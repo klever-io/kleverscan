@@ -19,9 +19,6 @@ export default createGlobalStyle`
     }
   }
 
-  body {
-  }
-
   body, input, textarea, button {
     font: 500 1rem Rubik, sans-serif;
   }

@@ -36,6 +36,7 @@ const Navbar: React.FC<INavbar> = ({ background, theme }) => {
 
       if (passLimit) {
         element.style.position = 'fixed';
+        element.style.top = '0';
         element.style.backgroundColor = theme.navbar.background;
       } else {
         element.style.position = 'unset';

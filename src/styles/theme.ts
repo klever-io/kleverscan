@@ -10,6 +10,14 @@ const theme = {
 
   input: {
     placeholder: '#9c9eb9',
+
+    shadow: '#191a29',
+    activeShadow: '#7418c2',
+
+    activeBorder: '#ee3f71',
+
+    error:
+      'linear-gradient(95deg, rgb(205, 52, 87), rgb(255, 68, 101), rgb(255, 68, 101))',
   },
 
   button: {

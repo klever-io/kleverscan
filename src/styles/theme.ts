@@ -3,7 +3,9 @@ const theme = {
   white: '#fff',
 
   navbar: {
-    background: '#2D3047',
+    background: '#2e2f47',
+    mobile: '#66688f',
+    mobileContainer: '#25253a',
   },
 
   input: {

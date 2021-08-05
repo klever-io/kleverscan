@@ -1,4 +1,6 @@
 import Head from 'next/head';
+import Navbar from '../components/Navbar';
+import { BackgroundVideo } from '../views/home';
 
 const Home: React.FC = () => {
   return (
@@ -8,7 +10,12 @@ const Home: React.FC = () => {
       </Head>
 
       <main>
-        <h1>Hello World</h1>
+        <BackgroundVideo>
+          <video playsInline autoPlay muted loop>
+            <source src="/background-video.mp4" type="video/mp4" />
+          </video>
+        </BackgroundVideo>
+        <Navbar background={false} />
       </main>
     </>
   );

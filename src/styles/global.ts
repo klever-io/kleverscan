@@ -27,11 +27,12 @@ export default createGlobalStyle`
   }
 
   input {
-    border: none;
+    border: unset;
+    
     background-color: transparent;
 
     &:focus {
-      outline: none;
+      outline: unset;
     }
   }
 
@@ -50,6 +51,12 @@ export default createGlobalStyle`
 
   button {
     cursor: pointer;
+
+    background-color: transparent;
+
+    border: unset;
+
+    color: ${props => props.theme.white};
   }
 
 `;

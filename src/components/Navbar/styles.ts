@@ -20,7 +20,7 @@ export const NavbarContainer = styled.nav<INavbar>`
   animation: 1s ease 0s 1 normal none running fadein;
 
   @media (max-width: 1200px) {
-    padding: 1rem 10rem;
+    padding: 1rem 7rem;
   }
 
   @media (max-width: 992px) {
@@ -91,6 +91,8 @@ export const MobileContainer = styled.div`
   left: 0;
   top: 4.6rem;
   width: 100%;
+
+  z-index: 2;
 
   padding: 1rem 2.5rem;
 

@@ -5,6 +5,7 @@ import { IInput } from '.';
 export const Container = styled.div<IInput>`
   padding: 0.1rem;
 
+  position: relative;
   display: flex;
   flex-direction: row;
 
@@ -42,10 +43,37 @@ export const Container = styled.div<IInput>`
     &::placeholder {
       color: ${props => props.theme.input.placeholder};
     }
+
+    @media (max-width: 1200px) {
+      min-width: 36rem;
+    }
+
+    @media (max-width: 560px) {
+      min-width: unset;
+    }
+  }
+
+  @media (max-width: 425px) {
+    padding: 0.5rem;
+    width: 95%;
+
+    justify-content: unset;
+
+    button {
+      position: absolute;
+
+      top: 4rem;
+      right: 25%;
+      width: 50%;
+    }
+
+    input {
+      width: 100%;
+    }
   }
 `;
 
-export const ErrorContainer = styled.div`
+export const ErrorContainer = styled.div<{ error: boolean }>`
   margin-top: 0.5rem;
   padding: 0.5rem 1rem;
 
@@ -55,7 +83,14 @@ export const ErrorContainer = styled.div`
 
   z-index: -1;
 
+  visibility: ${props => (props.error ? 'visible' : 'hidden')};
+  opacity: ${props => (props.error ? 1 : 0)};
+
   span {
     font-size: 1rem !important;
+  }
+
+  @media (max-width: 425px) {
+    margin-top: 5rem;
   }
 `;

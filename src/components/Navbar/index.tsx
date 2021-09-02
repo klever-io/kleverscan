@@ -24,6 +24,12 @@ export interface INavbar {
   theme: Theme;
 }
 
+interface IElement {
+  position: string;
+  top: string;
+  backgroundColor: string;
+}
+        
 const Navbar: React.FC<INavbar> = ({ background, theme }) => {
   const haveBackground = background === undefined ? true : background;
 
@@ -33,15 +39,22 @@ const Navbar: React.FC<INavbar> = ({ background, theme }) => {
       if (!element) return;
 
       const passLimit = window.pageYOffset > heightLimit;
+      const fixed: IElement = {
+        position: 'fixed',
+        top: '0',
+        backgroundColor: theme.navbar.background,
+      };
+      const unset: IElement = {
+        position: 'unset',
+        top: 'unset',
+        backgroundColor: 'transparent',
+      };
 
-      if (passLimit) {
-        element.style.position = 'fixed';
-        element.style.top = '0';
-        element.style.backgroundColor = theme.navbar.background;
-      } else {
-        element.style.position = 'unset';
-        element.style.backgroundColor = 'transparent';
-      }
+      const props = passLimit ? fixed : unset;
+
+      Object.keys(props).map(item => {
+        element.style[item] = props[item];
+      });
     };
 
     document.addEventListener('scroll', scrollHandle);

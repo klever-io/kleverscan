@@ -13,6 +13,7 @@ export interface INavbarItem {
 
 export const heightLimit = 70; // pixels
 export const navbarHeight = 5; // rem
+export const navbarPadding = '1rem 17.5rem';
 
 export const navbarItems: INavbarItem[] = [
   {

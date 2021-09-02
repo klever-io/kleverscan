@@ -44,11 +44,9 @@ const Input: React.FC<IInput> = ({ mainPage }) => {
           Search
         </Button>
       </Container>
-      {error && (
-        <ErrorContainer>
-          <span>{errorText}</span>
-        </ErrorContainer>
-      )}
+      <ErrorContainer error={error}>
+        <span>{errorText}</span>
+      </ErrorContainer>
     </>
   );
 };

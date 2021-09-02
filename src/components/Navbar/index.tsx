@@ -28,32 +28,38 @@ interface IElement {
   position: string;
   top: string;
   backgroundColor: string;
+  marginTop: string;
 }
-        
+
 const Navbar: React.FC<INavbar> = ({ background, theme }) => {
   const haveBackground = background === undefined ? true : background;
 
   useEffect(() => {
     const scrollHandle = () => {
       const element = document.getElementById('navbar');
-      if (!element) return;
+      const main = document.getElementsByTagName('main')[0];
+      if (!element || !main) return;
 
       const passLimit = window.pageYOffset > heightLimit;
       const fixed: IElement = {
         position: 'fixed',
         top: '0',
         backgroundColor: theme.navbar.background,
+        marginTop: '8.9375rem',
       };
       const unset: IElement = {
         position: 'unset',
         top: 'unset',
         backgroundColor: 'transparent',
+        marginTop: 'unset',
       };
 
       const props = passLimit ? fixed : unset;
 
       Object.keys(props).map(item => {
-        element.style[item] = props[item];
+        const el = item === 'marginTop' ? main : element;
+
+        el.style[item] = props[item];
       });
     };
 

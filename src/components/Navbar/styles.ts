@@ -9,6 +9,8 @@ export const NavbarContainer = styled.nav<INavbar>`
 
   display: flex;
 
+  z-index: 5;
+
   flex-direction: row;
   align-items: center;
 

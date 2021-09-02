@@ -22,7 +22,7 @@ export const BackgroundVideo = styled.div`
 
   video {
     min-width: 100%;
-
+    
     opacity: 0.6;
   }
 `;
@@ -161,7 +161,7 @@ export const BottomRow = styled(Row)`
 `;
 
 export const PriceHistoryContainer = styled.div`
-  padding: 1rem 1.5rem;
+  padding: 1rem 1rem;
 
   min-width: 18.75rem;
 
@@ -176,6 +176,8 @@ export const PriceHistoryContainer = styled.div`
   box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 10px 0px;
 
   span {
+    padding-bottom: 0.5rem;
+
     color: ${props => props.theme.input.placeholder};
     font-weight: 400;
     font-size: 0.775rem;
@@ -185,5 +187,124 @@ export const PriceHistoryContainer = styled.div`
 
   @media (max-width: 768px) {
     min-width: 13rem;
+  }
+`;
+
+export const LoaderContainer = styled.div`
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+`;
+
+export const ChartContainer = styled.div`
+  padding: 5rem 17.5rem 0 17.5rem;
+
+  display: flex;
+
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 2rem;
+
+  border-radius: 0.25rem;
+
+  @media (max-width: 1200px) {
+    padding-left: 7rem;
+    padding-right: 7rem;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+
+  @media (max-width: 425px) {
+    padding-top: 13rem;
+  }
+`;
+
+export const ChartContent = styled.div`
+  padding: 1rem 1.5rem 2rem 1.5rem;
+
+  width: 100%;
+  height: 20.31rem;
+
+  background-color: ${props => props.theme.white};
+
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 10px 0px;
+
+  span {
+    color: ${props => props.theme.input.placeholder};
+    font-weight: 400;
+  }
+`;
+
+export const TimeChart = styled(ChartContent)`
+  text-align: center;
+`;
+
+export const Divider = styled.div`
+  margin: 1rem 0;
+
+  width: 100%;
+  height: 1px;
+
+  background-color: ${props => props.theme.border};
+`;
+
+export const ReportsContainer = styled.div`
+  margin-top: 1.25rem;
+  padding-bottom: 3rem;
+
+  background-color: ${props => props.theme.background};
+`;
+
+export const ReportHeader = styled.div`
+  display: flex;
+
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  span {
+    color: ${props => props.theme.navbar.mobile};
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+
+  div {
+    &:first-child {
+      display: flex;
+
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+`;
+
+export const ReportHeaderIcon = styled.div`
+  padding: 0.5rem;
+  margin-right: 0.5rem;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background-image: ${props => props.theme.button.background};
+
+  color: ${props => props.theme.white};
+
+  border-radius: 0.5rem;
+
+  svg {
+    font-size: 1.5rem;
   }
 `;

@@ -1,3 +1,4 @@
+import { transparentize } from 'polished';
 import styled from 'styled-components';
 
 import { navbarHeight } from '../configs/navbar';
@@ -65,7 +66,7 @@ export const InputContainer = styled.section`
   }
 `;
 
-export const Container = styled.div`
+export const Container = styled.section`
   position: relative;
 `;
 
@@ -259,14 +260,14 @@ export const Divider = styled.div`
   background-color: ${props => props.theme.border};
 `;
 
-export const ReportsContainer = styled.div`
+export const ListContainer = styled.section`
   margin-top: 1.25rem;
   padding-bottom: 3rem;
 
   background-color: ${props => props.theme.background};
 `;
 
-export const ReportHeader = styled.div`
+export const ListHeader = styled.div`
   display: flex;
 
   flex-direction: row;
@@ -289,7 +290,7 @@ export const ReportHeader = styled.div`
   }
 `;
 
-export const ReportHeaderIcon = styled.div`
+export const ListHeaderIcon = styled.div`
   padding: 0.5rem;
   margin-right: 0.5rem;
 
@@ -307,4 +308,88 @@ export const ReportHeaderIcon = styled.div`
   svg {
     font-size: 1.5rem;
   }
+`;
+
+export const ListContent = styled.div`
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 12.5rem;
+
+  &::-webkit-scrollbar {
+    position: absolute;
+    width: 0.25rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 15px;
+  }
+
+  &:hover {
+    &::-webkit-scrollbar-thumb {
+      background: ${transparentize(0.75, '#000')};
+    }
+  }
+`;
+
+export const ListItem = styled.div`
+  margin-right: 10px;
+  padding: 0.5rem 0;
+
+  display: flex;
+
+  flex-direction: row;
+
+  justify-content: space-between;
+  align-items: center;
+
+  animation: 1s ease 0s 1 normal none running fadein;
+
+  div {
+    display: flex;
+
+    flex-direction: column;
+  }
+
+  span {
+    color: black;
+    font-weight: 400;
+  }
+
+  p {
+    font-weight: 400;
+    font-size: 0.875rem;
+    color: ${props => props.theme.input.placeholder};
+  }
+
+  a {
+    background-image: ${props => props.theme.text.background};
+    background-clip: text;
+    -webkit-background-clip: text;
+
+    color: transparent;
+
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+      text-decoration-color: ${props => props.theme.rose};
+    }
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid ${props => props.theme.border};
+  }
+`;
+
+export const ChartContentError = styled.div`
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;

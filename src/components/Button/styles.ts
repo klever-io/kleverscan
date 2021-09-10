@@ -1,26 +1,36 @@
-import { transparentize } from 'polished';
 import styled, { css } from 'styled-components';
+
+import { transparentize } from 'polished';
 
 import { IButton } from '.';
 
-export const Container = styled.div<IButton>`
+const ContainerMainPage = css`
+  background-color: unset;
+  background-image: ${props => props.theme.button.background};
+
+  border: unset;
+  border-radius: 0.5rem;
+`;
+
+export const Container = styled.button<IButton>`
   padding: 1rem 1.25rem;
 
   position: relative;
 
-  background-color: ${props => !props.mainPage && props.theme.white};
-  background-image: ${props => props.mainPage && props.theme.button.background};
+  background-color: ${props => props.theme.white};
 
-  border: 1px solid
-    ${props => (props.mainPage ? 'transparent' : props.theme.rose)};
-  border-radius: ${props => (props.mainPage ? 0.5 : 0.25)}rem;
+  border: 1px solid ${props => props.theme.rose};
+  border-radius: 0.25rem;
 
+  color: ${props => props.theme.white};
   font-size: 0.8rem;
   text-transform: uppercase;
 
   cursor: pointer;
 
   transition: 0.3s ease;
+
+  ${props => props.mainPage && ContainerMainPage};
 
   p {
     position: relative;

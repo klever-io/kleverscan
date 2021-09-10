@@ -5,6 +5,7 @@ const theme = {
 
   rose: '#EE3F71',
   purple: '#7D3FF1',
+  gray: '#EBEBEB',
 
   navbar: {
     background: '#2e2f47',
@@ -15,6 +16,8 @@ const theme = {
   input: {
     placeholder: '#9c9eb9',
 
+    border: '#DDDEE7',
+
     shadow: '#191a29',
     activeShadow: '#7418c2',
 
@@ -22,6 +25,22 @@ const theme = {
 
     error:
       'linear-gradient(95deg, rgb(205, 52, 87), rgb(255, 68, 101), rgb(255, 68, 101))',
+  },
+
+  table: {
+    shadow: '#DDDEE7',
+
+    text: '#66688f',
+    link: '#8B46A7',
+
+    icon: '#9c9eb9',
+
+    green: '#32D46C',
+    red: '#FF4465',
+
+    energy: 'linear-gradient(132.3deg, #33D46C 0%, #D3F13F 123.14%);',
+
+    helpIcon: '#9e9e9e',
   },
 
   text: {

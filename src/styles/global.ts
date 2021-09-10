@@ -56,4 +56,14 @@ export default createGlobalStyle`
     color: ${props => props.theme.white};
   }
 
+  @keyframes fadein {
+    from { 
+      opacity: 0; 
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
 `;

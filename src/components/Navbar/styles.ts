@@ -19,8 +19,6 @@ export const NavbarContainer = styled.nav<INavbar>`
 
   color: ${props => props.theme.white};
 
-  animation: 1s ease 0s 1 normal none running fadein;
-
   @media (max-width: 1200px) {
     padding: 1rem 7rem;
   }
@@ -34,6 +32,8 @@ export const NavbarContainer = styled.nav<INavbar>`
 
 export const LogoContainer = styled.div`
   margin-right: 7.5%;
+
+  cursor: pointer;
 `;
 
 export const ItemsContainer = styled.div`

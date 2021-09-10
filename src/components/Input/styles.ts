@@ -1,6 +1,18 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { IInput } from '.';
+
+const ContainerMainPage = css`
+  border: 1px solid transparent;
+  border-radius: 0.65rem;
+
+  box-shadow: 0px 12px 25px ${props => props.theme.input.shadow};
+
+  &:focus-within {
+    border-color: ${props => props.theme.input.activeBorder};
+    box-shadow: 0px 3px 20px ${props => props.theme.input.activeShadow};
+  }
+`;
 
 export const Container = styled.div<IInput>`
   padding: 0.1rem;
@@ -14,16 +26,24 @@ export const Container = styled.div<IInput>`
 
   background-color: ${props => props.theme.white};
 
-  border: 1px solid transparent;
-  border-radius: ${props => (props.mainPage ? 0.65 : 0.25)}rem;
-
-  box-shadow: 0px 12px 25px ${props => props.theme.input.shadow};
+  border: 1px solid ${props => props.theme.input.border};
+  border-radius: 0.25rem;
 
   transition: 0.5s ease;
 
+  ${props => props.mainPage && ContainerMainPage};
+
   &:focus-within {
     border-color: ${props => props.theme.input.activeBorder};
-    box-shadow: 0px 3px 20px ${props => props.theme.input.activeShadow};
+  }
+
+  div {
+    &:first-child {
+      display: flex;
+
+      flex-direction: row;
+      align-items: center;
+    }
   }
 
   svg {
@@ -55,7 +75,7 @@ export const Container = styled.div<IInput>`
 
   @media (max-width: 425px) {
     padding: 0.5rem;
-    width: 95%;
+    width: 80%;
 
     justify-content: unset;
 
@@ -67,14 +87,22 @@ export const Container = styled.div<IInput>`
       width: 50%;
     }
 
+    svg {
+      margin-left: 0;
+    }
+
     input {
-      width: 100%;
+      width: 85%;
+
+      position: absolute;
+      right: 0;
     }
   }
 `;
 
 export const ErrorContainer = styled.div<{ error: boolean }>`
-  margin-top: 0.5rem;
+  width: fit-content;
+  margin: 0.5rem auto 0 auto;
   padding: 0.5rem 1rem;
 
   background-image: ${props => props.theme.input.error};
@@ -87,6 +115,8 @@ export const ErrorContainer = styled.div<{ error: boolean }>`
   opacity: ${props => (props.error ? 1 : 0)};
 
   span {
+    font-weight: 400;
+    color: ${props => props.theme.white};
     font-size: 1rem !important;
   }
 

@@ -50,7 +50,9 @@ const Navbar: React.FC<INavbar> = ({ background, theme }) => {
       const unset: IElement = {
         position: 'unset',
         top: 'unset',
-        backgroundColor: 'transparent',
+        backgroundColor: haveBackground
+          ? theme.navbar.background
+          : 'transparent',
         marginTop: 'unset',
       };
 
@@ -68,7 +70,7 @@ const Navbar: React.FC<INavbar> = ({ background, theme }) => {
     return () => {
       document.removeEventListener('scroll', scrollHandle);
     };
-  }, [theme]);
+  }, [theme, haveBackground]);
 
   const handleMobileMenu = () => {
     const element = document.getElementById('mobile-menu');
@@ -91,9 +93,11 @@ const Navbar: React.FC<INavbar> = ({ background, theme }) => {
 
   return (
     <NavbarContainer id="navbar" background={haveBackground}>
-      <LogoContainer>
-        <Logo alt="Klever Logo" />
-      </LogoContainer>
+      <Link href="/" passHref>
+        <LogoContainer>
+          <Logo alt="Klever Logo" />
+        </LogoContainer>
+      </Link>
       <ItemsContainer>
         {navbarItems.map((item, index) => (
           <MenuOptions key={index} {...item} />

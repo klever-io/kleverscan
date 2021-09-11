@@ -337,7 +337,7 @@ export const getStaticProps: GetStaticProps<IHome> = async () => {
   };
 
   const blocks = await api.get('hyperblock/list');
-  if (blocks) {
+  if (Array.isArray(blocks)) {
     props.blocks = getLatest(blocks);
   } else {
     console.log(blocks.error.message);

@@ -177,14 +177,6 @@ const Address: React.FC<IAddress> = ({
               <strong>{available.toLocaleString()}</strong>
             </div>
           </ChartBody>
-          {/* <ChartBody>
-            <CircleChart active={percent > 0}>
-              <div>
-                <span>{percent}%</span>
-              </div>
-            </CircleChart>
-            <span>ola</span>
-          </ChartBody> */}
         </ChartContent>
       );
     };

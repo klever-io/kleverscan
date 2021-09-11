@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useRouter } from 'next/dist/client/router';
+import { useRouter } from 'next/router';
 
 import Head from 'next/head';
 import Navbar from '../Navbar';

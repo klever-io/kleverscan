@@ -23,7 +23,7 @@ export const BackgroundVideo = styled.div`
 
   video {
     min-width: 100%;
-    
+
     opacity: 0.6;
   }
 `;

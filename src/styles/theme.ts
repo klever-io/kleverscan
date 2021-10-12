@@ -43,8 +43,20 @@ const theme = {
     helpIcon: '#9e9e9e',
   },
 
+  content: {
+    tab: {
+      active: '#2D2E47',
+      inactive: '#9C9EB9',
+    },
+
+    divider: '#EEEFF6',
+  },
+
   text: {
+    black: '#2e2f47',
     background: 'linear-gradient(104deg, rgb(238, 63, 113), rgb(125, 63, 241))',
+    largeBackground:
+      'linear-gradient(104deg, rgb(238, 63, 113), rgb(125, 63, 241), rgb(125, 63, 241), rgb(238, 63, 113))',
   },
 
   button: {

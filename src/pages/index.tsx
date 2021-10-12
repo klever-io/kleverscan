@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import Link from 'next/link';
 import { GetStaticProps } from 'next';
 
+import { fromUnixTime } from 'date-fns';
 import { IconType } from 'react-icons/lib';
 
 import {
@@ -37,18 +38,17 @@ import {
   statsData,
 } from '../configs/home';
 
-import api from '../services/api';
+import { IResponse, IHyperblock, ITransaction } from '../types';
+import { breakText, getAge } from '../utils';
 
-import { IResponse, IBlock, ITransaction } from '../types';
+import api from '../services/api';
 
 import { FaLaravel } from 'react-icons/fa';
 import { BiSort } from 'react-icons/bi';
-import differenceInDays from 'date-fns/differenceInDays';
-import { breakText } from '../utils';
 
 interface IHome {
   transactions: ITransaction[];
-  blocks: IBlock[];
+  blocks: IHyperblock[];
   error: string;
 }
 
@@ -61,7 +61,7 @@ interface ISection {
   title: string;
   href: string;
   Icon: IconType;
-  data: (ITransaction | IBlock)[] | undefined;
+  data: (ITransaction | IHyperblock)[] | undefined;
   Component: React.FC<any>;
 }
 
@@ -71,16 +71,14 @@ interface ITransactionResponse extends IResponse {
   };
 }
 
+interface IHyperblockResponse extends IResponse {
+  data: {
+    hyperblocks: IHyperblock[];
+  };
+}
+
 const Home: React.FC<IHome> = ({ blocks, transactions }) => {
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    const time = 0.75 * 1000; //ms
-
-    setTimeout(() => {
-      setLoaded(true);
-    }, time); // simulate delay
-  }, []);
+  const [loaded] = useState(true);
 
   const StatsCard: React.FC = () => {
     return (
@@ -153,45 +151,46 @@ const Home: React.FC<IHome> = ({ blocks, transactions }) => {
     );
   };
 
-  const TransactionItem: React.FC<ITransaction> = ({ contract, timeStamp }) => {
+  const TransactionItem: React.FC<ITransaction> = ({
+    hash,
+    contract,
+    timeStamp,
+  }) => {
     const limitWordLetter = 14;
-    const diff = differenceInDays(new Date(timeStamp * 1000), new Date());
+    const contractPosition = 0;
+
+    const parameter = contract[contractPosition].parameter;
 
     return (
       <ListItem>
         <div>
           <span>
-            <a>{breakText('0x928bedfb95eba', limitWordLetter)}</a>
+            <a>{breakText(hash, limitWordLetter)}</a>
           </span>
-          <p>{`${Math.abs(diff)} days ago`}</p>
+          <p>{getAge(fromUnixTime(timeStamp))} ago</p>
         </div>
         <div>
           <span>
-            From{' '}
-            <a>
-              {breakText(contract[0].parameter.ownerAddress, limitWordLetter)}
-            </a>
+            From <a>{breakText(parameter.ownerAddress, limitWordLetter)}</a>
           </span>
           <span>
-            To{' '}
-            <a>{breakText(contract[0].parameter.toAddress, limitWordLetter)}</a>
+            To <a>{breakText(parameter.toAddress, limitWordLetter)}</a>
           </span>
         </div>
         <div>
-          <span>{contract[0].parameter.amount} KLV</span>
+          <span>{parameter.amount.toLocaleString()} KLV</span>
         </div>
       </ListItem>
     );
   };
 
-  const BlockItem: React.FC<IBlock> = ({
+  const BlockItem: React.FC<IHyperblock> = ({
     nonce,
     parentHash,
     timeStamp,
     sizeTxs,
   }) => {
     const limitWordLetter = 14;
-    const diff = differenceInDays(new Date(timeStamp * 1000), new Date());
 
     return (
       <ListItem>
@@ -199,7 +198,7 @@ const Home: React.FC<IHome> = ({ blocks, transactions }) => {
           <span>
             <a>{breakText(String(nonce), limitWordLetter)}</a>
           </span>
-          <p>{`${Math.abs(diff)} days ago`}</p>
+          <p>{getAge(fromUnixTime(timeStamp))} ago</p>
         </div>
         <div>
           <span>
@@ -244,17 +243,17 @@ const Home: React.FC<IHome> = ({ blocks, transactions }) => {
           </ListHeaderIcon>
           <span>{title}</span>
         </div>
-        <Link href={href} passHref>
-          <Button>
+        <Button>
+          <Link href={href}>
             <p>View All</p>
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </ListHeader>
     );
 
     const renderList = (
       Component: React.FC,
-      list: (ITransaction | IBlock)[] | undefined,
+      list: (ITransaction | IHyperblock)[] | undefined,
     ): JSX.Element => {
       const skeletonProps = { width: 200, height: 60 };
       const errorMessage = 'Unable to load data';
@@ -331,23 +330,22 @@ export const getStaticProps: GetStaticProps<IHome> = async () => {
 
   const getLatest = (array: any[]): any[] => {
     array.reverse();
-    array.length = 10;
+
+    if (array.length > 10) {
+      array.length = 10;
+    }
 
     return array;
   };
 
-  const blocks = await api.get('hyperblock/list');
-  if (Array.isArray(blocks)) {
-    props.blocks = getLatest(blocks);
-  } else {
-    console.log(blocks.error.message);
+  const blocks: IHyperblockResponse = await api.get('hyperblock/list');
+  if (!blocks.error) {
+    props.blocks = getLatest(blocks.data.hyperblocks);
   }
 
   const transactions: ITransactionResponse = await api.get('transaction/list');
   if (!transactions.error) {
     props.transactions = getLatest(transactions.data.transactions);
-  } else {
-    console.log(transactions.error.message);
   }
 
   return { props };

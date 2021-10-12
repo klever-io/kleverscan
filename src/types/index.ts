@@ -9,7 +9,13 @@ interface IContract {
   parameter: IParameter;
 }
 
+export enum Contract {
+  Transfer,
+  Contract,
+}
+
 export interface ITransaction {
+  hash: string;
   blockNum: number;
   sender: string;
   expiration: number;
@@ -22,16 +28,50 @@ export interface ITransaction {
   contract: IContract[];
 }
 
-export interface IBlock {
+export interface IHyperblock {
   nonce: number;
   parentHash: string;
   timeStamp: number;
-  transactions: Array<any>;
+  slot: number;
+  epoch: number;
+  isEpochStart: boolean;
+  size: number;
   sizeTxs: number;
+  transactions: ITransaction[];
+  txRootHash: string;
+  trieRoot: string;
+  validatorsTrieRoot: string;
+  stakingTrieRoot: string;
+  assetTrieRoot: string;
+  producerID: number;
+  ProducerPublicKey: string;
+  producerSignature: string;
+  prevRandSeed: string;
+  randSeed: string;
+  txCount: number;
+  txHashes: any[];
+  softwareVersion: string;
+  chainID: string;
+}
+
+export interface IAccount {
+  address: string;
+  balance: number;
+  blsPublicKey: string;
+  assets: any;
+  buckets: any;
 }
 
 interface IError {
   message: string;
+}
+
+export interface IPagination {
+  next: number;
+  previous: number;
+  perPage: number;
+  totalPages: number;
+  totalRecords: number;
 }
 
 export interface IResponse {

@@ -56,6 +56,21 @@ export default createGlobalStyle`
     color: ${props => props.theme.white};
   }
 
+  a {
+    background-image: ${props => props.theme.text.background};
+    background-clip: text;
+    -webkit-background-clip: text;
+
+    color: transparent;
+
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+      text-decoration-color: ${props => props.theme.rose};
+    }
+  }
+
   @keyframes fadein {
     from { 
       opacity: 0; 
@@ -65,5 +80,4 @@ export default createGlobalStyle`
       opacity: 1;
     }
   }
-
 `;

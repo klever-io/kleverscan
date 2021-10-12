@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 
 import { GetStaticProps } from 'next';
 
@@ -35,11 +35,13 @@ import { IoSnowOutline } from 'react-icons/io5';
 import { MdKeyboardArrowUp, MdKeyboardArrowDown } from 'react-icons/md';
 import { IoMdWifi, IoMdHelp } from 'react-icons/io';
 import { VscSymbolEvent } from 'react-icons/vsc';
+import api from '../../services/api';
+import { IAccount, IPagination, IResponse } from '../../types';
 
 interface IAddress {
   address: string;
   name: string;
-  balance: string;
+  balance: number;
   convertedBalance: string;
   available: string;
   frozen: string;
@@ -54,6 +56,16 @@ interface IAddress {
   };
 }
 
+interface IAccountResponse extends IResponse {
+  data: {
+    account: IAccount;
+  };
+}
+
+interface ITransactionsResponse extends IResponse {
+  pagination: IPagination;
+}
+
 interface Chart {
   Icon: IconType;
   title: string;
@@ -63,7 +75,7 @@ interface Chart {
 
 const Address: React.FC<IAddress> = ({
   address,
-  name,
+  // name,
   balance,
   convertedBalance,
   available,
@@ -86,21 +98,21 @@ const Address: React.FC<IAddress> = ({
     return chartsProps;
   };
 
-  const getName = () => {
-    if (!name) {
-      return '--';
-    }
+  // const getName = () => {
+  //   if (!name) {
+  //     return '--';
+  //   }
 
-    return name;
-  };
+  //   return name;
+  // };
 
   const AddressInfo = () => {
     return (
       <AddressInfoContainer>
         <span>Address</span>
         <p>{address}</p>
-        <span>Name</span>
-        <p>{getName()}</p>
+        {/* <span>Name</span>
+        <p>{getName()}</p> */}
       </AddressInfoContainer>
     );
   };
@@ -111,7 +123,7 @@ const Address: React.FC<IAddress> = ({
         <BalanceHeader>
           <span>Balance</span>
           <div>
-            <span>{balance} TRX</span>
+            <span>{balance.toLocaleString()} KLV</span>
             <p>({convertedBalance} USD)</p>
           </div>
         </BalanceHeader>
@@ -197,10 +209,10 @@ const Address: React.FC<IAddress> = ({
           </EnergyLoader>
           <ChartContainer>
             {getChartProps().map((chart, index) => (
-              <>
-                <Chart key={index} {...chart} />
+              <Fragment key={String(index)}>
+                <Chart {...chart} />
                 {index === 0 && <HorizontalDivider />}
-              </>
+              </Fragment>
             ))}
           </ChartContainer>
         </EnergyContainer>
@@ -237,31 +249,38 @@ const Address: React.FC<IAddress> = ({
 };
 
 export const getServerSideProps: GetStaticProps = async ({ params }) => {
-  const accountLength = 34;
+  const accountLength = 62;
+  const redirectProps = { redirect: { destination: '/404', permanent: false } };
 
-  let address;
-  if (params && params.address) {
-    address = params.address;
-  }
+  const address = String(params?.accounts);
 
   if (!address || address.length !== accountLength) {
-    return {
-      redirect: { destination: '/404', permanent: false },
-    };
+    return redirectProps;
+  }
+
+  const account: IAccountResponse = await api.get({
+    route: `address/${address}`,
+  });
+  const transactions: ITransactionsResponse = await api.get({
+    route: `address/${address}/transactions`,
+  });
+
+  if (account.error) {
+    return redirectProps;
   }
 
   const props: IAddress = {
-    address: 'TKi8JMDijic2QXF2oRe7Xg82fTbNa2gATr',
+    address,
     name: '',
-    balance: '14.670.46696',
+    balance: account.data.account.balance,
     convertedBalance: '698.949',
     available: '14,000.46696',
     frozen: '14,000.46696',
     transfers: {
-      send: 1000,
-      receive: 1000,
+      send: 0,
+      receive: 0,
     },
-    transactions: 21793,
+    transactions: transactions.pagination.totalRecords || 0,
     energy: {
       used: 1531,
       available: 10000,

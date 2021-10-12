@@ -115,8 +115,8 @@ export const ErrorContainer = styled.div<{ error: boolean }>`
   opacity: ${props => (props.error ? 1 : 0)};
 
   span {
-    font-weight: 400;
-    color: ${props => props.theme.white};
+    font-weight: 400 !important;
+    color: ${props => props.theme.white} !important;
     font-size: 1rem !important;
   }
 

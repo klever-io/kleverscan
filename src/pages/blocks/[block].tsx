@@ -74,6 +74,7 @@ const Block: React.FC<IHyperblock> = props => {
     { title: 'Transactions', data: transactionData },
     { title: 'Hashes', data: hashesData },
   ];
+  const title = 'Block Details';
 
   const [selectedTab, setSelectedTab] = useState<ITab>(tabs[0]);
 
@@ -124,7 +125,7 @@ const Block: React.FC<IHyperblock> = props => {
         <HeaderIcon>
           <FaLaravel />
         </HeaderIcon>
-        <h3>Block Details</h3>
+        <h3>{title}</h3>
       </Header>
 
       <Content>

@@ -355,6 +355,12 @@ export const ListItem = styled.div`
   }
 
   span {
+    max-width: 10rem;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
     color: black;
     font-weight: 400;
   }

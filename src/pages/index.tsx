@@ -39,7 +39,7 @@ import {
 } from '../configs/home';
 
 import { IResponse, IHyperblock, ITransaction } from '../types';
-import { breakText, getAge } from '../utils';
+import { getAge } from '../utils';
 
 import api from '../services/api';
 
@@ -49,7 +49,6 @@ import { BiSort } from 'react-icons/bi';
 interface IHome {
   transactions: ITransaction[];
   blocks: IHyperblock[];
-  error: string;
 }
 
 interface IChart {
@@ -156,29 +155,29 @@ const Home: React.FC<IHome> = ({ blocks, transactions }) => {
     contract,
     timeStamp,
   }) => {
-    const limitWordLetter = 14;
     const contractPosition = 0;
-
     const parameter = contract[contractPosition].parameter;
+
+    const amount = contract[contractPosition].parameter.amount || 0;
 
     return (
       <ListItem>
         <div>
           <span>
-            <a>{breakText(hash, limitWordLetter)}</a>
+            <a>{hash}</a>
           </span>
           <p>{getAge(fromUnixTime(timeStamp))} ago</p>
         </div>
         <div>
           <span>
-            From <a>{breakText(parameter.ownerAddress, limitWordLetter)}</a>
+            From <a>{parameter.ownerAddress}</a>
           </span>
           <span>
-            To <a>{breakText(parameter.toAddress, limitWordLetter)}</a>
+            To <a>{parameter.toAddress}</a>
           </span>
         </div>
         <div>
-          <span>{parameter.amount.toLocaleString()} KLV</span>
+          <span>{amount.toLocaleString()} KLV</span>
         </div>
       </ListItem>
     );
@@ -189,33 +188,31 @@ const Home: React.FC<IHome> = ({ blocks, transactions }) => {
     parentHash,
     timeStamp,
     sizeTxs,
-  }) => {
-    const limitWordLetter = 14;
-
-    return (
-      <ListItem>
-        <div>
-          <span>
-            <a>{breakText(String(nonce), limitWordLetter)}</a>
-          </span>
-          <p>{getAge(fromUnixTime(timeStamp))} ago</p>
-        </div>
-        <div>
-          <span>
-            Miner <a>{breakText(parentHash, limitWordLetter)}</a>
-          </span>
-          <span>
-            <p>
-              <a>{sizeTxs} txns</a> in {0} secs
-            </p>
-          </span>
-        </div>
-        <div>
-          <span>{0} KLV</span>
-        </div>
-      </ListItem>
-    );
-  };
+  }) => (
+    <ListItem>
+      <div>
+        <span>
+          <Link href={`/blocks/${nonce}`}>
+            <a>{nonce}</a>
+          </Link>
+        </span>
+        <p>{getAge(fromUnixTime(timeStamp))} ago</p>
+      </div>
+      <div>
+        <span>
+          Miner <a>{parentHash}</a>
+        </span>
+        <span>
+          <p>
+            <a>{sizeTxs} txns</a> in {0} secs
+          </p>
+        </span>
+      </div>
+      <div>
+        <span>{0} KLV</span>
+      </div>
+    </ListItem>
+  );
 
   const ReportList: React.FC = () => {
     const sections: ISection[] = [
@@ -266,7 +263,7 @@ const Home: React.FC<IHome> = ({ blocks, transactions }) => {
         );
       }
 
-      if (!list) {
+      if (!list || list.length === 0) {
         return (
           <ChartContentError>
             <span>{errorMessage}</span>
@@ -326,26 +323,20 @@ const Home: React.FC<IHome> = ({ blocks, transactions }) => {
 };
 
 export const getStaticProps: GetStaticProps<IHome> = async () => {
-  const props: IHome = { blocks: [], transactions: [], error: '' };
+  const props: IHome = { blocks: [], transactions: [] };
 
-  const getLatest = (array: any[]): any[] => {
-    array.reverse();
-
-    if (array.length > 10) {
-      array.length = 10;
-    }
-
-    return array;
-  };
-
-  const blocks: IHyperblockResponse = await api.get('hyperblock/list');
+  const blocks: IHyperblockResponse = await api.get({
+    route: 'hyperblock/list',
+  });
   if (!blocks.error) {
-    props.blocks = getLatest(blocks.data.hyperblocks);
+    props.blocks = blocks.data.hyperblocks;
   }
 
-  const transactions: ITransactionResponse = await api.get('transaction/list');
+  const transactions: ITransactionResponse = await api.get({
+    route: 'transaction/list',
+  });
   if (!transactions.error) {
-    props.transactions = getLatest(transactions.data.transactions);
+    props.transactions = transactions.data.transactions;
   }
 
   return { props };

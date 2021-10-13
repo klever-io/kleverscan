@@ -37,7 +37,7 @@ export const statsData: IStats[] = [
   },
   {
     Side: BottomRow,
-    name: 'Transaction Last Day',
+    name: 'Transactions Last Day',
     value: 0,
     haveCoin: false,
   },

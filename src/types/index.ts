@@ -5,13 +5,20 @@ interface IParameter {
 }
 
 interface IContract {
-  type: number;
+  type: Contract;
   parameter: IParameter;
 }
 
 export enum Contract {
   Transfer,
-  Contract,
+  CreateAsset,
+  CreateValidator,
+  ValidatorConfig,
+  Freeze,
+  Unfreeze,
+  Delegate,
+  Undelegate,
+  Withdraw,
 }
 
 export interface ITransaction {

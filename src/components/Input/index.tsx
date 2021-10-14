@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, KeyboardEvent } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -11,10 +11,6 @@ export interface IInput {
   mainPage?: boolean;
 }
 
-interface KeyboardEvent {
-  key: string;
-}
-
 const Input: React.FC<IInput> = ({ mainPage }) => {
   const router = useRouter();
 
@@ -24,20 +20,6 @@ const Input: React.FC<IInput> = ({ mainPage }) => {
   const isMainPage: boolean = mainPage === undefined ? false : mainPage;
   const placeholderText = 'Search Address, Block, Transfer';
   const errorText = 'Invalid Address, Block, Transfer.';
-
-  useEffect(() => {
-    const enterHandle = (event: KeyboardEvent) => {
-      if (event.key === 'Enter') {
-        handleSearch();
-      }
-    };
-
-    window.addEventListener('keypress', enterHandle);
-
-    return () => {
-      window.removeEventListener('keypress', enterHandle);
-    };
-  }, []);
 
   const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (error) {
@@ -77,12 +59,22 @@ const Input: React.FC<IInput> = ({ mainPage }) => {
     router.push(`/${type}/${inputValue}`);
   };
 
+  const keyDownHandle = (event: KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
     <>
       <Container mainPage={isMainPage}>
         <div>
           <FiSearch />
-          <input placeholder={placeholderText} onChange={handleInput} />
+          <input
+            placeholder={placeholderText}
+            onChange={handleInput}
+            onKeyDown={keyDownHandle}
+          />
         </div>
         <Button mainPage onClick={handleSearch}>
           Search

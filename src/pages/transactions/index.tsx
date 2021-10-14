@@ -64,7 +64,7 @@ const Transactions: React.FC<ITransactionPage> = ({
     transactions.map((transaction, index) => {
       const created = format(fromUnixTime(transaction.timeStamp), 'MM/dd/yyyy');
       const contract = transaction.contract
-        .map(contract => Contract[contract.type])
+        .map(contract => Object.values(Contract)[contract.type])
         .join(', ');
 
       return (

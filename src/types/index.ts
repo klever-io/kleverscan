@@ -1,27 +1,14 @@
-
 export enum Contract {
-  Transfer,
-  CreateAsset,
-  CreateValidator,
-  ValidatorConfig,
-  Freeze,
-  Unfreeze,
-  Delegate,
-  Undelegate,
-  Withdraw
+  Transfer = 'Transfer',
+  CreateAsset = 'Create Asset',
+  CreateValidator = 'Create Validator',
+  ValidatorConfig = 'Config Validator',
+  Freeze = 'Freeze',
+  Unfreeze = 'Unfreeze',
+  Delegate = 'Delegate',
+  Undelegate = 'Undelegate',
+  Withdraw = 'Withdraw',
 }
-
-export const contracts = {
-  0: 'Transfer',
-  1: 'Create Asset',
-  2: 'Create Validator',
-  3: 'Config Validator',
-  4: 'Freeze',
-  5: 'Unfreeze',
-  6: 'Delegate',
-  7: 'Undelegate',
-}
-
 
 export interface ITransferContract {
   amount: number;
@@ -47,8 +34,8 @@ export interface ICreateValidatorContract {
     canDelegate: boolean;
     commission: number;
     maxDelegationAmount: number;
-    rewardAddress: string
-  }
+    rewardAddress: string;
+  };
 }
 
 export interface IValidatorConfigContract {
@@ -57,8 +44,8 @@ export interface IValidatorConfigContract {
     canDelegate: boolean;
     commission: number;
     maxDelegationAmount: number;
-    rewardAddress: string
-  }
+    rewardAddress: string;
+  };
 }
 
 export interface IFreezeContract {
@@ -86,9 +73,13 @@ export interface IWithdrawContract {
   toAddress: string;
 }
 
-type IParameter = ITransferContract | ICreateAssetContract | ICreateValidatorContract | IValidatorConfigContract |
-  IFreezeContract | IUnfreezeContract
-
+type IParameter =
+  | ITransferContract
+  | ICreateAssetContract
+  | ICreateValidatorContract
+  | IValidatorConfigContract
+  | IFreezeContract
+  | IUnfreezeContract;
 
 interface IContract {
   type: Contract;
@@ -96,7 +87,7 @@ interface IContract {
 }
 
 export interface ICreateAssetReceipt {
-  assetId: string
+  assetId: string;
 }
 
 export interface IFreezeReceipt {
@@ -104,12 +95,10 @@ export interface IFreezeReceipt {
 }
 
 export interface IUnfreezeReceipt {
-  availableWithdrawEpoch: number
+  availableWithdrawEpoch: number;
 }
 
-
-
-export type IReceipt = ICreateAssetReceipt | IFreezeReceipt | IUnfreezeReceipt
+export type IReceipt = ICreateAssetReceipt | IFreezeReceipt | IUnfreezeReceipt;
 
 export interface ITransaction {
   hash: string;
@@ -128,8 +117,6 @@ export interface ITransaction {
   contract: IContract[];
   receipt: IReceipt[];
 }
-
-
 
 export interface IHyperblock {
   nonce: number;

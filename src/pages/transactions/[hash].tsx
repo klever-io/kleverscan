@@ -1,27 +1,28 @@
-import React, { Fragment, useState, useEffect } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import { FaLaravel } from 'react-icons/fa';
-import { GetStaticProps } from "next";
-import { format, fromUnixTime } from 'date-fns'
+import React from 'react';
+
+import { GetStaticProps } from 'next';
+import { format, fromUnixTime } from 'date-fns';
 import 'react-toastify/dist/ReactToastify.css';
-import Link from 'next/link';
 
-import { contracts, ITransaction, IResponse, Contract, ITransferContract, ICreateAssetContract, ICreateAssetReceipt, IFreezeReceipt, IUnfreezeReceipt, ICreateValidatorContract, IFreezeContract, IUnfreezeContract, IWithdrawContract } from "../../types";
 import {
-  Container,
-  Content,
-  Divider,
-  Header,
-  HeaderIcon,
-  Indicator,
-  Info,
-  Tab,
-  TabContainer,
-} from '../../views/blocks';
+  ITransaction,
+  IResponse,
+  Contract,
+  ITransferContract,
+  ICreateAssetContract,
+  ICreateAssetReceipt,
+  IFreezeReceipt,
+  IUnfreezeReceipt,
+  ICreateValidatorContract,
+  IFreezeContract,
+  IUnfreezeContract,
+  IWithdrawContract,
+} from '../../types';
 
-import Input from '../../components/Input';
+import Detail, { ITab, ITabData } from '../../components/Layout/Detail';
 
-import api from "../../services/api";
+import api from '../../services/api';
+import { navbarItems } from '../../configs/navbar';
 
 interface ITransactionResponse extends IResponse {
   data: {
@@ -29,296 +30,236 @@ interface ITransactionResponse extends IResponse {
   };
 }
 
-interface IData {
-  name: string;
-  info: string | number | boolean;
-  linked?: string;
-}
-
-
-interface ITab {
-  title: string;
-  data: Array<IData>
-}
 const Transaction: React.FC<ITransaction> = props => {
+  const getContractTypeName = (type: Contract) => Object.values(Contract)[type];
 
-  const getContract = (): IData[] => {
-    const { contract } = props;
+  const getContract = (): ITabData[] => {
+    const { contract: contracts } = props;
+    const contract = contracts[0];
 
-    if (contract.length <= 0) {
-      return [] as IData[]
+    if (contracts.length <= 0) {
+      return [] as ITabData[];
     }
 
-    console.log(contract[0].type)
-
-    switch (contract[0].type) {
+    switch (getContractTypeName(contract.type)) {
       case Contract.Transfer:
-
-        const transferParam = contract[0].parameter as ITransferContract
+        const transferParam = contract.parameter as ITransferContract;
 
         return [
-          { name: 'Contract', info: contracts[contract[0].type] },
-          { name: 'From', info: transferParam.ownerAddress },
-          { name: 'To', info: transferParam.toAddress },
-          { name: 'Amount', info: transferParam.amount },
-          ...(!!transferParam.assetAddress ? [{ name: 'Asset Address', info: transferParam.assetAddress }] : [])
-        ]
-
+          { name: 'Contract', info: getContractTypeName(contract.type) },
+          {
+            name: 'From',
+            info: transferParam.ownerAddress,
+            linked: `/accounts/${transferParam.ownerAddress}`,
+          },
+          {
+            name: 'To',
+            info: transferParam.toAddress,
+            linked: `/accounts/${transferParam.toAddress}`,
+          },
+          { name: 'Amount', info: transferParam.amount.toLocaleString() },
+          ...(!!transferParam.assetAddress
+            ? [
+                {
+                  name: 'Asset Address',
+                  info: transferParam.assetAddress,
+                  linked: `/assets/${transferParam.assetAddress}`,
+                },
+              ]
+            : []),
+        ];
 
       case Contract.CreateAsset:
-        const createAssetParam = contract[0].parameter as ICreateAssetContract
+        const createAssetParam = contract.parameter as ICreateAssetContract;
 
         return [
-          { name: 'Contract', info: contracts[contract[0].type] },
+          { name: 'Contract', info: getContractTypeName(contract.type) },
           { name: 'Name', info: createAssetParam.name },
-          { name: 'Owner Address', info: createAssetParam.ownerAddress },
+          {
+            name: 'Owner Address',
+            info: createAssetParam.ownerAddress,
+            linked: `/accounts/${createAssetParam.ownerAddress}`,
+          },
           { name: 'Token', info: createAssetParam.ticker },
           { name: 'Precision', info: createAssetParam.precision },
-          { name: 'Circulating Supply', info: createAssetParam.circulatingSupply },
+          {
+            name: 'Circulating Supply',
+            info: createAssetParam.circulatingSupply,
+          },
           { name: 'Initial Supply', info: createAssetParam.initialSupply },
           { name: 'Max Supply', info: createAssetParam.maxSupply },
-        ]
+        ];
 
       case Contract.CreateValidator:
       case Contract.ValidatorConfig:
-
-        console.log(contract[0].parameter)
-
-
-        const validatorParam = contract[0].parameter as ICreateValidatorContract
-
+        const validatorParam = contract.parameter as ICreateValidatorContract;
 
         return [
-          { name: 'Contract', info: contracts[contract[0].type] },
-          { name: 'Owner Address', info: validatorParam.ownerAddress },
-          { name: 'Can Delegate', info: validatorParam.config.canDelegate ? "True" : "False" },
+          { name: 'Contract', info: getContractTypeName(contract.type) },
+          {
+            name: 'Owner Address',
+            info: validatorParam.ownerAddress,
+            linked: `/accounts/${validatorParam.ownerAddress}`,
+          },
+          {
+            name: 'Can Delegate',
+            info: validatorParam.config.canDelegate ? 'True' : 'False',
+          },
           { name: 'Comission', info: validatorParam.config.commission },
-          { name: 'Max Delegation Amount', info: validatorParam.config.maxDelegationAmount },
-          { name: 'Reward address', info: validatorParam.config.rewardAddress },
-        ]
+          {
+            name: 'Max Delegation Amount',
+            info: validatorParam.config.maxDelegationAmount,
+          },
+          {
+            name: 'Reward address',
+            info: validatorParam.config.rewardAddress,
+            linked: `/accounts/${validatorParam.config.rewardAddress}`,
+          },
+        ];
 
       case Contract.Freeze:
-
-
-        const freezeParam = contract[0].parameter as IFreezeContract
+        const freezeParam = contract.parameter as IFreezeContract;
 
         return [
-          { name: 'Contract', info: contracts[contract[0].type] },
-          { name: 'Owner Address', info: freezeParam.ownerAddress },
-          { name: 'Owner Address', info: freezeParam.amount },
-        ]
-
-
+          { name: 'Contract', info: getContractTypeName(contract.type) },
+          {
+            name: 'Owner Address',
+            info: freezeParam.ownerAddress,
+            linked: `/accounts/${freezeParam.ownerAddress}`,
+          },
+          { name: 'Amount', info: freezeParam.amount.toLocaleString() },
+        ];
 
       case Contract.Unfreeze:
       case Contract.Delegate:
       case Contract.Undelegate:
-
-        const params = contract[0].parameter as IUnfreezeContract
+        const params = contract.parameter as IUnfreezeContract;
 
         return [
-          { name: 'Contract', info: contracts[contract[0].type] },
-          { name: 'Owner Address', info: params.ownerAddress },
+          { name: 'Contract', info: getContractTypeName(contract.type) },
+          {
+            name: 'Owner Address',
+            info: params.ownerAddress,
+            linked: `/accounts/${params.ownerAddress}`,
+          },
           { name: 'Bucket ID', info: params.bucketID },
-        ]
+        ];
 
       case Contract.Withdraw:
-
-        const withDrawParams = contract[0].parameter as IWithdrawContract
+        const withDrawParams = contract.parameter as IWithdrawContract;
 
         return [
-          { name: 'Contract', info: contracts[contract[0].type] },
-          { name: 'Owner Address', info: withDrawParams.ownerAddress },
-          { name: 'To Address', info: withDrawParams.toAddress },
-
-        ]
+          { name: 'Contract', info: getContractTypeName(contract.type) },
+          {
+            name: 'Owner Address',
+            info: withDrawParams.ownerAddress,
+            linked: `/accounts/${withDrawParams.ownerAddress}`,
+          },
+          {
+            name: 'To Address',
+            info: withDrawParams.toAddress,
+            linked: `/accounts/${withDrawParams.toAddress}`,
+          },
+        ];
 
       default:
-        console.log("OPAAA")
-        return [] as IData[]
+        return [] as ITabData[];
     }
-  }
+  };
 
-  const getReceipt = (): IData[] => {
-    const { contract, receipt } = props;
+  const getReceipt = (): ITabData[] => {
+    const { contract: contracts, receipt: receipts } = props;
 
-    if (contract.length <= 0) {
-      return [] as IData[]
+    if (
+      !contracts ||
+      contracts.length <= 0 ||
+      !receipts ||
+      receipts.length <= 0
+    ) {
+      return [] as ITabData[];
     }
 
-    switch (contract[0].type) {
+    const contract = contracts[0];
+    const receipt = receipts[0];
+
+    switch (getContractTypeName(contract.type)) {
       case Contract.CreateAsset:
+        const createAssetReceipt = receipt as ICreateAssetReceipt;
 
-        const createAssetReceipt = receipt[0] as ICreateAssetReceipt
-
-        return [
-          { name: 'Asset ID', info: createAssetReceipt.assetId },
-        ]
+        return [{ name: 'Asset ID', info: createAssetReceipt.assetId }];
 
       case Contract.Freeze:
+        const freezeReceipt = receipt as IFreezeReceipt;
 
-        const freezeReceipt = receipt[0] as IFreezeReceipt
-
-        return [
-          { name: 'Bucket ID', info: freezeReceipt.bucketId },
-        ]
-
+        return [{ name: 'Bucket ID', info: freezeReceipt.bucketId }];
 
       case Contract.Unfreeze:
-
-        const unfreezeReceipt = receipt[0] as IUnfreezeReceipt
+        const unfreezeReceipt = receipt as IUnfreezeReceipt;
 
         return [
-          { name: 'Avaliable Withdraw Epoch', info: unfreezeReceipt.availableWithdrawEpoch },
-        ]
+          {
+            name: 'Avaliable Withdraw Epoch',
+            info: unfreezeReceipt.availableWithdrawEpoch,
+          },
+        ];
 
       default:
-        return [] as IData[]
+        return [] as ITabData[];
     }
-  }
+  };
 
-
-  const overviewData: IData[] = [
+  const overviewData: ITabData[] = [
     { name: 'Hash', info: props.hash },
     { name: 'Block Number', info: props.blockNum },
-    { name: 'Sender', info: props.sender },
-    { name: 'Timestamp', info: format(fromUnixTime(props.timeStamp), "dd/MM/yyyy HH:mm") },
+    { name: 'Sender', info: props.sender, linked: `/accounts/${props.sender}` },
+    {
+      name: 'Timestamp',
+      info: format(fromUnixTime(props.timeStamp), 'dd/MM/yyyy HH:mm'),
+    },
     { name: 'Signature', info: props.signature },
     { name: 'Kapp Fee', info: props.kappFee },
     { name: 'Bandwith Fee', info: props.bandwidthFee },
     { name: 'Consumed Fee', info: props.consumedFee },
   ];
 
+  const contractData = getContract();
+  const receiptData = getReceipt();
 
-
-  const contractData = getContract()
-  const receiptData = getReceipt()
-
-
+  const title = 'Transaction Details';
   const tabs: ITab[] = [
     { title: 'Overview', data: overviewData },
     { title: 'Contract', data: contractData },
-    ...(receiptData.length > 0 ? [{ title: 'Receipt', data: receiptData }] : [])
+    ...(receiptData.length > 0
+      ? [{ title: 'Receipt', data: receiptData }]
+      : []),
   ];
+  const Icon = navbarItems.find(item => item.name === 'Transactions')?.Icon;
 
+  const detailProps = { title, tabs, Icon };
 
-
-  const [selectedTab, setSelectedTab] = useState<ITab>(tabs[0]);
-
-  useEffect(() => {
-    const tab = document.getElementById(
-      `tab-${selectedTab.title.toLowerCase()}`,
-    );
-    const indicator = document.getElementById('tab-indicator');
-
-    if (indicator && tab) {
-      indicator.style.width = `${String(tab.offsetWidth)}px`;
-      indicator.style.transform = `translateX(${String(tab.offsetLeft)}px)`;
-    }
-  }, [selectedTab]);
-
-
-  const renderTabs = () =>
-    tabs.map((tab, index) => {
-      const id = `tab-${tab.title.toLowerCase()}`;
-      const active = tab.title === selectedTab.title;
-      const handleTab = () => setSelectedTab(tab);
-
-      const props = { id, active, onClick: handleTab };
-
-      return (
-        <Tab key={String(index)} {...props}>
-          {tab.title}
-        </Tab>
-      );
-    });
-
-
-  const handleCopyInfo = (info: string, data: string | number | boolean) => {
-    const toastProps = {
-      autoClose: 2000,
-      pauseOnHover: false,
-      closeOnClick: true,
-    };
-
-    navigator.clipboard.writeText(String(data));
-    toast.info(`${info} copied to clipboard`, toastProps);
-  };
-
-
-
-  return (
-    <Container>
-      <ToastContainer />
-      <Input />
-      <Header>
-        <HeaderIcon>
-          <FaLaravel />
-        </HeaderIcon>
-        <h3>Transaction Details</h3>
-      </Header>
-
-      <Content>
-        <TabContainer>
-          <Indicator id="tab-indicator" />
-
-
-          {renderTabs()}
-        </TabContainer>
-        {selectedTab.data.map((data, index) => {
-          return (
-            <Fragment key={String(index)}>
-              <Info>
-                <span>{data.name}</span>
-                {data.linked ? (
-                  <Link href={data.linked}>{data.info}</Link>
-                ) : (
-                  <p onClick={() => handleCopyInfo(data.name, data.info)}>
-                    {data.info}
-                  </p>
-                )}
-              </Info>
-
-              {index + 1 !== selectedTab.data.length && <Divider />}
-            </Fragment>
-          );
-        })}
-      </Content>
-
-
-
-    </ Container>
-  )
-
-}
-
+  return <Detail {...detailProps} />;
+};
 
 export const getServerSideProps: GetStaticProps<ITransaction> = async ({
   params,
 }) => {
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
 
-  const hash = params?.hash
-
+  const hash = params?.hash;
   if (!hash) {
     return redirectProps;
   }
 
   const transaction: ITransactionResponse = await api.get({
-    route: `transaction/${hash}`
-  })
-
-
+    route: `transaction/${hash}`,
+  });
   if (transaction.error) {
     return redirectProps;
   }
 
-  const props: ITransaction = transaction.data.transaction
+  const props: ITransaction = transaction.data.transaction;
 
   return { props };
 };
 
-
-
-
-export default Transaction
+export default Transaction;

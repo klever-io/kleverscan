@@ -72,7 +72,7 @@ const Transactions: React.FC<ITransactionPage> = ({
         <tr key={String(index)}>
           <td>
             <span>
-              <Link href={`/transaction/${transaction.hash}`}>
+              <Link href={`/transactions/${transaction.hash}`}>
                 {transaction.hash}
               </Link>
             </span>

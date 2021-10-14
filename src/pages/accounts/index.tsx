@@ -5,10 +5,9 @@ import Link from 'next/link';
 
 import List, { IList } from '../../components/Layout/List';
 
-import { IAccount, IPagination, IResponse } from '../../types';
-
-import { FaRegUser } from 'react-icons/fa';
 import api from '../../services/api';
+import { IAccount, IPagination, IResponse } from '../../types';
+import { navbarItems } from '../../configs/navbar';
 
 interface IAccountPage {
   accounts: IAccount[];
@@ -27,7 +26,7 @@ const Accounts: React.FC<IAccountPage> = ({
   pagination,
 }) => {
   const title = 'Accounts';
-  const Icon = FaRegUser;
+  const Icon = navbarItems.find(item => item.name === 'Accounts')?.Icon;
   const maxItems = pagination.totalRecords;
   const headers = ['Address', 'Balance'];
 

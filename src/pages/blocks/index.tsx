@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 
 import { GetStaticProps } from 'next';
+import Link from 'next/link';
+import { fromUnixTime } from 'date-fns';
 
 import List, { IList } from '../../components/Layout/List';
 
 import { IHyperblock, IPagination, IResponse } from '../../types';
 
 import api from '../../services/api';
-
-import { FaLaravel } from 'react-icons/fa';
-import { fromUnixTime } from 'date-fns';
 import { getAge } from '../../utils';
+import { navbarItems } from '../../configs/navbar';
 
 interface IHyperblockPage {
   hyperblocks: IHyperblock[];
@@ -29,9 +29,9 @@ const Blocks: React.FC<IHyperblockPage> = ({
   pagination,
 }) => {
   const title = 'Blocks';
-  const Icon = FaLaravel;
+  const Icon = navbarItems.find(item => item.name === 'Blocks')?.Icon;
   const maxItems = pagination.totalRecords;
-  const headers = ['Height', 'Age', 'Transactions', 'Produced By'];
+  const headers = ['Nonce', 'Age', 'Transactions', 'Produced By'];
 
   const [hyperblocks, setHyperblocks] =
     useState<IHyperblock[]>(initialHyperblocks);
@@ -65,9 +65,13 @@ const Blocks: React.FC<IHyperblockPage> = ({
     hyperblocks.map((hyperblock, index) => {
       return (
         <tr key={String(index)}>
-          <td>{hyperblock.size}</td>
+          <td>
+            <Link href={`/blocks/${hyperblock.nonce}`}>
+              <a>{hyperblock.nonce}</a>
+            </Link>
+          </td>
           <td>{getAge(fromUnixTime(hyperblock.timeStamp))} ago</td>
-          <td>{hyperblock.sizeTxs}</td>
+          <td>{hyperblock.txCount}</td>
           <td>{hyperblock.producerID}</td>
         </tr>
       );

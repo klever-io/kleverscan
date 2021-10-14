@@ -1,6 +1,7 @@
 import type { AppProps } from 'next/app';
 
-import PageNProgress from 'next-styled-nprogress';
+// import PageNProgress from 'next-styled-nprogress';
+// TODO: Fix NProgress type
 import { ThemeProvider } from 'styled-components';
 
 import Layout from '../components/Layout';
@@ -15,12 +16,12 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
         <Component {...pageProps} />
       </Layout>
       <GlobalStyle />
-      <PageNProgress
+      {/* <PageNProgress
         color="#EE3F71"
         showSpinner={false}
         height="2px"
         delay={200}
-      />
+      /> */}
     </ThemeProvider>
   );
 };

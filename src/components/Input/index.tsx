@@ -48,22 +48,22 @@ const Input: React.FC<IInput> = ({ mainPage }) => {
   };
 
   const validationInput = (value: string) => {
-    const lengthBlockOrTxHash = 64;
-    const lengthAccountAddress = 34;
+    const addressLength = 62;
+    const txLength = 64;
 
     if (!isNaN(Number(value)) && Number(value) !== 0) {
-      return 'block';
+      return 'blocks';
     }
 
-    if (value.length === lengthBlockOrTxHash) {
-      return 'block';
+    if (value.length === txLength) {
+      return 'transactions';
     }
 
-    if (value.length === lengthAccountAddress) {
-      return 'address';
+    if (value.length === addressLength) {
+      return 'accounts';
     }
 
-    return null;
+    return 'assets';
   };
 
   const handleSearch = () => {

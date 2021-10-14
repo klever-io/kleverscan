@@ -14,9 +14,11 @@ import {
 
 import Input from '../../Input';
 
+import { BsQuestionCircleFill } from 'react-icons/bs';
+
 export interface IList {
   title: string;
-  Icon: IconType;
+  Icon: IconType | undefined;
   maxItems: number;
   listSize: number;
   loadMore?(): void;
@@ -38,9 +40,7 @@ const List: React.FC<IList> = ({
     return (
       <HeaderContainer>
         <div>
-          <HeaderIcon>
-            <Icon />
-          </HeaderIcon>
+          <HeaderIcon>{Icon ? <Icon /> : <BsQuestionCircleFill />}</HeaderIcon>
           <span>{title}</span>
         </div>
         <InputContainer>

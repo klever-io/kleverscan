@@ -2,7 +2,6 @@ import { IconType } from 'react-icons/lib';
 
 import { FaConnectdevelop, FaLaravel, FaRegUser } from 'react-icons/fa';
 import { DiGitBranch } from 'react-icons/di';
-import { BiSort } from 'react-icons/bi';
 import { HiDatabase } from 'react-icons/hi';
 
 export interface INavbarItem {
@@ -37,13 +36,8 @@ export const navbarItems: INavbarItem[] = [
     Icon: DiGitBranch,
   },
   {
-    name: 'Transfer',
-    pathTo: '/transfer',
-    Icon: BiSort,
-  },
-  {
-    name: 'Tokens',
-    pathTo: '/tokens',
+    name: 'Assets',
+    pathTo: '/assets',
     Icon: HiDatabase,
   },
 ];

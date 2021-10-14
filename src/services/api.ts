@@ -9,9 +9,15 @@ interface IQuery {
   [key: string]: any;
 }
 
+export interface IPrice {
+  name: string;
+  price: number;
+}
+
 export interface IProps {
   route: string;
   query?: IQuery;
+  body?: any;
   apiVersion?: string;
 }
 
@@ -21,8 +27,8 @@ const buildUrlQuery = (query: IQuery): string =>
     .join('&');
 
 const getHost = (route: string, query: IQuery, apiVersion: string) => {
-  let host = process.env.DEFAULT_HOST;
-  let port = process.env.DEFAULT_PORT;
+  let host = process.env.DEFAULT_API_HOST;
+  let port = process.env.DEFAULT_API_PORT;
   let urlParam = '';
 
   if (!host) {
@@ -90,8 +96,68 @@ const withoutBody = async (props: IProps, method: Method): Promise<any> => {
   }
 };
 
+const withBody = async (props: IProps, method: Method): Promise<any> => {
+  try {
+    const { route, body, query, apiVersion } = getProps(props);
+
+    const response = await fetch(getHost(route, query, apiVersion), {
+      method: method.toString(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      return Promise.resolve({
+        data: null,
+        error: response.statusText,
+        code: 'internal_error',
+      });
+    }
+
+    return response.json();
+  } catch (error) {
+    return Promise.resolve({ data: null, error, code: 'internal_error ' });
+  }
+};
+
+const getPrices = async (): Promise<any> => {
+  try {
+    const host = process.env.DEFAULT_PRICE_HOST || '/';
+
+    const response = await fetch(`${host}/prices`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ names: ['KLV/USD'] }),
+    });
+
+    if (!response.ok) {
+      return Promise.resolve({
+        data: null,
+        error: response.statusText,
+        code: 'internal_error',
+      });
+    }
+
+    const symbols: { symbols: IPrice[] } = await response.json();
+
+    return Promise.resolve({
+      data: symbols,
+      error: '',
+      code: 'successful',
+    });
+  } catch (error) {
+    return Promise.resolve({ data: null, error, code: 'internal_error' });
+  }
+};
+
 const api = {
   get: async (props: IProps): Promise<any> => withoutBody(props, Method.GET),
+  post: async (props: IProps): Promise<any> => withBody(props, Method.POST),
+  getPrices,
 };
 
 export default api;

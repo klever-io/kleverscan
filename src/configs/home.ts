@@ -25,7 +25,7 @@ const infoChartData: IChartData[] = [
 export const statsData: IStats[] = [
   {
     Side: TopRow,
-    name: 'Klever Price',
+    name: 'KLV Price',
     value: (0.0).toFixed(4),
     haveCoin: true,
   },

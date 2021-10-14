@@ -9,8 +9,7 @@ import List, { IList } from '../../components/Layout/List';
 import { Contract, IPagination, IResponse, ITransaction } from '../../types';
 
 import api from '../../services/api';
-
-import { DiGitBranch } from 'react-icons/di';
+import { navbarItems } from '../../configs/navbar';
 
 interface ITransactionPage {
   transactions: ITransaction[];
@@ -29,7 +28,7 @@ const Transactions: React.FC<ITransactionPage> = ({
   pagination,
 }) => {
   const title = 'Transactions';
-  const Icon = DiGitBranch;
+  const Icon = navbarItems.find(item => item.name === 'Transactions')?.Icon;
   const maxItems = pagination.totalRecords;
   const headers = ['Hash', 'Block', 'Created', 'Address', 'Contract'];
 

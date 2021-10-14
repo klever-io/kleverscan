@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Link from 'next/link';
 import { GetStaticProps } from 'next';
@@ -41,7 +41,7 @@ import {
 import { IResponse, IHyperblock, ITransaction } from '../types';
 import { getAge } from '../utils';
 
-import api from '../services/api';
+import api, { IPrice } from '../services/api';
 
 import { FaLaravel } from 'react-icons/fa';
 import { BiSort } from 'react-icons/bi';
@@ -49,6 +49,7 @@ import { BiSort } from 'react-icons/bi';
 interface IHome {
   transactions: ITransaction[];
   blocks: IHyperblock[];
+  price: number;
 }
 
 interface IChart {
@@ -76,8 +77,29 @@ interface IHyperblockResponse extends IResponse {
   };
 }
 
-const Home: React.FC<IHome> = ({ blocks, transactions }) => {
+interface IPriceResponse extends IResponse {
+  data: {
+    symbols: IPrice[];
+  };
+}
+
+const Home: React.FC<IHome> = ({ blocks, transactions, price }) => {
   const [loaded] = useState(true);
+  const [klvPrice, setKlvPrice] = useState(price);
+  const priceInterval = 10 * 60 * 1000; // 10 min
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const prices: IPriceResponse = await api.getPrices();
+      if (prices.data.symbols.length > 0) {
+        setKlvPrice(prices.data.symbols[0].price);
+      }
+    }, priceInterval);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   const StatsCard: React.FC = () => {
     return (
@@ -87,9 +109,9 @@ const Home: React.FC<IHome> = ({ blocks, transactions }) => {
             <div>
               <span>{item.name}</span>
               {loaded ? (
-                <p>{`${item.value} ${
-                  item.haveCoin ? defaultEquivalentCoin : ''
-                }`}</p>
+                <p>{`${
+                  item.name === 'KLV Price' ? klvPrice.toFixed(4) : item.value
+                } ${item.haveCoin ? defaultEquivalentCoin : ''}`}</p>
               ) : (
                 <Skeleton />
               )}
@@ -323,7 +345,7 @@ const Home: React.FC<IHome> = ({ blocks, transactions }) => {
 };
 
 export const getStaticProps: GetStaticProps<IHome> = async () => {
-  const props: IHome = { blocks: [], transactions: [] };
+  const props: IHome = { blocks: [], transactions: [], price: 0 };
 
   const blocks: IHyperblockResponse = await api.get({
     route: 'hyperblock/list',
@@ -337,6 +359,11 @@ export const getStaticProps: GetStaticProps<IHome> = async () => {
   });
   if (!transactions.error) {
     props.transactions = transactions.data.transactions;
+  }
+
+  const prices: IPriceResponse = await api.getPrices();
+  if (prices.data.symbols.length > 0) {
+    props.price = prices.data.symbols[0].price;
   }
 
   return { props };

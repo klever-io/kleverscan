@@ -1,46 +1,22 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React from 'react';
 
 import { GetStaticProps } from 'next';
-import Link from 'next/link';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
-import {
-  Container,
-  Content,
-  Divider,
-  Header,
-  HeaderIcon,
-  Indicator,
-  Info,
-  Tab,
-  TabContainer,
-} from '../../views/blocks';
-
-import Input from '../../components/Input';
+import Detail, { ITab, ITabData } from '../../components/Layout/Detail';
 
 import api from '../../services/api';
 import { IHyperblock, IResponse } from '../../types';
 
-import { FaLaravel } from 'react-icons/fa';
-
+import { navbarItems } from '../../configs/navbar';
+        
 interface IHyperblockResponse extends IResponse {
   data: {
     hyperblock: IHyperblock;
   };
 }
 
-interface ITab {
-  title: string;
-  data: {
-    name: string;
-    info: string | number;
-    linked?: string;
-  }[];
-}
-
 const Block: React.FC<IHyperblock> = props => {
-  const overviewData = [
+  const overviewData: ITabData[] = [
     { name: 'Nonce', info: props.nonce },
     { name: 'Slot', info: props.slot },
     { name: 'Epoch', info: props.epoch },
@@ -53,12 +29,12 @@ const Block: React.FC<IHyperblock> = props => {
     { name: 'Software Version', info: props.softwareVersion },
     { name: 'Chain ID', info: props.chainID },
   ];
-  const transactionData = props.transactions.map(transaction => ({
+  const transactionData: ITabData[] = props.transactions.map(transaction => ({
     name: 'Transaction',
     info: transaction.hash,
     linked: `/transactions/${transaction.hash}`,
   }));
-  const hashesData = [
+  const hashesData: ITabData[] = [
     { name: 'Parent Hash', info: props.parentHash },
     { name: 'TX Root Hash', info: props.txRootHash },
     { name: 'Trie Root', info: props.trieRoot },
@@ -69,92 +45,17 @@ const Block: React.FC<IHyperblock> = props => {
     { name: 'Random Seed', info: props.randSeed },
   ];
 
+  const title = 'Block Details';
   const tabs: ITab[] = [
     { title: 'Overview', data: overviewData },
     { title: 'Transactions', data: transactionData },
-    { title: 'Hashes', data: hashesData },
+    { title: 'Block Info', data: hashesData },
   ];
-  const title = 'Block Details';
+  const Icon = navbarItems.find(item => item.name === 'Blocks')?.Icon;
 
-  const [selectedTab, setSelectedTab] = useState<ITab>(tabs[0]);
+  const detailProps = { title, tabs, Icon };
 
-  useEffect(() => {
-    const tab = document.getElementById(
-      `tab-${selectedTab.title.toLowerCase()}`,
-    );
-    const indicator = document.getElementById('tab-indicator');
-
-    if (indicator && tab) {
-      indicator.style.width = `${String(tab.offsetWidth)}px`;
-      indicator.style.transform = `translateX(${String(tab.offsetLeft)}px)`;
-    }
-  }, [selectedTab]);
-
-  const renderTabs = () =>
-    tabs.map((tab, index) => {
-      const id = `tab-${tab.title.toLowerCase()}`;
-      const active = tab.title === selectedTab.title;
-      const handleTab = () => setSelectedTab(tab);
-
-      const props = { id, active, onClick: handleTab };
-
-      return (
-        <Tab key={String(index)} {...props}>
-          {tab.title}
-        </Tab>
-      );
-    });
-
-  const handleCopyInfo = (info: string, data: string | number) => {
-    const toastProps = {
-      autoClose: 2000,
-      pauseOnHover: false,
-      closeOnClick: true,
-    };
-
-    navigator.clipboard.writeText(String(data));
-    toast.info(`${info} copied to clipboard`, toastProps);
-  };
-
-  return (
-    <Container>
-      <ToastContainer />
-
-      <Input />
-      <Header>
-        <HeaderIcon>
-          <FaLaravel />
-        </HeaderIcon>
-        <h3>{title}</h3>
-      </Header>
-
-      <Content>
-        <TabContainer>
-          <Indicator id="tab-indicator" />
-
-          {renderTabs()}
-        </TabContainer>
-        {selectedTab.data.map((data, index) => {
-          return (
-            <Fragment key={String(index)}>
-              <Info>
-                <span>{data.name}</span>
-                {data.linked ? (
-                  <Link href={data.linked}>{data.info}</Link>
-                ) : (
-                  <p onClick={() => handleCopyInfo(data.name, data.info)}>
-                    {data.info}
-                  </p>
-                )}
-              </Info>
-
-              {index + 1 !== selectedTab.data.length && <Divider />}
-            </Fragment>
-          );
-        })}
-      </Content>
-    </Container>
-  );
+  return <Detail {...detailProps} />;
 };
 
 export const getServerSideProps: GetStaticProps<IHyperblock> = async ({
@@ -171,7 +72,6 @@ export const getServerSideProps: GetStaticProps<IHyperblock> = async ({
   const hyperblock: IHyperblockResponse = await api.get({
     route: `hyperblock/by-nonce/${blockNonce}`,
   });
-
   if (hyperblock.error) {
     return redirectProps;
   }

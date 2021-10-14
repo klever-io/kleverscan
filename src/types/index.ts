@@ -165,6 +165,20 @@ export interface IAccount {
   buckets: any;
 }
 
+export interface IAsset {
+  type: string;
+  address: string;
+  name: string;
+  ticker: string;
+  ownerAddress: string;
+  uris: any;
+  precision: number;
+  initialSupply: number;
+  circulatingSupply: number;
+  maxSupply: number;
+  royalties: number;
+}
+
 interface IError {
   message: string;
 }

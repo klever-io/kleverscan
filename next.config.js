@@ -7,7 +7,12 @@ const images = withImages({
   esModule: true,
 });
 
-const defaultEnvs = ['DEFAULT_HOST', 'DEFAULT_PORT', 'DEFAULT_API_VERSION'];
+const defaultEnvs = [
+  'DEFAULT_API_HOST',
+  'DEFAULT_API_PORT',
+  'DEFAULT_API_VERSION',
+  'DEFAULT_PRICE_HOST',
+];
 
 const getEnvs = () => {
   let envs = {};

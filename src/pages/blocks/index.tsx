@@ -31,7 +31,7 @@ const Blocks: React.FC<IHyperblockPage> = ({
   const title = 'Blocks';
   const Icon = navbarItems.find(item => item.name === 'Blocks')?.Icon;
   const maxItems = pagination.totalRecords;
-  const headers = ['Nonce', 'Age', 'Transactions', 'Produced By'];
+  const headers = ['Nonce', 'Age', 'Transactions'];
 
   const [hyperblocks, setHyperblocks] =
     useState<IHyperblock[]>(initialHyperblocks);
@@ -72,7 +72,7 @@ const Blocks: React.FC<IHyperblockPage> = ({
           </td>
           <td>{getAge(fromUnixTime(hyperblock.timeStamp))} ago</td>
           <td>{hyperblock.txCount}</td>
-          <td>{hyperblock.producerID}</td>
+          {/* <td>{hyperblock.producerID}</td> */}
         </tr>
       );
     });

@@ -22,6 +22,28 @@ const infoChartData: IChartData[] = [
   { value: 3490 },
 ];
 
+const transactionHistory: IChartData[] = [
+  { value: 1000 },
+  { value: 1235 },
+  { value: 1699 },
+  { value: 2400 },
+  { value: 2800 },
+  { value: 3321 },
+  { value: 3700 },
+  { value: 4124 },
+];
+
+const accountGrowth: IChartData[] = [
+  { value: 1000 },
+  { value: 1235 },
+  { value: 1599 },
+  { value: 2200 },
+  { value: 2500 },
+  { value: 3021 },
+  { value: 3500 },
+  { value: 3999 },
+];
+
 export const statsData: IStats[] = [
   {
     Side: TopRow,
@@ -51,4 +73,9 @@ export const statsData: IStats[] = [
 
 const defaultEquivalentCoin = 'USD';
 
-export { infoChartData, defaultEquivalentCoin };
+export {
+  transactionHistory,
+  accountGrowth,
+  infoChartData,
+  defaultEquivalentCoin,
+};

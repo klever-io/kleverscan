@@ -34,11 +34,19 @@ import Button from '../components/Button';
 import {
   infoChartData,
   IChartData,
-  defaultEquivalentCoin,
   statsData,
+  transactionHistory,
+  accountGrowth,
 } from '../configs/home';
 
-import { IResponse, IHyperblock, ITransaction } from '../types';
+import {
+  IResponse,
+  IHyperblock,
+  ITransaction,
+  ITransferContract,
+  Contract,
+  IPagination,
+} from '../types';
 import { getAge } from '../utils';
 
 import api, { IPrice } from '../services/api';
@@ -50,6 +58,7 @@ interface IHome {
   transactions: ITransaction[];
   blocks: IHyperblock[];
   price: number;
+  totalAccounts: number;
 }
 
 interface IChart {
@@ -77,13 +86,22 @@ interface IHyperblockResponse extends IResponse {
   };
 }
 
+interface IAccountResponse extends IResponse {
+  pagination: IPagination;
+}
+
 interface IPriceResponse extends IResponse {
   data: {
     symbols: IPrice[];
   };
 }
 
-const Home: React.FC<IHome> = ({ blocks, transactions, price }) => {
+const Home: React.FC<IHome> = ({
+  blocks,
+  transactions,
+  price,
+  totalAccounts,
+}) => {
   const [loaded] = useState(true);
   const [klvPrice, setKlvPrice] = useState(price);
   const priceInterval = 10 * 60 * 1000; // 10 min
@@ -102,19 +120,23 @@ const Home: React.FC<IHome> = ({ blocks, transactions, price }) => {
   }, []);
 
   const StatsCard: React.FC = () => {
+    const data = [
+      {
+        key: 'KLV Price',
+        data: `${klvPrice.toFixed(4)} USD`,
+      },
+      { key: 'Market Cap', data: `0 USD` },
+      { key: 'Total Accounts', data: totalAccounts },
+      { key: 'Transactions Last Day', data: 0 },
+    ];
+
     return (
       <StatsContainer>
         {statsData.map((item, index) => (
           <item.Side key={index}>
             <div>
               <span>{item.name}</span>
-              {loaded ? (
-                <p>{`${
-                  item.name === 'KLV Price' ? klvPrice.toFixed(4) : item.value
-                } ${item.haveCoin ? defaultEquivalentCoin : ''}`}</p>
-              ) : (
-                <Skeleton />
-              )}
+              <p>{data.find(i => i.key === item.name)?.data || 0}</p>
             </div>
           </item.Side>
         ))}
@@ -124,18 +146,11 @@ const Home: React.FC<IHome> = ({ blocks, transactions, price }) => {
 
   const PriceHistoryChart: React.FC = () => {
     const title = '24h Price History';
-    const skeletonProps = { width: 150, height: 40 };
 
     return (
       <PriceHistoryContainer>
         <span>{title}</span>
-        {loaded ? (
-          <Chart data={infoChartData} />
-        ) : (
-          <LoaderContainer>
-            <Skeleton {...skeletonProps} />
-          </LoaderContainer>
-        )}
+        <Chart data={infoChartData} />
       </PriceHistoryContainer>
     );
   };
@@ -144,14 +159,13 @@ const Home: React.FC<IHome> = ({ blocks, transactions, price }) => {
     const charts: IChart[] = [
       {
         title: '14 days Transaction History',
-        data: infoChartData,
+        data: transactionHistory,
       },
       {
         title: '14 days Address Growth',
-        data: infoChartData,
+        data: accountGrowth,
       },
     ];
-    const skeletonProps = { width: 200, height: 60 };
 
     return (
       <ChartContainer>
@@ -159,13 +173,10 @@ const Home: React.FC<IHome> = ({ blocks, transactions, price }) => {
           <TimeChart key={index}>
             <span>{chart.title}</span>
             <Divider />
-            {loaded ? (
-              <Chart data={chart.data} />
-            ) : (
-              <LoaderContainer>
-                <Skeleton {...skeletonProps} />
-              </LoaderContainer>
-            )}
+            <span style={{ fontSize: '.875rem' }}>
+              The information contained in the chart is for illustration
+            </span>
+            <Chart data={chart.data} />
           </TimeChart>
         ))}
       </ChartContainer>
@@ -178,24 +189,32 @@ const Home: React.FC<IHome> = ({ blocks, transactions, price }) => {
     timeStamp,
   }) => {
     const contractPosition = 0;
-    const parameter = contract[contractPosition].parameter;
+    const parameter = contract[contractPosition].parameter as ITransferContract;
 
-    const amount = contract[contractPosition].parameter.amount || 0;
+    const amount = parameter.amount || 0;
 
     return (
       <ListItem>
         <div>
           <span>
-            <a>{hash}</a>
+            <Link href={`/transactions/${hash}`}>
+              <a>{hash}</a>
+            </Link>
           </span>
           <p>{getAge(fromUnixTime(timeStamp))} ago</p>
         </div>
         <div>
           <span>
-            From <a>{parameter.ownerAddress}</a>
+            From{' '}
+            <Link href={`/accounts/${parameter.ownerAddress}`}>
+              {parameter.ownerAddress}
+            </Link>
           </span>
           <span>
-            To <a>{parameter.toAddress}</a>
+            To{' '}
+            <Link href={`/accounts/${parameter.toAddress}`}>
+              <a>{parameter.toAddress}</a>
+            </Link>
           </span>
         </div>
         <div>
@@ -209,7 +228,7 @@ const Home: React.FC<IHome> = ({ blocks, transactions, price }) => {
     nonce,
     parentHash,
     timeStamp,
-    sizeTxs,
+    txCount,
   }) => (
     <ListItem>
       <div>
@@ -226,13 +245,16 @@ const Home: React.FC<IHome> = ({ blocks, transactions, price }) => {
         </span>
         <span>
           <p>
-            <a>{sizeTxs} txns</a> in {0} secs
+            <Link href={`/blocks/${nonce}`}>
+              <a>{txCount} txns</a>
+            </Link>{' '}
+            in {0} secs
           </p>
         </span>
       </div>
-      <div>
+      {/* <div>
         <span>{0} KLV</span>
-      </div>
+      </div> */}
     </ListItem>
   );
 
@@ -345,7 +367,12 @@ const Home: React.FC<IHome> = ({ blocks, transactions, price }) => {
 };
 
 export const getStaticProps: GetStaticProps<IHome> = async () => {
-  const props: IHome = { blocks: [], transactions: [], price: 0 };
+  const props: IHome = {
+    blocks: [],
+    transactions: [],
+    price: 0,
+    totalAccounts: 0,
+  };
 
   const blocks: IHyperblockResponse = await api.get({
     route: 'hyperblock/list',
@@ -358,7 +385,18 @@ export const getStaticProps: GetStaticProps<IHome> = async () => {
     route: 'transaction/list',
   });
   if (!transactions.error) {
-    props.transactions = transactions.data.transactions;
+    props.transactions = transactions.data.transactions.filter(
+      transaction =>
+        Object.keys(Contract)[transaction.contract[0].type] ===
+        Contract.Transfer,
+    );
+  }
+
+  const accounts: IAccountResponse = await api.get({
+    route: 'address/list',
+  });
+  if (!accounts.error) {
+    props.totalAccounts = accounts.pagination.totalRecords;
   }
 
   const prices: IPriceResponse = await api.getPrices();

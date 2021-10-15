@@ -353,7 +353,7 @@ const Home: React.FC<IHome> = ({
       </BackgroundVideo>
       <InputContainer>
         <span>
-          <strong>Klever</strong> <p>Blockchain Explorer</p>
+          <strong>Klever</strong> <p>Blockchain Explorer (Testnet)</p>
         </span>
         <Input mainPage />
       </InputContainer>

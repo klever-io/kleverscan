@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import { fromUnixTime } from 'date-fns';
 
@@ -80,21 +80,22 @@ const Blocks: React.FC<IHyperblockPage> = ({
   return <List {...listProps}>{renderItems()}</List>;
 };
 
-export const getStaticProps: GetStaticProps<IHyperblockPage> = async () => {
-  const props: IHyperblockPage = {
-    hyperblocks: [],
-    pagination: {} as IPagination,
+export const getServerSideProps: GetServerSideProps<IHyperblockPage> =
+  async () => {
+    const props: IHyperblockPage = {
+      hyperblocks: [],
+      pagination: {} as IPagination,
+    };
+
+    const hyperblocks: IHyperblockResponse = await api.get({
+      route: 'hyperblock/list',
+    });
+    if (!hyperblocks.error) {
+      props.hyperblocks = hyperblocks.data.hyperblocks;
+      props.pagination = hyperblocks.pagination;
+    }
+
+    return { props };
   };
-
-  const hyperblocks: IHyperblockResponse = await api.get({
-    route: 'hyperblock/list',
-  });
-  if (!hyperblocks.error) {
-    props.hyperblocks = hyperblocks.data.hyperblocks;
-    props.pagination = hyperblocks.pagination;
-  }
-
-  return { props };
-};
 
 export default Blocks;

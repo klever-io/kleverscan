@@ -111,7 +111,7 @@ const Home: React.FC<IHome> = ({
       const prices: IPriceResponse = await api.getPrices();
 
       if (prices.error) {
-        setKlvPrice(0)
+        setKlvPrice(0);
       }
 
       if (!prices.error && prices.data?.symbols.length > 0) {
@@ -274,7 +274,7 @@ const Home: React.FC<IHome> = ({
       },
       {
         title: 'Transfer',
-        href: 'tranfers',
+        href: 'transactions',
         Icon: BiSort,
         data: transactions,
         Component: TransactionItem,
@@ -407,7 +407,7 @@ export const getStaticProps: GetStaticProps<IHome> = async () => {
   const prices: IPriceResponse = await api.getPrices();
 
   if (prices.error) {
-    props.price = 0
+    props.price = 0;
   }
 
   if (!prices.error && prices.data?.symbols.length > 0) {

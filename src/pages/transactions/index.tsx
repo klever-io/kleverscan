@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import { format, fromUnixTime } from 'date-fns';
 
@@ -100,21 +100,22 @@ const Transactions: React.FC<ITransactionPage> = ({
   return <List {...listProps}>{renderItems()}</List>;
 };
 
-export const getStaticProps: GetStaticProps<ITransactionPage> = async () => {
-  const props: ITransactionPage = {
-    transactions: [],
-    pagination: {} as IPagination,
+export const getServerSideProps: GetServerSideProps<ITransactionPage> =
+  async () => {
+    const props: ITransactionPage = {
+      transactions: [],
+      pagination: {} as IPagination,
+    };
+
+    const transactions: ITransactionResponse = await api.get({
+      route: 'transaction/list',
+    });
+    if (!transactions.error) {
+      props.transactions = transactions.data.transactions;
+      props.pagination = transactions.pagination;
+    }
+
+    return { props };
   };
-
-  const transactions: ITransactionResponse = await api.get({
-    route: 'transaction/list',
-  });
-  if (!transactions.error) {
-    props.transactions = transactions.data.transactions;
-    props.pagination = transactions.pagination;
-  }
-
-  return { props };
-};
 
 export default Transactions;

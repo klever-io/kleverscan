@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 
 import List, { IList } from '../../components/Layout/List';
@@ -84,7 +84,7 @@ const Blocks: React.FC<IAssetPage> = ({
   return <List {...listProps}>{renderItems()}</List>;
 };
 
-export const getStaticProps: GetStaticProps<IAssetPage> = async () => {
+export const getServerSideProps: GetServerSideProps<IAssetPage> = async () => {
   const props: IAssetPage = { assets: [], pagination: {} as IPagination };
 
   const assets: IAssetResponse = await api.get({

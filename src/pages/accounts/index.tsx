@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 
 import List, { IList } from '../../components/Layout/List';
@@ -72,16 +72,17 @@ const Accounts: React.FC<IAccountPage> = ({
   return <List {...listProps}>{renderItems()}</List>;
 };
 
-export const getStaticProps: GetStaticProps<IAccountPage> = async () => {
-  const props: IAccountPage = { accounts: [], pagination: {} as IPagination };
+export const getServerSideProps: GetServerSideProps<IAccountPage> =
+  async () => {
+    const props: IAccountPage = { accounts: [], pagination: {} as IPagination };
 
-  const accounts: IAccountResponse = await api.get({ route: 'address/list' });
-  if (!accounts.error) {
-    props.accounts = accounts.data.accounts;
-    props.pagination = accounts.pagination;
-  }
+    const accounts: IAccountResponse = await api.get({ route: 'address/list' });
+    if (!accounts.error) {
+      props.accounts = accounts.data.accounts;
+      props.pagination = accounts.pagination;
+    }
 
-  return { props };
-};
+    return { props };
+  };
 
 export default Accounts;

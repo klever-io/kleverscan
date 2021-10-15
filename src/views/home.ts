@@ -225,10 +225,6 @@ export const ChartContainer = styled.div`
     padding-left: 3rem;
     padding-right: 3rem;
   }
-
-  @media (max-width: 425px) {
-    padding-top: 13rem;
-  }
 `;
 
 export const ChartContent = styled.div`
@@ -249,6 +245,10 @@ export const ChartContent = styled.div`
 
 export const TimeChart = styled(ChartContent)`
   text-align: center;
+  padding: 1rem 0 4.1rem;
+  &:first-child {
+    margin-top: 13rem;
+  }
 `;
 
 export const Divider = styled.div`
@@ -265,6 +265,7 @@ export const ListContainer = styled.section`
   padding-bottom: 3rem;
 
   background-color: ${props => props.theme.background};
+  width: 100%;
 `;
 
 export const ListHeader = styled.div`
@@ -350,8 +351,8 @@ export const ListItem = styled.div`
 
   div {
     display: flex;
-
     flex-direction: column;
+    width: 30%;
   }
 
   span {

@@ -34,6 +34,7 @@ const transactionHistory: IChartData[] = [
 ];
 
 const accountGrowth: IChartData[] = [
+  { value: 0 },
   { value: 1000 },
   { value: 1235 },
   { value: 1599 },

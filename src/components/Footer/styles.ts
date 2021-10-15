@@ -1,4 +1,4 @@
-import { darken } from 'polished';
+import { darken, transparentize } from 'polished';
 import styled from 'styled-components';
 
 export const Container = styled.footer`
@@ -65,6 +65,17 @@ export const Content = styled.div`
       font-weight: 500;
     }
 
+    a {
+      color: white !important;
+
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+        text-decoration-color: ${props => props.theme.rose};
+      }
+    }
+
     @media (max-width: 768px) {
       font-size: 0.975rem;
     }
@@ -78,6 +89,17 @@ export const Content = styled.div`
     margin: 1.5rem 0;
 
     align-items: center;
+  }
+`;
+
+export const Tag = styled.a`
+  color: ${props => props.theme.white} !important;
+  background-image: unset !important;
+
+  &:hover {
+    text-decoration: unset !important;
+
+    color: ${props => transparentize(0.15, props.theme.white)} !important;
   }
 `;
 

@@ -186,7 +186,13 @@ const Transaction: React.FC<ITransaction> = props => {
       case Contract.CreateAsset:
         const createAssetReceipt = receipt as ICreateAssetReceipt;
 
-        return [{ name: 'Asset ID', info: createAssetReceipt.assetId }];
+        return [
+          {
+            name: 'Asset ID',
+            info: createAssetReceipt.assetId,
+            linked: `/assets/${createAssetReceipt.assetId}`,
+          },
+        ];
 
       case Contract.Freeze:
         const freezeReceipt = receipt as IFreezeReceipt;

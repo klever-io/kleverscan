@@ -5,6 +5,7 @@ import {
   Content,
   CreditsContainer,
   SectionContainer,
+  Tag,
 } from './styles';
 
 import Logo from '../../assets/logo.svg';
@@ -25,8 +26,8 @@ const Footer: React.FC = () => {
               <strong>{content.title}</strong>
             </span>
             {content.infoLinks.map((info, i) => (
-              <Link key={i} href={info.href} passHref>
-                {info.name}
+              <Link key={String(i)} href={info.href} passHref>
+                <Tag>{info.name}</Tag>
               </Link>
             ))}
           </Content>
@@ -34,7 +35,10 @@ const Footer: React.FC = () => {
       </SectionContainer>
       <CreditsContainer>
         <span>
-          Powered by <Link href="/">Getty/IO</Link>
+          Powered by{' '}
+          <Link href="/">
+            <Tag>Klever</Tag>
+          </Link>
         </span>
         <span>{version}</span>
       </CreditsContainer>

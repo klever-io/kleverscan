@@ -34,7 +34,7 @@ const List: React.FC<IList> = ({
   loadMore,
   children,
 }) => {
-  const paginationInfo = `Showing ${listSize} of ${maxItems}`;
+  const paginationInfo = `Showing ${listSize} of ${maxItems || 0}`;
 
   const Header: React.FC = () => {
     return (

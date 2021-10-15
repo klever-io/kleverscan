@@ -182,11 +182,12 @@ export const TransferContainer = styled.div`
   display: flex;
 
   flex-direction: row;
-  justify-content: space-between;
 
   color: ${props => props.theme.table.text};
 
   span {
+    margin-right: 5rem;
+
     font-weight: 400;
   }
 

@@ -1,6 +1,10 @@
 import { IconType } from 'react-icons/lib';
 
-import { FaConnectdevelop, FaLaravel, FaRegUser } from 'react-icons/fa';
+import {
+  // FaConnectdevelop,
+  FaLaravel,
+  FaRegUser,
+} from 'react-icons/fa';
 import { DiGitBranch } from 'react-icons/di';
 import { HiDatabase } from 'react-icons/hi';
 
@@ -15,11 +19,11 @@ export const navbarHeight = 5; // rem
 export const navbarPadding = '1rem 17.5rem';
 
 export const navbarItems: INavbarItem[] = [
-  {
-    name: 'Nodes',
-    pathTo: '/nodes',
-    Icon: FaConnectdevelop,
-  },
+  // {
+  //   name: 'Nodes',
+  //   pathTo: '/nodes',
+  //   Icon: FaConnectdevelop,
+  // },
   {
     name: 'Blocks',
     pathTo: '/blocks',

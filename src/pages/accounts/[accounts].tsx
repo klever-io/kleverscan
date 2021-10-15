@@ -1,8 +1,9 @@
-import React, { Fragment } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { GetStaticProps } from 'next';
-
-import { IconType } from 'react-icons/lib';
+import Link from 'next/link';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import {
   Container,
@@ -17,43 +18,27 @@ import {
   BalanceHeader,
   BalanceBody,
   TransferContainer,
-  PowerContainer,
-  EnergyContainer,
-  EnergyLoader,
-  CircleChart,
-  ChartContainer,
-  HorizontalDivider,
-  ChartContent,
-  ChartHeader,
-  ChartBody,
 } from '../../views/address';
 
 import Input from '../../components/Input';
 
-import { FaRegUser } from 'react-icons/fa';
-import { IoSnowOutline } from 'react-icons/io5';
-import { MdKeyboardArrowUp, MdKeyboardArrowDown } from 'react-icons/md';
-import { IoMdWifi, IoMdHelp } from 'react-icons/io';
-import { VscSymbolEvent } from 'react-icons/vsc';
-import api from '../../services/api';
+import api, { IPrice } from '../../services/api';
 import { IAccount, IPagination, IResponse } from '../../types';
 
-interface IAddress {
-  address: string;
-  name: string;
-  balance: number;
-  convertedBalance: string;
-  available: string;
-  frozen: string;
-  transfers: {
-    receive: number;
-    send: number;
-  };
-  transactions: number;
-  energy: {
-    used: number;
-    available: number;
-  };
+import { IoSnowOutline } from 'react-icons/io5';
+import { FaRegUser } from 'react-icons/fa';
+import {
+  Indicator,
+  Tab,
+  TabContainer,
+} from '../../components/Layout/Detail/styles';
+import { TableContainer } from '../../components/Layout/List/styles';
+import { IToast } from '../../components/Layout/Detail';
+
+interface IAccountPage {
+  account: IAccount;
+  totalTransactions: number;
+  convertedBalance: number;
 }
 
 interface IAccountResponse extends IResponse {
@@ -66,53 +51,143 @@ interface ITransactionsResponse extends IResponse {
   pagination: IPagination;
 }
 
-interface Chart {
-  Icon: IconType;
-  title: string;
-  percent: number;
-  available: number;
+interface IPriceResponse extends IResponse {
+  data: {
+    symbols: IPrice[];
+  };
 }
 
-const Address: React.FC<IAddress> = ({
-  address,
-  // name,
-  balance,
-  convertedBalance,
-  available,
-  frozen,
-  transfers,
-  transactions,
-  energy,
-}) => {
-  const getChartProps = () => {
-    const chartsProps = [
-      { Icon: IoMdWifi, title: 'Bandwidth', percent: 90, available: 61025 },
-      {
-        Icon: VscSymbolEvent,
-        title: 'Energy',
-        percent: 0,
-        available: 0,
-      },
-    ];
+interface ITab {
+  title: string;
+  headers: string[];
+  data: any[];
+}
 
-    return chartsProps;
+const Address: React.FC<IAccountPage> = ({
+  account,
+  convertedBalance,
+  totalTransactions,
+}) => {
+  const handleCopyInfo = (info: string, data: string | number) => {
+    const toastProps: IToast = {
+      autoClose: 2000,
+      pauseOnHover: false,
+      closeOnClick: true,
+    };
+
+    navigator.clipboard.writeText(String(data));
+    toast.info(`${info} copied to clipboard`, toastProps);
   };
 
-  // const getName = () => {
-  //   if (!name) {
-  //     return '--';
-  //   }
+  const getTokenData = () =>
+    Object.keys(account.assets).map((assetId, index) => (
+      <tr key={String(index)}>
+        <td>
+          <Link href={`/assets/${assetId}`}>{assetId}</Link>
+        </td>
+        <td>{account.assets[assetId].balance}</td>
+        <td>{account.assets[assetId].frozenBalance}</td>
+      </tr>
+    ));
 
-  //   return name;
-  // };
+  const getBucketData = () =>
+    Object.keys(account.buckets).map((bucketId, index) => (
+      <tr key={String(index)}>
+        <td>{account.buckets[bucketId].stakeValue}</td>
+        <td>{account.buckets[bucketId].staked ? 'True' : 'False'}</td>
+        <td>{account.buckets[bucketId].stakedEpoch}</td>
+        <td>{account.buckets[bucketId].unstakedEpoch}</td>
+        <td>
+          <span
+            style={{ cursor: 'pointer' }}
+            onClick={() =>
+              handleCopyInfo('Delegation', account.buckets[bucketId].delegation)
+            }
+          >
+            {account.buckets[bucketId].delegation}
+          </span>
+        </td>
+      </tr>
+    ));
+
+  const tabs: ITab[] = [
+    ...(account.assets && Object.values(account.assets).length > 0
+      ? [
+          {
+            title: 'Assets',
+            headers: ['Asset ID', 'Balance', 'Frozen'],
+            data: getTokenData(),
+          },
+        ]
+      : []),
+    ...(account.buckets && Object.values(account.buckets).length > 0
+      ? [
+          {
+            title: 'Buckets',
+            headers: [
+              'Staked Value',
+              'Staked',
+              'Staked Epoch',
+              'Unstaked Epoch',
+              'Delegation',
+            ],
+            data: getBucketData(),
+          },
+        ]
+      : []),
+  ];
+
+  const [selectedTab, setSelectedTab] = useState<ITab>(tabs[0] || ({} as ITab));
+
+  const getTotalBalance = () => {
+    return account.balance + getFreezeBalance();
+  };
+
+  const getFreezeBalance = () => {
+    if (Object.values(account.buckets).length <= 0) {
+      return 0;
+    }
+
+    const freezeBalance = Object.values(account.buckets).reduce(
+      (acc, bucket) => acc + bucket.stakeValue,
+      0,
+    );
+
+    return freezeBalance;
+  };
+
+  useEffect(() => {
+    const tab = document.getElementById(
+      `tab-${selectedTab.title.toLowerCase()}`,
+    );
+    const indicator = document.getElementById('tab-indicator');
+
+    if (indicator && tab) {
+      indicator.style.width = `${String(tab.offsetWidth)}px`;
+      indicator.style.transform = `translateX(${String(tab.offsetLeft)}px)`;
+    }
+  }, [selectedTab]);
+
+  const renderTabs = () =>
+    tabs.map((tab, index) => {
+      const id = `tab-${tab.title.toLowerCase()}`;
+      const active = tab.title === selectedTab.title;
+      const handleTab = () => setSelectedTab(tab);
+
+      const props = { id, active, onClick: handleTab };
+
+      return (
+        <Tab key={String(index)} {...props}>
+          {tab.title}
+        </Tab>
+      );
+    });
 
   const AddressInfo = () => {
     return (
       <AddressInfoContainer>
         <span>Address</span>
-        <p>{address}</p>
-        {/* <span>Name</span>
-        <p>{getName()}</p> */}
+        <p>{account.address}</p>
       </AddressInfoContainer>
     );
   };
@@ -123,16 +198,16 @@ const Address: React.FC<IAddress> = ({
         <BalanceHeader>
           <span>Balance</span>
           <div>
-            <span>{balance.toLocaleString()} KLV</span>
-            <p>({convertedBalance} USD)</p>
+            <span>{getTotalBalance().toLocaleString()} KLV</span>
+            <p>({convertedBalance.toLocaleString()} USD)</p>
           </div>
         </BalanceHeader>
         <BalanceBody>
           <span>Available</span>
-          <p>{available}</p>
+          <p>{account.balance.toLocaleString()}</p>
           <span>Frozen</span>
           <div>
-            <p>{frozen}</p>
+            <p>{getFreezeBalance().toLocaleString()}</p>
             <IoSnowOutline size={20} />
           </div>
         </BalanceBody>
@@ -143,85 +218,37 @@ const Address: React.FC<IAddress> = ({
   const Transfers = () => {
     return (
       <TransferContainer>
-        <span>Transfers</span>
-        <div>
-          <MdKeyboardArrowUp size={24} />
-          <p>{transfers.send}</p>
-          <MdKeyboardArrowDown size={24} />
-          <p>{transfers.receive}</p>
-        </div>
         <span>Transactions</span>
-        <p>{transactions}</p>
+        <p>{totalTransactions}</p>
       </TransferContainer>
     );
   };
 
-  const Power = () => {
-    const getTotalEnergy = () => {
-      return energy.used + energy.available;
-    };
+  const AccountTabs: React.FC = () => (
+    <Content style={{ marginTop: '.75rem' }}>
+      <TabContainer>
+        <Indicator id="tab-indicator" />
 
-    const getPercentEnergy = () => {
-      return (energy.used / getTotalEnergy()) * 100;
-    };
+        {renderTabs()}
+      </TabContainer>
 
-    const Chart: React.FC<Chart> = ({ Icon, title, percent, available }) => {
-      return (
-        <ChartContent>
-          <ChartHeader>
-            <div>
-              <Icon />
-              <span>{title}</span>
-            </div>
-            <div>
-              <IoMdHelp />
-            </div>
-          </ChartHeader>
-          <ChartBody>
-            <CircleChart active={percent > 0}>
-              <div>
-                <span>{percent}%</span>
-              </div>
-            </CircleChart>
-            <div>
-              <span>Available</span>
-              <span>{title}</span>
-              <strong>{available.toLocaleString()}</strong>
-            </div>
-          </ChartBody>
-        </ChartContent>
-      );
-    };
-
-    return (
-      <PowerContainer>
-        <span>Tron Power</span>
-        <EnergyContainer>
-          <div>
-            <p>{getTotalEnergy().toLocaleString()}</p>
-            <span>
-              ( Used: {energy.used.toLocaleString()} Available:{' '}
-              {energy.available.toLocaleString()} )
-            </span>
-          </div>
-          <EnergyLoader percent={getPercentEnergy()}>
-            <div />
-          </EnergyLoader>
-          <ChartContainer>
-            {getChartProps().map((chart, index) => (
-              <Fragment key={String(index)}>
-                <Chart {...chart} />
-                {index === 0 && <HorizontalDivider />}
-              </Fragment>
+      <TableContainer>
+        <table>
+          <thead>
+            {selectedTab.headers.map((header, index) => (
+              <td key={String(index)}>{header}</td>
             ))}
-          </ChartContainer>
-        </EnergyContainer>
-      </PowerContainer>
-    );
-  };
+          </thead>
+          <tbody>{selectedTab.data}</tbody>
+        </table>
+      </TableContainer>
+    </Content>
+  );
 
   return (
     <Container>
+      <ToastContainer />
+
       <Input />
       <Content>
         <Header>
@@ -229,7 +256,7 @@ const Address: React.FC<IAddress> = ({
             <FaRegUser />
           </HeaderIcon>
           <h3>Address</h3>
-          <span>#{address}</span>
+          <span>#{account.address}</span>
         </Header>
         <Body>
           <SideContainer>
@@ -239,16 +266,23 @@ const Address: React.FC<IAddress> = ({
             <Divider />
             <Transfers />
           </SideContainer>
-          <SideContainer>
-            <Power />
-          </SideContainer>
         </Body>
       </Content>
+
+      {tabs.length > 0 && <AccountTabs />}
     </Container>
   );
 };
 
-export const getServerSideProps: GetStaticProps = async ({ params }) => {
+export const getServerSideProps: GetStaticProps<IAccountPage> = async ({
+  params,
+}) => {
+  const props: IAccountPage = {
+    account: {} as IAccount,
+    convertedBalance: 0,
+    totalTransactions: 0,
+  };
+
   const accountLength = 62;
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
 
@@ -261,31 +295,24 @@ export const getServerSideProps: GetStaticProps = async ({ params }) => {
   const account: IAccountResponse = await api.get({
     route: `address/${address}`,
   });
-  const transactions: ITransactionsResponse = await api.get({
-    route: `address/${address}/transactions`,
-  });
-
   if (account.error) {
     return redirectProps;
   }
+  props.account = account.data.account;
 
-  const props: IAddress = {
-    address,
-    name: '',
-    balance: account.data.account.balance,
-    convertedBalance: '698.949',
-    available: '14,000.46696',
-    frozen: '14,000.46696',
-    transfers: {
-      send: 0,
-      receive: 0,
-    },
-    transactions: transactions.pagination.totalRecords || 0,
-    energy: {
-      used: 1531,
-      available: 10000,
-    },
-  };
+  const transactions: ITransactionsResponse = await api.get({
+    route: `address/${address}/transactions`,
+  });
+  if (account.error) {
+    return redirectProps;
+  }
+  props.totalTransactions = transactions.pagination.totalRecords;
+
+  const prices: IPriceResponse = await api.getPrices();
+  if (prices.data.symbols.length > 0) {
+    props.convertedBalance =
+      prices.data.symbols[0].price * account.data.account.balance;
+  }
 
   return { props };
 };

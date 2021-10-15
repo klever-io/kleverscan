@@ -33,7 +33,7 @@ export interface ITab {
   data: ITabData[];
 }
 
-interface IToast {
+export interface IToast {
   autoClose: number;
   pauseOnHover: boolean;
   closeOnClick: boolean;

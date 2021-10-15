@@ -148,8 +148,12 @@ export interface IAccount {
   address: string;
   balance: number;
   blsPublicKey: string;
-  assets: any;
-  buckets: any;
+  assets: {
+    [key: string]: any;
+  };
+  buckets: {
+    [key: string]: IBucket;
+  };
 }
 
 export interface IAsset {
@@ -164,6 +168,14 @@ export interface IAsset {
   circulatingSupply: number;
   maxSupply: number;
   royalties: number;
+}
+
+export interface IBucket {
+  stakeValue: number;
+  staked: boolean;
+  stakedEpoch: number;
+  unstakedEpoch: number;
+  delegation: string;
 }
 
 interface IError {

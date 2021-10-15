@@ -109,7 +109,12 @@ const Home: React.FC<IHome> = ({
   useEffect(() => {
     const interval = setInterval(async () => {
       const prices: IPriceResponse = await api.getPrices();
-      if (prices.data.symbols.length > 0) {
+
+      if (prices.error) {
+        setKlvPrice(0)
+      }
+
+      if (!prices.error && prices.data?.symbols.length > 0) {
         setKlvPrice(prices.data.symbols[0].price);
       }
     }, priceInterval);
@@ -400,7 +405,12 @@ export const getStaticProps: GetStaticProps<IHome> = async () => {
   }
 
   const prices: IPriceResponse = await api.getPrices();
-  if (prices.data.symbols.length > 0) {
+
+  if (prices.error) {
+    props.price = 0
+  }
+
+  if (!prices.error && prices.data?.symbols.length > 0) {
     props.price = prices.data.symbols[0].price;
   }
 

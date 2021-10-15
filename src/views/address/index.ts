@@ -44,9 +44,15 @@ export const Header = styled.div`
   }
 
   span {
+    max-width: 100%;
+
     margin-left: 0.5rem;
 
     font-weight: 400;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 `;
 
@@ -94,15 +100,29 @@ export const AddressInfoContainer = styled.div`
 
   flex-direction: column;
 
-  span {
+  p {
     margin: 1rem 0;
 
     color: ${props => props.theme.table.text};
     font-weight: 400;
   }
 
-  p {
+  span {
+    max-width: 100%;
+
     color: ${props => props.theme.table.link};
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    @media (max-width: 768px) {
+      max-width: 30rem;
+    }
+
+    @media (max-width: 550px) {
+      max-width: 15rem;
+    }
   }
 `;
 
@@ -146,6 +166,15 @@ export const BalanceHeader = styled.div`
       font-size: 0.875rem;
       color: ${props => props.theme.table.text};
     }
+
+    @media (max-width: 1024px) {
+      align-items: flex-start;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+    align-items: flex-start;
   }
 `;
 
@@ -169,10 +198,26 @@ export const BalanceBody = styled.div`
     flex-direction: row;
 
     gap: 0.5rem;
+
+    @media (max-width: 1024px) {
+      svg {
+        display: none;
+      }
+    }
   }
 
   svg {
     color: ${props => props.theme.table.icon};
+  }
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+
+    span {
+      &:not(:first-child) {
+        margin-top: 0.5rem;
+      }
+    }
   }
 `;
 
@@ -208,6 +253,10 @@ export const TransferContainer = styled.div`
 
       color: ${props => props.theme.table.green};
     }
+  }
+
+  @media (max-width: 1024px) {
+    justify-content: space-between;
   }
 `;
 

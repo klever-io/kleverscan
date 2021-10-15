@@ -157,9 +157,9 @@ const Address: React.FC<IAccountPage> = ({
   };
 
   useEffect(() => {
-    const tab = document.getElementById(
-      `tab-${selectedTab.title.toLowerCase()}`,
-    );
+    const title = selectedTab ? selectedTab.title : '';
+
+    const tab = document.getElementById(`tab-${title}`);
     const indicator = document.getElementById('tab-indicator');
 
     if (indicator && tab) {
@@ -186,8 +186,8 @@ const Address: React.FC<IAccountPage> = ({
   const AddressInfo = () => {
     return (
       <AddressInfoContainer>
-        <span>Address</span>
-        <p>{account.address}</p>
+        <p>Address</p>
+        <span>{account.address}</span>
       </AddressInfoContainer>
     );
   };

@@ -252,14 +252,10 @@ const Home: React.FC<IHome> = ({
           <p>
             <Link href={`/blocks/${nonce}`}>
               <a>{txCount} txns</a>
-            </Link>{' '}
-            in {0} secs
+            </Link>
           </p>
         </span>
       </div>
-      {/* <div>
-        <span>{0} KLV</span>
-      </div> */}
     </ListItem>
   );
 

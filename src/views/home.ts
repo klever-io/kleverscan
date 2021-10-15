@@ -246,8 +246,11 @@ export const ChartContent = styled.div`
 export const TimeChart = styled(ChartContent)`
   text-align: center;
   padding: 1rem 0 4.1rem;
-  &:first-child {
-    margin-top: 13rem;
+
+  @media (max-width: 425px) {
+    &:first-child {
+      margin-top: 10rem;
+    }
   }
 `;
 

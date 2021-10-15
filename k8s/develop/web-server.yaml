@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: explorer
+spec:
+  template:
+    spec:
+      containers:
+      - name: explorer
+        resources:
+          limits:
+            memory: 128Mi
+            cpu: 150m
+          requests:
+            cpu: 50m
+            memory: 64Mi

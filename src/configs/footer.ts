@@ -23,23 +23,23 @@ const contents: IContent[] = [
     infoLinks: [
       {
         name: 'Twitter',
-        href: '/',
+        href: 'https://twitter.com/klever_io',
       },
       {
         name: 'Facebook',
-        href: '/',
+        href: 'https://www.facebook.com/klever.io',
       },
       {
         name: 'Telegram',
-        href: '/',
+        href: 'https://t.me/Klever_io',
       },
       {
         name: 'Discord',
-        href: '/',
+        href: 'https://discord.gg/klever-io',
       },
       {
-        name: 'Medium',
-        href: '/',
+        name: 'News',
+        href: 'https://news.klever.io',
       },
     ],
   },

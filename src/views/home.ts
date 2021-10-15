@@ -53,6 +53,8 @@ export const InputContainer = styled.section`
 
   p {
     display: unset;
+
+    font-size: 1.875rem;
   }
 
   @media (max-width: 555px) {
@@ -340,7 +342,6 @@ export const ListContent = styled.div`
 `;
 
 export const ListItem = styled.div`
-  margin-right: 10px;
   padding: 0.5rem 0;
 
   display: flex;

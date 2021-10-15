@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import { format, fromUnixTime } from 'date-fns';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -17,6 +17,7 @@ import {
   IFreezeContract,
   IUnfreezeContract,
   IWithdrawContract,
+  IAsset,
 } from '../../types';
 
 import Detail, { ITab, ITabData } from '../../components/Layout/Detail';
@@ -30,7 +31,17 @@ interface ITransactionResponse extends IResponse {
   };
 }
 
-const Transaction: React.FC<ITransaction> = props => {
+interface IAssetResponse extends IResponse {
+  data: {
+    asset: IAsset;
+  };
+}
+
+interface ITransactionPage extends ITransaction {
+  precision: number;
+}
+
+const Transaction: React.FC<ITransactionPage> = props => {
   const getContractTypeName = (type: Contract) => Object.values(Contract)[type];
 
   const getContract = (): ITabData[] => {
@@ -84,10 +95,24 @@ const Transaction: React.FC<ITransaction> = props => {
           { name: 'Precision', info: createAssetParam.precision },
           {
             name: 'Circulating Supply',
-            info: createAssetParam.circulatingSupply,
+            info: (
+              createAssetParam.circulatingSupply /
+              10 ** props.precision
+            ).toFixed(props.precision),
           },
-          { name: 'Initial Supply', info: createAssetParam.initialSupply },
-          { name: 'Max Supply', info: createAssetParam.maxSupply },
+          {
+            name: 'Initial Supply',
+            info: (
+              createAssetParam.initialSupply /
+              10 ** props.precision
+            ).toFixed(props.precision),
+          },
+          {
+            name: 'Max Supply',
+            info: (createAssetParam.maxSupply / 10 ** props.precision).toFixed(
+              props.precision,
+            ),
+          },
         ];
 
       case Contract.CreateValidator:
@@ -108,7 +133,10 @@ const Transaction: React.FC<ITransaction> = props => {
           { name: 'Comission', info: validatorParam.config.commission },
           {
             name: 'Max Delegation Amount',
-            info: validatorParam.config.maxDelegationAmount,
+            info: (
+              validatorParam.config.maxDelegationAmount /
+              10 ** props.precision
+            ).toFixed(props.precision),
           },
           {
             name: 'Reward address',
@@ -223,9 +251,22 @@ const Transaction: React.FC<ITransaction> = props => {
       info: format(fromUnixTime(props.timeStamp), 'dd/MM/yyyy HH:mm'),
     },
     { name: 'Signature', info: props.signature },
-    { name: 'Kapp Fee', info: props.kappFee },
-    { name: 'Bandwith Fee', info: props.bandwidthFee },
-    { name: 'Consumed Fee', info: props.consumedFee },
+    {
+      name: 'Kapp Fee',
+      info: (props.kappFee / 10 ** props.precision).toFixed(props.precision),
+    },
+    {
+      name: 'Bandwith Fee',
+      info: (props.bandwidthFee / 10 ** props.precision).toFixed(
+        props.precision,
+      ),
+    },
+    {
+      name: 'Consumed Fee',
+      info: (props.consumedFee / 10 ** props.precision).toFixed(
+        props.precision,
+      ),
+    },
   ];
 
   const contractData = getContract();
@@ -246,7 +287,7 @@ const Transaction: React.FC<ITransaction> = props => {
   return <Detail {...detailProps} />;
 };
 
-export const getServerSideProps: GetStaticProps<ITransaction> = async ({
+export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
   params,
 }) => {
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
@@ -263,7 +304,28 @@ export const getServerSideProps: GetStaticProps<ITransaction> = async ({
     return redirectProps;
   }
 
-  const props: ITransaction = transaction.data.transaction;
+  let precision = 6; // Default KLV precision
+  const contractType =
+    Object.values(Contract)[transaction.data.transaction.contract[0].type];
+
+  if (contractType === Contract.Transfer) {
+    const contract = transaction.data.transaction.contract[0]
+      .parameter as ITransferContract;
+
+    if (contract.assetAddress) {
+      const asset: IAssetResponse = await api.get({
+        route: `assets/${contract.assetAddress}`,
+      });
+      if (!asset.error) {
+        precision = asset.data.asset.precision;
+      }
+    }
+  }
+
+  const props: ITransactionPage = {
+    ...transaction.data.transaction,
+    precision,
+  };
 
   return { props };
 };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import Link from 'next/link';
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 
 import { fromUnixTime } from 'date-fns';
 import { IconType } from 'react-icons/lib';
@@ -222,7 +222,7 @@ const Home: React.FC<IHome> = ({
             </Link>
           </span>
         </div>
-        <div>
+        <div style={{ alignItems: 'center' }}>
           <span>{amount.toLocaleString()} KLV</span>
         </div>
       </ListItem>
@@ -367,7 +367,7 @@ const Home: React.FC<IHome> = ({
   );
 };
 
-export const getStaticProps: GetStaticProps<IHome> = async () => {
+export const getServerSideProps: GetServerSideProps<IHome> = async () => {
   const props: IHome = {
     blocks: [],
     transactions: [],

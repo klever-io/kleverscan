@@ -27,8 +27,9 @@ const buildUrlQuery = (query: IQuery): string =>
     .join('&');
 
 const getHost = (route: string, query: IQuery, apiVersion: string) => {
-  let host = process.env.DEFAULT_API_HOST;
-  let port = process.env.DEFAULT_API_PORT;
+  let host =
+    process.env.DEFAULT_API_HOST || 'https://api.testnet.klever.finance';
+  let port = process.env.DEFAULT_API_PORT || '443';
   let urlParam = '';
 
   if (!host) {
@@ -51,7 +52,7 @@ const getHost = (route: string, query: IQuery, apiVersion: string) => {
 const getProps = (props: IProps) => {
   const defaultValues: IProps = {
     route: '/',
-    apiVersion: process.env.DEFAULT_API_VERSION,
+    apiVersion: process.env.DEFAULT_API_VERSION || 'v1.0',
   };
 
   const get = (target: any, name: string) => {
@@ -124,7 +125,9 @@ const withBody = async (props: IProps, method: Method): Promise<any> => {
 
 const getPrices = async (): Promise<any> => {
   try {
-    const host = process.env.DEFAULT_PRICE_HOST || '/';
+    const host =
+      process.env.DEFAULT_PRICE_HOST ||
+      'https://prices.endpoints.services.klever.io/v1';
 
     const response = await fetch(`${host}/prices`, {
       method: 'POST',

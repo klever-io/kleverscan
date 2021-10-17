@@ -41,7 +41,7 @@ const Navbar: React.FC<INavbar> = ({ background }) => {
 
   const MenuOptions: React.FC<INavbarItem> = ({ pathTo, Icon, name }) => (
     <Link href={pathTo} passHref>
-      <Item>
+      <Item onClick={handleMobileMenu}>
         <Icon />
         <span>{name}</span>
       </Item>
@@ -51,7 +51,7 @@ const Navbar: React.FC<INavbar> = ({ background }) => {
   return (
     <NavbarContainer id="navbar" background={haveBackground}>
       <Link href="/" passHref>
-        <LogoContainer>
+        <LogoContainer onClick={handleMobileMenu}>
           <Logo alt="Klever Logo" />
         </LogoContainer>
       </Link>

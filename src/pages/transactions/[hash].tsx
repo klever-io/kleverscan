@@ -320,6 +320,11 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
         precision = asset.data.asset.precision;
       }
     }
+  } else if (contractType === Contract.CreateAsset) {
+    const contract = transaction.data.transaction.contract[0]
+      .parameter as ICreateAssetContract;
+
+    precision = contract.precision;
   }
 
   const props: ITransactionPage = {

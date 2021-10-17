@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { GetServerSideProps } from 'next';
 
 import { fromUnixTime } from 'date-fns';
@@ -102,6 +103,7 @@ const Home: React.FC<IHome> = ({
   price,
   totalAccounts,
 }) => {
+  const router = useRouter();
   const [loaded] = useState(true);
   const [klvPrice, setKlvPrice] = useState(price);
   const priceInterval = 10 * 60 * 1000; // 10 min
@@ -285,10 +287,8 @@ const Home: React.FC<IHome> = ({
           </ListHeaderIcon>
           <span>{title}</span>
         </div>
-        <Button>
-          <Link href={href}>
-            <p>View All</p>
-          </Link>
+        <Button onClick={() => router.push(href)}>
+          <p>View All</p>
         </Button>
       </ListHeader>
     );

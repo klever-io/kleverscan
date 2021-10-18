@@ -32,18 +32,26 @@ const Accounts: React.FC<IAccountPage> = ({
 
   const [accounts, setAccounts] = useState<IAccount[]>(defaultAccounts);
   const [page, setPage] = useState(1);
+  const [maxPage, setMaxPage] = useState(false);
 
   const loadMore = async () => {
+    if (maxPage) {
+      return;
+    }
+
     const newAccounts: IAccountResponse = await api.get({
       route: 'address/list',
       query: { page },
     });
     if (!newAccounts.error) {
-      setAccounts([...accounts, ...newAccounts.data.accounts]);
+      if (page <= newAccounts.pagination.totalPages) {
+        setAccounts([...accounts, ...newAccounts.data.accounts]);
 
-      const next = newAccounts.pagination.next;
-      if (next !== 0) {
-        setPage(next);
+        setPage(page + 1);
+
+        if (page + 1 > newAccounts.pagination.totalPages) {
+          setMaxPage(true);
+        }
       }
     }
   };
@@ -55,6 +63,7 @@ const Accounts: React.FC<IAccountPage> = ({
     listSize: accounts.length,
     headers,
     loadMore,
+    maxPage,
   };
 
   const renderItems = () =>

@@ -29,9 +29,22 @@ const Asset: React.FC<IAsset> = props => {
   const assetInfoData: ITabData[] = [
     { name: 'Uris', info: props.uris },
     { name: 'Precision', info: props.precision },
-    { name: 'Initial Supply', info: props.initialSupply },
-    { name: 'Circulating Supply', info: props.circulatingSupply },
-    { name: 'Max Supply', info: props.maxSupply },
+    {
+      name: 'Initial Supply',
+      info: (props.initialSupply / 10 ** props.precision).toFixed(
+        props.precision,
+      ),
+    },
+    {
+      name: 'Circulating Supply',
+      info: (props.circulatingSupply / 10 ** props.precision).toFixed(
+        props.precision,
+      ),
+    },
+    {
+      name: 'Max Supply',
+      info: (props.maxSupply / 10 ** props.precision).toFixed(props.precision),
+    },
     { name: 'Royalties', info: props.royalties },
   ];
 

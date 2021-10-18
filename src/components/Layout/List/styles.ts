@@ -96,16 +96,14 @@ export const TableContainer = styled.div`
       tr {
         transition: 0.2s ease;
 
+        &:first-child {
+          td {
+            border-color: ${props => props.theme.rose};
+          }
+        }
+
         &:hover {
           background-color: ${props => darken(0.025, props.theme.white)};
-        }
-      }
-    }
-
-    tr {
-      &:first-child {
-        td {
-          border-color: ${props => props.theme.rose};
         }
       }
     }
@@ -168,7 +166,7 @@ export const TableContainer = styled.div`
   }
 `;
 
-export const LoadMoreButton = styled.div`
+export const LoadMoreButton = styled.div<{ maxPage: boolean }>`
   margin-top: 2.5rem;
   padding: 1rem 0;
 
@@ -179,7 +177,7 @@ export const LoadMoreButton = styled.div`
   align-items: center;
   justify-content: center;
 
-  cursor: pointer;
+  cursor: ${props => (props.maxPage ? 'not-allowed' : 'pointer')};
 
   background-color: ${props => props.theme.gray};
 

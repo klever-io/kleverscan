@@ -23,6 +23,7 @@ export interface IList {
   listSize: number;
   loadMore?(): void;
   headers: string[];
+  maxPage?: boolean;
 }
 
 const List: React.FC<IList> = ({
@@ -32,6 +33,7 @@ const List: React.FC<IList> = ({
   listSize,
   headers,
   loadMore,
+  maxPage,
   children,
 }) => {
   const paginationInfo = `Showing ${listSize} of ${maxItems || 0}`;
@@ -65,7 +67,7 @@ const List: React.FC<IList> = ({
           <tbody>{children}</tbody>
         </table>
       </TableContainer>
-      <LoadMoreButton onClick={loadMore}>
+      <LoadMoreButton onClick={loadMore} maxPage={maxPage || false}>
         <span>see more</span>
       </LoadMoreButton>
     </Container>

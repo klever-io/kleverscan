@@ -13,8 +13,20 @@ const contents: IContent[] = [
     title: 'explorer',
     infoLinks: [
       {
-        name: 'Website',
-        href: '/',
+        name: 'Exchange',
+        href: 'https://klever.io/',
+      },
+      {
+        name: 'Klever Finance',
+        href: 'https://klever.finance/',
+      },
+      {
+        name: 'NFT Marketplace',
+        href: 'https://klevernft.com/',
+      },
+      {
+        name: 'Help Desk',
+        href: 'https://klever.zendesk.com',
       },
     ],
   },

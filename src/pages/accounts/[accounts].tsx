@@ -85,15 +85,15 @@ const Address: React.FC<IAccountPage> = ({
         <td>
           <Link href={`/assets/${assetId}`}>{assetId}</Link>
         </td>
-        <td>{account.assets[assetId].balance}</td>
-        <td>{account.assets[assetId].frozenBalance}</td>
+        <td>{account.assets[assetId].balance.toLocaleString()}</td>
+        <td>{account.assets[assetId].frozenBalance.toLocaleString()}</td>
       </tr>
     ));
 
   const getBucketData = () =>
     Object.keys(account.buckets).map((bucketId, index) => (
       <tr key={String(index)}>
-        <td>{account.buckets[bucketId].stakeValue}</td>
+        <td>{account.buckets[bucketId].stakeValue.toLocaleString()}</td>
         <td>{account.buckets[bucketId].staked ? 'True' : 'False'}</td>
         <td>{account.buckets[bucketId].stakedEpoch}</td>
         <td>{account.buckets[bucketId].unstakedEpoch}</td>
@@ -159,7 +159,7 @@ const Address: React.FC<IAccountPage> = ({
   useEffect(() => {
     const title = selectedTab ? selectedTab.title : '';
 
-    const tab = document.getElementById(`tab-${title}`);
+    const tab = document.getElementById(`tab-${title.toLowerCase()}`);
     const indicator = document.getElementById('tab-indicator');
 
     if (indicator && tab) {
@@ -235,9 +235,11 @@ const Address: React.FC<IAccountPage> = ({
       <TableContainer>
         <table>
           <thead>
-            {selectedTab.headers.map((header, index) => (
-              <td key={String(index)}>{header}</td>
-            ))}
+            <tr>
+              {selectedTab.headers.map((header, index) => (
+                <td key={String(index)}>{header}</td>
+              ))}
+            </tr>
           </thead>
           <tbody>{selectedTab.data}</tbody>
         </table>

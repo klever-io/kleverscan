@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Link from 'next/link';
+import { isMobile } from 'react-device-detect';
 
 import {
   Item,
@@ -27,21 +28,29 @@ export interface INavbar {
 const Navbar: React.FC<INavbar> = ({ background }) => {
   const haveBackground = background === undefined ? true : background;
 
-  const handleMobileMenu = () => {
+  const handleMobileMenu = (behavior: 'open' | 'close' | undefined) => {
     const element = document.getElementById('mobile-menu');
-    if (!element) return;
+    if (!element || !isMobile) return;
 
     const display = element.style.display;
     const hiddenTypes = ['none', ''];
 
+    if (behavior) {
+      element.style.display = behavior === 'open' ? 'flex' : 'none';
+      return;
+    }
+
     element.style.display = hiddenTypes.includes(display) ? 'flex' : 'none';
   };
 
-  // TODO: Scroll behavior
-
-  const MenuOptions: React.FC<INavbarItem> = ({ pathTo, Icon, name }) => (
+  const MenuOptions: React.FC<INavbarItem> = ({
+    pathTo,
+    Icon,
+    name,
+    onClick,
+  }) => (
     <Link href={pathTo} passHref>
-      <Item onClick={handleMobileMenu}>
+      <Item onClick={onClick}>
         <Icon />
         <span>{name}</span>
       </Item>
@@ -51,7 +60,7 @@ const Navbar: React.FC<INavbar> = ({ background }) => {
   return (
     <NavbarContainer id="navbar" background={haveBackground}>
       <Link href="/" passHref>
-        <LogoContainer onClick={handleMobileMenu}>
+        <LogoContainer onClick={() => handleMobileMenu('close')}>
           <Logo alt="Klever Logo" />
         </LogoContainer>
       </Link>
@@ -60,12 +69,16 @@ const Navbar: React.FC<INavbar> = ({ background }) => {
           <MenuOptions key={index} {...item} />
         ))}
       </ItemsContainer>
-      <MobileButton onClick={handleMobileMenu}>
+      <MobileButton onClick={() => handleMobileMenu(undefined)}>
         <AiOutlineMenu />
       </MobileButton>
       <MobileContainer id="mobile-menu">
         {navbarItems.map((item, index) => (
-          <MenuOptions key={index} {...item} />
+          <MenuOptions
+            key={index}
+            onClick={() => handleMobileMenu(undefined)}
+            {...item}
+          />
         ))}
       </MobileContainer>
     </NavbarContainer>

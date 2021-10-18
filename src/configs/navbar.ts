@@ -12,6 +12,7 @@ export interface INavbarItem {
   name: string;
   pathTo: string;
   Icon: IconType;
+  onClick?(): void;
 }
 
 export const heightLimit = 70; // pixels

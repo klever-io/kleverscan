@@ -11,7 +11,6 @@ import {
 import Logo from '../../assets/logo.svg';
 
 import { contents, version } from '../../configs/footer';
-import Link from 'next/link';
 
 const Footer: React.FC = () => {
   return (
@@ -26,9 +25,9 @@ const Footer: React.FC = () => {
               <strong>{content.title}</strong>
             </span>
             {content.infoLinks.map((info, i) => (
-              <Link key={String(i)} href={info.href} passHref>
-                <Tag>{info.name}</Tag>
-              </Link>
+              <Tag key={String(i)} target="_blank" href={info.href}>
+                {info.name}
+              </Tag>
             ))}
           </Content>
         ))}
@@ -36,9 +35,9 @@ const Footer: React.FC = () => {
       <CreditsContainer>
         <span>
           Powered by{' '}
-          <Link href="/">
-            <Tag>Klever</Tag>
-          </Link>
+          <Tag target="_blank" href="https://klever.finance/" rel="noreferrer">
+            Klever Finance
+          </Tag>
         </span>
         <span>{version}</span>
       </CreditsContainer>

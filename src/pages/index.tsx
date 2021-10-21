@@ -47,10 +47,11 @@ import {
   ITransferContract,
   Contract,
   IPagination,
+  IChainStatistics,
 } from '../types';
 import { getAge } from '../utils';
 
-import api, { IPrice } from '../services/api';
+import api, { IPrice, Service } from '../services/api';
 
 import { FaLaravel } from 'react-icons/fa';
 import { BiSort } from 'react-icons/bi';
@@ -60,6 +61,7 @@ interface IHome {
   blocks: IHyperblock[];
   price: number;
   totalAccounts: number;
+  tps: string;
 }
 
 interface IChart {
@@ -91,10 +93,16 @@ interface IAccountResponse extends IResponse {
   pagination: IPagination;
 }
 
-interface IPriceResponse extends IResponse {
+interface IStatisticsResponse extends IResponse {
   data: {
-    symbols: IPrice[];
+    statistics: {
+      chainStatistics: IChainStatistics;
+    };
   };
+}
+
+interface IPriceResponse extends IResponse {
+  symbols: IPrice[];
 }
 
 const Home: React.FC<IHome> = ({
@@ -102,6 +110,7 @@ const Home: React.FC<IHome> = ({
   transactions,
   price,
   totalAccounts,
+  tps,
 }) => {
   const router = useRouter();
   const [loaded] = useState(true);
@@ -110,15 +119,17 @@ const Home: React.FC<IHome> = ({
 
   useEffect(() => {
     const interval = setInterval(async () => {
-      const prices: IPriceResponse = await api.getPrices();
-
-      if (prices.error) {
-        setKlvPrice(0);
+      const prices: IPriceResponse = await api.post({
+        route: 'prices',
+        service: Service.PRICE,
+        body: { names: ['KLV/USD'] },
+      });
+      if (!prices.error) {
+        setKlvPrice(prices.symbols[0].price);
+        return;
       }
 
-      if (!prices.error && prices.data?.symbols.length > 0) {
-        setKlvPrice(prices.data.symbols[0].price);
-      }
+      setKlvPrice(0);
     }, priceInterval);
 
     return () => {
@@ -134,7 +145,7 @@ const Home: React.FC<IHome> = ({
       },
       { key: 'Market Cap', data: `0 USD` },
       { key: 'Total Accounts', data: totalAccounts },
-      { key: 'Transactions Last Day', data: 0 },
+      { key: 'Live/Peak TPS', data: tps },
     ];
 
     return (
@@ -373,6 +384,7 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
     transactions: [],
     price: 0,
     totalAccounts: 0,
+    tps: '0/0',
   };
 
   const blocks: IHyperblockResponse = await api.get({
@@ -400,9 +412,23 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
     props.totalAccounts = accounts.pagination.totalRecords;
   }
 
-  const prices: IPriceResponse = await api.getPrices();
-  if (!prices.error && prices.data?.symbols.length > 0) {
-    props.price = prices.data.symbols[0].price;
+  const statistics: IStatisticsResponse = await api.get({
+    route: 'node/statistics',
+    service: Service.NODE,
+  });
+  if (!statistics.error) {
+    const chainStatistics = statistics.data.statistics.chainStatistics;
+
+    props.tps = `${chainStatistics.liveTPS}/${chainStatistics.peakTPS}`;
+  }
+
+  const prices: IPriceResponse = await api.post({
+    route: 'prices',
+    service: Service.PRICE,
+    body: { names: ['KLV/USD'] },
+  });
+  if (!prices.error) {
+    props.price = prices.symbols[0].price;
   }
 
   return { props };

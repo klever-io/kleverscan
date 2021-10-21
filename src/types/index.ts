@@ -178,6 +178,16 @@ export interface IBucket {
   delegation: string;
 }
 
+export interface IChainStatistics {
+  liveTPS: number,
+  averageTPS: number,
+  peakTPS: number,
+  currentBlockNonce: number,
+  totalProcessedTxCount: number,
+  averageBlockTxCount: number,
+  lastBlockTxCount: number
+}
+
 interface IError {
   message: string;
 }

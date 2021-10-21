@@ -22,7 +22,7 @@ import {
 
 import Input from '../../components/Input';
 
-import api, { IPrice } from '../../services/api';
+import api, { IPrice, Service } from '../../services/api';
 import {
   Contract,
   IAccount,
@@ -55,9 +55,7 @@ interface ITransactionsResponse extends IResponse {
 }
 
 interface IPriceResponse extends IResponse {
-  data: {
-    symbols: IPrice[];
-  };
+  symbols: IPrice[];
 }
 
 interface IAccountPage {
@@ -344,10 +342,14 @@ export const getServerSideProps: GetStaticProps<IAccountPage> = async ({
   }
   props.transactions = transactions;
 
-  const prices: IPriceResponse = await api.getPrices();
-  if (!prices.error && prices.data.symbols.length > 0) {
+  const prices: IPriceResponse = await api.post({
+    route: 'prices',
+    service: Service.PRICE,
+    body: { names: ['KLV/USD'] },
+  });
+  if (!prices.error) {
     props.convertedBalance =
-      prices.data.symbols[0].price *
+      prices.symbols[0].price *
       (account.data.account.balance / 10 ** precision);
   }
 

@@ -14,11 +14,18 @@ export interface IPrice {
   price: number;
 }
 
+export enum Service {
+  PROXY,
+  PRICE,
+  NODE
+}
+
 export interface IProps {
   route: string;
   query?: IQuery;
   body?: any;
   apiVersion?: string;
+  service?: Service;
 }
 
 const buildUrlQuery = (query: IQuery): string =>
@@ -26,32 +33,40 @@ const buildUrlQuery = (query: IQuery): string =>
     .map(key => `${key}=${query[key]}`)
     .join('&');
 
-const getHost = (route: string, query: IQuery, apiVersion: string) => {
-  let host =
-    process.env.DEFAULT_API_HOST || 'https://api.testnet.klever.finance';
+const getHost = (route: string, query: IQuery, service: Service, apiVersion: string) => {
+  const hostService = {
+    [Service.PROXY]: process.env.DEFAULT_API_HOST || 'https://api.testnet.klever.finance',
+    [Service.PRICE]: process.env.DEFAULT_PRICE_HOST || 'https://prices.endpoints.services.klever.io/v1',
+    [Service.NODE]: process.env.DEFAULT_NODE_HOST || 'http://65.108.9.154:8810'
+  }
+  
+  let host = hostService[service];
   let port = process.env.DEFAULT_API_PORT || '443';
   let urlParam = '';
 
-  if (!host) {
-    host = 'localhost';
-  } else if (host.substr(host.length - 1) === '/') {
+  if (host.substr(host.length - 1) === '/') {
     host = host.substring(0, host.length - 1);
   }
 
-  if (!port) {
-    port = '';
+  if (service === Service.PROXY) {
+    if (port) {
+      port = `:${port}`;
+    }
+
+    host = `${host}${port}/${apiVersion}`;
   }
 
   if (query) {
     urlParam = `?${buildUrlQuery(query)}`;
   }
 
-  return `${host}${port && `:${port}`}/${apiVersion}/${route}${urlParam}`;
+  return `${host}/${route}${urlParam}`;
 };
 
 const getProps = (props: IProps) => {
   const defaultValues: IProps = {
     route: '/',
+    service: Service.PROXY,
     apiVersion: process.env.DEFAULT_API_VERSION || 'v1.0',
   };
 
@@ -74,9 +89,13 @@ const getProps = (props: IProps) => {
 
 const withoutBody = async (props: IProps, method: Method): Promise<any> => {
   try {
-    const { route, query, apiVersion } = getProps(props);
+    const { route, query, service, apiVersion } = getProps(props);
 
-    const response = await fetch(getHost(route, query, apiVersion), {
+    if (service === Service.PRICE) {
+      console.log(getHost(route, query, service, apiVersion));
+    }
+
+    const response = await fetch(getHost(route, query, service, apiVersion), {
       method: method.toString(),
       headers: {
         'Content-Type': 'application/json',
@@ -99,9 +118,9 @@ const withoutBody = async (props: IProps, method: Method): Promise<any> => {
 
 const withBody = async (props: IProps, method: Method): Promise<any> => {
   try {
-    const { route, body, query, apiVersion } = getProps(props);
+    const { route, body, query, service, apiVersion } = getProps(props);
 
-    const response = await fetch(getHost(route, query, apiVersion), {
+    const response = await fetch(getHost(route, query, service, apiVersion), {
       method: method.toString(),
       headers: {
         'Content-Type': 'application/json',
@@ -123,44 +142,9 @@ const withBody = async (props: IProps, method: Method): Promise<any> => {
   }
 };
 
-const getPrices = async (): Promise<any> => {
-  try {
-    const host =
-      process.env.DEFAULT_PRICE_HOST ||
-      'https://prices.endpoints.services.klever.io/v1';
-
-    const response = await fetch(`${host}/prices`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ names: ['KLV/USD'] }),
-    });
-
-    if (!response.ok) {
-      return Promise.resolve({
-        data: null,
-        error: response.statusText,
-        code: 'internal_error',
-      });
-    }
-
-    const symbols: { symbols: IPrice[] } = await response.json();
-
-    return Promise.resolve({
-      data: symbols,
-      error: '',
-      code: 'successful',
-    });
-  } catch (error) {
-    return Promise.resolve({ data: null, error, code: 'internal_error' });
-  }
-};
-
 const api = {
   get: async (props: IProps): Promise<any> => withoutBody(props, Method.GET),
   post: async (props: IProps): Promise<any> => withBody(props, Method.POST),
-  getPrices,
 };
 
 export default api;

@@ -60,7 +60,7 @@ export const statsData: IStats[] = [
   },
   {
     Side: BottomRow,
-    name: 'Transactions Last Day',
+    name: 'Live/Peak TPS',
     value: 0,
     haveCoin: false,
   },

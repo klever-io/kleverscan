@@ -401,11 +401,6 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
   }
 
   const prices: IPriceResponse = await api.getPrices();
-
-  if (prices.error) {
-    props.price = 0;
-  }
-
   if (!prices.error && prices.data?.symbols.length > 0) {
     props.price = prices.data.symbols[0].price;
   }

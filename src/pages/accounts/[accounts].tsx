@@ -68,6 +68,8 @@ const Address: React.FC<IAccountPage> = ({
   convertedBalance,
   totalTransactions,
 }) => {
+  const precision = 6; // KLV default precision
+
   const handleCopyInfo = (info: string, data: string | number) => {
     const toastProps: IToast = {
       autoClose: 2000,
@@ -140,7 +142,7 @@ const Address: React.FC<IAccountPage> = ({
   const [selectedTab, setSelectedTab] = useState<ITab>(tabs[0] || ({} as ITab));
 
   const getTotalBalance = () => {
-    return account.balance + getFreezeBalance();
+    return (account.balance + getFreezeBalance()) / 10 ** precision;
   };
 
   const getFreezeBalance = () => {
@@ -153,7 +155,7 @@ const Address: React.FC<IAccountPage> = ({
       0,
     );
 
-    return freezeBalance;
+    return freezeBalance / 10 ** precision;
   };
 
   useEffect(() => {
@@ -204,7 +206,7 @@ const Address: React.FC<IAccountPage> = ({
         </BalanceHeader>
         <BalanceBody>
           <span>Available</span>
-          <p>{account.balance.toLocaleString()}</p>
+          <p>{(account.balance / 10 ** precision).toLocaleString()}</p>
           <span>Frozen</span>
           <div>
             <p>{getFreezeBalance().toLocaleString()}</p>
@@ -285,6 +287,7 @@ export const getServerSideProps: GetStaticProps<IAccountPage> = async ({
     totalTransactions: 0,
   };
 
+  const precision = 6; // KLV default precision;
   const accountLength = 62;
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
 
@@ -311,9 +314,10 @@ export const getServerSideProps: GetStaticProps<IAccountPage> = async ({
   props.totalTransactions = transactions.pagination.totalRecords;
 
   const prices: IPriceResponse = await api.getPrices();
-  if (prices.data.symbols.length > 0) {
+  if (!prices.error && prices.data.symbols.length > 0) {
     props.convertedBalance =
-      prices.data.symbols[0].price * account.data.account.balance;
+      prices.data.symbols[0].price *
+      (account.data.account.balance / 10 ** precision);
   }
 
   return { props };

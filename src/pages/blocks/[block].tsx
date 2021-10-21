@@ -8,7 +8,7 @@ import api from '../../services/api';
 import { IHyperblock, IResponse } from '../../types';
 
 import { navbarItems } from '../../configs/navbar';
-        
+
 interface IHyperblockResponse extends IResponse {
   data: {
     hyperblock: IHyperblock;
@@ -23,7 +23,6 @@ const Block: React.FC<IHyperblock> = props => {
     { name: 'Size', info: props.size },
     { name: 'Size TXs', info: props.sizeTxs },
     { name: 'TX Count', info: props.txCount },
-    { name: 'Producer ID', info: props.producerID },
     { name: 'Producer Public Key', info: props.ProducerPublicKey },
     { name: 'Producer Signature', info: props.producerSignature },
     { name: 'Software Version', info: props.softwareVersion },
@@ -39,7 +38,6 @@ const Block: React.FC<IHyperblock> = props => {
     { name: 'TX Root Hash', info: props.txRootHash },
     { name: 'Trie Root', info: props.trieRoot },
     { name: 'Validators Trie Root', info: props.validatorsTrieRoot },
-    { name: 'Staking Trie Root', info: props.stakingTrieRoot },
     { name: 'Asset Trie Root', info: props.assetTrieRoot },
     { name: 'Previous Random Seed', info: props.prevRandSeed },
     { name: 'Random Seed', info: props.randSeed },

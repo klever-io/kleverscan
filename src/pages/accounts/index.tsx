@@ -34,6 +34,8 @@ const Accounts: React.FC<IAccountPage> = ({
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(false);
 
+  const precision = 6; // KLV default precision
+
   const loadMore = async () => {
     if (maxPage) {
       return;
@@ -74,7 +76,7 @@ const Accounts: React.FC<IAccountPage> = ({
             <Link href={`/accounts/${account.address}`}>{account.address}</Link>
           </span>
         </td>
-        <td>{account.balance.toLocaleString()} KLV</td>
+        <td>{(account.balance / 10 ** precision).toLocaleString()} KLV</td>
       </tr>
     ));
 

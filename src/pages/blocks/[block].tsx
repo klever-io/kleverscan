@@ -5,17 +5,17 @@ import { GetStaticProps } from 'next';
 import Detail, { ITab, ITabData } from '../../components/Layout/Detail';
 
 import api from '../../services/api';
-import { IHyperblock, IResponse } from '../../types';
+import { IBlock, IResponse } from '../../types';
 
 import { navbarItems } from '../../configs/navbar';
 
-interface IHyperblockResponse extends IResponse {
+interface IBlockResponse extends IResponse {
   data: {
-    hyperblock: IHyperblock;
+    block: IBlock;
   };
 }
 
-const Block: React.FC<IHyperblock> = props => {
+const Block: React.FC<IBlock> = props => {
   const overviewData: ITabData[] = [
     { name: 'Nonce', info: props.nonce },
     { name: 'Slot', info: props.slot },
@@ -56,7 +56,7 @@ const Block: React.FC<IHyperblock> = props => {
   return <Detail {...detailProps} />;
 };
 
-export const getServerSideProps: GetStaticProps<IHyperblock> = async ({
+export const getServerSideProps: GetStaticProps<IBlock> = async ({
   params,
 }) => {
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
@@ -67,14 +67,14 @@ export const getServerSideProps: GetStaticProps<IHyperblock> = async ({
     return redirectProps;
   }
 
-  const hyperblock: IHyperblockResponse = await api.get({
-    route: `hyperblock/by-nonce/${blockNonce}`,
+  const block: IBlockResponse = await api.get({
+    route: `block/by-nonce/${blockNonce}`,
   });
-  if (hyperblock.error) {
+  if (block.error) {
     return redirectProps;
   }
 
-  const props: IHyperblock = hyperblock.data.hyperblock;
+  const props: IBlock = block.data.block;
 
   return { props };
 };

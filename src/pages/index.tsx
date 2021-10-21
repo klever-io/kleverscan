@@ -42,7 +42,7 @@ import {
 
 import {
   IResponse,
-  IHyperblock,
+  IBlock,
   ITransaction,
   ITransferContract,
   Contract,
@@ -58,7 +58,7 @@ import { BiSort } from 'react-icons/bi';
 
 interface IHome {
   transactions: ITransaction[];
-  blocks: IHyperblock[];
+  blocks: IBlock[];
   price: number;
   totalAccounts: number;
   tps: string;
@@ -73,7 +73,7 @@ interface ISection {
   title: string;
   href: string;
   Icon: IconType;
-  data: (ITransaction | IHyperblock)[] | undefined;
+  data: (ITransaction | IBlock)[] | undefined;
   Component: React.FC<any>;
 }
 
@@ -83,9 +83,9 @@ interface ITransactionResponse extends IResponse {
   };
 }
 
-interface IHyperblockResponse extends IResponse {
+interface IBlockResponse extends IResponse {
   data: {
-    hyperblocks: IHyperblock[];
+    blocks: IBlock[];
   };
 }
 
@@ -242,7 +242,7 @@ const Home: React.FC<IHome> = ({
     );
   };
 
-  const BlockItem: React.FC<IHyperblock> = ({
+  const BlockItem: React.FC<IBlock> = ({
     nonce,
     parentHash,
     timeStamp,
@@ -306,7 +306,7 @@ const Home: React.FC<IHome> = ({
 
     const renderList = (
       Component: React.FC,
-      list: (ITransaction | IHyperblock)[] | undefined,
+      list: (ITransaction | IBlock)[] | undefined,
     ): JSX.Element => {
       const skeletonProps = { width: 200, height: 60 };
       const errorMessage = 'Unable to load data';
@@ -387,11 +387,11 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
     tps: '0/0',
   };
 
-  const blocks: IHyperblockResponse = await api.get({
-    route: 'hyperblock/list',
+  const blocks: IBlockResponse = await api.get({
+    route: 'block/list',
   });
   if (!blocks.error) {
-    props.blocks = blocks.data.hyperblocks;
+    props.blocks = blocks.data.blocks;
   }
 
   const transactions: ITransactionResponse = await api.get({

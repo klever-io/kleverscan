@@ -118,7 +118,7 @@ export interface ITransaction {
   receipt: IReceipt[];
 }
 
-export interface IHyperblock {
+export interface IBlock {
   nonce: number;
   parentHash: string;
   timeStamp: number;

@@ -45,7 +45,6 @@ import {
   IBlock,
   ITransaction,
   ITransferContract,
-  Contract,
   IPagination,
   IChainStatistics,
 } from '../types';
@@ -117,6 +116,9 @@ const Home: React.FC<IHome> = ({
   const [klvPrice, setKlvPrice] = useState(price);
   const priceInterval = 10 * 60 * 1000; // 10 min
 
+  const [data, setData] = useState({ transactions, blocks });
+  const dataInterval = 10 * 1000;
+
   useEffect(() => {
     const interval = setInterval(async () => {
       const prices: IPriceResponse = await api.post({
@@ -131,6 +133,33 @@ const Home: React.FC<IHome> = ({
 
       setKlvPrice(0);
     }, priceInterval);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      let latestBlocks = [...data.blocks];
+      let latestTransactions = [...data.transactions];
+
+      const blocks: IBlockResponse = await api.get({
+        route: 'block/list',
+      });
+      if (!blocks.error) {
+        latestBlocks = blocks.data.blocks;
+      }
+
+      const transactions: ITransactionResponse = await api.get({
+        route: 'transaction/list',
+      });
+      if (!transactions.error) {
+        latestTransactions = transactions.data.transactions;
+      }
+
+      setData({ blocks: latestBlocks, transactions: latestTransactions });
+    }, dataInterval);
 
     return () => {
       clearInterval(interval);
@@ -162,44 +191,16 @@ const Home: React.FC<IHome> = ({
     );
   };
 
-  const PriceHistoryChart: React.FC = () => {
-    const title = '24h Price History';
-
-    return (
-      <PriceHistoryContainer>
-        <span>{title}</span>
-        <Chart data={infoChartData} />
-      </PriceHistoryContainer>
-    );
-  };
-
-  const TransactionCharts: React.FC = () => {
-    const charts: IChart[] = [
-      {
-        title: '14 days Transaction History',
-        data: transactionHistory,
-      },
-      {
-        title: '14 days Address Growth',
-        data: accountGrowth,
-      },
-    ];
-
-    return (
-      <ChartContainer>
-        {charts.map((chart, index) => (
-          <TimeChart key={index}>
-            <span>{chart.title}</span>
-            <Divider />
-            <span style={{ fontSize: '.875rem' }}>
-              The information contained in the chart is for illustration
-            </span>
-            <Chart data={chart.data} />
-          </TimeChart>
-        ))}
-      </ChartContainer>
-    );
-  };
+  const charts: IChart[] = [
+    {
+      title: '14 days Transaction History',
+      data: transactionHistory,
+    },
+    {
+      title: '14 days Address Growth',
+      data: accountGrowth,
+    },
+  ];
 
   const TransactionItem: React.FC<ITransaction> = ({
     hash,
@@ -278,14 +279,14 @@ const Home: React.FC<IHome> = ({
         title: 'Blocks',
         href: 'blocks',
         Icon: FaLaravel,
-        data: blocks,
+        data: data.blocks,
         Component: BlockItem,
       },
       {
-        title: 'Transfer',
+        title: 'Transactions',
         href: 'transactions',
         Icon: BiSort,
-        data: transactions,
+        data: data.transactions,
         Component: TransactionItem,
       },
     ];
@@ -367,9 +368,23 @@ const Home: React.FC<IHome> = ({
       <Container>
         <CardContainer>
           <StatsCard />
-          <PriceHistoryChart />
+          <PriceHistoryContainer>
+            <span>24h Price History</span>
+            <Chart data={infoChartData} />
+          </PriceHistoryContainer>
         </CardContainer>
-        <TransactionCharts />
+        <ChartContainer>
+          {charts.map((chart, index) => (
+            <TimeChart key={index}>
+              <span>{chart.title}</span>
+              <Divider />
+              <span style={{ fontSize: '.875rem' }}>
+                The information contained in the chart is for illustration
+              </span>
+              <Chart data={chart.data} />
+            </TimeChart>
+          ))}
+        </ChartContainer>
       </Container>
       <ListContainer>
         <ReportList />
@@ -398,11 +413,7 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
     route: 'transaction/list',
   });
   if (!transactions.error) {
-    props.transactions = transactions.data.transactions.filter(
-      transaction =>
-        Object.keys(Contract)[transaction.contract[0].type] ===
-        Contract.Transfer,
-    );
+    props.transactions = transactions.data.transactions;
   }
 
   const accounts: IAccountResponse = await api.get({

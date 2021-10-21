@@ -23,7 +23,13 @@ import {
 import Input from '../../components/Input';
 
 import api, { IPrice } from '../../services/api';
-import { IAccount, IPagination, IResponse } from '../../types';
+import {
+  Contract,
+  IAccount,
+  IPagination,
+  IResponse,
+  ITransaction,
+} from '../../types';
 
 import { IoSnowOutline } from 'react-icons/io5';
 import { FaRegUser } from 'react-icons/fa';
@@ -35,12 +41,6 @@ import {
 import { TableContainer } from '../../components/Layout/List/styles';
 import { IToast } from '../../components/Layout/Detail';
 
-interface IAccountPage {
-  account: IAccount;
-  totalTransactions: number;
-  convertedBalance: number;
-}
-
 interface IAccountResponse extends IResponse {
   data: {
     account: IAccount;
@@ -48,6 +48,9 @@ interface IAccountResponse extends IResponse {
 }
 
 interface ITransactionsResponse extends IResponse {
+  data: {
+    transactions: ITransaction[];
+  };
   pagination: IPagination;
 }
 
@@ -55,6 +58,12 @@ interface IPriceResponse extends IResponse {
   data: {
     symbols: IPrice[];
   };
+}
+
+interface IAccountPage {
+  account: IAccount;
+  transactions: ITransactionsResponse;
+  convertedBalance: number;
 }
 
 interface ITab {
@@ -66,7 +75,7 @@ interface ITab {
 const Address: React.FC<IAccountPage> = ({
   account,
   convertedBalance,
-  totalTransactions,
+  transactions,
 }) => {
   const precision = 6; // KLV default precision
 
@@ -112,6 +121,18 @@ const Address: React.FC<IAccountPage> = ({
       </tr>
     ));
 
+  const getTransactionData = () =>
+    transactions.data.transactions.map((transaction, index) => (
+      <tr key={String(index)}>
+        <td>{Object.values(Contract)[transaction.contract[0].type]}</td>
+        <td>
+          <Link href={`/transactions/${transaction.hash}`}>
+            {transaction.hash}
+          </Link>
+        </td>
+      </tr>
+    ));
+
   const tabs: ITab[] = [
     ...(account.assets && Object.values(account.assets).length > 0
       ? [
@@ -134,6 +155,16 @@ const Address: React.FC<IAccountPage> = ({
               'Delegation',
             ],
             data: getBucketData(),
+          },
+        ]
+      : []),
+    ...(transactions.data.transactions &&
+    transactions.data.transactions.length > 0
+      ? [
+          {
+            title: 'Transactions',
+            headers: ['Contract Type', 'Hash'],
+            data: getTransactionData(),
           },
         ]
       : []),
@@ -221,7 +252,7 @@ const Address: React.FC<IAccountPage> = ({
     return (
       <TransferContainer>
         <span>Transactions</span>
-        <p>{totalTransactions}</p>
+        <p>{transactions.pagination.totalRecords}</p>
       </TransferContainer>
     );
   };
@@ -284,7 +315,7 @@ export const getServerSideProps: GetStaticProps<IAccountPage> = async ({
   const props: IAccountPage = {
     account: {} as IAccount,
     convertedBalance: 0,
-    totalTransactions: 0,
+    transactions: {} as ITransactionsResponse,
   };
 
   const precision = 6; // KLV default precision;
@@ -311,7 +342,7 @@ export const getServerSideProps: GetStaticProps<IAccountPage> = async ({
   if (account.error) {
     return redirectProps;
   }
-  props.totalTransactions = transactions.pagination.totalRecords;
+  props.transactions = transactions;
 
   const prices: IPriceResponse = await api.getPrices();
   if (!prices.error && prices.data.symbols.length > 0) {

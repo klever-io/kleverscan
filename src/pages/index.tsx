@@ -113,31 +113,11 @@ const Home: React.FC<IHome> = ({
 }) => {
   const router = useRouter();
   const [loaded] = useState(true);
-  const [klvPrice, setKlvPrice] = useState(price);
-  const priceInterval = 10 * 60 * 1000; // 10 min
+
+  const [boardData, setBoardData] = useState({ price, totalAccounts, tps });
 
   const [data, setData] = useState({ transactions, blocks });
-  const dataInterval = 10 * 1000;
-
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      const prices: IPriceResponse = await api.post({
-        route: 'prices',
-        service: Service.PRICE,
-        body: { names: ['KLV/USD'] },
-      });
-      if (!prices.error) {
-        setKlvPrice(prices.symbols[0].price);
-        return;
-      }
-
-      setKlvPrice(0);
-    }, priceInterval);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+  const dataInterval = 10 * 1000; // 10 seconds
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -166,15 +146,59 @@ const Home: React.FC<IHome> = ({
     };
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      let newPrice = boardData.price;
+      let newAccounts = boardData.totalAccounts;
+      let newTps = boardData.tps;
+
+      const prices: IPriceResponse = await api.post({
+        route: 'prices',
+        service: Service.PRICE,
+        body: { names: ['KLV/USD'] },
+      });
+      if (!prices.error) {
+        newPrice = prices.symbols[0].price;
+      }
+
+      const statistics: IStatisticsResponse = await api.get({
+        route: 'node/statistics',
+        service: Service.NODE,
+      });
+      if (!statistics.error) {
+        const chainStatistics = statistics.data.statistics.chainStatistics;
+
+        newTps = `${chainStatistics.liveTPS}/${chainStatistics.peakTPS}`;
+      }
+
+      const accounts: IAccountResponse = await api.get({
+        route: 'address/list',
+      });
+      if (!accounts.error) {
+        newAccounts = accounts.pagination.totalRecords;
+      }
+
+      setBoardData({
+        price: newPrice,
+        tps: newTps,
+        totalAccounts: newAccounts,
+      });
+    }, dataInterval);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
   const StatsCard: React.FC = () => {
     const data = [
       {
         key: 'KLV Price',
-        data: `${klvPrice.toFixed(4)} USD`,
+        data: `${boardData.price.toFixed(4)} USD`,
       },
       { key: 'Market Cap', data: `0 USD` },
-      { key: 'Total Accounts', data: totalAccounts },
-      { key: 'Live/Peak TPS', data: tps },
+      { key: 'Total Accounts', data: boardData.totalAccounts },
+      { key: 'Live/Peak TPS', data: boardData.tps },
     ];
 
     return (

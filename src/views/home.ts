@@ -136,6 +136,8 @@ const Row = styled.div`
     font-weight: 400;
     font-size: 1.5rem;
     color: ${props => props.theme.navbar.background};
+
+    animation: 1s ease 0s 1 normal none running fadein;
   }
 
   @media (max-width: 425px) {

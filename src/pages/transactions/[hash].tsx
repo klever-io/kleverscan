@@ -242,8 +242,13 @@ const Transaction: React.FC<ITransactionPage> = props => {
     }
   };
 
+  const capitalize = (string: string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
   const overviewData: ITabData[] = [
     { name: 'Hash', info: props.hash },
+    { name: 'Status', info: props.status ? capitalize(props.status) : '- -' },
     { name: 'Block Number', info: props.blockNum },
     { name: 'Sender', info: props.sender, linked: `/accounts/${props.sender}` },
     {

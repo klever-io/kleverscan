@@ -63,6 +63,26 @@ export default class MyDocument extends Document {
             sizes="16x16"
             href="/favicon-16x16.png"
           />
+          <meta
+            name="description"
+            content="KleverScan is a part of Klever Ecosystem, which allows you to explore, follow transactions, accounts, and block creations. This is the first step to achieve an ultimate Blockchain with Klever empowerment, to support the KLV community and all transactions in its Blockchain."
+          />
+
+          <meta property="og:url" content="https://testnet.kleverscan.org/" />
+          <meta property="og:type" content="website" />
+          <meta property="og:title" content="KleverChain Testnet" />
+          <meta property="og:image" content="%PUBLIC_URL%/social-logo.png" />
+          <meta property="og:description" content="KleverScan is a part of Klever Ecosystem, which allows you to explore, follow transactions, accounts, and block creations. This is the first step to achieve an ultimate Blockchain with Klever empowerment, to support the KLV community and all transactions in its Blockchain." />
+          <meta property="og:site_name" content="KleverChain Testnet" />
+
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:site" content="@klever_io" />
+          <meta name="twitter:title" content="KleverChain Testnet" />
+          <meta name="twitter:description" content="KleverScan is a part of Klever Ecosystem, which allows you to explore, follow transactions, accounts, and block creations. This is the first step to achieve an ultimate Blockchain with Klever empowerment, to support the KLV community and all transactions in its Blockchain." />
+          <meta property="twitter:image:src" content="%PUBLIC_URL%/social-logo.png" />
+
+
+
         </Head>
         <body>
           <Main />

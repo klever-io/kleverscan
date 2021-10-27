@@ -229,7 +229,7 @@ const Home: React.FC<IHome> = ({
   const TransactionItem: React.FC<ITransaction> = ({
     hash,
     contract,
-    timeStamp,
+    timestamp,
   }) => {
     const contractPosition = 0;
     const parameter = contract[contractPosition].parameter as ITransferContract;
@@ -244,7 +244,7 @@ const Home: React.FC<IHome> = ({
               <a>{hash}</a>
             </Link>
           </span>
-          <p>{getAge(fromUnixTime(timeStamp))} ago</p>
+          <p>{getAge(fromUnixTime(timestamp))} ago</p>
         </div>
         <div>
           <span>
@@ -270,7 +270,7 @@ const Home: React.FC<IHome> = ({
   const BlockItem: React.FC<IBlock> = ({
     nonce,
     parentHash,
-    timeStamp,
+    timestamp,
     txCount,
   }) => (
     <ListItem>
@@ -280,7 +280,7 @@ const Home: React.FC<IHome> = ({
             <a>{nonce}</a>
           </Link>
         </span>
-        <p>{getAge(fromUnixTime(timeStamp))} ago</p>
+        <p>{getAge(fromUnixTime(timestamp))} ago</p>
       </div>
       <div>
         <span>

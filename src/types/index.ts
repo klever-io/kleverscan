@@ -105,15 +105,14 @@ export interface ITransaction {
   blockNum: number;
   sender: string;
   expiration: number;
-  timeStamp: number;
+  timestamp: number;
   fee: number;
   bandwidthFeeLimit: number;
   chainID: string;
   signature: string;
   searchOrder: number;
-  kappFee: number;
+  kAppFee: number;
   bandwidthFee: number;
-  consumedFee: number;
   status: string;
   contract: IContract[];
   receipt: IReceipt[];
@@ -122,7 +121,7 @@ export interface ITransaction {
 export interface IBlock {
   nonce: number;
   parentHash: string;
-  timeStamp: number;
+  timestamp: number;
   slot: number;
   epoch: number;
   isEpochStart: boolean;
@@ -180,13 +179,13 @@ export interface IBucket {
 }
 
 export interface IChainStatistics {
-  liveTPS: number,
-  averageTPS: number,
-  peakTPS: number,
-  currentBlockNonce: number,
-  totalProcessedTxCount: number,
-  averageBlockTxCount: number,
-  lastBlockTxCount: number
+  liveTPS: number;
+  averageTPS: number;
+  peakTPS: number;
+  currentBlockNonce: number;
+  totalProcessedTxCount: number;
+  averageBlockTxCount: number;
+  lastBlockTxCount: number;
 }
 
 interface IError {

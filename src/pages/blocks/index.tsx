@@ -33,8 +33,7 @@ const Blocks: React.FC<IBlockPage> = ({
   const maxItems = pagination.totalRecords;
   const headers = ['Nonce', 'Age', 'Transactions'];
 
-  const [blocks, setBlocks] =
-    useState<IBlock[]>(initialBlocks);
+  const [blocks, setBlocks] = useState<IBlock[]>(initialBlocks);
   const [page, setPage] = useState(1);
 
   const loadMore = async () => {
@@ -70,7 +69,7 @@ const Blocks: React.FC<IBlockPage> = ({
               <a>{block.nonce}</a>
             </Link>
           </td>
-          <td>{getAge(fromUnixTime(block.timeStamp))} ago</td>
+          <td>{getAge(fromUnixTime(block.timestamp))} ago</td>
           <td>{block.txCount}</td>
           {/* <td>{block.producerID}</td> */}
         </tr>
@@ -80,22 +79,21 @@ const Blocks: React.FC<IBlockPage> = ({
   return <List {...listProps}>{renderItems()}</List>;
 };
 
-export const getServerSideProps: GetServerSideProps<IBlockPage> =
-  async () => {
-    const props: IBlockPage = {
-      blocks: [],
-      pagination: {} as IPagination,
-    };
-
-    const block: IBlockResponse = await api.get({
-      route: 'block/list',
-    });
-    if (!block.error) {
-      props.blocks = block.data.blocks;
-      props.pagination = block.pagination;
-    }
-
-    return { props };
+export const getServerSideProps: GetServerSideProps<IBlockPage> = async () => {
+  const props: IBlockPage = {
+    blocks: [],
+    pagination: {} as IPagination,
   };
+
+  const block: IBlockResponse = await api.get({
+    route: 'block/list',
+  });
+  if (!block.error) {
+    props.blocks = block.data.blocks;
+    props.pagination = block.pagination;
+  }
+
+  return { props };
+};
 
 export default Blocks;

@@ -253,22 +253,16 @@ const Transaction: React.FC<ITransactionPage> = props => {
     { name: 'Sender', info: props.sender, linked: `/accounts/${props.sender}` },
     {
       name: 'Timestamp',
-      info: format(fromUnixTime(props.timeStamp), 'dd/MM/yyyy HH:mm'),
+      info: format(fromUnixTime(props.timestamp), 'dd/MM/yyyy HH:mm'),
     },
     { name: 'Signature', info: props.signature },
     {
       name: 'Kapp Fee',
-      info: (props.kappFee / 10 ** props.precision).toFixed(props.precision),
+      info: (props.kAppFee / 10 ** props.precision).toFixed(props.precision),
     },
     {
       name: 'Bandwith Fee',
       info: (props.bandwidthFee / 10 ** props.precision).toFixed(
-        props.precision,
-      ),
-    },
-    {
-      name: 'Consumed Fee',
-      info: (props.consumedFee / 10 ** props.precision).toFixed(
         props.precision,
       ),
     },

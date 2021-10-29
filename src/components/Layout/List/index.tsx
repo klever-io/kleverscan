@@ -4,6 +4,7 @@ import { IconType } from 'react-icons';
 
 import {
   Container,
+  EmptyRow,
   HeaderContainer,
   HeaderIcon,
   InputContainer,
@@ -55,6 +56,16 @@ const List: React.FC<IList> = ({
   const getTableTitles = () =>
     headers.map((header, index) => <th key={String(index)}>{header}</th>);
 
+  const EmptyBody: React.FC = () => {
+    return (
+      <EmptyRow>
+        <td
+          colSpan={headers.length}
+        >{`Unable to load list of ${title.toLowerCase()}`}</td>
+      </EmptyRow>
+    );
+  };
+
   return (
     <Container>
       <Header />
@@ -64,12 +75,14 @@ const List: React.FC<IList> = ({
           <thead>
             <tr>{getTableTitles()}</tr>
           </thead>
-          <tbody>{children}</tbody>
+          <tbody>{maxItems > 0 ? children : <EmptyBody />}</tbody>
         </table>
       </TableContainer>
-      <LoadMoreButton onClick={loadMore} maxPage={maxPage || false}>
-        <span>see more</span>
-      </LoadMoreButton>
+      {maxItems > 10 && (
+        <LoadMoreButton onClick={loadMore} maxPage={maxPage || false}>
+          <span>see more</span>
+        </LoadMoreButton>
+      )}
     </Container>
   );
 };

@@ -166,6 +166,13 @@ export const TableContainer = styled.div`
   }
 `;
 
+export const EmptyRow = styled.tr`
+  td {
+    color: ${props => props.theme.input.placeholder};
+    text-align: center;
+  }
+`;
+
 export const LoadMoreButton = styled.div<{ maxPage: boolean }>`
   margin-top: 2.5rem;
   padding: 1rem 0;

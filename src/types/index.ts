@@ -1,3 +1,5 @@
+import { LatLngExpression } from "leaflet";
+
 export enum Contract {
   Transfer = 'Transfer',
   CreateAsset = 'Create Asset',
@@ -205,4 +207,11 @@ export interface IResponse {
   data: any;
   code: string;
   error: IError;
+}
+
+export interface INodeData {
+  name: string;
+  count?: number;
+  location: LatLngExpression;
+  nodes?: INodeData[];
 }

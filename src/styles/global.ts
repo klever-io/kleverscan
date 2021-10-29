@@ -6,6 +6,10 @@ export default createGlobalStyle`
     padding: 0;
     box-sizing: border-box;
   }
+  
+  body {
+    background: #F7F7F7 !important; // TODO: remove it
+  }
 
   @media (max-width: 1080px) {
     html {

@@ -12,6 +12,7 @@
   "dependencies": {
     "babel-plugin-inline-react-svg": "^2.0.1",
     "date-fns": "^2.23.0",
+    "leaflet": "^1.7.1",
     "next": "11.0.1",
     "next-compose-plugins": "^2.2.1",
     "next-images": "^1.8.1",
@@ -22,6 +23,7 @@
     "react-device-detect": "^2.0.1",
     "react-dom": "17.0.2",
     "react-icons": "^4.2.0",
+    "react-leaflet": "^3.2.2",
     "react-toastify": "^8.0.3",
     "recharts": "^2.0.10",
     "styled-components": "^5.3.0"
@@ -29,6 +31,7 @@
   "devDependencies": {
     "@types/nprogress": "^0.2.0",
     "@types/react": "17.0.15",
+    "@types/react-leaflet": "^2.8.2",
     "@types/styled-components": "^5.1.11",
     "@typescript-eslint/eslint-plugin": "^4.28.5",
     "eslint": "7.31.0",

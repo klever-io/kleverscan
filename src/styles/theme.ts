@@ -52,6 +52,14 @@ const theme = {
     divider: '#EEEFF6',
   },
 
+  card: {
+    black: '#2e2f47',
+    white: '#ffffff',
+    gray: '#9C9EB9',
+    border: '#DDDEE7',
+    background: 'linear-gradient(104deg, rgb(238, 63, 113), rgb(125, 63, 241))',
+  },
+
   text: {
     black: '#2e2f47',
     background: 'linear-gradient(104deg, rgb(238, 63, 113), rgb(125, 63, 241))',
@@ -62,6 +70,14 @@ const theme = {
   button: {
     background: 'linear-gradient(132deg, rgb(238, 63, 113), rgb(125, 63, 241))',
   },
+
+  chart: {
+    line: '#DDDEE7'
+  },
+
+  map: {
+    marker: '#33d46c'
+  }
 };
 
 export default theme;

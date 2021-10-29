@@ -188,7 +188,7 @@ const Address: React.FC<IAccountPage> = ({
   };
 
   useEffect(() => {
-    const title = selectedTab ? selectedTab.title : '';
+    const title = selectedTab?.title ? selectedTab.title : '';
 
     const tab = document.getElementById(`tab-${title.toLowerCase()}`);
     const indicator = document.getElementById('tab-indicator');

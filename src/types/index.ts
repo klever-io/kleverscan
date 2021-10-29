@@ -120,6 +120,7 @@ export interface ITransaction {
 
 export interface IBlock {
   nonce: number;
+  hash: string;
   parentHash: string;
   timestamp: number;
   slot: number;

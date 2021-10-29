@@ -8,6 +8,7 @@ import api from '../../services/api';
 import { IBlock, IResponse } from '../../types';
 
 import { navbarItems } from '../../configs/navbar';
+import { format, fromUnixTime } from 'date-fns';
 
 interface IBlockResponse extends IResponse {
   data: {
@@ -17,6 +18,11 @@ interface IBlockResponse extends IResponse {
 
 const Block: React.FC<IBlock> = props => {
   const overviewData: ITabData[] = [
+    { name: 'Hash', info: props.hash },
+    {
+      name: 'Timestamp',
+      info: format(fromUnixTime(props.timestamp), 'dd/MM/yyyy HH:mm'),
+    },
     { name: 'Nonce', info: props.nonce },
     { name: 'Slot', info: props.slot },
     { name: 'Epoch', info: props.epoch },

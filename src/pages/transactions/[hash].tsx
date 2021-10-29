@@ -253,7 +253,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
     { name: 'Sender', info: props.sender, linked: `/accounts/${props.sender}` },
     {
       name: 'Timestamp',
-      info: format(fromUnixTime(props.timestamp), 'dd/MM/yyyy HH:mm'),
+      info: format(fromUnixTime(props.timestamp / 1000), 'dd/MM/yyyy HH:mm'),
     },
     { name: 'Signature', info: props.signature },
     {

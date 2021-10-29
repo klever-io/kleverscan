@@ -69,7 +69,7 @@ const Blocks: React.FC<IBlockPage> = ({
               <a>{block.nonce}</a>
             </Link>
           </td>
-          <td>{getAge(fromUnixTime(block.timestamp))} ago</td>
+          <td>{getAge(fromUnixTime(block.timestamp / 1000))} ago</td>
           <td>{block.txCount}</td>
           {/* <td>{block.producerID}</td> */}
         </tr>

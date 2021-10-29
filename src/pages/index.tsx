@@ -244,7 +244,7 @@ const Home: React.FC<IHome> = ({
               <a>{hash}</a>
             </Link>
           </span>
-          <p>{getAge(fromUnixTime(timestamp))} ago</p>
+          <p>{getAge(fromUnixTime(timestamp / 1000))} ago</p>
         </div>
         <div>
           <span>
@@ -280,7 +280,7 @@ const Home: React.FC<IHome> = ({
             <a>{nonce}</a>
           </Link>
         </span>
-        <p>{getAge(fromUnixTime(timestamp))} ago</p>
+        <p>{getAge(fromUnixTime(timestamp / 1000))} ago</p>
       </div>
       <div>
         <span>

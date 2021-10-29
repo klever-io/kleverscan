@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { GetStaticProps } from 'next';
 
@@ -50,11 +50,13 @@ const Block: React.FC<IBlock> = props => {
   ];
 
   const title = 'Block Details';
-  const tabs: ITab[] = [
+
+  const [tabs] = useState<ITab[]>([
     { title: 'Overview', data: overviewData },
     { title: 'Transactions', data: transactionData },
     { title: 'Block Info', data: hashesData },
-  ];
+  ]);
+
   const Icon = navbarItems.find(item => item.name === 'Blocks')?.Icon;
 
   const detailProps = { title, tabs, Icon };

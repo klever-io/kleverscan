@@ -1,22 +1,17 @@
 import React from 'react';
 
-import { useRouter } from 'next/router';
-
 import Head from 'next/head';
-import Navbar from '../Navbar';
+import Navbar from '../Header';
 import Footer from '../Footer';
 
 const Layout: React.FC = ({ children }) => {
-  const router = useRouter();
-  const haveBackground = router.pathname !== '/';
-
   return (
     <div>
       <Head>
         <title>Klever Explorer</title>
       </Head>
 
-      <Navbar background={haveBackground} />
+      <Navbar />
 
       <main>{children}</main>
 

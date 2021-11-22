@@ -1,63 +1,63 @@
 const theme = {
-  background: '#f7f7f7',
+  background: '#EBF1F8',
   white: '#fff',
-  border: '#eeeff6',
-
-  rose: '#EE3F71',
-  purple: '#7D3FF1',
-  gray: '#EBEBEB',
+  black: '#0B0B1E',
 
   navbar: {
-    background: '#2e2f47',
-    mobile: '#66688f',
-    mobileContainer: '#25253a',
+    background: '#0B0B1E',
+
+    text: '#646693',
+  },
+
+  footer: {
+    background: '#0B0B1E',
+
+    socialBorder: '#2c3041',
+
+    hover: '#aa33b5',
+    text: '#9b9dd1',
   },
 
   input: {
-    placeholder: '#9c9eb9',
-
-    border: '#DDDEE7',
-
-    shadow: '#191a29',
-    activeShadow: '#7418c2',
-
-    activeBorder: '#ee3f71',
-
-    error:
-      'linear-gradient(95deg, rgb(205, 52, 87), rgb(255, 68, 101), rgb(255, 68, 101))',
-  },
-
-  table: {
-    shadow: '#DDDEE7',
-
-    text: '#66688f',
-    link: '#8B46A7',
-
-    icon: '#9c9eb9',
-
-    green: '#32D46C',
-    red: '#FF4465',
-
-    energy: 'linear-gradient(132.3deg, #33D46C 0%, #D3F13F 123.14%);',
-
-    helpIcon: '#9e9e9e',
-  },
-
-  content: {
-    tab: {
-      active: '#2D2E47',
-      inactive: '#9C9EB9',
+    border: {
+      default: '#C6C7EB',
+      dark: '#7B7DB2',
+      home: '#585a92',
     },
 
-    divider: '#EEEFF6',
+    text: '#7B7DB2',
+
+    shadow: '#aa33b5',
   },
 
   card: {
-    black: '#2e2f47',
-    white: '#ffffff',
-    gray: '#9C9EB9',
-    border: '#DDDEE7',
-    background: 'linear-gradient(104deg, rgb(238, 63, 113), rgb(125, 63, 241))',
+    background: '#222345',
+
+    text: '#C6C7EB',
+    secondaryText: '#595C98',
+
+    green: '#86EF75',
+    red: '#FF4465',
+  },
+
+  blockCard: {
+    text: '#7B7DB2',
+  },
+
+  transactionCard: {
+    text: '#7B7DB2',
+
+    amount: '#595C98',
+  },
+
+  chart: {
+    background: '#5A2A73',
+    transparent: '#272349',
+
+    linear: {
+      stroke: '#aa33b5',
+      fill: '#585A92',
+    },
   },
 
   text: {
@@ -66,18 +66,6 @@ const theme = {
     largeBackground:
       'linear-gradient(104deg, rgb(238, 63, 113), rgb(125, 63, 241), rgb(125, 63, 241), rgb(238, 63, 113))',
   },
-
-  button: {
-    background: 'linear-gradient(132deg, rgb(238, 63, 113), rgb(125, 63, 241))',
-  },
-
-  chart: {
-    line: '#DDDEE7'
-  },
-
-  map: {
-    marker: '#33d46c'
-  }
 };
 
 export default theme;

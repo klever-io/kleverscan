@@ -1,4 +1,4 @@
-import { LatLngExpression } from "leaflet";
+import { LatLngExpression } from 'leaflet';
 
 export enum Contract {
   Transfer = 'Transfer',
@@ -121,8 +121,8 @@ export interface ITransaction {
 }
 
 export interface IBlock {
-  nonce: number;
   hash: string;
+  nonce: number;
   parentHash: string;
   timestamp: number;
   slot: number;
@@ -136,12 +136,12 @@ export interface IBlock {
   validatorsTrieRoot: string;
   stakingTrieRoot: string;
   assetTrieRoot: string;
-  producerID: number;
-  ProducerPublicKey: string;
   producerSignature: string;
+  signature: string;
   prevRandSeed: string;
   randSeed: string;
   txCount: number;
+  blockRewards: number;
   txHashes: any[];
   softwareVersion: string;
   chainID: string;

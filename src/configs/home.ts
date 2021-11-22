@@ -1,14 +1,8 @@
-import { BottomRow, TopRow } from '../views/home';
+import { sub } from 'date-fns';
 
 export interface IChartData {
+  date?: number;
   value: number;
-}
-
-interface IStats {
-  Side: React.FC;
-  name: string;
-  value: number | string;
-  haveCoin: boolean;
 }
 
 const infoChartData: IChartData[] = [
@@ -45,31 +39,96 @@ const accountGrowth: IChartData[] = [
   { value: 3999 },
 ];
 
-export const statsData: IStats[] = [
+const coinMockedData: IChartData[] = [
+  { value: 10 },
+  { value: 9 },
+  { value: 12 },
+  { value: 10 },
+  { value: 12 },
+  { value: 15 },
+  { value: 16 },
+  { value: 20 },
+  { value: 18 },
+  { value: 20 },
+  { value: 21 },
+  { value: 21 },
+  { value: 25 },
+  { value: 21 },
+  { value: 28 },
+  { value: 30 },
+  { value: 32 },
+  { value: 29 },
+  { value: 30 },
+  { value: 32 },
+  { value: 35 },
+  { value: 34 },
+  { value: 37 },
+  { value: 38 },
+  { value: 43 },
+];
+
+const transactionMockedData: IChartData[] = [
   {
-    Side: TopRow,
-    name: 'KLV Price',
-    value: (0.0).toFixed(4),
-    haveCoin: true,
+    date: sub(new Date(), { days: 15 }).getTime(),
+    value: 6,
   },
   {
-    Side: TopRow,
-    name: 'Market Cap',
-    value: 0,
-    haveCoin: true,
+    date: sub(new Date(), { days: 14 }).getTime(),
+    value: 10,
   },
   {
-    Side: BottomRow,
-    name: 'Live/Peak TPS',
-    value: 0,
-    haveCoin: false,
+    date: sub(new Date(), { days: 13 }).getTime(),
+    value: 3,
   },
   {
-    Side: BottomRow,
-    name: 'Total Accounts',
-    value: 0,
-    haveCoin: false,
+    date: sub(new Date(), { days: 12 }).getTime(),
+    value: 2,
   },
+  {
+    date: sub(new Date(), { days: 11 }).getTime(),
+    value: 4,
+  },
+  {
+    date: sub(new Date(), { days: 10 }).getTime(),
+    value: 3,
+  },
+  {
+    date: sub(new Date(), { days: 9 }).getTime(),
+    value: 5,
+  },
+  {
+    date: sub(new Date(), { days: 8 }).getTime(),
+    value: 6,
+  },
+  {
+    date: sub(new Date(), { days: 7 }).getTime(),
+    value: 7,
+  },
+  {
+    date: sub(new Date(), { days: 6 }).getTime(),
+    value: 9,
+  },
+  {
+    date: sub(new Date(), { days: 5 }).getTime(),
+    value: 8,
+  },
+  {
+    date: sub(new Date(), { days: 4 }).getTime(),
+    value: 7.5,
+  },
+  {
+    date: sub(new Date(), { days: 3 }).getTime(),
+    value: 6.1,
+  },
+  {
+    date: sub(new Date(), { days: 2 }).getTime(),
+    value: 4.9,
+  },
+  {
+    date: sub(new Date(), { days: 1 }).getTime(),
+    value: 3.13,
+  },
+  { date: new Date().getTime(), value: 5 },
 ];
 
 const defaultEquivalentCoin = 'USD';
@@ -79,4 +138,6 @@ export {
   accountGrowth,
   infoChartData,
   defaultEquivalentCoin,
+  coinMockedData,
+  transactionMockedData,
 };

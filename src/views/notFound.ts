@@ -12,7 +12,7 @@ export const Container = styled.div`
   justify-content: center;
 
   font-size: 2rem;
-  color: ${props => props.theme.table.text};
+  color: red;
 
   span {
     font-weight: 400;

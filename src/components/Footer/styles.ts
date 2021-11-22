@@ -1,121 +1,104 @@
-import { darken, transparentize } from 'polished';
 import styled from 'styled-components';
 
 export const Container = styled.footer`
-  padding: 1rem 17.5rem;
-
-  background-color: ${props => props.theme.navbar.background};
-
-  font-weight: 300;
-
-  a {
-    text-decoration: unset;
-    color: ${props => props.theme.white};
-    line-height: 2rem;
-
-    transition: 0.2s ease;
-
-    &:hover {
-      color: ${props => darken(0.15, props.theme.white)};
-    }
-  }
-
-  @media (max-width: 1200px) {
-    padding: 1rem 7rem;
-  }
-
-  @media (max-width: 992px) {
-    padding: 1rem 2.5rem;
-  }
-
-  @media (max-width: 768px) {
-    padding: 1rem 0;
-  }
-`;
-
-export const SectionContainer = styled.div`
-  padding: 4.5rem 0 1.5rem 0;
+  padding: 5rem 10rem;
 
   display: flex;
 
-  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 5rem;
 
-  @media (max-width: 768px) {
-    flex-direction: column;
-
-    align-items: center;
-  }
+  background-color: ${props => props.theme.footer.background};
 `;
 
-export const Content = styled.div`
+export const DescriptionContainer = styled.div`
   display: flex;
-  flex: 25%;
 
   flex-direction: column;
+  flex: 0 0 40%;
 
   span {
-    margin-bottom: 1.5rem;
+    padding: 1.25rem 0;
 
-    color: ${props => props.theme.navbar.mobile};
-    text-transform: uppercase;
-    letter-spacing: 0.25rem;
-    font-size: 0.85rem;
-
-    strong {
-      font-weight: 500;
-    }
-
-    a {
-      color: white !important;
-
-      cursor: pointer;
-
-      &:hover {
-        text-decoration: underline;
-        text-decoration-color: ${props => props.theme.rose};
-      }
-    }
-
-    @media (max-width: 768px) {
-      font-size: 0.975rem;
-    }
-  }
-
-  @media (max-width: 768px) {
-    font-size: 1.2rem;
-  }
-
-  @media (max-width: 768px) {
-    margin: 1.5rem 0;
-
-    align-items: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: white;
   }
 `;
 
-export const Tag = styled.a`
-  color: ${props => props.theme.white} !important;
-  background-image: unset !important;
+export const SocialContainer = styled.div`
+  display: flex;
 
-  &:hover {
-    text-decoration: unset !important;
+  flex-direction: row;
 
-    color: ${props => transparentize(0.15, props.theme.white)} !important;
-  }
+  gap: 0.75rem;
 `;
 
-export const CreditsContainer = styled.div`
-  padding: 2rem 0;
-
-  width: 100%;
+export const SocialIcon = styled.div`
+  width: 2.5rem;
+  height: 2.5rem;
 
   display: flex;
-  flex-direction: column;
+
   align-items: center;
   justify-content: center;
 
+  border: 2px solid ${props => props.theme.footer.socialBorder};
+  border-radius: 50%;
+
+  color: white;
+  font-size: 0.85rem;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+
+  &:hover {
+    border-color: ${props => props.theme.footer.hover};
+    background-color: ${props => props.theme.footer.hover};
+  }
+`;
+
+export const LinksContainer = styled.div`
+  display: flex;
+
+  flex-direction: column;
+  flex: 0 0 20%;
+`;
+
+export const LinkItems = styled.div`
+  display: flex;
+
+  flex-direction: column;
+
+  &:not(:last-child) {
+    margin-bottom: 1.75rem;
+  }
+
   span {
-    font-size: 0.875rem;
-    color: ${props => props.theme.navbar.mobile};
-    line-height: 1.5rem;
+    padding-bottom: 1rem;
+
+    font-weight: 500;
+    color: ${props => props.theme.white};
+  }
+
+  a {
+    margin-left: 1rem;
+
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: ${props => props.theme.footer.text};
+
+    text-decoration: none;
+
+    transition: 0.2s ease;
+
+    &:not(:last-child) {
+      margin-bottom: 1rem;
+    }
+
+    &:hover {
+      color: ${props => props.theme.footer.hover};
+    }
   }
 `;

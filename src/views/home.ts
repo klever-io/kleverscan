@@ -1,327 +1,378 @@
-import { transparentize } from 'polished';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
-import { navbarHeight } from '../configs/navbar';
-import { Theme } from '../styles/styles';
+import { lighten, transparentize } from 'polished';
 
-export const BackgroundVideo = styled.div`
-  position: absolute;
+import { default as DefaultInput } from '@/components/Inputt';
 
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: auto;
-  max-height: 35rem;
+interface IVariation {
+  positive: boolean;
+}
 
-  overflow: hidden;
+const FadeIn = keyframes`
+  0% {
+    opacity: 0;
+  }
 
-  background: ${props => props.theme.navbar.background};
-
-  z-index: -1;
-
-  video {
-    min-width: 100%;
-
-    opacity: 0.6;
+  100% {
+    opacity: 1;
   }
 `;
 
-export const InputContainer = styled.section`
-  margin-top: ${navbarHeight}rem;
-  margin-bottom: 17rem;
+export const Container = styled.div`
+  background-color: ${props => props.theme.background};
+`;
 
-  padding: 1rem 17.5rem;
+export const IconContainer = styled.div`
+  padding-right: 1rem;
+`;
 
-  display: flex;
-  flex-direction: column;
+export const Section = styled.section`
+  padding: 5rem 10rem 0 10rem;
 
-  justify-content: center;
-  align-items: center;
-
-  color: ${props => props.theme.white};
-
-  span {
-    font-size: 2rem;
-    font-weight: 400;
-
-    margin-bottom: 0.75rem;
-
-    white-space: nowrap;
+  h1 {
+    margin-bottom: 1rem;
   }
 
-  p {
-    display: unset;
+  &:last-child {
+    padding-bottom: 10rem;
+  }
+`;
 
-    font-size: 1.875rem;
+export const DataContainer = styled(Section)`
+  padding: 5rem 10rem;
+
+  background-color: #40274f;
+`;
+
+export const Input = styled(DefaultInput)`
+  margin: 0 5rem;
+  padding: 1.25rem 1rem;
+
+  background-color: ${props => props.theme.white};
+
+  border-color: ${props => props.theme.input.border.home};
+
+  &:focus-within {
+    box-shadow: 0 1px 10px ${props => props.theme.input.shadow};
   }
 
-  @media (max-width: 555px) {
-    padding: 0;
-
-    text-align: center;
-
-    p {
-      display: block;
+  input {
+    &::selection {
+      background-color: ${props => lighten(0.4, props.theme.input.border.home)};
     }
   }
 `;
 
-export const Container = styled.section`
+export const DataCardsContainer = styled.div`
+  margin-top: 4rem;
+
+  display: flex;
+
+  flex-direction: row;
+  align-items: center;
+
+  gap: 1rem;
+`;
+
+export const DataCardsContent = styled.div`
+  width: 100%;
+
+  display: flex;
+
+  flex-direction: column;
+  justify-content: center;
+
+  gap: 0.5rem;
+`;
+
+export const DataCard = styled.div`
+  padding: 1.5rem;
+
+  width: 100%;
+
+  display: flex;
+
+  flex-direction: row;
+  align-items: center;
+
+  background-color: ${props => props.theme.card.background};
+  border-radius: 1rem;
+`;
+
+export const DataCardValue = styled.div`
+  width: 100%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 0.25rem;
+
+  span {
+    color: ${props => props.theme.card.text};
+    font-size: 0.85rem;
+  }
+
+  p {
+    color: ${props => props.theme.white};
+    font-weight: 600;
+    font-size: 1rem;
+  }
+`;
+
+export const DataCardLatest = styled.div<IVariation>`
+  min-width: fit-content;
+  display: flex;
+
+  flex-direction: column;
+  align-items: flex-end;
+
+  gap: 0.5rem;
+
+  span {
+    font-size: 0.85rem;
+    color: ${props => props.theme.card.secondaryText};
+  }
+
+  p {
+    color: ${props => props.theme.card[props.positive ? 'green' : 'red']};
+  }
+`;
+
+export const CoinDataCard = styled(DataCard)`
+  width: auto;
+  height: 16rem;
+
+  flex-direction: column;
+
   position: relative;
 `;
 
-export const CardContainer = styled.div`
-  top: -7rem;
-  width: 100%;
-
-  padding: 0 17rem;
-
-  position: absolute;
-  display: flex;
-
-  flex-direction: row;
-
-  @media (max-width: 1200px) {
-    padding: 0 7rem;
-  }
-
-  @media (max-width: 768px) {
-    padding: 0 3rem;
-  }
-
-  @media (max-width: 425px) {
-    top: -13rem;
-
-    flex-direction: column;
-  }
-`;
-
-export const StatsContainer = styled.div`
-  width: 100%;
-
-  display: flex;
-  flex-wrap: wrap;
-
-  border-radius: 0.25rem 0 0 0.25rem;
-
-  background-color: ${props => props.theme.white};
-
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 10px 0px;
-
-  span {
-    background-image: ${props => props.theme.text.background};
-    background-clip: text;
-    -webkit-background-clip: text;
-
-    color: transparent;
-    font-weight: 400;
-    font-size: 0.9rem;
-  }
-
-  @media (max-width: 425px) {
-    justify-content: center;
-  }
-`;
-
-const borderProp = (theme: Theme) => `1px solid ${theme.border}`;
-
-const Row = styled.div`
-  flex: 50%;
-
-  padding: 1rem;
-
-  p {
-    font-weight: 400;
-    font-size: 1.5rem;
-    color: ${props => props.theme.navbar.background};
-
-    animation: 1s ease 0s 1 normal none running fadein;
-  }
-
-  @media (max-width: 425px) {
-    flex: 100%;
-
-    div {
-      display: flex;
-
-      flex-direction: column;
-      align-items: center;
-    }
-  }
-`;
-
-export const TopRow = styled(Row)`
-  border-right: ${props => borderProp(props.theme)};
-
-  @media (max-width: 425px) {
-    border-bottom: ${props => borderProp(props.theme)};
-  }
-`;
-
-export const BottomRow = styled(Row)`
-  border-top: ${props => borderProp(props.theme)};
-  border-right: ${props => borderProp(props.theme)};
-`;
-
-export const PriceHistoryContainer = styled.div`
-  padding: 1rem 1rem;
-
-  min-width: 18.75rem;
+export const CoinDataContent = styled.div`
+  min-width: 18.5rem;
 
   display: flex;
 
   flex-direction: column;
 
-  background-color: ${props => props.theme.white};
-
-  border-radius: 0 0.25rem 0.25rem 0;
-
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 10px 0px;
-
-  span {
-    padding-bottom: 0.5rem;
-
-    color: ${props => props.theme.input.placeholder};
-    font-weight: 400;
-    font-size: 0.775rem;
-    letter-spacing: 3px;
-    text-align: center;
-  }
-
-  @media (max-width: 768px) {
-    min-width: 13rem;
-  }
+  animation: 1.5s ease 0s 1 normal none running ${FadeIn};
 `;
 
-export const LoaderContainer = styled.div`
-  width: 100%;
-  height: 100%;
-
+export const CoinDataHeaderContainer = styled.div`
   display: flex;
 
-  align-items: center;
-  justify-content: center;
+  flex-direction: row;
+
+  z-index: 3;
 `;
 
-export const ChartContainer = styled.div`
-  padding: 5rem 17.5rem 0 17.5rem;
+export const CoinDataHeader = styled(CoinDataHeaderContainer)`
+  width: 100%;
 
+  flex-direction: column;
+`;
+
+export const CoinDataName = styled.div`
   display: flex;
 
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-
-  gap: 2rem;
-
-  border-radius: 0.25rem;
-
-  @media (max-width: 1200px) {
-    padding-left: 7rem;
-    padding-right: 7rem;
-  }
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-
-    padding-left: 3rem;
-    padding-right: 3rem;
-  }
-`;
-
-export const ChartContent = styled.div`
-  padding: 1rem 1.5rem 2rem 1.5rem;
-
-  width: 100%;
-  height: 20.31rem;
-
-  background-color: ${props => props.theme.white};
-
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 10px 0px;
-
-  span {
-    color: ${props => props.theme.input.placeholder};
-    font-weight: 400;
-  }
-`;
-
-export const TimeChart = styled(ChartContent)`
-  text-align: center;
-  padding: 1rem 0 4.1rem;
-
-  @media (max-width: 425px) {
-    &:first-child {
-      margin-top: 10rem;
-    }
-  }
-`;
-
-export const Divider = styled.div`
-  margin: 1rem 0;
-
-  width: 100%;
-  height: 1px;
-
-  background-color: ${props => props.theme.border};
-`;
-
-export const ListContainer = styled.section`
-  margin-top: 1.25rem;
-  padding-bottom: 3rem;
-
-  background-color: ${props => props.theme.background};
-  width: 100%;
-`;
-
-export const ListHeader = styled.div`
-  display: flex;
-
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-
-  span {
-    color: ${props => props.theme.navbar.mobile};
-    font-size: 1.25rem;
-    font-weight: 500;
-  }
-
-  div {
-    &:first-child {
-      display: flex;
-
-      flex-direction: row;
-      align-items: center;
-    }
-  }
-`;
-
-export const ListHeaderIcon = styled.div`
-  padding: 0.5rem;
-  margin-right: 0.5rem;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  background-image: ${props => props.theme.button.background};
 
   color: ${props => props.theme.white};
+  font-weight: 600;
 
-  border-radius: 0.5rem;
-
-  svg {
-    font-size: 1.5rem;
+  span {
+    font-size: 1.1rem;
   }
 `;
 
-export const ListContent = styled.div`
+export const CoinDataDescription = styled(CoinDataName)<IVariation>`
+  font-size: 0.95rem;
+  font-weight: 400;
+
+  span {
+    color: ${props => props.theme.card.text};
+    font-size: 0.85rem;
+  }
+
+  p {
+    color: ${props => props.theme.card[props.positive ? 'green' : 'red']};
+    font-weight: 500;
+  }
+`;
+
+export const CoinChartContainer = styled.div`
+  padding: 0 1.25rem;
+
+  height: 10rem;
+  width: 100%;
+
+  top: -1rem;
+  left: 0;
+
+  position: absolute;
+
+  z-index: 1;
+`;
+
+export const CoinValueContainer = styled.div`
+  margin-top: 3rem;
+`;
+
+export const CoinValueContent = styled.div`
+  display: flex;
+
+  flex-direction: column;
+
+  font-weight: 400;
+  color: ${props => props.theme.card.text};
+
+  gap: 0.25rem;
+
+  &:not(:last-child) {
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    font-size: 0.85rem;
+  }
+`;
+
+export const CoinValueDetail = styled.div<{ positive?: boolean }>`
+  display: flex;
+
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  span {
+    color: ${props => props.theme.white};
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  p {
+    color: ${props => {
+      if (!props.positive) {
+        return props.theme.card.text;
+      }
+
+      return props.theme.card[props.positive ? 'green' : 'red'];
+    }};
+  }
+`;
+
+export const CoinSelectorContainer = styled.div`
+  bottom: -1.5rem;
+  left: 50%;
+
+  position: absolute;
+
+  display: flex;
+
+  flex-direction: row;
+
+  gap: 0.75rem;
+`;
+
+export const CoinSelector = styled.div<{ isSelected: boolean }>`
+  width: 0.5rem;
+  height: 0.5rem;
+
+  background-color: ${props =>
+    props.isSelected ? props.theme.white : props.theme.black};
+
+  border-radius: 50%;
+
+  cursor: pointer;
+`;
+
+export const BlockCardContainer = styled.div`
+  min-width: 17rem;
+
+  padding: 1.5rem;
+
+  background-color: ${props => props.theme.white};
+
+  border-radius: 1rem;
+`;
+
+export const BlockCardRow = styled.div`
+  width: 100%;
+
+  display: flex;
+
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  &:not(:last-child) {
+    margin-bottom: 0.5rem;
+  }
+
+  &:nth-child(2) {
+    margin-bottom: 1rem;
+  }
+
+  &:last-child {
+    margin-top: 0.25rem;
+  }
+
+  strong {
+    font-weight: 600;
+  }
+
+  p {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: ${props => props.theme.blockCard.text};
+  }
+
+  small {
+    font-weight: 400;
+    font-size: 0.85rem;
+    color: ${props => props.theme.blockCard.text};
+  }
+
+  a {
+    margin-right: -0.625rem;
+
+    max-width: 5rem;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.85rem;
+
+    color: ${props => props.theme.black};
+  }
+
+  span {
+    font-size: 0.95rem;
+  }
+`;
+
+export const TransactionContainer = styled.div`
+  display: flex;
+
+  flex-direction: row;
+
+  gap: 1rem;
+`;
+
+export const TransactionContent = styled.div`
+  max-height: 27.5rem;
+  min-width: fit-content;
+
   overflow-y: auto;
-  overflow-x: hidden;
-  height: 12.5rem;
+
+  padding: 1.5rem;
+
+  background-color: ${props => props.theme.white};
+
+  border-radius: 1rem;
 
   &::-webkit-scrollbar {
     position: absolute;
@@ -338,71 +389,114 @@ export const ListContent = styled.div`
 
   &:hover {
     &::-webkit-scrollbar-thumb {
-      background: ${transparentize(0.75, '#000')};
+      background: ${props => transparentize(0.75, props.theme.black)};
     }
   }
 `;
 
-export const ListItem = styled.div`
-  padding: 0.5rem 0;
-
+export const TransactionRow = styled.div`
   display: flex;
 
   flex-direction: row;
-
-  justify-content: space-between;
   align-items: center;
 
-  animation: 1s ease 0s 1 normal none running fadein;
-
-  div {
-    display: flex;
-    flex-direction: column;
-    width: 30%;
-  }
-
-  span {
-    max-width: 10rem;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    color: black;
-    font-weight: 400;
-  }
-
-  p {
-    font-weight: 400;
-    font-size: 0.875rem;
-    color: ${props => props.theme.input.placeholder};
-  }
-
-  a {
-    background-image: ${props => props.theme.text.background};
-    background-clip: text;
-    -webkit-background-clip: text;
-
-    color: transparent;
-
-    cursor: pointer;
-
-    &:hover {
-      text-decoration: underline;
-      text-decoration-color: ${props => props.theme.rose};
-    }
-  }
-
   &:not(:last-child) {
-    border-bottom: 1px solid ${props => props.theme.border};
+    margin-bottom: 2rem;
   }
 `;
 
-export const ChartContentError = styled.div`
-  width: 100%;
-  height: 100%;
+export const TransactionData = styled.div`
+  margin-right: 2.5rem;
 
   display: flex;
-  align-items: center;
-  justify-content: center;
+
+  flex-direction: column;
+
+  gap: 0.25rem;
+
+  a {
+    max-width: 10rem;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+
+    color: ${props => props.theme.black};
+  }
+
+  span {
+    font-weight: 400;
+    font-size: 0.85rem;
+
+    color: ${props => props.theme.transactionCard.text};
+  }
+
+  strong {
+    font-weight: 600;
+
+    color: ${props => props.theme.transactionCard.text};
+  }
+
+  p {
+    max-width: 10rem;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+    font-size: 0.9rem !important;
+
+    color: ${props => props.theme.black};
+  }
+`;
+
+export const TransactionAmount = styled.div`
+  width: 14.5rem;
+  margin-left: auto;
+
+  text-align: right;
+
+  span {
+    max-width: 100%;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: ${props => props.theme.transactionCard.amount};
+  }
+`;
+
+export const TransactionChart = styled(TransactionContent)`
+  width: 100%;
+
+  position: relative;
+  display: flex;
+
+  flex-direction: column;
+
+  span {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: ${props => props.theme.black};
+  }
+
+  p {
+    font-size: 1rem;
+    color: ${props => props.theme.transactionCard.text};
+  }
+`;
+
+export const TransactionChartContent = styled.div`
+  position: absolute;
+
+  bottom: 0;
+  left: -1rem;
+
+  width: 95%;
+  height: 80%;
 `;

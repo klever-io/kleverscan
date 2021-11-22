@@ -17,19 +17,22 @@ const Chart: React.FC<IChart> = ({ data, theme }) => {
       <AreaChart data={data}>
         <defs>
           <linearGradient id="background" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="10%" stopColor={theme.rose} stopOpacity={0.5} />
-            <stop offset="90%" stopColor={theme.white} stopOpacity={0} />
-          </linearGradient>
-          <linearGradient id="stroke" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={theme.rose} stopOpacity={1} />
-            <stop offset="95%" stopColor={theme.purple} stopOpacity={1} />
+            <stop
+              offset="10%"
+              stopColor={theme.chart.background}
+              stopOpacity={0.9}
+            />
+            <stop
+              offset="90%"
+              stopColor={theme.chart.transparent}
+              stopOpacity={0}
+            />
           </linearGradient>
         </defs>
         <Area
           type="monotone"
           dataKey="value"
-          strokeWidth={2}
-          stroke="url(#stroke)"
+          strokeWidth={0}
           fillOpacity={1}
           fill="url(#background)"
         />

@@ -1,17 +1,9 @@
-import { IconType } from 'react-icons/lib';
-
-import {
-  // FaConnectdevelop,
-  FaLaravel,
-  FaRegUser,
-} from 'react-icons/fa';
-import { DiGitBranch } from 'react-icons/di';
-import { HiDatabase } from 'react-icons/hi';
+import { Category, Graph, Send, TwoUser } from '@/assets/icons';
 
 export interface INavbarItem {
   name: string;
   pathTo: string;
-  Icon: IconType;
+  Icon: any;
   onClick?(): void;
 }
 
@@ -19,30 +11,27 @@ export const heightLimit = 70; // pixels
 export const navbarHeight = 5; // rem
 export const navbarPadding = '1rem 17.5rem';
 
-export const navbarItems: INavbarItem[] = [
-  // {
-  //   name: 'Nodes',
-  //   pathTo: '/nodes',
-  //   Icon: FaConnectdevelop,
-  // },
+const navbarItems: INavbarItem[] = [
   {
     name: 'Blocks',
     pathTo: '/blocks',
-    Icon: FaLaravel,
+    Icon: Category,
   },
   {
     name: 'Accounts',
     pathTo: '/accounts',
-    Icon: FaRegUser,
+    Icon: TwoUser,
   },
   {
     name: 'Transactions',
     pathTo: '/transactions',
-    Icon: DiGitBranch,
+    Icon: Send,
   },
   {
     name: 'Assets',
     pathTo: '/assets',
-    Icon: HiDatabase,
+    Icon: Graph,
   },
 ];
+
+export { navbarItems };

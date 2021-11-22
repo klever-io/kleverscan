@@ -24,7 +24,7 @@ export default createGlobalStyle`
   }
 
   body, input, textarea, button {
-    font: 500 1rem Rubik, sans-serif;
+    font: 500 1rem Montserrat, sans-serif;
   }
 
   input {
@@ -39,7 +39,7 @@ export default createGlobalStyle`
 
   h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
-    font-family: Rubik, sans-serif;
+    font-family: Montserrat, sans-serif;
   }
 
   h1 {
@@ -60,7 +60,7 @@ export default createGlobalStyle`
     color: ${props => props.theme.white};
   }
 
-  a {
+  /* a {
     background-image: ${props => props.theme.text.background};
     background-clip: text;
     -webkit-background-clip: text;
@@ -73,7 +73,7 @@ export default createGlobalStyle`
       text-decoration: underline;
       text-decoration-color: ${props => props.theme.rose};
     }
-  }
+  } */
 
   @keyframes fadein {
     from { 

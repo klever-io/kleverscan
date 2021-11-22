@@ -17,7 +17,7 @@ export interface IPrice {
 export enum Service {
   PROXY,
   PRICE,
-  NODE
+  NODE,
 }
 
 export interface IProps {
@@ -33,13 +33,21 @@ const buildUrlQuery = (query: IQuery): string =>
     .map(key => `${key}=${query[key]}`)
     .join('&');
 
-const getHost = (route: string, query: IQuery, service: Service, apiVersion: string) => {
+const getHost = (
+  route: string,
+  query: IQuery,
+  service: Service,
+  apiVersion: string,
+) => {
   const hostService = {
-    [Service.PROXY]: process.env.DEFAULT_API_HOST || 'https://api.testnet.klever.finance',
-    [Service.PRICE]: process.env.DEFAULT_PRICE_HOST || 'https://prices.endpoints.services.klever.io/v1',
-    [Service.NODE]: process.env.DEFAULT_NODE_HOST || 'http://65.108.9.154:8810'
-  }
-  
+    [Service.PROXY]:
+      process.env.DEFAULT_API_HOST || 'https://api.testnet.klever.finance',
+    [Service.PRICE]:
+      process.env.DEFAULT_PRICE_HOST ||
+      'https://prices.endpoints.services.klever.io/v1',
+    [Service.NODE]: process.env.DEFAULT_NODE_HOST || 'http://65.108.9.154:8810',
+  };
+
   let host = hostService[service];
   let port = process.env.DEFAULT_API_PORT || '443';
   let urlParam = '';
@@ -142,9 +150,22 @@ const withBody = async (props: IProps, method: Method): Promise<any> => {
   }
 };
 
+const withTimeout = async (promise: Promise<any>, timeout = 5000) => {
+  return Promise.race([
+    promise,
+    new Promise(resolve => {
+      setTimeout(() => {
+        resolve({ data: null, error: 'Fetch timeout', code: 'internal_error' });
+      }, timeout);
+    }),
+  ]);
+};
+
 const api = {
-  get: async (props: IProps): Promise<any> => withoutBody(props, Method.GET),
-  post: async (props: IProps): Promise<any> => withBody(props, Method.POST),
+  get: async (props: IProps): Promise<any> =>
+    withTimeout(withoutBody(props, Method.GET)),
+  post: async (props: IProps): Promise<any> =>
+    withTimeout(withBody(props, Method.POST)),
 };
 
 export default api;

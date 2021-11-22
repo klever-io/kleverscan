@@ -5,6 +5,8 @@ metadata:
 spec:
   template:
     spec:
+      nodeSelector:
+        role: common
       containers:
       - name: explorer
         resources:

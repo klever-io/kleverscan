@@ -26,7 +26,7 @@ spec:
       imagePullSecrets:
         - name: docker-klever-explorer
       nodeSelector:
-        role: common-v2
+        role: common
 ---
 apiVersion: v1
 kind: Service

@@ -29,7 +29,6 @@ const Block: React.FC<IBlock> = props => {
     { name: 'Size', info: props.size },
     { name: 'Size TXs', info: props.sizeTxs },
     { name: 'TX Count', info: props.txCount },
-    { name: 'Producer Public Key', info: props.ProducerPublicKey },
     { name: 'Producer Signature', info: props.producerSignature },
     { name: 'Software Version', info: props.softwareVersion },
     { name: 'Chain ID', info: props.chainID },

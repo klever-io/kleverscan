@@ -3,10 +3,19 @@ const theme = {
   white: '#fff',
   black: '#0B0B1E',
 
+  border: '#eeeff6', // TODO: outdated
+
+  rose: '#EE3F71', // TODO: outdated
+  purple: '#7D3FF1', // TODO: outdated
+  gray: '#EBEBEB', // TODO: outdated
+
   navbar: {
     background: '#0B0B1E',
 
     text: '#646693',
+
+    mobile: '#66688f', // TODO: outdated
+    mobileContainer: '#25253a', // TODO: outdated
   },
 
   footer: {
@@ -28,6 +37,12 @@ const theme = {
     text: '#7B7DB2',
 
     shadow: '#aa33b5',
+
+    placeholder: '#9c9eb9', // TODO: outdated
+    activeShadow: '#7418c2', // TODO: outdated
+    activeBorder: '#ee3f71', // TODO: outdated
+    error:
+      'linear-gradient(95deg, rgb(205, 52, 87), rgb(255, 68, 101), rgb(255, 68, 101))', // TODO: outdated
   },
 
   card: {
@@ -38,6 +53,12 @@ const theme = {
 
     green: '#86EF75',
     red: '#FF4465',
+
+    // TODO: outdated
+    black: '#2e2f47',
+    white: '#ffffff',
+    gray: '#9C9EB9',
+    border: '#DDDEE7',
   },
 
   blockCard: {
@@ -58,6 +79,8 @@ const theme = {
       stroke: '#aa33b5',
       fill: '#585A92',
     },
+
+    line: '#DDDEE7', // TODO: outdated
   },
 
   text: {
@@ -65,6 +88,43 @@ const theme = {
     background: 'linear-gradient(104deg, rgb(238, 63, 113), rgb(125, 63, 241))',
     largeBackground:
       'linear-gradient(104deg, rgb(238, 63, 113), rgb(125, 63, 241), rgb(125, 63, 241), rgb(238, 63, 113))',
+  },
+
+  table: {
+    // TODO: outdated
+    shadow: '#DDDEE7',
+
+    text: '#66688f',
+    link: '#8B46A7',
+
+    icon: '#9c9eb9',
+
+    green: '#32D46C',
+    red: '#FF4465',
+
+    energy: 'linear-gradient(132.3deg, #33D46C 0%, #D3F13F 123.14%);',
+
+    helpIcon: '#9e9e9e',
+  },
+
+  content: {
+    // TODO: outdated
+    tab: {
+      active: '#2D2E47',
+      inactive: '#9C9EB9',
+    },
+
+    divider: '#EEEFF6',
+  },
+
+  button: {
+    // TODO: outdated
+    background: 'linear-gradient(132deg, rgb(238, 63, 113), rgb(125, 63, 241))',
+  },
+
+  map: {
+    // TODO: outdated
+    marker: '#33d46c',
   },
 };
 

@@ -83,7 +83,11 @@ export const LinkItems = styled.div`
   }
 
   a {
-    margin-left: 1rem;
+    display: flex;
+
+    align-items: center;
+
+    gap: 0.5rem;
 
     font-size: 0.9rem;
     font-weight: 400;

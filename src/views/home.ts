@@ -405,6 +405,19 @@ export const TransactionRow = styled.div`
   }
 `;
 
+export const TransactionEmpty = styled(TransactionRow)`
+  width: 27.5rem;
+  height: 20rem;
+
+  justify-content: center;
+  align-items: center;
+
+  span {
+    font-weight: 400;
+    color: ${props => transparentize(0.5, props.theme.transactionCard.text)};
+  }
+`;
+
 export const TransactionData = styled.div`
   margin-right: 2.5rem;
 
@@ -454,7 +467,7 @@ export const TransactionData = styled.div`
 `;
 
 export const TransactionAmount = styled.div`
-  width: 14.5rem;
+  width: 12.5rem;
   margin-left: auto;
 
   text-align: right;
@@ -473,6 +486,7 @@ export const TransactionAmount = styled.div`
 
 export const TransactionChart = styled(TransactionContent)`
   width: 100%;
+  min-height: 20rem;
 
   position: relative;
   display: flex;

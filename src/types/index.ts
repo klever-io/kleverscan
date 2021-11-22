@@ -83,7 +83,7 @@ type IParameter =
   | IFreezeContract
   | IUnfreezeContract;
 
-interface IContract {
+export interface IContract {
   type: Contract;
   parameter: IParameter;
 }

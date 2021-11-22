@@ -29,3 +29,25 @@ export const getAge = (date: Date): string => {
 
   return `${val} ${suffix}${val > 1 ? 's' : ''}`;
 };
+
+export const formatAmount = (number: number): string => {
+  const lookup = [
+    { value: 1, symbol: '' },
+    { value: 1e3, symbol: 'K' },
+    { value: 1e6, symbol: 'Mi' },
+    { value: 1e9, symbol: 'Bi' },
+    { value: 1e12, symbol: 'Tri' },
+    { value: 1e15, symbol: 'P' },
+    { value: 1e18, symbol: 'E' },
+  ];
+
+  const regex = /\.0+$|(\.[0-9]*[1-9])0+$/;
+  const item = lookup
+    .slice()
+    .reverse()
+    .find(i => number >= i.value);
+
+  return item
+    ? `${(number / item.value).toFixed(1).replace(regex, '$1')} ${item.symbol}`
+    : '0';
+};

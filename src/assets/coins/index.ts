@@ -1,3 +1,4 @@
-import KFI from './kfi.svg';
+import KFILogo from './kfi-logo.svg';
+import KLV from './klv.svg';
 
-export { KFI };
+export { KFILogo, KLV };

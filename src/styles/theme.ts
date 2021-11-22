@@ -50,6 +50,7 @@ const theme = {
 
     text: '#C6C7EB',
     secondaryText: '#595C98',
+    lightText: '#7B7DB2',
 
     green: '#86EF75',
     red: '#FF4465',
@@ -83,6 +84,19 @@ const theme = {
     line: '#DDDEE7', // TODO: outdated
   },
 
+  filter: {
+    title: '#7B7DB2',
+
+    border: '#C6C7EB',
+    text: '#4F5185',
+
+    item: {
+      background: '#C6C7EB',
+      text: '#595C98',
+      selected: '#aa33b5',
+    },
+  },
+
   text: {
     black: '#2e2f47',
     background: 'linear-gradient(104deg, rgb(238, 63, 113), rgb(125, 63, 241))',
@@ -91,10 +105,14 @@ const theme = {
   },
 
   table: {
+    text: '#7B7DB2',
+
+    success: '#37DD72',
+    pending: '#FFB342',
+
     // TODO: outdated
     shadow: '#DDDEE7',
 
-    text: '#66688f',
     link: '#8B46A7',
 
     icon: '#9c9eb9',

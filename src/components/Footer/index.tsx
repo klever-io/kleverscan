@@ -11,7 +11,6 @@ import {
   SocialIcon,
 } from './styles';
 
-import Logo from '../../assets/logo.svg';
 import {
   contents,
   description,
@@ -20,10 +19,15 @@ import {
   socials,
 } from '@/configs/footer';
 
+import Logo from '../../assets/footer-logo.svg';
+import { ChevronRight } from '@/assets/icons';
+
 const Footer: React.FC = () => {
-  const SocialItem: React.FC<ISocial> = ({ name, link }) => (
+  const SocialItem: React.FC<ISocial> = ({ Icon, link }) => (
     <a target="_blank" href={link} rel="noreferrer">
-      <SocialIcon>{name.charAt(0).toUpperCase()}</SocialIcon>
+      <SocialIcon>
+        <Icon />
+      </SocialIcon>
     </a>
   );
 
@@ -57,7 +61,10 @@ const Footer: React.FC = () => {
               <span>{link.title}</span>
               {link.infoLinks.map((item, index) => (
                 <Link key={String(index)} href={item.href}>
-                  {item.name}
+                  <a>
+                    <ChevronRight />
+                    {item.name}
+                  </a>
                 </Link>
               ))}
             </LinkItems>

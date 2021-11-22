@@ -1,16 +1,19 @@
 import React from 'react';
 
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 import { Container, Input, Item, Logo } from './styles';
 
 import { INavbarItem, navbarItems } from '@/configs/navbar';
 
 const Navbar: React.FC = () => {
+  const router = useRouter();
+
   const NavbarItem: React.FC<INavbarItem> = ({ name, Icon, pathTo }) => {
     return (
       <Link href={pathTo}>
-        <Item>
+        <Item selected={router.pathname.includes(name.toLowerCase())}>
           <Icon />
           <span>{name}</span>
         </Item>

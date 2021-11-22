@@ -1,18 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { fromUnixTime } from 'date-fns';
 
-import List, { IList } from '../../components/Layout/List';
+import { format, fromUnixTime } from 'date-fns';
 
-import { IBlock, IPagination, IResponse } from '../../types';
+import {
+  Card,
+  CardContainer,
+  Container,
+  Header,
+  Input,
+  TableContainer,
+  Title,
+} from '@/views/blocks';
 
-import api from '../../services/api';
-import { getAge } from '../../utils';
-import { navbarItems } from '../../configs/navbar';
+import Table, { ITable } from '@/components/Table';
+import { Row } from '@/components/Table/styles';
 
-interface IBlockPage {
+import { IBlock, IPagination, IResponse } from '@/types/index';
+import api from '@/services/api';
+import { formatAmount, getAge } from '@/utils/index';
+
+import { ArrowLeft } from '@/assets/icons';
+
+interface IBlocks {
   blocks: IBlock[];
   pagination: IPagination;
 }
@@ -24,63 +37,156 @@ interface IBlockResponse extends IResponse {
   pagination: IPagination;
 }
 
-const Blocks: React.FC<IBlockPage> = ({
-  blocks: initialBlocks,
-  pagination,
-}) => {
-  const title = 'Blocks';
-  const Icon = navbarItems.find(item => item.name === 'Blocks')?.Icon;
-  const maxItems = pagination.totalRecords;
-  const headers = ['Nonce', 'Age', 'Transactions'];
+interface ICard {
+  title: string;
+  headers: string[];
+  values: string[];
+}
 
-  const [blocks, setBlocks] = useState<IBlock[]>(initialBlocks);
-  const [page, setPage] = useState(1);
+const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks }) => {
+  const router = useRouter();
 
-  const loadMore = async () => {
-    const newBlocks: IBlockResponse = await api.get({
-      route: 'block/list',
-      query: { page },
-    });
-    if (!newBlocks.error) {
-      setBlocks([...blocks, ...newBlocks.data.blocks]);
+  const [blocks] = useState(defaultBlocks);
+  const [loading] = useState(false);
+  const [uptime] = useState(new Date().getTime());
+  const [age, setAge] = useState(
+    getAge(fromUnixTime(new Date().getTime() / 1000)),
+  );
 
-      const next = newBlocks.pagination.next;
-      if (next !== 0) {
-        setPage(next);
-      }
-    }
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newAge = getAge(fromUnixTime(uptime / 1000));
+
+      setAge(newAge);
+    }, 1 * 1000); // 1 sec
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  const cards: ICard[] = [
+    {
+      title: 'Number of Blocks',
+      headers: ['Blocks Yesterday', 'Cumulative Number'],
+      values: ['+27,684', '35,519,349'],
+    },
+    {
+      title: 'Block Reward',
+      headers: ['Reward Yesterday', 'Cumulative Revenue'],
+      values: ['4,872,384 KLV', '4.4 Bi KLV'],
+    },
+    {
+      title: 'Stats on Burned KLV',
+      headers: ['Burned Yesterday', 'Burned in Total'],
+      values: ['8,607,197 KLV', '1.4 Bi KLV'],
+    },
+  ];
+
+  const CardContent: React.FC<ICard> = ({ title, headers, values }) => {
+    return (
+      <Card>
+        <div>
+          <span>
+            <strong>{title}</strong>
+          </span>
+          <p>{age} ago</p>
+        </div>
+        <div>
+          <span>
+            <small>{headers[0]}</small>
+          </span>
+          <span>
+            <small>{headers[1]}</small>
+          </span>
+        </div>
+        <div>
+          <span>{values[0]}</span>
+          <span>{values[1]}</span>
+        </div>
+      </Card>
+    );
   };
 
-  const listProps: IList = {
-    title,
-    Icon,
-    maxItems,
-    listSize: blocks.length,
-    headers,
-    loadMore,
+  const header = [
+    'Block',
+    'Block size',
+    'Produced by',
+    'Created',
+    'Tx Count',
+    'Burned KLV',
+    'Energy/Bandwith',
+    'Block Reward',
+  ];
+
+  const TableBody: React.FC<IBlock> = ({
+    nonce,
+    size,
+    timestamp,
+    txCount,
+    blockRewards,
+  }) => {
+    return (
+      <Row type="blocks">
+        <span>
+          <Link href={`/block/${nonce}`}>{String(nonce)}</Link>
+        </span>
+        <span>{size.toLocaleString()} Bytes</span>
+        <span>Klever.io</span>
+        <span>
+          <small>
+            {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
+          </small>
+        </span>
+        <span>{txCount}</span>
+        <span>
+          <small>32,230.23 KLV</small>
+        </span>
+        <span>930,932/35,764</span>
+        <span>
+          <strong>{formatAmount(blockRewards)} KLV</strong>
+        </span>
+      </Row>
+    );
   };
 
-  const renderItems = () =>
-    blocks.map((block, index) => {
-      return (
-        <tr key={String(index)}>
-          <td>
-            <Link href={`/blocks/${block.nonce}`}>
-              <a>{block.nonce}</a>
-            </Link>
-          </td>
-          <td>{getAge(fromUnixTime(block.timestamp / 1000))} ago</td>
-          <td>{block.txCount}</td>
-          {/* <td>{block.producerID}</td> */}
-        </tr>
-      );
-    });
+  const tableProps: ITable = {
+    type: 'blocks',
+    header,
+    data: blocks as any[],
+    body: TableBody,
+    loading,
+  };
 
-  return <List {...listProps}>{renderItems()}</List>;
+  return (
+    <Container>
+      <Header>
+        <Title>
+          <div onClick={router.back}>
+            <ArrowLeft />
+          </div>
+          <h1>Blocks</h1>
+        </Title>
+
+        <Input />
+      </Header>
+
+      <CardContainer>
+        {cards.map((card, index) => (
+          <CardContent key={String(index)} {...card} />
+        ))}
+      </CardContainer>
+
+      <TableContainer>
+        <h3>List of blocks</h3>
+        <Table {...tableProps} />
+      </TableContainer>
+    </Container>
+  );
 };
 
-export const getServerSideProps: GetServerSideProps<IBlockPage> = async () => {
-  const props: IBlockPage = {
+export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
+  const props: IBlocks = {
     blocks: [],
     pagination: {} as IPagination,
   };

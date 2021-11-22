@@ -1,3 +1,11 @@
+import {
+  Discord,
+  Facebook,
+  Instagram,
+  Telegram,
+  Twitter,
+} from '@/assets/social';
+
 export interface IContent {
   title: string;
   infoLinks: IInfoLink[];
@@ -9,32 +17,32 @@ export interface IInfoLink {
 }
 
 export interface ISocial {
-  name: string;
+  Icon: any;
   link: string;
 }
 
 const description =
-  'Klever is a multi-crypto wallet with an intuitive and elegant interface that offers a safer, faster and smarter cryptocurrency experience for all users worldwide.';
+  'Klever Explorer is our main platform to visualize assets, blocks, nodes, accounts and transactions in an intuitive and interactive manner. Everything happening in KleverChain can be consulted here on our Explorer.';
 
 const socials: ISocial[] = [
   {
-    name: 'Facebook',
+    Icon: Facebook,
     link: 'https://www.facebook.com/klever.io',
   },
   {
-    name: 'Twitter',
+    Icon: Twitter,
     link: 'https://twitter.com/klever_io',
   },
   {
-    name: 'Discord',
+    Icon: Discord,
     link: 'https://discord.gg/klever-io',
   },
   {
-    name: 'Instagram',
+    Icon: Instagram,
     link: 'https://instagram.com/klever.io',
   },
   {
-    name: 'Telegram',
+    Icon: Telegram,
     link: 'https://t.me/Klever_io',
   },
 ];

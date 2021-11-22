@@ -36,12 +36,13 @@ import {
   TransactionAmount,
   TransactionChart,
   TransactionChartContent,
+  TransactionEmpty,
 } from '@/views/home';
 
 import Chart, { ChartType } from '@/components/Chart';
 
 import { Accounts, Transactions } from '@/assets/cards';
-import { KFI } from '@/assets/coins';
+import { KFILogo } from '@/assets/coins';
 
 import api, { IPrice, Service } from '@/services/api';
 
@@ -55,7 +56,7 @@ import {
 } from '../types';
 
 import { coinMockedData, transactionMockedData } from '@/configs/home';
-import { getAge } from '../utils';
+import { formatAmount, getAge } from '../utils';
 
 import Carousel from '@/components/Carousel';
 
@@ -144,7 +145,7 @@ const Home: React.FC<IHome> = ({
 
   const coinDataCards: ICoinCard[] = [
     {
-      Icon: KFI,
+      Icon: KFILogo,
       name: 'Klever Finance',
       shortname: 'KFI',
       price: kfiPrice,
@@ -305,7 +306,7 @@ const Home: React.FC<IHome> = ({
           </p>
         </TransactionData>
         <TransactionAmount>
-          <span>{amount.toFixed(4)} KLV</span>
+          <span>{formatAmount(amount)} KLV</span>
         </TransactionAmount>
       </TransactionRow>
     );
@@ -351,6 +352,12 @@ const Home: React.FC<IHome> = ({
         <h1>Transactions</h1>
         <TransactionContainer>
           <TransactionContent>
+            {transactions.length === 0 && (
+              <TransactionEmpty>
+                <span>Oops! Apparently no data loaded.</span>
+              </TransactionEmpty>
+            )}
+
             {transactions.map((transaction, index) => (
               <TransactionItem key={String(index)} {...transaction} />
             ))}

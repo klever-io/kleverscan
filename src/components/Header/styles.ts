@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import LogoSvg from '../../assets/new-logo.svg';
 
@@ -23,7 +23,7 @@ export const Logo = styled(LogoSvg)`
   cursor: pointer;
 `;
 
-export const Item = styled.div`
+export const Item = styled.div<{ selected: boolean }>`
   display: flex;
 
   flex-direction: row;
@@ -35,8 +35,14 @@ export const Item = styled.div`
 
   transition: 0.2s ease;
 
+  filter: brightness(${props => (props.selected ? 10 : 1)});
+
   &:hover {
-    filter: brightness(1.5);
+    ${props =>
+      !props.selected &&
+      css`
+        filter: brightness(1.5);
+      `};
   }
 
   span {

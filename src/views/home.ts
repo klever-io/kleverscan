@@ -205,10 +205,10 @@ export const CoinDataDescription = styled(CoinDataName)<IVariation>`
 export const CoinChartContainer = styled.div`
   padding: 0 1.25rem;
 
-  height: 10rem;
+  height: 7.5rem;
   width: 100%;
 
-  top: -1rem;
+  top: 1.5rem;
   left: 0;
 
   position: absolute;
@@ -254,7 +254,7 @@ export const CoinValueDetail = styled.div<{ positive?: boolean }>`
 
   p {
     color: ${props => {
-      if (!props.positive) {
+      if (props.positive === undefined) {
         return props.theme.card.text;
       }
 

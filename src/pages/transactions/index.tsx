@@ -251,7 +251,7 @@ const Transactions: React.FC<ITransactions> = ({
     return (
       <Row type="transactions" filter={filter}>
         <span>
-          <Link href={`/transaction/${hash}`}>{hash}</Link>
+          <Link href={`/transactions/${hash}`}>{hash}</Link>
         </span>
         <span>{blockNum}</span>
         <span>

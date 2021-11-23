@@ -44,7 +44,7 @@ import Chart, { ChartType } from '@/components/Chart';
 import { Accounts, Transactions } from '@/assets/cards';
 import { KFILogo } from '@/assets/coins';
 
-import api, { IPrice, Service } from '@/services/api';
+import api, { Service } from '@/services/api';
 
 import {
   IBlock,
@@ -55,10 +55,26 @@ import {
   ITransferContract,
 } from '../types';
 
-import { coinMockedData, transactionMockedData } from '@/configs/home';
+import { IChartData, transactionMockedData } from '@/configs/home';
 import { formatAmount, getAge } from '../utils';
 
 import Carousel from '@/components/Carousel';
+
+interface ICoinInfo {
+  name: string;
+  shortname: string;
+  price: number;
+  variation: number;
+  marketCap: {
+    price: number;
+    variation: number;
+  };
+  volume: {
+    price: number;
+    variation: number;
+  };
+  prices: IChartData[];
+}
 
 interface IHome {
   transactions: ITransaction[];
@@ -66,7 +82,7 @@ interface IHome {
   totalAccounts: number;
   totalTransactions: number;
   tps: string;
-  kfiPrice: number;
+  coinsData: ICoinInfo[];
 }
 
 interface ITransactionResponse extends IResponse {
@@ -94,8 +110,24 @@ interface IStatisticsResponse extends IResponse {
   };
 }
 
-interface IPriceResponse extends IResponse {
-  symbols: IPrice[];
+interface IGeckoResponse extends IResponse {
+  market_data: {
+    current_price: {
+      usd: number;
+    };
+    price_change_percentage_24h: number;
+    market_cap: {
+      usd: number;
+    };
+    market_cap_change_percentage_24h: number;
+    total_volume: {
+      usd: number;
+    };
+  };
+}
+
+interface IGeckoChartResponse extends IResponse {
+  prices: number[][];
 }
 
 interface ICard {
@@ -105,19 +137,8 @@ interface ICard {
   variation: string;
 }
 
-interface ICoinDetail {
-  price: number;
-  variation: string;
-}
-
-interface ICoinCard {
+interface ICoinCard extends ICoinInfo {
   Icon: any;
-  shortname: string;
-  name: string;
-  price: number;
-  variation: string;
-  marketCap: ICoinDetail;
-  volume: ICoinDetail;
 }
 
 const Home: React.FC<IHome> = ({
@@ -126,7 +147,7 @@ const Home: React.FC<IHome> = ({
   totalAccounts,
   totalTransactions,
   tps,
-  kfiPrice,
+  coinsData,
 }) => {
   const dataCards: ICard[] = [
     {
@@ -143,23 +164,14 @@ const Home: React.FC<IHome> = ({
     },
   ];
 
-  const coinDataCards: ICoinCard[] = [
-    {
-      Icon: KFILogo,
-      name: 'Klever Finance',
-      shortname: 'KFI',
-      price: kfiPrice,
-      variation: '+ 2.34%',
-      marketCap: {
-        price: 11544537494.529,
-        variation: '+ 2.34%',
-      },
-      volume: {
-        price: 11544537494.529,
-        variation: '+ 2.34%',
-      },
-    },
-  ];
+  const getCoinData = () => {
+    const icons = {
+      KLV: KFILogo,
+      KFI: KFILogo,
+    };
+
+    return coinsData.map(coin => ({ ...coin, Icon: icons[coin.shortname] }));
+  };
 
   const [selectedCoin, setSelectedCoin] = useState(0);
 
@@ -167,6 +179,16 @@ const Home: React.FC<IHome> = ({
     if (selectedCoin !== index) {
       setSelectedCoin(index);
     }
+  };
+
+  const getVariation = (variation: number) => {
+    const precision = 2;
+
+    if (variation < 0) {
+      return `- ${Math.abs(variation).toFixed(precision)}%`;
+    }
+
+    return `+ ${variation.toFixed(precision)}%`;
   };
 
   const Card: React.FC<ICard> = ({ Icon, title, value, variation }) => (
@@ -193,6 +215,7 @@ const Home: React.FC<IHome> = ({
     variation,
     marketCap,
     volume,
+    prices,
   }) => (
     <CoinDataCard>
       <CoinDataContent>
@@ -205,24 +228,28 @@ const Home: React.FC<IHome> = ({
               <span>{shortname}</span>
               <span>U$ {price.toLocaleString()}</span>
             </CoinDataName>
-            <CoinDataDescription positive={variation.includes('+')}>
+            <CoinDataDescription
+              positive={getVariation(variation).includes('+')}
+            >
               <span>{name}</span>
-              <p>{variation}</p>
+              <p>{getVariation(variation)}</p>
             </CoinDataDescription>
           </CoinDataHeader>
         </CoinDataHeaderContainer>
 
         <CoinChartContainer>
-          <Chart data={coinMockedData} />
+          <Chart data={prices} />
         </CoinChartContainer>
 
         <CoinValueContainer>
           {[marketCap, volume].map((item, index) => (
             <CoinValueContent key={String(index)}>
               <p>{index === 0 ? 'Market Cap' : 'Volume'}</p>
-              <CoinValueDetail positive={item.variation.includes('+')}>
+              <CoinValueDetail
+                positive={getVariation(item.variation).includes('+')}
+              >
                 <span>$ {item.price.toLocaleString()}</span>
-                <p>{item.variation}</p>
+                <p>{getVariation(item.variation)}</p>
               </CoinValueDetail>
             </CoinValueContent>
           ))}
@@ -236,7 +263,7 @@ const Home: React.FC<IHome> = ({
       </CoinDataContent>
 
       <CoinSelectorContainer>
-        {coinDataCards.map((_, index) => (
+        {getCoinData().map((_, index) => (
           <CoinSelector
             key={String(index)}
             onClick={() => handleSelectionCoin(index)}
@@ -252,6 +279,7 @@ const Home: React.FC<IHome> = ({
     timestamp,
     hash,
     transactions,
+    blockRewards,
   }) => (
     <BlockCardContainer>
       <BlockCardRow>
@@ -272,7 +300,7 @@ const Home: React.FC<IHome> = ({
       </BlockCardRow>
       <BlockCardRow>
         <p>Reward</p>
-        <span>{Number(4000.89).toFixed(2)} KLV</span>
+        <span>{formatAmount(blockRewards)} KLV</span>
       </BlockCardRow>
     </BlockCardContainer>
   );
@@ -290,7 +318,7 @@ const Home: React.FC<IHome> = ({
     return (
       <TransactionRow>
         <TransactionData>
-          <Link href={`/transaction/${hash}`}>{hash}</Link>
+          <Link href={`/transactions/${hash}`}>{hash}</Link>
           <span>
             {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
           </span>
@@ -335,7 +363,7 @@ const Home: React.FC<IHome> = ({
             ))}
           </DataCardsContent>
 
-          <CoinCard {...coinDataCards[selectedCoin]} />
+          <CoinCard {...getCoinData()[selectedCoin]} />
         </DataCardsContainer>
       </DataContainer>
 
@@ -382,7 +410,7 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
     totalAccounts: 0,
     totalTransactions: 0,
     tps: '0/0',
-    kfiPrice: 0,
+    coinsData: [],
   };
 
   const blocks: IBlockResponse = await api.get({
@@ -415,14 +443,48 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
     props.tps = `${chainStatistics.liveTPS}/${chainStatistics.peakTPS}`;
   }
 
-  const kfiPrice: IPriceResponse = await api.post({
-    route: 'prices',
-    service: Service.PRICE,
-    body: { names: ['KFI/USD'] },
+  const pushCoinData = (
+    name: string,
+    shortname: string,
+    response: IGeckoResponse,
+    chart: IGeckoChartResponse,
+  ) => {
+    props.coinsData.push({
+      name,
+      shortname,
+      price: response.market_data.current_price.usd,
+      variation: response.market_data.price_change_percentage_24h,
+      marketCap: {
+        price: response.market_data.market_cap.usd,
+        variation: response.market_data.market_cap_change_percentage_24h,
+      },
+      volume: {
+        price: response.market_data.total_volume.usd,
+        variation: 0,
+      },
+      prices: chart.prices.map(item => ({ value: item[1] })),
+    });
+  };
+
+  const klvData: IGeckoResponse = await api.get({
+    route: 'coins/klever',
+    service: Service.GECKO,
   });
-  if (!kfiPrice.error) {
-    props.kfiPrice = kfiPrice.symbols[0].price;
-  }
+  const klvChart: IGeckoChartResponse = await api.get({
+    route: `coins/klever/market_chart?vs_currency=usd&days=1`,
+    service: Service.GECKO,
+  });
+  pushCoinData('Klever', 'KLV', klvData, klvChart);
+
+  const kfiData: IGeckoResponse = await api.get({
+    route: 'coins/klever-finance',
+    service: Service.GECKO,
+  });
+  const kfiChart: IGeckoChartResponse = await api.get({
+    route: `coins/klever-finance/market_chart?vs_currency=usd&days=1`,
+    service: Service.GECKO,
+  });
+  pushCoinData('Klever Finance', 'KFI', kfiData, kfiChart);
 
   return { props };
 };

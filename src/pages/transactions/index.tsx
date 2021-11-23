@@ -27,6 +27,11 @@ import {
   ITransferContract,
   Contract,
   IContract,
+  ICreateAssetContract,
+  ICreateValidatorContract,
+  IFreezeContract,
+  IUnfreezeContract,
+  IWithdrawContract,
 } from '../../types';
 
 import { ArrowRight, ArrowLeft } from '@/assets/icons';
@@ -89,29 +94,13 @@ const Transactions: React.FC<ITransactions> = ({
     // TODO: fetch new transactions with filter
   }, [filter]);
 
-  const getHeader = () => {
-    switch (filter.name) {
-      case Contract.Transfer:
-        return [...header, 'Coin', 'Amount'];
-      default:
-        return header;
-    }
-  };
-
   const getContractType = (contracts: IContract[]) =>
     contracts.length > 1
       ? 'Multi contract'
       : Object.values(Contract)[contracts[0].type];
 
-  const Transfer: React.FC<ITransaction> = ({ contract }) => {
-    let amount = 0;
-    const contractType = getContractType(contract);
-
-    if (contractType === Contract.Transfer) {
-      const parameter = contract[0].parameter as ITransferContract;
-
-      amount = parameter.amount;
-    }
+  const Transfer: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as ITransferContract;
 
     return (
       <>
@@ -122,19 +111,129 @@ const Transactions: React.FC<ITransactions> = ({
           </div>
         </CenteredRow>
         <span>
-          <strong>{formatAmount(amount)}</strong>
+          <strong>{formatAmount(parameter.amount)}</strong>
         </span>
       </>
     );
   };
 
-  const FilteredComponent: React.FC<ITransaction> = props => {
+  const CreateAsset: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as ICreateAssetContract;
+
+    return (
+      <>
+        <span>{parameter.name}</span>
+        <span>
+          <small>{parameter.ticker}</small>
+        </span>
+      </>
+    );
+  };
+
+  const CreateValidator: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as ICreateValidatorContract;
+
+    return (
+      <>
+        <span>
+          <Link href={`/account/${parameter.config.rewardAddress}`}>
+            {parameter.config.rewardAddress}
+          </Link>
+        </span>
+        <span>
+          <strong>{parameter.config.canDelegate ? 'True' : 'False'}</strong>
+        </span>
+      </>
+    );
+  };
+
+  const Freeze: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as IFreezeContract;
+
+    return (
+      <span>
+        <strong>{formatAmount(parameter.amount)} KLV</strong>
+      </span>
+    );
+  };
+
+  const Unfreeze: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as IUnfreezeContract;
+
+    return (
+      <span>
+        <small>{parameter.bucketID}</small>
+      </span>
+    );
+  };
+
+  const Withdraw: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as IWithdrawContract;
+
+    return (
+      <span>
+        <Link href={`/account/${parameter.toAddress}`}>
+          {parameter.toAddress}
+        </Link>
+      </span>
+    );
+  };
+
+  const FilteredComponent: React.FC<ITransaction> = ({ contract }) => {
+    const contractType = getContractType(contract);
+
+    const getComponent: React.FC<any> = (Component: React.FC<IContract>) =>
+      contractType === filter.name ? <Component {...contract[0]} /> : <div />;
+
     switch (filter.name) {
       case Contract.Transfer:
-        return <Transfer {...props} />;
+        return getComponent(Transfer);
+      case Contract.CreateAsset:
+        return getComponent(CreateAsset);
+      case Contract.CreateValidator:
+      case Contract.ValidatorConfig:
+        return getComponent(CreateValidator);
+      case Contract.Freeze:
+        return getComponent(Freeze);
+      case Contract.Unfreeze:
+      case Contract.Delegate:
+      case Contract.Undelegate:
+        return getComponent(Unfreeze);
+      case Contract.Withdraw:
+        return getComponent(Withdraw);
       default:
         return <div />;
     }
+  };
+
+  const getHeader = () => {
+    let newHeaders: string[] = [];
+
+    switch (filter.name) {
+      case Contract.Transfer:
+        newHeaders = ['Coin', 'Amount'];
+        break;
+      case Contract.CreateAsset:
+        newHeaders = ['Name', 'Ticker'];
+        break;
+      case Contract.CreateValidator:
+      case Contract.ValidatorConfig:
+        newHeaders = ['Reward Address', 'Can Delegate'];
+        break;
+      case Contract.Freeze:
+        newHeaders = ['Amount'];
+        break;
+      case Contract.Unfreeze:
+      case Contract.Delegate:
+      case Contract.Undelegate:
+        newHeaders = ['Bucket ID'];
+        break;
+      case Contract.Withdraw:
+        newHeaders = ['To'];
+        break;
+    }
+
+    return header.concat(newHeaders);
   };
 
   const TableBody: React.FC<ITransaction> = props => {
@@ -215,7 +314,7 @@ export const getServerSideProps: GetServerSideProps<ITransactions> =
     };
 
     const transactions: ITransactionResponse = await api.get({
-      route: 'transaction/list',
+      route: 'transaction/by-type/1',
     });
     if (!transactions.error) {
       props.transactions = transactions.data.transactions;

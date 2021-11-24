@@ -72,7 +72,27 @@ const blocks = css`
   }
 `;
 
-const assets = css`
+const accounts = css`
+  margin-right: 1.25rem;
+
+  &:nth-child(1) {
+    width: 30rem;
+  }
+
+  &:nth-child(2) {
+    width: 8rem;
+  }
+
+  &:nth-child(3) {
+    width: 12rem;
+  }
+
+  &:nth-child(4) {
+    width: 10rem;
+  }
+`;
+
+const assetsPage = css`
   margin-right: 1.25rem;
 
   &:nth-child(1) {
@@ -80,7 +100,7 @@ const assets = css`
   }
 
   &:nth-child(2) {
-    width: 5rem;
+    width: 10rem;
   }
 
   &:nth-child(3) {
@@ -88,17 +108,66 @@ const assets = css`
   }
 
   &:nth-child(4) {
-    width: 7rem;
+    width: 10rem;
   }
 
   &:nth-child(5) {
-    width: 5rem;
+    width: 10rem;
   }
 
   &:nth-child(6) {
+    width: 10rem;
+  }
+`;
+
+const blocks = css`
+  margin-right: 1.25rem;
+  &:nth-child(1) {
+    width: 5rem;
+  }
+  &:nth-child(2) {
+    width: 7rem;
+  }
+  &:nth-child(3) {
+    width: 7rem;
+  }
+  &:nth-child(4) {
+    width: 7rem;
+  }
+  &:nth-child(5) {
+    width: 7rem;
+  }
+  &:nth-child(6) {
+    width: 8rem;
+  }
+  &:nth-child(7) {
+    width: 10rem;
+  }
+  &:nth-child(8) {
+    width: 10rem;
+  }
+`;
+
+const assets = css`
+  margin-right: 1.25rem;
+  &:nth-child(1) {
+    width: 5rem;
+  }
+  &:nth-child(2) {
+    width: 5rem;
+  }
+  &:nth-child(3) {
+    width: 8rem;
+  }
+  &:nth-child(4) {
+    width: 7rem;
+  }
+  &:nth-child(5) {
+    width: 5rem;
+  }
+  &:nth-child(6) {
     width: 12rem;
   }
-
   &:nth-child(7) {
     width: 12rem;
   }
@@ -106,23 +175,18 @@ const assets = css`
 
 const buckets = css`
   margin-right: 1.25rem;
-
   &:nth-child(1) {
     width: 10rem;
   }
-
   &:nth-child(2) {
     width: 5rem;
   }
-
   &:nth-child(3) {
     width: 12rem;
   }
-
   &:nth-child(4) {
     width: 12rem;
   }
-
   &:nth-child(5) {
     width: 10rem;
   }
@@ -131,6 +195,8 @@ const buckets = css`
 const widths = {
   transactions,
   blocks,
+  accounts,
+  assetsPage,
   assets,
   buckets,
 };

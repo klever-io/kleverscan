@@ -1,15 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 
-import List, { IList } from '../../components/Layout/List';
+import { fromUnixTime } from 'date-fns';
 
-import api from '../../services/api';
-import { IAccount, IPagination, IResponse } from '../../types';
-import { navbarItems } from '../../configs/navbar';
+import {
+  Card,
+  CardContainer,
+  Container,
+  Header,
+  Input,
+  TableContainer,
+  Title,
+} from '@/views/blocks';
 
-interface IAccountPage {
+import Table, { ITable } from '@/components/Table';
+import { Row } from '@/components/Table/styles';
+
+import { IAccount, IPagination, IResponse } from '@/types/index';
+import api from '@/services/api';
+import { formatAmount, getAge } from '@/utils/index';
+
+import { ArrowLeft } from '@/assets/icons';
+
+interface IAccounts {
   accounts: IAccount[];
   pagination: IPagination;
 }
@@ -21,79 +37,158 @@ interface IAccountResponse extends IResponse {
   pagination: IPagination;
 }
 
-const Accounts: React.FC<IAccountPage> = ({
+interface ICard {
+  title: string;
+  headers: string[];
+  values: string[];
+}
+
+const Accounts: React.FC<IAccounts> = ({
   accounts: defaultAccounts,
   pagination,
 }) => {
-  const title = 'Accounts';
-  const Icon = navbarItems.find(item => item.name === 'Accounts')?.Icon;
-  const maxItems = pagination.totalRecords;
-  const headers = ['Address', 'Balance'];
+  const router = useRouter();
+  const precision = 6; // default KLV precision
 
-  const [accounts, setAccounts] = useState<IAccount[]>(defaultAccounts);
-  const [page, setPage] = useState(1);
-  const [maxPage, setMaxPage] = useState(false);
+  const [accounts] = useState(defaultAccounts);
+  const [loading] = useState(false);
+  const [uptime] = useState(new Date().getTime());
+  const [age, setAge] = useState(
+    getAge(fromUnixTime(new Date().getTime() / 1000)),
+  );
 
-  const precision = 6; // KLV default precision
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newAge = getAge(fromUnixTime(uptime / 1000));
 
-  const loadMore = async () => {
-    if (maxPage) {
-      return;
-    }
+      setAge(newAge);
+    }, 1 * 1000); // 1 sec
 
-    const newAccounts: IAccountResponse = await api.get({
-      route: 'address/list',
-      query: { page },
-    });
-    if (!newAccounts.error) {
-      if (page <= newAccounts.pagination.totalPages) {
-        setAccounts([...accounts, ...newAccounts.data.accounts]);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
-        setPage(page + 1);
+  const cards: ICard[] = [
+    {
+      title: 'Number of Accounts',
+      headers: ['Accounts Yesterday', 'Total'],
+      values: ['--', pagination.totalRecords.toLocaleString()],
+    },
+    {
+      title: 'Number of Accounts',
+      headers: ['Accounts Yesterday', 'Total'],
+      values: ['--', pagination.totalRecords.toLocaleString()],
+    },
+  ];
 
-        if (page + 1 > newAccounts.pagination.totalPages) {
-          setMaxPage(true);
-        }
-      }
-    }
-  };
-
-  const listProps: IList = {
-    title,
-    Icon,
-    maxItems,
-    listSize: accounts.length,
-    headers,
-    loadMore,
-    maxPage,
-  };
-
-  const renderItems = () =>
-    accounts.map((account, index) => (
-      <tr key={String(index)}>
-        <td>
+  const CardContent: React.FC<ICard> = ({ title, headers, values }) => {
+    return (
+      <Card>
+        <div>
           <span>
-            <Link href={`/accounts/${account.address}`}>{account.address}</Link>
+            <strong>{title}</strong>
           </span>
-        </td>
-        <td>{(account.balance / 10 ** precision).toLocaleString()} KLV</td>
-      </tr>
-    ));
+          <p>{age} ago</p>
+        </div>
+        <div>
+          <span>
+            <small>{headers[0]}</small>
+          </span>
+          <span>
+            <small>{headers[1]}</small>
+          </span>
+        </div>
+        <div>
+          <span>{values[0]}</span>
+          <span>{values[1]}</span>
+        </div>
+      </Card>
+    );
+  };
 
-  return <List {...listProps}>{renderItems()}</List>;
+  const header = ['Address', 'KLV Staked', 'Transaction Count', 'KLV Balance'];
+
+  const TableBody: React.FC<IAccount> = ({ address, buckets, balance }) => {
+    const getFreezeBalance = () => {
+      if (Object.values(buckets).length <= 0) {
+        return 0;
+      }
+
+      const freezeBalance = Object.values(buckets).reduce(
+        (acc, bucket) => acc + bucket.stakeValue,
+        0,
+      );
+
+      return freezeBalance / 10 ** precision;
+    };
+
+    return (
+      <Row type="accounts">
+        <span>
+          <Link href={`/accounts/${address}`}>{address}</Link>
+        </span>
+        <span>
+          <strong>{formatAmount(getFreezeBalance())} KLV</strong>
+        </span>
+        <span>-</span>
+        <span>
+          <strong>{formatAmount(balance)} KLV</strong>
+        </span>
+      </Row>
+    );
+  };
+
+  const tableProps: ITable = {
+    type: 'accounts',
+    header,
+    data: accounts as any[],
+    body: TableBody,
+    loading,
+  };
+
+  return (
+    <Container>
+      <Header>
+        <Title>
+          <div onClick={router.back}>
+            <ArrowLeft />
+          </div>
+          <h1>Accounts</h1>
+        </Title>
+
+        <Input />
+      </Header>
+
+      <CardContainer>
+        {cards.map((card, index) => (
+          <CardContent key={String(index)} {...card} />
+        ))}
+      </CardContainer>
+
+      <TableContainer>
+        <h3>List of accounts</h3>
+        <Table {...tableProps} />
+      </TableContainer>
+    </Container>
+  );
 };
 
-export const getServerSideProps: GetServerSideProps<IAccountPage> =
-  async () => {
-    const props: IAccountPage = { accounts: [], pagination: {} as IPagination };
-
-    const accounts: IAccountResponse = await api.get({ route: 'address/list' });
-    if (!accounts.error) {
-      props.accounts = accounts.data.accounts;
-      props.pagination = accounts.pagination;
-    }
-
-    return { props };
+export const getServerSideProps: GetServerSideProps<IAccounts> = async () => {
+  const props: IAccounts = {
+    accounts: [],
+    pagination: {} as IPagination,
   };
+
+  const accounts: IAccountResponse = await api.get({
+    route: 'address/list',
+  });
+  if (!accounts.error) {
+    props.accounts = accounts.data.accounts;
+    props.pagination = accounts.pagination;
+  }
+
+  return { props };
+};
 
 export default Accounts;

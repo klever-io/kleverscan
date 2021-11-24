@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 
-import List, { IList } from '../../components/Layout/List';
+import { Container, Header, Input, Title } from '@/views/assets';
 
-import { IAsset, IPagination, IResponse } from '../../types';
+import Table, { ITable } from '@/components/Table';
+import { Row } from '@/components/Table/styles';
 
-import api from '../../services/api';
-import { navbarItems } from '../../configs/navbar';
+import { IAsset, IResponse, IPagination } from '@/types/index';
+import { formatAmount } from '@/utils/index';
+import api from '@/services/api';
+
+import { ArrowLeft } from '@/assets/icons';
 
 interface IAssetPage {
   assets: IAsset[];
@@ -22,74 +27,79 @@ interface IAssetResponse extends IResponse {
   pagination: IPagination;
 }
 
-const Blocks: React.FC<IAssetPage> = ({
-  assets: initialAssets,
-  pagination,
-}) => {
-  const title = 'Assets';
-  const Icon = navbarItems.find(item => item.name === 'Assets')?.Icon;
-  const maxItems = pagination.totalRecords;
-  const headers = ['Ticker', 'Name', 'Address', 'Type', 'Owner'];
+const Assets: React.FC<IAssetPage> = ({ assets }) => {
+  const router = useRouter();
 
-  const [assets, setAssets] = useState<IAsset[]>(initialAssets);
-  const [page, setPage] = useState(1);
-
-  const loadMore = async () => {
-    const newAssets: IAssetResponse = await api.get({
-      route: 'assets/kassets',
-      query: { page },
-    });
-    if (!newAssets.error) {
-      setAssets([...assets, ...newAssets.data.assets]);
-
-      const next = newAssets.pagination.next;
-      if (next !== 0) {
-        setPage(next);
-      }
-    }
+  const TableBody: React.FC<IAsset> = ({
+    ticker,
+    name,
+    address,
+    type,
+    initialSupply,
+    maxSupply,
+    circulatingSupply,
+  }) => {
+    return (
+      <Row type="assetsPage">
+        <span>
+          <p>{ticker}</p>
+        </span>
+        <span>
+          <Link href={`/assets/${address}`}>{name}</Link>
+        </span>
+        <span>{type}</span>
+        <span>
+          <strong>{formatAmount(initialSupply)} KLV</strong>
+        </span>
+        <span>
+          <strong>{formatAmount(maxSupply)} KLV</strong>
+        </span>
+        <span>
+          <strong>{formatAmount(circulatingSupply)} KLV</strong>
+        </span>
+      </Row>
+    );
   };
 
-  const listProps: IList = {
-    title,
-    Icon,
-    maxItems,
-    listSize: assets.length,
-    headers,
-    loadMore,
+  const header = [
+    'Token',
+    'Name',
+    'Type',
+    'Initial Supply',
+    'Max Supply',
+    'Circulating Supply',
+  ];
+
+  const tableProps: ITable = {
+    body: TableBody,
+    data: assets as any[],
+    header,
+    loading: false,
+    type: 'assetsPage',
   };
 
-  const renderItems = () =>
-    assets.map((asset, index) => {
-      return (
-        <tr key={String(index)}>
-          <td>{asset.ticker}</td>
-          <td>{asset.name}</td>
-          <td>
-            <span>
-              <Link href={`/assets/${asset.address}`}>{asset.address}</Link>
-            </span>
-          </td>
-          <td>{asset.type}</td>
-          <td>
-            <span>
-              <Link href={`/accounts/${asset.ownerAddress}`}>
-                {asset.ownerAddress}
-              </Link>
-            </span>
-          </td>
-        </tr>
-      );
-    });
+  return (
+    <Container>
+      <Header>
+        <Title>
+          <div onClick={router.back}>
+            <ArrowLeft />
+          </div>
+          <h1>Assets</h1>
+        </Title>
 
-  return <List {...listProps}>{renderItems()}</List>;
+        <Input />
+      </Header>
+
+      <Table {...tableProps} />
+    </Container>
+  );
 };
 
-export const getServerSideProps: GetServerSideProps<IAssetPage> = async () => {
+export const getServerSideProps: GetServerSideProps = async () => {
   const props: IAssetPage = { assets: [], pagination: {} as IPagination };
 
-  const assets: IAssetResponse = await api.get({
-    route: 'assets/kassets',
-  });
+  const assets: IAssetResponse = await api.get({ route: 'assets/kassets' });
   if (!assets.error) {
     props.assets = assets.data.assets;
     props.pagination = assets.pagination;
@@ -98,4 +108,4 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async () => {
   return { props };
 };
 
-export default Blocks;
+export default Assets;

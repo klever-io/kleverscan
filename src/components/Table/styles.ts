@@ -12,7 +12,7 @@ interface IStatus {
 }
 
 export interface ITableType {
-  type: 'transactions' | 'blocks' | 'assets' | 'transactionDetail' | 'buckets';
+  type: 'transactions' | 'blocks' | 'assets' | 'transactionDetail' | 'buckets' | 'accounts' | 'assetsPage';
   filter?: IFilterItem;
 }
 

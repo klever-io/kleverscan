@@ -55,29 +55,30 @@ const Transactions: React.FC<ITransactions> = ({
   transactions: defaultTransactions,
 }) => {
   const router = useRouter();
+  const defaultFilter: IFilterItem = { name: 'All', value: 'all' };
 
-  const [loading] = useState(false);
-  const [transactions] = useState(defaultTransactions);
-  const [filter, setFilter] = useState<IFilterItem>({
-    name: 'All',
-    value: 'all',
-  });
+  const [loading, setLoading] = useState(false);
+  const [transactions, setTransactions] = useState(defaultTransactions);
+
+  const [transactionType, setTransactionType] = useState(defaultFilter);
+  const [statusType, setStatusType] = useState(defaultFilter);
+  const [coinType, setCoinType] = useState(defaultFilter);
 
   const filters: IFilter[] = [
     {
       title: 'Coin',
       data: coins,
-      onClick: selected => setFilter(selected),
+      onClick: selected => setCoinType(selected),
     },
     {
       title: 'Status',
       data: status,
-      onClick: selected => setFilter(selected),
+      onClick: selected => setStatusType(selected),
     },
     {
       title: 'Contract',
       data: contracts,
-      onClick: selected => setFilter(selected),
+      onClick: selected => setTransactionType(selected),
     },
   ];
 
@@ -92,9 +93,43 @@ const Transactions: React.FC<ITransactions> = ({
     'Contract',
   ];
 
+  const buildQuery = (data: any) => {
+    const query = [];
+    for (const key in data) {
+      query.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`);
+    }
+
+    return query.join('&');
+  };
+
   useEffect(() => {
-    // TODO: fetch new transactions with filter
-  }, [filter]);
+    const fetchData = async () => {
+      setLoading(true);
+
+      const filters = [
+        { ref: transactionType, key: 'type' },
+        { ref: statusType, key: 'status' },
+        { ref: coinType, key: 'asset' },
+      ];
+      let routerQuery = {};
+      filters.forEach(filter => {
+        if (filter.ref.value !== 'all') {
+          routerQuery = { ...routerQuery, [filter.key]: filter.ref.value };
+        }
+      });
+
+      const response: ITransactionResponse = await api.get({
+        route: `transaction/list?${buildQuery(routerQuery)}`,
+      });
+      if (!response.error) {
+        setTransactions(response.data.transactions);
+      }
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [transactionType, statusType, coinType]);
 
   const getContractType = (contracts: IContract[]) =>
     contracts.length > 1
@@ -185,9 +220,13 @@ const Transactions: React.FC<ITransactions> = ({
     const contractType = getContractType(contract);
 
     const getComponent: React.FC<any> = (Component: React.FC<IContract>) =>
-      contractType === filter.name ? <Component {...contract[0]} /> : <div />;
+      contractType === transactionType.name ? (
+        <Component {...contract[0]} />
+      ) : (
+        <div />
+      );
 
-    switch (filter.name) {
+    switch (transactionType.name) {
       case Contract.Transfer:
         return getComponent(Transfer);
       case Contract.CreateAsset:
@@ -211,7 +250,7 @@ const Transactions: React.FC<ITransactions> = ({
   const getHeader = () => {
     let newHeaders: string[] = [];
 
-    switch (filter.name) {
+    switch (transactionType.name) {
       case Contract.Transfer:
         newHeaders = ['Coin', 'Amount'];
         break;
@@ -252,7 +291,7 @@ const Transactions: React.FC<ITransactions> = ({
     }
 
     return (
-      <Row type="transactions" filter={filter}>
+      <Row type="transactions" filter={transactionType}>
         <span>
           <Link href={`/transactions/${hash}`}>{hash}</Link>
         </span>
@@ -285,7 +324,7 @@ const Transactions: React.FC<ITransactions> = ({
     header: getHeader(),
     data: transactions as any[],
     body: TableBody,
-    filter,
+    filter: transactionType,
     loading,
   };
 

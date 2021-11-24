@@ -50,7 +50,9 @@ const theme = {
 
     text: '#C6C7EB',
     secondaryText: '#595C98',
-    lightText: '#7B7DB2',
+    darkText: '#7B7DB2',
+
+    border: '#EBF1F7',
 
     green: '#86EF75',
     red: '#FF4465',
@@ -59,7 +61,6 @@ const theme = {
     black: '#2e2f47',
     white: '#ffffff',
     gray: '#9C9EB9',
-    border: '#DDDEE7',
   },
 
   blockCard: {
@@ -70,6 +71,10 @@ const theme = {
     text: '#7B7DB2',
 
     amount: '#595C98',
+  },
+
+  accountCard: {
+    frozenBackground: '#F9F9FD',
   },
 
   chart: {
@@ -95,6 +100,10 @@ const theme = {
       text: '#595C98',
       selected: '#aa33b5',
     },
+  },
+
+  tab: {
+    indicator: '#aa33b5',
   },
 
   text: {

@@ -86,13 +86,13 @@ export const Card = styled.div`
 
       font-size: 0.85rem;
       font-weight: 400;
-      color: ${props => props.theme.card.lightText};
+      color: ${props => props.theme.card.darkText};
     }
 
     small {
       font-size: 0.85rem;
       font-weight: 600;
-      color: ${props => props.theme.card.lightText};
+      color: ${props => props.theme.card.darkText};
     }
   }
 `;

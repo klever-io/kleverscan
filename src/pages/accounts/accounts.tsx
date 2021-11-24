@@ -18,7 +18,7 @@ import {
   BalanceHeader,
   BalanceBody,
   TransferContainer,
-} from '../../views/address';
+} from '../../views/accounts/index2';
 
 import Input from '../../components/Input';
 

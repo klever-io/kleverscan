@@ -8,6 +8,8 @@ import ArrowRight from './arrow-right.svg';
 import ArrowLeft from './arrow-left.svg';
 import Plus from './plus.svg';
 import ChevronRight from './chevron-right.svg';
+import Compass from './compass.svg';
+import Copy from './copy.svg';
 
 export {
   Category,
@@ -20,4 +22,6 @@ export {
   ArrowLeft,
   Plus,
   ChevronRight,
+  Compass,
+  Copy,
 };

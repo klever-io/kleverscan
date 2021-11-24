@@ -1,4 +1,4 @@
-import { Category, Graph, Send, TwoUser } from '@/assets/icons';
+import { Category, Graph, Send, TwoUser, Compass } from '@/assets/icons';
 
 export interface INavbarItem {
   name: string;
@@ -16,6 +16,11 @@ const navbarItems: INavbarItem[] = [
     name: 'Blocks',
     pathTo: '/blocks',
     Icon: Category,
+  },
+  {
+    name: 'Nodes',
+    pathTo: '/nodes',
+    Icon: Compass,
   },
   {
     name: 'Accounts',

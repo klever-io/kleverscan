@@ -72,9 +72,67 @@ const blocks = css`
   }
 `;
 
+const assets = css`
+  margin-right: 1.25rem;
+
+  &:nth-child(1) {
+    width: 5rem;
+  }
+
+  &:nth-child(2) {
+    width: 5rem;
+  }
+
+  &:nth-child(3) {
+    width: 8rem;
+  }
+
+  &:nth-child(4) {
+    width: 7rem;
+  }
+
+  &:nth-child(5) {
+    width: 5rem;
+  }
+
+  &:nth-child(6) {
+    width: 12rem;
+  }
+
+  &:nth-child(7) {
+    width: 12rem;
+  }
+`;
+
+const buckets = css`
+  margin-right: 1.25rem;
+
+  &:nth-child(1) {
+    width: 10rem;
+  }
+
+  &:nth-child(2) {
+    width: 5rem;
+  }
+
+  &:nth-child(3) {
+    width: 12rem;
+  }
+
+  &:nth-child(4) {
+    width: 12rem;
+  }
+
+  &:nth-child(5) {
+    width: 10rem;
+  }
+`;
+
 const widths = {
   transactions,
   blocks,
+  assets,
+  buckets,
 };
 
 export default widths;

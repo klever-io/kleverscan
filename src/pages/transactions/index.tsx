@@ -34,9 +34,11 @@ import {
   IWithdrawContract,
 } from '../../types';
 
+import { formatAmount } from '../../utils';
+
 import { ArrowRight, ArrowLeft } from '@/assets/icons';
 import { KLV } from '@/assets/coins';
-import { formatAmount } from '../../utils';
+import { getStatusIcon } from '@/assets/status';
 
 interface ITransactions {
   transactions: ITransaction[];
@@ -239,6 +241,7 @@ const Transactions: React.FC<ITransactions> = ({
   const TableBody: React.FC<ITransaction> = props => {
     const { hash, blockNum, timestamp, sender, contract, status } = props;
 
+    const StatusIcon = getStatusIcon(status);
     let toAddress = '--';
     const contractType = getContractType(contract);
 
@@ -264,7 +267,10 @@ const Transactions: React.FC<ITransactions> = ({
           <ArrowRight />
         </span>
         <span>{toAddress}</span>
-        <Status status={status}>{status}</Status>
+        <Status status={status}>
+          <StatusIcon />
+          <span>{status}</span>
+        </Status>
         <span>
           <strong>{contractType}</strong>
         </span>
@@ -314,7 +320,7 @@ export const getServerSideProps: GetServerSideProps<ITransactions> =
     };
 
     const transactions: ITransactionResponse = await api.get({
-      route: 'transaction/by-type/1',
+      route: 'transaction/list',
     });
     if (!transactions.error) {
       props.transactions = transactions.data.transactions;

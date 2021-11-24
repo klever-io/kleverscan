@@ -12,7 +12,7 @@ interface IStatus {
 }
 
 export interface ITableType {
-  type: 'transactions' | 'blocks';
+  type: 'transactions' | 'blocks' | 'assets' | 'transactionDetail' | 'buckets';
   filter?: IFilterItem;
 }
 
@@ -88,13 +88,26 @@ export const Row = styled.div<ITableType>`
       font-size: 0.95rem;
       color: ${props => props.theme.table.text};
     }
+
+    p {
+      font-weight: 600;
+      color: ${props => props.theme.black};
+    }
   }
 `;
 
-export const Status = styled.span<IStatus>`
-  color: ${props => props.theme.table[props.status]} !important;
+export const Status = styled.div<IStatus>`
+  display: flex;
 
-  text-transform: capitalize;
+  flex-direction: row;
+
+  gap: 0.5rem;
+
+  span {
+    color: ${props => props.theme.table[props.status]} !important;
+
+    text-transform: capitalize;
+  }
 `;
 
 export const EmptyRow = styled(Row)`

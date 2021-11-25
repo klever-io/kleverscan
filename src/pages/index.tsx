@@ -382,7 +382,7 @@ const Home: React.FC<IHome> = ({
           <TransactionContent>
             {transactions.length === 0 && (
               <TransactionEmpty>
-                <span>Oops! Apparently no data loaded.</span>
+                <span>Oops! Apparently no data here.</span>
               </TransactionEmpty>
             )}
 

@@ -4,7 +4,15 @@ import { IFilterItem } from '../Filter';
 import { Body, Container, EmptyRow, Header, ITableType } from './styles';
 
 export interface ITable {
-  type: 'transactions' | 'blocks' | 'accounts' | 'assets' | 'transactionDetail' | 'buckets' | 'accounts' | 'assetsPage';
+  type:
+    | 'transactions'
+    | 'blocks'
+    | 'accounts'
+    | 'assets'
+    | 'transactionDetail'
+    | 'buckets'
+    | 'accounts'
+    | 'assetsPage';
   header: string[];
   data: any[];
   body: any;
@@ -36,7 +44,7 @@ const Table: React.FC<ITable> = ({
         )}
         {!loading && data.length === 0 && (
           <EmptyRow {...props}>
-            <p>Oops! Apparently no data loaded.</p>
+            <p>Oops! Apparently no data here.</p>
           </EmptyRow>
         )}
         {!loading &&

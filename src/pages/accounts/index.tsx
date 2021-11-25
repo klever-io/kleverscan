@@ -126,7 +126,7 @@ const Accounts: React.FC<IAccounts> = ({
     return (
       <Row type="accounts">
         <span>
-          <Link href={`/accounts/${address}`}>{address}</Link>
+          <Link href={`/account/${address}`}>{address}</Link>
         </span>
         <span>
           <strong>{formatAmount(getFreezeBalance())} KLV</strong>

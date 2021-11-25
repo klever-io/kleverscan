@@ -288,7 +288,7 @@ const Home: React.FC<IHome> = ({
       </BlockCardRow>
       <BlockCardRow>
         <small>{getAge(fromUnixTime(timestamp / 1000))} ago</small>
-        <Link href={`/blocks/${nonce}`}>{hash}</Link>
+        <Link href={`/block/${nonce}`}>{hash}</Link>
       </BlockCardRow>
       <BlockCardRow>
         <p>Burned</p>
@@ -318,7 +318,7 @@ const Home: React.FC<IHome> = ({
     return (
       <TransactionRow>
         <TransactionData>
-          <Link href={`/transactions/${hash}`}>{hash}</Link>
+          <Link href={`/transaction/${hash}`}>{hash}</Link>
           <span>
             {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
           </span>

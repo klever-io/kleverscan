@@ -45,7 +45,7 @@ const Assets: React.FC<IAssetPage> = ({ assets }) => {
           <p>{ticker}</p>
         </span>
         <span>
-          <Link href={`/assets/${address}`}>{name}</Link>
+          <Link href={`/asset/${address}`}>{name}</Link>
         </span>
         <span>{type}</span>
         <span>

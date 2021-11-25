@@ -38,7 +38,7 @@ const Transactions: React.FC<ITransaction[]> = props => {
     return (
       <Row type="transactions">
         <span>
-          <Link href={`/transactions/${hash}`}>{hash}</Link>
+          <Link href={`/transaction/${hash}`}>{hash}</Link>
         </span>
         <span>{blockNum}</span>
         <span>

@@ -299,13 +299,13 @@ const Transactions: React.FC<ITransactions> = ({
     if (contractType === Contract.Transfer) {
       const parameter = contract[0].parameter as ITransferContract;
 
-      toAddress = parameter.ownerAddress;
+      toAddress = parameter.toAddress;
     }
 
     return (
       <Row type="transactions" filter={transactionType}>
         <span>
-          <Link href={`/transactions/${hash}`}>{hash}</Link>
+          <Link href={`/transaction/${hash}`}>{hash}</Link>
         </span>
         <span>{blockNum}</span>
         <span>

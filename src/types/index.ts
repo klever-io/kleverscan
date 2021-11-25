@@ -141,6 +141,8 @@ export interface IBlock {
   prevRandSeed: string;
   randSeed: string;
   txCount: number;
+  txFees?: number;
+  kAppFees?: number;
   blockRewards: number;
   txHashes: any[];
   softwareVersion: string;

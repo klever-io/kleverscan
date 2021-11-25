@@ -115,7 +115,8 @@ const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks }) => {
     'Created',
     'Tx Count',
     'Burned KLV',
-    'Energy/Bandwith',
+    'kApp Fee',
+    'Bandwith Fee',
     'Block Reward',
   ];
 
@@ -124,6 +125,8 @@ const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks }) => {
     size,
     timestamp,
     txCount,
+    txFees,
+    kAppFees,
     blockRewards,
   }) => {
     return (
@@ -142,7 +145,12 @@ const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks }) => {
         <span>
           <small>32,230.23 KLV</small>
         </span>
-        <span>930,932/35,764</span>
+        <span>
+          <small>{formatAmount(txFees || 0)}</small>
+        </span>
+        <span>
+          <small>{formatAmount(kAppFees || 0)}</small>
+        </span>
         <span>
           <strong>{formatAmount(blockRewards)} KLV</strong>
         </span>

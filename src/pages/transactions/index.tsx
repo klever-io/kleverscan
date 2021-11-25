@@ -68,17 +68,29 @@ const Transactions: React.FC<ITransactions> = ({
     {
       title: 'Coin',
       data: coins,
-      onClick: selected => setCoinType(selected),
+      onClick: selected => {
+        if (coinType.value !== selected.value) {
+          setCoinType(selected);
+        }
+      },
     },
     {
       title: 'Status',
       data: status,
-      onClick: selected => setStatusType(selected),
+      onClick: selected => {
+        if (statusType.value !== selected.value) {
+          setStatusType(selected);
+        }
+      },
     },
     {
       title: 'Contract',
       data: contracts,
-      onClick: selected => setTransactionType(selected),
+      onClick: selected => {
+        if (transactionType.value !== selected.value) {
+          setTransactionType(selected);
+        }
+      },
     },
   ];
 

@@ -64,7 +64,6 @@ const Assets: React.FC<IAssets> = props => {
     'Token',
     'Address',
     'Token Type',
-    'Portfolio %',
     'Precision',
     'Balance',
     'Frozen',
@@ -87,7 +86,6 @@ const Assets: React.FC<IAssets> = props => {
           <Link href={`asset/${address}`}>{address}</Link>
         </span>
         <span>{type}</span>
-        <span>-</span>
         <span>
           <strong>{precision}</strong>
         </span>

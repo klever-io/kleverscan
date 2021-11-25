@@ -64,11 +64,15 @@ const blocks = css`
   }
 
   &:nth-child(7) {
-    width: 10rem;
+    width: 7rem;
   }
 
   &:nth-child(8) {
-    width: 10rem;
+    width: 8rem;
+  }
+
+  &:nth-child(9) {
+    width: 8rem;
   }
 `;
 

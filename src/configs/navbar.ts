@@ -13,14 +13,14 @@ export const navbarPadding = '1rem 17.5rem';
 
 const navbarItems: INavbarItem[] = [
   {
-    name: 'Blocks',
-    pathTo: '/blocks',
-    Icon: Category,
-  },
-  {
     name: 'Nodes',
     pathTo: '/nodes',
     Icon: Compass,
+  },
+  {
+    name: 'Blocks',
+    pathTo: '/blocks',
+    Icon: Category,
   },
   {
     name: 'Accounts',

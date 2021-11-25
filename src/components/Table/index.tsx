@@ -4,7 +4,7 @@ import { IFilterItem } from '../Filter';
 import { Body, Container, EmptyRow, Header, ITableType } from './styles';
 
 export interface ITable {
-  type: 'transactions' | 'blocks' | 'assets' | 'transactionDetail' | 'buckets' | 'accounts' | 'assetsPage';
+  type: 'transactions' | 'blocks' | 'accounts' | 'assets' | 'transactionDetail' | 'buckets' | 'accounts' | 'assetsPage';
   header: string[];
   data: any[];
   body: any;

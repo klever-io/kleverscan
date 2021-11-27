@@ -12,7 +12,8 @@ export interface ITable {
     | 'transactionDetail'
     | 'buckets'
     | 'accounts'
-    | 'assetsPage';
+    | 'assetsPage'
+    | 'holders';
   header: string[];
   data: any[];
   body: any;

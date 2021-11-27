@@ -151,6 +151,7 @@ const assets = css`
 
 const buckets = css`
   margin-right: 1.25rem;
+
   &:nth-child(1) {
     width: 10rem;
   }
@@ -168,6 +169,26 @@ const buckets = css`
   }
 `;
 
+const holders = css`
+  margin-right: 1.25rem;
+
+  &:nth-child(1) {
+    width: 3rem;
+  }
+
+  &:nth-child(2) {
+    width: 30rem;
+  }
+
+  &:nth-child(3) {
+    width: 5rem;
+  }
+
+  &:nth-child(4) {
+    width: 10rem;
+  }
+`;
+
 const widths = {
   transactions,
   blocks,
@@ -175,6 +196,7 @@ const widths = {
   assetsPage,
   assets,
   buckets,
+  holders,
 };
 
 export default widths;

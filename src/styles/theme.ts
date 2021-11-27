@@ -57,6 +57,8 @@ const theme = {
     green: '#86EF75',
     red: '#FF4465',
 
+    assetText: '#27284E',
+
     // TODO: outdated
     black: '#2e2f47',
     white: '#ffffff',

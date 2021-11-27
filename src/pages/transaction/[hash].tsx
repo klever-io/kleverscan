@@ -1,7 +1,9 @@
 import React from 'react';
 
 import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { format, fromUnixTime } from 'date-fns';
 
 import {
   CardContainer,
@@ -14,7 +16,10 @@ import {
   Title,
 } from '@/views/transactions/detail';
 
+import { Status } from '@/components/Table/styles';
+
 import api from '@/services/api';
+import { toLocaleFixed } from '@/utils/index';
 import {
   IResponse,
   ITransaction,
@@ -30,10 +35,7 @@ import {
 } from '@/types/index';
 
 import { ArrowLeft, Copy } from '@/assets/icons';
-import { useRouter } from 'next/router';
 import { getStatusIcon } from '@/assets/status';
-import { Status } from '@/components/Table/styles';
-import { format, fromUnixTime } from 'date-fns';
 import { KLV } from '@/assets/coins';
 
 interface ITransactionResponse extends IResponse {
@@ -74,12 +76,6 @@ const Transaction: React.FC<ITransactionPage> = ({
     contracts.length > 1
       ? 'Multi contract'
       : Object.values(Contract)[contracts[0].type];
-
-  const toLocaleFixed = (value: number, precision: number) => {
-    return value.toLocaleString(undefined, {
-      minimumFractionDigits: precision,
-    });
-  };
 
   const Transfer: React.FC<IContract> = ({ parameter: par }) => {
     const parameter = par as ITransferContract;

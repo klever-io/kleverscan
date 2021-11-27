@@ -51,3 +51,9 @@ export const formatAmount = (number: number): string => {
     ? `${(number / item.value).toFixed(1).replace(regex, '$1')} ${item.symbol}`
     : '0';
 };
+
+export const toLocaleFixed = (value: number, precision: number): string => {
+  return value.toLocaleString(undefined, {
+    minimumFractionDigits: precision,
+  });
+};

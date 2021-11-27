@@ -183,6 +183,11 @@ export interface IBucket {
   delegation: string;
 }
 
+export interface IHolder {
+  address: string;
+  amount: number;
+}
+
 export interface IChainStatistics {
   liveTPS: number;
   averageTPS: number;

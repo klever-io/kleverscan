@@ -36,12 +36,28 @@ export const Section = styled.section`
   &:last-child {
     padding-bottom: 10rem;
   }
+
+  @media (max-width: 768px) {
+    padding: 5rem 5rem 0 5rem;
+  }
+
+  @media (max-width: 425px) {
+    padding: 5rem 2.5rem 0 2.5rem;
+  }
 `;
 
 export const DataContainer = styled(Section)`
   padding: 5rem 10rem;
 
   background-color: #40274f;
+
+  @media (max-width: 768px) {
+    padding: 5rem;
+  }
+
+  @media (max-width: 425px) {
+    padding: 2.5rem;
+  }
 `;
 
 export const Input = styled(DefaultInput)`
@@ -61,6 +77,10 @@ export const Input = styled(DefaultInput)`
       background-color: ${props => lighten(0.4, props.theme.input.border.home)};
     }
   }
+
+  @media (max-width: 768px) {
+    margin: 0;
+  }
 `;
 
 export const DataCardsContainer = styled.div`
@@ -72,6 +92,10 @@ export const DataCardsContainer = styled.div`
   align-items: center;
 
   gap: 1rem;
+
+  @media (max-width: 425px) {
+    flex-direction: column;
+  }
 `;
 
 export const DataCardsContent = styled.div`
@@ -146,6 +170,10 @@ export const CoinDataCard = styled(DataCard)`
   flex-direction: column;
 
   position: relative;
+
+  @media (max-width: 425px) {
+    width: 100%;
+  }
 `;
 
 export const CoinDataContent = styled.div`
@@ -360,6 +388,10 @@ export const TransactionContainer = styled.div`
   flex-direction: row;
 
   gap: 1rem;
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+  }
 `;
 
 export const TransactionContent = styled.div`
@@ -391,6 +423,13 @@ export const TransactionContent = styled.div`
     &::-webkit-scrollbar-thumb {
       background: ${props => transparentize(0.75, props.theme.black)};
     }
+  }
+
+  @media (max-width: 425px) {
+    overflow: auto;
+
+    width: 100% !important;
+    min-width: unset;
   }
 `;
 

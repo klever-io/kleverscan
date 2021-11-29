@@ -6,6 +6,10 @@ export const Container = styled.div`
   padding: 3rem 10rem 5rem 10rem;
 
   background-color: ${props => props.theme.background};
+
+  @media (max-width: 768px) {
+    padding: 3rem 3rem 5rem 3rem;
+  }
 `;
 
 export const Header = styled.div`
@@ -14,6 +18,11 @@ export const Header = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 `;
 
 export const Title = styled.div`
@@ -82,6 +91,10 @@ export const Row = styled.div`
       width: 10rem;
     }
 
+    @media (max-width: 768px) {
+      max-width: 100%;
+    }
+
     overflow: hidden;
 
     text-overflow: ellipsis;
@@ -110,6 +123,11 @@ export const Row = styled.div`
       font-weight: 400;
     }
   }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 `;
 
 export const CenteredRow = styled.div`
@@ -132,9 +150,17 @@ export const CenteredRow = styled.div`
 
   span {
     width: 33rem !important;
+
+    @media (max-width: 768px) {
+      max-width: 80% !important;
+    }
   }
 
   svg {
     cursor: pointer;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
   }
 `;

@@ -46,6 +46,10 @@ export const Header = styled.div<ITableType>`
       props.filter.value !== 'all' &&
       filterWidths[props.filter.name]}
   }
+
+  @media (max-width: 768px) {
+    width: fit-content;
+  }
 `;
 
 export const Body = styled.div`
@@ -54,6 +58,10 @@ export const Body = styled.div`
   flex-direction: column;
 
   gap: 0.75rem;
+
+  @media (max-width: 768px) {
+    width: fit-content;
+  }
 `;
 
 export const Row = styled.div<ITableType>`
@@ -120,9 +128,7 @@ export const Status = styled.div<IStatus>`
 `;
 
 export const EmptyRow = styled(Row)`
-  padding: 0.75rem 1.5rem;
-
-  width: 100%;
+  width: 100% !important;
 
   justify-content: center;
   align-items: center;

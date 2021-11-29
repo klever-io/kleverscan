@@ -120,6 +120,7 @@ const theme = {
 
     success: '#37DD72',
     pending: '#FFB342',
+    fail: '#FF4465',
 
     // TODO: outdated
     shadow: '#DDDEE7',

@@ -15,7 +15,7 @@ import {
   OverviewContainer,
   Row,
   Title,
-} from '@/views/accounts';
+} from '@/views/accounts/detail';
 
 import Tabs, { ITabs } from '@/components/Tabs';
 import Assets from '@/components/Tabs/Assets';
@@ -138,7 +138,7 @@ const Account: React.FC<IAccountPage> = ({
           </span>
           <span>
             <CenteredRow onClick={() => handleCopyInfo(account.address)}>
-              <p>{account.address}</p>
+              <span>{account.address}</span>
               <Copy />
             </CenteredRow>
           </span>

@@ -1,14 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { Container, Input, Item, Logo } from './styles';
+import {
+  Container,
+  DesktopContainer,
+  Input,
+  Item,
+  Logo,
+  MenuIcon,
+  MobileBackground,
+  MobileContainer,
+  MobileContent,
+  MobileItem,
+} from './styles';
 
 import { INavbarItem, navbarItems } from '@/configs/navbar';
 
 const Navbar: React.FC = () => {
   const router = useRouter();
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? 'hidden' : 'visible';
+  }, [isOpen]);
+
+  const handleMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleClose = () => {
+    if (isOpen) {
+      setIsOpen(false);
+    }
+  };
 
   const NavbarItem: React.FC<INavbarItem> = ({ name, Icon, pathTo }) => {
     return (
@@ -21,18 +48,47 @@ const Navbar: React.FC = () => {
     );
   };
 
-  return (
-    <Container>
-      <Link href="/">
-        <Logo />
+  const MobileNavbarItem: React.FC<INavbarItem> = ({ name, Icon, pathTo }) => {
+    return (
+      <Link href={pathTo}>
+        <MobileItem
+          onClick={handleMenu}
+          selected={router.pathname.includes(name.toLowerCase())}
+        >
+          <span>{name}</span>
+          <Icon />
+        </MobileItem>
       </Link>
+    );
+  };
 
-      {navbarItems.map((item, index) => (
-        <NavbarItem key={String(index)} {...item} />
-      ))}
+  return (
+    <>
+      <Container>
+        <Link href="/">
+          <Logo onClick={handleClose} />
+        </Link>
 
-      <Input />
-    </Container>
+        <DesktopContainer>
+          {navbarItems.map((item, index) => (
+            <NavbarItem key={String(index)} {...item} />
+          ))}
+        </DesktopContainer>
+
+        <Input />
+        <MobileContainer>
+          <MenuIcon onClick={handleMenu} />
+        </MobileContainer>
+      </Container>
+
+      <MobileBackground onClick={handleClose} opened={isOpen} />
+
+      <MobileContent opened={isOpen}>
+        {navbarItems.map((item, index) => (
+          <MobileNavbarItem key={String(index)} {...item} />
+        ))}
+      </MobileContent>
+    </>
   );
 };
 

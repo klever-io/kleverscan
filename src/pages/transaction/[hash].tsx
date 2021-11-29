@@ -367,7 +367,7 @@ const Transaction: React.FC<ITransactionPage> = ({
               <strong>Hash</strong>
             </span>
             <CenteredRow onClick={() => handleCopyInfo(hash)}>
-              <p>{hash}</p>
+              <span>{hash}</span>
               <Copy />
             </CenteredRow>
           </Row>

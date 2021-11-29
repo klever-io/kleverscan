@@ -9,7 +9,7 @@ const coins: IFilterItem[] = [
 const status: IFilterItem[] = [
   { name: 'Success', value: 'success' },
   { name: 'Pending', value: 'pending' },
-  { name: 'Failed', value: 'failed' },
+  { name: 'Fail', value: 'fail' },
 ];
 
 const contracts = Object.values(Contract).map((contract, index) => ({

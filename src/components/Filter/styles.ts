@@ -88,6 +88,10 @@ export const Content = styled.div<{ open: boolean }>`
 
     transform: rotate(${props => (props.open ? 0 : 180)}deg);
   }
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 export const SelectorContainer = styled.div<{ open: boolean }>`
@@ -103,6 +107,7 @@ export const SelectorContainer = styled.div<{ open: boolean }>`
   display: flex;
 
   overflow-y: auto;
+  z-index: 10;
 
   flex-direction: column;
 

@@ -6,6 +6,10 @@ export const Container = styled.div`
   padding: 3rem 10rem 5rem 10rem;
 
   background-color: ${props => props.theme.background};
+
+  @media (max-width: 768px) {
+    padding: 3rem 3rem 5rem 3rem;
+  }
 `;
 
 export const Header = styled.div`
@@ -14,6 +18,11 @@ export const Header = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 `;
 
 export const Title = styled.div`
@@ -67,6 +76,11 @@ export const AssetTitle = styled.div`
     font-size: 0.85rem;
 
     border-radius: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
   }
 `;
 

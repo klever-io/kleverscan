@@ -31,9 +31,17 @@ export const Container = styled.div`
     &::selection {
       background-color: ${props => props.theme.input.text};
     }
+
+    @media (max-width: 768px) {
+      min-width: 0;
+    }
   }
 
   svg {
     cursor: pointer;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
   }
 `;

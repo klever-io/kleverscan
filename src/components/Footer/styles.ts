@@ -9,6 +9,12 @@ export const Container = styled.footer`
   gap: 5rem;
 
   background-color: ${props => props.theme.footer.background};
+
+  @media (max-width: 768px) {
+    padding: 5rem 3rem;
+
+    flex-direction: column;
+  }
 `;
 
 export const DescriptionContainer = styled.div`
@@ -23,6 +29,14 @@ export const DescriptionContainer = styled.div`
     font-size: 0.9rem;
     font-weight: 500;
     color: white;
+  }
+
+  @media (max-width: 768px) {
+    align-items: center;
+
+    span {
+      line-height: 1.25rem;
+    }
   }
 `;
 
@@ -64,6 +78,10 @@ export const LinksContainer = styled.div`
 
   flex-direction: column;
   flex: 0 0 20%;
+
+  @media (max-width: 768px) {
+    align-items: center;
+  }
 `;
 
 export const LinkItems = styled.div`

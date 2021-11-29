@@ -1,36 +1,142 @@
-import styled from 'styled-components';
+import { transparentize } from 'polished';
+import styled, { css } from 'styled-components';
+
+import { default as DefaultBackground } from '../assets/not-found.svg';
 
 export const Container = styled.div`
-  width: 100%;
-  height: 30rem;
+  padding: 10rem;
 
+  display: flex;
+
+  flex-direction: row;
+  justify-content: space-between;
+
+  background-color: ${props => props.theme.background};
+
+  @media (max-width: 768px) {
+    padding: 0 3rem;
+    align-items: center;
+
+    flex-direction: column-reverse;
+  }
+`;
+
+export const Content = styled.div`
   display: flex;
 
   flex-direction: column;
 
-  align-items: center;
-  justify-content: center;
+  gap: 2rem;
 
-  font-size: 2rem;
-  color: red;
+  h1 {
+    color: ${props => props.theme.black};
+    font-weight: 700;
+    font-size: 2.5rem;
+  }
 
   span {
+    max-width: 30rem;
+
+    color: ${props => props.theme.input.text};
     font-weight: 400;
+  }
+
+  @media (max-width: 768px) {
+    margin-bottom: 1rem;
+
+    align-items: center;
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    span {
+      max-width: 100%;
+    }
   }
 `;
 
-export const Subtitle = styled.span`
-  margin: 0.5rem 0 1.5rem 0;
+export const ButtonContainer = styled.div`
+  display: flex;
 
-  background-image: ${props => props.theme.text.background};
-  background-clip: text;
-  -webkit-background-clip: text;
+  flex-direction: row;
 
-  color: transparent;
-  font-weight: 500 !important;
-  font-size: 1rem;
+  align-items: center;
+
+  gap: 1rem;
+
+  a {
+    text-decoration: none;
+  }
 
   @media (max-width: 768px) {
+    width: 100%;
+
+    flex-direction: column;
+  }
+`;
+
+const hoverBackground = css`
+  filter: brightness(1.2);
+`;
+
+const hoverNoBackground = css`
+  background-color: ${props => transparentize(0.8, props.theme.input.shadow)};
+`;
+
+export const Button = styled.div<{ hasBackground: boolean }>`
+  padding: 1rem 2rem;
+
+  background-color: ${props =>
+    props.hasBackground ? props.theme.input.shadow : 'transparent'};
+
+  border-radius: 0.5rem;
+
+  cursor: pointer;
+
+  span {
+    font-weight: 500;
+    color: ${props =>
+      props.hasBackground ? props.theme.white : props.theme.input.shadow};
+  }
+
+  transition: 0.2s ease;
+
+  &:hover {
+    ${props => (props.hasBackground ? hoverBackground : hoverNoBackground)};
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+
     text-align: center;
+  }
+`;
+
+export const Background = styled(DefaultBackground)`
+  top: 50%;
+  left: 50%;
+
+  position: absolute;
+
+  transform: translate(-30%, -50%);
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+export const Number = styled.div`
+  span {
+    color: ${props => props.theme.black};
+    font-weight: 500;
+    font-size: 10rem;
+    font-family: Rubik, sans-serif;
+
+    text-shadow: 0px 4px 0px rgba(0, 0, 0, 0.25);
+
+    @media (max-width: 768px) {
+      font-size: 7rem;
+    }
   }
 `;

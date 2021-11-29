@@ -1,22 +1,50 @@
+import { useRouter } from 'next/router';
 import React from 'react';
 
-import { Container, Subtitle } from '../views/notFound';
-
-import Input from '../components/Input';
+import {
+  Container,
+  Content,
+  ButtonContainer,
+  Button,
+  Background,
+  Number,
+} from '../views/notFound';
 
 const NotFound: React.FC = () => {
-  return (
-    <Container>
-      <div>
-        <strong>Page</strong>
-        <span> not found</span>
-      </div>
-      <Subtitle>
-        Please re-search or double-click the information provided
-      </Subtitle>
+  const router = useRouter();
 
-      <Input />
-    </Container>
+  const handleBack = () => {
+    router.push('/');
+  };
+
+  return (
+    <>
+      <Container>
+        <Content>
+          <h1>Page not found!</h1>
+          <span>
+            Maybe that’s just an lorem ipsum lorem ipsum lorem ipsum lorem ipsum
+            lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem
+            ipsum lorem ipsum
+          </span>
+          <ButtonContainer>
+            <Button hasBackground onClick={handleBack}>
+              <span>Back to homepage</span>
+            </Button>
+            <a href="https://klever.zendesk.com/hc/pt-br">
+              <Button hasBackground={false}>
+                <span>Visit our help center</span>
+              </Button>
+            </a>
+          </ButtonContainer>
+        </Content>
+
+        <Number>
+          <span>404</span>
+        </Number>
+      </Container>
+      <Background />
+    </>
   );
 };
 

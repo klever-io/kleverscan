@@ -189,7 +189,7 @@ const holders = css`
   }
 
   &:nth-child(3) {
-    width: 5rem;
+    width: 7rem;
   }
 
   &:nth-child(4) {

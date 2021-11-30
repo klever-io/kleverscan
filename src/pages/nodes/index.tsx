@@ -24,14 +24,11 @@ import MapSvg from '@/components/MapSvg';
 import { ICountriesGeoData, ICountryNode } from '../../types';
 
 import { ArrowLeft } from '@/assets/icons';
-import { coinMockedData, IChartData, infoChartData } from '@/configs/home';
+import { coinMockedData, IChartData } from '@/configs/home';
 import { getAge } from '@/utils/index';
 import { getCountryISO3, ISO2 } from '@/utils/country';
 import geoData from '@/assets/countries.geo.json';
 import api from '@/services/api';
-
-const geojson2svg = require('geojson2svg');
-const getBounds = require('svg-path-bounds');
 
 interface ICard {
   title: string;
@@ -164,7 +161,10 @@ const Nodes: React.FC<INodePage> = ({ nodes, cardData }) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async () => {
+  /* eslint-disable */
   const geoip = require('geoip-lite');
+  const geojson2svg = require('geojson2svg');
+  const getBounds = require('svg-path-bounds');
 
   const countriesData: ICountriesGeoData = JSON.parse(JSON.stringify(geoData));
 

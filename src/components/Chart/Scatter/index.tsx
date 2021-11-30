@@ -9,7 +9,6 @@ import {
   YAxis,
 } from 'recharts';
 
-import { IChartData } from '../../../configs/home';
 import { Theme } from '../../../styles/styles';
 import { Coordinate } from 'recharts/types/util/types';
 
@@ -19,7 +18,7 @@ interface IChart {
   theme: Theme;
 }
 
-const Chart: React.FC<IChart> = ({ data, theme }) => {
+const Chart: React.FC<IChart> = ({ data }) => {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <ScatterChart>

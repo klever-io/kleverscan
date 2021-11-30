@@ -1,6 +1,6 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment } from 'react';
 
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import { MapContainer, Marker, TileLayer } from 'react-leaflet';
 import { divIcon, LatLngExpression, MarkerCluster } from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 require('react-leaflet-markercluster/dist/styles.min.css');
@@ -19,20 +19,20 @@ interface IMap {
 }
 
 const Map: React.FC<IMap> = ({ nodes }) => {
-  const [selectedNode, setSelectedNode] = useState<ICountryNode | null>(null);
+  // const [selectedNode, setSelectedNode] = useState<ICountryNode | null>(null);
 
   const mapConfig: IMapConfig = {
     initialPosition: [30, 0],
     zoom: 2,
   };
 
-  const handleMarker = (node: ICountryNode) => {
-    setSelectedNode(node);
-  };
+  // const handleMarker = (node: ICountryNode) => {
+  //   setSelectedNode(node);
+  // };
 
-  const handlePopup = () => {
-    setSelectedNode(null);
-  };
+  // const handlePopup = () => {
+  //   setSelectedNode(null);
+  // };
 
   const createClusterCustomIcon = function (cluster: MarkerCluster) {
     return divIcon({
@@ -64,9 +64,6 @@ const Map: React.FC<IMap> = ({ nodes }) => {
                   key={String(subIndex)}
                   position={subNode}
                   icon={divIcon({ className: 'map-marker' })}
-                  eventHandlers={{
-                    click: () => handleMarker(node),
-                  }}
                 />
               ))}
             </MarkerClusterGroup>

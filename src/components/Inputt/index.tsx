@@ -24,18 +24,18 @@ const Input: React.FC<IInput> = ({ className }) => {
     const txLength = 64;
 
     if (!isNaN(Number(value)) && Number(value) !== 0) {
-      return 'blocks';
+      return 'block';
     }
 
     if (value.length === txLength) {
-      return 'transactions';
+      return 'transaction';
     }
 
     if (value.length === addressLength) {
-      return 'accounts';
+      return 'account';
     }
 
-    return 'assets';
+    return 'asset';
   };
 
   const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {

@@ -38,6 +38,7 @@ const Assets: React.FC<IAssetPage> = ({ assets }) => {
     initialSupply,
     maxSupply,
     circulatingSupply,
+    precision,
   }) => {
     return (
       <Row type="assetsPage">
@@ -45,17 +46,25 @@ const Assets: React.FC<IAssetPage> = ({ assets }) => {
           <p>{ticker}</p>
         </span>
         <span>
-          <Link href={`/asset/${address}`}>{name}</Link>
+          <Link href={`/asset/${address}`}>{address}</Link>
+        </span>
+        <span>
+          <p>{name}</p>
         </span>
         <span>{type}</span>
         <span>
-          <strong>{formatAmount(initialSupply)} KLV</strong>
+          <strong>{formatAmount(initialSupply / 10 ** precision)} KLV</strong>
         </span>
         <span>
-          <strong>{formatAmount(maxSupply)} KLV</strong>
+          <strong>{formatAmount(maxSupply / 10 ** precision)} KLV</strong>
         </span>
         <span>
-          <strong>{formatAmount(circulatingSupply)} KLV</strong>
+          <strong>
+            {formatAmount(circulatingSupply / 10 ** precision)} KLV
+          </strong>
+        </span>
+        <span>
+          <strong>{precision}</strong>
         </span>
       </Row>
     );
@@ -63,11 +72,13 @@ const Assets: React.FC<IAssetPage> = ({ assets }) => {
 
   const header = [
     'Token',
+    'Address',
     'Name',
     'Type',
     'Initial Supply',
     'Max Supply',
     'Circulating Supply',
+    'Precision',
   ];
 
   const tableProps: ITable = {

@@ -100,11 +100,11 @@ const assetsPage = css`
   margin-right: 1.25rem;
 
   &:nth-child(1) {
-    width: 5rem;
+    width: 3rem;
   }
 
   &:nth-child(2) {
-    width: 10rem;
+    width: 5rem;
   }
 
   &:nth-child(3) {
@@ -112,15 +112,23 @@ const assetsPage = css`
   }
 
   &:nth-child(4) {
-    width: 10rem;
+    width: 7rem;
   }
 
   &:nth-child(5) {
-    width: 10rem;
+    width: 8rem;
   }
 
   &:nth-child(6) {
+    width: 8rem;
+  }
+
+  &:nth-child(7) {
     width: 10rem;
+  }
+
+  &:nth-child(8) {
+    width: 8rem;
   }
 `;
 

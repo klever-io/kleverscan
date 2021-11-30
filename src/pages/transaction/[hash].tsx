@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
@@ -38,6 +38,8 @@ import { ArrowLeft, Copy } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import { KLV } from '@/assets/coins';
 
+import { Loader } from '@/components/Loader/styles';
+
 interface ITransactionResponse extends IResponse {
   data: {
     transaction: ITransaction;
@@ -54,6 +56,20 @@ interface ITransactionPage extends ITransaction {
   precision: number;
 }
 
+const klvAsset: IAsset = {
+  type: '',
+  address: '',
+  name: 'Klever',
+  ticker: 'KLV',
+  ownerAddress: '',
+  precision: 6,
+  uris: null,
+  initialSupply: 0,
+  circulatingSupply: 0,
+  maxSupply: 0,
+  royalties: 0,
+};
+
 const Transaction: React.FC<ITransactionPage> = ({
   hash,
   status,
@@ -68,14 +84,39 @@ const Transaction: React.FC<ITransactionPage> = ({
   const StatusIcon = getStatusIcon(status);
   const precision = 6; // default KLV precision
 
-  const handleCopyInfo = (data: string) => {
-    navigator.clipboard.writeText(String(data));
-  };
+  const [coin, setCoin] = useState<IAsset>(klvAsset);
+  const [loading, setLoading] = useState(true);
 
   const getContractType = (contracts: IContract[]) =>
     contracts.length > 1
       ? 'Multi contract'
       : Object.values(Contract)[contracts[0].type];
+
+  useEffect(() => {
+    const fetchCoin = async () => {
+      if (getContractType(contract) === Contract.Transfer) {
+        const parameter = contract[0].parameter as ITransferContract;
+
+        if (parameter.assetAddress) {
+          const response: IAssetResponse = await api.get({
+            route: `assets/${parameter.assetAddress}`,
+          });
+
+          if (!response.error) {
+            setCoin(response.data.asset);
+          }
+        }
+      }
+
+      setLoading(false);
+    };
+
+    fetchCoin();
+  }, []);
+
+  const handleCopyInfo = (data: string) => {
+    navigator.clipboard.writeText(String(data));
+  };
 
   const Transfer: React.FC<IContract> = ({ parameter: par }) => {
     const parameter = par as ITransferContract;
@@ -87,9 +128,20 @@ const Transaction: React.FC<ITransactionPage> = ({
             <strong>Amount</strong>
           </span>
           <CenteredRow>
-            <strong>{parameter.amount.toLocaleString()}</strong>
-            <KLV style={{ marginLeft: '1rem' }} />
-            <strong>KLV</strong>
+            {loading ? (
+              <Loader />
+            ) : (
+              <>
+                <strong>
+                  {toLocaleFixed(
+                    parameter.amount / 10 ** coin.precision,
+                    precision,
+                  )}
+                </strong>
+                <KLV style={{ marginLeft: '1rem' }} />
+                <strong>{coin.ticker}</strong>
+              </>
+            )}
           </CenteredRow>
         </Row>
         <Row>

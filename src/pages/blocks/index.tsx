@@ -45,6 +45,7 @@ interface ICard {
 
 const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks }) => {
   const router = useRouter();
+  const precision = 6; // default KLV precision
 
   const [blocks] = useState(defaultBlocks);
   const [loading] = useState(false);
@@ -152,7 +153,7 @@ const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks }) => {
           <small>{formatAmount(kAppFees || 0)}</small>
         </span>
         <span>
-          <strong>{formatAmount(blockRewards)} KLV</strong>
+          <strong>{formatAmount(blockRewards / 10 ** precision)} KLV</strong>
         </span>
       </Row>
     );

@@ -149,6 +149,8 @@ const Home: React.FC<IHome> = ({
   tps,
   coinsData,
 }) => {
+  const precision = 6; // default KLV precision
+
   const dataCards: ICard[] = [
     {
       Icon: Accounts,
@@ -300,7 +302,7 @@ const Home: React.FC<IHome> = ({
       </BlockCardRow>
       <BlockCardRow>
         <p>Reward</p>
-        <span>{formatAmount(blockRewards)} KLV</span>
+        <span>{formatAmount(blockRewards / 10 ** precision)} KLV</span>
       </BlockCardRow>
     </BlockCardContainer>
   );

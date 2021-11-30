@@ -1,11 +1,13 @@
 import React, { Fragment, useState } from 'react';
 
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
-import { divIcon, LatLngExpression } from 'leaflet';
+import { divIcon, LatLngExpression, MarkerCluster } from 'leaflet';
+import MarkerClusterGroup from 'react-leaflet-markercluster';
+require('react-leaflet-markercluster/dist/styles.min.css');
 
 import { Container } from './styles';
 
-import { INodeData } from '../../types';
+import { ICountryNode } from '../../types';
 
 interface IMapConfig {
   initialPosition: LatLngExpression;
@@ -13,23 +15,30 @@ interface IMapConfig {
 }
 
 interface IMap {
-  nodes: INodeData[];
+  nodes: ICountryNode[];
 }
 
 const Map: React.FC<IMap> = ({ nodes }) => {
-  const [selectedNode, setSelectedNode] = useState<INodeData | null>(null);
+  const [selectedNode, setSelectedNode] = useState<ICountryNode | null>(null);
 
   const mapConfig: IMapConfig = {
     initialPosition: [30, 0],
     zoom: 2,
   };
 
-  const handleMarker = (node: INodeData) => {
+  const handleMarker = (node: ICountryNode) => {
     setSelectedNode(node);
   };
 
   const handlePopup = () => {
     setSelectedNode(null);
+  };
+
+  const createClusterCustomIcon = function (cluster: MarkerCluster) {
+    return divIcon({
+      html: `<b>${cluster.getChildCount()}</b>`,
+      className: 'map-cluster',
+    });
   };
 
   return (
@@ -40,43 +49,37 @@ const Map: React.FC<IMap> = ({ nodes }) => {
         attributionControl={false}
       >
         <TileLayer
-          url="http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png"
           attribution="&copy; <a href='http://basemaps.org/copyright>Base Maps</a> contributors'"
         />
 
         {nodes.map((node, index) => (
           <Fragment key={String(index)}>
-            <Marker
-              position={node.location}
-              icon={divIcon({
-                className: 'map-cluster',
-                html: `<b>${node.count}</b>`,
-              })}
-              eventHandlers={{
-                click: () => handleMarker(node),
-              }}
-            />
-
-            {node.nodes?.map((subNode, subIndex) => (
-              <Marker
-                key={String(subIndex)}
-                position={subNode.location}
-                icon={divIcon({ className: 'map-marker' })}
-                eventHandlers={{
-                  click: () => handleMarker(subNode),
-                }}
-              />
-            ))}
+            <MarkerClusterGroup
+              showCoverageOnHover={false}
+              iconCreateFunction={createClusterCustomIcon}
+            >
+              {node.nodes?.map((subNode, subIndex) => (
+                <Marker
+                  key={String(subIndex)}
+                  position={subNode}
+                  icon={divIcon({ className: 'map-marker' })}
+                  eventHandlers={{
+                    click: () => handleMarker(node),
+                  }}
+                />
+              ))}
+            </MarkerClusterGroup>
           </Fragment>
         ))}
-
+        {/* 
         {selectedNode && (
           <Popup position={selectedNode.location} onClose={handlePopup}>
             <div>
               <span>{selectedNode.name}</span>
             </div>
           </Popup>
-        )}
+        )} */}
       </MapContainer>
     </Container>
   );

@@ -1,85 +1,150 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
+
 import dynamic from 'next/dynamic';
+import { fromUnixTime } from 'date-fns';
 
 import {
+  CardChartContainer,
+  CardDetails,
   ChartBody,
   ChartContainer,
   ChartHeader,
-  Container,
   MapContainer,
-} from '../../views/nodes';
+} from '@/views/nodes';
 
-import {
-  HeaderContainer,
-  HeaderIcon,
-} from '../../components/Layout/List/styles';
-import CardList, { ICard } from '../../components/CardList';
-import Chart, { ChartType } from '../../components/Chart';
-const Map = dynamic(() => import('../../components/Map/index'), { ssr: false });
+import { Card, CardContainer, Container, Header, Title } from '@/views/blocks';
 
-import { navbarItems } from '../../configs/navbar';
-import { INodeData } from '../../types';
+import Chart, { ChartType } from '@/components/Chart';
+const Map = dynamic(() => import('@/components/Map/index'), { ssr: false });
+import MapSvg from '@/components/MapSvg';
 
-import { BsQuestionCircleFill } from 'react-icons/bs';
+import { ICountriesGeoData, ICountryNode } from '../../types';
 
+import { ArrowLeft } from '@/assets/icons';
+import { coinMockedData, IChartData, infoChartData } from '@/configs/home';
+import { getAge } from '@/utils/index';
+import { getCountryISO3, ISO2 } from '@/utils/country';
+import geoData from '@/assets/countries.geo.json';
+import api from '@/services/api';
+
+const geojson2svg = require('geojson2svg');
+const getBounds = require('svg-path-bounds');
+
+interface ICard {
+  title: string;
+  headers: string[];
+  values: string[];
+  chartType: 'chart' | 'map';
+  chartOptions?: any;
+  chartData: IChartData[] | string[];
+}
 interface INodePage {
-  totalNodes: number;
-  mostNodes: INodeData;
-  nodes: INodeData[];
+  nodes: ICountryNode[];
+  cardData: ICard[];
 }
 
-const Nodes: React.FC<INodePage> = ({ totalNodes, mostNodes, nodes }) => {
-  const cardData: ICard[] = [
-    {
-      title: 'Total Nodes',
-      subtitle: String(totalNodes),
-      transparent: false,
-    },
-    {
-      title: 'Most Nodes',
-      subtitle: `${mostNodes.name} (${mostNodes.count})`,
-      transparent: true,
-    },
-  ];
+interface IGeoIPLookup {
+  range: [number, number];
+  country: ISO2;
+  region: string;
+  timezone: string;
+  ll: [number, number];
+}
 
-  const Header: React.FC = () => {
-    const Icon = navbarItems.find(item => item.name === 'Nodes')?.Icon;
+interface IPeerData {
+  isblacklisted: boolean;
+  pid: string;
+  pk: string;
+  peertype: string;
+  addresses: string[];
+}
+interface IPeerResponse {
+  data: { peers: IPeerData[] };
+  pagination: string | null;
+  error: string;
+  code: string;
+}
 
-    return (
-      <HeaderContainer>
-        <div>
-          <HeaderIcon>{Icon ? <Icon /> : <BsQuestionCircleFill />}</HeaderIcon>
-          <span>Nodes</span>
-        </div>
-      </HeaderContainer>
-    );
-  };
+const Nodes: React.FC<INodePage> = ({ nodes, cardData }) => {
+  const router = useRouter();
 
-  const chartData = () => {
+  const [uptime] = useState(new Date().getTime());
+  const [age, setAge] = useState(
+    getAge(fromUnixTime(new Date().getTime() / 1000)),
+  );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newAge = getAge(fromUnixTime(uptime / 1000));
+
+      setAge(newAge);
+    }, 1 * 1000); // 1 sec
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  const rankingChartData = () => {
     const maxItems = 6;
     let data = [...nodes];
 
     if (nodes.length > maxItems) {
       const othersCount = nodes
         .slice(maxItems, nodes.length)
-        .reduce((acc, node) => acc + (node.count || 0), 0);
+        .reduce((acc, node) => acc + (node.nodes.length || 0), 0);
 
       data.length = maxItems;
-      data = [
-        ...data,
-        { name: 'Others', location: [0, 0], count: othersCount },
-      ];
+      data = [...data, { country: 'Others', nodes: Array(othersCount) }];
     }
 
-    return data.map(item => ({ name: item.name, value: item.count || 0 }));
+    return data.map(item => ({ name: item.country, value: item.nodes.length }));
   };
 
   return (
     <Container>
-      <Header />
-      <CardList data={cardData} />
+      <Header>
+        <Title>
+          <div onClick={router.back}>
+            <ArrowLeft />
+          </div>
+          <h1>Nodes</h1>
+        </Title>
+      </Header>
+
+      <CardContainer>
+        {cardData.map((card, index) => {
+          const { title, headers, values, chartType, chartOptions, chartData } =
+            card;
+          return (
+            <Card key={index}>
+              <div>
+                <span>
+                  <strong>{title}</strong>
+                </span>
+                <p>{age} ago</p>
+              </div>
+              <CardChartContainer>
+                {chartType === 'chart' ? (
+                  <Chart data={chartData} />
+                ) : (
+                  <MapSvg chartData={chartData} chartOptions={chartOptions} />
+                )}
+                <CardDetails variation={values[1].includes('%')}>
+                  <div>
+                    <span title={headers[0]}>{values[0]}</span>
+                    <span title={headers[1]}>{values[1]}</span>
+                  </div>
+                </CardDetails>
+              </CardChartContainer>
+            </Card>
+          );
+        })}
+        <Card style={{ backgroundColor: 'transparent' }} />
+      </CardContainer>
 
       <MapContainer>
         <Map nodes={nodes} />
@@ -91,7 +156,7 @@ const Nodes: React.FC<INodePage> = ({ totalNodes, mostNodes, nodes }) => {
           <span>Rank by country and region</span>
         </ChartHeader>
         <ChartBody>
-          <Chart type={ChartType.Horizontal} data={chartData()} />
+          <Chart type={ChartType.Horizontal} data={rankingChartData()} />
         </ChartBody>
       </ChartContainer>
     </Container>
@@ -99,41 +164,99 @@ const Nodes: React.FC<INodePage> = ({ totalNodes, mostNodes, nodes }) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const nodes: INodeData[] = [
-    {
-      name: 'Brasil',
-      count: 3,
-      location: [-15.793889, -47.882778],
-      nodes: [
-        { name: 'Rio de Janeiro', location: [-22.908333, -43.196388] },
-        { name: 'Belém', location: [-1.455833, -48.503887] },
-        { name: 'Porto Alegre', location: [-30.033056, -51.23] },
-      ],
-    },
-    {
-      name: 'United States',
-      count: 4,
-      location: [38.785091, -90.968285],
-      nodes: [
-        { name: 'New York', location: [40.73061, -73.935242] },
-        { name: 'Washington', location: [47.751076, -120.740135] },
-        { name: 'Texas', location: [31.0, -100.0] },
-        { name: 'Oregon', location: [44.0, -120.5] },
-      ],
-    },
-  ];
+  const geoip = require('geoip-lite');
 
-  let mostNodes = nodes[0];
-  for (const node of nodes) {
-    if ((node.count || 0) > (mostNodes.count || 0)) {
-      mostNodes = node;
+  const countriesData: ICountriesGeoData = JSON.parse(JSON.stringify(geoData));
+
+  const statistics: IPeerResponse = await api.get({
+    route: 'node/peerinfo',
+  });
+
+  const { peers } = statistics.data;
+
+  const nodes: ICountryNode[] = [];
+
+  for (let i = 0; i < peers.length; i++) {
+    const { addresses } = peers[i];
+    const filteredAddresses = addresses.filter((item, pos, self) => {
+      return self.indexOf(item) === pos && !item.startsWith('/ip4/127.0.0.1');
+    });
+    for (const address of filteredAddresses) {
+      // IP comes as /ip4/xx.xx.x.xx/tcp/xxxxx
+      const cleanIp = address.replace(/\/ip4\/|\/tcp\/[^\/]*$/g, '');
+      // temporary geoip fix
+      if (cleanIp === '35.200.204.226') continue;
+
+      const geo: IGeoIPLookup = geoip.lookup(cleanIp);
+      if (geo === null) continue;
+
+      const { country, ll } = geo;
+
+      const countryNodeIndex = nodes.findIndex(c => c.country === country);
+      if (countryNodeIndex === -1) {
+        nodes.push({
+          country,
+          nodes: [ll],
+        });
+      } else {
+        nodes[countryNodeIndex].nodes.push(ll);
+      }
     }
   }
 
+  let mostNodes = nodes[0];
+  for (const node of nodes) {
+    if (node.nodes.length > mostNodes.nodes.length) {
+      mostNodes = node;
+    }
+  }
+  const mostNodesCountryGeo = countriesData.features.find(
+    feat => feat.id === getCountryISO3(mostNodes.country),
+  );
+
+  const converter = geojson2svg({
+    viewportSize: { width: 200, height: 200 },
+    mapExtent: { left: -180, bottom: -180, right: 180, top: 180 },
+    output: 'path',
+    fitTo: 'height',
+  });
+  const pathStrings = converter.convert(mostNodesCountryGeo);
+  const viewBox = getBounds(pathStrings.join(' '));
+
+  const totalNodes = nodes.reduce(
+    (acc, node) => acc + (node.nodes.length || 0),
+    0,
+  );
+
+  const cardData: ICard[] = [
+    {
+      title: 'Total Nodes',
+      headers: ['Value', 'Increase'],
+      values: [String(totalNodes), '+0.00%'],
+      chartType: 'chart',
+      chartData: coinMockedData,
+    },
+    {
+      title: 'Most Nodes',
+      headers: ['Country', 'Nodes'],
+      values: [
+        mostNodesCountryGeo?.properties.name || '',
+        String(mostNodes.nodes.length),
+      ],
+      chartType: 'map',
+      chartOptions: {
+        scale: `${200 / (viewBox[2] - viewBox[0])}, ${
+          200 / (viewBox[2] - viewBox[0])
+        }`,
+        translate: `${-viewBox[0]} ${-viewBox[1]}`,
+      },
+      chartData: pathStrings,
+    },
+  ];
+
   const props: INodePage = {
-    totalNodes: nodes.reduce((acc, node) => acc + (node.count || 0), 0),
-    mostNodes,
     nodes,
+    cardData,
   };
 
   return { props };

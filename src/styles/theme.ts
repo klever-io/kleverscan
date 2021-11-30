@@ -80,7 +80,8 @@ const theme = {
   },
 
   chart: {
-    background: '#5A2A73',
+    darkBg: '#5A2A73',
+    lightBg: '#aa33b5',
     transparent: '#272349',
 
     linear: {

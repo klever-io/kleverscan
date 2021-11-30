@@ -27,9 +27,9 @@ const Horizontal: React.FC<IHorizontal> = ({ data, theme }) => (
   <ResponsiveContainer width="100%" height="100%">
     <BarChart data={data} layout="vertical">
       <defs>
-        <linearGradient id="background" x1="0" y1=".5" x2="1" y2="0">
-          <stop offset="5%" stopColor={theme.rose} stopOpacity={1} />
-          <stop offset="95%" stopColor={theme.purple} stopOpacity={1} />
+        <linearGradient id="horizontalBackground" x1="0" y1=".5" x2="1" y2="0">
+          <stop offset="5%" stopColor={theme.chart.lightBg} stopOpacity={1} />
+          <stop offset="95%" stopColor={theme.chart.lightBg} stopOpacity={1} />
         </linearGradient>
       </defs>
 
@@ -50,7 +50,7 @@ const Horizontal: React.FC<IHorizontal> = ({ data, theme }) => (
       <Bar
         label={{ fill: theme.white }}
         dataKey="value"
-        fill="url(#background)"
+        fill="url(#horizontalBackground)"
         barSize={30}
       />
     </BarChart>

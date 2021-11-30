@@ -2,11 +2,13 @@ import React from 'react';
 import Area from './Area';
 import Horizontal from './Horizontal';
 import Linear from './Linear';
+import Scatter from './Scatter';
 
 export enum ChartType {
   Area,
   Horizontal,
   Linear,
+  Scatter,
 }
 
 interface IChart {
@@ -24,6 +26,8 @@ const Chart: React.FC<IChart> = ({ type, data }) => {
       return <Horizontal {...props} />;
     case ChartType.Linear:
       return <Linear {...props} />;
+    case ChartType.Scatter:
+      return <Scatter {...props} />;
     default:
       return <Area {...props} />;
   }

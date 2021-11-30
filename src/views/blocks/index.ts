@@ -75,6 +75,7 @@ export const CardContainer = styled.section`
 export const Card = styled.div`
   width: 100%;
   padding: 1.5rem;
+  overflow: hidden;
 
   display: flex;
 

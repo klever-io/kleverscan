@@ -3,7 +3,7 @@ import React from 'react';
 import { Container } from './styles';
 
 interface ISkeleton {
-  width?: number;
+  width?: number | string;
   height?: number;
 }
 

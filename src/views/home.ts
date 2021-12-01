@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 
 import { lighten, transparentize } from 'polished';
 
@@ -50,6 +50,16 @@ export const DataContainer = styled(Section)`
   padding: 5rem 10rem;
 
   background-color: #40274f;
+  background-image: radial-gradient(
+      at 29% 76%,
+      hsla(238, 30%, 34%, 1) 0,
+      transparent 50%
+    ),
+    radial-gradient(at 80% 0%, hsla(261, 87%, 60%, 1) 0, transparent 50%),
+    radial-gradient(at 80% 50%, hsla(240, 47%, 9%, 1) 0, transparent 50%),
+    radial-gradient(at 0% 100%, hsla(240, 47%, 9%, 1) 0, transparent 50%),
+    radial-gradient(at 80% 100%, hsla(255, 47%, 36%, 1) 0, transparent 50%),
+    radial-gradient(at 0% 0%, hsla(295, 57%, 46%, 1) 0, transparent 50%);
 
   @media (max-width: 768px) {
     padding: 5rem;
@@ -93,7 +103,7 @@ export const DataCardsContainer = styled.div`
 
   gap: 1rem;
 
-  @media (max-width: 425px) {
+  @media (max-width: 768px) {
     flex-direction: column;
   }
 `;
@@ -171,7 +181,7 @@ export const CoinDataCard = styled(DataCard)`
 
   position: relative;
 
-  @media (max-width: 425px) {
+  @media (max-width: 768px) {
     width: 100%;
   }
 `;
@@ -184,6 +194,10 @@ export const CoinDataContent = styled.div`
   flex-direction: column;
 
   animation: 1.5s ease 0s 1 normal none running ${FadeIn};
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 export const CoinDataHeaderContainer = styled.div`
@@ -215,7 +229,7 @@ export const CoinDataName = styled.div`
   }
 `;
 
-export const CoinDataDescription = styled(CoinDataName)<IVariation>`
+export const CoinDataDescription = styled(CoinDataName) <IVariation>`
   font-size: 0.95rem;
   font-weight: 400;
 
@@ -282,12 +296,12 @@ export const CoinValueDetail = styled.div<{ positive?: boolean }>`
 
   p {
     color: ${props => {
-      if (props.positive === undefined) {
-        return props.theme.card.text;
-      }
+    if (props.positive === undefined) {
+      return props.theme.card.text;
+    }
 
-      return props.theme.card[props.positive ? 'green' : 'red'];
-    }};
+    return props.theme.card[props.positive ? 'green' : 'red'];
+  }};
   }
 `;
 
@@ -316,7 +330,11 @@ export const CoinSelector = styled.div<{ isSelected: boolean }>`
   cursor: pointer;
 `;
 
-export const BlockCardContainer = styled.div`
+interface BlockCardContainerProps {
+  blockIndex: number;
+}
+
+export const BlockCardContainer = styled.div<BlockCardContainerProps>`
   min-width: 17rem;
 
   padding: 1.5rem;
@@ -324,6 +342,17 @@ export const BlockCardContainer = styled.div`
   background-color: ${props => props.theme.white};
 
   border-radius: 1rem;
+
+
+  ${props => (props.blockIndex === 0) && css`
+  transition: 2s all ease-in-out;
+
+  animation: ${FadeIn} 1s 1;
+  animation-fill-mode: forwards;
+  
+  `
+  }
+
 `;
 
 export const BlockCardRow = styled.div`
@@ -349,6 +378,7 @@ export const BlockCardRow = styled.div`
 
   strong {
     font-weight: 600;
+    cursor: pointer;
   }
 
   p {
@@ -425,7 +455,7 @@ export const TransactionContent = styled.div`
     }
   }
 
-  @media (max-width: 425px) {
+  @media (max-width: 768px) {
     overflow: auto;
 
     width: 100% !important;

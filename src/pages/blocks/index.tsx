@@ -24,9 +24,20 @@ import api from '@/services/api';
 import { formatAmount, getAge } from '@/utils/index';
 
 import { ArrowLeft } from '@/assets/icons';
+import { PaginationContainer } from '@/components/Pagination/styles';
+import Pagination from '@/components/Pagination';
 
+interface IBlockStats {
+  total_burned: number;
+  total_block_rewards: number;
+}
+interface IBlockData {
+  yesterday: IBlockStats;
+  total: IBlockStats;
+}
 interface IBlocks {
   blocks: IBlock[];
+  statistics: IBlockData;
   pagination: IPagination;
 }
 
@@ -37,18 +48,29 @@ interface IBlockResponse extends IResponse {
   pagination: IPagination;
 }
 
+interface IStatisticsResponse extends IResponse {
+  data: {
+    block_stats: IBlockStats;
+  };
+}
+
 interface ICard {
   title: string;
   headers: string[];
   values: string[];
 }
 
-const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks }) => {
+const Blocks: React.FC<IBlocks> = ({
+  blocks: defaultBlocks,
+  statistics,
+  pagination,
+}) => {
   const router = useRouter();
   const precision = 6; // default KLV precision
 
-  const [blocks] = useState(defaultBlocks);
-  const [loading] = useState(false);
+  const [page, setPage] = useState(0);
+  const [blocks, setBlocks] = useState(defaultBlocks);
+  const [loading, setLoading] = useState(false);
   const [uptime] = useState(new Date().getTime());
   const [age, setAge] = useState(
     getAge(fromUnixTime(new Date().getTime() / 1000)),
@@ -66,21 +88,44 @@ const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks }) => {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+
+      const response: IBlockResponse = await api.get({
+        route: `block/list?page=${page}`,
+      });
+      if (!response.error) {
+        setBlocks(response.data.blocks);
+      }
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [page]);
+
   const cards: ICard[] = [
     {
       title: 'Number of Blocks',
       headers: ['Blocks Yesterday', 'Cumulative Number'],
-      values: ['+27,684', '35,519,349'],
+      values: ['--', String(blocks.length ? blocks[0].nonce : 0)],
     },
     {
       title: 'Block Reward',
       headers: ['Reward Yesterday', 'Cumulative Revenue'],
-      values: ['4,872,384 KLV', '4.4 Bi KLV'],
+      values: [
+        `${formatAmount(statistics.yesterday.total_block_rewards)} KLV`,
+        `${formatAmount(statistics.total.total_block_rewards)} KLV`,
+      ],
     },
     {
       title: 'Stats on Burned KLV',
       headers: ['Burned Yesterday', 'Burned in Total'],
-      values: ['8,607,197 KLV', '1.4 Bi KLV'],
+      values: [
+        `${formatAmount(statistics.yesterday.total_burned)} KLV`,
+        `${formatAmount(statistics.total.total_burned)} KLV`,
+      ],
     },
   ];
 
@@ -115,10 +160,10 @@ const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks }) => {
     'Produced by',
     'Created',
     'Tx Count',
-    'Burned KLV',
-    'kApp Fee',
-    'Bandwith Fee',
-    'Block Reward',
+    'Burned Fees',
+    'kApp Fees',
+    'Fee Rewards',
+    'Block Rewards',
   ];
 
   const TableBody: React.FC<IBlock> = ({
@@ -128,7 +173,9 @@ const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks }) => {
     txCount,
     txFees,
     kAppFees,
+    burnedFees,
     blockRewards,
+    transactions,
   }) => {
     return (
       <Row type="blocks">
@@ -144,7 +191,16 @@ const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks }) => {
         </span>
         <span>{txCount}</span>
         <span>
-          <small>32,230.23 KLV</small>
+          <small>
+            {`${formatAmount(
+              (burnedFees ||
+                transactions.reduce(
+                  (acc, value) => acc + value?.bandwidthFee,
+                  0,
+                )) /
+                10 ** precision,
+            )} KLV`}
+          </small>
         </span>
         <span>
           <small>{formatAmount((kAppFees || 0) / 10 ** precision)}</small>
@@ -190,6 +246,16 @@ const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks }) => {
         <h3>List of blocks</h3>
         <Table {...tableProps} />
       </TableContainer>
+
+      <PaginationContainer>
+        <Pagination
+          count={pagination.totalPages}
+          page={page}
+          onPaginate={page => {
+            setPage(page);
+          }}
+        />
+      </PaginationContainer>
     </Container>
   );
 };
@@ -197,6 +263,10 @@ const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks }) => {
 export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
   const props: IBlocks = {
     blocks: [],
+    statistics: {
+      yesterday: { total_burned: 0, total_block_rewards: 0 },
+      total: { total_burned: 0, total_block_rewards: 0 },
+    },
     pagination: {} as IPagination,
   };
 
@@ -206,6 +276,19 @@ export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
   if (!block.error) {
     props.blocks = block.data.blocks;
     props.pagination = block.pagination;
+  }
+
+  const yesterdayStatistics: IStatisticsResponse = await api.get({
+    route: 'block/statistics/1',
+  });
+  const totalStatistics: IStatisticsResponse = await api.get({
+    route: 'block/statistics/30',
+  });
+  if (!yesterdayStatistics.error && !totalStatistics.error) {
+    props.statistics = {
+      yesterday: yesterdayStatistics.data.block_stats,
+      total: totalStatistics.data.block_stats,
+    };
   }
 
   return { props };

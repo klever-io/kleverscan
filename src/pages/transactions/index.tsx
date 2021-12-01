@@ -18,7 +18,7 @@ import Filter, { IFilter, IFilterItem } from '@/components/Filter';
 import Table, { ITable } from '@/components/Table';
 import { Row, Status } from '@/components/Table/styles';
 
-import { coins, contracts, status } from '@/configs/transactions';
+import { contracts, status } from '@/configs/transactions';
 import api from '@/services/api';
 import {
   ITransaction,
@@ -32,6 +32,7 @@ import {
   IFreezeContract,
   IUnfreezeContract,
   IWithdrawContract,
+  IAsset,
 } from '../../types';
 
 import { formatAmount } from '../../utils';
@@ -39,9 +40,13 @@ import { formatAmount } from '../../utils';
 import { ArrowRight, ArrowLeft } from '@/assets/icons';
 import { KLV } from '@/assets/coins';
 import { getStatusIcon } from '@/assets/status';
+import Pagination from '@/components/Pagination';
+import { PaginationContainer } from '@/components/Pagination/styles';
 
 interface ITransactions {
   transactions: ITransaction[];
+  pagination: IPagination;
+  assets: IAsset[];
 }
 
 interface ITransactionResponse extends IResponse {
@@ -51,14 +56,23 @@ interface ITransactionResponse extends IResponse {
   pagination: IPagination;
 }
 
+interface IAssetResponse extends IResponse {
+  data: {
+    assets: IAsset[];
+  };
+}
+
 const Transactions: React.FC<ITransactions> = ({
   transactions: defaultTransactions,
+  pagination,
+  assets,
 }) => {
   const router = useRouter();
   const defaultFilter: IFilterItem = { name: 'All', value: 'all' };
 
   const [loading, setLoading] = useState(false);
   const [transactions, setTransactions] = useState(defaultTransactions);
+  const [page, setPage] = useState(0);
 
   const [transactionType, setTransactionType] = useState(defaultFilter);
   const [statusType, setStatusType] = useState(defaultFilter);
@@ -67,7 +81,7 @@ const Transactions: React.FC<ITransactions> = ({
   const filters: IFilter[] = [
     {
       title: 'Coin',
-      data: coins,
+      data: assets.map(asset => ({ name: asset.ticker, value: asset.address })),
       onClick: selected => {
         if (coinType.value !== selected.value) {
           setCoinType(selected);
@@ -130,8 +144,10 @@ const Transactions: React.FC<ITransactions> = ({
         }
       });
 
+      console.log(`transaction/list?${buildQuery(routerQuery)}&page=${page}`);
+
       const response: ITransactionResponse = await api.get({
-        route: `transaction/list?${buildQuery(routerQuery)}`,
+        route: `transaction/list?${buildQuery(routerQuery)}&page=${page}`,
       });
       if (!response.error) {
         setTransactions(response.data.transactions);
@@ -141,7 +157,7 @@ const Transactions: React.FC<ITransactions> = ({
     };
 
     fetchData();
-  }, [transactionType, statusType, coinType]);
+  }, [transactionType, statusType, coinType, page]);
 
   const getContractType = (contracts: IContract[]) =>
     contracts.length > 1
@@ -360,6 +376,15 @@ const Transactions: React.FC<ITransactions> = ({
       </Header>
 
       <Table {...tableProps} />
+      <PaginationContainer>
+        <Pagination
+          count={pagination.totalPages}
+          page={page}
+          onPaginate={page => {
+            setPage(page);
+          }}
+        />
+      </PaginationContainer>
     </Container>
   );
 };
@@ -368,6 +393,8 @@ export const getServerSideProps: GetServerSideProps<ITransactions> =
   async () => {
     const props: ITransactions = {
       transactions: [],
+      pagination: {} as IPagination,
+      assets: [],
     };
 
     const transactions: ITransactionResponse = await api.get({
@@ -375,6 +402,14 @@ export const getServerSideProps: GetServerSideProps<ITransactions> =
     });
     if (!transactions.error) {
       props.transactions = transactions.data.transactions;
+      props.pagination = transactions.pagination;
+    }
+
+    const assets: IAssetResponse = await api.get({
+      route: 'assets/kassets',
+    });
+    if (!assets.error) {
+      props.assets = assets.data.assets;
     }
 
     return { props };

@@ -24,6 +24,8 @@ import api from '@/services/api';
 import { formatAmount, getAge } from '@/utils/index';
 
 import { ArrowLeft } from '@/assets/icons';
+import { PaginationContainer } from '@/components/Pagination/styles';
+import Pagination from '@/components/Pagination';
 
 interface IAccounts {
   accounts: IAccount[];
@@ -50,8 +52,9 @@ const Accounts: React.FC<IAccounts> = ({
   const router = useRouter();
   const precision = 6; // default KLV precision
 
-  const [accounts] = useState(defaultAccounts);
-  const [loading] = useState(false);
+  const [page, setPage] = useState(0);
+  const [accounts, setAccounts] = useState(defaultAccounts);
+  const [loading, setLoading] = useState(false);
   const [uptime] = useState(new Date().getTime());
   const [age, setAge] = useState(
     getAge(fromUnixTime(new Date().getTime() / 1000)),
@@ -69,12 +72,24 @@ const Accounts: React.FC<IAccounts> = ({
     };
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+
+      const response: IAccountResponse = await api.get({
+        route: `address/list?page=${page}`,
+      });
+      if (!response.error) {
+        setAccounts(response.data.accounts);
+      }
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [page]);
+
   const cards: ICard[] = [
-    {
-      title: 'Number of Accounts',
-      headers: ['Accounts Yesterday', 'Total'],
-      values: ['--', pagination.totalRecords.toLocaleString()],
-    },
     {
       title: 'Number of Accounts',
       headers: ['Accounts Yesterday', 'Total'],
@@ -109,7 +124,12 @@ const Accounts: React.FC<IAccounts> = ({
 
   const header = ['Address', 'KLV Staked', 'Transaction Count', 'KLV Balance'];
 
-  const TableBody: React.FC<IAccount> = ({ address, buckets, balance }) => {
+  const TableBody: React.FC<IAccount> = ({
+    address,
+    buckets,
+    balance,
+    nonce,
+  }) => {
     const getFreezeBalance = () => {
       if (Object.values(buckets).length <= 0) {
         return 0;
@@ -131,9 +151,9 @@ const Accounts: React.FC<IAccounts> = ({
         <span>
           <strong>{formatAmount(getFreezeBalance())} KLV</strong>
         </span>
-        <span>-</span>
+        <span>{nonce}</span>
         <span>
-          <strong>{formatAmount(balance)} KLV</strong>
+          <strong>{formatAmount(balance / 10 ** precision)} KLV</strong>
         </span>
       </Row>
     );
@@ -170,6 +190,16 @@ const Accounts: React.FC<IAccounts> = ({
         <h3>List of accounts</h3>
         <Table {...tableProps} />
       </TableContainer>
+
+      <PaginationContainer>
+        <Pagination
+          count={pagination.totalPages}
+          page={page}
+          onPaginate={page => {
+            setPage(page);
+          }}
+        />
+      </PaginationContainer>
     </Container>
   );
 };

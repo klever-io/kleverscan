@@ -1,7 +1,8 @@
 import React from 'react';
 import { IFilterItem } from '../Filter';
+import Skeleton from '../Skeleton';
 
-import { Body, Container, EmptyRow, Header, ITableType } from './styles';
+import { Body, Container, EmptyRow, Header, ITableType, Row } from './styles';
 
 export interface ITable {
   type:
@@ -40,8 +41,19 @@ const Table: React.FC<ITable> = ({
       </Header>
       <Body>
         {loading && (
-          <span>Loading...</span>
-          // TODO: Create loader
+          <>
+            {Array(10)
+              .fill(10)
+              .map((_, index) => (
+                <Row key={String(index)} {...props}>
+                  {header.map((_, index2) => (
+                    <span key={String(index2)}>
+                      <Skeleton width="100%" />
+                    </span>
+                  ))}
+                </Row>
+              ))}
+          </>
         )}
         {!loading && data.length === 0 && (
           <EmptyRow {...props}>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
@@ -27,6 +27,8 @@ import api, { IPrice, Service } from '@/services/api';
 
 import { ArrowLeft, Copy } from '@/assets/icons';
 import { KLV } from '@/assets/coins';
+import { PaginationContainer } from '@/components/Pagination/styles';
+import Pagination from '@/components/Pagination';
 
 interface IAccountPage {
   account: IAccount;
@@ -53,11 +55,34 @@ interface IPriceResponse extends IResponse {
 
 const Account: React.FC<IAccountPage> = ({
   account,
-  transactions,
+  transactions: transactionResponse,
   convertedBalance,
 }) => {
   const router = useRouter();
   const precision = 6;
+
+  const [page, setPage] = useState(0);
+  const [, setLoading] = useState(false);
+  const [transactions, setTransactions] = useState(
+    transactionResponse.data.transactions,
+  );
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+
+      const response: ITransactionsResponse = await api.get({
+        route: `transaction/list?page=${page}`,
+      });
+      if (!response.error) {
+        setTransactions(response.data.transactions);
+      }
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [page]);
 
   const handleCopyInfo = (data: string) => {
     navigator.clipboard.writeText(String(data));
@@ -87,7 +112,7 @@ const Account: React.FC<IAccountPage> = ({
       headers.push('Assets');
     }
 
-    if (transactions.data.transactions.length > 0) {
+    if (transactionResponse.data.transactions.length > 0) {
       headers.push('Transactions');
     }
 
@@ -110,7 +135,20 @@ const Account: React.FC<IAccountPage> = ({
       case 'Assets':
         return <Assets {...account.assets} />;
       case 'Transactions':
-        return <Transactions {...transactions.data.transactions} />;
+        return (
+          <>
+            <Transactions {...transactions} />
+            <PaginationContainer>
+              <Pagination
+                count={transactionResponse.pagination.totalPages}
+                page={page}
+                onPaginate={page => {
+                  setPage(page);
+                }}
+              />
+            </PaginationContainer>
+          </>
+        );
       case 'Buckets':
         return <Buckets {...account.buckets} />;
       default:
@@ -180,7 +218,7 @@ const Account: React.FC<IAccountPage> = ({
           </span>
           <span>
             <small>
-              {transactions.pagination.totalRecords.toLocaleString()}
+              {transactionResponse.pagination.totalRecords.toLocaleString()}
             </small>
           </span>
         </Row>

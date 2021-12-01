@@ -1,5 +1,4 @@
 import { ISO2 } from '@/utils/country';
-import { LatLngExpression } from 'leaflet';
 
 export enum Contract {
   Transfer = 'Transfer',
@@ -107,10 +106,7 @@ export interface ITransaction {
   hash: string;
   blockNum: number;
   sender: string;
-  expiration: number;
   timestamp: number;
-  fee: number;
-  bandwidthFeeLimit: number;
   chainID: string;
   signature: string;
   searchOrder: number;
@@ -144,14 +140,20 @@ export interface IBlock {
   txCount: number;
   txFees?: number;
   kAppFees?: number;
+  burnedFees?: number;
   blockRewards: number;
   txHashes: any[];
   softwareVersion: string;
   chainID: string;
 }
 
+export interface IBlockCard {
+  blockIndex: number;
+}
+
 export interface IAccount {
   address: string;
+  nonce: number;
   balance: number;
   blsPublicKey: string;
   assets: {

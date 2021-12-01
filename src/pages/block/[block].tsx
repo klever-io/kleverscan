@@ -2,12 +2,9 @@ import React, { useState } from 'react';
 import { GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
 
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
 import { format, fromUnixTime } from 'date-fns';
 
-import { ArrowLeft, Copy } from '@/assets/icons';
+import { ArrowLeft } from '@/assets/icons';
 
 import {
   AssetTitle,
@@ -24,6 +21,7 @@ import {
 
 import Tabs, { ITabs } from '@/components/Tabs';
 import Transactions from '@/components/Tabs/Transactions';
+import Copy from '@/components/Copy';
 
 import { IBlock, IResponse } from '../../types';
 import api from '@/services/api';
@@ -62,10 +60,6 @@ const Block: React.FC<IBlock> = ({
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
 
-  const handleCopyInfo = (data: string) => {
-    navigator.clipboard.writeText(String(data));
-  };
-
   const Overview: React.FC = () => {
     return (
       <>
@@ -74,9 +68,9 @@ const Block: React.FC<IBlock> = ({
             <strong>Hash</strong>
           </span>
           <span>
-            <CenteredRow onClick={() => handleCopyInfo(hash)}>
+            <CenteredRow>
               <span>{hash}</span>
-              <Copy />
+              <Copy info="Hash" data={hash} />
             </CenteredRow>
           </span>
         </Row>
@@ -142,9 +136,9 @@ const Block: React.FC<IBlock> = ({
             <strong>Producer Signature</strong>
           </span>
           <span>
-            <CenteredRow onClick={() => handleCopyInfo(producerSignature)}>
+            <CenteredRow>
               <span>{producerSignature}</span>
-              <Copy />
+              <Copy info="Signature" data={producerSignature} />
             </CenteredRow>
           </span>
         </Row>
@@ -153,9 +147,9 @@ const Block: React.FC<IBlock> = ({
             <strong>Parent Hash</strong>
           </span>
           <span>
-            <CenteredRow onClick={() => handleCopyInfo(parentHash)}>
+            <CenteredRow>
               <span>{parentHash}</span>
-              <Copy />
+              <Copy info="Parent hash" data={parentHash} />
             </CenteredRow>
           </span>
         </Row>
@@ -164,9 +158,9 @@ const Block: React.FC<IBlock> = ({
             <strong>Trie Root</strong>
           </span>
           <span>
-            <CenteredRow onClick={() => handleCopyInfo(trieRoot)}>
+            <CenteredRow>
               <span>{trieRoot}</span>
-              <Copy />
+              <Copy info="Trie root" data={trieRoot} />
             </CenteredRow>
           </span>
         </Row>
@@ -175,9 +169,9 @@ const Block: React.FC<IBlock> = ({
             <strong>Validators Trie Root</strong>
           </span>
           <span>
-            <CenteredRow onClick={() => handleCopyInfo(validatorsTrieRoot)}>
+            <CenteredRow>
               <span>{validatorsTrieRoot}</span>
-              <Copy />
+              <Copy data={validatorsTrieRoot} />
             </CenteredRow>
           </span>
         </Row>
@@ -186,9 +180,9 @@ const Block: React.FC<IBlock> = ({
             <strong>Asset Trie Root</strong>
           </span>
           <span>
-            <CenteredRow onClick={() => handleCopyInfo(assetTrieRoot)}>
+            <CenteredRow>
               <span>{assetTrieRoot}</span>
-              <Copy />
+              <Copy data={assetTrieRoot} />
             </CenteredRow>
           </span>
         </Row>
@@ -197,9 +191,9 @@ const Block: React.FC<IBlock> = ({
             <strong>Previous Random Seed</strong>
           </span>
           <span>
-            <CenteredRow onClick={() => handleCopyInfo(prevRandSeed)}>
+            <CenteredRow>
               <span>{prevRandSeed}</span>
-              <Copy />
+              <Copy data={prevRandSeed} />
             </CenteredRow>
           </span>
         </Row>
@@ -208,9 +202,9 @@ const Block: React.FC<IBlock> = ({
             <strong>Previous Random Seed</strong>
           </span>
           <span>
-            <CenteredRow onClick={() => handleCopyInfo(randSeed)}>
+            <CenteredRow>
               <span>{randSeed}</span>
-              <Copy />
+              <Copy info="Random seed" data={randSeed} />
             </CenteredRow>
           </span>
         </Row>
@@ -245,8 +239,6 @@ const Block: React.FC<IBlock> = ({
 
   return (
     <Container>
-      <ToastContainer />
-
       <Header>
         <Title>
           <div onClick={router.back}>

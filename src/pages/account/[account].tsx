@@ -14,6 +14,7 @@ import {
   Input,
   OverviewContainer,
   Row,
+  RowContent,
   Title,
 } from '@/views/accounts/detail';
 
@@ -23,12 +24,14 @@ import Transactions from '@/components/Tabs/Transactions';
 import Buckets from '@/components/Tabs/Buckets';
 
 import { IAccount, IResponse, ITransaction, IPagination } from '@/types/index';
-import api, { IPrice, Service } from '@/services/api';
 
-import { ArrowLeft, Copy } from '@/assets/icons';
+import { ArrowLeft } from '@/assets/icons';
 import { KLV } from '@/assets/coins';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
+import Copy from '@/components/Copy';
+
+import api, { IPrice, Service } from '@/services/api';
 
 interface IAccountPage {
   account: IAccount;
@@ -83,10 +86,6 @@ const Account: React.FC<IAccountPage> = ({
 
     fetchData();
   }, [page]);
-
-  const handleCopyInfo = (data: string) => {
-    navigator.clipboard.writeText(String(data));
-  };
 
   const getFreezeBalance = () => {
     if (Object.values(account.buckets).length <= 0) {
@@ -174,28 +173,28 @@ const Account: React.FC<IAccountPage> = ({
           <span>
             <strong>Address</strong>
           </span>
-          <span>
-            <CenteredRow onClick={() => handleCopyInfo(account.address)}>
+          <RowContent>
+            <CenteredRow>
               <span>{account.address}</span>
-              <Copy />
+              <Copy info="Address" data={account.address} />
             </CenteredRow>
-          </span>
+          </RowContent>
         </Row>
         <Row>
           <span>
             <strong>Balance</strong>
           </span>
-          <span style={{ width: '100%' }}>
+          <RowContent>
             <BalanceContainer>
               <AmountContainer>
-                <div>
-                  <span>{getTotalBalance().toLocaleString()}</span>
-                  <p>USD {convertedBalance.toLocaleString()}</p>
-                </div>
                 <IconContainer>
                   <KLV />
                   <span>KLV</span>
                 </IconContainer>
+                <div>
+                  <span>{getTotalBalance().toLocaleString()}</span>
+                  <p>USD {convertedBalance.toLocaleString()}</p>
+                </div>
               </AmountContainer>
               <FrozenContainer>
                 <div>
@@ -210,17 +209,17 @@ const Account: React.FC<IAccountPage> = ({
                 </div>
               </FrozenContainer>
             </BalanceContainer>
-          </span>
+          </RowContent>
         </Row>
         <Row>
           <span>
             <strong>Transactions</strong>
           </span>
-          <span>
+          <RowContent>
             <small>
               {transactionResponse.pagination.totalRecords.toLocaleString()}
             </small>
-          </span>
+          </RowContent>
         </Row>
       </OverviewContainer>
 

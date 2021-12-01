@@ -21,6 +21,8 @@ const Buckets: React.FC<IBuckets> = props => {
     ...item,
   }));
 
+  const UINT32_MAX = 4294967295;
+
   const TableBody: React.FC<IBucketData> = ({
     stakeValue,
     staked,
@@ -35,7 +37,9 @@ const Buckets: React.FC<IBuckets> = props => {
         </span>
         <Status staked={staked}>{staked ? 'True' : 'False'}</Status>
         <span>{stakedEpoch.toLocaleString()}</span>
-        <span>{unstakedEpoch.toLocaleString()}</span>
+        <span>
+          {unstakedEpoch === UINT32_MAX ? '--' : unstakedEpoch.toLocaleString()}
+        </span>
         <span>{delegation}</span>
       </Row>
     );

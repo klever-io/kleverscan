@@ -106,17 +106,28 @@ export const Row = styled.div`
   }
 `;
 
+export const RowContent = styled.span`
+  width: 100%;
+`;
+
 export const CenteredRow = styled.div`
   display: flex;
 
   flex-direction: row;
   align-items: center;
+  flex: 1;
 
   gap: 0.5rem;
 
   span {
+    flex: 1;
+
     font-weight: 600 !important;
     font-size: 0.85rem !important;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     @media (max-width: 768px) {
       max-width: 100%;
@@ -143,12 +154,9 @@ export const AmountContainer = styled.div`
 
   flex-direction: row;
   align-items: center;
+  gap: 1.5rem;
 
   div {
-    display: flex;
-
-    flex-direction: column;
-
     span {
       font-weight: 600;
     }

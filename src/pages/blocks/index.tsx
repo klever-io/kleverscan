@@ -27,8 +27,17 @@ import { ArrowLeft } from '@/assets/icons';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
 
+interface IBlockStats {
+  total_burned: number;
+  total_block_rewards: number;
+}
+interface IBlockData {
+  yesterday: IBlockStats;
+  total: IBlockStats;
+}
 interface IBlocks {
   blocks: IBlock[];
+  statistics: IBlockData;
   pagination: IPagination;
 }
 
@@ -39,13 +48,23 @@ interface IBlockResponse extends IResponse {
   pagination: IPagination;
 }
 
+interface IStatisticsResponse extends IResponse {
+  data: {
+    block_stats: IBlockStats;
+  };
+}
+
 interface ICard {
   title: string;
   headers: string[];
   values: string[];
 }
 
-const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks, pagination }) => {
+const Blocks: React.FC<IBlocks> = ({
+  blocks: defaultBlocks,
+  statistics,
+  pagination,
+}) => {
   const router = useRouter();
   const precision = 6; // default KLV precision
 
@@ -90,17 +109,23 @@ const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks, pagination }) => {
     {
       title: 'Number of Blocks',
       headers: ['Blocks Yesterday', 'Cumulative Number'],
-      values: ['+27,684', '35,519,349'],
+      values: ['--', String(blocks.length ? blocks[0].nonce : 0)],
     },
     {
       title: 'Block Reward',
       headers: ['Reward Yesterday', 'Cumulative Revenue'],
-      values: ['4,872,384 KLV', '4.4 Bi KLV'],
+      values: [
+        `${formatAmount(statistics.yesterday.total_block_rewards)} KLV`,
+        `${formatAmount(statistics.total.total_block_rewards)} KLV`,
+      ],
     },
     {
       title: 'Stats on Burned KLV',
       headers: ['Burned Yesterday', 'Burned in Total'],
-      values: ['8,607,197 KLV', '1.4 Bi KLV'],
+      values: [
+        `${formatAmount(statistics.yesterday.total_burned)} KLV`,
+        `${formatAmount(statistics.total.total_burned)} KLV`,
+      ],
     },
   ];
 
@@ -135,10 +160,10 @@ const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks, pagination }) => {
     'Produced by',
     'Created',
     'Tx Count',
-    'Burned KLV',
-    'kApp Fee',
-    'Bandwith Fee',
-    'Block Reward',
+    'Burned Fees',
+    'kApp Fees',
+    'Fee Rewards',
+    'Block Rewards',
   ];
 
   const TableBody: React.FC<IBlock> = ({
@@ -148,7 +173,9 @@ const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks, pagination }) => {
     txCount,
     txFees,
     kAppFees,
+    burnedFees,
     blockRewards,
+    transactions,
   }) => {
     return (
       <Row type="blocks">
@@ -164,7 +191,16 @@ const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks, pagination }) => {
         </span>
         <span>{txCount}</span>
         <span>
-          <small>32,230.23 KLV</small>
+          <small>
+            {`${formatAmount(
+              (burnedFees ||
+                transactions.reduce(
+                  (acc, value) => acc + value?.bandwidthFee,
+                  0,
+                )) /
+                10 ** precision,
+            )} KLV`}
+          </small>
         </span>
         <span>
           <small>{formatAmount((kAppFees || 0) / 10 ** precision)}</small>
@@ -227,6 +263,10 @@ const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks, pagination }) => {
 export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
   const props: IBlocks = {
     blocks: [],
+    statistics: {
+      yesterday: { total_burned: 0, total_block_rewards: 0 },
+      total: { total_burned: 0, total_block_rewards: 0 },
+    },
     pagination: {} as IPagination,
   };
 
@@ -236,6 +276,19 @@ export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
   if (!block.error) {
     props.blocks = block.data.blocks;
     props.pagination = block.pagination;
+  }
+
+  const yesterdayStatistics: IStatisticsResponse = await api.get({
+    route: 'block/statistics/1',
+  });
+  const totalStatistics: IStatisticsResponse = await api.get({
+    route: 'block/statistics/30',
+  });
+  if (!yesterdayStatistics.error && !totalStatistics.error) {
+    props.statistics = {
+      yesterday: yesterdayStatistics.data.block_stats,
+      total: totalStatistics.data.block_stats,
+    };
   }
 
   return { props };

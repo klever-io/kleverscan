@@ -95,11 +95,6 @@ const Accounts: React.FC<IAccounts> = ({
       headers: ['Accounts Yesterday', 'Total'],
       values: ['--', pagination.totalRecords.toLocaleString()],
     },
-    {
-      title: 'Number of Accounts',
-      headers: ['Accounts Yesterday', 'Total'],
-      values: ['--', pagination.totalRecords.toLocaleString()],
-    },
   ];
 
   const CardContent: React.FC<ICard> = ({ title, headers, values }) => {

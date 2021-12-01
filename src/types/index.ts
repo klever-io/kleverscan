@@ -106,10 +106,7 @@ export interface ITransaction {
   hash: string;
   blockNum: number;
   sender: string;
-  expiration: number;
   timestamp: number;
-  fee: number;
-  bandwidthFeeLimit: number;
   chainID: string;
   signature: string;
   searchOrder: number;
@@ -143,6 +140,7 @@ export interface IBlock {
   txCount: number;
   txFees?: number;
   kAppFees?: number;
+  burnedFees?: number;
   blockRewards: number;
   txHashes: any[];
   softwareVersion: string;

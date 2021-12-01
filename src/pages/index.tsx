@@ -160,7 +160,6 @@ interface ICard {
   variation: string;
 }
 
-
 const Home: React.FC<IHome> = ({
   blocks,
   transactions,
@@ -175,9 +174,8 @@ const Home: React.FC<IHome> = ({
   const blockWatcherTimeout = 4000;
   const statisticsWatcherTimeout = 4000;
 
-
-  const [listedBlocks, setListedBlocks] = useState<IBlock[]>(blocks)
-  const [actualTPS, setActualTPS] = useState<string>(tps)
+  const [listedBlocks, setListedBlocks] = useState<IBlock[]>(blocks);
+  const [actualTPS, setActualTPS] = useState<string>(tps);
 
   const [selectedCoin, setSelectedCoin] = useState(0);
 
@@ -187,16 +185,15 @@ const Home: React.FC<IHome> = ({
     const blockWatcher = setInterval(async () => {
       const response: IBlockResponse = await api.get({
         route: 'block/list',
-      })
+      });
 
       if (!response.error) {
-        setListedBlocks(response.data?.blocks)
+        setListedBlocks(response.data?.blocks);
       }
-    }, blockWatcherTimeout)
+    }, blockWatcherTimeout);
 
-    return () => clearInterval(blockWatcher)
-  }, [listedBlocks])
-
+    return () => clearInterval(blockWatcher);
+  }, [listedBlocks]);
 
   // Statistics Watcher
 
@@ -205,22 +202,21 @@ const Home: React.FC<IHome> = ({
       const statistics: IStatisticsResponse = await api.get({
         route: 'node/statistics',
         service: Service.NODE,
-      })
+      });
 
       if (!statistics.error) {
         const chainStatistics = statistics.data.statistics.chainStatistics;
 
-
-        setActualTPS(`${chainStatistics.liveTPS}/${chainStatistics.peakTPS}`)
+        setActualTPS(`${chainStatistics.liveTPS}/${chainStatistics.peakTPS}`);
       }
-    }, statisticsWatcherTimeout)
+    }, statisticsWatcherTimeout);
 
-    return () => clearInterval(statisticsWatcher)
-  })
+    return () => clearInterval(statisticsWatcher);
+  });
 
   const coinData = useMemo(() => {
-    return coinsData[selectedCoin]
-  }, [selectedCoin])
+    return coinsData[selectedCoin];
+  }, [selectedCoin]);
 
   const dataCards: ICard[] = [
     {
@@ -243,17 +239,19 @@ const Home: React.FC<IHome> = ({
       KFI: KFILogo,
     };
 
-    const SelectedIcon = icons[coinData.shortname]
+    const SelectedIcon = icons[coinData.shortname];
 
-    return <SelectedIcon />
-  }, [])
+    return <SelectedIcon />;
+  }, []);
 
-
-  const handleSelectionCoin = useCallback((index: number) => {
-    if (selectedCoin !== index) {
-      setSelectedCoin(index);
-    }
-  }, [selectedCoin]);
+  const handleSelectionCoin = useCallback(
+    (index: number) => {
+      if (selectedCoin !== index) {
+        setSelectedCoin(index);
+      }
+    },
+    [selectedCoin],
+  );
 
   const getVariation = useCallback((variation: number) => {
     const precision = 2;
@@ -264,8 +262,6 @@ const Home: React.FC<IHome> = ({
 
     return `+ ${variation.toFixed(precision)}%`;
   }, []);
-
-
 
   const TransactionItem: React.FC<ITransaction> = ({
     hash,
@@ -324,7 +320,7 @@ const Home: React.FC<IHome> = ({
     hash,
     transactions,
     blockRewards,
-    blockIndex
+    blockIndex,
   }) => (
     <BlockCardContainer blockIndex={blockIndex}>
       <BlockCardRow>
@@ -341,7 +337,7 @@ const Home: React.FC<IHome> = ({
       </BlockCardRow>
       <BlockCardRow>
         <p>Transactions</p>
-        <span>{transactions.length}</span>
+        <span>{(transactions || []).length}</span>
       </BlockCardRow>
       <BlockCardRow>
         <p>Reward</p>
@@ -379,9 +375,7 @@ const Home: React.FC<IHome> = ({
           <CoinDataCard>
             <CoinDataContent>
               <CoinDataHeaderContainer>
-                <IconContainer>
-                  {getIcon()}
-                </IconContainer>
+                <IconContainer>{getIcon()}</IconContainer>
                 <CoinDataHeader>
                   <CoinDataName>
                     <span>{coinData.shortname}</span>
@@ -429,8 +423,6 @@ const Home: React.FC<IHome> = ({
                   isSelected={selectedCoin === index}
                 />
               ))}
-
-
             </CoinSelectorContainer>
           </CoinDataCard>
         </DataCardsContainer>

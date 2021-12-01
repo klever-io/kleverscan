@@ -106,6 +106,7 @@ export interface ITransaction {
   hash: string;
   blockNum: number;
   sender: string;
+  data?: string;
   timestamp: number;
   chainID: string;
   signature: string;

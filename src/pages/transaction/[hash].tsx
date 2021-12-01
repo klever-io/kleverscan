@@ -19,7 +19,7 @@ import {
 import { Status } from '@/components/Table/styles';
 
 import api from '@/services/api';
-import { toLocaleFixed } from '@/utils/index';
+import { toLocaleFixed, hexToString } from '@/utils/index';
 import {
   IResponse,
   ITransaction,
@@ -34,11 +34,12 @@ import {
   IWithdrawContract,
 } from '@/types/index';
 
-import { ArrowLeft, Copy } from '@/assets/icons';
+import { ArrowLeft } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import { KLV } from '@/assets/coins';
 
 import { Loader } from '@/components/Loader/styles';
+import Copy from '@/components/Copy';
 
 interface ITransactionResponse extends IResponse {
   data: {
@@ -74,6 +75,7 @@ const Transaction: React.FC<ITransactionPage> = ({
   hash,
   status,
   sender,
+  data,
   kAppFee,
   bandwidthFee,
   timestamp,
@@ -113,10 +115,6 @@ const Transaction: React.FC<ITransactionPage> = ({
 
     fetchCoin();
   }, []);
-
-  const handleCopyInfo = (data: string) => {
-    navigator.clipboard.writeText(String(data));
-  };
 
   const Transfer: React.FC<IContract> = ({ parameter: par }) => {
     const parameter = par as ITransferContract;
@@ -418,9 +416,9 @@ const Transaction: React.FC<ITransactionPage> = ({
             <span>
               <strong>Hash</strong>
             </span>
-            <CenteredRow onClick={() => handleCopyInfo(hash)}>
+            <CenteredRow>
               <span>{hash}</span>
-              <Copy />
+              <Copy data={hash} info="Hash" />
             </CenteredRow>
           </Row>
           <Row>
@@ -470,11 +468,22 @@ const Transaction: React.FC<ITransactionPage> = ({
             <span>
               <strong>Signature</strong>
             </span>
-            <CenteredRow onClick={() => handleCopyInfo(signature)}>
+            <CenteredRow>
               <span>{signature}</span>
-              <Copy />
+              <Copy data={signature} info="Signature" />
             </CenteredRow>
           </Row>
+          {data && (
+            <Row>
+              <span>
+                <strong>Data</strong>
+              </span>
+              <CenteredRow>
+                <span>{hexToString(data)}</span>
+                <Copy data={hexToString(data)} info="Data" />
+              </CenteredRow>
+            </Row>
+          )}
         </CardContent>
       </CardContainer>
 

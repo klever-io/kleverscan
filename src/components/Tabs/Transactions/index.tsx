@@ -32,7 +32,7 @@ const Transactions: React.FC<ITransaction[]> = props => {
     if (contractType === Contract.Transfer) {
       const parameter = contract[0].parameter as ITransferContract;
 
-      toAddress = parameter.ownerAddress;
+      toAddress = parameter.toAddress;
     }
 
     return (

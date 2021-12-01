@@ -69,6 +69,7 @@ const Transactions: React.FC<ITransactions> = ({
 }) => {
   const router = useRouter();
   const defaultFilter: IFilterItem = { name: 'All', value: 'all' };
+  const precision = 6; // default KLV precision
 
   const [loading, setLoading] = useState(false);
   const [transactions, setTransactions] = useState(defaultTransactions);
@@ -117,7 +118,7 @@ const Transactions: React.FC<ITransactions> = ({
     'To',
     'Status',
     'Contract',
-    'kAppFee',
+    'kApp Fee',
     'Bandwidth Fee',
   ];
 
@@ -145,8 +146,6 @@ const Transactions: React.FC<ITransactions> = ({
           routerQuery = { ...routerQuery, [filter.key]: filter.ref.value };
         }
       });
-
-      console.log(`transaction/list?${buildQuery(routerQuery)}&page=${page}`);
 
       const response: ITransactionResponse = await api.get({
         route: `transaction/list?${buildQuery(routerQuery)}&page=${page}`,
@@ -178,7 +177,7 @@ const Transactions: React.FC<ITransactions> = ({
           </div>
         </CenteredRow>
         <span>
-          <strong>{formatAmount(parameter.amount)}</strong>
+          <strong>{formatAmount(parameter.amount / 10 ** precision)}</strong>
         </span>
       </>
     );
@@ -219,7 +218,7 @@ const Transactions: React.FC<ITransactions> = ({
 
     return (
       <span>
-        <strong>{formatAmount(parameter.amount)} KLV</strong>
+        <strong>{formatAmount(parameter.amount / 10 ** precision)} KLV</strong>
       </span>
     );
   };
@@ -353,10 +352,10 @@ const Transactions: React.FC<ITransactions> = ({
           <strong>{contractType}</strong>
         </span>
         <span>
-          <strong>{kAppFee}</strong>
+          <strong>{formatAmount(kAppFee / 10 ** precision)}</strong>
         </span>
         <span>
-          <strong>{bandwidthFee}</strong>
+          <strong>{formatAmount(bandwidthFee / 10 ** precision)}</strong>
         </span>
 
         <FilteredComponent {...props} />

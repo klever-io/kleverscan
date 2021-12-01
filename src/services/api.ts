@@ -46,7 +46,8 @@ const getHost = (
     [Service.PRICE]:
       process.env.DEFAULT_PRICE_HOST ||
       'https://prices.endpoints.services.klever.io/v1',
-    [Service.NODE]: process.env.DEFAULT_NODE_HOST || 'https://node.testnet.klever.finance',
+    [Service.NODE]:
+      process.env.DEFAULT_NODE_HOST || 'https://node.testnet.klever.finance',
     [Service.GECKO]: 'https://api.coingecko.com/api/v3',
   };
 
@@ -102,7 +103,7 @@ const withoutBody = async (props: IProps, method: Method): Promise<any> => {
     const { route, query, service, apiVersion } = getProps(props);
 
     if (service === Service.PRICE) {
-      console.log(getHost(route, query, service, apiVersion));
+      // console.log(getHost(route, query, service, apiVersion));
     }
 
     const response = await fetch(getHost(route, query, service, apiVersion), {

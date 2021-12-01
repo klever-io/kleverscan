@@ -57,3 +57,11 @@ export const toLocaleFixed = (value: number, precision: number): string => {
     minimumFractionDigits: precision,
   });
 };
+
+export const hexToString = (hexStr: string) => {
+  var hex = hexStr.toString();
+  var retStr = '';
+  for (var i = 0; i < hex.length; i += 2)
+    retStr += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+  return retStr;
+};

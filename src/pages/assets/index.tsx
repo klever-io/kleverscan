@@ -47,7 +47,6 @@ const Assets: React.FC<IAssetPage> = ({
         route: `assets/kassets?page=${page}`,
       });
       if (!response.error) {
-        console.log(`assets/kassets?page=${page}`);
         setAssets(response.data.assets);
       }
 

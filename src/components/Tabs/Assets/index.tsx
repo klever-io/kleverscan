@@ -62,7 +62,7 @@ const Assets: React.FC<IAssets> = props => {
 
   const header = [
     'Token',
-    'Address',
+    'ID',
     'Token Type',
     'Precision',
     'Balance',
@@ -80,7 +80,7 @@ const Assets: React.FC<IAssets> = props => {
     return (
       <Row type="assets">
         <span>
-          <p>{ticker}</p>
+          <span>{ticker}</span>
         </span>
         <span>
           <Link href={`asset/${address}`}>{address}</Link>
@@ -90,7 +90,7 @@ const Assets: React.FC<IAssets> = props => {
           <strong>{precision}</strong>
         </span>
         <span>
-          <strong>{formatAmount(balance)} KLV</strong>
+          <strong>{formatAmount(balance / 10 ** precision)} KLV</strong>
         </span>
         <span>
           <strong>{formatAmount(frozenBalance)} KLV</strong>

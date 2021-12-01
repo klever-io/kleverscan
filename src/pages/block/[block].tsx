@@ -1,13 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
 
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
 import { format, fromUnixTime } from 'date-fns';
 
-import { ArrowLeft, Copy } from '@/assets/icons';
+import { ArrowLeft } from '@/assets/icons';
 
 import {
   AssetTitle,
@@ -24,11 +21,20 @@ import {
 
 import Tabs, { ITabs } from '@/components/Tabs';
 import Transactions from '@/components/Tabs/Transactions';
+import Copy from '@/components/Copy';
 
-import { IBlock, IResponse } from '../../types';
+import { IBlock, IPagination, IResponse, ITransaction } from '../../types';
 import api from '@/services/api';
 import { CenteredRow } from '@/views/transactions/detail';
 import { formatAmount } from '@/utils/index';
+import { PaginationContainer } from '@/components/Pagination/styles';
+import Pagination from '@/components/Pagination';
+
+interface IBlockPage {
+  block: IBlock;
+  transactions: ITransaction[];
+  totalPagesTransactions: number;
+}
 
 interface IBlockResponse extends IResponse {
   data: {
@@ -36,24 +42,36 @@ interface IBlockResponse extends IResponse {
   };
 }
 
-const Block: React.FC<IBlock> = ({
-  hash,
-  timestamp,
-  nonce,
-  epoch,
-  size,
-  kAppFees,
-  transactions,
-  softwareVersion,
-  chainID,
-  producerSignature,
-  parentHash,
-  trieRoot,
-  validatorsTrieRoot,
-  assetTrieRoot,
-  prevRandSeed,
-  randSeed,
+interface ITransactionResponse extends IResponse {
+  data: {
+    transactions: ITransaction[];
+  };
+  pagination: IPagination;
+}
+
+const Block: React.FC<IBlockPage> = ({
+  block,
+  transactions: defaultTransactions,
+  totalPagesTransactions,
 }) => {
+  const {
+    hash,
+    timestamp,
+    nonce,
+    epoch,
+    size,
+    kAppFees,
+    softwareVersion,
+    chainID,
+    producerSignature,
+    parentHash,
+    trieRoot,
+    validatorsTrieRoot,
+    assetTrieRoot,
+    prevRandSeed,
+    randSeed,
+  } = block;
+
   const router = useRouter();
   const cardHeaders = ['Overview', 'Info'];
   const tableHeaders = ['Transactions'];
@@ -62,9 +80,21 @@ const Block: React.FC<IBlock> = ({
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
 
-  const handleCopyInfo = (data: string) => {
-    navigator.clipboard.writeText(String(data));
-  };
+  const [transactionPage, setTransactionPage] = useState(0);
+  const [transactions, setTransactions] = useState(defaultTransactions);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response: ITransactionResponse = await api.get({
+        route: `transaction/list?page=${transactionPage}&nonce=${nonce}`,
+      });
+      if (!response.error) {
+        setTransactions(response.data.transactions);
+      }
+    };
+
+    fetchData();
+  }, [transactionPage]);
 
   const Overview: React.FC = () => {
     return (
@@ -74,9 +104,9 @@ const Block: React.FC<IBlock> = ({
             <strong>Hash</strong>
           </span>
           <span>
-            <CenteredRow onClick={() => handleCopyInfo(hash)}>
+            <CenteredRow>
               <span>{hash}</span>
-              <Copy />
+              <Copy info="Hash" data={hash} />
             </CenteredRow>
           </span>
         </Row>
@@ -142,9 +172,9 @@ const Block: React.FC<IBlock> = ({
             <strong>Producer Signature</strong>
           </span>
           <span>
-            <CenteredRow onClick={() => handleCopyInfo(producerSignature)}>
+            <CenteredRow>
               <span>{producerSignature}</span>
-              <Copy />
+              <Copy info="Signature" data={producerSignature} />
             </CenteredRow>
           </span>
         </Row>
@@ -153,9 +183,9 @@ const Block: React.FC<IBlock> = ({
             <strong>Parent Hash</strong>
           </span>
           <span>
-            <CenteredRow onClick={() => handleCopyInfo(parentHash)}>
+            <CenteredRow>
               <span>{parentHash}</span>
-              <Copy />
+              <Copy info="Parent hash" data={parentHash} />
             </CenteredRow>
           </span>
         </Row>
@@ -164,9 +194,9 @@ const Block: React.FC<IBlock> = ({
             <strong>Trie Root</strong>
           </span>
           <span>
-            <CenteredRow onClick={() => handleCopyInfo(trieRoot)}>
+            <CenteredRow>
               <span>{trieRoot}</span>
-              <Copy />
+              <Copy info="Trie root" data={trieRoot} />
             </CenteredRow>
           </span>
         </Row>
@@ -175,9 +205,9 @@ const Block: React.FC<IBlock> = ({
             <strong>Validators Trie Root</strong>
           </span>
           <span>
-            <CenteredRow onClick={() => handleCopyInfo(validatorsTrieRoot)}>
+            <CenteredRow>
               <span>{validatorsTrieRoot}</span>
-              <Copy />
+              <Copy data={validatorsTrieRoot} />
             </CenteredRow>
           </span>
         </Row>
@@ -186,9 +216,9 @@ const Block: React.FC<IBlock> = ({
             <strong>Asset Trie Root</strong>
           </span>
           <span>
-            <CenteredRow onClick={() => handleCopyInfo(assetTrieRoot)}>
+            <CenteredRow>
               <span>{assetTrieRoot}</span>
-              <Copy />
+              <Copy data={assetTrieRoot} />
             </CenteredRow>
           </span>
         </Row>
@@ -197,9 +227,9 @@ const Block: React.FC<IBlock> = ({
             <strong>Previous Random Seed</strong>
           </span>
           <span>
-            <CenteredRow onClick={() => handleCopyInfo(prevRandSeed)}>
+            <CenteredRow>
               <span>{prevRandSeed}</span>
-              <Copy />
+              <Copy data={prevRandSeed} />
             </CenteredRow>
           </span>
         </Row>
@@ -208,9 +238,9 @@ const Block: React.FC<IBlock> = ({
             <strong>Previous Random Seed</strong>
           </span>
           <span>
-            <CenteredRow onClick={() => handleCopyInfo(randSeed)}>
+            <CenteredRow>
               <span>{randSeed}</span>
-              <Copy />
+              <Copy info="Random seed" data={randSeed} />
             </CenteredRow>
           </span>
         </Row>
@@ -232,7 +262,19 @@ const Block: React.FC<IBlock> = ({
   const SelectedTabComponent: React.FC = () => {
     switch (selectedTab) {
       case 'Transactions':
-        return <Transactions {...transactions} />;
+        return (
+          <>
+            <Transactions {...transactions} />
+
+            <PaginationContainer>
+              <Pagination
+                count={totalPagesTransactions}
+                page={transactionPage}
+                onPaginate={page => setTransactionPage(page)}
+              />
+            </PaginationContainer>
+          </>
+        );
       default:
         return <div />;
     }
@@ -245,8 +287,6 @@ const Block: React.FC<IBlock> = ({
 
   return (
     <Container>
-      <ToastContainer />
-
       <Header>
         <Title>
           <div onClick={router.back}>
@@ -286,9 +326,15 @@ const Block: React.FC<IBlock> = ({
   );
 };
 
-export const getServerSideProps: GetStaticProps<IBlock> = async ({
+export const getServerSideProps: GetStaticProps<IBlockPage> = async ({
   params,
 }) => {
+  const props: IBlockPage = {
+    block: {} as IBlock,
+    totalPagesTransactions: 0,
+    transactions: [],
+  };
+
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
 
   const blockNonce = Number(params?.block);
@@ -303,8 +349,15 @@ export const getServerSideProps: GetStaticProps<IBlock> = async ({
   if (block.error) {
     return redirectProps;
   }
+  props.block = block.data.block;
 
-  const props: IBlock = block.data.block;
+  const transactions: ITransactionResponse = await api.get({
+    route: `transaction/list?nonce=${block.data.block.nonce}`,
+  });
+  if (!transactions.error) {
+    props.transactions = transactions.data.transactions;
+    props.totalPagesTransactions = transactions.pagination.totalPages;
+  }
 
   return { props };
 };

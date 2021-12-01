@@ -78,6 +78,7 @@ const contents: IContent[] = [
       { name: 'Klever News', href: 'http://news.klever.io/' },
       { name: 'Careers', href: 'https://klever.compleo.com.br/' },
       { name: 'Klever Finance', href: 'https://klever.finance/' },
+      { name: 'Klever Docs', href: 'https://docs.klever.finance/' },
     ],
   },
 ];

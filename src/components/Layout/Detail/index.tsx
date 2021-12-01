@@ -3,7 +3,7 @@ import React, { Fragment, useEffect, useState } from 'react';
 import Link from 'next/link';
 
 import { IconType } from 'react-icons/lib';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import {
@@ -88,8 +88,6 @@ const Detail: React.FC<IDetail> = ({ title, tabs, Icon }) => {
 
   return (
     <Container>
-      <ToastContainer />
-
       <Input />
       <Header>
         <HeaderIcon>{Icon ? <Icon /> : <BsQuestionCircleFill />}</HeaderIcon>

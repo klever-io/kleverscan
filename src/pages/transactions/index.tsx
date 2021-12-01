@@ -117,6 +117,8 @@ const Transactions: React.FC<ITransactions> = ({
     'To',
     'Status',
     'Contract',
+    'kAppFee',
+    'Bandwidth Fee',
   ];
 
   const buildQuery = (data: any) => {
@@ -306,7 +308,16 @@ const Transactions: React.FC<ITransactions> = ({
   };
 
   const TableBody: React.FC<ITransaction> = props => {
-    const { hash, blockNum, timestamp, sender, contract, status } = props;
+    const {
+      hash,
+      blockNum,
+      timestamp,
+      sender,
+      contract,
+      kAppFee,
+      bandwidthFee,
+      status,
+    } = props;
 
     const StatusIcon = getStatusIcon(status);
     let toAddress = '--';
@@ -340,6 +351,12 @@ const Transactions: React.FC<ITransactions> = ({
         </Status>
         <span>
           <strong>{contractType}</strong>
+        </span>
+        <span>
+          <strong>{kAppFee}</strong>
+        </span>
+        <span>
+          <strong>{bandwidthFee}</strong>
         </span>
 
         <FilteredComponent {...props} />

@@ -103,7 +103,7 @@ export const DataCardsContainer = styled.div`
 
   gap: 1rem;
 
-  @media (max-width: 425px) {
+  @media (max-width: 768px) {
     flex-direction: column;
   }
 `;
@@ -181,7 +181,7 @@ export const CoinDataCard = styled(DataCard)`
 
   position: relative;
 
-  @media (max-width: 425px) {
+  @media (max-width: 768px) {
     width: 100%;
   }
 `;
@@ -194,6 +194,10 @@ export const CoinDataContent = styled.div`
   flex-direction: column;
 
   animation: 1.5s ease 0s 1 normal none running ${FadeIn};
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 export const CoinDataHeaderContainer = styled.div`
@@ -435,7 +439,7 @@ export const TransactionContent = styled.div`
     }
   }
 
-  @media (max-width: 425px) {
+  @media (max-width: 768px) {
     overflow: auto;
 
     width: 100% !important;

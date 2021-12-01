@@ -78,10 +78,6 @@ export const Input = styled(DefaultInput)`
   border-color: ${props => props.theme.input.border.dark};
 
   @media (max-width: 1024px) {
-    width: 15rem;
-  }
-
-  @media (max-width: 425px) {
     display: none;
   }
 `;
@@ -100,6 +96,8 @@ export const DesktopContainer = styled.div`
 `;
 
 export const MobileContainer = styled.div`
+  margin-left: auto;
+
   display: flex;
   position: relative;
 

@@ -22,11 +22,6 @@ const NotFound: React.FC = () => {
       <Container>
         <Content>
           <h1>Page not found!</h1>
-          <span>
-            Maybe that’s just an lorem ipsum lorem ipsum lorem ipsum lorem ipsum
-            lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem
-            ipsum lorem ipsum
-          </span>
           <ButtonContainer>
             <Button hasBackground onClick={handleBack}>
               <span>Back to homepage</span>

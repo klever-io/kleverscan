@@ -122,7 +122,7 @@ const Accounts: React.FC<IAccounts> = ({
     );
   };
 
-  const header = ['Address', 'KLV Staked', 'Transaction Count', 'KLV Balance'];
+  const header = ['Address', 'KLV Staked', 'Nonce', 'KLV Balance'];
 
   const TableBody: React.FC<IAccount> = ({
     address,

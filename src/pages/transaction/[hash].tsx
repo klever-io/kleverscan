@@ -81,6 +81,8 @@ const Transaction: React.FC<ITransactionPage> = ({
   timestamp,
   signature,
   contract,
+  blockNum,
+  nonce,
 }) => {
   const router = useRouter();
   const StatusIcon = getStatusIcon(status);
@@ -429,6 +431,22 @@ const Transaction: React.FC<ITransactionPage> = ({
               <StatusIcon />
               <span>{status}</span>
             </Status>
+          </Row>
+          <Row>
+            <span>
+              <strong>Block Number</strong>
+            </span>
+            <span>
+              <p>{blockNum}</p>
+            </span>
+          </Row>
+          <Row>
+            <span>
+              <strong>Nonce</strong>
+            </span>
+            <span>
+              <p>{nonce}</p>
+            </span>
           </Row>
           <Row>
             <span>

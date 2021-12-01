@@ -15,24 +15,34 @@ import {
 
 import { ArrowRight } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
+import { formatAmount } from '@/utils/index';
 
-const Transactions: React.FC<ITransaction[]> = props => {
+interface ITransactionsProps {
+  transactions: ITransaction[];
+  precision?: number;
+}
+
+const Transactions: React.FC<ITransactionsProps> = props => {
   const getContractType = (contracts: IContract[]) =>
     contracts.length > 1
       ? 'Multi contract'
       : Object.values(Contract)[contracts[0].type];
+  const precision = props.precision || 6;
 
   const TableBody: React.FC<ITransaction> = props => {
     const { hash, blockNum, timestamp, sender, contract, status } = props;
 
     const StatusIcon = getStatusIcon(status);
     let toAddress = '--';
+    let amount = '--';
+
     const contractType = getContractType(contract);
 
     if (contractType === Contract.Transfer) {
       const parameter = contract[0].parameter as ITransferContract;
 
       toAddress = parameter.toAddress;
+      amount = formatAmount(parameter.amount / 10 ** precision);
     }
 
     return (
@@ -58,6 +68,9 @@ const Transactions: React.FC<ITransaction[]> = props => {
         <span>
           <strong>{contractType}</strong>
         </span>
+        <span>
+          <strong>{amount}</strong>
+        </span>
       </Row>
     );
   };
@@ -71,11 +84,12 @@ const Transactions: React.FC<ITransaction[]> = props => {
     'To',
     'Status',
     'Contract',
+    'Amount',
   ];
 
   const tableProps: ITable = {
     body: TableBody,
-    data: Object.values(props) as any[],
+    data: Object.values(props.transactions) as any[],
     loading: false,
     header,
     type: 'transactions',

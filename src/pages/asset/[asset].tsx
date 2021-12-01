@@ -231,7 +231,7 @@ const Asset: React.FC<IAssetPage> = ({
       case 'Transactions':
         return (
           <>
-            <Transactions {...transactions} />
+            <Transactions transactions={transactions} precision={precision} />
             <PaginationContainer>
               <Pagination
                 count={totalTransactionsPage}

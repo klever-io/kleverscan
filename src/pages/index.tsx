@@ -61,7 +61,6 @@ import {
 import { IChartData } from '@/configs/home';
 import { formatAmount, getAge } from '../utils';
 
-
 import Carousel from '@/components/Carousel';
 
 interface ICoinInfo {
@@ -327,12 +326,14 @@ const Home: React.FC<IHome> = ({
   }) => (
     <BlockCardContainer blockIndex={blockIndex}>
       <BlockCardRow>
-        <strong>#{nonce}</strong>
+        <Link href={`/block/${nonce}`}>
+          <strong>#{nonce}</strong>
+        </Link>
         <p>Miner</p>
       </BlockCardRow>
       <BlockCardRow>
         <small>{getAge(fromUnixTime(timestamp / 1000))} ago</small>
-        <Link href={`/block/${nonce}`}>{hash}</Link>
+        <a>{hash}</a>
       </BlockCardRow>
       <BlockCardRow>
         <p>Burned</p>
@@ -561,6 +562,9 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
     route: `coins/klever-finance/market_chart?vs_currency=usd&days=1`,
     service: Service.GECKO,
   });
+  // Currently hardcoded marketcap
+  kfiData.market_data.market_cap.usd =
+    150000 * kfiData.market_data.current_price.usd;
   pushCoinData('Klever Finance', 'KFI', kfiData, kfiChart);
 
   const yesterdayTransactions: IYesterdayResponse = await api.get({

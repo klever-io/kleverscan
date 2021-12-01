@@ -21,14 +21,14 @@ import { Row } from '@/components/Table/styles';
 
 import { IBlock, IPagination, IResponse } from '@/types/index';
 import api from '@/services/api';
-import { formatAmount, getAge } from '@/utils/index';
+import { formatAmount, getAge, toLocaleFixed } from '@/utils/index';
 
 import { ArrowLeft } from '@/assets/icons';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
 
 interface IBlockStats {
-  total_blocks?: number;
+  total_blocks: number;
   total_burned: number;
   total_block_rewards: number;
 }
@@ -110,7 +110,10 @@ const Blocks: React.FC<IBlocks> = ({
     {
       title: 'Number of Blocks',
       headers: ['Blocks Yesterday', 'Cumulative Number'],
-      values: ['--', String(blocks.length ? blocks[0].nonce : 0)],
+      values: [
+        toLocaleFixed(statistics.yesterday.total_blocks, 0),
+        toLocaleFixed(statistics.total.total_blocks, 0),
+      ],
     },
     {
       title: 'Block Reward',
@@ -174,7 +177,7 @@ const Blocks: React.FC<IBlocks> = ({
     txCount,
     txFees,
     kAppFees,
-    // burnedFees,
+    burnedFees,
     blockRewards,
   }) => {
     return (
@@ -191,23 +194,15 @@ const Blocks: React.FC<IBlocks> = ({
         </span>
         <span>{txCount}</span>
         <span>
-          <small>
-            {/* {`${formatAmount(
-              (burnedFees ||
-                transactions.reduce(
-                  (acc, value) => acc + value?.bandwidthFee,
-                  0,
-                )) /
-                10 ** precision,
-            )} KLV`} */}
-            0 KLV
-          </small>
+          <small>{`${formatAmount(
+            (burnedFees || 0) / 10 ** precision,
+          )} KLV`}</small>
         </span>
         <span>
-          <small>{formatAmount((kAppFees || 0) / 10 ** precision)}</small>
+          <small>{formatAmount((kAppFees || 0) / 10 ** precision)} KLV</small>
         </span>
         <span>
-          <small>{formatAmount((txFees || 0) / 10 ** precision)}</small>
+          <small>{formatAmount((txFees || 0) / 10 ** precision)} KLV</small>
         </span>
         <span>
           <strong>{formatAmount(blockRewards / 10 ** precision)} KLV</strong>
@@ -265,8 +260,8 @@ export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
   const props: IBlocks = {
     blocks: [],
     statistics: {
-      yesterday: { total_burned: 0, total_block_rewards: 0 },
-      total: { total_burned: 0, total_block_rewards: 0 },
+      yesterday: { total_blocks: 0, total_burned: 0, total_block_rewards: 0 },
+      total: { total_blocks: 0, total_burned: 0, total_block_rewards: 0 },
     },
     pagination: {} as IPagination,
   };

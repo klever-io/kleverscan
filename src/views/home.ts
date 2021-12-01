@@ -229,7 +229,7 @@ export const CoinDataName = styled.div`
   }
 `;
 
-export const CoinDataDescription = styled(CoinDataName) <IVariation>`
+export const CoinDataDescription = styled(CoinDataName)<IVariation>`
   font-size: 0.95rem;
   font-weight: 400;
 
@@ -296,12 +296,12 @@ export const CoinValueDetail = styled.div<{ positive?: boolean }>`
 
   p {
     color: ${props => {
-    if (props.positive === undefined) {
-      return props.theme.card.text;
-    }
+      if (props.positive === undefined) {
+        return props.theme.card.text;
+      }
 
-    return props.theme.card[props.positive ? 'green' : 'red'];
-  }};
+      return props.theme.card[props.positive ? 'green' : 'red'];
+    }};
   }
 `;
 
@@ -343,16 +343,14 @@ export const BlockCardContainer = styled.div<BlockCardContainerProps>`
 
   border-radius: 1rem;
 
+  ${props =>
+    props.blockIndex === 0 &&
+    css`
+      transition: 2s all ease-in-out;
 
-  ${props => (props.blockIndex === 0) && css`
-  transition: 2s all ease-in-out;
-
-  animation: ${FadeIn} 1s 1;
-  animation-fill-mode: forwards;
-  
-  `
-  }
-
+      animation: ${FadeIn} 1s 1;
+      animation-fill-mode: forwards;
+    `}
 `;
 
 export const BlockCardRow = styled.div`
@@ -405,6 +403,7 @@ export const BlockCardRow = styled.div`
     font-size: 0.85rem;
 
     color: ${props => props.theme.black};
+    cursor: default;
   }
 
   span {

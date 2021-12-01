@@ -107,6 +107,7 @@ export interface ITransaction {
   blockNum: number;
   sender: string;
   data?: string;
+  nonce: number;
   timestamp: number;
   chainID: string;
   signature: string;

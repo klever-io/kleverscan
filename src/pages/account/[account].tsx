@@ -136,7 +136,7 @@ const Account: React.FC<IAccountPage> = ({
       case 'Transactions':
         return (
           <>
-            <Transactions {...transactions} />
+            <Transactions transactions={transactions} />
             <PaginationContainer>
               <Pagination
                 count={transactionResponse.pagination.totalPages}

@@ -264,7 +264,7 @@ const Block: React.FC<IBlockPage> = ({
       case 'Transactions':
         return (
           <>
-            <Transactions {...transactions} />
+            <Transactions transactions={transactions} />
 
             <PaginationContainer>
               <Pagination

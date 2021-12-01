@@ -174,7 +174,7 @@ const Blocks: React.FC<IBlocks> = ({
     txCount,
     txFees,
     kAppFees,
-    // burnedFees,
+    burnedFees,
     blockRewards,
   }) => {
     return (
@@ -191,17 +191,9 @@ const Blocks: React.FC<IBlocks> = ({
         </span>
         <span>{txCount}</span>
         <span>
-          <small>
-            {/* {`${formatAmount(
-              (burnedFees ||
-                transactions.reduce(
-                  (acc, value) => acc + value?.bandwidthFee,
-                  0,
-                )) /
-                10 ** precision,
-            )} KLV`} */}
-            0 KLV
-          </small>
+          <small>{`${formatAmount(
+            (burnedFees || 0) / 10 ** precision,
+          )} KLV`}</small>
         </span>
         <span>
           <small>{formatAmount((kAppFees || 0) / 10 ** precision)}</small>

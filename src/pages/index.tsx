@@ -46,6 +46,8 @@ import { KFILogo } from '@/assets/coins';
 
 import api, { Service } from '@/services/api';
 
+import { toLocaleFixed } from '../utils';
+
 import {
   IBlock,
   IBlockCard,
@@ -58,6 +60,7 @@ import {
 
 import { IChartData } from '@/configs/home';
 import { formatAmount, getAge } from '../utils';
+
 
 import Carousel from '@/components/Carousel';
 
@@ -292,7 +295,7 @@ const Home: React.FC<IHome> = ({
           </p>
         </TransactionData>
         <TransactionAmount>
-          <span>{formatAmount(amount / 10 ** precision)} KLV</span>
+          <span>{toLocaleFixed(amount / 10 ** precision, precision)} KLV</span>
         </TransactionAmount>
       </TransactionRow>
     );

@@ -4,15 +4,57 @@ import Link from 'next/link';
 
 import Table, { ITable } from '@/components/Table';
 import { Row } from '@/components/Table/styles';
+import { IAccount, IAsset } from '@/types/index';
+import { toLocaleFixed } from '@/utils/index';
+import { RankingContainer } from './styles';
 
-import { IHolder } from '@/types/index';
+interface IHolder {
+  holders: IAccount[];
+  asset: IAsset;
+}
 
-const Holders: React.FC<IHolder[]> = props => {
-  const TableBody: React.FC<IHolder> = ({ address }) => {
+interface IBalance {
+  address: string;
+  balance: number;
+  index: number;
+}
+
+const Holders: React.FC<IHolder> = ({ holders, asset }) => {
+  const balances = holders
+    .map((holder, index) => {
+      if (Object.keys(holder.assets).includes(asset.address)) {
+        return {
+          address: holder.address,
+          balance: holder.assets[asset.address].balance,
+          index,
+        };
+      }
+    })
+    .sort((a, b) => b?.balance - a?.balance);
+
+  const totalAmount = Object.values(balances).reduce(
+    (acc, holder) => acc + holder?.balance,
+    0,
+  );
+
+  const TableBody: React.FC<IBalance> = ({ address, balance, index }) => {
     return (
       <Row type="holders">
         <span>
+          <RankingContainer>
+            <p>{index + 1}°</p>
+          </RankingContainer>
+        </span>
+        <span>
           <Link href={`/account/${address}`}>{address}</Link>
+        </span>
+        <span>
+          <strong>{((balance / totalAmount) * 100).toFixed(2)}%</strong>
+        </span>
+        <span>
+          <strong>
+            {toLocaleFixed(balance / 10 ** asset.precision, asset.precision)}
+          </strong>
         </span>
       </Row>
     );
@@ -22,7 +64,7 @@ const Holders: React.FC<IHolder[]> = props => {
 
   const tableProps: ITable = {
     body: TableBody,
-    data: Object.values(props) as any[],
+    data: balances as any[],
     loading: false,
     header,
     type: 'holders',

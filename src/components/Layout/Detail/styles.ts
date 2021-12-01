@@ -162,3 +162,7 @@ export const Divider = styled.div`
 
   background-color: ${props => props.theme.content.divider};
 `;
+
+export const CopyContent = styled.span`
+  cursor: pointer;
+`;

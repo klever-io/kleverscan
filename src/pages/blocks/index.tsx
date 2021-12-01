@@ -147,10 +147,10 @@ const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks }) => {
           <small>32,230.23 KLV</small>
         </span>
         <span>
-          <small>{formatAmount(txFees || 0)}</small>
+          <small>{formatAmount((kAppFees || 0) / 10 ** precision)}</small>
         </span>
         <span>
-          <small>{formatAmount(kAppFees || 0)}</small>
+          <small>{formatAmount((txFees || 0) / 10 ** precision)}</small>
         </span>
         <span>
           <strong>{formatAmount(blockRewards / 10 ** precision)} KLV</strong>

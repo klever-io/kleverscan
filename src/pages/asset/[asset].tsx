@@ -19,8 +19,8 @@ import {
 
 import api from '@/services/api';
 import {
+  IAccount,
   IAsset,
-  IHolder,
   IPagination,
   IResponse,
   ITransaction,
@@ -36,12 +36,18 @@ interface IAssetPage {
   asset: IAsset;
   transactions: ITransaction[];
   totalTransactions: number;
-  holders: IHolder[];
+  holders: IAccount[];
 }
 
 interface IAssetResponse extends IResponse {
   data: {
     asset: IAsset;
+  };
+}
+
+interface IHoldersResponse extends IResponse {
+  data: {
+    accounts: IAccount[];
   };
 }
 
@@ -110,7 +116,7 @@ const Asset: React.FC<IAssetPage> = ({
           <span>
             <strong>Holders</strong>
           </span>
-          <span>--</span>
+          <span>{holders.length}</span>
         </Row>
         <Row>
           <span>
@@ -187,7 +193,7 @@ const Asset: React.FC<IAssetPage> = ({
       case 'Transactions':
         return <Transactions {...transactions} />;
       case 'Holders':
-        return <Holders {...holders} />;
+        return <Holders asset={asset} holders={holders} />;
       default:
         return <div />;
     }
@@ -269,6 +275,13 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
   if (!transactions.error) {
     props.transactions = transactions.data.transactions;
     props.totalTransactions = transactions.pagination.totalRecords;
+  }
+
+  const holders: IHoldersResponse = await api.get({
+    route: `assets/holders/${address}`,
+  });
+  if (!holders.error) {
+    props.holders = holders.data.accounts;
   }
 
   return { props };

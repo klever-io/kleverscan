@@ -1,3 +1,4 @@
+import { ISO2 } from '@/utils/country';
 import { LatLngExpression } from 'leaflet';
 
 export enum Contract {
@@ -183,11 +184,6 @@ export interface IBucket {
   delegation: string;
 }
 
-export interface IHolder {
-  address: string;
-  amount: number;
-}
-
 export interface IChainStatistics {
   liveTPS: number;
   averageTPS: number;
@@ -216,9 +212,18 @@ export interface IResponse {
   error: IError;
 }
 
-export interface INodeData {
-  name: string;
-  count?: number;
-  location: LatLngExpression;
-  nodes?: INodeData[];
+export interface ICountryNode {
+  country: ISO2;
+  nodes: [number, number][];
+}
+
+export interface ICountryFeature {
+  type: string;
+  id: string;
+  properties: { name: string };
+  geometry: { type: string; coordinates: number[][][] };
+}
+
+export interface ICountriesGeoData {
+  features: ICountryFeature[];
 }

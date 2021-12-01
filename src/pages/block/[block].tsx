@@ -1,14 +1,34 @@
 import React, { useState } from 'react';
-
 import { GetStaticProps } from 'next';
+import { useRouter } from 'next/router';
 
-import Detail, { ITab, ITabData } from '../../components/Layout/Detail';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-import api from '../../services/api';
-import { IBlock, IResponse } from '../../types';
-
-import { navbarItems } from '../../configs/navbar';
 import { format, fromUnixTime } from 'date-fns';
+
+import { ArrowLeft, Copy } from '@/assets/icons';
+
+import {
+  AssetTitle,
+  CardContainer,
+  CardContent,
+  CardHeader,
+  CardHeaderItem,
+  Container,
+  Header,
+  Input,
+  Row,
+  Title,
+} from '@/views/assets/detail';
+
+import Tabs, { ITabs } from '@/components/Tabs';
+import Transactions from '@/components/Tabs/Transactions';
+
+import { IBlock, IResponse } from '../../types';
+import api from '@/services/api';
+import { CenteredRow } from '@/views/transactions/detail';
+import { formatAmount } from '@/utils/index';
 
 interface IBlockResponse extends IResponse {
   data: {
@@ -16,51 +36,254 @@ interface IBlockResponse extends IResponse {
   };
 }
 
-const Block: React.FC<IBlock> = props => {
-  const overviewData: ITabData[] = [
-    { name: 'Hash', info: props.hash },
-    {
-      name: 'Timestamp',
-      info: format(fromUnixTime(props.timestamp), 'dd/MM/yyyy HH:mm'),
-    },
-    { name: 'Nonce', info: props.nonce },
-    { name: 'Slot', info: props.slot },
-    { name: 'Epoch', info: props.epoch },
-    { name: 'Size', info: props.size },
-    { name: 'Size TXs', info: props.sizeTxs },
-    { name: 'TX Count', info: props.txCount },
-    { name: 'Producer Signature', info: props.producerSignature },
-    { name: 'Software Version', info: props.softwareVersion },
-    { name: 'Chain ID', info: props.chainID },
-  ];
-  const transactionData: ITabData[] = props.transactions.map(transaction => ({
-    name: 'Transaction',
-    info: transaction.hash,
-    linked: `/transactions/${transaction.hash}`,
-  }));
-  const hashesData: ITabData[] = [
-    { name: 'Parent Hash', info: props.parentHash },
-    { name: 'TX Root Hash', info: props.txRootHash },
-    { name: 'Trie Root', info: props.trieRoot },
-    { name: 'Validators Trie Root', info: props.validatorsTrieRoot },
-    { name: 'Asset Trie Root', info: props.assetTrieRoot },
-    { name: 'Previous Random Seed', info: props.prevRandSeed },
-    { name: 'Random Seed', info: props.randSeed },
-  ];
+const Block: React.FC<IBlock> = ({
+  hash,
+  timestamp,
+  nonce,
+  epoch,
+  size,
+  kAppFees,
+  transactions,
+  softwareVersion,
+  chainID,
+  producerSignature,
+  parentHash,
+  trieRoot,
+  validatorsTrieRoot,
+  assetTrieRoot,
+  prevRandSeed,
+  randSeed,
+}) => {
+  const router = useRouter();
+  const cardHeaders = ['Overview', 'Info'];
+  const tableHeaders = ['Transactions'];
+  const precision = 6; // default KLV precision
 
-  const title = 'Block Details';
+  const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
+  const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
 
-  const [tabs] = useState<ITab[]>([
-    { title: 'Overview', data: overviewData },
-    { title: 'Transactions', data: transactionData },
-    { title: 'Block Info', data: hashesData },
-  ]);
+  const handleCopyInfo = (data: string) => {
+    navigator.clipboard.writeText(String(data));
+  };
 
-  const Icon = navbarItems.find(item => item.name === 'Blocks')?.Icon;
+  const Overview: React.FC = () => {
+    return (
+      <>
+        <Row>
+          <span>
+            <strong>Hash</strong>
+          </span>
+          <span>
+            <CenteredRow onClick={() => handleCopyInfo(hash)}>
+              <span>{hash}</span>
+              <Copy />
+            </CenteredRow>
+          </span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Timestamp</strong>
+          </span>
+          <span>
+            <small>
+              {format(fromUnixTime(timestamp / 1000), 'dd/MM/yyyy HH:mm')}
+            </small>
+          </span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Nonce</strong>
+          </span>
+          <span>{nonce}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Epoch</strong>
+          </span>
+          <span>
+            <small>{epoch}</small>
+          </span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Block Size</strong>
+          </span>
+          <span>{size} Bytes</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>kApp Fee</strong>
+          </span>
+          <span>{formatAmount((kAppFees || 0) / 10 ** precision)}</span>
+        </Row>
+      </>
+    );
+  };
 
-  const detailProps = { title, tabs, Icon };
+  const Info: React.FC = () => {
+    return (
+      <>
+        <Row>
+          <span>
+            <strong>Software Version</strong>
+          </span>
+          <span>{softwareVersion}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Chain ID</strong>
+          </span>
+          <span>
+            <small>{chainID}</small>
+          </span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Producer Signature</strong>
+          </span>
+          <span>
+            <CenteredRow onClick={() => handleCopyInfo(producerSignature)}>
+              <span>{producerSignature}</span>
+              <Copy />
+            </CenteredRow>
+          </span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Parent Hash</strong>
+          </span>
+          <span>
+            <CenteredRow onClick={() => handleCopyInfo(parentHash)}>
+              <span>{parentHash}</span>
+              <Copy />
+            </CenteredRow>
+          </span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Trie Root</strong>
+          </span>
+          <span>
+            <CenteredRow onClick={() => handleCopyInfo(trieRoot)}>
+              <span>{trieRoot}</span>
+              <Copy />
+            </CenteredRow>
+          </span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Validators Trie Root</strong>
+          </span>
+          <span>
+            <CenteredRow onClick={() => handleCopyInfo(validatorsTrieRoot)}>
+              <span>{validatorsTrieRoot}</span>
+              <Copy />
+            </CenteredRow>
+          </span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Asset Trie Root</strong>
+          </span>
+          <span>
+            <CenteredRow onClick={() => handleCopyInfo(assetTrieRoot)}>
+              <span>{assetTrieRoot}</span>
+              <Copy />
+            </CenteredRow>
+          </span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Previous Random Seed</strong>
+          </span>
+          <span>
+            <CenteredRow onClick={() => handleCopyInfo(prevRandSeed)}>
+              <span>{prevRandSeed}</span>
+              <Copy />
+            </CenteredRow>
+          </span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Previous Random Seed</strong>
+          </span>
+          <span>
+            <CenteredRow onClick={() => handleCopyInfo(randSeed)}>
+              <span>{randSeed}</span>
+              <Copy />
+            </CenteredRow>
+          </span>
+        </Row>
+      </>
+    );
+  };
 
-  return <Detail {...detailProps} />;
+  const SelectedComponent: React.FC = () => {
+    switch (selectedCard) {
+      case 'Overview':
+        return <Overview />;
+      case 'Info':
+        return <Info />;
+      default:
+        return <div />;
+    }
+  };
+
+  const SelectedTabComponent: React.FC = () => {
+    switch (selectedTab) {
+      case 'Transactions':
+        return <Transactions {...transactions} />;
+      default:
+        return <div />;
+    }
+  };
+
+  const tabProps: ITabs = {
+    headers: tableHeaders,
+    onClick: header => setSelectedTab(header),
+  };
+
+  return (
+    <Container>
+      <ToastContainer />
+
+      <Header>
+        <Title>
+          <div onClick={router.back}>
+            <ArrowLeft />
+          </div>
+
+          <AssetTitle>
+            <h1>Block</h1>
+          </AssetTitle>
+        </Title>
+
+        <Input />
+      </Header>
+
+      <CardContainer>
+        <CardHeader>
+          {cardHeaders.map((header, index) => (
+            <CardHeaderItem
+              key={String(index)}
+              selected={selectedCard === header}
+              onClick={() => setSelectedCard(header)}
+            >
+              <span>{header}</span>
+            </CardHeaderItem>
+          ))}
+        </CardHeader>
+
+        <CardContent>
+          <SelectedComponent />
+        </CardContent>
+      </CardContainer>
+
+      <Tabs {...tabProps}>
+        <SelectedTabComponent />
+      </Tabs>
+    </Container>
+  );
 };
 
 export const getServerSideProps: GetStaticProps<IBlock> = async ({

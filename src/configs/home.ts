@@ -5,6 +5,11 @@ export interface IChartData {
   value: number;
 }
 
+export interface IScatterChartData {
+  x: number;
+  y: number;
+}
+
 const infoChartData: IChartData[] = [
   { value: 3000 },
   { value: 4000 },

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
 
@@ -23,10 +23,18 @@ import Tabs, { ITabs } from '@/components/Tabs';
 import Transactions from '@/components/Tabs/Transactions';
 import Copy from '@/components/Copy';
 
-import { IBlock, IResponse } from '../../types';
+import { IBlock, IPagination, IResponse, ITransaction } from '../../types';
 import api from '@/services/api';
 import { CenteredRow } from '@/views/transactions/detail';
 import { formatAmount } from '@/utils/index';
+import { PaginationContainer } from '@/components/Pagination/styles';
+import Pagination from '@/components/Pagination';
+
+interface IBlockPage {
+  block: IBlock;
+  transactions: ITransaction[];
+  totalPagesTransactions: number;
+}
 
 interface IBlockResponse extends IResponse {
   data: {
@@ -34,24 +42,36 @@ interface IBlockResponse extends IResponse {
   };
 }
 
-const Block: React.FC<IBlock> = ({
-  hash,
-  timestamp,
-  nonce,
-  epoch,
-  size,
-  kAppFees,
-  transactions,
-  softwareVersion,
-  chainID,
-  producerSignature,
-  parentHash,
-  trieRoot,
-  validatorsTrieRoot,
-  assetTrieRoot,
-  prevRandSeed,
-  randSeed,
+interface ITransactionResponse extends IResponse {
+  data: {
+    transactions: ITransaction[];
+  };
+  pagination: IPagination;
+}
+
+const Block: React.FC<IBlockPage> = ({
+  block,
+  transactions: defaultTransactions,
+  totalPagesTransactions,
 }) => {
+  const {
+    hash,
+    timestamp,
+    nonce,
+    epoch,
+    size,
+    kAppFees,
+    softwareVersion,
+    chainID,
+    producerSignature,
+    parentHash,
+    trieRoot,
+    validatorsTrieRoot,
+    assetTrieRoot,
+    prevRandSeed,
+    randSeed,
+  } = block;
+
   const router = useRouter();
   const cardHeaders = ['Overview', 'Info'];
   const tableHeaders = ['Transactions'];
@@ -59,6 +79,26 @@ const Block: React.FC<IBlock> = ({
 
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
+
+  const [transactionPage, setTransactionPage] = useState(0);
+  const [transactions, setTransactions] = useState(defaultTransactions);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response: ITransactionResponse = await api.get({
+        route: `transaction/list?page=${transactionPage}&nonce=${nonce}`,
+      });
+      if (!response.error) {
+        setTransactions(response.data.transactions);
+      }
+    };
+
+    fetchData();
+  }, [transactionPage]);
+
+  const handleCopyInfo = (data: string) => {
+    navigator.clipboard.writeText(String(data));
+  };
 
   const Overview: React.FC = () => {
     return (
@@ -226,7 +266,19 @@ const Block: React.FC<IBlock> = ({
   const SelectedTabComponent: React.FC = () => {
     switch (selectedTab) {
       case 'Transactions':
-        return <Transactions {...transactions} />;
+        return (
+          <>
+            <Transactions {...transactions} />
+
+            <PaginationContainer>
+              <Pagination
+                count={totalPagesTransactions}
+                page={transactionPage}
+                onPaginate={page => setTransactionPage(page)}
+              />
+            </PaginationContainer>
+          </>
+        );
       default:
         return <div />;
     }
@@ -278,9 +330,15 @@ const Block: React.FC<IBlock> = ({
   );
 };
 
-export const getServerSideProps: GetStaticProps<IBlock> = async ({
+export const getServerSideProps: GetStaticProps<IBlockPage> = async ({
   params,
 }) => {
+  const props: IBlockPage = {
+    block: {} as IBlock,
+    totalPagesTransactions: 0,
+    transactions: [],
+  };
+
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
 
   const blockNonce = Number(params?.block);
@@ -295,8 +353,15 @@ export const getServerSideProps: GetStaticProps<IBlock> = async ({
   if (block.error) {
     return redirectProps;
   }
+  props.block = block.data.block;
 
-  const props: IBlock = block.data.block;
+  const transactions: ITransactionResponse = await api.get({
+    route: `transaction/list?nonce=${block.data.block.nonce}`,
+  });
+  if (!transactions.error) {
+    props.transactions = transactions.data.transactions;
+    props.totalPagesTransactions = transactions.pagination.totalPages;
+  }
 
   return { props };
 };

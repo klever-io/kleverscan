@@ -321,9 +321,9 @@ const Home: React.FC<IHome> = ({
     nonce,
     timestamp,
     hash,
-    transactions,
     blockRewards,
     blockIndex,
+    txCount,
   }) => (
     <BlockCardContainer blockIndex={blockIndex}>
       <BlockCardRow>
@@ -340,7 +340,7 @@ const Home: React.FC<IHome> = ({
       </BlockCardRow>
       <BlockCardRow>
         <p>Transactions</p>
-        <span>{(transactions || []).length}</span>
+        <span>{txCount}</span>
       </BlockCardRow>
       <BlockCardRow>
         <p>Reward</p>

@@ -21,16 +21,16 @@ interface IBalance {
 
 const Holders: React.FC<IHolder> = ({ holders, asset }) => {
   const balances = holders
-    .map((holder, index) => {
+    .map(holder => {
       if (Object.keys(holder.assets).includes(asset.address)) {
         return {
           address: holder.address,
           balance: holder.assets[asset.address].balance,
-          index,
         };
       }
     })
-    .sort((a, b) => b?.balance - a?.balance);
+    .sort((a, b) => b?.balance - a?.balance)
+    .map((holder, index) => ({ ...holder, index }));
 
   const totalAmount = Object.values(balances).reduce(
     (acc, holder) => acc + holder?.balance,

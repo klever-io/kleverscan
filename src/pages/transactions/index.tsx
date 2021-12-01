@@ -146,8 +146,6 @@ const Transactions: React.FC<ITransactions> = ({
         }
       });
 
-      console.log(`transaction/list?${buildQuery(routerQuery)}&page=${page}`);
-
       const response: ITransactionResponse = await api.get({
         route: `transaction/list?${buildQuery(routerQuery)}&page=${page}`,
       });

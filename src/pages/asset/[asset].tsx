@@ -88,9 +88,9 @@ const Asset: React.FC<IAssetPage> = ({
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
 
-  const [transactionsPage, setTransactionsPage] = useState(1);
+  const [transactionsPage, setTransactionsPage] = useState(0);
   const [transactions, setTransactions] = useState(defaultTransactions);
-  const [holdersPage, setHoldersPage] = useState(1);
+  const [holdersPage, setHoldersPage] = useState(0);
   const [holders, setHolders] = useState(defaultHolders);
 
   useEffect(() => {
@@ -99,7 +99,6 @@ const Asset: React.FC<IAssetPage> = ({
         route: `transaction/list?asset=${asset.address}`,
       });
       if (!response.error) {
-        console.log(response.data);
         setTransactions(response.data.transactions);
       }
     };
@@ -233,8 +232,7 @@ const Asset: React.FC<IAssetPage> = ({
         return (
           <>
             <Transactions {...transactions} />
-            {/* TODO: Remove display after new endpoint */}
-            <PaginationContainer style={{ display: 'none' }}>
+            <PaginationContainer>
               <Pagination
                 count={totalTransactionsPage}
                 page={transactionsPage}
@@ -249,8 +247,7 @@ const Asset: React.FC<IAssetPage> = ({
         return (
           <>
             <Holders asset={asset} holders={holders} />
-            {/* TODO: Remove display after new endpoint */}
-            <PaginationContainer style={{ display: 'none' }}>
+            <PaginationContainer>
               <Pagination
                 count={totalHoldersPage}
                 page={holdersPage}

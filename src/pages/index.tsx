@@ -55,7 +55,7 @@ import {
   ITransferContract,
 } from '../types';
 
-import { IChartData, transactionMockedData } from '@/configs/home';
+import { IChartData } from '@/configs/home';
 import { formatAmount, getAge } from '../utils';
 
 import Carousel from '@/components/Carousel';
@@ -76,8 +76,13 @@ interface ICoinInfo {
   prices: IChartData[];
 }
 
+interface IDailyTransaction {
+  doc_count: number;
+  key: number;
+}
 interface IHome {
   transactions: ITransaction[];
+  transactionsList: IDailyTransaction[];
   blocks: IBlock[];
   totalAccounts: number;
   totalTransactions: number;
@@ -88,6 +93,13 @@ interface IHome {
 interface ITransactionResponse extends IResponse {
   data: {
     transactions: ITransaction[];
+  };
+  pagination: IPagination;
+}
+
+interface ITransactionListResponse extends IResponse {
+  data: {
+    number_by_day: IDailyTransaction[];
   };
   pagination: IPagination;
 }
@@ -144,6 +156,7 @@ interface ICoinCard extends ICoinInfo {
 const Home: React.FC<IHome> = ({
   blocks,
   transactions,
+  transactionsList,
   totalAccounts,
   totalTransactions,
   tps,
@@ -343,11 +356,14 @@ const Home: React.FC<IHome> = ({
   };
 
   const getTransactionChartData = () => {
-    return transactionMockedData.map(transaction => {
-      if (transaction.date) {
+    const sortedTransactionsList = transactionsList.sort(
+      (a, b) => a.key - b.key,
+    );
+    return sortedTransactionsList.map(transaction => {
+      if (transaction.key) {
         return {
-          date: format(fromUnixTime(transaction.date / 1000), 'dd MMM'),
-          value: transaction.value,
+          date: format(fromUnixTime(transaction.key / 1000), 'dd MMM'),
+          value: transaction.doc_count,
         };
       }
     });
@@ -394,7 +410,10 @@ const Home: React.FC<IHome> = ({
           </TransactionContent>
           <TransactionChart>
             <span>Daily Transactions</span>
-            <p>(14 days)</p>
+            <p>
+              ({transactionsList.length} day
+              {transactionsList.length > 1 ? 's' : ''})
+            </p>
             <TransactionChartContent>
               <Chart type={ChartType.Linear} data={getTransactionChartData()} />
             </TransactionChartContent>
@@ -409,6 +428,7 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
   const props: IHome = {
     blocks: [],
     transactions: [],
+    transactionsList: [],
     totalAccounts: 0,
     totalTransactions: 0,
     tps: '0/0',
@@ -428,6 +448,14 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
   if (!transactions.error) {
     props.transactions = transactions.data.transactions;
     props.totalTransactions = transactions.pagination.totalRecords;
+  }
+
+  const transactionsList: ITransactionListResponse = await api.get({
+    route: 'transaction/list/count/15',
+  });
+  if (!transactionsList.error) {
+    const { number_by_day } = transactionsList.data;
+    props.transactionsList = number_by_day;
   }
 
   const accounts: IAccountResponse = await api.get({ route: 'address/list' });

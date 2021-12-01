@@ -1,5 +1,4 @@
 import { ISO2 } from '@/utils/country';
-import { LatLngExpression } from 'leaflet';
 
 export enum Contract {
   Transfer = 'Transfer',
@@ -152,6 +151,7 @@ export interface IBlock {
 
 export interface IAccount {
   address: string;
+  nonce: number;
   balance: number;
   blsPublicKey: string;
   assets: {

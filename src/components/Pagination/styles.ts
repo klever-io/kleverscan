@@ -21,6 +21,9 @@ export const Container = styled.div`
 `;
 
 export const ArrowContainer = styled.div<{ active: boolean }>`
+  height: 2rem;
+  width: 2rem;
+
   display: flex;
 
   align-items: center;

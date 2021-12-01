@@ -49,7 +49,7 @@ const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks, pagination }) => {
   const router = useRouter();
   const precision = 6; // default KLV precision
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [blocks, setBlocks] = useState(defaultBlocks);
   const [loading, setLoading] = useState(false);
   const [uptime] = useState(new Date().getTime());

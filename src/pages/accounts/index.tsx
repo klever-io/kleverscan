@@ -52,7 +52,7 @@ const Accounts: React.FC<IAccounts> = ({
   const router = useRouter();
   const precision = 6; // default KLV precision
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [accounts, setAccounts] = useState(defaultAccounts);
   const [loading, setLoading] = useState(false);
   const [uptime] = useState(new Date().getTime());
@@ -129,7 +129,12 @@ const Accounts: React.FC<IAccounts> = ({
 
   const header = ['Address', 'KLV Staked', 'Transaction Count', 'KLV Balance'];
 
-  const TableBody: React.FC<IAccount> = ({ address, buckets, balance }) => {
+  const TableBody: React.FC<IAccount> = ({
+    address,
+    buckets,
+    balance,
+    nonce,
+  }) => {
     const getFreezeBalance = () => {
       if (Object.values(buckets).length <= 0) {
         return 0;
@@ -151,9 +156,9 @@ const Accounts: React.FC<IAccounts> = ({
         <span>
           <strong>{formatAmount(getFreezeBalance())} KLV</strong>
         </span>
-        <span>-</span>
+        <span>{nonce}</span>
         <span>
-          <strong>{formatAmount(balance)} KLV</strong>
+          <strong>{formatAmount(balance / 10 ** precision)} KLV</strong>
         </span>
       </Row>
     );

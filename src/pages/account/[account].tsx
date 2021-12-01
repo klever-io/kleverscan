@@ -61,7 +61,7 @@ const Account: React.FC<IAccountPage> = ({
   const router = useRouter();
   const precision = 6;
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [, setLoading] = useState(false);
   const [transactions, setTransactions] = useState(
     transactionResponse.data.transactions,

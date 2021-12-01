@@ -80,14 +80,18 @@ const Assets: React.FC<IAssetPage> = ({
         </span>
         <span>{type}</span>
         <span>
-          <strong>{formatAmount(initialSupply / 10 ** precision)} KLV</strong>
-        </span>
-        <span>
-          <strong>{formatAmount(maxSupply / 10 ** precision)} KLV</strong>
+          <strong>
+            {formatAmount(initialSupply / 10 ** precision)} {ticker}
+          </strong>
         </span>
         <span>
           <strong>
-            {formatAmount(circulatingSupply / 10 ** precision)} KLV
+            {formatAmount(maxSupply / 10 ** precision)} {ticker}
+          </strong>
+        </span>
+        <span>
+          <strong>
+            {formatAmount(circulatingSupply / 10 ** precision)} {ticker}
           </strong>
         </span>
         <span>
@@ -99,7 +103,7 @@ const Assets: React.FC<IAssetPage> = ({
 
   const header = [
     'Token',
-    'Address',
+    'ID',
     'Name',
     'Type',
     'Initial Supply',

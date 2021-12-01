@@ -362,7 +362,7 @@ const Home: React.FC<IHome> = ({
           </p>
         </TransactionData>
         <TransactionAmount>
-          <span>{formatAmount(amount)} KLV</span>
+          <span>{formatAmount(amount / 10 ** precision)} KLV</span>
         </TransactionAmount>
       </TransactionRow>
     );

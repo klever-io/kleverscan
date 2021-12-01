@@ -254,7 +254,7 @@ const Block: React.FC<IBlock> = ({
           </div>
 
           <AssetTitle>
-            <h1>Block</h1>
+            <h1>Block Detail</h1>
           </AssetTitle>
         </Title>
 

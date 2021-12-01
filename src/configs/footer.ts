@@ -51,27 +51,33 @@ const contents: IContent[] = [
   {
     title: 'Klever Exchange',
     infoLinks: [
-      { name: 'Privacy Policy', href: '#' },
-      { name: 'Terms of Use', href: '#' },
-      { name: 'WhitePaper', href: '#' },
-      { name: 'Trading Fees', href: '#' },
-      { name: 'Token List', href: '#' },
+      { name: 'Privacy Policy', href: 'https://klever.io/privacy-policy' },
+      { name: 'Terms of Use', href: 'https://klever.io/terms-of-use' },
+      {
+        name: 'WhitePaper',
+        href: 'https://klever.finance/wp-content/uploads/2021/10/Klever-Exchange-Whitepaper-v.1.0.pdf',
+      },
+      { name: 'Trading Fees', href: 'https://klever.io/trading-fees' },
+      { name: 'Token List', href: 'https://klever.io/markets' },
     ],
   },
   {
     title: 'Klever Wallet App',
     infoLinks: [
-      { name: 'Roadmap', href: '#' },
-      { name: 'Help Center', href: '#' },
+      { name: 'Roadmap', href: 'https://klever.finance/roadmap/' },
+      { name: 'Help Center', href: 'https://klever.zendesk.com/' },
     ],
   },
   {
     title: 'Klever Ecosystem',
     infoLinks: [
-      { name: 'WhitePaper', href: '#' },
-      { name: 'Klever News', href: '#' },
-      { name: 'Careers', href: '#' },
-      { name: 'Klever Finance', href: '#' },
+      {
+        name: 'WhitePaper',
+        href: 'https://klever.io/downloads/Klever_Whitepaper_v1.5.pdf',
+      },
+      { name: 'Klever News', href: 'http://news.klever.io/' },
+      { name: 'Careers', href: 'https://klever.compleo.com.br/' },
+      { name: 'Klever Finance', href: 'https://klever.finance/' },
     ],
   },
 ];

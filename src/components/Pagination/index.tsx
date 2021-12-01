@@ -14,9 +14,9 @@ const Pagination: React.FC<IPagination> = ({ count, page, onPaginate }) => {
   const cells = calculate(count, page);
 
   const prevProps = {
-    active: page > 1,
+    active: page > 0,
     onClick: () => {
-      if (page > 1) {
+      if (page > 0) {
         onPaginate(page - 1);
       }
     },
@@ -39,8 +39,8 @@ const Pagination: React.FC<IPagination> = ({ count, page, onPaginate }) => {
 
       {cells.map(({ value, ellipsis }) => {
         const props = {
-          active: value === page,
-          onClick: () => onPaginate(value),
+          active: value === page + 1,
+          onClick: () => onPaginate(value - 1),
         };
 
         return (

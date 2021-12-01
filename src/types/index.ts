@@ -147,6 +147,10 @@ export interface IBlock {
   chainID: string;
 }
 
+export interface IBlockCard {
+  blockIndex: number;
+}
+
 export interface IAccount {
   address: string;
   nonce: number;

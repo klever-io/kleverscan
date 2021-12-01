@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
@@ -48,6 +48,7 @@ import api, { Service } from '@/services/api';
 
 import {
   IBlock,
+  IBlockCard,
   IChainStatistics,
   IPagination,
   IResponse,
@@ -159,9 +160,6 @@ interface ICard {
   variation: string;
 }
 
-interface ICoinCard extends ICoinInfo {
-  Icon: any;
-}
 
 const Home: React.FC<IHome> = ({
   blocks,
@@ -174,6 +172,55 @@ const Home: React.FC<IHome> = ({
   yeasterdayTransactions,
 }) => {
   const precision = 6; // default KLV precision
+  const blockWatcherTimeout = 4000;
+  const statisticsWatcherTimeout = 4000;
+
+
+  const [listedBlocks, setListedBlocks] = useState<IBlock[]>(blocks)
+  const [actualTPS, setActualTPS] = useState<string>(tps)
+
+  const [selectedCoin, setSelectedCoin] = useState(0);
+
+  // Block Watcher
+
+  useEffect(() => {
+    const blockWatcher = setInterval(async () => {
+      const response: IBlockResponse = await api.get({
+        route: 'block/list',
+      })
+
+      if (!response.error) {
+        setListedBlocks(response.data?.blocks)
+      }
+    }, blockWatcherTimeout)
+
+    return () => clearInterval(blockWatcher)
+  }, [listedBlocks])
+
+
+  // Statistics Watcher
+
+  useEffect(() => {
+    const statisticsWatcher = setInterval(async () => {
+      const statistics: IStatisticsResponse = await api.get({
+        route: 'node/statistics',
+        service: Service.NODE,
+      })
+
+      if (!statistics.error) {
+        const chainStatistics = statistics.data.statistics.chainStatistics;
+
+
+        setActualTPS(`${chainStatistics.liveTPS}/${chainStatistics.peakTPS}`)
+      }
+    }, statisticsWatcherTimeout)
+
+    return () => clearInterval(statisticsWatcher)
+  })
+
+  const coinData = useMemo(() => {
+    return coinsData[selectedCoin]
+  }, [selectedCoin])
 
   const dataCards: ICard[] = [
     {
@@ -190,24 +237,25 @@ const Home: React.FC<IHome> = ({
     },
   ];
 
-  const getCoinData = () => {
+  const getIcon = useCallback(() => {
     const icons = {
       KLV: KFILogo,
       KFI: KFILogo,
     };
 
-    return coinsData.map(coin => ({ ...coin, Icon: icons[coin.shortname] }));
-  };
+    const SelectedIcon = icons[coinData.shortname]
 
-  const [selectedCoin, setSelectedCoin] = useState(0);
+    return <SelectedIcon />
+  }, [])
 
-  const handleSelectionCoin = (index: number) => {
+
+  const handleSelectionCoin = useCallback((index: number) => {
     if (selectedCoin !== index) {
       setSelectedCoin(index);
     }
-  };
+  }, [selectedCoin]);
 
-  const getVariation = (variation: number) => {
+  const getVariation = useCallback((variation: number) => {
     const precision = 2;
 
     if (variation < 0) {
@@ -215,123 +263,9 @@ const Home: React.FC<IHome> = ({
     }
 
     return `+ ${variation.toFixed(precision)}%`;
-  };
+  }, []);
 
-  const Card: React.FC<ICard> = ({ Icon, title, value, variation }) => (
-    <DataCard>
-      <IconContainer>
-        <Icon />
-      </IconContainer>
-      <DataCardValue>
-        <span>{title}</span>
-        <p>{value.toLocaleString()}</p>
-      </DataCardValue>
-      {!variation.includes('%') && (
-        <DataCardLatest positive={variation.includes('+')}>
-          <span>Last 24h</span>
-          <p>{variation}</p>
-        </DataCardLatest>
-      )}
-    </DataCard>
-  );
 
-  const CoinCard: React.FC<ICoinCard> = ({
-    Icon,
-    shortname,
-    name,
-    price,
-    variation,
-    marketCap,
-    volume,
-    prices,
-  }) => (
-    <CoinDataCard>
-      <CoinDataContent>
-        <CoinDataHeaderContainer>
-          <IconContainer>
-            <Icon />
-          </IconContainer>
-          <CoinDataHeader>
-            <CoinDataName>
-              <span>{shortname}</span>
-              <span>U$ {price.toLocaleString()}</span>
-            </CoinDataName>
-            <CoinDataDescription
-              positive={getVariation(variation).includes('+')}
-            >
-              <span>{name}</span>
-              <p>{getVariation(variation)}</p>
-            </CoinDataDescription>
-          </CoinDataHeader>
-        </CoinDataHeaderContainer>
-
-        <CoinChartContainer>
-          <Chart data={prices} />
-        </CoinChartContainer>
-
-        <CoinValueContainer>
-          {[marketCap, volume].map((item, index) => (
-            <CoinValueContent key={String(index)}>
-              <p>{index === 0 ? 'Market Cap' : 'Volume'}</p>
-              <CoinValueDetail
-                positive={getVariation(item.variation).includes('+')}
-              >
-                <span>$ {item.price.toLocaleString()}</span>
-                <p>{getVariation(item.variation)}</p>
-              </CoinValueDetail>
-            </CoinValueContent>
-          ))}
-          <CoinValueContent>
-            <CoinValueDetail>
-              <p>Live/Peak TPS</p>
-              <span>{tps}</span>
-            </CoinValueDetail>
-          </CoinValueContent>
-        </CoinValueContainer>
-      </CoinDataContent>
-
-      <CoinSelectorContainer>
-        {getCoinData().map((_, index) => (
-          <CoinSelector
-            key={String(index)}
-            onClick={() => handleSelectionCoin(index)}
-            isSelected={selectedCoin === index}
-          />
-        ))}
-      </CoinSelectorContainer>
-    </CoinDataCard>
-  );
-
-  const BlockCard: React.FC<IBlock> = ({
-    nonce,
-    timestamp,
-    hash,
-    transactions,
-    blockRewards,
-  }) => (
-    <BlockCardContainer>
-      <BlockCardRow>
-        <strong>#{nonce}</strong>
-        <p>Miner</p>
-      </BlockCardRow>
-      <BlockCardRow>
-        <small>{getAge(fromUnixTime(timestamp / 1000))} ago</small>
-        <Link href={`/block/${nonce}`}>{hash}</Link>
-      </BlockCardRow>
-      <BlockCardRow>
-        <p>Burned</p>
-        <span>142</span>
-      </BlockCardRow>
-      <BlockCardRow>
-        <p>Transactions</p>
-        <span>{transactions.length}</span>
-      </BlockCardRow>
-      <BlockCardRow>
-        <p>Reward</p>
-        <span>{formatAmount(blockRewards / 10 ** precision)} KLV</span>
-      </BlockCardRow>
-    </BlockCardContainer>
-  );
 
   const TransactionItem: React.FC<ITransaction> = ({
     hash,
@@ -382,6 +316,40 @@ const Home: React.FC<IHome> = ({
     });
   };
 
+  //TODO: Fix re-rendering and improve animation;
+
+  const BlockCard: React.FC<IBlock & IBlockCard> = ({
+    nonce,
+    timestamp,
+    hash,
+    transactions,
+    blockRewards,
+    blockIndex
+  }) => (
+    <BlockCardContainer blockIndex={blockIndex}>
+      <BlockCardRow>
+        <strong>#{nonce}</strong>
+        <p>Miner</p>
+      </BlockCardRow>
+      <BlockCardRow>
+        <small>{getAge(fromUnixTime(timestamp / 1000))} ago</small>
+        <Link href={`/block/${nonce}`}>{hash}</Link>
+      </BlockCardRow>
+      <BlockCardRow>
+        <p>Burned</p>
+        <span>142</span>
+      </BlockCardRow>
+      <BlockCardRow>
+        <p>Transactions</p>
+        <span>{transactions.length}</span>
+      </BlockCardRow>
+      <BlockCardRow>
+        <p>Reward</p>
+        <span>{formatAmount(blockRewards / 10 ** precision)} KLV</span>
+      </BlockCardRow>
+    </BlockCardContainer>
+  );
+
   return (
     <Container>
       <DataContainer>
@@ -389,20 +357,90 @@ const Home: React.FC<IHome> = ({
 
         <DataCardsContainer>
           <DataCardsContent>
-            {dataCards.map((card, index) => (
-              <Card key={String(index)} {...card} />
+            {dataCards.map(({ Icon, title, value, variation }, index) => (
+              <DataCard key={String(index)}>
+                <IconContainer>
+                  <Icon />
+                </IconContainer>
+                <DataCardValue>
+                  <span>{title}</span>
+                  <p>{value.toLocaleString()}</p>
+                </DataCardValue>
+                {!variation.includes('%') && (
+                  <DataCardLatest positive={variation.includes('+')}>
+                    <span>Last 24h</span>
+                    <p>{variation}</p>
+                  </DataCardLatest>
+                )}
+              </DataCard>
             ))}
           </DataCardsContent>
 
-          <CoinCard {...getCoinData()[selectedCoin]} />
+          <CoinDataCard>
+            <CoinDataContent>
+              <CoinDataHeaderContainer>
+                <IconContainer>
+                  {getIcon()}
+                </IconContainer>
+                <CoinDataHeader>
+                  <CoinDataName>
+                    <span>{coinData.shortname}</span>
+                    <span>U$ {coinData.price.toLocaleString()}</span>
+                  </CoinDataName>
+                  <CoinDataDescription
+                    positive={getVariation(coinData.variation).includes('+')}
+                  >
+                    <span>{coinData.name}</span>
+                    <p>{getVariation(coinData.variation)}</p>
+                  </CoinDataDescription>
+                </CoinDataHeader>
+              </CoinDataHeaderContainer>
+
+              <CoinChartContainer>
+                <Chart data={coinData.prices} />
+              </CoinChartContainer>
+
+              <CoinValueContainer>
+                {[coinData.marketCap, coinData.volume].map((item, index) => (
+                  <CoinValueContent key={String(index)}>
+                    <p>{index === 0 ? 'Market Cap' : 'Volume'}</p>
+                    <CoinValueDetail
+                      positive={getVariation(item.variation).includes('+')}
+                    >
+                      <span>$ {item.price.toLocaleString()}</span>
+                      <p>{getVariation(item.variation)}</p>
+                    </CoinValueDetail>
+                  </CoinValueContent>
+                ))}
+                <CoinValueContent>
+                  <CoinValueDetail>
+                    <p>Live/Peak TPS</p>
+                    <span>{actualTPS}</span>
+                  </CoinValueDetail>
+                </CoinValueContent>
+              </CoinValueContainer>
+            </CoinDataContent>
+
+            <CoinSelectorContainer>
+              {coinsData.map((_, index) => (
+                <CoinSelector
+                  key={String(index)}
+                  onClick={() => handleSelectionCoin(index)}
+                  isSelected={selectedCoin === index}
+                />
+              ))}
+
+
+            </CoinSelectorContainer>
+          </CoinDataCard>
         </DataCardsContainer>
       </DataContainer>
 
       <Section>
         <h1>Blocks</h1>
         <Carousel>
-          {blocks.map((block, index) => (
-            <BlockCard key={String(index)} {...block} />
+          {listedBlocks.map((block: IBlock, index) => (
+            <BlockCard blockIndex={index} key={String(index)} {...block} />
           ))}
         </Carousel>
       </Section>

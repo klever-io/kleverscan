@@ -52,6 +52,7 @@ export const ArrowLeft = styled(DefaultArrowLeft)`
   cursor: pointer;
 
   transition: 0.2s ease;
+  z-index:1;
 
   &:hover {
     filter: brightness(1.2);

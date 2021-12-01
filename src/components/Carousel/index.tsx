@@ -6,7 +6,6 @@ const Carousel: React.FC = ({ children }) => {
   const carouselRef = useRef<any>(null);
 
   const handleLeft = () => {
-    console.log(carouselRef.current.offsetWidth);
     carouselRef.current.scrollLeft -= carouselRef.current.offsetWidth / 2;
   };
 

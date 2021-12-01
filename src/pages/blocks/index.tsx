@@ -24,6 +24,8 @@ import api from '@/services/api';
 import { formatAmount, getAge } from '@/utils/index';
 
 import { ArrowLeft } from '@/assets/icons';
+import { PaginationContainer } from '@/components/Pagination/styles';
+import Pagination from '@/components/Pagination';
 
 interface IBlocks {
   blocks: IBlock[];
@@ -43,12 +45,13 @@ interface ICard {
   values: string[];
 }
 
-const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks }) => {
+const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks, pagination }) => {
   const router = useRouter();
   const precision = 6; // default KLV precision
 
-  const [blocks] = useState(defaultBlocks);
-  const [loading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [blocks, setBlocks] = useState(defaultBlocks);
+  const [loading, setLoading] = useState(false);
   const [uptime] = useState(new Date().getTime());
   const [age, setAge] = useState(
     getAge(fromUnixTime(new Date().getTime() / 1000)),
@@ -65,6 +68,23 @@ const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks }) => {
       clearInterval(interval);
     };
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+
+      const response: IBlockResponse = await api.get({
+        route: `block/list?page=${page}`,
+      });
+      if (!response.error) {
+        setBlocks(response.data.blocks);
+      }
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [page]);
 
   const cards: ICard[] = [
     {
@@ -190,6 +210,16 @@ const Blocks: React.FC<IBlocks> = ({ blocks: defaultBlocks }) => {
         <h3>List of blocks</h3>
         <Table {...tableProps} />
       </TableContainer>
+
+      <PaginationContainer>
+        <Pagination
+          count={pagination.totalPages}
+          page={page}
+          onPaginate={page => {
+            setPage(page);
+          }}
+        />
+      </PaginationContainer>
     </Container>
   );
 };

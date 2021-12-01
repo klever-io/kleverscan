@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
@@ -14,6 +14,8 @@ import { formatAmount } from '@/utils/index';
 import api from '@/services/api';
 
 import { ArrowLeft } from '@/assets/icons';
+import { PaginationContainer } from '@/components/Pagination/styles';
+import Pagination from '@/components/Pagination';
 
 interface IAssetPage {
   assets: IAsset[];
@@ -27,8 +29,33 @@ interface IAssetResponse extends IResponse {
   pagination: IPagination;
 }
 
-const Assets: React.FC<IAssetPage> = ({ assets }) => {
+const Assets: React.FC<IAssetPage> = ({
+  assets: defaultAssets,
+  pagination,
+}) => {
   const router = useRouter();
+
+  const [page, setPage] = useState(0);
+  const [assets, setAssets] = useState(defaultAssets);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+
+      const response: IAssetResponse = await api.get({
+        route: `assets/kassets?page=${page}`,
+      });
+      if (!response.error) {
+        console.log(`assets/kassets?page=${page}`);
+        setAssets(response.data.assets);
+      }
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [page]);
 
   const TableBody: React.FC<IAsset> = ({
     ticker,
@@ -85,7 +112,7 @@ const Assets: React.FC<IAssetPage> = ({ assets }) => {
     body: TableBody,
     data: assets as any[],
     header,
-    loading: false,
+    loading,
     type: 'assetsPage',
   };
 
@@ -103,6 +130,16 @@ const Assets: React.FC<IAssetPage> = ({ assets }) => {
       </Header>
 
       <Table {...tableProps} />
+
+      <PaginationContainer>
+        <Pagination
+          count={pagination.totalPages}
+          page={page}
+          onPaginate={page => {
+            setPage(page);
+          }}
+        />
+      </PaginationContainer>
     </Container>
   );
 };

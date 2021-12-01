@@ -39,9 +39,12 @@ import { formatAmount } from '../../utils';
 import { ArrowRight, ArrowLeft } from '@/assets/icons';
 import { KLV } from '@/assets/coins';
 import { getStatusIcon } from '@/assets/status';
+import Pagination from '@/components/Pagination';
+import { PaginationContainer } from '@/components/Pagination/styles';
 
 interface ITransactions {
   transactions: ITransaction[];
+  pagination: IPagination;
 }
 
 interface ITransactionResponse extends IResponse {
@@ -53,12 +56,14 @@ interface ITransactionResponse extends IResponse {
 
 const Transactions: React.FC<ITransactions> = ({
   transactions: defaultTransactions,
+  pagination,
 }) => {
   const router = useRouter();
   const defaultFilter: IFilterItem = { name: 'All', value: 'all' };
 
   const [loading, setLoading] = useState(false);
   const [transactions, setTransactions] = useState(defaultTransactions);
+  const [page, setPage] = useState(1);
 
   const [transactionType, setTransactionType] = useState(defaultFilter);
   const [statusType, setStatusType] = useState(defaultFilter);
@@ -131,7 +136,7 @@ const Transactions: React.FC<ITransactions> = ({
       });
 
       const response: ITransactionResponse = await api.get({
-        route: `transaction/list?${buildQuery(routerQuery)}`,
+        route: `transaction/list?${buildQuery(routerQuery)}&page=${page}`,
       });
       if (!response.error) {
         setTransactions(response.data.transactions);
@@ -141,7 +146,7 @@ const Transactions: React.FC<ITransactions> = ({
     };
 
     fetchData();
-  }, [transactionType, statusType, coinType]);
+  }, [transactionType, statusType, coinType, page]);
 
   const getContractType = (contracts: IContract[]) =>
     contracts.length > 1
@@ -360,6 +365,15 @@ const Transactions: React.FC<ITransactions> = ({
       </Header>
 
       <Table {...tableProps} />
+      <PaginationContainer>
+        <Pagination
+          count={pagination.totalPages}
+          page={page}
+          onPaginate={page => {
+            setPage(page);
+          }}
+        />
+      </PaginationContainer>
     </Container>
   );
 };
@@ -368,6 +382,7 @@ export const getServerSideProps: GetServerSideProps<ITransactions> =
   async () => {
     const props: ITransactions = {
       transactions: [],
+      pagination: {} as IPagination,
     };
 
     const transactions: ITransactionResponse = await api.get({
@@ -375,6 +390,7 @@ export const getServerSideProps: GetServerSideProps<ITransactions> =
     });
     if (!transactions.error) {
       props.transactions = transactions.data.transactions;
+      props.pagination = transactions.pagination;
     }
 
     return { props };

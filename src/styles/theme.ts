@@ -138,6 +138,10 @@ const theme = {
     helpIcon: '#9e9e9e',
   },
 
+  pagination: {
+    active: '#7D3FF1',
+  },
+
   content: {
     // TODO: outdated
     tab: {

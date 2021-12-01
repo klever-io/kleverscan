@@ -88,6 +88,7 @@ interface IHome {
   totalTransactions: number;
   tps: string;
   coinsData: ICoinInfo[];
+  yeasterdayTransactions: number;
 }
 
 interface ITransactionResponse extends IResponse {
@@ -138,6 +139,15 @@ interface IGeckoResponse extends IResponse {
   };
 }
 
+interface IYesterdayResponse extends IResponse {
+  data: {
+    number_by_day: {
+      doc_count: number;
+      key: number;
+    }[];
+  };
+}
+
 interface IGeckoChartResponse extends IResponse {
   prices: number[][];
 }
@@ -161,6 +171,7 @@ const Home: React.FC<IHome> = ({
   totalTransactions,
   tps,
   coinsData,
+  yeasterdayTransactions,
 }) => {
   const precision = 6; // default KLV precision
 
@@ -169,13 +180,13 @@ const Home: React.FC<IHome> = ({
       Icon: Accounts,
       title: 'Total accounts',
       value: totalAccounts,
-      variation: '+ 89.34%',
+      variation: '+ 0.00%',
     },
     {
       Icon: Transactions,
       title: 'Total transactions',
       value: totalTransactions,
-      variation: '+ 802,679',
+      variation: `+ ${yeasterdayTransactions.toLocaleString()}`,
     },
   ];
 
@@ -215,10 +226,12 @@ const Home: React.FC<IHome> = ({
         <span>{title}</span>
         <p>{value.toLocaleString()}</p>
       </DataCardValue>
-      <DataCardLatest positive={variation.includes('+')}>
-        <span>Last 24h</span>
-        <p>{variation}</p>
-      </DataCardLatest>
+      {!variation.includes('%') && (
+        <DataCardLatest positive={variation.includes('+')}>
+          <span>Last 24h</span>
+          <p>{variation}</p>
+        </DataCardLatest>
+      )}
     </DataCard>
   );
 
@@ -433,6 +446,7 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
     totalTransactions: 0,
     tps: '0/0',
     coinsData: [],
+    yeasterdayTransactions: 0,
   };
 
   const blocks: IBlockResponse = await api.get({
@@ -515,6 +529,14 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
     service: Service.GECKO,
   });
   pushCoinData('Klever Finance', 'KFI', kfiData, kfiChart);
+
+  const yesterdayTransactions: IYesterdayResponse = await api.get({
+    route: 'transaction/list/count/1',
+  });
+  if (!yesterdayTransactions.error) {
+    props.yeasterdayTransactions =
+      yesterdayTransactions.data.number_by_day[0].doc_count;
+  }
 
   return { props };
 };

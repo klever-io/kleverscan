@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
@@ -31,11 +31,15 @@ import { ArrowLeft } from '@/assets/icons';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Transactions from '@/components/Tabs/Transactions';
 import Holders from '@/components/Tabs/Holders';
+import { PaginationContainer } from '@/components/Pagination/styles';
+import Pagination from '@/components/Pagination';
 
 interface IAssetPage {
   asset: IAsset;
   transactions: ITransaction[];
   totalTransactions: number;
+  totalTransactionsPage: number;
+  totalHoldersPage: number;
   holders: IAccount[];
 }
 
@@ -49,6 +53,7 @@ interface IHoldersResponse extends IResponse {
   data: {
     accounts: IAccount[];
   };
+  pagination: IPagination;
 }
 
 interface ITransactionResponse extends IResponse {
@@ -60,9 +65,11 @@ interface ITransactionResponse extends IResponse {
 
 const Asset: React.FC<IAssetPage> = ({
   asset,
-  transactions,
+  transactions: defaultTransactions,
   totalTransactions,
-  holders,
+  holders: defaultHolders,
+  totalHoldersPage,
+  totalTransactionsPage,
 }) => {
   const {
     name,
@@ -80,6 +87,38 @@ const Asset: React.FC<IAssetPage> = ({
 
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
+
+  const [transactionsPage, setTransactionsPage] = useState(1);
+  const [transactions, setTransactions] = useState(defaultTransactions);
+  const [holdersPage, setHoldersPage] = useState(1);
+  const [holders, setHolders] = useState(defaultHolders);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response: ITransactionResponse = await api.get({
+        route: `transaction/list?asset=${asset.address}`,
+      });
+      if (!response.error) {
+        console.log(response.data);
+        setTransactions(response.data.transactions);
+      }
+    };
+
+    fetchData();
+  }, [transactionsPage]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response: IHoldersResponse = await api.get({
+        route: `assets/holders/${asset.address}`,
+      });
+      if (!response.error) {
+        setHolders(response.data.accounts);
+      }
+    };
+
+    fetchData();
+  }, [transactionsPage]);
 
   const Overview: React.FC = () => {
     return (
@@ -191,9 +230,37 @@ const Asset: React.FC<IAssetPage> = ({
   const SelectedTabComponent: React.FC = () => {
     switch (selectedTab) {
       case 'Transactions':
-        return <Transactions {...transactions} />;
+        return (
+          <>
+            <Transactions {...transactions} />
+            {/* TODO: Remove display after new endpoint */}
+            <PaginationContainer style={{ display: 'none' }}>
+              <Pagination
+                count={totalTransactionsPage}
+                page={transactionsPage}
+                onPaginate={page => {
+                  setTransactionsPage(page);
+                }}
+              />
+            </PaginationContainer>
+          </>
+        );
       case 'Holders':
-        return <Holders asset={asset} holders={holders} />;
+        return (
+          <>
+            <Holders asset={asset} holders={holders} />
+            {/* TODO: Remove display after new endpoint */}
+            <PaginationContainer style={{ display: 'none' }}>
+              <Pagination
+                count={totalHoldersPage}
+                page={holdersPage}
+                onPaginate={page => {
+                  setHoldersPage(page);
+                }}
+              />
+            </PaginationContainer>
+          </>
+        );
       default:
         return <div />;
     }
@@ -255,6 +322,8 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
     asset: {} as IAsset,
     transactions: [],
     totalTransactions: 0,
+    totalHoldersPage: 0,
+    totalTransactionsPage: 0,
     holders: [],
   };
 
@@ -270,11 +339,12 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
   }
 
   const transactions: ITransactionResponse = await api.get({
-    route: `transactions/list?asset=${address}`,
+    route: `transaction/list?asset=${address}`,
   });
   if (!transactions.error) {
     props.transactions = transactions.data.transactions;
     props.totalTransactions = transactions.pagination.totalRecords;
+    props.totalTransactionsPage = transactions.pagination.totalPages;
   }
 
   const holders: IHoldersResponse = await api.get({
@@ -282,6 +352,7 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
   });
   if (!holders.error) {
     props.holders = holders.data.accounts;
+    props.totalHoldersPage = holders.pagination.totalPages;
   }
 
   return { props };

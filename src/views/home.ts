@@ -50,6 +50,16 @@ export const DataContainer = styled(Section)`
   padding: 5rem 10rem;
 
   background-color: #40274f;
+  background-image: radial-gradient(
+      at 29% 76%,
+      hsla(238, 30%, 34%, 1) 0,
+      transparent 50%
+    ),
+    radial-gradient(at 80% 0%, hsla(261, 87%, 60%, 1) 0, transparent 50%),
+    radial-gradient(at 80% 50%, hsla(240, 47%, 9%, 1) 0, transparent 50%),
+    radial-gradient(at 0% 100%, hsla(240, 47%, 9%, 1) 0, transparent 50%),
+    radial-gradient(at 80% 100%, hsla(255, 47%, 36%, 1) 0, transparent 50%),
+    radial-gradient(at 0% 0%, hsla(295, 57%, 46%, 1) 0, transparent 50%);
 
   @media (max-width: 768px) {
     padding: 5rem;

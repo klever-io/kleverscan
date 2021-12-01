@@ -28,6 +28,7 @@ import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
 
 interface IBlockStats {
+  total_blocks?: number;
   total_burned: number;
   total_block_rewards: number;
 }
@@ -282,7 +283,7 @@ export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
     route: 'block/statistics/1',
   });
   const totalStatistics: IStatisticsResponse = await api.get({
-    route: 'block/statistics/30',
+    route: 'block/statistics/0',
   });
   if (!yesterdayStatistics.error && !totalStatistics.error) {
     props.statistics = {

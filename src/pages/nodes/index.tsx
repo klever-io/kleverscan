@@ -167,12 +167,15 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const getBounds = require('svg-path-bounds');
 
   const countriesData: ICountriesGeoData = JSON.parse(JSON.stringify(geoData));
+  let peers: IPeerData[] = [];
 
   const statistics: IPeerResponse = await api.get({
     route: 'node/peerinfo',
   });
 
-  const { peers } = statistics.data;
+  if (!statistics.error) {
+    peers = statistics.data?.peers;
+  }
 
   const nodes: ICountryNode[] = [];
 
@@ -204,7 +207,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     }
   }
 
-  let mostNodes = nodes[0];
+  let mostNodes: ICountryNode = { country: 'Empty', nodes: [] };
   for (const node of nodes) {
     if (node.nodes.length > mostNodes.nodes.length) {
       mostNodes = node;
@@ -214,19 +217,28 @@ export const getServerSideProps: GetServerSideProps = async () => {
     feat => feat.id === getCountryISO3(mostNodes.country),
   );
 
+  let pathStrings: string[] = [];
+  let viewBox: number[] = [];
   const converter = geojson2svg({
     viewportSize: { width: 200, height: 200 },
     mapExtent: { left: -180, bottom: -180, right: 180, top: 180 },
     output: 'path',
     fitTo: 'height',
   });
-  const pathStrings = converter.convert(mostNodesCountryGeo);
-  const viewBox = getBounds(pathStrings.join(' '));
+  if (mostNodesCountryGeo) {
+    pathStrings = converter.convert(mostNodesCountryGeo);
+    viewBox = getBounds(pathStrings.join(' '));
+  }
 
   const totalNodes = nodes.reduce(
     (acc, node) => acc + (node.nodes.length || 0),
     0,
   );
+
+  const mostNodesOptions: any = {
+    scale: '1, 1',
+    translate: '0, 0',
+  };
 
   const cardData: ICard[] = [
     {
@@ -244,12 +256,14 @@ export const getServerSideProps: GetServerSideProps = async () => {
         String(mostNodes.nodes.length),
       ],
       chartType: 'map',
-      chartOptions: {
-        scale: `${200 / (viewBox[2] - viewBox[0])}, ${
-          200 / (viewBox[2] - viewBox[0])
-        }`,
-        translate: `${-viewBox[0]} ${-viewBox[1]}`,
-      },
+      chartOptions: viewBox.length
+        ? {
+            scale: `${200 / (viewBox[2] - viewBox[0])}, ${
+              200 / (viewBox[2] - viewBox[0])
+            }`,
+            translate: `${-viewBox[0]} ${-viewBox[1]}`,
+          }
+        : mostNodesOptions,
       chartData: pathStrings,
     },
   ];

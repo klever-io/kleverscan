@@ -247,6 +247,7 @@ var countryISOMapping = {
   ZM: 'ZMB',
   ZW: 'ZWE',
   XK: 'XKX',
+  Empty: '',
   Others: 'Others',
 };
 

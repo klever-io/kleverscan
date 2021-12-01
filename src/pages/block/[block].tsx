@@ -96,10 +96,6 @@ const Block: React.FC<IBlockPage> = ({
     fetchData();
   }, [transactionPage]);
 
-  const handleCopyInfo = (data: string) => {
-    navigator.clipboard.writeText(String(data));
-  };
-
   const Overview: React.FC = () => {
     return (
       <>

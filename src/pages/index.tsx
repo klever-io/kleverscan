@@ -164,8 +164,8 @@ interface ICard {
 
 const Home: React.FC<IHome> = ({
   blocks,
-  transactions,
   transactionsList,
+  transactions: defaultTransactions,
   totalAccounts: defaultTotalAccounts,
   totalTransactions: defaultTotalTransactions,
   tps,
@@ -180,6 +180,7 @@ const Home: React.FC<IHome> = ({
   const [listedBlocks, setListedBlocks] = useState<IBlock[]>(blocks);
   const [actualTPS, setActualTPS] = useState<string>(tps);
 
+  const [transactions, setTransactions] = useState(defaultTransactions);
   const [totalAccounts, setTotalAccounts] = useState(defaultTotalAccounts);
   const [totalTransactions, setTotalTransactions] = useState(
     defaultTotalTransactions,
@@ -231,6 +232,7 @@ const Home: React.FC<IHome> = ({
         route: 'transaction/list',
       });
       if (!transactions.error) {
+        setTransactions(transactions.data.transactions);
         setTotalTransactions(transactions.pagination.totalRecords);
       }
     }, cardWatcherInterval);

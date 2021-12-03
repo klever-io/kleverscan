@@ -58,10 +58,13 @@ export const toLocaleFixed = (value: number, precision: number): string => {
   });
 };
 
-export const hexToString = (hexStr: string) => {
-  var hex = hexStr.toString();
-  var retStr = '';
-  for (var i = 0; i < hex.length; i += 2)
-    retStr += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
-  return retStr;
+export const hexToString = (hex: string): string => {
+  const stringHex = hex.toString();
+  let ret = '';
+
+  for (let i = 0; i < stringHex.length; i += 2) {
+    ret += String.fromCharCode(parseInt(stringHex.substr(i, 2), 16));
+  }
+
+  return ret;
 };

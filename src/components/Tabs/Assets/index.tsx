@@ -83,7 +83,7 @@ const Assets: React.FC<IAssets> = props => {
           <span>{ticker}</span>
         </span>
         <span>
-          <Link href={`asset/${address}`}>{address}</Link>
+          <Link href={`/asset/${address}`}>{address}</Link>
         </span>
         <span>{type}</span>
         <span>

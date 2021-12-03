@@ -32,7 +32,15 @@ const transactions = css`
   }
 
   &:nth-child(8) {
-    width: 10rem;
+    width: 5rem;
+  }
+
+  &:nth-child(9) {
+    width: 7rem;
+  }
+
+  &:nth-child(10) {
+    width: 8rem;
   }
 `;
 

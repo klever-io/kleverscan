@@ -119,16 +119,22 @@ const Blocks: React.FC<IBlocks> = ({
       title: 'Block Reward',
       headers: ['Reward Yesterday', 'Cumulative Revenue'],
       values: [
-        `${formatAmount(statistics.yesterday.total_block_rewards)} KLV`,
-        `${formatAmount(statistics.total.total_block_rewards)} KLV`,
+        `${formatAmount(
+          statistics.yesterday.total_block_rewards / 10 ** precision,
+        )} KLV`,
+        `${formatAmount(
+          statistics.total.total_block_rewards / 10 ** precision,
+        )} KLV`,
       ],
     },
     {
       title: 'Stats on Burned KLV',
       headers: ['Burned Yesterday', 'Burned in Total'],
       values: [
-        `${formatAmount(statistics.yesterday.total_burned)} KLV`,
-        `${formatAmount(statistics.total.total_burned)} KLV`,
+        `${formatAmount(
+          statistics.yesterday.total_burned / 10 ** precision,
+        )} KLV`,
+        `${formatAmount(statistics.total.total_burned / 10 ** precision)} KLV`,
       ],
     },
   ];

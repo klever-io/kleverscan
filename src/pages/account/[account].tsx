@@ -75,7 +75,7 @@ const Account: React.FC<IAccountPage> = ({
       setLoading(true);
 
       const response: ITransactionsResponse = await api.get({
-        route: `transaction/list?page=${page}`,
+        route: `address/${account.address}/transactions?page=${page}`,
       });
       if (!response.error) {
         setTransactions(response.data.transactions);
@@ -85,7 +85,7 @@ const Account: React.FC<IAccountPage> = ({
     };
 
     fetchData();
-  }, [page]);
+  }, [page, account.address]);
 
   const getFreezeBalance = () => {
     if (Object.values(account.buckets).length <= 0) {

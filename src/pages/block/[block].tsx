@@ -4,8 +4,6 @@ import { useRouter } from 'next/router';
 
 import { format, fromUnixTime } from 'date-fns';
 
-import { ArrowLeft } from '@/assets/icons';
-
 import {
   AssetTitle,
   CardContainer,
@@ -19,16 +17,19 @@ import {
   Title,
 } from '@/views/assets/detail';
 
+import { CenteredRow } from '@/views/transactions/detail';
+
 import Tabs, { ITabs } from '@/components/Tabs';
 import Transactions from '@/components/Tabs/Transactions';
 import Copy from '@/components/Copy';
+import Pagination from '@/components/Pagination';
+import { PaginationContainer } from '@/components/Pagination/styles';
 
 import { IBlock, IPagination, IResponse, ITransaction } from '../../types';
 import api from '@/services/api';
-import { CenteredRow } from '@/views/transactions/detail';
-import { formatAmount } from '@/utils/index';
-import { PaginationContainer } from '@/components/Pagination/styles';
-import Pagination from '@/components/Pagination';
+import { toLocaleFixed } from '@/utils/index';
+
+import { ArrowLeft } from '@/assets/icons';
 
 interface IBlockPage {
   block: IBlock;
@@ -61,6 +62,8 @@ const Block: React.FC<IBlockPage> = ({
     epoch,
     size,
     kAppFees,
+    txFees,
+    burnedFees,
     softwareVersion,
     chainID,
     producerSignature,
@@ -142,9 +145,33 @@ const Block: React.FC<IBlockPage> = ({
         </Row>
         <Row>
           <span>
-            <strong>kApp Fee</strong>
+            <strong>KApp Fee</strong>
           </span>
-          <span>{formatAmount((kAppFees || 0) / 10 ** precision)}</span>
+          <span>
+            <small>
+              {toLocaleFixed((kAppFees || 0) / 10 ** precision, precision)}
+            </small>
+          </span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Burned Fee</strong>
+          </span>
+          <span>
+            <small>
+              {toLocaleFixed((burnedFees || 0) / 10 ** precision, precision)}
+            </small>
+          </span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Bandwidth Fee</strong>
+          </span>
+          <span>
+            <small>
+              {toLocaleFixed((txFees || 0) / 10 ** precision, precision)}
+            </small>
+          </span>
         </Row>
       </>
     );

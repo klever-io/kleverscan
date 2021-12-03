@@ -39,7 +39,7 @@ export const Header = styled.div<ITableType>`
   font-size: 0.85rem;
 
   span {
-    flex: 1;
+    /* flex: 1; */
     ${props => widths[props.type]}
 
     ${props =>
@@ -78,7 +78,7 @@ export const Row = styled.div<ITableType>`
   border-radius: 0.5rem;
 
   span {
-    flex: 1;
+    /* flex: 1; */
     overflow: hidden;
 
     text-overflow: ellipsis;

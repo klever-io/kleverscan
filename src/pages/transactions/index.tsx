@@ -74,6 +74,7 @@ const Transactions: React.FC<ITransactions> = ({
   const [loading, setLoading] = useState(false);
   const [transactions, setTransactions] = useState(defaultTransactions);
   const [page, setPage] = useState(0);
+  const [count, setCount] = useState(pagination.totalPages);
 
   const [transactionType, setTransactionType] = useState(defaultFilter);
   const [statusType, setStatusType] = useState(defaultFilter);
@@ -82,7 +83,10 @@ const Transactions: React.FC<ITransactions> = ({
   const filters: IFilter[] = [
     {
       title: 'Coin',
-      data: assets.map(asset => ({ name: asset.ticker, value: asset.address })),
+      data: assets.map(asset => ({
+        name: asset.address,
+        value: asset.address,
+      })),
       onClick: selected => {
         if (coinType.value !== selected.value) {
           setCoinType(selected);
@@ -152,6 +156,7 @@ const Transactions: React.FC<ITransactions> = ({
       });
       if (!response.error) {
         setTransactions(response.data.transactions);
+        setCount(response.pagination.totalPages);
       }
 
       setLoading(false);
@@ -303,7 +308,13 @@ const Transactions: React.FC<ITransactions> = ({
         break;
     }
 
-    return header.concat(newHeaders);
+    console.log(transactionType);
+
+    if (transactionType.value !== 'all') {
+      return header.splice(0, header.length - 2).concat(newHeaders);
+    }
+
+    return header;
   };
 
   const TableBody: React.FC<ITransaction> = props => {
@@ -351,12 +362,16 @@ const Transactions: React.FC<ITransactions> = ({
         <span>
           <strong>{contractType}</strong>
         </span>
-        <span>
-          <strong>{formatAmount(kAppFee / 10 ** precision)}</strong>
-        </span>
-        <span>
-          <strong>{formatAmount(bandwidthFee / 10 ** precision)}</strong>
-        </span>
+        {transactionType.value === 'all' && (
+          <>
+            <span>
+              <strong>{formatAmount(kAppFee / 10 ** precision)}</strong>
+            </span>
+            <span>
+              <strong>{formatAmount(bandwidthFee / 10 ** precision)}</strong>
+            </span>
+          </>
+        )}
 
         <FilteredComponent {...props} />
       </Row>
@@ -394,7 +409,7 @@ const Transactions: React.FC<ITransactions> = ({
       <Table {...tableProps} />
       <PaginationContainer>
         <Pagination
-          count={pagination.totalPages}
+          count={count}
           page={page}
           onPaginate={page => {
             setPage(page);

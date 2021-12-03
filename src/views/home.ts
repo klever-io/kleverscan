@@ -416,7 +416,7 @@ export const TransactionContainer = styled.div`
 
   flex-direction: row;
 
-  gap: 1rem;
+  gap: 2rem;
 
   @media (max-width: 1024px) {
     flex-direction: column;
@@ -460,6 +460,9 @@ export const TransactionContent = styled.div`
     width: 100% !important;
     min-width: unset;
   }
+  @media (max-width: 1024px) {
+    min-width: 0;
+  }
 `;
 
 export const TransactionRow = styled.div`
@@ -467,6 +470,8 @@ export const TransactionRow = styled.div`
 
   flex-direction: row;
   align-items: center;
+
+  gap: 2.5rem;
 
   &:not(:last-child) {
     margin-bottom: 2rem;

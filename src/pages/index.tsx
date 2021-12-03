@@ -331,8 +331,12 @@ const Home: React.FC<IHome> = ({
     );
     return sortedTransactionsList.map(transaction => {
       if (transaction.key) {
+        // Create date object
+        const date = new Date(transaction.key);
+        // Set timezone to UTC
+        date.setTime(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
         return {
-          date: format(fromUnixTime(transaction.key / 1000), 'dd MMM'),
+          date: format(date, 'dd MMM'),
           value: transaction.doc_count,
         };
       }
@@ -348,6 +352,7 @@ const Home: React.FC<IHome> = ({
     blockRewards,
     blockIndex,
     txCount,
+    burnedFees,
   }) => (
     <BlockCardContainer blockIndex={blockIndex}>
       <BlockCardRow>
@@ -362,7 +367,7 @@ const Home: React.FC<IHome> = ({
       </BlockCardRow>
       <BlockCardRow>
         <p>Burned</p>
-        <span>142</span>
+        <span>{formatAmount((burnedFees || 0) / 10 ** precision)} KLV</span>
       </BlockCardRow>
       <BlockCardRow>
         <p>Transactions</p>

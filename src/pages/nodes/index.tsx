@@ -182,16 +182,27 @@ export const getServerSideProps: GetServerSideProps = async () => {
   for (let i = 0; i < peers.length; i++) {
     const { addresses } = peers[i];
     const filteredAddresses = addresses.filter((item, pos, self) => {
-      return self.indexOf(item) === pos && !item.startsWith('/ip4/127.0.0.1');
+      return self.indexOf(item) === pos &&
+        !item.startsWith('/ip4/127.0.0.1') &&
+        !item.startsWith('/ip4/10.') &&
+        !item.startsWith('/ip4/172.16.') &&
+        !item.startsWith('/ip4/172.17.') &&
+        !item.startsWith('.255/tcp');
+
     });
     for (const address of filteredAddresses) {
       // IP comes as /ip4/xx.xx.x.xx/tcp/xxxxx
       const cleanIp = address.replace(/\/ip4\/|\/tcp\/[^\/]*$/g, '');
-      // temporary geoip fix
-      if (cleanIp === '35.200.204.226') continue;
 
       const geo: IGeoIPLookup = geoip.lookup(cleanIp);
       if (geo === null) continue;
+
+      // TODO: manually allocate node
+      if (cleanIp=="35.200.204.226") {
+        geo.country = "IN";
+        geo.ll[0] = 19.07;
+        geo.ll[1] = 72.88;
+      }
 
       const { country, ll } = geo;
 
@@ -207,12 +218,9 @@ export const getServerSideProps: GetServerSideProps = async () => {
     }
   }
 
-  let mostNodes: ICountryNode = { country: 'Empty', nodes: [] };
-  for (const node of nodes) {
-    if (node.nodes.length > mostNodes.nodes.length) {
-      mostNodes = node;
-    }
-  }
+  nodes.sort((a,b) => (a.nodes.length > b.nodes.length) ? -1 : ((b.nodes.length > a.nodes.length) ? 1 : 0));
+  const mostNodes: ICountryNode = nodes?nodes[0]: { country: 'Empty', nodes: [] };
+  
   const mostNodesCountryGeo = countriesData.features.find(
     feat => feat.id === getCountryISO3(mostNodes.country),
   );

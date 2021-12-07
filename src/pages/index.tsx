@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { format, fromUnixTime } from 'date-fns';
 
 import {
@@ -42,7 +43,6 @@ import {
 import Chart, { ChartType } from '@/components/Chart';
 
 import { Accounts, Transactions } from '@/assets/cards';
-import { KFILogo } from '@/assets/coins';
 
 import api, { Service } from '@/services/api';
 
@@ -262,17 +262,6 @@ const Home: React.FC<IHome> = ({
     },
   ];
 
-  const getIcon = useCallback(() => {
-    const icons = {
-      KLV: KFILogo,
-      KFI: KFILogo,
-    };
-
-    const SelectedIcon = icons[coinData.shortname];
-
-    return <SelectedIcon />;
-  }, []);
-
   const handleSelectionCoin = useCallback(
     (index: number) => {
       if (selectedCoin !== index) {
@@ -411,7 +400,14 @@ const Home: React.FC<IHome> = ({
           <CoinDataCard>
             <CoinDataContent>
               <CoinDataHeaderContainer>
-                <IconContainer>{getIcon()}</IconContainer>
+                <IconContainer>
+                  <Image
+                    src={`/coins/${coinData.shortname}.png`}
+                    alt="Coin"
+                    width="50"
+                    height="50"
+                  />
+                </IconContainer>
                 <CoinDataHeader>
                   <CoinDataName>
                     <span>{coinData.shortname}</span>

@@ -1,12 +1,14 @@
 import React from 'react';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 import {
   Container,
   DescriptionContainer,
   LinkItems,
   LinksContainer,
+  LogoContainer,
   SocialContainer,
   SocialIcon,
 } from './styles';
@@ -19,7 +21,6 @@ import {
   socials,
 } from '@/configs/footer';
 
-import Logo from '../../assets/footer-logo.svg';
 import { ChevronRight } from '@/assets/icons';
 
 const Footer: React.FC = () => {
@@ -45,7 +46,9 @@ const Footer: React.FC = () => {
   return (
     <Container>
       <DescriptionContainer>
-        <Logo />
+        <LogoContainer>
+          <Image src="/logo-small.png" alt="Logo" width="224" height="28" />
+        </LogoContainer>
         <span>{description}</span>
         <SocialContainer>
           {socials.map((social, index) => (

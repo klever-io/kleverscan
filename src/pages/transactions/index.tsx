@@ -308,8 +308,6 @@ const Transactions: React.FC<ITransactions> = ({
         break;
     }
 
-    console.log(transactionType);
-
     if (transactionType.value !== 'all') {
       return header.splice(0, header.length - 2).concat(newHeaders);
     }

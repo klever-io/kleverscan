@@ -582,7 +582,7 @@ export const TransactionChartContent = styled.div`
   position: absolute;
 
   bottom: 0;
-  left: -1rem;
+  left: 0;
 
   width: 95%;
   height: 80%;

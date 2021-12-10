@@ -40,6 +40,17 @@ export const DescriptionContainer = styled.div`
   }
 `;
 
+export const LogoContainer = styled.div`
+  img {
+    position: unset !important;
+    display: unset !important;
+    min-width: unset !important;
+    max-width: unset !important;
+    height: 28px !important;
+    width: 224px !important;
+  }
+`;
+
 export const SocialContainer = styled.div`
   display: flex;
 

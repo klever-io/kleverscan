@@ -1,6 +1,5 @@
 import styled, { css } from 'styled-components';
 
-import LogoSvg from '../../assets/new-logo.svg';
 import { FiMenu } from 'react-icons/fi';
 
 import { default as DefaultInput } from '../Inputt';
@@ -32,7 +31,7 @@ export const Container = styled.div`
   }
 `;
 
-export const Logo = styled(LogoSvg)`
+export const Logo = styled.div`
   margin-right: 0.5rem;
 
   cursor: pointer;

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { format, fromUnixTime } from 'date-fns';
 
 import {
@@ -42,7 +43,6 @@ import {
 import Chart, { ChartType } from '@/components/Chart';
 
 import { Accounts, Transactions } from '@/assets/cards';
-import { KFILogo } from '@/assets/coins';
 
 import api, { Service } from '@/services/api';
 
@@ -164,8 +164,8 @@ interface ICard {
 
 const Home: React.FC<IHome> = ({
   blocks,
-  transactions,
   transactionsList,
+  transactions: defaultTransactions,
   totalAccounts: defaultTotalAccounts,
   totalTransactions: defaultTotalTransactions,
   tps,
@@ -180,6 +180,7 @@ const Home: React.FC<IHome> = ({
   const [listedBlocks, setListedBlocks] = useState<IBlock[]>(blocks);
   const [actualTPS, setActualTPS] = useState<string>(tps);
 
+  const [transactions, setTransactions] = useState(defaultTransactions);
   const [totalAccounts, setTotalAccounts] = useState(defaultTotalAccounts);
   const [totalTransactions, setTotalTransactions] = useState(
     defaultTotalTransactions,
@@ -231,6 +232,7 @@ const Home: React.FC<IHome> = ({
         route: 'transaction/list',
       });
       if (!transactions.error) {
+        setTransactions(transactions.data.transactions);
         setTotalTransactions(transactions.pagination.totalRecords);
       }
     }, cardWatcherInterval);
@@ -259,17 +261,6 @@ const Home: React.FC<IHome> = ({
       variation: `+ ${yeasterdayTransactions.toLocaleString()}`,
     },
   ];
-
-  const getIcon = useCallback(() => {
-    const icons = {
-      KLV: KFILogo,
-      KFI: KFILogo,
-    };
-
-    const SelectedIcon = icons[coinData.shortname];
-
-    return <SelectedIcon />;
-  }, []);
 
   const handleSelectionCoin = useCallback(
     (index: number) => {
@@ -409,7 +400,14 @@ const Home: React.FC<IHome> = ({
           <CoinDataCard>
             <CoinDataContent>
               <CoinDataHeaderContainer>
-                <IconContainer>{getIcon()}</IconContainer>
+                <IconContainer>
+                  <Image
+                    src={`/coins/${coinData.shortname}.png`}
+                    alt="Coin"
+                    width="50"
+                    height="50"
+                  />
+                </IconContainer>
                 <CoinDataHeader>
                   <CoinDataName>
                     <span>{coinData.shortname}</span>

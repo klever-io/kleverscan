@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 
 import {
@@ -66,7 +67,9 @@ const Navbar: React.FC = () => {
     <>
       <Container>
         <Link href="/">
-          <Logo onClick={handleClose} />
+          <Logo onClick={handleClose}>
+            <Image src="/logo-large.png" alt="Logo" width="215" height="29" />
+          </Logo>
         </Link>
 
         <DesktopContainer>

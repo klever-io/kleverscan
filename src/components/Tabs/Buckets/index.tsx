@@ -22,6 +22,7 @@ const Buckets: React.FC<IBuckets> = props => {
   }));
 
   const UINT32_MAX = 4294967295;
+  const precision = 6; // default KLV precision
 
   const TableBody: React.FC<IBucketData> = ({
     stakeValue,
@@ -33,7 +34,7 @@ const Buckets: React.FC<IBuckets> = props => {
     return (
       <Row type="buckets">
         <span>
-          <p>{stakeValue.toLocaleString()}</p>
+          <p>{(stakeValue / 10 ** precision).toLocaleString()}</p>
         </span>
         <Status staked={staked}>{staked ? 'True' : 'False'}</Status>
         <span>{stakedEpoch.toLocaleString()}</span>

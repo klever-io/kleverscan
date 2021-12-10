@@ -102,10 +102,6 @@ const withoutBody = async (props: IProps, method: Method): Promise<any> => {
   try {
     const { route, query, service, apiVersion } = getProps(props);
 
-    if (service === Service.PRICE) {
-      // console.log(getHost(route, query, service, apiVersion));
-    }
-
     const response = await fetch(getHost(route, query, service, apiVersion), {
       method: method.toString(),
       headers: {

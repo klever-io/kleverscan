@@ -115,6 +115,7 @@ export interface ITransaction {
   kAppFee: number;
   bandwidthFee: number;
   status: string;
+  resultCode: string;
   contract: IContract[];
   receipt: IReceipt[];
 }

@@ -74,6 +74,7 @@ const klvAsset: IAsset = {
 const Transaction: React.FC<ITransactionPage> = ({
   hash,
   status,
+  resultCode,
   sender,
   data,
   kAppFee,
@@ -431,6 +432,14 @@ const Transaction: React.FC<ITransactionPage> = ({
               <StatusIcon />
               <span>{status}</span>
             </Status>
+          </Row>
+          <Row>
+            <span>
+              <strong>Result Code</strong>
+            </span>
+            <span>
+              <p>{resultCode}</p>
+            </span>
           </Row>
           <Row>
             <span>

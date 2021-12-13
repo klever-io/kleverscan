@@ -140,7 +140,7 @@ const Transaction: React.FC<ITransactionPage> = ({
                   )}
                 </strong>
                 <KLV style={{ marginLeft: '1rem' }} />
-                <strong>{coin.ticker}</strong>
+                <Link href={`/asset/${coin.address}`}>{coin.address}</Link>
               </>
             )}
           </CenteredRow>

@@ -511,14 +511,15 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
     yeasterdayTransactions: 0,
   };
 
-  const blocks: IBlockResponse = await api.get({
+  const blocks: IBlockResponse = await api.getCached({
     route: 'block/list',
+    refreshTime: 4,
   });
   if (!blocks.error) {
     props.blocks = blocks.data.blocks;
   }
 
-  const transactions: ITransactionResponse = await api.get({
+  const transactions: ITransactionResponse = await api.getCached({
     route: 'transaction/list',
   });
   if (!transactions.error) {
@@ -526,7 +527,7 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
     props.totalTransactions = transactions.pagination.totalRecords;
   }
 
-  const transactionsList: ITransactionListResponse = await api.get({
+  const transactionsList: ITransactionListResponse = await api.getCached({
     route: 'transaction/list/count/15',
   });
   if (!transactionsList.error) {
@@ -534,12 +535,14 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
     props.transactionsList = number_by_day;
   }
 
-  const accounts: IAccountResponse = await api.get({ route: 'address/list' });
+  const accounts: IAccountResponse = await api.getCached({
+    route: 'address/list',
+  });
   if (!accounts.error) {
     props.totalAccounts = accounts.pagination.totalRecords;
   }
 
-  const statistics: IStatisticsResponse = await api.get({
+  const statistics: IStatisticsResponse = await api.getCached({
     route: 'node/statistics',
     service: Service.NODE,
   });
@@ -572,21 +575,21 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
     });
   };
 
-  const klvData: IGeckoResponse = await api.get({
+  const klvData: IGeckoResponse = await api.getCached({
     route: 'coins/klever',
     service: Service.GECKO,
   });
-  const klvChart: IGeckoChartResponse = await api.get({
+  const klvChart: IGeckoChartResponse = await api.getCached({
     route: `coins/klever/market_chart?vs_currency=usd&days=1`,
     service: Service.GECKO,
   });
   pushCoinData('Klever', 'KLV', klvData, klvChart);
 
-  const kfiData: IGeckoResponse = await api.get({
+  const kfiData: IGeckoResponse = await api.getCached({
     route: 'coins/klever-finance',
     service: Service.GECKO,
   });
-  const kfiChart: IGeckoChartResponse = await api.get({
+  const kfiChart: IGeckoChartResponse = await api.getCached({
     route: `coins/klever-finance/market_chart?vs_currency=usd&days=1`,
     service: Service.GECKO,
   });
@@ -595,7 +598,7 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
     150000 * kfiData.market_data.current_price.usd;
   pushCoinData('Klever Finance', 'KFI', kfiData, kfiChart);
 
-  const yesterdayTransactions: IYesterdayResponse = await api.get({
+  const yesterdayTransactions: IYesterdayResponse = await api.getCached({
     route: 'transaction/list/count/1',
   });
   if (!yesterdayTransactions.error) {

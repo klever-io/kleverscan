@@ -50,6 +50,7 @@ import { formatAmount, getAge } from '../utils';
 
 import Carousel from '@/components/Carousel';
 import CoinCard from '@/components/Cards/CoinCard';
+import Maintenance from '@/components/Maintenance';
 
 export interface ICoinInfo {
   name: string;
@@ -337,6 +338,7 @@ const Home: React.FC<IHome> = ({
   return (
     <Container>
       <DataContainer>
+        <Maintenance />
         <Input />
 
         <DataCardsContainer>

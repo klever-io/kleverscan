@@ -52,7 +52,9 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS }) => {
             <CardContainer key={String(index)}>
               <CardContent>
                 <HeaderContainer>
-                  <IconContainer src={`/coins/${coin.shortname}.png`} />
+                  <IconContainer
+                    src={`/coins/${coin.shortname.toLowerCase()}.png`}
+                  />
 
                   <HeaderContent>
                     <Name>

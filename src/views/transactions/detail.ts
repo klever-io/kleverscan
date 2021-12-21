@@ -160,6 +160,12 @@ export const CenteredRow = styled.div`
     cursor: pointer;
   }
 
+  a {
+    color: ${props => props.theme.black};
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
   @media (max-width: 768px) {
     width: 100%;
   }

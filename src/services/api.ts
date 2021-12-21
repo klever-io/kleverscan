@@ -19,6 +19,7 @@ export enum Service {
   PRICE,
   NODE,
   GECKO,
+  EXPLORER,
 }
 
 export interface IProps {
@@ -27,6 +28,7 @@ export interface IProps {
   body?: any;
   apiVersion?: string;
   service?: Service;
+  refreshTime?: number;
 }
 
 const buildUrlQuery = (query: IQuery): string =>
@@ -49,6 +51,7 @@ const getHost = (
     [Service.NODE]:
       process.env.DEFAULT_NODE_HOST || 'https://node.testnet.klever.finance',
     [Service.GECKO]: 'https://api.coingecko.com/api/v3',
+    [Service.EXPLORER]: 'http://localhost:3000',
   };
 
   let host = hostService[service];
@@ -79,6 +82,7 @@ const getProps = (props: IProps) => {
     route: '/',
     service: Service.PROXY,
     apiVersion: process.env.DEFAULT_API_VERSION || 'v1.0',
+    refreshTime: 60,
   };
 
   const get = (target: any, name: string) => {
@@ -160,11 +164,42 @@ const withTimeout = async (promise: Promise<any>, timeout = 5000) => {
   ]);
 };
 
+const getCached = async (props: IProps): Promise<any> => {
+  try {
+    const { route, query, service, apiVersion, refreshTime } = getProps(props);
+
+    const body = { route, service, refreshTime };
+
+    const response = await fetch(
+      getHost('api/data', query, Service.EXPLORER, apiVersion),
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      },
+    );
+    if (!response.ok) {
+      return Promise.resolve({
+        data: null,
+        error: response.statusText,
+        code: 'internal_error',
+      });
+    }
+
+    return response.json();
+  } catch (error) {
+    return Promise.resolve({ data: null, error, code: 'internal_error' });
+  }
+};
+
 const api = {
   get: async (props: IProps): Promise<any> =>
     withTimeout(withoutBody(props, Method.GET)),
   post: async (props: IProps): Promise<any> =>
     withTimeout(withBody(props, Method.POST)),
+  getCached,
 };
 
 export default api;

@@ -8,13 +8,25 @@ interface IVariation {
   positive: boolean;
 }
 
-const FadeIn = keyframes`
+const PushFade = keyframes`
   0% {
     opacity: 0;
+    transform: translateX(-17.25rem);
   }
 
   100% {
     opacity: 1;
+    transform: translateX(0rem);
+  }
+`;
+
+const PullFade = keyframes`
+  0% {
+    transform: translateX(-17.25rem);
+  }
+
+  100% {
+    transform: translateX(0rem);
   }
 `;
 
@@ -173,151 +185,6 @@ export const DataCardLatest = styled.div<IVariation>`
   }
 `;
 
-export const CoinDataCard = styled(DataCard)`
-  width: auto;
-  height: 16rem;
-
-  flex-direction: column;
-
-  position: relative;
-
-  @media (max-width: 768px) {
-    width: 100%;
-  }
-`;
-
-export const CoinDataContent = styled.div`
-  min-width: 18.5rem;
-
-  display: flex;
-
-  flex-direction: column;
-
-  animation: 1.5s ease 0s 1 normal none running ${FadeIn};
-
-  @media (max-width: 768px) {
-    width: 100%;
-  }
-`;
-
-export const CoinDataHeaderContainer = styled.div`
-  display: flex;
-
-  flex-direction: row;
-
-  z-index: 3;
-`;
-
-export const CoinDataHeader = styled(CoinDataHeaderContainer)`
-  width: 100%;
-
-  flex-direction: column;
-`;
-
-export const CoinDataName = styled.div`
-  display: flex;
-
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-
-  color: ${props => props.theme.white};
-  font-weight: 600;
-
-  span {
-    font-size: 1.1rem;
-  }
-`;
-
-export const CoinDataDescription = styled(CoinDataName)<IVariation>`
-  font-size: 0.95rem;
-  font-weight: 400;
-
-  span {
-    color: ${props => props.theme.card.text};
-    font-size: 0.85rem;
-  }
-
-  p {
-    color: ${props => props.theme.card[props.positive ? 'green' : 'red']};
-    font-weight: 500;
-  }
-`;
-
-export const CoinChartContainer = styled.div`
-  padding: 0 1.25rem;
-
-  height: 7.5rem;
-  width: 100%;
-
-  top: 1.5rem;
-  left: 0;
-
-  position: absolute;
-
-  z-index: 1;
-`;
-
-export const CoinValueContainer = styled.div`
-  margin-top: 3rem;
-`;
-
-export const CoinValueContent = styled.div`
-  display: flex;
-
-  flex-direction: column;
-
-  font-weight: 400;
-  color: ${props => props.theme.card.text};
-
-  gap: 0.25rem;
-
-  &:not(:last-child) {
-    margin-bottom: 0.5rem;
-  }
-
-  p {
-    font-size: 0.85rem;
-  }
-`;
-
-export const CoinValueDetail = styled.div<{ positive?: boolean }>`
-  display: flex;
-
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-
-  span {
-    color: ${props => props.theme.white};
-    font-size: 0.95rem;
-    font-weight: 600;
-  }
-
-  p {
-    color: ${props => {
-      if (props.positive === undefined) {
-        return props.theme.card.text;
-      }
-
-      return props.theme.card[props.positive ? 'green' : 'red'];
-    }};
-  }
-`;
-
-export const CoinSelectorContainer = styled.div`
-  bottom: -1.5rem;
-  left: 50%;
-
-  position: absolute;
-
-  display: flex;
-
-  flex-direction: row;
-
-  gap: 0.75rem;
-`;
-
 export const CoinSelector = styled.div<{ isSelected: boolean }>`
   width: 0.5rem;
   height: 0.5rem;
@@ -344,13 +211,19 @@ export const BlockCardContainer = styled.div<BlockCardContainerProps>`
   border-radius: 1rem;
 
   ${props =>
-    props.blockIndex === 0 &&
-    css`
-      transition: 2s all ease-in-out;
+    props.blockIndex === 0
+      ? css`
+          transition: 1s all ease;
 
-      animation: ${FadeIn} 1s 1;
-      animation-fill-mode: forwards;
-    `}
+          animation: ${PushFade} 2s 1;
+          animation-fill-mode: forwards;
+        `
+      : css`
+          transition: 1s all ease;
+
+          animation: ${PullFade} 2s 1;
+          animation-fill-mode: forwards;
+        `}
 `;
 
 export const BlockCardRow = styled.div`

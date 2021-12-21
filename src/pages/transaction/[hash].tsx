@@ -74,6 +74,7 @@ const klvAsset: IAsset = {
 const Transaction: React.FC<ITransactionPage> = ({
   hash,
   status,
+  resultCode,
   sender,
   data,
   kAppFee,
@@ -139,7 +140,7 @@ const Transaction: React.FC<ITransactionPage> = ({
                   )}
                 </strong>
                 <KLV style={{ marginLeft: '1rem' }} />
-                <strong>{coin.ticker}</strong>
+                <Link href={`/asset/${coin.address}`}>{coin.address}</Link>
               </>
             )}
           </CenteredRow>
@@ -431,6 +432,14 @@ const Transaction: React.FC<ITransactionPage> = ({
               <StatusIcon />
               <span>{status}</span>
             </Status>
+          </Row>
+          <Row>
+            <span>
+              <strong>Result Code</strong>
+            </span>
+            <span>
+              <p>{resultCode}</p>
+            </span>
           </Row>
           <Row>
             <span>

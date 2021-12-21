@@ -1,24 +1,11 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
 import { format, fromUnixTime } from 'date-fns';
 
 import {
   BlockCardContainer,
-  CoinChartContainer,
-  CoinDataCard,
-  CoinDataContent,
-  CoinDataDescription,
-  CoinDataHeader,
-  CoinDataHeaderContainer,
-  CoinDataName,
-  CoinSelector,
-  CoinSelectorContainer,
-  CoinValueContainer,
-  CoinValueContent,
-  CoinValueDetail,
   Container,
   DataCard,
   DataCardLatest,
@@ -62,8 +49,10 @@ import { IChartData } from '@/configs/home';
 import { formatAmount, getAge } from '../utils';
 
 import Carousel from '@/components/Carousel';
+import CoinCard from '@/components/Cards/CoinCard';
+import Maintenance from '@/components/Maintenance';
 
-interface ICoinInfo {
+export interface ICoinInfo {
   name: string;
   shortname: string;
   price: number;
@@ -186,8 +175,6 @@ const Home: React.FC<IHome> = ({
     defaultTotalTransactions,
   );
 
-  const [selectedCoin, setSelectedCoin] = useState(0);
-
   // Block Watcher
 
   useEffect(() => {
@@ -243,10 +230,6 @@ const Home: React.FC<IHome> = ({
     };
   });
 
-  const coinData = useMemo(() => {
-    return coinsData[selectedCoin];
-  }, [selectedCoin]);
-
   const dataCards: ICard[] = [
     {
       Icon: Accounts,
@@ -261,25 +244,6 @@ const Home: React.FC<IHome> = ({
       variation: `+ ${yeasterdayTransactions.toLocaleString()}`,
     },
   ];
-
-  const handleSelectionCoin = useCallback(
-    (index: number) => {
-      if (selectedCoin !== index) {
-        setSelectedCoin(index);
-      }
-    },
-    [selectedCoin],
-  );
-
-  const getVariation = useCallback((variation: number) => {
-    const precision = 2;
-
-    if (variation < 0) {
-      return `- ${Math.abs(variation).toFixed(precision)}%`;
-    }
-
-    return `+ ${variation.toFixed(precision)}%`;
-  }, []);
 
   const TransactionItem: React.FC<ITransaction> = ({
     hash,
@@ -374,6 +338,7 @@ const Home: React.FC<IHome> = ({
   return (
     <Container>
       <DataContainer>
+        <Maintenance />
         <Input />
 
         <DataCardsContainer>
@@ -397,66 +362,7 @@ const Home: React.FC<IHome> = ({
             ))}
           </DataCardsContent>
 
-          <CoinDataCard>
-            <CoinDataContent>
-              <CoinDataHeaderContainer>
-                <IconContainer>
-                  <Image
-                    src={`/coins/${coinData.shortname}.png`}
-                    alt="Coin"
-                    width="50"
-                    height="50"
-                  />
-                </IconContainer>
-                <CoinDataHeader>
-                  <CoinDataName>
-                    <span>{coinData.shortname}</span>
-                    <span>U$ {coinData.price.toLocaleString()}</span>
-                  </CoinDataName>
-                  <CoinDataDescription
-                    positive={getVariation(coinData.variation).includes('+')}
-                  >
-                    <span>{coinData.name}</span>
-                    <p>{getVariation(coinData.variation)}</p>
-                  </CoinDataDescription>
-                </CoinDataHeader>
-              </CoinDataHeaderContainer>
-
-              <CoinChartContainer>
-                <Chart data={coinData.prices} />
-              </CoinChartContainer>
-
-              <CoinValueContainer>
-                {[coinData.marketCap, coinData.volume].map((item, index) => (
-                  <CoinValueContent key={String(index)}>
-                    <p>{index === 0 ? 'Market Cap' : 'Volume'}</p>
-                    <CoinValueDetail
-                      positive={getVariation(item.variation).includes('+')}
-                    >
-                      <span>$ {item.price.toLocaleString()}</span>
-                      <p>{getVariation(item.variation)}</p>
-                    </CoinValueDetail>
-                  </CoinValueContent>
-                ))}
-                <CoinValueContent>
-                  <CoinValueDetail>
-                    <p>Live/Peak TPS</p>
-                    <span>{actualTPS}</span>
-                  </CoinValueDetail>
-                </CoinValueContent>
-              </CoinValueContainer>
-            </CoinDataContent>
-
-            <CoinSelectorContainer>
-              {coinsData.map((_, index) => (
-                <CoinSelector
-                  key={String(index)}
-                  onClick={() => handleSelectionCoin(index)}
-                  isSelected={selectedCoin === index}
-                />
-              ))}
-            </CoinSelectorContainer>
-          </CoinDataCard>
+          <CoinCard coins={coinsData} actualTPS={actualTPS} />
         </DataCardsContainer>
       </DataContainer>
 
@@ -511,14 +417,15 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
     yeasterdayTransactions: 0,
   };
 
-  const blocks: IBlockResponse = await api.get({
+  const blocks: IBlockResponse = await api.getCached({
     route: 'block/list',
+    refreshTime: 4,
   });
   if (!blocks.error) {
     props.blocks = blocks.data.blocks;
   }
 
-  const transactions: ITransactionResponse = await api.get({
+  const transactions: ITransactionResponse = await api.getCached({
     route: 'transaction/list',
   });
   if (!transactions.error) {
@@ -526,7 +433,7 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
     props.totalTransactions = transactions.pagination.totalRecords;
   }
 
-  const transactionsList: ITransactionListResponse = await api.get({
+  const transactionsList: ITransactionListResponse = await api.getCached({
     route: 'transaction/list/count/15',
   });
   if (!transactionsList.error) {
@@ -534,12 +441,14 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
     props.transactionsList = number_by_day;
   }
 
-  const accounts: IAccountResponse = await api.get({ route: 'address/list' });
+  const accounts: IAccountResponse = await api.getCached({
+    route: 'address/list',
+  });
   if (!accounts.error) {
     props.totalAccounts = accounts.pagination.totalRecords;
   }
 
-  const statistics: IStatisticsResponse = await api.get({
+  const statistics: IStatisticsResponse = await api.getCached({
     route: 'node/statistics',
     service: Service.NODE,
   });
@@ -572,21 +481,21 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
     });
   };
 
-  const klvData: IGeckoResponse = await api.get({
+  const klvData: IGeckoResponse = await api.getCached({
     route: 'coins/klever',
     service: Service.GECKO,
   });
-  const klvChart: IGeckoChartResponse = await api.get({
+  const klvChart: IGeckoChartResponse = await api.getCached({
     route: `coins/klever/market_chart?vs_currency=usd&days=1`,
     service: Service.GECKO,
   });
   pushCoinData('Klever', 'KLV', klvData, klvChart);
 
-  const kfiData: IGeckoResponse = await api.get({
+  const kfiData: IGeckoResponse = await api.getCached({
     route: 'coins/klever-finance',
     service: Service.GECKO,
   });
-  const kfiChart: IGeckoChartResponse = await api.get({
+  const kfiChart: IGeckoChartResponse = await api.getCached({
     route: `coins/klever-finance/market_chart?vs_currency=usd&days=1`,
     service: Service.GECKO,
   });
@@ -595,7 +504,7 @@ export const getServerSideProps: GetServerSideProps<IHome> = async () => {
     150000 * kfiData.market_data.current_price.usd;
   pushCoinData('Klever Finance', 'KFI', kfiData, kfiChart);
 
-  const yesterdayTransactions: IYesterdayResponse = await api.get({
+  const yesterdayTransactions: IYesterdayResponse = await api.getCached({
     route: 'transaction/list/count/1',
   });
   if (!yesterdayTransactions.error) {

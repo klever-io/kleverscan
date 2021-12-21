@@ -39,118 +39,22 @@ import { toLocaleFixed } from '../utils';
 import {
   IBlock,
   IBlockCard,
-  IChainStatistics,
-  IPagination,
-  IResponse,
   ITransaction,
   ITransferContract,
+  IHome,
+  ITransactionResponse,
+  IAccountResponse,
+  IBlockResponse,
+  IStatisticsResponse,
+  ICard,
 } from '../types';
 
-import { IChartData } from '@/configs/home';
 import { formatAmount, getAge } from '../utils';
+import HomeServerSideProps from '../utils/ServerSideProps/Home';
 
 import Carousel from '@/components/Carousel';
 import CoinCard from '@/components/Cards/CoinCard';
 import Maintenance from '@/components/Maintenance';
-
-export interface ICoinInfo {
-  name: string;
-  shortname: string;
-  price: number;
-  variation: number;
-  marketCap: {
-    price: number;
-    variation: number;
-  };
-  volume: {
-    price: number;
-    variation: number;
-  };
-  prices: IChartData[];
-}
-
-interface IDailyTransaction {
-  doc_count: number;
-  key: number;
-}
-interface IHome {
-  transactions: ITransaction[];
-  transactionsList: IDailyTransaction[];
-  blocks: IBlock[];
-  totalAccounts: number;
-  totalTransactions: number;
-  tps: string;
-  coinsData: ICoinInfo[];
-  yeasterdayTransactions: number;
-}
-
-interface ITransactionResponse extends IResponse {
-  data: {
-    transactions: ITransaction[];
-  };
-  pagination: IPagination;
-}
-
-interface ITransactionListResponse extends IResponse {
-  data: {
-    number_by_day: IDailyTransaction[];
-  };
-  pagination: IPagination;
-}
-
-interface IAccountResponse extends IResponse {
-  pagination: IPagination;
-}
-
-interface IBlockResponse extends IResponse {
-  data: {
-    blocks: IBlock[];
-  };
-}
-
-interface IStatisticsResponse extends IResponse {
-  data: {
-    statistics: {
-      chainStatistics: IChainStatistics;
-    };
-  };
-}
-
-interface IGeckoResponse extends IResponse {
-  market_data: {
-    current_price: {
-      usd: number;
-    };
-    price_change_percentage_24h: number;
-    market_cap: {
-      usd: number;
-    };
-    market_cap_change_percentage_24h: number;
-    total_volume: {
-      usd: number;
-    };
-  };
-}
-
-interface IYesterdayResponse extends IResponse {
-  data: {
-    number_by_day: {
-      doc_count: number;
-      key: number;
-    }[];
-  };
-}
-
-interface IGeckoChartResponse extends IResponse {
-  prices: number[][];
-}
-
-interface ICard {
-  Icon: any;
-  title: string;
-  value: number;
-  variation: string;
-}
 
 const Home: React.FC<IHome> = ({
   blocks,
@@ -407,113 +311,7 @@ const Home: React.FC<IHome> = ({
 };
 
 export const getServerSideProps: GetServerSideProps<IHome> = async () => {
-  const props: IHome = {
-    blocks: [],
-    transactions: [],
-    transactionsList: [],
-    totalAccounts: 0,
-    totalTransactions: 0,
-    tps: '0/0',
-    coinsData: [],
-    yeasterdayTransactions: 0,
-  };
-
-  const blocks: IBlockResponse = await api.getCached({
-    route: 'block/list',
-    refreshTime: 4,
-  });
-  if (!blocks.error) {
-    props.blocks = blocks.data.blocks;
-  }
-
-  const transactions: ITransactionResponse = await api.getCached({
-    route: 'transaction/list',
-  });
-  if (!transactions.error) {
-    props.transactions = transactions.data.transactions;
-    props.totalTransactions = transactions.pagination.totalRecords;
-  }
-
-  const transactionsList: ITransactionListResponse = await api.getCached({
-    route: 'transaction/list/count/15',
-  });
-  if (!transactionsList.error) {
-    const { number_by_day } = transactionsList.data;
-    props.transactionsList = number_by_day;
-  }
-
-  const accounts: IAccountResponse = await api.getCached({
-    route: 'address/list',
-  });
-  if (!accounts.error) {
-    props.totalAccounts = accounts.pagination.totalRecords;
-  }
-
-  const statistics: IStatisticsResponse = await api.getCached({
-    route: 'node/statistics',
-    service: Service.NODE,
-  });
-  if (!statistics.error) {
-    const chainStatistics = statistics.data.statistics.chainStatistics;
-
-    props.tps = `${chainStatistics.liveTPS}/${chainStatistics.peakTPS}`;
-  }
-
-  const pushCoinData = (
-    name: string,
-    shortname: string,
-    response: IGeckoResponse,
-    chart: IGeckoChartResponse,
-  ) => {
-    props.coinsData.push({
-      name,
-      shortname,
-      price: response.market_data.current_price.usd,
-      variation: response.market_data.price_change_percentage_24h,
-      marketCap: {
-        price: response.market_data.market_cap.usd,
-        variation: response.market_data.market_cap_change_percentage_24h,
-      },
-      volume: {
-        price: response.market_data.total_volume.usd,
-        variation: 0,
-      },
-      prices: chart.prices.map(item => ({ value: item[1] })),
-    });
-  };
-
-  const klvData: IGeckoResponse = await api.getCached({
-    route: 'coins/klever',
-    service: Service.GECKO,
-  });
-  const klvChart: IGeckoChartResponse = await api.getCached({
-    route: `coins/klever/market_chart?vs_currency=usd&days=1`,
-    service: Service.GECKO,
-  });
-  pushCoinData('Klever', 'KLV', klvData, klvChart);
-
-  const kfiData: IGeckoResponse = await api.getCached({
-    route: 'coins/klever-finance',
-    service: Service.GECKO,
-  });
-  const kfiChart: IGeckoChartResponse = await api.getCached({
-    route: `coins/klever-finance/market_chart?vs_currency=usd&days=1`,
-    service: Service.GECKO,
-  });
-  // Currently hardcoded marketcap
-  kfiData.market_data.market_cap.usd =
-    150000 * kfiData.market_data.current_price.usd;
-  pushCoinData('Klever Finance', 'KFI', kfiData, kfiChart);
-
-  const yesterdayTransactions: IYesterdayResponse = await api.getCached({
-    route: 'transaction/list/count/1',
-  });
-  if (!yesterdayTransactions.error) {
-    props.yeasterdayTransactions =
-      yesterdayTransactions.data.number_by_day[0].doc_count;
-  }
-
-  return { props };
+  return HomeServerSideProps();
 };
 
 export default Home;

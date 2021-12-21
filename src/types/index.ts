@@ -1,4 +1,5 @@
 import { ISO2 } from '@/utils/country';
+import { IChartData } from '@/configs/home';
 
 export enum Contract {
   Transfer = 'Transfer',
@@ -231,4 +232,102 @@ export interface ICountryFeature {
 
 export interface ICountriesGeoData {
   features: ICountryFeature[];
+}
+export interface ICoinInfo {
+  name: string;
+  shortname: string;
+  price: number;
+  variation: number;
+  marketCap: {
+    price: number;
+    variation: number;
+  };
+  volume: {
+    price: number;
+    variation: number;
+  };
+  prices: IChartData[];
+}
+
+export interface IDailyTransaction {
+  doc_count: number;
+  key: number;
+}
+export interface IHome {
+  transactions: ITransaction[];
+  transactionsList: IDailyTransaction[];
+  blocks: IBlock[];
+  totalAccounts: number;
+  totalTransactions: number;
+  tps: string;
+  coinsData: ICoinInfo[];
+  yeasterdayTransactions: number;
+}
+
+export interface ITransactionResponse extends IResponse {
+  data: {
+    transactions: ITransaction[];
+  };
+  pagination: IPagination;
+}
+
+export interface ITransactionListResponse extends IResponse {
+  data: {
+    number_by_day: IDailyTransaction[];
+  };
+  pagination: IPagination;
+}
+
+export interface IAccountResponse extends IResponse {
+  pagination: IPagination;
+}
+
+export interface IBlockResponse extends IResponse {
+  data: {
+    blocks: IBlock[];
+  };
+}
+
+export interface IStatisticsResponse extends IResponse {
+  data: {
+    statistics: {
+      chainStatistics: IChainStatistics;
+    };
+  };
+}
+
+export interface IGeckoResponse extends IResponse {
+  market_data: {
+    current_price: {
+      usd: number;
+    };
+    price_change_percentage_24h: number;
+    market_cap: {
+      usd: number;
+    };
+    market_cap_change_percentage_24h: number;
+    total_volume: {
+      usd: number;
+    };
+  };
+}
+
+export interface IYesterdayResponse extends IResponse {
+  data: {
+    number_by_day: {
+      doc_count: number;
+      key: number;
+    }[];
+  };
+}
+
+export interface IGeckoChartResponse extends IResponse {
+  prices: number[][];
+}
+
+export interface ICard {
+  Icon: any;
+  title: string;
+  value: number;
+  variation: string;
 }

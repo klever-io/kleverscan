@@ -73,17 +73,17 @@ const HomeServerSideProps = async () => {
     props.coinsData.push({
       name,
       shortname,
-      price: response.market_data.current_price.usd,
-      variation: response.market_data.price_change_percentage_24h,
+      price: response?.market_data?.current_price.usd,
+      variation: response?.market_data?.price_change_percentage_24h,
       marketCap: {
-        price: response.market_data.market_cap.usd,
-        variation: response.market_data.market_cap_change_percentage_24h,
+        price: response?.market_data?.market_cap.usd,
+        variation: response?.market_data?.market_cap_change_percentage_24h,
       },
       volume: {
-        price: response.market_data.total_volume.usd,
+        price: response?.market_data?.total_volume.usd,
         variation: 0,
       },
-      prices: chart.prices.map(item => ({ value: item[1] })),
+      prices: chart.prices?.map(item => ({ value: item[1] })),
     });
   };
 

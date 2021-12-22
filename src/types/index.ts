@@ -1,5 +1,6 @@
 import { ISO2 } from '@/utils/country';
 import { IChartData } from '@/configs/home';
+import { Dispatch, SetStateAction } from 'react';
 
 export enum Contract {
   Transfer = 'Transfer',
@@ -84,11 +85,6 @@ type IParameter =
   | IFreezeContract
   | IUnfreezeContract;
 
-export interface IContract {
-  type: Contract;
-  parameter: IParameter;
-}
-
 export interface ICreateAssetReceipt {
   assetId: string;
 }
@@ -119,6 +115,7 @@ export interface ITransaction {
   resultCode: string;
   contract: IContract[];
   receipt: IReceipt[];
+  precision: number;
 }
 
 export interface IBlock {
@@ -153,6 +150,11 @@ export interface IBlock {
 
 export interface IBlockCard {
   blockIndex: number;
+  precision: number;
+}
+export interface IBlockCardList {
+  blocks: IBlock[];
+  precision: number;
 }
 
 export interface IAccount {
@@ -180,6 +182,12 @@ export interface IAsset {
   circulatingSupply: number;
   maxSupply: number;
   royalties: number;
+}
+export interface IContract {
+  type: Contract;
+  parameter: IParameter;
+  precision?: number;
+  asset?: IAsset;
 }
 
 export interface IBucket {
@@ -263,7 +271,20 @@ export interface IHome {
   coinsData: ICoinInfo[];
   yeasterdayTransactions: number;
 }
+export interface IDataCards {
+  totalAccounts: number;
+  totalTransactions: number;
+  tps: string;
+  coinsData: ICoinInfo[];
+  yeasterdayTransactions: number;
+}
 
+export interface IHomeTransactions {
+  setTotalTransactions: Dispatch<SetStateAction<number>>;
+  transactions: ITransaction[];
+  transactionsList: IDailyTransaction[];
+  precision: number;
+}
 export interface ITransactionResponse extends IResponse {
   data: {
     transactions: ITransaction[];

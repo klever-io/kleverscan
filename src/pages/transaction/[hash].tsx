@@ -72,6 +72,7 @@ const klvAsset: IAsset = {
   circulatingSupply: 0,
   maxSupply: 0,
   royalties: 0,
+  mintedValue: 0,
 };
 
 const Transaction: React.FC<ITransactionPage> = ({

@@ -184,6 +184,7 @@ export interface IAsset {
   circulatingSupply: number;
   maxSupply: number;
   royalties: number;
+  mintedValue: number;
 }
 export interface IContract {
   type: Contract;

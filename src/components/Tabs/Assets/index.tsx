@@ -76,7 +76,7 @@ const Assets: React.FC<IAssets> = props => {
   const TableBody: React.FC<IAssetData> = ({
     ticker,
     assetId,
-    type,
+    assetType,
     precision,
     balance,
     frozenBalance,
@@ -89,15 +89,19 @@ const Assets: React.FC<IAssets> = props => {
         <span>
           <Link href={`/asset/${assetId}`}>{assetId}</Link>
         </span>
-        <span>{type}</span>
+        <span>{assetType}</span>
         <span>
           <strong>{precision}</strong>
         </span>
         <span>
-          <strong>{formatAmount(balance / 10 ** precision)} KLV</strong>
+          <strong>
+            {formatAmount(balance / 10 ** precision)} {ticker}
+          </strong>
         </span>
         <span>
-          <strong>{formatAmount(frozenBalance)} KLV</strong>
+          <strong>
+            {formatAmount(frozenBalance)} {ticker}
+          </strong>
         </span>
       </Row>
     );

@@ -60,7 +60,7 @@ const Assets: React.FC<IAssetPage> = ({
     ticker,
     name,
     assetId,
-    type,
+    assetType,
     initialSupply,
     maxSupply,
     circulatingSupply,
@@ -77,7 +77,7 @@ const Assets: React.FC<IAssetPage> = ({
         <span>
           <p>{name}</p>
         </span>
-        <span>{type}</span>
+        <span>{assetType}</span>
         <span>
           <strong>
             {formatAmount(initialSupply / 10 ** precision)} {ticker}

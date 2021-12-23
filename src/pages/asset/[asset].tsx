@@ -74,7 +74,7 @@ const Asset: React.FC<IAssetPage> = ({
   const {
     name,
     ticker,
-    type,
+    assetType,
     ownerAddress,
     precision,
     maxSupply,
@@ -280,7 +280,7 @@ const Asset: React.FC<IAssetPage> = ({
             <h1>
               {name} ({ticker})
             </h1>
-            <div>{type}</div>
+            <div>{assetType}</div>
           </AssetTitle>
         </Title>
 

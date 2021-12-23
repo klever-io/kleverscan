@@ -61,8 +61,8 @@ interface ITransactionPage extends ITransaction {
   asset: IAsset;
 }
 const klvAsset: IAsset = {
-  type: '',
-  address: '',
+  assetType: '',
+  assetId: '',
   name: 'Klever',
   ticker: 'KLV',
   ownerAddress: '',
@@ -308,7 +308,6 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
     precision,
     asset,
   };
-  console.log('===============================', props.contract);
 
   return { props };
 };

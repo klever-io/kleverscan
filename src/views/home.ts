@@ -212,14 +212,12 @@ export const BlockCardContainer = styled.div<BlockCardContainerProps>`
   transition: 1s all ease;
 
   animation: ${PullFade} 1s ease-in-out;
-  animation-delay: 2s;
 
   animation-fill-mode: forwards;
   :first-child {
     transition: 1s all ease;
 
     animation: ${PushFade} 1s ease-in-out;
-    animation-delay: 2s;
     animation-fill-mode: forwards;
   }
 `;

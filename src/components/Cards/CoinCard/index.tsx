@@ -16,7 +16,8 @@ import {
   ValueDetail,
 } from './styles';
 
-import { ICoinInfo } from '@/pages/index';
+import { ICoinInfo } from '@/types/index';
+
 import Chart from '@/components/Chart';
 
 interface ICoinCard {

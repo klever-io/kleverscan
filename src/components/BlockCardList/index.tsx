@@ -30,21 +30,24 @@ const BlockCardList: React.FC<IBlockCardList> = ({ blocks, precision }) => {
 
     return () => clearInterval(blockWatcher);
   }, []);
+
+  const getBLockCards = () => {
+    return listedBlocks.map((block: IBlock, index) => {
+      return (
+        <BlockCard
+          precision={precision}
+          blockIndex={index}
+          key={block.hash + index}
+          {...block}
+        />
+      );
+    });
+  };
+
   return (
     <Section>
       <h1>Blocks</h1>
-      <Carousel>
-        {listedBlocks.map((block: IBlock, index) => {
-          return (
-            <BlockCard
-              precision={precision}
-              blockIndex={index}
-              key={String(index)}
-              {...block}
-            />
-          );
-        })}
-      </Carousel>
+      <Carousel>{getBLockCards()}</Carousel>
     </Section>
   );
 };

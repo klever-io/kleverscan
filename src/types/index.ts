@@ -162,7 +162,7 @@ export interface IAccount {
   nonce: number;
   balance: number;
   blsPublicKey: string;
-  assets?: {
+  assets: {
     [key: string]: any;
   };
   buckets?: [
@@ -173,7 +173,7 @@ export interface IAccount {
 }
 
 export interface IAsset {
-  type: string;
+  assetType: string;
   assetId: string;
   name: string;
   ticker: string;

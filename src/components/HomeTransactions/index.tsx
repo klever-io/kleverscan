@@ -34,8 +34,6 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
         route: 'transaction/list',
       });
       if (!transactions.error) {
-        console.log(transactions);
-
         // Animation / Re-render bug START
         setTransactions(transactions.data.transactions);
         // Animation / Re-render bug END

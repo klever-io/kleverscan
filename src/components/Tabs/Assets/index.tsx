@@ -44,11 +44,15 @@ const Assets: React.FC<IAssets> = props => {
 
       for (let i = 0; i < assetData.length; i++) {
         // need old loop struct to save with async/await
-        const response: IAssetResponse = await api.get({
-          route: `assets/${assetData[i].tokenId}`,
-        });
-        if (!response.error) {
-          lastData.push({ ...response.data.asset, ...assetData[i] });
+        if (assetData[i].tokenId !== '') {
+          const response: IAssetResponse = await api.get({
+            route: `assets/${assetData[i].tokenId}`,
+          });
+          if (!response.error) {
+            console.log(response.data);
+
+            lastData.push({ ...response.data.asset, ...assetData[i] });
+          }
         }
       }
 
@@ -71,8 +75,8 @@ const Assets: React.FC<IAssets> = props => {
 
   const TableBody: React.FC<IAssetData> = ({
     ticker,
-    address,
-    type,
+    assetId,
+    assetType,
     precision,
     balance,
     frozenBalance,
@@ -83,17 +87,21 @@ const Assets: React.FC<IAssets> = props => {
           <span>{ticker}</span>
         </span>
         <span>
-          <Link href={`/asset/${address}`}>{address}</Link>
+          <Link href={`/asset/${assetId}`}>{assetId}</Link>
         </span>
-        <span>{type}</span>
+        <span>{assetType}</span>
         <span>
           <strong>{precision}</strong>
         </span>
         <span>
-          <strong>{formatAmount(balance / 10 ** precision)} KLV</strong>
+          <strong>
+            {formatAmount(balance / 10 ** precision)} {ticker}
+          </strong>
         </span>
         <span>
-          <strong>{formatAmount(frozenBalance)} KLV</strong>
+          <strong>
+            {formatAmount(frozenBalance)} {ticker}
+          </strong>
         </span>
       </Row>
     );

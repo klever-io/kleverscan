@@ -1,7 +1,6 @@
 import React from 'react';
 import { Container } from './styles';
 
-import { FiXOctagon } from 'react-icons/fi';
 import { FaWrench } from 'react-icons/fa';
 
 import { DataCard, IconContainer, DataCardValue } from '@/views/home';

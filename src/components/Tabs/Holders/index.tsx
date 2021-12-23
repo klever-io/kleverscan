@@ -22,10 +22,10 @@ interface IBalance {
 const Holders: React.FC<IHolder> = ({ holders, asset }) => {
   const balances = holders
     .map(holder => {
-      if (Object.keys(holder.assets).includes(asset.address)) {
+      if (Object.keys(holder.assets).includes(asset.assetId)) {
         return {
           address: holder.address,
-          balance: holder.assets[asset.address].balance,
+          balance: holder.assets[asset.assetId].balance,
         };
       }
     })

@@ -1,4 +1,6 @@
 import { ISO2 } from '@/utils/country';
+import { IChartData } from '@/configs/home';
+import { Dispatch, SetStateAction } from 'react';
 
 export enum Contract {
   Transfer = 'Transfer',
@@ -83,11 +85,6 @@ type IParameter =
   | IFreezeContract
   | IUnfreezeContract;
 
-export interface IContract {
-  type: Contract;
-  parameter: IParameter;
-}
-
 export interface ICreateAssetReceipt {
   assetId: string;
 }
@@ -118,6 +115,7 @@ export interface ITransaction {
   resultCode: string;
   contract: IContract[];
   receipt: IReceipt[];
+  precision: number;
 }
 
 export interface IBlock {
@@ -152,6 +150,11 @@ export interface IBlock {
 
 export interface IBlockCard {
   blockIndex: number;
+  precision: number;
+}
+export interface IBlockCardList {
+  blocks: IBlock[];
+  precision: number;
 }
 
 export interface IAccount {
@@ -162,14 +165,16 @@ export interface IAccount {
   assets: {
     [key: string]: any;
   };
-  buckets: {
-    [key: string]: IBucket;
-  };
+  buckets?: [
+    {
+      [key: string]: IBucket;
+    },
+  ];
 }
 
 export interface IAsset {
-  type: string;
-  address: string;
+  assetType: string;
+  assetId: string;
   name: string;
   ticker: string;
   ownerAddress: string;
@@ -179,6 +184,13 @@ export interface IAsset {
   circulatingSupply: number;
   maxSupply: number;
   royalties: number;
+  mintedValue: number;
+}
+export interface IContract {
+  type: Contract;
+  parameter: IParameter;
+  precision?: number;
+  asset?: IAsset;
 }
 
 export interface IBucket {
@@ -231,4 +243,115 @@ export interface ICountryFeature {
 
 export interface ICountriesGeoData {
   features: ICountryFeature[];
+}
+export interface ICoinInfo {
+  name: string;
+  shortname: string;
+  price: number;
+  variation: number;
+  marketCap: {
+    price: number;
+    variation: number;
+  };
+  volume: {
+    price: number;
+    variation: number;
+  };
+  prices: IChartData[];
+}
+
+export interface IDailyTransaction {
+  doc_count: number;
+  key: number;
+}
+export interface IHome {
+  transactions: ITransaction[];
+  transactionsList: IDailyTransaction[];
+  blocks: IBlock[];
+  totalAccounts: number;
+  totalTransactions: number;
+  tps: string;
+  coinsData: ICoinInfo[];
+  yeasterdayTransactions: number;
+}
+export interface IDataCards {
+  totalAccounts: number;
+  totalTransactions: number;
+  tps: string;
+  coinsData: ICoinInfo[];
+  yeasterdayTransactions: number;
+}
+
+export interface IHomeTransactions {
+  setTotalTransactions: Dispatch<SetStateAction<number>>;
+  transactions: ITransaction[];
+  transactionsList: IDailyTransaction[];
+  precision: number;
+}
+export interface ITransactionResponse extends IResponse {
+  data: {
+    transactions: ITransaction[];
+  };
+  pagination: IPagination;
+}
+
+export interface ITransactionListResponse extends IResponse {
+  data: {
+    number_by_day: IDailyTransaction[];
+  };
+  pagination: IPagination;
+}
+
+export interface IAccountResponse extends IResponse {
+  pagination: IPagination;
+}
+
+export interface IBlockResponse extends IResponse {
+  data: {
+    blocks: IBlock[];
+  };
+}
+
+export interface IStatisticsResponse extends IResponse {
+  data: {
+    statistics: {
+      chainStatistics: IChainStatistics;
+    };
+  };
+}
+
+export interface IGeckoResponse extends IResponse {
+  market_data: {
+    current_price: {
+      usd: number;
+    };
+    price_change_percentage_24h: number;
+    market_cap: {
+      usd: number;
+    };
+    market_cap_change_percentage_24h: number;
+    total_volume: {
+      usd: number;
+    };
+  };
+}
+
+export interface IYesterdayResponse extends IResponse {
+  data: {
+    number_by_day: {
+      doc_count: number;
+      key: number;
+    }[];
+  };
+}
+
+export interface IGeckoChartResponse extends IResponse {
+  prices: number[][];
+}
+
+export interface ICard {
+  Icon: any;
+  title: string;
+  value: number;
+  variation: string;
 }

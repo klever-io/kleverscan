@@ -74,7 +74,7 @@ const Asset: React.FC<IAssetPage> = ({
   const {
     name,
     ticker,
-    type,
+    assetType,
     ownerAddress,
     precision,
     maxSupply,
@@ -96,7 +96,7 @@ const Asset: React.FC<IAssetPage> = ({
   useEffect(() => {
     const fetchData = async () => {
       const response: ITransactionResponse = await api.get({
-        route: `transaction/list?asset=${asset.address}`,
+        route: `transaction/list?asset=${asset.assetId}`,
       });
       if (!response.error) {
         setTransactions(response.data.transactions);
@@ -109,7 +109,7 @@ const Asset: React.FC<IAssetPage> = ({
   useEffect(() => {
     const fetchData = async () => {
       const response: IHoldersResponse = await api.get({
-        route: `assets/holders/${asset.address}`,
+        route: `assets/holders/${asset.assetId}`,
       });
       if (!response.error) {
         setHolders(response.data.accounts);
@@ -280,7 +280,7 @@ const Asset: React.FC<IAssetPage> = ({
             <h1>
               {name} ({ticker})
             </h1>
-            <div>{type}</div>
+            <div>{assetType}</div>
           </AssetTitle>
         </Title>
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
@@ -28,17 +28,20 @@ import {
   ITransferContract,
   ICreateAssetContract,
   IContract,
-  ICreateValidatorContract,
-  IFreezeContract,
-  IUnfreezeContract,
-  IWithdrawContract,
 } from '@/types/index';
 
 import { ArrowLeft } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
-import { KLV } from '@/assets/coins';
 
-import { Loader } from '@/components/Loader/styles';
+import {
+  Transfer,
+  CreateAsset,
+  CreateValidator,
+  Freeze,
+  Unfreeze,
+  Withdraw,
+  Delegate,
+} from '@/components/TransactionContractComponents';
 import Copy from '@/components/Copy';
 
 interface ITransactionResponse extends IResponse {
@@ -55,11 +58,11 @@ interface IAssetResponse extends IResponse {
 
 interface ITransactionPage extends ITransaction {
   precision: number;
+  asset: IAsset;
 }
-
 const klvAsset: IAsset = {
-  type: '',
-  address: '',
+  assetType: '',
+  assetId: '',
   name: 'Klever',
   ticker: 'KLV',
   ownerAddress: '',
@@ -69,6 +72,7 @@ const klvAsset: IAsset = {
   circulatingSupply: 0,
   maxSupply: 0,
   royalties: 0,
+  mintedValue: 0,
 };
 
 const Transaction: React.FC<ITransactionPage> = ({
@@ -84,311 +88,35 @@ const Transaction: React.FC<ITransactionPage> = ({
   contract,
   blockNum,
   nonce,
+  asset,
 }) => {
   const router = useRouter();
   const StatusIcon = getStatusIcon(status);
   const precision = 6; // default KLV precision
-
-  const [coin, setCoin] = useState<IAsset>(klvAsset);
-  const [loading, setLoading] = useState(true);
 
   const getContractType = (contracts: IContract[]) =>
     contracts.length > 1
       ? 'Multi contract'
       : Object.values(Contract)[contracts[0].type];
 
-  useEffect(() => {
-    const fetchCoin = async () => {
-      if (getContractType(contract) === Contract.Transfer) {
-        const parameter = contract[0].parameter as ITransferContract;
-
-        if (parameter.assetAddress) {
-          const response: IAssetResponse = await api.get({
-            route: `assets/${parameter.assetAddress}`,
-          });
-
-          if (!response.error) {
-            setCoin(response.data.asset);
-          }
-        }
-      }
-
-      setLoading(false);
-    };
-
-    fetchCoin();
-  }, []);
-
-  const Transfer: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as ITransferContract;
-
-    return (
-      <>
-        <Row>
-          <span>
-            <strong>Amount</strong>
-          </span>
-          <CenteredRow>
-            {loading ? (
-              <Loader />
-            ) : (
-              <>
-                <strong>
-                  {toLocaleFixed(
-                    parameter.amount / 10 ** coin.precision,
-                    precision,
-                  )}
-                </strong>
-                <KLV style={{ marginLeft: '1rem' }} />
-                <Link href={`/asset/${coin.address}`}>{coin.address}</Link>
-              </>
-            )}
-          </CenteredRow>
-        </Row>
-        <Row>
-          <span>
-            <strong>To</strong>
-          </span>
-          <span>
-            <Link href={`/account/${parameter.toAddress}`}>
-              {parameter.toAddress}
-            </Link>
-          </span>
-        </Row>
-      </>
-    );
-  };
-
-  const CreateAsset: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as ICreateAssetContract;
-
-    return (
-      <>
-        <Row>
-          <span>
-            <strong>Name</strong>
-          </span>
-          <span>{parameter.name}</span>
-        </Row>
-        <Row>
-          <span>
-            <strong>Owner</strong>
-          </span>
-          <span>
-            <Link href={`/account/${parameter.ownerAddress}`}>
-              {parameter.ownerAddress}
-            </Link>
-          </span>
-        </Row>
-        <Row>
-          <span>
-            <strong>Token</strong>
-          </span>
-          <span>{parameter.ticker}</span>
-        </Row>
-        <Row>
-          <span>
-            <strong>Precision</strong>
-          </span>
-          <span>
-            <p>{parameter.precision}</p>
-          </span>
-        </Row>
-        <Row>
-          <span>
-            <strong>Circulating Supply</strong>
-          </span>
-          <span>
-            <small>
-              {toLocaleFixed(
-                parameter.circulatingSupply / 10 ** parameter.precision,
-                parameter.precision,
-              )}
-            </small>
-          </span>
-        </Row>
-        <Row>
-          <span>
-            <strong>Initial Supply</strong>
-          </span>
-          <span>
-            <small>
-              {toLocaleFixed(
-                parameter.initialSupply / 10 ** parameter.precision,
-                parameter.precision,
-              )}
-            </small>
-          </span>
-        </Row>
-        <Row>
-          <span>
-            <strong>Max Supply</strong>
-          </span>
-          <span>
-            <small>
-              {toLocaleFixed(
-                parameter.maxSupply / 10 ** parameter.precision,
-                parameter.precision,
-              )}
-            </small>
-          </span>
-        </Row>
-      </>
-    );
-  };
-
-  const CreateValidator: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as ICreateValidatorContract;
-
-    return (
-      <>
-        <Row>
-          <span>
-            <strong>Owner</strong>
-          </span>
-          <span>
-            <Link href={`/account/${parameter.ownerAddress}`}></Link>
-          </span>
-        </Row>
-        <Row>
-          <span>
-            <strong>Can Delegate</strong>
-          </span>
-          <span>
-            <p>{parameter.config.canDelegate ? 'True' : 'False'}</p>
-          </span>
-        </Row>
-        <Row>
-          <span>
-            <strong>Comission</strong>
-          </span>
-          <span>
-            <small>{parameter.config.commission.toLocaleString()}</small>
-          </span>
-        </Row>
-        <Row>
-          <span>
-            <strong>Max Delegation Amount</strong>
-          </span>
-          <span>
-            <small>
-              {toLocaleFixed(
-                parameter.config.maxDelegationAmount / 10 ** precision,
-                precision,
-              )}
-            </small>
-          </span>
-        </Row>
-        <Row>
-          <span>
-            <strong>Reward</strong>
-          </span>
-          <span>
-            <Link href={`/account/${parameter.config.rewardAddress}`}>
-              {parameter.config.rewardAddress}
-            </Link>
-          </span>
-        </Row>
-      </>
-    );
-  };
-
-  const Freeze: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IFreezeContract;
-
-    return (
-      <>
-        <Row>
-          <span>
-            <strong>Owner</strong>
-          </span>
-          <span>
-            <Link href={`/account/${parameter.ownerAddress}`}>
-              {parameter.ownerAddress}
-            </Link>
-          </span>
-        </Row>
-        <Row>
-          <span>
-            <strong>Amount</strong>
-          </span>
-          <span>
-            <small>{parameter.amount.toLocaleString()}</small>
-          </span>
-        </Row>
-      </>
-    );
-  };
-
-  const Unfreeze: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IUnfreezeContract;
-
-    return (
-      <>
-        <Row>
-          <span>
-            <strong>Owner</strong>
-          </span>
-          <span>
-            <Link href={`/account/${parameter.ownerAddress}`}>
-              {parameter.ownerAddress}
-            </Link>
-          </span>
-        </Row>
-        <Row>
-          <span>
-            <strong>Bucket ID</strong>
-          </span>
-          <span>{parameter.bucketID}</span>
-        </Row>
-      </>
-    );
-  };
-
-  const Withdraw: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IWithdrawContract;
-
-    return (
-      <>
-        <Row>
-          <span>
-            <strong>Owner</strong>
-          </span>
-          <span>
-            <Link href={`/account/${parameter.ownerAddress}`}>
-              {parameter.ownerAddress}
-            </Link>
-          </span>
-        </Row>
-        <Row>
-          <span>
-            <strong>To</strong>
-          </span>
-          <span>
-            <Link href={`/account/${parameter.toAddress}`}>
-              {parameter.toAddress}
-            </Link>
-          </span>
-        </Row>
-      </>
-    );
-  };
-
   const ContractComponent: React.FC = () => {
     const contractType = getContractType(contract);
 
     switch (contractType) {
       case Contract.Transfer:
-        return <Transfer {...contract[0]} />;
+        return (
+          <Transfer {...contract[0]} precision={precision} asset={asset} />
+        );
       case Contract.CreateAsset:
         return <CreateAsset {...contract[0]} />;
       case Contract.CreateValidator:
       case Contract.ValidatorConfig:
-        return <CreateValidator {...contract[0]} />;
+        return <CreateValidator {...contract[0]} precision={precision} />;
       case Contract.Freeze:
         return <Freeze {...contract[0]} />;
       case Contract.Unfreeze:
       case Contract.Delegate:
+        return <Delegate {...contract[0]} />;
       case Contract.Undelegate:
         return <Unfreeze {...contract[0]} />;
       case Contract.Withdraw:
@@ -552,6 +280,7 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
   }
 
   let precision = 6; // Default KLV precision
+  let asset: IAsset = klvAsset;
   const contractType =
     Object.values(Contract)[transaction.data.transaction.contract[0].type];
 
@@ -560,11 +289,12 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
       .parameter as ITransferContract;
 
     if (contract.assetAddress) {
-      const asset: IAssetResponse = await api.get({
+      const assetRes: IAssetResponse = await api.get({
         route: `assets/${contract.assetAddress}`,
       });
-      if (!asset.error) {
-        precision = asset.data.asset.precision;
+      if (!assetRes.error) {
+        precision = assetRes.data.asset.precision;
+        asset = assetRes.data.asset;
       }
     }
   } else if (contractType === Contract.CreateAsset) {
@@ -577,6 +307,7 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
   const props: ITransactionPage = {
     ...transaction.data.transaction,
     precision,
+    asset,
   };
 
   return { props };

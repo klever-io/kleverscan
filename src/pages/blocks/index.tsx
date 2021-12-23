@@ -272,20 +272,40 @@ export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
     pagination: {} as IPagination,
   };
 
-  const block: IBlockResponse = await api.get({
-    route: 'block/list',
-  });
+  const blockCall = new Promise<IBlockResponse>(resolve =>
+    resolve(
+      api.get({
+        route: 'block/list',
+      }),
+    ),
+  );
+
+  const yesterdayStatisticsCall = new Promise<IStatisticsResponse>(resolve =>
+    resolve(
+      api.get({
+        route: 'block/statistics/1',
+      }),
+    ),
+  );
+  const totalStatisticsCall = new Promise<IStatisticsResponse>(resolve =>
+    resolve(
+      api.get({
+        route: 'block/statistics/0',
+      }),
+    ),
+  );
+
+  const [block, yesterdayStatistics, totalStatistics] = await Promise.all([
+    blockCall,
+    yesterdayStatisticsCall,
+    totalStatisticsCall,
+  ]);
+
   if (!block.error) {
     props.blocks = block.data.blocks;
     props.pagination = block.pagination;
   }
 
-  const yesterdayStatistics: IStatisticsResponse = await api.get({
-    route: 'block/statistics/1',
-  });
-  const totalStatistics: IStatisticsResponse = await api.get({
-    route: 'block/statistics/0',
-  });
   if (!yesterdayStatistics.error && !totalStatistics.error) {
     props.statistics = {
       yesterday: yesterdayStatistics.data.block_stats,

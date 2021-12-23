@@ -8,7 +8,7 @@ import { Row } from '@/components/Table/styles';
 import { IBucket } from '@/types/index';
 
 interface IBuckets {
-  [key: string]: IBucket;
+  [key: string]: IBucket[];
 }
 
 interface IBucketData extends IBucket {

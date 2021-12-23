@@ -1,4 +1,4 @@
-import styled, { keyframes, css } from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 import { lighten, transparentize } from 'polished';
 
@@ -209,21 +209,17 @@ export const BlockCardContainer = styled.div<BlockCardContainerProps>`
   background-color: ${props => props.theme.white};
 
   border-radius: 1rem;
+  transition: 1s all ease;
 
-  ${props =>
-    props.blockIndex === 0
-      ? css`
-          transition: 1s all ease;
+  animation: ${PullFade} 1s ease-in-out;
 
-          animation: ${PushFade} 2s 1;
-          animation-fill-mode: forwards;
-        `
-      : css`
-          transition: 1s all ease;
+  animation-fill-mode: forwards;
+  :first-child {
+    transition: 1s all ease;
 
-          animation: ${PullFade} 2s 1;
-          animation-fill-mode: forwards;
-        `}
+    animation: ${PushFade} 1s ease-in-out;
+    animation-fill-mode: forwards;
+  }
 `;
 
 export const BlockCardRow = styled.div`
@@ -315,6 +311,7 @@ export const TransactionContent = styled.div`
 
   &::-webkit-scrollbar-track {
     background-color: transparent;
+    margin: 0.75rem;
   }
 
   &::-webkit-scrollbar-thumb {

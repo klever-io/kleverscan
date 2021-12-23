@@ -21,7 +21,6 @@ import {
 import Tabs, { ITabs } from '@/components/Tabs';
 import Assets from '@/components/Tabs/Assets';
 import Transactions from '@/components/Tabs/Transactions';
-import Buckets from '@/components/Tabs/Buckets';
 
 import { IAccount, IResponse, ITransaction, IPagination } from '@/types/index';
 
@@ -88,12 +87,12 @@ const Account: React.FC<IAccountPage> = ({
   }, [page, account.address]);
 
   const getFreezeBalance = () => {
-    if (Object.values(account.buckets).length <= 0) {
+    if (Object.values(account.assets).length <= 0) {
       return 0;
     }
 
-    const freezeBalance = Object.values(account.buckets).reduce(
-      (acc, bucket) => acc + bucket.stakeValue,
+    const freezeBalance = Object.values(account.assets).reduce(
+      (acc, asset) => acc + asset.frozenBalance,
       0,
     );
 
@@ -115,9 +114,9 @@ const Account: React.FC<IAccountPage> = ({
       headers.push('Transactions');
     }
 
-    if (account.buckets && Object.values(account.buckets).length > 0) {
-      headers.push('Buckets');
-    }
+    // if (account.assets && Object.values(account.assets).length > 0) {
+    //   headers.push('Buckets');
+    // }
 
     return headers;
   };
@@ -148,8 +147,8 @@ const Account: React.FC<IAccountPage> = ({
             </PaginationContainer>
           </>
         );
-      case 'Buckets':
-        return <Buckets {...account.buckets} />;
+      // case 'Buckets':
+      //   return <Buckets {...account.buckets} />;
       default:
         return <div />;
     }
@@ -275,6 +274,9 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
       prices.symbols[0].price *
       (account.data.account.balance / 10 ** precision);
   }
+  Object.values(props.account.assets).forEach(asset => {
+    console.log(asset);
+  });
 
   return { props };
 };

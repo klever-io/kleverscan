@@ -124,24 +124,19 @@ const Accounts: React.FC<IAccounts> = ({
 
   const header = ['Address', 'KLV Staked', 'Nonce', 'KLV Balance'];
 
-  const TableBody: React.FC<IAccount> = ({
-    address,
-    buckets,
-    balance,
-    nonce,
-  }) => {
-    const getFreezeBalance = () => {
-      if (Object.values(buckets).length <= 0) {
-        return 0;
-      }
+  const TableBody: React.FC<IAccount> = ({ address, balance, nonce }) => {
+    // const getFreezeBalance = () => {
+    //   if (Object.values(buckets).length <= 0) {
+    //     return 0;
+    //   }
 
-      const freezeBalance = Object.values(buckets).reduce(
-        (acc, bucket) => acc + bucket.stakeValue,
-        0,
-      );
+    //   const freezeBalance = Object.values(buckets).reduce(
+    //     (acc, bucket) => acc + bucket.stakeValue,
+    //     0,
+    //   );
 
-      return freezeBalance / 10 ** precision;
-    };
+    //   return freezeBalance / 10 ** precision;
+    // };
 
     return (
       <Row type="accounts">
@@ -149,7 +144,7 @@ const Accounts: React.FC<IAccounts> = ({
           <Link href={`/account/${address}`}>{address}</Link>
         </span>
         <span>
-          <strong>{formatAmount(getFreezeBalance())} KLV</strong>
+          <strong>{/* {formatAmount(getFreezeBalance())}  */}0 KLV</strong>
         </span>
         <span>{nonce}</span>
         <span>

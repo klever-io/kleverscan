@@ -84,8 +84,8 @@ const Transactions: React.FC<ITransactions> = ({
     {
       title: 'Coin',
       data: assets.map(asset => ({
-        name: asset.address,
-        value: asset.address,
+        name: asset.assetId,
+        value: asset.assetId,
       })),
       onClick: selected => {
         if (coinType.value !== selected.value) {

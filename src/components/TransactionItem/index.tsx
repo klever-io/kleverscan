@@ -19,6 +19,7 @@ const TransactionItem: React.FC<ITransaction> = ({
   timestamp,
   contract,
   precision,
+  sender,
 }) => {
   const contractPosition = 0;
   const parameter = contract[contractPosition].parameter as ITransferContract;
@@ -36,11 +37,11 @@ const TransactionItem: React.FC<ITransaction> = ({
       <TransactionData>
         <p>
           <strong>From: </strong>
-          {parameter.ownerAddress}
+          {sender}
         </p>
         <p>
           <strong>To: </strong>
-          {parameter.toAddress}
+          {parameter.toAddress || '--'}
         </p>
       </TransactionData>
       <TransactionAmount>

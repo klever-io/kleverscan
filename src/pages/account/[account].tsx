@@ -88,11 +88,11 @@ const Account: React.FC<IAccountPage> = ({
   }, [page, account.address]);
 
   const getFreezeBalance = () => {
-    if (Object.values(account.buckets).length <= 0) {
+    if (Object.values(account.assets).length <= 0) {
       return 0;
     }
 
-    const freezeBalance = Object.values(account.buckets).reduce(
+    const freezeBalance = Object.values(account.assets).reduce(
       (acc, bucket) => acc + bucket.stakeValue,
       0,
     );
@@ -275,6 +275,9 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
       prices.symbols[0].price *
       (account.data.account.balance / 10 ** precision);
   }
+  Object.values(props.account.assets).forEach(asset => {
+    console.log(asset);
+  });
 
   return { props };
 };

@@ -8,7 +8,6 @@ import { IHome } from '../types';
 
 import HomeServerSideProps from '../utils/ServerSideProps/Home';
 
-import Maintenance from '@/components/Maintenance';
 import HomeDataCards from '@/components/HomeDataCards';
 import BlockCardList from '@/components/BlockCardList';
 import HomeTransactions from '@/components/HomeTransactions';
@@ -30,7 +29,6 @@ const Home: React.FC<IHome> = ({
   return (
     <Container>
       <DataContainer>
-        <Maintenance />
         <Input />
         <HomeDataCards
           totalAccounts={defaultTotalAccounts}
@@ -53,8 +51,7 @@ const Home: React.FC<IHome> = ({
   );
 };
 
-export const getServerSideProps: GetServerSideProps<IHome> = async () => {
-  return HomeServerSideProps();
-};
+export const getServerSideProps: GetServerSideProps<IHome> =
+  HomeServerSideProps;
 
 export default Home;

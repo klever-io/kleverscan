@@ -40,6 +40,7 @@ import {
   Freeze,
   Unfreeze,
   Withdraw,
+  Delegate,
 } from '@/components/TransactionContractComponents';
 import Copy from '@/components/Copy';
 
@@ -114,6 +115,7 @@ const Transaction: React.FC<ITransactionPage> = ({
         return <Freeze {...contract[0]} />;
       case Contract.Unfreeze:
       case Contract.Delegate:
+        return <Delegate {...contract[0]} />;
       case Contract.Undelegate:
         return <Unfreeze {...contract[0]} />;
       case Contract.Withdraw:
@@ -306,6 +308,7 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
     precision,
     asset,
   };
+  console.log('===============================', props.contract);
 
   return { props };
 };

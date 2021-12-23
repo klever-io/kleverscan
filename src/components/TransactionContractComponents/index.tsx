@@ -45,7 +45,7 @@ export const Transfer: React.FC<IContract> = ({
               )}
             </strong>
             <KLV style={{ marginLeft: '1rem' }} />
-            <Link href={`/asset/${coin.address}`}>{coin.address}</Link>
+            <Link href={`/asset/${coin.assetId}`}>{coin.assetId}</Link>
           </>
         </CenteredRow>
       </Row>
@@ -79,9 +79,9 @@ export const CreateAsset: React.FC<IContract> = ({ parameter: par }) => {
           <strong>Owner</strong>
         </span>
         <span>
-          <Link href={`/account/${parameter.ownerAddress}`}>
+          {/* <Link href={`/account/${parameter.ownerAddress}`}>
             {parameter.ownerAddress}
-          </Link>
+          </Link> */}
         </span>
       </Row>
       <Row>
@@ -243,6 +243,20 @@ export const Unfreeze: React.FC<IContract> = ({ parameter: par }) => {
           </Link>
         </span>
       </Row>
+      <Row>
+        <span>
+          <strong>Bucket ID</strong>
+        </span>
+        <span>{parameter.bucketID}</span>
+      </Row>
+    </>
+  );
+};
+export const Delegate: React.FC<IContract> = ({ parameter: par }) => {
+  const parameter = par as IUnfreezeContract;
+
+  return (
+    <>
       <Row>
         <span>
           <strong>Bucket ID</strong>

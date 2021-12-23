@@ -59,7 +59,7 @@ const Assets: React.FC<IAssetPage> = ({
   const TableBody: React.FC<IAsset> = ({
     ticker,
     name,
-    address,
+    assetId,
     type,
     initialSupply,
     maxSupply,
@@ -72,7 +72,7 @@ const Assets: React.FC<IAssetPage> = ({
           <p>{ticker}</p>
         </span>
         <span>
-          <Link href={`/asset/${address}`}>{address}</Link>
+          <Link href={`/asset/${assetId}`}>{assetId}</Link>
         </span>
         <span>
           <p>{name}</p>

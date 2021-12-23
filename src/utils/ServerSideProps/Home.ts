@@ -10,8 +10,9 @@ import {
 } from '../../types';
 
 import api, { Service } from '@/services/api';
+import { GetServerSideProps } from 'next';
 
-const HomeServerSideProps = async () => {
+const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
   const props: IHome = {
     blocks: [],
     transactions: [],

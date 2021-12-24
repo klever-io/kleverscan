@@ -6,7 +6,7 @@ import { IResponse } from '@/types/index';
 import api, { Service } from '@/services/api';
 
 const redis = new Redis({
-  host: process.env.DEFAULT_REDIS_HOST || '10.15.139.227',
+  host: process.env.DEFAULT_REDIS_HOST || '10.196.89.28',
   port: Number(process.env.DEFAULT_REDIS_PORT) || 6379,
 });
 

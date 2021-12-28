@@ -2,6 +2,10 @@ import styled, { keyframes } from 'styled-components';
 
 import Image from 'next/image';
 
+import {
+  ArrowLeft as DefaultArrowLeft,
+  ArrowRight as DefaultArrowRight,
+} from '@/assets/pagination';
 interface IVariation {
   positive: boolean;
 }
@@ -17,13 +21,26 @@ const FadeIn = keyframes`
 `;
 
 export const Container = styled.div`
-  width: 22rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+`;
+
+export const ArrowContainer = styled.div`
+  width: 21rem;
 
   display: flex;
 
   position: relative;
 
   flex-direction: row;
+  @media (max-width: 768px) {
+    width: calc(100vw - 10rem);
+  }
+  @media (max-width: 425px) {
+    min-width: calc(100vw - 5rem);
+  }
 `;
 
 export const Content = styled.div`
@@ -32,17 +49,22 @@ export const Content = styled.div`
   overflow-x: auto;
   scroll-behavior: smooth !important;
 
-  gap: 0.75rem;
+  scroll-snap-type: x mandatory;
+  scroll-snap-stop: always;
 
   border-radius: 1rem;
 
   &&::-webkit-scrollbar {
     display: none;
   }
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 export const CardContainer = styled.div`
   padding: 1.5rem;
+  scroll-snap-align: start;
 
   width: auto;
 
@@ -56,7 +78,10 @@ export const CardContainer = styled.div`
   border-radius: 1rem;
 
   @media (max-width: 768px) {
-    width: 100%;
+    min-width: calc(100vw - 10rem);
+  }
+  @media (max-width: 425px) {
+    min-width: calc(100vw - 5rem);
   }
 `;
 
@@ -187,4 +212,80 @@ export const IconContainer = styled(Image).attrs(() => ({
   height: 50,
 }))`
   padding-right: 1rem;
+`;
+export const ArrowRight = styled(DefaultArrowRight)`
+  display: none;
+  @media (min-width: 768px) {
+    display: block;
+    position: absolute;
+
+    width: 2rem;
+    height: 2rem;
+    padding-top: 0.5rem;
+    padding-left: 1rem;
+    right: -0.25rem;
+    bottom: 50%;
+    transform: translateY(50%);
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+    filter: brightness(1);
+    z-index: 2;
+
+    &:hover {
+      filter: brightness(2);
+    }
+  }
+`;
+
+export const ArrowLeft = styled(DefaultArrowLeft)`
+  display: none;
+  @media (min-width: 768px) {
+    display: block;
+    position: absolute;
+    width: 2rem;
+    height: 2rem;
+    padding-top: 0.5rem;
+    padding-left: 0.25rem;
+    left: -0.25rem;
+    bottom: 50%;
+    transform: translateY(50%);
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+    z-index: 2;
+    filter: brightness(1);
+
+    &:hover {
+      filter: brightness(2);
+    }
+  }
+`;
+
+export const CoinsSelector = styled.div`
+  position: absolute;
+  bottom: -1rem;
+  display: flex;
+  min-width: 0.5rem;
+  height: 0.5rem;
+  gap: 0.5rem;
+  transition: 0.5s ease;
+
+  border-radius: 50%;
+  @media (min-width: 768px) {
+  }
+`;
+
+export const CoinSelector = styled.div<{ isSelected: boolean }>`
+  min-width: 0.5rem;
+  height: 0.5rem;
+
+  transition: 0.5s ease;
+
+  background-color: ${props =>
+    props.isSelected ? props.theme.white : props.theme.black};
+  cursor: pointer;
+  border-radius: 50%;
 `;

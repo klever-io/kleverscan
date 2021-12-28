@@ -3,7 +3,7 @@ import {
   ICard,
   IAccountResponse,
   IStatisticsResponse,
-} from '../../types';
+} from '../../../types';
 
 import { useEffect, useState } from 'react';
 import CoinCard from '@/components/Cards/CoinCard';

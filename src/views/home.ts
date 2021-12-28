@@ -185,18 +185,6 @@ export const DataCardLatest = styled.div<IVariation>`
   }
 `;
 
-export const CoinSelector = styled.div<{ isSelected: boolean }>`
-  width: 0.5rem;
-  height: 0.5rem;
-
-  background-color: ${props =>
-    props.isSelected ? props.theme.white : props.theme.black};
-
-  border-radius: 50%;
-
-  cursor: pointer;
-`;
-
 interface BlockCardContainerProps {
   blockIndex: number;
 }

@@ -8,7 +8,7 @@ import { IHome } from '../types';
 
 import HomeServerSideProps from '../utils/ServerSideProps/Home';
 
-import HomeDataCards from '@/components/HomeDataCards';
+import HomeDataCards from '@/components/Cards/HomeDataCards';
 import BlockCardList from '@/components/BlockCardList';
 import HomeTransactions from '@/components/HomeTransactions';
 

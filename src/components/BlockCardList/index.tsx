@@ -7,7 +7,7 @@ import api from '@/services/api';
 import { IBlock, IBlockResponse, IBlockCardList } from '../../types';
 
 import Carousel from '@/components/Carousel';
-import BlockCard from '@/components/BlockCard';
+import BlockCard from '@/components/Cards/BlockCard';
 
 const BlockCardList: React.FC<IBlockCardList> = ({ blocks, precision }) => {
   const [listedBlocks, setListedBlocks] = useState<IBlock[]>(blocks);

@@ -11,6 +11,7 @@ interface IPagination {
 }
 
 const Pagination: React.FC<IPagination> = ({ count, page, onPaginate }) => {
+  count += 1;
   const cells = calculate(count, page);
 
   const prevProps = {
@@ -23,7 +24,7 @@ const Pagination: React.FC<IPagination> = ({ count, page, onPaginate }) => {
   };
 
   const nextProps = {
-    active: page < count,
+    active: page < count - 1,
     onClick: () => {
       if (page < count) {
         onPaginate(page + 1);

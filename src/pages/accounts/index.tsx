@@ -145,7 +145,7 @@ const Accounts: React.FC<IAccounts> = ({
     //   }
 
     //   const freezeBalance = Object.values(buckets).reduce(
-    //     (acc, bucket) => acc + bucket.stakeValue,
+    //     (acc, bucket) => acc + bucket.balance,
     //     0,
     //   );
 

@@ -100,7 +100,7 @@ const Assets: React.FC<IAssets> = props => {
         </span>
         <span>
           <strong>
-            {formatAmount(frozenBalance)} {ticker}
+            {formatAmount(frozenBalance / 10 ** precision)} {ticker}
           </strong>
         </span>
       </Row>

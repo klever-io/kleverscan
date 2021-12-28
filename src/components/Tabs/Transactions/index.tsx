@@ -20,6 +20,7 @@ import { formatAmount } from '@/utils/index';
 interface ITransactionsProps {
   transactions: ITransaction[];
   precision?: number;
+  loading: boolean;
 }
 
 const Transactions: React.FC<ITransactionsProps> = props => {
@@ -90,7 +91,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
   const tableProps: ITable = {
     body: TableBody,
     data: Object.values(props.transactions) as any[],
-    loading: false,
+    loading: props.loading,
     header,
     type: 'transactions',
   };

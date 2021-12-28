@@ -19,11 +19,11 @@ import {
 
 import api from '@/services/api';
 import {
-  IAccount,
   IAsset,
   IPagination,
   IResponse,
   ITransaction,
+  IAccountAsset,
 } from '@/types/index';
 import { toLocaleFixed } from '@/utils/index';
 
@@ -40,7 +40,7 @@ interface IAssetPage {
   totalTransactions: number;
   totalTransactionsPage: number;
   totalHoldersPage: number;
-  holders: IAccount[];
+  holders: IAccountAsset[];
 }
 
 interface IAssetResponse extends IResponse {
@@ -51,7 +51,7 @@ interface IAssetResponse extends IResponse {
 
 interface IHoldersResponse extends IResponse {
   data: {
-    accounts: IAccount[];
+    accounts: IAccountAsset[];
   };
   pagination: IPagination;
 }
@@ -92,14 +92,18 @@ const Asset: React.FC<IAssetPage> = ({
   const [transactions, setTransactions] = useState(defaultTransactions);
   const [holdersPage, setHoldersPage] = useState(0);
   const [holders, setHolders] = useState(defaultHolders);
+  const [loadingTransactions, setLoadingTransactions] = useState(false);
+  const [loadingHolders, setLoadingHolders] = useState(false);
 
   useEffect(() => {
+    setLoadingTransactions(true);
     const fetchData = async () => {
       const response: ITransactionResponse = await api.get({
-        route: `transaction/list?asset=${asset.assetId}`,
+        route: `transaction/list?asset=${asset.assetId}&page=${transactionsPage}`,
       });
       if (!response.error) {
         setTransactions(response.data.transactions);
+        setLoadingTransactions(false);
       }
     };
 
@@ -107,17 +111,19 @@ const Asset: React.FC<IAssetPage> = ({
   }, [transactionsPage]);
 
   useEffect(() => {
+    setLoadingHolders(true);
     const fetchData = async () => {
       const response: IHoldersResponse = await api.get({
-        route: `assets/holders/${asset.assetId}`,
+        route: `assets/holders/${asset.assetId}?page=${holdersPage}`,
       });
       if (!response.error) {
         setHolders(response.data.accounts);
+        setLoadingHolders(false);
       }
     };
 
     fetchData();
-  }, [transactionsPage]);
+  }, [holdersPage]);
 
   const Overview: React.FC = () => {
     return (
@@ -231,7 +237,11 @@ const Asset: React.FC<IAssetPage> = ({
       case 'Transactions':
         return (
           <>
-            <Transactions transactions={transactions} precision={precision} />
+            <Transactions
+              transactions={transactions}
+              precision={precision}
+              loading={loadingTransactions}
+            />
             <PaginationContainer>
               <Pagination
                 count={totalTransactionsPage}
@@ -246,7 +256,7 @@ const Asset: React.FC<IAssetPage> = ({
       case 'Holders':
         return (
           <>
-            <Holders asset={asset} holders={holders} />
+            <Holders asset={asset} holders={holders} loading={loadingHolders} />
             <PaginationContainer>
               <Pagination
                 count={totalHoldersPage}
@@ -326,9 +336,9 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
 
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
 
-  const address = params?.asset;
+  const assetId = params?.asset;
 
-  const asset: IAssetResponse = await api.get({ route: `assets/${address}` });
+  const asset: IAssetResponse = await api.get({ route: `assets/${assetId}` });
   if (asset.error) {
     return redirectProps;
   } else {
@@ -336,7 +346,7 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
   }
 
   const transactions: ITransactionResponse = await api.get({
-    route: `transaction/list?asset=${address}`,
+    route: `transaction/list?asset=${assetId}`,
   });
   if (!transactions.error) {
     props.transactions = transactions.data.transactions;
@@ -345,7 +355,7 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
   }
 
   const holders: IHoldersResponse = await api.get({
-    route: `assets/holders/${address}`,
+    route: `assets/holders/${assetId}`,
   });
   if (!holders.error) {
     props.holders = holders.data.accounts;

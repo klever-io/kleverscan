@@ -4,13 +4,14 @@ import Link from 'next/link';
 
 import Table, { ITable } from '@/components/Table';
 import { Row } from '@/components/Table/styles';
-import { IAccount, IAsset } from '@/types/index';
+import { IAccountAsset, IAsset } from '@/types/index';
 import { toLocaleFixed } from '@/utils/index';
 import { RankingContainer } from './styles';
 
 interface IHolder {
-  holders: IAccount[];
+  holders: IAccountAsset[];
   asset: IAsset;
+  loading: boolean;
 }
 
 interface IBalance {
@@ -19,23 +20,23 @@ interface IBalance {
   index: number;
 }
 
-const Holders: React.FC<IHolder> = ({ holders, asset }) => {
+const Holders: React.FC<IHolder> = ({ holders, asset, loading }) => {
   const balances = holders
     .map(holder => {
-      if (Object.keys(holder.assets).includes(asset.assetId)) {
+      if (holder.assetId === asset.assetId) {
         return {
           address: holder.address,
-          balance: holder.assets[asset.assetId].balance,
+          balance: holder.frozenBalance,
         };
-      }
+      } else
+        return {
+          address: '',
+          balance: 0,
+        };
     })
-    .sort((a, b) => b?.balance - a?.balance)
     .map((holder, index) => ({ ...holder, index }));
 
-  const totalAmount = Object.values(balances).reduce(
-    (acc, holder) => acc + holder?.balance,
-    0,
-  );
+  const totalAmount = balances.reduce((acc, holder) => acc + holder.balance, 0);
 
   const TableBody: React.FC<IBalance> = ({ address, balance, index }) => {
     return (
@@ -65,7 +66,7 @@ const Holders: React.FC<IHolder> = ({ holders, asset }) => {
   const tableProps: ITable = {
     body: TableBody,
     data: balances as any[],
-    loading: false,
+    loading: loading,
     header,
     type: 'holders',
   };

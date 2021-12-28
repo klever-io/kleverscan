@@ -117,7 +117,7 @@ export const CenteredRow = styled.div`
   align-items: center;
   flex: 1;
 
-  gap: 0.5rem;
+  gap: 2rem;
 
   span {
     flex: 1;
@@ -128,6 +128,7 @@ export const CenteredRow = styled.div`
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: fit-content;
 
     @media (max-width: 768px) {
       max-width: 100%;

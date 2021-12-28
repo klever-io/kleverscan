@@ -12,6 +12,7 @@ interface IPagination {
 
 const Pagination: React.FC<IPagination> = ({ count, page, onPaginate }) => {
   count += 1;
+  count >= 1000 ? (count = 1000) : count;
   const cells = calculate(count, page);
 
   const prevProps = {

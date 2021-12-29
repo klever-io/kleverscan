@@ -285,14 +285,16 @@ export interface IHome {
   totalTransactions: number;
   tps: string;
   coinsData: ICoinInfo[];
-  yeasterdayTransactions: number;
+  yesterdayTransactions: number;
+  yesterdayAccounts: number;
 }
 export interface IDataCards {
   totalAccounts: number;
   totalTransactions: number;
   tps: string;
   coinsData: ICoinInfo[];
-  yeasterdayTransactions: number;
+  yesterdayTransactions: number;
+  yesterdayAccounts: number;
 }
 
 export interface IHomeTransactions {

@@ -21,7 +21,8 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     totalTransactions: 0,
     tps: '0/0',
     coinsData: [],
-    yeasterdayTransactions: 0,
+    yesterdayTransactions: 0,
+    yesterdayAccounts: 0,
   };
 
   const blocksCall = new Promise<IBlockResponse>(resolve =>
@@ -130,9 +131,16 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     ),
   );
 
+  const yesterdayAccountsCall = new Promise<IYesterdayResponse>(resolve =>
+    resolve(
+      api.getCached({
+        route: 'address/list/count/1',
+      }),
+    ),
+  );
+
   const [
-    blocks,
-    transactions,
+    [blocks, transactions],
     transactionsList,
     accounts,
     statistics,
@@ -141,9 +149,9 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     kfiData,
     kfiChart,
     yesterdayTransactions,
+    yesterdayAccounts,
   ] = await Promise.all([
-    blocksCall,
-    transactionsCall,
+    Promise.all([blocksCall, transactionsCall]),
     transactionsListCall,
     accountsCall,
     statisticsCall,
@@ -152,6 +160,7 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     kfiDataCall,
     kfiChartCall,
     yesterdayTransactionsCall,
+    yesterdayAccountsCall,
   ]);
 
   if (!blocks.error) {
@@ -182,8 +191,11 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
   pushCoinData('Klever Finance', 'KFI', kfiData, kfiChart);
 
   if (!yesterdayTransactions.error) {
-    props.yeasterdayTransactions =
+    props.yesterdayTransactions =
       yesterdayTransactions.data.number_by_day[0].doc_count;
+  }
+  if (!yesterdayAccounts.error) {
+    props.yesterdayAccounts = yesterdayAccounts.data.number_by_day[0].doc_count;
   }
 
   return { props };

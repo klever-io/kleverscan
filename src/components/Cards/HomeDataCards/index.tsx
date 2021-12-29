@@ -24,7 +24,8 @@ const HomeDataCards: React.FC<IDataCards> = ({
   totalTransactions,
   tps,
   coinsData,
-  yeasterdayTransactions,
+  yesterdayTransactions,
+  yesterdayAccounts,
 }) => {
   const statisticsWatcherTimeout = 4000;
   const cardWatcherInterval = 4 * 1000; // 4 secs
@@ -38,13 +39,13 @@ const HomeDataCards: React.FC<IDataCards> = ({
       Icon: Accounts,
       title: 'Total accounts',
       value: totalAccounts,
-      variation: '+ 0.00%',
+      variation: `+ ${yesterdayAccounts.toLocaleString()}`,
     },
     {
       Icon: Transactions,
       title: 'Total transactions',
       value: totalTransactions,
-      variation: `+ ${yeasterdayTransactions.toLocaleString()}`,
+      variation: `+ ${yesterdayTransactions.toLocaleString()}`,
     },
   ];
   useEffect(() => {

@@ -26,7 +26,7 @@ const Holders: React.FC<IHolder> = ({ holders, asset, loading }) => {
       if (holder.assetId === asset.assetId) {
         return {
           address: holder.address,
-          balance: holder.frozenBalance,
+          balance: holder.frozenBalance + holder.balance,
         };
       } else
         return {
@@ -35,8 +35,6 @@ const Holders: React.FC<IHolder> = ({ holders, asset, loading }) => {
         };
     })
     .map((holder, index) => ({ ...holder, index }));
-
-  const totalAmount = balances.reduce((acc, holder) => acc + holder.balance, 0);
 
   const TableBody: React.FC<IBalance> = ({ address, balance, index }) => {
     return (
@@ -50,7 +48,9 @@ const Holders: React.FC<IHolder> = ({ holders, asset, loading }) => {
           <Link href={`/account/${address}`}>{address}</Link>
         </span>
         <span>
-          <strong>{((balance / totalAmount) * 100).toFixed(2)}%</strong>
+          <strong>
+            {((balance / asset.circulatingSupply) * 100).toFixed(2)}%
+          </strong>
         </span>
         <span>
           <strong>

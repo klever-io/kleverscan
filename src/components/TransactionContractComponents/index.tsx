@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import Link from 'next/link';
 
@@ -27,9 +27,6 @@ export const Transfer: React.FC<IContract> = ({
   const coin: IAsset = asset || KLV;
   const parameter = par as ITransferContract;
 
-  useEffect(() => {
-    console.log(coin);
-  }, []);
   return (
     <>
       <Row>

@@ -3,6 +3,7 @@ import {
   ICard,
   IAccountResponse,
   IStatisticsResponse,
+  IYesterdayResponse,
 } from '../../../types';
 
 import { useEffect, useState } from 'react';
@@ -33,13 +34,16 @@ const HomeDataCards: React.FC<IDataCards> = ({
   const [actualTPS, setActualTPS] = useState<string>(tps);
 
   const [totalAccounts, setTotalAccounts] = useState(defaultTotalAccounts);
+  const [newAccounts, setNewAccounts] = useState(yesterdayAccounts);
 
   const dataCards: ICard[] = [
     {
       Icon: Accounts,
       title: 'Total accounts',
       value: totalAccounts,
-      variation: `+ ${yesterdayAccounts.toLocaleString()}`,
+      variation: `+ ${
+        newAccounts === totalAccounts ? '0%' : newAccounts.toLocaleString()
+      }`,
     },
     {
       Icon: Transactions,
@@ -63,12 +67,31 @@ const HomeDataCards: React.FC<IDataCards> = ({
     }, statisticsWatcherTimeout);
 
     const cardWatcher = setInterval(async () => {
-      const accounts: IAccountResponse = await api.get({
-        route: 'address/list',
-      });
+      const accountsCall = new Promise<IAccountResponse>(resolve =>
+        resolve(
+          api.get({
+            route: 'address/list',
+          }),
+        ),
+      );
+
+      const yesterdayAccountsCall = new Promise<IYesterdayResponse>(resolve =>
+        resolve(
+          api.getCached({
+            route: 'address/list/count/1',
+          }),
+        ),
+      );
+      const [accounts, yesterdayAccounts] = await Promise.all([
+        accountsCall,
+        yesterdayAccountsCall,
+      ]);
 
       if (!accounts.error) {
         setTotalAccounts(accounts.pagination.totalRecords);
+      }
+      if (!yesterdayAccounts.error) {
+        setNewAccounts(yesterdayAccounts.data.number_by_day[0].doc_count);
       }
     }, cardWatcherInterval);
 

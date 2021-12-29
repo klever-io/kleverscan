@@ -49,8 +49,6 @@ const Assets: React.FC<IAssets> = props => {
             route: `assets/${assetData[i].tokenId}`,
           });
           if (!response.error) {
-            console.log(response.data);
-
             lastData.push({ ...response.data.asset, ...assetData[i] });
           }
         }

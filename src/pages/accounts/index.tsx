@@ -105,7 +105,9 @@ const Accounts: React.FC<IAccounts> = ({
       title: 'Number of Accounts',
       headers: ['Accounts created in the last 24h', 'Total accounts'],
       values: [
-        createdYesterday.toLocaleString(),
+        createdYesterday === pagination.totalRecords
+          ? '--'
+          : createdYesterday.toLocaleString(),
         pagination.totalRecords.toLocaleString(),
       ],
     },
@@ -158,7 +160,7 @@ const Accounts: React.FC<IAccounts> = ({
           <Link href={`/account/${address}`}>{address}</Link>
         </span>
         <span>
-          <strong>{/* {formatAmount(getFreezeBalance())}  */}0 KLV</strong>
+          <strong>{/* {formatAmount(getFreezeBalance())}  */}-- KLV</strong>
         </span>
         <span>{nonce}</span>
         <span>

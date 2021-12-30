@@ -6,9 +6,9 @@ import { fromUnixTime } from 'date-fns';
 
 import { BlockCardContainer, BlockCardRow } from '@/views/home';
 
-import { IBlock, IBlockCard } from '../../types';
+import { IBlock, IBlockCard } from '../../../types';
 
-import { formatAmount, getAge } from '../../utils';
+import { formatAmount, getAge } from '../../../utils';
 
 const BlockCard: React.FC<IBlock & IBlockCard> = ({
   nonce,

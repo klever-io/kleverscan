@@ -8,7 +8,7 @@ import { IHome } from '../types';
 
 import HomeServerSideProps from '../utils/ServerSideProps/Home';
 
-import HomeDataCards from '@/components/HomeDataCards';
+import HomeDataCards from '@/components/Cards/HomeDataCards';
 import BlockCardList from '@/components/BlockCardList';
 import HomeTransactions from '@/components/HomeTransactions';
 
@@ -17,10 +17,11 @@ const Home: React.FC<IHome> = ({
   totalTransactions: defaultTotalTransactions,
   tps,
   coinsData,
-  yeasterdayTransactions,
+  yesterdayTransactions,
   blocks,
   transactionsList,
   transactions: defaultTransactions,
+  yesterdayAccounts,
 }) => {
   const precision = 6; // default KLV precision
   const [totalTransactions, setTotalTransactions] = useState(
@@ -35,7 +36,8 @@ const Home: React.FC<IHome> = ({
           totalTransactions={totalTransactions}
           tps={tps}
           coinsData={coinsData}
-          yeasterdayTransactions={yeasterdayTransactions}
+          yesterdayTransactions={yesterdayTransactions}
+          yesterdayAccounts={yesterdayAccounts}
         />
       </DataContainer>
 

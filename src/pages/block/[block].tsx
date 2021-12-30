@@ -85,14 +85,17 @@ const Block: React.FC<IBlockPage> = ({
 
   const [transactionPage, setTransactionPage] = useState(0);
   const [transactions, setTransactions] = useState(defaultTransactions);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const response: ITransactionResponse = await api.get({
         route: `transaction/list?page=${transactionPage}&nonce=${nonce}`,
       });
       if (!response.error) {
         setTransactions(response.data.transactions);
+        setLoading(false);
       }
     };
 
@@ -291,7 +294,7 @@ const Block: React.FC<IBlockPage> = ({
       case 'Transactions':
         return (
           <>
-            <Transactions transactions={transactions} />
+            <Transactions transactions={transactions} loading={loading} />
 
             <PaginationContainer>
               <Pagination

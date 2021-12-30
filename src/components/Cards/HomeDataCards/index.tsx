@@ -3,7 +3,8 @@ import {
   ICard,
   IAccountResponse,
   IStatisticsResponse,
-} from '../../types';
+  IYesterdayResponse,
+} from '../../../types';
 
 import { useEffect, useState } from 'react';
 import CoinCard from '@/components/Cards/CoinCard';
@@ -24,7 +25,8 @@ const HomeDataCards: React.FC<IDataCards> = ({
   totalTransactions,
   tps,
   coinsData,
-  yeasterdayTransactions,
+  yesterdayTransactions,
+  yesterdayAccounts,
 }) => {
   const statisticsWatcherTimeout = 4000;
   const cardWatcherInterval = 4 * 1000; // 4 secs
@@ -32,19 +34,22 @@ const HomeDataCards: React.FC<IDataCards> = ({
   const [actualTPS, setActualTPS] = useState<string>(tps);
 
   const [totalAccounts, setTotalAccounts] = useState(defaultTotalAccounts);
+  const [newAccounts, setNewAccounts] = useState(yesterdayAccounts);
 
   const dataCards: ICard[] = [
     {
       Icon: Accounts,
       title: 'Total accounts',
       value: totalAccounts,
-      variation: '+ 0.00%',
+      variation: `+ ${
+        newAccounts === totalAccounts ? '0%' : newAccounts.toLocaleString()
+      }`,
     },
     {
       Icon: Transactions,
       title: 'Total transactions',
       value: totalTransactions,
-      variation: `+ ${yeasterdayTransactions.toLocaleString()}`,
+      variation: `+ ${yesterdayTransactions.toLocaleString()}`,
     },
   ];
   useEffect(() => {
@@ -62,12 +67,31 @@ const HomeDataCards: React.FC<IDataCards> = ({
     }, statisticsWatcherTimeout);
 
     const cardWatcher = setInterval(async () => {
-      const accounts: IAccountResponse = await api.get({
-        route: 'address/list',
-      });
+      const accountsCall = new Promise<IAccountResponse>(resolve =>
+        resolve(
+          api.get({
+            route: 'address/list',
+          }),
+        ),
+      );
+
+      const yesterdayAccountsCall = new Promise<IYesterdayResponse>(resolve =>
+        resolve(
+          api.getCached({
+            route: 'address/list/count/1',
+          }),
+        ),
+      );
+      const [accounts, yesterdayAccounts] = await Promise.all([
+        accountsCall,
+        yesterdayAccountsCall,
+      ]);
 
       if (!accounts.error) {
         setTotalAccounts(accounts.pagination.totalRecords);
+      }
+      if (!yesterdayAccounts.error) {
+        setNewAccounts(yesterdayAccounts.data.number_by_day[0].doc_count);
       }
     }, cardWatcherInterval);
 

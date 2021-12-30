@@ -64,7 +64,7 @@ const Account: React.FC<IAccountPage> = ({
   const precision = 6;
 
   const [page, setPage] = useState(0);
-  const [, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [transactions, setTransactions] = useState(
     transactionResponse.data.transactions,
   );
@@ -99,10 +99,6 @@ const Account: React.FC<IAccountPage> = ({
     return freezeBalance / 10 ** precision;
   };
 
-  const getTotalBalance = () => {
-    return (account.balance + getFreezeBalance()) / 10 ** precision;
-  };
-
   const getTabHeaders = () => {
     const headers: string[] = [];
 
@@ -135,7 +131,7 @@ const Account: React.FC<IAccountPage> = ({
       case 'Transactions':
         return (
           <>
-            <Transactions transactions={transactions} />
+            <Transactions transactions={transactions} loading={loading} />
             <PaginationContainer>
               <Pagination
                 count={transactionResponse.pagination.totalPages}
@@ -191,7 +187,9 @@ const Account: React.FC<IAccountPage> = ({
                   <span>KLV</span>
                 </IconContainer>
                 <div>
-                  <span>{getTotalBalance().toLocaleString()}</span>
+                  <span>
+                    {(account.balance / 10 ** precision).toLocaleString()}
+                  </span>
                   <p>USD {convertedBalance.toLocaleString()}</p>
                 </div>
               </AmountContainer>
@@ -199,7 +197,10 @@ const Account: React.FC<IAccountPage> = ({
                 <div>
                   <strong>Available</strong>
                   <span>
-                    {(account.balance / 10 ** precision).toLocaleString()}
+                    {(
+                      account.balance / 10 ** precision -
+                      getFreezeBalance()
+                    ).toLocaleString()}
                   </span>
                 </div>
                 <div>
@@ -274,9 +275,6 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
       prices.symbols[0].price *
       (account.data.account.balance / 10 ** precision);
   }
-  Object.values(props.account.assets).forEach(asset => {
-    console.log(asset);
-  });
 
   return { props };
 };

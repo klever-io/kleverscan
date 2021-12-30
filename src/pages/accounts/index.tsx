@@ -30,6 +30,7 @@ import Pagination from '@/components/Pagination';
 interface IAccounts {
   accounts: IAccount[];
   pagination: IPagination;
+  createdYesterday: number;
 }
 
 interface IAccountResponse extends IResponse {
@@ -37,6 +38,15 @@ interface IAccountResponse extends IResponse {
     accounts: IAccount[];
   };
   pagination: IPagination;
+}
+interface IAccountRangeOfLastDays extends IResponse {
+  data: {
+    number_by_day: [
+      {
+        doc_count: number;
+      },
+    ];
+  };
 }
 
 interface ICard {
@@ -48,6 +58,7 @@ interface ICard {
 const Accounts: React.FC<IAccounts> = ({
   accounts: defaultAccounts,
   pagination,
+  createdYesterday,
 }) => {
   const router = useRouter();
   const precision = 6; // default KLV precision
@@ -92,8 +103,13 @@ const Accounts: React.FC<IAccounts> = ({
   const cards: ICard[] = [
     {
       title: 'Number of Accounts',
-      headers: ['Accounts Yesterday', 'Total'],
-      values: ['--', pagination.totalRecords.toLocaleString()],
+      headers: ['Accounts created in the last 24h', 'Total accounts'],
+      values: [
+        createdYesterday === pagination.totalRecords
+          ? '--'
+          : createdYesterday.toLocaleString(),
+        pagination.totalRecords.toLocaleString(),
+      ],
     },
   ];
 
@@ -131,7 +147,7 @@ const Accounts: React.FC<IAccounts> = ({
     //   }
 
     //   const freezeBalance = Object.values(buckets).reduce(
-    //     (acc, bucket) => acc + bucket.stakeValue,
+    //     (acc, bucket) => acc + bucket.balance,
     //     0,
     //   );
 
@@ -144,7 +160,7 @@ const Accounts: React.FC<IAccounts> = ({
           <Link href={`/account/${address}`}>{address}</Link>
         </span>
         <span>
-          <strong>{/* {formatAmount(getFreezeBalance())}  */}0 KLV</strong>
+          <strong>{/* {formatAmount(getFreezeBalance())}  */}-- KLV</strong>
         </span>
         <span>{nonce}</span>
         <span>
@@ -203,14 +219,36 @@ export const getServerSideProps: GetServerSideProps<IAccounts> = async () => {
   const props: IAccounts = {
     accounts: [],
     pagination: {} as IPagination,
+    createdYesterday: 0,
   };
 
-  const accounts: IAccountResponse = await api.get({
-    route: 'address/list',
-  });
+  const accountsCall = new Promise<IAccountResponse>(resolve =>
+    resolve(
+      api.get({
+        route: 'address/list',
+      }),
+    ),
+  );
+
+  const yesterdayAccountsCall = new Promise<IAccountRangeOfLastDays>(resolve =>
+    resolve(
+      api.get({
+        route: 'address/list/count/1',
+      }),
+    ),
+  );
+
+  const [accounts, yesterdayAccounts] = await Promise.all([
+    accountsCall,
+    yesterdayAccountsCall,
+  ]);
+
   if (!accounts.error) {
     props.accounts = accounts.data.accounts;
     props.pagination = accounts.pagination;
+  }
+  if (!yesterdayAccounts.error) {
+    props.createdYesterday = yesterdayAccounts.data.number_by_day[0].doc_count;
   }
 
   return { props };

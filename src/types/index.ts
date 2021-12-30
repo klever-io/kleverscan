@@ -163,13 +163,25 @@ export interface IAccount {
   balance: number;
   blsPublicKey: string;
   assets: {
-    [key: string]: any;
+    [key: string]: IAccountAsset;
   };
   buckets?: [
     {
       [key: string]: IBucket;
     },
   ];
+}
+
+export interface IAccountAsset {
+  address: string;
+  assetId: string;
+  balance: number;
+  frozenBalance: number;
+  lastClaim: {
+    timestamp: number;
+    epoch: number;
+  };
+  buckets?: IBucket[];
 }
 
 export interface IAsset {
@@ -194,10 +206,11 @@ export interface IContract {
 }
 
 export interface IBucket {
-  stakeValue: number;
-  staked: boolean;
+  id: string;
+  stakeAt: number;
   stakedEpoch: number;
   unstakedEpoch: number;
+  balance: number;
   delegation: string;
 }
 
@@ -272,14 +285,16 @@ export interface IHome {
   totalTransactions: number;
   tps: string;
   coinsData: ICoinInfo[];
-  yeasterdayTransactions: number;
+  yesterdayTransactions: number;
+  yesterdayAccounts: number;
 }
 export interface IDataCards {
   totalAccounts: number;
   totalTransactions: number;
   tps: string;
   coinsData: ICoinInfo[];
-  yeasterdayTransactions: number;
+  yesterdayTransactions: number;
+  yesterdayAccounts: number;
 }
 
 export interface IHomeTransactions {

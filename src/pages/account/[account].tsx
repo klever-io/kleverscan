@@ -256,7 +256,10 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
     return redirectProps;
   }
   props.account = account.data.account;
-
+  if (props.account.assets.KLV) {
+    props.account.assets.KLV.balance =
+      props.account.balance - props.account.assets.KLV.frozenBalance;
+  }
   const transactions: ITransactionsResponse = await api.get({
     route: `address/${address}/transactions`,
   });

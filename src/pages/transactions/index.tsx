@@ -135,35 +135,39 @@ const Transactions: React.FC<ITransactions> = ({
     return query.join('&');
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+  const fetchData = async () => {
+    setLoading(true);
 
-      const filters = [
-        { ref: transactionType, key: 'type' },
-        { ref: statusType, key: 'status' },
-        { ref: coinType, key: 'asset' },
-      ];
-      let routerQuery = {};
-      filters.forEach(filter => {
-        if (filter.ref.value !== 'all') {
-          routerQuery = { ...routerQuery, [filter.key]: filter.ref.value };
-        }
-      });
-
-      const response: ITransactionResponse = await api.get({
-        route: `transaction/list?${buildQuery(routerQuery)}&page=${page}`,
-      });
-      if (!response.error) {
-        setTransactions(response.data.transactions);
-        setCount(response.pagination.totalPages);
+    const filters = [
+      { ref: transactionType, key: 'type' },
+      { ref: statusType, key: 'status' },
+      { ref: coinType, key: 'asset' },
+    ];
+    let routerQuery = {};
+    filters.forEach(filter => {
+      if (filter.ref.value !== 'all') {
+        routerQuery = { ...routerQuery, [filter.key]: filter.ref.value };
       }
+    });
 
-      setLoading(false);
-    };
+    const response: ITransactionResponse = await api.get({
+      route: `transaction/list?${buildQuery(routerQuery)}&page=${page}`,
+    });
+    if (!response.error) {
+      setTransactions(response.data.transactions);
+      setCount(response.pagination.totalPages);
+    }
 
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (page !== 0) setPage(0);
+    else fetchData();
+  }, [transactionType, statusType, coinType]);
+  useEffect(() => {
     fetchData();
-  }, [transactionType, statusType, coinType, page]);
+  }, [page]);
 
   const getContractType = (contracts: IContract[]) =>
     contracts.length > 1
@@ -172,13 +176,22 @@ const Transactions: React.FC<ITransactions> = ({
 
   const Transfer: React.FC<IContract> = ({ parameter: par }) => {
     const parameter = par as ITransferContract;
-
     return (
       <>
         <CenteredRow>
           <div>
-            <KLV />
-            <p>KLV</p>
+            {parameter.assetId ? (
+              <Link href={`/asset/${parameter.assetId}`}>
+                {parameter.assetId}
+              </Link>
+            ) : (
+              <>
+                <Link href={`/asset/KLV`}>
+                  <KLV />
+                </Link>
+                <Link href={`/asset/KLV`}>KLV</Link>
+              </>
+            )}
           </div>
         </CenteredRow>
         <span>

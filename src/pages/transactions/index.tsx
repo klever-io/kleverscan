@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
@@ -7,11 +7,13 @@ import { format, fromUnixTime } from 'date-fns';
 
 import {
   CenteredRow,
+  Tooltip,
   Container,
   FilterContainer,
   Header,
   Input,
   Title,
+  TooltipText,
 } from '@/views/transactions';
 
 import Filter, { IFilter, IFilterItem } from '@/components/Filter';
@@ -176,14 +178,26 @@ const Transactions: React.FC<ITransactions> = ({
 
   const Transfer: React.FC<IContract> = ({ parameter: par }) => {
     const parameter = par as ITransferContract;
+    const tooltipRef = useRef<any>(null);
+
+    const handleMouseOver = (e: any) => {
+      const positionY = e.currentTarget.offsetTop;
+      const positionX = e.currentTarget.offsetLeft;
+
+      tooltipRef.current.style.top = positionY - 30 + 'px';
+      tooltipRef.current.style.left = positionX + 'px';
+    };
     return (
       <>
         <CenteredRow>
           <div>
             {parameter.assetId ? (
-              <Link href={`/asset/${parameter.assetId}`}>
-                {parameter.assetId}
-              </Link>
+              <Tooltip onMouseOver={(e: any) => handleMouseOver(e)}>
+                <Link href={`/asset/${parameter.assetId}`}>
+                  {parameter.assetId}
+                </Link>
+                <TooltipText ref={tooltipRef}>{parameter.assetId}</TooltipText>
+              </Tooltip>
             ) : (
               <>
                 <Link href={`/asset/KLV`}>

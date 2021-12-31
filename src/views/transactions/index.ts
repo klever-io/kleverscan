@@ -76,10 +76,40 @@ export const CenteredRow = styled.span`
     align-items: center;
 
     gap: 0.5rem;
-
+    width: 100%;
     p {
       font-weight: 600;
       color: ${props => props.theme.black};
     }
+  }
+`;
+
+export const TooltipText = styled.span`
+  visibility: hidden;
+  opacity: 0;
+  width: fit-content !important;
+  color: ${props => props.theme.white} !important;
+  background-color: ${props => props.theme.black};
+
+  padding: 5px 2px;
+  border-radius: 6px;
+
+  position: fixed;
+  z-index: 1;
+  transform: translateX(-12.5%);
+  transition: 0.3s ease;
+  pointer-events: none;
+`;
+
+export const Tooltip = styled.span`
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  &:hover ${TooltipText} {
+    visibility: visible;
+    opacity: 1;
   }
 `;

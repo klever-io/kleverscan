@@ -18,7 +18,7 @@ export interface ITransferContract {
   amount: number;
   ownerAddress: string;
   toAddress: string;
-  assetAddress?: string;
+  assetId?: string;
 }
 
 export interface ICreateAssetContract {

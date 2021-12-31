@@ -34,16 +34,19 @@ export const Transfer: React.FC<IContract> = ({
           <strong>Amount</strong>
         </span>
         <CenteredRow>
-          <>
-            <strong>
-              {toLocaleFixed(
-                parameter.amount / 10 ** coin.precision,
-                precision,
-              )}
-            </strong>
-            <KLV style={{ marginLeft: '1rem' }} />
+          <strong>
+            {toLocaleFixed(parameter.amount / 10 ** coin.precision, precision)}
+          </strong>
+          {coin.assetId ? (
             <Link href={`/asset/${coin.assetId}`}>{coin.assetId}</Link>
-          </>
+          ) : (
+            <>
+              <Link href={`/asset/KLV`}>
+                <KLV />
+              </Link>
+              <Link href={`/asset/KLV`}>KLV</Link>
+            </>
+          )}
         </CenteredRow>
       </Row>
       <Row>

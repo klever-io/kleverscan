@@ -287,10 +287,9 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
   if (contractType === Contract.Transfer) {
     const contract = transaction.data.transaction.contract[0]
       .parameter as ITransferContract;
-
-    if (contract.assetAddress) {
+    if (contract.assetId) {
       const assetRes: IAssetResponse = await api.get({
-        route: `assets/${contract.assetAddress}`,
+        route: `assets/${contract.assetId}`,
       });
       if (!assetRes.error) {
         precision = assetRes.data.asset.precision;

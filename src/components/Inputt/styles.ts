@@ -15,10 +15,9 @@ export const Container = styled.div`
   cursor: text;
 
   transition: 0.2s ease;
-
   input {
-    min-width: 20rem;
     width: 100%;
+    min-width: 5rem;
 
     font-size: 0.85rem;
 

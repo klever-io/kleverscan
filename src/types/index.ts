@@ -370,3 +370,12 @@ export interface ICard {
   value: number;
   variation: string;
 }
+
+export interface INodeCard {
+  title: string;
+  headers: string[];
+  values: string[];
+  chartType: 'chart' | 'map';
+  chartOptions?: any;
+  chartData: IChartData[] | string[];
+}

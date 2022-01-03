@@ -20,8 +20,9 @@ import { Card, CardContainer, Container, Header, Title } from '@/views/blocks';
 import Chart, { ChartType } from '@/components/Chart';
 const Map = dynamic(() => import('@/components/Map/index'), { ssr: false });
 import MapSvg from '@/components/MapSvg';
+import NodeCards from '@/components/Cards/NodeCards';
 
-import { ICountriesGeoData, ICountryNode } from '../../types';
+import { ICountriesGeoData, ICountryNode, INodeCard } from '../../types';
 
 import { ArrowLeft } from '@/assets/icons';
 import { Nodes as Icon } from '@/assets/title-icons';
@@ -31,17 +32,9 @@ import { getCountryISO3, ISO2 } from '@/utils/country';
 import geoData from '@/assets/countries.geo.json';
 import api from '@/services/api';
 
-interface ICard {
-  title: string;
-  headers: string[];
-  values: string[];
-  chartType: 'chart' | 'map';
-  chartOptions?: any;
-  chartData: IChartData[] | string[];
-}
 interface INodePage {
   nodes: ICountryNode[];
-  cardData: ICard[];
+  cardData: INodeCard[];
 }
 
 interface IGeoIPLookup {
@@ -68,23 +61,6 @@ interface IPeerResponse {
 
 const Nodes: React.FC<INodePage> = ({ nodes, cardData }) => {
   const router = useRouter();
-
-  const [uptime] = useState(new Date().getTime());
-  const [age, setAge] = useState(
-    getAge(fromUnixTime(new Date().getTime() / 1000)),
-  );
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const newAge = getAge(fromUnixTime(uptime / 1000));
-
-      setAge(newAge);
-    }, 1 * 1000); // 1 sec
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
 
   const rankingChartData = () => {
     const maxItems = 6;
@@ -114,36 +90,7 @@ const Nodes: React.FC<INodePage> = ({ nodes, cardData }) => {
         </Title>
       </Header>
 
-      <CardContainer>
-        {cardData.map((card, index) => {
-          const { title, headers, values, chartType, chartOptions, chartData } =
-            card;
-          return (
-            <Card key={index}>
-              <div>
-                <span>
-                  <strong>{title}</strong>
-                </span>
-                <p>{age} ago</p>
-              </div>
-              <CardChartContainer>
-                {chartType === 'chart' ? (
-                  <Chart data={chartData} />
-                ) : (
-                  <MapSvg chartData={chartData} chartOptions={chartOptions} />
-                )}
-                <CardDetails variation={values[1].includes('%')}>
-                  <div>
-                    <span title={headers[0]}>{values[0]}</span>
-                    <span title={headers[1]}>{values[1]}</span>
-                  </div>
-                </CardDetails>
-              </CardChartContainer>
-            </Card>
-          );
-        })}
-        <Card style={{ backgroundColor: 'transparent' }} />
-      </CardContainer>
+      <NodeCards cardData={cardData} />
 
       <MapContainer>
         <Map nodes={nodes} />
@@ -259,7 +206,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     translate: '0, 0',
   };
 
-  const cardData: ICard[] = [
+  const cardData: INodeCard[] = [
     {
       title: 'Total Nodes',
       headers: ['Value', 'Increase'],

@@ -26,6 +26,8 @@ import { IAccount, IResponse, ITransaction, IPagination } from '@/types/index';
 
 import { ArrowLeft } from '@/assets/icons';
 import { KLV } from '@/assets/coins';
+import { AccountDetails as AccountIcon } from '@/assets/title-icons';
+
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
 import Copy from '@/components/Copy';
@@ -158,6 +160,7 @@ const Account: React.FC<IAccountPage> = ({
             <ArrowLeft />
           </div>
           <h1>Account</h1>
+          <AccountIcon />
         </Title>
 
         <Input />

@@ -24,6 +24,7 @@ import api from '@/services/api';
 import { formatAmount, getAge, toLocaleFixed } from '@/utils/index';
 
 import { ArrowLeft } from '@/assets/icons';
+import { Blocks as Icon } from '@/assets/title-icons';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
 
@@ -233,6 +234,7 @@ const Blocks: React.FC<IBlocks> = ({
             <ArrowLeft />
           </div>
           <h1>Blocks</h1>
+          <Icon />
         </Title>
 
         <Input />

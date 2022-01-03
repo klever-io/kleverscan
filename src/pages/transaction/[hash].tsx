@@ -31,6 +31,7 @@ import {
 } from '@/types/index';
 
 import { ArrowLeft } from '@/assets/icons';
+import { TransactionDetails as Icon } from '@/assets/title-icons';
 import { getStatusIcon } from '@/assets/status';
 
 import {
@@ -133,7 +134,8 @@ const Transaction: React.FC<ITransactionPage> = ({
           <div onClick={router.back}>
             <ArrowLeft />
           </div>
-          <h1>Transaction Detail</h1>
+          <h1>Transaction Details</h1>
+          <Icon />
         </Title>
 
         <Input />

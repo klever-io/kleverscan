@@ -24,6 +24,7 @@ import MapSvg from '@/components/MapSvg';
 import { ICountriesGeoData, ICountryNode } from '../../types';
 
 import { ArrowLeft } from '@/assets/icons';
+import { Nodes as Icon } from '@/assets/title-icons';
 import { coinMockedData, IChartData } from '@/configs/home';
 import { getAge } from '@/utils/index';
 import { getCountryISO3, ISO2 } from '@/utils/country';
@@ -109,6 +110,7 @@ const Nodes: React.FC<INodePage> = ({ nodes, cardData }) => {
             <ArrowLeft />
           </div>
           <h1>Nodes</h1>
+          <Icon />
         </Title>
       </Header>
 
@@ -182,13 +184,14 @@ export const getServerSideProps: GetServerSideProps = async () => {
   for (let i = 0; i < peers.length; i++) {
     const { addresses } = peers[i];
     const filteredAddresses = addresses.filter((item, pos, self) => {
-      return self.indexOf(item) === pos &&
+      return (
+        self.indexOf(item) === pos &&
         !item.startsWith('/ip4/127.0.0.1') &&
         !item.startsWith('/ip4/10.') &&
         !item.startsWith('/ip4/172.16.') &&
         !item.startsWith('/ip4/172.17.') &&
-        !item.startsWith('.255/tcp');
-
+        !item.startsWith('.255/tcp')
+      );
     });
     for (const address of filteredAddresses) {
       // IP comes as /ip4/xx.xx.x.xx/tcp/xxxxx
@@ -198,8 +201,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
       if (geo === null) continue;
 
       // TODO: manually allocate node
-      if (cleanIp=="35.200.204.226") {
-        geo.country = "IN";
+      if (cleanIp == '35.200.204.226') {
+        geo.country = 'IN';
         geo.ll[0] = 19.07;
         geo.ll[1] = 72.88;
       }
@@ -218,9 +221,17 @@ export const getServerSideProps: GetServerSideProps = async () => {
     }
   }
 
-  nodes.sort((a,b) => (a.nodes.length > b.nodes.length) ? -1 : ((b.nodes.length > a.nodes.length) ? 1 : 0));
-  const mostNodes: ICountryNode = nodes?nodes[0]: { country: 'Empty', nodes: [] };
-  
+  nodes.sort((a, b) =>
+    a.nodes.length > b.nodes.length
+      ? -1
+      : b.nodes.length > a.nodes.length
+      ? 1
+      : 0,
+  );
+  const mostNodes: ICountryNode = nodes
+    ? nodes[0]
+    : { country: 'Empty', nodes: [] };
+
   const mostNodesCountryGeo = countriesData.features.find(
     feat => feat.id === getCountryISO3(mostNodes.country),
   );

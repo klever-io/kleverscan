@@ -40,6 +40,8 @@ import {
 import { formatAmount } from '../../utils';
 
 import { ArrowRight, ArrowLeft } from '@/assets/icons';
+import { Transactions as Icon } from '@/assets/title-icons';
+
 import { KLV } from '@/assets/coins';
 import { getStatusIcon } from '@/assets/status';
 import Pagination from '@/components/Pagination';
@@ -419,6 +421,7 @@ const Transactions: React.FC<ITransactions> = ({
           <ArrowLeft />
         </div>
         <h1>Transactions</h1>
+        <Icon />
       </Title>
 
       <Header>

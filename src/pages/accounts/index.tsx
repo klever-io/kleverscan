@@ -24,6 +24,7 @@ import api from '@/services/api';
 import { formatAmount, getAge } from '@/utils/index';
 
 import { ArrowLeft } from '@/assets/icons';
+import { Accounts as Icon } from '@/assets/title-icons';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
 
@@ -186,6 +187,7 @@ const Accounts: React.FC<IAccounts> = ({
             <ArrowLeft />
           </div>
           <h1>Accounts</h1>
+          <Icon />
         </Title>
 
         <Input />

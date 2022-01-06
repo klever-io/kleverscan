@@ -45,7 +45,6 @@ const Transactions: React.FC<ITransactionsProps> = props => {
       toAddress = parameter.toAddress;
       amount = formatAmount(parameter.amount / 10 ** precision);
     }
-
     return (
       <Row type="transactions">
         <span>
@@ -57,11 +56,15 @@ const Transactions: React.FC<ITransactionsProps> = props => {
             {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
           </small>
         </span>
-        <span>{sender}</span>
+        <Link href={`/account/${sender}`}>
+          <a className="address">{sender}</a>
+        </Link>
         <span>
           <ArrowRight />
         </span>
-        <span>{toAddress}</span>
+        <Link href={`/account/${toAddress}`}>
+          <a className="address">{toAddress}</a>
+        </Link>
         <Status status={status}>
           <StatusIcon />
           <span>{status}</span>

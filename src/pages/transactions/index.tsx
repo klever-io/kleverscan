@@ -371,17 +371,23 @@ const Transactions: React.FC<ITransactions> = ({
         <span>
           <Link href={`/transaction/${hash}`}>{hash}</Link>
         </span>
-        <span>{blockNum}</span>
+        <Link href={`/block/${blockNum}`}>
+          <a className="address">{blockNum}</a>
+        </Link>
         <span>
           <small>
             {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
           </small>
         </span>
-        <span>{sender}</span>
+        <Link href={`/account/${sender}`}>
+          <a className="address">{sender}</a>
+        </Link>
         <span>
           <ArrowRight />
         </span>
-        <span>{toAddress}</span>
+        <Link href={`/account/${toAddress}`}>
+          <a className="address">{toAddress}</a>
+        </Link>
         <Status status={status}>
           <StatusIcon />
           <span>{status}</span>

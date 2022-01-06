@@ -1,5 +1,7 @@
 import React, { useRef, useState } from 'react';
 
+import { useRouter } from 'next/router';
+
 import {
   CardContainer,
   CardContent,
@@ -29,6 +31,7 @@ interface ICoinCard {
 
 const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS }) => {
   const [selectedCoin, setSelectedCoin] = useState(0);
+  const router = useRouter();
 
   const getVariation = (variation: number) => {
     const precision = 2;
@@ -51,6 +54,9 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS }) => {
   const handleSelection = (index: number) => {
     carouselRef.current.scrollLeft = index * cardRef.current.offsetWidth;
   };
+  const coinNavigate = (coin: ICoinInfo) => {
+    router.push(`/asset/${coin.shortname}`);
+  };
 
   return (
     <Container>
@@ -61,18 +67,23 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS }) => {
               <CardContent>
                 <HeaderContainer>
                   <IconContainer
+                    onClick={() => coinNavigate(coin)}
                     src={`/coins/${coin.shortname.toLowerCase()}.png`}
                   />
 
                   <HeaderContent>
                     <Name>
-                      <span>{coin.shortname}</span>
+                      <span onClick={() => coinNavigate(coin)}>
+                        {coin.shortname}
+                      </span>
                       <span>U$ {coin.price.toLocaleString()}</span>
                     </Name>
                     <Description
                       positive={getVariation(coin.variation).includes('+')}
                     >
-                      <span>{coin.name}</span>
+                      <span onClick={() => coinNavigate(coin)}>
+                        {coin.name}
+                      </span>
                       <p>{getVariation(coin.variation)}</p>
                     </Description>
                   </HeaderContent>

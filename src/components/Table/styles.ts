@@ -77,7 +77,8 @@ export const Row = styled.div<ITableType>`
 
   border-radius: 0.5rem;
 
-  span {
+  span,
+  a {
     /* flex: 1; */
     overflow: hidden;
 
@@ -111,6 +112,13 @@ export const Row = styled.div<ITableType>`
     p {
       font-weight: 600;
       color: ${props => props.theme.black};
+    }
+  }
+  .address {
+    cursor: pointer;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
     }
   }
 `;

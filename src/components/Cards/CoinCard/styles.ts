@@ -115,6 +115,9 @@ export const Name = styled.div`
 
   span {
     font-size: 1.1rem;
+    &:first-of-type {
+      cursor: pointer;
+    }
   }
 `;
 
@@ -197,6 +200,7 @@ export const IconContainer = styled(Image).attrs(() => ({
   width: 50,
   height: 50,
 }))`
+  cursor: pointer;
   padding-right: 1rem;
 `;
 

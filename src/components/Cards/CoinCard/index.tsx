@@ -14,9 +14,6 @@ import {
   ValueContainer,
   ValueContent,
   ValueDetail,
-  ArrowLeft,
-  ArrowRight,
-  ArrowContainer,
   CoinsSelector,
   CoinSelector,
 } from './styles';
@@ -32,6 +29,7 @@ interface ICoinCard {
 
 const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS }) => {
   const [selectedCoin, setSelectedCoin] = useState(0);
+
   const getVariation = (variation: number) => {
     const precision = 2;
 
@@ -45,14 +43,6 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS }) => {
   const carouselRef = useRef<any>(null);
   const cardRef = useRef<any>(null);
 
-  const handleLeft = () => {
-    carouselRef.current.scrollLeft -= cardRef.current.offsetWidth;
-  };
-
-  const handleRight = () => {
-    carouselRef.current.scrollLeft += cardRef.current.offsetWidth;
-  };
-
   const handleSelectCoin = () => {
     setSelectedCoin(
       Math.floor(carouselRef.current.scrollLeft / cardRef.current.offsetWidth),
@@ -64,63 +54,58 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS }) => {
 
   return (
     <Container>
-      <ArrowContainer>
-        <ArrowLeft onClick={handleLeft} />
-        <Content ref={carouselRef} onScroll={handleSelectCoin}>
-          {coins.map((coin, index) => {
-            return (
-              <CardContainer key={String(index)} ref={cardRef}>
-                <CardContent>
-                  <HeaderContainer>
-                    <IconContainer
-                      src={`/coins/${coin.shortname.toLowerCase()}.png`}
-                    />
+      <Content ref={carouselRef} onScroll={handleSelectCoin}>
+        {coins.map((coin, index) => {
+          return (
+            <CardContainer key={String(index)} ref={cardRef}>
+              <CardContent>
+                <HeaderContainer>
+                  <IconContainer
+                    src={`/coins/${coin.shortname.toLowerCase()}.png`}
+                  />
 
-                    <HeaderContent>
-                      <Name>
-                        <span>{coin.shortname}</span>
-                        <span>U$ {coin.price.toLocaleString()}</span>
-                      </Name>
-                      <Description
-                        positive={getVariation(coin.variation).includes('+')}
+                  <HeaderContent>
+                    <Name>
+                      <span>{coin.shortname}</span>
+                      <span>U$ {coin.price.toLocaleString()}</span>
+                    </Name>
+                    <Description
+                      positive={getVariation(coin.variation).includes('+')}
+                    >
+                      <span>{coin.name}</span>
+                      <p>{getVariation(coin.variation)}</p>
+                    </Description>
+                  </HeaderContent>
+                </HeaderContainer>
+
+                <ChartContainer>
+                  <Chart data={coin.prices} />
+                </ChartContainer>
+
+                <ValueContainer>
+                  {[coin.marketCap, coin.volume].map((item, index) => (
+                    <ValueContent key={String(index)}>
+                      <p>{index === 0 ? 'Market Cap' : 'Volume'}</p>
+                      <ValueDetail
+                        positive={getVariation(item.variation).includes('+')}
                       >
-                        <span>{coin.name}</span>
-                        <p>{getVariation(coin.variation)}</p>
-                      </Description>
-                    </HeaderContent>
-                  </HeaderContainer>
-
-                  <ChartContainer>
-                    <Chart data={coin.prices} />
-                  </ChartContainer>
-
-                  <ValueContainer>
-                    {[coin.marketCap, coin.volume].map((item, index) => (
-                      <ValueContent key={String(index)}>
-                        <p>{index === 0 ? 'Market Cap' : 'Volume'}</p>
-                        <ValueDetail
-                          positive={getVariation(item.variation).includes('+')}
-                        >
-                          <span>$ {item.price.toLocaleString()}</span>
-                          <p>{getVariation(item.variation)}</p>
-                        </ValueDetail>
-                      </ValueContent>
-                    ))}
-                    <ValueContent>
-                      <ValueDetail>
-                        <p>Live/Peak TPS</p>
-                        <span>{actualTPS}</span>
+                        <span>$ {item.price.toLocaleString()}</span>
+                        <p>{getVariation(item.variation)}</p>
                       </ValueDetail>
                     </ValueContent>
-                  </ValueContainer>
-                </CardContent>
-              </CardContainer>
-            );
-          })}
-        </Content>
-
-        <ArrowRight onClick={handleRight} />
-      </ArrowContainer>
+                  ))}
+                  <ValueContent>
+                    <ValueDetail>
+                      <p>Live/Peak TPS</p>
+                      <span>{actualTPS}</span>
+                    </ValueDetail>
+                  </ValueContent>
+                </ValueContainer>
+              </CardContent>
+            </CardContainer>
+          );
+        })}
+      </Content>
 
       <CoinsSelector>
         {coins.map((_, index) => (

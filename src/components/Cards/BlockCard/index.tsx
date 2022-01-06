@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 import { fromUnixTime } from 'date-fns';
 
@@ -20,12 +20,14 @@ const BlockCard: React.FC<IBlock & IBlockCard> = ({
   burnedFees,
   precision,
 }) => {
+  const router = useRouter();
+  const handleClick = () => {
+    router.push(`/block/${nonce}`);
+  };
   return (
-    <BlockCardContainer blockIndex={blockIndex}>
+    <BlockCardContainer blockIndex={blockIndex} onClick={handleClick}>
       <BlockCardRow>
-        <Link href={`/block/${nonce}`}>
-          <strong>#{nonce}</strong>
-        </Link>
+        <strong>#{nonce}</strong>
         <p>Miner</p>
       </BlockCardRow>
       <BlockCardRow>

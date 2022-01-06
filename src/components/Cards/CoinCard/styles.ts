@@ -1,11 +1,6 @@
 import styled, { keyframes } from 'styled-components';
 
 import Image from 'next/image';
-
-import {
-  ArrowLeft as DefaultArrowLeft,
-  ArrowRight as DefaultArrowRight,
-} from '@/assets/pagination';
 interface IVariation {
   positive: boolean;
 }
@@ -27,22 +22,6 @@ export const Container = styled.div`
   position: relative;
 `;
 
-export const ArrowContainer = styled.div`
-  width: 21rem;
-
-  display: flex;
-
-  position: relative;
-
-  flex-direction: row;
-  @media (max-width: 768px) {
-    width: calc(100vw - 10rem);
-  }
-  @media (max-width: 425px) {
-    min-width: calc(100vw - 5rem);
-  }
-`;
-
 export const Content = styled.div`
   display: flex;
 
@@ -54,11 +33,20 @@ export const Content = styled.div`
 
   border-radius: 1rem;
 
+  width: 21rem;
+
+  position: relative;
+
+  flex-direction: row;
+
+  @media (max-width: 768px) {
+    width: calc(100vw - 10rem);
+  }
+  @media (max-width: 425px) {
+    min-width: calc(100vw - 5rem);
+  }
   &&::-webkit-scrollbar {
     display: none;
-  }
-  @media (max-width: 768px) {
-    width: 100%;
   }
 `;
 
@@ -155,8 +143,6 @@ export const ChartContainer = styled.div`
   left: 0;
 
   position: absolute;
-
-  z-index: 1;
 `;
 
 export const ValueContainer = styled.div`
@@ -212,56 +198,6 @@ export const IconContainer = styled(Image).attrs(() => ({
   height: 50,
 }))`
   padding-right: 1rem;
-`;
-export const ArrowRight = styled(DefaultArrowRight)`
-  display: none;
-  @media (min-width: 768px) {
-    display: block;
-    position: absolute;
-
-    width: 2rem;
-    height: 2rem;
-    padding-top: 0.5rem;
-    padding-left: 1rem;
-    right: -0.25rem;
-    bottom: 50%;
-    transform: translateY(50%);
-
-    cursor: pointer;
-
-    transition: 0.2s ease;
-    filter: brightness(1);
-    z-index: 2;
-
-    &:hover {
-      filter: brightness(2);
-    }
-  }
-`;
-
-export const ArrowLeft = styled(DefaultArrowLeft)`
-  display: none;
-  @media (min-width: 768px) {
-    display: block;
-    position: absolute;
-    width: 2rem;
-    height: 2rem;
-    padding-top: 0.5rem;
-    padding-left: 0.25rem;
-    left: -0.25rem;
-    bottom: 50%;
-    transform: translateY(50%);
-
-    cursor: pointer;
-
-    transition: 0.2s ease;
-    z-index: 2;
-    filter: brightness(1);
-
-    &:hover {
-      filter: brightness(2);
-    }
-  }
 `;
 
 export const CoinsSelector = styled.div`

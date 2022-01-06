@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+import { useRouter } from 'next/router';
+
 import { Section } from '@/views/home';
 
 import api from '@/services/api';
@@ -12,6 +14,7 @@ import BlockCard from '@/components/Cards/BlockCard';
 const BlockCardList: React.FC<IBlockCardList> = ({ blocks, precision }) => {
   const [listedBlocks, setListedBlocks] = useState<IBlock[]>(blocks);
   const blockWatcherTimeout = 4000;
+  const router = useRouter();
 
   useEffect(() => {
     const blockWatcher = setInterval(async () => {
@@ -46,7 +49,7 @@ const BlockCardList: React.FC<IBlockCardList> = ({ blocks, precision }) => {
 
   return (
     <Section>
-      <h1>Blocks</h1>
+      <h1 onClick={() => router.push(`blocks`)}>Blocks</h1>
       <Carousel>{getBLockCards()}</Carousel>
     </Section>
   );

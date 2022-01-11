@@ -205,6 +205,14 @@ const holders = css`
   }
 `;
 
+const validators = css`
+  margin-right: 1.25rem;
+
+  width: 100%;
+`;
+
+const nodes = validators;
+
 const widths = {
   transactions,
   blocks,
@@ -213,6 +221,8 @@ const widths = {
   assets,
   buckets,
   holders,
+  validators,
+  nodes,
 };
 
 export default widths;

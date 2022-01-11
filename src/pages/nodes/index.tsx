@@ -175,7 +175,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
       ? 1
       : 0,
   );
-  const mostNodes: ICountryNode = nodes
+  const mostNodes: ICountryNode = nodes.length
     ? nodes[0]
     : { country: 'Empty', nodes: [] };
 

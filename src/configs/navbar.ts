@@ -1,4 +1,11 @@
-import { Category, Graph, Send, TwoUser, Compass } from '@/assets/icons';
+import {
+  Category,
+  Graph,
+  Send,
+  TwoUser,
+  Compass,
+  TickSquare,
+} from '@/assets/icons';
 
 export interface INavbarItem {
   name: string;
@@ -36,6 +43,11 @@ const navbarItems: INavbarItem[] = [
     name: 'Assets',
     pathTo: '/assets',
     Icon: Graph,
+  },
+  {
+    name: 'Validators',
+    pathTo: '/validators',
+    Icon: TickSquare,
   },
 ];
 

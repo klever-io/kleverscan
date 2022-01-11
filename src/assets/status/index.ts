@@ -1,6 +1,7 @@
 import Success from './success.svg';
 import Pending from './pending.svg';
 import Error from './error.svg';
+import { ImCancelCircle } from 'react-icons/im';
 
 const getStatusIcon = (status: string): any => {
   switch (status) {
@@ -11,7 +12,7 @@ const getStatusIcon = (status: string): any => {
     case 'error':
       return Error;
     default:
-      return Error;
+      return ImCancelCircle;
   }
 };
 

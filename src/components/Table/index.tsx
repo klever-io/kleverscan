@@ -14,7 +14,9 @@ export interface ITable {
     | 'buckets'
     | 'accounts'
     | 'assetsPage'
-    | 'holders';
+    | 'holders'
+    | 'validators'
+    | 'nodes';
   header: string[];
   data: any[];
   body: any;

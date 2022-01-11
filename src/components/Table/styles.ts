@@ -21,7 +21,9 @@ export interface ITableType {
     | 'buckets'
     | 'accounts'
     | 'assetsPage'
-    | 'holders';
+    | 'holders'
+    | 'validators'
+    | 'nodes';
   filter?: IFilterItem;
 }
 
@@ -117,6 +119,7 @@ export const Row = styled.div<ITableType>`
   .address {
     cursor: pointer;
     text-decoration: none;
+    font-weight: 500;
     &:hover {
       text-decoration: underline;
     }
@@ -128,13 +131,20 @@ export const Status = styled.div<IStatus>`
 
   flex-direction: row;
 
+  align-items: center;
+
   gap: 0.5rem;
 
   span {
     color: ${props => props.theme.table[props.status]} !important;
-
     text-transform: capitalize;
   }
+  ${props =>
+    props.status === 'jailed' &&
+    `
+      color: ${props.theme.table.icon} !important;
+      
+    `}
 `;
 
 export const EmptyRow = styled(Row)`

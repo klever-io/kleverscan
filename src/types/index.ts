@@ -148,6 +148,19 @@ export interface IBlock {
   chainID: string;
 }
 
+export interface IPeer {
+  blsPublicKey: string;
+  ownerAddress: string;
+  rewardAddress: string;
+  canDelegate: boolean;
+  commission: number;
+  maxDelegationAmount: number;
+  rating: number;
+  list: string;
+  TotalDelegated: number;
+  selfDelegated: number;
+}
+
 export interface IBlockCard {
   blockIndex: number;
   precision: number;
@@ -212,6 +225,20 @@ export interface IBucket {
   unstakedEpoch: number;
   balance: number;
   delegation: string;
+}
+
+export interface IDelegationsResponse {
+  totalDelegated: number;
+  address: string;
+  buckets: number;
+  name?: string;
+}
+export interface IValidator {
+  rank: number;
+  name: string;
+  staked: number;
+  cumulativeStaked: number;
+  address: string;
 }
 
 export interface IChainStatistics {

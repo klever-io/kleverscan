@@ -121,7 +121,9 @@ const Validator: React.FC<IValidatorPage> = ({ peer }) => {
           <span>
             <ProgressContent>
               <StakedIndicator percent={stakedPercent} />
-              <PercentIndicator>{stakedPercent}%</PercentIndicator>
+              <PercentIndicator percent={stakedPercent}>
+                {stakedPercent}%
+              </PercentIndicator>
             </ProgressContent>
           </span>
         </Row>

@@ -256,13 +256,23 @@ export const Rating = styled.p.attrs<IRatingProps>(props => ({
   border-radius: 1rem;
 `;
 
-const getStakedColor = (props: any, percent: number) => {
+const getStakedBGColor = (props: any, percent: number) => {
   if (percent < 30) {
-    return props.theme.table.fail;
-  } else if (percent < 50) {
-    return props.theme.table.pending;
+    return props.theme.rose;
+  } else if (percent < 60) {
+    return props.theme.chart.lightBg;
+  } else if (percent < 90) {
+    return props.theme.purple;
   } else {
-    return props.theme.table.success;
+    return props.theme.input.activeShadow;
+  }
+};
+
+const getStakedTextColor = (props: any, percent: number) => {
+  if (percent < 60) {
+    return props.theme.black;
+  } else {
+    return props.theme.white;
   }
 };
 
@@ -270,13 +280,13 @@ export const StakedIndicator = styled.div<{ percent: number }>`
   height: 100%;
   width: ${props => `${props.percent}%`};
 
-  background-color: ${props => getStakedColor(props, props.percent)};
+  background-color: ${props => getStakedBGColor(props, props.percent)};
   border-radius: 0.25rem;
 
   opacity: 0.6;
 `;
 
-export const PercentIndicator = styled.div`
+export const PercentIndicator = styled.div<{ percent: number }>`
   margin: 0 auto;
 
   position: absolute;
@@ -284,7 +294,7 @@ export const PercentIndicator = styled.div`
   top: 0.25rem;
   left: 30%;
 
-  color: ${props => transparentize(0.3, props.theme.black)};
+  color: ${props => getStakedTextColor(props, props.percent)};
 
   font-size: 0.85rem;
 `;

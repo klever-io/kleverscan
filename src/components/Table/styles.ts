@@ -140,7 +140,7 @@ export const Status = styled.div<IStatus>`
     text-transform: capitalize;
   }
   ${props =>
-    props.status === 'jailed' &&
+    props.status === 'inactive' &&
     `
       color: ${props.theme.table.icon} !important;
       

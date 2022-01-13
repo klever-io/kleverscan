@@ -67,16 +67,14 @@ const Validator: React.FC<IValidatorPage> = ({ peer }) => {
       case 'leaving':
       case 'inactive':
       case 'observer':
-        return (status = 'fail');
+        return (status = 'inactive');
       case 'jailed':
-        return (status = 'jailed');
+        return (status = 'fail');
     }
     return status;
   };
 
-  const ListIcon = getStatusIcon(
-    getListStatus(list) === 'fail' ? 'error' : getListStatus(list),
-  );
+  const ListIcon = getStatusIcon(getListStatus(list));
 
   const getRateColor = (): string => {
     const percent = rating / 10 ** 7;

@@ -9,7 +9,7 @@ const getStatusIcon = (status: string): any => {
       return Success;
     case 'pending':
       return Pending;
-    case 'error':
+    case 'fail':
       return Error;
     default:
       return ImCancelCircle;

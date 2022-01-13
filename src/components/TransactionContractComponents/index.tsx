@@ -12,7 +12,6 @@ import {
   ICreateValidatorContract,
   IFreezeContract,
   IUnfreezeContract,
-  IWithdrawContract,
   IAsset,
 } from '@/types/index';
 
@@ -267,31 +266,6 @@ export const Delegate: React.FC<IContract> = ({ parameter: par }) => {
   );
 };
 
-export const Withdraw: React.FC<IContract> = ({ parameter: par }) => {
-  const parameter = par as IWithdrawContract;
-
-  return (
-    <>
-      <Row>
-        <span>
-          <strong>Owner</strong>
-        </span>
-        <span>
-          <Link href={`/account/${parameter.ownerAddress}`}>
-            {parameter.ownerAddress}
-          </Link>
-        </span>
-      </Row>
-      <Row>
-        <span>
-          <strong>To</strong>
-        </span>
-        <span>
-          <Link href={`/account/${parameter.toAddress}`}>
-            {parameter.toAddress}
-          </Link>
-        </span>
-      </Row>
-    </>
-  );
+export const Withdraw: React.FC<IContract> = () => {
+  return <></>;
 };

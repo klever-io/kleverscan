@@ -33,7 +33,6 @@ import {
   ICreateValidatorContract,
   IFreezeContract,
   IUnfreezeContract,
-  IWithdrawContract,
   IAsset,
 } from '../../types';
 
@@ -267,16 +266,8 @@ const Transactions: React.FC<ITransactions> = ({
     );
   };
 
-  const Withdraw: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IWithdrawContract;
-
-    return (
-      <span>
-        <Link href={`/account/${parameter.toAddress}`}>
-          {parameter.toAddress}
-        </Link>
-      </span>
-    );
+  const Withdraw: React.FC<IContract> = () => {
+    return <></>;
   };
 
   const FilteredComponent: React.FC<ITransaction> = ({ contract }) => {
@@ -331,9 +322,6 @@ const Transactions: React.FC<ITransactions> = ({
       case Contract.Delegate:
       case Contract.Undelegate:
         newHeaders = ['Bucket ID'];
-        break;
-      case Contract.Withdraw:
-        newHeaders = ['To'];
         break;
     }
 

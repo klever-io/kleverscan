@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
@@ -21,6 +21,7 @@ import {
   ProgressContent,
   ProgressIndicator,
 } from '@/views/validators';
+import { useDidUpdateEffect } from '@/utils/hooks';
 
 interface IValidatorPage {
   validators: IValidator[];
@@ -74,7 +75,7 @@ const Validators: React.FC<IValidatorPage> = ({
     }
   };
 
-  useEffect(() => {
+  useDidUpdateEffect(() => {
     fetchData();
   }, [page]);
 
@@ -82,7 +83,7 @@ const Validators: React.FC<IValidatorPage> = ({
     title: 'Validators',
     headerIcon: Icon,
     cards: undefined,
-    paginationCount: pagination.totalPages + 1,
+    paginationCount: pagination.totalPages,
     page: page,
     setPage: setPage,
   };
@@ -98,20 +99,20 @@ const Validators: React.FC<IValidatorPage> = ({
     );
   };
 
-  const TableBody: React.FC<IValidator> = ({
+  const TableBody: React.FC<IValidator> | null = ({
     rank,
     name,
     staked,
     cumulativeStaked,
     address,
   }) => {
-    return (
+    return address ? (
       <Row type="validators">
         <span>
-          <p>{rank}°</p>
+          <p>{rank - 1}°</p>
         </span>
         <span>
-          {validators[rank - pagination.previous * 10 - 1].address ? (
+          {validators[rank - pagination.previous * 10 - 1]?.address ? (
             <Link
               href={`validator/${
                 validators[rank - pagination.previous * 10 - 1].address
@@ -141,7 +142,7 @@ const Validators: React.FC<IValidatorPage> = ({
           )}
         </span>
       </Row>
-    );
+    ) : null;
   };
 
   const tableProps: ITable = {

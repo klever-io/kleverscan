@@ -11,7 +11,6 @@ import {
   Container,
   FilterContainer,
   Header,
-  Input,
   Title,
   TooltipText,
 } from '@/views/transactions';
@@ -45,6 +44,10 @@ import { KLV } from '@/assets/coins';
 import { getStatusIcon } from '@/assets/status';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
+import DateFilter, {
+  IDateFilter,
+  ISelectedDays,
+} from '@/components/DateFilter';
 
 interface ITransactions {
   transactions: ITransaction[];
@@ -78,6 +81,10 @@ const Transactions: React.FC<ITransactions> = ({
   const [transactions, setTransactions] = useState(defaultTransactions);
   const [page, setPage] = useState(0);
   const [count, setCount] = useState(pagination.totalPages);
+  const [dateFilter, setDateFilter] = useState({
+    start: '',
+    end: '',
+  });
 
   const [transactionType, setTransactionType] = useState(defaultFilter);
   const [statusType, setStatusType] = useState(defaultFilter);
@@ -129,15 +136,6 @@ const Transactions: React.FC<ITransactions> = ({
     'Bandwidth Fee',
   ];
 
-  const buildQuery = (data: any) => {
-    const query = [];
-    for (const key in data) {
-      query.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`);
-    }
-
-    return query.join('&');
-  };
-
   const fetchData = async () => {
     setLoading(true);
 
@@ -152,9 +150,22 @@ const Transactions: React.FC<ITransactions> = ({
         routerQuery = { ...routerQuery, [filter.key]: filter.ref.value };
       }
     });
+    routerQuery = dateFilter.start
+      ? {
+          ...routerQuery,
+          page: page,
+          startdate: dateFilter.start ? dateFilter.start : undefined,
+          enddate: dateFilter.end ? dateFilter.end : undefined,
+        }
+      : {
+          ...routerQuery,
+          page: page,
+        };
+    console.log(routerQuery);
 
     const response: ITransactionResponse = await api.get({
-      route: `transaction/list?${buildQuery(routerQuery)}&page=${page}`,
+      route: `transaction/list`,
+      query: routerQuery,
     });
     if (!response.error) {
       setTransactions(response.data.transactions);
@@ -167,7 +178,8 @@ const Transactions: React.FC<ITransactions> = ({
   useEffect(() => {
     if (page !== 0) setPage(0);
     else fetchData();
-  }, [transactionType, statusType, coinType]);
+  }, [transactionType, statusType, coinType, dateFilter]);
+
   useEffect(() => {
     fetchData();
   }, [page]);
@@ -408,6 +420,28 @@ const Transactions: React.FC<ITransactions> = ({
     loading,
   };
 
+  const resetDate = () => {
+    setPage(0);
+    setDateFilter({
+      start: '',
+      end: '',
+    });
+  };
+  const filterDate = (selectedDays: ISelectedDays) => {
+    setPage(0);
+    setDateFilter({
+      start: selectedDays.start.getTime().toString(),
+      end: selectedDays.end
+        ? (selectedDays.end.getTime() + 24 * 60 * 60 * 1000).toString()
+        : (selectedDays.start.getTime() + 24 * 60 * 60 * 1000).toString(),
+    });
+  };
+  const dateFilterProps: IDateFilter = {
+    resetDate,
+    filterDate,
+    empty: transactions.length === 0,
+  };
+
   return (
     <Container>
       <Title>
@@ -424,8 +458,7 @@ const Transactions: React.FC<ITransactions> = ({
             <Filter key={String(index)} {...filter} />
           ))}
         </FilterContainer>
-
-        <Input />
+        <DateFilter {...dateFilterProps} />
       </Header>
 
       <Table {...tableProps} />

@@ -33,6 +33,7 @@ import Transactions from '@/components/Tabs/Transactions';
 import Holders from '@/components/Tabs/Holders';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
+import { ISelectedDays } from '@/components/DateFilter';
 
 interface IAssetPage {
   asset: IAsset;
@@ -69,7 +70,7 @@ const Asset: React.FC<IAssetPage> = ({
   totalTransactions,
   holders: defaultHolders,
   totalHoldersPage,
-  totalTransactionsPage,
+  totalTransactionsPage: defaultTotalTransactionsPage,
 }) => {
   const {
     name,
@@ -89,7 +90,14 @@ const Asset: React.FC<IAssetPage> = ({
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
 
   const [transactionsPage, setTransactionsPage] = useState(0);
+  const [totalTransactionsPage, setTotalTransactionsPage] = useState(
+    defaultTotalTransactionsPage,
+  );
   const [transactions, setTransactions] = useState(defaultTransactions);
+  const [dateFilter, setDateFilter] = useState({
+    start: '',
+    end: '',
+  });
   const [holdersPage, setHoldersPage] = useState(0);
   const [holders, setHolders] = useState(defaultHolders);
   const [loadingTransactions, setLoadingTransactions] = useState(false);
@@ -98,17 +106,33 @@ const Asset: React.FC<IAssetPage> = ({
   useEffect(() => {
     setLoadingTransactions(true);
     const fetchData = async () => {
+      setLoadingTransactions(true);
+
+      const query = dateFilter.start
+        ? {
+            page: transactionsPage,
+            asset: asset.assetId,
+            startdate: dateFilter.start ? dateFilter.start : undefined,
+            enddate: dateFilter.end ? dateFilter.end : undefined,
+          }
+        : {
+            page: transactionsPage,
+            asset: asset.assetId,
+          };
+
       const response: ITransactionResponse = await api.get({
-        route: `transaction/list?asset=${asset.assetId}&page=${transactionsPage}`,
+        route: `transaction/list`,
+        query,
       });
       if (!response.error) {
         setTransactions(response.data.transactions);
+        setTotalTransactionsPage(response.pagination.totalPages);
         setLoadingTransactions(false);
       }
     };
 
     fetchData();
-  }, [transactionsPage]);
+  }, [transactionsPage, dateFilter]);
 
   useEffect(() => {
     setLoadingHolders(true);
@@ -272,10 +296,32 @@ const Asset: React.FC<IAssetPage> = ({
         return <div />;
     }
   };
+  const resetDate = () => {
+    setTransactionsPage(0);
+    setDateFilter({
+      start: '',
+      end: '',
+    });
+  };
+
+  const filterDate = (selectedDays: ISelectedDays) => {
+    setTransactionsPage(0);
+    setDateFilter({
+      start: selectedDays.start.getTime().toString(),
+      end: selectedDays.end
+        ? (selectedDays.end.getTime() + 24 * 60 * 60 * 1000).toString()
+        : (selectedDays.start.getTime() + 24 * 60 * 60 * 1000).toString(),
+    });
+  };
 
   const tabProps: ITabs = {
     headers: tableHeaders,
     onClick: header => setSelectedTab(header),
+    dateFilterProps: {
+      resetDate,
+      filterDate,
+      empty: transactions.length === 0,
+    },
   };
 
   return (

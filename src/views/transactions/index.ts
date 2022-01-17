@@ -37,7 +37,7 @@ export const Header = styled.section`
 
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
 
   @media (max-width: 768px) {
     flex-direction: column;

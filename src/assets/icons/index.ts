@@ -10,6 +10,7 @@ import Plus from './plus.svg';
 import ChevronRight from './chevron-right.svg';
 import Compass from './compass.svg';
 import Copy from './copy.svg';
+import Calendar from './calendar.svg';
 import TickSquare from './tick-square.svg';
 
 export {
@@ -25,5 +26,6 @@ export {
   ChevronRight,
   Compass,
   Copy,
+  Calendar,
   TickSquare,
 };

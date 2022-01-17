@@ -33,6 +33,7 @@ import Pagination from '@/components/Pagination';
 import Copy from '@/components/Copy';
 
 import api, { IPrice, Service } from '@/services/api';
+import { ISelectedDays } from '@/components/DateFilter';
 
 interface IAccountPage {
   account: IAccount;
@@ -66,6 +67,14 @@ const Account: React.FC<IAccountPage> = ({
   const precision = 6;
 
   const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(
+    transactionResponse.pagination.totalPages,
+  );
+
+  const [dateFilter, setDateFilter] = useState({
+    start: '',
+    end: '',
+  });
   const [loading, setLoading] = useState(false);
   const [transactions, setTransactions] = useState(
     transactionResponse.data.transactions,
@@ -74,19 +83,32 @@ const Account: React.FC<IAccountPage> = ({
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      const query = dateFilter.start
+        ? {
+            page: page,
+            address: account.address,
+            startdate: dateFilter.start ? dateFilter.start : undefined,
+            enddate: dateFilter.end ? dateFilter.end : undefined,
+          }
+        : {
+            page: page,
+            address: account.address,
+          };
 
       const response: ITransactionsResponse = await api.get({
-        route: `address/${account.address}/transactions?page=${page}`,
+        route: `transaction/list`,
+        query,
       });
       if (!response.error) {
         setTransactions(response.data.transactions);
+        setTotalPages(response.pagination.totalPages);
       }
 
       setLoading(false);
     };
 
     fetchData();
-  }, [page, account.address]);
+  }, [page, account.address, dateFilter]);
 
   const getFreezeBalance = () => {
     if (Object.values(account.assets).length <= 0) {
@@ -121,9 +143,31 @@ const Account: React.FC<IAccountPage> = ({
 
   const [selectedTab, setSelectedTab] = useState<string>(getTabHeaders()[0]);
 
+  const resetDate = () => {
+    setPage(0);
+    setDateFilter({
+      start: '',
+      end: '',
+    });
+  };
+  const filterDate = (selectedDays: ISelectedDays) => {
+    setPage(0);
+    setDateFilter({
+      start: selectedDays.start.getTime().toString(),
+      end: selectedDays.end
+        ? (selectedDays.end.getTime() + 24 * 60 * 60 * 1000).toString()
+        : (selectedDays.start.getTime() + 24 * 60 * 60 * 1000).toString(),
+    });
+  };
+
   const tabProps: ITabs = {
     headers: getTabHeaders(),
     onClick: header => setSelectedTab(header),
+    dateFilterProps: {
+      resetDate,
+      filterDate,
+      empty: transactions.length === 0,
+    },
   };
 
   const SelectedTabComponent: React.FC = () => {
@@ -136,7 +180,7 @@ const Account: React.FC<IAccountPage> = ({
             <Transactions transactions={transactions} loading={loading} />
             <PaginationContainer>
               <Pagination
-                count={transactionResponse.pagination.totalPages}
+                count={totalPages}
                 page={page}
                 onPaginate={page => {
                   setPage(page);
@@ -145,8 +189,6 @@ const Account: React.FC<IAccountPage> = ({
             </PaginationContainer>
           </>
         );
-      // case 'Buckets':
-      //   return <Buckets {...account.buckets} />;
       default:
         return <div />;
     }

@@ -34,3 +34,4 @@ yarn-error.log*
 .vscode
 # vercel
 .vercel
+.history

@@ -97,7 +97,6 @@ const Accounts: React.FC<IAccounts> = ({
       ],
     },
   ];
-
   const CardContent: React.FC<ICard> = ({ title, headers, values }) => {
     const [uptime] = useState(new Date().getTime());
     const [age, setAge] = useState(

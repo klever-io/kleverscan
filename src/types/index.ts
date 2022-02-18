@@ -133,7 +133,7 @@ export interface IBlock {
   trieRoot: string;
   validatorsTrieRoot: string;
   stakingTrieRoot: string;
-  assetTrieRoot: string;
+  kappsTrieRoot: string;
   producerSignature: string;
   signature: string;
   prevRandSeed: string;
@@ -154,11 +154,11 @@ export interface IPeer {
   rewardAddress: string;
   canDelegate: boolean;
   commission: number;
-  maxDelegationAmount: number;
+  maxDelegation: number;
   rating: number;
   list: string;
-  TotalDelegated: number;
-  selfDelegated: number;
+  totalStake: number;
+  selfStake: number;
 }
 
 export interface IBlockCard {

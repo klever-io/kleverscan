@@ -33,27 +33,28 @@ import { getStatusIcon } from '@/assets/status';
 import { ProgressContent } from '@/views/validators';
 
 interface IValidatorPage {
-  peer: IPeer;
+  validator: IPeer;
 }
 
 interface IValidatorResponse extends IResponse {
   data: {
-    peer: IPeer;
+    validator: IPeer;
   };
   pagination: IPagination;
 }
 
-const Validator: React.FC<IValidatorPage> = ({ peer }) => {
+const Validator: React.FC<IValidatorPage> = ({ validator }) => {
   const {
     blsPublicKey,
     ownerAddress,
     canDelegate,
     commission,
-    maxDelegationAmount,
+    maxDelegation,
     rating,
     list,
-    TotalDelegated,
-  } = peer;
+    totalStake,
+    selfStake,
+  } = validator;
   const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'error');
 
   const getListStatus = (list: string): string => {
@@ -88,7 +89,7 @@ const Validator: React.FC<IValidatorPage> = ({ peer }) => {
     }
   };
 
-  const stakedPercent = TotalDelegated / maxDelegationAmount;
+  const stakedPercent = maxDelegation <= 0 ? 100 : totalStake / maxDelegation;
 
   const router = useRouter();
 
@@ -114,7 +115,7 @@ const Validator: React.FC<IValidatorPage> = ({ peer }) => {
         </Row>
         <Row>
           <span>
-            <strong>Staked Percent</strong>
+            <strong>Delegated Percent</strong>
           </span>
           <span>
             <ProgressContent>
@@ -157,7 +158,7 @@ const Validator: React.FC<IValidatorPage> = ({ peer }) => {
             <strong>Staked Balance</strong>
           </span>
           <span>
-            <p>{(TotalDelegated / 10 ** 6).toLocaleString()} KLV</p>
+            <p>{(totalStake / 10 ** 6).toLocaleString()} KLV</p>
           </span>
         </Row>
         <Row>
@@ -185,10 +186,10 @@ const Validator: React.FC<IValidatorPage> = ({ peer }) => {
             <TitleInformation>
               <ValidatorTitle>
                 <h1>Klever Staking</h1>
-                <div>Rank {'X'}</div>
+                {/* <div>Rank {'X'}</div> */}
               </ValidatorTitle>
               <ValidatorDescription>
-                Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
+                Public Blockchain Infrastructure for the internet.
               </ValidatorDescription>
             </TitleInformation>
           </TitleContent>
@@ -208,14 +209,14 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> = async ({
   query: { hash },
 }) => {
   const props: IValidatorPage = {
-    peer: {} as IPeer,
+    validator: {} as IPeer,
   };
   const address = String(hash);
 
   const validator: IValidatorResponse = await api.get({
-    route: `validator/peer/${address}`,
+    route: `validator/${address}`,
   });
-  props.peer = validator.data.peer;
+  props.validator = validator.data.validator;
   return { props };
 };
 

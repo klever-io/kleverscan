@@ -125,7 +125,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
   if (!statistics.error) {
     peers = statistics.data?.peers;
   }
-
   const nodes: ICountryNode[] = [];
 
   for (let i = 0; i < peers.length; i++) {

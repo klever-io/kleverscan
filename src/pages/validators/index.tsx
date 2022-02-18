@@ -43,7 +43,7 @@ const Validators: React.FC<IValidatorPage> = ({
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [validators, setValidators] = useState<IValidator[]>(initialValidators);
-  const header = ['Rank', 'Name', 'Stake', 'Cumulative Stake', 'Peer Address'];
+  const header = ['Rank', 'Name', 'Stake', 'Cumulative Stake', 'Owner Address'];
 
   const precision = 6;
 
@@ -163,16 +163,7 @@ const Validators: React.FC<IValidatorPage> = ({
 export const getServerSideProps: GetServerSideProps<IValidatorPage> =
   async () => {
     const props: IValidatorPage = {
-      validators: [
-        {
-          rank: 1,
-          name: 'Binance Staking',
-          staked: 3634999.99,
-          cumulativeStaked: 34,
-          address:
-            'klv1d97d8eat7yeysnjx4lvx39pwtss2y8lrux7zw35pahlfl48wh5fqp5q8xt',
-        },
-      ],
+      validators: [],
       pagination: {} as IPagination,
     };
 

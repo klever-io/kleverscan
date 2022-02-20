@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
@@ -7,11 +7,12 @@ import { format, fromUnixTime } from 'date-fns';
 
 import {
   CenteredRow,
+  Tooltip,
   Container,
   FilterContainer,
   Header,
-  Input,
   Title,
+  TooltipText,
 } from '@/views/transactions';
 
 import Filter, { IFilter, IFilterItem } from '@/components/Filter';
@@ -31,17 +32,22 @@ import {
   ICreateValidatorContract,
   IFreezeContract,
   IUnfreezeContract,
-  IWithdrawContract,
   IAsset,
 } from '../../types';
 
 import { formatAmount } from '../../utils';
 
 import { ArrowRight, ArrowLeft } from '@/assets/icons';
+import { Transactions as Icon } from '@/assets/title-icons';
+
 import { KLV } from '@/assets/coins';
 import { getStatusIcon } from '@/assets/status';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
+import DateFilter, {
+  IDateFilter,
+  ISelectedDays,
+} from '@/components/DateFilter';
 
 interface ITransactions {
   transactions: ITransaction[];
@@ -75,6 +81,10 @@ const Transactions: React.FC<ITransactions> = ({
   const [transactions, setTransactions] = useState(defaultTransactions);
   const [page, setPage] = useState(0);
   const [count, setCount] = useState(pagination.totalPages);
+  const [dateFilter, setDateFilter] = useState({
+    start: '',
+    end: '',
+  });
 
   const [transactionType, setTransactionType] = useState(defaultFilter);
   const [statusType, setStatusType] = useState(defaultFilter);
@@ -126,44 +136,53 @@ const Transactions: React.FC<ITransactions> = ({
     'Bandwidth Fee',
   ];
 
-  const buildQuery = (data: any) => {
-    const query = [];
-    for (const key in data) {
-      query.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`);
+  const fetchData = async () => {
+    setLoading(true);
+
+    const filters = [
+      { ref: transactionType, key: 'type' },
+      { ref: statusType, key: 'status' },
+      { ref: coinType, key: 'asset' },
+    ];
+    let routerQuery = {};
+    filters.forEach(filter => {
+      if (filter.ref.value !== 'all') {
+        routerQuery = { ...routerQuery, [filter.key]: filter.ref.value };
+      }
+    });
+    routerQuery = dateFilter.start
+      ? {
+          ...routerQuery,
+          page: page,
+          startdate: dateFilter.start ? dateFilter.start : undefined,
+          enddate: dateFilter.end ? dateFilter.end : undefined,
+        }
+      : {
+          ...routerQuery,
+          page: page,
+        };
+    console.log(routerQuery);
+
+    const response: ITransactionResponse = await api.get({
+      route: `transaction/list`,
+      query: routerQuery,
+    });
+    if (!response.error) {
+      setTransactions(response.data.transactions);
+      setCount(response.pagination.totalPages);
     }
 
-    return query.join('&');
+    setLoading(false);
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+    if (page !== 0) setPage(0);
+    else fetchData();
+  }, [transactionType, statusType, coinType, dateFilter]);
 
-      const filters = [
-        { ref: transactionType, key: 'type' },
-        { ref: statusType, key: 'status' },
-        { ref: coinType, key: 'asset' },
-      ];
-      let routerQuery = {};
-      filters.forEach(filter => {
-        if (filter.ref.value !== 'all') {
-          routerQuery = { ...routerQuery, [filter.key]: filter.ref.value };
-        }
-      });
-
-      const response: ITransactionResponse = await api.get({
-        route: `transaction/list?${buildQuery(routerQuery)}&page=${page}`,
-      });
-      if (!response.error) {
-        setTransactions(response.data.transactions);
-        setCount(response.pagination.totalPages);
-      }
-
-      setLoading(false);
-    };
-
+  useEffect(() => {
     fetchData();
-  }, [transactionType, statusType, coinType, page]);
+  }, [page]);
 
   const getContractType = (contracts: IContract[]) =>
     contracts.length > 1
@@ -172,13 +191,34 @@ const Transactions: React.FC<ITransactions> = ({
 
   const Transfer: React.FC<IContract> = ({ parameter: par }) => {
     const parameter = par as ITransferContract;
+    const tooltipRef = useRef<any>(null);
 
+    const handleMouseOver = (e: any) => {
+      const positionY = e.currentTarget.offsetTop;
+      const positionX = e.currentTarget.offsetLeft;
+
+      tooltipRef.current.style.top = positionY - 30 + 'px';
+      tooltipRef.current.style.left = positionX + 'px';
+    };
     return (
       <>
         <CenteredRow>
           <div>
-            <KLV />
-            <p>KLV</p>
+            {parameter.assetId ? (
+              <Tooltip onMouseOver={(e: any) => handleMouseOver(e)}>
+                <Link href={`/asset/${parameter.assetId}`}>
+                  {parameter.assetId}
+                </Link>
+                <TooltipText ref={tooltipRef}>{parameter.assetId}</TooltipText>
+              </Tooltip>
+            ) : (
+              <>
+                <Link href={`/asset/KLV`}>
+                  <KLV />
+                </Link>
+                <Link href={`/asset/KLV`}>KLV</Link>
+              </>
+            )}
           </div>
         </CenteredRow>
         <span>
@@ -238,16 +278,8 @@ const Transactions: React.FC<ITransactions> = ({
     );
   };
 
-  const Withdraw: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IWithdrawContract;
-
-    return (
-      <span>
-        <Link href={`/account/${parameter.toAddress}`}>
-          {parameter.toAddress}
-        </Link>
-      </span>
-    );
+  const Withdraw: React.FC<IContract> = () => {
+    return <></>;
   };
 
   const FilteredComponent: React.FC<ITransaction> = ({ contract }) => {
@@ -303,9 +335,6 @@ const Transactions: React.FC<ITransactions> = ({
       case Contract.Undelegate:
         newHeaders = ['Bucket ID'];
         break;
-      case Contract.Withdraw:
-        newHeaders = ['To'];
-        break;
     }
 
     if (transactionType.value !== 'all') {
@@ -342,17 +371,23 @@ const Transactions: React.FC<ITransactions> = ({
         <span>
           <Link href={`/transaction/${hash}`}>{hash}</Link>
         </span>
-        <span>{blockNum}</span>
+        <Link href={`/block/${blockNum}`}>
+          <a className="address">{blockNum}</a>
+        </Link>
         <span>
           <small>
             {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
           </small>
         </span>
-        <span>{sender}</span>
+        <Link href={`/account/${sender}`}>
+          <a className="address">{sender}</a>
+        </Link>
         <span>
           <ArrowRight />
         </span>
-        <span>{toAddress}</span>
+        <Link href={`/account/${toAddress}`}>
+          <a className="address">{toAddress}</a>
+        </Link>
         <Status status={status}>
           <StatusIcon />
           <span>{status}</span>
@@ -385,6 +420,28 @@ const Transactions: React.FC<ITransactions> = ({
     loading,
   };
 
+  const resetDate = () => {
+    setPage(0);
+    setDateFilter({
+      start: '',
+      end: '',
+    });
+  };
+  const filterDate = (selectedDays: ISelectedDays) => {
+    setPage(0);
+    setDateFilter({
+      start: selectedDays.start.getTime().toString(),
+      end: selectedDays.end
+        ? (selectedDays.end.getTime() + 24 * 60 * 60 * 1000).toString()
+        : (selectedDays.start.getTime() + 24 * 60 * 60 * 1000).toString(),
+    });
+  };
+  const dateFilterProps: IDateFilter = {
+    resetDate,
+    filterDate,
+    empty: transactions.length === 0,
+  };
+
   return (
     <Container>
       <Title>
@@ -392,6 +449,7 @@ const Transactions: React.FC<ITransactions> = ({
           <ArrowLeft />
         </div>
         <h1>Transactions</h1>
+        <Icon />
       </Title>
 
       <Header>
@@ -400,8 +458,7 @@ const Transactions: React.FC<ITransactions> = ({
             <Filter key={String(index)} {...filter} />
           ))}
         </FilterContainer>
-
-        <Input />
+        <DateFilter {...dateFilterProps} />
       </Header>
 
       <Table {...tableProps} />

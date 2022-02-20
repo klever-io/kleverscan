@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 import { format } from 'date-fns';
 
@@ -24,6 +25,7 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
   transactions: defaultTransactions,
   precision,
 }) => {
+  const router = useRouter();
   const [transactions, setTransactions] = useState(defaultTransactions);
 
   const transactionsWatcherInterval = 4 * 1000;
@@ -66,7 +68,7 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
 
   return (
     <Section>
-      <h1>Transactions</h1>
+      <h1 onClick={() => router.push(`/transactions`)}>Transactions</h1>
       <TransactionContainer>
         <TransactionContent>
           {transactions.length === 0 && (

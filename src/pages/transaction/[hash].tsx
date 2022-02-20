@@ -31,6 +31,7 @@ import {
 } from '@/types/index';
 
 import { ArrowLeft } from '@/assets/icons';
+import { TransactionDetails as Icon } from '@/assets/title-icons';
 import { getStatusIcon } from '@/assets/status';
 
 import {
@@ -133,7 +134,8 @@ const Transaction: React.FC<ITransactionPage> = ({
           <div onClick={router.back}>
             <ArrowLeft />
           </div>
-          <h1>Transaction Detail</h1>
+          <h1>Transaction Details</h1>
+          <Icon />
         </Title>
 
         <Input />
@@ -287,10 +289,9 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
   if (contractType === Contract.Transfer) {
     const contract = transaction.data.transaction.contract[0]
       .parameter as ITransferContract;
-
-    if (contract.assetAddress) {
+    if (contract.assetId) {
       const assetRes: IAssetResponse = await api.get({
-        route: `assets/${contract.assetAddress}`,
+        route: `assets/${contract.assetId}`,
       });
       if (!assetRes.error) {
         precision = assetRes.data.asset.precision;

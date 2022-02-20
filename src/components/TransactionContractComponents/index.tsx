@@ -12,7 +12,6 @@ import {
   ICreateValidatorContract,
   IFreezeContract,
   IUnfreezeContract,
-  IWithdrawContract,
   IAsset,
 } from '@/types/index';
 
@@ -34,16 +33,19 @@ export const Transfer: React.FC<IContract> = ({
           <strong>Amount</strong>
         </span>
         <CenteredRow>
-          <>
-            <strong>
-              {toLocaleFixed(
-                parameter.amount / 10 ** coin.precision,
-                precision,
-              )}
-            </strong>
-            <KLV style={{ marginLeft: '1rem' }} />
+          <strong>
+            {toLocaleFixed(parameter.amount / 10 ** coin.precision, precision)}
+          </strong>
+          {coin.assetId ? (
             <Link href={`/asset/${coin.assetId}`}>{coin.assetId}</Link>
-          </>
+          ) : (
+            <>
+              <Link href={`/asset/KLV`}>
+                <KLV />
+              </Link>
+              <Link href={`/asset/KLV`}>KLV</Link>
+            </>
+          )}
         </CenteredRow>
       </Row>
       <Row>
@@ -264,31 +266,6 @@ export const Delegate: React.FC<IContract> = ({ parameter: par }) => {
   );
 };
 
-export const Withdraw: React.FC<IContract> = ({ parameter: par }) => {
-  const parameter = par as IWithdrawContract;
-
-  return (
-    <>
-      <Row>
-        <span>
-          <strong>Owner</strong>
-        </span>
-        <span>
-          <Link href={`/account/${parameter.ownerAddress}`}>
-            {parameter.ownerAddress}
-          </Link>
-        </span>
-      </Row>
-      <Row>
-        <span>
-          <strong>To</strong>
-        </span>
-        <span>
-          <Link href={`/account/${parameter.toAddress}`}>
-            {parameter.toAddress}
-          </Link>
-        </span>
-      </Row>
-    </>
-  );
+export const Withdraw: React.FC<IContract> = () => {
+  return <></>;
 };

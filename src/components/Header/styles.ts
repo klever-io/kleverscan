@@ -73,7 +73,7 @@ export const MobileItem = styled(Item)`
 
 export const Input = styled(DefaultInput)`
   margin-left: auto;
-
+  width: 25%;
   border-color: ${props => props.theme.input.border.dark};
 
   @media (max-width: 1024px) {

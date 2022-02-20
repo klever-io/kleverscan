@@ -43,6 +43,11 @@ export const Section = styled.section`
 
   h1 {
     margin-bottom: 1rem;
+    cursor: pointer;
+    width: fit-content;
+    &:hover {
+      text-decoration: underline;
+    }
   }
 
   &:last-child {
@@ -194,19 +199,23 @@ export const BlockCardContainer = styled.div<BlockCardContainerProps>`
 
   padding: 1.5rem;
 
+  cursor: pointer;
+  user-select: none;
+
   background-color: ${props => props.theme.white};
 
   border-radius: 1rem;
-  transition: 1s all ease;
+  transition: 1s all ease, 0.1s filter ease;
 
   animation: ${PullFade} 1s ease-in-out;
 
   animation-fill-mode: forwards;
   :first-child {
-    transition: 1s all ease;
-
     animation: ${PushFade} 1s ease-in-out;
     animation-fill-mode: forwards;
+  }
+  &:hover {
+    filter: brightness(0.97);
   }
 `;
 
@@ -214,7 +223,6 @@ export const BlockCardRow = styled.div`
   width: 100%;
 
   display: flex;
-
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
@@ -233,7 +241,6 @@ export const BlockCardRow = styled.div`
 
   strong {
     font-weight: 600;
-    cursor: pointer;
   }
 
   p {
@@ -333,6 +340,14 @@ export const TransactionRow = styled.div`
 
   &:not(:last-child) {
     margin-bottom: 2rem;
+  }
+  .clean-style {
+    text-decoration: inherit;
+    color: inherit;
+    font-weight: inherit;
+    &:hover {
+      text-decoration: underline;
+    }
   }
 `;
 

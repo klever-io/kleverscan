@@ -4,6 +4,7 @@ import {
   IAccountResponse,
   IStatisticsResponse,
   IYesterdayResponse,
+  ITransactionResponse,
 } from '../../../types';
 
 import { useEffect, useState } from 'react';
@@ -22,7 +23,7 @@ import api, { Service } from '@/services/api';
 
 const HomeDataCards: React.FC<IDataCards> = ({
   totalAccounts: defaultTotalAccounts,
-  totalTransactions,
+  totalTransactions: defaultTotalTransactions,
   tps,
   coinsData,
   yesterdayTransactions,
@@ -34,7 +35,11 @@ const HomeDataCards: React.FC<IDataCards> = ({
   const [actualTPS, setActualTPS] = useState<string>(tps);
 
   const [totalAccounts, setTotalAccounts] = useState(defaultTotalAccounts);
+  const [totalTransactions, setTotalTransactions] = useState(
+    defaultTotalTransactions,
+  );
   const [newAccounts, setNewAccounts] = useState(yesterdayAccounts);
+  const [newTransactions, setNewTransactions] = useState(yesterdayTransactions);
 
   const dataCards: ICard[] = [
     {
@@ -49,7 +54,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
       Icon: Transactions,
       title: 'Total transactions',
       value: totalTransactions,
-      variation: `+ ${yesterdayTransactions.toLocaleString()}`,
+      variation: `+ ${newTransactions.toLocaleString()}`,
     },
   ];
   useEffect(() => {
@@ -82,16 +87,44 @@ const HomeDataCards: React.FC<IDataCards> = ({
           }),
         ),
       );
-      const [accounts, yesterdayAccounts] = await Promise.all([
-        accountsCall,
-        yesterdayAccountsCall,
-      ]);
+
+      const transactionsCall = new Promise<ITransactionResponse>(resolve =>
+        resolve(
+          api.getCached({
+            route: 'transaction/list',
+          }),
+        ),
+      );
+
+      const yesterdayTransactionsCall = new Promise<IYesterdayResponse>(
+        resolve =>
+          resolve(
+            api.getCached({
+              route: 'transaction/list/count/1',
+            }),
+          ),
+      );
+      const [accounts, yesterdayAccounts, transactions, yesterdayTransactions] =
+        await Promise.all([
+          accountsCall,
+          yesterdayAccountsCall,
+          transactionsCall,
+          yesterdayTransactionsCall,
+        ]);
 
       if (!accounts.error) {
         setTotalAccounts(accounts.pagination.totalRecords);
       }
       if (!yesterdayAccounts.error) {
         setNewAccounts(yesterdayAccounts.data.number_by_day[0].doc_count);
+      }
+      if (!transactions.error) {
+        setTotalTransactions(transactions.pagination.totalRecords);
+      }
+      if (!yesterdayTransactions.error) {
+        setNewTransactions(
+          yesterdayTransactions.data.number_by_day[0].doc_count,
+        );
       }
     }, cardWatcherInterval);
 

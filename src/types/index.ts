@@ -18,7 +18,7 @@ export interface ITransferContract {
   amount: number;
   ownerAddress: string;
   toAddress: string;
-  assetAddress?: string;
+  assetId?: string;
 }
 
 export interface ICreateAssetContract {
@@ -133,7 +133,7 @@ export interface IBlock {
   trieRoot: string;
   validatorsTrieRoot: string;
   stakingTrieRoot: string;
-  assetTrieRoot: string;
+  kappsTrieRoot: string;
   producerSignature: string;
   signature: string;
   prevRandSeed: string;
@@ -146,6 +146,19 @@ export interface IBlock {
   txHashes: any[];
   softwareVersion: string;
   chainID: string;
+}
+
+export interface IPeer {
+  blsPublicKey: string;
+  ownerAddress: string;
+  rewardAddress: string;
+  canDelegate: boolean;
+  commission: number;
+  maxDelegation: number;
+  rating: number;
+  list: string;
+  totalStake: number;
+  selfStake: number;
 }
 
 export interface IBlockCard {
@@ -212,6 +225,20 @@ export interface IBucket {
   unstakedEpoch: number;
   balance: number;
   delegation: string;
+}
+
+export interface IDelegationsResponse {
+  totalDelegated: number;
+  address: string;
+  buckets: number;
+  name?: string;
+}
+export interface IValidator {
+  rank: number;
+  name: string;
+  staked: number;
+  cumulativeStaked: number;
+  address: string;
 }
 
 export interface IChainStatistics {
@@ -369,4 +396,20 @@ export interface ICard {
   title: string;
   value: number;
   variation: string;
+}
+
+export interface INodeCard {
+  title: string;
+  headers: string[];
+  values: string[];
+  chartType: 'chart' | 'map';
+  chartOptions?: any;
+  chartData: IChartData[] | string[];
+}
+
+export interface IProposalDetails {
+  proposer: string;
+  proposerContent: string;
+  created: number;
+  hash: string;
 }

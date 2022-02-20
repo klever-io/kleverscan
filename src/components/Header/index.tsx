@@ -78,7 +78,6 @@ const Navbar: React.FC = () => {
           ))}
         </DesktopContainer>
 
-        <Input />
         <MobileContainer>
           <MenuIcon onClick={handleMenu} />
         </MobileContainer>

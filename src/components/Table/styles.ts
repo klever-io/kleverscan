@@ -21,7 +21,13 @@ export interface ITableType {
     | 'buckets'
     | 'accounts'
     | 'assetsPage'
-    | 'holders';
+    | 'holders'
+    | 'validators'
+    | 'nodes'
+    | 'networkParams'
+    | 'proposals'
+    | 'votes';
+
   filter?: IFilterItem;
 }
 
@@ -77,7 +83,8 @@ export const Row = styled.div<ITableType>`
 
   border-radius: 0.5rem;
 
-  span {
+  span,
+  a {
     /* flex: 1; */
     overflow: hidden;
 
@@ -113,6 +120,14 @@ export const Row = styled.div<ITableType>`
       color: ${props => props.theme.black};
     }
   }
+  .address {
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 `;
 
 export const Status = styled.div<IStatus>`
@@ -120,13 +135,20 @@ export const Status = styled.div<IStatus>`
 
   flex-direction: row;
 
+  align-items: center;
+
   gap: 0.5rem;
 
   span {
     color: ${props => props.theme.table[props.status]} !important;
-
     text-transform: capitalize;
   }
+  ${props =>
+    props.status === 'inactive' &&
+    `
+      color: ${props.theme.table.icon} !important;
+      
+    `}
 `;
 
 export const EmptyRow = styled(Row)`

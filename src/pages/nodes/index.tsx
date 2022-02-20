@@ -20,27 +20,21 @@ import { Card, CardContainer, Container, Header, Title } from '@/views/blocks';
 import Chart, { ChartType } from '@/components/Chart';
 const Map = dynamic(() => import('@/components/Map/index'), { ssr: false });
 import MapSvg from '@/components/MapSvg';
+import NodeCards from '@/components/Cards/NodeCards';
 
-import { ICountriesGeoData, ICountryNode } from '../../types';
+import { ICountriesGeoData, ICountryNode, INodeCard } from '../../types';
 
 import { ArrowLeft } from '@/assets/icons';
+import { Nodes as Icon } from '@/assets/title-icons';
 import { coinMockedData, IChartData } from '@/configs/home';
 import { getAge } from '@/utils/index';
 import { getCountryISO3, ISO2 } from '@/utils/country';
 import geoData from '@/assets/countries.geo.json';
 import api from '@/services/api';
 
-interface ICard {
-  title: string;
-  headers: string[];
-  values: string[];
-  chartType: 'chart' | 'map';
-  chartOptions?: any;
-  chartData: IChartData[] | string[];
-}
 interface INodePage {
   nodes: ICountryNode[];
-  cardData: ICard[];
+  cardData: INodeCard[];
 }
 
 interface IGeoIPLookup {
@@ -68,23 +62,6 @@ interface IPeerResponse {
 const Nodes: React.FC<INodePage> = ({ nodes, cardData }) => {
   const router = useRouter();
 
-  const [uptime] = useState(new Date().getTime());
-  const [age, setAge] = useState(
-    getAge(fromUnixTime(new Date().getTime() / 1000)),
-  );
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const newAge = getAge(fromUnixTime(uptime / 1000));
-
-      setAge(newAge);
-    }, 1 * 1000); // 1 sec
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
-
   const rankingChartData = () => {
     const maxItems = 6;
     let data = [...nodes];
@@ -109,39 +86,11 @@ const Nodes: React.FC<INodePage> = ({ nodes, cardData }) => {
             <ArrowLeft />
           </div>
           <h1>Nodes</h1>
+          <Icon />
         </Title>
       </Header>
 
-      <CardContainer>
-        {cardData.map((card, index) => {
-          const { title, headers, values, chartType, chartOptions, chartData } =
-            card;
-          return (
-            <Card key={index}>
-              <div>
-                <span>
-                  <strong>{title}</strong>
-                </span>
-                <p>{age} ago</p>
-              </div>
-              <CardChartContainer>
-                {chartType === 'chart' ? (
-                  <Chart data={chartData} />
-                ) : (
-                  <MapSvg chartData={chartData} chartOptions={chartOptions} />
-                )}
-                <CardDetails variation={values[1].includes('%')}>
-                  <div>
-                    <span title={headers[0]}>{values[0]}</span>
-                    <span title={headers[1]}>{values[1]}</span>
-                  </div>
-                </CardDetails>
-              </CardChartContainer>
-            </Card>
-          );
-        })}
-        <Card style={{ backgroundColor: 'transparent' }} />
-      </CardContainer>
+      <NodeCards cardData={cardData} />
 
       <MapContainer>
         <Map nodes={nodes} />
@@ -176,19 +125,19 @@ export const getServerSideProps: GetServerSideProps = async () => {
   if (!statistics.error) {
     peers = statistics.data?.peers;
   }
-
   const nodes: ICountryNode[] = [];
 
   for (let i = 0; i < peers.length; i++) {
     const { addresses } = peers[i];
     const filteredAddresses = addresses.filter((item, pos, self) => {
-      return self.indexOf(item) === pos &&
+      return (
+        self.indexOf(item) === pos &&
         !item.startsWith('/ip4/127.0.0.1') &&
         !item.startsWith('/ip4/10.') &&
         !item.startsWith('/ip4/172.16.') &&
         !item.startsWith('/ip4/172.17.') &&
-        !item.startsWith('.255/tcp');
-
+        !item.startsWith('.255/tcp')
+      );
     });
     for (const address of filteredAddresses) {
       // IP comes as /ip4/xx.xx.x.xx/tcp/xxxxx
@@ -198,8 +147,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
       if (geo === null) continue;
 
       // TODO: manually allocate node
-      if (cleanIp=="35.200.204.226") {
-        geo.country = "IN";
+      if (cleanIp == '35.200.204.226') {
+        geo.country = 'IN';
         geo.ll[0] = 19.07;
         geo.ll[1] = 72.88;
       }
@@ -218,9 +167,17 @@ export const getServerSideProps: GetServerSideProps = async () => {
     }
   }
 
-  nodes.sort((a,b) => (a.nodes.length > b.nodes.length) ? -1 : ((b.nodes.length > a.nodes.length) ? 1 : 0));
-  const mostNodes: ICountryNode = nodes?nodes[0]: { country: 'Empty', nodes: [] };
-  
+  nodes.sort((a, b) =>
+    a.nodes.length > b.nodes.length
+      ? -1
+      : b.nodes.length > a.nodes.length
+      ? 1
+      : 0,
+  );
+  const mostNodes: ICountryNode = nodes.length
+    ? nodes[0]
+    : { country: 'Empty', nodes: [] };
+
   const mostNodesCountryGeo = countriesData.features.find(
     feat => feat.id === getCountryISO3(mostNodes.country),
   );
@@ -248,7 +205,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     translate: '0, 0',
   };
 
-  const cardData: ICard[] = [
+  const cardData: INodeCard[] = [
     {
       title: 'Total Nodes',
       headers: ['Value', 'Increase'],

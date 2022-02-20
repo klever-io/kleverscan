@@ -14,6 +14,7 @@ import { formatAmount } from '@/utils/index';
 import api from '@/services/api';
 
 import { ArrowLeft } from '@/assets/icons';
+import { Assets as Icon } from '@/assets/title-icons';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
 
@@ -127,6 +128,7 @@ const Assets: React.FC<IAssetPage> = ({
             <ArrowLeft />
           </div>
           <h1>Assets</h1>
+          <Icon />
         </Title>
 
         <Input />

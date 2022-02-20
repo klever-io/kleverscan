@@ -205,6 +205,64 @@ const holders = css`
   }
 `;
 
+const validators = css`
+  margin-right: 1.25rem;
+
+  width: 100%;
+`;
+
+const nodes = validators;
+
+const networkParams = css`
+  margin-right: 1.25rem;
+
+  &:nth-child(1) {
+    width: 4rem;
+  }
+
+  &:nth-child(2) {
+    width: 45rem;
+  }
+
+  &:nth-child(3) {
+    width: 7rem;
+  }
+`;
+
+const proposals = css`
+  margin-right: 1.25rem;
+  &:nth-child(1) {
+    width: 6rem;
+  }
+  &:nth-child(2) {
+    width: 24rem;
+  }
+  &:nth-child(3) {
+    width: 18rem;
+  }
+  &:nth-child(4) {
+    width: 12rem;
+  }
+  &:nth-child(5) {
+    width: 6rem;
+  }
+  &:nth-child(6) {
+    width: 4rem;
+  }
+`;
+const votes = css`
+  margin-right: 1.25rem;
+  &:nth-child(1) {
+    width: 38rem;
+  }
+  &:nth-child(2) {
+    width: 38rem;
+  }
+  &:nth-child(3) {
+    width: 14rem;
+  }
+`;
+
 const widths = {
   transactions,
   blocks,
@@ -213,6 +271,11 @@ const widths = {
   assets,
   buckets,
   holders,
+  validators,
+  nodes,
+  networkParams,
+  proposals,
+  votes,
 };
 
 export default widths;

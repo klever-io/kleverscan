@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
+import DateFilter, { IDateFilter } from '../DateFilter';
 
 import { Container, ItemContainer, Indicator, TabContainer } from './styles';
 
 export interface ITabs {
   headers: string[];
   onClick?(header: string, index: number): void;
+  dateFilterProps?: IDateFilter;
 }
 
-const Tabs: React.FC<ITabs> = ({ headers, onClick, children }) => {
+const Tabs: React.FC<ITabs> = ({
+  headers,
+  onClick,
+  dateFilterProps,
+  children,
+}) => {
   const [selected, setSelected] = useState(0);
 
   return (
@@ -31,8 +38,10 @@ const Tabs: React.FC<ITabs> = ({ headers, onClick, children }) => {
             </ItemContainer>
           );
         })}
+        {dateFilterProps && headers[selected] === 'Transactions' && (
+          <DateFilter {...dateFilterProps} />
+        )}
       </TabContainer>
-
       {children}
     </Container>
   );

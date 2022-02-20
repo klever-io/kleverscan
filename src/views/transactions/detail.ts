@@ -162,8 +162,12 @@ export const CenteredRow = styled.div`
 
   a {
     color: ${props => props.theme.black};
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 600;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
   }
 
   @media (max-width: 768px) {

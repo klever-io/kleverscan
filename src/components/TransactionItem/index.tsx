@@ -37,15 +37,24 @@ const TransactionItem: React.FC<ITransaction> = ({
       <TransactionData>
         <p>
           <strong>From: </strong>
-          {sender}
+          <Link href={`/account/${sender}`}>
+            <a className="clean-style">{sender}</a>
+          </Link>
         </p>
         <p>
           <strong>To: </strong>
-          {parameter.toAddress || '--'}
+          <Link href={`/account/${parameter.toAddress}`}>
+            <a className="clean-style">{parameter.toAddress || '--'}</a>
+          </Link>
         </p>
       </TransactionData>
       <TransactionAmount>
-        <span>{toLocaleFixed(amount / 10 ** precision, precision)} KLV</span>
+        <span>
+          {toLocaleFixed(amount / 10 ** precision, precision)}{' '}
+          <Link href={`/asset/KLV`}>
+            <a className="clean-style">KLV</a>
+          </Link>
+        </span>
       </TransactionAmount>
     </TransactionRow>
   );

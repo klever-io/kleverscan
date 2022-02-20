@@ -41,7 +41,6 @@ export const Container = styled.div`
   display: flex;
 
   flex-direction: column;
-
   span {
     padding-bottom: 0.25rem;
 
@@ -53,6 +52,7 @@ export const Container = styled.div`
 
 export const Content = styled.div<{ open: boolean }>`
   width: 10rem;
+  height: 2.8rem;
 
   padding: 0.5rem 1rem;
 

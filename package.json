@@ -32,6 +32,7 @@
     "react-leaflet-markercluster": "^3.0.0-rc1",
     "react-loader-spinner": "^4.0.0",
     "react-toastify": "^8.0.3",
+    "react-tooltip": "^4.2.21",
     "recharts": "^2.0.10",
     "styled-components": "^5.3.0",
     "svg-path-bounds": "^1.0.2"

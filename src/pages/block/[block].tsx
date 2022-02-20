@@ -70,7 +70,7 @@ const Block: React.FC<IBlockPage> = ({
     parentHash,
     trieRoot,
     validatorsTrieRoot,
-    assetTrieRoot,
+    kappsTrieRoot,
     prevRandSeed,
     randSeed,
   } = block;
@@ -91,7 +91,7 @@ const Block: React.FC<IBlockPage> = ({
     const fetchData = async () => {
       setLoading(true);
       const response: ITransactionResponse = await api.get({
-        route: `transaction/list?page=${transactionPage}&nonce=${nonce}`,
+        route: `transaction/list?page=${transactionPage}&blockNum=${nonce}`,
       });
       if (!response.error) {
         setTransactions(response.data.transactions);
@@ -243,12 +243,12 @@ const Block: React.FC<IBlockPage> = ({
         </Row>
         <Row>
           <span>
-            <strong>Asset Trie Root</strong>
+            <strong>KApps Trie Root</strong>
           </span>
           <span>
             <CenteredRow>
-              <span>{assetTrieRoot}</span>
-              <Copy data={assetTrieRoot} />
+              <span>{kappsTrieRoot}</span>
+              <Copy data={kappsTrieRoot} />
             </CenteredRow>
           </span>
         </Row>
@@ -382,7 +382,7 @@ export const getServerSideProps: GetStaticProps<IBlockPage> = async ({
   props.block = block.data.block;
 
   const transactions: ITransactionResponse = await api.get({
-    route: `transaction/list?nonce=${block.data.block.nonce}`,
+    route: `transaction/list?blockNum=${block.data.block.nonce}`,
   });
   if (!transactions.error) {
     props.transactions = transactions.data.transactions;

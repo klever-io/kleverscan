@@ -24,6 +24,7 @@ import api from '@/services/api';
 import { formatAmount, getAge } from '@/utils/index';
 
 import { ArrowLeft } from '@/assets/icons';
+import { Accounts as Icon } from '@/assets/title-icons';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
 
@@ -66,22 +67,6 @@ const Accounts: React.FC<IAccounts> = ({
   const [page, setPage] = useState(0);
   const [accounts, setAccounts] = useState(defaultAccounts);
   const [loading, setLoading] = useState(false);
-  const [uptime] = useState(new Date().getTime());
-  const [age, setAge] = useState(
-    getAge(fromUnixTime(new Date().getTime() / 1000)),
-  );
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const newAge = getAge(fromUnixTime(uptime / 1000));
-
-      setAge(newAge);
-    }, 1 * 1000); // 1 sec
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -112,8 +97,24 @@ const Accounts: React.FC<IAccounts> = ({
       ],
     },
   ];
-
   const CardContent: React.FC<ICard> = ({ title, headers, values }) => {
+    const [uptime] = useState(new Date().getTime());
+    const [age, setAge] = useState(
+      getAge(fromUnixTime(new Date().getTime() / 1000)),
+    );
+
+    useEffect(() => {
+      const interval = setInterval(() => {
+        const newAge = getAge(fromUnixTime(uptime / 1000));
+
+        setAge(newAge);
+      }, 1 * 1000); // 1 sec
+
+      return () => {
+        clearInterval(interval);
+      };
+    }, []);
+
     return (
       <Card>
         <div>
@@ -186,6 +187,7 @@ const Accounts: React.FC<IAccounts> = ({
             <ArrowLeft />
           </div>
           <h1>Accounts</h1>
+          <Icon />
         </Title>
 
         <Input />

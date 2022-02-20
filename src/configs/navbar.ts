@@ -5,6 +5,7 @@ import {
   TwoUser,
   Compass,
   TickSquare,
+  Proposal,
 } from '@/assets/icons';
 
 export interface INavbarItem {
@@ -48,6 +49,11 @@ const navbarItems: INavbarItem[] = [
     name: 'Validators',
     pathTo: '/validators',
     Icon: TickSquare,
+  },
+  {
+    name: 'Proposals',
+    pathTo: '/proposals',
+    Icon: Proposal,
   },
 ];
 

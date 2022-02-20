@@ -406,3 +406,10 @@ export interface INodeCard {
   chartOptions?: any;
   chartData: IChartData[] | string[];
 }
+
+export interface IProposalDetails {
+  proposer: string;
+  proposerContent: string;
+  created: number;
+  hash: string;
+}

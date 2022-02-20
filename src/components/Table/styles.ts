@@ -23,7 +23,11 @@ export interface ITableType {
     | 'assetsPage'
     | 'holders'
     | 'validators'
-    | 'nodes';
+    | 'nodes'
+    | 'networkParams'
+    | 'proposals'
+    | 'votes';
+
   filter?: IFilterItem;
 }
 

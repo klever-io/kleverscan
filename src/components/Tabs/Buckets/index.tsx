@@ -11,20 +11,11 @@ interface IBuckets {
   [key: string]: IBucket[];
 }
 
-interface IBucketData extends IBucket {
-  bucketId: string;
-}
-
-const Buckets: React.FC<IBuckets> = props => {
-  const bucketData = Object.values(props).map((item, index) => ({
-    bucketId: Object.keys(props)[index],
-    ...item,
-  }));
-
+const Buckets: React.FC<IBuckets> = ({ buckets }) => {
   const UINT32_MAX = 4294967295;
   const precision = 6; // default KLV precision
 
-  const TableBody: React.FC<IBucketData> = ({
+  const TableBody: React.FC<IBucket> = ({
     balance,
     stakedEpoch,
     unstakedEpoch,
@@ -56,7 +47,7 @@ const Buckets: React.FC<IBuckets> = props => {
   const tableProps: ITable = {
     type: 'buckets',
     header,
-    data: bucketData,
+    data: buckets,
     body: TableBody,
     loading: false,
   };

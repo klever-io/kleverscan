@@ -22,7 +22,13 @@ import Tabs, { ITabs } from '@/components/Tabs';
 import Assets from '@/components/Tabs/Assets';
 import Transactions from '@/components/Tabs/Transactions';
 
-import { IAccount, IResponse, ITransaction, IPagination } from '@/types/index';
+import {
+  IAccount,
+  IResponse,
+  ITransaction,
+  IPagination,
+  IBucket,
+} from '@/types/index';
 
 import { ArrowLeft } from '@/assets/icons';
 import { KLV } from '@/assets/coins';
@@ -34,6 +40,7 @@ import Copy from '@/components/Copy';
 
 import api, { IPrice, Service } from '@/services/api';
 import { ISelectedDays } from '@/components/DateFilter';
+import Buckets from '@/components/Tabs/Buckets';
 
 interface IAccountPage {
   account: IAccount;
@@ -80,6 +87,8 @@ const Account: React.FC<IAccountPage> = ({
     transactionResponse.data.transactions,
   );
 
+  const [buckets, setBuckets] = useState<IBucket[]>([]);
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -110,6 +119,23 @@ const Account: React.FC<IAccountPage> = ({
     fetchData();
   }, [page, account.address, dateFilter]);
 
+  useEffect(() => {
+    const { assets } = account;
+    if (Object.keys(assets).length === 0) {
+      return;
+    }
+
+    let assetBuckets: IBucket[] = [];
+
+    for (const key in assets) {
+      if (assets[key].buckets) {
+        assetBuckets = [...assetBuckets, ...(assets[key].buckets || [])];
+      }
+    }
+
+    setBuckets(assetBuckets);
+  }, [account]);
+
   const getFreezeBalance = () => {
     if (Object.values(account.assets).length <= 0) {
       return 0;
@@ -134,9 +160,9 @@ const Account: React.FC<IAccountPage> = ({
       headers.push('Transactions');
     }
 
-    // if (account.assets && Object.values(account.assets).length > 0) {
-    //   headers.push('Buckets');
-    // }
+    if (buckets.length > 0) {
+      headers.push('Buckets');
+    }
 
     return headers;
   };
@@ -189,6 +215,8 @@ const Account: React.FC<IAccountPage> = ({
             </PaginationContainer>
           </>
         );
+      case 'Buckets':
+        return <Buckets buckets={buckets} />;
       default:
         return <div />;
     }

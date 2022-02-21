@@ -87,6 +87,7 @@ const Transaction: React.FC<ITransactionPage> = ({
   timestamp,
   signature,
   contract,
+  receipts,
   blockNum,
   nonce,
   asset,
@@ -111,19 +112,25 @@ const Transaction: React.FC<ITransactionPage> = ({
           <Transfer {...contract[0]} precision={precision} asset={asset} />
         );
       case Contract.CreateAsset:
-        return <CreateAsset {...parsedContract} />;
+        return <CreateAsset {...parsedContract} receipts={receipts} />;
       case Contract.CreateValidator:
       case Contract.ValidatorConfig:
-        return <CreateValidator {...parsedContract} precision={precision} />;
+        return (
+          <CreateValidator
+            {...parsedContract}
+            precision={precision}
+            receipts={receipts}
+          />
+        );
       case Contract.Freeze:
-        return <Freeze {...parsedContract} />;
+        return <Freeze {...parsedContract} receipts={receipts} />;
       case Contract.Unfreeze:
       case Contract.Delegate:
-        return <Delegate {...parsedContract} />;
+        return <Delegate {...parsedContract} receipts={receipts} />;
       case Contract.Undelegate:
-        return <Unfreeze {...parsedContract} />;
+        return <Unfreeze {...parsedContract} receipts={receipts} />;
       case Contract.Withdraw:
-        return <Withdraw {...parsedContract} />;
+        return <Withdraw {...parsedContract} receipts={receipts} />;
       default:
         return <div />;
     }

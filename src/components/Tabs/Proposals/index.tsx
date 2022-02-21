@@ -91,9 +91,9 @@ const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
 
   const header = [
     'Number',
-    'ProposalContent',
+    'Proposal Content',
     'Time',
-    'Upvotes/TotalStaked',
+    'Upvotes/Total Staked',
     'Status',
     '',
   ];

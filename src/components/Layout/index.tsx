@@ -3,6 +3,7 @@ import React from 'react';
 import Head from 'next/head';
 import Navbar from '../Header';
 import Footer from '../Footer';
+import { Main } from '@/views/home';
 
 const Layout: React.FC = ({ children }) => {
   return (
@@ -13,7 +14,7 @@ const Layout: React.FC = ({ children }) => {
 
       <Navbar />
 
-      <main>{children}</main>
+      <Main>{children}</Main>
 
       <Footer />
     </div>

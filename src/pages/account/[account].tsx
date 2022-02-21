@@ -233,7 +233,10 @@ const Account: React.FC<IAccountPage> = ({
                 </IconContainer>
                 <div>
                   <span>
-                    {(account.balance / 10 ** precision).toLocaleString()}
+                    {(
+                      account.balance / 10 ** precision +
+                      getFreezeBalance()
+                    ).toLocaleString()}
                   </span>
                   <p>USD {convertedBalance.toLocaleString()}</p>
                 </div>
@@ -242,10 +245,7 @@ const Account: React.FC<IAccountPage> = ({
                 <div>
                   <strong>Available</strong>
                   <span>
-                    {(
-                      account.balance / 10 ** precision -
-                      getFreezeBalance()
-                    ).toLocaleString()}
+                    {(account.balance / 10 ** precision).toLocaleString()}
                   </span>
                 </div>
                 <div>

@@ -57,7 +57,7 @@ const Proposals: React.FC<IProposalsPage> = ({
   proposals: defaultProposals,
   totalProposalsPage,
 }) => {
-  const tableHeaders = ['Network Paramters', 'Proposals'];
+  const tableHeaders = ['Network Parameters', 'Proposals'];
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
   const [loadingNetworkParams, setLoadingNetWorkParams] = useState(false);
   const [loadingProposals, setLoadingProposals] = useState(false);
@@ -70,13 +70,13 @@ const Proposals: React.FC<IProposalsPage> = ({
       <Card>
         <div>
           <span>
-            The committee is made up of made up of KFI holders who are
-            responsible for modifying dynamic parameters such as block rewards
-            and transaction fees on the KLV network. Each KFI holder who has KFI
-            frozen is entitled to initiate and vote for proposals. A proposal is
-            adopted as long as it is voted for by at least half of all the KFI
-            frozen by the network. The adopted proposal will apply its changes
-            to network parameters in the next epoch.
+            The committee is made up of KFI holders who are responsible for
+            modifying dynamic parameters such as block rewards and transaction
+            fees on the KLV network. Each KFI holder who has KFI frozen is
+            entitled to initiate and vote for proposals. A proposal is adopted
+            as long as it is voted for by at least half of all the KFI frozen by
+            the network. The adopted proposal will apply its changes to network
+            parameters in the next epoch.
           </span>
         </div>
       </Card>
@@ -85,7 +85,7 @@ const Proposals: React.FC<IProposalsPage> = ({
 
   const SelectedTabComponent: React.FC = () => {
     switch (selectedTab) {
-      case 'Network Paramters':
+      case 'Network Parameters':
         return (
           <>
             <NetworkParams

@@ -59,7 +59,7 @@ const Validators: React.FC<IValidatorPage> = ({
           return {
             staked: delegation.totalDelegated,
             rank: index + validators.pagination.previous * 10 + 1,
-            name: delegation.name || 'Klever Staking',
+            name: delegation.name || delegation.address,
             cumulativeStaked: parseFloat(
               (
                 (delegation.totalDelegated / validators.data.totalFrozen) *
@@ -176,7 +176,7 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
           return {
             staked: delegation.totalDelegated,
             rank: index + validators.pagination.previous * 10 + 1,
-            name: delegation.name || 'Klever Staking',
+            name: delegation.name || delegation.address,
             cumulativeStaked: parseFloat(
               (
                 (delegation.totalDelegated / validators.data.totalFrozen) *

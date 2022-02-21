@@ -67,6 +67,7 @@ export const CreateAsset: React.FC<IContract> = ({
   parameter: par,
 }) => {
   const parameter = par as ICreateAssetContract;
+  const ownerAddress = parameter?.ownerAddress || sender;
 
   return (
     <>
@@ -81,7 +82,7 @@ export const CreateAsset: React.FC<IContract> = ({
           <strong>Owner</strong>
         </span>
         <span>
-          <Link href={`/account/${sender}`}>{sender}</Link>
+          <Link href={`/account/${ownerAddress}`}>{ownerAddress}</Link>
         </span>
       </Row>
       <Row>
@@ -142,11 +143,13 @@ export const CreateAsset: React.FC<IContract> = ({
 };
 
 export const CreateValidator: React.FC<IContract> = ({
+  sender,
   parameter: par,
   precision,
 }) => {
   precision = precision ? precision : 6;
   const parameter = par as ICreateValidatorContract;
+  const ownerAddress = parameter?.ownerAddress || sender;
 
   return (
     <>
@@ -155,7 +158,7 @@ export const CreateValidator: React.FC<IContract> = ({
           <strong>Owner</strong>
         </span>
         <span>
-          <Link href={`/account/${parameter.ownerAddress}`}></Link>
+          <Link href={`/account/${ownerAddress}`}>{ownerAddress}</Link>
         </span>
       </Row>
       <Row>

@@ -460,3 +460,10 @@ export const TransactionChartContent = styled.div`
   width: 95%;
   height: 80%;
 `;
+
+export const Main = styled.main`
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1800px;
+`;

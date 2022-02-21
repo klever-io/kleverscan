@@ -1,4 +1,5 @@
 import { createGlobalStyle } from 'styled-components';
+import theme from './theme';
 
 export default createGlobalStyle`
   * {
@@ -8,7 +9,7 @@ export default createGlobalStyle`
   }
   
   body {
-    background: #F7F7F7 !important; // TODO: remove it
+    background: ${theme.background} !important;
   }
 
   @media (max-width: 1080px) {

@@ -57,7 +57,7 @@ const Proposals: React.FC<IProposalsPage> = ({
   proposals: defaultProposals,
   totalProposalsPage,
 }) => {
-  const tableHeaders = ['Network Paramters', 'Proposals'];
+  const tableHeaders = ['Network Parameters', 'Proposals'];
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
   const [loadingNetworkParams, setLoadingNetWorkParams] = useState(false);
   const [loadingProposals, setLoadingProposals] = useState(false);
@@ -85,7 +85,7 @@ const Proposals: React.FC<IProposalsPage> = ({
 
   const SelectedTabComponent: React.FC = () => {
     switch (selectedTab) {
-      case 'Network Paramters':
+      case 'Network Parameters':
         return (
           <>
             <NetworkParams

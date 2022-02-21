@@ -62,7 +62,10 @@ export const Transfer: React.FC<IContract> = ({
   );
 };
 
-export const CreateAsset: React.FC<IContract> = ({ parameter: par }) => {
+export const CreateAsset: React.FC<IContract> = ({
+  sender,
+  parameter: par,
+}) => {
   const parameter = par as ICreateAssetContract;
 
   return (
@@ -78,9 +81,7 @@ export const CreateAsset: React.FC<IContract> = ({ parameter: par }) => {
           <strong>Owner</strong>
         </span>
         <span>
-          {/* <Link href={`/account/${parameter.ownerAddress}`}>
-            {parameter.ownerAddress}
-          </Link> */}
+          <Link href={`/account/${sender}`}>{sender}</Link>
         </span>
       </Row>
       <Row>
@@ -200,7 +201,7 @@ export const CreateValidator: React.FC<IContract> = ({
   );
 };
 
-export const Freeze: React.FC<IContract> = ({ parameter: par }) => {
+export const Freeze: React.FC<IContract> = ({ sender, parameter: par }) => {
   const parameter = par as IFreezeContract;
 
   return (
@@ -210,9 +211,7 @@ export const Freeze: React.FC<IContract> = ({ parameter: par }) => {
           <strong>Owner</strong>
         </span>
         <span>
-          <Link href={`/account/${parameter.ownerAddress}`}>
-            {parameter.ownerAddress}
-          </Link>
+          <Link href={`/account/${sender}`}>{sender}</Link>
         </span>
       </Row>
       <Row>
@@ -227,7 +226,7 @@ export const Freeze: React.FC<IContract> = ({ parameter: par }) => {
   );
 };
 
-export const Unfreeze: React.FC<IContract> = ({ parameter: par }) => {
+export const Unfreeze: React.FC<IContract> = ({ sender, parameter: par }) => {
   const parameter = par as IUnfreezeContract;
 
   return (
@@ -237,16 +236,14 @@ export const Unfreeze: React.FC<IContract> = ({ parameter: par }) => {
           <strong>Owner</strong>
         </span>
         <span>
-          <Link href={`/account/${parameter.ownerAddress}`}>
-            {parameter.ownerAddress}
-          </Link>
+          <Link href={`/account/${sender}`}>{sender}</Link>
         </span>
       </Row>
       <Row>
         <span>
           <strong>Bucket ID</strong>
         </span>
-        <span>{parameter.bucketID}</span>
+        <span>{parameter.bucketId}</span>
       </Row>
     </>
   );
@@ -260,7 +257,7 @@ export const Delegate: React.FC<IContract> = ({ parameter: par }) => {
         <span>
           <strong>Bucket ID</strong>
         </span>
-        <span>{parameter.bucketID}</span>
+        <span>{parameter.bucketId}</span>
       </Row>
     </>
   );

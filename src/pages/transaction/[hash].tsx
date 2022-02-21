@@ -103,25 +103,27 @@ const Transaction: React.FC<ITransactionPage> = ({
   const ContractComponent: React.FC = () => {
     const contractType = getContractType(contract);
 
+    const parsedContract = { ...contract[0], sender };
+
     switch (contractType) {
       case Contract.Transfer:
         return (
           <Transfer {...contract[0]} precision={precision} asset={asset} />
         );
       case Contract.CreateAsset:
-        return <CreateAsset {...contract[0]} />;
+        return <CreateAsset {...parsedContract} />;
       case Contract.CreateValidator:
       case Contract.ValidatorConfig:
-        return <CreateValidator {...contract[0]} precision={precision} />;
+        return <CreateValidator {...parsedContract} precision={precision} />;
       case Contract.Freeze:
-        return <Freeze {...contract[0]} />;
+        return <Freeze {...parsedContract} />;
       case Contract.Unfreeze:
       case Contract.Delegate:
-        return <Delegate {...contract[0]} />;
+        return <Delegate {...parsedContract} />;
       case Contract.Undelegate:
-        return <Unfreeze {...contract[0]} />;
+        return <Unfreeze {...parsedContract} />;
       case Contract.Withdraw:
-        return <Withdraw {...contract[0]} />;
+        return <Withdraw {...parsedContract} />;
       default:
         return <div />;
     }

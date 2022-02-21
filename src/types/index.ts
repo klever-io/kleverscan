@@ -16,7 +16,6 @@ export enum Contract {
 
 export interface ITransferContract {
   amount: number;
-  ownerAddress: string;
   toAddress: string;
   assetId?: string;
 }
@@ -43,7 +42,6 @@ export interface ICreateValidatorContract {
 }
 
 export interface IValidatorConfigContract {
-  ownerAddress: string;
   config: {
     canDelegate: boolean;
     commission: number;
@@ -54,27 +52,25 @@ export interface IValidatorConfigContract {
 
 export interface IFreezeContract {
   amount: number;
-  ownerAddress: string;
+  assetId: string;
 }
 
 export interface IUnfreezeContract {
-  bucketID: string;
-  ownerAddress: string;
+  bucketId: string;
+  assetId: string;
 }
 
 export interface IDelegateContract {
-  bucketID: string;
-  ownerAddress: string;
+  bucketId: string;
+  toAddress: string;
 }
 
 export interface IUndelegateContract {
-  bucketID: string;
-  ownerAddress: string;
+  bucketId: string;
 }
 
 export interface IWithdrawContract {
-  ownerAddress: string;
-  toAddress: string;
+  assetId: string;
 }
 
 type IParameter =
@@ -212,6 +208,7 @@ export interface IAsset {
   mintedValue: number;
 }
 export interface IContract {
+  sender: string;
   type: Contract;
   parameter: IParameter;
   precision?: number;

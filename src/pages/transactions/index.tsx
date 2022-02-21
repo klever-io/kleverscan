@@ -273,7 +273,7 @@ const Transactions: React.FC<ITransactions> = ({
 
     return (
       <span>
-        <small>{parameter.bucketID}</small>
+        <small>{parameter.bucketId}</small>
       </span>
     );
   };

@@ -21,8 +21,6 @@ import Chart, { ChartType } from '@/components/Chart';
 const Map = dynamic(() => import('@/components/Map/index'), { ssr: false });
 import MapSvg from '@/components/MapSvg';
 
-import { ICountriesGeoData, ICountryNode } from '../../types';
-
 import { ArrowLeft } from '@/assets/icons';
 import { coinMockedData, IChartData } from '@/configs/home';
 import { getAge } from '@/utils/index';

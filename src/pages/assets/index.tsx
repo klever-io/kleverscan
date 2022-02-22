@@ -10,7 +10,7 @@ import Table, { ITable } from '@/components/Table';
 import { Row } from '@/components/Table/styles';
 
 import { IAsset, IResponse, IPagination } from '@/types/index';
-import { formatAmount } from '@/utils/index';
+import { formatAmount, parseHardCodedSupply } from '@/utils/index';
 import api from '@/services/api';
 
 import { ArrowLeft } from '@/assets/icons';
@@ -48,7 +48,8 @@ const Assets: React.FC<IAssetPage> = ({
         route: `assets/kassets?page=${page}`,
       });
       if (!response.error) {
-        setAssets(response.data.assets);
+        const assets = parseHardCodedSupply(response.data.assets);
+        setAssets(assets);
       }
 
       setLoading(false);
@@ -157,6 +158,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
     props.assets = assets.data.assets;
     props.pagination = assets.pagination;
   }
+
+  props.assets = parseHardCodedSupply(props.assets);
 
   return { props };
 };

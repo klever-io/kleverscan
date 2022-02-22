@@ -110,7 +110,7 @@ export interface ITransaction {
   status: string;
   resultCode: string;
   contract: IContract[];
-  receipt: IReceipt[];
+  receipts: IReceipt[];
   precision: number;
 }
 
@@ -213,6 +213,7 @@ export interface IContract {
   parameter: IParameter;
   precision?: number;
   asset?: IAsset;
+  receipts?: IReceipt[];
 }
 
 export interface IBucket {

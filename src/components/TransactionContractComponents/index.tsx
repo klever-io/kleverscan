@@ -13,6 +13,9 @@ import {
   IFreezeContract,
   IUnfreezeContract,
   IAsset,
+  IFreezeReceipt,
+  IUnfreezeReceipt,
+  ICreateAssetReceipt,
 } from '@/types/index';
 
 import { KLV } from '@/assets/coins';
@@ -65,12 +68,20 @@ export const Transfer: React.FC<IContract> = ({
 export const CreateAsset: React.FC<IContract> = ({
   sender,
   parameter: par,
+  receipts: rec,
 }) => {
   const parameter = par as ICreateAssetContract;
+  const receipts = rec as ICreateAssetReceipt[];
   const ownerAddress = parameter?.ownerAddress || sender;
 
   return (
     <>
+      <Row>
+        <span>
+          <strong>Asset ID</strong>
+        </span>
+        <span>{receipts?.[0]?.assetId}</span>
+      </Row>
       <Row>
         <span>
           <strong>Name</strong>
@@ -204,8 +215,13 @@ export const CreateValidator: React.FC<IContract> = ({
   );
 };
 
-export const Freeze: React.FC<IContract> = ({ sender, parameter: par }) => {
+export const Freeze: React.FC<IContract> = ({
+  sender,
+  parameter: par,
+  receipts: rec,
+}) => {
   const parameter = par as IFreezeContract;
+  const receipts = rec as IFreezeReceipt[];
 
   return (
     <>
@@ -225,12 +241,23 @@ export const Freeze: React.FC<IContract> = ({ sender, parameter: par }) => {
           <small>{parameter.amount.toLocaleString()}</small>
         </span>
       </Row>
+      <Row>
+        <span>
+          <strong>Bucket ID</strong>
+        </span>
+        <span>{receipts?.[0]?.bucketId}</span>
+      </Row>
     </>
   );
 };
 
-export const Unfreeze: React.FC<IContract> = ({ sender, parameter: par }) => {
+export const Unfreeze: React.FC<IContract> = ({
+  sender,
+  parameter: par,
+  receipts: rec,
+}) => {
   const parameter = par as IUnfreezeContract;
+  const receipts = rec as IUnfreezeReceipt[];
 
   return (
     <>
@@ -247,6 +274,12 @@ export const Unfreeze: React.FC<IContract> = ({ sender, parameter: par }) => {
           <strong>Bucket ID</strong>
         </span>
         <span>{parameter.bucketId}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Available Epoch To Withdraw</strong>
+        </span>
+        <span>{receipts?.[0]?.availableWithdrawEpoch}</span>
       </Row>
     </>
   );

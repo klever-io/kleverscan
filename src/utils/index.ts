@@ -1,3 +1,5 @@
+import { IAsset } from '../types';
+
 export const breakText = (text: string, limit: number): string => {
   return text.length > limit ? `${text.substring(0, limit)}...` : text;
 };
@@ -67,4 +69,16 @@ export const hexToString = (hex: string): string => {
   }
 
   return ret;
+};
+
+export const parseHardCodedSupply = (assets: IAsset[]): IAsset[] => {
+  return assets.map(asset => {
+    if (asset.assetId === 'KLV') {
+      asset.maxSupply = 10000000000000000;
+    } else if (asset.assetId === 'KFI') {
+      asset.maxSupply = 21000000000000;
+    }
+
+    return asset;
+  });
 };

@@ -25,7 +25,7 @@ import {
   ITransaction,
   IAccountAsset,
 } from '@/types/index';
-import { toLocaleFixed } from '@/utils/index';
+import { parseHardCodedSupply, toLocaleFixed } from '@/utils/index';
 
 import { ArrowLeft } from '@/assets/icons';
 import Tabs, { ITabs } from '@/components/Tabs';
@@ -388,7 +388,7 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
   if (asset.error) {
     return redirectProps;
   } else {
-    props.asset = asset.data.asset;
+    props.asset = parseHardCodedSupply([asset.data.asset])[0];
   }
 
   const transactions: ITransactionResponse = await api.get({

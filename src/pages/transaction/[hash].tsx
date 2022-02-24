@@ -96,15 +96,25 @@ const Transaction: React.FC<ITransactionPage> = ({
   const StatusIcon = getStatusIcon(status);
   const precision = 6; // default KLV precision
 
-  const getContractType = (contracts: IContract[]) =>
-    contracts.length > 1
+  const getContractType = (contracts: IContract[]) => {
+    if (!contract) {
+      return 'Unkown';
+    }
+
+    return contracts.length > 1
       ? 'Multi contract'
       : Object.values(Contract)[contracts[0].type];
+  };
 
   const ContractComponent: React.FC = () => {
     const contractType = getContractType(contract);
+    let emptyContract: IContract = {} as IContract;
 
-    const parsedContract = { ...contract[0], sender };
+    if (contract) {
+      emptyContract = { ...contract[0] };
+    }
+
+    const parsedContract = { ...emptyContract, sender };
 
     switch (contractType) {
       case Contract.Transfer:
@@ -292,8 +302,11 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
 
   let precision = 6; // Default KLV precision
   let asset: IAsset = klvAsset;
-  const contractType =
-    Object.values(Contract)[transaction.data.transaction.contract[0].type];
+  let contractType = 'Unkown';
+  if (transaction.data.transaction.contract) {
+    contractType =
+      Object.values(Contract)[transaction.data.transaction.contract[0].type];
+  }
 
   if (contractType === Contract.Transfer) {
     const contract = transaction.data.transaction.contract[0]

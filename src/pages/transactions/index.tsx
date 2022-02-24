@@ -184,10 +184,15 @@ const Transactions: React.FC<ITransactions> = ({
     fetchData();
   }, [page]);
 
-  const getContractType = (contracts: IContract[]) =>
-    contracts.length > 1
+  const getContractType = (contracts: IContract[]) => {
+    if (!contracts) {
+      return 'Unkown';
+    }
+
+    return contracts.length > 1
       ? 'Multi contract'
       : Object.values(Contract)[contracts[0].type];
+  };
 
   const Transfer: React.FC<IContract> = ({ parameter: par }) => {
     const parameter = par as ITransferContract;

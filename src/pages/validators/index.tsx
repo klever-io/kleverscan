@@ -12,6 +12,7 @@ import {
   IPagination,
   IValidator,
   IDelegationsResponse,
+  ITotalFrozen,
 } from '@/types/index';
 import api from '@/services/api';
 
@@ -43,7 +44,7 @@ const Validators: React.FC<IValidatorPage> = ({
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [validators, setValidators] = useState<IValidator[]>(initialValidators);
-  const header = ['Rank', 'Name', 'Stake', 'Cumulative Stake', 'Owner Address'];
+  const header = ['Rank', 'Name', 'Rating', 'Self Stake', 'Status', 'Total Produced', 'Total Missed' , 'Stake', 'Cumulative Stake', 'Owner Address'];
 
   const precision = 6;
 
@@ -51,25 +52,38 @@ const Validators: React.FC<IValidatorPage> = ({
     setLoading(true);
 
     const validators: IValidatorResponse = await api.get({
-      route: `validator/delegated-list?page=${page}`,
+      route: `validator/list?page=${page}`,
+    });
+    const {data: { totalFrozen }}: ITotalFrozen = await api.get({
+      route: `validator/delegated-list`,
     });
     if (!validators.error) {
-      const delegations: IValidator[] = validators.data.delegations.map(
-        (delegation: IDelegationsResponse, index): IValidator => {
+      const delegations: IValidator[] = validators.data['validators'].map(
+        (delegation: IDelegationsResponse, index: number): IValidator => {
+          const totalProduced = delegation.totalLeaderSuccessRate.numSuccess + delegation.totalValidatorSuccessRate.numSuccess
+          const totalMissed = delegation.totalLeaderSuccessRate.numFailure + delegation.totalValidatorSuccessRate.numFailure
+
           return {
-            staked: delegation.totalDelegated,
+            staked: delegation.totalStake,
             rank: index + validators.pagination.previous * 10 + 1,
-            name: delegation.name || delegation.address,
+            name: delegation.name || delegation.ownerAddress,
             cumulativeStaked: parseFloat(
               (
-                (delegation.totalDelegated / validators.data.totalFrozen) *
+                (delegation.totalStake / totalFrozen) *
                 100
               ).toFixed(4),
             ),
-            address: delegation.address,
+            address: delegation.ownerAddress,
+            rating: delegation.rating,
+            selfStake: delegation.selfStake,
+            status: delegation.list,
+            totalProduced,
+            totalMissed
+
           };
         },
       );
+      console.log(delegations)
       setValidators(delegations);
       setLoading(false);
     }
@@ -105,6 +119,11 @@ const Validators: React.FC<IValidatorPage> = ({
     staked,
     cumulativeStaked,
     address,
+    rating,
+    selfStake,
+    status,
+    totalProduced,
+    totalMissed
   }) => {
     return address ? (
       <Row type="validators">
@@ -124,6 +143,11 @@ const Validators: React.FC<IValidatorPage> = ({
             <span>{name}</span>
           )}
         </span>
+        <span>{rating}</span>
+        <span><strong>{selfStake}</strong></span>
+        <span>{status.charAt(0).toUpperCase() + status.slice(1)}</span>
+        <span>{totalProduced}</span>
+        <span>{totalMissed}</span>
         <span>
           <strong>{(staked / 10 ** precision).toLocaleString()} KLV</strong>
         </span>
@@ -168,22 +192,35 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
     };
 
     const validators: IValidatorResponse = await api.get({
-      route: 'validator/delegated-list',
+      route: 'validator/list',
     });
+
+    const {data: { totalFrozen }}: ITotalFrozen = await api.get({
+      route: `validator/delegated-list`,
+    });
+
     if (!validators.error) {
-      const delegations: IValidator[] = validators.data.delegations.map(
-        (delegation: IDelegationsResponse, index): IValidator => {
+      const delegations: IValidator[] = validators.data['validators'].map(
+        (delegation: IDelegationsResponse, index: number): IValidator => {
+          const totalProduced = delegation.totalLeaderSuccessRate.numSuccess + delegation.totalValidatorSuccessRate.numSuccess
+          const totalMissed = delegation.totalLeaderSuccessRate.numFailure + delegation.totalValidatorSuccessRate.numFailure
+
           return {
-            staked: delegation.totalDelegated,
+            staked: delegation.totalStake,
             rank: index + validators.pagination.previous * 10 + 1,
-            name: delegation.name || delegation.address,
+            name: delegation.name || delegation.ownerAddress,
             cumulativeStaked: parseFloat(
               (
-                (delegation.totalDelegated / validators.data.totalFrozen) *
+                (delegation.totalStake / totalFrozen) *
                 100
               ).toFixed(4),
             ),
-            address: delegation.address,
+            address: delegation.ownerAddress,
+            rating: delegation.rating,
+            selfStake: delegation.selfStake,
+            status: delegation.list,
+            totalProduced,
+            totalMissed
           };
         },
       );

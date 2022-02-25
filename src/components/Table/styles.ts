@@ -43,19 +43,21 @@ export const Header = styled.div<ITableType>`
   color: ${props => props.theme.table.text};
   font-weight: 600;
   font-size: 0.85rem;
-
+  
   span {
     /* flex: 1; */
     ${props => widths[props.type]}
-
     ${props =>
       props.filter &&
       props.filter.value !== 'all' &&
       filterWidths[props.filter.name]}
+
   }
+  width: 118.75rem;
+  text-align: start;
 
   @media (max-width: 768px) {
-    width: fit-content;
+    width: 112.5rem;
   }
 `;
 
@@ -66,8 +68,11 @@ export const Body = styled.div`
 
   gap: 0.75rem;
 
+  width: fit-content;
+  max-width: 118.75rem;
+
   @media (max-width: 768px) {
-    width: fit-content;
+    width: 112.5rem;
   }
 `;
 

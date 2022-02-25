@@ -226,10 +226,23 @@ export interface IBucket {
 }
 
 export interface IDelegationsResponse {
-  totalDelegated: number;
-  address: string;
+  totalStake: number;
+  ownerAddress: string;
   buckets: number;
   name?: string;
+  totalLeaderSuccessRate: {
+    numSuccess: number,
+    numFailure: number
+  },
+  totalValidatorSuccessRate: {
+    numSuccess: number,
+    numFailure: number
+  },
+  rating: number,
+  selfStake: number,
+  list: string,
+  totalProduced: number,
+  totalMissed: number
 }
 export interface IValidator {
   rank: number;
@@ -237,6 +250,11 @@ export interface IValidator {
   staked: number;
   cumulativeStaked: number;
   address: string;
+  rating: number,
+  selfStake: number,
+  status: string,
+  totalProduced: number,
+  totalMissed: number
 }
 
 export interface IChainStatistics {
@@ -410,4 +428,11 @@ export interface IProposalDetails {
   proposerContent: string;
   created: number;
   hash: string;
+}
+
+
+export interface ITotalFrozen {
+  data: {
+    totalFrozen: number
+  }
 }

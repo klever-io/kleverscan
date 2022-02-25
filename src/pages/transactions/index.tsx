@@ -376,8 +376,8 @@ const Transactions: React.FC<ITransactions> = ({
         <span>
           <Link href={`/transaction/${hash}`}>{hash}</Link>
         </span>
-        <Link href={`/block/${blockNum}`}>
-          <a className="address">{blockNum}</a>
+        <Link href={`/block/${blockNum || 0}`}>
+          <a className="address">{blockNum || 0}</a>
         </Link>
         <span>
           <small>

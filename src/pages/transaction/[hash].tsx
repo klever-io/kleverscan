@@ -195,7 +195,7 @@ const Transaction: React.FC<ITransactionPage> = ({
               <strong>Block Number</strong>
             </span>
             <span>
-              <p>{blockNum}</p>
+              <p>{blockNum || 0}</p>
             </span>
           </Row>
           <Row>

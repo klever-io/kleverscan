@@ -50,7 +50,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
         <span>
           <Link href={`/transaction/${hash}`}>{hash}</Link>
         </span>
-        <span>{blockNum}</span>
+        <span>{blockNum || 0}</span>
         <span>
           <small>
             {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}

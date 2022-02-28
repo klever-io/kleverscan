@@ -6,6 +6,7 @@ import Table, { ITable } from '@/components/Table';
 import { Row } from '@/components/Table/styles';
 
 import { IBucket } from '@/types/index';
+import Link from 'next/link';
 
 interface IBuckets {
   [key: string]: IBucket[];
@@ -16,6 +17,7 @@ const Buckets: React.FC<IBuckets> = ({ buckets }) => {
   const precision = 6; // default KLV precision
 
   const TableBody: React.FC<IBucket> = ({
+    id,
     balance,
     stakedEpoch,
     unstakedEpoch,
@@ -28,10 +30,11 @@ const Buckets: React.FC<IBuckets> = ({ buckets }) => {
         </span>
         <Status staked={true}>{'True'}</Status>
         <span>{stakedEpoch.toLocaleString()}</span>
+        <span>{id}</span>
         <span>
           {unstakedEpoch === UINT32_MAX ? '--' : unstakedEpoch.toLocaleString()}
         </span>
-        <span>{delegation}</span>
+        <Link href={`/account/${delegation}`}>{delegation}</Link>
       </Row>
     );
   };
@@ -40,6 +43,7 @@ const Buckets: React.FC<IBuckets> = ({ buckets }) => {
     'Staked Values',
     'Staked',
     'Staked Epoch',
+    'Bucket Id',
     'Unstaked Epoch',
     'Delegation',
   ];

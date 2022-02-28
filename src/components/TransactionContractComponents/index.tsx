@@ -16,6 +16,22 @@ import {
   IFreezeReceipt,
   IUnfreezeReceipt,
   ICreateAssetReceipt,
+  IClaimContract,
+  IDelegateContract,
+  IUndelegateContract,
+  IWithdrawContract,
+  IAssetTriggerContract,
+  ISetAccountNameContract,
+  IProposalContract,
+  IVoteContract,
+  IConfigICOContract,
+  ISetICOPricesContract,
+  IBuyContract,
+  ISellContract,
+  ICancelMarketOrderContract,
+  ICreateMarketplaceContract,
+  IConfigMarketplaceContract,
+  IValidatorConfig,
 } from '@/types/index';
 
 import { KLV } from '@/assets/coins';
@@ -215,6 +231,26 @@ export const CreateValidator: React.FC<IContract> = ({
   );
 };
 
+export const ValidatorConfig: React.FC<IContract> = ({ parameter: par }) => {
+  const parameter = par as IValidatorConfig;
+  return (
+    <>
+      <Row>
+        <span>
+          <strong>Public Key</strong>
+        </span>
+        <span>{parameter.blsPublicKey}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Name</strong>
+        </span>
+        <span>{parameter.name}</span>
+      </Row>
+    </>
+  );
+};
+
 export const Freeze: React.FC<IContract> = ({
   sender,
   parameter: par,
@@ -271,9 +307,15 @@ export const Unfreeze: React.FC<IContract> = ({
       </Row>
       <Row>
         <span>
+          <strong>Asset ID</strong>
+        </span>
+        <span>{parameter.assetId}</span>
+      </Row>
+      <Row>
+        <span>
           <strong>Bucket ID</strong>
         </span>
-        <span>{parameter.bucketId}</span>
+        <span>{parameter.bucketID}</span>
       </Row>
       <Row>
         <span>
@@ -285,7 +327,7 @@ export const Unfreeze: React.FC<IContract> = ({
   );
 };
 export const Delegate: React.FC<IContract> = ({ parameter: par }) => {
-  const parameter = par as IUnfreezeContract;
+  const parameter = par as IDelegateContract;
 
   return (
     <>
@@ -293,12 +335,287 @@ export const Delegate: React.FC<IContract> = ({ parameter: par }) => {
         <span>
           <strong>Bucket ID</strong>
         </span>
-        <span>{parameter.bucketId}</span>
+        <span>{parameter.bucketID}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>to</strong>
+        </span>
+        <span>{parameter.toAddress}</span>
       </Row>
     </>
   );
 };
 
-export const Withdraw: React.FC<IContract> = () => {
+export const Undelegate: React.FC<IContract> = ({ parameter: par }) => {
+  const parameter = par as IUndelegateContract;
+
+  return (
+    <>
+      <Row>
+        <span>
+          <strong>Bucket ID</strong>
+        </span>
+        <span>{parameter.bucketID}</span>
+      </Row>
+    </>
+  );
+};
+
+export const Withdraw: React.FC<IContract> = ({ parameter: par }) => {
+  const parameter = par as IWithdrawContract;
+  return (
+    <>
+      <Row>
+        <span>
+          <strong>Asset ID</strong>
+        </span>
+        <span>{parameter.assetId}</span>
+      </Row>
+    </>
+  );
+};
+
+export const Claim: React.FC<IContract> = ({ parameter: par }) => {
+  const parameter = par as IClaimContract;
+
+  return (
+    <>
+      <Row>
+        <span>
+          <strong>Claim Type</strong>
+        </span>
+        <span>{parameter.claimType}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Id</strong>
+        </span>
+        <span>{parameter.id}</span>
+      </Row>
+    </>
+  );
+};
+
+export const Unjail: React.FC<IContract> = () => {
   return <></>;
+};
+
+export const AssetTrigger: React.FC<IContract> = ({ parameter: par }) => {
+  const parameter = par as IAssetTriggerContract;
+
+  return (
+    <>
+      <Row>
+        <span>
+          <strong>Trigger Type</strong>
+        </span>
+        <span>{parameter.triggerType}</span>
+      </Row>
+    </>
+  );
+};
+
+export const SetAccountName: React.FC<IContract> = ({ parameter: par }) => {
+  const parameter = par as ISetAccountNameContract;
+
+  return (
+    <>
+      <Row>
+        <span>
+          <strong>Name</strong>
+        </span>
+        <span>{parameter.name}</span>
+      </Row>
+    </>
+  );
+};
+
+export const Proposal: React.FC<IContract> = ({ parameter: par }) => {
+  const parameter = par as IProposalContract;
+
+  return (
+    <>
+      <Row>
+        <span>
+          <strong>Value</strong>
+        </span>
+        <span>{parameter.value}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Epoch Duration</strong>
+        </span>
+        <span>{parameter.epochsDuration}</span>
+      </Row>
+    </>
+  );
+};
+
+export const Vote: React.FC<IContract> = ({ parameter: par }) => {
+  const parameter = par as IVoteContract;
+
+  return (
+    <>
+      <Row>
+        <span>
+          <strong>Proposal Id</strong>
+        </span>
+        <span>{parameter.proposalId}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Amount</strong>
+        </span>
+        <span>{parameter.amount}</span>
+      </Row>
+    </>
+  );
+};
+
+export const ConfigICO: React.FC<IContract> = ({ parameter: par }) => {
+  const parameter = par as IConfigICOContract;
+
+  return (
+    <>
+      <Row>
+        <span>
+          <strong>Asset Id</strong>
+        </span>
+        <span>{parameter.assetId}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Status</strong>
+        </span>
+        <span>{parameter.status}</span>
+      </Row>
+    </>
+  );
+};
+
+export const SetICOPrices: React.FC<IContract> = ({ parameter: par }) => {
+  const parameter = par as ISetICOPricesContract;
+
+  return (
+    <>
+      <Row>
+        <span>
+          <strong>Asset Id</strong>
+        </span>
+        <span>{parameter.assetId}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Price</strong>
+        </span>
+        <span>{parameter.packInfo.price}</span>
+      </Row>
+    </>
+  );
+};
+
+export const Buy: React.FC<IContract> = ({ parameter: par }) => {
+  const parameter = par as IBuyContract;
+
+  return (
+    <>
+      <Row>
+        <span>
+          <strong>Buy Type</strong>
+        </span>
+        <span>{parameter.buyType}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Id</strong>
+        </span>
+        <span>{parameter.id}</span>
+      </Row>
+    </>
+  );
+};
+
+export const Sell: React.FC<IContract> = ({ parameter: par }) => {
+  const parameter = par as ISellContract;
+
+  return (
+    <>
+      <Row>
+        <span>
+          <strong>Market Type</strong>
+        </span>
+        <span>{parameter.marketType}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Asset Id</strong>
+        </span>
+        <span>{parameter.assetId}</span>
+      </Row>
+    </>
+  );
+};
+
+export const CancelMarketOrder: React.FC<IContract> = ({ parameter: par }) => {
+  const parameter = par as ICancelMarketOrderContract;
+
+  return (
+    <>
+      <Row>
+        <span>
+          <strong>Order Id</strong>
+        </span>
+        <span>{parameter.orderId}</span>
+      </Row>
+    </>
+  );
+};
+
+export const CreateMarketplace: React.FC<IContract> = ({ parameter: par }) => {
+  const parameter = par as ICreateMarketplaceContract;
+
+  return (
+    <>
+      <Row>
+        <span>
+          <strong>Name</strong>
+        </span>
+        <span>{parameter.name}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Address</strong>
+        </span>
+        <span>{parameter.referralAddress}</span>
+      </Row>
+    </>
+  );
+};
+
+export const ConfigMarketplace: React.FC<IContract> = ({ parameter: par }) => {
+  const parameter = par as IConfigMarketplaceContract;
+
+  return (
+    <>
+      <Row>
+        <span>
+          <strong>Name</strong>
+        </span>
+        <span>{parameter.name}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Market Id</strong>
+        </span>
+        <span>{parameter.marketplaceId}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Address</strong>
+        </span>
+        <span>{parameter.referralAddress}</span>
+      </Row>
+    </>
+  );
 };

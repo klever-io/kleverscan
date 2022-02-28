@@ -51,7 +51,7 @@ export const Container = styled.div`
 `;
 
 export const Content = styled.div<{ open: boolean }>`
-  width: 10rem;
+  width: 12rem;
   height: 2.8rem;
 
   padding: 0.5rem 1rem;

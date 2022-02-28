@@ -33,6 +33,23 @@ import {
   IFreezeContract,
   IUnfreezeContract,
   IAsset,
+  IClaimContract,
+  IUnjailContract,
+  IValidatorConfig,
+  IUndelegateContract,
+  IWithdrawContract,
+  IAssetTriggerContract,
+  ISetAccountNameContract,
+  IProposalContract,
+  IVoteContract,
+  IConfigICOContract,
+  ISetICOPricesContract,
+  IBuyContract,
+  ISellContract,
+  ICancelMarketOrderContract,
+  ICreateMarketplaceContract,
+  IConfigMarketplaceContract,
+  IValidatorConfigContract,
 } from '../../types';
 
 import { formatAmount } from '../../utils';
@@ -161,7 +178,6 @@ const Transactions: React.FC<ITransactions> = ({
           ...routerQuery,
           page: page,
         };
-    console.log(routerQuery);
 
     const response: ITransactionResponse = await api.get({
       route: `transaction/list`,
@@ -263,6 +279,18 @@ const Transactions: React.FC<ITransactions> = ({
     );
   };
 
+  const ValidatorConfig: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as IValidatorConfigContract;
+
+    return (
+      <>
+        <span>
+          <small>{parameter.config.blsPublicKey}</small>
+        </span>
+      </>
+    );
+  };
+
   const Freeze: React.FC<IContract> = ({ parameter: par }) => {
     const parameter = par as IFreezeContract;
 
@@ -278,12 +306,171 @@ const Transactions: React.FC<ITransactions> = ({
 
     return (
       <span>
-        <small>{parameter.bucketId}</small>
+        <small>{parameter.bucketID}</small>
       </span>
     );
   };
 
-  const Withdraw: React.FC<IContract> = () => {
+  const Delegate: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as IUnfreezeContract;
+
+    return (
+      <>
+        <span>
+          <small>{parameter.bucketID}</small>
+        </span>
+      </>
+    );
+  };
+
+  const Undelegate: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as IUndelegateContract;
+
+    return (
+      <span>
+        <small>{parameter.bucketID}</small>
+      </span>
+    );
+  };
+
+  const Withdraw: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as IWithdrawContract;
+    return (
+      <>
+        <span>{parameter.assetId}</span>
+      </>
+    );
+  };
+
+  const Claim: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as IClaimContract;
+
+    return (
+      <span>
+        <small>{parameter.claimType}</small>
+      </span>
+    );
+  };
+
+  const Unjail: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as IUnjailContract;
+
+    return <></>;
+  };
+
+  const AssetTrigger: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as IAssetTriggerContract;
+
+    return (
+      <span>
+        <small>{parameter.triggerType}</small>
+      </span>
+    );
+  };
+
+  const SetAccountName: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as ISetAccountNameContract;
+
+    return (
+      <span>
+        <small>{parameter.name}</small>
+      </span>
+    );
+  };
+
+  const Proposal: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as IProposalContract;
+
+    return (
+      <>
+        <span>{parameter.parameter}</span>
+      </>
+    );
+  };
+
+  const Vote: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as IVoteContract;
+
+    return (
+      <>
+        <span>{parameter.proposalId}</span>
+
+        <span>
+          <small>{parameter.amount}</small>
+        </span>
+      </>
+    );
+  };
+
+  const ConfigICO: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as IConfigICOContract;
+
+    return (
+      <>
+        <span>{parameter.assetId}</span>
+      </>
+    );
+  };
+
+  const SetICOPrices: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as ISetICOPricesContract;
+
+    return (
+      <>
+        <span>{parameter.assetId}</span>
+      </>
+    );
+  };
+
+  const Buy: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as IBuyContract;
+
+    return (
+      <>
+        <span>{parameter.buyType}</span>
+
+        <span>
+          <small>{parameter.amount}</small>
+        </span>
+      </>
+    );
+  };
+
+  const Sell: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as ISellContract;
+
+    return (
+      <>
+        <span>
+          <small>{parameter.assetId}</small>
+        </span>
+      </>
+    );
+  };
+
+  const CancelMarketOrder: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as ICancelMarketOrderContract;
+
+    return (
+      <>
+        <span>{parameter.orderId}</span>
+      </>
+    );
+  };
+
+  const CreateMarketplace: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as ICreateMarketplaceContract;
+
+    return (
+      <>
+        <span>{parameter.name}</span>
+      </>
+    );
+  };
+
+  const ConfigMarketplace: React.FC<IContract> = ({ parameter: par }) => {
+    const parameter = par as IConfigMarketplaceContract;
+
     return <></>;
   };
 
@@ -303,16 +490,45 @@ const Transactions: React.FC<ITransactions> = ({
       case Contract.CreateAsset:
         return getComponent(CreateAsset);
       case Contract.CreateValidator:
-      case Contract.ValidatorConfig:
         return getComponent(CreateValidator);
+      case Contract.ValidatorConfig:
+        return getComponent(ValidatorConfig);
       case Contract.Freeze:
         return getComponent(Freeze);
       case Contract.Unfreeze:
-      case Contract.Delegate:
-      case Contract.Undelegate:
         return getComponent(Unfreeze);
+      case Contract.Delegate:
+        return getComponent(Delegate);
+      case Contract.Undelegate:
+        return getComponent(Undelegate);
       case Contract.Withdraw:
         return getComponent(Withdraw);
+      case Contract.Claim:
+        return getComponent(Claim);
+      case Contract.Unjail:
+        return getComponent(Unjail);
+      case Contract.AssetTrigger:
+        return getComponent(AssetTrigger);
+      case Contract.SetAccountName:
+        return getComponent(SetAccountName);
+      case Contract.Proposal:
+        return getComponent(Proposal);
+      case Contract.Vote:
+        return getComponent(Vote);
+      case Contract.ConfigICO:
+        return getComponent(ConfigICO);
+      case Contract.SetICOPrices:
+        return getComponent(SetICOPrices);
+      case Contract.Buy:
+        return getComponent(Buy);
+      case Contract.Sell:
+        return getComponent(Sell);
+      case Contract.CancelMarketOrder:
+        return getComponent(CancelMarketOrder);
+      case Contract.CreateMarketplace:
+        return getComponent(CreateMarketplace);
+      case Contract.ConfigMarketplace:
+        return getComponent(ConfigMarketplace);
       default:
         return <div />;
     }
@@ -329,17 +545,61 @@ const Transactions: React.FC<ITransactions> = ({
         newHeaders = ['Name', 'Ticker'];
         break;
       case Contract.CreateValidator:
-      case Contract.ValidatorConfig:
         newHeaders = ['Reward Address', 'Can Delegate'];
+        break;
+      case Contract.ValidatorConfig:
+        newHeaders = ['Public Key'];
         break;
       case Contract.Freeze:
         newHeaders = ['Amount'];
         break;
       case Contract.Unfreeze:
-      case Contract.Delegate:
-      case Contract.Undelegate:
-        newHeaders = ['Bucket ID'];
+        newHeaders = ['Bucket Id'];
         break;
+      case Contract.Delegate:
+        newHeaders = ['Bucket Id'];
+        break;
+      case Contract.Undelegate:
+        newHeaders = ['Bucket Id'];
+        break;
+      case Contract.Withdraw:
+        newHeaders = ['Asset Id'];
+        break;
+      case Contract.Claim:
+        newHeaders = ['Claim Type'];
+        break;
+      case Contract.Unjail:
+      case Contract.AssetTrigger:
+        newHeaders = ['Trigger Type'];
+        break;
+      case Contract.SetAccountName:
+        newHeaders = ['Name'];
+        break;
+      case Contract.Proposal:
+        newHeaders = ['Parameter'];
+        break;
+      case Contract.Vote:
+        newHeaders = ['Proposal Id', 'Amount'];
+        break;
+      case Contract.ConfigICO:
+        newHeaders = ['Asset Id'];
+        break;
+      case Contract.SetICOPrices:
+        newHeaders = ['Asset Id'];
+        break;
+      case Contract.Buy:
+        newHeaders = ['Buy Type', 'Amount'];
+        break;
+      case Contract.Sell:
+        newHeaders = ['Asset Id'];
+        break;
+      case Contract.CancelMarketOrder:
+        newHeaders = ['Order Id'];
+        break;
+      case Contract.CreateMarketplace:
+        newHeaders = ['Name'];
+        break;
+      case Contract.ConfigMarketplace:
     }
 
     if (transactionType.value !== 'all') {

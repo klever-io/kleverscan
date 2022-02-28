@@ -174,3 +174,11 @@ export const CenteredRow = styled.div`
     width: 100%;
   }
 `;
+export const CardRaw = styled.div`
+  margin: 1.25rem 1.25rem;
+  font-weight: 400;
+  font-size: 0.85rem;
+
+  flex-direction: row;
+  align-items: center;
+`;

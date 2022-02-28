@@ -4,10 +4,13 @@ import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { format, fromUnixTime } from 'date-fns';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 
 import {
   CardContainer,
   CardContent,
+  CardRaw,
   CenteredRow,
   Container,
   Header,
@@ -31,7 +34,10 @@ import {
 } from '@/types/index';
 
 import { ArrowLeft } from '@/assets/icons';
-import { TransactionDetails as Icon } from '@/assets/title-icons';
+import {
+  TransactionDetails as Icon,
+  TransactionDetails,
+} from '@/assets/title-icons';
 import { getStatusIcon } from '@/assets/status';
 
 import {
@@ -42,6 +48,19 @@ import {
   Unfreeze,
   Withdraw,
   Delegate,
+  Claim,
+  Unjail,
+  AssetTrigger,
+  SetAccountName,
+  Proposal,
+  Vote,
+  ConfigICO,
+  SetICOPrices,
+  Buy,
+  Sell,
+  CancelMarketOrder,
+  CreateMarketplace,
+  ConfigMarketplace,
 } from '@/components/TransactionContractComponents';
 import Copy from '@/components/Copy';
 
@@ -76,23 +95,26 @@ const klvAsset: IAsset = {
   mintedValue: 0,
 };
 
-const Transaction: React.FC<ITransactionPage> = ({
-  hash,
-  status,
-  resultCode,
-  sender,
-  data,
-  kAppFee,
-  bandwidthFee,
-  timestamp,
-  signature,
-  contract,
-  receipts,
-  blockNum,
-  nonce,
-  asset,
-}) => {
+const Transaction: React.FC<ITransactionPage> = tx => {
   const router = useRouter();
+
+  const {
+    hash,
+    status,
+    resultCode,
+    sender,
+    data,
+    kAppFee,
+    bandwidthFee,
+    timestamp,
+    signature,
+    contract,
+    receipts,
+    blockNum,
+    nonce,
+    asset,
+  } = tx;
+
   const StatusIcon = getStatusIcon(status);
   const precision = 6; // default KLV precision
 
@@ -141,6 +163,33 @@ const Transaction: React.FC<ITransactionPage> = ({
         return <Unfreeze {...parsedContract} receipts={receipts} />;
       case Contract.Withdraw:
         return <Withdraw {...parsedContract} receipts={receipts} />;
+      case Contract.Claim:
+        return <Claim {...parsedContract} receipts={receipts} />;
+      case Contract.Unjail:
+        return <Unjail {...parsedContract} receipts={receipts} />;
+      case Contract.AssetTrigger:
+        return <AssetTrigger {...parsedContract} receipts={receipts} />;
+      case Contract.SetAccountName:
+        return <SetAccountName {...parsedContract} receipts={receipts} />;
+      case Contract.Proposal:
+        return <Proposal {...parsedContract} receipts={receipts} />;
+      case Contract.Vote:
+        return <Vote {...parsedContract} receipts={receipts} />;
+      case Contract.ConfigICO:
+        return <ConfigICO {...parsedContract} receipts={receipts} />;
+      case Contract.SetICOPrices:
+        return <SetICOPrices {...parsedContract} receipts={receipts} />;
+      case Contract.Buy:
+        return <Buy {...parsedContract} receipts={receipts} />;
+      case Contract.Sell:
+        return <Sell {...parsedContract} receipts={receipts} />;
+      case Contract.CancelMarketOrder:
+        return <CancelMarketOrder {...parsedContract} receipts={receipts} />;
+      case Contract.CreateMarketplace:
+        return <CreateMarketplace {...parsedContract} receipts={receipts} />;
+      case Contract.ConfigMarketplace:
+        return <ConfigMarketplace {...parsedContract} receipts={receipts} />;
+
       default:
         return <div />;
     }
@@ -195,7 +244,7 @@ const Transaction: React.FC<ITransactionPage> = ({
               <strong>Block Number</strong>
             </span>
             <span>
-              <p>{blockNum}</p>
+              <p>{blockNum || 0}</p>
             </span>
           </Row>
           <Row>
@@ -277,6 +326,22 @@ const Transaction: React.FC<ITransactionPage> = ({
           </Row>
 
           <ContractComponent />
+        </CardContent>
+      </CardContainer>
+      <CardContainer>
+        <h3>Raw Tx</h3>
+        <CardContent>
+          <CardRaw>
+            <SyntaxHighlighter
+              customStyle={{ height: '30rem', backgroundColor: 'white' }}
+              style={xcode}
+              language="json"
+              wrapLines={true}
+              wrapLongLines={true}
+            >
+              {JSON.stringify(tx, null, 2)}
+            </SyntaxHighlighter>
+          </CardRaw>
         </CardContent>
       </CardContainer>
     </Container>

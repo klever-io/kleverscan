@@ -12,6 +12,19 @@ export enum Contract {
   Delegate = 'Delegate',
   Undelegate = 'Undelegate',
   Withdraw = 'Withdraw',
+  Claim = 'Claim',
+  Unjail = 'Unjail',
+  AssetTrigger = 'AssetTrigger',
+  SetAccountName = 'SetAccountName',
+  Proposal = 'Proposal',
+  Vote = 'Vote',
+  ConfigICO = 'ConfigICO',
+  SetICOPrices = 'SetICOPrices',
+  Buy = 'Buy',
+  Sell = 'Sell',
+  CancelMarketOrder = 'CancelMarketOrder',
+  CreateMarketplace = 'CreateMarketplace',
+  ConfigMarketplace = 'ConfigMarketplace',
 }
 
 export interface ITransferContract {
@@ -20,34 +33,88 @@ export interface ITransferContract {
   assetId?: string;
 }
 
+export enum EnumAssetType {
+  Fungible = 0,
+  NonFungible = 1,
+}
+
+export interface IRoyaltyInfo {
+  amount: number;
+  percentage: number;
+}
+
+export interface IRoyaltiesInfo {
+  address: string;
+  transferPercentage: IRoyaltyInfo[];
+  transferFixed: number;
+  marketPercentage: number;
+  marketFixed: number;
+}
+
 export interface ICreateAssetContract {
-  circulatingSupply: number;
-  initialSupply: number;
-  maxSupply: number;
+  type: EnumAssetType;
   name: string;
   ticker: string;
   ownerAddress: string;
+  logo: string;
+  uris: any;
   precision: number;
-  royalties: number;
+  initialSupply: number;
+  circulatingSupply: number;
+  maxSupply: number;
+  royalties: IRoyaltiesInfo;
+  properties: IPropertiesInfo;
+  atributes: IAttributesInfo;
+  staking: IStakingInfo;
+  roles: IRolesInfo[];
+}
+
+export interface IPropertiesInfo {
+  canFreeze: boolean;
+  canWipe: boolean;
+  canPause: boolean;
+  canMint: boolean;
+  canBurn: boolean;
+  canChangeOwner: boolean;
+  canAddRoles: boolean;
+}
+
+export interface IAttributesInfo {
+  isPaused: boolean;
+  isNFTMintStopped: boolean;
+}
+
+export interface IStakingInfo {
+  type: number;
+  apr: number;
+  minEpochsToClaim: number;
+  minEpochsToUnstake: number;
+  minEpochsToWithdraw: number;
+}
+export interface IRolesInfo {
+  address: string;
+  hasRoleMint: boolean;
+  hasRoleSetICOPrices: boolean;
 }
 
 export interface ICreateValidatorContract {
   ownerAddress: string;
-  config: {
-    canDelegate: boolean;
-    commission: number;
-    maxDelegationAmount: number;
-    rewardAddress: string;
-  };
+  config: IValidatorConfig;
 }
 
 export interface IValidatorConfigContract {
-  config: {
-    canDelegate: boolean;
-    commission: number;
-    maxDelegationAmount: number;
-    rewardAddress: string;
-  };
+  config: IValidatorConfig;
+}
+
+export interface IValidatorConfig {
+  blsPublicKey: string;
+  rewardAddress: string;
+  canDelegate: boolean;
+  commission: number;
+  maxDelegationAmount: number;
+  logo: string;
+  uris: any;
+  name: string;
 }
 
 export interface IFreezeContract {
@@ -56,21 +123,136 @@ export interface IFreezeContract {
 }
 
 export interface IUnfreezeContract {
-  bucketId: string;
+  bucketID: string;
   assetId: string;
 }
 
 export interface IDelegateContract {
-  bucketId: string;
+  bucketID: string;
   toAddress: string;
 }
 
 export interface IUndelegateContract {
-  bucketId: string;
+  bucketID: string;
 }
 
 export interface IWithdrawContract {
   assetId: string;
+}
+export enum EnumClaimType {
+  StakingClaim = 0,
+  AllowanceClaim = 1,
+  MarketClaim = 2,
+}
+export interface IClaimContract {
+  claimType: EnumClaimType;
+  id: string;
+}
+export interface IUnjailContract {}
+
+export enum EnumTriggerType {
+  Mint = 0,
+  Burn = 1,
+  Wipe = 2,
+  Pause = 3,
+  Resume = 4,
+  ChangeOwner = 5,
+  AddRole = 6,
+  RemoveRole = 7,
+  UpdateMetadata = 8,
+  StopNFTMint = 9,
+  UpdateLogo = 10,
+  UpdateURIs = 11,
+  ChangeRoyaltiesReceiver = 12,
+}
+
+export interface IAssetTriggerContract {
+  triggerType: EnumTriggerType;
+  toAddress: string;
+  amount: number;
+  mime: string;
+  logo: string;
+  uri: any;
+  role: IRolesInfo;
+}
+
+export interface ISetAccountNameContract {
+  name: string;
+}
+
+export interface IProposalContract {
+  parameter: number;
+  value: string;
+  description: string;
+  epochsDuration: number;
+}
+
+export interface IVoteContract {
+  proposalId: number;
+  amount: number;
+}
+
+export enum EnumICOStatus {
+  DefaultICO = 0,
+  ActiveICO = 1,
+  PausedICO = 2,
+}
+
+export interface IConfigICOContract {
+  assetId: string;
+  receiverAddress: string;
+  status: EnumICOStatus;
+  maxAmount: number;
+  packInfo: any;
+}
+
+export interface ISetICOPricesContract {
+  assetId: string;
+  packInfo: any;
+}
+
+export enum EnumBuyType {
+  ICOBuy = 0,
+  MarketBuy = 1,
+}
+
+export interface IBuyContract {
+  buyType: EnumBuyType;
+  id: string;
+  currencyId: string;
+  amount: number;
+}
+
+export enum EnumMarketType {
+  BuyItNowMarket = 0,
+  AuctionMarket = 1,
+}
+
+export interface ISellContract {
+  marketType: EnumMarketType;
+  marketplaceID: string;
+  assetId: string;
+  currencyID: string;
+  price: number;
+  reservePrice: number;
+  endTime: number;
+}
+
+export interface ICancelMarketOrderContract {
+  orderId: string;
+}
+
+export interface ICreateMarketplaceContract {
+  name: string;
+  referralAddress: string;
+  referralPercentage: number;
+}
+
+export interface IConfigMarketplaceContract {
+  marketplaceId: string;
+  name: string;
+  referralAddress: string;
+  referralPercentage: number;
 }
 
 type IParameter =
@@ -79,7 +261,23 @@ type IParameter =
   | ICreateValidatorContract
   | IValidatorConfigContract
   | IFreezeContract
-  | IUnfreezeContract;
+  | IUnfreezeContract
+  | IDelegateContract
+  | IUndelegateContract
+  | IWithdrawContract
+  | IClaimContract
+  | IUnjailContract
+  | IAssetTriggerContract
+  | ISetAccountNameContract
+  | IProposalContract
+  | IVoteContract
+  | IConfigICOContract
+  | ISetICOPricesContract
+  | IBuyContract
+  | ISellContract
+  | ICancelMarketOrderContract
+  | ICreateMarketplaceContract
+  | IConfigMarketplaceContract;
 
 export interface ICreateAssetReceipt {
   assetId: string;
@@ -226,10 +424,23 @@ export interface IBucket {
 }
 
 export interface IDelegationsResponse {
-  totalDelegated: number;
-  address: string;
+  totalStake: number;
+  ownerAddress: string;
   buckets: number;
   name?: string;
+  totalLeaderSuccessRate: {
+    numSuccess: number,
+    numFailure: number
+  },
+  totalValidatorSuccessRate: {
+    numSuccess: number,
+    numFailure: number
+  },
+  rating: number,
+  selfStake: number,
+  list: string,
+  totalProduced: number,
+  totalMissed: number
 }
 export interface IValidator {
   rank: number;
@@ -237,6 +448,11 @@ export interface IValidator {
   staked: number;
   cumulativeStaked: number;
   address: string;
+  rating: number,
+  selfStake: number,
+  status: string,
+  totalProduced: number,
+  totalMissed: number
 }
 
 export interface IChainStatistics {
@@ -410,4 +626,11 @@ export interface IProposalDetails {
   proposerContent: string;
   created: number;
   hash: string;
+}
+
+
+export interface ITotalFrozen {
+  data: {
+    totalFrozen: number
+  }
 }

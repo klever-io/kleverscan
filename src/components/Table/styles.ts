@@ -47,7 +47,6 @@ export const Header = styled.div<ITableType>`
   span {
     /* flex: 1; */
     ${props => widths[props.type]}
-
     ${props =>
       props.filter &&
       props.filter.value !== 'all' &&

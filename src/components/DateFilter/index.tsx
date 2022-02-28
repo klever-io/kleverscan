@@ -216,6 +216,7 @@ const DateFilter: React.FC<IDateFilter> = ({
             onFocus={() => handleInputFocus()}
             value={inputValue}
             ref={inputRef}
+            readOnly={true}
           />
           {!inputRef.current?.value && <CalendarIcon />}
         </OutsideContent>

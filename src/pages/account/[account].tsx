@@ -286,6 +286,14 @@ const Account: React.FC<IAccountPage> = ({
         </Row>
         <Row>
           <span>
+            <strong>Nonce</strong>
+          </span>
+          <RowContent>
+            <small>{account.nonce}</small>
+          </RowContent>
+        </Row>
+        <Row>
+          <span>
             <strong>Transactions</strong>
           </span>
           <RowContent>

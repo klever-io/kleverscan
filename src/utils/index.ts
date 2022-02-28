@@ -80,7 +80,6 @@ export const parseHardCodedInfo = (assets: IAsset[]): IAsset[] => {
     }
 
     asset.assetId = encodeURIComponent(asset.assetId);
-
     return asset;
   });
 };

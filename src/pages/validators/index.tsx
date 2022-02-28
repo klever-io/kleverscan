@@ -12,7 +12,6 @@ import {
   IPagination,
   IValidator,
   IDelegationsResponse,
-  ITotalFrozen,
 } from '@/types/index';
 import api from '@/services/api';
 
@@ -23,6 +22,7 @@ import {
   ProgressIndicator,
 } from '@/views/validators';
 import { useDidUpdateEffect } from '@/utils/hooks';
+import { formatAmount } from '@/utils/index';
 
 interface IValidatorPage {
   validators: IValidator[];
@@ -44,7 +44,18 @@ const Validators: React.FC<IValidatorPage> = ({
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [validators, setValidators] = useState<IValidator[]>(initialValidators);
-  const header = ['Rank', 'Name', 'Rating', 'Self Stake', 'Status', 'Total Produced', 'Total Missed' , 'Stake', 'Cumulative Stake', 'Owner Address'];
+  const header = [
+    'Rank',
+    'Name',
+    'Rating',
+    'Self Stake',
+    'Status',
+    'Total Produced',
+    'Total Missed',
+    'Stake',
+    'Cumulative Stake',
+    'Owner Address',
+  ];
 
   const precision = 6;
 
@@ -54,14 +65,24 @@ const Validators: React.FC<IValidatorPage> = ({
     const validators: IValidatorResponse = await api.get({
       route: `validator/list?page=${page}`,
     });
-    const {data: { totalFrozen }}: ITotalFrozen = await api.get({
-      route: `validator/delegated-list`,
+
+    const delegatedList: IValidatorResponse = await api.get({
+      route: 'validator/delegated-list',
     });
+    if (delegatedList.code !== 'successful') {
+      setLoading(false);
+      return;
+    }
+
     if (!validators.error) {
       const delegations: IValidator[] = validators.data['validators'].map(
         (delegation: IDelegationsResponse, index: number): IValidator => {
-          const totalProduced = delegation.totalLeaderSuccessRate.numSuccess + delegation.totalValidatorSuccessRate.numSuccess
-          const totalMissed = delegation.totalLeaderSuccessRate.numFailure + delegation.totalValidatorSuccessRate.numFailure
+          const totalProduced =
+            delegation.totalLeaderSuccessRate.numSuccess +
+            delegation.totalValidatorSuccessRate.numSuccess;
+          const totalMissed =
+            delegation.totalLeaderSuccessRate.numFailure +
+            delegation.totalValidatorSuccessRate.numFailure;
 
           return {
             staked: delegation.totalStake,
@@ -69,7 +90,7 @@ const Validators: React.FC<IValidatorPage> = ({
             name: delegation.name || delegation.ownerAddress,
             cumulativeStaked: parseFloat(
               (
-                (delegation.totalStake / totalFrozen) *
+                (delegation.totalStake / delegatedList.data.totalFrozen) *
                 100
               ).toFixed(4),
             ),
@@ -78,12 +99,10 @@ const Validators: React.FC<IValidatorPage> = ({
             selfStake: delegation.selfStake,
             status: delegation.list,
             totalProduced,
-            totalMissed
-
+            totalMissed,
           };
         },
       );
-      console.log(delegations)
       setValidators(delegations);
       setLoading(false);
     }
@@ -108,7 +127,7 @@ const Validators: React.FC<IValidatorPage> = ({
         <ProgressContent>
           <ProgressIndicator percent={percent} />
         </ProgressContent>
-        <span>{percent}%</span>
+        <span>{percent.toFixed(2)}%</span>
       </ProgressContainer>
     );
   };
@@ -123,7 +142,7 @@ const Validators: React.FC<IValidatorPage> = ({
     selfStake,
     status,
     totalProduced,
-    totalMissed
+    totalMissed,
   }) => {
     return address ? (
       <Row type="validators">
@@ -144,12 +163,14 @@ const Validators: React.FC<IValidatorPage> = ({
           )}
         </span>
         <span>{rating}</span>
-        <span><strong>{selfStake}</strong></span>
+        <span>
+          <strong>{formatAmount(selfStake / 10 ** precision)} KLV</strong>
+        </span>
         <span>{status.charAt(0).toUpperCase() + status.slice(1)}</span>
         <span>{totalProduced}</span>
         <span>{totalMissed}</span>
         <span>
-          <strong>{(staked / 10 ** precision).toLocaleString()} KLV</strong>
+          <strong>{formatAmount(staked / 10 ** precision)} KLV</strong>
         </span>
         <span>
           <strong>
@@ -195,15 +216,22 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
       route: 'validator/list',
     });
 
-    const {data: { totalFrozen }}: ITotalFrozen = await api.get({
-      route: `validator/delegated-list`,
+    const delegatedList: IValidatorResponse = await api.get({
+      route: 'validator/delegated-list',
     });
+    if (delegatedList.code !== 'successful') {
+      return { props };
+    }
 
     if (!validators.error) {
       const delegations: IValidator[] = validators.data['validators'].map(
         (delegation: IDelegationsResponse, index: number): IValidator => {
-          const totalProduced = delegation.totalLeaderSuccessRate.numSuccess + delegation.totalValidatorSuccessRate.numSuccess
-          const totalMissed = delegation.totalLeaderSuccessRate.numFailure + delegation.totalValidatorSuccessRate.numFailure
+          const totalProduced =
+            delegation.totalLeaderSuccessRate.numSuccess +
+            delegation.totalValidatorSuccessRate.numSuccess;
+          const totalMissed =
+            delegation.totalLeaderSuccessRate.numFailure +
+            delegation.totalValidatorSuccessRate.numFailure;
 
           return {
             staked: delegation.totalStake,
@@ -211,7 +239,7 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
             name: delegation.name || delegation.ownerAddress,
             cumulativeStaked: parseFloat(
               (
-                (delegation.totalStake / totalFrozen) *
+                (delegation.totalStake / delegatedList.data.totalFrozen) *
                 100
               ).toFixed(4),
             ),
@@ -220,7 +248,7 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
             selfStake: delegation.selfStake,
             status: delegation.list,
             totalProduced,
-            totalMissed
+            totalMissed,
           };
         },
       );

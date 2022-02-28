@@ -131,7 +131,9 @@ const Validator: React.FC<IValidatorPage> = ({ validator }) => {
             <strong>Rating</strong>
           </span>
           <span>
-            <Rating rate={getRateColor()}>{(rating * 100) / 10000000}%</Rating>
+            <Rating rate={getRateColor()}>
+              {((rating * 100) / 10000000).toFixed(2)}%
+            </Rating>
           </span>
         </Row>
         <Row>

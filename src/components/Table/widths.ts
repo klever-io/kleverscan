@@ -206,7 +206,7 @@ const holders = css`
 `;
 
 const validators = css`
-  margin-right: 1.25rem;
+  margin-right: 1rem;
 
   width: 100%;
 `;

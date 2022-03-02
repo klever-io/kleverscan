@@ -77,6 +77,7 @@ export const Row = styled.div<ITableType>`
 
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
 
   background-color: ${props => props.theme.white};
 
@@ -136,9 +137,9 @@ export const Status = styled.div<IStatus>`
 
   align-items: center;
 
-  gap: 0.5rem;
+  gap: 0.9rem;
 
-  span {
+  p {
     color: ${props => props.theme.table[props.status]} !important;
     text-transform: capitalize;
   }

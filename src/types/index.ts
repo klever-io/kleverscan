@@ -429,18 +429,20 @@ export interface IDelegationsResponse {
   buckets: number;
   name?: string;
   totalLeaderSuccessRate: {
-    numSuccess: number,
-    numFailure: number
-  },
+    numSuccess: number;
+    numFailure: number;
+  };
   totalValidatorSuccessRate: {
-    numSuccess: number,
-    numFailure: number
-  },
-  rating: number,
-  selfStake: number,
-  list: string,
-  totalProduced: number,
-  totalMissed: number
+    numSuccess: number;
+    numFailure: number;
+  };
+  rating: number;
+  selfStake: number;
+  list: string;
+  totalProduced: number;
+  totalMissed: number;
+  canDelegate: boolean;
+  maxDelegation: number;
 }
 export interface IValidator {
   rank: number;
@@ -448,11 +450,13 @@ export interface IValidator {
   staked: number;
   cumulativeStaked: number;
   address: string;
-  rating: number,
-  selfStake: number,
-  status: string,
-  totalProduced: number,
-  totalMissed: number
+  rating: number;
+  selfStake: number;
+  status: string;
+  totalProduced: number;
+  totalMissed: number;
+  canDelegate: boolean;
+  maxDelegation: number;
 }
 
 export interface IChainStatistics {
@@ -628,9 +632,8 @@ export interface IProposalDetails {
   hash: string;
 }
 
-
 export interface ITotalFrozen {
   data: {
-    totalFrozen: number
-  }
+    totalFrozen: number;
+  };
 }

@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 import Detail from '@/components/Layout/Detail';
 import Table, { ITable } from '@/components/Table';
-import { Row } from '@/components/Table/styles';
+import { Row, Status } from '@/components/Table/styles';
 
 import {
   IResponse,
@@ -23,6 +23,7 @@ import {
 } from '@/views/validators';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { formatAmount } from '@/utils/index';
+import { getStatusIcon } from '@/assets/status';
 
 interface IValidatorPage {
   validators: IValidator[];
@@ -53,6 +54,8 @@ const Validators: React.FC<IValidatorPage> = ({
     'Total Produced',
     'Total Missed',
     'Stake',
+    'Can Delegate',
+    'Max Delegation',
     'Cumulative Stake',
     'Owner Address',
   ];
@@ -96,6 +99,8 @@ const Validators: React.FC<IValidatorPage> = ({
             ),
             address: delegation.ownerAddress,
             rating: delegation.rating,
+            canDelegate: delegation.canDelegate,
+            maxDelegation: delegation.maxDelegation,
             selfStake: delegation.selfStake,
             status: delegation.list,
             totalProduced,
@@ -143,7 +148,11 @@ const Validators: React.FC<IValidatorPage> = ({
     status,
     totalProduced,
     totalMissed,
+    canDelegate,
+    maxDelegation,
   }) => {
+    const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'error');
+
     return address ? (
       <Row type="validators">
         <span>
@@ -163,6 +172,7 @@ const Validators: React.FC<IValidatorPage> = ({
           )}
         </span>
         <span>{rating}</span>
+
         <span>
           <strong>{formatAmount(selfStake / 10 ** precision)} KLV</strong>
         </span>
@@ -171,6 +181,15 @@ const Validators: React.FC<IValidatorPage> = ({
         <span>{totalMissed}</span>
         <span>
           <strong>{formatAmount(staked / 10 ** precision)} KLV</strong>
+        </span>
+        <span>
+          <Status status={canDelegate ? 'success' : 'fail'}>
+            <DelegateIcon />
+            <p>{canDelegate ? 'Yes' : 'No'}</p>
+          </Status>
+        </span>
+        <span>
+          <strong>{formatAmount(maxDelegation / 10 ** precision)} KLV</strong>
         </span>
         <span>
           <strong>
@@ -245,6 +264,8 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
             ),
             address: delegation.ownerAddress,
             rating: delegation.rating,
+            canDelegate: delegation.canDelegate,
+            maxDelegation: delegation.maxDelegation,
             selfStake: delegation.selfStake,
             status: delegation.list,
             totalProduced,

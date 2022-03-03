@@ -4,6 +4,8 @@ import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
+import { Logo, LetterLogo } from './styles'
+
 import {
   CardContainer,
   CardContent,
@@ -24,7 +26,6 @@ import {
 import { IPagination, IPeer, IResponse } from '@/types/index';
 
 import { ArrowLeft } from '@/assets/icons';
-import { KLV } from '@/assets/validators';
 import api from '@/services/api';
 import { CenteredRow } from '@/views/transactions/detail';
 import Copy from '@/components/Copy';
@@ -54,7 +55,15 @@ const Validator: React.FC<IValidatorPage> = ({ validator }) => {
     list,
     totalStake,
     selfStake,
+    logo,
+    name
   } = validator;
+  const totalProduced =
+    validator.totalLeaderSuccessRate.numSuccess +
+    validator.totalValidatorSuccessRate.numSuccess;
+  const totalMissed =
+    validator.totalLeaderSuccessRate.numFailure +
+    validator.totalValidatorSuccessRate.numFailure;
   const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'error');
 
   const getListStatus = (list: string): string => {
@@ -88,6 +97,14 @@ const Validator: React.FC<IValidatorPage> = ({ validator }) => {
       return 'red';
     }
   };
+
+  const renderLogo = () => {
+    const regex = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
+    if(regex.test(logo)) {
+      return (<Logo alt={`${name}-logo`} src={logo} />);
+    }
+    return <LetterLogo>{logo.split('')[0]}</LetterLogo>;
+  }
 
   const stakedPercent = maxDelegation <= 0 ? 100 : totalStake / maxDelegation;
 
@@ -144,7 +161,6 @@ const Validator: React.FC<IValidatorPage> = ({ validator }) => {
             <ListIcon />
             <span>{list}</span>
           </Status>
-          {}
         </Row>
         <Row>
           <span>
@@ -157,6 +173,14 @@ const Validator: React.FC<IValidatorPage> = ({ validator }) => {
         </Row>
         <Row>
           <span>
+            <strong>Max Delegation</strong>
+          </span>
+          <span>
+            <p>{(maxDelegation).toLocaleString()}</p>
+          </span>
+        </Row>
+        <Row>
+          <span>
             <strong>Staked Balance</strong>
           </span>
           <span>
@@ -165,10 +189,34 @@ const Validator: React.FC<IValidatorPage> = ({ validator }) => {
         </Row>
         <Row>
           <span>
+            <strong>Self Stake</strong>
+          </span>
+          <span>
+            <p>{(selfStake / 10 ** 6).toLocaleString()} KLV</p>
+          </span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Total Produced</strong>
+          </span>
+          <span>
+            <p>{(totalProduced).toLocaleString()}</p>
+          </span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Total Missed</strong>
+          </span>
+          <span>
+            <p>{(totalMissed).toLocaleString()}</p>
+          </span>
+        </Row>
+        <Row>
+          <span>
             <strong>Commission</strong>
           </span>
           <span>
-            <p>{commission / 10 ** 2}%</p>
+            <p>{commission / 10 ** 2}</p>
           </span>
         </Row>
       </CardContent>
@@ -184,11 +232,10 @@ const Validator: React.FC<IValidatorPage> = ({ validator }) => {
           </div>
 
           <TitleContent>
-            <KLV />
+            {renderLogo()}
             <TitleInformation>
               <ValidatorTitle>
-                <h1>Klever Staking</h1>
-                {/* <div>Rank {'X'}</div> */}
+                <h1>{name}</h1>
               </ValidatorTitle>
               <ValidatorDescription>
                 Public Blockchain Infrastructure for the internet.

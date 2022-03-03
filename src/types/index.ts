@@ -342,6 +342,16 @@ export interface IBlock {
   chainID: string;
 }
 
+interface ItotalLeaderSuccessRate {
+  numSuccess: number,
+  numFailure: number
+}
+
+interface ItotalValidatorSuccessRate {
+  numSuccess: number,
+  numFailure: number
+}
+
 export interface IPeer {
   blsPublicKey: string;
   ownerAddress: string;
@@ -353,7 +363,12 @@ export interface IPeer {
   list: string;
   totalStake: number;
   selfStake: number;
+  logo: string,
+  name: string,
+  totalLeaderSuccessRate: ItotalLeaderSuccessRate,
+  totalValidatorSuccessRate: ItotalValidatorSuccessRate,
 }
+
 
 export interface IBlockCard {
   blockIndex: number;
@@ -428,14 +443,8 @@ export interface IDelegationsResponse {
   ownerAddress: string;
   buckets: number;
   name?: string;
-  totalLeaderSuccessRate: {
-    numSuccess: number;
-    numFailure: number;
-  };
-  totalValidatorSuccessRate: {
-    numSuccess: number;
-    numFailure: number;
-  };
+  totalLeaderSuccessRate: ItotalValidatorSuccessRate,
+  totalValidatorSuccessRate: ItotalValidatorSuccessRate,
   rating: number;
   selfStake: number;
   list: string;

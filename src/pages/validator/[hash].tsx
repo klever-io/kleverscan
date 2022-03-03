@@ -4,7 +4,7 @@ import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
-import { Logo, LetterLogo } from './styles'
+import { Logo, LetterLogo } from '@/views/validator';
 
 import {
   CardContainer,
@@ -56,7 +56,7 @@ const Validator: React.FC<IValidatorPage> = ({ validator }) => {
     totalStake,
     selfStake,
     logo,
-    name
+    name,
   } = validator;
   const totalProduced =
     validator.totalLeaderSuccessRate.numSuccess +
@@ -100,11 +100,11 @@ const Validator: React.FC<IValidatorPage> = ({ validator }) => {
 
   const renderLogo = () => {
     const regex = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
-    if(regex.test(logo)) {
-      return (<Logo alt={`${name}-logo`} src={logo} />);
+    if (regex.test(logo)) {
+      return <Logo alt={`${name}-logo`} src={logo} />;
     }
     return <LetterLogo>{logo.split('')[0]}</LetterLogo>;
-  }
+  };
 
   const stakedPercent = maxDelegation <= 0 ? 100 : totalStake / maxDelegation;
 
@@ -176,7 +176,7 @@ const Validator: React.FC<IValidatorPage> = ({ validator }) => {
             <strong>Max Delegation</strong>
           </span>
           <span>
-            <p>{(maxDelegation).toLocaleString()}</p>
+            <p>{maxDelegation.toLocaleString()}</p>
           </span>
         </Row>
         <Row>
@@ -200,7 +200,7 @@ const Validator: React.FC<IValidatorPage> = ({ validator }) => {
             <strong>Total Produced</strong>
           </span>
           <span>
-            <p>{(totalProduced).toLocaleString()}</p>
+            <p>{totalProduced.toLocaleString()}</p>
           </span>
         </Row>
         <Row>
@@ -208,7 +208,7 @@ const Validator: React.FC<IValidatorPage> = ({ validator }) => {
             <strong>Total Missed</strong>
           </span>
           <span>
-            <p>{(totalMissed).toLocaleString()}</p>
+            <p>{totalMissed.toLocaleString()}</p>
           </span>
         </Row>
         <Row>

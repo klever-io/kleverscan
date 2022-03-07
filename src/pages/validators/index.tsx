@@ -236,7 +236,7 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
     });
 
     const delegatedList: IValidatorResponse = await api.get({
-      route: 'validator/delegated-list',
+      route: 'validator/delegated/list',
     });
     if (delegatedList.code !== 'successful') {
       return { props };

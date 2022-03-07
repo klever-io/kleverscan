@@ -342,6 +342,16 @@ export interface IBlock {
   chainID: string;
 }
 
+interface ItotalLeaderSuccessRate {
+  numSuccess: number,
+  numFailure: number
+}
+
+interface ItotalValidatorSuccessRate {
+  numSuccess: number,
+  numFailure: number
+}
+
 export interface IPeer {
   blsPublicKey: string;
   ownerAddress: string;
@@ -353,7 +363,12 @@ export interface IPeer {
   list: string;
   totalStake: number;
   selfStake: number;
+  logo: string,
+  name: string,
+  totalLeaderSuccessRate: ItotalLeaderSuccessRate,
+  totalValidatorSuccessRate: ItotalValidatorSuccessRate,
 }
+
 
 export interface IBlockCard {
   blockIndex: number;
@@ -428,19 +443,15 @@ export interface IDelegationsResponse {
   ownerAddress: string;
   buckets: number;
   name?: string;
-  totalLeaderSuccessRate: {
-    numSuccess: number,
-    numFailure: number
-  },
-  totalValidatorSuccessRate: {
-    numSuccess: number,
-    numFailure: number
-  },
-  rating: number,
-  selfStake: number,
-  list: string,
-  totalProduced: number,
-  totalMissed: number
+  totalLeaderSuccessRate: ItotalValidatorSuccessRate,
+  totalValidatorSuccessRate: ItotalValidatorSuccessRate,
+  rating: number;
+  selfStake: number;
+  list: string;
+  totalProduced: number;
+  totalMissed: number;
+  canDelegate: boolean;
+  maxDelegation: number;
 }
 export interface IValidator {
   rank: number;
@@ -448,11 +459,13 @@ export interface IValidator {
   staked: number;
   cumulativeStaked: number;
   address: string;
-  rating: number,
-  selfStake: number,
-  status: string,
-  totalProduced: number,
-  totalMissed: number
+  rating: number;
+  selfStake: number;
+  status: string;
+  totalProduced: number;
+  totalMissed: number;
+  canDelegate: boolean;
+  maxDelegation: number;
 }
 
 export interface IChainStatistics {
@@ -628,9 +641,8 @@ export interface IProposalDetails {
   hash: string;
 }
 
-
 export interface ITotalFrozen {
   data: {
-    totalFrozen: number
-  }
+    totalFrozen: number;
+  };
 }

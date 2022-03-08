@@ -47,14 +47,16 @@ const Input: React.FC<IInput> = ({ className }) => {
   };
 
   const handleSearch = () => {
-    const type = getInputType(search);
+    const treatedSearch = search.trim();
 
-    if (search === '' || !search || !type) {
+    const type = getInputType(treatedSearch);
+
+    if (treatedSearch === '' || !treatedSearch || !type) {
       setError(true);
       return;
     }
 
-    router.push(`/${type}/${search}`);
+    router.push(`/${type}/${treatedSearch}`);
   };
 
   const keyDownHandle = (event: KeyboardEvent) => {

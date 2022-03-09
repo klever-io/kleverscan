@@ -4,10 +4,9 @@ import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
-import { Container, Header, Input, Title } from '@/views/assets';
+import { Container, Header, Input, Title, Row } from '@/views/assets';
 
 import Table, { ITable } from '@/components/Table';
-import { Row } from '@/components/Table/styles';
 
 import { IAsset, IResponse, IPagination } from '@/types/index';
 import { formatAmount, parseHardCodedInfo } from '@/utils/index';
@@ -17,6 +16,7 @@ import { ArrowLeft } from '@/assets/icons';
 import { Assets as Icon } from '@/assets/title-icons';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
+import { LetterLogo, Logo } from '@/views/assets/index';
 
 interface IAssetPage {
   assets: IAsset[];
@@ -57,9 +57,18 @@ const Assets: React.FC<IAssetPage> = ({
     fetchData();
   }, [page]);
 
+  const renderLogo = (logo: string, ticker: string, name: string) => {
+    const regex = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
+    if (regex.test(logo)) {
+      return <Logo alt={`${name}-logo`} src={logo} />;
+    }
+    return <LetterLogo>{ticker.split('')[0]}</LetterLogo>;
+  };
+
   const TableBody: React.FC<IAsset> = ({
     ticker,
     name,
+    logo,
     assetId,
     assetType,
     initialSupply,
@@ -69,6 +78,8 @@ const Assets: React.FC<IAssetPage> = ({
   }) => {
     return (
       <Row type="assetsPage">
+        <span>{renderLogo(logo, ticker, name)}</span>
+
         <span>
           <p>{ticker}</p>
         </span>
@@ -102,6 +113,7 @@ const Assets: React.FC<IAssetPage> = ({
   };
 
   const header = [
+    '',
     'Token',
     'ID',
     'Name',

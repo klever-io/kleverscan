@@ -343,13 +343,13 @@ export interface IBlock {
 }
 
 interface ItotalLeaderSuccessRate {
-  numSuccess: number,
-  numFailure: number
+  numSuccess: number;
+  numFailure: number;
 }
 
 interface ItotalValidatorSuccessRate {
-  numSuccess: number,
-  numFailure: number
+  numSuccess: number;
+  numFailure: number;
 }
 
 export interface IPeer {
@@ -363,12 +363,11 @@ export interface IPeer {
   list: string;
   totalStake: number;
   selfStake: number;
-  logo: string,
-  name: string,
-  totalLeaderSuccessRate: ItotalLeaderSuccessRate,
-  totalValidatorSuccessRate: ItotalValidatorSuccessRate,
+  logo: string;
+  name: string;
+  totalLeaderSuccessRate: ItotalLeaderSuccessRate;
+  totalValidatorSuccessRate: ItotalValidatorSuccessRate;
 }
-
 
 export interface IBlockCard {
   blockIndex: number;
@@ -412,6 +411,7 @@ export interface IAsset {
   name: string;
   ticker: string;
   ownerAddress: string;
+  logo: string;
   uris: any;
   precision: number;
   initialSupply: number;
@@ -444,8 +444,8 @@ export interface IDelegationsResponse {
   ownerAddress: string;
   buckets: number;
   name?: string;
-  totalLeaderSuccessRate: ItotalValidatorSuccessRate,
-  totalValidatorSuccessRate: ItotalValidatorSuccessRate,
+  totalLeaderSuccessRate: ItotalValidatorSuccessRate;
+  totalValidatorSuccessRate: ItotalValidatorSuccessRate;
   rating: number;
   selfStake: number;
   list: string;

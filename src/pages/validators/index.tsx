@@ -33,7 +33,7 @@ interface IValidatorPage {
 interface IValidatorResponse extends IResponse {
   data: {
     delegations: IDelegationsResponse[];
-    totalFrozen: number;
+    networkTotalStake: number;
   };
   pagination: IPagination;
 }
@@ -68,11 +68,7 @@ const Validators: React.FC<IValidatorPage> = ({
     const validators: IValidatorResponse = await api.get({
       route: `validator/list?page=${page}`,
     });
-
-    const delegatedList: IValidatorResponse = await api.get({
-      route: 'validator/delegated-list',
-    });
-    if (delegatedList.code !== 'successful') {
+    if (validators.code !== 'successful') {
       setLoading(false);
       return;
     }
@@ -89,11 +85,11 @@ const Validators: React.FC<IValidatorPage> = ({
 
           return {
             staked: delegation.totalStake,
-            rank: index + validators.pagination.previous * 10 + 1,
+            rank: index + page * pagination.perPage + 1,
             name: delegation.name || delegation.ownerAddress,
             cumulativeStaked: parseFloat(
               (
-                (delegation.totalStake / delegatedList.data.totalFrozen) *
+                (delegation.totalStake / validators.data.networkTotalStake) *
                 100
               ).toFixed(4),
             ),
@@ -132,7 +128,7 @@ const Validators: React.FC<IValidatorPage> = ({
         <ProgressContent>
           <ProgressIndicator percent={percent} />
         </ProgressContent>
-        <span>{percent.toFixed(2)}%</span>
+        <span>{percent?.toFixed(2)}%</span>
       </ProgressContainer>
     );
   };
@@ -156,13 +152,13 @@ const Validators: React.FC<IValidatorPage> = ({
     return address ? (
       <Row type="validators">
         <span>
-          <p>{rank - 1}°</p>
+          <p>{rank}°</p>
         </span>
         <span>
-          {validators[rank - pagination.previous * 10 - 1]?.address ? (
+          {validators[rank - page * pagination.perPage - 1]?.address ? (
             <Link
               href={`validator/${
-                validators[rank - pagination.previous * 10 - 1].address
+                validators[rank - page * pagination.perPage - 1].address
               }`}
             >
               {name}
@@ -235,10 +231,7 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
       route: 'validator/list',
     });
 
-    const delegatedList: IValidatorResponse = await api.get({
-      route: 'validator/delegated/list',
-    });
-    if (delegatedList.code !== 'successful') {
+    if (validators.code !== 'successful') {
       return { props };
     }
 
@@ -258,7 +251,7 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
             name: delegation.name || delegation.ownerAddress,
             cumulativeStaked: parseFloat(
               (
-                (delegation.totalStake / delegatedList.data.totalFrozen) *
+                (delegation.totalStake / validators.data.networkTotalStake) *
                 100
               ).toFixed(4),
             ),
@@ -277,7 +270,6 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
       props.validators = delegations;
       props.pagination = validators.pagination;
     }
-
     return { props };
   };
 

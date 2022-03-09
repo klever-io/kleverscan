@@ -19,7 +19,8 @@ export interface ITable {
     | 'nodes'
     | 'networkParams'
     | 'proposals'
-    | 'votes';
+    | 'votes'
+    | 'delegations';
 
   header: string[];
   data: any[];

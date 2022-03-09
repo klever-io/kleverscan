@@ -26,7 +26,8 @@ export interface ITableType {
     | 'nodes'
     | 'networkParams'
     | 'proposals'
-    | 'votes';
+    | 'votes'
+    | 'delegations';
 
   filter?: IFilterItem;
 }
@@ -77,7 +78,6 @@ export const Row = styled.div<ITableType>`
 
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
 
   background-color: ${props => props.theme.white};
 

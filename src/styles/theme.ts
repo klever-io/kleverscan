@@ -2,6 +2,7 @@ const theme = {
   background: '#EBF1F8',
   white: '#fff',
   black: '#0B0B1E',
+  borderLogo: '#ccc',
 
   border: '#eeeff6', // TODO: outdated
 

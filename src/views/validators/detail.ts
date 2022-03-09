@@ -298,3 +298,14 @@ export const PercentIndicator = styled.div<{ percent: number }>`
 
   font-size: 0.85rem;
 `;
+
+export const TableContainer = styled.section`
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 1.5rem;
+  h3 {
+    margin-top: 2rem;
+  }
+`;

@@ -1,6 +1,9 @@
 import styled from 'styled-components';
 
 import { default as DefaultInput } from '@/components/Inputt';
+import widths from '@/components/Table/widths';
+import filterWidths from '@/components/Table/filters';
+import { ITableType } from '@/components/Table/styles';
 
 export const Container = styled.div`
   padding: 3rem 10rem 5rem 10rem;
@@ -45,6 +48,71 @@ export const Title = styled.div`
   }
 `;
 
+export const Row = styled.div<ITableType>`
+  padding: 1rem 1.5rem;
+
+  display: flex;
+
+  flex-direction: row;
+  align-items: center;
+
+  background-color: ${props => props.theme.white};
+
+  border-radius: 0.5rem;
+
+  span {
+    &:nth-child(1) {
+      margin: -10px 33px -10px -10px;
+    }
+  }
+
+  span,
+  a {
+    /* flex: 1; */
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    font-size: 0.95rem;
+    color: ${props => props.theme.black};
+
+    ${props => widths[props.type]};
+    ${props =>
+      props.filter &&
+      props.filter.value !== 'all' &&
+      filterWidths[props.filter.name]}
+
+    a {
+      color: ${props => props.theme.black};
+      font-weight: 600;
+    }
+
+    small {
+      color: ${props => props.theme.table.text};
+    }
+
+    strong {
+      font-weight: 400;
+      font-size: 0.95rem;
+      color: ${props => props.theme.table.text};
+    }
+
+    p {
+      font-weight: 600;
+      color: ${props => props.theme.black};
+    }
+  }
+  .address {
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;
+
 export const Input = styled(DefaultInput)`
   margin-top: 1.1rem;
 
@@ -53,4 +121,23 @@ export const Input = styled(DefaultInput)`
   background-color: ${props => props.theme.white};
 
   border-color: ${props => props.theme.filter.border};
+`;
+
+export const Logo = styled.img`
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 50%;
+  border: 2px solid ${props => props.theme.borderLogo};
+`;
+
+export const LetterLogo = styled.div`
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 50%;
+  border: 2px solid ${props => props.theme.borderLogo};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  text-transform: uppercase;
 `;

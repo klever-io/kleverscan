@@ -86,6 +86,7 @@ const klvAsset: IAsset = {
   name: 'Klever',
   ticker: 'KLV',
   ownerAddress: '',
+  logo: '',
   precision: 6,
   uris: null,
   initialSupply: 0,

@@ -33,7 +33,7 @@ interface IValidatorPage {
 interface IValidatorResponse extends IResponse {
   data: {
     delegations: IDelegationsResponse[];
-    totalFrozen: number;
+    networkTotalStake: number;
   };
   pagination: IPagination;
 }
@@ -68,11 +68,8 @@ const Validators: React.FC<IValidatorPage> = ({
     const validators: IValidatorResponse = await api.get({
       route: `validator/list?page=${page}`,
     });
+    if (validators.code !== 'successful') {
 
-    const delegatedList: IValidatorResponse = await api.get({
-      route: 'validator/delegated/list',
-    });
-    if (delegatedList.code !== 'successful') {
       setLoading(false);
       return;
     }
@@ -93,7 +90,7 @@ const Validators: React.FC<IValidatorPage> = ({
             name: delegation.name || delegation.ownerAddress,
             cumulativeStaked: parseFloat(
               (
-                (delegation.totalStake / delegatedList.data.totalFrozen) *
+                (delegation.totalStake / validators.data.networkTotalStake) *
                 100
               ).toFixed(4),
             ),
@@ -132,7 +129,7 @@ const Validators: React.FC<IValidatorPage> = ({
         <ProgressContent>
           <ProgressIndicator percent={percent} />
         </ProgressContent>
-        <span>{percent.toFixed(2)}%</span>
+        <span>{percent?.toFixed(2)}%</span>
       </ProgressContainer>
     );
   };
@@ -152,7 +149,6 @@ const Validators: React.FC<IValidatorPage> = ({
     maxDelegation,
   }) => {
     const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'error');
-
     return address ? (
       <Row type="validators">
         <span>
@@ -235,10 +231,7 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
       route: 'validator/list',
     });
 
-    const delegatedList: IValidatorResponse = await api.get({
-      route: 'validator/delegated/list',
-    });
-    if (delegatedList.code !== 'successful') {
+    if (validators.code !== 'successful') {
       return { props };
     }
 
@@ -258,7 +251,7 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
             name: delegation.name || delegation.ownerAddress,
             cumulativeStaked: parseFloat(
               (
-                (delegation.totalStake / delegatedList.data.totalFrozen) *
+                (delegation.totalStake / validators.data.networkTotalStake) *
                 100
               ).toFixed(4),
             ),

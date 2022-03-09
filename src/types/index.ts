@@ -367,6 +367,9 @@ export interface IPeer {
   name: string;
   totalLeaderSuccessRate: ItotalLeaderSuccessRate;
   totalValidatorSuccessRate: ItotalValidatorSuccessRate;
+  uris: {
+    [index: string]: any;
+  };
 }
 
 export interface IBlockCard {

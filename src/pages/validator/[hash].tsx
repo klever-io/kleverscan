@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import { IoIosInfinite } from 'react-icons/io'
+
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -36,6 +38,7 @@ import { ArrowLeft } from '@/assets/icons';
 import api from '@/services/api';
 import { CenteredRow } from '@/views/transactions/detail';
 import Copy from '@/components/Copy';
+import Dropdown from '@/components/Dropdown'
 import { Status } from '@/components/Table/styles';
 import { getStatusIcon } from '@/assets/status';
 import { ProgressContent } from '@/views/validators';
@@ -53,7 +56,10 @@ interface IValidatorResponse extends IResponse {
     validator: IPeer;
   };
   pagination: IPagination;
-}
+};
+
+const precision = 6;
+
 
 interface IDelegateResponse extends IResponse {
   data: {
@@ -75,6 +81,7 @@ const Validator: React.FC<IValidatorPage> = ({ validator, delegators }) => {
     selfStake,
     logo,
     name,
+    uris,
   } = validator;
   const [loading, setLoading] = useState(false);
 
@@ -123,7 +130,24 @@ const Validator: React.FC<IValidatorPage> = ({ validator, delegators }) => {
     if (regex.test(logo)) {
       return <Logo alt={`${name}-logo`} src={logo} />;
     }
-    return <LetterLogo>{logo.split('')[0]}</LetterLogo>;
+    return <LetterLogo>{name.split('')[0] || 'K'}</LetterLogo>;
+  };
+
+  const renderTitle = () => {
+    return (
+      <h1>
+        {name || `${ownerAddress.slice(0,4)}...${ownerAddress.slice(-4)}`}
+      </h1>
+    );
+  };
+
+  const renderMaxDelegation = () => {
+    const maxDelegationWithPresicion = (maxDelegation / 10 ** precision).toLocaleString();
+    return (
+      <p>
+        {maxDelegation !== 0 ? `${maxDelegationWithPresicion} KLV` : <IoIosInfinite />}
+      </p>
+    );
   };
 
   const stakedPercent = maxDelegation <= 0 ? 100 : totalStake / maxDelegation;
@@ -156,9 +180,9 @@ const Validator: React.FC<IValidatorPage> = ({ validator, delegators }) => {
           </span>
           <span>
             <ProgressContent>
-              <StakedIndicator percent={stakedPercent} />
-              <PercentIndicator percent={stakedPercent}>
-                {stakedPercent}%
+              <StakedIndicator percent={maxDelegation === 0 ? 0 : stakedPercent} />
+              <PercentIndicator percent={maxDelegation === 0 ? 0 : stakedPercent}>
+                {maxDelegation === 0 ? 0 : stakedPercent.toFixed(2)}%
               </PercentIndicator>
             </ProgressContent>
           </span>
@@ -196,7 +220,7 @@ const Validator: React.FC<IValidatorPage> = ({ validator, delegators }) => {
             <strong>Max Delegation</strong>
           </span>
           <span>
-            <p>{maxDelegation.toLocaleString()}</p>
+            {renderMaxDelegation()}
           </span>
         </Row>
         <Row>
@@ -236,7 +260,15 @@ const Validator: React.FC<IValidatorPage> = ({ validator, delegators }) => {
             <strong>Commission</strong>
           </span>
           <span>
-            <p>{commission / 10 ** 2}</p>
+            <p>{commission / 10 ** 2}%</p>
+          </span>
+        </Row>
+        <Row>
+          <span>
+            <strong>URIS</strong>
+          </span>
+          <span>
+            <Dropdown uris={uris}/>
           </span>
         </Row>
       </CardContent>
@@ -285,7 +317,7 @@ const Validator: React.FC<IValidatorPage> = ({ validator, delegators }) => {
             {renderLogo()}
             <TitleInformation>
               <ValidatorTitle>
-                <h1>{name}</h1>
+                {renderTitle()}
               </ValidatorTitle>
               <ValidatorDescription>
                 Public Blockchain Infrastructure for the internet.

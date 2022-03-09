@@ -263,6 +263,19 @@ const votes = css`
   }
 `;
 
+const delegations = css`
+  margin-right: 1.25rem;
+  &:nth-child(1) {
+    width: 28rem;
+  }
+  &:nth-child(2) {
+    width: 38rem;
+  }
+  &:nth-child(3) {
+    width: 12rem;
+  }
+`;
+
 const widths = {
   transactions,
   blocks,
@@ -276,6 +289,7 @@ const widths = {
   networkParams,
   proposals,
   votes,
+  delegations,
 };
 
 export default widths;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
@@ -22,8 +22,15 @@ import {
   ValidatorDescription,
   ValidatorTitle,
 } from '@/views/validators/detail';
+import { Row as RowList } from '@/components/Table/styles';
 
-import { IPagination, IPeer, IResponse } from '@/types/index';
+import {
+  IDelegate,
+  IPagination,
+  IPeer,
+  IResponse,
+  IBucket,
+} from '@/types/index';
 
 import { ArrowLeft } from '@/assets/icons';
 import api from '@/services/api';
@@ -32,9 +39,13 @@ import Copy from '@/components/Copy';
 import { Status } from '@/components/Table/styles';
 import { getStatusIcon } from '@/assets/status';
 import { ProgressContent } from '@/views/validators';
+import Table, { ITable } from '@/components/Table';
+import { TableContainer } from '@/views/validators/detail';
+import { formatAmount } from '@/utils/index';
 
 interface IValidatorPage {
   validator: IPeer;
+  delegators: IBucket[];
 }
 
 interface IValidatorResponse extends IResponse {
@@ -44,7 +55,14 @@ interface IValidatorResponse extends IResponse {
   pagination: IPagination;
 }
 
-const Validator: React.FC<IValidatorPage> = ({ validator }) => {
+interface IDelegateResponse extends IResponse {
+  data: {
+    delegators: IDelegate[];
+  };
+  pagination: IPagination;
+}
+
+const Validator: React.FC<IValidatorPage> = ({ validator, delegators }) => {
   const {
     blsPublicKey,
     ownerAddress,
@@ -58,6 +76,8 @@ const Validator: React.FC<IValidatorPage> = ({ validator }) => {
     logo,
     name,
   } = validator;
+  const [loading, setLoading] = useState(false);
+
   const totalProduced =
     validator.totalLeaderSuccessRate.numSuccess +
     validator.totalValidatorSuccessRate.numSuccess;
@@ -223,6 +243,36 @@ const Validator: React.FC<IValidatorPage> = ({ validator }) => {
     );
   };
 
+  const precision = 6; // default KLV precision
+  const header = ['Address', 'Bucket ID', 'Staked Epoch', 'Amount '];
+
+  const TableBody: React.FC<IBucket> = ({
+    address,
+    id,
+    stakedEpoch,
+    balance,
+  }) => {
+    return (
+      <RowList type="delegations">
+        <Link href={`/account/${address}`}>{address}</Link>
+        <span>{id}</span>
+        <span>{stakedEpoch}</span>
+
+        <span>
+          <strong>{formatAmount(balance / 10 ** precision)} KLV</strong>
+        </span>
+      </RowList>
+    );
+  };
+
+  const tableProps: ITable = {
+    type: 'delegations',
+    header,
+    data: delegators as IBucket[],
+    body: TableBody,
+    loading,
+  };
+
   return (
     <Container>
       <Header>
@@ -250,6 +300,10 @@ const Validator: React.FC<IValidatorPage> = ({ validator }) => {
       <CardContainer>
         <Overview />
       </CardContainer>
+      <TableContainer>
+        <h3>List of delegations</h3>
+        <Table {...tableProps} />
+      </TableContainer>
     </Container>
   );
 };
@@ -259,13 +313,34 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> = async ({
 }) => {
   const props: IValidatorPage = {
     validator: {} as IPeer,
+    delegators: [],
   };
+
   const address = String(hash);
 
   const validator: IValidatorResponse = await api.get({
     route: `validator/${address}`,
   });
   props.validator = validator.data.validator;
+
+  const delegations: IDelegateResponse = await api.get({
+    route: `validator/delegated/${address}`,
+  });
+
+  const delegators: IBucket[] = [];
+  delegations?.data?.delegators.forEach(delegation => {
+    delegation.buckets.forEach(bucket => {
+      if (bucket.delegation === address) {
+        delegators.push({
+          address: delegation.address,
+          ...bucket,
+        });
+      }
+    });
+  });
+
+  props.delegators = delegators;
+
   return { props };
 };
 

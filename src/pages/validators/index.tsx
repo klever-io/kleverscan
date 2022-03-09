@@ -70,7 +70,7 @@ const Validators: React.FC<IValidatorPage> = ({
     });
 
     const delegatedList: IValidatorResponse = await api.get({
-      route: 'validator/delegated-list',
+      route: 'validator/delegated/list',
     });
     if (delegatedList.code !== 'successful') {
       setLoading(false);
@@ -277,7 +277,6 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
       props.validators = delegations;
       props.pagination = validators.pagination;
     }
-
     return { props };
   };
 

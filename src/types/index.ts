@@ -430,6 +430,7 @@ export interface IContract {
 }
 
 export interface IBucket {
+  address?: string;
   id: string;
   stakeAt: number;
   stakedEpoch: number;
@@ -645,4 +646,9 @@ export interface ITotalFrozen {
   data: {
     totalFrozen: number;
   };
+}
+
+export interface IDelegate {
+  address: string;
+  buckets: IBucket[];
 }

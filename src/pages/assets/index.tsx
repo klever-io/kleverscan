@@ -48,8 +48,7 @@ const Assets: React.FC<IAssetPage> = ({
         route: `assets/kassets?page=${page}`,
       });
       if (!response.error) {
-        const assets = parseHardCodedInfo(response.data.assets);
-        setAssets(assets);
+        setAssets(response.data.assets);
       }
 
       setLoading(false);

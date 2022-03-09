@@ -60,14 +60,16 @@ export const Row = styled.div<ITableType>`
 
   border-radius: 0.5rem;
 
+  span {
+    &:nth-child(1) {
+      margin: -10px 33px -10px -10px;
+    }
+  }
+
   span,
   a {
     /* flex: 1; */
     overflow: hidden;
-
-    &:nth-child(1) {
-      margin: -10px 33px -10px -10px;
-    }
 
     text-overflow: ellipsis;
     white-space: nowrap;

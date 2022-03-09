@@ -69,7 +69,6 @@ const Validators: React.FC<IValidatorPage> = ({
       route: `validator/list?page=${page}`,
     });
     if (validators.code !== 'successful') {
-
       setLoading(false);
       return;
     }
@@ -86,7 +85,7 @@ const Validators: React.FC<IValidatorPage> = ({
 
           return {
             staked: delegation.totalStake,
-            rank: index + validators.pagination.previous * 10 + 1,
+            rank: index + page * pagination.perPage + 1,
             name: delegation.name || delegation.ownerAddress,
             cumulativeStaked: parseFloat(
               (
@@ -149,16 +148,17 @@ const Validators: React.FC<IValidatorPage> = ({
     maxDelegation,
   }) => {
     const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'error');
+
     return address ? (
       <Row type="validators">
         <span>
-          <p>{rank - 1}°</p>
+          <p>{rank}°</p>
         </span>
         <span>
-          {validators[rank - pagination.previous * 10 - 1]?.address ? (
+          {validators[rank - page * pagination.perPage - 1]?.address ? (
             <Link
               href={`validator/${
-                validators[rank - pagination.previous * 10 - 1].address
+                validators[rank - page * pagination.perPage - 1].address
               }`}
             >
               {name}

@@ -28,7 +28,9 @@ const TransactionItem: React.FC<ITransaction> = ({
     const contractPosition = 0;
     const parameter = contract[contractPosition].parameter as ITransferContract;
 
-    amount = parameter.amount || 0;
+    if (parameter) {
+      amount = parameter.amount;
+    }
   }
 
   return (

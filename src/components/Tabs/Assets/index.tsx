@@ -44,7 +44,7 @@ const Assets: React.FC<IAssets> = props => {
 
       for (let i = 0; i < assetData.length; i++) {
         // need old loop struct to save with async/await
-        if (assetData[i].tokenId !== '') {
+        if (assetData[i].tokenId !== '' && assetData[i].tokenId !== 'KLV') {
           const response: IAssetResponse = await api.get({
             route: `assets/${assetData[i].tokenId}`,
           });

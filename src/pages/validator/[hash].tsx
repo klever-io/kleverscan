@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { IoIosInfinite } from 'react-icons/io'
+import { IoIosInfinite } from 'react-icons/io';
 
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
@@ -38,7 +38,7 @@ import { ArrowLeft } from '@/assets/icons';
 import api from '@/services/api';
 import { CenteredRow } from '@/views/transactions/detail';
 import Copy from '@/components/Copy';
-import Dropdown from '@/components/Dropdown'
+import Dropdown from '@/components/Dropdown';
 import { Status } from '@/components/Table/styles';
 import { getStatusIcon } from '@/assets/status';
 import { ProgressContent } from '@/views/validators';
@@ -56,10 +56,9 @@ interface IValidatorResponse extends IResponse {
     validator: IPeer;
   };
   pagination: IPagination;
-};
+}
 
 const precision = 6;
-
 
 interface IDelegateResponse extends IResponse {
   data: {
@@ -136,21 +135,29 @@ const Validator: React.FC<IValidatorPage> = ({ validator, delegators }) => {
   const renderTitle = () => {
     return (
       <h1>
-        {name || `${ownerAddress.slice(0,4)}...${ownerAddress.slice(-4)}`}
+        {name || `${ownerAddress.slice(0, 4)}...${ownerAddress.slice(-4)}`}
       </h1>
     );
   };
 
   const renderMaxDelegation = () => {
-    const maxDelegationWithPresicion = (maxDelegation / 10 ** precision).toLocaleString();
+    const maxDelegationWithPresicion = (
+      maxDelegation /
+      10 ** precision
+    ).toLocaleString();
     return (
       <p>
-        {maxDelegation !== 0 ? `${maxDelegationWithPresicion} KLV` : <IoIosInfinite />}
+        {maxDelegation !== 0 ? (
+          `${maxDelegationWithPresicion} KLV`
+        ) : (
+          <IoIosInfinite />
+        )}
       </p>
     );
   };
 
-  const stakedPercent = maxDelegation <= 0 ? 100 : totalStake / maxDelegation;
+  const stakedPercent =
+    (maxDelegation <= 0 ? 100 : totalStake / maxDelegation) * 100;
 
   const router = useRouter();
 
@@ -180,8 +187,12 @@ const Validator: React.FC<IValidatorPage> = ({ validator, delegators }) => {
           </span>
           <span>
             <ProgressContent>
-              <StakedIndicator percent={maxDelegation === 0 ? 0 : stakedPercent} />
-              <PercentIndicator percent={maxDelegation === 0 ? 0 : stakedPercent}>
+              <StakedIndicator
+                percent={maxDelegation === 0 ? 0 : stakedPercent}
+              />
+              <PercentIndicator
+                percent={maxDelegation === 0 ? 0 : stakedPercent}
+              >
                 {maxDelegation === 0 ? 0 : stakedPercent.toFixed(2)}%
               </PercentIndicator>
             </ProgressContent>
@@ -219,9 +230,7 @@ const Validator: React.FC<IValidatorPage> = ({ validator, delegators }) => {
           <span>
             <strong>Max Delegation</strong>
           </span>
-          <span>
-            {renderMaxDelegation()}
-          </span>
+          <span>{renderMaxDelegation()}</span>
         </Row>
         <Row>
           <span>
@@ -268,7 +277,7 @@ const Validator: React.FC<IValidatorPage> = ({ validator, delegators }) => {
             <strong>URIS</strong>
           </span>
           <span>
-            <Dropdown uris={uris}/>
+            <Dropdown uris={uris} />
           </span>
         </Row>
       </CardContent>
@@ -316,9 +325,7 @@ const Validator: React.FC<IValidatorPage> = ({ validator, delegators }) => {
           <TitleContent>
             {renderLogo()}
             <TitleInformation>
-              <ValidatorTitle>
-                {renderTitle()}
-              </ValidatorTitle>
+              <ValidatorTitle>{renderTitle()}</ValidatorTitle>
               <ValidatorDescription>
                 Public Blockchain Infrastructure for the internet.
               </ValidatorDescription>

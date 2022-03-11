@@ -265,7 +265,7 @@ const Block: React.FC<IBlockPage> = ({
         </Row>
         <Row>
           <span>
-            <strong>Previous Random Seed</strong>
+            <strong>Random Seed</strong>
           </span>
           <span>
             <CenteredRow>

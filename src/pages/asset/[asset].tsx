@@ -44,6 +44,7 @@ interface IAssetPage {
   totalTransactionsPage: number;
   totalHoldersPage: number;
   holders: IAccountAsset[];
+  totalRecords: number;
 }
 
 interface IAssetResponse extends IResponse {
@@ -73,6 +74,7 @@ const Asset: React.FC<IAssetPage> = ({
   holders: defaultHolders,
   totalHoldersPage,
   totalTransactionsPage: defaultTotalTransactionsPage,
+  totalRecords,
 }) => {
   const {
     name,
@@ -82,6 +84,7 @@ const Asset: React.FC<IAssetPage> = ({
     precision,
     maxSupply,
     initialSupply,
+    circulatingSupply
   } = asset;
 
   const router = useRouter();
@@ -172,7 +175,7 @@ const Asset: React.FC<IAssetPage> = ({
         </Row>
         <Row>
           <span>
-            <strong>Total Supply</strong>
+            <strong>Max Supply</strong>
           </span>
           <span>
             <small>
@@ -192,9 +195,19 @@ const Asset: React.FC<IAssetPage> = ({
         </Row>
         <Row>
           <span>
+            <strong>Circulating Supply</strong>
+          </span>
+          <span>
+            <small>
+              {toLocaleFixed(circulatingSupply / 10 ** precision, precision)}
+            </small>
+          </span>
+        </Row>
+        <Row>
+          <span>
             <strong>Holders</strong>
           </span>
-          <span>{holders.length}</span>
+          <span>{totalRecords}</span>
         </Row>
         <Row>
           <span>
@@ -389,6 +402,7 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
     totalHoldersPage: 0,
     totalTransactionsPage: 0,
     holders: [],
+    totalRecords: 0,
   };
 
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
@@ -417,6 +431,7 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
   if (!holders.error) {
     props.holders = holders.data.accounts;
     props.totalHoldersPage = holders.pagination.totalPages;
+    props.totalRecords = holders.pagination.totalRecords;
   }
 
   return { props };

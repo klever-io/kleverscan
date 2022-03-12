@@ -40,7 +40,7 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS }) => {
       return `- ${Math.abs(variation).toFixed(precision)}%`;
     }
 
-    return `+ ${variation.toFixed(precision)}%`;
+    return `+ ${variation ? variation.toFixed(precision) : '--'}%`;
   };
 
   const carouselRef = useRef<any>(null);

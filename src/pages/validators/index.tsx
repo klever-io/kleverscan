@@ -22,7 +22,7 @@ import {
   ProgressIndicator,
 } from '@/views/validators';
 import { useDidUpdateEffect } from '@/utils/hooks';
-import { parseName } from '@/utils/index' 
+import { capitalizeString, parseAddress } from '@/utils/index' 
 import { formatAmount } from '@/utils/index';
 import { getStatusIcon } from '@/assets/status';
 
@@ -83,7 +83,7 @@ const Validators: React.FC<IValidatorPage> = ({
           return {
             staked: delegation.totalStake,
             rank: index + page * pagination.perPage + 1,
-            name: delegation.name || parseName(delegation.ownerAddress),
+            name: delegation.name || parseAddress(delegation.ownerAddress),
             cumulativeStaked: parseFloat(
               (
                 (delegation.totalStake / validators.data.networkTotalStake) *
@@ -164,7 +164,7 @@ const Validators: React.FC<IValidatorPage> = ({
         <span>{((rating * 100) / 10000000).toFixed(2)}%</span>
 
         
-        <span>{status.charAt(0).toUpperCase() + status.slice(1)}</span>
+        <span>{capitalizeString(status)}</span>
         <span>
           <strong>{formatAmount(staked / 10 ** precision)} KLV</strong>
         </span>
@@ -231,7 +231,7 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
           return {
             staked: delegation.totalStake,
             rank: index + validators.pagination.previous * 10 + 1,
-            name: delegation.name || parseName(delegation.ownerAddress),
+            name: delegation.name || parseAddress(delegation.ownerAddress),
             cumulativeStaked: parseFloat(
               (
                 (delegation.totalStake / validators.data.networkTotalStake) *

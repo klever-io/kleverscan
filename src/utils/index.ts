@@ -84,6 +84,10 @@ export const parseHardCodedInfo = (assets: IAsset[]): IAsset[] => {
   });
 };
 
-export const parseName = (address: string): string => {
+export const capitalizeString = (str: string): string  => {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+};
+
+export const parseAddress = (address: string): string => {
   return `${address.slice(0,8)}...${address.slice(-8)}`
-}
+};

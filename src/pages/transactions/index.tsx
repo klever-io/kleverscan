@@ -52,7 +52,7 @@ import {
   IValidatorConfigContract,
 } from '../../types';
 
-import { formatAmount } from '../../utils';
+import { capitalizeString, formatAmount } from '../../utils';
 
 import { ArrowRight, ArrowLeft } from '@/assets/icons';
 import { Transactions as Icon } from '@/assets/title-icons';
@@ -655,7 +655,7 @@ const Transactions: React.FC<ITransactions> = ({
         </Link>
         <Status status={status}>
           <StatusIcon />
-          <span>{status}</span>
+          <span>{capitalizeString(status)}</span>
         </Status>
         <span>
           <strong>{contractType}</strong>

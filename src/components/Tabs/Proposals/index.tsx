@@ -16,6 +16,7 @@ import { ProgressContent } from '@/views/proposals';
 import Link from 'next/link';
 
 import { IProposal } from '@/types/index'
+import { parseAddress } from '@/utils/index';
 
 interface IProposalsProps {
   proposalParams: IProposals;
@@ -25,8 +26,6 @@ interface IProposalsProps {
 interface IProposals {
   [index: number]: IProposal;
 }
-
-
 
 const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
   const TableBody: React.FC<IProposal> = ({
@@ -41,10 +40,6 @@ const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
 
     const stakedPercent = 50;
 
-    const renderProposerLink = (proposer: string) => {
-      return `${proposer.slice(0,8)}...${proposer.slice(-8)}`
-    };
-
     return (
       <>
         <Row type="proposals">
@@ -54,7 +49,7 @@ const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
           <ProposerDescAndLink>
             <p>{description || ' - '}</p>
             <Proposer>Proposer</Proposer>
-            <Link href="/">{renderProposerLink(proposer)}</Link>
+            <Link href="/">{parseAddress(proposer)}</Link>
           </ProposerDescAndLink>
           <span>
             <small>

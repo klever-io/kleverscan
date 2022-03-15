@@ -225,17 +225,17 @@ const networkParams = css`
   }
 
   &:nth-child(3) {
-    width: 7rem;
+    width: 8rem;
   }
 `;
 
 const proposals = css`
   margin-right: 1.25rem;
   &:nth-child(1) {
-    width: 6rem;
+    width: 7rem;
   }
   &:nth-child(2) {
-    width: 24rem;
+    width: 23rem;
   }
   &:nth-child(3) {
     width: 18rem;
@@ -247,7 +247,7 @@ const proposals = css`
     width: 6rem;
   }
   &:nth-child(6) {
-    width: 4rem;
+    width: 3rem;
   }
 `;
 const votes = css`

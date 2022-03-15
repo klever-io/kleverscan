@@ -85,9 +85,9 @@ export const parseHardCodedInfo = (assets: IAsset[]): IAsset[] => {
 };
 
 export const parseAddress = (address: string, num: number): string => {
-  return address.length > 0
+  return address.length > num
     ? `${address.slice(0, num)}...${address.slice(-num)}`
-    : '';
+    : address;
 };
 
 export const capitalizeString = (str: string): string => {

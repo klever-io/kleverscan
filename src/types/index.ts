@@ -469,7 +469,6 @@ export interface IValidator {
   totalProduced: number;
   totalMissed: number;
   canDelegate: boolean;
-  maxDelegation: number;
 }
 
 export interface IChainStatistics {

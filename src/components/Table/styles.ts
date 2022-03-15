@@ -30,6 +30,7 @@ export interface ITableType {
     | 'delegations';
 
   filter?: IFilterItem;
+  pathname?: string;
 }
 
 export const Container = styled.div`
@@ -55,7 +56,7 @@ export const Header = styled.div<ITableType>`
   }
 
   @media (max-width: 768px) {
-    width: fit-content;
+    width: ${props => props.pathname === '/validators' ? '58rem': 'fit-content'};
   }
 `;
 

@@ -207,8 +207,14 @@ const holders = css`
 
 const validators = css`
   margin-right: 1rem;
+  width: 30%;
 
-  width: 100%;
+  &:nth-child(1) {
+    width: 10%;
+  }
+  &:nth-child(2) {
+    width: 60%;
+  }
 `;
 
 const nodes = validators;

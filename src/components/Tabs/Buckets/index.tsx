@@ -7,6 +7,7 @@ import { Row } from '@/components/Table/styles';
 
 import { IBucket } from '@/types/index';
 import Link from 'next/link';
+import { parseAddress } from '@/utils/index';
 
 interface IBuckets {
   [key: string]: IBucket[];
@@ -34,7 +35,13 @@ const Buckets: React.FC<IBuckets> = ({ buckets }) => {
         <span>
           {unstakedEpoch === UINT32_MAX ? '--' : unstakedEpoch.toLocaleString()}
         </span>
-        <Link href={`/account/${delegation}`}>{delegation}</Link>
+        {delegation.length > 0 ? (
+          <Link href={`/account/${delegation}`}>
+            {parseAddress(delegation, 8)}
+          </Link>
+        ) : (
+          <span>--</span>
+        )}
       </Row>
     );
   };

@@ -22,7 +22,7 @@ import {
   ProgressIndicator,
 } from '@/views/validators';
 import { useDidUpdateEffect } from '@/utils/hooks';
-import { capitalizeString, parseAddress } from '@/utils/index' 
+import { capitalizeString, parseAddress } from '@/utils/index';
 import { formatAmount } from '@/utils/index';
 import { getStatusIcon } from '@/assets/status';
 
@@ -74,16 +74,16 @@ const Validators: React.FC<IValidatorPage> = ({
       const delegations: IValidator[] = validators.data['validators'].map(
         (delegation: IDelegationsResponse, index: number): IValidator => {
           const totalProduced =
-          delegation.totalLeaderSuccessRate.numSuccess +
-          delegation.totalValidatorSuccessRate.numSuccess;
-        const totalMissed =
-          delegation.totalLeaderSuccessRate.numFailure +
-          delegation.totalValidatorSuccessRate.numFailure;
-        
+            delegation.totalLeaderSuccessRate.numSuccess +
+            delegation.totalValidatorSuccessRate.numSuccess;
+          const totalMissed =
+            delegation.totalLeaderSuccessRate.numFailure +
+            delegation.totalValidatorSuccessRate.numFailure;
+
           return {
             staked: delegation.totalStake,
             rank: index + page * pagination.perPage + 1,
-            name: delegation.name || parseAddress(delegation.ownerAddress),
+            name: delegation.name || parseAddress(delegation.ownerAddress, 8),
             cumulativeStaked: parseFloat(
               (
                 (delegation.totalStake / validators.data.networkTotalStake) *
@@ -163,7 +163,6 @@ const Validators: React.FC<IValidatorPage> = ({
         </span>
         <span>{((rating * 100) / 10000000).toFixed(2)}%</span>
 
-        
         <span>{capitalizeString(status)}</span>
         <span>
           <strong>{formatAmount(staked / 10 ** precision)} KLV</strong>
@@ -177,13 +176,12 @@ const Validators: React.FC<IValidatorPage> = ({
             <p>{canDelegate ? 'Yes' : 'No'}</p>
           </Status>
         </span>
-        
+
         <span>
           <strong>
             <Progress percent={cumulativeStaked} />
           </strong>
         </span>
-        
       </Row>
     ) : null;
   };
@@ -222,16 +220,16 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
       const delegations: IValidator[] = validators.data['validators'].map(
         (delegation: IDelegationsResponse, index: number): IValidator => {
           const totalProduced =
-          delegation.totalLeaderSuccessRate.numSuccess +
-          delegation.totalValidatorSuccessRate.numSuccess;
-        const totalMissed =
-          delegation.totalLeaderSuccessRate.numFailure +
-          delegation.totalValidatorSuccessRate.numFailure;
+            delegation.totalLeaderSuccessRate.numSuccess +
+            delegation.totalValidatorSuccessRate.numSuccess;
+          const totalMissed =
+            delegation.totalLeaderSuccessRate.numFailure +
+            delegation.totalValidatorSuccessRate.numFailure;
 
           return {
             staked: delegation.totalStake,
             rank: index + validators.pagination.previous * 10 + 1,
-            name: delegation.name || parseAddress(delegation.ownerAddress),
+            name: delegation.name || parseAddress(delegation.ownerAddress, 8),
             cumulativeStaked: parseFloat(
               (
                 (delegation.totalStake / validators.data.networkTotalStake) *

@@ -2,12 +2,14 @@ import React from 'react';
 
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
-import { Proposer,
+import {
+  Proposer,
   Row,
   ProposalStatus,
   ProposerDescAndLink,
   UpVotes,
-  PercentIndicator, StakedIndicator
+  PercentIndicator,
+  StakedIndicator,
 } from './styles';
 
 import { getStatusIcon } from '@/assets/status';
@@ -15,7 +17,7 @@ import { format, fromUnixTime } from 'date-fns';
 import { ProgressContent } from '@/views/proposals';
 import Link from 'next/link';
 
-import { IProposal } from '@/types/index'
+import { IProposal } from '@/types/index';
 import { parseAddress } from '@/utils/index';
 
 interface IProposalsProps {
@@ -34,7 +36,7 @@ const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
     epochStart,
     epochEnd,
     proposalStatus,
-    proposer
+    proposer,
   }) => {
     const StatusIcon = getStatusIcon(proposalStatus);
 
@@ -49,11 +51,12 @@ const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
           <ProposerDescAndLink>
             <p>{description || ' - '}</p>
             <Proposer>Proposer</Proposer>
-            <Link href="/">{parseAddress(proposer)}</Link>
+            <Link href="/">{parseAddress(proposer, 8)}</Link>
           </ProposerDescAndLink>
           <span>
             <small>
-            Start: {format(fromUnixTime(epochStart / 1000), 'MM/dd/yyyy HH:mm')}
+              Start:{' '}
+              {format(fromUnixTime(epochStart / 1000), 'MM/dd/yyyy HH:mm')}
             </small>{' '}
             <p />
             <small className="endTime">

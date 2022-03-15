@@ -15,7 +15,7 @@ import {
 
 import { ArrowRight } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
-import { formatAmount } from '@/utils/index';
+import { formatAmount, parseAddress } from '@/utils/index';
 
 interface ITransactionsProps {
   transactions: ITransaction[];
@@ -57,13 +57,13 @@ const Transactions: React.FC<ITransactionsProps> = props => {
           </small>
         </span>
         <Link href={`/account/${sender}`}>
-          <a className="address">{sender}</a>
+          <a className="address">{parseAddress(sender, 4)}</a>
         </Link>
         <span>
           <ArrowRight />
         </span>
         <Link href={`/account/${toAddress}`}>
-          <a className="address">{toAddress}</a>
+          <a className="address">{parseAddress(toAddress, 4)}</a>
         </Link>
         <Status status={status}>
           <StatusIcon />

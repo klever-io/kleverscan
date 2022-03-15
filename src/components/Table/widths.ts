@@ -88,7 +88,7 @@ const accounts = css`
   margin-right: 1.25rem;
 
   &:nth-child(1) {
-    width: 30rem;
+    width: 45rem;
   }
 
   &:nth-child(2) {

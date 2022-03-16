@@ -7,8 +7,6 @@ export const TabProposal = styled.div``;
 export const Row = styled.div<ITableType>`
   padding: 1rem 1.5rem;
   font-family: Rubik;
-    
-
   display: flex;
 
   flex-direction: row;
@@ -65,9 +63,7 @@ export const Row = styled.div<ITableType>`
       line-height: 24px;
     }
     .currentValue{
-        text-align: right;
+        text-align: start;
     }
   }
-  
-  .
 `;

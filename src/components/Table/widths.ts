@@ -88,7 +88,7 @@ const accounts = css`
   margin-right: 1.25rem;
 
   &:nth-child(1) {
-    width: 30rem;
+    width: 45rem;
   }
 
   &:nth-child(2) {
@@ -207,8 +207,14 @@ const holders = css`
 
 const validators = css`
   margin-right: 1rem;
+  width: 30%;
 
-  width: 100%;
+  &:nth-child(1) {
+    width: 10%;
+  }
+  &:nth-child(2) {
+    width: 60%;
+  }
 `;
 
 const nodes = validators;
@@ -225,17 +231,17 @@ const networkParams = css`
   }
 
   &:nth-child(3) {
-    width: 7rem;
+    width: 8rem;
   }
 `;
 
 const proposals = css`
   margin-right: 1.25rem;
   &:nth-child(1) {
-    width: 6rem;
+    width: 7rem;
   }
   &:nth-child(2) {
-    width: 24rem;
+    width: 23rem;
   }
   &:nth-child(3) {
     width: 18rem;
@@ -247,7 +253,7 @@ const proposals = css`
     width: 6rem;
   }
   &:nth-child(6) {
-    width: 4rem;
+    width: 3rem;
   }
 `;
 const votes = css`

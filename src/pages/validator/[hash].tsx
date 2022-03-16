@@ -44,7 +44,7 @@ import { getStatusIcon } from '@/assets/status';
 import { ProgressContent } from '@/views/validators';
 import Table, { ITable } from '@/components/Table';
 import { TableContainer } from '@/views/validators/detail';
-import { formatAmount } from '@/utils/index';
+import { formatAmount, parseAddress } from '@/utils/index';
 
 interface IValidatorPage {
   validator: IPeer;
@@ -133,11 +133,7 @@ const Validator: React.FC<IValidatorPage> = ({ validator, delegators }) => {
   };
 
   const renderTitle = () => {
-    return (
-      <h1>
-        {name || `${ownerAddress.slice(0, 4)}...${ownerAddress.slice(-4)}`}
-      </h1>
-    );
+    return <h1>{name || parseAddress(ownerAddress, 4)}</h1>;
   };
 
   const renderMaxDelegation = () => {
@@ -295,7 +291,9 @@ const Validator: React.FC<IValidatorPage> = ({ validator, delegators }) => {
   }) => {
     return (
       <RowList type="delegations">
-        <Link href={`/account/${address}`}>{address}</Link>
+        <Link href={`/account/${address}`}>
+          {parseAddress(address || '', 8)}
+        </Link>
         <span>{id}</span>
         <span>{stakedEpoch}</span>
 

@@ -22,6 +22,7 @@ import {
   ProgressIndicator,
 } from '@/views/validators';
 import { useDidUpdateEffect } from '@/utils/hooks';
+import { capitalizeString, parseAddress } from '@/utils/index';
 import { formatAmount } from '@/utils/index';
 import { getStatusIcon } from '@/assets/status';
 
@@ -49,15 +50,11 @@ const Validators: React.FC<IValidatorPage> = ({
     'Rank',
     'Name',
     'Rating',
-    'Self Stake',
     'Status',
-    'Total Produced',
-    'Total Missed',
     'Stake',
+    'Produced / Missed',
     'Can Delegate',
-    'Max Delegation',
     'Cumulative Stake',
-    'Owner Address',
   ];
 
   const precision = 6;
@@ -86,7 +83,7 @@ const Validators: React.FC<IValidatorPage> = ({
           return {
             staked: delegation.totalStake,
             rank: index + page * pagination.perPage + 1,
-            name: delegation.name || delegation.ownerAddress,
+            name: delegation.name || parseAddress(delegation.ownerAddress, 8),
             cumulativeStaked: parseFloat(
               (
                 (delegation.totalStake / validators.data.networkTotalStake) *
@@ -96,7 +93,6 @@ const Validators: React.FC<IValidatorPage> = ({
             address: delegation.ownerAddress,
             rating: delegation.rating,
             canDelegate: delegation.canDelegate,
-            maxDelegation: delegation.maxDelegation,
             selfStake: delegation.selfStake,
             status: delegation.list,
             totalProduced,
@@ -140,12 +136,10 @@ const Validators: React.FC<IValidatorPage> = ({
     cumulativeStaked,
     address,
     rating,
-    selfStake,
     status,
     totalProduced,
     totalMissed,
     canDelegate,
-    maxDelegation,
   }) => {
     const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'error');
 
@@ -167,16 +161,14 @@ const Validators: React.FC<IValidatorPage> = ({
             <span>{name}</span>
           )}
         </span>
-        <span>{rating}</span>
+        <span>{((rating * 100) / 10000000).toFixed(2)}%</span>
 
-        <span>
-          <strong>{formatAmount(selfStake / 10 ** precision)} KLV</strong>
-        </span>
-        <span>{status.charAt(0).toUpperCase() + status.slice(1)}</span>
-        <span>{totalProduced}</span>
-        <span>{totalMissed}</span>
+        <span>{capitalizeString(status)}</span>
         <span>
           <strong>{formatAmount(staked / 10 ** precision)} KLV</strong>
+        </span>
+        <span>
+          <strong>{`${totalProduced} / ${totalMissed}`}</strong>
         </span>
         <span>
           <Status status={canDelegate ? 'success' : 'fail'}>
@@ -184,22 +176,11 @@ const Validators: React.FC<IValidatorPage> = ({
             <p>{canDelegate ? 'Yes' : 'No'}</p>
           </Status>
         </span>
-        <span>
-          <strong>{formatAmount(maxDelegation / 10 ** precision)} KLV</strong>
-        </span>
+
         <span>
           <strong>
             <Progress percent={cumulativeStaked} />
           </strong>
-        </span>
-        <span>
-          {address ? (
-            <Link href={`/account/${address}`}>
-              <a className="address">{address}</a>
-            </Link>
-          ) : (
-            <span> -- </span>
-          )}
         </span>
       </Row>
     ) : null;
@@ -248,7 +229,7 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
           return {
             staked: delegation.totalStake,
             rank: index + validators.pagination.previous * 10 + 1,
-            name: delegation.name || delegation.ownerAddress,
+            name: delegation.name || parseAddress(delegation.ownerAddress, 8),
             cumulativeStaked: parseFloat(
               (
                 (delegation.totalStake / validators.data.networkTotalStake) *
@@ -258,7 +239,6 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
             address: delegation.ownerAddress,
             rating: delegation.rating,
             canDelegate: delegation.canDelegate,
-            maxDelegation: delegation.maxDelegation,
             selfStake: delegation.selfStake,
             status: delegation.list,
             totalProduced,

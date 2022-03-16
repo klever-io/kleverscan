@@ -10,7 +10,7 @@ import {
   TransactionAmount,
 } from '@/views/home';
 
-import { toLocaleFixed } from '../../utils';
+import { parseAddress, toLocaleFixed } from '../../utils';
 
 import { ITransaction, ITransferContract } from '../../types';
 
@@ -28,7 +28,7 @@ const TransactionItem: React.FC<ITransaction> = ({
     const contractPosition = 0;
     const parameter = contract[contractPosition].parameter as ITransferContract;
 
-    if (parameter) {
+    if (parameter?.amount) {
       amount = parameter.amount;
     }
   }
@@ -45,21 +45,25 @@ const TransactionItem: React.FC<ITransaction> = ({
         <p>
           <strong>From: </strong>
           <Link href={`/account/${sender}`}>
-            <a className="clean-style">{sender}</a>
+            <a className="clean-style">{parseAddress(sender, 4)}</a>
           </Link>
         </p>
         <p>
           <strong>To: </strong>
           <Link href={`/account/${parameter.toAddress}`}>
-            <a className="clean-style">{parameter.toAddress || '--'}</a>
+            <a className="clean-style">
+              {parameter.toAddress
+                ? parseAddress(parameter.toAddress, 4)
+                : '--'}
+            </a>
           </Link>
         </p>
       </TransactionData>
       <TransactionAmount>
         <span>
-          {toLocaleFixed(amount / 10 ** precision, precision)}{' '}
+          {toLocaleFixed(amount / 10 ** precision, precision)}
           <Link href={`/asset/KLV`}>
-            <a className="clean-style">KLV</a>
+            <a className="clean-style"> KLV</a>
           </Link>
         </span>
       </TransactionAmount>

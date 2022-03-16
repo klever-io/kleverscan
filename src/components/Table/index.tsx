@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/router'
 import { IFilterItem } from '../Filter';
 import Skeleton from '../Skeleton';
 
@@ -37,7 +38,8 @@ const Table: React.FC<ITable> = ({
   filter,
   loading,
 }) => {
-  const props: ITableType = { type, filter };
+  const { pathname } = useRouter();
+  const props: ITableType = { type, filter, pathname };
 
   return (
     <Container>

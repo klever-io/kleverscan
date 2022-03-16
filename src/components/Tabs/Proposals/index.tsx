@@ -2,13 +2,23 @@ import React from 'react';
 
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
-import { Proposer, Row } from './styles';
+import {
+  Proposer,
+  Row,
+  ProposalStatus,
+  ProposerDescAndLink,
+  UpVotes,
+  PercentIndicator,
+  StakedIndicator,
+} from './styles';
 
 import { getStatusIcon } from '@/assets/status';
 import { format, fromUnixTime } from 'date-fns';
 import { ProgressContent } from '@/views/proposals';
-import { PercentIndicator, StakedIndicator } from './styles';
 import Link from 'next/link';
+
+import { IProposal } from '@/types/index';
+import { parseAddress } from '@/utils/index';
 
 interface IProposalsProps {
   proposalParams: IProposals;
@@ -19,25 +29,6 @@ interface IProposals {
   [index: number]: IProposal;
 }
 
-interface IProposal {
-  proposalId: number;
-  proposalStatus: string;
-  parameter: string;
-  value: string;
-  description: string;
-  epochStart: number;
-  epochEnd: number;
-  votes: number;
-  voters: IVote[];
-  // hash: string;
-  // proposer: string;
-}
-
-interface IVote {
-  address: string;
-  amount: number;
-}
-
 const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
   const TableBody: React.FC<IProposal> = ({
     proposalId,
@@ -45,47 +36,51 @@ const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
     epochStart,
     epochEnd,
     proposalStatus,
+    proposer,
   }) => {
     const StatusIcon = getStatusIcon(proposalStatus);
 
     const stakedPercent = 50;
 
     return (
-      <Row type="proposals">
-        <span>
-          <p>#{proposalId}</p>
-        </span>
-        <span>
-          <p>{description}</p>
-          <Proposer>Proposer</Proposer>
-          <Link href=""></Link>
-        </span>
-        <span>
-          <small>
-            Start: {format(fromUnixTime(epochStart / 1000), 'MM/dd/yyyy HH:mm')}
-          </small>{' '}
-          <p />
-          <small>
-            End: {format(fromUnixTime(epochEnd / 1000), 'MM/dd/yyyy HH:mm')}
-          </small>
-        </span>
-        <span>
-          <p>2000000\123456789</p>
-          <ProgressContent>
-            <StakedIndicator percent={stakedPercent} />
-            <PercentIndicator percent={stakedPercent}>
-              {stakedPercent}%
-            </PercentIndicator>
-          </ProgressContent>
-        </span>
-        <Status status={proposalStatus}>
-          <StatusIcon />
-          <span>{proposalStatus}</span>
-        </Status>
-        <span>
-          <Link href={`/proposal/${proposalId}`}>Details</Link>
-        </span>
-      </Row>
+      <>
+        <Row type="proposals">
+          <span>
+            <p>#{proposalId}</p>
+          </span>
+          <ProposerDescAndLink>
+            <p>{description || ' - '}</p>
+            <Proposer>Proposer</Proposer>
+            <Link href="/">{parseAddress(proposer, 8)}</Link>
+          </ProposerDescAndLink>
+          <span>
+            <small>
+              Start:{' '}
+              {format(fromUnixTime(epochStart / 1000), 'MM/dd/yyyy HH:mm')}
+            </small>{' '}
+            <p />
+            <small className="endTime">
+              End: {format(fromUnixTime(epochEnd / 1000), 'MM/dd/yyyy HH:mm')}
+            </small>
+          </span>
+          <UpVotes>
+            <p>2000000\123456789</p>
+            <ProgressContent>
+              <StakedIndicator percent={stakedPercent} />
+              <PercentIndicator percent={stakedPercent}>
+                {stakedPercent}%
+              </PercentIndicator>
+            </ProgressContent>
+          </UpVotes>
+          <Status status={proposalStatus}>
+            <StatusIcon />
+            <ProposalStatus>{proposalStatus}</ProposalStatus>
+          </Status>
+          <span>
+            <Link href={`/proposal/${proposalId}`}>Details</Link>
+          </span>
+        </Row>
+      </>
     );
   };
 

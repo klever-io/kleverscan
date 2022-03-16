@@ -1,5 +1,8 @@
 import { ArrowLeft } from '@/assets/icons';
 import { Input } from '@/views/proposals';
+
+import Pagination from '@/components/Pagination';
+import { PaginationContainer } from '@/components/Pagination/styles';
 import Tabs, { ITabs } from '@/components/Tabs';
 
 import { Header, Title } from '@/views/accounts/detail';
@@ -7,16 +10,30 @@ import { Card } from '@/views/blocks';
 import { CardContainer } from '@/views/proposals';
 import router from 'next/router';
 import { Container } from '@/views/proposals';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import NetworkParams from '@/components/Tabs/NetworkParams';
 import ProposalsTab from '@/components/Tabs/Proposals';
 import { Proposals as Icon } from '@/assets/title-icons';
 import { GetServerSideProps } from 'next';
+import api from '@/services/api';
+import { useDidUpdateEffect } from '@/utils/hooks';
+
+import { IProposal, IProposalsResponse } from '@/types/index'
+
 
 interface IProposalsPage {
   networkParams: INetworkParam[];
   proposals: IProposal[];
   totalProposalsPage: number;
+}
+
+interface IProposalsMessages {
+  FeePerDataByte: string,
+  KAppFeeCreateAsset: string,
+  KAppFeeCreateValidator: string,
+  MaxEpochsUnclaimed: string,
+  MinSelfDelegatedAmount: string,
+  MinTotalDelegatedAmount: string,
 }
 
 interface INetworkParams {
@@ -33,25 +50,6 @@ interface IProposals {
   [index: number]: IProposal;
 }
 
-interface IProposal {
-  proposalId: number;
-  proposalStatus: string;
-  parameter: string;
-  value: string;
-  description: string;
-  epochStart: number;
-  epochEnd: number;
-  votes: number;
-  voters: IVote[];
-  // hash: string;
-  // proposer: string;
-}
-
-interface IVote {
-  address: string;
-  amount: number;
-}
-
 const Proposals: React.FC<IProposalsPage> = ({
   networkParams: defaultNetworkParams,
   proposals: defaultProposals,
@@ -61,9 +59,41 @@ const Proposals: React.FC<IProposalsPage> = ({
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
   const [loadingNetworkParams, setLoadingNetWorkParams] = useState(false);
   const [loadingProposals, setLoadingProposals] = useState(false);
+  const [page, setPage] = useState(0);
 
   const [networkParams, setNetworkParams] = useState(defaultNetworkParams);
   const [proposals, setProposals] = useState(defaultProposals);
+
+  const fetchData = async () => {
+    setLoadingProposals(true);
+
+    const proposals: IProposalsResponse = await api.get({route: `proposals/list'${page}`});
+  
+    if (!proposals.code) {
+      const mapProposals: IProposal[] = proposals.data.proposals.map(
+        (proposal: IProposal , index: number) => {
+          return {
+            proposalId: proposal.proposalId,
+            proposalStatus: proposal.proposalStatus,
+            parameter: proposal.parameter,
+            value: proposal.value,
+            description: proposal.description,
+            epochStart: proposal.epochStart,
+            epochEnd: proposal.epochEnd,
+            votes: proposal.voters[index].amount,
+            voters: proposal.voters,
+            proposer: proposal.proposer
+          };
+        },
+      );
+      setProposals(mapProposals);
+      setLoadingProposals(false);
+    }
+  };
+
+  useDidUpdateEffect(() => {
+    fetchData();
+  }, [page]);
 
   const CardContent: React.FC = () => {
     return (
@@ -101,6 +131,15 @@ const Proposals: React.FC<IProposalsPage> = ({
               proposalParams={proposals}
               loading={loadingProposals}
             />
+            <PaginationContainer>
+              <Pagination
+                count={totalProposalsPage}
+                page={page}
+                onPaginate={page => {
+                  setPage(page);
+                }}
+              />
+            </PaginationContainer>
           </>
         );
       default:
@@ -138,10 +177,29 @@ const Proposals: React.FC<IProposalsPage> = ({
 export const getServerSideProps: GetServerSideProps<IProposalsPage> = async ({
   params,
 }) => {
+  const { data: { parameters }} = await api.get({route: 'node/network-parameters'})
+  const proposalResponse = await api.get({route: 'proposals/list'})
+
+  const proposalsMessages: IProposalsMessages = {
+    FeePerDataByte: 'Proposal to modify Fee Per Data Byte',
+    KAppFeeCreateAsset: 'Proposal to modify KApp Fee to Create Asset',
+    KAppFeeCreateValidator: 'Proposal to modify KApp Fee to Create Validator',
+    MaxEpochsUnclaimed: 'Proposal to modify max Epochs Unclaimed',
+    MinSelfDelegatedAmount: 'Proposal to modify Min Self Delegated Amount',
+    MinTotalDelegatedAmount: 'Proposal to modify Min Total Delegated Amount',
+  }
+  const networkParams = Object.keys(parameters).map((key, index) => {
+    return {
+      number: index,
+      parameter: proposalsMessages[key],
+      currentValue: parameters[key].value
+    }
+  });
+  
   const props: IProposalsPage = {
-    networkParams: [],
-    proposals: [],
-    totalProposalsPage: 0,
+    networkParams,
+    proposals: proposalResponse.data?.proposals || [],
+    totalProposalsPage: proposalResponse.pagination.totalPages,
   };
 
   return { props };

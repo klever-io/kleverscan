@@ -47,7 +47,7 @@ export const Row = styled.div<ITableType>`
 
     small {
       color: ${props => props.theme.table.text};
-      font-size: 11px
+      font-size: 11px;
       display: flex;
       
     }
@@ -67,9 +67,10 @@ export const Row = styled.div<ITableType>`
       font-size: 14px;
       line-height: 24px;
     }
-   
-      
-  .
+  }
+  .endTime {
+      color: #F43942;
+    }
 `;
 
 const getStakedBGColor = (props: any, percent: number) => {
@@ -113,9 +114,19 @@ const getStakedTextColor = (props: any, percent: number) => {
 };
 
 export const Proposer = styled.p`
-   {
-    color: ${props => props.theme.table.text};
-    font-weight: 600;
-    font-size: 0.85rem;
-  }
+  color: ${props => props.theme.table.text} !important;
+  font-weight: 600;
+  font-size: 0.85rem;
+`;
+
+export const ProposalStatus = styled.span`
+  width: 18rem !important;
+`;
+
+export const ProposerDescAndLink = styled.span`
+  width: 23rem !important;
+`;
+
+export const UpVotes = styled.span`
+  width: 11.5rem !important;
 `;

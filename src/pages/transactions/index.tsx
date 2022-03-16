@@ -52,7 +52,7 @@ import {
   IValidatorConfigContract,
 } from '../../types';
 
-import { formatAmount } from '../../utils';
+import { formatAmount, parseAddress, capitalizeString } from '../../utils';
 
 import { ArrowRight, ArrowLeft } from '@/assets/icons';
 import { Transactions as Icon } from '@/assets/title-icons';
@@ -645,17 +645,17 @@ const Transactions: React.FC<ITransactions> = ({
           </small>
         </span>
         <Link href={`/account/${sender}`}>
-          <a className="address">{sender}</a>
+          <a className="address">{parseAddress(sender, 4)}</a>
         </Link>
         <span>
           <ArrowRight />
         </span>
         <Link href={`/account/${toAddress}`}>
-          <a className="address">{toAddress}</a>
+          <a className="address">{parseAddress(toAddress, 4)}</a>
         </Link>
         <Status status={status}>
           <StatusIcon />
-          <span>{status}</span>
+          <span>{capitalizeString(status)}</span>
         </Status>
         <span>
           <strong>{contractType}</strong>

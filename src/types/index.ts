@@ -469,7 +469,6 @@ export interface IValidator {
   totalProduced: number;
   totalMissed: number;
   canDelegate: boolean;
-  maxDelegation: number;
 }
 
 export interface IChainStatistics {
@@ -645,6 +644,30 @@ export interface IProposalDetails {
   hash: string;
 }
 
+export interface IProposal {
+  proposalId: number;
+  proposalStatus: string;
+  parameter: string;
+  value: string;
+  description: string;
+  epochStart: number;
+  epochEnd: number;
+  votes: number;
+  voters: IVote[];
+  // hash: string;
+  proposer: string;
+}
+
+export interface IVote {
+  address: string;
+  amount: number;
+}
+
+export interface IProposalsResponse extends IResponse {
+  data: {
+    proposals: IProposal[];
+  };
+}
 export interface ITotalFrozen {
   data: {
     totalFrozen: number;

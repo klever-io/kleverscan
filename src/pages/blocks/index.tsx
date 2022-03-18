@@ -27,6 +27,7 @@ import { ArrowLeft } from '@/assets/icons';
 import { Blocks as Icon } from '@/assets/title-icons';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
+import { useDidUpdateEffect } from '@/utils/hooks';
 
 interface IBlockStats {
   total_blocks: number;
@@ -74,7 +75,7 @@ const Blocks: React.FC<IBlocks> = ({
   const [blocks, setBlocks] = useState(defaultBlocks);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  useDidUpdateEffect(() => {
     const fetchData = async () => {
       setLoading(true);
 

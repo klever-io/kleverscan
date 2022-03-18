@@ -10,7 +10,7 @@ import { Card } from '@/views/blocks';
 import { CardContainer } from '@/views/proposals';
 import router from 'next/router';
 import { Container } from '@/views/proposals';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import NetworkParams from '@/components/Tabs/NetworkParams';
 import ProposalsTab from '@/components/Tabs/Proposals';
 import { Proposals as Icon } from '@/assets/title-icons';
@@ -18,8 +18,7 @@ import { GetServerSideProps } from 'next';
 import api from '@/services/api';
 import { useDidUpdateEffect } from '@/utils/hooks';
 
-import { IProposal, IProposalsResponse } from '@/types/index'
-
+import { IProposal, IProposalsResponse } from '@/types/index';
 
 interface IProposalsPage {
   networkParams: INetworkParam[];
@@ -28,12 +27,12 @@ interface IProposalsPage {
 }
 
 interface IProposalsMessages {
-  FeePerDataByte: string,
-  KAppFeeCreateAsset: string,
-  KAppFeeCreateValidator: string,
-  MaxEpochsUnclaimed: string,
-  MinSelfDelegatedAmount: string,
-  MinTotalDelegatedAmount: string,
+  FeePerDataByte: string;
+  KAppFeeCreateAsset: string;
+  KAppFeeCreateValidator: string;
+  MaxEpochsUnclaimed: string;
+  MinSelfDelegatedAmount: string;
+  MinTotalDelegatedAmount: string;
 }
 
 interface INetworkParams {
@@ -67,11 +66,13 @@ const Proposals: React.FC<IProposalsPage> = ({
   const fetchData = async () => {
     setLoadingProposals(true);
 
-    const proposals: IProposalsResponse = await api.get({route: `proposals/list'${page}`});
-  
+    const proposals: IProposalsResponse = await api.get({
+      route: `proposals/list'${page}`,
+    });
+
     if (!proposals.code) {
       const mapProposals: IProposal[] = proposals.data.proposals.map(
-        (proposal: IProposal , index: number) => {
+        (proposal: IProposal, index: number) => {
           return {
             proposalId: proposal.proposalId,
             proposalStatus: proposal.proposalStatus,
@@ -82,7 +83,7 @@ const Proposals: React.FC<IProposalsPage> = ({
             epochEnd: proposal.epochEnd,
             votes: proposal.voters[index].amount,
             voters: proposal.voters,
-            proposer: proposal.proposer
+            proposer: proposal.proposer,
           };
         },
       );
@@ -177,8 +178,10 @@ const Proposals: React.FC<IProposalsPage> = ({
 export const getServerSideProps: GetServerSideProps<IProposalsPage> = async ({
   params,
 }) => {
-  const { data: { parameters }} = await api.get({route: 'node/network-parameters'})
-  const proposalResponse = await api.get({route: 'proposals/list'})
+  const {
+    data: { parameters },
+  } = await api.get({ route: 'node/network-parameters' });
+  const proposalResponse = await api.get({ route: 'proposals/list' });
 
   const proposalsMessages: IProposalsMessages = {
     FeePerDataByte: 'Proposal to modify Fee Per Data Byte',
@@ -187,15 +190,15 @@ export const getServerSideProps: GetServerSideProps<IProposalsPage> = async ({
     MaxEpochsUnclaimed: 'Proposal to modify max Epochs Unclaimed',
     MinSelfDelegatedAmount: 'Proposal to modify Min Self Delegated Amount',
     MinTotalDelegatedAmount: 'Proposal to modify Min Total Delegated Amount',
-  }
+  };
   const networkParams = Object.keys(parameters).map((key, index) => {
     return {
       number: index,
       parameter: proposalsMessages[key],
-      currentValue: parameters[key].value
-    }
+      currentValue: parameters[key].value,
+    };
   });
-  
+
   const props: IProposalsPage = {
     networkParams,
     proposals: proposalResponse.data?.proposals || [],

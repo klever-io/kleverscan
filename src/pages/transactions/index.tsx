@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
@@ -65,6 +65,7 @@ import DateFilter, {
   IDateFilter,
   ISelectedDays,
 } from '@/components/DateFilter';
+import { useDidUpdateEffect } from '@/utils/hooks';
 
 interface ITransactions {
   transactions: ITransaction[];
@@ -191,12 +192,12 @@ const Transactions: React.FC<ITransactions> = ({
     setLoading(false);
   };
 
-  useEffect(() => {
+  useDidUpdateEffect(() => {
     if (page !== 0) setPage(0);
     else fetchData();
   }, [transactionType, statusType, coinType, dateFilter]);
 
-  useEffect(() => {
+  useDidUpdateEffect(() => {
     fetchData();
   }, [page]);
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
@@ -17,6 +17,7 @@ import { Assets as Icon } from '@/assets/title-icons';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
 import { LetterLogo, Logo } from '@/views/assets/index';
+import { useDidUpdateEffect } from '@/utils/hooks';
 
 interface IAssetPage {
   assets: IAsset[];
@@ -40,7 +41,7 @@ const Assets: React.FC<IAssetPage> = ({
   const [assets, setAssets] = useState(defaultAssets);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  useDidUpdateEffect(() => {
     const fetchData = async () => {
       setLoading(true);
 

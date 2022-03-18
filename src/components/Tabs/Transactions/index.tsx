@@ -15,7 +15,7 @@ import {
 
 import { ArrowRight } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
-import { formatAmount, parseAddress } from '@/utils/index';
+import { capitalizeString, formatAmount, parseAddress } from '@/utils/index';
 
 interface ITransactionsProps {
   transactions: ITransaction[];
@@ -67,7 +67,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
         </Link>
         <Status status={status}>
           <StatusIcon />
-          <span>{status}</span>
+          <span>{capitalizeString(status)}</span>
         </Status>
         <span>
           <strong>{contractType}</strong>

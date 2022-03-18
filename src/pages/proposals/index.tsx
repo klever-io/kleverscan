@@ -184,12 +184,12 @@ export const getServerSideProps: GetServerSideProps<IProposalsPage> = async ({
   const proposalResponse = await api.get({ route: 'proposals/list' });
 
   const proposalsMessages: IProposalsMessages = {
-    FeePerDataByte: 'Proposal to modify Fee Per Data Byte',
-    KAppFeeCreateAsset: 'Proposal to modify KApp Fee to Create Asset',
-    KAppFeeCreateValidator: 'Proposal to modify KApp Fee to Create Validator',
-    MaxEpochsUnclaimed: 'Proposal to modify max Epochs Unclaimed',
-    MinSelfDelegatedAmount: 'Proposal to modify Min Self Delegated Amount',
-    MinTotalDelegatedAmount: 'Proposal to modify Min Total Delegated Amount',
+    FeePerDataByte: 'Fee Per Data Byte',
+    KAppFeeCreateAsset: 'KApp Fee for Asset Creation',
+    KAppFeeCreateValidator: 'KApp Fee for Validator Creation',
+    MaxEpochsUnclaimed: 'Max Epochs to clear unclaimed',
+    MinSelfDelegatedAmount: 'Min Self Delegation Amount',
+    MinTotalDelegatedAmount: 'Min Total Delegation Amount',
   };
   const networkParams = Object.keys(parameters).map((key, index) => {
     return {

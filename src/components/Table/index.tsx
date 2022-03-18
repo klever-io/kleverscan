@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/router';
 import { IFilterItem } from '../Filter';
 import Skeleton from '../Skeleton';
 
@@ -48,7 +48,7 @@ const Table: React.FC<ITable> = ({
           <span key={String(index)}>{item}</span>
         ))}
       </Header>
-      <Body>
+      <Body {...props}>
         {loading && (
           <>
             {Array(10)

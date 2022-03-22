@@ -21,7 +21,12 @@ import { Row } from '@/components/Table/styles';
 
 import { IBlock, IPagination, IResponse } from '@/types/index';
 import api from '@/services/api';
-import { formatAmount, getAge, toLocaleFixed } from '@/utils/index';
+import {
+  formatAmount,
+  getAge,
+  parseAddress,
+  toLocaleFixed,
+} from '@/utils/index';
 
 import { ArrowLeft } from '@/assets/icons';
 import { Blocks as Icon } from '@/assets/title-icons';
@@ -182,6 +187,7 @@ const Blocks: React.FC<IBlocks> = ({
   const TableBody: React.FC<IBlock> = ({
     nonce,
     size,
+    producerName,
     timestamp,
     txCount,
     txFees,
@@ -195,7 +201,7 @@ const Blocks: React.FC<IBlocks> = ({
           <Link href={`/block/${nonce}`}>{String(nonce)}</Link>
         </span>
         <span>{size.toLocaleString()} Bytes</span>
-        <span>Klever.io</span>
+        <span>{parseAddress(producerName, 10)}</span>
         <span>
           <small>
             {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
@@ -316,7 +322,6 @@ export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
       total: totalStatistics.data.block_stats,
     };
   }
-
   return { props };
 };
 

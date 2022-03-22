@@ -51,7 +51,7 @@ const blocks = css`
   }
 
   &:nth-child(3) {
-    width: 7rem;
+    width: 12rem;
   }
 
   &:nth-child(4) {

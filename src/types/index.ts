@@ -340,6 +340,7 @@ export interface IBlock {
   txHashes: any[];
   softwareVersion: string;
   chainID: string;
+  producerName: string;
 }
 
 interface ItotalLeaderSuccessRate {

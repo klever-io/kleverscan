@@ -1,33 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 
 import dynamic from 'next/dynamic';
-import { fromUnixTime } from 'date-fns';
 
 import {
-  CardChartContainer,
-  CardDetails,
   ChartBody,
   ChartContainer,
   ChartHeader,
   MapContainer,
 } from '@/views/nodes';
 
-import { Card, CardContainer, Container, Header, Title } from '@/views/blocks';
+import { Container, Header, Title } from '@/views/blocks';
 
 import Chart, { ChartType } from '@/components/Chart';
 const Map = dynamic(() => import('@/components/Map/index'), { ssr: false });
-import MapSvg from '@/components/MapSvg';
+
 import NodeCards from '@/components/Cards/NodeCards';
 
 import { ICountriesGeoData, ICountryNode, INodeCard } from '../../types';
 
 import { ArrowLeft } from '@/assets/icons';
 import { Nodes as Icon } from '@/assets/title-icons';
-import { coinMockedData, IChartData } from '@/configs/home';
-import { getAge } from '@/utils/index';
+import { coinMockedData } from '@/configs/home';
+
 import { getCountryISO3, ISO2 } from '@/utils/country';
 import geoData from '@/assets/countries.geo.json';
 import api from '@/services/api';

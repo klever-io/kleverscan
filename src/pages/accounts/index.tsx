@@ -27,6 +27,7 @@ import { ArrowLeft } from '@/assets/icons';
 import { Accounts as Icon } from '@/assets/title-icons';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
+import { useDidUpdateEffect } from '@/utils/hooks';
 
 interface IAccounts {
   accounts: IAccount[];
@@ -68,7 +69,7 @@ const Accounts: React.FC<IAccounts> = ({
   const [accounts, setAccounts] = useState(defaultAccounts);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  useDidUpdateEffect(() => {
     const fetchData = async () => {
       setLoading(true);
 

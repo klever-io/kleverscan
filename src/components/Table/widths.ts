@@ -28,18 +28,13 @@ const transactions = css`
   }
 
   &:nth-child(7) {
-    width: 6rem;
-  }
-
-  &:nth-child(8) {
-    width: 5rem;
-  }
-
-  &:nth-child(9) {
     width: 7rem;
   }
 
-  &:nth-child(10) {
+  &:nth-child(8) {
+    width: 8rem;
+  }
+  &:nth-child(9) {
     width: 8rem;
   }
 `;
@@ -56,7 +51,7 @@ const blocks = css`
   }
 
   &:nth-child(3) {
-    width: 7rem;
+    width: 12rem;
   }
 
   &:nth-child(4) {

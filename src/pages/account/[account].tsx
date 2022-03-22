@@ -41,6 +41,7 @@ import Copy from '@/components/Copy';
 import api, { IPrice, Service } from '@/services/api';
 import { ISelectedDays } from '@/components/DateFilter';
 import Buckets from '@/components/Tabs/Buckets';
+import { useDidUpdateEffect } from '@/utils/hooks';
 
 interface IAccountPage {
   account: IAccount;
@@ -89,7 +90,7 @@ const Account: React.FC<IAccountPage> = ({
 
   const [buckets, setBuckets] = useState<IBucket[]>([]);
 
-  useEffect(() => {
+  useDidUpdateEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       const query = dateFilter.start

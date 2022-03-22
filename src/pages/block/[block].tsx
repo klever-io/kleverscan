@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
 
@@ -30,6 +30,7 @@ import api from '@/services/api';
 import { toLocaleFixed } from '@/utils/index';
 
 import { ArrowLeft } from '@/assets/icons';
+import { useDidUpdateEffect } from '@/utils/hooks';
 
 interface IBlockPage {
   block: IBlock;
@@ -87,7 +88,7 @@ const Block: React.FC<IBlockPage> = ({
   const [transactions, setTransactions] = useState(defaultTransactions);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  useDidUpdateEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       const response: ITransactionResponse = await api.get({

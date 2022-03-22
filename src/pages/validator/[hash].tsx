@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { IoIosInfinite } from 'react-icons/io';
 
@@ -45,10 +45,13 @@ import { ProgressContent } from '@/views/validators';
 import Table, { ITable } from '@/components/Table';
 import { TableContainer } from '@/views/validators/detail';
 import { formatAmount, parseAddress } from '@/utils/index';
+import { PaginationContainer } from '@/components/Pagination/styles';
+import Pagination from '@/components/Pagination';
 
 interface IValidatorPage {
   validator: IPeer;
   delegators: IBucket[];
+  pagination: IPagination;
 }
 
 interface IValidatorResponse extends IResponse {
@@ -67,7 +70,11 @@ interface IDelegateResponse extends IResponse {
   pagination: IPagination;
 }
 
-const Validator: React.FC<IValidatorPage> = ({ validator, delegators }) => {
+const Validator: React.FC<IValidatorPage> = ({
+  validator,
+  delegators: defaultDelegators,
+  pagination,
+}) => {
   const {
     blsPublicKey,
     ownerAddress,
@@ -83,6 +90,8 @@ const Validator: React.FC<IValidatorPage> = ({ validator, delegators }) => {
     uris,
   } = validator;
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(0);
+  const [delegators, setDelegators] = useState(defaultDelegators);
 
   const totalProduced =
     validator.totalLeaderSuccessRate.numSuccess +
@@ -151,6 +160,36 @@ const Validator: React.FC<IValidatorPage> = ({ validator, delegators }) => {
       </p>
     );
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+
+      const response: IDelegateResponse = await api.get({
+        route: `validator/delegated/${ownerAddress}?page=${page}`,
+      });
+
+      if (!response.error) {
+        const delegators: IBucket[] = [];
+        response?.data?.delegators.forEach(delegation => {
+          delegation.buckets.forEach(bucket => {
+            if (bucket.delegation === ownerAddress) {
+              delegators.push({
+                address: delegation.address,
+                ...bucket,
+              });
+            }
+          });
+        });
+
+        setDelegators(delegators);
+      }
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [page]);
 
   const stakedPercent =
     (maxDelegation <= 0 ? 100 : totalStake / maxDelegation) * 100;
@@ -337,10 +376,21 @@ const Validator: React.FC<IValidatorPage> = ({ validator, delegators }) => {
       <CardContainer>
         <Overview />
       </CardContainer>
+
       <TableContainer>
         <h3>List of delegations</h3>
         <Table {...tableProps} />
       </TableContainer>
+
+      <PaginationContainer>
+        <Pagination
+          count={pagination.totalPages}
+          page={page}
+          onPaginate={page => {
+            setPage(page);
+          }}
+        />
+      </PaginationContainer>
     </Container>
   );
 };
@@ -351,6 +401,7 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> = async ({
   const props: IValidatorPage = {
     validator: {} as IPeer,
     delegators: [],
+    pagination: {} as IPagination,
   };
 
   const address = String(hash);
@@ -358,7 +409,9 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> = async ({
   const validator: IValidatorResponse = await api.get({
     route: `validator/${address}`,
   });
-  props.validator = validator.data.validator;
+  if (!validator.error) {
+    props.validator = validator.data.validator;
+  }
 
   const delegations: IDelegateResponse = await api.get({
     route: `validator/delegated/${address}`,
@@ -376,7 +429,10 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> = async ({
     });
   });
 
-  props.delegators = delegators;
+  if (!delegations.error) {
+    props.pagination = delegations.pagination;
+    props.delegators = delegators;
+  }
 
   return { props };
 };

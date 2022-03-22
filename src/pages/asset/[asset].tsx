@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { useDidUpdateEffect } from '@/utils/hooks';
 
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
@@ -84,7 +85,7 @@ const Asset: React.FC<IAssetPage> = ({
     precision,
     maxSupply,
     initialSupply,
-    circulatingSupply
+    circulatingSupply,
   } = asset;
 
   const router = useRouter();
@@ -108,7 +109,7 @@ const Asset: React.FC<IAssetPage> = ({
   const [loadingTransactions, setLoadingTransactions] = useState(false);
   const [loadingHolders, setLoadingHolders] = useState(false);
 
-  useEffect(() => {
+  useDidUpdateEffect(() => {
     setLoadingTransactions(true);
     const fetchData = async () => {
       setLoadingTransactions(true);
@@ -139,7 +140,7 @@ const Asset: React.FC<IAssetPage> = ({
     fetchData();
   }, [transactionsPage, dateFilter]);
 
-  useEffect(() => {
+  useDidUpdateEffect(() => {
     setLoadingHolders(true);
     const fetchData = async () => {
       const response: IHoldersResponse = await api.get({

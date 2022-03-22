@@ -56,11 +56,12 @@ export const Header = styled.div<ITableType>`
   }
 
   @media (max-width: 768px) {
-    width: ${props => props.pathname === '/validators' ? '58rem': 'fit-content'};
+    width: ${props =>
+      props.pathname === '/validators' ? '58rem' : 'fit-content'};
   }
 `;
 
-export const Body = styled.div`
+export const Body = styled.div<ITableType>`
   display: flex;
 
   flex-direction: column;
@@ -68,7 +69,8 @@ export const Body = styled.div`
   gap: 0.75rem;
 
   @media (max-width: 768px) {
-    width: fit-content;
+    width: ${props =>
+      props.pathname === '/validators' ? '58rem' : 'fit-content'};
   }
 `;
 

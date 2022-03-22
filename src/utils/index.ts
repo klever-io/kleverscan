@@ -33,6 +33,10 @@ export const getAge = (date: Date): string => {
 };
 
 export const formatAmount = (number: number): string => {
+  if (number <= 0) {
+    return '0';
+  }
+
   const lookup = [
     { value: 1, symbol: '' },
     { value: 1e3, symbol: 'K' },
@@ -44,14 +48,15 @@ export const formatAmount = (number: number): string => {
   ];
 
   const regex = /\.0+$|(\.[0-9]*[1-9])0+$/;
-  const item = lookup
-    .slice()
-    .reverse()
-    .find(i => number >= i.value);
+  const item =
+    lookup
+      .slice()
+      .reverse()
+      .find(i => number >= i.value) || lookup[0];
 
-  return item
-    ? `${(number / item.value).toFixed(1).replace(regex, '$1')} ${item.symbol}`
-    : '0';
+  return `${(number / item.value).toFixed(2).replace(regex, '$1')} ${
+    item.symbol
+  }`;
 };
 
 export const toLocaleFixed = (value: number, precision: number): string => {

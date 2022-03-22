@@ -322,6 +322,7 @@ export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
       total: totalStatistics.data.block_stats,
     };
   }
+
   return { props };
 };
 

@@ -55,11 +55,11 @@ const navbarItems: INavbarItem[] = [
     pathTo: '/proposals',
     Icon: Proposal,
   },
-  // {
-  //   name: 'Charts',
-  //   pathTo: '/charts',
-  //   Icon: Graph,
-  // },
+  {
+    name: 'Charts',
+    pathTo: '/charts',
+    Icon: Graph,
+  },
 ];
 
 export { navbarItems };

@@ -57,13 +57,13 @@ const Transactions: React.FC<ITransactionsProps> = props => {
           </small>
         </span>
         <Link href={`/account/${sender}`}>
-          <a className="address">{parseAddress(sender, 4)}</a>
+          <a className="address">{parseAddress(sender, 12)}</a>
         </Link>
         <span>
           <ArrowRight />
         </span>
         <Link href={`/account/${toAddress}`}>
-          <a className="address">{parseAddress(toAddress, 4)}</a>
+          <a className="address">{parseAddress(toAddress, 12)}</a>
         </Link>
         <Status status={status}>
           <StatusIcon />

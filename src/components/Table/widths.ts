@@ -16,7 +16,7 @@ const transactions = css`
   }
 
   &:nth-child(4) {
-    width: 7rem;
+    width: 10rem;
   }
 
   &:nth-child(5) {
@@ -24,7 +24,7 @@ const transactions = css`
   }
 
   &:nth-child(6) {
-    width: 7rem;
+    width: 10rem;
   }
 
   &:nth-child(7) {
@@ -115,7 +115,7 @@ const assetsPage = css`
   }
 
   &:nth-child(4) {
-    width: 7rem;
+    width: 16rem;
   }
 
   &:nth-child(5) {
@@ -173,7 +173,7 @@ const buckets = css`
     width: 5rem;
   }
   &:nth-child(4) {
-    width: 20rem;
+    width: 38rem;
   }
   &:nth-child(5) {
     width: 7rem;

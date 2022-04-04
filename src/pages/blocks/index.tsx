@@ -202,7 +202,7 @@ const Blocks: React.FC<IBlocks> = ({
           <Link href={`/block/${nonce}`}>{String(nonce)}</Link>
         </span>
         <span>{size.toLocaleString()} Bytes</span>
-        <span>{parseAddress(producerName, 10)}</span>
+        <span>{parseAddress(producerName, 14)}</span>
         <span>
           <small>
             {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}

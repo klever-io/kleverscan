@@ -37,7 +37,7 @@ const Buckets: React.FC<IBuckets> = ({ buckets }) => {
         </span>
         {delegation.length > 0 ? (
           <Link href={`/account/${delegation}`}>
-            {parseAddress(delegation, 8)}
+            {parseAddress(delegation, 25)}
           </Link>
         ) : (
           <span>--</span>

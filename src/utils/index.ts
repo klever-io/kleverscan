@@ -89,9 +89,9 @@ export const parseHardCodedInfo = (assets: IAsset[]): IAsset[] => {
   });
 };
 
-export const parseAddress = (address: string, num: number): string => {
-  return address.length > num
-    ? `${address.slice(0, num)}...${address.slice(-num)}`
+export const parseAddress = (address: string, maxLen: number): string => {
+  return address.length > maxLen
+    ? `${address.slice(0, maxLen / 2)}...${address.slice(-(maxLen / 2))}`
     : address;
 };
 

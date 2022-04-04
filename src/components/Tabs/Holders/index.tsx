@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Table, { ITable } from '@/components/Table';
 import { Row } from '@/components/Table/styles';
 import { IAccountAsset, IAsset } from '@/types/index';
-import { toLocaleFixed } from '@/utils/index';
+import { parseAddress, toLocaleFixed } from '@/utils/index';
 import { RankingContainer } from './styles';
 
 interface IHolder {
@@ -45,7 +45,7 @@ const Holders: React.FC<IHolder> = ({ holders, asset, loading }) => {
           </RankingContainer>
         </span>
         <span>
-          <Link href={`/account/${address}`}>{address}</Link>
+          <Link href={`/account/${address}`}>{parseAddress(address, 40)}</Link>
         </span>
         <span>
           <strong>

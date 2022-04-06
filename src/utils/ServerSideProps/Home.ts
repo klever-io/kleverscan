@@ -7,7 +7,10 @@ import {
   IYesterdayResponse,
   IGeckoChartResponse,
   ITransactionResponse,
+  IParsedMetrics,
 } from '../../types';
+
+import { getEpochInfo } from '@/utils/index';
 
 import api, { Service } from '@/services/api';
 import { GetServerSideProps } from 'next';
@@ -19,7 +22,13 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     transactionsList: [],
     totalAccounts: 0,
     totalTransactions: 0,
-    tps: '0/0',
+    epochInfo: {
+      currentSlot: 0,
+      epochFinishSlot: 0,
+      epochLoadPercent: 0,
+      remainingTime: '0 seconds',
+    },
+    tps: '0 / 0',
     coinsData: [],
     yesterdayTransactions: 0,
     yesterdayAccounts: 0,
@@ -61,6 +70,15 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     resolve(
       api.getCached({
         route: 'node/statistics',
+        service: Service.NODE,
+      }),
+    ),
+  );
+
+  const metricsCall = new Promise<any>(resolve =>
+    resolve(
+      api.text({
+        route: 'node/metrics',
         service: Service.NODE,
       }),
     ),
@@ -144,6 +162,7 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     transactionsList,
     accounts,
     statistics,
+    metrics,
     klvData,
     klvChart,
     kfiData,
@@ -155,6 +174,7 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     transactionsListCall,
     accountsCall,
     statisticsCall,
+    metricsCall,
     klvDataCall,
     klvChartCall,
     kfiDataCall,
@@ -182,8 +202,22 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
   if (!statistics.error) {
     const chainStatistics = statistics.data.statistics.chainStatistics;
 
-    props.tps = `${chainStatistics.liveTPS}/${chainStatistics.peakTPS}`;
+    props.tps = `${chainStatistics.liveTPS} / ${chainStatistics.peakTPS}`;
   }
+
+  if (!metrics.error) {
+    const parsedMetrics = {} as IParsedMetrics;
+
+    const metricLines = metrics?.split('\n');
+    metricLines?.forEach((line: any) => {
+      const props = line?.split(' ');
+
+      parsedMetrics[props[0]?.split('{')?.[0]] = parseInt(props?.[1]);
+    });
+
+    props.epochInfo = getEpochInfo(parsedMetrics);
+  }
+
   pushCoinData('Klever', 'KLV', klvData, klvChart);
   // Currently hardcoded marketcap
   kfiData.market_data.market_cap.usd =

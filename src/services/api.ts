@@ -153,6 +153,31 @@ const withBody = async (props: IProps, method: Method): Promise<any> => {
   }
 };
 
+const withText = async (props: IProps, method: Method): Promise<any> => {
+  try {
+    const { route, query, service, apiVersion } = getProps(props);
+
+    const response = await fetch(getHost(route, query, service, apiVersion), {
+      method: method.toString(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      return Promise.resolve({
+        data: null,
+        error: response.statusText,
+        code: 'internal_error',
+      });
+    }
+
+    return response.text();
+  } catch (error) {
+    return Promise.resolve({ data: null, error, code: 'internal_error' });
+  }
+};
+
 const withTimeout = async (promise: Promise<any>, timeout = 5000) => {
   return Promise.race([
     promise,
@@ -199,6 +224,8 @@ const api = {
     withTimeout(withoutBody(props, Method.GET)),
   post: async (props: IProps): Promise<any> =>
     withTimeout(withBody(props, Method.POST)),
+  text: async (props: IProps): Promise<any> =>
+    withTimeout(withText(props, Method.GET)),
   getCached,
 };
 

@@ -116,16 +116,19 @@ export const DataCardsContainer = styled.div`
   display: flex;
 
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
 
   gap: 1rem;
 
   @media (max-width: 768px) {
     flex-direction: column;
   }
+  &:nth-child(2) {
+    margin-top: 4rem;
+  }
 `;
 
-export const DataCardsContent = styled.div`
+export const DataCardsWrapper = styled.div`
   width: 100%;
 
   display: flex;
@@ -136,8 +139,37 @@ export const DataCardsContent = styled.div`
   gap: 0.5rem;
 `;
 
+export const DataCardsContent = styled.div`
+  width: 100%;
+
+  display: flex;
+
+  flex-direction: row;
+  justify-content: center;
+
+  gap: 0.5rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
 export const DataCard = styled.div`
-  padding: 1.5rem;
+  padding: 1.2rem;
+
+  width: 100%;
+
+  display: flex;
+
+  flex-direction: row;
+  align-items: center;
+
+  background-color: ${props => props.theme.card.background};
+  border-radius: 1rem;
+`;
+
+export const EpochCard = styled.div`
+  padding: 1.2rem;
 
   width: 100%;
 
@@ -455,10 +487,10 @@ export const TransactionChartContent = styled.div`
   position: absolute;
 
   bottom: 0;
-  left: 1.2rem;
-  right: 1rem;
+  left: 1.5rem;
+  right: 2rem;
 
-  width: 95%;
+  width: 92%;
   height: 80%;
 `;
 

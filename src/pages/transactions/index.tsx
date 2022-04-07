@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import { format, fromUnixTime } from 'date-fns';
 
 import {
@@ -86,6 +86,15 @@ interface IAssetResponse extends IResponse {
   };
 }
 
+interface IRouterQuery {
+  type?: string;
+  status?: string;
+  asset?: string;
+  page?: number;
+  startdate?: string;
+  enddate?: string;
+}
+
 const Transactions: React.FC<ITransactions> = ({
   transactions: defaultTransactions,
   pagination,
@@ -103,11 +112,26 @@ const Transactions: React.FC<ITransactions> = ({
     start: '',
     end: '',
   });
-
+  
   const [transactionType, setTransactionType] = useState(defaultFilter);
   const [statusType, setStatusType] = useState(defaultFilter);
   const [coinType, setCoinType] = useState(defaultFilter);
 
+  const formatFilterQuery = (type: string): IFilterItem | undefined => {
+    switch(type) {
+      case 'COIN':
+        if(!router.query.asset) return undefined;
+        return { name: String(router.query.asset), value: router.query.asset };
+      case 'TYPE':
+        if(!router.query.type) return undefined;
+        return contracts.find(({value}) => value === router.query.type);
+      case 'STATUS':
+        if(!router.query.status) return undefined;
+        return status.find(({value}) => value === router.query.status)
+      default:
+        break;
+    }
+  };
   const filters: IFilter[] = [
     {
       title: 'Coin',
@@ -115,6 +139,7 @@ const Transactions: React.FC<ITransactions> = ({
         name: asset.assetId,
         value: asset.assetId,
       })),
+      filterQuery: formatFilterQuery('COIN'),
       onClick: selected => {
         if (coinType.value !== selected.value) {
           setCoinType(selected);
@@ -124,6 +149,7 @@ const Transactions: React.FC<ITransactions> = ({
     {
       title: 'Status',
       data: status,
+      filterQuery: formatFilterQuery('STATUS'),
       onClick: selected => {
         if (statusType.value !== selected.value) {
           setStatusType(selected);
@@ -133,6 +159,7 @@ const Transactions: React.FC<ITransactions> = ({
     {
       title: 'Contract',
       data: contracts,
+      filterQuery: formatFilterQuery('TYPE'),
       onClick: selected => {
         if (transactionType.value !== selected.value) {
           setTransactionType(selected);
@@ -162,7 +189,7 @@ const Transactions: React.FC<ITransactions> = ({
       { ref: statusType, key: 'status' },
       { ref: coinType, key: 'asset' },
     ];
-    let routerQuery = {};
+    let routerQuery: IRouterQuery = {};
     filters.forEach(filter => {
       if (filter.ref.value !== 'all') {
         routerQuery = { ...routerQuery, [filter.key]: filter.ref.value };
@@ -189,6 +216,9 @@ const Transactions: React.FC<ITransactions> = ({
       setCount(response.pagination.totalPages);
     }
 
+    const query = {...routerQuery};
+    delete query.page;
+    await Router.push({pathname: router.pathname, query});
     setLoading(false);
   };
 
@@ -742,7 +772,7 @@ const Transactions: React.FC<ITransactions> = ({
 };
 
 export const getServerSideProps: GetServerSideProps<ITransactions> =
-  async () => {
+  async (context) => {
     const props: ITransactions = {
       transactions: [],
       pagination: {} as IPagination,
@@ -751,6 +781,7 @@ export const getServerSideProps: GetServerSideProps<ITransactions> =
 
     const transactions: ITransactionResponse = await api.get({
       route: 'transaction/list',
+      query: context.query,
     });
     if (!transactions.error) {
       props.transactions = transactions.data.transactions;

@@ -14,11 +14,35 @@ import {
 import { IChartData } from '../../../configs/home';
 import { Theme } from '../../../styles/styles';
 
+import { TooltipContainer } from './styles'
+
 interface IChart {
   data: IChartData[];
   theme: Theme;
   value?: string;
   value2?: string;
+}
+
+interface ITooltipContent {
+  payload?: {
+    value: number;
+  }[],
+  label?: string;
+  active?: boolean;
+}
+
+const CustomTooltip = ({ payload, label, active }: ITooltipContent) => {
+  if (active && payload && payload.length) {
+    return (
+      <TooltipContainer>
+        <p>{`${label}`}</p>
+        <p>{`Burned: ${payload[0].value}`}</p>
+        <p>{`Minted: ${payload[1].value}`}</p>
+      </TooltipContainer>
+    );
+  }
+
+  return null;
 }
 
 const Chart: React.FC<IChart> = ({ data, theme, value, value2 }) => {
@@ -53,7 +77,7 @@ const Chart: React.FC<IChart> = ({ data, theme, value, value2 }) => {
           stroke={theme.chart.linear.fill}
         />
         <Legend />
-        <Tooltip />
+        <Tooltip content={<CustomTooltip />}/>
       </LineChart>
     </ResponsiveContainer>
   );

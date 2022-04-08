@@ -485,7 +485,7 @@ export const TransactionChart = styled(TransactionContent)`
 
 export const TransactionChartContent = styled.div`
   position: absolute;
-
+  overflow:hidden;
   bottom: 0;
   left: 1.5rem;
   right: 2rem;

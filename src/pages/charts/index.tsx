@@ -74,7 +74,6 @@ const Charts: React.FC<ICharts> = ({ statistics }) => {
                 value="burned"
                 value2="minted"
               />
-              x
             </TransactionChartContent>
           </TransactionChart>
 

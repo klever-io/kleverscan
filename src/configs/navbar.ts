@@ -13,6 +13,7 @@ export interface INavbarItem {
   pathTo: string;
   Icon: any;
   onClick?(): void;
+  pages?: INavbarItem[]
 }
 
 export const heightLimit = 70; // pixels
@@ -20,11 +21,6 @@ export const navbarHeight = 5; // rem
 export const navbarPadding = '1rem 17.5rem';
 
 const navbarItems: INavbarItem[] = [
-  {
-    name: 'Nodes',
-    pathTo: '/nodes',
-    Icon: Compass,
-  },
   {
     name: 'Blocks',
     pathTo: '/blocks',
@@ -51,14 +47,26 @@ const navbarItems: INavbarItem[] = [
     Icon: TickSquare,
   },
   {
-    name: 'Proposals',
-    pathTo: '/proposals',
-    Icon: Proposal,
-  },
-  {
-    name: 'Charts',
-    pathTo: '/charts',
+    name: 'More',
+    pathTo: '',
     Icon: Graph,
+    pages: [
+      {
+        name: 'Nodes',
+        pathTo: '/nodes',
+        Icon: Compass,
+      },
+      {
+        name: 'Proposals',
+        pathTo: '/proposals',
+        Icon: Proposal,
+      },
+      {
+        name: 'Charts',
+        pathTo: '/charts',
+        Icon: Graph,
+      },
+    ],
   },
 ];
 

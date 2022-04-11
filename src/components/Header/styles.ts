@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components';
 
 import { FiMenu } from 'react-icons/fi';
+import { MdArrowDropDown } from 'react-icons/md';
 
 import { default as DefaultInput } from '../Inputt';
 import { transparentize } from 'polished';
@@ -63,6 +64,12 @@ export const Item = styled.div<{ selected: boolean }>`
     color: ${props => props.theme.navbar.text};
     font-weight: 600;
   }
+
+  &:hover > div {
+    display: flex;
+    flex-direction: column;
+  }
+
 `;
 
 export const MobileItem = styled(Item)`
@@ -125,6 +132,11 @@ export const MobileContent = styled.div<IMobileMenu>`
   background-color: ${props => props.theme.navbar.background};
 
   transition: 0.5s ease;
+
+  ul > li {
+    display: flex;
+    justify-content: flex-end;
+  }
 `;
 
 export const MobileBackground = styled.div<IMobileMenu>`
@@ -149,6 +161,43 @@ export const MobileBackground = styled.div<IMobileMenu>`
     display: none;
   }
 `;
+
+export const DropdownMenu = styled.ul`
+  width: max-content;
+  background-color: ${props => props.theme.navbar.background};  
+  color: ${props => props.theme.navbar.text};
+  border-radius: 10px;
+  gap: 0.5rem;
+
+  @media (max-width: 1024px) {
+    background-color: ${props => transparentize(0.7, props.theme.black)};
+  }
+`;
+
+export const DropdownItem = styled.li`
+  display: flex;
+  gap: 0.5rem;
+  list-style: none;
+  &:hover {
+    filter: brightness(1.5);
+  };
+  padding: 1rem 0.7rem;
+`;
+
+export const DropdownIcon = styled(MdArrowDropDown)`
+  font-size: 1.4rem;
+`
+export const DropdownContainer = styled.div`
+  display: none;
+  padding: 1rem;
+  position: absolute;
+  top: 1rem;
+  left: -1rem;
+
+  @media (max-width: 1024px) {
+  left: 0.4rem;
+  }
+`
 
 export const MenuIcon = styled(FiMenu).attrs(props => ({
   color: props.theme.navbar.text,

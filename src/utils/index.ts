@@ -4,6 +4,11 @@ export const breakText = (text: string, limit: number): string => {
   return text.length > limit ? `${text.substring(0, limit)}...` : text;
 };
 
+export const timestampToDate = (timestamp: number) => {
+  const time = new Date(timestamp);
+  return time.toISOString().slice(0, 10);
+};
+
 export const getAge = (date: Date): string => {
   const diff = Math.abs(new Date().getTime() - date.getTime());
 

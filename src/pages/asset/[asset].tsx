@@ -28,7 +28,13 @@ import {
   ITransaction,
   IAccountAsset,
 } from '@/types/index';
-import { parseHardCodedInfo, toLocaleFixed } from '@/utils/index';
+
+import {
+  parseHardCodedInfo,
+  toLocaleFixed,
+  breakText,
+  timestampToDate
+} from '@/utils/index';
 
 import { ArrowLeft } from '@/assets/icons';
 import Tabs, { ITabs } from '@/components/Tabs';
@@ -79,8 +85,10 @@ const Asset: React.FC<IAssetPage> = ({
 }) => {
   const {
     name,
+    uris,
     assetId,
     assetType,
+    issueDate,
     ownerAddress,
     precision,
     maxSupply,
@@ -163,6 +171,30 @@ const Asset: React.FC<IAssetPage> = ({
     return <LetterLogo>{asset.ticker.split('')[0]}</LetterLogo>;
   };
 
+  const getWhitepaper = () => {
+    if (!uris || !uris.Whitepaper) {
+      return <>--</>;
+    }
+
+    return <a href="#">{breakText(uris.Whitepaper, 25)}</a>;
+  }
+
+  const getWebsite = () => {
+    if (!uris || !uris.Website) {
+      return <>--</>;
+    }
+
+    return <a href="#">{uris.Website}</a>;
+  }
+
+  const getIssueDate = () => {
+    if (issueDate) {
+      return timestampToDate(issueDate);
+    }
+
+    return '--';
+  }
+
   const Overview: React.FC = () => {
     return (
       <>
@@ -233,37 +265,31 @@ const Asset: React.FC<IAssetPage> = ({
           <span>
             <strong>White Papper</strong>
           </span>
-          <span>
-            <a href="#">--</a>
-          </span>
+          <span>{getWhitepaper()}</span>
         </Row>
         <Row>
           <span>
             <strong>Official Website</strong>
           </span>
-          <span>
-            <a href="#">--</a>
-          </span>
+          <span>{getWebsite()}</span>
         </Row>
         <Row>
           <span>
             <strong>Issuing Time</strong>
           </span>
-          <span>--</span>
+          <span>{getIssueDate()}</span>
         </Row>
         <Row>
           <span>
             <strong>Issuer</strong>
           </span>
-          <span>--</span>
+          <span>{ownerAddress ? ownerAddress : '--'}</span>
         </Row>
         <Row>
           <span>
             <strong>Precision</strong>
           </span>
-          <span>
-            <p>{precision}</p>
-          </span>
+          <span>{precision}</span>
         </Row>
       </>
     );

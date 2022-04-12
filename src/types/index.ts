@@ -423,7 +423,9 @@ export interface IAsset {
   maxSupply: number;
   royalties: number;
   mintedValue: number;
+  issueDate: number;
 }
+
 export interface IContract {
   sender: string;
   type: Contract;

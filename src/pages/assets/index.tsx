@@ -79,7 +79,7 @@ const Assets: React.FC<IAssetPage> = ({
   }) => {
     return (
       <Row type="assetsPage">
-        <span>{renderLogo(logo, ticker, name)}</span>
+        <div>{renderLogo(logo, ticker, name)}</div>
 
         <span>
           <p>{ticker}</p>

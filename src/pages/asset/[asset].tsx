@@ -378,7 +378,7 @@ const Asset: React.FC<IAssetPage> = ({
     <Container>
       <Header>
         <Title>
-          <div onClick={router.back}>
+          <div onClick={() => router.push('/assets')}>
             <ArrowLeft />
           </div>
           {renderLogo()}

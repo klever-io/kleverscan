@@ -239,7 +239,7 @@ const Blocks: React.FC<IBlocks> = ({
     <Container>
       <Header>
         <Title>
-          <div onClick={router.back}>
+          <div onClick={() => router.push('/')}>
             <ArrowLeft />
           </div>
           <h1>Blocks</h1>

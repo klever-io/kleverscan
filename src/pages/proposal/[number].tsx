@@ -107,7 +107,7 @@ const ProposalDetails: React.FC<IProposalPage> = ({
       <Container>
         <Header>
           <Title>
-            <div onClick={router.back}>
+            <div onClick={() => router.push('/proposals')}>
               <ArrowLeft />
             </div>
             <h1>Proposal Details</h1>

@@ -41,6 +41,7 @@ interface IAccountResponse extends IResponse {
   };
   pagination: IPagination;
 }
+
 interface IAccountRangeOfLastDays extends IResponse {
   data: {
     number_by_day: [
@@ -184,7 +185,7 @@ const Accounts: React.FC<IAccounts> = ({
     <Container>
       <Header>
         <Title>
-          <div onClick={router.back}>
+          <div onClick={() => router.push('/')}>
             <ArrowLeft />
           </div>
           <h1>Accounts</h1>

@@ -355,7 +355,7 @@ const Validator: React.FC<IValidatorPage> = ({
     <Container>
       <Header>
         <Title>
-          <div onClick={router.back}>
+          <div onClick={() => router.push('/')}>
             <ArrowLeft />
           </div>
 

@@ -201,7 +201,7 @@ const Transaction: React.FC<ITransactionPage> = tx => {
     <Container>
       <Header>
         <Title>
-          <div onClick={router.back}>
+          <div onClick={() => router.push('/transactions')}>
             <ArrowLeft />
           </div>
           <h1>Transaction Details</h1>

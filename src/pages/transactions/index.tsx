@@ -741,7 +741,7 @@ const Transactions: React.FC<ITransactions> = ({
   return (
     <Container>
       <Title>
-        <div onClick={router.back}>
+        <div onClick={() => router.push('/')}>
           <ArrowLeft />
         </div>
         <h1>Transactions</h1>

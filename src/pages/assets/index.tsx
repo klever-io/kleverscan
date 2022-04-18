@@ -137,7 +137,7 @@ const Assets: React.FC<IAssetPage> = ({
     <Container>
       <Header>
         <Title>
-          <div onClick={router.back}>
+          <div onClick={() => router.push('/')}>
             <ArrowLeft />
           </div>
           <h1>Assets</h1>

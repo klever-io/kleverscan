@@ -320,7 +320,7 @@ const Block: React.FC<IBlockPage> = ({
     <Container>
       <Header>
         <Title>
-          <div onClick={router.back}>
+          <div onClick={() => router.push('/blocks')}>
             <ArrowLeft />
           </div>
 

@@ -79,7 +79,7 @@ const Nodes: React.FC<INodePage> = ({ nodes, cardData }) => {
     <Container>
       <Header>
         <Title>
-          <div onClick={router.back}>
+          <div onClick={() => router.push('/')}>
             <ArrowLeft />
           </div>
           <h1>Nodes</h1>

@@ -235,7 +235,7 @@ const Account: React.FC<IAccountPage> = ({
     <Container>
       <Header>
         <Title>
-          <div onClick={router.back}>
+          <div onClick={() => router.push('/accounts')}>
             <ArrowLeft />
           </div>
           <h1>Account</h1>

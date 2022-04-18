@@ -54,7 +54,7 @@ const Charts: React.FC<ICharts> = ({ statistics }) => {
     <Container>
       <Header>
         <Title>
-          <div onClick={router.back}>
+          <div onClick={() => router.push('/')}>
             <ArrowLeft />
           </div>
           <h1>Charts</h1>

@@ -95,10 +95,11 @@ const Accounts: React.FC<IAccounts> = ({
         createdYesterday === pagination.totalRecords
           ? '--'
           : createdYesterday.toLocaleString(),
-        pagination.totalRecords.toLocaleString(),
+        pagination.totalRecords?.toLocaleString(),
       ],
     },
   ];
+
   const CardContent: React.FC<ICard> = ({ title, headers, values }) => {
     const [uptime] = useState(new Date().getTime());
     const [age, setAge] = useState(

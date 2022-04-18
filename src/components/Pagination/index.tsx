@@ -27,7 +27,7 @@ const Pagination: React.FC<IPagination> = ({ count, page, onPaginate }) => {
   const nextProps = {
     active: page < count - 1,
     onClick: () => {
-      if (page < count) {
+      if (page + 1 < count) {
         onPaginate(page + 1);
       }
     },

@@ -48,6 +48,7 @@ import {
   Unfreeze,
   Withdraw,
   Delegate,
+  Undelegate,
   Claim,
   Unjail,
   AssetTrigger,
@@ -159,10 +160,11 @@ const Transaction: React.FC<ITransactionPage> = tx => {
       case Contract.Freeze:
         return <Freeze {...parsedContract} receipts={receipts} />;
       case Contract.Unfreeze:
+        return <Unfreeze {...parsedContract} receipts={receipts} />;
       case Contract.Delegate:
         return <Delegate {...parsedContract} receipts={receipts} />;
       case Contract.Undelegate:
-        return <Unfreeze {...parsedContract} receipts={receipts} />;
+        return <Undelegate {...parsedContract} receipts={receipts} />;
       case Contract.Withdraw:
         return <Withdraw {...parsedContract} receipts={receipts} />;
       case Contract.Claim:

@@ -35,6 +35,9 @@ const Buckets: React.FC<IBuckets> = ({ buckets }) => {
         <span>
           {unstakedEpoch === UINT32_MAX ? '--' : unstakedEpoch.toLocaleString()}
         </span>
+        <span>
+          {unstakedEpoch + 2}
+        </span>
         {delegation.length > 0 ? (
           <Link href={`/account/${delegation}`}>
             {parseAddress(delegation, 25)}
@@ -52,6 +55,7 @@ const Buckets: React.FC<IBuckets> = ({ buckets }) => {
     'Staked Epoch',
     'Bucket Id',
     'Unstaked Epoch',
+    'Withdraw Time',
     'Delegation',
   ];
 

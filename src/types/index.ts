@@ -288,7 +288,7 @@ export interface IFreezeReceipt {
 }
 
 export interface IUnfreezeReceipt {
-  availableWithdrawEpoch: number;
+  availableEpoch: number;
 }
 
 export type IReceipt = ICreateAssetReceipt | IFreezeReceipt | IUnfreezeReceipt;

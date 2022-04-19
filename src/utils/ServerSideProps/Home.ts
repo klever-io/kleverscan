@@ -93,17 +93,17 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     props.coinsData.push({
       name,
       shortname,
-      price: response?.market_data?.current_price.usd,
-      variation: response?.market_data?.price_change_percentage_24h,
+      price: response?.market_data?.current_price.usd || 0,
+      variation: response?.market_data?.price_change_percentage_24h || 0,
       marketCap: {
-        price: response?.market_data?.market_cap.usd,
-        variation: response?.market_data?.market_cap_change_percentage_24h,
+        price: response?.market_data?.market_cap.usd || 0,
+        variation: response?.market_data?.market_cap_change_percentage_24h || 0,
       },
       volume: {
-        price: response?.market_data?.total_volume.usd,
+        price: response?.market_data?.total_volume.usd || 0,
         variation: 0,
       },
-      prices: chart.prices?.map(item => ({ value: item[1] })),
+      prices: chart.prices?.map(item => ({ value: item[1] })) || [],
     });
   };
 
@@ -220,8 +220,11 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
 
   pushCoinData('Klever', 'KLV', klvData, klvChart);
   // Currently hardcoded marketcap
-  kfiData.market_data.market_cap.usd =
-    150000 * kfiData.market_data.current_price.usd;
+
+  if (kfiData?.market_data?.market_cap) {
+    kfiData.market_data.market_cap.usd =
+      150000 * kfiData.market_data.current_price.usd;
+  }
   pushCoinData('Klever Finance', 'KFI', kfiData, kfiChart);
 
   if (!yesterdayTransactions.error) {

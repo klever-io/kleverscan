@@ -31,20 +31,20 @@ const Buckets: React.FC<IBuckets> = ({ buckets }) => {
         </span>
         <Status staked={true}>{'True'}</Status>
         <span>{stakedEpoch.toLocaleString()}</span>
-        <span>{id}</span>
+        <span>{parseAddress(id, 20)}</span>
         <span>
           {unstakedEpoch === UINT32_MAX ? '--' : unstakedEpoch.toLocaleString()}
         </span>
+        <span>{unstakedEpoch + 2}</span>
         <span>
-          {unstakedEpoch + 2}
+          {delegation.length > 0 ? (
+            <Link href={`/account/${delegation}`}>
+              {parseAddress(delegation, 22)}
+            </Link>
+          ) : (
+            <span>--</span>
+          )}
         </span>
-        {delegation.length > 0 ? (
-          <Link href={`/account/${delegation}`}>
-            {parseAddress(delegation, 25)}
-          </Link>
-        ) : (
-          <span>--</span>
-        )}
       </Row>
     );
   };

@@ -78,7 +78,7 @@ const Account: React.FC<IAccountPage> = ({
   transactions: transactionResponse,
   convertedBalance,
   precisions,
-  defaultKlvPrecision
+  defaultKlvPrecision,
 }) => {
   const router = useRouter();
 
@@ -156,6 +156,19 @@ const Account: React.FC<IAccountPage> = ({
     );
 
     return freezeBalance / 10 ** defaultKlvPrecision;
+  };
+
+  const getUnfreezeBalance = () => {
+    if (Object.values(account.assets).length <= 0) {
+      return 0;
+    }
+
+    const unfreezeBalance = Object.values(account.assets).reduce(
+      (acc, asset) => acc + asset.unfrozenBalance,
+      0,
+    );
+
+    return unfreezeBalance / 10 ** defaultKlvPrecision || 0;
   };
 
   const getTabHeaders = () => {
@@ -282,12 +295,19 @@ const Account: React.FC<IAccountPage> = ({
                 <div>
                   <strong>Available</strong>
                   <span>
-                    {(account.balance / 10 ** defaultKlvPrecision).toLocaleString()}
+                    {(
+                      account.balance /
+                      10 ** defaultKlvPrecision
+                    ).toLocaleString()}
                   </span>
                 </div>
                 <div>
                   <strong>Frozen</strong>
                   <span>{getFreezeBalance().toLocaleString()}</span>
+                </div>
+                <div>
+                  <strong>Unfrozen</strong>
+                  <span>{getUnfreezeBalance().toLocaleString()}</span>
                 </div>
               </FrozenContainer>
             </BalanceContainer>
@@ -335,8 +355,12 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
     route: 'assets/kassets',
   });
 
-  const filterPrecisions = precisions.data.assets.map(({assetId, precision}: IAssetInfo) => ({assetId, precision}));
-  const { precision } = filterPrecisions.find(({ assetId }: IAssetInfo) => assetId === 'KLV'); // KLV default precision from API
+  const filterPrecisions = precisions.data.assets.map(
+    ({ assetId, precision }: IAssetInfo) => ({ assetId, precision }),
+  );
+  const { precision } = filterPrecisions.find(
+    ({ assetId }: IAssetInfo) => assetId === 'KLV',
+  ); // KLV default precision from API
 
   const accountLength = 62;
   const redirectProps = { redirect: { destination: '/404', permanent: false } };

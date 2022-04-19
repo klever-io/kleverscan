@@ -83,12 +83,6 @@ export const hexToString = (hex: string): string => {
 
 export const parseHardCodedInfo = (assets: IAsset[]): IAsset[] => {
   return assets.map(asset => {
-    if (asset.assetId === 'KLV') {
-      asset.maxSupply = 10000000000000000;
-    } else if (asset.assetId === 'KFI') {
-      asset.maxSupply = 21000000000000;
-    }
-
     asset.assetId = encodeURIComponent(asset.assetId);
     return asset;
   });

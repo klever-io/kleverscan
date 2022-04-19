@@ -402,6 +402,7 @@ export interface IAccountAsset {
   assetId: string;
   balance: number;
   frozenBalance: number;
+  unfrozenBalance: number;
   lastClaim: {
     timestamp: number;
     epoch: number;

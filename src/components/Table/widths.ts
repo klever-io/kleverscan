@@ -103,15 +103,15 @@ const assetsPage = css`
   margin-right: 1.25rem;
 
   &:nth-child(1) {
-    width: 3.5rem;
+    width: 4rem;
   }
 
   &:nth-child(2) {
-    width: 5rem;
+    width: 4rem;
   }
 
   &:nth-child(3) {
-    width: 8rem;
+    width: 10rem;
   }
 
   &:nth-child(4) {
@@ -127,11 +127,11 @@ const assetsPage = css`
   }
 
   &:nth-child(7) {
-    width: 10rem;
+    width: 8 rem;
   }
 
   &:nth-child(8) {
-    width: 7rem;
+    width: 10rem;
   }
 `;
 
@@ -173,10 +173,16 @@ const buckets = css`
     width: 5rem;
   }
   &:nth-child(4) {
-    width: 38rem;
+    width: 16rem;
   }
   &:nth-child(5) {
-    width: 7rem;
+    width: 10rem;
+  }
+  &:nth-child(6) {
+    width: 10rem;
+  }
+  &:nth-child(7) {
+    width: 16rem;
   }
 `;
 
@@ -201,14 +207,34 @@ const holders = css`
 `;
 
 const validators = css`
-  margin-right: 1rem;
-  width: 30%;
+  margin-right: 1.25rem;
 
   &:nth-child(1) {
-    width: 10%;
+    width: 3rem;
   }
   &:nth-child(2) {
-    width: 60%;
+    width: 10rem;
+  }
+  &:nth-child(3) {
+    width: 6rem;
+  }
+  &:nth-child(4) {
+    width: 6rem;
+  }
+  &:nth-child(5) {
+    width: 10rem;
+  }
+  &:nth-child(6) {
+    width: 12rem;
+  }
+  &:nth-child(7) {
+    width: 8rem;
+  }
+  &:nth-child(8) {
+    width: 16rem;
+  }
+  &:nth-child(9) {
+    width: 1rem;
   }
 `;
 
@@ -267,13 +293,13 @@ const votes = css`
 const delegations = css`
   margin-right: 1.25rem;
   &:nth-child(1) {
-    width: 28rem;
+    width: 12rem;
   }
   &:nth-child(2) {
-    width: 38rem;
+    width: 40rem;
   }
   &:nth-child(3) {
-    width: 12rem;
+    width: 10rem;
   }
 `;
 

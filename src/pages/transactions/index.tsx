@@ -112,22 +112,22 @@ const Transactions: React.FC<ITransactions> = ({
     start: '',
     end: '',
   });
-  
+
   const [transactionType, setTransactionType] = useState(defaultFilter);
   const [statusType, setStatusType] = useState(defaultFilter);
   const [coinType, setCoinType] = useState(defaultFilter);
 
   const formatFilterQuery = (type: string): IFilterItem | undefined => {
-    switch(type) {
+    switch (type) {
       case 'COIN':
-        if(!router.query.asset) return undefined;
+        if (!router.query.asset) return undefined;
         return { name: String(router.query.asset), value: router.query.asset };
       case 'TYPE':
-        if(!router.query.type) return undefined;
-        return contracts.find(({value}) => value === router.query.type);
+        if (!router.query.type) return undefined;
+        return contracts.find(({ value }) => value === router.query.type);
       case 'STATUS':
-        if(!router.query.status) return undefined;
-        return status.find(({value}) => value === router.query.status)
+        if (!router.query.status) return undefined;
+        return status.find(({ value }) => value === router.query.status);
       default:
         break;
     }
@@ -216,9 +216,9 @@ const Transactions: React.FC<ITransactions> = ({
       setCount(response.pagination.totalPages);
     }
 
-    const query = {...routerQuery};
+    const query = { ...routerQuery };
     delete query.page;
-    await Router.push({pathname: router.pathname, query});
+    await Router.push({ pathname: router.pathname, query });
     setLoading(false);
   };
 
@@ -676,13 +676,13 @@ const Transactions: React.FC<ITransactions> = ({
           </small>
         </span>
         <Link href={`/account/${sender}`}>
-          <a className="address">{parseAddress(sender, 4)}</a>
+          <a className="address">{parseAddress(sender, 16)}</a>
         </Link>
         <span>
           <ArrowRight />
         </span>
         <Link href={`/account/${toAddress}`}>
-          <a className="address">{parseAddress(toAddress, 4)}</a>
+          <a className="address">{parseAddress(toAddress, 16)}</a>
         </Link>
         <Status status={status}>
           <StatusIcon />
@@ -772,7 +772,7 @@ const Transactions: React.FC<ITransactions> = ({
 };
 
 export const getServerSideProps: GetServerSideProps<ITransactions> =
-  async (context) => {
+  async context => {
     const props: ITransactions = {
       transactions: [],
       pagination: {} as IPagination,

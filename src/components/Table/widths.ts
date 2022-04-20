@@ -173,7 +173,7 @@ const buckets = css`
     width: 5rem;
   }
   &:nth-child(4) {
-    width: 16rem;
+    width: 20rem;
   }
   &:nth-child(5) {
     width: 10rem;

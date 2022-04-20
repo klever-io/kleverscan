@@ -8,6 +8,9 @@ import { Row } from '@/components/Table/styles';
 import { IBucket } from '@/types/index';
 import Link from 'next/link';
 import { parseAddress } from '@/utils/index';
+import Copy from '@/components/Copy';
+
+import { CenteredRow, RowContent } from '@/views/accounts/detail';
 
 interface IBuckets {
   [key: string]: IBucket[];
@@ -31,7 +34,12 @@ const Buckets: React.FC<IBuckets> = ({ buckets }) => {
         </span>
         <Status staked={true}>{'True'}</Status>
         <span>{stakedEpoch.toLocaleString()}</span>
-        <span>{parseAddress(id, 20)}</span>
+        <RowContent>
+          <CenteredRow className="bucketIdCopy">
+            <span>{id}</span>
+            <Copy info="BucketId" data={id} />
+          </CenteredRow>
+        </RowContent>
         <span>
           {unstakedEpoch === UINT32_MAX ? '--' : unstakedEpoch.toLocaleString()}
         </span>

@@ -99,6 +99,22 @@ export default class MyDocument extends Document {
             property="twitter:image:src"
             content="%PUBLIC_URL%/social-logo.png"
           />
+
+          <script
+            async
+            src="https://www.googletagmanager.com/gtag/js?id=G-ZB4W5DJX19"
+          />
+
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-ZB4W5DJX19', { page_path: window.location.pathname });
+            `,
+            }}
+          />
         </Head>
         <body>
           <Main />

@@ -38,6 +38,12 @@ export const IconContainer = styled.div`
   padding-right: 1rem;
 `;
 
+export const ProgressContainerSpan = styled.span`
+  @media (max-width: 590px) {
+    display: none;
+  }
+`;
+
 export const Section = styled.section`
   padding: 5rem 10rem 0 10rem;
 
@@ -105,7 +111,7 @@ export const Input = styled(DefaultInput)`
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1600px) {
     margin: 0;
   }
 `;
@@ -120,7 +126,7 @@ export const DataCardsContainer = styled.div`
 
   gap: 1rem;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1600px) {
     flex-direction: column;
   }
   &:nth-child(2) {
@@ -149,7 +155,7 @@ export const DataCardsContent = styled.div`
 
   gap: 0.5rem;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1600px) {
     flex-direction: column;
   }
 `;

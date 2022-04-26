@@ -19,6 +19,7 @@ import {
   DataCardsContent,
   DataCardValue,
   IconContainer,
+  ProgressContainerSpan,
 } from '@/views/home';
 import { getEpochInfo } from '@/utils/index';
 
@@ -201,7 +202,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
           {dataCards.map(({ Icon, title, value, variation }, index) => (
             <DataCard key={String(index)}>
               <IconContainer>
-                <Icon />
+                <Icon viewBox="0 0 70 70" />
               </IconContainer>
               <DataCardValue>
                 <span>{title}</span>
@@ -220,18 +221,18 @@ const HomeDataCards: React.FC<IDataCards> = ({
           {epochCards.map(({ Icon, title, value, progress }, index) => (
             <DataCard key={String(index)}>
               <IconContainer>
-                <Icon />
+                <Icon viewBox="0 0 70 70"/>
               </IconContainer>
               <DataCardValue>
                 <span>{title}</span>
                 <p>{value?.toLocaleString()}</p>
               </DataCardValue>
               {progress >= 0 && (
-                <span>
+                <ProgressContainerSpan>
                   <strong>
                     <Progress percent={metrics.epochLoadPercent} />
                   </strong>
-                </span>
+                </ProgressContainerSpan>
               )}
             </DataCard>
           ))}

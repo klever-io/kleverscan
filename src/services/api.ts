@@ -51,7 +51,8 @@ const getHost = (
     [Service.NODE]:
       process.env.DEFAULT_NODE_HOST || 'https://node.testnet.klever.finance',
     [Service.GECKO]: 'https://api.coingecko.com/api/v3',
-    [Service.EXPLORER]: 'https://testnet.kleverscan.org',
+    [Service.EXPLORER]:
+      process.env.DEFAULT_EXPLORER_HOST || 'https://testnet.kleverscan.org',
   };
 
   let host = hostService[service];

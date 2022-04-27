@@ -55,6 +55,8 @@ const getHost = (
       process.env.DEFAULT_EXPLORER_HOST || 'https://testnet.kleverscan.org',
   };
 
+  console.log({ envs: process.env, hostService });
+
   let host = hostService[service];
   let port = process.env.DEFAULT_API_PORT || '443';
   let urlParam = '';

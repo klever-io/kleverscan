@@ -5,7 +5,7 @@ import { Status } from './styles';
 import Table, { ITable } from '@/components/Table';
 import { Row } from '@/components/Table/styles';
 
-import { IBucket } from '@/types/index';
+import { IAsset, IBucket } from '@/types/index';
 import Link from 'next/link';
 import { parseAddress } from '@/utils/index';
 import Copy from '@/components/Copy';
@@ -13,10 +13,13 @@ import Copy from '@/components/Copy';
 import { CenteredRow, RowContent } from '@/views/accounts/detail';
 
 interface IBuckets {
-  [key: string]: IBucket[];
+  buckets: IBucket[];
+  assets: IAsset[];
 }
 
-const Buckets: React.FC<IBuckets> = ({ buckets }) => {
+
+
+const Buckets: React.FC<IBuckets> = ({ buckets, assets }) => {
   const UINT32_MAX = 4294967295;
   const precision = 6; // default KLV precision
 
@@ -27,6 +30,15 @@ const Buckets: React.FC<IBuckets> = ({ buckets }) => {
     unstakedEpoch,
     delegation,
   }) => {
+
+    const getAvaliableEpoch = (id: string) => {
+      if(id.length < 64) {
+        return assets.find(({ assetId }) => assetId === id )?.staking?.minEpochsToWithdraw || 2;
+      }
+
+      return 2; // Default for KLV
+    }
+    
     return (
       <Row type="buckets">
         <span>
@@ -43,7 +55,9 @@ const Buckets: React.FC<IBuckets> = ({ buckets }) => {
         <span>
           {unstakedEpoch === UINT32_MAX ? '--' : unstakedEpoch.toLocaleString()}
         </span>
-        <span>{unstakedEpoch + 2}</span>
+        <span>
+          {unstakedEpoch === UINT32_MAX ? '--' : (unstakedEpoch + getAvaliableEpoch(id)).toLocaleString()}
+        </span>
         <span>
           {delegation.length > 0 ? (
             <Link href={`/account/${delegation}`}>
@@ -63,7 +77,7 @@ const Buckets: React.FC<IBuckets> = ({ buckets }) => {
     'Staked Epoch',
     'Bucket Id',
     'Unstaked Epoch',
-    'Withdraw Time',
+    'Available Epoch',
     'Delegation',
   ];
 

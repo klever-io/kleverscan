@@ -28,6 +28,7 @@ import {
   ITransaction,
   IPagination,
   IBucket,
+  IAsset,
 } from '@/types/index';
 
 import { ArrowLeft } from '@/assets/icons';
@@ -53,6 +54,7 @@ interface IAccountPage {
   transactions: ITransactionsResponse;
   convertedBalance: number;
   precisions: IAssetInfo[];
+  assets: IAsset[],
   defaultKlvPrecision: number;
 }
 
@@ -78,7 +80,8 @@ const Account: React.FC<IAccountPage> = ({
   transactions: transactionResponse,
   convertedBalance,
   precisions,
-  defaultKlvPrecision,
+  assets,
+  defaultKlvPrecision
 }) => {
   const router = useRouter();
 
@@ -238,7 +241,7 @@ const Account: React.FC<IAccountPage> = ({
           </>
         );
       case 'Buckets':
-        return <Buckets buckets={buckets} />;
+        return <Buckets buckets={buckets} assets={assets} />;
       default:
         return <div />;
     }
@@ -348,14 +351,15 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
     convertedBalance: 0,
     transactions: {} as ITransactionsResponse,
     precisions: [],
+    assets: [],
     defaultKlvPrecision: 6,
   };
 
-  const precisions = await api.get({
+  const assets = await api.get({
     route: 'assets/kassets',
   });
 
-  const filterPrecisions = precisions.data.assets.map(
+  const filterPrecisions = assets.data.assets.map(
     ({ assetId, precision }: IAssetInfo) => ({ assetId, precision }),
   );
   const { precision } = filterPrecisions.find(
@@ -392,6 +396,7 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
   props.transactions = transactions;
   props.precisions = filterPrecisions;
   props.defaultKlvPrecision = precision; // Default KLV precision
+  props.assets = assets.data.assets;
 
   const prices: IPriceResponse = await api.post({
     route: 'prices',

@@ -425,6 +425,9 @@ export interface IAsset {
   royalties: number;
   mintedValue: number;
   issueDate: number;
+  staking: {
+    minEpochsToWithdraw: number;
+  }
 }
 
 export interface IContract {

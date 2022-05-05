@@ -27,12 +27,14 @@ interface IProposalsPage {
 }
 
 interface IProposalsMessages {
+  BlockRewards: string;
   FeePerDataByte: string;
   KAppFeeCreateAsset: string;
   KAppFeeCreateValidator: string;
   MaxEpochsUnclaimed: string;
   MinSelfDelegatedAmount: string;
   MinTotalDelegatedAmount: string;
+  StakingRewards: string;
 }
 
 interface INetworkParams {
@@ -118,12 +120,10 @@ const Proposals: React.FC<IProposalsPage> = ({
     switch (selectedTab) {
       case 'Network Parameters':
         return (
-          <>
-            <NetworkParams
-              networkParams={networkParams}
-              loading={loadingNetworkParams}
-            />
-          </>
+          <NetworkParams
+            networkParams={networkParams}
+            loading={loadingNetworkParams}
+          />
         );
       case 'Proposals':
         return (
@@ -179,15 +179,35 @@ export const getServerSideProps: GetServerSideProps<IProposalsPage> = async ({
   params,
 }) => {
   const { data } = await api.get({ route: 'node/network-parameters' });
-  const proposalResponse = await api.get({ route: 'proposals/list' });
+  const proposalResponse: IProposalsResponse = await api.get({
+    route: 'proposals/list',
+  });
+
+  //Mock Proposal ==============
+
+  // proposalResponse.data.proposals.push({
+  //   proposalId: 0,
+  //   proposalStatus: 'pending',
+  //   parameter: 'test',
+  //   value: 'test',
+  //   description:
+  //     'Propose to modify the fee of 1 unit of Bandwidth to 0.001  TRX Propose to modify the cost of account creation in the system contract to 1  TRX',
+  //   epochStart: 0,
+  //   epochEnd: 1000,
+  //   voters: [],
+  //   votes: 0,
+  //   proposer: 'test',
+  // });
 
   const proposalsMessages: IProposalsMessages = {
+    BlockRewards: 'Block Rewards',
     FeePerDataByte: 'Fee Per Data Byte',
     KAppFeeCreateAsset: 'KApp Fee for Asset Creation',
     KAppFeeCreateValidator: 'KApp Fee for Validator Creation',
     MaxEpochsUnclaimed: 'Max Epochs to clear unclaimed',
     MinSelfDelegatedAmount: 'Min Self Delegation Amount',
     MinTotalDelegatedAmount: 'Min Total Delegation Amount',
+    StakingRewards: 'Staking Rewards',
   };
 
   let networkParams = [] as INetworkParam[];

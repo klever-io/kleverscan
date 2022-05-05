@@ -427,7 +427,7 @@ export interface IAsset {
   issueDate: number;
   staking: {
     minEpochsToWithdraw: number;
-  }
+  };
 }
 
 export interface IContract {
@@ -683,6 +683,7 @@ export interface IProposalsResponse extends IResponse {
   data: {
     proposals: IProposal[];
   };
+  pagination: IPagination;
 }
 export interface ITotalFrozen {
   data: {

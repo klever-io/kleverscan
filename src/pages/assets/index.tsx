@@ -4,7 +4,7 @@ import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
-import { Container, Header, Input, Title, Row } from '@/views/assets';
+import { Container, Header, Input, Title } from '@/views/assets';
 
 import Table, { ITable } from '@/components/Table';
 
@@ -18,6 +18,7 @@ import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
 import { LetterLogo, Logo } from '@/views/assets/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
+import { Row } from '@/components/Table/styles';
 
 interface IAssetPage {
   assets: IAsset[];

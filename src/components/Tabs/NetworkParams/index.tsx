@@ -1,7 +1,6 @@
-import React from 'react';
-
 import Table, { ITable } from '@/components/Table';
-import { Row } from './styles';
+import { Row } from '@/components/Table/styles';
+import React from 'react';
 
 interface INetworkProps {
   networkParams: INetworkParams;
@@ -29,7 +28,7 @@ const NetworkParams: React.FC<INetworkProps> = ({ networkParams, loading }) => {
     return (
       <Row type="networkParams">
         <span>
-          <p>#{number}</p>
+          <strong>#{number}</strong>
         </span>
         <span>
           <p>{parameter}</p>

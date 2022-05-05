@@ -1,77 +1,5 @@
-import filterWidths from '@/components/Table/filters';
-import { ITableType } from '@/components/Table/styles';
-import widths from '@/components/Table/widths';
+import { lighten } from 'polished';
 import styled from 'styled-components';
-
-export const Row = styled.div<ITableType>`
-  padding: 1rem 1.5rem;
-  font-family: Rubik;
-  height: 198px;   
-  display: flex;
-
-  flex-direction: row;
-  align-items: center;
-
-  background-color: ${props => props.theme.white};
-
-  border-radius: 0.5rem;
-
-  span,
-  a {
-    /* flex: 1; */
-    overflow: hidden;
-    white-space: nowrap;
-    
-
-
-    font-size: 0.95rem;
-    color: ${props => props.theme.black};
-
-    ${props => widths[props.type]};
-    ${props =>
-      props.filter &&
-      props.filter.value !== 'all' &&
-      filterWidths[props.filter.name]}
-      
-
-      a {
-        color: ${props => props.theme.purple};
-        font-weight: 600;
-        font-size: 0.7rem;
-        font-style: normal;
-        font-weight: normal;
-        font-size: 14px;
-        line-height: 24px;
-      }
-    
-
-    small {
-      color: ${props => props.theme.table.text};
-      font-size: 11px;
-      display: flex;
-      
-    }
-
-    strong {
-      font-weight: 400;
-      font-size: 0.95rem;
-      color: ${props => props.theme.table.text};
-    }
-
-    p {
-      font-weight: 600;
-      color: ${props => props.theme.black};
-      font-family: Rubik;
-      font-style: normal;
-      font-weight: 500;
-      font-size: 14px;
-      line-height: 24px;
-    }
-  }
-  .endTime {
-      color: #F43942;
-    }
-`;
 
 const getStakedBGColor = (props: any, percent: number) => {
   if (percent < 30) {
@@ -120,13 +48,16 @@ export const Proposer = styled.p`
 `;
 
 export const ProposalStatus = styled.span`
-  width: 18rem !important;
+  max-width: 8rem;
 `;
 
-export const ProposerDescAndLink = styled.span`
-  width: 23rem !important;
+export const ProposerDescAndLink = styled.span``;
+
+export const Description = styled.p`
+  overflow: auto;
+  white-space: normal !important;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid ${props => lighten(0.33, props.theme.table.text)};
 `;
 
-export const UpVotes = styled.span`
-  width: 11.5rem !important;
-`;
+export const UpVotes = styled.span``;

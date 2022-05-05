@@ -54,7 +54,7 @@ interface IAccountPage {
   transactions: ITransactionsResponse;
   convertedBalance: number;
   precisions: IAssetInfo[];
-  assets: IAsset[],
+  assets: IAsset[];
   defaultKlvPrecision: number;
 }
 
@@ -81,7 +81,7 @@ const Account: React.FC<IAccountPage> = ({
   convertedBalance,
   precisions,
   assets,
-  defaultKlvPrecision
+  defaultKlvPrecision,
 }) => {
   const router = useRouter();
 

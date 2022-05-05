@@ -81,6 +81,7 @@ interface ITransactionPage extends ITransaction {
   precision: number;
   asset: IAsset;
 }
+
 const klvAsset: IAsset = {
   assetType: '',
   assetId: '',
@@ -96,6 +97,9 @@ const klvAsset: IAsset = {
   royalties: 0,
   mintedValue: 0,
   issueDate: 0,
+  staking: {
+    minEpochsToWithdraw: 0,
+  },
 };
 
 const Transaction: React.FC<ITransactionPage> = tx => {

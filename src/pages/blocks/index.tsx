@@ -35,9 +35,9 @@ import Pagination from '@/components/Pagination';
 import { useDidUpdateEffect } from '@/utils/hooks';
 
 interface IBlockStats {
-  total_blocks: number;
-  total_burned: number;
-  total_block_rewards: number;
+  totalBlocks: number;
+  totalBurned: number;
+  totalBlockRewards: number;
 }
 interface IBlockData {
   yesterday: IBlockStats;
@@ -58,7 +58,8 @@ interface IBlockResponse extends IResponse {
 
 interface IStatisticsResponse extends IResponse {
   data: {
-    block_stats: IBlockStats;
+    block_stats_by_day: IBlockStats;
+    block_stats_total: IBlockStats;
   };
 }
 
@@ -102,8 +103,8 @@ const Blocks: React.FC<IBlocks> = ({
       title: 'Number of Blocks',
       headers: ['Blocks Yesterday', 'Cumulative Number'],
       values: [
-        toLocaleFixed(statistics.yesterday.total_blocks, 0),
-        toLocaleFixed(statistics.total.total_blocks, 0),
+        toLocaleFixed(statistics.yesterday.totalBlocks, 0),
+        toLocaleFixed(statistics.total.totalBlocks, 0),
       ],
     },
     {
@@ -111,10 +112,10 @@ const Blocks: React.FC<IBlocks> = ({
       headers: ['Reward Yesterday', 'Cumulative Revenue'],
       values: [
         `${formatAmount(
-          statistics.yesterday.total_block_rewards / 10 ** precision,
+          statistics.yesterday.totalBlockRewards || 0 / 10 ** precision,
         )} KLV`,
         `${formatAmount(
-          statistics.total.total_block_rewards / 10 ** precision,
+          statistics.total.totalBlockRewards / 10 ** precision,
         )} KLV`,
       ],
     },
@@ -123,9 +124,9 @@ const Blocks: React.FC<IBlocks> = ({
       headers: ['Burned Yesterday', 'Burned in Total'],
       values: [
         `${formatAmount(
-          statistics.yesterday.total_burned / 10 ** precision,
+          statistics.yesterday.totalBurned / 10 ** precision,
         )} KLV`,
-        `${formatAmount(statistics.total.total_burned / 10 ** precision)} KLV`,
+        `${formatAmount(statistics.total.totalBurned / 10 ** precision)} KLV`,
       ],
     },
   ];
@@ -201,7 +202,7 @@ const Blocks: React.FC<IBlocks> = ({
           <Link href={`/block/${nonce}`}>{String(nonce)}</Link>
         </span>
         <span>{size.toLocaleString()} Bytes</span>
-        <span>{parseAddress(producerName, 10)}</span>
+        <span>{parseAddress(producerName, 14)}</span>
         <span>
           <small>
             {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
@@ -238,7 +239,7 @@ const Blocks: React.FC<IBlocks> = ({
     <Container>
       <Header>
         <Title>
-          <div onClick={router.back}>
+          <div onClick={() => router.push('/')}>
             <ArrowLeft />
           </div>
           <h1>Blocks</h1>
@@ -276,8 +277,8 @@ export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
   const props: IBlocks = {
     blocks: [],
     statistics: {
-      yesterday: { total_blocks: 0, total_burned: 0, total_block_rewards: 0 },
-      total: { total_blocks: 0, total_burned: 0, total_block_rewards: 0 },
+      yesterday: { totalBlocks: 0, totalBurned: 0, totalBlockRewards: 0 },
+      total: { totalBlocks: 0, totalBurned: 0, totalBlockRewards: 0 },
     },
     pagination: {} as IPagination,
   };
@@ -293,14 +294,14 @@ export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
   const yesterdayStatisticsCall = new Promise<IStatisticsResponse>(resolve =>
     resolve(
       api.get({
-        route: 'block/statistics/1',
+        route: 'block/statistics-by-day/1',
       }),
     ),
   );
   const totalStatisticsCall = new Promise<IStatisticsResponse>(resolve =>
     resolve(
       api.get({
-        route: 'block/statistics/0',
+        route: 'block/statistics-total/0',
       }),
     ),
   );
@@ -318,11 +319,10 @@ export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
 
   if (!yesterdayStatistics.error && !totalStatistics.error) {
     props.statistics = {
-      yesterday: yesterdayStatistics.data.block_stats,
-      total: totalStatistics.data.block_stats,
+      yesterday: yesterdayStatistics.data.block_stats_by_day[0],
+      total: totalStatistics.data.block_stats_total,
     };
   }
-
   return { props };
 };
 

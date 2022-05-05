@@ -157,7 +157,7 @@ const Proposals: React.FC<IProposalsPage> = ({
     <Container>
       <Header>
         <Title>
-          <div onClick={router.back}>
+          <div onClick={() => router.push('/')}>
             <ArrowLeft />
           </div>
           <h1>Proposal</h1>
@@ -178,9 +178,7 @@ const Proposals: React.FC<IProposalsPage> = ({
 export const getServerSideProps: GetServerSideProps<IProposalsPage> = async ({
   params,
 }) => {
-  const {
-    data: { parameters },
-  } = await api.get({ route: 'node/network-parameters' });
+  const { data } = await api.get({ route: 'node/network-parameters' });
   const proposalResponse = await api.get({ route: 'proposals/list' });
 
   const proposalsMessages: IProposalsMessages = {
@@ -191,18 +189,23 @@ export const getServerSideProps: GetServerSideProps<IProposalsPage> = async ({
     MinSelfDelegatedAmount: 'Min Self Delegation Amount',
     MinTotalDelegatedAmount: 'Min Total Delegation Amount',
   };
-  const networkParams = Object.keys(parameters).map((key, index) => {
-    return {
-      number: index,
-      parameter: proposalsMessages[key],
-      currentValue: parameters[key].value,
-    };
-  });
+
+  let networkParams = [] as INetworkParam[];
+
+  if (data) {
+    networkParams = Object.keys(data.parameters).map((key, index) => {
+      return {
+        number: index,
+        parameter: proposalsMessages[key],
+        currentValue: data.parameters[key].value,
+      };
+    });
+  }
 
   const props: IProposalsPage = {
     networkParams,
     proposals: proposalResponse.data?.proposals || [],
-    totalProposalsPage: proposalResponse.pagination.totalPages,
+    totalProposalsPage: proposalResponse?.pagination?.totalPages || 0,
   };
 
   return { props };

@@ -13,11 +13,13 @@ interface IAssets {
   [key: string]: {
     balance: number;
     frozenBalance: number;
+    unfrozenBalance?: number;
   };
 }
 
 interface IAssetData extends IAsset {
   balance: number;
+  unfrozenBalance?: number;
   frozenBalance: number;
 }
 
@@ -44,9 +46,13 @@ const Assets: React.FC<IAssets> = props => {
 
       for (let i = 0; i < assetData.length; i++) {
         // need old loop struct to save with async/await
-        if (assetData[i].tokenId !== '' && assetData[i].tokenId !== 'KLV') {
+        if (
+          assetData[i].tokenId !== '' &&
+          assetData[i].tokenId !== 'KLV' &&
+          !assetData[i].tokenId.includes('/')
+        ) {
           const response: IAssetResponse = await api.get({
-            route: `assets/${assetData[i].tokenId}`,
+            route: encodeURIComponent(`assets/${assetData[i].tokenId}`),
           });
           if (!response.error) {
             lastData.push({ ...response.data.asset, ...assetData[i] });

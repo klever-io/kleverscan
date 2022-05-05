@@ -15,6 +15,7 @@ import HomeTransactions from '@/components/HomeTransactions';
 const Home: React.FC<IHome> = ({
   totalAccounts: defaultTotalAccounts,
   totalTransactions: defaultTotalTransactions,
+  epochInfo: defaultEpochInfo,
   tps,
   coinsData,
   yesterdayTransactions,
@@ -34,6 +35,7 @@ const Home: React.FC<IHome> = ({
         <HomeDataCards
           totalAccounts={defaultTotalAccounts}
           totalTransactions={totalTransactions}
+          epochInfo={defaultEpochInfo}
           tps={tps}
           coinsData={coinsData}
           yesterdayTransactions={yesterdayTransactions}
@@ -42,7 +44,6 @@ const Home: React.FC<IHome> = ({
       </DataContainer>
 
       <BlockCardList blocks={blocks} precision={precision} />
-
       <HomeTransactions
         setTotalTransactions={setTotalTransactions}
         transactions={defaultTransactions}

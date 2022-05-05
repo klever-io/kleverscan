@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useRouter } from 'next/router';
 
 import {
@@ -9,59 +9,55 @@ import {
 
 import Chart, { ChartType } from '@/components/Chart';
 
-import { IBlock, IPagination, IResponse } from '../../types';
+import { IResponse } from '../../types';
 
 import { Container, Header, Title, Input, Section } from '@/views/charts';
 import { ArrowLeft } from '@/assets/icons';
-import { Proposals as Icon } from '@/assets/title-icons';
+import { Assets as Icon } from '@/assets/title-icons';
+import { GetServerSideProps } from 'next';
+import api from '@/services/api';
+import { format } from 'date-fns';
 
-interface ICard {
-  title: string;
-  headers: string[];
-  values: string[];
-}
 export interface IChartData {
   date?: number;
   value: number;
 }
-interface Graph {
-  data: IChartData[];
+
+interface IBlockStatsResponse {
+  date: number;
+  totalBlocks: number;
+  totalBurned: number;
+  totalMinted: number;
+  totalBlockRewards: number;
 }
 
-const Charts: React.FC<IBlocks> = ({
-  blocks: defaultBlocks,
-  statistics,
-  pagination,
-}) => {
+interface IBlockStats {
+  date: string;
+  burned: number;
+  minted: number;
+  value: number;
+}
+interface ICharts {
+  statistics: IBlockStats[];
+}
+
+interface IStatisticsResponse extends IResponse {
+  data: {
+    block_stats_by_day: IBlockStatsResponse[];
+  };
+}
+
+const Charts: React.FC<ICharts> = ({ statistics }) => {
   const router = useRouter();
-  const precision = 6; // default KLV precision
-
-  const [page, setPage] = useState(0);
-  const [blocks, setBlocks] = useState(defaultBlocks);
-  const [loading, setLoading] = useState(false);
-
-  const graph1 = [
-    { date: 2, value: 8 },
-    { date: 4, value: 12 },
-    { date: 6, value: 18 },
-    { date: 8, value: 12 },
-  ];
-
-  const graph2 = [
-    { date: 1, value: 7 },
-    { date: 3, value: 13 },
-    { date: 5, value: 17 },
-    { date: 7, value: 21 },
-  ];
 
   return (
     <Container>
       <Header>
         <Title>
-          <div onClick={router.back}>
+          <div onClick={() => router.push('/')}>
             <ArrowLeft />
           </div>
-          <h1>Graphs</h1>
+          <h1>Charts</h1>
           <Icon />
         </Title>
         <Input />
@@ -70,18 +66,21 @@ const Charts: React.FC<IBlocks> = ({
       <Section>
         <TransactionContainer>
           <TransactionChart>
-            <span>Graph 1</span>
-            <p>Total staked</p>
+            <span>Total KLV Burned vs Minted</span>
             <TransactionChartContent>
-              <Chart type={ChartType.Linear} data={graph1} />
+              <Chart
+                type={ChartType.DoubleLinear}
+                data={statistics}
+                value="burned"
+                value2="minted"
+              />
             </TransactionChartContent>
           </TransactionChart>
 
           <TransactionChart>
-            <span>Graph 2</span>
-            <p>KLV Burned</p>
+            <span>Block Rewards</span>
             <TransactionChartContent>
-              <Chart type={ChartType.Linear} data={graph2} />
+              <Chart type={ChartType.Linear} data={statistics} />
             </TransactionChartContent>
           </TransactionChart>
         </TransactionContainer>
@@ -90,32 +89,28 @@ const Charts: React.FC<IBlocks> = ({
   );
 };
 
-interface IBlockStats {
-  total_blocks: number;
-  total_burned: number;
-  total_block_rewards: number;
-}
-interface IBlockData {
-  yesterday: IBlockStats;
-  total: IBlockStats;
-}
-interface IBlocks {
-  blocks: IBlock[];
-  statistics: IBlockData;
-  pagination: IPagination;
-}
-
-interface IBlockResponse extends IResponse {
-  data: {
-    blocks: IBlock[];
+export const getServerSideProps: GetServerSideProps<ICharts> = async () => {
+  const props: ICharts = {
+    statistics: [] as IBlockStats[],
   };
-  pagination: IPagination;
-}
 
-interface IStatisticsResponse extends IResponse {
-  data: {
-    block_stats: IBlockStats;
-  };
-}
+  const statistics: IStatisticsResponse = await api.get({
+    route: 'block/statistics-by-day/15',
+  });
+  if (!statistics.error) {
+    props.statistics = statistics.data.block_stats_by_day
+      .reverse()
+      .map(stats => {
+        return {
+          date: format(stats.date, 'dd MMM'),
+          burned: stats.totalBurned / 1000000,
+          minted: stats.totalMinted / 1000000,
+          value: stats.totalBlockRewards / 1000000,
+        };
+      });
+  }
+
+  return { props };
+};
 
 export default Charts;

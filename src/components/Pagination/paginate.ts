@@ -31,7 +31,6 @@ const calculate = (total: number, position: number): ICell[] => {
       }
     } else {
       cells[1].ellipsis = true;
-      cells[defaultCellCount - 2].ellipsis = true;
 
       cells[pivot] = { value: position };
 
@@ -39,6 +38,8 @@ const calculate = (total: number, position: number): ICell[] => {
         cells[pivot + i] = { value: position + i };
         cells[pivot - i] = { value: position - i };
       }
+
+      cells[cells.length - 2].ellipsis = true;
     }
   } else {
     for (let i = 0; i < total; i++) {

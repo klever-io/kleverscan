@@ -1,7 +1,12 @@
-import { IAsset } from '../types';
+import { IAsset, IParsedMetrics, IEpochInfo } from '../types';
 
 export const breakText = (text: string, limit: number): string => {
   return text.length > limit ? `${text.substring(0, limit)}...` : text;
+};
+
+export const timestampToDate = (timestamp: number) => {
+  const time = new Date(timestamp);
+  return time.toISOString().slice(0, 10);
 };
 
 export const getAge = (date: Date): string => {
@@ -78,23 +83,79 @@ export const hexToString = (hex: string): string => {
 
 export const parseHardCodedInfo = (assets: IAsset[]): IAsset[] => {
   return assets.map(asset => {
-    if (asset.assetId === 'KLV') {
-      asset.maxSupply = 10000000000000000;
-    } else if (asset.assetId === 'KFI') {
-      asset.maxSupply = 21000000000000;
-    }
-
     asset.assetId = encodeURIComponent(asset.assetId);
     return asset;
   });
 };
 
-export const parseAddress = (address: string, num: number): string => {
-  return address.length > num
-    ? `${address.slice(0, num)}...${address.slice(-num)}`
+export const parseAddress = (address: string, maxLen: number): string => {
+  return address.length > maxLen
+    ? `${address.slice(0, maxLen / 2)}...${address.slice(-(maxLen / 2))}`
     : address;
 };
 
 export const capitalizeString = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+export const getEpochInfo = (parseMetrics: IParsedMetrics): IEpochInfo => {
+  const {
+    klv_slot_at_epoch_start,
+    klv_slots_per_epoch,
+    klv_current_slot,
+    klv_slot_duration,
+  } = parseMetrics;
+
+  const epochFinishSlot = klv_slot_at_epoch_start + klv_slots_per_epoch;
+  let slotsRemained = epochFinishSlot - klv_current_slot;
+  if (epochFinishSlot < klv_current_slot) {
+    slotsRemained = 0;
+  }
+
+  const secondsRemainedInEpoch = (slotsRemained * klv_slot_duration) / 1000;
+
+  const remainingTime = secondsToHourMinSec(secondsRemainedInEpoch);
+
+  const epochLoadPercent = 100 - (slotsRemained / klv_slots_per_epoch) * 100.0;
+
+  return {
+    currentSlot: klv_current_slot,
+    epochFinishSlot: epochFinishSlot,
+    epochLoadPercent,
+    remainingTime,
+  };
+};
+
+const secondsToHourMinSec = (input: number): string => {
+  const numSecondsInAMinute = 60;
+  const numMinutesInAHour = 60;
+  const numSecondsInAHour = numSecondsInAMinute * numMinutesInAHour;
+  let result = '';
+
+  const hours = Math.floor(input / numSecondsInAMinute / numMinutesInAHour);
+  let seconds = input % numSecondsInAHour;
+  const minutes = Math.floor(seconds / numSecondsInAMinute);
+  seconds = input % numSecondsInAMinute;
+
+  if (hours > 0) {
+    result = plural(hours, 'hour');
+  }
+  if (minutes > 0) {
+    result += plural(minutes, 'minute');
+  }
+  if (seconds > 0) {
+    result += plural(seconds, 'second');
+  }
+
+  result += ' ';
+
+  return result;
+};
+
+const plural = (count: number, singular: string): string => {
+  if (count < 2) {
+    return `${count} ${singular} `;
+  }
+
+  return `${count} ${singular}s `;
 };

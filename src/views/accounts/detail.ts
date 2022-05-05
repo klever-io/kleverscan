@@ -108,6 +108,11 @@ export const Row = styled.div`
 
 export const RowContent = styled.span`
   width: 100%;
+  .bucketIdCopy {
+    span {
+      margin-right: -2rem;
+    }
+  }
 `;
 
 export const CenteredRow = styled.div`

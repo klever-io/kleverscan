@@ -33,7 +33,7 @@ const Detail: React.FC<IDetail> = ({
     <Container>
       <Header>
         <Title>
-          <div onClick={router.back}>
+          <div onClick={() => router.push('/')}>
             <ArrowLeft />
           </div>
           <h1>{title}</h1>

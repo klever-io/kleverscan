@@ -28,6 +28,7 @@ import {
   ITransaction,
   IPagination,
   IBucket,
+  IAsset,
 } from '@/types/index';
 
 import { ArrowLeft } from '@/assets/icons';
@@ -43,10 +44,18 @@ import { ISelectedDays } from '@/components/DateFilter';
 import Buckets from '@/components/Tabs/Buckets';
 import { useDidUpdateEffect } from '@/utils/hooks';
 
+interface IAssetInfo {
+  assetId: string;
+  precision: number;
+}
+
 interface IAccountPage {
   account: IAccount;
   transactions: ITransactionsResponse;
   convertedBalance: number;
+  precisions: IAssetInfo[];
+  assets: IAsset[];
+  defaultKlvPrecision: number;
 }
 
 interface IAccountResponse extends IResponse {
@@ -70,9 +79,11 @@ const Account: React.FC<IAccountPage> = ({
   account,
   transactions: transactionResponse,
   convertedBalance,
+  precisions,
+  assets,
+  defaultKlvPrecision,
 }) => {
   const router = useRouter();
-  const precision = 6;
 
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(
@@ -147,7 +158,20 @@ const Account: React.FC<IAccountPage> = ({
       0,
     );
 
-    return freezeBalance / 10 ** precision;
+    return freezeBalance / 10 ** defaultKlvPrecision;
+  };
+
+  const getUnfreezeBalance = () => {
+    if (Object.values(account.assets).length <= 0) {
+      return 0;
+    }
+
+    const unfreezeBalance = Object.values(account.assets).reduce(
+      (acc, asset) => acc + asset.unfrozenBalance,
+      0,
+    );
+
+    return unfreezeBalance / 10 ** defaultKlvPrecision || 0;
   };
 
   const getTabHeaders = () => {
@@ -217,7 +241,7 @@ const Account: React.FC<IAccountPage> = ({
           </>
         );
       case 'Buckets':
-        return <Buckets buckets={buckets} />;
+        return <Buckets buckets={buckets} assets={assets} />;
       default:
         return <div />;
     }
@@ -227,7 +251,7 @@ const Account: React.FC<IAccountPage> = ({
     <Container>
       <Header>
         <Title>
-          <div onClick={router.back}>
+          <div onClick={() => router.push('/accounts')}>
             <ArrowLeft />
           </div>
           <h1>Account</h1>
@@ -263,7 +287,7 @@ const Account: React.FC<IAccountPage> = ({
                 <div>
                   <span>
                     {(
-                      account.balance / 10 ** precision +
+                      account.balance / 10 ** defaultKlvPrecision +
                       getFreezeBalance()
                     ).toLocaleString()}
                   </span>
@@ -274,12 +298,19 @@ const Account: React.FC<IAccountPage> = ({
                 <div>
                   <strong>Available</strong>
                   <span>
-                    {(account.balance / 10 ** precision).toLocaleString()}
+                    {(
+                      account.balance /
+                      10 ** defaultKlvPrecision
+                    ).toLocaleString()}
                   </span>
                 </div>
                 <div>
                   <strong>Frozen</strong>
                   <span>{getFreezeBalance().toLocaleString()}</span>
+                </div>
+                <div>
+                  <strong>Unfrozen</strong>
+                  <span>{getUnfreezeBalance().toLocaleString()}</span>
                 </div>
               </FrozenContainer>
             </BalanceContainer>
@@ -319,9 +350,22 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
     account: {} as IAccount,
     convertedBalance: 0,
     transactions: {} as ITransactionsResponse,
+    precisions: [],
+    assets: [],
+    defaultKlvPrecision: 6,
   };
 
-  const precision = 6; // KLV default precision;
+  const assets = await api.get({
+    route: 'assets/kassets',
+  });
+
+  const filterPrecisions = assets.data.assets.map(
+    ({ assetId, precision }: IAssetInfo) => ({ assetId, precision }),
+  );
+  const { precision } = filterPrecisions.find(
+    ({ assetId }: IAssetInfo) => assetId === 'KLV',
+  ); // KLV default precision from API
+
   const accountLength = 62;
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
 
@@ -345,10 +389,14 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
   const transactions: ITransactionsResponse = await api.get({
     route: `address/${address}/transactions`,
   });
+
   if (account.error) {
     return redirectProps;
   }
   props.transactions = transactions;
+  props.precisions = filterPrecisions;
+  props.defaultKlvPrecision = precision; // Default KLV precision
+  props.assets = assets.data.assets;
 
   const prices: IPriceResponse = await api.post({
     route: 'prices',

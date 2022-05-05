@@ -57,6 +57,7 @@ const Input: React.FC<IInput> = ({ className }) => {
     }
 
     router.push(`/${type}/${treatedSearch}`);
+    inputRef.current.value = '';
   };
 
   const keyDownHandle = (event: KeyboardEvent) => {

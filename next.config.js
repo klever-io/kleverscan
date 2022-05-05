@@ -12,7 +12,8 @@ const defaultEnvs = [
   'DEFAULT_API_PORT',
   'DEFAULT_API_VERSION',
   'DEFAULT_PRICE_HOST',
-  'DEFAULT_NODE_HOST'
+  'DEFAULT_NODE_HOST',
+  'DEFAULT_EXPLORER_HOST'
 ];
 
 const getEnvs = () => {

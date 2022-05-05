@@ -39,6 +39,9 @@ export const Content = styled.div`
 
   flex-direction: row;
 
+  @media (max-width: 1600px) {
+    width: calc(100vw - 20rem);
+  }
   @media (max-width: 768px) {
     width: calc(100vw - 10rem);
   }
@@ -65,6 +68,9 @@ export const CardContainer = styled.div`
   background-color: ${props => props.theme.card.background};
   border-radius: 1rem;
 
+  @media (max-width: 1600px) {
+    min-width: calc(100vw - 20rem);
+  }
   @media (max-width: 768px) {
     min-width: calc(100vw - 10rem);
   }
@@ -82,7 +88,7 @@ export const CardContent = styled.div`
 
   animation: 1.5s ease 0s 1 normal none running ${FadeIn};
 
-  @media (max-width: 768px) {
+  @media (max-width: 1600px) {
     width: 100%;
   }
 `;

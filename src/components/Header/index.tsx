@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import {
   Container,
   DesktopContainer,
+  DropdownMenu,
   Input,
   Item,
   Logo,
@@ -15,9 +16,17 @@ import {
   MobileContainer,
   MobileContent,
   MobileItem,
+  DropdownIcon,
+  DropdownContainer,
+  DropdownItem,
 } from './styles';
 
 import { INavbarItem, navbarItems } from '@/configs/navbar';
+
+interface IDropdownPages {
+  page: INavbarItem
+}
+
 
 const Navbar: React.FC = () => {
   const router = useRouter();
@@ -38,7 +47,44 @@ const Navbar: React.FC = () => {
     }
   };
 
-  const NavbarItem: React.FC<INavbarItem> = ({ name, Icon, pathTo }) => {
+  const DropdownDesktop = ({page}: IDropdownPages) => {
+    return (
+        <DropdownItem>
+          <page.Icon />
+          <Link href={page.pathTo}>
+            <span>{page.name}</span>
+          </Link>
+        </DropdownItem>
+    );
+  }
+
+  const DropdownMobile = ({page}: IDropdownPages) => {
+    return (
+        <DropdownItem onClick={handleMenu}>
+          <Link href={page.pathTo}>
+            <span>{page.name}</span>
+          </Link>
+          <page.Icon />
+        </DropdownItem>
+    );
+  }
+
+  const NavbarItem: React.FC<INavbarItem> = ({ name, Icon, pathTo, pages = [] }) => {
+    if(name === 'More') {
+      return (
+        <Item selected={router.pathname.includes(name.toLowerCase())}>
+          <span>{name}</span>
+          <DropdownContainer>
+            <DropdownMenu>
+              {pages.map((page, index) => (
+                <DropdownDesktop key={index} page={page} />
+              ))}
+            </DropdownMenu>
+        </DropdownContainer>
+        <span><DropdownIcon /></span>
+        </Item>
+      );
+    }
     return (
       <Link href={pathTo}>
         <Item selected={router.pathname.includes(name.toLowerCase())}>
@@ -49,7 +95,31 @@ const Navbar: React.FC = () => {
     );
   };
 
-  const MobileNavbarItem: React.FC<INavbarItem> = ({ name, Icon, pathTo }) => {
+  const MobileNavbarItem: React.FC<INavbarItem> = ({ name, Icon, pathTo, pages = [] }) => {
+    const [showMore, setShowMore] = useState(false);
+    const handleClick = () => {
+      setShowMore(!showMore);
+    }
+    if(name === 'More') {
+      return (
+        <MobileItem
+          onClick={handleClick}
+          selected={router.pathname.includes(name.toLowerCase())}
+        >
+          <span>{name}</span>
+          {showMore && (
+            <DropdownContainer>
+              <DropdownMenu>
+                {pages.map((page, index) => (
+                  <DropdownMobile key={index} page={page} />
+                ))}
+              </DropdownMenu>
+            </DropdownContainer>
+          )}
+          <span><DropdownIcon /></span>
+        </MobileItem>
+      );
+    }
     return (
       <Link href={pathTo}>
         <MobileItem

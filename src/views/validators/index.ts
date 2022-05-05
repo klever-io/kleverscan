@@ -1,10 +1,14 @@
 import styled from 'styled-components';
 
-export const ProgressContainer = styled.div`
+export const ProgressContainer = styled.div<{ textColor: string }>`
   display: flex;
 
   flex-direction: row;
   align-items: center;
+
+  span {
+    color: ${props => `${props.textColor}`};
+  }
 
   gap: 0.5rem;
 `;

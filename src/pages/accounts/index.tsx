@@ -41,6 +41,7 @@ interface IAccountResponse extends IResponse {
   };
   pagination: IPagination;
 }
+
 interface IAccountRangeOfLastDays extends IResponse {
   data: {
     number_by_day: [
@@ -94,10 +95,11 @@ const Accounts: React.FC<IAccounts> = ({
         createdYesterday === pagination.totalRecords
           ? '--'
           : createdYesterday.toLocaleString(),
-        pagination.totalRecords.toLocaleString(),
+        pagination.totalRecords?.toLocaleString(),
       ],
     },
   ];
+
   const CardContent: React.FC<ICard> = ({ title, headers, values }) => {
     const [uptime] = useState(new Date().getTime());
     const [age, setAge] = useState(
@@ -184,7 +186,7 @@ const Accounts: React.FC<IAccounts> = ({
     <Container>
       <Header>
         <Title>
-          <div onClick={router.back}>
+          <div onClick={() => router.push('/')}>
             <ArrowLeft />
           </div>
           <h1>Accounts</h1>

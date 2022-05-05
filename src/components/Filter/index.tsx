@@ -13,12 +13,12 @@ export interface IFilter {
   title: string;
   data: IFilterItem[];
   onClick?(item: IFilterItem): void;
+  filterQuery: IFilterItem | undefined;
 }
 
-const Filter: React.FC<IFilter> = ({ title, data, onClick }) => {
+const Filter: React.FC<IFilter> = ({ title, data, onClick, filterQuery }) => {
   const allItem: IFilterItem = { name: 'All', value: 'all' };
-
-  const [selected, setSelected] = useState(allItem);
+  const [selected, setSelected] = useState(filterQuery || allItem);
   const [open, setOpen] = useState(true);
 
   const contentRef = useRef<any>(null);
@@ -37,7 +37,7 @@ const Filter: React.FC<IFilter> = ({ title, data, onClick }) => {
       if (onClick) {
         onClick(item);
       }
-
+      
       setSelected(item);
       handleDropdown(false);
     };

@@ -38,6 +38,12 @@ export const IconContainer = styled.div`
   padding-right: 1rem;
 `;
 
+export const ProgressContainerSpan = styled.span`
+  @media (max-width: 590px) {
+    display: none;
+  }
+`;
+
 export const Section = styled.section`
   padding: 5rem 10rem 0 10rem;
 
@@ -105,7 +111,7 @@ export const Input = styled(DefaultInput)`
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1600px) {
     margin: 0;
   }
 `;
@@ -116,16 +122,19 @@ export const DataCardsContainer = styled.div`
   display: flex;
 
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
 
   gap: 1rem;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1600px) {
     flex-direction: column;
+  }
+  &:nth-child(2) {
+    margin-top: 4rem;
   }
 `;
 
-export const DataCardsContent = styled.div`
+export const DataCardsWrapper = styled.div`
   width: 100%;
 
   display: flex;
@@ -136,8 +145,37 @@ export const DataCardsContent = styled.div`
   gap: 0.5rem;
 `;
 
+export const DataCardsContent = styled.div`
+  width: 100%;
+
+  display: flex;
+
+  flex-direction: row;
+  justify-content: center;
+
+  gap: 0.5rem;
+
+  @media (max-width: 1600px) {
+    flex-direction: column;
+  }
+`;
+
 export const DataCard = styled.div`
-  padding: 1.5rem;
+  padding: 1.2rem;
+
+  width: 100%;
+
+  display: flex;
+
+  flex-direction: row;
+  align-items: center;
+
+  background-color: ${props => props.theme.card.background};
+  border-radius: 1rem;
+`;
+
+export const EpochCard = styled.div`
+  padding: 1.2rem;
 
   width: 100%;
 
@@ -453,11 +491,12 @@ export const TransactionChart = styled(TransactionContent)`
 
 export const TransactionChartContent = styled.div`
   position: absolute;
-
+  overflow:hidden;
   bottom: 0;
-  left: 0;
+  left: 1.5rem;
+  right: 2rem;
 
-  width: 95%;
+  width: 92%;
   height: 80%;
 `;
 

@@ -25,6 +25,7 @@ import { useDidUpdateEffect } from '@/utils/hooks';
 import { capitalizeString, parseAddress } from '@/utils/index';
 import { formatAmount } from '@/utils/index';
 import { getStatusIcon } from '@/assets/status';
+import theme from '@/styles/theme';
 
 interface IValidatorPage {
   validators: IValidator[];
@@ -120,7 +121,7 @@ const Validators: React.FC<IValidatorPage> = ({
 
   const Progress: React.FC<{ percent: number }> = ({ percent }) => {
     return (
-      <ProgressContainer>
+      <ProgressContainer textColor={theme.black}>
         <ProgressContent>
           <ProgressIndicator percent={percent} />
         </ProgressContent>

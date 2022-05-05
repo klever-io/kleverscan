@@ -288,7 +288,7 @@ export interface IFreezeReceipt {
 }
 
 export interface IUnfreezeReceipt {
-  availableWithdrawEpoch: number;
+  availableEpoch: number;
 }
 
 export type IReceipt = ICreateAssetReceipt | IFreezeReceipt | IUnfreezeReceipt;
@@ -402,6 +402,7 @@ export interface IAccountAsset {
   assetId: string;
   balance: number;
   frozenBalance: number;
+  unfrozenBalance: number;
   lastClaim: {
     timestamp: number;
     epoch: number;
@@ -423,7 +424,12 @@ export interface IAsset {
   maxSupply: number;
   royalties: number;
   mintedValue: number;
+  issueDate: number;
+  staking: {
+    minEpochsToWithdraw: number;
+  }
 }
+
 export interface IContract {
   sender: string;
   type: Contract;
@@ -538,6 +544,7 @@ export interface IDailyTransaction {
 export interface IHome {
   transactions: ITransaction[];
   transactionsList: IDailyTransaction[];
+  epochInfo: IEpochInfo;
   blocks: IBlock[];
   totalAccounts: number;
   totalTransactions: number;
@@ -550,6 +557,7 @@ export interface IDataCards {
   totalAccounts: number;
   totalTransactions: number;
   tps: string;
+  epochInfo: IEpochInfo;
   coinsData: ICoinInfo[];
   yesterdayTransactions: number;
   yesterdayAccounts: number;
@@ -629,6 +637,13 @@ export interface ICard {
   variation: string;
 }
 
+export interface IEpochCard {
+  Icon: any;
+  title: string;
+  value: number | string;
+  progress?: any;
+}
+
 export interface INodeCard {
   title: string;
   headers: string[];
@@ -678,4 +693,18 @@ export interface ITotalFrozen {
 export interface IDelegate {
   address: string;
   buckets: IBucket[];
+}
+
+export interface IEpochInfo {
+  currentSlot: number;
+  epochFinishSlot: number;
+  epochLoadPercent: number;
+  remainingTime: string;
+}
+
+export interface IParsedMetrics {
+  klv_slot_at_epoch_start: number;
+  klv_slots_per_epoch: number;
+  klv_current_slot: number;
+  klv_slot_duration: number;
 }

@@ -295,6 +295,10 @@ export const Unfreeze: React.FC<IContract> = ({
   const parameter = par as IUnfreezeContract;
   const receipts = rec as IUnfreezeReceipt[];
 
+  const getAvailabeEpoch = () => {
+    return Object.values(receipts).find((item) => item?.availableEpoch > 0)?.availableEpoch || '--';
+  }
+
   return (
     <>
       <Row>
@@ -319,9 +323,9 @@ export const Unfreeze: React.FC<IContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Available Epoch To Withdraw</strong>
+          <strong>Available Epoch</strong>
         </span>
-        <span>{receipts?.[0]?.availableWithdrawEpoch}</span>
+        <span>{getAvailabeEpoch()}</span>
       </Row>
     </>
   );

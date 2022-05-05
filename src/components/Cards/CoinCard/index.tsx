@@ -105,12 +105,7 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS }) => {
                       </ValueDetail>
                     </ValueContent>
                   ))}
-                  <ValueContent>
-                    <ValueDetail>
-                      <p>Live/Peak TPS</p>
-                      <span>{actualTPS}</span>
-                    </ValueDetail>
-                  </ValueContent>
+                  <ValueContent />
                 </ValueContainer>
               </CardContent>
             </CardContainer>

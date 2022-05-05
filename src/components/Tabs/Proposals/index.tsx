@@ -1,15 +1,15 @@
 import React from 'react';
 
 import Table, { ITable } from '@/components/Table';
-import { Status } from '@/components/Table/styles';
+import { Row, Status } from '@/components/Table/styles';
 import {
   Proposer,
-  Row,
   ProposalStatus,
   ProposerDescAndLink,
   UpVotes,
   PercentIndicator,
   StakedIndicator,
+  Description,
 } from './styles';
 
 import { getStatusIcon } from '@/assets/status';
@@ -18,7 +18,7 @@ import { ProgressContent } from '@/views/proposals';
 import Link from 'next/link';
 
 import { IProposal } from '@/types/index';
-import { parseAddress } from '@/utils/index';
+import { capitalizeString, parseAddress } from '@/utils/index';
 
 interface IProposalsProps {
   proposalParams: IProposals;
@@ -49,7 +49,7 @@ const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
             <p>#{proposalId}</p>
           </span>
           <ProposerDescAndLink>
-            <p>{description || ' - '}</p>
+            <Description>{description || ' - '}</Description>
             <Proposer>Proposer</Proposer>
             <Link href="/">{parseAddress(proposer, 8)}</Link>
           </ProposerDescAndLink>
@@ -74,7 +74,7 @@ const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
           </UpVotes>
           <Status status={proposalStatus}>
             <StatusIcon />
-            <ProposalStatus>{proposalStatus}</ProposalStatus>
+            <ProposalStatus>{capitalizeString(proposalStatus)}</ProposalStatus>
           </Status>
           <span>
             <Link href={`/proposal/${proposalId}`}>Details</Link>

@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { default as DefaultInput } from '@/components/Inputt';
 import widths from '@/components/Table/widths';
@@ -127,18 +127,19 @@ export const Input = styled(DefaultInput)`
   border-color: ${props => props.theme.filter.border};
 `;
 
-export const Logo = styled.img`
-  width: 3.2rem;
-  height: 3.2rem;
+const LogoCSS = css`
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 50%;
   border: 2px solid ${props => props.theme.borderLogo};
 `;
 
+export const Logo = styled.img`
+  ${LogoCSS}
+`;
+
 export const LetterLogo = styled.div`
-  width: 3.2rem;
-  height: 3.2rem;
-  border-radius: 50%;
-  border: 2px solid ${props => props.theme.borderLogo};
+  ${LogoCSS}
   display: flex;
   align-items: center;
   justify-content: center;

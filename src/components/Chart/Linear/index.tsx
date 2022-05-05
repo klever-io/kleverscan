@@ -5,6 +5,7 @@ import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 
 import { IChartData } from '../../../configs/home';
 import { Theme } from '../../../styles/styles';
+import { formatAmount } from '@/utils/index';
 
 interface IChart {
   data: IChartData[];
@@ -21,7 +22,12 @@ const Chart: React.FC<IChart> = ({ data, theme }) => {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <LineChart data={data}>
-        <YAxis type="number" scale="auto" {...axisProps} />
+        <YAxis
+          type="number"
+          scale="auto"
+          tickFormatter={formatAmount}
+          {...axisProps}
+        />
         <XAxis
           dataKey="date"
           scale="auto"

@@ -14,7 +14,8 @@ import {
 import { IChartData } from '../../../configs/home';
 import { Theme } from '../../../styles/styles';
 
-import { TooltipContainer } from './styles'
+import { TooltipContainer } from './styles';
+import { formatAmount } from '@/utils/index';
 
 interface IChart {
   data: IChartData[];
@@ -26,7 +27,7 @@ interface IChart {
 interface ITooltipContent {
   payload?: {
     value: number;
-  }[],
+  }[];
   label?: string;
   active?: boolean;
 }
@@ -43,7 +44,7 @@ const CustomTooltip = ({ payload, label, active }: ITooltipContent) => {
   }
 
   return null;
-}
+};
 
 const Chart: React.FC<IChart> = ({ data, theme, value, value2 }) => {
   const axisProps = {
@@ -55,7 +56,12 @@ const Chart: React.FC<IChart> = ({ data, theme, value, value2 }) => {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <LineChart data={data}>
-        <YAxis type="number" scale="auto" {...axisProps} />
+        <YAxis
+          type="number"
+          scale="auto"
+          tickFormatter={formatAmount}
+          {...axisProps}
+        />
         <XAxis
           dataKey="date"
           scale="auto"
@@ -77,7 +83,7 @@ const Chart: React.FC<IChart> = ({ data, theme, value, value2 }) => {
           stroke={theme.chart.linear.fill}
         />
         <Legend />
-        <Tooltip content={<CustomTooltip />}/>
+        <Tooltip content={<CustomTooltip />} />
       </LineChart>
     </ResponsiveContainer>
   );

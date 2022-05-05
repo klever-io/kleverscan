@@ -100,7 +100,7 @@ const accounts = css`
 `;
 
 const assetsPage = css`
-  margin-right: 1.25rem;
+  padding-right: 0.5rem;
 
   &:nth-child(1) {
     width: 4rem;
@@ -127,7 +127,7 @@ const assetsPage = css`
   }
 
   &:nth-child(7) {
-    width: 8 rem;
+    width: 8rem;
   }
 
   &:nth-child(8) {
@@ -257,24 +257,24 @@ const networkParams = css`
 `;
 
 const proposals = css`
-  margin-right: 1.25rem;
+  padding-right: 0.5rem;
   &:nth-child(1) {
-    width: 7rem;
+    width: 4rem;
   }
   &:nth-child(2) {
-    width: 23rem;
+    width: 18rem;
   }
   &:nth-child(3) {
-    width: 18rem;
+    width: 10rem;
   }
   &:nth-child(4) {
     width: 12rem;
   }
   &:nth-child(5) {
-    width: 6rem;
+    width: 10rem;
   }
   &:nth-child(6) {
-    width: 3rem;
+    width: 5rem;
   }
 `;
 const votes = css`

@@ -17,7 +17,7 @@ const BlockCard: React.FC<IBlock & IBlockCard> = ({
   blockRewards,
   blockIndex,
   txCount,
-  burnedFees,
+  txBurnedFees,
   precision,
 }) => {
   const router = useRouter();
@@ -36,7 +36,7 @@ const BlockCard: React.FC<IBlock & IBlockCard> = ({
       </BlockCardRow>
       <BlockCardRow>
         <p>Burned</p>
-        <span>{formatAmount((burnedFees || 0) / 10 ** precision)} KLV</span>
+        <span>{formatAmount((txBurnedFees || 0) / 10 ** precision)} KLV</span>
       </BlockCardRow>
       <BlockCardRow>
         <p>Transactions</p>

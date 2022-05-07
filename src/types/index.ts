@@ -335,7 +335,7 @@ export interface IBlock {
   txCount: number;
   txFees?: number;
   kAppFees?: number;
-  burnedFees?: number;
+  txBurnedFees?: number;
   blockRewards: number;
   txHashes: any[];
   softwareVersion: string;

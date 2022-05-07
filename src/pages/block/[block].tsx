@@ -64,7 +64,7 @@ const Block: React.FC<IBlockPage> = ({
     size,
     kAppFees,
     txFees,
-    burnedFees,
+    txBurnedFees,
     softwareVersion,
     chainID,
     producerSignature,
@@ -163,7 +163,7 @@ const Block: React.FC<IBlockPage> = ({
           </span>
           <span>
             <small>
-              {toLocaleFixed((burnedFees || 0) / 10 ** precision, precision)}
+              {toLocaleFixed((txBurnedFees || 0) / 10 ** precision, precision)}
             </small>
           </span>
         </Row>

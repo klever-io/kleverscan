@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { CenteredRow, Row } from '@/views/transactions/detail';
 
 import { toLocaleFixed } from '@/utils/index';
+
+import { findKey } from '@/utils/findKey';
+
 import {
   ITransferContract,
   ICreateAssetContract,
@@ -96,7 +99,7 @@ export const CreateAsset: React.FC<IContract> = ({
         <span>
           <strong>Asset ID</strong>
         </span>
-        <span>{receipts?.[0]?.assetId}</span>
+        <span>{findKey(receipts, 'assetId')}</span>
       </Row>
       <Row>
         <span>
@@ -281,7 +284,7 @@ export const Freeze: React.FC<IContract> = ({
         <span>
           <strong>Bucket ID</strong>
         </span>
-        <span>{receipts?.[0]?.bucketId}</span>
+        <span>{findKey(receipts, 'bucketId')}</span>
       </Row>
     </>
   );
@@ -296,8 +299,11 @@ export const Unfreeze: React.FC<IContract> = ({
   const receipts = rec as IUnfreezeReceipt[];
 
   const getAvailabeEpoch = () => {
-    return Object.values(receipts).find((item) => item?.availableEpoch > 0)?.availableEpoch || '--';
-  }
+    return (
+      Object.values(receipts).find(item => item?.availableEpoch > 0)
+        ?.availableEpoch || '--'
+    );
+  };
 
   return (
     <>

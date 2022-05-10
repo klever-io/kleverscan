@@ -1,4 +1,5 @@
 import type { AppProps } from 'next/app';
+import React from 'react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
@@ -11,6 +12,10 @@ import NProgress from '../components/NProgress';
 
 import GlobalStyle from '../styles/global';
 import theme from '../styles/theme';
+
+import Bugsnag from '../lib/bugsnag';
+
+const ErrorBoundary = Bugsnag.getPlugin('react')?.createErrorBoundary(React);
 
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   const router = useRouter();
@@ -28,7 +33,7 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
     };
   }, [router.events]);
 
-  return (
+  const children = (
     <ThemeProvider theme={theme}>
       <Layout>
         <Component {...pageProps} />
@@ -38,6 +43,8 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
       <ToastContainer />
     </ThemeProvider>
   );
+
+  return (ErrorBoundary ? <ErrorBoundary>{children}</ErrorBoundary> : children);
 };
 
 export default MyApp;

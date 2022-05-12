@@ -1,26 +1,12 @@
-import React, { useEffect, useState } from 'react';
-
-import Link from 'next/link';
-
 import Table, { ITable } from '@/components/Table';
 import { Row } from '@/components/Table/styles';
-
-import { IAsset, IResponse } from '@/types/index';
-import api from '@/services/api';
+import { IAccountAsset, IAsset, IResponse } from '@/types/index';
 import { formatAmount } from '@/utils/index';
+import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
 
 interface IAssets {
-  [key: string]: {
-    balance: number;
-    frozenBalance: number;
-    unfrozenBalance?: number;
-  };
-}
-
-interface IAssetData extends IAsset {
-  balance: number;
-  unfrozenBalance?: number;
-  frozenBalance: number;
+  assets: IAccountAsset[];
 }
 
 interface IAssetResponse extends IResponse {
@@ -29,38 +15,12 @@ interface IAssetResponse extends IResponse {
   };
 }
 
-const Assets: React.FC<IAssets> = props => {
-  const assetData = Object.values(props).map((item, index) => ({
-    tokenId: Object.keys(props)[index],
-    ...item,
-  }));
-
-  const [data, setData] = useState<IAssetData[]>([] as IAssetData[]);
+const Assets: React.FC<IAssets> = ({ assets }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-
-      const lastData: IAssetData[] = [];
-
-      for (let i = 0; i < assetData.length; i++) {
-        // need old loop struct to save with async/await
-        if (
-          assetData[i].tokenId !== '' &&
-          assetData[i].tokenId !== 'KLV' &&
-          !assetData[i].tokenId.includes('/')
-        ) {
-          const response: IAssetResponse = await api.get({
-            route: encodeURIComponent(`assets/${assetData[i].tokenId}`),
-          });
-          if (!response.error) {
-            lastData.push({ ...response.data.asset, ...assetData[i] });
-          }
-        }
-      }
-
-      setData(lastData);
 
       setLoading(false);
     };
@@ -77,14 +37,14 @@ const Assets: React.FC<IAssets> = props => {
     'Frozen',
   ];
 
-  const TableBody: React.FC<IAssetData> = ({
-    ticker,
+  const TableBody: React.FC<IAccountAsset> = ({
     assetId,
     assetType,
     precision,
     balance,
     frozenBalance,
   }) => {
+    const ticker = assetId.split('-')[0];
     return (
       <Row type="assets">
         <span>
@@ -93,7 +53,7 @@ const Assets: React.FC<IAssets> = props => {
         <span>
           <Link href={`/asset/${assetId}`}>{assetId}</Link>
         </span>
-        <span>{assetType}</span>
+        <span>{assetType === 0 ? 'Fungible' : 'Non Fungible'}</span>
         <span>
           <strong>{precision}</strong>
         </span>
@@ -114,7 +74,7 @@ const Assets: React.FC<IAssets> = props => {
   const tableProps: ITable = {
     type: 'assets',
     header,
-    data,
+    data: assets,
     body: TableBody,
     loading,
   };

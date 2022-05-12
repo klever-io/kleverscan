@@ -29,6 +29,7 @@ import {
   IPagination,
   IBucket,
   IAsset,
+  IAccountAsset,
 } from '@/types/index';
 
 import { ArrowLeft } from '@/assets/icons';
@@ -54,7 +55,7 @@ interface IAccountPage {
   transactions: ITransactionsResponse;
   convertedBalance: number;
   precisions: IAssetInfo[];
-  assets: IAsset[];
+  assets: IAccountAsset[];
   defaultKlvPrecision: number;
 }
 
@@ -224,7 +225,7 @@ const Account: React.FC<IAccountPage> = ({
   const SelectedTabComponent: React.FC = () => {
     switch (selectedTab) {
       case 'Assets':
-        return <Assets {...account.assets} />;
+        return <Assets assets={assets} />;
       case 'Transactions':
         return (
           <>
@@ -355,17 +356,6 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
     defaultKlvPrecision: 6,
   };
 
-  const assets = await api.get({
-    route: 'assets/kassets',
-  });
-
-  const filterPrecisions = assets.data.assets.map(
-    ({ assetId, precision }: IAssetInfo) => ({ assetId, precision }),
-  );
-  const { precision } = filterPrecisions.find(
-    ({ assetId }: IAssetInfo) => assetId === 'KLV',
-  ); // KLV default precision from API
-
   const accountLength = 62;
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
 
@@ -393,10 +383,19 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
   if (account.error) {
     return redirectProps;
   }
+
+  const filterPrecisions = Object.entries(account.data.account.assets).map(
+    ([assetId, asset]: [string, IAccountAsset]): IAssetInfo => ({
+      assetId,
+      precision: asset.precision,
+    }),
+  );
+  const precision = 6;
+
   props.transactions = transactions;
   props.precisions = filterPrecisions;
   props.defaultKlvPrecision = precision; // Default KLV precision
-  props.assets = assets.data.assets;
+  props.assets = Object.values(account.data.account.assets);
 
   const prices: IPriceResponse = await api.post({
     route: 'prices',

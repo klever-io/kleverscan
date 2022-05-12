@@ -400,7 +400,9 @@ export interface IAccount {
 export interface IAccountAsset {
   address: string;
   assetId: string;
+  assetType: number;
   balance: number;
+  precision: number;
   frozenBalance: number;
   unfrozenBalance: number;
   lastClaim: {

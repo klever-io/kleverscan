@@ -38,7 +38,7 @@ export const ArrowContainer = styled.div<{ active: boolean }>`
   opacity: ${props => !props.active && 0.3};
 `;
 
-export const ItemContainer = styled.div<{ active: boolean }>`
+export const ItemContainer = styled.div<{ active: boolean, onClick: () => void }>`
   height: 2rem;
   width: 2rem;
 

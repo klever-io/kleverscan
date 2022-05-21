@@ -20,6 +20,8 @@ import {
   CoinSelector,
 } from './styles';
 
+import { getVariation } from '@/utils/index';
+
 import { ICoinInfo } from '@/types/index';
 
 import Chart from '@/components/Chart';
@@ -32,16 +34,6 @@ interface ICoinCard {
 const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS }) => {
   const [selectedCoin, setSelectedCoin] = useState(0);
   const router = useRouter();
-
-  const getVariation = (variation: number) => {
-    const precision = 2;
-
-    if (variation < 0) {
-      return `- ${Math.abs(variation).toFixed(precision)}%`;
-    }
-
-    return `+ ${variation ? variation.toFixed(precision) : '--'}%`;
-  };
 
   const carouselRef = useRef<any>(null);
   const cardRef = useRef<any>(null);

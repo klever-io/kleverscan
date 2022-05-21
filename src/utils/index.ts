@@ -9,6 +9,16 @@ export const timestampToDate = (timestamp: number) => {
   return time.toISOString().slice(0, 10);
 };
 
+export const getVariation = (variation: number) => {
+  const precision = 2;
+
+  if (variation < 0) {
+    return `- ${Math.abs(variation).toFixed(precision)}%`;
+  }
+
+  return `+ ${variation ? variation.toFixed(precision) : '--'}%`;
+};
+
 export const getAge = (date: Date): string => {
   const diff = Math.abs(new Date().getTime() - date.getTime());
 

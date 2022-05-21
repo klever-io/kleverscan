@@ -17,11 +17,11 @@ describe('Component: Button', () => {
   it('Should have the correct styles for background-color, border, border-radius, cursor and color when not in main page', () => {
     const { container } = renderWithTheme(<Button>Click</Button>);
     const styles = {
-    background: theme.white,
-    border: `1px solid ${theme.rose}`,
-    borderRadius: '0.25rem',
-    color: theme.white,
-    cursor: 'pointer'
+      background: theme.white,
+      border: `1px solid ${theme.rose}`,
+      borderRadius: '0.25rem',
+      color: theme.white,
+      cursor: 'pointer'
     };
 
     expect(container.firstChild).toHaveStyle(styles);
@@ -30,12 +30,11 @@ describe('Component: Button', () => {
   it('Should have the correct background-image, background-color and radius when is on main page', () => {
     const { container } = renderWithTheme(<Button mainPage>Click</Button>);
     const styles = {
-    backgroundImage: theme.button.background,
-    backgroundColor: 'unset',
-    borderRadius: '0.5rem',
+      backgroundImage: theme.button.background,
+      backgroundColor: 'unset',
+      borderRadius: '0.5rem',
     };
     
     expect(container.firstChild).toHaveStyle(styles);
-  })
-  
+  });
 }); 

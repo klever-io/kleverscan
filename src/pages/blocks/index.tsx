@@ -112,7 +112,7 @@ const Blocks: React.FC<IBlocks> = ({
       headers: ['Reward Yesterday', 'Cumulative Revenue'],
       values: [
         `${formatAmount(
-          statistics.yesterday.totalBlockRewards || 0 / 10 ** precision,
+          (statistics.yesterday.totalBlockRewards || 0) / 10 ** precision,
         )} KLV`,
         `${formatAmount(
           statistics.total.totalBlockRewards / 10 ** precision,

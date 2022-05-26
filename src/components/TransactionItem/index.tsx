@@ -21,12 +21,12 @@ const TransactionItem: React.FC<ITransaction> = ({
   precision,
   sender,
 }) => {
-  const parameter: ITransferContract = {} as ITransferContract;
+  let parameter: ITransferContract = {} as ITransferContract;
   let amount = 0;
 
   if (contract) {
     const contractPosition = 0;
-    const parameter = contract[contractPosition].parameter as ITransferContract;
+    parameter = contract[contractPosition].parameter as ITransferContract;
 
     if (parameter?.amount) {
       amount = parameter.amount;

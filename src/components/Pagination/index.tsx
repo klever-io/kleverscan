@@ -86,7 +86,6 @@ const Pagination: React.FC<IPagination> = ({ count, page, onPaginate }) => {
                 onClick={() => modalLeftController()}
                 onMouseDown={e => e.preventDefault()}
               >
-                {' '}
                 {'...'}
               </ItemContainer>
               <PaginationModal {...leftPaginationProps} />
@@ -102,7 +101,6 @@ const Pagination: React.FC<IPagination> = ({ count, page, onPaginate }) => {
                 onClick={() => modalRightController()}
                 onMouseDown={e => e.preventDefault()}
               >
-                {' '}
                 {'...'}
               </ItemContainer>
               <PaginationModal {...rightPaginationProps} />

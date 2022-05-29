@@ -37,8 +37,8 @@ const CustomTooltip = ({ payload, label, active }: ITooltipContent) => {
     return (
       <TooltipContainer>
         <p>{`${label}`}</p>
-        <p>{`Burned: ${payload[0].value}`}</p>
-        <p>{`Minted: ${payload[1].value}`}</p>
+        <p>{`Burned: ${formatAmount(payload[0].value)}`}</p>
+        <p>{`Minted: ${formatAmount(payload[1].value)}`}</p>
       </TooltipContainer>
     );
   }

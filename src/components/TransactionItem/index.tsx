@@ -50,10 +50,10 @@ const TransactionItem: React.FC<ITransaction> = ({
         </p>
         <p>
           <strong>To: </strong>
-          <Link href={`/account/${parameter.toAddress}`}>
+          <Link href={`/account/${parameter?.toAddress}`}>
             <a className="clean-style">
-              {parameter.toAddress
-                ? parseAddress(parameter.toAddress, 12)
+              {parameter?.toAddress
+                ? parseAddress(parameter?.toAddress, 12)
                 : '--'}
             </a>
           </Link>

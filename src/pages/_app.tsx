@@ -20,19 +20,6 @@ const ErrorBoundary = Bugsnag.getPlugin('react')?.createErrorBoundary(React);
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   const router = useRouter();
 
-  const handleRouteChange = (url: any) => {
-    (window as any).gtag('config', 'G-ZB4W5DJX19', {
-      page_path: url,
-    });
-  };
-
-  useEffect(() => {
-    router.events.on('routeChangeComplete', handleRouteChange);
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange);
-    };
-  }, [router.events]);
-
   const children = (
     <ThemeProvider theme={theme}>
       <Layout>
@@ -44,7 +31,7 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
     </ThemeProvider>
   );
 
-  return (ErrorBoundary ? <ErrorBoundary>{children}</ErrorBoundary> : children);
+  return ErrorBoundary ? <ErrorBoundary>{children}</ErrorBoundary> : children;
 };
 
 export default MyApp;

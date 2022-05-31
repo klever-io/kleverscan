@@ -23,4 +23,7 @@ export const Container = styled.div`
 export const ListUris = styled.div`
     display: flex;
     flex-direction: column;
+    a {
+      color: ${props => props.theme.black}
+    }
 `;

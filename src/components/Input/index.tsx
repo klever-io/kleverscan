@@ -1,7 +1,7 @@
 import React, { KeyboardEvent, useRef, useEffect } from 'react';
 import { Container } from './styles';
 
-interface IInput extends React.InputHTMLAttributes<any> {
+interface Input extends React.InputHTMLAttributes<any> {
   type: string;
   value: string | number;
   onBlur: () => void;
@@ -9,9 +9,8 @@ interface IInput extends React.InputHTMLAttributes<any> {
   handleConfirmClick: () => void;
 }
 
-const Input: React.FC<IInput> = ({  onChange, handleConfirmClick, ...rest }) => {
+const Input: React.FC<Input> = ({ onChange, handleConfirmClick, ...rest }) => {
   const inputRef = useRef<HTMLInputElement>(null);
-
 
   useEffect(() => {
     inputRef?.current?.focus();

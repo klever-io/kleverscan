@@ -240,6 +240,29 @@ const validators = css`
 
 const nodes = validators;
 
+const validator = css`
+  margin-right: 1.25rem;
+  &:nth-child(1) {
+    width: 12rem;
+    max-width: 7rem;
+
+  }
+  &:nth-child(2) {
+    width: 60%;
+    max-width: 40rem;
+  }
+  &:nth-child(3) {
+    width: 10rem;
+    max-width: 10rem;
+  }
+
+  @media (max-width: 768px) {
+  :nth-child(2) {
+    width: 20rem;
+  }
+  }
+`;
+
 const networkParams = css`
   margin-right: 1.25rem;
 
@@ -312,6 +335,7 @@ const widths = {
   buckets,
   holders,
   validators,
+  validator,
   nodes,
   networkParams,
   proposals,

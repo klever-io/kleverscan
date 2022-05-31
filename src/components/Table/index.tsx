@@ -17,11 +17,13 @@ export interface ITable {
     | 'assetsPage'
     | 'holders'
     | 'validators'
+    | 'validator'
     | 'nodes'
     | 'networkParams'
     | 'proposals'
     | 'votes'
     | 'delegations';
+
 
   header: string[];
   data: any[];

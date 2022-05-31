@@ -1,140 +1,64 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-
 import userEvent from '@testing-library/user-event';
-
-import { useRouter } from 'next/router';
-
 import { ThemeProvider } from 'styled-components';
 import theme from '../../styles/theme';
-
 import Input from '.';
-// TODO: REFACTOR TEST TO THIS NEW INPUT COMPONENT
-const TRANSACTION = 'd83919b59a8309572e3ee552a9f1b39cd8f40900be14b915d3df31a49202d630';
-const ADDRESS = 'klv1mt8yw657z6nk9002pccmwql8w90k0ac6340cjqkvm9e7lu0z2wjqudt69s'
-const BLOCK = '77453';
-const ASSET = 'KLV';
 
-jest.mock('next/router', () => ({
-  __esModule: true,
-  useRouter: jest.fn()
-}));
+const mockedProps = {
+  type: 'text',
+  value: '',
+  onChange: jest.fn(),
+  handleConfirmClick: jest.fn(),
+  onBlur: jest.fn(),
+};
 
-describe('Component: Input', () => {  
-
+describe('Component: Input', () => {
   let container: HTMLElement;
 
   beforeEach(() => {
     container = render(
-    <ThemeProvider theme={theme}>
-      <Input />
-    </ThemeProvider>
+      <ThemeProvider theme={theme}>
+        <Input {...mockedProps} />
+      </ThemeProvider>,
     ).container;
   });
 
-  it('Should redirect for transaction page when match the hash length of transactions', async () => {
-    const user = userEvent.setup();
-    const mockRouter = {
-      push: jest.fn(),
-    };
-
-    (useRouter as jest.Mock).mockReturnValue(mockRouter)
-    const input: any = container.firstChild?.firstChild
-    const search: any = container.firstChild?.lastChild
-
-    await user.type(input, TRANSACTION);
-    await user.click(search);
-
-    expect(mockRouter.push).toHaveBeenCalled();
-    expect(mockRouter.push).toHaveBeenCalledWith(`/transaction/${TRANSACTION}`);
+  it("should render the component with it's input field value empty and focused", () => {
+    const input = container.firstElementChild?.firstElementChild;
+    expect(input?.innerHTML).toBe('');
+    expect(document.activeElement).toBe(input);
   });
 
-  it('Should redirect for address page when match the hash length of addresses', async () => {
+  it('should call handleConfirmClick function when pressing enter', () => {
     const user = userEvent.setup();
-    const mockRouter = {
-      push: jest.fn(),
-    };
-
-    (useRouter as jest.Mock).mockReturnValue(mockRouter)
-    const input: any = container.firstChild?.firstChild
-    const search: any = container.firstChild?.lastChild
-
-    await user.type(input, ADDRESS);
-    await user.click(search);
-
-    expect(mockRouter.push).toHaveBeenCalled();
-    expect(mockRouter.push).toHaveBeenCalledWith(`/account/${ADDRESS}`);
+    user.keyboard('{Enter}');
+    expect(mockedProps.handleConfirmClick).toHaveBeenCalled();
   });
 
-  it('Should redirect for block page when the value is a number', async () => {
-    const user = userEvent.setup();
-    const mockRouter = {
-      push: jest.fn(),
+  it("input and it's container should match styles", () => {
+    const containerStyles = {
+      padding: '0.8rem 1rem',
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      border: `1px solid ${theme.input.border.default}`,
+      borderRadius: '0.5rem',
+      cursor: 'text',
+      transition: '0.2s ease',
     };
 
-    (useRouter as jest.Mock).mockReturnValue(mockRouter)
-    const input: any = container.firstChild?.firstChild
-    const search: any = container.firstChild?.lastChild
-
-    await user.type(input, BLOCK);
-    await user.click(search);
-
-    expect(mockRouter.push).toHaveBeenCalled();
-    expect(mockRouter.push).toHaveBeenCalledWith(`/block/${BLOCK}`);
-  });
-
-  it('Should redirect for assets page when don\'t match with the hash length of addresses, transaction or if the value is a number', async () => {
-    const user = userEvent.setup();
-    const mockRouter = {
-      push: jest.fn(),
-    };
-
-    (useRouter as jest.Mock).mockReturnValue(mockRouter)
-    const input: any = container.firstChild?.firstChild
-    const search: any = container.firstChild?.lastChild
-
-    await user.type(input, ASSET);
-    await user.click(search);
-
-    expect(mockRouter.push).toHaveBeenCalled();
-    expect(mockRouter.push).toHaveBeenCalledWith(`/asset/${ASSET}`);
-  });
-
-  it('Should do the search when press "ENTER" on keyboard', async () => {
-    const user = userEvent.setup();
-    const mockRouter = {
-      push: jest.fn(),
-    };
-
-    (useRouter as jest.Mock).mockReturnValue(mockRouter)
-    const input: any = container.firstChild?.firstChild
-
-    await user.type(input, `${ASSET}{enter}`);
-
-    expect(mockRouter.push).toHaveBeenCalled();
-    expect(mockRouter.push).toHaveBeenCalledWith(`/asset/${ASSET}`);
-  });
-
-  it('Should do anything if the search is empty', async () => {
-    const user = userEvent.setup();
-    const mockRouter = {
-      push: jest.fn(),
-    };
-
-    (useRouter as jest.Mock).mockReturnValue(mockRouter)
-    const search: any = container.firstChild?.lastChild
-
-    await user.click(search);
-    
-    expect(mockRouter.push).not.toHaveBeenCalled();
-  });
-
-  it('Should match the style of the input', () => {
-    const style = {
+    const inputStyles = {
       width: '100%',
       minWidth: '5rem',
+      fontSize: '0.85rem',
       color: theme.input.text,
     };
-    expect(container.firstChild?.firstChild).toHaveStyle(style);
+
+    const input = container.firstElementChild?.firstElementChild;
+    const containerInput = container.firstElementChild;
+    expect(containerInput).toHaveStyle(containerStyles);
+    expect(input).toHaveStyle(inputStyles);
   });
 });

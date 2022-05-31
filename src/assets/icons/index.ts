@@ -13,6 +13,9 @@ import Copy from './copy.svg';
 import Calendar from './calendar.svg';
 import TickSquare from './tick-square.svg';
 import Proposal from './proposal.svg';
+import Receive from './receive.svg';
+import ArrowGreen from './arrow-up-green.svg';
+import ArrowPink from './arrow-down-pink.svg';
 
 export {
   Category,
@@ -30,4 +33,7 @@ export {
   Calendar,
   TickSquare,
   Proposal,
+  Receive,
+  ArrowGreen,
+  ArrowPink,
 };

@@ -672,8 +672,10 @@ export interface IProposal {
   epochEnd: number;
   votes: number;
   voters: IVote[];
-  // hash: string;
+  txHash: string;
   proposer: string;
+  createdDate: string;
+  endedDate: string;
 }
 
 export interface IVote {

@@ -86,6 +86,9 @@ const Proposals: React.FC<IProposalsPage> = ({
             votes: proposal.voters[index].amount,
             voters: proposal.voters,
             proposer: proposal.proposer,
+            txHash: proposal.txHash,
+            createdDate: proposal.createdDate,
+            endedDate: proposal.endedDate,
           };
         },
       );
@@ -182,22 +185,6 @@ export const getServerSideProps: GetServerSideProps<IProposalsPage> = async ({
   const proposalResponse: IProposalsResponse = await api.get({
     route: 'proposals/list',
   });
-
-  //Mock Proposal ==============
-
-  // proposalResponse.data.proposals.push({
-  //   proposalId: 0,
-  //   proposalStatus: 'pending',
-  //   parameter: 'test',
-  //   value: 'test',
-  //   description:
-  //     'Propose to modify the fee of 1 unit of Bandwidth to 0.001  TRX Propose to modify the cost of account creation in the system contract to 1  TRX',
-  //   epochStart: 0,
-  //   epochEnd: 1000,
-  //   voters: [],
-  //   votes: 0,
-  //   proposer: 'test',
-  // });
 
   const proposalsMessages: IProposalsMessages = {
     BlockRewards: 'Block Rewards',

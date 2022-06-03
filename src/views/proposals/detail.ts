@@ -2,6 +2,19 @@ import styled from 'styled-components';
 
 import { default as DefaultInput } from '@/components/Inputt';
 
+interface CardVoteProps {
+  color: string;
+}
+
+interface OptionValidatorProps {
+  selected: boolean;
+}
+
+interface ProgressBarProps {
+  widthPercentage: string;
+  background: string;
+}
+
 export const Container = styled.div`
   padding: 3rem 10rem 5rem 10rem;
 
@@ -104,6 +117,46 @@ export const ProgressContainer = styled.div`
   margin-left: 2rem;
 `;
 
+export const ProgressBar = styled.div`
+  width: 100%;
+  background-color: #ebf1f7;
+  height: 3rem;
+  border-radius: 4;
+  display: flex;
+  flex-direction: row;
+`;
+
+export const ProgressBarContent = styled.div<ProgressBarProps>`
+  height: 3rem;
+  width: ${props => props.widthPercentage}%;
+  background-color: ${props => props.background};
+`;
+
+export const PassThresholdText = styled.p`
+  color: #b039bf;
+  font-size: 11px;
+  margin-bottom: 5px;
+  font-weight: bold;
+`;
+
+export const VerticalLine = styled.div`
+  border-left: 1.5px solid #b039bf;
+  height: 20px;
+`;
+
+export const PassThresholdContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+`;
+
+export const StatusContent = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
 export const ProgressContent = styled.div`
   height: 1.5rem;
   width: 8rem;
@@ -115,6 +168,43 @@ export const ProgressContent = styled.div`
   background-opacity: 0.5;
 
   border-radius: 0.25rem;
+`;
+
+export const VotesContainer = styled.div`
+  background-color: white;
+  border-radius: 10px;
+  padding: 30px;
+  margin-bottom: 1.5rem;
+`;
+
+export const VotesHeader = styled.div`
+  flex-direction: column;
+  display: flex;
+  margin-top: 1rem;
+
+  strong {
+    opacity: 0.4;
+    font-size: 0.9rem;
+  }
+`;
+
+export const ProgressBarVotes = styled.div`
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+
+  span {
+    opacity: 0.6;
+    font-size: 0.8rem;
+  }
+`;
+
+export const ValidatorsContainer = styled.div`
+  margin-bottom: 10px;
+`;
+
+export const FiltersValidators = styled.div`
+  display: flex;
+  margin-top: 20px;
 `;
 
 export const CardContainer = styled.div`
@@ -131,6 +221,54 @@ export const CardContent = styled.div`
   background-color: ${props => props.theme.white};
 
   border-radius: 0.75rem;
+`;
+
+export const CardVoteContainer = styled.div`
+  display: flex;
+  flexdirection: row;
+`;
+
+export const CardVote = styled.div<CardVoteProps>`
+  width: 13rem;
+  padding: 30px 25px 30px 25px;
+  border: 1px solid ${props => props.color};
+  border-radius: 10px;
+
+  &:not(:first-child) {
+    margin-left: 1rem;
+  }
+
+  span {
+    color: ${props => props.color};
+    font-weight: bold;
+  }
+`;
+
+export const PercentageText = styled.p`
+  font-size: 1.4rem;
+  margin-top: 0.2rem;
+`;
+
+export const QtyVotesText = styled.p`
+  opacity: 0.6;
+  font-size: 0.8rem;
+`;
+
+export const OptionValidator = styled.div<OptionValidatorProps>`
+  background-color: ${props =>
+    props.selected ? '#B039BF' : 'rgb(0, 0, 0, 0.4)'};
+  padding: 6px 11px 6px 11px;
+  border-radius: 13px;
+  cursor: pointer;
+
+  strong {
+    font-size: 0.8rem;
+    color: white;
+  }
+
+  &:not(:first-child) {
+    margin-left: 0.7rem;
+  }
 `;
 
 export const Row = styled.div`
@@ -158,11 +296,15 @@ export const Row = styled.div`
   }
 
   span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
     &:first-child {
       width: 12rem;
     }
     &:nth-child(2) {
-      width: 10rem;
+      margin-right: 4rem;
     }
     &:nth-child(3) {
       width: 10rem;
@@ -183,7 +325,6 @@ export const Row = styled.div`
     small {
       font-weight: 400;
       font-size: 0.95rem;
-      color: ${props => props.theme.card.darkText};
     }
 
     a {
@@ -199,6 +340,9 @@ export const Row = styled.div`
     p {
       color: ${props => props.theme.card.darkText};
       font-weight: 400;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
 
@@ -208,48 +352,27 @@ export const Row = styled.div`
   }
 `;
 
-export const CenteredRow = styled.div`
-  display: flex;
-
-  flex-direction: row;
-  align-items: center;
-
-  gap: 0.5rem;
-
-  strong {
-    font-size: 1rem;
-    font-weight: 600;
-  }
-  small {
-    align-items: center;
-  }
-
-  p {
-    font-weight: 600;
-    font-size: 0.85rem;
-  }
-
-  span {
-    @media (max-width: 768px) {
-      max-width: 80% !important;
-    }
-  }
-
-  svg {
-    cursor: pointer;
-  }
-
-  a {
-    color: ${props => props.theme.black};
-    font-size: 1rem;
-    font-weight: 600;
-    text-decoration: none;
-  }
-  a:hover {
+export const HashText = styled.span`
+  color: #aa33b5;
+  cursor: pointer;
+  &:hover {
     text-decoration: underline;
   }
+`;
 
-  @media (max-width: 768px) {
-    width: 100%;
-  }
+export const EndedDate = styled.small`
+  color: red;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: center;
+  gap: 0.5rem;
+`;
+
+export const DateContainer = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: center;
+  gap: 0.5rem;
 `;

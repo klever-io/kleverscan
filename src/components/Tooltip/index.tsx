@@ -1,5 +1,5 @@
 import { IconHelp } from '@/assets/help';
-import React from 'react';
+import React, {useState} from 'react';
 
 import ReactTooltip from 'react-tooltip';
 
@@ -8,20 +8,29 @@ interface ITooltipProps {
 }
 
 const Tooltip: React.FC<ITooltipProps> = ({ msg }) => {
+  const [displayMessage, setDisplayMessage] = useState(false);
+
   return (
     <div>
-      <IconHelp data-tip data-for="buttonTooltip">
-        button
-      </IconHelp>
-      <ReactTooltip
-        id="buttonTooltip"
-        place="bottom"
-        effect="solid"
-        type="info"
-        backgroundColor="#7B7DB2"
+      <div
+        onMouseOver={() => setDisplayMessage(true)}
+        onMouseLeave={() => setDisplayMessage(false)}
       >
-        {msg}
-      </ReactTooltip>
+        <IconHelp data-tip data-for="buttonTooltip">
+          button
+        </IconHelp>
+          {displayMessage && 
+              <ReactTooltip
+              id="buttonTooltip"
+              place="bottom"
+              effect="solid"
+              type="info"
+              backgroundColor="#7B7DB2"
+            >
+              {msg}
+            </ReactTooltip>
+          }
+      </div>
     </div>
   );
 };

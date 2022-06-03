@@ -47,6 +47,11 @@ export const getAge = (date: Date): string => {
   return `${val} ${suffix}${val > 1 ? 's' : ''}`;
 };
 
+export const typeVoteColors = {
+  'Yes': '#B039BF',
+  'No': '#FF4A4A',
+};
+
 export const formatAmount = (number: number): string => {
   if (number <= 0) {
     return '0';
@@ -169,3 +174,7 @@ const plural = (count: number, singular: string): string => {
 
   return `${count} ${singular}s `;
 };
+
+export const addCommasToNumber = (numb: number): string => {
+  return numb.toLocaleString();
+}

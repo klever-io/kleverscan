@@ -143,6 +143,11 @@ export const Status = styled.div<IStatus>`
 
   gap: 0.9rem;
 
+  span {
+    color: ${props => props.status === 'ApprovedProposal' ? props.theme.table['success'] : props.theme.table[props.status]} !important;
+    font-weight: bold;
+  }
+
   p {
     color: ${props => props.theme.table[props.status]} !important;
     text-transform: capitalize;

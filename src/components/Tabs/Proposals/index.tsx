@@ -30,14 +30,16 @@ interface IProposals {
 }
 
 const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
-  const TableBody: React.FC<IProposal> = ({
-    proposalId,
-    description,
-    epochStart,
-    epochEnd,
-    proposalStatus,
-    proposer,
-  }) => {
+  const TableBody: React.FC<IProposal> = (props) => {
+    const {
+      proposalId,
+      description,
+      epochStart,
+      epochEnd,
+      proposalStatus,
+      proposer,
+    } = props;
+
     const StatusIcon = getStatusIcon(proposalStatus);
 
     const stakedPercent = 50;
@@ -51,16 +53,18 @@ const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
           <ProposerDescAndLink>
             <Description>{description || ' - '}</Description>
             <Proposer>Proposer</Proposer>
-            <Link href="/">{parseAddress(proposer, 8)}</Link>
+            <Link href={`/account/${proposer}`}>
+              {parseAddress(proposer, 8)}
+            </Link>
           </ProposerDescAndLink>
           <span>
             <small>
               Start:{' '}
-              {format(fromUnixTime(epochStart / 1000), 'MM/dd/yyyy HH:mm')}
+              {format(fromUnixTime(epochStart), 'MM/dd/yyyy HH:mm')}
             </small>{' '}
             <p />
             <small className="endTime">
-              End: {format(fromUnixTime(epochEnd / 1000), 'MM/dd/yyyy HH:mm')}
+              End: {format(fromUnixTime(epochEnd), 'MM/dd/yyyy HH:mm')}
             </small>
           </span>
           <UpVotes>
@@ -77,7 +81,7 @@ const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
             <ProposalStatus>{capitalizeString(proposalStatus)}</ProposalStatus>
           </Status>
           <span>
-            <Link href={`/proposal/${proposalId}`}>Details</Link>
+            <Link href={{pathname: `/proposal/${proposalId}`}}>Details</Link>
           </span>
         </Row>
       </>

@@ -19,7 +19,7 @@ const Map = dynamic(() => import('@/components/Map/index'), { ssr: false });
 
 import NodeCards from '@/components/Cards/NodeCards';
 
-import { ICountriesGeoData, ICountryNode, INodeCard } from '../../types';
+import { ICountriesGeoData, ICountryNode, INodeCard, IPeerData } from '../../types';
 
 import { ArrowLeft } from '@/assets/icons';
 import { Nodes as Icon } from '@/assets/title-icons';
@@ -42,13 +42,6 @@ interface IGeoIPLookup {
   ll: [number, number];
 }
 
-interface IPeerData {
-  isblacklisted: boolean;
-  pid: string;
-  pk: string;
-  peertype: string;
-  addresses: string[];
-}
 interface IPeerResponse {
   data: { peers: IPeerData[] };
   pagination: string | null;
@@ -136,6 +129,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
         !item.startsWith('.255/tcp')
       );
     });
+
     for (const address of filteredAddresses) {
       // IP comes as /ip4/xx.xx.x.xx/tcp/xxxxx
       const cleanIp = address.replace(/\/ip4\/|\/tcp\/[^\/]*$/g, '');
@@ -156,10 +150,16 @@ export const getServerSideProps: GetServerSideProps = async () => {
       if (countryNodeIndex === -1) {
         nodes.push({
           country,
-          nodes: [ll],
+          nodes: [{
+            data: peers[i],
+            coordenates: [ll],
+          }],
         });
       } else {
-        nodes[countryNodeIndex].nodes.push(ll);
+        nodes[countryNodeIndex].nodes.push({
+          data: peers[i],
+          coordenates: [ll],
+        });
       }
     }
   }
@@ -181,12 +181,14 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
   let pathStrings: string[] = [];
   let viewBox: number[] = [];
+
   const converter = geojson2svg({
     viewportSize: { width: 200, height: 200 },
     mapExtent: { left: -180, bottom: -180, right: 180, top: 180 },
     output: 'path',
     fitTo: 'height',
   });
+
   if (mostNodesCountryGeo) {
     pathStrings = converter.convert(mostNodesCountryGeo);
     viewBox = getBounds(pathStrings.join(' '));

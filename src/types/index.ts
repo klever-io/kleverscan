@@ -508,9 +508,22 @@ export interface IResponse {
   error: IError;
 }
 
+interface INodePeer {
+  coordenates: [number, number][];
+  data: any;
+}
+
 export interface ICountryNode {
   country: ISO2;
-  nodes: [number, number][];
+  nodes: INodePeer[];
+}
+
+export interface IPeerData {
+  isblacklisted: boolean;
+  pid: string;
+  pk: string;
+  peertype: string;
+  addresses: string[];
 }
 
 export interface ICountryFeature {

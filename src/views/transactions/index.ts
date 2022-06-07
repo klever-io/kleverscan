@@ -97,7 +97,7 @@ export const TooltipText = styled.span`
   position: fixed;
   z-index: 1;
   transform: translateX(-12.5%);
-  transition: 0.3s ease;
+  transition: 0.3s ease opacity;
   pointer-events: none;
 `;
 

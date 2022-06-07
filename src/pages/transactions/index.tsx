@@ -246,8 +246,8 @@ const Transactions: React.FC<ITransactions> = ({
     const tooltipRef = useRef<any>(null);
 
     const handleMouseOver = (e: any) => {
-      const positionY = e.currentTarget.offsetTop;
-      const positionX = e.currentTarget.offsetLeft;
+      const positionY = e.currentTarget.getBoundingClientRect().top;
+      const positionX = e.currentTarget.getBoundingClientRect().left;
 
       tooltipRef.current.style.top = positionY - 30 + 'px';
       tooltipRef.current.style.left = positionX + 'px';

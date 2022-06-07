@@ -15,9 +15,8 @@ const props = {
 }
 
 describe('Component: Footer', () => {
-  let container: HTMLElement;
   beforeEach(() => {
-    container = renderWithTheme(<DateFilter {...props} />).container;
+    renderWithTheme(<DateFilter {...props} />);
   });
 
   it('Should render the input with the "Add filter by ', () => {

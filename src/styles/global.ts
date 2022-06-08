@@ -12,6 +12,11 @@ export default createGlobalStyle`
     background: ${theme.background} !important;
   }
 
+  a, a:hover, a:focus, a:active {
+    text-decoration: none;
+    color: inherit;
+  }
+  
   @media (max-width: 1080px) {
     html {
       font-size: 93.75%;

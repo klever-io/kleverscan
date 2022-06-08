@@ -91,6 +91,10 @@ export const CardContent = styled.div`
   @media (max-width: 1600px) {
     width: 100%;
   }
+
+  a {
+    z-index: 1;
+  }
 `;
 
 export const HeaderContainer = styled.div`

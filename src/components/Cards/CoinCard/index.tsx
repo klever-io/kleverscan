@@ -25,6 +25,7 @@ import { getVariation } from '@/utils/index';
 import { ICoinInfo } from '@/types/index';
 
 import Chart from '@/components/Chart';
+import Link from 'next/link';
 
 interface ICoinCard {
   coins: ICoinInfo[];
@@ -46,9 +47,6 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS }) => {
   const handleSelection = (index: number) => {
     carouselRef.current.scrollLeft = index * cardRef.current.offsetWidth;
   };
-  const coinNavigate = (coin: ICoinInfo) => {
-    router.push(`/asset/${coin.shortname}`);
-  };
 
   return (
     <Container>
@@ -57,30 +55,28 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS }) => {
           return (
             <CardContainer key={String(index)} ref={cardRef}>
               <CardContent>
-                <HeaderContainer>
-                  <IconContainer
-                    onClick={() => coinNavigate(coin)}
-                    src={`/coins/${coin.shortname.toLowerCase()}.png`}
-                  />
+                <Link href={`/asset/${coin.shortname}`}>
+                  <a>
+                    <HeaderContainer>
+                      <IconContainer
+                        src={`/coins/${coin.shortname.toLowerCase()}.png`}
+                      />
 
-                  <HeaderContent>
-                    <Name>
-                      <span onClick={() => coinNavigate(coin)}>
-                        {coin.shortname}
-                      </span>
-                      <span>U$ {coin.price.toLocaleString()}</span>
-                    </Name>
-                    <Description
-                      positive={getVariation(coin.variation).includes('+')}
-                    >
-                      <span onClick={() => coinNavigate(coin)}>
-                        {coin.name}
-                      </span>
-                      <p>{getVariation(coin.variation)}</p>
-                    </Description>
-                  </HeaderContent>
-                </HeaderContainer>
-
+                      <HeaderContent>
+                        <Name>
+                          <span>{coin.shortname}</span>
+                          <span>U$ {coin.price.toLocaleString()}</span>
+                        </Name>
+                        <Description
+                          positive={getVariation(coin.variation).includes('+')}
+                        >
+                          <span>{coin.name}</span>
+                          <p>{getVariation(coin.variation)}</p>
+                        </Description>
+                      </HeaderContent>
+                    </HeaderContainer>
+                  </a>
+                </Link>
                 <ChartContainer>
                   <Chart data={coin.prices} />
                 </ChartContainer>

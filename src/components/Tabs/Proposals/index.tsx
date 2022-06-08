@@ -30,7 +30,7 @@ interface IProposals {
 }
 
 const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
-  const TableBody: React.FC<IProposal> = (props) => {
+  const TableBody: React.FC<IProposal> = props => {
     const {
       proposalId,
       description,
@@ -54,13 +54,12 @@ const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
             <Description>{description || ' - '}</Description>
             <Proposer>Proposer</Proposer>
             <Link href={`/account/${proposer}`}>
-              {parseAddress(proposer, 8)}
+              <a>{parseAddress(proposer, 8)}</a>
             </Link>
           </ProposerDescAndLink>
           <span>
             <small>
-              Start:{' '}
-              {format(fromUnixTime(epochStart), 'MM/dd/yyyy HH:mm')}
+              Start: {format(fromUnixTime(epochStart), 'MM/dd/yyyy HH:mm')}
             </small>{' '}
             <p />
             <small className="endTime">
@@ -81,7 +80,9 @@ const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
             <ProposalStatus>{capitalizeString(proposalStatus)}</ProposalStatus>
           </Status>
           <span>
-            <Link href={{pathname: `/proposal/${proposalId}`}}>Details</Link>
+            <Link href={{ pathname: `/proposal/${proposalId}` }}>
+              <a>Details</a>
+            </Link>
           </span>
         </Row>
       </>

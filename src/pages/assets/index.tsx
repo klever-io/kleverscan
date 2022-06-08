@@ -80,17 +80,26 @@ const Assets: React.FC<IAssetPage> = ({
   }) => {
     return (
       <Row type="assetsPage">
-        <span>{renderLogo(logo, ticker, name)}</span>
+        <Link href={`/asset/${assetId}`}>
+          <a>{renderLogo(logo, ticker, name)}</a>
+        </Link>
 
-        <span>
-          <p>{ticker}</p>
-        </span>
+        <Link href={`/asset/${assetId}`}>
+          <a>
+            <p>{ticker}</p>
+          </a>
+        </Link>
+
         <span>
           <Link href={`/asset/${assetId}`}>{assetId}</Link>
         </span>
-        <span>
-          <p>{name}</p>
-        </span>
+
+        <Link href={`/asset/${assetId}`}>
+          <a>
+            <p>{name}</p>
+          </a>
+        </Link>
+
         <span>{assetType}</span>
         <span>
           <strong>

@@ -312,9 +312,11 @@ const ProposalDetails: React.FC<IProposal> = props => {
                   <strong>Hash</strong>
                 </span>
                 <Link href={`/transaction/${proposalAPI.txHash}`}>
-                  <HashText>
-                    <a>{proposalAPI.txHash}</a>
-                  </HashText>
+                  <a>
+                    <HashText>
+                      <a>{proposalAPI.txHash}</a>
+                    </HashText>
+                  </a>
                 </Link>
               </Row>
             </CardContent>

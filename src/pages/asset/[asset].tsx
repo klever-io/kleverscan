@@ -33,7 +33,7 @@ import {
   parseHardCodedInfo,
   toLocaleFixed,
   breakText,
-  timestampToDate
+  timestampToDate,
 } from '@/utils/index';
 
 import { ArrowLeft } from '@/assets/icons';
@@ -177,7 +177,7 @@ const Asset: React.FC<IAssetPage> = ({
     }
 
     return <a href="#">{breakText(uris.Whitepaper, 25)}</a>;
-  }
+  };
 
   const getWebsite = () => {
     if (!uris || !uris.Website) {
@@ -185,7 +185,7 @@ const Asset: React.FC<IAssetPage> = ({
     }
 
     return <a href="#">{uris.Website}</a>;
-  }
+  };
 
   const getIssueDate = () => {
     if (issueDate) {
@@ -193,7 +193,7 @@ const Asset: React.FC<IAssetPage> = ({
     }
 
     return '--';
-  }
+  };
 
   const Overview: React.FC = () => {
     return (

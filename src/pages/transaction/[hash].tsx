@@ -77,7 +77,8 @@ interface IAssetResponse extends IResponse {
   };
 }
 
-interface ITransactionPage extends ITransaction {
+interface ITransactionPage {
+  transaction: ITransaction;
   precision: number;
   asset: IAsset;
 }
@@ -102,8 +103,10 @@ const klvAsset: IAsset = {
   },
 };
 
-const Transaction: React.FC<ITransactionPage> = tx => {
+const Transaction: React.FC<ITransactionPage> = props => {
   const router = useRouter();
+
+  const { transaction, asset } = props;
 
   const {
     hash,
@@ -119,8 +122,7 @@ const Transaction: React.FC<ITransactionPage> = tx => {
     receipts,
     blockNum,
     nonce,
-    asset,
-  } = tx;
+  } = transaction;
 
   const StatusIcon = getStatusIcon(status);
   const precision = 6; // default KLV precision
@@ -347,7 +349,7 @@ const Transaction: React.FC<ITransactionPage> = tx => {
               wrapLines={true}
               wrapLongLines={true}
             >
-              {JSON.stringify(tx, null, 2)}
+              {JSON.stringify(transaction, null, 2)}
             </SyntaxHighlighter>
           </CardRaw>
         </CardContent>
@@ -401,7 +403,7 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
   }
 
   const props: ITransactionPage = {
-    ...transaction.data.transaction,
+    transaction: transaction.data.transaction,
     precision,
     asset,
   };

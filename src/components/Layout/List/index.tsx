@@ -13,7 +13,7 @@ import {
   TableContainer,
 } from './styles';
 
-import Input from '../../Input';
+import Input from '../../Inputt';
 
 import { BsQuestionCircleFill } from 'react-icons/bs';
 

@@ -23,6 +23,11 @@ jest.mock('next/router', () => ({
 describe('Component: Input', () => {  
 
   let container: HTMLElement;
+  const mockRouter = {
+    push: jest.fn(),
+  };
+  (useRouter as jest.Mock).mockReturnValue(mockRouter);
+
 
   beforeEach(() => {
     container = render(
@@ -32,15 +37,15 @@ describe('Component: Input', () => {
     ).container;
   });
 
+  afterEach(() => {
+    (useRouter as jest.Mock).mockClear();
+  });
+
   it('Should redirect for transaction page when match the hash length of transactions', async () => {
     const user = userEvent.setup();
-    const mockRouter = {
-      push: jest.fn(),
-    };
 
-    (useRouter as jest.Mock).mockReturnValue(mockRouter)
-    const input: any = container.firstChild?.firstChild
-    const search: any = container.firstChild?.lastChild
+    const input: any = container.firstChild?.firstChild;
+    const search: any = container.firstChild?.lastChild;
 
     await user.type(input, TRANSACTION);
     await user.click(search);
@@ -51,13 +56,9 @@ describe('Component: Input', () => {
 
   it('Should redirect for address page when match the hash length of addresses', async () => {
     const user = userEvent.setup();
-    const mockRouter = {
-      push: jest.fn(),
-    };
 
-    (useRouter as jest.Mock).mockReturnValue(mockRouter)
-    const input: any = container.firstChild?.firstChild
-    const search: any = container.firstChild?.lastChild
+    const input: any = container.firstChild?.firstChild;
+    const search: any = container.firstChild?.lastChild;
 
     await user.type(input, ADDRESS);
     await user.click(search);
@@ -68,13 +69,9 @@ describe('Component: Input', () => {
 
   it('Should redirect for block page when the value is a number', async () => {
     const user = userEvent.setup();
-    const mockRouter = {
-      push: jest.fn(),
-    };
 
-    (useRouter as jest.Mock).mockReturnValue(mockRouter)
-    const input: any = container.firstChild?.firstChild
-    const search: any = container.firstChild?.lastChild
+    const input: any = container.firstChild?.firstChild;
+    const search: any = container.firstChild?.lastChild;
 
     await user.type(input, BLOCK);
     await user.click(search);
@@ -85,13 +82,9 @@ describe('Component: Input', () => {
 
   it('Should redirect for assets page when don\'t match with the hash length of addresses, transaction or if the value is a number', async () => {
     const user = userEvent.setup();
-    const mockRouter = {
-      push: jest.fn(),
-    };
 
-    (useRouter as jest.Mock).mockReturnValue(mockRouter)
-    const input: any = container.firstChild?.firstChild
-    const search: any = container.firstChild?.lastChild
+    const input: any = container.firstChild?.firstChild;
+    const search: any = container.firstChild?.lastChild;
 
     await user.type(input, ASSET);
     await user.click(search);
@@ -102,12 +95,8 @@ describe('Component: Input', () => {
 
   it('Should do the search when press "ENTER" on keyboard', async () => {
     const user = userEvent.setup();
-    const mockRouter = {
-      push: jest.fn(),
-    };
 
-    (useRouter as jest.Mock).mockReturnValue(mockRouter)
-    const input: any = container.firstChild?.firstChild
+    const input: any = container.firstChild?.firstChild;
 
     await user.type(input, `${ASSET}{enter}`);
 
@@ -117,12 +106,8 @@ describe('Component: Input', () => {
 
   it('Should do anything if the search is empty', async () => {
     const user = userEvent.setup();
-    const mockRouter = {
-      push: jest.fn(),
-    };
 
-    (useRouter as jest.Mock).mockReturnValue(mockRouter)
-    const search: any = container.firstChild?.lastChild
+    const search: any = container.firstChild?.lastChild;
 
     await user.click(search);
     

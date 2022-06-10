@@ -1,32 +1,16 @@
 import React, { useState, useEffect } from 'react';
-
-import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
-
-import dynamic from 'next/dynamic';
 import { fromUnixTime } from 'date-fns';
 
 import {
   CardChartContainer,
   CardDetails,
-  ChartBody,
-  ChartContainer,
-  ChartHeader,
-  MapContainer,
 } from '@/views/nodes';
 
-import { Card, CardContainer, Container, Header, Title } from '@/views/blocks';
-
-import Chart, { ChartType } from '@/components/Chart';
-const Map = dynamic(() => import('@/components/Map/index'), { ssr: false });
+import { Card, CardContainer } from '@/views/blocks';
+import Chart from '@/components/Chart';
 import MapSvg from '@/components/MapSvg';
 
-import { ArrowLeft } from '@/assets/icons';
-import { coinMockedData, IChartData } from '@/configs/home';
 import { getAge } from '@/utils/index';
-import { getCountryISO3, ISO2 } from '@/utils/country';
-import geoData from '@/assets/countries.geo.json';
-import api from '@/services/api';
 import { INodeCard } from '@/types/index';
 
 interface IProps {

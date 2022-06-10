@@ -38,9 +38,9 @@ const buildUrlQuery = (query: IQuery): string =>
 
 export const getHost = (
   route: string,
-  query: IQuery,
-  service: Service,
-  apiVersion: string,
+  query: IQuery | undefined,
+  service: Service | undefined,
+  apiVersion: string | undefined,
 ): string => {
   const hostService = {
     [Service.PROXY]:
@@ -55,7 +55,7 @@ export const getHost = (
       process.env.DEFAULT_EXPLORER_HOST || 'https://testnet.kleverscan.org',
   };
 
-  let host = hostService[service];
+  let host = hostService[service || 0];
   let port = process.env.DEFAULT_API_PORT || '443';
   let urlParam = '';
 

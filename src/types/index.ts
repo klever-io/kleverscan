@@ -410,6 +410,9 @@ export interface IAccountAsset {
     epoch: number;
   };
   buckets?: IBucket[];
+  staking?: {
+    minEpochsToWithdraw: number;
+  };
 }
 
 export interface IAsset {

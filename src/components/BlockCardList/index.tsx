@@ -51,9 +51,7 @@ const BlockCardList: React.FC<IBlockCardList> = ({ blocks, precision }) => {
   return (
     <Section>
       <Link href={'/blocks'}>
-        <a>
-          <h1>Blocks</h1>
-        </a>
+        <h1>Blocks</h1>
       </Link>
       <Carousel>{getBLockCards()}</Carousel>
     </Section>

@@ -423,7 +423,7 @@ const getVotingPowers = async (voters: any, powers: any) => {
     }
   });
 
-  return Promise.all(votingPowers);
+  return Promise.allSettled(votingPowers);
 };
 
 export const getServerSideProps: GetStaticProps<IProposal> = async ({

@@ -183,7 +183,7 @@ export const withText = async (props: IProps, method: Method): Promise<any> => {
 
 export const withTimeout = async (
   promise: Promise<any>,
-  timeout = 5000,
+  timeout = 10000,
 ): Promise<any> => {
   return Promise.race([
     promise,

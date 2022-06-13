@@ -358,7 +358,6 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
 
   const accountLength = 62;
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
-
   const address = String(params?.account);
 
   if (!address || address.length !== accountLength) {
@@ -368,14 +367,18 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
   const account: IAccountResponse = await api.get({
     route: `address/${address}`,
   });
+
   if (account.error) {
     return redirectProps;
   }
+
   props.account = account.data.account;
+
   if (props.account.assets.KLV) {
     props.account.assets.KLV.balance =
       props.account.balance - props.account.assets.KLV.frozenBalance;
   }
+
   const transactions: ITransactionsResponse = await api.get({
     route: `address/${address}/transactions`,
   });
@@ -390,6 +393,7 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
       precision: asset.precision,
     }),
   );
+
   const precision = 6;
 
   props.transactions = transactions;
@@ -402,6 +406,7 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
     service: Service.PRICE,
     body: { names: ['KLV/USD'] },
   });
+
   if (!prices.error) {
     props.convertedBalance =
       prices.symbols[0].price *

@@ -283,46 +283,82 @@ export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
     pagination: {} as IPagination,
   };
 
-  const blockCall = new Promise<IBlockResponse>(resolve =>
-    resolve(
-      api.get({
-        route: 'block/list',
-      }),
-    ),
-  );
+  const blockCall = new Promise<IBlockResponse>(async (resolve, reject) => {
+    const res = await api.get({
+      route: 'block/list',
+    });
 
-  const yesterdayStatisticsCall = new Promise<IStatisticsResponse>(resolve =>
-    resolve(
-      api.get({
+    if (!res.error || res.error === '') {
+      resolve(res);
+    }
+
+    reject(res.error);
+  });
+
+  const yesterdayStatisticsCall = new Promise<IStatisticsResponse>(
+    async (resolve, reject) => {
+      const res = await api.get({
         route: 'block/statistics-by-day/1',
-      }),
-    ),
-  );
-  const totalStatisticsCall = new Promise<IStatisticsResponse>(resolve =>
-    resolve(
-      api.get({
-        route: 'block/statistics-total/0',
-      }),
-    ),
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
   );
 
-  const [block, yesterdayStatistics, totalStatistics] = await Promise.all([
+  const totalStatisticsCall = new Promise<IStatisticsResponse>(
+    async (resolve, reject) => {
+      const res = await api.get({
+        route: 'block/statistics-total/0',
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
+  );
+
+  await Promise.allSettled([
     blockCall,
     yesterdayStatisticsCall,
     totalStatisticsCall,
-  ]);
+  ]).then(responses => {
+    responses.map((res, index) => {
+      if (res.status !== 'rejected') {
+        const { value }: any = res;
+        switch (index) {
+          case 0:
+            props.blocks = value.data.blocks;
+            props.pagination = value.pagination;
+            break;
 
-  if (!block.error) {
-    props.blocks = block.data.blocks;
-    props.pagination = block.pagination;
-  }
+          case 1:
+            console.log(value.data);
+            props.statistics = {
+              yesterday: value.data.block_stats_by_day[0],
+              total: {
+                totalBlocks: 0,
+                totalBurned: 0,
+                totalBlockRewards: 0,
+              },
+            };
+            break;
 
-  if (!yesterdayStatistics.error && !totalStatistics.error) {
-    props.statistics = {
-      yesterday: yesterdayStatistics.data.block_stats_by_day[0],
-      total: totalStatistics.data.block_stats_total,
-    };
-  }
+          case 2:
+            props.statistics['total'] = value.data.block_stats_total;
+
+          default:
+            break;
+        }
+      }
+    });
+  });
+
   return { props };
 };
 

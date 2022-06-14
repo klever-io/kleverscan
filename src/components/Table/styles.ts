@@ -29,7 +29,7 @@ export interface ITableType {
     | 'proposals'
     | 'votes'
     | 'delegations';
-
+  haveData?: number;
   filter?: IFilterItem;
   pathname?: string;
 }
@@ -39,9 +39,8 @@ export const Container = styled.div`
 `;
 
 export const Header = styled.div<ITableType>`
+  display: ${props => (props.haveData ? 'flex' : 'none')};
   padding: 1rem 1.5rem;
-
-  display: flex;
 
   color: ${props => props.theme.table.text};
   font-weight: 600;
@@ -49,16 +48,15 @@ export const Header = styled.div<ITableType>`
 
   span {
     /* flex: 1; */
+
     ${props => widths[props.type]}
     ${props =>
       props.filter &&
       props.filter.value !== 'all' &&
       filterWidths[props.filter.name]}
   }
-
-  @media (max-width: 768px) {
-    width: ${props =>
-      props.pathname === '/validators' ? '58rem' : 'fit-content'};
+  @media (max-width: 1300px) {
+    width: fit-content;
   }
 `;
 
@@ -66,12 +64,10 @@ export const Body = styled.div<ITableType>`
   display: flex;
 
   flex-direction: column;
-
   gap: 0.75rem;
 
-  @media (max-width: 768px) {
-    width: ${props =>
-      props.pathname === '/validators' ? '58rem' : 'fit-content'};
+  @media (max-width: 1300px) {
+    width: ${props => (props.haveData ? 'fit-content' : 'initial')};
   }
 `;
 
@@ -144,7 +140,10 @@ export const Status = styled.div<IStatus>`
   gap: 0.9rem;
 
   span {
-    color: ${props => props.status === 'ApprovedProposal' ? props.theme.table['success'] : props.theme.table[props.status]} !important;
+    color: ${props =>
+      props.status === 'ApprovedProposal'
+        ? props.theme.table['success']
+        : props.theme.table[props.status]} !important;
     font-weight: bold;
   }
 

@@ -35,12 +35,18 @@ const transactions = css`
     width: 8rem;
   }
   &:nth-child(9) {
-    width: 8rem;
+    width: 7rem;
+  }
+  &:nth-child(10) {
+    width: 3rem;
   }
 `;
 
 const blocks = css`
   margin-right: 1.25rem;
+  @media (max-width: 1000px) {
+    margin-right: 0.4rem;
+  }
 
   &:nth-child(1) {
     width: 5rem;
@@ -107,7 +113,7 @@ const assetsPage = css`
   }
 
   &:nth-child(2) {
-    width: 4rem;
+    width: 6rem;
   }
 
   &:nth-child(3) {
@@ -119,44 +125,44 @@ const assetsPage = css`
   }
 
   &:nth-child(5) {
-    width: 8rem;
+    width: 10rem;
   }
 
   &:nth-child(6) {
-    width: 8rem;
+    width: 10rem;
   }
 
   &:nth-child(7) {
-    width: 8rem;
+    width: 10rem;
   }
 
   &:nth-child(8) {
     width: 10rem;
+  }
+  &:nth-child(9) {
+    width: 5rem;
   }
 `;
 
 const assets = css`
   margin-right: 1.25rem;
   &:nth-child(1) {
-    width: 5rem;
-  }
-  &:nth-child(2) {
-    width: 5rem;
-  }
-  &:nth-child(3) {
     width: 8rem;
   }
+  &:nth-child(2) {
+    width: 8rem;
+  }
+  &:nth-child(3) {
+    width: 10rem;
+  }
   &:nth-child(4) {
-    width: 7rem;
+    width: 8rem;
   }
   &:nth-child(5) {
-    width: 5rem;
+    width: 10rem;
   }
   &:nth-child(6) {
-    width: 12rem;
-  }
-  &:nth-child(7) {
-    width: 12rem;
+    width: 15rem;
   }
 `;
 
@@ -210,10 +216,10 @@ const validators = css`
   margin-right: 1.25rem;
 
   &:nth-child(1) {
-    width: 3rem;
+    width: 2rem;
   }
   &:nth-child(2) {
-    width: 10rem;
+    width: 15rem;
   }
   &:nth-child(3) {
     width: 6rem;
@@ -222,19 +228,16 @@ const validators = css`
     width: 6rem;
   }
   &:nth-child(5) {
-    width: 10rem;
+    width: 7rem;
   }
   &:nth-child(6) {
-    width: 12rem;
+    width: 10rem;
   }
   &:nth-child(7) {
-    width: 8rem;
+    width: 6rem;
   }
   &:nth-child(8) {
-    width: 16rem;
-  }
-  &:nth-child(9) {
-    width: 1rem;
+    width: 10rem;
   }
 `;
 
@@ -243,23 +246,34 @@ const nodes = validators;
 const validator = css`
   margin-right: 1.25rem;
   &:nth-child(1) {
-    width: 12rem;
-    max-width: 7rem;
-
+    width: 8rem;
   }
   &:nth-child(2) {
-    width: 60%;
-    max-width: 40rem;
+    width: 40rem;
   }
   &:nth-child(3) {
-    width: 10rem;
-    max-width: 10rem;
+    width: 12rem;
+  }
+  &:nth-child(4) {
+    width: 5rem;
   }
 
   @media (max-width: 768px) {
-  :nth-child(2) {
-    width: 20rem;
-  }
+    &:nth-child(1) {
+      width: 12rem;
+      max-width: 7rem;
+    }
+    &:nth-child(2) {
+      width: 60%;
+      max-width: 40rem;
+    }
+    &:nth-child(3) {
+      width: 10rem;
+      max-width: 10rem;
+    }
+    :nth-child(2) {
+      width: 20rem;
+    }
   }
 `;
 

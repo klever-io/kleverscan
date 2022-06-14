@@ -7,7 +7,7 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: 768px) {
+  @media (max-width: 890px) {
     padding: 3rem 3rem 5rem 3rem;
   }
 `;
@@ -19,7 +19,7 @@ export const Header = styled.section`
   justify-content: space-between;
   align-items: center;
 
-  @media (max-width: 768px) {
+  @media (max-width: 870px) {
     flex-direction: column;
 
     align-items: flex-start;
@@ -67,7 +67,7 @@ export const CardContainer = styled.section`
 
   gap: 0.75rem;
 
-  @media (max-width: 768px) {
+  @media (max-width: 870px) {
     flex-direction: column;
   }
 `;
@@ -89,13 +89,20 @@ export const Card = styled.div`
 
   gap: 1rem;
 
+
   div {
     display: flex;
 
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-
+    span:nth-child(2) {
+      text-align: right;
+    }
+    p:nth-child(2) {
+      text-align: right;
+    }
+    
     strong {
       font-weight: 600;
     }

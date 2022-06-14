@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const ProgressContainer = styled.div<{ textColor: string }>`
   display: flex;
-
+  width: 15rem;
   flex-direction: row;
   align-items: center;
 

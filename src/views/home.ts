@@ -124,7 +124,7 @@ export const DataCardsContainer = styled.div`
   flex-direction: row;
   align-items: flex-start;
 
-  gap: 1rem;
+  gap: 0.5rem;
 
   @media (max-width: 1600px) {
     flex-direction: column;
@@ -320,7 +320,7 @@ export const TransactionContainer = styled.div`
 
   gap: 2rem;
 
-  @media (max-width: 1024px) {
+  @media (max-width: 1700px) {
     flex-direction: column;
   }
 `;

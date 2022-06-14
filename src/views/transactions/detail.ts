@@ -14,7 +14,7 @@ export const Container = styled.div`
 
 export const Header = styled.div`
   display: flex;
-
+  gap: 0.5rem;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
@@ -35,11 +35,17 @@ export const Title = styled.div`
 
   div {
     cursor: pointer;
+  }
 
-    svg {
-      height: auto;
-      width: auto;
-    }
+  svg {
+    overflow: visible;
+    position: relative;
+    left: 0.2rem;
+    top: 0.5rem;
+  }
+
+  h1 > p {
+    display: inline-block;
   }
 `;
 
@@ -86,11 +92,11 @@ export const Row = styled.div`
     border-bottom-right-radius: 0px;
   }
 
-  span {
-    &:first-child {
-      width: 10rem;
-    }
+  span:first-child {
+    min-width: 10rem;
+  }
 
+  span {
     @media (max-width: 768px) {
       max-width: 100%;
     }
@@ -132,10 +138,10 @@ export const Row = styled.div`
 
 export const CenteredRow = styled.div`
   display: flex;
-
+  overflow: hidden;
   flex-direction: row;
   align-items: center;
-
+  width: 100%;
   gap: 0.5rem;
 
   strong {
@@ -146,14 +152,6 @@ export const CenteredRow = styled.div`
   p {
     font-weight: 600;
     font-size: 0.85rem;
-  }
-
-  span {
-    width: 33rem !important;
-
-    @media (max-width: 768px) {
-      max-width: 80% !important;
-    }
   }
 
   svg {
@@ -168,10 +166,6 @@ export const CenteredRow = styled.div`
   }
   a:hover {
     text-decoration: underline;
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
   }
 `;
 export const CardRaw = styled.div`

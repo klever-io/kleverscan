@@ -212,16 +212,17 @@ const Transaction: React.FC<ITransactionPage> = props => {
           <div onClick={() => router.push('/transactions')}>
             <ArrowLeft />
           </div>
-          <h1>Transaction Details</h1>
-          <Icon />
+          <h1>
+            <p>Transaction</p>{' '}
+            <p>
+              Details <Icon />
+            </p>
+          </h1>
         </Title>
-
         <Input />
       </Header>
-
       <CardContainer>
         <h3>Overview</h3>
-
         <CardContent>
           <Row>
             <span>
@@ -321,10 +322,8 @@ const Transaction: React.FC<ITransactionPage> = props => {
           )}
         </CardContent>
       </CardContainer>
-
       <CardContainer>
         <h3>Contract</h3>
-
         <CardContent>
           <Row>
             <span>
@@ -334,7 +333,6 @@ const Transaction: React.FC<ITransactionPage> = props => {
               <p>{getContractType(contract)}</p>
             </span>
           </Row>
-
           <ContractComponent />
         </CardContent>
       </CardContainer>

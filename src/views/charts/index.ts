@@ -7,7 +7,7 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: 768px) {
+  @media (max-width: 850px) {
     padding: 3rem 3rem 5rem 3rem;
   }
 `;
@@ -69,13 +69,5 @@ export const Section = styled.section`
 
   &:last-child {
     padding-bottom: 10rem;
-  }
-
-  @media (max-width: 768px) {
-    padding: 5rem 5rem 0 5rem;
-  }
-
-  @media (max-width: 425px) {
-    padding: 5rem 2.5rem 0 2.5rem;
   }
 `;

@@ -9,7 +9,10 @@ export const Container = styled.div`
   padding: 3rem 10rem 5rem 10rem;
 
   background-color: ${props => props.theme.background};
-
+  @media (max-width: 1600px) {
+    padding-left: 5rem;
+    padding-right: 5rem;
+  }
   @media (max-width: 768px) {
     padding: 3rem 3rem 5rem 3rem;
   }

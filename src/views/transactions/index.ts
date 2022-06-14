@@ -7,6 +7,10 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
+  @media (max-width: 1600px) {
+    padding-left: 5rem;
+    padding-right: 5rem;
+  }
   @media (max-width: 768px) {
     padding: 3rem 3rem 5rem 3rem;
   }
@@ -69,9 +73,9 @@ export const Input = styled(DefaultInput)`
 `;
 
 export const CenteredRow = styled.span`
+  overflow: visible !important;
   div {
     display: flex;
-
     flex-direction: row;
     align-items: center;
 

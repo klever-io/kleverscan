@@ -113,7 +113,6 @@ export const ProgressContainer = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  align: right;
   margin-left: 2rem;
 `;
 

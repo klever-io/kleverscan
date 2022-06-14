@@ -41,7 +41,7 @@ const Table: React.FC<ITable> = ({
   loading,
 }) => {
   const { pathname } = useRouter();
-  const props: ITableType = { type, filter, pathname };
+  const props: ITableType = { type, filter, pathname, haveData: data.length };
 
   return (
     <Container>

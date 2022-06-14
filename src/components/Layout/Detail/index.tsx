@@ -3,7 +3,7 @@ import React from 'react';
 import { useRouter } from 'next/router';
 
 import { Container, Header, Input, TableContainer, Title } from './styles';
-
+import Table, { ITable } from '@/components/Table';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 
@@ -16,6 +16,7 @@ interface IDetail {
   cards: any | undefined;
   page: number;
   setPage: React.Dispatch<React.SetStateAction<number>>;
+  tableProps: ITable;
 }
 
 const Detail: React.FC<IDetail> = ({
@@ -26,6 +27,7 @@ const Detail: React.FC<IDetail> = ({
   children,
   page,
   setPage,
+  tableProps,
 }) => {
   const router = useRouter();
 
@@ -42,11 +44,11 @@ const Detail: React.FC<IDetail> = ({
 
         <Input />
       </Header>
-
       <TableContainer>
         {cards && <h3>List of {title.toLowerCase()}</h3>}
         {children}
       </TableContainer>
+    <Table {...tableProps}/>
 
       <PaginationContainer>
         <Pagination

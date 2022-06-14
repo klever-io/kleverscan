@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
-
-import Detail from '@/components/Layout/Detail';
 import Table, { ITable } from '@/components/Table';
+import Detail from '@/components/Layout/Detail';
 import { Row, Status } from '@/components/Table/styles';
 
 import {
@@ -84,7 +83,7 @@ const Validators: React.FC<IValidatorPage> = ({
           return {
             staked: delegation.totalStake,
             rank: index + page * pagination.perPage + 1,
-            name: delegation.name || parseAddress(delegation.ownerAddress, 8),
+            name: delegation.name || parseAddress(delegation.ownerAddress, 14),
             cumulativeStaked: parseFloat(
               (
                 (delegation.totalStake / validators.data.networkTotalStake) *
@@ -109,15 +108,6 @@ const Validators: React.FC<IValidatorPage> = ({
   useDidUpdateEffect(() => {
     fetchData();
   }, [page]);
-
-  const detailProps = {
-    title: 'Validators',
-    headerIcon: Icon,
-    cards: undefined,
-    paginationCount: pagination.totalPages,
-    page: page,
-    setPage: setPage,
-  };
 
   const Progress: React.FC<{ percent: number }> = ({ percent }) => {
     return (
@@ -195,11 +185,17 @@ const Validators: React.FC<IValidatorPage> = ({
     loading: loading,
   };
 
-  return (
-    <Detail {...detailProps}>
-      <Table {...tableProps}></Table>
-    </Detail>
-  );
+  const detailProps = {
+    title: 'Validators',
+    headerIcon: Icon,
+    cards: undefined,
+    paginationCount: pagination.totalPages,
+    page: page,
+    setPage: setPage,
+    tableProps,
+  };
+
+  return <Detail {...detailProps} />;
 };
 
 export const getServerSideProps: GetServerSideProps<IValidatorPage> =

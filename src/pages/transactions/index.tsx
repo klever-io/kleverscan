@@ -265,10 +265,12 @@ const Transactions: React.FC<ITransactions> = ({
               </Tooltip>
             ) : (
               <>
+              <Tooltip onMouseOver={(e: any) => handleMouseOver(e)}>
                 <Link href={`/asset/KLV`}>
                   <KLV />
                 </Link>
-                <Link href={`/asset/KLV`}>KLV</Link>
+                <TooltipText ref={tooltipRef}>KLV</TooltipText>
+                </Tooltip>
               </>
             )}
           </div>
@@ -678,7 +680,7 @@ const Transactions: React.FC<ITransactions> = ({
         <Link href={`/account/${sender}`}>
           <a className="address">{parseAddress(sender, 16)}</a>
         </Link>
-        <span>
+        <span style={{overflow: "visible"}}>
           <ArrowRight />
         </span>
         <Link href={`/account/${toAddress}`}>
@@ -756,8 +758,7 @@ const Transactions: React.FC<ITransactions> = ({
         </FilterContainer>
         <DateFilter {...dateFilterProps} />
       </Header>
-
-      <Table {...tableProps} />
+      <Table {...tableProps}/>
       <PaginationContainer>
         <Pagination
           count={count}

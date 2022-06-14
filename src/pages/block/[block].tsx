@@ -15,9 +15,10 @@ import {
   Input,
   Row,
   Title,
-} from '@/views/assets/detail';
-
-import { CenteredRow } from '@/views/transactions/detail';
+  CenteredRow,
+  CenteredRowSpan,
+  CommonSpan,
+} from '@/views/blocks/detail';
 
 import Tabs, { ITabs } from '@/components/Tabs';
 import Transactions from '@/components/Tabs/Transactions';
@@ -107,75 +108,73 @@ const Block: React.FC<IBlockPage> = ({
     return (
       <>
         <Row>
-          <span>
+          <CommonSpan>
             <strong>Hash</strong>
-          </span>
-          <span>
-            <CenteredRow>
-              <span>{hash}</span>
-              <Copy info="Hash" data={hash} />
-            </CenteredRow>
-          </span>
+          </CommonSpan>
+          <CenteredRow>
+            <CenteredRowSpan>{hash}</CenteredRowSpan>
+            <Copy info="Hash" data={hash} />
+          </CenteredRow>
         </Row>
         <Row>
-          <span>
+          <CommonSpan>
             <strong>Timestamp</strong>
-          </span>
-          <span>
+          </CommonSpan>
+          <CommonSpan>
             <small>
               {format(fromUnixTime(timestamp / 1000), 'dd/MM/yyyy HH:mm')}
             </small>
-          </span>
+          </CommonSpan>
         </Row>
         <Row>
-          <span>
+          <CommonSpan>
             <strong>Nonce</strong>
-          </span>
-          <span>{nonce}</span>
+          </CommonSpan>
+          <CommonSpan>{nonce}</CommonSpan>
         </Row>
         <Row>
-          <span>
+          <CommonSpan>
             <strong>Epoch</strong>
-          </span>
-          <span>
+          </CommonSpan>
+          <CommonSpan>
             <small>{epoch}</small>
-          </span>
+          </CommonSpan>
         </Row>
         <Row>
-          <span>
+          <CommonSpan>
             <strong>Block Size</strong>
-          </span>
-          <span>{size} Bytes</span>
+          </CommonSpan>
+          <CommonSpan>{size} Bytes</CommonSpan>
         </Row>
         <Row>
-          <span>
+          <CommonSpan>
             <strong>KApp Fee</strong>
-          </span>
-          <span>
+          </CommonSpan>
+          <CommonSpan>
             <small>
               {toLocaleFixed((kAppFees || 0) / 10 ** precision, precision)}
             </small>
-          </span>
+          </CommonSpan>
         </Row>
         <Row>
-          <span>
+          <CommonSpan>
             <strong>Burned Fee</strong>
-          </span>
-          <span>
+          </CommonSpan>
+          <CommonSpan>
             <small>
               {toLocaleFixed((txBurnedFees || 0) / 10 ** precision, precision)}
             </small>
-          </span>
+          </CommonSpan>
         </Row>
         <Row>
-          <span>
+          <CommonSpan>
             <strong>Bandwidth Fee</strong>
-          </span>
-          <span>
+          </CommonSpan>
+          <CommonSpan>
             <small>
               {toLocaleFixed((txFees || 0) / 10 ** precision, precision)}
             </small>
-          </span>
+          </CommonSpan>
         </Row>
       </>
     );
@@ -185,95 +184,82 @@ const Block: React.FC<IBlockPage> = ({
     return (
       <>
         <Row>
-          <span>
+          <CommonSpan>
             <strong>Software Version</strong>
-          </span>
-          <span>{softwareVersion}</span>
+          </CommonSpan>
+          <CommonSpan>{softwareVersion}</CommonSpan>
         </Row>
         <Row>
-          <span>
+          <CommonSpan>
             <strong>Chain ID</strong>
-          </span>
-          <span>
+          </CommonSpan>
+          <CommonSpan>
             <small>{chainID}</small>
-          </span>
+          </CommonSpan>
         </Row>
         <Row>
-          <span>
+          <CommonSpan>
             <strong>Producer Signature</strong>
-          </span>
-          <span>
-            <CenteredRow>
-              <span>{producerSignature}</span>
-              <Copy info="Signature" data={producerSignature} />
-            </CenteredRow>
-          </span>
+          </CommonSpan>
+
+          <CenteredRow>
+            <CenteredRowSpan>{producerSignature}</CenteredRowSpan>
+            <Copy info="Signature" data={producerSignature} />
+          </CenteredRow>
         </Row>
         <Row>
-          <span>
+          <CommonSpan>
             <strong>Parent Hash</strong>
-          </span>
-          <span>
-            <CenteredRow>
-              <span>{parentHash}</span>
-              <Copy info="Parent hash" data={parentHash} />
-            </CenteredRow>
-          </span>
+          </CommonSpan>
+          <CenteredRow>
+            <CenteredRowSpan>{parentHash}</CenteredRowSpan>
+            <Copy info="Parent hash" data={parentHash} />
+          </CenteredRow>
         </Row>
         <Row>
-          <span>
+          <CommonSpan>
             <strong>Trie Root</strong>
-          </span>
-          <span>
-            <CenteredRow>
-              <span>{trieRoot}</span>
-              <Copy info="Trie root" data={trieRoot} />
-            </CenteredRow>
-          </span>
+          </CommonSpan>
+          <CenteredRow>
+            <CenteredRowSpan>{trieRoot}</CenteredRowSpan>
+            <Copy info="Trie root" data={trieRoot} />
+          </CenteredRow>
         </Row>
         <Row>
-          <span>
+          <CommonSpan>
             <strong>Validators Trie Root</strong>
-          </span>
-          <span>
-            <CenteredRow>
-              <span>{validatorsTrieRoot}</span>
-              <Copy data={validatorsTrieRoot} />
-            </CenteredRow>
-          </span>
+          </CommonSpan>
+          <CenteredRow>
+            <CenteredRowSpan>{validatorsTrieRoot}</CenteredRowSpan>
+            <Copy data={validatorsTrieRoot} />
+          </CenteredRow>
         </Row>
         <Row>
-          <span>
+          <CommonSpan>
             <strong>KApps Trie Root</strong>
-          </span>
-          <span>
-            <CenteredRow>
-              <span>{kappsTrieRoot}</span>
-              <Copy data={kappsTrieRoot} />
-            </CenteredRow>
-          </span>
+          </CommonSpan>
+          <CenteredRow>
+            <CenteredRowSpan>{kappsTrieRoot}</CenteredRowSpan>
+            <Copy data={kappsTrieRoot} />
+          </CenteredRow>
         </Row>
         <Row>
-          <span>
+          <CommonSpan>
             <strong>Previous Random Seed</strong>
-          </span>
-          <span>
-            <CenteredRow>
-              <span>{prevRandSeed}</span>
-              <Copy data={prevRandSeed} />
-            </CenteredRow>
-          </span>
+          </CommonSpan>
+          <CenteredRow>
+            <CenteredRowSpan>{prevRandSeed}</CenteredRowSpan>
+            <Copy data={prevRandSeed} />
+          </CenteredRow>
         </Row>
         <Row>
-          <span>
+          <CommonSpan>
             <strong>Random Seed</strong>
-          </span>
-          <span>
-            <CenteredRow>
-              <span>{randSeed}</span>
-              <Copy info="Random seed" data={randSeed} />
-            </CenteredRow>
-          </span>
+          </CommonSpan>
+          <CenteredRow>
+            <CenteredRowSpan>{randSeed}</CenteredRowSpan>
+            <Copy info="Random seed" data={randSeed} />
+          </CenteredRow>
         </Row>
       </>
     );

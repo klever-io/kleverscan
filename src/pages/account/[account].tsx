@@ -57,6 +57,7 @@ interface IAccountPage {
   precisions: IAssetInfo[];
   assets: IAccountAsset[];
   defaultKlvPrecision: number;
+  allowance: IAllowanceResponse;
 }
 
 interface IAccountResponse extends IResponse {
@@ -76,6 +77,13 @@ interface IPriceResponse extends IResponse {
   symbols: IPrice[];
 }
 
+interface IAllowanceResponse extends IResponse {
+  data: {
+    allowance: number;
+    stakingRewards: number;
+  };
+}
+
 const Account: React.FC<IAccountPage> = ({
   account,
   transactions: transactionResponse,
@@ -83,6 +91,7 @@ const Account: React.FC<IAccountPage> = ({
   precisions,
   assets,
   defaultKlvPrecision,
+  allowance,
 }) => {
   const router = useRouter();
 
@@ -258,10 +267,8 @@ const Account: React.FC<IAccountPage> = ({
           <h1>Account</h1>
           <AccountIcon />
         </Title>
-
         <Input />
       </Header>
-
       <OverviewContainer>
         <Row>
           <span>
@@ -319,6 +326,28 @@ const Account: React.FC<IAccountPage> = ({
         </Row>
         <Row>
           <span>
+            <strong>Rewards</strong>
+            <strong>Available</strong>
+          </span>
+          <RowContent>
+            <BalanceContainer>
+              <FrozenContainer>
+                <div>
+                  <strong>Allowance</strong>
+                  <span>{allowance?.data?.allowance.toLocaleString()}</span>
+                </div>
+                <div>
+                  <strong>Staking</strong>
+                  <span>
+                    {allowance?.data?.stakingRewards.toLocaleString()}
+                  </span>
+                </div>
+              </FrozenContainer>
+            </BalanceContainer>
+          </RowContent>
+        </Row>
+        <Row>
+          <span>
             <strong>Nonce</strong>
           </span>
           <RowContent>
@@ -336,7 +365,6 @@ const Account: React.FC<IAccountPage> = ({
           </RowContent>
         </Row>
       </OverviewContainer>
-
       <Tabs {...tabProps}>
         <SelectedTabComponent />
       </Tabs>
@@ -354,6 +382,7 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
     precisions: [],
     assets: [],
     defaultKlvPrecision: 6,
+    allowance: {} as IAllowanceResponse,
   };
 
   const accountLength = 62;
@@ -411,6 +440,16 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
     props.convertedBalance =
       prices.symbols[0].price *
       (account.data.account.balance / 10 ** precision);
+  }
+
+  const allowance: IAllowanceResponse = await api.get({
+    route: `address/${address}/allowance?asset=KLV`,
+    service: Service.NODE,
+  });
+  if (!allowance.error) {
+    allowance.data.allowance = allowance.data.allowance / 10 ** precision;
+    allowance.data.stakingRewards = allowance.data.allowance / 10 ** precision;
+    props.allowance = allowance;
   }
 
   return { props };

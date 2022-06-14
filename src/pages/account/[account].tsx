@@ -393,59 +393,98 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
     return redirectProps;
   }
 
-  const account: IAccountResponse = await api.get({
-    route: `address/${address}`,
+  const accountCall = new Promise<IAccountResponse>(async (resolve, reject) => {
+    const res = await api.get({
+      route: `address/${address}`,
+    });
+
+    if (!res.error || res.error === '') {
+      resolve(res);
+    }
+
+    reject(res.error);
   });
 
-  if (account.error) {
-    return redirectProps;
-  }
+  const transactionsCall = new Promise<ITransactionsResponse>(
+    async (resolve, reject) => {
+      const res = await api.get({
+        route: `address/${address}/transactions`,
+      });
 
-  props.account = account.data.account;
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
 
-  if (props.account.assets.KLV) {
-    props.account.assets.KLV.balance =
-      props.account.balance - props.account.assets.KLV.frozenBalance;
-  }
+      reject(res.error);
+    },
+  );
 
-  const transactions: ITransactionsResponse = await api.get({
-    route: `address/${address}/transactions`,
+  const pricesCall = new Promise<IPriceResponse>(async (resolve, reject) => {
+    const res = await api.post({
+      route: 'prices',
+      service: Service.PRICE,
+      body: { names: ['KLV/USD'] },
+    });
+
+    if (!res.error || res.error === '') {
+      resolve(res);
+    }
+
+    reject(res.error);
   });
 
-  if (account.error) {
-    return redirectProps;
-  }
+  await Promise.allSettled([pricesCall, transactionsCall, accountCall]).then(
+    responses => {
+      responses.forEach((res, index) => {
+        if (res.status === 'fulfilled') {
+          const { value }: any = res;
 
-  const filterPrecisions = Object.entries(account.data.account.assets).map(
-    ([assetId, asset]: [string, IAccountAsset]): IAssetInfo => ({
-      assetId,
-      precision: asset.precision,
-    }),
+          if (index === 1) {
+            props.transactions = value;
+          } else if (index === 2) {
+            props.account = value.data.account;
+
+            if (props.account.assets.KLV) {
+              props.account.assets.KLV.balance =
+                props.account.balance - props.account.assets.KLV.frozenBalance;
+            }
+
+            const filterPrecisions = Object.entries(
+              value.data.account.assets,
+            ).map(
+              ([assetId, asset]: [string, any]): IAssetInfo => ({
+                assetId,
+                precision: asset.precision,
+              }),
+            );
+
+            const precision = 6;
+
+            props.precisions = filterPrecisions;
+            props.assets = Object.values(value.data.account.assets);
+
+            if (responses[0].status !== 'rejected') {
+              const prices = responses[0].value;
+              props.convertedBalance =
+                prices.symbols[0].price *
+                (value.data.account.balance / 10 ** precision);
+            }
+          }
+        } else if (index == 2) {
+          return redirectProps;
+        }
+      });
+    },
   );
 
   const precision = 6;
-
-  props.transactions = transactions;
-  props.precisions = filterPrecisions;
   props.defaultKlvPrecision = precision; // Default KLV precision
-  props.assets = Object.values(account.data.account.assets);
-
-  const prices: IPriceResponse = await api.post({
-    route: 'prices',
-    service: Service.PRICE,
-    body: { names: ['KLV/USD'] },
-  });
-
-  if (!prices.error) {
-    props.convertedBalance =
-      prices.symbols[0].price *
-      (account.data.account.balance / 10 ** precision);
-  }
 
   const allowance: IAllowanceResponse = await api.get({
     route: `address/${address}/allowance?asset=KLV`,
     service: Service.NODE,
   });
+
   if (!allowance.error) {
     allowance.data.allowance = allowance.data.allowance / 10 ** precision;
     allowance.data.stakingRewards = allowance.data.allowance / 10 ** precision;

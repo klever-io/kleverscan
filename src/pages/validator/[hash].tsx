@@ -571,33 +571,63 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> = async ({
 
   const address = String(hash);
 
-  const validator: IValidatorResponse = await api.get({
-    route: `validator/${address}`,
-  });
-  if (!validator.error) {
-    props.validator = validator.data.validator;
-  }
+  const validatorCall = new Promise<IValidatorResponse>(
+    async (resolve, reject) => {
+      const res = await api.get({
+        route: `validator/${address}`,
+      });
 
-  const delegations: IDelegateResponse = await api.get({
-    route: `validator/delegated/${address}`,
-  });
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
 
-  const delegators: IBucket[] = [];
-  delegations?.data?.delegators.forEach(delegation => {
-    delegation.buckets.forEach(bucket => {
-      if (bucket.delegation === address) {
-        delegators.push({
-          address: delegation.address,
-          ...bucket,
-        });
+      reject(res.error);
+    },
+  );
+
+  const delegationCall = new Promise<IDelegateResponse>(
+    async (resolve, reject) => {
+      const res = await api.get({
+        route: `validator/delegated/${address}`,
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
+  );
+
+  await Promise.allSettled([validatorCall, delegationCall]).then(promises => {
+    promises.forEach((res, index) => {
+      if (res.status === 'fulfilled') {
+        if (index === 0) {
+          const { value }: any = res;
+          props.validator = value.data.validator;
+        } else if (index === 1) {
+          const delegations: any = res.value;
+          const delegators: IBucket[] = [];
+
+          delegations.data?.delegators.forEach((delegation: any) => {
+            delegation.buckets.forEach((bucket: any) => {
+              if (bucket.delegation === address) {
+                delegators.push({
+                  address: delegation.address,
+                  ...bucket,
+                });
+              }
+            });
+          });
+
+          if (!delegations.error) {
+            props.pagination = delegations.pagination;
+            props.delegators = delegators;
+          }
+        }
       }
     });
   });
-
-  if (!delegations.error) {
-    props.pagination = delegations.pagination;
-    props.delegators = delegators;
-  }
 
   return { props };
 };

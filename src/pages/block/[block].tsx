@@ -377,14 +377,17 @@ export const getServerSideProps: GetStaticProps<IBlockPage> = async ({
   const block: IBlockResponse = await api.get({
     route: `block/by-nonce/${blockNonce}`,
   });
+
   if (block.error) {
     return redirectProps;
   }
+
   props.block = block.data.block;
 
   const transactions: ITransactionResponse = await api.get({
     route: `transaction/list?blockNum=${block.data.block.nonce}`,
   });
+
   if (!transactions.error) {
     props.transactions = transactions.data.transactions;
     props.totalPagesTransactions = transactions.pagination.totalPages;

@@ -436,30 +436,70 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
 
   const assetId = params?.asset;
 
-  const asset: IAssetResponse = await api.get({ route: `assets/${assetId}` });
-  if (asset.error) {
-    return redirectProps;
-  } else {
-    props.asset = parseHardCodedInfo([asset.data.asset])[0];
-  }
+  const assetCall = new Promise<IAssetResponse>(async (resolve, reject) => {
+    const res = await api.get({
+      route: `assets/${assetId}`,
+    });
 
-  const transactions: ITransactionResponse = await api.get({
-    route: `transaction/list?asset=${assetId}`,
-  });
-  if (!transactions.error) {
-    props.transactions = transactions.data.transactions;
-    props.totalTransactions = transactions.pagination.totalRecords;
-    props.totalTransactionsPage = transactions.pagination.totalPages;
-  }
+    if (!res.error || res.error === '') {
+      resolve(res);
+    }
 
-  const holders: IHoldersResponse = await api.get({
-    route: `assets/holders/${assetId}`,
+    reject(res.error);
   });
-  if (!holders.error) {
-    props.holders = holders.data.accounts;
-    props.totalHoldersPage = holders.pagination.totalPages;
-    props.totalRecords = holders.pagination.totalRecords;
-  }
+
+  const transactionCall = new Promise<ITransactionResponse>(
+    async (resolve, reject) => {
+      const res = await api.get({
+        route: `transaction/list?asset=${assetId}`,
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
+  );
+
+  const holdersCall = new Promise<IHoldersResponse>(async (resolve, reject) => {
+    const res = await api.get({
+      route: `assets/holders/${assetId}`,
+    });
+
+    if (!res.error || res.error === '') {
+      resolve(res);
+    }
+
+    reject(res.error);
+  });
+
+  await Promise.allSettled([assetCall, transactionCall, holdersCall]).then(
+    responses => {
+      responses.forEach((res, index) => {
+        if (res.status === 'fulfilled') {
+          if (index === 0) {
+            const asset: any = res.value;
+            props.asset = parseHardCodedInfo([asset.data.asset])[0];
+          } else if (index === 1) {
+            const transactions: any = res.value;
+
+            props.transactions = transactions.data.transactions;
+            props.totalTransactions = transactions.pagination.totalRecords;
+            props.totalTransactionsPage = transactions.pagination.totalPages;
+          } else if (index === 2) {
+            const holders: any = res.value;
+
+            props.holders = holders.data.accounts;
+            props.totalHoldersPage = holders.pagination.totalPages;
+            props.totalRecords = holders.pagination.totalRecords;
+          }
+        } else if (index == 0) {
+          return redirectProps;
+        }
+      });
+    },
+  );
 
   return { props };
 };

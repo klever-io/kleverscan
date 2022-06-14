@@ -43,7 +43,7 @@ interface INetworkParams {
 
 interface INetworkParam {
   number: number;
-  parameter: string;
+  parameter?: string;
   currentValue: string;
 }
 
@@ -203,7 +203,7 @@ export const getServerSideProps: GetServerSideProps<IProposalsPage> = async ({
     networkParams = Object.keys(data.parameters).map((key, index) => {
       return {
         number: index,
-        parameter: proposalsMessages[key],
+        parameter: proposalsMessages[key] ? proposalsMessages[key] : '',
         currentValue: data.parameters[key].value,
       };
     });

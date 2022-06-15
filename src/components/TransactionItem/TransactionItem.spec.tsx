@@ -3,50 +3,19 @@ import { screen } from '@testing-library/react';
 import { format, fromUnixTime } from 'date-fns';
 
 import theme from '../../styles/theme';
-import { ITransaction, Contract, ITransferContract } from '../../types'
+import { ITransferContract } from '../../types';
+import { mockTxItem } from '../../test/mocks';
 
 import TransactionItem from './';
 import { renderWithTheme } from '../../test/utils';
 import { parseAddress } from '../../utils'
 
-const mockTxItem: ITransaction = {
-  chainID: '10020',
-  blockNum: 123,
-  nonce: 123123,
-  signature: 'b66845fe95baef343b35393eb861f8bee4c41b06c8efab47aa243fe3560ff4e45518bfc7d89010dadaea37d2d0bf5be7d35c13b38b2f65d6baa9baa65s8d452w',
-  searchOrder: 35,
-  kAppFee: 0,
-  bandwidthFee: 150000,
-  status: 'success',
-  resultCode: 'Ok',
-  precision: 6,
-  receipts: [{
-    assetId: 'KLV',
-  }],
-  hash: 'a632bece34e0716fc465113e418f31911425783ea70624cb1555506225beeb4b',
-  sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jquca668',
-  timestamp: 1653331031000,
-  contract: [
-    {
-      sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jquca668',
-      type: Contract.Transfer,
-      parameter: {
-          amount: 3000000,
-          assetId: 'KLV',
-          toAddress: 'klv1t4cykcfs6k9kglwrcg95d5sas68d7w4a2rkv7v5qqqyj0gw4hd3s4uas4w'
-      }
-    }
-  ],
-};
+
 
 describe('Component: TransactionItem', () => {
-  let container: HTMLElement;
-
-  beforeEach(() => {
-    container = renderWithTheme(<TransactionItem {...mockTxItem} precision={6}/>).container;
-  });
 
   it('Should render hash, timestamp ( formated ), sender, toAddress and amount', () => {
+    renderWithTheme(<TransactionItem {...mockTxItem} precision={6}/>);
 
     const parameter = mockTxItem.contract[0].parameter as ITransferContract;
 
@@ -62,6 +31,8 @@ describe('Component: TransactionItem', () => {
   });
 
   it('Should have the correct href for each link', () => {
+    renderWithTheme(<TransactionItem {...mockTxItem} precision={6}/>);
+
     const parameter = mockTxItem.contract[0].parameter as ITransferContract;
 
     const hash = screen.getByRole('link', {name: mockTxItem.hash } );
@@ -74,6 +45,8 @@ describe('Component: TransactionItem', () => {
   });
 
   it('Should match the style for the Transaction Data', () => {
+  const { container } = renderWithTheme(<TransactionItem {...mockTxItem} precision={6}/>);
+
     const containerStyle = {
       marginRight: '2.5rem',
       gap: '0.25rem',
@@ -94,6 +67,8 @@ describe('Component: TransactionItem', () => {
   });
 
   it('Should match the style for Transaction Amount', () => {
+  const { container } = renderWithTheme(<TransactionItem {...mockTxItem} precision={6}/>);
+
     const style = {
       width: '12.5rem',
       textAlign: 'right',
@@ -108,5 +83,16 @@ describe('Component: TransactionItem', () => {
     const transactionAmountElement = container.firstChild?.lastChild;
     expect(transactionAmountElement).toHaveStyle(style);
     expect(transactionAmountElement?.firstChild).toHaveStyle(spanStyle);
+  });
+
+  it('Should render "--" as fallback when don\'t has "toAddress"', () => {
+    const txItem = { ...mockTxItem };
+    // TODO - Make ts stop the error, should type correctly
+    txItem.contract[0].parameter.toAddress = '';
+    renderWithTheme(<TransactionItem {...txItem} precision={6}/>);
+
+    const parameter = mockTxItem.contract[0].parameter as ITransferContract;
+    const toAddress = screen.getByText(/To:/i).nextSibling?.firstChild;
+    expect(toAddress).toHaveTextContent('--');
   });
 }); 

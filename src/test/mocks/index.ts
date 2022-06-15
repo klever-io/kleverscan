@@ -1,11 +1,45 @@
 
-import { Contract,
+import {
+  Contract,
   EnumClaimType,
   EnumICOStatus,
   EnumBuyType,
   EnumMarketType,
   EnumAssetType,
+  IAsset,
+  IAccountAsset,
+  ITransaction,
 } from '../../types'
+
+export const mockTxItem: ITransaction = {
+  chainID: '10020',
+  blockNum: 123,
+  nonce: 123123,
+  signature: 'b66845fe95baef343b35393eb861f8bee4c41b06c8efab47aa243fe3560ff4e45518bfc7d89010dadaea37d2d0bf5be7d35c13b38b2f65d6baa9baa65s8d452w',
+  searchOrder: 35,
+  kAppFee: 0,
+  bandwidthFee: 150000,
+  status: 'success',
+  resultCode: 'Ok',
+  precision: 6,
+  receipts: [{
+    assetId: 'KLV',
+  }],
+  hash: 'a632bece34e0716fc465113e418f31911425783ea70624cb1555506225beeb4b',
+  sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jquca668',
+  timestamp: 1653331031000,
+  contract: [
+    {
+      sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jquca668',
+      type: Contract.Transfer,
+      parameter: {
+          amount: 3000000,
+          assetId: 'KLV',
+          toAddress: 'klv1t4cykcfs6k9kglwrcg95d5sas68d7w4a2rkv7v5qqqyj0gw4hd3s4uas4w'
+      }
+    },
+  ],
+};
 
 export const mockedTxContractComponents = {
   transferContract: {
@@ -139,6 +173,28 @@ export const mockedTxContractComponents = {
       id: 'KLV',
     },
   },
+  validatorConfigContract: {
+    type: Contract.ValidatorConfig,
+    sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+    parameter: {
+      name: 'Klever Config',
+      blsPublicKey: 'pubkey'
+    },
+  },
+  setAccountNameContract: {
+    type: Contract.SetAccountName,
+    sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+    parameter: {
+      name: 'Klever',
+    },
+  },
+  assetTriggerContract: {
+    type: Contract.AssetTrigger,
+    sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+    parameter: {
+      triggerType: 0,
+    },
+  },
   sellContract: {
     type: Contract.Sell,
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
@@ -174,3 +230,109 @@ export const mockedTxContractComponents = {
     },
   },
 };
+
+export const klvAsset: IAsset = {
+  assetType: '',
+  assetId: 'KLV',
+  name: 'Klever',
+  ticker: 'KLV',
+  ownerAddress: '',
+  logo: '',
+  uris: null,
+  precision: 6,
+  initialSupply: 0,
+  circulatingSupply: 0,
+  maxSupply: 0,
+  royalties: 0,
+  mintedValue: 0,
+  issueDate: 0,
+  staking: {
+    minEpochsToWithdraw: 0
+  },
+};
+
+export const mockedHolders: IAccountAsset[] = [
+  {
+    address: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+    assetId: 'KLV',
+    assetType: EnumAssetType.Fungible,
+    balance: 10000000000000,
+    precision: 6,
+    frozenBalance: 10000000000000,
+    unfrozenBalance: 0,
+    lastClaim: {
+      timestamp: 0,
+      epoch: 0,
+    },
+  }
+];
+
+export const mockedTransactions = [
+  {
+    hash: '9854s785a325fc96520aa8c1d61669944113995dc67038a6d1beafas52147895',
+    blockNum: 36552,
+    timestamp: Date.now(),
+    sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+    contract: [
+      {
+        type: 6,
+        sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+        parameter: {
+          bucketID: '241ef463625511e08ca53f81e7ed0b40ee9cbf798c383e3595e7275as52d147',
+          toAddress: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+        }
+      }
+    ],
+    status: 'success',
+    chainID: '12565',
+    signature: '452s658695cd0f9c467a8a0741d07fcae2448f51681b068bd70daf7aeaa1e2d2cf2cb92d71aa78fbbc29eba2521f38b5a4b5dc4f3e29bfa5c2a031855458s665'
+  },
+  {
+    hash: '9854s785a325fc96520aa8c1d61669944113995dc67038a6d1beafs358a66587',
+    blockNum: 45245,
+    timestamp: Date.now(),
+    sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+    contract: [
+      {
+        type: 6,
+        sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+        parameter: {
+          bucketID: '241ef463625511e08ca53f81e7ed0b40ee9cbf798c383e3595e7275as52d147',
+          toAddress: '',
+        }
+      },
+      {
+        type: 0,
+        sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+        parameter: {
+          bucketID: '241ef463625511e08ca53f81e7ed0b40ee9cbf798c383e3595e7275as52d147',
+          toAddress: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+        }
+      },
+    ],
+    status: 'success',
+    chainID: '12565',
+    signature: '452s658695cd0f9c467a8a0741d07fcae2448f51681b068bd70daf7aeaa1e2d2cf2cb92d71aa78fbbc29eba2521f38b5a4b5dc4f3e29bfa5c2a031855458s665',
+  },
+  {
+    hash: '9854s785a325fc96520aa8c1d61669944113995dc67038a6d1beaf452s364863',
+    blockNum: '',
+    timestamp: Date.now(),
+    sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+    contract: [
+      {
+        type: 0,
+        sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+        parameter: {
+          amount: 1000000000,
+          bucketID: '241ef463625511e08ca53f81e7ed0b40ee9cbf798c383e3595e7275as52d147',
+          toAddress: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+        }
+      },
+    ],
+    status: 'success',
+    chainID: '12565',
+    signature: '452s658695cd0f9c467a8a0741d07fcae2448f51681b068bd70daf7aeaa1e2d2cf2cb92d71aa78fbbc29eba2521f38b5a4b5dc4f3e29bfa5c2a031855458s665',
+  },
+
+];

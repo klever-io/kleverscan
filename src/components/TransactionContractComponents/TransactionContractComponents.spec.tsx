@@ -4,7 +4,7 @@ import { screen } from '@testing-library/react';
 import theme from '../../styles/theme';
 import { renderWithTheme } from '../../test/utils';
 import { mockedTxContractComponents } from '../../test/mocks'
-import { IAsset } from '../../types';
+import { klvAsset } from '../../test/mocks'
 import { toLocaleFixed } from '../../utils'
 
 import {
@@ -26,28 +26,11 @@ import {
   CancelMarketOrder,
   CreateMarketplace,
   ConfigMarketplace,
+  ValidatorConfig,
+  AssetTrigger,
+  SetAccountName,
 } from './';
 
-
-const klvAsset: IAsset = {
-  assetType: '',
-  assetId: 'KLV',
-  name: 'Klever',
-  ticker: 'KLV',
-  ownerAddress: '',
-  logo: '',
-  uris: null,
-  precision: 6,
-  initialSupply: 0,
-  circulatingSupply: 0,
-  maxSupply: 0,
-  royalties: 0,
-  mintedValue: 0,
-  issueDate: 0,
-  staking: {
-    minEpochsToWithdraw: 0
-  },
-};
 const precision = 6; // defaulf klv precision
 
 describe('Component: TransactionContractComponents', () => {
@@ -81,8 +64,6 @@ describe('Component: TransactionContractComponents', () => {
       renderWithTheme(
         <Transfer
           {...mockedTxContractComponents.transferContract}
-          precision={precision}
-          asset={klvAsset}
         />
       );
       const row = screen.getByText(/Amount/i).parentNode?.parentNode;
@@ -126,8 +107,10 @@ describe('Component: TransactionContractComponents', () => {
     });
   });
 
-  describe('When contract is "Transfer"', () => {
+  describe('When contract is "CreateAsset"', () => {
     it('Should render the "Amount", "to"( who receive ) with the link and the coin with the link', () => {
+      const createAssetContract = {...mockedTxContractComponents.createAssetContract};
+      createAssetContract.parameter.ownerAddress = ''
       renderWithTheme(
         <CreateAsset
           {...mockedTxContractComponents.createAssetContract}
@@ -136,13 +119,13 @@ describe('Component: TransactionContractComponents', () => {
         />
       );
 
-      const { createAssetContract: { parameter } } = mockedTxContractComponents;
+      const { sender ,parameter }  = createAssetContract;
 
       const assetId = screen.getByText(/Asset Id/i);
       const name = screen.getByText(/Name/i);
       const owner = screen.getByText(/Owner/i);
       const ownerLink = screen.getByRole('link',
-        { name: parameter.ownerAddress});
+        { name: sender});
       const token = screen.getByText(/Token/i);
       const precisionAsset = screen.getByText(/Precision/i);
       const circulatingSupply = screen.getByText(/Circulating Supply/i);
@@ -158,7 +141,7 @@ describe('Component: TransactionContractComponents', () => {
       expect(circulatingSupply).toBeInTheDocument();
       expect(initialSupply).toBeInTheDocument();
       expect(maxSupply).toBeInTheDocument();
-      expect(ownerLink).toHaveAttribute('href', `/account/${parameter.ownerAddress}`)
+      expect(ownerLink).toHaveAttribute('href', `/account/${sender}`)
 
       expect(assetId.parentNode?.nextSibling?.firstChild)
         .toHaveTextContent(klvAsset.assetId);
@@ -279,6 +262,24 @@ describe('Component: TransactionContractComponents', () => {
       expect(bucketId).toBeInTheDocument();
       expect(bucketId.parentNode?.nextSibling?.firstChild)
         .toHaveTextContent(`${ parameter.bucketID }`);
+    });
+
+    it('Should render "--" when "Available Epoch" don\'t has any values', () => {
+      const unfreezeMock = {...mockedTxContractComponents.unfreezeContract };
+      unfreezeMock.receipts[0].availableEpoch = 0;
+      // console.log(unfreezeMock.receipts[0].availableEpoch || '--');
+      expect(true).toBeTruthy()
+      renderWithTheme(
+        <Unfreeze 
+          {...unfreezeMock}
+          receipts={unfreezeMock.receipts}
+        />
+      );
+
+    const availableEpoch = screen.getByText(/Available Epoch/i);
+    expect(availableEpoch).toBeInTheDocument();
+    expect(availableEpoch.parentElement?.nextSibling)
+      .toHaveTextContent('--');
     });
   });
 
@@ -502,7 +503,7 @@ describe('Component: TransactionContractComponents', () => {
   });
 
   describe('When contract is "CancelMarketOrder"', () => {
-    it('Should render "Order Id" and it\'s value', () => {
+    it('Should render "Order Id" and it\'s values', () => {
       renderWithTheme(
         <CancelMarketOrder
           {...mockedTxContractComponents.cancelMarketOrderContract}
@@ -521,7 +522,7 @@ describe('Component: TransactionContractComponents', () => {
   });
 
   describe('When contract is "CreateMarketplace"', () => {
-    it('Should render "Name" and "Address" with all it\'s value', () => {
+    it('Should render "Name" and "Address" with all it\'s values', () => {
       renderWithTheme(
         <CreateMarketplace
           {...mockedTxContractComponents.createMarketplaceContract}
@@ -544,7 +545,7 @@ describe('Component: TransactionContractComponents', () => {
   });
 
   describe('When contract is "ConfigMarketplace"', () => {
-    it('Should render "Name", "Market Id" and "Address" with all it\'s value', () => {
+    it('Should render "Name", "Market Id" and "Address" with all it\'s values', () => {
       renderWithTheme(
         <ConfigMarketplace
           {...mockedTxContractComponents.configMarketplaceContract}
@@ -567,6 +568,60 @@ describe('Component: TransactionContractComponents', () => {
         .toHaveTextContent(`${ parameter.marketplaceId }`);
       expect(address.parentNode?.nextSibling?.firstChild)
         .toHaveTextContent(`${ parameter.referralAddress }`);
+    });
+  });
+
+  describe('When contract is "ValidatorConfig"', () => {
+    it('Shoud render "Public Key" and "Name" with all it\'s values', () => {
+      renderWithTheme(
+        <ValidatorConfig
+          {...mockedTxContractComponents.validatorConfigContract}
+          receipts={[]}
+        />
+      );
+      
+      const { parameter } = mockedTxContractComponents.validatorConfigContract;
+      const pubKey = screen.getByText(parameter.blsPublicKey);
+      const name = screen.getByText(parameter.name);
+
+      expect(pubKey).toBeInTheDocument();
+      expect(name).toBeInTheDocument();
+    });
+  });
+
+  describe('When contract is "AssetTrigger"', () => {
+    it('Shoud render "Public Key" and "Name" with all it\'s values', () => {
+      renderWithTheme(
+        <AssetTrigger
+          {...mockedTxContractComponents.assetTriggerContract}
+          receipts={[]}
+        />
+      );
+      
+      const { parameter } = mockedTxContractComponents.assetTriggerContract;
+      const triggerType = screen.getByText(/Trigger Type/i);
+
+      expect(triggerType).toBeInTheDocument();
+      expect(triggerType.parentNode?.nextSibling)
+        .toHaveTextContent('0');
+    });
+  });
+
+  describe('When contract is "SetAccountName"', () => {
+    it('Shoud render "Public Key" and "Name" with all it\'s values', () => {
+      renderWithTheme(
+        <SetAccountName
+          {...mockedTxContractComponents.setAccountNameContract}
+          receipts={[]}
+        />
+      );
+      
+      const { parameter } = mockedTxContractComponents.setAccountNameContract;
+      const name = screen.getByText(/Name/i);
+
+      expect(name).toBeInTheDocument();
+      expect(name.parentNode?.nextSibling)
+        .toHaveTextContent(parameter.name);
     });
   });
 });

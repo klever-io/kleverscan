@@ -115,7 +115,7 @@ const Blocks: React.FC<IBlocks> = ({
           (statistics.yesterday.totalBlockRewards || 0) / 10 ** precision,
         )} KLV`,
         `${formatAmount(
-          statistics.total.totalBlockRewards / 10 ** precision,
+          (statistics.total.totalBlockRewards || 0) / 10 ** precision,
         )} KLV`,
       ],
     },
@@ -221,7 +221,9 @@ const Blocks: React.FC<IBlocks> = ({
           <small>{formatAmount((txFees || 0) / 10 ** precision)} KLV</small>
         </span>
         <span>
-          <strong>{formatAmount(blockRewards / 10 ** precision)} KLV</strong>
+          <strong>
+            {formatAmount((blockRewards || 0) / 10 ** precision)} KLV
+          </strong>
         </span>
       </Row>
     );

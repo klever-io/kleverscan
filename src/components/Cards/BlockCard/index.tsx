@@ -43,7 +43,9 @@ const BlockCard: React.FC<IBlock & IBlockCard> = ({
           </BlockCardRow>
           <BlockCardRow>
             <p>Reward</p>
-            <span>{formatAmount(blockRewards / 10 ** precision)} KLV</span>
+            <span>
+              {formatAmount((blockRewards || 0) / 10 ** precision)} KLV
+            </span>
           </BlockCardRow>
         </a>
       </Link>

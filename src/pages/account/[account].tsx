@@ -40,7 +40,8 @@ import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
 import Copy from '@/components/Copy';
 
-import api, { IPrice, Service } from '@/services/api';
+import api, { IPrice} from '@/services/api';
+import { Service } from '@/types/index';
 import { ISelectedDays } from '@/components/DateFilter';
 import Buckets from '@/components/Tabs/Buckets';
 import { useDidUpdateEffect } from '@/utils/hooks';

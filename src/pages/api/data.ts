@@ -3,7 +3,8 @@ import Redis from 'ioredis';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { IResponse } from '@/types/index';
-import api, { Service } from '@/services/api';
+import api from '@/services/api';
+import { Service } from '@/types/index';
 
 const redis = new Redis({
   host: process.env.DEFAULT_REDIS_HOST || '10.196.89.28',

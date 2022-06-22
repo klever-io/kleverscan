@@ -39,7 +39,8 @@ import { format, fromUnixTime } from 'date-fns';
 import Table, { ITable } from '@/components/Table';
 import { Row as TableRow } from '@/components/Table/styles';
 import { addCommasToNumber, formatAmount, typeVoteColors } from '@/utils/index';
-import api, { Service } from '@/services/api';
+import api from '@/services/api';
+import { Service } from '@/types/index';
 
 import { AiFillCheckCircle } from 'react-icons/ai';
 

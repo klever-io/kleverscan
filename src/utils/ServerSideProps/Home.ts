@@ -12,7 +12,8 @@ import {
 
 import { getEpochInfo } from '@/utils/index';
 
-import api, { Service } from '@/services/api';
+import api from '@/services/api';
+import { Service } from '@/types/index';
 import { GetServerSideProps } from 'next';
 
 const HomeServerSideProps: GetServerSideProps<IHome> = async () => {

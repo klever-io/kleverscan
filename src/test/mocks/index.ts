@@ -6,6 +6,7 @@ import {
   EnumBuyType,
   EnumMarketType,
   EnumAssetType,
+  IDataCards,
   IAsset,
   IAccountAsset,
   ITransaction,
@@ -231,6 +232,108 @@ export const mockedTxContractComponents = {
   },
 };
 
+export const mockedHomeDataCards: IDataCards = {
+  totalAccounts: 100,
+  totalTransactions: 20000,
+  tps: '0 / 3000',
+  epochInfo: {
+    currentSlot: 20,
+    epochFinishSlot: 200,
+    epochLoadPercent: 30,
+    remainingTime: 'two days'
+  },
+  coinsData: [
+    {
+      name: 'Klever',
+      shortname: 'KLV',
+      price: 0.23,
+      variation: 8,
+      marketCap: {
+        price: 97137477,
+        variation: 45.81105,
+      },
+      volume: {
+        price: 4372976,
+        variation: 0,
+      },
+      prices: [
+        { value: 0.012372596929497385 },
+        { value: 0.012404993140008574 },
+        { value: 0.012240615957263926 },
+      ],
+    },
+    {
+      name: 'Klever Finance',
+      shortname: 'KFI',
+      price: 97.78,
+      variation: 0,
+      marketCap: {
+        price: 14667000,
+        variation: 0
+      },
+      volume: {
+        price: 0.673435,
+        variation: 0
+      },
+      prices: [
+        {
+          value: 97.7800584108219
+        }
+      ]
+  }
+  ],
+  yesterdayTransactions: 20,
+  yesterdayAccounts: 2,
+};
+
+export const mockedMetrics = 'klv_slot_at_epoch_start{chainID="100015"} 486155\nklv_slots_per_epoch{chainID="100015"} 150\nklv_current_slot{chainID="100015"} 486191\nklv_slot_duration{chainID="100015"} 4000';
+
+export const mockedStatistics = {
+  data: {
+    statistics: {
+      chainStatistics: { 
+        liveTPS: 3,
+        peakTPS: 100
+      }
+    }
+  },
+  error: '',
+};
+
+export const mockedNewAccountsCall = {
+  yesterdayAccounts: {
+    data: {
+      number_by_day: [
+        {
+          doc_count: 33,
+        }
+      ],
+    },
+  },
+  error: '',
+};
+
+export const mockedTransactionsCall = {
+  transactions: {
+    pagination: {
+      totalRecords: 22,
+    }
+  },
+  error: '',
+};
+
+export const mockedYesterdayTxCall = {
+  yesterdayTransactions: {
+    data: {
+      number_by_day: [
+        {
+          doc_count: 444
+        },
+      ],
+    },
+  },
+  error: '',
+};
 export const klvAsset: IAsset = {
   assetType: '',
   assetId: 'KLV',

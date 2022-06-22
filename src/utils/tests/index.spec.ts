@@ -59,8 +59,9 @@ describe('unit tests for util funcs in index file', () => {
     test('with fixed date through mocked Date constructor', () => {
       const fixedDate = new Date(timestamp2);
       realDate = Date;
-      global.Date = class extends Date {
-        constructor(...args) {
+      // TODO - Fix TYPE
+      (global.Date as any) = class extends Date {
+        constructor(...args: any) {
           if (args.length > 0) {
             return super(...args);
           }
@@ -102,9 +103,9 @@ describe('unit tests for util funcs in index file', () => {
 
   describe('test toLocaleFixed function', () => {
     test('arbitrary numbers where English is the default language', () => {
-      expect(toLocaleFixed(4141414, 6)).toEqual('4,141,414.000000');
-      expect(toLocaleFixed(30000.65, 2)).toEqual('30,000.65');
-      expect(toLocaleFixed(1e9, 6)).toEqual('1,000,000,000.000000');
+      expect(toLocaleFixed(4141414, 6)).toEqual('4.141.414,000000');
+      expect(toLocaleFixed(30000.65, 2)).toEqual('30.000,65');
+      expect(toLocaleFixed(1e9, 6)).toEqual('1.000.000.000,000000');
     });
   });
 

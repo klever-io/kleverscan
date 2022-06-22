@@ -27,6 +27,14 @@ export enum Contract {
   ConfigMarketplace = 'ConfigMarketplace',
 }
 
+export enum Service {
+  PROXY,
+  PRICE,
+  NODE,
+  GECKO,
+  EXPLORER,
+}
+
 export interface ITransferContract {
   amount: number;
   toAddress: string;

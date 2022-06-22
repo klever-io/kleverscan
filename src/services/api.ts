@@ -1,3 +1,5 @@
+import { Service } from '@/types/index';
+
 export enum Method {
   GET = 'GET',
   POST = 'POST',
@@ -13,15 +15,6 @@ export interface IPrice {
   name: string;
   price: number;
 }
-
-export enum Service {
-  PROXY,
-  PRICE,
-  NODE,
-  GECKO,
-  EXPLORER,
-}
-
 export interface IProps {
   route: string;
   query?: IQuery;

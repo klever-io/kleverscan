@@ -1,7 +1,6 @@
 import api, {
   getHost,
   getProps,
-  Service,
   Method,
   withoutBody,
   withBody,
@@ -10,6 +9,7 @@ import api, {
   withTimeout,
 } from '../api';
 import mocks from './mocks';
+import { Service } from '@/types/index';
 
 describe('test api functions', () => {
   const defaultProps = {
@@ -101,11 +101,11 @@ describe('test api functions', () => {
 
   describe('withoutBody function', () => {
     afterEach(() => {
-      fetch.mockRestore();
+      (fetch as jest.Mock).mockRestore();
     });
     describe('address route', () => {
       test('successful fetch with address route', async () => {
-        global.fetch = jest.fn(() =>
+        (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: true,
             json: () => Promise.resolve(mocks.accounts),
@@ -123,7 +123,7 @@ describe('test api functions', () => {
       });
 
       test('failed fetch with address route', async () => {
-        fetch.mockImplementationOnce(() => Promise.reject('generic error'));
+        (fetch as jest.Mock).mockImplementationOnce(() => Promise.reject('generic error'));
         const res = await withoutBody(props1, Method.GET);
         expect(res).toStrictEqual({
           data: null,
@@ -133,7 +133,7 @@ describe('test api functions', () => {
       });
 
       test('successful fetch but status not ok', async () => {
-        global.fetch = jest.fn(() =>
+        (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: false,
             headers: Headers,
@@ -156,7 +156,7 @@ describe('test api functions', () => {
 
     describe('statistics route', () => {
       test('successful fetch', async () => {
-        global.fetch = jest.fn(() =>
+        (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: true,
             json: () => Promise.resolve(mocks.statistics),
@@ -175,7 +175,7 @@ describe('test api functions', () => {
       });
 
       test('failed fetch with statistics route', async () => {
-        fetch.mockImplementationOnce(() => Promise.reject('generic error'));
+        (fetch as jest.Mock).mockImplementationOnce(() => Promise.reject('generic error'));
         const res = await withoutBody(props2, Method.GET);
         expect(res).toStrictEqual({
           data: null,
@@ -185,7 +185,7 @@ describe('test api functions', () => {
       });
 
       test('successful fetch but status not ok', async () => {
-        global.fetch = jest.fn(() =>
+        (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: false,
             headers: Headers,
@@ -208,11 +208,11 @@ describe('test api functions', () => {
   });
   describe('withBody function', () => {
     afterEach(() => {
-      fetch.mockRestore();
+      (fetch as jest.Mock).mockRestore();
     });
     describe('prices route', () => {
       test('successful fetch in prices route', async () => {
-        global.fetch = jest.fn(() =>
+        (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: true,
             json: () => Promise.resolve(mocks.account),
@@ -231,7 +231,7 @@ describe('test api functions', () => {
       });
 
       test('failed fetch in prices route', async () => {
-        fetch.mockImplementationOnce(() => Promise.reject('generic error'));
+        (fetch as jest.Mock).mockImplementationOnce(() => Promise.reject('generic error'));
         const res = await withBody(propsBody, Method.POST);
         expect(res).toStrictEqual({
           data: null,
@@ -241,7 +241,7 @@ describe('test api functions', () => {
       });
 
       test('successful fetch but status not ok', async () => {
-        global.fetch = jest.fn(() =>
+        (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: false,
             headers: Headers,
@@ -265,11 +265,11 @@ describe('test api functions', () => {
 
   describe('withText function', () => {
     afterEach(() => {
-      fetch.mockRestore();
+      (fetch as jest.Mock).mockRestore();
     });
     describe('metrics route', () => {
       test('successful fetch with metrics route', async () => {
-        global.fetch = jest.fn(() =>
+        (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: true,
             text: () => Promise.resolve(mocks.metrics),
@@ -287,7 +287,7 @@ describe('test api functions', () => {
       });
 
       test('failed fetch with metrics route', async () => {
-        fetch.mockImplementationOnce(() => Promise.reject('generic error'));
+        (fetch as jest.Mock).mockImplementationOnce(() => Promise.reject('generic error'));
         const res = await withText(props3, Method.GET);
         expect(res).toEqual({
           data: null,
@@ -297,7 +297,7 @@ describe('test api functions', () => {
       });
 
       test('successful fetch but status not ok', async () => {
-        global.fetch = jest.fn(() =>
+        (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: false,
             headers: Headers,
@@ -321,11 +321,11 @@ describe('test api functions', () => {
 
   describe('getCached function', () => {
     afterEach(() => {
-      fetch.mockRestore();
+      (fetch as jest.Mock).mockRestore();
     });
     describe('transaction/list route', () => {
       test('successful fetch with transaction/list route', async () => {
-        global.fetch = jest.fn(() =>
+        (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: true,
             json: () => Promise.resolve(mocks.successfulGetCached),
@@ -343,7 +343,7 @@ describe('test api functions', () => {
       });
 
       test('failed fetch with transaction/list route', async () => {
-        fetch.mockImplementationOnce(() =>
+        (fetch as jest.Mock).mockImplementationOnce(() =>
           Promise.reject(mocks.getCachedObjectError),
         );
         const res = await getCached(props4);
@@ -351,7 +351,7 @@ describe('test api functions', () => {
       });
 
       test('successful fetch but status not ok', async () => {
-        global.fetch = jest.fn(() =>
+        (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: false,
             headers: Headers,
@@ -399,7 +399,7 @@ describe('test api functions', () => {
   describe('api integration function tests', () => {
     describe('api.get', () => {
       test('address route', async () => {
-        global.fetch = jest.fn(() =>
+        (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: true,
             json: () => Promise.resolve(mocks.accounts),
@@ -425,7 +425,7 @@ describe('test api functions', () => {
     });
     describe('api.post', () => {
       test('prices route', async () => {
-        global.fetch = jest.fn(() =>
+        (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: true,
             json: () => Promise.resolve(mocks.account),
@@ -449,7 +449,7 @@ describe('test api functions', () => {
 
     describe('api.text', () => {
       test('metrics route', async () => {
-        global.fetch = jest.fn(() =>
+        (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: true,
             text: () => Promise.resolve(mocks.metrics),

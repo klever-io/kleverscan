@@ -24,7 +24,8 @@ import {
 import { getEpochInfo } from '@/utils/index';
 
 import { Accounts, Transactions, Epoch, TPS } from '@/assets/cards';
-import api, { Service } from '@/services/api';
+import api from '@/services/api';
+import { Service } from '@/types/index';
 import {
   ProgressContainer,
   ProgressContent,

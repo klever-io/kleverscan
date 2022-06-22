@@ -43,7 +43,7 @@ export const Header = styled.section`
   justify-content: space-between;
   align-items: flex-end;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1200px) {
     flex-direction: column;
   }
 `;
@@ -55,10 +55,25 @@ export const FilterContainer = styled.div`
 
   gap: 0.75rem;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1200px) {
     width: 100%;
 
     flex-direction: column;
+  }
+`;
+
+export const FilterByDate = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: row;
+  margin-top: 1.7rem;
+  margin-left: 0.8rem;
+
+  @media (max-width: 1200px) {
+    justify-content: center;
+    margin-left: 0;
   }
 `;
 

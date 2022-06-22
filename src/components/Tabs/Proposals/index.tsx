@@ -38,11 +38,10 @@ const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
       epochEnd,
       proposalStatus,
       proposer,
+      totalStaked,
+      votes,
     } = props;
-
     const StatusIcon = getStatusIcon(proposalStatus);
-
-    const stakedPercent = 50;
 
     return (
       <>
@@ -58,22 +57,13 @@ const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
             </Link>
           </ProposerDescAndLink>
           <span>
-            <small>
-              Start: {format(fromUnixTime(epochStart), 'MM/dd/yyyy HH:mm')}
-            </small>{' '}
-            <p />
-            <small className="endTime">
-              End: {format(fromUnixTime(epochEnd), 'MM/dd/yyyy HH:mm')}
-            </small>
+            <small>Created Epoch: {epochStart}</small> <p />
+            <small className="endTime">Ended Epoch: {epochEnd}</small>
           </span>
           <UpVotes>
-            <p>2000000\123456789</p>
-            <ProgressContent>
-              <StakedIndicator percent={stakedPercent} />
-              <PercentIndicator percent={stakedPercent}>
-                {stakedPercent}%
-              </PercentIndicator>
-            </ProgressContent>
+            <p>
+              {votes['0'] / 1000000}\{totalStaked}
+            </p>
           </UpVotes>
           <Status status={proposalStatus}>
             <StatusIcon />

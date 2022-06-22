@@ -138,6 +138,7 @@ export const Status = styled.div<IStatus>`
   align-items: center;
 
   gap: 0.9rem;
+  min-width: 15rem;
 
   span {
     color: ${props =>
@@ -151,6 +152,7 @@ export const Status = styled.div<IStatus>`
     color: ${props => props.theme.table[props.status]} !important;
     text-transform: capitalize;
   }
+
   ${props =>
     props.status === 'inactive' &&
     `

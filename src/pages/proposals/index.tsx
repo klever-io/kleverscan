@@ -217,6 +217,14 @@ export const getServerSideProps: GetServerSideProps<IProposalsPage> = async ({
     route: 'proposals/list',
   });
 
+  const maxVotesInfo: any = await api.get({
+    route: 'assets/KFI',
+  });
+
+  proposalResponse.data?.proposals?.forEach((item: IProposal) => {
+    item.totalStaked = maxVotesInfo.data?.asset?.staking?.totalStaked / 1000000;
+  });
+
   const proposalsMessages: IProposalsMessages = {
     BlockRewards: 'Block Rewards',
     FeePerDataByte: 'Fee Per Data Byte',

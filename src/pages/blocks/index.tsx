@@ -340,7 +340,6 @@ export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
             break;
 
           case 1:
-            console.log(value.data);
             props.statistics = {
               yesterday: value.data.block_stats_by_day[0],
               total: {

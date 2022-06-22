@@ -285,27 +285,13 @@ const ProposalDetails: React.FC<IProposal> = props => {
                 <span>
                   <DateContainer>
                     <small>{proposalAPI.epochStart}</small>
-                    <Tooltip
-                      msg={`Epoch start at ${format(
-                        proposalAPI.timestampStart,
-                        'MM/dd/yyyy HH:mm',
-                      )}`}
-                    />
                   </DateContainer>
                 </span>
                 <span>
                   <strong>Ended Epoch:</strong>
                 </span>
                 <span>
-                  <EndedDate>
-                    {proposalAPI.epochEnd}
-                    <Tooltip
-                      msg={`Epoch start at ${format(
-                        fromUnixTime(proposalAPI.timestampEnd),
-                        'MM/dd/yyyy HH:mm',
-                      )}`}
-                    />
-                  </EndedDate>
+                  <EndedDate>{proposalAPI.epochEnd}</EndedDate>
                 </span>
               </Row>
               <Row>
@@ -445,23 +431,6 @@ export const getServerSideProps: GetStaticProps<IProposal> = async ({
   const props = proposalInfos.data.proposal;
   props.maxVotes = maxVotesInfo.data?.asset?.staking?.totalStaked / 1000000;
   props.votingPowers = votingPowers;
-
-  let metrics = await api.get({
-    route: 'node/metricsjson',
-    service: Service.NODE,
-  });
-
-  metrics = metrics.data.metrics;
-
-  const timestampStart =
-    metrics.klv_start_time * 1000 +
-    props.epochStart * metrics.klv_slots_per_epoch * metrics.klv_slot_duration;
-  const timestampEnd =
-    metrics.klv_start_time * 1000 +
-    props.epochEnd * metrics.klv_slots_per_epoch * metrics.klv_slot_duration;
-
-  props.timestampStart = timestampStart;
-  props.timestampEnd = timestampEnd;
 
   return { props };
 };

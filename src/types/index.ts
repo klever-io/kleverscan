@@ -700,6 +700,9 @@ export interface IProposal {
   proposer: string;
   createdDate: string;
   endedDate: string;
+  totalStaked?: number;
+  timestampStart?: number;
+  timestampEnd?: number;
 }
 
 export interface IVote {

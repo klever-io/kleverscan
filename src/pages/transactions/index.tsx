@@ -13,6 +13,7 @@ import {
   Header,
   Title,
   TooltipText,
+  FilterByDate,
 } from '@/views/transactions';
 
 import Filter, { IFilter, IFilterItem } from '@/components/Filter';
@@ -756,7 +757,10 @@ const Transactions: React.FC<ITransactions> = ({
             <Filter key={String(index)} {...filter} />
           ))}
         </FilterContainer>
-        <DateFilter {...dateFilterProps} />
+
+        <FilterByDate>
+          <DateFilter {...dateFilterProps} />
+        </FilterByDate>
       </Header>
       <Table {...tableProps}/>
       <PaginationContainer>

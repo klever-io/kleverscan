@@ -29,13 +29,15 @@ interface IBlockStatsResponse {
   totalBurned: number;
   totalMinted: number;
   totalBlockRewards: number;
+  totalTxFees: number;
 }
 
 interface IBlockStats {
   date: string;
   burned: number;
   minted: number;
-  value: number;
+  blocks: number;
+  transactions: number;
 }
 interface ICharts {
   statistics: IBlockStats[];
@@ -78,9 +80,14 @@ const Charts: React.FC<ICharts> = ({ statistics }) => {
           </TransactionChart>
 
           <TransactionChart>
-            <span>Block Rewards</span>
+            <span>Blocks Rewards vs Transactions Rewards</span>
             <TransactionChartContent>
-              <Chart type={ChartType.Linear} data={statistics} />
+              <Chart
+                type={ChartType.DoubleLinear}
+                data={statistics}
+                value="blocks"
+                value2="transactions"
+              />
             </TransactionChartContent>
           </TransactionChart>
         </TransactionContainer>
@@ -105,7 +112,8 @@ export const getServerSideProps: GetServerSideProps<ICharts> = async () => {
           date: format(stats.date, 'dd MMM'),
           burned: stats.totalBurned / 1000000,
           minted: stats.totalMinted / 1000000,
-          value: stats.totalBlockRewards / 1000000,
+          blocks: stats.totalBlockRewards / 1000000,
+          transactions: stats.totalTxFees / 1000000,
         };
       });
   }

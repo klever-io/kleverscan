@@ -15,6 +15,7 @@ export interface IPrice {
   name: string;
   price: number;
 }
+
 export interface IProps {
   route: string;
   query?: IQuery;

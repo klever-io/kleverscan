@@ -12,9 +12,10 @@ import {
   Container,
   Header,
   Input,
-  TableContainer,
   Title,
 } from '@/views/blocks';
+
+import { TableContainer } from '@/views/accounts';
 
 import Table, { ITable } from '@/components/Table';
 import { Row } from '@/components/Table/styles';

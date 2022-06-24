@@ -12,9 +12,10 @@ import {
   Container,
   Header,
   Input,
-  TableContainer,
   Title,
 } from '@/views/blocks';
+
+import { TableContainer } from '@/views/accounts';
 
 import Table, { ITable } from '@/components/Table';
 import { Row } from '@/components/Table/styles';
@@ -227,34 +228,56 @@ export const getServerSideProps: GetServerSideProps<IAccounts> = async () => {
     createdYesterday: 0,
   };
 
-  const accountsCall = new Promise<IAccountResponse>(resolve =>
-    resolve(
-      api.get({
+  const accountsCall = new Promise<IAccountResponse>(
+    async (resolve, reject) => {
+      const res = await api.get({
         route: 'address/list',
-      }),
-    ),
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
   );
 
-  const yesterdayAccountsCall = new Promise<IAccountRangeOfLastDays>(resolve =>
-    resolve(
-      api.get({
+  const yesterdayAccountsCall = new Promise<IAccountRangeOfLastDays>(
+    async (resolve, reject) => {
+      const res = await api.get({
         route: 'address/list/count/1',
-      }),
-    ),
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
   );
 
-  const [accounts, yesterdayAccounts] = await Promise.all([
-    accountsCall,
-    yesterdayAccountsCall,
-  ]);
+  await Promise.allSettled([accountsCall, yesterdayAccountsCall]).then(
+    responses => {
+      responses.map((res, index) => {
+        if (res.status !== 'rejected') {
+          const { value }: any = res;
+          switch (index) {
+            case 0:
+              props.accounts = value.data.accounts;
+              props.pagination = value.pagination;
+              break;
 
-  if (!accounts.error) {
-    props.accounts = accounts.data.accounts;
-    props.pagination = accounts.pagination;
-  }
-  if (!yesterdayAccounts.error) {
-    props.createdYesterday = yesterdayAccounts.data.number_by_day[0].doc_count;
-  }
+            case 1:
+              props.createdYesterday = value.data.number_by_day[0].doc_count;
+              break;
+
+            default:
+              break;
+          }
+        }
+      });
+    },
+  );
 
   return { props };
 };

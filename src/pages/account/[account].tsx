@@ -29,6 +29,7 @@ import {
   IPagination,
   IBucket,
   IAsset,
+  IAccountAsset,
 } from '@/types/index';
 
 import { ArrowLeft } from '@/assets/icons';
@@ -39,7 +40,8 @@ import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
 import Copy from '@/components/Copy';
 
-import api, { IPrice, Service } from '@/services/api';
+import api, { IPrice} from '@/services/api';
+import { Service } from '@/types/index';
 import { ISelectedDays } from '@/components/DateFilter';
 import Buckets from '@/components/Tabs/Buckets';
 import { useDidUpdateEffect } from '@/utils/hooks';
@@ -54,8 +56,9 @@ interface IAccountPage {
   transactions: ITransactionsResponse;
   convertedBalance: number;
   precisions: IAssetInfo[];
-  assets: IAsset[];
+  assets: IAccountAsset[];
   defaultKlvPrecision: number;
+  allowance: IAllowanceResponse;
 }
 
 interface IAccountResponse extends IResponse {
@@ -75,6 +78,13 @@ interface IPriceResponse extends IResponse {
   symbols: IPrice[];
 }
 
+interface IAllowanceResponse extends IResponse {
+  data: {
+    allowance: number;
+    stakingRewards: number;
+  };
+}
+
 const Account: React.FC<IAccountPage> = ({
   account,
   transactions: transactionResponse,
@@ -82,6 +92,7 @@ const Account: React.FC<IAccountPage> = ({
   precisions,
   assets,
   defaultKlvPrecision,
+  allowance,
 }) => {
   const router = useRouter();
 
@@ -224,7 +235,7 @@ const Account: React.FC<IAccountPage> = ({
   const SelectedTabComponent: React.FC = () => {
     switch (selectedTab) {
       case 'Assets':
-        return <Assets {...account.assets} />;
+        return <Assets assets={assets} />;
       case 'Transactions':
         return (
           <>
@@ -257,10 +268,8 @@ const Account: React.FC<IAccountPage> = ({
           <h1>Account</h1>
           <AccountIcon />
         </Title>
-
         <Input />
       </Header>
-
       <OverviewContainer>
         <Row>
           <span>
@@ -318,6 +327,28 @@ const Account: React.FC<IAccountPage> = ({
         </Row>
         <Row>
           <span>
+            <strong>Rewards</strong>
+            <strong>Available</strong>
+          </span>
+          <RowContent>
+            <BalanceContainer>
+              <FrozenContainer>
+                <div>
+                  <strong>Allowance</strong>
+                  <span>{allowance?.data?.allowance.toLocaleString()}</span>
+                </div>
+                <div>
+                  <strong>Staking</strong>
+                  <span>
+                    {allowance?.data?.stakingRewards.toLocaleString()}
+                  </span>
+                </div>
+              </FrozenContainer>
+            </BalanceContainer>
+          </RowContent>
+        </Row>
+        <Row>
+          <span>
             <strong>Nonce</strong>
           </span>
           <RowContent>
@@ -335,7 +366,6 @@ const Account: React.FC<IAccountPage> = ({
           </RowContent>
         </Row>
       </OverviewContainer>
-
       <Tabs {...tabProps}>
         <SelectedTabComponent />
       </Tabs>
@@ -353,60 +383,113 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
     precisions: [],
     assets: [],
     defaultKlvPrecision: 6,
+    allowance: {} as IAllowanceResponse,
   };
-
-  const assets = await api.get({
-    route: 'assets/kassets',
-  });
-
-  const filterPrecisions = assets.data.assets.map(
-    ({ assetId, precision }: IAssetInfo) => ({ assetId, precision }),
-  );
-  const { precision } = filterPrecisions.find(
-    ({ assetId }: IAssetInfo) => assetId === 'KLV',
-  ); // KLV default precision from API
 
   const accountLength = 62;
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
-
   const address = String(params?.account);
 
   if (!address || address.length !== accountLength) {
     return redirectProps;
   }
 
-  const account: IAccountResponse = await api.get({
-    route: `address/${address}`,
-  });
-  if (account.error) {
-    return redirectProps;
-  }
-  props.account = account.data.account;
-  if (props.account.assets.KLV) {
-    props.account.assets.KLV.balance =
-      props.account.balance - props.account.assets.KLV.frozenBalance;
-  }
-  const transactions: ITransactionsResponse = await api.get({
-    route: `address/${address}/transactions`,
+  const accountCall = new Promise<IAccountResponse>(async (resolve, reject) => {
+    const res = await api.get({
+      route: `address/${address}`,
+    });
+
+    if (!res.error || res.error === '') {
+      resolve(res);
+    }
+
+    reject(res.error);
   });
 
-  if (account.error) {
-    return redirectProps;
-  }
-  props.transactions = transactions;
-  props.precisions = filterPrecisions;
+  const transactionsCall = new Promise<ITransactionsResponse>(
+    async (resolve, reject) => {
+      const res = await api.get({
+        route: `address/${address}/transactions`,
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
+  );
+
+  const pricesCall = new Promise<IPriceResponse>(async (resolve, reject) => {
+    const res = await api.post({
+      route: 'prices',
+      service: Service.PRICE,
+      body: { names: ['KLV/USD'] },
+    });
+
+    if (!res.error || res.error === '') {
+      resolve(res);
+    }
+
+    reject(res.error);
+  });
+
+  await Promise.allSettled([pricesCall, transactionsCall, accountCall]).then(
+    responses => {
+      responses.forEach((res, index) => {
+        if (res.status === 'fulfilled') {
+          const { value }: any = res;
+
+          if (index === 1) {
+            props.transactions = value;
+          } else if (index === 2) {
+            props.account = value.data.account;
+
+            if (props.account.assets.KLV) {
+              props.account.assets.KLV.balance =
+                props.account.balance - props.account.assets.KLV.frozenBalance;
+            }
+
+            const filterPrecisions = Object.entries(
+              value.data.account.assets,
+            ).map(
+              ([assetId, asset]: [string, any]): IAssetInfo => ({
+                assetId,
+                precision: asset.precision,
+              }),
+            );
+
+            const precision = 6;
+
+            props.precisions = filterPrecisions;
+            props.assets = Object.values(value.data.account.assets);
+
+            if (responses[0].status !== 'rejected') {
+              const prices = responses[0].value;
+              props.convertedBalance =
+                prices.symbols[0].price *
+                (value.data.account.balance / 10 ** precision);
+            }
+          }
+        } else if (index == 2) {
+          return redirectProps;
+        }
+      });
+    },
+  );
+
+  const precision = 6;
   props.defaultKlvPrecision = precision; // Default KLV precision
-  props.assets = assets.data.assets;
 
-  const prices: IPriceResponse = await api.post({
-    route: 'prices',
-    service: Service.PRICE,
-    body: { names: ['KLV/USD'] },
+  const allowance: IAllowanceResponse = await api.get({
+    route: `address/${address}/allowance?asset=KLV`,
+    service: Service.NODE,
   });
-  if (!prices.error) {
-    props.convertedBalance =
-      prices.symbols[0].price *
-      (account.data.account.balance / 10 ** precision);
+
+  if (!allowance.error) {
+    allowance.data.allowance = allowance.data.allowance / 10 ** precision;
+    allowance.data.stakingRewards = allowance.data.allowance / 10 ** precision;
+    props.allowance = allowance;
   }
 
   return { props };

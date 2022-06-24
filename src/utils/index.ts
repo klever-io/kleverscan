@@ -9,6 +9,16 @@ export const timestampToDate = (timestamp: number) => {
   return time.toISOString().slice(0, 10);
 };
 
+export const getVariation = (variation: number) => {
+  const precision = 2;
+
+  if (variation < 0) {
+    return `- ${Math.abs(variation).toFixed(precision)}%`;
+  }
+
+  return `+ ${variation ? variation.toFixed(precision) : '--'}%`;
+};
+
 export const getAge = (date: Date): string => {
   const diff = Math.abs(new Date().getTime() - date.getTime());
 
@@ -35,6 +45,11 @@ export const getAge = (date: Date): string => {
   }
 
   return `${val} ${suffix}${val > 1 ? 's' : ''}`;
+};
+
+export const typeVoteColors = {
+  'Yes': '#B039BF',
+  'No': '#FF4A4A',
 };
 
 export const formatAmount = (number: number): string => {
@@ -65,7 +80,7 @@ export const formatAmount = (number: number): string => {
 };
 
 export const toLocaleFixed = (value: number, precision: number): string => {
-  return value.toLocaleString(undefined, {
+  return value?.toLocaleString(undefined, {
     minimumFractionDigits: precision,
   });
 };
@@ -159,3 +174,7 @@ const plural = (count: number, singular: string): string => {
 
   return `${count} ${singular}s `;
 };
+
+export const addCommasToNumber = (numb: number): string => {
+  return numb.toLocaleString();
+}

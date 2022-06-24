@@ -1,4 +1,6 @@
-enum Method {
+import { Service } from '@/types/index';
+
+export enum Method {
   GET = 'GET',
   POST = 'POST',
   PUT = 'PUT',
@@ -12,14 +14,6 @@ interface IQuery {
 export interface IPrice {
   name: string;
   price: number;
-}
-
-export enum Service {
-  PROXY,
-  PRICE,
-  NODE,
-  GECKO,
-  EXPLORER,
 }
 
 export interface IProps {
@@ -36,12 +30,12 @@ const buildUrlQuery = (query: IQuery): string =>
     .map(key => `${key}=${query[key]}`)
     .join('&');
 
-const getHost = (
+export const getHost = (
   route: string,
-  query: IQuery,
-  service: Service,
-  apiVersion: string,
-) => {
+  query: IQuery | undefined,
+  service: Service | undefined,
+  apiVersion: string | undefined,
+): string => {
   const hostService = {
     [Service.PROXY]:
       process.env.DEFAULT_API_HOST || 'https://api.testnet.klever.finance',
@@ -55,7 +49,7 @@ const getHost = (
       process.env.DEFAULT_EXPLORER_HOST || 'https://testnet.kleverscan.org',
   };
 
-  let host = hostService[service];
+  let host = hostService[service || 0];
   let port = process.env.DEFAULT_API_PORT || '443';
   let urlParam = '';
 
@@ -78,7 +72,7 @@ const getHost = (
   return `${host}/${route}${urlParam}`;
 };
 
-const getProps = (props: IProps) => {
+export const getProps = (props: IProps): IProps => {
   const defaultValues: IProps = {
     route: '/',
     service: Service.PROXY,
@@ -103,7 +97,10 @@ const getProps = (props: IProps) => {
   return new Proxy(props, handler);
 };
 
-const withoutBody = async (props: IProps, method: Method): Promise<any> => {
+export const withoutBody = async (
+  props: IProps,
+  method: Method,
+): Promise<any> => {
   try {
     const { route, query, service, apiVersion } = getProps(props);
 
@@ -128,10 +125,9 @@ const withoutBody = async (props: IProps, method: Method): Promise<any> => {
   }
 };
 
-const withBody = async (props: IProps, method: Method): Promise<any> => {
+export const withBody = async (props: IProps, method: Method): Promise<any> => {
   try {
     const { route, body, query, service, apiVersion } = getProps(props);
-
     const response = await fetch(getHost(route, query, service, apiVersion), {
       method: method.toString(),
       headers: {
@@ -150,11 +146,11 @@ const withBody = async (props: IProps, method: Method): Promise<any> => {
 
     return response.json();
   } catch (error) {
-    return Promise.resolve({ data: null, error, code: 'internal_error ' });
+    return Promise.resolve({ data: null, error, code: 'internal_error' });
   }
 };
 
-const withText = async (props: IProps, method: Method): Promise<any> => {
+export const withText = async (props: IProps, method: Method): Promise<any> => {
   try {
     const { route, query, service, apiVersion } = getProps(props);
 
@@ -179,7 +175,10 @@ const withText = async (props: IProps, method: Method): Promise<any> => {
   }
 };
 
-const withTimeout = async (promise: Promise<any>, timeout = 5000) => {
+export const withTimeout = async (
+  promise: Promise<any>,
+  timeout = 10000,
+): Promise<any> => {
   return Promise.race([
     promise,
     new Promise(resolve => {
@@ -190,7 +189,7 @@ const withTimeout = async (promise: Promise<any>, timeout = 5000) => {
   ]);
 };
 
-const getCached = async (props: IProps): Promise<any> => {
+export const getCached = async (props: IProps): Promise<any> => {
   try {
     const { route, query, service, apiVersion, refreshTime } = getProps(props);
 

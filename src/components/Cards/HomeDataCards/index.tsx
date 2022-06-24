@@ -24,7 +24,8 @@ import {
 import { getEpochInfo } from '@/utils/index';
 
 import { Accounts, Transactions, Epoch, TPS } from '@/assets/cards';
-import api, { Service } from '@/services/api';
+import api from '@/services/api';
+import { Service } from '@/types/index';
 import {
   ProgressContainer,
   ProgressContent,
@@ -120,61 +121,102 @@ const HomeDataCards: React.FC<IDataCards> = ({
     }, statisticsWatcherTimeout);
 
     const cardWatcher = setInterval(async () => {
-      const accountsCall = new Promise<IAccountResponse>(resolve =>
-        resolve(
-          api.get({
+      const accountsCall = new Promise<IAccountResponse>(
+        async (resolve, reject) => {
+          const res = await api.get({
             route: 'address/list',
-          }),
-        ),
+          });
+
+          if (!res.error || res.error === '') {
+            resolve(res);
+          }
+
+          reject(res.error);
+        },
       );
 
-      const yesterdayAccountsCall = new Promise<IYesterdayResponse>(resolve =>
-        resolve(
-          api.getCached({
+      const yesterdayAccountsCall = new Promise<IYesterdayResponse>(
+        async (resolve, reject) => {
+          const res = await api.getCached({
             route: 'address/list/count/1',
-          }),
-        ),
+          });
+
+          if (!res.error || res.error === '') {
+            resolve(res);
+          }
+
+          reject(res.error);
+        },
       );
 
-      const transactionsCall = new Promise<ITransactionResponse>(resolve =>
-        resolve(
-          api.getCached({
+      const transactionsCall = new Promise<ITransactionResponse>(
+        async (resolve, reject) => {
+          const res = await api.getCached({
             route: 'transaction/list',
-          }),
-        ),
+          });
+
+          if (!res.error || res.error === '') {
+            resolve(res);
+          }
+
+          reject(res.error);
+        },
       );
 
       const yesterdayTransactionsCall = new Promise<IYesterdayResponse>(
-        resolve =>
-          resolve(
-            api.getCached({
-              route: 'transaction/list/count/1',
-            }),
-          ),
+        async (resolve, reject) => {
+          const res = await api.getCached({
+            route: 'transaction/list/count/1',
+          });
+
+          if (!res.error || res.error === '') {
+            resolve(res);
+          }
+
+          reject(res.error);
+        },
       );
 
-      const [accounts, yesterdayAccounts, transactions, yesterdayTransactions] =
-        await Promise.all([
-          accountsCall,
-          yesterdayAccountsCall,
-          transactionsCall,
-          yesterdayTransactionsCall,
-        ]);
+      const promises = [
+        accountsCall,
+        yesterdayAccountsCall,
+        transactionsCall,
+        yesterdayTransactionsCall,
+      ];
 
-      if (!accounts.error) {
-        setTotalAccounts(accounts.pagination.totalRecords);
-      }
-      if (!yesterdayAccounts.error) {
-        setNewAccounts(yesterdayAccounts.data.number_by_day[0].doc_count);
-      }
-      if (!transactions.error) {
-        setTotalTransactions(transactions.pagination.totalRecords);
-      }
-      if (!yesterdayTransactions.error) {
-        setNewTransactions(
-          yesterdayTransactions.data.number_by_day[0].doc_count,
-        );
-      }
+      await Promise.allSettled(promises).then(responses => {
+        responses.forEach((res, index) => {
+          if (res.status !== 'rejected') {
+            const { value }: any = res;
+            switch (index) {
+              case 0:
+                setTotalAccounts(value.pagination.totalRecords);
+                break;
+
+              case 1:
+                setNewAccounts(
+                  value.yesterdayAccounts.data.number_by_day[0].doc_count,
+                );
+                break;
+
+              case 2:
+                setTotalTransactions(
+                  value.transactions.pagination.totalRecords,
+                );
+                break;
+
+              case 3:
+                setNewTransactions(
+                  value.yesterdayTransactions.data.number_by_day[0].doc_count,
+                );
+                break;
+
+              default:
+                break;
+            }
+          }
+        });
+      });
     }, cardWatcherInterval);
 
     return () => {
@@ -221,7 +263,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
           {epochCards.map(({ Icon, title, value, progress }, index) => (
             <DataCard key={String(index)}>
               <IconContainer>
-                <Icon viewBox="0 0 70 70"/>
+                <Icon viewBox="0 0 70 70" />
               </IconContainer>
               <DataCardValue>
                 <span>{title}</span>

@@ -1,29 +1,64 @@
 import React, { useEffect, useState } from 'react';
 
+import Chart, { ChartType } from '@/components/Chart';
+
 import { IoIosInfinite } from 'react-icons/io';
+
+import { ArrowGreen, ArrowPink, Receive } from '@/assets/icons/index';
 
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-
-import { Logo, LetterLogo } from '@/views/validator';
+import { fromUnixTime } from 'date-fns';
 
 import {
-  CardContainer,
-  CardContent,
-  Container,
-  Header,
-  Input,
-  PercentIndicator,
-  Rating,
-  Row,
+  Logo,
+  LetterLogo,
+  CenteredSubTitle,
+  Ranking,
+  CopyBackground,
+  ReceiveBackground,
+  HalfRow,
+  Card,
+  AllSmallCardsContainer,
+  BoldElement,
   StakedIndicator,
+  PercentIndicator,
+  TitleInformation,
+  ProgressContent,
+  EmptyProgressBar,
+  CardHeader,
+  RewardsCardHeader,
+  RewardsChart,
+  RewardsChartContent,
+  CardWrapper,
+  VotesFooter,
+  Header,
+  VotesHeader,
   Title,
   TitleContent,
-  TitleInformation,
-  ValidatorDescription,
   ValidatorTitle,
-} from '@/views/validators/detail';
+  Status,
+  HalfCirclePie,
+  Container,
+  PieData,
+  VotersPercent,
+  CommissionPercent,
+  ContainerVotes,
+  ContainerCircle,
+  RewardsCard,
+  RatingContainer,
+  Rating,
+  Row,
+  ElementsWrapper,
+  ContainerRewards,
+  RewardCardContentWrapper,
+  ContainerPerCentArrow,
+  SubContainerVotes,
+  CardSubHeader,
+} from '@/views/validator';
+
+import { CardContainer, CardContent } from '@/views/validators/detail';
 import { Row as RowList } from '@/components/Table/styles';
 
 import {
@@ -36,15 +71,17 @@ import {
 
 import { ArrowLeft } from '@/assets/icons';
 import api from '@/services/api';
-import { CenteredRow } from '@/views/transactions/detail';
 import Copy from '@/components/Copy';
 import Dropdown from '@/components/Dropdown';
-import { Status } from '@/components/Table/styles';
 import { getStatusIcon } from '@/assets/status';
-import { ProgressContent } from '@/views/validators';
 import Table, { ITable } from '@/components/Table';
 import { TableContainer } from '@/views/validators/detail';
-import { formatAmount, parseAddress } from '@/utils/index';
+import {
+  formatAmount,
+  parseAddress,
+  toLocaleFixed,
+  getAge,
+} from '@/utils/index';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
 
@@ -89,17 +126,40 @@ const Validator: React.FC<IValidatorPage> = ({
     name,
     uris,
   } = validator;
+
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [delegators, setDelegators] = useState(defaultDelegators);
+  const [uptime] = useState(new Date().getTime());
+  const [age, setAge] = useState(
+    getAge(fromUnixTime(new Date().getTime() / 1000)),
+  );
+  const [imgError, setImgError] = useState(false);
+  const [rerender, setRerender] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newAge = getAge(fromUnixTime(uptime / 1000));
+
+      setAge(newAge);
+    }, 1 * 1000); // 1 sec
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   const totalProduced =
-    validator.totalLeaderSuccessRate.numSuccess +
-    validator.totalValidatorSuccessRate.numSuccess;
+    validator?.totalLeaderSuccessRate?.numSuccess +
+    validator?.totalValidatorSuccessRate?.numSuccess;
   const totalMissed =
-    validator.totalLeaderSuccessRate.numFailure +
-    validator.totalValidatorSuccessRate.numFailure;
+    validator?.totalLeaderSuccessRate?.numFailure +
+    validator?.totalValidatorSuccessRate?.numFailure;
   const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'error');
+
+  const commissionPercent = commission / 10 ** 2;
+  const votersPercent = 100 - commission / 10 ** 2;
+  const rotationPercent = (votersPercent * 180) / 10 ** 2;
 
   const getListStatus = (list: string): string => {
     let status = '';
@@ -133,12 +193,23 @@ const Validator: React.FC<IValidatorPage> = ({
     }
   };
 
+  const handleLogoError = () => {
+    setImgError(true);
+    setRerender(!rerender);
+  };
+
   const renderLogo = () => {
     const regex = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
-    if (regex.test(logo)) {
-      return <Logo alt={`${name}-logo`} src={logo} />;
+    if (regex.test(logo) && !imgError) {
+      return (
+        <Logo
+          alt={`${name}-logo`}
+          src={logo}
+          onError={() => handleLogoError()}
+        />
+      );
     }
-    return <LetterLogo>{name.split('')[0] || 'K'}</LetterLogo>;
+    return <LetterLogo>{name?.split?.('')[0] || 'K'}</LetterLogo>;
   };
 
   const renderTitle = () => {
@@ -171,11 +242,11 @@ const Validator: React.FC<IValidatorPage> = ({
 
       if (!response.error) {
         const delegators: IBucket[] = [];
-        response?.data?.delegators.forEach(delegation => {
-          delegation.buckets.forEach(bucket => {
-            if (bucket.delegation === ownerAddress) {
+        response?.data?.delegators?.forEach(delegation => {
+          delegation?.buckets?.forEach(bucket => {
+            if (bucket?.delegation === ownerAddress) {
               delegators.push({
-                address: delegation.address,
+                address: delegation?.address,
                 ...bucket,
               });
             }
@@ -187,7 +258,6 @@ const Validator: React.FC<IValidatorPage> = ({
 
       setLoading(false);
     };
-
     fetchData();
   }, [page]);
 
@@ -208,112 +278,110 @@ const Validator: React.FC<IValidatorPage> = ({
           </span>
         </Row>
         <Row>
-          <span>
-            <strong>Public Key</strong>
-          </span>
-          <CenteredRow>
-            <span>{blsPublicKey}</span>
-            <Copy data={blsPublicKey} info="Key" />
-          </CenteredRow>
+          <RatingContainer>
+            <span>
+              <strong>Rating</strong>
+            </span>
+            <span>
+              <Rating rate={getRateColor()}>
+                {((rating * 100) / 10000000).toFixed(2)}%
+              </Rating>
+            </span>
+          </RatingContainer>
         </Row>
         <Row>
-          <span>
-            <strong>Delegated Percent</strong>
-          </span>
-          <span>
-            <ProgressContent>
-              <StakedIndicator
-                percent={maxDelegation === 0 ? 0 : stakedPercent}
-              />
-              <PercentIndicator
-                percent={maxDelegation === 0 ? 0 : stakedPercent}
-              >
-                {maxDelegation === 0 ? 0 : stakedPercent.toFixed(2)}%
-              </PercentIndicator>
-            </ProgressContent>
-          </span>
-        </Row>
-        <Row>
-          <span>
-            <strong>Rating</strong>
-          </span>
-          <span>
-            <Rating rate={getRateColor()}>
-              {((rating * 100) / 10000000).toFixed(2)}%
-            </Rating>
-          </span>
-        </Row>
-        <Row>
-          <span>
-            <strong>List</strong>
-          </span>
-          <Status status={getListStatus(list)}>
-            <ListIcon />
-            <span>{list}</span>
-          </Status>
-        </Row>
-        <Row>
-          <span>
-            <strong>Can Delegate</strong>
-          </span>
-          <Status status={canDelegate ? 'success' : 'fail'}>
-            <DelegateIcon />
-            <span>{canDelegate ? 'Yes' : 'No'}</span>
-          </Status>
+          <HalfRow>
+            <ElementsWrapper>
+              <span>
+                <strong>List</strong>
+              </span>
+              <Status status={getListStatus(list)}>
+                <ListIcon />
+                <span>{list}</span>
+              </Status>
+            </ElementsWrapper>
+          </HalfRow>
+          <HalfRow>
+            <ElementsWrapper>
+              <span>
+                <strong>Can Delegate</strong>
+              </span>
+              <Status status={canDelegate ? 'success' : 'fail'}>
+                <DelegateIcon />
+                <span>{canDelegate ? 'Yes' : 'No'}</span>
+              </Status>
+            </ElementsWrapper>
+          </HalfRow>
         </Row>
         <Row>
           <span>
             <strong>Max Delegation</strong>
           </span>
-          <span>{renderMaxDelegation()}</span>
+          <BoldElement>{renderMaxDelegation()}</BoldElement>
         </Row>
         <Row>
-          <span>
-            <strong>Staked Balance</strong>
-          </span>
-          <span>
-            <p>{(totalStake / 10 ** 6).toLocaleString()} KLV</p>
-          </span>
+          <HalfRow>
+            <ElementsWrapper>
+              <span>
+                <strong>Staked Balance</strong>
+              </span>
+              <BoldElement>
+                <span>{(totalStake / 10 ** precision).toLocaleString()}</span>
+                <span> KLV</span>
+              </BoldElement>
+            </ElementsWrapper>
+          </HalfRow>
+          <HalfRow>
+            <ElementsWrapper>
+              <span>
+                <strong>Self Stake</strong>
+              </span>
+              <BoldElement>
+                <span>{(selfStake / 10 ** 6).toLocaleString()}</span>
+                <span> KLV</span>
+              </BoldElement>
+            </ElementsWrapper>
+          </HalfRow>
         </Row>
         <Row>
-          <span>
-            <strong>Self Stake</strong>
-          </span>
-          <span>
-            <p>{(selfStake / 10 ** 6).toLocaleString()} KLV</p>
-          </span>
+          <HalfRow>
+            <ElementsWrapper>
+              <span>
+                <strong>Total Produced</strong>
+              </span>
+              <BoldElement>
+                <p>{totalProduced?.toLocaleString()}</p>
+              </BoldElement>
+            </ElementsWrapper>
+          </HalfRow>
+          <HalfRow>
+            <ElementsWrapper>
+              <span>
+                <strong>Total Missed</strong>
+              </span>
+              <BoldElement>
+                <p>{totalMissed?.toLocaleString()}</p>
+              </BoldElement>
+            </ElementsWrapper>
+          </HalfRow>
         </Row>
         <Row>
-          <span>
-            <strong>Total Produced</strong>
-          </span>
-          <span>
-            <p>{totalProduced.toLocaleString()}</p>
-          </span>
-        </Row>
-        <Row>
-          <span>
-            <strong>Total Missed</strong>
-          </span>
-          <span>
-            <p>{totalMissed.toLocaleString()}</p>
-          </span>
-        </Row>
-        <Row>
-          <span>
-            <strong>Commission</strong>
-          </span>
-          <span>
-            <p>{commission / 10 ** 2}%</p>
-          </span>
+          <ElementsWrapper>
+            <span>
+              <strong>Commission</strong>
+            </span>
+            <BoldElement>
+              <p>{commissionPercent}%</p>
+            </BoldElement>
+          </ElementsWrapper>
         </Row>
         <Row>
           <span>
             <strong>URIS</strong>
           </span>
-          <span>
+          <BoldElement>
             <Dropdown uris={uris} />
-          </span>
+          </BoldElement>
         </Row>
       </CardContent>
     );
@@ -329,62 +397,159 @@ const Validator: React.FC<IValidatorPage> = ({
     balance,
   }) => {
     return (
-      <RowList type="delegations">
+      <RowList type="validator">
         <Link href={`/account/${address}`}>
           {parseAddress(address || '', 12)}
         </Link>
         <span>{id}</span>
         <span>{stakedEpoch}</span>
-
         <span>
-          <strong>{formatAmount(balance / 10 ** precision)} KLV</strong>
+          <strong>{formatAmount(balance / 10 ** precision)}</strong>
         </span>
       </RowList>
     );
   };
 
   const tableProps: ITable = {
-    type: 'delegations',
+    type: 'validator',
     header,
     data: delegators as IBucket[],
     body: TableBody,
     loading,
   };
 
+  // mocked data:
+  const data = [
+    { value: 500, date: '12' },
+    { value: 300, date: '13' },
+    { value: 330, date: '13' },
+    { value: 400, date: '13' },
+    { value: 350, date: '13' },
+    { value: 150, date: '13' },
+    { value: 250, date: '13' },
+    { value: 350, date: '13' },
+    { value: 450, date: '13' },
+    { value: 500, date: '13' },
+  ];
+  const percentVotes = '+3.75%';
+
   return (
     <Container>
-      <Header>
-        <Title>
-          <div onClick={() => router.push('/')}>
-            <ArrowLeft />
-          </div>
-
-          <TitleContent>
-            {renderLogo()}
-            <TitleInformation>
-              <ValidatorTitle>{renderTitle()}</ValidatorTitle>
-              <ValidatorDescription>
-                Public Blockchain Infrastructure for the internet.
-              </ValidatorDescription>
-            </TitleInformation>
-          </TitleContent>
-        </Title>
-
-        <Input />
-      </Header>
-
+      <Title>
+        <div onClick={() => router.push('/validators')}>
+          <ArrowLeft />
+        </div>
+        <TitleContent>
+          {renderLogo()}
+          <TitleInformation>
+            <ValidatorTitle>
+              {renderTitle()}
+              {/* <Ranking>Rank 1</Ranking> */}
+            </ValidatorTitle>
+            <CenteredSubTitle>
+              <span>{blsPublicKey}</span>
+              <CopyBackground>
+                <Copy data={blsPublicKey} info="Key" />
+              </CopyBackground>
+              <ReceiveBackground>
+                <Receive />
+              </ReceiveBackground>
+            </CenteredSubTitle>
+          </TitleInformation>
+        </TitleContent>
+      </Title>
+      <AllSmallCardsContainer>
+        <Card marginLeft>
+          <CardWrapper>
+            <VotesHeader>
+              <span>
+                <strong>Current Delegations</strong>
+              </span>
+              <span>
+                <p>{`(Updated: ${age} ago)`}</p>
+              </span>
+            </VotesHeader>
+          </CardWrapper>
+          <RewardsChart>
+            <RewardsChartContent>
+              <Chart type={ChartType.Area} data={data} />
+            </RewardsChartContent>
+            <VotesFooter>
+              <span>{(totalStake / 10 ** precision).toLocaleString()}</span>
+              <span>
+                <strong>{percentVotes}</strong>
+              </span>
+            </VotesFooter>
+          </RewardsChart>
+        </Card>
+        <RewardsCard marginLeft marginRight>
+          <RewardsCardHeader>
+            <span>
+              <strong>Reward Distribution Ratio</strong>
+            </span>
+          </RewardsCardHeader>
+          <CardSubHeader>
+            <span>
+              <strong>Voters</strong>
+            </span>
+            <span>
+              <strong>Commission</strong>
+            </span>
+          </CardSubHeader>
+          <RewardCardContentWrapper>
+            <ContainerVotes>
+              <SubContainerVotes>
+                <ContainerPerCentArrow>
+                  <ArrowGreen />
+                  <VotersPercent>{votersPercent}%</VotersPercent>
+                </ContainerPerCentArrow>
+              </SubContainerVotes>
+            </ContainerVotes>
+            <ContainerCircle>
+              <HalfCirclePie rotation={`${rotationPercent}deg`}>
+                <PieData></PieData>
+                <PieData></PieData>
+              </HalfCirclePie>
+            </ContainerCircle>
+            <ContainerRewards>
+              <ContainerPerCentArrow>
+                <ArrowPink />
+                <CommissionPercent>{commissionPercent}%</CommissionPercent>
+              </ContainerPerCentArrow>
+            </ContainerRewards>
+          </RewardCardContentWrapper>
+        </RewardsCard>
+        <Card marginRight>
+          <CardHeader>
+            <span>
+              <strong>Delegated</strong>
+            </span>
+            <p>{`(Updated: ${age} ago)`}</p>
+          </CardHeader>
+          <EmptyProgressBar>
+            <ProgressContent percent={maxDelegation === 0 ? 0 : stakedPercent}>
+              <StakedIndicator
+                percent={maxDelegation === 0 ? 0 : stakedPercent}
+              >
+                {(totalStake / 10 ** precision).toLocaleString()}
+              </StakedIndicator>
+            </ProgressContent>
+            <PercentIndicator percent={maxDelegation === 0 ? 0 : stakedPercent}>
+              <p>{maxDelegation === 0 ? 0 : stakedPercent?.toFixed(0)}%</p>
+            </PercentIndicator>
+          </EmptyProgressBar>
+        </Card>
+      </AllSmallCardsContainer>
       <CardContainer>
         <Overview />
       </CardContainer>
-
       <TableContainer>
         <h3>List of delegations</h3>
         <Table {...tableProps} />
       </TableContainer>
-
       <PaginationContainer>
         <Pagination
-          count={pagination.totalPages}
+          count={pagination?.totalPages}
           page={page}
           onPaginate={page => {
             setPage(page);
@@ -406,33 +571,63 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> = async ({
 
   const address = String(hash);
 
-  const validator: IValidatorResponse = await api.get({
-    route: `validator/${address}`,
-  });
-  if (!validator.error) {
-    props.validator = validator.data.validator;
-  }
+  const validatorCall = new Promise<IValidatorResponse>(
+    async (resolve, reject) => {
+      const res = await api.get({
+        route: `validator/${address}`,
+      });
 
-  const delegations: IDelegateResponse = await api.get({
-    route: `validator/delegated/${address}`,
-  });
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
 
-  const delegators: IBucket[] = [];
-  delegations?.data?.delegators.forEach(delegation => {
-    delegation.buckets.forEach(bucket => {
-      if (bucket.delegation === address) {
-        delegators.push({
-          address: delegation.address,
-          ...bucket,
-        });
+      reject(res.error);
+    },
+  );
+
+  const delegationCall = new Promise<IDelegateResponse>(
+    async (resolve, reject) => {
+      const res = await api.get({
+        route: `validator/delegated/${address}`,
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
+  );
+
+  await Promise.allSettled([validatorCall, delegationCall]).then(promises => {
+    promises?.forEach((res, index) => {
+      if (res.status === 'fulfilled') {
+        if (index === 0) {
+          const { value }: any = res;
+          props.validator = value?.data?.validator;
+        } else if (index === 1) {
+          const delegations: any = res.value;
+          const delegators: IBucket[] = [];
+
+          delegations?.data?.delegators?.forEach((delegation: any) => {
+            delegation?.buckets?.forEach((bucket: any) => {
+              if (bucket?.delegation === address) {
+                delegators.push({
+                  address: delegation?.address,
+                  ...bucket,
+                });
+              }
+            });
+          });
+
+          if (!delegations.error) {
+            props.pagination = delegations?.pagination;
+            props.delegators = delegators;
+          }
+        }
       }
     });
   });
-
-  if (!delegations.error) {
-    props.pagination = delegations.pagination;
-    props.delegators = delegators;
-  }
 
   return { props };
 };

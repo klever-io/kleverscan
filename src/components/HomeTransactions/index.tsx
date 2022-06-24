@@ -18,6 +18,7 @@ import TransactionItem from '../TransactionItem';
 import api from '@/services/api';
 
 import { ITransactionResponse, IHomeTransactions } from '../../types';
+import Link from 'next/link';
 
 const HomeTransactions: React.FC<IHomeTransactions> = ({
   setTotalTransactions,
@@ -68,7 +69,12 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
 
   return (
     <Section>
-      <h1 onClick={() => router.push(`/transactions`)}>Transactions</h1>
+      <Link href={'/transactions'}>
+        <a>
+          <h1>Transactions</h1>
+        </a>
+      </Link>
+
       <TransactionContainer>
         <TransactionContent>
           {transactions.length === 0 && (

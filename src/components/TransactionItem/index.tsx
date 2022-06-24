@@ -21,12 +21,12 @@ const TransactionItem: React.FC<ITransaction> = ({
   precision,
   sender,
 }) => {
-  const parameter: ITransferContract = {} as ITransferContract;
+  let parameter: ITransferContract = {} as ITransferContract;
   let amount = 0;
 
   if (contract) {
     const contractPosition = 0;
-    const parameter = contract[contractPosition].parameter as ITransferContract;
+    parameter = contract[contractPosition].parameter as ITransferContract;
 
     if (parameter?.amount) {
       amount = parameter.amount;
@@ -45,15 +45,15 @@ const TransactionItem: React.FC<ITransaction> = ({
         <p>
           <strong>From: </strong>
           <Link href={`/account/${sender}`}>
-            <a className="clean-style">{parseAddress(sender, 4)}</a>
+            <a className="clean-style">{parseAddress(sender, 12)}</a>
           </Link>
         </p>
         <p>
           <strong>To: </strong>
-          <Link href={`/account/${parameter.toAddress}`}>
+          <Link href={`/account/${parameter?.toAddress}`}>
             <a className="clean-style">
-              {parameter.toAddress
-                ? parseAddress(parameter.toAddress, 4)
+              {parameter?.toAddress
+                ? parseAddress(parameter?.toAddress, 12)
                 : '--'}
             </a>
           </Link>

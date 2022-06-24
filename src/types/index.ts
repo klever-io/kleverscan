@@ -27,6 +27,14 @@ export enum Contract {
   ConfigMarketplace = 'ConfigMarketplace',
 }
 
+export enum Service {
+  PROXY,
+  PRICE,
+  NODE,
+  GECKO,
+  EXPLORER,
+}
+
 export interface ITransferContract {
   amount: number;
   toAddress: string;
@@ -400,7 +408,9 @@ export interface IAccount {
 export interface IAccountAsset {
   address: string;
   assetId: string;
+  assetType: number;
   balance: number;
+  precision: number;
   frozenBalance: number;
   unfrozenBalance: number;
   lastClaim: {
@@ -408,6 +418,9 @@ export interface IAccountAsset {
     epoch: number;
   };
   buckets?: IBucket[];
+  staking?: {
+    minEpochsToWithdraw: number;
+  };
 }
 
 export interface IAsset {
@@ -506,9 +519,22 @@ export interface IResponse {
   error: IError;
 }
 
+interface INodePeer {
+  coordenates: [number, number][];
+  data: any;
+}
+
 export interface ICountryNode {
   country: ISO2;
-  nodes: [number, number][];
+  nodes: INodePeer[];
+}
+
+export interface IPeerData {
+  isblacklisted: boolean;
+  pid: string;
+  pk: string;
+  peertype: string;
+  addresses: string[];
 }
 
 export interface ICountryFeature {
@@ -670,8 +696,13 @@ export interface IProposal {
   epochEnd: number;
   votes: number;
   voters: IVote[];
-  // hash: string;
+  txHash: string;
   proposer: string;
+  createdDate: string;
+  endedDate: string;
+  totalStaked?: number;
+  timestampStart?: number;
+  timestampEnd?: number;
 }
 
 export interface IVote {

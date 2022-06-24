@@ -40,16 +40,34 @@ export const Content = styled.div`
   flex-direction: row;
 
   @media (max-width: 1600px) {
-    width: calc(100vw - 20rem);
+    width: calc(100vw - 20.9rem);
   }
   @media (max-width: 768px) {
-    width: calc(100vw - 10rem);
+    width: calc(100vw - 11rem);
+  }
+  @media (max-width: 525px) {
+    min-width: calc(100vw - 10.97rem);
   }
   @media (max-width: 425px) {
-    min-width: calc(100vw - 5rem);
+    min-width: calc(100vw - 5.97rem);
   }
   &&::-webkit-scrollbar {
     display: none;
+  }
+
+  @-moz-document url-prefix() {
+    @media (max-width: 1600px) {
+      width: calc(100vw - 20rem);
+    }
+    @media (max-width: 768px) {
+      width: calc(100vw - 10rem);
+    }
+    @media (max-width: 525px) {
+      min-width: calc(100vw - 9.9rem);
+    }
+    @media (max-width: 425px) {
+      min-width: calc(100vw - 5rem);
+    }
   }
 `;
 
@@ -69,27 +87,50 @@ export const CardContainer = styled.div`
   border-radius: 1rem;
 
   @media (max-width: 1600px) {
-    min-width: calc(100vw - 20rem);
+    min-width: calc(100vw - 20.9rem);
   }
   @media (max-width: 768px) {
-    min-width: calc(100vw - 10rem);
+    min-width: calc(100vw - 11rem);
+  }
+  @media (max-width: 525px) {
+    min-width: calc(100vw - 10.97rem);
   }
   @media (max-width: 425px) {
-    min-width: calc(100vw - 5rem);
+    min-width: calc(100vw - 5.97rem);
+  }
+
+  @-moz-document url-prefix() {
+    @media (max-width: 1600px) {
+      min-width: calc(100vw - 20rem);
+    }
+    @media (max-width: 768px) {
+      min-width: calc(100vw - 10rem);
+    }
+    @media (max-width: 525px) {
+      min-width: calc(100vw - 9.9rem);
+    }
+    @media (max-width: 425px) {
+      min-width: calc(100vw - 5rem);
+    }
   }
 `;
 
 export const CardContent = styled.div`
   min-width: 18.5rem;
-
+  @media (max-width: 525px) {
+    min-width: 10.5rem;
+  }
   display: flex;
 
   flex-direction: column;
 
   animation: 1.5s ease 0s 1 normal none running ${FadeIn};
-
   @media (max-width: 1600px) {
     width: 100%;
+  }
+
+  a {
+    z-index: 1;
   }
 `;
 

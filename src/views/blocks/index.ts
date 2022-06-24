@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { default as DefaultInput } from '@/components/Inputt';
 
@@ -7,7 +7,7 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: 768px) {
+  @media (max-width: 890px) {
     padding: 3rem 3rem 5rem 3rem;
   }
 `;
@@ -19,9 +19,8 @@ export const Header = styled.section`
   justify-content: space-between;
   align-items: center;
 
-  @media (max-width: 768px) {
+  @media (max-width: 870px) {
     flex-direction: column;
-
     align-items: flex-start;
   }
 `;
@@ -53,7 +52,7 @@ export const Input = styled(DefaultInput)`
 
   border-color: ${props => props.theme.filter.border};
 
-  @media (max-width: 768px) {
+  @media (max-width: 870px) {
     width: 100%;
   }
 `;
@@ -67,7 +66,7 @@ export const CardContainer = styled.section`
 
   gap: 0.75rem;
 
-  @media (max-width: 768px) {
+  @media (max-width: 870px) {
     flex-direction: column;
   }
 `;
@@ -91,10 +90,16 @@ export const Card = styled.div`
 
   div {
     display: flex;
-
+    gap: 0.5rem;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    span:nth-child(2) {
+      text-align: right;
+    }
+    p:nth-child(2) {
+      text-align: right;
+    }
 
     strong {
       font-weight: 600;
@@ -116,10 +121,95 @@ export const Card = styled.div`
   }
 `;
 
-export const TableContainer = styled.section`
+export const EffectsContainer = styled.div<{ autoUpdate: boolean }>`
+  ${props => (props.autoUpdate ? tableEffects : '')}
+`;
+
+const tableEffects = css`
+  div > div:first-child {
+    opacity: 1;
+    animation-name: fadeInOpacity;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in;
+    animation-duration: 1s;
+
+    @keyframes fadeInOpacity {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+  }
+
+  div > div:not(:first-child) {
+    opacity: 1;
+    animation-name: down;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in;
+    animation-duration: 1s;
+
+    @keyframes down {
+      0% {
+        transform: translateY(-50%);
+      }
+
+      100% {
+        transform: translateY(0%);
+      }
+    }
+  }
+`;
+
+export const TableContainer = styled.section<{ autoUpdate: boolean }>`
   display: flex;
 
   flex-direction: column;
 
   gap: 1.5rem;
+`;
+
+export const ToggleButtonContainer = styled.div<{ autoUpdate: boolean }>`
+  display: inline-block;
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 45px;
+  height: 1.4rem;
+  background-color: ${props =>
+    props.autoUpdate ? props.theme.purple : 'gray'};
+  border-radius: 34px;
+  user-select: none;
+`;
+
+export const ToggleButton = styled.button<{ autoUpdate: boolean }>`
+  height: 1.1rem;
+  width: 17px;
+  position: relative;
+  left: 3px;
+  background-color: ${props => props.theme.white};
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+  border-radius: 100%;
+  color: ${props => props.theme.gray};
+  ${props =>
+    props.autoUpdate &&
+    css`
+      transform: translateX(22px);
+    `}
+`;
+
+export const TableHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+`;
+
+export const UpdateContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
 `;

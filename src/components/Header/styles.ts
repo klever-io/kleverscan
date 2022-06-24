@@ -195,7 +195,7 @@ export const DropdownContainer = styled.div`
   left: -1rem;
 
   @media (max-width: 1024px) {
-  left: 0.4rem;
+    left: 0.4rem;
   }
 `
 

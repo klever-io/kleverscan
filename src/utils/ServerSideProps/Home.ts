@@ -12,7 +12,8 @@ import {
 
 import { getEpochInfo } from '@/utils/index';
 
-import api, { Service } from '@/services/api';
+import api from '@/services/api';
+import { Service } from '@/types/index';
 import { GetServerSideProps } from 'next';
 
 const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
@@ -33,56 +34,6 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     yesterdayTransactions: 0,
     yesterdayAccounts: 0,
   };
-
-  const blocksCall = new Promise<IBlockResponse>(resolve =>
-    resolve(
-      api.getCached({
-        route: 'block/list',
-        refreshTime: 4,
-      }),
-    ),
-  );
-
-  const transactionsCall = new Promise<ITransactionResponse>(resolve =>
-    resolve(
-      api.getCached({
-        route: 'transaction/list',
-      }),
-    ),
-  );
-
-  const transactionsListCall = new Promise<ITransactionListResponse>(resolve =>
-    resolve(
-      api.getCached({
-        route: 'transaction/list/count/15',
-      }),
-    ),
-  );
-  const accountsCall = new Promise<IAccountResponse>(resolve =>
-    resolve(
-      api.getCached({
-        route: 'address/list',
-      }),
-    ),
-  );
-
-  const statisticsCall = new Promise<IAccountResponse>(resolve =>
-    resolve(
-      api.getCached({
-        route: 'node/statistics',
-        service: Service.NODE,
-      }),
-    ),
-  );
-
-  const metricsCall = new Promise<any>(resolve =>
-    resolve(
-      api.text({
-        route: 'node/metrics',
-        service: Service.NODE,
-      }),
-    ),
-  );
 
   const pushCoinData = (
     name: string,
@@ -107,70 +58,184 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     });
   };
 
-  const klvDataCall = new Promise<IGeckoResponse>(resolve =>
-    resolve(
-      api.getCached({
+  const blocksCall = new Promise<IBlockResponse>(
+    async (resolve, reject) => {
+      const res = await api.getCached({
+        route: 'block/list',
+        refreshTime: 4,
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
+  );
+
+  const transactionsCall = new Promise<IBlockResponse>(
+    async (resolve, reject) => {
+      const res = await api.getCached({
+        route: 'transaction/list',
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
+  );
+  
+  const transactionsListCall = new Promise<ITransactionListResponse>(
+    async (resolve, reject) => {
+      const res = await api.getCached({
+        route: 'transaction/list/count/15',
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
+  );
+
+  const accountsCall = new Promise<IAccountResponse>(
+    async (resolve, reject) => {
+      const res = await api.getCached({
+        route: 'address/list',
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
+  );
+
+  const statisticsCall = new Promise<IAccountResponse>(
+    async (resolve, reject) => {
+      const res = await api.getCached({
+        route: 'node/statistics',
+        service: Service.NODE,
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
+  );
+
+  const metricsCall = new Promise<IAccountResponse>(
+    async (resolve, reject) => {
+      const res = await api.text({
+        route: 'node/metrics',
+        service: Service.NODE,
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
+  );
+
+  const klvDataCall = new Promise<IAccountResponse>(
+    async (resolve, reject) => {
+      const res = await api.getCached({
         route: 'coins/klever',
         service: Service.GECKO,
-      }),
-    ),
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
   );
-  const klvChartCall = new Promise<IGeckoChartResponse>(resolve =>
-    resolve(
-      api.getCached({
+
+  const klvChartCall = new Promise<IAccountResponse>(
+    async (resolve, reject) => {
+      const res = await api.getCached({
         route: `coins/klever/market_chart?vs_currency=usd&days=1`,
         service: Service.GECKO,
-      }),
-    ),
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
   );
 
-  const kfiDataCall = new Promise<IGeckoResponse>(resolve =>
-    resolve(
-      api.getCached({
+  const kfiDataCall = new Promise<IAccountResponse>(
+    async (resolve, reject) => {
+      const res = await api.getCached({
         route: 'coins/klever-finance',
         service: Service.GECKO,
-      }),
-    ),
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
   );
-  const kfiChartCall = new Promise<IGeckoChartResponse>(resolve =>
-    resolve(
-      api.getCached({
+
+  const kfiChartCall = new Promise<IAccountResponse>(
+    async (resolve, reject) => {
+      const res = await api.getCached({
         route: `coins/klever-finance/market_chart?vs_currency=usd&days=1`,
         service: Service.GECKO,
-      }),
-    ),
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
   );
 
-  const yesterdayTransactionsCall = new Promise<IYesterdayResponse>(resolve =>
-    resolve(
-      api.getCached({
+  const yesterdayTransactionsCall = new Promise<IAccountResponse>(
+    async (resolve, reject) => {
+      const res = await api.getCached({
         route: 'transaction/list/count/1',
-      }),
-    ),
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
   );
 
-  const yesterdayAccountsCall = new Promise<IYesterdayResponse>(resolve =>
-    resolve(
-      api.getCached({
+  const yesterdayAccountsCall = new Promise<IAccountResponse>(
+    async (resolve, reject) => {
+      const res = await api.getCached({
         route: 'address/list/count/1',
-      }),
-    ),
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
   );
 
-  const [
-    [blocks, transactions],
-    transactionsList,
-    accounts,
-    statistics,
-    metrics,
-    klvData,
-    klvChart,
-    kfiData,
-    kfiChart,
-    yesterdayTransactions,
-    yesterdayAccounts,
-  ] = await Promise.all([
-    Promise.all([blocksCall, transactionsCall]),
+  const promises = [
+    blocksCall,
+    transactionsCall,
     transactionsListCall,
     accountsCall,
     statisticsCall,
@@ -181,59 +246,85 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     kfiChartCall,
     yesterdayTransactionsCall,
     yesterdayAccountsCall,
-  ]);
+  ];
 
-  if (!blocks.error) {
-    props.blocks = blocks.data.blocks;
-  }
+  await Promise.allSettled(promises).then(responses => {
+    responses.forEach((res, index) => {
+      if (res.status !== 'rejected') {
+        const {value}: any = res;
+        
+        switch (index) {
+          case 0:
+            props.blocks = value.data.blocks;
+            break;
+          
+          case 1:
+            props.transactions = value.data.transactions;
+            props.totalTransactions = value.pagination.totalRecords;
+            break;
 
-  if (!transactions.error) {
-    props.transactions = transactions.data.transactions;
-    props.totalTransactions = transactions.pagination.totalRecords;
-  }
+          case 2:
+            const { number_by_day } = value.data;
+            props.transactionsList = number_by_day;
+            break;
+          
+          case 3:
+            props.totalAccounts = value.pagination.totalRecords;
+            break;
 
-  if (!transactionsList.error) {
-    const { number_by_day } = transactionsList.data;
-    props.transactionsList = number_by_day;
-  }
-  if (!accounts.error) {
-    props.totalAccounts = accounts.pagination.totalRecords;
-  }
-  if (!statistics.error) {
-    const chainStatistics = statistics.data.statistics.chainStatistics;
+          case 4:
+            const chainStatistics = value.data.statistics.chainStatistics;
+            props.tps = `${chainStatistics.liveTPS} / ${chainStatistics.peakTPS}`;
+            break;
 
-    props.tps = `${chainStatistics.liveTPS} / ${chainStatistics.peakTPS}`;
-  }
+          case 5:
+            const parsedMetrics = {} as IParsedMetrics;
 
-  if (!metrics.error) {
-    const parsedMetrics = {} as IParsedMetrics;
+            const metricLines = value?.split('\n');
+            metricLines?.forEach((line: any) => {
+              const props = line?.split(' ');
+        
+              parsedMetrics[props[0]?.split('{')?.[0]] = parseInt(props?.[1]);
+            });
+        
+            props.epochInfo = getEpochInfo(parsedMetrics);
+            break;
 
-    const metricLines = metrics?.split('\n');
-    metricLines?.forEach((line: any) => {
-      const props = line?.split(' ');
+          case 6:
+            if (responses[7].status !== 'rejected') {
+              const klvChart: any = responses[7].value;
+              pushCoinData('Klever', 'KLV', value, klvChart);
+            }
+            break;
 
-      parsedMetrics[props[0]?.split('{')?.[0]] = parseInt(props?.[1]);
-    });
+          case 8:
+            if (value?.market_data?.market_cap) {
+              value.market_data.market_cap.usd =
+                150000 * value.market_data.current_price.usd;
+            }
+            break;
+          
+          case 9:
+            if (responses[8].status !== 'rejected') {
+              const kfiData: any = responses[8].value;
+              pushCoinData('Klever Finance', 'KFI', kfiData, value);
+            }
+            break;
 
-    props.epochInfo = getEpochInfo(parsedMetrics);
-  }
+          case 10:
+            props.yesterdayTransactions = value.data.number_by_day[0].doc_count;
+            break;
+          
+          case 11:
+            props.yesterdayAccounts = value.data.number_by_day[0].doc_count;
+            break;
 
-  pushCoinData('Klever', 'KLV', klvData, klvChart);
-  // Currently hardcoded marketcap
-
-  if (kfiData?.market_data?.market_cap) {
-    kfiData.market_data.market_cap.usd =
-      150000 * kfiData.market_data.current_price.usd;
-  }
-  pushCoinData('Klever Finance', 'KFI', kfiData, kfiChart);
-
-  if (!yesterdayTransactions.error) {
-    props.yesterdayTransactions =
-      yesterdayTransactions.data.number_by_day[0].doc_count;
-  }
-  if (!yesterdayAccounts.error) {
-    props.yesterdayAccounts = yesterdayAccounts.data.number_by_day[0].doc_count;
-  }
+          default:
+            break;
+        }
+      }
+    })
+  });
 
   return { props };
 };

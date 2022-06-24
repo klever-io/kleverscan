@@ -77,7 +77,8 @@ interface IAssetResponse extends IResponse {
   };
 }
 
-interface ITransactionPage extends ITransaction {
+interface ITransactionPage {
+  transaction: ITransaction;
   precision: number;
   asset: IAsset;
 }
@@ -102,8 +103,10 @@ const klvAsset: IAsset = {
   },
 };
 
-const Transaction: React.FC<ITransactionPage> = tx => {
+const Transaction: React.FC<ITransactionPage> = props => {
   const router = useRouter();
+
+  const { transaction, asset } = props;
 
   const {
     hash,
@@ -119,8 +122,7 @@ const Transaction: React.FC<ITransactionPage> = tx => {
     receipts,
     blockNum,
     nonce,
-    asset,
-  } = tx;
+  } = transaction;
 
   const StatusIcon = getStatusIcon(status);
   const precision = 6; // default KLV precision
@@ -210,16 +212,17 @@ const Transaction: React.FC<ITransactionPage> = tx => {
           <div onClick={() => router.push('/transactions')}>
             <ArrowLeft />
           </div>
-          <h1>Transaction Details</h1>
-          <Icon />
+          <h1>
+            <p>Transaction</p>{' '}
+            <p>
+              Details <Icon />
+            </p>
+          </h1>
         </Title>
-
         <Input />
       </Header>
-
       <CardContainer>
         <h3>Overview</h3>
-
         <CardContent>
           <Row>
             <span>
@@ -319,10 +322,8 @@ const Transaction: React.FC<ITransactionPage> = tx => {
           )}
         </CardContent>
       </CardContainer>
-
       <CardContainer>
         <h3>Contract</h3>
-
         <CardContent>
           <Row>
             <span>
@@ -332,7 +333,6 @@ const Transaction: React.FC<ITransactionPage> = tx => {
               <p>{getContractType(contract)}</p>
             </span>
           </Row>
-
           <ContractComponent />
         </CardContent>
       </CardContainer>
@@ -347,7 +347,7 @@ const Transaction: React.FC<ITransactionPage> = tx => {
               wrapLines={true}
               wrapLongLines={true}
             >
-              {JSON.stringify(tx, null, 2)}
+              {JSON.stringify(transaction, null, 2)}
             </SyntaxHighlighter>
           </CardRaw>
         </CardContent>
@@ -401,7 +401,7 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
   }
 
   const props: ITransactionPage = {
-    ...transaction.data.transaction,
+    transaction: transaction.data.transaction,
     precision,
     asset,
   };

@@ -3,7 +3,6 @@ import styled from 'styled-components';
 
 import { Copy as CopyIcon } from '@/assets/icons';
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 interface ICopyProps {
   data: string;

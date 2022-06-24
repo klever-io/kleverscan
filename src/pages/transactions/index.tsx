@@ -13,6 +13,7 @@ import {
   Header,
   Title,
   TooltipText,
+  FilterByDate,
 } from '@/views/transactions';
 
 import Filter, { IFilter, IFilterItem } from '@/components/Filter';
@@ -246,8 +247,8 @@ const Transactions: React.FC<ITransactions> = ({
     const tooltipRef = useRef<any>(null);
 
     const handleMouseOver = (e: any) => {
-      const positionY = e.currentTarget.offsetTop;
-      const positionX = e.currentTarget.offsetLeft;
+      const positionY = e.currentTarget.getBoundingClientRect().top;
+      const positionX = e.currentTarget.getBoundingClientRect().left;
 
       tooltipRef.current.style.top = positionY - 30 + 'px';
       tooltipRef.current.style.left = positionX + 'px';
@@ -265,10 +266,12 @@ const Transactions: React.FC<ITransactions> = ({
               </Tooltip>
             ) : (
               <>
+              <Tooltip onMouseOver={(e: any) => handleMouseOver(e)}>
                 <Link href={`/asset/KLV`}>
                   <KLV />
                 </Link>
-                <Link href={`/asset/KLV`}>KLV</Link>
+                <TooltipText ref={tooltipRef}>KLV</TooltipText>
+                </Tooltip>
               </>
             )}
           </div>
@@ -678,7 +681,7 @@ const Transactions: React.FC<ITransactions> = ({
         <Link href={`/account/${sender}`}>
           <a className="address">{parseAddress(sender, 16)}</a>
         </Link>
-        <span>
+        <span style={{overflow: "visible"}}>
           <ArrowRight />
         </span>
         <Link href={`/account/${toAddress}`}>
@@ -754,10 +757,12 @@ const Transactions: React.FC<ITransactions> = ({
             <Filter key={String(index)} {...filter} />
           ))}
         </FilterContainer>
-        <DateFilter {...dateFilterProps} />
-      </Header>
 
-      <Table {...tableProps} />
+        <FilterByDate>
+          <DateFilter {...dateFilterProps} />
+        </FilterByDate>
+      </Header>
+      <Table {...tableProps}/>
       <PaginationContainer>
         <Pagination
           count={count}

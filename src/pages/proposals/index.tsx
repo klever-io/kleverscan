@@ -21,7 +21,7 @@ import { useDidUpdateEffect } from '@/utils/hooks';
 import { IProposal, IProposalsResponse } from '@/types/index';
 
 interface IProposalsPage {
-  networkParams: INetworkParam[];
+  networkParams: INetworkParams;
   proposals: IProposal[];
   totalProposalsPage: number;
 }
@@ -29,11 +29,42 @@ interface IProposalsPage {
 interface IProposalsMessages {
   BlockRewards: string;
   FeePerDataByte: string;
+  KAppFeeAssetTrigger: string;
+  KAppFeeBuy: string;
+  KAppFeeCancelMarketOrder: string;
+  KAppFeeClaim: string;
+  KAppFeeConfigITO: string;
+  KAppFeeConfigMarketplace: string;
   KAppFeeCreateAsset: string;
+  KAppFeeCreateMarketplace: string;
   KAppFeeCreateValidator: string;
+  KAppFeeDelegate: string;
+  KAppFeeFreeze: string;
+  KAppFeeProposal: string;
+  KAppFeeSell: string;
+  KAppFeeSetAccountName: string;
+  KAppFeeSetITOPrices: string;
+  KAppFeeTransfer: string;
+  KAppFeeUndelegate: string;
+  KAppFeeUnfreeze: string;
+  KAppFeeUnjail: string;
+  KAppFeeUpdateAccountPermission: string;
+  KAppFeeValidatorConfig: string;
+  KAppFeeVote: string;
+  KAppFeeWithdraw: string;
+  LeaderValidatorRewardsPercentage: string;
+  MarketKeyLength: string;
+  MaxBucketSize: string;
   MaxEpochsUnclaimed: string;
+  MaxNFTMintBatch: string;
+  MaxNameSize: string;
+  MaxURIKeySize: string;
+  MaxURISize: string;
+  MinKFIStakedToEnableProposals: string;
+  MinKLVBucketAmount: string;
   MinSelfDelegatedAmount: string;
   MinTotalDelegatedAmount: string;
+  ProposalMaxEpochsDuration: string;
   StakingRewards: string;
 }
 
@@ -86,6 +117,9 @@ const Proposals: React.FC<IProposalsPage> = ({
             votes: proposal.voters[index].amount,
             voters: proposal.voters,
             proposer: proposal.proposer,
+            txHash: proposal.txHash,
+            createdDate: proposal.createdDate,
+            endedDate: proposal.endedDate,
           };
         },
       );
@@ -178,45 +212,68 @@ const Proposals: React.FC<IProposalsPage> = ({
 export const getServerSideProps: GetServerSideProps<IProposalsPage> = async ({
   params,
 }) => {
-  const { data } = await api.get({ route: 'node/network-parameters' });
+  const { data } = await api.get({ route: 'network/network-parameters' });
   const proposalResponse: IProposalsResponse = await api.get({
     route: 'proposals/list',
   });
 
-  //Mock Proposal ==============
+  const maxVotesInfo: any = await api.get({
+    route: 'assets/KFI',
+  });
 
-  // proposalResponse.data.proposals.push({
-  //   proposalId: 0,
-  //   proposalStatus: 'pending',
-  //   parameter: 'test',
-  //   value: 'test',
-  //   description:
-  //     'Propose to modify the fee of 1 unit of Bandwidth to 0.001  TRX Propose to modify the cost of account creation in the system contract to 1  TRX',
-  //   epochStart: 0,
-  //   epochEnd: 1000,
-  //   voters: [],
-  //   votes: 0,
-  //   proposer: 'test',
-  // });
+  proposalResponse.data?.proposals?.forEach((item: IProposal) => {
+    item.totalStaked = maxVotesInfo.data?.asset?.staking?.totalStaked / 1000000;
+  });
 
   const proposalsMessages: IProposalsMessages = {
     BlockRewards: 'Block Rewards',
     FeePerDataByte: 'Fee Per Data Byte',
+    KAppFeeAssetTrigger: 'KApp Fee for Asset Trigger',
+    KAppFeeBuy: 'KApp Fee for Buy',
+    KAppFeeCancelMarketOrder: 'KApp Fee for Cancel Market Order',
+    KAppFeeClaim: 'KApp Fee for Claim',
+    KAppFeeConfigITO: 'KApp Fee for Config ITO',
+    KAppFeeConfigMarketplace: 'KApp Fee for Config Marketplace',
     KAppFeeCreateAsset: 'KApp Fee for Asset Creation',
+    KAppFeeCreateMarketplace: 'KApp Fee for Marketplace Creation',
     KAppFeeCreateValidator: 'KApp Fee for Validator Creation',
+    KAppFeeDelegate: 'KApp Fee for Delegation',
+    KAppFeeFreeze: 'KApp Fee for Freeze',
+    KAppFeeProposal: 'KApp Fee for Proposal',
+    KAppFeeSell: 'KApp Fee for Sell',
+    KAppFeeSetAccountName: 'KApp Fee for Account Name',
+    KAppFeeSetITOPrices: 'KApp Fee for Set ITO Prices',
+    KAppFeeTransfer: 'KApp Fee for Transfer',
+    KAppFeeUndelegate: 'KApp Fee for Undelegate',
+    KAppFeeUnfreeze: 'KApp Fee for Unfreeze',
+    KAppFeeUnjail: 'KApp Fee for Unjail',
+    KAppFeeUpdateAccountPermission: 'KApp Fee for Update Account Permission',
+    KAppFeeValidatorConfig: 'KApp Fee for Validator Config',
+    KAppFeeVote: 'KApp Fee for Vote',
+    KAppFeeWithdraw: 'KApp Fee for Withdraw',
+    LeaderValidatorRewardsPercentage: 'Leader Validator rewards percentage',
+    MarketKeyLength: 'Length of the Market Key',
+    MaxBucketSize: 'Max bucket size',
     MaxEpochsUnclaimed: 'Max Epochs to clear unclaimed',
+    MaxNFTMintBatch: 'Max NFT Mint per batch',
+    MaxNameSize: 'Max Name Size',
+    MaxURIKeySize: 'Max URI Key Size',
+    MaxURISize: 'Max URI Value Size',
+    MinKFIStakedToEnableProposals: 'Min KFI staked to enable Proposals Kapps',
+    MinKLVBucketAmount: 'Min KLV Bucket Amount',
     MinSelfDelegatedAmount: 'Min Self Delegation Amount',
     MinTotalDelegatedAmount: 'Min Total Delegation Amount',
+    ProposalMaxEpochsDuration: 'Max Epochs for active proposal duration',
     StakingRewards: 'Staking Rewards',
   };
 
-  let networkParams = [] as INetworkParam[];
+  let networkParams = {} as INetworkParams;
 
   if (data) {
     networkParams = Object.keys(data.parameters).map((key, index) => {
       return {
         number: index,
-        parameter: proposalsMessages[key],
+        parameter: proposalsMessages[key] ? proposalsMessages[key] : '',
         currentValue: data.parameters[key].value,
       };
     });

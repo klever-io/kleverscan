@@ -53,15 +53,13 @@ export const fadeInContainerMobile = keyframes`
 `;
 
 export const Container = styled.div`
-  margin-left: auto;
-
   display: block;
-  width: fit-content;
   position: relative;
 `;
 
 export const OutsideContainer = styled.div`
   display: flex;
+  width: 100%;
   align-items: center;
   gap: 1rem;
   height: 2.8rem;
@@ -80,6 +78,7 @@ export const OutsideContainer = styled.div`
 export const OutsideContent = styled.div`
   padding: 1rem 0;
   height: 100%;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -123,6 +122,7 @@ export const CalendarContainer = styled.div`
   min-height: 18rem;
   width: 18rem;
   padding: 1rem;
+  margin-left: 5rem;
   background-color: ${props => props.theme.white};
   position: absolute;
   bottom: -0.5rem;

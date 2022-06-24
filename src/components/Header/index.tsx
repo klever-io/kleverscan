@@ -24,9 +24,8 @@ import {
 import { INavbarItem, navbarItems } from '@/configs/navbar';
 
 interface IDropdownPages {
-  page: INavbarItem
+  page: INavbarItem;
 }
-
 
 const Navbar: React.FC = () => {
   const router = useRouter();
@@ -47,30 +46,37 @@ const Navbar: React.FC = () => {
     }
   };
 
-  const DropdownDesktop = ({page}: IDropdownPages) => {
+  const DropdownDesktop = ({ page }: IDropdownPages) => {
     return (
-        <DropdownItem>
-          <page.Icon />
-          <Link href={page.pathTo}>
+      <DropdownItem>
+        <page.Icon />
+        <Link href={page.pathTo}>
+          <a>
             <span>{page.name}</span>
-          </Link>
-        </DropdownItem>
+          </a>
+        </Link>
+      </DropdownItem>
     );
-  }
+  };
 
-  const DropdownMobile = ({page}: IDropdownPages) => {
+  const DropdownMobile = ({ page }: IDropdownPages) => {
     return (
-        <DropdownItem onClick={handleMenu}>
-          <Link href={page.pathTo}>
-            <span>{page.name}</span>
-          </Link>
-          <page.Icon />
-        </DropdownItem>
+      <DropdownItem onClick={handleMenu}>
+        <Link href={page.pathTo}>
+          <span>{page.name}</span>
+        </Link>
+        <page.Icon />
+      </DropdownItem>
     );
-  }
+  };
 
-  const NavbarItem: React.FC<INavbarItem> = ({ name, Icon, pathTo, pages = [] }) => {
-    if(name === 'More') {
+  const NavbarItem: React.FC<INavbarItem> = ({
+    name,
+    Icon,
+    pathTo,
+    pages = [],
+  }) => {
+    if (name === 'More') {
       return (
         <Item selected={router.pathname.includes(name.toLowerCase())}>
           <span>{name}</span>
@@ -80,27 +86,37 @@ const Navbar: React.FC = () => {
                 <DropdownDesktop key={index} page={page} />
               ))}
             </DropdownMenu>
-        </DropdownContainer>
-        <span><DropdownIcon /></span>
+          </DropdownContainer>
+          <span>
+            <DropdownIcon />
+          </span>
         </Item>
       );
     }
+
     return (
       <Link href={pathTo}>
-        <Item selected={router.pathname.includes(name.toLowerCase())}>
-          <Icon />
-          <span>{name}</span>
-        </Item>
+        <a>
+          <Item selected={router.pathname.includes(name.toLowerCase())}>
+            <Icon />
+            <span>{name}</span>
+          </Item>
+        </a>
       </Link>
     );
   };
 
-  const MobileNavbarItem: React.FC<INavbarItem> = ({ name, Icon, pathTo, pages = [] }) => {
+  const MobileNavbarItem: React.FC<INavbarItem> = ({
+    name,
+    Icon,
+    pathTo,
+    pages = [],
+  }) => {
     const [showMore, setShowMore] = useState(false);
     const handleClick = () => {
       setShowMore(!showMore);
-    }
-    if(name === 'More') {
+    };
+    if (name === 'More') {
       return (
         <MobileItem
           onClick={handleClick}
@@ -116,7 +132,9 @@ const Navbar: React.FC = () => {
               </DropdownMenu>
             </DropdownContainer>
           )}
-          <span><DropdownIcon /></span>
+          <span>
+            <DropdownIcon />
+          </span>
         </MobileItem>
       );
     }
@@ -137,9 +155,11 @@ const Navbar: React.FC = () => {
     <>
       <Container>
         <Link href="/">
-          <Logo onClick={handleClose}>
-            <Image src="/logo-large.png" alt="Logo" width="215" height="29" />
-          </Logo>
+          <a>
+            <Logo onClick={handleClose}>
+              <Image src="/logo-large.png" alt="Logo" width="215" height="29" />
+            </Logo>
+          </a>
         </Link>
 
         <DesktopContainer>

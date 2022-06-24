@@ -30,17 +30,18 @@ interface IProposals {
 }
 
 const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
-  const TableBody: React.FC<IProposal> = ({
-    proposalId,
-    description,
-    epochStart,
-    epochEnd,
-    proposalStatus,
-    proposer,
-  }) => {
+  const TableBody: React.FC<IProposal> = props => {
+    const {
+      proposalId,
+      description,
+      epochStart,
+      epochEnd,
+      proposalStatus,
+      proposer,
+      totalStaked,
+      votes,
+    } = props;
     const StatusIcon = getStatusIcon(proposalStatus);
-
-    const stakedPercent = 50;
 
     return (
       <>
@@ -51,33 +52,27 @@ const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
           <ProposerDescAndLink>
             <Description>{description || ' - '}</Description>
             <Proposer>Proposer</Proposer>
-            <Link href="/">{parseAddress(proposer, 8)}</Link>
+            <Link href={`/account/${proposer}`}>
+              <a>{parseAddress(proposer, 8)}</a>
+            </Link>
           </ProposerDescAndLink>
           <span>
-            <small>
-              Start:{' '}
-              {format(fromUnixTime(epochStart / 1000), 'MM/dd/yyyy HH:mm')}
-            </small>{' '}
-            <p />
-            <small className="endTime">
-              End: {format(fromUnixTime(epochEnd / 1000), 'MM/dd/yyyy HH:mm')}
-            </small>
+            <small>Created Epoch: {epochStart}</small> <p />
+            <small className="endTime">Ended Epoch: {epochEnd}</small>
           </span>
           <UpVotes>
-            <p>2000000\123456789</p>
-            <ProgressContent>
-              <StakedIndicator percent={stakedPercent} />
-              <PercentIndicator percent={stakedPercent}>
-                {stakedPercent}%
-              </PercentIndicator>
-            </ProgressContent>
+            <p>
+              {votes['0'] / 1000000}\{totalStaked}
+            </p>
           </UpVotes>
           <Status status={proposalStatus}>
             <StatusIcon />
             <ProposalStatus>{capitalizeString(proposalStatus)}</ProposalStatus>
           </Status>
           <span>
-            <Link href={`/proposal/${proposalId}`}>Details</Link>
+            <Link href={{ pathname: `/proposal/${proposalId}` }}>
+              <a>Details</a>
+            </Link>
           </span>
         </Row>
       </>

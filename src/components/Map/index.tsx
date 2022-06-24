@@ -1,13 +1,14 @@
 import React, { Fragment } from 'react';
 
-import { MapContainer, Marker, TileLayer } from 'react-leaflet';
+import { MapContainer, Marker, TileLayer, Popup } from 'react-leaflet';
 import { divIcon, LatLngExpression, MarkerCluster } from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
+import Copy from '@/components/Copy';
 require('react-leaflet-markercluster/dist/styles.min.css');
 
-import { Container } from './styles';
+import { Container, Row } from './styles';
 
-import { ICountryNode } from '../../types';
+import { ICountryNode, IPeerData } from '../../types';
 
 interface IMapConfig {
   initialPosition: LatLngExpression;
@@ -19,26 +20,51 @@ interface IMap {
 }
 
 const Map: React.FC<IMap> = ({ nodes }) => {
-  // const [selectedNode, setSelectedNode] = useState<ICountryNode | null>(null);
-
   const mapConfig: IMapConfig = {
     initialPosition: [30, 0],
     zoom: 2,
   };
-
-  // const handleMarker = (node: ICountryNode) => {
-  //   setSelectedNode(node);
-  // };
-
-  // const handlePopup = () => {
-  //   setSelectedNode(null);
-  // };
 
   const createClusterCustomIcon = function (cluster: MarkerCluster) {
     return divIcon({
       html: `<b>${cluster.getChildCount()}</b>`,
       className: 'map-cluster',
     });
+  };
+
+  const nodeInfos = (nodeData: IPeerData) => {
+    const { peertype, pid, isblacklisted, pk } = nodeData;
+
+    return (
+      <>
+        <Row>
+          <span>
+            <strong>Peer type</strong>
+          </span>
+          <span>{peertype}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Black Listed</strong>
+          </span>
+          <span>{isblacklisted.toString()}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>PID</strong>
+          </span>
+          <span>{pid}</span>
+          <Copy info="PID" data={pid} />
+        </Row>
+        <Row>
+          <span>
+            <strong>Public Key</strong>
+          </span>
+          <span>{pk}</span>
+          <Copy info="Public Key" data={pk} />
+        </Row>
+      </>
+    );
   };
 
   return (
@@ -59,24 +85,20 @@ const Map: React.FC<IMap> = ({ nodes }) => {
               showCoverageOnHover={false}
               iconCreateFunction={createClusterCustomIcon}
             >
-              {node.nodes?.map((subNode, subIndex) => (
-                <Marker
-                  key={String(subIndex)}
-                  position={subNode}
-                  icon={divIcon({ className: 'map-marker' })}
-                />
-              ))}
+              {node.nodes?.map((subNode, subIndex) => {
+                return (
+                  <Marker
+                    key={String(subIndex)}
+                    position={subNode.coordenates[0]}
+                    icon={divIcon({ className: 'map-marker' })}
+                  >
+                    <Popup>{nodeInfos(subNode.data)}</Popup>
+                  </Marker>
+                );
+              })}
             </MarkerClusterGroup>
           </Fragment>
         ))}
-        {/* 
-        {selectedNode && (
-          <Popup position={selectedNode.location} onClose={handlePopup}>
-            <div>
-              <span>{selectedNode.name}</span>
-            </div>
-          </Popup>
-        )} */}
       </MapContainer>
     </Container>
   );

@@ -18,8 +18,6 @@ interface INetworkParam {
 }
 
 const NetworkParams: React.FC<INetworkProps> = ({ networkParams, loading }) => {
-  //TODO: fazer o MAP
-
   const TableBody: React.FC<INetworkParam> = ({
     number,
     parameter,

@@ -10,6 +10,7 @@ import { IBlock, IBlockResponse, IBlockCardList } from '../../types';
 
 import Carousel from '@/components/Carousel';
 import BlockCard from '@/components/Cards/BlockCard';
+import Link from 'next/link';
 
 const BlockCardList: React.FC<IBlockCardList> = ({ blocks, precision }) => {
   const [listedBlocks, setListedBlocks] = useState<IBlock[]>(blocks);
@@ -49,7 +50,9 @@ const BlockCardList: React.FC<IBlockCardList> = ({ blocks, precision }) => {
 
   return (
     <Section>
-      <h1 onClick={() => router.push(`blocks`)}>Blocks</h1>
+      <Link href={'/blocks'}>
+        <h1>Blocks</h1>
+      </Link>
       <Carousel>{getBLockCards()}</Carousel>
     </Section>
   );

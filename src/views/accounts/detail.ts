@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { default as DefaultInput } from '@/components/Inputt';
 
 export const Container = styled.div`
-  padding: 3rem 10rem 5rem 10rem;
+  padding: 3rem 8rem 5rem 8rem;
 
   background-color: ${props => props.theme.background};
 
@@ -80,13 +80,15 @@ export const Row = styled.div`
 
   span {
     &:first-child {
-      width: 8rem;
+      width: 10rem;
     }
 
-    overflow: hidden;
+    /* overflow: hidden; */
 
     text-overflow: ellipsis;
     white-space: nowrap;
+    display: flex;
+    flex-direction: column;
 
     strong {
       font-weight: 600;
@@ -108,6 +110,7 @@ export const Row = styled.div`
 
 export const RowContent = styled.span`
   width: 100%;
+
   .bucketIdCopy {
     span {
       margin-right: -2rem;
@@ -165,12 +168,15 @@ export const AmountContainer = styled.div`
   div {
     span {
       font-weight: 600;
+      margin-top: 0.2rem;
     }
 
     p {
       font-weight: 400;
       font-size: 0.85rem;
       color: ${props => props.theme.card.darkText};
+      margin-top: 0.2rem;
+      margin-bottom: 0.2rem;
     }
   }
 `;
@@ -226,5 +232,16 @@ export const FrozenContainer = styled.div`
     span {
       color: ${props => props.theme.card.darkText};
     }
+  }
+`;
+
+export const HalfRow = styled.div`
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  width: 50%;
+  @media (max-width: 768px) {
+    padding: 0.1rem;
+    width: 100%;
   }
 `;

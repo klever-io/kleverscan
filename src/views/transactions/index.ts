@@ -7,6 +7,10 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
+  @media (max-width: 1600px) {
+    padding-left: 5rem;
+    padding-right: 5rem;
+  }
   @media (max-width: 768px) {
     padding: 3rem 3rem 5rem 3rem;
   }
@@ -39,7 +43,7 @@ export const Header = styled.section`
   justify-content: space-between;
   align-items: flex-end;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1200px) {
     flex-direction: column;
   }
 `;
@@ -51,10 +55,25 @@ export const FilterContainer = styled.div`
 
   gap: 0.75rem;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1200px) {
     width: 100%;
 
     flex-direction: column;
+  }
+`;
+
+export const FilterByDate = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: row;
+  margin-top: 1.7rem;
+  margin-left: 0.8rem;
+
+  @media (max-width: 1200px) {
+    justify-content: center;
+    margin-left: 0;
   }
 `;
 
@@ -69,9 +88,9 @@ export const Input = styled(DefaultInput)`
 `;
 
 export const CenteredRow = styled.span`
+  overflow: visible !important;
   div {
     display: flex;
-
     flex-direction: row;
     align-items: center;
 
@@ -97,7 +116,7 @@ export const TooltipText = styled.span`
   position: fixed;
   z-index: 1;
   transform: translateX(-12.5%);
-  transition: 0.3s ease;
+  transition: 0.3s ease opacity;
   pointer-events: none;
 `;
 

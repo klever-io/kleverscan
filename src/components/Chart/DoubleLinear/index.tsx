@@ -27,6 +27,7 @@ interface IChart {
 interface ITooltipContent {
   payload?: {
     value: number;
+    name: string;
   }[];
   label?: string;
   active?: boolean;
@@ -37,8 +38,8 @@ const CustomTooltip = ({ payload, label, active }: ITooltipContent) => {
     return (
       <TooltipContainer>
         <p>{`${label}`}</p>
-        <p>{`Burned: ${payload[0].value}`}</p>
-        <p>{`Minted: ${payload[1].value}`}</p>
+        <p>{`${payload[0]?.name}: ${formatAmount(payload[0]?.value)}`}</p>
+        <p>{`${payload[1]?.name}: ${formatAmount(payload[1]?.value)}`}</p>
       </TooltipContainer>
     );
   }

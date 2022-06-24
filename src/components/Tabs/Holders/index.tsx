@@ -45,7 +45,9 @@ const Holders: React.FC<IHolder> = ({ holders, asset, loading }) => {
           </RankingContainer>
         </span>
         <span>
-          <Link href={`/account/${address}`}>{parseAddress(address, 40)}</Link>
+          <Link href={`/account/${address}`}>
+            <a>{parseAddress(address, 40)}</a>
+          </Link>
         </span>
         <span>
           <strong>

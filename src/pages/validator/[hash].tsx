@@ -150,11 +150,11 @@ const Validator: React.FC<IValidatorPage> = ({
   }, []);
 
   const totalProduced =
-    validator.totalLeaderSuccessRate.numSuccess +
-    validator.totalValidatorSuccessRate.numSuccess;
+    validator?.totalLeaderSuccessRate?.numSuccess +
+    validator?.totalValidatorSuccessRate?.numSuccess;
   const totalMissed =
-    validator.totalLeaderSuccessRate.numFailure +
-    validator.totalValidatorSuccessRate.numFailure;
+    validator?.totalLeaderSuccessRate?.numFailure +
+    validator?.totalValidatorSuccessRate?.numFailure;
   const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'error');
 
   const commissionPercent = commission / 10 ** 2;
@@ -209,7 +209,7 @@ const Validator: React.FC<IValidatorPage> = ({
         />
       );
     }
-    return <LetterLogo>{name.split('')[0] || 'K'}</LetterLogo>;
+    return <LetterLogo>{name?.split?.('')[0] || 'K'}</LetterLogo>;
   };
 
   const renderTitle = () => {
@@ -242,11 +242,11 @@ const Validator: React.FC<IValidatorPage> = ({
 
       if (!response.error) {
         const delegators: IBucket[] = [];
-        response?.data?.delegators.forEach(delegation => {
-          delegation.buckets.forEach(bucket => {
-            if (bucket.delegation === ownerAddress) {
+        response?.data?.delegators?.forEach(delegation => {
+          delegation?.buckets?.forEach(bucket => {
+            if (bucket?.delegation === ownerAddress) {
               delegators.push({
-                address: delegation.address,
+                address: delegation?.address,
                 ...bucket,
               });
             }
@@ -350,7 +350,7 @@ const Validator: React.FC<IValidatorPage> = ({
                 <strong>Total Produced</strong>
               </span>
               <BoldElement>
-                <p>{totalProduced.toLocaleString()}</p>
+                <p>{totalProduced?.toLocaleString()}</p>
               </BoldElement>
             </ElementsWrapper>
           </HalfRow>
@@ -360,7 +360,7 @@ const Validator: React.FC<IValidatorPage> = ({
                 <strong>Total Missed</strong>
               </span>
               <BoldElement>
-                <p>{totalMissed.toLocaleString()}</p>
+                <p>{totalMissed?.toLocaleString()}</p>
               </BoldElement>
             </ElementsWrapper>
           </HalfRow>
@@ -535,7 +535,7 @@ const Validator: React.FC<IValidatorPage> = ({
               </StakedIndicator>
             </ProgressContent>
             <PercentIndicator percent={maxDelegation === 0 ? 0 : stakedPercent}>
-              <p>{maxDelegation === 0 ? 0 : stakedPercent.toFixed(0)}%</p>
+              <p>{maxDelegation === 0 ? 0 : stakedPercent?.toFixed(0)}%</p>
             </PercentIndicator>
           </EmptyProgressBar>
         </Card>
@@ -549,7 +549,7 @@ const Validator: React.FC<IValidatorPage> = ({
       </TableContainer>
       <PaginationContainer>
         <Pagination
-          count={pagination.totalPages}
+          count={pagination?.totalPages}
           page={page}
           onPaginate={page => {
             setPage(page);
@@ -600,20 +600,20 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> = async ({
   );
 
   await Promise.allSettled([validatorCall, delegationCall]).then(promises => {
-    promises.forEach((res, index) => {
+    promises?.forEach((res, index) => {
       if (res.status === 'fulfilled') {
         if (index === 0) {
           const { value }: any = res;
-          props.validator = value.data.validator;
+          props.validator = value?.data?.validator;
         } else if (index === 1) {
           const delegations: any = res.value;
           const delegators: IBucket[] = [];
 
-          delegations.data?.delegators.forEach((delegation: any) => {
-            delegation.buckets.forEach((bucket: any) => {
-              if (bucket.delegation === address) {
+          delegations?.data?.delegators?.forEach((delegation: any) => {
+            delegation?.buckets?.forEach((bucket: any) => {
+              if (bucket?.delegation === address) {
                 delegators.push({
-                  address: delegation.address,
+                  address: delegation?.address,
                   ...bucket,
                 });
               }
@@ -621,7 +621,7 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> = async ({
           });
 
           if (!delegations.error) {
-            props.pagination = delegations.pagination;
+            props.pagination = delegations?.pagination;
             props.delegators = delegators;
           }
         }

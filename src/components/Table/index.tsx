@@ -24,7 +24,6 @@ export interface ITable {
     | 'votes'
     | 'delegations';
 
-
   header: string[];
   data: any[];
   body: any;
@@ -41,7 +40,7 @@ const Table: React.FC<ITable> = ({
   loading,
 }) => {
   const { pathname } = useRouter();
-  const props: ITableType = { type, filter, pathname, haveData: data.length };
+  const props: ITableType = { type, filter, pathname, haveData: data?.length };
 
   return (
     <Container>
@@ -66,7 +65,7 @@ const Table: React.FC<ITable> = ({
               ))}
           </>
         )}
-        {!loading && data.length === 0 && (
+        {!loading && (!data || data.length === 0) && (
           <EmptyRow {...props}>
             <p>Oops! Apparently no data here.</p>
           </EmptyRow>

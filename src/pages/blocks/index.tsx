@@ -103,8 +103,8 @@ const Blocks: React.FC<IBlocks> = ({
       title: 'Number of Blocks',
       headers: ['Blocks Yesterday', 'Cumulative Number'],
       values: [
-        toLocaleFixed(statistics.yesterday.totalBlocks, 0),
-        toLocaleFixed(statistics.total.totalBlocks, 0),
+        toLocaleFixed(statistics?.yesterday?.totalBlocks, 0),
+        toLocaleFixed(statistics?.total?.totalBlocks, 0),
       ],
     },
     {
@@ -112,10 +112,10 @@ const Blocks: React.FC<IBlocks> = ({
       headers: ['Reward Yesterday', 'Cumulative Revenue'],
       values: [
         `${formatAmount(
-          (statistics.yesterday.totalBlockRewards || 0) / 10 ** precision,
+          (statistics?.yesterday?.totalBlockRewards) / 10 ** precision,
         )} KLV`,
         `${formatAmount(
-          (statistics.total.totalBlockRewards || 0) / 10 ** precision,
+          (statistics?.total?.totalBlockRewards) / 10 ** precision,
         )} KLV`,
       ],
     },
@@ -124,9 +124,9 @@ const Blocks: React.FC<IBlocks> = ({
       headers: ['Burned Yesterday', 'Burned in Total'],
       values: [
         `${formatAmount(
-          statistics.yesterday.totalBurned / 10 ** precision,
+          statistics?.yesterday?.totalBurned / 10 ** precision,
         )} KLV`,
-        `${formatAmount(statistics.total.totalBurned / 10 ** precision)} KLV`,
+        `${formatAmount(statistics?.total?.totalBurned / 10 ** precision)} KLV`,
       ],
     },
   ];
@@ -335,13 +335,13 @@ export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
         const { value }: any = res;
         switch (index) {
           case 0:
-            props.blocks = value.data.blocks;
-            props.pagination = value.pagination;
+            props.blocks = value?.data?.blocks;
+            props.pagination = value?.pagination;
             break;
 
           case 1:
             props.statistics = {
-              yesterday: value.data.block_stats_by_day[0],
+              yesterday: value?.data?.block_stats_by_day[0] || null,
               total: {
                 totalBlocks: 0,
                 totalBurned: 0,
@@ -351,7 +351,7 @@ export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
             break;
 
           case 2:
-            props.statistics['total'] = value.data.block_stats_total;
+            props.statistics['total'] = value?.data?.block_stats_total;
 
           default:
             break;

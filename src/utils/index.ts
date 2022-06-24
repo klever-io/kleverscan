@@ -80,7 +80,7 @@ export const formatAmount = (number: number): string => {
 };
 
 export const toLocaleFixed = (value: number, precision: number): string => {
-  return value.toLocaleString(undefined, {
+  return value?.toLocaleString(undefined, {
     minimumFractionDigits: precision,
   });
 };

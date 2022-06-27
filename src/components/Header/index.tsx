@@ -49,7 +49,9 @@ const Navbar: React.FC = () => {
   const DropdownDesktop = ({ page }: IDropdownPages) => {
     return (
       <DropdownItem>
-        <page.Icon />
+        <Link href={page.pathTo}>
+          <page.Icon />
+        </Link>
         <Link href={page.pathTo}>
           <a>
             <span>{page.name}</span>
@@ -65,7 +67,9 @@ const Navbar: React.FC = () => {
         <Link href={page.pathTo}>
           <span>{page.name}</span>
         </Link>
-        <page.Icon />
+        <Link href={page.pathTo}>
+          <page.Icon />
+        </Link>
       </DropdownItem>
     );
   };

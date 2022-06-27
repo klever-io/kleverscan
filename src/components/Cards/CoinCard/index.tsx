@@ -1,7 +1,5 @@
 import React, { useRef, useState } from 'react';
 
-import { useRouter } from 'next/router';
-
 import {
   CardContainer,
   CardContent,
@@ -34,8 +32,6 @@ interface ICoinCard {
 
 const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS }) => {
   const [selectedCoin, setSelectedCoin] = useState(0);
-  const router = useRouter();
-
   const carouselRef = useRef<any>(null);
   const cardRef = useRef<any>(null);
 

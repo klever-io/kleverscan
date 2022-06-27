@@ -64,4 +64,23 @@ describe('Component: BlockCard', () => {
 
     expect(container.firstChild).toHaveStyle(style);
   });
+
+  it('Should render the fallback for "Reward" and "Burned" when don\'t pass the params "blockRewards" and "txBurnedFees"', () => {
+    renderWithTheme(
+      <BlockCard
+        hash={hash}
+        nonce={nonce}
+        parentHash={''}
+        timestamp={timestamp}
+        txCount={txCount}
+        precision={precision}
+      />
+    );
+    
+    const burned = screen.getByText(/Burned/i).nextSibling;
+    const reward = screen.getByText(/Reward/i).nextSibling;
+    expect(burned).toHaveTextContent('0');
+    expect(reward).toHaveTextContent('0');
+
+  });
 }); 

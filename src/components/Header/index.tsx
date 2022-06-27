@@ -50,10 +50,8 @@ const Navbar: React.FC = () => {
     return (
       <DropdownItem>
         <Link href={page.pathTo}>
-          <page.Icon />
-        </Link>
-        <Link href={page.pathTo}>
           <a>
+            <page.Icon />
             <span>{page.name}</span>
           </a>
         </Link>
@@ -65,10 +63,10 @@ const Navbar: React.FC = () => {
     return (
       <DropdownItem onClick={handleMenu}>
         <Link href={page.pathTo}>
-          <span>{page.name}</span>
-        </Link>
-        <Link href={page.pathTo}>
-          <page.Icon />
+          <a>
+            <span>{page.name}</span>
+            <page.Icon />
+          </a>
         </Link>
       </DropdownItem>
     );

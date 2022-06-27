@@ -166,7 +166,7 @@ export const DataCard = styled.div`
   width: 100%;
 
   display: flex;
-
+  gap: 0.5rem;
   flex-direction: row;
   align-items: center;
 

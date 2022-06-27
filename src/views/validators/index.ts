@@ -3,7 +3,11 @@ import styled from 'styled-components';
 export const ProgressContainer = styled.div<{ textColor: string }>`
   display: flex;
   width: 15rem;
+  @media (min-width:1600px) and (max-width: 1800px) {
+    width: 12rem;
+  }
   flex-direction: row;
+  justify-content: space-between;
   align-items: center;
 
   span {

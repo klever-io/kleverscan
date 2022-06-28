@@ -136,6 +136,7 @@ describe('test api functions', () => {
         (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: false,
+            json: () => Promise.resolve({error: 'Internal Server Error'}),
             headers: Headers,
             redirected: false,
             status: 500,
@@ -188,6 +189,7 @@ describe('test api functions', () => {
         (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: false,
+            json: () => Promise.resolve({error: 'Internal Server Error'}),
             headers: Headers,
             redirected: false,
             status: 500,
@@ -244,6 +246,7 @@ describe('test api functions', () => {
         (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: false,
+            json: () => Promise.resolve({error: 'Internal Server Error'}),
             headers: Headers,
             redirected: false,
             status: 500,
@@ -300,6 +303,7 @@ describe('test api functions', () => {
         (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: false,
+            json: () => Promise.resolve({error: 'Internal Server Error'}),
             headers: Headers,
             redirected: false,
             status: 500,
@@ -354,6 +358,7 @@ describe('test api functions', () => {
         (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: false,
+            json: () => Promise.resolve({error: 'Internal Server Error'}),
             headers: Headers,
             redirected: false,
             status: 500,

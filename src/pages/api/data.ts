@@ -9,6 +9,8 @@ import { Service } from '@/types/index';
 const redis = new Redis({
   host: process.env.DEFAULT_REDIS_HOST || '10.196.89.28',
   port: Number(process.env.DEFAULT_REDIS_PORT) || 6379,
+  username: process.env.DEFAULT_REDIS_USERNAME || '',
+  password: process.env.DEFAULT_REDIS_PASSWORD || '',
   connectTimeout: Number(process.env.DEFAULT_REDIS_CONNECT_TIMEOUT) || 5000,
 });
 

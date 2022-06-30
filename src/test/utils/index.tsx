@@ -13,25 +13,14 @@ export const renderWithTheme = (children: JSX.Element): RenderResult => {
   )
 };
 
-export const CoinTest = {
-  "name": "Klever",
-  "shortname": "KLV",
-  "price": 0.02012557,
-  "variation": 1.04801,
-  "marketCap": {
-      "price": 108822166,
-      "variation": 0.96403
-  },
-  "volume": {
-      "price": 6535768,
-      "variation": 0
-  },
-  "prices": [
-      {
-          "value": 0.019916836880262877
-      },
-      {
-          "value": 0.019849745804499344
-      },
-  ]
-}
+export const getMonthWithYear = (month: string, months: string[]): string => {
+  const date = new Date();
+  switch(month) {
+    case 'lastMonth':
+      return `${months[date.getMonth() - 1]} ${date.getFullYear()}`;
+    case 'nextMonth':
+      return `${months[date.getMonth() + 1]} ${date.getFullYear()}`;
+    default:
+      return `${months[date.getMonth()]} ${date.getFullYear()}`;
+  }
+};

@@ -40,7 +40,7 @@ import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
 import Copy from '@/components/Copy';
 
-import api, { IPrice} from '@/services/api';
+import api, { IPrice } from '@/services/api';
 import { Service } from '@/types/index';
 import { ISelectedDays } from '@/components/DateFilter';
 import Buckets from '@/components/Tabs/Buckets';
@@ -390,6 +390,18 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
   const address = String(params?.account);
 
+  const emptyAccount = {
+    account: {
+      address: address,
+      nonce: 0,
+      balance: 0,
+      allowance: 0,
+      permissions: [],
+      timestamp: new Date().getTime(),
+      assets: {},
+    },
+  };
+
   if (!address || address.length !== accountLength) {
     return redirectProps;
   }
@@ -400,6 +412,10 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
     });
 
     if (!res.error || res.error === '') {
+      resolve(res);
+    }
+    if (res.error === 'cannot find account in database') {
+      res.data = emptyAccount;
       resolve(res);
     }
 

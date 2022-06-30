@@ -267,8 +267,6 @@ describe('Component: TransactionContractComponents', () => {
     it('Should render "--" when "Available Epoch" don\'t has any values', () => {
       const unfreezeMock = {...mockedTxContractComponents.unfreezeContract };
       unfreezeMock.receipts[0].availableEpoch = 0;
-      // console.log(unfreezeMock.receipts[0].availableEpoch || '--');
-      expect(true).toBeTruthy()
       renderWithTheme(
         <Unfreeze 
           {...unfreezeMock}

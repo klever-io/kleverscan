@@ -114,7 +114,7 @@ export const withoutBody = async (
     if (!response.ok) {
       return Promise.resolve({
         data: null,
-        error: response.statusText,
+        error: (await response.json()).error,
         code: 'internal_error',
       });
     }
@@ -139,7 +139,7 @@ export const withBody = async (props: IProps, method: Method): Promise<any> => {
     if (!response.ok) {
       return Promise.resolve({
         data: null,
-        error: response.statusText,
+        error: (await response.json()).error,
         code: 'internal_error',
       });
     }
@@ -164,7 +164,7 @@ export const withText = async (props: IProps, method: Method): Promise<any> => {
     if (!response.ok) {
       return Promise.resolve({
         data: null,
-        error: response.statusText,
+        error: (await response.json()).error,
         code: 'internal_error',
       });
     }
@@ -208,7 +208,7 @@ export const getCached = async (props: IProps): Promise<any> => {
     if (!response.ok) {
       return Promise.resolve({
         data: null,
-        error: response.statusText,
+        error: (await response.json()).error,
         code: 'internal_error',
       });
     }

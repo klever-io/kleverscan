@@ -22,10 +22,28 @@ const mockedProposals: any = [
     description: '',
     epochStart: 500,
     epochEnd: 30000,
-    proposalStatus: 'sucess',
+    proposalStatus: 'pending',
     proposer: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waa5s89w5s25',
     votes: 53257
-  }
+  },
+  {
+    proposalId: 1,
+    description: '',
+    epochStart: 500,
+    epochEnd: 30000,
+    proposalStatus: 'fail',
+    proposer: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waa5s89w5s25',
+    votes: 53257
+  },
+  {
+    proposalId: 1,
+    description: '',
+    epochStart: 500,
+    epochEnd: 30000,
+    proposalStatus: 'ApprovedProposal',
+    proposer: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waa5s89w5s25',
+    votes: 53257
+  },
 ];
 
 jest.mock('next/router', () => ({
@@ -38,6 +56,9 @@ jest.mock('next/router', () => ({
 }));
 
 describe('Component: Tabs/Proposals' , () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  })
   
   it('Should render the Table and it\'s body and the header correctly', () => {
     renderWithTheme(

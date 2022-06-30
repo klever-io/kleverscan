@@ -49,9 +49,9 @@ const Navbar: React.FC = () => {
   const DropdownDesktop = ({ page }: IDropdownPages) => {
     return (
       <DropdownItem>
-        <page.Icon />
         <Link href={page.pathTo}>
           <a>
+            <page.Icon />
             <span>{page.name}</span>
           </a>
         </Link>
@@ -63,9 +63,11 @@ const Navbar: React.FC = () => {
     return (
       <DropdownItem onClick={handleMenu}>
         <Link href={page.pathTo}>
-          <span>{page.name}</span>
+          <a>
+            <span>{page.name}</span>
+            <page.Icon />
+          </a>
         </Link>
-        <page.Icon />
       </DropdownItem>
     );
   };
@@ -157,7 +159,7 @@ const Navbar: React.FC = () => {
         <Link href="/">
           <a>
             <Logo onClick={handleClose}>
-              <Image src="/logo-large.png" alt="Logo" width="215" height="29" />
+              <Image src="/logo-large.svg" alt="Logo" width="215" height="29" />
             </Logo>
           </a>
         </Link>

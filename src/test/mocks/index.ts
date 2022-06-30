@@ -12,6 +12,50 @@ import {
   ITransaction,
 } from '../../types'
 
+export const CoinTest = [
+  {
+    name: 'Klever',
+    shortname: 'KLV',
+    price: 0.02012557,
+    variation: 1.04801,
+    marketCap: {
+      price: 108822166,
+      variation: 0.96403
+    },
+    volume: {
+      price: 6535768,
+      variation: 0
+    },
+    prices: [
+      {
+        value: 0.019916836880262877
+      },
+      {
+        value: 0.019849745804499344
+      },
+    ],
+  },
+  {
+    name: 'Klever Finance',
+    shortname: 'KFI',
+    price: 102,
+    variation: 0,
+    marketCap: {
+      price: 15415500,
+      variation: 0
+    },
+    volume: {
+      price: 4.41,
+      variation: 0
+    },
+    prices: [
+      {
+        value: 100
+      }
+    ]
+  }
+];
+
 export const mockTxItem: ITransaction = {
   chainID: '10020',
   blockNum: 123,

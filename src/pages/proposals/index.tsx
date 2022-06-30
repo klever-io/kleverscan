@@ -27,45 +27,41 @@ interface IProposalsPage {
 }
 
 interface IProposalsMessages {
-  BlockRewards: string;
   FeePerDataByte: string;
-  KAppFeeAssetTrigger: string;
-  KAppFeeBuy: string;
-  KAppFeeCancelMarketOrder: string;
-  KAppFeeClaim: string;
-  KAppFeeConfigITO: string;
-  KAppFeeConfigMarketplace: string;
-  KAppFeeCreateAsset: string;
-  KAppFeeCreateMarketplace: string;
   KAppFeeCreateValidator: string;
-  KAppFeeDelegate: string;
-  KAppFeeFreeze: string;
-  KAppFeeProposal: string;
-  KAppFeeSell: string;
-  KAppFeeSetAccountName: string;
-  KAppFeeSetITOPrices: string;
-  KAppFeeTransfer: string;
-  KAppFeeUndelegate: string;
-  KAppFeeUnfreeze: string;
-  KAppFeeUnjail: string;
-  KAppFeeUpdateAccountPermission: string;
-  KAppFeeValidatorConfig: string;
-  KAppFeeVote: string;
-  KAppFeeWithdraw: string;
-  LeaderValidatorRewardsPercentage: string;
-  MarketKeyLength: string;
-  MaxBucketSize: string;
+  KAppFeeCreateAsset: string;
   MaxEpochsUnclaimed: string;
-  MaxNFTMintBatch: string;
-  MaxNameSize: string;
-  MaxURIKeySize: string;
-  MaxURISize: string;
-  MinKFIStakedToEnableProposals: string;
-  MinKLVBucketAmount: string;
   MinSelfDelegatedAmount: string;
   MinTotalDelegatedAmount: string;
-  ProposalMaxEpochsDuration: string;
+  BlockRewards: string;
   StakingRewards: string;
+  KAppFeeTransfer: string;
+  KAppFeeAssetTrigger: string;
+  KAppFeeValidatorConfig: string;
+  KAppFeeFreeze: string;
+  KAppFeeUnfreeze: string;
+  KAppFeeDelegate: string;
+  KAppFeeUndelegate: string;
+  KAppFeeWithdraw: string;
+  KAppFeeClaim: string;
+  KAppFeeUnjail: string;
+  KAppFeeSetAccountName: string;
+  KAppFeeProposal: string;
+  KAppFeeVote: string;
+  KAppFeeConfigITO: string;
+  KAppFeeSetITOPrices: string;
+  KAppFeeBuy: string;
+  KAppFeeSell: string;
+  KAppFeeCancelMarketOrder: string;
+  KAppFeeCreateMarketplace: string;
+  KAppFeeConfigMarketplace: string;
+  KAppFeeUpdateAccountPermission: string;
+  MaxNFTMintBatch: string;
+  MinKFIStakedToEnableProposals: string;
+  MinKLVBucketAmount: string;
+  MaxBucketSize: string;
+  LeaderValidatorRewardsPercentage: string;
+  ProposalMaxEpochsDuration: string;
 }
 
 interface INetworkParams {
@@ -226,51 +222,47 @@ export const getServerSideProps: GetServerSideProps<IProposalsPage> = async ({
   });
 
   const proposalsMessages: IProposalsMessages = {
-    BlockRewards: 'Block Rewards',
     FeePerDataByte: 'Fee Per Data Byte',
-    KAppFeeAssetTrigger: 'KApp Fee for Asset Trigger',
-    KAppFeeBuy: 'KApp Fee for Buy',
-    KAppFeeCancelMarketOrder: 'KApp Fee for Cancel Market Order',
-    KAppFeeClaim: 'KApp Fee for Claim',
-    KAppFeeConfigITO: 'KApp Fee for Config ITO',
-    KAppFeeConfigMarketplace: 'KApp Fee for Config Marketplace',
-    KAppFeeCreateAsset: 'KApp Fee for Asset Creation',
-    KAppFeeCreateMarketplace: 'KApp Fee for Marketplace Creation',
     KAppFeeCreateValidator: 'KApp Fee for Validator Creation',
-    KAppFeeDelegate: 'KApp Fee for Delegation',
-    KAppFeeFreeze: 'KApp Fee for Freeze',
-    KAppFeeProposal: 'KApp Fee for Proposal',
-    KAppFeeSell: 'KApp Fee for Sell',
-    KAppFeeSetAccountName: 'KApp Fee for Account Name',
-    KAppFeeSetITOPrices: 'KApp Fee for Set ITO Prices',
-    KAppFeeTransfer: 'KApp Fee for Transfer',
-    KAppFeeUndelegate: 'KApp Fee for Undelegate',
-    KAppFeeUnfreeze: 'KApp Fee for Unfreeze',
-    KAppFeeUnjail: 'KApp Fee for Unjail',
-    KAppFeeUpdateAccountPermission: 'KApp Fee for Update Account Permission',
-    KAppFeeValidatorConfig: 'KApp Fee for Validator Config',
-    KAppFeeVote: 'KApp Fee for Vote',
-    KAppFeeWithdraw: 'KApp Fee for Withdraw',
-    LeaderValidatorRewardsPercentage: 'Leader Validator rewards percentage',
-    MarketKeyLength: 'Length of the Market Key',
-    MaxBucketSize: 'Max bucket size',
+    KAppFeeCreateAsset: 'KApp Fee for Asset Creation',
     MaxEpochsUnclaimed: 'Max Epochs to clear unclaimed',
-    MaxNFTMintBatch: 'Max NFT Mint per batch',
-    MaxNameSize: 'Max Name Size',
-    MaxURIKeySize: 'Max URI Key Size',
-    MaxURISize: 'Max URI Value Size',
-    MinKFIStakedToEnableProposals: 'Min KFI staked to enable Proposals Kapps',
-    MinKLVBucketAmount: 'Min KLV Bucket Amount',
     MinSelfDelegatedAmount: 'Min Self Delegation Amount',
     MinTotalDelegatedAmount: 'Min Total Delegation Amount',
-    ProposalMaxEpochsDuration: 'Max Epochs for active proposal duration',
+    BlockRewards: 'Block Rewards',
     StakingRewards: 'Staking Rewards',
+    KAppFeeTransfer: 'KApp Fee for Transfer',
+    KAppFeeAssetTrigger: 'KApp Fee for Asset Trigger',
+    KAppFeeValidatorConfig: 'KApp Fee for Validator Config',
+    KAppFeeFreeze: 'KApp Fee for Freeze',
+    KAppFeeUnfreeze: 'KApp Fee for Unfreeze',
+    KAppFeeDelegate: 'KApp Fee for Delegation',
+    KAppFeeUndelegate: 'KApp Fee for Undelegate',
+    KAppFeeWithdraw: 'KApp Fee for Withdraw',
+    KAppFeeClaim: 'KApp Fee for Claim',
+    KAppFeeUnjail: 'KApp Fee for Unjail',
+    KAppFeeSetAccountName: 'KApp Fee for Account Name',
+    KAppFeeProposal: 'KApp Fee for Proposal',
+    KAppFeeVote: 'KApp Fee for Vote',
+    KAppFeeConfigITO: 'KApp Fee for Config ITO',
+    KAppFeeSetITOPrices: 'KApp Fee for Set ITO Prices',
+    KAppFeeBuy: 'KApp Fee for Buy',
+    KAppFeeSell: 'KApp Fee for Sell',
+    KAppFeeCancelMarketOrder: 'KApp Fee for Cancel Market Order',
+    KAppFeeCreateMarketplace: 'KApp Fee for Marketplace Creation',
+    KAppFeeConfigMarketplace: 'KApp Fee for Config Marketplace',
+    KAppFeeUpdateAccountPermission: 'KApp Fee for Update Account Permission',
+    MaxNFTMintBatch: 'Max NFT Mint per batch',
+    MinKFIStakedToEnableProposals: 'Min KFI staked to enable Proposals Kapps',
+    MinKLVBucketAmount: 'Min KLV Bucket Amount',
+    MaxBucketSize: 'Max bucket size',
+    LeaderValidatorRewardsPercentage: 'Leader Validator rewards percentage',
+    ProposalMaxEpochsDuration: 'Max Epochs for active proposal duration',
   };
 
   let networkParams = {} as INetworkParams;
 
   if (data) {
-    networkParams = Object.keys(data.parameters).map((key, index) => {
+    networkParams = Object.keys(proposalsMessages).map((key, index) => {
       return {
         number: index,
         parameter: proposalsMessages[key] ? proposalsMessages[key] : '',

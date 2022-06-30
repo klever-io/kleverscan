@@ -52,8 +52,8 @@ describe('Componenet: NodeCards', () => {
     const mapSvg = mostNodes?.parentNode?.nextSibling;
 
     await waitFor( async () => {
-      const testttt = await screen.findAllByText(/2 secs ago/i);
-      expect(testttt[0]).toHaveTextContent('2 secs ago');
+      const secsAgo = await screen.findAllByText(/2 secs ago/i);
+      expect(secsAgo[0]).toHaveTextContent('2 secs ago');
 
     }, { timeout: 3000 });
 

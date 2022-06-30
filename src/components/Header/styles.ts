@@ -69,7 +69,6 @@ export const Item = styled.div<{ selected: boolean }>`
     display: flex;
     flex-direction: column;
   }
-
 `;
 
 export const MobileItem = styled(Item)`
@@ -164,7 +163,7 @@ export const MobileBackground = styled.div<IMobileMenu>`
 
 export const DropdownMenu = styled.ul`
   width: max-content;
-  background-color: ${props => props.theme.navbar.background};  
+  background-color: ${props => props.theme.navbar.background};
   color: ${props => props.theme.navbar.text};
   border-radius: 10px;
   gap: 0.5rem;
@@ -180,13 +179,21 @@ export const DropdownItem = styled.li`
   list-style: none;
   &:hover {
     filter: brightness(1.5);
-  };
-  padding: 1rem 0.7rem;
+  }
+  padding: 0.4rem 0.7rem;
+  span {
+    margin: 0 0.4rem 0 0.4em;
+  }
+  @media (max-width: 1024px) {
+    span {
+      margin: 0 0.4rem 0 0;
+    }
+  }
 `;
 
 export const DropdownIcon = styled(MdArrowDropDown)`
   font-size: 1.4rem;
-`
+`;
 export const DropdownContainer = styled.div`
   display: none;
   padding: 1rem;
@@ -197,7 +204,7 @@ export const DropdownContainer = styled.div`
   @media (max-width: 1024px) {
     left: 0.4rem;
   }
-`
+`;
 
 export const MenuIcon = styled(FiMenu).attrs(props => ({
   color: props.theme.navbar.text,

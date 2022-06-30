@@ -20,6 +20,10 @@ export const Container = styled.div`
   flex-direction: column;
   align-items: center;
   position: relative;
+
+  @media (max-width: 1600px) {
+    width: 100%;
+  }
 `;
 
 export const Content = styled.div`
@@ -32,50 +36,26 @@ export const Content = styled.div`
   scroll-snap-stop: always;
 
   border-radius: 1rem;
-
   width: 21rem;
+  @media (max-width: 1600px) {
+    width: 100%;
+  }
+
 
   position: relative;
 
   flex-direction: row;
 
-  @media (max-width: 1600px) {
-    width: calc(100vw - 20.9rem);
-  }
-  @media (max-width: 768px) {
-    width: calc(100vw - 11rem);
-  }
-  @media (max-width: 525px) {
-    min-width: calc(100vw - 10.97rem);
-  }
-  @media (max-width: 425px) {
-    min-width: calc(100vw - 5.97rem);
-  }
   &&::-webkit-scrollbar {
     display: none;
   }
-
-  @-moz-document url-prefix() {
-    @media (max-width: 1600px) {
-      width: calc(100vw - 20rem);
-    }
-    @media (max-width: 768px) {
-      width: calc(100vw - 10rem);
-    }
-    @media (max-width: 525px) {
-      min-width: calc(100vw - 9.9rem);
-    }
-    @media (max-width: 425px) {
-      min-width: calc(100vw - 5rem);
-    }
-  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 `;
 
 export const CardContainer = styled.div`
   padding: 1.5rem;
   scroll-snap-align: start;
-
-  width: auto;
 
   display: flex;
   position: relative;
@@ -87,32 +67,9 @@ export const CardContainer = styled.div`
   border-radius: 1rem;
 
   @media (max-width: 1600px) {
-    min-width: calc(100vw - 20.9rem);
-  }
-  @media (max-width: 768px) {
-    min-width: calc(100vw - 11rem);
-  }
-  @media (max-width: 525px) {
-    min-width: calc(100vw - 10.97rem);
-  }
-  @media (max-width: 425px) {
-    min-width: calc(100vw - 5.97rem);
+    min-width: 100%;
   }
 
-  @-moz-document url-prefix() {
-    @media (max-width: 1600px) {
-      min-width: calc(100vw - 20rem);
-    }
-    @media (max-width: 768px) {
-      min-width: calc(100vw - 10rem);
-    }
-    @media (max-width: 525px) {
-      min-width: calc(100vw - 9.9rem);
-    }
-    @media (max-width: 425px) {
-      min-width: calc(100vw - 5rem);
-    }
-  }
 `;
 
 export const CardContent = styled.div`

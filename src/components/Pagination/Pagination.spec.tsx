@@ -16,7 +16,7 @@ interface IPagination {
 
 const paginationProps: IPagination = {
   count: 1000,
-  page: 0,
+  page: 1,
   onPaginate: jest.fn(page => (paginationProps.page = page)),
 };
 
@@ -54,15 +54,58 @@ const activeConfirmButtonStyles = {
 
 describe('Component: Pagination', () => {
   describe('Static tests', () => {
-    let container: HTMLElement;
     beforeEach(() => {
-      container = renderWithTheme(
-        <Pagination {...paginationProps} />,
-      ).container;
+      jest.clearAllMocks();
+      
     });
     afterAll(cleanup);
 
-    test('if pagination numbers are rendered according to the passed props', () => {
+    it('Should change to page 2 when click on right arrow', () => {
+      const { container } = renderWithTheme(
+        <Pagination {...paginationProps} />,
+      );
+      const rightArrow: any =
+        container.firstElementChild?.lastElementChild;
+    
+      fireEvent.click(rightArrow);
+      expect(paginationProps.page).toBe(2);
+    });
+
+    it('Should change to page 4 when click on left arrow ', () => {
+      const newProps = {...paginationProps};
+      newProps.page = 5;
+      newProps.count = 500;
+      const { container } = renderWithTheme(
+        <Pagination {...newProps} />,
+      );
+      const leftArrow: any =
+      container.firstElementChild?.firstElementChild;
+  
+      fireEvent.click(leftArrow);
+      expect(paginationProps.page).toBe(4);
+    });
+
+    it('Should open right modal when click on right ellipsis and should desapear when unblur', () => {
+      renderWithTheme(
+        <Pagination {...paginationProps} />,
+      );
+      const rightModal: any = screen.getByText('...');
+      fireEvent.click(rightModal);
+
+      const modal = screen.getByText('Choose Page');
+      expect(modal).toBeInTheDocument();
+      expect(modal).toBeVisible();
+
+      const modalContainer: any = modal?.parentElement?.parentElement?.parentElement;
+      fireEvent.blur(modalContainer);
+      expect(modal).not.toBeVisible();
+
+    });
+
+    it('if pagination numbers are rendered according to the passed props', () => {
+      renderWithTheme(
+        <Pagination {...paginationProps} />,
+      );
       let pageSpan;
       for (let index = 1; index <= 7; index++) {
         pageSpan = screen.getByText(String(index));
@@ -73,7 +116,10 @@ describe('Component: Pagination', () => {
       expect(lastPage).toBeVisible();
     });
 
-    test('if ellipsis is rendered and is in the correct position', () => {
+    it('if ellipsis is rendered and is in the correct position', () => {
+      renderWithTheme(
+        <Pagination {...paginationProps} />,
+      );
       const ellipsis = screen.getByText('...');
       expect(ellipsis).toBeVisible();
       const ellipsisContainer = ellipsis?.parentElement;
@@ -89,7 +135,10 @@ describe('Component: Pagination', () => {
       expect(ellipsisContainer?.firstElementChild).toHaveStyle(itemStyles);
     });
 
-    test('arrow icons buttons display', () => {
+    it('arrow icons buttons display', () => {
+      const { container } = renderWithTheme(
+        <Pagination {...paginationProps} />,
+      );
       const leftArrow =
         container.firstElementChild?.firstElementChild?.firstElementChild;
       const rightArrow =
@@ -104,10 +153,10 @@ describe('Component: Pagination', () => {
 
 describe('User interaction tests', () => {
   describe('User pagination through the last page', () => {
-    test('First render: click in the "1000" page element', () => {
-      const container = renderWithTheme(
+    it('First render: click in the "1000" page element', () => {
+      renderWithTheme(
         <Pagination {...paginationProps} />,
-      ).container;
+      );
       let pageSpan;
       for (let index = 1; index <= 7; index++) {
         pageSpan = screen.getByText(String(index));
@@ -119,16 +168,16 @@ describe('User interaction tests', () => {
       fireEvent.click(lastPage);
     });
 
-    test('Second render: expect correct elements rendering', () => {
-      const container = renderWithTheme(
+    it('Second render: expect correct elements rendering', () => {
+      const { container } = renderWithTheme(
         <Pagination {...paginationProps} />,
-      ).container;
+      );
       // nested selectors use more code, but this guarantee all pagination elements are in the exact correct order
       const page1 =
         container.firstElementChild?.firstElementChild?.nextElementSibling
           ?.firstElementChild;
 
-      const leftEllipsis =
+      const leftEllipsis: any =
         container.firstElementChild?.firstElementChild?.nextElementSibling
           ?.nextElementSibling?.firstElementChild;
 
@@ -217,12 +266,12 @@ describe('User interaction tests', () => {
       fireEvent.click(leftEllipsis);
     });
 
-    test('Third render: open modal and use it', () => {
-      const container = renderWithTheme(
+    it('Third render: open modal and use it', () => {
+      const { container } = renderWithTheme(
         <Pagination {...paginationProps} />,
-      ).container;
+      );
 
-      const leftEllipsis =
+      const leftEllipsis: any =
         container.firstElementChild?.firstElementChild?.nextElementSibling
           ?.nextElementSibling?.firstElementChild;
       const page994 =
@@ -241,7 +290,7 @@ describe('User interaction tests', () => {
       fireEvent.click(leftEllipsis);
 
       const choosePage = screen.getByText('Choose Page');
-      const modalInput =
+      const modalInput: any =
         choosePage?.parentElement?.parentElement?.nextElementSibling
           ?.firstElementChild;
 
@@ -251,10 +300,10 @@ describe('User interaction tests', () => {
       fireEvent.change(modalInput, { target: { value: '500' } });
       fireEvent.click(confirmButton);
     });
-    test('Fourth render: Pagination elements are in the correct order after using modal', () => {
-      const container = renderWithTheme(
+    it('Fourth render: Pagination elements are in the correct order after using modal', () => {
+      const { container } = renderWithTheme(
         <Pagination {...paginationProps} />,
-      ).container;
+      );
 
       const page1 =
         container.firstElementChild?.firstElementChild?.nextElementSibling

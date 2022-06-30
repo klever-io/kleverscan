@@ -159,7 +159,7 @@ const Navbar: React.FC = () => {
         <Link href="/">
           <a>
             <Logo onClick={handleClose}>
-              <Image src="/logo-large.png" alt="Logo" width="215" height="29" />
+              <Image src="/logo-large.svg" alt="Logo" width="215" height="29" />
             </Logo>
           </a>
         </Link>

@@ -47,7 +47,7 @@ const Footer: React.FC = () => {
     <Container>
       <DescriptionContainer>
         <LogoContainer>
-          <Image src="/logo-small.png" alt="Logo" width="224" height="28" />
+          <Image src="/logo-small.svg" alt="Logo" width="224" height="28" />
         </LogoContainer>
         <span>{description}</span>
         <SocialContainer>

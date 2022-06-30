@@ -55,7 +55,7 @@ const contents: IContent[] = [
       { name: 'Terms of Use', href: 'https://klever.io/terms-of-use' },
       {
         name: 'WhitePaper',
-        href: 'https://klever.finance/wp-content/uploads/2021/10/Klever-Exchange-Whitepaper-v.1.0.pdf',
+        href: 'https://bc.klever.finance/wp',
       },
       { name: 'Trading Fees', href: 'https://klever.io/trading-fees' },
       { name: 'Token List', href: 'https://klever.io/markets' },

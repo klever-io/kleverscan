@@ -138,7 +138,6 @@ export const Status = styled.div<IStatus>`
   align-items: center;
 
   gap: 0.9rem;
-  min-width: 15rem;
 
   span {
     color: ${props =>

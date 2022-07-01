@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
@@ -19,6 +19,7 @@ import Pagination from '@/components/Pagination';
 import { LetterLogo, Logo } from '@/views/assets/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { Row } from '@/components/Table/styles';
+import { IoIosInfinite } from 'react-icons/io';
 
 interface IAssetPage {
   assets: IAsset[];
@@ -61,7 +62,11 @@ const Assets: React.FC<IAssetPage> = ({
 
   const renderLogo = (logo: string, ticker: string, name: string) => {
     const regex = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
-    if (regex.test(logo)) {
+    if (
+      regex.test(logo) ||
+      logo === 'https://bc.klever.finance/logo_klv' ||
+      logo === 'https://bc.klever.finance/logo_kfi'
+    ) {
       return <Logo alt={`${name}-logo`} src={logo} />;
     }
     return <LetterLogo>{ticker.split('')[0]}</LetterLogo>;
@@ -78,6 +83,18 @@ const Assets: React.FC<IAssetPage> = ({
     circulatingSupply,
     precision,
   }) => {
+    const renderMaxSupply = (): ReactNode => {
+      return (
+        <strong>
+          {maxSupply !== 0 ? (
+            formatAmount(maxSupply / 10 ** precision)
+          ) : (
+            <IoIosInfinite />
+          )}
+        </strong>
+      );
+    };
+
     return (
       <Row type="assetsPage">
         <Link href={`/asset/${assetId}`}>
@@ -108,7 +125,7 @@ const Assets: React.FC<IAssetPage> = ({
         </span>
         <span>
           <strong>
-            {formatAmount(maxSupply / 10 ** precision)} {ticker}
+            {renderMaxSupply()} {ticker}
           </strong>
         </span>
         <span>

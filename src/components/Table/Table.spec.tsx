@@ -5,7 +5,7 @@ import { screen } from '@testing-library/react';
 import theme from '../../styles/theme';
 
 import { renderWithTheme } from '../../test/utils';
-import { ITable } from '@/components/Table';
+import { ITable } from '../../components/Table';
 
 import Table from './';
 
@@ -43,6 +43,10 @@ describe('Componenet: Table', () => {
     route: '/',
     pathname: '/validators',
   }));
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   it('Should render the headers of the table and the empty row when there\'s no data', () => {
     renderWithTheme(<Table {...tableProps} /> )

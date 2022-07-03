@@ -1,10 +1,9 @@
 import React from 'react';
 import { screen, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 
 import CoinCard from './';
 import { renderWithTheme } from '../../../test/utils';
-import { getVariation } from '@/utils/index';
+import { getVariation } from '../../../utils/index';
 import { CoinTest } from '../../../test/mocks';
 
 

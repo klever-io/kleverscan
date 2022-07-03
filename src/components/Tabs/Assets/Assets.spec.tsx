@@ -5,7 +5,7 @@ import {screen} from '@testing-library/react'
 
 import Assets from './';
 import { renderWithTheme } from '../../../test/utils';
-import { formatAmount } from '@/utils/index';
+import { formatAmount } from '../../../utils/index';
 
 describe('Component: Assets Tab', () => {
   const headerTable = ['Token', 'ID', 'Token Type', 'Precision', 'Balance', 'Frozen'];
@@ -31,6 +31,7 @@ describe('Component: Assets Tab', () => {
   }));
 
   beforeEach(() => {
+    jest.clearAllMocks();
     const useRouter: any = jest.spyOn(nextRouter, "useRouter");
     useRouter.mockImplementation(() => ({
       route: '/',

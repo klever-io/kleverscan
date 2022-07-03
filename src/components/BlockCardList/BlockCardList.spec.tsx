@@ -1,56 +1,10 @@
 import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
-import api from '@/services/api';
-
+import api from '../../services/api';
 
 import { renderWithTheme } from '../../test/utils';
+import { mockedBlocks, mockedFetchBlocks } from '../../test/mocks';
 import BlockCardList from './';
-
-const mockedBlocks = [
-  {
-    nonce: 15222,
-    timestamp: (Date.now() / 1000),
-    hash: '456s2d4895be5a559c12e7c695037d930d5d5a05389fe17901ed03365s42589s',
-    blockRewards: 15,
-    blockIndex: 42,
-    txCount: 0,
-    txBurnedFees: 0,
-  },
-  {
-    nonce: 14526,
-    timestamp: (Date.now() / 1000) - 500,
-    hash: '456s2d4895be5a559c12e7c695037d930d5d5a05389fe17901ed03365s42589s',
-    blockRewards: 15,
-    blockIndex: 48,
-    txCount: 0,
-    txBurnedFees: 0,
-  },
-];
-
-const mockedFetchBlocks = {
-  data: {
-    blocks: [
-      {
-        nonce: 5055,
-        timestamp: (Date.now() / 1000),
-        hash: '456s2d4895be5a559c12e7c695037d930d5d5a05389fe17901ed03365s42589s',
-        blockRewards: 98,
-        blockIndex: 55,
-        txCount: 0,
-        txBurnedFees: 0,
-      },
-      {
-        nonce: 98562,
-        timestamp: (Date.now() / 1000) - 500,
-        hash: '456s2d4895be5a559c12e7c695037d930d5d5a05389fe17901ed03365s42589s',
-        blockRewards: 55,
-        blockIndex: 74,
-        txCount: 0,
-        txBurnedFees: 0,
-      },
-    ]
-  }
-}
 
 jest.mock('@/services/api', () => {
   const mockedResult = [

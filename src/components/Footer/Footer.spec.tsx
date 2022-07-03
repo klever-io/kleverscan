@@ -4,7 +4,7 @@ import { screen } from '@testing-library/react';
 import theme from '../../styles/theme';
 
 
-import { socials, contents } from '@/configs/footer';
+import { socials, contents } from '../../configs/footer';
 import { renderWithTheme } from '../../test/utils';
 import Footer from './';
 

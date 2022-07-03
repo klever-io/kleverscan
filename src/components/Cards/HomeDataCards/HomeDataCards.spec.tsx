@@ -1,6 +1,6 @@
 import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
-import api from '@/services/api';
+import api from '../../../services/api';
 
 import { renderWithTheme } from '../../../test/utils';
 import {

@@ -1,9 +1,8 @@
 import React from 'react';
-import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ThemeProvider } from 'styled-components';
 import theme from '../../styles/theme';
 import Input from '.';
+import { renderWithTheme } from '../../test/utils';
 
 const mockedProps = {
   type: 'text',
@@ -17,11 +16,7 @@ describe('Component: Input', () => {
   let container: HTMLElement;
 
   beforeEach(() => {
-    container = render(
-      <ThemeProvider theme={theme}>
-        <Input {...mockedProps} />
-      </ThemeProvider>,
-    ).container;
+    container = renderWithTheme(<Input {...mockedProps} />).container;
   });
 
   it("should render the component with it's input field value empty and focused", () => {

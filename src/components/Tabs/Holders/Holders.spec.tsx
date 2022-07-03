@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react';
 
 import { klvAsset, mockedHolders } from '../../../test/mocks'
 import { renderWithTheme } from '../../../test/utils';
-import { toLocaleFixed } from '@/utils/index';
+import { toLocaleFixed } from '../../../utils/index';
 import Holders from './';
 
 jest.mock('next/router', () => ({
@@ -16,6 +16,11 @@ jest.mock('next/router', () => ({
 }));
 
 describe('Component: Tabs/Holders', () => {
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('Should render the the Table, it\'s Body and header correctly', () => {
     renderWithTheme(
       <Holders

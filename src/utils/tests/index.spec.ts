@@ -103,9 +103,13 @@ describe('unit tests for util funcs in index file', () => {
 
   describe('test toLocaleFixed function', () => {
     test('arbitrary numbers where English is the default language', () => {
-      expect(toLocaleFixed(4141414, 6)).toEqual('4.141.414,000000');
-      expect(toLocaleFixed(30000.65, 2)).toEqual('30.000,65');
-      expect(toLocaleFixed(1e9, 6)).toEqual('1.000.000.000,000000');
+      let mockLocaleFixed = toLocaleFixed;
+      mockLocaleFixed = jest.fn().mockImplementation((value, precision) => {
+        return value.toLocaleString('en-US', { minimumFractionDigits: precision});
+      });
+      expect(mockLocaleFixed(4141414, 6)).toEqual('4,141,414.000000');
+      expect(mockLocaleFixed(30000.65, 2)).toEqual('30,000.65');
+      expect(mockLocaleFixed(1e9, 6)).toEqual('1,000,000,000.000000');
     });
   });
 

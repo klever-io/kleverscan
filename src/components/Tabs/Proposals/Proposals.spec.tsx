@@ -2,49 +2,10 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 
 import theme from '../../../styles/theme';
-
-import { parseAddress } from '@/utils/index';
+import { parseAddress } from '../../../utils/index';
 import Proposals from './';
 import { renderWithTheme } from '../../../test/utils';
-
-const mockedProposals: any = [
-  {
-    proposalId: 0,
-    description: 'Test description',
-    epochStart: 0,
-    epochEnd: 10000,
-    proposalStatus: 'sucess',
-    proposer: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jquca668',
-    votes: 10223
-  },
-  {
-    proposalId: 1,
-    description: '',
-    epochStart: 500,
-    epochEnd: 30000,
-    proposalStatus: 'pending',
-    proposer: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waa5s89w5s25',
-    votes: 53257
-  },
-  {
-    proposalId: 1,
-    description: '',
-    epochStart: 500,
-    epochEnd: 30000,
-    proposalStatus: 'fail',
-    proposer: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waa5s89w5s25',
-    votes: 53257
-  },
-  {
-    proposalId: 1,
-    description: '',
-    epochStart: 500,
-    epochEnd: 30000,
-    proposalStatus: 'ApprovedProposal',
-    proposer: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waa5s89w5s25',
-    votes: 53257
-  },
-];
+import { mockedProposals} from '../../../test/mocks'
 
 jest.mock('next/router', () => ({
   useRouter() {
@@ -82,21 +43,30 @@ describe('Component: Tabs/Proposals' , () => {
   });
 
   it('Should render the "Number", "Proposal Content", "Time", "Upvotes/Total Staked" and "Status" with the correct values', () => {
-    // TODO - Add upvotes / total staked test
     renderWithTheme(
       <Proposals loading={false} proposalParams={mockedProposals} />
     );
     const proposalId = screen.getByText(`#${mockedProposals[0].proposalId}`);
     const description = screen.getByText(mockedProposals[0].description);
     const proposer = screen.getByText(parseAddress(mockedProposals[0].proposer, 8));
-    const epochStart = screen.getAllByText(/Start/i)[0];
-    const epochEnd = screen.getAllByText(/End/i)[0];
+    const epochStart = screen.getAllByText(/Created Epoch/i)[0];
+    const epochEnd = screen.getAllByText(/Ended Epoch/i)[0];
+    
     
     expect(proposalId).toBeInTheDocument();
     expect(description).toBeInTheDocument();
     expect(proposer).toBeInTheDocument();
     expect(epochStart).toBeInTheDocument();
     expect(epochEnd).toBeInTheDocument();
+    expect(epochStart).toHaveTextContent('Created Epoch: 4');
+    expect(epochEnd).toHaveTextContent('Ended Epoch: 8');
+
+    mockedProposals.forEach(({ votes, totalStaked }) => {
+      const calc = `${votes["0"] / 1000000}\\${totalStaked}`;
+      const votesAndTotalStaked = screen.getByText(calc);
+      expect(votesAndTotalStaked).toBeInTheDocument();
+      expect(votesAndTotalStaked).toHaveTextContent(calc);
+    });
   });
 
   it('Should render "-" if don\'t pass any description and the "Details" button with the correct href', () => {
@@ -123,8 +93,6 @@ describe('Component: Tabs/Proposals' , () => {
       <Proposals loading={false} proposalParams={mockedProposals} />
     );
     const proposer = screen.getAllByText(/Proposer/i)[0];
-    const status = screen.getAllByRole('link', { name: /Details/i})[0].parentNode?.previousSibling;
-    const percentIndicator = status?.previousSibling?.firstChild?.nextSibling?.lastChild;
     const description = screen.getByText(mockedProposals[0].description);
 
     const proposerStyle = {
@@ -132,12 +100,7 @@ describe('Component: Tabs/Proposals' , () => {
       fontWeight: 600,
       fontSize: '0.85rem',
     };
-    const percentIndicatorStyle = {
-      margin: '0 auto',
-      position: 'absolute',
-      top: '0.25rem',
-      left: '30%',
-    };
+
     const descriptionStyle = {
       overflow: 'auto',
       whiteSpace: 'normal',
@@ -145,7 +108,6 @@ describe('Component: Tabs/Proposals' , () => {
     };
 
     expect(proposer).toHaveStyle(proposerStyle);
-    expect(percentIndicator).toHaveStyle(percentIndicatorStyle);
     expect(description).toHaveStyle(descriptionStyle);
 
   });

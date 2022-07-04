@@ -1,6 +1,7 @@
 import {
   Discord,
   Facebook,
+  Github,
   Instagram,
   Telegram,
   Twitter,
@@ -44,6 +45,10 @@ const socials: ISocial[] = [
   {
     Icon: Telegram,
     link: 'https://t.me/Klever_io',
+  },
+  {
+    Icon: Github,
+    link: 'https://github.com/Klever-io',
   },
 ];
 

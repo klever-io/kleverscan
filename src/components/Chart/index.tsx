@@ -29,7 +29,7 @@ const Chart: React.FC<IChart> = ({ type, data, value, value2 }) => {
     case ChartType.Horizontal:
       return <Horizontal {...props} />;
     case ChartType.Linear:
-      return <Linear {...props} />;
+      return <Linear {...props} value={value} />;
     case ChartType.DoubleLinear:
       return <DoubleLinear {...props} value={value} value2={value2} />;
     case ChartType.Scatter:

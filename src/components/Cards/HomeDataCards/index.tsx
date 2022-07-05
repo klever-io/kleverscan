@@ -137,7 +137,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
 
       const yesterdayAccountsCall = new Promise<IYesterdayResponse>(
         async (resolve, reject) => {
-          const res = await api.getCached({
+          const res = await api.get({
             route: 'address/list/count/1',
           });
 
@@ -151,7 +151,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
 
       const transactionsCall = new Promise<ITransactionResponse>(
         async (resolve, reject) => {
-          const res = await api.getCached({
+          const res = await api.get({
             route: 'transaction/list',
           });
 
@@ -165,7 +165,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
 
       const yesterdayTransactionsCall = new Promise<IYesterdayResponse>(
         async (resolve, reject) => {
-          const res = await api.getCached({
+          const res = await api.get({
             route: 'transaction/list/count/1',
           });
 
@@ -194,21 +194,15 @@ const HomeDataCards: React.FC<IDataCards> = ({
                 break;
 
               case 1:
-                setNewAccounts(
-                  value.yesterdayAccounts.data.number_by_day[0].doc_count,
-                );
+                setNewAccounts(value.data.number_by_day[0].doc_count);
                 break;
 
               case 2:
-                setTotalTransactions(
-                  value.transactions.pagination.totalRecords,
-                );
+                setTotalTransactions(value.pagination.totalRecords);
                 break;
 
               case 3:
-                setNewTransactions(
-                  value.yesterdayTransactions.data.number_by_day[0].doc_count,
-                );
+                setNewTransactions(value.data.number_by_day[0].doc_count);
                 break;
 
               default:

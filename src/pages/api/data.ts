@@ -29,6 +29,7 @@ const middleware = async (
   res: NextApiResponse,
 ): Promise<any> => {
   const { route, service, refreshTime }: IProps = req.body;
+
   if (redis.status === 'ready') {
     let cache = await redis.get(`cache::${route}`);
 

@@ -12,6 +12,7 @@ import {
   Item,
   Logo,
   MenuIcon,
+  IconsMenu,
   MobileBackground,
   MobileContainer,
   MobileContent,
@@ -22,6 +23,8 @@ import {
 } from './styles';
 
 import { INavbarItem, navbarItems } from '@/configs/navbar';
+
+import ConnectWallet from './ConnectWallet';
 
 interface IDropdownPages {
   page: INavbarItem;
@@ -118,6 +121,7 @@ const Navbar: React.FC = () => {
     const handleClick = () => {
       setShowMore(!showMore);
     };
+
     if (name === 'More') {
       return (
         <MobileItem
@@ -165,9 +169,12 @@ const Navbar: React.FC = () => {
         </Link>
 
         <DesktopContainer>
-          {navbarItems.map((item, index) => (
-            <NavbarItem key={String(index)} {...item} />
-          ))}
+          <IconsMenu>
+            {navbarItems.map((item, index) => (
+              <NavbarItem key={String(index)} {...item} />
+            ))}
+          </IconsMenu>
+          <ConnectWallet />
         </DesktopContainer>
 
         <MobileContainer>

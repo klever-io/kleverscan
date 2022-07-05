@@ -123,7 +123,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
     const cardWatcher = setInterval(async () => {
       const accountsCall = new Promise<IAccountResponse>(
         async (resolve, reject) => {
-          const res = await api.get({
+          const res = await api.getCached({
             route: 'address/list',
           });
 
@@ -137,7 +137,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
 
       const yesterdayAccountsCall = new Promise<IYesterdayResponse>(
         async (resolve, reject) => {
-          const res = await api.get({
+          const res = await api.getCached({
             route: 'address/list/count/1',
           });
 
@@ -151,7 +151,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
 
       const transactionsCall = new Promise<ITransactionResponse>(
         async (resolve, reject) => {
-          const res = await api.get({
+          const res = await api.getCached({
             route: 'transaction/list',
           });
 
@@ -165,7 +165,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
 
       const yesterdayTransactionsCall = new Promise<IYesterdayResponse>(
         async (resolve, reject) => {
-          const res = await api.get({
+          const res = await api.getCached({
             route: 'transaction/list/count/1',
           });
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-
 import { useRouter } from 'next/router';
 import { GetStaticProps } from 'next';
+import { toLocaleFixed } from '@/utils/index'
 
 import {
   CardContainer,
@@ -30,6 +30,9 @@ import {
   PassThresholdContainer,
   PassThresholdText,
   DateContainer,
+  RowContent,
+  BalanceContainer,
+  NetworkParamsContainer,
 } from '@/views/proposals/detail';
 
 import { ArrowLeft } from '@/assets/icons';
@@ -38,14 +41,16 @@ import { getStatusIcon } from '@/assets/status';
 import { format, fromUnixTime } from 'date-fns';
 import Table, { ITable } from '@/components/Table';
 import { Row as TableRow } from '@/components/Table/styles';
-import { addCommasToNumber, formatAmount, typeVoteColors } from '@/utils/index';
+import { formatAmount, typeVoteColors } from '@/utils/index';
 import api from '@/services/api';
-import { Service } from '@/types/index';
+import { IRawParam, IFullInfoParam } from '@/types/index';
 
 import { AiFillCheckCircle } from 'react-icons/ai';
 
 import Tooltip from '../../components/Tooltip';
 import Link from 'next/link';
+import { NetworkParamsIndexer } from '@/types/index';
+import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
 
 interface IProposalPage {
   proposal: IProposal;
@@ -64,10 +69,11 @@ interface IProposal {
   txHash?: string;
   proposer?: string;
   code?: string;
-  maxVotes?: number;
+  totalStaked?: number;
   votingPowers?: any;
   timestampStart: number;
   timestampEnd: number;
+  parameters: IFullInfoParam[];
 }
 
 interface IVote {
@@ -80,7 +86,7 @@ interface IVote {
 
 interface IVoter {
   voter: string;
-  votingPower: number;
+  votingPower: string;
   voteDate: string;
   status: string;
 }
@@ -89,10 +95,9 @@ const ProposalDetails: React.FC<IProposal> = props => {
   const [status, setStatus] = useState('');
   const StatusIcon = getStatusIcon(status);
   const router = useRouter();
+  const precision = 10 ** 6;
   const proposalAPI: IProposal = props;
-
-  const { votingPowers, maxVotes } = proposalAPI;
-
+  const { votingPowers, totalStaked } = proposalAPI;
   const [filterVoters, setFilterVoters] = useState({
     Yes: 0,
     No: 0,
@@ -103,60 +108,68 @@ const ProposalDetails: React.FC<IProposal> = props => {
   const [selectedFilter, setSelectedFilter] = useState('Yes');
   const [votesPercentage, setVotesPercentage] = useState('');
 
-  const stakedPercent = 50;
-
   useEffect(() => {
-    if (maxVotes) {
-      const percentage = ((votedQty * 100) / maxVotes).toString();
-      setVotesPercentage(parseFloat(percentage).toPrecision(4));
+    if (totalStaked) {
+      let percentage = (votedQty * 100) / (totalStaked / precision);
+      if (percentage < 0.01) {
+        percentage = 0;
+      }
+      setVotesPercentage(percentage.toFixed(2));
     }
-  }, [maxVotes, votedQty]);
+  }, [totalStaked, votedQty]);
 
   useEffect(() => {
     if (proposalAPI.proposalStatus) {
       setStatus(proposalAPI.proposalStatus);
     }
 
-    Object.keys(proposalAPI.voters).map(async item => {
-      if (maxVotes) {
-        const list: IVoter[] = [...votersList];
-        const votesInfo = proposalAPI.voters[item];
+    const list: IVoter[] = [];
+    let tempVotedQty = 0;
+    const tempFilterVoters = {
+      Yes: 0,
+      No: 0,
+    };
 
-        const frozenBalance = votingPowers[item];
+    Object.keys(proposalAPI.voters ? proposalAPI.voters : []).map(
+      async item => {
+        if (totalStaked) {
+          const votesInfo = proposalAPI.voters[item];
+          const frozenBalance = votingPowers[item];
+          list.push({
+            voter: item,
+            votingPower: ((frozenBalance * 100) / totalStaked).toFixed(2),
+            voteDate: format(
+              fromUnixTime(votesInfo.timestamp / 1000),
+              'MM/dd/yyyy HH:mm',
+            ),
+            status: votesInfo.type === 0 ? 'Yes' : 'No',
+          });
 
-        list.push({
-          voter: item,
-          votingPower: (frozenBalance * 100) / maxVotes,
-          voteDate: format(
-            fromUnixTime(votesInfo.timestamp / 1000),
-            'MM/dd/yyyy HH:mm',
-          ),
-          status: votesInfo.type === 0 ? 'Yes' : 'No',
-        });
+          const typeVote = proposalAPI.voters[item].type;
+          const qtyVote = votesInfo.amount / 1000000;
 
-        setVotersList(list);
+          switch (typeVote) {
+            case 0:
+              tempFilterVoters['Yes'] += qtyVote;
+              tempVotedQty = tempVotedQty + qtyVote;
 
-        const typeVote = proposalAPI.voters[item].type;
-        const filters = { ...filterVoters };
-        const qtyVote = votesInfo.amount / 1000000;
-        switch (typeVote) {
-          case 0:
-            filters['Yes'] += qtyVote;
-            setVotedQty(votedQty + qtyVote);
-            setFilterVoters({ ...filters });
-            break;
+              break;
 
-          case 1:
-            filters['No'] += qtyVote;
-            setVotedQty(votedQty + qtyVote);
-            setFilterVoters({ ...filters });
-            break;
+            case 1:
+              tempFilterVoters['No'] += qtyVote;
+              tempVotedQty = votedQty + qtyVote;
+              break;
 
-          default:
-            break;
+            default:
+              break;
+          }
         }
-      }
-    });
+      },
+    );
+
+    setVotedQty(tempVotedQty);
+    setVotersList(list);
+    setFilterVoters(tempFilterVoters);
   }, []);
 
   const getQtyStatus = (status: string) => {
@@ -171,15 +184,27 @@ const ProposalDetails: React.FC<IProposal> = props => {
     return qtyStatus;
   };
 
-  const Progress: React.FC<{ percent: number }> = ({ percent }) => {
+  const renderProposalParams = () => {
+    return proposalAPI?.parameters.map(param => (
+      <div key={param.paramIndex}>
+        <strong>{param.paramText}</strong>
+        <span>{param.paramValue}</span>
+      </div>
+    ));
+  };
+
+  const Progress: React.FC = () => {
     return (
       <ProgressBar>
         {Object.keys(filterVoters).map((item: any, key: number) => {
-          if (maxVotes) {
+          if (totalStaked) {
             let percentageCard = (
               (filterVoters[item] * 100) /
-              maxVotes
+              (totalStaked / precision)
             ).toString();
+            if (Number(percentageCard) < 0.01) {
+              percentageCard = '0';
+            }
             if (percentageCard.split('.').length > 0) {
               percentageCard = parseFloat(percentageCard).toPrecision(4);
             }
@@ -274,9 +299,13 @@ const ProposalDetails: React.FC<IProposal> = props => {
               </Row>
               <Row>
                 <span>
-                  <strong>Proposal Content</strong>
+                  <strong>Hash</strong>
                 </span>
-                <span>{proposalAPI.description}</span>
+                <Link href={`/transaction/${proposalAPI.txHash}`}>
+                  <HashText>
+                    <a>{proposalAPI.txHash}</a>
+                  </HashText>
+                </Link>
               </Row>
               <Row>
                 <span>
@@ -296,15 +325,15 @@ const ProposalDetails: React.FC<IProposal> = props => {
               </Row>
               <Row>
                 <span>
-                  <strong>Hash</strong>
+                  <strong>Network Parameters</strong>
                 </span>
-                <Link href={`/transaction/${proposalAPI.txHash}`}>
-                  <a>
-                    <HashText>
-                      <a>{proposalAPI.txHash}</a>
-                    </HashText>
-                  </a>
-                </Link>
+                <RowContent>
+                  <BalanceContainer>
+                    <NetworkParamsContainer>
+                      {renderProposalParams()}
+                    </NetworkParamsContainer>
+                  </BalanceContainer>
+                </RowContent>
               </Row>
             </CardContent>
           </CardContainer>
@@ -317,7 +346,7 @@ const ProposalDetails: React.FC<IProposal> = props => {
             <VotesHeader>
               <strong>Total Voted</strong>
               <span>
-                {addCommasToNumber(votedQty)} ({votesPercentage}%)
+                {toLocaleFixed(votedQty, 6)} ({votesPercentage}%)
               </span>
             </VotesHeader>
 
@@ -327,11 +356,12 @@ const ProposalDetails: React.FC<IProposal> = props => {
                   <PassThresholdText>Pass threshold</PassThresholdText>
                   <VerticalLine />
                 </PassThresholdContainer>
-                <Progress percent={stakedPercent} />
+                <Progress />
               </PassThresholdContainer>
-              {maxVotes ? (
+              {totalStaked ? (
                 <span>
-                  Voted: {formatAmount(votedQty)} / {formatAmount(maxVotes)}
+                  Voted: {formatAmount(votedQty)} /{' '}
+                  {formatAmount(totalStaked / precision)}
                 </span>
               ) : null}
             </ProgressBarVotes>
@@ -339,28 +369,20 @@ const ProposalDetails: React.FC<IProposal> = props => {
             <CardVoteContainer>
               {filterVoters &&
                 Object.keys(filterVoters).map((item: any, key: number) => {
-                  if (maxVotes) {
-                    let percentageCard = (
-                      (filterVoters[item] * 100) /
-                      maxVotes
-                    ).toString();
-
-                    if (percentageCard.split('.').length > 0) {
-                      percentageCard =
-                        parseFloat(percentageCard).toPrecision(4);
-
-                      if (Number(percentageCard.split('.')[1]) === 0) {
-                        percentageCard = percentageCard.split('.')[0];
-                      }
+                  if (totalStaked) {
+                    let percentageCard =
+                      (filterVoters[item] * 100) / (totalStaked / precision);
+                    if (percentageCard < 0.01) {
+                      percentageCard = 0;
                     }
 
                     return (
                       <CardVote key={key} color={typeVoteColors[item]}>
                         <span>{item}</span>
-                        <PercentageText>{percentageCard}%</PercentageText>
-                        <QtyVotesText>
-                          {addCommasToNumber(filterVoters[item])}
-                        </QtyVotesText>
+                        <PercentageText>
+                          {percentageCard.toFixed(2)}%
+                        </PercentageText>
+                        <QtyVotesText>{toLocaleFixed(filterVoters[item], 6)}</QtyVotesText>
                       </CardVote>
                     );
                   }
@@ -391,7 +413,11 @@ const ProposalDetails: React.FC<IProposal> = props => {
             </div>
           </ValidatorsContainer>
 
-          <Table {...tableProps} />
+          {filterVoters[selectedFilter] ? (
+            <Table {...tableProps} />
+          ) : (
+            <Table {...{ ...tableProps, data: [] }} />
+          )}
         </Container>
       ) : null}
     </>
@@ -399,39 +425,48 @@ const ProposalDetails: React.FC<IProposal> = props => {
 };
 
 const getVotingPowers = async (voters: any, powers: any) => {
-  const votingPowers = Object.keys(voters).map(async address => {
-    const addressInfos: any = await api.get({
-      route: `address/${address}`,
-    });
+  if (!voters) {
+    voters = [];
+  }
 
-    if (addressInfos?.data) {
-      const { frozenBalance } = addressInfos.data.account?.assets?.KFI;
-      powers[address] = frozenBalance / 1000000;
-    }
+  Object.entries(voters).forEach(async ([address, data]: any[]) => {
+    powers[address] = data?.amount;
   });
+};
 
-  return Promise.allSettled(votingPowers);
+const getProposalNetworkParams = (params: IRawParam): IFullInfoParam[] => {
+  if (params) {
+    const fullInfoParams: IFullInfoParam[] = Object.entries(params).map(
+      ([index, value]) => ({
+        paramIndex: index,
+        paramLabel: NetworkParamsIndexer[index],
+        paramValue: Number(value),
+        paramText: proposalsMessages[NetworkParamsIndexer[index]],
+      }),
+    );
+
+    return fullInfoParams;
+  }
+  return [];
 };
 
 export const getServerSideProps: GetStaticProps<IProposal> = async ({
   params,
 }) => {
-  const maxVotesInfo: any = await api.get({
-    route: 'assets/KFI',
-  });
 
   const proposalInfos: any = await api.get({
     route: `proposals/${params?.number}`,
   });
-
   const votingPowers: any = {};
+  getVotingPowers(proposalInfos?.data?.proposal?.voters, votingPowers);
+  let props = proposalInfos?.data?.proposal;
+  if (!props) {
+    props = {};
+  }
 
-  await getVotingPowers(proposalInfos.data?.proposal?.voters, votingPowers);
-
-  const props = proposalInfos.data.proposal;
-  props.maxVotes = maxVotesInfo.data?.asset?.staking?.totalStaked / 1000000;
   props.votingPowers = votingPowers;
-
+  const paramsWithText = getProposalNetworkParams(props.parameters);
+  props.parameters = paramsWithText;
   return { props };
 };
 

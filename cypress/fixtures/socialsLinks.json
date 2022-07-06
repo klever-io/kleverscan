@@ -1,0 +1,29 @@
+[
+  {
+    "title": "Klever Exchange",
+    "infoLinks": [
+      { "name": "Privacy Policy", "href": "https://klever.io/privacy-policy" },
+      { "name": "Terms of Use", "href": "https://klever.io/terms-of-use" },
+      { "name": "WhitePaper", "href": "https://bc.klever.finance/wp" },
+      { "name": "Trading Fees", "href": "https://klever.io/trading-fees" },
+      { "name": "Token List", "href": "https://klever.io/markets" }
+    ]
+  },
+  {
+    "title": "Klever Wallet App",
+    "infoLinks": [
+      { "name": "Roadmap", "href": "https://klever.finance/roadmap/" },
+      { "name": "Help Center", "href": "https://klever.zendesk.com/" }
+    ]
+  },
+  {
+    "title": "Klever Ecosystem",
+    "infoLinks": [
+      { "name": "WhitePaper", "href": "https://bc.klever.finance/wp" },
+      { "name": "Klever News", "href": "https://klevernews.com/" },
+      { "name": "Careers", "href": "https://klever.compleo.com.br/" },
+      { "name": "Klever Finance", "href": "https://klever.finance/" },
+      { "name": "Klever Docs", "href": "https://docs.klever.finance/" }
+    ]
+  }
+]

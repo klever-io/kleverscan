@@ -41,39 +41,45 @@ const Proposals: React.FC<IProposalsProps> = ({
       if (!fullParameters) {
         return <></>;
       }
-      let tooltipMsg = '';
-      const proposalsTooltipInfo = fullParameters.map(
-        (param, index: number) => {
-          tooltipMsg += `<div>${param.paramText}&nbsp;&nbsp;${param.paramValue}</div>`;
-          if (index < 3) {
-            return (
-              <div
-                key={index}
-                style={{
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                <small>{param.paramText}</small>
-                <br />
-              </div>
-            );
-          }
-          if (index === 3) {
-            return <div key={index}>...</div>;
-          }
-        },
-      );
-      return (
-        <Tooltip onMouseOver={(e: any) => handleMouseOver(e)}>
-          {proposalsTooltipInfo}
-          <TooltipText ref={tooltipRef}>
-            <div dangerouslySetInnerHTML={{ __html: tooltipMsg }}></div>
-          </TooltipText>
-        </Tooltip>
-      );
+      return fullParameters.map((param, index: number) => {
+        if (index < 3) {
+          return (
+            <div
+              key={index}
+              style={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <small>{param.paramText}</small>
+              <br />
+            </div>
+          );
+        }
+        if (index === 3) {
+          return <div key={index}>...</div>;
+        }
+      });
     };
+
+    const renderProposalsNetworkParamsWithToolTip = () => {
+      if (parameters && proposalsWithNetWorkParams) {
+        return (
+          <Tooltip onMouseOver={(e: any) => handleMouseOver(e)}>
+        {renderProposalsNetworkParams(parameters)}
+        <TooltipText ref={tooltipRef}>
+          {parameters.map((param2, index2) => (
+            <div key={index2}>
+              {param2.paramText}&nbsp;&nbsp;{param2.paramValue}
+            </div>
+          ))}
+        </TooltipText>
+      </Tooltip>
+        )
+      }
+      return <></>
+    }
 
     const handleMouseOver = (e: any) => {
       const positionY = e.currentTarget.getBoundingClientRect().top;
@@ -136,9 +142,7 @@ const Proposals: React.FC<IProposalsProps> = ({
           <ProposalStatus>{capitalizeString(proposalStatus)}</ProposalStatus>
         </Status>
         <span>
-          {proposalsWithNetWorkParams
-            ? renderProposalsNetworkParams(parameters)
-            : null}
+        {renderProposalsNetworkParamsWithToolTip()}
         </span>
         <span>
           <Link href={{ pathname: `/proposal/${proposalId}` }}>Details</Link>

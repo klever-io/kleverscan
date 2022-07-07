@@ -51,7 +51,10 @@ export const ProposalStatus = styled.span`
 width: fit-content;
 `;
 
-export const ProposerDescAndLink = styled.span``;
+export const ProposerDescAndLink = styled.span`
+&:hover {
+    text-decoration: underline;
+  }`;
 
 const DescriptionBorder = css`
   border-bottom: 1px solid ${props => lighten(0.33, props.theme.table.text)};

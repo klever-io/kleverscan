@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { GetStaticProps } from 'next';
-import { toLocaleFixed } from '@/utils/index'
+import { toLocaleFixed } from '@/utils/index';
 
 import {
   CardContainer,
@@ -11,7 +11,7 @@ import {
   Title,
   Input,
   Row,
-  HashText,
+  HoverLink,
   EndedDate,
   CardVoteContainer,
   CardVote,
@@ -228,7 +228,9 @@ const ProposalDetails: React.FC<IProposal> = props => {
       return (
         <TableRow type="votes">
           <span>
-            <small>{voter}</small>
+          <Link href={`/account/${voter}`}>
+          <HoverLink><small>{voter}</small></HoverLink>
+            </Link>
           </span>
           <span>
             <p>{votingPower}%</p>
@@ -288,8 +290,10 @@ const ProposalDetails: React.FC<IProposal> = props => {
                 <span>
                   <strong>Proposer </strong>
                 </span>
-                <span>
-                  <p>{proposalAPI.proposer}</p>
+                <span style={{marginRight: '0.2rem'}}>
+                  <Link href={`/account/${proposalAPI.proposer}`}>
+                    <HoverLink><p>{proposalAPI.proposer}</p></HoverLink>
+                  </Link>
                 </span>
                 <Tooltip
                   msg={
@@ -302,9 +306,9 @@ const ProposalDetails: React.FC<IProposal> = props => {
                   <strong>Hash</strong>
                 </span>
                 <Link href={`/transaction/${proposalAPI.txHash}`}>
-                  <HashText>
-                    <a>{proposalAPI.txHash}</a>
-                  </HashText>
+                  <HoverLink>
+                    {proposalAPI.txHash}
+                  </HoverLink>
                 </Link>
               </Row>
               <Row>
@@ -382,7 +386,9 @@ const ProposalDetails: React.FC<IProposal> = props => {
                         <PercentageText>
                           {percentageCard.toFixed(2)}%
                         </PercentageText>
-                        <QtyVotesText>{toLocaleFixed(filterVoters[item], 6)}</QtyVotesText>
+                        <QtyVotesText>
+                          {toLocaleFixed(filterVoters[item], 6)}
+                        </QtyVotesText>
                       </CardVote>
                     );
                   }
@@ -453,7 +459,6 @@ const getProposalNetworkParams = (params: IRawParam): IFullInfoParam[] => {
 export const getServerSideProps: GetStaticProps<IProposal> = async ({
   params,
 }) => {
-
   const proposalInfos: any = await api.get({
     route: `proposals/${params?.number}`,
   });

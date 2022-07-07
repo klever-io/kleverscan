@@ -368,9 +368,10 @@ export const Row = styled.div`
   }
 `;
 
-export const HashText = styled.span`
+export const HoverLink = styled.span`
   cursor: pointer;
   width: fit-content;
+  color: ${props => props.theme.card.darkText} !important;
   &:hover {
     text-decoration: underline;
   }

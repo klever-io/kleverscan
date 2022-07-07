@@ -27,41 +27,70 @@ const ConnectWallet: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      window.kleverchainUrls = {
-        api:
-          process.env.DEFAULT_API_HOST ||
-          'https://api.testnet.klever.finance/v1.0',
-        node:
-          process.env.DEFAULT_NODE_HOST ||
-          'https://node.testnet.klever.finance',
-      };
+    const init = async () => {
+      if (typeof window !== 'undefined') {
+        window.kleverchainUrls = {
+          api:
+            process.env.DEFAULT_API_HOST ||
+            'https://api.testnet.klever.finance/v1.0',
+          node:
+            process.env.DEFAULT_NODE_HOST ||
+            'https://node.testnet.klever.finance',
+        };
 
-      if (sessionStorage.getItem('walletAddress')) {
-        setWalletAddress(sessionStorage.getItem('walletAddress'));
-      }
+        setExtensionInstalled(window.klever !== undefined);
 
-      setExtensionInstalled(window.klever !== undefined);
+        const interval = setInterval(() => {
+          if (window.klever !== undefined) {
+            setExtensionInstalled(true);
+            clearInterval(interval);
+          }
+        }, 100);
 
-      const interval = setInterval(() => {
-        if (window.klever !== undefined) {
-          setExtensionInstalled(true);
-          clearInterval(interval);
+        const timeout = new Promise(resolve => {
+          setTimeout(() => {
+            resolve(clearInterval(interval));
+          }, 5000);
+        });
+
+        await Promise.race([interval, timeout]);
+
+        if (sessionStorage.getItem('walletAddress')) {
+          setWalletAddress(sessionStorage.getItem('walletAddress'));
+
+          let interval: any;
+          const intervalPromise = new Promise(resolve => {
+            interval = setInterval(() => {
+              if (window?.klever?.active !== undefined) {
+                if (window?.klever?.active === false) {
+                  window.klever.initialize();
+                  clearInterval(interval);
+                  resolve(true);
+                }
+                if (window?.klever?.active === true) {
+                  clearInterval(interval);
+                  resolve(true);
+                }
+              }
+            }, 100);
+          });
+
+          const timeout = new Promise(resolve => {
+            setTimeout(() => {
+              clearInterval(interval);
+              resolve(false);
+            }, 10000);
+          });
+
+          await Promise.race([intervalPromise, timeout]);
         }
-      }, 100);
 
-      const timeout = new Promise(resolve => {
-        setTimeout(() => {
-          resolve(clearInterval(interval));
-        }, 5000);
-      });
-
-      Promise.race([interval, timeout]);
-
-      return () => {
-        clearInterval(interval);
-      };
-    }
+        return () => {
+          clearInterval(interval);
+        };
+      }
+    };
+    init();
   }, []);
 
   const preventEvent = (event: any) => {
@@ -139,40 +168,44 @@ const ConnectWallet: React.FC = () => {
   };
 
   return (
-    <ConnectContainer>
-      <ConnectButton onClick={handleConnect} key={String(extensionInstalled)}>
-        {loading ? (
-          <span> Loading... </span>
-        ) : (
-          <>
+    <>
+      {extensionInstalled && (
+        <ConnectContainer>
+          <ConnectButton
+            onClick={handleConnect}
+            key={String(extensionInstalled)}
+          >
+            {loading ? (
+              <span> Loading... </span>
+            ) : (
+              <>
+                {walletAddress && (
+                  <ItemTransaction selected={false}>
+                    <span>{parseAddress(walletAddress, 25)}</span>
+                    <DropdownContainer>
+                      <MenuTransaction>
+                        <DropdownDesktop key={'CreateTransaction'} />
+                      </MenuTransaction>
+                    </DropdownContainer>
+                  </ItemTransaction>
+                )}
+                {!walletAddress && <span>Connect your wallet</span>}
+              </>
+            )}
+          </ConnectButton>
+          <CopyContainer>
             {walletAddress && (
-              <ItemTransaction selected={false}>
-                <span>{parseAddress(walletAddress, 25)}</span>
-                <DropdownContainer>
-                  <MenuTransaction>
-                    <DropdownDesktop key={'CreateTransaction'} />
-                  </MenuTransaction>
-                </DropdownContainer>
-              </ItemTransaction>
+              <Copy info="Wallet Address" data={walletAddress} />
             )}
-            {!walletAddress && extensionInstalled && (
-              <span>Connect your wallet</span>
+          </CopyContainer>
+          <LogoutContainer>
+            {walletAddress && (
+              <LogoutIcon size={24} onClick={() => handleLogout()} />
             )}
-            {!walletAddress && !extensionInstalled && (
-              <span>Download Klever Extension</span>
-            )}
-          </>
-        )}
-      </ConnectButton>
-      <CopyContainer>
-        {walletAddress && <Copy info="Wallet Address" data={walletAddress} />}
-      </CopyContainer>
-      <LogoutContainer>
-        {walletAddress && (
-          <LogoutIcon size={24} onClick={() => handleLogout()} />
-        )}
-      </LogoutContainer>
-    </ConnectContainer>
+          </LogoutContainer>
+        </ConnectContainer>
+      )}
+    </>
   );
 };
 

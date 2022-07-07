@@ -5,7 +5,7 @@ import { contracts, options } from './contracts';
 
 import { core, sendTransaction, TransactionType } from '@klever/sdk';
 import { toast } from 'react-toastify';
-import { getNonce, getType } from './utils';
+import { getNonce, getType, precisionParse } from './utils';
 import { formatLabel } from '../../utils/index';
 
 import {
@@ -773,11 +773,13 @@ const ContractSpecific: React.FC<any> = () => {
       ...contractValues,
     };
 
+    const parsedPayload = await precisionParse(payload, selectedContractType);
+
     setLoading(true);
     try {
       const unsignedTx = await sendTransaction(
         getType(selectedContractType),
-        payload,
+        parsedPayload,
         {
           autobroadcast: false,
         },
@@ -791,10 +793,10 @@ const ContractSpecific: React.FC<any> = () => {
       );
       setLoading(false);
       setTxHash(response.txHashes[0]);
+      setContractValues({});
       toast.success('Transaction broadcast successfully');
     } catch (e: any) {
       setLoading(false);
-
       toast.error(e.message);
     }
   };

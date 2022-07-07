@@ -11,12 +11,14 @@ import {
   LogoutContainer,
   LogoutIcon,
   MenuTransaction,
+  CopyContainer,
 } from '../styles';
 
 import { BiTransfer } from 'react-icons/bi';
 import { parseAddress } from '../../../utils';
-import Loader from 'react-loader-spinner';
 import { toast } from 'react-toastify';
+
+import Copy from '@/components/Copy';
 
 const ConnectWallet: React.FC = () => {
   const [privateKey, setPrivateKey] = useState('');
@@ -162,6 +164,9 @@ const ConnectWallet: React.FC = () => {
           </>
         )}
       </ConnectButton>
+      <CopyContainer>
+        {walletAddress && <Copy info="Wallet Address" data={walletAddress} />}
+      </CopyContainer>
       <LogoutContainer>
         {walletAddress && (
           <LogoutIcon size={24} onClick={() => handleLogout()} />

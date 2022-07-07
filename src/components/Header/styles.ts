@@ -344,6 +344,48 @@ export const LogoutContainer = styled.div`
   }
 `;
 
+export const CopyContainer = styled.div`
+  position: relative;
+  font-size: 0.75rem;
+  margin-left: 0.8rem;
+
+  &:hover {
+    svg {
+      filter: brightness(1.5);
+    }
+  }
+
+  @media screen and (min-width: 768px) {
+    &:hover {
+      &::before {
+        content: '';
+        position: absolute;
+        top: 2rem;
+        left: 0.25rem;
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-bottom: 10px solid ${props => props.theme.card.background};
+        transform: translate(-25%, 100%);
+      }
+
+      &::after {
+        content: 'Copy address';
+        position: absolute;
+        top: 1rem;
+        left: 0;
+        background-color: ${props => props.theme.card.background};
+        color: ${props => props.theme.white};
+        padding: 0.5rem;
+        border-radius: 5px;
+        z-index: 500;
+        transform: translate(-50%, 40%);
+      }
+    }
+  }
+`;
+
 export const MenuIcon = styled(FiMenu).attrs(props => ({
   color: props.theme.navbar.text,
   size: 24,

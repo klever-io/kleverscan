@@ -799,13 +799,18 @@ const ContractSpecific: React.FC<any> = () => {
     }
   };
 
+  const showForm =
+    (Object.keys(formSelected).length !== 0 ||
+      selectedContractType === 'UnjailContract') &&
+    !loading;
+
   return (
     <>
       <MainContainer>
         <SelectContainer>
           <Select options={options} onChange={handleOption} />
         </SelectContainer>
-        {Object.keys(formSelected).length !== 0 && !loading && (
+        {showForm && (
           <FormContainer>
             <>
               {renderCompound(formSelected)}

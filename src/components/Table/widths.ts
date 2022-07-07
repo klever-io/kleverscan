@@ -294,24 +294,26 @@ const networkParams = css`
 `;
 
 const proposals = css`
-  padding-right: 0.5rem;
   &:nth-child(1) {
-    width: 4rem;
+    width: 5rem;
   }
   &:nth-child(2) {
-    width: 18rem;
+    width: 10rem;
   }
   &:nth-child(3) {
-    width: 10rem;
+    width: 9rem;
   }
   &:nth-child(4) {
-    width: 12rem;
+    width: 11rem;
   }
   &:nth-child(5) {
-    width: 10rem;
+    width: 12rem;
   }
   &:nth-child(6) {
-    width: 5rem;
+    width: 10rem;
+  }
+  &:nth-child(7) {
+    width: 5rem
   }
 `;
 const votes = css`
@@ -320,7 +322,7 @@ const votes = css`
     width: 38rem;
   }
   &:nth-child(2) {
-    width: 38rem;
+    width: 10rem;
   }
   &:nth-child(3) {
     width: 14rem;

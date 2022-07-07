@@ -30,6 +30,7 @@ describe('Component: Filter', () => {
   let container: HTMLElement;
 
   beforeEach(() => {
+    jest.clearAllMocks();
     container = renderWithTheme(<Filter {...filters[0]}/>).container;
   });
 

@@ -4,7 +4,7 @@ import { format, fromUnixTime } from 'date-fns';
 
 import { mockedTransactions } from '../../../test/mocks'
 import { renderWithTheme } from '../../../test/utils';
-import { capitalizeString, formatAmount } from '@/utils/index';
+import { capitalizeString, formatAmount } from '../../../utils/index';
 import Transaction from './';
 
 jest.mock('next/router', () => ({
@@ -17,6 +17,11 @@ jest.mock('next/router', () => ({
 }));
 
 describe('Component: Tabs/Transactions', () => {
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('Should render the the Table, it\'s Body and header correctly', () => {
     renderWithTheme(
       <Transaction

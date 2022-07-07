@@ -18,50 +18,17 @@ import { GetServerSideProps } from 'next';
 import api from '@/services/api';
 import { useDidUpdateEffect } from '@/utils/hooks';
 
-import { IProposal, IProposalsResponse } from '@/types/index';
-
+import {
+  IProposal,
+  IProposalsResponse,
+} from '@/types/index';
+import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
+import { NetworkParamsIndexer, IRawParam, IFullInfoParam } from '@/types/index';
 interface IProposalsPage {
   networkParams: INetworkParams;
   proposals: IProposal[];
   totalProposalsPage: number;
-}
-
-interface IProposalsMessages {
-  FeePerDataByte: string;
-  KAppFeeCreateValidator: string;
-  KAppFeeCreateAsset: string;
-  MaxEpochsUnclaimed: string;
-  MinSelfDelegatedAmount: string;
-  MinTotalDelegatedAmount: string;
-  BlockRewards: string;
-  StakingRewards: string;
-  KAppFeeTransfer: string;
-  KAppFeeAssetTrigger: string;
-  KAppFeeValidatorConfig: string;
-  KAppFeeFreeze: string;
-  KAppFeeUnfreeze: string;
-  KAppFeeDelegate: string;
-  KAppFeeUndelegate: string;
-  KAppFeeWithdraw: string;
-  KAppFeeClaim: string;
-  KAppFeeUnjail: string;
-  KAppFeeSetAccountName: string;
-  KAppFeeProposal: string;
-  KAppFeeVote: string;
-  KAppFeeConfigITO: string;
-  KAppFeeSetITOPrices: string;
-  KAppFeeBuy: string;
-  KAppFeeSell: string;
-  KAppFeeCancelMarketOrder: string;
-  KAppFeeCreateMarketplace: string;
-  KAppFeeConfigMarketplace: string;
-  KAppFeeUpdateAccountPermission: string;
-  MaxNFTMintBatch: string;
-  MinKFIStakedToEnableProposals: string;
-  MinKLVBucketAmount: string;
-  MaxBucketSize: string;
-  LeaderValidatorRewardsPercentage: string;
-  ProposalMaxEpochsDuration: string;
+  proposalsWithNetWorkParams: IFullInfoParam[][];
 }
 
 interface INetworkParams {
@@ -82,6 +49,7 @@ const Proposals: React.FC<IProposalsPage> = ({
   networkParams: defaultNetworkParams,
   proposals: defaultProposals,
   totalProposalsPage,
+  proposalsWithNetWorkParams,
 }) => {
   const tableHeaders = ['Network Parameters', 'Proposals'];
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
@@ -161,6 +129,7 @@ const Proposals: React.FC<IProposalsPage> = ({
             <ProposalsTab
               proposalParams={proposals}
               loading={loadingProposals}
+              proposalsWithNetWorkParams={proposalsWithNetWorkParams}
             />
             <PaginationContainer>
               <Pagination
@@ -205,6 +174,19 @@ const Proposals: React.FC<IProposalsPage> = ({
   );
 };
 
+const getProposalNetworkParams = (params: any): IFullInfoParam[] => {
+  const fullInfoParams: IFullInfoParam[] = Object.entries(params).map(
+    ([index, value]) => ({
+      paramIndex: index,
+      paramLabel: NetworkParamsIndexer[index],
+      paramValue: Number(value),
+      paramText: proposalsMessages[NetworkParamsIndexer[index]],
+    }),
+  );
+
+  return fullInfoParams;
+};
+
 export const getServerSideProps: GetServerSideProps<IProposalsPage> = async ({
   params,
 }) => {
@@ -212,52 +194,16 @@ export const getServerSideProps: GetServerSideProps<IProposalsPage> = async ({
   const proposalResponse: IProposalsResponse = await api.get({
     route: 'proposals/list',
   });
-
-  const maxVotesInfo: any = await api.get({
-    route: 'assets/KFI',
-  });
-
-  proposalResponse.data?.proposals?.forEach((item: IProposal) => {
-    item.totalStaked = maxVotesInfo.data?.asset?.staking?.totalStaked / 1000000;
-  });
-
-  const proposalsMessages: IProposalsMessages = {
-    FeePerDataByte: 'Fee Per Data Byte',
-    KAppFeeCreateValidator: 'KApp Fee for Validator Creation',
-    KAppFeeCreateAsset: 'KApp Fee for Asset Creation',
-    MaxEpochsUnclaimed: 'Max Epochs to clear unclaimed',
-    MinSelfDelegatedAmount: 'Min Self Delegation Amount',
-    MinTotalDelegatedAmount: 'Min Total Delegation Amount',
-    BlockRewards: 'Block Rewards',
-    StakingRewards: 'Staking Rewards',
-    KAppFeeTransfer: 'KApp Fee for Transfer',
-    KAppFeeAssetTrigger: 'KApp Fee for Asset Trigger',
-    KAppFeeValidatorConfig: 'KApp Fee for Validator Config',
-    KAppFeeFreeze: 'KApp Fee for Freeze',
-    KAppFeeUnfreeze: 'KApp Fee for Unfreeze',
-    KAppFeeDelegate: 'KApp Fee for Delegation',
-    KAppFeeUndelegate: 'KApp Fee for Undelegate',
-    KAppFeeWithdraw: 'KApp Fee for Withdraw',
-    KAppFeeClaim: 'KApp Fee for Claim',
-    KAppFeeUnjail: 'KApp Fee for Unjail',
-    KAppFeeSetAccountName: 'KApp Fee for Account Name',
-    KAppFeeProposal: 'KApp Fee for Proposal',
-    KAppFeeVote: 'KApp Fee for Vote',
-    KAppFeeConfigITO: 'KApp Fee for Config ITO',
-    KAppFeeSetITOPrices: 'KApp Fee for Set ITO Prices',
-    KAppFeeBuy: 'KApp Fee for Buy',
-    KAppFeeSell: 'KApp Fee for Sell',
-    KAppFeeCancelMarketOrder: 'KApp Fee for Cancel Market Order',
-    KAppFeeCreateMarketplace: 'KApp Fee for Marketplace Creation',
-    KAppFeeConfigMarketplace: 'KApp Fee for Config Marketplace',
-    KAppFeeUpdateAccountPermission: 'KApp Fee for Update Account Permission',
-    MaxNFTMintBatch: 'Max NFT Mint per batch',
-    MinKFIStakedToEnableProposals: 'Min KFI staked to enable Proposals Kapps',
-    MinKLVBucketAmount: 'Min KLV Bucket Amount',
-    MaxBucketSize: 'Max bucket size',
-    LeaderValidatorRewardsPercentage: 'Leader Validator rewards percentage',
-    ProposalMaxEpochsDuration: 'Max Epochs for active proposal duration',
-  };
+  let proposalsWithNetWorkParams: any[] = [];
+  if (!proposalResponse.error) {
+    proposalsWithNetWorkParams = proposalResponse?.data?.proposals?.map(
+      (proposal, index) => {
+        proposalResponse.data.proposals[index].parameters =
+          getProposalNetworkParams(proposal.parameters);
+        return getProposalNetworkParams(proposal.parameters);
+      },
+    );
+  }
 
   let networkParams = {} as INetworkParams;
 
@@ -270,13 +216,12 @@ export const getServerSideProps: GetServerSideProps<IProposalsPage> = async ({
       };
     });
   }
-
   const props: IProposalsPage = {
     networkParams,
     proposals: proposalResponse.data?.proposals || [],
     totalProposalsPage: proposalResponse?.pagination?.totalPages || 0,
+    proposalsWithNetWorkParams,
   };
-
   return { props };
 };
 

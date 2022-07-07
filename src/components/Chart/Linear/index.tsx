@@ -1,18 +1,50 @@
 import React from 'react';
 
 import { withTheme } from 'styled-components';
-import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
+import {
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
 import { IChartData } from '../../../configs/home';
 import { Theme } from '../../../styles/styles';
 import { formatAmount } from '@/utils/index';
+import { TooltipContainer } from '../DoubleLinear/styles';
 
 interface IChart {
   data: IChartData[];
   theme: Theme;
+  value?: string;
 }
 
-const Chart: React.FC<IChart> = ({ data, theme }) => {
+interface ITooltipContent {
+  payload?: {
+    value: number;
+    name: string;
+  }[];
+  label?: string;
+  active?: boolean;
+}
+
+const CustomTooltip = ({ payload, label, active }: ITooltipContent) => {
+  if (active && payload && payload.length) {
+    return (
+      <TooltipContainer>
+        <p>{`${label}`}</p>
+        <p>{`${payload[0]?.name}: ${formatAmount(payload[0]?.value)}`}</p>
+      </TooltipContainer>
+    );
+  }
+
+  return null;
+};
+
+const Chart: React.FC<IChart> = ({ data, theme, value }) => {
   const axisProps = {
     axisLine: false,
     tickLine: false,
@@ -41,6 +73,7 @@ const Chart: React.FC<IChart> = ({ data, theme }) => {
           strokeWidth={2}
           stroke={theme.chart.linear.stroke}
         />
+        <Tooltip content={<CustomTooltip />} />
       </LineChart>
     </ResponsiveContainer>
   );

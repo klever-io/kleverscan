@@ -1,5 +1,5 @@
 import { lighten } from 'polished';
-import styled from 'styled-components';
+import styled, {css} from 'styled-components';
 
 const getStakedBGColor = (props: any, percent: number) => {
   if (percent < 30) {
@@ -48,16 +48,55 @@ export const Proposer = styled.p`
 `;
 
 export const ProposalStatus = styled.span`
-  max-width: 8rem;
+width: fit-content;
 `;
 
-export const ProposerDescAndLink = styled.span``;
+export const ProposerDescAndLink = styled.span`
+&:hover {
+    text-decoration: underline;
+  }`;
 
-export const Description = styled.p`
+const DescriptionBorder = css`
+  border-bottom: 1px solid ${props => lighten(0.33, props.theme.table.text)};
+`
+
+export const Description = styled.p<{description: boolean}>`
   overflow: auto;
   white-space: normal !important;
   padding-bottom: 0.25rem;
-  border-bottom: 1px solid ${props => lighten(0.33, props.theme.table.text)};
+  border-bottom: ${props => props.description ? DescriptionBorder : null}
 `;
 
 export const UpVotes = styled.span``;
+
+
+export const TooltipText = styled.span`
+  visibility: hidden;
+  opacity: 0;
+  width: fit-content !important;
+  color: ${props => props.theme.white} !important;
+  background-color: rgb(123,125,178);
+
+  padding: 7px 7px;
+  border-radius: 6px;
+
+  position: fixed;
+  z-index: 1;
+  transform: translateX(-12.5%);
+  transition: 0.3s ease opacity;
+  pointer-events: none;
+`;
+
+export const Tooltip = styled.span`
+  position: relative;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+
+  &:hover ${TooltipText} {
+    visibility: visible;
+    opacity: 1;
+  }
+`;

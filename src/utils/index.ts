@@ -1,4 +1,5 @@
 import { IAsset, IParsedMetrics, IEpochInfo } from '../types';
+import { contracts } from '../components/ContractSpecific/contracts';
 
 export const breakText = (text: string, limit: number): string => {
   return text.length > limit ? `${text.substring(0, limit)}...` : text;
@@ -178,3 +179,122 @@ const plural = (count: number, singular: string): string => {
 export const addCommasToNumber = (numb: number): string => {
   return numb.toLocaleString();
 }
+
+export const formatLabel = (str: string) => {
+  switch (str) {
+    case 'assetID':
+      return 'AssetID';
+    case 'assetId':
+      return 'AssetID';
+    case 'bucketID':
+      return 'BucketID';
+    case 'isNFTMintStopped':
+      return 'Is NFT Mint Stopped';
+    case 'APR':
+      return 'APR';
+    case 'BLSPublicKey':
+      return 'BLS Public Key';
+    case 'marketplaceID':
+      return 'MarketplaceID';
+    default:
+      break;
+  }
+
+  if (str === 'assetID') {
+    return 'AssetID';
+  }
+
+  let formatedstr = str.charAt(0).toUpperCase() + str.slice(1);
+  let label = '';
+  formatedstr.split(/(?=[A-Z])/).forEach((item: string, index: number) => {
+    label += item;
+    if (index < formatedstr.split(/(?=[A-Z])/).length - 1) {
+      label += ' ';
+    }
+  });
+
+  return label;
+};
+
+export const changeObject = (
+  obj: any,
+  key: any,
+  value: any,
+  lastParent: any = '',
+  parent: any = '',
+) => {
+  let type = '';
+
+  const searchType = (obj: any, field: string) => {
+    Object.keys(obj).forEach(item => {
+      if (item === field) {
+        type = typeof obj[item];
+      } else if (
+        typeof obj[item] === 'object' &&
+        obj[item] !== null &&
+        !Array.isArray(obj[item])
+      ) {
+        searchType(obj[item], field);
+      } else if (Array.isArray(obj[item])) {
+        if (
+          typeof obj[item][0] === 'object' &&
+          obj[item][0] !== null &&
+          !Array.isArray(obj[item][0])
+        ) {
+          searchType(Object.keys(obj[item][0]), field)
+        }
+      }
+    });
+  };
+
+  searchType(contracts, key);
+
+  Object.keys(obj).map((item: any) => {
+    if (item === key) {
+      if (parent !== '' && parent) {
+        if (lastParent === parent) {
+          if (value === '') {
+            if (type === 'number') {
+              obj[item] = null;
+            } else {
+              obj[item] = '';
+            }
+          } else {
+            if (typeof value === 'boolean') {
+              obj[item] = Boolean(value);
+            } else if (!isNaN(Number(value)) && value.length !== 0) {
+              obj[item] = Number(value);
+            } else {
+              obj[item] = value;
+            }
+          }
+        }
+      } else {
+        if (value === '') {
+          if (type === 'number') {
+            obj[item] = null;
+          } else {
+            obj[item] = '';
+          }
+        } else {
+          if (typeof value === 'boolean') {
+            obj[item] = Boolean(value);
+          } else if (!isNaN(Number(value)) && value.length !== 0) {
+            obj[item] = Number(value);
+          } else {
+            obj[item] = value;
+          }
+        }
+      }
+    }
+    if (
+      typeof obj[item] === 'object' &&
+      !Array.isArray(obj[item]) &&
+      obj[item] !== null
+    ) {
+      if (parent) {
+        changeObject(obj[item], key, value, item, parent);
+      }
+    }
+  });
+};

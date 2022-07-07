@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDidUpdateEffect } from '@/utils/hooks';
+import AssetLogo from '@/components/Logo/AssetLogo';
 
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
@@ -85,6 +86,8 @@ const Asset: React.FC<IAssetPage> = ({
 }) => {
   const {
     name,
+    logo,
+    ticker,
     uris,
     assetId,
     assetType,
@@ -162,14 +165,6 @@ const Asset: React.FC<IAssetPage> = ({
 
     fetchData();
   }, [holdersPage]);
-
-  const renderLogo = () => {
-    const regex = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
-    if (regex.test(asset.logo)) {
-      return <Logo alt={`${name}-logo`} src={asset.logo} />;
-    }
-    return <LetterLogo>{asset.ticker.split('')[0]}</LetterLogo>;
-  };
 
   const getWhitepaper = () => {
     if (!uris || !uris.Whitepaper) {
@@ -381,8 +376,13 @@ const Asset: React.FC<IAssetPage> = ({
           <div onClick={() => router.push('/assets')}>
             <ArrowLeft />
           </div>
-          {renderLogo()}
-
+          <AssetLogo 
+          LetterLogo={LetterLogo}
+          Logo={Logo}
+          logo={logo}
+          ticker={ticker}
+          name={name}
+          />
           <AssetTitle>
             <h1>
               {name} ({assetId})

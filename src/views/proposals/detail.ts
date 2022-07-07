@@ -20,7 +20,7 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: 768px) {
+  @media (max-width: 1150px) {
     padding: 3rem 3rem 5rem 3rem;
   }
 `;
@@ -220,11 +220,27 @@ export const CardContent = styled.div`
   background-color: ${props => props.theme.white};
 
   border-radius: 0.75rem;
+
+  div:nth-child(2) {
+    span:nth-child(1) {
+      min-width: 6rem;
+    }
+  }
+  div:nth-child(3) {
+    span:nth-child(1) {
+      min-width: 6rem;
+    }
+  }
+
+  div:nth-child(4) {
+    span:nth-child(2n + 2) {
+      width: 6rem;
+    }
+  }
 `;
 
 export const CardVoteContainer = styled.div`
   display: flex;
-  flexdirection: row;
 `;
 
 export const CardVote = styled.div<CardVoteProps>`
@@ -273,6 +289,15 @@ export const OptionValidator = styled.div<OptionValidatorProps>`
 export const Row = styled.div`
   width: 100%;
 
+  @media (max-width: 768px) {
+    &:nth-child(1) {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 7rem;
+    }
+  }
+
   padding: 1.5rem 2rem;
 
   display: flex;
@@ -286,13 +311,6 @@ export const Row = styled.div`
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
   }
-  &:nth-child(3) {
-    span {
-      &:nth-child(2) {
-        width: 80%;
-      }
-    }
-  }
 
   span {
     overflow: hidden;
@@ -300,10 +318,9 @@ export const Row = styled.div`
     white-space: nowrap;
 
     &:first-child {
-      width: 12rem;
+      min-width: 12rem;
     }
     &:nth-child(2) {
-      margin-right: 4rem;
     }
     &:nth-child(3) {
       width: 10rem;
@@ -351,12 +368,16 @@ export const Row = styled.div`
   }
 `;
 
-export const HashText = styled.span`
-  color: #aa33b5;
+export const HoverLink = styled.span`
   cursor: pointer;
+  width: fit-content;
+  color: ${props => props.theme.card.darkText} !important;
   &:hover {
     text-decoration: underline;
   }
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export const EndedDate = styled.small`
@@ -374,4 +395,63 @@ export const DateContainer = styled.div`
   flex-direction: row;
   justify-content: center;
   gap: 0.5rem;
+`;
+
+export const RowContent = styled.span`
+  width: 100%;
+  .bucketIdCopy {
+    span {
+      margin-right: -2rem;
+    }
+  }
+`;
+
+export const BalanceContainer = styled.div`
+  display: flex;
+
+  flex-direction: column;
+`;
+
+export const NetworkParamsContainer = styled.div`
+  margin-top: 0.5rem;
+
+
+  display: flex;
+
+  flex-direction: column;
+
+  background-color: ${props => props.theme.accountCard.frozenBackground};
+
+  border-radius: 0.75rem;
+
+  div {
+    padding: 1.25rem 2rem;
+
+    display: flex;
+
+    flex-direction: row;
+    @media(max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    align-items: center;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid ${props => props.theme.card.border};
+
+      border-bottom-left-radius: 0px;
+      border-bottom-right-radius: 0px;
+    }
+    gap: 1rem;
+    justify-content: flex-start;
+
+    strong {
+      font-weight: 600;
+      color: ${props => props.theme.card.darkText};
+    }
+
+    span {
+      color: ${props => props.theme.card.darkText};
+    }
+  }
 `;

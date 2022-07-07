@@ -20,7 +20,7 @@ jest.mock('next/router', () => ({
   useRouter: jest.fn()
 }));
 
-describe('Component: Input', () => {  
+describe('Component: Inputt', () => {  
 
   let container: HTMLElement;
   const mockRouter = {
@@ -30,15 +30,12 @@ describe('Component: Input', () => {
 
 
   beforeEach(() => {
+    jest.clearAllMocks();
     container = render(
     <ThemeProvider theme={theme}>
       <Input />
     </ThemeProvider>
     ).container;
-  });
-
-  afterEach(() => {
-    (useRouter as jest.Mock).mockClear();
   });
 
   it('Should redirect for transaction page when match the hash length of transactions', async () => {

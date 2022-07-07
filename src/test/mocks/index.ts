@@ -10,6 +10,7 @@ import {
   IAsset,
   IAccountAsset,
   ITransaction,
+  IHomeTransactions,
 } from '../../types'
 
 export const CoinTest = [
@@ -481,5 +482,110 @@ export const mockedTransactions = [
     chainID: '12565',
     signature: '452s658695cd0f9c467a8a0741d07fcae2448f51681b068bd70daf7aeaa1e2d2cf2cb92d71aa78fbbc29eba2521f38b5a4b5dc4f3e29bfa5c2a031855458s665',
   },
-
 ];
+
+export const mockedBlocks = [
+  {
+    nonce: 15222,
+    timestamp: (Date.now() / 1000),
+    hash: '456s2d4895be5a559c12e7c695037d930d5d5a05389fe17901ed03365s42589s',
+    blockRewards: 15,
+    blockIndex: 42,
+    txCount: 0,
+    txBurnedFees: 0,
+  },
+  {
+    nonce: 14526,
+    timestamp: (Date.now() / 1000) - 500,
+    hash: '456s2d4895be5a559c12e7c695037d930d5d5a05389fe17901ed03365s42589s',
+    blockRewards: 15,
+    blockIndex: 48,
+    txCount: 0,
+    txBurnedFees: 0,
+  },
+];
+
+export const mockedFetchBlocks = {
+  data: {
+    blocks: [
+      {
+        nonce: 5055,
+        timestamp: (Date.now() / 1000),
+        hash: '456s2d4895be5a559c12e7c695037d930d5d5a05389fe17901ed03365s42589s',
+        blockRewards: 98,
+        blockIndex: 55,
+        txCount: 0,
+        txBurnedFees: 0,
+      },
+      {
+        nonce: 98562,
+        timestamp: (Date.now() / 1000) - 500,
+        hash: '456s2d4895be5a559c12e7c695037d930d5d5a05389fe17901ed03365s42589s',
+        blockRewards: 55,
+        blockIndex: 74,
+        txCount: 0,
+        txBurnedFees: 0,
+      },
+    ]
+  }
+};
+
+export const mockedProposals = [
+  {
+    proposalId: 0,
+    description: 'Test description',
+    epochStart: 4,
+    epochEnd: 8,
+    proposalStatus: 'sucess',
+    proposer: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jquca668',
+    votes: {"0": 2000000000000},
+    totalStaked: 2000000,
+  },
+  {
+    proposalId: 1,
+    description: '',
+    epochStart: 10,
+    epochEnd: 14,
+    proposalStatus: 'pending',
+    proposer: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waa5s89w5s25',
+    votes: {"0": 1500000000000},
+    totalStaked: 2000000,
+  },
+  {
+    proposalId: 1,
+    description: '',
+    epochStart: 24,
+    epochEnd: 28,
+    proposalStatus: 'fail',
+    proposer: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waa5s89w5s25',
+    votes: {"0": 1000000000000},
+    totalStaked: 2000000,
+  },
+  {
+    proposalId: 1,
+    description: '',
+    epochStart: 15,
+    epochEnd: 19,
+    proposalStatus: 'ApprovedProposal',
+    proposer: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waa5s89w5s25',
+    votes: {"0": 3000000000000  },
+    totalStaked: 3000000,
+  },
+];
+
+export const mockHomeTxs: IHomeTransactions = {
+  setTotalTransactions: () => ({}),
+  transactions: [],
+  transactionsList: [
+    {
+        doc_count: 9,
+        key: 1652140800000
+    },
+    {
+        doc_count: 32,
+        key: 1652227200000
+    },
+  ],
+  precision: 6,
+};
+

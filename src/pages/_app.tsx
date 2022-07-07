@@ -17,6 +17,14 @@ import Bugsnag from '../lib/bugsnag';
 
 const ErrorBoundary = Bugsnag.getPlugin('react')?.createErrorBoundary(React);
 
+//add window methods to global scope
+declare global {
+  interface Window {
+    klever: any;
+    kleverchainUrls: any;
+  }
+}
+
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   const router = useRouter();
 

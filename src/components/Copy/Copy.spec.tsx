@@ -1,8 +1,6 @@
 import React from 'react';
-import { screen, waitFor  } from '@testing-library/react'
 import userEvent from '@testing-library/user-event';
 
-import theme from '../../styles/theme';
 import { renderWithTheme } from '../../test/utils';
 
 import Copy from './';

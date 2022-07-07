@@ -1,90 +1,163 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
+import ReactDOMServer from 'react-dom/server';
 
 import Table, { ITable } from '@/components/Table';
 import { Row, Status } from '@/components/Table/styles';
 import {
-  Proposer,
   ProposalStatus,
   ProposerDescAndLink,
   UpVotes,
-  PercentIndicator,
-  StakedIndicator,
-  Description,
+  TooltipText,
+  Tooltip,
 } from './styles';
 
 import { getStatusIcon } from '@/assets/status';
-import { format, fromUnixTime } from 'date-fns';
-import { ProgressContent } from '@/views/proposals';
 import Link from 'next/link';
 
-import { IProposal } from '@/types/index';
+import { IProposal, IFullInfoParam } from '@/types/index';
 import { capitalizeString, parseAddress } from '@/utils/index';
 
 interface IProposalsProps {
   proposalParams: IProposals;
   loading: boolean;
+  proposalsWithNetWorkParams: IFullInfoParam[][];
 }
 
 interface IProposals {
   [index: number]: IProposal;
 }
 
-const Proposals: React.FC<IProposalsProps> = ({ proposalParams, loading }) => {
+const Proposals: React.FC<IProposalsProps> = ({
+  proposalParams,
+  loading,
+  proposalsWithNetWorkParams,
+}) => {
   const TableBody: React.FC<IProposal> = props => {
+    const tooltipRef = useRef<any>(null);
+
+    const renderProposalsNetworkParams = (
+      fullParameters: IFullInfoParam[] | undefined,
+    ) => {
+      if (!fullParameters) {
+        return <></>;
+      }
+      return fullParameters.map((param, index: number) => {
+        if (index < 3) {
+          return (
+            <div
+              key={index}
+              style={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <small>{param.paramText}</small>
+              <br />
+            </div>
+          );
+        }
+        if (index === 3) {
+          return <div key={index}>...</div>;
+        }
+      });
+    };
+
+    const renderProposalsNetworkParamsWithToolTip = () => {
+      if (parameters && proposalsWithNetWorkParams) {
+        return (
+          <Tooltip onMouseOver={(e: any) => handleMouseOver(e)}>
+        {renderProposalsNetworkParams(parameters)}
+        <TooltipText ref={tooltipRef}>
+          {parameters.map((param2, index2) => (
+            <div key={index2}>
+              {param2.paramText}&nbsp;&nbsp;{param2.paramValue}
+            </div>
+          ))}
+        </TooltipText>
+      </Tooltip>
+        )
+      }
+      return <></>
+    }
+
+    const handleMouseOver = (e: any) => {
+      const positionY = e.currentTarget.getBoundingClientRect().top;
+      const positionX = e.currentTarget.getBoundingClientRect().left;
+
+      tooltipRef.current.style.top = positionY - 30 + 'px';
+      tooltipRef.current.style.left = positionX + 'px';
+    };
     const {
       proposalId,
-      description,
       epochStart,
       epochEnd,
       proposalStatus,
       proposer,
       totalStaked,
       votes,
+      parameters,
     } = props;
     const StatusIcon = getStatusIcon(proposalStatus);
+    const precision = 10 ** 6;
 
+    const getPositiveVotes = () => {
+      let parsedPosVotes = votes['0'] / precision;
+      if (parsedPosVotes < 0.000001 || isNaN(parsedPosVotes)) {
+        parsedPosVotes = 0;
+      }
+      if (parsedPosVotes > 1) {
+        return Math.round(parsedPosVotes).toLocaleString();
+      }
+      return parsedPosVotes.toLocaleString();
+    };
+
+    const parseTotalStaked = () => {
+      if (typeof totalStaked === 'number') {
+        return Math.round(totalStaked / precision).toLocaleString();
+      }
+      return <span style={{ color: 'red' }}>Unavailable</span>;
+    };
     return (
-      <>
-        <Row type="proposals">
-          <span>
-            <p>#{proposalId}</p>
-          </span>
-          <ProposerDescAndLink>
-            <Description>{description || ' - '}</Description>
-            <Proposer>Proposer</Proposer>
-            <Link href={`/account/${proposer}`}>
-              <a>{parseAddress(proposer, 8)}</a>
-            </Link>
-          </ProposerDescAndLink>
-          <span>
-            <small>Created Epoch: {epochStart}</small> <p />
-            <small className="endTime">Ended Epoch: {epochEnd}</small>
-          </span>
-          <UpVotes>
-            <p>
-              {votes['0'] / 1000000}\{totalStaked}
-            </p>
-          </UpVotes>
-          <Status status={proposalStatus}>
-            <StatusIcon />
-            <ProposalStatus>{capitalizeString(proposalStatus)}</ProposalStatus>
-          </Status>
-          <span>
-            <Link href={{ pathname: `/proposal/${proposalId}` }}>
-              <a>Details</a>
-            </Link>
-          </span>
-        </Row>
-      </>
+      <Row type="proposals">
+        <span>
+          <p>#{proposalId}</p>
+        </span>
+        <ProposerDescAndLink>
+          <Link href={`/account/${proposer}`}>
+            <a>{parseAddress(proposer, 14)}</a>
+          </Link>
+        </ProposerDescAndLink>
+        <span>
+          <small>Created Epoch: {epochStart}</small> <p />
+          <small className="endTime">Ended Epoch: {epochEnd}</small>
+        </span>
+        <UpVotes>
+          <p>
+            {getPositiveVotes()}/{parseTotalStaked()}
+          </p>
+        </UpVotes>
+        <Status status={proposalStatus}>
+          <StatusIcon />
+          <ProposalStatus>{capitalizeString(proposalStatus)}</ProposalStatus>
+        </Status>
+        <span>
+        {renderProposalsNetworkParamsWithToolTip()}
+        </span>
+        <span>
+          <Link href={{ pathname: `/proposal/${proposalId}` }}>Details</Link>
+        </span>
+      </Row>
     );
   };
 
   const header = [
     'Number',
-    'Proposal Content',
+    'Proposer',
     'Time',
     'Upvotes/Total Staked',
     'Status',
+    'Network Parameters',
     '',
   ];
 

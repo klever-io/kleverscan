@@ -56,8 +56,8 @@ describe('Component: Pagination', () => {
   describe('Static tests', () => {
     beforeEach(() => {
       jest.clearAllMocks();
-      
     });
+    
     afterAll(cleanup);
 
     it('Should change to page 2 when click on right arrow', () => {

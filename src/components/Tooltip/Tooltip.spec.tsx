@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 
 import userEvent from '@testing-library/user-event';
 
@@ -15,18 +15,18 @@ describe('Tooltip', () => {
     const container = renderWithTheme(
       <Tooltip data-testid="tooltipId" msg={message} />,
     ).container;
-    const tooltipController =
+    const tooltipController: any =
       container.firstElementChild?.firstElementChild?.firstElementChild;
     let tooltipMsg = screen.queryByText(message);
     expect(tooltipMsg).not.toBeInTheDocument();
-    waitFor(async () => {
+    await waitFor(async () => {
       await userEvent.hover(tooltipController);
     });
     tooltipMsg = screen.getByText(message);
     expect(tooltipMsg).toBeInTheDocument();
     expect(tooltipMsg?.previousElementSibling?.nodeName).toBe('svg');
 
-    waitFor(async () => {
+    await waitFor(async () => {
       await userEvent.unhover(tooltipController);
     });
     expect(tooltipMsg).not.toBeInTheDocument();

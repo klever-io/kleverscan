@@ -123,7 +123,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
     const cardWatcher = setInterval(async () => {
       const accountsCall = new Promise<IAccountResponse>(
         async (resolve, reject) => {
-          const res = await api.get({
+          const res = await api.getCached({
             route: 'address/list',
           });
 
@@ -194,21 +194,15 @@ const HomeDataCards: React.FC<IDataCards> = ({
                 break;
 
               case 1:
-                setNewAccounts(
-                  value.yesterdayAccounts.data.number_by_day[0].doc_count,
-                );
+                setNewAccounts(value.data.number_by_day[0].doc_count);
                 break;
 
               case 2:
-                setTotalTransactions(
-                  value.transactions.pagination.totalRecords,
-                );
+                setTotalTransactions(value.pagination.totalRecords);
                 break;
 
               case 3:
-                setNewTransactions(
-                  value.yesterdayTransactions.data.number_by_day[0].doc_count,
-                );
+                setNewTransactions(value.data.number_by_day[0].doc_count);
                 break;
 
               default:

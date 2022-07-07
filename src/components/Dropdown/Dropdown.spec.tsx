@@ -2,7 +2,6 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-// import theme from '../../styles/theme';
 import { renderWithTheme } from '../../test/utils';
 
 import Dropdown from './';

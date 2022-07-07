@@ -28,6 +28,11 @@ jest.mock('next/router', () => ({
 }));
 
 describe('Component: Tabs/NetworkParams' , () => {
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+  
   it('Should render the the Table and it\'s Body and header correctly', () => {
     renderWithTheme(
       <NetworkParams loading={false} networkParams={mockedNetWorkParams} />

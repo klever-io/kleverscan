@@ -1,5 +1,4 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
 import Area from './index';
 
 import { renderWithTheme } from '../../../test/utils';

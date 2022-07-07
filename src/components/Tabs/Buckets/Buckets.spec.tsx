@@ -5,7 +5,7 @@ import {screen} from '@testing-library/react'
 
 import Buckets from './';
 import { renderWithTheme } from '../../../test/utils';
-import { parseAddress } from '@/utils/index';
+import { parseAddress } from '../../../utils/index';
 
 describe('Component: Buckets Tab', () => {
   const headerTable = [

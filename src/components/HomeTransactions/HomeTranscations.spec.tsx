@@ -2,31 +2,19 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 
 import theme from '../../styles/theme';
-import { IHomeTransactions } from '../../types'
 
 import HomeTransactions from './';
 import { renderWithTheme } from '../../test/utils';
+import { mockHomeTxs } from '../../test/mocks';
 
-const mockHomeTxs: IHomeTransactions = {
-  setTotalTransactions: jest.fn(),
-  transactions: [],
-  transactionsList: [
-    {
-        doc_count: 9,
-        key: 1652140800000
-    },
-    {
-        doc_count: 32,
-        key: 1652227200000
-    },
-  ],
-  precision: 6,
-  
-}
+mockHomeTxs.setTotalTransactions = jest.fn();
+
+
 
 describe('Component: HomeTransactions', () => {
   let container: HTMLElement;
   beforeEach(() => {
+    jest.clearAllMocks();
     container = renderWithTheme(
     <HomeTransactions 
       setTotalTransactions={jest.fn()}

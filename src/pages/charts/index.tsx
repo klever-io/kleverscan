@@ -29,7 +29,7 @@ interface IBlockStatsResponse {
   totalBurned: number;
   totalMinted: number;
   totalBlockRewards: number;
-  totalTxFees: number;
+  totalTxRewards: number;
 }
 
 interface IBlockStats {
@@ -113,11 +113,10 @@ export const getServerSideProps: GetServerSideProps<ICharts> = async () => {
           burned: stats.totalBurned / 1000000,
           minted: stats.totalMinted / 1000000,
           blocks: stats.totalBlockRewards / 1000000,
-          transactions: stats.totalTxFees / 1000000,
+          transactions: stats.totalTxRewards / 1000000,
         };
       });
   }
-
   return { props };
 };
 

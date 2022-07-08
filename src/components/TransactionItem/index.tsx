@@ -33,6 +33,19 @@ const TransactionItem: React.FC<ITransaction> = ({
     }
   }
 
+  const shouldRenderAssetId = (
+    amount: number,
+    assetId: string | undefined,
+  ): string | null => {
+    if (assetId) {
+      return assetId;
+    }
+    if (amount) {
+      return 'KLV';
+    }
+    return null;
+  };
+
   return (
     <TransactionRow>
       <TransactionData>
@@ -63,7 +76,10 @@ const TransactionItem: React.FC<ITransaction> = ({
         <span>
           {toLocaleFixed(amount / 10 ** precision, precision)}
           <Link href={`/asset/KLV`}>
-            <a className="clean-style"> KLV</a>
+            <a className="clean-style">
+              {' '}
+              {shouldRenderAssetId(parameter.amount, parameter.assetId)}
+            </a>
           </Link>
         </span>
       </TransactionAmount>

@@ -19,6 +19,7 @@ import {
   Title,
   LetterLogo,
   Logo,
+  HoverAnchor,
 } from '@/views/assets/detail';
 
 import api from '@/services/api';
@@ -171,7 +172,7 @@ const Asset: React.FC<IAssetPage> = ({
       return <>--</>;
     }
 
-    return <a href="#">{breakText(uris.Whitepaper, 25)}</a>;
+    return <HoverAnchor href={uris.Whitepaper}>{uris.Whitepaper}</HoverAnchor>;
   };
 
   const getWebsite = () => {
@@ -179,7 +180,7 @@ const Asset: React.FC<IAssetPage> = ({
       return <>--</>;
     }
 
-    return <a href="#">{uris.Website}</a>;
+    return <HoverAnchor href={uris.Website}>{uris.Website}</HoverAnchor>;
   };
 
   const getIssueDate = () => {
@@ -198,7 +199,9 @@ const Asset: React.FC<IAssetPage> = ({
             <strong>Owner</strong>
           </span>
           <span>
-            <Link href={`/account/${ownerAddress}`}>{ownerAddress}</Link>
+            <Link href={`/account/${ownerAddress}`}>
+              <HoverAnchor>
+              {ownerAddress}</HoverAnchor></Link>
           </span>
         </Row>
         <Row>
@@ -258,7 +261,7 @@ const Asset: React.FC<IAssetPage> = ({
       <>
         <Row>
           <span>
-            <strong>White Papper</strong>
+            <strong>White Paper</strong>
           </span>
           <span>{getWhitepaper()}</span>
         </Row>

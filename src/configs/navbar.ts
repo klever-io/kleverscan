@@ -51,11 +51,12 @@ const navbarItems: INavbarItem[] = [
     pathTo: '',
     Icon: Graph,
     pages: [
-      {
-        name: 'Nodes',
-        pathTo: '/nodes',
-        Icon: Compass,
-      },
+      // REMOVE COMMENT WHEN NODES PAGE FIXED
+      // {
+      //   name: 'Nodes',
+      //   pathTo: '/nodes',
+      //   Icon: Compass,
+      // },
       {
         name: 'Proposals',
         pathTo: '/proposals',

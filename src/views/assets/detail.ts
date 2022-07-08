@@ -224,3 +224,10 @@ export const LetterLogo = styled.div`
   font-size: 1.75rem;
   text-transform: uppercase;
 `;
+
+export const HoverAnchor = styled.a`
+&:hover {
+  text-decoration: underline;
+  cursor: pointer;
+} 
+`

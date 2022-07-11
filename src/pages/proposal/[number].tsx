@@ -206,7 +206,7 @@ const ProposalDetails: React.FC<IProposal> = props => {
             if (Number(percentageCard) < 0.01) {
               percentageCard = '0';
             }
-            if (percentageCard.split('.').length > 0) {
+            if (percentageCard?.split('.').length > 0) {
               percentageCard = parseFloat(percentageCard).toPrecision(4);
             }
 

@@ -155,9 +155,9 @@ const DateFilter: React.FC<IDateFilter> = ({
     filterDate(selectedDays);
 
     setInputValue(
-      `${selectedDays.start.toLocaleString().split(',')[0]}${
+      `${selectedDays?.start?.toLocaleString().split(',')[0]}${
         selectedDays.end
-          ? ' - ' + selectedDays.end.toLocaleString().split(',')[0]
+          ? ' - ' + selectedDays?.end?.toLocaleString().split(',')[0]
           : ''
       }`,
     );

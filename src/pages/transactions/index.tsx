@@ -266,11 +266,11 @@ const Transactions: React.FC<ITransactions> = ({
               </Tooltip>
             ) : (
               <>
-              <Tooltip onMouseOver={(e: any) => handleMouseOver(e)}>
-                <Link href={`/asset/KLV`}>
-                  <KLV />
-                </Link>
-                <TooltipText ref={tooltipRef}>KLV</TooltipText>
+                <Tooltip onMouseOver={(e: any) => handleMouseOver(e)}>
+                  <Link href={`/asset/KLV`}>
+                    <KLV />
+                  </Link>
+                  <TooltipText ref={tooltipRef}>KLV</TooltipText>
                 </Tooltip>
               </>
             )}
@@ -681,7 +681,7 @@ const Transactions: React.FC<ITransactions> = ({
         <Link href={`/account/${sender}`}>
           <a className="address">{parseAddress(sender, 16)}</a>
         </Link>
-        <span style={{overflow: "visible"}}>
+        <span style={{ overflow: 'visible' }}>
           <ArrowRight />
         </span>
         <Link href={`/account/${toAddress}`}>
@@ -762,7 +762,7 @@ const Transactions: React.FC<ITransactions> = ({
           <DateFilter {...dateFilterProps} />
         </FilterByDate>
       </Header>
-      <Table {...tableProps}/>
+      <Table {...tableProps} />
       <PaginationContainer>
         <Pagination
           count={count}
@@ -789,15 +789,15 @@ export const getServerSideProps: GetServerSideProps<ITransactions> =
       query: context.query,
     });
     if (!transactions.error) {
-      props.transactions = transactions.data.transactions;
-      props.pagination = transactions.pagination;
+      props.transactions = transactions?.data?.transactions || [];
+      props.pagination = transactions?.pagination || {};
     }
 
     const assets: IAssetResponse = await api.get({
       route: 'assets/kassets',
     });
     if (!assets.error) {
-      props.assets = assets.data.assets;
+      props.assets = assets?.data?.assets || [];
     }
 
     return { props };

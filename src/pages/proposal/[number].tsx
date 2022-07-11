@@ -73,7 +73,8 @@ interface IProposal {
   votingPowers?: any;
   timestampStart: number;
   timestampEnd: number;
-  parameters: IFullInfoParam[];
+  parameters: { [key: string]: string };
+  fullParameters: IFullInfoParam[];
 }
 
 interface IVote {
@@ -151,13 +152,13 @@ const ProposalDetails: React.FC<IProposal> = props => {
           switch (typeVote) {
             case 0:
               tempFilterVoters['Yes'] += qtyVote;
-              tempVotedQty = tempVotedQty + qtyVote;
+              tempVotedQty += qtyVote;
 
               break;
 
             case 1:
               tempFilterVoters['No'] += qtyVote;
-              tempVotedQty = votedQty + qtyVote;
+              tempVotedQty += qtyVote;
               break;
 
             default:
@@ -185,7 +186,7 @@ const ProposalDetails: React.FC<IProposal> = props => {
   };
 
   const renderProposalParams = () => {
-    return proposalAPI?.parameters.map(param => (
+    return proposalAPI?.fullParameters.map(param => (
       <div key={param.paramIndex}>
         <strong>{param.paramText}</strong>
         <span>{param.paramValue}</span>
@@ -228,8 +229,10 @@ const ProposalDetails: React.FC<IProposal> = props => {
       return (
         <TableRow type="votes">
           <span>
-          <Link href={`/account/${voter}`}>
-          <HoverLink><small>{voter}</small></HoverLink>
+            <Link href={`/account/${voter}`}>
+              <HoverLink>
+                <small>{voter}</small>
+              </HoverLink>
             </Link>
           </span>
           <span>
@@ -290,9 +293,11 @@ const ProposalDetails: React.FC<IProposal> = props => {
                 <span>
                   <strong>Proposer </strong>
                 </span>
-                <span style={{marginRight: '0.2rem'}}>
+                <span style={{ marginRight: '0.2rem' }}>
                   <Link href={`/account/${proposalAPI.proposer}`}>
-                    <HoverLink><p>{proposalAPI.proposer}</p></HoverLink>
+                    <HoverLink>
+                      <p>{proposalAPI.proposer}</p>
+                    </HoverLink>
                   </Link>
                 </span>
                 <Tooltip
@@ -306,9 +311,7 @@ const ProposalDetails: React.FC<IProposal> = props => {
                   <strong>Hash</strong>
                 </span>
                 <Link href={`/transaction/${proposalAPI.txHash}`}>
-                  <HoverLink>
-                    {proposalAPI.txHash}
-                  </HoverLink>
+                  <HoverLink>{proposalAPI.txHash}</HoverLink>
                 </Link>
               </Row>
               <Row>
@@ -471,7 +474,7 @@ export const getServerSideProps: GetStaticProps<IProposal> = async ({
 
   props.votingPowers = votingPowers;
   const paramsWithText = getProposalNetworkParams(props.parameters);
-  props.parameters = paramsWithText;
+  props.fullParameters = paramsWithText;
   return { props };
 };
 

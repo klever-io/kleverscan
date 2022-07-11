@@ -330,7 +330,7 @@ const Transactions: React.FC<ITransactions> = ({
 
     return (
       <span>
-        <strong>{formatAmount(parameter.amount / 10 ** precision)} KLV</strong>
+        <strong>{formatAmount(parameter.amount / 10 ** precision)} {parameter.assetId.replace(/['"]+/g, '')}</strong>
       </span>
     );
   };

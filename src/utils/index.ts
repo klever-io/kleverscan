@@ -5,12 +5,13 @@ export const breakText = (text: string, limit: number): string => {
   return text.length > limit ? `${text.substring(0, limit)}...` : text;
 };
 
-export const timestampToDate = (timestamp: number) => {
-  const time = new Date(timestamp);
-  return time.toISOString().slice(0, 10);
+export const timestampToDate = (timestamp: number): string => {
+  const time = new Date(timestamp * 1000);
+
+  return time.toLocaleString();
 };
 
-export const getVariation = (variation: number) => {
+export const getVariation = (variation: number): string => {
   const precision = 2;
 
   if (variation < 0) {

@@ -256,6 +256,7 @@ export const ValidatorConfig: React.FC<IContract> = ({ parameter: par }) => {
 };
 
 export const Freeze: React.FC<IContract> = ({
+  precision,
   sender,
   parameter: par,
   receipts: rec,
@@ -278,7 +279,7 @@ export const Freeze: React.FC<IContract> = ({
           <strong>Amount</strong>
         </span>
         <span>
-          <small>{parameter.amount.toLocaleString()}</small>
+          <small>{(parameter.amount / 10 ** (precision || 0)).toLocaleString()}</small>
         </span>
       </Row>
       <Row>

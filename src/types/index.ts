@@ -394,6 +394,7 @@ export interface IAccount {
   address: string;
   nonce: number;
   balance: number;
+  frozenBalance: number;
   blsPublicKey: string;
   assets: {
     [key: string]: IAccountAsset;

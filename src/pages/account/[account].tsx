@@ -54,7 +54,7 @@ interface IAssetInfo {
 interface IAccountPage {
   account: IAccount;
   transactions: ITransactionsResponse;
-  convertedBalance: number;
+  priceKLV: number;
   precisions: IAssetInfo[];
   assets: IAccountAsset[];
   defaultKlvPrecision: number;
@@ -88,7 +88,7 @@ interface IAllowanceResponse extends IResponse {
 const Account: React.FC<IAccountPage> = ({
   account,
   transactions: transactionResponse,
-  convertedBalance,
+  priceKLV,
   precisions,
   assets,
   defaultKlvPrecision,
@@ -159,30 +159,32 @@ const Account: React.FC<IAccountPage> = ({
     setBuckets(assetBuckets);
   }, [account]);
 
-  const getFreezeBalance = () => {
-    if (Object.values(account.assets).length <= 0) {
-      return 0;
-    }
-
-    const freezeBalance = Object.values(account.assets).reduce(
-      (acc, asset) => acc + asset.frozenBalance,
-      0,
-    );
-
-    return freezeBalance / 10 ** defaultKlvPrecision;
+  const calculateTotalKLV = () => {
+    // does not include Allowance and Staking
+    const available = account.balance;
+    const frozen = account.assets?.KLV?.frozenBalance || 0;
+    const unfrozen = account.assets?.KLV?.unfrozenBalance || 0;
+    return (available + frozen + unfrozen) / 10 ** defaultKlvPrecision;
   };
 
-  const getUnfreezeBalance = () => {
-    if (Object.values(account.assets).length <= 0) {
-      return 0;
-    }
-
-    const unfreezeBalance = Object.values(account.assets).reduce(
-      (acc, asset) => acc + asset.unfrozenBalance,
-      0,
+  const getKLVfreezeBalance = (): number => {
+    return (
+      (account.assets?.KLV?.frozenBalance || 0) / 10 ** defaultKlvPrecision
     );
+  };
 
-    return unfreezeBalance / 10 ** defaultKlvPrecision || 0;
+  const getKLVunfreezeBalance = (): number => {
+    return (
+      (account.assets?.KLV?.unfrozenBalance || 0) / 10 ** defaultKlvPrecision
+    );
+  };
+
+  const getKLVAllowance = (): number => {
+    return (allowance?.data?.allowance || 0) / 10 ** defaultKlvPrecision;
+  };
+
+  const getKLVStaking = (): number => {
+    return (allowance?.data?.stakingRewards || 0) / 10 ** defaultKlvPrecision;
   };
 
   const getTabHeaders = () => {
@@ -294,13 +296,8 @@ const Account: React.FC<IAccountPage> = ({
                   <span>KLV</span>
                 </IconContainer>
                 <div>
-                  <span>
-                    {(
-                      account.balance / 10 ** defaultKlvPrecision +
-                      getFreezeBalance()
-                    ).toLocaleString()}
-                  </span>
-                  <p>USD {convertedBalance.toLocaleString()}</p>
+                  <span>{calculateTotalKLV().toLocaleString()}</span>
+                  <p>USD {(calculateTotalKLV() * priceKLV).toLocaleString()}</p>
                 </div>
               </AmountContainer>
               <FrozenContainer>
@@ -315,11 +312,11 @@ const Account: React.FC<IAccountPage> = ({
                 </div>
                 <div>
                   <strong>Frozen</strong>
-                  <span>{getFreezeBalance().toLocaleString()}</span>
+                  <span>{getKLVfreezeBalance().toLocaleString()}</span>
                 </div>
                 <div>
                   <strong>Unfrozen</strong>
-                  <span>{getUnfreezeBalance().toLocaleString()}</span>
+                  <span>{getKLVunfreezeBalance().toLocaleString()}</span>
                 </div>
               </FrozenContainer>
             </BalanceContainer>
@@ -335,13 +332,11 @@ const Account: React.FC<IAccountPage> = ({
               <FrozenContainer>
                 <div>
                   <strong>Allowance</strong>
-                  <span>{allowance?.data?.allowance.toLocaleString()}</span>
+                  <span>{getKLVAllowance().toLocaleString()}</span>
                 </div>
                 <div>
                   <strong>Staking</strong>
-                  <span>
-                    {allowance?.data?.stakingRewards.toLocaleString()}
-                  </span>
+                  <span>{getKLVStaking().toLocaleString()}</span>
                 </div>
               </FrozenContainer>
             </BalanceContainer>
@@ -378,7 +373,7 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
 }) => {
   const props: IAccountPage = {
     account: {} as IAccount,
-    convertedBalance: 0,
+    priceKLV: 0,
     transactions: {} as ITransactionsResponse,
     precisions: [],
     assets: [],
@@ -395,6 +390,7 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
       address: address,
       nonce: 0,
       balance: 0,
+      frozenBalance: 0,
       allowance: 0,
       permissions: [],
       timestamp: new Date().getTime(),
@@ -461,11 +457,6 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
           } else if (index === 2) {
             props.account = value.data.account;
 
-            if (props.account.assets.KLV) {
-              props.account.assets.KLV.balance =
-                props.account.balance - props.account.assets.KLV.frozenBalance;
-            }
-
             const filterPrecisions = Object.entries(
               value.data.account.assets,
             ).map(
@@ -474,7 +465,6 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
                 precision: asset.precision,
               }),
             );
-
             const precision = 6;
 
             props.precisions = filterPrecisions;
@@ -482,9 +472,7 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
 
             if (responses[0].status !== 'rejected') {
               const prices = responses[0].value;
-              props.convertedBalance =
-                prices.symbols[0].price *
-                (value.data.account.balance / 10 ** precision);
+              props.priceKLV = prices.symbols[0].price;
             }
           }
         } else if (index == 2) {
@@ -503,11 +491,10 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
   });
 
   if (!allowance.error) {
-    allowance.data.allowance = allowance.data.allowance / 10 ** precision;
-    allowance.data.stakingRewards = allowance.data.allowance / 10 ** precision;
+    allowance.data.allowance = allowance.data.allowance;
+    allowance.data.stakingRewards = allowance.data.allowance;
     props.allowance = allowance;
   }
-
   return { props };
 };
 

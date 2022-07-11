@@ -92,6 +92,7 @@ export const CreateAsset: React.FC<IContract> = ({
   const parameter = par as ICreateAssetContract;
   const receipts = rec as ICreateAssetReceipt[];
   const ownerAddress = parameter?.ownerAddress || sender;
+  const assetId = findKey(receipts, 'assetId');
 
   return (
     <>
@@ -99,7 +100,7 @@ export const CreateAsset: React.FC<IContract> = ({
         <span>
           <strong>Asset ID</strong>
         </span>
-        <span>{findKey(receipts, 'assetId')}</span>
+        <Link href={`/asset/${assetId}`}>{assetId}</Link>
       </Row>
       <Row>
         <span>

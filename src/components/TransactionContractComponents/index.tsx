@@ -92,6 +92,7 @@ export const CreateAsset: React.FC<IContract> = ({
   const parameter = par as ICreateAssetContract;
   const receipts = rec as ICreateAssetReceipt[];
   const ownerAddress = parameter?.ownerAddress || sender;
+  const assetId = findKey(receipts, 'assetId');
 
   return (
     <>
@@ -99,7 +100,7 @@ export const CreateAsset: React.FC<IContract> = ({
         <span>
           <strong>Asset ID</strong>
         </span>
-        <span>{findKey(receipts, 'assetId')}</span>
+        <Link href={`/asset/${assetId}`}>{assetId}</Link>
       </Row>
       <Row>
         <span>
@@ -255,6 +256,7 @@ export const ValidatorConfig: React.FC<IContract> = ({ parameter: par }) => {
 };
 
 export const Freeze: React.FC<IContract> = ({
+  precision,
   sender,
   parameter: par,
   receipts: rec,
@@ -277,7 +279,7 @@ export const Freeze: React.FC<IContract> = ({
           <strong>Amount</strong>
         </span>
         <span>
-          <small>{parameter.amount.toLocaleString()}</small>
+          <small>{(parameter.amount / 10 ** (precision || 0)).toLocaleString()}</small>
         </span>
       </Row>
       <Row>

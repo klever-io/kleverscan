@@ -69,6 +69,8 @@ export const getHost = (
     urlParam = `?${buildUrlQuery(query)}`;
   }
 
+  console.log(`${host}/${route}${urlParam}`);
+
   return `${host}/${route}${urlParam}`;
 };
 

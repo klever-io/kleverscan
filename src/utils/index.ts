@@ -5,12 +5,13 @@ export const breakText = (text: string, limit: number): string => {
   return text.length > limit ? `${text.substring(0, limit)}...` : text;
 };
 
-export const timestampToDate = (timestamp: number) => {
-  const time = new Date(timestamp);
-  return time.toISOString().slice(0, 10);
+export const timestampToDate = (timestamp: number): string => {
+  const time = new Date(timestamp * 1000);
+
+  return time.toLocaleString();
 };
 
-export const getVariation = (variation: number) => {
+export const getVariation = (variation: number): string => {
   const precision = 2;
 
   if (variation < 0) {
@@ -49,8 +50,8 @@ export const getAge = (date: Date): string => {
 };
 
 export const typeVoteColors = {
-  'Yes': '#B039BF',
-  'No': '#FF4A4A',
+  Yes: '#B039BF',
+  No: '#FF4A4A',
 };
 
 export const formatAmount = (number: number): string => {
@@ -178,7 +179,7 @@ const plural = (count: number, singular: string): string => {
 
 export const addCommasToNumber = (numb: number): string => {
   return numb.toLocaleString();
-}
+};
 
 export const formatLabel = (str: string) => {
   switch (str) {
@@ -206,9 +207,9 @@ export const formatLabel = (str: string) => {
 
   let formatedstr = str.charAt(0).toUpperCase() + str.slice(1);
   let label = '';
-  formatedstr.split(/(?=[A-Z])/).forEach((item: string, index: number) => {
+  formatedstr?.split(/(?=[A-Z])/).forEach((item: string, index: number) => {
     label += item;
-    if (index < formatedstr.split(/(?=[A-Z])/).length - 1) {
+    if (index < formatedstr?.split(/(?=[A-Z])/).length - 1) {
       label += ' ';
     }
   });
@@ -241,7 +242,7 @@ export const changeObject = (
           obj[item][0] !== null &&
           !Array.isArray(obj[item][0])
         ) {
-          searchType(Object.keys(obj[item][0]), field)
+          searchType(Object.keys(obj[item][0]), field);
         }
       }
     });

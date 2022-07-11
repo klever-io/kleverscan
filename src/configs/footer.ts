@@ -62,7 +62,7 @@ const contents: IContent[] = [
         name: 'WhitePaper',
         href: 'https://bc.klever.finance/wp',
       },
-      { name: 'Trading Fees', href: 'https://klever.io/trading-fees' },
+      { name: 'Trading Fees', href: 'https://klever.io/en/fees' },
       { name: 'Token List', href: 'https://klever.io/markets' },
     ],
   },

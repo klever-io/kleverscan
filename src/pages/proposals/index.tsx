@@ -64,7 +64,7 @@ const Proposals: React.FC<IProposalsPage> = ({
     setLoadingProposals(true);
 
     const proposals: IProposalsResponse = await api.get({
-      route: `proposals/list'${page}`,
+      route: `proposals/list?page=${page}`,
     });
 
     if (!proposals.code) {

@@ -19,7 +19,12 @@ const Map = dynamic(() => import('@/components/Map/index'), { ssr: false });
 
 import NodeCards from '@/components/Cards/NodeCards';
 
-import { ICountriesGeoData, ICountryNode, INodeCard, IPeerData } from '../../types';
+import {
+  ICountriesGeoData,
+  ICountryNode,
+  INodeCard,
+  IPeerData,
+} from '../../types';
 
 import { ArrowLeft } from '@/assets/icons';
 import { Nodes as Icon } from '@/assets/title-icons';
@@ -101,7 +106,6 @@ const Nodes: React.FC<INodePage> = ({ nodes, cardData }) => {
 
 export const getServerSideProps: GetServerSideProps = async () => {
   /* eslint-disable */
-  const geoip = require('geoip-lite');
   const geojson2svg = require('geojson2svg');
   const getBounds = require('svg-path-bounds');
 
@@ -115,52 +119,33 @@ export const getServerSideProps: GetServerSideProps = async () => {
   if (!statistics.error) {
     peers = statistics.data?.peers;
   }
+
   const nodes: ICountryNode[] = [];
 
   for (let i = 0; i < peers.length; i++) {
-    const { addresses } = peers[i];
-    const filteredAddresses = addresses.filter((item, pos, self) => {
-      return (
-        self.indexOf(item) === pos &&
-        !item.startsWith('/ip4/127.0.0.1') &&
-        !item.startsWith('/ip4/10.') &&
-        !item.startsWith('/ip4/172.16.') &&
-        !item.startsWith('/ip4/172.17.') &&
-        !item.startsWith('.255/tcp')
-      );
-    });
+    if (peers[i].geolocation) {
+      peers[i].geolocation.forEach(geo => {
+        const { country, ll } = geo;
 
-    for (const address of filteredAddresses) {
-      // IP comes as /ip4/xx.xx.x.xx/tcp/xxxxx
-      const cleanIp = address.replace(/\/ip4\/|\/tcp\/[^\/]*$/g, '');
+        const countryNodeIndex = nodes.findIndex(c => c.country === country);
 
-      const geo: IGeoIPLookup = geoip.lookup(cleanIp);
-      if (geo === null) continue;
-
-      // TODO: manually allocate node
-      if (cleanIp == '35.200.204.226') {
-        geo.country = 'IN';
-        geo.ll[0] = 19.07;
-        geo.ll[1] = 72.88;
-      }
-
-      const { country, ll } = geo;
-
-      const countryNodeIndex = nodes.findIndex(c => c.country === country);
-      if (countryNodeIndex === -1) {
-        nodes.push({
-          country,
-          nodes: [{
+        if (countryNodeIndex === -1) {
+          nodes.push({
+            country,
+            nodes: [
+              {
+                data: peers[i],
+                coordenates: [ll],
+              },
+            ],
+          });
+        } else {
+          nodes[countryNodeIndex].nodes.push({
             data: peers[i],
             coordenates: [ll],
-          }],
-        });
-      } else {
-        nodes[countryNodeIndex].nodes.push({
-          data: peers[i],
-          coordenates: [ll],
-        });
-      }
+          });
+        }
+      });
     }
   }
 

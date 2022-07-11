@@ -45,10 +45,26 @@ export const InputContainer = styled.div<IInput>`
     margin-top: .8rem;
   }
 
-  input {
+  input, textarea {
     border: 1px solid gray;
     border-radius: 5px;
     padding: 10px;
+  }
+
+  textarea {
+    margin-top: 4px;
+    min-height: 10rem;
+  }
+`;
+
+export const AdvancedHeader = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+
+  span {
+    font-size: 0.9rem;
   }
 `;
 

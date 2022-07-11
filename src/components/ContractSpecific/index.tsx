@@ -7,6 +7,7 @@ import { core, sendTransaction, TransactionType } from '@klever/sdk';
 import { toast } from 'react-toastify';
 import { getNonce, getType, precisionParse } from './utils';
 import { formatLabel } from '../../utils/index';
+import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io';
 
 import {
   AddButton,
@@ -25,6 +26,7 @@ import {
   LoadingContainer,
   SelectContainer,
   MainContainer,
+  AdvancedHeader,
 } from './styles';
 import React from 'react';
 
@@ -57,7 +59,9 @@ const ContractSpecific: React.FC<any> = () => {
   const [mapValues, setMapValues] = useState({});
   const [selectedContractType, setSelectedContractType] = useState<any>({});
   const [loading, setLoading] = useState(false);
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [data, setData] = useState('');
 
   useEffect(() => {
     setContractValues({ ...formSelected });
@@ -816,6 +820,26 @@ const ContractSpecific: React.FC<any> = () => {
           <FormContainer>
             <>
               {renderCompound(formSelected)}
+              <SubFormContainer>
+                <AdvancedHeader
+                  onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
+                >
+                  <span>Advanced Options</span>
+                  {showAdvancedOptions ? (
+                    <IoMdArrowDropup size={20} />
+                  ) : (
+                    <IoMdArrowDropdown size={20} />
+                  )}
+                </AdvancedHeader>
+                {showAdvancedOptions && (
+                  <CompoundContainer>
+                    <b>Data</b>
+                    <InputContainer isCheckbox={false}>
+                      <textarea onChange={e => setData(e.target.value)} />
+                    </InputContainer>
+                  </CompoundContainer>
+                )}
+              </SubFormContainer>
               <SubmitButton>
                 <div onClick={() => handleSubmit()}>Create Transaction</div>
               </SubmitButton>

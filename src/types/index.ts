@@ -394,6 +394,7 @@ export interface IAccount {
   address: string;
   nonce: number;
   balance: number;
+  frozenBalance: number;
   blsPublicKey: string;
   assets: {
     [key: string]: IAccountAsset;
@@ -529,11 +530,17 @@ export interface ICountryNode {
   nodes: INodePeer[];
 }
 
+export interface IGeolocation {
+  country: ISO2;
+  ll: [number, number];
+}
+
 export interface IPeerData {
   isblacklisted: boolean;
   pid: string;
   pk: string;
   peertype: string;
+  geolocation: IGeolocation[];
   addresses: string[];
 }
 

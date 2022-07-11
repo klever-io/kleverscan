@@ -25,7 +25,7 @@ describe('Homepage interaction', () => {
       .parent().parent().next()
       .children().last().click();
   
-    cy.wait(200);
+    cy.wait(400);
     cy.get('span').contains('Finance').click();
     cy.url().should('eq', `${BASE_URL}/asset/KFI`);
   });
@@ -90,18 +90,23 @@ describe('Homepage interaction', () => {
 
     cy.contains('Blocks').click();
     cy.url().should('eq', `${BASE_URL}/blocks`);
+    cy.wait(400);
 
     cy.contains('Accounts').click();
     cy.url().should('eq', `${BASE_URL}/accounts`);
+    cy.wait(400);
 
     cy.contains('Transactions').click();
     cy.url().should('eq', `${BASE_URL}/transactions`);
+    cy.wait(400);
 
     cy.contains('Assets').click();
     cy.url().should('eq', `${BASE_URL}/assets`);
+    cy.wait(400);
 
     cy.contains('Validators').click();
     cy.url().should('eq', `${BASE_URL}/validators`);
+    cy.wait(400);
 
   });
 
@@ -155,8 +160,8 @@ describe('Homepage interaction', () => {
 
   it('Should redirect to account details page when click on any account (To)', () => {
     cy.visit('/');
+    cy.get(':nth-child(2) > .clean-style').contains(/^[a-z]/).click();
 
-    cy.get('strong').contains('To:').next().click();
     cy.location().should(url => {
       const address = url.href.split('account/')[1];
       expect(url.href).to.include(`${BASE_URL}/account/`);

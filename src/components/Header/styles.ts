@@ -120,8 +120,7 @@ export const DesktopContainer = styled.div`
   display: flex;
 
   flex-direction: row;
-  justify-content: space-around;
-
+  justify-content: space-between;
   width: 100%;
   gap: 1.5rem;
 

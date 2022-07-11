@@ -13,7 +13,7 @@ export interface INavbarItem {
   pathTo: string;
   Icon: any;
   onClick?(): void;
-  pages?: INavbarItem[]
+  pages?: INavbarItem[];
 }
 
 export const heightLimit = 70; // pixels

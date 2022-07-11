@@ -19,6 +19,7 @@ import {
   Title,
   LetterLogo,
   Logo,
+  HoverAnchor,
 } from '@/views/assets/detail';
 
 import api from '@/services/api';
@@ -166,12 +167,20 @@ const Asset: React.FC<IAssetPage> = ({
     fetchData();
   }, [holdersPage]);
 
+  const renderLogo = () => {
+    const regex = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
+    if (regex.test(asset.logo)) {
+      return <Logo alt={`${name}-logo`} src={asset.logo} />;
+    }
+    return <LetterLogo>{asset?.ticker?.split('')[0]}</LetterLogo>;
+  };
+
   const getWhitepaper = () => {
     if (!uris || !uris.Whitepaper) {
       return <>--</>;
     }
 
-    return <a href="#">{breakText(uris.Whitepaper, 25)}</a>;
+    return <HoverAnchor href={uris.Whitepaper}>{uris.Whitepaper}</HoverAnchor>;
   };
 
   const getWebsite = () => {
@@ -179,7 +188,7 @@ const Asset: React.FC<IAssetPage> = ({
       return <>--</>;
     }
 
-    return <a href="#">{uris.Website}</a>;
+    return <HoverAnchor href={uris.Website}>{uris.Website}</HoverAnchor>;
   };
 
   const getIssueDate = () => {
@@ -198,7 +207,9 @@ const Asset: React.FC<IAssetPage> = ({
             <strong>Owner</strong>
           </span>
           <span>
-            <Link href={`/account/${ownerAddress}`}>{ownerAddress}</Link>
+            <Link href={`/account/${ownerAddress}`}>
+              <HoverAnchor>{ownerAddress}</HoverAnchor>
+            </Link>
           </span>
         </Row>
         <Row>
@@ -258,7 +269,7 @@ const Asset: React.FC<IAssetPage> = ({
       <>
         <Row>
           <span>
-            <strong>White Papper</strong>
+            <strong>White Paper</strong>
           </span>
           <span>{getWhitepaper()}</span>
         </Row>
@@ -376,12 +387,12 @@ const Asset: React.FC<IAssetPage> = ({
           <div onClick={() => router.push('/assets')}>
             <ArrowLeft />
           </div>
-          <AssetLogo 
-          LetterLogo={LetterLogo}
-          Logo={Logo}
-          logo={logo}
-          ticker={ticker}
-          name={name}
+          <AssetLogo
+            LetterLogo={LetterLogo}
+            Logo={Logo}
+            logo={logo}
+            ticker={ticker}
+            name={name}
           />
           <AssetTitle>
             <h1>
@@ -484,15 +495,15 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
           } else if (index === 1) {
             const transactions: any = res.value;
 
-            props.transactions = transactions.data.transactions;
-            props.totalTransactions = transactions.pagination.totalRecords;
-            props.totalTransactionsPage = transactions.pagination.totalPages;
+            props.transactions = transactions?.data?.transactions;
+            props.totalTransactions = transactions?.pagination?.totalRecords;
+            props.totalTransactionsPage = transactions?.pagination?.totalPages;
           } else if (index === 2) {
             const holders: any = res.value;
 
-            props.holders = holders.data.accounts;
-            props.totalHoldersPage = holders.pagination.totalPages;
-            props.totalRecords = holders.pagination.totalRecords;
+            props.holders = holders?.data?.accounts || 0;
+            props.totalHoldersPage = holders?.pagination?.totalPages || 0;
+            props.totalRecords = holders?.pagination?.totalRecords || 0;
           }
         } else if (index == 0) {
           return redirectProps;

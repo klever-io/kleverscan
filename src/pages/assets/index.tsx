@@ -61,6 +61,18 @@ const Assets: React.FC<IAssetPage> = ({
     fetchData();
   }, [page]);
 
+  const renderLogo = (logo: string, ticker: string, name: string) => {
+    const regex = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
+    if (
+      regex.test(logo) ||
+      logo === 'https://bc.klever.finance/logo_klv' ||
+      logo === 'https://bc.klever.finance/logo_kfi'
+    ) {
+      return <Logo alt={`${name}-logo`} src={logo} />;
+    }
+    return <LetterLogo>{ticker?.split('')[0]}</LetterLogo>;
+  };
+
   const TableBody: React.FC<IAsset> = ({
     ticker,
     name,
@@ -87,13 +99,15 @@ const Assets: React.FC<IAssetPage> = ({
     return (
       <Row type="assetsPage">
         <Link href={`/asset/${assetId}`}>
-        <a><AssetLogo 
-          LetterLogo={LetterLogo}
-          Logo={Logo}
-          logo={logo}
-          ticker={ticker}
-          name={name}
-          /></a>
+          <a>
+            <AssetLogo
+              LetterLogo={LetterLogo}
+              Logo={Logo}
+              logo={logo}
+              ticker={ticker}
+              name={name}
+            />
+          </a>
         </Link>
 
         <Link href={`/asset/${assetId}`}>

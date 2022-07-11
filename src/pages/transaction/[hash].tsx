@@ -164,7 +164,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
           />
         );
       case Contract.Freeze:
-        return <Freeze {...parsedContract} receipts={receipts} />;
+        return <Freeze {...parsedContract} precision={precision} receipts={receipts} />;
       case Contract.Unfreeze:
         return <Unfreeze {...parsedContract} receipts={receipts} />;
       case Contract.Delegate:
@@ -399,7 +399,6 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
 
     precision = contract.precision;
   }
-
   const props: ITransactionPage = {
     transaction: transaction.data.transaction,
     precision,

@@ -20,7 +20,6 @@
     "@types/react-leaflet-markercluster": "^3.0.0",
     "babel-plugin-inline-react-svg": "^2.0.1",
     "date-fns": "^2.23.0",
-    "geoip-lite": "^1.4.2",
     "geojson2svg": "^1.2.9",
     "ioredis": "^4.28.2",
     "leaflet": "^1.7.1",

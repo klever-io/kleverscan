@@ -376,7 +376,7 @@ export const getServerSideProps: GetStaticProps<IBlockPage> = async ({
 
   if (!transactions.error) {
     props.transactions = transactions.data.transactions;
-    props.totalPagesTransactions = transactions.pagination.totalPages;
+    props.totalPagesTransactions = transactions?.pagination?.totalPages || 0;
   }
 
   return { props };

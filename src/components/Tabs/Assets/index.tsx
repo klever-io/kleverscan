@@ -44,7 +44,7 @@ const Assets: React.FC<IAssets> = ({ assets }) => {
     balance,
     frozenBalance,
   }) => {
-    const ticker = assetId.split('-')[0];
+    const ticker = assetId?.split('-')[0];
     return (
       <Row type="assets">
         <span>

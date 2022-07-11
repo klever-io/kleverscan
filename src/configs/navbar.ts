@@ -13,7 +13,7 @@ export interface INavbarItem {
   pathTo: string;
   Icon: any;
   onClick?(): void;
-  pages?: INavbarItem[]
+  pages?: INavbarItem[];
 }
 
 export const heightLimit = 70; // pixels
@@ -51,12 +51,11 @@ const navbarItems: INavbarItem[] = [
     pathTo: '',
     Icon: Graph,
     pages: [
-      // REMOVE COMMENT WHEN NODES PAGE FIXED
-      // {
-      //   name: 'Nodes',
-      //   pathTo: '/nodes',
-      //   Icon: Compass,
-      // },
+      {
+        name: 'Nodes',
+        pathTo: '/nodes',
+        Icon: Compass,
+      },
       {
         name: 'Proposals',
         pathTo: '/proposals',

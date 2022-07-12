@@ -35,6 +35,11 @@ export enum Service {
   EXPLORER,
 }
 
+export interface IContractOption {
+  value: string;
+  label: string;
+}
+
 export interface ITransferContract {
   amount: number;
   toAddress: string;
@@ -834,4 +839,34 @@ export interface IProposalsMessages {
   MaxBucketSize: string;
   LeaderValidatorRewardsPercentage: string;
   ProposalMaxEpochsDuration: string;
+}
+
+interface IInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  span?: number;
+  type?: string;
+
+  array?: boolean;
+  length?: number;
+  options?: {
+    label: string;
+    value: any;
+  }[];
+  toggleOptions?: [string, string];
+  bool?: boolean;
+  required?: boolean;
+  innerSection?: ISection;
+  selectPlaceholder?: string;
+  tooltip?: string;
+}
+
+export interface IFormField {
+  label: string;
+  props?: IInputProps;
+}
+
+export interface ISection {
+  title?: string;
+  inner?: boolean;
+  innerPath?: string;
+  fields: IFormField[];
 }

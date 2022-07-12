@@ -61,8 +61,6 @@ const precisionParse = async (
   payload: any,
   contractType: string,
 ): Promise<any> => {
-  console.log(contractType);
-
   let precision: number;
   let assetId: string;
   const KLVPecision = 10 ** 6; // Also used for KFI

@@ -6,7 +6,7 @@ import { Container, Header, Title } from '@/views/assets';
 
 import { ArrowLeft } from '@/assets/icons';
 import { Transactions as Icon } from '@/assets/title-icons';
-import ContractSpecific from '@/components/ContractSpecific';
+import Contract from '@/components/Contract';
 
 const CreateTransaction: React.FC<any> = () => {
   const router = useRouter();
@@ -31,7 +31,7 @@ const CreateTransaction: React.FC<any> = () => {
         </Title>
       </Header>
 
-      <ContractSpecific />
+      <Contract />
     </Container>
   );
 };

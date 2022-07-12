@@ -1,5 +1,4 @@
-import { IAsset, IParsedMetrics, IEpochInfo } from '../types';
-import { contracts } from '../components/ContractSpecific/contracts';
+import { IAsset, IParsedMetrics, IEpochInfo, IContractOption } from '../types';
 
 export const breakText = (text: string, limit: number): string => {
   return text.length > limit ? `${text.substring(0, limit)}...` : text;
@@ -181,6 +180,41 @@ export const addCommasToNumber = (numb: number): string => {
   return numb.toLocaleString();
 };
 
+export const parseData = (data: any) => {
+  const dataEntries = Object.entries(data);
+
+  dataEntries.forEach(([key, value]) => {
+    if (value === '') {
+      delete data[key];
+    } else if (typeof value === 'object') {
+      parseData(value);
+    } else if (
+      typeof value === 'string' &&
+      new RegExp(
+        '^((19|20)\\d\\d)[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])',
+      ).test(value)
+    ) {
+      data[key] = new Date(value).getTime() / 1000;
+    } else if (isNaN(value as any)) {
+      switch (value) {
+        case 'true':
+          data[key] = true;
+          break;
+        case 'false':
+          data[key] = false;
+          break;
+        default:
+          data[key] = value;
+          break;
+      }
+    } else {
+      data[key] = Math.floor(Number(value));
+    }
+  });
+
+  return data;
+};
+
 export const formatLabel = (str: string) => {
   switch (str) {
     case 'assetID':
@@ -217,85 +251,97 @@ export const formatLabel = (str: string) => {
   return label;
 };
 
-export const changeObject = (
-  obj: any,
-  key: any,
-  value: any,
-  lastParent: any = '',
-  parent: any = '',
-) => {
-  let type = '';
-
-  const searchType = (obj: any, field: string) => {
-    Object.keys(obj).forEach(item => {
-      if (item === field) {
-        type = typeof obj[item];
-      } else if (
-        typeof obj[item] === 'object' &&
-        obj[item] !== null &&
-        !Array.isArray(obj[item])
-      ) {
-        searchType(obj[item], field);
-      } else if (Array.isArray(obj[item])) {
-        if (
-          typeof obj[item][0] === 'object' &&
-          obj[item][0] !== null &&
-          !Array.isArray(obj[item][0])
-        ) {
-          searchType(Object.keys(obj[item][0]), field);
-        }
-      }
-    });
-  };
-
-  searchType(contracts, key);
-
-  Object.keys(obj).map((item: any) => {
-    if (item === key) {
-      if (parent !== '' && parent) {
-        if (lastParent === parent) {
-          if (value === '') {
-            if (type === 'number') {
-              obj[item] = null;
-            } else {
-              obj[item] = '';
-            }
-          } else {
-            if (typeof value === 'boolean') {
-              obj[item] = Boolean(value);
-            } else if (!isNaN(Number(value)) && value.length !== 0) {
-              obj[item] = Number(value);
-            } else {
-              obj[item] = value;
-            }
-          }
-        }
-      } else {
-        if (value === '') {
-          if (type === 'number') {
-            obj[item] = null;
-          } else {
-            obj[item] = '';
-          }
-        } else {
-          if (typeof value === 'boolean') {
-            obj[item] = Boolean(value);
-          } else if (!isNaN(Number(value)) && value.length !== 0) {
-            obj[item] = Number(value);
-          } else {
-            obj[item] = value;
-          }
-        }
-      }
-    }
-    if (
-      typeof obj[item] === 'object' &&
-      !Array.isArray(obj[item]) &&
-      obj[item] !== null
-    ) {
-      if (parent) {
-        changeObject(obj[item], key, value, item, parent);
-      }
-    }
-  });
-};
+export const contractOptions: IContractOption[] = [
+  {
+    label: 'Transfer',
+    value: 'TransferContract',
+  },
+  {
+    label: 'Create Asset',
+    value: 'CreateAssetContract',
+  },
+  {
+    label: 'Create Validator',
+    value: 'CreateValidatorContract',
+  },
+  {
+    label: 'Validator Config',
+    value: 'ValidatorConfigContract',
+  },
+  {
+    label: 'Freeze',
+    value: 'FreezeContract',
+  },
+  {
+    label: 'Unfreeze',
+    value: 'UnfreezeContract',
+  },
+  {
+    label: 'Delegate',
+    value: 'DelegateContract',
+  },
+  {
+    label: 'Undelegate',
+    value: 'UndelegateContract',
+  },
+  {
+    label: 'Withdraw',
+    value: 'WithdrawContract',
+  },
+  {
+    label: 'Claim',
+    value: 'ClaimContract',
+  },
+  {
+    label: 'Unjail',
+    value: 'UnjailContract',
+  },
+  {
+    label: 'Asset Trigger',
+    value: 'AssetTriggerContract',
+  },
+  {
+    label: 'Set Account Name',
+    value: 'SetAccountNameContract',
+  },
+  {
+    label: 'Proposal',
+    value: 'ProposalContract',
+  },
+  {
+    label: 'Vote',
+    value: 'VoteContract',
+  },
+  {
+    label: 'Config ITO',
+    value: 'ConfigITOContract',
+  },
+  {
+    label: 'Set ITO Prices',
+    value: 'SetITOPricesContract',
+  },
+  {
+    label: 'Buy',
+    value: 'BuyContract',
+  },
+  {
+    label: 'Sell',
+    value: 'SellContract',
+  },
+  {
+    label: 'Cancel Market Order',
+    value: 'CancelMarketOrderContract',
+  },
+  {
+    label: 'Create Marketplace',
+    value: 'CreateMarketplaceContract',
+  },
+  {
+    label: 'Config Marketplace',
+    value: 'ConfigMarketplaceContract',
+  },
+  {
+    label: 'Update Account Permission',
+    value: 'UpdateAccountPermissionContract',
+  },
+];

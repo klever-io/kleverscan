@@ -18,6 +18,8 @@
     "@klever/sdk": "^2.2.0",
     "@types/ioredis": "^4.28.2",
     "@types/react-leaflet-markercluster": "^3.0.0",
+    "@unform/core": "^2.1.6",
+    "@unform/web": "^2.1.6",
     "babel-plugin-inline-react-svg": "^2.0.1",
     "date-fns": "^2.23.0",
     "geojson2svg": "^1.2.9",

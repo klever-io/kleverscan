@@ -9,6 +9,18 @@ const theme = {
   rose: '#EE3F71', // TODO: outdated
   purple: '#7D3FF1', // TODO: outdated
   gray: '#EBEBEB', // TODO: outdated
+  error: '#9E1313',
+
+  status: {
+    done: '#58925A',
+    error: '#AA4247',
+    pending: '#9D9932',
+  },
+
+  form: {
+    background: '#FFFFFF',
+    sectionTitle: '#7B7DB2',
+  },
 
   navbar: {
     background: '#0B0B1E',

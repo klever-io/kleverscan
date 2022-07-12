@@ -67,7 +67,7 @@ const PermissionsForm: React.FC = () => {
 
       {signerQuantities.map((itemsQuantity, index) => {
         return (
-          <FormSection inner>
+          <FormSection inner key={String(index)}>
             <SectionTitle>Permission</SectionTitle>
             <FormInput
               title="Permission Name"

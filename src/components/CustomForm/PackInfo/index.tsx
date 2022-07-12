@@ -83,7 +83,7 @@ const PackInfoForm: React.FC = () => {
 
       {packItemQuantities.map((itemsQuantity, index) => {
         return (
-          <FormSection inner>
+          <FormSection inner key={String(index)}>
             <SectionTitle>Pack</SectionTitle>
             <FormInput
               title="Pack Currency ID"

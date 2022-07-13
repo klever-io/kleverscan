@@ -58,7 +58,7 @@ const getPrecision = async (asset: string): Promise<number> => {
 };
 
 const precisionParse = async (
-  payload: any,
+  payload: { [key: string]: any },
   contractType: string,
 ): Promise<any> => {
   let precision: number;

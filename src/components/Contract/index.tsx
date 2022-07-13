@@ -27,7 +27,7 @@ import PackInfoForm from '../CustomForm/PackInfo';
 import PermissionsForm from '../CustomForm/Permissions';
 import { getNonce, getType, precisionParse } from './utils';
 
-const Contract = () => {
+const Contract: React.FC = () => {
   // const sdk = useSdk();
 
   const [open, setOpen] = useState(false);

@@ -4,7 +4,7 @@ const getNonce = async (address: string): Promise<number> => {
   const request = await fetch(
     `${
       process.env.DEFAULT_NODE_HOST || 'https://node.mainnet.klever.finance'
-    }/address/${address}`,
+    }/address/${address}/nonce`,
     {
       method: 'GET',
       headers: {
@@ -15,7 +15,7 @@ const getNonce = async (address: string): Promise<number> => {
 
   const response = await request.json();
 
-  return response.data.account.Nonce;
+  return response.data.nonce;
 };
 
 const getType = (rawType: string): TransactionType => {

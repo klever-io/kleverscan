@@ -345,3 +345,62 @@ export const contractOptions: IContractOption[] = [
     value: 'UpdateAccountPermissionContract',
   },
 ];
+
+export const assetTriggerTypes = [
+  {
+    label: 'Mint (0)',
+    value: 0,
+  },
+  {
+    label: 'Burn (1)',
+    value: 1,
+  },
+  {
+    label: 'Wipe (2)',
+    value: 2,
+  },
+  {
+    label: 'Pause (3)',
+    value: 3,
+  },
+  {
+    label: 'Resume (4)',
+    value: 4,
+  },
+  {
+    label: 'Change Owner (5)',
+    value: 5,
+  },
+  {
+    label: 'Add Role (6)',
+    value: 6,
+  },
+  {
+    label: 'Remove Role (7)',
+    value: 7,
+  },
+  {
+    label: 'Update Metadata (8)',
+    value: 8,
+  },
+  {
+    label: 'Stop NFT Mint (9)',
+    value: 9,
+  },
+  {
+    label: 'Update Logo (10)',
+    value: 10,
+  },
+  {
+    label: 'Update URIs (11)',
+    value: 11,
+  },
+  {
+    label: 'Change Royalties Receiver (12)',
+    value: 12,
+  },
+  {
+    label: 'Update Staking (13)',
+    value: 13,
+  },
+];

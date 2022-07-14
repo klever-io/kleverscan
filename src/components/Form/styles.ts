@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components';
+import { lighten, transparentize } from 'polished';
 import { Form } from '@unform/web';
 
 interface IButton {
@@ -25,18 +26,15 @@ export const FormSection = styled.div<{ inner?: boolean }>`
     padding-top: 5rem;
   }
 
+  border: 0.2px solid ${({ theme }) => theme.input.border};
+  box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.8, '#000')};
+
   background-color: ${props => props.theme.form.background};
   ${props =>
     props.inner &&
     css`
-      filter: brightness(90%);
+      filter: brightness(97%);
       grid-column: auto / span 2;
-      /* button {
-        filter: brightness(0.75);
-        &:hover {
-          filter: brightness(0.85);
-        }
-      } */
     `}
 
   @media screen and (max-width: 768px) {

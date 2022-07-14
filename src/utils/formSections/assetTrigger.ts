@@ -6,7 +6,6 @@ const assetTriggerContract = (): ISection[] => {
   section.push(
     {
       fields: [
-        { label: 'Trigger Type', props: { type: 'number', required: true } },
         { label: 'AssetID', props: { required: true } },
         { label: 'Receiver', props: { required: true } },
         { label: 'Amount', props: { type: 'number', required: true } },

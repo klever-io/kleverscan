@@ -1,5 +1,4 @@
 import { Scope } from '@unform/core';
-import Button from 'components/Button';
 import FormInput from 'components/Form/FormInput';
 import {
   ButtonContainer,
@@ -9,7 +8,7 @@ import {
 import { useState } from 'react';
 
 const PermissionsForm: React.FC = () => {
-  const [signerQuantities, setSignerQuantities] = useState<number[]>([1]);
+  const [signerQuantities, setSignerQuantities] = useState<number[]>([]);
 
   const handleAddSigner = (index: number) => {
     const newSignerQuantities = [...signerQuantities];
@@ -40,8 +39,8 @@ const PermissionsForm: React.FC = () => {
         <Scope path={`permission[${outerIndex}].signer[${innerIndex}]`}>
           <FormSection inner>
             <SectionTitle>Signer</SectionTitle>
-            <FormInput title="Address" name="address" required />
-            <FormInput title="Weight" name="Weight" required type="number" />
+            <FormInput title="Address" name="address" />
+            <FormInput title="Weight" name="Weight" type="number" />
           </FormSection>
         </Scope>,
       );
@@ -51,7 +50,7 @@ const PermissionsForm: React.FC = () => {
         <ButtonContainer onClick={() => handleAddSigner(outerIndex)}>
           Add Signer
         </ButtonContainer>
-        {signerQuantities[outerIndex] > 1 && (
+        {signerQuantities[outerIndex] > 0 && (
           <ButtonContainer onClick={() => handleRemoveSigner(outerIndex)}>
             Remove Signer
           </ButtonContainer>
@@ -96,7 +95,7 @@ const PermissionsForm: React.FC = () => {
 
       <ButtonContainer onClick={handleAddPermission}>Add</ButtonContainer>
 
-      {signerQuantities.length > 1 && (
+      {signerQuantities.length > 0 && (
         <ButtonContainer onClick={handleRemovePack}>Remove</ButtonContainer>
       )}
     </FormSection>

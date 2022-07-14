@@ -46,9 +46,9 @@ const updatePermissionContract = (): ISection[] => [];
 
 const unjailContract = (): ISection[] => [];
 
-const formSection = (contract: string, type?: string): ISection[] => {
+const formSection = (contract: string, type?: string, address = ''): ISection[] => {
   const contractsSections = {
-    'CreateAssetContract': type ? createAsset(type) : createAsset('NFT'),
+    'CreateAssetContract': type ? createAsset(type, address) : createAsset('NFT', address),
     'TransferContract': transferContract(),
     'UnfreezeContract': unfreezeContract(),
     'FreezeContract': freezeContract(),
@@ -66,7 +66,7 @@ const formSection = (contract: string, type?: string): ISection[] => {
     'UnjailContract': unjailContract(),
     'SetAccountNameContract': setAccountNameContract(),
     'ValidatorConfigContract': validatorConfigContract(),
-    'CreateValidatorContract': createValidatorContract(),
+    'CreateValidatorContract': createValidatorContract(address),
     'SetITOPricesContract': setITOContract(),
     'ConfigITOContract': configITOContract(),
     'AssetTriggerContract': assetTriggerContract(),

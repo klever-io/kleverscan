@@ -69,7 +69,7 @@ const Form: React.FC<any> = ({
       if (length) {
         length += 1;
       } else {
-        length = 2;
+        length = 1;
       }
 
       if (length) {
@@ -92,7 +92,7 @@ const Form: React.FC<any> = ({
   ) => {
     let length = sections[sectionIndex].fields[fieldIndex].props?.length;
 
-    if (length && length > 1) {
+    if (length && length > 0) {
       length -= 1;
     }
 
@@ -115,6 +115,7 @@ const Form: React.FC<any> = ({
       field.props?.array && (
         <ButtonContainer
           onClick={() => addArrayItem(field, sectionIndex, fieldIndex)}
+          type="button"
         >
           Add
         </ButtonContainer>
@@ -129,17 +130,14 @@ const Form: React.FC<any> = ({
   ) => {
     const length = sections[sectionIndex]?.fields[fieldIndex]?.props?.length;
 
-    return (
-      field.props?.array &&
-      length &&
-      length > 1 && (
-        <ButtonContainer
-          onClick={() => removeArrayItem(field, sectionIndex, fieldIndex)}
-        >
-          Remove
-        </ButtonContainer>
-      )
-    );
+    return field.props?.array && length && length > 0 ? (
+      <ButtonContainer
+        onClick={() => removeArrayItem(field, sectionIndex, fieldIndex)}
+        type="button"
+      >
+        Remove
+      </ButtonContainer>
+    ) : null;
   };
 
   const getScopePath = (field: IFormField, index?: number) => {
@@ -162,12 +160,6 @@ const Form: React.FC<any> = ({
           </Scope>,
         );
       }
-    } else {
-      fields.push(
-        <Scope path={`${getScopePath(field)}[0]`} key={'0'}>
-          {getSectionInputs(field.props?.innerSection, sectionIndex)}
-        </Scope>,
-      );
     }
 
     return fields;
@@ -271,7 +263,9 @@ const Form: React.FC<any> = ({
         </FormSection>
       ))}
       {children}
-      {sections.length > 0 || contractName === 'UnjailContract' ? (
+      {sections.length > 0 ||
+      contractName === 'UnjailContract' ||
+      contractName === 'UpdateAccountPermissionContract' ? (
         <ButtonContainer submit type="submit">
           Create Transaction
         </ButtonContainer>

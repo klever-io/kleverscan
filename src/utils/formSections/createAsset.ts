@@ -1,7 +1,6 @@
 import { ISection } from '@/types/index';
 
-const createAsset = (type: string): ISection[] => {
-  const address = '';
+const createAsset = (type: string, address = ''): ISection[] => {
   const section = [] as ISection[];
 
   switch (type) {
@@ -80,7 +79,6 @@ const createAsset = (type: string): ISection[] => {
               label: 'Address',
               props: {
                 required: true,
-                defaultValue: address,
                 span: 2,
               },
             },
@@ -336,7 +334,6 @@ const createAsset = (type: string): ISection[] => {
               label: 'Address',
               props: {
                 required: true,
-                defaultValue: address,
                 tooltip: 'Target Address',
               },
             },

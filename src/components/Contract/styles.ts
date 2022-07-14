@@ -2,11 +2,16 @@ import { BsPersonSquare } from 'react-icons/bs';
 import { RiCopperCoinLine } from 'react-icons/ri';
 import styled, { css } from 'styled-components';
 
-export const Container = styled.div`
+interface IContainer {
+  loading?: boolean;
+}
+
+export const Container = styled.div<IContainer>`
   margin: auto;
   width: 90%;
   max-width: 1200px;
   padding: 2rem 0;
+  opacity: ${props => props.loading ? 0.4 : 1};
 `;
 
 export const Header = styled.div`
@@ -112,4 +117,10 @@ export const ExtraOptionContainer = styled.div`
   padding-top: 1rem;
   padding-bottom: 1rem;
   background-color: ${props => props.theme.white};
+`;
+
+export const AssetTriggerContainer = styled.div`
+  width: 100%;
+  position: relative;
+  margin-top: 3rem;
 `;

@@ -1,5 +1,4 @@
 import { Scope } from '@unform/core';
-import Button from 'components/Button';
 import FormInput from 'components/Form/FormInput';
 import {
   ButtonContainer,
@@ -9,7 +8,7 @@ import {
 import { useState } from 'react';
 
 const PackInfoForm: React.FC = () => {
-  const [packItemQuantities, setPackItemQuantities] = useState<number[]>([1]);
+  const [packItemQuantities, setPackItemQuantities] = useState<number[]>([]);
 
   const handleAddItem = (index: number) => {
     const newPackItemQuantities = [...packItemQuantities];
@@ -24,7 +23,7 @@ const PackInfoForm: React.FC = () => {
   };
 
   const handleAddPack = () => {
-    setPackItemQuantities([...packItemQuantities, 1]);
+    setPackItemQuantities([...packItemQuantities, 0]);
   };
 
   const handleRemovePack = () => {
@@ -61,7 +60,7 @@ const PackInfoForm: React.FC = () => {
         <ButtonContainer onClick={() => handleAddItem(outerIndex)}>
           Add Item
         </ButtonContainer>
-        {packItemQuantities[outerIndex] > 1 && (
+        {packItemQuantities[outerIndex] > 0 && (
           <ButtonContainer onClick={() => handleRemoveItem(outerIndex)}>
             Remove Item
           </ButtonContainer>
@@ -98,7 +97,7 @@ const PackInfoForm: React.FC = () => {
 
       <ButtonContainer onClick={handleAddPack}>Add Pack</ButtonContainer>
 
-      {packItemQuantities.length > 1 && (
+      {packItemQuantities.length > 0 && (
         <ButtonContainer onClick={handleRemovePack}>
           Remove Pack
         </ButtonContainer>

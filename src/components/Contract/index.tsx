@@ -1,49 +1,46 @@
-// import { useSdk } from '../../../hooks';
-import Form, { ISection } from 'components/Form';
-import { IContractOption } from '@/types/index';
-
-// import { useDidUpdateEffect } from 'hooks';
-import formSection from '@/utils/formSections';
-import { Container, Title } from './styles';
 import { useEffect, useState } from 'react';
-import Select from 'react-select';
-import { contractOptions } from '@/utils/index';
 
-// import { toast } from 'react-toastify';
-// import { IBroadcastResponse } from 'types';
-// import { getFeedback } from 'utils';
-// import sections from './formSections';
-import { core, sendTransaction, TransactionType } from '@klever/sdk';
-import { InputContainer, ExtraOptionContainer } from './styles';
+import { core, sendTransaction } from '@klever/sdk';
+import Select from 'react-select';
 import { toast } from 'react-toastify';
+
+import { Container } from './styles';
+import { ExtraOptionContainer, AssetTriggerContainer } from './styles';
 import {
   Slider,
   Toggle,
   ToggleContainer,
   StyledInput,
+  InputLabel,
 } from '@/components/Form/FormInput/styles';
-import { FormSection } from '@/components/Form/styles';
+import { getNonce, getType, precisionParse } from './utils';
+import { contractOptions, assetTriggerTypes } from '@/utils/index';
+import formSection from '@/utils/formSections';
+
 import PackInfoForm from '../CustomForm/PackInfo';
 import PermissionsForm from '../CustomForm/Permissions';
-import { getNonce, getType, precisionParse } from './utils';
+import Form, { ISection } from 'components/Form';
 
 const Contract: React.FC = () => {
-  // const sdk = useSdk();
-
-  const [open, setOpen] = useState(false);
-  const [payload, setPayload] = useState<any>({});
   const [loading, setLoading] = useState(false);
-  const [type, setType] = useState<string>('');
   const [formSections, setFormSections] = useState<ISection[]>([]);
   const [contractType, setContractType] = useState('');
   const [tokenChosen, setTokenChosen] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [ownerAddress, setOwnerAddress] = useState('');
+  const [typeAssetTrigger, setTypeAssetTrigger] = useState(0);
+
+  useEffect(() => {
+    if (sessionStorage) {
+      setOwnerAddress(sessionStorage.getItem('walletAddress') || '');
+    }
+  }, [ownerAddress]);
 
   useEffect(() => {
     if (tokenChosen) {
-      setFormSections([...formSection(contractType, 'Token')]);
+      setFormSections([...formSection(contractType, 'Token', ownerAddress)]);
     } else {
-      setFormSections([...formSection(contractType, 'NFT')]);
+      setFormSections([...formSection(contractType, 'NFT', ownerAddress)]);
     }
   }, [tokenChosen]);
 
@@ -52,6 +49,8 @@ const Contract: React.FC = () => {
 
     if (contractType === 'CreateAssetContract') {
       parsedValues.type = tokenChosen ? 0 : 1;
+    } else if (contractType === 'AssetTriggerContract') {
+      parsedValues.triggerType = typeAssetTrigger;
     }
 
     if (values.uris) {
@@ -89,35 +88,7 @@ const Contract: React.FC = () => {
 
   const handleOption = (selectedOption: any) => {
     setContractType(selectedOption.value);
-    setFormSections([...formSection(selectedOption.value)]);
-  };
-
-  const renderForm = () => {
-    if (contractType === 'UpdateAccountPermissionContract') {
-      return (
-        <Form
-          sections={formSections}
-          contractName={contractType}
-          key={contractType}
-          onSubmit={handleSubmit}
-        >
-          <PermissionsForm />
-        </Form>
-      );
-    } else {
-      return (
-        <Form
-          sections={formSections}
-          contractName={contractType}
-          key={
-            contractType === 'CreateAssetContract'
-              ? formSections.toString()
-              : contractType
-          }
-          onSubmit={handleSubmit}
-        />
-      );
-    }
+    setFormSections([...formSection(selectedOption.value, '', ownerAddress)]);
   };
 
   const handleSubmit = async (contractValues: any) => {
@@ -156,8 +127,36 @@ const Contract: React.FC = () => {
     }
   };
 
+  const renderForm = () => {
+    if (contractType === 'UpdateAccountPermissionContract') {
+      return (
+        <Form
+          sections={formSections}
+          contractName={contractType}
+          key={contractType}
+          onSubmit={handleSubmit}
+        >
+          <PermissionsForm />
+        </Form>
+      );
+    } else {
+      return (
+        <Form
+          sections={formSections}
+          contractName={contractType}
+          key={
+            contractType === 'CreateAssetContract'
+              ? formSections.toString()
+              : contractType
+          }
+          onSubmit={handleSubmit}
+        />
+      );
+    }
+  };
+
   return (
-    <Container>
+    <Container loading={loading}>
       <Select options={contractOptions} onChange={handleOption} />
       {contractType === 'CreateAssetContract' && (
         <ExtraOptionContainer>
@@ -175,6 +174,15 @@ const Contract: React.FC = () => {
           </ToggleContainer>
         </ExtraOptionContainer>
       )}
+      {contractType === 'AssetTriggerContract' && (
+        <AssetTriggerContainer>
+          <InputLabel>Trigger Type</InputLabel>
+          <Select
+            options={assetTriggerTypes}
+            onChange={value => setTypeAssetTrigger(value ? value.value : 0)}
+          />
+        </AssetTriggerContainer>
+      )}
       {contractType === 'ConfigITOContract' ||
       contractType === 'SetITOPricesContract' ? (
         <Form
@@ -187,6 +195,15 @@ const Contract: React.FC = () => {
         </Form>
       ) : (
         renderForm()
+      )}
+      {txHash && (
+        <a
+          href={`https://kleverscan.org/transaction/${txHash}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          https://kleverscan.org/transaction/{txHash}
+        </a>
       )}
     </Container>
   );

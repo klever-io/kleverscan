@@ -1,12 +1,15 @@
 import { ISection } from 'components/Form';
 
-const createValidatorContract = (): ISection[] => {
+const createValidatorContract = (address = ''): ISection[] => {
   const section = [] as ISection[];
 
   section.push(
     {
       fields: [{
-        label: 'Owner Address',  
+        label: 'Owner Address',
+        props: {
+          defaultValue: address,
+        }
       }]
     },
     {

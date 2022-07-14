@@ -27,13 +27,6 @@ const defaultStyles = css`
   font-weight: 500;
 
   transition: all 0.1s ease-in-out;
-
-  &:focus {
-    outline: unset !important;
-    outline-offset: unset !important;
-    border: 1px solid ${({ theme }) => theme.input.border};
-    box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.1, '#AA33B5')};
-  }
 `;
 
 export const StyledInput = styled.input<IProps>`

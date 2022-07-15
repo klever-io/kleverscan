@@ -13,14 +13,12 @@ const sellContract = (): ISection[] => {
         label: 'Price',
         props: {
           type: 'number',
-          required: true,
         },
       },
       { 
         label: 'Reserve Price',
         props: {
           type: 'number',
-          required: true,
         },
       },
       { 

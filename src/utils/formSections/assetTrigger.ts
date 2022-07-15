@@ -7,10 +7,10 @@ const assetTriggerContract = (): ISection[] => {
     {
       fields: [
         { label: 'AssetID', props: { required: true } },
-        { label: 'Receiver', props: { required: true } },
-        { label: 'Amount', props: { type: 'number', required: true } },
-        { label: 'MIME', props: { required: true } },
-        { label: 'Logo', props: { required: true } },
+        { label: 'Receiver'},
+        { label: 'Amount', props: { type: 'number' } },
+        { label: 'MIME' },
+        { label: 'Logo' },
       ],
     },
     {

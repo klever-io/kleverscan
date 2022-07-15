@@ -8,15 +8,11 @@ const createMarketplaceContract = (): ISection[] => {
       { label: 'Name', props: { required: true } },
       {
           label: 'Referral Address',
-          props: {
-            required: true,
-          },
       },
       {
           label: 'Referral Percentage',
           props: {
             type: 'number',
-            required: true,
           },
       },
     ],

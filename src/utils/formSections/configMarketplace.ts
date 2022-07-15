@@ -8,10 +8,7 @@ const configMarketplaceContract = (): ISection[] => {
       { label: 'Marketplace ID', props: { required: true } },
       { label: 'Name', props: { required: true } },
       {
-          label: 'Referral Address',
-          props: {
-            required: true,
-          },
+        label: 'Referral Address',
       },
       {
           label: 'Referral Percentage',

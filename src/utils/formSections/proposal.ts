@@ -8,7 +8,6 @@ const proposalContract = (): ISection[] => {
       fields: [
         {
           label: 'Description',
-          props: { required: true },
         },
         {
           label: 'Epochs Duration',

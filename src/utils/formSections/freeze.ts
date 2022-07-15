@@ -5,7 +5,7 @@ export const freezeContract = (): ISection[] => {
 
     section.push({
       fields: [
-        { label: 'AssetID', props: { required: true } },
+        { label: 'AssetID' },
         {
           label: 'Amount',
           props: { type: 'number', required: true },
@@ -21,7 +21,7 @@ export const unfreezeContract = (): ISection[] => {
 
     section.push({
       fields: [
-        { label: 'AssetID', props: { required: true } },
+        { label: 'AssetID' },
         {
           label: 'BucketID',
           props: { required: true },

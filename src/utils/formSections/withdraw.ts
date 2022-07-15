@@ -13,4 +13,3 @@ const withdrawContract = (): ISection[] => {
 };
 
 export default withdrawContract;
-  

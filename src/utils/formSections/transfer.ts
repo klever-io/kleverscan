@@ -12,9 +12,6 @@ const transferContract = (): ISection[] => {
         },
         {
           label: 'Receiver',
-          props: {
-            required: true,
-          },
         },
       ],
     });

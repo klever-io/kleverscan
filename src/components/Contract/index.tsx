@@ -22,7 +22,7 @@ import PermissionsForm from '../CustomForm/Permissions';
 import Form, { ISection } from 'components/Form';
 
 const Contract: React.FC = () => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [formSections, setFormSections] = useState<ISection[]>([]);
   const [contractType, setContractType] = useState('');
   const [tokenChosen, setTokenChosen] = useState(false);
@@ -156,7 +156,7 @@ const Contract: React.FC = () => {
   };
 
   return (
-    <Container loading={loading}>
+    <Container loading={loading ? loading : undefined}>
       <Select options={contractOptions} onChange={handleOption} />
       {contractType === 'CreateAssetContract' && (
         <ExtraOptionContainer>

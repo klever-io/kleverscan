@@ -11,6 +11,10 @@ interface IProps {
   type?: string;
 }
 
+interface ILabel {
+  disabled?: boolean;
+}
+
 const defaultStyles = css`
   width: 100%;
 
@@ -125,6 +129,8 @@ export const ToggleContainer = styled.div<IProps>`
   padding: 0.75rem 2rem;
   align-items: center;
   gap: 1rem;
+  opacity: ${props => props.disabled ? 0.6 : 1};
+  pointer-events: ${props => props.disabled ? 'none' : 'auto'};
   color: ${props => props.theme.input.text};
 `;
 
@@ -236,9 +242,9 @@ export const TooltipContainer = styled.div<{
   }
 `;
 
-export const InputLabel = styled.label`
+export const InputLabel = styled.label<ILabel>`
   user-select: none;
-
+  opacity: ${props => props.disabled ? 0.6 : 1};
   font-size: smaller;
   font-weight: 600;
   transform: translate(-1rem, -2.25rem);

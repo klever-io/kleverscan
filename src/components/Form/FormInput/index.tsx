@@ -142,7 +142,7 @@ const FormInput: React.FC<IFormInputProps> = ({
 
   return (
     <Container {...containerProps}>
-      <InputLabel>
+      <InputLabel disabled={inputProps.disabled}>
         {title}{' '}
         {tooltip && (
           <TooltipContainer tooltip={tooltip}>
@@ -152,7 +152,10 @@ const FormInput: React.FC<IFormInputProps> = ({
       </InputLabel>
       {type === 'checkbox' && toggleOptions && (
         <>
-          <ToggleContainer onChange={handleChange}>
+          <ToggleContainer
+            onChange={handleChange}
+            disabled={inputProps.disabled}
+          >
             {toggleOptions.length > 1 && toggleOptions[0]}
             <Toggle>
               <StyledInput
@@ -160,6 +163,7 @@ const FormInput: React.FC<IFormInputProps> = ({
                 required={false}
                 value={value}
                 checked={getIsChecked()}
+                onChange={() => {}}
               />
               <Slider />
               {error && <span>{description}</span>}

@@ -15,6 +15,7 @@ import {
   TooltipText,
   FilterByDate,
 } from '@/views/transactions';
+import { Input } from '@/views/transactions/detail';
 
 import Filter, { IFilter, IFilterItem } from '@/components/Filter';
 import Table, { ITable } from '@/components/Table';
@@ -761,6 +762,7 @@ const Transactions: React.FC<ITransactions> = ({
         <FilterByDate>
           <DateFilter {...dateFilterProps} />
         </FilterByDate>
+        <Input />
       </Header>
       <Table {...tableProps} />
       <PaginationContainer>

@@ -78,7 +78,7 @@ const TransactionItem: React.FC<ITransaction> = ({
           <Link href={`/asset/KLV`}>
             <a className="clean-style">
               {' '}
-              {shouldRenderAssetId(parameter.amount, parameter.assetId)}
+              {shouldRenderAssetId(parameter?.amount, parameter?.assetId)}
             </a>
           </Link>
         </span>

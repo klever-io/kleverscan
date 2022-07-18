@@ -446,7 +446,22 @@ export interface IAsset {
   issueDate: number;
   staking: {
     minEpochsToWithdraw: number;
+    totalStaked: number;
   };
+  burnedValue: number;
+  properties: {
+    canFreeze: boolean;
+    canWipe: boolean;
+    canPause: boolean;
+    canMint: boolean;
+    canBurn: boolean;
+    canChangeOwner: boolean;
+    canAddRoles: boolean;
+  },
+  attributes: {
+    isPaused: boolean;
+    isNFTMintStopped: boolean;
+  },
 }
 
 export interface IContract {

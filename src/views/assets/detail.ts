@@ -148,6 +148,9 @@ export const Row = styled.div`
     &:first-child {
       width: 10rem;
     }
+    &:nth-child(2) {
+      margin-left: 1rem;
+    }
 
     overflow: hidden;
 

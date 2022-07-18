@@ -98,10 +98,14 @@ const Asset: React.FC<IAssetPage> = ({
     maxSupply,
     initialSupply,
     circulatingSupply,
+    burnedValue,
+    staking,
+    properties,
+    attributes,
   } = asset;
 
   const router = useRouter();
-  const cardHeaders = ['Overview', 'More'];
+  const cardHeaders = ['Overview', 'More', 'URIS'];
   const tableHeaders = ['Transactions', 'Holders'];
 
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
@@ -244,6 +248,28 @@ const Asset: React.FC<IAssetPage> = ({
         </Row>
         <Row>
           <span>
+            <strong>Burned Value</strong>
+          </span>
+          <span>
+            <small>
+              {toLocaleFixed(burnedValue / 10 ** precision, precision)}
+            </small>
+          </span>
+        </Row>
+        {staking?.totalStaked && (
+          <Row>
+            <span>
+              <strong>Total Staked</strong>
+            </span>
+            <span>
+              <small>
+                {toLocaleFixed(staking?.totalStaked / 10 ** precision, precision)}
+              </small>
+            </span>
+          </Row>
+        )}
+        <Row>
+          <span>
             <strong>Holders</strong>
           </span>
           <span>{totalRecords}</span>
@@ -264,21 +290,25 @@ const Asset: React.FC<IAssetPage> = ({
     );
   };
 
+  const UriComponent: React.FC = () => {
+    console.log(Object.entries(uris))
+    return (
+      <>
+        {Object.entries(uris).map(([key, value]: [string, any]) => (
+          <Row key={String(key)}>
+            <span>
+              <strong>{key}</strong>
+            </span>
+            <a href={`${value}`} target='blank'>{value}</a>
+          </Row>
+        ))}
+      </>
+    );
+  };
+
   const More: React.FC = () => {
     return (
       <>
-        <Row>
-          <span>
-            <strong>White Paper</strong>
-          </span>
-          <span>{getWhitepaper()}</span>
-        </Row>
-        <Row>
-          <span>
-            <strong>Official Website</strong>
-          </span>
-          <span>{getWebsite()}</span>
-        </Row>
         <Row>
           <span>
             <strong>Issuing Time</strong>
@@ -297,6 +327,60 @@ const Asset: React.FC<IAssetPage> = ({
           </span>
           <span>{precision}</span>
         </Row>
+         <Row>
+          <span>
+            <strong>Can Freeze</strong>
+          </span>
+          <span>{String(properties.canFreeze)}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Can Wipe</strong>
+          </span>
+          <span>{String(properties.canWipe)}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Can Pause</strong>
+          </span>
+          <span>{String(properties.canPause)}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Can Mint</strong>
+          </span>
+          <span>{String(properties.canMint)}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Can Burn</strong>
+          </span>
+          <span>{String(properties.canBurn)}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Can Change Owner</strong>
+          </span>
+          <span>{String(properties.canChangeOwner)}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Can Add Roles</strong>
+          </span>
+          <span>{String(properties.canAddRoles)}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Paused</strong>
+          </span>
+          <span>{String(attributes.isPaused)}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>NFT Mint Stopped</strong>
+          </span>
+          <span>{String(attributes.isNFTMintStopped)}</span>
+        </Row>
       </>
     );
   };
@@ -307,6 +391,8 @@ const Asset: React.FC<IAssetPage> = ({
         return <Overview />;
       case 'More':
         return <More />;
+      case 'URIS': 
+        return <UriComponent />
       default:
         return <div />;
     }

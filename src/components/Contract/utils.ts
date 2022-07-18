@@ -1,4 +1,5 @@
 import { TransactionType } from '@klever/sdk';
+import { toast } from 'react-toastify';
 
 const getNonce = async (address: string): Promise<number> => {
   const request = await fetch(
@@ -39,7 +40,7 @@ const getType = (rawType: string): TransactionType => {
   return TransactionType[type];
 };
 
-const getPrecision = async (asset: string): Promise<number> => {
+const getPrecision = async (asset: string): Promise<number | undefined> => {
   const request = await fetch(
     `${
       process.env.DEFAULT_API_HOST || 'https://api.mainnet.klever.finance'
@@ -54,6 +55,12 @@ const getPrecision = async (asset: string): Promise<number> => {
 
   const response = await request.json();
 
+  if (response.error) {
+    const messageError = response.error.charAt(0).toUpperCase() + response.error.slice(1);
+    toast.error(messageError);
+    return;
+  }
+
   return 10 ** response.data.asset.precision;
 };
 
@@ -61,7 +68,7 @@ const precisionParse = async (
   payload: { [key: string]: any },
   contractType: string,
 ): Promise<any> => {
-  let precision: number;
+  let precision: number | undefined;
   let assetId: string;
   const KLVPecision = 10 ** 6; // Also used for KFI
   const percentagePrecision = 10 ** 6;
@@ -73,7 +80,9 @@ const precisionParse = async (
       if (payload.amount) {
         const assetId = payload.assetId ? payload.assetId : payload.assetID;
         precision = await getPrecision(assetId);
-        payload.amount = payload.amount * precision;
+        if (precision) {
+          payload.amount = payload.amount * precision;
+        } else return;
       }
       break;
     case 'VoteContract':
@@ -108,16 +117,20 @@ const precisionParse = async (
       if (payload.maxAmount) {
         const assetId = payload.assetId ? payload.assetId : payload.assetID;
         precision = await getPrecision(assetId);
-        payload.maxAmount = payload.maxAmount * precision;
+        if (precision) {
+          payload.maxAmount = payload.maxAmount * precision;
+        } else return;
       }
       if (payload.packInfo) {
         Object.entries(payload.packInfo).forEach(
           async ([key, packs]: [string, any]) => {
             const packPrecision = await getPrecision(key);
 
-            packs.forEach((pack: any) => {
-              pack.amount = pack.amount * packPrecision;
-            });
+            if (packPrecision) {
+              packs.forEach((pack: any) => {
+                pack.amount = pack.amount * packPrecision;
+              });
+            } else return;
           },
         );
       }
@@ -125,12 +138,16 @@ const precisionParse = async (
     case 'BuyContract':
       assetId = payload.currencyId;
       precision = await getPrecision(assetId);
-      payload.amount = payload.amount * precision;
+      if (precision) {
+        payload.amount = payload.amount * precision;
+      } else return;
       break;
     case 'SellContract':
       assetId = payload.currencyId;
       precision = await getPrecision(assetId);
-      payload.price &&= payload.price * precision;
+      if (precision) {
+        payload.price &&= payload.price * precision;
+      } else return;
       break;
     case 'CreateMarketplaceContract':
     case 'ConfigMarketplaceContract':

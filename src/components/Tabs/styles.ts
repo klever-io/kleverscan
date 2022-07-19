@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { transparentize } from 'polished';
 
 export const Container = styled.div`
   display: flex;
@@ -15,6 +16,19 @@ export const TabContainer = styled.div`
   align-items: center;
 
   gap: 1.5rem;
+  @media (max-width: 768px) {
+    display: grid;
+  }
+`;
+
+export const TabContent = styled.div`
+  display: flex;
+  margin: 2rem 0;
+
+  @media (max-width: 768px) {
+    display: flex;
+    margin: 2rem 1rem;
+  }
 `;
 
 export const ItemContainer = styled.div<{ selected: boolean }>`
@@ -23,12 +37,57 @@ export const ItemContainer = styled.div<{ selected: boolean }>`
   cursor: pointer;
 
   span {
+    padding: 0.5rem;
     opacity: ${props => (props.selected ? 1 : 0.2)};
 
     font-weight: 600;
     font-size: 1.1rem;
 
     transition: 0.2s ease;
+  }
+  @media (max-width: 768px) {
+    display: flex;
+  }
+`;
+
+export const FilterContent = styled.div`
+  gap: 1rem;
+  width: 100%;
+  display: flex;
+  .select {
+    select {
+      text-align: center;
+      width: 100%;
+      height: 2.8rem;
+      display: flex;
+      background: rgba(198, 199, 235, 0.2);
+      border: 1px solid ${props => props.theme.filter.border};
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-family: 'Montserrat';
+      font-style: normal;
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 17px;
+      color: #aa33b5;
+      select-items {
+      }
+    }
+    .option {
+      padding: 0.25rem 0.5rem;
+
+      display: flex;
+
+      border-radius: 0.5rem;
+
+      transition: 0.2s ease;
+      &:hover {
+        background: pink;
+      }
+    }
+  }
+  @media (max-width: 768px) {
+    display: grid;
   }
 `;
 

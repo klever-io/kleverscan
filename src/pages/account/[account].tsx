@@ -85,6 +85,15 @@ interface IAllowanceResponse extends IResponse {
   };
 }
 
+interface ITxQuery {
+  page?: number;
+  address?: string;
+  startdate?: string;
+  enddate?: string;
+  fromAddress?: string;
+  toAddress?: string;
+}
+
 const Account: React.FC<IAccountPage> = ({
   account,
   transactions: transactionResponse,
@@ -105,6 +114,8 @@ const Account: React.FC<IAccountPage> = ({
     start: '',
     end: '',
   });
+  const [fromToFilter, setFromToFilter] = useState(0);
+
   const [loading, setLoading] = useState(false);
   const [transactions, setTransactions] = useState(
     transactionResponse.data.transactions,
@@ -115,17 +126,7 @@ const Account: React.FC<IAccountPage> = ({
   useDidUpdateEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const query = dateFilter.start
-        ? {
-            page: page,
-            address: account.address,
-            startdate: dateFilter.start ? dateFilter.start : undefined,
-            enddate: dateFilter.end ? dateFilter.end : undefined,
-          }
-        : {
-            page: page,
-            address: account.address,
-          };
+      const query = getTxQuery();
 
       const response: ITransactionsResponse = await api.get({
         route: `transaction/list`,
@@ -140,7 +141,7 @@ const Account: React.FC<IAccountPage> = ({
     };
 
     fetchData();
-  }, [page, account.address, dateFilter]);
+  }, [page, account.address, dateFilter, fromToFilter]);
 
   useEffect(() => {
     const { assets } = account;
@@ -158,6 +159,28 @@ const Account: React.FC<IAccountPage> = ({
 
     setBuckets(assetBuckets);
   }, [account]);
+
+  const getTxQuery = (): ITxQuery => {
+    const txQuery: ITxQuery = {
+      page: page,
+      address: account.address,
+    };
+
+    if (dateFilter.start) {
+      txQuery.startdate = dateFilter.start;
+      txQuery.enddate = dateFilter.end;
+    }
+
+    if (fromToFilter === 1) {
+      txQuery.fromAddress = account.address;
+    }
+
+    if (fromToFilter === 2) {
+      txQuery.toAddress = account.address;
+    }
+
+    return txQuery;
+  };
 
   const calculateTotalKLV = () => {
     // does not include Allowance and Staking
@@ -214,6 +237,7 @@ const Account: React.FC<IAccountPage> = ({
       end: '',
     });
   };
+
   const filterDate = (selectedDays: ISelectedDays) => {
     setPage(0);
     setDateFilter({
@@ -224,6 +248,10 @@ const Account: React.FC<IAccountPage> = ({
     });
   };
 
+  const filterFromTo = (op: number) => {
+    setFromToFilter(op);
+  };
+
   const tabProps: ITabs = {
     headers: getTabHeaders(),
     onClick: header => setSelectedTab(header),
@@ -232,6 +260,7 @@ const Account: React.FC<IAccountPage> = ({
       filterDate,
       empty: transactions.length === 0,
     },
+    filterFromTo,
   };
 
   const SelectedTabComponent: React.FC = () => {

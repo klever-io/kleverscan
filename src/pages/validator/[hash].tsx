@@ -217,7 +217,7 @@ const Validator: React.FC<IValidatorPage> = ({
   };
 
   const renderTitle = () => {
-    return <h1>{name || parseAddress(ownerAddress, 12)}</h1>;
+    return <h1>{name || parseAddress(ownerAddress, 24)}</h1>;
   };
 
   const renderMaxDelegation = () => {
@@ -406,7 +406,7 @@ const Validator: React.FC<IValidatorPage> = ({
     return (
       <RowList type="validator">
         <Link href={`/account/${address}`}>
-          {parseAddress(address || '', 12)}
+          {parseAddress(address || '', 25)}
         </Link>
         <span>
           <CenteredRow>

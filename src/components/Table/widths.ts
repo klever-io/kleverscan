@@ -247,9 +247,9 @@ const validators = css`
 const nodes = validators;
 
 const validator = css`
-  margin-right: 1.25rem;
+  margin-right: 7rem;
   &:nth-child(1) {
-    width: 8rem;
+    width: 15rem;
   }
   &:nth-child(2) {
     width: 40rem;
@@ -259,6 +259,9 @@ const validator = css`
   }
   &:nth-child(4) {
     width: 5rem;
+  }
+  &:last-child {
+    margin-right: 0;
   }
 
   @media (max-width: 768px) {

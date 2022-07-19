@@ -226,7 +226,7 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
           return {
             staked: delegation.totalStake,
             rank: index + validators.pagination.previous * 10 + 1,
-            name: delegation.name || parseAddress(delegation.ownerAddress, 8),
+            name: delegation.name || parseAddress(delegation.ownerAddress, 14),
             cumulativeStaked: parseFloat(
               (
                 (delegation.totalStake / validators.data.networkTotalStake) *

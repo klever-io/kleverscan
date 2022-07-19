@@ -22,7 +22,7 @@ import {
 import { Status } from '@/components/Table/styles';
 
 import api from '@/services/api';
-import { toLocaleFixed, hexToString } from '@/utils/index';
+import { toLocaleFixed, hexToString, isDataEmpty } from '@/utils/index';
 import {
   IResponse,
   ITransaction,
@@ -98,8 +98,23 @@ const klvAsset: IAsset = {
   royalties: 0,
   mintedValue: 0,
   issueDate: 0,
+  burnedValue: 0,
+  properties: {
+    canAddRoles: true,
+    canBurn: true,
+    canChangeOwner: true,
+    canFreeze: true,
+    canMint: true,
+    canPause: true,
+    canWipe: false,
+  },
+  attributes: {
+    isNFTMintStopped: false,
+    isPaused: false,
+  },
   staking: {
     minEpochsToWithdraw: 0,
+    totalStaked: 0,
   },
 };
 
@@ -164,7 +179,13 @@ const Transaction: React.FC<ITransactionPage> = props => {
           />
         );
       case Contract.Freeze:
-        return <Freeze {...parsedContract} precision={precision} receipts={receipts} />;
+        return (
+          <Freeze
+            {...parsedContract}
+            precision={precision}
+            receipts={receipts}
+          />
+        );
       case Contract.Unfreeze:
         return <Unfreeze {...parsedContract} receipts={receipts} />;
       case Contract.Delegate:
@@ -271,7 +292,10 @@ const Transaction: React.FC<ITransactionPage> = props => {
               <strong>From</strong>
             </span>
             <span>
-              <Link href={`/account/${sender}`}>{sender}</Link>
+              <CenteredRow>
+                <Link href={`/account/${sender}`}>{sender}</Link>
+                <Copy data={sender} info="Sender" />
+              </CenteredRow>
             </span>
           </Row>
           <Row>
@@ -279,7 +303,12 @@ const Transaction: React.FC<ITransactionPage> = props => {
               <strong>kApp Fee</strong>
             </span>
             <span>
-              <p>{toLocaleFixed(kAppFee / 10 ** precision, precision)}</p>
+              <p>
+                {toLocaleFixed(
+                  status === 'success' ? kAppFee / 10 ** precision : 0,
+                  precision,
+                )}
+              </p>
             </span>
           </Row>
           <Row>
@@ -309,14 +338,14 @@ const Transaction: React.FC<ITransactionPage> = props => {
               <Copy data={signature} info="Signature" />
             </CenteredRow>
           </Row>
-          {data && (
+          {!isDataEmpty(data!) && (
             <Row>
               <span>
                 <strong>Data</strong>
               </span>
               <CenteredRow>
-                <span>{hexToString(data)}</span>
-                <Copy data={hexToString(data)} info="Data" />
+                <span>{hexToString(data!.join(','))}</span>
+                <Copy data={hexToString(data!.join(','))} info="Data" />
               </CenteredRow>
             </Row>
           )}

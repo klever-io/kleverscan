@@ -16,6 +16,8 @@ import {
 import { ArrowRight } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import { capitalizeString, formatAmount, parseAddress } from '@/utils/index';
+import { CenteredRow } from '@/views/accounts/detail';
+import Copy from '@/components/Copy';
 
 interface ITransactionsProps {
   transactions: ITransaction[];
@@ -49,6 +51,9 @@ const Transactions: React.FC<ITransactionsProps> = props => {
       <Row type="transactions">
         <span>
           <Link href={`/transaction/${hash}`}>{hash}</Link>
+          <CenteredRow>
+            <Copy data={hash} info="hash"></Copy>
+          </CenteredRow>
         </span>
         <Link href={`/block/${blockNum}`}>
           <a className="address">{blockNum || 0}</a>

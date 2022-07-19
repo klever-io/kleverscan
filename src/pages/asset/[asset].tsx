@@ -20,6 +20,7 @@ import {
   LetterLogo,
   Logo,
   HoverAnchor,
+  CenteredRow,
 } from '@/views/assets/detail';
 
 import api from '@/services/api';
@@ -45,6 +46,7 @@ import Holders from '@/components/Tabs/Holders';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
 import { ISelectedDays } from '@/components/DateFilter';
+import Copy from '@/components/Copy';
 
 interface IAssetPage {
   asset: IAsset;
@@ -105,7 +107,9 @@ const Asset: React.FC<IAssetPage> = ({
   } = asset;
 
   const router = useRouter();
-  const cardHeaders = ['Overview', 'More', 'URIS'];
+  const cardHeaders = uris
+    ? ['Overview', 'More', 'URIS']
+    : ['Overview', 'More'];
   const tableHeaders = ['Transactions', 'Holders'];
 
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
@@ -206,16 +210,22 @@ const Asset: React.FC<IAssetPage> = ({
   const Overview: React.FC = () => {
     return (
       <>
-        <Row>
-          <span>
-            <strong>Owner</strong>
-          </span>
-          <span>
-            <Link href={`/account/${ownerAddress}`}>
-              <HoverAnchor>{ownerAddress}</HoverAnchor>
-            </Link>
-          </span>
-        </Row>
+        {ownerAddress && (
+          <Row>
+            <span>
+              <strong>Owner</strong>
+            </span>
+
+            <span>
+              <CenteredRow>
+                <Link href={`/account/${ownerAddress}`}>
+                  <HoverAnchor>{ownerAddress}</HoverAnchor>
+                </Link>
+                <Copy data={ownerAddress} info="ownerAddress" />
+              </CenteredRow>
+            </span>
+          </Row>
+        )}
         <Row>
           <span>
             <strong>Max Supply</strong>
@@ -256,18 +266,19 @@ const Asset: React.FC<IAssetPage> = ({
             </small>
           </span>
         </Row>
-        {typeof staking?.totalStaked === 'number' && (
-          <Row>
-            <span>
-              <strong>Total Staked</strong>
-            </span>
-            <span>
-              <small>
-                {toLocaleFixed(staking?.totalStaked / 10 ** precision, precision)}
-              </small>
-            </span>
-          </Row>
-        )}
+        <Row>
+          <span>
+            <strong>Total Staked</strong>
+          </span>
+          <span>
+            <small>
+              {toLocaleFixed(
+                (staking?.totalStaked || 0) / 10 ** precision,
+                precision,
+              )}
+            </small>
+          </span>
+        </Row>
         <Row>
           <span>
             <strong>Holders</strong>
@@ -298,7 +309,9 @@ const Asset: React.FC<IAssetPage> = ({
             <span>
               <strong>{key}</strong>
             </span>
-            <a href={`${value}`} target='blank'>{value}</a>
+            <a href={`${value}`} target="blank">
+              {value}
+            </a>
           </Row>
         ))}
       </>
@@ -319,6 +332,9 @@ const Asset: React.FC<IAssetPage> = ({
             <strong>Issuer</strong>
           </span>
           <span>{ownerAddress ? ownerAddress : '--'}</span>
+          <CenteredRow>
+            <Copy data={ownerAddress} info="Issue" />
+          </CenteredRow>
         </Row>
         <Row>
           <span>
@@ -326,7 +342,7 @@ const Asset: React.FC<IAssetPage> = ({
           </span>
           <span>{precision}</span>
         </Row>
-         <Row>
+        <Row>
           <span>
             <strong>Can Freeze</strong>
           </span>
@@ -390,8 +406,8 @@ const Asset: React.FC<IAssetPage> = ({
         return <Overview />;
       case 'More':
         return <More />;
-      case 'URIS': 
-        return <UriComponent />
+      case 'URIS':
+        return <UriComponent />;
       default:
         return <div />;
     }
@@ -529,6 +545,7 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
   };
 
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
+  let assetNotFound = false;
 
   const assetId = params?.asset;
 
@@ -591,11 +608,15 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
             props.totalRecords = holders?.pagination?.totalRecords || 0;
           }
         } else if (index == 0) {
-          return redirectProps;
+          assetNotFound = true;
         }
       });
     },
   );
+
+  if (assetNotFound) {
+    return redirectProps;
+  }
 
   return { props };
 };

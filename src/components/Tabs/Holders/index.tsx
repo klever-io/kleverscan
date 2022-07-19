@@ -7,6 +7,8 @@ import { Row } from '@/components/Table/styles';
 import { IAccountAsset, IAsset } from '@/types/index';
 import { parseAddress, toLocaleFixed } from '@/utils/index';
 import { RankingContainer } from './styles';
+import { CenteredRow } from '@/views/validators/detail';
+import Copy from '@/components/Copy';
 
 interface IHolder {
   holders: IAccountAsset[];
@@ -44,11 +46,7 @@ const Holders: React.FC<IHolder> = ({ holders, asset, loading }) => {
             <p>{index + 1}°</p>
           </RankingContainer>
         </span>
-        <span>
-          <Link href={`/account/${address}`}>
-            <a>{parseAddress(address, 40)}</a>
-          </Link>
-        </span>
+        <Link href={`/account/${address}`}>{parseAddress(address, 40)}</Link>
         <span>
           <strong>
             {((balance / asset.circulatingSupply) * 100).toFixed(2)}%

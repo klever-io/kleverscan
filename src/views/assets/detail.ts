@@ -150,8 +150,8 @@ export const Row = styled.div`
     }
     &:nth-child(2) {
       margin-left: 1rem;
+      margin-right: 0.5rem;
     }
-
     overflow: hidden;
 
     text-overflow: ellipsis;
@@ -229,8 +229,8 @@ export const LetterLogo = styled.div`
 `;
 
 export const HoverAnchor = styled.a`
-&:hover {
-  text-decoration: underline;
-  cursor: pointer;
-} 
-`
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+`;

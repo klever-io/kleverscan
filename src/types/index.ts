@@ -310,7 +310,7 @@ export interface ITransaction {
   hash: string;
   blockNum: number;
   sender: string;
-  data?: string;
+  data?: string[];
   nonce: number;
   timestamp: number;
   chainID: string;
@@ -457,11 +457,11 @@ export interface IAsset {
     canBurn: boolean;
     canChangeOwner: boolean;
     canAddRoles: boolean;
-  },
+  };
   attributes: {
     isPaused: boolean;
     isNFTMintStopped: boolean;
-  },
+  };
 }
 
 export interface IContract {

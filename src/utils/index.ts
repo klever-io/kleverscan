@@ -346,6 +346,21 @@ export const contractOptions: IContractOption[] = [
   },
 ];
 
+export const isDataEmpty = (data: string[]): boolean => {
+  if (data?.length === 0) {
+    return true;
+  }
+
+  if (data !== undefined) {
+    for (let i = 0; i < data?.length; i++) {
+      if (data[i].length > 0) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+};
 export const assetTriggerTypes = [
   {
     label: 'Mint (0)',

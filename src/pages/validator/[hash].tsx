@@ -58,7 +58,11 @@ import {
   CardSubHeader,
 } from '@/views/validator';
 
-import { CardContainer, CardContent } from '@/views/validators/detail';
+import {
+  CardContainer,
+  CardContent,
+  CenteredRow,
+} from '@/views/validators/detail';
 import { Row as RowList } from '@/components/Table/styles';
 
 import {
@@ -274,7 +278,10 @@ const Validator: React.FC<IValidatorPage> = ({
             <strong>Owner Address</strong>
           </span>
           <span>
-            <Link href={`/account/${ownerAddress}`}>{ownerAddress}</Link>
+            <CenteredRow>
+              <Link href={`/account/${ownerAddress}`}>{ownerAddress}</Link>
+              <Copy data={ownerAddress} info="ownerAddress"></Copy>
+            </CenteredRow>
           </span>
         </Row>
         <Row>
@@ -401,7 +408,12 @@ const Validator: React.FC<IValidatorPage> = ({
         <Link href={`/account/${address}`}>
           {parseAddress(address || '', 12)}
         </Link>
-        <span>{id}</span>
+        <span>
+          <CenteredRow>
+            {id}
+            <Copy data={id} info="id"></Copy>
+          </CenteredRow>
+        </span>
         <span>{stakedEpoch}</span>
         <span>
           <strong>{formatAmount(balance / 10 ** precision)}</strong>

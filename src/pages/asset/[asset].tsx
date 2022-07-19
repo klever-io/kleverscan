@@ -256,7 +256,7 @@ const Asset: React.FC<IAssetPage> = ({
             </small>
           </span>
         </Row>
-        {staking?.totalStaked && (
+        {typeof staking?.totalStaked === 'number' && (
           <Row>
             <span>
               <strong>Total Staked</strong>
@@ -291,7 +291,6 @@ const Asset: React.FC<IAssetPage> = ({
   };
 
   const UriComponent: React.FC = () => {
-    console.log(Object.entries(uris))
     return (
       <>
         {Object.entries(uris).map(([key, value]: [string, any]) => (

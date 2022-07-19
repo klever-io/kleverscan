@@ -43,6 +43,7 @@ const createValidatorContract = (address = ''): ISection[] => {
                     type: 'checkbox',
                     toggleOptions: ['No', 'Yes'],
                     bool: true,
+                    tooltip: 'Permission to delegate',
                   },
                 },
                 {
@@ -50,6 +51,7 @@ const createValidatorContract = (address = ''): ISection[] => {
                   props: {
                     span: 2,
                     type: 'number',
+                    tooltip: 'Validation commission (precision 2)',
                   },
                 },
                 {
@@ -63,12 +65,14 @@ const createValidatorContract = (address = ''): ISection[] => {
                   label: 'Logo',
                   props: {
                     span: 2,
+                    tooltip: 'Logo URI',
                   },
                 },
                 {
                   label: 'Name',
                   props: {
                     span: 2,
+                    tooltip: 'Validator name',
                   },
                 },
                 {

@@ -5,13 +5,23 @@ const transferContract = (): ISection[] => {
 
     section.push({
       fields: [
-        { label: 'Amount', props: { type: 'number', required: true } },
+        { label: 'Amount',
+          props: {
+            type: 'number',
+            required: true,
+            tooltip: 'Amount to be send (with precision)'
+          },
+        },
         {
           label: 'AssetID',
-          props: { required: true },
+          props: {
+            required: true,
+            tooltip: 'AssetID, if empty it defaults to KLV',
+          },
         },
         {
           label: 'Receiver',
+          props: { tooltip: 'Receiver address' }
         },
       ],
     });

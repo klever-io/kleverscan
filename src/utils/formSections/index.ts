@@ -23,7 +23,7 @@ const cancelMarketOrderContract = (): ISection[] => {
 
   section.push({
     fields: [
-      { label: 'Order ID', props: { required: true, tooltip: 'Token name' } },
+      { label: 'Order ID', props: { required: true, tooltip: 'ID generated on "Sell"' } },
     ],
   });
 

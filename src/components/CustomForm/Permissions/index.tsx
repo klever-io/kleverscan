@@ -93,10 +93,14 @@ const PermissionsForm: React.FC = () => {
         );
       })}
 
-      <ButtonContainer onClick={handleAddPermission}>Add</ButtonContainer>
+      <ButtonContainer type="button" onClick={handleAddPermission}>
+        Add
+      </ButtonContainer>
 
       {signerQuantities.length > 0 && (
-        <ButtonContainer onClick={handleRemovePack}>Remove</ButtonContainer>
+        <ButtonContainer type="button" onClick={handleRemovePack}>
+          Remove
+        </ButtonContainer>
       )}
     </FormSection>
   );

@@ -6,11 +6,38 @@ const assetTriggerContract = (): ISection[] => {
   section.push(
     {
       fields: [
-        { label: 'AssetID', props: { required: true } },
-        { label: 'Receiver'},
-        { label: 'Amount', props: { type: 'number' } },
-        { label: 'MIME' },
-        { label: 'Logo' },
+        {
+          label: 'AssetID',
+          props: {
+            required: true,
+            tooltip: 'Target Asset',
+          },
+        },
+        {
+          label: 'Receiver',
+          props: {
+            tooltip: 'Target address for transaction',
+          }
+        },
+        {
+          label: 'Amount',
+          props: {
+            type: 'number',
+            tooltip: 'Amount (with precision)',
+          },
+        },
+        {
+          label: 'MIME',
+          props: {
+            tooltip: 'The nature and format of the metadata',
+          }
+        },
+        {
+          label: 'Logo',
+          props: {
+            tooltip: 'Logo image URL',
+          }
+        },
       ],
     },
     {
@@ -29,9 +56,15 @@ const assetTriggerContract = (): ISection[] => {
               fields: [
                 {
                   label: 'Label',
+                  props: {
+                    tooltip: 'URI identifier. Ex: "foo"',
+                  }
                 },
                 {
                   label: 'Address',
+                  props: {
+                    tooltip: 'URI address. Ex: "http://bar.com"',
+                  }
                 },
               ],
             },
@@ -56,6 +89,7 @@ const assetTriggerContract = (): ISection[] => {
                   label: 'Address',
                   props: {
                     span: 2,
+                    tooltip: 'Target Address',
                   },
                 },
                 {
@@ -64,6 +98,7 @@ const assetTriggerContract = (): ISection[] => {
                     type: 'checkbox',
                     toggleOptions: ['No', 'Yes'],
                     bool: true,
+                    tooltip: 'Should be able to mint?',
                   },
                 },
                 {
@@ -72,6 +107,7 @@ const assetTriggerContract = (): ISection[] => {
                     type: 'checkbox',
                     toggleOptions: ['No', 'Yes'],
                     bool: true,
+                    tooltip: 'Should be able to set ITO prices?',
                   },
                 },
               ],
@@ -96,24 +132,28 @@ const assetTriggerContract = (): ISection[] => {
           label: 'APR',
           props: {
             type: 'number',
+            tooltip: 'Percentage',
           },
         },
         {
           label: 'Min Epochs To Claim',
           props: {
             type: 'number',
+            tooltip: 'Minimum epochs to claim rewards',
           },
         },
         {
           label: 'Min Epochs To Unstake',
           props: {
             type: 'number',
+            tooltip: 'Minimum epochs to unstake',
           },
         },
         {
           label: 'Min Epochs To Withdraw',
           props: {
             type: 'number',
+            tooltip: 'Minimum epochs to withdraw after unstake',
           },
         },
       ],

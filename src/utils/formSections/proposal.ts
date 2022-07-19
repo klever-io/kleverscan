@@ -8,10 +8,16 @@ const proposalContract = (): ISection[] => {
       fields: [
         {
           label: 'Description',
+          props: {
+            tooltip: 'Proposal description',
+          }
         },
         {
           label: 'Epochs Duration',
-          props: { required: true },
+          props: {
+            required: true,
+            tooltip: 'Proposal epochs duration',
+          },
         },
         {
           label: 'Parameters',
@@ -25,9 +31,15 @@ const proposalContract = (): ISection[] => {
               fields: [
                 {
                   label: 'Label',
+                  props: {
+                    tooltip: 'Parameter key',
+                  }
                 },
                 {
                   label: 'Address',
+                  props: {
+                    tooltip: 'Parameter address',
+                  }
                 },
               ],
             },

@@ -8,16 +8,26 @@ const createAsset = (type: string, address = ''): ISection[] => {
       section.push(
         {
           fields: [
-            { label: 'Name', props: { required: true } },
+            {
+              label: 'Name',
+              props: {
+                required: true,
+                tooltip: 'Asset name',
+              },
+            },
             {
               label: 'Ticker',
-              props: { required: true },
+              props: {
+                required: true,
+                tooltip: 'Asset shorthand (capital letter only)',
+              },
             },
             {
               label: 'Owner',
               props: {
                 required: true,
                 defaultValue: address,
+                tooltip: 'Owner address',
               },
             },
             {
@@ -25,24 +35,28 @@ const createAsset = (type: string, address = ''): ISection[] => {
               props: {
                 type: 'number',
                 required: true,
+                tooltip: 'Asset precision (0 to 8)',
               },
             },
             {
               label: 'Initial Supply',
               props: {
                 type: 'number',
+                tooltip: 'Initial minted supply (fungible only) (with precision)',
               },
             },
             {
               label: 'Max Supply',
               props: {
                 type: 'number',
+                tooltip: 'Maximum supply of the asset (with precision)',
               },
             },
             {
               label: 'Logo',
               props: {
                 span: 2,
+                tooltip: 'Logo uri',
               },
             },
           ],
@@ -62,9 +76,15 @@ const createAsset = (type: string, address = ''): ISection[] => {
                   fields: [
                     {
                       label: 'Label',
+                      props: {
+                        tooltip: 'URI identifier. Ex: "foo"',
+                      }
                     },
                     {
                       label: 'Address',
+                      props: {
+                        tooltip: 'URI address. Ex: "http://bar.com"',
+                      }
                     },
                   ],
                 },
@@ -80,6 +100,7 @@ const createAsset = (type: string, address = ''): ISection[] => {
               props: {
                 required: true,
                 span: 2,
+                tooltip: 'Royalty receiver address',
               },
             },
             {
@@ -96,12 +117,14 @@ const createAsset = (type: string, address = ''): ISection[] => {
                       label: 'Amount',
                       props: {
                         type: 'number',
+                        tooltip: 'Max amount for that percentage',
                       },
                     },
                     {
                       label: 'Percentage',
                       props: {
                         type: 'number',
+                        tooltip: 'Fee % (precision 2)',
                       },
                     },
                   ],
@@ -122,7 +145,13 @@ const createAsset = (type: string, address = ''): ISection[] => {
                 disabled: true,
               },
             },
-            { label: 'APR', props: { type: 'number' } },
+            {
+              label: 'APR',
+              props: {
+                type: 'number',
+                tooltip: 'Percentage',
+              },
+            },
             {
               label: 'Min Epochs To Claim',
               props: {
@@ -312,13 +341,13 @@ const createAsset = (type: string, address = ''): ISection[] => {
                     {
                       label: 'Label',
                       props: {
-                        tooltip: 'Uri identifier',
+                        tooltip: 'URI identifier. Ex: "foo"',
                       },
                     },
                     {
                       label: 'Address',
                       props: {
-                        tooltip: 'Uri address',
+                        tooltip: 'URI address. Ex: "http://bar.com"',
                       },
                     },
                   ],

@@ -5,15 +5,25 @@ const createMarketplaceContract = (): ISection[] => {
 
   section.push({
     fields: [
-      { label: 'Name', props: { required: true } },
       {
-          label: 'Referral Address',
+        label: 'Name',
+        props: {
+          required: true,
+          tooltip: 'Marketplace name',
+        },
       },
       {
-          label: 'Referral Percentage',
-          props: {
-            type: 'number',
-          },
+        label: 'Referral Address',
+        props: {
+          tooltip: 'Royalties receiving address',
+        }
+      },
+      {
+        label: 'Referral Percentage',
+        props: {
+          type: 'number',
+          tooltip: 'Royalties percentage (precision 2)',
+        },
       },
     ],
   });

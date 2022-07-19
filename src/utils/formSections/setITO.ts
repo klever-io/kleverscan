@@ -6,7 +6,13 @@ const setITOContract = (): ISection[] => {
   section.push(
     {
       fields: [
-        { label: 'AssetID', props: { required: true } },
+        {
+          label: 'AssetID',
+          props: {
+            required: true,
+            tooltip: 'Target asset',
+          },
+        },
       ],
     },
   );

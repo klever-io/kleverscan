@@ -5,16 +5,29 @@ const voteContract = (): ISection[] => {
 
     section.push({
       fields: [
-        { label: 'Proposal ID', props: { type: 'number', required: true } },
+        {
+          label: 'Proposal ID',
+          props: {
+            type: 'number',
+            required: true,
+            tooltip: 'Proposal id to be voted in',
+          },
+        },
         {
           label: 'Amount',
-          props: { type: 'number', required: true },
+          props: {
+            type: 'number',
+            required: true,
+            tooltip: 'Weight of the vote, maximum amount depends on KFI of address',
+          },
         },
         {
           label: 'Type',
           props: {
-            type: 'number',
-            required: true,
+            type: 'checkbox',
+            toggleOptions: ['Yes', 'No'],
+            defaultValue: 0,
+            tooltip: 'Vote yes or vote no',
           },
         },
       ],

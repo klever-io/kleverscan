@@ -5,10 +5,19 @@ export const delegateContract = (): ISection[] => {
 
   section.push({
     fields: [
-      { label: 'Receiver', props: { required: true } },
+      {
+        label: 'Receiver',
+        props: {
+          required: true,
+          tooltip: 'Address to be delegated to',
+        },
+      },
       {
         label: 'BucketID',
-        props: { required: true },
+        props: {
+          required: true,
+          tooltip: 'Bucket to be delegated',
+        },
       },
     ],
   });
@@ -23,7 +32,10 @@ export const undelegateContract = (): ISection[] => {
     fields: [
       {
         label: 'BucketID',
-        props: { required: true },
+        props: {
+          required: true,
+          tooltip: 'Bucket ID to be undelegated',
+        },
       },
     ],
   });

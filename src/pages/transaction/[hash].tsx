@@ -22,7 +22,7 @@ import {
 import { Status } from '@/components/Table/styles';
 
 import api from '@/services/api';
-import { toLocaleFixed, hexToString, isDataEmpty } from '@/utils/index';
+import { toLocaleFixed, hexToString, isDataEmpty, capitalizeString } from '@/utils/index';
 import {
   IResponse,
   ITransaction,
@@ -260,7 +260,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
             </span>
             <Status status={status}>
               <StatusIcon />
-              <span>{status}</span>
+              <span>{capitalizeString(status)}</span>
             </Status>
           </Row>
           <Row>

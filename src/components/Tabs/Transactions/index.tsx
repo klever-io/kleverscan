@@ -50,10 +50,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
     return (
       <Row type="transactions">
         <span>
-          <Link href={`/transaction/${hash}`}>{hash}</Link>
-          <CenteredRow>
-            <Copy data={hash} info="hash"></Copy>
-          </CenteredRow>
+          <Link href={`/transaction/${hash}`}>{parseAddress(hash, 28)}</Link>
         </span>
         <Link href={`/block/${blockNum}`}>
           <a className="address">{blockNum || 0}</a>

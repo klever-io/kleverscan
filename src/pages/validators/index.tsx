@@ -146,10 +146,10 @@ const Validators: React.FC<IValidatorPage> = ({
                 validators[rank - page * pagination.perPage - 1].address
               }`}
             >
-              {name}
+              {parseAddress(name, 20)}
             </Link>
           ) : (
-            <span>{name}</span>
+            <span>{parseAddress(name, 20)}</span>
           )}
         </span>
         <span>{((rating * 100) / 10000000).toFixed(2)}%</span>
@@ -226,7 +226,7 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
           return {
             staked: delegation.totalStake,
             rank: index + validators.pagination.previous * 10 + 1,
-            name: delegation.name || parseAddress(delegation.ownerAddress, 14),
+            name: delegation.name || parseAddress(delegation.ownerAddress, 20),
             cumulativeStaked: parseFloat(
               (
                 (delegation.totalStake / validators.data.networkTotalStake) *

@@ -4,7 +4,7 @@ const transactions = css`
   margin-right: 1.25rem;
 
   &:nth-child(1) {
-    width: 16rem;
+    width: 20rem;
   }
 
   &:nth-child(2) {

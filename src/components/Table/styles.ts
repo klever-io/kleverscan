@@ -82,9 +82,7 @@ export const Row = styled.div<ITableType>`
   background-color: ${props => props.theme.white};
 
   border-radius: 0.5rem;
-  span {
-    display: flex;
-  }
+
   span,
   a {
     /* flex: 1; */

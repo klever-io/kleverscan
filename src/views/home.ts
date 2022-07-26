@@ -414,13 +414,17 @@ export const TransactionData = styled.div`
   a {
     max-width: 10rem;
 
-    overflow: hidden;
+    /* overflow: hidden; */
 
     text-overflow: ellipsis;
     white-space: nowrap;
     font-weight: 600;
 
     color: ${props => props.theme.black};
+
+    svg {
+      margin-left: 0.75rem;
+    }
   }
 
   span {

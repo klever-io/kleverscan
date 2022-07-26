@@ -9,6 +9,7 @@ import {
   TransactionData,
   TransactionAmount,
 } from '@/views/home';
+import { getStatusIcon } from '@/assets/status';
 
 import { parseAddress, toLocaleFixed } from '../../utils';
 
@@ -20,10 +21,11 @@ const TransactionItem: React.FC<ITransaction> = ({
   contract,
   precision,
   sender,
+  status
 }) => {
   let parameter: ITransferContract = {} as ITransferContract;
   let amount = 0;
-
+  const StatusIcon = getStatusIcon(status);
   if (contract) {
     const contractPosition = 0;
     parameter = contract[contractPosition].parameter as ITransferContract;
@@ -49,7 +51,12 @@ const TransactionItem: React.FC<ITransaction> = ({
   return (
     <TransactionRow>
       <TransactionData>
-        <Link href={`/transaction/${hash}`}>{hash}</Link>
+        <a href={`/transaction/${hash}`}>
+          {`${hash.slice(0, 15)}...`}
+          <span>
+            <StatusIcon />
+          </span>
+        </a>
         <span>
           {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
         </span>

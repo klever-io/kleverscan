@@ -12,7 +12,7 @@ import { IAsset, IResponse, IPagination } from '@/types/index';
 import { formatAmount, parseHardCodedInfo } from '@/utils/index';
 import api from '@/services/api';
 
-import { ArrowLeft } from '@/assets/icons';
+import { ArrowLeft, Certified } from '@/assets/icons';
 import { Assets as Icon } from '@/assets/title-icons';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
@@ -96,6 +96,14 @@ const Assets: React.FC<IAssetPage> = ({
       );
     };
 
+    const verifiedAssets = ['KLV', 'KFI', 'DVK-34ZH', 'LMT-KGIA'];
+
+    const isVerified = () => {
+      if(verifiedAssets.includes(assetId)) {
+        return <Certified className='isVerified'/>;
+      }
+    };
+
     return (
       <Row type="assetsPage">
         <Link href={`/asset/${assetId}`}>
@@ -107,6 +115,7 @@ const Assets: React.FC<IAssetPage> = ({
               ticker={ticker}
               name={name}
             />
+            {isVerified()}
           </a>
         </Link>
 

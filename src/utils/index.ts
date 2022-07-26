@@ -361,6 +361,22 @@ export const isDataEmpty = (data: string[]): boolean => {
 
   return true;
 };
+
+export const claimTypes = [
+  {
+    label: 'Staking Claim (0)',
+    value: 0,
+  },
+  {
+    label: 'Allowance Claim (1)',
+    value: 1,
+  },
+  {
+    label: 'Market Claim (2)',
+    value: 2,
+  }
+]
+
 export const assetTriggerTypes = [
   {
     label: 'Mint (0)',

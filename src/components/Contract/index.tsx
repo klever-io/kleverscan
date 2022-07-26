@@ -5,7 +5,12 @@ import Select from 'react-select';
 import { toast } from 'react-toastify';
 
 import { Container } from './styles';
-import { ExtraOptionContainer, AssetTriggerContainer } from './styles';
+import {
+  ExtraOptionContainer,
+  AssetTriggerContainer,
+  SelectContainer,
+  FieldLabel,
+} from './styles';
 import {
   Slider,
   Toggle,
@@ -14,7 +19,7 @@ import {
   InputLabel,
 } from '@/components/Form/FormInput/styles';
 import { getNonce, getType, precisionParse } from './utils';
-import { contractOptions, assetTriggerTypes } from '@/utils/index';
+import { contractOptions, assetTriggerTypes, claimTypes } from '@/utils/index';
 import formSection from '@/utils/formSections';
 
 import PackInfoForm from '../CustomForm/PackInfo';
@@ -28,7 +33,10 @@ const Contract: React.FC = () => {
   const [tokenChosen, setTokenChosen] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
   const [ownerAddress, setOwnerAddress] = useState('');
+  const [claimType, setClaimType] = useState(0);
   const [typeAssetTrigger, setTypeAssetTrigger] = useState(0);
+  const [data, setData] = useState('');
+  const [isMultisig, setIsMultisig] = useState(true);
 
   useEffect(() => {
     if (sessionStorage) {
@@ -51,6 +59,8 @@ const Contract: React.FC = () => {
       parsedValues.type = tokenChosen ? 0 : 1;
     } else if (contractType === 'AssetTriggerContract') {
       parsedValues.triggerType = typeAssetTrigger;
+    } else if (contractType === 'ClaimContract') {
+      parsedValues.claimType = claimType;
     }
 
     if (values.uris) {
@@ -110,6 +120,7 @@ const Contract: React.FC = () => {
         {
           autobroadcast: false,
         },
+        data,
       );
 
       const signature = await window.klever.sign(unsignedTx[0]);
@@ -135,6 +146,9 @@ const Contract: React.FC = () => {
           contractName={contractType}
           key={contractType}
           onSubmit={handleSubmit}
+          setData={setData}
+          setIsMultisig={setIsMultisig}
+          isMultisig={isMultisig}
         >
           <PermissionsForm />
         </Form>
@@ -150,6 +164,9 @@ const Contract: React.FC = () => {
               : contractType
           }
           onSubmit={handleSubmit}
+          setData={setData}
+          setIsMultisig={setIsMultisig}
+          isMultisig={isMultisig}
         />
       );
     }
@@ -158,6 +175,7 @@ const Contract: React.FC = () => {
   return (
     <Container loading={loading ? loading : undefined}>
       <Select options={contractOptions} onChange={handleOption} />
+
       {contractType === 'CreateAssetContract' && (
         <ExtraOptionContainer>
           <ToggleContainer>
@@ -174,6 +192,7 @@ const Contract: React.FC = () => {
           </ToggleContainer>
         </ExtraOptionContainer>
       )}
+
       {contractType === 'AssetTriggerContract' && (
         <AssetTriggerContainer>
           <InputLabel>Trigger Type</InputLabel>
@@ -183,6 +202,17 @@ const Contract: React.FC = () => {
           />
         </AssetTriggerContainer>
       )}
+
+      {contractType === 'ClaimContract' && (
+        <SelectContainer>
+          <FieldLabel>Claim Type</FieldLabel>
+          <Select
+            options={claimTypes}
+            onChange={value => setClaimType(value ? value.value : 0)}
+          />
+        </SelectContainer>
+      )}
+
       {contractType === 'ConfigITOContract' ||
       contractType === 'SetITOPricesContract' ? (
         <Form
@@ -190,12 +220,16 @@ const Contract: React.FC = () => {
           contractName={contractType}
           key={contractType}
           onSubmit={handleSubmit}
+          setData={setData}
+          setIsMultisig={setIsMultisig}
+          isMultisig={isMultisig}
         >
           <PackInfoForm />
         </Form>
       ) : (
         renderForm()
       )}
+
       {txHash && (
         <a
           href={`https://kleverscan.org/transaction/${txHash}`}

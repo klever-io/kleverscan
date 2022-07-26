@@ -1,3 +1,4 @@
+import { lighten } from 'polished';
 import { BsPersonSquare } from 'react-icons/bs';
 import { RiCopperCoinLine } from 'react-icons/ri';
 import styled, { css } from 'styled-components';
@@ -119,8 +120,28 @@ export const ExtraOptionContainer = styled.div`
   background-color: ${props => props.theme.white};
 `;
 
+export const SelectContainer = styled.div`
+  background-color: ${props => props.theme.white};
+  padding: 1.37rem;
+  border-radius: 1rem;
+  margin-top: 1rem;
+
+  border: 0.2px solid ${({ theme }) => theme.input.border};
+  box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.8, '#000')};
+`;
+
 export const AssetTriggerContainer = styled.div`
   width: 100%;
   position: relative;
   margin-top: 3rem;
 `;
+
+export const FieldLabel = styled.label`
+  user-select: none;
+  font-size: smaller;
+  font-weight: 600;
+  display: flex;
+  color: ${({ theme }) => theme.input.border.dark};
+  margin-bottom: .3rem;
+`;
+

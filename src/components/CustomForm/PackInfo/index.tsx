@@ -57,11 +57,17 @@ const PackInfoForm: React.FC = () => {
     }
     items.push(
       <>
-        <ButtonContainer onClick={() => handleAddItem(outerIndex)}>
+        <ButtonContainer
+          type="button"
+          onClick={() => handleAddItem(outerIndex)}
+        >
           Add Item
         </ButtonContainer>
         {packItemQuantities[outerIndex] > 0 && (
-          <ButtonContainer onClick={() => handleRemoveItem(outerIndex)}>
+          <ButtonContainer
+            type="button"
+            onClick={() => handleRemoveItem(outerIndex)}
+          >
             Remove Item
           </ButtonContainer>
         )}
@@ -95,10 +101,12 @@ const PackInfoForm: React.FC = () => {
         );
       })}
 
-      <ButtonContainer onClick={handleAddPack}>Add Pack</ButtonContainer>
+      <ButtonContainer type="button" onClick={handleAddPack}>
+        Add Pack
+      </ButtonContainer>
 
       {packItemQuantities.length > 0 && (
-        <ButtonContainer onClick={handleRemovePack}>
+        <ButtonContainer type="button" onClick={handleRemovePack}>
           Remove Pack
         </ButtonContainer>
       )}

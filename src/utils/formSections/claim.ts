@@ -5,12 +5,11 @@ const claimContract = (): ISection[] => {
 
   section.push({
     fields: [
-      { label: 'Claim Type', props: { type: 'number', required: true } },
       {
-          label: 'Id',
-          props: {
-            required: true,
-          },
+        label: 'Id',
+        props: {
+          required: true,
+        },
       },
     ],
   });

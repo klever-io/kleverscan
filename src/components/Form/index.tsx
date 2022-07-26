@@ -4,7 +4,16 @@ import { useRef, useState } from 'react';
 import { parseData } from '@/utils/index';
 import FormInput from './FormInput';
 
-import { ButtonContainer, FormBody, FormSection, SectionTitle } from './styles';
+import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
+import {
+  ButtonContainer,
+  FormBody,
+  FormSection,
+  SectionTitle,
+  AdvancedOptsContainer,
+} from './styles';
+import AdvancedOptions from './AdvancedOptions';
+import theme from '@/styles/theme';
 
 interface IInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   span?: number;
@@ -51,9 +60,13 @@ const Form: React.FC<any> = ({
   onSubmit,
   children,
   cancelOnly,
+  setData,
+  setIsMultisig,
+  isMultisig,
 }) => {
   const formRef = useRef<FormHandles>(null);
   const [sections, setSections] = useState(defaultSections);
+  const [showAdvancedOpts, setShowAdvancedOpts] = useState(false);
 
   const addArrayItem = (
     field: IFormField,
@@ -304,13 +317,35 @@ const Form: React.FC<any> = ({
           {getSectionInputs(section, index)}
         </FormSection>
       ))}
+
       {children}
+
       {sections.length > 0 ||
       contractName === 'UnjailContract' ||
       contractName === 'UpdateAccountPermissionContract' ? (
-        <ButtonContainer submit type="submit">
-          Create Transaction
-        </ButtonContainer>
+        <>
+          <AdvancedOptsContainer
+            onClick={() => setShowAdvancedOpts(!showAdvancedOpts)}
+          >
+            <span>Advanced Options</span>
+            {showAdvancedOpts ? (
+              <IoIosArrowUp color={theme.input.border.dark} />
+            ) : (
+              <IoIosArrowDown color={theme.input.border.dark} />
+            )}
+          </AdvancedOptsContainer>
+
+          {showAdvancedOpts ? (
+            <AdvancedOptions
+              setData={setData}
+              setIsMultisig={setIsMultisig}
+              isMultisig={isMultisig}
+            />
+          ) : null}
+          <ButtonContainer submit type="submit">
+            Create Transaction
+          </ButtonContainer>
+        </>
       ) : null}
     </FormBody>
   );

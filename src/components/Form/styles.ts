@@ -74,7 +74,7 @@ export const TooltipSpace = styled.div`
 export const InputWrapper = styled.div``;
 
 export const ButtonContainer = styled.button<IButton>`
-  background-color: #7B7DB2;
+  background-color: ${props => props.theme.form.sectionTitle};
   padding-top: 15px;
   padding-bottom: 15px;
   padding-left: 10px;
@@ -87,4 +87,20 @@ export const ButtonContainer = styled.button<IButton>`
   border-radius: 10px;
   margin-top: ${props => (props.submit ? 1.7 : 0)}rem;
   cursor: pointer;
+
+  @media (max-width: 768px) {
+    width: 45%;    
+  }
+`;
+
+export const AdvancedOptsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+  margin-top: 1rem;
+  span {
+    color: ${({ theme }) => theme.input.border.dark};
+    margin-right: .5rem;
+  }
 `;

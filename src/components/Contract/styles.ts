@@ -2,10 +2,18 @@ import { lighten } from 'polished';
 import { BsPersonSquare } from 'react-icons/bs';
 import { RiCopperCoinLine } from 'react-icons/ri';
 import styled, { css } from 'styled-components';
+import { IoMdCloseCircle } from 'react-icons/io';
 
 interface IContainer {
   loading?: boolean;
 }
+
+export const CloseIcon = styled(IoMdCloseCircle).attrs(props => ({
+  color: props.theme.form.hash,
+  size: 24,
+}))`
+  cursor: pointer;
+`;
 
 export const Container = styled.div<IContainer>`
   margin: auto;
@@ -118,6 +126,18 @@ export const ExtraOptionContainer = styled.div`
   padding-top: 1rem;
   padding-bottom: 1rem;
   background-color: ${props => props.theme.white};
+  box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.8, '#000')};
+
+  justify-content: space-between;
+  align-items: center;
+
+  padding-right: 2rem;
+
+  a {
+    padding-left: 2rem;
+    color: ${props => props.theme.form.hash};
+    font-weight: 600;
+  }
 `;
 
 export const SelectContainer = styled.div`

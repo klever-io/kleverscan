@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { core, sendTransaction } from '@klever/sdk';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
+import { IoMdCloseCircle } from 'react-icons/io';
 
 import { Container } from './styles';
 import {
@@ -10,6 +11,7 @@ import {
   AssetTriggerContainer,
   SelectContainer,
   FieldLabel,
+  CloseIcon,
 } from './styles';
 import {
   Slider,
@@ -120,7 +122,6 @@ const Contract: React.FC = () => {
         {
           autobroadcast: false,
         },
-        data,
       );
 
       const signature = await window.klever.sign(unsignedTx[0]);
@@ -172,8 +173,27 @@ const Contract: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (txHash) {
+      window.scrollTo(0, 0);
+    }
+  }, [txHash]);
+
   return (
     <Container loading={loading ? loading : undefined}>
+      {txHash && (
+        <ExtraOptionContainer>
+          <a
+            href={`https://kleverscan.org/transaction/${txHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Transaction visible at https://kleverscan.org/transaction/{txHash}
+          </a>
+          <CloseIcon onClick={() => setTxHash(null)} />
+        </ExtraOptionContainer>
+      )}
+
       <Select options={contractOptions} onChange={handleOption} />
 
       {contractType === 'CreateAssetContract' && (
@@ -228,16 +248,6 @@ const Contract: React.FC = () => {
         </Form>
       ) : (
         renderForm()
-      )}
-
-      {txHash && (
-        <a
-          href={`https://kleverscan.org/transaction/${txHash}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          https://kleverscan.org/transaction/{txHash}
-        </a>
       )}
     </Container>
   );

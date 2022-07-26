@@ -119,7 +119,7 @@ const FormInput: React.FC<IFormInputProps> = ({
     e.target.blur();
   };
 
-  type === 'number' && (inputProps['step'] = '1');
+  type === 'number' && (inputProps['step'] = '0.00000001');
   type === 'number' && (inputProps['onWheel'] = preventScroll);
 
   const handleKey = (e: any) => {

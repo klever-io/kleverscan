@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { ArrowLeft, ArrowRight } from '@/assets/pagination';
 import calculate from './paginate';
@@ -18,6 +18,10 @@ const Pagination: React.FC<IPagination> = ({ count, page, onPaginate }) => {
 
   const [showModalLeft, setShowModalLeft] = useState(false);
   const [showModalRight, setShowModalRight] = useState(false);
+
+useEffect(() => {
+  window.scrollTo(0, 0)
+}, [page])
 
   const prevProps = {
     active: page > 0,

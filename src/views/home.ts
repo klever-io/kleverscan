@@ -470,7 +470,7 @@ export const TransactionAmount = styled.div`
 
 export const TransactionChart = styled(TransactionContent)`
   width: 100%;
-  min-height: 20rem;
+  min-height: 22rem;
 
   position: relative;
   display: flex;

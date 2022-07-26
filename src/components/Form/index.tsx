@@ -73,25 +73,6 @@ const Form: React.FC<any> = ({
     sectionIndex: number,
     fieldIndex: number,
   ) => {
-    if (contractName === 'CreateValidatorContract') {
-      const newSections = [...sections];
-      let URIlength =
-        sections[1].fields[0].props.innerSection.fields[7].props.length;
-
-      if (URIlength) {
-        URIlength += 1;
-      } else {
-        URIlength = 1;
-      }
-
-      newSections[1].fields[0].props.innerSection.fields[7].props = {
-        ...newSections[1].fields[0].props.innerSection.fields[7].props,
-        length: URIlength,
-      };
-
-      setSections(newSections);
-    }
-
     if (
       (sectionIndex && fieldIndex) ||
       (!isNaN(sectionIndex) && !isNaN(fieldIndex))
@@ -122,37 +103,20 @@ const Form: React.FC<any> = ({
     sectionIndex: number,
     fieldIndex: number,
   ) => {
-    if (contractName === 'CreateValidatorContract') {
-      const newSections = [...sections];
-      let URIlength =
-        sections[1].fields[0].props.innerSection.fields[7].props.length;
+    let length = sections[sectionIndex].fields[fieldIndex].props?.length;
 
-      if (URIlength && URIlength > 0) {
-        URIlength -= 1;
-      }
-
-      newSections[1].fields[0].props.innerSection.fields[7].props = {
-        ...newSections[1].fields[0].props.innerSection.fields[7].props,
-        length: URIlength,
-      };
-
-      setSections(newSections);
-    } else {
-      let length = sections[sectionIndex].fields[fieldIndex].props?.length;
-
-      if (length && length > 0) {
-        length -= 1;
-      }
-
-      const newSections = [...sections];
-
-      newSections[sectionIndex].fields[fieldIndex].props = {
-        ...newSections[sectionIndex].fields[fieldIndex].props,
-        length,
-      };
-
-      setSections(newSections);
+    if (length && length > 0) {
+      length -= 1;
     }
+
+    const newSections = [...sections];
+
+    newSections[sectionIndex].fields[fieldIndex].props = {
+      ...newSections[sectionIndex].fields[fieldIndex].props,
+      length,
+    };
+
+    setSections(newSections);
   };
 
   const addFieldButton = (
@@ -177,13 +141,7 @@ const Form: React.FC<any> = ({
     sectionIndex: number,
     fieldIndex: number,
   ) => {
-    let length = 0;
-
-    if (contractName === 'CreateValidatorContract') {
-      length = sections[1].fields[0].props.innerSection.fields[7].props.length;
-    } else {
-      length = sections[sectionIndex]?.fields[fieldIndex]?.props?.length;
-    }
+    let length = sections[sectionIndex]?.fields[fieldIndex]?.props?.length;
 
     return field.props?.array && length && length > 0 ? (
       <ButtonContainer

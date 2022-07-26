@@ -20,8 +20,7 @@ const ErrorBoundary = Bugsnag.getPlugin('react')?.createErrorBoundary(React);
 //add window methods to global scope
 declare global {
   interface Window {
-    klever: any;
-    kleverchainUrls: any;
+    kleverWeb: any;
   }
 }
 

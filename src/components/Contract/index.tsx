@@ -3,30 +3,29 @@ import { useEffect, useState } from 'react';
 import { core, sendTransaction } from '@klever/sdk';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
-import { IoMdCloseCircle } from 'react-icons/io';
 
-import { Container } from './styles';
 import {
-  ExtraOptionContainer,
-  AssetTriggerContainer,
-  SelectContainer,
-  FieldLabel,
-  CloseIcon,
-} from './styles';
-import {
+  InputLabel,
   Slider,
+  StyledInput,
   Toggle,
   ToggleContainer,
-  StyledInput,
-  InputLabel,
 } from '@/components/Form/FormInput/styles';
-import { getNonce, getType, precisionParse } from './utils';
-import { contractOptions, assetTriggerTypes, claimTypes } from '@/utils/index';
 import formSection from '@/utils/formSections';
+import { assetTriggerTypes, claimTypes, contractOptions } from '@/utils/index';
+import {
+  AssetTriggerContainer,
+  CloseIcon,
+  Container,
+  ExtraOptionContainer,
+  FieldLabel,
+  SelectContainer,
+} from './styles';
+import { getNonce, getType, precisionParse } from './utils';
 
+import Form, { ISection } from 'components/Form';
 import PackInfoForm from '../CustomForm/PackInfo';
 import PermissionsForm from '../CustomForm/Permissions';
-import Form, { ISection } from 'components/Form';
 
 const Contract: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -121,17 +120,15 @@ const Contract: React.FC = () => {
         parsedPayload,
         {
           autobroadcast: false,
+          metadata: data,
         },
       );
 
-      const signature = await window.klever.sign(unsignedTx[0]);
+      const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
 
-      unsignedTx[0].Signature = [signature];
-      const response = await core.broadcastTransactions(
-        JSON.stringify(unsignedTx),
-      );
+      const response = await core.broadcastTransactions([signedTx]);
       setLoading(false);
-      setTxHash(response.txHashes[0]);
+      setTxHash(response.data.txsHashes[0]);
       toast.success('Transaction broadcast successfully');
     } catch (e: any) {
       setLoading(false);

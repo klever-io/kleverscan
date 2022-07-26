@@ -29,19 +29,18 @@ const ConnectWallet: React.FC = () => {
   useEffect(() => {
     const init = async () => {
       if (typeof window !== 'undefined') {
-        window.kleverchainUrls = {
-          api:
-            process.env.DEFAULT_API_HOST ||
-            'https://api.testnet.klever.finance/v1.0',
-          node:
-            process.env.DEFAULT_NODE_HOST ||
-            'https://node.testnet.klever.finance',
-        };
-
-        setExtensionInstalled(window.klever !== undefined);
+        setExtensionInstalled(window.kleverWeb !== undefined);
 
         const interval = setInterval(() => {
-          if (window.klever !== undefined) {
+          if (window.kleverWeb !== undefined) {
+            window.kleverWeb.provider = {
+              api:
+                process.env.DEFAULT_API_HOST ||
+                'https://api.testnet.klever.finance/v1.0',
+              node:
+                process.env.DEFAULT_NODE_HOST ||
+                'https://node.testnet.klever.finance',
+            };
             setExtensionInstalled(true);
             clearInterval(interval);
           }
@@ -61,13 +60,13 @@ const ConnectWallet: React.FC = () => {
           let interval: any;
           const intervalPromise = new Promise(resolve => {
             interval = setInterval(() => {
-              if (window?.klever?.active !== undefined) {
-                if (window?.klever?.active === false) {
-                  window.klever.initialize();
+              if (window?.kleverWeb?.active !== undefined) {
+                if (window?.kleverWeb?.active === false) {
+                  window.kleverWeb.initialize();
                   clearInterval(interval);
                   resolve(true);
                 }
-                if (window?.klever?.active === true) {
+                if (window?.kleverWeb?.active === true) {
                   clearInterval(interval);
                   resolve(true);
                 }
@@ -118,19 +117,19 @@ const ConnectWallet: React.FC = () => {
   };
 
   const handleConnect = async () => {
-    if (window.klever !== undefined) {
-      if (!window.klever.active) {
+    if (window.kleverWeb !== undefined) {
+      if (!window.kleverWeb.active) {
         setLoading(true);
-        await window.klever.initialize();
+        await window.kleverWeb.initialize();
         setLoading(false);
 
         let interval: any;
         const intervalPromise = new Promise(resolve => {
           interval = setInterval(() => {
-            if (window.klever.getWalletAddress() !== '?') {
+            if (window.kleverWeb.getWalletAddress() !== '?') {
               resolve(clearInterval(interval));
             }
-            window.klever.getWalletAddress();
+            window.kleverWeb.getWalletAddress();
           }, 100);
         });
 
@@ -144,7 +143,7 @@ const ConnectWallet: React.FC = () => {
 
         clearInterval(interval);
 
-        const address: string = window.klever.getWalletAddress();
+        const address: string = window.kleverWeb.getWalletAddress();
 
         if (address.substring(0, 3) === 'klv') {
           sessionStorage.setItem('walletAddress', address);
@@ -153,8 +152,8 @@ const ConnectWallet: React.FC = () => {
         } else {
           toast.error("Please change your extension's network to kleverchain");
         }
-      } else if (window.klever.active) {
-        const address: string = window.klever.getWalletAddress();
+      } else if (window.kleverWeb.active) {
+        const address: string = window.kleverWeb.getWalletAddress();
 
         if (address.substring(0, 3) === 'klv') {
           sessionStorage.setItem('walletAddress', address);

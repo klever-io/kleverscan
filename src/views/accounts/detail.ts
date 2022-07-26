@@ -125,7 +125,7 @@ export const CenteredRow = styled.div`
   align-items: center;
   flex: 1;
 
-  gap: 2rem;
+  gap: 0.5rem;
 
   span {
     flex: 1;

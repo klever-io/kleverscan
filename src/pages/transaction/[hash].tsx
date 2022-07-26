@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
@@ -33,7 +33,7 @@ import {
   IContract,
 } from '@/types/index';
 
-import { ArrowLeft } from '@/assets/icons';
+import { ArrowLeft, Receive } from '@/assets/icons';
 import {
   TransactionDetails as Icon,
   TransactionDetails,
@@ -64,6 +64,10 @@ import {
   ConfigMarketplace,
 } from '@/components/TransactionContractComponents';
 import Copy from '@/components/Copy';
+import QrCodeModal from '@/components/QrCodeModal';
+import { ReceiveBackground } from '@/views/validator';
+
+
 
 interface ITransactionResponse extends IResponse {
   data: {
@@ -120,7 +124,7 @@ const klvAsset: IAsset = {
 
 const Transaction: React.FC<ITransactionPage> = props => {
   const router = useRouter();
-
+  const [showModal, setShowModal] = useState(false);
   const { transaction, asset } = props;
 
   const {
@@ -252,6 +256,15 @@ const Transaction: React.FC<ITransactionPage> = props => {
             <CenteredRow>
               <span>{hash}</span>
               <Copy data={hash} info="Hash" />
+              <ReceiveBackground>
+                <Receive onClick={() => setShowModal(!showModal)} />
+                <QrCodeModal
+                  show={showModal}
+                  setShowModal={() => setShowModal(false)}
+                  value={hash}
+                  onClose={() => setShowModal(false)}
+                />
+              </ReceiveBackground>
             </CenteredRow>
           </Row>
           <Row>

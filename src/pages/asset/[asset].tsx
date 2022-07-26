@@ -39,7 +39,7 @@ import {
   timestampToDate,
 } from '@/utils/index';
 
-import { ArrowLeft } from '@/assets/icons';
+import { ArrowLeft, Receive } from '@/assets/icons';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Transactions from '@/components/Tabs/Transactions';
 import Holders from '@/components/Tabs/Holders';
@@ -47,6 +47,8 @@ import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
 import { ISelectedDays } from '@/components/DateFilter';
 import Copy from '@/components/Copy';
+import QrCodeModal from '@/components/QrCodeModal';
+import { ReceiveBackground } from '@/views/validator';
 
 interface IAssetPage {
   asset: IAsset;
@@ -128,6 +130,7 @@ const Asset: React.FC<IAssetPage> = ({
   const [holders, setHolders] = useState(defaultHolders);
   const [loadingTransactions, setLoadingTransactions] = useState(false);
   const [loadingHolders, setLoadingHolders] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   useDidUpdateEffect(() => {
     setLoadingTransactions(true);
@@ -222,6 +225,15 @@ const Asset: React.FC<IAssetPage> = ({
                   <HoverAnchor>{ownerAddress}</HoverAnchor>
                 </Link>
                 <Copy data={ownerAddress} info="ownerAddress" />
+                <ReceiveBackground>
+                <Receive onClick={() => setShowModal(!showModal)} />
+                <QrCodeModal
+                  show={showModal}
+                  setShowModal={() => setShowModal(false)}
+                  value={ownerAddress}
+                  onClose={() => setShowModal(false)}
+                />
+              </ReceiveBackground>
               </CenteredRow>
             </span>
           </Row>

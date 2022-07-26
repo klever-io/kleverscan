@@ -195,6 +195,13 @@ export const CenteredRow = styled.div`
     font-weight: 600;
   }
 
+  a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    
+  }
+
   p {
     font-weight: 600;
     font-size: 0.85rem;

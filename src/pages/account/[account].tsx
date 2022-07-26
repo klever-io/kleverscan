@@ -32,7 +32,7 @@ import {
   IAccountAsset,
 } from '@/types/index';
 
-import { ArrowLeft } from '@/assets/icons';
+import { ArrowLeft, Receive } from '@/assets/icons';
 import { KLV } from '@/assets/coins';
 import { AccountDetails as AccountIcon } from '@/assets/title-icons';
 
@@ -45,6 +45,8 @@ import { Service } from '@/types/index';
 import { ISelectedDays } from '@/components/DateFilter';
 import Buckets from '@/components/Tabs/Buckets';
 import { useDidUpdateEffect } from '@/utils/hooks';
+import QrCodeModal from '@/components/QrCodeModal';
+import { ReceiveBackground } from '@/views/validator';
 
 interface IAssetInfo {
   assetId: string;
@@ -122,6 +124,7 @@ const Account: React.FC<IAccountPage> = ({
   );
 
   const [buckets, setBuckets] = useState<IBucket[]>([]);
+  const [showModal, setShowModal] = useState(false);
 
   useDidUpdateEffect(() => {
     const fetchData = async () => {
@@ -310,6 +313,15 @@ const Account: React.FC<IAccountPage> = ({
             <CenteredRow>
               <span>{account.address}</span>
               <Copy info="Address" data={account.address} />
+              <ReceiveBackground>
+                <Receive onClick={() => setShowModal(!showModal)} />
+                <QrCodeModal
+                  show={showModal}
+                  setShowModal={() => setShowModal(false)}
+                  value={account.address}
+                  onClose={() => setShowModal(false)}
+                />
+              </ReceiveBackground>
             </CenteredRow>
           </RowContent>
         </Row>

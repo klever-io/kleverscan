@@ -88,6 +88,7 @@ import {
 } from '@/utils/index';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
+import QrCodeModal from '@/components/QrCodeModal';
 
 interface IValidatorPage {
   validator: IPeer;
@@ -140,6 +141,7 @@ const Validator: React.FC<IValidatorPage> = ({
   );
   const [imgError, setImgError] = useState(false);
   const [rerender, setRerender] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -464,7 +466,13 @@ const Validator: React.FC<IValidatorPage> = ({
                 <Copy data={blsPublicKey} info="Key" />
               </CopyBackground>
               <ReceiveBackground>
-                <Receive />
+                <Receive onClick={() => setShowModal(!showModal)} />
+                <QrCodeModal
+                  show={showModal}
+                  setShowModal={() => setShowModal(false)}
+                  value={blsPublicKey}
+                  onClose={() => setShowModal(false)}
+                />
               </ReceiveBackground>
             </CenteredSubTitle>
           </TitleInformation>

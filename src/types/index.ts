@@ -497,6 +497,7 @@ export interface IDelegationsResponse {
   totalMissed: number;
   canDelegate: boolean;
   maxDelegation: number;
+  commission: number;
 }
 export interface IValidator {
   rank: number;
@@ -510,6 +511,7 @@ export interface IValidator {
   totalProduced: number;
   totalMissed: number;
   canDelegate: boolean;
+  commission: number;
 }
 
 export interface IChainStatistics {

@@ -52,6 +52,7 @@ const Validators: React.FC<IValidatorPage> = ({
     'Rating',
     'Status',
     'Stake',
+    'Commission',
     'Produced / Missed',
     'Can Delegate',
     'Cumulative Stake',
@@ -97,6 +98,7 @@ const Validators: React.FC<IValidatorPage> = ({
             status: delegation.list,
             totalProduced,
             totalMissed,
+            commission: delegation.commission,
           };
         },
       );
@@ -124,6 +126,7 @@ const Validators: React.FC<IValidatorPage> = ({
     rank,
     name,
     staked,
+    commission,
     cumulativeStaked,
     address,
     rating,
@@ -132,7 +135,7 @@ const Validators: React.FC<IValidatorPage> = ({
     totalMissed,
     canDelegate,
   }) => {
-    const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'error');
+    const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'fail');
 
     return address ? (
       <Row type="validators">
@@ -157,6 +160,9 @@ const Validators: React.FC<IValidatorPage> = ({
         <span>{capitalizeString(status)}</span>
         <span>
           <strong>{formatAmount(staked / 10 ** precision)} KLV</strong>
+        </span>
+        <span>
+          <strong>{commission}</strong>
         </span>
         <span>
           <strong>{`${totalProduced} / ${totalMissed}`}</strong>
@@ -240,6 +246,7 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
             status: delegation.list,
             totalProduced,
             totalMissed,
+            commission: delegation.commission,
           };
         },
       );

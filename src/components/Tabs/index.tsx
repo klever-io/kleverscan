@@ -17,7 +17,7 @@ export interface ITabs {
   headers: string[];
   onClick?(header: string, index: number): void;
   dateFilterProps?: IDateFilter;
-  filterFromTo(op: number): void;
+  filterFromTo?(op: number): void;
 }
 
 const Tabs: React.FC<ITabs> = ({
@@ -70,7 +70,9 @@ const Tabs: React.FC<ITabs> = ({
             <div className="select">
               <select
                 className="filterFromTo"
-                onChange={e => filterFromTo(Number(e.target.value))}
+                onChange={e =>
+                  filterFromTo && filterFromTo(Number(e.target.value))
+                }
               >
                 <option className="option" value={0}>
                   All Transactions

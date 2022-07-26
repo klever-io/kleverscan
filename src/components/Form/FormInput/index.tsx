@@ -163,7 +163,9 @@ const FormInput: React.FC<IFormInputProps> = ({
                 required={false}
                 value={value}
                 checked={getIsChecked()}
-                onChange={() => {}}
+                onChange={e => {
+                  return e;
+                }}
               />
               <Slider />
               {error && <span>{description}</span>}

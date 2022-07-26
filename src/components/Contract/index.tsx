@@ -249,4 +249,5 @@ const Contract: React.FC = () => {
     </Container>
   );
 };
+
 export default Contract;

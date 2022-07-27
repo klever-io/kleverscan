@@ -58,7 +58,11 @@ import {
   CardSubHeader,
 } from '@/views/validator';
 
-import { CardContainer, CardContent } from '@/views/validators/detail';
+import {
+  CardContainer,
+  CardContent,
+  CenteredRow,
+} from '@/views/validators/detail';
 import { Row as RowList } from '@/components/Table/styles';
 
 import {
@@ -84,6 +88,7 @@ import {
 } from '@/utils/index';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
+import QrCodeModal from '@/components/QrCodeModal';
 
 interface IValidatorPage {
   validator: IPeer;
@@ -136,6 +141,7 @@ const Validator: React.FC<IValidatorPage> = ({
   );
   const [imgError, setImgError] = useState(false);
   const [rerender, setRerender] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -213,7 +219,7 @@ const Validator: React.FC<IValidatorPage> = ({
   };
 
   const renderTitle = () => {
-    return <h1>{name || parseAddress(ownerAddress, 12)}</h1>;
+    return <h1>{name || parseAddress(ownerAddress, 24)}</h1>;
   };
 
   const renderMaxDelegation = () => {
@@ -274,7 +280,10 @@ const Validator: React.FC<IValidatorPage> = ({
             <strong>Owner Address</strong>
           </span>
           <span>
-            <Link href={`/account/${ownerAddress}`}>{ownerAddress}</Link>
+            <CenteredRow>
+              <Link href={`/account/${ownerAddress}`}>{ownerAddress}</Link>
+              <Copy data={ownerAddress} info="ownerAddress"></Copy>
+            </CenteredRow>
           </span>
         </Row>
         <Row>
@@ -399,9 +408,14 @@ const Validator: React.FC<IValidatorPage> = ({
     return (
       <RowList type="validator">
         <Link href={`/account/${address}`}>
-          {parseAddress(address || '', 12)}
+          {parseAddress(address || '', 25)}
         </Link>
-        <span>{id}</span>
+        <span>
+          <CenteredRow>
+            {id}
+            <Copy data={id} info="id"></Copy>
+          </CenteredRow>
+        </span>
         <span>{stakedEpoch}</span>
         <span>
           <strong>{formatAmount(balance / 10 ** precision)}</strong>
@@ -452,7 +466,13 @@ const Validator: React.FC<IValidatorPage> = ({
                 <Copy data={blsPublicKey} info="Key" />
               </CopyBackground>
               <ReceiveBackground>
-                <Receive />
+                <Receive onClick={() => setShowModal(!showModal)} />
+                <QrCodeModal
+                  show={showModal}
+                  setShowModal={() => setShowModal(false)}
+                  value={blsPublicKey}
+                  onClose={() => setShowModal(false)}
+                />
               </ReceiveBackground>
             </CenteredSubTitle>
           </TitleInformation>

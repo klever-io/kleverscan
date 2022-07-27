@@ -85,14 +85,14 @@ describe('Transaction page interaction', () => {
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(1) > a').parent().click();
     cy.location().should(url => {
       const txHash = url.href.split('transaction/')[1];
-      expect(url.href).include(`${BASE_URL}/transaction/`)
+      expect(url.href).include(`${BASE_URL}/transaction/`);
       expect(txHash).to.have.length(64);
     });
   });
 
   it('Should use the "..." to navigate to page that aren\'t shown, go to last page and finally should enter on the transaction details of the page', () => {
     cy.get(':nth-child(9) > .styles__ItemContainer-sc-1iq811b-3').click();
-    cy.get('.styles__Container-sc-73jxvx-0 > input').type('200');
+    cy.get('.styles__Container-sc-73jxvx-0 > input').type('98');
     cy.get('.styles__Confirm-sc-porxf3-5').click();
     cy.wait(1000);
     cy.get(':nth-child(3) > .styles__ItemContainer-sc-1iq811b-3').click();
@@ -105,7 +105,7 @@ describe('Transaction page interaction', () => {
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(1) > a').parent().click();
     cy.location().should(url => {
       const txHash = url.href.split('transaction/')[1];
-      expect(url.href).include(`${BASE_URL}/transaction/`)
+      expect(url.href).include(`${BASE_URL}/transaction/`);
       expect(txHash).to.have.length(64);
     });
   });
@@ -182,7 +182,7 @@ describe('Transaction page interaction', () => {
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(1) > a').parent().click();
     cy.location().should(url => {
       const txHash = url.href.split('transaction/')[1];
-      expect(url.href).include(`${BASE_URL}/transaction/`)
+      expect(url.href).include(`${BASE_URL}/transaction/`);
       expect(txHash).to.have.length(64);
     });
 
@@ -193,7 +193,7 @@ describe('Transaction page interaction', () => {
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(1) > a').parent().click();
     cy.location().should(url => {
       const txHash = url.href.split('transaction/')[1];
-      expect(url.href).include(`${BASE_URL}/transaction/`)
+      expect(url.href).include(`${BASE_URL}/transaction/`);
       expect(txHash).to.have.length(64);
     });
 
@@ -204,12 +204,12 @@ describe('Transaction page interaction', () => {
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(1) > a').parent().click();
     cy.location().should(url => {
       const txHash = url.href.split('transaction/')[1];
-      expect(url.href).include(`${BASE_URL}/transaction/`)
+      expect(url.href).include(`${BASE_URL}/transaction/`);
       expect(txHash).to.have.length(64);
     });
   });
 
-  it.only('Filter by coin, status and contract', () => {
+  it('Filter by coin, status and contract', () => {
     cy.get(':nth-child(1) > .styles__Content-sc-1hif3ao-1').click();
     cy.get(':nth-child(1) > .styles__Content-sc-1hif3ao-1 > .styles__SelectorContainer-sc-1hif3ao-2 > :nth-child(2)').click();
     cy.wait(500);
@@ -223,7 +223,7 @@ describe('Transaction page interaction', () => {
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(1) > a').parent().click();
     cy.location().should(url => {
       const txHash = url.href.split('transaction/')[1];
-      expect(url.href).include(`${BASE_URL}/transaction/`)
+      expect(url.href).include(`${BASE_URL}/transaction/`);
       expect(txHash).to.have.length(64);
     });
   });
@@ -255,7 +255,7 @@ describe('Transaction page interaction', () => {
     cy.wait(500);
     cy.location().should(url => {
       const address = url.href.split('account/')[1];
-      expect(url.href).include(`${BASE_URL}/account/`)
+      expect(url.href).include(`${BASE_URL}/account/`);
       expect(address).to.have.length(62);
     });
   });

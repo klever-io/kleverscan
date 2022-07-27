@@ -20,6 +20,7 @@ import {
   LetterLogo,
   Logo,
   HoverAnchor,
+  CenteredRow,
 } from '@/views/assets/detail';
 
 import api from '@/services/api';
@@ -38,13 +39,16 @@ import {
   timestampToDate,
 } from '@/utils/index';
 
-import { ArrowLeft } from '@/assets/icons';
+import { ArrowLeft, Receive } from '@/assets/icons';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Transactions from '@/components/Tabs/Transactions';
 import Holders from '@/components/Tabs/Holders';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
 import { ISelectedDays } from '@/components/DateFilter';
+import Copy from '@/components/Copy';
+import QrCodeModal from '@/components/QrCodeModal';
+import { ReceiveBackground } from '@/views/validator';
 
 interface IAssetPage {
   asset: IAsset;
@@ -98,10 +102,16 @@ const Asset: React.FC<IAssetPage> = ({
     maxSupply,
     initialSupply,
     circulatingSupply,
+    burnedValue,
+    staking,
+    properties,
+    attributes,
   } = asset;
 
   const router = useRouter();
-  const cardHeaders = ['Overview', 'More'];
+  const cardHeaders = uris
+    ? ['Overview', 'More', 'URIS']
+    : ['Overview', 'More'];
   const tableHeaders = ['Transactions', 'Holders'];
 
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
@@ -120,6 +130,7 @@ const Asset: React.FC<IAssetPage> = ({
   const [holders, setHolders] = useState(defaultHolders);
   const [loadingTransactions, setLoadingTransactions] = useState(false);
   const [loadingHolders, setLoadingHolders] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   useDidUpdateEffect(() => {
     setLoadingTransactions(true);
@@ -202,16 +213,31 @@ const Asset: React.FC<IAssetPage> = ({
   const Overview: React.FC = () => {
     return (
       <>
-        <Row>
-          <span>
-            <strong>Owner</strong>
-          </span>
-          <span>
-            <Link href={`/account/${ownerAddress}`}>
-              <HoverAnchor>{ownerAddress}</HoverAnchor>
-            </Link>
-          </span>
-        </Row>
+        {ownerAddress && (
+          <Row>
+            <span>
+              <strong>Owner</strong>
+            </span>
+
+            <span>
+              <CenteredRow>
+                <Link href={`/account/${ownerAddress}`}>
+                  <HoverAnchor>{ownerAddress}</HoverAnchor>
+                </Link>
+                <Copy data={ownerAddress} info="ownerAddress" />
+                <ReceiveBackground>
+                <Receive onClick={() => setShowModal(!showModal)} />
+                <QrCodeModal
+                  show={showModal}
+                  setShowModal={() => setShowModal(false)}
+                  value={ownerAddress}
+                  onClose={() => setShowModal(false)}
+                />
+              </ReceiveBackground>
+              </CenteredRow>
+            </span>
+          </Row>
+        )}
         <Row>
           <span>
             <strong>Max Supply</strong>
@@ -244,6 +270,29 @@ const Asset: React.FC<IAssetPage> = ({
         </Row>
         <Row>
           <span>
+            <strong>Burned Value</strong>
+          </span>
+          <span>
+            <small>
+              {toLocaleFixed(burnedValue / 10 ** precision, precision)}
+            </small>
+          </span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Total Staked</strong>
+          </span>
+          <span>
+            <small>
+              {toLocaleFixed(
+                (staking?.totalStaked || 0) / 10 ** precision,
+                precision,
+              )}
+            </small>
+          </span>
+        </Row>
+        <Row>
+          <span>
             <strong>Holders</strong>
           </span>
           <span>{totalRecords}</span>
@@ -264,21 +313,26 @@ const Asset: React.FC<IAssetPage> = ({
     );
   };
 
+  const UriComponent: React.FC = () => {
+    return (
+      <>
+        {Object.entries(uris).map(([key, value]: [string, any]) => (
+          <Row key={String(key)}>
+            <span>
+              <strong>{key}</strong>
+            </span>
+            <a href={`${value}`} target="blank">
+              {value}
+            </a>
+          </Row>
+        ))}
+      </>
+    );
+  };
+
   const More: React.FC = () => {
     return (
       <>
-        <Row>
-          <span>
-            <strong>White Paper</strong>
-          </span>
-          <span>{getWhitepaper()}</span>
-        </Row>
-        <Row>
-          <span>
-            <strong>Official Website</strong>
-          </span>
-          <span>{getWebsite()}</span>
-        </Row>
         <Row>
           <span>
             <strong>Issuing Time</strong>
@@ -290,12 +344,69 @@ const Asset: React.FC<IAssetPage> = ({
             <strong>Issuer</strong>
           </span>
           <span>{ownerAddress ? ownerAddress : '--'}</span>
+          <CenteredRow>
+            <Copy data={ownerAddress} info="Issue" />
+          </CenteredRow>
         </Row>
         <Row>
           <span>
             <strong>Precision</strong>
           </span>
           <span>{precision}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Can Freeze</strong>
+          </span>
+          <span>{String(properties.canFreeze)}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Can Wipe</strong>
+          </span>
+          <span>{String(properties.canWipe)}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Can Pause</strong>
+          </span>
+          <span>{String(properties.canPause)}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Can Mint</strong>
+          </span>
+          <span>{String(properties.canMint)}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Can Burn</strong>
+          </span>
+          <span>{String(properties.canBurn)}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Can Change Owner</strong>
+          </span>
+          <span>{String(properties.canChangeOwner)}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Can Add Roles</strong>
+          </span>
+          <span>{String(properties.canAddRoles)}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>Paused</strong>
+          </span>
+          <span>{String(attributes.isPaused)}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>NFT Mint Stopped</strong>
+          </span>
+          <span>{String(attributes.isNFTMintStopped)}</span>
         </Row>
       </>
     );
@@ -307,6 +418,8 @@ const Asset: React.FC<IAssetPage> = ({
         return <Overview />;
       case 'More':
         return <More />;
+      case 'URIS':
+        return <UriComponent />;
       default:
         return <div />;
     }
@@ -444,6 +557,7 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
   };
 
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
+  let assetNotFound = false;
 
   const assetId = params?.asset;
 
@@ -506,11 +620,15 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
             props.totalRecords = holders?.pagination?.totalRecords || 0;
           }
         } else if (index == 0) {
-          return redirectProps;
+          assetNotFound = true;
         }
       });
     },
   );
+
+  if (assetNotFound) {
+    return redirectProps;
+  }
 
   return { props };
 };

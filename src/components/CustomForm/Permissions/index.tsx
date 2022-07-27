@@ -1,0 +1,109 @@
+import { Scope } from '@unform/core';
+import FormInput from 'components/Form/FormInput';
+import {
+  ButtonContainer,
+  FormSection,
+  SectionTitle,
+} from 'components/Form/styles';
+import { useState } from 'react';
+
+const PermissionsForm: React.FC = () => {
+  const [signerQuantities, setSignerQuantities] = useState<number[]>([]);
+
+  const handleAddSigner = (index: number) => {
+    const newSignerQuantities = [...signerQuantities];
+    newSignerQuantities[index] += 1;
+    setSignerQuantities(newSignerQuantities);
+  };
+
+  const handleRemoveSigner = (index: number) => {
+    const newSignerQuantities = [...signerQuantities];
+    newSignerQuantities[index] -= 1;
+    setSignerQuantities(newSignerQuantities);
+  };
+
+  const handleAddPermission = () => {
+    setSignerQuantities([...signerQuantities, 1]);
+  };
+
+  const handleRemovePack = () => {
+    const newSignerQuantities = [...signerQuantities];
+    newSignerQuantities.pop();
+    setSignerQuantities(newSignerQuantities);
+  };
+
+  const getSigners = (outerIndex: number, itemsQuantity: number) => {
+    const items = [];
+    for (let innerIndex = 0; innerIndex < itemsQuantity; innerIndex++) {
+      items.push(
+        <Scope path={`permission[${outerIndex}].signer[${innerIndex}]`}>
+          <FormSection inner>
+            <SectionTitle>Signer</SectionTitle>
+            <FormInput title="Address" name="address" />
+            <FormInput title="Weight" name="Weight" type="number" />
+          </FormSection>
+        </Scope>,
+      );
+    }
+    items.push(
+      <>
+        <ButtonContainer onClick={() => handleAddSigner(outerIndex)}>
+          Add Signer
+        </ButtonContainer>
+        {signerQuantities[outerIndex] > 0 && (
+          <ButtonContainer onClick={() => handleRemoveSigner(outerIndex)}>
+            Remove Signer
+          </ButtonContainer>
+        )}
+      </>,
+    );
+    return items;
+  };
+
+  return (
+    <FormSection>
+      <SectionTitle>Permissions</SectionTitle>
+
+      {signerQuantities.map((itemsQuantity, index) => {
+        return (
+          <FormSection inner key={String(index)}>
+            <SectionTitle>Permission</SectionTitle>
+            <FormInput
+              title="Permission Name"
+              name={`permission[${index}].permissionName`}
+              span={2}
+            />
+            <FormInput
+              title="Threshold"
+              name={`permission[${index}].threshold`}
+              span={2}
+            />
+            <FormInput
+              title="Operations"
+              name={`permission[${index}].operations`}
+              span={2}
+            />
+            <FormInput
+              title="Type"
+              name={`permission[${index}].type`}
+              span={2}
+            />
+            {getSigners(index, itemsQuantity)}
+          </FormSection>
+        );
+      })}
+
+      <ButtonContainer type="button" onClick={handleAddPermission}>
+        Add
+      </ButtonContainer>
+
+      {signerQuantities.length > 0 && (
+        <ButtonContainer type="button" onClick={handleRemovePack}>
+          Remove
+        </ButtonContainer>
+      )}
+    </FormSection>
+  );
+};
+
+export default PermissionsForm;

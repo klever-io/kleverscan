@@ -1,5 +1,4 @@
-import { IAsset, IParsedMetrics, IEpochInfo } from '../types';
-import { contracts } from '../components/ContractSpecific/contracts';
+import { IAsset, IParsedMetrics, IEpochInfo, IContractOption } from '../types';
 
 export const breakText = (text: string, limit: number): string => {
   return text.length > limit ? `${text.substring(0, limit)}...` : text;
@@ -181,6 +180,41 @@ export const addCommasToNumber = (numb: number): string => {
   return numb.toLocaleString();
 };
 
+export const parseData = (data: any) => {
+  const dataEntries = Object.entries(data);
+
+  dataEntries.forEach(([key, value]) => {
+    if (value === '') {
+      delete data[key];
+    } else if (typeof value === 'object') {
+      parseData(value);
+    } else if (
+      typeof value === 'string' &&
+      new RegExp(
+        '^((19|20)\\d\\d)[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])',
+      ).test(value)
+    ) {
+      data[key] = new Date(value).getTime() / 1000;
+    } else if (isNaN(value as any)) {
+      switch (value) {
+        case 'true':
+          data[key] = true;
+          break;
+        case 'false':
+          data[key] = false;
+          break;
+        default:
+          data[key] = value;
+          break;
+      }
+    } else {
+      data[key] = Math.floor(Number(value));
+    }
+  });
+
+  return data;
+};
+
 export const formatLabel = (str: string) => {
   switch (str) {
     case 'assetID':
@@ -205,7 +239,7 @@ export const formatLabel = (str: string) => {
     return 'AssetID';
   }
 
-  let formatedstr = str.charAt(0).toUpperCase() + str.slice(1);
+  const formatedstr = str.charAt(0).toUpperCase() + str.slice(1);
   let label = '';
   formatedstr?.split(/(?=[A-Z])/).forEach((item: string, index: number) => {
     label += item;
@@ -217,85 +251,187 @@ export const formatLabel = (str: string) => {
   return label;
 };
 
-export const changeObject = (
-  obj: any,
-  key: any,
-  value: any,
-  lastParent: any = '',
-  parent: any = '',
-) => {
-  let type = '';
+export const contractOptions: IContractOption[] = [
+  {
+    label: 'Transfer',
+    value: 'TransferContract',
+  },
+  {
+    label: 'Create Asset',
+    value: 'CreateAssetContract',
+  },
+  {
+    label: 'Create Validator',
+    value: 'CreateValidatorContract',
+  },
+  {
+    label: 'Validator Config',
+    value: 'ValidatorConfigContract',
+  },
+  {
+    label: 'Freeze',
+    value: 'FreezeContract',
+  },
+  {
+    label: 'Unfreeze',
+    value: 'UnfreezeContract',
+  },
+  {
+    label: 'Delegate',
+    value: 'DelegateContract',
+  },
+  {
+    label: 'Undelegate',
+    value: 'UndelegateContract',
+  },
+  {
+    label: 'Withdraw',
+    value: 'WithdrawContract',
+  },
+  {
+    label: 'Claim',
+    value: 'ClaimContract',
+  },
+  {
+    label: 'Unjail',
+    value: 'UnjailContract',
+  },
+  {
+    label: 'Asset Trigger',
+    value: 'AssetTriggerContract',
+  },
+  {
+    label: 'Set Account Name',
+    value: 'SetAccountNameContract',
+  },
+  {
+    label: 'Proposal',
+    value: 'ProposalContract',
+  },
+  {
+    label: 'Vote',
+    value: 'VoteContract',
+  },
+  {
+    label: 'Config ITO',
+    value: 'ConfigITOContract',
+  },
+  {
+    label: 'Set ITO Prices',
+    value: 'SetITOPricesContract',
+  },
+  {
+    label: 'Buy',
+    value: 'BuyContract',
+  },
+  {
+    label: 'Sell',
+    value: 'SellContract',
+  },
+  {
+    label: 'Cancel Market Order',
+    value: 'CancelMarketOrderContract',
+  },
+  {
+    label: 'Create Marketplace',
+    value: 'CreateMarketplaceContract',
+  },
+  {
+    label: 'Config Marketplace',
+    value: 'ConfigMarketplaceContract',
+  },
+  {
+    label: 'Update Account Permission',
+    value: 'UpdateAccountPermissionContract',
+  },
+];
 
-  const searchType = (obj: any, field: string) => {
-    Object.keys(obj).forEach(item => {
-      if (item === field) {
-        type = typeof obj[item];
-      } else if (
-        typeof obj[item] === 'object' &&
-        obj[item] !== null &&
-        !Array.isArray(obj[item])
-      ) {
-        searchType(obj[item], field);
-      } else if (Array.isArray(obj[item])) {
-        if (
-          typeof obj[item][0] === 'object' &&
-          obj[item][0] !== null &&
-          !Array.isArray(obj[item][0])
-        ) {
-          searchType(Object.keys(obj[item][0]), field);
-        }
-      }
-    });
-  };
+export const isDataEmpty = (data: string[]): boolean => {
+  if (data?.length === 0) {
+    return true;
+  }
 
-  searchType(contracts, key);
-
-  Object.keys(obj).map((item: any) => {
-    if (item === key) {
-      if (parent !== '' && parent) {
-        if (lastParent === parent) {
-          if (value === '') {
-            if (type === 'number') {
-              obj[item] = null;
-            } else {
-              obj[item] = '';
-            }
-          } else {
-            if (typeof value === 'boolean') {
-              obj[item] = Boolean(value);
-            } else if (!isNaN(Number(value)) && value.length !== 0) {
-              obj[item] = Number(value);
-            } else {
-              obj[item] = value;
-            }
-          }
-        }
-      } else {
-        if (value === '') {
-          if (type === 'number') {
-            obj[item] = null;
-          } else {
-            obj[item] = '';
-          }
-        } else {
-          if (typeof value === 'boolean') {
-            obj[item] = Boolean(value);
-          } else if (!isNaN(Number(value)) && value.length !== 0) {
-            obj[item] = Number(value);
-          } else {
-            obj[item] = value;
-          }
-        }
+  if (data !== undefined) {
+    for (let i = 0; i < data?.length; i++) {
+      if (data[i].length > 0) {
+        return false;
       }
     }
-    if (
-      typeof obj[item] === 'object' &&
-      !Array.isArray(obj[item]) &&
-      obj[item] !== null
-    ) {
-      if (parent) {
-        changeObject(obj[item], key, value, item, parent);
-      }
-    }
-  });
+  }
+
+  return true;
 };
+
+export const claimTypes = [
+  {
+    label: 'Staking Claim (0)',
+    value: 0,
+  },
+  {
+    label: 'Allowance Claim (1)',
+    value: 1,
+  },
+  {
+    label: 'Market Claim (2)',
+    value: 2,
+  },
+];
+
+export const assetTriggerTypes = [
+  {
+    label: 'Mint (0)',
+    value: 0,
+  },
+  {
+    label: 'Burn (1)',
+    value: 1,
+  },
+  {
+    label: 'Wipe (2)',
+    value: 2,
+  },
+  {
+    label: 'Pause (3)',
+    value: 3,
+  },
+  {
+    label: 'Resume (4)',
+    value: 4,
+  },
+  {
+    label: 'Change Owner (5)',
+    value: 5,
+  },
+  {
+    label: 'Add Role (6)',
+    value: 6,
+  },
+  {
+    label: 'Remove Role (7)',
+    value: 7,
+  },
+  {
+    label: 'Update Metadata (8)',
+    value: 8,
+  },
+  {
+    label: 'Stop NFT Mint (9)',
+    value: 9,
+  },
+  {
+    label: 'Update Logo (10)',
+    value: 10,
+  },
+  {
+    label: 'Update URIs (11)',
+    value: 11,
+  },
+  {
+    label: 'Change Royalties Receiver (12)',
+    value: 12,
+  },
+  {
+    label: 'Update Staking (13)',
+    value: 13,
+  },
+];

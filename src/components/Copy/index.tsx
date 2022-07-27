@@ -5,7 +5,7 @@ import { Copy as CopyIcon } from '@/assets/icons';
 import { toast } from 'react-toastify';
 
 interface ICopyProps {
-  data: string;
+  data?: string;
   info?: string;
 }
 

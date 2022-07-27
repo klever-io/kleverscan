@@ -16,6 +16,7 @@ import Proposal from './proposal.svg';
 import Receive from './receive.svg';
 import ArrowGreen from './arrow-up-green.svg';
 import ArrowPink from './arrow-down-pink.svg';
+import Certified from './certified.svg';
 
 export {
   Category,
@@ -36,4 +37,5 @@ export {
   Receive,
   ArrowGreen,
   ArrowPink,
+  Certified
 };

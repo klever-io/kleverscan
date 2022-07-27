@@ -29,6 +29,8 @@ import { Accounts as Icon } from '@/assets/title-icons';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Pagination from '@/components/Pagination';
 import { useDidUpdateEffect } from '@/utils/hooks';
+import Copy from '@/components/Copy';
+import { CenteredRow } from '@/views/accounts/detail';
 
 interface IAccounts {
   accounts: IAccount[];
@@ -162,7 +164,11 @@ const Accounts: React.FC<IAccounts> = ({
     return (
       <Row type="accounts">
         <span>
-          <Link href={`/account/${address}`}>{address}</Link>
+          <CenteredRow>
+            <Link href={`/account/${address}`}>{address}</Link>
+
+            <Copy info="Address" data={address} />
+          </CenteredRow>
         </span>
         <span>
           <strong>{/* {formatAmount(getFreezeBalance())}  */}-- KLV</strong>

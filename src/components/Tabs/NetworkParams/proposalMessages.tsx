@@ -1,4 +1,4 @@
-import { IProposalsMessages } from "@/types/index";
+import { IProposalsMessages } from "@/types/proposals";
 
 export const proposalsMessages: IProposalsMessages = {
   FeePerDataByte: 'Fee Per Data Byte',

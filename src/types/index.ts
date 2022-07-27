@@ -35,6 +35,11 @@ export enum Service {
   EXPLORER,
 }
 
+export interface IContractOption {
+  value: string;
+  label: string;
+}
+
 export interface ITransferContract {
   amount: number;
   toAddress: string;
@@ -305,7 +310,7 @@ export interface ITransaction {
   hash: string;
   blockNum: number;
   sender: string;
-  data?: string;
+  data?: string[];
   nonce: number;
   timestamp: number;
   chainID: string;
@@ -441,6 +446,21 @@ export interface IAsset {
   issueDate: number;
   staking: {
     minEpochsToWithdraw: number;
+    totalStaked: number;
+  };
+  burnedValue: number;
+  properties: {
+    canFreeze: boolean;
+    canWipe: boolean;
+    canPause: boolean;
+    canMint: boolean;
+    canBurn: boolean;
+    canChangeOwner: boolean;
+    canAddRoles: boolean;
+  };
+  attributes: {
+    isPaused: boolean;
+    isNFTMintStopped: boolean;
   };
 }
 
@@ -477,6 +497,7 @@ export interface IDelegationsResponse {
   totalMissed: number;
   canDelegate: boolean;
   maxDelegation: number;
+  commission: number;
 }
 export interface IValidator {
   rank: number;
@@ -490,6 +511,7 @@ export interface IValidator {
   totalProduced: number;
   totalMissed: number;
   canDelegate: boolean;
+  commission: number;
 }
 
 export interface IChainStatistics {
@@ -686,50 +708,6 @@ export interface INodeCard {
   chartData: IChartData[] | string[];
 }
 
-export interface IProposalDetails {
-  proposer: string;
-  proposerContent: string;
-  created: number;
-  hash: string;
-}
-
-export interface IProposal {
-  proposalId: number;
-  proposalStatus: string;
-  parameter: string;
-  value: string;
-  description: string;
-  epochStart: number;
-  epochEnd: number;
-  votes: number;
-  voters: IVote[];
-  txHash: string;
-  proposer: string;
-  createdDate: string;
-  endedDate: string;
-  totalStaked?: number;
-  timestampStart?: number;
-  timestampEnd?: number;
-  parameters?: IFullInfoParam[];
-}
-
-export interface IVote {
-  address: string;
-  amount: number;
-}
-
-export interface IProposalsResponse extends IResponse {
-  data: {
-    proposals: IProposal[];
-  };
-  pagination: IPagination;
-}
-export interface ITotalFrozen {
-  data: {
-    totalFrozen: number;
-  };
-}
-
 export interface IDelegate {
   address: string;
   buckets: IBucket[];
@@ -749,89 +727,8 @@ export interface IParsedMetrics {
   klv_slot_duration: number;
 }
 
-export interface IRawParam {
-  [name: string]: number | undefined;
-}
-
-export interface IFullInfoParam {
-  paramIndex: string;
-  paramLabel: string;
-  paramValue: number;
-  paramText: string;
-}
-
-export enum NetworkParamsIndexer {
-  FeePerDataByte = 0,
-  KAppFeeCreateValidator = 1,
-  KAppFeeCreateAsset = 2,
-  MaxEpochsUnclaimed = 3,
-  MinSelfDelegatedAmount = 4,
-  MinTotalDelegatedAmount = 5,
-  BlockRewards = 6,
-  StakingRewards = 7,
-  KAppFeeTransfer = 8,
-  KAppFeeAssetTrigger = 9,
-  KAppFeeValidatorConfig = 10,
-  KAppFeeFreeze = 11,
-  KAppFeeUnfreeze = 12,
-  KAppFeeDelegate = 13,
-  KAppFeeUndelegate = 14,
-  KAppFeeWithdraw = 15,
-  KAppFeeClaim = 16,
-  KAppFeeUnjail = 17,
-  KAppFeeSetAccountName = 18,
-  KAppFeeProposal = 19,
-  KAppFeeVote = 20,
-  KAppFeeConfigITO = 21,
-  KAppFeeSetITOPrices = 22,
-  KAppFeeBuy = 23,
-  KAppFeeSell = 24,
-  KAppFeeCancelMarketOrder = 25,
-  KAppFeeCreateMarketplace = 26,
-  KAppFeeConfigMarketplace = 27,
-  KAppFeeUpdateAccountPermission = 28,
-  MaxNFTMintBatch = 29,
-  MinKFIStakedToEnableProposals = 30,
-  MinKLVBucketAmount = 31,
-  MaxBucketSize = 32,
-  LeaderValidatorRewardsPercentage = 33,
-  ProposalMaxEpochsDuration = 34,
-}
-
-export interface IProposalsMessages {
-  FeePerDataByte: string;
-  KAppFeeCreateValidator: string;
-  KAppFeeCreateAsset: string;
-  MaxEpochsUnclaimed: string;
-  MinSelfDelegatedAmount: string;
-  MinTotalDelegatedAmount: string;
-  BlockRewards: string;
-  StakingRewards: string;
-  KAppFeeTransfer: string;
-  KAppFeeAssetTrigger: string;
-  KAppFeeValidatorConfig: string;
-  KAppFeeFreeze: string;
-  KAppFeeUnfreeze: string;
-  KAppFeeDelegate: string;
-  KAppFeeUndelegate: string;
-  KAppFeeWithdraw: string;
-  KAppFeeClaim: string;
-  KAppFeeUnjail: string;
-  KAppFeeSetAccountName: string;
-  KAppFeeProposal: string;
-  KAppFeeVote: string;
-  KAppFeeConfigITO: string;
-  KAppFeeSetITOPrices: string;
-  KAppFeeBuy: string;
-  KAppFeeSell: string;
-  KAppFeeCancelMarketOrder: string;
-  KAppFeeCreateMarketplace: string;
-  KAppFeeConfigMarketplace: string;
-  KAppFeeUpdateAccountPermission: string;
-  MaxNFTMintBatch: string;
-  MinKFIStakedToEnableProposals: string;
-  MinKLVBucketAmount: string;
-  MaxBucketSize: string;
-  LeaderValidatorRewardsPercentage: string;
-  ProposalMaxEpochsDuration: string;
+export interface ITotalFrozen {
+  data: {
+    totalFrozen: number;
+  };
 }

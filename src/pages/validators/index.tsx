@@ -52,6 +52,7 @@ const Validators: React.FC<IValidatorPage> = ({
     'Rating',
     'Status',
     'Stake',
+    'Commission',
     'Produced / Missed',
     'Can Delegate',
     'Cumulative Stake',
@@ -97,6 +98,7 @@ const Validators: React.FC<IValidatorPage> = ({
             status: delegation.list,
             totalProduced,
             totalMissed,
+            commission: delegation.commission,
           };
         },
       );
@@ -124,6 +126,7 @@ const Validators: React.FC<IValidatorPage> = ({
     rank,
     name,
     staked,
+    commission,
     cumulativeStaked,
     address,
     rating,
@@ -132,7 +135,7 @@ const Validators: React.FC<IValidatorPage> = ({
     totalMissed,
     canDelegate,
   }) => {
-    const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'error');
+    const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'fail');
 
     return address ? (
       <Row type="validators">
@@ -146,10 +149,10 @@ const Validators: React.FC<IValidatorPage> = ({
                 validators[rank - page * pagination.perPage - 1].address
               }`}
             >
-              {name}
+              {parseAddress(name, 20)}
             </Link>
           ) : (
-            <span>{name}</span>
+            <span>{parseAddress(name, 20)}</span>
           )}
         </span>
         <span>{((rating * 100) / 10000000).toFixed(2)}%</span>
@@ -157,6 +160,9 @@ const Validators: React.FC<IValidatorPage> = ({
         <span>{capitalizeString(status)}</span>
         <span>
           <strong>{formatAmount(staked / 10 ** precision)} KLV</strong>
+        </span>
+        <span>
+          <strong>{commission}</strong>
         </span>
         <span>
           <strong>{`${totalProduced} / ${totalMissed}`}</strong>
@@ -226,7 +232,7 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
           return {
             staked: delegation.totalStake,
             rank: index + validators.pagination.previous * 10 + 1,
-            name: delegation.name || parseAddress(delegation.ownerAddress, 8),
+            name: delegation.name || parseAddress(delegation.ownerAddress, 20),
             cumulativeStaked: parseFloat(
               (
                 (delegation.totalStake / validators.data.networkTotalStake) *
@@ -240,6 +246,7 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
             status: delegation.list,
             totalProduced,
             totalMissed,
+            commission: delegation.commission,
           };
         },
       );

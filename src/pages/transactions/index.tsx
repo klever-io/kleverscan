@@ -15,6 +15,7 @@ import {
   TooltipText,
   FilterByDate,
 } from '@/views/transactions';
+import { Input } from '@/views/transactions/detail';
 
 import Filter, { IFilter, IFilterItem } from '@/components/Filter';
 import Table, { ITable } from '@/components/Table';
@@ -330,7 +331,10 @@ const Transactions: React.FC<ITransactions> = ({
 
     return (
       <span>
-        <strong>{formatAmount(parameter.amount / 10 ** precision)} {parameter.assetId.replace(/['"]+/g, '')}</strong>
+        <strong>
+          {formatAmount(parameter.amount / 10 ** precision)}{' '}
+          {parameter.assetId.replace(/['"]+/g, '')}
+        </strong>
       </span>
     );
   };
@@ -668,7 +672,7 @@ const Transactions: React.FC<ITransactions> = ({
     return (
       <Row type="transactions" filter={transactionType}>
         <span>
-          <Link href={`/transaction/${hash}`}>{hash}</Link>
+          <Link href={`/transaction/${hash}`}>{parseAddress(hash, 28)}</Link>
         </span>
         <Link href={`/block/${blockNum || 0}`}>
           <a className="address">{blockNum || 0}</a>
@@ -761,6 +765,7 @@ const Transactions: React.FC<ITransactions> = ({
         <FilterByDate>
           <DateFilter {...dateFilterProps} />
         </FilterByDate>
+        <Input />
       </Header>
       <Table {...tableProps} />
       <PaginationContainer>

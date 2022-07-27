@@ -87,7 +87,6 @@ export const Row = styled.div<ITableType>`
   a {
     /* flex: 1; */
     overflow: hidden;
-
     text-overflow: ellipsis;
     white-space: nowrap;
 
@@ -118,6 +117,22 @@ export const Row = styled.div<ITableType>`
     p {
       font-weight: 600;
       color: ${props => props.theme.black};
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .isVerified {
+      position: absolute;
+      left: 13rem;
+
+      @media (max-width: 1600px) {
+        left: 8rem;
+      }
+
+      @media (max-width: 768px) {
+        left: 6rem;
+      }
     }
   }
   .address {

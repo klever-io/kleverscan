@@ -14,25 +14,14 @@ import {
 import { getStatusIcon } from '@/assets/status';
 import Link from 'next/link';
 
-import { IProposal, IFullInfoParam } from '@/types/index';
+import { IProposal, IFullInfoParam, IProposals, IProposalsProps, IParsedProposal } from '@/types/proposals';
 import { capitalizeString, parseAddress } from '@/utils/index';
 
-interface IProposalsProps {
-  proposalParams: IProposals;
-  loading: boolean;
-  proposalsWithNetWorkParams: IFullInfoParam[][];
-}
-
-interface IProposals {
-  [index: number]: IProposal;
-}
-
 const Proposals: React.FC<IProposalsProps> = ({
-  proposalParams,
+  proposals,
   loading,
-  proposalsWithNetWorkParams,
 }) => {
-  const TableBody: React.FC<IProposal> = props => {
+  const TableBody: React.FC<IParsedProposal> = props => {
     const tooltipRef = useRef<any>(null);
 
     const renderProposalsNetworkParams = (
@@ -64,12 +53,12 @@ const Proposals: React.FC<IProposalsProps> = ({
     };
 
     const renderProposalsNetworkParamsWithToolTip = () => {
-      if (parameters && proposalsWithNetWorkParams) {
+      if (parsedParameters) {
         return (
           <Tooltip onMouseOver={(e: any) => handleMouseOver(e)}>
-        {renderProposalsNetworkParams(parameters)}
+        {renderProposalsNetworkParams(parsedParameters)}
         <TooltipText ref={tooltipRef}>
-          {parameters.map((param2, index2) => (
+          {parsedParameters.map((param2, index2) => (
             <div key={index2}>
               {param2.paramText}&nbsp;&nbsp;{param2.paramValue}
             </div>
@@ -96,7 +85,7 @@ const Proposals: React.FC<IProposalsProps> = ({
       proposer,
       totalStaked,
       votes,
-      parameters,
+      parsedParameters,
     } = props;
     const StatusIcon = getStatusIcon(proposalStatus);
     const precision = 10 ** 6;
@@ -163,7 +152,7 @@ const Proposals: React.FC<IProposalsProps> = ({
 
   const tableProps: ITable = {
     body: TableBody,
-    data: proposalParams as any[],
+    data: proposals as any[],
     loading: loading,
     header,
     type: 'proposals',

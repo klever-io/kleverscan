@@ -3,7 +3,7 @@ describe('Account Page interaction', () => {
   
   beforeEach(() => {
     cy.viewport(1900, 1080);
-    cy.visit('/accounts')
+    cy.visit('/accounts');
   });
 
   it('Should redirect to account detail when click on any address', () => {
@@ -20,7 +20,7 @@ describe('Account Page interaction', () => {
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(1) > a').click();
     cy.location().should(url => {
       const address = url.href.split('account/')[1];
-      expect(url.href).include(`${BASE_URL}/account/`)
+      expect(url.href).include(`${BASE_URL}/account/`);
       expect(address).to.have.length(62);
     });
   });
@@ -28,14 +28,14 @@ describe('Account Page interaction', () => {
   it('Should use the right arrow to navigate to page 2 and 3,  with left arrow should back to page 2 and finally click on address of the page and redirect to account details', () => {
     cy.get('.aaQsj').click();
     cy.wait(1000);
-    cy.get('.styles__Container-sc-1iq811b-1 > :nth-child(11)').click();
+    cy.get('.styles__Container-sc-1iq811b-1 > :last-child').click();
     cy.wait(1000);
     cy.get('.styles__Container-sc-1iq811b-1 > :nth-child(1)').click();
     cy.wait(1500);
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(1) > a').click();
     cy.location().should(url => {
       const address = url.href.split('account/')[1];
-      expect(url.href).include(`${BASE_URL}/account/`)
+      expect(url.href).include(`${BASE_URL}/account/`);
       expect(address).to.have.length(62);
     });
   });
@@ -46,7 +46,7 @@ describe('Account Page interaction', () => {
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(1) > a').click();
     cy.location().should(url => {
       const address = url.href.split('account/')[1];
-      expect(url.href).include(`${BASE_URL}/account/`)
+      expect(url.href).include(`${BASE_URL}/account/`);
       expect(address).to.have.length(62);
     });
   });
@@ -58,7 +58,7 @@ describe('Account Page interaction', () => {
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(1) > a').parent().click();
     cy.location().should(url => {
       const address = url.href.split('account/')[1];
-      expect(url.href).include(`${BASE_URL}/account/`)
+      expect(url.href).include(`${BASE_URL}/account/`);
       expect(address).to.have.length(62);
     });
     cy.get('.detail__Title-sc-m29ajr-2 > div').click();
@@ -67,7 +67,7 @@ describe('Account Page interaction', () => {
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(1) > a').click();
     cy.location().should(url => {
       const address = url.href.split('account/')[1];
-      expect(url.href).include(`${BASE_URL}/account/`)
+      expect(url.href).include(`${BASE_URL}/account/`);
       expect(address).to.have.length(62);
     });
   });
@@ -145,7 +145,7 @@ describe('Account Page interaction', () => {
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(1) > a').click();
     cy.wait(2500);
     cy.get('.styles__TabContainer-sc-1p8l23y-1 > :nth-child(2) > span')
-    .contains('Transactions').should('be.visible').click();
+      .contains('Transactions').should('be.visible').click();
 
     cy.contains('Hash').should('be.visible');
     cy.get('.styles__Header-sc-zt5c8s-1 > :nth-child(2)').contains('Block').should('be.visible');
@@ -167,7 +167,7 @@ describe('Account Page interaction', () => {
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(1) > a').click();
     cy.wait(2500);
     cy.get('.styles__TabContainer-sc-1p8l23y-1 > :nth-child(2) > span')
-    .contains('Transactions').should('be.visible').click();
+      .contains('Transactions').should('be.visible').click();
 
     const date = new Date();
     cy.get('.styles__OutsideContent-sc-yhzcck-2').click();
@@ -175,7 +175,7 @@ describe('Account Page interaction', () => {
       cy.get('.styles__DaysTable-sc-yhzcck-11').contains(String(date.getDate())).click();
       cy.get('.styles__DaysTable-sc-yhzcck-11').contains(String(date.getDate() - 2)).click();
       cy.get('.styles__Confirm-sc-yhzcck-14').click();
-      const filter = `${date.getMonth() + 1}/${date.getDate() - 2}/${date.getFullYear()} - ${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`
+      const filter = `${date.getMonth() + 1}/${date.getDate() - 2}/${date.getFullYear()} - ${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
       cy.get('.styles__Input-sc-yhzcck-3').should('have.value', filter);
 
     } else {
@@ -184,17 +184,16 @@ describe('Account Page interaction', () => {
       cy.get('.styles__DaysTable-sc-yhzcck-11').contains('26').click();
       cy.get('.styles__Confirm-sc-yhzcck-14').click();
       const getMonth = date.getMonth() === 0 ? 1 : date.getMonth();
-      const filter = `${getMonth}/26/${date.getFullYear()} - ${date.getMonth() + 1}/1/${date.getFullYear()}`
+      const filter = `${getMonth}/26/${date.getFullYear()} - ${date.getMonth() + 1}/1/${date.getFullYear()}`;
       cy.get('.styles__Input-sc-yhzcck-3').should('have.value', filter);
     }
-
   });
 
   it('Transaction Tab: Click on address FROM and should redirect to account detail.', () => {
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(1) > a').click();
     cy.wait(2500);
     cy.get('.styles__TabContainer-sc-1p8l23y-1 > :nth-child(2) > span')
-    .contains('Transactions').should('be.visible').click();
+      .contains('Transactions').should('be.visible').click();
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(4)').click();
     cy.wait(2000);
     cy.location().should(url => {
@@ -208,7 +207,7 @@ describe('Account Page interaction', () => {
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(1) > a').click();
     cy.wait(2500);
     cy.get('.styles__TabContainer-sc-1p8l23y-1 > :nth-child(3) > span')
-    .contains('Buckets').should('be.visible').click();
+      .contains('Buckets').should('be.visible').click();
     cy.get('.styles__Header-sc-zt5c8s-1 > :nth-child(1)').contains('Staked Values')
       .should('be.visible');
     cy.get('.styles__Header-sc-zt5c8s-1 > :nth-child(2)').contains('Staked')

@@ -72,7 +72,7 @@ export const Section = styled.section`
 export const DataContainer = styled(Section)`
   padding: 5rem 10rem;
 
-  background-color: #40274f;
+  /* background-color: #40274f;
   background-image: radial-gradient(
       at 29% 76%,
       hsla(238, 30%, 34%, 1) 0,
@@ -82,7 +82,7 @@ export const DataContainer = styled(Section)`
     radial-gradient(at 80% 50%, hsla(240, 47%, 9%, 1) 0, transparent 50%),
     radial-gradient(at 0% 100%, hsla(240, 47%, 9%, 1) 0, transparent 50%),
     radial-gradient(at 80% 100%, hsla(255, 47%, 36%, 1) 0, transparent 50%),
-    radial-gradient(at 0% 0%, hsla(295, 57%, 46%, 1) 0, transparent 50%);
+    radial-gradient(at 0% 0%, hsla(295, 57%, 46%, 1) 0, transparent 50%); */
 
   @media (max-width: 768px) {
     padding: 5rem;
@@ -414,13 +414,17 @@ export const TransactionData = styled.div`
   a {
     max-width: 10rem;
 
-    overflow: hidden;
+    /* overflow: hidden; */
 
     text-overflow: ellipsis;
     white-space: nowrap;
     font-weight: 600;
 
     color: ${props => props.theme.black};
+
+    svg {
+      margin-left: 0.75rem;
+    }
   }
 
   span {
@@ -470,7 +474,7 @@ export const TransactionAmount = styled.div`
 
 export const TransactionChart = styled(TransactionContent)`
   width: 100%;
-  min-height: 20rem;
+  min-height: 22rem;
 
   position: relative;
   display: flex;

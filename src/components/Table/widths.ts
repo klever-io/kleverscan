@@ -4,7 +4,7 @@ const transactions = css`
   margin-right: 1.25rem;
 
   &:nth-child(1) {
-    width: 10rem;
+    width: 20rem;
   }
 
   &:nth-child(2) {
@@ -12,7 +12,7 @@ const transactions = css`
   }
 
   &:nth-child(3) {
-    width: 7rem;
+    width: 8rem;
   }
 
   &:nth-child(4) {
@@ -89,7 +89,7 @@ const accounts = css`
   margin-right: 1.25rem;
 
   &:nth-child(1) {
-    width: 45rem;
+    width: 39rem;
   }
 
   &:nth-child(2) {
@@ -200,14 +200,17 @@ const holders = css`
   }
 
   &:nth-child(2) {
-    width: 30rem;
+    width: 27rem;
   }
 
   &:nth-child(3) {
-    width: 7rem;
+    width: 6rem;
   }
 
   &:nth-child(4) {
+    width: 10rem;
+  }
+  &:nth-child(5) {
     width: 10rem;
   }
 `;
@@ -244,9 +247,9 @@ const validators = css`
 const nodes = validators;
 
 const validator = css`
-  margin-right: 1.25rem;
+  margin-right: 7rem;
   &:nth-child(1) {
-    width: 8rem;
+    width: 15rem;
   }
   &:nth-child(2) {
     width: 40rem;
@@ -256,6 +259,9 @@ const validator = css`
   }
   &:nth-child(4) {
     width: 5rem;
+  }
+  &:last-child {
+    margin-right: 0;
   }
 
   @media (max-width: 768px) {
@@ -289,7 +295,7 @@ const networkParams = css`
   }
 
   &:nth-child(3) {
-    width: 8rem;
+    width: 9rem;
   }
 `;
 
@@ -313,7 +319,7 @@ const proposals = css`
     width: 10rem;
   }
   &:nth-child(7) {
-    width: 5rem
+    width: 5rem;
   }
 `;
 const votes = css`

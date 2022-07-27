@@ -43,39 +43,15 @@ import Table, { ITable } from '@/components/Table';
 import { Row as TableRow } from '@/components/Table/styles';
 import { formatAmount, typeVoteColors } from '@/utils/index';
 import api from '@/services/api';
-import { IRawParam, IFullInfoParam } from '@/types/index';
+import { IRawParam, IFullInfoParam, IParsedProposal, IVoters, IVotingPowers } from '@/types/proposals';
 
 import { AiFillCheckCircle } from 'react-icons/ai';
 
 import Tooltip from '../../components/Tooltip';
 import Link from 'next/link';
-import { NetworkParamsIndexer } from '@/types/index';
+import { NetworkParamsIndexer } from '@/types/proposals';
 import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
-
-interface IProposalPage {
-  proposal: IProposal;
-}
-
-interface IProposal {
-  proposalId?: number;
-  proposalStatus?: string;
-  parameter?: string;
-  value?: string;
-  description?: string;
-  epochStart: number;
-  epochEnd: number;
-  votes?: number;
-  voters?: any;
-  txHash?: string;
-  proposer?: string;
-  code?: string;
-  totalStaked?: number;
-  votingPowers?: any;
-  timestampStart: number;
-  timestampEnd: number;
-  parameters: { [key: string]: string };
-  fullParameters: IFullInfoParam[];
-}
+import { IProposal } from '@/types/proposals';
 
 interface IVote {
   status: string;
@@ -92,18 +68,17 @@ interface IVoter {
   status: string;
 }
 
-const ProposalDetails: React.FC<IProposal> = props => {
+const ProposalDetails: React.FC<IParsedProposal> = props => {
   const [status, setStatus] = useState('');
   const StatusIcon = getStatusIcon(status);
   const router = useRouter();
   const precision = 10 ** 6;
-  const proposalAPI: IProposal = props;
+  const proposalAPI: IParsedProposal = props;
   const { votingPowers, totalStaked } = proposalAPI;
   const [filterVoters, setFilterVoters] = useState({
     Yes: 0,
     No: 0,
   });
-
   const [votedQty, setVotedQty] = useState(0);
   const [votersList, setVotersList] = useState<IVoter[]>([]);
   const [selectedFilter, setSelectedFilter] = useState('Yes');
@@ -133,12 +108,12 @@ const ProposalDetails: React.FC<IProposal> = props => {
 
     Object.keys(proposalAPI.voters ? proposalAPI.voters : []).map(
       async item => {
-        if (totalStaked) {
+        if (totalStaked && votingPowers) {
           const votesInfo = proposalAPI.voters[item];
           const frozenBalance = votingPowers[item];
           list.push({
             voter: item,
-            votingPower: ((frozenBalance * 100) / totalStaked).toFixed(2),
+            votingPower: ((frozenBalance * 100) / totalStaked).toFixed(3),
             voteDate: format(
               fromUnixTime(votesInfo.timestamp / 1000),
               'MM/dd/yyyy HH:mm',
@@ -186,7 +161,7 @@ const ProposalDetails: React.FC<IProposal> = props => {
   };
 
   const renderProposalParams = () => {
-    return proposalAPI?.fullParameters.map(param => (
+    return proposalAPI?.parsedParameters.map(param => (
       <div key={param.paramIndex}>
         <strong>{param.paramText}</strong>
         <span>{param.paramValue}</span>
@@ -433,25 +408,28 @@ const ProposalDetails: React.FC<IProposal> = props => {
   );
 };
 
-const getVotingPowers = async (voters: any, powers: any) => {
+export const getVotingPowers = (voters: IVoters | []): IVotingPowers => {
   if (!voters) {
     voters = [];
   }
-
-  Object.entries(voters).forEach(async ([address, data]: any[]) => {
+  const powers = {};
+  Object.entries(voters).forEach(([address, data]: any[]) => {
     powers[address] = data?.amount;
   });
+  return powers;
 };
 
-const getProposalNetworkParams = (params: IRawParam): IFullInfoParam[] => {
+export const getProposalNetworkParams = (params: IRawParam): IFullInfoParam[] => {
   if (params) {
     const fullInfoParams: IFullInfoParam[] = Object.entries(params).map(
-      ([index, value]) => ({
-        paramIndex: index,
-        paramLabel: NetworkParamsIndexer[index],
-        paramValue: Number(value),
-        paramText: proposalsMessages[NetworkParamsIndexer[index]],
-      }),
+      ([index, value]) => {
+        return {
+          paramIndex: index,
+          paramLabel: NetworkParamsIndexer[index],
+          paramValue: Number(value),
+          paramText: proposalsMessages[NetworkParamsIndexer[index]],
+        };
+      },
     );
 
     return fullInfoParams;
@@ -465,16 +443,15 @@ export const getServerSideProps: GetStaticProps<IProposal> = async ({
   const proposalInfos: any = await api.get({
     route: `proposals/${params?.number}`,
   });
-  const votingPowers: any = {};
-  getVotingPowers(proposalInfos?.data?.proposal?.voters, votingPowers);
   let props = proposalInfos?.data?.proposal;
+  
   if (!props) {
     props = {};
   }
-
+  const votingPowers = getVotingPowers(props.voters);
   props.votingPowers = votingPowers;
-  const paramsWithText = getProposalNetworkParams(props.parameters);
-  props.fullParameters = paramsWithText;
+  const fullInfoParams = getProposalNetworkParams(props.parameters);
+  props.parsedParameters = fullInfoParams;
   return { props };
 };
 

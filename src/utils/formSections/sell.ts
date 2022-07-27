@@ -14,7 +14,7 @@ const sellContract = (): ISection[] => {
         },
       },
       {
-        label: 'Marketplace ID',
+        label: 'Marketplace Id',
         props: {
           required: true,
           tooltip: 'Maketplace ID in which the sell order will be created',

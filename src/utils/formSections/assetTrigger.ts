@@ -7,7 +7,7 @@ const assetTriggerContract = (): ISection[] => {
     {
       fields: [
         {
-          label: 'AssetID',
+          label: 'AssetId',
           props: {
             required: true,
             tooltip: 'Target Asset',

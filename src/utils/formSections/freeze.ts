@@ -6,7 +6,7 @@ export const freezeContract = (): ISection[] => {
     section.push({
       fields: [
         {
-          label: 'AssetID',
+          label: 'KDA',
           props: {
             tooltip: 'Defaults to KLV',
           }
@@ -31,13 +31,13 @@ export const unfreezeContract = (): ISection[] => {
     section.push({
       fields: [
         {
-          label: 'AssetID',
+          label: 'KDA',
           props: {
             tooltip: 'Unfrozen asset ID, defaults to KLV if empty',
           }
         },
         {
-          label: 'BucketID',
+          label: 'BucketId',
           props: {
             required: true,
             tooltip: 'Bucket to be unfrozen',

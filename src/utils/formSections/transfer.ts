@@ -13,7 +13,7 @@ const transferContract = (): ISection[] => {
           },
         },
         {
-          label: 'AssetID',
+          label: 'KDA',
           props: {
             required: true,
             tooltip: 'AssetID, if empty it defaults to KLV',

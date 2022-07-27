@@ -150,16 +150,6 @@ export const SelectContainer = styled.div`
   box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.8, '#000')};
 `;
 
-export const SelectContainer = styled.div`
-  background-color: ${props => props.theme.white};
-  padding: 1.37rem;
-  border-radius: 1rem;
-  margin-top: 1rem;
-
-  border: 0.2px solid ${({ theme }) => theme.input.border};
-  box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.8, '#000')};
-`;
-
 export const AssetTriggerContainer = styled.div`
   width: 100%;
   position: relative;

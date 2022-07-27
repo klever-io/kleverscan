@@ -6,7 +6,7 @@ const configMarketplaceContract = (): ISection[] => {
   section.push({
     fields: [
       {
-        label: 'Marketplace ID',
+        label: 'Marketplace Id',
         props: {
           required: true,
           tooltip: 'Target Marketplace ID',

@@ -197,6 +197,14 @@ const Form: React.FC<any> = ({
   };
 
   const unCapitalize = (string: string) => {
+    if (string === 'BLSPublicKey') {
+      return 'blsPublicKey';
+    }
+
+    if (string === string.toUpperCase()) {
+      return string.toLowerCase();
+    }
+
     return string.charAt(0).toLowerCase() + string.slice(1);
   };
 

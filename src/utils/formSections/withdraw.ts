@@ -6,7 +6,7 @@ const withdrawContract = (): ISection[] => {
   section.push({
     fields: [
       {
-        label: 'AssetID',
+        label: 'KDA',
         props: {
           required: true,
           tooltip: 'Asset ID to be withdrawn',

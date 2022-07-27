@@ -62,6 +62,20 @@ const Contract: React.FC = () => {
       parsedValues.triggerType = typeAssetTrigger;
     } else if (contractType === 'ClaimContract') {
       parsedValues.claimType = claimType;
+    } else if (contractType === 'ProposalContract') {
+      if (values.parameters) {
+        const parameters = {};
+
+        values.parameters.forEach((parameter: any) => {
+          if (parameter.key && parameter.value) {
+            parameters[parameter.key] = parameter.value;
+          }
+        });
+
+        if (Object.keys(parameters).length > 0) {
+          parsedValues.parameters = parameters;
+        }
+      }
     }
 
     if (values.uris) {

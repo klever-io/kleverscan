@@ -23,7 +23,7 @@ const createAsset = (type: string, address = ''): ISection[] => {
               },
             },
             {
-              label: 'Owner',
+              label: 'Owner Address',
               props: {
                 required: true,
                 defaultValue: address,

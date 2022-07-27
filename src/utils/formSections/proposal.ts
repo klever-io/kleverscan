@@ -30,13 +30,13 @@ const proposalContract = (): ISection[] => {
               innerPath: 'parameters',
               fields: [
                 {
-                  label: 'Label',
+                  label: 'Key',
                   props: {
                     tooltip: 'Parameter key',
                   }
                 },
                 {
-                  label: 'Address',
+                  label: 'Value',
                   props: {
                     tooltip: 'Parameter address',
                   }

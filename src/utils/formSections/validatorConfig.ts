@@ -15,7 +15,7 @@ const validatorConfigContract = (): ISection[] => {
         label: 'Reward Address',
       },
       {
-        label: 'BLS',
+        label: 'BLS Public Key',
         props: {
           tooltip: 'BLS Public Key',
         }

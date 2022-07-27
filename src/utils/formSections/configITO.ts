@@ -7,7 +7,7 @@ const configITOContract = (): ISection[] => {
     {
       fields: [
         {
-          label: 'AssetID',
+          label: 'KDA',
           props: {
             required: true,
             tooltip: 'Target Asset',

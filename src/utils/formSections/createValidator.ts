@@ -6,14 +6,14 @@ const createValidatorContract = (address = ''): ISection[] => {
   section.push({
     fields: [
       {
-        label: 'Address',
+        label: 'Owner Address',
         props: {
           value: address,
           required: true,
         }
       },
       {
-        label: 'BLS',
+        label: 'BLS Public Key',
         props: {
           tooltip: 'BLS Public Key',
         }

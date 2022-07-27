@@ -42,7 +42,8 @@ const createAsset = (type: string, address = ''): ISection[] => {
               label: 'Initial Supply',
               props: {
                 type: 'number',
-                tooltip: 'Initial minted supply (fungible only) (with precision)',
+                tooltip:
+                  'Initial minted supply (fungible only) (with precision)',
               },
             },
             {
@@ -78,13 +79,13 @@ const createAsset = (type: string, address = ''): ISection[] => {
                       label: 'Label',
                       props: {
                         tooltip: 'URI identifier. Ex: "foo"',
-                      }
+                      },
                     },
                     {
                       label: 'Address',
                       props: {
                         tooltip: 'URI address. Ex: "http://bar.com"',
-                      }
+                      },
                     },
                   ],
                 },
@@ -301,7 +302,7 @@ const createAsset = (type: string, address = ''): ISection[] => {
               props: { required: true, tooltip: 'Token shorthand' },
             },
             {
-              label: 'Owner',
+              label: 'Owner Address',
               props: {
                 required: true,
                 defaultValue: address,

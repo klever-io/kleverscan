@@ -55,10 +55,7 @@ export const StyledInput = styled.input<IProps>`
       ? css`
           color: ${theme.error} !important;
           border: 1px solid ${theme.error} !important;
-          background-color: ${transparentize(
-            0.8,
-            '#9E1313',
-          )} !important;
+          background-color: ${transparentize(0.8, '#9E1313')} !important;
           + label {
             color: ${theme.error} !important;
           }
@@ -129,8 +126,8 @@ export const ToggleContainer = styled.div<IProps>`
   padding: 0.75rem 2rem;
   align-items: center;
   gap: 1rem;
-  opacity: ${props => props.disabled ? 0.6 : 1};
-  pointer-events: ${props => props.disabled ? 'none' : 'auto'};
+  opacity: ${props => (props.disabled ? 0.6 : 1)};
+  pointer-events: ${props => (props.disabled ? 'none' : 'auto')};
   color: ${props => props.theme.input.text};
 `;
 
@@ -207,44 +204,41 @@ export const TooltipContainer = styled.div<{
   z-index: 10;
 
   &:hover {
-    @media screen and (min-width: 768px) {
-      &::after {
-        font-size: 0.75rem;
-        letter-spacing: initial;
+    &::after {
+      font-size: 0.75rem;
+      letter-spacing: initial;
 
-        margin-left: 0.5rem;
+      margin-left: 0.5rem;
 
-        background-color: ${props => props.theme.card.background};
-        color: ${props => props.theme.white};
+      background-color: ${props => props.theme.card.background};
+      color: ${props => props.theme.white};
 
-        padding: 0.5rem;
+      padding: 0.5rem;
 
-        border-radius: 5px;
+      border-radius: 5px;
 
-        z-index: 900;
+      z-index: 900;
 
-        white-space: pre;
+      white-space: pre;
 
-        transform: translate(-50%, 100%);
-        ${props =>
-          props.tooltip &&
-          css`
-            content: '${props.tooltip}';
-          `}
-      }
+      transform: translate(-50%, 100%);
+      ${props =>
+        props.tooltip &&
+        css`
+          content: '${props.tooltip}';
+        `}
     }
   }
 
-  @media screen and (max-width: 768px) {
-    font-size: 1.25rem;
+  @media screen and (max-width: 1025px) {
+    font-size: 1rem;
     max-width: 11ch;
-    padding: 1rem 0;
   }
 `;
 
 export const InputLabel = styled.label<ILabel>`
   user-select: none;
-  opacity: ${props => props.disabled ? 0.6 : 1};
+  opacity: ${props => (props.disabled ? 0.6 : 1)};
   font-size: smaller;
   font-weight: 600;
   transform: translate(-1rem, -2.25rem);
@@ -254,9 +248,15 @@ export const InputLabel = styled.label<ILabel>`
   top: 0.9rem;
 
   display: flex;
+  align-items: flex-start;
+
   gap: 0.5rem;
 
   color: ${({ theme }) => theme.input.border.dark};
 
   transition: transform 0.2s ease;
+
+  @media screen and (max-width: 1025px) {
+    top: 0.8rem;
+  }
 `;

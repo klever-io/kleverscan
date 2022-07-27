@@ -834,6 +834,11 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
+"@klever/sdk@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@klever/sdk/-/sdk-3.0.1.tgz#f3b42941fa377a591f9051810a2b14587fce3f9a"
+  integrity sha512-2R+DUJpNt5porXl8rZX5HyxY8/KN55TKC8eiel62ZgPVIV5iRLN+Wd7yXdQqJy4LWuCpI93jgQgVC/2sg4TcJQ==
+
 "@next/env@11.0.1":
   version "11.0.1"
   resolved "https://registry.yarnpkg.com/@next/env/-/env-11.0.1.tgz#6dc96ac76f1663ab747340e907e8933f190cc8fd"

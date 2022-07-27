@@ -1,27 +1,33 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Link from 'next/link';
 
 import {
   ConnectButton,
   ConnectContainer,
-  DropdownContainer,
-  DropdownItem,
-  ItemTransaction,
+  CopyContainer,
   LogoutContainer,
   LogoutIcon,
   MenuTransaction,
-  CopyContainer,
-} from '../styles';
+  StyledTransfer,
+} from './styles';
 
 import { BiTransfer } from 'react-icons/bi';
-import { parseAddress } from '../../../utils';
 import { toast } from 'react-toastify';
+import { parseAddress } from '../../../utils';
 
 import Copy from '@/components/Copy';
+import { useRouter } from 'next/router';
+import { MobileNavbarItem } from '..';
+import { DropdownContainer, DropdownItem } from '../styles';
 
-const ConnectWallet: React.FC = () => {
-  const [privateKey, setPrivateKey] = useState('');
+interface IConnectWalletProps {
+  handleMenu?: () => void;
+}
+
+const ConnectWallet: React.FC<IConnectWalletProps> = ({ handleMenu }) => {
+  const router = useRouter();
+
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [extensionInstalled, setExtensionInstalled] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -92,15 +98,14 @@ const ConnectWallet: React.FC = () => {
     init();
   }, []);
 
-  const preventEvent = (event: any) => {
-    event.preventDefault();
-    event.stopPropagation();
-  };
-
   const handleLogout = () => {
     sessionStorage.removeItem('walletAddress');
-    sessionStorage.removeItem('privateKey');
-    window.location.reload();
+    setWalletAddress('');
+
+    if (router.pathname.includes('/create-transaction')) {
+      handleMenu && handleMenu();
+      router.push('/');
+    }
   };
 
   const DropdownDesktop = () => {
@@ -166,6 +171,13 @@ const ConnectWallet: React.FC = () => {
     }
   };
 
+  const createTransactionProps = {
+    name: 'Create Transaction',
+    pathTo: '/create-transaction',
+    Icon: StyledTransfer,
+    onClick: handleMenu,
+  };
+
   return (
     <>
       {extensionInstalled && (
@@ -179,19 +191,25 @@ const ConnectWallet: React.FC = () => {
             ) : (
               <>
                 {walletAddress && (
-                  <ItemTransaction selected={false}>
+                  <>
                     <span>{parseAddress(walletAddress, 25)}</span>
                     <DropdownContainer>
                       <MenuTransaction>
                         <DropdownDesktop key={'CreateTransaction'} />
                       </MenuTransaction>
                     </DropdownContainer>
-                  </ItemTransaction>
+                  </>
                 )}
                 {!walletAddress && <span>Connect your wallet</span>}
               </>
             )}
           </ConnectButton>
+          {extensionInstalled &&
+            walletAddress &&
+            typeof window !== 'undefined' &&
+            window.innerWidth < 1025 && (
+              <MobileNavbarItem {...createTransactionProps} />
+            )}
           <CopyContainer>
             {walletAddress && (
               <Copy info="Wallet Address" data={walletAddress} />

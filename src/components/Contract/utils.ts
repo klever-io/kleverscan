@@ -56,7 +56,8 @@ const getPrecision = async (asset: string): Promise<number | undefined> => {
   const response = await request.json();
 
   if (response.error) {
-    const messageError = response.error.charAt(0).toUpperCase() + response.error.slice(1);
+    const messageError =
+      response.error.charAt(0).toUpperCase() + response.error.slice(1);
     toast.error(messageError);
     return;
   }
@@ -78,7 +79,7 @@ const precisionParse = async (
     case 'FreezeContract':
     case 'AssetTriggerContract':
       if (payload.amount) {
-        const assetId = payload.assetId ? payload.assetId : payload.assetID;
+        const assetId = payload.assetId ? payload.assetId : payload.kda;
         precision = await getPrecision(assetId);
         if (precision) {
           payload.amount = payload.amount * precision;

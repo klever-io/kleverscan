@@ -239,7 +239,7 @@ export const formatLabel = (str: string) => {
     return 'AssetID';
   }
 
-  let formatedstr = str.charAt(0).toUpperCase() + str.slice(1);
+  const formatedstr = str.charAt(0).toUpperCase() + str.slice(1);
   let label = '';
   formatedstr?.split(/(?=[A-Z])/).forEach((item: string, index: number) => {
     label += item;
@@ -374,8 +374,8 @@ export const claimTypes = [
   {
     label: 'Market Claim (2)',
     value: 2,
-  }
-]
+  },
+];
 
 export const assetTriggerTypes = [
   {

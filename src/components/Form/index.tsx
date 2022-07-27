@@ -141,7 +141,7 @@ const Form: React.FC<any> = ({
     sectionIndex: number,
     fieldIndex: number,
   ) => {
-    let length = sections[sectionIndex]?.fields[fieldIndex]?.props?.length;
+    const length = sections[sectionIndex]?.fields[fieldIndex]?.props?.length;
 
     return field.props?.array && length && length > 0 ? (
       <ButtonContainer

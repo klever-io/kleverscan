@@ -4,7 +4,7 @@ import { MapContainer, Marker, TileLayer, Popup } from 'react-leaflet';
 import { divIcon, LatLngExpression, MarkerCluster } from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import Copy from '@/components/Copy';
-require('react-leaflet-markercluster/dist/styles.min.css');
+import 'react-leaflet-markercluster/dist/styles.min.css';
 
 import { Container, Row } from './styles';
 

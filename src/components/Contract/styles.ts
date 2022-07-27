@@ -12,6 +12,7 @@ export const CloseIcon = styled(IoMdCloseCircle).attrs(props => ({
   color: props.theme.form.hash,
   size: 24,
 }))`
+  min-width: 24px;
   cursor: pointer;
 `;
 
@@ -20,7 +21,11 @@ export const Container = styled.div<IContainer>`
   width: 90%;
   max-width: 1200px;
   padding: 2rem 0;
-  opacity: ${props => props.loading ? 0.4 : 1};
+  opacity: ${props => (props.loading ? 0.4 : 1)};
+
+  @media screen and (max-width: 1025px) {
+    width: 100%;
+  }
 `;
 
 export const Header = styled.div`
@@ -125,11 +130,14 @@ export const ExtraOptionContainer = styled.div`
   border-radius: 12px;
   padding-top: 1rem;
   padding-bottom: 1rem;
+
   background-color: ${props => props.theme.white};
   box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.8, '#000')};
 
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+
+  gap: 1rem;
 
   padding-right: 2rem;
 
@@ -137,6 +145,16 @@ export const ExtraOptionContainer = styled.div`
     padding-left: 2rem;
     color: ${props => props.theme.form.hash};
     font-weight: 600;
+
+    text-decoration: underline;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  svg:last-of-type {
+    margin-left: auto;
   }
 `;
 
@@ -162,6 +180,5 @@ export const FieldLabel = styled.label`
   font-weight: 600;
   display: flex;
   color: ${({ theme }) => theme.input.border.dark};
-  margin-bottom: .3rem;
+  margin-bottom: 0.3rem;
 `;
-

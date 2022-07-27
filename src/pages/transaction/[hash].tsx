@@ -22,7 +22,12 @@ import {
 import { Status } from '@/components/Table/styles';
 
 import api from '@/services/api';
-import { toLocaleFixed, hexToString, isDataEmpty, capitalizeString } from '@/utils/index';
+import {
+  toLocaleFixed,
+  hexToString,
+  isDataEmpty,
+  capitalizeString,
+} from '@/utils/index';
 import {
   IResponse,
   ITransaction,
@@ -66,8 +71,6 @@ import {
 import Copy from '@/components/Copy';
 import QrCodeModal from '@/components/QrCodeModal';
 import { ReceiveBackground } from '@/views/validator';
-
-
 
 interface ITransactionResponse extends IResponse {
   data: {
@@ -351,14 +354,23 @@ const Transaction: React.FC<ITransactionPage> = props => {
               <Copy data={signature} info="Signature" />
             </CenteredRow>
           </Row>
-          {!isDataEmpty(data!) && (
+          {!isDataEmpty(data || []) && (
             <Row>
               <span>
                 <strong>Data</strong>
               </span>
               <CenteredRow>
-                <span>{hexToString(data!.join(','))}</span>
-                <Copy data={hexToString(data!.join(','))} info="Data" />
+                <span>
+                  {hexToString(
+                    (data && data.length > 0 && data.join(',')) || '',
+                  )}
+                </span>
+                <Copy
+                  data={hexToString(
+                    (data && data.length > 0 && data.join(',')) || '',
+                  )}
+                  info="Data"
+                />
               </CenteredRow>
             </Row>
           )}

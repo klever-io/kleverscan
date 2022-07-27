@@ -7,7 +7,6 @@ import {
   TickSquare,
   Proposal,
 } from '@/assets/icons';
-
 export interface INavbarItem {
   name: string;
   pathTo: string;

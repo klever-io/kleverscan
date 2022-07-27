@@ -26,6 +26,7 @@ import { getNonce, getType, precisionParse } from './utils';
 import Form, { ISection } from 'components/Form';
 import PackInfoForm from '../CustomForm/PackInfo';
 import PermissionsForm from '../CustomForm/Permissions';
+import Copy from '../Copy';
 
 const Contract: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -199,8 +200,9 @@ const Contract: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Transaction visible at https://kleverscan.org/transaction/{txHash}
+            hash: {txHash}
           </a>
+          <Copy data={txHash} />
           <CloseIcon onClick={() => setTxHash(null)} />
         </ExtraOptionContainer>
       )}

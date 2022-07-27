@@ -1,4 +1,4 @@
-import { ISection } from '@/types/index';
+import { ISection } from 'components/Form';
 
 const createAsset = (type: string, address = ''): ISection[] => {
   const section = [] as ISection[];

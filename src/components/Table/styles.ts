@@ -86,9 +86,7 @@ export const Row = styled.div<ITableType>`
   span,
   a {
     /* flex: 1; */
-    display: flex;
-    /* overflow: hidden; */
-
+    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 
@@ -119,6 +117,9 @@ export const Row = styled.div<ITableType>`
     p {
       font-weight: 600;
       color: ${props => props.theme.black};
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .isVerified {

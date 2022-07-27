@@ -574,48 +574,720 @@ export const mockedFetchBlocks = {
   },
 };
 
-export const mockedProposals = [
-  {
-    proposalId: 0,
-    description: 'Test description',
-    epochStart: 4,
-    epochEnd: 8,
-    proposalStatus: 'sucess',
-    proposer: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jquca668',
-    votes: { '0': 2000000000000 },
-    totalStaked: 2000000,
+//this function mocks /proposals/${number}
+export const getMockedProposal = (number: number): any => ({
+  data: { proposal: mockedProposalsList.data.proposals[number] },
+});
+
+export const mockedProposalsList = {
+  data: {
+    proposals: [
+      {
+        proposalId: 0,
+        proposer:
+          'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
+        txHash:
+          'e46c6e4d389de415b04417562047fe1c9492f25cc477f7a838a2d7c18392f458',
+        proposalStatus: 'ApprovedProposal',
+        parameters: {
+          '6': '15000000',
+          '7': '40000000',
+          '15': '5000000',
+          '16': '7',
+          '17': '1111',
+        },
+        description: 'Proposal to change bandwidth fee - automated test',
+        epochStart: 8207,
+        epochEnd: 8217,
+        timestamp: 0,
+        votes: { '0': 8000000000, '1': 4000000000 },
+        voters: {
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+            type: 0,
+            amount: 2000000000,
+            timestamp: 1656082815000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1: {
+            type: 0,
+            amount: 2000000000,
+            timestamp: 1656082815000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs2: {
+            type: 0,
+            amount: 2000000000,
+            timestamp: 1656082815000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs3: {
+            type: 0,
+            amount: 2000000000,
+            timestamp: 1656082815000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs4: {
+            type: 1,
+            amount: 2000000000,
+            timestamp: 1656082815000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs5: {
+            type: 1,
+            amount: 2000000000,
+            timestamp: 1656082815000,
+          },
+        },
+        totalStaked: 12000000000,
+      },
+      {
+        proposalId: 1,
+        proposer:
+          'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
+        txHash:
+          '9c74d9b6021e03ef58044e153731b1f5e93bb7fba787d5d2332dd277938e0a22',
+        proposalStatus: 'ApprovedProposal',
+        parameters: {
+          '0': '100000',
+          '1': '0',
+          '2': '15000000',
+        },
+        description: 'Proposal to change bandwidth fee - automated test',
+        epochStart: 8009,
+        epochEnd: 8019,
+        timestamp: 1656082115000,
+        votes: { '0': 6500000000 },
+        voters: {
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+            type: 0,
+            amount: 2000000000,
+            timestamp: 1656082815000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1: {
+            type: 0,
+            amount: 2000000000,
+            timestamp: 1656082815000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs2: {
+            type: 0,
+            amount: 2000000000,
+            timestamp: 1656082815000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs3: {
+            type: 0,
+            amount: 500000000,
+            timestamp: 1656082815000,
+          },
+        },
+        totalStaked: 8000000000000,
+      },
+      {
+        proposalId: 2,
+        proposer:
+          'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
+        txHash:
+          '520b5991a02e61f1d723231ed4b6d2d3d4a4e5db38cfabc4ea2a57bf327234af',
+        proposalStatus: 'DeniedProposal',
+        parameters: {
+          '6': '15000000',
+        },
+        description: 'Proposal to change bandwidth fee - automated test',
+        epochStart: 93,
+        epochEnd: 103,
+        votes: {
+          '0': 1,
+        },
+        timestamp: 313151433211341412,
+        voters: {
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+            type: 0,
+            amount: 1,
+            timestamp: 1656082815000,
+          },
+        },
+        totalStaked: 2,
+      },
+      {
+        proposalId: 3,
+        proposer:
+          'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
+        txHash:
+          '030e210a47b2729e16b7bc2feb1ab4e18033dcd0f20ef3563687a71e47a06fd7',
+        proposalStatus: 'ApprovedProposal',
+        parameters: {
+          '6': '15000000',
+          '34': '233333',
+          '17': '2311',
+        },
+        description: 'Proposal to change bandwidth fee - automated test',
+        epochStart: 324,
+        epochEnd: 334,
+        voters: {
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+            type: 1,
+            amount: 200,
+            timestamp: 1656110807000,
+          },
+        },
+        timestamp: 0,
+        votes: { '1': 200 },
+        totalStaked: 1000000000000,
+      },
+      {
+        proposalId: 4,
+        proposer:
+          'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
+        txHash:
+          '714b3efc00fcd3f5f4cf08638c2c3919268d61bba6a440e2073349f16c2e7e6e',
+        proposalStatus: 'DeniedProposal',
+        parameters: {
+          '6': '15000000',
+        },
+        description: 'Proposal to change bandwidth fee - automated test',
+        epochStart: 325,
+        epochEnd: 335,
+        votes: {
+          '0': 1,
+        },
+        timestamp: 0,
+        voters: {
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+            type: 1,
+            amount: 200,
+            timestamp: 1656110807000,
+          },
+        },
+        totalStaked: 1000000000000,
+      },
+      {
+        proposalId: 5,
+        proposer:
+          'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
+        txHash:
+          '2fa0b31d444bdaf3ed232904e8aa94c01a5f50f4979a7695fd81c994447fc330',
+        proposalStatus: 'DeniedProposal',
+        parameters: {
+          '6': '15000000',
+        },
+        description: 'Proposal to change bandwidth fee - automated test',
+        epochStart: 8860,
+        epochEnd: 8870,
+        votes: {
+          '0': 1,
+        },
+        timestamp: 0,
+        voters: {
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+            type: 0,
+            amount: 1,
+            timestamp: 1657138339000,
+          },
+        },
+        totalStaked: 6000000000000,
+      },
+      {
+        proposalId: 6,
+        proposer:
+          'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
+        txHash:
+          'd5015129b6cc4381ca90755548234a3b02c3faca41455012c2643d222a123854',
+        proposalStatus: 'ActiveProposal',
+        parameters: {
+          '6': '15000000',
+        },
+        description: 'Proposal to change bandwidth fee - automated test',
+        epochStart: 8911,
+        epochEnd: 8921,
+        votes: {
+          '0': 1,
+        },
+        timestamp: 0,
+        voters: {
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+            type: 0,
+            amount: 60123000,
+            timestamp: 1657144539000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1: {
+            type: 0,
+            amount: 60513100,
+            timestamp: 1657144329000,
+          },
+        },
+        totalStaked: 6000000000000,
+      },
+      {
+        proposalId: 7,
+        proposer:
+          'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
+        txHash:
+          '871640d46a5d747766cd5a9b806860c2a4e255d489e26d9821a41519e7e35914',
+        proposalStatus: 'DeniedProposal',
+        parameters: {
+          '6': '15000000',
+        },
+        description: 'Proposal to change bandwidth fee - automated test',
+        epochStart: 89,
+        epochEnd: 99,
+        votes: {
+          '0': 112213412311,
+          '1': 4968256329000,
+        },
+        timestamp: 0,
+        voters: {
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+            type: 0,
+            amount: 112213412311,
+            timestamp: 1656082443000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1: {
+            type: 1,
+            amount: 100105003300,
+            timestamp: 1656085443000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs2: {
+            type: 1,
+            amount: 200105003300,
+            timestamp: 1656085443000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs3: {
+            type: 1,
+            amount: 300105003300,
+            timestamp: 1656085443000,
+          },
+        },
+        totalStaked: 1001050033000,
+      },
+      {
+        proposalId: 8,
+        proposer:
+          'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
+        txHash:
+          'ec1ea2b93a0d95fe309782e2b538bec31e47fdc20c8c6d812ed142cbd1b71a4f',
+        proposalStatus: 'DeniedProposal',
+        parameters: {
+          '6': '15000000',
+        },
+        description: 'Proposal to change bandwidth fee - automated test',
+        epochStart: 8011,
+        epochEnd: 8021,
+        voters: {
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+            type: 0,
+            amount: 10000001,
+            timestamp: 1656082443000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1: {
+            type: 1,
+            amount: 50000000,
+            timestamp: 1656082543000,
+          },
+        },
+        timestamp: 0,
+        votes: { '0': 10000001, '1': 50000000 },
+        totalStaked: 4000000000000,
+      },
+      {
+        proposalId: 9,
+        proposer:
+          'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
+        txHash:
+          '476a971df4d2f7fb56fc6014e0f29d0269405c42351fabd53c50706741d83784',
+        proposalStatus: 'DeniedProposal',
+        parameters: {
+          '6': '15000000',
+        },
+        description: 'Proposal to change bandwidth fee - automated test',
+        epochStart: 8211,
+        epochEnd: 8221,
+        votes: {
+          '0': 3550886967051,
+          '1': 263028664226,
+        },
+        timestamp: 0,
+        voters: {
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj11: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj12: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj13: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj14: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj15: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj16: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj17: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj21: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj22: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj23: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj24: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj25: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj26: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj27: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj31: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj32: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj33: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj34: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj35: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj36: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj37: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj41: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj44: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj47: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjx1: {
+            type: 1,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjx2: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjx3: {
+            type: 1,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjx4: {
+            type: 0,
+            amount: 131514332113,
+            timestamp: 1657060171000,
+          },
+        },
+        totalStaked: 4000000000000,
+      },
+    ],
   },
-  {
-    proposalId: 1,
-    description: '',
-    epochStart: 10,
-    epochEnd: 14,
-    proposalStatus: 'pending',
-    proposer: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waa5s89w5s25',
-    votes: { '0': 1500000000000 },
-    totalStaked: 2000000,
+  pagination: {
+    next: 1,
+    previous: 0,
+    perPage: 10,
+    totalPages: 1,
+    totalRecords: 12,
   },
-  {
-    proposalId: 1,
-    description: '',
-    epochStart: 24,
-    epochEnd: 28,
-    proposalStatus: 'fail',
-    proposer: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waa5s89w5s25',
-    votes: { '0': 1000000000000 },
-    totalStaked: 2000000,
+  error: '',
+  code: 'successful',
+};
+
+export const mockedProposalsListPage2 = {
+  data: {
+    proposals: [
+      {
+        proposalId: 10,
+        proposer:
+          'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
+        txHash:
+          'd5015129b6cc4381ca90755548234a3b02c3faca41455012c2643d222a123854',
+        proposalStatus: 'ActiveProposal',
+        parameters: {
+          '6': '15000000',
+        },
+        description: 'Proposal to change bandwidth fee - automated test',
+        epochStart: 8911,
+        epochEnd: 8921,
+        votes: {
+          '0': 1,
+        },
+        timestamp: 0,
+        voters: {
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+            type: 0,
+            amount: 60123000,
+            timestamp: 1657144539000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1: {
+            type: 0,
+            amount: 60513100,
+            timestamp: 1657144329000,
+          },
+        },
+        totalStaked: 6000000000000,
+      },
+      {
+        proposalId: 11,
+        proposer:
+          'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
+        txHash:
+          'd5015129b6cc4381ca90755548234a3b02c3faca41455012c2643d222a123854',
+        proposalStatus: 'ActiveProposal',
+        parameters: {
+          '6': '15000000',
+        },
+        description: 'Proposal to change bandwidth fee - automated test',
+        epochStart: 8911,
+        epochEnd: 8921,
+        votes: {
+          '0': 1,
+        },
+        timestamp: 0,
+        voters: {
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+            type: 0,
+            amount: 60123000,
+            timestamp: 1657144539000,
+          },
+          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1: {
+            type: 0,
+            amount: 60513100,
+            timestamp: 1657144329000,
+          },
+        },
+        totalStaked: 3000000000000,
+      },
+    ],
   },
-  {
-    proposalId: 1,
-    description: '',
-    epochStart: 15,
-    epochEnd: 19,
-    proposalStatus: 'ApprovedProposal',
-    proposer: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waa5s89w5s25',
-    votes: { '0': 3000000000000 },
-    totalStaked: 3000000,
+  pagination: {
+    next: 2,
+    previous: 0,
+    perPage: 10,
+    totalPages: 1,
+    totalRecords: 12,
   },
-];
+  error: '',
+  code: 'successful',
+};
+
+export const networkParametersMock = {
+  data: {
+    parameters: {
+      BlockRewards: {
+        type: 'Int64',
+        value: '15000000',
+      },
+      FeePerDataByte: {
+        type: 'Int64',
+        value: '4000',
+      },
+      KAppFeeAssetTrigger: {
+        type: 'Int64',
+        value: '2000000',
+      },
+      KAppFeeBuy: {
+        type: 'Int64',
+        value: '1000000',
+      },
+      KAppFeeCancelMarketOrder: {
+        type: 'Int64',
+        value: '50000000',
+      },
+      KAppFeeClaim: {
+        type: 'Int64',
+        value: '1000000',
+      },
+      KAppFeeConfigITO: {
+        type: 'Int64',
+        value: '20000000000',
+      },
+      KAppFeeConfigMarketplace: {
+        type: 'Int64',
+        value: '1000000000',
+      },
+      KAppFeeCreateAsset: {
+        type: 'Int64',
+        value: '20000000000',
+      },
+      KAppFeeCreateMarketplace: {
+        type: 'Int64',
+        value: '50000000000',
+      },
+      KAppFeeCreateValidator: {
+        type: 'Int64',
+        value: '50000000000',
+      },
+      KAppFeeDelegate: {
+        type: 'Int64',
+        value: '1000000',
+      },
+      KAppFeeFreeze: {
+        type: 'Int64',
+        value: '1000000',
+      },
+      KAppFeeProposal: {
+        type: 'Int64',
+        value: '500000000',
+      },
+      KAppFeeSell: {
+        type: 'Int64',
+        value: '10000000',
+      },
+      KAppFeeSetAccountName: {
+        type: 'Int64',
+        value: '100000000',
+      },
+      KAppFeeSetITOPrices: {
+        type: 'Int64',
+        value: '1000000',
+      },
+      KAppFeeTransfer: {
+        type: 'Int64',
+        value: '500000',
+      },
+      KAppFeeUndelegate: {
+        type: 'Int64',
+        value: '1000000',
+      },
+      KAppFeeUnfreeze: {
+        type: 'Int64',
+        value: '1000000',
+      },
+      KAppFeeUnjail: {
+        type: 'Int64',
+        value: '10000000000',
+      },
+      KAppFeeUpdateAccountPermission: {
+        type: 'Int64',
+        value: '1000000000',
+      },
+      KAppFeeValidatorConfig: {
+        type: 'Int64',
+        value: '1000000000',
+      },
+      KAppFeeVote: {
+        type: 'Int64',
+        value: '1000000',
+      },
+      KAppFeeWithdraw: {
+        type: 'Int64',
+        value: '1000000',
+      },
+      LeaderValidatorRewardsPercentage: {
+        type: 'Uint32',
+        value: '6000',
+      },
+      MaxBucketSize: {
+        type: 'Int64',
+        value: '100',
+      },
+      MaxEpochsUnclaimed: {
+        type: 'Int64',
+        value: '100',
+      },
+      MaxNFTMintBatch: {
+        type: 'Int64',
+        value: '50',
+      },
+      MinKFIStakedToEnableProposals: {
+        type: 'Int64',
+        value: '1000000000000',
+      },
+      MinKLVBucketAmount: {
+        type: 'Int64',
+        value: '1000000000',
+      },
+      MinSelfDelegatedAmount: {
+        type: 'Int64',
+        value: '1500000000000',
+      },
+      MinTotalDelegatedAmount: {
+        type: 'Int64',
+        value: '10000000000000',
+      },
+      ProposalMaxEpochsDuration: {
+        type: 'Uint32',
+        value: '40',
+      },
+      StakingRewards: {
+        type: 'Int64',
+        value: '15000000',
+      },
+    },
+  },
+  error: '',
+  code: 'successful',
+};
 
 export const mockHomeTxs: IHomeTransactions = {
   setTotalTransactions: () => ({}),

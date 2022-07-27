@@ -295,7 +295,7 @@ const networkParams = css`
   }
 
   &:nth-child(3) {
-    width: 8rem;
+    width: 9rem;
   }
 `;
 

@@ -20,36 +20,22 @@ import { useDidUpdateEffect } from '@/utils/hooks';
 
 import {
   IProposal,
+  IProposals,
   IProposalsResponse,
-} from '@/types/index';
+  INetworkParam,
+  INetworkParams,
+  IProposalsPage,
+  NetworkParamsIndexer,
+  IRawParam,
+  IFullInfoParam,
+  IParsedProposal,
+} from '@/types/proposals';
 import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
-import { NetworkParamsIndexer, IRawParam, IFullInfoParam } from '@/types/index';
-interface IProposalsPage {
-  networkParams: INetworkParams;
-  proposals: IProposal[];
-  totalProposalsPage: number;
-  proposalsWithNetWorkParams: IFullInfoParam[][];
-}
-
-interface INetworkParams {
-  [index: number]: INetworkParam;
-}
-
-interface INetworkParam {
-  number: number;
-  parameter: string;
-  currentValue: string;
-}
-
-interface IProposals {
-  [index: number]: IProposal;
-}
 
 const Proposals: React.FC<IProposalsPage> = ({
   networkParams: defaultNetworkParams,
   proposals: defaultProposals,
   totalProposalsPage,
-  proposalsWithNetWorkParams,
 }) => {
   const tableHeaders = ['Network Parameters', 'Proposals'];
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
@@ -58,38 +44,19 @@ const Proposals: React.FC<IProposalsPage> = ({
   const [page, setPage] = useState(0);
 
   const [networkParams, setNetworkParams] = useState(defaultNetworkParams);
-  const [proposals, setProposals] = useState(defaultProposals);
+  const [proposals, setProposals] = useState<IParsedProposal[] | any[]>(defaultProposals);
 
   const fetchData = async () => {
     setLoadingProposals(true);
-
     const proposals: IProposalsResponse = await api.get({
       route: `proposals/list?page=${page}`,
     });
-
-    if (!proposals.code) {
-      const mapProposals: IProposal[] = proposals.data.proposals.map(
-        (proposal: IProposal, index: number) => {
-          return {
-            proposalId: proposal.proposalId,
-            proposalStatus: proposal.proposalStatus,
-            parameter: proposal.parameter,
-            value: proposal.value,
-            description: proposal.description,
-            epochStart: proposal.epochStart,
-            epochEnd: proposal.epochEnd,
-            votes: proposal.voters[index].amount,
-            voters: proposal.voters,
-            proposer: proposal.proposer,
-            txHash: proposal.txHash,
-            createdDate: proposal.createdDate,
-            endedDate: proposal.endedDate,
-          };
-        },
-      );
-      setProposals(mapProposals);
-      setLoadingProposals(false);
-    }
+    if (!proposals.error && proposals?.data?.proposals) {
+      let parsedProposalResponse: any[] = [];
+      parsedProposalResponse = parseAllProposals(proposals?.data?.proposals);
+        setProposals(parsedProposalResponse);
+        setLoadingProposals(false);
+      }
   };
 
   useDidUpdateEffect(() => {
@@ -126,11 +93,7 @@ const Proposals: React.FC<IProposalsPage> = ({
       case 'Proposals':
         return (
           <>
-            <ProposalsTab
-              proposalParams={proposals}
-              loading={loadingProposals}
-              proposalsWithNetWorkParams={proposalsWithNetWorkParams}
-            />
+            <ProposalsTab proposals={proposals} loading={loadingProposals} />
             <PaginationContainer>
               <Pagination
                 count={totalProposalsPage}
@@ -174,7 +137,23 @@ const Proposals: React.FC<IProposalsPage> = ({
   );
 };
 
-const getProposalNetworkParams = (params: any): IFullInfoParam[] => {
+export const parseAllProposals = (
+  arrayOfProposals: any[],
+): IParsedProposal[] | [] => {
+  if (arrayOfProposals) {
+     arrayOfProposals.forEach((proposal, index) => {
+      arrayOfProposals[index].parsedParameters = getProposalNetworkParams(
+        proposal.parameters,
+      );
+    });
+    return arrayOfProposals;
+  }
+  return [];
+};
+
+export const getProposalNetworkParams = (
+  params: IRawParam,
+): IFullInfoParam[] => {
   const fullInfoParams: IFullInfoParam[] = Object.entries(params).map(
     ([index, value]) => ({
       paramIndex: index,
@@ -194,15 +173,9 @@ export const getServerSideProps: GetServerSideProps<IProposalsPage> = async ({
   const proposalResponse: IProposalsResponse = await api.get({
     route: 'proposals/list',
   });
-  let proposalsWithNetWorkParams: any[] = [];
-  if (!proposalResponse.error) {
-    proposalsWithNetWorkParams = proposalResponse?.data?.proposals?.map(
-      (proposal, index) => {
-        proposalResponse.data.proposals[index].parameters =
-          getProposalNetworkParams(proposal.parameters);
-        return getProposalNetworkParams(proposal.parameters);
-      },
-    );
+  let parsedProposalResponse: any[] = [];
+  if (!proposalResponse.error && proposalResponse?.data?.proposals) {
+    parsedProposalResponse = parseAllProposals(proposalResponse.data.proposals);
   }
 
   let networkParams = {} as INetworkParams;
@@ -218,9 +191,8 @@ export const getServerSideProps: GetServerSideProps<IProposalsPage> = async ({
   }
   const props: IProposalsPage = {
     networkParams,
-    proposals: proposalResponse.data?.proposals || [],
+    proposals: parsedProposalResponse || [],
     totalProposalsPage: proposalResponse?.pagination?.totalPages || 0,
-    proposalsWithNetWorkParams,
   };
   return { props };
 };

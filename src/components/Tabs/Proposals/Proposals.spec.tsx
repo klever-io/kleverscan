@@ -1,114 +1,186 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
-import theme from '../../../styles/theme';
 import { parseAddress } from '../../../utils/index';
-import Proposals from './';
+import Proposals from '.';
 import { renderWithTheme } from '../../../test/utils';
-import { mockedProposals} from '../../../test/mocks'
+import { mockedProposalsList } from '../../../test/mocks/index';
+import { parseAllProposals } from '../../../pages/proposals';
+import theme from '../../../styles/theme';
 
 jest.mock('next/router', () => ({
   useRouter() {
-    return ({
+    return {
       route: '/',
       pathname: '',
-    });
+    };
   },
 }));
 
-describe('Component: Tabs/Proposals' , () => {
+describe('Component: Tabs/Proposals', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-  })
-  
-  it('Should render the Table and it\'s body and the header correctly', () => {
-    renderWithTheme(
-      <Proposals loading={false} proposalParams={mockedProposals} />
-    );
-    const proposalId = screen.getByText(`#${mockedProposals[0].proposalId}`);
-    const headers = ['Number', 'Proposal Content', 'Time', 'Upvotes/Total Staked', 'Status'];
+  });
 
-    const tableBody = proposalId.parentNode?.parentNode?.parentNode;
+  it("Should render the Table and it's body and the header correctly", () => {
+    const parsedProposals = parseAllProposals(
+      mockedProposalsList.data.proposals,
+    );
+    renderWithTheme(<Proposals loading={false} proposals={parsedProposals} />);
+
+    const proposalNumber = screen.getByText('#0');
+    const headers = [
+      'Number',
+      'Proposer',
+      'Time',
+      'Upvotes/Total Staked',
+      'Status',
+      'Network Parameters',
+    ];
+
+    const tableBody = proposalNumber.parentNode?.parentNode?.parentNode;
     const tableBodyStyle = {
       display: 'flex',
       flexDirection: 'column',
       gap: '0.75rem',
     };
-
     expect(tableBody).toHaveStyle(tableBodyStyle);
-    headers.forEach(( name ) => {
+    headers.forEach(name => {
       const header = screen.getByText(name);
       expect(header).toBeInTheDocument();
     });
   });
 
-  it('Should render the "Number", "Proposal Content", "Time", "Upvotes/Total Staked" and "Status" with the correct values', () => {
-    renderWithTheme(
-      <Proposals loading={false} proposalParams={mockedProposals} />
+  it('Should render the "Number", "Proposer", "Time", "Upvotes/Total Staked", "Status" and "Network Parameters" with the correct values and styles', () => {
+    const parsedProposals = parseAllProposals(
+      mockedProposalsList.data.proposals,
     );
-    const proposalId = screen.getByText(`#${mockedProposals[0].proposalId}`);
-    const description = screen.getByText(mockedProposals[0].description);
-    const proposer = screen.getByText(parseAddress(mockedProposals[0].proposer, 8));
+    renderWithTheme(<Proposals loading={false} proposals={parsedProposals} />);
+    const proposalNumber = screen.getByText('#0');
+    const proposer = screen.getAllByText(
+      parseAddress(parsedProposals[0].proposer, 14),
+    )[0];
     const epochStart = screen.getAllByText(/Created Epoch/i)[0];
     const epochEnd = screen.getAllByText(/Ended Epoch/i)[0];
-    
-    
-    expect(proposalId).toBeInTheDocument();
-    expect(description).toBeInTheDocument();
-    expect(proposer).toBeInTheDocument();
-    expect(epochStart).toBeInTheDocument();
-    expect(epochEnd).toBeInTheDocument();
-    expect(epochStart).toHaveTextContent('Created Epoch: 4');
-    expect(epochEnd).toHaveTextContent('Ended Epoch: 8');
+    const upVotesAndTotalStaked = epochEnd.parentNode?.nextSibling?.firstChild;
+    const status = screen.getAllByText('ApprovedProposal')[0];
+    const details = screen.getAllByText('Details')[0];
 
-    mockedProposals.forEach(({ votes, totalStaked }) => {
-      const calc = `${votes["0"] / 1000000}\\${totalStaked}`;
-      const votesAndTotalStaked = screen.getByText(calc);
-      expect(votesAndTotalStaked).toBeInTheDocument();
-      expect(votesAndTotalStaked).toHaveTextContent(calc);
+    expect(proposalNumber).toBeInTheDocument();
+    expect(proposer).toBeInTheDocument();
+    expect(epochStart).toHaveTextContent('Created Epoch: 8207');
+    expect(epochEnd).toHaveTextContent('Ended Epoch: 8217');
+    expect(upVotesAndTotalStaked).toHaveTextContent('8,000/12,000');
+    expect(status).toBeInTheDocument();
+    expect(details).toBeInTheDocument();
+
+    const proposalNetworkParams = [
+      'Block Rewards',
+      'Staking Rewards',
+      'KApp Fee for Withdraw',
+    ];
+    proposalNetworkParams.forEach(param => {
+      const nodeParam = screen.getAllByText(param)[0];
+      expect(nodeParam).toBeInTheDocument();
+    });
+
+    const proposalNumberStyles = {
+      color: theme.black,
+      fontWeight: '600',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+    };
+
+    const proposerStyles = {
+      width: '5rem',
+      color: theme.black,
+      fontWeight: '600',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+      fontSize: '0.95rem',
+    };
+
+    const epochsStyles = {
+      color: '#7B7DB2',
+    };
+
+    const upVotesAndTotalStakedStyles = {
+      color: theme.black,
+      fontWeight: '600',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+    };
+
+    const statusStyles = {
+      width: '10rem',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+      fontSize: '0.95rem',
+      color: '#37DD72',
+      fontWeight: 'bold',
+    };
+
+    const networkParamsStyles = {
+      color: '#7B7DB2',
+    };
+
+    const detailsStyles = {
+      color: theme.black,
+      fontWeight: '600',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+    };
+
+    expect(proposalNumber).toHaveStyle(proposalNumberStyles);
+    expect(proposer).toHaveStyle(proposerStyles);
+    expect(epochStart).toHaveStyle(epochsStyles);
+    expect(epochEnd).toHaveStyle(epochsStyles);
+    expect(upVotesAndTotalStaked).toHaveStyle(upVotesAndTotalStakedStyles);
+    expect(status).toHaveStyle(statusStyles);
+    expect(details).toHaveStyle(detailsStyles);
+    proposalNetworkParams.forEach(param => {
+      const nodeParam = screen.getAllByText(param)[0];
+      expect(nodeParam).toHaveStyle(networkParamsStyles);
     });
   });
 
-  it('Should render "-" if don\'t pass any description and the "Details" button with the correct href', () => {
-    renderWithTheme(
-      <Proposals loading={false} proposalParams={mockedProposals} />
-    );
-
-    const proposer = screen.getAllByText(/Proposer/i)[1];
-    const description = proposer.previousSibling;
-    const links = screen.getAllByRole('link', { name: /Details/i});
-
-    expect(proposer).toBeInTheDocument();
-    expect(description).toBeInTheDocument();
-    expect(description).toHaveTextContent('-');
-    links.forEach(( link, index ) => {
-      expect(link)
-      .toHaveAttribute('href', `/proposal/${mockedProposals[index].proposalId}`);
-    });
-
+  it('should render empty data message when there are no proposals', () => {
+    const parsedProposals = parseAllProposals([]);
+    renderWithTheme(<Proposals loading={false} proposals={parsedProposals} />);
+    const noDataMsg = screen.getByText('Oops! Apparently no data here.');
+    expect(noDataMsg).toBeInTheDocument();
   });
 
-  it('Should match the style of the elements', () => {
-    renderWithTheme(
-      <Proposals loading={false} proposalParams={mockedProposals} />
+  it('should render the network parameters tooltip text on hover', async () => {
+    const parsedProposals = parseAllProposals(
+      mockedProposalsList.data.proposals,
     );
-    const proposer = screen.getAllByText(/Proposer/i)[0];
-    const description = screen.getByText(mockedProposals[0].description);
+    renderWithTheme(<Proposals loading={false} proposals={parsedProposals} />);
+    const tooltipChild = screen.getAllByText(/15000000/)[0];
+    expect(tooltipChild).toBeInTheDocument();
+    expect(tooltipChild).not.toBeVisible();
+    const tooltipTextContainer = tooltipChild.parentNode;
+    expect(tooltipTextContainer).toHaveStyle({
+      visibility: 'hidden',
+      opacity: 0,
+    });
+    const tooltipContainer: any = tooltipTextContainer?.parentNode;
+    expect(tooltipContainer).toBeVisible();
+    expect(tooltipTextContainer).not.toBeVisible();
 
-    const proposerStyle = {
-      color: theme.table.text,
-      fontWeight: 600,
-      fontSize: '0.85rem',
-    };
-
-    const descriptionStyle = {
-      overflow: 'auto',
-      whiteSpace: 'normal',
-      paddingBottom: '0.25rem',
-    };
-
-    expect(proposer).toHaveStyle(proposerStyle);
-    expect(description).toHaveStyle(descriptionStyle);
-
+    let visibleTooltipChild: HTMLElement | undefined;
+    await waitFor(async () => {
+      await userEvent.hover(tooltipContainer);
+      visibleTooltipChild = screen.getAllByText(/15000000/)[0];
+    });
+    // TODO: MAKE TOOLTIPCONTAINER CHANGE CSS ON HOVER CORRECTLY
+    // expect(visibleTooltipChild.parentNode).toHaveStyle({visibility: 'visible', opacity: 1})
+    // expect(tooltipTextContainer).toBeVisible()
   });
 });

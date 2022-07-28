@@ -87,7 +87,7 @@ const Blocks: React.FC<IBlocks> = ({
   const precision = 6; // default KLV precision
   const blocksWatcherInterval = 4 * 1000; // 4 secs
 
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [blocks, setBlocks] = useState(defaultBlocks);
   const [statistics, setStatistics] = useState(defaultStatistics);
   const [loading, setLoading] = useState(false);

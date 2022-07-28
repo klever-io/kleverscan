@@ -107,7 +107,7 @@ const Account: React.FC<IAccountPage> = ({
 }) => {
   const router = useRouter();
 
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(
     transactionResponse.pagination.totalPages,
   );
@@ -234,7 +234,7 @@ const Account: React.FC<IAccountPage> = ({
   const [selectedTab, setSelectedTab] = useState<string>(getTabHeaders()[0]);
 
   const resetDate = () => {
-    setPage(0);
+    setPage(1);
     setDateFilter({
       start: '',
       end: '',
@@ -242,7 +242,7 @@ const Account: React.FC<IAccountPage> = ({
   };
 
   const filterDate = (selectedDays: ISelectedDays) => {
-    setPage(0);
+    setPage(1);
     setDateFilter({
       start: selectedDays.start.getTime().toString(),
       end: selectedDays.end

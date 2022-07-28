@@ -12,7 +12,7 @@ interface IPagination {
 }
 
 const Pagination: React.FC<IPagination> = ({ count, page, onPaginate }) => {
-  count += 1;
+  // count += 1;
   count >= 1000 ? (count = 1000) : count;
   const cells = calculate(count, page);
 
@@ -24,9 +24,9 @@ useEffect(() => {
 }, [page])
 
   const prevProps = {
-    active: page > 0,
+    active: page > 1,
     onClick: () => {
-      if (page > 0) {
+      if (page > 1) {
         onPaginate(page - 1);
       }
     },
@@ -115,8 +115,8 @@ useEffect(() => {
         return (
           <ItemContainer
             key={value}
-            active={value === page + 1}
-            onClick={() => onPaginate(value - 1)}
+            active={value === page}
+            onClick={() => onPaginate(value)}
           >
             <span>{value}</span>
           </ItemContainer>

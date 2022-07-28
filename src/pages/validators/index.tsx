@@ -43,7 +43,7 @@ const Validators: React.FC<IValidatorPage> = ({
   validators: initialValidators,
   pagination,
 }) => {
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [validators, setValidators] = useState<IValidator[]>(initialValidators);
   const header = [
@@ -83,7 +83,7 @@ const Validators: React.FC<IValidatorPage> = ({
 
           return {
             staked: delegation.totalStake,
-            rank: index + page * pagination.perPage + 1,
+            rank: (index + 1) + (page * pagination.perPage - 10) ,
             name: delegation.name || parseAddress(delegation.ownerAddress, 14),
             cumulativeStaked: parseFloat(
               (
@@ -143,10 +143,10 @@ const Validators: React.FC<IValidatorPage> = ({
           <p>{rank}°</p>
         </span>
         <span>
-          {validators[rank - page * pagination.perPage - 1]?.address ? (
+          {validators[(rank - 1) - (page * pagination.perPage - 10)]?.address ? (
             <Link
               href={`validator/${
-                validators[rank - page * pagination.perPage - 1].address
+                validators[(rank - 1) - (page * pagination.perPage - 10)].address
               }`}
             >
               {parseAddress(name, 20)}
@@ -231,7 +231,7 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> =
 
           return {
             staked: delegation.totalStake,
-            rank: index + validators.pagination.previous * 10 + 1,
+            rank: (index + 1) + (validators.pagination.self * validators.pagination.perPage - 10),
             name: delegation.name || parseAddress(delegation.ownerAddress, 20),
             cumulativeStaked: parseFloat(
               (

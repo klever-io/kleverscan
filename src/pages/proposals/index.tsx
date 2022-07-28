@@ -41,7 +41,7 @@ const Proposals: React.FC<IProposalsPage> = ({
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
   const [loadingNetworkParams, setLoadingNetWorkParams] = useState(false);
   const [loadingProposals, setLoadingProposals] = useState(false);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
 
   const [networkParams, setNetworkParams] = useState(defaultNetworkParams);
   const [proposals, setProposals] = useState<IParsedProposal[] | any[]>(defaultProposals);

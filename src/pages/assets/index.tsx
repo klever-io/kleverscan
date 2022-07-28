@@ -40,7 +40,7 @@ const Assets: React.FC<IAssetPage> = ({
 }) => {
   const router = useRouter();
 
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [assets, setAssets] = useState(defaultAssets);
   const [loading, setLoading] = useState(false);
 
@@ -51,6 +51,7 @@ const Assets: React.FC<IAssetPage> = ({
       const response: IAssetResponse = await api.get({
         route: `assets/kassets?page=${page}`,
       });
+
       if (!response.error) {
         setAssets(response.data.assets);
       }
@@ -232,6 +233,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
     props.assets = assets.data.assets;
     props.pagination = assets.pagination;
   }
+
+  props.pagination = assets.pagination;
 
   props.assets = parseHardCodedInfo(props.assets);
 

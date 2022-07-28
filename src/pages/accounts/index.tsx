@@ -69,7 +69,7 @@ const Accounts: React.FC<IAccounts> = ({
   const router = useRouter();
   const precision = 6; // default KLV precision
 
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [accounts, setAccounts] = useState(defaultAccounts);
   const [loading, setLoading] = useState(false);
 

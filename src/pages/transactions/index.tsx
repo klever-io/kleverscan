@@ -108,7 +108,7 @@ const Transactions: React.FC<ITransactions> = ({
 
   const [loading, setLoading] = useState(false);
   const [transactions, setTransactions] = useState(defaultTransactions);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [count, setCount] = useState(pagination.totalPages);
   const [dateFilter, setDateFilter] = useState({
     start: '',
@@ -225,7 +225,7 @@ const Transactions: React.FC<ITransactions> = ({
   };
 
   useDidUpdateEffect(() => {
-    if (page !== 0) setPage(0);
+    if (page !== 1) setPage(1);
     else fetchData();
   }, [transactionType, statusType, coinType, dateFilter]);
 
@@ -724,14 +724,14 @@ const Transactions: React.FC<ITransactions> = ({
   };
 
   const resetDate = () => {
-    setPage(0);
+    setPage(1);
     setDateFilter({
       start: '',
       end: '',
     });
   };
   const filterDate = (selectedDays: ISelectedDays) => {
-    setPage(0);
+    setPage(1);
     setDateFilter({
       start: selectedDays.start.getTime().toString(),
       end: selectedDays.end

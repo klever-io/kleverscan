@@ -85,7 +85,7 @@ const Block: React.FC<IBlockPage> = ({
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
 
-  const [transactionPage, setTransactionPage] = useState(0);
+  const [transactionPage, setTransactionPage] = useState(1);
   const [transactions, setTransactions] = useState(defaultTransactions);
   const [loading, setLoading] = useState(false);
 

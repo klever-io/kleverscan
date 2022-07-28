@@ -117,7 +117,7 @@ const Asset: React.FC<IAssetPage> = ({
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
 
-  const [transactionsPage, setTransactionsPage] = useState(0);
+  const [transactionsPage, setTransactionsPage] = useState(1);
   const [totalTransactionsPage, setTotalTransactionsPage] = useState(
     defaultTotalTransactionsPage,
   );
@@ -126,7 +126,7 @@ const Asset: React.FC<IAssetPage> = ({
     start: '',
     end: '',
   });
-  const [holdersPage, setHoldersPage] = useState(0);
+  const [holdersPage, setHoldersPage] = useState(1);
   const [holders, setHolders] = useState(defaultHolders);
   const [loadingTransactions, setLoadingTransactions] = useState(false);
   const [loadingHolders, setLoadingHolders] = useState(false);
@@ -466,7 +466,7 @@ const Asset: React.FC<IAssetPage> = ({
     }
   };
   const resetDate = () => {
-    setTransactionsPage(0);
+    setTransactionsPage(1);
     setDateFilter({
       start: '',
       end: '',
@@ -474,7 +474,7 @@ const Asset: React.FC<IAssetPage> = ({
   };
 
   const filterDate = (selectedDays: ISelectedDays) => {
-    setTransactionsPage(0);
+    setTransactionsPage(1);
     setDateFilter({
       start: selectedDays.start.getTime().toString(),
       end: selectedDays.end

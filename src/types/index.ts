@@ -529,6 +529,7 @@ interface IError {
 }
 
 export interface IPagination {
+  self: number;
   next: number;
   previous: number;
   perPage: number;

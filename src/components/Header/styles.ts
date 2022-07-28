@@ -220,8 +220,6 @@ export const DropdownContainer = styled.div`
 
   border-radius: 0 0 0.5rem 0.5rem;
 
-  width: 14rem;
-
   transform: translateY(100%);
 
   @media (max-width: 1024px) {

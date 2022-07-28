@@ -41,6 +41,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
   coinsData,
   yesterdayTransactions,
   yesterdayAccounts,
+  coinsStaking,
 }) => {
   const statisticsWatcherTimeout = 4000;
   const cardWatcherInterval = 4 * 1000; // 4 secs
@@ -275,7 +276,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
         </DataCardsContent>
       </DataCardsWrapper>
 
-      <CoinCard coins={coinsData} actualTPS={actualTPS} />
+      <CoinCard coins={coinsData} actualTPS={actualTPS} coinsStaking={coinsStaking}/>
     </DataCardsContainer>
   );
 };

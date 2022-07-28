@@ -121,7 +121,7 @@ const assetsPage = css`
   }
 
   &:nth-child(4) {
-    width: 16rem;
+    width: 14rem;
   }
 
   &:nth-child(5) {
@@ -140,7 +140,10 @@ const assetsPage = css`
     width: 10rem;
   }
   &:nth-child(9) {
-    width: 5rem;
+    width: 8rem;
+  }
+  &:nth-child(10) {
+    width: 4rem;
   }
 `;
 

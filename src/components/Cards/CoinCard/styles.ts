@@ -143,7 +143,7 @@ export const Description = styled(Name)<IVariation>`
 export const ChartContainer = styled.div`
   padding: 0 1.25rem;
 
-  height: 7.5rem;
+  height: 14.5rem;
   width: 100%;
 
   top: 1.5rem;
@@ -153,7 +153,7 @@ export const ChartContainer = styled.div`
 `;
 
 export const ValueContainer = styled.div`
-  margin-top: 3rem;
+  margin-top: 0.5rem;
 `;
 
 export const ValueContent = styled.div`
@@ -171,6 +171,7 @@ export const ValueContent = styled.div`
   }
 
   p {
+    font-weight: 500;
     font-size: 0.85rem;
   }
 `;

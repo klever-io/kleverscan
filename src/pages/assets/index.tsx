@@ -81,6 +81,7 @@ const Assets: React.FC<IAssetPage> = ({
     assetType,
     initialSupply,
     maxSupply,
+    staking,
     circulatingSupply,
     precision,
   }) => {
@@ -131,7 +132,15 @@ const Assets: React.FC<IAssetPage> = ({
 
         <Link href={`/asset/${assetId}`}>
           <a>
-            <p>{name}</p>
+            <p
+              style={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+             {name}
+            </p>
           </a>
         </Link>
 
@@ -152,6 +161,13 @@ const Assets: React.FC<IAssetPage> = ({
           </strong>
         </span>
         <span>
+          <strong>
+            {staking?.totalStaked
+              ? formatAmount(staking.totalStaked / 10 ** precision)
+              : 0}
+          </strong>
+        </span>
+        <span>
           <strong>{precision}</strong>
         </span>
       </Row>
@@ -167,6 +183,7 @@ const Assets: React.FC<IAssetPage> = ({
     'Initial Supply',
     'Max Supply',
     'Circulating Supply',
+    'Total Staked',
     'Precision',
   ];
 

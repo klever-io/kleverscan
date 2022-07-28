@@ -23,6 +23,7 @@ const Home: React.FC<IHome> = ({
   transactionsList,
   transactions: defaultTransactions,
   yesterdayAccounts,
+  coinsStaking,
 }) => {
   const precision = 6; // default KLV precision
   const [totalTransactions, setTotalTransactions] = useState(
@@ -40,6 +41,7 @@ const Home: React.FC<IHome> = ({
           coinsData={coinsData}
           yesterdayTransactions={yesterdayTransactions}
           yesterdayAccounts={yesterdayAccounts}
+          coinsStaking={coinsStaking}
         />
       </DataContainer>
 

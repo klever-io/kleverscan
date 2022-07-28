@@ -20,7 +20,7 @@ import {
 
 import { getVariation } from '@/utils/index';
 
-import { ICoinInfo } from '@/types/index';
+import { ICoinInfo, ICoinsStaking, ICoinStaking } from '@/types/index';
 
 import Chart from '@/components/Chart';
 import Link from 'next/link';
@@ -28,9 +28,10 @@ import Link from 'next/link';
 interface ICoinCard {
   coins: ICoinInfo[];
   actualTPS: string;
+  coinsStaking: ICoinsStaking;
 }
 
-const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS }) => {
+const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, coinsStaking }) => {
   const [selectedCoin, setSelectedCoin] = useState(0);
   const carouselRef = useRef<any>(null);
   const cardRef = useRef<any>(null);
@@ -42,6 +43,36 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS }) => {
   };
   const handleSelection = (index: number) => {
     carouselRef.current.scrollLeft = index * cardRef.current.offsetWidth;
+  };
+
+  const renderTotalStaking = (coin: ICoinInfo) => {
+    const currentCoin =
+      coin.shortname === 'KLV'
+        ? coinsStaking?.klvStaking
+        : coinsStaking?.kfiStaking;
+
+    if (
+      typeof currentCoin?.totalStaking !== 'number' ||
+      typeof currentCoin?.dayBeforeTotalStaking !== 'number'
+    ) {
+      return null;
+    }
+    const todayPercent =
+      (currentCoin.totalStaking * 100) / currentCoin.dayBeforeTotalStaking;
+    const yesterdayPercent = 100;
+    const variation = todayPercent - yesterdayPercent;
+
+    return (
+      <ValueContent>
+        <p>Total Staked</p>
+        <ValueDetail positive={getVariation(variation).includes('+')}>
+          <span>
+            $ {coin.shortname === 'KLV' ? (coin.price * currentCoin.totalStaking).toLocaleString() : '--'}
+          </span>
+          <p>{coin.shortname === 'KLV' ? getVariation(variation) : getVariation(0)}</p>
+        </ValueDetail>
+      </ValueContent>
+    );
   };
 
   return (
@@ -61,13 +92,13 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS }) => {
                       <HeaderContent>
                         <Name>
                           <span>{coin.shortname}</span>
-                          <span>U$ {coin.price.toLocaleString()}</span>
+                          <span>U$ {coin.shortname === 'KLV' ? coin.price.toLocaleString() : '--'}</span>
                         </Name>
                         <Description
-                          positive={getVariation(coin.variation).includes('+')}
+                          positive={coin.shortname === 'KLV' ? getVariation(coin.variation).includes('+') : getVariation(0).includes('+')}
                         >
                           <span>{coin.name}</span>
-                          <p>{getVariation(coin.variation)}</p>
+                          <p>{coin.shortname === 'KLV' ? getVariation(coin.variation) : getVariation(0)}</p>
                         </Description>
                       </HeaderContent>
                     </HeaderContainer>
@@ -76,20 +107,51 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS }) => {
                 <ChartContainer>
                   <Chart data={coin.prices} />
                 </ChartContainer>
-
                 <ValueContainer>
-                  {[coin.marketCap, coin.volume].map((item, index) => (
-                    <ValueContent key={String(index)}>
-                      <p>{index === 0 ? 'Market Cap' : 'Volume'}</p>
-                      <ValueDetail
-                        positive={getVariation(item.variation).includes('+')}
-                      >
-                        <span>$ {item.price.toLocaleString()}</span>
-                        <p>{getVariation(item.variation)}</p>
-                      </ValueDetail>
-                    </ValueContent>
-                  ))}
-                  <ValueContent />
+                  <ValueContent>
+                    <p>Market Cap</p>
+                    <ValueDetail
+                      positive={getVariation(coin.marketCap.variation).includes(
+                        '+',
+                      )}
+                    >
+                      {coin.shortname === 'KLV' ? (
+                        <>
+                          {' '}
+                          <span>$ {coin.marketCap.price.toLocaleString()}</span>
+                          <p>{getVariation(coin.marketCap.variation)}</p>
+                        </>
+                      ) : (
+                        <>
+                          <span>$ --</span>
+                          <p>{getVariation(0)}</p>
+                        </>
+                      )}
+                    </ValueDetail>
+                  </ValueContent>
+                  <ValueContent>
+                    <p>Volume</p>
+                    <ValueDetail
+                      positive={getVariation(coin.volume.variation).includes(
+                        '+',
+                      )}
+                    >
+                      {coin.shortname === 'KLV' ? (
+                        <>
+                          {' '}
+                          <span>$ {coin.volume.price.toLocaleString()}</span>
+                          <p>{getVariation(coin.volume.variation)}</p>
+                        </>
+                      ) : (
+                        <>
+                          {' '}
+                          <span>$ --</span>
+                          <p>{getVariation(0)}</p>
+                        </>
+                      )}
+                    </ValueDetail>
+                  </ValueContent>
+                  {renderTotalStaking(coin)}
                 </ValueContainer>
               </CardContent>
             </CardContainer>

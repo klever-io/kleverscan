@@ -33,6 +33,16 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     coinsData: [],
     yesterdayTransactions: 0,
     yesterdayAccounts: 0,
+    coinsStaking: {
+      klvStaking: {
+        totalStaking: null,
+        dayBeforeTotalStaking: null,
+      },
+      kfiStaking: {
+        totalStaking: null,
+        dayBeforeTotalStaking: null,
+      },
+    },
   };
 
   const pushCoinData = (
@@ -58,20 +68,18 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     });
   };
 
-  const blocksCall = new Promise<IBlockResponse>(
-    async (resolve, reject) => {
-      const res = await api.getCached({
-        route: 'block/list',
-        refreshTime: 4,
-      });
+  const blocksCall = new Promise<IBlockResponse>(async (resolve, reject) => {
+    const res = await api.getCached({
+      route: 'block/list',
+      refreshTime: 4,
+    });
 
-      if (!res.error || res.error === '') {
-        resolve(res);
-      }
+    if (!res.error || res.error === '') {
+      resolve(res);
+    }
 
-      reject(res.error);
-    },
-  );
+    reject(res.error);
+  });
 
   const transactionsCall = new Promise<IBlockResponse>(
     async (resolve, reject) => {
@@ -86,7 +94,7 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
       reject(res.error);
     },
   );
-  
+
   const transactionsListCall = new Promise<ITransactionListResponse>(
     async (resolve, reject) => {
       const res = await api.getCached({
@@ -130,35 +138,31 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     },
   );
 
-  const metricsCall = new Promise<IAccountResponse>(
-    async (resolve, reject) => {
-      const res = await api.text({
-        route: 'node/metrics',
-        service: Service.NODE,
-      });
+  const metricsCall = new Promise<IAccountResponse>(async (resolve, reject) => {
+    const res = await api.text({
+      route: 'node/metrics',
+      service: Service.NODE,
+    });
 
-      if (!res.error || res.error === '') {
-        resolve(res);
-      }
+    if (!res.error || res.error === '') {
+      resolve(res);
+    }
 
-      reject(res.error);
-    },
-  );
+    reject(res.error);
+  });
 
-  const klvDataCall = new Promise<IAccountResponse>(
-    async (resolve, reject) => {
-      const res = await api.getCached({
-        route: 'coins/klever',
-        service: Service.GECKO,
-      });
+  const klvDataCall = new Promise<IAccountResponse>(async (resolve, reject) => {
+    const res = await api.getCached({
+      route: 'coins/klever',
+      service: Service.GECKO,
+    });
 
-      if (!res.error || res.error === '') {
-        resolve(res);
-      }
+    if (!res.error || res.error === '') {
+      resolve(res);
+    }
 
-      reject(res.error);
-    },
-  );
+    reject(res.error);
+  });
 
   const klvChartCall = new Promise<IAccountResponse>(
     async (resolve, reject) => {
@@ -175,20 +179,18 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     },
   );
 
-  const kfiDataCall = new Promise<IAccountResponse>(
-    async (resolve, reject) => {
-      const res = await api.getCached({
-        route: 'coins/klever-finance',
-        service: Service.GECKO,
-      });
+  const kfiDataCall = new Promise<IAccountResponse>(async (resolve, reject) => {
+    const res = await api.getCached({
+      route: 'coins/klever-finance',
+      service: Service.GECKO,
+    });
 
-      if (!res.error || res.error === '') {
-        resolve(res);
-      }
+    if (!res.error || res.error === '') {
+      resolve(res);
+    }
 
-      reject(res.error);
-    },
-  );
+    reject(res.error);
+  });
 
   const kfiChartCall = new Promise<IAccountResponse>(
     async (resolve, reject) => {
@@ -233,6 +235,30 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     },
   );
 
+  const klvCall = new Promise<IAccountResponse>(async (resolve, reject) => {
+    const res = await api.get({
+      route: `assets/KLV`,
+    });
+
+    if (!res.error || res.error === '') {
+      resolve(res);
+    }
+
+    reject(res.error);
+  });
+
+  const kfiCall = new Promise<IAccountResponse>(async (resolve, reject) => {
+    const res = await api.get({
+      route: `assets/KFI`,
+    });
+
+    if (!res.error || res.error === '') {
+      resolve(res);
+    }
+
+    reject(res.error);
+  });
+
   const promises = [
     blocksCall,
     transactionsCall,
@@ -246,18 +272,20 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     kfiChartCall,
     yesterdayTransactionsCall,
     yesterdayAccountsCall,
+    klvCall,
+    kfiCall,
   ];
 
   await Promise.allSettled(promises).then(responses => {
     responses.forEach((res, index) => {
       if (res.status !== 'rejected') {
-        const {value}: any = res;
-        
+        const { value }: any = res;
+
         switch (index) {
           case 0:
             props.blocks = value.data.blocks;
             break;
-          
+
           case 1:
             props.transactions = value.data.transactions;
             props.totalTransactions = value.pagination.totalRecords;
@@ -267,7 +295,7 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
             const { number_by_day } = value.data;
             props.transactionsList = number_by_day;
             break;
-          
+
           case 3:
             props.totalAccounts = value.pagination.totalRecords;
             break;
@@ -283,10 +311,10 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
             const metricLines = value?.split('\n');
             metricLines?.forEach((line: any) => {
               const props = line?.split(' ');
-        
+
               parsedMetrics[props[0]?.split('{')?.[0]] = parseInt(props?.[1]);
             });
-        
+
             props.epochInfo = getEpochInfo(parsedMetrics);
             break;
 
@@ -303,7 +331,7 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
                 150000 * value.market_data.current_price.usd;
             }
             break;
-          
+
           case 9:
             if (responses[8].status !== 'rejected') {
               const kfiData: any = responses[8].value;
@@ -314,16 +342,35 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
           case 10:
             props.yesterdayTransactions = value.data.number_by_day[0].doc_count;
             break;
-          
+
           case 11:
             props.yesterdayAccounts = value.data.number_by_day[0].doc_count;
+            break;
+
+          case 12:
+            const initialKlv = 0;
+            props.coinsStaking.klvStaking.totalStaking =
+              value?.data?.asset?.staking?.totalStaked / 1000000 || null;
+   
+            props.coinsStaking.klvStaking.dayBeforeTotalStaking = (value?.data?.asset?.staking?.fpr.slice(-4).reduce((acc: number, curr: {totalStaked: number}) => acc + curr.totalStaked, initialKlv)) / (4 * 1000000);
+
+            break;
+
+          case 13:
+            const initialKfi = 0;
+            props.coinsStaking.kfiStaking.totalStaking =
+              value?.data?.asset?.staking?.totalStaked / 1000000 || null;
+
+              props.coinsStaking.kfiStaking.dayBeforeTotalStaking = (value?.data?.asset?.staking?.fpr.slice(-4).reduce((acc: number, curr: {totalStaked: number}) => acc + curr.totalStaked, initialKfi)) / (4 * 1000000);
+              // sum last 4 total staked positions and divide by 4
+
             break;
 
           default:
             break;
         }
       }
-    })
+    });
   });
 
   return { props };

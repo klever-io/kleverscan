@@ -596,6 +596,18 @@ export interface IDailyTransaction {
   doc_count: number;
   key: number;
 }
+
+export interface ICoinStaking {
+  totalStaking: number | null,
+  dayBeforeTotalStaking: number | null,
+}
+
+export interface ICoinsStaking {
+  klvStaking: ICoinStaking,
+  kfiStaking: ICoinStaking,
+}
+
+
 export interface IHome {
   transactions: ITransaction[];
   transactionsList: IDailyTransaction[];
@@ -607,6 +619,7 @@ export interface IHome {
   coinsData: ICoinInfo[];
   yesterdayTransactions: number;
   yesterdayAccounts: number;
+  coinsStaking: ICoinsStaking;
 }
 export interface IDataCards {
   totalAccounts: number;
@@ -616,6 +629,7 @@ export interface IDataCards {
   coinsData: ICoinInfo[];
   yesterdayTransactions: number;
   yesterdayAccounts: number;
+  coinsStaking: ICoinsStaking;
 }
 
 export interface IHomeTransactions {

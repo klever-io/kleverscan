@@ -47,10 +47,10 @@ describe('Blocks Page interaction', () => {
   });
 
   it('Should use the right arrow to navigate to page 2 and 3,  with left arrow should back to page 2 and finally click on block of the page and redirect to block details', () => {
-    cy.get('.hWzTrJ > svg');
-    cy.get('.aaQsj').click();
-    cy.get('.aaQsj').eq(1).click();
-    cy.get('.aaQsj').eq(0).click();
+    cy.get('.styles__Container-sc-1iq811b-1 > :last-child').click();
+    cy.get('.styles__Container-sc-1iq811b-1 > :last-child').click();
+    cy.get('.styles__Container-sc-1iq811b-1 > :first-child').click();
+
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(1) > a').click();
     cy.contains('Block Detail').should('be.visible');
   });
@@ -138,7 +138,7 @@ describe('Blocks Page interaction', () => {
     cy.contains('KApp Fee').should('be.visible');   
     cy.contains('Burned Fee').should('be.visible');   
     cy.contains('Bandwidth Fee').should('be.visible');   
-    cy.get('.fleKXr').click();
+    cy.get('.jBMNQO').click();
     cy.contains('Software Version').should('be.visible');
     cy.contains('Chain ID').should('be.visible');
     cy.contains('Producer Signature').should('be.visible');
@@ -148,7 +148,7 @@ describe('Blocks Page interaction', () => {
     cy.contains('KApps Trie Root').should('be.visible');
     cy.contains('Previous Random Seed').should('be.visible');
     cy.get(':nth-child(9) > .detail__CommonSpan-sc-1hrlpyd-14 > strong').contains('Random Seed').should('be.visible');
-    cy.get('.fleKXr').click();
+    cy.get('.jBMNQO').click();
     cy.get('.Copy__IconContainer-sc-15b3s39-0').click();
     cy.contains('Hash copied to clipboard').should('be.visible');
   });

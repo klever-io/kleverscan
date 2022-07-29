@@ -34,7 +34,7 @@ describe('Validators interaction', () => {
   });
 
   it('Use the right arrow to go to next page, enter on the first validator hash and redirect to validator details', () => {
-    cy.get('.aaQsj').click();
+    cy.get('.styles__Container-sc-1iq811b-1 > :last-child').click();
     cy.wait(1000);
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(2) > a').click();
     cy.location().should(url => {
@@ -47,7 +47,7 @@ describe('Validators interaction', () => {
   it('Click on last page and use the left arrow to back 1 page, enter on the first validator hash and redirect to validator details', () => {
     cy.get('.styles__Container-sc-1iq811b-1 > :nth-last-child(2)').click();
     cy.wait(1000);
-    cy.get('.aaQsj').click();
+    cy.get('.styles__Container-sc-1iq811b-1 > :first-child').click();
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(2) > a').click();
     cy.location().should(url => {
       const address = url.href.split('validator/')[1];
@@ -79,13 +79,13 @@ describe('Validators interaction', () => {
     cy.contains('Bucket ID').should('be.visible');
     cy.contains('Staked Epoch').should('be.visible');
     cy.contains('Amount').should('be.visible');
-    cy.get('.Copy__IconContainer-sc-15b3s39-0').click();
+    cy.get('.validator__CopyBackground-sc-1jnsbb5-4 > .Copy__IconContainer-sc-15b3s39-0 > svg').click();
     cy.get('div').contains('Key copied to clipboard').should('be.visible');
   });
 
   it('Validator Details: Click on address on "Owner Address" and should redirect to account detail page', () => {
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(2) > a').click();
-    cy.get('.detail__CardContent-sc-f211pl-9 > :nth-child(1) > :nth-child(2) > a').click();
+    cy.get('.detail__CenteredRow-sc-f211pl-11 > a').click();
     cy.location().should(url => {
       const address = url.href.split('account/')[1];
       expect(url.href).include(`${BASE_URL}/account/`);

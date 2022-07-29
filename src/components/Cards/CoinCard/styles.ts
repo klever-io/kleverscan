@@ -40,8 +40,7 @@ export const Content = styled.div`
   @media (max-width: 1600px) {
     width: 100%;
   }
-
-
+  overflow-y: hidden;
   position: relative;
 
   flex-direction: row;
@@ -69,7 +68,6 @@ export const CardContainer = styled.div`
   @media (max-width: 1600px) {
     min-width: 100%;
   }
-
 `;
 
 export const CardContent = styled.div`

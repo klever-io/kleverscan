@@ -66,10 +66,15 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, coinsStaking }) => {
       <ValueContent>
         <p>Total Staked</p>
         <ValueDetail positive={getVariation(variation).includes('+')}>
-          <span>
-            $ {coin.shortname === 'KLV' ? (coin.price * currentCoin.totalStaking).toLocaleString() : '--'}
-          </span>
-          <p>{coin.shortname === 'KLV' ? getVariation(variation) : getVariation(0)}</p>
+          {coin.shortname === 'KLV' ? (
+            <span>
+              $ {(coin.price * currentCoin.totalStaking).toLocaleString(undefined,{maximumFractionDigits: 0})}
+            </span>
+          ) : (
+            <span>KFI {currentCoin.totalStaking.toLocaleString()} </span>
+          )}
+
+          <p>{getVariation(variation)}</p>
         </ValueDetail>
       </ValueContent>
     );
@@ -92,21 +97,37 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, coinsStaking }) => {
                       <HeaderContent>
                         <Name>
                           <span>{coin.shortname}</span>
-                          <span>U$ {coin.shortname === 'KLV' ? coin.price.toLocaleString() : '--'}</span>
+                          <span>
+                            U${' '}
+                            {coin.shortname === 'KLV'
+                              ? coin.price.toLocaleString()
+                              : '--'}
+                          </span>
                         </Name>
                         <Description
-                          positive={coin.shortname === 'KLV' ? getVariation(coin.variation).includes('+') : getVariation(0).includes('+')}
+                          positive={
+                            coin.shortname === 'KLV'
+                              ? getVariation(coin.variation).includes('+')
+                              : getVariation(0).includes('+')
+                          }
                         >
                           <span>{coin.name}</span>
-                          <p>{coin.shortname === 'KLV' ? getVariation(coin.variation) : getVariation(0)}</p>
+                          <p>
+                            {coin.shortname === 'KLV'
+                              ? getVariation(coin.variation)
+                              : getVariation(0)}
+                          </p>
                         </Description>
                       </HeaderContent>
                     </HeaderContainer>
                   </a>
                 </Link>
-                <ChartContainer>
-                  <Chart data={coin.prices} />
-                </ChartContainer>
+                {coin.shortname === 'KLV' ? (
+                  <ChartContainer>
+                    <Chart data={coin.prices} />
+                  </ChartContainer>
+                ) : null}
+
                 <ValueContainer>
                   <ValueContent>
                     <p>Market Cap</p>

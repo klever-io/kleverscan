@@ -1,24 +1,6 @@
 import { TransactionType } from '@klever/sdk';
 import { toast } from 'react-toastify';
 
-const getNonce = async (address: string): Promise<number> => {
-  const request = await fetch(
-    `${
-      process.env.DEFAULT_NODE_HOST || 'https://node.mainnet.klever.finance'
-    }/address/${address}/nonce`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  );
-
-  const response = await request.json();
-
-  return response.data.nonce;
-};
-
 const getType = (rawType: string): TransactionType => {
   let type = rawType.substring(0, rawType.length - 8);
 
@@ -159,4 +141,4 @@ const precisionParse = async (
   return payload;
 };
 
-export { getNonce, getType, precisionParse };
+export { getType, precisionParse };

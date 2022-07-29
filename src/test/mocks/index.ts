@@ -301,6 +301,16 @@ export const mockedHomeDataCards: IDataCards = {
     epochLoadPercent: 30,
     remainingTime: 'two days',
   },
+  coinsStaking: {
+    klvStaking: {
+      totalStaking: 10000000000000,
+      dayBeforeTotalStaking: 5000000000000,
+    },
+    kfiStaking: {
+      totalStaking: 10000000000000,
+      dayBeforeTotalStaking: 5000000000000,
+    },
+  },
   coinsData: [
     {
       name: 'Klever',

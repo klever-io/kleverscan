@@ -60,6 +60,7 @@ const Form: React.FC<any> = ({
   onSubmit,
   children,
   cancelOnly,
+  loading,
   setData,
   setIsMultisig,
   isMultisig,
@@ -308,7 +309,7 @@ const Form: React.FC<any> = ({
               isMultisig={isMultisig}
             />
           ) : null}
-          <ButtonContainer submit type="submit">
+          <ButtonContainer submit={!loading} type="submit" disabled={loading}>
             Create Transaction
           </ButtonContainer>
         </>

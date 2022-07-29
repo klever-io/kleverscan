@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { core, sendTransaction } from '@klever/sdk';
+import { core, Account } from '@klever/sdk';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
 
@@ -21,7 +21,7 @@ import {
   FieldLabel,
   SelectContainer,
 } from './styles';
-import { getNonce, getType, precisionParse } from './utils';
+import { getType, precisionParse } from './utils';
 
 import Form, { ISection } from 'components/Form';
 import PackInfoForm from '../CustomForm/PackInfo';
@@ -118,25 +118,23 @@ const Contract: React.FC = () => {
   };
 
   const handleSubmit = async (contractValues: any) => {
-    const walletAddress = sessionStorage.getItem('walletAddress');
-    const nonce = await getNonce(walletAddress || '');
+    setLoading(true);
+
     const payload = {
-      sender: walletAddress,
-      nonce,
       ...parseValues(contractValues),
     };
 
     const parsedPayload = await precisionParse(payload, contractType);
 
-    setLoading(true);
     try {
-      const unsignedTx = await sendTransaction(
-        getType(contractType),
-        parsedPayload,
-        {
-          autobroadcast: false,
-          metadata: data,
-        },
+      const unsignedTx = await core.buildTransaction(
+        [
+          {
+            type: getType(contractType),
+            payload: parsedPayload,
+          },
+        ],
+        [data],
       );
 
       const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
@@ -147,39 +145,37 @@ const Contract: React.FC = () => {
       toast.success('Transaction broadcast successfully');
     } catch (e: any) {
       setLoading(false);
-      toast.error(e.message);
+      console.log(`%c ${e}`, 'color: red');
+      toast.error(e.message ? e.message : e);
     }
+  };
+
+  const formProps = {
+    sections: formSections,
+    onSubmit: handleSubmit,
+    loading,
+    setData,
+    setIsMultisig,
+    isMultisig,
   };
 
   const renderForm = () => {
     if (contractType === 'UpdateAccountPermissionContract') {
       return (
-        <Form
-          sections={formSections}
-          contractName={contractType}
-          key={contractType}
-          onSubmit={handleSubmit}
-          setData={setData}
-          setIsMultisig={setIsMultisig}
-          isMultisig={isMultisig}
-        >
+        <Form contractName={contractType} key={contractType} {...formProps}>
           <PermissionsForm />
         </Form>
       );
     } else {
       return (
         <Form
-          sections={formSections}
           contractName={contractType}
           key={
             contractType === 'CreateAssetContract'
               ? formSections.toString()
               : contractType
           }
-          onSubmit={handleSubmit}
-          setData={setData}
-          setIsMultisig={setIsMultisig}
-          isMultisig={isMultisig}
+          {...formProps}
         />
       );
     }
@@ -248,15 +244,7 @@ const Contract: React.FC = () => {
 
       {contractType === 'ConfigITOContract' ||
       contractType === 'SetITOPricesContract' ? (
-        <Form
-          sections={formSections}
-          contractName={contractType}
-          key={contractType}
-          onSubmit={handleSubmit}
-          setData={setData}
-          setIsMultisig={setIsMultisig}
-          isMultisig={isMultisig}
-        >
+        <Form contractName={contractType} key={contractType} {...formProps}>
           <PackInfoForm />
         </Form>
       ) : (

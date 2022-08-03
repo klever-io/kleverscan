@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
+import { GetServerSideProps } from 'next';
+import api from '@/services/api';
 
 import { Container, Header, Title } from '@/views/assets';
 
@@ -9,13 +11,14 @@ import { Transactions as Icon } from '@/assets/title-icons';
 import { ICollectionList } from '@/types/index';
 import Contract from '@/components/Contract';
 
-import api from '@/services/api';
+import { IProposalsResponse } from '@/types/proposals';
 
 interface IContract {
   assets?: any;
+  proposals?: any;
 }
 
-const CreateTransaction: React.FC<IContract> = props => {
+const CreateTransaction: React.FC<IContract> = ({ proposals }) => {
   const [assets, setAssets] = useState<any>({});
   const [assetsList, setAssetsLists] = useState<any>([]);
   const router = useRouter();
@@ -29,7 +32,7 @@ const CreateTransaction: React.FC<IContract> = props => {
 
         if (account?.data?.account?.assets) {
           const { assets, frozenBalance, balance } = account?.data?.account;
-          let list: ICollectionList[] = [];
+          const list: ICollectionList[] = [];
           if (Object.keys(assets).length === 0 && balance !== 0) {
             list.push({
               label: 'KLV',
@@ -82,9 +85,43 @@ const CreateTransaction: React.FC<IContract> = props => {
         </Title>
       </Header>
 
-      <Contract assetsList={assetsList} />
+      <Contract assetsList={assetsList} proposalsList={proposals} />
     </Container>
   );
+};
+
+export const getServerSideProps: GetServerSideProps<any> = async () => {
+  const proposalResponse: IProposalsResponse = await api.get({
+    route: 'proposals/list',
+  });
+
+  const proposals: any = [];
+
+  const descriptionProposal = (item: any) => {
+    if (item.description !== '') {
+      if (item.description.length < 40) {
+        return `${item.proposalId}: ${item.description}`;
+      }
+      return `${item.proposalId}: ${item.description.substring(0, 40)}...`;
+    }
+
+    return String(item.proposalId);
+  };
+
+  proposalResponse?.data?.proposals.forEach((item: any) => {
+    proposals.push({
+      label: descriptionProposal(item),
+      value: item.proposalId,
+    });
+  });
+
+  proposals.sort((a: any, b: any) => (a.value > b.value ? 1 : -1));
+
+  const props: any = {
+    proposals: proposals,
+  };
+
+  return { props };
 };
 
 export default CreateTransaction;

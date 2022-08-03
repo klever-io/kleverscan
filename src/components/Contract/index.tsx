@@ -34,9 +34,10 @@ import Copy from '../Copy';
 
 interface IContract {
   assetsList: ICollectionList[];
+  proposalsList: any[];
 }
 
-const Contract: React.FC<IContract> = ({ assetsList }) => {
+const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [formSections, setFormSections] = useState<ISection[]>([]);
   const [contractType, setContractType] = useState('');
@@ -50,6 +51,7 @@ const Contract: React.FC<IContract> = ({ assetsList }) => {
   const [assetBalance, setAssetBalance] = useState<number | null>(null);
   const [collection, setCollection] = useState<any>({});
   const [assetID, setAssetID] = useState(0);
+  const [proposalId, setProposalId] = useState<number | null>(null);
 
   useEffect(() => {
     if (sessionStorage) {
@@ -107,8 +109,8 @@ const Contract: React.FC<IContract> = ({ assetsList }) => {
         const parameters = {};
 
         values.parameters.forEach((parameter: any) => {
-          if (parameter.key && parameter.value) {
-            parameters[parameter.key] = parameter.value;
+          if (!isNaN(Number(parameter.key)) && parameter.value) {
+            parameters[parameter.key] = String(parameter.value);
           }
         });
 
@@ -116,6 +118,8 @@ const Contract: React.FC<IContract> = ({ assetsList }) => {
           parsedValues.parameters = parameters;
         }
       }
+    } else if (contractType === 'VoteContract') {
+      parsedValues.proposalId = proposalId;
     }
 
     if (values.uris) {
@@ -287,6 +291,18 @@ const Contract: React.FC<IContract> = ({ assetsList }) => {
       )}
 
       <Select options={contractOptions} onChange={handleOption} />
+
+      {contractType === 'VoteContract' && (
+        <SelectContainer>
+          <SelectContent size={30}>
+            <FieldLabel>Proposal ID</FieldLabel>
+            <Select
+              options={proposalsList}
+              onChange={(value: any) => setProposalId(value?.value)}
+            />
+          </SelectContent>
+        </SelectContainer>
+      )}
 
       {contractType === 'AssetTriggerContract' && (
         <AssetTriggerContainer>

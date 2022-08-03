@@ -196,7 +196,6 @@ export const SelectContent = styled.div<ISelect>`
   display: flex;
   flex-direction: column;
   min-width: ${props => props.size}%;
-
   &:not(:first-child) {
     margin-left: 1rem;
   }

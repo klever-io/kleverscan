@@ -60,10 +60,12 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
   const [proposalId, setProposalId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (sessionStorage) {
-      setOwnerAddress(sessionStorage.getItem('walletAddress') || '');
+    if (typeof window !== 'undefined') {
+      if (window.kleverWeb) {
+        setOwnerAddress(window.kleverWeb.getWalletAddress());
+      }
     }
-  }, [ownerAddress]);
+  }, []);
 
   useEffect(() => {
     if (contractType === 'DelegateContract') {

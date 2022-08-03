@@ -25,54 +25,58 @@ const CreateTransaction: React.FC<IContract> = ({ proposals }) => {
 
   useEffect(() => {
     const getAssets = async () => {
-      if (sessionStorage.getItem('walletAddress')) {
-        const account: any = await api.get({
-          route: `address/${sessionStorage.getItem('walletAddress')}`,
-        });
+      if (typeof window !== 'undefined') {
+        if (window.kleverWeb) {
+          const address = window.kleverWeb.getWalletAddress();
+          if (address) {
+            const account: any = await api.get({
+              route: `address/${address}`,
+            });
 
-        if (account?.data?.account?.assets) {
-          const { assets, frozenBalance, balance } = account?.data?.account;
-          const list: ICollectionList[] = [];
-          if (Object.keys(assets).length === 0 && balance !== 0) {
-            list.push({
-              label: 'KLV',
-              value: 'KLV',
-              isNFT: false,
-              balance,
-              frozenBalance: frozenBalance ? frozenBalance : 0,
-              precision: 6,
-              buckets: [],
-            });
-          } else {
-            Object.keys(account.data.account.assets).map(item => {
-              const { assetType, frozenBalance, balance, precision, buckets } =
-                account.data.account.assets[item];
-              list.push({
-                label: item,
-                value: item,
-                isNFT: assetType === 1,
-                balance,
-                frozenBalance,
-                precision,
-                buckets,
+            if (account?.data?.account?.assets) {
+              const { assets, frozenBalance, balance } = account?.data?.account;
+              const list: ICollectionList[] = [];
+
+              Object.keys(account.data.account.assets).map(item => {
+                const {
+                  assetType,
+                  frozenBalance,
+                  balance,
+                  precision,
+                  buckets,
+                } = account.data.account.assets[item];
+                list.push({
+                  label: item,
+                  value: item,
+                  isNFT: assetType === 1,
+                  balance,
+                  frozenBalance,
+                  precision,
+                  buckets,
+                });
               });
-            });
-            setAssets(account.data.account.assets);
+
+              if (!Object.keys(assets).includes('KLV') && balance !== 0) {
+                list.unshift({
+                  label: 'KLV',
+                  value: 'KLV',
+                  isNFT: false,
+                  balance,
+                  frozenBalance: frozenBalance ? frozenBalance : 0,
+                  precision: 6,
+                  buckets: [],
+                });
+              }
+              setAssets(account.data.account.assets);
+
+              setAssetsLists(list);
+            }
           }
-          setAssetsLists(list);
         }
       }
     };
 
     getAssets();
-  }, []);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (!sessionStorage.getItem('walletAddress')) {
-        router.push('/');
-      }
-    }
   }, []);
 
   return (

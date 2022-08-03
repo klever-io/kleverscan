@@ -20,6 +20,7 @@ import Copy from '@/components/Copy';
 import { useRouter } from 'next/router';
 import { MobileNavbarItem } from '..';
 import { DropdownContainer, DropdownItem } from '../styles';
+import { useDidUpdateEffect } from '@/utils/hooks';
 
 interface IConnectWalletProps {
   handleMenu?: () => void;
@@ -35,75 +36,41 @@ const ConnectWallet: React.FC<IConnectWalletProps> = ({ handleMenu }) => {
   useEffect(() => {
     const init = async () => {
       if (typeof window !== 'undefined') {
-        setExtensionInstalled(window.kleverWeb !== undefined);
+        let interval: any;
 
-        const interval = setInterval(() => {
-          if (window.kleverWeb !== undefined) {
-            window.kleverWeb.provider = {
-              api:
-                process.env.DEFAULT_API_HOST ||
-                'https://api.testnet.klever.finance/v1.0',
-              node:
-                process.env.DEFAULT_NODE_HOST ||
-                'https://node.testnet.klever.finance',
-            };
-            setExtensionInstalled(true);
-            clearInterval(interval);
-          }
-        }, 100);
+        const intervalPromise = new Promise(resolve => {
+          interval = setInterval(() => {
+            if (window.kleverWeb !== undefined) {
+              setExtensionInstalled(true);
+              resolve(clearInterval(interval));
+            }
+          }, 100);
+        });
 
-        const timeout = new Promise(resolve => {
+        const timeoutPromise = new Promise(resolve => {
           setTimeout(() => {
+            handleLogout();
             resolve(clearInterval(interval));
           }, 5000);
         });
 
-        await Promise.race([interval, timeout]);
+        await Promise.race([intervalPromise, timeoutPromise]);
 
-        if (sessionStorage.getItem('walletAddress')) {
-          setWalletAddress(sessionStorage.getItem('walletAddress'));
-
-          let interval: any;
-          const intervalPromise = new Promise(resolve => {
-            interval = setInterval(() => {
-              if (window?.kleverWeb?.active !== undefined) {
-                if (window?.kleverWeb?.active === false) {
-                  window.kleverWeb.initialize();
-                  clearInterval(interval);
-                  resolve(true);
-                }
-                if (window?.kleverWeb?.active === true) {
-                  clearInterval(interval);
-                  resolve(true);
-                }
-              }
-            }, 100);
-          });
-
-          const timeout = new Promise(resolve => {
-            setTimeout(() => {
-              clearInterval(interval);
-              resolve(false);
-            }, 10000);
-          });
-
-          await Promise.race([intervalPromise, timeout]);
-        }
-
-        return () => {
-          clearInterval(interval);
-        };
+        return () => clearInterval(interval);
       }
     };
     init();
   }, []);
 
-  const handleLogout = () => {
-    sessionStorage.removeItem('walletAddress');
-    setWalletAddress('');
+  useDidUpdateEffect(() => {
+    if (extensionInstalled) {
+      handleConnect(true);
+    }
+  }, [extensionInstalled]);
 
+  const handleLogout = () => {
     if (router.pathname.includes('/create-transaction')) {
-      handleMenu && handleMenu();
+      window.innerWidth < 1025 && handleMenu && handleMenu();
       router.push('/');
     }
   };
@@ -121,53 +88,31 @@ const ConnectWallet: React.FC<IConnectWalletProps> = ({ handleMenu }) => {
     );
   };
 
-  const handleConnect = async () => {
-    if (window.kleverWeb !== undefined) {
-      if (!window.kleverWeb.active) {
-        setLoading(true);
-        await window.kleverWeb.initialize();
-        setLoading(false);
+  const handleConnect = async (silent?: boolean) => {
+    window.kleverWeb.provider = {
+      api:
+        process.env.DEFAULT_API_HOST ||
+        'https://api.testnet.klever.finance/v1.0',
+      node:
+        process.env.DEFAULT_NODE_HOST || 'https://node.testnet.klever.finance',
+    };
 
-        let interval: any;
-        const intervalPromise = new Promise(resolve => {
-          interval = setInterval(() => {
-            if (window.kleverWeb.getWalletAddress() !== '?') {
-              resolve(clearInterval(interval));
-            }
-            window.kleverWeb.getWalletAddress();
-          }, 100);
-        });
+    try {
+      setLoading(true);
+      await window.kleverWeb.initialize();
+      setLoading(false);
 
-        const timeout = new Promise(resolve => {
-          setTimeout(() => {
-            resolve(clearInterval(interval));
-          }, 2000);
-        });
+      const address: string = await window.kleverWeb.getWalletAddress();
 
-        await Promise.race([intervalPromise, timeout]);
-
-        clearInterval(interval);
-
-        const address: string = window.kleverWeb.getWalletAddress();
-
-        if (address.substring(0, 3) === 'klv') {
-          sessionStorage.setItem('walletAddress', address);
-
-          setWalletAddress(address);
-        } else {
-          toast.error("Please change your extension's network to kleverchain");
-        }
-      } else if (window.kleverWeb.active) {
-        const address: string = window.kleverWeb.getWalletAddress();
-
-        if (address.substring(0, 3) === 'klv') {
-          sessionStorage.setItem('walletAddress', address);
-
-          setWalletAddress(address);
-        } else {
-          toast.error("Please change your extension's network to kleverchain");
-        }
+      if (address.startsWith('klv') && address.length === 62) {
+        setWalletAddress(address);
+      } else {
+        !silent &&
+          toast.error('Invalid wallet address, please switch to a klv wallet');
       }
+    } catch (e) {
+      setLoading(false);
+      !silent && toast.error(String(e).split(':')[1]);
     }
   };
 
@@ -183,7 +128,7 @@ const ConnectWallet: React.FC<IConnectWalletProps> = ({ handleMenu }) => {
       {extensionInstalled && (
         <ConnectContainer>
           <ConnectButton
-            onClick={handleConnect}
+            onClick={() => handleConnect()}
             key={String(extensionInstalled)}
           >
             {loading ? (
@@ -215,11 +160,6 @@ const ConnectWallet: React.FC<IConnectWalletProps> = ({ handleMenu }) => {
               <Copy info="Wallet Address" data={walletAddress} />
             )}
           </CopyContainer>
-          <LogoutContainer>
-            {walletAddress && (
-              <LogoutIcon size={24} onClick={() => handleLogout()} />
-            )}
-          </LogoutContainer>
         </ConnectContainer>
       )}
     </>

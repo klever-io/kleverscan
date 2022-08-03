@@ -290,6 +290,8 @@ const Form: React.FC<any> = ({
       {sections.length > 0 ||
       contractName === 'UnjailContract' ||
       contractName === 'WithdrawContract' ||
+      contractName === 'UnfreezeContract' ||
+      contractName === 'UndelegateContract' ||
       contractName === 'SetITOPricesContract' ||
       contractName === 'UpdateAccountPermissionContract' ? (
         <>

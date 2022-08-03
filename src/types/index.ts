@@ -47,6 +47,7 @@ export interface ICollectionList {
   frozenBalance: number;
   balance: number;
   precision?: number;
+  buckets?: any[];
 }
 
 export interface IContractOption {

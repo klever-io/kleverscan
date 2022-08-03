@@ -32,6 +32,8 @@ import PackInfoForm from '../CustomForm/PackInfo';
 import PermissionsForm from '../CustomForm/Permissions';
 import Copy from '../Copy';
 
+import { parseAddress } from '@/utils/index';
+
 interface IContract {
   assetsList: ICollectionList[];
   proposalsList: any[];
@@ -48,7 +50,11 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
   const [typeAssetTrigger, setTypeAssetTrigger] = useState(0);
   const [data, setData] = useState('');
   const [isMultisig, setIsMultisig] = useState(true);
+  const [bucketsCollection, setBucketsCollection] = useState<any>([]);
+  const [bucketsList, setBucketsList] = useState<any>([]);
+  const [selectedBucket, setSelectedBucket] = useState('');
   const [assetBalance, setAssetBalance] = useState<number | null>(null);
+
   const [collection, setCollection] = useState<any>({});
   const [assetID, setAssetID] = useState(0);
   const [proposalId, setProposalId] = useState<number | null>(null);
@@ -58,6 +64,45 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
       setOwnerAddress(sessionStorage.getItem('walletAddress') || '');
     }
   }, [ownerAddress]);
+
+  useEffect(() => {
+    if (contractType === 'DelegateContract') {
+      setBucketsCollection(['KFI', 'KLV']);
+    } else if (contractType === 'UndelegateContract') {
+      const buckets: any = [];
+      assetsList.forEach((asset: any) => {
+        asset?.buckets.forEach((bucket: any) => {
+          if (bucket.delegation !== ownerAddress) {
+            buckets.push({
+              label: parseAddress(bucket.id, 20),
+              value: bucket.id,
+            });
+          }
+        });
+      });
+
+      setBucketsList([...buckets]);
+    }
+  }, [contractType]);
+
+  useEffect(() => {
+    let buckets: any = [];
+
+    bucketsCollection.forEach((collection: string) => {
+      assetsList.forEach((item: any) => {
+        if (item.label === collection) {
+          item.buckets.forEach((bucket: any) => {
+            buckets.push({
+              label: parseAddress(bucket.id, 20),
+              value: bucket.id,
+            });
+          });
+        }
+      });
+    });
+
+    setBucketsList([...buckets]);
+  }, [bucketsCollection]);
 
   useEffect(() => {
     if (tokenChosen) {
@@ -120,6 +165,10 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
       }
     } else if (contractType === 'VoteContract') {
       parsedValues.proposalId = proposalId;
+    }
+
+    if (contractHaveBucketId()) {
+      parsedValues.bucketId = selectedBucket;
     }
 
     if (values.uris) {
@@ -224,7 +273,7 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
     }
   };
 
-  const contractHaveKDA = () => {
+  const contractHaveKDA = (): boolean => {
     const contracts = [
       'TransferContract',
       'FreezeContract',
@@ -233,6 +282,16 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
       'ConfigITOContract',
       'SetITOPricesContract',
       'AssetTriggerContract',
+    ];
+
+    return contracts.includes(contractType);
+  };
+
+  const contractHaveBucketId = (): boolean => {
+    const contracts = [
+      'UnfreezeContract',
+      'DelegateContract',
+      'UndelegateContract',
     ];
 
     return contracts.includes(contractType);
@@ -289,7 +348,6 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
           <CloseIcon onClick={() => setTxHash(null)} />
         </ExtraOptionContainer>
       )}
-
       <Select options={contractOptions} onChange={handleOption} />
 
       {contractType === 'VoteContract' && (
@@ -333,7 +391,12 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
             </div>
             <Select
               options={getAssetsList(assetsList)}
-              onChange={value => setCollection(value)}
+              onChange={value => {
+                setCollection(value);
+                if (contractType === 'UnfreezeContract') {
+                  setBucketsCollection([value.value]);
+                }
+              }}
             />
           </SelectContent>
           {collection?.isNFT && (
@@ -345,6 +408,20 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
               />
             </SelectContent>
           )}
+        </SelectContainer>
+      )}
+
+      {contractHaveBucketId() && (
+        <SelectContainer>
+          <SelectContent size={40}>
+            <FieldLabel>Select a bucket</FieldLabel>
+            <Select
+              options={bucketsList}
+              onChange={(value: any) => {
+                setSelectedBucket(value.value);
+              }}
+            />
+          </SelectContent>
         </SelectContainer>
       )}
 

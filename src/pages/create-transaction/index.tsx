@@ -41,10 +41,11 @@ const CreateTransaction: React.FC<IContract> = ({ proposals }) => {
               balance,
               frozenBalance: frozenBalance ? frozenBalance : 0,
               precision: 6,
+              buckets: [],
             });
           } else {
             Object.keys(account.data.account.assets).map(item => {
-              const { assetType, frozenBalance, balance, precision } =
+              const { assetType, frozenBalance, balance, precision, buckets } =
                 account.data.account.assets[item];
               list.push({
                 label: item,
@@ -53,6 +54,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals }) => {
                 balance,
                 frozenBalance,
                 precision,
+                buckets,
               });
             });
             setAssets(account.data.account.assets);

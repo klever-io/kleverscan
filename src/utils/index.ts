@@ -208,7 +208,7 @@ export const parseData = (data: any) => {
           break;
       }
     } else {
-      data[key] = Math.floor(Number(value));
+      data[key] = Number(value);
     }
   });
 

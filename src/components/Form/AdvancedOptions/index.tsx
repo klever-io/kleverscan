@@ -37,7 +37,8 @@ const AdvancedOptions: React.FC<IAdvOptions> = ({
           <Toggle>
             <StyledInput
               type="checkbox"
-              defaultChecked={true}
+              defaultChecked={false}
+              value={String(isMultisig)}
               onClick={() => setIsMultisig(!isMultisig)}
             />
             <Slider />

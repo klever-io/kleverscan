@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { core, Account } from '@klever/sdk';
+import { core } from '@klever/sdk';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
 
@@ -11,26 +11,26 @@ import {
   Toggle,
   ToggleContainer,
 } from '@/components/Form/FormInput/styles';
+import { ICollectionList } from '@/types/index';
 import formSection from '@/utils/formSections';
 import { assetTriggerTypes, claimTypes, contractOptions } from '@/utils/index';
 import {
+  AssetIDInput,
   AssetTriggerContainer,
+  BalanceLabel,
   CloseIcon,
   Container,
   ExtraOptionContainer,
   FieldLabel,
   SelectContainer,
   SelectContent,
-  AssetIDInput,
-  BalanceLabel,
 } from './styles';
-import { ICollectionList } from '@/types/index';
 import { getType, precisionParse } from './utils';
 
 import Form, { ISection } from 'components/Form';
+import Copy from '../Copy';
 import PackInfoForm from '../CustomForm/PackInfo';
 import PermissionsForm from '../CustomForm/Permissions';
-import Copy from '../Copy';
 
 import { parseAddress } from '@/utils/index';
 
@@ -49,7 +49,7 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
   const [claimType, setClaimType] = useState(0);
   const [typeAssetTrigger, setTypeAssetTrigger] = useState(0);
   const [data, setData] = useState('');
-  const [isMultisig, setIsMultisig] = useState(true);
+  const [isMultisig, setIsMultisig] = useState(false);
   const [bucketsCollection, setBucketsCollection] = useState<any>([]);
   const [bucketsList, setBucketsList] = useState<any>([]);
   const [selectedBucket, setSelectedBucket] = useState('');
@@ -86,7 +86,7 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
   }, [contractType]);
 
   useEffect(() => {
-    let buckets: any = [];
+    const buckets: any = [];
 
     bucketsCollection.forEach((collection: string) => {
       assetsList.forEach((item: any) => {
@@ -231,10 +231,27 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
 
       const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
 
-      const response = await core.broadcastTransactions([signedTx]);
-      setLoading(false);
-      setTxHash(response.data.txsHashes[0]);
-      toast.success('Transaction broadcast successfully');
+      if (isMultisig) {
+        const blob = new Blob([JSON.stringify(signedTx)], {
+          type: 'application/json',
+        });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${contractType} - Nonce: ${signedTx.RawData.Nonce}.json`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+
+        setLoading(false);
+        toast.success(
+          'Transaction built and signed, send the file to the co-owner(s)',
+        );
+      } else {
+        const response = await core.broadcastTransactions([signedTx]);
+        setLoading(false);
+        setTxHash(response.data.txsHashes[0]);
+        toast.success('Transaction broadcast successfully');
+      }
     } catch (e: any) {
       setLoading(false);
       console.log(`%c ${e}`, 'color: red');

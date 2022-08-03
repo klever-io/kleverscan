@@ -20,7 +20,11 @@ import {
   ExtraOptionContainer,
   FieldLabel,
   SelectContainer,
+  SelectContent,
+  AssetIDInput,
+  BalanceLabel,
 } from './styles';
+import { ICollectionList } from '@/types/index';
 import { getType, precisionParse } from './utils';
 
 import Form, { ISection } from 'components/Form';
@@ -28,7 +32,11 @@ import PackInfoForm from '../CustomForm/PackInfo';
 import PermissionsForm from '../CustomForm/Permissions';
 import Copy from '../Copy';
 
-const Contract: React.FC = () => {
+interface IContract {
+  assetsList: ICollectionList[];
+}
+
+const Contract: React.FC<IContract> = ({ assetsList }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [formSections, setFormSections] = useState<ISection[]>([]);
   const [contractType, setContractType] = useState('');
@@ -39,6 +47,9 @@ const Contract: React.FC = () => {
   const [typeAssetTrigger, setTypeAssetTrigger] = useState(0);
   const [data, setData] = useState('');
   const [isMultisig, setIsMultisig] = useState(true);
+  const [assetBalance, setAssetBalance] = useState<number | null>(null);
+  const [collection, setCollection] = useState<any>({});
+  const [assetID, setAssetID] = useState(0);
 
   useEffect(() => {
     if (sessionStorage) {
@@ -54,10 +65,38 @@ const Contract: React.FC = () => {
     }
   }, [tokenChosen]);
 
+  useEffect(() => {
+    setAssetBalance(null);
+  }, []);
+
+  useEffect(() => {
+    setAssetBalance(null);
+    setCollection({});
+  }, [contractType]);
+
+  useEffect(() => {
+    setAssetBalance(collection?.balance);
+    const getAssetID = async () => {
+      if (!collection.isNFT) {
+        setAssetID(0);
+      }
+    };
+
+    getAssetID();
+  }, [collection]);
+
   const parseValues = (values: any) => {
     const parsedValues = JSON.parse(JSON.stringify(values));
 
-    if (contractType === 'CreateAssetContract') {
+    if (contractHaveKDA()) {
+      if (contractType === 'AssetTriggerContract') {
+        parsedValues.assetId =
+          assetID !== 0 ? `${collection.value}/${assetID}` : collection.value;
+      } else {
+        parsedValues.kda =
+          assetID !== 0 ? `${collection.value}/${assetID}` : collection.value;
+      }
+    } else if (contractType === 'CreateAssetContract') {
       parsedValues.type = tokenChosen ? 0 : 1;
     } else if (contractType === 'AssetTriggerContract') {
       parsedValues.triggerType = typeAssetTrigger;
@@ -181,6 +220,50 @@ const Contract: React.FC = () => {
     }
   };
 
+  const contractHaveKDA = () => {
+    const contracts = [
+      'TransferContract',
+      'FreezeContract',
+      'UnfreezeContract',
+      'WithdrawContract',
+      'ConfigITOContract',
+      'SetITOPricesContract',
+      'AssetTriggerContract',
+    ];
+
+    return contracts.includes(contractType);
+  };
+
+  const getAssetsList = (assets: any[]) => {
+    if (contractType === 'AssetTriggerContract') {
+      const bothCollectionNFT = [1, 2];
+      const justCollection = [0, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13];
+      const justNFT = [8];
+
+      if (bothCollectionNFT.includes(typeAssetTrigger)) {
+        return assets;
+      } else if (justCollection.includes(typeAssetTrigger)) {
+        return assets.filter((value: ICollectionList) => {
+          return !value.isNFT;
+        });
+      } else if (justNFT.includes(typeAssetTrigger)) {
+        return assets.filter((value: ICollectionList) => {
+          return value.isNFT;
+        });
+      }
+    } else if (contractType === 'FreezeContract') {
+      return assets.filter((value: ICollectionList) => {
+        return !value.isNFT;
+      });
+    } else if (contractType === 'UnfreezeContract') {
+      return assets.filter((value: ICollectionList) => {
+        return !value.isNFT && value.frozenBalance !== 0;
+      });
+    }
+
+    return assets;
+  };
+
   useEffect(() => {
     if (txHash) {
       window.scrollTo(0, 0);
@@ -205,6 +288,50 @@ const Contract: React.FC = () => {
 
       <Select options={contractOptions} onChange={handleOption} />
 
+      {contractType === 'AssetTriggerContract' && (
+        <AssetTriggerContainer>
+          <InputLabel>Trigger Type</InputLabel>
+          <Select
+            options={assetTriggerTypes}
+            onChange={value => setTypeAssetTrigger(value ? value.value : 0)}
+          />
+        </AssetTriggerContainer>
+      )}
+
+      {contractHaveKDA() && (
+        <SelectContainer>
+          <SelectContent size={55}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}
+            >
+              <FieldLabel>Select an asset/collection</FieldLabel>
+              {!isNaN(Number(assetBalance)) && assetBalance !== null && (
+                <BalanceLabel>
+                  Balance: {assetBalance / 10 ** collection.precision}
+                </BalanceLabel>
+              )}
+            </div>
+            <Select
+              options={getAssetsList(assetsList)}
+              onChange={value => setCollection(value)}
+            />
+          </SelectContent>
+          {collection?.isNFT && (
+            <SelectContent size={13}>
+              <FieldLabel>Asset ID</FieldLabel>
+              <AssetIDInput
+                type="number"
+                onChange={e => setAssetID(Number(e.target.value))}
+              />
+            </SelectContent>
+          )}
+        </SelectContainer>
+      )}
+
       {contractType === 'CreateAssetContract' && (
         <ExtraOptionContainer>
           <ToggleContainer>
@@ -220,16 +347,6 @@ const Contract: React.FC = () => {
             NFT
           </ToggleContainer>
         </ExtraOptionContainer>
-      )}
-
-      {contractType === 'AssetTriggerContract' && (
-        <AssetTriggerContainer>
-          <InputLabel>Trigger Type</InputLabel>
-          <Select
-            options={assetTriggerTypes}
-            onChange={value => setTypeAssetTrigger(value ? value.value : 0)}
-          />
-        </AssetTriggerContainer>
       )}
 
       {contractType === 'ClaimContract' && (

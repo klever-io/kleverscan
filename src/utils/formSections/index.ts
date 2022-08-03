@@ -4,7 +4,7 @@ import createAsset from "./createAsset";
 import transferContract from "./transfer";
 import {unfreezeContract, freezeContract} from "./freeze";
 import {delegateContract, undelegateContract} from './delegate';
-import withdrawContract from './withdraw';
+// import withdrawContract from './withdraw';
 import proposalContract from './proposal';
 import voteContract from './vote';
 import buyContract from './buy';
@@ -14,7 +14,7 @@ import configMarketplaceContract from './configMarketplace';
 import claimContract from './claim';
 import validatorConfigContract from './validatorConfig';
 import createValidatorContract from './createValidator';
-import setITOContract from './setITO';
+// import setITOContract from './setITO';
 import configITOContract from './configITO';
 import assetTriggerContract from './assetTrigger';
 
@@ -45,6 +45,10 @@ const setAccountNameContract = (): ISection[] => {
 const updatePermissionContract = (): ISection[] => [];
 
 const unjailContract = (): ISection[] => [];
+
+const withdrawContract = (): ISection[] => [];
+
+const setITOContract = (): ISection[] => [];
 
 const formSection = (contract: string, type?: string, address = ''): ISection[] => {
   const contractsSections = {

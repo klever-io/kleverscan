@@ -8,6 +8,28 @@ interface IContainer {
   loading?: boolean;
 }
 
+interface ISelect {
+  size: number;
+}
+
+const defaultStyles = css`
+  width: 100%;
+
+  padding: 0.5rem 1rem;
+  border: 1px solid ${({ theme }) => theme.input.border.dark};
+  border-radius: 0.5rem;
+
+  color: ${({ theme }) => theme.input.border.dark};
+
+  background-color: transparent;
+
+  box-shadow: unset;
+
+  font-weight: 500;
+
+  transition: all 0.1s ease-in-out;
+`;
+
 export const CloseIcon = styled(IoMdCloseCircle).attrs(props => ({
   color: props.theme.form.hash,
   size: 24,
@@ -159,6 +181,8 @@ export const ExtraOptionContainer = styled.div`
 `;
 
 export const SelectContainer = styled.div`
+  display: flex;
+  align-items: center;
   background-color: ${props => props.theme.white};
   padding: 1.37rem;
   border-radius: 1rem;
@@ -166,6 +190,16 @@ export const SelectContainer = styled.div`
 
   border: 0.2px solid ${({ theme }) => theme.input.border};
   box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.8, '#000')};
+`;
+
+export const SelectContent = styled.div<ISelect>`
+  display: flex;
+  flex-direction: column;
+  min-width: ${props => props.size}%;
+
+  &:not(:first-child) {
+    margin-left: 1rem;
+  }
 `;
 
 export const AssetTriggerContainer = styled.div`
@@ -181,4 +215,19 @@ export const FieldLabel = styled.label`
   display: flex;
   color: ${({ theme }) => theme.input.border.dark};
   margin-bottom: 0.3rem;
+`;
+
+export const BalanceLabel = styled.label`
+  user-select: none;
+  font-size: smaller;
+  font-weight: 600;
+  display: flex;
+  color: ${({ theme }) => theme.input.border.dark};
+  margin-bottom: 0.3rem;
+`;
+
+export const AssetIDInput = styled.input`
+  height: 2.6rem;
+
+  ${defaultStyles}
 `;

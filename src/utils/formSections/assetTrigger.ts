@@ -7,13 +7,6 @@ const assetTriggerContract = (): ISection[] => {
     {
       fields: [
         {
-          label: 'AssetId',
-          props: {
-            required: true,
-            tooltip: 'Target Asset',
-          },
-        },
-        {
           label: 'Receiver',
           props: {
             tooltip: 'Target address for transaction',
@@ -23,7 +16,7 @@ const assetTriggerContract = (): ISection[] => {
           label: 'Amount',
           props: {
             type: 'number',
-            tooltip: 'Amount (with precision)',
+            tooltip: 'Amount',
           },
         },
         {

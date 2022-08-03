@@ -7,13 +7,6 @@ const configITOContract = (): ISection[] => {
     {
       fields: [
         {
-          label: 'KDA',
-          props: {
-            required: true,
-            tooltip: 'Target Asset',
-          },
-        },
-        {
           label: 'Receiver Address',
           props: {
             required: true,
@@ -33,7 +26,7 @@ const configITOContract = (): ISection[] => {
           props: {
             type: 'number',
             required: true,
-            tooltip: 'Max amount of assets sold in the ITO (with precision)',
+            tooltip: 'Max amount of assets sold in the ITO',
           },
         },
     ],

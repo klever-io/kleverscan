@@ -38,14 +38,14 @@ const sellContract = (): ISection[] => {
         label: 'Price',
         props: {
           type: 'number',
-          tooltip: 'Price for instant sell (with precision)',
+          tooltip: 'Price for instant sell',
         },
       },
       { 
         label: 'Reserve Price',
         props: {
           type: 'number',
-          tooltip: 'Minimum auction price (with precision)',
+          tooltip: 'Minimum auction price',
         },
       },
       { 

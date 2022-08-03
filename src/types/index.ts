@@ -35,6 +35,20 @@ export enum Service {
   EXPLORER,
 }
 
+export interface IDropdownItem {
+  label: string;
+  value: any;
+}
+
+export interface ICollectionList {
+  label: string;
+  value: string;
+  isNFT: boolean;
+  frozenBalance: number;
+  balance: number;
+  precision?: number;
+}
+
 export interface IContractOption {
   value: string;
   label: string;

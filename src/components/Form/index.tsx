@@ -289,6 +289,8 @@ const Form: React.FC<any> = ({
 
       {sections.length > 0 ||
       contractName === 'UnjailContract' ||
+      contractName === 'WithdrawContract' ||
+      contractName === 'SetITOPricesContract' ||
       contractName === 'UpdateAccountPermissionContract' ? (
         <>
           <AdvancedOptsContainer

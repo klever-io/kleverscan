@@ -29,7 +29,7 @@ export const ConnectButton = styled.div`
     cursor: pointer;
   }
 
-  @media screen and (min-width: 768px) {
+  @media screen and (min-width: 1025px) {
     &:hover > div {
       display: flex;
       flex-direction: column;
@@ -43,7 +43,9 @@ export const ConnectContainer = styled.div`
   align-items: center;
   user-select: none;
 
-  @media screen and (max-width: 768px) {
+  gap: 1rem;
+
+  @media screen and (max-width: 1025px) {
     margin-top: auto;
 
     flex-direction: column-reverse;
@@ -69,7 +71,7 @@ export const LogoutContainer = styled.div`
     }
   }
 
-  @media screen and (min-width: 768px) {
+  @media screen and (min-width: 1025px) {
     &:hover {
       &::before {
         content: '';
@@ -102,7 +104,7 @@ export const LogoutContainer = styled.div`
 
 export const CopyContainer = styled.div`
   position: relative;
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   margin-left: 0.8rem;
 
   &:hover {
@@ -111,12 +113,12 @@ export const CopyContainer = styled.div`
     }
   }
 
-  @media screen and (min-width: 768px) {
+  @media screen and (min-width: 1025px) {
     &:hover {
       &::before {
         content: '';
         position: absolute;
-        top: 2rem;
+        top: 1.25rem;
         left: 0.25rem;
         width: 0;
         height: 0;
@@ -159,7 +161,12 @@ export const MobileTransaction = styled.a`
   color: ${props => props.theme.navbar.text};
 `;
 
-export const StyledTransfer = styled(BiTransfer)`
+export const MobileStyledTransfer = styled(BiTransfer)`
   color: ${props => props.theme.navbar.text};
   size: 20px;
+`;
+export const StyledTransfer = styled(BiTransfer)`
+  color: ${props => props.theme.navbar.text};
+  width: 25px;
+  height: 25px;
 `;

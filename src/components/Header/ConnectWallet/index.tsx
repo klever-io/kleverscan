@@ -9,6 +9,7 @@ import {
   LogoutContainer,
   LogoutIcon,
   MenuTransaction,
+  MobileStyledTransfer,
   StyledTransfer,
 } from './styles';
 
@@ -21,6 +22,7 @@ import { useRouter } from 'next/router';
 import { MobileNavbarItem } from '..';
 import { DropdownContainer, DropdownItem } from '../styles';
 import { useDidUpdateEffect } from '@/utils/hooks';
+import IconTooltip from '@/components/IconTooltip';
 
 interface IConnectWalletProps {
   handleMenu?: () => void;
@@ -75,52 +77,61 @@ const ConnectWallet: React.FC<IConnectWalletProps> = ({ handleMenu }) => {
     }
   };
 
-  const DropdownDesktop = () => {
-    return (
-      <DropdownItem>
-        <Link href={'/create-transaction'}>
-          <a>
-            <BiTransfer size={20} />
-            <span>Create Transaction</span>
-          </a>
-        </Link>
-      </DropdownItem>
-    );
-  };
-
   const handleConnect = async (silent?: boolean) => {
-    window.kleverWeb.provider = {
-      api:
-        process.env.DEFAULT_API_HOST ||
-        'https://api.testnet.klever.finance/v1.0',
-      node:
-        process.env.DEFAULT_NODE_HOST || 'https://node.testnet.klever.finance',
-    };
+    if (!walletAddress) {
+      window.kleverWeb.provider = {
+        api:
+          process.env.DEFAULT_API_HOST ||
+          'https://api.testnet.klever.finance/v1.0',
+        node:
+          process.env.DEFAULT_NODE_HOST ||
+          'https://node.testnet.klever.finance',
+      };
 
-    try {
-      setLoading(true);
-      await window.kleverWeb.initialize();
-      setLoading(false);
+      try {
+        setLoading(true);
+        await window.kleverWeb.initialize();
+        setLoading(false);
 
-      const address: string = await window.kleverWeb.getWalletAddress();
+        const address: string = await window.kleverWeb.getWalletAddress();
 
-      if (address.startsWith('klv') && address.length === 62) {
-        setWalletAddress(address);
-      } else {
-        !silent &&
-          toast.error('Invalid wallet address, please switch to a klv wallet');
+        if (address.startsWith('klv') && address.length === 62) {
+          setWalletAddress(address);
+        } else {
+          !silent &&
+            toast.error(
+              'Invalid wallet address, please switch to a klv wallet',
+            );
+        }
+      } catch (e) {
+        setLoading(false);
+        !silent && toast.error(String(e).split(':')[1]);
       }
-    } catch (e) {
-      setLoading(false);
-      !silent && toast.error(String(e).split(':')[1]);
     }
   };
 
-  const createTransactionProps = {
-    name: 'Create Transaction',
-    pathTo: '/create-transaction',
-    Icon: StyledTransfer,
-    onClick: handleMenu,
+  const getCreateTransactionButton = () => {
+    if (extensionInstalled && walletAddress && typeof window !== 'undefined') {
+      if (window.innerWidth < 1025) {
+        const createTransactionProps = {
+          name: 'Create Transaction',
+          pathTo: '/create-transaction',
+          Icon: MobileStyledTransfer,
+          onClick: handleMenu,
+        };
+        return <MobileNavbarItem {...createTransactionProps} />;
+      } else if (window.innerWidth >= 1025) {
+        const handleNavigate = () => {
+          router.push('/create-transaction');
+        };
+        const iconTooltipProps = {
+          Icon: StyledTransfer,
+          handleClick: handleNavigate,
+          tooltip: 'Create Transaction',
+        };
+        return <IconTooltip {...iconTooltipProps} />;
+      }
+    }
   };
 
   return (
@@ -136,25 +147,13 @@ const ConnectWallet: React.FC<IConnectWalletProps> = ({ handleMenu }) => {
             ) : (
               <>
                 {walletAddress && (
-                  <>
-                    <span>{parseAddress(walletAddress, 25)}</span>
-                    <DropdownContainer>
-                      <MenuTransaction>
-                        <DropdownDesktop key={'CreateTransaction'} />
-                      </MenuTransaction>
-                    </DropdownContainer>
-                  </>
+                  <span>{parseAddress(walletAddress, 25)}</span>
                 )}
                 {!walletAddress && <span>Connect your wallet</span>}
               </>
             )}
           </ConnectButton>
-          {extensionInstalled &&
-            walletAddress &&
-            typeof window !== 'undefined' &&
-            window.innerWidth < 1025 && (
-              <MobileNavbarItem {...createTransactionProps} />
-            )}
+          {getCreateTransactionButton()}
           <CopyContainer>
             {walletAddress && (
               <Copy info="Wallet Address" data={walletAddress} />

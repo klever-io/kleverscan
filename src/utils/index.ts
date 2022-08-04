@@ -435,3 +435,45 @@ export const assetTriggerTypes = [
     value: 13,
   },
 ];
+
+export const doIf = async (
+  success: () => any,
+  failure: () => any,
+  condition: () => boolean,
+  timeoutMS = 5000,
+  intervalMS = 100,
+): Promise<void> => {
+  console.log('here');
+  let interval: any;
+
+  const IntervalPromise = new Promise(resolve => {
+    const interval = setInterval(() => {
+      if (condition()) {
+        resolve(
+          (() => {
+            console.log('Interval');
+            success();
+            clearInterval(interval);
+            clearTimeout(timeout);
+          })(),
+        );
+      }
+    }, intervalMS);
+  });
+
+  let timeout: any;
+
+  const TimeoutPromise = new Promise(resolve => {
+    timeout = setTimeout(() => {
+      resolve(
+        (() => {
+          console.log('Timeout');
+          failure();
+          clearInterval(interval);
+        })(),
+      );
+    }, timeoutMS);
+  });
+
+  await Promise.race([IntervalPromise, TimeoutPromise]);
+};

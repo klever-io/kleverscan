@@ -12,6 +12,8 @@ import { ICollectionList } from '@/types/index';
 import Contract from '@/components/Contract';
 
 import { IProposalsResponse } from '@/types/proposals';
+import { doIf } from '@/utils/index';
+import { toast } from 'react-toastify';
 
 interface IContract {
   assets?: any;
@@ -19,15 +21,24 @@ interface IContract {
 }
 
 const CreateTransaction: React.FC<IContract> = ({ proposals }) => {
-  const [assets, setAssets] = useState<any>({});
   const [assetsList, setAssetsLists] = useState<any>([]);
   const router = useRouter();
 
   useEffect(() => {
     const getAssets = async () => {
       if (typeof window !== 'undefined') {
-        if (window.kleverWeb) {
-          const address = window.kleverWeb.getWalletAddress();
+        const callback = async () => {
+          let address = '';
+
+          console.log(window?.kleverWeb?.getWalletAddress !== undefined);
+
+          await doIf(
+            () => (address = window.kleverWeb.getWalletAddress()),
+            () => handleLogout(),
+            () => window?.kleverWeb?.getWalletAddress !== undefined,
+            500,
+          );
+
           if (address) {
             const account: any = await api.get({
               route: `address/${address}`,
@@ -67,17 +78,30 @@ const CreateTransaction: React.FC<IContract> = ({ proposals }) => {
                   buckets: [],
                 });
               }
-              setAssets(account.data.account.assets);
 
               setAssetsLists(list);
             }
           }
-        }
+        };
+
+        doIf(
+          async () => await callback(),
+          () => handleLogout(),
+          () => window.kleverWeb !== undefined,
+          500,
+        );
       }
     };
 
     getAssets();
   }, []);
+
+  const handleLogout = () => {
+    if (router.pathname.includes('/create-transaction')) {
+      toast.error('Please connect your wallet to create a transaction');
+      router.push('/');
+    }
+  };
 
   return (
     <Container>

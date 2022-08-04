@@ -15,7 +15,7 @@ import {
 
 import { BiTransfer } from 'react-icons/bi';
 import { toast } from 'react-toastify';
-import { parseAddress } from '../../../utils';
+import { doIf, parseAddress } from '../../../utils';
 
 import Copy from '@/components/Copy';
 import { useRouter } from 'next/router';
@@ -38,18 +38,11 @@ const ConnectWallet: React.FC<IConnectWalletProps> = ({ handleMenu }) => {
   useEffect(() => {
     const init = async () => {
       if (typeof window !== 'undefined') {
-        const interval = setInterval(() => {
-          if (window.kleverWeb !== undefined) {
-            setExtensionInstalled(true);
-            clearInterval(interval);
-            clearTimeout(timeout);
-          }
-        }, 100);
-
-        const timeout = setTimeout(() => {
-          handleLogout();
-          clearInterval(interval);
-        }, 5000);
+        await doIf(
+          () => setExtensionInstalled(true),
+          () => handleLogout(),
+          () => window.kleverWeb !== undefined,
+        );
       }
     };
     init();

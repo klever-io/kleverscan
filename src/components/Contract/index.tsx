@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 
 import { core } from '@klever/sdk';
 import Select from './Select';
@@ -40,6 +41,7 @@ interface IContract {
 }
 
 const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
+  const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [formSections, setFormSections] = useState<ISection[]>([]);
   const [contractType, setContractType] = useState('');
@@ -61,8 +63,12 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      if (window.kleverWeb) {
-        setOwnerAddress(window.kleverWeb.getWalletAddress());
+      try {
+        if (window.kleverWeb) {
+          setOwnerAddress(window.kleverWeb.getWalletAddress());
+        }
+      } catch (error) {
+        router.push('/');
       }
     }
   }, []);

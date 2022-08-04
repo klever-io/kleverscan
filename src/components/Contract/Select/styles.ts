@@ -31,7 +31,7 @@ const ReactSelect = css`
     border: 1px solid ${props => props.theme.input.border.dark};
     height: 2.5rem;
     width: 100%;
-    padding: 0 1.5rem;
+    padding: 0 0.625rem;
     color: ${props => props.theme.input.border.dark};
 
     min-height: 3rem;

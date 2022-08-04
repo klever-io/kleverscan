@@ -38,27 +38,18 @@ const ConnectWallet: React.FC<IConnectWalletProps> = ({ handleMenu }) => {
   useEffect(() => {
     const init = async () => {
       if (typeof window !== 'undefined') {
-        let interval: any;
+        const interval = setInterval(() => {
+          if (window.kleverWeb !== undefined) {
+            setExtensionInstalled(true);
+            clearInterval(interval);
+            clearTimeout(timeout);
+          }
+        }, 100);
 
-        const intervalPromise = new Promise(resolve => {
-          interval = setInterval(() => {
-            if (window.kleverWeb !== undefined) {
-              setExtensionInstalled(true);
-              resolve(clearInterval(interval));
-            }
-          }, 100);
-        });
-
-        const timeoutPromise = new Promise(resolve => {
-          setTimeout(() => {
-            handleLogout();
-            resolve(clearInterval(interval));
-          }, 5000);
-        });
-
-        await Promise.race([intervalPromise, timeoutPromise]);
-
-        return () => clearInterval(interval);
+        const timeout = setTimeout(() => {
+          handleLogout();
+          clearInterval(interval);
+        }, 5000);
       }
     };
     init();

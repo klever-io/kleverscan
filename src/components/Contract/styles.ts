@@ -189,10 +189,16 @@ export const SelectContainer = styled.div`
   box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.8, '#000')};
 `;
 
-export const SelectContent = styled.div`
+interface ISelect {
+  size?: number;
+}
+
+export const SelectContent = styled.div<ISelect>`
   display: flex;
   flex-direction: column;
   width: calc(50% - 0.5rem);
+
+  max-width: ${props => (props.size ? `${props.size}%` : 'unset')};
   &:not(:first-child) {
     margin-left: 1rem;
   }
@@ -223,7 +229,7 @@ export const BalanceLabel = styled.label`
 `;
 
 export const AssetIDInput = styled.input`
-  height: 2.6rem;
+  height: 3rem;
 
   ${defaultStyles}
 `;

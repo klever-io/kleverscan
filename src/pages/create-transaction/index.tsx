@@ -114,12 +114,14 @@ export const getServerSideProps: GetServerSideProps<any> = async () => {
     return String(item.proposalId);
   };
 
-  proposalResponse?.data?.proposals.forEach((item: any) => {
-    proposals.push({
-      label: descriptionProposal(item),
-      value: item.proposalId,
+  proposalResponse?.data?.proposals
+    .filter(proposal => proposal.proposalStatus === 'ActiveProposal')
+    .forEach((item: any) => {
+      proposals.push({
+        label: descriptionProposal(item),
+        value: item.proposalId,
+      });
     });
-  });
 
   proposals.sort((a: any, b: any) => (a.value > b.value ? 1 : -1));
 

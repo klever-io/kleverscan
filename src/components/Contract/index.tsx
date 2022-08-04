@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { core } from '@klever/sdk';
-import Select from 'react-select';
+import Select from './Select';
 import { toast } from 'react-toastify';
 
 import {
@@ -371,7 +371,7 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
 
       {contractType === 'VoteContract' && (
         <SelectContainer>
-          <SelectContent size={30}>
+          <SelectContent>
             <FieldLabel>Proposal ID</FieldLabel>
             <Select
               options={proposalsList}
@@ -393,7 +393,7 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
 
       {contractHaveKDA() && (
         <SelectContainer>
-          <SelectContent size={55}>
+          <SelectContent>
             <div
               style={{
                 display: 'flex',
@@ -432,7 +432,7 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
 
       {contractHaveBucketId() && (
         <SelectContainer>
-          <SelectContent size={40}>
+          <SelectContent>
             <FieldLabel>Select a bucket</FieldLabel>
             <Select
               options={bucketsList}

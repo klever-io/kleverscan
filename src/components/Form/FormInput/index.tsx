@@ -1,7 +1,7 @@
 import { useField } from '@unform/core';
 import { description } from 'configs/footer';
+import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
-import Select from './Select';
 import {
   Container,
   InfoIcon,
@@ -13,6 +13,11 @@ import {
   ToggleContainer,
   TooltipContainer,
 } from './styles';
+
+const Select = dynamic(() => import('./Select'), {
+  ssr: false,
+  loading: () => null,
+});
 
 export interface IFormInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {

@@ -2,7 +2,7 @@ import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
 import { components } from 'react-select';
-import { Container, HiddenInput } from './styles';
+import { Container } from './styles';
 
 const ReactSelect = dynamic(() => import('react-select'), {
   ssr: false,
@@ -17,22 +17,17 @@ export interface IDropdownItem {
 export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   options?: IDropdownItem[];
   selectPlaceholder?: string;
+  onChange: (value: any) => void;
   title?: string;
-  inputRef: React.RefObject<HTMLInputElement>;
 }
 
-const Filter: React.FC<IFilter> = ({
-  options: data,
-  inputRef,
+const Select: React.FC<IFilter> = ({
+  options,
+  onChange,
   selectPlaceholder,
   title,
   ...rest
 }) => {
-  const [selected, setSelected] = useState<IDropdownItem>({
-    label: '',
-    value: '',
-  });
-
   const Placeholder = (props: any) => {
     return <components.Placeholder {...props} />;
   };
@@ -47,30 +42,23 @@ const Filter: React.FC<IFilter> = ({
     );
   };
 
-  const handleSelect = (selected: any) => {
-    setSelected(selected);
+  const props = {
+    classNamePrefix: 'react-select',
+    options,
+    onChange,
   };
 
   return (
     <Container>
       <ReactSelect
-        classNamePrefix="react-select"
         placeholder={
           selectPlaceholder ? selectPlaceholder : `Choose ${title ? title : ''}`
         }
         components={{ Placeholder, DropdownIndicator }}
-        options={data}
-        onChange={e => handleSelect(e)}
-      />
-
-      <HiddenInput
-        {...rest}
-        ref={inputRef}
-        type="text"
-        value={selected.value}
+        {...props}
       />
     </Container>
   );
 };
 
-export default Filter;
+export default Select;

@@ -8,10 +8,6 @@ interface IContainer {
   loading?: boolean;
 }
 
-interface ISelect {
-  size: number;
-}
-
 const defaultStyles = css`
   width: 100%;
 
@@ -187,15 +183,16 @@ export const SelectContainer = styled.div`
   padding: 1.37rem;
   border-radius: 1rem;
   margin-top: 1rem;
+  width: 100%;
 
   border: 0.2px solid ${({ theme }) => theme.input.border};
   box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.8, '#000')};
 `;
 
-export const SelectContent = styled.div<ISelect>`
+export const SelectContent = styled.div`
   display: flex;
   flex-direction: column;
-  min-width: ${props => props.size}%;
+  width: calc(50% - 0.5rem);
   &:not(:first-child) {
     margin-left: 1rem;
   }

@@ -1,5 +1,6 @@
 // import { lighten } from 'polished';
 import styled, { css } from 'styled-components';
+import { lighten } from 'polished';
 
 const ReactSelect = css`
   .react-select {
@@ -91,16 +92,18 @@ export const Container = styled.div`
   .react-select__control {
     min-height: 3rem;
     background-color: unset;
-    border-color: ${({ theme }) => theme.input.border.dark};
+    border-color: ${({ theme }) => theme.card.background};
 
     transition: 0.2s ease-in-out;
     &:hover {
       border-color: ${({ theme }) => theme.input.border.dark};
+      box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.1, props.theme.card.background)};
     }
   }
   .react-select__control--is-focused {
     color: ${props => props.theme.white};
     border: 1px solid ${({ theme }) => theme.input.border.dark};
+    box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.1, props.theme.card.background)};
   }
 `;
 

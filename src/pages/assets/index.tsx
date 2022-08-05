@@ -62,18 +62,6 @@ const Assets: React.FC<IAssetPage> = ({
     fetchData();
   }, [page]);
 
-  const renderLogo = (logo: string, ticker: string, name: string) => {
-    const regex = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
-    if (
-      regex.test(logo) ||
-      logo === 'https://bc.klever.finance/logo_klv' ||
-      logo === 'https://bc.klever.finance/logo_kfi'
-    ) {
-      return <Logo alt={`${name}-logo`} src={logo} />;
-    }
-    return <LetterLogo>{ticker?.split('')[0]}</LetterLogo>;
-  };
-
   const TableBody: React.FC<IAsset> = ({
     ticker,
     name,
@@ -98,11 +86,11 @@ const Assets: React.FC<IAssetPage> = ({
       );
     };
 
-    const verifiedAssets = ['KLV', 'KFI', 'DVK-34ZH', 'LMT-KGIA'];
+    const verifiedAssets = ['KLV', 'KFI', 'DVK-34ZH', 'LMT-KGIA', 'NVR-3NSO', 'KBRL-V309','KUSD-1EYY' ];
 
     const isVerified = () => {
       if(verifiedAssets.includes(assetId)) {
-        return <Certified className='isVerified'/>;
+        return <Certified className='isVerified'/>
       }
     };
 
@@ -112,12 +100,12 @@ const Assets: React.FC<IAssetPage> = ({
           <a>
             <AssetLogo
               LetterLogo={LetterLogo}
+              isVerified={isVerified}
               Logo={Logo}
               logo={logo}
               ticker={ticker}
               name={name}
             />
-            {isVerified()}
           </a>
         </Link>
 

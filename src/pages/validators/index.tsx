@@ -83,7 +83,7 @@ const Validators: React.FC<IValidatorPage> = ({
 
           return {
             staked: delegation.totalStake,
-            rank: (index + 1) + (page * pagination.perPage - 10) ,
+            rank: index + 1 + (page * pagination.perPage - 10),
             name: delegation.name || parseAddress(delegation.ownerAddress, 14),
             cumulativeStaked: parseFloat(
               (
@@ -143,10 +143,10 @@ const Validators: React.FC<IValidatorPage> = ({
           <p>{rank}°</p>
         </span>
         <span>
-          {validators[(rank - 1) - (page * pagination.perPage - 10)]?.address ? (
+          {validators[rank - 1 - (page * pagination.perPage - 10)]?.address ? (
             <Link
               href={`validator/${
-                validators[(rank - 1) - (page * pagination.perPage - 10)].address
+                validators[rank - 1 - (page * pagination.perPage - 10)].address
               }`}
             >
               {parseAddress(name, 20)}
@@ -162,7 +162,7 @@ const Validators: React.FC<IValidatorPage> = ({
           <strong>{formatAmount(staked / 10 ** precision)} KLV</strong>
         </span>
         <span>
-          <strong>{commission}</strong>
+          <strong>{commission / 10 ** 2}%</strong>
         </span>
         <span>
           <strong>{`${totalProduced} / ${totalMissed}`}</strong>
@@ -204,57 +204,58 @@ const Validators: React.FC<IValidatorPage> = ({
   return <Detail {...detailProps} />;
 };
 
-export const getServerSideProps: GetServerSideProps<IValidatorPage> =
-  async () => {
-    const props: IValidatorPage = {
-      validators: [],
-      pagination: {} as IPagination,
-    };
-
-    const validators: IValidatorResponse = await api.get({
-      route: 'validator/list',
-    });
-
-    if (validators.code !== 'successful') {
-      return { props };
-    }
-
-    if (!validators.error) {
-      const delegations: IValidator[] = validators.data['validators'].map(
-        (delegation: IDelegationsResponse, index: number): IValidator => {
-          const totalProduced =
-            delegation.totalLeaderSuccessRate.numSuccess +
-            delegation.totalValidatorSuccessRate.numSuccess;
-          const totalMissed =
-            delegation.totalLeaderSuccessRate.numFailure +
-            delegation.totalValidatorSuccessRate.numFailure;
-
-          return {
-            staked: delegation.totalStake,
-            rank: (index + 1) + (validators.pagination.self * validators.pagination.perPage - 10),
-            name: delegation.name || parseAddress(delegation.ownerAddress, 20),
-            cumulativeStaked: parseFloat(
-              (
-                (delegation.totalStake / validators.data.networkTotalStake) *
-                100
-              ).toFixed(4),
-            ),
-            address: delegation.ownerAddress,
-            rating: delegation.rating,
-            canDelegate: delegation.canDelegate,
-            selfStake: delegation.selfStake,
-            status: delegation.list,
-            totalProduced,
-            totalMissed,
-            commission: delegation.commission,
-          };
-        },
-      );
-
-      props.validators = delegations;
-      props.pagination = validators.pagination;
-    }
-    return { props };
+export const getServerSideProps: GetServerSideProps<
+  IValidatorPage
+> = async () => {
+  const props: IValidatorPage = {
+    validators: [],
+    pagination: {} as IPagination,
   };
+
+  const validators: IValidatorResponse = await api.get({
+    route: 'validator/list',
+  });
+
+  if (validators.code !== 'successful') {
+    return { props };
+  }
+
+  if (!validators.error) {
+    const delegations: IValidator[] = validators.data['validators'].map(
+      (delegation: IDelegationsResponse, index: number): IValidator => {
+        const totalProduced =
+          delegation.totalLeaderSuccessRate.numSuccess +
+          delegation.totalValidatorSuccessRate.numSuccess;
+        const totalMissed =
+          delegation.totalLeaderSuccessRate.numFailure +
+          delegation.totalValidatorSuccessRate.numFailure;
+
+        return {
+          staked: delegation.totalStake,
+          rank: index + validators.pagination.previous * 10 + 1,
+          name: delegation.name || parseAddress(delegation.ownerAddress, 20),
+          cumulativeStaked: parseFloat(
+            (
+              (delegation.totalStake / validators.data.networkTotalStake) *
+              100
+            ).toFixed(4),
+          ),
+          address: delegation.ownerAddress,
+          rating: delegation.rating,
+          canDelegate: delegation.canDelegate,
+          selfStake: delegation.selfStake,
+          status: delegation.list,
+          totalProduced,
+          totalMissed,
+          commission: delegation.commission,
+        };
+      },
+    );
+
+    props.validators = delegations;
+    props.pagination = validators.pagination;
+  }
+  return { props };
+};
 
 export default Validators;

@@ -6,6 +6,7 @@ interface IAssetLogo {
   logo: string;
   ticker: string;
   name: string;
+  isVerified: () => JSX.Element | undefined;
 }
 const AssetLogo: React.FC<IAssetLogo> = ({
   LetterLogo,
@@ -13,6 +14,7 @@ const AssetLogo: React.FC<IAssetLogo> = ({
   logo,
   ticker,
   name,
+  isVerified,
 }) => {
   const regex = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
   if (
@@ -20,9 +22,19 @@ const AssetLogo: React.FC<IAssetLogo> = ({
     logo === 'https://bc.klever.finance/logo_klv' ||
     logo === 'https://bc.klever.finance/logo_kfi'
   ) {
-    return <Logo alt={`${name}-logo`} src={logo} />;
+    return (
+      <>
+        {isVerified()}
+        <Logo alt={`${name}-logo`} src={logo} />
+      </>
+    );
   }
-  return <LetterLogo>{ticker?.split('')?.[0] || ''}</LetterLogo>;
+  return (
+    <>
+      {isVerified()}
+      <LetterLogo>{ticker?.split('')?.[0] || ''}</LetterLogo>
+    </>
+  );
 };
 
 export default AssetLogo;

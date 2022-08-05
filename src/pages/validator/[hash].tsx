@@ -161,7 +161,7 @@ const Validator: React.FC<IValidatorPage> = ({
   const totalMissed =
     validator?.totalLeaderSuccessRate?.numFailure +
     validator?.totalValidatorSuccessRate?.numFailure;
-  const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'error');
+  const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'fail');
 
   const commissionPercent = commission / 10 ** 2;
   const votersPercent = 100 - commission / 10 ** 2;

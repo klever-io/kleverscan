@@ -131,7 +131,7 @@ export const Row = styled.div<ITableType>`
       }
 
       @media (max-width: 768px) {
-        left: 6rem;
+        left: 4rem;
       }
     }
   }

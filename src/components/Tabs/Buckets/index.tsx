@@ -39,8 +39,18 @@ const Buckets: React.FC<IBuckets> = ({ buckets, assets }) => {
       return 2; // Default for KLV
     };
 
+    const getAssetId = (id: string) => {
+      if(id.length === 64) {
+        return assets.find(({buckets}) => (bucket: string) => bucket === id)?.assetId;
+      }
+      return id;
+    };
+
     return (
       <Row type="buckets">
+        <span>
+          {getAssetId(id)}
+        </span>
         <span>
           <p>{(balance / 10 ** precision).toLocaleString()}</p>
         </span>
@@ -74,6 +84,7 @@ const Buckets: React.FC<IBuckets> = ({ buckets, assets }) => {
   };
 
   const header = [
+    'Asset Id',
     'Staked Values',
     'Staked',
     'Staked Epoch',

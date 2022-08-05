@@ -113,7 +113,7 @@ export const RowContent = styled.span`
 
   .bucketIdCopy {
     span {
-      margin-right: -2rem;
+      /* margin-right: -2rem; */
     }
   }
 `;

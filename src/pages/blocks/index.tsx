@@ -225,10 +225,10 @@ const Blocks: React.FC<IBlocks> = ({
       headers: ['Reward Yesterday', 'Cumulative Revenue'],
       values: [
         `${formatAmount(
-          (statistics?.yesterday?.totalBlockRewards) / 10 ** precision,
+          statistics?.yesterday?.totalBlockRewards / 10 ** precision,
         )} KLV`,
         `${formatAmount(
-          (statistics?.total?.totalBlockRewards) / 10 ** precision,
+          statistics?.total?.totalBlockRewards / 10 ** precision,
         )} KLV`,
       ],
     },
@@ -315,7 +315,9 @@ const Blocks: React.FC<IBlocks> = ({
           <Link href={`/block/${nonce}`}>{String(nonce)}</Link>
         </span>
         <span>{size.toLocaleString()} Bytes</span>
-        <Link href={`/validator/${producerName}`}>{parseAddress(producerName, 14)}</Link>
+        <Link href={`/validator/${producerName}`}>
+          {parseAddress(producerName, 14)}
+        </Link>
         <span>
           <small>
             {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}

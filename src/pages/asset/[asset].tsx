@@ -226,14 +226,14 @@ const Asset: React.FC<IAssetPage> = ({
                 </Link>
                 <Copy data={ownerAddress} info="ownerAddress" />
                 <ReceiveBackground>
-                <Receive onClick={() => setShowModal(!showModal)} />
-                <QrCodeModal
-                  show={showModal}
-                  setShowModal={() => setShowModal(false)}
-                  value={ownerAddress}
-                  onClose={() => setShowModal(false)}
-                />
-              </ReceiveBackground>
+                  <Receive onClick={() => setShowModal(!showModal)} />
+                  <QrCodeModal
+                    show={showModal}
+                    setShowModal={() => setShowModal(false)}
+                    value={ownerAddress}
+                    onClose={() => setShowModal(false)}
+                  />
+                </ReceiveBackground>
               </CenteredRow>
             </span>
           </Row>
@@ -506,6 +506,7 @@ const Asset: React.FC<IAssetPage> = ({
             logo={logo}
             ticker={ticker}
             name={name}
+            isVerified={() => undefined}
           />
           <AssetTitle>
             <h1>

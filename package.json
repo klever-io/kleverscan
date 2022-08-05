@@ -10,7 +10,8 @@
     "test": "jest",
     "test-cov": "jest --coverage",
     "test-cy": "cypress run",
-    "test-cy:open": "cypress run --headed --no-exit"
+    "test-cy:open": "cypress run --headed --no-exit",
+    "postinstall": "husky install"
   },
   "dependencies": {
     "@bugsnag/js": "^7.16.2",
@@ -65,8 +66,10 @@
     "eslint": "7.31.0",
     "eslint-config-next": "11.0.1",
     "eslint-config-prettier": "^8.3.0",
+    "husky": "^8.0.1",
     "jest": "^28.0.2",
     "jest-environment-jsdom": "^28.0.2",
+    "lint-staged": "^13.0.3",
     "prettier": "^2.3.2",
     "ts-node": "^10.7.0",
     "typescript": "4.3.5"

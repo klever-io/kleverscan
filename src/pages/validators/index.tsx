@@ -1,30 +1,26 @@
-import React, { useState } from 'react';
-
-import { GetServerSideProps } from 'next';
-import Link from 'next/link';
-import Table, { ITable } from '@/components/Table';
-import Detail from '@/components/Layout/Detail';
-import { Row, Status } from '@/components/Table/styles';
-
-import {
-  IResponse,
-  IPagination,
-  IValidator,
-  IDelegationsResponse,
-} from '@/types/index';
-import api from '@/services/api';
-
 import { Validators as Icon } from '@/assets/cards';
+import { getStatusIcon } from '@/assets/status';
+import Detail from '@/components/Layout/Detail';
+import { ITable } from '@/components/Table';
+import { Row, Status } from '@/components/Table/styles';
+import api from '@/services/api';
+import theme from '@/styles/theme';
+import {
+  IDelegationsResponse,
+  IPagination,
+  IResponse,
+  IValidator,
+} from '@/types/index';
+import { useDidUpdateEffect } from '@/utils/hooks';
+import { capitalizeString, formatAmount, parseAddress } from '@/utils/index';
 import {
   ProgressContainer,
   ProgressContent,
   ProgressIndicator,
 } from '@/views/validators';
-import { useDidUpdateEffect } from '@/utils/hooks';
-import { capitalizeString, parseAddress } from '@/utils/index';
-import { formatAmount } from '@/utils/index';
-import { getStatusIcon } from '@/assets/status';
-import theme from '@/styles/theme';
+import { GetServerSideProps } from 'next';
+import Link from 'next/link';
+import React, { useState } from 'react';
 
 interface IValidatorPage {
   validators: IValidator[];
@@ -232,7 +228,10 @@ export const getServerSideProps: GetServerSideProps<
 
         return {
           staked: delegation.totalStake,
-          rank: index + validators.pagination.previous * 10 + 1,
+          rank:
+            index +
+            (validators.pagination.self - 1) * validators.pagination.perPage +
+            1,
           name: delegation.name || parseAddress(delegation.ownerAddress, 20),
           cumulativeStaked: parseFloat(
             (

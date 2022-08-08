@@ -443,7 +443,6 @@ export const doIf = async (
   timeoutMS = 5000,
   intervalMS = 100,
 ): Promise<void> => {
-  console.log('here');
   let interval: any;
 
   const IntervalPromise = new Promise(resolve => {
@@ -451,7 +450,6 @@ export const doIf = async (
       if (condition()) {
         resolve(
           (() => {
-            console.log('Interval');
             success();
             clearInterval(interval);
             clearTimeout(timeout);
@@ -467,7 +465,6 @@ export const doIf = async (
     timeout = setTimeout(() => {
       resolve(
         (() => {
-          console.log('Timeout');
           failure();
           clearInterval(interval);
         })(),

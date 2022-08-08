@@ -1,6 +1,7 @@
+import { IParamList } from '@/types/index';
 import { ISection } from 'components/Form';
 
-const proposalContract = (): ISection[] => {
+const proposalContract = (paramsList?: IParamList[]): ISection[] => {
   const section = [] as ISection[];
 
   section.push(
@@ -30,13 +31,15 @@ const proposalContract = (): ISection[] => {
               innerPath: 'parameters',
               fields: [
                 {
-                  label: 'Key',
+                  label: 'Parameter Key',
                   props: {
+                    type: 'dropdown',
+                    options: paramsList,
                     tooltip: 'Parameter key',
                   }
                 },
                 {
-                  label: 'Value',
+                  label: 'Parameter Value',
                   props: {
                     tooltip: 'Parameter address',
                   }

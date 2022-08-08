@@ -12,7 +12,7 @@ import {
   Toggle,
   ToggleContainer,
 } from '@/components/Form/FormInput/styles';
-import { ICollectionList } from '@/types/index';
+import { ICollectionList, IParamList } from '@/types/index';
 import formSection from '@/utils/formSections';
 import { assetTriggerTypes, claimTypes, contractOptions } from '@/utils/index';
 import {
@@ -34,13 +34,19 @@ import PackInfoForm from '../CustomForm/PackInfo';
 import PermissionsForm from '../CustomForm/Permissions';
 
 import { parseAddress } from '@/utils/index';
+import { INetworkParam } from '@/types/proposals';
 
 interface IContract {
   assetsList: ICollectionList[];
   proposalsList: any[];
+  paramsList: IParamList[];
 }
 
-const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
+const Contract: React.FC<IContract> = ({
+  assetsList,
+  proposalsList,
+  paramsList,
+}) => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [formSections, setFormSections] = useState<ISection[]>([]);
@@ -162,8 +168,13 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
         const parameters = {};
 
         values.parameters.forEach((parameter: any) => {
-          if (!isNaN(Number(parameter.key)) && parameter.value) {
-            parameters[parameter.key] = String(parameter.value);
+          if (
+            !isNaN(Number(parameter.parameterKey)) &&
+            parameter.parameterValue
+          ) {
+            parameters[parameter.parameterKey] = String(
+              parameter.parameterValue,
+            );
           }
         });
 
@@ -214,7 +225,13 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
 
   const handleOption = (selectedOption: any) => {
     setContractType(selectedOption.value);
-    setFormSections([...formSection(selectedOption.value, '', ownerAddress)]);
+    if (selectedOption.value === 'ProposalContract') {
+      setFormSections([
+        ...formSection(selectedOption.value, '', ownerAddress, paramsList),
+      ]);
+    } else {
+      setFormSections([...formSection(selectedOption.value, '', ownerAddress)]);
+    }
   };
 
   const handleSubmit = async (contractValues: any) => {
@@ -425,7 +442,7 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
             />
           </SelectContent>
           {collection?.isNFT && (
-            <SelectContent size={13}>
+            <SelectContent>
               <FieldLabel>Asset ID</FieldLabel>
               <AssetIDInput
                 type="number"

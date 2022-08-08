@@ -40,6 +40,12 @@ export interface IDropdownItem {
   value: any;
 }
 
+export interface IParamList {
+  label: string;
+  value: number;
+  currentValue?: number;
+}
+
 export interface ICollectionList {
   label: string;
   value: string;

@@ -108,6 +108,7 @@ const theme = {
 
   filter: {
     title: '#7B7DB2',
+    titleFocused: '#FFFFFF',
 
     border: '#C6C7EB',
     text: '#4F5185',

@@ -61,7 +61,7 @@ export interface INetworkParams {
 export interface INetworkParam {
   number: number;
   parameter: string;
-  currentValue: string;
+  currentValue: number;
 }
 
 export interface IProposals {

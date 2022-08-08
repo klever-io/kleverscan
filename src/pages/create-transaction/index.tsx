@@ -8,19 +8,22 @@ import { Container, Header, Title } from '@/views/assets';
 
 import { ArrowLeft } from '@/assets/icons';
 import { Transactions as Icon } from '@/assets/title-icons';
-import { ICollectionList } from '@/types/index';
+import { ICollectionList, IParamList } from '@/types/index';
 import Contract from '@/components/Contract';
 
-import { IProposalsResponse } from '@/types/proposals';
+import { IProposalsResponse, INetworkParam } from '@/types/proposals';
+import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
 import { doIf } from '@/utils/index';
 import { toast } from 'react-toastify';
 
 interface IContract {
   assets?: any;
   proposals?: any;
+  paramsList?: any;
 }
 
-const CreateTransaction: React.FC<IContract> = ({ proposals }) => {
+const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
+  const [assets, setAssets] = useState<any>({});
   const [assetsList, setAssetsLists] = useState<any>([]);
   const router = useRouter();
 
@@ -29,8 +32,6 @@ const CreateTransaction: React.FC<IContract> = ({ proposals }) => {
       if (typeof window !== 'undefined') {
         const callback = async () => {
           let address = '';
-
-          console.log(window?.kleverWeb?.getWalletAddress !== undefined);
 
           await doIf(
             () => (address = window.kleverWeb.getWalletAddress()),
@@ -115,7 +116,11 @@ const CreateTransaction: React.FC<IContract> = ({ proposals }) => {
         </Title>
       </Header>
 
-      <Contract assetsList={assetsList} proposalsList={proposals} />
+      <Contract
+        assetsList={assetsList}
+        proposalsList={proposals}
+        paramsList={paramsList}
+      />
     </Container>
   );
 };
@@ -123,6 +128,29 @@ const CreateTransaction: React.FC<IContract> = ({ proposals }) => {
 export const getServerSideProps: GetServerSideProps<any> = async () => {
   const proposalResponse: IProposalsResponse = await api.get({
     route: 'proposals/list',
+  });
+
+  const { data } = await api.get({ route: 'network/network-parameters' });
+
+  let networkParams = {} as INetworkParam[];
+  const paramsList = [] as IParamList[];
+
+  if (data) {
+    networkParams = Object.keys(proposalsMessages).map((key, index) => {
+      return {
+        number: index,
+        parameter: proposalsMessages[key] ? proposalsMessages[key] : '',
+        currentValue: data.parameters[key].value,
+      };
+    });
+  }
+
+  networkParams?.forEach((param: INetworkParam) => {
+    paramsList.push({
+      value: param.number,
+      label: `${param.parameter} - ${param.currentValue}`,
+      currentValue: param.currentValue,
+    });
   });
 
   const proposals: any = [];
@@ -151,6 +179,7 @@ export const getServerSideProps: GetServerSideProps<any> = async () => {
 
   const props: any = {
     proposals: proposals,
+    paramsList: paramsList,
   };
 
   return { props };

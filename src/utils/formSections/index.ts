@@ -1,4 +1,5 @@
 import { ISection } from 'components/Form';
+import { IParamList } from '@/types/index';
 
 import createAsset from "./createAsset";
 import transferContract from "./transfer";
@@ -52,7 +53,7 @@ const undelegateContract = (): ISection[] => [];
 
 const setITOContract = (): ISection[] => [];
 
-const formSection = (contract: string, type?: string, address = ''): ISection[] => {
+const formSection = (contract: string, type?: string, address = '', paramsList?: IParamList[]): ISection[] => {
   const contractsSections = {
     'CreateAssetContract': type ? createAsset(type, address) : createAsset('NFT', address),
     'TransferContract': transferContract(),
@@ -61,7 +62,7 @@ const formSection = (contract: string, type?: string, address = ''): ISection[] 
     'DelegateContract': delegateContract(),
     'UndelegateContract': undelegateContract(),
     'WithdrawContract': withdrawContract(),
-    'ProposalContract': proposalContract(),
+    'ProposalContract': proposalContract(paramsList),
     'VoteContract': voteContract(),
     'BuyContract': buyContract(),
     'SellContract': sellContract(),

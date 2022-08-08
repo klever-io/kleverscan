@@ -44,7 +44,9 @@ const Proposals: React.FC<IProposalsPage> = ({
   const [page, setPage] = useState(1);
 
   const [networkParams, setNetworkParams] = useState(defaultNetworkParams);
-  const [proposals, setProposals] = useState<IParsedProposal[] | any[]>(defaultProposals);
+  const [proposals, setProposals] = useState<IParsedProposal[] | any[]>(
+    defaultProposals,
+  );
 
   const fetchData = async () => {
     setLoadingProposals(true);
@@ -54,9 +56,9 @@ const Proposals: React.FC<IProposalsPage> = ({
     if (!proposals.error && proposals?.data?.proposals) {
       let parsedProposalResponse: any[] = [];
       parsedProposalResponse = parseAllProposals(proposals?.data?.proposals);
-        setProposals(parsedProposalResponse);
-        setLoadingProposals(false);
-      }
+      setProposals(parsedProposalResponse);
+      setLoadingProposals(false);
+    }
   };
 
   useDidUpdateEffect(() => {
@@ -141,7 +143,7 @@ export const parseAllProposals = (
   arrayOfProposals: any[],
 ): IParsedProposal[] | [] => {
   if (arrayOfProposals) {
-     arrayOfProposals.forEach((proposal, index) => {
+    arrayOfProposals.forEach((proposal, index) => {
       arrayOfProposals[index].parsedParameters = getProposalNetworkParams(
         proposal.parameters,
       );

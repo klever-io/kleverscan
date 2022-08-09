@@ -56,6 +56,7 @@ export const Content = styled.div<{ open: boolean }>`
   height: 2.8rem;
 
   padding: 0.5rem 1rem;
+  padding-right: 0;
 
   position: relative;
   display: flex;
@@ -169,4 +170,14 @@ export const Item = styled.div<{ selected: boolean }>`
         ? props.theme.filter.item.selected
         : props.theme.filter.item.text};
   }
+`;
+
+export const HiddenInput = styled.input<{ show: boolean }>`
+  width: 100%;
+  display: ${props => (props.show ? 'inline-block' : 'none')};
+`;
+
+export const ArrowDownContainer = styled.div`
+  padding: 0.5rem 1rem;
+  margin-top: 0 !important;
 `;

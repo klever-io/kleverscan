@@ -1,8 +1,6 @@
 FROM node:16-alpine AS builder
 WORKDIR /app
 
-ENV NODE_ENV production
-
 COPY . .
 RUN yarn --frozen-lockfiles
 RUN yarn build

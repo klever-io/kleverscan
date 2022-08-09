@@ -38,6 +38,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
     const StatusIcon = getStatusIcon(status);
     let toAddress = '--';
     let amount = '--';
+    let assetId = '--';
 
     const contractType = getContractType(contract);
 
@@ -46,6 +47,9 @@ const Transactions: React.FC<ITransactionsProps> = props => {
 
       toAddress = parameter.toAddress;
       amount = formatAmount(parameter.amount / 10 ** precision);
+      if (parameter.assetId) {
+        assetId = parameter.assetId;
+      }
     }
     return (
       <Row type="transactions">
@@ -79,6 +83,9 @@ const Transactions: React.FC<ITransactionsProps> = props => {
         <span>
           <strong>{amount}</strong>
         </span>
+        <span>
+          <strong>{assetId}</strong>
+        </span>
       </Row>
     );
   };
@@ -93,6 +100,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
     'Status',
     'Contract',
     'Amount',
+    'Asset Id',
   ];
 
   const tableProps: ITable = {

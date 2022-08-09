@@ -1,5 +1,8 @@
 FROM node:16-alpine AS builder
 WORKDIR /app
+
+ENV NODE_ENV production
+
 COPY . .
 RUN yarn --frozen-lockfiles
 RUN yarn build
@@ -7,6 +10,8 @@ RUN yarn build
 # Production image, copy all the files and run next
 FROM node:16-alpine AS runner
 WORKDIR /app
+
+ENV NODE_ENV production
 
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001

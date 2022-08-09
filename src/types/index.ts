@@ -619,16 +619,33 @@ export interface IDailyTransaction {
   key: number;
 }
 
-export interface ICoinStaking {
-  totalStaking: number | null,
-  dayBeforeTotalStaking: number | null,
+export interface IAssetStaking {
+  totalStaking: number | null;
+  dayBeforeTotalStaking: number | null;
 }
 
-export interface ICoinsStaking {
-  klvStaking: ICoinStaking,
-  kfiStaking: ICoinStaking,
+export interface IAssetsData {
+  klv: IAssetData;
+  kfi: IAssetData;
 }
 
+export interface IAssetData {
+  prices: IAssetPrice;
+  staking: IAssetStaking;
+  volume: number | null;
+  circulatingSupply: number | null;
+}
+
+export interface IAssetPrice {
+  todaysPrice: number | null;
+  yesterdayPrice: number | null;
+  variation: number | null;
+}
+
+export interface IAssetsPrice {
+  klvPrice: IAssetPrice;
+  kfiPrice: IAssetPrice;
+}
 
 export interface IHome {
   transactions: ITransaction[];
@@ -641,7 +658,7 @@ export interface IHome {
   coinsData: ICoinInfo[];
   yesterdayTransactions: number;
   yesterdayAccounts: number;
-  coinsStaking: ICoinsStaking;
+  assetsData: IAssetsData;
 }
 export interface IDataCards {
   totalAccounts: number;
@@ -651,7 +668,7 @@ export interface IDataCards {
   coinsData: ICoinInfo[];
   yesterdayTransactions: number;
   yesterdayAccounts: number;
-  coinsStaking: ICoinsStaking;
+  assetsData: IAssetsData;
 }
 
 export interface IHomeTransactions {

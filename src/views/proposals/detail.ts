@@ -223,12 +223,12 @@ export const CardContent = styled.div`
 
   div:nth-child(2) {
     span:nth-child(1) {
-      min-width: 6rem;
+      min-width: 12rem;
     }
   }
   div:nth-child(3) {
     span:nth-child(1) {
-      min-width: 6rem;
+      min-width: 12rem;
     }
   }
 
@@ -284,6 +284,18 @@ export const OptionValidator = styled.div<OptionValidatorProps>`
   &:not(:first-child) {
     margin-left: 0.7rem;
   }
+`;
+
+export const HalfRow = styled.div`
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  width: 50%;
+  @media (max-width: 768px) {
+    padding: 0.1rem;
+    width: 100%;
+  }
+  color: ${props => props.theme.card.darkText};
 `;
 
 export const Row = styled.div`
@@ -415,7 +427,6 @@ export const BalanceContainer = styled.div`
 export const NetworkParamsContainer = styled.div`
   margin-top: 0.5rem;
 
-
   display: flex;
 
   flex-direction: column;
@@ -430,7 +441,7 @@ export const NetworkParamsContainer = styled.div`
     display: flex;
 
     flex-direction: row;
-    @media(max-width: 768px) {
+    @media (max-width: 768px) {
       flex-direction: column;
       align-items: flex-start;
     }

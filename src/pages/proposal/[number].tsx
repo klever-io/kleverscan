@@ -33,6 +33,7 @@ import {
   RowContent,
   BalanceContainer,
   NetworkParamsContainer,
+  HalfRow,
 } from '@/views/proposals/detail';
 
 import { ArrowLeft } from '@/assets/icons';
@@ -43,7 +44,13 @@ import Table, { ITable } from '@/components/Table';
 import { Row as TableRow } from '@/components/Table/styles';
 import { formatAmount, typeVoteColors } from '@/utils/index';
 import api from '@/services/api';
-import { IRawParam, IFullInfoParam, IParsedProposal, IVoters, IVotingPowers } from '@/types/proposals';
+import {
+  IRawParam,
+  IFullInfoParam,
+  IParsedProposal,
+  IVoters,
+  IVotingPowers,
+} from '@/types/proposals';
 
 import { AiFillCheckCircle } from 'react-icons/ai';
 
@@ -74,7 +81,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
   const router = useRouter();
   const precision = 10 ** 6;
   const proposalAPI: IParsedProposal = props;
-  const { votingPowers, totalStaked } = proposalAPI;
+  const { votingPowers, totalStaked, description } = proposalAPI;
   const [filterVoters, setFilterVoters] = useState({
     Yes: 0,
     No: 0,
@@ -270,9 +277,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                 </span>
                 <span style={{ marginRight: '0.2rem' }}>
                   <Link href={`/account/${proposalAPI.proposer}`}>
-                    <HoverLink>
-                      <p>{proposalAPI.proposer}</p>
-                    </HoverLink>
+                    <HoverLink>{proposalAPI.proposer}</HoverLink>
                   </Link>
                 </span>
                 <Tooltip
@@ -290,20 +295,20 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                 </Link>
               </Row>
               <Row>
-                <span>
-                  <strong>Created Epoch:</strong>
-                </span>
-                <span>
-                  <DateContainer>
-                    <small>{proposalAPI.epochStart}</small>
-                  </DateContainer>
-                </span>
-                <span>
-                  <strong>Ended Epoch:</strong>
-                </span>
-                <span>
-                  <EndedDate>{proposalAPI.epochEnd}</EndedDate>
-                </span>
+                <HalfRow>
+                  <span>
+                    <strong>Created Epoch</strong>
+                  </span>
+                  <span>
+                    <span>{proposalAPI.epochStart}</span>
+                  </span>
+                </HalfRow>
+                <HalfRow>
+                  <span>
+                    <strong>Ended Epoch</strong>
+                  </span>
+                  <span style={{ color: 'red' }}>{proposalAPI.epochEnd}</span>
+                </HalfRow>
               </Row>
               <Row>
                 <span>
@@ -316,6 +321,12 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                     </NetworkParamsContainer>
                   </BalanceContainer>
                 </RowContent>
+              </Row>
+              <Row>
+                <span>
+                  <strong>Description</strong>
+                </span>
+                <span>{description}</span>
               </Row>
             </CardContent>
           </CardContainer>
@@ -419,7 +430,9 @@ export const getVotingPowers = (voters: IVoters | []): IVotingPowers => {
   return powers;
 };
 
-export const getProposalNetworkParams = (params: IRawParam): IFullInfoParam[] => {
+export const getProposalNetworkParams = (
+  params: IRawParam,
+): IFullInfoParam[] => {
   if (params) {
     const fullInfoParams: IFullInfoParam[] = Object.entries(params).map(
       ([index, value]) => {
@@ -444,7 +457,7 @@ export const getServerSideProps: GetStaticProps<IProposal> = async ({
     route: `proposals/${params?.number}`,
   });
   let props = proposalInfos?.data?.proposal;
-  
+
   if (!props) {
     props = {};
   }

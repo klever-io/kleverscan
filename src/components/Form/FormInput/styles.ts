@@ -129,6 +129,7 @@ export const ToggleContainer = styled.div<IProps>`
   opacity: ${props => (props.disabled ? 0.6 : 1)};
   pointer-events: ${props => (props.disabled ? 'none' : 'auto')};
   color: ${props => props.theme.input.text};
+  user-select: none;
 `;
 
 export const Slider = styled.div`

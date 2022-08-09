@@ -71,4 +71,5 @@ export const ToggleContainer = styled.div`
   padding: 0.75rem 2rem;
   gap: 1rem;
   color: ${props => props.theme.input.text};
+  user-select: none;
 `;

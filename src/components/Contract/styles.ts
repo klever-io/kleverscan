@@ -233,3 +233,9 @@ export const AssetIDInput = styled.input`
 
   ${defaultStyles}
 `;
+
+export const BalanceContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+`;

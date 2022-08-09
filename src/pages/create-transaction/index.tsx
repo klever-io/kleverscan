@@ -11,6 +11,9 @@ import { Transactions as Icon } from '@/assets/title-icons';
 import { ICollectionList, IParamList } from '@/types/index';
 import Contract from '@/components/Contract';
 
+import { Card } from '@/views/blocks';
+import { CardContainer } from '@/views/create-transaction';
+
 import { IProposalsResponse, INetworkParam } from '@/types/proposals';
 import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
 import { doIf } from '@/utils/index';
@@ -115,6 +118,22 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
           <Icon />
         </Title>
       </Header>
+
+      <CardContainer>
+        <Card>
+          <div>
+            <span>
+              Select a contract type, fill in the form fields and click on the
+              &quot;Create Transaction&quot; button. A Klever Extension window
+              will appear and you will fill in your wallet password. At the end,
+              the hash of your transaction will be generated. You can view your
+              transaction details on the{' '}
+              <a href="https://kleverscan.org/transactions/">Transactions</a>{' '}
+              page.
+            </span>
+          </div>
+        </Card>
+      </CardContainer>
 
       <Contract
         assetsList={assetsList}

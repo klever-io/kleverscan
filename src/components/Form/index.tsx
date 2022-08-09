@@ -11,6 +11,8 @@ import {
   FormSection,
   SectionTitle,
   AdvancedOptsContainer,
+  ArrowUpIcon,
+  ArrowDownIcon,
 } from './styles';
 import AdvancedOptions from './AdvancedOptions';
 import theme from '@/styles/theme';
@@ -299,11 +301,7 @@ const Form: React.FC<any> = ({
             onClick={() => setShowAdvancedOpts(!showAdvancedOpts)}
           >
             <span>Advanced Options</span>
-            {showAdvancedOpts ? (
-              <IoIosArrowUp color={theme.input.border.dark} />
-            ) : (
-              <IoIosArrowDown color={theme.input.border.dark} />
-            )}
+            {showAdvancedOpts ? <ArrowUpIcon /> : <ArrowDownIcon />}
           </AdvancedOptsContainer>
 
           {showAdvancedOpts ? (

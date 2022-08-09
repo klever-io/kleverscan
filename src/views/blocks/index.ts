@@ -88,6 +88,14 @@ export const Card = styled.div`
 
   gap: 1rem;
 
+  span {
+    a {
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
   div {
     display: flex;
     gap: 0.5rem;

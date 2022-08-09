@@ -25,6 +25,7 @@ import {
   FieldLabel,
   SelectContainer,
   SelectContent,
+  BalanceContainer,
 } from './styles';
 import { getType, precisionParse } from './utils';
 
@@ -34,7 +35,6 @@ import PackInfoForm from '../CustomForm/PackInfo';
 import PermissionsForm from '../CustomForm/Permissions';
 
 import { parseAddress } from '@/utils/index';
-import { INetworkParam } from '@/types/proposals';
 
 interface IContract {
   assetsList: ICollectionList[];
@@ -390,7 +390,12 @@ const Contract: React.FC<IContract> = ({
           <CloseIcon onClick={() => setTxHash(null)} />
         </ExtraOptionContainer>
       )}
-      <Select options={contractOptions} onChange={handleOption} />
+
+      <Select
+        options={contractOptions}
+        onChange={handleOption}
+        title={'Contract'}
+      />
 
       {contractType === 'VoteContract' && (
         <SelectContainer>
@@ -417,20 +422,15 @@ const Contract: React.FC<IContract> = ({
       {contractHaveKDA() && (
         <SelectContainer>
           <SelectContent>
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}
-            >
+            <BalanceContainer>
               <FieldLabel>Select an asset/collection</FieldLabel>
               {!isNaN(Number(assetBalance)) && assetBalance !== null && (
                 <BalanceLabel>
                   Balance: {assetBalance / 10 ** collection.precision}
                 </BalanceLabel>
               )}
-            </div>
+            </BalanceContainer>
+
             <Select
               options={getAssetsList(assetsList)}
               onChange={value => {

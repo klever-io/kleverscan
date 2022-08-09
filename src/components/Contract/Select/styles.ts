@@ -100,6 +100,8 @@ export const Container = styled.div`
   width: 100%;
   display: flex;
 
+  user-select: none;
+
   flex-direction: column;
   span {
     padding-bottom: 0.25rem;

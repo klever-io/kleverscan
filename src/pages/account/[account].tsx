@@ -1,8 +1,26 @@
-import React, { useEffect, useState } from 'react';
-
-import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
-
+import { KLV } from '@/assets/coins';
+import { ArrowLeft, Receive } from '@/assets/icons';
+import { AccountDetails as AccountIcon } from '@/assets/title-icons';
+import Copy from '@/components/Copy';
+import { ISelectedDays } from '@/components/DateFilter';
+import Pagination from '@/components/Pagination';
+import { PaginationContainer } from '@/components/Pagination/styles';
+import QrCodeModal from '@/components/QrCodeModal';
+import Tabs, { ITabs } from '@/components/Tabs';
+import Assets from '@/components/Tabs/Assets';
+import Buckets from '@/components/Tabs/Buckets';
+import Transactions from '@/components/Tabs/Transactions';
+import api, { IPrice } from '@/services/api';
+import {
+  IAccount,
+  IAccountAsset,
+  IBucket,
+  IPagination,
+  IResponse,
+  ITransaction,
+  Service,
+} from '@/types/index';
+import { useDidUpdateEffect } from '@/utils/hooks';
 import {
   AmountContainer,
   BalanceContainer,
@@ -17,36 +35,10 @@ import {
   RowContent,
   Title,
 } from '@/views/accounts/detail';
-
-import Tabs, { ITabs } from '@/components/Tabs';
-import Assets from '@/components/Tabs/Assets';
-import Transactions from '@/components/Tabs/Transactions';
-
-import {
-  IAccount,
-  IResponse,
-  ITransaction,
-  IPagination,
-  IBucket,
-  IAsset,
-  IAccountAsset,
-} from '@/types/index';
-
-import { ArrowLeft, Receive } from '@/assets/icons';
-import { KLV } from '@/assets/coins';
-import { AccountDetails as AccountIcon } from '@/assets/title-icons';
-
-import { PaginationContainer } from '@/components/Pagination/styles';
-import Pagination from '@/components/Pagination';
-import Copy from '@/components/Copy';
-
-import api, { IPrice } from '@/services/api';
-import { Service } from '@/types/index';
-import { ISelectedDays } from '@/components/DateFilter';
-import Buckets from '@/components/Tabs/Buckets';
-import { useDidUpdateEffect } from '@/utils/hooks';
-import QrCodeModal from '@/components/QrCodeModal';
 import { ReceiveBackground } from '@/views/validator';
+import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
 
 interface IAssetInfo {
   assetId: string;
@@ -60,7 +52,8 @@ interface IAccountPage {
   precisions: IAssetInfo[];
   assets: IAccountAsset[];
   defaultKlvPrecision: number;
-  allowance: IAllowanceResponse;
+  KLVallowance: IAllowanceResponse;
+  KFIallowance: IAllowanceResponse;
 }
 
 interface IAccountResponse extends IResponse {
@@ -103,7 +96,8 @@ const Account: React.FC<IAccountPage> = ({
   precisions,
   assets,
   defaultKlvPrecision,
-  allowance,
+  KLVallowance,
+  KFIallowance,
 }) => {
   const router = useRouter();
 
@@ -206,11 +200,19 @@ const Account: React.FC<IAccountPage> = ({
   };
 
   const getKLVAllowance = (): number => {
-    return (allowance?.data?.allowance || 0) / 10 ** defaultKlvPrecision;
+    return (KLVallowance?.data?.allowance || 0) / 10 ** defaultKlvPrecision;
   };
 
   const getKLVStaking = (): number => {
-    return (allowance?.data?.stakingRewards || 0) / 10 ** defaultKlvPrecision;
+    return (
+      (KLVallowance?.data?.stakingRewards || 0) / 10 ** defaultKlvPrecision
+    );
+  };
+
+  const getKFIStaking = (): number => {
+    return (
+      (KFIallowance?.data?.stakingRewards || 0) / 10 ** defaultKlvPrecision
+    );
   };
 
   const getTabHeaders = () => {
@@ -376,8 +378,12 @@ const Account: React.FC<IAccountPage> = ({
                   <span>{getKLVAllowance().toLocaleString()}</span>
                 </div>
                 <div>
-                  <strong>Staking</strong>
+                  <strong>KLV Staking</strong>
                   <span>{getKLVStaking().toLocaleString()}</span>
+                </div>
+                <div>
+                  <strong>KFI Staking</strong>
+                  <span>{getKFIStaking().toLocaleString()}</span>
                 </div>
               </FrozenContainer>
             </BalanceContainer>
@@ -419,7 +425,8 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
     precisions: [],
     assets: [],
     defaultKlvPrecision: 6,
-    allowance: {} as IAllowanceResponse,
+    KLVallowance: {} as IAllowanceResponse,
+    KFIallowance: {} as IAllowanceResponse,
   };
 
   const accountLength = 62;
@@ -526,16 +533,40 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
   const precision = 6;
   props.defaultKlvPrecision = precision; // Default KLV precision
 
-  const allowance: IAllowanceResponse = await api.get({
-    route: `address/${address}/allowance?asset=KLV`,
-    service: Service.NODE,
-  });
+  const KLVAllowancePromise = new Promise<IAllowanceResponse>(resolve =>
+    resolve(
+      api.get({
+        route: `address/${address}/allowance?asset=KLV`,
+        service: Service.NODE,
+      }),
+    ),
+  );
 
-  if (!allowance.error) {
-    allowance.data.allowance = allowance.data.allowance;
-    allowance.data.stakingRewards = allowance.data.allowance;
-    props.allowance = allowance;
-  }
+  const KFIAllowancePromise = new Promise<IAllowanceResponse>(resolve =>
+    resolve(
+      api.get({
+        route: `address/${address}/allowance?asset=KFI`,
+        service: Service.NODE,
+      }),
+    ),
+  );
+
+  await Promise.allSettled([KLVAllowancePromise, KFIAllowancePromise]).then(
+    responses => {
+      responses.forEach((res, index) => {
+        if (res.status === 'fulfilled') {
+          const { value }: { value: IAllowanceResponse } = res;
+
+          if (index === 0) {
+            props.KLVallowance = value;
+          } else if (index === 1) {
+            props.KFIallowance = value;
+          }
+        }
+      });
+    },
+  );
+
   return { props };
 };
 

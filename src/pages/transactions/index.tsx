@@ -44,8 +44,8 @@ import {
   ISetAccountNameContract,
   IProposalContract,
   IVoteContract,
-  IConfigICOContract,
-  ISetICOPricesContract,
+  IConfigITOContract,
+  ISetITOPricesContract,
   IBuyContract,
   ISellContract,
   ICancelMarketOrderContract,
@@ -421,7 +421,7 @@ const Transactions: React.FC<ITransactions> = ({
 
     return (
       <>
-        <span>{parameter.parameter}</span>
+        <span>{parameter.parameters}</span>
       </>
     );
   };
@@ -441,7 +441,7 @@ const Transactions: React.FC<ITransactions> = ({
   };
 
   const ConfigICO: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IConfigICOContract;
+    const parameter = par as IConfigITOContract;
 
     return (
       <>
@@ -451,7 +451,7 @@ const Transactions: React.FC<ITransactions> = ({
   };
 
   const SetICOPrices: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as ISetICOPricesContract;
+    const parameter = par as ISetITOPricesContract;
 
     return (
       <>
@@ -491,7 +491,7 @@ const Transactions: React.FC<ITransactions> = ({
 
     return (
       <>
-        <span>{parameter.orderId}</span>
+        <span>{parameter.orderID}</span>
       </>
     );
   };
@@ -553,9 +553,9 @@ const Transactions: React.FC<ITransactions> = ({
         return getComponent(Proposal);
       case Contract.Vote:
         return getComponent(Vote);
-      case Contract.ConfigICO:
+      case Contract.ConfigITO:
         return getComponent(ConfigICO);
-      case Contract.SetICOPrices:
+      case Contract.SetITOPrices:
         return getComponent(SetICOPrices);
       case Contract.Buy:
         return getComponent(Buy);
@@ -619,10 +619,10 @@ const Transactions: React.FC<ITransactions> = ({
       case Contract.Vote:
         newHeaders = ['Proposal Id', 'Amount'];
         break;
-      case Contract.ConfigICO:
+      case Contract.ConfigITO:
         newHeaders = ['Asset Id'];
         break;
-      case Contract.SetICOPrices:
+      case Contract.SetITOPrices:
         newHeaders = ['Asset Id'];
         break;
       case Contract.Buy:
@@ -801,7 +801,6 @@ export const getServerSideProps: GetServerSideProps<
 
   const assets: IAssetResponse = await api.get({
     route: 'assets/kassets',
-    query: { limit: 300 },
   });
   if (!assets.error) {
     props.assets = assets?.data?.assets || [];

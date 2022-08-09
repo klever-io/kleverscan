@@ -82,7 +82,7 @@ export const CardContent = styled.div`
 export const Row = styled.div`
   width: 100%;
 
-  padding: 1.5rem 2rem;
+  padding: 1.2rem 2rem;
 
   display: flex;
 
@@ -133,6 +133,46 @@ export const Row = styled.div`
       font-weight: 400;
     }
   }
+  .accordion-disabled {
+    display: flex;
+    color: black;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    border: none;
+    outline: none;
+    transition: 0.4s;
+  }
+  .accordionHeader {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .accordion-active {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    border: none;
+    outline: none;
+    transition: 0.4s;
+    .icon {
+      transform: rotate(45deg);
+    }
+  }
+
+  /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+
+  /* Style the accordion panel. Note: hidden by default */
+  .panel {
+    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin: 1rem 10rem;
+    transition: max-height 0.2s ease-out;
+  }
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -179,4 +219,11 @@ export const CardRaw = styled.div`
 
   flex-direction: row;
   align-items: center;
+`;
+
+export const Hr = styled.hr`
+  padding: 0.08rem;
+  background: #ebf1f7;
+  padding: 0.2rem;
+  border-radius: 4px;
 `;

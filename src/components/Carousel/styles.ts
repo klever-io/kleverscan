@@ -15,6 +15,7 @@ export const Container = styled.div`
 
 export const Content = styled.div`
   display: flex;
+  padding: 0.3rem;
 
   overflow-x: auto;
   scroll-behavior: smooth !important;

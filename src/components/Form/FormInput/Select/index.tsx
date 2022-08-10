@@ -1,7 +1,14 @@
+import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
-import ReactSelect, { components } from 'react-select';
+import { components } from 'react-select';
 import { Container, HiddenInput } from './styles';
+
+const ReactSelect = dynamic(() => import('react-select'), {
+  ssr: false,
+  loading: () => null,
+});
+
 export interface IDropdownItem {
   label: string;
   value: any;

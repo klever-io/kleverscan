@@ -1,16 +1,15 @@
-import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
+import React from 'react';
 import api from '../../services/api';
-
-import { renderWithTheme } from '../../test/utils';
 import { mockedBlocks, mockedFetchBlocks } from '../../test/mocks';
+import { renderWithTheme } from '../../test/utils';
 import BlockCardList from './';
 
 jest.mock('@/services/api', () => {
   const mockedResult = [
     {
       nonce: 5055,
-      timestamp: (Date.now() / 1000),
+      timestamp: Date.now() / 1000,
       hash: '456s2d4895be5a559c12e7c695037d930d5d5a05389fe17901ed03365s42589s',
       blockRewards: 98,
       blockIndex: 55,
@@ -19,24 +18,21 @@ jest.mock('@/services/api', () => {
     },
     {
       nonce: 98562,
-      timestamp: (Date.now() / 1000) - 500,
+      timestamp: Date.now() / 1000 - 500,
       hash: '456s2d4895be5a559c12e7c695037d930d5d5a05389fe17901ed03365s42589s',
       blockRewards: 55,
       blockIndex: 74,
       txCount: 0,
       txBurnedFees: 0,
     },
-  ]
-  return { 
-    get: jest.fn(() => Promise.resolve({ data: { blocks: mockedResult } }))
-  } 
+  ];
+  return {
+    get: jest.fn(() => Promise.resolve({ data: { blocks: mockedResult } })),
+  };
 });
 
 describe('Component: BlockCardList', () => {
-
-  (api.get as jest.Mock)
-    .mockReturnValueOnce( mockedFetchBlocks );
-
+  (api.get as jest.Mock).mockReturnValueOnce(mockedFetchBlocks);
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -55,12 +51,17 @@ describe('Component: BlockCardList', () => {
   it('Should fetch blocks each 4 seconds', async () => {
     renderWithTheme(<BlockCardList blocks={mockedBlocks} precision={6} />);
 
-    await waitFor(() => {
-      expect(api.get).toHaveBeenCalled();
-      expect(api.get).toReturnWith(mockedFetchBlocks);
-    }, { timeout: 5000});
-    
-    const { data: { blocks } }= mockedFetchBlocks;
+    await waitFor(
+      () => {
+        expect(api.get).toHaveBeenCalled();
+        expect(api.get).toReturnWith(mockedFetchBlocks);
+      },
+      { timeout: 5000 },
+    );
+
+    const {
+      data: { blocks },
+    } = mockedFetchBlocks;
     const block = screen.getByText(`#${blocks[0].nonce}`);
     expect(block).toBeInTheDocument();
   });
@@ -75,7 +76,7 @@ describe('Component: BlockCardList', () => {
       width: 'fit-content',
     };
     const sectionStyle = {
-      padding: '5rem 10rem 10rem 10rem'
+      padding: '5rem 10rem 10rem 10rem',
     };
     expect(blockTitle).toHaveStyle(blockTitleStyle);
     expect(section).toHaveStyle(sectionStyle);

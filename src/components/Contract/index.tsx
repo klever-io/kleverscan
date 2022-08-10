@@ -1,9 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { core, sendTransaction } from '@klever/sdk';
-import Select from 'react-select';
-import { toast } from 'react-toastify';
-
 import {
   InputLabel,
   Slider,
@@ -11,24 +5,49 @@ import {
   Toggle,
   ToggleContainer,
 } from '@/components/Form/FormInput/styles';
+import { ICollectionList, IParamList } from '@/types/index';
 import formSection from '@/utils/formSections';
-import { assetTriggerTypes, claimTypes, contractOptions } from '@/utils/index';
 import {
+  assetTriggerTypes,
+  claimTypes,
+  contractOptions,
+  parseAddress,
+} from '@/utils/index';
+import { core } from '@klever/sdk';
+import Form, { ISection } from 'components/Form';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import Copy from '../Copy';
+import PackInfoForm from '../CustomForm/PackInfo';
+import PermissionsForm from '../CustomForm/Permissions';
+import Select from './Select';
+import {
+  AssetIDInput,
   AssetTriggerContainer,
+  BalanceContainer,
+  BalanceLabel,
   CloseIcon,
   Container,
   ExtraOptionContainer,
   FieldLabel,
   SelectContainer,
+  SelectContent,
 } from './styles';
-import { getNonce, getType, precisionParse } from './utils';
+import { getType, precisionParse } from './utils';
 
-import Form, { ISection } from 'components/Form';
-import PackInfoForm from '../CustomForm/PackInfo';
-import PermissionsForm from '../CustomForm/Permissions';
-import Copy from '../Copy';
+interface IContract {
+  assetsList: ICollectionList[];
+  proposalsList: any[];
+  paramsList: IParamList[];
+}
 
-const Contract: React.FC = () => {
+const Contract: React.FC<IContract> = ({
+  assetsList,
+  proposalsList,
+  paramsList,
+}) => {
+  const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [formSections, setFormSections] = useState<ISection[]>([]);
   const [contractType, setContractType] = useState('');
@@ -38,13 +57,66 @@ const Contract: React.FC = () => {
   const [claimType, setClaimType] = useState(0);
   const [typeAssetTrigger, setTypeAssetTrigger] = useState(0);
   const [data, setData] = useState('');
-  const [isMultisig, setIsMultisig] = useState(true);
+  const [isMultisig, setIsMultisig] = useState(false);
+  const [bucketsCollection, setBucketsCollection] = useState<any>([]);
+  const [bucketsList, setBucketsList] = useState<any>([]);
+  const [selectedBucket, setSelectedBucket] = useState('');
+  const [assetBalance, setAssetBalance] = useState<number | null>(null);
+
+  const [collection, setCollection] = useState<any>({});
+  const [assetID, setAssetID] = useState(0);
+  const [proposalId, setProposalId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (sessionStorage) {
-      setOwnerAddress(sessionStorage.getItem('walletAddress') || '');
+    if (typeof window !== 'undefined') {
+      try {
+        if (window.kleverWeb) {
+          setOwnerAddress(window.kleverWeb.getWalletAddress());
+        }
+      } catch (error) {
+        router.push('/');
+      }
     }
-  }, [ownerAddress]);
+  }, []);
+
+  useEffect(() => {
+    if (contractType === 'DelegateContract') {
+      setBucketsCollection(['KFI', 'KLV']);
+    } else if (contractType === 'UndelegateContract') {
+      const buckets: any = [];
+      assetsList.forEach((asset: any) => {
+        asset?.buckets.forEach((bucket: any) => {
+          if (bucket.delegation !== ownerAddress) {
+            buckets.push({
+              label: parseAddress(bucket.id, 20),
+              value: bucket.id,
+            });
+          }
+        });
+      });
+
+      setBucketsList([...buckets]);
+    }
+  }, [contractType]);
+
+  useEffect(() => {
+    const buckets: any = [];
+
+    bucketsCollection.forEach((collection: string) => {
+      assetsList.forEach((item: any) => {
+        if (item.label === collection) {
+          item.buckets.forEach((bucket: any) => {
+            buckets.push({
+              label: parseAddress(bucket.id, 20),
+              value: bucket.id,
+            });
+          });
+        }
+      });
+    });
+
+    setBucketsList([...buckets]);
+  }, [bucketsCollection]);
 
   useEffect(() => {
     if (tokenChosen) {
@@ -54,10 +126,38 @@ const Contract: React.FC = () => {
     }
   }, [tokenChosen]);
 
+  useEffect(() => {
+    setAssetBalance(null);
+  }, []);
+
+  useEffect(() => {
+    setAssetBalance(null);
+    setCollection({});
+  }, [contractType]);
+
+  useEffect(() => {
+    setAssetBalance(collection?.balance);
+    const getAssetID = async () => {
+      if (!collection.isNFT) {
+        setAssetID(0);
+      }
+    };
+
+    getAssetID();
+  }, [collection]);
+
   const parseValues = (values: any) => {
     const parsedValues = JSON.parse(JSON.stringify(values));
 
-    if (contractType === 'CreateAssetContract') {
+    if (contractHaveKDA()) {
+      if (contractType === 'AssetTriggerContract') {
+        parsedValues.assetId =
+          assetID !== 0 ? `${collection.value}/${assetID}` : collection.value;
+      } else {
+        parsedValues.kda =
+          assetID !== 0 ? `${collection.value}/${assetID}` : collection.value;
+      }
+    } else if (contractType === 'CreateAssetContract') {
       parsedValues.type = tokenChosen ? 0 : 1;
     } else if (contractType === 'AssetTriggerContract') {
       parsedValues.triggerType = typeAssetTrigger;
@@ -68,8 +168,13 @@ const Contract: React.FC = () => {
         const parameters = {};
 
         values.parameters.forEach((parameter: any) => {
-          if (parameter.key && parameter.value) {
-            parameters[parameter.key] = parameter.value;
+          if (
+            !isNaN(Number(parameter.parameterKey)) &&
+            parameter.parameterValue
+          ) {
+            parameters[parameter.parameterKey] = String(
+              parameter.parameterValue,
+            );
           }
         });
 
@@ -77,6 +182,12 @@ const Contract: React.FC = () => {
           parsedValues.parameters = parameters;
         }
       }
+    } else if (contractType === 'VoteContract') {
+      parsedValues.proposalId = proposalId;
+    }
+
+    if (contractHaveBucketId()) {
+      parsedValues.bucketId = selectedBucket;
     }
 
     if (values.uris) {
@@ -94,7 +205,7 @@ const Contract: React.FC = () => {
     }
 
     Object.keys(parsedValues).forEach((item: any) => {
-      if (parsedValues[item].uris) {
+      if (parsedValues[item] && parsedValues[item].uris) {
         const uris = {};
 
         parsedValues[item].uris.forEach((uri: any) => {
@@ -114,75 +225,148 @@ const Contract: React.FC = () => {
 
   const handleOption = (selectedOption: any) => {
     setContractType(selectedOption.value);
-    setFormSections([...formSection(selectedOption.value, '', ownerAddress)]);
+    if (selectedOption.value === 'ProposalContract') {
+      setFormSections([
+        ...formSection(selectedOption.value, '', ownerAddress, paramsList),
+      ]);
+    } else {
+      setFormSections([...formSection(selectedOption.value, '', ownerAddress)]);
+    }
   };
 
   const handleSubmit = async (contractValues: any) => {
-    const walletAddress = sessionStorage.getItem('walletAddress');
-    const nonce = await getNonce(walletAddress || '');
+    setLoading(true);
+
     const payload = {
-      sender: walletAddress,
-      nonce,
       ...parseValues(contractValues),
     };
 
     const parsedPayload = await precisionParse(payload, contractType);
 
-    setLoading(true);
     try {
-      const unsignedTx = await sendTransaction(
-        getType(contractType),
-        parsedPayload,
-        {
-          autobroadcast: false,
-          metadata: data,
-        },
+      const unsignedTx = await core.buildTransaction(
+        [
+          {
+            type: getType(contractType),
+            payload: parsedPayload,
+          },
+        ],
+        [data],
       );
 
       const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
 
-      const response = await core.broadcastTransactions([signedTx]);
-      setLoading(false);
-      setTxHash(response.data.txsHashes[0]);
-      toast.success('Transaction broadcast successfully');
+      if (isMultisig) {
+        const blob = new Blob([JSON.stringify(signedTx)], {
+          type: 'application/json',
+        });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${contractType} - Nonce: ${signedTx.RawData.Nonce}.json`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+
+        setLoading(false);
+        toast.success(
+          'Transaction built and signed, send the file to the co-owner(s)',
+        );
+      } else {
+        const response = await core.broadcastTransactions([signedTx]);
+        setLoading(false);
+        setTxHash(response.data.txsHashes[0]);
+        toast.success('Transaction broadcast successfully');
+      }
     } catch (e: any) {
       setLoading(false);
-      toast.error(e.message);
+      console.log(`%c ${e}`, 'color: red');
+      toast.error(e.message ? e.message : e);
     }
+  };
+
+  const formProps = {
+    sections: formSections,
+    onSubmit: handleSubmit,
+    loading,
+    setData,
+    setIsMultisig,
+    isMultisig,
   };
 
   const renderForm = () => {
     if (contractType === 'UpdateAccountPermissionContract') {
       return (
-        <Form
-          sections={formSections}
-          contractName={contractType}
-          key={contractType}
-          onSubmit={handleSubmit}
-          setData={setData}
-          setIsMultisig={setIsMultisig}
-          isMultisig={isMultisig}
-        >
+        <Form contractName={contractType} key={contractType} {...formProps}>
           <PermissionsForm />
         </Form>
       );
     } else {
       return (
         <Form
-          sections={formSections}
           contractName={contractType}
           key={
             contractType === 'CreateAssetContract'
               ? formSections.toString()
               : contractType
           }
-          onSubmit={handleSubmit}
-          setData={setData}
-          setIsMultisig={setIsMultisig}
-          isMultisig={isMultisig}
+          {...formProps}
         />
       );
     }
+  };
+
+  const contractHaveKDA = (): boolean => {
+    const contracts = [
+      'TransferContract',
+      'FreezeContract',
+      'UnfreezeContract',
+      'WithdrawContract',
+      'ConfigITOContract',
+      'SetITOPricesContract',
+      'AssetTriggerContract',
+    ];
+
+    return contracts.includes(contractType);
+  };
+
+  const contractHaveBucketId = (): boolean => {
+    const contracts = [
+      'UnfreezeContract',
+      'DelegateContract',
+      'UndelegateContract',
+    ];
+
+    return contracts.includes(contractType);
+  };
+
+  const getAssetsList = (assets: any[]) => {
+    if (contractType === 'AssetTriggerContract') {
+      const bothCollectionNFT = [1, 2];
+      const justCollection = [0, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13];
+      const justNFT = [8];
+
+      if (bothCollectionNFT.includes(typeAssetTrigger)) {
+        return assets;
+      } else if (justCollection.includes(typeAssetTrigger)) {
+        return assets.filter((value: ICollectionList) => {
+          return !value.isNFT;
+        });
+      } else if (justNFT.includes(typeAssetTrigger)) {
+        return assets.filter((value: ICollectionList) => {
+          return value.isNFT;
+        });
+      }
+    } else if (contractType === 'FreezeContract') {
+      return assets.filter((value: ICollectionList) => {
+        return !value.isNFT;
+      });
+    } else if (contractType === 'UnfreezeContract') {
+      return assets.filter((value: ICollectionList) => {
+        return !value.isNFT && value.frozenBalance !== 0;
+      });
+    }
+
+    return assets;
   };
 
   useEffect(() => {
@@ -207,7 +391,81 @@ const Contract: React.FC = () => {
         </ExtraOptionContainer>
       )}
 
-      <Select options={contractOptions} onChange={handleOption} />
+      <Select
+        options={contractOptions}
+        onChange={handleOption}
+        title={'Contract'}
+      />
+
+      {contractType === 'VoteContract' && (
+        <SelectContainer>
+          <SelectContent>
+            <FieldLabel>Proposal ID</FieldLabel>
+            <Select
+              options={proposalsList}
+              onChange={(value: any) => setProposalId(value?.value)}
+            />
+          </SelectContent>
+        </SelectContainer>
+      )}
+
+      {contractType === 'AssetTriggerContract' && (
+        <AssetTriggerContainer>
+          <InputLabel>Trigger Type</InputLabel>
+          <Select
+            options={assetTriggerTypes}
+            onChange={value => setTypeAssetTrigger(value ? value.value : 0)}
+          />
+        </AssetTriggerContainer>
+      )}
+
+      {contractHaveKDA() && (
+        <SelectContainer>
+          <SelectContent>
+            <BalanceContainer>
+              <FieldLabel>Select an asset/collection</FieldLabel>
+              {!isNaN(Number(assetBalance)) && assetBalance !== null && (
+                <BalanceLabel>
+                  Balance: {assetBalance / 10 ** collection.precision}
+                </BalanceLabel>
+              )}
+            </BalanceContainer>
+
+            <Select
+              options={getAssetsList(assetsList)}
+              onChange={value => {
+                setCollection(value);
+                if (contractType === 'UnfreezeContract') {
+                  setBucketsCollection([value.value]);
+                }
+              }}
+            />
+          </SelectContent>
+          {collection?.isNFT && (
+            <SelectContent>
+              <FieldLabel>Asset ID</FieldLabel>
+              <AssetIDInput
+                type="number"
+                onChange={e => setAssetID(Number(e.target.value))}
+              />
+            </SelectContent>
+          )}
+        </SelectContainer>
+      )}
+
+      {contractHaveBucketId() && (
+        <SelectContainer>
+          <SelectContent>
+            <FieldLabel>Select a bucket</FieldLabel>
+            <Select
+              options={bucketsList}
+              onChange={(value: any) => {
+                setSelectedBucket(value.value);
+              }}
+            />
+          </SelectContent>
+        </SelectContainer>
+      )}
 
       {contractType === 'CreateAssetContract' && (
         <ExtraOptionContainer>
@@ -226,16 +484,6 @@ const Contract: React.FC = () => {
         </ExtraOptionContainer>
       )}
 
-      {contractType === 'AssetTriggerContract' && (
-        <AssetTriggerContainer>
-          <InputLabel>Trigger Type</InputLabel>
-          <Select
-            options={assetTriggerTypes}
-            onChange={value => setTypeAssetTrigger(value ? value.value : 0)}
-          />
-        </AssetTriggerContainer>
-      )}
-
       {contractType === 'ClaimContract' && (
         <SelectContainer>
           <FieldLabel>Claim Type</FieldLabel>
@@ -248,15 +496,7 @@ const Contract: React.FC = () => {
 
       {contractType === 'ConfigITOContract' ||
       contractType === 'SetITOPricesContract' ? (
-        <Form
-          sections={formSections}
-          contractName={contractType}
-          key={contractType}
-          onSubmit={handleSubmit}
-          setData={setData}
-          setIsMultisig={setIsMultisig}
-          isMultisig={isMultisig}
-        >
+        <Form contractName={contractType} key={contractType} {...formProps}>
           <PackInfoForm />
         </Form>
       ) : (

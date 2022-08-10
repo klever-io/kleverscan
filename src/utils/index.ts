@@ -1,4 +1,12 @@
-import { IAsset, IParsedMetrics, IEpochInfo, IContractOption } from '../types';
+import api from '@/services/api';
+import { toast } from 'react-toastify';
+import {
+  IAsset,
+  IContractOption,
+  IEpochInfo,
+  IFormData,
+  IParsedMetrics,
+} from '../types';
 
 export const breakText = (text: string, limit: number): string => {
   return text.length > limit ? `${text.substring(0, limit)}...` : text;
@@ -180,7 +188,7 @@ export const addCommasToNumber = (numb: number): string => {
   return numb.toLocaleString();
 };
 
-export const parseData = (data: any) => {
+export const parseData = (data: IFormData): IFormData => {
   const dataEntries = Object.entries(data);
 
   dataEntries.forEach(([key, value]) => {
@@ -208,14 +216,14 @@ export const parseData = (data: any) => {
           break;
       }
     } else {
-      data[key] = Math.floor(Number(value));
+      data[key] = Number(value);
     }
   });
 
   return data;
 };
 
-export const formatLabel = (str: string) => {
+export const formatLabel = (str: string): string => {
   switch (str) {
     case 'assetID':
       return 'AssetID';
@@ -435,3 +443,57 @@ export const assetTriggerTypes = [
     value: 13,
   },
 ];
+
+export const doIf = async (
+  success: () => any,
+  failure: () => any,
+  condition: () => boolean,
+  timeoutMS = 5000,
+  intervalMS = 100,
+): Promise<void> => {
+  let interval: any;
+
+  const IntervalPromise = new Promise(resolve => {
+    const interval = setInterval(() => {
+      if (condition()) {
+        resolve(
+          (() => {
+            success();
+            clearInterval(interval);
+            clearTimeout(timeout);
+          })(),
+        );
+      }
+    }, intervalMS);
+  });
+
+  let timeout: any;
+
+  const TimeoutPromise = new Promise(resolve => {
+    timeout = setTimeout(() => {
+      resolve(
+        (() => {
+          failure();
+          clearInterval(interval);
+        })(),
+      );
+    }, timeoutMS);
+  });
+
+  await Promise.race([IntervalPromise, TimeoutPromise]);
+};
+
+export const getPrecision = async (
+  asset: string,
+): Promise<number | undefined> => {
+  const response = await api.get({ route: `assets/${asset}` });
+
+  if (response.error) {
+    const messageError =
+      response.error.charAt(0).toUpperCase() + response.error.slice(1);
+    toast.error(messageError);
+    return;
+  }
+
+  return 10 ** response.data.asset.precision;
+};

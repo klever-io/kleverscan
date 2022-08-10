@@ -1,8 +1,14 @@
-import React, { useRef, useState } from 'react';
-
-import { Container, Content, Item, SelectorContainer } from './styles';
-
 import { ArrowDown } from '@/assets/icons';
+import React, { useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
+import {
+  ArrowDownContainer,
+  Container,
+  Content,
+  HiddenInput,
+  Item,
+  SelectorContainer,
+} from './styles';
 
 export interface IFilterItem {
   name: string;
@@ -20,26 +26,54 @@ const Filter: React.FC<IFilter> = ({ title, data, onClick, filterQuery }) => {
   const allItem: IFilterItem = { name: 'All', value: 'all' };
   const [selected, setSelected] = useState(filterQuery || allItem);
   const [open, setOpen] = useState(true);
+  const [focus, setFocus] = useState(false);
+  const [arrowOpen, setArrowOpen] = useState(false);
+  const [inputValue, setInputValue] = useState('');
 
   const contentRef = useRef<any>(null);
   const selectorRef = useRef<any>(null);
+  const focusRef = useRef<any>(null);
 
-  const handleDropdown = (behavior?: boolean) => {
-    const to = behavior || !open;
-
-    setOpen(to);
+  const openDropdown = () => {
+    if (!focus) {
+      flushSync(() => {
+        setOpen(false);
+        setFocus(true);
+        setArrowOpen(true);
+      });
+      if (title !== 'Status') {
+        focusRef.current.focus();
+      }
+    }
   };
 
-  const getDataArray = () => [allItem].concat(data);
+  const arrowOnClick = () => {
+    if (arrowOpen) {
+      closeDropDown();
+    } else {
+      setArrowOpen(true);
+      setOpen(false);
+      setFocus(true);
+    }
+  };
+
+  const closeDropDown = () => {
+    setArrowOpen(false);
+    setOpen(true);
+    setFocus(false);
+    setInputValue('');
+  };
 
   const SelectorItem: React.FC<IFilterItem> = item => {
     const handleClick = () => {
       if (onClick) {
         onClick(item);
       }
-      
       setSelected(item);
-      handleDropdown(false);
+      openDropdown();
+      if (title !== 'Status') {
+        setFocus(true);
+      }
     };
 
     return (
@@ -49,27 +83,65 @@ const Filter: React.FC<IFilter> = ({ title, data, onClick, filterQuery }) => {
     );
   };
 
+  const handleChange = ({
+    target: { value },
+  }: {
+    target: { value: string };
+  }) => {
+    if (value === '') {
+      setInputValue('');
+    } else {
+      const parsedValue = value.match(/[\w-\s]+/gi)?.[0];
+      if (parsedValue) {
+        setInputValue(parsedValue);
+      }
+    }
+  };
+
+  const getDataArray = () => [allItem].concat(data);
+
+  const filterArrayByInput = (input: string) => {
+    if (input === '') {
+      return getDataArray();
+    }
+    const regex = new RegExp(`${input}`, 'gi');
+    return getDataArray().filter(item => String(item.name).match(regex)?.[0]);
+  };
+
+  const filteredArray = filterArrayByInput(inputValue);
+
   const contentProps = {
     ref: contentRef,
     open,
-    onClick: () => handleDropdown(),
+    onClick: title !== 'Status' ? () => openDropdown() : () => arrowOnClick(),
   };
 
   const selectorProps = {
     ref: selectorRef,
     open,
+    onClick: () => closeDropDown(),
   };
 
   return (
     <Container>
       <span>{title}</span>
-
       <Content {...contentProps}>
-        <span>{selected.name}</span>
-        <ArrowDown />
+        {focus && title !== 'Status' && (
+          <HiddenInput
+            value={inputValue}
+            type="text"
+            ref={focusRef}
+            show={focus}
+            onChange={e => handleChange(e)}
+          />
+        )}
+        <span>{open && selected.name}</span>
+        <ArrowDownContainer onClick={() => arrowOnClick()}>
+          <ArrowDown />
+        </ArrowDownContainer>
 
         <SelectorContainer {...selectorProps}>
-          {getDataArray().map((item, index) => (
+          {filteredArray.map((item, index) => (
             <SelectorItem key={String(index)} {...item} />
           ))}
         </SelectorContainer>

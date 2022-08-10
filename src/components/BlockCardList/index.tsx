@@ -1,16 +1,11 @@
-import React, { useState, useEffect } from 'react';
-
-import { useRouter } from 'next/router';
-
-import { Section } from '@/views/home';
-
-import api from '@/services/api';
-
-import { IBlock, IBlockResponse, IBlockCardList } from '../../types';
-
-import Carousel from '@/components/Carousel';
 import BlockCard from '@/components/Cards/BlockCard';
+import Carousel from '@/components/Carousel';
+import api from '@/services/api';
+import { Section } from '@/views/home';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { IBlock, IBlockCardList, IBlockResponse } from '../../types';
 
 const BlockCardList: React.FC<IBlockCardList> = ({ blocks, precision }) => {
   const [listedBlocks, setListedBlocks] = useState<IBlock[]>(blocks);
@@ -35,7 +30,7 @@ const BlockCardList: React.FC<IBlockCardList> = ({ blocks, precision }) => {
     return () => clearInterval(blockWatcher);
   }, []);
 
-  const getBLockCards = () => {
+  const getBLockCards = useCallback(() => {
     return listedBlocks.map((block: IBlock, index) => {
       return (
         <BlockCard
@@ -46,7 +41,7 @@ const BlockCardList: React.FC<IBlockCardList> = ({ blocks, precision }) => {
         />
       );
     });
-  };
+  }, [listedBlocks, precision]);
 
   return (
     <Section>

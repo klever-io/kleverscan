@@ -34,21 +34,21 @@ const sellContract = (): ISection[] => {
           tooltip: 'Transaction currency token',
         },
       },
-      { 
+      {
         label: 'Price',
         props: {
           type: 'number',
-          tooltip: 'Price for instant sell (with precision)',
+          tooltip: 'Price for instant sell',
         },
       },
-      { 
+      {
         label: 'Reserve Price',
         props: {
           type: 'number',
-          tooltip: 'Minimum auction price (with precision)',
+          tooltip: 'Minimum auction price',
         },
       },
-      { 
+      {
         label: 'End Time',
         props: {
           type: 'number',
@@ -61,6 +61,5 @@ const sellContract = (): ISection[] => {
 
   return section;
 };
-  
+
 export default sellContract;
-  

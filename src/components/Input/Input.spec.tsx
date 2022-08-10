@@ -1,7 +1,7 @@
-import React from 'react';
 import userEvent from '@testing-library/user-event';
-import theme from '../../styles/theme';
+import React from 'react';
 import Input from '.';
+import theme from '../../styles/theme';
 import { renderWithTheme } from '../../test/utils';
 
 const mockedProps = {

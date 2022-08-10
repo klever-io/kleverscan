@@ -1,22 +1,22 @@
-import Category from './category.svg';
-import Graph from './graph.svg';
-import Send from './send.svg';
-import TwoUser from './two-user.svg';
-import Search from './search.svg';
+import ArrowPink from './arrow-down-pink.svg';
 import ArrowDown from './arrow-down.svg';
-import ArrowRight from './arrow-right.svg';
 import ArrowLeft from './arrow-left.svg';
-import Plus from './plus.svg';
+import ArrowRight from './arrow-right.svg';
+import ArrowGreen from './arrow-up-green.svg';
+import Calendar from './calendar.svg';
+import Category from './category.svg';
+import Certified from './certified.svg';
 import ChevronRight from './chevron-right.svg';
 import Compass from './compass.svg';
 import Copy from './copy.svg';
-import Calendar from './calendar.svg';
-import TickSquare from './tick-square.svg';
+import Graph from './graph.svg';
+import Plus from './plus.svg';
 import Proposal from './proposal.svg';
 import Receive from './receive.svg';
-import ArrowGreen from './arrow-up-green.svg';
-import ArrowPink from './arrow-down-pink.svg';
-import Certified from './certified.svg';
+import Search from './search.svg';
+import Send from './send.svg';
+import TickSquare from './tick-square.svg';
+import TwoUser from './two-user.svg';
 
 export {
   Category,
@@ -37,5 +37,5 @@ export {
   Receive,
   ArrowGreen,
   ArrowPink,
-  Certified
+  Certified,
 };

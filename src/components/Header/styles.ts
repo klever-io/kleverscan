@@ -1,9 +1,7 @@
-import styled, { css, keyframes } from 'styled-components';
-
+import { transparentize } from 'polished';
 import { FiMenu } from 'react-icons/fi';
 import { MdArrowDropDown } from 'react-icons/md';
-
-import { transparentize } from 'polished';
+import styled, { css, keyframes } from 'styled-components';
 import { default as DefaultInput } from '../Inputt';
 
 interface IMobileMenu {
@@ -219,8 +217,6 @@ export const DropdownContainer = styled.div`
   background-color: ${props => props.theme.navbar.background};
 
   border-radius: 0 0 0.5rem 0.5rem;
-
-  width: 14rem;
 
   transform: translateY(100%);
 

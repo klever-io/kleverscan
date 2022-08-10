@@ -42,15 +42,14 @@ const createAsset = (type: string, address = ''): ISection[] => {
               label: 'Initial Supply',
               props: {
                 type: 'number',
-                tooltip:
-                  'Initial minted supply (fungible only) (with precision)',
+                tooltip: 'Initial minted supply (fungible only)',
               },
             },
             {
               label: 'Max Supply',
               props: {
                 type: 'number',
-                tooltip: 'Maximum supply of the asset (with precision)',
+                tooltip: 'Maximum supply of the asset',
               },
             },
             {

@@ -1,17 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { fromUnixTime } from 'date-fns';
-
-import {
-  CardChartContainer,
-  CardDetails,
-} from '@/views/nodes';
-
-import { Card, CardContainer } from '@/views/blocks';
 import Chart from '@/components/Chart';
 import MapSvg from '@/components/MapSvg';
-
-import { getAge } from '@/utils/index';
 import { INodeCard } from '@/types/index';
+import { getAge } from '@/utils/index';
+import { Card, CardContainer } from '@/views/blocks';
+import { CardChartContainer, CardDetails } from '@/views/nodes';
+import { fromUnixTime } from 'date-fns';
+import React, { useEffect, useState } from 'react';
 
 interface IProps {
   cardData: INodeCard[];

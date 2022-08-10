@@ -1,26 +1,21 @@
-import React, { ReactNode, useState } from 'react';
-
-import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-
-import { Container, Header, Input, Title } from '@/views/assets';
-
-import Table, { ITable } from '@/components/Table';
-
-import { IAsset, IResponse, IPagination } from '@/types/index';
-import { formatAmount, parseHardCodedInfo } from '@/utils/index';
-import api from '@/services/api';
-
 import { ArrowLeft, Certified } from '@/assets/icons';
 import { Assets as Icon } from '@/assets/title-icons';
-import { PaginationContainer } from '@/components/Pagination/styles';
-import Pagination from '@/components/Pagination';
-import { LetterLogo, Logo } from '@/views/assets/index';
-import { useDidUpdateEffect } from '@/utils/hooks';
-import { Row } from '@/components/Table/styles';
-import { IoIosInfinite } from 'react-icons/io';
 import AssetLogo from '@/components/Logo/AssetLogo';
+import Pagination from '@/components/Pagination';
+import { PaginationContainer } from '@/components/Pagination/styles';
+import Table, { ITable } from '@/components/Table';
+import { Row } from '@/components/Table/styles';
+import api from '@/services/api';
+import { IAsset, IPagination, IResponse } from '@/types/index';
+import { useDidUpdateEffect } from '@/utils/hooks';
+import { formatAmount, parseHardCodedInfo } from '@/utils/index';
+import { Container, Header, Input, Title } from '@/views/assets';
+import { LetterLogo, Logo } from '@/views/assets/index';
+import { GetServerSideProps } from 'next';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { ReactNode, useCallback, useState } from 'react';
+import { IoIosInfinite } from 'react-icons/io';
 
 interface IAssetPage {
   assets: IAsset[];
@@ -40,7 +35,7 @@ const Assets: React.FC<IAssetPage> = ({
 }) => {
   const router = useRouter();
 
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [assets, setAssets] = useState(defaultAssets);
   const [loading, setLoading] = useState(false);
 
@@ -49,8 +44,9 @@ const Assets: React.FC<IAssetPage> = ({
       setLoading(true);
 
       const response: IAssetResponse = await api.get({
-        route: `assets/kassets?page=${page}`,
+        route: `assets/kassets?hidden=false&page=${page}`,
       });
+
       if (!response.error) {
         setAssets(response.data.assets);
       }
@@ -61,18 +57,6 @@ const Assets: React.FC<IAssetPage> = ({
     fetchData();
   }, [page]);
 
-  const renderLogo = (logo: string, ticker: string, name: string) => {
-    const regex = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
-    if (
-      regex.test(logo) ||
-      logo === 'https://bc.klever.finance/logo_klv' ||
-      logo === 'https://bc.klever.finance/logo_kfi'
-    ) {
-      return <Logo alt={`${name}-logo`} src={logo} />;
-    }
-    return <LetterLogo>{ticker?.split('')[0]}</LetterLogo>;
-  };
-
   const TableBody: React.FC<IAsset> = ({
     ticker,
     name,
@@ -81,8 +65,10 @@ const Assets: React.FC<IAssetPage> = ({
     assetType,
     initialSupply,
     maxSupply,
+    staking,
     circulatingSupply,
     precision,
+    verified,
   }) => {
     const renderMaxSupply = (): ReactNode => {
       return (
@@ -96,13 +82,11 @@ const Assets: React.FC<IAssetPage> = ({
       );
     };
 
-    const verifiedAssets = ['KLV', 'KFI', 'DVK-34ZH', 'LMT-KGIA'];
-
-    const isVerified = () => {
-      if(verifiedAssets.includes(assetId)) {
-        return <Certified className='isVerified'/>;
+    const isVerified = useCallback(() => {
+      if (verified) {
+        return <Certified className="isVerified" />;
       }
-    };
+    }, []);
 
     return (
       <Row type="assetsPage">
@@ -110,12 +94,12 @@ const Assets: React.FC<IAssetPage> = ({
           <a>
             <AssetLogo
               LetterLogo={LetterLogo}
+              isVerified={isVerified}
               Logo={Logo}
               logo={logo}
               ticker={ticker}
               name={name}
             />
-            {isVerified()}
           </a>
         </Link>
 
@@ -131,7 +115,15 @@ const Assets: React.FC<IAssetPage> = ({
 
         <Link href={`/asset/${assetId}`}>
           <a>
-            <p>{name}</p>
+            <p
+              style={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {name}
+            </p>
           </a>
         </Link>
 
@@ -152,6 +144,13 @@ const Assets: React.FC<IAssetPage> = ({
           </strong>
         </span>
         <span>
+          <strong>
+            {staking?.totalStaked
+              ? formatAmount(staking.totalStaked / 10 ** precision)
+              : 0}
+          </strong>
+        </span>
+        <span>
           <strong>{precision}</strong>
         </span>
       </Row>
@@ -167,6 +166,7 @@ const Assets: React.FC<IAssetPage> = ({
     'Initial Supply',
     'Max Supply',
     'Circulating Supply',
+    'Total Staked',
     'Precision',
   ];
 
@@ -210,13 +210,19 @@ const Assets: React.FC<IAssetPage> = ({
 export const getServerSideProps: GetServerSideProps = async () => {
   const props: IAssetPage = { assets: [], pagination: {} as IPagination };
 
-  const assets: IAssetResponse = await api.get({ route: 'assets/kassets' });
+  const assets: IAssetResponse = await api.get({
+    route: 'assets/kassets?hidden=false',
+  });
   if (!assets.error) {
     props.assets = assets.data.assets;
     props.pagination = assets.pagination;
   }
 
+  props.pagination = assets.pagination;
+
   props.assets = parseHardCodedInfo(props.assets);
+
+  console.log(props.assets[0]);
 
   return { props };
 };

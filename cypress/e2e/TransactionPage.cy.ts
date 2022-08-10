@@ -51,11 +51,11 @@ describe('Transaction page interaction', () => {
   });
   
   it('Should use the right arrow to navigate to page 2 and 3,  with left arrow should back to page 1 and finally click on address of the page and redirect to account details', () => {
-    cy.get('.aaQsj').click();
+    cy.get('.styles__Container-sc-1iq811b-1 > :last-child').click();
     cy.wait(1000);
-    cy.get('.styles__Container-sc-1iq811b-1 > :nth-child(11)').click();
+    cy.get('.styles__Container-sc-1iq811b-1 > :last-child').click();
     cy.wait(1000);
-    cy.get('.styles__Container-sc-1iq811b-1 > :nth-child(1)').click();
+    cy.get('.styles__Container-sc-1iq811b-1 > :first-child').click();
     cy.wait(1500);
     cy.get('.styles__Body-sc-zt5c8s-2 > :nth-child(1) > :nth-child(1) > a').parent().click();
     cy.location().should(url => {
@@ -110,49 +110,49 @@ describe('Transaction page interaction', () => {
     });
   });
   
-  // it('Should redirect to transaction details when type hash of TX on search input', () => {
-  //   cy.fixture('searchData').then(({ transaction }) => {
-  //     cy.get('input').type(`${transaction}{enter}`);
-  //     cy.location().should(url => {
-  //       const hash = url.href.split('transaction/')[1];
-  //       expect(url.href).include(`${BASE_URL}/transaction/`);
-  //       expect(hash).to.have.length(64);
-  //     });
-  //   });
-  // });
+  it('Should redirect to transaction details when type hash of TX on search input', () => {
+    cy.fixture('searchData').then(({ transaction }) => {
+      cy.get('.styles__Container-sc-14zyhv2-0 > input').type(`${transaction}{enter}`);
+      cy.location().should(url => {
+        const hash = url.href.split('transaction/')[1];
+        expect(url.href).include(`${BASE_URL}/transaction/`);
+        expect(hash).to.have.length(64);
+      });
+    });
+  });
   
-  // it('Should redirect to account details when type address of an account on search input', () => {
-  //   cy.fixture('searchData').then(({ address }) => {
-  //     cy.get('input').type(`${address}{enter}`);
-  //     cy.location().should(url => {
-  //       const address = url.href.split('account/')[1];
-  //       expect(url.href).include(`${BASE_URL}/account/`);
-  //       expect(address).to.have.length(62);
-  //     });
-  //   });
-  // });
+  it('Should redirect to account details when type address of an account on search input', () => {
+    cy.fixture('searchData').then(({ address }) => {
+      cy.get('.styles__Container-sc-14zyhv2-0 > input').type(`${address}{enter}`);
+      cy.location().should(url => {
+        const address = url.href.split('account/')[1];
+        expect(url.href).include(`${BASE_URL}/account/`);
+        expect(address).to.have.length(62);
+      });
+    });
+  });
   
-  // it('Should redirect to the block details when type the number of a block on search input', () => {
-  //   cy.fixture('searchData').then(({ block }) => {
-  //     cy.get('input').type(`${block}{enter}`);
-  //     cy.location().should(url => {
-  //       const blockNum = isNaN(Number(url.href.split('block/')[1]));
-  //       expect(url.href).include(`${BASE_URL}/block/`);
-  //       expect(blockNum).to.be.false;
-  //     });
-  //   });
-  // });
+  it('Should redirect to the block details when type the number of a block on search input', () => {
+    cy.fixture('searchData').then(({ block }) => {
+      cy.get('.styles__Container-sc-14zyhv2-0 > input').type(`${block}{enter}`);
+      cy.location().should(url => {
+        const blockNum = isNaN(Number(url.href.split('block/')[1]));
+        expect(url.href).include(`${BASE_URL}/block/`);
+        expect(blockNum).to.be.false;
+      });
+    });
+  });
   
-  // it('Should redirect to asset/klv when type the asset on search input', () => {
-  //   cy.fixture('searchData').then(({ asset }) => {
-  //     cy.get('input').type(`${asset}{enter}`);
-  //     cy.location().should(url => {
-  //       const asset = url.href.split('asset/')[1];
-  //       expect(url.href).include(`${BASE_URL}/asset/`);
-  //       expect(asset).equal('KLV');
-  //     });
-  //   });
-  // });
+  it('Should redirect to asset/klv when type the asset on search input', () => {
+    cy.fixture('searchData').then(({ asset }) => {
+      cy.get('.styles__Container-sc-14zyhv2-0 > input').type(`${asset}{enter}`);
+      cy.location().should(url => {
+        const asset = url.href.split('asset/')[1];
+        expect(url.href).include(`${BASE_URL}/asset/`);
+        expect(asset).equal('KLV');
+      });
+    });
+  });
 
   it('Filter transaction using date filter', () => {
     const date = new Date();
@@ -209,10 +209,10 @@ describe('Transaction page interaction', () => {
     });
   });
 
-  it('Filter by coin, status and contract', () => {
-    cy.get(':nth-child(1) > .styles__Content-sc-1hif3ao-1').click();
-    cy.get(':nth-child(1) > .styles__Content-sc-1hif3ao-1 > .styles__SelectorContainer-sc-1hif3ao-2 > :nth-child(2)').click();
-    cy.wait(500);
+  it('Filter by status and contract', () => {
+    // cy.get(':nth-child(1) > .styles__Content-sc-1hif3ao-1').click();
+    // cy.get(':nth-child(1) > .styles__Content-sc-1hif3ao-1 > .styles__SelectorContainer-sc-1hif3ao-2 > :nth-child(2)').click();
+    // cy.wait(500);
     cy.get(':nth-child(2) > .styles__Content-sc-1hif3ao-1').click();
     cy.get(':nth-child(2) > .styles__Content-sc-1hif3ao-1 > .styles__SelectorContainer-sc-1hif3ao-2 > :nth-child(2)').click();
     cy.wait(500);
@@ -243,7 +243,6 @@ describe('Transaction page interaction', () => {
     cy.contains('Bandwidth Fee').should('be.visible');
     cy.contains('Time').should('be.visible');
     cy.contains('Signature').should('be.visible');
-    cy.contains('Data').should('be.visible');
     cy.get('h3').contains('Contract').should('be.visible');
     cy.get('strong').contains('Contract').should('be.visible');
     cy.contains('Owner').should('be.visible');
@@ -251,7 +250,7 @@ describe('Transaction page interaction', () => {
     cy.contains('Bucket ID').should('be.visible');
     cy.get('h3').contains('Raw Tx').should('be.visible');
 
-    cy.get(':nth-child(6) > :nth-child(2) > a').click();
+    cy.get('.detail__CenteredRow-sc-hi7vn3-7 > a').click();
     cy.wait(500);
     cy.location().should(url => {
       const address = url.href.split('account/')[1];

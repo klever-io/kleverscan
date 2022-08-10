@@ -1,6 +1,5 @@
 import { IconHelp } from '@/assets/help';
-import React, {useState} from 'react';
-
+import React, { useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 
 interface ITooltipProps {
@@ -19,17 +18,17 @@ const Tooltip: React.FC<ITooltipProps> = ({ msg }) => {
         <IconHelp data-tip data-for="buttonTooltip">
           button
         </IconHelp>
-          {displayMessage && 
-              <ReactTooltip
-              id="buttonTooltip"
-              place="bottom"
-              effect="solid"
-              type="info"
-              backgroundColor="#7B7DB2"
-            >
-              {msg}
-            </ReactTooltip>
-          }
+        {displayMessage && (
+          <ReactTooltip
+            id="buttonTooltip"
+            place="bottom"
+            effect="solid"
+            type="info"
+            backgroundColor="#7B7DB2"
+          >
+            {msg}
+          </ReactTooltip>
+        )}
       </div>
     </div>
   );

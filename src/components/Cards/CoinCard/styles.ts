@@ -1,6 +1,6 @@
+import Image from 'next/image';
 import styled, { keyframes } from 'styled-components';
 
-import Image from 'next/image';
 interface IVariation {
   positive: boolean;
 }
@@ -28,6 +28,7 @@ export const Container = styled.div`
 
 export const Content = styled.div`
   display: flex;
+  box-shadow: 5px 6px 5px 0px rgba(0, 0, 0, 0.1);
 
   overflow-x: auto;
   scroll-behavior: smooth !important;
@@ -40,8 +41,7 @@ export const Content = styled.div`
   @media (max-width: 1600px) {
     width: 100%;
   }
-
-
+  overflow-y: hidden;
   position: relative;
 
   flex-direction: row;
@@ -69,7 +69,6 @@ export const CardContainer = styled.div`
   @media (max-width: 1600px) {
     min-width: 100%;
   }
-
 `;
 
 export const CardContent = styled.div`
@@ -143,7 +142,7 @@ export const Description = styled(Name)<IVariation>`
 export const ChartContainer = styled.div`
   padding: 0 1.25rem;
 
-  height: 7.5rem;
+  height: 14.5rem;
   width: 100%;
 
   top: 1.5rem;
@@ -153,7 +152,7 @@ export const ChartContainer = styled.div`
 `;
 
 export const ValueContainer = styled.div`
-  margin-top: 3rem;
+  margin-top: 0.5rem;
 `;
 
 export const ValueContent = styled.div`
@@ -171,6 +170,7 @@ export const ValueContent = styled.div`
   }
 
   p {
+    font-weight: 500;
     font-size: 0.85rem;
   }
 `;
@@ -223,13 +223,16 @@ export const CoinsSelector = styled.div`
 `;
 
 export const CoinSelector = styled.div<{ isSelected: boolean }>`
-  min-width: 0.5rem;
-  height: 0.5rem;
+  min-width: 0.6rem;
+  height: 0.6rem;
 
   transition: 0.5s ease;
 
   background-color: ${props =>
-    props.isSelected ? props.theme.white : props.theme.black};
+    props.isSelected ? props.theme.card.background : props.theme.white};
+
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.3);
+
   cursor: pointer;
   border-radius: 50%;
 `;

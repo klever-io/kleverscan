@@ -1,6 +1,7 @@
 import { ArrowLeft, ArrowRight, WarningIcon } from '@/assets/calendar';
+import { Calendar as CalendarIcon } from '@/assets/icons';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { MdClear } from 'react-icons/md';
-import React, { useEffect, useRef, useState } from 'react';
 import {
   CalendarContainer,
   CalendarContent,
@@ -19,7 +20,6 @@ import {
   Warning,
 } from './styles';
 
-import { Calendar as CalendarIcon } from '@/assets/icons';
 export interface ISelectedDays {
   start: Date;
   end: Date | null;
@@ -68,21 +68,25 @@ const DateFilter: React.FC<IDateFilter> = ({
 
   const inputRef = useRef<any>(null);
 
-  const handleInputFocus = () => {
+  const handleInputFocus = useCallback(() => {
     setCalendarOpen(true);
-  };
+  }, [setCalendarOpen]);
 
-  const handleArrowClick = (side: string) => {
-    const newDate = new Date(date);
-    newDate.setDate(1);
+  const handleArrowClick = useCallback(
+    (side: string) => {
+      const newDate = new Date(date);
+      newDate.setDate(1);
 
-    if (side === 'left') {
-      newDate.setMonth(newDate.getMonth() - 1);
-    } else {
-      newDate.setMonth(newDate.getMonth() + 1);
-    }
-    setDate(newDate);
-  };
+      if (side === 'left') {
+        newDate.setMonth(newDate.getMonth() - 1);
+      } else {
+        newDate.setMonth(newDate.getMonth() + 1);
+      }
+      setDate(newDate);
+    },
+    [date],
+  );
+
   useEffect(() => {
     empty ? setWarning(true) : setWarning(false);
   }, [empty]);
@@ -98,32 +102,35 @@ const DateFilter: React.FC<IDateFilter> = ({
     setStartingDay(new Date(date.getFullYear(), date.getMonth(), 1).getDay());
   }, [date]);
 
-  const handleDayClick = (day: Date) => {
-    if (firstSelection) {
-      setSelectedDays({
-        start: day,
-        end: null,
-        values: [day],
-      });
-      setFirstSelection(false);
-      setButtonActive(true);
-    } else if (!firstSelection) {
-      if (selectedDays.start && day < selectedDays.start) {
-        const prevStart = selectedDays.start;
+  const handleDayClick = useCallback(
+    (day: Date) => {
+      if (firstSelection) {
         setSelectedDays({
-          ...selectedDays,
-          end: prevStart,
           start: day,
+          end: null,
+          values: [day],
         });
-      } else {
-        setSelectedDays({
-          ...selectedDays,
-          end: day,
-        });
+        setFirstSelection(false);
+        setButtonActive(true);
+      } else if (!firstSelection) {
+        if (selectedDays.start && day < selectedDays.start) {
+          const prevStart = selectedDays.start;
+          setSelectedDays({
+            ...selectedDays,
+            end: prevStart,
+            start: day,
+          });
+        } else {
+          setSelectedDays({
+            ...selectedDays,
+            end: day,
+          });
+        }
+        setFirstSelection(true);
       }
-      setFirstSelection(true);
-    }
-  };
+    },
+    [selectedDays, firstSelection],
+  );
 
   useEffect(() => {
     if (selectedDays.end) {
@@ -151,7 +158,7 @@ const DateFilter: React.FC<IDateFilter> = ({
     }
   }, [selectedDays.end]);
 
-  const handleConfirmClick = () => {
+  const handleConfirmClick = useCallback(() => {
     filterDate(selectedDays);
 
     setInputValue(
@@ -165,9 +172,9 @@ const DateFilter: React.FC<IDateFilter> = ({
     inputRef.current.blur();
     setCalendarOpen(false);
     setButtonActive(false);
-  };
+  }, [selectedDays, filterDate]);
 
-  const handleClear = () => {
+  const handleClear = useCallback(() => {
     setInputValue('');
     setSelectedDays({
       start: currentDate,
@@ -179,13 +186,14 @@ const DateFilter: React.FC<IDateFilter> = ({
     setCalendarOpen(false);
 
     resetDate();
-  };
-  const handleClose = () => {
+  }, [resetDate]);
+
+  const handleClose = useCallback(() => {
     setDontBlur(false);
     setCalendarOpen(false);
     inputRef.current.blur();
     setSelectedDays(selectedDaysInitialValue);
-  };
+  }, [selectedDaysInitialValue]);
 
   const months = [
     'January',

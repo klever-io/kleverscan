@@ -1,30 +1,26 @@
-import React, { useState } from 'react';
-
-import { GetServerSideProps } from 'next';
-import Link from 'next/link';
-import Table, { ITable } from '@/components/Table';
-import Detail from '@/components/Layout/Detail';
-import { Row, Status } from '@/components/Table/styles';
-
-import {
-  IResponse,
-  IPagination,
-  IValidator,
-  IDelegationsResponse,
-} from '@/types/index';
-import api from '@/services/api';
-
 import { Validators as Icon } from '@/assets/cards';
+import { getStatusIcon } from '@/assets/status';
+import Detail from '@/components/Layout/Detail';
+import { ITable } from '@/components/Table';
+import { Row, Status } from '@/components/Table/styles';
+import api from '@/services/api';
+import theme from '@/styles/theme';
+import {
+  IDelegationsResponse,
+  IPagination,
+  IResponse,
+  IValidator,
+} from '@/types/index';
+import { useDidUpdateEffect } from '@/utils/hooks';
+import { capitalizeString, formatAmount, parseAddress } from '@/utils/index';
 import {
   ProgressContainer,
   ProgressContent,
   ProgressIndicator,
 } from '@/views/validators';
-import { useDidUpdateEffect } from '@/utils/hooks';
-import { capitalizeString, parseAddress } from '@/utils/index';
-import { formatAmount } from '@/utils/index';
-import { getStatusIcon } from '@/assets/status';
-import theme from '@/styles/theme';
+import { GetServerSideProps } from 'next';
+import Link from 'next/link';
+import React, { useState } from 'react';
 
 interface IValidatorPage {
   validators: IValidator[];
@@ -43,7 +39,7 @@ const Validators: React.FC<IValidatorPage> = ({
   validators: initialValidators,
   pagination,
 }) => {
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [validators, setValidators] = useState<IValidator[]>(initialValidators);
   const header = [
@@ -83,7 +79,7 @@ const Validators: React.FC<IValidatorPage> = ({
 
           return {
             staked: delegation.totalStake,
-            rank: index + page * pagination.perPage + 1,
+            rank: index + 1 + (page * pagination.perPage - 10),
             name: delegation.name || parseAddress(delegation.ownerAddress, 14),
             cumulativeStaked: parseFloat(
               (
@@ -143,10 +139,10 @@ const Validators: React.FC<IValidatorPage> = ({
           <p>{rank}°</p>
         </span>
         <span>
-          {validators[rank - page * pagination.perPage - 1]?.address ? (
+          {validators[rank - 1 - (page * pagination.perPage - 10)]?.address ? (
             <Link
               href={`validator/${
-                validators[rank - page * pagination.perPage - 1].address
+                validators[rank - 1 - (page * pagination.perPage - 10)].address
               }`}
             >
               {parseAddress(name, 20)}
@@ -162,7 +158,7 @@ const Validators: React.FC<IValidatorPage> = ({
           <strong>{formatAmount(staked / 10 ** precision)} KLV</strong>
         </span>
         <span>
-          <strong>{commission}</strong>
+          <strong>{commission / 10 ** 2}%</strong>
         </span>
         <span>
           <strong>{`${totalProduced} / ${totalMissed}`}</strong>
@@ -204,57 +200,61 @@ const Validators: React.FC<IValidatorPage> = ({
   return <Detail {...detailProps} />;
 };
 
-export const getServerSideProps: GetServerSideProps<IValidatorPage> =
-  async () => {
-    const props: IValidatorPage = {
-      validators: [],
-      pagination: {} as IPagination,
-    };
-
-    const validators: IValidatorResponse = await api.get({
-      route: 'validator/list',
-    });
-
-    if (validators.code !== 'successful') {
-      return { props };
-    }
-
-    if (!validators.error) {
-      const delegations: IValidator[] = validators.data['validators'].map(
-        (delegation: IDelegationsResponse, index: number): IValidator => {
-          const totalProduced =
-            delegation.totalLeaderSuccessRate.numSuccess +
-            delegation.totalValidatorSuccessRate.numSuccess;
-          const totalMissed =
-            delegation.totalLeaderSuccessRate.numFailure +
-            delegation.totalValidatorSuccessRate.numFailure;
-
-          return {
-            staked: delegation.totalStake,
-            rank: index + validators.pagination.previous * 10 + 1,
-            name: delegation.name || parseAddress(delegation.ownerAddress, 20),
-            cumulativeStaked: parseFloat(
-              (
-                (delegation.totalStake / validators.data.networkTotalStake) *
-                100
-              ).toFixed(4),
-            ),
-            address: delegation.ownerAddress,
-            rating: delegation.rating,
-            canDelegate: delegation.canDelegate,
-            selfStake: delegation.selfStake,
-            status: delegation.list,
-            totalProduced,
-            totalMissed,
-            commission: delegation.commission,
-          };
-        },
-      );
-
-      props.validators = delegations;
-      props.pagination = validators.pagination;
-    }
-    return { props };
+export const getServerSideProps: GetServerSideProps<
+  IValidatorPage
+> = async () => {
+  const props: IValidatorPage = {
+    validators: [],
+    pagination: {} as IPagination,
   };
+
+  const validators: IValidatorResponse = await api.get({
+    route: 'validator/list',
+  });
+
+  if (validators.code !== 'successful') {
+    return { props };
+  }
+
+  if (!validators.error) {
+    const delegations: IValidator[] = validators.data['validators'].map(
+      (delegation: IDelegationsResponse, index: number): IValidator => {
+        const totalProduced =
+          delegation.totalLeaderSuccessRate.numSuccess +
+          delegation.totalValidatorSuccessRate.numSuccess;
+        const totalMissed =
+          delegation.totalLeaderSuccessRate.numFailure +
+          delegation.totalValidatorSuccessRate.numFailure;
+
+        return {
+          staked: delegation.totalStake,
+          rank:
+            index +
+            (validators.pagination.self - 1) * validators.pagination.perPage +
+            1,
+          name: delegation.name || parseAddress(delegation.ownerAddress, 20),
+          cumulativeStaked: parseFloat(
+            (
+              (delegation.totalStake / validators.data.networkTotalStake) *
+              100
+            ).toFixed(4),
+          ),
+          address: delegation.ownerAddress,
+          rating: delegation.rating,
+          canDelegate: delegation.canDelegate,
+          selfStake: delegation.selfStake,
+          status: delegation.list,
+          totalProduced,
+          totalMissed,
+          commission: delegation.commission,
+        };
+      },
+    );
+
+    props.validators = delegations;
+    props.pagination = validators.pagination;
+  }
+  return { props };
+};
 
 export default Validators;

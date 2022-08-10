@@ -1,12 +1,30 @@
 import { lighten } from 'polished';
 import { BsPersonSquare } from 'react-icons/bs';
+import { IoMdCloseCircle } from 'react-icons/io';
 import { RiCopperCoinLine } from 'react-icons/ri';
 import styled, { css } from 'styled-components';
-import { IoMdCloseCircle } from 'react-icons/io';
 
 interface IContainer {
   loading?: boolean;
 }
+
+const defaultStyles = css`
+  width: 100%;
+
+  padding: 0.5rem 1rem;
+  border: 1px solid ${({ theme }) => theme.input.border.dark};
+  border-radius: 0.5rem;
+
+  color: ${({ theme }) => theme.input.border.dark};
+
+  background-color: transparent;
+
+  box-shadow: unset;
+
+  font-weight: 500;
+
+  transition: all 0.1s ease-in-out;
+`;
 
 export const CloseIcon = styled(IoMdCloseCircle).attrs(props => ({
   color: props.theme.form.hash,
@@ -159,13 +177,31 @@ export const ExtraOptionContainer = styled.div`
 `;
 
 export const SelectContainer = styled.div`
+  display: flex;
+  align-items: center;
   background-color: ${props => props.theme.white};
   padding: 1.37rem;
   border-radius: 1rem;
   margin-top: 1rem;
+  width: 100%;
 
   border: 0.2px solid ${({ theme }) => theme.input.border};
   box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.8, '#000')};
+`;
+
+interface ISelect {
+  size?: number;
+}
+
+export const SelectContent = styled.div<ISelect>`
+  display: flex;
+  flex-direction: column;
+  width: calc(50% - 0.5rem);
+
+  max-width: ${props => (props.size ? `${props.size}%` : 'unset')};
+  &:not(:first-child) {
+    margin-left: 1rem;
+  }
 `;
 
 export const AssetTriggerContainer = styled.div`
@@ -181,4 +217,25 @@ export const FieldLabel = styled.label`
   display: flex;
   color: ${({ theme }) => theme.input.border.dark};
   margin-bottom: 0.3rem;
+`;
+
+export const BalanceLabel = styled.label`
+  user-select: none;
+  font-size: smaller;
+  font-weight: 600;
+  display: flex;
+  color: ${({ theme }) => theme.input.border.dark};
+  margin-bottom: 0.3rem;
+`;
+
+export const AssetIDInput = styled.input`
+  height: 3rem;
+
+  ${defaultStyles}
+`;
+
+export const BalanceContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 `;

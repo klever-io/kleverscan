@@ -10,7 +10,7 @@ const calculate = (total: number, position: number): ICell[] => {
   const cells: ICell[] = [];
 
   if (total > defaultCellCount) {
-    position += 1;
+    // position += 1;
     if (position >= 5 && position <= total - 4) {
       cells[0] = { value: 1 };
 

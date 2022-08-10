@@ -1,14 +1,13 @@
 import {
   Slider,
-  Toggle,
   StyledInput,
+  Toggle,
 } from '@/components/Form/FormInput/styles';
-
 import {
-  ExtraOptionContainer,
-  InputLabel,
-  FieldContainer,
   DataField,
+  ExtraOptionContainer,
+  FieldContainer,
+  InputLabel,
   ToggleContainer,
 } from './styles';
 
@@ -37,7 +36,8 @@ const AdvancedOptions: React.FC<IAdvOptions> = ({
           <Toggle>
             <StyledInput
               type="checkbox"
-              defaultChecked={true}
+              defaultChecked={false}
+              value={String(isMultisig)}
               onClick={() => setIsMultisig(!isMultisig)}
             />
             <Slider />

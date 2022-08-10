@@ -3,44 +3,35 @@ import { ISection } from 'components/Form';
 const configITOContract = (): ISection[] => {
   const section = [] as ISection[];
 
-  section.push(
-    {
-      fields: [
-        {
-          label: 'KDA',
-          props: {
-            required: true,
-            tooltip: 'Target Asset',
-          },
+  section.push({
+    fields: [
+      {
+        label: 'Receiver Address',
+        props: {
+          required: true,
+          tooltip: 'Wallet address that will receive the currency',
         },
-        {
-          label: 'Receiver Address',
-          props: {
-            required: true,
-            tooltip: 'Wallet address that will receive the currency',
-          },
+      },
+      {
+        label: 'Status',
+        props: {
+          type: 'checkbox',
+          toggleOptions: ['Inactive', 'Active'],
+          defaultValue: 0,
         },
-        {
-          label: 'Status',
-          props: {
-            type: 'checkbox',
-            toggleOptions: ['Inactive', 'Active'],
-            defaultValue: 0,
-          },
+      },
+      {
+        label: 'Max Amount',
+        props: {
+          type: 'number',
+          required: true,
+          tooltip: 'Max amount of assets sold in the ITO',
         },
-        {
-          label: 'Max Amount',
-          props: {
-            type: 'number',
-            required: true,
-            tooltip: 'Max amount of assets sold in the ITO (with precision)',
-          },
-        },
+      },
     ],
-    },
-  );
+  });
 
   return section;
 };
-  
+
 export default configITOContract;

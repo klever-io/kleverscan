@@ -1,94 +1,79 @@
-import React, { useEffect, useState } from 'react';
-
-import Chart, { ChartType } from '@/components/Chart';
-
-import { IoIosInfinite } from 'react-icons/io';
-
+import { ArrowLeft } from '@/assets/icons';
 import { ArrowGreen, ArrowPink, Receive } from '@/assets/icons/index';
-
-import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { fromUnixTime } from 'date-fns';
-
-import {
-  Logo,
-  LetterLogo,
-  CenteredSubTitle,
-  Ranking,
-  CopyBackground,
-  ReceiveBackground,
-  HalfRow,
-  Card,
-  AllSmallCardsContainer,
-  BoldElement,
-  StakedIndicator,
-  PercentIndicator,
-  TitleInformation,
-  ProgressContent,
-  EmptyProgressBar,
-  CardHeader,
-  RewardsCardHeader,
-  RewardsChart,
-  RewardsChartContent,
-  CardWrapper,
-  VotesFooter,
-  Header,
-  VotesHeader,
-  Title,
-  TitleContent,
-  ValidatorTitle,
-  Status,
-  HalfCirclePie,
-  Container,
-  PieData,
-  VotersPercent,
-  CommissionPercent,
-  ContainerVotes,
-  ContainerCircle,
-  RewardsCard,
-  RatingContainer,
-  Rating,
-  Row,
-  ElementsWrapper,
-  ContainerRewards,
-  RewardCardContentWrapper,
-  ContainerPerCentArrow,
-  SubContainerVotes,
-  CardSubHeader,
-} from '@/views/validator';
-
-import {
-  CardContainer,
-  CardContent,
-  CenteredRow,
-} from '@/views/validators/detail';
+import { getStatusIcon } from '@/assets/status';
+import Chart, { ChartType } from '@/components/Chart';
+import Copy from '@/components/Copy';
+import Dropdown from '@/components/Dropdown';
+import Pagination from '@/components/Pagination';
+import { PaginationContainer } from '@/components/Pagination/styles';
+import QrCodeModal from '@/components/QrCodeModal';
+import Table, { ITable } from '@/components/Table';
 import { Row as RowList } from '@/components/Table/styles';
-
+import api from '@/services/api';
 import {
+  IBucket,
   IDelegate,
   IPagination,
   IPeer,
   IResponse,
-  IBucket,
 } from '@/types/index';
-
-import { ArrowLeft } from '@/assets/icons';
-import api from '@/services/api';
-import Copy from '@/components/Copy';
-import Dropdown from '@/components/Dropdown';
-import { getStatusIcon } from '@/assets/status';
-import Table, { ITable } from '@/components/Table';
-import { TableContainer } from '@/views/validators/detail';
+import { formatAmount, getAge, parseAddress } from '@/utils/index';
 import {
-  formatAmount,
-  parseAddress,
-  toLocaleFixed,
-  getAge,
-} from '@/utils/index';
-import { PaginationContainer } from '@/components/Pagination/styles';
-import Pagination from '@/components/Pagination';
-import QrCodeModal from '@/components/QrCodeModal';
+  AllSmallCardsContainer,
+  BoldElement,
+  Card,
+  CardHeader,
+  CardSubHeader,
+  CardWrapper,
+  CenteredSubTitle,
+  CommissionPercent,
+  Container,
+  ContainerCircle,
+  ContainerPerCentArrow,
+  ContainerRewards,
+  ContainerVotes,
+  CopyBackground,
+  ElementsWrapper,
+  EmptyProgressBar,
+  HalfCirclePie,
+  HalfRow,
+  LetterLogo,
+  Logo,
+  PercentIndicator,
+  PieData,
+  ProgressContent,
+  Rating,
+  RatingContainer,
+  ReceiveBackground,
+  RewardCardContentWrapper,
+  RewardsCard,
+  RewardsCardHeader,
+  RewardsChart,
+  RewardsChartContent,
+  Row,
+  StakedIndicator,
+  Status,
+  SubContainerVotes,
+  Title,
+  TitleContent,
+  TitleInformation,
+  ValidatorTitle,
+  VotersPercent,
+  VotesFooter,
+  VotesHeader,
+} from '@/views/validator';
+import {
+  CardContainer,
+  CardContent,
+  CenteredRow,
+  TableContainer,
+} from '@/views/validators/detail';
+import { fromUnixTime } from 'date-fns';
+import { GetServerSideProps } from 'next';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+import { IoIosInfinite } from 'react-icons/io';
 
 interface IValidatorPage {
   validator: IPeer;
@@ -161,7 +146,7 @@ const Validator: React.FC<IValidatorPage> = ({
   const totalMissed =
     validator?.totalLeaderSuccessRate?.numFailure +
     validator?.totalValidatorSuccessRate?.numFailure;
-  const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'error');
+  const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'fail');
 
   const commissionPercent = commission / 10 ** 2;
   const votersPercent = 100 - commission / 10 ** 2;

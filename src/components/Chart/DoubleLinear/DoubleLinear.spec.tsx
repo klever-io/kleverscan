@@ -1,7 +1,6 @@
 import React from 'react';
-import Chart, { ChartType } from '../index';
-
 import { renderWithTheme } from '../../../test/utils';
+import Chart, { ChartType } from '../index';
 
 const statistics = [
   { date: '23 May', burned: 1100825.905, minted: 2690.412102, value: 112485 },

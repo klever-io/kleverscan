@@ -1,73 +1,65 @@
-import React, { useState, useRef } from 'react';
-
-import { GetServerSideProps } from 'next';
-import Link from 'next/link';
-import Router, { useRouter } from 'next/router';
-import { format, fromUnixTime } from 'date-fns';
-
-import {
-  CenteredRow,
-  Tooltip,
-  Container,
-  FilterContainer,
-  Header,
-  Title,
-  TooltipText,
-  FilterByDate,
-} from '@/views/transactions';
-import { Input } from '@/views/transactions/detail';
-
-import Filter, { IFilter, IFilterItem } from '@/components/Filter';
-import Table, { ITable } from '@/components/Table';
-import { Row, Status } from '@/components/Table/styles';
-
-import { contracts, status } from '@/configs/transactions';
-import api from '@/services/api';
-import {
-  ITransaction,
-  IResponse,
-  IPagination,
-  ITransferContract,
-  Contract,
-  IContract,
-  ICreateAssetContract,
-  ICreateValidatorContract,
-  IFreezeContract,
-  IUnfreezeContract,
-  IAsset,
-  IClaimContract,
-  IUnjailContract,
-  IValidatorConfig,
-  IUndelegateContract,
-  IWithdrawContract,
-  IAssetTriggerContract,
-  ISetAccountNameContract,
-  IProposalContract,
-  IVoteContract,
-  IConfigICOContract,
-  ISetICOPricesContract,
-  IBuyContract,
-  ISellContract,
-  ICancelMarketOrderContract,
-  ICreateMarketplaceContract,
-  IConfigMarketplaceContract,
-  IValidatorConfigContract,
-} from '../../types';
-
-import { formatAmount, parseAddress, capitalizeString } from '../../utils';
-
-import { ArrowRight, ArrowLeft } from '@/assets/icons';
-import { Transactions as Icon } from '@/assets/title-icons';
-
 import { KLV } from '@/assets/coins';
+import { ArrowLeft, ArrowRight } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
-import Pagination from '@/components/Pagination';
-import { PaginationContainer } from '@/components/Pagination/styles';
+import { Transactions as Icon } from '@/assets/title-icons';
 import DateFilter, {
   IDateFilter,
   ISelectedDays,
 } from '@/components/DateFilter';
+import Filter, { IFilter, IFilterItem } from '@/components/Filter';
+import Pagination from '@/components/Pagination';
+import { PaginationContainer } from '@/components/Pagination/styles';
+import Table, { ITable } from '@/components/Table';
+import { Row, Status } from '@/components/Table/styles';
+import { contracts, status } from '@/configs/transactions';
+import api from '@/services/api';
 import { useDidUpdateEffect } from '@/utils/hooks';
+import {
+  CenteredRow,
+  Container,
+  FilterByDate,
+  FilterContainer,
+  Header,
+  Title,
+  Tooltip,
+  TooltipText,
+} from '@/views/transactions';
+import { Input } from '@/views/transactions/detail';
+import { format, fromUnixTime } from 'date-fns';
+import { GetServerSideProps } from 'next';
+import Link from 'next/link';
+import Router, { useRouter } from 'next/router';
+import React, { useCallback, useRef, useState } from 'react';
+import {
+  Contract,
+  IAsset,
+  IAssetTriggerContract,
+  IBuyContract,
+  ICancelMarketOrderContract,
+  IClaimContract,
+  IConfigITOContract,
+  IConfigMarketplaceContract,
+  IContract,
+  ICreateAssetContract,
+  ICreateMarketplaceContract,
+  ICreateValidatorContract,
+  IFreezeContract,
+  IPagination,
+  IProposalContract,
+  IResponse,
+  ISellContract,
+  ISetAccountNameContract,
+  ISetITOPricesContract,
+  ITransaction,
+  ITransferContract,
+  IUndelegateContract,
+  IUnfreezeContract,
+  IUnjailContract,
+  IValidatorConfigContract,
+  IVoteContract,
+  IWithdrawContract,
+} from '../../types';
+import { capitalizeString, formatAmount, parseAddress } from '../../utils';
 
 interface ITransactions {
   transactions: ITransaction[];
@@ -108,7 +100,7 @@ const Transactions: React.FC<ITransactions> = ({
 
   const [loading, setLoading] = useState(false);
   const [transactions, setTransactions] = useState(defaultTransactions);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [count, setCount] = useState(pagination.totalPages);
   const [dateFilter, setDateFilter] = useState({
     start: '',
@@ -119,21 +111,28 @@ const Transactions: React.FC<ITransactions> = ({
   const [statusType, setStatusType] = useState(defaultFilter);
   const [coinType, setCoinType] = useState(defaultFilter);
 
-  const formatFilterQuery = (type: string): IFilterItem | undefined => {
-    switch (type) {
-      case 'COIN':
-        if (!router.query.asset) return undefined;
-        return { name: String(router.query.asset), value: router.query.asset };
-      case 'TYPE':
-        if (!router.query.type) return undefined;
-        return contracts.find(({ value }) => value === router.query.type);
-      case 'STATUS':
-        if (!router.query.status) return undefined;
-        return status.find(({ value }) => value === router.query.status);
-      default:
-        break;
-    }
-  };
+  const formatFilterQuery = useCallback(
+    (type: string): IFilterItem | undefined => {
+      switch (type) {
+        case 'COIN':
+          if (!router.query.asset) return undefined;
+          return {
+            name: String(router.query.asset),
+            value: router.query.asset,
+          };
+        case 'TYPE':
+          if (!router.query.type) return undefined;
+          return contracts.find(({ value }) => value === router.query.type);
+        case 'STATUS':
+          if (!router.query.status) return undefined;
+          return status.find(({ value }) => value === router.query.status);
+        default:
+          break;
+      }
+    },
+    [router.query.asset, router.query.type, router.query.status],
+  );
+
   const filters: IFilter[] = [
     {
       title: 'Coin',
@@ -225,7 +224,7 @@ const Transactions: React.FC<ITransactions> = ({
   };
 
   useDidUpdateEffect(() => {
-    if (page !== 0) setPage(0);
+    if (page !== 1) setPage(1);
     else fetchData();
   }, [transactionType, statusType, coinType, dateFilter]);
 
@@ -233,7 +232,7 @@ const Transactions: React.FC<ITransactions> = ({
     fetchData();
   }, [page]);
 
-  const getContractType = (contracts: IContract[]) => {
+  const getContractType = useCallback((contracts: IContract[]) => {
     if (!contracts) {
       return 'Unkown';
     }
@@ -241,7 +240,7 @@ const Transactions: React.FC<ITransactions> = ({
     return contracts.length > 1
       ? 'Multi contract'
       : Object.values(Contract)[contracts[0].type];
-  };
+  }, []);
 
   const Transfer: React.FC<IContract> = ({ parameter: par }) => {
     const parameter = par as ITransferContract;
@@ -421,7 +420,7 @@ const Transactions: React.FC<ITransactions> = ({
 
     return (
       <>
-        <span>{parameter.parameter}</span>
+        <span>{parameter.parameters}</span>
       </>
     );
   };
@@ -441,7 +440,7 @@ const Transactions: React.FC<ITransactions> = ({
   };
 
   const ConfigICO: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IConfigICOContract;
+    const parameter = par as IConfigITOContract;
 
     return (
       <>
@@ -451,7 +450,7 @@ const Transactions: React.FC<ITransactions> = ({
   };
 
   const SetICOPrices: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as ISetICOPricesContract;
+    const parameter = par as ISetITOPricesContract;
 
     return (
       <>
@@ -491,7 +490,7 @@ const Transactions: React.FC<ITransactions> = ({
 
     return (
       <>
-        <span>{parameter.orderId}</span>
+        <span>{parameter.orderID}</span>
       </>
     );
   };
@@ -553,9 +552,9 @@ const Transactions: React.FC<ITransactions> = ({
         return getComponent(Proposal);
       case Contract.Vote:
         return getComponent(Vote);
-      case Contract.ConfigICO:
+      case Contract.ConfigITO:
         return getComponent(ConfigICO);
-      case Contract.SetICOPrices:
+      case Contract.SetITOPrices:
         return getComponent(SetICOPrices);
       case Contract.Buy:
         return getComponent(Buy);
@@ -619,10 +618,10 @@ const Transactions: React.FC<ITransactions> = ({
       case Contract.Vote:
         newHeaders = ['Proposal Id', 'Amount'];
         break;
-      case Contract.ConfigICO:
+      case Contract.ConfigITO:
         newHeaders = ['Asset Id'];
         break;
-      case Contract.SetICOPrices:
+      case Contract.SetITOPrices:
         newHeaders = ['Asset Id'];
         break;
       case Contract.Buy:
@@ -724,14 +723,14 @@ const Transactions: React.FC<ITransactions> = ({
   };
 
   const resetDate = () => {
-    setPage(0);
+    setPage(1);
     setDateFilter({
       start: '',
       end: '',
     });
   };
   const filterDate = (selectedDays: ISelectedDays) => {
-    setPage(0);
+    setPage(1);
     setDateFilter({
       start: selectedDays.start.getTime().toString(),
       end: selectedDays.end
@@ -781,31 +780,32 @@ const Transactions: React.FC<ITransactions> = ({
   );
 };
 
-export const getServerSideProps: GetServerSideProps<ITransactions> =
-  async context => {
-    const props: ITransactions = {
-      transactions: [],
-      pagination: {} as IPagination,
-      assets: [],
-    };
-
-    const transactions: ITransactionResponse = await api.get({
-      route: 'transaction/list',
-      query: context.query,
-    });
-    if (!transactions.error) {
-      props.transactions = transactions?.data?.transactions || [];
-      props.pagination = transactions?.pagination || {};
-    }
-
-    const assets: IAssetResponse = await api.get({
-      route: 'assets/kassets',
-    });
-    if (!assets.error) {
-      props.assets = assets?.data?.assets || [];
-    }
-
-    return { props };
+export const getServerSideProps: GetServerSideProps<
+  ITransactions
+> = async context => {
+  const props: ITransactions = {
+    transactions: [],
+    pagination: {} as IPagination,
+    assets: [],
   };
+
+  const transactions: ITransactionResponse = await api.get({
+    route: 'transaction/list',
+    query: context.query,
+  });
+  if (!transactions.error) {
+    props.transactions = transactions?.data?.transactions || [];
+    props.pagination = transactions?.pagination || {};
+  }
+
+  const assets: IAssetResponse = await api.get({
+    route: 'assets/kassets',
+  });
+  if (!assets.error) {
+    props.assets = assets?.data?.assets || [];
+  }
+
+  return { props };
+};
 
 export default Transactions;

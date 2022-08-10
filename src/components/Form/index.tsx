@@ -1,19 +1,17 @@
-import { Scope, SubmitHandler, FormHandles } from '@unform/core';
-import React from 'react';
-import { useRef, useState } from 'react';
 import { parseData } from '@/utils/index';
+import { FormHandles, Scope, SubmitHandler } from '@unform/core';
+import React, { useCallback, useRef, useState } from 'react';
+import AdvancedOptions from './AdvancedOptions';
 import FormInput from './FormInput';
-
-import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import {
+  AdvancedOptsContainer,
+  ArrowDownIcon,
+  ArrowUpIcon,
   ButtonContainer,
   FormBody,
   FormSection,
   SectionTitle,
-  AdvancedOptsContainer,
 } from './styles';
-import AdvancedOptions from './AdvancedOptions';
-import theme from '@/styles/theme';
 
 interface IInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   span?: number;
@@ -60,6 +58,7 @@ const Form: React.FC<any> = ({
   onSubmit,
   children,
   cancelOnly,
+  loading,
   setData,
   setIsMultisig,
   isMultisig,
@@ -68,115 +67,114 @@ const Form: React.FC<any> = ({
   const [sections, setSections] = useState(defaultSections);
   const [showAdvancedOpts, setShowAdvancedOpts] = useState(false);
 
-  const addArrayItem = (
-    field: IFormField,
-    sectionIndex: number,
-    fieldIndex: number,
-  ) => {
-    if (
-      (sectionIndex && fieldIndex) ||
-      (!isNaN(sectionIndex) && !isNaN(fieldIndex))
-    ) {
-      let length = sections[sectionIndex]?.fields[fieldIndex]?.props?.length;
+  const addArrayItem = useCallback(
+    (field: IFormField, sectionIndex: number, fieldIndex: number) => {
+      if (
+        (sectionIndex && fieldIndex) ||
+        (!isNaN(sectionIndex) && !isNaN(fieldIndex))
+      ) {
+        let length = sections[sectionIndex]?.fields[fieldIndex]?.props?.length;
 
-      if (length) {
-        length += 1;
-      } else {
-        length = 1;
+        if (length) {
+          length += 1;
+        } else {
+          length = 1;
+        }
+
+        if (length) {
+          const newSections = [...sections];
+
+          newSections[sectionIndex].fields[fieldIndex].props = {
+            ...newSections[sectionIndex].fields[fieldIndex].props,
+            length,
+          };
+
+          setSections(newSections);
+        }
+      }
+    },
+    [sections],
+  );
+
+  const removeArrayItem = useCallback(
+    (field: IFormField, sectionIndex: number, fieldIndex: number) => {
+      let length = sections[sectionIndex].fields[fieldIndex].props?.length;
+
+      if (length && length > 0) {
+        length -= 1;
       }
 
-      if (length) {
-        const newSections = [...sections];
+      const newSections = [...sections];
 
-        newSections[sectionIndex].fields[fieldIndex].props = {
-          ...newSections[sectionIndex].fields[fieldIndex].props,
-          length,
-        };
+      newSections[sectionIndex].fields[fieldIndex].props = {
+        ...newSections[sectionIndex].fields[fieldIndex].props,
+        length,
+      };
 
-        setSections(newSections);
-      }
-    }
-  };
+      setSections(newSections);
+    },
+    [sections],
+  );
 
-  const removeArrayItem = (
-    field: IFormField,
-    sectionIndex: number,
-    fieldIndex: number,
-  ) => {
-    let length = sections[sectionIndex].fields[fieldIndex].props?.length;
+  const addFieldButton = useCallback(
+    (field: IFormField, sectionIndex: number, fieldIndex: number) => {
+      return (
+        field.props?.array && (
+          <ButtonContainer
+            onClick={() => addArrayItem(field, sectionIndex, fieldIndex)}
+            type="button"
+          >
+            Add
+          </ButtonContainer>
+        )
+      );
+    },
+    [addArrayItem],
+  );
 
-    if (length && length > 0) {
-      length -= 1;
-    }
+  const removeFieldButton = useCallback(
+    (field: IFormField, sectionIndex: number, fieldIndex: number) => {
+      const length = sections[sectionIndex]?.fields[fieldIndex]?.props?.length;
 
-    const newSections = [...sections];
-
-    newSections[sectionIndex].fields[fieldIndex].props = {
-      ...newSections[sectionIndex].fields[fieldIndex].props,
-      length,
-    };
-
-    setSections(newSections);
-  };
-
-  const addFieldButton = (
-    field: IFormField,
-    sectionIndex: number,
-    fieldIndex: number,
-  ) => {
-    return (
-      field.props?.array && (
+      return field.props?.array && length && length > 0 ? (
         <ButtonContainer
-          onClick={() => addArrayItem(field, sectionIndex, fieldIndex)}
+          onClick={() => removeArrayItem(field, sectionIndex, fieldIndex)}
           type="button"
         >
-          Add
+          Remove
         </ButtonContainer>
-      )
-    );
-  };
+      ) : null;
+    },
+    [removeArrayItem],
+  );
 
-  const removeFieldButton = (
-    field: IFormField,
-    sectionIndex: number,
-    fieldIndex: number,
-  ) => {
-    const length = sections[sectionIndex]?.fields[fieldIndex]?.props?.length;
-
-    return field.props?.array && length && length > 0 ? (
-      <ButtonContainer
-        onClick={() => removeArrayItem(field, sectionIndex, fieldIndex)}
-        type="button"
-      >
-        Remove
-      </ButtonContainer>
-    ) : null;
-  };
-
-  const getScopePath = (field: IFormField, index?: number) => {
+  const getScopePath = useCallback((field: IFormField, index?: number) => {
     if (field.props?.innerSection) {
       const path =
         field.props.innerSection.innerPath &&
         field.props?.innerSection.innerPath;
       return path;
     }
-  };
+  }, []);
 
-  const getSectionArrayInputs = (field: IFormField, sectionIndex?: number) => {
-    const fields = [];
+  const getSectionArrayInputs = useCallback(
+    (field: IFormField, sectionIndex?: number) => {
+      const fields = [];
 
-    if (field.props?.length) {
-      for (let i = 0; i < field.props.length; i++) {
-        fields.push(
-          <Scope path={`${getScopePath(field)}[${i}]`} key={String(i)}>
-            {getSectionInputs(field.props.innerSection, sectionIndex)}
-          </Scope>,
-        );
+      if (field.props?.length) {
+        for (let i = 0; i < field.props.length; i++) {
+          fields.push(
+            <Scope path={`${getScopePath(field)}[${i}]`} key={String(i)}>
+              {getSectionInputs(field.props.innerSection, sectionIndex)}
+            </Scope>,
+          );
+        }
       }
-    }
 
-    return fields;
-  };
+      return fields;
+    },
+    [],
+  );
 
   const getArrayInputs = (field: IFormField, section: ISection) => {
     const fields = [];
@@ -196,7 +194,7 @@ const Form: React.FC<any> = ({
     return fields;
   };
 
-  const unCapitalize = (string: string) => {
+  const unCapitalize = useCallback((string: string) => {
     if (string === 'BLSPublicKey') {
       return 'blsPublicKey';
     }
@@ -206,7 +204,7 @@ const Form: React.FC<any> = ({
     }
 
     return string.charAt(0).toLowerCase() + string.slice(1);
-  };
+  }, []);
 
   const getInputField = (field: IFormField, section: ISection) => {
     if (field.props?.array && field.props?.length) {
@@ -288,17 +286,17 @@ const Form: React.FC<any> = ({
 
       {sections.length > 0 ||
       contractName === 'UnjailContract' ||
+      contractName === 'WithdrawContract' ||
+      contractName === 'UnfreezeContract' ||
+      contractName === 'UndelegateContract' ||
+      contractName === 'SetITOPricesContract' ||
       contractName === 'UpdateAccountPermissionContract' ? (
         <>
           <AdvancedOptsContainer
             onClick={() => setShowAdvancedOpts(!showAdvancedOpts)}
           >
             <span>Advanced Options</span>
-            {showAdvancedOpts ? (
-              <IoIosArrowUp color={theme.input.border.dark} />
-            ) : (
-              <IoIosArrowDown color={theme.input.border.dark} />
-            )}
+            {showAdvancedOpts ? <ArrowUpIcon /> : <ArrowDownIcon />}
           </AdvancedOptsContainer>
 
           {showAdvancedOpts ? (
@@ -308,7 +306,7 @@ const Form: React.FC<any> = ({
               isMultisig={isMultisig}
             />
           ) : null}
-          <ButtonContainer submit type="submit">
+          <ButtonContainer submit={!loading} type="submit" disabled={loading}>
             Create Transaction
           </ButtonContainer>
         </>

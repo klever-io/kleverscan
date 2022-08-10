@@ -1,15 +1,15 @@
 import {
   Contract,
-  EnumClaimType,
-  EnumICOStatus,
-  EnumBuyType,
-  EnumMarketType,
   EnumAssetType,
-  IDataCards,
-  IAsset,
+  EnumBuyType,
+  EnumClaimType,
+  EnumITOStatus,
+  EnumMarketType,
   IAccountAsset,
-  ITransaction,
+  IAsset,
+  IDataCards,
   IHomeTransactions,
+  ITransaction,
 } from '../../types';
 
 export const CoinTest = [
@@ -206,15 +206,15 @@ export const mockedTxContractComponents = {
     },
   },
   configIcoContract: {
-    type: Contract.ConfigICO,
+    type: Contract.ConfigITO,
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
     parameter: {
       assetId: 'KLV',
-      status: EnumICOStatus.DefaultICO,
+      status: EnumITOStatus.DefaultITO,
     },
   },
   setIcoPricesContract: {
-    type: Contract.SetICOPrices,
+    type: Contract.SetITOPrices,
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
     parameter: {
       assetId: 'KLV',
@@ -291,6 +291,35 @@ export const mockedTxContractComponents = {
   },
 };
 
+const assetsData = {
+  klv: {
+    prices: {
+      todaysPrice: null,
+      yesterdayPrice: null,
+      variation: null,
+    },
+    staking: {
+      totalStaking: null,
+      dayBeforeTotalStaking: null,
+    },
+    volume: null,
+    circulatingSupply: null,
+  },
+  kfi: {
+    prices: {
+      todaysPrice: null,
+      yesterdayPrice: null,
+      variation: null,
+    },
+    staking: {
+      totalStaking: null,
+      dayBeforeTotalStaking: null,
+    },
+    volume: null,
+    circulatingSupply: null,
+  },
+};
+
 export const mockedHomeDataCards: IDataCards = {
   totalAccounts: 100,
   totalTransactions: 20000,
@@ -300,6 +329,34 @@ export const mockedHomeDataCards: IDataCards = {
     epochFinishSlot: 200,
     epochLoadPercent: 30,
     remainingTime: 'two days',
+  },
+  assetsData: {
+    klv: {
+      prices: {
+        todaysPrice: null,
+        yesterdayPrice: null,
+        variation: null,
+      },
+      staking: {
+        totalStaking: 10000000000000,
+        dayBeforeTotalStaking: 5000000000000,
+      },
+      volume: null,
+      circulatingSupply: null,
+    },
+    kfi: {
+      prices: {
+        todaysPrice: null,
+        yesterdayPrice: null,
+        variation: null,
+      },
+      staking: {
+        totalStaking: 10000000000000,
+        dayBeforeTotalStaking: 5000000000000,
+      },
+      volume: null,
+      circulatingSupply: null,
+    },
   },
   coinsData: [
     {
@@ -410,6 +467,7 @@ export const klvAsset: IAsset = {
   mintedValue: 0,
   issueDate: 0,
   burnedValue: 0,
+  verified: false,
   properties: {
     canAddRoles: true,
     canBurn: true,

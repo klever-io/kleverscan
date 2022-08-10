@@ -1,47 +1,41 @@
-import React, { useEffect, useState } from 'react';
-
-import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-
-import { format, fromUnixTime } from 'date-fns';
-
-import {
-  Card,
-  CardContainer,
-  Container,
-  Header,
-  Input,
-  TableContainer,
-  Title,
-  EffectsContainer,
-  ToggleButtonContainer,
-  ToggleButton,
-  TableHeader,
-  UpdateContainer,
-} from '@/views/blocks';
-
+import { ArrowLeft } from '@/assets/icons';
+import { Blocks as Icon } from '@/assets/title-icons';
+import Pagination from '@/components/Pagination';
+import { PaginationContainer } from '@/components/Pagination/styles';
 import Table, { ITable } from '@/components/Table';
 import { Row } from '@/components/Table/styles';
-
-import { IBlock, IPagination, IResponse } from '@/types/index';
 import api from '@/services/api';
+import { IBlock, IPagination, IResponse } from '@/types/index';
+import { useDidUpdateEffect } from '@/utils/hooks';
 import {
   formatAmount,
   getAge,
   parseAddress,
   toLocaleFixed,
 } from '@/utils/index';
-
-import { ArrowLeft } from '@/assets/icons';
-import { Blocks as Icon } from '@/assets/title-icons';
-import { PaginationContainer } from '@/components/Pagination/styles';
-import Pagination from '@/components/Pagination';
-import { useDidUpdateEffect } from '@/utils/hooks';
 import {
-  storageUpdateBlocks,
   getStorageUpdateConfig,
+  storageUpdateBlocks,
 } from '@/utils/localStorage/localStorageData';
+import {
+  Card,
+  CardContainer,
+  Container,
+  EffectsContainer,
+  Header,
+  Input,
+  TableContainer,
+  TableHeader,
+  Title,
+  ToggleButton,
+  ToggleButtonContainer,
+  UpdateContainer,
+} from '@/views/blocks';
+import { format, fromUnixTime } from 'date-fns';
+import { GetServerSideProps } from 'next';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { useCallback, useEffect, useState } from 'react';
 
 interface IBlockStats {
   totalBlocks: number;
@@ -87,13 +81,13 @@ const Blocks: React.FC<IBlocks> = ({
   const precision = 6; // default KLV precision
   const blocksWatcherInterval = 4 * 1000; // 4 secs
 
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [blocks, setBlocks] = useState(defaultBlocks);
   const [statistics, setStatistics] = useState(defaultStatistics);
   const [loading, setLoading] = useState(false);
   const [autoUpdate, setAutoUpdate] = useState(false);
 
-  const updateBlocks = async () => {
+  const updateBlocks = useCallback(async () => {
     const newState = storageUpdateBlocks(autoUpdate);
     setAutoUpdate(newState);
     const response: IBlockResponse = await api.get({
@@ -102,7 +96,7 @@ const Blocks: React.FC<IBlocks> = ({
     if (!response.error) {
       setBlocks(response.data.blocks);
     }
-  };
+  }, [page, autoUpdate]);
 
   useEffect(() => {
     const updateBlocksConfig = getStorageUpdateConfig();
@@ -225,10 +219,10 @@ const Blocks: React.FC<IBlocks> = ({
       headers: ['Reward Yesterday', 'Cumulative Revenue'],
       values: [
         `${formatAmount(
-          (statistics?.yesterday?.totalBlockRewards) / 10 ** precision,
+          statistics?.yesterday?.totalBlockRewards / 10 ** precision,
         )} KLV`,
         `${formatAmount(
-          (statistics?.total?.totalBlockRewards) / 10 ** precision,
+          statistics?.total?.totalBlockRewards / 10 ** precision,
         )} KLV`,
       ],
     },
@@ -315,7 +309,9 @@ const Blocks: React.FC<IBlocks> = ({
           <Link href={`/block/${nonce}`}>{String(nonce)}</Link>
         </span>
         <span>{size.toLocaleString()} Bytes</span>
-        <Link href={`/validator/${producerName}`}>{parseAddress(producerName, 14)}</Link>
+        <Link href={`/validator/${producerName}`}>
+          {parseAddress(producerName, 14)}
+        </Link>
         <span>
           <small>
             {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}

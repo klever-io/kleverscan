@@ -1,4 +1,4 @@
-import React, { KeyboardEvent, useRef, useEffect } from 'react';
+import React, { KeyboardEvent, useEffect, useRef } from 'react';
 import { Container } from './styles';
 
 interface Input extends React.InputHTMLAttributes<any> {

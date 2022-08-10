@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
-
 import { ArrowLeft, ArrowRight } from '@/assets/pagination';
+import React, { useEffect, useState } from 'react';
 import calculate from './paginate';
-import { ArrowContainer, Container, ItemContainer } from './styles';
 import PaginationModal from './PaginationModal/PaginationModal';
+import { ArrowContainer, Container, ItemContainer } from './styles';
 
 interface IPagination {
   count: number;
@@ -12,21 +11,21 @@ interface IPagination {
 }
 
 const Pagination: React.FC<IPagination> = ({ count, page, onPaginate }) => {
-  count += 1;
+  // count += 1;
   count >= 1000 ? (count = 1000) : count;
   const cells = calculate(count, page);
 
   const [showModalLeft, setShowModalLeft] = useState(false);
   const [showModalRight, setShowModalRight] = useState(false);
 
-useEffect(() => {
-  window.scrollTo(0, 0)
-}, [page])
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [page]);
 
   const prevProps = {
-    active: page > 0,
+    active: page > 1,
     onClick: () => {
-      if (page > 0) {
+      if (page > 1) {
         onPaginate(page - 1);
       }
     },
@@ -115,8 +114,8 @@ useEffect(() => {
         return (
           <ItemContainer
             key={value}
-            active={value === page + 1}
-            onClick={() => onPaginate(value - 1)}
+            active={value === page}
+            onClick={() => onPaginate(value)}
           >
             <span>{value}</span>
           </ItemContainer>

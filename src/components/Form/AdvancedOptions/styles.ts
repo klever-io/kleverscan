@@ -10,7 +10,7 @@ export const Container = styled.div<IContainer>`
   width: 90%;
   max-width: 1200px;
   padding: 2rem 0;
-  opacity: ${props => props.loading ? 0.4 : 1};
+  opacity: ${props => (props.loading ? 0.4 : 1)};
 `;
 
 export const ExtraOptionContainer = styled.div`
@@ -71,4 +71,5 @@ export const ToggleContainer = styled.div`
   padding: 0.75rem 2rem;
   gap: 1rem;
   color: ${props => props.theme.input.text};
+  user-select: none;
 `;

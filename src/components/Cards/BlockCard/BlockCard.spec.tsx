@@ -1,17 +1,16 @@
+import { screen } from '@testing-library/react';
+import { fromUnixTime } from 'date-fns';
 import React from 'react';
-
 import theme from '../../../styles/theme';
-import {screen} from '@testing-library/react'
-
-import BlockCard from './';
 import { renderWithTheme } from '../../../test/utils';
 import { getAge } from '../../../utils';
-import { fromUnixTime } from 'date-fns';
+import BlockCard from './';
 
 describe('Component: BlockCard', () => {
   const textBlockCard: string[] = ['Transactions', 'Miner', 'Burned', 'Reward'];
   const timestamp = 1652813596000;
-  const hash = '110f313d0abe5a559c12e7c695037d930d5d5a05389fe17901ed03058d36b79a';
+  const hash =
+    '110f313d0abe5a559c12e7c695037d930d5d5a05389fe17901ed03058d36b79a';
   const txBurnedFees = 1500000;
   const precision = 6;
   const nonce = 262522;
@@ -29,16 +28,18 @@ describe('Component: BlockCard', () => {
         blockRewards={blockRewards}
         txBurnedFees={txBurnedFees}
         precision={precision}
-      />
+      />,
     );
 
-    expect(screen.getByText(getAge(fromUnixTime(timestamp / 1000)) + ' ago')).toBeInTheDocument();
+    expect(
+      screen.getByText(getAge(fromUnixTime(timestamp / 1000)) + ' ago'),
+    ).toBeInTheDocument();
     expect(screen.getByText(hash)).toBeInTheDocument();
     expect(screen.getByText(`#${nonce}`)).toBeInTheDocument();
 
     textBlockCard.forEach((item: string) => {
       expect(screen.getByText(item)).toBeInTheDocument();
-    })
+    });
   });
 
   it('Should have the correct styles for background-color, border-radius, cursor and padding', () => {
@@ -52,7 +53,7 @@ describe('Component: BlockCard', () => {
         blockRewards={blockRewards}
         txBurnedFees={txBurnedFees}
         precision={precision}
-      />
+      />,
     );
 
     const style = {
@@ -74,13 +75,12 @@ describe('Component: BlockCard', () => {
         timestamp={timestamp}
         txCount={txCount}
         precision={precision}
-      />
+      />,
     );
-    
+
     const burned = screen.getByText(/Burned/i).nextSibling;
     const reward = screen.getByText(/Reward/i).nextSibling;
     expect(burned).toHaveTextContent('0');
     expect(reward).toHaveTextContent('0');
-
   });
-}); 
+});

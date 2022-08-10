@@ -1,7 +1,7 @@
-import React from 'react';
-
+import React, { useCallback } from 'react';
 import { IconType } from 'react-icons';
-
+import { BsQuestionCircleFill } from 'react-icons/bs';
+import Input from '../../Inputt';
 import {
   Container,
   EmptyRow,
@@ -12,10 +12,6 @@ import {
   PaginationInfo,
   TableContainer,
 } from './styles';
-
-import Input from '../../Inputt';
-
-import { BsQuestionCircleFill } from 'react-icons/bs';
 
 export interface IList {
   title: string;
@@ -53,8 +49,10 @@ const List: React.FC<IList> = ({
     );
   };
 
-  const getTableTitles = () =>
-    headers.map((header, index) => <th key={String(index)}>{header}</th>);
+  const getTableTitles = useCallback(
+    () => headers.map((header, index) => <th key={String(index)}>{header}</th>),
+    [headers],
+  );
 
   const EmptyBody: React.FC = () => {
     return (

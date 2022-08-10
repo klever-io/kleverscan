@@ -1,8 +1,7 @@
+import { IChartData } from '@/configs/home';
+import { Theme } from '@/styles/styles';
 import React from 'react';
 import { withTheme } from 'styled-components';
-import { IChartData } from '@/configs/home';
-
-import { Theme } from '@/styles/styles';
 
 interface IMapSvg {
   chartData: IChartData[] | string[];

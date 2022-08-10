@@ -1,16 +1,13 @@
 import React from 'react';
-
-import { withTheme } from 'styled-components';
-
 import {
-  BarChart,
   Bar,
-  YAxis,
+  BarChart,
   CartesianGrid,
-  XAxis,
   ResponsiveContainer,
+  XAxis,
+  YAxis,
 } from 'recharts';
-
+import { withTheme } from 'styled-components';
 import { Theme } from '../../../styles/styles';
 
 export interface IBarData {

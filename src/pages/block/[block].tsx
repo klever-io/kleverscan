@@ -1,37 +1,32 @@
-import React, { useState } from 'react';
-import { GetStaticProps } from 'next';
-import { useRouter } from 'next/router';
-
-import { format, fromUnixTime } from 'date-fns';
-
+import { ArrowLeft } from '@/assets/icons';
+import Copy from '@/components/Copy';
+import Pagination from '@/components/Pagination';
+import { PaginationContainer } from '@/components/Pagination/styles';
+import Tabs, { ITabs } from '@/components/Tabs';
+import Transactions from '@/components/Tabs/Transactions';
+import api from '@/services/api';
+import { useDidUpdateEffect } from '@/utils/hooks';
+import { toLocaleFixed } from '@/utils/index';
 import {
   AssetTitle,
   CardContainer,
   CardContent,
   CardHeader,
   CardHeaderItem,
+  CenteredRow,
+  CenteredRowSpan,
+  CommonSpan,
   Container,
   Header,
   Input,
   Row,
   Title,
-  CenteredRow,
-  CenteredRowSpan,
-  CommonSpan,
 } from '@/views/blocks/detail';
-
-import Tabs, { ITabs } from '@/components/Tabs';
-import Transactions from '@/components/Tabs/Transactions';
-import Copy from '@/components/Copy';
-import Pagination from '@/components/Pagination';
-import { PaginationContainer } from '@/components/Pagination/styles';
-
+import { format, fromUnixTime } from 'date-fns';
+import { GetStaticProps } from 'next';
+import { useRouter } from 'next/router';
+import React, { useState } from 'react';
 import { IBlock, IPagination, IResponse, ITransaction } from '../../types';
-import api from '@/services/api';
-import { toLocaleFixed } from '@/utils/index';
-
-import { ArrowLeft } from '@/assets/icons';
-import { useDidUpdateEffect } from '@/utils/hooks';
 
 interface IBlockPage {
   block: IBlock;
@@ -85,7 +80,7 @@ const Block: React.FC<IBlockPage> = ({
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
 
-  const [transactionPage, setTransactionPage] = useState(0);
+  const [transactionPage, setTransactionPage] = useState(1);
   const [transactions, setTransactions] = useState(defaultTransactions);
   const [loading, setLoading] = useState(false);
 

@@ -1,11 +1,8 @@
-import styled from 'styled-components';
-
 import { transparentize } from 'polished';
-
+import styled from 'styled-components';
 import { IFilterItem } from '../Filter';
-
-import widths from './widths';
 import filterWidths from './filters';
+import widths from './widths';
 
 interface IStatus {
   status: string;
@@ -131,7 +128,7 @@ export const Row = styled.div<ITableType>`
       }
 
       @media (max-width: 768px) {
-        left: 6rem;
+        left: 4rem;
       }
     }
   }

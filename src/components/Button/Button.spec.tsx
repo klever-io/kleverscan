@@ -1,16 +1,14 @@
-import React from 'react';
 import { screen } from '@testing-library/react';
-
+import React from 'react';
 import theme from '../../styles/theme';
-
-import Button from './';
 import { renderWithTheme } from '../../test/utils';
+import Button from './';
 
 describe('Component: Button', () => {
   it('Should render the button with the correct text', () => {
-    renderWithTheme(<Button>Click</Button>)
+    renderWithTheme(<Button>Click</Button>);
 
-    const button = screen.getByRole('button', {name: /Click/i});
+    const button = screen.getByRole('button', { name: /Click/i });
     expect(button).toBeInTheDocument();
   });
 
@@ -21,7 +19,7 @@ describe('Component: Button', () => {
       border: `1px solid ${theme.rose}`,
       borderRadius: '0.25rem',
       color: theme.white,
-      cursor: 'pointer'
+      cursor: 'pointer',
     };
 
     expect(container.firstChild).toHaveStyle(styles);
@@ -34,7 +32,7 @@ describe('Component: Button', () => {
       backgroundColor: 'unset',
       borderRadius: '0.5rem',
     };
-    
+
     expect(container.firstChild).toHaveStyle(styles);
   });
-}); 
+});

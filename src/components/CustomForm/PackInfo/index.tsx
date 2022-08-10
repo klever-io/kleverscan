@@ -78,7 +78,7 @@ const PackInfoForm: React.FC = () => {
 
   const tooltipsMessages = {
     Amount:
-      'For NFTs: Amount sold; For token: Min amount for that price to be applied (with precision)',
+      'For NFTs: Amount sold; For token: Min amount for that price to be applied',
     Price: 'For NFTs: Price for that amount; For Tokens: Price of each token',
   };
 

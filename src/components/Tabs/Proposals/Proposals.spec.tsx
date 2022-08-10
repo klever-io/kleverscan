@@ -1,13 +1,12 @@
-import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-import { parseAddress } from '../../../utils/index';
+import React from 'react';
 import Proposals from '.';
-import { renderWithTheme } from '../../../test/utils';
-import { mockedProposalsList } from '../../../test/mocks/index';
 import { parseAllProposals } from '../../../pages/proposals';
 import theme from '../../../styles/theme';
+import { mockedProposalsList } from '../../../test/mocks/index';
+import { renderWithTheme } from '../../../test/utils';
+import { parseAddress } from '../../../utils/index';
 
 jest.mock('next/router', () => ({
   useRouter() {

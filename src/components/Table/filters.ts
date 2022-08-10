@@ -1,6 +1,5 @@
-import { css } from 'styled-components';
-
 import { Contract } from '@/types/index';
+import { css } from 'styled-components';
 
 const defaultChild = 8;
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import Area from './Area';
+import DoubleLinear from './DoubleLinear';
 import Horizontal from './Horizontal';
 import Linear from './Linear';
-import DoubleLinear from './DoubleLinear';
 import Scatter from './Scatter';
 
 export enum ChartType {

@@ -1,24 +1,22 @@
-import React from 'react';
-
-import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
-
-import dynamic from 'next/dynamic';
-
+import geoData from '@/assets/countries.geo.json';
+import { ArrowLeft } from '@/assets/icons';
+import { Nodes as Icon } from '@/assets/title-icons';
+import NodeCards from '@/components/Cards/NodeCards';
+import Chart, { ChartType } from '@/components/Chart';
+import { coinMockedData } from '@/configs/home';
+import api from '@/services/api';
+import { getCountryISO3, ISO2 } from '@/utils/country';
+import { Container, Header, Title } from '@/views/blocks';
 import {
   ChartBody,
   ChartContainer,
   ChartHeader,
   MapContainer,
 } from '@/views/nodes';
-
-import { Container, Header, Title } from '@/views/blocks';
-
-import Chart, { ChartType } from '@/components/Chart';
-const Map = dynamic(() => import('@/components/Map/index'), { ssr: false });
-
-import NodeCards from '@/components/Cards/NodeCards';
-
+import { GetServerSideProps } from 'next';
+import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
+import React, { useCallback } from 'react';
 import {
   ICountriesGeoData,
   ICountryNode,
@@ -26,13 +24,7 @@ import {
   IPeerData,
 } from '../../types';
 
-import { ArrowLeft } from '@/assets/icons';
-import { Nodes as Icon } from '@/assets/title-icons';
-import { coinMockedData } from '@/configs/home';
-
-import { getCountryISO3, ISO2 } from '@/utils/country';
-import geoData from '@/assets/countries.geo.json';
-import api from '@/services/api';
+const Map = dynamic(() => import('@/components/Map/index'), { ssr: false });
 
 interface INodePage {
   nodes: ICountryNode[];
@@ -57,7 +49,7 @@ interface IPeerResponse {
 const Nodes: React.FC<INodePage> = ({ nodes, cardData }) => {
   const router = useRouter();
 
-  const rankingChartData = () => {
+  const rankingChartData = useCallback(() => {
     const maxItems = 6;
     let data = [...nodes];
 
@@ -71,7 +63,7 @@ const Nodes: React.FC<INodePage> = ({ nodes, cardData }) => {
     }
 
     return data.map(item => ({ name: item.country, value: item.nodes.length }));
-  };
+  }, [nodes]);
 
   return (
     <Container>

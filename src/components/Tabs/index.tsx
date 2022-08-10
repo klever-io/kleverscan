@@ -1,15 +1,11 @@
-import { ArrowDown } from '@/assets/icons';
 import React, { useState } from 'react';
-import Button from '../Button';
 import DateFilter, { IDateFilter } from '../DateFilter';
-import Filter, { IFilter } from '../Filter';
-
 import {
   Container,
-  ItemContainer,
-  Indicator,
-  TabContainer,
   FilterContent,
+  Indicator,
+  ItemContainer,
+  TabContainer,
   TabContent,
 } from './styles';
 

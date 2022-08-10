@@ -14,10 +14,15 @@ interface IQrCodeModal {
   onClose: React.SetStateAction<any>;
 }
 
-const QrCodeModal: React.FC<IQrCodeModal> = ({ value, show, setShowModal, onClose }) => {
+const QrCodeModal: React.FC<IQrCodeModal> = ({
+  value,
+  show,
+  setShowModal,
+  onClose,
+}) => {
   return show ? (
     <ModalBackdrop onClick={onClose}>
-      <ModalContainer onClick={(e) => e.stopPropagation()}>
+      <ModalContainer onClick={e => e.stopPropagation()}>
         <ModalHeader>
           <ModalXButton onClick={setShowModal}>x</ModalXButton>
         </ModalHeader>
@@ -28,7 +33,7 @@ const QrCodeModal: React.FC<IQrCodeModal> = ({ value, show, setShowModal, onClos
           <ModalXButton></ModalXButton>
         </ModalHeader>
       </ModalContainer>
-     </ModalBackdrop>
+    </ModalBackdrop>
   ) : (
     <></>
   );

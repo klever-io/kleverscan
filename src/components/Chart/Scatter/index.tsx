@@ -1,16 +1,14 @@
 import React from 'react';
-
-import { withTheme } from 'styled-components';
 import {
+  ResponsiveContainer,
   Scatter,
   ScatterChart,
-  ResponsiveContainer,
   XAxis,
   YAxis,
 } from 'recharts';
-
-import { Theme } from '../../../styles/styles';
 import { Coordinate } from 'recharts/types/util/types';
+import { withTheme } from 'styled-components';
+import { Theme } from '../../../styles/styles';
 
 interface IChart {
   data: any[];

@@ -1,15 +1,15 @@
+import { Service } from '@/types/index';
 import api, {
+  getCached,
   getHost,
   getProps,
   Method,
-  withoutBody,
   withBody,
+  withoutBody,
   withText,
-  getCached,
   withTimeout,
 } from '../api';
 import mocks from './mocks';
-import { Service } from '@/types/index';
 
 describe('test api functions', () => {
   const defaultProps = {
@@ -123,7 +123,9 @@ describe('test api functions', () => {
       });
 
       test('failed fetch with address route', async () => {
-        (fetch as jest.Mock).mockImplementationOnce(() => Promise.reject('generic error'));
+        (fetch as jest.Mock).mockImplementationOnce(() =>
+          Promise.reject('generic error'),
+        );
         const res = await withoutBody(props1, Method.GET);
         expect(res).toStrictEqual({
           data: null,
@@ -136,7 +138,7 @@ describe('test api functions', () => {
         (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: false,
-            json: () => Promise.resolve({error: 'Internal Server Error'}),
+            json: () => Promise.resolve({ error: 'Internal Server Error' }),
             headers: Headers,
             redirected: false,
             status: 500,
@@ -176,7 +178,9 @@ describe('test api functions', () => {
       });
 
       test('failed fetch with statistics route', async () => {
-        (fetch as jest.Mock).mockImplementationOnce(() => Promise.reject('generic error'));
+        (fetch as jest.Mock).mockImplementationOnce(() =>
+          Promise.reject('generic error'),
+        );
         const res = await withoutBody(props2, Method.GET);
         expect(res).toStrictEqual({
           data: null,
@@ -189,7 +193,7 @@ describe('test api functions', () => {
         (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: false,
-            json: () => Promise.resolve({error: 'Internal Server Error'}),
+            json: () => Promise.resolve({ error: 'Internal Server Error' }),
             headers: Headers,
             redirected: false,
             status: 500,
@@ -233,7 +237,9 @@ describe('test api functions', () => {
       });
 
       test('failed fetch in prices route', async () => {
-        (fetch as jest.Mock).mockImplementationOnce(() => Promise.reject('generic error'));
+        (fetch as jest.Mock).mockImplementationOnce(() =>
+          Promise.reject('generic error'),
+        );
         const res = await withBody(propsBody, Method.POST);
         expect(res).toStrictEqual({
           data: null,
@@ -246,7 +252,7 @@ describe('test api functions', () => {
         (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: false,
-            json: () => Promise.resolve({error: 'Internal Server Error'}),
+            json: () => Promise.resolve({ error: 'Internal Server Error' }),
             headers: Headers,
             redirected: false,
             status: 500,
@@ -290,7 +296,9 @@ describe('test api functions', () => {
       });
 
       test('failed fetch with metrics route', async () => {
-        (fetch as jest.Mock).mockImplementationOnce(() => Promise.reject('generic error'));
+        (fetch as jest.Mock).mockImplementationOnce(() =>
+          Promise.reject('generic error'),
+        );
         const res = await withText(props3, Method.GET);
         expect(res).toEqual({
           data: null,
@@ -303,7 +311,7 @@ describe('test api functions', () => {
         (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: false,
-            json: () => Promise.resolve({error: 'Internal Server Error'}),
+            json: () => Promise.resolve({ error: 'Internal Server Error' }),
             headers: Headers,
             redirected: false,
             status: 500,
@@ -358,7 +366,7 @@ describe('test api functions', () => {
         (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.resolve({
             ok: false,
-            json: () => Promise.resolve({error: 'Internal Server Error'}),
+            json: () => Promise.resolve({ error: 'Internal Server Error' }),
             headers: Headers,
             redirected: false,
             status: 500,

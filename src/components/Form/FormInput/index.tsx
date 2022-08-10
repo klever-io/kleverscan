@@ -1,7 +1,7 @@
 import { useField } from '@unform/core';
 import { description } from 'configs/footer';
-import { useEffect, useRef, useState } from 'react';
-import Select from './Select';
+import dynamic from 'next/dynamic';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Container,
   InfoIcon,
@@ -13,6 +13,11 @@ import {
   ToggleContainer,
   TooltipContainer,
 } from './styles';
+
+const Select = dynamic(() => import('./Select'), {
+  ssr: false,
+  loading: () => null,
+});
 
 export interface IFormInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -47,7 +52,7 @@ const FormInput: React.FC<IFormInputProps> = ({
   const areaRef = useRef<HTMLTextAreaElement>(null);
   const { fieldName, registerField, error } = useField(name);
 
-  const getInitialValue = () => {
+  const getInitialValue = useCallback(() => {
     switch (type) {
       case 'checkbox':
         if (defaultValue === undefined) {
@@ -60,7 +65,7 @@ const FormInput: React.FC<IFormInputProps> = ({
       default:
         return '';
     }
-  };
+  }, [type, defaultValue, bool]);
 
   const [value, setValue] = useState(getInitialValue());
 

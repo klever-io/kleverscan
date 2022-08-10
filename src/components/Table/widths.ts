@@ -38,7 +38,7 @@ const transactions = css`
     width: 7rem;
   }
   &:nth-child(10) {
-    width: 3rem;
+    width: 7rem;
   }
 `;
 
@@ -121,7 +121,7 @@ const assetsPage = css`
   }
 
   &:nth-child(4) {
-    width: 16rem;
+    width: 14rem;
   }
 
   &:nth-child(5) {
@@ -140,7 +140,10 @@ const assetsPage = css`
     width: 10rem;
   }
   &:nth-child(9) {
-    width: 5rem;
+    width: 8rem;
+  }
+  &:nth-child(10) {
+    width: 4rem;
   }
 `;
 
@@ -179,7 +182,7 @@ const buckets = css`
     width: 5rem;
   }
   &:nth-child(4) {
-    width: 20rem;
+    width: 11rem;
   }
   &:nth-child(5) {
     width: 10rem;

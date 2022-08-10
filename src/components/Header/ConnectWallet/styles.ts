@@ -1,10 +1,7 @@
-import styled from 'styled-components';
-
-import { IoIosLogOut } from 'react-icons/io';
-
 import { transparentize } from 'polished';
-
 import { BiTransfer } from 'react-icons/bi';
+import { IoIosLogOut } from 'react-icons/io';
+import styled from 'styled-components';
 
 export const ConnectButton = styled.div`
   background-color: ${props => props.theme.navbar.text};

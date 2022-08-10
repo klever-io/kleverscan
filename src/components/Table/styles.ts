@@ -1,11 +1,8 @@
-import styled from 'styled-components';
-
 import { transparentize } from 'polished';
-
+import styled from 'styled-components';
 import { IFilterItem } from '../Filter';
-
-import widths from './widths';
 import filterWidths from './filters';
+import widths from './widths';
 
 interface IStatus {
   status: string;

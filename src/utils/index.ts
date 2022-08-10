@@ -1,4 +1,12 @@
-import { IAsset, IParsedMetrics, IEpochInfo, IContractOption } from '../types';
+import api from '@/services/api';
+import { toast } from 'react-toastify';
+import {
+  IAsset,
+  IContractOption,
+  IEpochInfo,
+  IFormData,
+  IParsedMetrics,
+} from '../types';
 
 export const breakText = (text: string, limit: number): string => {
   return text.length > limit ? `${text.substring(0, limit)}...` : text;
@@ -180,7 +188,7 @@ export const addCommasToNumber = (numb: number): string => {
   return numb.toLocaleString();
 };
 
-export const parseData = (data: any) => {
+export const parseData = (data: IFormData): IFormData => {
   const dataEntries = Object.entries(data);
 
   dataEntries.forEach(([key, value]) => {
@@ -215,7 +223,7 @@ export const parseData = (data: any) => {
   return data;
 };
 
-export const formatLabel = (str: string) => {
+export const formatLabel = (str: string): string => {
   switch (str) {
     case 'assetID':
       return 'AssetID';
@@ -443,7 +451,6 @@ export const doIf = async (
   timeoutMS = 5000,
   intervalMS = 100,
 ): Promise<void> => {
-  console.log('here');
   let interval: any;
 
   const IntervalPromise = new Promise(resolve => {
@@ -451,7 +458,6 @@ export const doIf = async (
       if (condition()) {
         resolve(
           (() => {
-            console.log('Interval');
             success();
             clearInterval(interval);
             clearTimeout(timeout);
@@ -467,7 +473,6 @@ export const doIf = async (
     timeout = setTimeout(() => {
       resolve(
         (() => {
-          console.log('Timeout');
           failure();
           clearInterval(interval);
         })(),
@@ -476,4 +481,19 @@ export const doIf = async (
   });
 
   await Promise.race([IntervalPromise, TimeoutPromise]);
+};
+
+export const getPrecision = async (
+  asset: string,
+): Promise<number | undefined> => {
+  const response = await api.get({ route: `assets/${asset}` });
+
+  if (response.error) {
+    const messageError =
+      response.error.charAt(0).toUpperCase() + response.error.slice(1);
+    toast.error(messageError);
+    return;
+  }
+
+  return 10 ** response.data.asset.precision;
 };

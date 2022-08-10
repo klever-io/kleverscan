@@ -1,30 +1,25 @@
-import React, { useEffect, useState } from 'react';
-
-import Link from 'next/link';
+import { INavbarItem, navbarItems } from '@/configs/navbar';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
-
+import React, { useEffect, useState } from 'react';
+import ConnectWallet from './ConnectWallet';
 import {
   Container,
   DesktopContainer,
+  DropdownContainer,
+  DropdownIcon,
+  DropdownItem,
   DropdownMenu,
-  Input,
+  IconsMenu,
   Item,
   Logo,
   MenuIcon,
-  IconsMenu,
   MobileBackground,
   MobileContainer,
   MobileContent,
   MobileItem,
-  DropdownIcon,
-  DropdownContainer,
-  DropdownItem,
 } from './styles';
-
-import { INavbarItem, navbarItems } from '@/configs/navbar';
-
-import ConnectWallet from './ConnectWallet';
 
 interface IDropdownPages {
   page: INavbarItem;

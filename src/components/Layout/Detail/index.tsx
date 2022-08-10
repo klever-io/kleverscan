@@ -1,13 +1,10 @@
-import React from 'react';
-
-import { useRouter } from 'next/router';
-
-import { Container, Header, Input, TableContainer, Title } from './styles';
-import Table, { ITable } from '@/components/Table';
+import { ArrowLeft } from '@/assets/icons';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
-
-import { ArrowLeft } from '@/assets/icons';
+import Table, { ITable } from '@/components/Table';
+import { useRouter } from 'next/router';
+import React from 'react';
+import { Container, Header, Input, TableContainer, Title } from './styles';
 
 interface IDetail {
   title: string;
@@ -48,7 +45,7 @@ const Detail: React.FC<IDetail> = ({
         {cards && <h3>List of {title.toLowerCase()}</h3>}
         {children}
       </TableContainer>
-    <Table {...tableProps}/>
+      <Table {...tableProps} />
 
       <PaginationContainer>
         <Pagination

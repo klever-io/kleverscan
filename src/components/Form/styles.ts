@@ -1,6 +1,7 @@
-import styled, { css } from 'styled-components';
-import { lighten, transparentize } from 'polished';
 import { Form } from '@unform/web';
+import { lighten } from 'polished';
+import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
+import styled, { css } from 'styled-components';
 
 interface IButton {
   submit?: boolean;
@@ -42,8 +43,8 @@ export const FormSection = styled.div<{ inner?: boolean }>`
     flex-direction: column;
     gap: 2rem;
 
-    padding: 0.5rem;
-    padding-top: 5rem;
+    padding: 1.5rem;
+    padding-top: 3.3rem;
 
     ${props =>
       props.inner &&
@@ -62,6 +63,7 @@ export const SectionTitle = styled.div`
   position: absolute;
   top: 1rem;
   left: 1rem;
+  user-select: none;
 `;
 
 export const TooltipSpace = styled.div`
@@ -88,8 +90,13 @@ export const ButtonContainer = styled.button<IButton>`
   margin-top: ${props => (props.submit ? 1.7 : 0)}rem;
   cursor: pointer;
 
+  border: 0.2px solid ${({ theme }) => theme.input.border};
+  box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.6, '#000')};
+
+  user-select: none;
+
   @media (max-width: 768px) {
-    width: 45%;    
+    width: 45%;
   }
 `;
 
@@ -101,6 +108,15 @@ export const AdvancedOptsContainer = styled.div`
   margin-top: 1rem;
   span {
     color: ${({ theme }) => theme.input.border.dark};
-    margin-right: .5rem;
+    margin-right: 0.5rem;
+    user-select: none;
   }
+`;
+
+export const ArrowUpIcon = styled(IoIosArrowUp)`
+  color: ${({ theme }) => theme.input.border.dark};
+`;
+
+export const ArrowDownIcon = styled(IoIosArrowDown)`
+  color: ${({ theme }) => theme.input.border.dark};
 `;

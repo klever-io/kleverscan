@@ -1,4 +1,4 @@
-import { IResponse, IPagination } from '@/types/index';
+import { IPagination, IResponse } from '@/types/index';
 
 export interface IProposal {
   proposalId: number;
@@ -31,11 +31,11 @@ export interface IParsedProposal extends IProposal {
 }
 
 export interface IVotingPowers {
-  [address: number]: number
+  [address: number]: number;
 }
 
 export interface IVoters {
-  [address: string]: IVote
+  [address: string]: IVote;
 }
 
 export interface IVote {
@@ -61,7 +61,7 @@ export interface INetworkParams {
 export interface INetworkParam {
   number: number;
   parameter: string;
-  currentValue: string;
+  currentValue: number;
 }
 
 export interface IProposals {

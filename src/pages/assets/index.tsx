@@ -1,26 +1,21 @@
-import React, { ReactNode, useState } from 'react';
-
-import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-
-import { Container, Header, Input, Title } from '@/views/assets';
-
-import Table, { ITable } from '@/components/Table';
-
-import { IAsset, IResponse, IPagination } from '@/types/index';
-import { formatAmount, parseHardCodedInfo } from '@/utils/index';
-import api from '@/services/api';
-
 import { ArrowLeft, Certified } from '@/assets/icons';
 import { Assets as Icon } from '@/assets/title-icons';
-import { PaginationContainer } from '@/components/Pagination/styles';
-import Pagination from '@/components/Pagination';
-import { LetterLogo, Logo } from '@/views/assets/index';
-import { useDidUpdateEffect } from '@/utils/hooks';
-import { Row } from '@/components/Table/styles';
-import { IoIosInfinite } from 'react-icons/io';
 import AssetLogo from '@/components/Logo/AssetLogo';
+import Pagination from '@/components/Pagination';
+import { PaginationContainer } from '@/components/Pagination/styles';
+import Table, { ITable } from '@/components/Table';
+import { Row } from '@/components/Table/styles';
+import api from '@/services/api';
+import { IAsset, IPagination, IResponse } from '@/types/index';
+import { useDidUpdateEffect } from '@/utils/hooks';
+import { formatAmount, parseHardCodedInfo } from '@/utils/index';
+import { Container, Header, Input, Title } from '@/views/assets';
+import { LetterLogo, Logo } from '@/views/assets/index';
+import { GetServerSideProps } from 'next';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { ReactNode, useCallback, useState } from 'react';
+import { IoIosInfinite } from 'react-icons/io';
 
 interface IAssetPage {
   assets: IAsset[];
@@ -49,7 +44,7 @@ const Assets: React.FC<IAssetPage> = ({
       setLoading(true);
 
       const response: IAssetResponse = await api.get({
-        route: `assets/kassets?page=${page}`,
+        route: `assets/kassets?hidden=false&page=${page}`,
       });
 
       if (!response.error) {
@@ -73,6 +68,7 @@ const Assets: React.FC<IAssetPage> = ({
     staking,
     circulatingSupply,
     precision,
+    verified,
   }) => {
     const renderMaxSupply = (): ReactNode => {
       return (
@@ -86,13 +82,11 @@ const Assets: React.FC<IAssetPage> = ({
       );
     };
 
-    const verifiedAssets = ['KLV', 'KFI', 'DVK-34ZH', 'LMT-KGIA', 'NVR-3NSO', 'KBRL-V309','KUSD-1EYY' ];
-
-    const isVerified = () => {
-      if(verifiedAssets.includes(assetId)) {
-        return <Certified className='isVerified'/>
+    const isVerified = useCallback(() => {
+      if (verified) {
+        return <Certified className="isVerified" />;
       }
-    };
+    }, []);
 
     return (
       <Row type="assetsPage">
@@ -128,7 +122,7 @@ const Assets: React.FC<IAssetPage> = ({
                 whiteSpace: 'nowrap',
               }}
             >
-             {name}
+              {name}
             </p>
           </a>
         </Link>
@@ -216,7 +210,9 @@ const Assets: React.FC<IAssetPage> = ({
 export const getServerSideProps: GetServerSideProps = async () => {
   const props: IAssetPage = { assets: [], pagination: {} as IPagination };
 
-  const assets: IAssetResponse = await api.get({ route: 'assets/kassets' });
+  const assets: IAssetResponse = await api.get({
+    route: 'assets/kassets?hidden=false',
+  });
   if (!assets.error) {
     props.assets = assets.data.assets;
     props.pagination = assets.pagination;
@@ -225,6 +221,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
   props.pagination = assets.pagination;
 
   props.assets = parseHardCodedInfo(props.assets);
+
+  console.log(props.assets[0]);
 
   return { props };
 };

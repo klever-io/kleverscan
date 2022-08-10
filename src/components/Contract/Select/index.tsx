@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import React, { useState } from 'react';
+import React, { useCallback } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
 import { components } from 'react-select';
 import { Container } from './styles';
@@ -28,19 +28,21 @@ const Select: React.FC<IFilter> = ({
   title,
   ...rest
 }) => {
-  const Placeholder = (props: any) => {
+  const Placeholder = useCallback((props: any) => {
     return <components.Placeholder {...props} />;
-  };
-  const CaretDownIcon = () => {
+  }, []);
+
+  const CaretDownIcon = useCallback(() => {
     return <IoIosArrowDown />;
-  };
-  const DropdownIndicator = (props: any) => {
+  }, []);
+
+  const DropdownIndicator = useCallback((props: any) => {
     return (
       <components.DropdownIndicator {...props}>
         <CaretDownIcon />
       </components.DropdownIndicator>
     );
-  };
+  }, []);
 
   const props = {
     classNamePrefix: 'react-select',

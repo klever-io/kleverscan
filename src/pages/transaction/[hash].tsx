@@ -1,12 +1,40 @@
-import React, { useState } from 'react';
-
-import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { format, fromUnixTime } from 'date-fns';
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import { xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
-
+import { ArrowLeft, Receive } from '@/assets/icons';
+import { getStatusIcon } from '@/assets/status';
+import { TransactionDetails as Icon } from '@/assets/title-icons';
+import Copy from '@/components/Copy';
+import QrCodeModal from '@/components/QrCodeModal';
+import { Status } from '@/components/Table/styles';
+import {
+  AssetTrigger,
+  Buy,
+  CancelMarketOrder,
+  Claim,
+  ConfigITO,
+  ConfigMarketplace,
+  CreateAsset,
+  CreateMarketplace,
+  CreateValidator,
+  Delegate,
+  Freeze,
+  Proposal,
+  Sell,
+  SetAccountName,
+  SetITOPrices,
+  Transfer,
+  Undelegate,
+  Unfreeze,
+  Unjail,
+  Vote,
+  Withdraw,
+} from '@/components/TransactionContractComponents';
+import api from '@/services/api';
+import { Contract, IAsset, IResponse, ITransaction } from '@/types/index';
+import {
+  capitalizeString,
+  hexToString,
+  isDataEmpty,
+  toLocaleFixed,
+} from '@/utils/index';
 import {
   CardContainer,
   CardContent,
@@ -14,63 +42,19 @@ import {
   CenteredRow,
   Container,
   Header,
+  Hr,
   Input,
   Row,
   Title,
 } from '@/views/transactions/detail';
-
-import { Status } from '@/components/Table/styles';
-
-import api from '@/services/api';
-import {
-  toLocaleFixed,
-  hexToString,
-  isDataEmpty,
-  capitalizeString,
-} from '@/utils/index';
-import {
-  IResponse,
-  ITransaction,
-  IAsset,
-  Contract,
-  ITransferContract,
-  ICreateAssetContract,
-  IContract,
-} from '@/types/index';
-
-import { ArrowLeft, Receive } from '@/assets/icons';
-import {
-  TransactionDetails as Icon,
-  TransactionDetails,
-} from '@/assets/title-icons';
-import { getStatusIcon } from '@/assets/status';
-
-import {
-  Transfer,
-  CreateAsset,
-  CreateValidator,
-  Freeze,
-  Unfreeze,
-  Withdraw,
-  Delegate,
-  Undelegate,
-  Claim,
-  Unjail,
-  AssetTrigger,
-  SetAccountName,
-  Proposal,
-  Vote,
-  ConfigICO,
-  SetICOPrices,
-  Buy,
-  Sell,
-  CancelMarketOrder,
-  CreateMarketplace,
-  ConfigMarketplace,
-} from '@/components/TransactionContractComponents';
-import Copy from '@/components/Copy';
-import QrCodeModal from '@/components/QrCodeModal';
 import { ReceiveBackground } from '@/views/validator';
+import { format, fromUnixTime } from 'date-fns';
+import { GetServerSideProps } from 'next';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { useState } from 'react';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 
 interface ITransactionResponse extends IResponse {
   data: {
@@ -86,8 +70,6 @@ interface IAssetResponse extends IResponse {
 
 interface ITransactionPage {
   transaction: ITransaction;
-  precision: number;
-  asset: IAsset;
 }
 
 const klvAsset: IAsset = {
@@ -128,7 +110,7 @@ const klvAsset: IAsset = {
 const Transaction: React.FC<ITransactionPage> = props => {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
-  const { transaction, asset } = props;
+  const { transaction } = props;
 
   const {
     hash,
@@ -147,90 +129,166 @@ const Transaction: React.FC<ITransactionPage> = props => {
   } = transaction;
 
   const StatusIcon = getStatusIcon(status);
-  const precision = 6; // default KLV precision
 
-  const getContractType = (contracts: IContract[]) => {
-    if (!contract) {
-      return 'Unkown';
-    }
+  const ContractComponent: React.FC<any> = ({ contracts }) => {
+    return (
+      <div>
+        {contracts.map((contract: any, index: number) => {
+          switch (contract.typeString) {
+            case Contract.Transfer:
+              return (
+                <>
+                  <Transfer {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
 
-    return contracts.length > 1
-      ? 'Multi contract'
-      : Object.values(Contract)[contracts[0].type];
-  };
-
-  const ContractComponent: React.FC = () => {
-    const contractType = getContractType(contract);
-    let emptyContract: IContract = {} as IContract;
-
-    if (contract) {
-      emptyContract = { ...contract[0] };
-    }
-
-    const parsedContract = { ...emptyContract, sender };
-
-    switch (contractType) {
-      case Contract.Transfer:
-        return (
-          <Transfer {...contract[0]} precision={precision} asset={asset} />
-        );
-      case Contract.CreateAsset:
-        return <CreateAsset {...parsedContract} receipts={receipts} />;
-      case Contract.CreateValidator:
-      case Contract.ValidatorConfig:
-        return (
-          <CreateValidator
-            {...parsedContract}
-            precision={precision}
-            receipts={receipts}
-          />
-        );
-      case Contract.Freeze:
-        return (
-          <Freeze
-            {...parsedContract}
-            precision={precision}
-            receipts={receipts}
-          />
-        );
-      case Contract.Unfreeze:
-        return <Unfreeze {...parsedContract} receipts={receipts} />;
-      case Contract.Delegate:
-        return <Delegate {...parsedContract} receipts={receipts} />;
-      case Contract.Undelegate:
-        return <Undelegate {...parsedContract} receipts={receipts} />;
-      case Contract.Withdraw:
-        return <Withdraw {...parsedContract} receipts={receipts} />;
-      case Contract.Claim:
-        return <Claim {...parsedContract} receipts={receipts} />;
-      case Contract.Unjail:
-        return <Unjail {...parsedContract} receipts={receipts} />;
-      case Contract.AssetTrigger:
-        return <AssetTrigger {...parsedContract} receipts={receipts} />;
-      case Contract.SetAccountName:
-        return <SetAccountName {...parsedContract} receipts={receipts} />;
-      case Contract.Proposal:
-        return <Proposal {...parsedContract} receipts={receipts} />;
-      case Contract.Vote:
-        return <Vote {...parsedContract} receipts={receipts} />;
-      case Contract.ConfigICO:
-        return <ConfigICO {...parsedContract} receipts={receipts} />;
-      case Contract.SetICOPrices:
-        return <SetICOPrices {...parsedContract} receipts={receipts} />;
-      case Contract.Buy:
-        return <Buy {...parsedContract} receipts={receipts} />;
-      case Contract.Sell:
-        return <Sell {...parsedContract} receipts={receipts} />;
-      case Contract.CancelMarketOrder:
-        return <CancelMarketOrder {...parsedContract} receipts={receipts} />;
-      case Contract.CreateMarketplace:
-        return <CreateMarketplace {...parsedContract} receipts={receipts} />;
-      case Contract.ConfigMarketplace:
-        return <ConfigMarketplace {...parsedContract} receipts={receipts} />;
-
-      default:
-        return <div />;
-    }
+            case Contract.CreateAsset:
+              return (
+                <>
+                  <CreateAsset {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
+            case Contract.CreateValidator:
+              return <CreateValidator {...contract} receipts={receipts} />;
+            case Contract.ValidatorConfig:
+            case Contract.Freeze:
+              return (
+                <>
+                  <Freeze
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
+            case Contract.Unfreeze:
+              return (
+                <>
+                  <Unfreeze {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
+            case Contract.Delegate:
+              return (
+                <>
+                  <Delegate {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
+            case Contract.Undelegate:
+              return (
+                <>
+                  <Undelegate {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
+            case Contract.Withdraw:
+              return (
+                <>
+                  <Withdraw {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
+            case Contract.Claim:
+              return (
+                <>
+                  <Claim {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
+            case Contract.Unjail:
+              return (
+                <>
+                  <Unjail {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
+            case Contract.AssetTrigger:
+              return (
+                <>
+                  <AssetTrigger {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
+            case Contract.SetAccountName:
+              return (
+                <>
+                  <SetAccountName {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
+            case Contract.Proposal:
+              return (
+                <>
+                  <Proposal {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
+            case Contract.Vote:
+              return (
+                <>
+                  <Vote {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
+            case Contract.ConfigITO:
+              return (
+                <>
+                  <ConfigITO {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
+            case Contract.SetITOPrices:
+              return (
+                <>
+                  <SetITOPrices {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
+            case Contract.Buy:
+              return (
+                <>
+                  <Buy {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
+            case Contract.Sell:
+              return (
+                <>
+                  <Sell {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
+            case Contract.CancelMarketOrder:
+              return (
+                <>
+                  <CancelMarketOrder {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
+            case Contract.CreateMarketplace:
+              return (
+                <>
+                  <CreateMarketplace {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
+            case Contract.ConfigMarketplace:
+              return (
+                <>
+                  <ConfigMarketplace {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </>
+              );
+            default:
+              return <div />;
+          }
+        })}
+      </div>
+    );
   };
 
   return (
@@ -320,10 +378,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
             </span>
             <span>
               <p>
-                {toLocaleFixed(
-                  status === 'success' ? kAppFee / 10 ** precision : 0,
-                  precision,
-                )}
+                {toLocaleFixed(status === 'success' ? kAppFee / 1000000 : 0, 6)}
               </p>
             </span>
           </Row>
@@ -332,7 +387,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
               <strong>Bandwidth Fee</strong>
             </span>
             <span>
-              <p>{toLocaleFixed(bandwidthFee / 10 ** precision, precision)}</p>
+              <p>{toLocaleFixed(bandwidthFee / 1000000, 6)}</p>
             </span>
           </Row>
           <Row>
@@ -377,17 +432,9 @@ const Transaction: React.FC<ITransactionPage> = props => {
         </CardContent>
       </CardContainer>
       <CardContainer>
-        <h3>Contract</h3>
+        <h3>Contracts</h3>
         <CardContent>
-          <Row>
-            <span>
-              <strong>Contract</strong>
-            </span>
-            <span>
-              <p>{getContractType(contract)}</p>
-            </span>
-          </Row>
-          <ContractComponent />
+          <ContractComponent contracts={contract} />
         </CardContent>
       </CardContainer>
       <CardContainer>
@@ -427,36 +474,8 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
     return redirectProps;
   }
 
-  let precision = 6; // Default KLV precision
-  let asset: IAsset = klvAsset;
-  let contractType = 'Unkown';
-  if (transaction.data.transaction.contract) {
-    contractType =
-      Object.values(Contract)[transaction.data.transaction.contract[0].type];
-  }
-
-  if (contractType === Contract.Transfer) {
-    const contract = transaction.data.transaction.contract[0]
-      .parameter as ITransferContract;
-    if (contract.assetId) {
-      const assetRes: IAssetResponse = await api.get({
-        route: `assets/${contract.assetId}`,
-      });
-      if (!assetRes.error) {
-        precision = assetRes.data.asset.precision;
-        asset = assetRes.data.asset;
-      }
-    }
-  } else if (contractType === Contract.CreateAsset) {
-    const contract = transaction.data.transaction.contract[0]
-      .parameter as ICreateAssetContract;
-
-    precision = contract.precision;
-  }
   const props: ITransactionPage = {
     transaction: transaction.data.transaction,
-    precision,
-    asset,
   };
 
   return { props };

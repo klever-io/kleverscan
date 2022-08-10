@@ -1,8 +1,7 @@
-import React, { Fragment } from 'react';
-import styled from 'styled-components';
-
 import { Copy as CopyIcon } from '@/assets/icons';
+import React, { Fragment } from 'react';
 import { toast } from 'react-toastify';
+import styled from 'styled-components';
 
 interface ICopyProps {
   data?: string;

@@ -16,7 +16,7 @@ const createMarketplaceContract = (): ISection[] => {
         label: 'Referral Address',
         props: {
           tooltip: 'Royalties receiving address',
-        }
+        },
       },
       {
         label: 'Referral Percentage',
@@ -30,6 +30,5 @@ const createMarketplaceContract = (): ISection[] => {
 
   return section;
 };
-  
+
 export default createMarketplaceContract;
-  

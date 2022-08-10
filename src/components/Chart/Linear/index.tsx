@@ -1,8 +1,6 @@
+import { formatAmount } from '@/utils/index';
 import React from 'react';
-
-import { withTheme } from 'styled-components';
 import {
-  Legend,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -10,10 +8,9 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-
+import { withTheme } from 'styled-components';
 import { IChartData } from '../../../configs/home';
 import { Theme } from '../../../styles/styles';
-import { formatAmount } from '@/utils/index';
 import { TooltipContainer } from '../DoubleLinear/styles';
 
 interface IChart {

@@ -1,8 +1,8 @@
 import { lighten } from 'polished';
 import { BsPersonSquare } from 'react-icons/bs';
+import { IoMdCloseCircle } from 'react-icons/io';
 import { RiCopperCoinLine } from 'react-icons/ri';
 import styled, { css } from 'styled-components';
-import { IoMdCloseCircle } from 'react-icons/io';
 
 interface IContainer {
   loading?: boolean;
@@ -232,4 +232,10 @@ export const AssetIDInput = styled.input`
   height: 3rem;
 
   ${defaultStyles}
+`;
+
+export const BalanceContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 `;

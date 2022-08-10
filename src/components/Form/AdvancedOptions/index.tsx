@@ -1,14 +1,13 @@
 import {
   Slider,
-  Toggle,
   StyledInput,
+  Toggle,
 } from '@/components/Form/FormInput/styles';
-
 import {
-  ExtraOptionContainer,
-  InputLabel,
-  FieldContainer,
   DataField,
+  ExtraOptionContainer,
+  FieldContainer,
+  InputLabel,
   ToggleContainer,
 } from './styles';
 

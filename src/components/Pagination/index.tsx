@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
-
 import { ArrowLeft, ArrowRight } from '@/assets/pagination';
+import React, { useEffect, useState } from 'react';
 import calculate from './paginate';
-import { ArrowContainer, Container, ItemContainer } from './styles';
 import PaginationModal from './PaginationModal/PaginationModal';
+import { ArrowContainer, Container, ItemContainer } from './styles';
 
 interface IPagination {
   count: number;
@@ -19,9 +18,9 @@ const Pagination: React.FC<IPagination> = ({ count, page, onPaginate }) => {
   const [showModalLeft, setShowModalLeft] = useState(false);
   const [showModalRight, setShowModalRight] = useState(false);
 
-useEffect(() => {
-  window.scrollTo(0, 0)
-}, [page])
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [page]);
 
   const prevProps = {
     active: page > 1,

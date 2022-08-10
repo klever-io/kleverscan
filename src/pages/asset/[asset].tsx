@@ -1,54 +1,48 @@
-import React, { useState } from 'react';
-import { useDidUpdateEffect } from '@/utils/hooks';
+import { ArrowLeft, Certified, Receive } from '@/assets/icons';
+import Copy from '@/components/Copy';
+import { ISelectedDays } from '@/components/DateFilter';
 import AssetLogo from '@/components/Logo/AssetLogo';
-
-import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-
+import Pagination from '@/components/Pagination';
+import { PaginationContainer } from '@/components/Pagination/styles';
+import QrCodeModal from '@/components/QrCodeModal';
+import Tabs, { ITabs } from '@/components/Tabs';
+import Holders from '@/components/Tabs/Holders';
+import Transactions from '@/components/Tabs/Transactions';
+import api from '@/services/api';
+import {
+  IAccountAsset,
+  IAsset,
+  IPagination,
+  IResponse,
+  ITransaction,
+} from '@/types/index';
+import { useDidUpdateEffect } from '@/utils/hooks';
+import {
+  parseHardCodedInfo,
+  timestampToDate,
+  toLocaleFixed,
+} from '@/utils/index';
 import {
   AssetTitle,
   CardContainer,
   CardContent,
   CardHeader,
   CardHeaderItem,
+  CenteredRow,
   Container,
   Header,
+  HoverAnchor,
   Input,
-  Row,
-  Title,
   LetterLogo,
   Logo,
-  HoverAnchor,
-  CenteredRow,
+  Row,
+  Title,
 } from '@/views/assets/detail';
-
-import api from '@/services/api';
-import {
-  IAsset,
-  IPagination,
-  IResponse,
-  ITransaction,
-  IAccountAsset,
-} from '@/types/index';
-
-import {
-  parseHardCodedInfo,
-  toLocaleFixed,
-  breakText,
-  timestampToDate,
-} from '@/utils/index';
-
-import { ArrowLeft, Receive } from '@/assets/icons';
-import Tabs, { ITabs } from '@/components/Tabs';
-import Transactions from '@/components/Tabs/Transactions';
-import Holders from '@/components/Tabs/Holders';
-import { PaginationContainer } from '@/components/Pagination/styles';
-import Pagination from '@/components/Pagination';
-import { ISelectedDays } from '@/components/DateFilter';
-import Copy from '@/components/Copy';
-import QrCodeModal from '@/components/QrCodeModal';
 import { ReceiveBackground } from '@/views/validator';
+import { GetServerSideProps } from 'next';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { useCallback, useState } from 'react';
 
 interface IAssetPage {
   asset: IAsset;
@@ -106,6 +100,7 @@ const Asset: React.FC<IAssetPage> = ({
     staking,
     properties,
     attributes,
+    verified,
   } = asset;
 
   const router = useRouter();
@@ -178,37 +173,13 @@ const Asset: React.FC<IAssetPage> = ({
     fetchData();
   }, [holdersPage]);
 
-  const renderLogo = () => {
-    const regex = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
-    if (regex.test(asset.logo)) {
-      return <Logo alt={`${name}-logo`} src={asset.logo} />;
-    }
-    return <LetterLogo>{asset?.ticker?.split('')[0]}</LetterLogo>;
-  };
-
-  const getWhitepaper = () => {
-    if (!uris || !uris.Whitepaper) {
-      return <>--</>;
-    }
-
-    return <HoverAnchor href={uris.Whitepaper}>{uris.Whitepaper}</HoverAnchor>;
-  };
-
-  const getWebsite = () => {
-    if (!uris || !uris.Website) {
-      return <>--</>;
-    }
-
-    return <HoverAnchor href={uris.Website}>{uris.Website}</HoverAnchor>;
-  };
-
-  const getIssueDate = () => {
+  const getIssueDate = useCallback(() => {
     if (issueDate) {
       return timestampToDate(issueDate);
     }
 
     return '--';
-  };
+  }, [issueDate]);
 
   const Overview: React.FC = () => {
     return (
@@ -493,6 +464,12 @@ const Asset: React.FC<IAssetPage> = ({
     },
   };
 
+  const isVerified = useCallback(() => {
+    if (verified) {
+      return <Certified className="isVerified" />;
+    }
+  }, []);
+
   return (
     <Container>
       <Header>
@@ -502,11 +479,11 @@ const Asset: React.FC<IAssetPage> = ({
           </div>
           <AssetLogo
             LetterLogo={LetterLogo}
+            isVerified={isVerified}
             Logo={Logo}
             logo={logo}
             ticker={ticker}
             name={name}
-            isVerified={() => undefined}
           />
           <AssetTitle>
             <h1>

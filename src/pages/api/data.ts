@@ -1,10 +1,7 @@
-import Redis from 'ioredis';
-
-import type { NextApiRequest, NextApiResponse } from 'next';
-
-import { IResponse } from '@/types/index';
 import api from '@/services/api';
-import { Service } from '@/types/index';
+import { IResponse, Service } from '@/types/index';
+import Redis from 'ioredis';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 const redis = new Redis({
   host: process.env.DEFAULT_REDIS_HOST || '10.196.89.28',

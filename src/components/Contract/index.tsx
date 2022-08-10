@@ -1,10 +1,3 @@
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-
-import { core } from '@klever/sdk';
-import Select from './Select';
-import { toast } from 'react-toastify';
-
 import {
   InputLabel,
   Slider,
@@ -12,12 +5,27 @@ import {
   Toggle,
   ToggleContainer,
 } from '@/components/Form/FormInput/styles';
-import { ICollectionList } from '@/types/index';
+import { ICollectionList, IParamList } from '@/types/index';
 import formSection from '@/utils/formSections';
-import { assetTriggerTypes, claimTypes, contractOptions } from '@/utils/index';
+import {
+  assetTriggerTypes,
+  claimTypes,
+  contractOptions,
+  parseAddress,
+} from '@/utils/index';
+import { core } from '@klever/sdk';
+import Form, { ISection } from 'components/Form';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import Copy from '../Copy';
+import PackInfoForm from '../CustomForm/PackInfo';
+import PermissionsForm from '../CustomForm/Permissions';
+import Select from './Select';
 import {
   AssetIDInput,
   AssetTriggerContainer,
+  BalanceContainer,
   BalanceLabel,
   CloseIcon,
   Container,
@@ -28,19 +36,17 @@ import {
 } from './styles';
 import { getType, precisionParse } from './utils';
 
-import Form, { ISection } from 'components/Form';
-import Copy from '../Copy';
-import PackInfoForm from '../CustomForm/PackInfo';
-import PermissionsForm from '../CustomForm/Permissions';
-
-import { parseAddress } from '@/utils/index';
-
 interface IContract {
   assetsList: ICollectionList[];
   proposalsList: any[];
+  paramsList: IParamList[];
 }
 
-const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
+const Contract: React.FC<IContract> = ({
+  assetsList,
+  proposalsList,
+  paramsList,
+}) => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [formSections, setFormSections] = useState<ISection[]>([]);
@@ -162,8 +168,13 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
         const parameters = {};
 
         values.parameters.forEach((parameter: any) => {
-          if (!isNaN(Number(parameter.key)) && parameter.value) {
-            parameters[parameter.key] = String(parameter.value);
+          if (
+            !isNaN(Number(parameter.parameterKey)) &&
+            parameter.parameterValue
+          ) {
+            parameters[parameter.parameterKey] = String(
+              parameter.parameterValue,
+            );
           }
         });
 
@@ -194,7 +205,7 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
     }
 
     Object.keys(parsedValues).forEach((item: any) => {
-      if (parsedValues[item].uris) {
+      if (parsedValues[item] && parsedValues[item].uris) {
         const uris = {};
 
         parsedValues[item].uris.forEach((uri: any) => {
@@ -214,7 +225,13 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
 
   const handleOption = (selectedOption: any) => {
     setContractType(selectedOption.value);
-    setFormSections([...formSection(selectedOption.value, '', ownerAddress)]);
+    if (selectedOption.value === 'ProposalContract') {
+      setFormSections([
+        ...formSection(selectedOption.value, '', ownerAddress, paramsList),
+      ]);
+    } else {
+      setFormSections([...formSection(selectedOption.value, '', ownerAddress)]);
+    }
   };
 
   const handleSubmit = async (contractValues: any) => {
@@ -373,7 +390,12 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
           <CloseIcon onClick={() => setTxHash(null)} />
         </ExtraOptionContainer>
       )}
-      <Select options={contractOptions} onChange={handleOption} />
+
+      <Select
+        options={contractOptions}
+        onChange={handleOption}
+        title={'Contract'}
+      />
 
       {contractType === 'VoteContract' && (
         <SelectContainer>
@@ -400,20 +422,15 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
       {contractHaveKDA() && (
         <SelectContainer>
           <SelectContent>
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}
-            >
+            <BalanceContainer>
               <FieldLabel>Select an asset/collection</FieldLabel>
               {!isNaN(Number(assetBalance)) && assetBalance !== null && (
                 <BalanceLabel>
                   Balance: {assetBalance / 10 ** collection.precision}
                 </BalanceLabel>
               )}
-            </div>
+            </BalanceContainer>
+
             <Select
               options={getAssetsList(assetsList)}
               onChange={value => {
@@ -425,7 +442,7 @@ const Contract: React.FC<IContract> = ({ assetsList, proposalsList }) => {
             />
           </SelectContent>
           {collection?.isNFT && (
-            <SelectContent size={13}>
+            <SelectContent>
               <FieldLabel>Asset ID</FieldLabel>
               <AssetIDInput
                 type="number"

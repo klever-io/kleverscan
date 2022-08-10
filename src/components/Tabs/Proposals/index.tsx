@@ -1,27 +1,35 @@
-import React, { useRef, useState } from 'react';
-import ReactDOMServer from 'react-dom/server';
-
+import { getStatusIcon } from '@/assets/status';
 import Table, { ITable } from '@/components/Table';
 import { Row, Status } from '@/components/Table/styles';
 import {
+  IFullInfoParam,
+  IParsedProposal,
+  IProposalsProps,
+} from '@/types/proposals';
+import { capitalizeString, parseAddress } from '@/utils/index';
+import Link from 'next/link';
+import React, { useCallback, useRef } from 'react';
+import {
   ProposalStatus,
   ProposerDescAndLink,
-  UpVotes,
-  TooltipText,
   Tooltip,
+  TooltipText,
+  UpVotes,
 } from './styles';
 
-import { getStatusIcon } from '@/assets/status';
-import Link from 'next/link';
-
-import { IProposal, IFullInfoParam, IProposals, IProposalsProps, IParsedProposal } from '@/types/proposals';
-import { capitalizeString, parseAddress } from '@/utils/index';
-
-const Proposals: React.FC<IProposalsProps> = ({
-  proposals,
-  loading,
-}) => {
+const Proposals: React.FC<IProposalsProps> = ({ proposals, loading }) => {
   const TableBody: React.FC<IParsedProposal> = props => {
+    const {
+      proposalId,
+      epochStart,
+      epochEnd,
+      proposalStatus,
+      proposer,
+      totalStaked,
+      votes,
+      parsedParameters,
+    } = props;
+
     const tooltipRef = useRef<any>(null);
 
     const renderProposalsNetworkParams = (
@@ -52,23 +60,23 @@ const Proposals: React.FC<IProposalsProps> = ({
       });
     };
 
-    const renderProposalsNetworkParamsWithToolTip = () => {
+    const renderProposalsNetworkParamsWithToolTip = useCallback(() => {
       if (parsedParameters) {
         return (
           <Tooltip onMouseOver={(e: any) => handleMouseOver(e)}>
-        {renderProposalsNetworkParams(parsedParameters)}
-        <TooltipText ref={tooltipRef}>
-          {parsedParameters.map((param2, index2) => (
-            <div key={index2}>
-              {param2.paramText}&nbsp;&nbsp;{param2.paramValue}
-            </div>
-          ))}
-        </TooltipText>
-      </Tooltip>
-        )
+            {renderProposalsNetworkParams(parsedParameters)}
+            <TooltipText ref={tooltipRef}>
+              {parsedParameters.map((param2, index2) => (
+                <div key={index2}>
+                  {param2.paramText}&nbsp;&nbsp;{param2.paramValue}
+                </div>
+              ))}
+            </TooltipText>
+          </Tooltip>
+        );
       }
-      return <></>
-    }
+      return <></>;
+    }, [parsedParameters]);
 
     const handleMouseOver = (e: any) => {
       const positionY = e.currentTarget.getBoundingClientRect().top;
@@ -77,16 +85,7 @@ const Proposals: React.FC<IProposalsProps> = ({
       tooltipRef.current.style.top = positionY - 30 + 'px';
       tooltipRef.current.style.left = positionX + 'px';
     };
-    const {
-      proposalId,
-      epochStart,
-      epochEnd,
-      proposalStatus,
-      proposer,
-      totalStaked,
-      votes,
-      parsedParameters,
-    } = props;
+
     const StatusIcon = getStatusIcon(proposalStatus);
     const precision = 10 ** 6;
 
@@ -130,9 +129,7 @@ const Proposals: React.FC<IProposalsProps> = ({
           <StatusIcon />
           <ProposalStatus>{capitalizeString(proposalStatus)}</ProposalStatus>
         </Status>
-        <span>
-        {renderProposalsNetworkParamsWithToolTip()}
-        </span>
+        <span>{renderProposalsNetworkParamsWithToolTip()}</span>
         <span>
           <Link href={{ pathname: `/proposal/${proposalId}` }}>Details</Link>
         </span>

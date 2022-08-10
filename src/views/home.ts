@@ -1,8 +1,6 @@
-import styled, { keyframes } from 'styled-components';
-
-import { lighten, transparentize } from 'polished';
-
 import { default as DefaultInput } from '@/components/Inputt';
+import { lighten, transparentize } from 'polished';
+import styled, { keyframes } from 'styled-components';
 
 interface IVariation {
   positive: boolean;
@@ -96,10 +94,9 @@ export const DataContainer = styled(Section)`
 export const Input = styled(DefaultInput)`
   margin: 0 5rem;
   padding: 1.25rem 1rem;
+  box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.6, props.theme.card.background)};
 
   background-color: ${props => props.theme.white};
-
-  border-color: ${props => props.theme.input.border.home};
 
   &:focus-within {
     box-shadow: 0 1px 10px ${props => props.theme.input.shadow};
@@ -171,6 +168,7 @@ export const DataCard = styled.div`
   align-items: center;
 
   background-color: ${props => props.theme.card.background};
+  box-shadow: 5px 6px 5px 0px rgba(0, 0, 0, 0.1);
   border-radius: 1rem;
 `;
 
@@ -241,6 +239,8 @@ export const BlockCardContainer = styled.div<BlockCardContainerProps>`
   user-select: none;
 
   background-color: ${props => props.theme.white};
+
+  box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.6, props.theme.card.background)};
 
   border-radius: 1rem;
   transition: 1s all ease, 0.1s filter ease;
@@ -334,6 +334,8 @@ export const TransactionContent = styled.div`
   padding: 1.5rem;
 
   background-color: ${props => props.theme.white};
+
+  box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.6, props.theme.card.background)};
 
   border-radius: 1rem;
 
@@ -495,7 +497,7 @@ export const TransactionChart = styled(TransactionContent)`
 
 export const TransactionChartContent = styled.div`
   position: absolute;
-  overflow:hidden;
+  overflow: hidden;
   bottom: 0;
   left: 1.5rem;
   right: 2rem;

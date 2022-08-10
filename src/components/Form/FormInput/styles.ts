@@ -1,6 +1,6 @@
-import styled, { css } from 'styled-components';
 import { lighten, transparentize } from 'polished';
 import { BsQuestionCircleFill } from 'react-icons/bs';
+import styled, { css } from 'styled-components';
 
 interface IProps {
   error?: boolean;
@@ -129,6 +129,7 @@ export const ToggleContainer = styled.div<IProps>`
   opacity: ${props => (props.disabled ? 0.6 : 1)};
   pointer-events: ${props => (props.disabled ? 'none' : 'auto')};
   color: ${props => props.theme.input.text};
+  user-select: none;
 `;
 
 export const Slider = styled.div`

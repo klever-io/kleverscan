@@ -1,9 +1,6 @@
-import React, { useState, KeyboardEvent, useRef } from 'react';
-
-import { useRouter } from 'next/router';
-
 import { Search } from '@/assets/icons';
-
+import { useRouter } from 'next/router';
+import React, { KeyboardEvent, useRef, useState } from 'react';
 import { Container } from './styles';
 
 interface IInput {

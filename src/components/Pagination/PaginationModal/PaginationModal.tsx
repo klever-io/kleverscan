@@ -1,11 +1,11 @@
 import Input from '@/components/Input';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { MdClear } from 'react-icons/md';
 import {
-  PaginationModalContainer,
-  PaginationModalHeader,
   Confirm,
   Container,
+  PaginationModalContainer,
+  PaginationModalHeader,
 } from './styles';
 
 interface IPaginationModal {
@@ -40,10 +40,10 @@ const PaginationModal: React.FC<IPaginationModal> = ({
     } else {
       setButtonActive(false);
     }
-  });
+  }, [newPage, page, count]);
 
   const handleConfirmClick = () => {
-    onPaginate(Number(newPage) - 1);
+    onPaginate(Number(newPage));
     handleClose();
     setMouseOut(true);
   };
@@ -52,14 +52,14 @@ const PaginationModal: React.FC<IPaginationModal> = ({
     setShowModal(false);
   };
 
-  const handleChange = (value: string) => {
+  const handleChange = useCallback((value: string) => {
     const numberOrEmptyString = value.replace(/[^\d]+/g, '');
     if (numberOrEmptyString !== '') {
       setNewPage(Number(numberOrEmptyString));
     } else {
       setNewPage('');
     }
-  };
+  }, []);
 
   const handleBlur = () => {
     if (mouseOut) {

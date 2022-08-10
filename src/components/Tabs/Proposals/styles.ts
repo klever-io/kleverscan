@@ -1,5 +1,5 @@
 import { lighten } from 'polished';
-import styled, {css} from 'styled-components';
+import styled, { css } from 'styled-components';
 
 const getStakedBGColor = (props: any, percent: number) => {
   if (percent < 30) {
@@ -48,34 +48,34 @@ export const Proposer = styled.p`
 `;
 
 export const ProposalStatus = styled.span`
-width: fit-content;
+  width: fit-content;
 `;
 
 export const ProposerDescAndLink = styled.span`
-&:hover {
+  &:hover {
     text-decoration: underline;
-  }`;
+  }
+`;
 
 const DescriptionBorder = css`
   border-bottom: 1px solid ${props => lighten(0.33, props.theme.table.text)};
-`
+`;
 
-export const Description = styled.p<{description: boolean}>`
+export const Description = styled.p<{ description: boolean }>`
   overflow: auto;
   white-space: normal !important;
   padding-bottom: 0.25rem;
-  border-bottom: ${props => props.description ? DescriptionBorder : null}
+  border-bottom: ${props => (props.description ? DescriptionBorder : null)};
 `;
 
 export const UpVotes = styled.span``;
-
 
 export const TooltipText = styled.span`
   visibility: hidden;
   opacity: 0;
   width: fit-content !important;
   color: ${props => props.theme.white} !important;
-  background-color: rgb(123,125,178);
+  background-color: rgb(123, 125, 178);
 
   padding: 7px 7px;
   border-radius: 6px;
@@ -93,7 +93,6 @@ export const Tooltip = styled.span`
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-
 
   &:hover ${TooltipText} {
     visibility: visible;

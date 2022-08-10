@@ -1,6 +1,5 @@
+import { formatAmount } from '@/utils/index';
 import React from 'react';
-
-import { withTheme } from 'styled-components';
 import {
   Legend,
   Line,
@@ -10,12 +9,10 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-
+import { withTheme } from 'styled-components';
 import { IChartData } from '../../../configs/home';
 import { Theme } from '../../../styles/styles';
-
 import { TooltipContainer } from './styles';
-import { formatAmount } from '@/utils/index';
 
 interface IChart {
   data: IChartData[];

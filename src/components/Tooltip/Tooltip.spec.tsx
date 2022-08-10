@@ -1,11 +1,7 @@
-import React from 'react';
-
 import { screen, waitFor } from '@testing-library/react';
-
 import userEvent from '@testing-library/user-event';
-
+import React from 'react';
 import { renderWithTheme } from '../../test/utils/';
-
 import Tooltip from './index';
 
 describe('Tooltip', () => {

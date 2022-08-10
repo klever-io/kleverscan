@@ -1,11 +1,8 @@
-import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-
+import React from 'react';
 import theme from '../../styles/theme';
-
-import { renderWithTheme, getMonthWithYear } from '../../test/utils';
+import { getMonthWithYear, renderWithTheme } from '../../test/utils';
 import DateFilter from './';
 
 const props = {
@@ -30,7 +27,6 @@ const months = [
 ];
 
 describe('Component: DateFilter', () => {
-
   beforeEach(() => {
     jest.clearAllMocks();
     renderWithTheme(<DateFilter {...props} />);
@@ -38,7 +34,7 @@ describe('Component: DateFilter', () => {
 
   it('Should render the input with the "Add filter by ', () => {
     const input = screen.getByPlaceholderText(/Add filter by date/i);
-    expect(input).toBeInTheDocument();    
+    expect(input).toBeInTheDocument();
   });
 
   it('Should render the calendar container after click on the input', async () => {
@@ -51,7 +47,7 @@ describe('Component: DateFilter', () => {
     expect(calendar).toBeInTheDocument();
   });
 
-  it('Should match the style of the input and the calendar container', async() => {
+  it('Should match the style of the input and the calendar container', async () => {
     const user = userEvent.setup();
 
     const inputStyle = {
@@ -64,8 +60,9 @@ describe('Component: DateFilter', () => {
     expect(input).toHaveStyle(inputStyle);
 
     await user.click(input);
-    
-    const calendarContainer = screen.getByText(/Date Filter/i).parentNode?.parentNode?.parentNode;
+
+    const calendarContainer =
+      screen.getByText(/Date Filter/i).parentNode?.parentNode?.parentNode;
 
     const calendarStyle = {
       minHeight: '18rem',
@@ -86,9 +83,10 @@ describe('Component: DateFilter', () => {
 
     await user.click(input);
 
-    const arrowLeft: any = screen.getByText(/Choose the proper date/i).parentNode?.nextSibling?.firstChild?.firstChild;
-    const rightArrow: any = screen.getByText(/Choose the proper date/i).parentNode?.nextSibling?.firstChild?.lastChild;
-
+    const arrowLeft: any = screen.getByText(/Choose the proper date/i)
+      .parentNode?.nextSibling?.firstChild?.firstChild;
+    const rightArrow: any = screen.getByText(/Choose the proper date/i)
+      .parentNode?.nextSibling?.firstChild?.lastChild;
 
     const presentMonth = getMonthWithYear('', months);
     expect(screen.getByText(presentMonth)).toHaveTextContent(presentMonth);
@@ -107,31 +105,34 @@ describe('Component: DateFilter', () => {
     const input = screen.getByPlaceholderText(/Add filter by date/i);
 
     await user.click(input);
-    
+
     const date = new Date();
-    const arrowLeft: any = screen.getByText(/Choose the proper date/i).parentNode?.nextSibling?.firstChild?.firstChild;
-    const rightArrow: any = screen.getByText(/Choose the proper date/i).parentNode?.nextSibling?.firstChild?.lastChild;
+    const arrowLeft: any = screen.getByText(/Choose the proper date/i)
+      .parentNode?.nextSibling?.firstChild?.firstChild;
+    const rightArrow: any = screen.getByText(/Choose the proper date/i)
+      .parentNode?.nextSibling?.firstChild?.lastChild;
     const confirm: any = screen.getByText(/Confirm/i);
 
-    if(date.getDate() <= 5) {
+    if (date.getDate() <= 5) {
       await user.click(arrowLeft);
       const startDay: any = screen.getByText('18');
       const endDay: any = screen.getByText('23');
 
-      expect(screen.getByText(getMonthWithYear('lastMonth', months))).toBeVisible();
+      expect(
+        screen.getByText(getMonthWithYear('lastMonth', months)),
+      ).toBeVisible();
       await user.click(startDay);
       await user.click(endDay);
       await user.click(confirm);
     } else {
       const startDay: any = screen.getByText(date.getDate() - 5);
       const endDay: any = screen.getByText(date.getDate());
-      
+
       await user.click(startDay);
       await user.click(endDay);
 
       await user.click(confirm);
     }
-
   });
 
   it('Should select the days to filter', async () => {
@@ -142,15 +143,18 @@ describe('Component: DateFilter', () => {
 
     const confirm: any = screen.getByText(/Confirm/i);
     const date = new Date();
-  
-    if(date.getDate() <= 5) {
+
+    if (date.getDate() <= 5) {
       const startDay: any = screen.getByText(date.getDate());
-      const arrowLeft: any = screen.getByText(/Choose the proper date/i).parentNode?.nextSibling?.firstChild?.firstChild;
+      const arrowLeft: any = screen.getByText(/Choose the proper date/i)
+        .parentNode?.nextSibling?.firstChild?.firstChild;
 
       await user.click(startDay);
       await user.click(arrowLeft);
 
-      expect(screen.getByText(getMonthWithYear('lastMonth', months))).toBeVisible();
+      expect(
+        screen.getByText(getMonthWithYear('lastMonth', months)),
+      ).toBeVisible();
       const endDay: any = screen.getByText('25');
 
       await user.click(endDay);

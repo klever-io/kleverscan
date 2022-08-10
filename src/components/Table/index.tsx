@@ -1,8 +1,7 @@
-import React from 'react';
 import { useRouter } from 'next/router';
+import React from 'react';
 import { IFilterItem } from '../Filter';
 import Skeleton from '../Skeleton';
-
 import { Body, Container, EmptyRow, Header, ITableType, Row } from './styles';
 
 export interface ITable {

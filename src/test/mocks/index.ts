@@ -1,15 +1,15 @@
 import {
   Contract,
+  EnumAssetType,
+  EnumBuyType,
   EnumClaimType,
   EnumICOStatus,
-  EnumBuyType,
   EnumMarketType,
-  EnumAssetType,
-  IDataCards,
-  IAsset,
   IAccountAsset,
-  ITransaction,
+  IAsset,
+  IDataCards,
   IHomeTransactions,
+  ITransaction,
 } from '../../types';
 
 export const CoinTest = [
@@ -291,6 +291,35 @@ export const mockedTxContractComponents = {
   },
 };
 
+const assetsData = {
+  klv: {
+    prices: {
+      todaysPrice: null,
+      yesterdayPrice: null,
+      variation: null,
+    },
+    staking: {
+      totalStaking: null,
+      dayBeforeTotalStaking: null,
+    },
+    volume: null,
+    circulatingSupply: null,
+  },
+  kfi: {
+    prices: {
+      todaysPrice: null,
+      yesterdayPrice: null,
+      variation: null,
+    },
+    staking: {
+      totalStaking: null,
+      dayBeforeTotalStaking: null,
+    },
+    volume: null,
+    circulatingSupply: null,
+  },
+};
+
 export const mockedHomeDataCards: IDataCards = {
   totalAccounts: 100,
   totalTransactions: 20000,
@@ -301,14 +330,32 @@ export const mockedHomeDataCards: IDataCards = {
     epochLoadPercent: 30,
     remainingTime: 'two days',
   },
-  coinsStaking: {
-    klvStaking: {
-      totalStaking: 10000000000000,
-      dayBeforeTotalStaking: 5000000000000,
+  assetsData: {
+    klv: {
+      prices: {
+        todaysPrice: null,
+        yesterdayPrice: null,
+        variation: null,
+      },
+      staking: {
+        totalStaking: 10000000000000,
+        dayBeforeTotalStaking: 5000000000000,
+      },
+      volume: null,
+      circulatingSupply: null,
     },
-    kfiStaking: {
-      totalStaking: 10000000000000,
-      dayBeforeTotalStaking: 5000000000000,
+    kfi: {
+      prices: {
+        todaysPrice: null,
+        yesterdayPrice: null,
+        variation: null,
+      },
+      staking: {
+        totalStaking: 10000000000000,
+        dayBeforeTotalStaking: 5000000000000,
+      },
+      volume: null,
+      circulatingSupply: null,
     },
   },
   coinsData: [

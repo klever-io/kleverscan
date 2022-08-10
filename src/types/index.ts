@@ -1,30 +1,30 @@
-import { ISO2 } from '@/utils/country';
 import { IChartData } from '@/configs/home';
+import { ISO2 } from '@/utils/country';
 import { Dispatch, SetStateAction } from 'react';
 
 export enum Contract {
-  Transfer = 'Transfer',
-  CreateAsset = 'Create Asset',
-  CreateValidator = 'Create Validator',
-  ValidatorConfig = 'Config Validator',
-  Freeze = 'Freeze',
-  Unfreeze = 'Unfreeze',
-  Delegate = 'Delegate',
-  Undelegate = 'Undelegate',
-  Withdraw = 'Withdraw',
-  Claim = 'Claim',
-  Unjail = 'Unjail',
-  AssetTrigger = 'AssetTrigger',
-  SetAccountName = 'SetAccountName',
-  Proposal = 'Proposal',
-  Vote = 'Vote',
-  ConfigICO = 'ConfigICO',
-  SetICOPrices = 'SetICOPrices',
-  Buy = 'Buy',
-  Sell = 'Sell',
-  CancelMarketOrder = 'CancelMarketOrder',
-  CreateMarketplace = 'CreateMarketplace',
-  ConfigMarketplace = 'ConfigMarketplace',
+  Transfer = 'TransferContractType',
+  CreateAsset = 'CreateAssetContractType',
+  CreateValidator = 'CreateValidatorContractType',
+  ValidatorConfig = 'ConfigValidatorContractType',
+  Freeze = 'FreezeContractType',
+  Unfreeze = 'UnfreezeContractType',
+  Delegate = 'DelegateContractType',
+  Undelegate = 'UndelegateContractType',
+  Withdraw = 'WithdrawContractType',
+  Claim = 'ClaimContractType',
+  Unjail = 'UnjailContractType',
+  AssetTrigger = 'AssetTriggerContractType',
+  SetAccountName = 'SetAccountNameContractType',
+  Proposal = 'ProposalContractType',
+  Vote = 'VoteContractType',
+  ConfigITO = 'ConfigITOContractType',
+  SetITOPrices = 'SetITOPricesContractType',
+  Buy = 'BuyContractType',
+  Sell = 'SellContractType',
+  CancelMarketOrder = 'CancelMarketOrderContractType',
+  CreateMarketplace = 'CreateMarketplaceContractType',
+  ConfigMarketplace = 'ConfigMarketplaceContractType',
 }
 
 export enum Service {
@@ -38,6 +38,12 @@ export enum Service {
 export interface IDropdownItem {
   label: string;
   value: any;
+}
+
+export interface IParamList {
+  label: string;
+  value: number;
+  currentValue?: number;
 }
 
 export interface ICollectionList {
@@ -92,7 +98,7 @@ export interface ICreateAssetContract {
   maxSupply: number;
   royalties: IRoyaltiesInfo;
   properties: IPropertiesInfo;
-  atributes: IAttributesInfo;
+  attributes: IAttributesInfo;
   staking: IStakingInfo;
   roles: IRolesInfo[];
 }
@@ -197,11 +203,13 @@ export enum EnumTriggerType {
 export interface IAssetTriggerContract {
   triggerType: EnumTriggerType;
   toAddress: string;
+  assetId: string;
   amount: number;
   mime: string;
   logo: string;
   uri: any;
   role: IRolesInfo;
+  staking: IStakingInfo;
 }
 
 export interface ISetAccountNameContract {
@@ -209,7 +217,7 @@ export interface ISetAccountNameContract {
 }
 
 export interface IProposalContract {
-  parameter: number;
+  parameters: number;
   value: string;
   description: string;
   epochsDuration: number;
@@ -220,21 +228,21 @@ export interface IVoteContract {
   amount: number;
 }
 
-export enum EnumICOStatus {
+export enum EnumITOStatus {
   DefaultICO = 0,
   ActiveICO = 1,
   PausedICO = 2,
 }
 
-export interface IConfigICOContract {
+export interface IConfigITOContract {
   assetId: string;
   receiverAddress: string;
-  status: EnumICOStatus;
+  status: EnumITOStatus;
   maxAmount: number;
   packInfo: any;
 }
 
-export interface ISetICOPricesContract {
+export interface ISetITOPricesContract {
   assetId: string;
   packInfo: any;
 }
@@ -247,7 +255,7 @@ export enum EnumBuyType {
 export interface IBuyContract {
   buyType: EnumBuyType;
   id: string;
-  currencyId: string;
+  currencyID: string;
   amount: number;
 }
 
@@ -267,7 +275,7 @@ export interface ISellContract {
 }
 
 export interface ICancelMarketOrderContract {
-  orderId: string;
+  orderID: string;
 }
 
 export interface ICreateMarketplaceContract {
@@ -277,7 +285,7 @@ export interface ICreateMarketplaceContract {
 }
 
 export interface IConfigMarketplaceContract {
-  marketplaceId: string;
+  marketplaceID: string;
   name: string;
   referralAddress: string;
   referralPercentage: number;
@@ -299,8 +307,8 @@ type IParameter =
   | ISetAccountNameContract
   | IProposalContract
   | IVoteContract
-  | IConfigICOContract
-  | ISetICOPricesContract
+  | IConfigITOContract
+  | ISetITOPricesContract
   | IBuyContract
   | ISellContract
   | ICancelMarketOrderContract
@@ -459,6 +467,7 @@ export interface IAsset {
   royalties: number;
   mintedValue: number;
   issueDate: number;
+  verified: boolean;
   staking: {
     minEpochsToWithdraw: number;
     totalStaked: number;
@@ -486,6 +495,7 @@ export interface IContract {
   precision?: number;
   asset?: IAsset;
   receipts?: IReceipt[];
+  contractIndex: number;
 }
 
 export interface IBucket {
@@ -613,16 +623,33 @@ export interface IDailyTransaction {
   key: number;
 }
 
-export interface ICoinStaking {
-  totalStaking: number | null,
-  dayBeforeTotalStaking: number | null,
+export interface IAssetStaking {
+  totalStaking: number | null;
+  dayBeforeTotalStaking: number | null;
 }
 
-export interface ICoinsStaking {
-  klvStaking: ICoinStaking,
-  kfiStaking: ICoinStaking,
+export interface IAssetsData {
+  klv: IAssetData;
+  kfi: IAssetData;
 }
 
+export interface IAssetData {
+  prices: IAssetPrice;
+  staking: IAssetStaking;
+  volume: number | null;
+  circulatingSupply: number | null;
+}
+
+export interface IAssetPrice {
+  todaysPrice: number | null;
+  yesterdayPrice: number | null;
+  variation: number | null;
+}
+
+export interface IAssetsPrice {
+  klvPrice: IAssetPrice;
+  kfiPrice: IAssetPrice;
+}
 
 export interface IHome {
   transactions: ITransaction[];
@@ -635,7 +662,7 @@ export interface IHome {
   coinsData: ICoinInfo[];
   yesterdayTransactions: number;
   yesterdayAccounts: number;
-  coinsStaking: ICoinsStaking;
+  assetsData: IAssetsData;
 }
 export interface IDataCards {
   totalAccounts: number;
@@ -645,7 +672,7 @@ export interface IDataCards {
   coinsData: ICoinInfo[];
   yesterdayTransactions: number;
   yesterdayAccounts: number;
-  coinsStaking: ICoinsStaking;
+  assetsData: IAssetsData;
 }
 
 export interface IHomeTransactions {
@@ -761,4 +788,8 @@ export interface ITotalFrozen {
   data: {
     totalFrozen: number;
   };
+}
+
+export interface IFormData {
+  [key: string]: any;
 }

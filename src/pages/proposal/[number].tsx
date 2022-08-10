@@ -1,57 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { GetStaticProps } from 'next';
-import { toLocaleFixed } from '@/utils/index';
-
+import { ArrowLeft } from '@/assets/icons';
+import { getStatusIcon } from '@/assets/status';
+import Table, { ITable } from '@/components/Table';
+import { Row as TableRow, Status } from '@/components/Table/styles';
+import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
+import api from '@/services/api';
 import {
+  IFullInfoParam,
+  IParsedProposal,
+  IProposal,
+  IRawParam,
+  IVoters,
+  IVotingPowers,
+  NetworkParamsIndexer,
+} from '@/types/proposals';
+import { formatAmount, toLocaleFixed, typeVoteColors } from '@/utils/index';
+import {
+  BalanceContainer,
   CardContainer,
   CardContent,
-  Container,
-  Header,
-  Title,
-  Input,
-  Row,
-  HoverLink,
-  EndedDate,
-  CardVoteContainer,
   CardVote,
-  PercentageText,
-  QtyVotesText,
-  OptionValidator,
-  ProgressBar,
-  VotesContainer,
-  StatusContent,
-  VotesHeader,
-  ProgressBarVotes,
-  ValidatorsContainer,
+  CardVoteContainer,
+  Container,
   FiltersValidators,
-  VerticalLine,
-  ProgressBarContent,
+  HalfRow,
+  Header,
+  HoverLink,
+  Input,
+  NetworkParamsContainer,
+  OptionValidator,
   PassThresholdContainer,
   PassThresholdText,
-  DateContainer,
+  PercentageText,
+  ProgressBar,
+  ProgressBarContent,
+  ProgressBarVotes,
+  QtyVotesText,
+  Row,
   RowContent,
-  BalanceContainer,
-  NetworkParamsContainer,
+  StatusContent,
+  Title,
+  ValidatorsContainer,
+  VerticalLine,
+  VotesContainer,
+  VotesHeader,
 } from '@/views/proposals/detail';
-
-import { ArrowLeft } from '@/assets/icons';
-import { Status } from '@/components/Table/styles';
-import { getStatusIcon } from '@/assets/status';
 import { format, fromUnixTime } from 'date-fns';
-import Table, { ITable } from '@/components/Table';
-import { Row as TableRow } from '@/components/Table/styles';
-import { formatAmount, typeVoteColors } from '@/utils/index';
-import api from '@/services/api';
-import { IRawParam, IFullInfoParam, IParsedProposal, IVoters, IVotingPowers } from '@/types/proposals';
-
-import { AiFillCheckCircle } from 'react-icons/ai';
-
-import Tooltip from '../../components/Tooltip';
+import { GetStaticProps } from 'next';
 import Link from 'next/link';
-import { NetworkParamsIndexer } from '@/types/proposals';
-import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
-import { IProposal } from '@/types/proposals';
+import { useRouter } from 'next/router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { AiFillCheckCircle } from 'react-icons/ai';
+import Tooltip from '../../components/Tooltip';
 
 interface IVote {
   status: string;
@@ -74,7 +73,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
   const router = useRouter();
   const precision = 10 ** 6;
   const proposalAPI: IParsedProposal = props;
-  const { votingPowers, totalStaked } = proposalAPI;
+  const { votingPowers, totalStaked, description } = proposalAPI;
   const [filterVoters, setFilterVoters] = useState({
     Yes: 0,
     No: 0,
@@ -148,26 +147,29 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
     setFilterVoters(tempFilterVoters);
   }, []);
 
-  const getQtyStatus = (status: string) => {
-    let qtyStatus = 0;
+  const getQtyStatus = useCallback(
+    (status: string) => {
+      let qtyStatus = 0;
 
-    votersList.forEach((item: any) => {
-      if (item.status === status) {
-        qtyStatus += 1;
-      }
-    });
+      votersList.forEach((item: any) => {
+        if (item.status === status) {
+          qtyStatus += 1;
+        }
+      });
 
-    return qtyStatus;
-  };
+      return qtyStatus;
+    },
+    [votersList],
+  );
 
-  const renderProposalParams = () => {
+  const renderProposalParams = useCallback(() => {
     return proposalAPI?.parsedParameters.map(param => (
       <div key={param.paramIndex}>
         <strong>{param.paramText}</strong>
         <span>{param.paramValue}</span>
       </div>
     ));
-  };
+  }, [proposalAPI]);
 
   const Progress: React.FC = () => {
     return (
@@ -270,9 +272,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                 </span>
                 <span style={{ marginRight: '0.2rem' }}>
                   <Link href={`/account/${proposalAPI.proposer}`}>
-                    <HoverLink>
-                      <p>{proposalAPI.proposer}</p>
-                    </HoverLink>
+                    <HoverLink>{proposalAPI.proposer}</HoverLink>
                   </Link>
                 </span>
                 <Tooltip
@@ -290,20 +290,20 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                 </Link>
               </Row>
               <Row>
-                <span>
-                  <strong>Created Epoch:</strong>
-                </span>
-                <span>
-                  <DateContainer>
-                    <small>{proposalAPI.epochStart}</small>
-                  </DateContainer>
-                </span>
-                <span>
-                  <strong>Ended Epoch:</strong>
-                </span>
-                <span>
-                  <EndedDate>{proposalAPI.epochEnd}</EndedDate>
-                </span>
+                <HalfRow>
+                  <span>
+                    <strong>Created Epoch</strong>
+                  </span>
+                  <span>
+                    <span>{proposalAPI.epochStart}</span>
+                  </span>
+                </HalfRow>
+                <HalfRow>
+                  <span>
+                    <strong>Ended Epoch</strong>
+                  </span>
+                  <span style={{ color: 'red' }}>{proposalAPI.epochEnd}</span>
+                </HalfRow>
               </Row>
               <Row>
                 <span>
@@ -316,6 +316,12 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                     </NetworkParamsContainer>
                   </BalanceContainer>
                 </RowContent>
+              </Row>
+              <Row>
+                <span>
+                  <strong>Description</strong>
+                </span>
+                <span>{description}</span>
               </Row>
             </CardContent>
           </CardContainer>
@@ -419,7 +425,9 @@ export const getVotingPowers = (voters: IVoters | []): IVotingPowers => {
   return powers;
 };
 
-export const getProposalNetworkParams = (params: IRawParam): IFullInfoParam[] => {
+export const getProposalNetworkParams = (
+  params: IRawParam,
+): IFullInfoParam[] => {
   if (params) {
     const fullInfoParams: IFullInfoParam[] = Object.entries(params).map(
       ([index, value]) => {
@@ -444,7 +452,7 @@ export const getServerSideProps: GetStaticProps<IProposal> = async ({
     route: `proposals/${params?.number}`,
   });
   let props = proposalInfos?.data?.proposal;
-  
+
   if (!props) {
     props = {};
   }

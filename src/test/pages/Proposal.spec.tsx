@@ -1,9 +1,11 @@
+import { fireEvent, screen } from '@testing-library/react';
 import React from 'react';
-import { screen, fireEvent } from '@testing-library/react';
-import ProposalDetails, { getServerSideProps } from '../../pages/proposal/[number]';
-import { renderWithTheme } from '../../test/utils';
-import { getMockedProposal } from '../../test/mocks/index';
+import ProposalDetails, {
+  getServerSideProps,
+} from '../../pages/proposal/[number]';
 import api from '../../services/api';
+import { getMockedProposal } from '../../test/mocks/index';
+import { renderWithTheme } from '../../test/utils';
 
 jest.mock('next/router', () => ({
   useRouter() {

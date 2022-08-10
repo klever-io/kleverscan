@@ -1,27 +1,32 @@
-import React from 'react';
-import * as nextRouter from 'next/router';
 import { fireEvent, screen } from '@testing-library/react';
-
-import theme from '../../styles/theme';
+import * as nextRouter from 'next/router';
+import React from 'react';
 import Navbar from '.';
+import theme from '../../styles/theme';
 import { renderWithTheme } from '../../test/utils/';
 
-
 describe('Component: Header/navbar', () => {
-  const navBarItems = ['Blocks', 'Accounts', 'Transactions', 'Assets', 'Validators', 'More'];
+  const navBarItems = [
+    'Blocks',
+    'Accounts',
+    'Transactions',
+    'Assets',
+    'Validators',
+    'More',
+  ];
 
   jest.mock('next/router', () => ({
     useRouter() {
-      return ({
+      return {
         route: '/',
         pathname: '',
-      });
+      };
     },
   }));
-  
+
   beforeEach(() => {
     jest.clearAllMocks();
-    const useRouter = jest.spyOn(nextRouter, "useRouter") as jest.Mock;
+    const useRouter = jest.spyOn(nextRouter, 'useRouter') as jest.Mock;
     useRouter.mockImplementation(() => ({
       route: '/',
       pathname: '',
@@ -30,36 +35,40 @@ describe('Component: Header/navbar', () => {
       push: jest.fn(),
       events: {
         on: jest.fn(),
-        off: jest.fn()
+        off: jest.fn(),
       },
       beforePopState: jest.fn(() => null),
-      prefetch: jest.fn(() => null)
+      prefetch: jest.fn(() => null),
     }));
   });
-  
+
   it('Should render the navbar items ( Logo, Blocks, Accounts, Transactions, Assets, Validatores and More) - desktop version', () => {
     const { container } = renderWithTheme(<Navbar />);
 
     const logo = screen.getByAltText('Logo');
     expect(logo).toBeInTheDocument();
 
-    const navbar = container.firstChild?.childNodes[1]
+    const navbar = container.firstChild?.childNodes[1];
     navbar?.childNodes.forEach((element, index) => {
       expect(element).toBeInTheDocument();
       expect(element).toHaveTextContent(navBarItems[index]);
-    })
+    });
   });
 
   it(`Should have the correct style background for the navbar\'s container`, () => {
     const { container } = renderWithTheme(<Navbar />);
 
-    expect(container.firstChild).toHaveStyle(`background: ${theme.navbar.background}`);
+    expect(container.firstChild).toHaveStyle(
+      `background: ${theme.navbar.background}`,
+    );
   });
 
   it('Should have the correct style for the navbar items - desktop version', () => {
     const { container } = renderWithTheme(<Navbar />);
 
-    const navbarItem = container.querySelector('div > div > div:nth-child(2) > div');
+    const navbarItem = container.querySelector(
+      'div > div > div:nth-child(2) > div',
+    );
     const style = {
       filter: 'brightness(1)',
       cursor: 'pointer',
@@ -75,10 +84,9 @@ describe('Component: Header/navbar', () => {
     const dropDownContainer = container.querySelector(selector);
     const dropDownMenu = container.querySelector(`${selector} ul`);
 
-
     const dropDownContainerStyle = {
       display: 'none',
-      position: 'absolute'
+      position: 'absolute',
     };
     const dropDownMenuStyle = {
       width: 'max-content',
@@ -86,12 +94,11 @@ describe('Component: Header/navbar', () => {
       color: theme.navbar.text,
     };
 
-
     expect(dropDownContainer).toHaveStyle(dropDownContainerStyle);
     expect(dropDownMenu).toHaveStyle(dropDownMenuStyle);
   });
 
-   it('Should appear the navbar menu when click on the icon and when click again should disappear - mobile version', async () => {
+  it('Should appear the navbar menu when click on the icon and when click again should disappear - mobile version', async () => {
     const { container } = renderWithTheme(<Navbar />);
 
     const mobile = container.firstChild?.lastChild;
@@ -100,10 +107,10 @@ describe('Component: Header/navbar', () => {
 
     expect(mobile).toHaveStyle('position: relative');
     expect(content).toHaveStyle('right: -100%');
-    
+
     fireEvent.click(button);
     expect(content).toHaveStyle('right: 0');
-    
+
     fireEvent.click(button);
     expect(content).toHaveStyle('right: -100%');
   });
@@ -116,7 +123,7 @@ describe('Component: Header/navbar', () => {
 
     container.lastChild?.childNodes.forEach((element, index) => {
       expect(element).toBeInTheDocument();
-      expect(element).toHaveTextContent(navBarItems[index])
+      expect(element).toHaveTextContent(navBarItems[index]);
     });
   });
 
@@ -132,9 +139,8 @@ describe('Component: Header/navbar', () => {
     const openMenuMobile: any = container.firstChild?.lastChild?.firstChild;
     const mobileBackground: any = container.firstChild?.nextSibling;
     fireEvent.click(openMenuMobile);
-    expect(document.body.style.overflow).toBe('hidden')
+    expect(document.body.style.overflow).toBe('hidden');
     fireEvent.click(mobileBackground);
-    expect(document.body.style.overflow).toBe('visible')
-
+    expect(document.body.style.overflow).toBe('visible');
   });
 });

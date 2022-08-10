@@ -1,24 +1,23 @@
-import styled from 'styled-components'
-
 import { transparentize } from 'polished';
+import styled from 'styled-components';
 
 export const Container = styled.div`
   .leaflet-container {
     width: 100%;
     height: 30rem;
-    
+
     overflow: hidden;
 
     background-color: ${props => props.theme.white};
 
-    border-radius: .5rem;
+    border-radius: 0.5rem;
   }
 
-  .map-marker{
+  .map-marker {
     width: 0.75rem;
     height: 0.75rem;
-    
-    background-color: ${props => transparentize(.25, props.theme.map.marker)};
+
+    background-color: ${props => transparentize(0.25, props.theme.map.marker)};
 
     border-radius: 50%;
   }
@@ -35,15 +34,16 @@ export const Container = styled.div`
     justify-content: center;
 
     background-image: ${props => props.theme.text.background};
-    
+
     border-radius: 50%;
 
-    font-size: .975rem;
+    font-size: 0.975rem;
     font-weight: 500;
     text-align: right;
     color: ${props => props.theme.white};
 
-    box-shadow: inset 0 0 0 .437rem ${props => transparentize(.5, props.theme.white)};
+    box-shadow: inset 0 0 0 0.437rem
+      ${props => transparentize(0.5, props.theme.white)};
   }
 `;
 

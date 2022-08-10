@@ -1,6 +1,6 @@
 // import { lighten } from 'polished';
+import { lighten } from 'polished';
 import styled, { css } from 'styled-components';
-import { lighten, transparentize } from 'polished';
 
 const ReactSelect = css`
   .react-select {
@@ -99,6 +99,8 @@ export const Container = styled.div`
   height: 100%;
   width: 100%;
   display: flex;
+
+  user-select: none;
 
   flex-direction: column;
   span {

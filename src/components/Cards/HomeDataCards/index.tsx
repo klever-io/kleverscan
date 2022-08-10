@@ -1,37 +1,35 @@
-import {
-  IDataCards,
-  ICard,
-  IAccountResponse,
-  IStatisticsResponse,
-  IYesterdayResponse,
-  ITransactionResponse,
-  IEpochCard,
-  IParsedMetrics,
-} from '../../../types';
-
-import { useEffect, useState } from 'react';
+import { Accounts, Epoch, TPS, Transactions } from '@/assets/cards';
 import CoinCard from '@/components/Cards/CoinCard';
+import api from '@/services/api';
+import theme from '@/styles/theme';
+import { Service } from '@/types/index';
+import { getEpochInfo } from '@/utils/index';
 import {
   DataCard,
   DataCardLatest,
   DataCardsContainer,
-  DataCardsWrapper,
   DataCardsContent,
+  DataCardsWrapper,
   DataCardValue,
   IconContainer,
   ProgressContainerSpan,
 } from '@/views/home';
-import { getEpochInfo } from '@/utils/index';
-
-import { Accounts, Transactions, Epoch, TPS } from '@/assets/cards';
-import api from '@/services/api';
-import { Service } from '@/types/index';
 import {
   ProgressContainer,
   ProgressContent,
   ProgressIndicator,
 } from '@/views/validators';
-import theme from '@/styles/theme';
+import { useEffect, useState } from 'react';
+import {
+  IAccountResponse,
+  ICard,
+  IDataCards,
+  IEpochCard,
+  IParsedMetrics,
+  IStatisticsResponse,
+  ITransactionResponse,
+  IYesterdayResponse,
+} from '../../../types';
 
 const HomeDataCards: React.FC<IDataCards> = ({
   totalAccounts: defaultTotalAccounts,
@@ -41,7 +39,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
   coinsData,
   yesterdayTransactions,
   yesterdayAccounts,
-  coinsStaking,
+  assetsData,
 }) => {
   const statisticsWatcherTimeout = 4000;
   const cardWatcherInterval = 4 * 1000; // 4 secs
@@ -276,7 +274,11 @@ const HomeDataCards: React.FC<IDataCards> = ({
         </DataCardsContent>
       </DataCardsWrapper>
 
-      <CoinCard coins={coinsData} actualTPS={actualTPS} coinsStaking={coinsStaking}/>
+      <CoinCard
+        coins={coinsData}
+        actualTPS={actualTPS}
+        assetsData={assetsData}
+      />
     </DataCardsContainer>
   );
 };

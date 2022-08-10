@@ -1,18 +1,15 @@
-import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
+import React from 'react';
 import { renderWithTheme } from '../../test/utils';
-
 import Dropdown from './';
 
 describe('Component: Dropdown URI', () => {
   it('Should render the uris when pass only 1 URI', () => {
-    const uris = { github: 'github.com/klever-io'};
+    const uris = { github: 'github.com/klever-io' };
     renderWithTheme(<Dropdown uris={uris} />);
 
-    const github = screen.getByRole('link',
-      { name: uris.github });
+    const github = screen.getByRole('link', { name: uris.github });
     expect(github).toBeInTheDocument();
     expect(github).toHaveAttribute('href', `https://${uris.github}`);
   });
@@ -28,13 +25,10 @@ describe('Component: Dropdown URI', () => {
     };
     const { container } = renderWithTheme(<Dropdown uris={uris} />);
 
-    const github = screen.getByRole('link',
-      { name: uris.github });
-    const website = screen.getByRole('link',
-    { name: uris.website });
-    const twitter = screen.getByRole('link',
-    { name: uris.twitter });
-    
+    const github = screen.getByRole('link', { name: uris.github });
+    const website = screen.getByRole('link', { name: uris.website });
+    const twitter = screen.getByRole('link', { name: uris.twitter });
+
     expect(github).toBeInTheDocument();
     expect(website).toBeInTheDocument();
     expect(twitter).toBeInTheDocument();
@@ -44,12 +38,8 @@ describe('Component: Dropdown URI', () => {
 
     const showMore: any = container.firstChild?.lastChild;
     await user.click(showMore);
-    const linkedin = screen.getByRole('link',
-    { name: uris.linkedin });
+    const linkedin = screen.getByRole('link', { name: uris.linkedin });
     expect(linkedin).toBeInTheDocument();
     expect(linkedin).toHaveAttribute('href', `https://${uris.linkedin}`);
-
   });
-
-  
 });

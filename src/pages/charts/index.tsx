@@ -1,22 +1,18 @@
-import React from 'react';
-import { useRouter } from 'next/router';
-
-import {
-  TransactionContainer,
-  TransactionChart,
-  TransactionChartContent,
-} from '@/views/home';
-
-import Chart, { ChartType } from '@/components/Chart';
-
-import { IResponse } from '../../types';
-
-import { Container, Header, Title, Input, Section } from '@/views/charts';
 import { ArrowLeft } from '@/assets/icons';
 import { Assets as Icon } from '@/assets/title-icons';
-import { GetServerSideProps } from 'next';
+import Chart, { ChartType } from '@/components/Chart';
 import api from '@/services/api';
+import { Container, Header, Input, Section, Title } from '@/views/charts';
+import {
+  TransactionChart,
+  TransactionChartContent,
+  TransactionContainer,
+} from '@/views/home';
 import { format } from 'date-fns';
+import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
+import React from 'react';
+import { IResponse } from '../../types';
 
 export interface IChartData {
   date?: number;

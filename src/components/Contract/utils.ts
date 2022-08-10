@@ -1,5 +1,5 @@
+import { getPrecision } from '@/utils/index';
 import { TransactionType } from '@klever/sdk';
-import { toast } from 'react-toastify';
 
 const getType = (rawType: string): TransactionType => {
   let type = rawType.substring(0, rawType.length - 8);
@@ -22,31 +22,6 @@ const getType = (rawType: string): TransactionType => {
   return TransactionType[type];
 };
 
-const getPrecision = async (asset: string): Promise<number | undefined> => {
-  const request = await fetch(
-    `${
-      process.env.DEFAULT_API_HOST || 'https://api.mainnet.klever.finance'
-    }/assets/${asset}`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  );
-
-  const response = await request.json();
-
-  if (response.error) {
-    const messageError =
-      response.error.charAt(0).toUpperCase() + response.error.slice(1);
-    toast.error(messageError);
-    return;
-  }
-
-  return 10 ** response.data.asset.precision;
-};
-
 const precisionParse = async (
   payload: { [key: string]: any },
   contractType: string,
@@ -54,7 +29,7 @@ const precisionParse = async (
   let precision: number | undefined;
   let assetId: string;
   const KLVPecision = 10 ** 6; // Also used for KFI
-  const percentagePrecision = 10 ** 6;
+  const percentagePrecision = 10 ** 2;
 
   switch (contractType) {
     case 'TransferContract':

@@ -1,7 +1,6 @@
 import React from 'react';
-import Area from './index';
-
 import { renderWithTheme } from '../../../test/utils';
+import Area from './index';
 
 const data = [
   { value: 500, date: 1 },

@@ -1,9 +1,8 @@
-import React from 'react';
-
-import Head from 'next/head';
-import Navbar from '../Header';
-import Footer from '../Footer';
 import { Main } from '@/views/home';
+import Head from 'next/head';
+import React from 'react';
+import Footer from '../Footer';
+import Navbar from '../Header';
 
 const Layout: React.FC = ({ children }) => {
   return (

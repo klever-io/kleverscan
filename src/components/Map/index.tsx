@@ -1,14 +1,11 @@
-import React, { Fragment } from 'react';
-
-import { MapContainer, Marker, TileLayer, Popup } from 'react-leaflet';
-import { divIcon, LatLngExpression, MarkerCluster } from 'leaflet';
-import MarkerClusterGroup from 'react-leaflet-markercluster';
 import Copy from '@/components/Copy';
+import { divIcon, LatLngExpression, MarkerCluster } from 'leaflet';
+import React, { Fragment } from 'react';
+import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-markercluster';
 import 'react-leaflet-markercluster/dist/styles.min.css';
-
-import { Container, Row } from './styles';
-
 import { ICountryNode, IPeerData } from '../../types';
+import { Container, Row } from './styles';
 
 interface IMapConfig {
   initialPosition: LatLngExpression;

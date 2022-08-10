@@ -1,20 +1,16 @@
-import {
-  IHome,
-  ITransactionListResponse,
-  IAccountResponse,
-  IBlockResponse,
-  IGeckoResponse,
-  IYesterdayResponse,
-  IGeckoChartResponse,
-  ITransactionResponse,
-  IParsedMetrics,
-} from '../../types';
-
-import { getEpochInfo } from '@/utils/index';
-
 import api from '@/services/api';
 import { Service } from '@/types/index';
+import { getEpochInfo } from '@/utils/index';
 import { GetServerSideProps } from 'next';
+import {
+  IAccountResponse,
+  IBlockResponse,
+  IGeckoChartResponse,
+  IGeckoResponse,
+  IHome,
+  IParsedMetrics,
+  ITransactionListResponse,
+} from '../../types';
 
 const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
   const props: IHome = {
@@ -33,14 +29,32 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     coinsData: [],
     yesterdayTransactions: 0,
     yesterdayAccounts: 0,
-    coinsStaking: {
-      klvStaking: {
-        totalStaking: null,
-        dayBeforeTotalStaking: null,
+    assetsData: {
+      klv: {
+        prices: {
+          todaysPrice: null,
+          yesterdayPrice: null,
+          variation: null,
+        },
+        staking: {
+          totalStaking: null,
+          dayBeforeTotalStaking: null,
+        },
+        volume: null,
+        circulatingSupply: null,
       },
-      kfiStaking: {
-        totalStaking: null,
-        dayBeforeTotalStaking: null,
+      kfi: {
+        prices: {
+          todaysPrice: null,
+          yesterdayPrice: null,
+          variation: null,
+        },
+        staking: {
+          totalStaking: null,
+          dayBeforeTotalStaking: null,
+        },
+        volume: null,
+        circulatingSupply: null,
       },
     },
   };
@@ -259,6 +273,46 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     reject(res.error);
   });
 
+  // const klvPriceCall = new Promise<IAccountResponse>(
+  //   async (resolve, reject) => {
+  //     const res = await api.post({
+  //       route: `coinstats`,
+  //       service: Service.PRICE,
+  //       body: {
+  //         ID: '38',
+  //         Name: 'klv',
+  //         Currency: 'USD',
+  //       },
+  //     });
+
+  //     if (!res.error || res.error === '') {
+  //       resolve(res);
+  //     }
+
+  //     reject(res.error);
+  //   },
+  // );
+
+  const kfiPriceCall = new Promise<IAccountResponse>(
+    async (resolve, reject) => {
+      const res = await api.post({
+        route: `coinstats`,
+        service: Service.PRICE,
+        body: {
+          ID: 'kfi',
+          Name: 'kfi',
+          Currency: 'USD',
+        },
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
+  );
+
   const promises = [
     blocksCall,
     transactionsCall,
@@ -274,6 +328,7 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     yesterdayAccountsCall,
     klvCall,
     kfiCall,
+    kfiPriceCall,
   ];
 
   await Promise.allSettled(promises).then(responses => {
@@ -349,20 +404,58 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
 
           case 12:
             const initialKlv = 0;
-            props.coinsStaking.klvStaking.totalStaking =
+            props.assetsData.klv.staking.totalStaking =
               value?.data?.asset?.staking?.totalStaked / 1000000 || null;
-   
-            props.coinsStaking.klvStaking.dayBeforeTotalStaking = (value?.data?.asset?.staking?.fpr.slice(-4).reduce((acc: number, curr: {totalStaked: number}) => acc + curr.totalStaked, initialKlv)) / (4 * 1000000);
+
+            props.assetsData.klv.staking.dayBeforeTotalStaking =
+              value?.data?.asset?.staking?.fpr
+                .slice(-4)
+                .reduce(
+                  (acc: number, curr: { totalStaked: number }) =>
+                    acc + curr.totalStaked,
+                  initialKlv,
+                ) /
+              (4 * 1000000);
+
+            props.assetsData.klv.circulatingSupply =
+              value?.data?.asset?.circulatingSupply / 1000000 || null;
 
             break;
 
           case 13:
             const initialKfi = 0;
-            props.coinsStaking.kfiStaking.totalStaking =
+            props.assetsData.kfi.staking.totalStaking =
               value?.data?.asset?.staking?.totalStaked / 1000000 || null;
 
-              props.coinsStaking.kfiStaking.dayBeforeTotalStaking = (value?.data?.asset?.staking?.fpr.slice(-4).reduce((acc: number, curr: {totalStaked: number}) => acc + curr.totalStaked, initialKfi)) / (4 * 1000000);
-              // sum last 4 total staked positions and divide by 4
+            props.assetsData.kfi.staking.dayBeforeTotalStaking =
+              value?.data?.asset?.staking?.fpr
+                .slice(-4)
+                .reduce(
+                  (acc: number, curr: { totalStaked: number }) =>
+                    acc + curr.totalStaked,
+                  initialKfi,
+                ) /
+              (4 * 1000000);
+            // sum last 4 total staked positions and divide by 4
+
+            props.assetsData.kfi.circulatingSupply =
+              value?.data?.asset?.circulatingSupply / 1000000;
+
+            break;
+
+          case 14:
+            if (!value.code) {
+              const data = value.Exchanges.find(
+                (exchange: any) => exchange.ExchangeName === 'Klever',
+              );
+              props.assetsData.kfi.volume = data.Volume;
+              props.assetsData.kfi.prices.todaysPrice = data.Price;
+              props.assetsData.kfi.prices.variation = data.PriceVariation;
+              if (data.Price && data.PriceVariation) {
+                props.assetsData.kfi.prices.yesterdayPrice =
+                  data.Price - data.PriceVariation;
+              }
+            }
 
             break;
 

@@ -1,40 +1,36 @@
-import React from 'react';
 import { render } from '@testing-library/react';
-
 import userEvent from '@testing-library/user-event';
-
 import { useRouter } from 'next/router';
-
+import React from 'react';
 import { ThemeProvider } from 'styled-components';
 import theme from '../../styles/theme';
-
 import Input from './';
 
-const TRANSACTION = 'd83919b59a8309572e3ee552a9f1b39cd8f40900be14b915d3df31a49202d630';
-const ADDRESS = 'klv1mt8yw657z6nk9002pccmwql8w90k0ac6340cjqkvm9e7lu0z2wjqudt69s'
+const TRANSACTION =
+  'd83919b59a8309572e3ee552a9f1b39cd8f40900be14b915d3df31a49202d630';
+const ADDRESS =
+  'klv1mt8yw657z6nk9002pccmwql8w90k0ac6340cjqkvm9e7lu0z2wjqudt69s';
 const BLOCK = '77453';
 const ASSET = 'KLV';
 
 jest.mock('next/router', () => ({
   __esModule: true,
-  useRouter: jest.fn()
+  useRouter: jest.fn(),
 }));
 
-describe('Component: Inputt', () => {  
-
+describe('Component: Inputt', () => {
   let container: HTMLElement;
   const mockRouter = {
     push: jest.fn(),
   };
   (useRouter as jest.Mock).mockReturnValue(mockRouter);
 
-
   beforeEach(() => {
     jest.clearAllMocks();
     container = render(
-    <ThemeProvider theme={theme}>
-      <Input />
-    </ThemeProvider>
+      <ThemeProvider theme={theme}>
+        <Input />
+      </ThemeProvider>,
     ).container;
   });
 
@@ -77,7 +73,7 @@ describe('Component: Inputt', () => {
     expect(mockRouter.push).toHaveBeenCalledWith(`/block/${BLOCK}`);
   });
 
-  it('Should redirect for assets page when don\'t match with the hash length of addresses, transaction or if the value is a number', async () => {
+  it("Should redirect for assets page when don't match with the hash length of addresses, transaction or if the value is a number", async () => {
     const user = userEvent.setup();
 
     const input: any = container.firstChild?.firstChild;
@@ -107,7 +103,7 @@ describe('Component: Inputt', () => {
     const search: any = container.firstChild?.lastChild;
 
     await user.click(search);
-    
+
     expect(mockRouter.push).not.toHaveBeenCalled();
   });
 

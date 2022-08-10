@@ -1,20 +1,16 @@
-import {
-  IHome,
-  ITransactionListResponse,
-  IAccountResponse,
-  IBlockResponse,
-  IGeckoResponse,
-  IYesterdayResponse,
-  IGeckoChartResponse,
-  ITransactionResponse,
-  IParsedMetrics,
-} from '../../types';
-
-import { getEpochInfo } from '@/utils/index';
-
 import api from '@/services/api';
 import { Service } from '@/types/index';
+import { getEpochInfo } from '@/utils/index';
 import { GetServerSideProps } from 'next';
+import {
+  IAccountResponse,
+  IBlockResponse,
+  IGeckoChartResponse,
+  IGeckoResponse,
+  IHome,
+  IParsedMetrics,
+  ITransactionListResponse,
+} from '../../types';
 
 const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
   const props: IHome = {

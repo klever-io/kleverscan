@@ -1,8 +1,14 @@
-import React from 'react';
-
-import Link from 'next/link';
+import { ChevronRight } from '@/assets/icons';
+import {
+  contents,
+  description,
+  IContent,
+  ISocial,
+  socials,
+} from '@/configs/footer';
 import Image from 'next/image';
-
+import Link from 'next/link';
+import React, { useCallback } from 'react';
 import {
   Container,
   DescriptionContainer,
@@ -13,16 +19,6 @@ import {
   SocialIcon,
 } from './styles';
 
-import {
-  contents,
-  description,
-  IContent,
-  ISocial,
-  socials,
-} from '@/configs/footer';
-
-import { ChevronRight } from '@/assets/icons';
-
 const Footer: React.FC = () => {
   const SocialItem: React.FC<ISocial> = ({ Icon, link }) => (
     <a target="_blank" href={link} rel="noreferrer">
@@ -32,7 +28,7 @@ const Footer: React.FC = () => {
     </a>
   );
 
-  const getReducedLinks = () => {
+  const getReducedLinks = useCallback(() => {
     const reduced = contents.reduce((acc: IContent[][], _, index, arr) => {
       if (index % 2 === 0) {
         acc.push(arr.slice(index, index + 2));
@@ -41,7 +37,7 @@ const Footer: React.FC = () => {
     }, []);
 
     return reduced;
-  };
+  }, []);
 
   return (
     <Container>

@@ -1,64 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { GetStaticProps } from 'next';
-import { toLocaleFixed } from '@/utils/index';
-
-import {
-  CardContainer,
-  CardContent,
-  Container,
-  Header,
-  Title,
-  Input,
-  Row,
-  HoverLink,
-  EndedDate,
-  CardVoteContainer,
-  CardVote,
-  PercentageText,
-  QtyVotesText,
-  OptionValidator,
-  ProgressBar,
-  VotesContainer,
-  StatusContent,
-  VotesHeader,
-  ProgressBarVotes,
-  ValidatorsContainer,
-  FiltersValidators,
-  VerticalLine,
-  ProgressBarContent,
-  PassThresholdContainer,
-  PassThresholdText,
-  DateContainer,
-  RowContent,
-  BalanceContainer,
-  NetworkParamsContainer,
-  HalfRow,
-} from '@/views/proposals/detail';
-
 import { ArrowLeft } from '@/assets/icons';
-import { Status } from '@/components/Table/styles';
 import { getStatusIcon } from '@/assets/status';
-import { format, fromUnixTime } from 'date-fns';
 import Table, { ITable } from '@/components/Table';
-import { Row as TableRow } from '@/components/Table/styles';
-import { formatAmount, typeVoteColors } from '@/utils/index';
+import { Row as TableRow, Status } from '@/components/Table/styles';
+import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
 import api from '@/services/api';
 import {
-  IRawParam,
   IFullInfoParam,
   IParsedProposal,
+  IProposal,
+  IRawParam,
   IVoters,
   IVotingPowers,
+  NetworkParamsIndexer,
 } from '@/types/proposals';
-
-import { AiFillCheckCircle } from 'react-icons/ai';
-
-import Tooltip from '../../components/Tooltip';
+import { formatAmount, toLocaleFixed, typeVoteColors } from '@/utils/index';
+import {
+  BalanceContainer,
+  CardContainer,
+  CardContent,
+  CardVote,
+  CardVoteContainer,
+  Container,
+  FiltersValidators,
+  HalfRow,
+  Header,
+  HoverLink,
+  Input,
+  NetworkParamsContainer,
+  OptionValidator,
+  PassThresholdContainer,
+  PassThresholdText,
+  PercentageText,
+  ProgressBar,
+  ProgressBarContent,
+  ProgressBarVotes,
+  QtyVotesText,
+  Row,
+  RowContent,
+  StatusContent,
+  Title,
+  ValidatorsContainer,
+  VerticalLine,
+  VotesContainer,
+  VotesHeader,
+} from '@/views/proposals/detail';
+import { format, fromUnixTime } from 'date-fns';
+import { GetStaticProps } from 'next';
 import Link from 'next/link';
-import { NetworkParamsIndexer } from '@/types/proposals';
-import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
-import { IProposal } from '@/types/proposals';
+import { useRouter } from 'next/router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { AiFillCheckCircle } from 'react-icons/ai';
+import Tooltip from '../../components/Tooltip';
 
 interface IVote {
   status: string;
@@ -155,26 +147,29 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
     setFilterVoters(tempFilterVoters);
   }, []);
 
-  const getQtyStatus = (status: string) => {
-    let qtyStatus = 0;
+  const getQtyStatus = useCallback(
+    (status: string) => {
+      let qtyStatus = 0;
 
-    votersList.forEach((item: any) => {
-      if (item.status === status) {
-        qtyStatus += 1;
-      }
-    });
+      votersList.forEach((item: any) => {
+        if (item.status === status) {
+          qtyStatus += 1;
+        }
+      });
 
-    return qtyStatus;
-  };
+      return qtyStatus;
+    },
+    [votersList],
+  );
 
-  const renderProposalParams = () => {
+  const renderProposalParams = useCallback(() => {
     return proposalAPI?.parsedParameters.map(param => (
       <div key={param.paramIndex}>
         <strong>{param.paramText}</strong>
         <span>{param.paramValue}</span>
       </div>
     ));
-  };
+  }, [proposalAPI]);
 
   const Progress: React.FC = () => {
     return (

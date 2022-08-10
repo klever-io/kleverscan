@@ -1,6 +1,5 @@
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { renderWithTheme } from '../../test/utils';
 import Proposals, { getServerSideProps } from '../../pages/proposals/index';
 import api from '../../services/api';
 import {
@@ -8,6 +7,7 @@ import {
   mockedProposalsListPage2,
   networkParametersMock,
 } from '../../test/mocks/index';
+import { renderWithTheme } from '../../test/utils';
 
 jest.mock('next/router', () => ({
   useRouter() {

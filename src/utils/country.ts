@@ -1,4 +1,4 @@
-var countryISOMapping = {
+const countryISOMapping = {
   AF: 'AFG',
   AX: 'ALA',
   AL: 'ALB',
@@ -253,6 +253,6 @@ var countryISOMapping = {
 
 export type ISO2 = keyof typeof countryISOMapping;
 
-export const getCountryISO3 = (iso2Code: ISO2) => {
+export const getCountryISO3 = (iso2Code: ISO2): string => {
   return countryISOMapping[iso2Code];
 };

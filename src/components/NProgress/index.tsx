@@ -1,6 +1,5 @@
-import React from 'react';
-
 import PageNProgress from 'next-styled-nprogress';
+import React from 'react';
 
 const NProgress: React.FC = () => {
   const props = {

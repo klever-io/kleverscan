@@ -1,23 +1,17 @@
-import React from 'react';
-
-import Link from 'next/link';
-import { format, fromUnixTime } from 'date-fns';
-
+import { ArrowRight } from '@/assets/icons';
+import { getStatusIcon } from '@/assets/status';
 import Table, { ITable } from '@/components/Table';
 import { Row, Status } from '@/components/Table/styles';
-
 import {
   Contract,
   IContract,
   ITransaction,
   ITransferContract,
 } from '@/types/index';
-
-import { ArrowRight } from '@/assets/icons';
-import { getStatusIcon } from '@/assets/status';
 import { capitalizeString, formatAmount, parseAddress } from '@/utils/index';
-import { CenteredRow } from '@/views/accounts/detail';
-import Copy from '@/components/Copy';
+import { format, fromUnixTime } from 'date-fns';
+import Link from 'next/link';
+import React from 'react';
 
 interface ITransactionsProps {
   transactions: ITransaction[];

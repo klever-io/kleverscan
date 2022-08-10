@@ -1,10 +1,3 @@
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-
-import { core } from '@klever/sdk';
-import Select from './Select';
-import { toast } from 'react-toastify';
-
 import {
   InputLabel,
   Slider,
@@ -14,10 +7,25 @@ import {
 } from '@/components/Form/FormInput/styles';
 import { ICollectionList, IParamList } from '@/types/index';
 import formSection from '@/utils/formSections';
-import { assetTriggerTypes, claimTypes, contractOptions } from '@/utils/index';
+import {
+  assetTriggerTypes,
+  claimTypes,
+  contractOptions,
+  parseAddress,
+} from '@/utils/index';
+import { core } from '@klever/sdk';
+import Form, { ISection } from 'components/Form';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import Copy from '../Copy';
+import PackInfoForm from '../CustomForm/PackInfo';
+import PermissionsForm from '../CustomForm/Permissions';
+import Select from './Select';
 import {
   AssetIDInput,
   AssetTriggerContainer,
+  BalanceContainer,
   BalanceLabel,
   CloseIcon,
   Container,
@@ -25,16 +33,8 @@ import {
   FieldLabel,
   SelectContainer,
   SelectContent,
-  BalanceContainer,
 } from './styles';
 import { getType, precisionParse } from './utils';
-
-import Form, { ISection } from 'components/Form';
-import Copy from '../Copy';
-import PackInfoForm from '../CustomForm/PackInfo';
-import PermissionsForm from '../CustomForm/Permissions';
-
-import { parseAddress } from '@/utils/index';
 
 interface IContract {
   assetsList: ICollectionList[];

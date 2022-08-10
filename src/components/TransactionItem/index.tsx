@@ -1,19 +1,14 @@
-import React from 'react';
-
-import Link from 'next/link';
-
-import { format, fromUnixTime } from 'date-fns';
-
-import {
-  TransactionRow,
-  TransactionData,
-  TransactionAmount,
-} from '@/views/home';
 import { getStatusIcon } from '@/assets/status';
-
-import { parseAddress, toLocaleFixed } from '../../utils';
-
+import {
+  TransactionAmount,
+  TransactionData,
+  TransactionRow,
+} from '@/views/home';
+import { format, fromUnixTime } from 'date-fns';
+import Link from 'next/link';
+import React from 'react';
 import { ITransaction, ITransferContract } from '../../types';
+import { parseAddress, toLocaleFixed } from '../../utils';
 
 const TransactionItem: React.FC<ITransaction> = ({
   hash,
@@ -21,7 +16,7 @@ const TransactionItem: React.FC<ITransaction> = ({
   contract,
   precision,
   sender,
-  status
+  status,
 }) => {
   let parameter: ITransferContract = {} as ITransferContract;
   let amount = 0;

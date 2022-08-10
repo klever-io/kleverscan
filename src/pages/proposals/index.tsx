@@ -1,36 +1,28 @@
 import { ArrowLeft } from '@/assets/icons';
-import { Input } from '@/views/proposals';
-
+import { Proposals as Icon } from '@/assets/title-icons';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Tabs, { ITabs } from '@/components/Tabs';
-
+import NetworkParams from '@/components/Tabs/NetworkParams';
+import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
+import ProposalsTab from '@/components/Tabs/Proposals';
+import api from '@/services/api';
+import {
+  IFullInfoParam,
+  INetworkParams,
+  IParsedProposal,
+  IProposalsPage,
+  IProposalsResponse,
+  IRawParam,
+  NetworkParamsIndexer,
+} from '@/types/proposals';
+import { useDidUpdateEffect } from '@/utils/hooks';
 import { Header, Title } from '@/views/accounts/detail';
 import { Card } from '@/views/blocks';
-import { CardContainer } from '@/views/proposals';
-import router from 'next/router';
-import { Container } from '@/views/proposals';
-import { useState } from 'react';
-import NetworkParams from '@/components/Tabs/NetworkParams';
-import ProposalsTab from '@/components/Tabs/Proposals';
-import { Proposals as Icon } from '@/assets/title-icons';
+import { CardContainer, Container, Input } from '@/views/proposals';
 import { GetServerSideProps } from 'next';
-import api from '@/services/api';
-import { useDidUpdateEffect } from '@/utils/hooks';
-
-import {
-  IProposal,
-  IProposals,
-  IProposalsResponse,
-  INetworkParam,
-  INetworkParams,
-  IProposalsPage,
-  NetworkParamsIndexer,
-  IRawParam,
-  IFullInfoParam,
-  IParsedProposal,
-} from '@/types/proposals';
-import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
+import router from 'next/router';
+import { useCallback, useState } from 'react';
 
 const Proposals: React.FC<IProposalsPage> = ({
   networkParams: defaultNetworkParams,
@@ -48,7 +40,7 @@ const Proposals: React.FC<IProposalsPage> = ({
     defaultProposals,
   );
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoadingProposals(true);
     const proposals: IProposalsResponse = await api.get({
       route: `proposals/list?page=${page}`,
@@ -59,7 +51,7 @@ const Proposals: React.FC<IProposalsPage> = ({
       setProposals(parsedProposalResponse);
       setLoadingProposals(false);
     }
-  };
+  }, [page]);
 
   useDidUpdateEffect(() => {
     fetchData();

@@ -1,19 +1,14 @@
 import type { AppProps } from 'next/app';
-import React from 'react';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-
-import { ThemeProvider } from 'styled-components';
+import React from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { ThemeProvider } from 'styled-components';
 import Layout from '../components/Layout';
 import NProgress from '../components/NProgress';
-
+import Bugsnag from '../lib/bugsnag';
 import GlobalStyle from '../styles/global';
 import theme from '../styles/theme';
-
-import Bugsnag from '../lib/bugsnag';
 
 const ErrorBoundary = Bugsnag.getPlugin('react')?.createErrorBoundary(React);
 

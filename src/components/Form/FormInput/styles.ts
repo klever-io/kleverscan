@@ -1,6 +1,6 @@
-import styled, { css } from 'styled-components';
 import { lighten, transparentize } from 'polished';
 import { BsQuestionCircleFill } from 'react-icons/bs';
+import styled, { css } from 'styled-components';
 
 interface IProps {
   error?: boolean;

@@ -1,44 +1,37 @@
-import React, { useEffect, useState } from 'react';
-
-import Link from 'next/link';
-
-import { CenteredRow, Row } from '@/views/transactions/detail';
-
-import { toLocaleFixed } from '@/utils/index';
-
-import { findKey, findReceipt } from '@/utils/findKey';
-import { getPrecision } from '@/components/Contract/utils';
-
-import {
-  ITransferContract,
-  ICreateAssetContract,
-  IContract,
-  ICreateValidatorContract,
-  IFreezeContract,
-  IUnfreezeContract,
-  IAsset,
-  IFreezeReceipt,
-  IUnfreezeReceipt,
-  ICreateAssetReceipt,
-  IClaimContract,
-  IDelegateContract,
-  IUndelegateContract,
-  IWithdrawContract,
-  IAssetTriggerContract,
-  ISetAccountNameContract,
-  IProposalContract,
-  IVoteContract,
-  IConfigITOContract,
-  ISetITOPricesContract,
-  IBuyContract,
-  ISellContract,
-  ICancelMarketOrderContract,
-  ICreateMarketplaceContract,
-  IConfigMarketplaceContract,
-  IValidatorConfig,
-} from '@/types/index';
-
 import { KLV } from '@/assets/coins';
+import { getPrecision } from '@/components/Contract/utils';
+import {
+  IAssetTriggerContract,
+  IBuyContract,
+  ICancelMarketOrderContract,
+  IClaimContract,
+  IConfigITOContract,
+  IConfigMarketplaceContract,
+  IContract,
+  ICreateAssetContract,
+  ICreateAssetReceipt,
+  ICreateMarketplaceContract,
+  ICreateValidatorContract,
+  IDelegateContract,
+  IFreezeContract,
+  IFreezeReceipt,
+  IProposalContract,
+  ISellContract,
+  ISetAccountNameContract,
+  ISetITOPricesContract,
+  ITransferContract,
+  IUndelegateContract,
+  IUnfreezeContract,
+  IUnfreezeReceipt,
+  IValidatorConfig,
+  IVoteContract,
+  IWithdrawContract,
+} from '@/types/index';
+import { findKey, findReceipt } from '@/utils/findKey';
+import { toLocaleFixed } from '@/utils/index';
+import { CenteredRow, Row } from '@/views/transactions/detail';
+import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
 import Copy from '../Copy';
 
 export const Transfer: React.FC<any> = ({ parameter: par }) => {

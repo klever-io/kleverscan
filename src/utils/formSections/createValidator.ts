@@ -10,13 +10,13 @@ const createValidatorContract = (address = ''): ISection[] => {
         props: {
           value: address,
           required: true,
-        }
+        },
       },
       {
         label: 'BLS Public Key',
         props: {
           tooltip: 'BLS Public Key',
-        }
+        },
       },
       {
         label: 'Reward Address',
@@ -79,11 +79,10 @@ const createValidatorContract = (address = ''): ISection[] => {
           },
         },
       },
-    ]
+    ],
   });
 
   return section;
 };
-  
+
 export default createValidatorContract;
-  

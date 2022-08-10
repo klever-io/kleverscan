@@ -1,6 +1,5 @@
-import styled from 'styled-components';
-
 import { default as DefaultInput } from '@/components/Inputt';
+import styled from 'styled-components';
 
 interface CardVoteProps {
   color: string;

@@ -1,6 +1,5 @@
-import styled, { keyframes } from 'styled-components';
-import { lighten } from 'polished';
 import Image from 'next/image';
+import styled, { keyframes } from 'styled-components';
 
 interface IVariation {
   positive: boolean;
@@ -29,7 +28,7 @@ export const Container = styled.div`
 
 export const Content = styled.div`
   display: flex;
-  box-shadow: 5px 6px 5px 0px rgba(0,0,0,0.1);
+  box-shadow: 5px 6px 5px 0px rgba(0, 0, 0, 0.1);
 
   overflow-x: auto;
   scroll-behavior: smooth !important;

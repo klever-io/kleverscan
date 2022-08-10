@@ -1,9 +1,7 @@
-import styled, { css, keyframes } from 'styled-components';
-
+import { transparentize } from 'polished';
 import { FiMenu } from 'react-icons/fi';
 import { MdArrowDropDown } from 'react-icons/md';
-
-import { transparentize } from 'polished';
+import styled, { css, keyframes } from 'styled-components';
 import { default as DefaultInput } from '../Inputt';
 
 interface IMobileMenu {

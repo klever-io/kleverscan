@@ -1,22 +1,17 @@
-import React, { useEffect, useState } from 'react';
-
-import { useRouter } from 'next/router';
-import { GetServerSideProps } from 'next';
-import api from '@/services/api';
-
-import { Container, Header, Title } from '@/views/assets';
-
 import { ArrowLeft } from '@/assets/icons';
 import { Transactions as Icon } from '@/assets/title-icons';
-import { ICollectionList, IParamList } from '@/types/index';
 import Contract from '@/components/Contract';
-
+import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
+import api from '@/services/api';
+import { ICollectionList, IParamList } from '@/types/index';
+import { INetworkParam, IProposalsResponse } from '@/types/proposals';
+import { doIf } from '@/utils/index';
+import { Container, Header, Title } from '@/views/assets';
 import { Card } from '@/views/blocks';
 import { CardContainer } from '@/views/create-transaction';
-
-import { IProposalsResponse, INetworkParam } from '@/types/proposals';
-import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
-import { doIf } from '@/utils/index';
+import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 interface IContract {

@@ -1,17 +1,16 @@
 import {
   breakText,
-  timestampToDate,
-  getVariation,
-  getAge,
-  formatAmount,
-  toLocaleFixed,
-  hexToString,
-  parseHardCodedInfo,
-  parseAddress,
   capitalizeString,
+  formatAmount,
+  getAge,
   getEpochInfo,
+  getVariation,
+  hexToString,
+  parseAddress,
+  parseHardCodedInfo,
+  timestampToDate,
+  toLocaleFixed,
 } from '../index';
-
 import mocks from './mocks';
 
 describe('unit tests for util funcs in index file', () => {
@@ -105,7 +104,9 @@ describe('unit tests for util funcs in index file', () => {
     test('arbitrary numbers where English is the default language', () => {
       let mockLocaleFixed = toLocaleFixed;
       mockLocaleFixed = jest.fn().mockImplementation((value, precision) => {
-        return value.toLocaleString('en-US', { minimumFractionDigits: precision});
+        return value.toLocaleString('en-US', {
+          minimumFractionDigits: precision,
+        });
       });
       expect(mockLocaleFixed(4141414, 6)).toEqual('4,141,414.000000');
       expect(mockLocaleFixed(30000.65, 2)).toEqual('30,000.65');

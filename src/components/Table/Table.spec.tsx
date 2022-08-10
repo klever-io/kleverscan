@@ -1,12 +1,9 @@
-import React from 'react';
-import * as nextRouter from 'next/router';
 import { screen } from '@testing-library/react';
-
-import theme from '../../styles/theme';
-
-import { renderWithTheme } from '../../test/utils';
+import * as nextRouter from 'next/router';
+import React from 'react';
 import { ITable } from '../../components/Table';
-
+import theme from '../../styles/theme';
+import { renderWithTheme } from '../../test/utils';
 import Table from './';
 
 const testHeaders = [
@@ -31,14 +28,14 @@ const tableProps: ITable = {
 describe('Componenet: Table', () => {
   jest.mock('next/router', () => ({
     useRouter() {
-      return ({
+      return {
         route: '/',
         pathname: '',
-      });
+      };
     },
   }));
 
-  const useRouter: any = jest.spyOn(nextRouter, "useRouter");
+  const useRouter: any = jest.spyOn(nextRouter, 'useRouter');
   useRouter.mockImplementation(() => ({
     route: '/',
     pathname: '/validators',
@@ -48,8 +45,8 @@ describe('Componenet: Table', () => {
     jest.clearAllMocks();
   });
 
-  it('Should render the headers of the table and the empty row when there\'s no data', () => {
-    renderWithTheme(<Table {...tableProps} /> )
+  it("Should render the headers of the table and the empty row when there's no data", () => {
+    renderWithTheme(<Table {...tableProps} />);
     testHeaders.forEach((header, index) => {
       const getHeader = screen.getByText(header);
       expect(getHeader).toBeInTheDocument();
@@ -61,14 +58,16 @@ describe('Componenet: Table', () => {
   });
 
   it('Should match the style for the header and the empty row', () => {
-    renderWithTheme(<Table {...tableProps} /> )
+    renderWithTheme(<Table {...tableProps} />);
     const header = screen.getByText(/Rank/i).parentNode;
-    const emptyRow = screen.getByText(/Oops! Apparently no data here./i).parentNode;
+    const emptyRow = screen.getByText(
+      /Oops! Apparently no data here./i,
+    ).parentNode;
     const headerStyle = {
       padding: '1rem 1.5rem',
       color: theme.table.text,
       fontWeight: '600',
-      fontSize: '0.85rem'
+      fontSize: '0.85rem',
     };
     const emptyRowStyle = {
       width: '100%',

@@ -1,4 +1,10 @@
-import { IAsset, IParsedMetrics, IEpochInfo, IContractOption } from '../types';
+import {
+  IAsset,
+  IContractOption,
+  IEpochInfo,
+  IFormData,
+  IParsedMetrics,
+} from '../types';
 
 export const breakText = (text: string, limit: number): string => {
   return text.length > limit ? `${text.substring(0, limit)}...` : text;
@@ -180,7 +186,7 @@ export const addCommasToNumber = (numb: number): string => {
   return numb.toLocaleString();
 };
 
-export const parseData = (data: any) => {
+export const parseData = (data: IFormData): IFormData => {
   const dataEntries = Object.entries(data);
 
   dataEntries.forEach(([key, value]) => {
@@ -215,7 +221,7 @@ export const parseData = (data: any) => {
   return data;
 };
 
-export const formatLabel = (str: string) => {
+export const formatLabel = (str: string): string => {
   switch (str) {
     case 'assetID':
       return 'AssetID';

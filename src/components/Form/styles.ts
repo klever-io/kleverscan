@@ -1,8 +1,7 @@
-import styled, { css } from 'styled-components';
-import { lighten, transparentize } from 'polished';
 import { Form } from '@unform/web';
-
+import { lighten } from 'polished';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
+import styled, { css } from 'styled-components';
 
 interface IButton {
   submit?: boolean;
@@ -97,7 +96,7 @@ export const ButtonContainer = styled.button<IButton>`
   user-select: none;
 
   @media (max-width: 768px) {
-    width: 45%;    
+    width: 45%;
   }
 `;
 
@@ -109,7 +108,7 @@ export const AdvancedOptsContainer = styled.div`
   margin-top: 1rem;
   span {
     color: ${({ theme }) => theme.input.border.dark};
-    margin-right: .5rem;
+    margin-right: 0.5rem;
     user-select: none;
   }
 `;

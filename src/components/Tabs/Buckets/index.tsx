@@ -1,16 +1,12 @@
-import React from 'react';
-
-import { Status } from './styles';
-
+import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
 import { Row } from '@/components/Table/styles';
-
-import { IAccountAsset, IAsset, IBucket } from '@/types/index';
-import Link from 'next/link';
+import { IAccountAsset, IBucket } from '@/types/index';
 import { parseAddress } from '@/utils/index';
-import Copy from '@/components/Copy';
-
 import { CenteredRow, RowContent } from '@/views/accounts/detail';
+import Link from 'next/link';
+import React from 'react';
+import { Status } from './styles';
 
 interface IBuckets {
   buckets: IBucket[];
@@ -40,17 +36,19 @@ const Buckets: React.FC<IBuckets> = ({ buckets, assets }) => {
     };
 
     const getAssetId = (id: string) => {
-      if(id.length === 64) {
-        return assets.find(({buckets}) => (bucket: string) => bucket === id)?.assetId;
+      if (id.length === 64) {
+        return assets.find(
+          ({ buckets }) =>
+            (bucket: string) =>
+              bucket === id,
+        )?.assetId;
       }
       return id;
     };
 
     return (
       <Row type="buckets">
-        <span>
-          {getAssetId(id)}
-        </span>
+        <span>{getAssetId(id)}</span>
         <span>
           <p>{(balance / 10 ** precision).toLocaleString()}</p>
         </span>

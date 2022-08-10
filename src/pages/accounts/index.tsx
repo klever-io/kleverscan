@@ -1,11 +1,16 @@
-import React, { useEffect, useState } from 'react';
-
-import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-
-import { fromUnixTime } from 'date-fns';
-
+import { ArrowLeft } from '@/assets/icons';
+import { Accounts as Icon } from '@/assets/title-icons';
+import Copy from '@/components/Copy';
+import Pagination from '@/components/Pagination';
+import { PaginationContainer } from '@/components/Pagination/styles';
+import Table, { ITable } from '@/components/Table';
+import { Row } from '@/components/Table/styles';
+import api from '@/services/api';
+import { IAccount, IPagination, IResponse } from '@/types/index';
+import { useDidUpdateEffect } from '@/utils/hooks';
+import { formatAmount, getAge } from '@/utils/index';
+import { TableContainer } from '@/views/accounts';
+import { CenteredRow } from '@/views/accounts/detail';
 import {
   Card,
   CardContainer,
@@ -14,23 +19,11 @@ import {
   Input,
   Title,
 } from '@/views/blocks';
-
-import { TableContainer } from '@/views/accounts';
-
-import Table, { ITable } from '@/components/Table';
-import { Row } from '@/components/Table/styles';
-
-import { IAccount, IPagination, IResponse } from '@/types/index';
-import api from '@/services/api';
-import { formatAmount, getAge } from '@/utils/index';
-
-import { ArrowLeft } from '@/assets/icons';
-import { Accounts as Icon } from '@/assets/title-icons';
-import { PaginationContainer } from '@/components/Pagination/styles';
-import Pagination from '@/components/Pagination';
-import { useDidUpdateEffect } from '@/utils/hooks';
-import Copy from '@/components/Copy';
-import { CenteredRow } from '@/views/accounts/detail';
+import { fromUnixTime } from 'date-fns';
+import { GetServerSideProps } from 'next';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
 
 interface IAccounts {
   accounts: IAccount[];

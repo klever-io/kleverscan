@@ -1,11 +1,9 @@
+import { transparentize } from 'polished';
 import React from 'react';
-
-import { withTheme } from 'styled-components';
 import { Area, AreaChart, ResponsiveContainer } from 'recharts';
-
+import { withTheme } from 'styled-components';
 import { IChartData } from '../../../configs/home';
 import { Theme } from '../../../styles/styles';
-import { transparentize } from 'polished';
 
 interface IChart {
   data: IChartData[];

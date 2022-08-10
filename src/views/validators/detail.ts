@@ -1,7 +1,5 @@
-import styled from 'styled-components';
-
 import { default as DefaultInput } from '@/components/Inputt';
-import { transparentize } from 'polished';
+import styled from 'styled-components';
 
 interface IRatingProps {
   rate: string;

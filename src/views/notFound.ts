@@ -1,6 +1,5 @@
 import { transparentize } from 'polished';
 import styled, { css } from 'styled-components';
-
 import { default as DefaultBackground } from '../assets/not-found.svg';
 
 export const Container = styled.div`

@@ -10,7 +10,7 @@ export const Container = styled.div<IContainer>`
   width: 90%;
   max-width: 1200px;
   padding: 2rem 0;
-  opacity: ${props => props.loading ? 0.4 : 1};
+  opacity: ${props => (props.loading ? 0.4 : 1)};
 `;
 
 export const ExtraOptionContainer = styled.div`

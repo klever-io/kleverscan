@@ -16,6 +16,5 @@ const claimContract = (): ISection[] => {
 
   return section;
 };
-  
+
 export default claimContract;
-  

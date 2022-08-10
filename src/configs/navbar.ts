@@ -1,11 +1,11 @@
 import {
   Category,
-  Graph,
-  Send,
-  TwoUser,
   Compass,
-  TickSquare,
+  Graph,
   Proposal,
+  Send,
+  TickSquare,
+  TwoUser,
 } from '@/assets/icons';
 export interface INavbarItem {
   name: string;

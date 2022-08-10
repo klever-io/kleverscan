@@ -1,6 +1,5 @@
-import styled from 'styled-components';
-
 import { default as DefaultInput } from '@/components/Inputt';
+import styled from 'styled-components';
 
 export const Container = styled.div`
   padding: 3rem 8rem 5rem 8rem;

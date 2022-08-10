@@ -1,7 +1,5 @@
-import styled, { css } from 'styled-components';
-
 import { transparentize } from 'polished';
-
+import styled, { css } from 'styled-components';
 import { IButton } from '.';
 
 const ContainerMainPage = css`

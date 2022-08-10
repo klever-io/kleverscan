@@ -1,6 +1,6 @@
 // import { lighten } from 'polished';
+import { lighten } from 'polished';
 import styled, { css } from 'styled-components';
-import { lighten, transparentize } from 'polished';
 
 const ReactSelect = css`
   .react-select {

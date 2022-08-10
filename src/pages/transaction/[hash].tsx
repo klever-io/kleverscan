@@ -1,12 +1,40 @@
-import React, { useState } from 'react';
-
-import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { format, fromUnixTime } from 'date-fns';
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import { xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
-
+import { ArrowLeft, Receive } from '@/assets/icons';
+import { getStatusIcon } from '@/assets/status';
+import { TransactionDetails as Icon } from '@/assets/title-icons';
+import Copy from '@/components/Copy';
+import QrCodeModal from '@/components/QrCodeModal';
+import { Status } from '@/components/Table/styles';
+import {
+  AssetTrigger,
+  Buy,
+  CancelMarketOrder,
+  Claim,
+  ConfigITO,
+  ConfigMarketplace,
+  CreateAsset,
+  CreateMarketplace,
+  CreateValidator,
+  Delegate,
+  Freeze,
+  Proposal,
+  Sell,
+  SetAccountName,
+  SetITOPrices,
+  Transfer,
+  Undelegate,
+  Unfreeze,
+  Unjail,
+  Vote,
+  Withdraw,
+} from '@/components/TransactionContractComponents';
+import api from '@/services/api';
+import { Contract, IAsset, IResponse, ITransaction } from '@/types/index';
+import {
+  capitalizeString,
+  hexToString,
+  isDataEmpty,
+  toLocaleFixed,
+} from '@/utils/index';
 import {
   CardContainer,
   CardContent,
@@ -19,59 +47,14 @@ import {
   Row,
   Title,
 } from '@/views/transactions/detail';
-
-import { Status } from '@/components/Table/styles';
-
-import api from '@/services/api';
-import {
-  toLocaleFixed,
-  hexToString,
-  isDataEmpty,
-  capitalizeString,
-} from '@/utils/index';
-import {
-  IResponse,
-  ITransaction,
-  IAsset,
-  Contract,
-  ITransferContract,
-  ICreateAssetContract,
-  IContract,
-} from '@/types/index';
-
-import { ArrowLeft, Receive } from '@/assets/icons';
-import {
-  TransactionDetails as Icon,
-  TransactionDetails,
-} from '@/assets/title-icons';
-import { getStatusIcon } from '@/assets/status';
-
-import {
-  Transfer,
-  CreateAsset,
-  CreateValidator,
-  Freeze,
-  Unfreeze,
-  Withdraw,
-  Delegate,
-  Undelegate,
-  Claim,
-  Unjail,
-  AssetTrigger,
-  SetAccountName,
-  Proposal,
-  Vote,
-  ConfigITO,
-  SetITOPrices,
-  Buy,
-  Sell,
-  CancelMarketOrder,
-  CreateMarketplace,
-  ConfigMarketplace,
-} from '@/components/TransactionContractComponents';
-import Copy from '@/components/Copy';
-import QrCodeModal from '@/components/QrCodeModal';
 import { ReceiveBackground } from '@/views/validator';
+import { format, fromUnixTime } from 'date-fns';
+import { GetServerSideProps } from 'next';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { useState } from 'react';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 
 interface ITransactionResponse extends IResponse {
   data: {

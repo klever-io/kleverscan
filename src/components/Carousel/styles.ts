@@ -1,9 +1,8 @@
-import styled from 'styled-components';
-
 import {
   ArrowLeft as DefaultArrowLeft,
   ArrowRight as DefaultArrowRight,
 } from '@/assets/carousel';
+import styled from 'styled-components';
 
 export const Container = styled.div`
   display: flex;
@@ -53,7 +52,7 @@ export const ArrowLeft = styled(DefaultArrowLeft)`
   cursor: pointer;
 
   transition: 0.2s ease;
-  z-index:1;
+  z-index: 1;
 
   &:hover {
     filter: brightness(1.2);

@@ -1,11 +1,7 @@
+import { cleanup, fireEvent, screen } from '@testing-library/react';
 import React from 'react';
-
-import { fireEvent, screen, cleanup } from '@testing-library/react';
-
 import Pagination from '.';
-
 import theme from '../../styles/theme';
-
 import { renderWithTheme } from '../../test/utils/';
 
 interface IPagination {
@@ -57,38 +53,32 @@ describe('Component: Pagination', () => {
     beforeEach(() => {
       jest.clearAllMocks();
     });
-    
+
     afterAll(cleanup);
 
     it('Should change to page 2 when click on right arrow', () => {
       const { container } = renderWithTheme(
         <Pagination {...paginationProps} />,
       );
-      const rightArrow: any =
-        container.firstElementChild?.lastElementChild;
-    
+      const rightArrow: any = container.firstElementChild?.lastElementChild;
+
       fireEvent.click(rightArrow);
       expect(paginationProps.page).toBe(2);
     });
 
     it('Should change to page 4 when click on left arrow ', () => {
-      const newProps = {...paginationProps};
+      const newProps = { ...paginationProps };
       newProps.page = 5;
       newProps.count = 500;
-      const { container } = renderWithTheme(
-        <Pagination {...newProps} />,
-      );
-      const leftArrow: any =
-      container.firstElementChild?.firstElementChild;
-  
+      const { container } = renderWithTheme(<Pagination {...newProps} />);
+      const leftArrow: any = container.firstElementChild?.firstElementChild;
+
       fireEvent.click(leftArrow);
       expect(paginationProps.page).toBe(4);
     });
 
     it('Should open right modal when click on right ellipsis and should desapear when unblur', () => {
-      renderWithTheme(
-        <Pagination {...paginationProps} />,
-      );
+      renderWithTheme(<Pagination {...paginationProps} />);
       const rightModal: any = screen.getByText('...');
       fireEvent.click(rightModal);
 
@@ -96,16 +86,14 @@ describe('Component: Pagination', () => {
       expect(modal).toBeInTheDocument();
       expect(modal).toBeVisible();
 
-      const modalContainer: any = modal?.parentElement?.parentElement?.parentElement;
+      const modalContainer: any =
+        modal?.parentElement?.parentElement?.parentElement;
       fireEvent.blur(modalContainer);
       expect(modal).not.toBeVisible();
-
     });
 
     it('if pagination numbers are rendered according to the passed props', () => {
-      renderWithTheme(
-        <Pagination {...paginationProps} />,
-      );
+      renderWithTheme(<Pagination {...paginationProps} />);
       let pageSpan;
       for (let index = 1; index <= 7; index++) {
         pageSpan = screen.getByText(String(index));
@@ -117,9 +105,7 @@ describe('Component: Pagination', () => {
     });
 
     it('if ellipsis is rendered and is in the correct position', () => {
-      renderWithTheme(
-        <Pagination {...paginationProps} />,
-      );
+      renderWithTheme(<Pagination {...paginationProps} />);
       const ellipsis = screen.getByText('...');
       expect(ellipsis).toBeVisible();
       const ellipsisContainer = ellipsis?.parentElement;
@@ -154,9 +140,7 @@ describe('Component: Pagination', () => {
 describe('User interaction tests', () => {
   describe('User pagination through the last page', () => {
     it('First render: click in the "1000" page element', () => {
-      renderWithTheme(
-        <Pagination {...paginationProps} />,
-      );
+      renderWithTheme(<Pagination {...paginationProps} />);
       let pageSpan;
       for (let index = 1; index <= 7; index++) {
         pageSpan = screen.getByText(String(index));

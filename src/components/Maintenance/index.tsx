@@ -1,9 +1,7 @@
+import { DataCard, DataCardValue, IconContainer } from '@/views/home';
 import React from 'react';
-import { Container } from './styles';
-
 import { FaWrench } from 'react-icons/fa';
-
-import { DataCard, IconContainer, DataCardValue } from '@/views/home';
+import { Container } from './styles';
 
 const Maintenance: React.FC = () => {
   return (

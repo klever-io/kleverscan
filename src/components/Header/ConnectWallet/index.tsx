@@ -1,28 +1,18 @@
-import React, { useEffect, useState } from 'react';
-
-import Link from 'next/link';
-
+import Copy from '@/components/Copy';
+import IconTooltip from '@/components/IconTooltip';
+import { useDidUpdateEffect } from '@/utils/hooks';
+import { useRouter } from 'next/router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { MobileNavbarItem } from '..';
+import { doIf, parseAddress } from '../../../utils';
 import {
   ConnectButton,
   ConnectContainer,
   CopyContainer,
-  LogoutContainer,
-  LogoutIcon,
-  MenuTransaction,
   MobileStyledTransfer,
   StyledTransfer,
 } from './styles';
-
-import { BiTransfer } from 'react-icons/bi';
-import { toast } from 'react-toastify';
-import { doIf, parseAddress } from '../../../utils';
-
-import Copy from '@/components/Copy';
-import { useRouter } from 'next/router';
-import { MobileNavbarItem } from '..';
-import { DropdownContainer, DropdownItem } from '../styles';
-import { useDidUpdateEffect } from '@/utils/hooks';
-import IconTooltip from '@/components/IconTooltip';
 
 interface IConnectWalletProps {
   handleMenu?: () => void;
@@ -54,12 +44,12 @@ const ConnectWallet: React.FC<IConnectWalletProps> = ({ handleMenu }) => {
     }
   }, [extensionInstalled]);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     if (router.pathname.includes('/create-transaction')) {
       window.innerWidth < 1025 && handleMenu && handleMenu();
       router.push('/');
     }
-  };
+  }, [router, handleMenu]);
 
   const handleConnect = async (silent?: boolean) => {
     if (!walletAddress) {
@@ -94,7 +84,7 @@ const ConnectWallet: React.FC<IConnectWalletProps> = ({ handleMenu }) => {
     }
   };
 
-  const getCreateTransactionButton = () => {
+  const getCreateTransactionButton = useCallback(() => {
     if (extensionInstalled && walletAddress && typeof window !== 'undefined') {
       if (window.innerWidth < 1025) {
         const createTransactionProps = {
@@ -116,7 +106,7 @@ const ConnectWallet: React.FC<IConnectWalletProps> = ({ handleMenu }) => {
         return <IconTooltip {...iconTooltipProps} />;
       }
     }
-  };
+  }, [extensionInstalled, walletAddress, router, handleMenu]);
 
   return (
     <>

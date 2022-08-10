@@ -18,7 +18,7 @@ const validatorConfigContract = (): ISection[] => {
         label: 'BLS Public Key',
         props: {
           tooltip: 'BLS Public Key',
-        }
+        },
       },
       {
         label: 'Can Delegate',
@@ -68,11 +68,10 @@ const validatorConfigContract = (): ISection[] => {
           },
         },
       },
-    ]
+    ],
   });
 
   return section;
 };
-  
+
 export default validatorConfigContract;
-  

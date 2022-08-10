@@ -1,5 +1,5 @@
-import styled, { keyframes } from 'styled-components';
 import { transparentize } from 'polished';
+import styled, { keyframes } from 'styled-components';
 
 const Show = keyframes`
   0% {

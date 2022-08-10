@@ -1,47 +1,41 @@
-import React, { useEffect, useState } from 'react';
-
-import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-
-import { format, fromUnixTime } from 'date-fns';
-
-import {
-  Card,
-  CardContainer,
-  Container,
-  Header,
-  Input,
-  TableContainer,
-  Title,
-  EffectsContainer,
-  ToggleButtonContainer,
-  ToggleButton,
-  TableHeader,
-  UpdateContainer,
-} from '@/views/blocks';
-
+import { ArrowLeft } from '@/assets/icons';
+import { Blocks as Icon } from '@/assets/title-icons';
+import Pagination from '@/components/Pagination';
+import { PaginationContainer } from '@/components/Pagination/styles';
 import Table, { ITable } from '@/components/Table';
 import { Row } from '@/components/Table/styles';
-
-import { IBlock, IPagination, IResponse } from '@/types/index';
 import api from '@/services/api';
+import { IBlock, IPagination, IResponse } from '@/types/index';
+import { useDidUpdateEffect } from '@/utils/hooks';
 import {
   formatAmount,
   getAge,
   parseAddress,
   toLocaleFixed,
 } from '@/utils/index';
-
-import { ArrowLeft } from '@/assets/icons';
-import { Blocks as Icon } from '@/assets/title-icons';
-import { PaginationContainer } from '@/components/Pagination/styles';
-import Pagination from '@/components/Pagination';
-import { useDidUpdateEffect } from '@/utils/hooks';
 import {
-  storageUpdateBlocks,
   getStorageUpdateConfig,
+  storageUpdateBlocks,
 } from '@/utils/localStorage/localStorageData';
+import {
+  Card,
+  CardContainer,
+  Container,
+  EffectsContainer,
+  Header,
+  Input,
+  TableContainer,
+  TableHeader,
+  Title,
+  ToggleButton,
+  ToggleButtonContainer,
+  UpdateContainer,
+} from '@/views/blocks';
+import { format, fromUnixTime } from 'date-fns';
+import { GetServerSideProps } from 'next';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { useCallback, useEffect, useState } from 'react';
 
 interface IBlockStats {
   totalBlocks: number;
@@ -93,7 +87,7 @@ const Blocks: React.FC<IBlocks> = ({
   const [loading, setLoading] = useState(false);
   const [autoUpdate, setAutoUpdate] = useState(false);
 
-  const updateBlocks = async () => {
+  const updateBlocks = useCallback(async () => {
     const newState = storageUpdateBlocks(autoUpdate);
     setAutoUpdate(newState);
     const response: IBlockResponse = await api.get({
@@ -102,7 +96,7 @@ const Blocks: React.FC<IBlocks> = ({
     if (!response.error) {
       setBlocks(response.data.blocks);
     }
-  };
+  }, [page, autoUpdate]);
 
   useEffect(() => {
     const updateBlocksConfig = getStorageUpdateConfig();

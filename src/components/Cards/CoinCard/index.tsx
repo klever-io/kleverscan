@@ -1,9 +1,14 @@
-import React, { useRef, useState } from 'react';
-
+import Chart from '@/components/Chart';
+import { IAssetsData, ICoinInfo } from '@/types/index';
+import { getVariation } from '@/utils/index';
+import Link from 'next/link';
+import React, { useCallback, useRef, useState } from 'react';
 import {
   CardContainer,
   CardContent,
   ChartContainer,
+  CoinSelector,
+  CoinsSelector,
   Container,
   Content,
   Description,
@@ -14,16 +19,7 @@ import {
   ValueContainer,
   ValueContent,
   ValueDetail,
-  CoinsSelector,
-  CoinSelector,
 } from './styles';
-
-import { getVariation } from '@/utils/index';
-
-import { ICoinInfo, IAssetsData, IAssetData } from '@/types/index';
-
-import Chart from '@/components/Chart';
-import Link from 'next/link';
 
 interface ICoinCard {
   coins: ICoinInfo[];
@@ -36,61 +32,65 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, assetsData }) => {
   const carouselRef = useRef<any>(null);
   const cardRef = useRef<any>(null);
 
-  const handleSelectCoin: any = () => {
+  const handleSelectCoin: any = useCallback(() => {
     setSelectedCoin(
       Math.floor(carouselRef.current.scrollLeft / cardRef.current.offsetWidth),
     );
-  };
+  }, [carouselRef, cardRef]);
+
   const handleSelection = (index: number) => {
     carouselRef.current.scrollLeft = index * cardRef.current.offsetWidth;
   };
 
-  const renderTotalStaking = (coin: ICoinInfo) => {
-    const currentCoin =
-      coin.shortname === 'KLV'
-        ? assetsData?.klv?.staking
-        : assetsData?.kfi?.staking;
+  const renderTotalStaking = useCallback(
+    (coin: ICoinInfo) => {
+      const currentCoin =
+        coin.shortname === 'KLV'
+          ? assetsData?.klv?.staking
+          : assetsData?.kfi?.staking;
 
-    let totalStakedInDolar;
-    let variation;
-    if (
-      typeof currentCoin?.totalStaking !== 'number' ||
-      typeof currentCoin?.dayBeforeTotalStaking !== 'number' ||
-      typeof assetsData?.kfi?.prices?.todaysPrice !== 'number'
-    ) {
-      totalStakedInDolar = '--';
-      variation = 0;
-    } else {
-      const todayPercent =
-        (currentCoin.totalStaking * 100) / currentCoin.dayBeforeTotalStaking;
-      const yesterdayPercent = 100;
-      variation = todayPercent - yesterdayPercent;
-      if (coin.shortname === 'KLV') {
-        totalStakedInDolar = (
-          currentCoin.totalStaking * coin.price
-        ).toLocaleString(undefined, { maximumFractionDigits: 0 });
+      let totalStakedInDolar;
+      let variation;
+      if (
+        typeof currentCoin?.totalStaking !== 'number' ||
+        typeof currentCoin?.dayBeforeTotalStaking !== 'number' ||
+        typeof assetsData?.kfi?.prices?.todaysPrice !== 'number'
+      ) {
+        totalStakedInDolar = '--';
+        variation = 0;
       } else {
-        totalStakedInDolar = (
-          currentCoin.totalStaking * assetsData.kfi.prices.todaysPrice
-        ).toLocaleString(undefined, { maximumFractionDigits: 0 });
+        const todayPercent =
+          (currentCoin.totalStaking * 100) / currentCoin.dayBeforeTotalStaking;
+        const yesterdayPercent = 100;
+        variation = todayPercent - yesterdayPercent;
+        if (coin.shortname === 'KLV') {
+          totalStakedInDolar = (
+            currentCoin.totalStaking * coin.price
+          ).toLocaleString(undefined, { maximumFractionDigits: 0 });
+        } else {
+          totalStakedInDolar = (
+            currentCoin.totalStaking * assetsData.kfi.prices.todaysPrice
+          ).toLocaleString(undefined, { maximumFractionDigits: 0 });
+        }
       }
-    }
 
-    return (
-      <ValueContent>
-        <p>Total Staked</p>
-        <ValueDetail positive={getVariation(variation).includes('+')}>
-          {coin.shortname === 'KLV' ? (
-            <span>$ {totalStakedInDolar}</span>
-          ) : (
-            <span>$ {totalStakedInDolar}</span>
-          )}
+      return (
+        <ValueContent>
+          <p>Total Staked</p>
+          <ValueDetail positive={getVariation(variation).includes('+')}>
+            {coin.shortname === 'KLV' ? (
+              <span>$ {totalStakedInDolar}</span>
+            ) : (
+              <span>$ {totalStakedInDolar}</span>
+            )}
 
-          <p>{getVariation(variation)}</p>
-        </ValueDetail>
-      </ValueContent>
-    );
-  };
+            <p>{getVariation(variation)}</p>
+          </ValueDetail>
+        </ValueContent>
+      );
+    },
+    [assetsData],
+  );
 
   const renderKfiMarketCap = () => {
     if (

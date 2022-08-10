@@ -1,14 +1,10 @@
-import React from 'react';
-
-import Link from 'next/link';
-
 import Table, { ITable } from '@/components/Table';
 import { Row } from '@/components/Table/styles';
 import { IAccountAsset, IAsset } from '@/types/index';
 import { parseAddress, toLocaleFixed } from '@/utils/index';
+import Link from 'next/link';
+import React from 'react';
 import { RankingContainer } from './styles';
-import { CenteredRow } from '@/views/validators/detail';
-import Copy from '@/components/Copy';
 
 interface IHolder {
   holders: IAccountAsset[];

@@ -1,7 +1,6 @@
 import React from 'react';
-import Chart, { ChartType } from '../index';
-
 import { renderWithTheme } from '../../../test/utils';
+import Chart, { ChartType } from '../index';
 
 const nodes = [
   { name: 'US', value: 62 },

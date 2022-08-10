@@ -1,9 +1,7 @@
-import React from 'react';
 import userEvent from '@testing-library/user-event';
-
-import { renderWithTheme } from '../../test/utils';
-
+import React from 'react';
 import IconTooltip from '.';
+import { renderWithTheme } from '../../test/utils';
 
 Object.assign(navigator, {
   clipboard: {

@@ -1,12 +1,11 @@
 import { useRouter } from 'next/router';
 import React from 'react';
-
 import {
+  Background,
+  Button,
+  ButtonContainer,
   Container,
   Content,
-  ButtonContainer,
-  Button,
-  Background,
   Number,
 } from '../views/notFound';
 

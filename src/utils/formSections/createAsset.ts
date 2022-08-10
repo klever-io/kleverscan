@@ -42,8 +42,7 @@ const createAsset = (type: string, address = ''): ISection[] => {
               label: 'Initial Supply',
               props: {
                 type: 'number',
-                tooltip:
-                  'Initial minted supply (fungible only)',
+                tooltip: 'Initial minted supply (fungible only)',
               },
             },
             {

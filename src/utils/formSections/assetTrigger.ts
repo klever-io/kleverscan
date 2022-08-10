@@ -10,7 +10,7 @@ const assetTriggerContract = (): ISection[] => {
           label: 'Receiver',
           props: {
             tooltip: 'Target address for transaction',
-          }
+          },
         },
         {
           label: 'Amount',
@@ -23,13 +23,13 @@ const assetTriggerContract = (): ISection[] => {
           label: 'MIME',
           props: {
             tooltip: 'The nature and format of the metadata',
-          }
+          },
         },
         {
           label: 'Logo',
           props: {
             tooltip: 'Logo image URL',
-          }
+          },
         },
       ],
     },
@@ -51,13 +51,13 @@ const assetTriggerContract = (): ISection[] => {
                   label: 'Label',
                   props: {
                     tooltip: 'URI identifier. Ex: "foo"',
-                  }
+                  },
                 },
                 {
                   label: 'Address',
                   props: {
                     tooltip: 'URI address. Ex: "http://bar.com"',
-                  }
+                  },
                 },
               ],
             },
@@ -150,10 +150,10 @@ const assetTriggerContract = (): ISection[] => {
           },
         },
       ],
-    }
+    },
   );
 
   return section;
 };
-  
+
 export default assetTriggerContract;

@@ -1,8 +1,8 @@
 import { lighten } from 'polished';
 import { BsPersonSquare } from 'react-icons/bs';
+import { IoMdCloseCircle } from 'react-icons/io';
 import { RiCopperCoinLine } from 'react-icons/ri';
 import styled, { css } from 'styled-components';
-import { IoMdCloseCircle } from 'react-icons/io';
 
 interface IContainer {
   loading?: boolean;

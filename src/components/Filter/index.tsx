@@ -1,5 +1,6 @@
+import { ArrowDown } from '@/assets/icons';
 import React, { useRef, useState } from 'react';
-
+import { flushSync } from 'react-dom';
 import {
   ArrowDownContainer,
   Container,
@@ -8,9 +9,6 @@ import {
   Item,
   SelectorContainer,
 } from './styles';
-
-import { ArrowDown } from '@/assets/icons';
-import { flushSync } from 'react-dom';
 
 export interface IFilterItem {
   name: string;

@@ -1,24 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-
-import { format } from 'date-fns';
-
+import Chart, { ChartType } from '@/components/Chart';
+import api from '@/services/api';
 import {
   Section,
-  TransactionContainer,
-  TransactionContent,
   TransactionChart,
   TransactionChartContent,
+  TransactionContainer,
+  TransactionContent,
   TransactionEmpty,
 } from '@/views/home';
-
-import Chart, { ChartType } from '@/components/Chart';
-import TransactionItem from '../TransactionItem';
-
-import api from '@/services/api';
-
-import { ITransactionResponse, IHomeTransactions } from '../../types';
+import { format } from 'date-fns';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { IHomeTransactions, ITransactionResponse } from '../../types';
+import TransactionItem from '../TransactionItem';
 
 const HomeTransactions: React.FC<IHomeTransactions> = ({
   setTotalTransactions,
@@ -49,7 +44,7 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
     };
   }, []);
 
-  const getTransactionChartData = () => {
+  const getTransactionChartData = useCallback(() => {
     const sortedTransactionsList = transactionsList.sort(
       (a, b) => a.key - b.key,
     );
@@ -65,7 +60,7 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
         };
       }
     });
-  };
+  }, [transactionsList]);
 
   return (
     <Section>

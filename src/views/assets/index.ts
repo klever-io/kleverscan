@@ -1,9 +1,8 @@
-import styled, { css } from 'styled-components';
-
 import { default as DefaultInput } from '@/components/Inputt';
-import widths from '@/components/Table/widths';
 import filterWidths from '@/components/Table/filters';
 import { ITableType } from '@/components/Table/styles';
+import widths from '@/components/Table/widths';
+import styled, { css } from 'styled-components';
 
 export const Container = styled.div`
   padding: 3rem 10rem 5rem 10rem;

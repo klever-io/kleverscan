@@ -1,9 +1,7 @@
-import React from 'react';
 import userEvent from '@testing-library/user-event';
-
+import React from 'react';
 import theme from '../../styles/theme';
-
-import { renderWithTheme } from '../../test/utils'
+import { renderWithTheme } from '../../test/utils';
 import Filter, { IFilter } from './';
 
 const data = [
@@ -14,7 +12,7 @@ const data = [
   {
     name: 'Filter 2',
     value: 'value 2',
-  }
+  },
 ];
 
 const filters: IFilter[] = [
@@ -31,7 +29,7 @@ describe('Component: Filter', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    container = renderWithTheme(<Filter {...filters[0]}/>).container;
+    container = renderWithTheme(<Filter {...filters[0]} />).container;
   });
 
   it('Should render the title and the selector', () => {
@@ -47,10 +45,10 @@ describe('Component: Filter', () => {
 
     selector?.lastChild?.childNodes.forEach((item, index) => {
       expect(item).toBeInTheDocument();
-      if(index === 0) {
+      if (index === 0) {
         expect(item).toHaveTextContent('All');
       } else {
-        expect(item).toHaveTextContent(filters[0].data[index -1].name);
+        expect(item).toHaveTextContent(filters[0].data[index - 1].name);
       }
     });
   });

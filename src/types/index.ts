@@ -1,5 +1,5 @@
-import { ISO2 } from '@/utils/country';
 import { IChartData } from '@/configs/home';
+import { ISO2 } from '@/utils/country';
 import { Dispatch, SetStateAction } from 'react';
 
 export enum Contract {
@@ -787,4 +787,8 @@ export interface ITotalFrozen {
   data: {
     totalFrozen: number;
   };
+}
+
+export interface IFormData {
+  [key: string]: any;
 }

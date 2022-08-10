@@ -38,7 +38,7 @@ import {
 import { ReceiveBackground } from '@/views/validator';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 interface IAssetInfo {
   assetId: string;
@@ -157,7 +157,7 @@ const Account: React.FC<IAccountPage> = ({
     setBuckets(assetBuckets);
   }, [account]);
 
-  const getTxQuery = (): ITxQuery => {
+  const getTxQuery = useCallback((): ITxQuery => {
     const txQuery: ITxQuery = {
       page: page,
       address: account.address,
@@ -177,21 +177,21 @@ const Account: React.FC<IAccountPage> = ({
     }
 
     return txQuery;
-  };
+  }, [account.address, dateFilter, fromToFilter, page]);
 
-  const calculateTotalKLV = () => {
+  const calculateTotalKLV = useCallback(() => {
     // does not include Allowance and Staking
     const available = account.balance;
     const frozen = account.assets?.KLV?.frozenBalance || 0;
     const unfrozen = account.assets?.KLV?.unfrozenBalance || 0;
     return (available + frozen + unfrozen) / 10 ** defaultKlvPrecision;
-  };
+  }, [account.balance, account.assets, defaultKlvPrecision]);
 
-  const getKLVfreezeBalance = (): number => {
+  const getKLVfreezeBalance = useCallback((): number => {
     return (
       (account.assets?.KLV?.frozenBalance || 0) / 10 ** defaultKlvPrecision
     );
-  };
+  }, [account.assets, defaultKlvPrecision]);
 
   const getKLVunfreezeBalance = (): number => {
     return (
@@ -215,7 +215,7 @@ const Account: React.FC<IAccountPage> = ({
     );
   };
 
-  const getTabHeaders = () => {
+  const getTabHeaders = useCallback(() => {
     const headers: string[] = [];
 
     if (account.assets && Object.values(account.assets).length > 0) {
@@ -231,7 +231,7 @@ const Account: React.FC<IAccountPage> = ({
     }
 
     return headers;
-  };
+  }, [account.assets, buckets, transactionResponse.data.transactions]);
 
   const [selectedTab, setSelectedTab] = useState<string>(getTabHeaders()[0]);
 
@@ -243,7 +243,7 @@ const Account: React.FC<IAccountPage> = ({
     });
   };
 
-  const filterDate = (selectedDays: ISelectedDays) => {
+  const filterDate = useCallback((selectedDays: ISelectedDays) => {
     setPage(1);
     setDateFilter({
       start: selectedDays.start.getTime().toString(),
@@ -251,7 +251,7 @@ const Account: React.FC<IAccountPage> = ({
         ? (selectedDays.end.getTime() + 24 * 60 * 60 * 1000).toString()
         : (selectedDays.start.getTime() + 24 * 60 * 60 * 1000).toString(),
     });
-  };
+  }, []);
 
   const filterFromTo = (op: number) => {
     setFromToFilter(op);

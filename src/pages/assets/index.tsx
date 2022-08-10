@@ -44,7 +44,7 @@ const Assets: React.FC<IAssetPage> = ({
       setLoading(true);
 
       const response: IAssetResponse = await api.get({
-        route: `assets/kassets?page=${page}`,
+        route: `assets/kassets?hidden=false&page=${page}`,
       });
 
       if (!response.error) {
@@ -68,6 +68,7 @@ const Assets: React.FC<IAssetPage> = ({
     staking,
     circulatingSupply,
     precision,
+    verified,
   }) => {
     const renderMaxSupply = (): ReactNode => {
       return (
@@ -81,21 +82,11 @@ const Assets: React.FC<IAssetPage> = ({
       );
     };
 
-    const verifiedAssets = [
-      'KLV',
-      'KFI',
-      'DVK-34ZH',
-      'LMT-KGIA',
-      'NVR-3NSO',
-      'KBRL-V309',
-      'KUSD-1EYY',
-    ];
-
     const isVerified = useCallback(() => {
-      if (verifiedAssets.includes(assetId)) {
+      if (verified) {
         return <Certified className="isVerified" />;
       }
-    }, [verifiedAssets, assetId]);
+    }, []);
 
     return (
       <Row type="assetsPage">
@@ -219,7 +210,9 @@ const Assets: React.FC<IAssetPage> = ({
 export const getServerSideProps: GetServerSideProps = async () => {
   const props: IAssetPage = { assets: [], pagination: {} as IPagination };
 
-  const assets: IAssetResponse = await api.get({ route: 'assets/kassets' });
+  const assets: IAssetResponse = await api.get({
+    route: 'assets/kassets?hidden=false',
+  });
   if (!assets.error) {
     props.assets = assets.data.assets;
     props.pagination = assets.pagination;
@@ -228,6 +221,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
   props.pagination = assets.pagination;
 
   props.assets = parseHardCodedInfo(props.assets);
+
+  console.log(props.assets[0]);
 
   return { props };
 };

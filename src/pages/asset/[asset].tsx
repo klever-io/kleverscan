@@ -1,4 +1,4 @@
-import { ArrowLeft, Receive } from '@/assets/icons';
+import { ArrowLeft, Certified, Receive } from '@/assets/icons';
 import Copy from '@/components/Copy';
 import { ISelectedDays } from '@/components/DateFilter';
 import AssetLogo from '@/components/Logo/AssetLogo';
@@ -100,6 +100,7 @@ const Asset: React.FC<IAssetPage> = ({
     staking,
     properties,
     attributes,
+    verified,
   } = asset;
 
   const router = useRouter();
@@ -463,6 +464,12 @@ const Asset: React.FC<IAssetPage> = ({
     },
   };
 
+  const isVerified = useCallback(() => {
+    if (verified) {
+      return <Certified className="isVerified" />;
+    }
+  }, []);
+
   return (
     <Container>
       <Header>
@@ -472,11 +479,11 @@ const Asset: React.FC<IAssetPage> = ({
           </div>
           <AssetLogo
             LetterLogo={LetterLogo}
+            isVerified={isVerified}
             Logo={Logo}
             logo={logo}
             ticker={ticker}
             name={name}
-            isVerified={() => undefined}
           />
           <AssetTitle>
             <h1>

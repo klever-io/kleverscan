@@ -467,6 +467,7 @@ export interface IAsset {
   royalties: number;
   mintedValue: number;
   issueDate: number;
+  verified: boolean;
   staking: {
     minEpochsToWithdraw: number;
     totalStaked: number;

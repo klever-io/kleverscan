@@ -88,6 +88,7 @@ const klvAsset: IAsset = {
   mintedValue: 0,
   issueDate: 0,
   burnedValue: 0,
+  verified: false,
   properties: {
     canAddRoles: true,
     canBurn: true,

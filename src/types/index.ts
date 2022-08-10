@@ -229,9 +229,9 @@ export interface IVoteContract {
 }
 
 export enum EnumITOStatus {
-  DefaultICO = 0,
-  ActiveICO = 1,
-  PausedICO = 2,
+  DefaultITO = 0,
+  ActiveITO = 1,
+  PausedITO = 2,
 }
 
 export interface IConfigITOContract {
@@ -495,7 +495,7 @@ export interface IContract {
   precision?: number;
   asset?: IAsset;
   receipts?: IReceipt[];
-  contractIndex: number;
+  contractIndex?: number;
 }
 
 export interface IBucket {

@@ -1,3 +1,5 @@
+import api from '@/services/api';
+import { toast } from 'react-toastify';
 import {
   IAsset,
   IContractOption,
@@ -479,4 +481,19 @@ export const doIf = async (
   });
 
   await Promise.race([IntervalPromise, TimeoutPromise]);
+};
+
+export const getPrecision = async (
+  asset: string,
+): Promise<number | undefined> => {
+  const response = await api.get({ route: `assets/${asset}` });
+
+  if (response.error) {
+    const messageError =
+      response.error.charAt(0).toUpperCase() + response.error.slice(1);
+    toast.error(messageError);
+    return;
+  }
+
+  return 10 ** response.data.asset.precision;
 };

@@ -205,7 +205,7 @@ const Contract: React.FC<IContract> = ({
     }
 
     Object.keys(parsedValues).forEach((item: any) => {
-      if (parsedValues[item].uris) {
+      if (parsedValues[item] && parsedValues[item].uris) {
         const uris = {};
 
         parsedValues[item].uris.forEach((uri: any) => {

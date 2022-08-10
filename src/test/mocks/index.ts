@@ -3,7 +3,7 @@ import {
   EnumAssetType,
   EnumBuyType,
   EnumClaimType,
-  EnumICOStatus,
+  EnumITOStatus,
   EnumMarketType,
   IAccountAsset,
   IAsset,
@@ -206,15 +206,15 @@ export const mockedTxContractComponents = {
     },
   },
   configIcoContract: {
-    type: Contract.ConfigICO,
+    type: Contract.ConfigITO,
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
     parameter: {
       assetId: 'KLV',
-      status: EnumICOStatus.DefaultICO,
+      status: EnumITOStatus.DefaultITO,
     },
   },
   setIcoPricesContract: {
-    type: Contract.SetICOPrices,
+    type: Contract.SetITOPrices,
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
     parameter: {
       assetId: 'KLV',
@@ -467,6 +467,7 @@ export const klvAsset: IAsset = {
   mintedValue: 0,
   issueDate: 0,
   burnedValue: 0,
+  verified: false,
   properties: {
     canAddRoles: true,
     canBurn: true,

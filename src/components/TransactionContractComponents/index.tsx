@@ -615,7 +615,7 @@ export const Freeze: React.FC<IContract> = ({
         <span>
           <strong>Bucket ID</strong>
         </span>
-        <span>{findReceipt(receipts, contractIndex, 3, 'bucketId')}</span>
+        <span>{findReceipt(receipts, contractIndex || 0, 3, 'bucketId')}</span>
       </Row>
     </>
   );

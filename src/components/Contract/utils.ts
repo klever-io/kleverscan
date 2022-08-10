@@ -116,4 +116,4 @@ const precisionParse = async (
   return payload;
 };
 
-export { getType, precisionParse };
+export { getType, getPrecision, precisionParse };

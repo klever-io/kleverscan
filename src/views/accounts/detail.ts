@@ -70,6 +70,8 @@ export const Row = styled.div`
   flex-direction: row;
   align-items: center;
 
+  color: ${props => props.theme.black};
+
   &:not(:last-child) {
     border-bottom: 1px solid ${props => props.theme.card.border};
 

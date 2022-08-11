@@ -32,7 +32,7 @@ export const ArrowContainer = styled.div<{ active: boolean }>`
   align-items: center;
   justify-content: center;
 
-  background-color: ${props => props.theme.white};
+  background-color: ${props => props.theme.true.white};
 
   border-radius: 50%;
 
@@ -62,7 +62,8 @@ export const ItemContainer = styled.div<{
 
   border-radius: 50%;
 
-  color: ${props => (props.active ? props.theme.white : props.theme.black)};
+  color: ${props =>
+    props.active ? props.theme.true.white : props.theme.black};
 
   cursor: pointer;
 

@@ -1,5 +1,5 @@
-import { ArrowLeft } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
+import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
 import { Row as TableRow, Status } from '@/components/Table/styles';
 import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
@@ -38,7 +38,6 @@ import {
   Row,
   RowContent,
   StatusContent,
-  Title,
   ValidatorsContainer,
   VerticalLine,
   VotesContainer,
@@ -245,12 +244,8 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
       {proposalAPI ? (
         <Container>
           <Header>
-            <Title>
-              <div onClick={() => router.push('/proposals')}>
-                <ArrowLeft />
-              </div>
-              <h1>Proposal Details</h1>
-            </Title>
+            <Title route={'/proposals'} title="Proposal Details" />
+
             <Input />
           </Header>
           <CardContainer>

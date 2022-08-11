@@ -170,6 +170,11 @@ export const Status = styled.div<IStatus>`
       color: ${props.theme.table.icon} !important;
       
     `}
+  svg {
+    path {
+      fill: ${props => props.theme.white};
+    }
+  }
 `;
 
 export const EmptyRow = styled(Row)`

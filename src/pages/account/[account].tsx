@@ -1,8 +1,9 @@
 import { KLV } from '@/assets/coins';
-import { ArrowLeft, Receive } from '@/assets/icons';
+import { Receive } from '@/assets/icons';
 import { AccountDetails as AccountIcon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import { ISelectedDays } from '@/components/DateFilter';
+import Title from '@/components/Layout/Title';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import QrCodeModal from '@/components/QrCodeModal';
@@ -33,7 +34,6 @@ import {
   OverviewContainer,
   Row,
   RowContent,
-  Title,
 } from '@/views/accounts/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { GetServerSideProps } from 'next';
@@ -298,13 +298,8 @@ const Account: React.FC<IAccountPage> = ({
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/accounts')}>
-            <ArrowLeft />
-          </div>
-          <h1>Account</h1>
-          <AccountIcon />
-        </Title>
+        <Title title="Account" Icon={AccountIcon} route={'/accounts'} />
+
         <Input />
       </Header>
       <OverviewContainer>

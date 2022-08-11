@@ -20,8 +20,8 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import Copy from '../Copy';
 import PackInfoForm from '../CustomForm/PackInfo';
-import PermissionsForm from '../CustomForm/Permissions';
 import ParametersForm from '../CustomForm/Parameters';
+import PermissionsForm from '../CustomForm/Permissions';
 import Select from './Select';
 import {
   AssetIDInput,

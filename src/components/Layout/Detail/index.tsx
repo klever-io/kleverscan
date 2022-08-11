@@ -1,10 +1,10 @@
-import { ArrowLeft } from '@/assets/icons';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Table, { ITable } from '@/components/Table';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { Container, Header, Input, TableContainer, Title } from './styles';
+import Title from '../Title';
+import { Container, Header, Input, TableContainer } from './styles';
 
 interface IDetail {
   title: string;
@@ -31,13 +31,7 @@ const Detail: React.FC<IDetail> = ({
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/')}>
-            <ArrowLeft />
-          </div>
-          <h1>{title}</h1>
-          <Icon />
-        </Title>
+        <Title title={title} Icon={Icon} />
 
         <Input />
       </Header>

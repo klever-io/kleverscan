@@ -34,7 +34,7 @@ const defaultStyles = css`
 `;
 
 export const StyledInput = styled.input<IProps>`
-  height: ${({type}) => type === 'hidden' ? 0 : 3}rem;
+  height: ${({ type }) => (type === 'hidden' ? 0 : 3)}rem;
 
   ${defaultStyles}
 
@@ -65,15 +65,15 @@ export const StyledInput = styled.input<IProps>`
   ${({ type }) =>
     type === 'hidden'
       ? css`
-        position: absolute;
-        top: 100;
-        bottom: 0;
-        z-index: -1;
-        pointer-events: none;
-        color: transparent;
-        border: none;
-        outline: none;
-      `
+          position: absolute;
+          top: 100;
+          bottom: 0;
+          z-index: -1;
+          pointer-events: none;
+          color: transparent;
+          border: none;
+          outline: none;
+        `
       : null}
 
   /* Remove view password icon */
@@ -146,14 +146,15 @@ export const ToggleContainer = styled.div<IProps>`
   user-select: none;
 `;
 
-export const Slider = styled.div`
+export const Slider = styled.div<{ active?: string }>`
   position: absolute;
   cursor: pointer;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: ${({ theme }) => lighten(0, '#7B7DB2')};
+  background-color: ${props =>
+    props?.active === 'true' ? props.theme.purple : lighten(0, '#7B7DB2')};
   -webkit-transition: 0.4s;
   transition: 0.4s;
   border-radius: 5rem;

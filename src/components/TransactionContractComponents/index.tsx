@@ -1,5 +1,4 @@
 import { KLV } from '@/assets/coins';
-import { getPrecision } from '@/components/Contract/utils';
 import {
   IAssetTriggerContract,
   IBuyContract,
@@ -28,7 +27,7 @@ import {
   IWithdrawContract,
 } from '@/types/index';
 import { findKey, findReceipt } from '@/utils/findKey';
-import { toLocaleFixed } from '@/utils/index';
+import { getPrecision, toLocaleFixed } from '@/utils/index';
 import { CenteredRow, Row } from '@/views/transactions/detail';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';

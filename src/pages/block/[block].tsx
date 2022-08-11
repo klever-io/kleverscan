@@ -1,5 +1,5 @@
-import { ArrowLeft } from '@/assets/icons';
 import Copy from '@/components/Copy';
+import Title from '@/components/Layout/Title';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Tabs, { ITabs } from '@/components/Tabs';
@@ -8,7 +8,6 @@ import api from '@/services/api';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { toLocaleFixed } from '@/utils/index';
 import {
-  AssetTitle,
   CardContainer,
   CardContent,
   CardHeader,
@@ -20,7 +19,6 @@ import {
   Header,
   Input,
   Row,
-  Title,
 } from '@/views/blocks/detail';
 import { format, fromUnixTime } from 'date-fns';
 import { GetStaticProps } from 'next';
@@ -301,15 +299,7 @@ const Block: React.FC<IBlockPage> = ({
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/blocks')}>
-            <ArrowLeft />
-          </div>
-
-          <AssetTitle>
-            <h1>Block Detail</h1>
-          </AssetTitle>
-        </Title>
+        <Title title="Block Details" />
 
         <Input />
       </Header>

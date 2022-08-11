@@ -24,24 +24,6 @@ export const Header = styled.section`
   }
 `;
 
-export const Title = styled.div`
-  display: flex;
-
-  flex-direction: row;
-  align-items: center;
-
-  gap: 0.75rem;
-
-  div {
-    cursor: pointer;
-
-    svg {
-      height: auto;
-      width: auto;
-    }
-  }
-`;
-
 export const Input = styled(DefaultInput)`
   margin-top: 1.1rem;
 
@@ -86,6 +68,8 @@ export const Card = styled.div`
   border-radius: 1rem;
 
   gap: 1rem;
+
+  color: ${props => props.theme.black};
 
   span {
     a {
@@ -177,36 +161,6 @@ export const TableContainer = styled.section<{ autoUpdate: boolean }>`
   gap: 1.5rem;
 `;
 
-export const ToggleButtonContainer = styled.div<{ autoUpdate: boolean }>`
-  display: inline-block;
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 45px;
-  height: 1.4rem;
-  background-color: ${props =>
-    props.autoUpdate ? props.theme.purple : 'gray'};
-  border-radius: 34px;
-  user-select: none;
-`;
-
-export const ToggleButton = styled.button<{ autoUpdate: boolean }>`
-  height: 1.1rem;
-  width: 17px;
-  position: relative;
-  left: 3px;
-  background-color: ${props => props.theme.white};
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
-  border-radius: 100%;
-  color: ${props => props.theme.gray};
-  ${props =>
-    props.autoUpdate &&
-    css`
-      transform: translateX(22px);
-    `}
-`;
-
 export const TableHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -219,4 +173,6 @@ export const UpdateContainer = styled.div`
   gap: 0.5rem;
   cursor: pointer;
   user-select: none;
+
+  color: ${props => props.theme.black};
 `;

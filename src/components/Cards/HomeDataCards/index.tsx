@@ -1,7 +1,6 @@
 import { Accounts, Epoch, TPS, Transactions } from '@/assets/cards';
 import CoinCard from '@/components/Cards/CoinCard';
 import api from '@/services/api';
-import theme from '@/styles/theme';
 import { Service } from '@/types/index';
 import { getEpochInfo } from '@/utils/index';
 import {
@@ -19,6 +18,7 @@ import {
   ProgressContent,
   ProgressIndicator,
 } from '@/views/validators';
+import { useTheme } from 'contexts/theme';
 import { useEffect, useState } from 'react';
 import {
   IAccountResponse,
@@ -220,8 +220,9 @@ const HomeDataCards: React.FC<IDataCards> = ({
   }, []);
 
   const Progress: React.FC<{ percent: number }> = ({ percent }) => {
+    const { theme } = useTheme();
     return (
-      <ProgressContainer textColor={theme.white}>
+      <ProgressContainer textColor={theme.card.white}>
         <ProgressContent>
           <ProgressIndicator percent={percent} />
         </ProgressContent>

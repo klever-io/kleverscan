@@ -1,8 +1,8 @@
-import { ArrowLeft } from '@/assets/icons';
 import { Assets as Icon } from '@/assets/title-icons';
 import Chart, { ChartType } from '@/components/Chart';
+import Title from '@/components/Layout/Title';
 import api from '@/services/api';
-import { Container, Header, Input, Section, Title } from '@/views/charts';
+import { Container, Header, Input, Section } from '@/views/charts';
 import {
   TransactionChart,
   TransactionChartContent,
@@ -51,13 +51,8 @@ const Charts: React.FC<ICharts> = ({ statistics }) => {
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/')}>
-            <ArrowLeft />
-          </div>
-          <h1>Charts</h1>
-          <Icon />
-        </Title>
+        <Title title="Charts" Icon={Icon} />
+
         <Input />
       </Header>
 

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import ConnectWallet from './ConnectWallet';
+import OptionsContainer from './OptionsContainer';
 import {
   Container,
   DesktopContainer,
@@ -173,6 +174,7 @@ const Navbar: React.FC = () => {
             ))}
           </IconsMenu>
           <ConnectWallet />
+          <OptionsContainer />
         </DesktopContainer>
 
         <MobileContainer>
@@ -183,6 +185,7 @@ const Navbar: React.FC = () => {
       <MobileBackground onClick={handleClose} opened={isOpen} />
 
       <MobileContent opened={isOpen}>
+        <OptionsContainer />
         {navbarItems.map((item, index) => (
           <MobileNavbarItem
             key={String(index)}
@@ -190,6 +193,7 @@ const Navbar: React.FC = () => {
             onClick={handleMenu}
           />
         ))}
+
         <ConnectWallet handleMenu={handleMenu} />
       </MobileContent>
     </>

@@ -1,9 +1,9 @@
+import Select from '@/components/Contract/Select';
+import { IParamList } from '@/types/index';
 import FormInput from 'components/Form/FormInput';
 import { ButtonContainer, FormSection } from 'components/Form/styles';
-import { IParamList } from '@/types/index';
-import { SectionTitle } from './styles';
-import Select from '@/components/Contract/Select';
 import { useState } from 'react';
+import { SectionTitle } from './styles';
 
 interface IParamForm {
   paramsList: IParamList[];

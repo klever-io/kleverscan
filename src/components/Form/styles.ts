@@ -28,13 +28,13 @@ export const FormSection = styled.div<{ inner?: boolean }>`
   }
 
   border: 0.2px solid ${({ theme }) => theme.input.border};
-  box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.8, '#000')};
+  box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? '#000' : lighten(0.8, '#000'))};
 
-  background-color: ${props => props.theme.form.background};
+  background-color: ${props => props.theme.white};
   ${props =>
     props.inner &&
     css`
-      filter: brightness(97%);
+      filter: ${props.theme.dark ? 'brightness(1.1)' : 'brightness(97%)'};
       grid-column: auto / span 2;
     `}
 
@@ -91,12 +91,16 @@ export const ButtonContainer = styled.button<IButton>`
   cursor: pointer;
 
   border: 0.2px solid ${({ theme }) => theme.input.border};
-  box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.6, '#000')};
+  box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? '#000' : lighten(0.6, '#000'))};
 
   user-select: none;
 
   @media (max-width: 768px) {
     width: 45%;
+  }
+
+  &[type='submit'] {
+    background-color: ${props => props.theme.purple};
   }
 `;
 

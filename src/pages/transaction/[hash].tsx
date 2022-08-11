@@ -1,7 +1,8 @@
-import { ArrowLeft, Receive } from '@/assets/icons';
+import { Receive } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import { TransactionDetails as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
+import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
 import { Status } from '@/components/Table/styles';
 import {
@@ -45,7 +46,6 @@ import {
   Hr,
   Input,
   Row,
-  Title,
 } from '@/views/transactions/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { format, fromUnixTime } from 'date-fns';
@@ -295,17 +295,12 @@ const Transaction: React.FC<ITransactionPage> = props => {
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/transactions')}>
-            <ArrowLeft />
-          </div>
-          <h1>
-            <p>Transaction</p>{' '}
-            <p>
-              Details <Icon />
-            </p>
-          </h1>
-        </Title>
+        <Title
+          title="Transaction Details"
+          Icon={Icon}
+          route={'/transactions'}
+        />
+
         <Input />
       </Header>
       <CardContainer>

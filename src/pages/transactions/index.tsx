@@ -1,5 +1,5 @@
 import { KLV } from '@/assets/coins';
-import { ArrowLeft, ArrowRight } from '@/assets/icons';
+import { ArrowRight } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import { Transactions as Icon } from '@/assets/title-icons';
 import DateFilter, {
@@ -7,6 +7,7 @@ import DateFilter, {
   ISelectedDays,
 } from '@/components/DateFilter';
 import Filter, { IFilter, IFilterItem } from '@/components/Filter';
+import Title from '@/components/Layout/Title';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Table, { ITable } from '@/components/Table';
@@ -20,7 +21,6 @@ import {
   FilterByDate,
   FilterContainer,
   Header,
-  Title,
   Tooltip,
   TooltipText,
 } from '@/views/transactions';
@@ -746,13 +746,7 @@ const Transactions: React.FC<ITransactions> = ({
 
   return (
     <Container>
-      <Title>
-        <div onClick={() => router.push('/')}>
-          <ArrowLeft />
-        </div>
-        <h1>Transactions</h1>
-        <Icon />
-      </Title>
+      <Title title="Transactions" Icon={Icon} />
 
       <Header>
         <FilterContainer>

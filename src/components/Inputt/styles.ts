@@ -9,7 +9,6 @@ export const Container = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  border: 1px solid ${props => props.theme.input.border.default};
   border-radius: 0.5rem;
 
   cursor: text;

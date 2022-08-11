@@ -1,12 +1,12 @@
-import { ArrowLeft } from '@/assets/icons';
 import { Transactions as Icon } from '@/assets/title-icons';
 import Contract from '@/components/Contract';
+import Title from '@/components/Layout/Title';
 import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
 import api from '@/services/api';
 import { ICollectionList, IParamList } from '@/types/index';
 import { INetworkParam, IProposalsResponse } from '@/types/proposals';
 import { doIf } from '@/utils/index';
-import { Container, Header, Title } from '@/views/assets';
+import { Container, Header } from '@/views/assets';
 import { Card } from '@/views/blocks';
 import { CardContainer } from '@/views/create-transaction';
 import { GetServerSideProps } from 'next';
@@ -105,13 +105,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/')}>
-            <ArrowLeft />
-          </div>
-          <h1>Create Transaction</h1>
-          <Icon />
-        </Title>
+        <Title Icon={Icon} title={'Create Transaction'} />
       </Header>
 
       <CardContainer>

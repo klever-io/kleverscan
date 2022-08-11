@@ -150,7 +150,7 @@ export const ExtraOptionContainer = styled.div`
   padding-bottom: 1rem;
 
   background-color: ${props => props.theme.white};
-  box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.8, '#000')};
+  box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? '#000' : lighten(0.8, '#000'))};
 
   justify-content: flex-start;
   align-items: center;
@@ -186,7 +186,7 @@ export const SelectContainer = styled.div`
   width: 100%;
 
   border: 0.2px solid ${({ theme }) => theme.input.border};
-  box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.8, '#000')};
+  box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? '#000' : lighten(0.8, '#000'))};
 `;
 
 interface ISelect {

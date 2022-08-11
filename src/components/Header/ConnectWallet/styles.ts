@@ -7,7 +7,7 @@ export const ConnectButton = styled.div`
   background-color: ${props => props.theme.navbar.text};
   padding: 0.6rem;
   border-radius: 0.3rem;
-  color: ${props => props.theme.white};
+  color: ${props => props.theme.card.white};
   font-size: 0.9rem;
 
   text-align: center;
@@ -40,7 +40,10 @@ export const ConnectContainer = styled.div`
   align-items: center;
   user-select: none;
 
-  gap: 1rem;
+  gap: 0.5rem;
+
+  margin-left: auto;
+  padding-right: 0.5rem;
 
   @media screen and (max-width: 1025px) {
     margin-top: auto;
@@ -89,7 +92,7 @@ export const LogoutContainer = styled.div`
         top: 1rem;
         left: 0;
         background-color: ${props => props.theme.card.background};
-        color: ${props => props.theme.white};
+        color: ${props => props.theme.card.white};
         padding: 0.5rem;
         border-radius: 5px;
         z-index: 500;
@@ -131,7 +134,7 @@ export const CopyContainer = styled.div`
         top: 1rem;
         left: 0;
         background-color: ${props => props.theme.card.background};
-        color: ${props => props.theme.white};
+        color: ${props => props.theme.card.white};
         padding: 0.5rem;
         border-radius: 5px;
         z-index: 500;

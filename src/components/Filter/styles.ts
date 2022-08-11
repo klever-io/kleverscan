@@ -67,7 +67,9 @@ export const Content = styled.div<{ open: boolean }>`
 
   background-color: ${props => props.theme.white};
 
-  border: 1px solid ${props => props.theme.filter.border};
+  border: 1px solid
+    ${props =>
+      props.theme.dark ? props.theme.card.border : props.theme.filter.border};
   border-radius: 0.5rem;
 
   cursor: pointer;
@@ -175,6 +177,8 @@ export const Item = styled.div<{ selected: boolean }>`
 export const HiddenInput = styled.input<{ show: boolean }>`
   width: 100%;
   display: ${props => (props.show ? 'inline-block' : 'none')};
+  caret-color: ${props => props.theme.black};
+  color: ${props => props.theme.black};
 `;
 
 export const ArrowDownContainer = styled.div`

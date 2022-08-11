@@ -54,6 +54,10 @@ export const FilterContainer = styled.div`
 
   gap: 0.75rem;
 
+  > div:last-child {
+    min-width: 15rem;
+  }
+
   @media (max-width: 1200px) {
     width: 100%;
 

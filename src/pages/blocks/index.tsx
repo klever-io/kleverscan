@@ -1,5 +1,6 @@
-import { ArrowLeft } from '@/assets/icons';
 import { Blocks as Icon } from '@/assets/title-icons';
+import ToggleButton from '@/components/Button/Toggle';
+import Title from '@/components/Layout/Title';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Table, { ITable } from '@/components/Table';
@@ -26,9 +27,6 @@ import {
   Input,
   TableContainer,
   TableHeader,
-  Title,
-  ToggleButton,
-  ToggleButtonContainer,
   UpdateContainer,
 } from '@/views/blocks';
 import { format, fromUnixTime } from 'date-fns';
@@ -349,13 +347,7 @@ const Blocks: React.FC<IBlocks> = ({
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/')}>
-            <ArrowLeft />
-          </div>
-          <h1>Blocks</h1>
-          <Icon />
-        </Title>
+        <Title title="Blocks" Icon={Icon} />
 
         <Input />
       </Header>
@@ -371,9 +363,7 @@ const Blocks: React.FC<IBlocks> = ({
           <h3>List of blocks</h3>
           <UpdateContainer onClick={() => updateBlocks()}>
             <span>Auto update</span>
-            <ToggleButtonContainer autoUpdate={autoUpdate}>
-              <ToggleButton autoUpdate={autoUpdate} />
-            </ToggleButtonContainer>
+            <ToggleButton active={autoUpdate} />
           </UpdateContainer>
         </TableHeader>
         <EffectsContainer autoUpdate={autoUpdate}>

@@ -9,7 +9,7 @@ interface IMobileMenu {
 }
 
 export const Container = styled.div`
-  padding: 1rem 5rem;
+  padding: 1rem 2rem;
 
   display: flex;
   position: relative;
@@ -17,7 +17,7 @@ export const Container = styled.div`
   flex-direction: row;
   align-items: center;
 
-  gap: 1.5rem;
+  gap: 0.5rem;
 
   background-color: ${props => props.theme.navbar.background};
 
@@ -48,7 +48,7 @@ export const Item = styled.div<{ selected: boolean }>`
 
   transition: 0.2s ease;
 
-  filter: brightness(${props => (props.selected ? 10 : 1)});
+  filter: brightness(${props => (props.selected ? 2.5 : 1)});
 
   &:hover {
     ${props =>
@@ -113,8 +113,9 @@ export const DesktopContainer = styled.div`
 
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
-  gap: 1.5rem;
+  gap: 0.5rem;
 
   @media (max-width: 1024px) {
     display: none;

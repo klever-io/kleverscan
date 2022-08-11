@@ -35,6 +35,8 @@ export const ItemContainer = styled.div<{ selected: boolean }>`
 
   cursor: pointer;
 
+  color: ${props => props.theme.black};
+
   span {
     padding: 0.5rem;
     opacity: ${props => (props.selected ? 1 : 0.2)};

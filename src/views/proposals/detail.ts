@@ -169,7 +169,9 @@ export const ProgressContent = styled.div`
 `;
 
 export const VotesContainer = styled.div`
-  background-color: white;
+  background-color: ${props => props.theme.white};
+  color: ${props => props.theme.black};
+
   border-radius: 10px;
   padding: 30px;
   margin-bottom: 1.5rem;
@@ -197,6 +199,7 @@ export const ProgressBarVotes = styled.div`
 `;
 
 export const ValidatorsContainer = styled.div`
+  color: ${props => props.theme.black};
   margin-bottom: 10px;
 `;
 
@@ -299,6 +302,8 @@ export const HalfRow = styled.div`
 
 export const Row = styled.div`
   width: 100%;
+
+  color: ${props => props.theme.black};
 
   @media (max-width: 768px) {
     &:nth-child(1) {

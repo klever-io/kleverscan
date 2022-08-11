@@ -70,7 +70,7 @@ export const AssetTitle = styled.div`
 
     background-color: ${props => props.theme.card.assetText};
 
-    color: ${props => props.theme.white};
+    color: ${props => props.theme.true.white};
     font-weight: 400;
     font-size: 0.85rem;
 
@@ -112,9 +112,9 @@ export const CardHeaderItem = styled.div<{ selected: boolean }>`
   span {
     font-weight: 600;
     font-size: 0.95rem;
-    color: ${props => props.theme.card.assetText};
+    color: ${props => props.theme.black};
 
-    opacity: ${props => (props.selected ? 1 : 0.2)};
+    opacity: ${props => (props.selected ? 1 : 0.33)};
 
     transition: 0.2s ease;
   }
@@ -136,6 +136,7 @@ export const Row = styled.div`
   flex-direction: row;
   align-items: center;
 
+  color: ${props => props.theme.black};
   &:not(:last-child) {
     border-bottom: 1px solid ${props => props.theme.card.border};
 

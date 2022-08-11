@@ -280,6 +280,7 @@ const Block: React.FC<IBlockPage> = ({
 
             <PaginationContainer>
               <Pagination
+                scrollUp={true}
                 count={totalPagesTransactions}
                 page={transactionPage}
                 onPaginate={page => setTransactionPage(page)}

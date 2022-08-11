@@ -209,6 +209,7 @@ const Accounts: React.FC<IAccounts> = ({
 
       <PaginationContainer>
         <Pagination
+          scrollUp={true}
           count={pagination.totalPages}
           page={page}
           onPaginate={page => {

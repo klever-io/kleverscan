@@ -196,6 +196,7 @@ const Assets: React.FC<IAssetPage> = ({
 
       <PaginationContainer>
         <Pagination
+          scrollUp={true}
           count={pagination.totalPages}
           page={page}
           onPaginate={page => {

@@ -5,12 +5,18 @@ import PaginationModal from './PaginationModal/PaginationModal';
 import { ArrowContainer, Container, ItemContainer } from './styles';
 
 interface IPagination {
+  scrollUp: boolean;
   count: number;
   page: number;
   onPaginate(page: number): void;
 }
 
-const Pagination: React.FC<IPagination> = ({ count, page, onPaginate }) => {
+const Pagination: React.FC<IPagination> = ({
+  count,
+  page,
+  onPaginate,
+  scrollUp,
+}) => {
   // count += 1;
   count >= 1000 ? (count = 1000) : count;
   const cells = calculate(count, page);
@@ -19,7 +25,9 @@ const Pagination: React.FC<IPagination> = ({ count, page, onPaginate }) => {
   const [showModalRight, setShowModalRight] = useState(false);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (scrollUp) {
+      window.scrollTo(0, 0);
+    }
   }, [page]);
 
   const prevProps = {
@@ -32,9 +40,9 @@ const Pagination: React.FC<IPagination> = ({ count, page, onPaginate }) => {
   };
 
   const nextProps = {
-    active: page < count - 1,
+    active: page < count,
     onClick: () => {
-      if (page + 1 < count) {
+      if (page + 1 <= count) {
         onPaginate(page + 1);
       }
     },

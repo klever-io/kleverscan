@@ -1,6 +1,7 @@
 import Copy from '@/components/Copy';
 import IconTooltip from '@/components/IconTooltip';
 import { useDidUpdateEffect } from '@/utils/hooks';
+import { core } from '@klever/sdk';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -63,9 +64,11 @@ const ConnectWallet: React.FC<IConnectWalletProps> = ({ handleMenu }) => {
       };
 
       try {
-        setLoading(true);
-        await window.kleverWeb.initialize();
-        setLoading(false);
+        if (!core.isKleverWebActive()) {
+          setLoading(true);
+          await core.initialize();
+          setLoading(false);
+        }
 
         const address: string = await window.kleverWeb.getWalletAddress();
 

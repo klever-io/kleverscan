@@ -90,6 +90,7 @@ const Proposals: React.FC<IProposalsPage> = ({
             <ProposalsTab proposals={proposals} loading={loadingProposals} />
             <PaginationContainer>
               <Pagination
+                scrollUp={true}
                 count={totalProposalsPage}
                 page={page}
                 onPaginate={page => {

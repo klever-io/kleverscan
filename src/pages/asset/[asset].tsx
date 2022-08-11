@@ -408,6 +408,7 @@ const Asset: React.FC<IAssetPage> = ({
             />
             <PaginationContainer>
               <Pagination
+                scrollUp={false}
                 count={totalTransactionsPage}
                 page={transactionsPage}
                 onPaginate={page => {
@@ -423,6 +424,7 @@ const Asset: React.FC<IAssetPage> = ({
             <Holders asset={asset} holders={holders} loading={loadingHolders} />
             <PaginationContainer>
               <Pagination
+                scrollUp={false}
                 count={totalHoldersPage}
                 page={holdersPage}
                 onPaginate={page => {

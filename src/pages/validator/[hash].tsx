@@ -554,6 +554,7 @@ const Validator: React.FC<IValidatorPage> = ({
       </TableContainer>
       <PaginationContainer>
         <Pagination
+          scrollUp={false}
           count={pagination?.totalPages}
           page={page}
           onPaginate={page => {

@@ -278,6 +278,7 @@ const Account: React.FC<IAccountPage> = ({
             <Transactions transactions={transactions} loading={loading} />
             <PaginationContainer>
               <Pagination
+                scrollUp={false}
                 count={totalPages}
                 page={page}
                 onPaginate={page => {

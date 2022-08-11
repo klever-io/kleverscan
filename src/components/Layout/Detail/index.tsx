@@ -49,6 +49,7 @@ const Detail: React.FC<IDetail> = ({
 
       <PaginationContainer>
         <Pagination
+          scrollUp={true}
           count={paginationCount}
           page={page}
           onPaginate={page => {

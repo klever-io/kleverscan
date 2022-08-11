@@ -769,6 +769,7 @@ const Transactions: React.FC<ITransactions> = ({
       <Table {...tableProps} />
       <PaginationContainer>
         <Pagination
+          scrollUp={true}
           count={count}
           page={page}
           onPaginate={page => {

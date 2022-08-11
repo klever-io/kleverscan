@@ -5,12 +5,14 @@ import theme from '../../styles/theme';
 import { renderWithTheme } from '../../test/utils/';
 
 interface IPagination {
+  scrollUp: boolean;
   count: number;
   page: number;
   onPaginate(page: number): void;
 }
 
 const paginationProps: IPagination = {
+  scrollUp: true,
   count: 1000,
   page: 1,
   onPaginate: jest.fn(page => (paginationProps.page = page)),

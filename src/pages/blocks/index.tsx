@@ -383,6 +383,7 @@ const Blocks: React.FC<IBlocks> = ({
 
       <PaginationContainer>
         <Pagination
+          scrollUp={true}
           count={pagination.totalPages}
           page={page}
           onPaginate={page => {

@@ -118,7 +118,7 @@ const Validator: React.FC<IValidatorPage> = ({
   } = validator;
 
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [delegators, setDelegators] = useState(defaultDelegators);
   const [uptime] = useState(new Date().getTime());
   const [age, setAge] = useState(

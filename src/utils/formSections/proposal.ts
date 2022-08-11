@@ -19,34 +19,6 @@ const proposalContract = (paramsList?: IParamList[]): ISection[] => {
           tooltip: 'Proposal epochs duration',
         },
       },
-      {
-        label: 'Parameters',
-        props: {
-          type: 'struct',
-          array: true,
-          innerSection: {
-            title: 'Parameters',
-            inner: true,
-            innerPath: 'parameters',
-            fields: [
-              {
-                label: 'Parameter Key',
-                props: {
-                  type: 'dropdown',
-                  options: paramsList,
-                  tooltip: 'Parameter key',
-                },
-              },
-              {
-                label: 'Parameter Value',
-                props: {
-                  tooltip: 'Parameter address',
-                },
-              },
-            ],
-          },
-        },
-      },
     ],
   });
 

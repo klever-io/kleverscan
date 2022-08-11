@@ -147,14 +147,16 @@ const FormInput: React.FC<IFormInputProps> = ({
 
   return (
     <Container {...containerProps}>
-      <InputLabel disabled={inputProps.disabled}>
-        {title}{' '}
-        {tooltip && (
-          <TooltipContainer tooltip={tooltip}>
-            <InfoIcon />
-          </TooltipContainer>
-        )}
-      </InputLabel>
+      {type !== 'hidden' && (
+        <InputLabel disabled={inputProps.disabled}>
+          {title}{' '}
+          {tooltip && (
+            <TooltipContainer tooltip={tooltip}>
+              <InfoIcon />
+            </TooltipContainer>
+          )}
+        </InputLabel>
+      )}
       {type === 'checkbox' && toggleOptions && (
         <>
           <ToggleContainer
@@ -191,12 +193,21 @@ const FormInput: React.FC<IFormInputProps> = ({
           {error && <span>{description}</span>}
         </>
       )}
-      {type !== 'checkbox' && type !== 'dropdown' && type !== 'textarea' && (
+      {type === 'hidden' && (
         <>
           <StyledInput {...inputProps} />
           {error && <span>{description}</span>}
         </>
       )}
+      {type !== 'checkbox' &&
+        type !== 'dropdown' &&
+        type !== 'textarea' &&
+        type !== 'hidden' && (
+          <>
+            <StyledInput {...inputProps} />
+            {error && <span>{description}</span>}
+          </>
+        )}
     </Container>
   );
 };

@@ -34,7 +34,7 @@ const defaultStyles = css`
 `;
 
 export const StyledInput = styled.input<IProps>`
-  height: 3rem;
+  height: ${({type}) => type === 'hidden' ? 0 : 3}rem;
 
   ${defaultStyles}
 
@@ -60,6 +60,20 @@ export const StyledInput = styled.input<IProps>`
             color: ${theme.error} !important;
           }
         `
+      : null}
+
+  ${({ type }) =>
+    type === 'hidden'
+      ? css`
+        position: absolute;
+        top: 100;
+        bottom: 0;
+        z-index: -1;
+        pointer-events: none;
+        color: transparent;
+        border: none;
+        outline: none;
+      `
       : null}
 
   /* Remove view password icon */

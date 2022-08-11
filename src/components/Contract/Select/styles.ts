@@ -112,3 +112,27 @@ export const Container = styled.div`
   }
   ${ReactSelect}
 `;
+
+export const TitleLabel = styled.label`
+  user-select: none;
+  font-size: smaller;
+  font-weight: 600;
+  transform: translate(-1rem, -2.25rem);
+
+  position: absolute;
+  left: 1rem;
+  top: 0.9rem;
+
+  display: flex;
+  align-items: flex-start;
+
+  gap: 0.5rem;
+
+  color: ${({ theme }) => theme.input.border.dark};
+
+  transition: transform 0.2s ease;
+
+  @media screen and (max-width: 1025px) {
+    top: 0.8rem;
+  }
+`;

@@ -21,6 +21,7 @@ import { toast } from 'react-toastify';
 import Copy from '../Copy';
 import PackInfoForm from '../CustomForm/PackInfo';
 import PermissionsForm from '../CustomForm/Permissions';
+import ParametersForm from '../CustomForm/Parameters';
 import Select from './Select';
 import {
   AssetIDInput,
@@ -170,7 +171,7 @@ const Contract: React.FC<IContract> = ({
         values.parameters.forEach((parameter: any) => {
           if (
             !isNaN(Number(parameter.parameterKey)) &&
-            parameter.parameterValue
+            !isNaN(Number(parameter.parameterValue))
           ) {
             parameters[parameter.parameterKey] = String(
               parameter.parameterValue,
@@ -236,13 +237,10 @@ const Contract: React.FC<IContract> = ({
 
   const handleSubmit = async (contractValues: any) => {
     setLoading(true);
-
     const payload = {
       ...parseValues(contractValues),
     };
-
     const parsedPayload = await precisionParse(payload, contractType);
-
     try {
       const unsignedTx = await core.buildTransaction(
         [
@@ -253,9 +251,7 @@ const Contract: React.FC<IContract> = ({
         ],
         [data],
       );
-
       const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
-
       if (isMultisig) {
         const blob = new Blob([JSON.stringify(signedTx)], {
           type: 'application/json',
@@ -266,7 +262,6 @@ const Contract: React.FC<IContract> = ({
         link.download = `${contractType} - Nonce: ${signedTx.RawData.Nonce}.json`;
         link.click();
         window.URL.revokeObjectURL(url);
-
         setLoading(false);
         toast.success(
           'Transaction built and signed, send the file to the co-owner(s)',
@@ -298,6 +293,12 @@ const Contract: React.FC<IContract> = ({
       return (
         <Form contractName={contractType} key={contractType} {...formProps}>
           <PermissionsForm />
+        </Form>
+      );
+    } else if (contractType === 'ProposalContract') {
+      return (
+        <Form contractName={contractType} key={contractType} {...formProps}>
+          {paramsList.length > 0 && <ParametersForm paramsList={paramsList} />}
         </Form>
       );
     } else {

@@ -162,7 +162,7 @@ export const getServerSideProps: GetServerSideProps<any> = async () => {
   networkParams?.forEach((param: INetworkParam) => {
     paramsList.push({
       value: param.number,
-      label: `${param.parameter} - ${param.currentValue}`,
+      label: `${param.parameter}: ${param.currentValue}`,
       currentValue: param.currentValue,
     });
   });

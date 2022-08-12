@@ -1,5 +1,8 @@
-import React, { useRef, useState } from 'react';
-
+import Chart from '@/components/Chart';
+import { IAssetsData, ICoinInfo } from '@/types/index';
+import { getVariation } from '@/utils/index';
+import Link from 'next/link';
+import React, { useCallback, useRef, useState } from 'react';
 import {
   CardContainer,
   CardContent,

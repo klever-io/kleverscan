@@ -29,7 +29,13 @@ import {
   Withdraw,
 } from '@/components/TransactionContractComponents';
 import api from '@/services/api';
-import { Contract, IAsset, IResponse, ITransaction } from '@/types/index';
+import {
+  Contract,
+  IAsset,
+  IBlock,
+  IResponse,
+  ITransaction,
+} from '@/types/index';
 import {
   capitalizeString,
   hexToString,
@@ -56,6 +62,12 @@ import React, { useState } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 
+interface IBlockResponse extends IResponse {
+  data: {
+    block: IBlock;
+  };
+}
+
 interface ITransactionResponse extends IResponse {
   data: {
     transaction: ITransaction;
@@ -70,6 +82,7 @@ interface IAssetResponse extends IResponse {
 
 interface ITransactionPage {
   transaction: ITransaction;
+  block: IBlock;
 }
 
 const klvAsset: IAsset = {
@@ -111,7 +124,7 @@ const klvAsset: IAsset = {
 const Transaction: React.FC<ITransactionPage> = props => {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
-  const { transaction } = props;
+  const { transaction, block } = props;
 
   const {
     hash,
@@ -343,6 +356,14 @@ const Transaction: React.FC<ITransactionPage> = props => {
           </Row>
           <Row>
             <span>
+              <strong>Epoch</strong>
+            </span>
+            <span>
+              <p>{block.epoch}</p>
+            </span>
+          </Row>
+          <Row>
+            <span>
               <strong>Block Number</strong>
             </span>
             <span>
@@ -470,11 +491,19 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
     return redirectProps;
   }
 
+  const block: IBlockResponse = await api.get({
+    route: `block/by-nonce/${transaction?.data?.transaction?.blockNum}`,
+  });
+
+  if (block.error) {
+    return redirectProps;
+  }
+
   const props: ITransactionPage = {
     transaction: transaction.data.transaction,
+    block: block.data.block,
   };
 
   return { props };
 };
-
 export default Transaction;

@@ -21,77 +21,72 @@ interface IContract {
 }
 
 const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
-  const [assets, setAssets] = useState<any>({});
   const [assetsList, setAssetsLists] = useState<any>([]);
   const router = useRouter();
 
-  useEffect(() => {
-    const getAssets = async () => {
-      if (typeof window !== 'undefined') {
-        const callback = async () => {
-          let address = '';
-
-          await doIf(
-            () => (address = window.kleverWeb.getWalletAddress()),
-            () => handleLogout(),
-            () => window?.kleverWeb?.getWalletAddress !== undefined,
-            500,
-          );
-
-          if (address) {
-            const account: any = await api.get({
-              route: `address/${address}`,
-            });
-
-            if (account?.data?.account?.assets) {
-              const { assets, frozenBalance, balance } = account?.data?.account;
-              const list: ICollectionList[] = [];
-
-              Object.keys(account.data.account.assets).map(item => {
-                const {
-                  assetType,
-                  frozenBalance,
-                  balance,
-                  precision,
-                  buckets,
-                } = account.data.account.assets[item];
-                list.push({
-                  label: item,
-                  value: item,
-                  isNFT: assetType === 1,
-                  balance,
-                  frozenBalance,
-                  precision,
-                  buckets,
-                });
-              });
-
-              if (!Object.keys(assets).includes('KLV') && balance !== 0) {
-                list.unshift({
-                  label: 'KLV',
-                  value: 'KLV',
-                  isNFT: false,
-                  balance,
-                  frozenBalance: frozenBalance ? frozenBalance : 0,
-                  precision: 6,
-                  buckets: [],
-                });
-              }
-
-              setAssetsLists(list);
-            }
-          }
-        };
-
-        doIf(
-          async () => await callback(),
+  const getAssets = async () => {
+    if (typeof window !== 'undefined') {
+      const callback = async () => {
+        let address = '';
+        await doIf(
+          () => (address = window.kleverWeb.getWalletAddress()),
           () => handleLogout(),
-          () => window.kleverWeb !== undefined,
+          () => window?.kleverWeb?.getWalletAddress !== undefined,
           500,
         );
-      }
-    };
 
+        if (address) {
+          const account: any = await api.get({
+            route: `address/${address}`,
+          });
+
+          if (account?.data?.account?.assets) {
+            const { assets, frozenBalance, balance } = account?.data?.account;
+            const list: ICollectionList[] = [];
+
+            Object.keys(account.data.account.assets).map(item => {
+              const { assetType, frozenBalance, balance, precision, buckets } =
+                account.data.account.assets[item];
+              list.push({
+                label: item,
+                value: item,
+                isNFT: assetType === 1,
+                balance,
+                frozenBalance,
+                precision,
+                buckets,
+              });
+            });
+
+            if (!Object.keys(assets).includes('KLV') && balance !== 0) {
+              list.unshift({
+                label: 'KLV',
+                value: 'KLV',
+                isNFT: false,
+                balance,
+                frozenBalance: frozenBalance ? frozenBalance : 0,
+                precision: 6,
+                buckets: [],
+              });
+            }
+
+            setAssetsLists(list);
+          } else if (!account?.data) {
+            setAssetsLists([]);
+          }
+        }
+      };
+
+      doIf(
+        async () => await callback(),
+        () => handleLogout(),
+        () => window.kleverWeb !== undefined,
+        500,
+      );
+    }
+  };
+
+  useEffect(() => {
     getAssets();
   }, []);
 
@@ -128,6 +123,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
         assetsList={assetsList}
         proposalsList={proposals}
         paramsList={paramsList}
+        getAssets={getAssets}
       />
     </Container>
   );

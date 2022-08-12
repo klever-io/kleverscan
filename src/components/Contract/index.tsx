@@ -41,12 +41,14 @@ interface IContract {
   assetsList: ICollectionList[];
   proposalsList: any[];
   paramsList: IParamList[];
+  getAssets: () => void;
 }
 
 const Contract: React.FC<IContract> = ({
   assetsList,
   proposalsList,
   paramsList,
+  getAssets,
 }) => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
@@ -395,6 +397,7 @@ const Contract: React.FC<IContract> = ({
       <Select
         options={contractOptions}
         onChange={handleOption}
+        getAssets={getAssets}
         title={'Contract'}
       />
 

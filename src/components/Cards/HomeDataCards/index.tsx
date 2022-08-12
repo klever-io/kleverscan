@@ -25,7 +25,6 @@ import {
   ICard,
   IDataCards,
   IEpochCard,
-  IParsedMetrics,
   IStatisticsResponse,
   ITransactionResponse,
   IYesterdayResponse,
@@ -80,8 +79,8 @@ const HomeDataCards: React.FC<IDataCards> = ({
     {
       Icon: Epoch,
       title: 'Epoch Remaining Time',
-      value: metrics.remainingTime,
-      progress: metrics.epochLoadPercent,
+      value: metrics?.remainingTime,
+      progress: metrics?.epochLoadPercent,
     },
   ];
 
@@ -89,7 +88,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
     const statisticsWatcher = setInterval(async () => {
       const statistics: IStatisticsResponse = await api.get({
         route: 'node/statistics',
-        service: Service.NODE,
+        service: Service.PROXY,
       });
 
       if (!statistics.error) {
@@ -100,22 +99,13 @@ const HomeDataCards: React.FC<IDataCards> = ({
     }, statisticsWatcherTimeout);
 
     const metricswatcher = setInterval(async () => {
-      const metrics: any = await api.text({
-        route: 'node/metrics',
-        service: Service.NODE,
+      const metrics: any = await api.get({
+        route: 'node/overview',
+        service: Service.PROXY,
       });
 
       if (!metrics.error) {
-        const parsedMetrics = {} as IParsedMetrics;
-
-        const metricLines = metrics?.split('\n');
-        metricLines?.forEach((line: any) => {
-          const props = line?.split(' ');
-
-          parsedMetrics[props[0]?.split('{')?.[0]] = parseInt(props?.[1]);
-        });
-
-        setMetrics(getEpochInfo(parsedMetrics));
+        setMetrics(getEpochInfo(metrics?.data?.overview));
       }
     }, statisticsWatcherTimeout);
 

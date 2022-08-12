@@ -75,8 +75,7 @@ interface IPriceResponse extends IResponse {
 
 interface IAllowanceResponse extends IResponse {
   data: {
-    allowance: number;
-    stakingRewards: number;
+    result: { allowance: number; stakingRewards: number };
   };
 }
 
@@ -200,18 +199,22 @@ const Account: React.FC<IAccountPage> = ({
   };
 
   const getKLVAllowance = (): number => {
-    return (KLVallowance?.data?.allowance || 0) / 10 ** defaultKlvPrecision;
+    return (
+      (KLVallowance?.data?.result?.allowance || 0) / 10 ** defaultKlvPrecision
+    );
   };
 
   const getKLVStaking = (): number => {
     return (
-      (KLVallowance?.data?.stakingRewards || 0) / 10 ** defaultKlvPrecision
+      (KLVallowance?.data?.result?.stakingRewards || 0) /
+      10 ** defaultKlvPrecision
     );
   };
 
   const getKFIStaking = (): number => {
     return (
-      (KFIallowance?.data?.stakingRewards || 0) / 10 ** defaultKlvPrecision
+      (KFIallowance?.data?.result?.stakingRewards || 0) /
+      10 ** defaultKlvPrecision
     );
   };
 
@@ -532,8 +535,8 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
   const KLVAllowancePromise = new Promise<IAllowanceResponse>(resolve =>
     resolve(
       api.get({
-        route: `address/${address}/allowance?asset=KLV`,
-        service: Service.NODE,
+        route: `address/${address}/allowance?assetID=KLV`,
+        service: Service.PROXY,
       }),
     ),
   );
@@ -541,8 +544,8 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
   const KFIAllowancePromise = new Promise<IAllowanceResponse>(resolve =>
     resolve(
       api.get({
-        route: `address/${address}/allowance?asset=KFI`,
-        service: Service.NODE,
+        route: `address/${address}/allowance?assetID=KFI`,
+        service: Service.PROXY,
       }),
     ),
   );
@@ -552,7 +555,6 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
       responses.forEach((res, index) => {
         if (res.status === 'fulfilled') {
           const { value }: { value: IAllowanceResponse } = res;
-
           if (index === 0) {
             props.KLVallowance = value;
           } else if (index === 1) {

@@ -5,7 +5,7 @@ import {
   IContractOption,
   IEpochInfo,
   IFormData,
-  IParsedMetrics,
+  IMetrics,
 } from '../types';
 
 export const breakText = (text: string, limit: number): string => {
@@ -122,28 +122,24 @@ export const capitalizeString = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-export const getEpochInfo = (parseMetrics: IParsedMetrics): IEpochInfo => {
-  const {
-    klv_slot_at_epoch_start,
-    klv_slots_per_epoch,
-    klv_current_slot,
-    klv_slot_duration,
-  } = parseMetrics;
+export const getEpochInfo = (metrics: IMetrics): IEpochInfo => {
+  const { slotAtEpochStart, slotsPerEpoch, currentSlot, slotDuration } =
+    metrics;
 
-  const epochFinishSlot = klv_slot_at_epoch_start + klv_slots_per_epoch;
-  let slotsRemained = epochFinishSlot - klv_current_slot;
-  if (epochFinishSlot < klv_current_slot) {
+  const epochFinishSlot = slotAtEpochStart + slotsPerEpoch;
+  let slotsRemained = epochFinishSlot - currentSlot;
+  if (epochFinishSlot < currentSlot) {
     slotsRemained = 0;
   }
 
-  const secondsRemainedInEpoch = (slotsRemained * klv_slot_duration) / 1000;
+  const secondsRemainedInEpoch = (slotsRemained * slotDuration) / 1000;
 
   const remainingTime = secondsToHourMinSec(secondsRemainedInEpoch);
 
-  const epochLoadPercent = 100 - (slotsRemained / klv_slots_per_epoch) * 100.0;
+  const epochLoadPercent = 100 - (slotsRemained / slotsPerEpoch) * 100.0;
 
   return {
-    currentSlot: klv_current_slot,
+    currentSlot: currentSlot,
     epochFinishSlot: epochFinishSlot,
     epochLoadPercent,
     remainingTime,

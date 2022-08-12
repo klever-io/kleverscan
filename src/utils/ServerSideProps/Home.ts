@@ -8,7 +8,6 @@ import {
   IGeckoChartResponse,
   IGeckoResponse,
   IHome,
-  IParsedMetrics,
   ITransactionListResponse,
 } from '../../types';
 
@@ -141,7 +140,7 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     async (resolve, reject) => {
       const res = await api.getCached({
         route: 'node/statistics',
-        service: Service.NODE,
+        service: Service.PROXY,
       });
 
       if (!res.error || res.error === '') {
@@ -153,9 +152,9 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
   );
 
   const metricsCall = new Promise<IAccountResponse>(async (resolve, reject) => {
-    const res = await api.text({
-      route: 'node/metrics',
-      service: Service.NODE,
+    const res = await api.get({
+      route: 'node/overview',
+      service: Service.PROXY,
     });
 
     if (!res.error || res.error === '') {
@@ -361,16 +360,10 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
             break;
 
           case 5:
-            const parsedMetrics = {} as IParsedMetrics;
+            if (value) {
+              props.epochInfo = getEpochInfo(value.data.overview);
+            }
 
-            const metricLines = value?.split('\n');
-            metricLines?.forEach((line: any) => {
-              const props = line?.split(' ');
-
-              parsedMetrics[props[0]?.split('{')?.[0]] = parseInt(props?.[1]);
-            });
-
-            props.epochInfo = getEpochInfo(parsedMetrics);
             break;
 
           case 6:

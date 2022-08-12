@@ -778,11 +778,11 @@ export interface IEpochInfo {
   remainingTime: string;
 }
 
-export interface IParsedMetrics {
-  klv_slot_at_epoch_start: number;
-  klv_slots_per_epoch: number;
-  klv_current_slot: number;
-  klv_slot_duration: number;
+export interface IMetrics {
+  slotAtEpochStart: number;
+  slotsPerEpoch: number;
+  currentSlot: number;
+  slotDuration: number;
 }
 
 export interface ITotalFrozen {

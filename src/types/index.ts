@@ -674,6 +674,7 @@ export interface IDataCards {
   yesterdayTransactions: number;
   yesterdayAccounts: number;
   assetsData: IAssetsData;
+  block: IBlock;
 }
 
 export interface IHomeTransactions {

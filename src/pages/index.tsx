@@ -29,6 +29,7 @@ const Home: React.FC<IHome> = ({
       <DataContainer>
         <Input />
         <HomeDataCards
+          block={blocks?.[0]}
           totalAccounts={defaultTotalAccounts}
           totalTransactions={totalTransactions}
           epochInfo={defaultEpochInfo}

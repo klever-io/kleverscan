@@ -34,6 +34,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
   totalAccounts: defaultTotalAccounts,
   totalTransactions: defaultTotalTransactions,
   epochInfo: defaultEpochInfo,
+  block,
   tps,
   coinsData,
   yesterdayTransactions,
@@ -78,9 +79,9 @@ const HomeDataCards: React.FC<IDataCards> = ({
     },
     {
       Icon: Epoch,
-      title: 'Epoch Remaining Time',
-      value: metrics?.remainingTime,
-      progress: metrics?.epochLoadPercent,
+      title: `Epoch #${block.epoch} Remaining Time`,
+      value: metrics.remainingTime,
+      progress: metrics.epochLoadPercent,
     },
   ];
 

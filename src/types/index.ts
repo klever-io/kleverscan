@@ -432,6 +432,7 @@ export interface IAccount {
       [key: string]: IBucket;
     },
   ];
+  collection: INfts[];
 }
 
 export interface IAccountAsset {
@@ -792,4 +793,12 @@ export interface ITotalFrozen {
 
 export interface IFormData {
   [key: string]: any;
+}
+
+export interface INfts {
+  address: string;
+  assetName: string;
+  collection: string;
+  assetId: string;
+  nftNonce: number;
 }

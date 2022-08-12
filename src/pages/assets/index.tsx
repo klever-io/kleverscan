@@ -218,8 +218,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
   props.assets = parseHardCodedInfo(props.assets);
 
-  console.log(props.assets[0]);
-
   return { props };
 };
 

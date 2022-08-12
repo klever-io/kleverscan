@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 
 interface IAssets {
   assets: IAccountAsset[];
+  address: string;
 }
 
 interface IAssetResponse extends IResponse {
@@ -15,7 +16,7 @@ interface IAssetResponse extends IResponse {
   };
 }
 
-const Assets: React.FC<IAssets> = ({ assets }) => {
+const Assets: React.FC<IAssets> = ({ assets, address }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -35,6 +36,7 @@ const Assets: React.FC<IAssets> = ({ assets }) => {
     'Precision',
     'Balance',
     'Frozen',
+    '',
   ];
 
   const TableBody: React.FC<IAccountAsset> = ({
@@ -67,6 +69,11 @@ const Assets: React.FC<IAssets> = ({ assets }) => {
             {formatAmount(frozenBalance / 10 ** precision)} {ticker}
           </strong>
         </span>
+        {assetType === 1 && (
+          <Link href={`/account/${address}/collection/${assetId}`}>
+            Details
+          </Link>
+        )}
       </Row>
     );
   };

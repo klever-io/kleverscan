@@ -25,7 +25,8 @@ export interface ITableType {
     | 'networkParams'
     | 'proposals'
     | 'votes'
-    | 'delegations';
+    | 'delegations'
+    | 'nfts';
   haveData?: number;
   filter?: IFilterItem;
   pathname?: string;

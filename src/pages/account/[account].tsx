@@ -271,7 +271,7 @@ const Account: React.FC<IAccountPage> = ({
   const SelectedTabComponent: React.FC = () => {
     switch (selectedTab) {
       case 'Assets':
-        return <Assets assets={assets} />;
+        return <Assets assets={assets} address={account.address} />;
       case 'Transactions':
         return (
           <>

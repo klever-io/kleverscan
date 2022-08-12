@@ -14,6 +14,7 @@ interface IDetail {
   page: number;
   setPage: React.Dispatch<React.SetStateAction<number>>;
   tableProps: ITable;
+  route?: string;
 }
 
 const Detail: React.FC<IDetail> = ({
@@ -25,13 +26,14 @@ const Detail: React.FC<IDetail> = ({
   page,
   setPage,
   tableProps,
+  route,
 }) => {
   const router = useRouter();
 
   return (
     <Container>
       <Header>
-        <Title title={title} Icon={Icon} />
+        <Title title={title} Icon={Icon} route={route} />
 
         <Input />
       </Header>

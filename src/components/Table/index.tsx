@@ -21,7 +21,8 @@ export interface ITable {
     | 'networkParams'
     | 'proposals'
     | 'votes'
-    | 'delegations';
+    | 'delegations'
+    | 'nfts';
 
   header: string[];
   data: any[];

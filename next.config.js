@@ -2,6 +2,7 @@
 
 const withImages = require('next-images');
 const withPlugins = require('next-compose-plugins');
+const { i18n } = require('./next-i18next.config');
 
 const images = withImages({
   esModule: true,
@@ -30,3 +31,8 @@ const getEnvs = () => {
 module.exports = withPlugins([images], {
   env: getEnvs(),
 });
+
+module.exports = {
+  ...module.exports,
+  i18n,
+};

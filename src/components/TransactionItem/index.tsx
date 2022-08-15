@@ -5,6 +5,7 @@ import {
   TransactionRow,
 } from '@/views/home';
 import { format, fromUnixTime } from 'date-fns';
+import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React from 'react';
 import { ITransaction, ITransferContract } from '../../types';
@@ -21,6 +22,9 @@ const TransactionItem: React.FC<ITransaction> = ({
   let parameter: ITransferContract = {} as ITransferContract;
   let amount = 0;
   const StatusIcon = getStatusIcon(status);
+
+  const { t } = useTranslation('transactions');
+
   if (contract) {
     const contractPosition = 0;
     parameter = contract[contractPosition].parameter as ITransferContract;
@@ -58,13 +62,13 @@ const TransactionItem: React.FC<ITransaction> = ({
       </TransactionData>
       <TransactionData>
         <p>
-          <strong>From: </strong>
+          <strong>{t('From')}: </strong>
           <Link href={`/account/${sender}`}>
             <a className="clean-style">{parseAddress(sender, 12)}</a>
           </Link>
         </p>
         <p>
-          <strong>To: </strong>
+          <strong>{t('To')}: </strong>
           <Link href={`/account/${parameter?.toAddress}`}>
             <a className="clean-style">
               {parameter?.toAddress

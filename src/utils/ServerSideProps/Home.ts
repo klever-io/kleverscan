@@ -2,6 +2,7 @@ import api from '@/services/api';
 import { Service } from '@/types/index';
 import { getEpochInfo } from '@/utils/index';
 import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import {
   IAccountResponse,
   IBlockResponse,
@@ -11,7 +12,9 @@ import {
   ITransactionListResponse,
 } from '../../types';
 
-const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
+const HomeServerSideProps: GetServerSideProps<IHome> = async ({
+  locale = 'en',
+}) => {
   const props: IHome = {
     blocks: [],
     transactions: [],
@@ -56,6 +59,11 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
         circulatingSupply: null,
       },
     },
+    ...(await serverSideTranslations(locale, [
+      'common',
+      'blocks',
+      'transactions',
+    ])),
   };
 
   const pushCoinData = (

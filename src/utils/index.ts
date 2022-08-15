@@ -1,4 +1,5 @@
 import api from '@/services/api';
+import { TFunction } from 'next-i18next';
 import { toast } from 'react-toastify';
 import {
   IAsset,
@@ -28,7 +29,7 @@ export const getVariation = (variation: number): string => {
   return `+ ${variation ? variation.toFixed(precision) : '--'}%`;
 };
 
-export const getAge = (date: Date): string => {
+export const getAge = (date: Date, t?: TFunction): string => {
   const diff = Math.abs(new Date().getTime() - date.getTime());
 
   const sec = Math.ceil(diff / 1000);
@@ -41,16 +42,16 @@ export const getAge = (date: Date): string => {
 
   if (sec <= 59) {
     val = sec;
-    suffix = 'sec';
+    suffix = t ? t('Date.Time.sec') : 'sec';
   } else if (sec > 59 && min <= 59) {
     val = min;
-    suffix = 'min';
+    suffix = t ? t('Date.Time.min') : 'min';
   } else if (min > 59 && hour <= 23) {
     val = hour;
-    suffix = 'hour';
+    suffix = t ? t('Date.Time.hour') : 'hour';
   } else if (hour > 24) {
     val = day;
-    suffix = 'day';
+    suffix = t ? t('Date.Time.day') : 'day';
   }
 
   return `${val} ${suffix}${val > 1 ? 's' : ''}`;
@@ -146,7 +147,7 @@ export const getEpochInfo = (metrics: IMetrics): IEpochInfo => {
   };
 };
 
-const secondsToHourMinSec = (input: number): string => {
+const secondsToHourMinSec = (input: number, t?: TFunction): string => {
   const numSecondsInAMinute = 60;
   const numMinutesInAHour = 60;
   const numSecondsInAHour = numSecondsInAMinute * numMinutesInAHour;
@@ -158,13 +159,13 @@ const secondsToHourMinSec = (input: number): string => {
   seconds = input % numSecondsInAMinute;
 
   if (hours > 0) {
-    result = plural(hours, 'hour');
+    result = plural(hours, t ? t('Date.Time.hour') : 'hour');
   }
   if (minutes > 0) {
-    result += plural(minutes, 'minute');
+    result += plural(minutes, t ? t('Date.Time.minute') : 'minute');
   }
   if (seconds > 0) {
-    result += plural(seconds, 'second');
+    result += plural(seconds, t ? t('Date.Time.second') : 'second');
   }
 
   result += ' ';

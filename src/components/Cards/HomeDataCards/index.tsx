@@ -19,6 +19,7 @@ import {
   ProgressIndicator,
 } from '@/views/validators';
 import { useTheme } from 'contexts/theme';
+import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 import {
   IAccountResponse,
@@ -54,10 +55,12 @@ const HomeDataCards: React.FC<IDataCards> = ({
   const [newAccounts, setNewAccounts] = useState(yesterdayAccounts);
   const [newTransactions, setNewTransactions] = useState(yesterdayTransactions);
 
+  const { t } = useTranslation('common', { keyPrefix: 'Cards' });
+
   const dataCards: ICard[] = [
     {
       Icon: Accounts,
-      title: 'Total accounts',
+      title: t('Total Accounts'),
       value: totalAccounts,
       variation: `+ ${
         newAccounts === totalAccounts ? '0%' : newAccounts.toLocaleString()
@@ -65,7 +68,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
     },
     {
       Icon: Transactions,
-      title: 'Total transactions',
+      title: t('Total Transactions'),
       value: totalTransactions,
       variation: `+ ${newTransactions.toLocaleString()}`,
     },
@@ -74,12 +77,12 @@ const HomeDataCards: React.FC<IDataCards> = ({
   const epochCards: IEpochCard[] = [
     {
       Icon: TPS,
-      title: 'Live/Peak TPS',
+      title: t('Live/Peak TPS'),
       value: actualTPS,
     },
     {
       Icon: Epoch,
-      title: `Epoch #${block.epoch} Remaining Time`,
+      title: `${t('Epoch')} #${block.epoch} ${t('Remaining Time')}`,
       value: metrics.remainingTime,
       progress: metrics.epochLoadPercent,
     },
@@ -237,7 +240,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
               </DataCardValue>
               {!variation.includes('%') && (
                 <DataCardLatest positive={variation.includes('+')}>
-                  <span>Last 24h</span>
+                  <span>{t('Last 24h')}</span>
                   <p>{variation}</p>
                 </DataCardLatest>
               )}

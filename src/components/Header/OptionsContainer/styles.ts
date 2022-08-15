@@ -26,7 +26,7 @@ export const Container = styled.div`
 export const IconContainer = styled.div`
   height: 1.25rem;
 
-  /* border-left: 1px solid ${props => props.theme.navbar.text}; */
+  border-left: 1px solid ${props => props.theme.navbar.text};
   padding-left: 0.5rem;
 
   cursor: pointer;

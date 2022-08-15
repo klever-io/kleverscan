@@ -1,0 +1,51 @@
+{
+  "EmptyData": "Oops! Apparently no data here.",
+  "Search Address, Block, Transaction": "Search Address, Block, Transaction",
+  "Cards": {
+    "Total Accounts": "Total Accounts",
+    "Total Transactions": "Total Transactions",
+    "Live/Peak TPS": "Live/Peak TPS",
+    "Epoch": "Epoch",
+    "Remaining Time": "Remaining Time",
+    "Last 24h": "Last 24h",
+    "Market Cap": "Market Cap",
+    "Volume": "Volume",
+    "Total Staked": "Total Staked"
+  },
+  "Titles": {
+    "Assets": "Assets",
+    "Accounts": "Accounts",
+    "Blocks": "Blocks",
+    "Transactions": "Transactions",
+    "Validators": "Validators",
+    "Proposals": "Proposals"
+  },
+  "Date": {
+    "Elapsed Time": "ago",
+    "Today": "Today",
+    "Yesterday": "Yesterday",
+    "Day": "Day",
+    "Time": {
+      "sec": "sec",
+      "min": "min",
+      "day": "day",
+      "hour": "hour",
+      "minute": "minute",
+      "second": "second"
+    },
+    "Months": {
+      "Jan": "Jan",
+      "Feb": "Feb",
+      "Mar": "Mar",
+      "Apr": "Apr",
+      "May": "May",
+      "Jun": "Jun",
+      "Jul": "Jul",
+      "Aug": "Aug",
+      "Sep": "Sep",
+      "Oct": "Oct",
+      "Nov": "Nov",
+      "Dec": "Dec"
+    }
+  }
+}

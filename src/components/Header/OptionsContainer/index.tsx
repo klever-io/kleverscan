@@ -1,17 +1,13 @@
 import { useTheme } from 'contexts/theme';
-import { toast } from 'react-toastify';
+import Language from './Language';
 import { Container, IconContainer, MoonIcon, SunIcon } from './styles';
 
 const OptionsContainer: React.FC = () => {
   const theme = useTheme();
 
-  const handleLanguage = () => {
-    toast.info('Not implemented yet');
-  };
-
   return (
     <Container>
-      {/* <LanguageContainer onClick={handleLanguage}>EN</LanguageContainer> */}
+      <Language />
       <IconContainer onClick={() => theme.toggleDarkTheme()}>
         {theme.isDarkTheme ? <MoonIcon /> : <SunIcon />}
       </IconContainer>

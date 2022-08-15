@@ -1,6 +1,7 @@
-import React from 'react';
 import { InternalThemeProvider } from 'contexts/theme';
+import { appWithTranslation } from 'next-i18next';
 import type { AppProps } from 'next/app';
+import React from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Layout from '../components/Layout';
@@ -32,4 +33,4 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   return ErrorBoundary ? <ErrorBoundary>{children}</ErrorBoundary> : children;
 };
 
-export default MyApp;
+export default appWithTranslation(MyApp);

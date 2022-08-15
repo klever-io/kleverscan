@@ -43,16 +43,18 @@ const Detail: React.FC<IDetail> = ({
       </TableContainer>
       <Table {...tableProps} />
 
-      <PaginationContainer>
-        <Pagination
-          scrollUp={true}
-          count={paginationCount}
-          page={page}
-          onPaginate={page => {
-            setPage(page);
-          }}
-        />
-      </PaginationContainer>
+      {!!paginationCount && (
+        <PaginationContainer>
+          <Pagination
+            scrollUp={true}
+            count={paginationCount}
+            page={page}
+            onPaginate={page => {
+              setPage(page);
+            }}
+          />
+        </PaginationContainer>
+      )}
     </Container>
   );
 };

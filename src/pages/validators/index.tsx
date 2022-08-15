@@ -64,6 +64,8 @@ const Validators: React.FC<IValidatorPage> = ({
     });
     if (validators.code !== 'successful') {
       setLoading(false);
+      setValidators([]);
+      setPage(1);
       return;
     }
 
@@ -192,7 +194,7 @@ const Validators: React.FC<IValidatorPage> = ({
     title: 'Validators',
     headerIcon: Icon,
     cards: undefined,
-    paginationCount: pagination.totalPages,
+    paginationCount: validators.length > 0 ? pagination.totalPages : 0,
     page: page,
     setPage: setPage,
     tableProps,

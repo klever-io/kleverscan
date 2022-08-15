@@ -15,7 +15,6 @@ import api, { IPrice } from '@/services/api';
 import {
   IAccount,
   IAccountAsset,
-  IBucket,
   IPagination,
   IResponse,
   ITransaction,
@@ -38,7 +37,7 @@ import {
 import { ReceiveBackground } from '@/views/validator';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 interface IAssetInfo {
   assetId: string;
@@ -115,8 +114,6 @@ const Account: React.FC<IAccountPage> = ({
   const [transactions, setTransactions] = useState(
     transactionResponse.data.transactions,
   );
-
-  const [buckets, setBuckets] = useState<IBucket[]>([]);
   const [showModal, setShowModal] = useState(false);
 
   useDidUpdateEffect(() => {
@@ -138,23 +135,6 @@ const Account: React.FC<IAccountPage> = ({
 
     fetchData();
   }, [page, account.address, dateFilter, fromToFilter]);
-
-  useEffect(() => {
-    const { assets } = account;
-    if (Object.keys(assets).length === 0) {
-      return;
-    }
-
-    let assetBuckets: IBucket[] = [];
-
-    for (const key in assets) {
-      if (assets[key].buckets) {
-        assetBuckets = [...assetBuckets, ...(assets[key].buckets || [])];
-      }
-    }
-
-    setBuckets(assetBuckets);
-  }, [account]);
 
   const getTxQuery = useCallback((): ITxQuery => {
     const txQuery: ITxQuery = {
@@ -229,12 +209,19 @@ const Account: React.FC<IAccountPage> = ({
       headers.push('Transactions');
     }
 
-    if (buckets.length > 0) {
-      headers.push('Buckets');
+    if (Object.keys(assets).length === 0) {
+      return headers;
+    }
+
+    for (const key in assets) {
+      if (assets[key].buckets) {
+        headers.push('Buckets');
+        break;
+      }
     }
 
     return headers;
-  }, [account.assets, buckets, transactionResponse.data.transactions]);
+  }, [account.assets, transactionResponse.data.transactions]);
 
   const [selectedTab, setSelectedTab] = useState<string>(getTabHeaders()[0]);
 
@@ -292,7 +279,7 @@ const Account: React.FC<IAccountPage> = ({
           </>
         );
       case 'Buckets':
-        return <Buckets buckets={buckets} assets={assets} />;
+        return <Buckets assets={assets} />;
       default:
         return <div />;
     }

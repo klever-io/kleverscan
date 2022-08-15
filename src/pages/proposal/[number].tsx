@@ -16,6 +16,7 @@ import {
 import { formatAmount, toLocaleFixed, typeVoteColors } from '@/utils/index';
 import {
   BalanceContainer,
+  BigSpan,
   CardContainer,
   CardContent,
   CardVote,
@@ -314,7 +315,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                 <span>
                   <strong>Description</strong>
                 </span>
-                <span>{description}</span>
+                <BigSpan>{description}</BigSpan>
               </Row>
             </CardContent>
           </CardContainer>
@@ -441,6 +442,7 @@ export const getServerSideProps: GetStaticProps<IProposal> = async ({
   const proposalInfos: any = await api.get({
     route: `proposals/${params?.number}`,
   });
+
   let props = proposalInfos?.data?.proposal;
 
   if (!props) {
@@ -450,6 +452,7 @@ export const getServerSideProps: GetStaticProps<IProposal> = async ({
   props.votingPowers = votingPowers;
   const fullInfoParams = getProposalNetworkParams(props.parameters);
   props.parsedParameters = fullInfoParams;
+
   return { props };
 };
 

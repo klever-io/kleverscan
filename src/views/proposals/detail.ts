@@ -470,3 +470,8 @@ export const NetworkParamsContainer = styled.div`
     }
   }
 `;
+
+export const BigSpan = styled.span`
+  overflow: visible !important;
+  white-space: normal !important;
+`;

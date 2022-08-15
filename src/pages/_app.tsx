@@ -1,7 +1,7 @@
+import React from 'react';
 import { InternalThemeProvider } from 'contexts/theme';
 import type { AppProps } from 'next/app';
-import { useRouter } from 'next/router';
-import React from 'react';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Layout from '../components/Layout';
 import NProgress from '../components/NProgress';
@@ -18,10 +18,9 @@ declare global {
 }
 
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
-  const router = useRouter();
-
   const children = (
     <InternalThemeProvider>
+      <ToastContainer />
       <Layout>
         <Component {...pageProps} />
       </Layout>

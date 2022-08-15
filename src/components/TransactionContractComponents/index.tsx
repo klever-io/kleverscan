@@ -132,12 +132,14 @@ export const CreateAsset: React.FC<IContract> = ({
         </span>
         <strong>Create Asset</strong>
       </Row>
-      <Row>
-        <span>
-          <strong>Asset ID</strong>
-        </span>
-        <Link href={`/asset/${assetId}`}>{assetId}</Link>
-      </Row>
+      {assetId && (
+        <Row>
+          <span>
+            <strong>Asset ID</strong>
+          </span>
+          <Link href={`/asset/${assetId}`}>{assetId}</Link>
+        </Row>
+      )}
       <Row>
         <span>
           <strong>Name</strong>

@@ -44,8 +44,9 @@ const Assets: React.FC<IAssetPage> = ({
     const fetchData = async () => {
       setLoading(true);
 
-      const response: IAssetResponse = await api.get({
+      const response: IAssetResponse = await api.getCached({
         route: `assets/kassets?hidden=false&page=${page}`,
+        refreshTime: 21600,
       });
 
       if (!response.error) {
@@ -206,8 +207,9 @@ const Assets: React.FC<IAssetPage> = ({
 export const getServerSideProps: GetServerSideProps = async () => {
   const props: IAssetPage = { assets: [], pagination: {} as IPagination };
 
-  const assets: IAssetResponse = await api.get({
+  const assets: IAssetResponse = await api.getCached({
     route: 'assets/kassets?hidden=false',
+    refreshTime: 21600,
   });
   if (!assets.error) {
     props.assets = assets.data.assets;

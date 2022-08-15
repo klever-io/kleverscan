@@ -10,6 +10,7 @@ import {
   ButtonContainer,
   FormBody,
   FormSection,
+  FormGap,
   SectionTitle,
 } from './styles';
 
@@ -273,24 +274,38 @@ const Form: React.FC<any> = ({
     ref: formRef,
   };
 
+  const isEmptyContract = (contract: string) => {
+    const contracts = [
+      'UnjailContract',
+      'WithdrawContract',
+      'UnfreezeContract',
+      'UndelegateContract',
+      'UpdateAccountPermissionContract',
+      'SetITOPricesContract',
+      'SetITOPricesContract',
+      'AssetTriggerContract',
+    ];
+
+    return contracts.includes(contract);
+  };
+
   return (
     <FormBody {...formProps}>
-      {sections.map((section: any, index: number) => (
-        <FormSection key={String(index)}>
-          <SectionTitle>{section.title}</SectionTitle>
-          {getSectionInputs(section, index)}
-        </FormSection>
-      ))}
+      {sections.map((section: any, index: number) => {
+        return (
+          <>
+            {sections.length === 1 && section.title && <FormGap />}
+            <FormSection key={String(index)}>
+              <SectionTitle>{section.title}</SectionTitle>
+              {getSectionInputs(section, index)}
+            </FormSection>
+          </>
+        );
+      })}
 
       {children}
 
-      {sections.length > 0 ||
-      contractName === 'UnjailContract' ||
-      contractName === 'WithdrawContract' ||
-      contractName === 'UnfreezeContract' ||
-      contractName === 'UndelegateContract' ||
-      contractName === 'SetITOPricesContract' ||
-      contractName === 'UpdateAccountPermissionContract' ? (
+      {sections.length > 0 || isEmptyContract(contractName) ? (
         <>
           <AdvancedOptsContainer
             onClick={() => setShowAdvancedOpts(!showAdvancedOpts)}

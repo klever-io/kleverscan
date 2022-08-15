@@ -63,6 +63,7 @@ const formSection = (
   type?: string,
   address = '',
   paramsList?: IParamList[],
+  assetTriggerType?: number | null,
 ): ISection[] => {
   const contractsSections = {
     CreateAssetContract: type
@@ -88,7 +89,7 @@ const formSection = (
     CreateValidatorContract: createValidatorContract(address),
     SetITOPricesContract: setITOContract(),
     ConfigITOContract: configITOContract(),
-    AssetTriggerContract: assetTriggerContract(),
+    AssetTriggerContract: assetTriggerContract(assetTriggerType),
     UpdateAccountPermissionContract: updatePermissionContract(),
   };
 

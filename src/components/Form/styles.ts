@@ -7,6 +7,10 @@ interface IButton {
   submit?: boolean;
 }
 
+interface ISpaceForm {
+  section?: string;
+}
+
 export const FormBody = styled(Form)``;
 
 export const FormSection = styled.div<{ inner?: boolean }>`
@@ -74,6 +78,8 @@ export const TooltipSpace = styled.div`
 `;
 
 export const InputWrapper = styled.div``;
+
+export const FormGap = styled.div<ISpaceForm>``;
 
 export const ButtonContainer = styled.button<IButton>`
   background-color: ${props => props.theme.form.sectionTitle};

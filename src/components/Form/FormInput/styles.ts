@@ -226,7 +226,7 @@ export const TooltipContainer = styled.div<{
 
       margin-left: 0.5rem;
 
-      background-color: ${props => props.theme.card.background};
+      background-color: ${props => props.theme.form.sectionTitle};
       color: ${props => props.theme.white};
 
       padding: 0.5rem;

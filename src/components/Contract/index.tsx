@@ -35,7 +35,12 @@ import {
   SelectContainer,
   SelectContent,
 } from './styles';
-import { getType, precisionParse } from './utils';
+import {
+  getType,
+  precisionParse,
+  contractHaveKDA,
+  contractHaveBucketId,
+} from './utils';
 
 interface IContract {
   assetsList: ICollectionList[];
@@ -43,6 +48,8 @@ interface IContract {
   paramsList: IParamList[];
   getAssets: () => void;
 }
+
+let triggerKey = 0;
 
 const Contract: React.FC<IContract> = ({
   assetsList,
@@ -58,14 +65,13 @@ const Contract: React.FC<IContract> = ({
   const [txHash, setTxHash] = useState<string | null>(null);
   const [ownerAddress, setOwnerAddress] = useState('');
   const [claimType, setClaimType] = useState(0);
-  const [typeAssetTrigger, setTypeAssetTrigger] = useState(0);
+  const [typeAssetTrigger, setTypeAssetTrigger] = useState<number | null>(null);
   const [data, setData] = useState('');
   const [isMultisig, setIsMultisig] = useState(false);
   const [bucketsCollection, setBucketsCollection] = useState<any>([]);
   const [bucketsList, setBucketsList] = useState<any>([]);
   const [selectedBucket, setSelectedBucket] = useState('');
   const [assetBalance, setAssetBalance] = useState<number | null>(null);
-
   const [collection, setCollection] = useState<any>({});
   const [assetID, setAssetID] = useState(0);
   const [proposalId, setProposalId] = useState<number | null>(null);
@@ -83,6 +89,16 @@ const Contract: React.FC<IContract> = ({
   }, []);
 
   useEffect(() => {
+    setFormSections([
+      ...formSection(contractType, '', ownerAddress, [], typeAssetTrigger),
+    ]);
+  }, [typeAssetTrigger]);
+
+  useEffect(() => {
+    if (contractType !== 'AssetTriggerContract') {
+      setTypeAssetTrigger(null);
+    }
+
     if (contractType === 'DelegateContract') {
       setBucketsCollection(['KFI', 'KLV']);
     } else if (contractType === 'UndelegateContract') {
@@ -152,7 +168,7 @@ const Contract: React.FC<IContract> = ({
   const parseValues = (values: any) => {
     const parsedValues = JSON.parse(JSON.stringify(values));
 
-    if (contractHaveKDA()) {
+    if (contractHaveKDA(contractType, typeAssetTrigger)) {
       if (contractType === 'AssetTriggerContract') {
         parsedValues.assetId =
           assetID !== 0 ? `${collection.value}/${assetID}` : collection.value;
@@ -189,7 +205,7 @@ const Contract: React.FC<IContract> = ({
       parsedValues.proposalId = proposalId;
     }
 
-    if (contractHaveBucketId()) {
+    if (contractHaveBucketId(contractType)) {
       parsedValues.bucketId = selectedBucket;
     }
 
@@ -304,46 +320,21 @@ const Contract: React.FC<IContract> = ({
         </Form>
       );
     } else {
-      return (
-        <Form
-          contractName={contractType}
-          key={
-            contractType === 'CreateAssetContract'
-              ? formSections.toString()
-              : contractType
-          }
-          {...formProps}
-        />
-      );
+      triggerKey += 1;
+
+      const key =
+        contractType === 'CreateAssetContract'
+          ? String(formSections)
+          : contractType === 'AssetTriggerContract'
+          ? triggerKey
+          : contractType;
+
+      return <Form contractName={contractType} key={key} {...formProps} />;
     }
   };
 
-  const contractHaveKDA = (): boolean => {
-    const contracts = [
-      'TransferContract',
-      'FreezeContract',
-      'UnfreezeContract',
-      'WithdrawContract',
-      'ConfigITOContract',
-      'SetITOPricesContract',
-      'AssetTriggerContract',
-    ];
-
-    return contracts.includes(contractType);
-  };
-
-  const contractHaveBucketId = (): boolean => {
-    const contracts = [
-      'UnfreezeContract',
-      'DelegateContract',
-      'UndelegateContract',
-    ];
-
-    return contracts.includes(contractType);
-  };
-
   const getAssetsList = (assets: any[]) => {
-    if (contractType === 'AssetTriggerContract') {
+    if (contractType === 'AssetTriggerContract' && typeAssetTrigger !== null) {
       const bothCollectionNFT = [1, 2];
       const justCollection = [0, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13];
       const justNFT = [8];
@@ -423,7 +414,7 @@ const Contract: React.FC<IContract> = ({
         </AssetTriggerContainer>
       )}
 
-      {contractHaveKDA() && (
+      {contractHaveKDA(contractType, typeAssetTrigger) && (
         <SelectContainer>
           <SelectContent>
             <BalanceContainer>
@@ -445,6 +436,7 @@ const Contract: React.FC<IContract> = ({
               }}
             />
           </SelectContent>
+
           {collection?.isNFT && (
             <SelectContent>
               <FieldLabel>Asset ID</FieldLabel>
@@ -457,7 +449,7 @@ const Contract: React.FC<IContract> = ({
         </SelectContainer>
       )}
 
-      {contractHaveBucketId() && (
+      {contractHaveBucketId(contractType) && (
         <SelectContainer>
           <SelectContent>
             <FieldLabel>Select a bucket</FieldLabel>

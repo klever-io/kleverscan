@@ -116,4 +116,31 @@ const precisionParse = async (
   return payload;
 };
 
-export { getType, getPrecision, precisionParse };
+const contractHaveKDA = (contract: string, assetTriggerType?: number | null): boolean => {
+  const contracts = [
+    'TransferContract',
+    'FreezeContract',
+    'UnfreezeContract',
+    'WithdrawContract',
+    'ConfigITOContract',
+    'SetITOPricesContract',
+  ];
+
+  if (contract === 'AssetTriggerContract' && assetTriggerType !== null) {
+    return true;
+  }
+
+  return contracts.includes(contract);
+};
+
+const contractHaveBucketId = (contract: string): boolean => {
+  const contracts = [
+    'UnfreezeContract',
+    'DelegateContract',
+    'UndelegateContract',
+  ];
+
+  return contracts.includes(contract);
+};
+
+export { getType, getPrecision, precisionParse, contractHaveKDA, contractHaveBucketId };

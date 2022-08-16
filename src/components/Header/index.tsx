@@ -1,8 +1,9 @@
 import { INavbarItem, navbarItems } from '@/configs/navbar';
+import { useWidth } from '@/utils/hooks';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ConnectWallet from './ConnectWallet';
 import OptionsContainer from './OptionsContainer';
 import {
@@ -20,6 +21,8 @@ import {
   MobileContainer,
   MobileContent,
   MobileItem,
+  MobileNavbarItemList,
+  MobileOptions,
 } from './styles';
 
 interface IDropdownPages {
@@ -99,31 +102,14 @@ export const MobileNavbarItem: React.FC<INavbarItem> = ({
   pages = [],
 }) => {
   const router = useRouter();
-  const [showMore, setShowMore] = useState(false);
-  const handleClick = () => {
-    setShowMore(!showMore);
-  };
 
   if (name === 'More') {
     return (
-      <MobileItem
-        onClick={handleClick}
-        selected={router.pathname.includes(name.toLowerCase())}
-      >
-        <span>{name}</span>
-        {showMore && (
-          <DropdownContainer>
-            <DropdownMenu>
-              {pages.map((page, index) => (
-                <DropdownMobile key={index} page={page} />
-              ))}
-            </DropdownMenu>
-          </DropdownContainer>
-        )}
-        <span>
-          <DropdownIcon />
-        </span>
-      </MobileItem>
+      <>
+        {pages.map((item, index) => (
+          <MobileNavbarItem key={String(index)} {...item} onClick={onClick} />
+        ))}
+      </>
     );
   }
   return (
@@ -142,6 +128,17 @@ export const MobileNavbarItem: React.FC<INavbarItem> = ({
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
+  const mobileNavbar = useRef<HTMLDivElement>(null);
+  const prevScrollpos = useRef<number>(0);
+
+  const width = useWidth();
+
+  useEffect(() => {
+    if (width > 1025) {
+      setIsOpen(false);
+    }
+  }, [width]);
+
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : 'visible';
   }, [isOpen]);
@@ -156,9 +153,42 @@ const Navbar: React.FC = () => {
     }
   };
 
+  const handleMobileScroll = () => {
+    const navbar = mobileNavbar.current;
+
+    const currentScrollPos = window.pageYOffset;
+
+    if (navbar === null) {
+      return;
+    }
+
+    if (prevScrollpos.current > currentScrollPos) {
+      navbar.style.top = '0';
+    } else {
+      navbar.style.top = '-4.5rem';
+    }
+    prevScrollpos.current = currentScrollPos;
+  };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (window.innerWidth < 1025) {
+        window.addEventListener('scroll', handleMobileScroll);
+      } else {
+        window.removeEventListener('scroll', handleMobileScroll);
+      }
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('scroll', handleMobileScroll);
+      }
+    };
+  }, [width]);
+
   return (
     <>
-      <Container>
+      <Container ref={mobileNavbar}>
         <Link href="/">
           <a>
             <Logo onClick={handleClose}>
@@ -185,14 +215,18 @@ const Navbar: React.FC = () => {
       <MobileBackground onClick={handleClose} opened={isOpen} />
 
       <MobileContent opened={isOpen}>
-        <OptionsContainer />
-        {navbarItems.map((item, index) => (
-          <MobileNavbarItem
-            key={String(index)}
-            {...item}
-            onClick={handleMenu}
-          />
-        ))}
+        <MobileOptions>
+          <OptionsContainer />
+        </MobileOptions>
+        <MobileNavbarItemList>
+          {navbarItems.map((item, index) => (
+            <MobileNavbarItem
+              key={String(index)}
+              {...item}
+              onClick={handleMenu}
+            />
+          ))}
+        </MobileNavbarItemList>
 
         <ConnectWallet handleMenu={handleMenu} />
       </MobileContent>

@@ -11,15 +11,22 @@ interface IMobileMenu {
 export const Container = styled.div`
   padding: 1rem 2rem;
 
-  display: flex;
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
 
+  display: flex;
   flex-direction: row;
   align-items: center;
 
   gap: 0.5rem;
 
   background-color: ${props => props.theme.navbar.background};
+
+  z-index: 1000;
+
+  transition: top 0.1s linear;
 
   @media (max-width: 425px) {
     padding: 1rem 2.5rem;
@@ -95,7 +102,7 @@ export const ItemTransaction = styled.div<{ selected: boolean }>`
 export const MobileItem = styled(Item)`
   justify-content: flex-end;
 
-  font-size: 1.25rem;
+  font-size: 1.5rem;
 `;
 
 export const Input = styled(DefaultInput)`
@@ -161,11 +168,11 @@ export const MobileContent = styled.div<IMobileMenu>`
 
   flex-direction: column;
 
-  gap: 1rem;
+  gap: 1.5rem;
 
   background-color: ${props => props.theme.navbar.background};
 
-  transition: 0.5s ease;
+  transition: 0.3s ease-out;
 
   ul > li {
     display: flex;
@@ -173,27 +180,45 @@ export const MobileContent = styled.div<IMobileMenu>`
   }
 `;
 
+export const MobileOptions = styled.div`
+  padding: 0.5rem 0;
+
+  z-index: 10;
+  > div {
+    gap: 1.5rem;
+
+    > div:last-child {
+      padding-left: 1.5rem;
+    }
+  }
+`;
+
+export const MobileNavbarItemList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  overflow-y: auto;
+`;
+
 export const MobileBackground = styled.div<IMobileMenu>`
-  width: 100vw;
+  width: 100%;
   height: 100vh;
 
   top: 4rem;
   left: 0;
 
-  position: absolute;
+  position: fixed;
 
   z-index: 500 !important;
 
   opacity: ${props => (props.opened ? 1 : 0)};
   visibility: ${props => (props.opened ? 'visible' : 'hidden')};
 
-  background-color: ${props => transparentize(0.7, props.theme.black)};
+  background-color: ${props =>
+    transparentize(props.theme.dark ? 0.85 : 0.7, props.theme.true.black)};
 
-  transition: 0.5s ease;
-
-  @media (min-width: 1025px) {
-    display: none;
-  }
+  transition: opacity 0.5s ease, visibility 0.5s ease;
 `;
 
 const expand = keyframes`

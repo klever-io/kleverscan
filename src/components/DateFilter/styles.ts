@@ -55,6 +55,9 @@ export const fadeInContainerMobile = keyframes`
 export const Container = styled.div`
   display: block;
   position: relative;
+  @media (max-width: 1025px) {
+    width: 100%;
+  }
 `;
 
 export const OutsideContainer = styled.div`
@@ -84,7 +87,9 @@ export const OutsideContent = styled.div`
   justify-content: center;
 
   background-color: ${props =>
-    props.theme.dark ? props.theme.card.assetText : 'rgba(198, 199, 235, 0.2)'};
+    props.theme.dark
+      ? props.theme.card.assetText
+      : props.theme.dateFilter.outsideBackground};
   border-radius: 0.5rem;
 
   cursor: pointer;
@@ -133,11 +138,12 @@ export const CalendarContainer = styled.div`
   border-radius: 20px;
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
 
-  @media (min-width: 768px) {
+  @media (min-width: 1025px) {
     animation: ${fadeInContainer} 0.2s linear;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1025px) {
+    left: 7rem;
     animation: ${fadeInContainerMobile} 0.2s linear forwards;
   }
 `;

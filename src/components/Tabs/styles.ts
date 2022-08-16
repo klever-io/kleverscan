@@ -61,7 +61,10 @@ export const FilterContent = styled.div`
       width: 100%;
       height: 2.8rem;
       display: flex;
-      background: rgba(198, 199, 235, 0.2);
+      background-color: ${props =>
+        props.theme.dark
+          ? props.theme.card.assetText
+          : props.theme.dateFilter.outsideBackground};
       border: 1px solid ${props => props.theme.filter.border};
       border-radius: 0.5rem;
       cursor: pointer;

@@ -14,7 +14,8 @@ export const ConnectButton = styled.div`
 
   position: relative;
 
-  width: 14rem;
+  min-width: 14rem;
+  width: 100%;
 
   cursor: pointer;
 
@@ -27,11 +28,17 @@ export const ConnectButton = styled.div`
   }
 
   @media screen and (min-width: 1025px) {
+    width: 14rem;
     &:hover > div {
       display: flex;
       flex-direction: column;
     }
   }
+`;
+
+export const ButtonAndCopy = styled.div`
+  display: flex;
+  align-items: center;
 `;
 
 export const ConnectContainer = styled.div`
@@ -106,6 +113,12 @@ export const CopyContainer = styled.div`
   position: relative;
   font-size: 0.9rem;
   margin-left: 0.8rem;
+
+  svg {
+    g {
+      fill: ${props => props.theme.navbar.text};
+    }
+  }
 
   &:hover {
     svg {

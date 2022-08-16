@@ -177,6 +177,10 @@ const theme = {
     // TODO: outdated
     marker: '#33d46c',
   },
+
+  dateFilter: {
+    outsideBackground: 'rgba(198, 199, 235, 0.2)',
+  },
 };
 
 export default theme;

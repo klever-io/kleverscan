@@ -13,6 +13,7 @@ const Language: React.FC = () => {
   const closeTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const handleLanguage = (locale: string) => {
+    setActive(false);
     router.locale = locale;
 
     router.push(router.asPath, router.asPath, {

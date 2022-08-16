@@ -208,6 +208,13 @@ const parseValues = (
     parsedValues.triggerType = typeAssetTrigger;
   } else if (contractType === 'ClaimContract') {
     parsedValues.claimType = claimType;
+    if (parsedValues.assetID) {
+      parsedValues.id = parsedValues.assetID;
+      delete parsedValues.assetID;
+    } else if (parsedValues.orderID) {
+      parsedValues.id = parsedValues.orderID;
+      delete parsedValues.orderID;
+    }
   } else if (contractType === 'ProposalContract') {
     if (values.parameters) {
       const parameters = {};

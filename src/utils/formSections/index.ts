@@ -64,6 +64,7 @@ const formSection = (
   address = '',
   paramsList?: IParamList[],
   assetTriggerType?: number | null,
+  claimLabel?: string,
 ): ISection[] => {
   const contractsSections = {
     CreateAssetContract: type
@@ -82,7 +83,7 @@ const formSection = (
     CancelMarketOrderContract: cancelMarketOrderContract(),
     CreateMarketplaceContract: createMarketplaceContract(),
     ConfigMarketplaceContract: configMarketplaceContract(),
-    ClaimContract: claimContract(),
+    ClaimContract: claimContract(claimLabel),
     UnjailContract: unjailContract(),
     SetAccountNameContract: setAccountNameContract(),
     ValidatorConfigContract: validatorConfigContract(),

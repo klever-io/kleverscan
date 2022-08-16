@@ -13,11 +13,9 @@ import {
   contractOptions,
   parseAddress,
 } from '@/utils/index';
-import { core } from '@klever/sdk';
 import Form, { ISection } from 'components/Form';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 import Copy from '../Copy';
 import PackInfoForm from '../CustomForm/PackInfo';
 import ParametersForm from '../CustomForm/Parameters';
@@ -39,9 +37,7 @@ import {
   contractHaveBucketId,
   contractHaveKDA,
   getAssetsList,
-  getType,
   parseValues,
-  precisionParse,
 } from './utils';
 
 interface IContract {
@@ -52,6 +48,7 @@ interface IContract {
 }
 
 let triggerKey = 0;
+let claimKey = 0;
 
 const Contract: React.FC<IContract> = ({
   assetsList,
@@ -77,6 +74,7 @@ const Contract: React.FC<IContract> = ({
   const [collection, setCollection] = useState<any>({});
   const [assetID, setAssetID] = useState(0);
   const [proposalId, setProposalId] = useState<number | null>(null);
+  const [claimLabel, setClaimLabel] = useState('Asset ID');
 
   useEffect(() => {
     setAssetBalance(null);
@@ -96,6 +94,19 @@ const Contract: React.FC<IContract> = ({
       window.scrollTo(0, 0);
     }
   }, [txHash]);
+
+  useEffect(() => {
+    setFormSections([
+      ...formSection(
+        'ClaimContract',
+        '',
+        ownerAddress,
+        paramsList,
+        typeAssetTrigger,
+        claimLabel,
+      ),
+    ]);
+  }, [claimLabel]);
 
   useEffect(() => {
     setFormSections([
@@ -170,12 +181,32 @@ const Contract: React.FC<IContract> = ({
 
   const handleOption = (selectedOption: any) => {
     setContractType(selectedOption.value);
-    if (selectedOption.value === 'ProposalContract') {
-      setFormSections([
-        ...formSection(selectedOption.value, '', ownerAddress, paramsList),
-      ]);
-    } else {
-      setFormSections([...formSection(selectedOption.value, '', ownerAddress)]);
+
+    switch (selectedOption.value) {
+      case 'ProposalContract':
+        setFormSections([
+          ...formSection(selectedOption.value, '', ownerAddress, paramsList),
+        ]);
+        break;
+
+      case 'ClaimContract':
+        setFormSections([
+          ...formSection(
+            selectedOption.value,
+            '',
+            ownerAddress,
+            paramsList,
+            typeAssetTrigger,
+            claimLabel,
+          ),
+        ]);
+        break;
+
+      default:
+        setFormSections([
+          ...formSection(selectedOption.value, '', ownerAddress),
+        ]);
+        break;
     }
   };
 
@@ -290,7 +321,16 @@ const Contract: React.FC<IContract> = ({
       <FieldLabel>Claim Type</FieldLabel>
       <Select
         options={claimTypes}
-        onChange={value => setClaimType(value ? value.value : 0)}
+        onChange={value => {
+          if (!isNaN(value?.value)) {
+            if (value.value === 0 || value.value === 1) {
+              setClaimLabel('Asset ID');
+            } else if (value.value === 2) {
+              setClaimLabel('Order ID');
+            }
+            setClaimType(value.value);
+          }
+        }}
       />
     </SelectContainer>
   );
@@ -389,12 +429,15 @@ const Contract: React.FC<IContract> = ({
 
       default:
         triggerKey += 1;
+        claimKey += 1;
 
         const key =
           contractType === 'CreateAssetContract'
             ? String(formSections)
             : contractType === 'AssetTriggerContract'
             ? triggerKey
+            : contractType === 'ClaimContract'
+            ? claimKey
             : contractType;
 
         return <Form contractName={contractType} key={key} {...formProps} />;

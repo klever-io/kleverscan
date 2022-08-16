@@ -30,9 +30,5 @@ const getEnvs = () => {
 
 module.exports = withPlugins([images], {
   env: getEnvs(),
-});
-
-module.exports = {
-  ...module.exports,
   i18n,
-};
+});

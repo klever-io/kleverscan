@@ -1,3 +1,4 @@
+import { ICollectionList } from '@/types/index';
 import { getPrecision } from '@/utils/index';
 import { TransactionType } from '@klever/sdk';
 
@@ -116,7 +117,10 @@ const precisionParse = async (
   return payload;
 };
 
-const contractHaveKDA = (contract: string, assetTriggerType?: number | null): boolean => {
+const contractHaveKDA = (
+  contract: string,
+  assetTriggerType?: number | null,
+): boolean => {
   const contracts = [
     'TransferContract',
     'FreezeContract',
@@ -143,4 +147,131 @@ const contractHaveBucketId = (contract: string): boolean => {
   return contracts.includes(contract);
 };
 
-export { getType, getPrecision, precisionParse, contractHaveKDA, contractHaveBucketId };
+const getAssetsList = (
+  assets: any[],
+  contractType: string,
+  typeAssetTrigger: number | null,
+): any[] => {
+  if (contractType === 'AssetTriggerContract' && typeAssetTrigger !== null) {
+    const bothCollectionNFT = [1, 2];
+    const justCollection = [0, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13];
+    const justNFT = [8];
+
+    if (bothCollectionNFT.includes(typeAssetTrigger)) {
+      return assets;
+    } else if (justCollection.includes(typeAssetTrigger)) {
+      return assets.filter((value: ICollectionList) => {
+        return !value.isNFT;
+      });
+    } else if (justNFT.includes(typeAssetTrigger)) {
+      return assets.filter((value: ICollectionList) => {
+        return value.isNFT;
+      });
+    }
+  } else if (contractType === 'FreezeContract') {
+    return assets.filter((value: ICollectionList) => {
+      return !value.isNFT;
+    });
+  } else if (contractType === 'UnfreezeContract') {
+    return assets.filter((value: ICollectionList) => {
+      return !value.isNFT && value.frozenBalance !== 0;
+    });
+  }
+
+  return assets;
+};
+
+const parseValues = (
+  values: Record<string, any>,
+  contractType: string,
+  typeAssetTrigger: number | null,
+  claimType: number,
+  assetID: number,
+  collection: Record<string, any>,
+  selectedBucket: string,
+  proposalId: number | null,
+  tokenChosen: boolean,
+): any => {
+  const parsedValues = JSON.parse(JSON.stringify(values));
+
+  if (contractHaveKDA(contractType, typeAssetTrigger)) {
+    if (contractType === 'AssetTriggerContract') {
+      parsedValues.assetId =
+        assetID !== 0 ? `${collection.value}/${assetID}` : collection.value;
+    } else {
+      parsedValues.kda =
+        assetID !== 0 ? `${collection.value}/${assetID}` : collection.value;
+    }
+  } else if (contractType === 'CreateAssetContract') {
+    parsedValues.type = tokenChosen ? 0 : 1;
+  } else if (contractType === 'AssetTriggerContract') {
+    parsedValues.triggerType = typeAssetTrigger;
+  } else if (contractType === 'ClaimContract') {
+    parsedValues.claimType = claimType;
+  } else if (contractType === 'ProposalContract') {
+    if (values.parameters) {
+      const parameters = {};
+
+      values.parameters.forEach((parameter: any) => {
+        if (
+          !isNaN(Number(parameter.parameterKey)) &&
+          !isNaN(Number(parameter.parameterValue))
+        ) {
+          parameters[parameter.parameterKey] = String(parameter.parameterValue);
+        }
+      });
+
+      if (Object.keys(parameters).length > 0) {
+        parsedValues.parameters = parameters;
+      }
+    }
+  } else if (contractType === 'VoteContract') {
+    parsedValues.proposalId = proposalId;
+  }
+
+  if (contractHaveBucketId(contractType)) {
+    parsedValues.bucketId = selectedBucket;
+  }
+
+  if (values.uris) {
+    const uris = {};
+
+    values.uris.forEach((uri: any) => {
+      if (uri.label && uri.address) {
+        uris[uri.label] = uri.address;
+      }
+    });
+
+    if (Object.keys(uris).length > 0) {
+      parsedValues.uris = uris;
+    }
+  }
+
+  Object.keys(parsedValues).forEach((item: any) => {
+    if (parsedValues[item] && parsedValues[item].uris) {
+      const uris = {};
+
+      parsedValues[item].uris.forEach((uri: any) => {
+        if (uri.label && uri.address) {
+          uris[uri.label] = uri.address;
+        }
+      });
+
+      if (Object.keys(uris).length > 0) {
+        parsedValues[item].uris = uris;
+      }
+    }
+  });
+
+  return parsedValues;
+};
+
+export {
+  getType,
+  getAssetsList,
+  getPrecision,
+  precisionParse,
+  parseValues,
+  contractHaveKDA,
+  contractHaveBucketId,
+};

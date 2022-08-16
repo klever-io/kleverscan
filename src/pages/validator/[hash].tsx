@@ -4,6 +4,7 @@ import Chart, { ChartType } from '@/components/Chart';
 import Copy from '@/components/Copy';
 import Dropdown from '@/components/Dropdown';
 import Title from '@/components/Layout/Title';
+import { regexImgUrl } from '@/utils/index';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import QrCodeModal from '@/components/QrCodeModal';
@@ -124,8 +125,27 @@ const Validator: React.FC<IValidatorPage> = ({
     getAge(fromUnixTime(new Date().getTime() / 1000)),
   );
   const [imgError, setImgError] = useState(false);
-  const [rerender, setRerender] = useState(false);
   const [showModal, setShowModal] = useState(false);
+
+  const [rerender, setRerender] = useState(false);
+
+  const handleLogoError = () => {
+    setImgError(true);
+    setRerender(!rerender);
+  };
+
+  const renderLogo = () => {
+    if (regexImgUrl(logo) && !imgError) {
+      return (
+        <Logo
+          alt={`${name}-logo`}
+          src={logo}
+          onError={() => handleLogoError()}
+        />
+      );
+    }
+    return <LetterLogo>{name?.split?.('')[0] || 'K'}</LetterLogo>;
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -181,25 +201,6 @@ const Validator: React.FC<IValidatorPage> = ({
     } else {
       return 'red';
     }
-  };
-
-  const handleLogoError = () => {
-    setImgError(true);
-    setRerender(!rerender);
-  };
-
-  const renderLogo = () => {
-    const regex = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
-    if (regex.test(logo) && !imgError) {
-      return (
-        <Logo
-          alt={`${name}-logo`}
-          src={logo}
-          onError={() => handleLogoError()}
-        />
-      );
-    }
-    return <LetterLogo>{name?.split?.('')[0] || 'K'}</LetterLogo>;
   };
 
   const renderTitle = () => {

@@ -494,3 +494,67 @@ export const getPrecision = async (
 
   return 10 ** response.data.asset.precision;
 };
+
+export const regexImgUrl = (url: string): boolean => {
+  const regex = /[\/.](gif|jpg|jpeg|tiff|png|webp)$/i;
+  if (regex.test(url)) {
+    return true;
+  }
+  return false;
+};
+
+export const validateImgRequestHeader = async (
+  url: string,
+  timeout: number,
+): Promise<boolean> => {
+  try {
+    const fetchHeaders = fetch(url, { method: 'HEAD' });
+    const timeoutPromise = new Promise(resolve => {
+      setTimeout(() => resolve(false), timeout);
+    });
+    const headers: any = await Promise.race([fetchHeaders, timeoutPromise]);
+    if (
+      typeof headers === 'object' &&
+      headers?.headers?.get('content-type').startsWith('image')
+    ) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    return false;
+  }
+};
+
+export const isImage = async (
+  url: string,
+  timeout: number,
+): Promise<unknown> => {
+  const imgPromise = new Promise(resolve => {
+    const img = new Image();
+    img.src = url;
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+  });
+  const timeoutPromise = new Promise(resolve => {
+    setTimeout(() => resolve(false), timeout);
+  });
+  return Promise.race([imgPromise, timeoutPromise]);
+};
+
+export const validateImgUrl = async (
+  url: string,
+  timeout: number,
+): Promise<boolean> => {
+  if (regexImgUrl(url)) {
+    return true;
+  }
+
+  if (await validateImgRequestHeader(url, timeout)) {
+    return true;
+  }
+
+  if (await isImage(url, timeout)) {
+    return true;
+  }
+  return false;
+};

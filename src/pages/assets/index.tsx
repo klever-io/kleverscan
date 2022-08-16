@@ -216,7 +216,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     props.pagination = assets.pagination;
   }
 
-  props.pagination = assets.pagination;
+  props.pagination = assets?.pagination || {};
 
   props.assets = parseHardCodedInfo(props.assets);
 

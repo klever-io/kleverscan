@@ -71,7 +71,7 @@ const Assets: React.FC<IAssets> = ({ assets, address }) => {
         </span>
         {assetType === 1 && (
           <Link href={`/account/${address}/collection/${assetId}`}>
-            Details
+            View NFTs
           </Link>
         )}
       </Row>

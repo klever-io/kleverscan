@@ -800,4 +800,6 @@ export interface INfts {
   collection: string;
   assetId: string;
   nftNonce: number;
+  mime?: string;
+  metadata?: string;
 }

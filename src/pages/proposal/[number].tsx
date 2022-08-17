@@ -294,7 +294,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                 </HalfRow>
                 <HalfRow>
                   <span>
-                    <strong>Ended Epoch</strong>
+                    <strong>Ending Epoch</strong>
                   </span>
                   <span style={{ color: 'red' }}>{proposalAPI.epochEnd}</span>
                 </HalfRow>

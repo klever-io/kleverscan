@@ -3,6 +3,7 @@ import { Service } from '@/types/index';
 import { addPrecisionTransactions, getEpochInfo } from '@/utils/index';
 import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import nextI18NextConfig from '../../../next-i18next.config';
 import {
   IAccountResponse,
   IBlockResponse,
@@ -59,11 +60,11 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
         circulatingSupply: null,
       },
     },
-    ...(await serverSideTranslations(locale, [
-      'common',
-      'blocks',
-      'transactions',
-    ])),
+    ...(await serverSideTranslations(
+      locale,
+      ['common', 'blocks', 'transactions'],
+      nextI18NextConfig,
+    )),
   };
 
   const pushCoinData = (

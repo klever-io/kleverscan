@@ -9,7 +9,9 @@ import NProgress from '../components/NProgress';
 import Bugsnag from '../lib/bugsnag';
 import GlobalStyle from '../styles/global';
 
-const ErrorBoundary = Bugsnag.getPlugin('react')?.createErrorBoundary(React);
+const ErrorBoundary =
+  !process.env.BUGSNAG_DISABLED &&
+  Bugsnag.getPlugin('react')?.createErrorBoundary(React);
 
 //add window methods to global scope
 declare global {

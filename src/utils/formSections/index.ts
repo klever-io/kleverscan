@@ -83,7 +83,7 @@ const formSection = (
     CancelMarketOrderContract: cancelMarketOrderContract(),
     CreateMarketplaceContract: createMarketplaceContract(),
     ConfigMarketplaceContract: configMarketplaceContract(),
-    ClaimContract: claimContract(claimLabel),
+    ClaimContract: claimContract(claimLabel || ''),
     UnjailContract: unjailContract(),
     SetAccountNameContract: setAccountNameContract(),
     ValidatorConfigContract: validatorConfigContract(),

@@ -16,6 +16,7 @@ const defaultEnvs = [
   'DEFAULT_NODE_HOST',
   'DEFAULT_EXPLORER_HOST',
   'BUGSNAG_KEY',
+  'BUGSNAG_DISABLED',
 ];
 
 const getEnvs = () => {

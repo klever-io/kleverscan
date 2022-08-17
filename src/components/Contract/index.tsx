@@ -13,9 +13,11 @@ import {
   contractOptions,
   parseAddress,
 } from '@/utils/index';
+import { core } from '@klever/sdk';
 import Form, { ISection } from 'components/Form';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import Copy from '../Copy';
 import PackInfoForm from '../CustomForm/PackInfo';
 import ParametersForm from '../CustomForm/Parameters';
@@ -37,7 +39,9 @@ import {
   contractHaveBucketId,
   contractHaveKDA,
   getAssetsList,
+  getType,
   parseValues,
+  precisionParse,
 } from './utils';
 
 interface IContract {

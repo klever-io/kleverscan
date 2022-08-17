@@ -1189,7 +1189,7 @@ export const CancelMarketOrder: React.FC<IContract> = ({ parameter: par }) => {
         <span>
           <strong>Order Id</strong>
         </span>
-        <span>{parameter?.orderID}</span>
+        <span>{parameter?.orderId}</span>
       </Row>
     </>
   );

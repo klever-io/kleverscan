@@ -222,7 +222,6 @@ export enum EnumTriggerType {
 export interface IAssetTriggerContract {
   triggerType: EnumTriggerType;
   toAddress: string;
-  assetId: string;
   amount: number;
   mime: string;
   logo: string;
@@ -230,6 +229,7 @@ export interface IAssetTriggerContract {
   role: IRolesInfo;
   assetId?: string;
   precision?: number;
+  staking?: IStakingInfo;
 }
 
 export interface ISetAccountNameContract {

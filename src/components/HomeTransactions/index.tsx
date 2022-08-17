@@ -1,5 +1,6 @@
 import Chart, { ChartType } from '@/components/Chart';
 import api from '@/services/api';
+import { addPrecisionTransactions } from '@/utils/index';
 import {
   Section,
   TransactionChart,
@@ -12,8 +13,13 @@ import { format } from 'date-fns';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
-import { IHomeTransactions, ITransactionResponse } from '../../types';
+import {
+  IAssetResponse,
+  IHomeTransactions,
+  ITransactionResponse,
+} from '../../types';
 import TransactionItem from '../TransactionItem';
+
 const HomeTransactions: React.FC<IHomeTransactions> = ({
   setTotalTransactions,
   transactionsList,
@@ -31,8 +37,12 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
       const transactions: ITransactionResponse = await api.get({
         route: 'transaction/list',
       });
-      if (!transactions.error) {
+      const assets: IAssetResponse = await api.get({ route: 'assets/kassets' });
+      if (!transactions.error || !assets.error) {
         // Animation / Re-render bug START
+        transactions.data.transactions = addPrecisionTransactions(
+          transactions.data.transactions,
+        );
         setTransactions(transactions.data.transactions);
         // Animation / Re-render bug END
         setTotalTransactions(transactions.pagination.totalRecords);

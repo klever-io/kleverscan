@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
 import { validateImgUrl } from '@/utils/index';
+import React, { useCallback, useEffect, useState } from 'react';
 
 interface IAssetLogo {
   LetterLogo: React.FunctionComponent<any>;

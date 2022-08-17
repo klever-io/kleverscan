@@ -3,10 +3,12 @@ import { TFunction } from 'next-i18next';
 import { toast } from 'react-toastify';
 import {
   IAsset,
+  IAssetOne,
   IContractOption,
   IEpochInfo,
   IFormData,
   IMetrics,
+  ITransaction,
 } from '../types';
 
 export const breakText = (text: string, limit: number): string => {
@@ -557,4 +559,40 @@ export const validateImgUrl = async (
     return true;
   }
   return false;
+};
+
+export const getContractType = (contract: string): boolean => {
+  if (
+    contract === 'TransferContractType' ||
+    contract === 'FreezeContractType' ||
+    contract === 'UnfreezeContractType'
+  ) {
+    return true;
+  }
+  return false;
+};
+
+export const addPrecisionTransactions = (
+  transactions: ITransaction[],
+): ITransaction[] => {
+  return transactions.map(transaction => {
+    if (transaction.contract.length > 1) {
+      return transaction;
+    }
+
+    transaction?.contract.map(async contrct => {
+      if (contrct?.parameter?.assetId) {
+        const response: IAssetOne = await api.get({
+          route: `assets/${contrct.parameter.assetId}`,
+        });
+        if (!response.error && response.code === 'successful') {
+          contrct.precision = response.data?.asset?.precision || 0;
+        }
+        return contrct;
+      }
+      contrct.precision = 6;
+      return contrct;
+    });
+    return transaction;
+  });
 };

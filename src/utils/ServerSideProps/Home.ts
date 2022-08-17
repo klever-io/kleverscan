@@ -1,6 +1,6 @@
 import api from '@/services/api';
 import { Service } from '@/types/index';
-import { getEpochInfo } from '@/utils/index';
+import { addPrecisionTransactions, getEpochInfo } from '@/utils/index';
 import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import {
@@ -339,7 +339,7 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
   ];
 
   await Promise.allSettled(promises).then(responses => {
-    responses.forEach((res, index) => {
+    responses.forEach(async (res, index) => {
       if (res.status !== 'rejected') {
         const { value }: any = res;
 
@@ -351,6 +351,7 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
           case 1:
             props.transactions = value.data.transactions;
             props.totalTransactions = value.pagination.totalRecords;
+            props.transactions = addPrecisionTransactions(props.transactions);
             break;
 
           case 2:

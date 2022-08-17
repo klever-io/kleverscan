@@ -4,7 +4,6 @@ import Chart, { ChartType } from '@/components/Chart';
 import Copy from '@/components/Copy';
 import Dropdown from '@/components/Dropdown';
 import Title from '@/components/Layout/Title';
-import { regexImgUrl } from '@/utils/index';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import QrCodeModal from '@/components/QrCodeModal';
@@ -18,7 +17,7 @@ import {
   IPeer,
   IResponse,
 } from '@/types/index';
-import { formatAmount, getAge, parseAddress } from '@/utils/index';
+import { formatAmount, getAge, parseAddress, regexImgUrl } from '@/utils/index';
 import {
   AllSmallCardsContainer,
   BoldElement,

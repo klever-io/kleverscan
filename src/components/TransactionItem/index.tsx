@@ -8,19 +8,19 @@ import { format, fromUnixTime } from 'date-fns';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React from 'react';
-import { ITransaction, ITransferContract } from '../../types';
-import { parseAddress, toLocaleFixed } from '../../utils';
+import { Contract, ITransaction, ITransferContract } from '../../types';
+import { getContractType, parseAddress, toLocaleFixed } from '../../utils';
 
 const TransactionItem: React.FC<ITransaction> = ({
   hash,
   timestamp,
   contract,
-  precision,
   sender,
   status,
 }) => {
   let parameter: ITransferContract = {} as ITransferContract;
   let amount = 0;
+  let precision = 6;
   const StatusIcon = getStatusIcon(status);
 
   const { t } = useTranslation('transactions');
@@ -32,19 +32,29 @@ const TransactionItem: React.FC<ITransaction> = ({
     if (parameter?.amount) {
       amount = parameter.amount;
     }
+    if (parameter && parameter?.precision) {
+      precision = parameter.precision;
+    }
   }
 
-  const shouldRenderAssetId = (
-    amount: number,
-    assetId: string | undefined,
-  ): string | null => {
-    if (assetId) {
-      return assetId;
+  const shouldRenderAssetId = () => {
+    const contractType = Object.values(Contract)[contract[0].type];
+    const checkContract = getContractType(contractType);
+
+    if (contract.length > 1) {
+      return <p>Multi Contract</p>;
     }
-    if (amount) {
-      return 'KLV';
+    if (contract.length === 1 && checkContract) {
+      return (
+        <Link href={`/asset/${parameter.assetId || 'KLV'}`}>
+          <a className="clean-style">
+            {toLocaleFixed(amount / 10 ** precision, precision)}{' '}
+            {parameter?.assetId || 'KLV'}
+          </a>
+        </Link>
+      );
     }
-    return null;
+    return <p>{contractType}</p>;
   };
 
   return (
@@ -79,15 +89,7 @@ const TransactionItem: React.FC<ITransaction> = ({
         </p>
       </TransactionData>
       <TransactionAmount>
-        <span>
-          {toLocaleFixed(amount / 10 ** precision, precision)}
-          <Link href={`/asset/KLV`}>
-            <a className="clean-style">
-              {' '}
-              {shouldRenderAssetId(parameter?.amount, parameter?.assetId)}
-            </a>
-          </Link>
-        </span>
+        <span>{shouldRenderAssetId()}</span>
       </TransactionAmount>
     </TransactionRow>
   );

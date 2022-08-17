@@ -27,7 +27,7 @@ import {
 
 interface IDropdownPages {
   page: INavbarItem;
-  handleMenu?: () => void;
+  onClick?: () => void;
 }
 
 const DropdownDesktop = ({ page }: IDropdownPages) => {
@@ -43,9 +43,9 @@ const DropdownDesktop = ({ page }: IDropdownPages) => {
   );
 };
 
-const DropdownMobile = ({ page, handleMenu }: IDropdownPages) => {
+const DropdownMobile = ({ page, onClick }: IDropdownPages) => {
   return (
-    <DropdownItem onClick={handleMenu}>
+    <DropdownItem onClick={onClick}>
       <Link href={page.pathTo}>
         <a>
           <span>{page.name}</span>

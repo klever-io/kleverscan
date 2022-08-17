@@ -1,5 +1,6 @@
-import { ArrowLeft, Certified } from '@/assets/icons';
+import { Certified } from '@/assets/icons';
 import { Assets as Icon } from '@/assets/title-icons';
+import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
@@ -9,7 +10,7 @@ import api from '@/services/api';
 import { IAsset, IPagination, IResponse } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { formatAmount, parseHardCodedInfo } from '@/utils/index';
-import { Container, Header, Input, Title } from '@/views/assets';
+import { Container, Header, Input } from '@/views/assets';
 import { LetterLogo, Logo } from '@/views/assets/index';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
@@ -43,8 +44,9 @@ const Assets: React.FC<IAssetPage> = ({
     const fetchData = async () => {
       setLoading(true);
 
-      const response: IAssetResponse = await api.get({
+      const response: IAssetResponse = await api.getCached({
         route: `assets/kassets?hidden=false&page=${page}`,
+        refreshTime: 21600,
       });
 
       if (!response.error) {
@@ -181,13 +183,7 @@ const Assets: React.FC<IAssetPage> = ({
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/')}>
-            <ArrowLeft />
-          </div>
-          <h1>Assets</h1>
-          <Icon />
-        </Title>
+        <Title title="Assets" Icon={Icon} />
 
         <Input />
       </Header>
@@ -211,19 +207,18 @@ const Assets: React.FC<IAssetPage> = ({
 export const getServerSideProps: GetServerSideProps = async () => {
   const props: IAssetPage = { assets: [], pagination: {} as IPagination };
 
-  const assets: IAssetResponse = await api.get({
+  const assets: IAssetResponse = await api.getCached({
     route: 'assets/kassets?hidden=false',
+    refreshTime: 21600,
   });
   if (!assets.error) {
     props.assets = assets.data.assets;
     props.pagination = assets.pagination;
   }
 
-  props.pagination = assets.pagination;
+  props.pagination = assets?.pagination || {};
 
   props.assets = parseHardCodedInfo(props.assets);
-
-  console.log(props.assets[0]);
 
   return { props };
 };

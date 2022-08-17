@@ -1,5 +1,6 @@
 import { BlockCardContainer, BlockCardRow } from '@/views/home';
 import { fromUnixTime } from 'date-fns';
+import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React from 'react';
 import { IBlock, IBlockCard } from '../../../types';
@@ -15,30 +16,36 @@ const BlockCard: React.FC<IBlock & IBlockCard> = ({
   txBurnedFees,
   precision,
 }) => {
+  const { t } = useTranslation('blocks');
+  const { t: commonT } = useTranslation('common');
+
   return (
     <BlockCardContainer blockIndex={blockIndex}>
       <Link href={`/block/${nonce}`}>
         <a>
           <BlockCardRow>
             <strong>#{nonce}</strong>
-            <p>Miner</p>
+            <p>{t('Miner')}</p>
           </BlockCardRow>
           <BlockCardRow>
-            <small>{getAge(fromUnixTime(timestamp / 1000))} ago</small>
+            <small>
+              {getAge(fromUnixTime(timestamp / 1000), commonT)}{' '}
+              {commonT('Date.Elapsed Time')}
+            </small>
             <a>{hash}</a>
           </BlockCardRow>
           <BlockCardRow>
-            <p>Burned</p>
+            <p>{t('Burned')}</p>
             <span>
               {formatAmount((txBurnedFees || 0) / 10 ** precision)} KLV
             </span>
           </BlockCardRow>
           <BlockCardRow>
-            <p>Transactions</p>
+            <p>{commonT('Titles.Transactions')}</p>
             <span>{txCount}</span>
           </BlockCardRow>
           <BlockCardRow>
-            <p>Reward</p>
+            <p>{t('Reward')}</p>
             <span>
               {formatAmount((blockRewards || 0) / 10 ** precision)} KLV
             </span>

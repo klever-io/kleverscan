@@ -1,5 +1,4 @@
 import { KLV } from '@/assets/coins';
-import { getPrecision } from '@/components/Contract/utils';
 import {
   IAssetTriggerContract,
   IBuyContract,
@@ -28,7 +27,7 @@ import {
   IWithdrawContract,
 } from '@/types/index';
 import { findKey, findReceipt } from '@/utils/findKey';
-import { toLocaleFixed } from '@/utils/index';
+import { getPrecision, toLocaleFixed } from '@/utils/index';
 import { CenteredRow, Row } from '@/views/transactions/detail';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
@@ -133,12 +132,14 @@ export const CreateAsset: React.FC<IContract> = ({
         </span>
         <strong>Create Asset</strong>
       </Row>
-      <Row>
-        <span>
-          <strong>Asset ID</strong>
-        </span>
-        <Link href={`/asset/${assetId}`}>{assetId}</Link>
-      </Row>
+      {assetId && (
+        <Row>
+          <span>
+            <strong>Asset ID</strong>
+          </span>
+          <Link href={`/asset/${assetId}`}>{assetId}</Link>
+        </Row>
+      )}
       <Row>
         <span>
           <strong>Name</strong>
@@ -615,7 +616,9 @@ export const Freeze: React.FC<IContract> = ({
         <span>
           <strong>Bucket ID</strong>
         </span>
-        <span>{findReceipt(receipts, contractIndex || 0, 3, 'bucketId')}</span>
+        <span>
+          {contractIndex && findReceipt(receipts, contractIndex, 3, 'bucketId')}
+        </span>
       </Row>
     </>
   );
@@ -1186,7 +1189,7 @@ export const CancelMarketOrder: React.FC<IContract> = ({ parameter: par }) => {
         <span>
           <strong>Order Id</strong>
         </span>
-        <span>{parameter?.orderID}</span>
+        <span>{parameter?.orderId}</span>
       </Row>
     </>
   );

@@ -1,12 +1,12 @@
 import geoData from '@/assets/countries.geo.json';
-import { ArrowLeft } from '@/assets/icons';
 import { Nodes as Icon } from '@/assets/title-icons';
 import NodeCards from '@/components/Cards/NodeCards';
 import Chart, { ChartType } from '@/components/Chart';
+import Title from '@/components/Layout/Title';
 import { coinMockedData } from '@/configs/home';
 import api from '@/services/api';
 import { getCountryISO3, ISO2 } from '@/utils/country';
-import { Container, Header, Title } from '@/views/blocks';
+import { Container, Header } from '@/views/blocks';
 import {
   ChartBody,
   ChartContainer,
@@ -68,13 +68,7 @@ const Nodes: React.FC<INodePage> = ({ nodes, cardData }) => {
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/')}>
-            <ArrowLeft />
-          </div>
-          <h1>Nodes</h1>
-          <Icon />
-        </Title>
+        <Title title="Nodes" Icon={Icon} />
       </Header>
 
       <NodeCards cardData={cardData} />

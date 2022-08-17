@@ -1,9 +1,9 @@
-import { ArrowLeft } from '@/assets/icons';
 import { ArrowGreen, ArrowPink, Receive } from '@/assets/icons/index';
 import { getStatusIcon } from '@/assets/status';
 import Chart, { ChartType } from '@/components/Chart';
 import Copy from '@/components/Copy';
 import Dropdown from '@/components/Dropdown';
+import Title from '@/components/Layout/Title';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import QrCodeModal from '@/components/QrCodeModal';
@@ -17,7 +17,7 @@ import {
   IPeer,
   IResponse,
 } from '@/types/index';
-import { formatAmount, getAge, parseAddress } from '@/utils/index';
+import { formatAmount, getAge, parseAddress, regexImgUrl } from '@/utils/index';
 import {
   AllSmallCardsContainer,
   BoldElement,
@@ -54,7 +54,6 @@ import {
   StakedIndicator,
   Status,
   SubContainerVotes,
-  Title,
   TitleContent,
   TitleInformation,
   ValidatorTitle,
@@ -118,15 +117,34 @@ const Validator: React.FC<IValidatorPage> = ({
   } = validator;
 
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [delegators, setDelegators] = useState(defaultDelegators);
   const [uptime] = useState(new Date().getTime());
   const [age, setAge] = useState(
     getAge(fromUnixTime(new Date().getTime() / 1000)),
   );
   const [imgError, setImgError] = useState(false);
-  const [rerender, setRerender] = useState(false);
   const [showModal, setShowModal] = useState(false);
+
+  const [rerender, setRerender] = useState(false);
+
+  const handleLogoError = () => {
+    setImgError(true);
+    setRerender(!rerender);
+  };
+
+  const renderLogo = () => {
+    if (regexImgUrl(logo) && !imgError) {
+      return (
+        <Logo
+          alt={`${name}-logo`}
+          src={logo}
+          onError={() => handleLogoError()}
+        />
+      );
+    }
+    return <LetterLogo>{name?.split?.('')[0] || 'K'}</LetterLogo>;
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -182,25 +200,6 @@ const Validator: React.FC<IValidatorPage> = ({
     } else {
       return 'red';
     }
-  };
-
-  const handleLogoError = () => {
-    setImgError(true);
-    setRerender(!rerender);
-  };
-
-  const renderLogo = () => {
-    const regex = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
-    if (regex.test(logo) && !imgError) {
-      return (
-        <Logo
-          alt={`${name}-logo`}
-          src={logo}
-          onError={() => handleLogoError()}
-        />
-      );
-    }
-    return <LetterLogo>{name?.split?.('')[0] || 'K'}</LetterLogo>;
   };
 
   const renderTitle = () => {
@@ -434,35 +433,36 @@ const Validator: React.FC<IValidatorPage> = ({
 
   return (
     <Container>
-      <Title>
-        <div onClick={() => router.push('/validators')}>
-          <ArrowLeft />
-        </div>
-        <TitleContent>
-          {renderLogo()}
-          <TitleInformation>
-            <ValidatorTitle>
-              {renderTitle()}
-              {/* <Ranking>Rank 1</Ranking> */}
-            </ValidatorTitle>
-            <CenteredSubTitle>
-              <span>{blsPublicKey}</span>
-              <CopyBackground>
-                <Copy data={blsPublicKey} info="Key" />
-              </CopyBackground>
-              <ReceiveBackground>
-                <Receive onClick={() => setShowModal(!showModal)} />
-                <QrCodeModal
-                  show={showModal}
-                  setShowModal={() => setShowModal(false)}
-                  value={blsPublicKey}
-                  onClose={() => setShowModal(false)}
-                />
-              </ReceiveBackground>
-            </CenteredSubTitle>
-          </TitleInformation>
-        </TitleContent>
-      </Title>
+      <Title
+        Component={() => (
+          <TitleContent>
+            {renderLogo()}
+            <TitleInformation>
+              <ValidatorTitle>
+                {renderTitle()}
+                {/* <Ranking>Rank 1</Ranking> */}
+              </ValidatorTitle>
+              <CenteredSubTitle>
+                <span>{blsPublicKey}</span>
+                <CopyBackground>
+                  <Copy data={blsPublicKey} info="Key" />
+                </CopyBackground>
+                <ReceiveBackground>
+                  <Receive onClick={() => setShowModal(!showModal)} />
+                  <QrCodeModal
+                    show={showModal}
+                    setShowModal={() => setShowModal(false)}
+                    value={blsPublicKey}
+                    onClose={() => setShowModal(false)}
+                  />
+                </ReceiveBackground>
+              </CenteredSubTitle>
+            </TitleInformation>
+          </TitleContent>
+        )}
+        route={'/validators'}
+      />
+
       <AllSmallCardsContainer>
         <Card marginLeft>
           <CardWrapper>

@@ -40,13 +40,13 @@ const ReactSelect = css`
     transition: 0.2s ease-in-out;
     &:hover {
       border-color: ${({ theme }) => theme.input.border.dark};
-      box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.6, props.theme.card.background)};
+      box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? lighten(0.2, props.theme.card.background) : lighten(0.6, props.theme.card.background))};
     }
   }
   .react-select__control--is-focused {
     color: ${props => props.theme.input.border.dark};
     border: 1px solid ${({ theme }) => theme.input.border.dark};
-    box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.6, props.theme.card.background)};
+    box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? lighten(0.2, props.theme.card.background) : lighten(0.6, props.theme.card.background))};
   }
   .react-select__indicator-separator {
     display: none;

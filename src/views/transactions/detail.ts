@@ -68,6 +68,8 @@ export const CardContainer = styled.div`
   display: flex;
 
   flex-direction: column;
+
+  color: ${props => props.theme.black};
 `;
 
 export const CardContent = styled.div`
@@ -87,6 +89,8 @@ export const Row = styled.div`
 
   flex-direction: row;
   align-items: center;
+
+  color: ${props => props.theme.black};
 
   &:not(:last-child) {
     border-bottom: 1px solid ${props => props.theme.card.border};

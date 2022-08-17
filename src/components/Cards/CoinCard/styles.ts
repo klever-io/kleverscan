@@ -73,6 +73,7 @@ export const CardContainer = styled.div`
 
 export const CardContent = styled.div`
   min-width: 18.5rem;
+
   @media (max-width: 525px) {
     min-width: 10.5rem;
   }
@@ -113,7 +114,8 @@ export const Name = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  color: ${props => props.theme.white};
+  color: ${props => props.theme.card.white};
+
   font-weight: 600;
 
   span {
@@ -182,8 +184,10 @@ export const ValueDetail = styled.div<{ positive?: boolean }>`
   align-items: center;
   justify-content: space-between;
 
+  color: ${props => props.theme.card.white};
+
   span {
-    color: ${props => props.theme.white};
+    color: ${props => props.theme.card.white};
     font-size: 0.95rem;
     font-weight: 600;
   }
@@ -232,6 +236,8 @@ export const CoinSelector = styled.div<{ isSelected: boolean }>`
     props.isSelected ? props.theme.card.background : props.theme.white};
 
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.3);
+
+  filter: ${props => (props.theme.dark ? 'brightness(2)' : 'none')};
 
   cursor: pointer;
   border-radius: 50%;

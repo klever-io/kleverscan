@@ -1,11 +1,14 @@
 import api from '@/services/api';
+import { TFunction } from 'next-i18next';
 import { toast } from 'react-toastify';
 import {
   IAsset,
+  IAssetOne,
   IContractOption,
   IEpochInfo,
   IFormData,
-  IParsedMetrics,
+  IMetrics,
+  ITransaction,
 } from '../types';
 
 export const breakText = (text: string, limit: number): string => {
@@ -28,7 +31,7 @@ export const getVariation = (variation: number): string => {
   return `+ ${variation ? variation.toFixed(precision) : '--'}%`;
 };
 
-export const getAge = (date: Date): string => {
+export const getAge = (date: Date, t?: TFunction): string => {
   const diff = Math.abs(new Date().getTime() - date.getTime());
 
   const sec = Math.ceil(diff / 1000);
@@ -41,16 +44,16 @@ export const getAge = (date: Date): string => {
 
   if (sec <= 59) {
     val = sec;
-    suffix = 'sec';
+    suffix = t ? t('Date.Time.sec') : 'sec';
   } else if (sec > 59 && min <= 59) {
     val = min;
-    suffix = 'min';
+    suffix = t ? t('Date.Time.min') : 'min';
   } else if (min > 59 && hour <= 23) {
     val = hour;
-    suffix = 'hour';
+    suffix = t ? t('Date.Time.hour') : 'hour';
   } else if (hour > 24) {
     val = day;
-    suffix = 'day';
+    suffix = t ? t('Date.Time.day') : 'day';
   }
 
   return `${val} ${suffix}${val > 1 ? 's' : ''}`;
@@ -122,35 +125,31 @@ export const capitalizeString = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-export const getEpochInfo = (parseMetrics: IParsedMetrics): IEpochInfo => {
-  const {
-    klv_slot_at_epoch_start,
-    klv_slots_per_epoch,
-    klv_current_slot,
-    klv_slot_duration,
-  } = parseMetrics;
+export const getEpochInfo = (metrics: IMetrics): IEpochInfo => {
+  const { slotAtEpochStart, slotsPerEpoch, currentSlot, slotDuration } =
+    metrics;
 
-  const epochFinishSlot = klv_slot_at_epoch_start + klv_slots_per_epoch;
-  let slotsRemained = epochFinishSlot - klv_current_slot;
-  if (epochFinishSlot < klv_current_slot) {
+  const epochFinishSlot = slotAtEpochStart + slotsPerEpoch;
+  let slotsRemained = epochFinishSlot - currentSlot;
+  if (epochFinishSlot < currentSlot) {
     slotsRemained = 0;
   }
 
-  const secondsRemainedInEpoch = (slotsRemained * klv_slot_duration) / 1000;
+  const secondsRemainedInEpoch = (slotsRemained * slotDuration) / 1000;
 
   const remainingTime = secondsToHourMinSec(secondsRemainedInEpoch);
 
-  const epochLoadPercent = 100 - (slotsRemained / klv_slots_per_epoch) * 100.0;
+  const epochLoadPercent = 100 - (slotsRemained / slotsPerEpoch) * 100.0;
 
   return {
-    currentSlot: klv_current_slot,
+    currentSlot: currentSlot,
     epochFinishSlot: epochFinishSlot,
     epochLoadPercent,
     remainingTime,
   };
 };
 
-const secondsToHourMinSec = (input: number): string => {
+const secondsToHourMinSec = (input: number, t?: TFunction): string => {
   const numSecondsInAMinute = 60;
   const numMinutesInAHour = 60;
   const numSecondsInAHour = numSecondsInAMinute * numMinutesInAHour;
@@ -162,13 +161,13 @@ const secondsToHourMinSec = (input: number): string => {
   seconds = input % numSecondsInAMinute;
 
   if (hours > 0) {
-    result = plural(hours, 'hour');
+    result = plural(hours, t ? t('Date.Time.hour') : 'hour');
   }
   if (minutes > 0) {
-    result += plural(minutes, 'minute');
+    result += plural(minutes, t ? t('Date.Time.minute') : 'minute');
   }
   if (seconds > 0) {
-    result += plural(seconds, 'second');
+    result += plural(seconds, t ? t('Date.Time.second') : 'second');
   }
 
   result += ' ';
@@ -496,4 +495,104 @@ export const getPrecision = async (
   }
 
   return 10 ** response.data.asset.precision;
+};
+
+export const regexImgUrl = (url: string): boolean => {
+  const regex = /[\/.](gif|jpg|jpeg|tiff|png|webp)$/i;
+  if (regex.test(url)) {
+    return true;
+  }
+  return false;
+};
+
+export const validateImgRequestHeader = async (
+  url: string,
+  timeout: number,
+): Promise<boolean> => {
+  try {
+    const fetchHeaders = fetch(url, { method: 'HEAD' });
+    const timeoutPromise = new Promise(resolve => {
+      setTimeout(() => resolve(false), timeout);
+    });
+    const headers: any = await Promise.race([fetchHeaders, timeoutPromise]);
+    if (
+      typeof headers === 'object' &&
+      headers?.headers?.get('content-type').startsWith('image')
+    ) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    return false;
+  }
+};
+
+export const isImage = async (
+  url: string,
+  timeout: number,
+): Promise<unknown> => {
+  const imgPromise = new Promise(resolve => {
+    const img = new Image();
+    img.src = url;
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+  });
+  const timeoutPromise = new Promise(resolve => {
+    setTimeout(() => resolve(false), timeout);
+  });
+  return Promise.race([imgPromise, timeoutPromise]);
+};
+
+export const validateImgUrl = async (
+  url: string,
+  timeout: number,
+): Promise<boolean> => {
+  if (regexImgUrl(url)) {
+    return true;
+  }
+
+  if (await validateImgRequestHeader(url, timeout)) {
+    return true;
+  }
+
+  if (await isImage(url, timeout)) {
+    return true;
+  }
+  return false;
+};
+
+export const getContractType = (contract: string): boolean => {
+  if (
+    contract === 'TransferContractType' ||
+    contract === 'FreezeContractType' ||
+    contract === 'UnfreezeContractType'
+  ) {
+    return true;
+  }
+  return false;
+};
+
+export const addPrecisionTransactions = (
+  transactions: ITransaction[],
+): ITransaction[] => {
+  return transactions.map(transaction => {
+    if (transaction.contract.length > 1) {
+      return transaction;
+    }
+
+    transaction?.contract.map(async contrct => {
+      if (contrct?.parameter?.assetId) {
+        const response: IAssetOne = await api.get({
+          route: `assets/${contrct.parameter.assetId}`,
+        });
+        if (!response.error && response.code === 'successful') {
+          contrct.precision = response.data?.asset?.precision || 0;
+        }
+        return contrct;
+      }
+      contrct.precision = 6;
+      return contrct;
+    });
+    return transaction;
+  });
 };

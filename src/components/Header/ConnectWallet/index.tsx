@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { MobileNavbarItem } from '..';
 import { doIf, parseAddress } from '../../../utils';
 import {
+  ButtonAndCopy,
   ConnectButton,
   ConnectContainer,
   CopyContainer,
@@ -115,27 +116,29 @@ const ConnectWallet: React.FC<IConnectWalletProps> = ({ handleMenu }) => {
     <>
       {extensionInstalled && (
         <ConnectContainer>
-          <ConnectButton
-            onClick={() => handleConnect()}
-            key={String(extensionInstalled)}
-          >
-            {loading ? (
-              <span> Loading... </span>
-            ) : (
-              <>
-                {walletAddress && (
-                  <span>{parseAddress(walletAddress, 25)}</span>
-                )}
-                {!walletAddress && <span>Connect your wallet</span>}
-              </>
-            )}
-          </ConnectButton>
+          <ButtonAndCopy>
+            <ConnectButton
+              onClick={() => handleConnect()}
+              key={String(extensionInstalled)}
+            >
+              {loading ? (
+                <span> Loading... </span>
+              ) : (
+                <>
+                  {walletAddress && (
+                    <span>{parseAddress(walletAddress, 25)}</span>
+                  )}
+                  {!walletAddress && <span>Connect your wallet</span>}
+                </>
+              )}
+            </ConnectButton>
+            <CopyContainer>
+              {walletAddress && (
+                <Copy info="Wallet Address" data={walletAddress} />
+              )}
+            </CopyContainer>
+          </ButtonAndCopy>
           {getCreateTransactionButton()}
-          <CopyContainer>
-            {walletAddress && (
-              <Copy info="Wallet Address" data={walletAddress} />
-            )}
-          </CopyContainer>
         </ConnectContainer>
       )}
     </>

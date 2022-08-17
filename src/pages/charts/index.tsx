@@ -1,8 +1,8 @@
-import { ArrowLeft } from '@/assets/icons';
 import { Assets as Icon } from '@/assets/title-icons';
 import Chart, { ChartType } from '@/components/Chart';
+import Title from '@/components/Layout/Title';
 import api from '@/services/api';
-import { Container, Header, Input, Section, Title } from '@/views/charts';
+import { Container, Header, Input, Section } from '@/views/charts';
 import {
   TransactionChart,
   TransactionChartContent,
@@ -26,6 +26,8 @@ interface IBlockStatsResponse {
   totalMinted: number;
   totalBlockRewards: number;
   totalTxRewards: number;
+  totalStakingRewards: number;
+  totalKappsFees: number;
 }
 
 interface IBlockStats {
@@ -34,6 +36,8 @@ interface IBlockStats {
   minted: number;
   blocks: number;
   transactions: number;
+  KLV: number;
+  KFI: number;
 }
 interface ICharts {
   statistics: IBlockStats[];
@@ -51,13 +55,8 @@ const Charts: React.FC<ICharts> = ({ statistics }) => {
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/')}>
-            <ArrowLeft />
-          </div>
-          <h1>Charts</h1>
-          <Icon />
-        </Title>
+        <Title title="Charts" Icon={Icon} />
+
         <Input />
       </Header>
 
@@ -86,6 +85,18 @@ const Charts: React.FC<ICharts> = ({ statistics }) => {
               />
             </TransactionChartContent>
           </TransactionChart>
+
+          <TransactionChart>
+            <span>KLV Rewards Pool vs KFI Rewards Pool</span>
+            <TransactionChartContent>
+              <Chart
+                type={ChartType.DoubleLinear}
+                data={statistics}
+                value="KFI"
+                value2="KLV"
+              />
+            </TransactionChartContent>
+          </TransactionChart>
         </TransactionContainer>
       </Section>
     </Container>
@@ -110,6 +121,8 @@ export const getServerSideProps: GetServerSideProps<ICharts> = async () => {
           minted: stats.totalMinted / 1000000,
           blocks: stats.totalBlockRewards / 1000000,
           transactions: stats.totalTxRewards / 1000000,
+          KFI: stats.totalKappsFees / 1000000,
+          KLV: stats.totalStakingRewards / 1000000,
         };
       });
   }

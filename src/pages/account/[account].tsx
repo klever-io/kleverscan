@@ -1,8 +1,9 @@
 import { KLV } from '@/assets/coins';
-import { ArrowLeft, Receive } from '@/assets/icons';
+import { Receive } from '@/assets/icons';
 import { AccountDetails as AccountIcon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import { ISelectedDays } from '@/components/DateFilter';
+import Title from '@/components/Layout/Title';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import QrCodeModal from '@/components/QrCodeModal';
@@ -14,7 +15,6 @@ import api, { IPrice } from '@/services/api';
 import {
   IAccount,
   IAccountAsset,
-  IBucket,
   IPagination,
   IResponse,
   ITransaction,
@@ -33,12 +33,11 @@ import {
   OverviewContainer,
   Row,
   RowContent,
-  Title,
 } from '@/views/accounts/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 interface IAssetInfo {
   assetId: string;
@@ -75,8 +74,7 @@ interface IPriceResponse extends IResponse {
 
 interface IAllowanceResponse extends IResponse {
   data: {
-    allowance: number;
-    stakingRewards: number;
+    result: { allowance: number; stakingRewards: number };
   };
 }
 
@@ -116,8 +114,6 @@ const Account: React.FC<IAccountPage> = ({
   const [transactions, setTransactions] = useState(
     transactionResponse.data.transactions,
   );
-
-  const [buckets, setBuckets] = useState<IBucket[]>([]);
   const [showModal, setShowModal] = useState(false);
 
   useDidUpdateEffect(() => {
@@ -139,23 +135,6 @@ const Account: React.FC<IAccountPage> = ({
 
     fetchData();
   }, [page, account.address, dateFilter, fromToFilter]);
-
-  useEffect(() => {
-    const { assets } = account;
-    if (Object.keys(assets).length === 0) {
-      return;
-    }
-
-    let assetBuckets: IBucket[] = [];
-
-    for (const key in assets) {
-      if (assets[key].buckets) {
-        assetBuckets = [...assetBuckets, ...(assets[key].buckets || [])];
-      }
-    }
-
-    setBuckets(assetBuckets);
-  }, [account]);
 
   const getTxQuery = useCallback((): ITxQuery => {
     const txQuery: ITxQuery = {
@@ -200,18 +179,22 @@ const Account: React.FC<IAccountPage> = ({
   };
 
   const getKLVAllowance = (): number => {
-    return (KLVallowance?.data?.allowance || 0) / 10 ** defaultKlvPrecision;
+    return (
+      (KLVallowance?.data?.result?.allowance || 0) / 10 ** defaultKlvPrecision
+    );
   };
 
   const getKLVStaking = (): number => {
     return (
-      (KLVallowance?.data?.stakingRewards || 0) / 10 ** defaultKlvPrecision
+      (KLVallowance?.data?.result?.stakingRewards || 0) /
+      10 ** defaultKlvPrecision
     );
   };
 
   const getKFIStaking = (): number => {
     return (
-      (KFIallowance?.data?.stakingRewards || 0) / 10 ** defaultKlvPrecision
+      (KFIallowance?.data?.result?.stakingRewards || 0) /
+      10 ** defaultKlvPrecision
     );
   };
 
@@ -226,12 +209,19 @@ const Account: React.FC<IAccountPage> = ({
       headers.push('Transactions');
     }
 
-    if (buckets.length > 0) {
-      headers.push('Buckets');
+    if (Object.keys(assets).length === 0) {
+      return headers;
+    }
+
+    for (const key in assets) {
+      if (assets[key].buckets) {
+        headers.push('Buckets');
+        break;
+      }
     }
 
     return headers;
-  }, [account.assets, buckets, transactionResponse.data.transactions]);
+  }, [account.assets, transactionResponse.data.transactions]);
 
   const [selectedTab, setSelectedTab] = useState<string>(getTabHeaders()[0]);
 
@@ -271,7 +261,7 @@ const Account: React.FC<IAccountPage> = ({
   const SelectedTabComponent: React.FC = () => {
     switch (selectedTab) {
       case 'Assets':
-        return <Assets assets={assets} />;
+        return <Assets assets={assets} address={account.address} />;
       case 'Transactions':
         return (
           <>
@@ -289,7 +279,7 @@ const Account: React.FC<IAccountPage> = ({
           </>
         );
       case 'Buckets':
-        return <Buckets buckets={buckets} assets={assets} />;
+        return <Buckets assets={assets} />;
       default:
         return <div />;
     }
@@ -298,13 +288,8 @@ const Account: React.FC<IAccountPage> = ({
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/accounts')}>
-            <ArrowLeft />
-          </div>
-          <h1>Account</h1>
-          <AccountIcon />
-        </Title>
+        <Title title="Account" Icon={AccountIcon} route={'/accounts'} />
+
         <Input />
       </Header>
       <OverviewContainer>
@@ -537,8 +522,8 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
   const KLVAllowancePromise = new Promise<IAllowanceResponse>(resolve =>
     resolve(
       api.get({
-        route: `address/${address}/allowance?asset=KLV`,
-        service: Service.NODE,
+        route: `address/${address}/allowance?assetID=KLV`,
+        service: Service.PROXY,
       }),
     ),
   );
@@ -546,8 +531,8 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
   const KFIAllowancePromise = new Promise<IAllowanceResponse>(resolve =>
     resolve(
       api.get({
-        route: `address/${address}/allowance?asset=KFI`,
-        service: Service.NODE,
+        route: `address/${address}/allowance?assetID=KFI`,
+        service: Service.PROXY,
       }),
     ),
   );
@@ -557,7 +542,6 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
       responses.forEach((res, index) => {
         if (res.status === 'fulfilled') {
           const { value }: { value: IAllowanceResponse } = res;
-
           if (index === 0) {
             props.KLVallowance = value;
           } else if (index === 1) {

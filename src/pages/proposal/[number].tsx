@@ -1,5 +1,5 @@
-import { ArrowLeft } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
+import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
 import { Row as TableRow, Status } from '@/components/Table/styles';
 import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
@@ -9,13 +9,14 @@ import {
   IParsedProposal,
   IProposal,
   IRawParam,
-  IVoters,
+  IVote,
   IVotingPowers,
   NetworkParamsIndexer,
 } from '@/types/proposals';
 import { formatAmount, toLocaleFixed, typeVoteColors } from '@/utils/index';
 import {
   BalanceContainer,
+  BigSpan,
   CardContainer,
   CardContent,
   CardVote,
@@ -38,7 +39,6 @@ import {
   Row,
   RowContent,
   StatusContent,
-  Title,
   ValidatorsContainer,
   VerticalLine,
   VotesContainer,
@@ -52,7 +52,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { AiFillCheckCircle } from 'react-icons/ai';
 import Tooltip from '../../components/Tooltip';
 
-interface IVote {
+interface IParsedVote {
   status: string;
   validator: string;
   votingPower: string;
@@ -60,7 +60,7 @@ interface IVote {
   voter: string;
 }
 
-interface IVoter {
+interface IParsedVoter {
   voter: string;
   votingPower: string;
   voteDate: string;
@@ -79,7 +79,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
     No: 0,
   });
   const [votedQty, setVotedQty] = useState(0);
-  const [votersList, setVotersList] = useState<IVoter[]>([]);
+  const [votersList, setVotersList] = useState<IParsedVoter[]>([]);
   const [selectedFilter, setSelectedFilter] = useState('Yes');
   const [votesPercentage, setVotesPercentage] = useState('');
 
@@ -98,49 +98,47 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
       setStatus(proposalAPI.proposalStatus);
     }
 
-    const list: IVoter[] = [];
+    const list: IParsedVoter[] = [];
     let tempVotedQty = 0;
     const tempFilterVoters = {
       Yes: 0,
       No: 0,
     };
 
-    Object.keys(proposalAPI.voters ? proposalAPI.voters : []).map(
-      async item => {
-        if (totalStaked && votingPowers) {
-          const votesInfo = proposalAPI.voters[item];
-          const frozenBalance = votingPowers[item];
-          list.push({
-            voter: item,
-            votingPower: ((frozenBalance * 100) / totalStaked).toFixed(3),
-            voteDate: format(
-              fromUnixTime(votesInfo.timestamp / 1000),
-              'MM/dd/yyyy HH:mm',
-            ),
-            status: votesInfo.type === 0 ? 'Yes' : 'No',
-          });
+    proposalAPI.voters.forEach(voter => {
+      if (totalStaked && votingPowers) {
+        const votesInfo = voter;
+        const frozenBalance = votingPowers[voter.address];
+        list.push({
+          voter: voter.address,
+          votingPower: ((frozenBalance * 100) / totalStaked).toFixed(3),
+          voteDate: format(
+            fromUnixTime(votesInfo.timestamp / 1000),
+            'MM/dd/yyyy HH:mm',
+          ),
+          status: votesInfo.type === 0 ? 'Yes' : 'No',
+        });
 
-          const typeVote = proposalAPI.voters[item].type;
-          const qtyVote = votesInfo.amount / 1000000;
+        const typeVote = voter.type;
+        const qtyVote = votesInfo.amount / 1000000;
 
-          switch (typeVote) {
-            case 0:
-              tempFilterVoters['Yes'] += qtyVote;
-              tempVotedQty += qtyVote;
+        switch (typeVote) {
+          case 0:
+            tempFilterVoters['Yes'] += qtyVote;
+            tempVotedQty += qtyVote;
 
-              break;
+            break;
 
-            case 1:
-              tempFilterVoters['No'] += qtyVote;
-              tempVotedQty += qtyVote;
-              break;
+          case 1:
+            tempFilterVoters['No'] += qtyVote;
+            tempVotedQty += qtyVote;
+            break;
 
-            default:
-              break;
-          }
+          default:
+            break;
         }
-      },
-    );
+      }
+    });
 
     setVotedQty(tempVotedQty);
     setVotersList(list);
@@ -200,7 +198,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
     );
   };
 
-  const TableBody: React.FC<IVote> = props => {
+  const TableBody: React.FC<IParsedVote> = props => {
     const { status, voter, votingPower, voteDate } = props;
     if (status === selectedFilter) {
       return (
@@ -245,12 +243,8 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
       {proposalAPI ? (
         <Container>
           <Header>
-            <Title>
-              <div onClick={() => router.push('/proposals')}>
-                <ArrowLeft />
-              </div>
-              <h1>Proposal Details</h1>
-            </Title>
+            <Title route={'/proposals'} title="Proposal Details" />
+
             <Input />
           </Header>
           <CardContainer>
@@ -300,7 +294,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                 </HalfRow>
                 <HalfRow>
                   <span>
-                    <strong>Ended Epoch</strong>
+                    <strong>Ending Epoch</strong>
                   </span>
                   <span style={{ color: 'red' }}>{proposalAPI.epochEnd}</span>
                 </HalfRow>
@@ -321,7 +315,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                 <span>
                   <strong>Description</strong>
                 </span>
-                <span>{description}</span>
+                <BigSpan>{description}</BigSpan>
               </Row>
             </CardContent>
           </CardContainer>
@@ -414,13 +408,10 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
   );
 };
 
-export const getVotingPowers = (voters: IVoters | []): IVotingPowers => {
-  if (!voters) {
-    voters = [];
-  }
+export const getVotingPowers = (voters: IVote[]): IVotingPowers => {
   const powers = {};
-  Object.entries(voters).forEach(([address, data]: any[]) => {
-    powers[address] = data?.amount;
+  voters.forEach(voter => {
+    powers[voter.address] = voter?.amount;
   });
   return powers;
 };
@@ -451,6 +442,7 @@ export const getServerSideProps: GetStaticProps<IProposal> = async ({
   const proposalInfos: any = await api.get({
     route: `proposals/${params?.number}`,
   });
+
   let props = proposalInfos?.data?.proposal;
 
   if (!props) {
@@ -460,6 +452,7 @@ export const getServerSideProps: GetStaticProps<IProposal> = async ({
   props.votingPowers = votingPowers;
   const fullInfoParams = getProposalNetworkParams(props.parameters);
   props.parsedParameters = fullInfoParams;
+
   return { props };
 };
 

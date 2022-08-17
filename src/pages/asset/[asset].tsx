@@ -1,6 +1,7 @@
-import { ArrowLeft, Certified, Receive } from '@/assets/icons';
+import { Certified, Receive } from '@/assets/icons';
 import Copy from '@/components/Copy';
 import { ISelectedDays } from '@/components/DateFilter';
+import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
@@ -36,7 +37,6 @@ import {
   LetterLogo,
   Logo,
   Row,
-  Title,
 } from '@/views/assets/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { GetServerSideProps } from 'next';
@@ -470,30 +470,32 @@ const Asset: React.FC<IAssetPage> = ({
     if (verified) {
       return <Certified className="isVerified" />;
     }
-  }, []);
+  }, [verified]);
 
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/assets')}>
-            <ArrowLeft />
-          </div>
-          <AssetLogo
-            LetterLogo={LetterLogo}
-            isVerified={isVerified}
-            Logo={Logo}
-            logo={logo}
-            ticker={ticker}
-            name={name}
-          />
-          <AssetTitle>
-            <h1>
-              {name} ({assetId})
-            </h1>
-            <div>{assetType}</div>
-          </AssetTitle>
-        </Title>
+        <Title
+          Component={() => (
+            <>
+              <AssetLogo
+                LetterLogo={LetterLogo}
+                isVerified={isVerified}
+                Logo={Logo}
+                logo={logo}
+                ticker={ticker}
+                name={name}
+              />
+              <AssetTitle>
+                <h1>
+                  {name} ({assetId})
+                </h1>
+                <div>{assetType}</div>
+              </AssetTitle>
+            </>
+          )}
+          route={'/assets'}
+        />
 
         <Input />
       </Header>

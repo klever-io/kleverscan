@@ -177,7 +177,8 @@ export const ProgressContainer = styled.div<{ textColor: string }>`
 export const EmptyProgressBar = styled.div`
   height: 2.3rem;
   width: 100%;
-  background-color: #ebf1f7;
+  background-color: ${props =>
+    props.theme.dark ? props.theme.background : '#ebf1f7'};
   border-radius: 0.25rem;
 `;
 
@@ -187,7 +188,8 @@ export const ProgressContent = styled.div<{ percent: number }>`
   display: flex;
   justify-content: left;
   align-items: center;
-  background-color: #c47fd0 !important;
+  background-color: ${props =>
+    props.theme.dark ? props.theme.card.assetText : '#c47fd0'} !important;
   border-radius: 0.25rem;
 `;
 
@@ -209,6 +211,7 @@ export const AllSmallCardsContainer = styled.section`
   justify-content: space-around;
   margin: 1.5rem 0;
   flex-direction: row;
+
   @media (max-width: 1050px) {
     flex-direction: column;
   }
@@ -307,12 +310,13 @@ export const CardHeader = styled.div`
   flex-direction: row;
   justify-content: space-between;
   gap: 0.5rem;
+  color: ${props => props.theme.black};
+
   p {
     text-align: right;
     opacity: 0.4;
     font-size: 0.85rem;
     font-weight: 500;
-    color: ${props => props.theme.card.darkText};
   }
 
   div {
@@ -338,12 +342,14 @@ export const RewardsCardHeader = styled.div`
   flex-direction: row;
   justify-content: space-between;
   gap: 0.5rem;
+
+  color: ${props => props.theme.black};
+
   p {
     text-align: right;
     opacity: 0.4;
     font-size: 0.85rem;
     font-weight: 500;
-    color: ${props => props.theme.card.darkText};
   }
 
   div {
@@ -526,6 +532,8 @@ export const Row = styled.div`
   flex-direction: row;
   align-items: center;
 
+  color: ${props => props.theme.black};
+
   &:not(:last-child) {
     border-bottom: 1px solid ${props => props.theme.card.border};
     border-bottom-left-radius: 0px;
@@ -673,13 +681,13 @@ export const StakedIndicator = styled.div<{
   width: ${props => `${props.percent}%`};
   font-weight: 600;
   border-radius: 0.25rem;
-  color: #646693;
+  color: ${props => props.theme.black};
 `;
 
 export const PercentIndicator = styled.div<{ percent: number }>`
   min-width: 10rem;
   top: 0.25rem;
-  color: #646693;
+  color: ${props => props.theme.black};
   position: relative;
   z-index: 1;
   padding-right: 0.3rem;
@@ -761,12 +769,14 @@ export const VotesHeader = styled.div`
   flex-direction: row;
   justify-content: space-between;
 
+  color: ${props => props.theme.black};
+
   p {
     text-align: right;
     opacity: 0.4;
     font-size: 0.85rem;
     font-weight: 500;
-    color: ${props => props.theme.card.darkText};
+    color: ${props => props.theme.black};
   }
 `;
 

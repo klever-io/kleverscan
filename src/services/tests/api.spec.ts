@@ -25,12 +25,12 @@ describe('test api functions', () => {
 
   const props2 = {
     route: 'node/statistics',
-    service: Service.NODE,
+    service: Service.PROXY,
   };
 
   const props3 = {
-    route: 'node/metrics',
-    service: Service.NODE,
+    route: 'node/overview',
+    service: Service.PROXY,
   };
 
   const props4 = {
@@ -79,7 +79,7 @@ describe('test api functions', () => {
       const { route, query, service, apiVersion } = getProps(props2);
       expect(route).toEqual('node/statistics');
       expect(query).toEqual(undefined);
-      expect(service).toEqual(Service.NODE);
+      expect(service).toEqual(Service.PROXY);
       expect(apiVersion).toEqual('v1.0');
     });
   });
@@ -169,7 +169,7 @@ describe('test api functions', () => {
             status: 200,
             statusText: '',
             type: 'cors',
-            url: 'https://node.testnet.klever.finance/node/statistics',
+            url: 'https://api.testnet.klever.finance/node/statistics',
           }),
         );
 
@@ -199,7 +199,7 @@ describe('test api functions', () => {
             status: 500,
             statusText: 'Internal Server Error',
             type: 'cors',
-            url: 'https://node.testnet.klever.finance/node/statistics',
+            url: 'https://api.testnet.klever.finance/node/statistics',
           }),
         );
 
@@ -288,7 +288,7 @@ describe('test api functions', () => {
             status: 200,
             statusText: '',
             type: 'cors',
-            url: 'https://node.testnet.klever.finance/node/metrics',
+            url: 'https://node.testnet.klever.finance/node/overview',
           }),
         );
         const res = await withText(props3, Method.GET);
@@ -317,7 +317,7 @@ describe('test api functions', () => {
             status: 500,
             statusText: 'Internal Server Error',
             type: 'cors',
-            url: 'https://node.testnet.klever.finance/node/metrics',
+            url: 'https://node.testnet.klever.finance/node/overview',
           }),
         );
 
@@ -472,12 +472,12 @@ describe('test api functions', () => {
             status: 200,
             statusText: '',
             type: 'cors',
-            url: 'https://node.testnet.klever.finance/node/metrics',
+            url: 'https://node.testnet.klever.finance/node/overview',
           }),
         );
         const metrics: any = await api.text({
-          route: 'node/metrics',
-          service: Service.NODE,
+          route: 'node/overview',
+          service: Service.PROXY,
         });
         expect(metrics).toStrictEqual(mocks.metrics);
       });

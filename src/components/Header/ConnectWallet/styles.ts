@@ -7,14 +7,15 @@ export const ConnectButton = styled.div`
   background-color: ${props => props.theme.navbar.text};
   padding: 0.6rem;
   border-radius: 0.3rem;
-  color: ${props => props.theme.white};
+  color: ${props => props.theme.card.white};
   font-size: 0.9rem;
 
   text-align: center;
 
   position: relative;
 
-  width: 14rem;
+  min-width: 14rem;
+  width: 100%;
 
   cursor: pointer;
 
@@ -27,11 +28,17 @@ export const ConnectButton = styled.div`
   }
 
   @media screen and (min-width: 1025px) {
+    width: 14rem;
     &:hover > div {
       display: flex;
       flex-direction: column;
     }
   }
+`;
+
+export const ButtonAndCopy = styled.div`
+  display: flex;
+  align-items: center;
 `;
 
 export const ConnectContainer = styled.div`
@@ -40,7 +47,10 @@ export const ConnectContainer = styled.div`
   align-items: center;
   user-select: none;
 
-  gap: 1rem;
+  gap: 0.5rem;
+
+  margin-left: auto;
+  padding-right: 0.5rem;
 
   @media screen and (max-width: 1025px) {
     margin-top: auto;
@@ -89,7 +99,7 @@ export const LogoutContainer = styled.div`
         top: 1rem;
         left: 0;
         background-color: ${props => props.theme.card.background};
-        color: ${props => props.theme.white};
+        color: ${props => props.theme.card.white};
         padding: 0.5rem;
         border-radius: 5px;
         z-index: 500;
@@ -103,6 +113,12 @@ export const CopyContainer = styled.div`
   position: relative;
   font-size: 0.9rem;
   margin-left: 0.8rem;
+
+  svg {
+    g {
+      fill: ${props => props.theme.navbar.text};
+    }
+  }
 
   &:hover {
     svg {
@@ -131,7 +147,7 @@ export const CopyContainer = styled.div`
         top: 1rem;
         left: 0;
         background-color: ${props => props.theme.card.background};
-        color: ${props => props.theme.white};
+        color: ${props => props.theme.card.white};
         padding: 0.5rem;
         border-radius: 5px;
         z-index: 500;

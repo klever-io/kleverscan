@@ -1,4 +1,5 @@
 import { Search } from '@/assets/icons';
+import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import React, { KeyboardEvent, useRef, useState } from 'react';
 import { Container } from './styles';
@@ -11,10 +12,11 @@ const Input: React.FC<IInput> = ({ className }) => {
   const [search, setSearch] = useState('');
   const [error, setError] = useState(false);
   const inputRef = useRef<any>(null);
+  const { t } = useTranslation('common');
 
   const router = useRouter();
 
-  const placeholder = 'Search Address, Block, Transfer';
+  const placeholder = t('Search Address, Block, Transaction');
 
   const getInputType = (value: string) => {
     const addressLength = 62;

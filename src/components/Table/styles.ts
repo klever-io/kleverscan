@@ -25,7 +25,8 @@ export interface ITableType {
     | 'networkParams'
     | 'proposals'
     | 'votes'
-    | 'delegations';
+    | 'delegations'
+    | 'nfts';
   haveData?: number;
   filter?: IFilterItem;
   pathname?: string;
@@ -38,6 +39,8 @@ export const Container = styled.div`
 export const Header = styled.div<ITableType>`
   display: ${props => (props.haveData ? 'flex' : 'none')};
   padding: 1rem 1.5rem;
+
+  min-width: fit-content;
 
   color: ${props => props.theme.table.text};
   font-weight: 600;
@@ -52,13 +55,12 @@ export const Header = styled.div<ITableType>`
       props.filter.value !== 'all' &&
       filterWidths[props.filter.name]}
   }
-  @media (max-width: 1300px) {
-    width: fit-content;
-  }
 `;
 
 export const Body = styled.div<ITableType>`
   display: flex;
+
+  min-width: fit-content;
 
   flex-direction: column;
   gap: 0.75rem;
@@ -79,6 +81,8 @@ export const Row = styled.div<ITableType>`
   background-color: ${props => props.theme.white};
 
   border-radius: 0.5rem;
+
+  width: 100%;
 
   span,
   a {
@@ -170,6 +174,11 @@ export const Status = styled.div<IStatus>`
       color: ${props.theme.table.icon} !important;
       
     `}
+  svg {
+    path {
+      fill: ${props => props.theme.white};
+    }
+  }
 `;
 
 export const EmptyRow = styled(Row)`

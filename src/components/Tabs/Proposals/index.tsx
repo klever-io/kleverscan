@@ -118,7 +118,7 @@ const Proposals: React.FC<IProposalsProps> = ({ proposals, loading }) => {
         </ProposerDescAndLink>
         <span>
           <small>Created Epoch: {epochStart}</small> <p />
-          <small className="endTime">Ended Epoch: {epochEnd}</small>
+          <small className="endTime">Ending Epoch: {epochEnd}</small>
         </span>
         <UpVotes>
           <p>

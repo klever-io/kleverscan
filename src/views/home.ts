@@ -1,6 +1,6 @@
 import { default as DefaultInput } from '@/components/Inputt';
 import { lighten, transparentize } from 'polished';
-import styled, { keyframes } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 interface IVariation {
   positive: boolean;
@@ -46,6 +46,7 @@ export const Section = styled.section`
   padding: 5rem 10rem 0 10rem;
 
   h1 {
+    color: ${props => props.theme.black};
     margin-bottom: 1rem;
     cursor: pointer;
     width: fit-content;
@@ -94,12 +95,11 @@ export const DataContainer = styled(Section)`
 export const Input = styled(DefaultInput)`
   margin: 0 5rem;
   padding: 1.25rem 1rem;
-  box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.6, props.theme.card.background)};
 
   background-color: ${props => props.theme.white};
 
   &:focus-within {
-    box-shadow: 0 1px 10px ${props => props.theme.input.shadow};
+    box-shadow: 0 0 10px -4px ${props => props.theme.input.shadow};
   }
 
   input {
@@ -201,7 +201,7 @@ export const DataCardValue = styled.div`
   }
 
   p {
-    color: ${props => props.theme.white};
+    color: ${props => props.theme.card.white};
     font-weight: 600;
     font-size: 1rem;
   }
@@ -240,10 +240,16 @@ export const BlockCardContainer = styled.div<BlockCardContainerProps>`
 
   background-color: ${props => props.theme.white};
 
-  box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.6, props.theme.card.background)};
+  ${props =>
+    !props.theme.dark &&
+    css`
+      box-shadow: 0 0 0.5rem - 0.125rem
+        ${props => lighten(0.6, props.theme.card.background)};
+    `}
 
   border-radius: 1rem;
   transition: 1s all ease, 0.1s filter ease;
+  transition: color 0.1s ease, background-color 0.1s ease;
 
   animation: ${PullFade} 1s ease-in-out;
 
@@ -259,6 +265,8 @@ export const BlockCardContainer = styled.div<BlockCardContainerProps>`
 
 export const BlockCardRow = styled.div`
   width: 100%;
+
+  color: ${props => props.theme.black};
 
   display: flex;
   flex-direction: row;
@@ -335,8 +343,12 @@ export const TransactionContent = styled.div`
 
   background-color: ${props => props.theme.white};
 
-  box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.6, props.theme.card.background)};
-
+  ${props =>
+    !props.theme.dark &&
+    css`
+      box-shadow: 0 0 0.5rem - 0.125rem
+        ${props => lighten(0.6, props.theme.card.background)};
+    `}
   border-radius: 1rem;
 
   &::-webkit-scrollbar {
@@ -426,6 +438,15 @@ export const TransactionData = styled.div`
 
     svg {
       margin-left: 0.75rem;
+
+      path {
+        fill: ${props => props.theme.white};
+      }
+    }
+    &:hover {
+      color: ${props => props.theme.black};
+      filter: brightness(1.2);
+      text-decoration: underline;
     }
   }
 
@@ -510,5 +531,5 @@ export const Main = styled.main`
   display: block;
   margin-left: auto;
   margin-right: auto;
-  /* max-width: 1800px; */
+  margin-top: 4.25rem;
 `;

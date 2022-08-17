@@ -1,0 +1,51 @@
+{
+  "EmptyData": "Ainda não existem dados.",
+  "Search Address, Block, Transaction": "Pesquisar Endereço, Bloco, Transação",
+  "Cards": {
+    "Total Accounts": "Total de Contas",
+    "Total Transactions": "Total de Transações",
+    "Live/Peak TPS": "Atual/Pico de TPS",
+    "Epoch": "Época",
+    "Remaining Time": "Tempo Restante",
+    "Last 24h": "Últimas 24h",
+    "Market Cap": "Capitalização",
+    "Volume": "Volume",
+    "Total Staked": "Total Congelado"
+  },
+  "Titles": {
+    "Assets": "Ativos",
+    "Accounts": "Contas",
+    "Blocks": "Blocos",
+    "Transactions": "Transações",
+    "Validators": "Validadores",
+    "Proposals": "Propostas"
+  },
+  "Date": {
+    "Elapsed Time": "atrás",
+    "Today": "Hoje",
+    "Yesterday": "Ontem",
+    "Day": "Dia",
+    "Time": {
+      "sec": "seg",
+      "min": "min",
+      "day": "dia",
+      "hour": "hora",
+      "minute": "minuto",
+      "second": "segundo"
+    },
+    "Months": {
+      "Jan": "Jan",
+      "Feb": "Fev",
+      "Mar": "Mar",
+      "Apr": "Abr",
+      "May": "Mai",
+      "Jun": "Jun",
+      "Jul": "Jul",
+      "Aug": "Ago",
+      "Sep": "Set",
+      "Oct": "Out",
+      "Nov": "Nov",
+      "Dec": "Dez"
+    }
+  }
+}

@@ -1,4 +1,5 @@
 const theme = {
+  dark: false,
   background: '#EBF1F8',
   white: '#fff',
   black: '#0B0B1E',
@@ -11,6 +12,10 @@ const theme = {
   gray: '#EBEBEB', // TODO: outdated
   error: '#9E1313',
 
+  true: {
+    white: '#fff',
+    black: '#0B0B1E',
+  },
   status: {
     done: '#58925A',
     error: '#AA4247',
@@ -25,7 +30,6 @@ const theme = {
 
   navbar: {
     background: '#0B0B1E',
-
     text: '#646693',
 
     mobile: '#66688f', // TODO: outdated
@@ -72,11 +76,8 @@ const theme = {
     red: '#FF4465',
 
     assetText: '#27284E',
-
-    // TODO: outdated
-    black: '#2e2f47',
-    white: '#ffffff',
-    gray: '#9C9EB9',
+    white: '#fff',
+    black: '#0B0B1E',
   },
 
   blockCard: {
@@ -175,6 +176,10 @@ const theme = {
   map: {
     // TODO: outdated
     marker: '#33d46c',
+  },
+
+  dateFilter: {
+    outsideBackground: 'rgba(198, 199, 235, 0.2)',
   },
 };
 

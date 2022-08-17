@@ -54,6 +54,7 @@ export interface ICollectionList {
   balance: number;
   precision?: number;
   buckets?: any[];
+  minEpochsToWithdraw?: number | null;
 }
 
 export interface IContractOption {
@@ -65,6 +66,7 @@ export interface ITransferContract {
   amount: number;
   toAddress: string;
   assetId?: string;
+  precision?: number;
 }
 
 export enum EnumAssetType {
@@ -101,6 +103,7 @@ export interface ICreateAssetContract {
   attributes: IAttributesInfo;
   staking: IStakingInfo;
   roles: IRolesInfo[];
+  assetId?: string;
 }
 
 export interface IPropertiesInfo {
@@ -134,10 +137,14 @@ export interface IRolesInfo {
 export interface ICreateValidatorContract {
   ownerAddress: string;
   config: IValidatorConfig;
+  assetId?: string;
+  precision?: number;
 }
 
 export interface IValidatorConfigContract {
   config: IValidatorConfig;
+  assetId?: string;
+  precision?: number;
 }
 
 export interface IValidatorConfig {
@@ -154,24 +161,31 @@ export interface IValidatorConfig {
 export interface IFreezeContract {
   amount: number;
   assetId: string;
+  precision?: number;
 }
 
 export interface IUnfreezeContract {
   bucketID: string;
   assetId: string;
+  precision?: number;
 }
 
 export interface IDelegateContract {
   bucketID: string;
   toAddress: string;
+  assetId?: string;
+  precision?: number;
 }
 
 export interface IUndelegateContract {
   bucketID: string;
+  assetId?: string;
+  precision?: number;
 }
 
 export interface IWithdrawContract {
   assetId: string;
+  precision?: number;
 }
 export enum EnumClaimType {
   StakingClaim = 0,
@@ -181,8 +195,13 @@ export enum EnumClaimType {
 export interface IClaimContract {
   claimType: EnumClaimType;
   id: string;
+  assetId?: string;
+  precision?: number;
 }
-export interface IUnjailContract {}
+export interface IUnjailContract {
+  assetId?: string;
+  precision?: number;
+}
 
 export enum EnumTriggerType {
   Mint = 0,
@@ -203,17 +222,20 @@ export enum EnumTriggerType {
 export interface IAssetTriggerContract {
   triggerType: EnumTriggerType;
   toAddress: string;
-  assetId: string;
   amount: number;
   mime: string;
   logo: string;
   uri: any;
   role: IRolesInfo;
-  staking: IStakingInfo;
+  assetId?: string;
+  precision?: number;
+  staking?: IStakingInfo;
 }
 
 export interface ISetAccountNameContract {
   name: string;
+  assetId?: string;
+  precision?: number;
 }
 
 export interface IProposalContract {
@@ -221,11 +243,15 @@ export interface IProposalContract {
   value: string;
   description: string;
   epochsDuration: number;
+  assetId?: string;
+  precision?: number;
 }
 
 export interface IVoteContract {
   proposalId: number;
   amount: number;
+  assetId?: string;
+  precision?: number;
 }
 
 export enum EnumITOStatus {
@@ -240,11 +266,13 @@ export interface IConfigITOContract {
   status: EnumITOStatus;
   maxAmount: number;
   packInfo: any;
+  precision?: number;
 }
 
 export interface ISetITOPricesContract {
   assetId: string;
   packInfo: any;
+  precision?: number;
 }
 
 export enum EnumBuyType {
@@ -257,6 +285,8 @@ export interface IBuyContract {
   id: string;
   currencyID: string;
   amount: number;
+  assetId?: string;
+  precision?: number;
 }
 
 export enum EnumMarketType {
@@ -272,16 +302,21 @@ export interface ISellContract {
   price: number;
   reservePrice: number;
   endTime: number;
+  precision?: number;
 }
 
 export interface ICancelMarketOrderContract {
-  orderID: string;
+  orderId: string;
+  assetId?: string;
+  precision?: number;
 }
 
 export interface ICreateMarketplaceContract {
   name: string;
   referralAddress: string;
   referralPercentage: number;
+  assetId?: string;
+  precision?: number;
 }
 
 export interface IConfigMarketplaceContract {
@@ -289,6 +324,8 @@ export interface IConfigMarketplaceContract {
   name: string;
   referralAddress: string;
   referralPercentage: number;
+  assetId?: string;
+  precision?: number;
 }
 
 type IParameter =
@@ -432,6 +469,7 @@ export interface IAccount {
       [key: string]: IBucket;
     },
   ];
+  collection: INfts[];
 }
 
 export interface IAccountAsset {
@@ -447,9 +485,6 @@ export interface IAccountAsset {
     epoch: number;
   };
   buckets?: IBucket[];
-  staking?: {
-    minEpochsToWithdraw: number;
-  };
 }
 
 export interface IAsset {
@@ -673,6 +708,7 @@ export interface IDataCards {
   yesterdayTransactions: number;
   yesterdayAccounts: number;
   assetsData: IAssetsData;
+  block: IBlock;
 }
 
 export interface IHomeTransactions {
@@ -702,6 +738,17 @@ export interface IAccountResponse extends IResponse {
 export interface IBlockResponse extends IResponse {
   data: {
     blocks: IBlock[];
+  };
+}
+export interface IAssetResponse extends IResponse {
+  data: {
+    assets: IAsset[];
+  };
+}
+
+export interface IAssetOne extends IResponse {
+  data: {
+    asset: IAsset;
   };
 }
 
@@ -777,11 +824,11 @@ export interface IEpochInfo {
   remainingTime: string;
 }
 
-export interface IParsedMetrics {
-  klv_slot_at_epoch_start: number;
-  klv_slots_per_epoch: number;
-  klv_current_slot: number;
-  klv_slot_duration: number;
+export interface IMetrics {
+  slotAtEpochStart: number;
+  slotsPerEpoch: number;
+  currentSlot: number;
+  slotDuration: number;
 }
 
 export interface ITotalFrozen {
@@ -792,4 +839,14 @@ export interface ITotalFrozen {
 
 export interface IFormData {
   [key: string]: any;
+}
+
+export interface INfts {
+  address: string;
+  assetName: string;
+  collection: string;
+  assetId: string;
+  nftNonce: number;
+  mime?: string;
+  metadata?: string;
 }

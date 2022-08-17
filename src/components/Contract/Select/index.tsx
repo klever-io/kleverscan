@@ -19,6 +19,7 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   selectPlaceholder?: string;
   onChange: (value: any) => void;
   title?: string;
+  getAssets?: () => void;
   label?: string;
 }
 
@@ -27,6 +28,7 @@ const Select: React.FC<IFilter> = ({
   onChange,
   selectPlaceholder,
   title,
+  getAssets,
   label,
   ...rest
 }) => {
@@ -60,6 +62,7 @@ const Select: React.FC<IFilter> = ({
           selectPlaceholder ? selectPlaceholder : `Choose ${title ? title : ''}`
         }
         components={{ Placeholder, DropdownIndicator }}
+        onFocus={() => getAssets && getAssets()}
         {...props}
       />
     </Container>

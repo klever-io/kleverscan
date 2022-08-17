@@ -1,12 +1,12 @@
-import { ArrowLeft } from '@/assets/icons';
 import { Transactions as Icon } from '@/assets/title-icons';
 import Contract from '@/components/Contract';
+import Title from '@/components/Layout/Title';
 import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
 import api from '@/services/api';
 import { ICollectionList, IParamList } from '@/types/index';
 import { INetworkParam, IProposalsResponse } from '@/types/proposals';
 import { doIf } from '@/utils/index';
-import { Container, Header, Title } from '@/views/assets';
+import { Container, Header } from '@/views/assets';
 import { Card } from '@/views/blocks';
 import { CardContainer } from '@/views/create-transaction';
 import { GetServerSideProps } from 'next';
@@ -21,77 +21,92 @@ interface IContract {
 }
 
 const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
-  const [assets, setAssets] = useState<any>({});
   const [assetsList, setAssetsLists] = useState<any>([]);
   const router = useRouter();
 
-  useEffect(() => {
-    const getAssets = async () => {
-      if (typeof window !== 'undefined') {
-        const callback = async () => {
-          let address = '';
-
-          await doIf(
-            () => (address = window.kleverWeb.getWalletAddress()),
-            () => handleLogout(),
-            () => window?.kleverWeb?.getWalletAddress !== undefined,
-            500,
-          );
-
-          if (address) {
-            const account: any = await api.get({
-              route: `address/${address}`,
-            });
-
-            if (account?.data?.account?.assets) {
-              const { assets, frozenBalance, balance } = account?.data?.account;
-              const list: ICollectionList[] = [];
-
-              Object.keys(account.data.account.assets).map(item => {
-                const {
-                  assetType,
-                  frozenBalance,
-                  balance,
-                  precision,
-                  buckets,
-                } = account.data.account.assets[item];
-                list.push({
-                  label: item,
-                  value: item,
-                  isNFT: assetType === 1,
-                  balance,
-                  frozenBalance,
-                  precision,
-                  buckets,
-                });
-              });
-
-              if (!Object.keys(assets).includes('KLV') && balance !== 0) {
-                list.unshift({
-                  label: 'KLV',
-                  value: 'KLV',
-                  isNFT: false,
-                  balance,
-                  frozenBalance: frozenBalance ? frozenBalance : 0,
-                  precision: 6,
-                  buckets: [],
-                });
-              }
-
-              setAssetsLists(list);
-            }
-          }
-        };
-
-        doIf(
-          async () => await callback(),
+  const getAssets = async () => {
+    if (typeof window !== 'undefined') {
+      const callback = async () => {
+        let address = '';
+        await doIf(
+          () => (address = window.kleverWeb.getWalletAddress()),
           () => handleLogout(),
-          () => window.kleverWeb !== undefined,
+          () => window?.kleverWeb?.getWalletAddress !== undefined,
           500,
         );
-      }
-    };
 
+        if (address) {
+          const account: any = await api.get({
+            route: `address/${address}`,
+          });
+
+          if (account?.data?.account?.assets) {
+            const { assets, frozenBalance, balance } = account?.data?.account;
+            const list: ICollectionList[] = [];
+
+            Object.keys(account.data.account.assets).map(async item => {
+              const assetInfo: any = await api.get({
+                route: `assets/${item}`,
+              });
+
+              const minEpochsToWithdraw =
+                assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
+
+              const { assetType, frozenBalance, balance, precision, buckets } =
+                account.data.account.assets[item];
+              list.push({
+                label: item,
+                value: item,
+                isNFT: assetType === 1,
+                balance,
+                frozenBalance,
+                precision,
+                buckets,
+                minEpochsToWithdraw: minEpochsToWithdraw
+                  ? minEpochsToWithdraw
+                  : null,
+              });
+            });
+
+            if (!Object.keys(assets).includes('KLV') && balance !== 0) {
+              const assetInfo: any = await api.get({
+                route: `assets/KLV`,
+              });
+
+              const minEpochsToWithdraw =
+                assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
+
+              list.unshift({
+                label: 'KLV',
+                value: 'KLV',
+                isNFT: false,
+                balance,
+                frozenBalance: frozenBalance ? frozenBalance : 0,
+                precision: 6,
+                buckets: [],
+                minEpochsToWithdraw: minEpochsToWithdraw
+                  ? minEpochsToWithdraw
+                  : null,
+              });
+            }
+
+            setAssetsLists(list);
+          } else if (!account?.data) {
+            setAssetsLists([]);
+          }
+        }
+      };
+
+      doIf(
+        async () => await callback(),
+        () => handleLogout(),
+        () => window.kleverWeb !== undefined,
+        500,
+      );
+    }
+  };
+
+  useEffect(() => {
     getAssets();
   }, []);
 
@@ -105,13 +120,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/')}>
-            <ArrowLeft />
-          </div>
-          <h1>Create Transaction</h1>
-          <Icon />
-        </Title>
+        <Title Icon={Icon} title={'Create Transaction'} />
       </Header>
 
       <CardContainer>
@@ -134,6 +143,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
         assetsList={assetsList}
         proposalsList={proposals}
         paramsList={paramsList}
+        getAssets={getAssets}
       />
     </Container>
   );

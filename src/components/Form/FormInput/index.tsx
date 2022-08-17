@@ -174,7 +174,7 @@ const FormInput: React.FC<IFormInputProps> = ({
                   return e;
                 }}
               />
-              <Slider />
+              <Slider active={String(getIsChecked())} />
               {error && <span>{description}</span>}
             </Toggle>
             {toggleOptions.length > 1 && toggleOptions[1]}

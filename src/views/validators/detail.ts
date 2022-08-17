@@ -303,6 +303,8 @@ export const TableContainer = styled.section`
   flex-direction: column;
 
   gap: 1.5rem;
+
+  color: ${props => props.theme.black};
   h3 {
     margin-top: 2rem;
   }

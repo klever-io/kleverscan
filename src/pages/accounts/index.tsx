@@ -1,6 +1,6 @@
-import { ArrowLeft } from '@/assets/icons';
 import { Accounts as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
+import Title from '@/components/Layout/Title';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Table, { ITable } from '@/components/Table';
@@ -11,14 +11,7 @@ import { useDidUpdateEffect } from '@/utils/hooks';
 import { formatAmount, getAge } from '@/utils/index';
 import { TableContainer } from '@/views/accounts';
 import { CenteredRow } from '@/views/accounts/detail';
-import {
-  Card,
-  CardContainer,
-  Container,
-  Header,
-  Input,
-  Title,
-} from '@/views/blocks';
+import { Card, CardContainer, Container, Header, Input } from '@/views/blocks';
 import { fromUnixTime } from 'date-fns';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
@@ -185,13 +178,7 @@ const Accounts: React.FC<IAccounts> = ({
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/')}>
-            <ArrowLeft />
-          </div>
-          <h1>Accounts</h1>
-          <Icon />
-        </Title>
+        <Title title="Accounts" Icon={Icon} />
 
         <Input />
       </Header>

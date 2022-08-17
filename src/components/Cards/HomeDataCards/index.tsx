@@ -82,7 +82,10 @@ const HomeDataCards: React.FC<IDataCards> = ({
     },
     {
       Icon: Epoch,
-      title: `${t('Epoch')} #${block.epoch} ${t('Remaining Time')}`,
+      title:
+        `${t('Epoch')}` +
+        (block?.epoch ? ` #${block.epoch} ` : ' ') +
+        `${t('Remaining Time')}`,
       value: metrics.remainingTime,
       progress: metrics.epochLoadPercent,
     },

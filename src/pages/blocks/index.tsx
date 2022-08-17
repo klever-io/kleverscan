@@ -101,6 +101,15 @@ const Blocks: React.FC<IBlocks> = ({
     setAutoUpdate(updateBlocksConfig);
   }, []);
 
+  useEffect(() => {
+    if (page !== 1) {
+      setAutoUpdate(false);
+    } else {
+      const updateBlocksConfig = getStorageUpdateConfig();
+      setAutoUpdate(updateBlocksConfig);
+    }
+  }, [page]);
+
   useDidUpdateEffect(() => {
     const fetchData = async () => {
       setLoading(true);

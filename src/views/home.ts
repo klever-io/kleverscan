@@ -531,5 +531,4 @@ export const Main = styled.main`
   display: block;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 4.25rem;
 `;

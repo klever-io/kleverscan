@@ -11,7 +11,7 @@ interface IMobileMenu {
 export const Container = styled.div`
   padding: 1rem 2rem;
 
-  position: fixed;
+  position: sticky;
   top: 0;
   left: 0;
   right: 0;

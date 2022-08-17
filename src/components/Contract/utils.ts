@@ -176,6 +176,26 @@ const getAssetsList = (
     return assets.filter((value: ICollectionList) => {
       return !value.isNFT && value.frozenBalance !== 0;
     });
+  } else if (contractType === 'WithdrawContract') {
+    return assets.filter((value: ICollectionList) => {
+      let thereIsUnfreezedBucket = false;
+      let passedMinEpochs = false;
+
+      value.buckets?.forEach((bucket: any) => {
+        if (bucket.unstakedEpoch !== 4294967295) {
+          thereIsUnfreezedBucket = true;
+        }
+
+        if (
+          value.minEpochsToWithdraw &&
+          bucket.stakedEpoch !== value.minEpochsToWithdraw
+        ) {
+          passedMinEpochs = true;
+        }
+      });
+
+      return thereIsUnfreezedBucket && passedMinEpochs ? value : null;
+    });
   }
 
   return assets;

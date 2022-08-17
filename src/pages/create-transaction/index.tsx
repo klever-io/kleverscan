@@ -44,7 +44,14 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
             const { assets, frozenBalance, balance } = account?.data?.account;
             const list: ICollectionList[] = [];
 
-            Object.keys(account.data.account.assets).map(item => {
+            Object.keys(account.data.account.assets).map(async item => {
+              const assetInfo: any = await api.get({
+                route: `assets/${item}`,
+              });
+
+              const minEpochsToWithdraw =
+                assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
+
               const { assetType, frozenBalance, balance, precision, buckets } =
                 account.data.account.assets[item];
               list.push({
@@ -55,10 +62,20 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
                 frozenBalance,
                 precision,
                 buckets,
+                minEpochsToWithdraw: minEpochsToWithdraw
+                  ? minEpochsToWithdraw
+                  : null,
               });
             });
 
             if (!Object.keys(assets).includes('KLV') && balance !== 0) {
+              const assetInfo: any = await api.get({
+                route: `assets/KLV`,
+              });
+
+              const minEpochsToWithdraw =
+                assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
+
               list.unshift({
                 label: 'KLV',
                 value: 'KLV',
@@ -67,6 +84,9 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
                 frozenBalance: frozenBalance ? frozenBalance : 0,
                 precision: 6,
                 buckets: [],
+                minEpochsToWithdraw: minEpochsToWithdraw
+                  ? minEpochsToWithdraw
+                  : null,
               });
             }
 

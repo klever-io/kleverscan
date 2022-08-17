@@ -54,6 +54,7 @@ export interface ICollectionList {
   balance: number;
   precision?: number;
   buckets?: any[];
+  minEpochsToWithdraw?: number | null;
 }
 
 export interface IContractOption {

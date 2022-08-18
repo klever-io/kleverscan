@@ -1,5 +1,5 @@
 import { IFilterItem } from '@/components/Filter';
-import { Contract } from '../types';
+import { ContractsName } from '../types';
 
 const coins: IFilterItem[] = [
   { name: 'KLV', value: 'klv' },
@@ -12,7 +12,7 @@ const status: IFilterItem[] = [
   { name: 'Fail', value: 'fail' },
 ];
 
-const contracts = Object.values(Contract).map((contract, index) => ({
+const contracts = Object.values(ContractsName).map((contract, index) => ({
   name: contract,
   value: String(index),
 }));

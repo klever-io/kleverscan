@@ -27,6 +27,32 @@ export enum Contract {
   ConfigMarketplace = 'ConfigMarketplaceContractType',
 }
 
+//used in Filter Contracts
+export enum ContractsName {
+  TransferContractType = 'Transfer',
+  CreateAssetContractType = 'Create Asset',
+  CreateValidatorContractType = 'Create Validator',
+  ConfigValidatorContractType = 'Config Validator',
+  FreezeContractType = 'Freeze',
+  UnfreezeContractType = 'Unfreeze',
+  DelegateContractType = 'Delegate',
+  UndelegateContractType = 'Undelegate',
+  WithdrawContractType = 'Withdraw',
+  ClaimContractType = 'Claim',
+  UnjailContractType = 'Unjail',
+  AssetTriggerContractType = 'Asset Trigger',
+  SetAccountNameContractType = 'Set Account Name',
+  ProposalContractType = 'Proposal',
+  VoteContractType = 'Vote',
+  ConfigITOContractType = 'Config ITO',
+  SetITOPricesContractType = 'Set ITO',
+  BuyContractType = 'Buy',
+  SellContractType = 'Sell',
+  CancelMarketOrderContractType = 'Cancel Marketplace Order',
+  CreateMarketplaceContractType = 'Create Marketplace',
+  ConfigMarketplaceContractType = 'Config Marketplae',
+}
+
 export enum Service {
   PROXY,
   PRICE,

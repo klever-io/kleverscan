@@ -240,3 +240,27 @@ export const BalanceContainer = styled.div`
   flex-direction: row;
   justify-content: space-between;
 `;
+
+export const CardContainer = styled.div`
+  margin-top: -0.7rem;
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: -2rem;
+  padding: 2rem 0;
+
+  font-family: Rubik;
+  font-family: Rubik;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 15px;
+
+  div {
+    span {
+      color: ${props => props.theme.form.sectionTitle};
+    }
+  }
+
+  @media screen and (max-width: 1025px) {
+    width: 100%;
+  }
+`;

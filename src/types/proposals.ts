@@ -15,7 +15,8 @@ export interface IProposal {
   totalStaked?: number;
   timestampStart?: number;
   timestampEnd?: number;
-  parsedParameters?: IFullInfoParam[];
+  fullInfoParams?: IFullInfoParam[];
+  currentNetworkParams?: INetworkParams;
 }
 
 export interface IProposalsResponse extends IResponse {
@@ -28,6 +29,13 @@ export interface IProposalsResponse extends IResponse {
 export interface IParsedProposal extends IProposal {
   parsedParameters: IFullInfoParam[];
   votingPowers?: IVotingPowers;
+  currentNetworkParams: INetworkParams;
+}
+
+export interface IAPINetworkParams {
+  parameters: {
+    [key: string]: { type: string; value: string };
+  };
 }
 
 export interface IVotingPowers {
@@ -58,7 +66,7 @@ export interface INetworkParams {
 export interface INetworkParam {
   number: number;
   parameter: string;
-  currentValue: number;
+  currentValue: string;
 }
 
 export interface IProposals {
@@ -72,6 +80,11 @@ export interface IProposalsProps {
 
 export interface IRawParam {
   [name: string]: string;
+}
+
+export interface IParsedParams {
+  currentNetworkParams: INetworkParams;
+  fullInfoParams: IFullInfoParam[];
 }
 
 export interface IFullInfoParam {

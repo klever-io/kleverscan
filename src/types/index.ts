@@ -69,7 +69,7 @@ export interface IDropdownItem {
 export interface IParamList {
   label: string;
   value: number;
-  currentValue?: number;
+  currentValue?: string;
 }
 
 export interface ICollectionList {

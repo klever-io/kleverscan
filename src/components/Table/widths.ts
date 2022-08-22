@@ -310,7 +310,7 @@ const proposals = css`
     width: 10rem;
   }
   &:nth-child(3) {
-    width: 9rem;
+    width: 12rem;
   }
   &:nth-child(4) {
     width: 11rem;
@@ -319,7 +319,7 @@ const proposals = css`
     width: 12rem;
   }
   &:nth-child(6) {
-    width: 10rem;
+    width: 16rem;
   }
   &:nth-child(7) {
     width: 5rem;

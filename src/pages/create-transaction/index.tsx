@@ -43,30 +43,38 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
           if (account?.data?.account?.assets) {
             const { assets, frozenBalance, balance } = account?.data?.account;
             const list: ICollectionList[] = [];
+            const addAssetsInfo = Object.keys(account.data.account.assets).map(
+              async item => {
+                const assetInfo: any = await api.get({
+                  route: `assets/${item}`,
+                });
 
-            Object.keys(account.data.account.assets).map(async item => {
-              const assetInfo: any = await api.get({
-                route: `assets/${item}`,
-              });
+                const minEpochsToWithdraw =
+                  assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
 
-              const minEpochsToWithdraw =
-                assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
+                const {
+                  assetType,
+                  frozenBalance,
+                  balance,
+                  precision,
+                  buckets,
+                } = account.data.account.assets[item];
+                list.push({
+                  label: item,
+                  value: item,
+                  isNFT: assetType === 1,
+                  balance,
+                  frozenBalance,
+                  precision,
+                  buckets,
+                  minEpochsToWithdraw: minEpochsToWithdraw
+                    ? minEpochsToWithdraw
+                    : null,
+                });
+              },
+            );
 
-              const { assetType, frozenBalance, balance, precision, buckets } =
-                account.data.account.assets[item];
-              list.push({
-                label: item,
-                value: item,
-                isNFT: assetType === 1,
-                balance,
-                frozenBalance,
-                precision,
-                buckets,
-                minEpochsToWithdraw: minEpochsToWithdraw
-                  ? minEpochsToWithdraw
-                  : null,
-              });
-            });
+            await Promise.all(addAssetsInfo);
 
             if (!Object.keys(assets).includes('KLV') && balance !== 0) {
               const assetInfo: any = await api.get({

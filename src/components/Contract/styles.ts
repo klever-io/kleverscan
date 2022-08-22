@@ -179,7 +179,7 @@ export const ExtraOptionContainer = styled.div`
 export const SelectContainer = styled.div`
   display: flex;
   align-items: flex-start;
-  flex-direction: column;
+  flex-direction: row;
   background-color: ${props => props.theme.white};
   padding: 1.37rem;
   border-radius: 1rem;

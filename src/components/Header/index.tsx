@@ -145,6 +145,9 @@ const Navbar: React.FC = () => {
 
   const handleMenu = () => {
     setIsOpen(!isOpen);
+    if (mobileNavbar.current !== null) {
+      mobileNavbar.current.style.top = '0';
+    }
   };
 
   const handleClose = () => {
@@ -212,7 +215,11 @@ const Navbar: React.FC = () => {
         </MobileContainer>
       </Container>
 
-      <MobileBackground onClick={handleClose} opened={isOpen} />
+      <MobileBackground
+        onClick={handleClose}
+        onTouchStart={handleClose}
+        opened={isOpen}
+      />
 
       <MobileContent opened={isOpen}>
         <MobileOptions>

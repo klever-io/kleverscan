@@ -179,7 +179,7 @@ export const ExtraOptionContainer = styled.div`
 export const SelectContainer = styled.div`
   display: flex;
   align-items: flex-start;
-  flex-direction: column;
+  flex-direction: row;
   background-color: ${props => props.theme.white};
   padding: 1.37rem;
   border-radius: 1rem;
@@ -239,4 +239,28 @@ export const BalanceContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+`;
+
+export const CardContainer = styled.div`
+  margin-top: -0.7rem;
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: -2rem;
+  padding: 2rem 0;
+
+  font-family: Rubik;
+  font-family: Rubik;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 15px;
+
+  div {
+    span {
+      color: ${props => props.theme.form.sectionTitle};
+    }
+  }
+
+  @media screen and (max-width: 1025px) {
+    width: 100%;
+  }
 `;

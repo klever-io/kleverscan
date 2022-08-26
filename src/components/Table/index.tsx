@@ -52,8 +52,8 @@ const Table: React.FC<ITable> = ({
       <Body {...props}>
         {loading && (
           <>
-            {Array(10)
-              .fill(10)
+            {Array(5)
+              .fill(5)
               .map((_, index) => (
                 <Row key={String(index)} {...props}>
                   {header.map((_, index2) => (

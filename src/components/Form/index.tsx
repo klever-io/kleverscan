@@ -9,8 +9,8 @@ import {
   ArrowUpIcon,
   ButtonContainer,
   FormBody,
-  FormSection,
   FormGap,
+  FormSection,
   SectionTitle,
 } from './styles';
 

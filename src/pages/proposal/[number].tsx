@@ -5,7 +5,10 @@ import { Row as TableRow, Status } from '@/components/Table/styles';
 import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
 import api from '@/services/api';
 import {
+  IAPINetworkParams,
   IFullInfoParam,
+  INetworkParams,
+  IParsedParams,
   IParsedProposal,
   IProposal,
   IRawParam,
@@ -105,7 +108,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
       No: 0,
     };
 
-    proposalAPI.voters.forEach(voter => {
+    proposalAPI?.voters?.forEach(voter => {
       if (totalStaked && votingPowers) {
         const votesInfo = voter;
         const frozenBalance = votingPowers[voter.address];
@@ -165,6 +168,10 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
       <div key={param.paramIndex}>
         <strong>{param.paramText}</strong>
         <span>{param.paramValue}</span>
+        <p>
+          Current Value:{' '}
+          {props?.currentNetworkParams?.[param.paramText]?.currentValue}
+        </p>
       </div>
     ));
   }, [proposalAPI]);
@@ -410,7 +417,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
 
 export const getVotingPowers = (voters: IVote[]): IVotingPowers => {
   const powers = {};
-  voters.forEach(voter => {
+  voters?.forEach(voter => {
     powers[voter.address] = voter?.amount;
   });
   return powers;
@@ -418,22 +425,33 @@ export const getVotingPowers = (voters: IVote[]): IVotingPowers => {
 
 export const getProposalNetworkParams = (
   params: IRawParam,
-): IFullInfoParam[] => {
-  if (params) {
-    const fullInfoParams: IFullInfoParam[] = Object.entries(params).map(
-      ([index, value]) => {
-        return {
-          paramIndex: index,
-          paramLabel: NetworkParamsIndexer[index],
-          paramValue: Number(value),
-          paramText: proposalsMessages[NetworkParamsIndexer[index]],
-        };
-      },
-    );
+  apiNetworkParams: IAPINetworkParams,
+): IParsedParams => {
+  const currentNetworkParams = {} as INetworkParams;
+  let fullInfoParams: IFullInfoParam[] = [];
 
-    return fullInfoParams;
+  if (apiNetworkParams) {
+    Object.keys(proposalsMessages).map((key, index) => {
+      currentNetworkParams[proposalsMessages[key]] = {
+        number: index,
+        parameter: proposalsMessages[key] ? proposalsMessages[key] : '',
+        currentValue: apiNetworkParams?.parameters?.[key]?.value,
+      };
+    });
   }
-  return [];
+
+  if (params) {
+    fullInfoParams = Object.entries(params).map(([index, value]) => {
+      return {
+        paramIndex: index,
+        paramLabel: NetworkParamsIndexer[index],
+        paramValue: Number(value),
+        paramText: proposalsMessages[NetworkParamsIndexer[index]],
+      };
+    });
+  }
+
+  return { currentNetworkParams, fullInfoParams };
 };
 
 export const getServerSideProps: GetStaticProps<IProposal> = async ({
@@ -442,16 +460,18 @@ export const getServerSideProps: GetStaticProps<IProposal> = async ({
   const proposalInfos: any = await api.get({
     route: `proposals/${params?.number}`,
   });
+  const { data } = await api.get({ route: 'network/network-parameters' });
 
   let props = proposalInfos?.data?.proposal;
-
   if (!props) {
     props = {};
   }
+
   const votingPowers = getVotingPowers(props.voters);
   props.votingPowers = votingPowers;
-  const fullInfoParams = getProposalNetworkParams(props.parameters);
-  props.parsedParameters = fullInfoParams;
+  const parsedParameters = getProposalNetworkParams(props.parameters, data);
+  props.parsedParameters = parsedParameters?.fullInfoParams;
+  props.currentNetworkParams = parsedParameters?.currentNetworkParams;
 
   return { props };
 };

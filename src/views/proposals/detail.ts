@@ -430,7 +430,6 @@ export const BalanceContainer = styled.div`
 
 export const NetworkParamsContainer = styled.div`
   margin-top: 0.5rem;
-
   display: flex;
 
   flex-direction: column;
@@ -441,14 +440,9 @@ export const NetworkParamsContainer = styled.div`
 
   div {
     padding: 1.25rem 2rem;
-
     display: flex;
-
     flex-direction: row;
-    @media (max-width: 768px) {
-      flex-direction: column;
-      align-items: flex-start;
-    }
+
     align-items: center;
 
     &:not(:last-child) {
@@ -461,12 +455,32 @@ export const NetworkParamsContainer = styled.div`
     justify-content: flex-start;
 
     strong {
+      width: 100%;
+      min-width: 380px;
       font-weight: 600;
       color: ${props => props.theme.card.darkText};
     }
 
     span {
+      width: 100%;
+      min-width: 140px;
+
       color: ${props => props.theme.card.darkText};
+    }
+    p {
+      font-weight: 400;
+      font-size: 12px;
+      min-width: 200px;
+      overflow: visible !important;
+      white-space: normal !important;
+    }
+
+    @media (max-width: 1355px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 980px) {
     }
   }
 `;

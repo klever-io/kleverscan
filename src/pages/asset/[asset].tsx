@@ -135,12 +135,14 @@ const Asset: React.FC<IAssetPage> = ({
       const query = dateFilter.start
         ? {
             page: transactionsPage,
+            limit: 5,
             asset: asset.assetId,
             startdate: dateFilter.start ? dateFilter.start : undefined,
             enddate: dateFilter.end ? dateFilter.end : undefined,
           }
         : {
             page: transactionsPage,
+            limit: 5,
             asset: asset.assetId,
           };
 
@@ -558,7 +560,7 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
   const transactionCall = new Promise<ITransactionResponse>(
     async (resolve, reject) => {
       const res = await api.get({
-        route: `transaction/list?asset=${assetId}`,
+        route: `transaction/list?asset=${assetId}&limit=5`,
       });
 
       if (!res.error || res.error === '') {

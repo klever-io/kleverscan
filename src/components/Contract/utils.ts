@@ -293,6 +293,31 @@ const parseValues = (
   return parsedValues;
 };
 
+const contractsDescription = {
+  TransferContract: 'Transfer assets to a given receiver.',
+  CreateAssetContract: 'Choose between creating a Token or an NFT.',
+  CreateValidatorContract: 'Generate a new validator.',
+  ValidatorConfigContract: 'Edit the current settings for a validator.',
+  FreezeContract: 'Freeze a chosen amount of an asset or collection.',
+  UnfreezeContract: 'Unfreeze a bucket of an asset or collection.',
+  DelegateContract: 'Delegate a bucket to a validator.',
+  UndelegateContract: 'Undelegate a bucket.',
+  WithdrawContract: 'Total withdraw of the chosen asset.',
+  ClaimContract: 'Claim rewards or expired market orders.',
+  UnjailContract: 'Remove bad actors…',
+  AssetTriggerContract:
+    'A contract setting operations over a collection of assets or an NFT.',
+  SetAccountNameContract: 'Set a new name for the current account.',
+  ProposalContract: 'Create a proposal for the current project.',
+  VoteContract: 'Vote for a proposal.',
+  ConfigITOContract: 'Set up an Initial Token Offering.',
+  SetITOPricesContract: 'Set the prices for the Initial Token Offering.',
+  BuyContract: 'Buy tokens.',
+  SellContract: 'Sell tokens.',
+  CreateMarketplaceContract: 'Create a new Marketplace.',
+  ConfigMarketplaceContract: 'Set up a Marketplace.',
+};
+
 export {
   getType,
   getAssetsList,
@@ -301,4 +326,5 @@ export {
   parseValues,
   contractHaveKDA,
   contractHaveBucketId,
+  contractsDescription,
 };

@@ -13,6 +13,7 @@ import {
   contractOptions,
   parseAddress,
 } from '@/utils/index';
+import { Card } from '@/views/blocks';
 import { core } from '@klever/sdk';
 import Form, { ISection } from 'components/Form';
 import { useRouter } from 'next/router';
@@ -28,6 +29,7 @@ import {
   AssetTriggerContainer,
   BalanceContainer,
   BalanceLabel,
+  CardContainer,
   CloseIcon,
   Container,
   ExtraOptionContainer,
@@ -38,6 +40,7 @@ import {
 import {
   contractHaveBucketId,
   contractHaveKDA,
+  contractsDescription,
   getAssetsList,
   getType,
   parseValues,
@@ -477,6 +480,16 @@ const Contract: React.FC<IContract> = ({
         getAssets={getAssets}
         title={'Contract'}
       />
+
+      {contractsDescription[contractType] && (
+        <CardContainer>
+          <Card>
+            <div>
+              <span>{contractsDescription[contractType]}</span>
+            </div>
+          </Card>
+        </CardContainer>
+      )}
 
       {renderSelect()}
 

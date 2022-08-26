@@ -212,7 +212,7 @@ export const AllSmallCardsContainer = styled.section`
   margin: 1.5rem 0;
   flex-direction: row;
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     flex-direction: column;
   }
 `;
@@ -249,7 +249,7 @@ export const Card = styled.div<{ marginLeft?: boolean; marginRight?: boolean }>`
   border-radius: 1rem;
   gap: 1rem;
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     margin: 0;
     margin-top: 1rem;
     height: 10.5rem;
@@ -293,7 +293,7 @@ export const RewardsCard = styled.div<{
     padding: 0.8rem;
   }
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     margin: 0;
     margin-top: 1rem;
     height: 10.5rem;
@@ -405,7 +405,7 @@ export const CardSubHeader = styled.div`
     }
   }
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     font-size: 1.1rem;
     span:nth-child(1) {
       right: 13%;
@@ -431,7 +431,7 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     padding: 3rem 3rem 5rem 3rem;
   }
 `;
@@ -726,7 +726,7 @@ export const RewardsChartContent = styled.div`
     bottom: 1.4rem;
   }
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     bottom: 0.5rem;
   }
   @media (max-width: 417px) {
@@ -791,7 +791,7 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
     height: 3.55rem;
   }
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     width: 14rem;
     height: 7rem;
   }
@@ -841,7 +841,7 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
       left: 18%;
     }
 
-    @media (max-width: 1050px) {
+    @media (max-width: 1110px) {
       left: 29%;
       font-size: 1rem;
     }
@@ -872,7 +872,7 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
       transform-origin: 50% 0;
     }
 
-    @media (max-width: 1050px) {
+    @media (max-width: 1110px) {
       transform-origin: 50% 0;
       border: 9px solid #37dd72;
       border-top: none;
@@ -906,7 +906,7 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
       height: 8px;
     }
 
-    @media (max-width: 1050px) {
+    @media (max-width: 1110px) {
       transform-origin: 50% 0;
       border: 9px solid #ff4681;
       border-top: none;
@@ -953,7 +953,7 @@ export const PieData = styled.div`
   transform-style: preserve-3d;
   backface-visibility: hidden;
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     border: 12.5px solid;
     border-top: none;
   }
@@ -975,13 +975,13 @@ export const ContainerVotes = styled.div`
   @media (max-width: 1200px) {
     width: 4.5rem;
   }
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     strong {
       font-size: 0.7rem !important;
     }
   }
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     top: 1.5rem;
     min-width: 0;
     strong {
@@ -1004,7 +1004,7 @@ export const SubContainerVotes = styled.div`
   flex-direction: row;
   justify-content: flex-end;
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     justify-content: flex-end !important;
   }
 `;
@@ -1023,12 +1023,12 @@ export const ContainerRewards = styled.span`
   @media (max-width: 1200px) {
     width: 4.5rem;
   }
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     strong {
       font-size: 0.7rem !important;
     }
   }
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     top: 1.5rem;
     Strong {
       font-size: 0.95rem !important;
@@ -1054,7 +1054,7 @@ export const VotersPercent = styled.span`
   font-weight: 600;
   color: #37dd72;
   display: block;
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     font-size: 1.3rem;
   }
   @media (max-width: 430px) {
@@ -1086,7 +1086,7 @@ export const ContainerCircle = styled.span`
     top: 1rem;
   }
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     height: 12rem;
   }
 `;
@@ -1095,7 +1095,7 @@ export const CommissionPercent = styled.span`
   font-size: 1rem;
   font-weight: 600;
   color: #ff4681;
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     font-size: 1.3rem;
   }
   @media (max-width: 430px) {
@@ -1126,7 +1126,7 @@ export const RewardCardContentWrapper = styled.div`
     bottom: 0.5rem;
   }
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     height: auto;
     bottom: 2.5rem;
     justify-content: center;

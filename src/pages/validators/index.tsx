@@ -2,7 +2,7 @@ import { Validators as Icon } from '@/assets/cards';
 import { getStatusIcon } from '@/assets/status';
 import Detail from '@/components/Layout/Detail';
 import { ITable } from '@/components/Table';
-import { Row, Status } from '@/components/Table/styles';
+import { Status } from '@/components/Table/styles';
 import api from '@/services/api';
 import {
   IDelegationsResponse,
@@ -16,8 +16,10 @@ import {
   ProgressContainer,
   ProgressContent,
   ProgressIndicator,
+  ProgressPercentage,
 } from '@/views/validators';
 import { useTheme } from 'contexts/theme';
+import { useWidth } from 'contexts/width';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import React, { useState } from 'react';
@@ -112,80 +114,84 @@ const Validators: React.FC<IValidatorPage> = ({
   const Progress: React.FC<{ percent: number }> = ({ percent }) => {
     const { theme } = useTheme();
     return (
-      <ProgressContainer textColor={theme.black}>
+      <ProgressContainer>
         <ProgressContent>
           <ProgressIndicator percent={percent} />
         </ProgressContent>
-        <span>{percent?.toFixed(2)}%</span>
+        <ProgressPercentage textColor={theme.black}>
+          {percent?.toFixed(2)}%
+        </ProgressPercentage>
       </ProgressContainer>
     );
   };
 
-  const TableBody: React.FC<IValidator> | null = ({
-    rank,
-    name,
-    staked,
-    commission,
-    cumulativeStaked,
-    address,
-    rating,
-    status,
-    totalProduced,
-    totalMissed,
-    canDelegate,
-  }) => {
+  const { isMobile } = useWidth();
+
+  const rowSections = (validator: IValidator): JSX.Element[] | undefined => {
+    const {
+      rank,
+      name,
+      staked,
+      commission,
+      cumulativeStaked,
+      address,
+      rating,
+      status,
+      totalProduced,
+      totalMissed,
+      canDelegate,
+    } = validator;
+
     const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'fail');
 
-    return address ? (
-      <Row type="validators">
-        <span>
-          <p>{rank}°</p>
-        </span>
-        <span>
-          {validators[rank - 1 - (page * pagination.perPage - 10)]?.address ? (
-            <Link
-              href={`validator/${
-                validators[rank - 1 - (page * pagination.perPage - 10)].address
-              }`}
-            >
-              {parseAddress(name, 20)}
-            </Link>
-          ) : (
-            <span>{parseAddress(name, 20)}</span>
-          )}
-        </span>
-        <span>{((rating * 100) / 10000000).toFixed(2)}%</span>
+    const sections = address
+      ? [
+          <p key={rank}>{rank}°</p>,
+          <span key={name}>
+            {validators[rank - 1 - (page * pagination.perPage - 10)]
+              ?.address ? (
+              <Link
+                href={`validator/${
+                  validators[rank - 1 - (page * pagination.perPage - 10)]
+                    .address
+                }`}
+              >
+                {isMobile ? parseAddress(name, 14) : parseAddress(name, 20)}
+              </Link>
+            ) : (
+              <span>{parseAddress(name, 20)}</span>
+            )}
+          </span>,
+          <span key={rating}>{((rating * 100) / 10000000).toFixed(2)}%</span>,
 
-        <span>{capitalizeString(status)}</span>
-        <span>
-          <strong>{formatAmount(staked / 10 ** precision)} KLV</strong>
-        </span>
-        <span>
-          <strong>{commission / 10 ** 2}%</strong>
-        </span>
-        <span>
-          <strong>{`${totalProduced} / ${totalMissed}`}</strong>
-        </span>
-        <span>
-          <Status status={canDelegate ? 'success' : 'fail'}>
+          <span key={status}>{capitalizeString(status)}</span>,
+          <strong key={staked}>
+            {formatAmount(staked / 10 ** precision)} KLV
+          </strong>,
+          <strong key={commission}>{commission / 10 ** 2}%</strong>,
+          <strong
+            key={totalProduced}
+          >{`${totalProduced} / ${totalMissed}`}</strong>,
+          <Status
+            status={canDelegate ? 'success' : 'fail'}
+            key={String(canDelegate)}
+          >
             <DelegateIcon />
             <p>{canDelegate ? 'Yes' : 'No'}</p>
-          </Status>
-        </span>
+          </Status>,
 
-        <span>
-          <strong>
-            <Progress percent={cumulativeStaked} />
-          </strong>
-        </span>
-      </Row>
-    ) : null;
+          <Progress percent={cumulativeStaked} key={cumulativeStaked} />,
+        ]
+      : undefined;
+
+    return sections;
   };
 
   const tableProps: ITable = {
     type: 'validators',
     header,
-    body: TableBody,
+    rowSections,
+    columnSpans: [1, 1, 1, 1, 1, 1, 1, 1, 2],
     data: validators as any[],
     loading: loading,
   };

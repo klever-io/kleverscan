@@ -38,13 +38,11 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
         route: 'transaction/list',
       });
       const assets: IAssetResponse = await api.get({ route: 'assets/kassets' });
-      if (!transactions.error || !assets.error) {
-        // Animation / Re-render bug START
+      if (!transactions.error && !assets.error) {
         transactions.data.transactions = addPrecisionTransactions(
           transactions.data.transactions,
         );
         setTransactions(transactions.data.transactions);
-        // Animation / Re-render bug END
         setTotalTransactions(transactions.pagination.totalRecords);
       }
     }, transactionsWatcherInterval);

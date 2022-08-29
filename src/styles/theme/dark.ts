@@ -1,5 +1,6 @@
 const darktheme = {
   dark: true,
+  maxWidth: '1900px',
   background: '#030307',
   white: '#0B0B1E',
   black: '#ccc',

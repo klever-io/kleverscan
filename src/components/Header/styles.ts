@@ -16,12 +16,6 @@ export const Container = styled.div`
   left: 0;
   right: 0;
 
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  gap: 0.5rem;
-
   background-color: ${props => props.theme.navbar.background};
 
   z-index: 1000;
@@ -35,6 +29,18 @@ export const Container = styled.div`
 
     justify-content: space-between;
   }
+`;
+
+export const Content = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  gap: 0.5rem;
+
+  max-width: ${props => props.theme.maxWidth};
+
+  margin: 0 auto;
 `;
 
 export const Logo = styled.div`

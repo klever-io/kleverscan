@@ -1,4 +1,5 @@
 import { InternalThemeProvider } from 'contexts/theme';
+import { WidthProvider } from 'contexts/width';
 import { appWithTranslation } from 'next-i18next';
 import type { AppProps } from 'next/app';
 import React from 'react';
@@ -23,12 +24,14 @@ declare global {
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   const children = (
     <InternalThemeProvider>
-      <ToastContainer />
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-      <GlobalStyle />
-      <NProgress />
+      <WidthProvider>
+        <ToastContainer />
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+        <GlobalStyle />
+        <NProgress />
+      </WidthProvider>
     </InternalThemeProvider>
   );
 

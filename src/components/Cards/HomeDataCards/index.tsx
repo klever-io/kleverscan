@@ -17,6 +17,7 @@ import {
   ProgressContainer,
   ProgressContent,
   ProgressIndicator,
+  ProgressPercentage,
 } from '@/views/validators';
 import { useTheme } from 'contexts/theme';
 import { useTranslation } from 'next-i18next';
@@ -219,11 +220,13 @@ const HomeDataCards: React.FC<IDataCards> = ({
   const Progress: React.FC<{ percent: number }> = ({ percent }) => {
     const { theme } = useTheme();
     return (
-      <ProgressContainer textColor={theme.card.white}>
+      <ProgressContainer>
         <ProgressContent>
           <ProgressIndicator percent={percent} />
         </ProgressContent>
-        <span>{percent?.toFixed(2)}%</span>
+        <ProgressPercentage textColor={theme.card.white}>
+          {percent?.toFixed(2)}%
+        </ProgressPercentage>
       </ProgressContainer>
     );
   };

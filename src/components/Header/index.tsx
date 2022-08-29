@@ -1,5 +1,5 @@
 import { INavbarItem, navbarItems } from '@/configs/navbar';
-import { useWidth } from '@/utils/hooks';
+import { useWidth } from 'contexts/width';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -8,6 +8,7 @@ import ConnectWallet from './ConnectWallet';
 import OptionsContainer from './OptionsContainer';
 import {
   Container,
+  Content,
   DesktopContainer,
   DropdownContainer,
   DropdownIcon,
@@ -131,7 +132,7 @@ const Navbar: React.FC = () => {
   const mobileNavbar = useRef<HTMLDivElement>(null);
   const prevScrollpos = useRef<number>(0);
 
-  const width = useWidth();
+  const { width } = useWidth();
 
   useEffect(() => {
     if (width > 1025) {
@@ -192,27 +193,34 @@ const Navbar: React.FC = () => {
   return (
     <>
       <Container ref={mobileNavbar}>
-        <Link href="/">
-          <a>
-            <Logo onClick={handleClose}>
-              <Image src="/logo-large.svg" alt="Logo" width="215" height="29" />
-            </Logo>
-          </a>
-        </Link>
+        <Content>
+          <Link href="/">
+            <a>
+              <Logo onClick={handleClose}>
+                <Image
+                  src="/logo-large.svg"
+                  alt="Logo"
+                  width="215"
+                  height="29"
+                />
+              </Logo>
+            </a>
+          </Link>
 
-        <DesktopContainer>
-          <IconsMenu>
-            {navbarItems.map((item, index) => (
-              <NavbarItem key={String(index)} {...item} />
-            ))}
-          </IconsMenu>
-          <ConnectWallet />
-          <OptionsContainer />
-        </DesktopContainer>
+          <DesktopContainer>
+            <IconsMenu>
+              {navbarItems.map((item, index) => (
+                <NavbarItem key={String(index)} {...item} />
+              ))}
+            </IconsMenu>
+            <ConnectWallet />
+            <OptionsContainer />
+          </DesktopContainer>
 
-        <MobileContainer>
-          <MenuIcon onClick={handleMenu} />
-        </MobileContainer>
+          <MobileContainer>
+            <MenuIcon onClick={handleMenu} />
+          </MobileContainer>
+        </Content>
       </Container>
 
       <MobileBackground

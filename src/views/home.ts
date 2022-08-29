@@ -529,6 +529,10 @@ export const TransactionChartContent = styled.div`
 
 export const Main = styled.main`
   display: block;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
+  max-width: ${props => props.theme.maxWidth};
+`;
+export const LayoutContainer = styled.div`
+  margin: auto;
+  background-color: ${props => props.theme.background};
 `;

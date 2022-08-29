@@ -157,7 +157,7 @@ export interface IStakingInfo {
 export interface IRolesInfo {
   address: string;
   hasRoleMint: boolean;
-  hasRoleSetICOPrices: boolean;
+  hasRoleSetITOPrices: boolean;
 }
 
 export interface ICreateValidatorContract {
@@ -264,8 +264,12 @@ export interface ISetAccountNameContract {
   precision?: number;
 }
 
+export interface IProposalParameter {
+  [key: string]: string;
+}
+
 export interface IProposalContract {
-  parameters: number;
+  parameters: IProposalParameter;
   value: string;
   description: string;
   epochsDuration: number;
@@ -302,7 +306,7 @@ export interface ISetITOPricesContract {
 }
 
 export enum EnumBuyType {
-  ICOBuy = 0,
+  ITOBuy = 0,
   MarketBuy = 1,
 }
 
@@ -354,7 +358,7 @@ export interface IConfigMarketplaceContract {
   precision?: number;
 }
 
-type IParameter =
+export type IParameter =
   | ITransferContract
   | ICreateAssetContract
   | ICreateValidatorContract

@@ -164,7 +164,18 @@ export const ExtraOptionContainer = styled.div`
     color: ${props => props.theme.form.hash};
     font-weight: 600;
 
-    text-decoration: underline;
+    text-decoration: none;
+
+    &:hover {
+      color: ${props => props.theme.form.hoverHash};
+    }
+
+    &:visited {
+      color: ${props => props.theme.form.hash};
+      &:hover {
+        color: ${props => props.theme.form.hoverHash};
+      }
+    }
 
     overflow: hidden;
     white-space: nowrap;

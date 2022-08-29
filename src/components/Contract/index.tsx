@@ -16,6 +16,7 @@ import {
 import { Card } from '@/views/blocks';
 import { core } from '@klever/sdk';
 import Form, { ISection } from 'components/Form';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -361,13 +362,11 @@ const Contract: React.FC<IContract> = ({
 
   const hashComponent = () => (
     <ExtraOptionContainer>
-      <a
-        href={`https://kleverscan.org/transaction/${txHash}`}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        hash: {txHash}
-      </a>
+      <Link href={`/transaction/${txHash}`}>
+        <a target="_blank" rel="noopener noreferrer">
+          Hash: {txHash}
+        </a>
+      </Link>
       <Copy data={txHash ? txHash : ''} />
       <CloseIcon onClick={() => setTxHash(null)} />
     </ExtraOptionContainer>

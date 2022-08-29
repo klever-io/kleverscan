@@ -26,6 +26,7 @@ const theme = {
     background: '#FFFFFF',
     sectionTitle: '#7B7DB2',
     hash: '#4b4d80',
+    hoverHash: '#0B0B1E',
   },
 
   navbar: {

@@ -26,6 +26,7 @@ const darktheme = {
     background: '#FFFFFF',
     sectionTitle: '#7B7DB2',
     hash: '#4b4d80',
+    hoverHash: '#6E7099',
   },
 
   navbar: {

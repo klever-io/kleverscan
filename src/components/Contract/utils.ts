@@ -1,4 +1,4 @@
-import { ICollectionList } from '@/types/index';
+import { ICollectionList, IKAssets } from '@/types/index';
 import { getPrecision } from '@/utils/index';
 import { TransactionType } from '@klever/sdk';
 
@@ -147,26 +147,81 @@ const contractHaveBucketId = (contract: string): boolean => {
   return contracts.includes(contract);
 };
 
+const filterByProperties = (assets: any[], typeAssetTrigger: number) => {
+  switch (typeAssetTrigger) {
+    case 0:
+      return assets.filter((item: IKAssets) => {
+        return item.properties?.canMint;
+      });
+
+    case 1:
+      return assets.filter((item: IKAssets) => {
+        return item.properties?.canBurn;
+      });
+
+    case 2:
+      return assets.filter((item: IKAssets) => {
+        return item.properties?.canWipe;
+      });
+
+    case 3:
+      return assets.filter((item: IKAssets) => {
+        return item.properties?.canPause && !item.isPaused;
+      });
+
+    case 4:
+      return assets.filter((item: IKAssets) => {
+        return item.isPaused;
+      });
+
+    case 5:
+      return assets.filter((item: IKAssets) => {
+        return item.properties?.canChangeOwner;
+      });
+
+    case 6:
+      return assets.filter((item: IKAssets) => {
+        return item.properties?.canAddRoles;
+      });
+
+    default:
+      return assets;
+  }
+};
+
+const showAssetIDInput = (
+  contractType: string,
+  typeAssetTrigger: number | null,
+): boolean => {
+  if (
+    contractType === 'AssetTriggerContract' &&
+    typeAssetTrigger !== null &&
+    !isNaN(typeAssetTrigger)
+  ) {
+    const doNotInput = [0, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13];
+    return !doNotInput.includes(typeAssetTrigger);
+  }
+
+  return true;
+};
+
 const getAssetsList = (
   assets: any[],
   contractType: string,
   typeAssetTrigger: number | null,
 ): any[] => {
   if (contractType === 'AssetTriggerContract' && typeAssetTrigger !== null) {
-    const bothCollectionNFT = [1, 2];
-    const justCollection = [0, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13];
+    const bothCollectionNFT = [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13];
     const justNFT = [8];
 
     if (bothCollectionNFT.includes(typeAssetTrigger)) {
-      return assets;
-    } else if (justCollection.includes(typeAssetTrigger)) {
-      return assets.filter((value: ICollectionList) => {
-        return !value.isNFT;
-      });
+      return filterByProperties(assets, typeAssetTrigger);
     } else if (justNFT.includes(typeAssetTrigger)) {
-      return assets.filter((value: ICollectionList) => {
+      const newAssets: IKAssets[] = assets.filter((value: IKAssets) => {
         return value.isNFT;
       });
+
+      return filterByProperties(newAssets, typeAssetTrigger);
     }
   } else if (contractType === 'FreezeContract') {
     return assets.filter((value: ICollectionList) => {
@@ -216,6 +271,7 @@ const parseValues = (
 
   if (contractHaveKDA(contractType, typeAssetTrigger)) {
     if (contractType === 'AssetTriggerContract') {
+      parsedValues.triggerType = typeAssetTrigger;
       parsedValues.assetId =
         assetID !== 0 ? `${collection.value}/${assetID}` : collection.value;
     } else {
@@ -322,6 +378,7 @@ export {
   getType,
   getAssetsList,
   getPrecision,
+  showAssetIDInput,
   precisionParse,
   parseValues,
   contractHaveKDA,

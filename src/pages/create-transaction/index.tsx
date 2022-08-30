@@ -3,7 +3,7 @@ import Contract from '@/components/Contract';
 import Title from '@/components/Layout/Title';
 import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
 import api from '@/services/api';
-import { ICollectionList, IParamList } from '@/types/index';
+import { ICollectionList, IKAssets, IParamList } from '@/types/index';
 import { INetworkParam, IProposalsResponse } from '@/types/proposals';
 import { doIf } from '@/utils/index';
 import { Container, Header } from '@/views/assets';
@@ -22,7 +22,35 @@ interface IContract {
 
 const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
   const [assetsList, setAssetsLists] = useState<any>([]);
+  const [kassetsList, setKAssetsList] = useState<IKAssets[]>([]);
   const router = useRouter();
+
+  const getKAssets = async (address: string) => {
+    const response: any = await api.get({
+      route: `assets/kassets`,
+      query: {
+        owner: address,
+        limit: 10000,
+      },
+    });
+    if (response.error) return;
+
+    const list: IKAssets[] = [];
+
+    if (response?.data?.assets?.length > 0) {
+      response.data.assets.forEach((item: any) => {
+        list.push({
+          label: item.assetId,
+          value: item.assetId,
+          properties: item.properties,
+          isNFT: item.assetType !== 'Fungible',
+          isPaused: item.attributes.isPaused,
+        });
+      });
+
+      setKAssetsList([...list]);
+    }
+  };
 
   const getAssets = async () => {
     if (typeof window !== 'undefined') {
@@ -36,6 +64,8 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
         );
 
         if (address) {
+          getKAssets(address);
+
           const account: any = await api.get({
             route: `address/${address}`,
           });
@@ -152,6 +182,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
         proposalsList={proposals}
         paramsList={paramsList}
         getAssets={getAssets}
+        kAssets={kassetsList}
       />
     </Container>
   );

@@ -5,7 +5,7 @@ import {
   Toggle,
   ToggleContainer,
 } from '@/components/Form/FormInput/styles';
-import { ICollectionList, IParamList } from '@/types/index';
+import { ICollectionList, IKAssets, IParamList } from '@/types/index';
 import formSection from '@/utils/formSections';
 import {
   assetTriggerTypes,
@@ -46,22 +46,26 @@ import {
   getType,
   parseValues,
   precisionParse,
+  showAssetIDInput,
 } from './utils';
 
 interface IContract {
   assetsList: ICollectionList[];
   proposalsList: any[];
   paramsList: IParamList[];
+  kAssets: IKAssets[];
   getAssets: () => void;
 }
 
 let triggerKey = 0;
 let claimKey = 0;
+let assetID = 0;
 
 const Contract: React.FC<IContract> = ({
   assetsList,
   proposalsList,
   paramsList,
+  kAssets,
   getAssets,
 }) => {
   const router = useRouter();
@@ -80,7 +84,6 @@ const Contract: React.FC<IContract> = ({
   const [selectedBucket, setSelectedBucket] = useState('');
   const [assetBalance, setAssetBalance] = useState<number | null>(null);
   const [collection, setCollection] = useState<any>({});
-  const [assetID, setAssetID] = useState(0);
   const [proposalId, setProposalId] = useState<number | null>(null);
   const [claimLabel, setClaimLabel] = useState('Asset ID');
 
@@ -180,7 +183,7 @@ const Contract: React.FC<IContract> = ({
     setAssetBalance(collection?.balance);
     const getAssetID = async () => {
       if (!collection.isNFT) {
-        setAssetID(0);
+        assetID = 0;
       }
     };
 
@@ -318,6 +321,7 @@ const Contract: React.FC<IContract> = ({
     <AssetTriggerContainer>
       <InputLabel>Trigger Type</InputLabel>
       <Select
+        getAssets={getAssets}
         options={assetTriggerTypes}
         onChange={value => setTypeAssetTrigger(value ? value.value : 0)}
       />
@@ -399,7 +403,11 @@ const Contract: React.FC<IContract> = ({
         </BalanceContainer>
 
         <Select
-          options={getAssetsList(assetsList, contractType, typeAssetTrigger)}
+          options={getAssetsList(
+            contractType === 'AssetTriggerContract' ? kAssets : assetsList,
+            contractType,
+            typeAssetTrigger,
+          )}
           onChange={value => {
             setCollection(value);
             if (contractType === 'UnfreezeContract') {
@@ -409,12 +417,12 @@ const Contract: React.FC<IContract> = ({
         />
       </SelectContent>
 
-      {collection?.isNFT && (
+      {collection?.isNFT && showAssetIDInput(contractType, typeAssetTrigger) && (
         <SelectContent>
           <FieldLabel>Asset ID</FieldLabel>
           <AssetIDInput
             type="number"
-            onChange={e => setAssetID(Number(e.target.value))}
+            onChange={e => (assetID = Number(e.target.value))}
           />
         </SelectContent>
       )}
@@ -446,7 +454,14 @@ const Contract: React.FC<IContract> = ({
             ? claimKey
             : contractType;
 
-        return <Form contractName={contractType} key={key} {...formProps} />;
+        return (
+          <Form
+            contractName={contractType}
+            key={key}
+            showForm={showForm()}
+            {...formProps}
+          />
+        );
     }
   };
 
@@ -468,6 +483,12 @@ const Contract: React.FC<IContract> = ({
         break;
     }
   };
+
+  const showForm = () =>
+    (contractType !== 'AssetTriggerContract' ||
+      typeAssetTrigger !== 1 ||
+      !collection?.isNFT) &&
+    !(typeAssetTrigger === 1 && Object.keys(collection).length === 0);
 
   return (
     <Container loading={loading ? loading : undefined}>

@@ -72,6 +72,16 @@ export interface IParamList {
   currentValue?: string;
 }
 
+interface IAssetProperties {
+  canAddRoles: boolean;
+  canFreeze: boolean;
+  canWipe: boolean;
+  canPause: boolean;
+  canMint: boolean;
+  canBurn: boolean;
+  canChangeOwner: boolean;
+}
+
 export interface ICollectionList {
   label: string;
   value: string;
@@ -81,6 +91,14 @@ export interface ICollectionList {
   precision?: number;
   buckets?: any[];
   minEpochsToWithdraw?: number | null;
+}
+
+export interface IKAssets {
+  label: string;
+  value: string;
+  properties?: IAssetProperties;
+  isNFT: boolean;
+  isPaused: boolean;
 }
 
 export interface IContractOption {

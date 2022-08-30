@@ -97,7 +97,7 @@ export const Card = styled.div`
     }
 
     p {
-      opacity: 0.4;
+      opacity: 0.7;
 
       font-size: 0.85rem;
       font-weight: 400;

@@ -475,6 +475,14 @@ interface ItotalValidatorSuccessRate {
   numFailure: number;
 }
 
+export interface IUri {
+  key: string;
+  value: string;
+}
+
+export interface IUris {
+  uris?: IUri[];
+}
 export interface IPeer {
   blsPublicKey: string;
   ownerAddress: string;
@@ -490,9 +498,7 @@ export interface IPeer {
   name: string;
   totalLeaderSuccessRate: ItotalLeaderSuccessRate;
   totalValidatorSuccessRate: ItotalValidatorSuccessRate;
-  uris: {
-    [index: string]: any;
-  };
+  uris: IUri[];
 }
 
 export interface IBlockCard {

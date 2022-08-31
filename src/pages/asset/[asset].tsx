@@ -620,9 +620,11 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
       facebook: 'https://facebook.com/LoveMonsterNFT',
       instagram: 'https://instagram.com/LoveMonsterNFT',
       medium: '',
-      metadata: 'QmNaa2KQ6NkjjESpPHEnAow9hivnsAkq2Gd6R26cHG28Er',
+      metadata:
+        'https://klever-mint.mypinata.cloud/ipfs/QmNaa2KQ6NkjjESpPHEnAow9hivnsAkq2Gd6R26cHG28Er',
       metadataExtension: 'png',
-      metadataImage: 'QmWVmUDPBeQzv6fG93JxQxFVee8b6smFD3RQosQXJHiZTJ',
+      metadataImage:
+        'https://klever-mint.mypinata.cloud/ipfs/QmWVmUDPBeQzv6fG93JxQxFVee8b6smFD3RQosQXJHiZTJ',
       telegram: 'https://t.me/LoveMonsterNFT',
       twitter: 'https://twitter.com/LoveMonsterNFT',
       website: 'https://lovemonsternft.com',

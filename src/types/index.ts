@@ -462,6 +462,7 @@ export interface IBlock {
   softwareVersion: string;
   chainID: string;
   producerName: string;
+  producerOwnerAddress: string;
 }
 
 interface ItotalLeaderSuccessRate {

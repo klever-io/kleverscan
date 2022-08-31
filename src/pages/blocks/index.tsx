@@ -303,6 +303,7 @@ const Blocks: React.FC<IBlocks> = ({
       nonce,
       size,
       producerName,
+      producerOwnerAddress,
       timestamp,
       txCount,
       txFees,
@@ -316,7 +317,10 @@ const Blocks: React.FC<IBlocks> = ({
         {String(nonce)}
       </Link>,
       <React.Fragment key={size}>{size.toLocaleString()} Bytes</React.Fragment>,
-      <Link href={`/validator/${producerName}`} key={producerName}>
+      <Link
+        href={`/validator/${producerOwnerAddress}`}
+        key={producerOwnerAddress}
+      >
         {parseAddress(producerName, 12)}
       </Link>,
       <small key={timestamp}>

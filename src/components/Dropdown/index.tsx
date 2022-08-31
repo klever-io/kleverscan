@@ -1,15 +1,7 @@
+import { IUris } from '@/types/index';
 import React, { useCallback, useState } from 'react';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { Container, ListUris } from './styles';
-
-interface IUri {
-  key: string;
-  value: string;
-}
-
-interface IUris {
-  uris?: IUri[];
-}
 
 const Dropdown: React.FC<IUris> = ({ uris }) => {
   const [showMore, setShowMore] = useState(false);

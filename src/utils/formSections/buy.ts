@@ -1,20 +1,12 @@
 import { ISection } from 'components/Form';
 
-const buyContract = (): ISection[] => {
+const buyContract = (labelId: string): ISection[] => {
   const section = [] as ISection[];
 
   section.push({
     fields: [
       {
-        label: 'Buy Type',
-        props: {
-          type: 'checkbox',
-          toggleOptions: ['ITO Buy', 'Market Buy'],
-          defaultValue: 0,
-        },
-      },
-      {
-        label: 'Id',
+        label: labelId,
         props: {
           required: true,
           tooltip: 'ITOBuy: ITO Asset ID, MarketBuy: order ID',

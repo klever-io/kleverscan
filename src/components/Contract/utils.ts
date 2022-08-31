@@ -266,6 +266,7 @@ const parseValues = (
   selectedBucket: string,
   proposalId: number | null,
   tokenChosen: boolean,
+  ITOBuy: boolean,
 ): any => {
   const parsedValues = JSON.parse(JSON.stringify(values));
 
@@ -290,6 +291,15 @@ const parseValues = (
     } else if (parsedValues.orderID) {
       parsedValues.id = parsedValues.orderID;
       delete parsedValues.orderID;
+    }
+  } else if (contractType === 'BuyContract') {
+    parsedValues.buyType = ITOBuy ? 0 : 1;
+    if (parsedValues.orderID) {
+      parsedValues.id = parsedValues.orderID;
+      delete parsedValues.orderID;
+    } else if (parsedValues.iTOAssetID) {
+      parsedValues.id = parsedValues.iTOAssetID;
+      delete parsedValues.iTOAssetID;
     }
   } else if (contractType === 'ProposalContract') {
     if (values.parameters) {

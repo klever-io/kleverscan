@@ -59,6 +59,7 @@ interface IContract {
 
 let triggerKey = 0;
 let claimKey = 0;
+let buyKey = 0;
 let assetID = 0;
 
 const Contract: React.FC<IContract> = ({
@@ -73,6 +74,7 @@ const Contract: React.FC<IContract> = ({
   const [formSections, setFormSections] = useState<ISection[]>([]);
   const [contractType, setContractType] = useState('');
   const [tokenChosen, setTokenChosen] = useState(false);
+  const [ITOBuy, setITOBuy] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
   const [ownerAddress, setOwnerAddress] = useState('');
   const [claimType, setClaimType] = useState(0);
@@ -86,6 +88,7 @@ const Contract: React.FC<IContract> = ({
   const [collection, setCollection] = useState<any>({});
   const [proposalId, setProposalId] = useState<number | null>(null);
   const [claimLabel, setClaimLabel] = useState('Asset ID');
+  const [buyLabel, setBuyLabel] = useState('Order ID');
 
   useEffect(() => {
     setAssetBalance(null);
@@ -190,6 +193,23 @@ const Contract: React.FC<IContract> = ({
     getAssetID();
   }, [collection]);
 
+  const defineBuyContract = (label: string) => {
+    buyKey += 1;
+    setFormSections([
+      ...formSection('BuyContract', '', ownerAddress, [], null, '', label),
+    ]);
+  };
+
+  useEffect(() => {
+    if (ITOBuy) {
+      setBuyLabel('ITO Asset ID');
+      defineBuyContract('ITO Asset ID');
+    } else {
+      setBuyLabel('Order ID');
+      defineBuyContract('Order ID');
+    }
+  }, [ITOBuy]);
+
   const handleOption = (selectedOption: any) => {
     setContractType(selectedOption.value);
 
@@ -213,6 +233,10 @@ const Contract: React.FC<IContract> = ({
         ]);
         break;
 
+      case 'BuyContract':
+        defineBuyContract(buyLabel);
+        break;
+
       default:
         setFormSections([
           ...formSection(selectedOption.value, '', ownerAddress),
@@ -232,6 +256,7 @@ const Contract: React.FC<IContract> = ({
       selectedBucket,
       proposalId,
       tokenChosen,
+      ITOBuy,
     );
 
     setLoading(true);
@@ -364,6 +389,23 @@ const Contract: React.FC<IContract> = ({
     </ExtraOptionContainer>
   );
 
+  const buyTypeToggle = () => (
+    <ExtraOptionContainer>
+      <ToggleContainer>
+        ITO Buy
+        <Toggle>
+          <StyledInput
+            type="checkbox"
+            defaultChecked={true}
+            onClick={() => setITOBuy(!ITOBuy)}
+          />
+          <Slider />
+        </Toggle>
+        Market Buy
+      </ToggleContainer>
+    </ExtraOptionContainer>
+  );
+
   const hashComponent = () => (
     <ExtraOptionContainer>
       <Link href={`/transaction/${txHash}`}>
@@ -452,6 +494,8 @@ const Contract: React.FC<IContract> = ({
             ? triggerKey
             : contractType === 'ClaimContract'
             ? claimKey
+            : contractType === 'BuyContract'
+            ? buyKey
             : contractType;
 
         return (
@@ -478,6 +522,9 @@ const Contract: React.FC<IContract> = ({
 
       case 'ClaimContract':
         return claimSelect();
+
+      case 'BuyContract':
+        return buyTypeToggle();
 
       default:
         break;

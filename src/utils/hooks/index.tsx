@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 export const useDidUpdateEffect = (fn: Function, inputs: Array<any>): void => {
   const didMountRef = useRef(false);
@@ -10,17 +10,4 @@ export const useDidUpdateEffect = (fn: Function, inputs: Array<any>): void => {
     }
     didMountRef.current = true;
   }, inputs);
-};
-
-export const useWidth = (): number => {
-  const [width, setWidth] = useState(0);
-
-  const handleResize = () => setWidth(window.innerWidth);
-
-  useEffect(() => {
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [handleResize]);
-
-  return width;
 };

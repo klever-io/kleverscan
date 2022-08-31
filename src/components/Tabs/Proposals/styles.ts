@@ -57,6 +57,11 @@ export const ProposerDescAndLink = styled.span`
   }
 `;
 
+export const ProposalTime = styled.span`
+  display: flex;
+  flex-direction: column;
+`;
+
 const DescriptionBorder = css`
   border-bottom: 1px solid ${props => lighten(0.33, props.theme.table.text)};
 `;

@@ -72,6 +72,16 @@ export interface IParamList {
   currentValue?: string;
 }
 
+interface IAssetProperties {
+  canAddRoles: boolean;
+  canFreeze: boolean;
+  canWipe: boolean;
+  canPause: boolean;
+  canMint: boolean;
+  canBurn: boolean;
+  canChangeOwner: boolean;
+}
+
 export interface ICollectionList {
   label: string;
   value: string;
@@ -81,6 +91,14 @@ export interface ICollectionList {
   precision?: number;
   buckets?: any[];
   minEpochsToWithdraw?: number | null;
+}
+
+export interface IKAssets {
+  label: string;
+  value: string;
+  properties?: IAssetProperties;
+  isNFT: boolean;
+  isPaused: boolean;
 }
 
 export interface IContractOption {
@@ -157,7 +175,7 @@ export interface IStakingInfo {
 export interface IRolesInfo {
   address: string;
   hasRoleMint: boolean;
-  hasRoleSetICOPrices: boolean;
+  hasRoleSetITOPrices: boolean;
 }
 
 export interface ICreateValidatorContract {
@@ -264,8 +282,12 @@ export interface ISetAccountNameContract {
   precision?: number;
 }
 
+export interface IProposalParameter {
+  [key: string]: string;
+}
+
 export interface IProposalContract {
-  parameters: number;
+  parameters: IProposalParameter;
   value: string;
   description: string;
   epochsDuration: number;
@@ -302,7 +324,7 @@ export interface ISetITOPricesContract {
 }
 
 export enum EnumBuyType {
-  ICOBuy = 0,
+  ITOBuy = 0,
   MarketBuy = 1,
 }
 
@@ -354,7 +376,7 @@ export interface IConfigMarketplaceContract {
   precision?: number;
 }
 
-type IParameter =
+export type IParameter =
   | ITransferContract
   | ICreateAssetContract
   | ICreateValidatorContract

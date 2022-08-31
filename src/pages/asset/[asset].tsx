@@ -614,6 +614,21 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
     return redirectProps;
   }
 
+  if (props.asset.assetId === 'LMNFT-SM99') {
+    props.asset.uris = {
+      discord: '',
+      facebook: 'https://facebook.com/LoveMonsterNFT',
+      instagram: 'https://instagram.com/LoveMonsterNFT',
+      medium: '',
+      metadata: 'QmNaa2KQ6NkjjESpPHEnAow9hivnsAkq2Gd6R26cHG28Er',
+      metadataExtension: 'png',
+      metadataImage: 'QmWVmUDPBeQzv6fG93JxQxFVee8b6smFD3RQosQXJHiZTJ',
+      telegram: 'https://t.me/LoveMonsterNFT',
+      twitter: 'https://twitter.com/LoveMonsterNFT',
+      website: 'https://lovemonsternft.com',
+    };
+  }
+
   return { props };
 };
 

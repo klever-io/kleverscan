@@ -1,4 +1,3 @@
-import { KLV } from '@/assets/coins';
 import { ArrowRight } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import { Transactions as Icon } from '@/assets/title-icons';
@@ -11,53 +10,55 @@ import Title from '@/components/Layout/Title';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Table, { ITable } from '@/components/Table';
-import { Row, Status } from '@/components/Table/styles';
+import { Status } from '@/components/Table/styles';
 import { contracts, status } from '@/configs/transactions';
 import api from '@/services/api';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import {
-  CenteredRow,
+  AssetTriggerSections,
+  BuySections,
+  CancelMarketOrderSections,
+  ClaimSections,
+  ConfigITOSections,
+  ConfigMarketplaceSections,
+  CreateAssetSections,
+  CreateMarketplaceSections,
+  CreateValidatorSections,
+  DelegateSections,
+  FreezeSections,
+  ProposalSections,
+  SellSections,
+  SetAccountNameSections,
+  SetITOPricesSections,
+  TransferSections,
+  UndelegateSections,
+  UnfreezeSections,
+  UnjailSections,
+  ValidatorConfigSections,
+  VoteSections,
+  WithdrawSections,
+} from '@/utils/transactionListSections';
+import {
   Container,
   FilterByDate,
   FilterContainer,
   Header,
-  Tooltip,
-  TooltipText,
 } from '@/views/transactions';
 import { Input } from '@/views/transactions/detail';
+import { useWidth } from 'contexts/width';
 import { format, fromUnixTime } from 'date-fns';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import Router, { useRouter } from 'next/router';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Contract,
   IAsset,
-  IAssetTriggerContract,
-  IBuyContract,
-  ICancelMarketOrderContract,
-  IClaimContract,
-  IConfigITOContract,
-  IConfigMarketplaceContract,
   IContract,
-  ICreateAssetContract,
-  ICreateMarketplaceContract,
-  ICreateValidatorContract,
-  IFreezeContract,
   IPagination,
-  IProposalContract,
   IResponse,
-  ISellContract,
-  ISetAccountNameContract,
-  ISetITOPricesContract,
   ITransaction,
   ITransferContract,
-  IUndelegateContract,
-  IUnfreezeContract,
-  IUnjailContract,
-  IValidatorConfigContract,
-  IVoteContract,
-  IWithdrawContract,
 } from '../../types';
 import { capitalizeString, formatAmount, parseAddress } from '../../utils';
 
@@ -110,6 +111,11 @@ const Transactions: React.FC<ITransactions> = ({
   const [transactionType, setTransactionType] = useState(defaultFilter);
   const [statusType, setStatusType] = useState(defaultFilter);
   const [coinType, setCoinType] = useState(defaultFilter);
+
+  const baseColumnSpans = [
+    2, 1, 1, 1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  ];
+  const [columnSpans, setColumnSpans] = useState(baseColumnSpans);
 
   const formatFilterQuery = useCallback(
     (type: string): IFilterItem | undefined => {
@@ -242,332 +248,56 @@ const Transactions: React.FC<ITransactions> = ({
       : Object.values(Contract)[contracts[0].type];
   }, []);
 
-  const Transfer: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as ITransferContract;
-    const tooltipRef = useRef<any>(null);
-
-    const handleMouseOver = (e: any) => {
-      const positionY = e.currentTarget.getBoundingClientRect().top;
-      const positionX = e.currentTarget.getBoundingClientRect().left;
-
-      tooltipRef.current.style.top = positionY - 30 + 'px';
-      tooltipRef.current.style.left = positionX + 'px';
-    };
-    return (
-      <>
-        <CenteredRow>
-          <div>
-            {parameter.assetId ? (
-              <Tooltip onMouseOver={(e: any) => handleMouseOver(e)}>
-                <Link href={`/asset/${parameter.assetId}`}>
-                  {parameter.assetId}
-                </Link>
-                <TooltipText ref={tooltipRef}>{parameter.assetId}</TooltipText>
-              </Tooltip>
-            ) : (
-              <>
-                <Tooltip onMouseOver={(e: any) => handleMouseOver(e)}>
-                  <Link href={`/asset/KLV`}>
-                    <KLV />
-                  </Link>
-                  <TooltipText ref={tooltipRef}>KLV</TooltipText>
-                </Tooltip>
-              </>
-            )}
-          </div>
-        </CenteredRow>
-        <span>
-          <strong>{formatAmount(parameter.amount / 10 ** precision)}</strong>
-        </span>
-      </>
-    );
-  };
-
-  const CreateAsset: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as ICreateAssetContract;
-
-    return (
-      <>
-        <span>{parameter.name}</span>
-        <span>
-          <small>{parameter.ticker}</small>
-        </span>
-      </>
-    );
-  };
-
-  const CreateValidator: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as ICreateValidatorContract;
-
-    return (
-      <>
-        <span>
-          <Link href={`/account/${parameter.config.rewardAddress}`}>
-            {parameter.config.rewardAddress}
-          </Link>
-        </span>
-        <span>
-          <strong>{parameter.config.canDelegate ? 'True' : 'False'}</strong>
-        </span>
-      </>
-    );
-  };
-
-  const ValidatorConfig: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IValidatorConfigContract;
-
-    return (
-      <>
-        <span>
-          <small>{parameter.config.blsPublicKey}</small>
-        </span>
-      </>
-    );
-  };
-
-  const Freeze: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IFreezeContract;
-
-    return (
-      <span>
-        <strong>
-          {formatAmount(parameter.amount / 10 ** precision)}{' '}
-          {parameter.assetId.replace(/['"]+/g, '')}
-        </strong>
-      </span>
-    );
-  };
-
-  const Unfreeze: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IUnfreezeContract;
-
-    return (
-      <span>
-        <small>{parameter.bucketID}</small>
-      </span>
-    );
-  };
-
-  const Delegate: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IUnfreezeContract;
-
-    return (
-      <>
-        <span>
-          <small>{parameter.bucketID}</small>
-        </span>
-      </>
-    );
-  };
-
-  const Undelegate: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IUndelegateContract;
-
-    return (
-      <span>
-        <small>{parameter.bucketID}</small>
-      </span>
-    );
-  };
-
-  const Withdraw: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IWithdrawContract;
-    return (
-      <>
-        <span>{parameter.assetId}</span>
-      </>
-    );
-  };
-
-  const Claim: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IClaimContract;
-
-    return (
-      <span>
-        <small>{parameter.claimType}</small>
-      </span>
-    );
-  };
-
-  const Unjail: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IUnjailContract;
-
-    return <></>;
-  };
-
-  const AssetTrigger: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IAssetTriggerContract;
-
-    return (
-      <span>
-        <small>{parameter.triggerType}</small>
-      </span>
-    );
-  };
-
-  const SetAccountName: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as ISetAccountNameContract;
-
-    return (
-      <span>
-        <small>{parameter.name}</small>
-      </span>
-    );
-  };
-
-  const Proposal: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IProposalContract;
-
-    return (
-      <>
-        <span>{parameter.parameters}</span>
-      </>
-    );
-  };
-
-  const Vote: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IVoteContract;
-
-    return (
-      <>
-        <span>{parameter.proposalId}</span>
-
-        <span>
-          <small>{parameter.amount}</small>
-        </span>
-      </>
-    );
-  };
-
-  const ConfigICO: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IConfigITOContract;
-
-    return (
-      <>
-        <span>{parameter.assetId}</span>
-      </>
-    );
-  };
-
-  const SetICOPrices: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as ISetITOPricesContract;
-
-    return (
-      <>
-        <span>{parameter.assetId}</span>
-      </>
-    );
-  };
-
-  const Buy: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IBuyContract;
-
-    return (
-      <>
-        <span>{parameter.buyType}</span>
-
-        <span>
-          <small>{parameter.amount}</small>
-        </span>
-      </>
-    );
-  };
-
-  const Sell: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as ISellContract;
-
-    return (
-      <>
-        <span>
-          <small>{parameter.assetId}</small>
-        </span>
-      </>
-    );
-  };
-
-  const CancelMarketOrder: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as ICancelMarketOrderContract;
-
-    return (
-      <>
-        <span>{parameter.orderId}</span>
-      </>
-    );
-  };
-
-  const CreateMarketplace: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as ICreateMarketplaceContract;
-
-    return (
-      <>
-        <span>{parameter.name}</span>
-      </>
-    );
-  };
-
-  const ConfigMarketplace: React.FC<IContract> = ({ parameter: par }) => {
-    const parameter = par as IConfigMarketplaceContract;
-
-    return <></>;
-  };
-
-  const FilteredComponent: React.FC<ITransaction> = ({ contract }) => {
+  const getFilteredSections = (contract: IContract[]): JSX.Element[] => {
     const contractType = getContractType(contract);
 
-    const getComponent: React.FC<any> = (Component: React.FC<IContract>) =>
-      contractType === transactionType.name ? (
-        <Component {...contract[0]} />
-      ) : (
-        <div />
-      );
-
-    switch (transactionType.name) {
+    switch (contractType) {
       case Contract.Transfer:
-        return getComponent(Transfer);
+        return TransferSections(contract[0].parameter);
       case Contract.CreateAsset:
-        return getComponent(CreateAsset);
+        return CreateAssetSections(contract[0].parameter);
       case Contract.CreateValidator:
-        return getComponent(CreateValidator);
+        return CreateValidatorSections(contract[0].parameter);
       case Contract.ValidatorConfig:
-        return getComponent(ValidatorConfig);
+        return ValidatorConfigSections(contract[0].parameter);
       case Contract.Freeze:
-        return getComponent(Freeze);
+        return FreezeSections(contract[0].parameter);
       case Contract.Unfreeze:
-        return getComponent(Unfreeze);
+        return UnfreezeSections(contract[0].parameter);
       case Contract.Delegate:
-        return getComponent(Delegate);
+        return DelegateSections(contract[0].parameter);
       case Contract.Undelegate:
-        return getComponent(Undelegate);
+        return UndelegateSections(contract[0].parameter);
       case Contract.Withdraw:
-        return getComponent(Withdraw);
+        return WithdrawSections(contract[0].parameter);
       case Contract.Claim:
-        return getComponent(Claim);
+        return ClaimSections(contract[0].parameter);
       case Contract.Unjail:
-        return getComponent(Unjail);
+        return UnjailSections(contract[0].parameter);
       case Contract.AssetTrigger:
-        return getComponent(AssetTrigger);
+        return AssetTriggerSections(contract[0].parameter);
       case Contract.SetAccountName:
-        return getComponent(SetAccountName);
+        return SetAccountNameSections(contract[0].parameter);
       case Contract.Proposal:
-        return getComponent(Proposal);
+        return ProposalSections(contract[0].parameter);
       case Contract.Vote:
-        return getComponent(Vote);
+        return VoteSections(contract[0].parameter);
       case Contract.ConfigITO:
-        return getComponent(ConfigICO);
+        return ConfigITOSections(contract[0].parameter);
       case Contract.SetITOPrices:
-        return getComponent(SetICOPrices);
+        return SetITOPricesSections(contract[0].parameter);
       case Contract.Buy:
-        return getComponent(Buy);
+        return BuySections(contract[0].parameter);
       case Contract.Sell:
-        return getComponent(Sell);
+        return SellSections(contract[0].parameter);
       case Contract.CancelMarketOrder:
-        return getComponent(CancelMarketOrder);
+        return CancelMarketOrderSections(contract[0].parameter);
       case Contract.CreateMarketplace:
-        return getComponent(CreateMarketplace);
+        return CreateMarketplaceSections(contract[0].parameter);
       case Contract.ConfigMarketplace:
-        return getComponent(ConfigMarketplace);
+        return ConfigMarketplaceSections(contract[0].parameter);
       default:
-        return <div />;
+        return [<></>];
     }
   };
 
@@ -613,7 +343,7 @@ const Transactions: React.FC<ITransactions> = ({
         newHeaders = ['Name'];
         break;
       case Contract.Proposal:
-        newHeaders = ['Parameter'];
+        newHeaders = ['Description'];
         break;
       case Contract.Vote:
         newHeaders = ['Proposal Id', 'Amount'];
@@ -646,7 +376,9 @@ const Transactions: React.FC<ITransactions> = ({
     return header;
   };
 
-  const TableBody: React.FC<ITransaction> = props => {
+  const { isMobile } = useWidth();
+
+  const rowSections = (props: ITransaction): JSX.Element[] => {
     const {
       hash,
       blockNum,
@@ -668,56 +400,57 @@ const Transactions: React.FC<ITransactions> = ({
       toAddress = parameter.toAddress;
     }
 
-    return (
-      <Row type="transactions" filter={transactionType}>
-        <span>
-          <Link href={`/transaction/${hash}`}>{parseAddress(hash, 28)}</Link>
-        </span>
-        <Link href={`/block/${blockNum || 0}`}>
-          <a className="address">{blockNum || 0}</a>
-        </Link>
-        <span>
-          <small>
-            {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
-          </small>
-        </span>
-        <Link href={`/account/${sender}`}>
-          <a className="address">{parseAddress(sender, 16)}</a>
-        </Link>
-        <span style={{ overflow: 'visible' }}>
-          <ArrowRight />
-        </span>
-        <Link href={`/account/${toAddress}`}>
-          <a className="address">{parseAddress(toAddress, 16)}</a>
-        </Link>
-        <Status status={status}>
-          <StatusIcon />
-          <span>{capitalizeString(status)}</span>
-        </Status>
-        <span>
-          <strong>{contractType}</strong>
-        </span>
-        {transactionType.value === 'all' && (
-          <>
-            <span>
-              <strong>{formatAmount(kAppFee / 10 ** precision)}</strong>
-            </span>
-            <span>
-              <strong>{formatAmount(bandwidthFee / 10 ** precision)}</strong>
-            </span>
-          </>
-        )}
+    const sections = [
+      <Link href={`/transaction/${hash}`} key={hash}>
+        {parseAddress(hash, 28)}
+      </Link>,
+      <Link href={`/block/${blockNum || 0}`} key={blockNum}>
+        <a className="address">{blockNum || 0}</a>
+      </Link>,
+      <small key={timestamp}>
+        {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
+      </small>,
+      <Link href={`/account/${sender}`} key={sender}>
+        <a className="address">{parseAddress(sender, 16)}</a>
+      </Link>,
+      !isMobile ? <ArrowRight /> : <></>,
+      <Link href={`/account/${toAddress}`} key={toAddress}>
+        <a className="address">{parseAddress(toAddress, 16)}</a>
+      </Link>,
+      <Status status={status} key={status}>
+        <StatusIcon />
+        <span>{capitalizeString(status)}</span>
+      </Status>,
+      <strong key={contractType}>{contractType}</strong>,
+      transactionType.value === 'all' ? (
+        <strong>{formatAmount(kAppFee / 10 ** precision)}</strong>
+      ) : (
+        <></>
+      ),
+      transactionType.value === 'all' ? (
+        <strong>{formatAmount(bandwidthFee / 10 ** precision)}</strong>
+      ) : (
+        <></>
+      ),
+    ];
 
-        <FilteredComponent {...props} />
-      </Row>
-    );
+    const filteredContract = getFilteredSections(contract);
+
+    if (transactionType.value !== 'all') {
+      sections.pop();
+      sections.pop();
+      sections.push(...filteredContract);
+    }
+
+    return sections;
   };
 
   const tableProps: ITable = {
     type: 'transactions',
     header: getHeader(),
     data: transactions as any[],
-    body: TableBody,
+    rowSections,
+    columnSpans,
     filter: transactionType,
     loading,
   };

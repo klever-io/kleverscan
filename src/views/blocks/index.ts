@@ -6,8 +6,8 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: 890px) {
-    padding: 3rem 3rem 5rem 3rem;
+  @media (max-width: 768px) {
+    padding: 3rem 1rem 5rem 1rem;
   }
 `;
 
@@ -97,7 +97,7 @@ export const Card = styled.div`
     }
 
     p {
-      opacity: 0.4;
+      opacity: 0.7;
 
       font-size: 0.85rem;
       font-weight: 400;

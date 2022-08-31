@@ -1,6 +1,6 @@
 import { getStatusIcon } from '@/assets/status';
 import Table, { ITable } from '@/components/Table';
-import { Row, Status } from '@/components/Table/styles';
+import { Status } from '@/components/Table/styles';
 import {
   IFullInfoParam,
   IParsedProposal,
@@ -8,9 +8,10 @@ import {
 } from '@/types/proposals';
 import { capitalizeString, parseAddress } from '@/utils/index';
 import Link from 'next/link';
-import React, { useCallback, useRef } from 'react';
+import React, { useRef } from 'react';
 import {
   ProposalStatus,
+  ProposalTime,
   ProposerDescAndLink,
   Tooltip,
   TooltipText,
@@ -18,7 +19,9 @@ import {
 } from './styles';
 
 const Proposals: React.FC<IProposalsProps> = ({ proposals, loading }) => {
-  const TableBody: React.FC<IParsedProposal> = props => {
+  const tooltipRef = useRef<any>(null);
+
+  const rowSections = (props: IParsedProposal): JSX.Element[] => {
     const {
       proposalId,
       epochStart,
@@ -29,8 +32,6 @@ const Proposals: React.FC<IProposalsProps> = ({ proposals, loading }) => {
       votes,
       parsedParameters,
     } = props;
-
-    const tooltipRef = useRef<any>(null);
 
     const renderProposalsNetworkParams = (
       fullParameters: IFullInfoParam[] | undefined,
@@ -60,7 +61,7 @@ const Proposals: React.FC<IProposalsProps> = ({ proposals, loading }) => {
       });
     };
 
-    const renderProposalsNetworkParamsWithToolTip = useCallback(() => {
+    const renderProposalsNetworkParamsWithToolTip = () => {
       if (parsedParameters) {
         return (
           <Tooltip onMouseOver={(e: any) => handleMouseOver(e)}>
@@ -76,7 +77,7 @@ const Proposals: React.FC<IProposalsProps> = ({ proposals, loading }) => {
         );
       }
       return <></>;
-    }, [parsedParameters]);
+    };
 
     const handleMouseOver = (e: any) => {
       const positionY = e.currentTarget.getBoundingClientRect().top;
@@ -106,35 +107,34 @@ const Proposals: React.FC<IProposalsProps> = ({ proposals, loading }) => {
       }
       return <span style={{ color: 'red' }}>Unavailable</span>;
     };
-    return (
-      <Row type="proposals">
-        <span>
-          <p>#{proposalId}</p>
-        </span>
-        <ProposerDescAndLink>
-          <Link href={`/account/${proposer}`}>
-            <a>{parseAddress(proposer, 14)}</a>
-          </Link>
-        </ProposerDescAndLink>
-        <span>
-          <small>Created Epoch: {epochStart}</small> <p />
-          <small className="endTime">Ending Epoch: {epochEnd}</small>
-        </span>
-        <UpVotes>
-          <p>
-            {getPositiveVotes()}/{parseTotalStaked()}
-          </p>
-        </UpVotes>
-        <Status status={proposalStatus}>
-          <StatusIcon />
-          <ProposalStatus>{capitalizeString(proposalStatus)}</ProposalStatus>
-        </Status>
-        <span>{renderProposalsNetworkParamsWithToolTip()}</span>
-        <span>
-          <Link href={{ pathname: `/proposal/${proposalId}` }}>Details</Link>
-        </span>
-      </Row>
-    );
+    const sections = [
+      <p key={proposalId}>#{proposalId}</p>,
+      <ProposerDescAndLink key={proposer}>
+        <Link href={`/account/${proposer}`}>
+          <a>{parseAddress(proposer, 14)}</a>
+        </Link>
+      </ProposerDescAndLink>,
+      <ProposalTime key={`${epochStart}/${epochEnd}`}>
+        <small>Created Epoch: {epochStart}</small>
+        <small className="endTime">Ending Epoch: {epochEnd}</small>
+      </ProposalTime>,
+      <UpVotes key={String(votes)}>
+        <p>
+          {getPositiveVotes()}/{parseTotalStaked()}
+        </p>
+      </UpVotes>,
+      <Status status={proposalStatus} key={proposalStatus}>
+        <StatusIcon />
+        <ProposalStatus>{capitalizeString(proposalStatus)}</ProposalStatus>
+      </Status>,
+      <span key={String(parsedParameters)}>
+        {renderProposalsNetworkParamsWithToolTip()}
+      </span>,
+      <Link href={{ pathname: `/proposal/${proposalId}` }} key={proposalId}>
+        Details
+      </Link>,
+    ];
+    return sections;
   };
 
   const header = [
@@ -148,7 +148,8 @@ const Proposals: React.FC<IProposalsProps> = ({ proposals, loading }) => {
   ];
 
   const tableProps: ITable = {
-    body: TableBody,
+    rowSections,
+    columnSpans: [1, 1, 1, 1, 2, 2, 2],
     data: proposals as any[],
     loading: loading,
     header,

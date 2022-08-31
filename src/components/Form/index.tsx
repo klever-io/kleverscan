@@ -63,6 +63,7 @@ const Form: React.FC<any> = ({
   setData,
   setIsMultisig,
   isMultisig,
+  showForm,
 }) => {
   const formRef = useRef<FormHandles>(null);
   const [sections, setSections] = useState(defaultSections);
@@ -291,19 +292,20 @@ const Form: React.FC<any> = ({
 
   return (
     <FormBody {...formProps}>
-      {sections.map((section: any, index: number) => {
-        return (
-          <>
-            {sections.length === 1 && section.title && <FormGap />}
-            <FormSection key={String(index)}>
-              <SectionTitle>{section.title}</SectionTitle>
-              {getSectionInputs(section, index)}
-            </FormSection>
-          </>
-        );
-      })}
+      {showForm &&
+        sections.map((section: any, index: number) => {
+          return (
+            <>
+              {sections.length === 1 && section.title && <FormGap />}
+              <FormSection key={String(index)}>
+                <SectionTitle>{section.title}</SectionTitle>
+                {getSectionInputs(section, index)}
+              </FormSection>
+            </>
+          );
+        })}
 
-      {children}
+      {showForm && children}
 
       {sections.length > 0 || isEmptyContract(contractName) ? (
         <>

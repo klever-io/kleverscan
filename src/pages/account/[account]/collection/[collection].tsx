@@ -30,7 +30,7 @@ const Validators: React.FC<ICollectionPage> = ({
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [collection, setCollection] = useState<INfts[]>(initialCollection);
-  const header = ['Nonce', 'Collection', 'Asset Id', 'Address', ''];
+  const header = ['ID', 'Collection', 'Asset Id', 'Address', ''];
 
   const fetchData = async () => {
     setLoading(true);

@@ -1,5 +1,6 @@
 const darktheme = {
   dark: true,
+  maxWidth: '1900px',
   background: '#030307',
   white: '#0B0B1E',
   black: '#ccc',
@@ -26,6 +27,7 @@ const darktheme = {
     background: '#FFFFFF',
     sectionTitle: '#7B7DB2',
     hash: '#4b4d80',
+    hoverHash: '#6E7099',
   },
 
   navbar: {

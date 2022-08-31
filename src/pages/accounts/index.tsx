@@ -4,14 +4,14 @@ import Title from '@/components/Layout/Title';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Table, { ITable } from '@/components/Table';
-import { Row } from '@/components/Table/styles';
 import api from '@/services/api';
 import { IAccount, IPagination, IResponse } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
-import { formatAmount, getAge } from '@/utils/index';
+import { formatAmount, getAge, parseAddress } from '@/utils/index';
 import { TableContainer } from '@/views/accounts';
 import { CenteredRow } from '@/views/accounts/detail';
 import { Card, CardContainer, Container, Header, Input } from '@/views/blocks';
+import { useWidth } from 'contexts/width';
 import { fromUnixTime } from 'date-fns';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
@@ -133,45 +133,37 @@ const Accounts: React.FC<IAccounts> = ({
 
   const header = ['Address', 'KLV Staked', 'Nonce', 'KLV Balance'];
 
-  const TableBody: React.FC<IAccount> = ({ address, balance, nonce }) => {
-    // const getFreezeBalance = () => {
-    //   if (Object.values(buckets).length <= 0) {
-    //     return 0;
-    //   }
+  const { isMobile } = useWidth();
 
-    //   const freezeBalance = Object.values(buckets).reduce(
-    //     (acc, bucket) => acc + bucket.balance,
-    //     0,
-    //   );
+  const rowSections = (account: IAccount): JSX.Element[] => {
+    const { address, balance, frozenBalance, nonce } = account;
+    const sections = [
+      <CenteredRow key={address}>
+        <Link href={`/account/${address}`}>
+          {isMobile ? parseAddress(address, 28) : address}
+        </Link>
 
-    //   return freezeBalance / 10 ** precision;
-    // };
+        <Copy info="Address" data={address} />
+      </CenteredRow>,
 
-    return (
-      <Row type="accounts">
-        <span>
-          <CenteredRow>
-            <Link href={`/account/${address}`}>{address}</Link>
+      <strong key={frozenBalance}>
+        {formatAmount(frozenBalance / 10 ** precision)} KLV
+      </strong>,
+      <span key={nonce}>{nonce}</span>,
 
-            <Copy info="Address" data={address} />
-          </CenteredRow>
-        </span>
-        <span>
-          <strong>{/* {formatAmount(getFreezeBalance())}  */}-- KLV</strong>
-        </span>
-        <span>{nonce}</span>
-        <span>
-          <strong>{formatAmount(balance / 10 ** precision)} KLV</strong>
-        </span>
-      </Row>
-    );
+      <strong key={balance}>
+        {formatAmount(balance / 10 ** precision)} KLV
+      </strong>,
+    ];
+    return sections;
   };
 
   const tableProps: ITable = {
     type: 'accounts',
     header,
     data: accounts as any[],
-    body: TableBody,
+    rowSections,
+    columnSpans: [2],
     loading,
   };
 

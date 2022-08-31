@@ -6,8 +6,8 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: 1000px) {
-    padding: 3rem 3rem 5rem 3rem;
+  @media (max-width: 768px) {
+    padding: 3rem 1rem 5rem 1rem;
   }
 `;
 
@@ -16,6 +16,8 @@ export const Header = styled.section`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+
+  margin-bottom: 1rem;
 
   @media (max-width: 768px) {
     flex-direction: column;

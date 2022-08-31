@@ -4,7 +4,6 @@ import Title from '@/components/Layout/Title';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Table, { ITable } from '@/components/Table';
-import { Row } from '@/components/Table/styles';
 import api from '@/services/api';
 import { IBlock, IPagination, IResponse } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
@@ -299,57 +298,53 @@ const Blocks: React.FC<IBlocks> = ({
     'Block Rewards',
   ];
 
-  const TableBody: React.FC<IBlock> = ({
-    nonce,
-    size,
-    producerName,
-    timestamp,
-    txCount,
-    txFees,
-    kAppFees,
-    txBurnedFees,
-    blockRewards,
-  }) => {
-    return (
-      <Row type="blocks">
-        <span>
-          <Link href={`/block/${nonce}`}>{String(nonce)}</Link>
-        </span>
-        <span>{size.toLocaleString()} Bytes</span>
-        <Link href={`/validator/${producerName}`}>
-          {parseAddress(producerName, 14)}
-        </Link>
-        <span>
-          <small>
-            {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
-          </small>
-        </span>
-        <span>{txCount}</span>
-        <span>
-          <small>{`${formatAmount(
-            (txBurnedFees || 0) / 10 ** precision,
-          )} KLV`}</small>
-        </span>
-        <span>
-          <small>{formatAmount((kAppFees || 0) / 10 ** precision)} KLV</small>
-        </span>
-        <span>
-          <small>{formatAmount((txFees || 0) / 10 ** precision)} KLV</small>
-        </span>
-        <span>
-          <strong>
-            {formatAmount((blockRewards || 0) / 10 ** precision)} KLV
-          </strong>
-        </span>
-      </Row>
-    );
+  const rowSections = (block: IBlock): JSX.Element[] => {
+    const {
+      nonce,
+      size,
+      producerName,
+      timestamp,
+      txCount,
+      txFees,
+      kAppFees,
+      txBurnedFees,
+      blockRewards,
+    } = block;
+
+    const sections = [
+      <Link href={`/block/${nonce}`} key={nonce}>
+        {String(nonce)}
+      </Link>,
+      <React.Fragment key={size}>{size.toLocaleString()} Bytes</React.Fragment>,
+      <Link href={`/validator/${producerName}`} key={producerName}>
+        {parseAddress(producerName, 12)}
+      </Link>,
+      <small key={timestamp}>
+        {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
+      </small>,
+      <React.Fragment key={txCount}>{txCount}</React.Fragment>,
+      <small key={txBurnedFees}>{`${formatAmount(
+        (txBurnedFees || 0) / 10 ** precision,
+      )} KLV`}</small>,
+      <small key={kAppFees}>
+        {formatAmount((kAppFees || 0) / 10 ** precision)} KLV
+      </small>,
+      <small key={txFees}>
+        {formatAmount((txFees || 0) / 10 ** precision)} KLV
+      </small>,
+      <strong key={blockRewards}>
+        {formatAmount((blockRewards || 0) / 10 ** precision)} KLV
+      </strong>,
+    ];
+
+    return sections;
   };
 
   const tableProps: ITable = {
     type: 'blocks',
     header,
     data: blocks as any[],
-    body: TableBody,
+    rowSections,
     loading,
   };
 

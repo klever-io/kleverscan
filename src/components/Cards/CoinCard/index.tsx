@@ -129,12 +129,12 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, assetsData }) => {
                             U${' '}
                             {coin.shortname === 'KLV'
                               ? coin.price.toLocaleString(undefined, {
-                                  maximumFractionDigits: 2,
+                                  maximumFractionDigits: 6,
                                 })
                               : assetsData?.kfi?.prices?.todaysPrice
                               ? assetsData?.kfi?.prices?.todaysPrice.toLocaleString(
                                   undefined,
-                                  { maximumFractionDigits: 2 },
+                                  { maximumFractionDigits: 6 },
                                 )
                               : '--'}
                           </span>
@@ -173,7 +173,7 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, assetsData }) => {
                     <ValueDetail
                       positive={
                         coin.shortname === 'KLV'
-                          ? getVariation(coin.volume.variation).includes('+')
+                          ? getVariation(coin.marketCap.variation).includes('+')
                           : getVariation(0).includes('+')
                       }
                     >

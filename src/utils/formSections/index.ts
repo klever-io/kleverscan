@@ -65,6 +65,7 @@ const formSection = (
   paramsList?: IParamList[],
   assetTriggerType?: number | null,
   claimLabel?: string,
+  buyLabel?: string,
 ): ISection[] => {
   const contractsSections = {
     CreateAssetContract: type
@@ -78,7 +79,7 @@ const formSection = (
     WithdrawContract: withdrawContract(),
     ProposalContract: proposalContract(paramsList),
     VoteContract: voteContract(),
-    BuyContract: buyContract(),
+    BuyContract: buyContract(buyLabel ? buyLabel : 'Id'),
     SellContract: sellContract(),
     CancelMarketOrderContract: cancelMarketOrderContract(),
     CreateMarketplaceContract: createMarketplaceContract(),

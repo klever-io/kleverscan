@@ -227,7 +227,7 @@ export const mockedTxContractComponents = {
     type: Contract.Buy,
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
     parameter: {
-      buyType: EnumBuyType.ICOBuy,
+      buyType: EnumBuyType.ITOBuy,
       id: 'KLV',
     },
   },

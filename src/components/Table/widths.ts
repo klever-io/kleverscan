@@ -319,10 +319,11 @@ const proposals = css`
     width: 12rem;
   }
   &:nth-child(6) {
-    width: 16rem;
+    width: 14rem;
   }
   &:nth-child(7) {
     width: 5rem;
+    margin-left: 2rem;
   }
 `;
 const votes = css`

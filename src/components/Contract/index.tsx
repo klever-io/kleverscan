@@ -5,7 +5,7 @@ import {
   Toggle,
   ToggleContainer,
 } from '@/components/Form/FormInput/styles';
-import { ICollectionList, IParamList } from '@/types/index';
+import { ICollectionList, IKAssets, IParamList } from '@/types/index';
 import formSection from '@/utils/formSections';
 import {
   assetTriggerTypes,
@@ -16,6 +16,7 @@ import {
 import { Card } from '@/views/blocks';
 import { core } from '@klever/sdk';
 import Form, { ISection } from 'components/Form';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -45,22 +46,27 @@ import {
   getType,
   parseValues,
   precisionParse,
+  showAssetIDInput,
 } from './utils';
 
 interface IContract {
   assetsList: ICollectionList[];
   proposalsList: any[];
   paramsList: IParamList[];
+  kAssets: IKAssets[];
   getAssets: () => void;
 }
 
 let triggerKey = 0;
 let claimKey = 0;
+let buyKey = 0;
+let assetID = 0;
 
 const Contract: React.FC<IContract> = ({
   assetsList,
   proposalsList,
   paramsList,
+  kAssets,
   getAssets,
 }) => {
   const router = useRouter();
@@ -68,6 +74,7 @@ const Contract: React.FC<IContract> = ({
   const [formSections, setFormSections] = useState<ISection[]>([]);
   const [contractType, setContractType] = useState('');
   const [tokenChosen, setTokenChosen] = useState(false);
+  const [ITOBuy, setITOBuy] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
   const [ownerAddress, setOwnerAddress] = useState('');
   const [claimType, setClaimType] = useState(0);
@@ -79,9 +86,9 @@ const Contract: React.FC<IContract> = ({
   const [selectedBucket, setSelectedBucket] = useState('');
   const [assetBalance, setAssetBalance] = useState<number | null>(null);
   const [collection, setCollection] = useState<any>({});
-  const [assetID, setAssetID] = useState(0);
   const [proposalId, setProposalId] = useState<number | null>(null);
   const [claimLabel, setClaimLabel] = useState('Asset ID');
+  const [buyLabel, setBuyLabel] = useState('Order ID');
 
   useEffect(() => {
     setAssetBalance(null);
@@ -179,12 +186,29 @@ const Contract: React.FC<IContract> = ({
     setAssetBalance(collection?.balance);
     const getAssetID = async () => {
       if (!collection.isNFT) {
-        setAssetID(0);
+        assetID = 0;
       }
     };
 
     getAssetID();
   }, [collection]);
+
+  const defineBuyContract = (label: string) => {
+    buyKey += 1;
+    setFormSections([
+      ...formSection('BuyContract', '', ownerAddress, [], null, '', label),
+    ]);
+  };
+
+  useEffect(() => {
+    if (ITOBuy) {
+      setBuyLabel('ITO Asset ID');
+      defineBuyContract('ITO Asset ID');
+    } else {
+      setBuyLabel('Order ID');
+      defineBuyContract('Order ID');
+    }
+  }, [ITOBuy]);
 
   const handleOption = (selectedOption: any) => {
     setContractType(selectedOption.value);
@@ -209,6 +233,10 @@ const Contract: React.FC<IContract> = ({
         ]);
         break;
 
+      case 'BuyContract':
+        defineBuyContract(buyLabel);
+        break;
+
       default:
         setFormSections([
           ...formSection(selectedOption.value, '', ownerAddress),
@@ -228,6 +256,7 @@ const Contract: React.FC<IContract> = ({
       selectedBucket,
       proposalId,
       tokenChosen,
+      ITOBuy,
     );
 
     setLoading(true);
@@ -317,6 +346,7 @@ const Contract: React.FC<IContract> = ({
     <AssetTriggerContainer>
       <InputLabel>Trigger Type</InputLabel>
       <Select
+        getAssets={getAssets}
         options={assetTriggerTypes}
         onChange={value => setTypeAssetTrigger(value ? value.value : 0)}
       />
@@ -359,15 +389,30 @@ const Contract: React.FC<IContract> = ({
     </ExtraOptionContainer>
   );
 
+  const buyTypeToggle = () => (
+    <ExtraOptionContainer>
+      <ToggleContainer>
+        ITO Buy
+        <Toggle>
+          <StyledInput
+            type="checkbox"
+            defaultChecked={true}
+            onClick={() => setITOBuy(!ITOBuy)}
+          />
+          <Slider />
+        </Toggle>
+        Market Buy
+      </ToggleContainer>
+    </ExtraOptionContainer>
+  );
+
   const hashComponent = () => (
     <ExtraOptionContainer>
-      <a
-        href={`https://kleverscan.org/transaction/${txHash}`}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        hash: {txHash}
-      </a>
+      <Link href={`/transaction/${txHash}`}>
+        <a target="_blank" rel="noopener noreferrer">
+          Hash: {txHash}
+        </a>
+      </Link>
       <Copy data={txHash ? txHash : ''} />
       <CloseIcon onClick={() => setTxHash(null)} />
     </ExtraOptionContainer>
@@ -400,7 +445,11 @@ const Contract: React.FC<IContract> = ({
         </BalanceContainer>
 
         <Select
-          options={getAssetsList(assetsList, contractType, typeAssetTrigger)}
+          options={getAssetsList(
+            contractType === 'AssetTriggerContract' ? kAssets : assetsList,
+            contractType,
+            typeAssetTrigger,
+          )}
           onChange={value => {
             setCollection(value);
             if (contractType === 'UnfreezeContract') {
@@ -410,12 +459,12 @@ const Contract: React.FC<IContract> = ({
         />
       </SelectContent>
 
-      {collection?.isNFT && (
+      {collection?.isNFT && showAssetIDInput(contractType, typeAssetTrigger) && (
         <SelectContent>
           <FieldLabel>Asset ID</FieldLabel>
           <AssetIDInput
             type="number"
-            onChange={e => setAssetID(Number(e.target.value))}
+            onChange={e => (assetID = Number(e.target.value))}
           />
         </SelectContent>
       )}
@@ -445,9 +494,18 @@ const Contract: React.FC<IContract> = ({
             ? triggerKey
             : contractType === 'ClaimContract'
             ? claimKey
+            : contractType === 'BuyContract'
+            ? buyKey
             : contractType;
 
-        return <Form contractName={contractType} key={key} {...formProps} />;
+        return (
+          <Form
+            contractName={contractType}
+            key={key}
+            showForm={showForm()}
+            {...formProps}
+          />
+        );
     }
   };
 
@@ -465,10 +523,19 @@ const Contract: React.FC<IContract> = ({
       case 'ClaimContract':
         return claimSelect();
 
+      case 'BuyContract':
+        return buyTypeToggle();
+
       default:
         break;
     }
   };
+
+  const showForm = () =>
+    (contractType !== 'AssetTriggerContract' ||
+      typeAssetTrigger !== 1 ||
+      !collection?.isNFT) &&
+    !(typeAssetTrigger === 1 && Object.keys(collection).length === 0);
 
   return (
     <Container loading={loading ? loading : undefined}>

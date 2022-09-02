@@ -267,7 +267,7 @@ export const CardContainer = styled.div`
 
   div {
     span {
-      color: ${props => props.theme.form.sectionTitle};
+      color: ${props => props.theme.darkText};
     }
   }
 

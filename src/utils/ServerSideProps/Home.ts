@@ -398,11 +398,14 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
             break;
 
           case 10:
-            props.yesterdayTransactions = value.data.number_by_day[0].doc_count;
+            if (value.data?.number_by_day?.length > 0)
+              props.yesterdayTransactions =
+                value.data?.number_by_day[0]?.doc_count;
             break;
 
           case 11:
-            props.yesterdayAccounts = value.data.number_by_day[0].doc_count;
+            if (value.data?.number_by_day?.length > 0)
+              props.yesterdayAccounts = value.data?.number_by_day[0]?.doc_count;
             break;
 
           case 12:

@@ -12,10 +12,10 @@ const defaultStyles = css`
   width: 100%;
 
   padding: 0.5rem 1rem;
-  border: 1px solid ${({ theme }) => theme.input.border.dark};
+  border: 1px solid ${({ theme }) => theme.darkText};
   border-radius: 0.5rem;
 
-  color: ${({ theme }) => theme.input.border.dark};
+  color: ${({ theme }) => theme.darkText};
 
   background-color: transparent;
 
@@ -227,7 +227,7 @@ export const FieldLabel = styled.label`
   font-size: smaller;
   font-weight: 600;
   display: flex;
-  color: ${({ theme }) => theme.input.border.dark};
+  color: ${({ theme }) => theme.darkText};
   margin-bottom: 0.3rem;
 `;
 
@@ -236,7 +236,7 @@ export const BalanceLabel = styled.label`
   font-size: smaller;
   font-weight: 600;
   display: flex;
-  color: ${({ theme }) => theme.input.border.dark};
+  color: ${({ theme }) => theme.darkText};
   margin-bottom: 0.3rem;
 `;
 

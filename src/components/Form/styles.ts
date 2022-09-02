@@ -63,7 +63,7 @@ export const SectionTitle = styled.div`
   width: calc(100% - 2rem);
   font-weight: 600;
   display: flex;
-  color: ${props => props.theme.form.sectionTitle};
+  color: ${props => props.theme.darkText};
   position: absolute;
   top: 1rem;
   left: 1rem;
@@ -82,7 +82,7 @@ export const InputWrapper = styled.div``;
 export const FormGap = styled.div<ISpaceForm>``;
 
 export const ButtonContainer = styled.button<IButton>`
-  background-color: ${props => props.theme.form.sectionTitle};
+  background-color: ${props => props.theme.darkText};
   padding-top: 15px;
   padding-bottom: 15px;
   padding-left: 10px;
@@ -117,16 +117,16 @@ export const AdvancedOptsContainer = styled.div`
   cursor: pointer;
   margin-top: 1rem;
   span {
-    color: ${({ theme }) => theme.input.border.dark};
+    color: ${({ theme }) => theme.darkText};
     margin-right: 0.5rem;
     user-select: none;
   }
 `;
 
 export const ArrowUpIcon = styled(IoIosArrowUp)`
-  color: ${({ theme }) => theme.input.border.dark};
+  color: ${({ theme }) => theme.darkText};
 `;
 
 export const ArrowDownIcon = styled(IoIosArrowDown)`
-  color: ${({ theme }) => theme.input.border.dark};
+  color: ${({ theme }) => theme.darkText};
 `;

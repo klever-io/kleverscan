@@ -99,7 +99,7 @@ export const Input = styled(DefaultInput)`
   background-color: ${props => props.theme.white};
 
   &:focus-within {
-    box-shadow: 0 0 10px -4px ${props => props.theme.input.shadow};
+    box-shadow: 0 0 10px -4px ${props => props.theme.violet};
   }
 
   input {
@@ -196,7 +196,7 @@ export const DataCardValue = styled.div`
   gap: 0.25rem;
 
   span {
-    color: ${props => props.theme.card.text};
+    color: ${props => props.theme.lightGray};
     font-size: 0.85rem;
   }
 
@@ -292,13 +292,13 @@ export const BlockCardRow = styled.div`
   p {
     font-weight: 600;
     font-size: 0.95rem;
-    color: ${props => props.theme.blockCard.text};
+    color: ${props => props.theme.darkText};
   }
 
   small {
     font-weight: 400;
     font-size: 0.85rem;
-    color: ${props => props.theme.blockCard.text};
+    color: ${props => props.theme.darkText};
   }
 
   a {
@@ -412,7 +412,7 @@ export const TransactionEmpty = styled(TransactionRow)`
 
   span {
     font-weight: 400;
-    color: ${props => transparentize(0.5, props.theme.transactionCard.text)};
+    color: ${props => transparentize(0.5, props.theme.darkText)};
   }
 `;
 
@@ -454,13 +454,13 @@ export const TransactionData = styled.div`
     font-weight: 400;
     font-size: 0.85rem;
 
-    color: ${props => props.theme.transactionCard.text};
+    color: ${props => props.theme.darkText};
   }
 
   strong {
     font-weight: 600;
 
-    color: ${props => props.theme.transactionCard.text};
+    color: ${props => props.theme.darkText};
   }
 
   p {
@@ -491,7 +491,7 @@ export const TransactionAmount = styled.div`
     text-overflow: ellipsis;
     white-space: nowrap;
 
-    color: ${props => props.theme.transactionCard.amount};
+    color: ${props => props.theme.secondaryText};
   }
 `;
 
@@ -512,7 +512,7 @@ export const TransactionChart = styled(TransactionContent)`
 
   p {
     font-size: 1rem;
-    color: ${props => props.theme.transactionCard.text};
+    color: ${props => props.theme.darkText};
   }
 `;
 

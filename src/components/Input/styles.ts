@@ -9,7 +9,7 @@ export const Container = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  border: 1px solid ${props => props.theme.input.border.default};
+  border: 1px solid ${props => props.theme.lightGray};
   border-radius: 0.5rem;
 
   cursor: text;
@@ -21,14 +21,14 @@ export const Container = styled.div`
 
     font-size: 0.85rem;
 
-    color: ${props => props.theme.input.text};
+    color: ${props => props.theme.darkText};
 
     &::placeholder {
-      color: ${props => props.theme.input.text};
+      color: ${props => props.theme.darkText};
     }
 
     &::selection {
-      background-color: ${props => props.theme.input.text};
+      background-color: ${props => props.theme.darkText};
     }
 
     @media (max-width: 768px) {

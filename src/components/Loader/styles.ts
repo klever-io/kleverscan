@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 export const Loader = styled(DefaultLoader).attrs(props => ({
   type: 'TailSpin',
-  color: props.theme.input.shadow,
+  color: props.theme.violet,
   height: 30,
   width: 30,
 }))``;

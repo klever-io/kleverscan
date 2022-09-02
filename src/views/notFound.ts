@@ -36,7 +36,7 @@ export const Content = styled.div`
   span {
     max-width: 30rem;
 
-    color: ${props => props.theme.input.text};
+    color: ${props => props.theme.darkText};
     font-weight: 400;
   }
 
@@ -80,14 +80,14 @@ const hoverBackground = css`
 `;
 
 const hoverNoBackground = css`
-  background-color: ${props => transparentize(0.8, props.theme.input.shadow)};
+  background-color: ${props => transparentize(0.8, props.theme.violet)};
 `;
 
 export const Button = styled.div<{ hasBackground: boolean }>`
   padding: 1rem 2rem;
 
   background-color: ${props =>
-    props.hasBackground ? props.theme.input.shadow : 'transparent'};
+    props.hasBackground ? props.theme.violet : 'transparent'};
 
   border-radius: 0.5rem;
 
@@ -96,7 +96,7 @@ export const Button = styled.div<{ hasBackground: boolean }>`
   span {
     font-weight: 500;
     color: ${props =>
-      props.hasBackground ? props.theme.white : props.theme.input.shadow};
+      props.hasBackground ? props.theme.white : props.theme.violet};
   }
 
   transition: 0.2s ease;

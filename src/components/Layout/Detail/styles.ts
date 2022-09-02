@@ -51,7 +51,7 @@ export const Input = styled(DefaultInput)`
 
   background-color: ${props => props.theme.white};
 
-  border-color: ${props => props.theme.filter.border};
+  border-color: ${props => props.theme.lightGray};
 
   @media (max-width: 768px) {
     width: 100%;
@@ -105,13 +105,13 @@ export const Card = styled.div`
 
       font-size: 0.85rem;
       font-weight: 400;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     small {
       font-size: 0.85rem;
       font-weight: 600;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
   }
 `;

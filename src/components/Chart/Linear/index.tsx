@@ -45,7 +45,7 @@ const Chart: React.FC<IChart> = ({ data, theme, value }) => {
   const axisProps = {
     axisLine: false,
     tickLine: false,
-    style: { fill: theme.chart.linear.fill, fontSize: '.75rem' },
+    style: { fill: theme.lightBlue, fontSize: '.75rem' },
   };
 
   return (
@@ -68,7 +68,7 @@ const Chart: React.FC<IChart> = ({ data, theme, value }) => {
           dataKey="value"
           dot={false}
           strokeWidth={2}
-          stroke={theme.chart.linear.stroke}
+          stroke={theme.violet}
         />
         <Tooltip content={<CustomTooltip />} />
       </LineChart>

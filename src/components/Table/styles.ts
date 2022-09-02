@@ -48,7 +48,7 @@ export const Header = styled.div<ITableType>`
 
   min-width: 100%;
 
-  color: ${props => props.theme.table.text};
+  color: ${props => props.theme.darkText};
   font-weight: 600;
   font-size: 0.85rem;
 
@@ -121,13 +121,13 @@ export const Row = styled.div<ITableType>`
     }
 
     small {
-      color: ${props => props.theme.table.text};
+      color: ${props => props.theme.darkText};
     }
 
     strong {
       font-weight: 400;
       font-size: 0.95rem;
-      color: ${props => props.theme.table.text};
+      color: ${props => props.theme.darkText};
     }
 
     p {
@@ -272,6 +272,6 @@ export const EmptyRow = styled(Row)`
 
   p {
     font-weight: 400;
-    color: ${props => transparentize(0.5, props.theme.table.text)};
+    color: ${props => transparentize(0.5, props.theme.darkText)};
   }
 `;

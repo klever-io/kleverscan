@@ -28,9 +28,7 @@ const Chart: React.FC<IChart> = ({ data, theme, bg = 'regular' }) => {
             />
             <stop
               offset="90%"
-              stopColor={
-                bg === 'regular' ? theme.chart.lightBg : theme.chart.darkBg
-              }
+              stopColor={bg === 'regular' ? theme.violet : theme.chart.darkBg}
               stopOpacity={0}
             />
           </linearGradient>

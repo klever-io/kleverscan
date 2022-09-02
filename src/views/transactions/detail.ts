@@ -55,7 +55,7 @@ export const Input = styled(DefaultInput)`
 
   background-color: ${props => props.theme.white};
 
-  border-color: ${props => props.theme.filter.border};
+  border-color: ${props => props.theme.lightGray};
 
   input {
     min-width: 12rem;
@@ -116,13 +116,13 @@ export const Row = styled.div`
     strong {
       font-weight: 600;
       font-size: 0.95rem;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     small {
       font-weight: 400;
       font-size: 0.95rem;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     a {
@@ -132,7 +132,7 @@ export const Row = styled.div`
     }
 
     p {
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
       font-weight: 400;
     }
   }

@@ -58,9 +58,7 @@ describe('Component: Header/navbar', () => {
   it(`Should have the correct style background for the navbar\'s container`, () => {
     const { container } = renderWithTheme(<Navbar />);
 
-    expect(container.firstChild).toHaveStyle(
-      `background: ${theme.navbar.background}`,
-    );
+    expect(container.firstChild).toHaveStyle(`background: ${theme.black}`);
   });
 
   it('Should have the correct style for the navbar items - desktop version', () => {
@@ -90,7 +88,7 @@ describe('Component: Header/navbar', () => {
     };
     const dropDownMenuStyle = {
       width: 'max-content',
-      background: theme.navbar.background,
+      background: theme.black,
       color: theme.navbar.text,
     };
 

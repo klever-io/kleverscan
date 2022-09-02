@@ -8,7 +8,7 @@ export const MapContainer = styled.div`
   background-color: ${props => props.theme.white};
   border-radius: 0.5rem;
 
-  box-shadow: 0 2px 15px ${props => props.theme.table.shadow};
+  box-shadow: 0 2px 15px ${props => props.theme.shadow};
 `;
 
 export const CardDetails = styled.div<{ variation?: boolean }>`
@@ -57,7 +57,7 @@ export const ChartContainer = styled.div`
   background-color: ${props => props.theme.white};
   border-radius: 0.5rem;
 
-  box-shadow: 0 2px 15px ${props => props.theme.table.shadow};
+  box-shadow: 0 2px 15px ${props => props.theme.shadow};
 `;
 
 export const ChartHeader = styled.div`

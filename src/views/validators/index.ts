@@ -49,7 +49,7 @@ export const ProgressIndicator = styled.div<{ percent: number }>`
   height: 100%;
   width: ${props => `${props.percent}%`};
 
-  background-color: ${props => props.theme.tab.indicator};
+  background-color: ${props => props.theme.violet};
   border-radius: 0.25rem;
 
   opacity: 0.6;

@@ -114,7 +114,7 @@ export const MobileItem = styled(Item)`
 export const Input = styled(DefaultInput)`
   margin-left: auto;
   width: 25%;
-  border-color: ${props => props.theme.input.border.dark};
+  border-color: ${props => props.theme.darkText};
 
   @media (max-width: 1024px) {
     display: none;
@@ -222,7 +222,7 @@ export const MobileBackground = styled.div<IMobileMenu>`
   visibility: ${props => (props.opened ? 'visible' : 'hidden')};
 
   background-color: ${props =>
-    transparentize(props.theme.dark ? 0.85 : 0.7, props.theme.true.black)};
+    transparentize(props.theme.dark ? 0.85 : 0.7, props.theme.black)};
 
   transition: opacity 0.5s ease, visibility 0.5s ease;
 `;

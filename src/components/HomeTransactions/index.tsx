@@ -40,7 +40,7 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
       const assets: IAssetResponse = await api.get({ route: 'assets/kassets' });
       if (!transactions.error && !assets.error) {
         transactions.data.transactions = addPrecisionTransactions(
-          transactions.data.transactions,
+          transactions?.data?.transactions,
         );
         setTransactions(transactions.data.transactions);
         setTotalTransactions(transactions.pagination.totalRecords);

@@ -38,7 +38,7 @@ export const InputLabel = styled.label`
   display: flex;
   gap: 0.5rem;
 
-  color: ${({ theme }) => theme.input.border.dark};
+  color: ${({ theme }) => theme.darkText};
 
   transition: transform 0.2s ease;
 `;
@@ -60,9 +60,9 @@ export const FieldContainer = styled.div`
 export const DataField = styled.textarea`
   width: 100%;
   min-height: 10rem;
-  color: ${({ theme }) => theme.input.border.dark};
+  color: ${({ theme }) => theme.darkText};
   padding: 10px;
-  border: 1px solid ${({ theme }) => theme.input.border.dark};
+  border: 1px solid ${({ theme }) => theme.darkText};
 `;
 
 export const ToggleContainer = styled.div`
@@ -70,6 +70,6 @@ export const ToggleContainer = styled.div`
   justify-content: flex-start;
   padding: 0.75rem 2rem;
   gap: 1rem;
-  color: ${props => props.theme.input.text};
+  color: ${props => props.theme.darkText};
   user-select: none;
 `;

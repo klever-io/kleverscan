@@ -108,7 +108,7 @@ export const Input = styled(DefaultInput)`
 
   background-color: ${props => props.theme.white};
 
-  border-color: ${props => props.theme.filter.border};
+  border-color: ${props => props.theme.lightGray};
 `;
 
 export const CardContainer = styled.div`
@@ -162,13 +162,13 @@ export const Row = styled.div`
     strong {
       font-weight: 600;
       font-size: 0.95rem;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     small {
       font-weight: 400;
       font-size: 0.95rem;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     a {
@@ -179,7 +179,7 @@ export const Row = styled.div`
     }
 
     p {
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
       font-weight: 400;
     }
   }
@@ -246,7 +246,7 @@ export const Rating = styled.p.attrs<IRatingProps>(props => ({
       ? props.theme.table.success
       : props.rate === 'yellow'
       ? props.theme.table.pending
-      : props.theme.table.fail};
+      : props.theme.red};
 
   color: ${props => props.theme.white} !important;
   font-weight: 400;
@@ -258,7 +258,7 @@ const getStakedBGColor = (props: any, percent: number) => {
   if (percent < 30) {
     return props.theme.rose;
   } else if (percent < 60) {
-    return props.theme.chart.lightBg;
+    return props.theme.violet;
   } else if (percent < 90) {
     return props.theme.purple;
   } else {

@@ -19,10 +19,10 @@ const defaultStyles = css`
   width: 100%;
 
   padding: 0.5rem 1rem;
-  border: 1px solid ${({ theme }) => theme.input.border.dark};
+  border: 1px solid ${({ theme }) => theme.darkText};
   border-radius: 0.5rem;
 
-  color: ${({ theme }) => theme.input.border.dark};
+  color: ${({ theme }) => theme.darkText};
 
   background-color: transparent;
 
@@ -142,7 +142,7 @@ export const ToggleContainer = styled.div<IProps>`
   gap: 1rem;
   opacity: ${props => (props.disabled ? 0.6 : 1)};
   pointer-events: ${props => (props.disabled ? 'none' : 'auto')};
-  color: ${props => props.theme.input.text};
+  color: ${props => props.theme.darkText};
   user-select: none;
 `;
 
@@ -208,7 +208,7 @@ export const RightContentContainer = styled.div`
 
 export const InfoIcon = styled(BsQuestionCircleFill)`
   height: 1rem;
-  color: ${({ theme }) => theme.input.border.dark};
+  color: ${({ theme }) => theme.darkText};
 `;
 
 export const TooltipContainer = styled.div<{
@@ -226,7 +226,7 @@ export const TooltipContainer = styled.div<{
 
       margin-left: 0.5rem;
 
-      background-color: ${props => props.theme.form.sectionTitle};
+      background-color: ${props => props.theme.darkText};
       color: ${props => props.theme.white};
 
       padding: 0.5rem;
@@ -268,7 +268,7 @@ export const InputLabel = styled.label<ILabel>`
 
   gap: 0.5rem;
 
-  color: ${({ theme }) => theme.input.border.dark};
+  color: ${({ theme }) => theme.darkText};
 
   transition: transform 0.2s ease;
 

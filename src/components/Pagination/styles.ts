@@ -32,7 +32,7 @@ export const ArrowContainer = styled.div<{ active: boolean }>`
   align-items: center;
   justify-content: center;
 
-  background-color: ${props => props.theme.true.white};
+  background-color: ${props => props.theme.white};
 
   border-radius: 50%;
 
@@ -58,7 +58,7 @@ export const ItemContainer = styled.div<{
   justify-content: center;
 
   background-color: ${props =>
-    props.active ? props.theme.pagination.active : 'transparent'};
+    props.active ? props.theme.purple : 'transparent'};
 
   border-radius: 50%;
 
@@ -73,7 +73,7 @@ export const ItemContainer = styled.div<{
     ${props =>
       !props.active
         ? css`
-            background-color: ${props => props.theme.pagination.active};
+            background-color: ${props => props.theme.purple};
             color: ${props => props.theme.white};
           `
         : css`

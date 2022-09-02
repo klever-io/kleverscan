@@ -83,7 +83,7 @@ describe('Component: TransactionContractComponents', () => {
       const rowStrongStyle = {
         fontWeight: '600',
         fontSize: '0.95rem',
-        color: theme.card.darkText,
+        color: theme.darkText,
       };
 
       const centeredRow = screen.getByText(/Amount/i).parentNode?.nextSibling;

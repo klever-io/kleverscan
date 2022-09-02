@@ -10,10 +10,10 @@ export const TooltipContainer = styled.div`
       color: black;
     }
     :nth-child(2) {
-      color: ${props => props.theme.chart.linear.stroke};
+      color: ${props => props.theme.violet};
     }
     :nth-child(3) {
-      color: ${props => props.theme.chart.linear.fill};
+      color: ${props => props.theme.lightBlue};
     }
   }
 `;

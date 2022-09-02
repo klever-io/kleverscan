@@ -127,6 +127,7 @@ export const getServerSideProps: GetServerSideProps<INftPage> = async ({
   const response: INftResponse = await api.get({
     route: `address/${address}/collection/${assetId}`,
   });
+
   if (response.error) {
     return redirectProps;
   }
@@ -138,6 +139,10 @@ export const getServerSideProps: GetServerSideProps<INftPage> = async ({
     assetId: assetId,
     address,
   };
+
+  if (!props.nft) {
+    return redirectProps;
+  }
 
   return { props };
 };

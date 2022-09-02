@@ -9,20 +9,19 @@ const createMarketplaceContract = (): ISection[] => {
         label: 'Name',
         props: {
           required: true,
-          tooltip: 'Marketplace name',
         },
       },
       {
         label: 'Referral Address',
         props: {
-          tooltip: 'Royalties receiving address',
+          tooltip: 'Address that will receive royalties',
         },
       },
       {
         label: 'Referral Percentage',
         props: {
           type: 'number',
-          tooltip: 'Royalties percentage (precision 2)',
+          tooltip: 'Royalties percentage with 2 decimals',
         },
       },
     ],

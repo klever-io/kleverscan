@@ -208,13 +208,14 @@ export const getServerSideProps: GetServerSideProps<any> = async () => {
     });
   }
 
-  networkParams?.forEach((param: INetworkParam) => {
-    paramsList.push({
-      value: param.number,
-      label: `${param.parameter}: ${param.currentValue}`,
-      currentValue: param.currentValue,
+  networkParams.length &&
+    networkParams?.forEach((param: INetworkParam) => {
+      paramsList.push({
+        value: param.number,
+        label: `${param.parameter}: ${param.currentValue}`,
+        currentValue: param.currentValue,
+      });
     });
-  });
 
   const proposals: any = [];
 

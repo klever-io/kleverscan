@@ -30,9 +30,10 @@ const assetTriggerContract = (type?: number | null): ISection[] => {
       break;
 
     case 6:
-      section = []
+      section = [];
       section.push({
         title: 'Role',
+        tooltip: 'Set permissions to specific address',
         fields: [
           {
             label: 'Role',

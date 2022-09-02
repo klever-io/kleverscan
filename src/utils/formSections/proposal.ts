@@ -9,14 +9,14 @@ const proposalContract = (paramsList?: IParamList[]): ISection[] => {
       {
         label: 'Description',
         props: {
-          tooltip: 'Proposal description',
+          tooltip: 'Outline the ideas of the proposal',
         },
       },
       {
         label: 'Epochs Duration',
         props: {
           required: true,
-          tooltip: 'Proposal epochs duration',
+          tooltip: 'The time the proposal will be available for voting',
         },
       },
     ],

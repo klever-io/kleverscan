@@ -546,6 +546,7 @@ const Contract: React.FC<IContract> = ({
         onChange={handleOption}
         getAssets={getAssets}
         title={'Contract'}
+        isContractSelect
       />
 
       {contractsDescription[contractType] && (

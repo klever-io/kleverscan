@@ -59,15 +59,22 @@ export const FormSection = styled.div<{ inner?: boolean }>`
 `;
 
 export const SectionTitle = styled.div`
-  font-size: 1.2rem;
+  p {
+    &:first-child {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+  }
+
   width: calc(100% - 2rem);
-  font-weight: 600;
   display: flex;
   color: ${props => props.theme.darkText};
   position: absolute;
   top: 1rem;
   left: 1rem;
   user-select: none;
+  gap: 0.5rem;
+  align-items: center;
 `;
 
 export const TooltipSpace = styled.div`

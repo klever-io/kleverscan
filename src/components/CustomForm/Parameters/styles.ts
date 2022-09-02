@@ -10,4 +10,5 @@ export const SectionTitle = styled.div`
   top: 1rem;
   left: 1rem;
   user-select: none;
+  gap: 0.5rem;
 `;

@@ -211,38 +211,40 @@ export const InfoIcon = styled(BsQuestionCircleFill)`
   color: ${({ theme }) => theme.darkText};
 `;
 
+export const TooltipContent = styled.div`
+  &:hover {
+    visibility: visible;
+  }
+  color: ${props => props.theme.form.tooltip};
+  position: absolute;
+  display: inline-block;
+  background-color: ${props => props.theme.form.tooltipContainer};
+  padding: 0.4rem 0.5rem 0.4rem 0.5rem;
+  margin-left: 0.5rem;
+  border-radius: 0.2rem;
+  font-size: smaller;
+  visibility: hidden;
+
+  @media (min-width: 950px) {
+    white-space: pre;
+  }
+
+  @media (max-width: 950px) {
+    width: auto;
+    min-width: 18rem;
+  }
+`;
+
 export const TooltipContainer = styled.div<{
   tooltip?: string;
 }>`
   user-select: none;
 
   position: relative;
-  z-index: 10;
 
   &:hover {
-    &::after {
-      font-size: 0.75rem;
-      letter-spacing: initial;
-
-      margin-left: 0.5rem;
-
-      background-color: ${props => props.theme.darkText};
-      color: ${props => props.theme.white};
-
-      padding: 0.5rem;
-
-      border-radius: 5px;
-
-      z-index: 900;
-
-      white-space: pre;
-
-      transform: translate(-50%, 100%);
-      ${props =>
-        props.tooltip &&
-        css`
-          content: '${props.tooltip}';
-        `}
+    div {
+      visibility: visible;
     }
   }
 
@@ -258,6 +260,7 @@ export const InputLabel = styled.label<ILabel>`
   font-size: smaller;
   font-weight: 600;
   transform: translate(-1rem, -2.25rem);
+  z-index: 997;
 
   position: absolute;
   left: 1rem;

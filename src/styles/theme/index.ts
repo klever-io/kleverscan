@@ -35,6 +35,8 @@ const theme = {
     background: '#FFFFFF',
     hash: '#4b4d80',
     hoverHash: '#0B0B1E',
+    tooltip: '#FFFFFF',
+    tooltipContainer: '#646693',
   },
 
   navbar: {

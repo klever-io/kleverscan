@@ -35,6 +35,8 @@ const darktheme = {
     background: '#FFFFFF',
     hash: '#4b4d80',
     hoverHash: '#6E7099',
+    tooltip: '#FFFFFF',
+    tooltipContainer: '#646693',
   },
 
   navbar: {

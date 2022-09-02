@@ -38,7 +38,7 @@ const setAccountNameContract = (): ISection[] => {
     fields: [
       {
         label: 'Name',
-        props: { required: true, tooltip: 'Set sender name of account' },
+        props: { required: true },
       },
     ],
   });

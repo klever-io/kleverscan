@@ -2,6 +2,10 @@
 import { lighten } from 'polished';
 import styled, { css } from 'styled-components';
 
+interface IContainer {
+  isContractSelect?: boolean;
+}
+
 const ReactSelect = css`
   .react-select {
     margin: 0.25rem 0;
@@ -93,13 +97,13 @@ const ReactSelect = css`
   }
 `;
 
-export const Container = styled.div`
+export const Container = styled.div<IContainer>`
   position: relative;
 
   height: 100%;
   width: 100%;
   display: flex;
-
+  z-index: ${props => (props.isContractSelect ? 999 : 998)};
   user-select: none;
 
   flex-direction: column;

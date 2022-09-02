@@ -98,10 +98,10 @@ const Contract: React.FC<IContract> = ({
           setOwnerAddress(window.kleverWeb.getWalletAddress());
         }
       } catch (error) {
-        router.push('/');
+        console.error(error);
       }
     }
-  }, []);
+  }, [contractType]);
 
   useEffect(() => {
     if (txHash) {

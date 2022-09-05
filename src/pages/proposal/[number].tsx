@@ -305,6 +305,14 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                   </span>
                   <span style={{ color: 'red' }}>{proposalAPI.epochEnd}</span>
                 </HalfRow>
+                <HalfRow>
+                  <span>
+                    <strong>Actual Epoch</strong>
+                  </span>
+                  <span>
+                    <span>{proposalAPI.overview.epochNumber}</span>
+                  </span>
+                </HalfRow>
               </Row>
               <Row>
                 <span>
@@ -462,6 +470,8 @@ export const getServerSideProps: GetStaticProps<IProposal> = async ({
   });
   const { data } = await api.get({ route: 'network/network-parameters' });
 
+  const { data: overviewData } = await api.get({ route: 'node/overview' });
+
   let props = proposalInfos?.data?.proposal;
   if (!props) {
     props = {};
@@ -472,6 +482,7 @@ export const getServerSideProps: GetStaticProps<IProposal> = async ({
   const parsedParameters = getProposalNetworkParams(props.parameters, data);
   props.parsedParameters = parsedParameters?.fullInfoParams;
   props.currentNetworkParams = parsedParameters?.currentNetworkParams;
+  props.overview = overviewData?.overview;
 
   return { props };
 };

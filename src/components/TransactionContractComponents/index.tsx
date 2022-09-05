@@ -1158,12 +1158,14 @@ export const Sell: React.FC<IContract> = ({ parameter: par }) => {
         </span>
         <span>{(parameter?.price / precision).toLocaleString()}</span>
       </Row>{' '}
-      <Row>
-        <span>
-          <strong>Reserve Price</strong>
-        </span>
-        <span>{(parameter?.reservePrice / precision).toLocaleString()}</span>
-      </Row>
+      {parameter?.reservePrice && (
+        <Row>
+          <span>
+            <strong>Reserve Price</strong>
+          </span>
+          <span>{(parameter?.reservePrice / precision).toLocaleString()}</span>
+        </Row>
+      )}
       <Row>
         <span>
           <strong>End Time</strong>

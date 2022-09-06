@@ -60,7 +60,7 @@ const Chart: React.FC<IChart> = ({ data, theme, value }) => {
         <XAxis
           dataKey="date"
           scale="auto"
-          padding={{ left: 20 }}
+          padding={{ left: 20, right: 30 }}
           {...axisProps}
         />
         <Line

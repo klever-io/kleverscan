@@ -8,3 +8,10 @@ export const Loader = styled(DefaultLoader).attrs(props => ({
   height: 30,
   width: 30,
 }))``;
+
+export const HomeLoader = styled(DefaultLoader).attrs(props => ({
+  type: 'TailSpin',
+  color: props.theme.input.shadow,
+  height: '40%',
+  width: '40%',
+}))``;

@@ -2,6 +2,10 @@ import Chart, { ChartType } from '@/components/Chart';
 import api from '@/services/api';
 import { addPrecisionTransactions } from '@/utils/index';
 import {
+  ContainerTimeFilter,
+  HomeLoaderContainer,
+  ItemTimeFilter,
+  ListItemTimeFilter,
   Section,
   TransactionChart,
   TransactionChartContent,
@@ -18,17 +22,24 @@ import {
   IHomeTransactions,
   ITransactionResponse,
 } from '../../types';
+import { HomeLoader } from '../Loader/styles';
 import TransactionItem from '../TransactionItem';
 
 const HomeTransactions: React.FC<IHomeTransactions> = ({
   setTotalTransactions,
-  transactionsList,
+  transactionsList: defaultTransactionList,
   transactions: defaultTransactions,
   precision,
 }) => {
+  const filterDays = [1, 7, 15, 30];
   const { t } = useTranslation('transactions');
   const { t: commonT } = useTranslation('common');
   const [transactions, setTransactions] = useState(defaultTransactions);
+  const [transactionsList, setTransactionsList] = useState(
+    defaultTransactionList,
+  );
+  const [timeFilter, setTimeFilter] = useState(16);
+  const [loadingDailyTxs, setLoadingDailyTxs] = useState(false);
 
   const transactionsWatcherInterval = 4 * 1000;
 
@@ -51,6 +62,25 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
       clearInterval(transactionsWatcher);
     };
   }, []);
+
+  useEffect(() => {
+    const fetchTotalDays = async () => {
+      setLoadingDailyTxs(true);
+      try {
+        const res = await api.getCached({
+          route: `transaction/list/count/${timeFilter}`,
+        });
+        if (!res.error || res.error === '') {
+          setTransactionsList(res.data.number_by_day);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+      setLoadingDailyTxs(false);
+    };
+
+    fetchTotalDays();
+  }, [timeFilter]);
 
   const getTransactionChartData = useCallback(() => {
     const sortedTransactionsList = transactionsList.sort(
@@ -99,14 +129,30 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
           ))}
         </TransactionContent>
         <TransactionChart>
-          <span>{t('Daily Transactions')}</span>
-          <p>
-            ({transactionsList.length} {commonT('Date.Day').toLocaleLowerCase()}
-            {transactionsList.length > 1 ? 's' : ''})
-          </p>
-          <TransactionChartContent>
-            <Chart type={ChartType.Linear} data={getTransactionChartData()} />
-          </TransactionChartContent>
+          <ContainerTimeFilter>
+            <span>{t('Daily Transactions')}</span>
+            <ListItemTimeFilter>
+              {filterDays.map(item => (
+                <ItemTimeFilter
+                  key={String(item)}
+                  onClick={() => setTimeFilter(item + 1)}
+                  selected={!!(timeFilter === item + 1)}
+                >
+                  {item !== 30 ? `${String(item)}D` : '1M'}
+                </ItemTimeFilter>
+              ))}
+            </ListItemTimeFilter>
+          </ContainerTimeFilter>
+          {loadingDailyTxs && (
+            <HomeLoaderContainer>
+              <HomeLoader />
+            </HomeLoaderContainer>
+          )}
+          {!loadingDailyTxs && (
+            <TransactionChartContent>
+              <Chart type={ChartType.Linear} data={getTransactionChartData()} />
+            </TransactionChartContent>
+          )}
         </TransactionChart>
       </TransactionContainer>
     </Section>

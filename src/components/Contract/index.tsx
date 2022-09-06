@@ -111,20 +111,21 @@ const Contract: React.FC<IContract> = ({
 
   useEffect(() => {
     setFormSections([
-      ...formSection(
-        'ClaimContract',
-        '',
-        ownerAddress,
-        paramsList,
-        typeAssetTrigger,
+      ...formSection({
+        contract: 'ClaimContract',
+        address: ownerAddress,
         claimLabel,
-      ),
+      }),
     ]);
   }, [claimLabel]);
 
   useEffect(() => {
     setFormSections([
-      ...formSection(contractType, '', ownerAddress, [], typeAssetTrigger),
+      ...formSection({
+        contract: contractType,
+        address: ownerAddress,
+        assetTriggerType: typeAssetTrigger,
+      }),
     ]);
   }, [typeAssetTrigger]);
 
@@ -176,9 +177,21 @@ const Contract: React.FC<IContract> = ({
 
   useEffect(() => {
     if (tokenChosen) {
-      setFormSections([...formSection(contractType, 'Token', ownerAddress)]);
+      setFormSections([
+        ...formSection({
+          contract: contractType,
+          type: 'Token',
+          address: ownerAddress,
+        }),
+      ]);
     } else {
-      setFormSections([...formSection(contractType, 'NFT', ownerAddress)]);
+      setFormSections([
+        ...formSection({
+          contract: contractType,
+          type: 'NFT',
+          address: ownerAddress,
+        }),
+      ]);
     }
   }, [tokenChosen]);
 
@@ -196,7 +209,11 @@ const Contract: React.FC<IContract> = ({
   const defineBuyContract = (label: string) => {
     buyKey += 1;
     setFormSections([
-      ...formSection('BuyContract', '', ownerAddress, [], null, '', label),
+      ...formSection({
+        contract: 'BuyContract',
+        address: ownerAddress,
+        buyLabel: label,
+      }),
     ]);
   };
 
@@ -216,20 +233,21 @@ const Contract: React.FC<IContract> = ({
     switch (selectedOption.value) {
       case 'ProposalContract':
         setFormSections([
-          ...formSection(selectedOption.value, '', ownerAddress, paramsList),
+          ...formSection({
+            contract: selectedOption.value,
+            address: ownerAddress,
+            paramsList,
+          }),
         ]);
         break;
 
       case 'ClaimContract':
         setFormSections([
-          ...formSection(
-            selectedOption.value,
-            '',
-            ownerAddress,
-            paramsList,
-            typeAssetTrigger,
+          ...formSection({
+            contract: selectedOption.value,
+            address: ownerAddress,
             claimLabel,
-          ),
+          }),
         ]);
         break;
 
@@ -239,7 +257,10 @@ const Contract: React.FC<IContract> = ({
 
       default:
         setFormSections([
-          ...formSection(selectedOption.value, '', ownerAddress),
+          ...formSection({
+            contract: selectedOption.value,
+            address: ownerAddress,
+          }),
         ]);
         break;
     }
@@ -349,6 +370,7 @@ const Contract: React.FC<IContract> = ({
         getAssets={getAssets}
         options={assetTriggerTypes}
         onChange={value => setTypeAssetTrigger(value ? value.value : 0)}
+        precedence={2}
       />
     </AssetTriggerContainer>
   );
@@ -546,7 +568,7 @@ const Contract: React.FC<IContract> = ({
         onChange={handleOption}
         getAssets={getAssets}
         title={'Contract'}
-        isContractSelect
+        precedence={1}
       />
 
       {contractsDescription[contractType] && (

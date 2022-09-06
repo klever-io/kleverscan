@@ -3,7 +3,7 @@ import { lighten } from 'polished';
 import styled, { css } from 'styled-components';
 
 interface IContainer {
-  isContractSelect?: boolean;
+  precedence?: number;
 }
 
 const ReactSelect = css`
@@ -103,7 +103,8 @@ export const Container = styled.div<IContainer>`
   height: 100%;
   width: 100%;
   display: flex;
-  z-index: ${props => (props.isContractSelect ? 999 : 998)};
+  z-index: ${props =>
+    props.precedence === 1 ? 999 : props.precedence === 2 ? 998 : 997};
   user-select: none;
 
   flex-direction: column;

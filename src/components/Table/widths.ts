@@ -109,7 +109,7 @@ const assetsPage = css`
   padding-right: 0.5rem;
 
   &:nth-child(1) {
-    width: 4rem;
+    width: 5rem;
   }
 
   &:nth-child(2) {

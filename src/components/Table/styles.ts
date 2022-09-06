@@ -139,16 +139,9 @@ export const Row = styled.div<ITableType>`
     }
 
     .isVerified {
-      position: absolute;
-      left: 13rem;
-
-      @media (max-width: 1600px) {
-        left: 8rem;
-      }
-
-      @media (max-width: 768px) {
-        left: 4rem;
-      }
+      position: relative;
+      left: -0.9rem;
+      top: -1rem;
     }
   }
   .address {

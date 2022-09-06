@@ -1,4 +1,4 @@
-import { Certified, Receive } from '@/assets/icons';
+import { Receive } from '@/assets/icons';
 import Copy from '@/components/Copy';
 import { ISelectedDays } from '@/components/DateFilter';
 import Title from '@/components/Layout/Title';
@@ -37,6 +37,7 @@ import {
   LetterLogo,
   Logo,
   Row,
+  VerifiedContainer,
 } from '@/views/assets/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { GetServerSideProps } from 'next';
@@ -470,7 +471,7 @@ const Asset: React.FC<IAssetPage> = ({
 
   const isVerified = useCallback(() => {
     if (verified) {
-      return <Certified className="isVerified" />;
+      return <VerifiedContainer />;
     }
   }, [verified]);
 

@@ -48,8 +48,8 @@ const AssetLogo: React.FC<IAssetLogo> = ({
   const renderLogo = (url: string) => {
     return (
       <>
-        {isVerified()}
         <Logo alt={`${name}-logo`} src={url} onError={() => setError(true)} />
+        {isVerified()}
       </>
     );
   };
@@ -60,8 +60,8 @@ const AssetLogo: React.FC<IAssetLogo> = ({
 
   return (
     <>
-      {isVerified()}
       <LetterLogo>{ticker?.split('')?.[0] || ''}</LetterLogo>
+      {isVerified()}
     </>
   );
 };

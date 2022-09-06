@@ -1,3 +1,4 @@
+import { Certified } from '@/assets/icons';
 import { default as DefaultInput } from '@/components/Inputt';
 import styled from 'styled-components';
 
@@ -39,6 +40,21 @@ export const Title = styled.div`
 
       cursor: pointer;
     }
+  }
+`;
+
+export const VerifiedContainer = styled(Certified)`
+  position: relative;
+  top: 0;
+  left: 0;
+  transform: translate(-130%, -60%);
+
+  @media (min-width: 769px) and (max-width: 900px) {
+    transform: translate(-150%, -60%);
+  }
+
+  @media (max-width: 361px) {
+    transform: translate(-150%, -60%);
   }
 `;
 

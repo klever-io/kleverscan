@@ -1,22 +1,33 @@
 import styled from 'styled-components';
 
-export const ProgressContainer = styled.div<{ textColor: string }>`
+export const ProgressContainer = styled.div`
   display: flex;
-  width: 14rem;
+  min-width: 14rem;
   @media (min-width: 1600px) and (max-width: 1800px) {
-    width: 10rem;
+    min-width: 10rem;
   }
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
 
-  span {
-    color: ${props => `${props.textColor}`};
-    position: relative;
-    left: 0.5rem;
-  }
-
   gap: 0.5rem;
+
+  @media (max-width: 768px) {
+    width: 100%;
+
+    span {
+      width: fit-content !important;
+      min-width: 4rem !important;
+    }
+  }
+`;
+
+export const ProgressPercentage = styled.div<{ textColor: string }>`
+  color: ${props => `${props.textColor}`};
+  position: relative;
+  margin-left: 0.5rem;
+  min-width: fit-content;
+  overflow: unset !important;
 `;
 
 export const ProgressContent = styled.div`
@@ -28,13 +39,17 @@ export const ProgressContent = styled.div`
   background-color: ${props => props.theme.background};
 
   border-radius: 0.25rem;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 export const ProgressIndicator = styled.div<{ percent: number }>`
   height: 100%;
   width: ${props => `${props.percent}%`};
 
-  background-color: ${props => props.theme.tab.indicator};
+  background-color: ${props => props.theme.violet};
   border-radius: 0.25rem;
 
   opacity: 0.6;

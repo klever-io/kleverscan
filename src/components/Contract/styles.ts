@@ -12,10 +12,10 @@ const defaultStyles = css`
   width: 100%;
 
   padding: 0.5rem 1rem;
-  border: 1px solid ${({ theme }) => theme.input.border.dark};
+  border: 1px solid ${({ theme }) => theme.darkText};
   border-radius: 0.5rem;
 
-  color: ${({ theme }) => theme.input.border.dark};
+  color: ${({ theme }) => theme.darkText};
 
   background-color: transparent;
 
@@ -150,7 +150,7 @@ export const ExtraOptionContainer = styled.div`
   padding-bottom: 1rem;
 
   background-color: ${props => props.theme.white};
-  box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.8, '#000')};
+  box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? '#000' : lighten(0.8, '#000'))};
 
   justify-content: flex-start;
   align-items: center;
@@ -164,7 +164,18 @@ export const ExtraOptionContainer = styled.div`
     color: ${props => props.theme.form.hash};
     font-weight: 600;
 
-    text-decoration: underline;
+    text-decoration: none;
+
+    &:hover {
+      color: ${props => props.theme.form.hoverHash};
+    }
+
+    &:visited {
+      color: ${props => props.theme.form.hash};
+      &:hover {
+        color: ${props => props.theme.form.hoverHash};
+      }
+    }
 
     overflow: hidden;
     white-space: nowrap;
@@ -178,7 +189,8 @@ export const ExtraOptionContainer = styled.div`
 
 export const SelectContainer = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  flex-direction: row;
   background-color: ${props => props.theme.white};
   padding: 1.37rem;
   border-radius: 1rem;
@@ -186,7 +198,7 @@ export const SelectContainer = styled.div`
   width: 100%;
 
   border: 0.2px solid ${({ theme }) => theme.input.border};
-  box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.8, '#000')};
+  box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? '#000' : lighten(0.8, '#000'))};
 `;
 
 interface ISelect {
@@ -215,7 +227,7 @@ export const FieldLabel = styled.label`
   font-size: smaller;
   font-weight: 600;
   display: flex;
-  color: ${({ theme }) => theme.input.border.dark};
+  color: ${({ theme }) => theme.darkText};
   margin-bottom: 0.3rem;
 `;
 
@@ -224,7 +236,7 @@ export const BalanceLabel = styled.label`
   font-size: smaller;
   font-weight: 600;
   display: flex;
-  color: ${({ theme }) => theme.input.border.dark};
+  color: ${({ theme }) => theme.darkText};
   margin-bottom: 0.3rem;
 `;
 
@@ -238,4 +250,28 @@ export const BalanceContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+`;
+
+export const CardContainer = styled.div`
+  margin-top: -0.7rem;
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: -2rem;
+  padding: 2rem 0;
+
+  font-family: Rubik;
+  font-family: Rubik;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 15px;
+
+  div {
+    span {
+      color: ${props => props.theme.darkText};
+    }
+  }
+
+  @media screen and (max-width: 1025px) {
+    width: 100%;
+  }
 `;

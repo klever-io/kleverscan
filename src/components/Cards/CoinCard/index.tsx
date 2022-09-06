@@ -1,6 +1,7 @@
 import Chart from '@/components/Chart';
 import { IAssetsData, ICoinInfo } from '@/types/index';
 import { getVariation } from '@/utils/index';
+import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useCallback, useRef, useState } from 'react';
 import {
@@ -31,6 +32,8 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, assetsData }) => {
   const [selectedCoin, setSelectedCoin] = useState(0);
   const carouselRef = useRef<any>(null);
   const cardRef = useRef<any>(null);
+
+  const { t } = useTranslation('common', { keyPrefix: 'Cards' });
 
   const handleSelectCoin: any = useCallback(() => {
     setSelectedCoin(
@@ -76,7 +79,7 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, assetsData }) => {
 
       return (
         <ValueContent>
-          <p>Total Staked</p>
+          <p>{t('Total Staked')}</p>
           <ValueDetail positive={getVariation(variation).includes('+')}>
             {coin.shortname === 'KLV' ? (
               <span>$ {totalStakedInDolar}</span>
@@ -126,12 +129,12 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, assetsData }) => {
                             U${' '}
                             {coin.shortname === 'KLV'
                               ? coin.price.toLocaleString(undefined, {
-                                  maximumFractionDigits: 2,
+                                  maximumFractionDigits: 6,
                                 })
                               : assetsData?.kfi?.prices?.todaysPrice
                               ? assetsData?.kfi?.prices?.todaysPrice.toLocaleString(
                                   undefined,
-                                  { maximumFractionDigits: 2 },
+                                  { maximumFractionDigits: 6 },
                                 )
                               : '--'}
                           </span>
@@ -166,11 +169,11 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, assetsData }) => {
 
                 <ValueContainer>
                   <ValueContent>
-                    <p>Market Cap</p>
+                    <p>{t('Market Cap')}</p>
                     <ValueDetail
                       positive={
                         coin.shortname === 'KLV'
-                          ? getVariation(coin.volume.variation).includes('+')
+                          ? getVariation(coin.marketCap.variation).includes('+')
                           : getVariation(0).includes('+')
                       }
                     >
@@ -189,7 +192,7 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, assetsData }) => {
                     </ValueDetail>
                   </ValueContent>
                   <ValueContent>
-                    <p>Volume</p>
+                    <p>{t('Volume')}</p>
                     <ValueDetail
                       positive={
                         coin.shortname === 'KLV'

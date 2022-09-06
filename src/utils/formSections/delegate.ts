@@ -9,7 +9,7 @@ export const delegateContract = (): ISection[] => {
         label: 'Receiver',
         props: {
           required: true,
-          tooltip: 'Address to be delegated to',
+          tooltip: 'Validator to whom the bucket will be delegated',
         },
       },
     ],

@@ -49,7 +49,7 @@ export const Input = styled(DefaultInput)`
 
   background-color: ${props => props.theme.white};
 
-  border-color: ${props => props.theme.filter.border};
+  border-color: ${props => props.theme.lightGray};
 `;
 
 export const OverviewContainer = styled.div`
@@ -69,6 +69,8 @@ export const Row = styled.div`
 
   flex-direction: row;
   align-items: center;
+
+  color: ${props => props.theme.black};
 
   &:not(:last-child) {
     border-bottom: 1px solid ${props => props.theme.card.border};
@@ -91,13 +93,13 @@ export const Row = styled.div`
 
     strong {
       font-weight: 600;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     small {
       font-weight: 400;
       font-size: 0.95rem;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
   }
 
@@ -109,12 +111,6 @@ export const Row = styled.div`
 
 export const RowContent = styled.span`
   width: 100%;
-
-  .bucketIdCopy {
-    span {
-      /* margin-right: -2rem; */
-    }
-  }
 `;
 
 export const CenteredRow = styled.div`
@@ -173,7 +169,7 @@ export const AmountContainer = styled.div`
     p {
       font-weight: 400;
       font-size: 0.85rem;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
       margin-top: 0.2rem;
       margin-bottom: 0.2rem;
     }
@@ -225,11 +221,11 @@ export const FrozenContainer = styled.div`
       width: 10rem;
 
       font-weight: 600;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     span {
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
   }
 `;

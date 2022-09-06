@@ -1,5 +1,5 @@
-import { ArrowLeft } from '@/assets/icons';
 import { Proposals as Icon } from '@/assets/title-icons';
+import Title from '@/components/Layout/Title';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Tabs, { ITabs } from '@/components/Tabs';
@@ -17,11 +17,10 @@ import {
   NetworkParamsIndexer,
 } from '@/types/proposals';
 import { useDidUpdateEffect } from '@/utils/hooks';
-import { Header, Title } from '@/views/accounts/detail';
+import { Header } from '@/views/accounts/detail';
 import { Card } from '@/views/blocks';
 import { CardContainer, Container, Input } from '@/views/proposals';
 import { GetServerSideProps } from 'next';
-import router from 'next/router';
 import { useCallback, useState } from 'react';
 
 const Proposals: React.FC<IProposalsPage> = ({
@@ -90,6 +89,7 @@ const Proposals: React.FC<IProposalsPage> = ({
             <ProposalsTab proposals={proposals} loading={loadingProposals} />
             <PaginationContainer>
               <Pagination
+                scrollUp={true}
                 count={totalProposalsPage}
                 page={page}
                 onPaginate={page => {
@@ -112,13 +112,8 @@ const Proposals: React.FC<IProposalsPage> = ({
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/')}>
-            <ArrowLeft />
-          </div>
-          <h1>Proposal</h1>
-          <Icon />
-        </Title>
+        <Title title="Proposals" Icon={Icon} />
+
         <Input />
       </Header>
       <CardContainer>

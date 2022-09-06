@@ -177,7 +177,8 @@ export const ProgressContainer = styled.div<{ textColor: string }>`
 export const EmptyProgressBar = styled.div`
   height: 2.3rem;
   width: 100%;
-  background-color: #ebf1f7;
+  background-color: ${props =>
+    props.theme.dark ? props.theme.background : '#ebf1f7'};
   border-radius: 0.25rem;
 `;
 
@@ -187,7 +188,8 @@ export const ProgressContent = styled.div<{ percent: number }>`
   display: flex;
   justify-content: left;
   align-items: center;
-  background-color: #c47fd0 !important;
+  background-color: ${props =>
+    props.theme.dark ? props.theme.card.assetText : '#c47fd0'} !important;
   border-radius: 0.25rem;
 `;
 
@@ -209,7 +211,8 @@ export const AllSmallCardsContainer = styled.section`
   justify-content: space-around;
   margin: 1.5rem 0;
   flex-direction: row;
-  @media (max-width: 1050px) {
+
+  @media (max-width: 1110px) {
     flex-direction: column;
   }
 `;
@@ -246,7 +249,7 @@ export const Card = styled.div<{ marginLeft?: boolean; marginRight?: boolean }>`
   border-radius: 1rem;
   gap: 1rem;
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     margin: 0;
     margin-top: 1rem;
     height: 10.5rem;
@@ -290,7 +293,7 @@ export const RewardsCard = styled.div<{
     padding: 0.8rem;
   }
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     margin: 0;
     margin-top: 1rem;
     height: 10.5rem;
@@ -307,12 +310,13 @@ export const CardHeader = styled.div`
   flex-direction: row;
   justify-content: space-between;
   gap: 0.5rem;
+  color: ${props => props.theme.black};
+
   p {
     text-align: right;
     opacity: 0.4;
     font-size: 0.85rem;
     font-weight: 500;
-    color: ${props => props.theme.card.darkText};
   }
 
   div {
@@ -328,7 +332,7 @@ export const CardHeader = styled.div`
     small {
       font-size: 0.85rem;
       font-weight: 600;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
   }
 `;
@@ -338,12 +342,14 @@ export const RewardsCardHeader = styled.div`
   flex-direction: row;
   justify-content: space-between;
   gap: 0.5rem;
+
+  color: ${props => props.theme.black};
+
   p {
     text-align: right;
     opacity: 0.4;
     font-size: 0.85rem;
     font-weight: 500;
-    color: ${props => props.theme.card.darkText};
   }
 
   div {
@@ -359,7 +365,7 @@ export const RewardsCardHeader = styled.div`
     small {
       font-size: 0.85rem;
       font-weight: 600;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
   }
   @media (max-width: 1200px) {
@@ -373,7 +379,7 @@ export const CardSubHeader = styled.div`
   justify-content: space-between;
   position: relative;
   top: 0.4rem;
-  color: ${props => props.theme.card.darkText};
+  color: ${props => props.theme.darkText};
   font-size: 0.85rem;
   font-weight: 500;
   span:nth-child(1) {
@@ -399,7 +405,7 @@ export const CardSubHeader = styled.div`
     }
   }
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     font-size: 1.1rem;
     span:nth-child(1) {
       right: 13%;
@@ -425,7 +431,7 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     padding: 3rem 3rem 5rem 3rem;
   }
 `;
@@ -526,6 +532,8 @@ export const Row = styled.div`
   flex-direction: row;
   align-items: center;
 
+  color: ${props => props.theme.black};
+
   &:not(:last-child) {
     border-bottom: 1px solid ${props => props.theme.card.border};
     border-bottom-left-radius: 0px;
@@ -549,13 +557,13 @@ export const Row = styled.div`
     strong {
       font-weight: 600;
       font-size: 0.95rem;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     small {
       font-weight: 400;
       font-size: 0.95rem;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     a {
@@ -566,7 +574,7 @@ export const Row = styled.div`
     }
 
     p {
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
       font-weight: 400;
     }
   }
@@ -650,7 +658,7 @@ export const Rating = styled.p.attrs<IRatingProps>(props => ({
       ? props.theme.table.success
       : props.rate === 'yellow'
       ? props.theme.table.pending
-      : props.theme.table.fail};
+      : props.theme.red};
 
   color: ${props => props.theme.white} !important;
   font-weight: 400;
@@ -673,13 +681,13 @@ export const StakedIndicator = styled.div<{
   width: ${props => `${props.percent}%`};
   font-weight: 600;
   border-radius: 0.25rem;
-  color: #646693;
+  color: ${props => props.theme.black};
 `;
 
 export const PercentIndicator = styled.div<{ percent: number }>`
   min-width: 10rem;
   top: 0.25rem;
-  color: #646693;
+  color: ${props => props.theme.black};
   position: relative;
   z-index: 1;
   padding-right: 0.3rem;
@@ -718,7 +726,7 @@ export const RewardsChartContent = styled.div`
     bottom: 1.4rem;
   }
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     bottom: 0.5rem;
   }
   @media (max-width: 417px) {
@@ -735,7 +743,7 @@ export const RewardsChart = styled(RewardsChartContent)`
 
   p {
     font-size: 1rem;
-    color: ${props => props.theme.transactionCard.text};
+    color: ${props => props.theme.darkText};
   }
 `;
 
@@ -761,12 +769,14 @@ export const VotesHeader = styled.div`
   flex-direction: row;
   justify-content: space-between;
 
+  color: ${props => props.theme.black};
+
   p {
     text-align: right;
     opacity: 0.4;
     font-size: 0.85rem;
     font-weight: 500;
-    color: ${props => props.theme.card.darkText};
+    color: ${props => props.theme.black};
   }
 `;
 
@@ -781,7 +791,7 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
     height: 3.55rem;
   }
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     width: 14rem;
     height: 7rem;
   }
@@ -825,13 +835,13 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
     width: fit-content;
     font-weight: 300;
     font-size: 0.8rem;
-    color: ${props => props.theme.card.darkText};
+    color: ${props => props.theme.darkText};
 
     @media (max-width: 1200px) {
       left: 18%;
     }
 
-    @media (max-width: 1050px) {
+    @media (max-width: 1110px) {
       left: 29%;
       font-size: 1rem;
     }
@@ -862,7 +872,7 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
       transform-origin: 50% 0;
     }
 
-    @media (max-width: 1050px) {
+    @media (max-width: 1110px) {
       transform-origin: 50% 0;
       border: 9px solid #37dd72;
       border-top: none;
@@ -896,7 +906,7 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
       height: 8px;
     }
 
-    @media (max-width: 1050px) {
+    @media (max-width: 1110px) {
       transform-origin: 50% 0;
       border: 9px solid #ff4681;
       border-top: none;
@@ -943,7 +953,7 @@ export const PieData = styled.div`
   transform-style: preserve-3d;
   backface-visibility: hidden;
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     border: 12.5px solid;
     border-top: none;
   }
@@ -965,13 +975,13 @@ export const ContainerVotes = styled.div`
   @media (max-width: 1200px) {
     width: 4.5rem;
   }
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     strong {
       font-size: 0.7rem !important;
     }
   }
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     top: 1.5rem;
     min-width: 0;
     strong {
@@ -994,7 +1004,7 @@ export const SubContainerVotes = styled.div`
   flex-direction: row;
   justify-content: flex-end;
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     justify-content: flex-end !important;
   }
 `;
@@ -1013,12 +1023,12 @@ export const ContainerRewards = styled.span`
   @media (max-width: 1200px) {
     width: 4.5rem;
   }
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     strong {
       font-size: 0.7rem !important;
     }
   }
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     top: 1.5rem;
     Strong {
       font-size: 0.95rem !important;
@@ -1044,7 +1054,7 @@ export const VotersPercent = styled.span`
   font-weight: 600;
   color: #37dd72;
   display: block;
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     font-size: 1.3rem;
   }
   @media (max-width: 430px) {
@@ -1076,7 +1086,7 @@ export const ContainerCircle = styled.span`
     top: 1rem;
   }
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     height: 12rem;
   }
 `;
@@ -1085,7 +1095,7 @@ export const CommissionPercent = styled.span`
   font-size: 1rem;
   font-weight: 600;
   color: #ff4681;
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     font-size: 1.3rem;
   }
   @media (max-width: 430px) {
@@ -1107,7 +1117,7 @@ export const RewardCardContentWrapper = styled.div`
   strong {
     font-weight: 600;
     font-size: 0.95rem;
-    color: ${props => props.theme.card.darkText};
+    color: ${props => props.theme.darkText};
   }
   @media (max-width: 967px) {
     top: -2rem;
@@ -1116,7 +1126,7 @@ export const RewardCardContentWrapper = styled.div`
     bottom: 0.5rem;
   }
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1110px) {
     height: auto;
     bottom: 2.5rem;
     justify-content: center;

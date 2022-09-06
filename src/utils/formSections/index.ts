@@ -38,7 +38,7 @@ const setAccountNameContract = (): ISection[] => {
     fields: [
       {
         label: 'Name',
-        props: { required: true, tooltip: 'Set sender name of account' },
+        props: { required: true },
       },
     ],
   });
@@ -58,12 +58,25 @@ const undelegateContract = (): ISection[] => [];
 
 const setITOContract = (): ISection[] => [];
 
-const formSection = (
-  contract: string,
-  type?: string,
-  address = '',
-  paramsList?: IParamList[],
-): ISection[] => {
+interface IFormSectionArgs {
+  contract: string;
+  type?: string;
+  address: string;
+  paramsList?: IParamList[];
+  assetTriggerType?: number | null;
+  claimLabel?: string;
+  buyLabel?: string;
+}
+
+const formSection = ({
+  contract,
+  type,
+  address,
+  paramsList,
+  assetTriggerType,
+  claimLabel,
+  buyLabel,
+}: IFormSectionArgs): ISection[] => {
   const contractsSections = {
     CreateAssetContract: type
       ? createAsset(type, address)
@@ -76,19 +89,19 @@ const formSection = (
     WithdrawContract: withdrawContract(),
     ProposalContract: proposalContract(paramsList),
     VoteContract: voteContract(),
-    BuyContract: buyContract(),
+    BuyContract: buyContract(buyLabel ? buyLabel : 'Id'),
     SellContract: sellContract(),
     CancelMarketOrderContract: cancelMarketOrderContract(),
     CreateMarketplaceContract: createMarketplaceContract(),
     ConfigMarketplaceContract: configMarketplaceContract(),
-    ClaimContract: claimContract(),
+    ClaimContract: claimContract(claimLabel || ''),
     UnjailContract: unjailContract(),
     SetAccountNameContract: setAccountNameContract(),
     ValidatorConfigContract: validatorConfigContract(),
     CreateValidatorContract: createValidatorContract(address),
     SetITOPricesContract: setITOContract(),
     ConfigITOContract: configITOContract(),
-    AssetTriggerContract: assetTriggerContract(),
+    AssetTriggerContract: assetTriggerContract(assetTriggerType),
     UpdateAccountPermissionContract: updatePermissionContract(),
   };
 

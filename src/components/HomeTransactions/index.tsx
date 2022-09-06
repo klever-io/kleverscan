@@ -1,6 +1,11 @@
 import Chart, { ChartType } from '@/components/Chart';
 import api from '@/services/api';
+import { addPrecisionTransactions } from '@/utils/index';
 import {
+  ContainerTimeFilter,
+  HomeLoaderContainer,
+  ItemTimeFilter,
+  ListItemTimeFilter,
   Section,
   TransactionChart,
   TransactionChartContent,
@@ -9,20 +14,32 @@ import {
   TransactionEmpty,
 } from '@/views/home';
 import { format } from 'date-fns';
+import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { IHomeTransactions, ITransactionResponse } from '../../types';
+import {
+  IAssetResponse,
+  IHomeTransactions,
+  ITransactionResponse,
+} from '../../types';
+import { HomeLoader } from '../Loader/styles';
 import TransactionItem from '../TransactionItem';
 
 const HomeTransactions: React.FC<IHomeTransactions> = ({
   setTotalTransactions,
-  transactionsList,
+  transactionsList: defaultTransactionList,
   transactions: defaultTransactions,
   precision,
 }) => {
-  const router = useRouter();
+  const filterDays = [1, 7, 15, 30];
+  const { t } = useTranslation('transactions');
+  const { t: commonT } = useTranslation('common');
   const [transactions, setTransactions] = useState(defaultTransactions);
+  const [transactionsList, setTransactionsList] = useState(
+    defaultTransactionList,
+  );
+  const [timeFilter, setTimeFilter] = useState(16);
+  const [loadingDailyTxs, setLoadingDailyTxs] = useState(false);
 
   const transactionsWatcherInterval = 4 * 1000;
 
@@ -31,10 +48,12 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
       const transactions: ITransactionResponse = await api.get({
         route: 'transaction/list',
       });
-      if (!transactions.error) {
-        // Animation / Re-render bug START
+      const assets: IAssetResponse = await api.get({ route: 'assets/kassets' });
+      if (!transactions.error && !assets.error) {
+        transactions.data.transactions = addPrecisionTransactions(
+          transactions?.data?.transactions,
+        );
         setTransactions(transactions.data.transactions);
-        // Animation / Re-render bug END
         setTotalTransactions(transactions.pagination.totalRecords);
       }
     }, transactionsWatcherInterval);
@@ -43,6 +62,25 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
       clearInterval(transactionsWatcher);
     };
   }, []);
+
+  useEffect(() => {
+    const fetchTotalDays = async () => {
+      setLoadingDailyTxs(true);
+      try {
+        const res = await api.getCached({
+          route: `transaction/list/count/${timeFilter}`,
+        });
+        if (!res.error || res.error === '') {
+          setTransactionsList(res.data.number_by_day);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+      setLoadingDailyTxs(false);
+    };
+
+    fetchTotalDays();
+  }, [timeFilter]);
 
   const getTransactionChartData = useCallback(() => {
     const sortedTransactionsList = transactionsList.sort(
@@ -54,8 +92,12 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
         const date = new Date(transaction.key);
         // Set timezone to UTC
         date.setTime(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
+        const dateString = format(date, 'dd MMM');
         return {
-          date: format(date, 'dd MMM'),
+          date:
+            dateString.slice(0, 2) +
+            ' ' +
+            commonT(`Date.Months.${dateString.slice(3)}`),
           value: transaction.doc_count,
         };
       }
@@ -66,7 +108,7 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
     <Section>
       <Link href={'/transactions'}>
         <a>
-          <h1>Transactions</h1>
+          <h1>{t('Transactions')}</h1>
         </a>
       </Link>
 
@@ -74,7 +116,7 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
         <TransactionContent>
           {transactions.length === 0 && (
             <TransactionEmpty>
-              <span>Oops! Apparently no data here.</span>
+              <span>{commonT('EmptyData')}</span>
             </TransactionEmpty>
           )}
 
@@ -87,14 +129,30 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
           ))}
         </TransactionContent>
         <TransactionChart>
-          <span>Daily Transactions</span>
-          <p>
-            ({transactionsList.length} day
-            {transactionsList.length > 1 ? 's' : ''})
-          </p>
-          <TransactionChartContent>
-            <Chart type={ChartType.Linear} data={getTransactionChartData()} />
-          </TransactionChartContent>
+          <ContainerTimeFilter>
+            <span>{t('Daily Transactions')}</span>
+            <ListItemTimeFilter>
+              {filterDays.map(item => (
+                <ItemTimeFilter
+                  key={String(item)}
+                  onClick={() => setTimeFilter(item + 1)}
+                  selected={!!(timeFilter === item + 1)}
+                >
+                  {item !== 30 ? `${String(item)}D` : '1M'}
+                </ItemTimeFilter>
+              ))}
+            </ListItemTimeFilter>
+          </ContainerTimeFilter>
+          {loadingDailyTxs && (
+            <HomeLoaderContainer>
+              <HomeLoader />
+            </HomeLoaderContainer>
+          )}
+          {!loadingDailyTxs && (
+            <TransactionChartContent>
+              <Chart type={ChartType.Linear} data={getTransactionChartData()} />
+            </TransactionChartContent>
+          )}
         </TransactionChart>
       </TransactionContainer>
     </Section>

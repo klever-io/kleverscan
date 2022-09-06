@@ -9,7 +9,7 @@ import {
   Buy,
   CancelMarketOrder,
   Claim,
-  ConfigICO,
+  ConfigITO,
   ConfigMarketplace,
   CreateAsset,
   CreateMarketplace,
@@ -19,7 +19,7 @@ import {
   Proposal,
   Sell,
   SetAccountName,
-  SetICOPrices,
+  SetITOPrices,
   Transfer,
   Undelegate,
   Unfreeze,
@@ -83,7 +83,7 @@ describe('Component: TransactionContractComponents', () => {
       const rowStrongStyle = {
         fontWeight: '600',
         fontSize: '0.95rem',
-        color: theme.card.darkText,
+        color: theme.darkText,
       };
 
       const centeredRow = screen.getByText(/Amount/i).parentNode?.nextSibling;
@@ -451,10 +451,10 @@ describe('Component: TransactionContractComponents', () => {
     });
   });
 
-  describe('When contract is "ConfigICO"', () => {
+  describe('When contract is "ConfigITO"', () => {
     it('Should render "Asset Id" and "Status" with all it\'s values', () => {
       renderWithTheme(
-        <ConfigICO
+        <ConfigITO
           {...mockedTxContractComponents.configIcoContract}
           receipts={[]}
         />,
@@ -478,10 +478,10 @@ describe('Component: TransactionContractComponents', () => {
     });
   });
 
-  describe('When contract is "SetICOPrices"', () => {
+  describe('When contract is "SetITOPrices"', () => {
     it('Should render "Asset Id" and "Price" with all it\'s values', () => {
       renderWithTheme(
-        <SetICOPrices
+        <SetITOPrices
           {...mockedTxContractComponents.setIcoPricesContract}
           receipts={[]}
         />,

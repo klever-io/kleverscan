@@ -1,11 +1,14 @@
 import { INavbarItem, navbarItems } from '@/configs/navbar';
+import { useWidth } from 'contexts/width';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ConnectWallet from './ConnectWallet';
+import OptionsContainer from './OptionsContainer';
 import {
   Container,
+  Content,
   DesktopContainer,
   DropdownContainer,
   DropdownIcon,
@@ -19,11 +22,13 @@ import {
   MobileContainer,
   MobileContent,
   MobileItem,
+  MobileNavbarItemList,
+  MobileOptions,
 } from './styles';
 
 interface IDropdownPages {
   page: INavbarItem;
-  handleMenu?: () => void;
+  onClick?: () => void;
 }
 
 const DropdownDesktop = ({ page }: IDropdownPages) => {
@@ -39,9 +44,9 @@ const DropdownDesktop = ({ page }: IDropdownPages) => {
   );
 };
 
-const DropdownMobile = ({ page, handleMenu }: IDropdownPages) => {
+const DropdownMobile = ({ page, onClick }: IDropdownPages) => {
   return (
-    <DropdownItem onClick={handleMenu}>
+    <DropdownItem onClick={onClick}>
       <Link href={page.pathTo}>
         <a>
           <span>{page.name}</span>
@@ -98,31 +103,14 @@ export const MobileNavbarItem: React.FC<INavbarItem> = ({
   pages = [],
 }) => {
   const router = useRouter();
-  const [showMore, setShowMore] = useState(false);
-  const handleClick = () => {
-    setShowMore(!showMore);
-  };
 
   if (name === 'More') {
     return (
-      <MobileItem
-        onClick={handleClick}
-        selected={router.pathname.includes(name.toLowerCase())}
-      >
-        <span>{name}</span>
-        {showMore && (
-          <DropdownContainer>
-            <DropdownMenu>
-              {pages.map((page, index) => (
-                <DropdownMobile key={index} page={page} />
-              ))}
-            </DropdownMenu>
-          </DropdownContainer>
-        )}
-        <span>
-          <DropdownIcon />
-        </span>
-      </MobileItem>
+      <>
+        {pages.map((item, index) => (
+          <MobileNavbarItem key={String(index)} {...item} onClick={onClick} />
+        ))}
+      </>
     );
   }
   return (
@@ -141,12 +129,26 @@ export const MobileNavbarItem: React.FC<INavbarItem> = ({
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
+  const mobileNavbar = useRef<HTMLDivElement>(null);
+  const prevScrollpos = useRef<number>(0);
+
+  const { width } = useWidth();
+
+  useEffect(() => {
+    if (width > 1025) {
+      setIsOpen(false);
+    }
+  }, [width]);
+
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : 'visible';
   }, [isOpen]);
 
   const handleMenu = () => {
     setIsOpen(!isOpen);
+    if (mobileNavbar.current !== null) {
+      mobileNavbar.current.style.top = '0';
+    }
   };
 
   const handleClose = () => {
@@ -155,41 +157,92 @@ const Navbar: React.FC = () => {
     }
   };
 
+  const handleMobileScroll = () => {
+    const navbar = mobileNavbar.current;
+
+    const currentScrollPos = window.pageYOffset;
+
+    if (navbar === null) {
+      return;
+    }
+
+    if (prevScrollpos.current > currentScrollPos) {
+      navbar.style.top = '0';
+    } else {
+      navbar.style.top = '-4.5rem';
+    }
+    prevScrollpos.current = currentScrollPos;
+  };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (window.innerWidth < 1025) {
+        window.addEventListener('scroll', handleMobileScroll);
+      } else {
+        window.removeEventListener('scroll', handleMobileScroll);
+      }
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('scroll', handleMobileScroll);
+      }
+    };
+  }, [width]);
+
   return (
     <>
-      <Container>
-        <Link href="/">
-          <a>
-            <Logo onClick={handleClose}>
-              <Image src="/logo-large.svg" alt="Logo" width="215" height="29" />
-            </Logo>
-          </a>
-        </Link>
+      <Container ref={mobileNavbar}>
+        <Content>
+          <Link href="/">
+            <a>
+              <Logo onClick={handleClose}>
+                <Image
+                  src="/logo-large.svg"
+                  alt="Logo"
+                  width="215"
+                  height="29"
+                />
+              </Logo>
+            </a>
+          </Link>
 
-        <DesktopContainer>
-          <IconsMenu>
-            {navbarItems.map((item, index) => (
-              <NavbarItem key={String(index)} {...item} />
-            ))}
-          </IconsMenu>
-          <ConnectWallet />
-        </DesktopContainer>
+          <DesktopContainer>
+            <IconsMenu>
+              {navbarItems.map((item, index) => (
+                <NavbarItem key={String(index)} {...item} />
+              ))}
+            </IconsMenu>
+            <ConnectWallet />
+            <OptionsContainer />
+          </DesktopContainer>
 
-        <MobileContainer>
-          <MenuIcon onClick={handleMenu} />
-        </MobileContainer>
+          <MobileContainer>
+            <MenuIcon onClick={handleMenu} />
+          </MobileContainer>
+        </Content>
       </Container>
 
-      <MobileBackground onClick={handleClose} opened={isOpen} />
+      <MobileBackground
+        onClick={handleClose}
+        onTouchStart={handleClose}
+        opened={isOpen}
+      />
 
       <MobileContent opened={isOpen}>
-        {navbarItems.map((item, index) => (
-          <MobileNavbarItem
-            key={String(index)}
-            {...item}
-            onClick={handleMenu}
-          />
-        ))}
+        <MobileOptions>
+          <OptionsContainer />
+        </MobileOptions>
+        <MobileNavbarItemList>
+          {navbarItems.map((item, index) => (
+            <MobileNavbarItem
+              key={String(index)}
+              {...item}
+              onClick={handleMenu}
+            />
+          ))}
+        </MobileNavbarItemList>
+
         <ConnectWallet handleMenu={handleMenu} />
       </MobileContent>
     </>

@@ -6,8 +6,8 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: 890px) {
-    padding: 3rem 3rem 5rem 3rem;
+  @media (max-width: 768px) {
+    padding: 3rem 1rem 5rem 1rem;
   }
 `;
 
@@ -24,24 +24,6 @@ export const Header = styled.section`
   }
 `;
 
-export const Title = styled.div`
-  display: flex;
-
-  flex-direction: row;
-  align-items: center;
-
-  gap: 0.75rem;
-
-  div {
-    cursor: pointer;
-
-    svg {
-      height: auto;
-      width: auto;
-    }
-  }
-`;
-
 export const Input = styled(DefaultInput)`
   margin-top: 1.1rem;
 
@@ -49,7 +31,7 @@ export const Input = styled(DefaultInput)`
 
   background-color: ${props => props.theme.white};
 
-  border-color: ${props => props.theme.filter.border};
+  border-color: ${props => props.theme.lightGray};
 
   @media (max-width: 870px) {
     width: 100%;
@@ -87,6 +69,8 @@ export const Card = styled.div`
 
   gap: 1rem;
 
+  color: ${props => props.theme.black};
+
   span {
     a {
       &:hover {
@@ -113,17 +97,17 @@ export const Card = styled.div`
     }
 
     p {
-      opacity: 0.4;
+      opacity: 0.7;
 
       font-size: 0.85rem;
       font-weight: 400;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     small {
       font-size: 0.85rem;
       font-weight: 600;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
   }
 `;
@@ -177,36 +161,6 @@ export const TableContainer = styled.section<{ autoUpdate: boolean }>`
   gap: 1.5rem;
 `;
 
-export const ToggleButtonContainer = styled.div<{ autoUpdate: boolean }>`
-  display: inline-block;
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 45px;
-  height: 1.4rem;
-  background-color: ${props =>
-    props.autoUpdate ? props.theme.purple : 'gray'};
-  border-radius: 34px;
-  user-select: none;
-`;
-
-export const ToggleButton = styled.button<{ autoUpdate: boolean }>`
-  height: 1.1rem;
-  width: 17px;
-  position: relative;
-  left: 3px;
-  background-color: ${props => props.theme.white};
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
-  border-radius: 100%;
-  color: ${props => props.theme.gray};
-  ${props =>
-    props.autoUpdate &&
-    css`
-      transform: translateX(22px);
-    `}
-`;
-
 export const TableHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -219,4 +173,6 @@ export const UpdateContainer = styled.div`
   gap: 0.5rem;
   cursor: pointer;
   user-select: none;
+
+  color: ${props => props.theme.black};
 `;

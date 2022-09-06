@@ -1,12 +1,14 @@
 import Copy from '@/components/Copy';
 import IconTooltip from '@/components/IconTooltip';
 import { useDidUpdateEffect } from '@/utils/hooks';
+import { core } from '@klever/sdk';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { MobileNavbarItem } from '..';
 import { doIf, parseAddress } from '../../../utils';
 import {
+  ButtonAndCopy,
   ConnectButton,
   ConnectContainer,
   CopyContainer,
@@ -63,9 +65,11 @@ const ConnectWallet: React.FC<IConnectWalletProps> = ({ handleMenu }) => {
       };
 
       try {
-        setLoading(true);
-        await window.kleverWeb.initialize();
-        setLoading(false);
+        if (!core.isKleverWebActive()) {
+          setLoading(true);
+          await core.initialize();
+          setLoading(false);
+        }
 
         const address: string = await window.kleverWeb.getWalletAddress();
 
@@ -112,27 +116,29 @@ const ConnectWallet: React.FC<IConnectWalletProps> = ({ handleMenu }) => {
     <>
       {extensionInstalled && (
         <ConnectContainer>
-          <ConnectButton
-            onClick={() => handleConnect()}
-            key={String(extensionInstalled)}
-          >
-            {loading ? (
-              <span> Loading... </span>
-            ) : (
-              <>
-                {walletAddress && (
-                  <span>{parseAddress(walletAddress, 25)}</span>
-                )}
-                {!walletAddress && <span>Connect your wallet</span>}
-              </>
-            )}
-          </ConnectButton>
+          <ButtonAndCopy>
+            <ConnectButton
+              onClick={() => handleConnect()}
+              key={String(extensionInstalled)}
+            >
+              {loading ? (
+                <span> Loading... </span>
+              ) : (
+                <>
+                  {walletAddress && (
+                    <span>{parseAddress(walletAddress, 25)}</span>
+                  )}
+                  {!walletAddress && <span>Connect your wallet</span>}
+                </>
+              )}
+            </ConnectButton>
+            <CopyContainer>
+              {walletAddress && (
+                <Copy info="Wallet Address" data={walletAddress} />
+              )}
+            </CopyContainer>
+          </ButtonAndCopy>
           {getCreateTransactionButton()}
-          <CopyContainer>
-            {walletAddress && (
-              <Copy info="Wallet Address" data={walletAddress} />
-            )}
-          </CopyContainer>
         </ConnectContainer>
       )}
     </>

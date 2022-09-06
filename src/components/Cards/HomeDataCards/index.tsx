@@ -1,7 +1,6 @@
 import { Accounts, Epoch, TPS, Transactions } from '@/assets/cards';
 import CoinCard from '@/components/Cards/CoinCard';
 import api from '@/services/api';
-import theme from '@/styles/theme';
 import { Service } from '@/types/index';
 import { getEpochInfo } from '@/utils/index';
 import {
@@ -18,14 +17,16 @@ import {
   ProgressContainer,
   ProgressContent,
   ProgressIndicator,
+  ProgressPercentage,
 } from '@/views/validators';
+import { useTheme } from 'contexts/theme';
+import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 import {
   IAccountResponse,
   ICard,
   IDataCards,
   IEpochCard,
-  IParsedMetrics,
   IStatisticsResponse,
   ITransactionResponse,
   IYesterdayResponse,
@@ -35,6 +36,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
   totalAccounts: defaultTotalAccounts,
   totalTransactions: defaultTotalTransactions,
   epochInfo: defaultEpochInfo,
+  block,
   tps,
   coinsData,
   yesterdayTransactions,
@@ -46,7 +48,8 @@ const HomeDataCards: React.FC<IDataCards> = ({
 
   const [actualTPS, setActualTPS] = useState<string>(tps);
   const [metrics, setMetrics] = useState(defaultEpochInfo);
-
+  const [counterEpoch, setCounterEpoch] = useState(0);
+  const [lastPercentage, setLastPercentage] = useState<number | null>(null);
   const [totalAccounts, setTotalAccounts] = useState(defaultTotalAccounts);
   const [totalTransactions, setTotalTransactions] = useState(
     defaultTotalTransactions,
@@ -54,10 +57,19 @@ const HomeDataCards: React.FC<IDataCards> = ({
   const [newAccounts, setNewAccounts] = useState(yesterdayAccounts);
   const [newTransactions, setNewTransactions] = useState(yesterdayTransactions);
 
+  const { t } = useTranslation('common', { keyPrefix: 'Cards' });
+
+  useEffect(() => {
+    if (metrics.epochLoadPercent === 0 && lastPercentage !== null) {
+      setCounterEpoch(counterEpoch + 1);
+    }
+    setLastPercentage(metrics.epochLoadPercent);
+  }, [metrics.epochLoadPercent]);
+
   const dataCards: ICard[] = [
     {
       Icon: Accounts,
-      title: 'Total accounts',
+      title: t('Total Accounts'),
       value: totalAccounts,
       variation: `+ ${
         newAccounts === totalAccounts ? '0%' : newAccounts.toLocaleString()
@@ -65,7 +77,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
     },
     {
       Icon: Transactions,
-      title: 'Total transactions',
+      title: t('Total Transactions'),
       value: totalTransactions,
       variation: `+ ${newTransactions.toLocaleString()}`,
     },
@@ -74,12 +86,15 @@ const HomeDataCards: React.FC<IDataCards> = ({
   const epochCards: IEpochCard[] = [
     {
       Icon: TPS,
-      title: 'Live/Peak TPS',
+      title: t('Live/Peak TPS'),
       value: actualTPS,
     },
     {
       Icon: Epoch,
-      title: 'Epoch Remaining Time',
+      title:
+        `${t('Epoch')}` +
+        (block?.epoch ? ` #${block.epoch + counterEpoch} ` : ' ') +
+        `${t('Remaining Time')}`,
       value: metrics.remainingTime,
       progress: metrics.epochLoadPercent,
     },
@@ -89,7 +104,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
     const statisticsWatcher = setInterval(async () => {
       const statistics: IStatisticsResponse = await api.get({
         route: 'node/statistics',
-        service: Service.NODE,
+        service: Service.PROXY,
       });
 
       if (!statistics.error) {
@@ -100,22 +115,13 @@ const HomeDataCards: React.FC<IDataCards> = ({
     }, statisticsWatcherTimeout);
 
     const metricswatcher = setInterval(async () => {
-      const metrics: any = await api.text({
-        route: 'node/metrics',
-        service: Service.NODE,
+      const metrics: any = await api.get({
+        route: 'node/overview',
+        service: Service.PROXY,
       });
 
       if (!metrics.error) {
-        const parsedMetrics = {} as IParsedMetrics;
-
-        const metricLines = metrics?.split('\n');
-        metricLines?.forEach((line: any) => {
-          const props = line?.split(' ');
-
-          parsedMetrics[props[0]?.split('{')?.[0]] = parseInt(props?.[1]);
-        });
-
-        setMetrics(getEpochInfo(parsedMetrics));
+        setMetrics(getEpochInfo(metrics?.data?.overview));
       }
     }, statisticsWatcherTimeout);
 
@@ -220,12 +226,15 @@ const HomeDataCards: React.FC<IDataCards> = ({
   }, []);
 
   const Progress: React.FC<{ percent: number }> = ({ percent }) => {
+    const { theme } = useTheme();
     return (
-      <ProgressContainer textColor={theme.white}>
+      <ProgressContainer>
         <ProgressContent>
           <ProgressIndicator percent={percent} />
         </ProgressContent>
-        <span>{percent?.toFixed(2)}%</span>
+        <ProgressPercentage textColor={theme.card.white}>
+          {percent?.toFixed(2)}%
+        </ProgressPercentage>
       </ProgressContainer>
     );
   };
@@ -245,7 +254,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
               </DataCardValue>
               {!variation.includes('%') && (
                 <DataCardLatest positive={variation.includes('+')}>
-                  <span>Last 24h</span>
+                  <span>{t('Last 24h')}</span>
                   <p>{variation}</p>
                 </DataCardLatest>
               )}
@@ -282,4 +291,5 @@ const HomeDataCards: React.FC<IDataCards> = ({
     </DataCardsContainer>
   );
 };
+
 export default HomeDataCards;

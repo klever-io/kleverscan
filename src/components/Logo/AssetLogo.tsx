@@ -1,4 +1,5 @@
-import React from 'react';
+import { validateImgUrl } from '@/utils/index';
+import React, { useCallback, useEffect, useState } from 'react';
 
 interface IAssetLogo {
   LetterLogo: React.FunctionComponent<any>;
@@ -16,23 +17,51 @@ const AssetLogo: React.FC<IAssetLogo> = ({
   name,
   isVerified,
 }) => {
-  const regex = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
-  if (
-    regex.test(logo) ||
-    logo === 'https://bc.klever.finance/logo_klv' ||
-    logo === 'https://bc.klever.finance/logo_kfi'
-  ) {
+  const [urlIsImg, setUrlIsImg] = useState(false);
+  const [error, setError] = useState(false);
+  const maxRequestAwaitTime = 2000; // 2 secs
+
+  const validateLogo = useCallback(
+    async (url: string) => {
+      const isImg = await validateImgUrl(url, maxRequestAwaitTime);
+      if (isImg) {
+        setUrlIsImg(true);
+      }
+    },
+    [urlIsImg],
+  );
+
+  const getCorrectLogo = () => {
+    if (ticker === 'KLV') {
+      return '/assets/klv-logo.png';
+    }
+
+    if (ticker === 'KFI') {
+      return '/assets/kfi-logo.png';
+    }
+    return logo;
+  };
+  useEffect(() => {
+    validateLogo(getCorrectLogo());
+  }, []);
+
+  const renderLogo = (url: string) => {
     return (
       <>
+        <Logo alt={`${name}-logo`} src={url} onError={() => setError(true)} />
         {isVerified()}
-        <Logo alt={`${name}-logo`} src={logo} />
       </>
     );
+  };
+
+  if (urlIsImg && !error) {
+    return renderLogo(getCorrectLogo());
   }
+
   return (
     <>
-      {isVerified()}
       <LetterLogo>{ticker?.split('')?.[0] || ''}</LetterLogo>
+      {isVerified()}
     </>
   );
 };

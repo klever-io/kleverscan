@@ -36,7 +36,7 @@ export const TooltipContainer = styled.div<{ tooltip: string }>`
         top: 1rem;
         left: 0;
         background-color: ${props => props.theme.card.background};
-        color: ${props => props.theme.white};
+        color: ${props => props.theme.card.white};
         padding: 0.5rem;
         border-radius: 5px;
         z-index: 500;

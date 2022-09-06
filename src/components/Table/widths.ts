@@ -109,7 +109,7 @@ const assetsPage = css`
   padding-right: 0.5rem;
 
   &:nth-child(1) {
-    width: 4rem;
+    width: 5rem;
   }
 
   &:nth-child(2) {
@@ -310,7 +310,7 @@ const proposals = css`
     width: 10rem;
   }
   &:nth-child(3) {
-    width: 9rem;
+    width: 12rem;
   }
   &:nth-child(4) {
     width: 11rem;
@@ -319,10 +319,11 @@ const proposals = css`
     width: 12rem;
   }
   &:nth-child(6) {
-    width: 10rem;
+    width: 14rem;
   }
   &:nth-child(7) {
     width: 5rem;
+    margin-left: 2rem;
   }
 `;
 const votes = css`
@@ -351,6 +352,26 @@ const delegations = css`
   }
 `;
 
+const nfts = css`
+  margin-right: 1.25rem;
+
+  &:nth-child(1) {
+    width: 8rem;
+  }
+
+  &:nth-child(2) {
+    width: 12rem;
+  }
+
+  &:nth-child(3) {
+    width: 12rem;
+  }
+
+  &:nth-child(4) {
+    width: 15rem;
+  }
+`;
+
 const widths = {
   transactions,
   blocks,
@@ -366,6 +387,7 @@ const widths = {
   proposals,
   votes,
   delegations,
+  nfts,
 };
 
 export default widths;

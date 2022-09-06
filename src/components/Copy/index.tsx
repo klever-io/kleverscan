@@ -13,10 +13,9 @@ const IconContainer = styled.div`
 `;
 
 const Copy: React.FC<ICopyProps> = ({ data, info = 'Text' }) => {
-  const handleCopyInfo = () => {
-    navigator.clipboard.writeText(String(data));
+  const handleCopyInfo = async () => {
+    await navigator.clipboard.writeText(String(data));
 
-    navigator.clipboard.writeText(String(data));
     toast.info(`${info} copied to clipboard`, {
       autoClose: 2000,
       pauseOnHover: false,

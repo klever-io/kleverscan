@@ -1,5 +1,5 @@
 import { transparentize } from 'polished';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { IFilterItem } from '../Filter';
 import filterWidths from './filters';
 import widths from './widths';
@@ -25,46 +25,57 @@ export interface ITableType {
     | 'networkParams'
     | 'proposals'
     | 'votes'
-    | 'delegations';
+    | 'delegations'
+    | 'nfts';
   haveData?: number;
   filter?: IFilterItem;
   pathname?: string;
+  rowSections?: boolean;
 }
 
-export const Container = styled.div`
+export const ContainerView = styled.div`
   overflow-x: auto;
+  width: 100%;
+`;
+
+export const Container = styled.div`
+  min-width: fit-content;
 `;
 
 export const Header = styled.div<ITableType>`
   display: ${props => (props.haveData ? 'flex' : 'none')};
   padding: 1rem 1.5rem;
 
-  color: ${props => props.theme.table.text};
+  min-width: 100%;
+
+  color: ${props => props.theme.darkText};
   font-weight: 600;
   font-size: 0.85rem;
 
   span {
-    /* flex: 1; */
-
     ${props => widths[props.type]}
     ${props =>
       props.filter &&
       props.filter.value !== 'all' &&
       filterWidths[props.filter.name]}
   }
-  @media (max-width: 1300px) {
-    width: fit-content;
-  }
 `;
 
 export const Body = styled.div<ITableType>`
   display: flex;
+  width: 100%;
+
+  min-width: fit-content;
 
   flex-direction: column;
   gap: 0.75rem;
 
   @media (max-width: 1300px) {
     width: ${props => (props.haveData ? 'fit-content' : 'initial')};
+  }
+
+  @media (max-width: 768px) {
+    min-width: 100%;
   }
 `;
 
@@ -80,9 +91,16 @@ export const Row = styled.div<ITableType>`
 
   border-radius: 0.5rem;
 
+  width: 100%;
+
+  > span,
+  > a {
+    @media screen and (min-width: 769px) {
+      ${props => props.rowSections && widths[props.type]};
+    }
+  }
   span,
   a {
-    /* flex: 1; */
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -90,7 +108,8 @@ export const Row = styled.div<ITableType>`
     font-size: 0.95rem;
     color: ${props => props.theme.black};
 
-    ${props => widths[props.type]};
+    ${props => !props.rowSections && widths[props.type]};
+
     ${props =>
       props.filter &&
       props.filter.value !== 'all' &&
@@ -102,13 +121,13 @@ export const Row = styled.div<ITableType>`
     }
 
     small {
-      color: ${props => props.theme.table.text};
+      color: ${props => props.theme.darkText};
     }
 
     strong {
       font-weight: 400;
       font-size: 0.95rem;
-      color: ${props => props.theme.table.text};
+      color: ${props => props.theme.darkText};
     }
 
     p {
@@ -120,16 +139,9 @@ export const Row = styled.div<ITableType>`
     }
 
     .isVerified {
-      position: absolute;
-      left: 13rem;
-
-      @media (max-width: 1600px) {
-        left: 8rem;
-      }
-
-      @media (max-width: 768px) {
-        left: 4rem;
-      }
+      position: relative;
+      left: -0.9rem;
+      top: -1rem;
     }
   }
   .address {
@@ -140,6 +152,70 @@ export const Row = styled.div<ITableType>`
       text-decoration: underline;
     }
   }
+  ${props =>
+    props.rowSections &&
+    css`
+      span,
+      a {
+        span,
+        p,
+        strong,
+        small {
+          width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+
+      @media screen and (max-width: 768px) {
+        width: 100%;
+
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+        grid-gap: 0.75rem;
+
+        span,
+        a {
+          span,
+          p,
+          strong,
+          small {
+            width: 100%;
+            grid-column: span 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: ${props => props.theme.black};
+          }
+        }
+        .address {
+          width: 100% !important;
+        }
+      }
+    `}
+`;
+
+export const MobileCardItem = styled.span<{ columnSpan?: number }>`
+  display: flex;
+  flex-direction: column;
+
+  @media screen and (max-width: 768px) {
+    ${props =>
+      !props.columnSpan || props.columnSpan >= 0
+        ? css`
+            grid-column: span ${props.columnSpan};
+          `
+        : css`
+            display: none;
+          `}
+  }
+`;
+
+export const MobileHeader = styled.div`
+  color: ${props => props.theme.table.text};
+  font-weight: 600;
+  font-size: 0.8rem;
 `;
 
 export const Status = styled.div<IStatus>`
@@ -150,6 +226,10 @@ export const Status = styled.div<IStatus>`
   align-items: center;
 
   gap: 0.9rem;
+
+  svg {
+    min-width: fit-content;
+  }
 
   span {
     color: ${props =>
@@ -170,6 +250,11 @@ export const Status = styled.div<IStatus>`
       color: ${props.theme.table.icon} !important;
       
     `}
+  svg {
+    path {
+      fill: ${props => props.theme.white};
+    }
+  }
 `;
 
 export const EmptyRow = styled(Row)`
@@ -180,6 +265,6 @@ export const EmptyRow = styled(Row)`
 
   p {
     font-weight: 400;
-    color: ${props => transparentize(0.5, props.theme.table.text)};
+    color: ${props => transparentize(0.5, props.theme.darkText)};
   }
 `;

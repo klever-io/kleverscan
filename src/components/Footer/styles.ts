@@ -1,14 +1,18 @@
 import styled from 'styled-components';
 
 export const Container = styled.footer`
+  background-color: ${props => props.theme.footer.background};
+`;
+
+export const Content = styled.div`
+  max-width: ${props => props.theme.maxWidth};
+  margin: 0 auto;
   padding: 5rem 10rem;
 
   display: flex;
 
   flex-direction: row;
   gap: 5rem;
-
-  background-color: ${props => props.theme.footer.background};
 
   @media (max-width: 768px) {
     padding: 5rem 3rem;
@@ -79,8 +83,8 @@ export const SocialIcon = styled.div`
   transition: 0.2s ease;
 
   &:hover {
-    border-color: ${props => props.theme.footer.hover};
-    background-color: ${props => props.theme.footer.hover};
+    border-color: ${props => props.theme.violet};
+    background-color: ${props => props.theme.violet};
   }
 `;
 
@@ -131,7 +135,7 @@ export const LinkItems = styled.div`
     }
 
     &:hover {
-      color: ${props => props.theme.footer.hover};
+      color: ${props => props.theme.violet};
     }
   }
 `;

@@ -1,7 +1,8 @@
-import { ArrowLeft, Receive } from '@/assets/icons';
+import { Receive } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import { TransactionDetails as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
+import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
 import { Status } from '@/components/Table/styles';
 import {
@@ -28,7 +29,13 @@ import {
   Withdraw,
 } from '@/components/TransactionContractComponents';
 import api from '@/services/api';
-import { Contract, IAsset, IResponse, ITransaction } from '@/types/index';
+import {
+  Contract,
+  IAsset,
+  IBlock,
+  IResponse,
+  ITransaction,
+} from '@/types/index';
 import {
   capitalizeString,
   hexToString,
@@ -45,7 +52,6 @@ import {
   Hr,
   Input,
   Row,
-  Title,
 } from '@/views/transactions/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { format, fromUnixTime } from 'date-fns';
@@ -55,6 +61,12 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
+
+interface IBlockResponse extends IResponse {
+  data: {
+    block: IBlock;
+  };
+}
 
 interface ITransactionResponse extends IResponse {
   data: {
@@ -70,6 +82,7 @@ interface IAssetResponse extends IResponse {
 
 interface ITransactionPage {
   transaction: ITransaction;
+  block: IBlock;
 }
 
 const klvAsset: IAsset = {
@@ -111,7 +124,7 @@ const klvAsset: IAsset = {
 const Transaction: React.FC<ITransactionPage> = props => {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
-  const { transaction } = props;
+  const { transaction, block } = props;
 
   const {
     hash,
@@ -138,151 +151,156 @@ const Transaction: React.FC<ITransactionPage> = props => {
           switch (contract.typeString) {
             case Contract.Transfer:
               return (
-                <>
+                <div key={`${index}`}>
                   <Transfer {...contract} receipts={receipts} />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
 
             case Contract.CreateAsset:
               return (
-                <>
+                <div key={`${index}`}>
                   <CreateAsset {...contract} receipts={receipts} />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
             case Contract.CreateValidator:
-              return <CreateValidator {...contract} receipts={receipts} />;
+              return (
+                <div key={`${index}`}>
+                  <CreateValidator {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </div>
+              );
             case Contract.ValidatorConfig:
             case Contract.Freeze:
               return (
-                <>
+                <div key={`${index}`}>
                   <Freeze
                     {...contract}
                     contractIndex={index}
                     receipts={receipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
             case Contract.Unfreeze:
               return (
-                <>
+                <div key={`${index}`}>
                   <Unfreeze {...contract} receipts={receipts} />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
             case Contract.Delegate:
               return (
-                <>
+                <div key={`${index}`}>
                   <Delegate {...contract} receipts={receipts} />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
             case Contract.Undelegate:
               return (
-                <>
+                <div key={`${index}`}>
                   <Undelegate {...contract} receipts={receipts} />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
             case Contract.Withdraw:
               return (
-                <>
+                <div key={`${index}`}>
                   <Withdraw {...contract} receipts={receipts} />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
             case Contract.Claim:
               return (
-                <>
+                <div key={`${index}`}>
                   <Claim {...contract} receipts={receipts} />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
             case Contract.Unjail:
               return (
-                <>
+                <div key={`${index}`}>
                   <Unjail {...contract} receipts={receipts} />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
             case Contract.AssetTrigger:
               return (
-                <>
+                <div key={`${index}`}>
                   <AssetTrigger {...contract} receipts={receipts} />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
             case Contract.SetAccountName:
               return (
-                <>
+                <div key={`${index}`}>
                   <SetAccountName {...contract} receipts={receipts} />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
             case Contract.Proposal:
               return (
-                <>
+                <div key={`${index}`}>
                   <Proposal {...contract} receipts={receipts} />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
             case Contract.Vote:
               return (
-                <>
+                <div key={`${index}`}>
                   <Vote {...contract} receipts={receipts} />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
             case Contract.ConfigITO:
               return (
-                <>
+                <div key={`${index}`}>
                   <ConfigITO {...contract} receipts={receipts} />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
             case Contract.SetITOPrices:
               return (
-                <>
+                <div key={`${index}`}>
                   <SetITOPrices {...contract} receipts={receipts} />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
             case Contract.Buy:
               return (
-                <>
+                <div key={`${index}`}>
                   <Buy {...contract} receipts={receipts} />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
             case Contract.Sell:
               return (
-                <>
+                <div key={`${index}`}>
                   <Sell {...contract} receipts={receipts} />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
             case Contract.CancelMarketOrder:
               return (
-                <>
+                <div key={`${index}`}>
                   <CancelMarketOrder {...contract} receipts={receipts} />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
             case Contract.CreateMarketplace:
               return (
-                <>
+                <div key={`${index}`}>
                   <CreateMarketplace {...contract} receipts={receipts} />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
             case Contract.ConfigMarketplace:
               return (
-                <>
+                <div key={`${index}`}>
                   <ConfigMarketplace {...contract} receipts={receipts} />
                   {index < contracts.length - 1 && <Hr />}
-                </>
+                </div>
               );
             default:
               return <div />;
@@ -295,17 +313,12 @@ const Transaction: React.FC<ITransactionPage> = props => {
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/transactions')}>
-            <ArrowLeft />
-          </div>
-          <h1>
-            <p>Transaction</p>{' '}
-            <p>
-              Details <Icon />
-            </p>
-          </h1>
-        </Title>
+        <Title
+          title="Transaction Details"
+          Icon={Icon}
+          route={'/transactions'}
+        />
+
         <Input />
       </Header>
       <CardContainer>
@@ -344,6 +357,14 @@ const Transaction: React.FC<ITransactionPage> = props => {
             </span>
             <span>
               <p>{resultCode}</p>
+            </span>
+          </Row>
+          <Row>
+            <span>
+              <strong>Epoch</strong>
+            </span>
+            <span>
+              <p>{block.epoch}</p>
             </span>
           </Row>
           <Row>
@@ -475,11 +496,19 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
     return redirectProps;
   }
 
+  const block: IBlockResponse = await api.get({
+    route: `block/by-nonce/${transaction?.data?.transaction?.blockNum}`,
+  });
+
+  if (block.error) {
+    return redirectProps;
+  }
+
   const props: ITransactionPage = {
     transaction: transaction.data.transaction,
+    block: block.data.block,
   };
 
   return { props };
 };
-
 export default Transaction;

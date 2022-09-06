@@ -1,6 +1,7 @@
-import { ArrowLeft, Certified, Receive } from '@/assets/icons';
+import { Receive } from '@/assets/icons';
 import Copy from '@/components/Copy';
 import { ISelectedDays } from '@/components/DateFilter';
+import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
@@ -36,7 +37,7 @@ import {
   LetterLogo,
   Logo,
   Row,
-  Title,
+  VerifiedContainer,
 } from '@/views/assets/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { GetServerSideProps } from 'next';
@@ -135,12 +136,14 @@ const Asset: React.FC<IAssetPage> = ({
       const query = dateFilter.start
         ? {
             page: transactionsPage,
+            limit: 5,
             asset: asset.assetId,
             startdate: dateFilter.start ? dateFilter.start : undefined,
             enddate: dateFilter.end ? dateFilter.end : undefined,
           }
         : {
             page: transactionsPage,
+            limit: 5,
             asset: asset.assetId,
           };
 
@@ -408,6 +411,7 @@ const Asset: React.FC<IAssetPage> = ({
             />
             <PaginationContainer>
               <Pagination
+                scrollUp={false}
                 count={totalTransactionsPage}
                 page={transactionsPage}
                 onPaginate={page => {
@@ -423,6 +427,7 @@ const Asset: React.FC<IAssetPage> = ({
             <Holders asset={asset} holders={holders} loading={loadingHolders} />
             <PaginationContainer>
               <Pagination
+                scrollUp={false}
                 count={totalHoldersPage}
                 page={holdersPage}
                 onPaginate={page => {
@@ -466,32 +471,34 @@ const Asset: React.FC<IAssetPage> = ({
 
   const isVerified = useCallback(() => {
     if (verified) {
-      return <Certified className="isVerified" />;
+      return <VerifiedContainer />;
     }
-  }, []);
+  }, [verified]);
 
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/assets')}>
-            <ArrowLeft />
-          </div>
-          <AssetLogo
-            LetterLogo={LetterLogo}
-            isVerified={isVerified}
-            Logo={Logo}
-            logo={logo}
-            ticker={ticker}
-            name={name}
-          />
-          <AssetTitle>
-            <h1>
-              {name} ({assetId})
-            </h1>
-            <div>{assetType}</div>
-          </AssetTitle>
-        </Title>
+        <Title
+          Component={() => (
+            <>
+              <AssetLogo
+                LetterLogo={LetterLogo}
+                isVerified={isVerified}
+                Logo={Logo}
+                logo={logo}
+                ticker={ticker}
+                name={name}
+              />
+              <AssetTitle>
+                <h1>
+                  {name} ({assetId})
+                </h1>
+                <div>{assetType}</div>
+              </AssetTitle>
+            </>
+          )}
+          route={'/assets'}
+        />
 
         <Input />
       </Header>
@@ -554,7 +561,7 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
   const transactionCall = new Promise<ITransactionResponse>(
     async (resolve, reject) => {
       const res = await api.get({
-        route: `transaction/list?asset=${assetId}`,
+        route: `transaction/list?asset=${assetId}&limit=5`,
       });
 
       if (!res.error || res.error === '') {
@@ -606,6 +613,23 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
 
   if (assetNotFound) {
     return redirectProps;
+  }
+
+  if (props.asset.assetId === 'LMNFT-SM99') {
+    props.asset.uris = {
+      discord: '',
+      facebook: 'https://facebook.com/LoveMonsterNFT',
+      instagram: 'https://instagram.com/LoveMonsterNFT',
+      medium: '',
+      metadata:
+        'https://klever-mint.mypinata.cloud/ipfs/QmNaa2KQ6NkjjESpPHEnAow9hivnsAkq2Gd6R26cHG28Er',
+      metadataExtension: 'png',
+      metadataImage:
+        'https://klever-mint.mypinata.cloud/ipfs/QmWVmUDPBeQzv6fG93JxQxFVee8b6smFD3RQosQXJHiZTJ',
+      telegram: 'https://t.me/LoveMonsterNFT',
+      twitter: 'https://twitter.com/LoveMonsterNFT',
+      website: 'https://lovemonsternft.com',
+    };
   }
 
   return { props };

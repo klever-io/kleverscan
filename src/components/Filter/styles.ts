@@ -45,7 +45,7 @@ export const Container = styled.div`
   span {
     padding-bottom: 0.25rem;
 
-    color: ${props => props.theme.filter.title};
+    color: ${props => props.theme.darkText};
     font-weight: 600;
     font-size: 0.9rem;
   }
@@ -67,7 +67,9 @@ export const Content = styled.div<{ open: boolean }>`
 
   background-color: ${props => props.theme.white};
 
-  border: 1px solid ${props => props.theme.filter.border};
+  border: 1px solid
+    ${props =>
+      props.theme.dark ? props.theme.card.border : props.theme.lightGray};
   border-radius: 0.5rem;
 
   cursor: pointer;
@@ -117,7 +119,7 @@ export const SelectorContainer = styled.div<{ open: boolean }>`
 
   background-color: ${props => props.theme.white};
 
-  border: 1px solid ${props => props.theme.filter.border};
+  border: 1px solid ${props => props.theme.lightGray};
   border-radius: 0.5rem;
 
   animation: ${props => (props.open ? Hide : Show)} 0.2s
@@ -152,15 +154,14 @@ export const Item = styled.div<{ selected: boolean }>`
   align-items: center;
 
   background-color: ${props =>
-    props.selected && transparentize(0.75, props.theme.filter.item.background)};
+    props.selected && transparentize(0.75, props.theme.lightGray)};
 
   border-radius: 0.5rem;
 
   transition: 0.2s ease;
 
   &:hover {
-    background-color: ${props =>
-      transparentize(0.75, props.theme.filter.item.background)};
+    background-color: ${props => transparentize(0.75, props.theme.lightGray)};
   }
 
   p {
@@ -175,6 +176,8 @@ export const Item = styled.div<{ selected: boolean }>`
 export const HiddenInput = styled.input<{ show: boolean }>`
   width: 100%;
   display: ${props => (props.show ? 'inline-block' : 'none')};
+  caret-color: ${props => props.theme.black};
+  color: ${props => props.theme.black};
 `;
 
 export const ArrowDownContainer = styled.div`

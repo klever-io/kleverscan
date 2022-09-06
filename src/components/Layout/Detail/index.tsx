@@ -1,10 +1,10 @@
-import { ArrowLeft } from '@/assets/icons';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Table, { ITable } from '@/components/Table';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { Container, Header, Input, TableContainer, Title } from './styles';
+import Title from '../Title';
+import { Container, Header, Input, TableContainer } from './styles';
 
 interface IDetail {
   title: string;
@@ -14,6 +14,7 @@ interface IDetail {
   page: number;
   setPage: React.Dispatch<React.SetStateAction<number>>;
   tableProps: ITable;
+  route?: string;
 }
 
 const Detail: React.FC<IDetail> = ({
@@ -25,19 +26,14 @@ const Detail: React.FC<IDetail> = ({
   page,
   setPage,
   tableProps,
+  route,
 }) => {
   const router = useRouter();
 
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/')}>
-            <ArrowLeft />
-          </div>
-          <h1>{title}</h1>
-          <Icon />
-        </Title>
+        <Title title={title} Icon={Icon} route={route} />
 
         <Input />
       </Header>
@@ -47,15 +43,18 @@ const Detail: React.FC<IDetail> = ({
       </TableContainer>
       <Table {...tableProps} />
 
-      <PaginationContainer>
-        <Pagination
-          count={paginationCount}
-          page={page}
-          onPaginate={page => {
-            setPage(page);
-          }}
-        />
-      </PaginationContainer>
+      {!!paginationCount && (
+        <PaginationContainer>
+          <Pagination
+            scrollUp={true}
+            count={paginationCount}
+            page={page}
+            onPaginate={page => {
+              setPage(page);
+            }}
+          />
+        </PaginationContainer>
+      )}
     </Container>
   );
 };

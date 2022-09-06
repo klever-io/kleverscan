@@ -3,12 +3,14 @@ import { FormHandles, Scope, SubmitHandler } from '@unform/core';
 import React, { useCallback, useRef, useState } from 'react';
 import AdvancedOptions from './AdvancedOptions';
 import FormInput from './FormInput';
+import { InfoIcon, TooltipContainer, TooltipContent } from './FormInput/styles';
 import {
   AdvancedOptsContainer,
   ArrowDownIcon,
   ArrowUpIcon,
   ButtonContainer,
   FormBody,
+  FormGap,
   FormSection,
   SectionTitle,
 } from './styles';
@@ -40,6 +42,7 @@ export interface ISection {
   title?: string;
   inner?: boolean;
   innerPath?: string;
+  tooltip?: string;
   fields: IFormField[];
 }
 
@@ -62,6 +65,7 @@ const Form: React.FC<any> = ({
   setData,
   setIsMultisig,
   isMultisig,
+  showForm,
 }) => {
   const formRef = useRef<FormHandles>(null);
   const [sections, setSections] = useState(defaultSections);
@@ -246,7 +250,17 @@ const Form: React.FC<any> = ({
       } else if (field.props?.innerSection && field.props.array) {
         return (
           <FormSection inner key={String(index)}>
-            <SectionTitle>{field.label}</SectionTitle>
+            <SectionTitle>
+              {field.label}
+              {field.props?.tooltip && (
+                <TooltipContainer>
+                  <InfoIcon size={13} />
+                  <TooltipContent>
+                    <p>{field.props.tooltip}</p>
+                  </TooltipContent>
+                </TooltipContainer>
+              )}
+            </SectionTitle>
             {getSectionArrayInputs(field, sectionIndex)}
             {addFieldButton(field, sectionIndex, index)}
             {removeFieldButton(field, sectionIndex, index)}
@@ -273,24 +287,49 @@ const Form: React.FC<any> = ({
     ref: formRef,
   };
 
+  const isEmptyContract = (contract: string) => {
+    const contracts = [
+      'UnjailContract',
+      'WithdrawContract',
+      'UnfreezeContract',
+      'UndelegateContract',
+      'UpdateAccountPermissionContract',
+      'SetITOPricesContract',
+      'SetITOPricesContract',
+      'AssetTriggerContract',
+    ];
+
+    return contracts.includes(contract);
+  };
+
   return (
     <FormBody {...formProps}>
-      {sections.map((section: any, index: number) => (
-        <FormSection key={String(index)}>
-          <SectionTitle>{section.title}</SectionTitle>
-          {getSectionInputs(section, index)}
-        </FormSection>
-      ))}
+      {showForm &&
+        sections.map((section: any, index: number) => {
+          return (
+            <>
+              {sections.length === 1 && section.title && <FormGap />}
+              <FormSection key={String(index)}>
+                <SectionTitle>
+                  <p>{section.title}</p>
+                  {section.tooltip && (
+                    <TooltipContainer>
+                      <InfoIcon size={13} />
+                      <TooltipContent>
+                        <span>{section.tooltip}</span>
+                      </TooltipContent>
+                    </TooltipContainer>
+                  )}
+                </SectionTitle>
+                {getSectionInputs(section, index)}
+              </FormSection>
+            </>
+          );
+        })}
 
-      {children}
+      {showForm && children}
 
-      {sections.length > 0 ||
-      contractName === 'UnjailContract' ||
-      contractName === 'WithdrawContract' ||
-      contractName === 'UnfreezeContract' ||
-      contractName === 'UndelegateContract' ||
-      contractName === 'SetITOPricesContract' ||
-      contractName === 'UpdateAccountPermissionContract' ? (
+      {sections.length > 0 || isEmptyContract(contractName) ? (
         <>
           <AdvancedOptsContainer
             onClick={() => setShowAdvancedOpts(!showAdvancedOpts)}

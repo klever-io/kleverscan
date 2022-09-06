@@ -55,7 +55,7 @@ export const Input = styled(DefaultInput)`
 
   background-color: ${props => props.theme.white};
 
-  border-color: ${props => props.theme.filter.border};
+  border-color: ${props => props.theme.lightGray};
 
   input {
     min-width: 12rem;
@@ -68,6 +68,8 @@ export const CardContainer = styled.div`
   display: flex;
 
   flex-direction: column;
+
+  color: ${props => props.theme.black};
 `;
 
 export const CardContent = styled.div`
@@ -87,6 +89,8 @@ export const Row = styled.div`
 
   flex-direction: row;
   align-items: center;
+
+  color: ${props => props.theme.black};
 
   &:not(:last-child) {
     border-bottom: 1px solid ${props => props.theme.card.border};
@@ -112,13 +116,13 @@ export const Row = styled.div`
     strong {
       font-weight: 600;
       font-size: 0.95rem;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     small {
       font-weight: 400;
       font-size: 0.95rem;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     a {
@@ -128,7 +132,7 @@ export const Row = styled.div`
     }
 
     p {
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
       font-weight: 400;
     }
   }

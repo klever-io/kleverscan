@@ -35,6 +35,8 @@ export const ItemContainer = styled.div<{ selected: boolean }>`
 
   cursor: pointer;
 
+  color: ${props => props.theme.black};
+
   span {
     padding: 0.5rem;
     opacity: ${props => (props.selected ? 1 : 0.2)};
@@ -59,8 +61,11 @@ export const FilterContent = styled.div`
       width: 100%;
       height: 2.8rem;
       display: flex;
-      background: rgba(198, 199, 235, 0.2);
-      border: 1px solid ${props => props.theme.filter.border};
+      background-color: ${props =>
+        props.theme.dark
+          ? props.theme.card.assetText
+          : props.theme.dateFilter.outsideBackground};
+      border: 1px solid ${props => props.theme.lightGray};
       border-radius: 0.5rem;
       cursor: pointer;
       font-family: 'Montserrat';
@@ -101,5 +106,5 @@ export const Indicator = styled.div<{ selected: boolean }>`
   visibility: ${props => (props.selected ? 'visible' : 'hidden')};
   opacity: ${props => (props.selected ? 1 : 0)};
 
-  background-color: ${props => props.theme.tab.indicator};
+  background-color: ${props => props.theme.violet};
 `;

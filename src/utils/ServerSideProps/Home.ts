@@ -1,18 +1,21 @@
 import api from '@/services/api';
 import { Service } from '@/types/index';
-import { getEpochInfo } from '@/utils/index';
+import { addPrecisionTransactions, getEpochInfo } from '@/utils/index';
 import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import nextI18NextConfig from '../../../next-i18next.config';
 import {
   IAccountResponse,
   IBlockResponse,
   IGeckoChartResponse,
   IGeckoResponse,
   IHome,
-  IParsedMetrics,
   ITransactionListResponse,
 } from '../../types';
 
-const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
+const HomeServerSideProps: GetServerSideProps<IHome> = async ({
+  locale = 'en',
+}) => {
   const props: IHome = {
     blocks: [],
     transactions: [],
@@ -57,6 +60,11 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
         circulatingSupply: null,
       },
     },
+    ...(await serverSideTranslations(
+      locale,
+      ['common', 'blocks', 'transactions'],
+      nextI18NextConfig,
+    )),
   };
 
   const pushCoinData = (
@@ -141,7 +149,7 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
     async (resolve, reject) => {
       const res = await api.getCached({
         route: 'node/statistics',
-        service: Service.NODE,
+        service: Service.PROXY,
       });
 
       if (!res.error || res.error === '') {
@@ -153,9 +161,9 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
   );
 
   const metricsCall = new Promise<IAccountResponse>(async (resolve, reject) => {
-    const res = await api.text({
-      route: 'node/metrics',
-      service: Service.NODE,
+    const res = await api.get({
+      route: 'node/overview',
+      service: Service.PROXY,
     });
 
     if (!res.error || res.error === '') {
@@ -332,7 +340,7 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
   ];
 
   await Promise.allSettled(promises).then(responses => {
-    responses.forEach((res, index) => {
+    responses.forEach(async (res, index) => {
       if (res.status !== 'rejected') {
         const { value }: any = res;
 
@@ -344,6 +352,7 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
           case 1:
             props.transactions = value.data.transactions;
             props.totalTransactions = value.pagination.totalRecords;
+            props.transactions = addPrecisionTransactions(props.transactions);
             break;
 
           case 2:
@@ -361,16 +370,10 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
             break;
 
           case 5:
-            const parsedMetrics = {} as IParsedMetrics;
+            if (value) {
+              props.epochInfo = getEpochInfo(value.data.overview);
+            }
 
-            const metricLines = value?.split('\n');
-            metricLines?.forEach((line: any) => {
-              const props = line?.split(' ');
-
-              parsedMetrics[props[0]?.split('{')?.[0]] = parseInt(props?.[1]);
-            });
-
-            props.epochInfo = getEpochInfo(parsedMetrics);
             break;
 
           case 6:
@@ -395,11 +398,14 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async () => {
             break;
 
           case 10:
-            props.yesterdayTransactions = value.data.number_by_day[0].doc_count;
+            if (value.data?.number_by_day?.length > 0)
+              props.yesterdayTransactions =
+                value.data?.number_by_day[0]?.doc_count;
             break;
 
           case 11:
-            props.yesterdayAccounts = value.data.number_by_day[0].doc_count;
+            if (value.data?.number_by_day?.length > 0)
+              props.yesterdayAccounts = value.data?.number_by_day[0]?.doc_count;
             break;
 
           case 12:

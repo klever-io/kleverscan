@@ -1,20 +1,20 @@
-import { ArrowLeft, Certified } from '@/assets/icons';
+import { Certified } from '@/assets/icons';
 import { Assets as Icon } from '@/assets/title-icons';
+import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Table, { ITable } from '@/components/Table';
-import { Row } from '@/components/Table/styles';
 import api from '@/services/api';
 import { IAsset, IPagination, IResponse } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { formatAmount, parseHardCodedInfo } from '@/utils/index';
-import { Container, Header, Input, Title } from '@/views/assets';
+import { Container, Header, Input } from '@/views/assets';
 import { LetterLogo, Logo } from '@/views/assets/index';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { ReactNode, useCallback, useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
 
 interface IAssetPage {
@@ -43,8 +43,9 @@ const Assets: React.FC<IAssetPage> = ({
     const fetchData = async () => {
       setLoading(true);
 
-      const response: IAssetResponse = await api.get({
+      const response: IAssetResponse = await api.getCached({
         route: `assets/kassets?hidden=false&page=${page}`,
+        refreshTime: 21600,
       });
 
       if (!response.error) {
@@ -57,19 +58,21 @@ const Assets: React.FC<IAssetPage> = ({
     fetchData();
   }, [page]);
 
-  const TableBody: React.FC<IAsset> = ({
-    ticker,
-    name,
-    logo,
-    assetId,
-    assetType,
-    initialSupply,
-    maxSupply,
-    staking,
-    circulatingSupply,
-    precision,
-    verified,
-  }) => {
+  const rowSections = (asset: IAsset): JSX.Element[] => {
+    const {
+      ticker,
+      name,
+      logo,
+      assetId,
+      assetType,
+      initialSupply,
+      maxSupply,
+      staking,
+      circulatingSupply,
+      precision,
+      verified,
+    } = asset;
+
     const renderMaxSupply = (): ReactNode => {
       return (
         <strong>
@@ -82,79 +85,68 @@ const Assets: React.FC<IAssetPage> = ({
       );
     };
 
-    const isVerified = useCallback(() => {
+    const isVerified = () => {
       if (verified) {
         return <Certified className="isVerified" />;
       }
-    }, []);
+    };
 
-    return (
-      <Row type="assetsPage">
-        <Link href={`/asset/${assetId}`}>
-          <a>
-            <AssetLogo
-              LetterLogo={LetterLogo}
-              isVerified={isVerified}
-              Logo={Logo}
-              logo={logo}
-              ticker={ticker}
-              name={name}
-            />
-          </a>
-        </Link>
+    const sections = [
+      <Link href={`/asset/${assetId}`} key={assetId}>
+        <a>
+          <AssetLogo
+            LetterLogo={LetterLogo}
+            isVerified={isVerified}
+            Logo={Logo}
+            logo={logo}
+            ticker={ticker}
+            name={name}
+          />
+        </a>
+      </Link>,
 
-        <Link href={`/asset/${assetId}`}>
-          <a>
-            <p>{ticker}</p>
-          </a>
-        </Link>
+      <Link href={`/asset/${assetId}`} key={ticker}>
+        <a>
+          <p>{ticker}</p>
+        </a>
+      </Link>,
 
-        <span>
-          <Link href={`/asset/${assetId}`}>{assetId}</Link>
-        </span>
+      <Link href={`/asset/${assetId}`} key={assetId}>
+        {assetId}
+      </Link>,
+      <Link href={`/asset/${assetId}`} key={assetId}>
+        <a>
+          <p
+            style={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {name}
+          </p>
+        </a>
+      </Link>,
 
-        <Link href={`/asset/${assetId}`}>
-          <a>
-            <p
-              style={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {name}
-            </p>
-          </a>
-        </Link>
+      <span key={assetType}>{assetType}</span>,
+      <strong key={initialSupply}>
+        {formatAmount(initialSupply / 10 ** precision)} {ticker}
+      </strong>,
+      <strong key={maxSupply}>
+        {renderMaxSupply()} {ticker}
+      </strong>,
+      <strong key={circulatingSupply}>
+        {formatAmount(circulatingSupply / 10 ** precision)} {ticker}
+      </strong>,
+      <strong key={String(staking?.totalStaked)}>
+        {staking?.totalStaked
+          ? formatAmount(staking.totalStaked / 10 ** precision)
+          : 0}
+      </strong>,
+      <strong key={precision}>{precision}</strong>,
+    ];
 
-        <span>{assetType}</span>
-        <span>
-          <strong>
-            {formatAmount(initialSupply / 10 ** precision)} {ticker}
-          </strong>
-        </span>
-        <span>
-          <strong>
-            {renderMaxSupply()} {ticker}
-          </strong>
-        </span>
-        <span>
-          <strong>
-            {formatAmount(circulatingSupply / 10 ** precision)} {ticker}
-          </strong>
-        </span>
-        <span>
-          <strong>
-            {staking?.totalStaked
-              ? formatAmount(staking.totalStaked / 10 ** precision)
-              : 0}
-          </strong>
-        </span>
-        <span>
-          <strong>{precision}</strong>
-        </span>
-      </Row>
-    );
+    return sections;
   };
 
   const header = [
@@ -171,7 +163,7 @@ const Assets: React.FC<IAssetPage> = ({
   ];
 
   const tableProps: ITable = {
-    body: TableBody,
+    rowSections,
     data: assets as any[],
     header,
     loading,
@@ -181,13 +173,7 @@ const Assets: React.FC<IAssetPage> = ({
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/')}>
-            <ArrowLeft />
-          </div>
-          <h1>Assets</h1>
-          <Icon />
-        </Title>
+        <Title title="Assets" Icon={Icon} />
 
         <Input />
       </Header>
@@ -196,6 +182,7 @@ const Assets: React.FC<IAssetPage> = ({
 
       <PaginationContainer>
         <Pagination
+          scrollUp={true}
           count={pagination.totalPages}
           page={page}
           onPaginate={page => {
@@ -210,19 +197,18 @@ const Assets: React.FC<IAssetPage> = ({
 export const getServerSideProps: GetServerSideProps = async () => {
   const props: IAssetPage = { assets: [], pagination: {} as IPagination };
 
-  const assets: IAssetResponse = await api.get({
+  const assets: IAssetResponse = await api.getCached({
     route: 'assets/kassets?hidden=false',
+    refreshTime: 21600,
   });
   if (!assets.error) {
     props.assets = assets.data.assets;
     props.pagination = assets.pagination;
   }
 
-  props.pagination = assets.pagination;
+  props.pagination = assets?.pagination || {};
 
   props.assets = parseHardCodedInfo(props.assets);
-
-  console.log(props.assets[0]);
 
   return { props };
 };

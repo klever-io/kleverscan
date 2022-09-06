@@ -14,7 +14,7 @@ interface INetworkParams {
 interface INetworkParam {
   number: number;
   parameter: string;
-  currentValue: number;
+  currentValue: string;
 }
 
 const NetworkParams: React.FC<INetworkProps> = ({ networkParams, loading }) => {

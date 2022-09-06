@@ -2,7 +2,7 @@ import dynamic from 'next/dynamic';
 import React, { useCallback } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
 import { components } from 'react-select';
-import { Container } from './styles';
+import { Container, TitleLabel } from './styles';
 
 const ReactSelect = dynamic(() => import('react-select'), {
   ssr: false,
@@ -19,6 +19,9 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   selectPlaceholder?: string;
   onChange: (value: any) => void;
   title?: string;
+  getAssets?: () => void;
+  label?: string;
+  precedence?: number; // z-index precedence
 }
 
 const Select: React.FC<IFilter> = ({
@@ -26,6 +29,9 @@ const Select: React.FC<IFilter> = ({
   onChange,
   selectPlaceholder,
   title,
+  getAssets,
+  label,
+  precedence,
   ...rest
 }) => {
   const Placeholder = useCallback((props: any) => {
@@ -51,12 +57,14 @@ const Select: React.FC<IFilter> = ({
   };
 
   return (
-    <Container>
+    <Container precedence={precedence}>
+      {label && <TitleLabel>{label}</TitleLabel>}
       <ReactSelect
         placeholder={
           selectPlaceholder ? selectPlaceholder : `Choose ${title ? title : ''}`
         }
         components={{ Placeholder, DropdownIndicator }}
+        onFocus={() => getAssets && getAssets()}
         {...props}
       />
     </Container>

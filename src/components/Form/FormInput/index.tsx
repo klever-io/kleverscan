@@ -12,6 +12,7 @@ import {
   Toggle,
   ToggleContainer,
   TooltipContainer,
+  TooltipContent,
 } from './styles';
 
 const Select = dynamic(() => import('./Select'), {
@@ -147,14 +148,19 @@ const FormInput: React.FC<IFormInputProps> = ({
 
   return (
     <Container {...containerProps}>
-      <InputLabel disabled={inputProps.disabled}>
-        {title}{' '}
-        {tooltip && (
-          <TooltipContainer tooltip={tooltip}>
-            <InfoIcon />
-          </TooltipContainer>
-        )}
-      </InputLabel>
+      {type !== 'hidden' && (
+        <InputLabel disabled={inputProps.disabled}>
+          {title}{' '}
+          {tooltip && (
+            <TooltipContainer>
+              <InfoIcon />
+              <TooltipContent>
+                <p>{tooltip}</p>
+              </TooltipContent>
+            </TooltipContainer>
+          )}
+        </InputLabel>
+      )}
       {type === 'checkbox' && toggleOptions && (
         <>
           <ToggleContainer
@@ -172,7 +178,7 @@ const FormInput: React.FC<IFormInputProps> = ({
                   return e;
                 }}
               />
-              <Slider />
+              <Slider active={String(getIsChecked())} />
               {error && <span>{description}</span>}
             </Toggle>
             {toggleOptions.length > 1 && toggleOptions[1]}
@@ -191,12 +197,21 @@ const FormInput: React.FC<IFormInputProps> = ({
           {error && <span>{description}</span>}
         </>
       )}
-      {type !== 'checkbox' && type !== 'dropdown' && type !== 'textarea' && (
+      {type === 'hidden' && (
         <>
           <StyledInput {...inputProps} />
           {error && <span>{description}</span>}
         </>
       )}
+      {type !== 'checkbox' &&
+        type !== 'dropdown' &&
+        type !== 'textarea' &&
+        type !== 'hidden' && (
+          <>
+            <StyledInput {...inputProps} />
+            {error && <span>{description}</span>}
+          </>
+        )}
     </Container>
   );
 };

@@ -19,10 +19,10 @@ const defaultStyles = css`
   width: 100%;
 
   padding: 0.5rem 1rem;
-  border: 1px solid ${({ theme }) => theme.input.border.dark};
+  border: 1px solid ${({ theme }) => theme.darkText};
   border-radius: 0.5rem;
 
-  color: ${({ theme }) => theme.input.border.dark};
+  color: ${({ theme }) => theme.darkText};
 
   background-color: transparent;
 
@@ -34,7 +34,7 @@ const defaultStyles = css`
 `;
 
 export const StyledInput = styled.input<IProps>`
-  height: 3rem;
+  height: ${({ type }) => (type === 'hidden' ? 0 : 3)}rem;
 
   ${defaultStyles}
 
@@ -59,6 +59,20 @@ export const StyledInput = styled.input<IProps>`
           + label {
             color: ${theme.error} !important;
           }
+        `
+      : null}
+
+  ${({ type }) =>
+    type === 'hidden'
+      ? css`
+          position: absolute;
+          top: 100;
+          bottom: 0;
+          z-index: -1;
+          pointer-events: none;
+          color: transparent;
+          border: none;
+          outline: none;
         `
       : null}
 
@@ -128,18 +142,19 @@ export const ToggleContainer = styled.div<IProps>`
   gap: 1rem;
   opacity: ${props => (props.disabled ? 0.6 : 1)};
   pointer-events: ${props => (props.disabled ? 'none' : 'auto')};
-  color: ${props => props.theme.input.text};
+  color: ${props => props.theme.darkText};
   user-select: none;
 `;
 
-export const Slider = styled.div`
+export const Slider = styled.div<{ active?: string }>`
   position: absolute;
   cursor: pointer;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: ${({ theme }) => lighten(0, '#7B7DB2')};
+  background-color: ${props =>
+    props?.active === 'true' ? props.theme.purple : lighten(0, '#7B7DB2')};
   -webkit-transition: 0.4s;
   transition: 0.4s;
   border-radius: 5rem;
@@ -193,7 +208,31 @@ export const RightContentContainer = styled.div`
 
 export const InfoIcon = styled(BsQuestionCircleFill)`
   height: 1rem;
-  color: ${({ theme }) => theme.input.border.dark};
+  color: ${({ theme }) => theme.darkText};
+`;
+
+export const TooltipContent = styled.div`
+  &:hover {
+    visibility: visible;
+  }
+  color: ${props => props.theme.form.tooltip};
+  position: absolute;
+  display: inline-block;
+  background-color: ${props => props.theme.form.tooltipContainer};
+  padding: 0.4rem 0.5rem 0.4rem 0.5rem;
+  margin-left: 0.5rem;
+  border-radius: 0.2rem;
+  font-size: smaller;
+  visibility: hidden;
+
+  @media (min-width: 950px) {
+    white-space: pre;
+  }
+
+  @media (max-width: 950px) {
+    width: auto;
+    min-width: 18rem;
+  }
 `;
 
 export const TooltipContainer = styled.div<{
@@ -202,32 +241,10 @@ export const TooltipContainer = styled.div<{
   user-select: none;
 
   position: relative;
-  z-index: 10;
 
   &:hover {
-    &::after {
-      font-size: 0.75rem;
-      letter-spacing: initial;
-
-      margin-left: 0.5rem;
-
-      background-color: ${props => props.theme.card.background};
-      color: ${props => props.theme.white};
-
-      padding: 0.5rem;
-
-      border-radius: 5px;
-
-      z-index: 900;
-
-      white-space: pre;
-
-      transform: translate(-50%, 100%);
-      ${props =>
-        props.tooltip &&
-        css`
-          content: '${props.tooltip}';
-        `}
+    div {
+      visibility: visible;
     }
   }
 
@@ -243,6 +260,7 @@ export const InputLabel = styled.label<ILabel>`
   font-size: smaller;
   font-weight: 600;
   transform: translate(-1rem, -2.25rem);
+  z-index: 997;
 
   position: absolute;
   left: 1rem;
@@ -253,7 +271,7 @@ export const InputLabel = styled.label<ILabel>`
 
   gap: 0.5rem;
 
-  color: ${({ theme }) => theme.input.border.dark};
+  color: ${({ theme }) => theme.darkText};
 
   transition: transform 0.2s ease;
 

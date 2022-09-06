@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 interface DayItemProps {
   isKey: boolean;
@@ -55,6 +55,9 @@ export const fadeInContainerMobile = keyframes`
 export const Container = styled.div`
   display: block;
   position: relative;
+  @media (max-width: 1025px) {
+    width: 100%;
+  }
 `;
 
 export const OutsideContainer = styled.div`
@@ -83,7 +86,10 @@ export const OutsideContent = styled.div`
   align-items: center;
   justify-content: center;
 
-  background-color: rgba(198, 199, 235, 0.2);
+  background-color: ${props =>
+    props.theme.dark
+      ? props.theme.card.assetText
+      : props.theme.dateFilter.outsideBackground};
   border-radius: 0.5rem;
 
   cursor: pointer;
@@ -103,13 +109,13 @@ export const Input = styled.input`
   width: 75%;
   font-weight: 700;
   font-size: 0.95rem;
-  color: ${props => props.theme.footer.hover};
+  color: ${props => props.theme.violet};
 
   caret-color: transparent;
 
   cursor: pointer;
   &::placeholder {
-    color: ${props => props.theme.footer.hover};
+    color: ${props => props.theme.violet};
   }
   &:not([value='']) {
     animation: ${fadeInItem} 0.2s ease-in-out;
@@ -132,11 +138,12 @@ export const CalendarContainer = styled.div`
   border-radius: 20px;
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
 
-  @media (min-width: 768px) {
+  @media (min-width: 1025px) {
     animation: ${fadeInContainer} 0.2s linear;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1025px) {
+    left: 7rem;
     animation: ${fadeInContainerMobile} 0.2s linear forwards;
   }
 `;
@@ -230,29 +237,33 @@ export const DayItem = styled.div.attrs((props: DayItemProps) => ({
   color: ${props => props.theme.black};
   ${props =>
     props.isKey &&
-    `
-    background-color: ${props.theme.purple};
-    color: ${props.theme.white};
-  `};
+    css`
+      background-color: ${props.theme.purple};
+      color: ${props.theme.true.white};
+    `};
   ${props =>
     props.isBetween &&
     !props.isKey &&
-    `
-    background-color: ${props.theme.purple};
-    filter: opacity(0.75);
-    color: ${props.theme.white};
-  `};
+    css`
+      background-color: ${props.theme.purple};
+      filter: ${props.theme.dark ? 'brightness(0.66)' : 'opacity(0.75)'};
+      color: ${props.theme.white};
+    `};
 
   ${props =>
     props.isCurrent &&
     !props.isKey &&
     !props.isBetween &&
-    `background-color: ${props.theme.gray}`};
+    css`
+      background-color: ${props.theme.dark
+        ? props.theme.card.assetText
+        : props.theme.gray};
+    `};
   ${props =>
     props.isAfter &&
-    `
-    color: ${props.theme.gray};
-    pointer-events: none;
+    css`
+      filter: opacity(0.15);
+      pointer-events: none;
     `}
 `;
 
@@ -278,6 +289,7 @@ export const Confirm = styled.button.attrs((props: ConfirmButtonProps) => ({
   padding: 0.5rem;
   border-radius: 0.5rem;
   background-color: ${props => props.theme.purple};
+  color: ${props => props.theme.true.white};
   transition: all 0.1s ease-in-out;
   ${props =>
     !props.isActive &&

@@ -7,7 +7,7 @@ export const Container = styled.div`
   background-color: ${props => props.theme.background};
 
   @media (max-width: 768px) {
-    padding: 3rem 3rem 5rem 3rem;
+    padding: 3rem 1rem 5rem 1rem;
   }
 `;
 
@@ -51,7 +51,7 @@ export const Input = styled(DefaultInput)`
 
   background-color: ${props => props.theme.white};
 
-  border-color: ${props => props.theme.filter.border};
+  border-color: ${props => props.theme.lightGray};
 `;
 
 export const ProgressContent = styled.div`
@@ -119,13 +119,13 @@ export const Card = styled.div`
 
       font-size: 0.85rem;
       font-weight: 400;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     small {
       font-size: 0.85rem;
       font-weight: 600;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
   }
 `;

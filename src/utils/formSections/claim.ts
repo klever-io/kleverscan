@@ -1,12 +1,12 @@
 import { ISection } from 'components/Form';
 
-const claimContract = (): ISection[] => {
+const claimContract = (labelId: string): ISection[] => {
   const section = [] as ISection[];
 
   section.push({
     fields: [
       {
-        label: 'Id',
+        label: labelId,
         props: {
           required: true,
         },

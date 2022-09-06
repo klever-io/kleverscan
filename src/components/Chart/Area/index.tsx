@@ -13,7 +13,7 @@ interface IChart {
 
 const Chart: React.FC<IChart> = ({ data, theme, bg = 'regular' }) => {
   return (
-    <ResponsiveContainer width="100%" height="100%">
+    <ResponsiveContainer width="100%" height="100%" debounce={300}>
       <AreaChart data={data}>
         <defs>
           <linearGradient id="areaBackground" x1="0" y1="0" x2="0" y2="1">
@@ -28,9 +28,7 @@ const Chart: React.FC<IChart> = ({ data, theme, bg = 'regular' }) => {
             />
             <stop
               offset="90%"
-              stopColor={
-                bg === 'regular' ? theme.chart.lightBg : theme.chart.darkBg
-              }
+              stopColor={bg === 'regular' ? theme.violet : theme.chart.darkBg}
               stopOpacity={0}
             />
           </linearGradient>

@@ -58,11 +58,12 @@ export const ItemContainer = styled.div<{
   justify-content: center;
 
   background-color: ${props =>
-    props.active ? props.theme.pagination.active : 'transparent'};
+    props.active ? props.theme.purple : 'transparent'};
 
   border-radius: 50%;
 
-  color: ${props => (props.active ? props.theme.white : props.theme.black)};
+  color: ${props =>
+    props.active ? props.theme.true.white : props.theme.black};
 
   cursor: pointer;
 
@@ -72,7 +73,7 @@ export const ItemContainer = styled.div<{
     ${props =>
       !props.active
         ? css`
-            background-color: ${props => props.theme.pagination.active};
+            background-color: ${props => props.theme.purple};
             color: ${props => props.theme.white};
           `
         : css`

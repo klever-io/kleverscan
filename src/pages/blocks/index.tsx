@@ -1,9 +1,9 @@
-import { ArrowLeft } from '@/assets/icons';
 import { Blocks as Icon } from '@/assets/title-icons';
+import ToggleButton from '@/components/Button/Toggle';
+import Title from '@/components/Layout/Title';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import Table, { ITable } from '@/components/Table';
-import { Row } from '@/components/Table/styles';
 import api from '@/services/api';
 import { IBlock, IPagination, IResponse } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
@@ -26,9 +26,6 @@ import {
   Input,
   TableContainer,
   TableHeader,
-  Title,
-  ToggleButton,
-  ToggleButtonContainer,
   UpdateContainer,
 } from '@/views/blocks';
 import { format, fromUnixTime } from 'date-fns';
@@ -102,6 +99,15 @@ const Blocks: React.FC<IBlocks> = ({
     const updateBlocksConfig = getStorageUpdateConfig();
     setAutoUpdate(updateBlocksConfig);
   }, []);
+
+  useEffect(() => {
+    if (page !== 1) {
+      setAutoUpdate(false);
+    } else {
+      const updateBlocksConfig = getStorageUpdateConfig();
+      setAutoUpdate(updateBlocksConfig);
+    }
+  }, [page]);
 
   useDidUpdateEffect(() => {
     const fetchData = async () => {
@@ -292,70 +298,64 @@ const Blocks: React.FC<IBlocks> = ({
     'Block Rewards',
   ];
 
-  const TableBody: React.FC<IBlock> = ({
-    nonce,
-    size,
-    producerName,
-    timestamp,
-    txCount,
-    txFees,
-    kAppFees,
-    txBurnedFees,
-    blockRewards,
-  }) => {
-    return (
-      <Row type="blocks">
-        <span>
-          <Link href={`/block/${nonce}`}>{String(nonce)}</Link>
-        </span>
-        <span>{size.toLocaleString()} Bytes</span>
-        <Link href={`/validator/${producerName}`}>
-          {parseAddress(producerName, 14)}
-        </Link>
-        <span>
-          <small>
-            {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
-          </small>
-        </span>
-        <span>{txCount}</span>
-        <span>
-          <small>{`${formatAmount(
-            (txBurnedFees || 0) / 10 ** precision,
-          )} KLV`}</small>
-        </span>
-        <span>
-          <small>{formatAmount((kAppFees || 0) / 10 ** precision)} KLV</small>
-        </span>
-        <span>
-          <small>{formatAmount((txFees || 0) / 10 ** precision)} KLV</small>
-        </span>
-        <span>
-          <strong>
-            {formatAmount((blockRewards || 0) / 10 ** precision)} KLV
-          </strong>
-        </span>
-      </Row>
-    );
+  const rowSections = (block: IBlock): JSX.Element[] => {
+    const {
+      nonce,
+      size,
+      producerName,
+      producerOwnerAddress,
+      timestamp,
+      txCount,
+      txFees,
+      kAppFees,
+      txBurnedFees,
+      blockRewards,
+    } = block;
+
+    const sections = [
+      <Link href={`/block/${nonce}`} key={nonce}>
+        {String(nonce)}
+      </Link>,
+      <React.Fragment key={size}>{size.toLocaleString()} Bytes</React.Fragment>,
+      <Link
+        href={`/validator/${producerOwnerAddress}`}
+        key={producerOwnerAddress}
+      >
+        {parseAddress(producerName, 12)}
+      </Link>,
+      <small key={timestamp}>
+        {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
+      </small>,
+      <React.Fragment key={txCount}>{txCount}</React.Fragment>,
+      <small key={txBurnedFees}>{`${formatAmount(
+        (txBurnedFees || 0) / 10 ** precision,
+      )} KLV`}</small>,
+      <small key={kAppFees}>
+        {formatAmount((kAppFees || 0) / 10 ** precision)} KLV
+      </small>,
+      <small key={txFees}>
+        {formatAmount((txFees || 0) / 10 ** precision)} KLV
+      </small>,
+      <strong key={blockRewards}>
+        {formatAmount((blockRewards || 0) / 10 ** precision)} KLV
+      </strong>,
+    ];
+
+    return sections;
   };
 
   const tableProps: ITable = {
     type: 'blocks',
     header,
     data: blocks as any[],
-    body: TableBody,
+    rowSections,
     loading,
   };
 
   return (
     <Container>
       <Header>
-        <Title>
-          <div onClick={() => router.push('/')}>
-            <ArrowLeft />
-          </div>
-          <h1>Blocks</h1>
-          <Icon />
-        </Title>
+        <Title title="Blocks" Icon={Icon} />
 
         <Input />
       </Header>
@@ -371,9 +371,7 @@ const Blocks: React.FC<IBlocks> = ({
           <h3>List of blocks</h3>
           <UpdateContainer onClick={() => updateBlocks()}>
             <span>Auto update</span>
-            <ToggleButtonContainer autoUpdate={autoUpdate}>
-              <ToggleButton autoUpdate={autoUpdate} />
-            </ToggleButtonContainer>
+            <ToggleButton active={autoUpdate} />
           </UpdateContainer>
         </TableHeader>
         <EffectsContainer autoUpdate={autoUpdate}>
@@ -383,6 +381,7 @@ const Blocks: React.FC<IBlocks> = ({
 
       <PaginationContainer>
         <Pagination
+          scrollUp={true}
           count={pagination.totalPages}
           page={page}
           onPaginate={page => {

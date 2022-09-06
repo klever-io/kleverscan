@@ -11,7 +11,7 @@ export const Container = styled.div`
     padding-right: 5rem;
   }
   @media (max-width: 768px) {
-    padding: 3rem 3rem 5rem 3rem;
+    padding: 3rem 1rem 5rem 1rem;
   }
 `;
 
@@ -54,6 +54,10 @@ export const FilterContainer = styled.div`
 
   gap: 0.75rem;
 
+  > div:last-child {
+    min-width: 15rem;
+  }
+
   @media (max-width: 1200px) {
     width: 100%;
 
@@ -83,7 +87,7 @@ export const Input = styled(DefaultInput)`
 
   background-color: ${props => props.theme.white};
 
-  border-color: ${props => props.theme.filter.border};
+  border-color: ${props => props.theme.lightGray};
 `;
 
 export const CenteredRow = styled.span`

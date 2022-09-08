@@ -65,7 +65,7 @@ export const FilterContent = styled.div`
         props.theme.dark
           ? props.theme.card.assetText
           : props.theme.dateFilter.outsideBackground};
-      border: 1px solid ${props => props.theme.filter.border};
+      border: 1px solid ${props => props.theme.lightGray};
       border-radius: 0.5rem;
       cursor: pointer;
       font-family: 'Montserrat';
@@ -106,5 +106,5 @@ export const Indicator = styled.div<{ selected: boolean }>`
   visibility: ${props => (props.selected ? 'visible' : 'hidden')};
   opacity: ${props => (props.selected ? 1 : 0)};
 
-  background-color: ${props => props.theme.tab.indicator};
+  background-color: ${props => props.theme.violet};
 `;

@@ -3,6 +3,7 @@ import { FormHandles, Scope, SubmitHandler } from '@unform/core';
 import React, { useCallback, useRef, useState } from 'react';
 import AdvancedOptions from './AdvancedOptions';
 import FormInput from './FormInput';
+import { InfoIcon, TooltipContainer, TooltipContent } from './FormInput/styles';
 import {
   AdvancedOptsContainer,
   ArrowDownIcon,
@@ -41,6 +42,7 @@ export interface ISection {
   title?: string;
   inner?: boolean;
   innerPath?: string;
+  tooltip?: string;
   fields: IFormField[];
 }
 
@@ -248,7 +250,17 @@ const Form: React.FC<any> = ({
       } else if (field.props?.innerSection && field.props.array) {
         return (
           <FormSection inner key={String(index)}>
-            <SectionTitle>{field.label}</SectionTitle>
+            <SectionTitle>
+              {field.label}
+              {field.props?.tooltip && (
+                <TooltipContainer>
+                  <InfoIcon size={13} />
+                  <TooltipContent>
+                    <p>{field.props.tooltip}</p>
+                  </TooltipContent>
+                </TooltipContainer>
+              )}
+            </SectionTitle>
             {getSectionArrayInputs(field, sectionIndex)}
             {addFieldButton(field, sectionIndex, index)}
             {removeFieldButton(field, sectionIndex, index)}
@@ -298,7 +310,17 @@ const Form: React.FC<any> = ({
             <>
               {sections.length === 1 && section.title && <FormGap />}
               <FormSection key={String(index)}>
-                <SectionTitle>{section.title}</SectionTitle>
+                <SectionTitle>
+                  <p>{section.title}</p>
+                  {section.tooltip && (
+                    <TooltipContainer>
+                      <InfoIcon size={13} />
+                      <TooltipContent>
+                        <span>{section.tooltip}</span>
+                      </TooltipContent>
+                    </TooltipContainer>
+                  )}
+                </SectionTitle>
                 {getSectionInputs(section, index)}
               </FormSection>
             </>

@@ -83,8 +83,8 @@ export const SocialIcon = styled.div`
   transition: 0.2s ease;
 
   &:hover {
-    border-color: ${props => props.theme.footer.hover};
-    background-color: ${props => props.theme.footer.hover};
+    border-color: ${props => props.theme.violet};
+    background-color: ${props => props.theme.violet};
   }
 `;
 
@@ -135,7 +135,7 @@ export const LinkItems = styled.div`
     }
 
     &:hover {
-      color: ${props => props.theme.footer.hover};
+      color: ${props => props.theme.violet};
     }
   }
 `;

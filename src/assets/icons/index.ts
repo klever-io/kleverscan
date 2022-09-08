@@ -5,7 +5,7 @@ import ArrowRight from './arrow-right.svg';
 import ArrowGreen from './arrow-up-green.svg';
 import Calendar from './calendar.svg';
 import Category from './category.svg';
-import Certified from './certified.svg';
+import Certified from './Certified.svg';
 import ChevronRight from './chevron-right.svg';
 import Compass from './compass.svg';
 import Copy from './copy.svg';

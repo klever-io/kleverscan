@@ -78,7 +78,7 @@ export const TableContainer = styled.div`
 
   border-radius: 0.5rem;
 
-  box-shadow: 0 2px 15px ${props => props.theme.table.shadow};
+  box-shadow: 0 2px 15px ${props => props.theme.shadow};
 
   table {
     width: 100%;

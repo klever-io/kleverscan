@@ -38,7 +38,7 @@ const setAccountNameContract = (): ISection[] => {
     fields: [
       {
         label: 'Name',
-        props: { required: true, tooltip: 'Set sender name of account' },
+        props: { required: true },
       },
     ],
   });
@@ -58,15 +58,25 @@ const undelegateContract = (): ISection[] => [];
 
 const setITOContract = (): ISection[] => [];
 
-const formSection = (
-  contract: string,
-  type?: string,
-  address = '',
-  paramsList?: IParamList[],
-  assetTriggerType?: number | null,
-  claimLabel?: string,
-  buyLabel?: string,
-): ISection[] => {
+interface IFormSectionArgs {
+  contract: string;
+  type?: string;
+  address: string;
+  paramsList?: IParamList[];
+  assetTriggerType?: number | null;
+  claimLabel?: string;
+  buyLabel?: string;
+}
+
+const formSection = ({
+  contract,
+  type,
+  address,
+  paramsList,
+  assetTriggerType,
+  claimLabel,
+  buyLabel,
+}: IFormSectionArgs): ISection[] => {
   const contractsSections = {
     CreateAssetContract: type
       ? createAsset(type, address)

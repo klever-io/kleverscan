@@ -66,7 +66,7 @@ describe('Component: Filter', () => {
     const contentStyle = {
       position: 'relative',
       backgroundColor: theme.white,
-      border: `1px solid ${theme.filter.border}`,
+      border: `1px solid ${theme.lightGray}`,
       cursor: 'pointer',
     };
     const selectorContainer = {

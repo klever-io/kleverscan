@@ -12,14 +12,13 @@ const createAsset = (type: string, address = ''): ISection[] => {
               label: 'Name',
               props: {
                 required: true,
-                tooltip: 'Asset name',
               },
             },
             {
               label: 'Ticker',
               props: {
                 required: true,
-                tooltip: 'Asset shorthand (capital letter only)',
+                tooltip: 'Capital letters only',
               },
             },
             {
@@ -27,7 +26,6 @@ const createAsset = (type: string, address = ''): ISection[] => {
               props: {
                 required: true,
                 defaultValue: address,
-                tooltip: 'Owner address',
               },
             },
             {
@@ -42,7 +40,7 @@ const createAsset = (type: string, address = ''): ISection[] => {
               label: 'Initial Supply',
               props: {
                 type: 'number',
-                tooltip: 'Initial minted supply (fungible only)',
+                tooltip: 'Initial minted supply',
               },
             },
             {
@@ -56,13 +54,14 @@ const createAsset = (type: string, address = ''): ISection[] => {
               label: 'Logo',
               props: {
                 span: 2,
-                tooltip: 'Logo uri',
+                tooltip: 'Logo URI',
               },
             },
           ],
         },
         {
           title: 'Uris',
+          tooltip: 'Any useful URIs related to the token',
           fields: [
             {
               label: 'Uri',
@@ -94,6 +93,8 @@ const createAsset = (type: string, address = ''): ISection[] => {
         },
         {
           title: 'Royalties',
+          tooltip:
+            'Fees for transferring and buying the token in the marketplace',
           fields: [
             {
               label: 'Address',
@@ -108,6 +109,7 @@ const createAsset = (type: string, address = ''): ISection[] => {
               props: {
                 type: 'struct',
                 array: true,
+                tooltip: 'How much to be charged with fees',
                 innerSection: {
                   title: 'Royalty Info',
                   inner: true,
@@ -149,34 +151,36 @@ const createAsset = (type: string, address = ''): ISection[] => {
               label: 'APR',
               props: {
                 type: 'number',
-                tooltip: 'Percentage',
+                tooltip: 'Annual percentage rate',
               },
             },
             {
               label: 'Min Epochs To Claim',
               props: {
                 type: 'number',
-                tooltip: 'Minimum epochs to claim rewards',
+                tooltip: 'Minimum amount of epochs to claim rewards',
               },
             },
             {
               label: 'Min Epochs To Unstake',
               props: {
                 type: 'number',
-                tooltip: 'Minimum epochs to unstake',
+                tooltip: 'Minimum amount of epochs to unstake tokens',
               },
             },
             {
               label: 'Min Epochs To Withdraw',
               props: {
                 type: 'number',
-                tooltip: 'Minimum epochs to withdraw after unstake',
+                tooltip:
+                  'Minimum amount of epochs to withdraw tokens after unstaking',
               },
             },
           ],
         },
         {
           title: 'Roles',
+          tooltip: 'Set permissions to specific address',
           fields: [
             {
               label: 'Roles',
@@ -221,69 +225,72 @@ const createAsset = (type: string, address = ''): ISection[] => {
         },
         {
           title: 'Properties',
+          tooltip: 'Choose the properties the new token will have',
           fields: [
             {
-              label: 'Can Freeze',
+              label: 'Freeze',
               props: {
                 type: 'checkbox',
                 toggleOptions: ['No', 'Yes'],
                 bool: true,
-                tooltip: 'Should be freezable?',
+                tooltip: 'Lock up tokens to generate rewards',
               },
             },
             {
-              label: 'Can Wipe',
+              label: 'Wipe',
               props: {
                 type: 'checkbox',
                 toggleOptions: ['No', 'Yes'],
                 bool: true,
                 defaultValue: 'false',
-                tooltip: 'Should be wipeable?',
+                tooltip:
+                  'Burn the tokens from a suspicious account and send them back to owner',
               },
             },
             {
-              label: 'Can Pause',
+              label: 'Pause',
               props: {
                 type: 'checkbox',
                 toggleOptions: ['No', 'Yes'],
                 bool: true,
-                tooltip: 'Should be pausable?',
+                tooltip: 'Stop transactions',
               },
             },
             {
-              label: 'Can Mint',
+              label: 'Mint',
               props: {
                 type: 'checkbox',
                 toggleOptions: ['No', 'Yes'],
                 bool: true,
-                tooltip: 'Should be mintable?',
+                tooltip: 'Create new tokens using a mint process',
               },
             },
             {
-              label: 'Can Burn',
+              label: 'Burn',
               props: {
                 type: 'checkbox',
                 toggleOptions: ['No', 'Yes'],
                 bool: true,
-                tooltip: 'Should be burnable?',
+                tooltip: 'Eliminate part of the token circulation',
               },
             },
             {
-              label: 'Can Change Owner',
+              label: 'Change Owner',
               props: {
                 type: 'checkbox',
                 toggleOptions: ['No', 'Yes'],
                 bool: true,
-                tooltip: 'Should the owner be changeable?',
+                tooltip: 'Gives the option of changing the asset owner',
               },
             },
             {
-              label: 'Can Add Roles',
+              label: 'Add Roles',
               props: {
                 type: 'checkbox',
                 toggleOptions: ['No', 'Yes'],
                 bool: true,
-                tooltip: 'Should roles be add-able?',
+                tooltip:
+                  'Defines whether roles can be applied to addresses that\nweren’t defined during the token creation process',
               },
             },
           ],
@@ -295,17 +302,16 @@ const createAsset = (type: string, address = ''): ISection[] => {
       section.push(
         {
           fields: [
-            { label: 'Name', props: { required: true, tooltip: 'Token name' } },
+            { label: 'Name', props: { required: true } },
             {
               label: 'Ticker',
-              props: { required: true, tooltip: 'Token shorthand' },
+              props: { required: true, tooltip: 'Capital letters only' },
             },
             {
               label: 'Owner Address',
               props: {
                 required: true,
                 defaultValue: address,
-                tooltip: 'Owner address',
               },
             },
             {
@@ -319,14 +325,14 @@ const createAsset = (type: string, address = ''): ISection[] => {
               label: 'Logo',
               props: {
                 span: 2,
-                tooltip: 'URL of the tokens logo',
+                tooltip: 'Logo URI',
               },
             },
           ],
         },
         {
           title: 'Uris',
-
+          tooltip: 'Any useful URIs related to the token',
           fields: [
             {
               label: 'Uri',
@@ -358,6 +364,8 @@ const createAsset = (type: string, address = ''): ISection[] => {
         },
         {
           title: 'Royalties',
+          tooltip:
+            'Fees for transferring and buying the NFT in the marketplace',
           fields: [
             {
               label: 'Address',
@@ -391,6 +399,7 @@ const createAsset = (type: string, address = ''): ISection[] => {
         },
         {
           title: 'Roles',
+          tooltip: 'Set permissions to a specific address',
           fields: [
             {
               label: 'Roles',
@@ -435,69 +444,69 @@ const createAsset = (type: string, address = ''): ISection[] => {
         },
         {
           title: 'Properties',
+          tooltip: 'Choose the properties the new NFT will have',
           fields: [
             {
-              label: 'Can Freeze',
+              label: 'Freeze',
               props: {
                 type: 'checkbox',
                 toggleOptions: ['No', 'Yes'],
                 bool: true,
-                tooltip: 'Should be freezable?',
+                tooltip: 'Lock up tokens to generate rewards',
               },
             },
             {
-              label: 'Can Wipe',
+              label: 'Wipe',
               props: {
                 type: 'checkbox',
                 toggleOptions: ['No', 'Yes'],
                 bool: true,
                 defaultValue: 'false',
-                tooltip: 'Should be wipeable?',
               },
             },
             {
-              label: 'Can Pause',
+              label: 'Pause',
               props: {
                 type: 'checkbox',
                 toggleOptions: ['No', 'Yes'],
                 bool: true,
-                tooltip: 'Should be pausable?',
               },
             },
             {
-              label: 'Can Mint',
+              label: 'Mint',
               props: {
                 type: 'checkbox',
                 toggleOptions: ['No', 'Yes'],
                 bool: true,
-                tooltip: 'Should be mintable?',
+                tooltip: 'Create new tokens using a mint process',
               },
             },
             {
-              label: 'Can Burn',
+              label: 'Burn',
               props: {
                 type: 'checkbox',
                 toggleOptions: ['No', 'Yes'],
                 bool: true,
-                tooltip: 'Should be burnable?',
+                tooltip: 'Eliminate part of the token circulation',
               },
             },
             {
-              label: 'Can Change Owner',
+              label: 'Change Owner',
               props: {
                 type: 'checkbox',
                 toggleOptions: ['No', 'Yes'],
                 bool: true,
-                tooltip: 'Should the owner be changeable?',
+                tooltip: 'Gives the option of changing the NFT owner',
               },
             },
             {
-              label: 'Can Add Roles',
+              label: 'Add Roles',
               props: {
                 type: 'checkbox',
                 toggleOptions: ['No', 'Yes'],
                 bool: true,
-                tooltip: 'Should roles be add-able?',
+                tooltip:
+                  'Defines whether roles can be applied to addresses that \nweren’t defined during the NFT creation process',
               },
             },
           ],

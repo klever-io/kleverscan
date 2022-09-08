@@ -95,13 +95,13 @@ export const Row = styled.div<ITableType>`
     }
 
     small {
-      color: ${props => props.theme.table.text};
+      color: ${props => props.theme.darkText};
     }
 
     strong {
       font-weight: 400;
       font-size: 0.95rem;
-      color: ${props => props.theme.table.text};
+      color: ${props => props.theme.darkText};
     }
 
     p {
@@ -126,7 +126,7 @@ export const Input = styled(DefaultInput)`
 
   background-color: ${props => props.theme.white};
 
-  border-color: ${props => props.theme.filter.border};
+  border-color: ${props => props.theme.lightGray};
 `;
 
 const LogoCSS = css`

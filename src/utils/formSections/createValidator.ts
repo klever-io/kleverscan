@@ -6,6 +6,13 @@ const createValidatorContract = (address = ''): ISection[] => {
   section.push({
     fields: [
       {
+        label: 'Name',
+        props: {
+          tooltip: 'Validator name',
+          required: true,
+        },
+      },
+      {
         label: 'Owner Address',
         props: {
           value: address,
@@ -14,14 +21,13 @@ const createValidatorContract = (address = ''): ISection[] => {
       },
       {
         label: 'BLS Public Key',
-        props: {
-          tooltip: 'BLS Public Key',
-        },
       },
       {
         label: 'Reward Address',
         props: {
           required: true,
+          tooltip:
+            'Address that will receive per validated\nblock or transaction',
         },
       },
       {
@@ -37,31 +43,26 @@ const createValidatorContract = (address = ''): ISection[] => {
         label: 'Comission',
         props: {
           type: 'number',
-          tooltip: 'Validation commission (precision 2)',
+          tooltip: 'Validation commission with 2 decimals',
         },
       },
       {
         label: 'Max Delegation Amount',
         props: {
           type: 'number',
+          tooltip: 'Limit of delegation a validator accepts',
         },
       },
       {
         label: 'Logo',
         props: {
-          tooltip: 'Logo URI',
-        },
-      },
-      {
-        label: 'Name',
-        props: {
-          tooltip: 'Validator name',
-          required: true,
+          tooltip: 'To be shown on the Explorer details page',
         },
       },
       {
         label: 'Uri',
         props: {
+          tooltip: 'Any relevant URI for the validator',
           type: 'struct',
           array: true,
           innerSection: {

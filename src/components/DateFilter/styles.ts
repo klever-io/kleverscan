@@ -109,13 +109,13 @@ export const Input = styled.input`
   width: 75%;
   font-weight: 700;
   font-size: 0.95rem;
-  color: ${props => props.theme.footer.hover};
+  color: ${props => props.theme.violet};
 
   caret-color: transparent;
 
   cursor: pointer;
   &::placeholder {
-    color: ${props => props.theme.footer.hover};
+    color: ${props => props.theme.violet};
   }
   &:not([value='']) {
     animation: ${fadeInItem} 0.2s ease-in-out;
@@ -247,7 +247,7 @@ export const DayItem = styled.div.attrs((props: DayItemProps) => ({
     css`
       background-color: ${props.theme.purple};
       filter: ${props.theme.dark ? 'brightness(0.66)' : 'opacity(0.75)'};
-      color: ${props.theme.true.white};
+      color: ${props.theme.white};
     `};
 
   ${props =>

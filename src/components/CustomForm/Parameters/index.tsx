@@ -1,4 +1,5 @@
 import Select from '@/components/Contract/Select';
+import { InfoIcon, TooltipContainer } from '@/components/Form/FormInput/styles';
 import { IParamList } from '@/types/index';
 import FormInput from 'components/Form/FormInput';
 import { ButtonContainer, FormSection } from 'components/Form/styles';
@@ -27,7 +28,14 @@ const ParametersForm: React.FC<IParamForm> = ({ paramsList }) => {
 
   return (
     <FormSection>
-      <SectionTitle>Parameters</SectionTitle>
+      <SectionTitle>
+        Parameters
+        <TooltipContainer
+          tooltip={'What network parameters the proposal is aiming to change'}
+        >
+          <InfoIcon />
+        </TooltipContainer>
+      </SectionTitle>
 
       {parametersQuantities.map((itemsQuantity, index) => {
         return (

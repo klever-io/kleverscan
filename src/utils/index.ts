@@ -272,7 +272,7 @@ export const contractOptions: IContractOption[] = [
     value: 'CreateValidatorContract',
   },
   {
-    label: 'Validator Config',
+    label: 'Edit Validator Settings',
     value: 'ValidatorConfigContract',
   },
   {
@@ -344,7 +344,7 @@ export const contractOptions: IContractOption[] = [
     value: 'CreateMarketplaceContract',
   },
   {
-    label: 'Config Marketplace',
+    label: 'Configure Marketplace',
     value: 'ConfigMarketplaceContract',
   },
   {

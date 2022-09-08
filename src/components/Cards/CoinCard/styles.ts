@@ -163,7 +163,7 @@ export const ValueContent = styled.div`
   flex-direction: column;
 
   font-weight: 400;
-  color: ${props => props.theme.card.text};
+  color: ${props => props.theme.lightGray};
 
   gap: 0.25rem;
 
@@ -195,7 +195,7 @@ export const ValueDetail = styled.div<{ positive?: boolean }>`
   p {
     color: ${props => {
       if (props.positive === undefined) {
-        return props.theme.card.text;
+        return props.theme.lightGray;
       }
 
       return props.theme.card[props.positive ? 'green' : 'red'];

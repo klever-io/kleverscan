@@ -62,14 +62,14 @@ export const Input = styled(DefaultInput)`
 
   background-color: ${props => props.theme.white};
 
-  border-color: ${props => props.theme.filter.border};
+  border-color: ${props => props.theme.lightGray};
 `;
 
 const getStakedBGColor = (props: any, percent: number) => {
   if (percent < 30) {
     return props.theme.rose;
   } else if (percent < 60) {
-    return props.theme.chart.lightBg;
+    return props.theme.violet;
   } else if (percent < 90) {
     return props.theme.purple;
   } else {
@@ -162,7 +162,7 @@ export const ProgressContent = styled.div`
 
   position: relative;
 
-  background-color: ${props => props.theme.card.text}!important;
+  background-color: ${props => props.theme.lightGray}!important;
   background-opacity: 0.5;
 
   border-radius: 0.25rem;
@@ -297,7 +297,7 @@ export const HalfRow = styled.div`
     padding: 0.1rem;
     width: 100%;
   }
-  color: ${props => props.theme.card.darkText};
+  color: ${props => props.theme.darkText};
 `;
 
 export const Row = styled.div`
@@ -351,7 +351,7 @@ export const Row = styled.div`
     strong {
       font-weight: 600;
       font-size: 0.95rem;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     small {
@@ -370,7 +370,7 @@ export const Row = styled.div`
     }
 
     p {
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
       font-weight: 400;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -387,7 +387,7 @@ export const Row = styled.div`
 export const HoverLink = styled.span`
   cursor: pointer;
   width: fit-content;
-  color: ${props => props.theme.card.darkText} !important;
+  color: ${props => props.theme.darkText} !important;
   &:hover {
     text-decoration: underline;
   }
@@ -458,14 +458,29 @@ export const NetworkParamsContainer = styled.div`
       width: 100%;
       min-width: 380px;
       font-weight: 600;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     span {
       width: 100%;
       min-width: 140px;
 
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
+    }
+    p {
+      font-weight: 400;
+      font-size: 12px;
+      min-width: 200px;
+      overflow: visible !important;
+      white-space: normal !important;
+    }
+
+    @media (max-width: 1355px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 980px) {
     }
     p {
       font-weight: 400;

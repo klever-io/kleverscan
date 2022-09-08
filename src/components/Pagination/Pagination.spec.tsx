@@ -30,7 +30,7 @@ const itemStyles = {
 };
 
 const itemActiveStyles = {
-  backgroundColor: theme.pagination.active,
+  backgroundColor: theme.purple,
   color: theme.white,
 };
 

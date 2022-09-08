@@ -12,6 +12,7 @@ import {
   Toggle,
   ToggleContainer,
   TooltipContainer,
+  TooltipContent,
 } from './styles';
 
 const Select = dynamic(() => import('./Select'), {
@@ -151,8 +152,11 @@ const FormInput: React.FC<IFormInputProps> = ({
         <InputLabel disabled={inputProps.disabled}>
           {title}{' '}
           {tooltip && (
-            <TooltipContainer tooltip={tooltip}>
+            <TooltipContainer>
               <InfoIcon />
+              <TooltipContent>
+                <p>{tooltip}</p>
+              </TooltipContent>
             </TooltipContainer>
           )}
         </InputLabel>

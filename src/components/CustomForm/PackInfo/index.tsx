@@ -1,3 +1,4 @@
+import { InfoIcon, TooltipContainer } from '@/components/Form/FormInput/styles';
 import { Scope } from '@unform/core';
 import FormInput from 'components/Form/FormInput';
 import {
@@ -84,7 +85,12 @@ const PackInfoForm: React.FC = () => {
 
   return (
     <FormSection>
-      <SectionTitle>PackInfo</SectionTitle>
+      <SectionTitle>
+        PackInfo{' '}
+        <TooltipContainer tooltip={'Add new packs and their items'}>
+          <InfoIcon />
+        </TooltipContainer>
+      </SectionTitle>
 
       {packItemQuantities.map((itemsQuantity, index) => {
         return (

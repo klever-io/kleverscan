@@ -48,7 +48,8 @@ const HomeDataCards: React.FC<IDataCards> = ({
 
   const [actualTPS, setActualTPS] = useState<string>(tps);
   const [metrics, setMetrics] = useState(defaultEpochInfo);
-
+  const [counterEpoch, setCounterEpoch] = useState(0);
+  const [lastPercentage, setLastPercentage] = useState<number | null>(null);
   const [totalAccounts, setTotalAccounts] = useState(defaultTotalAccounts);
   const [totalTransactions, setTotalTransactions] = useState(
     defaultTotalTransactions,
@@ -57,6 +58,13 @@ const HomeDataCards: React.FC<IDataCards> = ({
   const [newTransactions, setNewTransactions] = useState(yesterdayTransactions);
 
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
+
+  useEffect(() => {
+    if (metrics.epochLoadPercent === 0 && lastPercentage !== null) {
+      setCounterEpoch(counterEpoch + 1);
+    }
+    setLastPercentage(metrics.epochLoadPercent);
+  }, [metrics.epochLoadPercent]);
 
   const dataCards: ICard[] = [
     {
@@ -85,7 +93,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
       Icon: Epoch,
       title:
         `${t('Epoch')}` +
-        (block?.epoch ? ` #${block.epoch} ` : ' ') +
+        (block?.epoch ? ` #${block.epoch + counterEpoch} ` : ' ') +
         `${t('Remaining Time')}`,
       value: metrics.remainingTime,
       progress: metrics.epochLoadPercent,
@@ -283,4 +291,5 @@ const HomeDataCards: React.FC<IDataCards> = ({
     </DataCardsContainer>
   );
 };
+
 export default HomeDataCards;

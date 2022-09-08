@@ -332,7 +332,7 @@ export const CardHeader = styled.div`
     small {
       font-size: 0.85rem;
       font-weight: 600;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
   }
 `;
@@ -365,7 +365,7 @@ export const RewardsCardHeader = styled.div`
     small {
       font-size: 0.85rem;
       font-weight: 600;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
   }
   @media (max-width: 1200px) {
@@ -379,7 +379,7 @@ export const CardSubHeader = styled.div`
   justify-content: space-between;
   position: relative;
   top: 0.4rem;
-  color: ${props => props.theme.card.darkText};
+  color: ${props => props.theme.darkText};
   font-size: 0.85rem;
   font-weight: 500;
   span:nth-child(1) {
@@ -557,13 +557,13 @@ export const Row = styled.div`
     strong {
       font-weight: 600;
       font-size: 0.95rem;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     small {
       font-weight: 400;
       font-size: 0.95rem;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     a {
@@ -574,7 +574,7 @@ export const Row = styled.div`
     }
 
     p {
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
       font-weight: 400;
     }
   }
@@ -658,7 +658,7 @@ export const Rating = styled.p.attrs<IRatingProps>(props => ({
       ? props.theme.table.success
       : props.rate === 'yellow'
       ? props.theme.table.pending
-      : props.theme.table.fail};
+      : props.theme.red};
 
   color: ${props => props.theme.white} !important;
   font-weight: 400;
@@ -743,7 +743,7 @@ export const RewardsChart = styled(RewardsChartContent)`
 
   p {
     font-size: 1rem;
-    color: ${props => props.theme.transactionCard.text};
+    color: ${props => props.theme.darkText};
   }
 `;
 
@@ -835,7 +835,7 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
     width: fit-content;
     font-weight: 300;
     font-size: 0.8rem;
-    color: ${props => props.theme.card.darkText};
+    color: ${props => props.theme.darkText};
 
     @media (max-width: 1200px) {
       left: 18%;
@@ -1117,7 +1117,7 @@ export const RewardCardContentWrapper = styled.div`
   strong {
     font-weight: 600;
     font-size: 0.95rem;
-    color: ${props => props.theme.card.darkText};
+    color: ${props => props.theme.darkText};
   }
   @media (max-width: 967px) {
     top: -2rem;

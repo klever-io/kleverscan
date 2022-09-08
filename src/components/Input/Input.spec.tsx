@@ -38,7 +38,7 @@ describe('Component: Input', () => {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      border: `1px solid ${theme.input.border.default}`,
+      border: `1px solid ${theme.lightGray}`,
       borderRadius: '0.5rem',
       cursor: 'text',
       transition: '0.2s ease',
@@ -48,7 +48,7 @@ describe('Component: Input', () => {
       width: '100%',
       minWidth: '5rem',
       fontSize: '0.85rem',
-      color: theme.input.text,
+      color: theme.darkText,
     };
 
     const input = container.firstElementChild?.firstElementChild;

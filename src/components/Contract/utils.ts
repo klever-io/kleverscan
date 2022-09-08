@@ -270,6 +270,25 @@ const parseValues = (
 ): any => {
   const parsedValues = JSON.parse(JSON.stringify(values));
 
+  if (contractType === 'TransferContract') {
+    parsedValues.receiver = parsedValues.receiverAddress;
+    delete parsedValues.receiverAddress;
+  } else if (contractType === 'CreateAssetContract') {
+    const oldProperties = { ...parsedValues.properties };
+    const newProperties: any = {};
+    delete parsedValues.properties;
+
+    newProperties.canFreeze = oldProperties.freeze;
+    newProperties.canPause = oldProperties.pause;
+    newProperties.canBurn = oldProperties.burn;
+    newProperties.canAddRoles = oldProperties.addRoles;
+    newProperties.canWipe = oldProperties.wipe;
+    newProperties.canMint = oldProperties.mint;
+    newProperties.canChangeOwner = oldProperties.changeOwner;
+
+    parsedValues.properties = newProperties;
+  }
+
   if (contractHaveKDA(contractType, typeAssetTrigger)) {
     if (contractType === 'AssetTriggerContract') {
       parsedValues.triggerType = typeAssetTrigger;

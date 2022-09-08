@@ -13,12 +13,13 @@ const validatorConfigContract = (): ISection[] => {
       },
       {
         label: 'Reward Address',
+        props: {
+          tooltip:
+            'Address that will receive per validated block or transaction',
+        },
       },
       {
         label: 'BLS Public Key',
-        props: {
-          tooltip: 'BLS Public Key',
-        },
       },
       {
         label: 'Can Delegate',
@@ -33,19 +34,20 @@ const validatorConfigContract = (): ISection[] => {
         label: 'Comission',
         props: {
           type: 'number',
-          tooltip: 'Validation commission (precision 2)',
+          tooltip: 'Validation commission with 2 decimals',
         },
       },
       {
         label: 'Max Delegation Amount',
         props: {
           type: 'number',
+          tooltip: 'Limit of delegation a validator accepts',
         },
       },
       {
         label: 'Logo',
         props: {
-          tooltip: 'Logo URI',
+          tooltip: 'To be shown on the Explorer details page',
         },
       },
       {

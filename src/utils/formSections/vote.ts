@@ -10,8 +10,7 @@ const voteContract = (): ISection[] => {
         props: {
           type: 'number',
           required: true,
-          tooltip:
-            'Weight of the vote, maximum amount depends on KFI of address',
+          tooltip: 'Weight depends on the amount of KFI held',
         },
       },
       {

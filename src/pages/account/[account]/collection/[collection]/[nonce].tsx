@@ -139,6 +139,10 @@ export const getServerSideProps: GetServerSideProps<INftPage> = async ({
     address,
   };
 
+  if (!props.nft) {
+    return redirectProps;
+  }
+
   return { props };
 };
 

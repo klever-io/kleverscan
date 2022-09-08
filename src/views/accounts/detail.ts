@@ -49,7 +49,7 @@ export const Input = styled(DefaultInput)`
 
   background-color: ${props => props.theme.white};
 
-  border-color: ${props => props.theme.filter.border};
+  border-color: ${props => props.theme.lightGray};
 `;
 
 export const OverviewContainer = styled.div`
@@ -93,13 +93,13 @@ export const Row = styled.div`
 
     strong {
       font-weight: 600;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     small {
       font-weight: 400;
       font-size: 0.95rem;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
   }
 
@@ -169,7 +169,7 @@ export const AmountContainer = styled.div`
     p {
       font-weight: 400;
       font-size: 0.85rem;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
       margin-top: 0.2rem;
       margin-bottom: 0.2rem;
     }
@@ -221,11 +221,11 @@ export const FrozenContainer = styled.div`
       width: 10rem;
 
       font-weight: 600;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     span {
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
   }
 `;

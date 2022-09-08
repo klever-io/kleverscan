@@ -247,7 +247,7 @@ export const getServerSideProps: GetServerSideProps<IAccounts> = async () => {
               break;
 
             case 1:
-              props.createdYesterday = value.data.number_by_day[0].doc_count;
+              props.createdYesterday = value.data.number_by_day[0]?.doc_count;
               break;
 
             default:

@@ -10,12 +10,11 @@ const transferContract = (): ISection[] => {
         props: {
           type: 'number',
           required: true,
-          tooltip: 'Amount to be send',
+          tooltip: 'Amount to be sent',
         },
       },
       {
-        label: 'Receiver',
-        props: { tooltip: 'Receiver address' },
+        label: 'Receiver Address',
       },
     ],
   });

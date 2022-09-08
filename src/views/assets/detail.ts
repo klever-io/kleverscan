@@ -1,3 +1,4 @@
+import { Certified } from '@/assets/icons';
 import { default as DefaultInput } from '@/components/Inputt';
 import styled from 'styled-components';
 
@@ -42,6 +43,21 @@ export const Title = styled.div`
   }
 `;
 
+export const VerifiedContainer = styled(Certified)`
+  position: relative;
+  top: 0;
+  left: 0;
+  transform: translate(-130%, -60%);
+
+  @media (min-width: 769px) and (max-width: 900px) {
+    transform: translate(-150%, -60%);
+  }
+
+  @media (max-width: 361px) {
+    transform: translate(-150%, -60%);
+  }
+`;
+
 export const Input = styled(DefaultInput)`
   margin-top: 1.1rem;
 
@@ -49,7 +65,7 @@ export const Input = styled(DefaultInput)`
 
   background-color: ${props => props.theme.white};
 
-  border-color: ${props => props.theme.filter.border};
+  border-color: ${props => props.theme.lightGray};
 `;
 
 export const AssetTitle = styled.div`
@@ -160,13 +176,13 @@ export const Row = styled.div`
     strong {
       font-weight: 600;
       font-size: 0.95rem;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     small {
       font-weight: 400;
       font-size: 0.95rem;
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
     }
 
     a {
@@ -176,7 +192,7 @@ export const Row = styled.div`
     }
 
     p {
-      color: ${props => props.theme.card.darkText};
+      color: ${props => props.theme.darkText};
       font-weight: 400;
     }
   }

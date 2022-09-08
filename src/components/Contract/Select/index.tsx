@@ -21,6 +21,7 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   title?: string;
   getAssets?: () => void;
   label?: string;
+  precedence?: number; // z-index precedence
 }
 
 const Select: React.FC<IFilter> = ({
@@ -30,6 +31,7 @@ const Select: React.FC<IFilter> = ({
   title,
   getAssets,
   label,
+  precedence,
   ...rest
 }) => {
   const Placeholder = useCallback((props: any) => {
@@ -55,7 +57,7 @@ const Select: React.FC<IFilter> = ({
   };
 
   return (
-    <Container>
+    <Container precedence={precedence}>
       {label && <TitleLabel>{label}</TitleLabel>}
       <ReactSelect
         placeholder={

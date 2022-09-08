@@ -17,6 +17,11 @@ export interface IProposal {
   timestampEnd?: number;
   fullInfoParams?: IFullInfoParam[];
   currentNetworkParams?: INetworkParams;
+  overview: INodeOverview;
+}
+
+interface INodeOverview {
+  epochNumber: number;
 }
 
 export interface IProposalsResponse extends IResponse {

@@ -48,7 +48,7 @@ export const Header = styled.div<ITableType>`
 
   min-width: 100%;
 
-  color: ${props => props.theme.table.text};
+  color: ${props => props.theme.darkText};
   font-weight: 600;
   font-size: 0.85rem;
 
@@ -121,13 +121,13 @@ export const Row = styled.div<ITableType>`
     }
 
     small {
-      color: ${props => props.theme.table.text};
+      color: ${props => props.theme.darkText};
     }
 
     strong {
       font-weight: 400;
       font-size: 0.95rem;
-      color: ${props => props.theme.table.text};
+      color: ${props => props.theme.darkText};
     }
 
     p {
@@ -139,16 +139,9 @@ export const Row = styled.div<ITableType>`
     }
 
     .isVerified {
-      position: absolute;
-      left: 13rem;
-
-      @media (max-width: 1600px) {
-        left: 8rem;
-      }
-
-      @media (max-width: 768px) {
-        left: 4rem;
-      }
+      position: relative;
+      left: -0.9rem;
+      top: -1rem;
     }
   }
   .address {
@@ -272,6 +265,6 @@ export const EmptyRow = styled(Row)`
 
   p {
     font-weight: 400;
-    color: ${props => transparentize(0.5, props.theme.table.text)};
+    color: ${props => transparentize(0.5, props.theme.darkText)};
   }
 `;

@@ -25,8 +25,8 @@ const Horizontal: React.FC<IHorizontal> = ({ data, theme }) => (
     <BarChart data={data} layout="vertical">
       <defs>
         <linearGradient id="horizontalBackground" x1="0" y1=".5" x2="1" y2="0">
-          <stop offset="5%" stopColor={theme.chart.lightBg} stopOpacity={1} />
-          <stop offset="95%" stopColor={theme.chart.lightBg} stopOpacity={1} />
+          <stop offset="5%" stopColor={theme.violet} stopOpacity={1} />
+          <stop offset="95%" stopColor={theme.violet} stopOpacity={1} />
         </linearGradient>
       </defs>
 
@@ -35,7 +35,7 @@ const Horizontal: React.FC<IHorizontal> = ({ data, theme }) => (
         type="number"
         tickLine={false}
         style={{ fontWeight: 300, fill: theme.navbar.mobile }}
-        axisLine={{ stroke: theme.chart.line }}
+        axisLine={{ stroke: theme.shadow }}
       />
       <YAxis
         type="category"

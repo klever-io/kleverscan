@@ -22,14 +22,14 @@ const configMarketplaceContract = (): ISection[] => {
       {
         label: 'Referral Address',
         props: {
-          tooltip: 'New referral percentage (precision 2)',
+          tooltip: 'New Referral Address',
         },
       },
       {
         label: 'Referral Percentage',
         props: {
           type: 'number',
-          tooltip: 'New referral address',
+          tooltip: 'New referral percentage with 2 decimals',
         },
       },
     ],

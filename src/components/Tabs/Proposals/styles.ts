@@ -5,7 +5,7 @@ const getStakedBGColor = (props: any, percent: number) => {
   if (percent < 30) {
     return props.theme.rose;
   } else if (percent < 60) {
-    return props.theme.chart.lightBg;
+    return props.theme.violet;
   } else if (percent < 90) {
     return props.theme.purple;
   } else {
@@ -42,7 +42,7 @@ const getStakedTextColor = (props: any, percent: number) => {
 };
 
 export const Proposer = styled.p`
-  color: ${props => props.theme.table.text} !important;
+  color: ${props => props.theme.darkText} !important;
   font-weight: 600;
   font-size: 0.85rem;
 `;

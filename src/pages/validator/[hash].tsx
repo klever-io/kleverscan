@@ -569,6 +569,8 @@ const Validator: React.FC<IValidatorPage> = ({
 export const getServerSideProps: GetServerSideProps<IValidatorPage> = async ({
   query: { hash },
 }) => {
+  const redirectProps = { redirect: { destination: '/404', permanent: false } };
+
   const props: IValidatorPage = {
     validator: {} as IPeer,
     delegators: [],
@@ -634,6 +636,10 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> = async ({
       }
     });
   });
+
+  if (Object.keys(props.validator).length === 0) {
+    return redirectProps;
+  }
 
   return { props };
 };

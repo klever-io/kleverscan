@@ -4,8 +4,6 @@ import { AccountDetails as AccountIcon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import { ISelectedDays } from '@/components/DateFilter';
 import Title from '@/components/Layout/Title';
-import Pagination from '@/components/Pagination';
-import { PaginationContainer } from '@/components/Pagination/styles';
 import QrCodeModal from '@/components/QrCodeModal';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Assets from '@/components/Tabs/Assets';
@@ -18,9 +16,9 @@ import {
   IPagination,
   IResponse,
   ITransaction,
+  ITxQuery,
   Service,
 } from '@/types/index';
-import { useDidUpdateEffect } from '@/utils/hooks';
 import {
   AmountContainer,
   BalanceContainer,
@@ -36,8 +34,7 @@ import {
 } from '@/views/accounts/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 interface IAssetInfo {
   assetId: string;
@@ -78,15 +75,6 @@ interface IAllowanceResponse extends IResponse {
   };
 }
 
-interface ITxQuery {
-  page?: number;
-  address?: string;
-  startdate?: string;
-  enddate?: string;
-  fromAddress?: string;
-  toAddress?: string;
-}
-
 const Account: React.FC<IAccountPage> = ({
   account,
   transactions: transactionResponse,
@@ -97,48 +85,22 @@ const Account: React.FC<IAccountPage> = ({
   KLVallowance,
   KFIallowance,
 }) => {
-  const router = useRouter();
-
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(
-    transactionResponse.pagination.totalPages,
-  );
-
   const [dateFilter, setDateFilter] = useState({
     start: '',
     end: '',
   });
   const [fromToFilter, setFromToFilter] = useState(0);
-
-  const [loading, setLoading] = useState(false);
-  const [transactions, setTransactions] = useState(
-    transactionResponse.data.transactions,
-  );
   const [showModal, setShowModal] = useState(false);
+  const [query, setQuery] = useState({});
 
-  useDidUpdateEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const query = getTxQuery();
-
-      const response: ITransactionsResponse = await api.get({
-        route: `transaction/list`,
-        query,
-      });
-      if (!response.error) {
-        setTransactions(response.data.transactions);
-        setTotalPages(response.pagination.totalPages);
-      }
-
-      setLoading(false);
-    };
-
-    fetchData();
-  }, [page, account.address, dateFilter, fromToFilter]);
+  const requestTransactions = async (page: number) =>
+    api.get({
+      route: `transaction/list`,
+      query: { page, ...query },
+    });
 
   const getTxQuery = useCallback((): ITxQuery => {
     const txQuery: ITxQuery = {
-      page: page,
       address: account.address,
     };
 
@@ -156,7 +118,16 @@ const Account: React.FC<IAccountPage> = ({
     }
 
     return txQuery;
-  }, [account.address, dateFilter, fromToFilter, page]);
+  }, [dateFilter, fromToFilter]);
+
+  const fetchData = async () => {
+    const txQuery = getTxQuery();
+    setQuery(txQuery);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [dateFilter, fromToFilter]);
 
   const calculateTotalKLV = useCallback(() => {
     // does not include Allowance and Staking
@@ -226,7 +197,6 @@ const Account: React.FC<IAccountPage> = ({
   const [selectedTab, setSelectedTab] = useState<string>(getTabHeaders()[0]);
 
   const resetDate = () => {
-    setPage(1);
     setDateFilter({
       start: '',
       end: '',
@@ -234,7 +204,6 @@ const Account: React.FC<IAccountPage> = ({
   };
 
   const filterDate = useCallback((selectedDays: ISelectedDays) => {
-    setPage(1);
     setDateFilter({
       start: selectedDays.start.getTime().toString(),
       end: selectedDays.end
@@ -247,13 +216,21 @@ const Account: React.FC<IAccountPage> = ({
     setFromToFilter(op);
   };
 
+  const transactionTableProps = {
+    scrollUp: false,
+    totalPages: transactionResponse?.pagination?.totalPages || 0,
+    dataName: 'transactions',
+    request: (page: number) => requestTransactions(page),
+    query,
+  };
+
   const tabProps: ITabs = {
     headers: getTabHeaders(),
     onClick: header => setSelectedTab(header),
     dateFilterProps: {
       resetDate,
       filterDate,
-      empty: transactions.length === 0,
+      empty: transactionResponse?.data?.transactions?.length === 0,
     },
     filterFromTo,
   };
@@ -264,19 +241,10 @@ const Account: React.FC<IAccountPage> = ({
         return <Assets assets={assets} address={account.address} />;
       case 'Transactions':
         return (
-          <>
-            <Transactions transactions={transactions} loading={loading} />
-            <PaginationContainer>
-              <Pagination
-                scrollUp={false}
-                count={totalPages}
-                page={page}
-                onPaginate={page => {
-                  setPage(page);
-                }}
-              />
-            </PaginationContainer>
-          </>
+          <Transactions
+            transactions={transactionResponse.data.transactions}
+            transactionsTableProps={transactionTableProps}
+          />
         );
       case 'Buckets':
         return <Buckets assets={assets} />;

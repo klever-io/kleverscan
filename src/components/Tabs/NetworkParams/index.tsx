@@ -4,7 +4,6 @@ import React from 'react';
 
 interface INetworkProps {
   networkParams: INetworkParams;
-  loading: boolean;
 }
 
 interface INetworkParams {
@@ -17,7 +16,7 @@ interface INetworkParam {
   currentValue: string;
 }
 
-const NetworkParams: React.FC<INetworkProps> = ({ networkParams, loading }) => {
+const NetworkParams: React.FC<INetworkProps> = ({ networkParams }) => {
   const TableBody: React.FC<INetworkParam> = ({
     number,
     parameter,
@@ -43,7 +42,6 @@ const NetworkParams: React.FC<INetworkProps> = ({ networkParams, loading }) => {
   const tableProps: ITable = {
     body: TableBody,
     data: networkParams as any[],
-    loading: loading,
     header,
     type: 'networkParams',
   };

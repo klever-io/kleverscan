@@ -7,8 +7,6 @@ import DateFilter, {
 } from '@/components/DateFilter';
 import Filter, { IFilter, IFilterItem } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
-import Pagination from '@/components/Pagination';
-import { PaginationContainer } from '@/components/Pagination/styles';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import { contracts, status } from '@/configs/transactions';
@@ -59,6 +57,7 @@ import {
   IResponse,
   ITransaction,
   ITransferContract,
+  Query,
 } from '../../types';
 import { capitalizeString, formatAmount, parseAddress } from '../../utils';
 
@@ -81,7 +80,7 @@ interface IAssetResponse extends IResponse {
   };
 }
 
-interface IRouterQuery {
+interface IRouterQuery extends Query {
   type?: string;
   status?: string;
   asset?: string;
@@ -99,10 +98,6 @@ const Transactions: React.FC<ITransactions> = ({
   const defaultFilter: IFilterItem = { name: 'All', value: 'all' };
   const precision = 6; // default KLV precision
 
-  const [loading, setLoading] = useState(false);
-  const [transactions, setTransactions] = useState(defaultTransactions);
-  const [page, setPage] = useState(1);
-  const [count, setCount] = useState(pagination.totalPages);
   const [dateFilter, setDateFilter] = useState({
     start: '',
     end: '',
@@ -111,6 +106,7 @@ const Transactions: React.FC<ITransactions> = ({
   const [transactionType, setTransactionType] = useState(defaultFilter);
   const [statusType, setStatusType] = useState(defaultFilter);
   const [coinType, setCoinType] = useState(defaultFilter);
+  const [query, setQuery] = useState({});
 
   const baseColumnSpans = [
     2, 1, 1, 1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -188,9 +184,13 @@ const Transactions: React.FC<ITransactions> = ({
     'Bandwidth Fee',
   ];
 
-  const fetchData = async () => {
-    setLoading(true);
+  const requestTransactions = async (page: number) =>
+    api.get({
+      route: `transaction/list`,
+      query: { page, ...query },
+    });
 
+  const fetchData = async () => {
     const filters = [
       { ref: transactionType, key: 'type' },
       { ref: statusType, key: 'status' },
@@ -205,38 +205,19 @@ const Transactions: React.FC<ITransactions> = ({
     routerQuery = dateFilter.start
       ? {
           ...routerQuery,
-          page: page,
           startdate: dateFilter.start ? dateFilter.start : undefined,
           enddate: dateFilter.end ? dateFilter.end : undefined,
         }
-      : {
-          ...routerQuery,
-          page: page,
-        };
+      : routerQuery;
 
-    const response: ITransactionResponse = await api.get({
-      route: `transaction/list`,
-      query: routerQuery,
-    });
-    if (!response.error) {
-      setTransactions(response.data.transactions);
-      setCount(response.pagination.totalPages);
-    }
+    setQuery(routerQuery);
 
-    const query = { ...routerQuery };
-    delete query.page;
-    await Router.push({ pathname: router.pathname, query });
-    setLoading(false);
+    await Router.push({ pathname: router.pathname, query: { ...routerQuery } });
   };
 
   useDidUpdateEffect(() => {
-    if (page !== 1) setPage(1);
-    else fetchData();
-  }, [transactionType, statusType, coinType, dateFilter]);
-
-  useDidUpdateEffect(() => {
     fetchData();
-  }, [page]);
+  }, [transactionType, statusType, coinType, dateFilter]);
 
   const getContractType = useCallback((contracts: IContract[]) => {
     if (!contracts) {
@@ -448,22 +429,24 @@ const Transactions: React.FC<ITransactions> = ({
   const tableProps: ITable = {
     type: 'transactions',
     header: getHeader(),
-    data: transactions as any[],
+    data: defaultTransactions as any[],
     rowSections,
     columnSpans,
     filter: transactionType,
-    loading,
+    dataName: 'transactions',
+    scrollUp: true,
+    totalPages: pagination.totalPages,
+    request: page => requestTransactions(page),
+    query,
   };
 
   const resetDate = () => {
-    setPage(1);
     setDateFilter({
       start: '',
       end: '',
     });
   };
   const filterDate = (selectedDays: ISelectedDays) => {
-    setPage(1);
     setDateFilter({
       start: selectedDays.start.getTime().toString(),
       end: selectedDays.end
@@ -474,7 +457,7 @@ const Transactions: React.FC<ITransactions> = ({
   const dateFilterProps: IDateFilter = {
     resetDate,
     filterDate,
-    empty: transactions.length === 0,
+    empty: defaultTransactions.length === 0,
   };
 
   return (
@@ -494,16 +477,6 @@ const Transactions: React.FC<ITransactions> = ({
         <Input />
       </Header>
       <Table {...tableProps} />
-      <PaginationContainer>
-        <Pagination
-          scrollUp={true}
-          count={count}
-          page={page}
-          onPaginate={page => {
-            setPage(page);
-          }}
-        />
-      </PaginationContainer>
     </Container>
   );
 };

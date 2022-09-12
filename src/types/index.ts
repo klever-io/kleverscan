@@ -1,6 +1,11 @@
 import { IChartData } from '@/configs/home';
 import { ISO2 } from '@/utils/country';
 import { Dispatch, SetStateAction } from 'react';
+import { IBlock } from './blocks';
+
+export type Query = {
+  [key: string]: any;
+};
 
 export enum Contract {
   Transfer = 'TransferContractType',
@@ -433,38 +438,6 @@ export interface ITransaction {
   precision: number;
 }
 
-export interface IBlock {
-  hash: string;
-  nonce: number;
-  parentHash: string;
-  timestamp: number;
-  slot: number;
-  epoch: number;
-  isEpochStart: boolean;
-  size: number;
-  sizeTxs: number;
-  transactions: ITransaction[];
-  txRootHash: string;
-  trieRoot: string;
-  validatorsTrieRoot: string;
-  stakingTrieRoot: string;
-  kappsTrieRoot: string;
-  producerSignature: string;
-  signature: string;
-  prevRandSeed: string;
-  randSeed: string;
-  txCount: number;
-  txFees?: number;
-  kAppFees?: number;
-  txBurnedFees?: number;
-  blockRewards: number;
-  txHashes: any[];
-  softwareVersion: string;
-  chainID: string;
-  producerName: string;
-  producerOwnerAddress: string;
-}
-
 interface ItotalLeaderSuccessRate {
   numSuccess: number;
   numFailure: number;
@@ -501,15 +474,6 @@ export interface IPeer {
   uris: IUri[];
 }
 
-export interface IBlockCard {
-  blockIndex: number;
-  precision: number;
-}
-export interface IBlockCardList {
-  blocks: IBlock[];
-  precision: number;
-}
-
 export interface IAccount {
   address: string;
   nonce: number;
@@ -527,6 +491,18 @@ export interface IAccount {
   collection: INfts[];
 }
 
+export interface IHolder {
+  holders: IBalance[];
+  asset: IAsset;
+  holdersTableProps: IInnerTableProps;
+}
+
+export interface IBalance {
+  address: string;
+  balance: number;
+  index: number;
+}
+
 export interface IAccountAsset {
   address: string;
   assetId: string;
@@ -540,6 +516,13 @@ export interface IAccountAsset {
     epoch: number;
   };
   buckets?: IBucket[];
+}
+
+export interface IAssetsHoldersResponse extends IResponse {
+  data: {
+    accounts: IAccountAsset[];
+  };
+  pagination: IPagination;
 }
 
 export interface IAsset {
@@ -596,6 +579,35 @@ export interface IBucket {
   unstakedEpoch: number;
   balance: number;
   delegation: string;
+}
+
+// TODO: establish a pattern for filter types
+export interface ITxQuery {
+  page?: number;
+  address?: string;
+  startdate?: string;
+  start?: string;
+  enddate?: string;
+  end?: string;
+  fromAddress?: string;
+  toAddress?: string;
+}
+
+export interface IInnerTableProps {
+  scrollUp: boolean;
+  totalPages: number;
+  dataName: string;
+  request: (page: number) => Promise<any>;
+  query?: ITxQuery;
+  page?: number;
+}
+
+export interface IValidatorResponse extends IResponse {
+  data: {
+    delegations: IDelegationsResponse[];
+    networkTotalStake: number;
+  };
+  pagination: IPagination;
 }
 
 export interface IDelegationsResponse {

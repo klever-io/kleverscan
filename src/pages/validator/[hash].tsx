@@ -4,8 +4,6 @@ import Chart, { ChartType } from '@/components/Chart';
 import Copy from '@/components/Copy';
 import Dropdown from '@/components/Dropdown';
 import Title from '@/components/Layout/Title';
-import Pagination from '@/components/Pagination';
-import { PaginationContainer } from '@/components/Pagination/styles';
 import QrCodeModal from '@/components/QrCodeModal';
 import Table, { ITable } from '@/components/Table';
 import { Row as RowList } from '@/components/Table/styles';
@@ -70,7 +68,6 @@ import {
 import { fromUnixTime } from 'date-fns';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
 
@@ -116,9 +113,6 @@ const Validator: React.FC<IValidatorPage> = ({
     uris,
   } = validator;
 
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [delegators, setDelegators] = useState(defaultDelegators);
   const [uptime] = useState(new Date().getTime());
   const [age, setAge] = useState(
     getAge(fromUnixTime(new Date().getTime() / 1000)),
@@ -222,39 +216,27 @@ const Validator: React.FC<IValidatorPage> = ({
     );
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+  const requestValidator = async (page: number) => {
+    const response: IDelegateResponse = await api.get({
+      route: `validator/delegated/${ownerAddress}?page=${page}`,
+    });
 
-      const response: IDelegateResponse = await api.get({
-        route: `validator/delegated/${ownerAddress}?page=${page}`,
-      });
-
-      if (!response.error) {
-        const delegators: IBucket[] = [];
-        response?.data?.delegators?.forEach(delegation => {
-          delegation?.buckets?.forEach(bucket => {
-            if (bucket?.delegation === ownerAddress) {
-              delegators.push({
-                address: delegation?.address,
-                ...bucket,
-              });
-            }
+    const delegators: IBucket[] = [];
+    response?.data?.delegators?.forEach(delegation => {
+      delegation?.buckets?.forEach(bucket => {
+        if (bucket?.delegation === ownerAddress) {
+          delegators.push({
+            address: delegation?.address,
+            ...bucket,
           });
-        });
-
-        setDelegators(delegators);
-      }
-
-      setLoading(false);
-    };
-    fetchData();
-  }, [page]);
+        }
+      });
+    });
+    return { ...response, data: { validator: delegators } };
+  };
 
   const stakedPercent =
     (maxDelegation <= 0 ? 100 : totalStake / maxDelegation) * 100;
-
-  const router = useRouter();
 
   const Overview: React.FC = () => {
     return (
@@ -411,9 +393,12 @@ const Validator: React.FC<IValidatorPage> = ({
   const tableProps: ITable = {
     type: 'validator',
     header,
-    data: delegators as IBucket[],
+    data: defaultDelegators as IBucket[],
     body: TableBody,
-    loading,
+    request: page => requestValidator(page),
+    scrollUp: false,
+    totalPages: pagination.totalPages,
+    dataName: 'validator',
   };
 
   // mocked data:
@@ -552,16 +537,6 @@ const Validator: React.FC<IValidatorPage> = ({
         <h3>List of delegations</h3>
         <Table {...tableProps} />
       </TableContainer>
-      <PaginationContainer>
-        <Pagination
-          scrollUp={false}
-          count={pagination?.totalPages}
-          page={page}
-          onPaginate={page => {
-            setPage(page);
-          }}
-        />
-      </PaginationContainer>
     </Container>
   );
 };

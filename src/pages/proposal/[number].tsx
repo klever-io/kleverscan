@@ -50,7 +50,6 @@ import {
 import { format, fromUnixTime } from 'date-fns';
 import { GetStaticProps } from 'next';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { AiFillCheckCircle } from 'react-icons/ai';
 import Tooltip from '../../components/Tooltip';
@@ -73,7 +72,6 @@ interface IParsedVoter {
 const ProposalDetails: React.FC<IParsedProposal> = props => {
   const [status, setStatus] = useState('');
   const StatusIcon = getStatusIcon(status);
-  const router = useRouter();
   const precision = 10 ** 6;
   const proposalAPI: IParsedProposal = props;
   const { votingPowers, totalStaked, description } = proposalAPI;
@@ -239,7 +237,6 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
 
   const tableProps: ITable = {
     header: ['Voter', 'Voting Power', 'Vote date'],
-    loading: false,
     type: 'votes',
     body: TableBody,
     data: votersList,

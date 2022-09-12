@@ -1,7 +1,4 @@
-import Pagination from '@/components/Pagination';
-import { PaginationContainer } from '@/components/Pagination/styles';
 import Table, { ITable } from '@/components/Table';
-import { useRouter } from 'next/router';
 import React from 'react';
 import Title from '../Title';
 import { Container, Header, Input, TableContainer } from './styles';
@@ -9,10 +6,7 @@ import { Container, Header, Input, TableContainer } from './styles';
 interface IDetail {
   title: string;
   headerIcon: any;
-  paginationCount: number;
   cards: any | undefined;
-  page: number;
-  setPage: React.Dispatch<React.SetStateAction<number>>;
   tableProps: ITable;
   route?: string;
 }
@@ -20,21 +14,15 @@ interface IDetail {
 const Detail: React.FC<IDetail> = ({
   title,
   headerIcon: Icon,
-  paginationCount,
   cards,
   children,
-  page,
-  setPage,
   tableProps,
   route,
 }) => {
-  const router = useRouter();
-
   return (
     <Container>
       <Header>
         <Title title={title} Icon={Icon} route={route} />
-
         <Input />
       </Header>
       <TableContainer>
@@ -42,19 +30,6 @@ const Detail: React.FC<IDetail> = ({
         {children}
       </TableContainer>
       <Table {...tableProps} />
-
-      {!!paginationCount && (
-        <PaginationContainer>
-          <Pagination
-            scrollUp={true}
-            count={paginationCount}
-            page={page}
-            onPaginate={page => {
-              setPage(page);
-            }}
-          />
-        </PaginationContainer>
-      )}
     </Container>
   );
 };

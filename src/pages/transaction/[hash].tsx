@@ -29,13 +29,8 @@ import {
   Withdraw,
 } from '@/components/TransactionContractComponents';
 import api from '@/services/api';
-import {
-  Contract,
-  IAsset,
-  IBlock,
-  IResponse,
-  ITransaction,
-} from '@/types/index';
+import { IBlock } from '@/types/blocks';
+import { Contract, IAsset, IResponse, ITransaction } from '@/types/index';
 import {
   capitalizeString,
   hexToString,

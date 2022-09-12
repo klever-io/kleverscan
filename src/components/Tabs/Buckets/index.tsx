@@ -121,7 +121,6 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
     header,
     data: assets,
     body: TableBody,
-    loading: false,
   };
 
   return <Table {...tableProps} />;

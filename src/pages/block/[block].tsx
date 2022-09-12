@@ -1,11 +1,9 @@
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
-import Pagination from '@/components/Pagination';
-import { PaginationContainer } from '@/components/Pagination/styles';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Transactions from '@/components/Tabs/Transactions';
 import api from '@/services/api';
-import { useDidUpdateEffect } from '@/utils/hooks';
+import { IBlock } from '@/types/blocks';
 import { toLocaleFixed } from '@/utils/index';
 import {
   CardContainer,
@@ -22,9 +20,8 @@ import {
 } from '@/views/blocks/detail';
 import { format, fromUnixTime } from 'date-fns';
 import { GetStaticProps } from 'next';
-import { useRouter } from 'next/router';
 import React, { useState } from 'react';
-import { IBlock, IPagination, IResponse, ITransaction } from '../../types';
+import { IPagination, IResponse, ITransaction } from '../../types';
 
 interface IBlockPage {
   block: IBlock;
@@ -70,7 +67,6 @@ const Block: React.FC<IBlockPage> = ({
     randSeed,
   } = block;
 
-  const router = useRouter();
   const cardHeaders = ['Overview', 'Info'];
   const tableHeaders = ['Transactions'];
   const precision = 6; // default KLV precision
@@ -78,24 +74,10 @@ const Block: React.FC<IBlockPage> = ({
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
 
-  const [transactionPage, setTransactionPage] = useState(1);
-  const [transactions, setTransactions] = useState(defaultTransactions);
-  const [loading, setLoading] = useState(false);
-
-  useDidUpdateEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const response: ITransactionResponse = await api.get({
-        route: `transaction/list?page=${transactionPage}&blockNum=${nonce}`,
-      });
-      if (!response.error) {
-        setTransactions(response.data.transactions);
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [transactionPage]);
+  const requestBlock = async (page: number): Promise<ITransactionResponse> =>
+    api.get({
+      route: `transaction/list?page=${page}&blockNum=${nonce}`,
+    });
 
   const Overview: React.FC = () => {
     return (
@@ -269,21 +251,23 @@ const Block: React.FC<IBlockPage> = ({
     }
   };
 
+  const transactionTableProps = {
+    scrollUp: false,
+    totalPages: totalPagesTransactions || 0,
+    dataName: 'transactions',
+    request: (page: number) => requestBlock(page),
+  };
+
   const SelectedTabComponent: React.FC = () => {
     switch (selectedTab) {
       case 'Transactions':
         return (
           <>
-            <Transactions transactions={transactions} loading={loading} />
-
-            <PaginationContainer>
-              <Pagination
-                scrollUp={true}
-                count={totalPagesTransactions}
-                page={transactionPage}
-                onPaginate={page => setTransactionPage(page)}
-              />
-            </PaginationContainer>
+            <Transactions
+              precision={precision}
+              transactions={defaultTransactions}
+              transactionsTableProps={transactionTableProps}
+            />
           </>
         );
       default:

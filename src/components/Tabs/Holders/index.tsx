@@ -1,45 +1,19 @@
 import Table, { ITable } from '@/components/Table';
 import { Row } from '@/components/Table/styles';
-import { IAccountAsset, IAsset } from '@/types/index';
+import { IBalance, IHolder } from '@/types/index';
 import { parseAddress, toLocaleFixed } from '@/utils/index';
 import Link from 'next/link';
 import React from 'react';
 import { RankingContainer } from './styles';
 
-interface IHolder {
-  holders: IAccountAsset[];
-  asset: IAsset;
-  loading: boolean;
-}
-
-interface IBalance {
-  address: string;
-  balance: number;
-  index: number;
-}
-
-const Holders: React.FC<IHolder> = ({ holders, asset, loading }) => {
-  const balances = holders
-    .map(holder => {
-      if (holder.assetId === asset.assetId) {
-        return {
-          address: holder.address,
-          balance: holder.frozenBalance + holder.balance,
-        };
-      } else
-        return {
-          address: '',
-          balance: 0,
-        };
-    })
-    .map((holder, index) => ({ ...holder, index }));
-
+const Holders: React.FC<IHolder> = ({ holders, asset, holdersTableProps }) => {
   const TableBody: React.FC<IBalance> = ({ address, balance, index }) => {
     return (
       <Row type="holders">
         <span>
           <RankingContainer>
-            <p>{index + 1}°</p>
+            {/* TODO: FIX RANKING, SINCE PROPS DONT CHANGE AFTER NEW RENDERING PAGE REMAINS 1 */}
+            <p>{(index + 1) * (holdersTableProps?.page || 1)}°</p>
           </RankingContainer>
         </span>
         <Link href={`/account/${address}`}>{parseAddress(address, 40)}</Link>
@@ -61,10 +35,10 @@ const Holders: React.FC<IHolder> = ({ holders, asset, loading }) => {
 
   const tableProps: ITable = {
     body: TableBody,
-    data: balances as any[],
-    loading: loading,
+    data: holders as any[],
     header,
     type: 'holders',
+    ...holdersTableProps,
   };
 
   return <Table {...tableProps} />;

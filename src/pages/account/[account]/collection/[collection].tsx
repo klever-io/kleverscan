@@ -4,15 +4,15 @@ import { ITable } from '@/components/Table';
 import { Row } from '@/components/Table/styles';
 import api from '@/services/api';
 import { INfts, IPagination, IResponse } from '@/types/index';
-import { useDidUpdateEffect } from '@/utils/hooks';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React from 'react';
 
 interface ICollectionPage {
   collection: INfts[];
   pagination: IPagination;
   address: string;
+  collectionAsset: string;
 }
 
 interface ICollectionResponse extends IResponse {
@@ -23,36 +23,18 @@ interface ICollectionResponse extends IResponse {
 }
 
 const Validators: React.FC<ICollectionPage> = ({
-  collection: initialCollection,
+  collection,
   pagination,
   address,
+  collectionAsset,
 }) => {
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [collection, setCollection] = useState<INfts[]>(initialCollection);
+  // initialCollection
   const header = ['ID', 'Collection', 'Asset Id', 'Address', ''];
 
-  const fetchData = async () => {
-    setLoading(true);
-
-    const getCollection: ICollectionResponse = await api.get({
-      route: `address/${address}/collection/${collection}?page=${page}`,
+  const requestCollection = (page: number) =>
+    api.get({
+      route: `address/${address}/collection/${collectionAsset}?page=${page}`,
     });
-    if (getCollection.code !== 'successful') {
-      setLoading(false);
-      return;
-    }
-
-    if (!getCollection.error) {
-      setCollection(collection);
-      setLoading(false);
-    }
-  };
-
-  useDidUpdateEffect(() => {
-    fetchData();
-  }, [page]);
-
   const TableBody: React.FC<INfts> | null = ({
     address,
     collection: assetId,
@@ -77,7 +59,10 @@ const Validators: React.FC<ICollectionPage> = ({
     header,
     body: TableBody,
     data: collection as any[],
-    loading: loading,
+    scrollUp: true,
+    totalPages: pagination.totalPages,
+    dataName: 'collection',
+    request: (page: number) => requestCollection(page),
   };
 
   const detailProps = {
@@ -85,8 +70,6 @@ const Validators: React.FC<ICollectionPage> = ({
     headerIcon: Icon,
     cards: undefined,
     paginationCount: pagination.totalPages,
-    page: page,
-    setPage: setPage,
     tableProps,
     route: `/account/${address}`,
   };
@@ -102,6 +85,7 @@ export const getServerSideProps: GetServerSideProps<ICollectionPage> = async ({
     collection: [],
     pagination: {} as IPagination,
     address: '',
+    collectionAsset: collection,
   };
   props.address = address;
 

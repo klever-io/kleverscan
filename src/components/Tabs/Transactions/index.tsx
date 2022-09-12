@@ -5,6 +5,7 @@ import { Row, Status } from '@/components/Table/styles';
 import {
   Contract,
   IContract,
+  IInnerTableProps,
   ITransaction,
   ITransferContract,
 } from '@/types/index';
@@ -16,7 +17,7 @@ import React from 'react';
 interface ITransactionsProps {
   transactions: ITransaction[];
   precision?: number;
-  loading: boolean;
+  transactionsTableProps: IInnerTableProps;
 }
 
 const Transactions: React.FC<ITransactionsProps> = props => {
@@ -97,10 +98,12 @@ const Transactions: React.FC<ITransactionsProps> = props => {
     'Asset Id',
   ];
 
+  const transactionTableProps = props.transactionsTableProps;
+
   const tableProps: ITable = {
+    ...transactionTableProps,
     body: TableBody,
     data: Object.values(props.transactions) as any[],
-    loading: props.loading,
     header,
     type: 'transactions',
   };

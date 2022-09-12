@@ -1,12 +1,9 @@
 import { Accounts as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
-import Pagination from '@/components/Pagination';
-import { PaginationContainer } from '@/components/Pagination/styles';
 import Table, { ITable } from '@/components/Table';
 import api from '@/services/api';
 import { IAccount, IPagination, IResponse } from '@/types/index';
-import { useDidUpdateEffect } from '@/utils/hooks';
 import { formatAmount, getAge, parseAddress } from '@/utils/index';
 import { TableContainer } from '@/views/accounts';
 import { CenteredRow } from '@/views/accounts/detail';
@@ -15,7 +12,6 @@ import { useWidth } from 'contexts/width';
 import { fromUnixTime } from 'date-fns';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 interface IAccounts {
@@ -52,29 +48,12 @@ const Accounts: React.FC<IAccounts> = ({
   pagination,
   createdYesterday,
 }) => {
-  const router = useRouter();
   const precision = 6; // default KLV precision
 
-  const [page, setPage] = useState(1);
-  const [accounts, setAccounts] = useState(defaultAccounts);
-  const [loading, setLoading] = useState(false);
-
-  useDidUpdateEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-
-      const response: IAccountResponse = await api.get({
-        route: `address/list?page=${page}`,
-      });
-      if (!response.error) {
-        setAccounts(response.data.accounts);
-      }
-
-      setLoading(false);
-    };
-
-    fetchData();
-  }, [page]);
+  const requestAccounts = async (page: number) =>
+    await api.get({
+      route: `address/list?page=${page}`,
+    });
 
   const cards: ICard[] = [
     {
@@ -161,10 +140,13 @@ const Accounts: React.FC<IAccounts> = ({
   const tableProps: ITable = {
     type: 'accounts',
     header,
-    data: accounts as any[],
+    data: defaultAccounts as any[],
     rowSections,
     columnSpans: [2],
-    loading,
+    request: page => requestAccounts(page),
+    dataName: 'accounts',
+    scrollUp: true,
+    totalPages: pagination.totalPages,
   };
 
   return (
@@ -185,17 +167,6 @@ const Accounts: React.FC<IAccounts> = ({
         <h3>List of accounts</h3>
         <Table {...tableProps} />
       </TableContainer>
-
-      <PaginationContainer>
-        <Pagination
-          scrollUp={true}
-          count={pagination.totalPages}
-          page={page}
-          onPaginate={page => {
-            setPage(page);
-          }}
-        />
-      </PaginationContainer>
     </Container>
   );
 };

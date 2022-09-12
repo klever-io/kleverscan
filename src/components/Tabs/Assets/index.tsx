@@ -3,7 +3,7 @@ import { Row } from '@/components/Table/styles';
 import { IAccountAsset, IAsset, IResponse } from '@/types/index';
 import { formatAmount } from '@/utils/index';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 interface IAssets {
   assets: IAccountAsset[];
@@ -17,18 +17,6 @@ interface IAssetResponse extends IResponse {
 }
 
 const Assets: React.FC<IAssets> = ({ assets, address }) => {
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-
-      setLoading(false);
-    };
-
-    fetchData();
-  }, []);
-
   const header = [
     'Token',
     'ID',
@@ -83,7 +71,6 @@ const Assets: React.FC<IAssets> = ({ assets, address }) => {
     header,
     data: assets,
     body: TableBody,
-    loading,
   };
 
   return <Table {...tableProps} />;

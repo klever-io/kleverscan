@@ -448,6 +448,29 @@ export const assetTriggerTypes = [
   },
 ];
 
+export const asyncDoIf = async (
+  success: (result?: any) => any,
+  failure: (error?: any) => any,
+  condition: () => Promise<any>,
+  tries = 3,
+): Promise<void> => {
+  const array = Array.from({ length: tries }, (_, i) => i);
+  let error = '';
+
+  for (const i of array) {
+    const result = await condition();
+    if (result && !result.error) {
+      success(result);
+      return;
+    } else if (result.error) {
+      error = result;
+    }
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+  failure(error);
+  return;
+};
+
 export const doIf = async (
   success: () => any,
   failure: () => any,

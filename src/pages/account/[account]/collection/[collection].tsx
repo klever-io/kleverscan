@@ -29,7 +29,7 @@ const Validators: React.FC<ICollectionPage> = ({
   collectionAsset,
 }) => {
   // initialCollection
-  const header = ['ID', 'Collection', 'Asset Id', 'Address', ''];
+  const header = ['ID', 'Collection Name', 'Collection Id', 'Address', ''];
 
   const requestCollection = (page: number) =>
     api.get({
@@ -37,17 +37,19 @@ const Validators: React.FC<ICollectionPage> = ({
     });
   const TableBody: React.FC<INfts> | null = ({
     address,
-    collection: assetId,
-    assetName: collection,
+    collection: collectionId,
+    assetName,
     nftNonce,
   }) => {
     return address ? (
       <Row type="nfts">
         <span>#{nftNonce}</span>
-        <span>{collection}</span>
-        <span>{assetId}</span>
+        <span>{assetName}</span>
+        <span>{collectionId}</span>
         <Link href={`/account/${address}`}>{address}</Link>
-        <Link href={`/account/${address}/collection/${assetId}/${nftNonce}`}>
+        <Link
+          href={`/account/${address}/collection/${collectionId}/${nftNonce}`}
+        >
           Detail
         </Link>
       </Row>

@@ -1,49 +1,65 @@
 import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
-import { Row } from '@/components/Table/styles';
 import api from '@/services/api';
-import { IAccountAsset, IAsset } from '@/types/index';
+import { IAccountAsset, IAsset, IBucket } from '@/types/index';
 import { parseAddress } from '@/utils/index';
 import { CenteredRow, RowContent } from '@/views/accounts/detail';
+import { useWidth } from 'contexts/width';
 import Link from 'next/link';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { Status } from './styles';
 
 interface IBuckets {
   assets: IAccountAsset[];
 }
 
+interface IAssetsBuckets {
+  asset: IAccountAsset;
+  bucket: IBucket;
+}
+
 const Buckets: React.FC<IBuckets> = ({ assets }) => {
   const UINT32_MAX = 4294967295;
   const precision = 6; // default KLV precision
   const detailsCache = useRef<{ [key: string]: IAsset }>({});
+  let assetDetails: IAsset;
+  let assetsBuckets: IAssetsBuckets[] = [];
 
-  const TableBody: React.FC<IAccountAsset> = asset => {
-    const [assetDetails, setAssetDetails] = useState<IAsset>();
-
+  assets.forEach(asset => {
     const assetHasUnstakedBucket = asset?.buckets?.find(
       bucket => bucket.unstakedEpoch !== UINT32_MAX,
     );
 
-    useEffect(() => {
-      const getDetails = async () => {
-        if (detailsCache[asset.assetId]) {
-          setAssetDetails(detailsCache[asset.assetId]);
-        } else {
-          const details = await api.get({ route: `/assets/${asset.assetId}` });
-          setAssetDetails(details);
-          detailsCache.current[asset.assetId] = details;
-        }
-      };
-
-      if (assetHasUnstakedBucket) {
-        getDetails();
+    const getDetails = async () => {
+      if (detailsCache[asset.assetId]) {
+        assetDetails = detailsCache[asset.assetId];
+      } else {
+        const details = await api.get({ route: `/assets/${asset.assetId}` });
+        assetDetails = details;
+        detailsCache.current[asset.assetId] = details;
       }
-    }, []);
+    };
 
-    if (!asset.buckets) {
-      return <></>;
+    if (assetHasUnstakedBucket) {
+      getDetails();
     }
+
+    if (asset.buckets) {
+      assetsBuckets = [
+        ...assetsBuckets,
+        ...asset.buckets.map(bucket => {
+          return {
+            asset,
+            bucket,
+          };
+        }),
+      ];
+    }
+  });
+  const { isMobile } = useWidth();
+
+  const rowSections = (assetBucket: IAssetsBuckets): JSX.Element[] => {
+    const { asset, bucket } = assetBucket;
 
     const getAvaliableEpoch = async (
       assetId: string,
@@ -57,52 +73,48 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
       return unstakedEpoch + 2; // Default for KLV
     };
 
-    return (
+    const sections = [
+      <Link href={`/asset/${asset.assetId}`} key={asset.assetId}>
+        <a>{asset.assetId}</a>
+      </Link>,
+      <p key={bucket.unstakedEpoch}>
+        {(bucket.balance / 10 ** asset.precision).toLocaleString()}
+      </p>,
+      <Status staked={true} key={'true'}>
+        {'True'}
+      </Status>,
+      <span key={bucket.unstakedEpoch}>
+        {bucket.stakedEpoch.toLocaleString()}
+      </span>,
+      <RowContent key={bucket.id}>
+        <CenteredRow className="bucketIdCopy">
+          <span>{!isMobile ? bucket.id : parseAddress(bucket.id, 24)}</span>
+          <Copy info="BucketId" data={bucket.id} />
+        </CenteredRow>
+      </RowContent>,
       <>
-        {asset.buckets.map(bucket => (
-          <Row type="buckets" key={bucket.id}>
-            <span>
-              <Link href={`/asset/${asset.assetId}`}>
-                <a>{asset.assetId}</a>
-              </Link>
-            </span>
-            <span>
-              <p>{(bucket.balance / 10 ** asset.precision).toLocaleString()}</p>
-            </span>
-            <Status staked={true}>{'True'}</Status>
-            <span>{bucket.stakedEpoch.toLocaleString()}</span>
-            <RowContent>
-              <CenteredRow className="bucketIdCopy">
-                <span>{bucket.id}</span>
-                <Copy info="BucketId" data={bucket.id} />
-              </CenteredRow>
-            </RowContent>
-            <span>
-              {bucket.unstakedEpoch === UINT32_MAX
-                ? '--'
-                : bucket.unstakedEpoch.toLocaleString()}
-            </span>
-            <span>
-              {bucket.unstakedEpoch === UINT32_MAX
-                ? '--'
-                : getAvaliableEpoch(
-                    asset.assetId,
-                    bucket.unstakedEpoch,
-                  ).toLocaleString()}
-            </span>
-            <span>
-              {bucket.delegation.length > 0 ? (
-                <Link href={`/account/${bucket.delegation}`}>
-                  <a>{parseAddress(bucket.delegation, 22)}</a>
-                </Link>
-              ) : (
-                <span>--</span>
-              )}
-            </span>
-          </Row>
-        ))}
-      </>
-    );
+        {bucket.unstakedEpoch === UINT32_MAX
+          ? '--'
+          : bucket.unstakedEpoch.toLocaleString()}
+        {bucket.unstakedEpoch === UINT32_MAX
+          ? '--'
+          : getAvaliableEpoch(
+              asset.assetId,
+              bucket.unstakedEpoch,
+            ).toLocaleString()}
+      </>,
+      <>
+        {bucket.delegation.length > 0 ? (
+          <Link href={`/account/${bucket.delegation}`}>
+            <a>{parseAddress(bucket.delegation, 22)}</a>
+          </Link>
+        ) : (
+          <span>--</span>
+        )}
+      </>,
+    ];
+
+    return sections;
   };
 
   const header = [
@@ -119,8 +131,9 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
   const tableProps: ITable = {
     type: 'buckets',
     header,
-    data: assets,
-    body: TableBody,
+    data: assetsBuckets,
+    rowSections,
+    columnSpans: [1, 1, 1, 1, 2, 1, 1, 1],
   };
 
   return <Table {...tableProps} />;

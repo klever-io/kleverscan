@@ -1,6 +1,7 @@
 import { ArrowRight } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import { Transactions as Icon } from '@/assets/title-icons';
+import Copy from '@/components/Copy';
 import DateFilter, {
   IDateFilter,
   ISelectedDays,
@@ -36,6 +37,7 @@ import {
   VoteSections,
   WithdrawSections,
 } from '@/utils/transactionListSections';
+import { CenteredRow } from '@/views/accounts/detail';
 import {
   Container,
   FilterByDate,
@@ -382,9 +384,10 @@ const Transactions: React.FC<ITransactions> = ({
     }
 
     const sections = [
-      <Link href={`/transaction/${hash}`} key={hash}>
-        {parseAddress(hash, 28)}
-      </Link>,
+      <CenteredRow className="bucketIdCopy" key={hash}>
+        <Link href={`/transaction/${hash}`}>{parseAddress(hash, 24)}</Link>
+        <Copy info="TXHash" data={hash} />
+      </CenteredRow>,
       <Link href={`/block/${blockNum || 0}`} key={blockNum}>
         <a className="address">{blockNum || 0}</a>
       </Link>,

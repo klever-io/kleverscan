@@ -1,5 +1,4 @@
 import Table, { ITable } from '@/components/Table';
-import { Row } from '@/components/Table/styles';
 import { IAccountAsset, IAsset, IResponse } from '@/types/index';
 import { formatAmount } from '@/utils/index';
 import Link from 'next/link';
@@ -27,50 +26,40 @@ const Assets: React.FC<IAssets> = ({ assets, address }) => {
     '',
   ];
 
-  const TableBody: React.FC<IAccountAsset> = ({
-    assetId,
-    assetType,
-    precision,
-    balance,
-    frozenBalance,
-  }) => {
+  const rowSections = (props: IAccountAsset): JSX.Element[] => {
+    const { assetId, assetType, precision, balance, frozenBalance } = props;
     const ticker = assetId?.split('-')[0];
-    return (
-      <Row type="assets">
-        <span>
-          <span>{ticker}</span>
-        </span>
-        <span>
-          <Link href={`/asset/${assetId}`}>{assetId}</Link>
-        </span>
-        <span>{assetType === 0 ? 'Fungible' : 'Non Fungible'}</span>
-        <span>
-          <strong>{precision}</strong>
-        </span>
-        <span>
-          <strong>
-            {formatAmount(balance / 10 ** precision)} {ticker}
-          </strong>
-        </span>
-        <span>
-          <strong>
-            {formatAmount(frozenBalance / 10 ** precision)} {ticker}
-          </strong>
-        </span>
+    return [
+      <span key={ticker}>{ticker}</span>,
+      <Link key={assetId} href={`/asset/${assetId}`}>
+        {assetId}
+      </Link>,
+      <span key={assetType}>
+        {assetType === 0 ? 'Fungible' : 'Non Fungible'}
+      </span>,
+      <strong key={precision}>{precision}</strong>,
+      <strong key={balance}>
+        {formatAmount(balance / 10 ** precision)} {ticker}
+      </strong>,
+      <strong key={frozenBalance}>
+        {formatAmount(frozenBalance / 10 ** precision)} {ticker}
+      </strong>,
+      <span key={address}>
         {assetType === 1 && (
           <Link href={`/account/${address}/collection/${assetId}`}>
             View NFTs
           </Link>
         )}
-      </Row>
-    );
+      </span>,
+    ];
   };
 
   const tableProps: ITable = {
+    rowSections,
+    columnSpans: [1, 1, 1, 1, 1, 1, 1],
     type: 'assets',
     header,
     data: assets,
-    body: TableBody,
   };
 
   return <Table {...tableProps} />;

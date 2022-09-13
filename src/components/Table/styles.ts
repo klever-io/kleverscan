@@ -205,6 +205,7 @@ export const MobileCardItem = styled.span<{ columnSpan?: number }>`
       !props.columnSpan || props.columnSpan >= 0
         ? css`
             grid-column: span ${props.columnSpan};
+            gap: 0.25rem;
           `
         : css`
             display: none;

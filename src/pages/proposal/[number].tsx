@@ -1,7 +1,8 @@
+import { Copy } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
-import { Row as TableRow, Status } from '@/components/Table/styles';
+import { Status } from '@/components/Table/styles';
 import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
 import api from '@/services/api';
 import {
@@ -16,7 +17,12 @@ import {
   IVotingPowers,
   NetworkParamsIndexer,
 } from '@/types/proposals';
-import { formatAmount, toLocaleFixed, typeVoteColors } from '@/utils/index';
+import {
+  formatAmount,
+  parseAddress,
+  toLocaleFixed,
+  typeVoteColors,
+} from '@/utils/index';
 import {
   BalanceContainer,
   BigSpan,
@@ -47,6 +53,7 @@ import {
   VotesContainer,
   VotesHeader,
 } from '@/views/proposals/detail';
+import { CenteredRow } from '@/views/validators/detail';
 import { format, fromUnixTime } from 'date-fns';
 import { GetStaticProps } from 'next';
 import Link from 'next/link';
@@ -203,42 +210,36 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
     );
   };
 
-  const TableBody: React.FC<IParsedVote> = props => {
-    const { status, voter, votingPower, voteDate } = props;
+  const rowSections = (vote: IParsedVote): JSX.Element[] => {
+    const { status, voter, votingPower, voteDate } = vote;
+
+    let sections = [<></>];
     if (status === selectedFilter) {
-      return (
-        <TableRow type="votes">
-          <span>
-            <Link href={`/account/${voter}`}>
-              <HoverLink>
-                <small>{voter}</small>
-              </HoverLink>
-            </Link>
-          </span>
-          <span>
-            <p>{votingPower}%</p>
-          </span>
-          <span>
-            <StatusContent>
-              <AiFillCheckCircle
-                color={typeVoteColors[status]}
-                size={18}
-                style={{ marginRight: 5 }}
-              />
-              <small>{voteDate}</small>
-            </StatusContent>
-          </span>
-        </TableRow>
-      );
+      sections = [
+        <CenteredRow key={voter}>
+          <Link href={`/account/${voter}`}>{parseAddress(voter, 24)}</Link>
+          <Copy data={voter} info="voter"></Copy>
+        </CenteredRow>,
+        <p key={votingPower}>{votingPower}%</p>,
+        <StatusContent key={status}>
+          <AiFillCheckCircle
+            color={typeVoteColors[status]}
+            size={18}
+            style={{ marginRight: 5 }}
+          />
+          <small>{voteDate}</small>
+        </StatusContent>,
+      ];
     }
 
-    return <></>;
+    return sections;
   };
 
   const tableProps: ITable = {
     header: ['Voter', 'Voting Power', 'Vote date'],
     type: 'votes',
-    body: TableBody,
+    rowSections,
+    columnSpans: [2, 1, 1],
     data: votersList,
   };
 

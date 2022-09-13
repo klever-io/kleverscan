@@ -6,7 +6,6 @@ import Dropdown from '@/components/Dropdown';
 import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
 import Table, { ITable } from '@/components/Table';
-import { Row as RowList } from '@/components/Table/styles';
 import api from '@/services/api';
 import {
   IBucket,
@@ -365,36 +364,32 @@ const Validator: React.FC<IValidatorPage> = ({
   const precision = 6; // default KLV precision
   const header = ['Address', 'Bucket ID', 'Staked Epoch', 'Amount '];
 
-  const TableBody: React.FC<IBucket> = ({
-    address,
-    id,
-    stakedEpoch,
-    balance,
-  }) => {
-    return (
-      <RowList type="validator">
-        <Link href={`/account/${address}`}>
-          {parseAddress(address || '', 25)}
+  const rowSections = (bucket: IBucket): JSX.Element[] => {
+    const { address, id, stakedEpoch, balance } = bucket;
+    const sections = [
+      <CenteredRow key={id}>
+        <Link href={`/account/${address}`} key={address}>
+          {parseAddress(address || '', 24)}
         </Link>
-        <span>
-          <CenteredRow>
-            {id}
-            <Copy data={id} info="id"></Copy>
-          </CenteredRow>
-        </span>
-        <span>{stakedEpoch}</span>
-        <span>
-          <strong>{formatAmount(balance / 10 ** precision)}</strong>
-        </span>
-      </RowList>
-    );
+        <Copy data={address} info="address"></Copy>
+      </CenteredRow>,
+      <CenteredRow key={id}>
+        {parseAddress(id || '', 24)}
+        <Copy data={id} info="id"></Copy>
+      </CenteredRow>,
+      <span key={stakedEpoch}>{stakedEpoch}</span>,
+      <strong key={balance}>{formatAmount(balance / 10 ** precision)}</strong>,
+    ];
+
+    return sections;
   };
 
   const tableProps: ITable = {
     type: 'validator',
     header,
     data: defaultDelegators as IBucket[],
-    body: TableBody,
+    rowSections,
+    columnSpans: [2, 2, 1, 1],
     request: page => requestValidator(page),
     scrollUp: false,
     totalPages: pagination.totalPages,

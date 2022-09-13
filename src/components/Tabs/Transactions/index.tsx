@@ -1,7 +1,8 @@
 import { ArrowRight } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
+import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
-import { Row, Status } from '@/components/Table/styles';
+import { Status } from '@/components/Table/styles';
 import {
   Contract,
   IContract,
@@ -10,6 +11,8 @@ import {
   ITransferContract,
 } from '@/types/index';
 import { capitalizeString, formatAmount, parseAddress } from '@/utils/index';
+import { CenteredRow } from '@/views/accounts/detail';
+import { useWidth } from 'contexts/width';
 import { format, fromUnixTime } from 'date-fns';
 import Link from 'next/link';
 import React from 'react';
@@ -27,7 +30,9 @@ const Transactions: React.FC<ITransactionsProps> = props => {
       : Object.values(Contract)[contracts[0].type];
   const precision = props.precision || 6;
 
-  const TableBody: React.FC<ITransaction> = props => {
+  const { isMobile } = useWidth();
+
+  const rowSections = (props: ITransaction): JSX.Element[] => {
     const { hash, blockNum, timestamp, sender, contract, status } = props;
 
     const StatusIcon = getStatusIcon(status);
@@ -46,43 +51,33 @@ const Transactions: React.FC<ITransactionsProps> = props => {
         assetId = parameter.assetId;
       }
     }
-    return (
-      <Row type="transactions">
-        <span>
-          <Link href={`/transaction/${hash}`}>{parseAddress(hash, 28)}</Link>
-        </span>
-        <Link href={`/block/${blockNum}`}>
-          <a className="address">{blockNum || 0}</a>
-        </Link>
-        <span>
-          <small>
-            {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
-          </small>
-        </span>
-        <Link href={`/account/${sender}`}>
-          <a className="address">{parseAddress(sender, 16)}</a>
-        </Link>
-        <span>
-          <ArrowRight />
-        </span>
-        <Link href={`/account/${toAddress}`}>
-          <a className="address">{parseAddress(toAddress, 16)}</a>
-        </Link>
-        <Status status={status}>
-          <StatusIcon />
-          <span>{capitalizeString(status)}</span>
-        </Status>
-        <span>
-          <strong>{contractType}</strong>
-        </span>
-        <span>
-          <strong>{amount}</strong>
-        </span>
-        <span>
-          <strong>{assetId}</strong>
-        </span>
-      </Row>
-    );
+    const sections = [
+      <CenteredRow className="bucketIdCopy" key={hash}>
+        <Link href={`/transaction/${hash}`}>{parseAddress(hash, 24)}</Link>
+        <Copy info="TXHash" data={hash} />
+      </CenteredRow>,
+      <Link href={`/block/${blockNum}`} key={blockNum}>
+        <a className="address">{blockNum || 0}</a>
+      </Link>,
+      <small key={timestamp}>
+        {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
+      </small>,
+      <Link href={`/account/${sender}`} key={sender}>
+        <a className="address">{parseAddress(sender, 16)}</a>
+      </Link>,
+      !isMobile ? <ArrowRight /> : <></>,
+      <Link href={`/account/${toAddress}`} key={toAddress}>
+        <a className="address">{parseAddress(toAddress, 16)}</a>
+      </Link>,
+      <Status status={status} key={status}>
+        <StatusIcon />
+        <span>{capitalizeString(status)}</span>
+      </Status>,
+      <strong key={contractType}>{contractType}</strong>,
+      <strong key={amount}>{amount}</strong>,
+      <strong key={assetId}>{assetId}</strong>,
+    ];
+    return sections;
   };
 
   const header = [
@@ -102,10 +97,11 @@ const Transactions: React.FC<ITransactionsProps> = props => {
 
   const tableProps: ITable = {
     ...transactionTableProps,
-    body: TableBody,
+    rowSections: rowSections,
     data: Object.values(props.transactions) as any[],
     header,
     type: 'transactions',
+    columnSpans: [2, 1, 1, 1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   };
 
   return <Table {...tableProps} />;

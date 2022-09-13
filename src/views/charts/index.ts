@@ -6,8 +6,8 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: 850px) {
-    padding: 3rem 3rem 5rem 3rem;
+  @media (max-width: 768px) {
+    padding: 3rem 1rem 5rem 1rem;
   }
 `;
 

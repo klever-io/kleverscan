@@ -119,7 +119,7 @@ const Accounts: React.FC<IAccounts> = ({
     const sections = [
       <CenteredRow key={address}>
         <Link href={`/account/${address}`}>
-          {isMobile ? parseAddress(address, 28) : address}
+          {isMobile ? parseAddress(address, 24) : address}
         </Link>
 
         <Copy info="Address" data={address} />

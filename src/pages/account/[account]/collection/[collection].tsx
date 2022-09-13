@@ -1,9 +1,10 @@
 import { Validators as Icon } from '@/assets/cards';
 import Detail from '@/components/Layout/Detail';
 import { ITable } from '@/components/Table';
-import { Row } from '@/components/Table/styles';
 import api from '@/services/api';
 import { INfts, IPagination, IResponse } from '@/types/index';
+import { parseAddress } from '@/utils/index';
+import { useWidth } from 'contexts/width';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import React from 'react';
@@ -35,31 +36,41 @@ const Validators: React.FC<ICollectionPage> = ({
     api.get({
       route: `address/${address}/collection/${collectionAsset}?page=${page}`,
     });
-  const TableBody: React.FC<INfts> | null = ({
-    address,
-    collection: collectionId,
-    assetName,
-    nftNonce,
-  }) => {
-    return address ? (
-      <Row type="nfts">
-        <span>#{nftNonce}</span>
-        <span>{assetName}</span>
-        <span>{collectionId}</span>
-        <Link href={`/account/${address}`}>{address}</Link>
-        <Link
-          href={`/account/${address}/collection/${collectionId}/${nftNonce}`}
-        >
-          Detail
-        </Link>
-      </Row>
-    ) : null;
+
+  const { isMobile } = useWidth();
+
+  const rowSections = (nft: INfts): JSX.Element[] => {
+    const {
+      address,
+      collection: collectionId,
+      assetName: collection,
+      nftNonce,
+    } = nft;
+
+    const sections = address
+      ? [
+          <span key={nftNonce}>#{nftNonce}</span>,
+          <span key={collection}>{collection}</span>,
+          <span key={collectionId}>{collectionId}</span>,
+          <Link href={`/account/${address}`} key={address}>
+            {isMobile ? parseAddress(address, 16) : address}
+          </Link>,
+          <Link
+            href={`/account/${address}/collection/${collectionId}/${nftNonce}`}
+            key={nftNonce}
+          >
+            Detail
+          </Link>,
+        ]
+      : [<></>];
+
+    return sections;
   };
 
   const tableProps: ITable = {
     type: 'nfts',
     header,
-    body: TableBody,
+    rowSections,
     data: collection as any[],
     scrollUp: true,
     totalPages: pagination.totalPages,

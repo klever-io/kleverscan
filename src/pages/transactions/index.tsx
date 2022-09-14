@@ -99,21 +99,21 @@ const Transactions: React.FC<ITransactions> = ({
   const router = useRouter();
   const defaultFilter: IFilterItem = { name: 'All', value: 'all' };
   const precision = 6; // default KLV precision
+  const baseColumnSpans = [
+    2, 1, 1, 1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  ];
 
-  const [dateFilter, setDateFilter] = useState({
-    start: '',
-    end: '',
-  });
+  const { isMobile } = useWidth();
 
   const [transactionType, setTransactionType] = useState(defaultFilter);
   const [statusType, setStatusType] = useState(defaultFilter);
   const [coinType, setCoinType] = useState(defaultFilter);
   const [query, setQuery] = useState({});
-
-  const baseColumnSpans = [
-    2, 1, 1, 1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  ];
   const [columnSpans, setColumnSpans] = useState(baseColumnSpans);
+  const [dateFilter, setDateFilter] = useState({
+    start: '',
+    end: '',
+  });
 
   const formatFilterQuery = useCallback(
     (type: string): IFilterItem | undefined => {
@@ -136,6 +136,16 @@ const Transactions: React.FC<ITransactions> = ({
     },
     [router.query.asset, router.query.type, router.query.status],
   );
+
+  const getContractType = useCallback((contracts: IContract[]) => {
+    if (!contracts) {
+      return 'Unkown';
+    }
+
+    return contracts.length > 1
+      ? 'Multi contract'
+      : Object.values(Contract)[contracts[0].type];
+  }, []);
 
   const filters: IFilter[] = [
     {
@@ -220,16 +230,6 @@ const Transactions: React.FC<ITransactions> = ({
   useDidUpdateEffect(() => {
     fetchData();
   }, [transactionType, statusType, coinType, dateFilter]);
-
-  const getContractType = useCallback((contracts: IContract[]) => {
-    if (!contracts) {
-      return 'Unkown';
-    }
-
-    return contracts.length > 1
-      ? 'Multi contract'
-      : Object.values(Contract)[contracts[0].type];
-  }, []);
 
   const getFilteredSections = (contract: IContract[]): JSX.Element[] => {
     const contractType = getContractType(contract);
@@ -358,8 +358,6 @@ const Transactions: React.FC<ITransactions> = ({
 
     return header;
   };
-
-  const { isMobile } = useWidth();
 
   const rowSections = (props: ITransaction): JSX.Element[] => {
     const {

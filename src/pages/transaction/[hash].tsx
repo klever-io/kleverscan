@@ -50,7 +50,7 @@ import {
 } from '@/views/transactions/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { format, fromUnixTime } from 'date-fns';
-import { GetServerSideProps } from 'next';
+import { GetStaticPaths, GetStaticProps } from 'next';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
@@ -436,7 +436,16 @@ const Transaction: React.FC<ITransactionPage> = props => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
+export const getStaticPaths: GetStaticPaths = async () => {
+  const paths: string[] = [];
+
+  return {
+    paths,
+    fallback: 'blocking',
+  };
+};
+
+export const getStaticProps: GetStaticProps<ITransactionPage> = async ({
   params,
 }) => {
   const redirectProps = { redirect: { destination: '/404', permanent: false } };

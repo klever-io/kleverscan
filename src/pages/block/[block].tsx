@@ -19,7 +19,7 @@ import {
   Row,
 } from '@/views/blocks/detail';
 import { format, fromUnixTime } from 'date-fns';
-import { GetStaticProps } from 'next';
+import { GetStaticPaths, GetStaticProps } from 'next';
 import React, { useState } from 'react';
 import { IPagination, IResponse, ITransaction } from '../../types';
 
@@ -313,7 +313,16 @@ const Block: React.FC<IBlockPage> = ({
   );
 };
 
-export const getServerSideProps: GetStaticProps<IBlockPage> = async ({
+export const getStaticPaths: GetStaticPaths = async () => {
+  const paths: string[] = [];
+
+  return {
+    paths,
+    fallback: 'blocking',
+  };
+};
+
+export const getStaticProps: GetStaticProps<IBlockPage> = async ({
   params,
 }) => {
   const props: IBlockPage = {
@@ -349,7 +358,9 @@ export const getServerSideProps: GetStaticProps<IBlockPage> = async ({
     props.totalPagesTransactions = transactions?.pagination?.totalPages || 0;
   }
 
-  return { props };
+  return {
+    props,
+  };
 };
 
 export default Block;

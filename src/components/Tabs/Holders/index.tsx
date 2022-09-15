@@ -1,14 +1,15 @@
 import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
-import { IAsset } from '@/types/index';
+import { IAccountAsset, IAsset } from '@/types/index';
 import { parseAddress, toLocaleFixed } from '@/utils/index';
 import Link from 'next/link';
 import React from 'react';
 import { AddressContainer, RankingContainer, RankingText } from './styles';
 
 interface IHolder {
-  holders: IBalance[];
+  holders: IAccountAsset[];
   asset: IAsset;
+  loading: boolean;
   holdersTableProps: any;
 }
 

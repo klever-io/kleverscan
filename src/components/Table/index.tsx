@@ -2,7 +2,8 @@ import { Query } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { useWidth } from 'contexts/width';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { IFilterItem } from '../Filter';
 import Pagination from '../Pagination';
 import { PaginationContainer } from '../Pagination/styles';
 import Skeleton from '../Skeleton';
@@ -42,6 +43,7 @@ export interface ITable {
   data: any[];
   body?: any;
   rowSections?: (item: any) => JSX.Element[] | undefined;
+  filter?: IFilterItem;
   columnSpans?: number[];
   scrollUp?: boolean;
   totalPages?: number;
@@ -59,6 +61,7 @@ const Table: React.FC<ITable> = ({
   body: Component,
   rowSections,
   columnSpans,
+  filter,
   request,
   scrollUp,
   totalPages: defaultTotalPages,
@@ -68,7 +71,7 @@ const Table: React.FC<ITable> = ({
   intervalController,
 }) => {
   const { pathname } = useRouter();
-  const props: ITableType = { type, pathname, haveData: data?.length };
+  const props: ITableType = { type, filter, pathname, haveData: data?.length };
   const { isMobile } = useWidth();
 
   const [loading, setLoading] = useState(false);
@@ -76,7 +79,6 @@ const Table: React.FC<ITable> = ({
   const [totalPages, setTotalPages] = useState(defaultTotalPages);
   const [items, setItems] = useState(data);
   const dataRef = useRef([]) as any;
-  const router = useRouter();
 
   const fetchData = async () => {
     if (!interval && request && dataName) {
@@ -110,14 +112,14 @@ const Table: React.FC<ITable> = ({
     fetchData();
   }, [page]);
 
-  useEffect(() => {
+  useDidUpdateEffect(() => {
     if (page !== 1) {
       setPage(1);
     }
     fetchData();
   }, [query]);
 
-  useEffect(() => {
+  useDidUpdateEffect(() => {
     if (interval) {
       const intervalId = setInterval(() => {
         fetchData();

@@ -2,12 +2,13 @@ import { Blocks as Icon } from '@/assets/title-icons';
 import ToggleButton from '@/components/Button/Toggle';
 import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
+import api from '@/services/api';
 import {
   blockCall,
   totalStatisticsCall,
   yesterdayStatisticsCall,
 } from '@/services/apiCalls';
-import { IBlock, IBlocks, ICard } from '@/types/blocks';
+import { IBlock, IBlockResponse, IBlocks, ICard } from '@/types/blocks';
 import { IPagination } from '@/types/index';
 import {
   formatAmount,
@@ -49,11 +50,21 @@ const Blocks: React.FC<IBlocks> = ({
 
   const requestBlocks = async (page: number) => {
     let response = { data: { blocks } };
+    const blockCall = new Promise<IBlockResponse>(async (resolve, reject) => {
+      const res = await api.get({
+        route: `block/list?page=${page}`,
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+      reject(res.error);
+    });
 
     await Promise.allSettled([
-      blockCall(page),
-      yesterdayStatisticsCall(),
-      totalStatisticsCall(),
+      blockCall,
+      yesterdayStatisticsCall,
+      totalStatisticsCall,
     ]).then(responses => {
       responses.map((res, index) => {
         if (res.status !== 'rejected') {
@@ -295,9 +306,9 @@ export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
   };
 
   await Promise.allSettled([
-    blockCall(),
-    yesterdayStatisticsCall(),
-    totalStatisticsCall(),
+    blockCall,
+    yesterdayStatisticsCall,
+    totalStatisticsCall,
   ]).then(responses => {
     responses.map((res, index) => {
       if (res.status !== 'rejected') {

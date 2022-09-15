@@ -58,31 +58,6 @@ export enum ContractsName {
   ConfigMarketplaceContractType = 'Config Marketplae',
 }
 
-export enum ContractsIndex {
-  'Transfer',
-  'Create Asset',
-  'Create Validator',
-  'Config Validator',
-  'Freeze',
-  'Unfreeze',
-  'Delegate',
-  'Undelegate',
-  'Withdraw',
-  'Claim',
-  'Unjail',
-  'Asset Trigger',
-  'Set Account Name',
-  'Proposal',
-  'Vote',
-  'Config ITO',
-  'Set ITO',
-  'Buy',
-  'Sell',
-  'Cancel Marketplace Order',
-  'Create Marketplace',
-  'Config Marketplae',
-}
-
 export enum Service {
   PROXY,
   PRICE,

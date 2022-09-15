@@ -1,12 +1,14 @@
 import { Blocks as Icon } from '@/assets/title-icons';
 import ToggleButton from '@/components/Button/Toggle';
 import Title from '@/components/Layout/Title';
-import Pagination from '@/components/Pagination';
-import { PaginationContainer } from '@/components/Pagination/styles';
 import Table, { ITable } from '@/components/Table';
-import api from '@/services/api';
-import { IBlock, IPagination, IResponse } from '@/types/index';
-import { useDidUpdateEffect } from '@/utils/hooks';
+import {
+  blockCall,
+  totalStatisticsCall,
+  yesterdayStatisticsCall,
+} from '@/services/apiCalls';
+import { IBlock, IBlocks, ICard } from '@/types/blocks';
+import { IPagination } from '@/types/index';
 import {
   formatAmount,
   getAge,
@@ -31,185 +33,80 @@ import {
 import { format, fromUnixTime } from 'date-fns';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
-
-interface IBlockStats {
-  totalBlocks: number;
-  totalBurned: number;
-  totalBlockRewards: number;
-}
-interface IBlockData {
-  yesterday: IBlockStats;
-  total: IBlockStats;
-}
-interface IBlocks {
-  blocks: IBlock[];
-  statistics: IBlockData;
-  pagination: IPagination;
-}
-
-interface IBlockResponse extends IResponse {
-  data: {
-    blocks: IBlock[];
-  };
-  pagination: IPagination;
-}
-
-interface IStatisticsResponse extends IResponse {
-  data: {
-    block_stats_by_day: IBlockStats;
-    block_stats_total: IBlockStats;
-  };
-}
-
-interface ICard {
-  title: string;
-  headers: string[];
-  values: string[];
-}
 
 const Blocks: React.FC<IBlocks> = ({
   blocks: defaultBlocks,
   statistics: defaultStatistics,
   pagination,
 }) => {
-  const router = useRouter();
   const precision = 6; // default KLV precision
   const blocksWatcherInterval = 4 * 1000; // 4 secs
 
-  const [page, setPage] = useState(1);
   const [blocks, setBlocks] = useState(defaultBlocks);
   const [statistics, setStatistics] = useState(defaultStatistics);
-  const [loading, setLoading] = useState(false);
-  const [autoUpdate, setAutoUpdate] = useState(false);
+  const [blocksInterval, setBlocksInterval] = useState(blocksWatcherInterval);
+
+  const requestBlocks = async (page: number) => {
+    let response = { data: { blocks } };
+
+    await Promise.allSettled([
+      blockCall(page),
+      yesterdayStatisticsCall(),
+      totalStatisticsCall(),
+    ]).then(responses => {
+      responses.map((res, index) => {
+        if (res.status !== 'rejected') {
+          const { value }: any = res;
+          switch (index) {
+            case 0:
+              response = value;
+              setBlocks(value.data.blocks);
+              break;
+
+            case 1:
+              setStatistics({
+                yesterday: value.data.block_stats_by_day[0],
+                total: {
+                  totalBlocks: 0,
+                  totalBurned: 0,
+                  totalBlockRewards: 0,
+                },
+              });
+              break;
+
+            case 2:
+              setStatistics({
+                ...statistics,
+                total: value.data.block_stats_total,
+              });
+
+            default:
+              break;
+          }
+        }
+      });
+    });
+    return response;
+  };
 
   const updateBlocks = useCallback(async () => {
-    const newState = storageUpdateBlocks(autoUpdate);
-    setAutoUpdate(newState);
-    const response: IBlockResponse = await api.get({
-      route: `block/list?page=${page}`,
-    });
-    if (!response.error) {
-      setBlocks(response.data.blocks);
+    const newState = storageUpdateBlocks(!!blocksInterval);
+    if (newState) {
+      setBlocksInterval(blocksWatcherInterval);
+    } else {
+      setBlocksInterval(0);
     }
-  }, [page, autoUpdate]);
+  }, [blocksInterval]);
 
   useEffect(() => {
     const updateBlocksConfig = getStorageUpdateConfig();
-    setAutoUpdate(updateBlocksConfig);
-  }, []);
-
-  useEffect(() => {
-    if (page !== 1) {
-      setAutoUpdate(false);
+    if (updateBlocksConfig) {
+      setBlocksInterval(blocksWatcherInterval);
     } else {
-      const updateBlocksConfig = getStorageUpdateConfig();
-      setAutoUpdate(updateBlocksConfig);
+      setBlocksInterval(0);
     }
-  }, [page]);
-
-  useDidUpdateEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-
-      const response: IBlockResponse = await api.get({
-        route: `block/list?page=${page}`,
-      });
-      if (!response.error) {
-        setBlocks(response.data.blocks);
-      }
-
-      setLoading(false);
-    };
-
-    fetchData();
-  }, [page]);
-
-  useEffect(() => {
-    if (autoUpdate) {
-      const updateInterval = setInterval(async () => {
-        const blockCall = new Promise<IBlockResponse>(
-          async (resolve, reject) => {
-            const res = await api.get({
-              route: `block/list?page=${page}`,
-            });
-
-            if (!res.error || res.error === '') {
-              resolve(res);
-            }
-            reject(res.error);
-          },
-        );
-
-        const yesterdayStatisticsCall = new Promise<IStatisticsResponse>(
-          async (resolve, reject) => {
-            const res = await api.get({
-              route: 'block/statistics-by-day/1',
-            });
-
-            if (!res.error || res.error === '') {
-              resolve(res);
-            }
-
-            reject(res.error);
-          },
-        );
-
-        const totalStatisticsCall = new Promise<IStatisticsResponse>(
-          async (resolve, reject) => {
-            const res = await api.get({
-              route: 'block/statistics-total/0',
-            });
-
-            if (!res.error || res.error === '') {
-              resolve(res);
-            }
-
-            reject(res.error);
-          },
-        );
-
-        await Promise.allSettled([
-          blockCall,
-          yesterdayStatisticsCall,
-          totalStatisticsCall,
-        ]).then(responses => {
-          responses.map((res, index) => {
-            if (res.status !== 'rejected') {
-              const { value }: any = res;
-              switch (index) {
-                case 0:
-                  setBlocks(value.data.blocks);
-                  break;
-
-                case 1:
-                  setStatistics({
-                    yesterday: value.data.block_stats_by_day[0],
-                    total: {
-                      totalBlocks: 0,
-                      totalBurned: 0,
-                      totalBlockRewards: 0,
-                    },
-                  });
-                  break;
-
-                case 2:
-                  setStatistics({
-                    ...statistics,
-                    total: value.data.block_stats_total,
-                  });
-
-                default:
-                  break;
-              }
-            }
-          });
-        });
-      }, blocksWatcherInterval);
-      return () => clearInterval(updateInterval);
-    }
-  }, [autoUpdate, page]);
+  }, []);
 
   const cards: ICard[] = [
     {
@@ -349,7 +246,12 @@ const Blocks: React.FC<IBlocks> = ({
     header,
     data: blocks as any[],
     rowSections,
-    loading,
+    scrollUp: true,
+    totalPages: pagination.totalPages,
+    dataName: 'blocks',
+    request: (page: number) => requestBlocks(page),
+    interval: blocksInterval,
+    intervalController: setBlocksInterval,
   };
 
   return (
@@ -366,29 +268,18 @@ const Blocks: React.FC<IBlocks> = ({
         ))}
       </CardContainer>
 
-      <TableContainer autoUpdate={autoUpdate}>
+      <TableContainer autoUpdate={!!blocksInterval}>
         <TableHeader>
           <h3>List of blocks</h3>
           <UpdateContainer onClick={() => updateBlocks()}>
             <span>Auto update</span>
-            <ToggleButton active={autoUpdate} />
+            <ToggleButton active={!!blocksInterval} />
           </UpdateContainer>
         </TableHeader>
-        <EffectsContainer autoUpdate={autoUpdate}>
+        <EffectsContainer autoUpdate={!!blocksInterval}>
           <Table {...tableProps} />
         </EffectsContainer>
       </TableContainer>
-
-      <PaginationContainer>
-        <Pagination
-          scrollUp={true}
-          count={pagination.totalPages}
-          page={page}
-          onPaginate={page => {
-            setPage(page);
-          }}
-        />
-      </PaginationContainer>
     </Container>
   );
 };
@@ -403,50 +294,10 @@ export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
     pagination: {} as IPagination,
   };
 
-  const blockCall = new Promise<IBlockResponse>(async (resolve, reject) => {
-    const res = await api.get({
-      route: 'block/list',
-    });
-
-    if (!res.error || res.error === '') {
-      resolve(res);
-    }
-
-    reject(res.error);
-  });
-
-  const yesterdayStatisticsCall = new Promise<IStatisticsResponse>(
-    async (resolve, reject) => {
-      const res = await api.get({
-        route: 'block/statistics-by-day/1',
-      });
-
-      if (!res.error || res.error === '') {
-        resolve(res);
-      }
-
-      reject(res.error);
-    },
-  );
-
-  const totalStatisticsCall = new Promise<IStatisticsResponse>(
-    async (resolve, reject) => {
-      const res = await api.get({
-        route: 'block/statistics-total/0',
-      });
-
-      if (!res.error || res.error === '') {
-        resolve(res);
-      }
-
-      reject(res.error);
-    },
-  );
-
   await Promise.allSettled([
-    blockCall,
-    yesterdayStatisticsCall,
-    totalStatisticsCall,
+    blockCall(),
+    yesterdayStatisticsCall(),
+    totalStatisticsCall(),
   ]).then(responses => {
     responses.map((res, index) => {
       if (res.status !== 'rejected') {

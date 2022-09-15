@@ -1,20 +1,9 @@
-import { IFilterItem } from '@/components/Filter';
 import { ContractsName } from '../types';
 
-const coins: IFilterItem[] = [
-  { name: 'KLV', value: 'klv' },
-  { name: 'KFI', value: 'kfi' },
-];
+const coins: string[] = ['KLV', 'KFI'];
 
-const status: IFilterItem[] = [
-  { name: 'Success', value: 'success' },
-  { name: 'Pending', value: 'pending' },
-  { name: 'Fail', value: 'fail' },
-];
+const status: string[] = ['Success', 'Pending', 'Fail'];
 
-const contracts = Object.values(ContractsName).map((contract, index) => ({
-  name: contract,
-  value: String(index),
-}));
+const contracts = Object.values(ContractsName).map(contract => contract);
 
 export { coins, status, contracts };

@@ -170,7 +170,7 @@ export const MobileContent = styled.div<IMobileMenu>`
   display: flex;
   position: fixed;
 
-  z-index: 500 !important;
+  z-index: 1000 !important;
 
   flex-direction: column;
 
@@ -216,7 +216,7 @@ export const MobileBackground = styled.div<IMobileMenu>`
 
   position: fixed;
 
-  z-index: 500 !important;
+  z-index: 1000 !important;
 
   opacity: ${props => (props.opened ? 1 : 0)};
   visibility: ${props => (props.opened ? 'visible' : 'hidden')};

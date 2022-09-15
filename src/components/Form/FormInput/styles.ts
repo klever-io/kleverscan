@@ -260,7 +260,7 @@ export const InputLabel = styled.label<ILabel>`
   font-size: smaller;
   font-weight: 600;
   transform: translate(-1rem, -2.25rem);
-  z-index: 997;
+  z-index: 996;
 
   position: absolute;
   left: 1rem;

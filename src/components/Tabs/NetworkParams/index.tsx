@@ -1,10 +1,8 @@
 import Table, { ITable } from '@/components/Table';
-import { Row } from '@/components/Table/styles';
 import React from 'react';
 
 interface INetworkProps {
   networkParams: INetworkParams;
-  loading: boolean;
 }
 
 interface INetworkParams {
@@ -17,33 +15,25 @@ interface INetworkParam {
   currentValue: string;
 }
 
-const NetworkParams: React.FC<INetworkProps> = ({ networkParams, loading }) => {
-  const TableBody: React.FC<INetworkParam> = ({
-    number,
-    parameter,
-    currentValue,
-  }) => {
-    return (
-      <Row type="networkParams">
-        <span>
-          <strong>#{number}</strong>
-        </span>
-        <span>
-          <p>{parameter}</p>
-        </span>
-        <span>
-          <p className="currentValue">{currentValue}</p>
-        </span>
-      </Row>
-    );
+const NetworkParams: React.FC<INetworkProps> = ({ networkParams }) => {
+  const rowSections = (props: INetworkParam): JSX.Element[] => {
+    const { number, parameter, currentValue } = props;
+
+    return [
+      <strong key={String(number)}>#{number}</strong>,
+      <p key={parameter}>{parameter}</p>,
+      <p key={currentValue} className="currentValue">
+        {currentValue}
+      </p>,
+    ];
   };
 
   const header = ['Number', 'Parameter', 'Current Value'];
 
   const tableProps: ITable = {
-    body: TableBody,
+    rowSections,
+    columnSpans: [1, 2, 1],
     data: networkParams as any[],
-    loading: loading,
     header,
     type: 'networkParams',
   };

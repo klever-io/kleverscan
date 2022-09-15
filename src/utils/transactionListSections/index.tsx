@@ -1,4 +1,4 @@
-import { KLV } from '@/assets/coins';
+import Tooltip from '@/components/Tooltip';
 import {
   IAssetTriggerContract,
   IBuyContract,
@@ -23,42 +23,33 @@ import {
   IVoteContract,
   IWithdrawContract,
 } from '@/types/index';
-import { CenteredRow, Tooltip, TooltipText } from '@/views/transactions';
+import { CenteredRow } from '@/views/transactions';
 import Link from 'next/link';
-import { useRef } from 'react';
 import { formatAmount } from '..';
 
 const precision = 6; // default KLV precision
 
 const TransferSections = (par: IParameter): JSX.Element[] => {
   const parameter = par as unknown as ITransferContract;
-  const tooltipRef = useRef<any>(null);
 
-  const handleMouseOver = (e: any) => {
-    const positionY = e.currentTarget.getBoundingClientRect().top;
-    const positionX = e.currentTarget.getBoundingClientRect().left;
-
-    tooltipRef.current.style.top = positionY - 30 + 'px';
-    tooltipRef.current.style.left = positionX + 'px';
-  };
   return [
     <CenteredRow key={parameter.assetId}>
       <div>
         {parameter.assetId ? (
-          <Tooltip onMouseOver={(e: any) => handleMouseOver(e)}>
-            <Link href={`/asset/${parameter.assetId}`}>
-              {parameter.assetId}
-            </Link>
-            <TooltipText ref={tooltipRef}>{parameter.assetId}</TooltipText>
-          </Tooltip>
+          <Tooltip
+            msg={parameter.assetId}
+            Component={() => (
+              <Link href={`/asset/${parameter.assetId}`}>
+                {parameter.assetId}
+              </Link>
+            )}
+          ></Tooltip>
         ) : (
           <>
-            <Tooltip onMouseOver={(e: any) => handleMouseOver(e)}>
-              <Link href={`/asset/KLV`}>
-                <KLV />
-              </Link>
-              <TooltipText ref={tooltipRef}>KLV</TooltipText>
-            </Tooltip>
+            <Tooltip
+              msg="KLV"
+              Component={() => <Link href={`/asset/KLV`}>KLV</Link>}
+            ></Tooltip>
           </>
         )}
       </div>

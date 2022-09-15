@@ -3,8 +3,6 @@ import Copy from '@/components/Copy';
 import { ISelectedDays } from '@/components/DateFilter';
 import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
-import Pagination from '@/components/Pagination';
-import { PaginationContainer } from '@/components/Pagination/styles';
 import QrCodeModal from '@/components/QrCodeModal';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Holders from '@/components/Tabs/Holders';
@@ -13,13 +11,14 @@ import api from '@/services/api';
 import {
   IAccountAsset,
   IAsset,
+  IBalance,
   IPagination,
   IResponse,
   ITransaction,
 } from '@/types/index';
-import { useDidUpdateEffect } from '@/utils/hooks';
 import {
   parseHardCodedInfo,
+  parseHolders,
   timestampToDate,
   toLocaleFixed,
 } from '@/utils/index';
@@ -42,7 +41,6 @@ import {
 import { ReceiveBackground } from '@/views/validator';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import React, { useCallback, useState } from 'react';
 
 interface IAssetPage {
@@ -51,8 +49,9 @@ interface IAssetPage {
   totalTransactions: number;
   totalTransactionsPage: number;
   totalHoldersPage: number;
-  holders: IAccountAsset[];
+  holders: IBalance[];
   totalRecords: number;
+  page: number;
 }
 
 interface IAssetResponse extends IResponse {
@@ -79,10 +78,11 @@ const Asset: React.FC<IAssetPage> = ({
   asset,
   transactions: defaultTransactions,
   totalTransactions,
-  holders: defaultHolders,
+  holders,
   totalHoldersPage,
-  totalTransactionsPage: defaultTotalTransactionsPage,
+  totalTransactionsPage,
   totalRecords,
+  page,
 }) => {
   const {
     name,
@@ -104,7 +104,6 @@ const Asset: React.FC<IAssetPage> = ({
     verified,
   } = asset;
 
-  const router = useRouter();
   const cardHeaders = uris
     ? ['Overview', 'More', 'URIS']
     : ['Overview', 'More'];
@@ -112,69 +111,41 @@ const Asset: React.FC<IAssetPage> = ({
 
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
-
-  const [transactionsPage, setTransactionsPage] = useState(1);
-  const [totalTransactionsPage, setTotalTransactionsPage] = useState(
-    defaultTotalTransactionsPage,
-  );
-  const [transactions, setTransactions] = useState(defaultTransactions);
   const [dateFilter, setDateFilter] = useState({
     start: '',
     end: '',
   });
-  const [holdersPage, setHoldersPage] = useState(1);
-  const [holders, setHolders] = useState(defaultHolders);
-  const [loadingTransactions, setLoadingTransactions] = useState(false);
-  const [loadingHolders, setLoadingHolders] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
-  useDidUpdateEffect(() => {
-    setLoadingTransactions(true);
-    const fetchData = async () => {
-      setLoadingTransactions(true);
+  const requestTransactions = async (page: number) => {
+    const query = dateFilter.start
+      ? {
+          limit: 5,
+          asset: asset.assetId,
+          startdate: dateFilter.start ? dateFilter.start : undefined,
+          enddate: dateFilter.end ? dateFilter.end : undefined,
+        }
+      : {
+          limit: 5,
+          asset: asset.assetId,
+        };
 
-      const query = dateFilter.start
-        ? {
-            page: transactionsPage,
-            limit: 5,
-            asset: asset.assetId,
-            startdate: dateFilter.start ? dateFilter.start : undefined,
-            enddate: dateFilter.end ? dateFilter.end : undefined,
-          }
-        : {
-            page: transactionsPage,
-            limit: 5,
-            asset: asset.assetId,
-          };
+    const res = await api.get({
+      route: `transaction/list`,
+      query: { page, ...query },
+    });
+    return res;
+  };
 
-      const response: ITransactionResponse = await api.get({
-        route: `transaction/list`,
-        query,
-      });
-      if (!response.error) {
-        setTransactions(response.data.transactions);
-        setTotalTransactionsPage(response.pagination.totalPages);
-        setLoadingTransactions(false);
-      }
-    };
+  const requestAssetHolders = async (page: number) => {
+    const response = await api.get({
+      route: `assets/holders/${asset.assetId}?page=${page}`,
+    });
+    const unparsedHolders = response?.data?.accounts || [];
+    const parsedHolders = parseHolders(unparsedHolders, asset.assetId);
 
-    fetchData();
-  }, [transactionsPage, dateFilter]);
-
-  useDidUpdateEffect(() => {
-    setLoadingHolders(true);
-    const fetchData = async () => {
-      const response: IHoldersResponse = await api.get({
-        route: `assets/holders/${asset.assetId}?page=${holdersPage}`,
-      });
-      if (!response.error) {
-        setHolders(response.data.accounts);
-        setLoadingHolders(false);
-      }
-    };
-
-    fetchData();
-  }, [holdersPage]);
+    return { ...response, data: { accounts: parsedHolders } };
+  };
 
   const getIssueDate = useCallback(() => {
     if (issueDate) {
@@ -399,50 +370,45 @@ const Asset: React.FC<IAssetPage> = ({
     }
   };
 
+  const transactionsTableProps = {
+    scrollUp: false,
+    totalPages: totalTransactionsPage,
+    dataName: 'transactions',
+    request: (page: number) => requestTransactions(page),
+    query: dateFilter,
+  };
+
+  const holdersTableProps = {
+    scrollUp: false,
+    totalPages: totalHoldersPage,
+    dataName: 'accounts',
+    request: (page: number) => requestAssetHolders(page),
+    page,
+  };
+
   const SelectedTabComponent: React.FC = () => {
     switch (selectedTab) {
       case 'Transactions':
         return (
-          <>
-            <Transactions
-              transactions={transactions}
-              precision={precision}
-              loading={loadingTransactions}
-            />
-            <PaginationContainer>
-              <Pagination
-                scrollUp={false}
-                count={totalTransactionsPage}
-                page={transactionsPage}
-                onPaginate={page => {
-                  setTransactionsPage(page);
-                }}
-              />
-            </PaginationContainer>
-          </>
+          <Transactions
+            transactions={defaultTransactions}
+            precision={precision}
+            transactionsTableProps={transactionsTableProps}
+          />
         );
       case 'Holders':
         return (
-          <>
-            <Holders asset={asset} holders={holders} loading={loadingHolders} />
-            <PaginationContainer>
-              <Pagination
-                scrollUp={false}
-                count={totalHoldersPage}
-                page={holdersPage}
-                onPaginate={page => {
-                  setHoldersPage(page);
-                }}
-              />
-            </PaginationContainer>
-          </>
+          <Holders
+            asset={asset}
+            holders={holders}
+            holdersTableProps={holdersTableProps}
+          />
         );
       default:
         return <div />;
     }
   };
   const resetDate = () => {
-    setTransactionsPage(1);
     setDateFilter({
       start: '',
       end: '',
@@ -450,7 +416,6 @@ const Asset: React.FC<IAssetPage> = ({
   };
 
   const filterDate = (selectedDays: ISelectedDays) => {
-    setTransactionsPage(1);
     setDateFilter({
       start: selectedDays.start.getTime().toString(),
       end: selectedDays.end
@@ -459,14 +424,16 @@ const Asset: React.FC<IAssetPage> = ({
     });
   };
 
+  const dateFilterProps = {
+    resetDate,
+    filterDate,
+    empty: defaultTransactions.length === 0,
+  };
+
   const tabProps: ITabs = {
     headers: tableHeaders,
     onClick: header => setSelectedTab(header),
-    dateFilterProps: {
-      resetDate,
-      filterDate,
-      empty: transactions.length === 0,
-    },
+    dateFilterProps,
   };
 
   const isVerified = useCallback(() => {
@@ -539,6 +506,7 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
     totalTransactionsPage: 0,
     holders: [],
     totalRecords: 0,
+    page: 1,
   };
 
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
@@ -600,9 +568,15 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
           } else if (index === 2) {
             const holders: any = res.value;
 
-            props.holders = holders?.data?.accounts || 0;
-            props.totalHoldersPage = holders?.pagination?.totalPages || 0;
-            props.totalRecords = holders?.pagination?.totalRecords || 0;
+            const unparsedHolders = holders?.data?.accounts || [];
+
+            props.holders = parseHolders(
+              unparsedHolders,
+              props?.asset?.assetId,
+            );
+            props.totalHoldersPage = holders?.pagination?.totalPages || 1;
+            props.totalRecords = holders?.pagination?.totalRecords || 1;
+            props.page = holders?.pagination?.self || 1;
           }
         } else if (index == 0) {
           assetNotFound = true;

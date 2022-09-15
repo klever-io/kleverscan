@@ -1,6 +1,7 @@
 import { getStatusIcon } from '@/assets/status';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
+import Tooltip from '@/components/Tooltip';
 import {
   IFullInfoParam,
   IParsedProposal,
@@ -13,12 +14,14 @@ import {
   ProposalStatus,
   ProposalTime,
   ProposerDescAndLink,
-  Tooltip,
-  TooltipText,
   UpVotes,
 } from './styles';
 
-const Proposals: React.FC<IProposalsProps> = ({ proposals, loading }) => {
+const Proposals: React.FC<IProposalsProps> = ({
+  proposals,
+  totalPages,
+  request,
+}) => {
   const tooltipRef = useRef<any>(null);
 
   const rowSections = (props: IParsedProposal): JSX.Element[] => {
@@ -62,29 +65,24 @@ const Proposals: React.FC<IProposalsProps> = ({ proposals, loading }) => {
     };
 
     const renderProposalsNetworkParamsWithToolTip = () => {
+      let message = '';
+      {
+        parsedParameters.forEach(
+          (param2, index2) =>
+            (message += `${param2.paramText}  ${param2.paramValue}` + '\n'),
+        );
+      }
       if (parsedParameters) {
         return (
-          <Tooltip onMouseOver={(e: any) => handleMouseOver(e)}>
-            {renderProposalsNetworkParams(parsedParameters)}
-            <TooltipText ref={tooltipRef}>
-              {parsedParameters.map((param2, index2) => (
-                <div key={index2}>
-                  {param2.paramText}&nbsp;&nbsp;{param2.paramValue}
-                </div>
-              ))}
-            </TooltipText>
-          </Tooltip>
+          <Tooltip
+            Component={() => (
+              <div>{renderProposalsNetworkParams(parsedParameters)}</div>
+            )}
+            msg={message}
+          ></Tooltip>
         );
       }
       return <></>;
-    };
-
-    const handleMouseOver = (e: any) => {
-      const positionY = e.currentTarget.getBoundingClientRect().top;
-      const positionX = e.currentTarget.getBoundingClientRect().left;
-
-      tooltipRef.current.style.top = positionY - 30 + 'px';
-      tooltipRef.current.style.left = positionX + 'px';
     };
 
     const StatusIcon = getStatusIcon(proposalStatus);
@@ -151,9 +149,12 @@ const Proposals: React.FC<IProposalsProps> = ({ proposals, loading }) => {
     rowSections,
     columnSpans: [1, 1, 1, 1, 2, 2, 2],
     data: proposals as any[],
-    loading: loading,
     header,
     type: 'proposals',
+    scrollUp: false,
+    totalPages,
+    dataName: 'proposals',
+    request: page => request(page),
   };
 
   return <Table {...tableProps} />;

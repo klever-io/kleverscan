@@ -1,12 +1,13 @@
 import BlockCard from '@/components/Cards/BlockCard';
 import Carousel from '@/components/Carousel';
 import api from '@/services/api';
+import { IBlock, IBlockCardList } from '@/types/blocks';
 import { Section } from '@/views/home';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { IBlock, IBlockCardList, IBlockResponse } from '../../types';
+import { IBlockResponse } from '../../types';
 
 const BlockCardList: React.FC<IBlockCardList> = ({ blocks, precision }) => {
   const [listedBlocks, setListedBlocks] = useState<IBlock[]>(blocks);

@@ -1,4 +1,5 @@
 import { default as DefaultInput } from '@/components/Inputt';
+import Link from 'next/link';
 import styled from 'styled-components';
 
 export const Container = styled.div`
@@ -133,5 +134,11 @@ export const Tooltip = styled.span`
   &:hover ${TooltipText} {
     visibility: visible;
     opacity: 1;
+  }
+`;
+
+export const StyledLink = styled(Link)`
+  &:hover {
+    overflow: visible;
   }
 `;

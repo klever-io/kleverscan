@@ -1,4 +1,5 @@
 import { Service } from '@/types/index';
+import { asyncDoIf } from '../utils';
 
 export enum Method {
   GET = 'GET',
@@ -101,78 +102,114 @@ export const withoutBody = async (
   props: IProps,
   method: Method,
 ): Promise<any> => {
-  try {
-    const { route, query, service, apiVersion } = getProps(props);
+  const request = async () => {
+    try {
+      const { route, query, service, apiVersion } = getProps(props);
 
-    const response = await fetch(getHost(route, query, service, apiVersion), {
-      method: method.toString(),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      return Promise.resolve({
-        data: null,
-        error: (await response.json()).error,
-        code: 'internal_error',
+      const response = await fetch(getHost(route, query, service, apiVersion), {
+        method: method.toString(),
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
-    }
 
-    return response.json();
-  } catch (error) {
-    return Promise.resolve({ data: null, error, code: 'internal_error' });
-  }
+      if (!response.ok) {
+        return {
+          data: null,
+          error: (await response.json()).error,
+          code: 'internal_error',
+        };
+      }
+
+      return response.json();
+    } catch (error) {
+      return { data: null, error, code: 'internal_error' };
+    }
+  };
+
+  let result: any;
+
+  await asyncDoIf(
+    res => (result = res),
+    err => (result = Promise.resolve(err)),
+    () => request(),
+  );
+
+  return result;
 };
 
 export const withBody = async (props: IProps, method: Method): Promise<any> => {
-  try {
-    const { route, body, query, service, apiVersion } = getProps(props);
-    const response = await fetch(getHost(route, query, service, apiVersion), {
-      method: method.toString(),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      return Promise.resolve({
-        data: null,
-        error: (await response.json()).error,
-        code: 'internal_error',
+  const request = async () => {
+    try {
+      const { route, body, query, service, apiVersion } = getProps(props);
+      const response = await fetch(getHost(route, query, service, apiVersion), {
+        method: method.toString(),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
       });
-    }
 
-    return response.json();
-  } catch (error) {
-    return Promise.resolve({ data: null, error, code: 'internal_error' });
-  }
+      if (!response.ok) {
+        return {
+          data: null,
+          error: (await response.json()).error,
+          code: 'internal_error',
+        };
+      }
+
+      return response.json();
+    } catch (error) {
+      return { data: null, error, code: 'internal_error' };
+    }
+  };
+
+  let result: any;
+
+  await asyncDoIf(
+    res => (result = res),
+    err => (result = Promise.resolve(err)),
+    () => request(),
+  );
+
+  return result;
 };
 
 export const withText = async (props: IProps, method: Method): Promise<any> => {
-  try {
-    const { route, query, service, apiVersion } = getProps(props);
+  const request = async () => {
+    try {
+      const { route, query, service, apiVersion } = getProps(props);
 
-    const response = await fetch(getHost(route, query, service, apiVersion), {
-      method: method.toString(),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      return Promise.resolve({
-        data: null,
-        error: (await response.json()).error,
-        code: 'internal_error',
+      const response = await fetch(getHost(route, query, service, apiVersion), {
+        method: method.toString(),
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
-    }
 
-    return response.text();
-  } catch (error) {
-    return Promise.resolve({ data: null, error, code: 'internal_error' });
-  }
+      if (!response.ok) {
+        return {
+          data: null,
+          error: (await response.json()).error,
+          code: 'internal_error',
+        };
+      }
+
+      return response.text();
+    } catch (error) {
+      return { data: null, error, code: 'internal_error' };
+    }
+  };
+
+  let result: any;
+
+  await asyncDoIf(
+    res => (result = res),
+    err => (result = Promise.resolve(err)),
+    () => request(),
+  );
+
+  return result;
 };
 
 export const withTimeout = async (
@@ -190,33 +227,46 @@ export const withTimeout = async (
 };
 
 export const getCached = async (props: IProps): Promise<any> => {
-  try {
-    const { route, query, service, apiVersion, refreshTime } = getProps(props);
+  const request = async () => {
+    try {
+      const { route, query, service, apiVersion, refreshTime } =
+        getProps(props);
 
-    const body = { route, service, refreshTime };
+      const body = { route, service, refreshTime };
 
-    const response = await fetch(
-      getHost('api/data', query, Service.EXPLORER, apiVersion),
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        getHost('api/data', query, Service.EXPLORER, apiVersion),
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body),
         },
-        body: JSON.stringify(body),
-      },
-    );
-    if (!response.ok) {
-      return Promise.resolve({
-        data: null,
-        error: (await response.json()).error,
-        code: 'internal_error',
-      });
-    }
+      );
+      if (!response.ok) {
+        return {
+          data: null,
+          error: (await response.json()).error,
+          code: 'internal_error',
+        };
+      }
 
-    return response.json();
-  } catch (error) {
-    return Promise.resolve({ data: null, error, code: 'internal_error' });
-  }
+      return response.json();
+    } catch (error) {
+      return { data: null, error, code: 'internal_error' };
+    }
+  };
+
+  let result: any;
+
+  await asyncDoIf(
+    res => (result = res),
+    err => (result = Promise.resolve(err)),
+    () => request(),
+  );
+
+  return result;
 };
 
 const api = {

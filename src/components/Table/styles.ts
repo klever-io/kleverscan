@@ -1,7 +1,5 @@
 import { transparentize } from 'polished';
 import styled, { css } from 'styled-components';
-import { IFilterItem } from '../Filter';
-import filterWidths from './filters';
 import widths from './widths';
 
 interface IStatus {
@@ -28,7 +26,6 @@ export interface ITableType {
     | 'delegations'
     | 'nfts';
   haveData?: number;
-  filter?: IFilterItem;
   pathname?: string;
   rowSections?: boolean;
 }
@@ -54,10 +51,6 @@ export const Header = styled.div<ITableType>`
 
   span {
     ${props => widths[props.type]}
-    ${props =>
-      props.filter &&
-      props.filter.value !== 'all' &&
-      filterWidths[props.filter.name]}
   }
 `;
 
@@ -109,11 +102,6 @@ export const Row = styled.div<ITableType>`
     color: ${props => props.theme.black};
 
     ${props => !props.rowSections && widths[props.type]};
-
-    ${props =>
-      props.filter &&
-      props.filter.value !== 'all' &&
-      filterWidths[props.filter.name]}
 
     a {
       color: ${props => props.theme.black};
@@ -205,6 +193,7 @@ export const MobileCardItem = styled.span<{ columnSpan?: number }>`
       !props.columnSpan || props.columnSpan >= 0
         ? css`
             grid-column: span ${props.columnSpan};
+            gap: 0.25rem;
           `
         : css`
             display: none;

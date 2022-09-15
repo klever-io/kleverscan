@@ -4,11 +4,8 @@ import Chart, { ChartType } from '@/components/Chart';
 import Copy from '@/components/Copy';
 import Dropdown from '@/components/Dropdown';
 import Title from '@/components/Layout/Title';
-import Pagination from '@/components/Pagination';
-import { PaginationContainer } from '@/components/Pagination/styles';
 import QrCodeModal from '@/components/QrCodeModal';
 import Table, { ITable } from '@/components/Table';
-import { Row as RowList } from '@/components/Table/styles';
 import api from '@/services/api';
 import {
   IBucket,
@@ -70,7 +67,6 @@ import {
 import { fromUnixTime } from 'date-fns';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
 
@@ -116,9 +112,6 @@ const Validator: React.FC<IValidatorPage> = ({
     uris,
   } = validator;
 
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [delegators, setDelegators] = useState(defaultDelegators);
   const [uptime] = useState(new Date().getTime());
   const [age, setAge] = useState(
     getAge(fromUnixTime(new Date().getTime() / 1000)),
@@ -222,39 +215,27 @@ const Validator: React.FC<IValidatorPage> = ({
     );
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+  const requestValidator = async (page: number) => {
+    const response: IDelegateResponse = await api.get({
+      route: `validator/delegated/${ownerAddress}?page=${page}`,
+    });
 
-      const response: IDelegateResponse = await api.get({
-        route: `validator/delegated/${ownerAddress}?page=${page}`,
-      });
-
-      if (!response.error) {
-        const delegators: IBucket[] = [];
-        response?.data?.delegators?.forEach(delegation => {
-          delegation?.buckets?.forEach(bucket => {
-            if (bucket?.delegation === ownerAddress) {
-              delegators.push({
-                address: delegation?.address,
-                ...bucket,
-              });
-            }
+    const delegators: IBucket[] = [];
+    response?.data?.delegators?.forEach(delegation => {
+      delegation?.buckets?.forEach(bucket => {
+        if (bucket?.delegation === ownerAddress) {
+          delegators.push({
+            address: delegation?.address,
+            ...bucket,
           });
-        });
-
-        setDelegators(delegators);
-      }
-
-      setLoading(false);
-    };
-    fetchData();
-  }, [page]);
+        }
+      });
+    });
+    return { ...response, data: { validator: delegators } };
+  };
 
   const stakedPercent =
     (maxDelegation <= 0 ? 100 : totalStake / maxDelegation) * 100;
-
-  const router = useRouter();
 
   const Overview: React.FC = () => {
     return (
@@ -383,37 +364,36 @@ const Validator: React.FC<IValidatorPage> = ({
   const precision = 6; // default KLV precision
   const header = ['Address', 'Bucket ID', 'Staked Epoch', 'Amount '];
 
-  const TableBody: React.FC<IBucket> = ({
-    address,
-    id,
-    stakedEpoch,
-    balance,
-  }) => {
-    return (
-      <RowList type="validator">
-        <Link href={`/account/${address}`}>
-          {parseAddress(address || '', 25)}
+  const rowSections = (bucket: IBucket): JSX.Element[] => {
+    const { address, id, stakedEpoch, balance } = bucket;
+    const sections = [
+      <CenteredRow key={id}>
+        <Link href={`/account/${address}`} key={address}>
+          {parseAddress(address || '', 24)}
         </Link>
-        <span>
-          <CenteredRow>
-            {id}
-            <Copy data={id} info="id"></Copy>
-          </CenteredRow>
-        </span>
-        <span>{stakedEpoch}</span>
-        <span>
-          <strong>{formatAmount(balance / 10 ** precision)}</strong>
-        </span>
-      </RowList>
-    );
+        <Copy data={address} info="address"></Copy>
+      </CenteredRow>,
+      <CenteredRow key={id}>
+        {parseAddress(id || '', 24)}
+        <Copy data={id} info="id"></Copy>
+      </CenteredRow>,
+      <span key={stakedEpoch}>{stakedEpoch}</span>,
+      <strong key={balance}>{formatAmount(balance / 10 ** precision)}</strong>,
+    ];
+
+    return sections;
   };
 
   const tableProps: ITable = {
     type: 'validator',
     header,
-    data: delegators as IBucket[],
-    body: TableBody,
-    loading,
+    data: defaultDelegators as IBucket[],
+    rowSections,
+    columnSpans: [2, 2, 1, 1],
+    request: page => requestValidator(page),
+    scrollUp: false,
+    totalPages: pagination.totalPages,
+    dataName: 'validator',
   };
 
   // mocked data:
@@ -552,16 +532,6 @@ const Validator: React.FC<IValidatorPage> = ({
         <h3>List of delegations</h3>
         <Table {...tableProps} />
       </TableContainer>
-      <PaginationContainer>
-        <Pagination
-          scrollUp={false}
-          count={pagination?.totalPages}
-          page={page}
-          onPaginate={page => {
-            setPage(page);
-          }}
-        />
-      </PaginationContainer>
     </Container>
   );
 };

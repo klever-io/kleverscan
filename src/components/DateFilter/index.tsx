@@ -1,5 +1,6 @@
 import { ArrowLeft, ArrowRight, WarningIcon } from '@/assets/calendar';
 import { Calendar as CalendarIcon } from '@/assets/icons';
+import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { MdClear } from 'react-icons/md';
 import {
@@ -26,6 +27,11 @@ export interface ISelectedDays {
   values: Date[];
 }
 
+export interface IRouterDate {
+  startdate: Date | string;
+  enddate: Date | string;
+}
+
 export interface IDateFilter {
   filterDate(selectedDays: ISelectedDays): void;
   resetDate(): void;
@@ -38,12 +44,38 @@ const DateFilter: React.FC<IDateFilter> = ({
   empty,
 }) => {
   const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+  const router = useRouter();
+
   const auxDate = new Date();
   const currentDate = new Date(
     auxDate.getFullYear(),
     auxDate.getMonth(),
     auxDate.getDate(),
   );
+
+  const dateFromRouter = {
+    startdate: new Date(Number(router.query.startdate)),
+    enddate: new Date(Number(router.query.enddate)),
+  };
+  const selectedDaysInitialValue: ISelectedDays = {
+    start: currentDate,
+    end: currentDate,
+    values: [],
+  };
+
+  const selectDays = () => {
+    if (dateFromRouter.startdate.toString() !== 'Invalid Date') {
+      selectedDaysInitialValue.start = dateFromRouter.startdate;
+    }
+    if (dateFromRouter.enddate.toString() !== 'Invalid Date') {
+      selectedDaysInitialValue.end = dateFromRouter.enddate;
+    }
+  };
+
+  useCallback(() => {
+    selectDays();
+  }, [router.query]);
+
   const [date, setDate] = useState(currentDate);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [monthDays, setMonthDays] = useState(
@@ -51,11 +83,6 @@ const DateFilter: React.FC<IDateFilter> = ({
       i => new Date(date.getFullYear(), date.getMonth(), i + 1),
     ),
   );
-  const selectedDaysInitialValue: ISelectedDays = {
-    start: currentDate,
-    end: currentDate,
-    values: [],
-  };
   const [selectedDays, setSelectedDays] = useState<ISelectedDays>(
     selectedDaysInitialValue,
   );

@@ -1,5 +1,4 @@
 import { default as DefaultInput } from '@/components/Inputt';
-import filterWidths from '@/components/Table/filters';
 import { ITableType } from '@/components/Table/styles';
 import widths from '@/components/Table/widths';
 import styled, { css } from 'styled-components';
@@ -84,10 +83,6 @@ export const Row = styled.div<ITableType>`
     color: ${props => props.theme.black};
 
     ${props => widths[props.type]};
-    ${props =>
-      props.filter &&
-      props.filter.value !== 'all' &&
-      filterWidths[props.filter.name]}
 
     a {
       color: ${props => props.theme.black};

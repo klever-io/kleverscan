@@ -34,7 +34,7 @@ import {
 } from '@/views/accounts/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { GetServerSideProps } from 'next';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 interface IAssetInfo {
   assetId: string;
@@ -85,49 +85,21 @@ const Account: React.FC<IAccountPage> = ({
   KLVallowance,
   KFIallowance,
 }) => {
-  const [dateFilter, setDateFilter] = useState({
-    start: '',
-    end: '',
-  });
-  const [fromToFilter, setFromToFilter] = useState(0);
+  const initialStateFilter: ITxQuery = {
+    startdate: '',
+    enddate: '',
+    fromAddress: '',
+    toAddress: '',
+  };
+
   const [showModal, setShowModal] = useState(false);
-  const [query, setQuery] = useState({});
+  const [query, setQuery] = useState(initialStateFilter);
 
   const requestTransactions = async (page: number) =>
     api.get({
       route: `transaction/list`,
       query: { page, ...query },
     });
-
-  const getTxQuery = useCallback((): ITxQuery => {
-    const txQuery: ITxQuery = {
-      address: account.address,
-    };
-
-    if (dateFilter.start) {
-      txQuery.startdate = dateFilter.start;
-      txQuery.enddate = dateFilter.end;
-    }
-
-    if (fromToFilter === 1) {
-      txQuery.fromAddress = account.address;
-    }
-
-    if (fromToFilter === 2) {
-      txQuery.toAddress = account.address;
-    }
-
-    return txQuery;
-  }, [dateFilter, fromToFilter]);
-
-  const fetchData = async () => {
-    const txQuery = getTxQuery();
-    setQuery(txQuery);
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, [dateFilter, fromToFilter]);
 
   const calculateTotalKLV = useCallback(() => {
     // does not include Allowance and Staking
@@ -197,23 +169,35 @@ const Account: React.FC<IAccountPage> = ({
   const [selectedTab, setSelectedTab] = useState<string>(getTabHeaders()[0]);
 
   const resetDate = () => {
-    setDateFilter({
-      start: '',
-      end: '',
-    });
+    const updatedQuery = { ...query };
+    delete updatedQuery.startdate;
+    delete updatedQuery.enddate;
+    setQuery(updatedQuery);
   };
 
-  const filterDate = useCallback((selectedDays: ISelectedDays) => {
-    setDateFilter({
-      start: selectedDays.start.getTime().toString(),
-      end: selectedDays.end
+  const filterDate = (selectedDays: ISelectedDays) => {
+    setQuery({
+      ...query,
+      startdate: selectedDays.start.getTime().toString(),
+      enddate: selectedDays.end
         ? (selectedDays.end.getTime() + 24 * 60 * 60 * 1000).toString()
         : (selectedDays.start.getTime() + 24 * 60 * 60 * 1000).toString(),
     });
-  }, []);
+  };
 
   const filterFromTo = (op: number) => {
-    setFromToFilter(op);
+    const updatedQuery = { ...query };
+    if (op === 0) {
+      delete updatedQuery.toAddress;
+      delete updatedQuery.fromAddress;
+      setQuery(updatedQuery);
+    } else if (op === 1) {
+      delete updatedQuery.toAddress;
+      setQuery({ ...updatedQuery, fromAddress: account.address });
+    } else if (op === 2) {
+      delete updatedQuery.fromAddress;
+      setQuery({ ...updatedQuery, toAddress: account.address });
+    }
   };
 
   const transactionTableProps = {

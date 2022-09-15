@@ -6,13 +6,12 @@ import DateFilter, {
   IDateFilter,
   ISelectedDays,
 } from '@/components/DateFilter';
-import Filter, { IFilter, IFilterItem } from '@/components/Filter';
+import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import { contracts, status } from '@/configs/transactions';
 import api from '@/services/api';
-import { useDidUpdateEffect } from '@/utils/hooks';
 import {
   AssetTriggerSections,
   BuySections,
@@ -49,17 +48,18 @@ import { useWidth } from 'contexts/width';
 import { format, fromUnixTime } from 'date-fns';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
-import Router, { useRouter } from 'next/router';
-import React, { useCallback, useState } from 'react';
+import { useRouter } from 'next/router';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Contract,
+  ContractsIndex,
+  ContractsName,
   IAsset,
   IContract,
   IPagination,
   IResponse,
   ITransaction,
   ITransferContract,
-  Query,
 } from '../../types';
 import { capitalizeString, formatAmount, parseAddress } from '../../utils';
 
@@ -82,60 +82,49 @@ interface IAssetResponse extends IResponse {
   };
 }
 
-interface IRouterQuery extends Query {
-  type?: string;
-  status?: string;
-  asset?: string;
-  page?: number;
-  startdate?: string;
-  enddate?: string;
-}
-
 const Transactions: React.FC<ITransactions> = ({
   transactions: defaultTransactions,
   pagination,
   assets,
 }) => {
   const router = useRouter();
-  const defaultFilter: IFilterItem = { name: 'All', value: 'all' };
   const precision = 6; // default KLV precision
-  const baseColumnSpans = [
+  const { isMobile } = useWidth();
+  const columnSpans = [
     2, 1, 1, 1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   ];
 
-  const { isMobile } = useWidth();
+  const getContractIndex = (contractName: string): string =>
+    ContractsIndex[contractName];
+  const getContractName = (): string => ContractsIndex[Number(query.type)];
+  const [query, setQuery] = useState(router.query);
 
-  const [transactionType, setTransactionType] = useState(defaultFilter);
-  const [statusType, setStatusType] = useState(defaultFilter);
-  const [coinType, setCoinType] = useState(defaultFilter);
-  const [query, setQuery] = useState({});
-  const [columnSpans, setColumnSpans] = useState(baseColumnSpans);
-  const [dateFilter, setDateFilter] = useState({
-    start: '',
-    end: '',
-  });
+  const handleSelected = (selected: string, filterType: string): void => {
+    if (selected === 'All') {
+      const updatedQuery = { ...query };
+      delete updatedQuery[filterType];
+      setQuery(updatedQuery);
+    } else if (filterType === 'type') {
+      setQuery({ ...query, [filterType]: getContractIndex(selected) });
+    } else if (selected !== query[filterType]) {
+      setQuery({ ...query, [filterType]: selected });
+    }
+  };
 
-  const formatFilterQuery = useCallback(
-    (type: string): IFilterItem | undefined => {
-      switch (type) {
-        case 'COIN':
-          if (!router.query.asset) return undefined;
-          return {
-            name: String(router.query.asset),
-            value: router.query.asset,
-          };
-        case 'TYPE':
-          if (!router.query.type) return undefined;
-          return contracts.find(({ value }) => value === router.query.type);
-        case 'STATUS':
-          if (!router.query.status) return undefined;
-          return status.find(({ value }) => value === router.query.status);
-        default:
-          break;
-      }
-    },
-    [router.query.asset, router.query.type, router.query.status],
-  );
+  useEffect(() => {
+    // this useEffect was built for the single purpose of solving the data difference between the router and the filter state when router.query isn't empty and user clicks again in the transactions page through the navbar button. It was the only solution that worked.
+    if (
+      Object.keys(router.query).length === 0 &&
+      Object.keys(query).length > 0
+    ) {
+      router.push({ pathname: router.pathname, query });
+    }
+  }, [router.query]);
+
+  useEffect(() => {
+    //TODO? cannot use this useEffect on table since some pages names are dynamic and router needs static names for push. Needs to check this further.
+    router.push({ pathname: router.pathname, query });
+  }, [query]);
 
   const getContractType = useCallback((contracts: IContract[]) => {
     if (!contracts) {
@@ -150,36 +139,21 @@ const Transactions: React.FC<ITransactions> = ({
   const filters: IFilter[] = [
     {
       title: 'Coin',
-      data: assets.map(asset => ({
-        name: asset.assetId,
-        value: asset.assetId,
-      })),
-      filterQuery: formatFilterQuery('COIN'),
-      onClick: selected => {
-        if (coinType.value !== selected.value) {
-          setCoinType(selected);
-        }
-      },
+      data: assets.map(asset => asset.assetId),
+      onClick: selected => handleSelected(selected, 'asset'),
+      current: query.asset as string | undefined,
     },
     {
       title: 'Status',
       data: status,
-      filterQuery: formatFilterQuery('STATUS'),
-      onClick: selected => {
-        if (statusType.value !== selected.value) {
-          setStatusType(selected);
-        }
-      },
+      onClick: selected => handleSelected(selected, 'status'),
+      current: query.status as string | undefined,
     },
     {
       title: 'Contract',
       data: contracts,
-      filterQuery: formatFilterQuery('TYPE'),
-      onClick: selected => {
-        if (transactionType.value !== selected.value) {
-          setTransactionType(selected);
-        }
-      },
+      onClick: selected => handleSelected(selected, 'type'),
+      current: getContractName(),
     },
   ];
 
@@ -201,35 +175,6 @@ const Transactions: React.FC<ITransactions> = ({
       route: `transaction/list`,
       query: { page, ...query },
     });
-
-  const fetchData = async () => {
-    const filters = [
-      { ref: transactionType, key: 'type' },
-      { ref: statusType, key: 'status' },
-      { ref: coinType, key: 'asset' },
-    ];
-    let routerQuery: IRouterQuery = {};
-    filters.forEach(filter => {
-      if (filter.ref.value !== 'all') {
-        routerQuery = { ...routerQuery, [filter.key]: filter.ref.value };
-      }
-    });
-    routerQuery = dateFilter.start
-      ? {
-          ...routerQuery,
-          startdate: dateFilter.start ? dateFilter.start : undefined,
-          enddate: dateFilter.end ? dateFilter.end : undefined,
-        }
-      : routerQuery;
-
-    setQuery(routerQuery);
-
-    await Router.push({ pathname: router.pathname, query: { ...routerQuery } });
-  };
-
-  useDidUpdateEffect(() => {
-    fetchData();
-  }, [transactionType, statusType, coinType, dateFilter]);
 
   const getFilteredSections = (contract: IContract[]): JSX.Element[] => {
     const contractType = getContractType(contract);
@@ -286,8 +231,7 @@ const Transactions: React.FC<ITransactions> = ({
 
   const getHeader = () => {
     let newHeaders: string[] = [];
-
-    switch (transactionType.name) {
+    switch (ContractsName[getContractName()]) {
       case Contract.Transfer:
         newHeaders = ['Coin', 'Amount'];
         break;
@@ -352,7 +296,7 @@ const Transactions: React.FC<ITransactions> = ({
       case Contract.ConfigMarketplace:
     }
 
-    if (transactionType.value !== 'all') {
+    if (query.type) {
       return header.splice(0, header.length - 2).concat(newHeaders);
     }
 
@@ -404,12 +348,12 @@ const Transactions: React.FC<ITransactions> = ({
         <span>{capitalizeString(status)}</span>
       </Status>,
       <strong key={contractType}>{contractType}</strong>,
-      transactionType.value === 'all' ? (
+      query.type ? (
         <strong>{formatAmount(kAppFee / 10 ** precision)}</strong>
       ) : (
         <></>
       ),
-      transactionType.value === 'all' ? (
+      !query.type ? (
         <strong>{formatAmount(bandwidthFee / 10 ** precision)}</strong>
       ) : (
         <></>
@@ -418,7 +362,7 @@ const Transactions: React.FC<ITransactions> = ({
 
     const filteredContract = getFilteredSections(contract);
 
-    if (transactionType.value !== 'all') {
+    if (query.type) {
       sections.pop();
       sections.pop();
       sections.push(...filteredContract);
@@ -433,7 +377,6 @@ const Transactions: React.FC<ITransactions> = ({
     data: defaultTransactions as any[],
     rowSections,
     columnSpans,
-    filter: transactionType,
     dataName: 'transactions',
     scrollUp: true,
     totalPages: pagination.totalPages,
@@ -442,15 +385,16 @@ const Transactions: React.FC<ITransactions> = ({
   };
 
   const resetDate = () => {
-    setDateFilter({
-      start: '',
-      end: '',
-    });
+    const updatedQuery = { ...query };
+    delete updatedQuery.startdate;
+    delete updatedQuery.enddate;
+    setQuery(updatedQuery);
   };
   const filterDate = (selectedDays: ISelectedDays) => {
-    setDateFilter({
-      start: selectedDays.start.getTime().toString(),
-      end: selectedDays.end
+    setQuery({
+      ...query,
+      startdate: selectedDays.start.getTime().toString(),
+      enddate: selectedDays.end
         ? (selectedDays.end.getTime() + 24 * 60 * 60 * 1000).toString()
         : (selectedDays.start.getTime() + 24 * 60 * 60 * 1000).toString(),
     });
@@ -495,6 +439,7 @@ export const getServerSideProps: GetServerSideProps<
     route: 'transaction/list',
     query: context.query,
   });
+
   if (!transactions.error) {
     props.transactions = transactions?.data?.transactions || [];
     props.pagination = transactions?.pagination || {};

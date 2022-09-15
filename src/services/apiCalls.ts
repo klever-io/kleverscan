@@ -1,10 +1,10 @@
 import api from '@/services/api';
 import { IBlockResponse, IStatisticsResponse } from '@/types/blocks';
 
-export const blockCall = new Promise<IBlockResponse>(
-  async (resolve, reject) => {
+export const blockCall = async (page?: number): Promise<IBlockResponse> =>
+  new Promise<IBlockResponse>(async (resolve, reject) => {
     const res = await api.get({
-      route: 'block/list',
+      route: `block/list?page=${page ?? 1}`,
     });
 
     if (!res.error || res.error === '') {
@@ -12,11 +12,10 @@ export const blockCall = new Promise<IBlockResponse>(
     }
 
     reject(res.error);
-  },
-);
+  });
 
-export const yesterdayStatisticsCall = new Promise<IStatisticsResponse>(
-  async (resolve, reject) => {
+export const yesterdayStatisticsCall = async (): Promise<IStatisticsResponse> =>
+  new Promise<IStatisticsResponse>(async (resolve, reject) => {
     const res = await api.get({
       route: 'block/statistics-by-day/1',
     });
@@ -26,11 +25,10 @@ export const yesterdayStatisticsCall = new Promise<IStatisticsResponse>(
     }
 
     reject(res.error);
-  },
-);
+  });
 
-export const totalStatisticsCall = new Promise<IStatisticsResponse>(
-  async (resolve, reject) => {
+export const totalStatisticsCall = async (): Promise<IStatisticsResponse> =>
+  new Promise<IStatisticsResponse>(async (resolve, reject) => {
     const res = await api.get({
       route: 'block/statistics-total/0',
     });
@@ -40,5 +38,4 @@ export const totalStatisticsCall = new Promise<IStatisticsResponse>(
     }
 
     reject(res.error);
-  },
-);
+  });

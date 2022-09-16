@@ -12,11 +12,20 @@ export const RankingContainer = styled.div`
   background-color: ${props => props.theme.background};
 
   border-radius: 50%;
+`;
 
-  p {
-    margin-left: 0.25rem;
+export const RankingText = styled.span`
+  margin-left: 0.25rem;
 
-    color: ${props => props.theme.black};
-    font-weight: 600;
-  }
+  width: fit-content !important;
+
+  color: ${props => props.theme.black};
+  font-weight: 600;
+`;
+
+export const AddressContainer = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
 `;

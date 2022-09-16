@@ -1,7 +1,7 @@
 import { InternalThemeProvider } from 'contexts/theme';
 import { WidthProvider } from 'contexts/width';
-import { appWithTranslation } from 'next-i18next';
-import type { AppProps } from 'next/app';
+import { appWithTranslation, SSRConfig } from 'next-i18next';
+import type { AppProps as NextJsAppProps } from 'next/app';
 import React from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -21,6 +21,9 @@ declare global {
   }
 }
 
+declare type AppProps = NextJsAppProps & {
+  pageProps: SSRConfig;
+};
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   const children = (
     <InternalThemeProvider>

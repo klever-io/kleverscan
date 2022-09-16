@@ -2,13 +2,18 @@ import api from '@/services/api';
 import { TFunction } from 'next-i18next';
 import { toast } from 'react-toastify';
 import {
+  IAccountAsset,
   IAsset,
   IAssetOne,
+  IBalance,
   IContractOption,
+  IDelegationsResponse,
   IEpochInfo,
   IFormData,
   IMetrics,
   ITransaction,
+  IValidator,
+  IValidatorResponse,
 } from '../types';
 
 export const breakText = (text: string, limit: number): string => {
@@ -443,6 +448,29 @@ export const assetTriggerTypes = [
   },
 ];
 
+export const asyncDoIf = async (
+  success: (result?: any) => any,
+  failure: (error?: any) => any,
+  condition: () => Promise<any>,
+  tries = 3,
+): Promise<void> => {
+  const array = Array.from({ length: tries }, (_, i) => i);
+  let error = '';
+
+  for (const i of array) {
+    const result = await condition();
+    if (result && !result.error) {
+      success(result);
+      return;
+    } else if (result.error) {
+      error = result;
+    }
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+  failure(error);
+  return;
+};
+
 export const doIf = async (
   success: () => any,
   failure: () => any,
@@ -596,3 +624,60 @@ export const addPrecisionTransactions = (
     return transaction;
   });
 };
+
+export const parseValidators = (
+  validators: IValidatorResponse,
+): IValidator[] => {
+  return validators.data['validators'].map(
+    (delegation: IDelegationsResponse, index: number): IValidator => {
+      const totalProduced =
+        delegation.totalLeaderSuccessRate.numSuccess +
+        delegation.totalValidatorSuccessRate.numSuccess;
+      const totalMissed =
+        delegation.totalLeaderSuccessRate.numFailure +
+        delegation.totalValidatorSuccessRate.numFailure;
+
+      return {
+        staked: delegation.totalStake,
+        rank:
+          index +
+          (validators.pagination.self - 1) * validators.pagination.perPage +
+          1,
+        name: delegation.name || parseAddress(delegation.ownerAddress, 20),
+        cumulativeStaked: parseFloat(
+          (
+            (delegation.totalStake / validators.data.networkTotalStake) *
+            100
+          ).toFixed(4),
+        ),
+        address: delegation.ownerAddress,
+        rating: delegation.rating,
+        canDelegate: delegation.canDelegate,
+        selfStake: delegation.selfStake,
+        status: delegation.list,
+        totalProduced,
+        totalMissed,
+        commission: delegation.commission,
+      };
+    },
+  );
+};
+
+export const parseHolders = (
+  holders: IAccountAsset[] | [],
+  assetId: string,
+): IBalance[] =>
+  holders.map((holder: IAccountAsset, index: number) => {
+    if (holder.assetId === assetId) {
+      return {
+        index,
+        address: holder.address,
+        balance: holder.frozenBalance + holder.balance,
+      };
+    } else
+      return {
+        index,
+        address: '',
+        balance: 0,
+      };
+  });

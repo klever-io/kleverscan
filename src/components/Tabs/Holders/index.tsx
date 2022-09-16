@@ -1,15 +1,15 @@
+import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
-import { Row } from '@/components/Table/styles';
-import { IAccountAsset, IAsset } from '@/types/index';
+import { IAsset } from '@/types/index';
 import { parseAddress, toLocaleFixed } from '@/utils/index';
 import Link from 'next/link';
 import React from 'react';
-import { RankingContainer } from './styles';
+import { AddressContainer, RankingContainer, RankingText } from './styles';
 
 interface IHolder {
-  holders: IAccountAsset[];
+  holders: IBalance[];
   asset: IAsset;
-  loading: boolean;
+  holdersTableProps: any;
 }
 
 interface IBalance {
@@ -18,53 +18,37 @@ interface IBalance {
   index: number;
 }
 
-const Holders: React.FC<IHolder> = ({ holders, asset, loading }) => {
-  const balances = holders
-    .map(holder => {
-      if (holder.assetId === asset.assetId) {
-        return {
-          address: holder.address,
-          balance: holder.frozenBalance + holder.balance,
-        };
-      } else
-        return {
-          address: '',
-          balance: 0,
-        };
-    })
-    .map((holder, index) => ({ ...holder, index }));
+const Holders: React.FC<IHolder> = ({ holders, asset, holdersTableProps }) => {
+  const rowSections = (props: IBalance): JSX.Element[] => {
+    const { address, balance, index } = props;
 
-  const TableBody: React.FC<IBalance> = ({ address, balance, index }) => {
-    return (
-      <Row type="holders">
-        <span>
-          <RankingContainer>
-            <p>{index + 1}°</p>
-          </RankingContainer>
-        </span>
+    return [
+      <RankingContainer key={index}>
+        <RankingText>{index + 1}°</RankingText>
+      </RankingContainer>,
+      <AddressContainer key={address}>
         <Link href={`/account/${address}`}>{parseAddress(address, 40)}</Link>
-        <span>
-          <strong>
-            {((balance / asset.circulatingSupply) * 100).toFixed(2)}%
-          </strong>
-        </span>
-        <span>
-          <strong>
-            {toLocaleFixed(balance / 10 ** asset.precision, asset.precision)}
-          </strong>
-        </span>
-      </Row>
-    );
+
+        <Copy info="Address" data={address} />
+      </AddressContainer>,
+      <strong key={asset.circulatingSupply}>
+        {((balance / asset.circulatingSupply) * 100).toFixed(2)}%
+      </strong>,
+      <strong key={asset.precision}>
+        {toLocaleFixed(balance / 10 ** asset.precision, asset.precision)}
+      </strong>,
+    ];
   };
 
   const header = ['Rank', 'Address', 'Percentage', 'Amount'];
 
   const tableProps: ITable = {
-    body: TableBody,
-    data: balances as any[],
-    loading: loading,
+    rowSections,
+    columnSpans: [1, 2, 1, 1],
+    data: holders,
     header,
     type: 'holders',
+    ...holdersTableProps,
   };
 
   return <Table {...tableProps} />;

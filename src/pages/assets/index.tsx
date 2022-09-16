@@ -2,18 +2,14 @@ import { Certified } from '@/assets/icons';
 import { Assets as Icon } from '@/assets/title-icons';
 import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
-import Pagination from '@/components/Pagination';
-import { PaginationContainer } from '@/components/Pagination/styles';
 import Table, { ITable } from '@/components/Table';
 import api from '@/services/api';
 import { IAsset, IPagination, IResponse } from '@/types/index';
-import { useDidUpdateEffect } from '@/utils/hooks';
 import { formatAmount, parseHardCodedInfo } from '@/utils/index';
 import { Container, Header, Input } from '@/views/assets';
 import { LetterLogo, Logo } from '@/views/assets/index';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import React, { ReactNode, useState } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
 
@@ -33,30 +29,13 @@ const Assets: React.FC<IAssetPage> = ({
   assets: defaultAssets,
   pagination,
 }) => {
-  const router = useRouter();
-
-  const [page, setPage] = useState(1);
   const [assets, setAssets] = useState(defaultAssets);
-  const [loading, setLoading] = useState(false);
 
-  useDidUpdateEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-
-      const response: IAssetResponse = await api.getCached({
-        route: `assets/kassets?hidden=false&page=${page}`,
-        refreshTime: 21600,
-      });
-
-      if (!response.error) {
-        setAssets(response.data.assets);
-      }
-
-      setLoading(false);
-    };
-
-    fetchData();
-  }, [page]);
+  const requestAssets = async (page: number) =>
+    api.getCached({
+      route: `assets/kassets?hidden=false&page=${page}`,
+      refreshTime: 21600,
+    });
 
   const rowSections = (asset: IAsset): JSX.Element[] => {
     const {
@@ -166,8 +145,11 @@ const Assets: React.FC<IAssetPage> = ({
     rowSections,
     data: assets as any[],
     header,
-    loading,
     type: 'assetsPage',
+    request: page => requestAssets(page),
+    dataName: 'assets',
+    scrollUp: true,
+    totalPages: pagination.totalPages,
   };
 
   return (
@@ -179,17 +161,6 @@ const Assets: React.FC<IAssetPage> = ({
       </Header>
 
       <Table {...tableProps} />
-
-      <PaginationContainer>
-        <Pagination
-          scrollUp={true}
-          count={pagination.totalPages}
-          page={page}
-          onPaginate={page => {
-            setPage(page);
-          }}
-        />
-      </PaginationContainer>
     </Container>
   );
 };

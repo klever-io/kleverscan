@@ -1,7 +1,5 @@
 import { Proposals as Icon } from '@/assets/title-icons';
 import Title from '@/components/Layout/Title';
-import Pagination from '@/components/Pagination';
-import { PaginationContainer } from '@/components/Pagination/styles';
 import Tabs, { ITabs } from '@/components/Tabs';
 import NetworkParams from '@/components/Tabs/NetworkParams';
 import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
@@ -16,12 +14,11 @@ import {
   IRawParam,
   NetworkParamsIndexer,
 } from '@/types/proposals';
-import { useDidUpdateEffect } from '@/utils/hooks';
 import { Header } from '@/views/accounts/detail';
 import { Card } from '@/views/blocks';
 import { CardContainer, Container, Input } from '@/views/proposals';
 import { GetServerSideProps } from 'next';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 const Proposals: React.FC<IProposalsPage> = ({
   networkParams: defaultNetworkParams,
@@ -30,31 +27,16 @@ const Proposals: React.FC<IProposalsPage> = ({
 }) => {
   const tableHeaders = ['Network Parameters', 'Proposals'];
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
-  const [loadingNetworkParams, setLoadingNetWorkParams] = useState(false);
-  const [loadingProposals, setLoadingProposals] = useState(false);
-  const [page, setPage] = useState(1);
 
-  const [networkParams, setNetworkParams] = useState(defaultNetworkParams);
-  const [proposals, setProposals] = useState<IParsedProposal[] | any[]>(
-    defaultProposals,
-  );
-
-  const fetchData = useCallback(async () => {
-    setLoadingProposals(true);
+  const requestProposals = async (page: number) => {
     const proposals: IProposalsResponse = await api.get({
       route: `proposals/list?page=${page}`,
     });
-    if (!proposals.error && proposals?.data?.proposals) {
-      let parsedProposalResponse: any[] = [];
-      parsedProposalResponse = parseAllProposals(proposals?.data?.proposals);
-      setProposals(parsedProposalResponse);
-      setLoadingProposals(false);
-    }
-  }, [page]);
 
-  useDidUpdateEffect(() => {
-    fetchData();
-  }, [page]);
+    let parsedProposalResponse: any[] = [];
+    parsedProposalResponse = parseAllProposals(proposals?.data?.proposals);
+    return { ...proposals, data: { proposals: parsedProposalResponse } };
+  };
 
   const CardContent: React.FC = () => {
     return (
@@ -77,26 +59,15 @@ const Proposals: React.FC<IProposalsPage> = ({
   const SelectedTabComponent: React.FC = () => {
     switch (selectedTab) {
       case 'Network Parameters':
-        return (
-          <NetworkParams
-            networkParams={networkParams}
-            loading={loadingNetworkParams}
-          />
-        );
+        return <NetworkParams networkParams={defaultNetworkParams} />;
       case 'Proposals':
         return (
           <>
-            <ProposalsTab proposals={proposals} loading={loadingProposals} />
-            <PaginationContainer>
-              <Pagination
-                scrollUp={true}
-                count={totalProposalsPage}
-                page={page}
-                onPaginate={page => {
-                  setPage(page);
-                }}
-              />
-            </PaginationContainer>
+            <ProposalsTab
+              proposals={defaultProposals}
+              totalPages={totalProposalsPage}
+              request={requestProposals}
+            />
           </>
         );
       default:
@@ -155,9 +126,9 @@ export const getProposalNetworkParams = (
   return fullInfoParams;
 };
 
-export const getServerSideProps: GetServerSideProps<IProposalsPage> = async ({
-  params,
-}) => {
+export const getServerSideProps: GetServerSideProps<
+  IProposalsPage
+> = async () => {
   const { data } = await api.get({ route: 'network/network-parameters' });
   const proposalResponse: IProposalsResponse = await api.get({
     route: 'proposals/list',

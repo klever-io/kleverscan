@@ -30,6 +30,15 @@ interface INftPage {
 }
 
 const NftDetail: React.FC<INftPage> = ({ nft, address, assetId }) => {
+  const isJsonString = (metadata: string) => {
+    try {
+      JSON.parse(metadata);
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  };
   return (
     <Container>
       <Header>
@@ -83,9 +92,19 @@ const NftDetail: React.FC<INftPage> = ({ nft, address, assetId }) => {
               <p>{nft?.mime || '--'}</p>
             </span>
           </Row>
+          {nft?.metadata && !isJsonString(nft?.metadata) && (
+            <Row>
+              <span>
+                <strong>Metadata</strong>
+              </span>
+              <span>
+                <p>{nft?.metadata}</p>
+              </span>
+            </Row>
+          )}
         </CardContent>
 
-        {nft?.metadata && (
+        {nft?.metadata && isJsonString(nft?.metadata) && (
           <>
             <h3>Metadata</h3>
             <CardContent>
@@ -127,6 +146,7 @@ export const getServerSideProps: GetServerSideProps<INftPage> = async ({
   const response: INftResponse = await api.get({
     route: `address/${address}/collection/${assetId}`,
   });
+
   if (response.error) {
     return redirectProps;
   }

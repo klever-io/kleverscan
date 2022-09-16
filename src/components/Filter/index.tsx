@@ -11,20 +11,19 @@ import {
 } from './styles';
 
 export interface IFilterItem {
-  name: string;
-  value: any;
+  item: string;
 }
 
 export interface IFilter {
   title: string;
-  data: IFilterItem[];
-  onClick?(item: IFilterItem): void;
-  filterQuery: IFilterItem | undefined;
+  data: string[];
+  onClick?(selected: string, filterType: string): void;
+  current: string | undefined;
 }
 
-const Filter: React.FC<IFilter> = ({ title, data, onClick, filterQuery }) => {
-  const allItem: IFilterItem = { name: 'All', value: 'all' };
-  const [selected, setSelected] = useState(filterQuery || allItem);
+const Filter: React.FC<IFilter> = ({ title, data, onClick, current }) => {
+  const allItem = 'All';
+  const [selected, setSelected] = useState(current || allItem);
   const [open, setOpen] = useState(true);
   const [focus, setFocus] = useState(false);
   const [arrowOpen, setArrowOpen] = useState(false);
@@ -64,10 +63,12 @@ const Filter: React.FC<IFilter> = ({ title, data, onClick, filterQuery }) => {
     setInputValue('');
   };
 
-  const SelectorItem: React.FC<IFilterItem> = item => {
+  const SelectorItem: React.FC<IFilterItem> = ({ item }) => {
     const handleClick = () => {
       if (onClick) {
-        onClick(item);
+        onClick(item, '');
+        // dont know why, but need to pass a string in this onClick fn, any string just for TS purposes
+        // since the fn calls are all with hard coded 2nd parameter in the parent component
       }
       setSelected(item);
       openDropdown();
@@ -75,10 +76,9 @@ const Filter: React.FC<IFilter> = ({ title, data, onClick, filterQuery }) => {
         setFocus(true);
       }
     };
-
     return (
-      <Item onClick={handleClick} selected={item.name === selected.name}>
-        <p>{item.name}</p>
+      <Item onClick={handleClick} selected={item === selected}>
+        <p>{item}</p>
       </Item>
     );
   };
@@ -105,7 +105,7 @@ const Filter: React.FC<IFilter> = ({ title, data, onClick, filterQuery }) => {
       return getDataArray();
     }
     const regex = new RegExp(`${input}`, 'gi');
-    return getDataArray().filter(item => String(item.name).match(regex)?.[0]);
+    return getDataArray().filter(item => String(item).match(regex)?.[0]);
   };
 
   const filteredArray = filterArrayByInput(inputValue);
@@ -121,7 +121,6 @@ const Filter: React.FC<IFilter> = ({ title, data, onClick, filterQuery }) => {
     open,
     onClick: () => closeDropDown(),
   };
-
   return (
     <Container>
       <span>{title}</span>
@@ -135,14 +134,13 @@ const Filter: React.FC<IFilter> = ({ title, data, onClick, filterQuery }) => {
             onChange={e => handleChange(e)}
           />
         )}
-        <span>{open && selected.name}</span>
+        <span>{open && selected ? selected : ''}</span>
         <ArrowDownContainer onClick={() => arrowOnClick()}>
           <ArrowDown />
         </ArrowDownContainer>
-
         <SelectorContainer {...selectorProps}>
           {filteredArray.map((item, index) => (
-            <SelectorItem key={String(index)} {...item} />
+            <SelectorItem key={String(index)} item={item} />
           ))}
         </SelectorContainer>
       </Content>

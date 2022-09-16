@@ -80,7 +80,8 @@ export interface IProposals {
 
 export interface IProposalsProps {
   proposals: IParsedProposal[];
-  loading: boolean;
+  totalPages: number;
+  request: (page: number) => Promise<any>;
 }
 
 export interface IRawParam {

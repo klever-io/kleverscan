@@ -29,13 +29,8 @@ import {
   Withdraw,
 } from '@/components/TransactionContractComponents';
 import api from '@/services/api';
-import {
-  Contract,
-  IAsset,
-  IBlock,
-  IResponse,
-  ITransaction,
-} from '@/types/index';
+import { IBlock } from '@/types/blocks';
+import { Contract, IAsset, IResponse, ITransaction } from '@/types/index';
 import {
   capitalizeString,
   hexToString,
@@ -55,9 +50,8 @@ import {
 } from '@/views/transactions/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { format, fromUnixTime } from 'date-fns';
-import { GetServerSideProps } from 'next';
+import { GetStaticPaths, GetStaticProps } from 'next';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
@@ -85,44 +79,7 @@ interface ITransactionPage {
   block: IBlock;
 }
 
-const klvAsset: IAsset = {
-  assetType: '',
-  assetId: '',
-  name: 'Klever',
-  ticker: 'KLV',
-  ownerAddress: '',
-  logo: '',
-  precision: 6,
-  uris: null,
-  initialSupply: 0,
-  circulatingSupply: 0,
-  maxSupply: 0,
-  royalties: 0,
-  mintedValue: 0,
-  issueDate: 0,
-  burnedValue: 0,
-  verified: false,
-  properties: {
-    canAddRoles: true,
-    canBurn: true,
-    canChangeOwner: true,
-    canFreeze: true,
-    canMint: true,
-    canPause: true,
-    canWipe: false,
-  },
-  attributes: {
-    isNFTMintStopped: false,
-    isPaused: false,
-  },
-  staking: {
-    minEpochsToWithdraw: 0,
-    totalStaked: 0,
-  },
-};
-
 const Transaction: React.FC<ITransactionPage> = props => {
-  const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   const { transaction, block } = props;
 
@@ -479,7 +436,16 @@ const Transaction: React.FC<ITransactionPage> = props => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
+export const getStaticPaths: GetStaticPaths = async () => {
+  const paths: string[] = [];
+
+  return {
+    paths,
+    fallback: 'blocking',
+  };
+};
+
+export const getStaticProps: GetStaticProps<ITransactionPage> = async ({
   params,
 }) => {
   const redirectProps = { redirect: { destination: '/404', permanent: false } };

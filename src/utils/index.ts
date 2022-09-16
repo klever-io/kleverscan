@@ -638,19 +638,20 @@ export const parseValidators = (
         delegation.totalValidatorSuccessRate.numFailure;
 
       return {
-        staked: delegation.totalStake,
+        ownerAddress: delegation.ownerAddress,
+        parsedAddress: parseAddress(delegation.ownerAddress, 20),
+        name: delegation.name,
         rank:
           index +
           (validators.pagination.self - 1) * validators.pagination.perPage +
           1,
-        name: delegation.name || parseAddress(delegation.ownerAddress, 20),
         cumulativeStaked: parseFloat(
           (
             (delegation.totalStake / validators.data.networkTotalStake) *
             100
           ).toFixed(4),
         ),
-        address: delegation.ownerAddress,
+        staked: delegation.totalStake,
         rating: delegation.rating,
         canDelegate: delegation.canDelegate,
         selfStake: delegation.selfStake,

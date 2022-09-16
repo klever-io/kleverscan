@@ -1,6 +1,6 @@
 import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
-import { IAsset } from '@/types/index';
+import { IAsset, IBalance } from '@/types/index';
 import { parseAddress, toLocaleFixed } from '@/utils/index';
 import Link from 'next/link';
 import React from 'react';
@@ -12,19 +12,13 @@ interface IHolder {
   holdersTableProps: any;
 }
 
-interface IBalance {
-  address: string;
-  balance: number;
-  index: number;
-}
-
 const Holders: React.FC<IHolder> = ({ holders, asset, holdersTableProps }) => {
   const rowSections = (props: IBalance): JSX.Element[] => {
-    const { address, balance, index } = props;
+    const { address, balance, index, rank } = props;
 
     return [
       <RankingContainer key={index}>
-        <RankingText>{index + 1}°</RankingText>
+        <RankingText>{rank}°</RankingText>
       </RankingContainer>,
       <AddressContainer key={address}>
         <Link href={`/account/${address}`}>{parseAddress(address, 40)}</Link>

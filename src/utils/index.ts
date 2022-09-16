@@ -11,6 +11,7 @@ import {
   IEpochInfo,
   IFormData,
   IMetrics,
+  IPagination,
   ITransaction,
   IValidator,
   IValidatorResponse,
@@ -667,6 +668,7 @@ export const parseValidators = (
 export const parseHolders = (
   holders: IAccountAsset[] | [],
   assetId: string,
+  pagination: IPagination,
 ): IBalance[] =>
   holders.map((holder: IAccountAsset, index: number) => {
     if (holder.assetId === assetId) {
@@ -674,11 +676,13 @@ export const parseHolders = (
         index,
         address: holder.address,
         balance: holder.frozenBalance + holder.balance,
+        rank: index + 1 + (pagination.self - 1) * pagination.perPage,
       };
     } else
       return {
         index,
         address: '',
         balance: 0,
+        rank: 0,
       };
   });

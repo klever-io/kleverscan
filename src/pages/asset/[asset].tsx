@@ -141,8 +141,12 @@ const Asset: React.FC<IAssetPage> = ({
     const response = await api.get({
       route: `assets/holders/${asset.assetId}?page=${page}`,
     });
-    const unparsedHolders = response?.data?.accounts || [];
-    const parsedHolders = parseHolders(unparsedHolders, asset.assetId);
+
+    let parsedHolders: IBalance[] = [];
+    if (!response.error) {
+      const holders = response.data.accounts;
+      parsedHolders = parseHolders(holders, asset.assetId, response.pagination);
+    }
 
     return { ...response, data: { accounts: parsedHolders } };
   };
@@ -573,6 +577,7 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
             props.holders = parseHolders(
               unparsedHolders,
               props?.asset?.assetId,
+              holders.pagination,
             );
             props.totalHoldersPage = holders?.pagination?.totalPages || 1;
             props.totalRecords = holders?.pagination?.totalRecords || 1;

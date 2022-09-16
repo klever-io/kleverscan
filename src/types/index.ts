@@ -526,6 +526,7 @@ export interface IBalance {
   address: string;
   balance: number;
   index: number;
+  rank: number;
 }
 
 export interface IAccountAsset {

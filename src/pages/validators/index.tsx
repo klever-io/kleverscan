@@ -5,12 +5,7 @@ import { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import api from '@/services/api';
 import { IPagination, IValidator, IValidatorResponse } from '@/types/index';
-import {
-  capitalizeString,
-  formatAmount,
-  parseAddress,
-  parseValidators,
-} from '@/utils/index';
+import { capitalizeString, formatAmount, parseValidators } from '@/utils/index';
 import {
   ProgressContainer,
   ProgressContent,
@@ -77,12 +72,13 @@ const Validators: React.FC<IValidatorPage> = ({
 
   const rowSections = (validator: IValidator): JSX.Element[] | undefined => {
     const {
-      rank,
       name,
+      ownerAddress,
+      parsedAddress,
+      rank,
       staked,
       commission,
       cumulativeStaked,
-      address,
       rating,
       status,
       totalProduced,
@@ -91,23 +87,15 @@ const Validators: React.FC<IValidatorPage> = ({
     } = validator;
 
     const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'fail');
-    const sections = address
+    const sections = ownerAddress
       ? [
           <p key={rank}>{rank}°</p>,
-          <span key={name}>
-            {initialValidators[rank - 1 - (1 * pagination.perPage - 10)]
-              ?.address ? (
-              <Link
-                href={`validator/${
-                  initialValidators[rank - 1 - (1 * pagination.perPage - 10)]
-                    .address
-                }`}
-              >
-                {isMobile ? parseAddress(name, 14) : parseAddress(name, 20)}
+          <span key={ownerAddress}>
+            {
+              <Link href={`validator/${ownerAddress}`}>
+                {name ? name : parsedAddress}
               </Link>
-            ) : (
-              <span>{parseAddress(name, 20)}</span>
-            )}
+            }
           </span>,
           <span key={rating}>{((rating * 100) / 10000000).toFixed(2)}%</span>,
 

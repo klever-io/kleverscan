@@ -11,6 +11,7 @@ import {
   IEpochInfo,
   IFormData,
   IMetrics,
+  IPagination,
   ITransaction,
   IValidator,
   IValidatorResponse,
@@ -638,19 +639,20 @@ export const parseValidators = (
         delegation.totalValidatorSuccessRate.numFailure;
 
       return {
-        staked: delegation.totalStake,
+        ownerAddress: delegation.ownerAddress,
+        parsedAddress: parseAddress(delegation.ownerAddress, 20),
+        name: delegation.name,
         rank:
           index +
           (validators.pagination.self - 1) * validators.pagination.perPage +
           1,
-        name: delegation.name || parseAddress(delegation.ownerAddress, 20),
         cumulativeStaked: parseFloat(
           (
             (delegation.totalStake / validators.data.networkTotalStake) *
             100
           ).toFixed(4),
         ),
-        address: delegation.ownerAddress,
+        staked: delegation.totalStake,
         rating: delegation.rating,
         canDelegate: delegation.canDelegate,
         selfStake: delegation.selfStake,
@@ -666,6 +668,7 @@ export const parseValidators = (
 export const parseHolders = (
   holders: IAccountAsset[] | [],
   assetId: string,
+  pagination: IPagination,
 ): IBalance[] =>
   holders.map((holder: IAccountAsset, index: number) => {
     if (holder.assetId === assetId) {
@@ -673,11 +676,13 @@ export const parseHolders = (
         index,
         address: holder.address,
         balance: holder.frozenBalance + holder.balance,
+        rank: index + 1 + (pagination.self - 1) * pagination.perPage,
       };
     } else
       return {
         index,
         address: '',
         balance: 0,
+        rank: 0,
       };
   });

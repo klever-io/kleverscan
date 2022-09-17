@@ -86,6 +86,7 @@ const Account: React.FC<IAccountPage> = ({
   KFIallowance,
 }) => {
   const initialStateFilter: ITxQuery = {
+    address: account.address,
     startdate: '',
     enddate: '',
     fromAddress: '',

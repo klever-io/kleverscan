@@ -526,6 +526,7 @@ export interface IBalance {
   address: string;
   balance: number;
   index: number;
+  rank: number;
 }
 
 export interface IAccountAsset {
@@ -652,11 +653,12 @@ export interface IDelegationsResponse {
   commission: number;
 }
 export interface IValidator {
+  ownerAddress: string;
+  name: string | undefined;
+  parsedAddress: string;
   rank: number;
-  name: string;
   staked: number;
   cumulativeStaked: number;
-  address: string;
   rating: number;
   selfStake: number;
   status: string;

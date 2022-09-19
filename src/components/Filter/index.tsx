@@ -18,10 +18,17 @@ export interface IFilter {
   title: string;
   data: string[];
   onClick?(selected: string, filterType: string): void;
+  onChange?(value: string): void;
   current: string | undefined;
 }
 
-const Filter: React.FC<IFilter> = ({ title, data, onClick, current }) => {
+const Filter: React.FC<IFilter> = ({
+  title,
+  data,
+  onClick,
+  onChange,
+  current,
+}) => {
   const allItem = 'All';
   const [selected, setSelected] = useState(current || allItem);
   const [open, setOpen] = useState(true);
@@ -96,6 +103,9 @@ const Filter: React.FC<IFilter> = ({ title, data, onClick, current }) => {
         setInputValue(parsedValue);
       }
     }
+    if (onChange) {
+      onChange(value);
+    }
   };
 
   const getDataArray = () => [allItem].concat(data);
@@ -131,7 +141,7 @@ const Filter: React.FC<IFilter> = ({ title, data, onClick, current }) => {
             type="text"
             ref={focusRef}
             show={focus}
-            onChange={e => handleChange(e)}
+            onChange={handleChange}
           />
         )}
         <span>{open && selected ? selected : ''}</span>

@@ -31,6 +31,19 @@ export const Header = styled.section`
   }
 `;
 
+export const HeaderContainer = styled.div`
+  div:last-child {
+    margin-top: 1.5rem;
+    div {
+      margin-top: 0;
+    }
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`;
+
 export const Title = styled.div`
   display: flex;
 
@@ -115,7 +128,7 @@ export const Row = styled.div<ITableType>`
 `;
 
 export const Input = styled(DefaultInput)`
-  margin-top: 1.1rem;
+  margin-top: 5rem;
 
   padding: 0.75rem 1rem;
 

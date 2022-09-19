@@ -55,6 +55,33 @@ const Input: React.FC<IInput> = ({ className }) => {
       return;
     }
 
+    if (
+      type === 'asset' &&
+      (treatedSearch.toUpperCase() === 'KFI' ||
+        treatedSearch.toUpperCase() === 'KLV' ||
+        treatedSearch.length === 8)
+    ) {
+      router.push(`/${type}/${treatedSearch}`);
+      inputRef.current.value = '';
+      return;
+    }
+
+    if (
+      type === 'asset' &&
+      treatedSearch.length >= 3 &&
+      treatedSearch.length < 9
+    ) {
+      inputRef.current.value = '';
+      router
+        .push({
+          pathname: '/assets',
+          query: `asset=${treatedSearch.toUpperCase()}`,
+        })
+        .then(() => {
+          if (router.pathname === '/assets') router.reload();
+        });
+      return;
+    }
     router.push(`/${type}/${treatedSearch}`);
     inputRef.current.value = '';
   };

@@ -165,6 +165,8 @@ export const TableHeader = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 0.5rem;
+
+  color: ${props => props.theme.black};
 `;
 
 export const UpdateContainer = styled.div`

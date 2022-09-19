@@ -55,6 +55,8 @@ export const Item = styled.div<{ selected: boolean }>`
   flex-direction: row;
   align-items: center;
 
+  position: relative;
+
   gap: 0.5rem;
 
   cursor: pointer;

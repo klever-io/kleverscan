@@ -71,10 +71,18 @@ const DateFilter: React.FC<IDateFilter> = ({
       selectedDaysInitialValue.end = dateFromRouter.enddate;
     }
   };
+  selectDays();
 
-  useCallback(() => {
-    selectDays();
-  }, [router.query]);
+  const formatInputInitialValue = () => {
+    if (dateFromRouter.startdate.toString() === 'Invalid Date') {
+      return '';
+    }
+    return `${selectedDaysInitialValue?.start?.toLocaleString().split(',')[0]}${
+      selectedDaysInitialValue.end
+        ? ' - ' + selectedDaysInitialValue?.end?.toLocaleString().split(',')[0]
+        : ''
+    }`;
+  };
 
   const [date, setDate] = useState(currentDate);
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -90,7 +98,7 @@ const DateFilter: React.FC<IDateFilter> = ({
   const [warning, setWarning] = useState(false);
   const [firstSelection, setFirstSelection] = useState(true);
   const [dontBlur, setDontBlur] = useState(false);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState(formatInputInitialValue());
   const [buttonActive, setButtonActive] = useState(true);
 
   const inputRef = useRef<any>(null);

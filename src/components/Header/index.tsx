@@ -16,6 +16,7 @@ import {
   DropdownMenu,
   IconsMenu,
   Item,
+  LinkStyled,
   Logo,
   MenuIcon,
   MobileBackground,
@@ -31,32 +32,6 @@ interface IDropdownPages {
   onClick?: () => void;
 }
 
-const DropdownDesktop = ({ page }: IDropdownPages) => {
-  return (
-    <DropdownItem>
-      <Link href={page.pathTo}>
-        <a>
-          <page.Icon />
-          <span>{page.name}</span>
-        </a>
-      </Link>
-    </DropdownItem>
-  );
-};
-
-const DropdownMobile = ({ page, onClick }: IDropdownPages) => {
-  return (
-    <DropdownItem onClick={onClick}>
-      <Link href={page.pathTo}>
-        <a>
-          <span>{page.name}</span>
-          <page.Icon />
-        </a>
-      </Link>
-    </DropdownItem>
-  );
-};
-
 const NavbarItem: React.FC<INavbarItem> = ({
   name,
   Icon,
@@ -64,6 +39,21 @@ const NavbarItem: React.FC<INavbarItem> = ({
   pages = [],
 }) => {
   const router = useRouter();
+
+  const DropdownDesktop = ({ page }: IDropdownPages) => {
+    return (
+      <DropdownItem
+        disabled={router.pathname.includes(page.name.toLowerCase())}
+      >
+        <Link href={page.pathTo}>
+          <a>
+            <page.Icon />
+            <span>{page.name}</span>
+          </a>
+        </Link>
+      </DropdownItem>
+    );
+  };
 
   if (name === 'More') {
     return (
@@ -85,12 +75,12 @@ const NavbarItem: React.FC<INavbarItem> = ({
 
   return (
     <Link href={pathTo}>
-      <a>
+      <LinkStyled disabled={router.pathname.includes(name.toLowerCase())}>
         <Item selected={router.pathname.includes(name.toLowerCase())}>
           <Icon />
           <span>{name}</span>
         </Item>
-      </a>
+      </LinkStyled>
     </Link>
   );
 };

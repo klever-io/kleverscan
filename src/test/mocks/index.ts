@@ -499,6 +499,7 @@ export const klvAsset: IAsset = {
   issueDate: 0,
   burnedValue: 0,
   verified: false,
+  hidden: false,
   properties: {
     canAddRoles: true,
     canBurn: true,

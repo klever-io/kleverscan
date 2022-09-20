@@ -176,7 +176,7 @@ const buckets = css`
     width: 10rem;
   }
   &:nth-child(2) {
-    width: 5rem;
+    width: 8rem;
   }
   &:nth-child(3) {
     width: 5rem;
@@ -191,7 +191,10 @@ const buckets = css`
     width: 10rem;
   }
   &:nth-child(7) {
-    width: 16rem;
+    width: 10rem;
+  }
+  &:nth-child(8) {
+    width: 14rem;
   }
 `;
 

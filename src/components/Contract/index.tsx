@@ -334,19 +334,34 @@ const Contract: React.FC<IContract> = ({
   };
 
   const permissionsForm = () => (
-    <Form contractName={contractType} key={contractType} {...formProps}>
+    <Form
+      contractName={contractType}
+      key={contractType}
+      showForm={showForm()}
+      {...formProps}
+    >
       <PermissionsForm />
     </Form>
   );
 
   const proposalForm = () => (
-    <Form contractName={contractType} key={contractType} {...formProps}>
+    <Form
+      contractName={contractType}
+      key={contractType}
+      showForm={showForm()}
+      {...formProps}
+    >
       {paramsList.length > 0 && <ParametersForm paramsList={paramsList} />}
     </Form>
   );
 
   const ITOForm = () => (
-    <Form contractName={contractType} key={contractType} {...formProps}>
+    <Form
+      contractName={contractType}
+      key={contractType}
+      showForm={showForm()}
+      {...formProps}
+    >
       <PackInfoForm />
     </Form>
   );

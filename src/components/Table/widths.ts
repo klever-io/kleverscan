@@ -375,6 +375,14 @@ const nfts = css`
   }
 `;
 
+const validatorsList = css`
+  margin-right: 1.25rem;
+
+  &:nth-child(1) {
+    width: 70rem;
+  }
+`;
+
 const widths = {
   transactions,
   blocks,
@@ -391,6 +399,7 @@ const widths = {
   votes,
   delegations,
   nfts,
+  validatorsList,
 };
 
 export default widths;

@@ -12,12 +12,11 @@ const Tooltip: React.FC<ITooltipProps> = ({ msg, Component }) => {
   const parsedMsgs = msg.split('\n');
 
   return (
-    <div>
-      <span
-        style={{ display: 'flex' }}
-        onMouseOver={() => setDisplayMessage(true)}
-        onMouseLeave={() => setDisplayMessage(false)}
-      >
+    <div
+      onMouseOver={() => setDisplayMessage(true)}
+      onMouseLeave={() => setDisplayMessage(false)}
+    >
+      <span style={{ display: 'flex' }}>
         {Component ? (
           <div data-tip data-for="buttonTooltip">
             <Component />
@@ -27,15 +26,16 @@ const Tooltip: React.FC<ITooltipProps> = ({ msg, Component }) => {
             button
           </IconHelp>
         )}
-        {((displayMessage && Component && msg.length >= 9) ||
-          (displayMessage && !Component)) && (
+        {((Component && msg.length >= 9) || !Component) && (
           <div>
             <StyledTooltip
+              displayMsg={displayMessage}
               id="buttonTooltip"
               place="bottom"
               effect="solid"
               type="info"
               backgroundColor="#7B7DB2"
+              delayShow={1}
             >
               {parsedMsgs.map((parsedMsg, index) => (
                 <span key={index} style={{ color: 'white' }}>

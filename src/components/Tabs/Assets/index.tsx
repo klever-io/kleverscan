@@ -1,4 +1,5 @@
 import Table, { ITable } from '@/components/Table';
+import { CustomLink } from '@/components/Table/styles';
 import { IAccountAsset, IAsset, IResponse } from '@/types/index';
 import { formatAmount } from '@/utils/index';
 import Link from 'next/link';
@@ -29,6 +30,14 @@ const Assets: React.FC<IAssets> = ({ assets, address }) => {
   const rowSections = (props: IAccountAsset): JSX.Element[] => {
     const { assetId, assetType, precision, balance, frozenBalance } = props;
     const ticker = assetId?.split('-')[0];
+    const sectionViewNfts =
+      assetType === 1 ? (
+        <Link href={`/account/${address}/collection/${assetId}`} key={address}>
+          <CustomLink>View NFTs</CustomLink>
+        </Link>
+      ) : (
+        <></>
+      );
     return [
       <span key={ticker}>{ticker}</span>,
       <Link key={assetId} href={`/asset/${assetId}`}>
@@ -44,13 +53,7 @@ const Assets: React.FC<IAssets> = ({ assets, address }) => {
       <strong key={frozenBalance}>
         {formatAmount(frozenBalance / 10 ** precision)} {ticker}
       </strong>,
-      <span key={address}>
-        {assetType === 1 && (
-          <Link href={`/account/${address}/collection/${assetId}`}>
-            View NFTs
-          </Link>
-        )}
-      </span>,
+      sectionViewNfts,
     ];
   };
 

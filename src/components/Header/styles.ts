@@ -55,6 +55,8 @@ export const Item = styled.div<{ selected: boolean }>`
   flex-direction: row;
   align-items: center;
 
+  position: relative;
+
   gap: 0.5rem;
 
   cursor: pointer;
@@ -80,6 +82,13 @@ export const Item = styled.div<{ selected: boolean }>`
     display: flex;
     flex-direction: column;
   }
+
+  pointer-events: ${props => (props.selected ? 'none' : 'all')};
+  cursor: 'default';
+`;
+
+export const LinkStyled = styled.a<{ disabled: boolean }>`
+  pointer-events: ${props => (props.disabled ? 'none' : 'all')};
 `;
 
 export const ItemTransaction = styled.div<{ selected: boolean }>`
@@ -256,7 +265,7 @@ export const DropdownContainer = styled.div`
     left: 0.4rem;
   }
 `;
-export const DropdownItem = styled.li`
+export const DropdownItem = styled.li<{ disabled: boolean }>`
   display: flex;
   gap: 0.5rem;
   list-style: none;
@@ -274,7 +283,9 @@ export const DropdownItem = styled.li`
   a {
     display: flex;
     flex-direction: row;
+    pointer-events: ${props => (props.disabled ? 'none' : 'all')};
   }
+  cursor: ${props => (props.disabled ? 'default' : 'pointer')};
 
   @media (max-width: 1024px) {
     span {

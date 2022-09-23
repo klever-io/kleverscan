@@ -1,6 +1,7 @@
 import { Validators as Icon } from '@/assets/cards';
 import Detail from '@/components/Layout/Detail';
 import { ITable } from '@/components/Table';
+import { CustomLink } from '@/components/Table/styles';
 import api from '@/services/api';
 import { INfts, IPagination, IResponse } from '@/types/index';
 import { parseAddress } from '@/utils/index';
@@ -59,7 +60,7 @@ const Validators: React.FC<ICollectionPage> = ({
             href={`/account/${address}/collection/${collectionId}/${nftNonce}`}
             key={nftNonce}
           >
-            Detail
+            <CustomLink>Detail</CustomLink>
           </Link>,
         ]
       : [<></>];

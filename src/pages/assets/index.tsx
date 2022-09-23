@@ -1,16 +1,19 @@
 import { Certified } from '@/assets/icons';
 import { Assets as Icon } from '@/assets/title-icons';
+import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Table, { ITable } from '@/components/Table';
 import api from '@/services/api';
 import { IAsset, IPagination, IResponse } from '@/types/index';
 import { formatAmount, parseHardCodedInfo } from '@/utils/index';
-import { Container, Header, Input } from '@/views/assets';
+import { Container, Header, HeaderContainer, Input } from '@/views/assets';
 import { LetterLogo, Logo } from '@/views/assets/index';
+import { FilterContainer } from '@/views/transactions';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
-import React, { ReactNode, useState } from 'react';
+import { useRouter } from 'next/router';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
 
 interface IAssetPage {
@@ -25,17 +28,60 @@ interface IAssetResponse extends IResponse {
   pagination: IPagination;
 }
 
-const Assets: React.FC<IAssetPage> = ({
-  assets: defaultAssets,
-  pagination,
-}) => {
-  const [assets, setAssets] = useState(defaultAssets);
+const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
+  const router = useRouter();
+  const [assetFilters, setAssetsFilters] = useState(assets);
+  const [filterToken, setFilterToken] = useState(router.query.asset);
 
-  const requestAssets = async (page: number) =>
-    api.getCached({
-      route: `assets/kassets?hidden=false&page=${page}`,
-      refreshTime: 21600,
-    });
+  let fetchPartialAssetTimeout: ReturnType<typeof setTimeout>;
+
+  const filters: IFilter[] = [
+    {
+      title: 'Asset',
+      data: assetFilters.map(asset => asset.assetId),
+      onClick: value => setFilterToken(value),
+      onChange: value => {
+        clearTimeout(fetchPartialAssetTimeout);
+        fetchPartialAssetTimeout = setTimeout(async () => {
+          let response: IAssetResponse;
+          if (
+            value &&
+            !assetFilters.find(asset =>
+              asset.assetId.includes(value.toUpperCase()),
+            )
+          ) {
+            response = await api.getCached({
+              route: `assets/kassets?asset=${value}`,
+            });
+            setAssetsFilters([...assetFilters, ...response.data.assets]);
+          }
+        }, 500);
+      },
+      current: (filterToken as string) || undefined,
+    },
+  ];
+
+  const requestAssets = async (page: number) => {
+    if (filterToken === 'All' || filterToken === undefined) {
+      return api.getCached({
+        route: `assets/kassets?hidden=false&page=${page}`,
+        refreshTime: 21600,
+      });
+    } else {
+      return api.getCached({
+        route: `assets/kassets?hidden=false&asset=${filterToken}&page=${page}`,
+        refreshTime: 21600,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (filterToken === 'All') {
+      router.push({ pathname: router.pathname, query: '' });
+    } else {
+      router.push({ pathname: router.pathname, query: `asset=${filterToken}` });
+    }
+  }, [filterToken]);
 
   const rowSections = (asset: IAsset): JSX.Element[] => {
     const {
@@ -150,12 +196,20 @@ const Assets: React.FC<IAssetPage> = ({
     dataName: 'assets',
     scrollUp: true,
     totalPages: pagination.totalPages,
+    query: router.query,
   };
 
   return (
     <Container>
       <Header>
-        <Title title="Assets" Icon={Icon} />
+        <HeaderContainer>
+          <Title title="Assets" Icon={Icon} />
+          <FilterContainer>
+            {filters.map((filter, index) => (
+              <Filter key={String(index)} {...filter} />
+            ))}
+          </FilterContainer>
+        </HeaderContainer>
 
         <Input />
       </Header>
@@ -165,13 +219,21 @@ const Assets: React.FC<IAssetPage> = ({
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async context => {
   const props: IAssetPage = { assets: [], pagination: {} as IPagination };
+  let assets: IAssetResponse;
 
-  const assets: IAssetResponse = await api.getCached({
-    route: 'assets/kassets?hidden=false',
-    refreshTime: 21600,
-  });
+  if (context.query.asset) {
+    assets = await api.getCached({
+      route: `assets/kassets?hidden=false&asset=${context.query.asset}`,
+      refreshTime: 21600,
+    });
+  } else {
+    assets = await api.getCached({
+      route: 'assets/kassets?hidden=false',
+      refreshTime: 21600,
+    });
+  }
   if (!assets.error) {
     props.assets = assets.data.assets;
     props.pagination = assets.pagination;

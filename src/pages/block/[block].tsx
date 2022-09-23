@@ -2,6 +2,7 @@ import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Transactions from '@/components/Tabs/Transactions';
+import Validators from '@/components/Tabs/Validators';
 import api from '@/services/api';
 import { IBlock } from '@/types/blocks';
 import { toLocaleFixed } from '@/utils/index';
@@ -62,13 +63,14 @@ const Block: React.FC<IBlockPage> = ({
     parentHash,
     trieRoot,
     validatorsTrieRoot,
+    validators,
     kappsTrieRoot,
     prevRandSeed,
     randSeed,
   } = block;
 
   const cardHeaders = ['Overview', 'Info'];
-  const tableHeaders = ['Transactions'];
+  const tableHeaders = ['Transactions', 'Validators'];
   const precision = 6; // default KLV precision
 
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
@@ -270,6 +272,8 @@ const Block: React.FC<IBlockPage> = ({
             />
           </>
         );
+      case 'Validators':
+        return <Validators validators={validators} />;
       default:
         return <div />;
     }

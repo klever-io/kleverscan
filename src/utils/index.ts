@@ -38,12 +38,11 @@ export const getVariation = (variation: number): string => {
 };
 
 export const getAge = (date: Date, t?: TFunction): string => {
-  const diff = Math.abs(new Date().getTime() - date.getTime());
-
-  const sec = Math.ceil(diff / 1000);
-  const min = Math.ceil(diff / (1000 * 60));
-  const hour = Math.ceil(diff / (1000 * 60 * 60));
-  const day = Math.ceil(diff / (1000 * 60 * 60 * 24));
+  const diff = Math.abs(new Date().getTime() - date.getTime()) - 60;
+  const sec = Math.floor(diff / 1000);
+  const min = Math.floor(diff / (1000 * 60));
+  const hour = Math.floor(diff / (1000 * 60 * 60));
+  const day = Math.floor(diff / (1000 * 60 * 60 * 24));
 
   let val = 0;
   let suffix = '';
@@ -61,7 +60,6 @@ export const getAge = (date: Date, t?: TFunction): string => {
     val = day;
     suffix = t ? t('Date.Time.day') : 'day';
   }
-
   return `${val} ${suffix}${val > 1 ? 's' : ''}`;
 };
 

@@ -36,7 +36,8 @@ export interface ITable {
     | 'proposals'
     | 'votes'
     | 'delegations'
-    | 'nfts';
+    | 'nfts'
+    | 'validatorsList';
 
   header: string[];
   data: any[];

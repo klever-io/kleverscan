@@ -566,7 +566,6 @@ export interface IAsset {
   royalties: number;
   mintedValue: number;
   issueDate: number;
-  verified: boolean;
   staking: {
     minEpochsToWithdraw: number;
     totalStaked: number;
@@ -585,6 +584,15 @@ export interface IAsset {
     isPaused: boolean;
     isNFTMintStopped: boolean;
   };
+  hidden: boolean;
+  verified: boolean;
+  metadata?: string;
+  mime?: string;
+}
+
+export interface IParsedAsset extends IAsset {
+  nonce: string;
+  nonceOwner: string;
 }
 
 export interface IContract {

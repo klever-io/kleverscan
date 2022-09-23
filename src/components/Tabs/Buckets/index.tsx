@@ -61,10 +61,7 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
   const rowSections = (assetBucket: IAssetsBuckets): JSX.Element[] => {
     const { asset, bucket } = assetBucket;
 
-    const getAvaliableEpoch = async (
-      assetId: string,
-      unstakedEpoch: number,
-    ) => {
+    const getAvaliableEpoch = (assetId: string, unstakedEpoch: number) => {
       if (assetId.length < 64) {
         return (
           unstakedEpoch + (assetDetails?.staking?.minEpochsToWithdraw || 2)
@@ -96,6 +93,8 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
         {bucket.unstakedEpoch === UINT32_MAX
           ? '--'
           : bucket.unstakedEpoch.toLocaleString()}
+      </>,
+      <>
         {bucket.unstakedEpoch === UINT32_MAX
           ? '--'
           : getAvaliableEpoch(

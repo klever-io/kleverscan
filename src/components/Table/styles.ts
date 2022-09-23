@@ -24,7 +24,8 @@ export interface ITableType {
     | 'proposals'
     | 'votes'
     | 'delegations'
-    | 'nfts';
+    | 'nfts'
+    | 'validatorsList';
   haveData?: number;
   pathname?: string;
   rowSections?: boolean;
@@ -188,6 +189,10 @@ export const MobileCardItem = styled.span<{ columnSpan?: number }>`
   display: flex;
   flex-direction: column;
 
+  &:last-child {
+    flex-grow: 1;
+  }
+
   @media screen and (max-width: 768px) {
     ${props =>
       !props.columnSpan || props.columnSpan >= 0
@@ -255,5 +260,24 @@ export const EmptyRow = styled(Row)`
   p {
     font-weight: 400;
     color: ${props => transparentize(0.5, props.theme.darkText)};
+  }
+`;
+
+export const CustomLink = styled.a`
+  align-self: end;
+  color: ${props => props.theme.text};
+  background: ${props => props.theme.violet};
+  padding: 0.625rem 2.94rem;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  @media (max-width: 768px) {
+    display: flex;
+    justify-content: center;
+    width: 100%;
   }
 `;

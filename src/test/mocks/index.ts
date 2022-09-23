@@ -353,6 +353,7 @@ export const mockedHomeDataCards: IDataCards = {
     chainID: '10008',
     producerName: 'producerName',
     producerOwnerAddress: 'producerAddress',
+    validators: ['validatorBLS'],
   },
   tps: '0 / 3000',
   epochInfo: {
@@ -499,6 +500,7 @@ export const klvAsset: IAsset = {
   issueDate: 0,
   burnedValue: 0,
   verified: false,
+  hidden: false,
   properties: {
     canAddRoles: true,
     canBurn: true,

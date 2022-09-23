@@ -29,6 +29,7 @@ export interface IBlock {
   softwareVersion: string;
   chainID: string;
   producerName: string;
+  validators: string[];
   producerOwnerAddress: string;
 }
 

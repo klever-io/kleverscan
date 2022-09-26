@@ -44,7 +44,7 @@ import {
   Header,
 } from '@/views/transactions';
 import { Input } from '@/views/transactions/detail';
-import { useWidth } from 'contexts/width';
+import { useMobile } from 'contexts/mobile';
 import { format, fromUnixTime } from 'date-fns';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
@@ -89,7 +89,7 @@ const Transactions: React.FC<ITransactions> = ({
 }) => {
   const router = useRouter();
   const precision = 6; // default KLV precision
-  const { isMobile } = useWidth();
+  const { isMobile } = useMobile();
   const columnSpans = [
     2, 1, 1, 1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   ];

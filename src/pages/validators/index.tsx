@@ -12,8 +12,8 @@ import {
   ProgressIndicator,
   ProgressPercentage,
 } from '@/views/validators';
+import { useMobile } from 'contexts/mobile';
 import { useTheme } from 'contexts/theme';
-import { useWidth } from 'contexts/width';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import React from 'react';
@@ -68,7 +68,7 @@ const Validators: React.FC<IValidatorPage> = ({
     );
   };
 
-  const { isMobile } = useWidth();
+  const { isMobile } = useMobile();
 
   const rowSections = (validator: IValidator): JSX.Element[] | undefined => {
     const {

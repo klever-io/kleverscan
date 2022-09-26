@@ -12,7 +12,7 @@ import {
 } from '@/types/index';
 import { capitalizeString, formatAmount, parseAddress } from '@/utils/index';
 import { CenteredRow } from '@/views/accounts/detail';
-import { useWidth } from 'contexts/width';
+import { useMobile } from 'contexts/mobile';
 import { format, fromUnixTime } from 'date-fns';
 import Link from 'next/link';
 import React from 'react';
@@ -30,7 +30,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
       : Object.values(Contract)[contracts[0].type];
   const precision = props.precision || 6;
 
-  const { isMobile } = useWidth();
+  const { isMobile } = useMobile();
 
   const rowSections = (props: ITransaction): JSX.Element[] => {
     const { hash, blockNum, timestamp, sender, contract, status } = props;

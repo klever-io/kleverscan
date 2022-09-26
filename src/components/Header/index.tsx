@@ -1,9 +1,9 @@
 import { INavbarItem, navbarItems } from '@/configs/navbar';
-import { useWidth } from 'contexts/width';
+import { useMobile } from 'contexts/mobile';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import ConnectWallet from './ConnectWallet';
 import OptionsContainer from './OptionsContainer';
 import {
@@ -39,6 +39,8 @@ const NavbarItem: React.FC<INavbarItem> = ({
   pages = [],
 }) => {
   const router = useRouter();
+
+  const { isMobile } = useMobile();
 
   const DropdownDesktop = ({ page }: IDropdownPages) => {
     return (
@@ -117,38 +119,12 @@ export const MobileNavbarItem: React.FC<INavbarItem> = ({
 };
 
 const Navbar: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const mobileNavbar = useRef<HTMLDivElement>(null);
+  const { mobileNavbarRef, closeMenu, handleMenu, isMobile, mobileMenuOpen } =
+    useMobile();
   const prevScrollpos = useRef<number>(0);
 
-  const { width } = useWidth();
-
-  useEffect(() => {
-    if (width > 1025) {
-      setIsOpen(false);
-    }
-  }, [width]);
-
-  useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : 'visible';
-  }, [isOpen]);
-
-  const handleMenu = () => {
-    setIsOpen(!isOpen);
-    if (mobileNavbar.current !== null) {
-      mobileNavbar.current.style.top = '0';
-    }
-  };
-
-  const handleClose = () => {
-    if (isOpen) {
-      setIsOpen(false);
-    }
-  };
-
   const handleMobileScroll = () => {
-    const navbar = mobileNavbar.current;
+    const navbar = mobileNavbarRef.current;
 
     const currentScrollPos = window.pageYOffset;
 
@@ -166,7 +142,7 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      if (window.innerWidth < 1025) {
+      if (isMobile) {
         window.addEventListener('scroll', handleMobileScroll);
       } else {
         window.removeEventListener('scroll', handleMobileScroll);
@@ -178,15 +154,15 @@ const Navbar: React.FC = () => {
         window.removeEventListener('scroll', handleMobileScroll);
       }
     };
-  }, [width]);
+  }, [isMobile]);
 
   return (
     <>
-      <Container ref={mobileNavbar}>
+      <Container ref={mobileNavbarRef}>
         <Content>
           <Link href="/">
             <a>
-              <Logo onClick={handleClose}>
+              <Logo onClick={closeMenu}>
                 <Image
                   src="/logo-large.svg"
                   alt="Logo"
@@ -214,12 +190,12 @@ const Navbar: React.FC = () => {
       </Container>
 
       <MobileBackground
-        onClick={handleClose}
-        onTouchStart={handleClose}
-        opened={isOpen}
+        onClick={closeMenu}
+        onTouchStart={closeMenu}
+        opened={mobileMenuOpen}
       />
 
-      <MobileContent opened={isOpen}>
+      <MobileContent opened={mobileMenuOpen}>
         <MobileOptions>
           <OptionsContainer />
         </MobileOptions>
@@ -233,7 +209,7 @@ const Navbar: React.FC = () => {
           ))}
         </MobileNavbarItemList>
 
-        <ConnectWallet handleMenu={handleMenu} />
+        <ConnectWallet />
       </MobileContent>
     </>
   );

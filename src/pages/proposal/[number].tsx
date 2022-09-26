@@ -87,13 +87,14 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
     No: 0,
   });
   const [votedQty, setVotedQty] = useState(0);
+  const [totalVoted, setTotalVoted] = useState(0);
   const [votersList, setVotersList] = useState<IParsedVoter[]>([]);
   const [selectedFilter, setSelectedFilter] = useState('Yes');
   const [votesPercentage, setVotesPercentage] = useState('');
 
   useEffect(() => {
     if (totalStaked) {
-      let percentage = (votedQty * 100) / (totalStaked / precision);
+      let percentage = (totalVoted * 100) / (totalStaked / precision);
       if (percentage < 0.01) {
         percentage = 0;
       }
@@ -108,9 +109,13 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
 
     const list: IParsedVoter[] = [];
     let tempVotedQty = 0;
+    const qntyVotesYes = Object.values(proposalAPI.votes)[0] / 10 ** 6 || 0;
+    const qntyVotesNo = Object.values(proposalAPI.votes)[1] / 10 ** 6 || 0;
+    const votesAmount = qntyVotesYes + qntyVotesNo;
+    setTotalVoted(votesAmount);
     const tempFilterVoters = {
-      Yes: 0,
-      No: 0,
+      Yes: qntyVotesYes,
+      No: qntyVotesNo,
     };
 
     proposalAPI?.voters?.forEach(voter => {
@@ -132,13 +137,10 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
 
         switch (typeVote) {
           case 0:
-            tempFilterVoters['Yes'] += qtyVote;
             tempVotedQty += qtyVote;
-
             break;
 
           case 1:
-            tempFilterVoters['No'] += qtyVote;
             tempVotedQty += qtyVote;
             break;
 
@@ -341,7 +343,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
             <VotesHeader>
               <strong>Total Voted</strong>
               <span>
-                {toLocaleFixed(votedQty, 6)} ({votesPercentage}%)
+                {toLocaleFixed(totalVoted, 6)} ({votesPercentage}%)
               </span>
             </VotesHeader>
 
@@ -355,7 +357,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
               </PassThresholdContainer>
               {totalStaked ? (
                 <span>
-                  Voted: {formatAmount(votedQty)} /{' '}
+                  Voted: {formatAmount(totalVoted)} /{' '}
                   {formatAmount(totalStaked / precision)}
                 </span>
               ) : null}

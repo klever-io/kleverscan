@@ -4,6 +4,7 @@ import { ISelectedDays } from '@/components/DateFilter';
 import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import QrCodeModal from '@/components/QrCodeModal';
+import { EmptyRow } from '@/components/Table/styles';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Holders from '@/components/Tabs/Holders';
 import Transactions from '@/components/Tabs/Transactions';
@@ -265,16 +266,22 @@ const Asset: React.FC<IAssetPage> = ({
   const UriComponent: React.FC = () => {
     return (
       <>
-        {Object.entries(uris).map(([key, value]: [string, any]) => (
-          <Row key={String(key)}>
-            <span>
-              <strong>{key}</strong>
-            </span>
-            <a href={`${value}`} target="blank">
-              {value}
-            </a>
-          </Row>
-        ))}
+        {Object.entries(uris).length ? (
+          Object.entries(uris).map(([key, value]: [string, any]) => (
+            <Row key={String(key)}>
+              <span>
+                <strong>{key}</strong>
+              </span>
+              <a href={`${value}`} target="blank">
+                {value}
+              </a>
+            </Row>
+          ))
+        ) : (
+          <EmptyRow type="assets">
+            <p>No URI found</p>
+          </EmptyRow>
+        )}
       </>
     );
   };

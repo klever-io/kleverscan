@@ -28,6 +28,12 @@ import {
 } from '@/types/index';
 import { findKey, findReceipt } from '@/utils/findKey';
 import { getPrecision, toLocaleFixed } from '@/utils/index';
+import { getProposalNetworkParams } from '@/utils/parametersProposal';
+import {
+  BalanceContainer,
+  NetworkParamsContainer,
+  RowContent,
+} from '@/views/proposals/detail';
 import { CenteredRow, Row } from '@/views/transactions/detail';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
@@ -910,6 +916,7 @@ export const SetAccountName: React.FC<IContract> = ({ parameter: par }) => {
 
 export const Proposal: React.FC<IContract> = ({ parameter: par }) => {
   const parameter = par as IProposalContract;
+  const parameters = getProposalNetworkParams(parameter?.parameters);
 
   return (
     <>
@@ -935,7 +942,18 @@ export const Proposal: React.FC<IContract> = ({ parameter: par }) => {
         <span>
           <strong>Parameters</strong>
         </span>
-        <span>{parameter?.parameters?.toString()}</span>
+        <RowContent>
+          <BalanceContainer>
+            <NetworkParamsContainer>
+              {parameters.map(param => (
+                <div key={param.paramIndex}>
+                  <strong>{param.paramText}</strong>
+                  <span>{param.paramValue}</span>
+                </div>
+              ))}
+            </NetworkParamsContainer>
+          </BalanceContainer>
+        </RowContent>
       </Row>
     </>
   );

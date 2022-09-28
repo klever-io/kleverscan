@@ -17,16 +17,31 @@ import {
   IValidatorResponse,
 } from '../types';
 
+/**
+ * Emulates CSS ellipsis by receiving a string and a limit, if the string length is bigger then the limit, the exceeded characters will be replaced by the ellipsis.
+ * @param text
+ * @param limit
+ * @returns string
+ */
 export const breakText = (text: string, limit: number): string => {
   return text.length > limit ? `${text.substring(0, limit)}...` : text;
 };
 
+/**
+ * Converts a timestamp number into a Date instance and returns it's time based on user locale.
+ * @param timestamp
+ * @returns string
+ */
 export const timestampToDate = (timestamp: number): string => {
   const time = new Date(timestamp * 1000);
-
   return time.toLocaleString();
 };
 
+/**
+ * Receives a variation number that should be the result from a subtraction between two variables in percent value. If variation is positive returns a string representing a positive variation, otherwise, a negative variation. In case variation equals to zero, returns a string with two dashes.
+ * @param variation
+ * @returns string
+ */
 export const getVariation = (variation: number): string => {
   const precision = 2;
 
@@ -37,6 +52,12 @@ export const getVariation = (variation: number): string => {
   return `+ ${variation ? variation.toFixed(precision) : '--'}%`;
 };
 
+/**
+ * Receives a Date instance and calculate how many time has passed between now and this Date. Will return a string indicating how many time passed. Second arg is for translation option (optional).
+ * @param date
+ * @param t
+ * @returns string
+ */
 export const getAge = (date: Date, t?: TFunction): string => {
   const diff = Math.abs(new Date().getTime() - date.getTime()) - 60;
   const sec = Math.floor(diff / 1000);
@@ -68,6 +89,12 @@ export const typeVoteColors = {
   No: '#FF4A4A',
 };
 
+/**
+ * Formats a number and returns it's string representation in short scale (Million, Billion...) with 2 decimals points when number is not integer.
+ * Example: 8874165276.908615 --> "8.87 Bi"
+ * @param number
+ * @returns string
+ */
 export const formatAmount = (number: number): string => {
   if (number <= 0) {
     return '0';
@@ -95,12 +122,23 @@ export const formatAmount = (number: number): string => {
   }`;
 };
 
+/**
+ * Shorthand version of toLocaleString for passing precision and always using user locale. It receives a number that will be formatted having a minimal precision according to the precision arg passed.
+ * @param value
+ * @param precision
+ * @returns string
+ */
 export const toLocaleFixed = (value: number, precision: number): string => {
   return value?.toLocaleString(undefined, {
     minimumFractionDigits: precision,
   });
 };
 
+/**
+ * Converts hexadecimal bytes into human readable string.
+ * @param hex
+ * @returns string
+ */
 export const hexToString = (hex: string): string => {
   const stringHex = hex.toString();
   let ret = '';
@@ -112,6 +150,11 @@ export const hexToString = (hex: string): string => {
   return ret;
 };
 
+/**
+ * Sanitizes the assetId's from an IAsset array so they can be valid as URI components.
+ * @param assets
+ * @returns IAsset[]
+ */
 export const parseHardCodedInfo = (assets: IAsset[]): IAsset[] => {
   return assets.map(asset => {
     asset.assetId = encodeURIComponent(asset.assetId);
@@ -119,16 +162,42 @@ export const parseHardCodedInfo = (assets: IAsset[]): IAsset[] => {
   });
 };
 
+/**
+ * Splits an address in two parts, if the address length is greater than the maxLen. The first part is the beginning of the address. The last part is the end of the address. Ellipsis is between the splitted address.
+ * @param address
+ * @param maxLen
+ * @returns string
+ */
 export const parseAddress = (address: string, maxLen: number): string => {
   return address.length > maxLen
     ? `${address.slice(0, maxLen / 2)}...${address.slice(-(maxLen / 2))}`
     : address;
 };
 
+/**
+ * Receives an string as an argument and returns it with it's first character capitalized.
+ * @param str
+ * @returns string
+ */
 export const capitalizeString = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
+/**
+ * Receives an IMetrics object as an argument and use it to return an IEpochInfo object.
+ *
+ * DEFAULT VALUES FOR MAINNET (some may change):
+ *
+ * slotDuration = 4000 --> 4 sec --> time for a block to be produced
+ *
+ * slotsPerEpoch = 5400 --> 5400 x 4 --> 21600 sec for every epoch, which is the time for the network to choose it's new block producers
+ *
+ * currentSlot --> current slot network is in, changes every 4 sec
+ *
+ * slotAtEpochStart --> slot in which actual epoch started, changes every 21600 sec
+ * @param metrics
+ * @returns IEpochInfo object
+ */
 export const getEpochInfo = (metrics: IMetrics): IEpochInfo => {
   const { slotAtEpochStart, slotsPerEpoch, currentSlot, slotDuration } =
     metrics;
@@ -153,6 +222,12 @@ export const getEpochInfo = (metrics: IMetrics): IEpochInfo => {
   };
 };
 
+/**
+ * Receive a number as first arg that represents seconds, process this number to returns it's representation in hours, minutes and seconds as a string. Second argument is if translation option was passed.
+ * @param input
+ * @param t
+ * @returns string
+ */
 const secondsToHourMinSec = (input: number, t?: TFunction): string => {
   const numSecondsInAMinute = 60;
   const numMinutesInAHour = 60;
@@ -165,32 +240,29 @@ const secondsToHourMinSec = (input: number, t?: TFunction): string => {
   seconds = input % numSecondsInAMinute;
 
   if (hours > 0) {
-    result = plural(hours, t ? t('Date.Time.hour') : 'hour');
+    result = `${hours} ${t ? t('Date.Time.h') : 'h'} `;
   }
   if (minutes > 0) {
-    result += plural(minutes, t ? t('Date.Time.minute') : 'minute');
+    result += `${minutes} ${t ? t('Date.Time.min') : 'min'} `;
   }
   if (seconds > 0) {
-    result += plural(seconds, t ? t('Date.Time.second') : 'second');
+    result += `${seconds} ${t ? t('Date.Time.sec') : 'sec'}`;
   }
 
   result += ' ';
-
   return result;
 };
 
-const plural = (count: number, singular: string): string => {
-  if (count < 2) {
-    return `${count} ${singular} `;
-  }
-
-  return `${count} ${singular}s `;
-};
-
+/**
+ * Simply add commas to a number by calling toLocaleString method.
+ * @param numb
+ * @returns string
+ */
 export const addCommasToNumber = (numb: number): string => {
   return numb.toLocaleString();
 };
 
+/** Parse data from an Object whose values are saved as string and convert them to their content. Example: "true" --> true */
 export const parseData = (data: IFormData): IFormData => {
   const dataEntries = Object.entries(data);
 
@@ -226,6 +298,11 @@ export const parseData = (data: IFormData): IFormData => {
   return data;
 };
 
+/**
+ * Throws a string into a switch case statement to return the hardcoded parsed version of this string. In case none of the cases matches, function will execute default parse mode, which it splits the string by it's capital letters and join all words by empty spaces.
+ * @param str
+ * @returns string
+ */
 export const formatLabel = (str: string): string => {
   switch (str) {
     case 'assetID':
@@ -356,7 +433,11 @@ export const contractOptions: IContractOption[] = [
     value: 'UpdateAccountPermissionContract',
   },
 ];
-
+/**
+ * Verifies not only if an array of strings is empty, but also if it's content is full of empty strings, in that case it will still return true as well.
+ * @param data
+ * @returns boolean
+ */
 export const isDataEmpty = (data: string[]): boolean => {
   if (data?.length === 0) {
     return true;
@@ -446,7 +527,14 @@ export const assetTriggerTypes = [
     value: 13,
   },
 ];
-
+/**
+ * Wraps the content and params of a promise and put it inside a loop. The loop will break and return if promise succeeds or it will end after the third try(or the number passed as arg). There is a timeout of 500 milliseconds between each try.
+ * @param success callback fn for promise fulfilled
+ * @param failure callback fn for promise rejection
+ * @param condition the content of the promise
+ * @param tries number of tries for the passed promise
+ * @returns Promise void
+ */
 export const asyncDoIf = async (
   success: (result?: any) => any,
   failure: (error?: any) => any,
@@ -469,6 +557,16 @@ export const asyncDoIf = async (
   failure(error);
   return;
 };
+
+/**
+ * Makes your promise race with a timeout promise. If it loses, your promise will be rejected. Default timeout is 5 seconds.
+ * @param success callback fn for promise fulfilled
+ * @param failure callback fn for promise rejection
+ * @param condition the content of the promise
+ * @param timeoutMS time limit for the timeout promise, indicates how much time your promise has until it fails.
+ * @param intervalMS time interval between your promise calls
+ * @returns Promise void
+ */
 
 export const doIf = async (
   success: () => any,
@@ -509,6 +607,11 @@ export const doIf = async (
   await Promise.race([IntervalPromise, TimeoutPromise]);
 };
 
+/**
+ * Get an asset's precision and use it as an exponent to the base 10, the result is returned. In case of error returns undefined and a toast error.
+ * @param asset
+ * @returns Promise < number | undefined >
+ */
 export const getPrecision = async (
   asset: string,
 ): Promise<number | undefined> => {
@@ -524,6 +627,11 @@ export const getPrecision = async (
   return 10 ** response.data.asset.precision;
 };
 
+/**
+ * Validates URL extension with regex. Accepted formats: gif|jpg|jpeg|tiff|png|webp
+ * @param url
+ * @returns boolean
+ */
 export const regexImgUrl = (url: string): boolean => {
   const regex = /[\/.](gif|jpg|jpeg|tiff|png|webp)$/i;
   if (regex.test(url)) {
@@ -532,6 +640,12 @@ export const regexImgUrl = (url: string): boolean => {
   return false;
 };
 
+/**
+ * Check if the header 'content-type' of a specified URL is of type 'image'. Must pass a timeout arg for this check.
+ * @param url
+ * @param timeout
+ * @returns Promise < boolean >
+ */
 export const validateImgRequestHeader = async (
   url: string,
   timeout: number,
@@ -554,6 +668,12 @@ export const validateImgRequestHeader = async (
   }
 };
 
+/**
+ * Checks if an URL can be used as an html image src. Must pass a timeout arg for this check.
+ * @param url
+ * @param timeout
+ * @returns although TS says unknown, it should return Promise < boolean >
+ */
 export const isImage = async (
   url: string,
   timeout: number,
@@ -570,6 +690,12 @@ export const isImage = async (
   return Promise.race([imgPromise, timeoutPromise]);
 };
 
+/**
+ * Compiles all URL image validators functions and use it as the definitive URL image validator function.
+ * @param url
+ * @param timeout
+ * @returns Promise < boolean >
+ */
 export const validateImgUrl = async (
   url: string,
   timeout: number,
@@ -588,6 +714,11 @@ export const validateImgUrl = async (
   return false;
 };
 
+/**
+ * Checks if the contractType is Transfer, Freeze ou Unfreeze. Otherwise returns false.
+ * @param contract
+ * @returns boolean
+ */
 export const getContractType = (contract: string): boolean => {
   if (
     contract === 'TransferContractType' ||
@@ -599,6 +730,11 @@ export const getContractType = (contract: string): boolean => {
   return false;
 };
 
+/**
+ * Receive a list of transactions and add precision field to the contracts of the transactions, unless the contract is Multi Transaction (transaction.contract.length > 1 case).
+ * @param transactions
+ * @returns ITransaction[] with precision key in contracts.
+ */
 export const addPrecisionTransactions = (
   transactions: ITransaction[],
 ): ITransaction[] => {
@@ -624,6 +760,11 @@ export const addPrecisionTransactions = (
   });
 };
 
+/**
+ * Receives an IValidatorResponse with data from all validators and parse it adding new fields: parsedAddress, rank, staked, cumulativeStaked and status.
+ * @param validators
+ * @returns IValidator[]
+ */
 export const parseValidators = (
   validators: IValidatorResponse,
 ): IValidator[] => {
@@ -663,6 +804,13 @@ export const parseValidators = (
   );
 };
 
+/**
+ *  Receives an IAccountAsset[] (which comes from an IAssetsHoldersResponse) and returns a new array of objects only with index, address, balance and rank properties.
+ * @param holders
+ * @param assetId is required to check if the holder asset is really from the correct asset.
+ * @param pagination is required because is used to calculate the rank of the asset holder.
+ * @returns IBalance[] which is the data necessary for the frontend to show the holders of an asset.
+ */
 export const parseHolders = (
   holders: IAccountAsset[] | [],
   assetId: string,

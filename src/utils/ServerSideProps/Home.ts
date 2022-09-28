@@ -26,7 +26,7 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
       currentSlot: 0,
       epochFinishSlot: 0,
       epochLoadPercent: 0,
-      remainingTime: '0 seconds',
+      remainingTime: '0 sec',
     },
     tps: '0 / 0',
     coinsData: [],

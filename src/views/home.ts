@@ -205,6 +205,12 @@ export const DataCardValue = styled.div`
     font-weight: 600;
     font-size: 1rem;
   }
+  div {
+    display: flex;
+    span {
+      margin-right: 0.45rem;
+    }
+  }
 `;
 
 export const DataCardLatest = styled.div<IVariation>`

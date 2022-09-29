@@ -117,13 +117,17 @@ const Transactions: React.FC<ITransactions> = ({
       Object.keys(router.query).length === 0 &&
       Object.keys(query).length > 0
     ) {
-      router.push({ pathname: router.pathname, query });
+      router.push({ pathname: router.pathname, query }, undefined, {
+        shallow: true,
+      });
     }
   }, [router.query]);
 
   useEffect(() => {
     //TODO? cannot use this useEffect on table since some pages names are dynamic and router needs static names for push. Needs to check this further.
-    router.push({ pathname: router.pathname, query });
+    router.push({ pathname: router.pathname, query }, undefined, {
+      shallow: true,
+    });
   }, [query]);
 
   const getContractType = useCallback((contracts: IContract[]) => {

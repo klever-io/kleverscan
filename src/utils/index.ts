@@ -615,16 +615,20 @@ export const doIf = async (
 export const getPrecision = async (
   asset: string,
 ): Promise<number | undefined> => {
-  const response = await api.get({ route: `assets/${asset}` });
+  try {
+    const response = await api.get({ route: `assets/${asset}` });
 
-  if (response.error) {
-    const messageError =
-      response.error.charAt(0).toUpperCase() + response.error.slice(1);
-    toast.error(messageError);
-    return;
+    if (response.error) {
+      const messageError =
+        response.error.charAt(0).toUpperCase() + response.error.slice(1);
+      toast.error(messageError);
+      return;
+    }
+
+    return 10 ** response.data.asset.precision;
+  } catch (error) {
+    console.error(error);
   }
-
-  return 10 ** response.data.asset.precision;
 };
 
 /**

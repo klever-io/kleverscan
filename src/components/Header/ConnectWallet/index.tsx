@@ -2,6 +2,7 @@ import Copy from '@/components/Copy';
 import IconTooltip from '@/components/IconTooltip';
 import { useExtension } from 'contexts/extension';
 import { useMobile } from 'contexts/mobile';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback } from 'react';
 import { MobileNavbarItem } from '..';
@@ -65,7 +66,11 @@ const ConnectWallet: React.FC = () => {
               ) : (
                 <>
                   {walletAddress && (
-                    <span>{parseAddress(walletAddress, 25)}</span>
+                    <Link href={`/account/${walletAddress}`}>
+                      <a>
+                        <span>{parseAddress(walletAddress, 25)}</span>
+                      </a>
+                    </Link>
                   )}
                   {!walletAddress && <span>Connect your wallet</span>}
                 </>

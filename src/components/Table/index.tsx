@@ -127,6 +127,10 @@ const Table: React.FC<ITable> = ({
     }
   }, [interval]);
 
+  useEffect(() => {
+    setItems(data);
+  }, [data]);
+
   return (
     <>
       <ContainerView>

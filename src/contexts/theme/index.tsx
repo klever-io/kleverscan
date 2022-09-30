@@ -16,24 +16,14 @@ export const ThemeContext = createContext({} as ITheme);
 export const InternalThemeProvider: React.FC = ({ children }) => {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
 
-  const setBodyColor = () => {
-    const body = document.getElementsByTagName('body')[0];
-
-    body.style.backgroundColor = isDarkTheme
-      ? darkTheme.navbar.background
-      : theme.background;
-  };
-
   useEffect(() => {
     const isDarkTheme = localStorage.getItem('isDarkTheme') === 'true';
     setIsDarkTheme(isDarkTheme);
-    setBodyColor();
   }, []);
 
   const toggleDarkTheme = () => {
     setIsDarkTheme(!isDarkTheme);
     localStorage.setItem('isDarkTheme', String(!isDarkTheme));
-    setBodyColor();
   };
 
   const values: ITheme = {

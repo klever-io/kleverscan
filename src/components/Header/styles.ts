@@ -45,6 +45,8 @@ export const Content = styled.div`
   flex-direction: row;
   align-items: center;
 
+  position: relative;
+
   gap: 0.5rem;
 
   max-width: ${props => props.theme.maxWidth};
@@ -148,7 +150,7 @@ export const DesktopContainer = styled.div`
   align-items: center;
   width: 100%;
   gap: 0.5rem;
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: none;
   }
 `;
@@ -169,7 +171,6 @@ export const IconsMenu = styled.div`
 export const MobileContainer = styled.div`
   margin-left: auto;
 
-  display: flex;
   position: relative;
   display: none;
 
@@ -198,6 +199,9 @@ export const MobileContent = styled.div<IMobileMenu>`
   background-color: ${props => props.theme.navbar.background};
 
   transition: 0.3s ease-out;
+
+  visibility: ${props => (props.opened ? 'visible' : 'hidden')};
+  opacity: ${props => (props.opened ? 1 : 0)};
 
   ul > li {
     display: flex;

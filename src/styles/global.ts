@@ -11,7 +11,7 @@ export default createGlobalStyle`
   }
   
   body {
-    background: ${theme.background} !important;
+    background: ${theme.background};
   }
 
   a, a:hover, a:focus, a:active {

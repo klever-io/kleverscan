@@ -1,5 +1,5 @@
 import { createGlobalStyle } from 'styled-components';
-import theme from './theme/index';
+import darktheme from './theme/dark';
 
 export default createGlobalStyle`
   * {
@@ -11,7 +11,7 @@ export default createGlobalStyle`
   }
   
   body {
-    background: ${theme.background} !important;
+    background: ${darktheme.navbar.background};
   }
 
   a, a:hover, a:focus, a:active {

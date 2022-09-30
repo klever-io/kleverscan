@@ -556,6 +556,8 @@ export const Main = styled.main`
 export const LayoutContainer = styled.div`
   margin: auto;
   background-color: ${props => props.theme.background};
+
+  position: relative;
 `;
 
 export const ContainerTimeFilter = styled.div`

@@ -123,7 +123,7 @@ const theme = {
   },
 
   breakpoints: {
-    mobile: '(max-width: 768px)',
+    mobile: '768px',
     tablet: '1025px',
   },
 };

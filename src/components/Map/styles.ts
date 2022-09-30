@@ -69,7 +69,7 @@ export const Row = styled.div`
 
     width: 10rem;
 
-    @media (max-width: 768px) {
+    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
       max-width: 100%;
     }
 
@@ -102,7 +102,7 @@ export const Row = styled.div`
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }

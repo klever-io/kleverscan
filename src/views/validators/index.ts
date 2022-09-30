@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const ProgressContainer = styled.div`
   display: flex;
-  min-width: 14rem;
+  min-width: 10rem;
   @media (min-width: 1600px) and (max-width: 1800px) {
     min-width: 10rem;
   }
@@ -12,7 +12,7 @@ export const ProgressContainer = styled.div`
 
   gap: 0.5rem;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
 
     span {
@@ -32,7 +32,7 @@ export const ProgressPercentage = styled.div<{ textColor: string }>`
 
 export const ProgressContent = styled.div`
   height: 1.5rem;
-  width: 10rem;
+  width: 7vw;
 
   position: relative;
 
@@ -40,7 +40,7 @@ export const ProgressContent = styled.div`
 
   border-radius: 0.25rem;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
   }
 `;

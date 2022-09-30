@@ -240,13 +240,13 @@ const secondsToHourMinSec = (input: number, t?: TFunction): string => {
   seconds = input % numSecondsInAMinute;
 
   if (hours > 0) {
-    result = `${hours} ${t ? t('Date.Time.h') : 'h'} `;
+    result = `${hours}h`;
   }
   if (minutes > 0) {
-    result += `${minutes} ${t ? t('Date.Time.min') : 'min'} `;
+    result += ` ${minutes}m`;
   }
   if (seconds > 0) {
-    result += `${seconds} ${t ? t('Date.Time.sec') : 'sec'}`;
+    result += ` ${seconds}s`;
   }
 
   result += ' ';

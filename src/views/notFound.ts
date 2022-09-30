@@ -12,7 +12,7 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 0 3rem;
     align-items: center;
 
@@ -40,7 +40,7 @@ export const Content = styled.div`
     font-weight: 400;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     margin-bottom: 1rem;
 
     align-items: center;
@@ -68,7 +68,7 @@ export const ButtonContainer = styled.div`
     text-decoration: none;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
 
     flex-direction: column;
@@ -105,7 +105,7 @@ export const Button = styled.div<{ hasBackground: boolean }>`
     ${props => (props.hasBackground ? hoverBackground : hoverNoBackground)};
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
 
     text-align: center;
@@ -120,7 +120,7 @@ export const Background = styled(DefaultBackground)`
 
   transform: translate(-30%, -50%);
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: none;
   }
 `;
@@ -134,7 +134,7 @@ export const Number = styled.div`
 
     text-shadow: 0px 4px 0px rgba(0, 0, 0, 0.25);
 
-    @media (max-width: 768px) {
+    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
       font-size: 7rem;
     }
   }

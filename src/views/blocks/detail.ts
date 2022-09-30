@@ -6,7 +6,7 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 3rem 1rem 5rem 1rem;
   }
 `;
@@ -18,7 +18,7 @@ export const Header = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -77,7 +77,7 @@ export const AssetTitle = styled.div`
     border-radius: 1rem;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -144,7 +144,7 @@ export const Row = styled.div`
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
   }
-  @media (max-width: 480px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -176,7 +176,7 @@ export const CenteredRow = styled.div`
   align-items: center;
   gap: 0.5rem;
 
-  @media (max-width: 480px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
   }
 

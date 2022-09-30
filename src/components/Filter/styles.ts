@@ -93,7 +93,7 @@ export const Content = styled.div<{ open: boolean }>`
     transform: rotate(${props => (props.open ? 0 : 180)}deg);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
   }
 `;

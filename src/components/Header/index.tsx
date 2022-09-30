@@ -25,6 +25,7 @@ import {
   MobileItem,
   MobileNavbarItemList,
   MobileOptions,
+  NavBarOptionsContainer,
 } from './styles';
 
 interface IDropdownPages {
@@ -179,8 +180,10 @@ const Navbar: React.FC = () => {
                 <NavbarItem key={String(index)} {...item} />
               ))}
             </IconsMenu>
-            <ConnectWallet />
-            <OptionsContainer />
+            <NavBarOptionsContainer>
+              <ConnectWallet />
+              <OptionsContainer />
+            </NavBarOptionsContainer>
           </DesktopContainer>
 
           <MobileContainer>

@@ -55,7 +55,7 @@ export const fadeInContainerMobile = keyframes`
 export const Container = styled.div`
   display: block;
   position: relative;
-  @media (max-width: 1025px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
   }
 `;
@@ -142,7 +142,7 @@ export const CalendarContainer = styled.div`
     animation: ${fadeInContainer} 0.2s linear;
   }
 
-  @media (max-width: 1025px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     left: 7rem;
     animation: ${fadeInContainerMobile} 0.2s linear forwards;
   }

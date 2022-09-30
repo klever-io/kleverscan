@@ -6,7 +6,7 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 3rem 1rem 5rem 1rem;
   }
 `;
@@ -20,7 +20,7 @@ export const Header = styled.section`
   justify-content: space-between;
   align-items: center;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -81,7 +81,7 @@ export const CardContainer = styled.section`
   font-size: 14px;
   line-height: 24px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
   }
 `;

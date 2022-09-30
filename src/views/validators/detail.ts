@@ -10,7 +10,7 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 3rem 1rem 5rem 1rem;
   }
 `;
@@ -22,7 +22,7 @@ export const Header = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -89,7 +89,7 @@ export const ValidatorTitle = styled.div`
     border-radius: 1rem;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -150,7 +150,7 @@ export const Row = styled.div`
       width: 10rem;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
       max-width: 100%;
     }
 
@@ -184,7 +184,7 @@ export const Row = styled.div`
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -211,7 +211,7 @@ export const CenteredRow = styled.div`
   span {
     width: 33rem !important;
 
-    @media (max-width: 768px) {
+    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
       max-width: 80% !important;
     }
   }
@@ -226,7 +226,7 @@ export const CenteredRow = styled.div`
     font-weight: 600;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
   }
 `;

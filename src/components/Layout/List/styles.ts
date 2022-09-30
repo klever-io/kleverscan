@@ -4,11 +4,11 @@ import styled from 'styled-components';
 export const Container = styled.div`
   padding: 5rem 17rem;
 
-  @media (max-width: 1500px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 5rem 7rem;
   }
 
-  @media (max-width: 1200px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 5rem 3rem;
   }
 `;
@@ -35,7 +35,7 @@ export const HeaderContainer = styled.div`
     }
   }
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column-reverse;
   }
 `;

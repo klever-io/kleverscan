@@ -414,16 +414,20 @@ const Transactions: React.FC<ITransactions> = ({
       <Title title="Transactions" Icon={Icon} />
 
       <Header>
-        <FilterContainer>
-          {filters.map((filter, index) => (
-            <Filter key={String(index)} {...filter} />
-          ))}
-        </FilterContainer>
+        <div>
+          <FilterContainer>
+            {filters.map((filter, index) => (
+              <Filter key={String(index)} {...filter} />
+            ))}
+          </FilterContainer>
 
-        <FilterByDate>
-          <DateFilter {...dateFilterProps} />
-        </FilterByDate>
-        <Input />
+          <FilterByDate>
+            <DateFilter {...dateFilterProps} />
+          </FilterByDate>
+        </div>
+        <div>
+          <Input />
+        </div>
       </Header>
       <Table {...tableProps} />
     </Container>

@@ -6,7 +6,7 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 3rem 1rem 5rem 1rem;
   }
 `;
@@ -18,7 +18,7 @@ export const Header = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -103,7 +103,7 @@ export const Row = styled.div`
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -140,7 +140,7 @@ export const CenteredRow = styled.div`
     cursor: pointer;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
   }
 `;
@@ -233,7 +233,7 @@ export const HalfRow = styled.div`
   overflow: hidden;
   align-items: center;
   width: 50%;
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 0.1rem;
     width: 100%;
   }

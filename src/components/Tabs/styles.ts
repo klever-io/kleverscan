@@ -15,7 +15,7 @@ export const TabContainer = styled.div`
   align-items: center;
 
   gap: 1.5rem;
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: grid;
   }
 `;
@@ -24,7 +24,7 @@ export const TabContent = styled.div`
   display: flex;
   margin: 2rem 0;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: flex;
     margin: 2rem 1rem;
   }
@@ -46,7 +46,7 @@ export const ItemContainer = styled.div<{ selected: boolean }>`
 
     transition: 0.2s ease;
   }
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: flex;
   }
 `;
@@ -90,7 +90,7 @@ export const FilterContent = styled.div`
       }
     }
   }
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: grid;
   }
 `;

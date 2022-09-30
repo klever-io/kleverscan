@@ -30,7 +30,7 @@ const ConnectWallet: React.FC = () => {
 
   const getCreateTransactionButton = useCallback(() => {
     if (extensionInstalled && walletAddress && typeof window !== 'undefined') {
-      if (window.innerWidth < 1025) {
+      if (window.innerWidth < 768) {
         const createTransactionProps = {
           name: 'Create Transaction',
           pathTo: '/create-transaction',
@@ -38,7 +38,7 @@ const ConnectWallet: React.FC = () => {
           onClick: handleMenu,
         };
         return <MobileNavbarItem {...createTransactionProps} />;
-      } else if (window.innerWidth >= 1025) {
+      } else if (window.innerWidth >= 768) {
         const handleNavigate = () => {
           router.push('/create-transaction');
         };

@@ -6,7 +6,7 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 3rem 1rem 5rem 1rem;
   }
 `;
@@ -18,7 +18,7 @@ export const Header = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -59,6 +59,10 @@ export const Input = styled(DefaultInput)`
 
   input {
     min-width: 12rem;
+  }
+
+  @media (max-width: 1204px) {
+    flex: 1;
   }
 `;
 
@@ -104,7 +108,7 @@ export const Row = styled.div`
   }
 
   span {
-    @media (max-width: 768px) {
+    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
       max-width: 100%;
     }
 
@@ -177,7 +181,7 @@ export const Row = styled.div`
     transition: max-height 0.2s ease-out;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }

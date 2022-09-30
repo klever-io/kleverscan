@@ -7,14 +7,15 @@ export const Container = styled.footer`
 export const Content = styled.div`
   max-width: ${props => props.theme.maxWidth};
   margin: 0 auto;
-  padding: 5rem 10rem;
+  padding: 5rem 2rem;
+  justify-content: center;
 
   display: flex;
 
   flex-direction: row;
   gap: 5rem;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 5rem 3rem;
 
     flex-direction: column;
@@ -35,7 +36,7 @@ export const DescriptionContainer = styled.div`
     color: white;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     align-items: center;
 
     span {
@@ -94,7 +95,7 @@ export const LinksContainer = styled.div`
   flex-direction: column;
   flex: 0 0 20%;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     align-items: center;
   }
 `;

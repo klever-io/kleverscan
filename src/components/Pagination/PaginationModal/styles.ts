@@ -96,11 +96,11 @@ export const PaginationModalContainer = styled.div.attrs(
     animation: ${fadeInContainer} 0.2s linear;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     left: ${props => (props.modalLeft ? '4.5rem' : '-3rem')};
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     animation: ${fadeInContainerMobile} 0.2s linear forwards;
   }
 `;

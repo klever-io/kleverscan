@@ -77,9 +77,15 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
 
   useEffect(() => {
     if (filterToken === 'All') {
-      router.push({ pathname: router.pathname, query: '' });
+      router.push({ pathname: router.pathname, query: '' }, undefined, {
+        shallow: true,
+      });
     } else {
-      router.push({ pathname: router.pathname, query: `asset=${filterToken}` });
+      router.push(
+        { pathname: router.pathname, query: `asset=${filterToken}` },
+        undefined,
+        { shallow: true },
+      );
     }
   }, [filterToken]);
 

@@ -7,7 +7,7 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 3rem 1rem 5rem 1rem;
   }
 `;
@@ -19,7 +19,7 @@ export const Header = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -53,7 +53,7 @@ export const VerifiedContainer = styled(Certified)`
     transform: translate(-150%, -60%);
   }
 
-  @media (max-width: 361px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     transform: translate(-150%, -60%);
   }
 `;
@@ -93,7 +93,7 @@ export const AssetTitle = styled.div`
     border-radius: 1rem;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }

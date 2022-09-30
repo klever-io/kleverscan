@@ -122,5 +122,10 @@ const darktheme = {
   dateFilter: {
     outsideBackground: 'rgba(198, 199, 235, 0.2)',
   },
+
+  breakpoints: {
+    mobile: '768px',
+    tablet: '1025px',
+  },
 };
 export default darktheme;

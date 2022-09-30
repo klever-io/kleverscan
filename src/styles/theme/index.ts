@@ -121,6 +121,11 @@ const theme = {
   dateFilter: {
     outsideBackground: 'rgba(198, 199, 235, 0.2)',
   },
+
+  breakpoints: {
+    mobile: '(max-width: 768px)',
+    tablet: '1025px',
+  },
 };
 
 export default theme;

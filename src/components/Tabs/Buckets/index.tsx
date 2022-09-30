@@ -4,7 +4,7 @@ import api from '@/services/api';
 import { IAccountAsset, IAsset, IBucket } from '@/types/index';
 import { parseAddress } from '@/utils/index';
 import { CenteredRow, RowContent } from '@/views/accounts/detail';
-import { useWidth } from 'contexts/width';
+import { useMobile } from 'contexts/mobile';
 import Link from 'next/link';
 import React, { useRef } from 'react';
 import { Status } from './styles';
@@ -56,7 +56,7 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
       ];
     }
   });
-  const { isMobile } = useWidth();
+  const { isMobile } = useMobile();
 
   const rowSections = (assetBucket: IAssetsBuckets): JSX.Element[] => {
     const { asset, bucket } = assetBucket;

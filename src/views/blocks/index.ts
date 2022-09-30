@@ -6,7 +6,7 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 3rem 1rem 5rem 1rem;
   }
 `;
@@ -18,7 +18,7 @@ export const Header = styled.section`
   justify-content: space-between;
   align-items: center;
 
-  @media (max-width: 870px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -33,7 +33,7 @@ export const Input = styled(DefaultInput)`
 
   border-color: ${props => props.theme.lightGray};
 
-  @media (max-width: 870px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
   }
 `;
@@ -47,7 +47,7 @@ export const CardContainer = styled.section`
 
   gap: 0.75rem;
 
-  @media (max-width: 870px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
   }
 `;

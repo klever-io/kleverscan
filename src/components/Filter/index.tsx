@@ -32,6 +32,7 @@ const Filter: React.FC<IFilter> = ({
   const allItem = 'All';
   const [selected, setSelected] = useState(current || allItem);
   const [open, setOpen] = useState(true);
+  const [dontBlur, setDontBlur] = useState(false);
   const [focus, setFocus] = useState(false);
   const [arrowOpen, setArrowOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -47,9 +48,8 @@ const Filter: React.FC<IFilter> = ({
         setFocus(true);
         setArrowOpen(true);
       });
-      if (title !== 'Status') {
-        focusRef.current.focus();
-      }
+
+      focusRef.current.focus();
     }
   };
 
@@ -79,9 +79,8 @@ const Filter: React.FC<IFilter> = ({
       }
       setSelected(item);
       openDropdown();
-      if (title !== 'Status') {
-        setFocus(true);
-      }
+
+      setFocus(true);
     };
     return (
       <Item onClick={handleClick} selected={item === selected}>
@@ -123,7 +122,7 @@ const Filter: React.FC<IFilter> = ({
   const contentProps = {
     ref: contentRef,
     open,
-    onClick: title !== 'Status' ? () => openDropdown() : () => arrowOnClick(),
+    onClick: () => openDropdown(),
   };
 
   const selectorProps = {
@@ -131,14 +130,20 @@ const Filter: React.FC<IFilter> = ({
     open,
     onClick: () => closeDropDown(),
   };
+
   return (
     <Container>
       <span>{title}</span>
-      <Content {...contentProps}>
-        {focus && title !== 'Status' && (
+      <Content
+        onMouseEnter={() => setDontBlur(true)}
+        onMouseLeave={() => setDontBlur(false)}
+        {...contentProps}
+      >
+        {focus && (
           <HiddenInput
+            onBlur={() => !dontBlur && closeDropDown()}
             value={inputValue}
-            type="text"
+            type={title !== 'Status' ? 'text' : 'button'}
             ref={focusRef}
             show={focus}
             onChange={handleChange}

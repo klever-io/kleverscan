@@ -44,7 +44,7 @@ const transactions = css`
 
 const blocks = css`
   margin-right: 1.25rem;
-  @media (max-width: 1000px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     margin-right: 0.4rem;
   }
 
@@ -270,7 +270,7 @@ const validator = css`
     margin-right: 0;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     &:nth-child(1) {
       width: 12rem;
       max-width: 7rem;

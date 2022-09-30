@@ -64,11 +64,11 @@ export const Body = styled.div<ITableType>`
   flex-direction: column;
   gap: 0.75rem;
 
-  @media (max-width: 1300px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: ${props => (props.haveData ? 'fit-content' : 'initial')};
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     min-width: 100%;
   }
 `;

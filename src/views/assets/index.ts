@@ -7,11 +7,11 @@ export const Container = styled.div`
   padding: 3rem 10rem 5rem 10rem;
 
   background-color: ${props => props.theme.background};
-  @media (max-width: 1600px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding-left: 5rem;
     padding-right: 5rem;
   }
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 1rem 1rem 2rem 1rem;
   }
 `;
@@ -25,7 +25,7 @@ export const Header = styled.section`
   justify-content: space-between;
   align-items: center;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }

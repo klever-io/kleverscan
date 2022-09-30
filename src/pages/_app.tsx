@@ -1,5 +1,6 @@
+import { ExtensionProvider } from 'contexts/extension';
+import { MobileProvider } from 'contexts/mobile';
 import { InternalThemeProvider } from 'contexts/theme';
-import { WidthProvider } from 'contexts/width';
 import { appWithTranslation, SSRConfig } from 'next-i18next';
 import type { AppProps as NextJsAppProps } from 'next/app';
 import React from 'react';
@@ -27,14 +28,16 @@ declare type AppProps = NextJsAppProps & {
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   const children = (
     <InternalThemeProvider>
-      <WidthProvider>
-        <ToastContainer />
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-        <GlobalStyle />
-        <NProgress />
-      </WidthProvider>
+      <MobileProvider>
+        <ExtensionProvider>
+          <ToastContainer />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+          <GlobalStyle />
+          <NProgress />
+        </ExtensionProvider>
+      </MobileProvider>
     </InternalThemeProvider>
   );
 

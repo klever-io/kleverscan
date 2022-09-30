@@ -8,6 +8,7 @@ export const TooltipContainer = styled.div<{ tooltip: string }>`
   position: relative;
   font-size: 0.9rem;
   margin-left: 0.8rem;
+  margin-top: 0.4rem;
 
   &:hover {
     svg {

@@ -8,7 +8,7 @@ import { formatAmount, getAge, parseAddress } from '@/utils/index';
 import { TableContainer } from '@/views/accounts';
 import { CenteredRow } from '@/views/accounts/detail';
 import { Card, CardContainer, Container, Header, Input } from '@/views/blocks';
-import { useWidth } from 'contexts/width';
+import { useMobile } from 'contexts/mobile';
 import { fromUnixTime } from 'date-fns';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
@@ -112,7 +112,7 @@ const Accounts: React.FC<IAccounts> = ({
 
   const header = ['Address', 'KLV Staked', 'Nonce', 'KLV Balance'];
 
-  const { isMobile } = useWidth();
+  const { isMobile } = useMobile();
 
   const rowSections = (account: IAccount): JSX.Element[] => {
     const { address, balance, frozenBalance, nonce } = account;

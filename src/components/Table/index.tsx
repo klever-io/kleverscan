@@ -1,6 +1,6 @@
 import { Query } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
-import { useWidth } from 'contexts/width';
+import { useMobile } from 'contexts/mobile';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import Pagination from '../Pagination';
@@ -70,7 +70,7 @@ const Table: React.FC<ITable> = ({
 }) => {
   const { pathname } = useRouter();
   const props: ITableType = { type, pathname, haveData: data?.length };
-  const { isMobile } = useWidth();
+  const { isMobile } = useMobile();
 
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -126,6 +126,10 @@ const Table: React.FC<ITable> = ({
       return () => clearInterval(intervalId);
     }
   }, [interval]);
+
+  useEffect(() => {
+    setItems(data);
+  }, [data]);
 
   return (
     <>

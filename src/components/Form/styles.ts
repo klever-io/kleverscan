@@ -108,7 +108,7 @@ export const ButtonContainer = styled.button<IButton>`
 
   user-select: none;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 45%;
   }
 

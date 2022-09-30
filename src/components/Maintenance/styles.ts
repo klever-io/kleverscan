@@ -16,7 +16,7 @@ export const Container = styled.div`
     font-weight: bold;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     svg {
       font-size: 2rem;
     }

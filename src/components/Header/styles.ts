@@ -22,12 +22,21 @@ export const Container = styled.div`
 
   transition: top 0.1s linear;
 
-  @media (max-width: 425px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 1rem 2.5rem;
 
     overflow: hidden;
 
     justify-content: space-between;
+  }
+`;
+
+export const NavBarOptionsContainer = styled.div`
+  display: flex;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
   }
 `;
 
@@ -125,7 +134,7 @@ export const Input = styled(DefaultInput)`
   width: 25%;
   border-color: ${props => props.theme.darkText};
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: none;
   }
 `;
@@ -134,12 +143,12 @@ export const DesktopContainer = styled.div`
   display: flex;
 
   flex-direction: row;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   width: 100%;
   gap: 0.5rem;
-
-  @media (max-width: 1024px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: none;
   }
 `;
@@ -152,7 +161,7 @@ export const IconsMenu = styled.div`
 
   gap: 1.5rem;
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: none;
   }
 `;
@@ -162,9 +171,10 @@ export const MobileContainer = styled.div`
 
   display: flex;
   position: relative;
+  display: none;
 
-  @media (min-width: 1025px) {
-    display: none;
+  @media (max-width: 768px) {
+    display: flex;
   }
 `;
 
@@ -251,7 +261,7 @@ export const DropdownContainer = styled.div`
   display: none;
   position: absolute;
   bottom: 0;
-  left: 0;
+  right: 0.4vw;
 
   animation: ${expand} 0.2s ease;
 
@@ -261,7 +271,7 @@ export const DropdownContainer = styled.div`
 
   transform: translateY(100%);
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     left: 0.4rem;
   }
 `;
@@ -287,7 +297,7 @@ export const DropdownItem = styled.li<{ disabled: boolean }>`
   }
   cursor: ${props => (props.disabled ? 'default' : 'pointer')};
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     span {
       margin: 0 0.4rem 0 0;
     }
@@ -301,7 +311,7 @@ export const DropdownMenu = styled.ul`
   border-radius: 10px;
   gap: 0.5rem;
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     background-color: ${props => transparentize(0.7, props.theme.black)};
   }
 `;

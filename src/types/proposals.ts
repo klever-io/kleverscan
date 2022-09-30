@@ -35,6 +35,7 @@ export interface IParsedProposal extends IProposal {
   parsedParameters: IFullInfoParam[];
   votingPowers?: IVotingPowers;
   currentNetworkParams: INetworkParams;
+  pagination: IPagination;
 }
 
 export interface IAPINetworkParams {

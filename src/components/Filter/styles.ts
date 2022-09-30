@@ -93,7 +93,7 @@ export const Content = styled.div<{ open: boolean }>`
     transform: rotate(${props => (props.open ? 0 : 180)}deg);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
   }
 `;
@@ -175,7 +175,7 @@ export const Item = styled.div<{ selected: boolean }>`
 
 export const HiddenInput = styled.input<{ show: boolean }>`
   width: 100%;
-  display: ${props => (props.show ? 'inline-block' : 'none')};
+  visibility: ${props => (props.show ? 'visible' : 'hidden')};
   caret-color: ${props => props.theme.black};
   color: ${props => props.theme.black};
 `;

@@ -460,7 +460,7 @@ export interface ITransaction {
   resultCode: string;
   contract: IContract[];
   receipts: IReceipt[];
-  precision: number;
+  precision?: number;
 }
 
 interface ItotalLeaderSuccessRate {
@@ -662,7 +662,7 @@ export interface IDelegationsResponse {
 }
 export interface IValidator {
   ownerAddress: string;
-  name: string | undefined;
+  name?: string;
   parsedAddress: string;
   rank: number;
   staked: number;

@@ -18,7 +18,7 @@ export const Container = styled.div`
   align-items: center;
 
   gap: 0.5rem;
-  @media (max-width: 400px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     gap: 0;
   }
 `;
@@ -48,7 +48,7 @@ export const ItemContainer = styled.div<{
   height: 2rem;
   width: 2rem;
 
-  @media (max-width: 400px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     font-size: smaller;
   }
 

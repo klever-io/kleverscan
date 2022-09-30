@@ -44,7 +44,7 @@ import {
   Header,
 } from '@/views/transactions';
 import { Input } from '@/views/transactions/detail';
-import { useWidth } from 'contexts/width';
+import { useMobile } from 'contexts/mobile';
 import { format, fromUnixTime } from 'date-fns';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
@@ -89,7 +89,7 @@ const Transactions: React.FC<ITransactions> = ({
 }) => {
   const router = useRouter();
   const precision = 6; // default KLV precision
-  const { isMobile } = useWidth();
+  const { isMobile } = useMobile();
   const columnSpans = [
     2, 1, 1, 1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   ];
@@ -117,13 +117,17 @@ const Transactions: React.FC<ITransactions> = ({
       Object.keys(router.query).length === 0 &&
       Object.keys(query).length > 0
     ) {
-      router.push({ pathname: router.pathname, query });
+      router.push({ pathname: router.pathname, query }, undefined, {
+        shallow: true,
+      });
     }
   }, [router.query]);
 
   useEffect(() => {
     //TODO? cannot use this useEffect on table since some pages names are dynamic and router needs static names for push. Needs to check this further.
-    router.push({ pathname: router.pathname, query });
+    router.push({ pathname: router.pathname, query }, undefined, {
+      shallow: true,
+    });
   }, [query]);
 
   const getContractType = useCallback((contracts: IContract[]) => {
@@ -410,16 +414,20 @@ const Transactions: React.FC<ITransactions> = ({
       <Title title="Transactions" Icon={Icon} />
 
       <Header>
-        <FilterContainer>
-          {filters.map((filter, index) => (
-            <Filter key={String(index)} {...filter} />
-          ))}
-        </FilterContainer>
+        <div>
+          <FilterContainer>
+            {filters.map((filter, index) => (
+              <Filter key={String(index)} {...filter} />
+            ))}
+          </FilterContainer>
 
-        <FilterByDate>
-          <DateFilter {...dateFilterProps} />
-        </FilterByDate>
-        <Input />
+          <FilterByDate>
+            <DateFilter {...dateFilterProps} />
+          </FilterByDate>
+        </div>
+        <div>
+          <Input />
+        </div>
       </Header>
       <Table {...tableProps} />
     </Container>

@@ -5,7 +5,7 @@ import { CustomLink } from '@/components/Table/styles';
 import api from '@/services/api';
 import { INfts, IPagination, IResponse } from '@/types/index';
 import { parseAddress } from '@/utils/index';
-import { useWidth } from 'contexts/width';
+import { useMobile } from 'contexts/mobile';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import React from 'react';
@@ -38,7 +38,7 @@ const Validators: React.FC<ICollectionPage> = ({
       route: `address/${address}/collection/${collectionAsset}?page=${page}`,
     });
 
-  const { isMobile } = useWidth();
+  const { isMobile } = useMobile();
 
   const rowSections = (nft: INfts): JSX.Element[] => {
     const {

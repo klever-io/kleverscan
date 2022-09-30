@@ -3,15 +3,15 @@ import Link from 'next/link';
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  padding: 3rem 10rem 5rem 10rem;
+  padding: 3rem 5rem 5rem 5rem;
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: 1600px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding-left: 5rem;
     padding-right: 5rem;
   }
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 3rem 1rem 5rem 1rem;
   }
 `;
@@ -38,13 +38,22 @@ export const Header = styled.section`
   margin: 1.5rem 0;
 
   display: flex;
+  flex-wrap: wrap;
 
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-end;
 
-  @media (max-width: 1200px) {
+  div {
+    display: flex;
+  }
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
+    div {
+      width: 100%;
+      flex-direction: column;
+    }
   }
 `;
 
@@ -59,7 +68,7 @@ export const FilterContainer = styled.div`
     min-width: 15rem;
   }
 
-  @media (max-width: 1200px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
 
     flex-direction: column;
@@ -67,15 +76,16 @@ export const FilterContainer = styled.div`
 `;
 
 export const FilterByDate = styled.div`
-  width: 100%;
+  width: fit-content;
   display: flex;
   justify-content: flex-start;
   align-items: center;
   flex-direction: row;
   margin-top: 1.7rem;
   margin-left: 0.8rem;
+  margin-right: 0.8rem;
 
-  @media (max-width: 1200px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     justify-content: center;
     margin-left: 0;
   }

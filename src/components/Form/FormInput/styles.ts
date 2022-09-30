@@ -229,7 +229,7 @@ export const TooltipContent = styled.div`
     white-space: pre;
   }
 
-  @media (max-width: 950px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: auto;
     min-width: 18rem;
   }

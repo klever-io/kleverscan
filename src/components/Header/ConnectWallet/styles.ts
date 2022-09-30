@@ -27,7 +27,7 @@ export const ConnectButton = styled.div`
     cursor: pointer;
   }
 
-  @media screen and (min-width: 1025px) {
+  @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
     width: 14rem;
     &:hover > div {
       display: flex;
@@ -47,17 +47,18 @@ export const ConnectContainer = styled.div`
   align-items: center;
   user-select: none;
 
-  gap: 0.5rem;
-
-  margin-left: auto;
   padding-right: 0.5rem;
+  justify-content: flex-start;
+  align-items: flex-start;
 
   @media screen and (max-width: 1025px) {
+    margin-left: 0;
     margin-top: auto;
+  }
 
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column-reverse;
     align-items: flex-end;
-
     gap: 1.5rem;
   }
 `;
@@ -78,7 +79,7 @@ export const LogoutContainer = styled.div`
     }
   }
 
-  @media screen and (min-width: 1025px) {
+  @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
     &:hover {
       &::before {
         content: '';
@@ -126,7 +127,7 @@ export const CopyContainer = styled.div`
     }
   }
 
-  @media screen and (min-width: 1025px) {
+  @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
     &:hover {
       &::before {
         content: '';
@@ -162,7 +163,7 @@ export const MenuTransaction = styled.ul`
   gap: 0.5rem;
   margin-top: 0.3rem;
 
-  @media (max-width: 1024px) {
+  @media ${props => props.theme.breakpoints.mobile} {
     background-color: ${props => transparentize(0.7, props.theme.black)};
   }
 `;

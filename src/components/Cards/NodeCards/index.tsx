@@ -57,7 +57,6 @@ const NodeCards: React.FC<IProps> = ({ cardData }) => {
           </Card>
         );
       })}
-      <Card style={{ backgroundColor: 'transparent' }} />
     </CardContainer>
   );
 };

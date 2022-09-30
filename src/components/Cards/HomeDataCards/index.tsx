@@ -1,5 +1,6 @@
 import { Accounts, Epoch, TPS, Transactions } from '@/assets/cards';
 import CoinCard from '@/components/Cards/CoinCard';
+import Tooltip from '@/components/Tooltip';
 import api from '@/services/api';
 import { Service } from '@/types/index';
 import { getEpochInfo } from '@/utils/index';
@@ -268,7 +269,14 @@ const HomeDataCards: React.FC<IDataCards> = ({
                 <Icon viewBox="0 0 70 70" />
               </IconContainer>
               <DataCardValue>
-                <span>{title}</span>
+                <div>
+                  <span>{title}</span>
+                  {index === 0 && (
+                    <span style={{ marginTop: '-0.25rem' }}>
+                      <Tooltip msg="Transactions per slot" />
+                    </span>
+                  )}
+                </div>
                 <p>{value?.toLocaleString()}</p>
               </DataCardValue>
               {progress >= 0 && (

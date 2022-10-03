@@ -42,7 +42,7 @@ import {
 import { ReceiveBackground } from '@/views/validator';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 interface IAssetPage {
   asset: IAsset;
@@ -453,8 +453,8 @@ const Asset: React.FC<IAssetPage> = ({
     }
   }, [verified]);
 
-  return (
-    <Container>
+  const getHeader = useMemo(() => {
+    return (
       <Header>
         <Title
           Component={() => (
@@ -480,7 +480,12 @@ const Asset: React.FC<IAssetPage> = ({
 
         <Input />
       </Header>
+    );
+  }, [assetId, assetType, isVerified, logo, name, ticker]);
 
+  return (
+    <Container>
+      {getHeader}
       <CardContainer>
         <CardHeader>
           {cardHeaders.map((header, index) => (

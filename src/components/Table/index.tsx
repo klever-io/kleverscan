@@ -71,13 +71,18 @@ const Table: React.FC<ITable> = ({
   const { pathname } = useRouter();
   const props: ITableType = { type, pathname, haveData: data?.length };
   const { isMobile } = useMobile();
-
+  const [isTablet, setIsTablet] = useState(false);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(defaultTotalPages);
   const [items, setItems] = useState(data);
   const dataRef = useRef([]) as any;
   const router = useRouter();
+
+  useEffect(() => {
+    const tabletWindow = window.innerWidth <= 1025 && window.innerWidth >= 769;
+    setIsTablet(tabletWindow);
+  });
 
   const fetchData = async () => {
     if (!interval && request && dataName) {
@@ -135,7 +140,7 @@ const Table: React.FC<ITable> = ({
     <>
       <ContainerView>
         <Container>
-          {(!isMobile || !rowSections) && !!items?.length && (
+          {((!isMobile && !isTablet) || !rowSections) && !!items?.length && (
             <Header {...props}>
               {header.map((item, index) => (
                 <span key={String(index)}>{item}</span>
@@ -169,9 +174,9 @@ const Table: React.FC<ITable> = ({
                           key={String(index2) + String(index)}
                           columnSpan={columnSpans?.[index2]}
                         >
-                          {isMobile && (
+                          {isMobile || isTablet ? (
                             <MobileHeader>{header[index2]}</MobileHeader>
-                          )}
+                          ) : null}
                           {Section}
                         </MobileCardItem>
                       ))}

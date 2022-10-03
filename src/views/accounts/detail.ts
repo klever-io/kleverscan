@@ -1,15 +1,7 @@
 import { default as DefaultInput } from '@/components/Inputt';
 import styled from 'styled-components';
 
-export const Container = styled.div`
-  padding: 3rem 8rem 5rem 8rem;
-
-  background-color: ${props => props.theme.background};
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding: 3rem 1rem 5rem 1rem;
-  }
-`;
+export const Container = styled.div``;
 
 export const Header = styled.div`
   display: flex;

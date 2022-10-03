@@ -3,18 +3,7 @@ import { ITableType } from '@/components/Table/styles';
 import widths from '@/components/Table/widths';
 import styled, { css } from 'styled-components';
 
-export const Container = styled.div`
-  padding: 3rem 10rem 5rem 10rem;
-
-  background-color: ${props => props.theme.background};
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding-left: 5rem;
-    padding-right: 5rem;
-  }
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding: 1rem 1rem 2rem 1rem;
-  }
-`;
+export const Container = styled.div``;
 
 export const Header = styled.section`
   margin-bottom: 1rem;

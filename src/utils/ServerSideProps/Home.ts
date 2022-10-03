@@ -454,12 +454,13 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
               const data = value.Exchanges.find(
                 (exchange: any) => exchange.ExchangeName === 'Klever',
               );
-              props.assetsData.kfi.volume = data.Volume;
-              props.assetsData.kfi.prices.todaysPrice = data.Price;
-              props.assetsData.kfi.prices.variation = data.PriceVariation;
+              props.assetsData.kfi.volume = data.Volume ?? null;
+              props.assetsData.kfi.prices.todaysPrice = data.Price ?? null;
+              props.assetsData.kfi.prices.variation =
+                data.PriceVariation ?? null;
               if (data.Price && data.PriceVariation) {
                 props.assetsData.kfi.prices.yesterdayPrice =
-                  data.Price - data.PriceVariation;
+                  data.Price - data.PriceVariation ?? null;
               }
             }
 

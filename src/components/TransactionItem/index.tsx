@@ -7,9 +7,9 @@ import {
 import { format, fromUnixTime } from 'date-fns';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Contract, ITransaction, ITransferContract } from '../../types';
-import { getContractType, parseAddress, toLocaleFixed } from '../../utils';
+import { getContractType, getPrecision, parseAddress } from '../../utils';
 
 const TransactionItem: React.FC<ITransaction> = ({
   hash,
@@ -19,23 +19,28 @@ const TransactionItem: React.FC<ITransaction> = ({
   status,
 }) => {
   let parameter: ITransferContract = {} as ITransferContract;
-  let amount = 0;
-  let precision = 6;
+  const [amount, setAmount] = useState(0);
+  const [assetId, setAssetId] = useState('');
+
   const StatusIcon = getStatusIcon(status);
 
   const { t } = useTranslation('transactions');
 
-  if (contract) {
-    const contractPosition = 0;
-    parameter = contract[contractPosition].parameter as ITransferContract;
+  useEffect(() => {
+    const getParams = async () => {
+      if (contract) {
+        const contractPosition = 0;
+        parameter = contract[contractPosition].parameter as ITransferContract;
 
-    if (parameter?.amount) {
-      amount = parameter.amount;
-    }
-    if (parameter && parameter?.precision) {
-      precision = parameter.precision;
-    }
-  }
+        if (parameter?.amount && parameter?.assetId) {
+          const precision = (await getPrecision(parameter.assetId)) ?? 6;
+          setAmount(parameter.amount / 10 ** precision);
+          setAssetId(parameter.assetId);
+        }
+      }
+    };
+    getParams();
+  }, []);
 
   const shouldRenderAssetId = () => {
     const contractType = Object.values(Contract)[contract[0].type];
@@ -46,10 +51,9 @@ const TransactionItem: React.FC<ITransaction> = ({
     }
     if (contract.length === 1 && checkContract) {
       return (
-        <Link href={`/asset/${parameter.assetId || 'KLV'}`}>
+        <Link href={`/asset/${assetId || 'KLV'}`}>
           <a className="clean-style">
-            {toLocaleFixed(amount / 10 ** precision, precision)}{' '}
-            {parameter?.assetId || 'KLV'}
+            {amount} {assetId || 'KLV'}
           </a>
         </Link>
       );

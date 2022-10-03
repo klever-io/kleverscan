@@ -617,7 +617,7 @@ export const getPrecision = async (
   asset: string,
 ): Promise<number | undefined> => {
   try {
-    const response = await api.get({ route: `assets/${asset}` });
+    const response = await api.getCached({ route: `assets/${asset}` });
 
     if (response.error) {
       const messageError =
@@ -626,7 +626,7 @@ export const getPrecision = async (
       return;
     }
 
-    return 10 ** response.data.asset.precision;
+    return response.data.asset.precision;
   } catch (error) {
     console.error(error);
   }

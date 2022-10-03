@@ -333,7 +333,6 @@ export const TransactionContainer = styled.div`
   display: flex;
 
   flex-direction: row;
-  flex-wrap: wrap;
   gap: 1rem;
   justify-content: center;
 
@@ -345,10 +344,6 @@ export const TransactionContainer = styled.div`
 export const TransactionContent = styled.div`
   max-height: 27.5rem;
   min-width: 48%;
-
-  &:last-child {
-    min-width: 100%;
-  }
 
   overflow-y: auto;
 
@@ -507,7 +502,7 @@ export const TransactionAmount = styled.div`
 `;
 
 export const TransactionChart = styled(TransactionContent)`
-  width: 48%;
+  width: 40%;
   min-height: 22rem;
 
   position: relative;

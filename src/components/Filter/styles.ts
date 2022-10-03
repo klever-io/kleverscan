@@ -79,7 +79,6 @@ export const Content = styled.div<{ open: boolean }>`
 
     max-width: 6.25rem;
 
-    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 
@@ -183,4 +182,10 @@ export const HiddenInput = styled.input<{ show: boolean }>`
 export const ArrowDownContainer = styled.div`
   padding: 0.5rem 1rem;
   margin-top: 0 !important;
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    position: absolute;
+    top: 0.6rem;
+    left: 0;
+  }
 `;

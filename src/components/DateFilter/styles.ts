@@ -55,6 +55,7 @@ export const fadeInContainerMobile = keyframes`
 export const Container = styled.div`
   display: block;
   position: relative;
+  flex-direction: column;
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
   }
@@ -125,6 +126,8 @@ export const Input = styled.input`
 `;
 
 export const CalendarContainer = styled.div`
+  display: flex;
+  flex-direction: column;
   min-height: 18rem;
   width: 18rem;
   padding: 1rem;
@@ -132,7 +135,7 @@ export const CalendarContainer = styled.div`
   background-color: ${props => props.theme.white};
   position: absolute;
   bottom: -0.5rem;
-  left: -3rem;
+  right: 0;
   transform: translateY(100%);
   z-index: 10;
   border-radius: 20px;
@@ -143,11 +146,14 @@ export const CalendarContainer = styled.div`
   }
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    left: 7rem;
+    left: 39%;
+    bottom: -100%;
     animation: ${fadeInContainerMobile} 0.2s linear forwards;
+    width: 79% !important;
   }
 `;
 export const CalendarHeader = styled.div`
+  flex-direction: column;
   color: ${props => props.theme.black};
   strong {
     font-size: 1.5rem;
@@ -193,10 +199,21 @@ export const MonthPicker = styled.div.attrs((props: MonthPickerProps) => ({
     }
   `}
   }
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-direction: row !important;
+  }
 `;
 
 export const DayPicker = styled.div`
+  display: flex;
+  flex-direction: column;
   margin-top: 0.5rem;
+  padding: 0 1rem;
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    margin-top: 2rem !important;
+  }
 `;
 
 export const HeaderRow = styled.div`
@@ -205,16 +222,28 @@ export const HeaderRow = styled.div`
   padding-bottom: 0.5rem;
   border-bottom: 1px solid ${props => props.theme.navbar.text};
   font-size: 0.9rem;
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-direction: row !important;
+  }
 `;
 
 export const HeaderItem = styled.div`
   font-weight: 400;
   color: ${props => props.theme.navbar.text};
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    margin-left: 1rem;
+  }
 `;
 
 export const DaysTable = styled.div`
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+  flex-wrap: wrap;
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-direction: row !important;
+  }
 `;
 
 export const DayItem = styled.div.attrs((props: DayItemProps) => ({
@@ -232,6 +261,7 @@ export const DayItem = styled.div.attrs((props: DayItemProps) => ({
   font-size: 0.9rem;
   transition: all 0.1s ease-in-out;
   animation: ${fadeInItem} 0.5s ease-in-out;
+  justify-content: center;
 
   cursor: pointer;
   color: ${props => props.theme.black};
@@ -265,6 +295,11 @@ export const DayItem = styled.div.attrs((props: DayItemProps) => ({
       filter: opacity(0.15);
       pointer-events: none;
     `}
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    width: 14% !important;
+    padding: 1rem 1rem;
+    line-height: 0;
+  }
 `;
 
 export const Warning = styled.div`

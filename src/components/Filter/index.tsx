@@ -15,7 +15,10 @@ export interface IFilterItem {
 }
 
 export interface IFilter {
-  title: string;
+  title?: string;
+  firstItem?: string;
+  inputType?: string;
+  overFlow?: string;
   data: string[];
   onClick?(selected: string, filterType: string): void;
   onChange?(value: string): void;
@@ -28,8 +31,11 @@ const Filter: React.FC<IFilter> = ({
   onClick,
   onChange,
   current,
+  firstItem,
+  overFlow,
+  inputType = 'text',
 }) => {
-  const allItem = 'All';
+  const allItem = firstItem || 'All';
   const [selected, setSelected] = useState(current || allItem);
   const [open, setOpen] = useState(true);
   const [dontBlur, setDontBlur] = useState(false);
@@ -106,7 +112,7 @@ const Filter: React.FC<IFilter> = ({
       onChange(value);
     }
   };
-
+  // console.log(overFlow ? 'visible' : 'hidden');
   const getDataArray = () => [allItem].concat(data);
 
   const filterArrayByInput = (input: string) => {
@@ -128,6 +134,7 @@ const Filter: React.FC<IFilter> = ({
   const selectorProps = {
     ref: selectorRef,
     open,
+    overFlow,
     onClick: () => closeDropDown(),
   };
 
@@ -143,13 +150,15 @@ const Filter: React.FC<IFilter> = ({
           <HiddenInput
             onBlur={() => !dontBlur && closeDropDown()}
             value={inputValue}
-            type={title !== 'Status' ? 'text' : 'button'}
+            type={title !== 'Status' ? inputType : 'button'}
             ref={focusRef}
             show={focus}
             onChange={handleChange}
           />
         )}
-        <span>{open && selected ? selected : ''}</span>
+        <span style={{ overflow: overFlow ? overFlow : 'hidden' }}>
+          {open && selected ? selected : ''}
+        </span>
         <ArrowDownContainer onClick={() => arrowOnClick()}>
           <ArrowDown />
         </ArrowDownContainer>

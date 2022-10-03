@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import DateFilter, { IDateFilter } from '../DateFilter';
+import Filter, { IFilter } from '../Filter';
 import {
   Container,
   FilterContent,
@@ -26,7 +27,7 @@ const Tabs: React.FC<ITabs> = ({
   const [selected, setSelected] = useState(0);
   const [txIn, setTxIn] = useState(true);
   const [txOut, setTxOut] = useState(false);
-
+  const [filterName, setFilterName] = useState('All Transactions');
   const OnClick = () => {
     if (txIn === true) {
       setTxIn(false);
@@ -37,6 +38,34 @@ const Tabs: React.FC<ITabs> = ({
     }
   };
 
+  const handleClickFilterName = (filter: string) => {
+    switch (filter) {
+      case 'All Transactions':
+        filterFromTo && filterFromTo(0);
+        break;
+      case 'Transactions Out':
+        filterFromTo && filterFromTo(1);
+        break;
+      case 'Transactions In':
+        filterFromTo && filterFromTo(2);
+        break;
+
+      default:
+        filterFromTo && filterFromTo(0);
+    }
+  };
+  const filters: IFilter[] = [
+    {
+      firstItem: 'All Transactions',
+      data: ['Transactions Out', 'Transactions In'],
+      onClick: e => {
+        handleClickFilterName(e);
+      },
+      current: filterName,
+      overFlow: 'visible',
+      inputType: 'button',
+    },
+  ];
   return (
     <Container>
       <TabContainer>
@@ -63,24 +92,9 @@ const Tabs: React.FC<ITabs> = ({
         {dateFilterProps && headers[selected] === 'Transactions' && (
           <FilterContent>
             <DateFilter {...dateFilterProps} />
-            <div className="select">
-              <select
-                className="filterFromTo"
-                onChange={e =>
-                  filterFromTo && filterFromTo(Number(e.target.value))
-                }
-              >
-                <option className="option" value={0}>
-                  All Transactions
-                </option>
-                <option className="option" value={1}>
-                  Transactions Out
-                </option>
-                <option className="option" value={2}>
-                  Transacions In
-                </option>
-              </select>
-            </div>
+            {filters.map((filter, index) => (
+              <Filter key={index} {...filter} />
+            ))}
           </FilterContent>
         )}
       </TabContainer>

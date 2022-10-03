@@ -55,6 +55,7 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
+import { useTheme } from '../../contexts/theme/index';
 
 interface IBlockResponse extends IResponse {
   data: {
@@ -82,6 +83,7 @@ interface ITransactionPage {
 const Transaction: React.FC<ITransactionPage> = props => {
   const [showModal, setShowModal] = useState(false);
   const { transaction, block } = props;
+  const { isDarkTheme } = useTheme();
 
   const {
     hash,
@@ -267,6 +269,12 @@ const Transaction: React.FC<ITransactionPage> = props => {
     );
   };
 
+  const rawTxTheme = {
+    height: '30rem',
+    color: isDarkTheme ? 'white' : 'black',
+    backgroundColor: isDarkTheme ? '#0B0B1E' : 'white',
+  };
+
   return (
     <Container>
       <Header>
@@ -421,7 +429,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
         <CardContent>
           <CardRaw>
             <SyntaxHighlighter
-              customStyle={{ height: '30rem', backgroundColor: 'white' }}
+              customStyle={rawTxTheme}
               style={xcode}
               language="json"
               wrapLines={true}

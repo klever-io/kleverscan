@@ -5,6 +5,7 @@ import {
   IAccountAsset,
   IAsset,
   IAssetOne,
+  IAssetResponse,
   IBalance,
   IContractOption,
   IDelegationsResponse,
@@ -836,3 +837,35 @@ export const parseHolders = (
         rank: 0,
       };
   });
+
+/**
+ * Receives timeout, value and assets (IAssets[]) and check if the value is in the array. If not then fetch the value from API
+ * @param timeout is required to do a debounce function
+ * @param value is required to search on the array.
+ * @param assets is required because is used to find the value.
+ * @returns return false if find the value in the array(assets) or return the assets from API response (IAssets[])
+ */
+export const fetchPartialAsset = (
+  timeout: ReturnType<typeof setTimeout>,
+  value: string,
+  assets: IAsset[],
+): Promise<IAsset[] | false> => {
+  clearTimeout(timeout);
+  return new Promise(res => {
+    timeout = setTimeout(async () => {
+      let response: IAssetResponse;
+      if (
+        value &&
+        !assets.find((asset: any) =>
+          asset.assetId.includes(value.toUpperCase()),
+        )
+      ) {
+        response = await api.getCached({
+          route: `assets/kassets?asset=${value}`,
+        });
+        res(response.data.assets);
+      }
+      res(false);
+    }, 500);
+  });
+};

@@ -309,24 +309,24 @@ export const BlockCardRow = styled.div`
     color: ${props => props.theme.darkText};
   }
 
-  a {
-    margin-right: -0.625rem;
-
-    max-width: 5rem;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 0.85rem;
-
-    color: ${props => props.theme.black};
-    cursor: default;
-  }
-
   span {
     font-size: 0.95rem;
   }
+`;
+
+export const BlockCardHash = styled.span`
+  margin-right: -0.625rem;
+
+  max-width: 5rem;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
+
+  color: ${props => props.theme.black};
+  cursor: default;
 `;
 
 export const TransactionContainer = styled.div`

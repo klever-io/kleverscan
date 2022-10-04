@@ -165,7 +165,7 @@ const Table: React.FC<ITable> = ({
             )}
             {!loading &&
               items?.map((item, index) => (
-                <>
+                <React.Fragment key={String(index)}>
                   {Component && <Component key={String(index)} {...item} />}
                   {rowSections && (
                     <Row key={String(index)} {...props} rowSections={true}>
@@ -182,7 +182,7 @@ const Table: React.FC<ITable> = ({
                       ))}
                     </Row>
                   )}
-                </>
+                </React.Fragment>
               ))}
           </Body>
           {!loading && (!items || items?.length === 0) && (

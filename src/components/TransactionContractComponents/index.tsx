@@ -55,7 +55,7 @@ export const Transfer: React.FC<any> = ({ parameter: par }) => {
     }
 
     if (assetID.length === 0 || assetID[0] === 'KLV' || assetID[0] === 'KFI') {
-      setPrecision(1000000);
+      setPrecision(6);
       return;
     }
 
@@ -78,7 +78,8 @@ export const Transfer: React.FC<any> = ({ parameter: par }) => {
           <strong>
             {(parameter?.amount / 10 ** precision).toLocaleString()}
           </strong>
-          {parameter?.assetId?.split('/')[0] ? (
+          {parameter?.assetId?.split('/')[0] &&
+          parameter?.assetId?.split('/')[0] !== 'KLV' ? (
             <>
               <Link href={`/asset/${parameter?.assetId?.split('/')[0]}`}>
                 {parameter?.assetId?.split('/')[0]}
@@ -589,7 +590,7 @@ export const Freeze: React.FC<IContract> = ({
     }
 
     if (assetID.length === 0 || assetID[0] === 'KLV' || assetID[0] === 'KFI') {
-      setPrecision(1000000);
+      setPrecision(6);
       return;
     }
 
@@ -822,7 +823,7 @@ export const AssetTrigger: React.FC<IContract> = ({ parameter: par }) => {
     }
 
     if (assetID.length === 0 || assetID[0] === 'KLV' || assetID[0] === 'KFI') {
-      setPrecision(1000000);
+      setPrecision(6);
       return;
     }
 
@@ -1005,7 +1006,7 @@ export const ConfigITO: React.FC<IContract> = ({ parameter: par }) => {
     }
 
     if (assetID.length === 0 || assetID[0] === 'KLV' || assetID[0] === 'KFI') {
-      setPrecision(1000000);
+      setPrecision(6);
       return;
     }
 
@@ -1082,7 +1083,7 @@ export const Buy: React.FC<IContract> = ({ parameter: par }) => {
     };
 
     if (parameter?.currencyID === 'KLV' || parameter?.currencyID === 'KFI') {
-      setPrecision(1000000);
+      setPrecision(6);
       return;
     }
 
@@ -1135,8 +1136,8 @@ export const Sell: React.FC<IContract> = ({ parameter: par }) => {
       setPrecision((await getPrecision(parameter?.currencyID || 'KLV')) ?? 6);
     };
 
-    if (parameter?.currencyID === 'KLV' || parameter?.currencyID === 'KFI') {
-      setPrecision(1000000);
+    if (parameter?.currencyID === 'KFI') {
+      setPrecision(6);
       return;
     }
 

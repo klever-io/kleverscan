@@ -2,19 +2,7 @@ import { default as DefaultInput } from '@/components/Inputt';
 import Link from 'next/link';
 import styled from 'styled-components';
 
-export const Container = styled.div`
-  padding: 3rem 5rem 5rem 5rem;
-
-  background-color: ${props => props.theme.background};
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding-left: 5rem;
-    padding-right: 5rem;
-  }
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding: 3rem 1rem 5rem 1rem;
-  }
-`;
+export const Container = styled.div``;
 
 export const Title = styled.div`
   display: flex;

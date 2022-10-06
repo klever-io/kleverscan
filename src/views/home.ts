@@ -309,24 +309,24 @@ export const BlockCardRow = styled.div`
     color: ${props => props.theme.darkText};
   }
 
-  a {
-    margin-right: -0.625rem;
-
-    max-width: 5rem;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 0.85rem;
-
-    color: ${props => props.theme.black};
-    cursor: default;
-  }
-
   span {
     font-size: 0.95rem;
   }
+`;
+
+export const BlockCardHash = styled.span`
+  margin-right: -0.625rem;
+
+  max-width: 5rem;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
+
+  color: ${props => props.theme.black};
+  cursor: default;
 `;
 
 export const TransactionContainer = styled.div`
@@ -341,9 +341,13 @@ export const TransactionContainer = styled.div`
   }
 `;
 
+export const ChartsContainer = styled(TransactionContainer)`
+  flex-wrap: wrap;
+`;
+
 export const TransactionContent = styled.div`
   max-height: 27.5rem;
-  min-width: 48%;
+  min-width: calc(50% - 0.5rem);
 
   overflow-y: auto;
 
@@ -525,6 +529,10 @@ export const TransactionChart = styled(TransactionContent)`
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     min-height: 24.5rem;
   }
+
+  &:last-child {
+    width: 100%;
+  }
 `;
 
 export const TransactionChartContent = styled.div`
@@ -544,9 +552,15 @@ export const TransactionChartContent = styled.div`
 `;
 
 export const Main = styled.main`
+  padding: 3rem min(10vw, 10rem) 5rem min(10vw, 10rem);
   display: block;
   margin: 0 auto;
   max-width: ${props => props.theme.maxWidth};
+  background-color: ${props => props.theme.background};
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    padding: 3rem 1rem 5rem 1rem;
+  }
 `;
 export const LayoutContainer = styled.div`
   margin: auto;

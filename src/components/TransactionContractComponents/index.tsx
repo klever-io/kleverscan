@@ -47,7 +47,7 @@ export const Transfer: React.FC<any> = ({ parameter: par }) => {
     const assetID = parameter?.assetId?.split('/') || [];
 
     const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) || 1);
+      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 6);
     };
 
     if (assetID.length > 1) {
@@ -55,7 +55,7 @@ export const Transfer: React.FC<any> = ({ parameter: par }) => {
     }
 
     if (assetID.length === 0 || assetID[0] === 'KLV' || assetID[0] === 'KFI') {
-      setPrecision(1000000);
+      setPrecision(6);
       return;
     }
 
@@ -75,8 +75,11 @@ export const Transfer: React.FC<any> = ({ parameter: par }) => {
           <strong>Amount</strong>
         </span>
         <CenteredRow>
-          <strong>{(parameter?.amount / precision).toLocaleString()}</strong>
-          {parameter?.assetId?.split('/')[0] ? (
+          <strong>
+            {(parameter?.amount / 10 ** precision).toLocaleString()}
+          </strong>
+          {parameter?.assetId?.split('/')[0] &&
+          parameter?.assetId?.split('/')[0] !== 'KLV' ? (
             <>
               <Link href={`/asset/${parameter?.assetId?.split('/')[0]}`}>
                 {parameter?.assetId?.split('/')[0]}
@@ -579,7 +582,7 @@ export const Freeze: React.FC<IContract> = ({
     const assetID = parameter?.assetId?.split('/') || [];
 
     const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) || 1);
+      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 6);
     };
 
     if (assetID.length > 1) {
@@ -587,7 +590,7 @@ export const Freeze: React.FC<IContract> = ({
     }
 
     if (assetID.length === 0 || assetID[0] === 'KLV' || assetID[0] === 'KFI') {
-      setPrecision(1000000);
+      setPrecision(6);
       return;
     }
 
@@ -615,7 +618,7 @@ export const Freeze: React.FC<IContract> = ({
           <strong>Amount</strong>
         </span>
         <span>
-          <small>{(parameter.amount / precision).toLocaleString()}</small>
+          <small>{(parameter.amount / 10 ** precision).toLocaleString()}</small>
         </span>
       </Row>
       <Row>
@@ -623,7 +626,8 @@ export const Freeze: React.FC<IContract> = ({
           <strong>Bucket ID</strong>
         </span>
         <span>
-          {contractIndex && findReceipt(receipts, contractIndex, 3, 'bucketId')}
+          {contractIndex !== undefined &&
+            findReceipt(receipts, contractIndex, 3, 'bucketId')}
         </span>
       </Row>
     </>
@@ -811,7 +815,7 @@ export const AssetTrigger: React.FC<IContract> = ({ parameter: par }) => {
     const assetID = parameter?.assetId?.split('/') || [];
 
     const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) || 1);
+      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 6);
     };
 
     if (assetID.length > 1) {
@@ -819,7 +823,7 @@ export const AssetTrigger: React.FC<IContract> = ({ parameter: par }) => {
     }
 
     if (assetID.length === 0 || assetID[0] === 'KLV' || assetID[0] === 'KFI') {
-      setPrecision(1000000);
+      setPrecision(6);
       return;
     }
 
@@ -851,7 +855,7 @@ export const AssetTrigger: React.FC<IContract> = ({ parameter: par }) => {
           <span>
             <strong>Amount</strong>
           </span>
-          <span>{(parameter?.amount / precision).toLocaleString()}</span>
+          <span>{(parameter?.amount / 10 ** precision).toLocaleString()}</span>
         </Row>
       )}
       {parameter.toAddress && (
@@ -994,7 +998,7 @@ export const ConfigITO: React.FC<IContract> = ({ parameter: par }) => {
     const assetID = parameter?.assetId?.split('/') || [];
 
     const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) || 1);
+      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 6);
     };
 
     if (assetID.length > 1) {
@@ -1002,7 +1006,7 @@ export const ConfigITO: React.FC<IContract> = ({ parameter: par }) => {
     }
 
     if (assetID.length === 0 || assetID[0] === 'KLV' || assetID[0] === 'KFI') {
-      setPrecision(1000000);
+      setPrecision(6);
       return;
     }
 
@@ -1040,7 +1044,9 @@ export const ConfigITO: React.FC<IContract> = ({ parameter: par }) => {
           <span>
             <strong>Max Amount</strong>
           </span>
-          <span>{(parameter?.maxAmount / precision).toLocaleString()}</span>
+          <span>
+            {(parameter?.maxAmount / 10 ** precision).toLocaleString()}
+          </span>
         </Row>
       )}
     </>
@@ -1073,11 +1079,11 @@ export const Buy: React.FC<IContract> = ({ parameter: par }) => {
 
   useEffect(() => {
     const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(parameter?.currencyID || 'KLV')) || 1);
+      setPrecision((await getPrecision(parameter?.currencyID || 'KLV')) ?? 6);
     };
 
     if (parameter?.currencyID === 'KLV' || parameter?.currencyID === 'KFI') {
-      setPrecision(1000000);
+      setPrecision(6);
       return;
     }
 
@@ -1114,7 +1120,7 @@ export const Buy: React.FC<IContract> = ({ parameter: par }) => {
         <span>
           <strong>Amount</strong>
         </span>
-        <span>{(parameter.amount / precision).toLocaleString()}</span>
+        <span>{(parameter.amount / 10 ** precision).toLocaleString()}</span>
       </Row>
     </>
   );
@@ -1127,11 +1133,11 @@ export const Sell: React.FC<IContract> = ({ parameter: par }) => {
 
   useEffect(() => {
     const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(parameter?.currencyID || 'KLV')) || 1);
+      setPrecision((await getPrecision(parameter?.currencyID || 'KLV')) ?? 6);
     };
 
-    if (parameter?.currencyID === 'KLV' || parameter?.currencyID === 'KFI') {
-      setPrecision(1000000);
+    if (parameter?.currencyID === 'KFI') {
+      setPrecision(6);
       return;
     }
 
@@ -1174,14 +1180,16 @@ export const Sell: React.FC<IContract> = ({ parameter: par }) => {
         <span>
           <strong>Price</strong>
         </span>
-        <span>{(parameter?.price / precision).toLocaleString()}</span>
+        <span>{(parameter?.price / 10 ** precision).toLocaleString()}</span>
       </Row>{' '}
       {parameter?.reservePrice && (
         <Row>
           <span>
             <strong>Reserve Price</strong>
           </span>
-          <span>{(parameter?.reservePrice / precision).toLocaleString()}</span>
+          <span>
+            {(parameter?.reservePrice / 10 ** precision).toLocaleString()}
+          </span>
         </Row>
       )}
       <Row>

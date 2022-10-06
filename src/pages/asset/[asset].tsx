@@ -18,8 +18,10 @@ import {
   ITransaction,
 } from '@/types/index';
 import {
+  filterDate,
   parseHardCodedInfo,
   parseHolders,
+  resetDate,
   timestampToDate,
   toLocaleFixed,
 } from '@/utils/index';
@@ -42,7 +44,8 @@ import {
 import { ReceiveBackground } from '@/views/validator';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
-import React, { useCallback, useState } from 'react';
+import { useRouter } from 'next/router';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface IAssetPage {
   asset: IAsset;
@@ -110,32 +113,34 @@ const Asset: React.FC<IAssetPage> = ({
     : ['Overview', 'More'];
   const tableHeaders = ['Transactions', 'Holders'];
 
+  const router = useRouter();
+
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
-  const [dateFilter, setDateFilter] = useState({
-    start: '',
-    end: '',
-  });
+  const [query, setQuery] = useState(router.query);
   const [showModal, setShowModal] = useState(false);
 
-  const requestTransactions = async (page: number) => {
-    const query = dateFilter.start
-      ? {
-          limit: 5,
-          asset: asset.assetId,
-          startdate: dateFilter.start ? dateFilter.start : undefined,
-          enddate: dateFilter.end ? dateFilter.end : undefined,
-        }
-      : {
-          limit: 5,
-          asset: asset.assetId,
-        };
-
-    const res = await api.get({
-      route: `transaction/list`,
-      query: { page, ...query },
+  useEffect(() => {
+    router.push({ pathname: router.pathname, query }, undefined, {
+      shallow: true,
     });
-    return res;
+  }, [query]);
+
+  const requestTransactions = async (page: number) => {
+    const newQuery = { ...query, asset: asset.assetId };
+    return await api.get({
+      route: `transaction/list`,
+      query: { page, ...newQuery },
+    });
+  };
+
+  const filterQueryDate = (selectedDays: ISelectedDays) => {
+    const getFilteredDays = filterDate(selectedDays);
+    setQuery({ ...query, ...getFilteredDays });
+  };
+
+  const resetQueryDate = () => {
+    setQuery(resetDate(query));
   };
 
   const requestAssetHolders = async (page: number) => {
@@ -386,7 +391,7 @@ const Asset: React.FC<IAssetPage> = ({
     totalPages: totalTransactionsPage,
     dataName: 'transactions',
     request: (page: number) => requestTransactions(page),
-    query: dateFilter,
+    query,
   };
 
   const holdersTableProps = {
@@ -419,25 +424,10 @@ const Asset: React.FC<IAssetPage> = ({
         return <div />;
     }
   };
-  const resetDate = () => {
-    setDateFilter({
-      start: '',
-      end: '',
-    });
-  };
-
-  const filterDate = (selectedDays: ISelectedDays) => {
-    setDateFilter({
-      start: selectedDays.start.getTime().toString(),
-      end: selectedDays.end
-        ? (selectedDays.end.getTime() + 24 * 60 * 60 * 1000).toString()
-        : (selectedDays.start.getTime() + 24 * 60 * 60 * 1000).toString(),
-    });
-  };
 
   const dateFilterProps = {
-    resetDate,
-    filterDate,
+    resetDate: resetQueryDate,
+    filterDate: filterQueryDate,
     empty: defaultTransactions.length === 0,
   };
 
@@ -453,8 +443,8 @@ const Asset: React.FC<IAssetPage> = ({
     }
   }, [verified]);
 
-  return (
-    <Container>
+  const getHeader = useMemo(() => {
+    return (
       <Header>
         <Title
           Component={() => (
@@ -480,7 +470,12 @@ const Asset: React.FC<IAssetPage> = ({
 
         <Input />
       </Header>
+    );
+  }, [assetId, assetType, isVerified, logo, name, ticker]);
 
+  return (
+    <Container>
+      {getHeader}
       <CardContainer>
         <CardHeader>
           {cardHeaders.map((header, index) => (

@@ -61,7 +61,12 @@ import {
   ITransaction,
   ITransferContract,
 } from '../../types';
-import { capitalizeString, formatAmount, parseAddress } from '../../utils';
+import {
+  capitalizeString,
+  fetchPartialAsset,
+  formatAmount,
+  parseAddress,
+} from '../../utils';
 
 interface ITransactions {
   transactions: ITransaction[];
@@ -98,6 +103,7 @@ const Transactions: React.FC<ITransactions> = ({
     ContractsIndex[contractName];
   const getContractName = (): string => ContractsIndex[Number(query.type)];
   const [query, setQuery] = useState(router.query);
+  const [assetFilters, setAssetsFilters] = useState(assets);
 
   const handleSelected = (selected: string, filterType: string): void => {
     if (selected === 'All') {
@@ -140,11 +146,22 @@ const Transactions: React.FC<ITransactions> = ({
       : Object.values(Contract)[contracts[0].type];
   }, []);
 
+  let fetchPartialAssetTimeout: ReturnType<typeof setTimeout>;
   const filters: IFilter[] = [
     {
       title: 'Coin',
-      data: assets.map(asset => asset.assetId),
+      data: assetFilters.map(asset => asset.assetId),
       onClick: selected => handleSelected(selected, 'asset'),
+      onChange: async value => {
+        const response = await fetchPartialAsset(
+          fetchPartialAssetTimeout,
+          value,
+          assets,
+        );
+        if (response) {
+          setAssetsFilters([...assetFilters, ...response]);
+        }
+      },
       current: query.asset as string | undefined,
     },
     {

@@ -28,7 +28,7 @@ const precisionParse = async (
   contractType: string,
 ): Promise<any> => {
   let precision: number | undefined;
-  let assetId: string;
+  let assetId = 'KLV';
   const KLVPecision = 10 ** 6; // Also used for KFI
   const percentagePrecision = 10 ** 2;
 
@@ -39,8 +39,8 @@ const precisionParse = async (
       if (payload.amount) {
         const assetId = payload.assetId ? payload.assetId : payload.kda;
         precision = await getPrecision(assetId);
-        if (precision) {
-          payload.amount = payload.amount * precision;
+        if (precision !== undefined) {
+          payload.amount = payload.amount * 10 ** precision;
         } else return;
       }
       break;
@@ -76,8 +76,8 @@ const precisionParse = async (
       if (payload.maxAmount) {
         const assetId = payload.assetId ? payload.assetId : payload.assetID;
         precision = await getPrecision(assetId);
-        if (precision) {
-          payload.maxAmount = payload.maxAmount * precision;
+        if (precision !== undefined) {
+          payload.maxAmount = payload.maxAmount * 10 ** precision;
         } else return;
       }
       if (payload.packInfo) {
@@ -85,9 +85,9 @@ const precisionParse = async (
           async ([key, packs]: [string, any]) => {
             const packPrecision = await getPrecision(key);
 
-            if (packPrecision) {
+            if (packPrecision !== undefined) {
               packs.forEach((pack: any) => {
-                pack.amount = pack.amount * packPrecision;
+                pack.amount = pack.amount * 10 ** packPrecision;
               });
             } else return;
           },
@@ -97,15 +97,15 @@ const precisionParse = async (
     case 'BuyContract':
       assetId = payload.currencyId;
       precision = await getPrecision(assetId);
-      if (precision) {
-        payload.amount = payload.amount * precision;
+      if (precision !== undefined) {
+        payload.amount = payload.amount * 10 ** precision;
       } else return;
       break;
     case 'SellContract':
       assetId = payload.currencyId;
       precision = await getPrecision(assetId);
-      if (precision) {
-        payload.price &&= payload.price * precision;
+      if (precision !== undefined) {
+        payload.price &&= payload.price * 10 ** precision;
       } else return;
       break;
     case 'CreateMarketplaceContract':
@@ -267,6 +267,7 @@ const parseValues = (
   proposalId: number | null,
   tokenChosen: boolean,
   ITOBuy: boolean,
+  binaryOperations: string[],
 ): any => {
   const parsedValues = JSON.parse(JSON.stringify(values));
 
@@ -339,6 +340,17 @@ const parseValues = (
     }
   } else if (contractType === 'VoteContract') {
     parsedValues.proposalId = proposalId;
+  } else if (contractType === 'UpdateAccountPermissionContract') {
+    if (parsedValues.permissions?.length > 0) {
+      parsedValues.permissions.forEach((item: any, index: number) => {
+        const hex = Number(`0b${binaryOperations[index]}`).toString(16);
+        let newHex = hex;
+        if (newHex.length % 2 !== 0) {
+          newHex = '0' + newHex;
+        }
+        parsedValues.permissions[index].operations = newHex;
+      });
+    }
   }
 
   if (contractHaveBucketId(contractType)) {

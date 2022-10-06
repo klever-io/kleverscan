@@ -68,7 +68,7 @@ export const Body = styled.div<ITableType>`
     width: ${props => (props.haveData ? 'fit-content' : 'initial')};
   }
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     min-width: 100%;
   }
 `;
@@ -89,7 +89,7 @@ export const Row = styled.div<ITableType>`
 
   > span,
   > a {
-    @media screen and (min-width: 769px) {
+    @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
       ${props => props.rowSections && widths[props.type]};
     }
   }
@@ -157,7 +157,8 @@ export const Row = styled.div<ITableType>`
         }
       }
 
-      @media screen and (max-width: 768px) {
+      @media screen and (max-width: ${props =>
+          props.theme.breakpoints.tablet}) {
         width: 100%;
 
         display: grid;
@@ -193,7 +194,7 @@ export const MobileCardItem = styled.span<{ columnSpan?: number }>`
     flex-grow: 1;
   }
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     ${props =>
       !props.columnSpan || props.columnSpan >= 0
         ? css`

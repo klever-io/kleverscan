@@ -339,7 +339,7 @@ export const getStaticProps: GetStaticProps<IBlockPage> = async ({
 
   const blockNonce = Number(params?.block);
 
-  if (!blockNonce || isNaN(blockNonce)) {
+  if (blockNonce < 0 || isNaN(blockNonce)) {
     return redirectProps;
   }
 

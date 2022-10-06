@@ -18,14 +18,4 @@ export const CardContainer = styled.div`
   }
 `;
 
-export const Container = styled.div`
-  padding: 3rem 10rem 8rem 10rem;
-  background-color: ${props => props.theme.background};
-  @media (max-width: 1600px) {
-    padding-left: 5rem;
-    padding-right: 5rem;
-  }
-  @media (max-width: 768px) {
-    padding: 1rem 1rem 2rem 1rem;
-  }
-`;
+export const Container = styled.div``;

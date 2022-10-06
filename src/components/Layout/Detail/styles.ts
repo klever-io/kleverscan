@@ -1,15 +1,7 @@
 import { default as DefaultInput } from '@/components/Inputt';
 import styled from 'styled-components';
 
-export const Container = styled.div`
-  padding: 3rem 10rem 5rem 10rem;
-
-  background-color: ${props => props.theme.background};
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding: 3rem 1rem 5rem 1rem;
-  }
-`;
+export const Container = styled.div``;
 
 export const Header = styled.section`
   display: flex;

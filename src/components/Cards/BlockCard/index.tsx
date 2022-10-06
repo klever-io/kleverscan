@@ -1,5 +1,5 @@
 import { IBlock, IBlockCard } from '@/types/blocks';
-import { BlockCardContainer, BlockCardRow } from '@/views/home';
+import { BlockCardContainer, BlockCardHash, BlockCardRow } from '@/views/home';
 import { fromUnixTime } from 'date-fns';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
@@ -32,7 +32,7 @@ const BlockCard: React.FC<IBlock & IBlockCard> = ({
               {getAge(fromUnixTime(timestamp / 1000), commonT)}{' '}
               {commonT('Date.Elapsed Time')}
             </small>
-            <a>{hash}</a>
+            <BlockCardHash>{hash}</BlockCardHash>
           </BlockCardRow>
           <BlockCardRow>
             <p>{t('Burned')}</p>

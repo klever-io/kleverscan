@@ -1,14 +1,18 @@
+import { ISelectedDays } from '@/components/DateFilter';
 import api from '@/services/api';
 import { TFunction } from 'next-i18next';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { toast } from 'react-toastify';
 import {
   IAccountAsset,
   IAsset,
   IAssetOne,
+  IAssetResponse,
   IBalance,
   IContractOption,
   IDelegationsResponse,
   IEpochInfo,
+  IFilterDater,
   IFormData,
   IMetrics,
   IPagination,
@@ -428,10 +432,10 @@ export const contractOptions: IContractOption[] = [
     label: 'Configure Marketplace',
     value: 'ConfigMarketplaceContract',
   },
-  {
-    label: 'Update Account Permission',
-    value: 'UpdateAccountPermissionContract',
-  },
+  // {
+  //   label: 'Update Account Permission',
+  //   value: 'UpdateAccountPermissionContract',
+  // },
 ];
 /**
  * Verifies not only if an array of strings is empty, but also if it's content is full of empty strings, in that case it will still return true as well.
@@ -558,6 +562,41 @@ export const asyncDoIf = async (
   return;
 };
 
+export const contractsList = [
+  'Transfer',
+  'CreateAsset',
+  'Create Validator',
+  'Config Validator',
+  'Freeze',
+  'Unfreeze',
+  'Delegate',
+  'Undelegate',
+  'Withdraw',
+  'Claim',
+  'Unjail',
+  'Asset Trigger',
+  'Set Account Name',
+  'Proposal',
+  'Vote',
+  'Config ITO',
+  'Set ITO Prices',
+  'Buy',
+  'Sell',
+  'Cancel Market Order',
+  'Create Market',
+  'Config Marketplace',
+  'Update Account Permission',
+];
+
+export const setCharAt = (
+  str: string,
+  index: number,
+  newChar: string,
+): string => {
+  if (index > str.length - 1) return str;
+  return str.substring(0, index) + newChar + str.substring(index + 1);
+};
+
 /**
  * Makes your promise race with a timeout promise. If it loses, your promise will be rejected. Default timeout is 5 seconds.
  * @param success callback fn for promise fulfilled
@@ -616,7 +655,7 @@ export const getPrecision = async (
   asset: string,
 ): Promise<number | undefined> => {
   try {
-    const response = await api.get({ route: `assets/${asset}` });
+    const response = await api.getCached({ route: `assets/${asset}` });
 
     if (response.error) {
       const messageError =
@@ -625,7 +664,7 @@ export const getPrecision = async (
       return;
     }
 
-    return 10 ** response.data.asset.precision;
+    return response.data.asset.precision;
   } catch (error) {
     console.error(error);
   }
@@ -836,3 +875,75 @@ export const parseHolders = (
         rank: 0,
       };
   });
+
+/**
+ * Receives timeout, value and assets (IAssets[]) and check if the value is in the array. If not then fetch the value from API
+ * @param timeout is required to do a debounce function
+ * @param value is required to search on the array.
+ * @param assets is required because is used to find the value.
+ * @returns return false if find the value in the array(assets) or return the assets from API response (IAssets[])
+ */
+export const fetchPartialAsset = (
+  timeout: ReturnType<typeof setTimeout>,
+  value: string,
+  assets: IAsset[],
+): Promise<IAsset[] | false> => {
+  clearTimeout(timeout);
+  return new Promise(res => {
+    timeout = setTimeout(async () => {
+      let response: IAssetResponse;
+      if (
+        value &&
+        !assets.find((asset: any) =>
+          asset.assetId.includes(value.toUpperCase()),
+        )
+      ) {
+        response = await api.getCached({
+          route: `assets/kassets?asset=${value}`,
+        });
+        res(response.data.assets);
+      }
+      res(false);
+    }, 500);
+  });
+};
+
+/**
+ * Receive tab from next router query and find the selected tab.
+ * @param tab is required to use next router query
+ * @returns return number corresponding to the tab selected.
+ */
+export const getSelectedTab = (tab: string | string[] | undefined): number => {
+  if (tab === 'Assets' || tab === undefined) {
+    return 0;
+  } else if (tab === 'Transactions') {
+    return 1;
+  }
+  return 2;
+};
+
+/**
+ * Receive selectedDays
+ * @param selectedDays is required to format the date filter
+ * @returns return the filter as object with "startdate" and "enddate"
+ */
+export const filterDate = (selectedDays: ISelectedDays): IFilterDater => {
+  return {
+    startdate: selectedDays.start.getTime().toString(),
+    enddate: selectedDays.end
+      ? (selectedDays.end.getTime() + 24 * 60 * 60 * 1000).toString()
+      : (selectedDays.start.getTime() + 24 * 60 * 60 * 1000).toString(),
+  };
+};
+
+/**
+ * Receive query as object with filters and "RESET" the date filter
+ * @param query is required to reset the date filter
+ * @returns return object with all filters and the new date
+ */
+export const resetDate = (query: NextParsedUrlQuery): NextParsedUrlQuery => {
+  const updatedQuery = { ...query };
+  delete updatedQuery.startdate;
+  delete updatedQuery.enddate;
+  return updatedQuery;
+};

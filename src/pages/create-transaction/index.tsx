@@ -68,7 +68,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
       const callback = async () => {
         let address = '';
         await doIf(
-          () => (address = window.kleverWeb.getWalletAddress()),
+          async () => (address = await window.kleverWeb.getWalletAddress()),
           () => handleLogout(),
           () => window?.kleverWeb?.getWalletAddress !== undefined,
           500,

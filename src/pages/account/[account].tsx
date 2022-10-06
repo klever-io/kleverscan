@@ -16,9 +16,9 @@ import {
   IPagination,
   IResponse,
   ITransaction,
-  ITxQuery,
   Service,
 } from '@/types/index';
+import { filterDate, getSelectedTab, resetDate } from '@/utils/index';
 import {
   AmountContainer,
   BalanceContainer,
@@ -34,7 +34,8 @@ import {
 } from '@/views/accounts/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { GetServerSideProps } from 'next';
-import React, { useCallback, useState } from 'react';
+import { useRouter } from 'next/router';
+import React, { useCallback, useEffect, useState } from 'react';
 
 interface IAssetInfo {
   assetId: string;
@@ -85,16 +86,10 @@ const Account: React.FC<IAccountPage> = ({
   KLVallowance,
   KFIallowance,
 }) => {
-  const initialStateFilter: ITxQuery = {
-    address: account.address,
-    startdate: '',
-    enddate: '',
-    fromAddress: '',
-    toAddress: '',
-  };
+  const router = useRouter();
 
   const [showModal, setShowModal] = useState(false);
-  const [query, setQuery] = useState(initialStateFilter);
+  const [query, setQuery] = useState(router.query);
 
   const requestTransactions = async (page: number) =>
     api.get({
@@ -167,24 +162,24 @@ const Account: React.FC<IAccountPage> = ({
     return headers;
   }, [account.assets, transactionResponse.data.transactions]);
 
-  const [selectedTab, setSelectedTab] = useState<string>(getTabHeaders()[0]);
+  const [selectedTab, setSelectedTab] = useState<string>(
+    getTabHeaders()[getSelectedTab(router.query?.tab)],
+  );
 
-  const resetDate = () => {
-    const updatedQuery = { ...query };
-    delete updatedQuery.startdate;
-    delete updatedQuery.enddate;
-    setQuery(updatedQuery);
+  const resetQueryDate = () => {
+    setQuery(resetDate(query));
   };
 
-  const filterDate = (selectedDays: ISelectedDays) => {
-    setQuery({
-      ...query,
-      startdate: selectedDays.start.getTime().toString(),
-      enddate: selectedDays.end
-        ? (selectedDays.end.getTime() + 24 * 60 * 60 * 1000).toString()
-        : (selectedDays.start.getTime() + 24 * 60 * 60 * 1000).toString(),
+  const filterQueryDate = (selectedDays: ISelectedDays) => {
+    const getFilteredDays = filterDate(selectedDays);
+    setQuery({ ...query, ...getFilteredDays });
+  };
+
+  useEffect(() => {
+    router.push({ pathname: router.pathname, query }, undefined, {
+      shallow: true,
     });
-  };
+  }, [query]);
 
   const filterFromTo = (op: number) => {
     const updatedQuery = { ...query };
@@ -211,10 +206,13 @@ const Account: React.FC<IAccountPage> = ({
 
   const tabProps: ITabs = {
     headers: getTabHeaders(),
-    onClick: header => setSelectedTab(header),
+    onClick: header => {
+      setSelectedTab(header);
+      setQuery({ ...query, tab: header });
+    },
     dateFilterProps: {
-      resetDate,
-      filterDate,
+      resetDate: resetQueryDate,
+      filterDate: filterQueryDate,
       empty: transactionResponse?.data?.transactions?.length === 0,
     },
     filterFromTo,

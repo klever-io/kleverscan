@@ -86,10 +86,10 @@ const Proposals: React.FC<IProposalsProps> = ({
     };
 
     const StatusIcon = getStatusIcon(proposalStatus);
-    const precision = 10 ** 6;
+    const precision = 6;
 
     const getPositiveVotes = () => {
-      let parsedPosVotes = votes['0'] / precision;
+      let parsedPosVotes = votes['0'] / 10 ** precision;
       if (parsedPosVotes < 0.000001 || isNaN(parsedPosVotes)) {
         parsedPosVotes = 0;
       }
@@ -101,7 +101,7 @@ const Proposals: React.FC<IProposalsProps> = ({
 
     const parseTotalStaked = () => {
       if (typeof totalStaked === 'number') {
-        return Math.round(totalStaked / precision).toLocaleString();
+        return Math.round(totalStaked / 10 ** precision).toLocaleString();
       }
       return <span style={{ color: 'red' }}>Unavailable</span>;
     };

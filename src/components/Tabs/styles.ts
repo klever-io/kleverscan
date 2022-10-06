@@ -15,7 +15,7 @@ export const TabContainer = styled.div`
   align-items: center;
 
   gap: 1.5rem;
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     display: grid;
   }
 `;
@@ -55,42 +55,12 @@ export const FilterContent = styled.div`
   gap: 1rem;
   width: 100%;
   display: flex;
-  .select {
-    select {
-      text-align: center;
-      width: 100%;
-      height: 2.8rem;
-      display: flex;
-      background-color: ${props =>
-        props.theme.dark
-          ? props.theme.card.assetText
-          : props.theme.dateFilter.outsideBackground};
-      border: 1px solid ${props => props.theme.lightGray};
-      border-radius: 0.5rem;
-      cursor: pointer;
-      font-family: 'Montserrat';
-      font-style: normal;
-      font-weight: 700;
-      font-size: 14px;
-      line-height: 17px;
-      color: #aa33b5;
-      select-items {
-      }
-    }
-    .option {
-      padding: 0.25rem 0.5rem;
-
-      display: flex;
-
-      border-radius: 0.5rem;
-
-      transition: 0.2s ease;
-      &:hover {
-        background: pink;
-      }
-    }
+  align-items: center;
+  > div:last-child {
+    min-width: 18rem;
   }
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     display: grid;
   }
 `;

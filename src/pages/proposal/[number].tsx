@@ -79,7 +79,7 @@ interface IParsedVoter {
 const ProposalDetails: React.FC<IParsedProposal> = props => {
   const [status, setStatus] = useState('');
   const StatusIcon = getStatusIcon(status);
-  const precision = 10 ** 6;
+  const precision = 6;
   const proposalAPI: IParsedProposal = props;
   const { votingPowers, totalStaked, description, pagination } = proposalAPI;
   const [filterVoters, setFilterVoters] = useState({
@@ -98,7 +98,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
 
   useEffect(() => {
     if (totalStaked) {
-      let percentage = (totalVoted * 100) / (totalStaked / precision);
+      let percentage = (totalVoted * 100) / (totalStaked / 10 ** precision);
       if (percentage < 0.01) {
         percentage = 0;
       }
@@ -213,7 +213,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
           if (totalStaked) {
             let percentageCard = (
               (filterVoters[item] * 100) /
-              (totalStaked / precision)
+              (totalStaked / 10 ** precision)
             ).toString();
             if (Number(percentageCard) < 0.01) {
               percentageCard = '0';
@@ -414,7 +414,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
               {totalStaked ? (
                 <span>
                   Voted: {formatAmount(totalVoted)} /{' '}
-                  {formatAmount(totalStaked / precision)}
+                  {formatAmount(totalStaked / 10 ** precision)}
                 </span>
               ) : null}
             </ProgressBarVotes>
@@ -424,7 +424,8 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                 Object.keys(filterVoters).map((item: any, key: number) => {
                   if (totalStaked) {
                     let percentageCard =
-                      (filterVoters[item] * 100) / (totalStaked / precision);
+                      (filterVoters[item] * 100) /
+                      (totalStaked / 10 ** precision);
                     if (percentageCard < 0.01) {
                       percentageCard = 0;
                     }

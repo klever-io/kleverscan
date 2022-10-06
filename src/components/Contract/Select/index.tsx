@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
 import { components } from 'react-select';
 import { Container, TitleLabel } from './styles';
@@ -34,6 +34,7 @@ const Select: React.FC<IFilter> = ({
   precedence,
   ...rest
 }) => {
+  const getAssetsEnableRef = useRef<any>(true);
   const Placeholder = useCallback((props: any) => {
     return <components.Placeholder {...props} />;
   }, []);
@@ -50,10 +51,32 @@ const Select: React.FC<IFilter> = ({
     );
   }, []);
 
+  const handleChange = (value: any) => {
+    if (getAssets && getAssetsEnableRef.current) {
+      getAssets();
+    }
+
+    getAssetsEnableRef.current = true;
+    onChange(value);
+  };
+
+  const handleMenuOpen = () => {
+    getAssets && getAssets();
+    if (title !== 'Contract') getAssetsEnableRef.current = false;
+  };
+
+  const handleMenuClose = () => {
+    setTimeout(() => {
+      getAssetsEnableRef.current = true;
+    }, 200);
+  };
+
   const props = {
     classNamePrefix: 'react-select',
     options,
-    onChange,
+    onChange: handleChange,
+    onMenuOpen: handleMenuOpen,
+    onMenuClose: handleMenuClose,
   };
 
   return (
@@ -64,7 +87,6 @@ const Select: React.FC<IFilter> = ({
           selectPlaceholder ? selectPlaceholder : `Choose ${title ? title : ''}`
         }
         components={{ Placeholder, DropdownIndicator }}
-        onFocus={() => getAssets && getAssets()}
         {...props}
       />
     </Container>

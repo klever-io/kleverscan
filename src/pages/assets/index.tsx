@@ -6,11 +6,7 @@ import AssetLogo from '@/components/Logo/AssetLogo';
 import Table, { ITable } from '@/components/Table';
 import api from '@/services/api';
 import { IAsset, IPagination, IResponse } from '@/types/index';
-import {
-  fetchPartialAsset,
-  formatAmount,
-  parseHardCodedInfo,
-} from '@/utils/index';
+import { formatAmount, parseHardCodedInfo } from '@/utils/index';
 import { Container, Header, HeaderContainer, Input } from '@/views/assets';
 import { LetterLogo, Logo } from '@/views/assets/index';
 import { FilterContainer } from '@/views/transactions';
@@ -35,7 +31,7 @@ interface IAssetResponse extends IResponse {
 const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
   const router = useRouter();
   const [assetFilters, setAssetsFilters] = useState(assets);
-  const [filterToken, setFilterToken] = useState(router.query.asset);
+  const [filterToken, setFilterToken] = useState(router.query.asset || 'All');
 
   let fetchPartialAssetTimeout: ReturnType<typeof setTimeout>;
 
@@ -44,15 +40,22 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
       title: 'Asset',
       data: assetFilters.map(asset => asset.assetId),
       onClick: value => setFilterToken(value),
-      onChange: async value => {
-        const response = await fetchPartialAsset(
-          fetchPartialAssetTimeout,
-          value,
-          assets,
-        );
-        if (response) {
-          setAssetsFilters([...assetFilters, ...response]);
-        }
+      onChange: value => {
+        clearTimeout(fetchPartialAssetTimeout);
+        fetchPartialAssetTimeout = setTimeout(async () => {
+          let response: IAssetResponse;
+          if (
+            value &&
+            !assetFilters.find(asset =>
+              asset.assetId.includes(value.toUpperCase()),
+            )
+          ) {
+            response = await api.getCached({
+              route: `assets/kassets?asset=${value}`,
+            });
+            setAssetsFilters([...assetFilters, ...response.data.assets]);
+          }
+        }, 500);
       },
       current: (filterToken as string) || undefined,
     },
@@ -73,17 +76,28 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
   };
 
   useEffect(() => {
-    if (filterToken === 'All') {
-      router.push({ pathname: router.pathname, query: '' }, undefined, {
-        shallow: true,
-      });
-    } else {
-      router.push(
-        { pathname: router.pathname, query: `asset=${filterToken}` },
-        undefined,
-        { shallow: true },
-      );
-    }
+    const changeUrl = async () => {
+      if (filterToken === 'All') {
+        router.push({ pathname: router.pathname, query: '' }, undefined, {
+          shallow: true,
+        });
+
+        const assets: IAssetResponse = await api.getCached({
+          route: 'assets/kassets?hidden=false',
+          refreshTime: 21600,
+        });
+        filters[0].data = assets.data.assets.map(asset => asset.assetId);
+      } else {
+        router.push(
+          { pathname: router.pathname, query: `asset=${filterToken}` },
+          undefined,
+          {
+            shallow: true,
+          },
+        );
+      }
+    };
+    changeUrl();
   }, [filterToken]);
 
   const rowSections = (asset: IAsset): JSX.Element[] => {
@@ -209,7 +223,7 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
           <Title title="Assets" Icon={Icon} />
           <FilterContainer>
             {filters.map((filter, index) => (
-              <Filter key={String(index)} {...filter} />
+              <Filter key={String(filter)} {...filter} />
             ))}
           </FilterContainer>
         </HeaderContainer>

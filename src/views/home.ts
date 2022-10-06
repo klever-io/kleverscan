@@ -341,9 +341,13 @@ export const TransactionContainer = styled.div`
   }
 `;
 
+export const ChartsContainer = styled(TransactionContainer)`
+  flex-wrap: wrap;
+`;
+
 export const TransactionContent = styled.div`
   max-height: 27.5rem;
-  min-width: 48%;
+  min-width: calc(50% - 0.5rem);
 
   overflow-y: auto;
 
@@ -524,6 +528,10 @@ export const TransactionChart = styled(TransactionContent)`
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     min-height: 24.5rem;
+  }
+
+  &:last-child {
+    width: 100%;
   }
 `;
 

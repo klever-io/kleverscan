@@ -23,7 +23,6 @@ import { toast } from 'react-toastify';
 import Copy from '../Copy';
 import PackInfoForm from '../CustomForm/PackInfo';
 import ParametersForm from '../CustomForm/Parameters';
-import PermissionsForm from '../CustomForm/Permissions';
 import Select from './Select';
 import {
   AssetIDInput,
@@ -89,13 +88,20 @@ const Contract: React.FC<IContract> = ({
   const [proposalId, setProposalId] = useState<number | null>(null);
   const [claimLabel, setClaimLabel] = useState('Asset ID');
   const [buyLabel, setBuyLabel] = useState('Order ID');
+  const [binaryOperations, setBinaryOperations] = useState([]);
 
   useEffect(() => {
     setAssetBalance(null);
     if (typeof window !== 'undefined') {
       try {
         if (window.kleverWeb) {
-          setOwnerAddress(window.kleverWeb.getWalletAddress());
+          (async () => {
+            try {
+              setOwnerAddress(await window.kleverWeb.getWalletAddress());
+            } catch (error) {
+              console.error(error);
+            }
+          })();
         }
       } catch (error) {
         console.error(error);
@@ -278,6 +284,7 @@ const Contract: React.FC<IContract> = ({
       proposalId,
       tokenChosen,
       ITOBuy,
+      binaryOperations,
     );
 
     setLoading(true);
@@ -334,14 +341,18 @@ const Contract: React.FC<IContract> = ({
   };
 
   const permissionsForm = () => (
-    <Form
-      contractName={contractType}
-      key={contractType}
-      showForm={showForm()}
-      {...formProps}
-    >
-      <PermissionsForm />
-    </Form>
+    // <Form
+    //   contractName={contractType}
+    //   key={contractType}
+    //   showForm={showForm()}
+    //   {...formProps}
+    // >
+    //   <PermissionsForm
+    //     setBinaryOperations={setBinaryOperations}
+    //     binaryOperations={binaryOperations}
+    //   />
+    // </Form>
+    <></>
   );
 
   const proposalForm = () => (

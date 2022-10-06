@@ -1,13 +1,26 @@
+import { contractsList, setCharAt } from '@/utils/index';
 import { Scope } from '@unform/core';
 import FormInput from 'components/Form/FormInput';
+import { Container, InputLabel } from 'components/Form/FormInput/styles';
 import {
   ButtonContainer,
   FormSection,
   SectionTitle,
 } from 'components/Form/styles';
 import { useState } from 'react';
+import { Checkbox, CheckboxContract, ContractsList } from './styles';
 
-const PermissionsForm: React.FC = () => {
+interface IPermissionsForm {
+  setBinaryOperations: any;
+  binaryOperations: string[];
+}
+
+const binaryDefault = '00000000000000000000000';
+
+const PermissionsForm: React.FC<IPermissionsForm> = ({
+  setBinaryOperations,
+  binaryOperations,
+}) => {
   const [signerQuantities, setSignerQuantities] = useState<number[]>([]);
 
   const handleAddSigner = (index: number) => {
@@ -23,12 +36,20 @@ const PermissionsForm: React.FC = () => {
   };
 
   const handleAddPermission = () => {
+    const binaryOp = [...binaryOperations];
+    binaryOp.push(binaryDefault);
+    setBinaryOperations([...binaryOp]);
     setSignerQuantities([...signerQuantities, 1]);
   };
 
   const handleRemovePack = () => {
     const newSignerQuantities = [...signerQuantities];
+    const binaryOp = [...binaryOperations];
+
+    binaryOp.pop();
     newSignerQuantities.pop();
+
+    setBinaryOperations([...binaryOp]);
     setSignerQuantities(newSignerQuantities);
   };
 
@@ -36,11 +57,11 @@ const PermissionsForm: React.FC = () => {
     const items = [];
     for (let innerIndex = 0; innerIndex < itemsQuantity; innerIndex++) {
       items.push(
-        <Scope path={`permission[${outerIndex}].signer[${innerIndex}]`}>
+        <Scope path={`permissions[${outerIndex}].signers[${innerIndex}]`}>
           <FormSection inner>
-            <SectionTitle>Signer</SectionTitle>
+            <SectionTitle>Signers</SectionTitle>
             <FormInput title="Address" name="address" />
-            <FormInput title="Weight" name="Weight" type="number" />
+            <FormInput title="Weight" name="weight" type="number" />
           </FormSection>
         </Scope>,
       );
@@ -67,25 +88,55 @@ const PermissionsForm: React.FC = () => {
       {signerQuantities.map((itemsQuantity, index) => {
         return (
           <FormSection inner key={String(index)}>
-            <SectionTitle>Permission</SectionTitle>
+            <SectionTitle>Permissions</SectionTitle>
             <FormInput
               title="Permission Name"
-              name={`permission[${index}].permissionName`}
+              name={`permissions[${index}].permissionName`}
               span={2}
             />
             <FormInput
               title="Threshold"
-              name={`permission[${index}].threshold`}
+              name={`permissions[${index}].threshold`}
               span={2}
             />
-            <FormInput
-              title="Operations"
-              name={`permission[${index}].operations`}
-              span={2}
-            />
+            <Container>
+              <InputLabel>Operations</InputLabel>
+              <ContractsList>
+                {contractsList.map((item: any, key: number) => {
+                  return (
+                    <CheckboxContract key={key}>
+                      <Checkbox
+                        type="checkbox"
+                        onChange={e => {
+                          const binaryOp = [...binaryOperations];
+                          const binary = binaryOp[index];
+                          if (e.target.checked) {
+                            binaryOp[index] = setCharAt(
+                              binary,
+                              binary.length - (key + 1),
+                              '1',
+                            );
+                          } else {
+                            binaryOp[index] = setCharAt(
+                              binary,
+                              binary.length - (key + 1),
+                              '0',
+                            );
+                          }
+
+                          setBinaryOperations([...binaryOp]);
+                        }}
+                        key={key}
+                      />
+                      <span>{item}</span>
+                    </CheckboxContract>
+                  );
+                })}
+              </ContractsList>
+            </Container>
             <FormInput
               title="Type"
-              name={`permission[${index}].type`}
+              name={`permissions[${index}].type`}
               span={2}
             />
             {getSigners(index, itemsQuantity)}

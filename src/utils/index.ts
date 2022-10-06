@@ -429,10 +429,10 @@ export const contractOptions: IContractOption[] = [
     label: 'Configure Marketplace',
     value: 'ConfigMarketplaceContract',
   },
-  {
-    label: 'Update Account Permission',
-    value: 'UpdateAccountPermissionContract',
-  },
+  // {
+  //   label: 'Update Account Permission',
+  //   value: 'UpdateAccountPermissionContract',
+  // },
 ];
 /**
  * Verifies not only if an array of strings is empty, but also if it's content is full of empty strings, in that case it will still return true as well.
@@ -557,6 +557,41 @@ export const asyncDoIf = async (
   }
   failure(error);
   return;
+};
+
+export const contractsList = [
+  'Transfer',
+  'CreateAsset',
+  'Create Validator',
+  'Config Validator',
+  'Freeze',
+  'Unfreeze',
+  'Delegate',
+  'Undelegate',
+  'Withdraw',
+  'Claim',
+  'Unjail',
+  'Asset Trigger',
+  'Set Account Name',
+  'Proposal',
+  'Vote',
+  'Config ITO',
+  'Set ITO Prices',
+  'Buy',
+  'Sell',
+  'Cancel Market Order',
+  'Create Market',
+  'Config Marketplace',
+  'Update Account Permission',
+];
+
+export const setCharAt = (
+  str: string,
+  index: number,
+  newChar: string,
+): string => {
+  if (index > str.length - 1) return str;
+  return str.substring(0, index) + newChar + str.substring(index + 1);
 };
 
 /**

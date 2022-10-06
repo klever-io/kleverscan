@@ -267,6 +267,7 @@ const parseValues = (
   proposalId: number | null,
   tokenChosen: boolean,
   ITOBuy: boolean,
+  binaryOperations: string[],
 ): any => {
   const parsedValues = JSON.parse(JSON.stringify(values));
 
@@ -339,6 +340,17 @@ const parseValues = (
     }
   } else if (contractType === 'VoteContract') {
     parsedValues.proposalId = proposalId;
+  } else if (contractType === 'UpdateAccountPermissionContract') {
+    if (parsedValues.permissions?.length > 0) {
+      parsedValues.permissions.forEach((item: any, index: number) => {
+        const hex = Number(`0b${binaryOperations[index]}`).toString(16);
+        let newHex = hex;
+        if (newHex.length % 2 !== 0) {
+          newHex = '0' + newHex;
+        }
+        parsedValues.permissions[index].operations = newHex;
+      });
+    }
   }
 
   if (contractHaveBucketId(contractType)) {

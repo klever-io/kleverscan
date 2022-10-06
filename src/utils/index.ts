@@ -1,5 +1,7 @@
+import { ISelectedDays } from '@/components/DateFilter';
 import api from '@/services/api';
 import { TFunction } from 'next-i18next';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { toast } from 'react-toastify';
 import {
   IAccountAsset,
@@ -10,6 +12,7 @@ import {
   IContractOption,
   IDelegationsResponse,
   IEpochInfo,
+  IFilterDater,
   IFormData,
   IMetrics,
   IPagination,
@@ -903,4 +906,44 @@ export const fetchPartialAsset = (
       res(false);
     }, 500);
   });
+};
+
+/**
+ * Receive tab from next router query and find the selected tab.
+ * @param tab is required to use next router query
+ * @returns return number corresponding to the tab selected.
+ */
+export const getSelectedTab = (tab: string | string[] | undefined): number => {
+  if (tab === 'Assets' || tab === undefined) {
+    return 0;
+  } else if (tab === 'Transactions') {
+    return 1;
+  }
+  return 2;
+};
+
+/**
+ * Receive selectedDays
+ * @param selectedDays is required to format the date filter
+ * @returns return the filter as object with "startdate" and "enddate"
+ */
+export const filterDate = (selectedDays: ISelectedDays): IFilterDater => {
+  return {
+    startdate: selectedDays.start.getTime().toString(),
+    enddate: selectedDays.end
+      ? (selectedDays.end.getTime() + 24 * 60 * 60 * 1000).toString()
+      : (selectedDays.start.getTime() + 24 * 60 * 60 * 1000).toString(),
+  };
+};
+
+/**
+ * Receive query as object with filters and "RESET" the date filter
+ * @param query is required to reset the date filter
+ * @returns return object with all filters and the new date
+ */
+export const resetDate = (query: NextParsedUrlQuery): NextParsedUrlQuery => {
+  const updatedQuery = { ...query };
+  delete updatedQuery.startdate;
+  delete updatedQuery.enddate;
+  return updatedQuery;
 };

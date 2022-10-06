@@ -1,3 +1,5 @@
+import { getSelectedTab } from '@/utils/index';
+import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import DateFilter, { IDateFilter } from '../DateFilter';
 import Filter, { IFilter } from '../Filter';
@@ -24,10 +26,22 @@ const Tabs: React.FC<ITabs> = ({
   filterFromTo,
   children,
 }) => {
-  const [selected, setSelected] = useState(0);
+  const router = useRouter();
+  const getFilterName = () => {
+    if (router.query?.fromAddress) {
+      return 'Transaction Out';
+    } else if (router.query?.toAddress) {
+      return 'Transaction In';
+    }
+    return undefined;
+  };
+
+  const [selected, setSelected] = useState(getSelectedTab(router.query?.tab));
   const [txIn, setTxIn] = useState(true);
   const [txOut, setTxOut] = useState(false);
-  const [filterName, setFilterName] = useState('All Transactions');
+  const [filterName, setFilterName] = useState(
+    getFilterName() || 'All Transactions',
+  );
   const OnClick = () => {
     if (txIn === true) {
       setTxIn(false);

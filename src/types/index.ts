@@ -952,3 +952,8 @@ export interface INfts {
   mime?: string;
   metadata?: string;
 }
+
+export interface IFilterDater {
+  startdate: string;
+  enddate: string;
+}

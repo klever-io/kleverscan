@@ -91,11 +91,22 @@ const Account: React.FC<IAccountPage> = ({
   const [showModal, setShowModal] = useState(false);
   const [query, setQuery] = useState(router.query);
 
-  const requestTransactions = async (page: number) =>
-    api.get({
-      route: `transaction/list`,
-      query: { page, ...query },
-    });
+  const requestTransactions = async (page: number) => {
+    const localQuery = { ...query, page };
+    delete localQuery.tab;
+
+    if (localQuery.fromAddress || localQuery.toAddress) {
+      return api.get({
+        route: `transaction/list`,
+        query: localQuery,
+      });
+    } else {
+      return api.get({
+        route: `address/${account.address}/transactions`,
+        query: localQuery,
+      });
+    }
+  };
 
   const calculateTotalKLV = useCallback(() => {
     // does not include Allowance and Staking

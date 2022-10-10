@@ -1,4 +1,4 @@
-import { Service } from '@/types/index';
+import { Service } from '../../types';
 import api, {
   getCached,
   getHost,

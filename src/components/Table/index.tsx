@@ -141,7 +141,7 @@ const Table: React.FC<ITable> = ({
       <ContainerView>
         <Container>
           {((!isMobile && !isTablet) || !rowSections) && !!items?.length && (
-            <Header {...props}>
+            <Header {...props} key={String(header)}>
               {header.map((item, index) => (
                 <span key={String(index)}>{item}</span>
               ))}

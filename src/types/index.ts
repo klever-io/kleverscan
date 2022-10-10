@@ -55,7 +55,7 @@ export enum ContractsName {
   SellContractType = 'Sell',
   CancelMarketOrderContractType = 'Cancel Marketplace Order',
   CreateMarketplaceContractType = 'Create Marketplace',
-  ConfigMarketplaceContractType = 'Config Marketplae',
+  ConfigMarketplaceContractType = 'Config Marketplace',
 }
 
 export enum ContractsIndex {

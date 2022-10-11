@@ -76,6 +76,16 @@ interface IAllowanceResponse extends IResponse {
   };
 }
 
+interface IQueryParams {
+  page?: number;
+  limit?: string;
+  startDate?: string;
+  endDate?: string;
+  tab?: string;
+  fromAddress?: string;
+  toAddress?: string;
+}
+
 const Account: React.FC<IAccountPage> = ({
   account,
   transactions: transactionResponse,
@@ -92,7 +102,7 @@ const Account: React.FC<IAccountPage> = ({
   const [query, setQuery] = useState(router.query);
 
   const requestTransactions = async (page: number) => {
-    const localQuery = { ...query, page };
+    const localQuery: IQueryParams = { ...query, page };
     delete localQuery.tab;
 
     if (localQuery.fromAddress || localQuery.toAddress) {

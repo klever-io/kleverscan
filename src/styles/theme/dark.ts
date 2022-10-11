@@ -10,8 +10,6 @@ const darktheme = {
   form: {
     ...theme.form,
     hoverHash: '#6E7099',
-    tooltip: '#FFFFFF',
-    tooltipContainer: '#646693',
   },
 
   input: {
@@ -27,11 +25,6 @@ const darktheme = {
 
   accountCard: {
     frozenBackground: '#222345',
-  },
-
-  breakpoints: {
-    mobile: '768px',
-    tablet: '1025px',
   },
 };
 export default darktheme;

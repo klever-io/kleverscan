@@ -53,7 +53,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   Contract,
   ContractsIndex,
-  ContractsName,
   IAsset,
   IContract,
   IPagination,
@@ -252,69 +251,72 @@ const Transactions: React.FC<ITransactions> = ({
 
   const getHeader = () => {
     let newHeaders: string[] = [];
-    switch (ContractsName[getContractName()]) {
-      case Contract.Transfer:
+    switch (ContractsIndex[ContractsIndex[Number(query.type)]]) {
+      case ContractsIndex.Transfer:
         newHeaders = ['Coin', 'Amount'];
         break;
-      case Contract.CreateAsset:
+      case ContractsIndex['Create Asset']:
         newHeaders = ['Name', 'Ticker'];
         break;
-      case Contract.CreateValidator:
+      case ContractsIndex['Create Validator']:
         newHeaders = ['Reward Address', 'Can Delegate'];
         break;
-      case Contract.ValidatorConfig:
+      case ContractsIndex['Config Validator']:
+        newHeaders = ['BLS public key'];
+        break;
+      case ContractsIndex['Validator Config']:
         newHeaders = ['Public Key'];
         break;
-      case Contract.Freeze:
+      case ContractsIndex.Freeze:
         newHeaders = ['Amount'];
         break;
-      case Contract.Unfreeze:
+      case ContractsIndex.Unfreeze:
         newHeaders = ['Bucket Id'];
         break;
-      case Contract.Delegate:
+      case ContractsIndex.Delegate:
         newHeaders = ['Bucket Id'];
         break;
-      case Contract.Undelegate:
+      case ContractsIndex.Undelegate:
         newHeaders = ['Bucket Id'];
         break;
-      case Contract.Withdraw:
+      case ContractsIndex.Withdraw:
         newHeaders = ['Asset Id'];
         break;
-      case Contract.Claim:
+      case ContractsIndex.Claim:
         newHeaders = ['Claim Type'];
         break;
-      case Contract.Unjail:
-      case Contract.AssetTrigger:
+      case ContractsIndex.Unjail:
+      case ContractsIndex['Asset Trigger']:
         newHeaders = ['Trigger Type'];
         break;
-      case Contract.SetAccountName:
+      case ContractsIndex['Set Account Name']:
         newHeaders = ['Name'];
         break;
-      case Contract.Proposal:
+      case ContractsIndex.Proposal:
         newHeaders = ['Description'];
         break;
-      case Contract.Vote:
+      case ContractsIndex.Vote:
         newHeaders = ['Proposal Id', 'Amount'];
         break;
-      case Contract.ConfigITO:
+      case ContractsIndex['Config ITO']:
         newHeaders = ['Asset Id'];
         break;
-      case Contract.SetITOPrices:
+      case ContractsIndex['Set ITO']:
         newHeaders = ['Asset Id'];
         break;
-      case Contract.Buy:
+      case ContractsIndex.Buy:
         newHeaders = ['Buy Type', 'Amount'];
         break;
-      case Contract.Sell:
+      case ContractsIndex.Sell:
         newHeaders = ['Asset Id'];
         break;
-      case Contract.CancelMarketOrder:
+      case ContractsIndex['Cancel Market Order']:
         newHeaders = ['Order Id'];
         break;
-      case Contract.CreateMarketplace:
+      case ContractsIndex['Create Marketplace']:
         newHeaders = ['Name'];
         break;
-      case Contract.ConfigMarketplace:
+      case ContractsIndex['Config Marketplace']:
     }
 
     if (query.type) {

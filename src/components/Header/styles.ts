@@ -185,7 +185,9 @@ export const MobileContent = styled.div<IMobileMenu>`
   height: calc(100vh - 4rem);
 
   top: 4rem;
-  right: ${props => (props.opened ? 0 : '-100%')};
+  right: 0;
+
+  transform: translateX(${props => (props.opened ? 0 : '100%')});
 
   display: flex;
   position: fixed;

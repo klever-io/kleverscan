@@ -3,13 +3,11 @@ import styled from 'styled-components';
 
 export const MoonIcon = styled(BsMoonFill)`
   height: 100%;
-  width: 100%;
   color: ${props => props.theme.navbar.text};
 `;
 
 export const SunIcon = styled(BsSunFill)`
   height: 100%;
-  width: 100%;
   color: ${props => props.theme.navbar.text};
 `;
 

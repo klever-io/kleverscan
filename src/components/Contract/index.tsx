@@ -305,6 +305,8 @@ const Contract: React.FC<IContract> = ({
 
     setLoading(true);
 
+    const parsedData = Buffer.from(data, 'utf-8').toString('base64');
+
     const payload = {
       ...parsedValues,
     };
@@ -317,7 +319,7 @@ const Contract: React.FC<IContract> = ({
             payload: parsedPayload,
           },
         ],
-        [data],
+        [parsedData],
       );
       const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
       if (isMultisig) {

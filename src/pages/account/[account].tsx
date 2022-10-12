@@ -237,6 +237,7 @@ const Account: React.FC<IAccountPage> = ({
       empty: transactionResponse?.data?.transactions?.length === 0,
     },
     filterFromTo,
+    showTxInTxOutFilter: true,
   };
 
   const SelectedTabComponent: React.FC = () => {

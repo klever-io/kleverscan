@@ -102,7 +102,7 @@ const precisionParse = async (
       } else return;
       break;
     case 'SellContract':
-      assetId = payload.currencyId;
+      assetId = payload.assetID;
       precision = await getPrecision(assetId);
       if (precision !== undefined) {
         payload.price &&= payload.price * 10 ** precision;

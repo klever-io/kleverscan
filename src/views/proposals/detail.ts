@@ -428,8 +428,7 @@ export const BalanceContainer = styled.div`
 export const NetworkParamsContainer = styled.div`
   margin-top: 0.5rem;
   display: flex;
-  overflow: scroll;
-
+  overflow: auto;
   flex-direction: column;
 
   background-color: ${props => props.theme.accountCard.frozenBackground};

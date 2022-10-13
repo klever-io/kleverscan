@@ -260,9 +260,9 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
     return sections;
   };
 
-  const requestVoters = async (page: number) => {
+  const requestVoters = async (page: number, limit: number) => {
     const voters = await api.get({
-      route: `proposals/${proposalAPI.proposalId}?pageVoters=${page}`,
+      route: `proposals/${proposalAPI.proposalId}?pageVoters=${page}&limitVoters=${limit}`,
     });
     if (voters.error) {
       return {

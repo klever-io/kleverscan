@@ -154,7 +154,7 @@ const Proposals: React.FC<IProposalsProps> = ({
     scrollUp: false,
     totalPages,
     dataName: 'proposals',
-    request: page => request(page),
+    request: (page, limit) => request(page, limit),
   };
 
   return <Table {...tableProps} />;

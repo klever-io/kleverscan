@@ -61,15 +61,15 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
     },
   ];
 
-  const requestAssets = async (page: number) => {
+  const requestAssets = async (page: number, limit: number) => {
     if (filterToken === 'All' || filterToken === undefined) {
       return api.getCached({
-        route: `assets/kassets?hidden=false&page=${page}`,
+        route: `assets/kassets?hidden=false&page=${page}&limit=${limit}`,
         refreshTime: 21600,
       });
     } else {
       return api.getCached({
-        route: `assets/kassets?hidden=false&asset=${filterToken}&page=${page}`,
+        route: `assets/kassets?hidden=false&asset=${filterToken}&page=${page}&limit=${limit}`,
         refreshTime: 21600,
       });
     }
@@ -86,7 +86,7 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
           route: 'assets/kassets?hidden=false',
           refreshTime: 21600,
         });
-        filters[0].data = assets.data.assets.map(asset => asset.assetId);
+        filters[0].data = assets?.data?.assets?.map(asset => asset.assetId);
       } else {
         router.push(
           { pathname: router.pathname, query: `asset=${filterToken}` },
@@ -209,7 +209,7 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
     data: assets as any[],
     header,
     type: 'assetsPage',
-    request: page => requestAssets(page),
+    request: (page, limit) => requestAssets(page, limit),
     dataName: 'assets',
     scrollUp: true,
     totalPages: pagination.totalPages,

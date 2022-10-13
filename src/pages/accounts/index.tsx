@@ -50,9 +50,9 @@ const Accounts: React.FC<IAccounts> = ({
 }) => {
   const precision = 6; // default KLV precision
 
-  const requestAccounts = async (page: number) =>
+  const requestAccounts = async (page: number, limit: number) =>
     await api.get({
-      route: `address/list?page=${page}`,
+      route: `address/list?page=${page}&limit=${limit}`,
     });
 
   const cards: ICard[] = [
@@ -143,7 +143,7 @@ const Accounts: React.FC<IAccounts> = ({
     data: defaultAccounts as any[],
     rowSections,
     columnSpans: [2],
-    request: page => requestAccounts(page),
+    request: (page, limit) => requestAccounts(page, limit),
     dataName: 'accounts',
     scrollUp: true,
     totalPages: pagination.totalPages,

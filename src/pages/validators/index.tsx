@@ -41,9 +41,9 @@ const Validators: React.FC<IValidatorPage> = ({
 
   const precision = 6;
 
-  const requestValidators = async (page: number) => {
+  const requestValidators = async (page: number, limit: number) => {
     const validators = await api.get({
-      route: `validator/list?page=${page}`,
+      route: `validator/list?page=${page}&limit=${limit}`,
     });
 
     if (!validators.error) {
@@ -128,7 +128,7 @@ const Validators: React.FC<IValidatorPage> = ({
     rowSections,
     columnSpans: [1, 1, 1, 1, 1, 1, 1, 1, 2],
     data: initialValidators,
-    request: page => requestValidators(page),
+    request: (page, limit) => requestValidators(page, limit),
     totalPages: pagination.totalPages,
     scrollUp: true,
     dataName: 'validators',

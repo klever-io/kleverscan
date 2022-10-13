@@ -47,11 +47,11 @@ const Blocks: React.FC<IBlocks> = ({
   const [statistics, setStatistics] = useState(defaultStatistics);
   const [blocksInterval, setBlocksInterval] = useState(blocksWatcherInterval);
 
-  const requestBlocks = async (page: number) => {
+  const requestBlocks = async (page: number, limit: number) => {
     let response = { data: { blocks } };
 
     await Promise.allSettled([
-      blockCall(page),
+      blockCall(page, limit),
       yesterdayStatisticsCall(),
       totalStatisticsCall(),
     ]).then(responses => {
@@ -249,7 +249,7 @@ const Blocks: React.FC<IBlocks> = ({
     scrollUp: true,
     totalPages: pagination?.totalPages || 1,
     dataName: 'blocks',
-    request: (page: number) => requestBlocks(page),
+    request: (page: number, limit: number) => requestBlocks(page, limit),
     interval: blocksInterval,
     intervalController: setBlocksInterval,
   };

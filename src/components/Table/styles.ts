@@ -282,3 +282,107 @@ export const CustomLink = styled.a`
     width: 100%;
   }
 `;
+
+export const FloatContainer = styled.div`
+  width: 100%;
+`;
+
+export const LimitContainer = styled.div`
+  display: block;
+  position: relative;
+  float: right;
+  width: fit-content;
+  font-size: 15px;
+  text-align: left;
+  color: ${props => props.theme.black};
+  border-radius: 7px;
+  background-color: ${props => props.theme.white};
+  padding: 5px;
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    margin-bottom: 10px;
+  }
+  span {
+    padding-left: 0.5rem;
+    font-size: 0.9rem;
+    color: #7b7db2;
+    font-weight: 600;
+  }
+`;
+
+export const LimitText = styled.div`
+  text-align: right;
+  position: relative;
+  color: ${props => props.theme.black};
+  display: flex;
+  margin-top: 5px;
+
+  transform: translateZ(0);
+`;
+
+export const LimitButton = styled.button<{ selected?: boolean }>`
+  color: ${props => props.theme.black};
+  overflow: hidden;
+  border: 1px solid ${props => props.theme.purple};
+  height: fit-content;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.8rem;
+  opacity: ${props => (props.selected ? 1 : 0.8)};
+  transform: scaleY(${props => (props.selected ? 1.05 : 1)});
+
+  &:hover {
+    cursor: pointer;
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  &:first-child {
+    margin-left: 5px;
+    border-radius: 5px 0 0 5px;
+  }
+
+  &:last-child {
+    border-radius: 0 5px 5px 0;
+  }
+`;
+
+export const ItemContainer = styled.div<{
+  active: boolean;
+}>`
+  height: 1.9rem;
+  width: 1.9rem;
+  font: 500 15px Montserrat, sans-serif;
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    font-size: small;
+  }
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background-color: ${props =>
+    props.active ? props.theme.purple : 'transparent'};
+
+  border-radius: 50%;
+
+  color: ${props =>
+    props.active ? props.theme.true.white : props.theme.black};
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+
+  &:hover {
+    ${props =>
+      !props.active
+        ? css`
+            background-color: ${props => props.theme.purple};
+            color: ${props => props.theme.white};
+          `
+        : css`
+            cursor: not-allowed;
+          `}
+  }
+`;

@@ -33,9 +33,9 @@ const Validators: React.FC<ICollectionPage> = ({
   // initialCollection
   const header = ['ID', 'Collection Name', 'Collection Id', 'Address', ''];
 
-  const requestCollection = (page: number) =>
+  const requestCollection = (page: number, limit: number) =>
     api.get({
-      route: `address/${address}/collection/${collectionAsset}?page=${page}`,
+      route: `address/${address}/collection/${collectionAsset}?page=${page}&limit=${limit}`,
     });
 
   const { isMobile } = useMobile();
@@ -76,7 +76,7 @@ const Validators: React.FC<ICollectionPage> = ({
     scrollUp: true,
     totalPages: pagination.totalPages,
     dataName: 'collection',
-    request: (page: number) => requestCollection(page),
+    request: (page: number, limit: number) => requestCollection(page, limit),
   };
 
   const detailProps = {

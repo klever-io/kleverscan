@@ -82,7 +82,7 @@ export interface IProposals {
 export interface IProposalsProps {
   proposals: IParsedProposal[];
   totalPages: number;
-  request: (page: number) => Promise<any>;
+  request: (page: number, limit: number) => Promise<any>;
 }
 
 export interface IRawParam {

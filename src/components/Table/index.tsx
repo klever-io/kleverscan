@@ -11,8 +11,12 @@ import {
   Container,
   ContainerView,
   EmptyRow,
+  FloatContainer,
   Header,
   ITableType,
+  ItemContainer,
+  LimitContainer,
+  LimitText,
   MobileCardItem,
   MobileHeader,
   Row,
@@ -47,7 +51,7 @@ export interface ITable {
   scrollUp?: boolean;
   totalPages?: number;
   dataName?: string;
-  request?: (page: number) => Promise<any>;
+  request?: (page: number, limit: number) => Promise<any>;
   query?: Query;
   interval?: number;
   intervalController?: React.Dispatch<React.SetStateAction<number>>;
@@ -75,9 +79,10 @@ const Table: React.FC<ITable> = ({
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(defaultTotalPages);
+  const [limit, setLimit] = useState<number>(10);
   const [items, setItems] = useState(data);
   const dataRef = useRef([]) as any;
-  const router = useRouter();
+  const limits = [5, 10, 30, 50];
 
   useEffect(() => {
     const tabletWindow = window.innerWidth <= 1025 && window.innerWidth >= 769;
@@ -85,12 +90,9 @@ const Table: React.FC<ITable> = ({
   });
 
   const fetchData = async () => {
-    if (!interval && request && dataName) {
-      // TODO: check if this "if" with interval check is still necessary after fixing blocks updating effect
-      setLoading(true);
-    }
     if (request && dataName) {
-      const response = await request(page);
+      const response = await request(page, limit);
+      setLoading(true);
       if (!response.error) {
         setItems(response.data[dataName]);
         setTotalPages(response.pagination.totalPages);
@@ -98,8 +100,8 @@ const Table: React.FC<ITable> = ({
         setPage(1);
         setItems([]);
       }
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   useDidUpdateEffect(() => {
@@ -117,6 +119,10 @@ const Table: React.FC<ITable> = ({
   }, [page]);
 
   useEffect(() => {
+    fetchData();
+  }, [limit]);
+
+  useEffect(() => {
     if (page !== 1) {
       setPage(1);
     }
@@ -124,13 +130,16 @@ const Table: React.FC<ITable> = ({
   }, [query]);
 
   useEffect(() => {
+    setLoading(true);
     if (interval) {
       const intervalId = setInterval(() => {
         fetchData();
       }, interval);
       return () => clearInterval(intervalId);
+    } else {
+      fetchData();
     }
-  }, [interval]);
+  }, [interval, limit]);
 
   useEffect(() => {
     setItems(data);
@@ -138,6 +147,27 @@ const Table: React.FC<ITable> = ({
 
   return (
     <>
+      {typeof scrollUp === 'boolean' &&
+        typeof totalPages === 'number' &&
+        !!items &&
+        items?.length > 0 && (
+          <FloatContainer>
+            <LimitContainer>
+              <span>Per page</span>
+              <LimitText>
+                {limits.map(value => (
+                  <ItemContainer
+                    key={value}
+                    onClick={() => setLimit(value)}
+                    active={value === limit}
+                  >
+                    {value}
+                  </ItemContainer>
+                ))}
+              </LimitText>
+            </LimitContainer>
+          </FloatContainer>
+        )}
       <ContainerView>
         <Container>
           {((!isMobile && !isTablet) || !rowSections) && !!items?.length && (
@@ -192,18 +222,20 @@ const Table: React.FC<ITable> = ({
           )}
         </Container>
       </ContainerView>
-      {typeof scrollUp === 'boolean' && typeof totalPages === 'number' && (
-        <PaginationContainer>
-          <Pagination
-            scrollUp={scrollUp}
-            count={totalPages}
-            page={page}
-            onPaginate={page => {
-              setPage(page);
-            }}
-          />
-        </PaginationContainer>
-      )}
+      {typeof scrollUp === 'boolean' &&
+        typeof totalPages === 'number' &&
+        totalPages > 1 && (
+          <PaginationContainer>
+            <Pagination
+              scrollUp={scrollUp}
+              count={totalPages}
+              page={page}
+              onPaginate={page => {
+                setPage(page);
+              }}
+            />
+          </PaginationContainer>
+        )}
     </>
   );
 };

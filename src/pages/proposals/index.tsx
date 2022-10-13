@@ -26,9 +26,9 @@ const Proposals: React.FC<IProposalsPage> = ({
   const tableHeaders = ['Network Parameters', 'Proposals'];
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
 
-  const requestProposals = async (page: number) => {
+  const requestProposals = async (page: number, limit: number) => {
     const proposals: IProposalsResponse = await api.get({
-      route: `proposals/list?page=${page}`,
+      route: `proposals/list?page=${page}&limit=${limit}`,
     });
 
     let parsedProposalResponse: any[] = [];

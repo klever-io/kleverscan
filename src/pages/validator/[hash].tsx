@@ -169,9 +169,9 @@ const Validator: React.FC<IValidatorPage> = ({
     );
   };
 
-  const requestValidator = async (page: number) => {
+  const requestValidator = async (page: number, limit: number) => {
     const response: IDelegateResponse = await api.get({
-      route: `validator/delegated/${ownerAddress}?page=${page}`,
+      route: `validator/delegated/${ownerAddress}?page=${page}&limit=${limit}`,
     });
 
     const delegators: IBucket[] = [];
@@ -341,7 +341,7 @@ const Validator: React.FC<IValidatorPage> = ({
     data: defaultDelegators as IBucket[],
     rowSections,
     columnSpans: [2, 2, 1, 1],
-    request: page => requestValidator(page),
+    request: (page, limit) => requestValidator(page, limit),
     scrollUp: false,
     totalPages: pagination.totalPages,
     dataName: 'validator',

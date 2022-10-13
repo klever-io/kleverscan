@@ -190,10 +190,10 @@ const Transactions: React.FC<ITransactions> = ({
     'Bandwidth Fee',
   ];
 
-  const requestTransactions = async (page: number) =>
+  const requestTransactions = async (page: number, limit?: number) =>
     api.get({
       route: `transaction/list`,
-      query: { page, ...query },
+      query: { page, limit, ...query },
     });
 
   const getFilteredSections = (contract: IContract[]): JSX.Element[] => {
@@ -403,7 +403,7 @@ const Transactions: React.FC<ITransactions> = ({
     dataName: 'transactions',
     scrollUp: true,
     totalPages: pagination.totalPages,
-    request: page => requestTransactions(page),
+    request: (page, limit) => requestTransactions(page, limit),
     query,
   };
 

@@ -104,9 +104,9 @@ const Transactions: React.FC<ITransactionsProps> = props => {
         ),
         span: 1,
       },
-      { element: <strong key={contractType}>{contractType}</strong> },
-      { element: <strong key={amount}>{amount}</strong> },
-      { element: <strong key={assetId}>{assetId}</strong> },
+      { element: <strong key={contractType}>{contractType}</strong>, span: 1 },
+      { element: <strong key={amount}>{amount}</strong>, span: 1 },
+      { element: <strong key={assetId}>{assetId}</strong>, span: 1 },
     ];
     return sections;
   };

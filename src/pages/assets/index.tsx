@@ -225,7 +225,7 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
         ),
         span: 1,
       },
-      { element: <strong key={precision}>{precision}</strong> },
+      { element: <strong key={precision}>{precision}</strong>, span: 1 },
     ];
 
     return sections;

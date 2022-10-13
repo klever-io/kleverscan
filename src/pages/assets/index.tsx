@@ -5,7 +5,7 @@ import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Table, { ITable } from '@/components/Table';
 import api from '@/services/api';
-import { IAsset, IPagination, IResponse } from '@/types/index';
+import { IAsset, IPagination, IResponse, IRowSection } from '@/types/index';
 import { formatAmount, parseHardCodedInfo } from '@/utils/index';
 import { Container, Header, HeaderContainer, Input } from '@/views/assets';
 import { LetterLogo, Logo } from '@/views/assets/index';
@@ -100,7 +100,7 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
     changeUrl();
   }, [filterToken]);
 
-  const rowSections = (asset: IAsset): JSX.Element[] => {
+  const rowSections = (asset: IAsset): IRowSection[] => {
     const {
       ticker,
       name,
@@ -134,58 +134,98 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
     };
 
     const sections = [
-      <Link href={`/asset/${assetId}`} key={assetId}>
-        <a>
-          <AssetLogo
-            LetterLogo={LetterLogo}
-            isVerified={isVerified}
-            Logo={Logo}
-            logo={logo}
-            ticker={ticker}
-            name={name}
-          />
-        </a>
-      </Link>,
+      {
+        element: (
+          <Link href={`/asset/${assetId}`} key={assetId}>
+            <a>
+              <AssetLogo
+                LetterLogo={LetterLogo}
+                isVerified={isVerified}
+                Logo={Logo}
+                logo={logo}
+                ticker={ticker}
+                name={name}
+              />
+            </a>
+          </Link>
+        ),
+        span: 1,
+      },
 
-      <Link href={`/asset/${assetId}`} key={ticker}>
-        <a>
-          <p>{ticker}</p>
-        </a>
-      </Link>,
+      {
+        element: (
+          <Link href={`/asset/${assetId}`} key={ticker}>
+            <a>
+              <p>{ticker}</p>
+            </a>
+          </Link>
+        ),
+        span: 1,
+      },
 
-      <Link href={`/asset/${assetId}`} key={assetId}>
-        {assetId}
-      </Link>,
-      <Link href={`/asset/${assetId}`} key={assetId}>
-        <a>
-          <p
-            style={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {name}
-          </p>
-        </a>
-      </Link>,
+      {
+        element: (
+          <Link href={`/asset/${assetId}`} key={assetId}>
+            {assetId}
+          </Link>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <Link href={`/asset/${assetId}`} key={assetId}>
+            <a>
+              <p
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {name}
+              </p>
+            </a>
+          </Link>
+        ),
+        span: 1,
+      },
 
-      <span key={assetType}>{assetType}</span>,
-      <strong key={initialSupply}>
-        {formatAmount(initialSupply / 10 ** precision)} {ticker}
-      </strong>,
-      <strong key={maxSupply}>
-        {renderMaxSupply()} {ticker}
-      </strong>,
-      <strong key={circulatingSupply}>
-        {formatAmount(circulatingSupply / 10 ** precision)} {ticker}
-      </strong>,
-      <strong key={String(staking?.totalStaked)}>
-        {staking?.totalStaked
-          ? formatAmount(staking.totalStaked / 10 ** precision)
-          : 0}
-      </strong>,
-      <strong key={precision}>{precision}</strong>,
+      { element: <span key={assetType}>{assetType}</span>, span: 1 },
+      {
+        element: (
+          <strong key={initialSupply}>
+            {formatAmount(initialSupply / 10 ** precision)} {ticker}
+          </strong>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <strong key={maxSupply}>
+            {renderMaxSupply()} {ticker}
+          </strong>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <strong key={circulatingSupply}>
+            {formatAmount(circulatingSupply / 10 ** precision)} {ticker}
+          </strong>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <strong key={String(staking?.totalStaked)}>
+            {staking?.totalStaked
+              ? formatAmount(staking.totalStaked / 10 ** precision)
+              : 0}
+          </strong>
+        ),
+        span: 1,
+      },
+      { element: <strong key={precision}>{precision}</strong> },
     ];
 
     return sections;

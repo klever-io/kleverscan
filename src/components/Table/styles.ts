@@ -160,11 +160,9 @@ export const Row = styled.div<ITableType>`
       @media screen and (max-width: ${props =>
           props.theme.breakpoints.tablet}) {
         width: 100%;
-
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+        grid-template-columns: repeat(2, 1fr);
         grid-gap: 0.75rem;
-
         span,
         a {
           span,
@@ -186,14 +184,25 @@ export const Row = styled.div<ITableType>`
     `}
 `;
 
-export const MobileCardItem = styled.span<{ columnSpan?: number }>`
+export const MobileCardItem = styled.span<{
+  columnSpan?: number;
+  isRightAligned?: boolean;
+}>`
   display: flex;
   flex-direction: column;
-
   &:last-child {
     flex-grow: 1;
   }
 
+  ${props =>
+    props.isRightAligned &&
+    css`
+      text-align: right;
+      align-items: flex-end;
+      span {
+        justify-content: right;
+      }
+    `}
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     ${props =>
       !props.columnSpan || props.columnSpan >= 0
@@ -276,7 +285,7 @@ export const CustomLink = styled.a`
     opacity: 0.8;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     display: flex;
     justify-content: center;
     width: 100%;

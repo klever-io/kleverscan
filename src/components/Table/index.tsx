@@ -1,4 +1,4 @@
-import { Query } from '@/types/index';
+import { IRowSection, Query } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { useMobile } from 'contexts/mobile';
 import { useRouter } from 'next/router';
@@ -46,8 +46,7 @@ export interface ITable {
   header: string[];
   data: any[];
   body?: any;
-  rowSections?: (item: any) => JSX.Element[] | undefined;
-  columnSpans?: number[];
+  rowSections?: (item: any) => IRowSection[] | undefined;
   scrollUp?: boolean;
   totalPages?: number;
   dataName?: string;
@@ -63,7 +62,6 @@ const Table: React.FC<ITable> = ({
   data,
   body: Component,
   rowSections,
-  columnSpans,
   request,
   scrollUp,
   totalPages: defaultTotalPages,
@@ -194,26 +192,43 @@ const Table: React.FC<ITable> = ({
               </>
             )}
             {!loading &&
-              items?.map((item, index) => (
-                <React.Fragment key={String(index)}>
-                  {Component && <Component key={String(index)} {...item} />}
-                  {rowSections && (
-                    <Row key={String(index)} {...props} rowSections={true}>
-                      {rowSections(item)?.map((Section, index2) => (
-                        <MobileCardItem
-                          key={String(index2) + String(index)}
-                          columnSpan={columnSpans?.[index2]}
-                        >
-                          {isMobile || isTablet ? (
-                            <MobileHeader>{header[index2]}</MobileHeader>
-                          ) : null}
-                          {Section}
-                        </MobileCardItem>
-                      ))}
-                    </Row>
-                  )}
-                </React.Fragment>
-              ))}
+              items?.map((item, index) => {
+                let spanCount = 0;
+
+                return (
+                  <React.Fragment key={String(index)}>
+                    {Component && <Component key={String(index)} {...item} />}
+                    {rowSections && (
+                      <Row key={String(index)} {...props} rowSections={true}>
+                        {rowSections(item)?.map(({ element, span }, index2) => {
+                          let isRightAligned = false;
+                          spanCount += span || 1;
+                          if (span === -1) {
+                            spanCount += 1;
+                          }
+                          if (span !== 2 && spanCount % 2 === 0) {
+                            isRightAligned = true;
+                          }
+                          return (
+                            <MobileCardItem
+                              isRightAligned={
+                                (isMobile || isTablet) && isRightAligned
+                              }
+                              key={String(index2) + String(index)}
+                              columnSpan={span}
+                            >
+                              {isMobile || isTablet ? (
+                                <MobileHeader>{header[index2]}</MobileHeader>
+                              ) : null}
+                              {element}
+                            </MobileCardItem>
+                          );
+                        })}
+                      </Row>
+                    )}
+                  </React.Fragment>
+                );
+              })}
           </Body>
           {!loading && (!items || items?.length === 0) && (
             <EmptyRow {...props}>

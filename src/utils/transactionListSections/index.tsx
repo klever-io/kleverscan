@@ -12,6 +12,7 @@ import {
   IFreezeContract,
   IParameter,
   IProposalContract,
+  IRowSection,
   ISellContract,
   ISetAccountNameContract,
   ISetITOPricesContract,
@@ -29,227 +30,340 @@ import { formatAmount } from '..';
 
 const precision = 6; // default KLV precision
 
-const TransferSections = (par: IParameter): JSX.Element[] => {
+const TransferSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as ITransferContract;
 
   return [
-    <CenteredRow key={parameter.assetId}>
-      <div>
-        {parameter.assetId ? (
-          <Tooltip
-            msg={parameter.assetId}
-            Component={() => (
-              <Link href={`/asset/${parameter.assetId}`}>
-                {parameter.assetId}
-              </Link>
+    {
+      element: (
+        <CenteredRow key={parameter.assetId}>
+          <div>
+            {parameter.assetId ? (
+              <Tooltip
+                msg={parameter.assetId}
+                Component={() => (
+                  <Link href={`/asset/${parameter.assetId}`}>
+                    {parameter.assetId}
+                  </Link>
+                )}
+              ></Tooltip>
+            ) : (
+              <>
+                <Tooltip
+                  msg="KLV"
+                  Component={() => <Link href={`/asset/KLV`}>KLV</Link>}
+                ></Tooltip>
+              </>
             )}
-          ></Tooltip>
-        ) : (
-          <>
-            <Tooltip
-              msg="KLV"
-              Component={() => <Link href={`/asset/KLV`}>KLV</Link>}
-            ></Tooltip>
-          </>
-        )}
-      </div>
-    </CenteredRow>,
-    <span key={parameter.amount}>
-      <strong>{formatAmount(parameter.amount / 10 ** precision)}</strong>
-    </span>,
+          </div>
+        </CenteredRow>
+      ),
+      span: 1,
+    },
+    {
+      element: (
+        <span key={parameter.amount}>
+          <strong>{formatAmount(parameter.amount / 10 ** precision)}</strong>
+        </span>
+      ),
+      span: 1,
+    },
   ];
 };
 
-const CreateAssetSections = (par: IParameter): JSX.Element[] => {
+const CreateAssetSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as ICreateAssetContract;
 
   return [
-    <span key={parameter.name}>{parameter.name}</span>,
-    <span key={parameter.ticker}>
-      <small>{parameter.ticker}</small>
-    </span>,
+    { element: <span key={parameter.name}>{parameter.name}</span>, span: 1 },
+    {
+      element: (
+        <span key={parameter.ticker}>
+          <small>{parameter.ticker}</small>
+        </span>
+      ),
+      span: 1,
+    },
   ];
 };
 
-const CreateValidatorSections = (par: IParameter): JSX.Element[] => {
+const CreateValidatorSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as ICreateValidatorContract;
 
   return [
-    <span key={parameter.config.rewardAddress}>
-      <Link href={`/account/${parameter.config.rewardAddress}`}>
-        {parameter.config.rewardAddress}
-      </Link>
-    </span>,
-    <span key={String(parameter.config.canDelegate)}>
-      <strong>{parameter.config.canDelegate ? 'True' : 'False'}</strong>
-    </span>,
+    {
+      element: (
+        <span key={parameter.config.rewardAddress}>
+          <Link href={`/account/${parameter.config.rewardAddress}`}>
+            {parameter.config.rewardAddress}
+          </Link>
+        </span>
+      ),
+      span: 1,
+    },
+    {
+      element: (
+        <span key={String(parameter.config.canDelegate)}>
+          <strong>{parameter.config.canDelegate ? 'True' : 'False'}</strong>
+        </span>
+      ),
+      span: 1,
+    },
   ];
 };
 
-const ValidatorConfigSections = (par: IParameter): JSX.Element[] => {
+const ValidatorConfigSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IValidatorConfigContract;
 
   return [
-    <span key={parameter.config.blsPublicKey}>
-      <small>{parameter.config.blsPublicKey}</small>
-    </span>,
+    {
+      element: (
+        <span key={parameter.config.blsPublicKey}>
+          <small>{parameter.config.blsPublicKey}</small>
+        </span>
+      ),
+      span: 1,
+    },
   ];
 };
 
-const FreezeSections = (par: IParameter): JSX.Element[] => {
+const FreezeSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IFreezeContract;
 
   return [
-    <span key={parameter.amount}>
-      <strong>
-        {formatAmount(parameter.amount / 10 ** precision)}{' '}
-        {parameter.assetId.replace(/['"]+/g, '')}
-      </strong>
-    </span>,
+    {
+      element: (
+        <span key={parameter.amount}>
+          <strong>
+            {formatAmount(parameter.amount / 10 ** precision)}{' '}
+            {parameter.assetId.replace(/['"]+/g, '')}
+          </strong>
+        </span>
+      ),
+      span: 1,
+    },
   ];
 };
 
-const UnfreezeSections = (par: IParameter): JSX.Element[] => {
+const UnfreezeSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IUnfreezeContract;
 
   return [
-    <span key={parameter.bucketID}>
-      <small>{parameter.bucketID}</small>
-    </span>,
+    {
+      element: (
+        <span key={parameter.bucketID}>
+          <small>{parameter.bucketID}</small>
+        </span>
+      ),
+      span: 1,
+    },
   ];
 };
 
-const DelegateSections = (par: IParameter): JSX.Element[] => {
+const DelegateSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IUnfreezeContract;
 
   return [
-    <span key={parameter.bucketID}>
-      <small>{parameter.bucketID}</small>
-    </span>,
+    {
+      element: (
+        <span key={parameter.bucketID}>
+          <small>{parameter.bucketID}</small>
+        </span>
+      ),
+      span: 1,
+    },
   ];
 };
 
-const UndelegateSections = (par: IParameter): JSX.Element[] => {
+const UndelegateSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IUndelegateContract;
 
   return [
-    <span key={parameter.bucketID}>
-      <small>{parameter.bucketID}</small>
-    </span>,
+    {
+      element: (
+        <span key={parameter.bucketID}>
+          <small>{parameter.bucketID}</small>
+        </span>
+      ),
+      span: 1,
+    },
   ];
 };
 
-const WithdrawSections = (par: IParameter): JSX.Element[] => {
+const WithdrawSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IWithdrawContract;
   return [
-    <>
-      <span>{parameter.assetId}</span>
-    </>,
+    {
+      element: (
+        <>
+          <span>{parameter.assetId}</span>
+        </>
+      ),
+      span: 1,
+    },
   ];
 };
 
-const ClaimSections = (par: IParameter): JSX.Element[] => {
+const ClaimSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IClaimContract;
 
   return [
-    <span key={parameter.claimType}>
-      <small>{parameter.claimType}</small>
-    </span>,
+    {
+      element: (
+        <span key={parameter.claimType}>
+          <small>{parameter.claimType}</small>
+        </span>
+      ),
+      span: 1,
+    },
   ];
 };
 
-const UnjailSections = (par: IParameter): JSX.Element[] => {
+const UnjailSections = (par: IParameter): IRowSection[] => {
   const parameter = par as IUnjailContract;
 
-  return [];
+  return [{ element: <></>, span: 1 }];
 };
 
-const AssetTriggerSections = (par: IParameter): JSX.Element[] => {
+const AssetTriggerSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IAssetTriggerContract;
 
   return [
-    <span key={parameter.triggerType}>
-      <small>{parameter.triggerType}</small>
-    </span>,
+    {
+      element: (
+        <span key={parameter.triggerType}>
+          <small>{parameter.triggerType}</small>
+        </span>
+      ),
+      span: 1,
+    },
   ];
 };
 
-const SetAccountNameSections = (par: IParameter): JSX.Element[] => {
+const SetAccountNameSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as ISetAccountNameContract;
 
   return [
-    <span key={parameter.name}>
-      <small>{parameter.name}</small>
-    </span>,
+    {
+      element: (
+        <span key={parameter.name}>
+          <small>{parameter.name}</small>
+        </span>
+      ),
+      span: 1,
+    },
   ];
 };
 
-const ProposalSections = (par: IParameter): JSX.Element[] => {
+const ProposalSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IProposalContract;
 
-  return [<span key={parameter.description}>{parameter.description}</span>];
+  return [
+    {
+      element: <span key={parameter.description}>{parameter.description}</span>,
+      span: 1,
+    },
+  ];
 };
 
-const VoteSections = (par: IParameter): JSX.Element[] => {
+const VoteSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IVoteContract;
 
   return [
-    <span key={parameter.proposalId}>{parameter.proposalId}</span>,
-    <span key={parameter.amount}>
-      <small>{parameter.amount}</small>
-    </span>,
+    {
+      element: <span key={parameter.proposalId}>{parameter.proposalId}</span>,
+      span: 1,
+    },
+    {
+      element: (
+        <span key={parameter.amount}>
+          <small>{parameter.amount}</small>
+        </span>
+      ),
+      span: 1,
+    },
   ];
 };
 
-const ConfigITOSections = (par: IParameter): JSX.Element[] => {
+const ConfigITOSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IConfigITOContract;
 
-  return [<span key={parameter.assetId}>{parameter.assetId}</span>];
+  return [
+    {
+      element: <span key={parameter.assetId}>{parameter.assetId}</span>,
+      span: 1,
+    },
+  ];
 };
 
-const SetITOPricesSections = (par: IParameter): JSX.Element[] => {
+const SetITOPricesSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as ISetITOPricesContract;
 
-  return [<span key={parameter.assetId}>{parameter.assetId}</span>];
+  return [
+    {
+      element: <span key={parameter.assetId}>{parameter.assetId}</span>,
+      span: 1,
+    },
+  ];
 };
 
-const BuySections = (par: IParameter): JSX.Element[] => {
+const BuySections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IBuyContract;
 
   return [
-    <span key={parameter.buyType}>{parameter.buyType}</span>,
-    <span key={parameter.amount}>
-      <small>{parameter.amount}</small>
-    </span>,
+    {
+      element: <span key={parameter.buyType}>{parameter.buyType}</span>,
+      span: 1,
+    },
+    {
+      element: (
+        <span key={parameter.amount}>
+          <small>{parameter.amount}</small>
+        </span>
+      ),
+      span: 1,
+    },
   ];
 };
 
-const SellSections = (par: IParameter): JSX.Element[] => {
+const SellSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as ISellContract;
 
   return [
-    <span key={parameter.assetId}>
-      <small>{parameter.assetId}</small>
-    </span>,
+    {
+      element: (
+        <span key={parameter.assetId}>
+          <small>{parameter.assetId}</small>
+        </span>
+      ),
+      span: 1,
+    },
   ];
 };
 
-const CancelMarketOrderSections = (par: IParameter): JSX.Element[] => {
+const CancelMarketOrderSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as ICancelMarketOrderContract;
 
-  return [<span key={parameter.orderId}>{parameter.orderId}</span>];
+  return [
+    {
+      element: <span key={parameter.orderId}>{parameter.orderId}</span>,
+      span: 1,
+    },
+  ];
 };
 
-const CreateMarketplaceSections = (par: IParameter): JSX.Element[] => {
+const CreateMarketplaceSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as ICreateMarketplaceContract;
 
-  return [<span key={parameter.name}>{parameter.name}</span>];
+  return [
+    { element: <span key={parameter.name}>{parameter.name}</span>, span: 1 },
+  ];
 };
 
-const ConfigMarketplaceSections = (par: IParameter): JSX.Element[] => {
+const ConfigMarketplaceSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IConfigMarketplaceContract;
 
-  return [<></>];
+  return [{ element: <></>, span: 1 }];
 };
 
 export {

@@ -5,6 +5,7 @@ import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
 import api from '@/services/api';
+import { IRowSection } from '@/types/index';
 import {
   IAPINetworkParams,
   IFullInfoParam,
@@ -235,25 +236,35 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
     );
   };
 
-  const rowSections = (vote: IParsedVote): JSX.Element[] => {
+  const rowSections = (vote: IParsedVote): IRowSection[] => {
     const { status, voter, votingPower, voteDate } = vote;
 
-    let sections = [<></>];
+    let sections = [{ element: <></>, span: 1 }];
     if (status === selectedFilter) {
       sections = [
-        <CenteredRow key={voter}>
-          <Link href={`/account/${voter}`}>{parseAddress(voter, 24)}</Link>
-          <Copy data={voter} info="voter"></Copy>
-        </CenteredRow>,
-        <p key={votingPower}>{votingPower}%</p>,
-        <StatusContent key={status}>
-          <AiFillCheckCircle
-            color={typeVoteColors[status]}
-            size={18}
-            style={{ marginRight: 5 }}
-          />
-          <small>{voteDate}</small>
-        </StatusContent>,
+        {
+          element: (
+            <CenteredRow key={voter}>
+              <Link href={`/account/${voter}`}>{parseAddress(voter, 24)}</Link>
+              <Copy data={voter} info="voter"></Copy>
+            </CenteredRow>
+          ),
+          span: 2,
+        },
+        { element: <p key={votingPower}>{votingPower}%</p>, span: 1 },
+        {
+          element: (
+            <StatusContent key={status}>
+              <AiFillCheckCircle
+                color={typeVoteColors[status]}
+                size={18}
+                style={{ marginRight: 5 }}
+              />
+              <small>{voteDate}</small>
+            </StatusContent>
+          ),
+          span: 1,
+        },
       ];
     }
 
@@ -290,7 +301,6 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
     header: ['Voter', 'Voting Power', 'Vote date'],
     type: 'votes',
     rowSections,
-    columnSpans: [2, 1, 1],
     data: votersList,
     totalPages: pagination?.totalPages,
     scrollUp: false,

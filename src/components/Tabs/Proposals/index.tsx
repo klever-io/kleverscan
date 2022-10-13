@@ -1,7 +1,8 @@
 import { getStatusIcon } from '@/assets/status';
 import Table, { ITable } from '@/components/Table';
-import { Status } from '@/components/Table/styles';
+import { CustomLink, Status } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
+import { IRowSection } from '@/types/index';
 import {
   IFullInfoParam,
   IParsedProposal,
@@ -24,7 +25,7 @@ const Proposals: React.FC<IProposalsProps> = ({
 }) => {
   const tooltipRef = useRef<any>(null);
 
-  const rowSections = (props: IParsedProposal): JSX.Element[] => {
+  const rowSections = (props: IParsedProposal): IRowSection[] => {
     const {
       proposalId,
       epochStart,
@@ -106,31 +107,61 @@ const Proposals: React.FC<IProposalsProps> = ({
       return <span style={{ color: 'red' }}>Unavailable</span>;
     };
     const sections = [
-      <p key={proposalId}>#{proposalId}</p>,
-      <ProposerDescAndLink key={proposer}>
-        <Link href={`/account/${proposer}`}>
-          <a>{parseAddress(proposer, 14)}</a>
-        </Link>
-      </ProposerDescAndLink>,
-      <ProposalTime key={`${epochStart}/${epochEnd}`}>
-        <small>Created Epoch: {epochStart}</small>
-        <small className="endTime">Ending Epoch: {epochEnd}</small>
-      </ProposalTime>,
-      <UpVotes key={String(votes)}>
-        <p>
-          {getPositiveVotes()}/{parseTotalStaked()}
-        </p>
-      </UpVotes>,
-      <Status status={proposalStatus} key={proposalStatus}>
-        <StatusIcon />
-        <ProposalStatus>{capitalizeString(proposalStatus)}</ProposalStatus>
-      </Status>,
-      <span key={String(parsedParameters)}>
-        {renderProposalsNetworkParamsWithToolTip()}
-      </span>,
-      <Link href={{ pathname: `/proposal/${proposalId}` }} key={proposalId}>
-        Details
-      </Link>,
+      { element: <p key={proposalId}>#{proposalId}</p>, span: 1 },
+      {
+        element: (
+          <ProposerDescAndLink key={proposer}>
+            <Link href={`/account/${proposer}`}>
+              <a>{parseAddress(proposer, 14)}</a>
+            </Link>
+          </ProposerDescAndLink>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <ProposalTime key={`${epochStart}/${epochEnd}`}>
+            <small>Created Epoch: {epochStart}</small>
+            <small className="endTime">Ending Epoch: {epochEnd}</small>
+          </ProposalTime>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <UpVotes key={String(votes)}>
+            <p>
+              {getPositiveVotes()}/{parseTotalStaked()}
+            </p>
+          </UpVotes>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <Status status={proposalStatus} key={proposalStatus}>
+            <StatusIcon />
+            <ProposalStatus>{capitalizeString(proposalStatus)}</ProposalStatus>
+          </Status>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <span key={String(parsedParameters)}>
+            {renderProposalsNetworkParamsWithToolTip()}
+          </span>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <Link href={{ pathname: `/proposal/${proposalId}` }} key={proposalId}>
+            <CustomLink>Details</CustomLink>
+          </Link>
+        ),
+        span: 2,
+      },
     ];
     return sections;
   };
@@ -147,7 +178,6 @@ const Proposals: React.FC<IProposalsProps> = ({
 
   const tableProps: ITable = {
     rowSections,
-    columnSpans: [1, 1, 1, 1, 2, 2, 2],
     data: proposals as any[],
     header,
     type: 'proposals',

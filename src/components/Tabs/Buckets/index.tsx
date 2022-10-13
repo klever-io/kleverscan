@@ -1,7 +1,7 @@
 import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
 import api from '@/services/api';
-import { IAccountAsset, IAsset, IBucket } from '@/types/index';
+import { IAccountAsset, IAsset, IBucket, IRowSection } from '@/types/index';
 import { parseAddress } from '@/utils/index';
 import { CenteredRow, RowContent } from '@/views/accounts/detail';
 import { useMobile } from 'contexts/mobile';
@@ -58,7 +58,7 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
   });
   const { isMobile } = useMobile();
 
-  const rowSections = (assetBucket: IAssetsBuckets): JSX.Element[] => {
+  const rowSections = (assetBucket: IAssetsBuckets): IRowSection[] => {
     const { asset, bucket } = assetBucket;
 
     const getAvaliableEpoch = (assetId: string, unstakedEpoch: number) => {
@@ -71,46 +71,86 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
     };
 
     const sections = [
-      <Link href={`/asset/${asset.assetId}`} key={asset.assetId}>
-        <a>{asset.assetId}</a>
-      </Link>,
-      <p key={bucket.unstakedEpoch}>
-        {(bucket.balance / 10 ** asset.precision).toLocaleString()}
-      </p>,
-      <Status staked={true} key={'true'}>
-        {'True'}
-      </Status>,
-      <span key={bucket.unstakedEpoch}>
-        {bucket.stakedEpoch.toLocaleString()}
-      </span>,
-      <RowContent key={bucket.id}>
-        <CenteredRow className="bucketIdCopy">
-          <span>{!isMobile ? bucket.id : parseAddress(bucket.id, 24)}</span>
-          <Copy info="BucketId" data={bucket.id} />
-        </CenteredRow>
-      </RowContent>,
-      <>
-        {bucket.unstakedEpoch === UINT32_MAX
-          ? '--'
-          : bucket.unstakedEpoch.toLocaleString()}
-      </>,
-      <>
-        {bucket.unstakedEpoch === UINT32_MAX
-          ? '--'
-          : getAvaliableEpoch(
-              asset.assetId,
-              bucket.unstakedEpoch,
-            ).toLocaleString()}
-      </>,
-      <>
-        {bucket.delegation.length > 0 ? (
-          <Link href={`/account/${bucket.delegation}`}>
-            <a>{parseAddress(bucket.delegation, 22)}</a>
+      {
+        element: (
+          <Link href={`/asset/${asset.assetId}`} key={asset.assetId}>
+            <a>{asset.assetId}</a>
           </Link>
-        ) : (
-          <span>--</span>
-        )}
-      </>,
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <p key={bucket.unstakedEpoch}>
+            {(bucket.balance / 10 ** asset.precision).toLocaleString()}
+          </p>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <Status staked={true} key={'true'}>
+            {'True'}
+          </Status>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <span key={bucket.unstakedEpoch}>
+            {bucket.stakedEpoch.toLocaleString()}
+          </span>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <RowContent key={bucket.id}>
+            <CenteredRow className="bucketIdCopy">
+              <span>{!isMobile ? bucket.id : parseAddress(bucket.id, 24)}</span>
+              <Copy info="BucketId" data={bucket.id} />
+            </CenteredRow>
+          </RowContent>
+        ),
+        span: 2,
+      },
+      {
+        element: (
+          <>
+            {bucket.unstakedEpoch === UINT32_MAX
+              ? '--'
+              : bucket.unstakedEpoch.toLocaleString()}
+          </>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <>
+            {bucket.unstakedEpoch === UINT32_MAX
+              ? '--'
+              : getAvaliableEpoch(
+                  asset.assetId,
+                  bucket.unstakedEpoch,
+                ).toLocaleString()}
+          </>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <>
+            {bucket.delegation.length > 0 ? (
+              <Link href={`/account/${bucket.delegation}`}>
+                <a>{parseAddress(bucket.delegation, 22)}</a>
+              </Link>
+            ) : (
+              <span>--</span>
+            )}
+          </>
+        ),
+        span: 1,
+      },
     ];
 
     return sections;
@@ -132,7 +172,6 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
     header,
     data: assetsBuckets,
     rowSections,
-    columnSpans: [1, 1, 1, 1, 2, 1, 1, 1],
   };
 
   return <Table {...tableProps} />;

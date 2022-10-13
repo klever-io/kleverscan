@@ -3,7 +3,7 @@ import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
 import api from '@/services/api';
-import { IAccount, IPagination, IResponse } from '@/types/index';
+import { IAccount, IPagination, IResponse, IRowSection } from '@/types/index';
 import { formatAmount, getAge, parseAddress } from '@/utils/index';
 import { TableContainer } from '@/views/accounts';
 import { CenteredRow } from '@/views/accounts/detail';
@@ -114,25 +114,42 @@ const Accounts: React.FC<IAccounts> = ({
 
   const { isMobile } = useMobile();
 
-  const rowSections = (account: IAccount): JSX.Element[] => {
+  const rowSections = (account: IAccount): IRowSection[] => {
     const { address, balance, frozenBalance, nonce } = account;
     const sections = [
-      <CenteredRow key={address}>
-        <Link href={`/account/${address}`}>
-          {isMobile ? parseAddress(address, 24) : address}
-        </Link>
+      {
+        element: (
+          <CenteredRow key={address}>
+            <Link href={`/account/${address}`}>
+              {isMobile ? parseAddress(address, 24) : address}
+            </Link>
 
-        <Copy info="Address" data={address} />
-      </CenteredRow>,
+            <Copy info="Address" data={address} />
+          </CenteredRow>
+        ),
+        span: 2,
+      },
 
-      <strong key={frozenBalance}>
-        {formatAmount(frozenBalance / 10 ** precision)} KLV
-      </strong>,
-      <span key={nonce}>{nonce}</span>,
-
-      <strong key={balance}>
-        {formatAmount(balance / 10 ** precision)} KLV
-      </strong>,
+      {
+        element: (
+          <strong key={frozenBalance}>
+            {formatAmount(frozenBalance / 10 ** precision)} KLV
+          </strong>
+        ),
+        span: 1,
+      },
+      {
+        element: <span key={nonce}>{nonce}</span>,
+        span: 1,
+      },
+      {
+        element: (
+          <strong key={balance}>
+            {formatAmount(balance / 10 ** precision)} KLV
+          </strong>
+        ),
+        span: 1,
+      },
     ];
     return sections;
   };
@@ -142,7 +159,6 @@ const Accounts: React.FC<IAccounts> = ({
     header,
     data: defaultAccounts as any[],
     rowSections,
-    columnSpans: [2],
     request: (page, limit) => requestAccounts(page, limit),
     dataName: 'accounts',
     scrollUp: true,

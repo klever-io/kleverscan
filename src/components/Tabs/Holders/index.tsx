@@ -1,6 +1,6 @@
 import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
-import { IAsset, IBalance } from '@/types/index';
+import { IAsset, IBalance, IRowSection } from '@/types/index';
 import { parseAddress, toLocaleFixed } from '@/utils/index';
 import Link from 'next/link';
 import React from 'react';
@@ -13,24 +13,46 @@ interface IHolder {
 }
 
 const Holders: React.FC<IHolder> = ({ holders, asset, holdersTableProps }) => {
-  const rowSections = (props: IBalance): JSX.Element[] => {
+  const rowSections = (props: IBalance): IRowSection[] => {
     const { address, balance, index, rank } = props;
 
     return [
-      <RankingContainer key={index}>
-        <RankingText>{rank}°</RankingText>
-      </RankingContainer>,
-      <AddressContainer key={address}>
-        <Link href={`/account/${address}`}>{parseAddress(address, 40)}</Link>
+      {
+        element: (
+          <RankingContainer key={index}>
+            <RankingText>{rank}°</RankingText>
+          </RankingContainer>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <AddressContainer key={address}>
+            <Link href={`/account/${address}`}>
+              {parseAddress(address, 40)}
+            </Link>
 
-        <Copy info="Address" data={address} />
-      </AddressContainer>,
-      <strong key={asset.circulatingSupply}>
-        {((balance / asset.circulatingSupply) * 100).toFixed(2)}%
-      </strong>,
-      <strong key={asset.precision}>
-        {toLocaleFixed(balance / 10 ** asset.precision, asset.precision)}
-      </strong>,
+            <Copy info="Address" data={address} />
+          </AddressContainer>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <strong key={asset.circulatingSupply}>
+            {((balance / asset.circulatingSupply) * 100).toFixed(2)}%
+          </strong>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <strong key={asset.precision}>
+            {toLocaleFixed(balance / 10 ** asset.precision, asset.precision)}
+          </strong>
+        ),
+        span: 1,
+      },
     ];
   };
 
@@ -38,7 +60,6 @@ const Holders: React.FC<IHolder> = ({ holders, asset, holdersTableProps }) => {
 
   const tableProps: ITable = {
     rowSections,
-    columnSpans: [1, 2, 1, 1],
     data: holders,
     header,
     type: 'holders',

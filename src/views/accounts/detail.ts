@@ -132,7 +132,8 @@ export const CenteredRow = styled.div`
     cursor: pointer;
   }
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    flex-wrap: wrap;
     width: 100%;
   }
 `;

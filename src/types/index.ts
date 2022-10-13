@@ -957,3 +957,8 @@ export interface IFilterDater {
   startdate: string;
   enddate: string;
 }
+
+export interface IRowSection {
+  element: JSX.Element;
+  span: number;
+}

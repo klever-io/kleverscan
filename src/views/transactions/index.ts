@@ -69,7 +69,7 @@ export const FilterByDate = styled.div`
   justify-content: flex-start;
   align-items: center;
   flex-direction: row;
-  margin-top: 1.7rem;
+  margin-top: 1.4rem;
   margin-left: 0.8rem;
   margin-right: 0.8rem;
 

@@ -27,5 +27,4 @@ const darktheme = {
     frozenBackground: '#222345',
   },
 };
-
 export default darktheme;

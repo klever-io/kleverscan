@@ -23,7 +23,7 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
   const precision = 6; // default KLV precision
   const detailsCache = useRef<{ [key: string]: IAsset }>({});
   let assetDetails: IAsset;
-  let assetsBuckets: IAssetsBuckets[] = [];
+  const assetsBuckets: IAssetsBuckets[] = [];
 
   assets.forEach(asset => {
     const assetHasUnstakedBucket = asset?.buckets?.find(
@@ -42,18 +42,6 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
 
     if (assetHasUnstakedBucket) {
       getDetails();
-    }
-
-    if (asset.buckets) {
-      assetsBuckets = [
-        ...assetsBuckets,
-        ...asset.buckets.map(bucket => {
-          return {
-            asset,
-            bucket,
-          };
-        }),
-      ];
     }
   });
   const { isMobile } = useMobile();

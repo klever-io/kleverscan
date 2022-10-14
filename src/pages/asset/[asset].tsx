@@ -108,11 +108,12 @@ const Asset: React.FC<IAssetPage> = ({
     verified,
   } = asset;
 
-  const router = useRouter();
   const cardHeaders = uris
     ? ['Overview', 'More', 'URIS']
     : ['Overview', 'More'];
   const tableHeaders = ['Transactions', 'Holders'];
+
+  const router = useRouter();
 
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);

@@ -303,6 +303,11 @@ const Contract: React.FC<IContract> = ({
       binaryOperations,
     );
 
+    if (parsedValues.amount === 0) {
+      toast.error('Amount cannot be 0');
+      return;
+    }
+
     setLoading(true);
 
     const parsedData = Buffer.from(data, 'utf-8').toString('base64');

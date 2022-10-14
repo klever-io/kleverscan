@@ -1,6 +1,6 @@
 import Table, { ITable } from '@/components/Table';
 import { CustomLink } from '@/components/Table/styles';
-import { IAccountAsset, IAsset, IResponse } from '@/types/index';
+import { IAccountAsset, IAsset, IResponse, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/index';
 import Link from 'next/link';
 import React from 'react';
@@ -27,7 +27,7 @@ const Assets: React.FC<IAssets> = ({ assets, address }) => {
     '',
   ];
 
-  const rowSections = (props: IAccountAsset): JSX.Element[] => {
+  const rowSections = (props: IAccountAsset): IRowSection[] => {
     const { assetId, assetType, precision, balance, frozenBalance } = props;
     const ticker = assetId?.split('-')[0];
     const sectionViewNfts =
@@ -39,27 +39,46 @@ const Assets: React.FC<IAssets> = ({ assets, address }) => {
         <></>
       );
     return [
-      <span key={ticker}>{ticker}</span>,
-      <Link key={assetId} href={`/asset/${assetId}`}>
-        {assetId}
-      </Link>,
-      <span key={assetType}>
-        {assetType === 0 ? 'Fungible' : 'Non Fungible'}
-      </span>,
-      <strong key={precision}>{precision}</strong>,
-      <strong key={balance}>
-        {formatAmount(balance / 10 ** precision)} {ticker}
-      </strong>,
-      <strong key={frozenBalance}>
-        {formatAmount(frozenBalance / 10 ** precision)} {ticker}
-      </strong>,
-      sectionViewNfts,
+      { element: <span key={ticker}>{ticker}</span>, span: 1 },
+      {
+        element: (
+          <Link key={assetId} href={`/asset/${assetId}`}>
+            {assetId}
+          </Link>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <span key={assetType}>
+            {assetType === 0 ? 'Fungible' : 'Non Fungible'}
+          </span>
+        ),
+        span: 1,
+      },
+      { element: <strong key={precision}>{precision}</strong>, span: 1 },
+      {
+        element: (
+          <strong key={balance}>
+            {formatAmount(balance / 10 ** precision)} {ticker}
+          </strong>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <strong key={frozenBalance}>
+            {formatAmount(frozenBalance / 10 ** precision)} {ticker}
+          </strong>
+        ),
+        span: 1,
+      },
+      { element: sectionViewNfts, span: 2 },
     ];
   };
 
   const tableProps: ITable = {
     rowSections,
-    columnSpans: [1, 1, 1, 1, 1, 1, 1],
     type: 'assets',
     header,
     data: assets,

@@ -1,4 +1,5 @@
 import Table, { ITable } from '@/components/Table';
+import { IRowSection } from '@/types/index';
 import React from 'react';
 
 interface INetworkProps {
@@ -16,15 +17,20 @@ interface INetworkParam {
 }
 
 const NetworkParams: React.FC<INetworkProps> = ({ networkParams }) => {
-  const rowSections = (props: INetworkParam): JSX.Element[] => {
+  const rowSections = (props: INetworkParam): IRowSection[] => {
     const { number, parameter, currentValue } = props;
 
     return [
-      <strong key={String(number)}>#{number}</strong>,
-      <p key={parameter}>{parameter}</p>,
-      <p key={currentValue} className="currentValue">
-        {currentValue}
-      </p>,
+      { element: <strong key={String(number)}>#{number}</strong>, span: 2 },
+      { element: <p key={parameter}>{parameter}</p>, span: 2 },
+      {
+        element: (
+          <p key={currentValue} className="currentValue">
+            {currentValue}
+          </p>
+        ),
+        span: 1,
+      },
     ];
   };
 
@@ -32,7 +38,6 @@ const NetworkParams: React.FC<INetworkProps> = ({ networkParams }) => {
 
   const tableProps: ITable = {
     rowSections,
-    columnSpans: [1, 2, 1],
     data: networkParams as any[],
     header,
     type: 'networkParams',

@@ -11,6 +11,7 @@ import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import { contracts, status } from '@/configs/transactions';
+import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import {
   AssetTriggerSections,
@@ -44,7 +45,6 @@ import {
   Header,
 } from '@/views/transactions';
 import { Input } from '@/views/transactions/detail';
-import { useMobile } from 'contexts/mobile';
 import { format, fromUnixTime } from 'date-fns';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
@@ -57,6 +57,7 @@ import {
   IContract,
   IPagination,
   IResponse,
+  IRowSection,
   ITransaction,
   ITransferContract,
 } from '../../types';
@@ -94,9 +95,6 @@ const Transactions: React.FC<ITransactions> = ({
   const router = useRouter();
   const precision = 6; // default KLV precision
   const { isMobile } = useMobile();
-  const columnSpans = [
-    2, 1, 1, 1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  ];
 
   const getContractIndex = (contractName: string): string =>
     ContractsIndex[contractName];
@@ -190,13 +188,13 @@ const Transactions: React.FC<ITransactions> = ({
     'Bandwidth Fee',
   ];
 
-  const requestTransactions = async (page: number) =>
+  const requestTransactions = async (page: number, limit?: number) =>
     api.get({
       route: `transaction/list`,
-      query: { page, ...query },
+      query: { page, limit, ...query },
     });
 
-  const getFilteredSections = (contract: IContract[]): JSX.Element[] => {
+  const getFilteredSections = (contract: IContract[]): IRowSection[] => {
     const contractType = getContractType(contract);
 
     switch (contractType) {
@@ -245,7 +243,7 @@ const Transactions: React.FC<ITransactions> = ({
       case Contract.ConfigMarketplace:
         return ConfigMarketplaceSections(contract[0].parameter);
       default:
-        return [<></>];
+        return [{ element: <></>, span: 1 }];
     }
   };
 
@@ -326,7 +324,7 @@ const Transactions: React.FC<ITransactions> = ({
     return header;
   };
 
-  const rowSections = (props: ITransaction): JSX.Element[] => {
+  const rowSections = (props: ITransaction): IRowSection[] => {
     const {
       hash,
       blockNum,
@@ -349,40 +347,79 @@ const Transactions: React.FC<ITransactions> = ({
     }
 
     const sections = [
-      <CenteredRow className="bucketIdCopy" key={hash}>
-        <Link href={`/transaction/${hash}`}>{parseAddress(hash, 24)}</Link>
-        <Copy info="TXHash" data={hash} />
-      </CenteredRow>,
-      <Link href={`/block/${blockNum || 0}`} key={blockNum}>
-        <a className="address">{blockNum || 0}</a>
-      </Link>,
-      <small key={timestamp}>
-        {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
-      </small>,
-      <Link href={`/account/${sender}`} key={sender}>
-        <a className="address">{parseAddress(sender, 16)}</a>
-      </Link>,
-      !isMobile ? <ArrowRight /> : <></>,
-      <Link href={`/account/${toAddress}`} key={toAddress}>
-        <a className="address">{parseAddress(toAddress, 16)}</a>
-      </Link>,
-      <Status status={status} key={status}>
-        <StatusIcon />
-        <span>{capitalizeString(status)}</span>
-      </Status>,
-      <strong key={contractType}>{contractType}</strong>,
-      query.type ? (
-        <strong>{formatAmount(kAppFee / 10 ** precision)}</strong>
-      ) : (
-        <></>
-      ),
-      !query.type ? (
-        <strong>{formatAmount(bandwidthFee / 10 ** precision)}</strong>
-      ) : (
-        <></>
-      ),
-    ];
+      {
+        element: (
+          <CenteredRow className="bucketIdCopy" key={hash}>
+            <Link href={`/transaction/${hash}`}>{parseAddress(hash, 24)}</Link>
+            <Copy info="TXHash" data={hash} />
+          </CenteredRow>
+        ),
+        span: 2,
+      },
+      {
+        element: (
+          <Link href={`/block/${blockNum || 0}`} key={blockNum}>
+            <a className="address">{blockNum || 0}</a>
+          </Link>
+        ),
+        span: 1,
+      },
 
+      {
+        element: (
+          <small key={timestamp}>
+            {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
+          </small>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <Link href={`/account/${sender}`} key={sender}>
+            <a className="address">{parseAddress(sender, 16)}</a>
+          </Link>
+        ),
+        span: 1,
+      },
+      { element: !isMobile ? <ArrowRight /> : <></>, span: -1 },
+      {
+        element: (
+          <Link href={`/account/${toAddress}`} key={toAddress}>
+            <a className="address">{parseAddress(toAddress, 16)}</a>
+          </Link>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <Status status={status} key={status}>
+            <StatusIcon />
+            <span>{capitalizeString(status)}</span>
+          </Status>
+        ),
+        span: 1,
+      },
+      {
+        element: <strong key={contractType}>{contractType}</strong>,
+        span: 1,
+      },
+      {
+        element: query.type ? (
+          <strong>{formatAmount(kAppFee / 10 ** precision)}</strong>
+        ) : (
+          <></>
+        ),
+        span: 1,
+      },
+      {
+        element: !query.type ? (
+          <strong>{formatAmount(bandwidthFee / 10 ** precision)}</strong>
+        ) : (
+          <></>
+        ),
+        span: 1,
+      },
+    ];
     const filteredContract = getFilteredSections(contract);
 
     if (query.type) {
@@ -399,11 +436,10 @@ const Transactions: React.FC<ITransactions> = ({
     header: getHeader(),
     data: defaultTransactions as any[],
     rowSections,
-    columnSpans,
     dataName: 'transactions',
     scrollUp: true,
     totalPages: pagination.totalPages,
-    request: page => requestTransactions(page),
+    request: (page, limit) => requestTransactions(page, limit),
     query,
   };
 

@@ -13,6 +13,7 @@ import {
   IPagination,
   IPeer,
   IResponse,
+  IRowSection,
 } from '@/types/index';
 import { formatAmount, parseAddress, regexImgUrl } from '@/utils/index';
 import {
@@ -169,9 +170,9 @@ const Validator: React.FC<IValidatorPage> = ({
     );
   };
 
-  const requestValidator = async (page: number) => {
+  const requestValidator = async (page: number, limit: number) => {
     const response: IDelegateResponse = await api.get({
-      route: `validator/delegated/${ownerAddress}?page=${page}`,
+      route: `validator/delegated/${ownerAddress}?page=${page}&limit=${limit}`,
     });
 
     const delegators: IBucket[] = [];
@@ -315,21 +316,38 @@ const Validator: React.FC<IValidatorPage> = ({
   const precision = 6; // default KLV precision
   const header = ['Address', 'Bucket ID', 'Staked Epoch', 'Amount '];
 
-  const rowSections = (bucket: IBucket): JSX.Element[] => {
+  const rowSections = (bucket: IBucket): IRowSection[] => {
     const { address, id, stakedEpoch, balance } = bucket;
     const sections = [
-      <CenteredRow key={id}>
-        <Link href={`/account/${address}`} key={address}>
-          {parseAddress(address || '', 24)}
-        </Link>
-        <Copy data={address} info="address"></Copy>
-      </CenteredRow>,
-      <CenteredRow key={id}>
-        {parseAddress(id || '', 24)}
-        <Copy data={id} info="id"></Copy>
-      </CenteredRow>,
-      <span key={stakedEpoch}>{stakedEpoch}</span>,
-      <strong key={balance}>{formatAmount(balance / 10 ** precision)}</strong>,
+      {
+        element: (
+          <CenteredRow key={id}>
+            <Link href={`/account/${address}`} key={address}>
+              {parseAddress(address || '', 24)}
+            </Link>
+            <Copy data={address} info="address"></Copy>
+          </CenteredRow>
+        ),
+        span: 2,
+      },
+      {
+        element: (
+          <CenteredRow key={id}>
+            {parseAddress(id || '', 24)}
+            <Copy data={id} info="id"></Copy>
+          </CenteredRow>
+        ),
+        span: 2,
+      },
+      { element: <span key={stakedEpoch}>{stakedEpoch}</span>, span: 1 },
+      {
+        element: (
+          <strong key={balance}>
+            {formatAmount(balance / 10 ** precision)}
+          </strong>
+        ),
+        span: 1,
+      },
     ];
 
     return sections;
@@ -340,8 +358,7 @@ const Validator: React.FC<IValidatorPage> = ({
     header,
     data: defaultDelegators as IBucket[],
     rowSections,
-    columnSpans: [2, 2, 1, 1],
-    request: page => requestValidator(page),
+    request: (page, limit) => requestValidator(page, limit),
     scrollUp: false,
     totalPages: pagination.totalPages,
     dataName: 'validator',

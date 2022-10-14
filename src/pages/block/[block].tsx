@@ -76,9 +76,12 @@ const Block: React.FC<IBlockPage> = ({
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
 
-  const requestBlock = async (page: number): Promise<ITransactionResponse> =>
+  const requestBlock = async (
+    page: number,
+    limit: number,
+  ): Promise<ITransactionResponse> =>
     api.get({
-      route: `transaction/list?page=${page}&blockNum=${nonce}`,
+      route: `transaction/list?page=${page}&blockNum=${nonce}&limit=${limit}`,
     });
 
   const Overview: React.FC = () => {
@@ -257,7 +260,7 @@ const Block: React.FC<IBlockPage> = ({
     scrollUp: false,
     totalPages: totalPagesTransactions || 0,
     dataName: 'transactions',
-    request: (page: number) => requestBlock(page),
+    request: (page: number, limit: number) => requestBlock(page, limit),
   };
 
   const SelectedTabComponent: React.FC = () => {

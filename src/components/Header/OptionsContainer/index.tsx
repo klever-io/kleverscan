@@ -1,4 +1,4 @@
-import { useTheme } from 'contexts/theme';
+import { useTheme } from '@/contexts/theme';
 import Language from './Language';
 import { Container, IconContainer, MoonIcon, SunIcon } from './styles';
 

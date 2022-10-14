@@ -1,6 +1,6 @@
-import { ExtensionProvider } from 'contexts/extension';
+import { ExtensionProvider } from '@/contexts/extension';
+import { InternalThemeProvider } from '@/contexts/theme';
 import { MobileProvider } from 'contexts/mobile';
-import { InternalThemeProvider } from 'contexts/theme';
 import { appWithTranslation, SSRConfig } from 'next-i18next';
 import type { AppProps as NextJsAppProps } from 'next/app';
 import React from 'react';

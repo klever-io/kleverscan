@@ -26,6 +26,7 @@ export const ProgressPercentage = styled.div<{ textColor: string }>`
   color: ${props => `${props.textColor}`};
   position: relative;
   margin-left: 0.5rem;
+
   min-width: fit-content;
   overflow: unset !important;
 `;
@@ -40,7 +41,7 @@ export const ProgressContent = styled.div`
 
   border-radius: 0.25rem;
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
   }
 `;

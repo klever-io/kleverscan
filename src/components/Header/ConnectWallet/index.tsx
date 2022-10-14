@@ -1,7 +1,7 @@
 import Copy from '@/components/Copy';
 import IconTooltip from '@/components/IconTooltip';
-import { useExtension } from 'contexts/extension';
-import { useMobile } from 'contexts/mobile';
+import { useExtension } from '@/contexts/extension';
+import { useMobile } from '@/contexts/mobile';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback } from 'react';

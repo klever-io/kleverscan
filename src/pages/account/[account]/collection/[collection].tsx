@@ -2,13 +2,13 @@ import { Validators as Icon } from '@/assets/cards';
 import Detail from '@/components/Layout/Detail';
 import { ITable } from '@/components/Table';
 import { CustomLink } from '@/components/Table/styles';
+import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
-import { INfts, IPagination, IResponse } from '@/types/index';
+import { INfts, IPagination, IResponse, IRowSection } from '@/types/index';
 import { parseAddress } from '@/utils/index';
-import { useMobile } from 'contexts/mobile';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface ICollectionPage {
   collection: INfts[];
@@ -32,15 +32,21 @@ const Validators: React.FC<ICollectionPage> = ({
 }) => {
   // initialCollection
   const header = ['ID', 'Collection Name', 'Collection Id', 'Address', ''];
+  const [isTablet, setIsTablet] = useState(false);
 
-  const requestCollection = (page: number) =>
+  useEffect(() => {
+    const tabletWindow = window.innerWidth <= 1025 && window.innerWidth >= 769;
+    setIsTablet(tabletWindow);
+  });
+
+  const requestCollection = (page: number, limit: number) =>
     api.get({
-      route: `address/${address}/collection/${collectionAsset}?page=${page}`,
+      route: `address/${address}/collection/${collectionAsset}?page=${page}&limit=${limit}`,
     });
 
   const { isMobile } = useMobile();
 
-  const rowSections = (nft: INfts): JSX.Element[] => {
+  const rowSections = (nft: INfts): IRowSection[] => {
     const {
       address,
       collection: collectionId,
@@ -50,20 +56,34 @@ const Validators: React.FC<ICollectionPage> = ({
 
     const sections = address
       ? [
-          <span key={nftNonce}>#{nftNonce}</span>,
-          <span key={collection}>{collection}</span>,
-          <span key={collectionId}>{collectionId}</span>,
-          <Link href={`/account/${address}`} key={address}>
-            {isMobile ? parseAddress(address, 16) : address}
-          </Link>,
-          <Link
-            href={`/account/${address}/collection/${collectionId}/${nftNonce}`}
-            key={nftNonce}
-          >
-            <CustomLink>Detail</CustomLink>
-          </Link>,
+          { element: <span key={nftNonce}>#{nftNonce}</span>, span: 1 },
+          { element: <span key={collection}>{collection}</span>, span: 1 },
+          { element: <span key={collectionId}>{collectionId}</span>, span: 1 },
+          {
+            element: (
+              <Link href={`/account/${address}`} key={address}>
+                {isMobile
+                  ? parseAddress(address, 14)
+                  : address || isTablet
+                  ? parseAddress(address, 20)
+                  : address}
+              </Link>
+            ),
+            span: 1,
+          },
+          {
+            element: (
+              <Link
+                href={`/account/${address}/collection/${collectionId}/${nftNonce}`}
+                key={nftNonce}
+              >
+                <CustomLink>Details</CustomLink>
+              </Link>
+            ),
+            span: 2,
+          },
         ]
-      : [<></>];
+      : [{ element: <></>, span: 1 }];
 
     return sections;
   };
@@ -76,7 +96,7 @@ const Validators: React.FC<ICollectionPage> = ({
     scrollUp: true,
     totalPages: pagination.totalPages,
     dataName: 'collection',
-    request: (page: number) => requestCollection(page),
+    request: (page: number, limit: number) => requestCollection(page, limit),
   };
 
   const detailProps = {

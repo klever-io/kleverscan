@@ -99,10 +99,10 @@ const Account: React.FC<IAccountPage> = ({
   const router = useRouter();
 
   const [showModal, setShowModal] = useState(false);
-  const [query, setQuery] = useState(router.query);
+  const [query, setQuery] = useState<any>(router.query);
 
-  const requestTransactions = async (page: number) => {
-    const localQuery: IQueryParams = { ...query, page };
+  const requestTransactions = async (page: number, limit: number) => {
+    const localQuery: IQueryParams = { ...query, page, limit };
     delete localQuery.tab;
 
     if (localQuery.fromAddress || localQuery.toAddress) {
@@ -221,7 +221,7 @@ const Account: React.FC<IAccountPage> = ({
     scrollUp: false,
     totalPages: transactionResponse?.pagination?.totalPages || 0,
     dataName: 'transactions',
-    request: (page: number) => requestTransactions(page),
+    request: (page: number, limit: number) => requestTransactions(page, limit),
     query,
   };
 
@@ -237,6 +237,7 @@ const Account: React.FC<IAccountPage> = ({
       empty: transactionResponse?.data?.transactions?.length === 0,
     },
     filterFromTo,
+    showTxInTxOutFilter: true,
   };
 
   const SelectedTabComponent: React.FC = () => {

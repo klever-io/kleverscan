@@ -17,6 +17,7 @@ export interface ITabs {
   onClick?(header: string, index: number): void;
   dateFilterProps?: IDateFilter;
   filterFromTo?(op: number): void;
+  showTxInTxOutFilter?: boolean;
 }
 
 const Tabs: React.FC<ITabs> = ({
@@ -25,6 +26,7 @@ const Tabs: React.FC<ITabs> = ({
   dateFilterProps,
   filterFromTo,
   children,
+  showTxInTxOutFilter = false,
 }) => {
   const router = useRouter();
   const getFilterName = () => {
@@ -106,9 +108,10 @@ const Tabs: React.FC<ITabs> = ({
         {dateFilterProps && headers[selected] === 'Transactions' && (
           <FilterContent>
             <DateFilter {...dateFilterProps} />
-            {filters.map((filter, index) => (
-              <Filter key={index} {...filter} />
-            ))}
+            {showTxInTxOutFilter &&
+              filters.map((filter, index) => (
+                <Filter key={index} {...filter} />
+              ))}
           </FilterContent>
         )}
       </TabContainer>

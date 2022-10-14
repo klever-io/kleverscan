@@ -21,6 +21,7 @@
       "@/assets/*": ["assets/*"],
       "@/components/*": ["components/*"],
       "@/configs/*": ["configs/*"],
+      "@/contexts/*": ["contexts/*"],
       "@/pages/*": ["pages/*"],
       "@/services/*": ["services/*"],
       "@/styles/*": ["styles/*"],

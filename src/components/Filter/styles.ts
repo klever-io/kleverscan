@@ -174,6 +174,7 @@ export const Item = styled.div<{ selected: boolean }>`
 
 export const HiddenInput = styled.input<{ show: boolean }>`
   width: 100%;
+  position: absolute;
   visibility: ${props => (props.show ? 'visible' : 'hidden')};
   caret-color: ${props => props.theme.black};
   color: ${props => props.theme.black};

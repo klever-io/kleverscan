@@ -26,6 +26,7 @@ import {
   toLocaleFixed,
 } from '@/utils/index';
 import {
+  AssetHeaderContainer,
   AssetTitle,
   CardContainer,
   CardContent,
@@ -126,11 +127,11 @@ const Asset: React.FC<IAssetPage> = ({
     });
   }, [query]);
 
-  const requestTransactions = async (page: number) => {
+  const requestTransactions = async (page: number, limit: number) => {
     const newQuery = { ...query, asset: asset.assetId };
     return await api.get({
       route: `transaction/list`,
-      query: { page, ...newQuery },
+      query: { page, limit, ...newQuery },
     });
   };
 
@@ -143,9 +144,9 @@ const Asset: React.FC<IAssetPage> = ({
     setQuery(resetDate(query));
   };
 
-  const requestAssetHolders = async (page: number) => {
+  const requestAssetHolders = async (page: number, limit: number) => {
     const response = await api.get({
-      route: `assets/holders/${asset.assetId}?page=${page}`,
+      route: `assets/holders/${asset.assetId}?page=${page}&limit=${limit}`,
     });
 
     let parsedHolders: IBalance[] = [];
@@ -390,7 +391,7 @@ const Asset: React.FC<IAssetPage> = ({
     scrollUp: false,
     totalPages: totalTransactionsPage,
     dataName: 'transactions',
-    request: (page: number) => requestTransactions(page),
+    request: (page: number, limit: number) => requestTransactions(page, limit),
     query,
   };
 
@@ -398,7 +399,7 @@ const Asset: React.FC<IAssetPage> = ({
     scrollUp: false,
     totalPages: totalHoldersPage,
     dataName: 'accounts',
-    request: (page: number) => requestAssetHolders(page),
+    request: (page: number, limit: number) => requestAssetHolders(page, limit),
     page,
   };
 
@@ -458,9 +459,21 @@ const Asset: React.FC<IAssetPage> = ({
                 name={name}
               />
               <AssetTitle>
-                <h1>
-                  {name} ({assetId})
-                </h1>
+                <AssetHeaderContainer isVerfied={verified}>
+                  <h1>
+                    {name} ({assetId})
+                  </h1>
+                  {!verified && (
+                    <p>
+                      Do you own this asset ?{' '}
+                      <Link href="https://klever.finance/kleverchain-asset-verification/">
+                        <a target="_blank" rel="noopener noreferrer">
+                          Verify it here
+                        </a>
+                      </Link>
+                    </p>
+                  )}
+                </AssetHeaderContainer>
                 <div>{assetType}</div>
               </AssetTitle>
             </>

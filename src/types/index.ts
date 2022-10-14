@@ -631,7 +631,7 @@ export interface IInnerTableProps {
   scrollUp: boolean;
   totalPages: number;
   dataName: string;
-  request: (page: number) => Promise<any>;
+  request: (page: number, limit: number) => Promise<any>;
   query?: ITxQuery;
   page?: number;
 }
@@ -956,4 +956,9 @@ export interface INfts {
 export interface IFilterDater {
   startdate: string;
   enddate: string;
+}
+
+export interface IRowSection {
+  element: JSX.Element;
+  span: number;
 }

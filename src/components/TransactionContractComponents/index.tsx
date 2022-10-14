@@ -76,7 +76,7 @@ export const Transfer: React.FC<any> = ({ parameter: par }) => {
         </span>
         <CenteredRow>
           <strong>
-            {(parameter?.amount / 10 ** precision).toLocaleString()}
+            {toLocaleFixed(parameter?.amount / 10 ** precision, precision)}
           </strong>
           {parameter?.assetId?.split('/')[0] &&
           parameter?.assetId?.split('/')[0] !== 'KLV' ? (
@@ -618,7 +618,9 @@ export const Freeze: React.FC<IContract> = ({
           <strong>Amount</strong>
         </span>
         <span>
-          <small>{(parameter.amount / 10 ** precision).toLocaleString()}</small>
+          <small>
+            {toLocaleFixed(parameter.amount / 10 ** precision, precision)}
+          </small>
         </span>
       </Row>
       <Row>
@@ -855,7 +857,9 @@ export const AssetTrigger: React.FC<IContract> = ({ parameter: par }) => {
           <span>
             <strong>Amount</strong>
           </span>
-          <span>{(parameter?.amount / 10 ** precision).toLocaleString()}</span>
+          <span>
+            {toLocaleFixed(parameter?.amount / 10 ** precision, precision)}
+          </span>
         </Row>
       )}
       {parameter.toAddress && (
@@ -1045,7 +1049,7 @@ export const ConfigITO: React.FC<IContract> = ({ parameter: par }) => {
             <strong>Max Amount</strong>
           </span>
           <span>
-            {(parameter?.maxAmount / 10 ** precision).toLocaleString()}
+            {toLocaleFixed(parameter?.maxAmount / 10 ** precision, precision)}
           </span>
         </Row>
       )}
@@ -1120,7 +1124,9 @@ export const Buy: React.FC<IContract> = ({ parameter: par }) => {
         <span>
           <strong>Amount</strong>
         </span>
-        <span>{(parameter.amount / 10 ** precision).toLocaleString()}</span>
+        <span>
+          {toLocaleFixed(parameter?.amount / 10 ** precision || 0, precision)}
+        </span>
       </Row>
     </>
   );
@@ -1180,7 +1186,9 @@ export const Sell: React.FC<IContract> = ({ parameter: par }) => {
         <span>
           <strong>Price</strong>
         </span>
-        <span>{(parameter?.price / 10 ** precision).toLocaleString()}</span>
+        <span>
+          {toLocaleFixed(parameter?.price / 10 ** precision || 0, precision)}
+        </span>
       </Row>{' '}
       {parameter?.reservePrice && (
         <Row>
@@ -1188,7 +1196,10 @@ export const Sell: React.FC<IContract> = ({ parameter: par }) => {
             <strong>Reserve Price</strong>
           </span>
           <span>
-            {(parameter?.reservePrice / 10 ** precision).toLocaleString()}
+            {toLocaleFixed(
+              parameter?.reservePrice / 10 ** precision,
+              precision,
+            )}
           </span>
         </Row>
       )}

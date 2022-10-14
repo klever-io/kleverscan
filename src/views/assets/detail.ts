@@ -248,3 +248,27 @@ export const HoverAnchor = styled.a`
     cursor: pointer;
   }
 `;
+
+export const AssetHeaderContainer = styled.div<{ isVerfied: boolean }>`
+  background-color: transparent !important;
+  display: flex;
+  flex-direction: column;
+  margin-top: ${props => (props.isVerfied ? '0' : '1rem')};
+  color: ${props => props.theme.black} !important;
+  &:hover {
+    cursor: default;
+  }
+
+  p {
+    margin-top: 0.25rem;
+    color: ${props => props.theme.darkText} !important;
+  }
+
+  a {
+    color: ${props => props.theme.black} !important;
+    font-weight: 600;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;

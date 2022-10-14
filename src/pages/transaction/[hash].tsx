@@ -28,6 +28,7 @@ import {
   Vote,
   Withdraw,
 } from '@/components/TransactionContractComponents';
+import { useTheme } from '@/contexts/theme/index';
 import api from '@/services/api';
 import { IBlock } from '@/types/blocks';
 import { Contract, IAsset, IResponse, ITransaction } from '@/types/index';
@@ -55,7 +56,6 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
-import { useTheme } from '../../contexts/theme/index';
 
 interface IBlockResponse extends IResponse {
   data: {

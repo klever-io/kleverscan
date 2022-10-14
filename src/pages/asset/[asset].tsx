@@ -26,6 +26,7 @@ import {
   toLocaleFixed,
 } from '@/utils/index';
 import {
+  AssetHeaderContainer,
   AssetTitle,
   CardContainer,
   CardContent,
@@ -458,9 +459,21 @@ const Asset: React.FC<IAssetPage> = ({
                 name={name}
               />
               <AssetTitle>
-                <h1>
-                  {name} ({assetId})
-                </h1>
+                <AssetHeaderContainer isVerfied={verified}>
+                  <h1>
+                    {name} ({assetId})
+                  </h1>
+                  {!verified && (
+                    <p>
+                      Do you own this asset ?{' '}
+                      <Link href="https://klever.finance/kleverchain-asset-verification/">
+                        <a target="_blank" rel="noopener noreferrer">
+                          Verify it here
+                        </a>
+                      </Link>
+                    </p>
+                  )}
+                </AssetHeaderContainer>
                 <div>{assetType}</div>
               </AssetTitle>
             </>

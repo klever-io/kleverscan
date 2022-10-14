@@ -1,10 +1,10 @@
 import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
+import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import { IAccountAsset, IAsset, IBucket, IRowSection } from '@/types/index';
 import { parseAddress } from '@/utils/index';
 import { CenteredRow, RowContent } from '@/views/accounts/detail';
-import { useMobile } from 'contexts/mobile';
 import Link from 'next/link';
 import React, { useRef } from 'react';
 import { Status } from './styles';

@@ -1,6 +1,6 @@
+import { useMobile } from '@/contexts/mobile';
 import { doIf } from '@/utils/index';
 import { core } from '@klever/sdk';
-import { useMobile } from 'contexts/mobile';
 import router from 'next/router';
 import {
   createContext,

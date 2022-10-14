@@ -1,6 +1,6 @@
+import { useMobile } from '@/contexts/mobile';
 import { IRowSection, Query } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
-import { useMobile } from 'contexts/mobile';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import Pagination from '../Pagination';

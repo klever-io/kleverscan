@@ -1,5 +1,5 @@
 import { INavbarItem, navbarItems } from '@/configs/navbar';
-import { useMobile } from 'contexts/mobile';
+import { useMobile } from '@/contexts/mobile';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';

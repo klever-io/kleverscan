@@ -11,6 +11,7 @@ import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import { contracts, status } from '@/configs/transactions';
+import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import {
   AssetTriggerSections,
@@ -44,7 +45,6 @@ import {
   Header,
 } from '@/views/transactions';
 import { Input } from '@/views/transactions/detail';
-import { useMobile } from 'contexts/mobile';
 import { format, fromUnixTime } from 'date-fns';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';

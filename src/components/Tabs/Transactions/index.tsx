@@ -3,6 +3,7 @@ import { getStatusIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
+import { useMobile } from '@/contexts/mobile';
 import {
   Contract,
   IContract,
@@ -13,7 +14,6 @@ import {
 } from '@/types/index';
 import { capitalizeString, formatAmount, parseAddress } from '@/utils/index';
 import { CenteredRow } from '@/views/accounts/detail';
-import { useMobile } from 'contexts/mobile';
 import { format, fromUnixTime } from 'date-fns';
 import Link from 'next/link';
 import React from 'react';

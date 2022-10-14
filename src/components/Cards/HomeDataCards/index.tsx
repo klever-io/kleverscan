@@ -1,6 +1,7 @@
 import { Accounts, Epoch, TPS, Transactions } from '@/assets/cards';
 import CoinCard from '@/components/Cards/CoinCard';
 import Tooltip from '@/components/Tooltip';
+import { useTheme } from '@/contexts/theme';
 import api from '@/services/api';
 import { Service } from '@/types/index';
 import { getEpochInfo } from '@/utils/index';
@@ -20,7 +21,6 @@ import {
   ProgressIndicator,
   ProgressPercentage,
 } from '@/views/validators';
-import { useTheme } from 'contexts/theme';
 import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 import {

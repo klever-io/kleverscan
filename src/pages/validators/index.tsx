@@ -3,6 +3,8 @@ import { getStatusIcon } from '@/assets/status';
 import Detail from '@/components/Layout/Detail';
 import { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
+import { useMobile } from '@/contexts/mobile';
+import { useTheme } from '@/contexts/theme';
 import api from '@/services/api';
 import {
   IPagination,
@@ -17,8 +19,6 @@ import {
   ProgressIndicator,
   ProgressPercentage,
 } from '@/views/validators';
-import { useMobile } from 'contexts/mobile';
-import { useTheme } from 'contexts/theme';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import React from 'react';

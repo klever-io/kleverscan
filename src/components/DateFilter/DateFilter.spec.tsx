@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import * as nextRouter from 'next/router';
 import React from 'react';
-import theme from '../../styles/theme';
 import { getMonthWithYear, renderWithTheme } from '../../test/utils';
 import DateFilter from './';
 
@@ -10,6 +10,16 @@ const props = {
   filterDate: jest.fn(),
   empty: true,
 };
+
+jest.mock('next/router', () => ({
+  useRouter() {
+    return {
+      route: '/',
+      pathname: '',
+      query: {},
+    };
+  },
+}));
 
 const months = [
   'January',
@@ -29,6 +39,20 @@ const months = [
 describe('Component: DateFilter', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    const useRouter = jest.spyOn(nextRouter, 'useRouter') as jest.Mock;
+    useRouter.mockImplementation(() => ({
+      route: '/',
+      pathname: '',
+      query: {},
+      asPath: '',
+      push: jest.fn(),
+      events: {
+        on: jest.fn(),
+        off: jest.fn(),
+      },
+      beforePopState: jest.fn(() => null),
+      prefetch: jest.fn(() => null),
+    }));
     renderWithTheme(<DateFilter {...props} />);
   });
 
@@ -53,8 +77,10 @@ describe('Component: DateFilter', () => {
     const inputStyle = {
       width: '75%',
       fontWeight: '700',
-      cursor: 'pointer',
+      fontSize: '0.95rem',
+      color: '#aa33b5',
       caretColor: 'transparent',
+      cursor: 'pointer',
     };
     const input = screen.getByPlaceholderText(/Add filter by date/i);
     expect(input).toHaveStyle(inputStyle);
@@ -65,14 +91,20 @@ describe('Component: DateFilter', () => {
       screen.getByText(/Date Filter/i).parentNode?.parentNode?.parentNode;
 
     const calendarStyle = {
+      display: 'flex',
+      flexDirection: 'column',
       minHeight: '18rem',
       width: '18rem',
       padding: '1rem',
-      backgroundColor: `${theme.white}`,
-      left: '-3rem',
-      bottom: '-0.5rem',
+      marginLeft: '5rem',
+      backgroundColor: '#fff',
       position: 'absolute',
+      bottom: '-0.5rem',
+      right: '0',
+      transform: 'translateY(100%)',
+      zIndex: '10',
       borderRadius: '20px',
+      boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.2)',
     };
     expect(calendarContainer).toHaveStyle(calendarStyle);
   });

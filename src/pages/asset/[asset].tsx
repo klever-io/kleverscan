@@ -463,7 +463,7 @@ const Asset: React.FC<IAssetPage> = ({
                   <h1>
                     {name} ({assetId})
                   </h1>
-                  {!verified && (
+                  {/* {!verified && (
                     <p>
                       Do you own this asset ?{' '}
                       <Link href="https://klever.finance/kleverchain-asset-verification/">
@@ -472,7 +472,7 @@ const Asset: React.FC<IAssetPage> = ({
                         </a>
                       </Link>
                     </p>
-                  )}
+                  )} */}
                 </AssetHeaderContainer>
                 <div>{assetType}</div>
               </AssetTitle>

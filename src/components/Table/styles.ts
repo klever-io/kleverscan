@@ -232,7 +232,7 @@ export const Status = styled.div<IStatus>`
   gap: 0.9rem;
 
   svg {
-    min-width: fit-content;
+    min-width: 20px;
   }
 
   span {
@@ -280,7 +280,6 @@ export const CustomLink = styled.a`
   padding: 0.625rem 2.94rem;
   border-radius: 4px;
   cursor: pointer;
-
   &:hover {
     opacity: 0.8;
   }

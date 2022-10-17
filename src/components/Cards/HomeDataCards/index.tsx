@@ -169,10 +169,28 @@ const HomeDataCards: React.FC<IDataCards> = ({
         },
       );
 
-      const yesterdayTransactionsCall = new Promise<IYesterdayResponse>(
+      //TODO: Uncomment this when the API is fixed
+      // const yesterdayTransactionsCall = new Promise<IYesterdayResponse>(
+      //   async (resolve, reject) => {
+      //     const res = await api.getCached({
+      //       route: 'transaction/list/count/1',
+      //     });
+
+      //     if (!res.error || res.error === '') {
+      //       resolve(res);
+      //     }
+
+      //     reject(res.error);
+      //   },
+      // );
+
+      //TODO: Remove this when the API is fixed
+      const yesterdayTransactionsCall = new Promise<IAccountResponse>(
         async (resolve, reject) => {
           const res = await api.getCached({
-            route: 'transaction/list/count/1',
+            route: `transaction/list?startdate=${
+              new Date().getTime() - 86400000
+            }&enddate=${new Date().getTime()}`,
           });
 
           if (!res.error || res.error === '') {
@@ -208,7 +226,10 @@ const HomeDataCards: React.FC<IDataCards> = ({
                 break;
 
               case 3:
-                setNewTransactions(value.data.number_by_day[0].doc_count);
+                //TODO: Uncomment this when the API is fixed
+                // setNewTransactions(value.data.number_by_day[0].doc_count);
+                //TODO: Remove this when the API is fixed
+                setNewTransactions(value.pagination.totalRecords);
                 break;
 
               default:

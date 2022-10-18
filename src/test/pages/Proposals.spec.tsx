@@ -53,6 +53,9 @@ describe('test proposals page', () => {
     (api.get as jest.Mock)
       .mockReturnValueOnce(networkParametersMock)
       .mockReturnValueOnce(mockedProposalsList)
+      .mockReturnValueOnce(mockedProposalsList)
+      .mockReturnValueOnce(mockedProposalsList)
+      .mockReturnValueOnce(mockedProposalsList)
       .mockReturnValueOnce(mockedProposalsListPage2);
     const getServerSidePropsCopy = getServerSideProps as any;
     const { props } = (await getServerSidePropsCopy({})) as any;
@@ -68,16 +71,18 @@ describe('test proposals page', () => {
 
     let proposalsTabProof = screen.queryAllByText('ApprovedProposal');
     expect(proposalsTabProof.length).toEqual(0);
-    const proposalsTab = screen.getByText('Proposals');
+    const proposalsTab = screen.getAllByText('Proposals')[1];
 
-    fireEvent.click(proposalsTab);
+    await act(async () => {
+      fireEvent.click(proposalsTab);
+    });
 
     expect(networkParamsTabProof).not.toBeInTheDocument();
     proposalsTabProof = screen.queryAllByText('ApprovedProposal');
     expect(proposalsTabProof.length).toEqual(3);
     expect(networkParamsTabProof).not.toBeInTheDocument();
 
-    const page1Proposal = screen.getByText(/0\/4,000,000/);
+    const page1Proposal = screen.getAllByText(/0\/4,000,000/)[0];
     let page2Proposal = screen.queryByText(/0\/3,000,000/);
     expect(page2Proposal).toEqual(null);
     expect(page1Proposal).toBeInTheDocument();

@@ -94,7 +94,7 @@ const Validators: React.FC<ICollectionPage> = ({
     rowSections,
     data: collection as any[],
     scrollUp: true,
-    totalPages: pagination.totalPages,
+    totalPages: pagination?.totalPages || 1,
     dataName: 'collection',
     request: (page: number, limit: number) => requestCollection(page, limit),
   };
@@ -103,7 +103,7 @@ const Validators: React.FC<ICollectionPage> = ({
     title: 'NFT Collection',
     headerIcon: Icon,
     cards: undefined,
-    paginationCount: pagination.totalPages,
+    paginationCount: pagination?.totalPages || 1,
     tableProps,
     route: `/account/${address}`,
   };

@@ -171,7 +171,7 @@ const Validators: React.FC<IValidatorPage> = ({
     rowSections,
     data: initialValidators,
     request: (page, limit) => requestValidators(page, limit),
-    totalPages: pagination.totalPages,
+    totalPages: pagination?.totalPages || 1,
     scrollUp: true,
     dataName: 'validators',
   };

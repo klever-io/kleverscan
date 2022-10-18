@@ -438,7 +438,7 @@ const Transactions: React.FC<ITransactions> = ({
     rowSections,
     dataName: 'transactions',
     scrollUp: true,
-    totalPages: pagination.totalPages,
+    totalPages: pagination?.totalPages || 1,
     request: (page, limit) => requestTransactions(page, limit),
     query,
   };

@@ -93,7 +93,7 @@ const Table: React.FC<ITable> = ({
       setLoading(true);
       if (!response.error) {
         setItems(response.data[dataName]);
-        setTotalPages(response.pagination.totalPages);
+        setTotalPages(response?.pagination?.totalPages || 1);
       } else {
         setPage(1);
         setItems([]);

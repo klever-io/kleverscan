@@ -252,7 +252,7 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
     request: (page, limit) => requestAssets(page, limit),
     dataName: 'assets',
     scrollUp: true,
-    totalPages: pagination.totalPages,
+    totalPages: pagination?.totalPages || 1,
     query: router.query,
   };
 

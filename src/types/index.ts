@@ -896,6 +896,7 @@ export interface ICard {
   title: string;
   value: number;
   variation: string;
+  percentage?: string;
 }
 
 export interface IEpochCard {

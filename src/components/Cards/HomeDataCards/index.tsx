@@ -81,6 +81,9 @@ const HomeDataCards: React.FC<IDataCards> = ({
       title: t('Total Transactions'),
       value: totalTransactions,
       variation: `+ ${newTransactions.toLocaleString()}`,
+      percentage: `(${((newTransactions * 100) / totalTransactions).toFixed(
+        2,
+      )}%)`,
     },
   ];
 
@@ -265,23 +268,27 @@ const HomeDataCards: React.FC<IDataCards> = ({
     <DataCardsContainer>
       <DataCardsWrapper>
         <DataCardsContent>
-          {dataCards.map(({ Icon, title, value, variation }, index) => (
-            <DataCard key={String(index)}>
-              <IconContainer>
-                <Icon viewBox="0 0 70 70" />
-              </IconContainer>
-              <DataCardValue>
-                <span>{title}</span>
-                <p>{value.toLocaleString()}</p>
-              </DataCardValue>
-              {!variation.includes('%') && (
-                <DataCardLatest positive={variation.includes('+')}>
-                  <span>{t('Last 24h')}</span>
-                  <p>{variation}</p>
-                </DataCardLatest>
-              )}
-            </DataCard>
-          ))}
+          {dataCards.map(
+            ({ Icon, title, value, variation, percentage }, index) => (
+              <DataCard key={String(index)}>
+                <IconContainer>
+                  <Icon viewBox="0 0 70 70" />
+                </IconContainer>
+                <DataCardValue>
+                  <span>{title}</span>
+                  <p>{value.toLocaleString()}</p>
+                </DataCardValue>
+                {!variation.includes('%') && (
+                  <DataCardLatest positive={variation.includes('+')}>
+                    <span>{t('Last 24h')}</span>
+                    <p>
+                      {variation} {percentage}
+                    </p>
+                  </DataCardLatest>
+                )}
+              </DataCard>
+            ),
+          )}
         </DataCardsContent>
         <DataCardsContent>
           {epochCards.map(({ Icon, title, value, progress }, index) => (

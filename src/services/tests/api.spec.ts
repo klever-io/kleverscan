@@ -123,7 +123,7 @@ describe('test api functions', () => {
       });
 
       test('failed fetch with address route', async () => {
-        (fetch as jest.Mock).mockImplementationOnce(() =>
+        (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.reject('generic error'),
         );
         const res = await withoutBody(props1, Method.GET);
@@ -178,7 +178,7 @@ describe('test api functions', () => {
       });
 
       test('failed fetch with statistics route', async () => {
-        (fetch as jest.Mock).mockImplementationOnce(() =>
+        (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.reject('generic error'),
         );
         const res = await withoutBody(props2, Method.GET);
@@ -212,6 +212,7 @@ describe('test api functions', () => {
       });
     });
   });
+
   describe('withBody function', () => {
     afterEach(() => {
       (fetch as jest.Mock).mockRestore();
@@ -237,7 +238,7 @@ describe('test api functions', () => {
       });
 
       test('failed fetch in prices route', async () => {
-        (fetch as jest.Mock).mockImplementationOnce(() =>
+        (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.reject('generic error'),
         );
         const res = await withBody(propsBody, Method.POST);
@@ -296,7 +297,7 @@ describe('test api functions', () => {
       });
 
       test('failed fetch with metrics route', async () => {
-        (fetch as jest.Mock).mockImplementationOnce(() =>
+        (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.reject('generic error'),
         );
         const res = await withText(props3, Method.GET);
@@ -355,7 +356,7 @@ describe('test api functions', () => {
       });
 
       test('failed fetch with transaction/list route', async () => {
-        (fetch as jest.Mock).mockImplementationOnce(() =>
+        (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.reject(mocks.getCachedObjectError),
         );
         const res = await getCached(props4);

@@ -1,10 +1,14 @@
+import { MobileProvider } from '@/contexts/mobile';
+import { InternalThemeProvider } from '@/contexts/theme';
 import { render, RenderResult } from '@testing-library/react';
 import React from 'react';
-import { ThemeProvider } from 'styled-components';
-import theme from '../../styles/theme';
 
 export const renderWithTheme = (children: JSX.Element): RenderResult => {
-  return render(<ThemeProvider theme={theme}>{children}</ThemeProvider>);
+  return render(
+    <MobileProvider>
+      <InternalThemeProvider>{children}</InternalThemeProvider>
+    </MobileProvider>,
+  );
 };
 
 export const getMonthWithYear = (month: string, months: string[]): string => {

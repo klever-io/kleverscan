@@ -638,7 +638,7 @@ export interface IInnerTableProps {
 
 export interface IValidatorResponse extends IResponse {
   data: {
-    delegations: IDelegationsResponse[];
+    validators: IDelegationsResponse[];
     networkTotalStake: number;
   };
   pagination: IPagination;
@@ -647,15 +647,13 @@ export interface IValidatorResponse extends IResponse {
 export interface IDelegationsResponse {
   totalStake: number;
   ownerAddress: string;
-  buckets: number;
+  buckets?: number;
   name?: string;
   totalLeaderSuccessRate: ItotalValidatorSuccessRate;
   totalValidatorSuccessRate: ItotalValidatorSuccessRate;
   rating: number;
   selfStake: number;
   list: string;
-  totalProduced: number;
-  totalMissed: number;
   canDelegate: boolean;
   maxDelegation: number;
   commission: number;
@@ -702,7 +700,7 @@ export interface IPagination {
 export interface IResponse {
   data: any;
   code: string;
-  error: IError;
+  error: IError | string;
 }
 
 interface INodePeer {

@@ -44,7 +44,7 @@ export interface ITable {
     | 'validatorsList';
 
   header: string[];
-  data: any[];
+  data: any[] | null;
   body?: any;
   rowSections?: (item: any) => IRowSection[] | undefined;
   scrollUp?: boolean;
@@ -113,6 +113,7 @@ const Table: React.FC<ITable> = ({
     if (page !== 1 && intervalController) {
       intervalController(0);
     }
+    setLoading(true);
     fetchData();
   }, [page]);
 
@@ -124,6 +125,7 @@ const Table: React.FC<ITable> = ({
     if (page !== 1) {
       setPage(1);
     }
+    setLoading(true);
     fetchData();
   }, [query]);
 
@@ -192,6 +194,8 @@ const Table: React.FC<ITable> = ({
               </>
             )}
             {!loading &&
+              items &&
+              items?.length > 0 &&
               items?.map((item, index) => {
                 let spanCount = 0;
 

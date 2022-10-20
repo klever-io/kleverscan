@@ -51,12 +51,12 @@ describe('test proposals page', () => {
 
   it('should paginate the proposals correctly', async () => {
     (api.get as jest.Mock)
-      .mockReturnValueOnce(networkParametersMock)
+      .mockReturnValueOnce(networkParametersMock) // first call on ssr
+      .mockReturnValueOnce(mockedProposalsList) // second call on ssr
+      .mockReturnValueOnce(mockedProposalsList) // third, fourth and fifth calls are when proposal tab is clicked, (it generates 3 repeated calls simultaneously TODO: FIX THIS)
       .mockReturnValueOnce(mockedProposalsList)
       .mockReturnValueOnce(mockedProposalsList)
-      .mockReturnValueOnce(mockedProposalsList)
-      .mockReturnValueOnce(mockedProposalsList)
-      .mockReturnValueOnce(mockedProposalsListPage2);
+      .mockReturnValueOnce(mockedProposalsListPage2); // last call is when paginate to page 2, no repeated calls are generated
     const getServerSidePropsCopy = getServerSideProps as any;
     const { props } = (await getServerSidePropsCopy({})) as any;
     act(() => {

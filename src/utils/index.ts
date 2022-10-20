@@ -271,9 +271,9 @@ export const parseData = (data: IFormData): IFormData => {
   const dataEntries = Object.entries(data);
 
   dataEntries.forEach(([key, value]) => {
-    if (value === '') {
+    if (value === '' || value === null) {
       delete data[key];
-    } else if (typeof value === 'object' && value !== null) {
+    } else if (typeof value === 'object') {
       parseData(value);
     } else if (
       typeof value === 'string' &&

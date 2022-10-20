@@ -666,9 +666,10 @@ export const mockedFetchBlocks = {
 };
 
 //this function mocks /proposals/${number}
-export const getMockedProposal = (number: number): any => ({
-  data: { proposal: mockedProposalsList.data.proposals[number] },
-});
+export const getMockedProposal = (number: number, serverSide = true): any => {
+  const selectedProposal = mockedProposalsList.data.proposals[number];
+  return { data: { proposal: selectedProposal } };
+};
 
 export const mockedProposalsList = {
   data: {
@@ -692,39 +693,59 @@ export const mockedProposalsList = {
         epochEnd: 8217,
         timestamp: 0,
         votes: { '0': 8000000000, '1': 4000000000 },
-        voters: {
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+        voters: [
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr',
             type: 0,
             amount: 2000000000,
             timestamp: 1656082815000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1: {
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1',
             type: 0,
             amount: 2000000000,
             timestamp: 1656082815000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs2: {
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs2',
             type: 0,
             amount: 2000000000,
             timestamp: 1656082815000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs3: {
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs3',
             type: 0,
             amount: 2000000000,
             timestamp: 1656082815000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs4: {
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs4',
             type: 1,
             amount: 2000000000,
             timestamp: 1656082815000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs5: {
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs5',
             type: 1,
             amount: 2000000000,
             timestamp: 1656082815000,
           },
-        },
+        ],
         totalStaked: 12000000000,
+        votersPage: {
+          self: 1,
+          next: 2,
+          previous: 0,
+          perPage: 10,
+          totalPages: 2,
+          totalRecords: 12,
+        },
       },
       {
         proposalId: 1,
@@ -743,29 +764,45 @@ export const mockedProposalsList = {
         epochEnd: 8019,
         timestamp: 1656082115000,
         votes: { '0': 6500000000 },
-        voters: {
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+        voters: [
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr',
             type: 0,
             amount: 2000000000,
             timestamp: 1656082815000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1: {
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1',
             type: 0,
             amount: 2000000000,
             timestamp: 1656082815000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs2: {
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs2',
             type: 0,
             amount: 2000000000,
             timestamp: 1656082815000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs3: {
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs3',
             type: 0,
             amount: 500000000,
             timestamp: 1656082815000,
           },
-        },
+        ],
         totalStaked: 8000000000000,
+        votersPage: {
+          self: 1,
+          next: 1,
+          previous: 0,
+          perPage: 10,
+          totalPages: 1,
+          totalRecords: 12,
+        },
       },
       {
         proposalId: 2,
@@ -784,14 +821,24 @@ export const mockedProposalsList = {
           '0': 1,
         },
         timestamp: 313151433211341412,
-        voters: {
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+        voters: [
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr',
             type: 0,
             amount: 1,
             timestamp: 1656082815000,
           },
-        },
+        ],
         totalStaked: 2,
+        votersPage: {
+          self: 1,
+          next: 1,
+          previous: 0,
+          perPage: 10,
+          totalPages: 1,
+          totalRecords: 12,
+        },
       },
       {
         proposalId: 3,
@@ -808,16 +855,26 @@ export const mockedProposalsList = {
         description: 'Proposal to change bandwidth fee - automated test',
         epochStart: 324,
         epochEnd: 334,
-        voters: {
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+        voters: [
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr',
             type: 1,
             amount: 200,
             timestamp: 1656110807000,
           },
-        },
+        ],
         timestamp: 0,
         votes: { '1': 200 },
         totalStaked: 1000000000000,
+        votersPage: {
+          self: 1,
+          next: 1,
+          previous: 0,
+          perPage: 10,
+          totalPages: 1,
+          totalRecords: 12,
+        },
       },
       {
         proposalId: 4,
@@ -836,14 +893,24 @@ export const mockedProposalsList = {
           '0': 1,
         },
         timestamp: 0,
-        voters: {
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+        voters: [
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr',
             type: 1,
             amount: 200,
             timestamp: 1656110807000,
           },
-        },
+        ],
         totalStaked: 1000000000000,
+        votersPage: {
+          self: 1,
+          next: 1,
+          previous: 0,
+          perPage: 10,
+          totalPages: 1,
+          totalRecords: 12,
+        },
       },
       {
         proposalId: 5,
@@ -862,14 +929,24 @@ export const mockedProposalsList = {
           '0': 1,
         },
         timestamp: 0,
-        voters: {
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+        voters: [
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr',
             type: 0,
             amount: 1,
             timestamp: 1657138339000,
           },
-        },
+        ],
         totalStaked: 6000000000000,
+        votersPage: {
+          self: 1,
+          next: 1,
+          previous: 0,
+          perPage: 10,
+          totalPages: 1,
+          totalRecords: 12,
+        },
       },
       {
         proposalId: 6,
@@ -888,19 +965,31 @@ export const mockedProposalsList = {
           '0': 1,
         },
         timestamp: 0,
-        voters: {
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+        voters: [
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr',
             type: 0,
             amount: 60123000,
             timestamp: 1657144539000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1: {
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1',
             type: 0,
             amount: 60513100,
             timestamp: 1657144329000,
           },
-        },
+        ],
         totalStaked: 6000000000000,
+        votersPage: {
+          self: 1,
+          next: 1,
+          previous: 0,
+          perPage: 10,
+          totalPages: 1,
+          totalRecords: 12,
+        },
       },
       {
         proposalId: 7,
@@ -920,29 +1009,45 @@ export const mockedProposalsList = {
           '1': 4968256329000,
         },
         timestamp: 0,
-        voters: {
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+        voters: [
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr',
             type: 0,
             amount: 112213412311,
             timestamp: 1656082443000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1: {
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1',
             type: 1,
             amount: 100105003300,
             timestamp: 1656085443000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs2: {
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs2',
             type: 1,
             amount: 200105003300,
             timestamp: 1656085443000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs3: {
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs3',
             type: 1,
             amount: 300105003300,
             timestamp: 1656085443000,
           },
-        },
+        ],
         totalStaked: 1001050033000,
+        votersPage: {
+          self: 1,
+          next: 1,
+          previous: 0,
+          perPage: 10,
+          totalPages: 1,
+          totalRecords: 12,
+        },
       },
       {
         proposalId: 8,
@@ -957,21 +1062,32 @@ export const mockedProposalsList = {
         description: 'Proposal to change bandwidth fee - automated test',
         epochStart: 8011,
         epochEnd: 8021,
-        voters: {
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+        voters: [
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr',
             type: 0,
             amount: 10000001,
             timestamp: 1656082443000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1: {
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1',
             type: 1,
             amount: 50000000,
             timestamp: 1656082543000,
           },
-        },
+        ],
         timestamp: 0,
         votes: { '0': 10000001, '1': 50000000 },
         totalStaked: 4000000000000,
+        votersPage: {
+          next: 1,
+          previous: 0,
+          perPage: 10,
+          totalPages: 1,
+          totalRecords: 12,
+        },
       },
       {
         proposalId: 9,
@@ -991,154 +1107,247 @@ export const mockedProposalsList = {
           '1': 263028664226,
         },
         timestamp: 0,
-        voters: {
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+        voters: [
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr10',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj11: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj11',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj12: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj12',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj13: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj13',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj14: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj14',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj15: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj15',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj16: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj16',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj17: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj17',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj21: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj21',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj22: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj22',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj23: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj23',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj24: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj24',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj25: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj25',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj26: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj26',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj27: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj27',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj31: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj31',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj32: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj32',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj33: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj33',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj34: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj34',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj35: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj35',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj36: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj36',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj37: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj37',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj41: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj41',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj44: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj44',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj47: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmj47',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjx1: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjx1',
             type: 1,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjx2: {
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjx2',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjx3: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjx3',
             type: 1,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjx4: {
+
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjx4',
             type: 0,
             amount: 131514332113,
             timestamp: 1657060171000,
           },
-        },
+        ],
         totalStaked: 4000000000000,
+        votersPage: {
+          self: 1,
+          next: 2,
+          previous: 1,
+          perPage: 10,
+          totalPages: 4,
+          totalRecords: 58,
+        },
       },
     ],
   },
@@ -1174,19 +1383,31 @@ export const mockedProposalsListPage2 = {
           '0': 1,
         },
         timestamp: 0,
-        voters: {
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+        voters: [
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr',
             type: 0,
             amount: 60123000,
             timestamp: 1657144539000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1: {
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1',
             type: 0,
             amount: 60513100,
             timestamp: 1657144329000,
           },
-        },
+        ],
         totalStaked: 6000000000000,
+        votersPage: {
+          self: 1,
+          next: 1,
+          previous: 0,
+          perPage: 10,
+          totalPages: 1,
+          totalRecords: 12,
+        },
       },
       {
         proposalId: 11,
@@ -1205,19 +1426,31 @@ export const mockedProposalsListPage2 = {
           '0': 1,
         },
         timestamp: 0,
-        voters: {
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: {
+        voters: [
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr',
             type: 0,
             amount: 60123000,
             timestamp: 1657144539000,
           },
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1: {
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1',
             type: 0,
             amount: 60513100,
             timestamp: 1657144329000,
           },
-        },
+        ],
         totalStaked: 3000000000000,
+        votersPage: {
+          self: 1,
+          next: 1,
+          previous: 0,
+          perPage: 10,
+          totalPages: 1,
+          totalRecords: 12,
+        },
       },
     ],
   },
@@ -1228,6 +1461,25 @@ export const mockedProposalsListPage2 = {
     perPage: 10,
     totalPages: 2,
     totalRecords: 12,
+  },
+  error: '',
+  code: 'successful',
+};
+export const overViewParametersMock = {
+  data: {
+    overview: {
+      baseTxSize: 250,
+      chainID: '108',
+      currentSlot: 2342011,
+      epochNumber: 433,
+      nonce: 2334860,
+      nonceAtEpochStart: 2331052,
+      slotAtEpochStart: 2338203,
+      slotCurrentTimestamp: 1666048444,
+      slotDuration: 4000,
+      slotsPerEpoch: 5400,
+      startTime: 1656680400,
+    },
   },
   error: '',
   code: 'successful',

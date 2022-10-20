@@ -288,6 +288,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
         },
       };
     }
+
     const parsedVotersResponse = voters?.data?.proposal;
     const votesFormatted = validateFormattedVotes(parsedVotersResponse);
     setVotersList(votesFormatted);
@@ -313,7 +314,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
 
   return (
     <>
-      {proposalAPI ? (
+      {proposalAPI && (
         <Container>
           <Header>
             <Title route={'/proposals'} title="Proposal Details" />
@@ -484,7 +485,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
             <Table {...tablePropsNo} />
           )}
         </Container>
-      ) : null}
+      )}
     </>
   );
 };

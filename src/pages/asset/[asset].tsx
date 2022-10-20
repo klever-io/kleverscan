@@ -40,6 +40,7 @@ import {
   LetterLogo,
   Logo,
   Row,
+  UriContainer,
   VerifiedContainer,
 } from '@/views/assets/detail';
 import { ReceiveBackground } from '@/views/validator';
@@ -278,9 +279,11 @@ const Asset: React.FC<IAssetPage> = ({
               <span>
                 <strong>{key}</strong>
               </span>
-              <a href={`${value}`} target="blank">
-                {value}
-              </a>
+              <UriContainer>
+                <a href={`${value}`} target="blank">
+                  {value}
+                </a>
+              </UriContainer>
             </Row>
           ))
         ) : (

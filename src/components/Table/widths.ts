@@ -326,7 +326,7 @@ const proposals = css`
   }
   &:nth-child(7) {
     width: 5rem;
-    margin-left: 2rem;
+    margin-left: 5rem;
   }
 `;
 const votes = css`

@@ -301,7 +301,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
                   <span>{title}</span>
                   {index === 0 && (
                     <span style={{ marginTop: '-0.25rem' }}>
-                      <Tooltip msg="Transactions per slot" />
+                      <Tooltip msg="Transactions per second" />
                     </span>
                   )}
                 </div>

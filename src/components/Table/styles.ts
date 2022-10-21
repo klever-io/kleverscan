@@ -95,7 +95,6 @@ export const Row = styled.div<ITableType>`
   }
   span,
   a {
-    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 
@@ -131,6 +130,10 @@ export const Row = styled.div<ITableType>`
       position: relative;
       left: -0.9rem;
       top: -1rem;
+    }
+
+    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+      overflow: hidden;
     }
   }
   .address {

@@ -367,6 +367,7 @@ export const getStaticProps: GetStaticProps<IBlockPage> = async ({
 
   return {
     props,
+    revalidate: 60,
   };
 };
 

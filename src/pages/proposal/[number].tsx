@@ -56,7 +56,7 @@ import {
 } from '@/views/proposals/detail';
 import { CenteredRow } from '@/views/validators/detail';
 import { format, fromUnixTime } from 'date-fns';
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
 import { AiFillCheckCircle } from 'react-icons/ai';
@@ -529,7 +529,7 @@ export const getProposalNetworkParams = (
   return { currentNetworkParams, fullInfoParams };
 };
 
-export const getServerSideProps: GetStaticProps<IProposal> = async ({
+export const getServerSideProps: GetServerSideProps<IProposal> = async ({
   params,
 }) => {
   let props: any = {};

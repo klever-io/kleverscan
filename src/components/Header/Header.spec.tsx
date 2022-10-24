@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react';
+import { act, fireEvent, screen } from '@testing-library/react';
 import * as nextRouter from 'next/router';
 import React from 'react';
 import Navbar from '.';
@@ -12,7 +12,9 @@ describe('Component: Header/navbar', () => {
     'Transactions',
     'Assets',
     'Validators',
-    'More',
+    'Nodes',
+    'Proposals',
+    'Charts',
   ];
 
   jest.mock('next/router', () => ({
@@ -65,7 +67,7 @@ describe('Component: Header/navbar', () => {
     const { container } = renderWithTheme(<Navbar />);
 
     const navbarItem = container.querySelector(
-      'div > div > div:nth-child(2) > div',
+      'div > div > div:nth-child(1) > div > div:nth-child(1) > div',
     );
     const style = {
       filter: 'brightness(1)',
@@ -78,7 +80,7 @@ describe('Component: Header/navbar', () => {
   it('Should not init with dropdown menu from "More" visible and match the style for the Dropdown" - desktop version', () => {
     const { container } = renderWithTheme(<Navbar />);
 
-    const selector = `div > div > div:nth-child(2) > div:nth-child(6) div`;
+    const selector = `div > div > div:nth-child(1) > div:nth-child(6) div`;
     const dropDownContainer = container.querySelector(selector);
     const dropDownMenu = container.querySelector(`${selector} ul`);
 
@@ -101,28 +103,27 @@ describe('Component: Header/navbar', () => {
 
     const mobile = container.firstChild?.lastChild;
     const content = container.lastChild;
-    const button: any = mobile?.firstChild;
-
+    const button: any = mobile?.lastChild?.firstChild;
     expect(mobile).toHaveStyle('position: relative');
-    expect(content).toHaveStyle('right: -100%');
+    expect(content).toHaveStyle({ visibility: 'hidden', opacity: '0' });
 
     fireEvent.click(button);
-    expect(content).toHaveStyle('right: 0');
+    expect(content).toHaveStyle({ visibility: 'visible', opacity: '1' });
 
     fireEvent.click(button);
-    expect(content).toHaveStyle('right: -100%');
+    expect(content).toHaveStyle({ visibility: 'hidden', opacity: '0' });
   });
 
   it('Should render the navbar items ( Logo, Blocks, Accounts, Transactions, Assets, Validatores and More) - Mobile version', () => {
     const { container } = renderWithTheme(<Navbar />);
-
     const logo = screen.getByAltText('Logo');
     expect(logo).toBeInTheDocument();
-
-    container.lastChild?.childNodes.forEach((element, index) => {
-      expect(element).toBeInTheDocument();
-      expect(element).toHaveTextContent(navBarItems[index]);
-    });
+    container.firstChild?.nextSibling?.nextSibling?.firstChild?.nextSibling?.childNodes.forEach(
+      (element, index) => {
+        expect(element).toBeInTheDocument();
+        expect(element).toHaveTextContent(navBarItems[index]);
+      },
+    );
   });
 
   it('Should change the overflow of the document.body when click to open mobile menu', () => {
@@ -133,8 +134,11 @@ describe('Component: Header/navbar', () => {
       value: 950,
     });
 
-    window.dispatchEvent(new Event('resize'));
-    const openMenuMobile: any = container.firstChild?.lastChild?.firstChild;
+    act(() => {
+      window.dispatchEvent(new Event('resize'));
+    });
+    const openMenuMobile: any =
+      container.firstChild?.lastChild?.lastChild?.firstChild;
     const mobileBackground: any = container.firstChild?.nextSibling;
     fireEvent.click(openMenuMobile);
     expect(document.body.style.overflow).toBe('hidden');

@@ -95,7 +95,6 @@ export const Item = styled.div<{ selected: boolean }>`
   }
 
   pointer-events: ${props => (props.selected ? 'none' : 'all')};
-  cursor: 'default';
 `;
 
 export const LinkStyled = styled.a<{ disabled: boolean }>`

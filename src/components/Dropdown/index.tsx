@@ -5,7 +5,6 @@ import { Container, ListUris } from './styles';
 
 const Dropdown: React.FC<IUris> = ({ uris }) => {
   const [showMore, setShowMore] = useState(false);
-
   const renderArrowShowMore = useCallback(() => {
     if (showMore) return <IoIosArrowUp />;
     return <IoIosArrowDown />;

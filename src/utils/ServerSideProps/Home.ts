@@ -1,6 +1,6 @@
 import api from '@/services/api';
 import { Service } from '@/types/index';
-import { addPrecisionTransactions, getEpochInfo } from '@/utils/index';
+import { addPrecisionTransactions, calcApr, getEpochInfo } from '@/utils/index';
 import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import nextI18NextConfig from '../../../next-i18next.config';
@@ -39,6 +39,8 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
           yesterdayPrice: null,
           variation: null,
         },
+        estimatedAprYesterday: 0,
+        estimatedAprBeforeYesterday: 0,
         staking: {
           totalStaking: null,
           dayBeforeTotalStaking: null,
@@ -52,6 +54,8 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
           yesterdayPrice: null,
           variation: null,
         },
+        estimatedAprYesterday: 0,
+        estimatedAprBeforeYesterday: 0,
         staking: {
           totalStaking: null,
           dayBeforeTotalStaking: null,
@@ -434,6 +438,12 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
 
           case 12:
             const initialKlv = 0;
+            props.assetsData.klv.estimatedAprYesterday =
+              calcApr(value?.data.asset, 4, 0) * 100;
+
+            props.assetsData.klv.estimatedAprBeforeYesterday =
+              calcApr(value?.data.asset, 4, 4) * 100;
+
             props.assetsData.klv.staking.totalStaking =
               value?.data?.asset?.staking?.totalStaked / 1000000 || null;
 
@@ -454,6 +464,17 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
 
           case 13:
             const initialKfi = 0;
+            props.assetsData.kfi.estimatedAprYesterday = calcApr(
+              value?.data.asset,
+              4,
+              0,
+            );
+            props.assetsData.kfi.estimatedAprBeforeYesterday = calcApr(
+              value?.data.asset,
+              4,
+              4,
+            );
+
             props.assetsData.kfi.staking.totalStaking =
               value?.data?.asset?.staking?.totalStaked / 1000000 || null;
 

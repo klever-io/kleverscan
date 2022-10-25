@@ -10,7 +10,9 @@
     "Last 24h": "Last 24h",
     "Market Cap": "Market Cap",
     "Volume": "Volume",
-    "Total Staked": "Total Staked"
+    "Total Staked": "Total Staked",
+    "Estimated APR": "Estimated APR",
+    "KLV per KFI": "KLV per KFI"
   },
   "Titles": {
     "Assets": "Assets",

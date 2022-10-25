@@ -569,6 +569,10 @@ export interface IAsset {
   staking: {
     minEpochsToWithdraw: number;
     totalStaked: number;
+    fpr: {
+      totalAmount: number;
+      totalStaked: number;
+    }[];
   };
   burnedValue: number;
   properties: {
@@ -773,6 +777,8 @@ export interface IAssetData {
   staking: IAssetStaking;
   volume: number | null;
   circulatingSupply: number | null;
+  estimatedAprYesterday: number;
+  estimatedAprBeforeYesterday: number;
 }
 
 export interface IAssetPrice {

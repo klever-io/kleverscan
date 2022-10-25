@@ -12,6 +12,12 @@ const darktheme = {
     hoverHash: '#6E7099',
   },
 
+  chart: {
+    darkBg: '#5A2A73',
+    lightBg: '#aa33b5',
+    backgroundTooltip: 'rgb(255, 255, 255, 0.8)',
+  },
+
   input: {
     ...theme.input,
     activeShadow: '#ee3f71',

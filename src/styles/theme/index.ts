@@ -80,6 +80,7 @@ const theme = {
   chart: {
     darkBg: '#5A2A73',
     lightBg: '#aa33b5',
+    backgroundTooltip: '#fff',
   },
 
   filter: {

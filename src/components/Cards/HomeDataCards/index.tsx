@@ -225,7 +225,12 @@ const HomeDataCards: React.FC<IDataCards> = ({
                 break;
 
               case 2:
-                setTotalTransactions(value.pagination.totalRecords);
+                const newTotalTransactions = value.pagination.totalRecords;
+                if (
+                  totalTransactions &&
+                  totalTransactions < newTotalTransactions
+                )
+                  setTotalTransactions(value.pagination.totalRecords);
                 break;
 
               case 3:

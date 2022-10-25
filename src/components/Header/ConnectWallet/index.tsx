@@ -4,7 +4,8 @@ import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useCallback } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
+import React, { useCallback, useState } from 'react';
 import { MobileNavbarItem } from '..';
 import { parseAddress } from '../../../utils';
 import {
@@ -13,11 +14,14 @@ import {
   ConnectContainer,
   CopyContainer,
   MobileStyledTransfer,
+  QRCodeContainer,
+  QRCodeContent,
   StyledTransfer,
 } from './styles';
 
 const ConnectWallet: React.FC = () => {
   const router = useRouter();
+  const [displayQr, setDisplayQr] = useState(false);
 
   const {
     walletAddress,
@@ -56,7 +60,14 @@ const ConnectWallet: React.FC = () => {
     <>
       {extensionInstalled && (
         <ConnectContainer>
-          <ButtonAndCopy>
+          <ButtonAndCopy
+            onMouseOver={() => {
+              if (walletAddress) {
+                setDisplayQr(true);
+              }
+            }}
+            onMouseOut={() => setDisplayQr(false)}
+          >
             <ConnectButton
               onClick={() => connectExtension()}
               key={String(extensionInstalled)}
@@ -84,6 +95,15 @@ const ConnectWallet: React.FC = () => {
           </ButtonAndCopy>
           {getCreateTransactionButton()}
         </ConnectContainer>
+      )}
+      {displayQr && walletAddress && (
+        <QRCodeContainer>
+          <QRCodeContent>
+            <div>
+              <QRCodeSVG value={walletAddress} size={100}></QRCodeSVG>
+            </div>
+          </QRCodeContent>
+        </QRCodeContainer>
       )}
     </>
   );

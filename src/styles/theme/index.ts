@@ -123,6 +123,10 @@ const theme = {
     outsideBackground: 'rgba(198, 199, 235, 0.2)',
   },
 
+  qrcodeTooltip: {
+    background: '#fff',
+  },
+
   breakpoints: {
     mobile: '768px',
     tablet: '1025px',

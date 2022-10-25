@@ -29,6 +29,10 @@ const darktheme = {
     white: '#ccc',
   },
 
+  qrcodeTooltip: {
+    background: '#222345',
+  },
+
   accountCard: {
     frozenBackground: '#222345',
   },

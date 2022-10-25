@@ -404,7 +404,7 @@ const Transactions: React.FC<ITransactions> = ({
         span: 1,
       },
       {
-        element: query.type ? (
+        element: contractType ? (
           <strong>{formatAmount(kAppFee / 10 ** precision)}</strong>
         ) : (
           <></>

@@ -826,6 +826,7 @@ export interface IHome {
   tps: string;
   coinsData: ICoinInfo[];
   yesterdayTransactions: number;
+  beforeYesterdayTransactions: number;
   yesterdayAccounts: number;
   assetsData: IAssetsData;
 }
@@ -836,6 +837,7 @@ export interface IDataCards {
   epochInfo: IEpochInfo;
   coinsData: ICoinInfo[];
   yesterdayTransactions: number;
+  beforeYesterdayTransactions: number;
   yesterdayAccounts: number;
   assetsData: IAssetsData;
   block: IBlock;
@@ -924,7 +926,7 @@ export interface ICard {
   title: string;
   value: number;
   variation: string;
-  percentage?: string;
+  percentage?: number;
 }
 
 export interface IEpochCard {

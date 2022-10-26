@@ -31,6 +31,7 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
     tps: '0 / 0',
     coinsData: [],
     yesterdayTransactions: 0,
+    beforeYesterdayTransactions: 0,
     yesterdayAccounts: 0,
     assetsData: {
       klv: {
@@ -265,6 +266,22 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
     },
   );
 
+  const beforeYesterdayTransactionsCall = new Promise<IAccountResponse>(
+    async (resolve, reject) => {
+      const res = await api.getCached({
+        route: `transaction/list?startdate=${
+          new Date().getTime() - 86400000 * 2
+        }&enddate=${new Date().getTime() - 86400000}`,
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
+  );
+
   const yesterdayAccountsCall = new Promise<IAccountResponse>(
     async (resolve, reject) => {
       const res = await api.getCached({
@@ -355,6 +372,7 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
     kfiDataCall,
     kfiChartCall,
     yesterdayTransactionsCall,
+    beforeYesterdayTransactionsCall,
     yesterdayAccountsCall,
     klvCall,
     kfiCall,
@@ -432,11 +450,17 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
             break;
 
           case 11:
+            if (value.pagination.totalRecords > 0)
+              props.beforeYesterdayTransactions = value.pagination.totalRecords;
+
+            break;
+
+          case 12:
             if (value.data?.number_by_day?.length > 0)
               props.yesterdayAccounts = value.data?.number_by_day[0]?.doc_count;
             break;
 
-          case 12:
+          case 13:
             const initialKlv = 0;
             props.assetsData.klv.estimatedAprYesterday =
               calcApr(value?.data.asset, 4, 0) * 100;
@@ -462,7 +486,7 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
 
             break;
 
-          case 13:
+          case 14:
             const initialKfi = 0;
             props.assetsData.kfi.estimatedAprYesterday = calcApr(
               value?.data.asset,
@@ -494,7 +518,7 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
 
             break;
 
-          case 14:
+          case 15:
             if (!value.code) {
               const data = value.Exchanges.find(
                 (exchange: any) => exchange.ExchangeName === 'Klever',

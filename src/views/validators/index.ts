@@ -2,7 +2,6 @@ import styled from 'styled-components';
 
 export const ProgressContainer = styled.div`
   display: flex;
-  min-width: 10rem;
   @media (min-width: 1600px) and (max-width: 1800px) {
     min-width: 10rem;
   }
@@ -42,7 +41,7 @@ export const ProgressContent = styled.div`
   border-radius: 0.25rem;
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 100%;
+    width: calc(7vw + 3rem);
   }
 `;
 

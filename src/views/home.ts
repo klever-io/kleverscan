@@ -37,9 +37,12 @@ export const IconContainer = styled.div`
 `;
 
 export const ProgressContainerSpan = styled.span`
-  width: 50%;
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    display: none;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+
+  strong {
+    width: fit-content;
   }
 `;
 
@@ -70,8 +73,7 @@ export const Section = styled.section`
 `;
 
 export const DataContainer = styled(Section)`
-  padding: 5rem min(3%, 10rem) 10rem;
-
+  padding: 5rem 0;
   /* background-color: #40274f;
   background-image: radial-gradient(
       at 29% 76%,
@@ -135,6 +137,7 @@ export const DataCardsContainer = styled.div`
 
 export const DataCardsWrapper = styled.div`
   width: 100%;
+  height: 17.401rem;
 
   display: flex;
 
@@ -142,10 +145,14 @@ export const DataCardsWrapper = styled.div`
   justify-content: center;
 
   gap: 0.5rem;
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    height: fit-content;
+  }
 `;
 
 export const DataCardsContent = styled.div`
   width: 100%;
+  height: 50%;
 
   display: flex;
 
@@ -153,6 +160,10 @@ export const DataCardsContent = styled.div`
   justify-content: center;
 
   gap: 0.5rem;
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    height: auto;
+  }
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
@@ -186,6 +197,19 @@ export const EpochCard = styled.div`
 
   background-color: ${props => props.theme.card.background};
   border-radius: 1rem;
+`;
+
+export const Percentage = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 0.55rem;
+
+  span {
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-right: 0;
+  }
 `;
 
 export const DataCardValue = styled.div`
@@ -222,7 +246,7 @@ export const DataCardLatest = styled.div<IVariation>`
   flex-direction: column;
   align-items: flex-end;
 
-  gap: 0.5rem;
+  gap: 0.2rem;
 
   span {
     font-size: 0.85rem;
@@ -552,14 +576,14 @@ export const TransactionChartContent = styled.div`
 `;
 
 export const Main = styled.main`
-  padding: 3rem min(10vw, 10rem) 5rem min(10vw, 10rem);
+  padding: 3rem min(5vw, 10rem) 5rem;
   display: block;
   margin: 0 auto;
   max-width: ${props => props.theme.maxWidth};
   background-color: ${props => props.theme.background};
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding: 3rem 1rem 5rem 1rem;
+    padding: 3rem 0.1rem 5rem;
   }
 `;
 export const LayoutContainer = styled.div`

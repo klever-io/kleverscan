@@ -106,6 +106,11 @@ export const Row = styled.div<ITableType>`
     a {
       color: ${props => props.theme.black};
       font-weight: 600;
+      &:hover {
+        strong {
+          opacity: 0.7;
+        }
+      }
     }
 
     small {

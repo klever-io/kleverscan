@@ -51,7 +51,22 @@ const Transactions: React.FC<ITransactionsProps> = props => {
       if (parameter.assetId) {
         assetId = parameter.assetId;
       }
+      if (!parameter.assetId) assetId = 'KLV';
     }
+
+    const assetIdSection = () => {
+      if (contractType === Contract.Transfer) {
+        return (
+          <Link href={`/asset/${assetId}`} key={assetId}>
+            <a>
+              <strong>{assetId}</strong>
+            </a>
+          </Link>
+        );
+      }
+
+      return <strong>{assetId}</strong>;
+    };
     const sections = [
       {
         element: (
@@ -106,7 +121,10 @@ const Transactions: React.FC<ITransactionsProps> = props => {
       },
       { element: <strong key={contractType}>{contractType}</strong>, span: 1 },
       { element: <strong key={amount}>{amount}</strong>, span: 1 },
-      { element: <strong key={assetId}>{assetId}</strong>, span: 1 },
+      {
+        element: assetIdSection(),
+        span: 1,
+      },
     ];
     return sections;
   };

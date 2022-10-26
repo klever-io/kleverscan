@@ -165,7 +165,7 @@ const Account: React.FC<IAccountPage> = ({
       headers.push('Assets');
     }
 
-    if (transactionResponse.data.transactions.length > 0) {
+    if (transactionResponse.data?.transactions.length > 0) {
       headers.push('Transactions');
     }
 
@@ -181,7 +181,7 @@ const Account: React.FC<IAccountPage> = ({
     }
 
     return headers;
-  }, [account.assets, transactionResponse.data.transactions]);
+  }, [account.assets, transactionResponse.data?.transactions]);
 
   const [selectedTab, setSelectedTab] = useState<string>(
     getTabHeaders()[getSelectedTab(router.query?.tab)],
@@ -258,6 +258,13 @@ const Account: React.FC<IAccountPage> = ({
     }
   };
 
+  const availableBalance = (
+    account.balance /
+    10 ** defaultKlvPrecision
+  ).toLocaleString();
+  const totalKLV = calculateTotalKLV().toLocaleString();
+  const pricedKLV = calculateTotalKLV() * priceKLV;
+
   return (
     <Container>
       <Header>
@@ -298,18 +305,17 @@ const Account: React.FC<IAccountPage> = ({
                   <span>KLV</span>
                 </IconContainer>
                 <div>
-                  <span>{calculateTotalKLV().toLocaleString()}</span>
-                  <p>USD {(calculateTotalKLV() * priceKLV).toLocaleString()}</p>
+                  <span>{isNaN(Number(totalKLV)) ? 0 : totalKLV}</span>
+                  {!isNaN(Number(pricedKLV)) && (
+                    <p>USD {pricedKLV.toLocaleString()}</p>
+                  )}
                 </div>
               </AmountContainer>
               <FrozenContainer>
                 <div>
                   <strong>Available</strong>
                   <span>
-                    {(
-                      account.balance /
-                      10 ** defaultKlvPrecision
-                    ).toLocaleString()}
+                    {isNaN(Number(availableBalance)) ? 0 : availableBalance}
                   </span>
                 </div>
                 <div>
@@ -362,7 +368,7 @@ const Account: React.FC<IAccountPage> = ({
           </span>
           <RowContent>
             <small>
-              {transactionResponse.pagination.totalRecords.toLocaleString()}
+              {transactionResponse?.pagination?.totalRecords.toLocaleString()}
             </small>
           </RowContent>
         </Row>
@@ -377,6 +383,8 @@ const Account: React.FC<IAccountPage> = ({
 export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
   params,
 }) => {
+  const redirectProps = { redirect: { destination: '/404', permanent: false } };
+
   const props: IAccountPage = {
     account: {} as IAccount,
     priceKLV: 0,
@@ -389,7 +397,6 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
   };
 
   const accountLength = 62;
-  const redirectProps = { redirect: { destination: '/404', permanent: false } };
   const address = String(params?.account);
 
   const emptyAccount = {
@@ -524,6 +531,10 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
       });
     },
   );
+
+  if (Object.keys(props.account).length === 0) {
+    props.account.address = address;
+  }
 
   return { props };
 };

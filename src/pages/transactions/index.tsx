@@ -10,6 +10,7 @@ import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
+import Tooltip from '@/components/Tooltip';
 import { contracts, status } from '@/configs/transactions';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
@@ -43,6 +44,8 @@ import {
   FilterByDate,
   FilterContainer,
   Header,
+  MultiContractContainer,
+  MultiContractCounter,
 } from '@/views/transactions';
 import { Input } from '@/views/transactions/detail';
 import { format, fromUnixTime } from 'date-fns';
@@ -60,6 +63,7 @@ import {
   IRowSection,
   ITransaction,
   ITransferContract,
+  ReducedContract,
 } from '../../types';
 import {
   capitalizeString,
@@ -94,7 +98,7 @@ const Transactions: React.FC<ITransactions> = ({
 }) => {
   const router = useRouter();
   const precision = 6; // default KLV precision
-  const { isMobile } = useMobile();
+  const { isMobile, isTablet } = useMobile();
 
   const getContractIndex = (contractName: string): string =>
     ContractsIndex[contractName];
@@ -336,6 +340,54 @@ const Transactions: React.FC<ITransactions> = ({
       status,
     } = props;
 
+    const reduceContracts = (): ReducedContract => {
+      const reducedContract: ReducedContract = {};
+      contract.forEach(contrct => {
+        if (!reducedContract[contrct.type]) {
+          reducedContract[contrct.type] = 1;
+        } else {
+          reducedContract[contrct.type] += 1;
+        }
+      });
+      return reducedContract;
+    };
+
+    const renderContracts = () => {
+      let msg = '';
+      Object.entries(reduceContracts()).forEach(([contrct, number]) => {
+        msg += `${ContractsIndex[contrct]}: ${number}x\n`;
+      });
+
+      const getViewport = () => {
+        const styles = { offset: { right: 54, top: 5, bottom: 0 } };
+        if (isMobile) {
+          styles.offset.right = 0;
+          styles.offset.top = 0;
+          styles.offset.bottom = 10;
+        } else if (isTablet) {
+          styles.offset.right = 54;
+          styles.offset.bottom = 10;
+        }
+        return styles;
+      };
+      const customStyles = getViewport();
+
+      return (
+        <aside>
+          <Tooltip
+            msg={msg}
+            customStyles={customStyles}
+            Component={() => (
+              <MultiContractContainer>
+                {contractType}
+                <MultiContractCounter>{contract.length}</MultiContractCounter>
+              </MultiContractContainer>
+            )}
+          ></Tooltip>
+        </aside>
+      );
+    };
+
     const StatusIcon = getStatusIcon(status);
     let toAddress = '--';
     const contractType = getContractType(contract);
@@ -400,7 +452,12 @@ const Transactions: React.FC<ITransactions> = ({
         span: 1,
       },
       {
-        element: <strong key={contractType}>{contractType}</strong>,
+        element:
+          contractType === 'Multi contract' ? (
+            renderContracts()
+          ) : (
+            <strong key={contractType}>{contractType}</strong>
+          ),
         span: 1,
       },
       {

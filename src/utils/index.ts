@@ -63,7 +63,7 @@ export const getVariation = (variation: number): string => {
  * @returns string
  */
 export const getAge = (date: Date, t?: TFunction): string => {
-  const diff = Math.abs(new Date().getTime() - date.getTime()) - 60;
+  const diff = Math.abs(new Date().getTime() - date.getTime());
   const sec = Math.floor(diff / 1000);
   const min = Math.floor(diff / (1000 * 60));
   const hour = Math.floor(diff / (1000 * 60 * 60));

@@ -24,7 +24,7 @@ interface ICollectionResponse extends IResponse {
   pagination: IPagination;
 }
 
-const Validators: React.FC<ICollectionPage> = ({
+const Collection: React.FC<ICollectionPage> = ({
   collection,
   pagination,
   address,
@@ -40,25 +40,28 @@ const Validators: React.FC<ICollectionPage> = ({
   });
 
   const requestCollection = (page: number, limit: number) =>
-    api.get({
+    api.getCached({
       route: `address/${address}/collection/${collectionAsset}?page=${page}&limit=${limit}`,
     });
 
   const { isMobile } = useMobile();
 
   const rowSections = (nft: INfts): IRowSection[] => {
-    const {
-      address,
-      collection: collectionId,
-      assetName: collection,
-      nftNonce,
-    } = nft;
+    const { address, assetName: collection, assetId } = nft;
 
+    const collectionId = assetId.split('/')[0];
+    const nftId = assetId.split('/')[1];
     const sections = address
       ? [
-          { element: <span key={nftNonce}>#{nftNonce}</span>, span: 1 },
+          {
+            element: <span key={assetId}>#{nftId}</span>,
+            span: 1,
+          },
           { element: <span key={collection}>{collection}</span>, span: 1 },
-          { element: <span key={collectionId}>{collectionId}</span>, span: 1 },
+          {
+            element: <span key={collectionId}>{collectionId}</span>,
+            span: 1,
+          },
           {
             element: (
               <Link href={`/account/${address}`} key={address}>
@@ -74,8 +77,8 @@ const Validators: React.FC<ICollectionPage> = ({
           {
             element: (
               <Link
-                href={`/account/${address}/collection/${collectionId}/${nftNonce}`}
-                key={nftNonce}
+                href={`/account/${address}/collection/${collectionId}/${nftId}`}
+                key={assetId}
               >
                 <CustomLink>Details</CustomLink>
               </Link>
@@ -138,4 +141,4 @@ export const getServerSideProps: GetServerSideProps<ICollectionPage> = async ({
   return { props };
 };
 
-export default Validators;
+export default Collection;

@@ -179,8 +179,31 @@ export const MobileStyledTransfer = styled(BiTransfer)`
   color: ${props => props.theme.navbar.text};
   size: 20px;
 `;
+
 export const StyledTransfer = styled(BiTransfer)`
   color: ${props => props.theme.navbar.text};
   width: 25px;
   height: 25px;
+`;
+
+export const QRCodeContainer = styled.div`
+  position: absolute;
+
+  -webkit-box-shadow: 3px 3px 8px 5px rgba(0, 0, 0, 0.05);
+  box-shadow: 3px 3px 8px 5px rgba(0, 0, 0, 0.05);
+`;
+
+export const QRCodeContent = styled.div`
+  position: relative;
+  background-color: ${props => props.theme.qrcodeTooltip.background};
+  border-radius: 1rem;
+  padding: 1rem;
+  top: 5.3rem;
+  left: 0.2rem;
+
+  div {
+    background-color: #fff;
+    padding: 0.3rem;
+    border-radius: 0.2rem;
+  }
 `;

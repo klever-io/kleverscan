@@ -27,7 +27,9 @@ const QrCodeModal: React.FC<IQrCodeModal> = ({
           <ModalXButton onClick={setShowModal}>x</ModalXButton>
         </ModalHeader>
         <ModalBody>
-          <QRCodeSVG value={value}></QRCodeSVG>
+          <div>
+            <QRCodeSVG value={value}></QRCodeSVG>
+          </div>
         </ModalBody>
         <ModalHeader>
           <ModalXButton></ModalXButton>

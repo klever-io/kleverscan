@@ -80,6 +80,7 @@ const theme = {
   chart: {
     darkBg: '#5A2A73',
     lightBg: '#aa33b5',
+    backgroundTooltip: '#fff',
   },
 
   filter: {
@@ -120,6 +121,10 @@ const theme = {
 
   dateFilter: {
     outsideBackground: 'rgba(198, 199, 235, 0.2)',
+  },
+
+  qrcodeTooltip: {
+    background: '#fff',
   },
 
   breakpoints: {

@@ -272,3 +272,8 @@ export const AssetHeaderContainer = styled.div<{ isVerfied: boolean }>`
     }
   }
 `;
+
+export const UriContainer = styled.div`
+  overflow-x: auto;
+  width: 95%;
+`;

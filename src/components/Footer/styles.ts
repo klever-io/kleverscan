@@ -113,7 +113,7 @@ export const LinkItems = styled.div`
     padding-bottom: 1rem;
 
     font-weight: 500;
-    color: ${props => props.theme.white};
+    color: white;
   }
 
   a {

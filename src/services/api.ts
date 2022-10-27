@@ -26,6 +26,15 @@ export interface IProps {
   refreshTime?: number;
 }
 
+const pagination = {
+  self: 0,
+  next: 0,
+  previous: 0,
+  perPage: 0,
+  totalPages: 0,
+  totalRecords: 0,
+};
+
 const buildUrlQuery = (query: IQuery): string =>
   Object.keys(query)
     .map(key => `${key}=${query[key]}`)
@@ -117,12 +126,18 @@ export const withoutBody = async (
           data: null,
           error: (await response.json()).error,
           code: 'internal_error',
+          pagination,
         };
       }
 
       return response.json();
     } catch (error) {
-      return { data: null, error, code: 'internal_error' };
+      return {
+        data: null,
+        error,
+        code: 'internal_error',
+        pagination,
+      };
     }
   };
 
@@ -154,12 +169,13 @@ export const withBody = async (props: IProps, method: Method): Promise<any> => {
           data: null,
           error: (await response.json()).error,
           code: 'internal_error',
+          pagination,
         };
       }
 
       return response.json();
     } catch (error) {
-      return { data: null, error, code: 'internal_error' };
+      return { data: null, error, code: 'internal_error', pagination };
     }
   };
 
@@ -191,12 +207,18 @@ export const withText = async (props: IProps, method: Method): Promise<any> => {
           data: null,
           error: (await response.json()).error,
           code: 'internal_error',
+          pagination,
         };
       }
 
       return response.text();
     } catch (error) {
-      return { data: null, error, code: 'internal_error' };
+      return {
+        data: null,
+        error,
+        code: 'internal_error',
+        pagination,
+      };
     }
   };
 
@@ -219,7 +241,12 @@ export const withTimeout = async (
     promise,
     new Promise(resolve => {
       setTimeout(() => {
-        resolve({ data: null, error: 'Fetch timeout', code: 'internal_error' });
+        resolve({
+          data: null,
+          error: 'Fetch timeout',
+          code: 'internal_error',
+          pagination,
+        });
       }, timeout);
     }),
   ]);
@@ -248,12 +275,18 @@ export const getCached = async (props: IProps): Promise<any> => {
           data: null,
           error: (await response.json()).error,
           code: 'internal_error',
+          pagination,
         };
       }
 
       return response.json();
     } catch (error) {
-      return { data: null, error, code: 'internal_error' };
+      return {
+        data: null,
+        error,
+        code: 'internal_error',
+        pagination,
+      };
     }
   };
 

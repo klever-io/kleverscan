@@ -360,7 +360,7 @@ const Validator: React.FC<IValidatorPage> = ({
     rowSections,
     request: (page, limit) => requestValidator(page, limit),
     scrollUp: false,
-    totalPages: pagination.totalPages,
+    totalPages: pagination?.totalPages || 1,
     dataName: 'validator',
   };
 

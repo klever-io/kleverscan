@@ -56,7 +56,7 @@ import {
 } from '@/views/proposals/detail';
 import { CenteredRow } from '@/views/validators/detail';
 import { format, fromUnixTime } from 'date-fns';
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
 import { AiFillCheckCircle } from 'react-icons/ai';
@@ -288,6 +288,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
         },
       };
     }
+
     const parsedVotersResponse = voters?.data?.proposal;
     const votesFormatted = validateFormattedVotes(parsedVotersResponse);
     setVotersList(votesFormatted);
@@ -313,7 +314,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
 
   return (
     <>
-      {proposalAPI ? (
+      {proposalAPI && (
         <Container>
           <Header>
             <Title route={'/proposals'} title="Proposal Details" />
@@ -484,7 +485,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
             <Table {...tablePropsNo} />
           )}
         </Container>
-      ) : null}
+      )}
     </>
   );
 };
@@ -528,7 +529,7 @@ export const getProposalNetworkParams = (
   return { currentNetworkParams, fullInfoParams };
 };
 
-export const getServerSideProps: GetStaticProps<IProposal> = async ({
+export const getServerSideProps: GetServerSideProps<IProposal> = async ({
   params,
 }) => {
   let props: any = {};

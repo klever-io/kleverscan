@@ -51,6 +51,7 @@ const activeConfirmButtonStyles = {
 };
 
 describe('Component: Pagination', () => {
+  window.scrollTo = jest.fn();
   describe('Static tests', () => {
     beforeEach(() => {
       jest.clearAllMocks();

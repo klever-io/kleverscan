@@ -38,28 +38,10 @@ export const Header = styled.section`
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
-    div {
+    div:nth-child(1) {
       width: 100%;
       flex-direction: column;
     }
-  }
-`;
-
-export const FilterContainer = styled.div`
-  display: flex;
-
-  flex-direction: row;
-
-  gap: 0.75rem;
-
-  > div:last-child {
-    min-width: 15rem;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    width: 100%;
-
-    flex-direction: column;
   }
 `;
 
@@ -139,4 +121,33 @@ export const StyledLink = styled(Link)`
   &:hover {
     overflow: visible;
   }
+`;
+
+export const MultiContractContainer = styled.strong`
+  position: relative;
+  overflow: visible !important;
+`;
+
+export const MultiContractCounter = styled.span`
+  background-color: ${props => props.theme.violet};
+  position: relative;
+  line-height: 20px;
+  color: ${props => props.theme.true.white} !important;
+  width: 20px !important;
+  height: 20px !important;
+  text-align: center;
+  display: inline-block;
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    transform: translate(5%, 28%);
+    bottom: 5px;
+    right: 1px;
+  }
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    bottom: 5px;
+    right: 1px;
+  }
+  transform: translateY(-50%);
+  font-size: smaller !important;
+  border-radius: 50%;
 `;

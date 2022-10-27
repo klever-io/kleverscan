@@ -44,7 +44,7 @@ export interface ITable {
     | 'validatorsList';
 
   header: string[];
-  data: any[];
+  data: any[] | null;
   body?: any;
   rowSections?: (item: any) => IRowSection[] | undefined;
   scrollUp?: boolean;
@@ -66,12 +66,15 @@ const Table: React.FC<ITable> = ({
   scrollUp,
   totalPages: defaultTotalPages,
   dataName,
-  query,
   interval,
   intervalController,
 }) => {
-  const { pathname } = useRouter();
-  const props: ITableType = { type, pathname, haveData: data?.length };
+  const router = useRouter();
+  const props: ITableType = {
+    type,
+    pathname: router.pathname,
+    haveData: data?.length,
+  };
   const { isMobile } = useMobile();
   const [isTablet, setIsTablet] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -93,7 +96,7 @@ const Table: React.FC<ITable> = ({
       setLoading(true);
       if (!response.error) {
         setItems(response.data[dataName]);
-        setTotalPages(response.pagination.totalPages);
+        setTotalPages(response?.pagination?.totalPages || 1);
       } else {
         setPage(1);
         setItems([]);
@@ -113,6 +116,7 @@ const Table: React.FC<ITable> = ({
     if (page !== 1 && intervalController) {
       intervalController(0);
     }
+    setLoading(true);
     fetchData();
   }, [page]);
 
@@ -120,12 +124,15 @@ const Table: React.FC<ITable> = ({
     fetchData();
   }, [limit]);
 
-  useEffect(() => {
-    if (page !== 1) {
-      setPage(1);
+  useDidUpdateEffect(() => {
+    if (router.query) {
+      if (page !== 1) {
+        setPage(1);
+      }
+      setLoading(true);
+      fetchData();
     }
-    fetchData();
-  }, [query]);
+  }, [router.query]);
 
   useEffect(() => {
     setLoading(true);
@@ -134,8 +141,6 @@ const Table: React.FC<ITable> = ({
         fetchData();
       }, interval);
       return () => clearInterval(intervalId);
-    } else {
-      fetchData();
     }
   }, [interval, limit]);
 
@@ -192,6 +197,8 @@ const Table: React.FC<ITable> = ({
               </>
             )}
             {!loading &&
+              items &&
+              items?.length > 0 &&
               items?.map((item, index) => {
                 let spanCount = 0;
 

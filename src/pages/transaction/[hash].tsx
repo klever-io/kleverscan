@@ -483,6 +483,9 @@ export const getStaticProps: GetStaticProps<ITransactionPage> = async ({
     block: block.data.block,
   };
 
-  return { props };
+  return {
+    props,
+    revalidate: 60,
+  };
 };
 export default Transaction;

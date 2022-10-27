@@ -4,7 +4,7 @@ import Tooltip from '@/components/Tooltip';
 import { useTheme } from '@/contexts/theme';
 import api from '@/services/api';
 import { Service } from '@/types/index';
-import { getEpochInfo } from '@/utils/index';
+import { getEpochInfo, getVariation } from '@/utils/index';
 import {
   DataCard,
   DataCardLatest,
@@ -13,6 +13,7 @@ import {
   DataCardsWrapper,
   DataCardValue,
   IconContainer,
+  Percentage,
   ProgressContainerSpan,
 } from '@/views/home';
 import {
@@ -32,6 +33,7 @@ import {
   ITransactionResponse,
   IYesterdayResponse,
 } from '../../../types';
+import { ValueDetail } from '../CoinCard/styles';
 
 const HomeDataCards: React.FC<IDataCards> = ({
   totalAccounts: defaultTotalAccounts,
@@ -41,6 +43,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
   tps,
   coinsData,
   yesterdayTransactions,
+  beforeYesterdayTransactions,
   yesterdayAccounts,
   assetsData,
 }) => {
@@ -81,6 +84,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
       title: t('Total Transactions'),
       value: totalTransactions,
       variation: `+ ${newTransactions.toLocaleString()}`,
+      percentage: (newTransactions * 100) / (beforeYesterdayTransactions * 100),
     },
   ];
 
@@ -222,7 +226,12 @@ const HomeDataCards: React.FC<IDataCards> = ({
                 break;
 
               case 2:
-                setTotalTransactions(value.pagination.totalRecords);
+                const newTotalTransactions = value.pagination.totalRecords;
+                if (
+                  totalTransactions &&
+                  totalTransactions < newTotalTransactions
+                )
+                  setTotalTransactions(value.pagination.totalRecords);
                 break;
 
               case 3:
@@ -254,34 +263,66 @@ const HomeDataCards: React.FC<IDataCards> = ({
         <ProgressContent>
           <ProgressIndicator percent={percent} />
         </ProgressContent>
-        <ProgressPercentage textColor={theme.card.white}>
-          {percent?.toFixed(2)}%
-        </ProgressPercentage>
+        <ProgressPercentage textColor={theme.card.white}></ProgressPercentage>
       </ProgressContainer>
     );
+  };
+
+  const PercentageComponent: React.FC<{
+    progress: any;
+    value: string | number;
+  }> = ({ progress, value }) => {
+    const [show, setShow] = useState(false);
+    if (progress) {
+      return (
+        <Percentage>
+          <p>{value?.toLocaleString()}</p>
+          {progress >= 0 && (
+            <div>
+              <ProgressContainerSpan>
+                <strong>
+                  <Progress percent={metrics.epochLoadPercent} />
+                </strong>
+                <span>
+                  {metrics.epochLoadPercent.toFixed(2)}% to next epoch
+                </span>
+              </ProgressContainerSpan>
+            </div>
+          )}
+        </Percentage>
+      );
+    }
+    return <p>{value?.toLocaleString()}</p>;
   };
 
   return (
     <DataCardsContainer>
       <DataCardsWrapper>
         <DataCardsContent>
-          {dataCards.map(({ Icon, title, value, variation }, index) => (
-            <DataCard key={String(index)}>
-              <IconContainer>
-                <Icon viewBox="0 0 70 70" />
-              </IconContainer>
-              <DataCardValue>
-                <span>{title}</span>
-                <p>{value.toLocaleString()}</p>
-              </DataCardValue>
-              {!variation.includes('%') && (
-                <DataCardLatest positive={variation.includes('+')}>
-                  <span>{t('Last 24h')}</span>
-                  <p>{variation}</p>
-                </DataCardLatest>
-              )}
-            </DataCard>
-          ))}
+          {dataCards.map(
+            ({ Icon, title, value, variation, percentage }, index) => (
+              <DataCard key={String(index)}>
+                <IconContainer>
+                  <Icon viewBox="0 0 70 70" />
+                </IconContainer>
+                <DataCardValue>
+                  <span>{title}</span>
+                  <p>{value.toLocaleString()}</p>
+                </DataCardValue>
+                {!variation.includes('%') && (
+                  <DataCardLatest positive={variation.includes('+')}>
+                    <span>{t('Last 24h')}</span>
+                    <p>{variation}</p>
+                    {percentage && (
+                      <ValueDetail positive={true}>
+                        <p>{getVariation(+percentage)}</p>
+                      </ValueDetail>
+                    )}
+                  </DataCardLatest>
+                )}
+              </DataCard>
+            ),
+          )}
         </DataCardsContent>
         <DataCardsContent>
           {epochCards.map(({ Icon, title, value, progress }, index) => (
@@ -294,19 +335,12 @@ const HomeDataCards: React.FC<IDataCards> = ({
                   <span>{title}</span>
                   {index === 0 && (
                     <span style={{ marginTop: '-0.25rem' }}>
-                      <Tooltip msg="Transactions per slot" />
+                      <Tooltip msg="Transactions per second" />
                     </span>
                   )}
                 </div>
-                <p>{value?.toLocaleString()}</p>
+                {<PercentageComponent progress={progress} value={value} />}
               </DataCardValue>
-              {progress >= 0 && (
-                <ProgressContainerSpan>
-                  <strong>
-                    <Progress percent={metrics.epochLoadPercent} />
-                  </strong>
-                </ProgressContainerSpan>
-              )}
             </DataCard>
           ))}
         </DataCardsContent>

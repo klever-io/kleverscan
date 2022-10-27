@@ -1077,10 +1077,9 @@ export const SetITOPrices: React.FC<IContract> = ({ parameter: par }) => {
   );
 };
 
-export const Buy: React.FC<IContract> = ({ parameter: par }) => {
+export const Buy: React.FC<IContract> = ({ parameter: par, receipts }) => {
   const parameter = par as IBuyContract;
   const [precision, setPrecision] = useState(1);
-
   useEffect(() => {
     const getAssetPrecision = async () => {
       setPrecision((await getPrecision(parameter?.currencyID || 'KLV')) ?? 6);
@@ -1094,6 +1093,20 @@ export const Buy: React.FC<IContract> = ({ parameter: par }) => {
     getAssetPrecision();
   }, []);
 
+  const hasNft = receipts?.find(
+    (receipt: any) => receipt?.assetId && receipt?.assetId.includes('/'),
+  );
+
+  const renderAmountValue = () => {
+    if (parameter?.buyType === ('ITOBuy' as any) && hasNft) {
+      return <span>{parameter.amount}</span>;
+    }
+    return (
+      <span>
+        {toLocaleFixed(parameter?.amount / 10 ** precision || 0, precision)}
+      </span>
+    );
+  };
   return (
     <>
       <Row>
@@ -1124,9 +1137,7 @@ export const Buy: React.FC<IContract> = ({ parameter: par }) => {
         <span>
           <strong>Amount</strong>
         </span>
-        <span>
-          {toLocaleFixed(parameter?.amount / 10 ** precision || 0, precision)}
-        </span>
+        <span>{renderAmountValue()}</span>
       </Row>
     </>
   );

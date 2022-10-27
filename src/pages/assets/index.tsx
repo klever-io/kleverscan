@@ -4,12 +4,12 @@ import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Table, { ITable } from '@/components/Table';
+import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import api from '@/services/api';
 import { IAsset, IPagination, IResponse, IRowSection } from '@/types/index';
 import { formatAmount, parseHardCodedInfo } from '@/utils/index';
 import { Container, Header, HeaderContainer, Input } from '@/views/assets';
 import { LetterLogo, Logo } from '@/views/assets/index';
-import { FilterContainer } from '@/views/transactions';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -252,7 +252,7 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
     request: (page, limit) => requestAssets(page, limit),
     dataName: 'assets',
     scrollUp: true,
-    totalPages: pagination.totalPages,
+    totalPages: pagination?.totalPages || 1,
     query: router.query,
   };
 

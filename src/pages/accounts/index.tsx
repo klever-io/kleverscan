@@ -162,7 +162,7 @@ const Accounts: React.FC<IAccounts> = ({
     request: (page, limit) => requestAccounts(page, limit),
     dataName: 'accounts',
     scrollUp: true,
-    totalPages: pagination.totalPages,
+    totalPages: pagination?.totalPages || 1,
   };
 
   return (

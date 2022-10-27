@@ -56,6 +56,7 @@ export const Content = styled.div`
 
 export const Logo = styled.div`
   margin-right: 0.5rem;
+  min-width: 6rem;
 
   cursor: pointer;
 `;
@@ -95,7 +96,6 @@ export const Item = styled.div<{ selected: boolean }>`
   }
 
   pointer-events: ${props => (props.selected ? 'none' : 'all')};
-  cursor: 'default';
 `;
 
 export const LinkStyled = styled.a<{ disabled: boolean }>`
@@ -159,6 +159,7 @@ export const IconsMenu = styled.div`
   display: flex;
 
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
 
   gap: 1.5rem;

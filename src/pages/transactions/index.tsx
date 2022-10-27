@@ -6,11 +6,11 @@ import DateFilter, {
   IDateFilter,
   ISelectedDays,
 } from '@/components/DateFilter';
-import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
-import { contracts, status } from '@/configs/transactions';
+import Tooltip from '@/components/Tooltip';
+import TransactionsFilters from '@/components/TransactionsFilters';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import {
@@ -41,15 +41,17 @@ import { CenteredRow } from '@/views/accounts/detail';
 import {
   Container,
   FilterByDate,
-  FilterContainer,
   Header,
+  MultiContractContainer,
+  MultiContractCounter,
 } from '@/views/transactions';
 import { Input } from '@/views/transactions/detail';
 import { format, fromUnixTime } from 'date-fns';
 import { GetServerSideProps } from 'next';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import {
   Contract,
   ContractsIndex,
@@ -60,13 +62,9 @@ import {
   IRowSection,
   ITransaction,
   ITransferContract,
+  ReducedContract,
 } from '../../types';
-import {
-  capitalizeString,
-  fetchPartialAsset,
-  formatAmount,
-  parseAddress,
-} from '../../utils';
+import { capitalizeString, formatAmount, parseAddress } from '../../utils';
 
 interface ITransactions {
   transactions: ITransaction[];
@@ -94,86 +92,23 @@ const Transactions: React.FC<ITransactions> = ({
 }) => {
   const router = useRouter();
   const precision = 6; // default KLV precision
-  const { isMobile } = useMobile();
+  const { isMobile, isTablet } = useMobile();
 
-  const getContractIndex = (contractName: string): string =>
-    ContractsIndex[contractName];
-  const getContractName = (): string => ContractsIndex[Number(query.type)];
-  const [query, setQuery] = useState(router.query);
-  const [assetFilters, setAssetsFilters] = useState(assets);
-
-  const handleSelected = (selected: string, filterType: string): void => {
-    if (selected === 'All') {
-      const updatedQuery = { ...query };
-      delete updatedQuery[filterType];
-      setQuery(updatedQuery);
-    } else if (filterType === 'type') {
-      setQuery({ ...query, [filterType]: getContractIndex(selected) });
-    } else if (selected !== query[filterType]) {
-      setQuery({ ...query, [filterType]: selected });
-    }
-  };
-
-  useEffect(() => {
-    // this useEffect was built for the single purpose of solving the data difference between the router and the filter state when router.query isn't empty and user clicks again in the transactions page through the navbar button. It was the only solution that worked.
-    if (
-      Object.keys(router.query).length === 0 &&
-      Object.keys(query).length > 0
-    ) {
-      router.push({ pathname: router.pathname, query }, undefined, {
-        shallow: true,
-      });
-    }
-  }, [router.query]);
-
-  useEffect(() => {
-    //TODO? cannot use this useEffect on table since some pages names are dynamic and router needs static names for push. Needs to check this further.
-    router.push({ pathname: router.pathname, query }, undefined, {
+  const setQueryAndRouter = (newQuery: NextParsedUrlQuery) => {
+    router.push({ pathname: router.pathname, query: newQuery }, undefined, {
       shallow: true,
     });
-  }, [query]);
+  };
 
   const getContractType = useCallback((contracts: IContract[]) => {
     if (!contracts) {
-      return 'Unkown';
+      return 'Unknown';
     }
 
     return contracts.length > 1
       ? 'Multi contract'
       : Object.values(Contract)[contracts[0].type];
   }, []);
-
-  let fetchPartialAssetTimeout: ReturnType<typeof setTimeout>;
-  const filters: IFilter[] = [
-    {
-      title: 'Coin',
-      data: assetFilters.map(asset => asset.assetId),
-      onClick: selected => handleSelected(selected, 'asset'),
-      onChange: async value => {
-        const response = await fetchPartialAsset(
-          fetchPartialAssetTimeout,
-          value,
-          assets,
-        );
-        if (response) {
-          setAssetsFilters([...assetFilters, ...response]);
-        }
-      },
-      current: query.asset as string | undefined,
-    },
-    {
-      title: 'Status',
-      data: status,
-      onClick: selected => handleSelected(selected, 'status'),
-      current: query.status as string | undefined,
-    },
-    {
-      title: 'Contract',
-      data: contracts,
-      onClick: selected => handleSelected(selected, 'type'),
-      current: getContractName(),
-    },
-  ];
 
   const header = [
     'Hash',
@@ -191,7 +126,7 @@ const Transactions: React.FC<ITransactions> = ({
   const requestTransactions = async (page: number, limit?: number) =>
     api.get({
       route: `transaction/list`,
-      query: { page, limit, ...query },
+      query: { page, limit, ...router.query },
     });
 
   const getFilteredSections = (contract: IContract[]): IRowSection[] => {
@@ -249,7 +184,7 @@ const Transactions: React.FC<ITransactions> = ({
 
   const getHeader = () => {
     let newHeaders: string[] = [];
-    switch (ContractsIndex[ContractsIndex[Number(query.type)]]) {
+    switch (ContractsIndex[ContractsIndex[Number(router.query.type)]]) {
       case ContractsIndex.Transfer:
         newHeaders = ['Coin', 'Amount'];
         break;
@@ -317,7 +252,7 @@ const Transactions: React.FC<ITransactions> = ({
       case ContractsIndex['Config Marketplace']:
     }
 
-    if (query.type) {
+    if (router.query.type) {
       return header.splice(0, header.length - 2).concat(newHeaders);
     }
 
@@ -335,6 +270,54 @@ const Transactions: React.FC<ITransactions> = ({
       bandwidthFee,
       status,
     } = props;
+
+    const reduceContracts = (): ReducedContract => {
+      const reducedContract: ReducedContract = {};
+      contract.forEach(contrct => {
+        if (!reducedContract[contrct.type]) {
+          reducedContract[contrct.type] = 1;
+        } else {
+          reducedContract[contrct.type] += 1;
+        }
+      });
+      return reducedContract;
+    };
+
+    const renderContracts = () => {
+      let msg = '';
+      Object.entries(reduceContracts()).forEach(([contrct, number]) => {
+        msg += `${ContractsIndex[contrct]}: ${number}x\n`;
+      });
+
+      const getViewport = () => {
+        const styles = { offset: { right: 54, top: 5, bottom: 0 } };
+        if (isMobile) {
+          styles.offset.right = 0;
+          styles.offset.top = 0;
+          styles.offset.bottom = 10;
+        } else if (isTablet) {
+          styles.offset.right = 54;
+          styles.offset.bottom = 10;
+        }
+        return styles;
+      };
+      const customStyles = getViewport();
+
+      return (
+        <aside>
+          <Tooltip
+            msg={msg}
+            customStyles={customStyles}
+            Component={() => (
+              <MultiContractContainer>
+                {contractType}
+                <MultiContractCounter>{contract.length}</MultiContractCounter>
+              </MultiContractContainer>
+            )}
+          ></Tooltip>
+        </aside>
+      );
+    };
 
     const StatusIcon = getStatusIcon(status);
     let toAddress = '--';
@@ -400,11 +383,16 @@ const Transactions: React.FC<ITransactions> = ({
         span: 1,
       },
       {
-        element: <strong key={contractType}>{contractType}</strong>,
+        element:
+          contractType === 'Multi contract' ? (
+            renderContracts()
+          ) : (
+            <strong key={contractType}>{contractType}</strong>
+          ),
         span: 1,
       },
       {
-        element: query.type ? (
+        element: contractType ? (
           <strong>{formatAmount(kAppFee / 10 ** precision)}</strong>
         ) : (
           <></>
@@ -412,7 +400,7 @@ const Transactions: React.FC<ITransactions> = ({
         span: 1,
       },
       {
-        element: !query.type ? (
+        element: !router.query.type ? (
           <strong>{formatAmount(bandwidthFee / 10 ** precision)}</strong>
         ) : (
           <></>
@@ -422,7 +410,7 @@ const Transactions: React.FC<ITransactions> = ({
     ];
     const filteredContract = getFilteredSections(contract);
 
-    if (query.type) {
+    if (router.query.type) {
       sections.pop();
       sections.pop();
       sections.push(...filteredContract);
@@ -438,20 +426,20 @@ const Transactions: React.FC<ITransactions> = ({
     rowSections,
     dataName: 'transactions',
     scrollUp: true,
-    totalPages: pagination.totalPages,
+    totalPages: pagination?.totalPages || 1,
     request: (page, limit) => requestTransactions(page, limit),
-    query,
+    query: router.query,
   };
 
   const resetDate = () => {
-    const updatedQuery = { ...query };
+    const updatedQuery = { ...router.query };
     delete updatedQuery.startdate;
     delete updatedQuery.enddate;
-    setQuery(updatedQuery);
+    setQueryAndRouter(updatedQuery);
   };
   const filterDate = (selectedDays: ISelectedDays) => {
-    setQuery({
-      ...query,
+    setQueryAndRouter({
+      ...router.query,
       startdate: selectedDays.start.getTime().toString(),
       enddate: selectedDays.end
         ? (selectedDays.end.getTime() + 24 * 60 * 60 * 1000).toString()
@@ -464,18 +452,21 @@ const Transactions: React.FC<ITransactions> = ({
     empty: defaultTransactions.length === 0,
   };
 
+  const transactionsFiltersProps = {
+    query: router.query,
+    setQuery: setQueryAndRouter,
+    assets,
+  };
+
   return (
     <Container>
       <Title title="Transactions" Icon={Icon} />
 
       <Header>
         <div>
-          <FilterContainer>
-            {filters.map((filter, index) => (
-              <Filter key={String(index)} {...filter} />
-            ))}
-          </FilterContainer>
-
+          <TransactionsFilters
+            {...transactionsFiltersProps}
+          ></TransactionsFilters>
           <FilterByDate>
             <DateFilter {...dateFilterProps} />
           </FilterByDate>

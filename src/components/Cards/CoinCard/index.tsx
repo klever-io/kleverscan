@@ -45,6 +45,21 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, assetsData }) => {
     carouselRef.current.scrollLeft = index * cardRef.current.offsetWidth;
   };
 
+  const calcPercentageDiff = (coin: string) => {
+    if (coin === 'KLV') {
+      return getVariation(
+        (assetsData.klv.estimatedAprYesterday -
+          assetsData.klv.estimatedAprBeforeYesterday) /
+          assetsData.klv.estimatedAprBeforeYesterday,
+      );
+    }
+    return getVariation(
+      (assetsData.kfi.estimatedAprYesterday -
+        assetsData.kfi.estimatedAprBeforeYesterday) /
+        assetsData.kfi.estimatedAprBeforeYesterday,
+    );
+  };
+
   const renderTotalStaking = useCallback(
     (coin: ICoinInfo) => {
       const currentCoin =
@@ -224,6 +239,39 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, assetsData }) => {
                     </ValueDetail>
                   </ValueContent>
                   {renderTotalStaking(coin)}
+                  <ValueContent>
+                    <p>{t('Estimated APR')}</p>
+                    <ValueDetail
+                      positive={calcPercentageDiff(coin.shortname).includes(
+                        '+',
+                      )}
+                    >
+                      {coin.shortname === 'KLV' ? (
+                        <>
+                          {' '}
+                          <span>
+                            {`${
+                              assetsData.klv.estimatedAprYesterday?.toFixed(
+                                4,
+                              ) || '--'
+                            } %`}
+                          </span>
+                          <p>{calcPercentageDiff(coin.shortname)}</p>
+                        </>
+                      ) : (
+                        <>
+                          <span>
+                            {`${
+                              assetsData.kfi?.estimatedAprYesterday?.toFixed(
+                                4,
+                              ) || '--'
+                            } ${t('KLV per KFI')}`}
+                          </span>
+                          <p>{calcPercentageDiff(coin.shortname)}</p>
+                        </>
+                      )}
+                    </ValueDetail>
+                  </ValueContent>
                 </ValueContainer>
               </CardContent>
             </CardContainer>

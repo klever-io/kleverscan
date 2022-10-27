@@ -2,6 +2,7 @@ import { getStatusIcon } from '@/assets/status';
 import Table, { ITable } from '@/components/Table';
 import { CustomLink, Status } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
+import { useMobile } from '@/contexts/mobile';
 import { IRowSection } from '@/types/index';
 import {
   IFullInfoParam,
@@ -24,6 +25,7 @@ const Proposals: React.FC<IProposalsProps> = ({
   request,
 }) => {
   const tooltipRef = useRef<any>(null);
+  const { isMobile } = useMobile();
 
   const rowSections = (props: IParsedProposal): IRowSection[] => {
     const {
@@ -75,12 +77,15 @@ const Proposals: React.FC<IProposalsProps> = ({
       }
       if (parsedParameters) {
         return (
-          <Tooltip
-            Component={() => (
-              <div>{renderProposalsNetworkParams(parsedParameters)}</div>
-            )}
-            msg={message}
-          ></Tooltip>
+          <span style={{ display: 'flex' }}>
+            <Tooltip
+              Component={() => (
+                <div>{renderProposalsNetworkParams(parsedParameters)}</div>
+              )}
+              customStyles={isMobile ? { offset: { left: 55 } } : {}}
+              msg={message}
+            ></Tooltip>
+          </span>
         );
       }
       return <></>;

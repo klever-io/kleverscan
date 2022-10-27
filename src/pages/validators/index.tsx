@@ -1,10 +1,9 @@
 import { Validators as Icon } from '@/assets/cards';
 import { getStatusIcon } from '@/assets/status';
 import Detail from '@/components/Layout/Detail';
+import Progress from '@/components/Progress';
 import { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
-import { useMobile } from '@/contexts/mobile';
-import { useTheme } from '@/contexts/theme';
 import api from '@/services/api';
 import {
   IPagination,
@@ -13,12 +12,6 @@ import {
   IValidatorResponse,
 } from '@/types/index';
 import { capitalizeString, formatAmount, parseValidators } from '@/utils/index';
-import {
-  ProgressContainer,
-  ProgressContent,
-  ProgressIndicator,
-  ProgressPercentage,
-} from '@/views/validators';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import React from 'react';
@@ -58,22 +51,6 @@ const Validators: React.FC<IValidatorPage> = ({
       return validators;
     }
   };
-
-  const Progress: React.FC<{ percent: number }> = ({ percent }) => {
-    const { theme } = useTheme();
-    return (
-      <ProgressContainer>
-        <ProgressContent>
-          <ProgressIndicator percent={percent} />
-        </ProgressContent>
-        <ProgressPercentage textColor={theme.black}>
-          {percent?.toFixed(2)}%
-        </ProgressPercentage>
-      </ProgressContainer>
-    );
-  };
-
-  const { isMobile } = useMobile();
 
   const rowSections = (validator: IValidator): IRowSection[] | undefined => {
     const {
@@ -171,7 +148,7 @@ const Validators: React.FC<IValidatorPage> = ({
     rowSections,
     data: initialValidators,
     request: (page, limit) => requestValidators(page, limit),
-    totalPages: pagination.totalPages,
+    totalPages: pagination?.totalPages || 1,
     scrollUp: true,
     dataName: 'validators',
   };

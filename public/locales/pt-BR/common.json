@@ -10,7 +10,9 @@
     "Last 24h": "Últimas 24h",
     "Market Cap": "Capitalização",
     "Volume": "Volume",
-    "Total Staked": "Total Congelado"
+    "Total Staked": "Total Congelado",
+    "Estimated APR": "APR Estimado",
+    "KLV per KFI": "KLV por KFI"
   },
   "Titles": {
     "Assets": "Ativos",

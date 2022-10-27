@@ -14,6 +14,7 @@ const Home: React.FC<IHome> = ({
   tps,
   coinsData,
   yesterdayTransactions,
+  beforeYesterdayTransactions,
   blocks,
   transactionsList,
   transactions: defaultTransactions,
@@ -36,6 +37,7 @@ const Home: React.FC<IHome> = ({
           tps={tps}
           coinsData={coinsData}
           yesterdayTransactions={yesterdayTransactions}
+          beforeYesterdayTransactions={beforeYesterdayTransactions}
           yesterdayAccounts={yesterdayAccounts}
           assetsData={assetsData}
         />

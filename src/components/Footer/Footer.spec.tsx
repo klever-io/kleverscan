@@ -23,7 +23,8 @@ describe('Component: Footer', () => {
 
   it("Should render all social media links and each should have the correct address to Klever's socials pages", () => {
     const getSocials =
-      container.firstChild?.firstChild?.childNodes[2]?.childNodes;
+      container.firstChild?.firstChild?.firstChild?.childNodes[2].childNodes;
+
     getSocials?.forEach((element, index) => {
       expect(element).toHaveAttribute('href', socials[index].link);
     });
@@ -56,8 +57,7 @@ describe('Component: Footer', () => {
     };
 
     const getSocials =
-      container.firstChild?.firstChild?.childNodes[2]?.childNodes;
-
+      container.firstChild?.firstChild?.firstChild?.childNodes[2].childNodes;
     getSocials?.forEach(item => {
       expect(item.firstChild).toHaveStyle(style);
     });

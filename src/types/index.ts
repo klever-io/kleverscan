@@ -83,6 +83,30 @@ export enum ContractsIndex {
   'Config Marketplae',
 }
 
+export interface ReducedContract {
+  [0]?: number;
+  [1]?: number;
+  [2]?: number;
+  [3]?: number;
+  [4]?: number;
+  [5]?: number;
+  [6]?: number;
+  [7]?: number;
+  [8]?: number;
+  [9]?: number;
+  [10]?: number;
+  [11]?: number;
+  [13]?: number;
+  [14]?: number;
+  [15]?: number;
+  [16]?: number;
+  [17]?: number;
+  [18]?: number;
+  [19]?: number;
+  [20]?: number;
+  [21]?: number;
+}
+
 export enum Service {
   PROXY,
   PRICE,
@@ -569,6 +593,10 @@ export interface IAsset {
   staking: {
     minEpochsToWithdraw: number;
     totalStaked: number;
+    fpr: {
+      totalAmount: number;
+      totalStaked: number;
+    }[];
   };
   burnedValue: number;
   properties: {
@@ -638,7 +666,7 @@ export interface IInnerTableProps {
 
 export interface IValidatorResponse extends IResponse {
   data: {
-    delegations: IDelegationsResponse[];
+    validators: IDelegationsResponse[];
     networkTotalStake: number;
   };
   pagination: IPagination;
@@ -647,15 +675,13 @@ export interface IValidatorResponse extends IResponse {
 export interface IDelegationsResponse {
   totalStake: number;
   ownerAddress: string;
-  buckets: number;
+  buckets?: number;
   name?: string;
   totalLeaderSuccessRate: ItotalValidatorSuccessRate;
   totalValidatorSuccessRate: ItotalValidatorSuccessRate;
   rating: number;
   selfStake: number;
   list: string;
-  totalProduced: number;
-  totalMissed: number;
   canDelegate: boolean;
   maxDelegation: number;
   commission: number;
@@ -702,7 +728,7 @@ export interface IPagination {
 export interface IResponse {
   data: any;
   code: string;
-  error: IError;
+  error: IError | string;
 }
 
 interface INodePeer {
@@ -775,6 +801,8 @@ export interface IAssetData {
   staking: IAssetStaking;
   volume: number | null;
   circulatingSupply: number | null;
+  estimatedAprYesterday: number;
+  estimatedAprBeforeYesterday: number;
 }
 
 export interface IAssetPrice {
@@ -798,6 +826,7 @@ export interface IHome {
   tps: string;
   coinsData: ICoinInfo[];
   yesterdayTransactions: number;
+  beforeYesterdayTransactions: number;
   yesterdayAccounts: number;
   assetsData: IAssetsData;
 }
@@ -808,6 +837,7 @@ export interface IDataCards {
   epochInfo: IEpochInfo;
   coinsData: ICoinInfo[];
   yesterdayTransactions: number;
+  beforeYesterdayTransactions: number;
   yesterdayAccounts: number;
   assetsData: IAssetsData;
   block: IBlock;
@@ -896,6 +926,7 @@ export interface ICard {
   title: string;
   value: number;
   variation: string;
+  percentage?: number;
 }
 
 export interface IEpochCard {
@@ -961,4 +992,16 @@ export interface IFilterDater {
 export interface IRowSection {
   element: JSX.Element;
   span: number;
+}
+
+export interface IOffset {
+  left?: number;
+  right?: number;
+  top?: number;
+  bottom?: number;
+}
+
+export interface ICustomStyles {
+  offset?: IOffset;
+  place?: 'top' | 'right' | 'bottom' | 'left';
 }

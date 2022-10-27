@@ -45,7 +45,7 @@ const Blocks: React.FC<IBlocks> = ({
 
   const [blocks, setBlocks] = useState(defaultBlocks);
   const [statistics, setStatistics] = useState(defaultStatistics);
-  const [blocksInterval, setBlocksInterval] = useState(blocksWatcherInterval);
+  const [blocksInterval, setBlocksInterval] = useState(0);
 
   const requestBlocks = async (page: number, limit: number) => {
     let response = { data: { blocks } };

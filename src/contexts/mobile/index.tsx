@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 interface IMobile {
   isMobile: boolean;
+  isTablet: boolean;
   mobileMenuOpen: boolean;
   handleMenu: () => void;
   closeMenu: () => void;
@@ -16,6 +17,7 @@ export const MobileProvider: React.FC = ({ children }) => {
   const mobileNavbarRef = useRef<HTMLDivElement>(null);
 
   const isMobile = width <= 768;
+  const isTablet = width <= 1025;
 
   const handleResize = () => setWidth(window.innerWidth);
 
@@ -50,6 +52,7 @@ export const MobileProvider: React.FC = ({ children }) => {
 
   const values: IMobile = {
     isMobile: isMobile,
+    isTablet: isTablet,
     mobileMenuOpen,
     handleMenu,
     closeMenu,

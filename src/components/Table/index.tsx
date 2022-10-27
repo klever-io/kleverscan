@@ -125,11 +125,13 @@ const Table: React.FC<ITable> = ({
   }, [limit]);
 
   useDidUpdateEffect(() => {
-    if (page !== 1) {
-      setPage(1);
+    if (router.query) {
+      if (page !== 1) {
+        setPage(1);
+      }
+      setLoading(true);
+      fetchData();
     }
-    setLoading(true);
-    fetchData();
   }, [router.query]);
 
   useEffect(() => {
@@ -139,8 +141,6 @@ const Table: React.FC<ITable> = ({
         fetchData();
       }, interval);
       return () => clearInterval(intervalId);
-    } else {
-      fetchData();
     }
   }, [interval, limit]);
 

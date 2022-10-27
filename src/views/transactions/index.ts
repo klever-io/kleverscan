@@ -38,28 +38,10 @@ export const Header = styled.section`
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
-    div {
+    div:nth-child(1) {
       width: 100%;
       flex-direction: column;
     }
-  }
-`;
-
-export const FilterContainer = styled.div`
-  display: flex;
-
-  flex-direction: row;
-
-  gap: 0.75rem;
-
-  > div:last-child {
-    min-width: 15rem;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    width: 100%;
-
-    flex-direction: column;
   }
 `;
 

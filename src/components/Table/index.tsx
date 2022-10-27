@@ -66,12 +66,15 @@ const Table: React.FC<ITable> = ({
   scrollUp,
   totalPages: defaultTotalPages,
   dataName,
-  query,
   interval,
   intervalController,
 }) => {
-  const { pathname } = useRouter();
-  const props: ITableType = { type, pathname, haveData: data?.length };
+  const router = useRouter();
+  const props: ITableType = {
+    type,
+    pathname: router.pathname,
+    haveData: data?.length,
+  };
   const { isMobile } = useMobile();
   const [isTablet, setIsTablet] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -121,13 +124,13 @@ const Table: React.FC<ITable> = ({
     fetchData();
   }, [limit]);
 
-  useEffect(() => {
+  useDidUpdateEffect(() => {
     if (page !== 1) {
       setPage(1);
     }
     setLoading(true);
     fetchData();
-  }, [query]);
+  }, [router.query]);
 
   useEffect(() => {
     setLoading(true);

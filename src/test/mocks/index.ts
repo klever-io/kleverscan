@@ -375,6 +375,8 @@ export const mockedHomeDataCards: IDataCards = {
       },
       volume: null,
       circulatingSupply: null,
+      estimatedAprYesterday: 5.5,
+      estimatedAprBeforeYesterday: 5.6,
     },
     kfi: {
       prices: {
@@ -388,6 +390,8 @@ export const mockedHomeDataCards: IDataCards = {
       },
       volume: null,
       circulatingSupply: null,
+      estimatedAprYesterday: 5.5,
+      estimatedAprBeforeYesterday: 5.6,
     },
   },
   coinsData: [
@@ -517,6 +521,12 @@ export const klvAsset: IAsset = {
   staking: {
     minEpochsToWithdraw: 0,
     totalStaked: 0,
+    fpr: [
+      {
+        totalAmount: 313000000000,
+        totalStaked: 213000000000,
+      },
+    ],
   },
 };
 

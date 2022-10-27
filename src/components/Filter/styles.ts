@@ -151,7 +151,7 @@ export const Item = styled.div<{ selected: boolean }>`
   display: flex;
 
   align-items: center;
-
+  justify-content: center;
   background-color: ${props =>
     props.selected && transparentize(0.75, props.theme.lightGray)};
 
@@ -183,10 +183,4 @@ export const HiddenInput = styled.input<{ show: boolean }>`
 export const ArrowDownContainer = styled.div`
   padding: 0.5rem 1rem;
   margin-top: 0 !important;
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    position: absolute;
-    top: 0.6rem;
-    left: 0;
-  }
 `;

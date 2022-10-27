@@ -436,6 +436,7 @@ export const mockedHomeDataCards: IDataCards = {
   ],
   yesterdayTransactions: 20,
   yesterdayAccounts: 2,
+  beforeYesterdayTransactions: 10,
 };
 
 export const mockedMetrics =

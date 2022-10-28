@@ -135,8 +135,8 @@ const Table: React.FC<ITable> = ({
   }, [router.query]);
 
   useEffect(() => {
-    setLoading(true);
     if (interval) {
+      setLoading(true);
       const intervalId = setInterval(() => {
         fetchData();
       }, interval);

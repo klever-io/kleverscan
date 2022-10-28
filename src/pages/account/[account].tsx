@@ -281,11 +281,8 @@ const Account: React.FC<IAccountPage> = ({
     }
   };
 
-  const availableBalance = (
-    account.balance /
-    10 ** defaultKlvPrecision
-  ).toLocaleString();
-  const totalKLV = calculateTotalKLV().toLocaleString();
+  const availableBalance = account.balance / 10 ** defaultKlvPrecision;
+  const totalKLV = calculateTotalKLV();
   const pricedKLV = calculateTotalKLV() * priceKLV;
 
   return (
@@ -328,7 +325,9 @@ const Account: React.FC<IAccountPage> = ({
                   <span>KLV</span>
                 </IconContainer>
                 <div>
-                  <span>{isNaN(Number(totalKLV)) ? 0 : totalKLV}</span>
+                  <span>
+                    {isNaN(Number(totalKLV)) ? 0 : totalKLV.toLocaleString()}
+                  </span>
                   {!isNaN(Number(pricedKLV)) && (
                     <p>USD {pricedKLV.toLocaleString()}</p>
                   )}
@@ -338,7 +337,9 @@ const Account: React.FC<IAccountPage> = ({
                 <div>
                   <strong>Available</strong>
                   <span>
-                    {isNaN(Number(availableBalance)) ? 0 : availableBalance}
+                    {isNaN(Number(availableBalance))
+                      ? 0
+                      : availableBalance.toLocaleString()}
                   </span>
                 </div>
                 <div>

@@ -64,7 +64,7 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
     const getAvaliableEpoch = (assetId: string, unstakedEpoch: number) => {
       if (assetId.length < 64) {
         return (
-          unstakedEpoch + (assetDetails?.staking?.minEpochsToWithdraw || 2)
+          unstakedEpoch + (assetDetails?.staking?.minEpochsToWithdraw ?? 2)
         );
       }
       return unstakedEpoch + 2; // Default for KLV

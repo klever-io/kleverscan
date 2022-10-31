@@ -242,7 +242,7 @@ const getAssetsList = (
         }
 
         if (
-          value.minEpochsToWithdraw &&
+          value.minEpochsToWithdraw !== undefined &&
           bucket.stakedEpoch !== value.minEpochsToWithdraw
         ) {
           passedMinEpochs = true;

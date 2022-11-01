@@ -290,8 +290,7 @@ const Block: React.FC<IBlockPage> = ({
   return (
     <Container>
       <Header>
-        <Title title="Block Details" />
-
+        <Title title="Block Details" route="/blocks" />
         <Input />
       </Header>
 

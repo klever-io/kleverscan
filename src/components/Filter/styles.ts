@@ -165,6 +165,7 @@ export const Item = styled.div<{ selected: boolean }>`
 
   p {
     font-weight: 400;
+    text-align: center;
     color: ${props =>
       props.selected
         ? props.theme.filter.item.selected

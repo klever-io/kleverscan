@@ -78,7 +78,10 @@ const NavbarItem: React.FC<INavbarItem> = ({
 
   return (
     <Link href={pathTo}>
-      <LinkStyled disabled={router.pathname.includes(name.toLowerCase())}>
+      <LinkStyled
+        disabled={router.pathname.includes(name.toLowerCase())}
+        href={pathTo}
+      >
         <Item selected={router.pathname.includes(name.toLowerCase())}>
           <Icon />
           <span>{name}</span>

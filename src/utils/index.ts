@@ -1,9 +1,36 @@
 import { ISelectedDays } from '@/components/DateFilter';
 import api from '@/services/api';
+import {
+  AssetTriggerSections,
+  BuySections,
+  CancelMarketOrderSections,
+  ClaimSections,
+  ConfigITOSections,
+  ConfigMarketplaceSections,
+  CreateAssetSections,
+  CreateMarketplaceSections,
+  CreateValidatorSections,
+  DelegateSections,
+  FreezeSections,
+  ProposalSections,
+  SellSections,
+  SetAccountNameSections,
+  SetITOPricesSections,
+  TransferSections,
+  UndelegateSections,
+  UnfreezeSections,
+  UnjailSections,
+  ValidatorConfigSections,
+  VoteSections,
+  WithdrawSections,
+} from '@/utils/transactionListSections';
 import { TFunction } from 'next-i18next';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
+import { NextRouter } from 'next/router';
 import { toast } from 'react-toastify';
 import {
+  Contract,
+  ContractsIndex,
   IAccountAsset,
   IAsset,
   IAssetOne,
@@ -11,6 +38,7 @@ import {
   IBalance,
   IBuyITOsTotalPrices,
   IBuyReceipt,
+  IContract,
   IContractOption,
   IDelegationsResponse,
   IEpochInfo,
@@ -19,6 +47,7 @@ import {
   IMetrics,
   IPagination,
   IReceipt,
+  IRowSection,
   ITransaction,
   IValidator,
   IValidatorResponse,
@@ -994,4 +1023,193 @@ export const getTotalAssetsPrices = (
     }
   });
   return ITOBuyPrices;
+};
+
+/**
+ * Receive the contracts number to return the contract name using the Contract Enum
+ * @param contracts is required to fill using the Enum
+ * @returns return string with the contract name
+ */
+export const contractTypes = (contracts: IContract[]): string => {
+  if (!contracts) {
+    return 'Unknown';
+  }
+
+  return contracts.length > 1
+    ? 'Multi contract'
+    : Object.values(Contract)[contracts[0].type];
+};
+
+/**
+ * Receive the contracts number to return the contract name using the Contract Enum
+ * @param contracts is required to filter the contracts header based on each contract
+ * @param contractType is required to know which contract section with contract header should render
+ * @returns return a array of sections
+ */
+export const filteredSections = (
+  contract: IContract[],
+  contractType: string,
+): IRowSection[] => {
+  switch (contractType) {
+    case Contract.Transfer:
+      return TransferSections(contract[0].parameter);
+    case Contract.CreateAsset:
+      return CreateAssetSections(contract[0].parameter);
+    case Contract.CreateValidator:
+      return CreateValidatorSections(contract[0].parameter);
+    case Contract.ValidatorConfig:
+      return ValidatorConfigSections(contract[0].parameter);
+    case Contract.Freeze:
+      return FreezeSections(contract[0].parameter);
+    case Contract.Unfreeze:
+      return UnfreezeSections(contract[0].parameter);
+    case Contract.Delegate:
+      return DelegateSections(contract[0].parameter);
+    case Contract.Undelegate:
+      return UndelegateSections(contract[0].parameter);
+    case Contract.Withdraw:
+      return WithdrawSections(contract[0].parameter);
+    case Contract.Claim:
+      return ClaimSections(contract[0].parameter);
+    case Contract.Unjail:
+      return UnjailSections(contract[0].parameter);
+    case Contract.AssetTrigger:
+      return AssetTriggerSections(contract[0].parameter);
+    case Contract.SetAccountName:
+      return SetAccountNameSections(contract[0].parameter);
+    case Contract.Proposal:
+      return ProposalSections(contract[0].parameter);
+    case Contract.Vote:
+      return VoteSections(contract[0].parameter);
+    case Contract.ConfigITO:
+      return ConfigITOSections(contract[0].parameter);
+    case Contract.SetITOPrices:
+      return SetITOPricesSections(contract[0].parameter);
+    case Contract.Buy:
+      return BuySections(contract[0].parameter);
+    case Contract.Sell:
+      return SellSections(contract[0].parameter);
+    case Contract.CancelMarketOrder:
+      return CancelMarketOrderSections(contract[0].parameter);
+    case Contract.CreateMarketplace:
+      return CreateMarketplaceSections(contract[0].parameter);
+    case Contract.ConfigMarketplace:
+      return ConfigMarketplaceSections(contract[0].parameter);
+    default:
+      return [];
+  }
+};
+
+export const initialsTableHeaders = [
+  'Hash',
+  'Block',
+  'Created',
+  'From',
+  '',
+  'To',
+  'Status',
+  'Contract',
+];
+
+export const contractTableHeaders = [
+  'Coin',
+  'Amount',
+  'Name',
+  'Ticker',
+  'Reward Address',
+  'Can Delegate',
+  'BLS public key',
+  'Public Key',
+  'Bucket Id',
+  'Asset Id',
+  'Claim Type',
+  'Trigger Type',
+  'Description',
+  'Proposal Id',
+  'Buy Type',
+  'Order Id',
+];
+
+/**
+ * Receive the header of the table and the NextJS Router
+ * @param router is required to filter using the router.query when it exists
+ * @param header is required to do the filter when has filter on router.query
+ * @returns return a array of string with the headers based on each contract
+ */
+export const getHeader = (router: NextRouter, header: string[]): string[] => {
+  let newHeaders: string[] = [];
+  switch (ContractsIndex[ContractsIndex[Number(router.query.type)]]) {
+    case ContractsIndex.Transfer:
+      newHeaders = [contractTableHeaders[0], contractTableHeaders[1]];
+      break;
+    case ContractsIndex['Create Asset']:
+      newHeaders = [contractTableHeaders[2], contractTableHeaders[3]];
+      break;
+    case ContractsIndex['Create Validator']:
+      newHeaders = [contractTableHeaders[4], contractTableHeaders[5]];
+      break;
+    case ContractsIndex['Config Validator']:
+      newHeaders = [contractTableHeaders[6]];
+      break;
+    case ContractsIndex['Validator Config']:
+      newHeaders = [contractTableHeaders[7]];
+      break;
+    case ContractsIndex.Freeze:
+      newHeaders = [contractTableHeaders[1]];
+      break;
+    case ContractsIndex.Unfreeze:
+      newHeaders = [contractTableHeaders[8]];
+      break;
+    case ContractsIndex.Delegate:
+      newHeaders = [contractTableHeaders[8]];
+      break;
+    case ContractsIndex.Undelegate:
+      newHeaders = [contractTableHeaders[8]];
+      break;
+    case ContractsIndex.Withdraw:
+      newHeaders = [contractTableHeaders[9]];
+      break;
+    case ContractsIndex.Claim:
+      newHeaders = [contractTableHeaders[10]];
+      break;
+    case ContractsIndex.Unjail:
+      break;
+    case ContractsIndex['Asset Trigger']:
+      newHeaders = [contractTableHeaders[11]];
+      break;
+    case ContractsIndex['Set Account Name']:
+      newHeaders = [contractTableHeaders[2]];
+      break;
+    case ContractsIndex.Proposal:
+      newHeaders = [contractTableHeaders[12]];
+      break;
+    case ContractsIndex.Vote:
+      newHeaders = [contractTableHeaders[13], contractTableHeaders[1]];
+      break;
+    case ContractsIndex['Config ITO']:
+      newHeaders = [contractTableHeaders[9]];
+      break;
+    case ContractsIndex['Set ITO']:
+      newHeaders = [contractTableHeaders[9]];
+      break;
+    case ContractsIndex.Buy:
+      newHeaders = [contractTableHeaders[14], contractTableHeaders[1]];
+      break;
+    case ContractsIndex.Sell:
+      newHeaders = [contractTableHeaders[9]];
+      break;
+    case ContractsIndex['Cancel Marketplace Order']:
+      newHeaders = [contractTableHeaders[15]];
+      break;
+    case ContractsIndex['Create Marketplace']:
+      newHeaders = [contractTableHeaders[2]];
+      break;
+    case ContractsIndex['Config Marketplace']:
+  }
+
+  if (router.query.type) {
+    return header.splice(0, header.length - 2).concat(newHeaders);
+  }
+
+  return header;
 };

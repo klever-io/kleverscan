@@ -423,7 +423,7 @@ export interface ISellContract {
 }
 
 export interface ICancelMarketOrderContract {
-  orderId: string;
+  orderID: string;
   assetId?: string;
   precision?: number;
 }

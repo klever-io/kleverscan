@@ -192,11 +192,12 @@ const UndelegateSections = (par: IParameter): IRowSection[] => {
 
 const WithdrawSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IWithdrawContract;
+  const assetId = parameter?.assetId ?? 'KLV';
   return [
     {
       element: (
         <>
-          <span>{parameter.assetId}</span>
+          <span>{assetId}</span>
         </>
       ),
       span: 1,
@@ -346,7 +347,7 @@ const CancelMarketOrderSections = (par: IParameter): IRowSection[] => {
 
   return [
     {
-      element: <span key={parameter.orderId}>{parameter.orderId}</span>,
+      element: <span key={parameter.orderID}>{parameter.orderID}</span>,
       span: 1,
     },
   ];

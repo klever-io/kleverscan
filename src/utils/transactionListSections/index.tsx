@@ -1,7 +1,7 @@
 import Tooltip from '@/components/Tooltip';
 import {
   IAssetTriggerContract,
-  IBuyContract,
+  IBuyContractPayload,
   ICancelMarketOrderContract,
   IClaimContract,
   IConfigITOContract,
@@ -308,7 +308,7 @@ const SetITOPricesSections = (par: IParameter): IRowSection[] => {
 };
 
 const BuySections = (par: IParameter): IRowSection[] => {
-  const parameter = par as unknown as IBuyContract;
+  const parameter = par as unknown as IBuyContractPayload;
 
   return [
     {

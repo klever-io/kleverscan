@@ -9,6 +9,8 @@ import {
   IAssetOne,
   IAssetResponse,
   IBalance,
+  IBuyITOsTotalPrices,
+  IBuyReceipt,
   IContractOption,
   IDelegationsResponse,
   IEpochInfo,
@@ -16,6 +18,7 @@ import {
   IFormData,
   IMetrics,
   IPagination,
+  IReceipt,
   ITransaction,
   IValidator,
   IValidatorResponse,
@@ -975,4 +978,20 @@ export const calcApr = (
   values.totalAmount = values.totalAmount / epochQty;
 
   return (values.totalAmount / values.totalStaked) * 4 * 365;
+};
+
+export const getTotalAssetsPrices = (
+  ITOBuyPrices: IBuyITOsTotalPrices,
+  receipts: IReceipt[],
+  sender: string,
+): IBuyITOsTotalPrices => {
+  receipts.map(receipt => {
+    const buyITOReceipt = receipt as unknown as IBuyReceipt;
+    if (buyITOReceipt.assetId && buyITOReceipt.from === sender) {
+      ITOBuyPrices[buyITOReceipt.assetId].price +=
+        (buyITOReceipt?.value ?? 0) /
+        10 ** ITOBuyPrices[buyITOReceipt.assetId].precision;
+    }
+  });
+  return ITOBuyPrices;
 };

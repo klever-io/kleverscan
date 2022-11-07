@@ -24,7 +24,6 @@ const TransactionsFilters: React.FC<ITransactionsFilters> = ({
   const getContractName = (): string => ContractsIndex[Number(query.type)];
 
   const [assetFilters, setAssetsFilters] = useState(assets);
-
   const handleSelected = (selected: string, filterType: string): void => {
     if (selected === 'All') {
       const updatedQuery = { ...query };
@@ -33,7 +32,11 @@ const TransactionsFilters: React.FC<ITransactionsFilters> = ({
     } else if (filterType === 'type') {
       setQuery({ ...query, [filterType]: getContractIndex(selected) });
     } else if (selected !== query[filterType]) {
-      setQuery({ ...query, [filterType]: selected });
+      if (selected === 'KLV' && router.pathname === '/account/[account]') {
+        setQuery({ ...query, [filterType]: selected });
+      } else {
+        setQuery({ ...query, [filterType]: selected.toLowerCase() });
+      }
     }
   };
 

@@ -89,7 +89,10 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
         filters[0].data = assets?.data?.assets?.map(asset => asset.assetId);
       } else {
         router.push(
-          { pathname: router.pathname, query: `asset=${filterToken}` },
+          {
+            pathname: router.pathname,
+            query: `asset=${filterToken}`,
+          },
           undefined,
           {
             shallow: true,

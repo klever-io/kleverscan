@@ -490,13 +490,15 @@ const transactionsList: ITransactionResponse = {
         contract: [
           {
             sender: '',
-            type: Contract.Claim,
+            type: 9,
+            typeString: Contract.Claim,
             parameter: {},
             precision: 6,
           },
           {
             sender: '',
-            type: Contract.Claim,
+            type: 9,
+            typeString: Contract.Claim,
             parameter: {},
             precision: 6,
           },
@@ -526,7 +528,8 @@ const transactionsList: ITransactionResponse = {
         contract: [
           {
             sender: '',
-            type: Contract.Claim,
+            type: 9,
+            typeString: Contract.Claim,
             parameter: {},
             precision: 6,
           },
@@ -556,7 +559,8 @@ const transactionsList: ITransactionResponse = {
         contract: [
           {
             sender: '',
-            type: Contract.Freeze,
+            type: 4,
+            typeString: Contract.Freeze,
             parameter: {
               amount: 58376726,
               assetId: 'PVM-GVCI',

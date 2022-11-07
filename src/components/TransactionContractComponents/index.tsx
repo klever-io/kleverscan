@@ -1,12 +1,14 @@
 import { KLV } from '@/assets/coins';
 import {
   IAssetTriggerContract,
-  IBuyContract,
+  IBuyContractPayload,
+  IBuyReceipt,
   ICancelMarketOrderContract,
   IClaimContract,
   IConfigITOContract,
   IConfigMarketplaceContract,
   IContract,
+  IContractBuyProps,
   ICreateAssetContract,
   ICreateAssetReceipt,
   ICreateMarketplaceContract,
@@ -1077,36 +1079,84 @@ export const SetITOPrices: React.FC<IContract> = ({ parameter: par }) => {
   );
 };
 
-export const Buy: React.FC<IContract> = ({ parameter: par, receipts }) => {
-  const parameter = par as IBuyContract;
-  const [precision, setPrecision] = useState(1);
-  useEffect(() => {
-    const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(parameter?.currencyID || 'KLV')) ?? 6);
-    };
+export const Buy: React.FC<IContractBuyProps> = ({
+  parameter: par,
+  receipts: rec,
+  contracts,
+  sender,
+}) => {
+  const parameter = par as IBuyContractPayload;
+  const receipts = rec as unknown as IBuyReceipt[];
+  const [amountPrecision, setAmountPrecision] = useState(0);
+  const [currencyIDPrecision, setCurrencyIDPrecision] = useState(6);
 
-    if (parameter?.currencyID === 'KLV' || parameter?.currencyID === 'KFI') {
-      setPrecision(6);
-      return;
+  const getContractTotalAmount = () => {
+    let value = 0;
+    receipts.forEach(receipt => {
+      if (receipt.to === sender) {
+        value += receipt?.value ?? 0;
+      }
+    });
+    return value;
+  };
+
+  const getITOBuyPrice = () => {
+    const txValue = receipts?.find(
+      receipt =>
+        receipt.assetId === parameter.currencyID && receipt.from === sender,
+    )?.value;
+    if (typeof txValue === 'number') {
+      return (txValue / 10 ** currencyIDPrecision).toLocaleString();
     }
+    return 0;
+  };
 
-    getAssetPrecision();
+  useEffect(() => {
+    const getPrecisions = async () => {
+      if (parameter?.currencyID !== 'KLV' && parameter?.currencyID !== 'KFI') {
+        setCurrencyIDPrecision(
+          (await getPrecision(parameter?.currencyID || 'KLV')) ?? 6,
+        );
+      }
+      if (parameter?.buyType === 'ITOBuy') {
+        setAmountPrecision((await getPrecision(parameter?.id)) ?? 0);
+      } else if (parameter?.buyType === 'MarketBuy') {
+        const assetBought =
+          receipts
+            .find(receipt => receipt.to === sender)
+            ?.assetId?.split('/')[0] ?? '';
+        setAmountPrecision((await getPrecision(assetBought)) ?? 0);
+      }
+    };
+    getPrecisions();
   }, []);
 
-  const hasNft = receipts?.find(
-    (receipt: any) => receipt?.assetId && receipt?.assetId.includes('/'),
-  );
-
-  const renderAmountValue = () => {
-    if (parameter?.buyType === ('ITOBuy' as any) && hasNft) {
-      return <span>{parameter.amount}</span>;
+  const renderAmount = () => {
+    if (parameter?.buyType === 'ITOBuy') {
+      return (parameter.amount / 10 ** amountPrecision).toLocaleString();
     }
-    return (
-      <span>
-        {toLocaleFixed(parameter?.amount / 10 ** precision || 0, precision)}
-      </span>
-    );
+
+    if (parameter?.buyType === 'MarketBuy' && contracts.length < 2) {
+      // no support for multicontract
+      const parsedAmount = getContractTotalAmount() / 10 ** amountPrecision;
+      if (parsedAmount !== 0) {
+        return parsedAmount.toLocaleString();
+      }
+    }
+    return;
   };
+
+  const renderPrice = () => {
+    if (parameter?.buyType === 'MarketBuy') {
+      return (parameter.amount / 10 ** currencyIDPrecision).toLocaleString();
+    }
+    if (parameter?.buyType === 'ITOBuy' && contracts.length < 2) {
+      // support for multicontract in parent component
+      return getITOBuyPrice();
+    }
+    return;
+  };
+
   return (
     <>
       <Row>
@@ -1137,7 +1187,13 @@ export const Buy: React.FC<IContract> = ({ parameter: par, receipts }) => {
         <span>
           <strong>Amount</strong>
         </span>
-        <span>{renderAmountValue()}</span>
+        <span>{renderAmount() || '--'}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Price</strong>
+        </span>
+        <span>{renderPrice()}</span>
       </Row>
     </>
   );

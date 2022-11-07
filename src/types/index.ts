@@ -383,7 +383,22 @@ export enum EnumBuyType {
 }
 
 export interface IBuyContract {
-  buyType: EnumBuyType;
+  type: 17;
+  typeString: 'BuyContractType';
+  parameter: IBuyContractPayload;
+  assetId?: string; // only here for TS purposes
+  precision?: number; // only here for TS purposes
+}
+
+export interface IBuyITOsTotalPrices {
+  [key: string]: {
+    price: number;
+    precision: number;
+  };
+}
+
+export interface IBuyContractPayload {
+  buyType: 'MarketBuy' | 'ITOBuy';
   id: string;
   currencyID: string;
   amount: number;
@@ -408,7 +423,7 @@ export interface ISellContract {
 }
 
 export interface ICancelMarketOrderContract {
-  orderId: string;
+  orderID: string;
   assetId?: string;
   precision?: number;
 }
@@ -466,7 +481,19 @@ export interface IUnfreezeReceipt {
   availableEpoch: number;
 }
 
-export type IReceipt = ICreateAssetReceipt | IFreezeReceipt | IUnfreezeReceipt;
+export interface IBuyReceipt {
+  assetId: string;
+  type: number;
+  from?: string;
+  to?: string;
+  value?: number;
+}
+
+export type IReceipt =
+  | ICreateAssetReceipt
+  | IFreezeReceipt
+  | IUnfreezeReceipt
+  | IBuyReceipt;
 
 export interface ITransaction {
   hash: string;
@@ -622,15 +649,25 @@ export interface IParsedAsset extends IAsset {
   nonce: string;
   nonceOwner: string;
 }
-
 export interface IContract {
   sender: string;
-  type: Contract;
+  type: number;
+  typeString: Contract;
   parameter: IParameter;
   precision?: number;
   asset?: IAsset;
   receipts?: IReceipt[];
   contractIndex?: number;
+}
+
+export interface IContractBuyProps extends IContract {
+  sender: string;
+  contracts: IBuyContract[];
+}
+
+export interface IAssetAmount {
+  asset: string;
+  amount: number;
 }
 
 export interface IBucket {

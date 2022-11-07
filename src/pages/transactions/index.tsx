@@ -13,30 +13,6 @@ import Tooltip from '@/components/Tooltip';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
-import {
-  AssetTriggerSections,
-  BuySections,
-  CancelMarketOrderSections,
-  ClaimSections,
-  ConfigITOSections,
-  ConfigMarketplaceSections,
-  CreateAssetSections,
-  CreateMarketplaceSections,
-  CreateValidatorSections,
-  DelegateSections,
-  FreezeSections,
-  ProposalSections,
-  SellSections,
-  SetAccountNameSections,
-  SetITOPricesSections,
-  TransferSections,
-  UndelegateSections,
-  UnfreezeSections,
-  UnjailSections,
-  ValidatorConfigSections,
-  VoteSections,
-  WithdrawSections,
-} from '@/utils/transactionListSections';
 import { CenteredRow } from '@/views/accounts/detail';
 import {
   Container,
@@ -64,7 +40,15 @@ import {
   ITransferContract,
   ReducedContract,
 } from '../../types';
-import { capitalizeString, formatAmount, parseAddress } from '../../utils';
+import {
+  capitalizeString,
+  contractTypes,
+  filteredSections,
+  formatAmount,
+  getHeader,
+  initialsTableHeaders,
+  parseAddress,
+} from '../../utils';
 
 interface ITransactions {
   transactions: ITransaction[];
@@ -100,28 +84,7 @@ const Transactions: React.FC<ITransactions> = ({
     });
   };
 
-  const getContractType = useCallback((contracts: IContract[]) => {
-    if (!contracts) {
-      return 'Unknown';
-    }
-
-    return contracts.length > 1
-      ? 'Multi contract'
-      : Object.values(Contract)[contracts[0].type];
-  }, []);
-
-  const header = [
-    'Hash',
-    'Block',
-    'Created',
-    'From',
-    '',
-    'To',
-    'Status',
-    'Contract',
-    'kApp Fee',
-    'Bandwidth Fee',
-  ];
+  const getContractType = useCallback(contractTypes, []);
 
   const requestTransactions = async (page: number, limit?: number) =>
     api.get({
@@ -131,132 +94,7 @@ const Transactions: React.FC<ITransactions> = ({
 
   const getFilteredSections = (contract: IContract[]): IRowSection[] => {
     const contractType = getContractType(contract);
-
-    switch (contractType) {
-      case Contract.Transfer:
-        return TransferSections(contract[0].parameter);
-      case Contract.CreateAsset:
-        return CreateAssetSections(contract[0].parameter);
-      case Contract.CreateValidator:
-        return CreateValidatorSections(contract[0].parameter);
-      case Contract.ValidatorConfig:
-        return ValidatorConfigSections(contract[0].parameter);
-      case Contract.Freeze:
-        return FreezeSections(contract[0].parameter);
-      case Contract.Unfreeze:
-        return UnfreezeSections(contract[0].parameter);
-      case Contract.Delegate:
-        return DelegateSections(contract[0].parameter);
-      case Contract.Undelegate:
-        return UndelegateSections(contract[0].parameter);
-      case Contract.Withdraw:
-        return WithdrawSections(contract[0].parameter);
-      case Contract.Claim:
-        return ClaimSections(contract[0].parameter);
-      case Contract.Unjail:
-        return UnjailSections(contract[0].parameter);
-      case Contract.AssetTrigger:
-        return AssetTriggerSections(contract[0].parameter);
-      case Contract.SetAccountName:
-        return SetAccountNameSections(contract[0].parameter);
-      case Contract.Proposal:
-        return ProposalSections(contract[0].parameter);
-      case Contract.Vote:
-        return VoteSections(contract[0].parameter);
-      case Contract.ConfigITO:
-        return ConfigITOSections(contract[0].parameter);
-      case Contract.SetITOPrices:
-        return SetITOPricesSections(contract[0].parameter);
-      case Contract.Buy:
-        return BuySections(contract[0].parameter);
-      case Contract.Sell:
-        return SellSections(contract[0].parameter);
-      case Contract.CancelMarketOrder:
-        return CancelMarketOrderSections(contract[0].parameter);
-      case Contract.CreateMarketplace:
-        return CreateMarketplaceSections(contract[0].parameter);
-      case Contract.ConfigMarketplace:
-        return ConfigMarketplaceSections(contract[0].parameter);
-      default:
-        return [{ element: <></>, span: 1 }];
-    }
-  };
-
-  const getHeader = () => {
-    let newHeaders: string[] = [];
-    switch (ContractsIndex[ContractsIndex[Number(router.query.type)]]) {
-      case ContractsIndex.Transfer:
-        newHeaders = ['Coin', 'Amount'];
-        break;
-      case ContractsIndex['Create Asset']:
-        newHeaders = ['Name', 'Ticker'];
-        break;
-      case ContractsIndex['Create Validator']:
-        newHeaders = ['Reward Address', 'Can Delegate'];
-        break;
-      case ContractsIndex['Config Validator']:
-        newHeaders = ['BLS public key'];
-        break;
-      case ContractsIndex['Validator Config']:
-        newHeaders = ['Public Key'];
-        break;
-      case ContractsIndex.Freeze:
-        newHeaders = ['Amount'];
-        break;
-      case ContractsIndex.Unfreeze:
-        newHeaders = ['Bucket Id'];
-        break;
-      case ContractsIndex.Delegate:
-        newHeaders = ['Bucket Id'];
-        break;
-      case ContractsIndex.Undelegate:
-        newHeaders = ['Bucket Id'];
-        break;
-      case ContractsIndex.Withdraw:
-        newHeaders = ['Asset Id'];
-        break;
-      case ContractsIndex.Claim:
-        newHeaders = ['Claim Type'];
-        break;
-      case ContractsIndex.Unjail:
-      case ContractsIndex['Asset Trigger']:
-        newHeaders = ['Trigger Type'];
-        break;
-      case ContractsIndex['Set Account Name']:
-        newHeaders = ['Name'];
-        break;
-      case ContractsIndex.Proposal:
-        newHeaders = ['Description'];
-        break;
-      case ContractsIndex.Vote:
-        newHeaders = ['Proposal Id', 'Amount'];
-        break;
-      case ContractsIndex['Config ITO']:
-        newHeaders = ['Asset Id'];
-        break;
-      case ContractsIndex['Set ITO']:
-        newHeaders = ['Asset Id'];
-        break;
-      case ContractsIndex.Buy:
-        newHeaders = ['Buy Type', 'Amount'];
-        break;
-      case ContractsIndex.Sell:
-        newHeaders = ['Asset Id'];
-        break;
-      case ContractsIndex['Cancel Market Order']:
-        newHeaders = ['Order Id'];
-        break;
-      case ContractsIndex['Create Marketplace']:
-        newHeaders = ['Name'];
-        break;
-      case ContractsIndex['Config Marketplace']:
-    }
-
-    if (router.query.type) {
-      return header.splice(0, header.length - 2).concat(newHeaders);
-    }
-
-    return header;
+    return filteredSections(contract, contractType);
   };
 
   const rowSections = (props: ITransaction): IRowSection[] => {
@@ -304,7 +142,7 @@ const Transactions: React.FC<ITransactions> = ({
       const customStyles = getViewport();
 
       return (
-        <aside>
+        <aside style={{ width: 'fit-content' }}>
           <Tooltip
             msg={msg}
             customStyles={customStyles}
@@ -419,9 +257,11 @@ const Transactions: React.FC<ITransactions> = ({
     return sections;
   };
 
+  const header = [...initialsTableHeaders, 'kApp Fee', 'Bandwidth Fee'];
+
   const tableProps: ITable = {
     type: 'transactions',
-    header: getHeader(),
+    header: getHeader(router, header),
     data: defaultTransactions as any[],
     rowSections,
     dataName: 'transactions',

@@ -292,7 +292,7 @@ const Blocks: React.FC<IBlocks> = ({
     data: blocks as any[],
     rowSections,
     scrollUp: true,
-    totalPages: pagination?.totalPages || 1,
+    totalPages: pagination?.totalPages ?? 1,
     dataName: 'blocks',
     request: (page: number, limit: number) => requestBlocks(page, limit),
     interval: blocksInterval,

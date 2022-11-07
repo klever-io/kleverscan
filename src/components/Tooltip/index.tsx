@@ -14,7 +14,7 @@ const Tooltip: React.FC<ITooltipProps> = ({ msg, Component, customStyles }) => {
   const parsedMsgs = msg.split('\n');
 
   return (
-    <div
+    <span
       onMouseOver={() => setDisplayMessage(true)}
       onMouseLeave={() => setDisplayMessage(false)}
     >
@@ -51,7 +51,7 @@ const Tooltip: React.FC<ITooltipProps> = ({ msg, Component, customStyles }) => {
           </div>
         )}
       </>
-    </div>
+    </span>
   );
 };
 

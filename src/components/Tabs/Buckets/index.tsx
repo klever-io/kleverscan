@@ -6,7 +6,7 @@ import { IAccountAsset, IAsset, IBucket, IRowSection } from '@/types/index';
 import { parseAddress } from '@/utils/index';
 import { CenteredRow, RowContent } from '@/views/accounts/detail';
 import Link from 'next/link';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Status } from './styles';
 
 interface IBuckets {
@@ -22,40 +22,48 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
   const UINT32_MAX = 4294967295;
   const precision = 6; // default KLV precision
   const detailsCache = useRef<{ [key: string]: IAsset }>({});
-  let assetDetails: IAsset;
-  let assetsBuckets: IAssetsBuckets[] = [];
+  const [assetDetails, setAssetDetails] = useState<IAsset>();
+  const [assetsBuckets, setAssetsBuckets] = useState<IAssetsBuckets[]>([]);
 
-  assets.forEach(asset => {
-    const assetHasUnstakedBucket = asset?.buckets?.find(
-      bucket => bucket.unstakedEpoch !== UINT32_MAX,
-    );
+  useEffect(() => {
+    assets.forEach(asset => {
+      const assetHasUnstakedBucket = asset?.buckets?.find(
+        bucket => bucket.unstakedEpoch !== UINT32_MAX,
+      );
 
-    const getDetails = async () => {
-      if (detailsCache[asset.assetId]) {
-        assetDetails = detailsCache[asset.assetId];
-      } else {
-        const details = await api.get({ route: `/assets/${asset.assetId}` });
-        assetDetails = details;
-        detailsCache.current[asset.assetId] = details;
+      const getDetails = async () => {
+        if (detailsCache[asset.assetId]) {
+          setAssetDetails(detailsCache[asset.assetId]);
+        } else {
+          const details = await api.get({ route: `assets/${asset.assetId}` });
+          if (details.error !== '') {
+            return;
+          }
+          setAssetDetails(details.data.asset);
+          detailsCache.current[asset.assetId] = details;
+        }
+      };
+
+      if (assetHasUnstakedBucket) {
+        getDetails();
       }
-    };
 
-    if (assetHasUnstakedBucket) {
-      getDetails();
-    }
-
-    if (asset.buckets) {
-      assetsBuckets = [
-        ...assetsBuckets,
-        ...asset.buckets.map(bucket => {
+      if (asset.buckets) {
+        const newBuckets = asset.buckets.map(bucket => {
           return {
             asset,
             bucket,
           };
-        }),
-      ];
-    }
-  });
+        });
+
+        setAssetsBuckets(prevAssetBuckets => [
+          ...prevAssetBuckets,
+          ...newBuckets,
+        ]);
+      }
+    });
+  }, [assets]);
+
   const { isMobile } = useMobile();
 
   const rowSections = (assetBucket: IAssetsBuckets): IRowSection[] => {
@@ -63,11 +71,11 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
 
     const getAvaliableEpoch = (assetId: string, unstakedEpoch: number) => {
       if (assetId.length < 64) {
-        return (
-          unstakedEpoch + (assetDetails?.staking?.minEpochsToWithdraw ?? 2)
-        );
+        return assetDetails?.staking?.minEpochsToWithdraw
+          ? unstakedEpoch + assetDetails.staking.minEpochsToWithdraw
+          : '--';
       }
-      return unstakedEpoch + 2; // Default for KLV
+      return unstakedEpoch + 2; // Default for KLV and KFI
     };
 
     const sections = [

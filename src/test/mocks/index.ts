@@ -79,7 +79,8 @@ export const mockTxItem: ITransaction = {
   contract: [
     {
       sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jquca668',
-      type: Contract.Transfer,
+      type: 0,
+      typeString: Contract.Transfer,
       parameter: {
         amount: 3000000,
         assetId: 'KLV',

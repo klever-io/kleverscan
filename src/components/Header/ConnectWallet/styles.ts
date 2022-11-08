@@ -14,7 +14,7 @@ export const ConnectButton = styled.div`
 
   position: relative;
 
-  min-width: 14rem;
+  min-width: 10rem;
   width: 100%;
 
   cursor: pointer;
@@ -51,15 +51,43 @@ export const ConnectContainer = styled.div`
   justify-content: flex-start;
   align-items: flex-start;
 
-  @media screen and (max-width: 1025px) {
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     margin-left: 0;
     margin-top: auto;
+  }
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    flex-direction: column;
   }
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column-reverse;
     align-items: flex-end;
     gap: 1.5rem;
+  }
+`;
+
+export const NavBarOptionsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    justify-content: flex-end;
+    margin: 0;
+  }
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    justify-content: flex-end;
+    margin: 0;
+    flex-direction: column;
+  }
+`;
+
+export const NavBarOptionsItems = styled.div`
+  display: flex;
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    width: 100%;
+    justify-content: flex-end;
   }
 `;
 
@@ -114,6 +142,7 @@ export const CopyContainer = styled.div`
   position: relative;
   font-size: 0.9rem;
   margin-left: 0.8rem;
+  margin-top: 0.41rem;
 
   svg {
     g {

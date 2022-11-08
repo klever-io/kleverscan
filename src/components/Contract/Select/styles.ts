@@ -137,7 +137,7 @@ export const TitleLabel = styled.label`
 
   transition: transform 0.2s ease;
 
-  @media screen and (max-width: 1025px) {
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     top: 0.8rem;
   }
 `;

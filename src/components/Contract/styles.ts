@@ -41,7 +41,7 @@ export const Container = styled.div<IContainer>`
   padding: 2rem 0;
   opacity: ${props => (props.loading ? 0.4 : 1)};
 
-  @media screen and (max-width: 1025px) {
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
   }
 `;
@@ -271,7 +271,7 @@ export const CardContainer = styled.div`
     }
   }
 
-  @media screen and (max-width: 1025px) {
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
   }
 `;

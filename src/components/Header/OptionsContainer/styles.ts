@@ -11,7 +11,7 @@ export const SunIcon = styled(BsSunFill)`
   color: ${props => props.theme.navbar.text};
 `;
 
-export const Container = styled.div`
+export const Container = styled.div<{ isConnected: boolean | null }>`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -19,6 +19,7 @@ export const Container = styled.div`
   gap: 0.5rem;
 
   user-select: none;
+  margin-top: ${props => (props.isConnected === true ? 0 : '0.41rem')};
 `;
 
 export const IconContainer = styled.div`

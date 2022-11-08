@@ -35,7 +35,7 @@ export const NavBarOptionsContainer = styled.div`
   display: flex;
   align-items: center;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
   }
 `;
@@ -145,7 +145,6 @@ export const DesktopContainer = styled.div`
   display: flex;
 
   flex-direction: row;
-  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   width: 100%;
@@ -162,7 +161,7 @@ export const IconsMenu = styled.div`
   flex-wrap: wrap;
   align-items: center;
 
-  gap: 1.5rem;
+  gap: 1rem;
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: none;
@@ -175,7 +174,7 @@ export const MobileContainer = styled.div`
   position: relative;
   display: none;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: flex;
   }
 `;

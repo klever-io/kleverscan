@@ -185,7 +185,6 @@ const Navbar: React.FC = () => {
             </IconsMenu>
             <NavBarOptionsContainer>
               <ConnectWallet />
-              <OptionsContainer />
             </NavBarOptionsContainer>
           </DesktopContainer>
 

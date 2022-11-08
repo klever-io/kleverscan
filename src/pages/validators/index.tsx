@@ -41,7 +41,7 @@ const Validators: React.FC<IValidatorPage> = ({
 
   const requestValidators = async (page: number, limit: number) => {
     const validators = await api.get({
-      route: `validator/list?page=${page}&limit=${limit}`,
+      route: `validator/list?sort=elected&sort=eligible&sort=waiting&sort=inactive&sort=jailed&page=${page}&limit=${limit}`,
     });
 
     if (!validators.error) {
@@ -172,7 +172,8 @@ export const getServerSideProps: GetServerSideProps<
   };
 
   const validators: IValidatorResponse = await api.get({
-    route: 'validator/list',
+    route:
+      'validator/list?sort=elected&sort=eligible&sort=waiting&sort=inactive&sort=jailed',
   });
 
   if (validators.code !== 'successful') {

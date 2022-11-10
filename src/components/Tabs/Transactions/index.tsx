@@ -138,7 +138,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
 
     const filteredContract = getFilteredSections(contract);
 
-    if (router.query.type) {
+    if (router?.query?.type) {
       sections.pop();
       sections.pop();
       sections.push(...filteredContract);
@@ -155,7 +155,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
     ...transactionTableProps,
     rowSections: rowSections,
     data: Object.values(props.transactions) as any[],
-    header: getHeader(router, header),
+    header: router?.query?.type ? getHeader(router, header) : header,
     type: 'transactions',
   };
 

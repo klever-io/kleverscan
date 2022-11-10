@@ -31,9 +31,9 @@ const Tabs: React.FC<ITabs> = ({
   const router = useRouter();
   const getFilterName = () => {
     if (router.query?.fromAddress && !router.query?.toAddress) {
-      return 'Transaction Out';
+      return 'Transactions Out';
     } else if (router.query?.toAddress && !router.query?.fromAddress) {
-      return 'Transaction In';
+      return 'Transactions In';
     } else if (router.query?.fromAddress && router.query?.toAddress) {
       return 'All Transactions';
     }
@@ -95,7 +95,7 @@ const Tabs: React.FC<ITabs> = ({
           })}
         </TabContent>
         {dateFilterProps && headers[selected] === 'Transactions' && (
-          <FilterContent>
+          <FilterContent data-testid="filter-container">
             <DateFilter {...dateFilterProps} />
             {showTxInTxOutFilter &&
               filters.map((filter, index) => (

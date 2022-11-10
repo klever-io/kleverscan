@@ -213,7 +213,7 @@ const Table: React.FC<ITable> = ({
               ))}
             </Header>
           )}
-          <Body {...props}>
+          <Body {...props} data-testid="table-body">
             {loading && (
               <>
                 {Array(5)

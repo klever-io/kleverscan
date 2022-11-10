@@ -68,7 +68,7 @@ const Proposals: React.FC<IProposalsProps> = ({
 
     const renderProposalsNetworkParamsWithToolTip = () => {
       let message = '';
-      {
+      if (parsedParameters) {
         parsedParameters.forEach(
           (param2, index2) =>
             (message += `${param2.paramText}  ${param2.paramValue}` + '\n'),

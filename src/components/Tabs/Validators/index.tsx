@@ -14,7 +14,7 @@ const Validators: React.FC<IValidatorsProps> = props => {
     return sections;
   };
 
-  const header = ['Validator '];
+  const header = ['Validator'];
 
   const tableProps: ITable = {
     rowSections,

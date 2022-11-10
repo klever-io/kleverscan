@@ -24,6 +24,7 @@ import {
   VoteSections,
   WithdrawSections,
 } from '@/utils/transactionListSections';
+import { format, fromUnixTime } from 'date-fns';
 import { TFunction } from 'next-i18next';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { NextRouter } from 'next/router';
@@ -1009,6 +1010,207 @@ export const calcApr = (
   return (values.totalAmount / values.totalStaked) * 4 * 365;
 };
 
+const getCells = async (
+  tableRowData: any,
+  router: NextRouter,
+): Promise<IRowSection[]> => {
+  const {
+    hash,
+    blockNum,
+    timestamp,
+    sender,
+    status,
+    contract,
+    bandwidthFee,
+    kAppFee,
+  } = tableRowData;
+  const to = contract[0].parameter.toAddress || '';
+  const typeString = contract[0].typeString || '';
+  const created = format(fromUnixTime(timestamp / 1000), 'yyyy-MM-dd HH:mm:ss');
+  const cells = [hash, blockNum, created, sender, to, status, typeString];
+  const parsedbandwidthFee = bandwidthFee / 10 ** 6;
+  const parsedkAppFee = kAppFee / 10 ** 6;
+
+  const getParsedAmount = async (assetId: string) => {
+    const amount = contract[0].parameter.amount ?? '';
+    const precision = (await getPrecision(assetId)) ?? 6;
+    return amount / 10 ** precision;
+  };
+
+  // all data extracted:
+  // const assetId = contract[0].parameter.assetId || 'KLV';
+  // const coin = contract[0].parameter.assetId || 'KLV';
+  // const amount = contract[0].parameter.amount || 0;
+  // const name = contract[0].parameter.name || '';
+  // const ticker = contract[0].parameter.ticker || '';
+  // const rewardAddress = contract[0].parameter.config.rewardAddress || '';
+  // const canDelegate = contract[0].parameter.config.canDelegate || '';
+  // const blsPublicKey = contract[0].parameter.config.blsPublicKey || '';
+  // const bucketID = contract[0].parameter.bucketID || '';
+  // const claimType = contract[0].parameter.claimType || '';
+  // const triggerType = contract[0].parameter.triggerType || '';
+  // const description = contract[0].parameter.description || '';
+  // const proposalId = contract[0].parameter.proposalId || '';
+  // const buyType = contract[0].parameter.buyType || '';
+  // const orderID = contract[0].parameter.orderID || '';
+
+  if (!router.query.type) {
+    cells.push(parsedkAppFee, parsedbandwidthFee);
+    return cells;
+  }
+
+  switch (contract[0].typeString) {
+    case Contract.Transfer:
+      const coin = contract[0].parameter.assetId || 'KLV';
+      const asyncAmount = await getParsedAmount(coin);
+      cells.push(coin, asyncAmount);
+      break;
+    case Contract.CreateAsset:
+      let name = contract[0].parameter.name || '';
+      const ticker = contract[0].parameter.ticker || '';
+      cells.push(name, ticker);
+      break;
+    case Contract.CreateValidator:
+      const rewardAddress = contract[0].parameter.config.rewardAddress || '';
+      const canDelegate = contract[0].parameter.config.canDelegate || '';
+      cells.push(rewardAddress, canDelegate);
+      break;
+    case Contract.ValidatorConfig:
+      const blsPublicKey = contract[0].parameter.config.blsPublicKey || '';
+      cells.push(blsPublicKey);
+      break;
+    case Contract.Freeze:
+      let amount = contract[0].parameter.amount / 10 ** 6 || '';
+      cells.push(amount);
+      break;
+    case Contract.Unfreeze:
+      let bucketID = contract[0].parameter.bucketID || '';
+      cells.push(bucketID);
+      break;
+    case Contract.Delegate:
+      bucketID = contract[0].parameter.bucketID || '';
+      cells.push(bucketID);
+      break;
+    case Contract.Undelegate:
+      bucketID = contract[0].parameter.bucketID || '';
+      cells.push(bucketID);
+      break;
+    case Contract.Withdraw:
+      let assetId = contract[0].parameter.assetId || 'KLV';
+      cells.push(assetId);
+      break;
+    case Contract.Claim:
+      const claimType = contract[0].parameter.claimType || '';
+      cells.push(claimType);
+      break;
+    case Contract.Unjail:
+      cells.push(parsedkAppFee, parsedbandwidthFee);
+      break;
+    case Contract.AssetTrigger:
+      const triggerType = contract[0].parameter.triggerType || '';
+      cells.push(triggerType);
+      break;
+    case Contract.SetAccountName:
+      name = contract[0].parameter.name || '';
+      cells.push(name);
+      break;
+    case Contract.Proposal:
+      const description = contract[0].parameter.description || '';
+      cells.push(description);
+      break;
+    case Contract.Vote:
+      const proposalId = contract[0].parameter.proposalId || '';
+      amount = contract[0].parameter.amount / 10 ** 6 || '';
+      cells.push(proposalId, amount);
+      break;
+    case Contract.ConfigITO:
+      assetId = contract[0].parameter.assetId || 'KLV';
+      cells.push(assetId);
+      break;
+    case Contract.SetITOPrices:
+      assetId = contract[0].parameter.assetId || 'KLV';
+      cells.push(assetId);
+      break;
+    case Contract.Buy:
+      const buyType = contract[0].parameter.buyType || '';
+      cells.push(buyType);
+      break;
+    case Contract.Sell:
+      assetId = contract[0].parameter.assetId || 'KLV';
+      cells.push(assetId);
+      break;
+    case Contract.CancelMarketOrder:
+      const orderID = contract[0].parameter.orderID || '';
+      cells.push(orderID);
+      break;
+    case Contract.CreateMarketplace:
+      name = contract[0].parameter.name || '';
+      cells.push(name);
+      break;
+    case Contract.ConfigMarketplace:
+      cells.push(parsedkAppFee, parsedbandwidthFee);
+      break;
+    default:
+      cells.push(parsedkAppFee, parsedbandwidthFee);
+  }
+  return cells;
+};
+
+const processHeaders = (router: NextRouter) => {
+  const deafultHeaders = [...initialsTableHeaders];
+  deafultHeaders.push('kApp Fee', 'Bandwidth Fee');
+  const headers = getHeader(router, deafultHeaders);
+  const sanitizedHeaders = headers.filter(header => header !== '');
+  return sanitizedHeaders;
+};
+
+const processRow = async (row: any[], router: NextRouter) => {
+  let finalVal = '';
+  const parsedRow = await getCells(row, router);
+  for (let j = 0; j < parsedRow.length; j++) {
+    const innerValue = parsedRow[j] === null ? '' : parsedRow[j].toString();
+
+    let result = innerValue.replace(/"/g, '""');
+    if (result.search(/("|,|\n)/g) >= 0) result = '"' + result + '"';
+    if (j > 0) finalVal += ',';
+    finalVal += result;
+  }
+  return finalVal + '\n';
+};
+
+export const exportToCsv = async (
+  filename: string,
+  rows: any[] | null,
+  router: NextRouter,
+): Promise<void> => {
+  if (!rows || rows.length === 0) {
+    window.alert('No data to export!');
+    return;
+  }
+  let csvFile = '';
+  for (let i = -1; i < rows.length; i++) {
+    if (i === -1) {
+      const headers = processHeaders(router);
+      csvFile += headers + '\n';
+    } else {
+      csvFile += await processRow(rows[i], router);
+    }
+  }
+  if (typeof window !== undefined) {
+    const blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }
+};
+
 export const getTotalAssetsPrices = (
   ITOBuyPrices: IBuyITOsTotalPrices,
   receipts: IReceipt[],
@@ -1024,7 +1226,6 @@ export const getTotalAssetsPrices = (
   });
   return ITOBuyPrices;
 };
-
 /**
  * Receive the contracts number to return the contract name using the Contract Enum
  * @param contracts is required to fill using the Enum

@@ -41,6 +41,7 @@ const TransferSections = (par: IParameter): IRowSection[] => {
             {parameter.assetId ? (
               <Tooltip
                 msg={parameter.assetId}
+                minMsgLength={9}
                 Component={() => (
                   <Link href={`/asset/${parameter.assetId}`}>
                     {parameter.assetId}
@@ -50,6 +51,7 @@ const TransferSections = (par: IParameter): IRowSection[] => {
             ) : (
               <>
                 <Tooltip
+                  minMsgLength={9}
                   msg="KLV"
                   Component={() => <Link href={`/asset/KLV`}>KLV</Link>}
                 ></Tooltip>
@@ -278,7 +280,7 @@ const VoteSections = (par: IParameter): IRowSection[] => {
     {
       element: (
         <span key={parameter.amount}>
-          <small>{parameter.amount}</small>
+          <small>{parameter.amount / 10 ** 6}</small>
         </span>
       ),
       span: 1,

@@ -47,7 +47,16 @@ const Transactions: React.FC<ITransactionsProps> = props => {
   const { isMobile } = useMobile();
 
   const rowSections = (props: ITransaction): IRowSection[] => {
-    const { hash, blockNum, timestamp, sender, contract, status } = props;
+    const {
+      hash,
+      blockNum,
+      timestamp,
+      sender,
+      contract,
+      status,
+      kAppFee,
+      bandwidthFee,
+    } = props;
 
     const StatusIcon = getStatusIcon(status);
     let toAddress = '--';
@@ -67,19 +76,6 @@ const Transactions: React.FC<ITransactionsProps> = props => {
       if (!parameter.assetId) assetId = 'KLV';
     }
 
-    const assetIdSection = () => {
-      if (contractType === Contract.Transfer) {
-        return (
-          <Link href={`/asset/${assetId}`} key={assetId}>
-            <a>
-              <strong>{assetId}</strong>
-            </a>
-          </Link>
-        );
-      }
-
-      return <strong>{assetId}</strong>;
-    };
     const sections = [
       {
         element: (
@@ -133,9 +129,9 @@ const Transactions: React.FC<ITransactionsProps> = props => {
         span: 1,
       },
       { element: <strong key={contractType}>{contractType}</strong>, span: 1 },
-      { element: <strong key={amount}>{amount}</strong>, span: 1 },
+      { element: <strong key={kAppFee}>{kAppFee / 10 ** 6}</strong>, span: 1 },
       {
-        element: assetIdSection(),
+        element: <strong key={kAppFee}>{bandwidthFee / 10 ** 6}</strong>,
         span: 1,
       },
     ];
@@ -151,7 +147,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
     return sections;
   };
 
-  const header = [...initialsTableHeaders, 'Amount', 'Asset Id'];
+  const header = [...initialsTableHeaders, 'kApp Fee', 'Bandwidth Fee'];
 
   const transactionTableProps = props.transactionsTableProps;
 

@@ -7,7 +7,7 @@ const theme = {
   borderLogo: '#ccc',
 
   border: '#eeeff6',
-
+  green: 'green',
   red: '#FF4465',
   rose: '#EE3F71',
   purple: '#7D3FF1',

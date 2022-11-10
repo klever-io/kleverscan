@@ -80,7 +80,7 @@ export enum ContractsIndex {
   'Sell',
   'Cancel Marketplace Order',
   'Create Marketplace',
-  'Config Marketplae',
+  'Config Marketplace',
 }
 
 export interface ReducedContract {

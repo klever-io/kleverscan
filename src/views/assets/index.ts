@@ -1,4 +1,4 @@
-import { default as DefaultInput } from '@/components/Inputt';
+import { default as DefaultInput } from '@/components/InputGlobal';
 import { ITableType } from '@/components/Table/styles';
 import widths from '@/components/Table/widths';
 import styled, { css } from 'styled-components';

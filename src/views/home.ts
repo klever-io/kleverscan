@@ -1,4 +1,4 @@
-import { default as DefaultInput } from '@/components/Inputt';
+import { default as DefaultInput } from '@/components/InputGlobal';
 import { lighten, transparentize } from 'polished';
 import styled, { css, keyframes } from 'styled-components';
 

@@ -1,4 +1,4 @@
-import { default as DefaultInput } from '@/components/Inputt';
+import { default as DefaultInput } from '@/components/InputGlobal';
 import Link from 'next/link';
 import styled from 'styled-components';
 

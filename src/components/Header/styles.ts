@@ -2,7 +2,7 @@ import { transparentize } from 'polished';
 import { FiMenu } from 'react-icons/fi';
 import { MdArrowDropDown } from 'react-icons/md';
 import styled, { css, keyframes } from 'styled-components';
-import { default as DefaultInput } from '../Inputt';
+import { default as DefaultInput } from '../InputGlobal';
 
 interface IMobileMenu {
   opened: boolean;

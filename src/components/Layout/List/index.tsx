@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { IconType } from 'react-icons';
 import { BsQuestionCircleFill } from 'react-icons/bs';
-import Input from '../../Inputt';
+import Input from '../../InputGlobal';
 import {
   Container,
   EmptyRow,

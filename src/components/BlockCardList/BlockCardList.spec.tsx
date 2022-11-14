@@ -5,6 +5,24 @@ import { mockedBlocks, mockedFetchBlocks } from '../../test/mocks';
 import { renderWithTheme } from '../../test/utils';
 import BlockCardList from './';
 
+jest.mock('react-i18next', () => ({
+  useTranslation: jest.fn(),
+}));
+jest.mock('react-i18next', () => ({
+  // this mock makes sure any components using the translate hook can use it without a warning being shown
+  useTranslation: () => {
+    return {
+      t: (str: any) => str,
+      i18n: {
+        changeLanguage: () =>
+          new Promise(() => {
+            'blocks';
+          }),
+      },
+    };
+  },
+}));
+
 jest.mock('@/services/api', () => {
   const mockedResult = [
     {
@@ -76,8 +94,9 @@ describe('Component: BlockCardList', () => {
       width: 'fit-content',
     };
     const sectionStyle = {
-      padding: '5rem 10rem 10rem 10rem',
+      padding: '0 min(3%, 10rem) 10rem',
     };
+
     expect(blockTitle).toHaveStyle(blockTitleStyle);
     expect(section).toHaveStyle(sectionStyle);
   });

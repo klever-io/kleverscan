@@ -8,9 +8,19 @@ import { format, fromUnixTime } from 'date-fns';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
-import { Contract, ITransaction, ITransferContract } from '../../types';
-import { getContractType, getPrecision, parseAddress } from '../../utils';
+import { ITransaction } from '../../types';
+import { getContractType, parseAddress, toLocaleFixed } from '../../utils';
 
+export interface IContract {
+  type: number;
+  typeString: string;
+  parameter: {
+    amount: number;
+    assetId: string;
+    toAddress: string;
+  };
+  precision: number;
+}
 const TransactionItem: React.FC<ITransaction> = ({
   hash,
   timestamp,
@@ -18,32 +28,37 @@ const TransactionItem: React.FC<ITransaction> = ({
   sender,
   status,
 }) => {
-  let parameter: ITransferContract = {} as ITransferContract;
-  const [amount, setAmount] = useState(0);
+  let contractFilter: IContract = {} as IContract;
+  const [amount, setAmount] = useState('');
   const [assetId, setAssetId] = useState('');
 
   const StatusIcon = getStatusIcon(status);
 
   const { t } = useTranslation('transactions');
+  const contractPosition = 0;
+  contractFilter = contract[contractPosition] as IContract;
 
   useEffect(() => {
     const getParams = async () => {
+      const precision = contractFilter?.precision ?? 6;
       if (contract) {
-        const contractPosition = 0;
-        parameter = contract[contractPosition].parameter as ITransferContract;
-
-        if (parameter?.amount && parameter?.assetId) {
-          const precision = (await getPrecision(parameter.assetId)) ?? 6;
-          setAmount(parameter.amount / 10 ** precision);
-          setAssetId(parameter.assetId);
+        if (
+          contractFilter?.parameter.amount &&
+          contractFilter?.parameter.assetId
+        ) {
+          setAmount(
+            toLocaleFixed(
+              contractFilter?.parameter?.amount / 10 ** precision,
+              precision,
+            ),
+          );
         }
       }
     };
     getParams();
-  }, []);
-
+  }, [contractFilter]);
   const shouldRenderAssetId = () => {
-    const contractType = Object.values(Contract)[contract[0].type];
+    const contractType = contract[0].typeString;
     const checkContract = getContractType(contractType);
 
     if (contract.length > 1) {
@@ -83,10 +98,10 @@ const TransactionItem: React.FC<ITransaction> = ({
         </p>
         <p>
           <strong>{t('To')}: </strong>
-          <Link href={`/account/${parameter?.toAddress}`}>
+          <Link href={`/account/${contractFilter?.parameter?.toAddress}`}>
             <a className="clean-style">
-              {parameter?.toAddress
-                ? parseAddress(parameter?.toAddress, 12)
+              {contractFilter?.parameter?.toAddress
+                ? parseAddress(contractFilter?.parameter?.toAddress, 12)
                 : '--'}
             </a>
           </Link>

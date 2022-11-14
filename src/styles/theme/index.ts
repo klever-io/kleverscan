@@ -75,6 +75,7 @@ const theme = {
 
   accountCard: {
     frozenBackground: '#F9F9FD',
+    cardStaking: '#EBF1F7',
   },
 
   chart: {

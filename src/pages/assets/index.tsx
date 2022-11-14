@@ -230,6 +230,18 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
         ),
         span: 1,
       },
+      {
+        element: (
+          <strong>
+            {staking
+              ? staking?.interestType === 'APRI'
+                ? 'APR'
+                : 'FPR'
+              : '--'}
+          </strong>
+        ),
+        span: 1,
+      },
       { element: <strong key={precision}>{precision}</strong>, span: 1 },
     ];
 
@@ -246,6 +258,7 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
     'Max Supply',
     'Circulating Supply',
     'Total Staked',
+    'Rewards Type',
     'Precision',
   ];
 

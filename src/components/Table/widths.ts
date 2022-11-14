@@ -143,6 +143,9 @@ const assetsPage = css`
     width: 8rem;
   }
   &:nth-child(10) {
+    width: 8rem;
+  }
+  &:nth-child(11) {
     width: 4rem;
   }
 `;

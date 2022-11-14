@@ -614,16 +614,39 @@ export interface IAsset {
   initialSupply: number;
   circulatingSupply: number;
   maxSupply: number;
-  royalties: number;
+  royalties: {
+    address: string;
+    marketPercentage: number;
+    transferFixed: number;
+    transferPercentage: [
+      {
+        amount: number;
+        percentage: number;
+      },
+    ];
+  };
   mintedValue: number;
   issueDate: number;
   staking: {
+    interestType: string;
     minEpochsToWithdraw: number;
     totalStaked: number;
+    apr: [
+      {
+        timestamp: number;
+        epoch: number;
+        value: number;
+      },
+    ];
     fpr: {
       totalAmount: number;
       totalStaked: number;
+      TotalClaimed: number;
+      epoch: number;
     }[];
+    currentFPRAmount: number;
+    minEpochsToClaim: number;
+    minEpochsToUnstake: number;
   };
   burnedValue: number;
   properties: {

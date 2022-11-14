@@ -34,6 +34,9 @@ import {
   CardHeaderItem,
   CenteredRow,
   Container,
+  ContentRow,
+  ContentScrollBar,
+  FrozenContainer,
   Header,
   HoverAnchor,
   Input,
@@ -43,6 +46,7 @@ import {
   UriContainer,
   VerifiedContainer,
 } from '@/views/assets/detail';
+import { BalanceContainer, RowContent } from '@/views/proposals/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
@@ -108,10 +112,11 @@ const Asset: React.FC<IAssetPage> = ({
     properties,
     attributes,
     verified,
+    royalties,
   } = asset;
 
   const cardHeaders = uris
-    ? ['Overview', 'More', 'URIS']
+    ? ['Overview', 'More', 'URIS', 'Staking & Royalties']
     : ['Overview', 'More'];
   const tableHeaders = ['Transactions', 'Holders'];
 
@@ -171,7 +176,7 @@ const Asset: React.FC<IAssetPage> = ({
     return (
       <>
         {ownerAddress && (
-          <Row>
+          <Row isStakingRoyalties={false}>
             <span>
               <strong>Owner</strong>
             </span>
@@ -195,7 +200,7 @@ const Asset: React.FC<IAssetPage> = ({
             </span>
           </Row>
         )}
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>Max Supply</strong>
           </span>
@@ -205,7 +210,7 @@ const Asset: React.FC<IAssetPage> = ({
             </small>
           </span>
         </Row>
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>Initial Supply</strong>
           </span>
@@ -215,7 +220,7 @@ const Asset: React.FC<IAssetPage> = ({
             </small>
           </span>
         </Row>
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>Circulating Supply</strong>
           </span>
@@ -225,7 +230,7 @@ const Asset: React.FC<IAssetPage> = ({
             </small>
           </span>
         </Row>
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>Burned Value</strong>
           </span>
@@ -235,7 +240,7 @@ const Asset: React.FC<IAssetPage> = ({
             </small>
           </span>
         </Row>
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>Total Staked</strong>
           </span>
@@ -248,19 +253,19 @@ const Asset: React.FC<IAssetPage> = ({
             </small>
           </span>
         </Row>
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>Holders</strong>
           </span>
           <span>{totalRecords}</span>
         </Row>
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>Transactions</strong>
           </span>
           <span>{totalTransactions}</span>
         </Row>
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>Market Cap</strong>
           </span>
@@ -275,7 +280,7 @@ const Asset: React.FC<IAssetPage> = ({
       <>
         {Object.entries(uris).length ? (
           Object.entries(uris).map(([key, value]: [string, any]) => (
-            <Row key={String(key)}>
+            <Row key={String(key)} isStakingRoyalties={false}>
               <span>
                 <strong>{key}</strong>
               </span>
@@ -298,13 +303,13 @@ const Asset: React.FC<IAssetPage> = ({
   const More: React.FC = () => {
     return (
       <>
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>Issuing Time</strong>
           </span>
           <span>{getIssueDate()}</span>
         </Row>
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>Issuer</strong>
           </span>
@@ -313,66 +318,215 @@ const Asset: React.FC<IAssetPage> = ({
             <Copy data={ownerAddress} info="Issue" />
           </CenteredRow>
         </Row>
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>Precision</strong>
           </span>
           <span>{precision}</span>
         </Row>
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>Can Freeze</strong>
           </span>
           <span>{String(properties.canFreeze)}</span>
         </Row>
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>Can Wipe</strong>
           </span>
           <span>{String(properties.canWipe)}</span>
         </Row>
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>Can Pause</strong>
           </span>
           <span>{String(properties.canPause)}</span>
         </Row>
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>Can Mint</strong>
           </span>
           <span>{String(properties.canMint)}</span>
         </Row>
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>Can Burn</strong>
           </span>
           <span>{String(properties.canBurn)}</span>
         </Row>
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>Can Change Owner</strong>
           </span>
           <span>{String(properties.canChangeOwner)}</span>
         </Row>
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>Can Add Roles</strong>
           </span>
           <span>{String(properties.canAddRoles)}</span>
         </Row>
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>Paused</strong>
           </span>
           <span>{String(attributes.isPaused)}</span>
         </Row>
-        <Row>
+        <Row isStakingRoyalties={false}>
           <span>
             <strong>NFT Mint Stopped</strong>
           </span>
           <span>{String(attributes.isNFTMintStopped)}</span>
         </Row>
+      </>
+    );
+  };
+  const stakingAprOrFpr = useCallback(() => {
+    if (staking?.apr || staking?.fpr) {
+      return (
+        <ContentRow>
+          <strong>{staking?.apr.length > 0 ? 'APR' : 'FPR'}</strong>
+          <ContentScrollBar>
+            {staking.interestType === 'FPRI'
+              ? staking.fpr.map((fpr, index) => (
+                  <span key={index}>
+                    <p>
+                      Total Amount:{' '}
+                      {toLocaleFixed(
+                        (fpr.totalAmount || 0) / 10 ** precision,
+                        precision,
+                      )}
+                    </p>
+                    <p>
+                      Total Staked:{' '}
+                      {toLocaleFixed(
+                        (fpr.totalStaked || 0) / 10 ** precision,
+                        precision,
+                      )}
+                    </p>
+                    <p>Epoch: {fpr.epoch}</p>
+                    <p>Total Claimed: {fpr.TotalClaimed}</p>
+                  </span>
+                ))
+              : staking.apr.map((apr, index) => (
+                  <span key={index}>
+                    <p>
+                      Timestamp:{' '}
+                      {toLocaleFixed(
+                        (apr.timestamp || 0) / 10 ** precision,
+                        precision,
+                      )}
+                    </p>
+                    <p>Epoch: {apr.epoch}</p>
+                    <p>Value: {apr.value}</p>
+                  </span>
+                ))}
+          </ContentScrollBar>
+        </ContentRow>
+      );
+    }
+    return;
+  }, [staking]);
+
+  const StakingRoyalties: React.FC = () => {
+    return (
+      <>
+        {royalties && (
+          <div>
+            <Row isStakingRoyalties={true}>
+              <span>
+                <strong>Royalties</strong>
+              </span>
+              <RowContent>
+                <BalanceContainer>
+                  <FrozenContainer>
+                    <div>
+                      <strong>Address</strong>
+                      <p>{royalties.address || '--'}</p>
+                    </div>
+                    <div>
+                      <strong>Market Percentage</strong>
+                      <p>{royalties.marketPercentage / 10 ** 2 || '--'}</p>
+                    </div>
+                    <div>
+                      <strong>Transfer Fixed</strong>
+                      <p>{royalties.transferFixed || '--'}</p>
+                    </div>
+                    {royalties.transferPercentage ? (
+                      royalties.transferPercentage.map(
+                        (transfer, index) =>
+                          Object.keys(transfer).length > 0 && (
+                            <div key={index}>
+                              <strong>Transfer Percentage</strong>
+                              <p>
+                                Amount:{' '}
+                                {toLocaleFixed(
+                                  (transfer.amount || 0) / 10 ** precision,
+                                  precision,
+                                )}
+                              </p>
+                              <p>Percentage: {transfer.percentage}</p>
+                            </div>
+                          ),
+                      )
+                    ) : (
+                      <div>
+                        <strong>Transfer Percentage</strong>
+                        <p>Amount: --</p>
+                        <p>Percentage: -- </p>
+                      </div>
+                    )}
+                  </FrozenContainer>
+                </BalanceContainer>
+              </RowContent>
+            </Row>
+            <Row isStakingRoyalties={true}>
+              <span>
+                <strong>Staking</strong>
+              </span>
+              <RowContent>
+                <BalanceContainer>
+                  <FrozenContainer>
+                    <div>
+                      <strong>Total Staked</strong>
+                      <p>
+                        {toLocaleFixed(
+                          (staking?.totalStaked || 0) / 10 ** precision,
+                          precision,
+                        )}
+                      </p>
+                    </div>
+                    <div>
+                      <strong>Current FPR Amount</strong>
+
+                      <p>
+                        {toLocaleFixed(
+                          (staking?.currentFPRAmount || 0) / 10 ** precision,
+                          precision,
+                        )}
+                      </p>
+                    </div>
+                    <div>
+                      <strong>Min Epochs To Claim</strong>
+
+                      <p>{staking?.minEpochsToClaim || '--'}</p>
+                    </div>
+                    <div>
+                      <strong>Min Epochs To Unstake</strong>
+
+                      <p>{staking?.minEpochsToUnstake || '--'}</p>
+                    </div>
+                    <div>
+                      <strong>Min Epochs To Withdraw</strong>
+                      <p>{staking?.minEpochsToWithdraw || '--'}</p>
+                    </div>
+                    {stakingAprOrFpr()}
+                  </FrozenContainer>
+                </BalanceContainer>
+              </RowContent>
+            </Row>
+          </div>
+        )}
       </>
     );
   };
@@ -385,6 +539,8 @@ const Asset: React.FC<IAssetPage> = ({
         return <More />;
       case 'URIS':
         return <UriComponent />;
+      case 'Staking & Royalties':
+        return <StakingRoyalties />;
       default:
         return <div />;
     }

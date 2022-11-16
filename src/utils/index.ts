@@ -1406,6 +1406,8 @@ export const getHeader = (router: NextRouter, header: string[]): string[] => {
       newHeaders = [contractTableHeaders[2]];
       break;
     case ContractsIndex['Config Marketplace']:
+      newHeaders = ['Marketplace ID'];
+      break;
   }
 
   if (router.query.type) {

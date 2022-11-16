@@ -280,7 +280,7 @@ const VoteSections = (par: IParameter): IRowSection[] => {
     {
       element: (
         <span key={parameter.amount}>
-          <small>{parameter.amount / 10 ** 6}</small>
+          <small>{parameter.amount / 10 ** precision}</small>
         </span>
       ),
       span: 1,
@@ -365,8 +365,14 @@ const CreateMarketplaceSections = (par: IParameter): IRowSection[] => {
 
 const ConfigMarketplaceSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IConfigMarketplaceContract;
-
-  return [{ element: <></>, span: 1 }];
+  return [
+    {
+      element: (
+        <span key={parameter.marketplaceID}>{parameter.marketplaceID}</span>
+      ),
+      span: 1,
+    },
+  ];
 };
 
 export {

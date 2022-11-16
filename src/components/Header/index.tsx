@@ -1,4 +1,5 @@
 import { INavbarItem, navbarItems } from '@/configs/navbar';
+import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -126,6 +127,7 @@ const Navbar: React.FC = () => {
   const { mobileNavbarRef, closeMenu, handleMenu, isMobile, mobileMenuOpen } =
     useMobile();
   const prevScrollpos = useRef<number>(0);
+  const { extensionInstalled } = useExtension();
 
   const handleMobileScroll = () => {
     const navbar = mobileNavbarRef.current;
@@ -185,6 +187,7 @@ const Navbar: React.FC = () => {
             </IconsMenu>
             <NavBarOptionsContainer>
               <ConnectWallet />
+              {!extensionInstalled && <OptionsContainer />}
             </NavBarOptionsContainer>
           </DesktopContainer>
 

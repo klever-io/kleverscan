@@ -54,6 +54,7 @@ import {
   NestedContainerWrapper,
   Row,
 } from '@/views/transactions/detail';
+import { format, fromUnixTime } from 'date-fns';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import Copy from '../Copy';
@@ -1291,7 +1292,9 @@ export const Sell: React.FC<IContract> = ({ parameter: par }) => {
         <span>
           <strong>End Time</strong>
         </span>
-        <span>{parameter?.endTime}</span>
+        <span>
+          {format(fromUnixTime(parameter?.endTime), 'dd/MM/yyyy HH:mm')}
+        </span>
       </Row>
     </>
   );

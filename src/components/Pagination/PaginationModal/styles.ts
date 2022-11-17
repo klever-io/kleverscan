@@ -92,7 +92,7 @@ export const PaginationModalContainer = styled.div.attrs(
   border-radius: 20px;
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
 
-  @media (min-width: 768px) {
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
     animation: ${fadeInContainer} 0.2s linear;
   }
 

@@ -9,6 +9,12 @@ const statistics = [
   { date: '27 May', burned: 3167733.15, minted: 0, value: 323985 },
 ];
 
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
+}));
+
 describe('Double Linear Chart', () => {
   const mockedClientHeight = 100;
   const mockedClientWidth = 100;

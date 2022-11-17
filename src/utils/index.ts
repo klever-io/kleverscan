@@ -1,45 +1,16 @@
 import { ISelectedDays } from '@/components/DateFilter';
 import api from '@/services/api';
-import {
-  AssetTriggerSections,
-  BuySections,
-  CancelMarketOrderSections,
-  ClaimSections,
-  ConfigITOSections,
-  ConfigMarketplaceSections,
-  CreateAssetSections,
-  CreateMarketplaceSections,
-  CreateValidatorSections,
-  DelegateSections,
-  FreezeSections,
-  ProposalSections,
-  SellSections,
-  SetAccountNameSections,
-  SetITOPricesSections,
-  TransferSections,
-  UndelegateSections,
-  UnfreezeSections,
-  UnjailSections,
-  ValidatorConfigSections,
-  VoteSections,
-  WithdrawSections,
-} from '@/utils/transactionListSections';
 import { TFunction } from 'next-i18next';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { NextRouter } from 'next/router';
 import { toast } from 'react-toastify';
 import {
-  Contract,
-  ContractsIndex,
   IAccountAsset,
   IAsset,
   IAssetOne,
   IAssetResponse,
   IBalance,
-  IBuyITOsTotalPrices,
   IBuyReceipt,
-  IContract,
-  IContractOption,
   IDelegationsResponse,
   IEpochInfo,
   IFilterDater,
@@ -47,11 +18,17 @@ import {
   IMetrics,
   IPagination,
   IReceipt,
-  IRowSection,
   ITransaction,
   IValidator,
   IValidatorResponse,
 } from '../types';
+import { ContractsIndex, IBuyITOsTotalPrices } from '../types/contracts';
+import {
+  contractsList,
+  getCells,
+  getHeader,
+  initialsTableHeaders,
+} from './contracts';
 
 /**
  * Emulates CSS ellipsis by receiving a string and a limit, if the string length is bigger then the limit, the exceeded characters will be replaced by the ellipsis.
@@ -375,100 +352,6 @@ export const formatLabel = (str: string): string => {
   return label;
 };
 
-export const contractOptions: IContractOption[] = [
-  {
-    label: 'Transfer',
-    value: 'TransferContract',
-  },
-  {
-    label: 'Create Asset',
-    value: 'CreateAssetContract',
-  },
-  {
-    label: 'Create Validator',
-    value: 'CreateValidatorContract',
-  },
-  {
-    label: 'Edit Validator Settings',
-    value: 'ValidatorConfigContract',
-  },
-  {
-    label: 'Freeze',
-    value: 'FreezeContract',
-  },
-  {
-    label: 'Unfreeze',
-    value: 'UnfreezeContract',
-  },
-  {
-    label: 'Delegate',
-    value: 'DelegateContract',
-  },
-  {
-    label: 'Undelegate',
-    value: 'UndelegateContract',
-  },
-  {
-    label: 'Withdraw',
-    value: 'WithdrawContract',
-  },
-  {
-    label: 'Claim',
-    value: 'ClaimContract',
-  },
-  {
-    label: 'Unjail',
-    value: 'UnjailContract',
-  },
-  {
-    label: 'Asset Trigger',
-    value: 'AssetTriggerContract',
-  },
-  {
-    label: 'Set Account Name',
-    value: 'SetAccountNameContract',
-  },
-  {
-    label: 'Proposal',
-    value: 'ProposalContract',
-  },
-  {
-    label: 'Vote',
-    value: 'VoteContract',
-  },
-  {
-    label: 'Config ITO',
-    value: 'ConfigITOContract',
-  },
-  {
-    label: 'Set ITO Prices',
-    value: 'SetITOPricesContract',
-  },
-  {
-    label: 'Buy',
-    value: 'BuyContract',
-  },
-  {
-    label: 'Sell',
-    value: 'SellContract',
-  },
-  {
-    label: 'Cancel Market Order',
-    value: 'CancelMarketOrderContract',
-  },
-  {
-    label: 'Create Marketplace',
-    value: 'CreateMarketplaceContract',
-  },
-  {
-    label: 'Configure Marketplace',
-    value: 'ConfigMarketplaceContract',
-  },
-  // {
-  //   label: 'Update Account Permission',
-  //   value: 'UpdateAccountPermissionContract',
-  // },
-];
 /**
  * Verifies not only if an array of strings is empty, but also if it's content is full of empty strings, in that case it will still return true as well.
  * @param data
@@ -490,79 +373,6 @@ export const isDataEmpty = (data: string[]): boolean => {
   return true;
 };
 
-export const claimTypes = [
-  {
-    label: 'Staking Claim (0)',
-    value: 0,
-  },
-  {
-    label: 'Allowance Claim (1)',
-    value: 1,
-  },
-  {
-    label: 'Market Claim (2)',
-    value: 2,
-  },
-];
-
-export const assetTriggerTypes = [
-  {
-    label: 'Mint (0)',
-    value: 0,
-  },
-  {
-    label: 'Burn (1)',
-    value: 1,
-  },
-  {
-    label: 'Wipe (2)',
-    value: 2,
-  },
-  {
-    label: 'Pause (3)',
-    value: 3,
-  },
-  {
-    label: 'Resume (4)',
-    value: 4,
-  },
-  {
-    label: 'Change Owner (5)',
-    value: 5,
-  },
-  {
-    label: 'Add Role (6)',
-    value: 6,
-  },
-  {
-    label: 'Remove Role (7)',
-    value: 7,
-  },
-  {
-    label: 'Update Metadata (8)',
-    value: 8,
-  },
-  {
-    label: 'Stop NFT Mint (9)',
-    value: 9,
-  },
-  {
-    label: 'Update Logo (10)',
-    value: 10,
-  },
-  {
-    label: 'Update URIs (11)',
-    value: 11,
-  },
-  {
-    label: 'Change Royalties Receiver (12)',
-    value: 12,
-  },
-  {
-    label: 'Update Staking (13)',
-    value: 13,
-  },
-];
 /**
  * Wraps the content and params of a promise and put it inside a loop. The loop will break and return if promise succeeds or it will end after the third try(or the number passed as arg). There is a timeout of 500 milliseconds between each try.
  * @param success callback fn for promise fulfilled
@@ -593,32 +403,6 @@ export const asyncDoIf = async (
   failure(error);
   return;
 };
-
-export const contractsList = [
-  'Transfer',
-  'CreateAsset',
-  'Create Validator',
-  'Config Validator',
-  'Freeze',
-  'Unfreeze',
-  'Delegate',
-  'Undelegate',
-  'Withdraw',
-  'Claim',
-  'Unjail',
-  'Asset Trigger',
-  'Set Account Name',
-  'Proposal',
-  'Vote',
-  'Config ITO',
-  'Set ITO Prices',
-  'Buy',
-  'Sell',
-  'Cancel Market Order',
-  'Create Market',
-  'Config Marketplace',
-  'Update Account Permission',
-];
 
 export const setCharAt = (
   str: string,
@@ -810,6 +594,8 @@ export const getContractType = (contract: string): boolean => {
  * @param transactions
  * @returns ITransaction[] with precision key in contracts.
  */
+// parameter must necessarily contain assetId
+
 export const addPrecisionTransactions = (
   transactions: ITransaction[],
 ): ITransaction[] => {
@@ -817,11 +603,11 @@ export const addPrecisionTransactions = (
     if (transaction.contract.length > 1) {
       return transaction;
     }
-
     transaction?.contract.map(async contrct => {
-      if (contrct?.parameter?.assetId) {
+      const parameter = contrct?.parameter as any;
+      if (parameter?.assetId) {
         const response: IAssetOne = await api.get({
-          route: `assets/${contrct.parameter.assetId}`,
+          route: `assets/${parameter?.assetId}`,
         });
         if (!response.error && response.code === 'successful') {
           contrct.precision = response.data?.asset?.precision || 0;
@@ -896,7 +682,8 @@ export const parseHolders = (
       return {
         index,
         address: holder.address,
-        balance: holder.frozenBalance + holder.balance,
+        balance: 0,
+        frozenBalance: holder.frozenBalance,
         rank: index + 1 + (pagination.self - 1) * pagination.perPage,
       };
     } else
@@ -904,6 +691,7 @@ export const parseHolders = (
         index,
         address: '',
         balance: 0,
+        frozenBalance: 0,
         rank: 0,
       };
   });
@@ -1009,6 +797,61 @@ export const calcApr = (
   return (values.totalAmount / values.totalStaked) * 4 * 365;
 };
 
+const processHeaders = (router: NextRouter) => {
+  const deafultHeaders = [...initialsTableHeaders];
+  deafultHeaders.push('kApp Fee', 'Bandwidth Fee');
+  const headers = getHeader(router, deafultHeaders);
+  const sanitizedHeaders = headers.filter(header => header !== '');
+  return sanitizedHeaders;
+};
+
+const processRow = async (row: ITransaction, router: NextRouter) => {
+  let finalVal = '';
+  const parsedRow = await getCells(row, router);
+  for (let j = 0; j < parsedRow.length; j++) {
+    const innerValue = parsedRow[j] === null ? '' : parsedRow[j].toString();
+
+    let result = innerValue.replace(/"/g, '""');
+    if (result.search(/("|,|\n)/g) >= 0) result = '"' + result + '"';
+    if (j > 0) finalVal += ',';
+    finalVal += result;
+  }
+  return finalVal + '\n';
+};
+
+export const exportToCsv = async (
+  filename: string,
+  rows: any[] | null,
+  router: NextRouter,
+): Promise<void> => {
+  if (!rows || rows.length === 0) {
+    window.alert('No data to export!');
+    return;
+  }
+  let csvFile = '';
+  for (let i = -1; i < rows.length; i++) {
+    if (i === -1) {
+      const headers = processHeaders(router);
+      csvFile += headers + '\n';
+    } else {
+      csvFile += await processRow(rows[i], router);
+    }
+  }
+  if (typeof window !== undefined) {
+    const blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }
+};
+
 export const getTotalAssetsPrices = (
   ITOBuyPrices: IBuyITOsTotalPrices,
   receipts: IReceipt[],
@@ -1025,191 +868,18 @@ export const getTotalAssetsPrices = (
   return ITOBuyPrices;
 };
 
-/**
- * Receive the contracts number to return the contract name using the Contract Enum
- * @param contracts is required to fill using the Enum
- * @returns return string with the contract name
- */
-export const contractTypes = (contracts: IContract[]): string => {
-  if (!contracts) {
-    return 'Unknown';
+export const calculatePermissionOperations = (
+  operations: string,
+): typeof contractsList => {
+  const stringContracts: typeof contractsList = [];
+  if (typeof operations === 'string' && operations.match(/^[0-9A-Fa-f]+$/g)) {
+    const binaryOperations = parseInt(operations, 16).toString(2);
+    const reversedBinaryOperationsArray = binaryOperations.split('').reverse();
+    reversedBinaryOperationsArray.forEach((char, index) => {
+      if (char === '1') {
+        stringContracts.push(ContractsIndex[index]);
+      }
+    });
   }
-
-  return contracts.length > 1
-    ? 'Multi contract'
-    : Object.values(Contract)[contracts[0].type];
-};
-
-/**
- * Receive the contracts number to return the contract name using the Contract Enum
- * @param contracts is required to filter the contracts header based on each contract
- * @param contractType is required to know which contract section with contract header should render
- * @returns return a array of sections
- */
-export const filteredSections = (
-  contract: IContract[],
-  contractType: string,
-): IRowSection[] => {
-  switch (contractType) {
-    case Contract.Transfer:
-      return TransferSections(contract[0].parameter);
-    case Contract.CreateAsset:
-      return CreateAssetSections(contract[0].parameter);
-    case Contract.CreateValidator:
-      return CreateValidatorSections(contract[0].parameter);
-    case Contract.ValidatorConfig:
-      return ValidatorConfigSections(contract[0].parameter);
-    case Contract.Freeze:
-      return FreezeSections(contract[0].parameter);
-    case Contract.Unfreeze:
-      return UnfreezeSections(contract[0].parameter);
-    case Contract.Delegate:
-      return DelegateSections(contract[0].parameter);
-    case Contract.Undelegate:
-      return UndelegateSections(contract[0].parameter);
-    case Contract.Withdraw:
-      return WithdrawSections(contract[0].parameter);
-    case Contract.Claim:
-      return ClaimSections(contract[0].parameter);
-    case Contract.Unjail:
-      return UnjailSections(contract[0].parameter);
-    case Contract.AssetTrigger:
-      return AssetTriggerSections(contract[0].parameter);
-    case Contract.SetAccountName:
-      return SetAccountNameSections(contract[0].parameter);
-    case Contract.Proposal:
-      return ProposalSections(contract[0].parameter);
-    case Contract.Vote:
-      return VoteSections(contract[0].parameter);
-    case Contract.ConfigITO:
-      return ConfigITOSections(contract[0].parameter);
-    case Contract.SetITOPrices:
-      return SetITOPricesSections(contract[0].parameter);
-    case Contract.Buy:
-      return BuySections(contract[0].parameter);
-    case Contract.Sell:
-      return SellSections(contract[0].parameter);
-    case Contract.CancelMarketOrder:
-      return CancelMarketOrderSections(contract[0].parameter);
-    case Contract.CreateMarketplace:
-      return CreateMarketplaceSections(contract[0].parameter);
-    case Contract.ConfigMarketplace:
-      return ConfigMarketplaceSections(contract[0].parameter);
-    default:
-      return [];
-  }
-};
-
-export const initialsTableHeaders = [
-  'Hash',
-  'Block',
-  'Created',
-  'From',
-  '',
-  'To',
-  'Status',
-  'Contract',
-];
-
-export const contractTableHeaders = [
-  'Coin',
-  'Amount',
-  'Name',
-  'Ticker',
-  'Reward Address',
-  'Can Delegate',
-  'BLS public key',
-  'Public Key',
-  'Bucket Id',
-  'Asset Id',
-  'Claim Type',
-  'Trigger Type',
-  'Description',
-  'Proposal Id',
-  'Buy Type',
-  'Order Id',
-];
-
-/**
- * Receive the header of the table and the NextJS Router
- * @param router is required to filter using the router.query when it exists
- * @param header is required to do the filter when has filter on router.query
- * @returns return a array of string with the headers based on each contract
- */
-export const getHeader = (router: NextRouter, header: string[]): string[] => {
-  let newHeaders: string[] = [];
-  switch (ContractsIndex[ContractsIndex[Number(router.query.type)]]) {
-    case ContractsIndex.Transfer:
-      newHeaders = [contractTableHeaders[0], contractTableHeaders[1]];
-      break;
-    case ContractsIndex['Create Asset']:
-      newHeaders = [contractTableHeaders[2], contractTableHeaders[3]];
-      break;
-    case ContractsIndex['Create Validator']:
-      newHeaders = [contractTableHeaders[4], contractTableHeaders[5]];
-      break;
-    case ContractsIndex['Config Validator']:
-      newHeaders = [contractTableHeaders[6]];
-      break;
-    case ContractsIndex['Validator Config']:
-      newHeaders = [contractTableHeaders[7]];
-      break;
-    case ContractsIndex.Freeze:
-      newHeaders = [contractTableHeaders[1]];
-      break;
-    case ContractsIndex.Unfreeze:
-      newHeaders = [contractTableHeaders[8]];
-      break;
-    case ContractsIndex.Delegate:
-      newHeaders = [contractTableHeaders[8]];
-      break;
-    case ContractsIndex.Undelegate:
-      newHeaders = [contractTableHeaders[8]];
-      break;
-    case ContractsIndex.Withdraw:
-      newHeaders = [contractTableHeaders[9]];
-      break;
-    case ContractsIndex.Claim:
-      newHeaders = [contractTableHeaders[10]];
-      break;
-    case ContractsIndex.Unjail:
-      break;
-    case ContractsIndex['Asset Trigger']:
-      newHeaders = [contractTableHeaders[11]];
-      break;
-    case ContractsIndex['Set Account Name']:
-      newHeaders = [contractTableHeaders[2]];
-      break;
-    case ContractsIndex.Proposal:
-      newHeaders = [contractTableHeaders[12]];
-      break;
-    case ContractsIndex.Vote:
-      newHeaders = [contractTableHeaders[13], contractTableHeaders[1]];
-      break;
-    case ContractsIndex['Config ITO']:
-      newHeaders = [contractTableHeaders[9]];
-      break;
-    case ContractsIndex['Set ITO']:
-      newHeaders = [contractTableHeaders[9]];
-      break;
-    case ContractsIndex.Buy:
-      newHeaders = [contractTableHeaders[14], contractTableHeaders[1]];
-      break;
-    case ContractsIndex.Sell:
-      newHeaders = [contractTableHeaders[9]];
-      break;
-    case ContractsIndex['Cancel Marketplace Order']:
-      newHeaders = [contractTableHeaders[15]];
-      break;
-    case ContractsIndex['Create Marketplace']:
-      newHeaders = [contractTableHeaders[2]];
-      break;
-    case ContractsIndex['Config Marketplace']:
-  }
-
-  if (router.query.type) {
-    return header.splice(0, header.length - 2).concat(newHeaders);
-  }
-
-  return header;
+  return stringContracts;
 };

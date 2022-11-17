@@ -7,12 +7,17 @@ interface ITooltipProps {
   msg: string;
   Component?: React.FC;
   customStyles?: ICustomStyles;
+  minMsgLength?: number;
 }
 
-const Tooltip: React.FC<ITooltipProps> = ({ msg, Component, customStyles }) => {
+const Tooltip: React.FC<ITooltipProps> = ({
+  msg,
+  Component,
+  customStyles,
+  minMsgLength = 0,
+}) => {
   const [displayMessage, setDisplayMessage] = useState(false);
   const parsedMsgs = msg.split('\n');
-
   return (
     <span
       onMouseOver={() => setDisplayMessage(true)}
@@ -29,7 +34,7 @@ const Tooltip: React.FC<ITooltipProps> = ({ msg, Component, customStyles }) => {
             button
           </IconHelp>
         )}
-        {((Component && msg.length >= 9) || !Component) && (
+        {((Component && msg.length > minMsgLength) || !Component) && (
           <div>
             <StyledTooltip
               displayMsg={displayMessage}

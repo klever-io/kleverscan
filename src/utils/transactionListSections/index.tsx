@@ -9,10 +9,11 @@ import {
   ICreateAssetContract,
   ICreateMarketplaceContract,
   ICreateValidatorContract,
+  IDepositContract,
   IFreezeContract,
+  IITOTriggerContract,
   IParameter,
   IProposalContract,
-  IRowSection,
   ISellContract,
   ISetAccountNameContract,
   ISetITOPricesContract,
@@ -20,10 +21,12 @@ import {
   IUndelegateContract,
   IUnfreezeContract,
   IUnjailContract,
+  IUpdateAccountPermissionContract,
   IValidatorConfigContract,
   IVoteContract,
   IWithdrawContract,
-} from '@/types/index';
+} from '@/types/contracts';
+import { IRowSection } from '@/types/index';
 import { CenteredRow } from '@/views/transactions';
 import Link from 'next/link';
 import { formatAmount } from '..';
@@ -41,6 +44,7 @@ const TransferSections = (par: IParameter): IRowSection[] => {
             {parameter.assetId ? (
               <Tooltip
                 msg={parameter.assetId}
+                minMsgLength={9}
                 Component={() => (
                   <Link href={`/asset/${parameter.assetId}`}>
                     {parameter.assetId}
@@ -50,6 +54,7 @@ const TransferSections = (par: IParameter): IRowSection[] => {
             ) : (
               <>
                 <Tooltip
+                  minMsgLength={9}
                   msg="KLV"
                   Component={() => <Link href={`/asset/KLV`}>KLV</Link>}
                 ></Tooltip>
@@ -278,7 +283,7 @@ const VoteSections = (par: IParameter): IRowSection[] => {
     {
       element: (
         <span key={parameter.amount}>
-          <small>{parameter.amount}</small>
+          <small>{parameter.amount / 10 ** precision}</small>
         </span>
       ),
       span: 1,
@@ -364,7 +369,48 @@ const CreateMarketplaceSections = (par: IParameter): IRowSection[] => {
 const ConfigMarketplaceSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IConfigMarketplaceContract;
 
-  return [{ element: <></>, span: 1 }];
+  return [
+    {
+      element: (
+        <span key={parameter?.marketplaceID}>
+          {parameter?.marketplaceID || ''}
+        </span>
+      ),
+      span: 1,
+    },
+  ];
+};
+
+const UpdateAccountPermissionContractSections = (
+  par: IParameter,
+): IRowSection[] => {
+  const parameter = par as unknown as IUpdateAccountPermissionContract;
+  return [
+    {
+      element: (
+        <span key={parameter?.permissions[0]?.permissionName}>
+          {parameter?.permissions[0]?.permissionName || ''}
+        </span>
+      ),
+      span: 1,
+    },
+  ];
+};
+
+const DepositSections = (par: IParameter): IRowSection[] => {
+  const parameter = par as unknown as IDepositContract;
+  return [
+    { element: <span>{parameter?.depositType || ''}</span>, span: 1 },
+    { element: <span>{parameter?.id || ''}</span>, span: 1 },
+  ];
+};
+
+const IITOTriggerSections = (par: IParameter): IRowSection[] => {
+  const parameter = par as unknown as IITOTriggerContract;
+  return [
+    { element: <span>{parameter?.triggerType || ''}</span>, span: 1 },
+    { element: <span>{parameter?.assetID || ''}</span>, span: 1 },
+  ];
 };
 
 export {
@@ -390,4 +436,7 @@ export {
   CreateMarketplaceSections,
   ConfigMarketplaceSections,
   CreateAssetSections,
+  UpdateAccountPermissionContractSections,
+  DepositSections,
+  IITOTriggerSections,
 };

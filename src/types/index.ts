@@ -2,110 +2,11 @@ import { IChartData } from '@/configs/home';
 import { ISO2 } from '@/utils/country';
 import { Dispatch, SetStateAction } from 'react';
 import { IBlock } from './blocks';
+import { Contract, IContract, IParameterOnlyAssetId } from './contracts';
 
 export type Query = {
   [key: string]: any;
 };
-
-export enum Contract {
-  Transfer = 'TransferContractType',
-  CreateAsset = 'CreateAssetContractType',
-  CreateValidator = 'CreateValidatorContractType',
-  ValidatorConfig = 'ConfigValidatorContractType',
-  Freeze = 'FreezeContractType',
-  Unfreeze = 'UnfreezeContractType',
-  Delegate = 'DelegateContractType',
-  Undelegate = 'UndelegateContractType',
-  Withdraw = 'WithdrawContractType',
-  Claim = 'ClaimContractType',
-  Unjail = 'UnjailContractType',
-  AssetTrigger = 'AssetTriggerContractType',
-  SetAccountName = 'SetAccountNameContractType',
-  Proposal = 'ProposalContractType',
-  Vote = 'VoteContractType',
-  ConfigITO = 'ConfigITOContractType',
-  SetITOPrices = 'SetITOPricesContractType',
-  Buy = 'BuyContractType',
-  Sell = 'SellContractType',
-  CancelMarketOrder = 'CancelMarketOrderContractType',
-  CreateMarketplace = 'CreateMarketplaceContractType',
-  ConfigMarketplace = 'ConfigMarketplaceContractType',
-}
-
-//used in Filter Contracts
-export enum ContractsName {
-  TransferContractType = 'Transfer',
-  CreateAssetContractType = 'Create Asset',
-  CreateValidatorContractType = 'Create Validator',
-  ConfigValidatorContractType = 'Config Validator',
-  FreezeContractType = 'Freeze',
-  UnfreezeContractType = 'Unfreeze',
-  DelegateContractType = 'Delegate',
-  UndelegateContractType = 'Undelegate',
-  WithdrawContractType = 'Withdraw',
-  ClaimContractType = 'Claim',
-  UnjailContractType = 'Unjail',
-  AssetTriggerContractType = 'Asset Trigger',
-  SetAccountNameContractType = 'Set Account Name',
-  ProposalContractType = 'Proposal',
-  VoteContractType = 'Vote',
-  ConfigITOContractType = 'Config ITO',
-  SetITOPricesContractType = 'Set ITO',
-  BuyContractType = 'Buy',
-  SellContractType = 'Sell',
-  CancelMarketOrderContractType = 'Cancel Marketplace Order',
-  CreateMarketplaceContractType = 'Create Marketplace',
-  ConfigMarketplaceContractType = 'Config Marketplace',
-}
-
-export enum ContractsIndex {
-  'Transfer',
-  'Create Asset',
-  'Create Validator',
-  'Config Validator',
-  'Freeze',
-  'Unfreeze',
-  'Delegate',
-  'Undelegate',
-  'Withdraw',
-  'Claim',
-  'Unjail',
-  'Asset Trigger',
-  'Set Account Name',
-  'Proposal',
-  'Vote',
-  'Config ITO',
-  'Set ITO',
-  'Buy',
-  'Sell',
-  'Cancel Marketplace Order',
-  'Create Marketplace',
-  'Config Marketplae',
-}
-
-export interface ReducedContract {
-  [0]?: number;
-  [1]?: number;
-  [2]?: number;
-  [3]?: number;
-  [4]?: number;
-  [5]?: number;
-  [6]?: number;
-  [7]?: number;
-  [8]?: number;
-  [9]?: number;
-  [10]?: number;
-  [11]?: number;
-  [13]?: number;
-  [14]?: number;
-  [15]?: number;
-  [16]?: number;
-  [17]?: number;
-  [18]?: number;
-  [19]?: number;
-  [20]?: number;
-  [21]?: number;
-}
 
 export enum Service {
   PROXY,
@@ -155,320 +56,6 @@ export interface IKAssets {
   isPaused: boolean;
 }
 
-export interface IContractOption {
-  value: string;
-  label: string;
-}
-
-export interface ITransferContract {
-  amount: number;
-  toAddress: string;
-  assetId?: string;
-  precision?: number;
-}
-
-export enum EnumAssetType {
-  Fungible = 0,
-  NonFungible = 1,
-}
-
-export interface IRoyaltyInfo {
-  amount: number;
-  percentage: number;
-}
-
-export interface IRoyaltiesInfo {
-  address: string;
-  transferPercentage: IRoyaltyInfo[];
-  transferFixed: number;
-  marketPercentage: number;
-  marketFixed: number;
-}
-
-export interface ICreateAssetContract {
-  type: EnumAssetType;
-  name: string;
-  ticker: string;
-  ownerAddress: string;
-  logo: string;
-  uris: any;
-  precision: number;
-  initialSupply: number;
-  circulatingSupply: number;
-  maxSupply: number;
-  royalties: IRoyaltiesInfo;
-  properties: IPropertiesInfo;
-  attributes: IAttributesInfo;
-  staking: IStakingInfo;
-  roles: IRolesInfo[];
-  assetId?: string;
-}
-
-export interface IPropertiesInfo {
-  canFreeze: boolean;
-  canWipe: boolean;
-  canPause: boolean;
-  canMint: boolean;
-  canBurn: boolean;
-  canChangeOwner: boolean;
-  canAddRoles: boolean;
-}
-
-export interface IAttributesInfo {
-  isPaused: boolean;
-  isNFTMintStopped: boolean;
-}
-
-export interface IStakingInfo {
-  type: number;
-  apr: number;
-  minEpochsToClaim: number;
-  minEpochsToUnstake: number;
-  minEpochsToWithdraw: number;
-}
-export interface IRolesInfo {
-  address: string;
-  hasRoleMint: boolean;
-  hasRoleSetITOPrices: boolean;
-}
-
-export interface ICreateValidatorContract {
-  ownerAddress: string;
-  config: IValidatorConfig;
-  assetId?: string;
-  precision?: number;
-}
-
-export interface IValidatorConfigContract {
-  config: IValidatorConfig;
-  assetId?: string;
-  precision?: number;
-}
-
-export interface IValidatorConfig {
-  blsPublicKey: string;
-  rewardAddress: string;
-  canDelegate: boolean;
-  commission: number;
-  maxDelegationAmount: number;
-  logo: string;
-  uris: any;
-  name: string;
-}
-
-export interface IFreezeContract {
-  amount: number;
-  assetId: string;
-  precision?: number;
-}
-
-export interface IUnfreezeContract {
-  bucketID: string;
-  assetId: string;
-  precision?: number;
-}
-
-export interface IDelegateContract {
-  bucketID: string;
-  toAddress: string;
-  assetId?: string;
-  precision?: number;
-}
-
-export interface IUndelegateContract {
-  bucketID: string;
-  assetId?: string;
-  precision?: number;
-}
-
-export interface IWithdrawContract {
-  assetId: string;
-  precision?: number;
-}
-export enum EnumClaimType {
-  StakingClaim = 0,
-  AllowanceClaim = 1,
-  MarketClaim = 2,
-}
-export interface IClaimContract {
-  claimType: EnumClaimType;
-  id: string;
-  assetId?: string;
-  precision?: number;
-}
-export interface IUnjailContract {
-  assetId?: string;
-  precision?: number;
-}
-
-export enum EnumTriggerType {
-  Mint = 0,
-  Burn = 1,
-  Wipe = 2,
-  Pause = 3,
-  Resume = 4,
-  ChangeOwner = 5,
-  AddRole = 6,
-  RemoveRole = 7,
-  UpdateMetadata = 8,
-  StopNFTMint = 9,
-  UpdateLogo = 10,
-  UpdateURIs = 11,
-  ChangeRoyaltiesReceiver = 12,
-}
-
-export interface IAssetTriggerContract {
-  triggerType: EnumTriggerType;
-  toAddress: string;
-  amount: number;
-  mime: string;
-  logo: string;
-  uri: any;
-  role: IRolesInfo;
-  assetId?: string;
-  precision?: number;
-  staking?: IStakingInfo;
-}
-
-export interface ISetAccountNameContract {
-  name: string;
-  assetId?: string;
-  precision?: number;
-}
-
-export interface IProposalParameter {
-  [key: string]: string;
-}
-
-export interface IProposalContract {
-  parameters: IProposalParameter;
-  value: string;
-  description: string;
-  epochsDuration: number;
-  assetId?: string;
-  precision?: number;
-}
-
-export interface IVoteContract {
-  proposalId: number;
-  amount: number;
-  assetId?: string;
-  precision?: number;
-}
-
-export enum EnumITOStatus {
-  DefaultITO = 0,
-  ActiveITO = 1,
-  PausedITO = 2,
-}
-
-export interface IConfigITOContract {
-  assetId: string;
-  receiverAddress: string;
-  status: EnumITOStatus;
-  maxAmount: number;
-  packInfo: any;
-  precision?: number;
-}
-
-export interface ISetITOPricesContract {
-  assetId: string;
-  packInfo: any;
-  precision?: number;
-}
-
-export enum EnumBuyType {
-  ITOBuy = 0,
-  MarketBuy = 1,
-}
-
-export interface IBuyContract {
-  type: 17;
-  typeString: 'BuyContractType';
-  parameter: IBuyContractPayload;
-  assetId?: string; // only here for TS purposes
-  precision?: number; // only here for TS purposes
-}
-
-export interface IBuyITOsTotalPrices {
-  [key: string]: {
-    price: number;
-    precision: number;
-  };
-}
-
-export interface IBuyContractPayload {
-  buyType: 'MarketBuy' | 'ITOBuy';
-  id: string;
-  currencyID: string;
-  amount: number;
-  assetId?: string;
-  precision?: number;
-}
-
-export enum EnumMarketType {
-  BuyItNowMarket = 0,
-  AuctionMarket = 1,
-}
-
-export interface ISellContract {
-  marketType: EnumMarketType;
-  marketplaceID: string;
-  assetId: string;
-  currencyID: string;
-  price: number;
-  reservePrice: number;
-  endTime: number;
-  precision?: number;
-}
-
-export interface ICancelMarketOrderContract {
-  orderID: string;
-  assetId?: string;
-  precision?: number;
-}
-
-export interface ICreateMarketplaceContract {
-  name: string;
-  referralAddress: string;
-  referralPercentage: number;
-  assetId?: string;
-  precision?: number;
-}
-
-export interface IConfigMarketplaceContract {
-  marketplaceID: string;
-  name: string;
-  referralAddress: string;
-  referralPercentage: number;
-  assetId?: string;
-  precision?: number;
-}
-
-export type IParameter =
-  | ITransferContract
-  | ICreateAssetContract
-  | ICreateValidatorContract
-  | IValidatorConfigContract
-  | IFreezeContract
-  | IUnfreezeContract
-  | IDelegateContract
-  | IUndelegateContract
-  | IWithdrawContract
-  | IClaimContract
-  | IUnjailContract
-  | IAssetTriggerContract
-  | ISetAccountNameContract
-  | IProposalContract
-  | IVoteContract
-  | IConfigITOContract
-  | ISetITOPricesContract
-  | IBuyContract
-  | ISellContract
-  | ICancelMarketOrderContract
-  | ICreateMarketplaceContract
-  | IConfigMarketplaceContract;
-
 export interface ICreateAssetReceipt {
   assetId: string;
 }
@@ -512,6 +99,36 @@ export interface ITransaction {
   contract: IContract[];
   receipts: IReceipt[];
   precision?: number;
+}
+
+export interface ITransactionAssetIds {
+  hash: string;
+  blockNum: number;
+  sender: string;
+  data?: string[];
+  nonce: number;
+  timestamp: number;
+  chainID: string;
+  signature: string;
+  searchOrder: number;
+  kAppFee: number;
+  bandwidthFee: number;
+  status: string;
+  resultCode: string;
+  contract: IContractAssetIds[];
+  receipts: IReceipt[];
+  precision?: number;
+}
+
+export interface IContractAssetIds {
+  sender: string;
+  type: number;
+  typeString: Contract;
+  parameter: IParameterOnlyAssetId;
+  precision?: number;
+  asset?: IAsset;
+  receipts?: IReceipt[];
+  contractIndex?: number;
 }
 
 interface ItotalLeaderSuccessRate {
@@ -576,6 +193,7 @@ export interface IHolder {
 export interface IBalance {
   address: string;
   balance: number;
+  frozenBalance: number;
   index: number;
   rank: number;
 }
@@ -602,6 +220,47 @@ export interface IAssetsHoldersResponse extends IResponse {
   pagination: IPagination;
 }
 
+export interface IRoyalties {
+  address?: string;
+  marketPercentage?: number;
+  transferFixed?: number;
+  transferPercentage?: [
+    {
+      amount: number;
+      percentage: number;
+    },
+  ];
+}
+
+export interface IRole {
+  address: string;
+  hasRoleMint: boolean;
+  hasRoleSetITOPrices: boolean;
+}
+
+export interface IStaking {
+  interestType: string;
+  minEpochsToWithdraw: number;
+  totalStaked: number;
+  apr:
+    | {
+        timestamp: number;
+        epoch: number;
+        value: number;
+      }[]
+    | [];
+
+  fpr: {
+    totalAmount: number;
+    totalStaked: number;
+    TotalClaimed: number;
+    epoch: number;
+  }[];
+  currentFPRAmount: number;
+  minEpochsToClaim: number;
+  minEpochsToUnstake: number;
+}
+
 export interface IAsset {
   assetType: string;
   assetId: string;
@@ -614,17 +273,11 @@ export interface IAsset {
   initialSupply: number;
   circulatingSupply: number;
   maxSupply: number;
-  royalties: number;
+  royalties: IRoyalties;
   mintedValue: number;
   issueDate: number;
-  staking: {
-    minEpochsToWithdraw: number;
-    totalStaked: number;
-    fpr: {
-      totalAmount: number;
-      totalStaked: number;
-    }[];
-  };
+  staking: IStaking;
+  roles?: IRole[];
   burnedValue: number;
   properties: {
     canFreeze: boolean;
@@ -648,21 +301,6 @@ export interface IAsset {
 export interface IParsedAsset extends IAsset {
   nonce: string;
   nonceOwner: string;
-}
-export interface IContract {
-  sender: string;
-  type: number;
-  typeString: Contract;
-  parameter: IParameter;
-  precision?: number;
-  asset?: IAsset;
-  receipts?: IReceipt[];
-  contractIndex?: number;
-}
-
-export interface IContractBuyProps extends IContract {
-  sender: string;
-  contracts: IBuyContract[];
 }
 
 export interface IAssetAmount {
@@ -889,6 +527,13 @@ export interface IHomeTransactions {
 export interface ITransactionResponse extends IResponse {
   data: {
     transactions: ITransaction[];
+  };
+  pagination: IPagination;
+}
+
+export interface IAssetTransactionResponse extends IResponse {
+  data: {
+    transactions: ITransactionAssetIds[];
   };
   pagination: IPagination;
 }

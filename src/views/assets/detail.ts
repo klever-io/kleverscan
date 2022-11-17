@@ -1,5 +1,6 @@
 import { Certified } from '@/assets/icons';
-import { default as DefaultInput } from '@/components/Inputt';
+import { default as DefaultInput } from '@/components/InputGlobal';
+import { transparentize } from 'polished';
 import styled from 'styled-components';
 
 export const Container = styled.div``;
@@ -134,11 +135,17 @@ export const CardContent = styled.div`
   border-radius: 0 0.75rem 0.75rem 0.75rem;
 `;
 
-export const Row = styled.div`
+export const Row = styled.div<{ isStakingRoyalties: boolean }>`
   width: 100%;
-
   padding: 1.5rem 2rem;
-
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-direction: ${props => (props.isStakingRoyalties ? 'column' : 'row')};
+    align-items: start;
+    span:nth-child(1) {
+      padding-bottom: 15px;
+      padding-left: 15px;
+    }
+  }
   display: flex;
 
   flex-direction: row;
@@ -158,7 +165,6 @@ export const Row = styled.div`
     }
     &:nth-child(2) {
       margin-left: 1rem;
-      margin-right: 0.5rem;
     }
     overflow: hidden;
 
@@ -192,7 +198,6 @@ export const Row = styled.div`
 
 export const CenteredRow = styled.div`
   display: flex;
-
   flex-direction: row;
   align-items: center;
 
@@ -276,4 +281,135 @@ export const AssetHeaderContainer = styled.div<{ isVerfied: boolean }>`
 export const UriContainer = styled.div`
   overflow-x: auto;
   width: 95%;
+`;
+
+export const FrozenContainer = styled.div`
+  display: flex;
+  overflow: auto;
+  flex-direction: column;
+  background-color: ${props => props.theme.accountCard.frozenBackground};
+  border-radius: 0.75rem;
+  flex-wrap: wrap;
+  overflow-x: auto;
+  &::-webkit-scrollbar {
+    position: absolute;
+    height: 0.5rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 15px;
+  }
+  &:hover {
+    &::-webkit-scrollbar-thumb {
+      background: ${props => transparentize(0.75, props.theme.black)};
+    }
+  }
+
+  div {
+    padding: 1.25rem 2rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    gap: 1rem;
+    &:not(:last-child) {
+      border-bottom: 1px solid ${props => props.theme.card.border};
+      border-width: 100%;
+      border-bottom-left-radius: 0px;
+      border-bottom-right-radius: 0px;
+    }
+    strong {
+      min-width: 200px;
+      font-weight: 600;
+      color: ${props => props.theme.darkText};
+    }
+
+    span {
+      min-width: 230px;
+      color: ${props => props.theme.darkText};
+    }
+    p {
+      font-weight: 400;
+      font-size: 15px;
+      min-width: 200px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+      flex-direction: column;
+      align-items: self-start;
+      width: auto;
+      overflow-x: hidden;
+      span {
+        text-align: left;
+      }
+      p {
+        text-align: left;
+        width: auto;
+      }
+    }
+  }
+`;
+export const ContentRow = styled.div`
+  width: 100%;
+  div {
+    padding: 0px;
+  }
+`;
+export const ContentScrollBar = styled.div`
+  width: 100%;
+  overflow-x: scroll;
+
+  span {
+    flex-direction: column;
+    background-color: ${props => props.theme.accountCard.cardStaking};
+    border: 1px solid ${props => props.theme.card.border};
+    padding: 1rem;
+    border-radius: 0.75rem;
+    height: auto;
+    p {
+      font-size: 13px;
+    }
+  }
+  &::-webkit-scrollbar {
+    position: absolute;
+    height: 0.5rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 15px;
+  }
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    max-height: 500px;
+    min-width: 20rem;
+    justify-content: center;
+    span {
+      min-height: 100px;
+      max-width: 140px;
+    }
+    span:nth-child(2) {
+      margin-left: 0px;
+    }
+
+    p {
+      font-size: 13px;
+    }
+  }
+  &:hover {
+    &::-webkit-scrollbar-thumb {
+      background: ${props => transparentize(0.75, props.theme.black)};
+    }
+  }
 `;

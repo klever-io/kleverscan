@@ -9,11 +9,11 @@ import Link from 'next/link';
 import React, { useEffect, useRef, useState } from 'react';
 import { Status } from './styles';
 
-interface IBuckets {
+export interface IBuckets {
   assets: IAccountAsset[];
 }
 
-interface IAssetsBuckets {
+export interface IAssetsBuckets {
   asset: IAccountAsset;
   bucket: IBucket;
 }

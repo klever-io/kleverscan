@@ -1,16 +1,24 @@
 import { useMobile } from '@/contexts/mobile';
 import { IRowSection, Query } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
+import { exportToCsv } from '@/utils/index';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
+import { TbTableExport } from 'react-icons/tb';
+// import { VscJson } from 'react-icons/vsc';
 import Pagination from '../Pagination';
 import { PaginationContainer } from '../Pagination/styles';
 import Skeleton from '../Skeleton';
+import Tooltip from '../Tooltip';
 import {
   Body,
+  ButtonsContainer,
   Container,
   ContainerView,
   EmptyRow,
+  ExportButton,
+  ExportContainer,
+  ExportLabel,
   FloatContainer,
   Header,
   ITableType,
@@ -155,6 +163,31 @@ const Table: React.FC<ITable> = ({
         !!items &&
         items?.length > 0 && (
           <FloatContainer>
+            {dataName === 'transactions' && (
+              <ExportContainer>
+                <ExportLabel>
+                  <Tooltip
+                    msg="Current filters will be applied."
+                    Component={() => (
+                      <div style={{ cursor: 'help' }}>Export</div>
+                    )}
+                  />
+                </ExportLabel>
+                <ButtonsContainer>
+                  <ExportButton
+                    onClick={() => exportToCsv('transactions', items, router)}
+                  >
+                    <Tooltip
+                      msg="CSV"
+                      Component={() => <TbTableExport size={25} />}
+                    />
+                  </ExportButton>
+                  {/* <ExportButton>
+                    <VscJson size={25} />
+                  </ExportButton> */}
+                </ButtonsContainer>
+              </ExportContainer>
+            )}
             <LimitContainer>
               <span>Per page</span>
               <LimitText>
@@ -180,7 +213,7 @@ const Table: React.FC<ITable> = ({
               ))}
             </Header>
           )}
-          <Body {...props}>
+          <Body {...props} data-testid="table-body">
             {loading && (
               <>
                 {Array(5)

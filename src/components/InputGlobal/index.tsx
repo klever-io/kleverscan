@@ -4,11 +4,11 @@ import { useRouter } from 'next/router';
 import React, { KeyboardEvent, useRef, useState } from 'react';
 import { Container } from './styles';
 
-interface IInput {
+interface InputGlobal {
   className?: string;
 }
 
-const Input: React.FC<IInput> = ({ className }) => {
+const Input: React.FC<InputGlobal> = ({ className }) => {
   const [search, setSearch] = useState('');
   const [error, setError] = useState(false);
   const inputRef = useRef<any>(null);

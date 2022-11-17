@@ -301,6 +301,9 @@ export const CustomLink = styled.a`
 
 export const FloatContainer = styled.div`
   width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
 `;
 
 export const LimitContainer = styled.div`
@@ -314,14 +317,14 @@ export const LimitContainer = styled.div`
   border-radius: 7px;
   background-color: ${props => props.theme.white};
   padding: 5px;
-
+  margin-left: auto;
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     margin-bottom: 10px;
   }
   span {
     padding-left: 0.5rem;
     font-size: 0.9rem;
-    color: #7b7db2;
+    color: ${props => props.theme.darkText};
     font-weight: 600;
   }
 `;
@@ -401,4 +404,45 @@ export const ItemContainer = styled.div<{
             cursor: not-allowed;
           `}
   }
+`;
+
+export const ExportContainer = styled.div`
+  border-radius: 5px;
+  width: fit-content;
+  padding: 5px;
+  color: ${props => props.theme.darkText};
+  background-color: ${props => props.theme.white};
+
+  font-size: 0.9rem;
+  font-weight: 600;
+  height: fit-content;
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    margin-bottom: 10px;
+  }
+`;
+
+export const ExportLabel = styled.div`
+  padding-left: 0.2rem;
+`;
+
+export const ExportButton = styled.button`
+  border-radius: 50%;
+  padding: 0.125rem;
+  display: grid;
+  place-items: center;
+  transition: color 0.5s linear;
+  svg {
+    transition: inherit;
+    color: ${props => props.theme.table.text};
+  }
+
+  &:hover {
+    svg {
+      color: ${props => props.theme.green};
+    }
+  }
+`;
+
+export const ButtonsContainer = styled.div`
+  display: flex;
 `;

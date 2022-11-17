@@ -5,41 +5,60 @@ import { renderWithTheme } from '../../../test/utils';
 import { formatAmount } from '../../../utils/index';
 import Assets from './';
 
+export const headerTable = [
+  'Token',
+  'ID',
+  'Token Type',
+  'Precision',
+  'Balance',
+  'Frozen',
+];
+export const address =
+  'klv18slsv4v8yxdarvvyxdwgvdeqwrna899k2vcshlrlc4xjuyjlhveqv78t8s';
+const frozenBalance = 10000000000000;
+export const assetId = 'KLV';
+const assetName = 'KLEVER';
+const assetType = 0;
+const balance = 0;
+const precision = 6;
+const ticker = assetId.split('-')[0];
+export const balanceText = `${formatAmount(
+  balance / 10 ** precision,
+)} ${ticker}`;
+export const frozenBalanceText = `${formatAmount(
+  frozenBalance / 10 ** precision,
+)} ${ticker}`;
+export const assetText = assetType === 0 ? 'Fungible' : 'Non Fungible';
+
+const assets = [
+  {
+    address,
+    assetId,
+    assetName,
+    assetType,
+    balance,
+    buckets: [],
+    frozenBalance,
+    lastClaim: { timestamp: 0, epoch: 0 },
+    precision,
+    unfrozenBalance: 0,
+  },
+];
+
+export const mockedAssets = <Assets assets={assets} address={address} />;
 describe('Component: Assets Tab', () => {
-  const headerTable = [
-    'Token',
-    'ID',
-    'Token Type',
-    'Precision',
-    'Balance',
-    'Frozen',
-  ];
-  const address =
-    'klv18slsv4v8yxdarvvyxdwgvdeqwrna899k2vcshlrlc4xjuyjlhveqv78t8s';
-  const frozenBalance = 10000000000000;
-  const assetId = 'KLV';
-  const assetName = 'KLEVER';
-  const assetType = 0;
-  const balance = 0;
-  const precision = 6;
-  const ticker = assetId.split('-')[0];
-  const balanceText = `${formatAmount(balance / 10 ** precision)} ${ticker}`;
-  const frozenBalanceText = `${formatAmount(
-    frozenBalance / 10 ** precision,
-  )} ${ticker}`;
-  const assetText = assetType === 0 ? 'Fungible' : 'Non Fungible';
-
-  jest.mock('next/router', () => ({
-    useRouter() {
-      return {
-        route: '/',
-        pathname: '',
-      };
-    },
-  }));
-
   beforeEach(() => {
     jest.clearAllMocks();
+
+    jest.mock('next/router', () => ({
+      useRouter() {
+        return {
+          route: '/',
+          pathname: '',
+        };
+      },
+    }));
+
     const useRouter: any = jest.spyOn(nextRouter, 'useRouter');
     useRouter.mockImplementation(() => ({
       route: '/',
@@ -56,23 +75,8 @@ describe('Component: Assets Tab', () => {
     }));
   });
 
-  const assets = [
-    {
-      address,
-      assetId,
-      assetName,
-      assetType,
-      balance,
-      buckets: [],
-      frozenBalance,
-      lastClaim: { timestamp: 0, epoch: 0 },
-      precision,
-      unfrozenBalance: 0,
-    },
-  ];
-
   it('Should render the Assets Tab correctly', () => {
-    renderWithTheme(<Assets assets={assets} />);
+    renderWithTheme(mockedAssets);
 
     headerTable.map(header => {
       expect(screen.getByText(header)).toBeInTheDocument();

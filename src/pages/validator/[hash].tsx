@@ -219,7 +219,7 @@ const Validator: React.FC<IValidatorPage> = ({
           <HalfRow>
             <ElementsWrapper>
               <span>
-                <strong>List</strong>
+                <strong>Status</strong>
               </span>
               <Status status={getListStatus(list)}>
                 <ListIcon />

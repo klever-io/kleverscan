@@ -248,7 +248,7 @@ export const TooltipContainer = styled.div<{
     }
   }
 
-  @media screen and (max-width: 1025px) {
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     font-size: 1rem;
     max-width: 11ch;
   }
@@ -275,7 +275,7 @@ export const InputLabel = styled.label<ILabel>`
 
   transition: transform 0.2s ease;
 
-  @media screen and (max-width: 1025px) {
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     top: 0.8rem;
   }
 `;

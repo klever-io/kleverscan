@@ -1,4 +1,4 @@
-import { default as DefaultInput } from '@/components/Inputt';
+import { default as DefaultInput } from '@/components/InputGlobal';
 import styled from 'styled-components';
 
 export const Container = styled.div``;
@@ -210,7 +210,7 @@ export const FrozenContainer = styled.div`
 
     strong {
       width: 10rem;
-
+      margin-right: 5px;
       font-weight: 600;
       color: ${props => props.theme.darkText};
     }

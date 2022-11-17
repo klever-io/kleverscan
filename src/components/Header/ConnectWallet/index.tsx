@@ -8,12 +8,15 @@ import { QRCodeSVG } from 'qrcode.react';
 import React, { useCallback, useState } from 'react';
 import { MobileNavbarItem } from '..';
 import { parseAddress } from '../../../utils';
+import OptionsContainer from '../OptionsContainer';
 import {
   ButtonAndCopy,
   ConnectButton,
   ConnectContainer,
   CopyContainer,
   MobileStyledTransfer,
+  NavBarOptionsContainer,
+  NavBarOptionsItems,
   QRCodeContainer,
   QRCodeContent,
   StyledTransfer,
@@ -56,6 +59,26 @@ const ConnectWallet: React.FC = () => {
     }
   }, [extensionInstalled, walletAddress, router, handleMenu]);
 
+  const renderOptionsWithConnection = () => {
+    if (window.innerWidth < 768) {
+      return getCreateTransactionButton();
+    }
+
+    return (
+      <NavBarOptionsItems>
+        {getCreateTransactionButton()}
+        <NavBarOptionsContainer>
+          <CopyContainer>
+            {walletAddress && (
+              <Copy info="Wallet Address" data={walletAddress} />
+            )}
+          </CopyContainer>
+          <OptionsContainer isConnected={!!walletAddress} />
+        </NavBarOptionsContainer>
+      </NavBarOptionsItems>
+    );
+  };
+
   return (
     <>
       {extensionInstalled && (
@@ -87,13 +110,15 @@ const ConnectWallet: React.FC = () => {
                 </>
               )}
             </ConnectButton>
-            <CopyContainer>
-              {walletAddress && (
-                <Copy info="Wallet Address" data={walletAddress} />
-              )}
-            </CopyContainer>
+            {window.innerWidth < 768 && (
+              <CopyContainer>
+                {walletAddress && (
+                  <Copy info="Wallet Address" data={walletAddress} />
+                )}
+              </CopyContainer>
+            )}
           </ButtonAndCopy>
-          {getCreateTransactionButton()}
+          {renderOptionsWithConnection()}
         </ConnectContainer>
       )}
       {displayQr && walletAddress && (

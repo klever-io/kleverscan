@@ -63,10 +63,12 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
 
   const requestAssets = async (page: number, limit: number) => {
     if (filterToken === 'All' || filterToken === undefined) {
-      return api.getCached({
+      const res: IAssetResponse = await api.getCached({
         route: `assets/kassets?hidden=false&page=${page}&limit=${limit}`,
         refreshTime: 21600,
       });
+      setAssetsFilters(res.data.assets);
+      return res;
     } else {
       return api.getCached({
         route: `assets/kassets?hidden=false&asset=${filterToken}&page=${page}&limit=${limit}`,
@@ -228,6 +230,18 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
         ),
         span: 1,
       },
+      {
+        element: (
+          <strong>
+            {staking
+              ? staking?.interestType === 'APRI'
+                ? 'APR'
+                : 'FPR'
+              : '--'}
+          </strong>
+        ),
+        span: 1,
+      },
       { element: <strong key={precision}>{precision}</strong>, span: 1 },
     ];
 
@@ -244,6 +258,7 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
     'Max Supply',
     'Circulating Supply',
     'Total Staked',
+    'Rewards Type',
     'Precision',
   ];
 

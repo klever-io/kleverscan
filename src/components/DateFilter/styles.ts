@@ -141,7 +141,7 @@ export const CalendarContainer = styled.div`
   border-radius: 20px;
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
 
-  @media (min-width: 1025px) {
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
     animation: ${fadeInContainer} 0.2s linear;
   }
 

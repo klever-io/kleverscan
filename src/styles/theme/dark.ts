@@ -35,6 +35,7 @@ const darktheme = {
 
   accountCard: {
     frozenBackground: '#222345',
+    cardStaking: '#4b4d80',
   },
 };
 export default darktheme;

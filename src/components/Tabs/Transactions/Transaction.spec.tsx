@@ -1,10 +1,43 @@
-import { screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import { format, fromUnixTime } from 'date-fns';
 import React from 'react';
 import { mockedTransactions } from '../../../test/mocks';
 import { renderWithTheme } from '../../../test/utils';
-import { capitalizeString, formatAmount } from '../../../utils/index';
+import { IInnerTableProps } from '../../../types';
+import {
+  capitalizeString,
+  formatAmount,
+  parseAddress,
+} from '../../../utils/index';
 import Transaction from './';
+
+const precision = 6;
+
+const mockedAPIResponse = {
+  data: {
+    transactions: mockedTransactions,
+  },
+  pagination: {
+    self: 1,
+    next: 2,
+    previous: 1,
+    perPage: 10,
+    totalPages: 1000,
+    totalRecords: 19348805,
+  },
+};
+
+const request = jest.fn(async (page: number, limit: number) => {
+  return Promise.resolve(mockedAPIResponse);
+});
+
+const transactionTableProps: IInnerTableProps = {
+  scrollUp: false,
+  totalPages: 1,
+  dataName: 'transactions',
+  request,
+  query: {},
+};
 
 jest.mock('next/router', () => ({
   useRouter() {
@@ -15,15 +48,23 @@ jest.mock('next/router', () => ({
   },
 }));
 
+export const mockedTransactionTab = (
+  <Transaction
+    transactions={mockedTransactions}
+    precision={precision}
+    transactionsTableProps={transactionTableProps}
+  />
+);
+
 describe('Component: Tabs/Transactions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("Should render the the Table, it's Body and header correctly", () => {
-    renderWithTheme(
-      <Transaction transactions={mockedTransactions} loading={false} />,
-    );
+  it("Should render the the Table, it's Body and header correctly", async () => {
+    await act(async () => {
+      renderWithTheme(mockedTransactionTab);
+    });
 
     const headers = [
       'Hash',
@@ -36,8 +77,11 @@ describe('Component: Tabs/Transactions', () => {
       'Contract',
       'Amount',
     ];
-    const hash = screen.getByRole('link', { name: mockedTransactions[0].hash });
-    const tableBody = hash.parentNode?.parentNode?.parentNode;
+    const hash = screen.getByRole('link', {
+      name: parseAddress(mockedTransactions[0].hash, 24),
+    });
+    const tableBody = screen.getByTestId('table-body');
+
     const tableBodyStyle = {
       display: 'flex',
       flexDirection: 'column',
@@ -46,7 +90,7 @@ describe('Component: Tabs/Transactions', () => {
 
     headers.forEach(name => {
       if (!name) return;
-      const header = screen.getByText(name);
+      const header = screen.getAllByText(name)[0];
       expect(header).toBeInTheDocument();
     });
 
@@ -54,15 +98,23 @@ describe('Component: Tabs/Transactions', () => {
     expect(tableBody).toHaveStyle(tableBodyStyle);
   });
 
-  it('Should render the correct values for "Hash", "Block", "Created", "From", "To", "Status", "Contract and "Amount"', () => {
-    renderWithTheme(
-      <Transaction transactions={mockedTransactions} loading={false} />,
-    );
+  it('Should render the correct values for "Hash", "Block", "Created", "From", "To", "Status", "Contract and "Amount"', async () => {
+    await act(async () => {
+      renderWithTheme(
+        <Transaction
+          transactions={mockedTransactions}
+          precision={precision}
+          transactionsTableProps={transactionTableProps}
+        />,
+      );
+    });
 
     const { hash, blockNum, timestamp, sender, status, contract } =
       mockedTransactions[0];
 
-    const linkHash = screen.getByRole('link', { name: hash });
+    const linkHash = screen.getByRole('link', {
+      name: parseAddress(hash, 24),
+    });
     const componentBlockNum = screen.getByText(blockNum);
     const formatedTimestamp = format(
       fromUnixTime(timestamp / 1000),
@@ -70,13 +122,12 @@ describe('Component: Tabs/Transactions', () => {
     );
     const timeStamp = screen.getAllByText(formatedTimestamp)[0];
 
-    const parsedAddress = /klv1hun5...jsdfr741/i;
     const componenetSender = screen.getAllByRole('link', {
-      name: parsedAddress,
+      name: parseAddress(mockedTransactions[0].sender, 16),
     })[0];
     const toAddress = screen.getAllByRole('link', { name: '--' })[0];
     const componentStatus = screen.getAllByText(capitalizeString(status))[0];
-    const contactType = screen.getByText('Delegate');
+    const contactType = screen.getByText('DelegateContractType');
     const amount = screen.getAllByText('--');
 
     expect(linkHash).toBeInTheDocument();
@@ -92,20 +143,26 @@ describe('Component: Tabs/Transactions', () => {
     expect(componenetSender).toHaveAttribute('href', `/account/${sender}`);
   });
 
-  it('Should be "Mult Contract" when has more than one contract on transaction and show the "toAdress" and "Amount" when the contract is "Transfer" and "BlockNum" must be 0 as fallback', () => {
-    renderWithTheme(
-      <Transaction transactions={mockedTransactions} loading={false} />,
-    );
+  it('Should be "Multi Contract" when has more than one contract on transaction and show the "toAdress" and "Amount" when the contract is "Transfer" and "BlockNum" must be 0 as fallback', async () => {
+    await act(async () => {
+      renderWithTheme(
+        <Transaction
+          transactions={mockedTransactions}
+          precision={precision}
+          transactionsTableProps={transactionTableProps}
+        />,
+      );
+    });
 
     const { parameter } = mockedTransactions[2].contract[0] as any;
-    const multContract = screen.getByText(/Multi Contract/i);
+    const multiContract = screen.getByText(/Multi Contract/i);
     const blockNum = screen.getByRole('link', {
-      name: mockedTransactions[2].hash,
-    }).parentNode?.nextSibling;
+      name: parseAddress(mockedTransactions[2].hash, 24),
+    }).parentNode?.parentNode?.nextSibling?.childNodes[1];
     const formatedAmount = formatAmount(parameter?.amount / 10 ** 6);
     const amount = screen.getByText(formatedAmount);
 
-    expect(multContract).toBeInTheDocument();
+    expect(multiContract).toBeInTheDocument();
     expect(amount).toBeInTheDocument();
     expect(blockNum).toBeInTheDocument();
     expect(blockNum).toHaveTextContent('0');

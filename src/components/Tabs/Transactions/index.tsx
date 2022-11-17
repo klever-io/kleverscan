@@ -4,23 +4,15 @@ import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import { useMobile } from '@/contexts/mobile';
+import { Contract, IContract, ITransferContract } from '@/types/contracts';
+import { IInnerTableProps, IRowSection, ITransaction } from '@/types/index';
 import {
-  Contract,
-  IContract,
-  IInnerTableProps,
-  IRowSection,
-  ITransaction,
-  ITransferContract,
-} from '@/types/index';
-import {
-  capitalizeString,
   contractTypes,
   filteredSections,
-  formatAmount,
   getHeader,
   initialsTableHeaders,
-  parseAddress,
-} from '@/utils/index';
+} from '@/utils/contracts';
+import { capitalizeString, formatAmount, parseAddress } from '@/utils/index';
 import { CenteredRow } from '@/views/accounts/detail';
 import { format, fromUnixTime } from 'date-fns';
 import Link from 'next/link';
@@ -47,7 +39,16 @@ const Transactions: React.FC<ITransactionsProps> = props => {
   const { isMobile } = useMobile();
 
   const rowSections = (props: ITransaction): IRowSection[] => {
-    const { hash, blockNum, timestamp, sender, contract, status } = props;
+    const {
+      hash,
+      blockNum,
+      timestamp,
+      sender,
+      contract,
+      status,
+      kAppFee,
+      bandwidthFee,
+    } = props;
 
     const StatusIcon = getStatusIcon(status);
     let toAddress = '--';
@@ -67,19 +68,6 @@ const Transactions: React.FC<ITransactionsProps> = props => {
       if (!parameter.assetId) assetId = 'KLV';
     }
 
-    const assetIdSection = () => {
-      if (contractType === Contract.Transfer) {
-        return (
-          <Link href={`/asset/${assetId}`} key={assetId}>
-            <a>
-              <strong>{assetId}</strong>
-            </a>
-          </Link>
-        );
-      }
-
-      return <strong>{assetId}</strong>;
-    };
     const sections = [
       {
         element: (
@@ -133,16 +121,16 @@ const Transactions: React.FC<ITransactionsProps> = props => {
         span: 1,
       },
       { element: <strong key={contractType}>{contractType}</strong>, span: 1 },
-      { element: <strong key={amount}>{amount}</strong>, span: 1 },
+      { element: <strong key={kAppFee}>{kAppFee / 10 ** 6}</strong>, span: 1 },
       {
-        element: assetIdSection(),
+        element: <strong key={kAppFee}>{bandwidthFee / 10 ** 6}</strong>,
         span: 1,
       },
     ];
 
     const filteredContract = getFilteredSections(contract);
 
-    if (router.query.type) {
+    if (router?.query?.type) {
       sections.pop();
       sections.pop();
       sections.push(...filteredContract);
@@ -151,7 +139,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
     return sections;
   };
 
-  const header = [...initialsTableHeaders, 'Amount', 'Asset Id'];
+  const header = [...initialsTableHeaders, 'kApp Fee', 'Bandwidth Fee'];
 
   const transactionTableProps = props.transactionsTableProps;
 
@@ -159,7 +147,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
     ...transactionTableProps,
     rowSections: rowSections,
     data: Object.values(props.transactions) as any[],
-    header: getHeader(router, header),
+    header: router?.query?.type ? getHeader(router, header) : header,
     type: 'transactions',
   };
 

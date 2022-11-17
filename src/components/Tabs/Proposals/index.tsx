@@ -11,7 +11,7 @@ import {
 } from '@/types/proposals';
 import { capitalizeString, parseAddress } from '@/utils/index';
 import Link from 'next/link';
-import React, { useRef } from 'react';
+import React from 'react';
 import {
   ProposalStatus,
   ProposalTime,
@@ -24,7 +24,6 @@ const Proposals: React.FC<IProposalsProps> = ({
   totalPages,
   request,
 }) => {
-  const tooltipRef = useRef<any>(null);
   const { isMobile } = useMobile();
 
   const rowSections = (props: IParsedProposal): IRowSection[] => {
@@ -69,7 +68,7 @@ const Proposals: React.FC<IProposalsProps> = ({
 
     const renderProposalsNetworkParamsWithToolTip = () => {
       let message = '';
-      {
+      if (parsedParameters) {
         parsedParameters.forEach(
           (param2, index2) =>
             (message += `${param2.paramText}  ${param2.paramValue}` + '\n'),

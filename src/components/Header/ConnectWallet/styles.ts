@@ -211,7 +211,6 @@ export const MobileStyledTransfer = styled(BiTransfer)`
 
 export const StyledTransfer = styled(BiTransfer)`
   color: ${props => props.theme.navbar.text};
-
   width: 25px;
   height: 25px;
 `;

@@ -20,7 +20,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   IAssetResponse,
   IHomeTransactions,
-  ITransactionAssetIds,
   ITransactionResponse,
 } from '../../types';
 import { HomeLoader } from '../Loader/styles';
@@ -52,7 +51,7 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
       const assets: IAssetResponse = await api.get({ route: 'assets/kassets' });
       if (!transactions.error && !assets.error) {
         transactions.data.transactions = addPrecisionTransactions(
-          transactions?.data?.transactions as unknown as ITransactionAssetIds[],
+          transactions?.data?.transactions,
         );
         setTransactions(transactions.data.transactions);
         setTotalTransactions(transactions.pagination.totalRecords);

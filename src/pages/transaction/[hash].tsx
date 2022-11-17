@@ -1,4 +1,4 @@
-import { Proposal, Receive } from '@/assets/icons';
+import { Receive } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import { TransactionDetails as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
@@ -16,9 +16,8 @@ import {
   CreateMarketplace,
   CreateValidator,
   Delegate,
-  Deposit,
   Freeze,
-  ITOTrigger,
+  Proposal,
   Sell,
   SetAccountName,
   SetITOPrices,
@@ -26,7 +25,6 @@ import {
   Undelegate,
   Unfreeze,
   Unjail,
-  UpdateAccountPermission,
   Vote,
   Withdraw,
 } from '@/components/TransactionContractComponents';
@@ -35,11 +33,13 @@ import api from '@/services/api';
 import { IBlock } from '@/types/blocks';
 import {
   Contract,
+  IAsset,
   IBuyContractPayload,
   IBuyITOsTotalPrices,
   IContract,
-} from '@/types/contracts';
-import { IAsset, IResponse, ITransaction } from '@/types/index';
+  IResponse,
+  ITransaction,
+} from '@/types/index';
 import {
   capitalizeString,
   getPrecision,
@@ -335,27 +335,6 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
-            case Contract.UpdateAccountPermission:
-              return (
-                <div key={`${index}`}>
-                  <UpdateAccountPermission {...contract} receipts={receipts} />
-                  {index < contracts.length - 1 && <Hr />}
-                </div>
-              );
-            case Contract.Deposit:
-              return (
-                <div key={`${index}`}>
-                  <Deposit {...contract} receipts={receipts} />
-                  {index < contracts.length - 1 && <Hr />}
-                </div>
-              );
-            case Contract.ITOTrigger:
-              return (
-                <div key={`${index}`}>
-                  <ITOTrigger {...contract} receipts={receipts} />
-                  {index < contracts.length - 1 && <Hr />}
-                </div>
-              );
             default:
               return <div />;
           }
@@ -424,7 +403,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
               <strong>Epoch</strong>
             </span>
             <span>
-              <p>{block?.epoch}</p>
+              <p>{block.epoch}</p>
             </span>
           </Row>
           <Row>
@@ -562,17 +541,20 @@ export const getStaticProps: GetStaticProps<ITransactionPage> = async ({
   const transaction: ITransactionResponse = await api.get({
     route: `transaction/${hash}`,
   });
-  const tx = transaction?.data?.transaction;
-  if (transaction.error || (!tx?.blockNum && !tx?.nonce && !tx?.sender)) {
+  if (transaction.error) {
     return redirectProps;
   }
   const block: IBlockResponse = await api.get({
     route: `block/by-nonce/${transaction?.data?.transaction?.blockNum}`,
   });
 
+  if (block.error) {
+    return redirectProps;
+  }
+
   const props: ITransactionPage = {
     transaction: transaction.data.transaction,
-    block: block?.data?.block || {},
+    block: block.data.block,
   };
 
   return {

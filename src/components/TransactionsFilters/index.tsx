@@ -3,8 +3,7 @@ import { contracts, status } from '@/configs/transactions';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
-import { IAsset } from '../../types';
-import { ContractsIndex } from '../../types/contracts';
+import { ContractsIndex, IAsset } from '../../types';
 import { fetchPartialAsset } from '../../utils';
 import { FilterContainer } from './styles';
 

@@ -68,7 +68,7 @@ export const Section = styled.section`
   }
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding: 5rem 0 0;
+    padding: 5rem 2.5rem 0 2.5rem;
   }
 `;
 
@@ -87,7 +87,11 @@ export const DataContainer = styled(Section)`
     radial-gradient(at 0% 0%, hsla(295, 57%, 46%, 1) 0, transparent 50%); */
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding: 2.5rem 0 0;
+    padding: 5rem;
+  }
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    padding: 2.5rem;
   }
 `;
 
@@ -579,7 +583,7 @@ export const Main = styled.main`
   background-color: ${props => props.theme.background};
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding: 3rem 2rem 5rem;
+    padding: 3rem 0.1rem 5rem;
   }
 `;
 export const LayoutContainer = styled.div`

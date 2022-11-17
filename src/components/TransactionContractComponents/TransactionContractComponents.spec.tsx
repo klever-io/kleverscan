@@ -1,11 +1,8 @@
-import { screen, waitFor } from '@testing-library/react';
-import { format } from 'date-fns';
+import { screen } from '@testing-library/react';
 import React from 'react';
-import { act } from 'react-dom/test-utils';
 import theme from '../../styles/theme';
 import { klvAsset, mockedTxContractComponents } from '../../test/mocks';
 import { renderWithTheme } from '../../test/utils';
-import * as utils from '../../utils';
 import { toLocaleFixed } from '../../utils';
 import {
   AssetTrigger,
@@ -26,14 +23,12 @@ import {
   Transfer,
   Undelegate,
   Unfreeze,
-  Unjail,
   ValidatorConfig,
   Vote,
   Withdraw,
 } from './';
-const fnsCopySpy = { format }; // this solves a spyOn bug
 
-const precision = 6; // default klv precision
+const precision = 6; // defaulf klv precision
 
 describe('Component: TransactionContractComponents', () => {
   describe('When contract is "Transfer"', () => {
@@ -78,7 +73,7 @@ describe('Component: TransactionContractComponents', () => {
 
       const rowStyle = {
         width: '100%',
-        padding: '1.2rem 2rem',
+        padding: '1.5rem 2rem',
       };
       const rowSpanStyle = {
         overflow: 'hidden',
@@ -128,12 +123,13 @@ describe('Component: TransactionContractComponents', () => {
 
       const { sender, parameter } = createAssetContract;
 
-      const assetId = screen.getByText(/Asset ID/i);
+      const assetId = screen.getByText(/Asset Id/i);
       const name = screen.getByText(/Name/i);
       const owner = screen.getByText(/Owner/i);
       const ownerLink = screen.getByRole('link', { name: sender });
-      const token = screen.getByText(/Ticker/i);
+      const token = screen.getByText(/Token/i);
       const precisionAsset = screen.getByText(/Precision/i);
+      const circulatingSupply = screen.getByText(/Circulating Supply/i);
       const initialSupply = screen.getByText(/Initial Supply/i);
       const maxSupply = screen.getByText(/Max Supply/i);
 
@@ -143,6 +139,7 @@ describe('Component: TransactionContractComponents', () => {
       expect(ownerLink).toBeInTheDocument();
       expect(token).toBeInTheDocument();
       expect(precisionAsset).toBeInTheDocument();
+      expect(circulatingSupply).toBeInTheDocument();
       expect(initialSupply).toBeInTheDocument();
       expect(maxSupply).toBeInTheDocument();
       expect(ownerLink).toHaveAttribute('href', `/account/${sender}`);
@@ -159,6 +156,14 @@ describe('Component: TransactionContractComponents', () => {
       expect(
         precisionAsset.parentNode?.nextSibling?.firstChild,
       ).toHaveTextContent(String(parameter.precision));
+      expect(
+        circulatingSupply.parentNode?.nextSibling?.firstChild,
+      ).toHaveTextContent(
+        toLocaleFixed(
+          parameter.circulatingSupply / 10 ** parameter.precision,
+          parameter.precision,
+        ),
+      );
       expect(
         initialSupply.parentNode?.nextSibling?.firstChild,
       ).toHaveTextContent(
@@ -193,7 +198,7 @@ describe('Component: TransactionContractComponents', () => {
       })[0];
       const canDelegate = screen.getByText(/Can Delegate/i);
       const comission = screen.getByText(/Comission/i);
-      const maxDelegationAmount = screen.getByText(/Max Delegation/i);
+      const maxDelegationAmount = screen.getByText(/Max Delegation Amount/i);
       const reward = screen.getByText(/Reward/i);
       const rewardLink = screen.getAllByRole('link', {
         name: parameter.config.rewardAddress,
@@ -211,7 +216,7 @@ describe('Component: TransactionContractComponents', () => {
       );
       expect(comission).toBeInTheDocument();
       expect(comission.parentNode?.nextSibling?.firstChild).toHaveTextContent(
-        '5%',
+        String(parameter.config.commission),
       );
       expect(maxDelegationAmount).toBeInTheDocument();
       expect(
@@ -232,7 +237,7 @@ describe('Component: TransactionContractComponents', () => {
   });
 
   describe('When contract is "Freeze"', () => {
-    it('Should render "Amount" and "Bucket ID" with all it\'s values', () => {
+    it('Should render "Owner" with link, "Amount" and "Bucket ID" with all it\'s values', () => {
       renderWithTheme(
         <Freeze {...mockedTxContractComponents.freezeContract} receipts={[]} />,
       );
@@ -241,11 +246,18 @@ describe('Component: TransactionContractComponents', () => {
         freezeContract: { sender, parameter },
       } = mockedTxContractComponents;
 
+      const owner = screen.getByText(/Owner/i);
+      const ownerLink = screen.getByRole('link', { name: sender });
       const amount = screen.getByText(/Amount/i);
       const bucketId = screen.getByText(/Bucket ID/i);
+
+      expect(owner).toBeInTheDocument();
+      expect(ownerLink).toBeInTheDocument();
+      expect(ownerLink).toHaveTextContent(sender);
+      expect(ownerLink).toHaveAttribute('href', `/account/${sender}`);
       expect(amount).toBeInTheDocument();
       expect(amount.parentNode?.nextSibling?.firstChild).toHaveTextContent(
-        '700.000000',
+        parameter.amount.toLocaleString(),
       );
       expect(bucketId).toBeInTheDocument();
       expect(bucketId.parentNode?.nextSibling?.firstChild).toBeNull();
@@ -253,7 +265,7 @@ describe('Component: TransactionContractComponents', () => {
   });
 
   describe('When contract is "Unfreeze"', () => {
-    it('Should render "Amount" and "Bucket ID" with all it\'s values', () => {
+    it('Should render "Owner" with link, "Amount" and "Bucket ID" with all it\'s values', () => {
       renderWithTheme(
         <Unfreeze
           {...mockedTxContractComponents.unfreezeContract}
@@ -265,9 +277,15 @@ describe('Component: TransactionContractComponents', () => {
         unfreezeContract: { sender, parameter },
       } = mockedTxContractComponents;
 
+      const owner = screen.getByText(/Owner/i);
+      const ownerLink = screen.getByRole('link', { name: sender });
       const assetId = screen.getByText(/Asset ID/i);
       const bucketId = screen.getByText(/Bucket ID/i);
 
+      expect(owner).toBeInTheDocument();
+      expect(ownerLink).toBeInTheDocument();
+      expect(ownerLink).toHaveTextContent(sender);
+      expect(ownerLink).toHaveAttribute('href', `/account/${sender}`);
       expect(assetId).toBeInTheDocument();
       expect(assetId.parentNode?.nextSibling?.firstChild).toHaveTextContent(
         parameter.assetId,
@@ -382,18 +400,6 @@ describe('Component: TransactionContractComponents', () => {
     });
   });
 
-  describe('When contract is "Unjail"', () => {
-    it('Should render "Unjail Type"', () => {
-      renderWithTheme(
-        <Unjail {...mockedTxContractComponents.unjailContract} receipts={[]} />,
-      );
-      const typeLabel = screen.getByText(/Type/i);
-      const type = screen.getByText('Unjail');
-      expect(typeLabel).toBeInTheDocument();
-      expect(type).toBeInTheDocument();
-    });
-  });
-
   describe('When contract is "Proposal"', () => {
     it('Should render "Value" and "Epoch Duration" with all it\'s values', () => {
       renderWithTheme(
@@ -406,13 +412,15 @@ describe('Component: TransactionContractComponents', () => {
       const {
         proposalContract: { parameter },
       } = mockedTxContractComponents;
-      const epochDuration = screen.getByText(/Epoch Duration/i);
-      const proposalParam = screen.getByText(/KApp Fee for Proposal/i);
-      expect(proposalParam).toBeInTheDocument();
-      const proposalValue = screen.getByText('50000000000');
-      expect(proposalValue).toBeInTheDocument();
 
+      const value = screen.getByText(/Value/i);
+      const epochDuration = screen.getByText(/Epoch Duration/i);
+
+      expect(value).toBeInTheDocument();
       expect(epochDuration).toBeInTheDocument();
+      expect(value.parentNode?.nextSibling?.firstChild).toHaveTextContent(
+        `${parameter.value}`,
+      );
       expect(
         epochDuration.parentNode?.nextSibling?.firstChild,
       ).toHaveTextContent(`${parameter.epochsDuration}`);
@@ -437,7 +445,9 @@ describe('Component: TransactionContractComponents', () => {
       expect(proposalId.parentNode?.nextSibling?.firstChild).toHaveTextContent(
         `${parameter.proposalId}`,
       );
-      expect(amount.parentNode?.nextSibling?.firstChild).toHaveTextContent('4');
+      expect(amount.parentNode?.nextSibling?.firstChild).toHaveTextContent(
+        `${parameter.amount}`,
+      );
     });
   });
 
@@ -482,95 +492,64 @@ describe('Component: TransactionContractComponents', () => {
       } = mockedTxContractComponents;
 
       const assetId = screen.getByText(/Asset Id/i);
+      const price = screen.getByText(/Price/i);
 
       expect(assetId).toBeInTheDocument();
+      expect(price).toBeInTheDocument();
       expect(assetId.parentNode?.nextSibling?.firstChild).toHaveTextContent(
         `${parameter.assetId}`,
+      );
+      expect(price.parentNode?.nextSibling?.firstChild).toHaveTextContent(
+        `${parameter.packInfo.price}`,
       );
     });
   });
 
   describe('When contract is "Buy"', () => {
-    it('Should render "Buy Type" and "Id" with all it\'s values', async () => {
-      const spy = jest.spyOn(utils, 'getPrecision');
-      spy.mockReturnValue(new Promise(resolve => resolve(6)));
-      await act(async () => {
-        renderWithTheme(
-          <Buy
-            {...mockedTxContractComponents.buyContract}
-            receipts={mockedTxContractComponents.ITOBuyReceipts}
-            contracts={[mockedTxContractComponents.buyContract]}
-          />,
-        );
-      });
+    it('Should render "Buy Type" and "Id" with all it\'s values', () => {
+      renderWithTheme(
+        <Buy {...mockedTxContractComponents.buyContract} receipts={[]} />,
+      );
 
       const {
         buyContract: { parameter },
       } = mockedTxContractComponents;
 
-      const buyTypeLabel = screen.getByText(/Buy Type/i);
-      const idLabel = screen.getByText('Id');
-      const currencyIDLabel = screen.getByText('Currency Id');
-      const amountLabel = screen.getByText(/Amount/i);
-      const priceLabel = screen.getByText(/Price/i);
+      const buyType = screen.getByText(/Buy Type/i);
+      const id = screen.getByText(/Id/i);
 
-      expect(buyTypeLabel).toBeInTheDocument();
-      expect(idLabel).toBeInTheDocument();
-      expect(currencyIDLabel).toBeInTheDocument();
-      expect(amountLabel).toBeInTheDocument();
-      expect(priceLabel).toBeInTheDocument();
-
-      const buyType = screen.getByText(/ITOBuy/i);
-      const id = screen.getByText(/1bcf565e5263856f/i);
-      const currencyID = screen.getByText(/KLV/i);
-
-      await waitFor(() => {
-        const amount = screen.getByText('320');
-        expect(amount).toBeInTheDocument();
-        const price = screen.getByText('20');
-        expect(price).toBeInTheDocument();
-      });
       expect(buyType).toBeInTheDocument();
       expect(id).toBeInTheDocument();
-      expect(currencyID).toBeInTheDocument();
-
-      spy.mockRestore();
+      expect(buyType.parentNode?.nextSibling?.firstChild).toHaveTextContent(
+        `${parameter.buyType}`,
+      );
+      expect(id.parentNode?.nextSibling?.firstChild).toHaveTextContent(
+        `${parameter.id}`,
+      );
     });
   });
 
   describe('When contract is "Sell"', () => {
-    it('Should render "Market Type" and "Asset Id" with all it\'s values', async () => {
-      const spyPrecision = jest.spyOn(utils, 'getPrecision');
-      spyPrecision.mockReturnValue(new Promise(resolve => resolve(6)));
+    it('Should render "Market Type" and "Asset Id" with all it\'s values', () => {
+      renderWithTheme(
+        <Sell {...mockedTxContractComponents.sellContract} receipts={[]} />,
+      );
 
-      const spyFormat = jest.spyOn(fnsCopySpy, 'format');
-      spyFormat.mockReturnValue('14/11/2023 18:52');
+      const {
+        sellContract: { parameter },
+      } = mockedTxContractComponents;
 
-      await act(async () => {
-        renderWithTheme(
-          <Sell {...mockedTxContractComponents.sellContract} receipts={[]} />,
-        );
-      });
+      const marketType = screen.getByText(/Market Type/i);
+      const assetId = screen.getByText(/Asset Id/i);
 
-      const assetId = screen.getByText('KPNFT-13Z0/9016');
-      const currencyID = screen.getByText('KLV');
-      const endTime = screen.getByText('14/11/2023 18:52');
-      const marketType = screen.getByText('BuyItNowMarket');
-      const marketplaceID = screen.getByText('d4f2bab340c55fde');
-      const price = screen.getByText('450.000000');
-
-      const values = [
-        assetId,
-        currencyID,
-        endTime,
-        marketType,
-        marketplaceID,
-        price,
-      ];
-
-      values.forEach(value => {
-        expect(value).toBeInTheDocument();
-      });
+      expect(marketType).toBeInTheDocument();
+      expect(assetId).toBeInTheDocument();
+      expect(marketType.parentNode?.nextSibling?.firstChild).toHaveTextContent(
+        `${parameter.marketType}`,
+      );
+      expect(assetId.parentNode?.nextSibling?.firstChild).toHaveTextContent(
+        `${parameter.assetId}`,
+      );
     });
   });
 
@@ -587,11 +566,12 @@ describe('Component: TransactionContractComponents', () => {
         cancelMarketOrderContract: { parameter },
       } = mockedTxContractComponents;
 
-      const orderIdLabel = screen.getByText(/Order Id/i);
+      const orderId = screen.getByText(/Order Id/i);
 
-      expect(orderIdLabel).toBeInTheDocument();
-      const orderId = screen.getByText('asdkanslkdmaisdjqpwdknajsndidj234');
       expect(orderId).toBeInTheDocument();
+      expect(orderId.parentNode?.nextSibling?.firstChild).toHaveTextContent(
+        `${parameter.orderId}`,
+      );
     });
   });
 
@@ -636,8 +616,9 @@ describe('Component: TransactionContractComponents', () => {
       } = mockedTxContractComponents;
 
       const name = screen.getByText(/Name/i);
-      const marketId = screen.getByText(/Marketplace Id/i);
+      const marketId = screen.getByText(/Market Id/i);
       const address = screen.getByText(/Address/i);
+
       expect(name).toBeInTheDocument();
       expect(marketId).toBeInTheDocument();
       expect(address).toBeInTheDocument();
@@ -645,7 +626,7 @@ describe('Component: TransactionContractComponents', () => {
         `${parameter.name}`,
       );
       expect(marketId.parentNode?.nextSibling?.firstChild).toHaveTextContent(
-        `${parameter.marketplaceID}`,
+        `${parameter.marketplaceId}`,
       );
       expect(address.parentNode?.nextSibling?.firstChild).toHaveTextContent(
         `${parameter.referralAddress}`,
@@ -698,7 +679,7 @@ describe('Component: TransactionContractComponents', () => {
       );
 
       const { parameter } = mockedTxContractComponents.setAccountNameContract;
-      const name = screen.getByText('Name');
+      const name = screen.getByText(/Name/i);
 
       expect(name).toBeInTheDocument();
       expect(name.parentNode?.nextSibling).toHaveTextContent(parameter.name);

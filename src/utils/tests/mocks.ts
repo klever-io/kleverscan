@@ -1,7 +1,6 @@
-import { Contract } from '@/types/contracts';
-import { IAsset, ITransactionResponse } from '@/types/index';
+import { Contract, ITransactionResponse } from '@/types/index';
 
-const KFI: IAsset = {
+const KFI = {
   assetType: 'Fungible',
   assetId: 'KFI',
   name: 'KLEVER FINANCE',
@@ -25,7 +24,7 @@ const KFI: IAsset = {
   mintedValue: 21000000000000,
   burnedValue: 0,
   issueDate: 0,
-  royalties: {},
+  royalties: 0,
   staking: {
     interestType: 'FPRI',
     apr: [],
@@ -60,7 +59,7 @@ const KFI: IAsset = {
   verified: false,
 };
 
-const DVK: IAsset = {
+const DVK = {
   assetType: 'NonFungible',
   assetId: 'DVK-f67214',
   name: 'Devikins',
@@ -78,12 +77,10 @@ const DVK: IAsset = {
   mintedValue: 5,
   burnedValue: 0,
   issueDate: 0,
-  royalties: {},
+  royalties: 0,
   staking: {
     minEpochsToWithdraw: 2,
     totalStaked: 1234567,
-    interestType: 'APRI',
-    apr: [],
     fpr: [
       {
         totalAmount: 0,
@@ -92,9 +89,6 @@ const DVK: IAsset = {
         TotalClaimed: 0,
       },
     ],
-    currentFPRAmount: 0,
-    minEpochsToClaim: 0,
-    minEpochsToUnstake: 0,
   },
   properties: {
     canFreeze: true,
@@ -114,7 +108,7 @@ const DVK: IAsset = {
   verified: false,
 };
 
-const SNTEST: IAsset = {
+const SNTEST = {
   assetType: 'NonFungible',
   assetId: 'SNTEST-4c9dd8',
   name: 'SNTEST',
@@ -132,7 +126,7 @@ const SNTEST: IAsset = {
   mintedValue: 4,
   burnedValue: 0,
   issueDate: 0,
-  royalties: {},
+  royalties: 0,
   staking: {
     minEpochsToWithdraw: 2,
     totalStaked: 1234567,
@@ -144,11 +138,6 @@ const SNTEST: IAsset = {
         TotalClaimed: 0,
       },
     ],
-    apr: [],
-    interestType: 'APRI',
-    currentFPRAmount: 0,
-    minEpochsToClaim: 0,
-    minEpochsToUnstake: 0,
   },
   properties: {
     canFreeze: false,
@@ -179,7 +168,7 @@ const SNTEST: IAsset = {
   verified: false,
 };
 
-const specialAsset: IAsset = {
+const specialAsset = {
   assetType: 'test',
   assetId: 'some id, that/ need"s: @ encoding ?? ?',
   name: 'test',
@@ -197,15 +186,10 @@ const specialAsset: IAsset = {
   mintedValue: 4,
   burnedValue: 0,
   issueDate: 0,
-  royalties: {},
+  royalties: 0,
   staking: {
     minEpochsToWithdraw: 2,
     totalStaked: 1234567,
-    currentFPRAmount: 0,
-    interestType: 'APRI',
-    minEpochsToClaim: 0,
-    minEpochsToUnstake: 0,
-    apr: [],
     fpr: [
       {
         totalAmount: 0,
@@ -770,7 +754,7 @@ const addressList = {
   error: '',
   code: 'successful',
 };
-const assets: IAsset[] = [KFI, DVK, SNTEST, specialAsset];
+const assets: any[] = [KFI, DVK, SNTEST, specialAsset];
 
 const mocks = {
   assets,

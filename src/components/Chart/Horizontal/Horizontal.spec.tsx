@@ -12,12 +12,6 @@ const nodes = [
   { name: 'Others', value: 7 },
 ];
 
-global.ResizeObserver = jest.fn().mockImplementation(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-}));
-
 describe('Horizontal Chart', () => {
   const mockedClientHeight = 100;
   const mockedClientWidth = 100;

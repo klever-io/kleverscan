@@ -541,7 +541,7 @@ export const klvAsset: IAsset = {
   initialSupply: 0,
   circulatingSupply: 0,
   maxSupply: 0,
-  royalties: 0,
+  royalties: {},
   mintedValue: 0,
   issueDate: 0,
   burnedValue: 0,
@@ -561,15 +561,23 @@ export const klvAsset: IAsset = {
     isPaused: false,
   },
   staking: {
-    minEpochsToWithdraw: 0,
-    totalStaked: 0,
+    interestType: 'FPRI',
+    totalStaked: 130000000000000,
+    currentFPRAmount: 0,
+    minEpochsToClaim: 1,
+    minEpochsToUnstake: 1,
+    minEpochsToWithdraw: 2,
     fpr: [
       {
         totalAmount: 313000000000,
         totalStaked: 213000000000,
+        TotalClaimed: 0,
+        epoch: 0,
       },
     ],
+    apr: [],
   },
+  roles: [],
 };
 
 export const mockedHolders: IAccountAsset[] = [

@@ -220,6 +220,47 @@ export interface IAssetsHoldersResponse extends IResponse {
   pagination: IPagination;
 }
 
+export interface IRoyalties {
+  address?: string;
+  marketPercentage?: number;
+  transferFixed?: number;
+  transferPercentage?: [
+    {
+      amount: number;
+      percentage: number;
+    },
+  ];
+}
+
+export interface IRole {
+  address: string;
+  hasRoleMint: boolean;
+  hasRoleSetITOPrices: boolean;
+}
+
+export interface IStaking {
+  interestType: string;
+  minEpochsToWithdraw: number;
+  totalStaked: number;
+  apr:
+    | {
+        timestamp: number;
+        epoch: number;
+        value: number;
+      }[]
+    | [];
+
+  fpr: {
+    totalAmount: number;
+    totalStaked: number;
+    TotalClaimed: number;
+    epoch: number;
+  }[];
+  currentFPRAmount: number;
+  minEpochsToClaim: number;
+  minEpochsToUnstake: number;
+}
+
 export interface IAsset {
   assetType: string;
   assetId: string;
@@ -232,40 +273,11 @@ export interface IAsset {
   initialSupply: number;
   circulatingSupply: number;
   maxSupply: number;
-  royalties: {
-    address: string;
-    marketPercentage: number;
-    transferFixed: number;
-    transferPercentage: [
-      {
-        amount: number;
-        percentage: number;
-      },
-    ];
-  };
+  royalties: IRoyalties;
   mintedValue: number;
   issueDate: number;
-  staking: {
-    interestType: string;
-    minEpochsToWithdraw: number;
-    totalStaked: number;
-    apr: [
-      {
-        timestamp: number;
-        epoch: number;
-        value: number;
-      },
-    ];
-    fpr: {
-      totalAmount: number;
-      totalStaked: number;
-      TotalClaimed: number;
-      epoch: number;
-    }[];
-    currentFPRAmount: number;
-    minEpochsToClaim: number;
-    minEpochsToUnstake: number;
-  };
+  staking: IStaking;
+  roles?: IRole[];
   burnedValue: number;
   properties: {
     canFreeze: boolean;

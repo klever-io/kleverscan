@@ -1,7 +1,7 @@
 import { Contract } from '@/types/contracts';
 import { IAsset, ITransactionResponse } from '@/types/index';
 
-const KFI = {
+const KFI: IAsset = {
   assetType: 'Fungible',
   assetId: 'KFI',
   name: 'KLEVER FINANCE',
@@ -25,7 +25,7 @@ const KFI = {
   mintedValue: 21000000000000,
   burnedValue: 0,
   issueDate: 0,
-  royalties: 0,
+  royalties: {},
   staking: {
     interestType: 'FPRI',
     apr: [],
@@ -60,7 +60,7 @@ const KFI = {
   verified: false,
 };
 
-const DVK = {
+const DVK: IAsset = {
   assetType: 'NonFungible',
   assetId: 'DVK-f67214',
   name: 'Devikins',
@@ -78,10 +78,12 @@ const DVK = {
   mintedValue: 5,
   burnedValue: 0,
   issueDate: 0,
-  royalties: 0,
+  royalties: {},
   staking: {
     minEpochsToWithdraw: 2,
     totalStaked: 1234567,
+    interestType: 'APRI',
+    apr: [],
     fpr: [
       {
         totalAmount: 0,
@@ -90,6 +92,9 @@ const DVK = {
         TotalClaimed: 0,
       },
     ],
+    currentFPRAmount: 0,
+    minEpochsToClaim: 0,
+    minEpochsToUnstake: 0,
   },
   properties: {
     canFreeze: true,
@@ -109,7 +114,7 @@ const DVK = {
   verified: false,
 };
 
-const SNTEST = {
+const SNTEST: IAsset = {
   assetType: 'NonFungible',
   assetId: 'SNTEST-4c9dd8',
   name: 'SNTEST',
@@ -127,7 +132,7 @@ const SNTEST = {
   mintedValue: 4,
   burnedValue: 0,
   issueDate: 0,
-  royalties: 0,
+  royalties: {},
   staking: {
     minEpochsToWithdraw: 2,
     totalStaked: 1234567,
@@ -139,6 +144,11 @@ const SNTEST = {
         TotalClaimed: 0,
       },
     ],
+    apr: [],
+    interestType: 'APRI',
+    currentFPRAmount: 0,
+    minEpochsToClaim: 0,
+    minEpochsToUnstake: 0,
   },
   properties: {
     canFreeze: false,
@@ -169,7 +179,7 @@ const SNTEST = {
   verified: false,
 };
 
-const specialAsset = {
+const specialAsset: IAsset = {
   assetType: 'test',
   assetId: 'some id, that/ need"s: @ encoding ?? ?',
   name: 'test',
@@ -187,10 +197,15 @@ const specialAsset = {
   mintedValue: 4,
   burnedValue: 0,
   issueDate: 0,
-  royalties: 0,
+  royalties: {},
   staking: {
     minEpochsToWithdraw: 2,
     totalStaked: 1234567,
+    currentFPRAmount: 0,
+    interestType: 'APRI',
+    minEpochsToClaim: 0,
+    minEpochsToUnstake: 0,
+    apr: [],
     fpr: [
       {
         totalAmount: 0,

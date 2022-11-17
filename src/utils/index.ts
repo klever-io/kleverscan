@@ -682,7 +682,8 @@ export const parseHolders = (
       return {
         index,
         address: holder.address,
-        balance: holder.frozenBalance + holder.balance,
+        balance: 0,
+        frozenBalance: holder.frozenBalance,
         rank: index + 1 + (pagination.self - 1) * pagination.perPage,
       };
     } else
@@ -690,6 +691,7 @@ export const parseHolders = (
         index,
         address: '',
         balance: 0,
+        frozenBalance: 0,
         rank: 0,
       };
   });

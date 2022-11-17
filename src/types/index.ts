@@ -193,6 +193,7 @@ export interface IHolder {
 export interface IBalance {
   address: string;
   balance: number;
+  frozenBalance: number;
   index: number;
   rank: number;
 }

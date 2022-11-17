@@ -1,4 +1,5 @@
-import { Contract, IAsset, ITransactionResponse } from '@/types/index';
+import { Contract } from '@/types/contracts';
+import { IAsset, ITransactionResponse } from '@/types/index';
 
 const KFI = {
   assetType: 'Fungible',

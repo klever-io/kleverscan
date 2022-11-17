@@ -2,7 +2,6 @@ import { KLV } from '@/assets/coins';
 import {
   IAssetTriggerContract,
   IBuyContractPayload,
-  IBuyReceipt,
   ICancelMarketOrderContract,
   IClaimContract,
   IConfigITOContract,
@@ -10,33 +9,51 @@ import {
   IContract,
   IContractBuyProps,
   ICreateAssetContract,
-  ICreateAssetReceipt,
   ICreateMarketplaceContract,
   ICreateValidatorContract,
   IDelegateContract,
+  IDepositContract,
   IFreezeContract,
-  IFreezeReceipt,
+  IITOTriggerContract,
   IProposalContract,
   ISellContract,
   ISetAccountNameContract,
   ISetITOPricesContract,
+  ITOTriggerType,
   ITransferContract,
   IUndelegateContract,
   IUnfreezeContract,
-  IUnfreezeReceipt,
+  IUpdateAccountPermissionContract,
   IValidatorConfig,
   IVoteContract,
   IWithdrawContract,
+} from '@/types/contracts';
+import {
+  IBuyReceipt,
+  ICreateAssetReceipt,
+  IFreezeReceipt,
+  IUnfreezeReceipt,
 } from '@/types/index';
 import { findKey, findReceipt } from '@/utils/findKey';
-import { getPrecision, toLocaleFixed } from '@/utils/index';
+import {
+  calculatePermissionOperations,
+  getPrecision,
+  toLocaleFixed,
+} from '@/utils/index';
 import { getProposalNetworkParams } from '@/utils/parametersProposal';
 import {
   BalanceContainer,
-  NetworkParamsContainer,
+  FrozenContainer,
   RowContent,
-} from '@/views/proposals/detail';
-import { CenteredRow, Row } from '@/views/transactions/detail';
+} from '@/views/accounts/detail';
+import { NetworkParamsContainer } from '@/views/proposals/detail';
+import {
+  CenteredRow,
+  HeaderWrapper,
+  Hr,
+  NestedContainerWrapper,
+  Row,
+} from '@/views/transactions/detail';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import Copy from '../Copy';
@@ -1363,6 +1380,408 @@ export const ConfigMarketplace: React.FC<IContract> = ({ parameter: par }) => {
         </span>
         <span>{parameter?.referralPercentage / 100}%</span>
       </Row>
+    </>
+  );
+};
+
+export const UpdateAccountPermission: React.FC<IContract> = ({
+  parameter: par,
+}) => {
+  const parameter = par as IUpdateAccountPermissionContract;
+  const permission = parameter?.permissions[0];
+  const operations = calculatePermissionOperations(permission?.operations);
+  const signers = permission?.signers || [];
+  return (
+    <>
+      <Row>
+        <span>
+          <strong>Type</strong>
+        </span>
+        <strong>Update Account Permission</strong>
+      </Row>
+      <Row>
+        <span>
+          <strong>Permission Name</strong>
+        </span>
+        <span>{permission?.permissionName ?? ''}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Permission Type</strong>
+        </span>
+        <span>{permission?.type ?? ''}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Threshold</strong>
+        </span>
+        <span>{permission?.threshold ?? ''}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Operations</strong>
+        </span>
+        <RowContent>
+          <BalanceContainer>
+            <FrozenContainer>
+              {operations.map(operation => (
+                <div key={operation}>{operation}</div>
+              ))}
+            </FrozenContainer>
+          </BalanceContainer>
+        </RowContent>
+      </Row>
+      <Row>
+        <span>
+          <strong>Signers</strong>
+        </span>
+        <RowContent>
+          <BalanceContainer>
+            <FrozenContainer>
+              {signers.map((signer, index) => (
+                <div
+                  style={{ flexDirection: 'column', alignItems: 'start' }}
+                  key={index}
+                >
+                  <span style={{ maxWidth: '100%' }}>
+                    <a href={`/account/${signer?.address}`}>
+                      <strong>{signer.address ?? ''}</strong>
+                    </a>
+                  </span>
+                  <span>
+                    {' '}
+                    Weight:
+                    <strong style={{ color: 'white' }}>
+                      {' '}
+                      {signer.weight ?? ''}
+                    </strong>
+                  </span>
+                </div>
+              ))}
+            </FrozenContainer>
+          </BalanceContainer>
+        </RowContent>
+      </Row>
+    </>
+  );
+};
+
+export const Deposit: React.FC<IContract> = ({ parameter: par }) => {
+  const parameter = par as IDepositContract;
+  const [precision, setPrecision] = useState(6);
+
+  useEffect(() => {
+    const getAssetPrecision = async () => {
+      setPrecision((await getPrecision(parameter?.currencyID || 'KLV')) ?? 6);
+    };
+
+    if (parameter?.currencyID === 'KFI') {
+      setPrecision(6);
+      return;
+    }
+
+    getAssetPrecision();
+  }, []);
+
+  return (
+    <>
+      <Row>
+        <span>
+          <strong>Type</strong>
+        </span>
+        <strong>Deposit</strong>
+      </Row>
+      <Row>
+        <span>
+          <strong>Deposit Type</strong>
+        </span>
+        <span>{parameter?.depositTypeString}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Id</strong>
+        </span>
+        <span>{parameter?.id}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Amount</strong>
+        </span>
+        <span>{parameter?.amount / 10 ** precision}</span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Currency Id</strong>
+        </span>
+        <span>{parameter?.currencyID}</span>
+      </Row>
+    </>
+  );
+};
+
+export const ITOTrigger: React.FC<IContract> = ({ parameter: par }) => {
+  const parameter = par as IITOTriggerContract;
+
+  const packInfo = parameter?.packInfo || [];
+  const whitelistInfo = parameter?.whitelistInfo || [];
+
+  const getInitialPacksPrecisions = () => {
+    const initialPacksPrecisions = [];
+    for (let index = 0; index < packInfo.length; index++) {
+      initialPacksPrecisions.push({ value: 0 });
+    }
+    return initialPacksPrecisions;
+  };
+
+  const [precision, setPrecision] = useState(0);
+
+  type PacksPrecision =
+    | PromiseSettledResult<number | undefined>[]
+    | { value: number }[];
+
+  const [packsPrecision, setPacksPrecision] = useState<PacksPrecision>(
+    getInitialPacksPrecisions(),
+  );
+
+  useEffect(() => {
+    const getAssetPrecision = async () => {
+      setPrecision((await getPrecision(parameter?.assetID || 'KLV')) ?? 6);
+    };
+
+    if (parameter?.assetID === 'KFI') {
+      setPrecision(6);
+      return;
+    }
+
+    const getPacksPrecision = async () => {
+      const promises = packInfo.map(pack => {
+        return getPrecision(pack.key);
+      });
+      const result = await Promise.allSettled(promises);
+      setPacksPrecision(result);
+    };
+    getPacksPrecision();
+    getAssetPrecision();
+  }, []);
+
+  const renderPackPrecision = (price: number, index: number) => {
+    try {
+      const promiseResult = packsPrecision[
+        index
+      ] as PromiseSettledResult<number>;
+      if (promiseResult.status === 'fulfilled') {
+        return price / 10 ** promiseResult?.value || 0;
+      }
+    } catch (error) {
+      return '';
+    }
+  };
+
+  const renderMaxAmount = () => {
+    if (typeof parameter?.maxAmount === 'number') {
+      return parameter.maxAmount / 10 ** precision;
+    }
+    return '';
+  };
+
+  const renderWhiteListInfo = () => {
+    return (
+      <Row>
+        <span>
+          <strong>White List Info</strong>
+        </span>
+        <RowContent>
+          <BalanceContainer>
+            <FrozenContainer>
+              {whitelistInfo.map((info, index) => (
+                <section key={info.address}>
+                  <div key={info.address}>
+                    <strong>Address</strong>
+                    <span>{info.address}</span>
+                  </div>
+                  <div>
+                    <strong>Limit</strong>
+                    <span>{info.limit}</span>
+                  </div>
+                  {index < whitelistInfo.length - 1 && <Hr />}
+                </section>
+              ))}
+            </FrozenContainer>
+          </BalanceContainer>
+        </RowContent>
+      </Row>
+    );
+  };
+
+  const renderTriggerTypeData = () => {
+    const triggerType = parameter?.triggerType;
+
+    switch (triggerType) {
+      case ITOTriggerType.SetITOPrices:
+        return (
+          <Row>
+            <NestedContainerWrapper>
+              {packInfo.map((pack, index) => (
+                <HeaderWrapper key={index}>
+                  <span>
+                    <strong>Pack Info</strong>
+                  </span>
+                  <RowContent>
+                    <BalanceContainer>
+                      <FrozenContainer>
+                        <section key={index}>
+                          <div>
+                            <strong>KDA</strong>
+                            <span>{pack.key}</span>
+                          </div>
+                          <Hr />
+                          {pack.packs.map((pack2, index2) => (
+                            <section key={index2}>
+                              <div>
+                                <strong>Amount</strong>
+                                <span>{pack2.amount / 10 ** precision}</span>
+                              </div>
+                              <div>
+                                <strong>Price</strong>
+                                <span>
+                                  {renderPackPrecision(pack2.price, index)}
+                                </span>
+                              </div>
+                              {index2 < pack.packs.length - 1 && <Hr />}
+                            </section>
+                          ))}
+                        </section>
+                      </FrozenContainer>
+                    </BalanceContainer>
+                  </RowContent>
+                </HeaderWrapper>
+              ))}
+            </NestedContainerWrapper>
+          </Row>
+        );
+      case ITOTriggerType.UpdateStatus:
+        return (
+          <Row>
+            <span>
+              <strong>Status</strong>
+            </span>
+            <span>{parameter?.status}</span>
+          </Row>
+        );
+      case ITOTriggerType.UpdateReceiverAddress:
+        return (
+          <Row>
+            <span>
+              <strong>Receiver Address</strong>
+            </span>
+            <span>{parameter?.receiverAddress}</span>
+          </Row>
+        );
+      case ITOTriggerType.UpdateMaxAmount:
+        return (
+          <Row>
+            <span>
+              <strong>Max Amount</strong>
+            </span>
+            <span>{renderMaxAmount()}</span>
+          </Row>
+        );
+      case ITOTriggerType.UpdateDefaultLimitPerAddress:
+        return (
+          <Row>
+            <span>
+              <strong>
+                Default Limit
+                <br />
+                per Address
+              </strong>
+            </span>
+            <span>{parameter?.defaultLimitPerAddress}</span>
+          </Row>
+        );
+      case ITOTriggerType.UpdateTimes:
+        return (
+          <>
+            <Row>
+              <span>
+                <strong>Start Time</strong>
+              </span>
+              <span>{parameter?.startTime}</span>
+            </Row>
+            <Row>
+              <span>
+                <strong>End time</strong>
+              </span>
+              <span>{parameter?.endTime}</span>
+            </Row>
+          </>
+        );
+      case ITOTriggerType.UpdateWhitelistStatus:
+        return (
+          <Row>
+            <span>
+              <strong>White List Status</strong>
+            </span>
+            <span>{parameter?.whitelistStatus}</span>
+          </Row>
+        );
+      case ITOTriggerType.AddToWhitelist:
+        return renderWhiteListInfo();
+      case ITOTriggerType.RemoveFromWhitelist:
+        return renderWhiteListInfo();
+      case ITOTriggerType.WipeWhitelist:
+        break;
+      case ITOTriggerType.UpdateWhitelistTimes:
+        return (
+          <>
+            <Row>
+              <span>
+                <strong>
+                  White List
+                  <br />
+                  Start Time
+                </strong>
+              </span>
+              <span>{parameter?.whitelistStartTime}</span>
+            </Row>
+            <Row>
+              <span>
+                <strong>
+                  White List
+                  <br />
+                  End Time
+                </strong>
+              </span>
+              <span>{parameter?.whitelistEndTime}</span>
+            </Row>
+          </>
+        );
+      default:
+        break;
+    }
+  };
+
+  return (
+    <>
+      <Row>
+        <span>
+          <strong>Type</strong>
+        </span>
+        <strong>ITO Trigger</strong>
+      </Row>
+      <Row>
+        <span>
+          <strong>Trigger Type</strong>
+        </span>
+        <strong>{parameter?.triggerType}</strong>
+      </Row>
+      <Row>
+        <span>
+          <strong>Asset Id</strong>
+        </span>
+        <span>{parameter?.assetID}</span>
+      </Row>
+      {renderTriggerTypeData()}
     </>
   );
 };

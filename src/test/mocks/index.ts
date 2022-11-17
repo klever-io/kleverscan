@@ -1,16 +1,18 @@
 import {
-  Contract,
-  EnumAssetType,
-  EnumBuyType,
-  EnumClaimType,
-  EnumITOStatus,
-  EnumMarketType,
   IAccountAsset,
   IAsset,
   IDataCards,
   IHomeTransactions,
   ITransaction,
 } from '../../types';
+import {
+  Contract,
+  EnumAssetType,
+  EnumBuyType,
+  EnumClaimType,
+  EnumITOStatus,
+  EnumMarketType,
+} from '../../types/contracts';
 
 export const CoinTest = [
   {

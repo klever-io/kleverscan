@@ -6,13 +6,13 @@ import {
   ToggleContainer,
 } from '@/components/Form/FormInput/styles';
 import { ICollectionList, IKAssets, IParamList } from '@/types/index';
-import formSection from '@/utils/formSections';
 import {
   assetTriggerTypes,
   claimTypes,
   contractOptions,
-  parseAddress,
-} from '@/utils/index';
+} from '@/utils/contracts';
+import formSection from '@/utils/formSections';
+import { parseAddress } from '@/utils/index';
 import { Card } from '@/views/blocks';
 import { core } from '@klever/sdk';
 import Form, { ISection } from 'components/Form';

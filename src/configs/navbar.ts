@@ -1,6 +1,5 @@
 import {
   Category,
-  Compass,
   Graph,
   Proposal,
   Send,
@@ -50,11 +49,11 @@ const navbarItems: INavbarItem[] = [
     pathTo: '',
     Icon: Graph,
     pages: [
-      {
-        name: 'Nodes',
-        pathTo: '/nodes',
-        Icon: Compass,
-      },
+      // {
+      //   name: 'Nodes',
+      //   pathTo: '/nodes',
+      //   Icon: Compass,
+      // },
       {
         name: 'Proposals',
         pathTo: '/proposals',

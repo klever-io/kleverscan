@@ -29,26 +29,26 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback } from 'react';
 import {
+  Contract,
+  ContractsIndex,
   IAsset,
+  IContract,
   IPagination,
   IResponse,
   IRowSection,
   ITransaction,
-} from '../../types';
-import {
-  Contract,
-  ContractsIndex,
-  IContract,
   ITransferContract,
   ReducedContract,
-} from '../../types/contracts';
-import { capitalizeString, formatAmount, parseAddress } from '../../utils';
+} from '../../types';
 import {
+  capitalizeString,
   contractTypes,
   filteredSections,
+  formatAmount,
   getHeader,
   initialsTableHeaders,
-} from '../../utils/contracts';
+  parseAddress,
+} from '../../utils';
 
 interface ITransactions {
   transactions: ITransaction[];

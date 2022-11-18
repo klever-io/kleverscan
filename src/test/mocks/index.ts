@@ -1,16 +1,16 @@
 import {
+  Contract,
+  EnumAssetType,
+  EnumBuyType,
+  EnumClaimType,
+  EnumITOStatus,
+  EnumMarketType,
   IAccountAsset,
   IAsset,
   IDataCards,
   IHomeTransactions,
   ITransaction,
 } from '../../types';
-import {
-  Contract,
-  EnumAssetType,
-  EnumClaimType,
-  EnumITOStatus,
-} from '../../types/contracts';
 
 export const CoinTest = [
   {
@@ -111,6 +111,7 @@ export const mockedTxContractComponents = {
       ownerAddress:
         'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
       precision: 6,
+      circulatingSupply: 10000000000,
       initialSupply: 1000000,
       maxSupply: 3000000000000000,
     },
@@ -189,20 +190,12 @@ export const mockedTxContractComponents = {
       id: 'KLV',
     },
   },
-  unjailContract: {
-    type: Contract.Unjail,
-  },
-
   proposalContract: {
     type: Contract.Proposal,
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
     parameter: {
-      description: 'quality proposal',
-      epochsDuration: 40,
-      parameters: {
-        19: '50000000000',
-        amount: 4000000,
-      },
+      value: 1231,
+      epochsDuration: 100,
     },
   },
   voteContract: {
@@ -233,41 +226,12 @@ export const mockedTxContractComponents = {
   },
   buyContract: {
     type: Contract.Buy,
-    sender: 'klv15lgs4a0qe9ufs5l6qmngnptc76sel0tpgwppsdq9nhfyryp20fcsmcjeny',
+    sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
     parameter: {
-      buyType: 'ITOBuy',
-      id: '1bcf565e5263856f',
-      currencyID: 'KLV',
-      amount: 320000000,
+      buyType: EnumBuyType.ITOBuy,
+      id: 'KLV',
     },
   },
-
-  ITOBuyReceipts: [
-    {
-      signer: 'klv15lgs4a0qe9ufs5l6qmngnptc76sel0tpgwppsdq9nhfyryp20fcsmcjeny',
-      type: 19,
-      weight: '1',
-    },
-    {
-      assetId: 'KLV',
-      from: 'klv15lgs4a0qe9ufs5l6qmngnptc76sel0tpgwppsdq9nhfyryp20fcsmcjeny',
-      to: 'klv1un8gk5mmyhllmsjw8f0d9hyu6wzc590cyvvfuvgndth8w0jthvssquhjlw',
-      type: 0,
-      value: 20000000,
-    },
-    {
-      assetId: 'KID-36W3',
-      type: 2,
-    },
-    {
-      assetId: 'KID-36W3',
-      from: 'klv1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpgm89z',
-      to: 'klv15lgs4a0qe9ufs5l6qmngnptc76sel0tpgwppsdq9nhfyryp20fcsmcjeny',
-      type: 0,
-      value: 1000,
-    },
-  ],
-
   validatorConfigContract: {
     type: Contract.ValidatorConfig,
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
@@ -294,19 +258,15 @@ export const mockedTxContractComponents = {
     type: Contract.Sell,
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
     parameter: {
-      marketType: 'BuyItNowMarket',
-      assetId: 'KPNFT-13Z0/9016',
-      currencyID: 'KLV',
-      endTime: 1699998726,
-      marketplaceID: 'd4f2bab340c55fde',
-      price: 450000000,
+      marketType: EnumMarketType.BuyItNowMarket,
+      assetId: 'KLV',
     },
   },
   cancelMarketOrderContract: {
     type: Contract.CancelMarketOrder,
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
     parameter: {
-      orderID: 'asdkanslkdmaisdjqpwdknajsndidj234',
+      orderId: 'asdkanslkdmaisdjqpwdknajsndidj234',
     },
   },
   createMarketplaceContract: {
@@ -316,18 +276,18 @@ export const mockedTxContractComponents = {
       name: 'kleverPlace',
       referralAddress:
         'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
-      referralpercentage: 100,
+      referralpercentage: 1,
     },
   },
   configMarketplaceContract: {
     type: Contract.ConfigMarketplace,
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
     parameter: {
-      marketplaceID: 'askdjaknsdkczmcas65e1231jnd1837481rhfn',
+      marketplaceId: 'askdjaknsdkczmcas65e1231jnd1837481rhfn',
       name: 'kleverPlace',
       referralAddress:
         'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
-      referralPercentage: 100,
+      referralpercentage: 1,
     },
   },
 };
@@ -531,7 +491,7 @@ export const mockedYesterdayTxCall = {
 };
 export const klvAsset: IAsset = {
   assetType: '',
-  assetId: 'KLV',
+  assetId: '',
   name: 'Klever',
   ticker: 'KLV',
   ownerAddress: '',
@@ -541,7 +501,17 @@ export const klvAsset: IAsset = {
   initialSupply: 0,
   circulatingSupply: 0,
   maxSupply: 0,
-  royalties: {},
+  royalties: {
+    address: 'string',
+    marketPercentage: 555,
+    transferFixed: 5555,
+    transferPercentage: [
+      {
+        amount: 55555,
+        percentage: 555,
+      },
+    ],
+  },
   mintedValue: 0,
   issueDate: 0,
   burnedValue: 0,
@@ -561,23 +531,28 @@ export const klvAsset: IAsset = {
     isPaused: false,
   },
   staking: {
-    interestType: 'FPRI',
-    totalStaked: 130000000000000,
-    currentFPRAmount: 0,
-    minEpochsToClaim: 1,
-    minEpochsToUnstake: 1,
-    minEpochsToWithdraw: 2,
+    interestType: 'anything',
+    minEpochsToWithdraw: 0,
+    totalStaked: 0,
     fpr: [
       {
         totalAmount: 313000000000,
         totalStaked: 213000000000,
-        TotalClaimed: 0,
-        epoch: 0,
+        TotalClaimed: 3131131,
+        epoch: 12313,
       },
     ],
-    apr: [],
+    apr: [
+      {
+        timestamp: 231313131313213,
+        epoch: 313131,
+        value: 11111111,
+      },
+    ],
+    currentFPRAmount: 31313,
+    minEpochsToClaim: 3,
+    minEpochsToUnstake: 3,
   },
-  roles: [],
 };
 
 export const mockedHolders: IAccountAsset[] = [

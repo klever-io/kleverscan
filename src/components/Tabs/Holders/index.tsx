@@ -14,7 +14,7 @@ interface IHolder {
 
 const Holders: React.FC<IHolder> = ({ holders, asset, holdersTableProps }) => {
   const rowSections = (props: IBalance): IRowSection[] => {
-    const { address, frozenBalance, index, rank } = props;
+    const { address, balance, index, rank } = props;
 
     return [
       {
@@ -40,7 +40,7 @@ const Holders: React.FC<IHolder> = ({ holders, asset, holdersTableProps }) => {
       {
         element: (
           <strong key={asset.circulatingSupply}>
-            {((frozenBalance / asset.circulatingSupply) * 100).toFixed(2)}%
+            {((balance / asset.circulatingSupply) * 100).toFixed(2)}%
           </strong>
         ),
         span: 1,
@@ -48,10 +48,7 @@ const Holders: React.FC<IHolder> = ({ holders, asset, holdersTableProps }) => {
       {
         element: (
           <strong key={asset.precision}>
-            {toLocaleFixed(
-              frozenBalance / 10 ** asset.precision,
-              asset.precision,
-            )}
+            {toLocaleFixed(balance / 10 ** asset.precision, asset.precision)}
           </strong>
         ),
         span: 1,
@@ -59,7 +56,7 @@ const Holders: React.FC<IHolder> = ({ holders, asset, holdersTableProps }) => {
     ];
   };
 
-  const header = ['Rank', 'Address', 'Percentage', 'Frozen Amount'];
+  const header = ['Rank', 'Address', 'Percentage', 'Amount'];
 
   const tableProps: ITable = {
     rowSections,

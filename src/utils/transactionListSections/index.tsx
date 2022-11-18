@@ -9,11 +9,10 @@ import {
   ICreateAssetContract,
   ICreateMarketplaceContract,
   ICreateValidatorContract,
-  IDepositContract,
   IFreezeContract,
-  IITOTriggerContract,
   IParameter,
   IProposalContract,
+  IRowSection,
   ISellContract,
   ISetAccountNameContract,
   ISetITOPricesContract,
@@ -21,12 +20,10 @@ import {
   IUndelegateContract,
   IUnfreezeContract,
   IUnjailContract,
-  IUpdateAccountPermissionContract,
   IValidatorConfigContract,
   IVoteContract,
   IWithdrawContract,
-} from '@/types/contracts';
-import { IRowSection } from '@/types/index';
+} from '@/types/index';
 import { CenteredRow } from '@/views/transactions';
 import Link from 'next/link';
 import { formatAmount } from '..';
@@ -368,48 +365,13 @@ const CreateMarketplaceSections = (par: IParameter): IRowSection[] => {
 
 const ConfigMarketplaceSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IConfigMarketplaceContract;
-
   return [
     {
       element: (
-        <span key={parameter?.marketplaceID}>
-          {parameter?.marketplaceID || ''}
-        </span>
+        <span key={parameter.marketplaceID}>{parameter.marketplaceID}</span>
       ),
       span: 1,
     },
-  ];
-};
-
-const UpdateAccountPermissionContractSections = (
-  par: IParameter,
-): IRowSection[] => {
-  const parameter = par as unknown as IUpdateAccountPermissionContract;
-  return [
-    {
-      element: (
-        <span key={parameter?.permissions[0]?.permissionName}>
-          {parameter?.permissions[0]?.permissionName || ''}
-        </span>
-      ),
-      span: 1,
-    },
-  ];
-};
-
-const DepositSections = (par: IParameter): IRowSection[] => {
-  const parameter = par as unknown as IDepositContract;
-  return [
-    { element: <span>{parameter?.depositType || ''}</span>, span: 1 },
-    { element: <span>{parameter?.id || ''}</span>, span: 1 },
-  ];
-};
-
-const IITOTriggerSections = (par: IParameter): IRowSection[] => {
-  const parameter = par as unknown as IITOTriggerContract;
-  return [
-    { element: <span>{parameter?.triggerType || ''}</span>, span: 1 },
-    { element: <span>{parameter?.assetID || ''}</span>, span: 1 },
   ];
 };
 
@@ -436,7 +398,4 @@ export {
   CreateMarketplaceSections,
   ConfigMarketplaceSections,
   CreateAssetSections,
-  UpdateAccountPermissionContractSections,
-  DepositSections,
-  IITOTriggerSections,
 };

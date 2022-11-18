@@ -229,7 +229,7 @@ export const TooltipContent = styled.div`
     white-space: pre;
   }
 
-  @media (max-width: 950px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: auto;
     min-width: 18rem;
   }
@@ -248,7 +248,7 @@ export const TooltipContainer = styled.div<{
     }
   }
 
-  @media screen and (max-width: 1025px) {
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     font-size: 1rem;
     max-width: 11ch;
   }
@@ -275,7 +275,7 @@ export const InputLabel = styled.label<ILabel>`
 
   transition: transform 0.2s ease;
 
-  @media screen and (max-width: 1025px) {
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     top: 0.8rem;
   }
 `;

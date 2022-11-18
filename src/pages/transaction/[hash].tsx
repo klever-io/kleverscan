@@ -1,4 +1,4 @@
-import { Receive } from '@/assets/icons';
+import { Proposal, Receive } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import { TransactionDetails as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
@@ -16,8 +16,9 @@ import {
   CreateMarketplace,
   CreateValidator,
   Delegate,
+  Deposit,
   Freeze,
-  Proposal,
+  ITOTrigger,
   Sell,
   SetAccountName,
   SetITOPrices,
@@ -25,18 +26,33 @@ import {
   Undelegate,
   Unfreeze,
   Unjail,
+  UpdateAccountPermission,
   Vote,
   Withdraw,
 } from '@/components/TransactionContractComponents';
+import { useTheme } from '@/contexts/theme/index';
 import api from '@/services/api';
 import { IBlock } from '@/types/blocks';
-import { Contract, IAsset, IResponse, ITransaction } from '@/types/index';
+import {
+  Contract,
+  IBuyContractPayload,
+  IBuyITOsTotalPrices,
+  IContract,
+} from '@/types/contracts';
+import { IAsset, IResponse, ITransaction } from '@/types/index';
 import {
   capitalizeString,
+  getPrecision,
+  getTotalAssetsPrices,
   hexToString,
   isDataEmpty,
   toLocaleFixed,
 } from '@/utils/index';
+import {
+  BalanceContainer,
+  FrozenContainer,
+  RowContent,
+} from '@/views/accounts/detail';
 import {
   CardContainer,
   CardContent,
@@ -52,7 +68,7 @@ import { ReceiveBackground } from '@/views/validator';
 import { format, fromUnixTime } from 'date-fns';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 
@@ -82,6 +98,9 @@ interface ITransactionPage {
 const Transaction: React.FC<ITransactionPage> = props => {
   const [showModal, setShowModal] = useState(false);
   const { transaction, block } = props;
+  const { isDarkTheme } = useTheme();
+  const [totalAssetsPrices, setTotalAssetsPrices] =
+    useState<IBuyITOsTotalPrices>({});
 
   const {
     hash,
@@ -101,10 +120,62 @@ const Transaction: React.FC<ITransactionPage> = props => {
 
   const StatusIcon = getStatusIcon(status);
 
+  useEffect(() => {
+    const getAsyncTotalAssetsPrices = async () => {
+      const ITOBuyPrices = await getITOBuyPrices();
+      if (Object.keys(ITOBuyPrices).length > 0) {
+        const totalAssetsPrices = getTotalAssetsPrices(
+          ITOBuyPrices,
+          receipts,
+          sender,
+        );
+        setTotalAssetsPrices(totalAssetsPrices);
+      }
+    };
+    getAsyncTotalAssetsPrices();
+  }, []);
+
+  const getITOBuyPrices = async () => {
+    const ITOBuyObject = {};
+    for (let index = 0; index < contract.length; index++) {
+      const parameter = contract[index]?.parameter as IBuyContractPayload;
+      if (parameter?.buyType === 'ITOBuy' && parameter?.currencyID) {
+        ITOBuyObject[parameter.currencyID] = { price: 0, precision: 0 };
+        ITOBuyObject[parameter.currencyID].precision =
+          (await getPrecision(parameter.currencyID)) ?? 6;
+      }
+    }
+    return ITOBuyObject;
+  };
+
+  const renderMultiContractITOBuy = () => {
+    if (Object.keys(totalAssetsPrices).length > 1) {
+      return (
+        <Row>
+          <span>
+            <strong>Total Price ITOBuy</strong>
+          </span>
+          <RowContent>
+            <BalanceContainer>
+              <FrozenContainer>
+                {Object.entries(totalAssetsPrices).map(([asset, data]) => (
+                  <div key={asset}>
+                    <strong>{asset ?? 0}</strong>
+                    <span>{data.price.toLocaleString() ?? 0}</span>
+                  </div>
+                ))}
+              </FrozenContainer>
+            </BalanceContainer>
+          </RowContent>
+        </Row>
+      );
+    }
+  };
+
   const ContractComponent: React.FC<any> = ({ contracts }) => {
     return (
       <div>
-        {contracts.map((contract: any, index: number) => {
+        {contracts.map((contract: IContract, index: number) => {
           switch (contract.typeString) {
             case Contract.Transfer:
               return (
@@ -227,7 +298,12 @@ const Transaction: React.FC<ITransactionPage> = props => {
             case Contract.Buy:
               return (
                 <div key={`${index}`}>
-                  <Buy {...contract} receipts={receipts} />
+                  <Buy
+                    {...contract}
+                    receipts={receipts}
+                    sender={sender}
+                    contracts={contracts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
@@ -259,12 +335,39 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
+            case Contract.UpdateAccountPermission:
+              return (
+                <div key={`${index}`}>
+                  <UpdateAccountPermission {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </div>
+              );
+            case Contract.Deposit:
+              return (
+                <div key={`${index}`}>
+                  <Deposit {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </div>
+              );
+            case Contract.ITOTrigger:
+              return (
+                <div key={`${index}`}>
+                  <ITOTrigger {...contract} receipts={receipts} />
+                  {index < contracts.length - 1 && <Hr />}
+                </div>
+              );
             default:
               return <div />;
           }
         })}
       </div>
     );
+  };
+
+  const rawTxTheme = {
+    height: '30rem',
+    color: isDarkTheme ? 'white' : 'black',
+    backgroundColor: isDarkTheme ? '#0B0B1E' : 'white',
   };
 
   return (
@@ -321,7 +424,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
               <strong>Epoch</strong>
             </span>
             <span>
-              <p>{block.epoch}</p>
+              <p>{block?.epoch}</p>
             </span>
           </Row>
           <Row>
@@ -408,12 +511,13 @@ const Transaction: React.FC<ITransactionPage> = props => {
               </CenteredRow>
             </Row>
           )}
+          {renderMultiContractITOBuy()}
         </CardContent>
       </CardContainer>
       <CardContainer>
         <h3>Contracts</h3>
         <CardContent>
-          <ContractComponent contracts={contract} />
+          <ContractComponent contracts={contract} sender={sender} />
         </CardContent>
       </CardContainer>
       <CardContainer>
@@ -421,7 +525,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
         <CardContent>
           <CardRaw>
             <SyntaxHighlighter
-              customStyle={{ height: '30rem', backgroundColor: 'white' }}
+              customStyle={rawTxTheme}
               style={xcode}
               language="json"
               wrapLines={true}
@@ -458,23 +562,21 @@ export const getStaticProps: GetStaticProps<ITransactionPage> = async ({
   const transaction: ITransactionResponse = await api.get({
     route: `transaction/${hash}`,
   });
-  if (transaction.error) {
+  const tx = transaction?.data?.transaction;
+  if (transaction.error || (!tx?.blockNum && !tx?.nonce && !tx?.sender)) {
     return redirectProps;
   }
-
   const block: IBlockResponse = await api.get({
     route: `block/by-nonce/${transaction?.data?.transaction?.blockNum}`,
   });
 
-  if (block.error) {
-    return redirectProps;
-  }
-
   const props: ITransactionPage = {
     transaction: transaction.data.transaction,
-    block: block.data.block,
+    block: block?.data?.block || {},
   };
 
-  return { props };
+  return {
+    props,
+  };
 };
 export default Transaction;

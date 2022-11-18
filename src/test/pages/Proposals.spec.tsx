@@ -51,9 +51,12 @@ describe('test proposals page', () => {
 
   it('should paginate the proposals correctly', async () => {
     (api.get as jest.Mock)
-      .mockReturnValueOnce(networkParametersMock)
+      .mockReturnValueOnce(networkParametersMock) // first call on ssr
+      .mockReturnValueOnce(mockedProposalsList) // second call on ssr
+      .mockReturnValueOnce(mockedProposalsList) // third, fourth and fifth calls are when proposal tab is clicked, (it generates 3 repeated calls simultaneously TODO: FIX THIS)
       .mockReturnValueOnce(mockedProposalsList)
-      .mockReturnValueOnce(mockedProposalsListPage2);
+      .mockReturnValueOnce(mockedProposalsList)
+      .mockReturnValueOnce(mockedProposalsListPage2); // last call is when paginate to page 2, no repeated calls are generated
     const getServerSidePropsCopy = getServerSideProps as any;
     const { props } = (await getServerSidePropsCopy({})) as any;
     act(() => {
@@ -68,16 +71,18 @@ describe('test proposals page', () => {
 
     let proposalsTabProof = screen.queryAllByText('ApprovedProposal');
     expect(proposalsTabProof.length).toEqual(0);
-    const proposalsTab = screen.getByText('Proposals');
+    const proposalsTab = screen.getAllByText('Proposals')[1];
 
-    fireEvent.click(proposalsTab);
+    await act(async () => {
+      fireEvent.click(proposalsTab);
+    });
 
     expect(networkParamsTabProof).not.toBeInTheDocument();
     proposalsTabProof = screen.queryAllByText('ApprovedProposal');
     expect(proposalsTabProof.length).toEqual(3);
     expect(networkParamsTabProof).not.toBeInTheDocument();
 
-    const page1Proposal = screen.getByText(/0\/4,000,000/);
+    const page1Proposal = screen.getAllByText(/0\/4,000,000/)[0];
     let page2Proposal = screen.queryByText(/0\/3,000,000/);
     expect(page2Proposal).toEqual(null);
     expect(page1Proposal).toBeInTheDocument();

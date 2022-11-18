@@ -2,6 +2,7 @@ import { screen } from '@testing-library/react';
 import * as nextRouter from 'next/router';
 import React from 'react';
 import { renderWithTheme } from '../../../test/utils';
+import { IAccountAsset, IBucket } from '../../../types';
 import { parseAddress } from '../../../utils/index';
 import Buckets from './';
 
@@ -28,9 +29,10 @@ describe('Component: Buckets Tab', () => {
   const bucketId =
     '9deb772022e3e5e1f258bb8cb6b6cf39d460750ffa727d7414b7fb3c8c8a87a2';
   const stakeAt = 1653329019;
-  const unstakedEpoch = 4294967295;
+  const unstakedEpoch = 55555;
   const stakedEpoch = 0;
   const delegation = '';
+  const MAX_UINT32 = 4294967295;
 
   jest.mock('next/router', () => ({
     useRouter() {
@@ -59,22 +61,7 @@ describe('Component: Buckets Tab', () => {
     }));
   });
 
-  const assets = [
-    {
-      address,
-      assetId,
-      assetName,
-      assetType,
-      balance,
-      buckets: [],
-      frozenBalance,
-      lastClaim: { timestamp: 0, epoch: 0 },
-      precision,
-      unfrozenBalance: 0,
-    },
-  ];
-
-  const buckets = [
+  const buckets: IBucket[] = [
     {
       balance: balanceBucket,
       delegation,
@@ -85,8 +72,22 @@ describe('Component: Buckets Tab', () => {
     },
   ];
 
+  const assets: IAccountAsset[] = [
+    {
+      address,
+      assetId,
+      assetType,
+      balance,
+      buckets,
+      frozenBalance,
+      lastClaim: { timestamp: 0, epoch: 0 },
+      precision,
+      unfrozenBalance: 0,
+    },
+  ];
+
   it('Should render the Buckets Tab correctly', () => {
-    renderWithTheme(<Buckets buckets={buckets} assets={assets} />);
+    renderWithTheme(<Buckets assets={assets} />);
 
     headerTable.map(header => {
       expect(screen.getByText(header)).toBeInTheDocument();
@@ -105,59 +106,38 @@ describe('Component: Buckets Tab', () => {
     }
   });
 
-  it('Should render the value of "unstaked epoch" when isn\'t to "UINT32_MAX" and "minEpochsToWithdraw" when exist property in assets', () => {
-    const newBuckets = [...buckets];
-    const newAssets = [...assets];
-    newAssets[0]['staking'] = { minEpochsToWithdraw: 4 };
-
-    newBuckets[0].unstakedEpoch = 55555;
-    newBuckets[0].id = 'KLV';
-    renderWithTheme(<Buckets buckets={newBuckets} assets={newAssets} />);
-
-    const unstakedEpoch = screen.getByText((55555).toLocaleString());
-    const minEpochsToWithdraw = unstakedEpoch.nextSibling;
-
-    expect(unstakedEpoch).toBeInTheDocument();
-    expect(unstakedEpoch).toBeVisible();
-    expect(minEpochsToWithdraw).toBeInTheDocument();
-    expect(minEpochsToWithdraw).toBeVisible();
-    expect(minEpochsToWithdraw).toHaveTextContent((55559).toLocaleString());
-  });
-
   it('Should render the fallback value for "minEpochsToWithdraw" when don\t exist the property in assets or don\' find the bucketId', () => {
-    const newBuckets = [...buckets];
     const newAssets = [...assets];
-    newBuckets[0].unstakedEpoch = 55555;
-    newBuckets[0].id = 'KFI';
-    renderWithTheme(<Buckets buckets={newBuckets} assets={newAssets} />);
+    renderWithTheme(<Buckets assets={newAssets} />);
 
-    const unstakedEpoch = screen.getByText((55555).toLocaleString());
-    const minEpochsToWithdraw = unstakedEpoch.nextElementSibling;
+    const unstakedEpochElement = screen.getByText(
+      unstakedEpoch.toLocaleString(),
+    );
+    const minEpochsToWithdraw = unstakedEpochElement.nextElementSibling;
 
-    expect(unstakedEpoch).toBeInTheDocument();
-    expect(unstakedEpoch).toBeVisible();
+    expect(unstakedEpochElement).toBeInTheDocument();
+    expect(unstakedEpochElement).toBeVisible();
     expect(minEpochsToWithdraw).toBeInTheDocument();
     expect(minEpochsToWithdraw).toBeVisible();
-    expect(minEpochsToWithdraw).toHaveTextContent((55557).toLocaleString());
+    expect(minEpochsToWithdraw).toHaveTextContent('--');
   });
 
   it('Should render the default "minEpochsToWithdraw" to KLV and when the link to "account" page when delegation has a value', () => {
-    const newBuckets = [...buckets];
     const newAssets = [...assets];
-    newBuckets[0].unstakedEpoch = 55555;
-    newBuckets[0].delegation =
-      'klv18slsv4v8yxdarvvyxdwgvdeqwrna899k2vcshlrlc4xjuyjlhveqv78t8s';
-    newBuckets[0].id =
-      'kvklalsdlmqweiqiwoekasmdasldlasdooiwqeoiwqelsaldaslmdaskdasjdaosk';
-    renderWithTheme(<Buckets buckets={newBuckets} assets={newAssets} />);
 
-    const { delegation } = newBuckets[0];
+    const delegationAddress =
+      'klv18slsv4v8yxdarvvyxdwgvdeqwrna899k2vcshlrlc4xjuyjlhveqv78t8s';
+
+    if (newAssets[0].buckets)
+      newAssets[0].buckets[0].delegation = delegationAddress;
+    renderWithTheme(<Buckets assets={newAssets} />);
+
     const link = screen.getByRole('link', {
-      name: parseAddress(delegation, 22),
+      name: parseAddress(delegationAddress, 22),
     });
 
     expect(link).toBeInTheDocument();
     expect(link).toBeVisible();
-    expect(link).toHaveAttribute('href', `/account/${delegation}`);
+    expect(link).toHaveAttribute('href', `/account/${delegationAddress}`);
   });
 });

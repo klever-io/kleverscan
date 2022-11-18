@@ -1,9 +1,10 @@
 import { INavbarItem, navbarItems } from '@/configs/navbar';
-import { useWidth } from 'contexts/width';
+import { useExtension } from '@/contexts/extension';
+import { useMobile } from '@/contexts/mobile';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import ConnectWallet from './ConnectWallet';
 import OptionsContainer from './OptionsContainer';
 import {
@@ -16,6 +17,7 @@ import {
   DropdownMenu,
   IconsMenu,
   Item,
+  LinkStyled,
   Logo,
   MenuIcon,
   MobileBackground,
@@ -24,38 +26,13 @@ import {
   MobileItem,
   MobileNavbarItemList,
   MobileOptions,
+  NavBarOptionsContainer,
 } from './styles';
 
 interface IDropdownPages {
   page: INavbarItem;
   onClick?: () => void;
 }
-
-const DropdownDesktop = ({ page }: IDropdownPages) => {
-  return (
-    <DropdownItem>
-      <Link href={page.pathTo}>
-        <a>
-          <page.Icon />
-          <span>{page.name}</span>
-        </a>
-      </Link>
-    </DropdownItem>
-  );
-};
-
-const DropdownMobile = ({ page, onClick }: IDropdownPages) => {
-  return (
-    <DropdownItem onClick={onClick}>
-      <Link href={page.pathTo}>
-        <a>
-          <span>{page.name}</span>
-          <page.Icon />
-        </a>
-      </Link>
-    </DropdownItem>
-  );
-};
 
 const NavbarItem: React.FC<INavbarItem> = ({
   name,
@@ -64,6 +41,23 @@ const NavbarItem: React.FC<INavbarItem> = ({
   pages = [],
 }) => {
   const router = useRouter();
+
+  const { isMobile } = useMobile();
+
+  const DropdownDesktop = ({ page }: IDropdownPages) => {
+    return (
+      <DropdownItem
+        disabled={router.pathname.includes(page.name.toLowerCase())}
+      >
+        <Link href={page.pathTo}>
+          <a>
+            <page.Icon />
+            <span>{page.name}</span>
+          </a>
+        </Link>
+      </DropdownItem>
+    );
+  };
 
   if (name === 'More') {
     return (
@@ -85,12 +79,15 @@ const NavbarItem: React.FC<INavbarItem> = ({
 
   return (
     <Link href={pathTo}>
-      <a>
+      <LinkStyled
+        disabled={router.pathname.includes(name.toLowerCase())}
+        href={pathTo}
+      >
         <Item selected={router.pathname.includes(name.toLowerCase())}>
           <Icon />
           <span>{name}</span>
         </Item>
-      </a>
+      </LinkStyled>
     </Link>
   );
 };
@@ -127,38 +124,13 @@ export const MobileNavbarItem: React.FC<INavbarItem> = ({
 };
 
 const Navbar: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const mobileNavbar = useRef<HTMLDivElement>(null);
+  const { mobileNavbarRef, closeMenu, handleMenu, isMobile, mobileMenuOpen } =
+    useMobile();
   const prevScrollpos = useRef<number>(0);
-
-  const { width } = useWidth();
-
-  useEffect(() => {
-    if (width > 1025) {
-      setIsOpen(false);
-    }
-  }, [width]);
-
-  useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : 'visible';
-  }, [isOpen]);
-
-  const handleMenu = () => {
-    setIsOpen(!isOpen);
-    if (mobileNavbar.current !== null) {
-      mobileNavbar.current.style.top = '0';
-    }
-  };
-
-  const handleClose = () => {
-    if (isOpen) {
-      setIsOpen(false);
-    }
-  };
+  const { extensionInstalled } = useExtension();
 
   const handleMobileScroll = () => {
-    const navbar = mobileNavbar.current;
+    const navbar = mobileNavbarRef.current;
 
     const currentScrollPos = window.pageYOffset;
 
@@ -176,7 +148,7 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      if (window.innerWidth < 1025) {
+      if (isMobile) {
         window.addEventListener('scroll', handleMobileScroll);
       } else {
         window.removeEventListener('scroll', handleMobileScroll);
@@ -188,15 +160,15 @@ const Navbar: React.FC = () => {
         window.removeEventListener('scroll', handleMobileScroll);
       }
     };
-  }, [width]);
+  }, [isMobile]);
 
   return (
     <>
-      <Container ref={mobileNavbar}>
+      <Container ref={mobileNavbarRef}>
         <Content>
           <Link href="/">
             <a>
-              <Logo onClick={handleClose}>
+              <Logo onClick={closeMenu}>
                 <Image
                   src="/logo-large.svg"
                   alt="Logo"
@@ -213,8 +185,10 @@ const Navbar: React.FC = () => {
                 <NavbarItem key={String(index)} {...item} />
               ))}
             </IconsMenu>
-            <ConnectWallet />
-            <OptionsContainer />
+            <NavBarOptionsContainer>
+              <ConnectWallet />
+              {!extensionInstalled && <OptionsContainer />}
+            </NavBarOptionsContainer>
           </DesktopContainer>
 
           <MobileContainer>
@@ -224,12 +198,12 @@ const Navbar: React.FC = () => {
       </Container>
 
       <MobileBackground
-        onClick={handleClose}
-        onTouchStart={handleClose}
-        opened={isOpen}
+        onClick={closeMenu}
+        onTouchStart={closeMenu}
+        opened={mobileMenuOpen}
       />
 
-      <MobileContent opened={isOpen}>
+      <MobileContent opened={mobileMenuOpen}>
         <MobileOptions>
           <OptionsContainer />
         </MobileOptions>
@@ -243,7 +217,7 @@ const Navbar: React.FC = () => {
           ))}
         </MobileNavbarItemList>
 
-        <ConnectWallet handleMenu={handleMenu} />
+        <ConnectWallet />
       </MobileContent>
     </>
   );

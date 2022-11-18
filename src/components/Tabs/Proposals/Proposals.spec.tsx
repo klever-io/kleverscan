@@ -1,10 +1,13 @@
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import Proposals from '.';
 import { parseAllProposals } from '../../../pages/proposals';
 import theme from '../../../styles/theme';
-import { mockedProposalsList } from '../../../test/mocks/index';
+import {
+  emptyProposalsResponse,
+  mockedProposalsResponse,
+} from '../../../test/mocks/tabs/proposals';
 import { renderWithTheme } from '../../../test/utils';
 import { parseAddress } from '../../../utils/index';
 
@@ -17,16 +20,32 @@ jest.mock('next/router', () => ({
   },
 }));
 
+const request = jest.fn(async (page: number, limit: number) => {
+  return Promise.resolve(mockedProposalsResponse);
+});
+
+const emptyRequest = jest.fn(async (page: number, limit: number) => {
+  return Promise.resolve(emptyProposalsResponse);
+});
+
 describe('Component: Tabs/Proposals', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("Should render the Table and it's body and the header correctly", () => {
+  it("Should render the Table and it's body and the header correctly", async () => {
     const parsedProposals = parseAllProposals(
-      mockedProposalsList.data.proposals,
+      mockedProposalsResponse.data.proposals,
     );
-    renderWithTheme(<Proposals loading={false} proposals={parsedProposals} />);
+    await act(async () => {
+      renderWithTheme(
+        <Proposals
+          loading={false}
+          proposals={parsedProposals}
+          request={(page: number, limit: number) => request(page, limit)}
+        />,
+      );
+    });
 
     const proposalNumber = screen.getByText('#0');
     const headers = [
@@ -38,7 +57,8 @@ describe('Component: Tabs/Proposals', () => {
       'Network Parameters',
     ];
 
-    const tableBody = proposalNumber.parentNode?.parentNode?.parentNode;
+    const tableBody = screen.getByTestId('table-body');
+
     const tableBodyStyle = {
       display: 'flex',
       flexDirection: 'column',
@@ -46,30 +66,39 @@ describe('Component: Tabs/Proposals', () => {
     };
     expect(tableBody).toHaveStyle(tableBodyStyle);
     headers.forEach(name => {
-      const header = screen.getByText(name);
+      const header = screen.getAllByText(name)[0];
       expect(header).toBeInTheDocument();
     });
   });
 
-  it('Should render the "Number", "Proposer", "Time", "Upvotes/Total Staked", "Status" and "Network Parameters" with the correct values and styles', () => {
+  it('Should render the "Number", "Proposer", "Time", "Upvotes/Total Staked", "Status" and "Network Parameters" with the correct values and styles', async () => {
     const parsedProposals = parseAllProposals(
-      mockedProposalsList.data.proposals,
+      mockedProposalsResponse.data.proposals,
     );
-    renderWithTheme(<Proposals loading={false} proposals={parsedProposals} />);
+    await act(async () => {
+      renderWithTheme(
+        <Proposals
+          loading={false}
+          proposals={parsedProposals}
+          request={(page: number, limit: number) => request(page, limit)}
+        />,
+      );
+    });
     const proposalNumber = screen.getByText('#0');
     const proposer = screen.getAllByText(
       parseAddress(parsedProposals[0].proposer, 14),
     )[0];
     const epochStart = screen.getAllByText(/Created Epoch/i)[0];
-    const epochEnd = screen.getAllByText(/Ended Epoch/i)[0];
-    const upVotesAndTotalStaked = epochEnd.parentNode?.nextSibling?.firstChild;
+    const epochEnd = screen.getAllByText(/Ending Epoch/i)[0];
+    const upVotesAndTotalStaked = screen.getAllByText('Upvotes/Total Staked')[0]
+      .nextSibling?.firstChild;
     const status = screen.getAllByText('ApprovedProposal')[0];
     const details = screen.getAllByText('Details')[0];
 
     expect(proposalNumber).toBeInTheDocument();
     expect(proposer).toBeInTheDocument();
     expect(epochStart).toHaveTextContent('Created Epoch: 8207');
-    expect(epochEnd).toHaveTextContent('Ended Epoch: 8217');
+    expect(epochEnd).toHaveTextContent('Ending Epoch: 8217');
     expect(upVotesAndTotalStaked).toHaveTextContent('8,000/12,000');
     expect(status).toBeInTheDocument();
     expect(details).toBeInTheDocument();
@@ -93,13 +122,8 @@ describe('Component: Tabs/Proposals', () => {
     };
 
     const proposerStyles = {
-      width: '5rem',
       color: theme.black,
       fontWeight: '600',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      whiteSpace: 'nowrap',
-      fontSize: '0.95rem',
     };
 
     const epochsStyles = {
@@ -115,7 +139,6 @@ describe('Component: Tabs/Proposals', () => {
     };
 
     const statusStyles = {
-      width: '10rem',
       overflow: 'hidden',
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
@@ -131,9 +154,6 @@ describe('Component: Tabs/Proposals', () => {
     const detailsStyles = {
       color: theme.black,
       fontWeight: '600',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      whiteSpace: 'nowrap',
     };
 
     expect(proposalNumber).toHaveStyle(proposalNumberStyles);
@@ -149,18 +169,35 @@ describe('Component: Tabs/Proposals', () => {
     });
   });
 
-  it('should render empty data message when there are no proposals', () => {
+  it('should render empty data message when there are no proposals', async () => {
     const parsedProposals = parseAllProposals([]);
-    renderWithTheme(<Proposals loading={false} proposals={parsedProposals} />);
+    await act(async () => {
+      renderWithTheme(
+        <Proposals
+          loading={false}
+          proposals={parsedProposals}
+          request={(page: number, limit: number) => emptyRequest(page, limit)}
+        />,
+      );
+    });
     const noDataMsg = screen.getByText('Oops! Apparently no data here.');
     expect(noDataMsg).toBeInTheDocument();
   });
 
   it('should render the network parameters tooltip text on hover', async () => {
     const parsedProposals = parseAllProposals(
-      mockedProposalsList.data.proposals,
+      mockedProposalsResponse.data.proposals,
     );
-    renderWithTheme(<Proposals loading={false} proposals={parsedProposals} />);
+    await act(async () => {
+      renderWithTheme(
+        <Proposals
+          loading={false}
+          proposals={parsedProposals}
+          request={(page: number, limit: number) => request(page, limit)}
+        />,
+      );
+    });
+
     const tooltipChild = screen.getAllByText(/15000000/)[0];
     expect(tooltipChild).toBeInTheDocument();
     expect(tooltipChild).not.toBeVisible();

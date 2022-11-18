@@ -44,7 +44,7 @@ const transactions = css`
 
 const blocks = css`
   margin-right: 1.25rem;
-  @media (max-width: 1000px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     margin-right: 0.4rem;
   }
 
@@ -143,6 +143,9 @@ const assetsPage = css`
     width: 8rem;
   }
   &:nth-child(10) {
+    width: 8rem;
+  }
+  &:nth-child(11) {
     width: 4rem;
   }
 `;
@@ -176,7 +179,7 @@ const buckets = css`
     width: 10rem;
   }
   &:nth-child(2) {
-    width: 5rem;
+    width: 8rem;
   }
   &:nth-child(3) {
     width: 5rem;
@@ -191,7 +194,10 @@ const buckets = css`
     width: 10rem;
   }
   &:nth-child(7) {
-    width: 16rem;
+    width: 10rem;
+  }
+  &:nth-child(8) {
+    width: 14rem;
   }
 `;
 
@@ -267,7 +273,7 @@ const validator = css`
     margin-right: 0;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     &:nth-child(1) {
       width: 12rem;
       max-width: 7rem;
@@ -323,7 +329,7 @@ const proposals = css`
   }
   &:nth-child(7) {
     width: 5rem;
-    margin-left: 2rem;
+    margin-left: 5rem;
   }
 `;
 const votes = css`
@@ -372,6 +378,14 @@ const nfts = css`
   }
 `;
 
+const validatorsList = css`
+  margin-right: 1.25rem;
+
+  &:nth-child(1) {
+    width: 70rem;
+  }
+`;
+
 const widths = {
   transactions,
   blocks,
@@ -388,6 +402,7 @@ const widths = {
   votes,
   delegations,
   nfts,
+  validatorsList,
 };
 
 export default widths;

@@ -1,15 +1,7 @@
-import { default as DefaultInput } from '@/components/Inputt';
+import { default as DefaultInput } from '@/components/InputGlobal';
 import styled, { css } from 'styled-components';
 
-export const Container = styled.div`
-  padding: 3rem 10rem 5rem 10rem;
-
-  background-color: ${props => props.theme.background};
-
-  @media (max-width: 768px) {
-    padding: 3rem 1rem 5rem 1rem;
-  }
-`;
+export const Container = styled.div``;
 
 export const Header = styled.section`
   display: flex;
@@ -18,7 +10,7 @@ export const Header = styled.section`
   justify-content: space-between;
   align-items: center;
 
-  @media (max-width: 870px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -33,7 +25,7 @@ export const Input = styled(DefaultInput)`
 
   border-color: ${props => props.theme.lightGray};
 
-  @media (max-width: 870px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
   }
 `;
@@ -47,7 +39,7 @@ export const CardContainer = styled.section`
 
   gap: 0.75rem;
 
-  @media (max-width: 870px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
   }
 `;
@@ -165,6 +157,8 @@ export const TableHeader = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 0.5rem;
+
+  color: ${props => props.theme.black};
 `;
 
 export const UpdateContainer = styled.div`

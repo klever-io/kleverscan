@@ -1,13 +1,14 @@
 import { Validators as Icon } from '@/assets/cards';
 import Detail from '@/components/Layout/Detail';
 import { ITable } from '@/components/Table';
+import { CustomLink } from '@/components/Table/styles';
+import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
-import { INfts, IPagination, IResponse } from '@/types/index';
+import { INfts, IPagination, IResponse, IRowSection } from '@/types/index';
 import { parseAddress } from '@/utils/index';
-import { useWidth } from 'contexts/width';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface ICollectionPage {
   collection: INfts[];
@@ -23,7 +24,7 @@ interface ICollectionResponse extends IResponse {
   pagination: IPagination;
 }
 
-const Validators: React.FC<ICollectionPage> = ({
+const Collection: React.FC<ICollectionPage> = ({
   collection,
   pagination,
   address,
@@ -31,38 +32,61 @@ const Validators: React.FC<ICollectionPage> = ({
 }) => {
   // initialCollection
   const header = ['ID', 'Collection Name', 'Collection Id', 'Address', ''];
+  const [isTablet, setIsTablet] = useState(false);
 
-  const requestCollection = (page: number) =>
-    api.get({
-      route: `address/${address}/collection/${collectionAsset}?page=${page}`,
+  useEffect(() => {
+    const tabletWindow = window.innerWidth <= 1025 && window.innerWidth >= 769;
+    setIsTablet(tabletWindow);
+  });
+
+  const requestCollection = (page: number, limit: number) =>
+    api.getCached({
+      route: `address/${address}/collection/${collectionAsset}?page=${page}&limit=${limit}`,
     });
 
-  const { isMobile } = useWidth();
+  const { isMobile } = useMobile();
 
-  const rowSections = (nft: INfts): JSX.Element[] => {
-    const {
-      address,
-      collection: collectionId,
-      assetName: collection,
-      nftNonce,
-    } = nft;
+  const rowSections = (nft: INfts): IRowSection[] => {
+    const { address, assetName: collection, assetId } = nft;
 
+    const collectionId = assetId.split('/')[0];
+    const nftId = assetId.split('/')[1];
     const sections = address
       ? [
-          <span key={nftNonce}>#{nftNonce}</span>,
-          <span key={collection}>{collection}</span>,
-          <span key={collectionId}>{collectionId}</span>,
-          <Link href={`/account/${address}`} key={address}>
-            {isMobile ? parseAddress(address, 16) : address}
-          </Link>,
-          <Link
-            href={`/account/${address}/collection/${collectionId}/${nftNonce}`}
-            key={nftNonce}
-          >
-            Detail
-          </Link>,
+          {
+            element: <span key={assetId}>#{nftId}</span>,
+            span: 1,
+          },
+          { element: <span key={collection}>{collection}</span>, span: 1 },
+          {
+            element: <span key={collectionId}>{collectionId}</span>,
+            span: 1,
+          },
+          {
+            element: (
+              <Link href={`/account/${address}`} key={address}>
+                {isMobile
+                  ? parseAddress(address, 14)
+                  : address || isTablet
+                  ? parseAddress(address, 20)
+                  : address}
+              </Link>
+            ),
+            span: 1,
+          },
+          {
+            element: (
+              <Link
+                href={`/account/${address}/collection/${collectionId}/${nftId}`}
+                key={assetId}
+              >
+                <CustomLink>Details</CustomLink>
+              </Link>
+            ),
+            span: 2,
+          },
         ]
-      : [<></>];
+      : [{ element: <></>, span: 1 }];
 
     return sections;
   };
@@ -73,16 +97,16 @@ const Validators: React.FC<ICollectionPage> = ({
     rowSections,
     data: collection as any[],
     scrollUp: true,
-    totalPages: pagination.totalPages,
+    totalPages: pagination?.totalPages || 1,
     dataName: 'collection',
-    request: (page: number) => requestCollection(page),
+    request: (page: number, limit: number) => requestCollection(page, limit),
   };
 
   const detailProps = {
     title: 'NFT Collection',
     headerIcon: Icon,
     cards: undefined,
-    paginationCount: pagination.totalPages,
+    paginationCount: pagination?.totalPages || 1,
     tableProps,
     route: `/account/${address}`,
   };
@@ -117,4 +141,4 @@ export const getServerSideProps: GetServerSideProps<ICollectionPage> = async ({
   return { props };
 };
 
-export default Validators;
+export default Collection;

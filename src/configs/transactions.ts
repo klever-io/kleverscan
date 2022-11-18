@@ -1,4 +1,4 @@
-import { ContractsName } from '../types';
+import { ContractsName } from '../types/contracts';
 
 const coins: string[] = ['KLV', 'KFI'];
 

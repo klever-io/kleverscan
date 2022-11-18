@@ -1,15 +1,7 @@
-import { default as DefaultInput } from '@/components/Inputt';
+import { default as DefaultInput } from '@/components/InputGlobal';
 import styled from 'styled-components';
 
-export const Container = styled.div`
-  padding: 3rem 8rem 5rem 8rem;
-
-  background-color: ${props => props.theme.background};
-
-  @media (max-width: 768px) {
-    padding: 3rem 1rem 5rem 1rem;
-  }
-`;
+export const Container = styled.div``;
 
 export const Header = styled.div`
   display: flex;
@@ -18,7 +10,7 @@ export const Header = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -103,7 +95,7 @@ export const Row = styled.div`
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -140,7 +132,8 @@ export const CenteredRow = styled.div`
     cursor: pointer;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    flex-wrap: wrap;
     width: 100%;
   }
 `;
@@ -217,7 +210,7 @@ export const FrozenContainer = styled.div`
 
     strong {
       width: 10rem;
-
+      margin-right: 5px;
       font-weight: 600;
       color: ${props => props.theme.darkText};
     }
@@ -233,7 +226,7 @@ export const HalfRow = styled.div`
   overflow: hidden;
   align-items: center;
   width: 50%;
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 0.1rem;
     width: 100%;
   }

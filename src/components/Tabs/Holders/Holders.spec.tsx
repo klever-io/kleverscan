@@ -1,8 +1,10 @@
 import { screen } from '@testing-library/react';
 import React from 'react';
-import { klvAsset, mockedHolders } from '../../../test/mocks';
+import { act } from 'react-dom/test-utils';
+import { klvAsset as KLVMock, mockedHolders } from '../../../test/mocks';
+import { mockedHoldersResponse } from '../../../test/mocks/tabs/holders';
 import { renderWithTheme } from '../../../test/utils';
-import { toLocaleFixed } from '../../../utils/index';
+import { parseAddress, toLocaleFixed } from '../../../utils/index';
 import Holders from './';
 
 jest.mock('next/router', () => ({
@@ -14,60 +16,79 @@ jest.mock('next/router', () => ({
   },
 }));
 
+const klvAsset = KLVMock;
+
+klvAsset.circulatingSupply = 1000000000 * 10 ** klvAsset.precision;
+
+const holdersTableProps = {
+  scrollUp: false,
+  totalPages: 10,
+  dataName: 'accounts',
+  request: jest.fn((page: number, limit: number) => {
+    return Promise.resolve(mockedHoldersResponse);
+  }),
+  page: 1,
+};
+
 describe('Component: Tabs/Holders', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("Should render the the Table, it's Body and header correctly", () => {
-    renderWithTheme(
-      <Holders holders={mockedHolders} asset={klvAsset} loading={false} />,
-    );
-
+  it("Should render the the Table, it's Body and header correctly", async () => {
+    await act(async () => {
+      renderWithTheme(
+        <Holders
+          holders={mockedHolders}
+          asset={klvAsset}
+          holdersTableProps={holdersTableProps}
+        />,
+      );
+    });
     const headers = ['Rank', 'Address', 'Percentage', 'Amount'];
-    const rank = screen.getByText('1°');
-    const tableBody = rank.parentNode?.parentNode?.parentNode?.parentNode;
-    const tableBodyStyle = {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '0.75rem',
-    };
+    const rank = screen.getByText('1');
+    const tableBody = screen.getByTestId('table-body');
 
     headers.forEach(name => {
-      const header = screen.getByText(name);
+      const header = screen.getAllByText(name)[0];
       expect(header).toBeInTheDocument();
     });
 
     expect(rank).toBeInTheDocument();
-    expect(tableBody).toHaveStyle(tableBodyStyle);
   });
 
-  it('Should render the correct values for "Rank", "Addrress", "Percentage" and "Amount"', () => {
-    renderWithTheme(
-      <Holders holders={mockedHolders} asset={klvAsset} loading={false} />,
-    );
+  it('Should render the correct values for "Rank", "Address", "Percentage" and "Amount"', async () => {
+    await act(async () => {
+      renderWithTheme(
+        <Holders
+          holders={mockedHolders}
+          asset={klvAsset}
+          holdersTableProps={holdersTableProps}
+        />,
+      );
+    });
 
     const link = screen.getByRole('link', {
-      name: /klv1hun5jj78k8563wc7...29mfvy95waf9jsdfr741/i,
+      name: parseAddress(mockedHoldersResponse.data.accounts[0].address, 40),
     });
-    const balance = mockedHolders[0].balance + mockedHolders[0].frozenBalance;
+    const balance = mockedHoldersResponse.data.accounts[0].balance;
 
     const calcPercentage = (
       (balance / klvAsset.circulatingSupply) *
       100
     ).toFixed(2);
-    const percentage = screen.getByText(`${calcPercentage}%`);
+    const percentage = screen.getAllByText(`${calcPercentage}%`)[0];
 
     const calcAmount = toLocaleFixed(
       balance / 10 ** klvAsset.precision,
       klvAsset.precision,
     );
-    const amount = screen.getByText(calcAmount);
+    const amount = screen.getAllByText(calcAmount)[0];
 
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute(
       'href',
-      `/account/${mockedHolders[0].address}`,
+      `/account/${mockedHoldersResponse.data.accounts[0].address}`,
     );
     expect(percentage).toBeInTheDocument();
     expect(amount).toBeInTheDocument();

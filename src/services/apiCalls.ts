@@ -1,10 +1,13 @@
 import api from '@/services/api';
 import { IBlockResponse, IStatisticsResponse } from '@/types/blocks';
 
-export const blockCall = async (page?: number): Promise<IBlockResponse> =>
+export const blockCall = async (
+  page = 1,
+  limit = 10,
+): Promise<IBlockResponse> =>
   new Promise<IBlockResponse>(async (resolve, reject) => {
     const res = await api.get({
-      route: `block/list?page=${page ?? 1}`,
+      route: `block/list?page=${page}&limit=${limit}`,
     });
 
     if (!res.error || res.error === '') {

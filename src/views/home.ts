@@ -1,4 +1,4 @@
-import { default as DefaultInput } from '@/components/Inputt';
+import { default as DefaultInput } from '@/components/InputGlobal';
 import { lighten, transparentize } from 'polished';
 import styled, { css, keyframes } from 'styled-components';
 
@@ -37,13 +37,17 @@ export const IconContainer = styled.div`
 `;
 
 export const ProgressContainerSpan = styled.span`
-  @media (max-width: 590px) {
-    display: none;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+
+  strong {
+    width: fit-content;
   }
 `;
 
 export const Section = styled.section`
-  padding: 5rem 10rem 0 10rem;
+  padding: 0 min(3%, 10rem) 10rem;
 
   h1 {
     color: ${props => props.theme.black};
@@ -59,18 +63,17 @@ export const Section = styled.section`
     padding-bottom: 10rem;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 5rem 5rem 0 5rem;
   }
 
-  @media (max-width: 425px) {
-    padding: 5rem 2.5rem 0 2.5rem;
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    padding: 5rem 0 0;
   }
 `;
 
 export const DataContainer = styled(Section)`
-  padding: 5rem 10rem;
-
+  padding: 5rem 0;
   /* background-color: #40274f;
   background-image: radial-gradient(
       at 29% 76%,
@@ -83,12 +86,8 @@ export const DataContainer = styled(Section)`
     radial-gradient(at 80% 100%, hsla(255, 47%, 36%, 1) 0, transparent 50%),
     radial-gradient(at 0% 0%, hsla(295, 57%, 46%, 1) 0, transparent 50%); */
 
-  @media (max-width: 768px) {
-    padding: 5rem;
-  }
-
-  @media (max-width: 425px) {
-    padding: 2.5rem;
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    padding: 2.5rem 0 0;
   }
 `;
 
@@ -108,13 +107,14 @@ export const Input = styled(DefaultInput)`
     }
   }
 
-  @media (max-width: 1600px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     margin: 0;
   }
 `;
 
 export const DataCardsContainer = styled.div`
   margin-top: 4rem;
+  /* flex-wrap: wrap; */
 
   display: flex;
 
@@ -123,7 +123,7 @@ export const DataCardsContainer = styled.div`
 
   gap: 0.5rem;
 
-  @media (max-width: 1600px) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: column;
   }
   &:nth-child(2) {
@@ -133,6 +133,7 @@ export const DataCardsContainer = styled.div`
 
 export const DataCardsWrapper = styled.div`
   width: 100%;
+  height: 17.401rem;
 
   display: flex;
 
@@ -140,10 +141,14 @@ export const DataCardsWrapper = styled.div`
   justify-content: center;
 
   gap: 0.5rem;
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    height: fit-content;
+  }
 `;
 
 export const DataCardsContent = styled.div`
   width: 100%;
+  height: 50%;
 
   display: flex;
 
@@ -152,7 +157,11 @@ export const DataCardsContent = styled.div`
 
   gap: 0.5rem;
 
-  @media (max-width: 1600px) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    height: auto;
+  }
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
   }
 `;
@@ -186,6 +195,19 @@ export const EpochCard = styled.div`
   border-radius: 1rem;
 `;
 
+export const Percentage = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 0.55rem;
+
+  span {
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-right: 0;
+  }
+`;
+
 export const DataCardValue = styled.div`
   width: 100%;
 
@@ -205,6 +227,12 @@ export const DataCardValue = styled.div`
     font-weight: 600;
     font-size: 1rem;
   }
+  div {
+    display: flex;
+    span {
+      margin-right: 0.45rem;
+    }
+  }
 `;
 
 export const DataCardLatest = styled.div<IVariation>`
@@ -214,7 +242,7 @@ export const DataCardLatest = styled.div<IVariation>`
   flex-direction: column;
   align-items: flex-end;
 
-  gap: 0.5rem;
+  gap: 0.2rem;
 
   span {
     font-size: 0.85rem;
@@ -301,41 +329,45 @@ export const BlockCardRow = styled.div`
     color: ${props => props.theme.darkText};
   }
 
-  a {
-    margin-right: -0.625rem;
-
-    max-width: 5rem;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 0.85rem;
-
-    color: ${props => props.theme.black};
-    cursor: default;
-  }
-
   span {
     font-size: 0.95rem;
   }
+`;
+
+export const BlockCardHash = styled.span`
+  margin-right: -0.625rem;
+
+  max-width: 5rem;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
+
+  color: ${props => props.theme.black};
+  cursor: default;
 `;
 
 export const TransactionContainer = styled.div`
   display: flex;
 
   flex-direction: row;
+  gap: 1rem;
+  justify-content: center;
 
-  gap: 2rem;
-
-  @media (max-width: 1700px) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: column;
   }
 `;
 
+export const ChartsContainer = styled(TransactionContainer)`
+  flex-wrap: wrap;
+`;
+
 export const TransactionContent = styled.div`
   max-height: 27.5rem;
-  min-width: fit-content;
+  min-width: calc(50% - 0.5rem);
 
   overflow-y: auto;
 
@@ -371,13 +403,13 @@ export const TransactionContent = styled.div`
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     overflow: auto;
 
     width: 100% !important;
     min-width: unset;
   }
-  @media (max-width: 1024px) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     min-width: 0;
   }
 `;
@@ -494,7 +526,7 @@ export const TransactionAmount = styled.div`
 `;
 
 export const TransactionChart = styled(TransactionContent)`
-  width: 100%;
+  width: 40%;
   min-height: 22rem;
 
   position: relative;
@@ -514,8 +546,12 @@ export const TransactionChart = styled(TransactionContent)`
     color: ${props => props.theme.darkText};
   }
 
-  @media (max-width: 530px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     min-height: 24.5rem;
+  }
+
+  &:last-child {
+    width: 100%;
   }
 `;
 
@@ -529,20 +565,28 @@ export const TransactionChartContent = styled.div`
   width: 92%;
   height: 80%;
 
-  @media (max-width: 530px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     bottom: -1rem;
     left: -0.1rem;
   }
 `;
 
 export const Main = styled.main`
+  padding: 3rem min(5vw, 10rem) 5rem;
   display: block;
   margin: 0 auto;
   max-width: ${props => props.theme.maxWidth};
+  background-color: ${props => props.theme.background};
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    padding: 3rem 2rem 5rem;
+  }
 `;
 export const LayoutContainer = styled.div`
   margin: auto;
   background-color: ${props => props.theme.background};
+
+  position: relative;
 `;
 
 export const ContainerTimeFilter = styled.div`
@@ -551,7 +595,7 @@ export const ContainerTimeFilter = styled.div`
   height: fit-content;
   justify-content: space-between;
 
-  @media (max-width: 530px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     justify-content: flex-start;
   }
@@ -561,7 +605,7 @@ export const ListItemTimeFilter = styled.ul`
   list-style: none;
   display: flex;
   justify-content: center;
-  @media (max-width: 530px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     margin-top: 0.35rem;
   }
 `;
@@ -585,7 +629,7 @@ export const ItemTimeFilter = styled.li<{ selected: boolean }>`
     border-radius: 0 10px 10px 0;
   }
 
-  @media (max-width: 530px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
   }
   ${props =>
@@ -608,7 +652,7 @@ export const HomeLoaderContainer = styled.div`
     align-items: center;
   }
 
-  @media (max-width: 1700px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     div {
       margin-bottom: 4rem;
     }
@@ -618,7 +662,7 @@ export const HomeLoaderContainer = styled.div`
     }
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     div {
       margin-bottom: 6rem;
     }

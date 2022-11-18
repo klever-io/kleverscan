@@ -24,7 +24,9 @@ const BlockCardList: React.FC<IBlockCardList> = ({ blocks, precision }) => {
         });
 
         if (!blocks.error) {
-          setListedBlocks(blocks.data?.blocks);
+          if (listedBlocks[0].nonce !== blocks.data?.blocks[0].nonce) {
+            setListedBlocks(blocks.data?.blocks);
+          }
         }
       } catch (error) {
         console.error(error);

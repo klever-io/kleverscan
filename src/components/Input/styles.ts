@@ -31,7 +31,7 @@ export const Container = styled.div`
       background-color: ${props => props.theme.darkText};
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
       min-width: 0;
     }
   }
@@ -40,7 +40,7 @@ export const Container = styled.div`
     cursor: pointer;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
   }
 `;

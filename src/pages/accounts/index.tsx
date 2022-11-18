@@ -2,13 +2,13 @@ import { Accounts as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
+import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
-import { IAccount, IPagination, IResponse } from '@/types/index';
+import { IAccount, IPagination, IResponse, IRowSection } from '@/types/index';
 import { formatAmount, getAge, parseAddress } from '@/utils/index';
 import { TableContainer } from '@/views/accounts';
 import { CenteredRow } from '@/views/accounts/detail';
 import { Card, CardContainer, Container, Header, Input } from '@/views/blocks';
-import { useWidth } from 'contexts/width';
 import { fromUnixTime } from 'date-fns';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
@@ -50,9 +50,9 @@ const Accounts: React.FC<IAccounts> = ({
 }) => {
   const precision = 6; // default KLV precision
 
-  const requestAccounts = async (page: number) =>
+  const requestAccounts = async (page: number, limit: number) =>
     await api.get({
-      route: `address/list?page=${page}`,
+      route: `address/list?page=${page}&limit=${limit}`,
     });
 
   const cards: ICard[] = [
@@ -112,27 +112,44 @@ const Accounts: React.FC<IAccounts> = ({
 
   const header = ['Address', 'KLV Staked', 'Nonce', 'KLV Balance'];
 
-  const { isMobile } = useWidth();
+  const { isMobile } = useMobile();
 
-  const rowSections = (account: IAccount): JSX.Element[] => {
+  const rowSections = (account: IAccount): IRowSection[] => {
     const { address, balance, frozenBalance, nonce } = account;
     const sections = [
-      <CenteredRow key={address}>
-        <Link href={`/account/${address}`}>
-          {isMobile ? parseAddress(address, 24) : address}
-        </Link>
+      {
+        element: (
+          <CenteredRow key={address}>
+            <Link href={`/account/${address}`}>
+              {isMobile ? parseAddress(address, 24) : address}
+            </Link>
 
-        <Copy info="Address" data={address} />
-      </CenteredRow>,
+            <Copy info="Address" data={address} />
+          </CenteredRow>
+        ),
+        span: 2,
+      },
 
-      <strong key={frozenBalance}>
-        {formatAmount(frozenBalance / 10 ** precision)} KLV
-      </strong>,
-      <span key={nonce}>{nonce}</span>,
-
-      <strong key={balance}>
-        {formatAmount(balance / 10 ** precision)} KLV
-      </strong>,
+      {
+        element: (
+          <strong key={frozenBalance}>
+            {formatAmount(frozenBalance / 10 ** precision)} KLV
+          </strong>
+        ),
+        span: 1,
+      },
+      {
+        element: <span key={nonce}>{nonce}</span>,
+        span: 1,
+      },
+      {
+        element: (
+          <strong key={balance}>
+            {formatAmount(balance / 10 ** precision)} KLV
+          </strong>
+        ),
+        span: 1,
+      },
     ];
     return sections;
   };
@@ -142,11 +159,10 @@ const Accounts: React.FC<IAccounts> = ({
     header,
     data: defaultAccounts as any[],
     rowSections,
-    columnSpans: [2],
-    request: page => requestAccounts(page),
+    request: (page, limit) => requestAccounts(page, limit),
     dataName: 'accounts',
     scrollUp: true,
-    totalPages: pagination.totalPages,
+    totalPages: pagination?.totalPages || 1,
   };
 
   return (

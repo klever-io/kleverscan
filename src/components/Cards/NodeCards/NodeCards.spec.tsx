@@ -5,6 +5,11 @@ import { renderWithTheme } from '../../../test/utils';
 import { INodeCard } from '../../../types';
 import NodeCards from './';
 
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
+}));
 const mockCardData: INodeCard[] = [
   {
     title: 'Total Nodes',
@@ -29,15 +34,34 @@ const mockCardData: INodeCard[] = [
 ];
 
 describe('Componenet: NodeCards', () => {
+  beforeAll(() => {
+    jest
+      .spyOn(HTMLElement.prototype, 'clientHeight', 'get')
+      .mockReturnValue(100);
+    jest
+      .spyOn(HTMLElement.prototype, 'clientWidth', 'get')
+      .mockReturnValue(100);
+  });
+
   it('Should render "Title", "Time ago" and the charts for the data', async () => {
     renderWithTheme(<NodeCards cardData={mockCardData} />);
 
-    const timeAgo = screen.getAllByText(/1 sec ago/i);
-    const totalNodes = timeAgo[0].previousSibling;
-    const mostNodes = timeAgo[1].previousSibling;
-    const chart = totalNodes?.parentNode?.nextSibling;
-    const mapSvg = mostNodes?.parentNode?.nextSibling;
+    await waitFor(async () => {
+      const timeAgo = screen.getAllByText(/1 sec ago/i);
+      const totalNodes = timeAgo[0].previousSibling;
+      const mostNodes = timeAgo[1].previousSibling;
+      const chart = totalNodes?.parentNode?.nextSibling;
+      const mapSvg = mostNodes?.parentNode?.nextSibling;
 
+      expect(timeAgo[0]).toBeInTheDocument();
+      expect(timeAgo[1]).toBeInTheDocument();
+      expect(totalNodes?.firstChild).toBeInTheDocument();
+      expect(totalNodes?.firstChild).toHaveTextContent(mockCardData[0].title);
+      expect(mostNodes?.firstChild).toBeInTheDocument();
+      expect(mostNodes?.firstChild).toHaveTextContent(mockCardData[1].title);
+      expect(mapSvg?.firstChild).toHaveAttribute('viewBox', '0 0 200 120');
+      expect(chart?.firstChild).toHaveStyle({ width: '100%', height: '100%' });
+    });
     await waitFor(
       async () => {
         const secsAgo = await screen.findAllByText(/4 secs ago/i);
@@ -45,15 +69,6 @@ describe('Componenet: NodeCards', () => {
       },
       { timeout: 5000 },
     );
-
-    expect(timeAgo[0]).toBeInTheDocument();
-    expect(timeAgo[1]).toBeInTheDocument();
-    expect(totalNodes?.firstChild).toBeInTheDocument();
-    expect(totalNodes?.firstChild).toHaveTextContent(mockCardData[0].title);
-    expect(mostNodes?.firstChild).toBeInTheDocument();
-    expect(mostNodes?.firstChild).toHaveTextContent(mockCardData[1].title);
-    expect(mapSvg?.firstChild).toHaveAttribute('viewBox', '0 0 200 120');
-    expect(chart?.firstChild).toHaveStyle({ width: '100%', height: '100%' });
   });
 
   it('Should match the style for the CardContainer and the Card', () => {

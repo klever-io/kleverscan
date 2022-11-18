@@ -6,24 +6,23 @@ import {
   ToggleContainer,
 } from '@/components/Form/FormInput/styles';
 import { ICollectionList, IKAssets, IParamList } from '@/types/index';
-import formSection from '@/utils/formSections';
 import {
   assetTriggerTypes,
   claimTypes,
   contractOptions,
-  parseAddress,
-} from '@/utils/index';
+} from '@/utils/contracts';
+import formSection from '@/utils/formSections';
+import { parseAddress } from '@/utils/index';
 import { Card } from '@/views/blocks';
 import { core } from '@klever/sdk';
 import Form, { ISection } from 'components/Form';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import Copy from '../Copy';
 import PackInfoForm from '../CustomForm/PackInfo';
 import ParametersForm from '../CustomForm/Parameters';
-import PermissionsForm from '../CustomForm/Permissions';
 import Select from './Select';
 import {
   AssetIDInput,
@@ -89,13 +88,23 @@ const Contract: React.FC<IContract> = ({
   const [proposalId, setProposalId] = useState<number | null>(null);
   const [claimLabel, setClaimLabel] = useState('Asset ID');
   const [buyLabel, setBuyLabel] = useState('Order ID');
+  const [binaryOperations, setBinaryOperations] = useState([]);
+
+  const collectionRef = useRef<any>(null);
+  const contractRef = useRef<any>(null);
 
   useEffect(() => {
     setAssetBalance(null);
     if (typeof window !== 'undefined') {
       try {
         if (window.kleverWeb) {
-          setOwnerAddress(window.kleverWeb.getWalletAddress());
+          (async () => {
+            try {
+              setOwnerAddress(await window.kleverWeb.getWalletAddress());
+            } catch (error) {
+              console.error(error);
+            }
+          })();
         }
       } catch (error) {
         console.error(error);
@@ -131,6 +140,8 @@ const Contract: React.FC<IContract> = ({
 
   useEffect(() => {
     setAssetBalance(null);
+    if (JSON.stringify(collection) !== JSON.stringify({}))
+      collectionRef.current = collection;
     setCollection({});
 
     if (contractType !== 'AssetTriggerContract') {
@@ -155,6 +166,17 @@ const Contract: React.FC<IContract> = ({
       setBucketsList([...buckets]);
     }
   }, [contractType]);
+
+  useEffect(() => {
+    if (
+      JSON.stringify(collectionRef.current) !== JSON.stringify({}) &&
+      collectionRef.current !== null &&
+      contractType !== contractRef.current
+    ) {
+      setCollection(collectionRef.current);
+      contractRef.current = contractType;
+    }
+  }, [collection]);
 
   useEffect(() => {
     const buckets: any = [];
@@ -278,9 +300,17 @@ const Contract: React.FC<IContract> = ({
       proposalId,
       tokenChosen,
       ITOBuy,
+      binaryOperations,
     );
 
+    if (parsedValues.amount === 0) {
+      toast.error('Amount cannot be 0');
+      return;
+    }
+
     setLoading(true);
+
+    const parsedData = Buffer.from(data, 'utf-8').toString('base64');
 
     const payload = {
       ...parsedValues,
@@ -294,7 +324,7 @@ const Contract: React.FC<IContract> = ({
             payload: parsedPayload,
           },
         ],
-        [data],
+        [parsedData],
       );
       const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
       if (isMultisig) {
@@ -334,19 +364,38 @@ const Contract: React.FC<IContract> = ({
   };
 
   const permissionsForm = () => (
-    <Form contractName={contractType} key={contractType} {...formProps}>
-      <PermissionsForm />
-    </Form>
+    // <Form
+    //   contractName={contractType}
+    //   key={contractType}
+    //   showForm={showForm()}
+    //   {...formProps}
+    // >
+    //   <PermissionsForm
+    //     setBinaryOperations={setBinaryOperations}
+    //     binaryOperations={binaryOperations}
+    //   />
+    // </Form>
+    <></>
   );
 
   const proposalForm = () => (
-    <Form contractName={contractType} key={contractType} {...formProps}>
+    <Form
+      contractName={contractType}
+      key={contractType}
+      showForm={showForm()}
+      {...formProps}
+    >
       {paramsList.length > 0 && <ParametersForm paramsList={paramsList} />}
     </Form>
   );
 
   const ITOForm = () => (
-    <Form contractName={contractType} key={contractType} {...formProps}>
+    <Form
+      contractName={contractType}
+      key={contractType}
+      showForm={showForm()}
+      {...formProps}
+    >
       <PackInfoForm />
     </Form>
   );
@@ -478,6 +527,7 @@ const Contract: React.FC<IContract> = ({
               setBucketsCollection([value.value]);
             }
           }}
+          getAssets={getAssets}
         />
       </SelectContent>
 

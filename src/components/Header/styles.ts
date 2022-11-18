@@ -2,7 +2,7 @@ import { transparentize } from 'polished';
 import { FiMenu } from 'react-icons/fi';
 import { MdArrowDropDown } from 'react-icons/md';
 import styled, { css, keyframes } from 'styled-components';
-import { default as DefaultInput } from '../Inputt';
+import { default as DefaultInput } from '../InputGlobal';
 
 interface IMobileMenu {
   opened: boolean;
@@ -22,7 +22,7 @@ export const Container = styled.div`
 
   transition: top 0.1s linear;
 
-  @media (max-width: 425px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 1rem 2.5rem;
 
     overflow: hidden;
@@ -31,10 +31,21 @@ export const Container = styled.div`
   }
 `;
 
+export const NavBarOptionsContainer = styled.div`
+  display: flex;
+  align-items: center;
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-direction: column;
+  }
+`;
+
 export const Content = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+
+  position: relative;
 
   gap: 0.5rem;
 
@@ -45,6 +56,7 @@ export const Content = styled.div`
 
 export const Logo = styled.div`
   margin-right: 0.5rem;
+  min-width: 6rem;
 
   cursor: pointer;
 `;
@@ -54,6 +66,8 @@ export const Item = styled.div<{ selected: boolean }>`
 
   flex-direction: row;
   align-items: center;
+
+  position: relative;
 
   gap: 0.5rem;
 
@@ -80,6 +94,12 @@ export const Item = styled.div<{ selected: boolean }>`
     display: flex;
     flex-direction: column;
   }
+
+  pointer-events: ${props => (props.selected ? 'none' : 'all')};
+`;
+
+export const LinkStyled = styled.a<{ disabled: boolean }>`
+  pointer-events: ${props => (props.disabled ? 'none' : 'all')};
 `;
 
 export const ItemTransaction = styled.div<{ selected: boolean }>`
@@ -116,7 +136,7 @@ export const Input = styled(DefaultInput)`
   width: 25%;
   border-color: ${props => props.theme.darkText};
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: none;
   }
 `;
@@ -129,8 +149,7 @@ export const DesktopContainer = styled.div`
   align-items: center;
   width: 100%;
   gap: 0.5rem;
-
-  @media (max-width: 1024px) {
+  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: none;
   }
 `;
@@ -139,11 +158,12 @@ export const IconsMenu = styled.div`
   display: flex;
 
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
 
-  gap: 1.5rem;
+  gap: 1rem;
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: none;
   }
 `;
@@ -151,11 +171,11 @@ export const IconsMenu = styled.div`
 export const MobileContainer = styled.div`
   margin-left: auto;
 
-  display: flex;
   position: relative;
+  display: none;
 
-  @media (min-width: 1025px) {
-    display: none;
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    display: flex;
   }
 `;
 
@@ -165,7 +185,9 @@ export const MobileContent = styled.div<IMobileMenu>`
   height: calc(100vh - 4rem);
 
   top: 4rem;
-  right: ${props => (props.opened ? 0 : '-100%')};
+  right: 0;
+
+  transform: translateX(${props => (props.opened ? 0 : '100%')});
 
   display: flex;
   position: fixed;
@@ -179,6 +201,9 @@ export const MobileContent = styled.div<IMobileMenu>`
   background-color: ${props => props.theme.navbar.background};
 
   transition: 0.3s ease-out;
+
+  visibility: ${props => (props.opened ? 'visible' : 'hidden')};
+  opacity: ${props => (props.opened ? 1 : 0)};
 
   ul > li {
     display: flex;
@@ -242,7 +267,7 @@ export const DropdownContainer = styled.div`
   display: none;
   position: absolute;
   bottom: 0;
-  left: 0;
+  right: 0.4vw;
 
   animation: ${expand} 0.2s ease;
 
@@ -252,11 +277,11 @@ export const DropdownContainer = styled.div`
 
   transform: translateY(100%);
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     left: 0.4rem;
   }
 `;
-export const DropdownItem = styled.li`
+export const DropdownItem = styled.li<{ disabled: boolean }>`
   display: flex;
   gap: 0.5rem;
   list-style: none;
@@ -274,9 +299,11 @@ export const DropdownItem = styled.li`
   a {
     display: flex;
     flex-direction: row;
+    pointer-events: ${props => (props.disabled ? 'none' : 'all')};
   }
+  cursor: ${props => (props.disabled ? 'default' : 'pointer')};
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     span {
       margin: 0 0.4rem 0 0;
     }
@@ -290,7 +317,7 @@ export const DropdownMenu = styled.ul`
   border-radius: 10px;
   gap: 0.5rem;
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     background-color: ${props => transparentize(0.7, props.theme.black)};
   }
 `;

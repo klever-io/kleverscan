@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
+import Input from '.';
 import theme from '../../styles/theme';
-import Input from './';
 
 const TRANSACTION =
   'd83919b59a8309572e3ee552a9f1b39cd8f40900be14b915d3df31a49202d630';
@@ -12,16 +12,21 @@ const ADDRESS =
   'klv1mt8yw657z6nk9002pccmwql8w90k0ac6340cjqkvm9e7lu0z2wjqudt69s';
 const BLOCK = '77453';
 const ASSET = 'KLV';
+const ASSET2 = 'KUSD';
+const objectCall = { pathname: '/assets', query: 'asset=KUSD' };
 
 jest.mock('next/router', () => ({
   __esModule: true,
   useRouter: jest.fn(),
 }));
 
-describe('Component: Inputt', () => {
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({ t: key => key }),
+}));
+describe('Component: InputGlobal', () => {
   let container: HTMLElement;
   const mockRouter = {
-    push: jest.fn(),
+    push: jest.fn(() => Promise.resolve(true)),
   };
   (useRouter as jest.Mock).mockReturnValue(mockRouter);
 
@@ -97,6 +102,17 @@ describe('Component: Inputt', () => {
     expect(mockRouter.push).toHaveBeenCalledWith(`/asset/${ASSET}`);
   });
 
+  it('Should do the search when press "ENTER" on keyboard with a different asset than KLV or KFI', async () => {
+    const user = userEvent.setup();
+
+    const input: any = container.firstChild?.firstChild;
+
+    await user.type(input, `${ASSET2}{enter}`);
+
+    expect(mockRouter.push).toHaveBeenCalled();
+    expect(mockRouter.push).toHaveBeenCalledWith(objectCall);
+  });
+
   it('Should do anything if the search is empty', async () => {
     const user = userEvent.setup();
 
@@ -111,7 +127,7 @@ describe('Component: Inputt', () => {
     const style = {
       width: '100%',
       minWidth: '5rem',
-      color: theme.input.text,
+      color: theme.darkText,
     };
     expect(container.firstChild?.firstChild).toHaveStyle(style);
   });

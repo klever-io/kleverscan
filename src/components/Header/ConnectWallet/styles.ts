@@ -14,7 +14,7 @@ export const ConnectButton = styled.div`
 
   position: relative;
 
-  min-width: 14rem;
+  min-width: 10rem;
   width: 100%;
 
   cursor: pointer;
@@ -27,7 +27,7 @@ export const ConnectButton = styled.div`
     cursor: pointer;
   }
 
-  @media screen and (min-width: 1025px) {
+  @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
     width: 14rem;
     &:hover > div {
       display: flex;
@@ -47,18 +47,47 @@ export const ConnectContainer = styled.div`
   align-items: center;
   user-select: none;
 
-  gap: 0.5rem;
-
-  margin-left: auto;
   padding-right: 0.5rem;
+  justify-content: flex-start;
+  align-items: flex-start;
 
-  @media screen and (max-width: 1025px) {
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    margin-left: 0;
     margin-top: auto;
+  }
 
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    flex-direction: column;
+  }
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column-reverse;
     align-items: flex-end;
-
     gap: 1.5rem;
+  }
+`;
+
+export const NavBarOptionsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    justify-content: flex-end;
+    margin: 0;
+  }
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    justify-content: flex-end;
+    margin: 0;
+    flex-direction: column;
+  }
+`;
+
+export const NavBarOptionsItems = styled.div`
+  display: flex;
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    width: 100%;
+    justify-content: flex-end;
   }
 `;
 
@@ -78,7 +107,7 @@ export const LogoutContainer = styled.div`
     }
   }
 
-  @media screen and (min-width: 1025px) {
+  @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
     &:hover {
       &::before {
         content: '';
@@ -113,6 +142,7 @@ export const CopyContainer = styled.div`
   position: relative;
   font-size: 0.9rem;
   margin-left: 0.8rem;
+  margin-top: 0.41rem;
 
   svg {
     g {
@@ -126,7 +156,7 @@ export const CopyContainer = styled.div`
     }
   }
 
-  @media screen and (min-width: 1025px) {
+  @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
     &:hover {
       &::before {
         content: '';
@@ -162,7 +192,7 @@ export const MenuTransaction = styled.ul`
   gap: 0.5rem;
   margin-top: 0.3rem;
 
-  @media (max-width: 1024px) {
+  @media ${props => props.theme.breakpoints.mobile} {
     background-color: ${props => transparentize(0.7, props.theme.black)};
   }
 `;
@@ -178,8 +208,32 @@ export const MobileStyledTransfer = styled(BiTransfer)`
   color: ${props => props.theme.navbar.text};
   size: 20px;
 `;
+
 export const StyledTransfer = styled(BiTransfer)`
   color: ${props => props.theme.navbar.text};
+
   width: 25px;
   height: 25px;
+`;
+
+export const QRCodeContainer = styled.div`
+  position: absolute;
+
+  -webkit-box-shadow: 3px 3px 8px 5px rgba(0, 0, 0, 0.05);
+  box-shadow: 3px 3px 8px 5px rgba(0, 0, 0, 0.05);
+`;
+
+export const QRCodeContent = styled.div`
+  position: relative;
+  background-color: ${props => props.theme.qrcodeTooltip.background};
+  border-radius: 1rem;
+  padding: 1rem;
+  top: 5.3rem;
+  left: 0.2rem;
+
+  div {
+    background-color: #fff;
+    padding: 0.3rem;
+    border-radius: 0.2rem;
+  }
 `;

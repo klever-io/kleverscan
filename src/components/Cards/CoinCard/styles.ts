@@ -21,7 +21,7 @@ export const Container = styled.div`
   align-items: center;
   position: relative;
 
-  @media (max-width: 1600px) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
   }
 `;
@@ -38,7 +38,7 @@ export const Content = styled.div`
 
   border-radius: 1rem;
   width: 21rem;
-  @media (max-width: 1600px) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
   }
   overflow-y: hidden;
@@ -66,7 +66,7 @@ export const CardContainer = styled.div`
   background-color: ${props => props.theme.card.background};
   border-radius: 1rem;
 
-  @media (max-width: 1600px) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     min-width: 100%;
   }
 `;
@@ -74,7 +74,7 @@ export const CardContainer = styled.div`
 export const CardContent = styled.div`
   min-width: 18.5rem;
 
-  @media (max-width: 525px) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     min-width: 10.5rem;
   }
   display: flex;
@@ -82,7 +82,7 @@ export const CardContent = styled.div`
   flex-direction: column;
 
   animation: 1.5s ease 0s 1 normal none running ${FadeIn};
-  @media (max-width: 1600px) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
   }
 
@@ -222,8 +222,6 @@ export const CoinsSelector = styled.div`
   transition: 0.5s ease;
 
   border-radius: 50%;
-  @media (min-width: 768px) {
-  }
 `;
 
 export const CoinSelector = styled.div<{ isSelected: boolean }>`

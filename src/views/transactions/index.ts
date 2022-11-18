@@ -1,20 +1,8 @@
-import { default as DefaultInput } from '@/components/Inputt';
+import { default as DefaultInput } from '@/components/InputGlobal';
 import Link from 'next/link';
 import styled from 'styled-components';
 
-export const Container = styled.div`
-  padding: 3rem 10rem 5rem 10rem;
-
-  background-color: ${props => props.theme.background};
-
-  @media (max-width: 1600px) {
-    padding-left: 5rem;
-    padding-right: 5rem;
-  }
-  @media (max-width: 768px) {
-    padding: 3rem 1rem 5rem 1rem;
-  }
-`;
+export const Container = styled.div``;
 
 export const Title = styled.div`
   display: flex;
@@ -38,44 +26,36 @@ export const Header = styled.section`
   margin: 1.5rem 0;
 
   display: flex;
+  flex-wrap: wrap;
 
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-end;
 
-  @media (max-width: 1200px) {
-    flex-direction: column;
-  }
-`;
-
-export const FilterContainer = styled.div`
-  display: flex;
-
-  flex-direction: row;
-
-  gap: 0.75rem;
-
-  > div:last-child {
-    min-width: 15rem;
+  div {
+    display: flex;
   }
 
-  @media (max-width: 1200px) {
-    width: 100%;
-
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
+    div:nth-child(1) {
+      width: 100%;
+      flex-direction: column;
+    }
   }
 `;
 
 export const FilterByDate = styled.div`
-  width: 100%;
+  width: fit-content;
   display: flex;
   justify-content: flex-start;
   align-items: center;
   flex-direction: row;
-  margin-top: 1.7rem;
+  margin-top: 1.4rem;
   margin-left: 0.8rem;
+  margin-right: 0.8rem;
 
-  @media (max-width: 1200px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     justify-content: center;
     margin-left: 0;
   }
@@ -141,4 +121,33 @@ export const StyledLink = styled(Link)`
   &:hover {
     overflow: visible;
   }
+`;
+
+export const MultiContractContainer = styled.strong`
+  position: relative;
+  overflow: visible !important;
+`;
+
+export const MultiContractCounter = styled.span`
+  background-color: ${props => props.theme.violet};
+  position: relative;
+  line-height: 20px;
+  color: ${props => props.theme.true.white} !important;
+  width: 20px !important;
+  height: 20px !important;
+  text-align: center;
+  display: inline-block;
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    transform: translate(5%, 28%);
+    bottom: 5px;
+    right: 1px;
+  }
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    bottom: 5px;
+    right: 1px;
+  }
+  transform: translateY(-50%);
+  font-size: smaller !important;
+  border-radius: 50%;
 `;

@@ -2,7 +2,7 @@ import { TransactionDetails as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
 import api from '@/services/api';
-import { INfts, IResponse } from '@/types/index';
+import { IAsset, IAssetOne, IParsedAsset } from '@/types/index';
 import {
   CardContainer,
   CardContent,
@@ -17,19 +17,14 @@ import { GetServerSideProps } from 'next';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 
-interface INftResponse extends IResponse {
-  data: {
-    collection: INfts[];
-  };
-}
-
-interface INftPage {
-  nft: INfts | undefined;
-  assetId: string | string[];
-  address: string | string[];
-}
-
-const NftDetail: React.FC<INftPage> = ({ nft, address, assetId }) => {
+const NftDetail: React.FC<IParsedAsset> = ({
+  assetId,
+  name,
+  metadata,
+  mime,
+  nonce,
+  nonceOwner,
+}) => {
   const isJsonString = (metadata: string) => {
     try {
       JSON.parse(metadata);
@@ -45,7 +40,7 @@ const NftDetail: React.FC<INftPage> = ({ nft, address, assetId }) => {
         <Title
           title="NFT Details"
           Icon={Icon}
-          route={`/account/${address}/collection/${assetId}`}
+          route={`/account/${nonceOwner}/collection/${assetId}`}
         />
 
         <Input />
@@ -58,22 +53,22 @@ const NftDetail: React.FC<INftPage> = ({ nft, address, assetId }) => {
               <strong>Address</strong>
             </span>
             <CenteredRow>
-              <span>{nft?.address}</span>
-              <Copy data={nft?.address} info="Address" />
+              <span>{nonceOwner}</span>
+              <Copy data={nonceOwner} info="Address" />
             </CenteredRow>
           </Row>
           <Row>
             <span>
               <strong>Collection</strong>
             </span>
-            {nft?.assetName}
+            {name}
           </Row>
           <Row>
             <span>
               <strong>Asset ID</strong>
             </span>
             <span>
-              <p>{nft?.collection}</p>
+              <p>{assetId}</p>
             </span>
           </Row>
           <Row>
@@ -81,7 +76,7 @@ const NftDetail: React.FC<INftPage> = ({ nft, address, assetId }) => {
               <strong>Nonce</strong>
             </span>
             <span>
-              <p>{nft?.nftNonce}</p>
+              <p>{nonce}</p>
             </span>
           </Row>
           <Row>
@@ -89,22 +84,22 @@ const NftDetail: React.FC<INftPage> = ({ nft, address, assetId }) => {
               <strong>Mime</strong>
             </span>
             <span>
-              <p>{nft?.mime || '--'}</p>
+              <p>{mime || '--'}</p>
             </span>
           </Row>
-          {nft?.metadata && !isJsonString(nft?.metadata) && (
+          {metadata && !isJsonString(metadata) && (
             <Row>
               <span>
                 <strong>Metadata</strong>
               </span>
               <span>
-                <p>{nft?.metadata}</p>
+                <p>{metadata}</p>
               </span>
             </Row>
           )}
         </CardContent>
 
-        {nft?.metadata && isJsonString(nft?.metadata) && (
+        {metadata && isJsonString(metadata) && (
           <>
             <h3>Metadata</h3>
             <CardContent>
@@ -120,7 +115,7 @@ const NftDetail: React.FC<INftPage> = ({ nft, address, assetId }) => {
                   wrapLines={true}
                   wrapLongLines={true}
                 >
-                  {JSON.stringify(JSON.parse(nft?.metadata), null, 2)}
+                  {JSON.stringify(JSON.parse(metadata), null, 2)}
                 </SyntaxHighlighter>
               </CardRaw>
             </CardContent>
@@ -131,7 +126,7 @@ const NftDetail: React.FC<INftPage> = ({ nft, address, assetId }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<INftPage> = async ({
+export const getServerSideProps: GetServerSideProps<IAsset> = async ({
   params,
 }) => {
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
@@ -143,23 +138,15 @@ export const getServerSideProps: GetServerSideProps<INftPage> = async ({
     return redirectProps;
   }
 
-  const response: INftResponse = await api.get({
-    route: `address/${address}/collection/${assetId}`,
+  const response: IAssetOne = await api.get({
+    route: `assets/${assetId}/${nonce}`,
   });
 
-  if (response.error) {
-    return redirectProps;
-  }
+  const props = response?.data?.asset;
+  props['nonce'] = nonce;
+  props['nonceOwner'] = address;
 
-  const props: INftPage = {
-    nft: response.data.collection.find(
-      (collection: INfts) => +nonce === collection.nftNonce,
-    ),
-    assetId: assetId,
-    address,
-  };
-
-  if (!props.nft) {
+  if (response.error || !props) {
     return redirectProps;
   }
 

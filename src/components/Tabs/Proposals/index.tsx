@@ -1,7 +1,9 @@
 import { getStatusIcon } from '@/assets/status';
 import Table, { ITable } from '@/components/Table';
-import { Status } from '@/components/Table/styles';
+import { CustomLink, Status } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
+import { useMobile } from '@/contexts/mobile';
+import { IRowSection } from '@/types/index';
 import {
   IFullInfoParam,
   IParsedProposal,
@@ -9,7 +11,7 @@ import {
 } from '@/types/proposals';
 import { capitalizeString, parseAddress } from '@/utils/index';
 import Link from 'next/link';
-import React, { useRef } from 'react';
+import React from 'react';
 import {
   ProposalStatus,
   ProposalTime,
@@ -22,9 +24,9 @@ const Proposals: React.FC<IProposalsProps> = ({
   totalPages,
   request,
 }) => {
-  const tooltipRef = useRef<any>(null);
+  const { isMobile } = useMobile();
 
-  const rowSections = (props: IParsedProposal): JSX.Element[] => {
+  const rowSections = (props: IParsedProposal): IRowSection[] => {
     const {
       proposalId,
       epochStart,
@@ -66,7 +68,7 @@ const Proposals: React.FC<IProposalsProps> = ({
 
     const renderProposalsNetworkParamsWithToolTip = () => {
       let message = '';
-      {
+      if (parsedParameters) {
         parsedParameters.forEach(
           (param2, index2) =>
             (message += `${param2.paramText}  ${param2.paramValue}` + '\n'),
@@ -74,22 +76,25 @@ const Proposals: React.FC<IProposalsProps> = ({
       }
       if (parsedParameters) {
         return (
-          <Tooltip
-            Component={() => (
-              <div>{renderProposalsNetworkParams(parsedParameters)}</div>
-            )}
-            msg={message}
-          ></Tooltip>
+          <span style={{ display: 'flex' }}>
+            <Tooltip
+              Component={() => (
+                <div>{renderProposalsNetworkParams(parsedParameters)}</div>
+              )}
+              customStyles={isMobile ? { offset: { left: 55 } } : {}}
+              msg={message}
+            ></Tooltip>
+          </span>
         );
       }
       return <></>;
     };
 
     const StatusIcon = getStatusIcon(proposalStatus);
-    const precision = 10 ** 6;
+    const precision = 6;
 
     const getPositiveVotes = () => {
-      let parsedPosVotes = votes['0'] / precision;
+      let parsedPosVotes = votes['0'] / 10 ** precision;
       if (parsedPosVotes < 0.000001 || isNaN(parsedPosVotes)) {
         parsedPosVotes = 0;
       }
@@ -101,36 +106,66 @@ const Proposals: React.FC<IProposalsProps> = ({
 
     const parseTotalStaked = () => {
       if (typeof totalStaked === 'number') {
-        return Math.round(totalStaked / precision).toLocaleString();
+        return Math.round(totalStaked / 10 ** precision).toLocaleString();
       }
       return <span style={{ color: 'red' }}>Unavailable</span>;
     };
     const sections = [
-      <p key={proposalId}>#{proposalId}</p>,
-      <ProposerDescAndLink key={proposer}>
-        <Link href={`/account/${proposer}`}>
-          <a>{parseAddress(proposer, 14)}</a>
-        </Link>
-      </ProposerDescAndLink>,
-      <ProposalTime key={`${epochStart}/${epochEnd}`}>
-        <small>Created Epoch: {epochStart}</small>
-        <small className="endTime">Ending Epoch: {epochEnd}</small>
-      </ProposalTime>,
-      <UpVotes key={String(votes)}>
-        <p>
-          {getPositiveVotes()}/{parseTotalStaked()}
-        </p>
-      </UpVotes>,
-      <Status status={proposalStatus} key={proposalStatus}>
-        <StatusIcon />
-        <ProposalStatus>{capitalizeString(proposalStatus)}</ProposalStatus>
-      </Status>,
-      <span key={String(parsedParameters)}>
-        {renderProposalsNetworkParamsWithToolTip()}
-      </span>,
-      <Link href={{ pathname: `/proposal/${proposalId}` }} key={proposalId}>
-        Details
-      </Link>,
+      { element: <p key={proposalId}>#{proposalId}</p>, span: 1 },
+      {
+        element: (
+          <ProposerDescAndLink key={proposer}>
+            <Link href={`/account/${proposer}`}>
+              <a>{parseAddress(proposer, 14)}</a>
+            </Link>
+          </ProposerDescAndLink>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <ProposalTime key={`${epochStart}/${epochEnd}`}>
+            <small>Created Epoch: {epochStart}</small>
+            <small className="endTime">Ending Epoch: {epochEnd}</small>
+          </ProposalTime>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <UpVotes key={String(votes)}>
+            <p>
+              {getPositiveVotes()}/{parseTotalStaked()}
+            </p>
+          </UpVotes>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <Status status={proposalStatus} key={proposalStatus}>
+            <StatusIcon />
+            <ProposalStatus>{capitalizeString(proposalStatus)}</ProposalStatus>
+          </Status>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <span key={String(parsedParameters)}>
+            {renderProposalsNetworkParamsWithToolTip()}
+          </span>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <Link href={{ pathname: `/proposal/${proposalId}` }} key={proposalId}>
+            <CustomLink>Details</CustomLink>
+          </Link>
+        ),
+        span: 2,
+      },
     ];
     return sections;
   };
@@ -147,14 +182,13 @@ const Proposals: React.FC<IProposalsProps> = ({
 
   const tableProps: ITable = {
     rowSections,
-    columnSpans: [1, 1, 1, 1, 2, 2, 2],
     data: proposals as any[],
     header,
     type: 'proposals',
     scrollUp: false,
     totalPages,
     dataName: 'proposals',
-    request: page => request(page),
+    request: (page, limit) => request(page, limit),
   };
 
   return <Table {...tableProps} />;

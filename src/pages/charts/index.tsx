@@ -4,9 +4,9 @@ import Title from '@/components/Layout/Title';
 import api from '@/services/api';
 import { Container, Header, Input, Section } from '@/views/charts';
 import {
+  ChartsContainer,
   TransactionChart,
   TransactionChartContent,
-  TransactionContainer,
 } from '@/views/home';
 import { format } from 'date-fns';
 import { GetServerSideProps } from 'next';
@@ -61,7 +61,7 @@ const Charts: React.FC<ICharts> = ({ statistics }) => {
       </Header>
 
       <Section>
-        <TransactionContainer>
+        <ChartsContainer>
           <TransactionChart>
             <span>Total KLV Burned vs Minted</span>
             <TransactionChartContent>
@@ -97,7 +97,7 @@ const Charts: React.FC<ICharts> = ({ statistics }) => {
               />
             </TransactionChartContent>
           </TransactionChart>
-        </TransactionContainer>
+        </ChartsContainer>
       </Section>
     </Container>
   );

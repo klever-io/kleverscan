@@ -2,6 +2,7 @@ import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Transactions from '@/components/Tabs/Transactions';
+import Validators from '@/components/Tabs/Validators';
 import api from '@/services/api';
 import { IBlock } from '@/types/blocks';
 import { toLocaleFixed } from '@/utils/index';
@@ -62,21 +63,25 @@ const Block: React.FC<IBlockPage> = ({
     parentHash,
     trieRoot,
     validatorsTrieRoot,
+    validators,
     kappsTrieRoot,
     prevRandSeed,
     randSeed,
   } = block;
 
   const cardHeaders = ['Overview', 'Info'];
-  const tableHeaders = ['Transactions'];
+  const tableHeaders = ['Transactions', 'Validators'];
   const precision = 6; // default KLV precision
 
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
 
-  const requestBlock = async (page: number): Promise<ITransactionResponse> =>
+  const requestBlock = async (
+    page: number,
+    limit: number,
+  ): Promise<ITransactionResponse> =>
     api.get({
-      route: `transaction/list?page=${page}&blockNum=${nonce}`,
+      route: `transaction/list?page=${page}&blockNum=${nonce}&limit=${limit}`,
     });
 
   const Overview: React.FC = () => {
@@ -255,7 +260,7 @@ const Block: React.FC<IBlockPage> = ({
     scrollUp: false,
     totalPages: totalPagesTransactions || 0,
     dataName: 'transactions',
-    request: (page: number) => requestBlock(page),
+    request: (page: number, limit: number) => requestBlock(page, limit),
   };
 
   const SelectedTabComponent: React.FC = () => {
@@ -270,6 +275,8 @@ const Block: React.FC<IBlockPage> = ({
             />
           </>
         );
+      case 'Validators':
+        return <Validators validators={validators} />;
       default:
         return <div />;
     }
@@ -283,8 +290,7 @@ const Block: React.FC<IBlockPage> = ({
   return (
     <Container>
       <Header>
-        <Title title="Block Details" />
-
+        <Title title="Block Details" route="/blocks" />
         <Input />
       </Header>
 
@@ -335,7 +341,7 @@ export const getStaticProps: GetStaticProps<IBlockPage> = async ({
 
   const blockNonce = Number(params?.block);
 
-  if (!blockNonce || isNaN(blockNonce)) {
+  if (blockNonce < 0 || isNaN(blockNonce)) {
     return redirectProps;
   }
 

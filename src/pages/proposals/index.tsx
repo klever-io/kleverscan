@@ -6,14 +6,12 @@ import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessa
 import ProposalsTab from '@/components/Tabs/Proposals';
 import api from '@/services/api';
 import {
-  IFullInfoParam,
   INetworkParams,
   IParsedProposal,
   IProposalsPage,
   IProposalsResponse,
-  IRawParam,
-  NetworkParamsIndexer,
 } from '@/types/proposals';
+import { getProposalNetworkParams } from '@/utils/parametersProposal';
 import { Header } from '@/views/accounts/detail';
 import { Card } from '@/views/blocks';
 import { CardContainer, Container, Input } from '@/views/proposals';
@@ -28,9 +26,9 @@ const Proposals: React.FC<IProposalsPage> = ({
   const tableHeaders = ['Network Parameters', 'Proposals'];
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
 
-  const requestProposals = async (page: number) => {
+  const requestProposals = async (page: number, limit: number) => {
     const proposals: IProposalsResponse = await api.get({
-      route: `proposals/list?page=${page}`,
+      route: `proposals/list?page=${page}&limit=${limit}`,
     });
 
     let parsedProposalResponse: any[] = [];
@@ -109,21 +107,6 @@ export const parseAllProposals = (
     return arrayOfProposals;
   }
   return [];
-};
-
-export const getProposalNetworkParams = (
-  params: IRawParam,
-): IFullInfoParam[] => {
-  const fullInfoParams: IFullInfoParam[] = Object.entries(params).map(
-    ([index, value]) => ({
-      paramIndex: index,
-      paramLabel: NetworkParamsIndexer[index],
-      paramValue: Number(value),
-      paramText: proposalsMessages[NetworkParamsIndexer[index]],
-    }),
-  );
-
-  return fullInfoParams;
 };
 
 export const getServerSideProps: GetServerSideProps<

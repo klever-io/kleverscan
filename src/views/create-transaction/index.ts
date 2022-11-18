@@ -13,7 +13,9 @@ export const CardContainer = styled.div`
   font-weight: normal;
   font-size: 15px;
 
-  @media screen and (max-width: 1025px) {
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
   }
 `;
+
+export const Container = styled.div``;

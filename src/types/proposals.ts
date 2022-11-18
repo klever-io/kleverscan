@@ -35,6 +35,7 @@ export interface IParsedProposal extends IProposal {
   parsedParameters: IFullInfoParam[];
   votingPowers?: IVotingPowers;
   currentNetworkParams: INetworkParams;
+  pagination: IPagination;
 }
 
 export interface IAPINetworkParams {
@@ -81,7 +82,7 @@ export interface IProposals {
 export interface IProposalsProps {
   proposals: IParsedProposal[];
   totalPages: number;
-  request: (page: number) => Promise<any>;
+  request: (page: number, limit: number) => Promise<any>;
 }
 
 export interface IRawParam {

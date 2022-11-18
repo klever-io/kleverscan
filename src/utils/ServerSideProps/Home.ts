@@ -1,6 +1,6 @@
 import api from '@/services/api';
 import { Service } from '@/types/index';
-import { addPrecisionTransactions, getEpochInfo } from '@/utils/index';
+import { addPrecisionTransactions, calcApr, getEpochInfo } from '@/utils/index';
 import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import nextI18NextConfig from '../../../next-i18next.config';
@@ -26,11 +26,12 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
       currentSlot: 0,
       epochFinishSlot: 0,
       epochLoadPercent: 0,
-      remainingTime: '0 seconds',
+      remainingTime: '0 sec',
     },
     tps: '0 / 0',
     coinsData: [],
     yesterdayTransactions: 0,
+    beforeYesterdayTransactions: 0,
     yesterdayAccounts: 0,
     assetsData: {
       klv: {
@@ -39,6 +40,8 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
           yesterdayPrice: null,
           variation: null,
         },
+        estimatedAprYesterday: 0,
+        estimatedAprBeforeYesterday: 0,
         staking: {
           totalStaking: null,
           dayBeforeTotalStaking: null,
@@ -52,6 +55,8 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
           yesterdayPrice: null,
           variation: null,
         },
+        estimatedAprYesterday: 0,
+        estimatedAprBeforeYesterday: 0,
         staking: {
           totalStaking: null,
           dayBeforeTotalStaking: null,
@@ -229,10 +234,44 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
     },
   );
 
+  //TODO: Uncomment when backend is fixed
+  // const yesterdayTransactionsCall = new Promise<IAccountResponse>(
+  //   async (resolve, reject) => {
+  //     const res = await api.getCached({
+  //       route: 'transaction/list/count/1',
+  //     });
+
+  //     if (!res.error || res.error === '') {
+  //       resolve(res);
+  //     }
+
+  //     reject(res.error);
+  //   },
+  // );
+
+  //TODO: Remove this call when backend is fixed
   const yesterdayTransactionsCall = new Promise<IAccountResponse>(
     async (resolve, reject) => {
       const res = await api.getCached({
-        route: 'transaction/list/count/1',
+        route: `transaction/list?startdate=${
+          new Date().getTime() - 86400000
+        }&enddate=${new Date().getTime()}`,
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
+  );
+
+  const beforeYesterdayTransactionsCall = new Promise<IAccountResponse>(
+    async (resolve, reject) => {
+      const res = await api.getCached({
+        route: `transaction/list?startdate=${
+          new Date().getTime() - 86400000 * 2
+        }&enddate=${new Date().getTime() - 86400000}`,
       });
 
       if (!res.error || res.error === '') {
@@ -333,6 +372,7 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
     kfiDataCall,
     kfiChartCall,
     yesterdayTransactionsCall,
+    beforeYesterdayTransactionsCall,
     yesterdayAccountsCall,
     klvCall,
     kfiCall,
@@ -398,18 +438,36 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
             break;
 
           case 10:
-            if (value.data?.number_by_day?.length > 0)
-              props.yesterdayTransactions =
-                value.data?.number_by_day[0]?.doc_count;
+            //TODO: Uncomment this when backend is fixed
+            // if (value.data?.number_by_day?.length > 0)
+            //   props.yesterdayTransactions =
+            //     value.data?.number_by_day[0]?.doc_count;
+
+            //TODO: Remove this when backend is fixed
+            if (value.pagination.totalRecords > 0)
+              props.yesterdayTransactions = value.pagination.totalRecords;
+
             break;
 
           case 11:
+            if (value.pagination.totalRecords > 0)
+              props.beforeYesterdayTransactions = value.pagination.totalRecords;
+
+            break;
+
+          case 12:
             if (value.data?.number_by_day?.length > 0)
               props.yesterdayAccounts = value.data?.number_by_day[0]?.doc_count;
             break;
 
-          case 12:
+          case 13:
             const initialKlv = 0;
+            props.assetsData.klv.estimatedAprYesterday =
+              calcApr(value?.data.asset, 4, 0) * 100;
+
+            props.assetsData.klv.estimatedAprBeforeYesterday =
+              calcApr(value?.data.asset, 4, 4) * 100;
+
             props.assetsData.klv.staking.totalStaking =
               value?.data?.asset?.staking?.totalStaked / 1000000 || null;
 
@@ -428,8 +486,19 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
 
             break;
 
-          case 13:
+          case 14:
             const initialKfi = 0;
+            props.assetsData.kfi.estimatedAprYesterday = calcApr(
+              value?.data.asset,
+              4,
+              0,
+            );
+            props.assetsData.kfi.estimatedAprBeforeYesterday = calcApr(
+              value?.data.asset,
+              4,
+              4,
+            );
+
             props.assetsData.kfi.staking.totalStaking =
               value?.data?.asset?.staking?.totalStaked / 1000000 || null;
 
@@ -449,17 +518,18 @@ const HomeServerSideProps: GetServerSideProps<IHome> = async ({
 
             break;
 
-          case 14:
+          case 15:
             if (!value.code) {
               const data = value.Exchanges.find(
                 (exchange: any) => exchange.ExchangeName === 'Klever',
               );
-              props.assetsData.kfi.volume = data.Volume;
-              props.assetsData.kfi.prices.todaysPrice = data.Price;
-              props.assetsData.kfi.prices.variation = data.PriceVariation;
+              props.assetsData.kfi.volume = data.Volume ?? null;
+              props.assetsData.kfi.prices.todaysPrice = data.Price ?? null;
+              props.assetsData.kfi.prices.variation =
+                data.PriceVariation ?? null;
               if (data.Price && data.PriceVariation) {
                 props.assetsData.kfi.prices.yesterdayPrice =
-                  data.Price - data.PriceVariation;
+                  data.Price - data.PriceVariation ?? null;
               }
             }
 

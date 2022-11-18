@@ -1,31 +1,60 @@
+import { ISelectedDays } from '@/components/DateFilter';
 import api from '@/services/api';
 import { TFunction } from 'next-i18next';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
+import { NextRouter } from 'next/router';
 import { toast } from 'react-toastify';
 import {
   IAccountAsset,
   IAsset,
   IAssetOne,
+  IAssetResponse,
   IBalance,
-  IContractOption,
+  IBuyReceipt,
   IDelegationsResponse,
   IEpochInfo,
+  IFilterDater,
   IFormData,
   IMetrics,
+  IPagination,
+  IReceipt,
   ITransaction,
   IValidator,
   IValidatorResponse,
 } from '../types';
+import { ContractsIndex, IBuyITOsTotalPrices } from '../types/contracts';
+import {
+  contractsList,
+  getCells,
+  getHeader,
+  initialsTableHeaders,
+} from './contracts';
 
+/**
+ * Emulates CSS ellipsis by receiving a string and a limit, if the string length is bigger then the limit, the exceeded characters will be replaced by the ellipsis.
+ * @param text
+ * @param limit
+ * @returns string
+ */
 export const breakText = (text: string, limit: number): string => {
   return text.length > limit ? `${text.substring(0, limit)}...` : text;
 };
 
+/**
+ * Converts a timestamp number into a Date instance and returns it's time based on user locale.
+ * @param timestamp
+ * @returns string
+ */
 export const timestampToDate = (timestamp: number): string => {
   const time = new Date(timestamp * 1000);
-
   return time.toLocaleString();
 };
 
+/**
+ * Receives a variation number that should be the result from a subtraction between two variables in percent value. If variation is positive returns a string representing a positive variation, otherwise, a negative variation. In case variation equals to zero, returns a string with two dashes.
+ * @param variation
+ * @returns string
+ */
 export const getVariation = (variation: number): string => {
   const precision = 2;
 
@@ -36,13 +65,18 @@ export const getVariation = (variation: number): string => {
   return `+ ${variation ? variation.toFixed(precision) : '--'}%`;
 };
 
+/**
+ * Receives a Date instance and calculate how many time has passed between now and this Date. Will return a string indicating how many time passed. Second arg is for translation option (optional).
+ * @param date
+ * @param t
+ * @returns string
+ */
 export const getAge = (date: Date, t?: TFunction): string => {
   const diff = Math.abs(new Date().getTime() - date.getTime());
-
-  const sec = Math.ceil(diff / 1000);
-  const min = Math.ceil(diff / (1000 * 60));
-  const hour = Math.ceil(diff / (1000 * 60 * 60));
-  const day = Math.ceil(diff / (1000 * 60 * 60 * 24));
+  const sec = Math.floor(diff / 1000);
+  const min = Math.floor(diff / (1000 * 60));
+  const hour = Math.floor(diff / (1000 * 60 * 60));
+  const day = Math.floor(diff / (1000 * 60 * 60 * 24));
 
   let val = 0;
   let suffix = '';
@@ -60,7 +94,6 @@ export const getAge = (date: Date, t?: TFunction): string => {
     val = day;
     suffix = t ? t('Date.Time.day') : 'day';
   }
-
   return `${val} ${suffix}${val > 1 ? 's' : ''}`;
 };
 
@@ -69,6 +102,12 @@ export const typeVoteColors = {
   No: '#FF4A4A',
 };
 
+/**
+ * Formats a number and returns it's string representation in short scale (Million, Billion...) with 2 decimals points when number is not integer.
+ * Example: 8874165276.908615 --> "8.87 Bi"
+ * @param number
+ * @returns string
+ */
 export const formatAmount = (number: number): string => {
   if (number <= 0) {
     return '0';
@@ -96,12 +135,23 @@ export const formatAmount = (number: number): string => {
   }`;
 };
 
+/**
+ * Shorthand version of toLocaleString for passing precision and always using user locale. It receives a number that will be formatted having a minimal precision according to the precision arg passed.
+ * @param value
+ * @param precision
+ * @returns string
+ */
 export const toLocaleFixed = (value: number, precision: number): string => {
   return value?.toLocaleString(undefined, {
     minimumFractionDigits: precision,
   });
 };
 
+/**
+ * Converts hexadecimal bytes into human readable string.
+ * @param hex
+ * @returns string
+ */
 export const hexToString = (hex: string): string => {
   const stringHex = hex.toString();
   let ret = '';
@@ -113,6 +163,11 @@ export const hexToString = (hex: string): string => {
   return ret;
 };
 
+/**
+ * Sanitizes the assetId's from an IAsset array so they can be valid as URI components.
+ * @param assets
+ * @returns IAsset[]
+ */
 export const parseHardCodedInfo = (assets: IAsset[]): IAsset[] => {
   return assets.map(asset => {
     asset.assetId = encodeURIComponent(asset.assetId);
@@ -120,16 +175,42 @@ export const parseHardCodedInfo = (assets: IAsset[]): IAsset[] => {
   });
 };
 
+/**
+ * Splits an address in two parts, if the address length is greater than the maxLen. The first part is the beginning of the address. The last part is the end of the address. Ellipsis is between the splitted address.
+ * @param address
+ * @param maxLen
+ * @returns string
+ */
 export const parseAddress = (address: string, maxLen: number): string => {
   return address.length > maxLen
     ? `${address.slice(0, maxLen / 2)}...${address.slice(-(maxLen / 2))}`
     : address;
 };
 
+/**
+ * Receives an string as an argument and returns it with it's first character capitalized.
+ * @param str
+ * @returns string
+ */
 export const capitalizeString = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
+/**
+ * Receives an IMetrics object as an argument and use it to return an IEpochInfo object.
+ *
+ * DEFAULT VALUES FOR MAINNET (some may change):
+ *
+ * slotDuration = 4000 --> 4 sec --> time for a block to be produced
+ *
+ * slotsPerEpoch = 5400 --> 5400 x 4 --> 21600 sec for every epoch, which is the time for the network to choose it's new block producers
+ *
+ * currentSlot --> current slot network is in, changes every 4 sec
+ *
+ * slotAtEpochStart --> slot in which actual epoch started, changes every 21600 sec
+ * @param metrics
+ * @returns IEpochInfo object
+ */
 export const getEpochInfo = (metrics: IMetrics): IEpochInfo => {
   const { slotAtEpochStart, slotsPerEpoch, currentSlot, slotDuration } =
     metrics;
@@ -154,6 +235,12 @@ export const getEpochInfo = (metrics: IMetrics): IEpochInfo => {
   };
 };
 
+/**
+ * Receive a number as first arg that represents seconds, process this number to returns it's representation in hours, minutes and seconds as a string. Second argument is if translation option was passed.
+ * @param input
+ * @param t
+ * @returns string
+ */
 const secondsToHourMinSec = (input: number, t?: TFunction): string => {
   const numSecondsInAMinute = 60;
   const numMinutesInAHour = 60;
@@ -166,37 +253,34 @@ const secondsToHourMinSec = (input: number, t?: TFunction): string => {
   seconds = input % numSecondsInAMinute;
 
   if (hours > 0) {
-    result = plural(hours, t ? t('Date.Time.hour') : 'hour');
+    result = `${hours}h`;
   }
   if (minutes > 0) {
-    result += plural(minutes, t ? t('Date.Time.minute') : 'minute');
+    result += ` ${minutes}m`;
   }
   if (seconds > 0) {
-    result += plural(seconds, t ? t('Date.Time.second') : 'second');
+    result += ` ${seconds}s`;
   }
 
   result += ' ';
-
   return result;
 };
 
-const plural = (count: number, singular: string): string => {
-  if (count < 2) {
-    return `${count} ${singular} `;
-  }
-
-  return `${count} ${singular}s `;
-};
-
+/**
+ * Simply add commas to a number by calling toLocaleString method.
+ * @param numb
+ * @returns string
+ */
 export const addCommasToNumber = (numb: number): string => {
   return numb.toLocaleString();
 };
 
+/** Parse data from an Object whose values are saved as string and convert them to their content. Example: "true" --> true */
 export const parseData = (data: IFormData): IFormData => {
   const dataEntries = Object.entries(data);
 
   dataEntries.forEach(([key, value]) => {
-    if (value === '') {
+    if (value === '' || value === null) {
       delete data[key];
     } else if (typeof value === 'object') {
       parseData(value);
@@ -227,6 +311,11 @@ export const parseData = (data: IFormData): IFormData => {
   return data;
 };
 
+/**
+ * Throws a string into a switch case statement to return the hardcoded parsed version of this string. In case none of the cases matches, function will execute default parse mode, which it splits the string by it's capital letters and join all words by empty spaces.
+ * @param str
+ * @returns string
+ */
 export const formatLabel = (str: string): string => {
   switch (str) {
     case 'assetID':
@@ -263,101 +352,11 @@ export const formatLabel = (str: string): string => {
   return label;
 };
 
-export const contractOptions: IContractOption[] = [
-  {
-    label: 'Transfer',
-    value: 'TransferContract',
-  },
-  {
-    label: 'Create Asset',
-    value: 'CreateAssetContract',
-  },
-  {
-    label: 'Create Validator',
-    value: 'CreateValidatorContract',
-  },
-  {
-    label: 'Edit Validator Settings',
-    value: 'ValidatorConfigContract',
-  },
-  {
-    label: 'Freeze',
-    value: 'FreezeContract',
-  },
-  {
-    label: 'Unfreeze',
-    value: 'UnfreezeContract',
-  },
-  {
-    label: 'Delegate',
-    value: 'DelegateContract',
-  },
-  {
-    label: 'Undelegate',
-    value: 'UndelegateContract',
-  },
-  {
-    label: 'Withdraw',
-    value: 'WithdrawContract',
-  },
-  {
-    label: 'Claim',
-    value: 'ClaimContract',
-  },
-  {
-    label: 'Unjail',
-    value: 'UnjailContract',
-  },
-  {
-    label: 'Asset Trigger',
-    value: 'AssetTriggerContract',
-  },
-  {
-    label: 'Set Account Name',
-    value: 'SetAccountNameContract',
-  },
-  {
-    label: 'Proposal',
-    value: 'ProposalContract',
-  },
-  {
-    label: 'Vote',
-    value: 'VoteContract',
-  },
-  {
-    label: 'Config ITO',
-    value: 'ConfigITOContract',
-  },
-  {
-    label: 'Set ITO Prices',
-    value: 'SetITOPricesContract',
-  },
-  {
-    label: 'Buy',
-    value: 'BuyContract',
-  },
-  {
-    label: 'Sell',
-    value: 'SellContract',
-  },
-  {
-    label: 'Cancel Market Order',
-    value: 'CancelMarketOrderContract',
-  },
-  {
-    label: 'Create Marketplace',
-    value: 'CreateMarketplaceContract',
-  },
-  {
-    label: 'Configure Marketplace',
-    value: 'ConfigMarketplaceContract',
-  },
-  {
-    label: 'Update Account Permission',
-    value: 'UpdateAccountPermissionContract',
-  },
-];
-
+/**
+ * Verifies not only if an array of strings is empty, but also if it's content is full of empty strings, in that case it will still return true as well.
+ * @param data
+ * @returns boolean
+ */
 export const isDataEmpty = (data: string[]): boolean => {
   if (data?.length === 0) {
     return true;
@@ -374,80 +373,14 @@ export const isDataEmpty = (data: string[]): boolean => {
   return true;
 };
 
-export const claimTypes = [
-  {
-    label: 'Staking Claim (0)',
-    value: 0,
-  },
-  {
-    label: 'Allowance Claim (1)',
-    value: 1,
-  },
-  {
-    label: 'Market Claim (2)',
-    value: 2,
-  },
-];
-
-export const assetTriggerTypes = [
-  {
-    label: 'Mint (0)',
-    value: 0,
-  },
-  {
-    label: 'Burn (1)',
-    value: 1,
-  },
-  {
-    label: 'Wipe (2)',
-    value: 2,
-  },
-  {
-    label: 'Pause (3)',
-    value: 3,
-  },
-  {
-    label: 'Resume (4)',
-    value: 4,
-  },
-  {
-    label: 'Change Owner (5)',
-    value: 5,
-  },
-  {
-    label: 'Add Role (6)',
-    value: 6,
-  },
-  {
-    label: 'Remove Role (7)',
-    value: 7,
-  },
-  {
-    label: 'Update Metadata (8)',
-    value: 8,
-  },
-  {
-    label: 'Stop NFT Mint (9)',
-    value: 9,
-  },
-  {
-    label: 'Update Logo (10)',
-    value: 10,
-  },
-  {
-    label: 'Update URIs (11)',
-    value: 11,
-  },
-  {
-    label: 'Change Royalties Receiver (12)',
-    value: 12,
-  },
-  {
-    label: 'Update Staking (13)',
-    value: 13,
-  },
-];
-
+/**
+ * Wraps the content and params of a promise and put it inside a loop. The loop will break and return if promise succeeds or it will end after the third try(or the number passed as arg). There is a timeout of 500 milliseconds between each try.
+ * @param success callback fn for promise fulfilled
+ * @param failure callback fn for promise rejection
+ * @param condition the content of the promise
+ * @param tries number of tries for the passed promise
+ * @returns Promise void
+ */
 export const asyncDoIf = async (
   success: (result?: any) => any,
   failure: (error?: any) => any,
@@ -470,6 +403,25 @@ export const asyncDoIf = async (
   failure(error);
   return;
 };
+
+export const setCharAt = (
+  str: string,
+  index: number,
+  newChar: string,
+): string => {
+  if (index > str.length - 1) return str;
+  return str.substring(0, index) + newChar + str.substring(index + 1);
+};
+
+/**
+ * Makes your promise race with a timeout promise. If it loses, your promise will be rejected. Default timeout is 5 seconds.
+ * @param success callback fn for promise fulfilled
+ * @param failure callback fn for promise rejection
+ * @param condition the content of the promise
+ * @param timeoutMS time limit for the timeout promise, indicates how much time your promise has until it fails.
+ * @param intervalMS time interval between your promise calls
+ * @returns Promise void
+ */
 
 export const doIf = async (
   success: () => any,
@@ -510,21 +462,35 @@ export const doIf = async (
   await Promise.race([IntervalPromise, TimeoutPromise]);
 };
 
+/**
+ * Get an asset's precision and use it as an exponent to the base 10, the result is returned. In case of error returns undefined and a toast error.
+ * @param asset
+ * @returns Promise < number | undefined >
+ */
 export const getPrecision = async (
   asset: string,
 ): Promise<number | undefined> => {
-  const response = await api.get({ route: `assets/${asset}` });
+  try {
+    const response = await api.getCached({ route: `assets/${asset}` });
 
-  if (response.error) {
-    const messageError =
-      response.error.charAt(0).toUpperCase() + response.error.slice(1);
-    toast.error(messageError);
-    return;
+    if (response.error) {
+      const messageError =
+        response.error.charAt(0).toUpperCase() + response.error.slice(1);
+      toast.error(messageError);
+      return;
+    }
+
+    return response.data.asset.precision;
+  } catch (error) {
+    console.error(error);
   }
-
-  return 10 ** response.data.asset.precision;
 };
 
+/**
+ * Validates URL extension with regex. Accepted formats: gif|jpg|jpeg|tiff|png|webp
+ * @param url
+ * @returns boolean
+ */
 export const regexImgUrl = (url: string): boolean => {
   const regex = /[\/.](gif|jpg|jpeg|tiff|png|webp)$/i;
   if (regex.test(url)) {
@@ -533,6 +499,12 @@ export const regexImgUrl = (url: string): boolean => {
   return false;
 };
 
+/**
+ * Check if the header 'content-type' of a specified URL is of type 'image'. Must pass a timeout arg for this check.
+ * @param url
+ * @param timeout
+ * @returns Promise < boolean >
+ */
 export const validateImgRequestHeader = async (
   url: string,
   timeout: number,
@@ -555,6 +527,12 @@ export const validateImgRequestHeader = async (
   }
 };
 
+/**
+ * Checks if an URL can be used as an html image src. Must pass a timeout arg for this check.
+ * @param url
+ * @param timeout
+ * @returns although TS says unknown, it should return Promise < boolean >
+ */
 export const isImage = async (
   url: string,
   timeout: number,
@@ -571,6 +549,12 @@ export const isImage = async (
   return Promise.race([imgPromise, timeoutPromise]);
 };
 
+/**
+ * Compiles all URL image validators functions and use it as the definitive URL image validator function.
+ * @param url
+ * @param timeout
+ * @returns Promise < boolean >
+ */
 export const validateImgUrl = async (
   url: string,
   timeout: number,
@@ -589,6 +573,11 @@ export const validateImgUrl = async (
   return false;
 };
 
+/**
+ * Checks if the contractType is Transfer, Freeze ou Unfreeze. Otherwise returns false.
+ * @param contract
+ * @returns boolean
+ */
 export const getContractType = (contract: string): boolean => {
   if (
     contract === 'TransferContractType' ||
@@ -600,6 +589,13 @@ export const getContractType = (contract: string): boolean => {
   return false;
 };
 
+/**
+ * Receive a list of transactions and add precision field to the contracts of the transactions, unless the contract is Multi Transaction (transaction.contract.length > 1 case).
+ * @param transactions
+ * @returns ITransaction[] with precision key in contracts.
+ */
+// parameter must necessarily contain assetId
+
 export const addPrecisionTransactions = (
   transactions: ITransaction[],
 ): ITransaction[] => {
@@ -607,11 +603,11 @@ export const addPrecisionTransactions = (
     if (transaction.contract.length > 1) {
       return transaction;
     }
-
     transaction?.contract.map(async contrct => {
-      if (contrct?.parameter?.assetId) {
+      const parameter = contrct?.parameter as any;
+      if (parameter?.assetId) {
         const response: IAssetOne = await api.get({
-          route: `assets/${contrct.parameter.assetId}`,
+          route: `assets/${parameter?.assetId}`,
         });
         if (!response.error && response.code === 'successful') {
           contrct.precision = response.data?.asset?.precision || 0;
@@ -625,6 +621,11 @@ export const addPrecisionTransactions = (
   });
 };
 
+/**
+ * Receives an IValidatorResponse with data from all validators and parse it adding new fields: parsedAddress, rank, staked, cumulativeStaked and status.
+ * @param validators
+ * @returns IValidator[]
+ */
 export const parseValidators = (
   validators: IValidatorResponse,
 ): IValidator[] => {
@@ -638,19 +639,20 @@ export const parseValidators = (
         delegation.totalValidatorSuccessRate.numFailure;
 
       return {
-        staked: delegation.totalStake,
+        ownerAddress: delegation.ownerAddress,
+        parsedAddress: parseAddress(delegation.ownerAddress, 20),
+        name: delegation.name,
         rank:
           index +
           (validators.pagination.self - 1) * validators.pagination.perPage +
           1,
-        name: delegation.name || parseAddress(delegation.ownerAddress, 20),
         cumulativeStaked: parseFloat(
           (
             (delegation.totalStake / validators.data.networkTotalStake) *
             100
           ).toFixed(4),
         ),
-        address: delegation.ownerAddress,
+        staked: delegation.totalStake,
         rating: delegation.rating,
         canDelegate: delegation.canDelegate,
         selfStake: delegation.selfStake,
@@ -663,21 +665,221 @@ export const parseValidators = (
   );
 };
 
+/**
+ *  Receives an IAccountAsset[] (which comes from an IAssetsHoldersResponse) and returns a new array of objects only with index, address, balance and rank properties.
+ * @param holders
+ * @param assetId is required to check if the holder asset is really from the correct asset.
+ * @param pagination is required because is used to calculate the rank of the asset holder.
+ * @returns IBalance[] which is the data necessary for the frontend to show the holders of an asset.
+ */
 export const parseHolders = (
   holders: IAccountAsset[] | [],
   assetId: string,
+  pagination: IPagination,
 ): IBalance[] =>
   holders.map((holder: IAccountAsset, index: number) => {
     if (holder.assetId === assetId) {
       return {
         index,
         address: holder.address,
-        balance: holder.frozenBalance + holder.balance,
+        balance: 0,
+        frozenBalance: holder.frozenBalance,
+        rank: index + 1 + (pagination.self - 1) * pagination.perPage,
       };
     } else
       return {
         index,
         address: '',
         balance: 0,
+        frozenBalance: 0,
+        rank: 0,
       };
   });
+
+/**
+ * Receives timeout, value and assets (IAssets[]) and check if the value is in the array. If not then fetch the value from API
+ * @param timeout is required to do a debounce function
+ * @param value is required to search on the array.
+ * @param assets is required because is used to find the value.
+ * @returns return false if find the value in the array(assets) or return the assets from API response (IAssets[])
+ */
+export const fetchPartialAsset = (
+  timeout: ReturnType<typeof setTimeout>,
+  value: string,
+  assets: IAsset[],
+): Promise<IAsset[] | false> => {
+  clearTimeout(timeout);
+  return new Promise(res => {
+    timeout = setTimeout(async () => {
+      let response: IAssetResponse;
+      if (
+        value &&
+        !assets.find((asset: any) =>
+          asset.assetId.includes(value.toUpperCase()),
+        )
+      ) {
+        response = await api.getCached({
+          route: `assets/kassets?asset=${value}`,
+        });
+        res(response.data.assets);
+      }
+      res(false);
+    }, 500);
+  });
+};
+
+/**
+ * Receive tab from next router query and find the selected tab.
+ * @param tab is required to use next router query
+ * @returns return number corresponding to the tab selected.
+ */
+export const getSelectedTab = (tab: string | string[] | undefined): number => {
+  if (tab === 'Assets' || tab === undefined) {
+    return 0;
+  } else if (tab === 'Transactions') {
+    return 1;
+  }
+  return 2;
+};
+
+/**
+ * Receive selectedDays
+ * @param selectedDays is required to format the date filter
+ * @returns return the filter as object with "startdate" and "enddate"
+ */
+export const filterDate = (selectedDays: ISelectedDays): IFilterDater => {
+  return {
+    startdate: selectedDays.start.getTime().toString(),
+    enddate: selectedDays.end
+      ? (selectedDays.end.getTime() + 24 * 60 * 60 * 1000).toString()
+      : (selectedDays.start.getTime() + 24 * 60 * 60 * 1000).toString(),
+  };
+};
+
+/**
+ * Receive query as object with filters and "RESET" the date filter
+ * @param query is required to reset the date filter
+ * @returns return object with all filters and the new date
+ */
+export const resetDate = (query: NextParsedUrlQuery): NextParsedUrlQuery => {
+  const updatedQuery = { ...query };
+  delete updatedQuery.startdate;
+  delete updatedQuery.enddate;
+  return updatedQuery;
+};
+
+/**
+ * Receive the asset with fpr values to calculate the apr
+ * @param asset is required to use the totalStaked and totalAmount values of each epoch
+ * @param epochQty  is required and it's the number of epoch to use to calculate the estimared apr, by default it'll use 10 epoch
+ * @param start is required to know which epoch should start to calc the before last epoch. This is the last epoch before the 24h ( last 5th epoch)
+ * @returns return a number that is the estimated APR
+ */
+export const calcApr = (
+  asset: IAsset,
+  epochQty: number,
+  start: number,
+): number => {
+  const values = {
+    totalStaked: 0,
+    totalAmount: 0,
+  };
+  for (let index = 1 + start; index <= epochQty + start; index += 1) {
+    values.totalStaked +=
+      asset?.staking?.fpr[asset?.staking?.fpr.length - index].totalStaked;
+    values.totalAmount +=
+      asset?.staking?.fpr[asset?.staking?.fpr.length - index].totalAmount;
+  }
+
+  values.totalStaked = values.totalStaked / epochQty;
+  values.totalAmount = values.totalAmount / epochQty;
+
+  return (values.totalAmount / values.totalStaked) * 4 * 365;
+};
+
+const processHeaders = (router: NextRouter) => {
+  const deafultHeaders = [...initialsTableHeaders];
+  deafultHeaders.push('kApp Fee', 'Bandwidth Fee');
+  const headers = getHeader(router, deafultHeaders);
+  const sanitizedHeaders = headers.filter(header => header !== '');
+  return sanitizedHeaders;
+};
+
+const processRow = async (row: ITransaction, router: NextRouter) => {
+  let finalVal = '';
+  const parsedRow = await getCells(row, router);
+  for (let j = 0; j < parsedRow.length; j++) {
+    const innerValue = parsedRow[j] === null ? '' : parsedRow[j].toString();
+
+    let result = innerValue.replace(/"/g, '""');
+    if (result.search(/("|,|\n)/g) >= 0) result = '"' + result + '"';
+    if (j > 0) finalVal += ',';
+    finalVal += result;
+  }
+  return finalVal + '\n';
+};
+
+export const exportToCsv = async (
+  filename: string,
+  rows: any[] | null,
+  router: NextRouter,
+): Promise<void> => {
+  if (!rows || rows.length === 0) {
+    window.alert('No data to export!');
+    return;
+  }
+  let csvFile = '';
+  for (let i = -1; i < rows.length; i++) {
+    if (i === -1) {
+      const headers = processHeaders(router);
+      csvFile += headers + '\n';
+    } else {
+      csvFile += await processRow(rows[i], router);
+    }
+  }
+  if (typeof window !== undefined) {
+    const blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }
+};
+
+export const getTotalAssetsPrices = (
+  ITOBuyPrices: IBuyITOsTotalPrices,
+  receipts: IReceipt[],
+  sender: string,
+): IBuyITOsTotalPrices => {
+  receipts.map(receipt => {
+    const buyITOReceipt = receipt as unknown as IBuyReceipt;
+    if (buyITOReceipt.assetId && buyITOReceipt.from === sender) {
+      ITOBuyPrices[buyITOReceipt.assetId].price +=
+        (buyITOReceipt?.value ?? 0) /
+        10 ** ITOBuyPrices[buyITOReceipt.assetId].precision;
+    }
+  });
+  return ITOBuyPrices;
+};
+
+export const calculatePermissionOperations = (
+  operations: string,
+): typeof contractsList => {
+  const stringContracts: typeof contractsList = [];
+  if (typeof operations === 'string' && operations.match(/^[0-9A-Fa-f]+$/g)) {
+    const binaryOperations = parseInt(operations, 16).toString(2);
+    const reversedBinaryOperationsArray = binaryOperations.split('').reverse();
+    reversedBinaryOperationsArray.forEach((char, index) => {
+      if (char === '1') {
+        stringContracts.push(ContractsIndex[index]);
+      }
+    });
+  }
+  return stringContracts;
+};

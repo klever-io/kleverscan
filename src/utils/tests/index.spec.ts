@@ -1,17 +1,55 @@
+import FakeTimers from '@sinonjs/fake-timers';
+import api from '../../services/api';
 import {
+  addCommasToNumber,
+  addPrecisionTransactions,
+  asyncDoIf,
   breakText,
   capitalizeString,
+  doIf,
+  fetchPartialAsset,
+  filterDate,
   formatAmount,
+  formatLabel,
   getAge,
+  getContractType,
   getEpochInfo,
+  getPrecision,
+  getSelectedTab,
   getVariation,
   hexToString,
+  isDataEmpty,
+  isImage,
   parseAddress,
+  parseData,
   parseHardCodedInfo,
+  parseHolders,
+  parseValidators,
+  regexImgUrl,
+  resetDate,
+  setCharAt,
   timestampToDate,
   toLocaleFixed,
+  validateImgRequestHeader,
+  validateImgUrl,
 } from '../index';
 import mocks from './mocks';
+
+jest.mock('next/router', () => ({
+  useRouter() {
+    return {
+      route: '/',
+      pathname: '',
+    };
+  },
+}));
+
+jest.mock('@/services/api', () => {
+  return {
+    getCached: jest.fn(),
+    get: jest.fn(),
+  };
+});
 
 describe('unit tests for util funcs in index file', () => {
   const timestamp1 = 1556322834000;
@@ -19,6 +57,10 @@ describe('unit tests for util funcs in index file', () => {
   const timestamp3 = 1654195050246;
   const timestamp4 = 1654205050246;
 
+  const clock = FakeTimers.install();
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
   describe('test breakText function', () => {
     test('when limit threshold is not surpassed', () => {
       expect(breakText('Hello World!', 12)).toEqual('Hello World!');
@@ -30,8 +72,8 @@ describe('unit tests for util funcs in index file', () => {
 
   describe('test timestampToDate function', () => {
     test('using old dates timestamps as parameters', () => {
-      expect(timestampToDate(timestamp1)).toEqual('2019-04-26');
-      expect(timestampToDate(timestamp2)).toEqual('2022-06-02');
+      expect(timestampToDate(timestamp1)).toEqual('11/27/51287, 3:20:00 PM');
+      expect(timestampToDate(timestamp2)).toEqual('4/28/54389, 8:17:26 AM');
     });
   });
 
@@ -54,25 +96,11 @@ describe('unit tests for util funcs in index file', () => {
   });
 
   describe('test getAge function', () => {
-    let realDate;
+    clock.setSystemTime(new Date(timestamp2));
     test('with fixed date through mocked Date constructor', () => {
-      const fixedDate = new Date(timestamp2);
-      realDate = Date;
-      // TODO - Fix TYPE
-      (global.Date as any) = class extends Date {
-        constructor(...args: any) {
-          if (args.length > 0) {
-            return super(...args);
-          }
-          return fixedDate;
-        }
-      };
-
       expect(getAge(new Date(timestamp2))).toEqual('0 sec');
-      expect(getAge(new Date(timestamp3))).toEqual('17 mins');
-      expect(getAge(new Date(timestamp4))).toEqual('4 hours');
-
-      global.Date = realDate;
+      expect(getAge(new Date(timestamp3))).toEqual('16 mins');
+      expect(getAge(new Date(timestamp4))).toEqual('3 hours');
     });
   });
 
@@ -168,43 +196,43 @@ describe('unit tests for util funcs in index file', () => {
 
   describe('test getEpochInfo function', () => {
     const parsedMetrics1 = {
-      klv_slot_at_epoch_start: 220503,
-      klv_slots_per_epoch: 150,
-      klv_current_slot: 220651,
-      klv_slot_duration: 4000,
+      slotAtEpochStart: 220503,
+      slotsPerEpoch: 150,
+      currentSlot: 220651,
+      slotDuration: 4000,
     };
     const parsedMetrics2 = {
-      klv_slot_at_epoch_start: 220653,
-      klv_slots_per_epoch: 150,
-      klv_current_slot: 220669,
-      klv_slot_duration: 4000,
+      slotAtEpochStart: 220653,
+      slotsPerEpoch: 150,
+      currentSlot: 220669,
+      slotDuration: 4000,
     };
 
     const parsedMetrics3 = {
-      klv_slot_at_epoch_start: 220453,
-      klv_slots_per_epoch: 150,
-      klv_current_slot: 220670,
-      klv_slot_duration: 4000,
+      slotAtEpochStart: 220453,
+      slotsPerEpoch: 150,
+      currentSlot: 220670,
+      slotDuration: 4000,
     };
 
     const parsedMetrics4 = {
-      klv_slot_at_epoch_start: 9220755,
-      klv_slots_per_epoch: 2500,
-      klv_current_slot: 9221670,
-      klv_slot_duration: 4000,
+      slotAtEpochStart: 9220755,
+      slotsPerEpoch: 2500,
+      currentSlot: 9221670,
+      slotDuration: 4000,
     };
 
     const result1 = {
       currentSlot: 220651,
       epochFinishSlot: 220653,
       epochLoadPercent: 98.66666666666667,
-      remainingTime: '8 seconds  ',
+      remainingTime: ' 8s ',
     };
     const result2 = {
       currentSlot: 220669,
       epochFinishSlot: 220803,
       epochLoadPercent: 10.666666666666671,
-      remainingTime: '8 minutes 56 seconds  ',
+      remainingTime: ' 8m 56s ',
     };
     const result3 = {
       currentSlot: 220670,
@@ -217,13 +245,418 @@ describe('unit tests for util funcs in index file', () => {
       currentSlot: 9221670,
       epochFinishSlot: 9223255,
       epochLoadPercent: 36.6,
-      remainingTime: '1 hour 45 minutes 40 seconds  ',
+      remainingTime: '1h 45m 40s ',
     };
     test('if correct object is returned', () => {
       expect(getEpochInfo(parsedMetrics1)).toStrictEqual(result1);
       expect(getEpochInfo(parsedMetrics2)).toStrictEqual(result2);
       expect(getEpochInfo(parsedMetrics3)).toStrictEqual(result3);
       expect(getEpochInfo(parsedMetrics4)).toStrictEqual(result4);
+    });
+  });
+
+  describe('test addCommasToNumber function', () => {
+    test('if the number returned a string', () => {
+      const num = 12000000;
+      const num2 = 20000000;
+      const num3 = 80000000;
+      expect(addCommasToNumber(num)).toEqual('12,000,000');
+      expect(addCommasToNumber(num2)).toEqual('20,000,000');
+      expect(addCommasToNumber(num3)).toEqual('80,000,000');
+    });
+  });
+
+  describe('test parseData function', () => {
+    test('if Object whose values are saved as string and convert them to their content', () => {
+      const data = {
+        test: '',
+        test2: 'test2',
+      };
+      const data2 = {
+        test: {
+          test3: 'Test number 3',
+        },
+      };
+      const data3 = {
+        test: 123124124,
+      };
+      const data4 = {
+        test4: '1999-01-01',
+      };
+      expect(parseData(data)).toEqual({ test2: 'test2' });
+      expect(parseData(data2)).toEqual({ test: { test3: 'Test number 3' } });
+      expect(parseData(data3)).toEqual({ test: 123124124 });
+      expect(parseData(data4)).toEqual({ test4: 915148800 });
+    });
+  });
+
+  describe('test formatLabel function', () => {
+    const isNFTMintStopped = 'isNFTMintStopped';
+    const assetID = 'assetID';
+    const bucketID = 'bucketID';
+    const apr = 'APR';
+    const blsPublicKey = 'BLSPublicKey';
+    const marketPlaceID = 'marketplaceID';
+    test.each`
+      string              | expected
+      ${isNFTMintStopped} | ${'Is NFT Mint Stopped'}
+      ${assetID}          | ${'AssetID'}
+      ${bucketID}         | ${'BucketID'}
+      ${apr}              | ${'APR'}
+      ${blsPublicKey}     | ${'BLS Public Key'}
+      ${marketPlaceID}    | ${'MarketplaceID'}
+      ${'KLV'}            | ${'K L V'}
+      ${'assetId'}        | ${'AssetID'}
+    `('if return correct string', ({ string, expected }) => {
+      expect(formatLabel(string)).toEqual(expected);
+    });
+  });
+
+  describe('test isDataEmpty function', () => {
+    test('return true if array of strings is empty', () => {
+      const empty = [];
+      const data = ['3030303830'];
+      const data2 = [''];
+      expect(isDataEmpty(empty)).toEqual(true);
+      expect(isDataEmpty(data)).toEqual(false);
+      expect(isDataEmpty(data2)).toEqual(true);
+    });
+  });
+
+  describe('test setCharAt function', () => {
+    test('if return new string', () => {
+      const test = setCharAt('1500000', 5, '4000');
+      const test2 = setCharAt('2000', 5, '4000');
+      expect(test).toEqual('1500040000');
+      expect(test2).toEqual('2000');
+    });
+  });
+  describe('test regexImgUrl function', () => {
+    test('Validates URL extension with regex', () => {
+      const logo1 = regexImgUrl(
+        'https://cdn-images-1.medium.com/max/720/1*2Wu5yLlLrfsfz6wMYFlYtQ.png',
+      );
+      const logo2 = regexImgUrl(
+        'https://cdn-images-1.medium.com/max/720/1*2Wu5yLlLrfsfz6wMYFlYtQ.gif',
+      );
+      const logo3 = regexImgUrl(
+        'https://cdn-images-1.medium.com/max/720/1*2Wu5yLlLrfsfz6wMYFlYtQ.jpg',
+      );
+      const logo4 = regexImgUrl(
+        'https://cdn-images-1.medium.com/max/720/1*2Wu5yLlLrfsfz6wMYFlYtQ.jpeg',
+      );
+      const logo5 = regexImgUrl(
+        'https://cdn-images-1.medium.com/max/720/1*2Wu5yLlLrfsfz6wMYFlYtQ.tiff',
+      );
+      const logo6 = regexImgUrl(
+        'https://cdn-images-1.medium.com/max/720/1*2Wu5yLlLrfsfz6wMYFlYtQ.webp',
+      );
+      const logo7 = regexImgUrl(
+        'https://cdn-images-1.medium.com/max/720/1*2Wu5yLlLrfsfz6wMYFlYtQ.html',
+      );
+      expect(logo1).toEqual(true);
+      expect(logo2).toEqual(true);
+      expect(logo3).toEqual(true);
+      expect(logo4).toEqual(true);
+      expect(logo5).toEqual(true);
+      expect(logo6).toEqual(true);
+      expect(logo7).toEqual(false);
+    });
+  });
+
+  describe('test getContractType function', () => {
+    test.each`
+      contract                  | expected
+      ${'TransferContractType'} | ${true}
+      ${'FreezeContractType'}   | ${true}
+      ${'FreezeContractType'}   | ${true}
+      ${'UnjailContractType'}   | ${false}
+      ${'VoteContractType'}     | ${false}
+    `(
+      'check if contract is Transfer, Freeze or Unfreeze',
+      ({ contract, expected }) => {
+        expect(getContractType(contract)).toEqual(expected);
+      },
+    );
+  });
+
+  describe('test getSelectedTab function', () => {
+    test('return boolean when selecting a tab', () => {
+      const assetsTab = getSelectedTab('Assets');
+      const transactionsTab = getSelectedTab('Transactions');
+      const emptyTab = getSelectedTab(['']);
+      const emptyString = getSelectedTab('');
+      expect(assetsTab).toEqual(0);
+      expect(transactionsTab).toEqual(1);
+      expect(emptyTab).toEqual(2);
+      expect(emptyString).toEqual(2);
+    });
+  });
+
+  describe('test filterDate', () => {
+    test('return the filter as object with "startdate" and "enddate"', () => {
+      const dateFilter1 = {
+        start: new Date('2022-10-02T03:00:00.000Z'),
+        end: new Date('2022-10-03T03:00:00.000Z'),
+        values: [
+          new Date('2022-10-02T03:00:00.000Z'),
+          new Date('2022-10-03T03:00:00.000Z'),
+        ],
+      };
+      const dateFilter2 = {
+        start: new Date('2022-10-02T03:00:00.000Z'),
+        end: null,
+        values: [new Date('2022-10-02T03:00:00.000Z')],
+      };
+      expect(filterDate(dateFilter1)).toEqual({
+        startdate: '1664679600000',
+        enddate: '1664852400000',
+      });
+      expect(filterDate(dateFilter2)).toEqual({
+        startdate: '1664679600000',
+        enddate: '1664766000000',
+      });
+    });
+  });
+
+  describe('test validateImgUrl', () => {
+    test('return true if url is valid', async () => {
+      const url1 = await validateImgUrl(
+        'https://cdn-images-1.medium.com/max/720/1*2Wu5yLlLrfsfz6wMYFlYtQ.png',
+        2000,
+      );
+      expect(url1).toEqual(true);
+    });
+  });
+
+  describe('test parseValidators', () => {
+    const validators = [
+      {
+        ownerAddress:
+          'klv1tyajtxfsuslwqu8jmvp4xq87dppua0mwugx7ntv5dqt5cx200xfqayxflh',
+        parsedAddress: 'klv1tyajtx...0xfqayxflh',
+        name: 'PLC-Node',
+        rank: 1,
+        cumulativeStaked: 0.3923,
+        staked: 10000000000000,
+        rating: 10000000,
+        canDelegate: true,
+        selfStake: 1500000000000,
+        status: 'elected',
+        totalProduced: 586576,
+        totalMissed: 1824,
+        commission: 0,
+      },
+      {
+        ownerAddress:
+          'klv1qh2va63uesnzydz9pykqmszcphewse9f87mqxmkyhh0qfmv5l28s35r5r2',
+        parsedAddress: 'klv1qh2va6...l28s35r5r2',
+        name: 'Skywalker',
+        rank: 2,
+        cumulativeStaked: 0.3923,
+        staked: 10000000000000,
+        rating: 10000000,
+        canDelegate: true,
+        selfStake: 1500000000000,
+        status: 'elected',
+        totalProduced: 436141,
+        totalMissed: 1096,
+        commission: 0,
+      },
+    ];
+    test('if correct array is returned', () => {
+      const result = parseValidators(mocks.validator);
+      expect(result).toHaveLength(2);
+      expect(result).toStrictEqual(validators);
+    });
+  });
+
+  describe('test resetDate function', () => {
+    const query = {
+      account: 'klv16sd7crk4jlc8csrv7lwskqrpjgjklvcsmlhexuesa9p6a3dm57rs5vh0hq',
+      tab: 'Transactions',
+      startdate: '1665457200000',
+      enddate: '1666321200000',
+    };
+    test('check if "RESET" the date filter', () => {
+      const result = resetDate(query);
+      expect(result).toEqual({
+        account:
+          'klv16sd7crk4jlc8csrv7lwskqrpjgjklvcsmlhexuesa9p6a3dm57rs5vh0hq',
+        tab: 'Transactions',
+      });
+    });
+  });
+
+  describe('test parseHolders', () => {
+    const { data, pagination } = mocks.holdersList;
+    const holders = [
+      {
+        index: 0,
+        address:
+          'klv1rquwyta7kh4jueua76xpqkfgcwsws9yadtuxtp5g2cyt5ps04cpq5ywg5x',
+        balance: 500000000000000,
+        rank: 1,
+      },
+      {
+        index: 1,
+        address:
+          'klv1edd0ymfmv9r2mxk7mdtsk4zfeql5cp9vyn7t4y4adq58vp2r9alslfglw8',
+        balance: 500000000000000,
+        rank: 2,
+      },
+      {
+        index: 2,
+        address:
+          'klv14ragd2rgqat485vu6ssh4vu9rhmc68mg6vrmkmuhdqda9eeykucqvewgsh',
+        balance: 500000000000000,
+        rank: 3,
+      },
+      {
+        index: 3,
+        address: '',
+        balance: 0,
+        rank: 0,
+      },
+    ];
+    test('if correct array is returned', () => {
+      const result = parseHolders(data.accounts, 'KLV', pagination);
+      expect(result).toStrictEqual(holders);
+    });
+  });
+
+  describe('test getPrecision function ', () => {
+    test('return precision asset', async () => {
+      (api.getCached as jest.Mock).mockReturnValueOnce(mocks.precisionAsset);
+      const precision = (await getPrecision('PVM-GVCI')) as any;
+      expect(precision).toEqual(10);
+    });
+  });
+
+  describe('test addPrecisionTransactions function', () => {
+    const asset = {
+      data: {
+        asset: mocks.assets[1],
+      },
+      error: '',
+      code: 'successful',
+    };
+    test('return all transactions with precision key in contracts', async () => {
+      (api.get as jest.Mock).mockReturnValueOnce(asset);
+      const { transactions } = mocks.transactionsList.data;
+      const response = addPrecisionTransactions(transactions);
+      expect(response).toEqual(transactions);
+    });
+  });
+
+  describe('test fetchPartialAsset function', () => {
+    let fetchPartialAssetTimeout: ReturnType<typeof setTimeout>;
+    test('if pass an asset that does not exist return all assets', async () => {
+      (api.getCached as jest.Mock).mockReturnValueOnce({
+        data: {
+          assets: mocks.assets,
+        },
+      });
+      const result = fetchPartialAsset(
+        fetchPartialAssetTimeout,
+        'KLV',
+        mocks.assets,
+      );
+      await clock.tickAsync(5000);
+
+      await expect(result).resolves.toStrictEqual(mocks.assets);
+    });
+    test('return false if asset value exist', async () => {
+      (api.getCached as jest.Mock).mockReturnValueOnce({
+        data: {
+          assets: mocks.assets,
+        },
+      });
+      const result = fetchPartialAsset(
+        fetchPartialAssetTimeout,
+        'KFI',
+        mocks.assets,
+      );
+      await clock.tickAsync(5000);
+
+      await expect(result).resolves.toEqual(false);
+    });
+  });
+
+  describe('test isImage function', () => {
+    const url =
+      'https://cdn-images-1.medium.com/max/720/1*2Wu5yLlLrfsfz6wMYFlYtQ.png';
+    test("if return false, if it's not a html image src", async () => {
+      const expected = false;
+      (global.fetch = jest.fn() as jest.Mock).mockReturnValueOnce(url);
+      const result = isImage(url, 2000);
+      await clock.tickAsync(5000);
+
+      await expect(result).resolves.toEqual(expected);
+    });
+  });
+
+  describe('test validateImgRequestHeader function', () => {
+    test('return true if url type is "image"', async () => {
+      const expected = true;
+      (global.fetch = jest.fn() as jest.Mock).mockReturnValueOnce({
+        headers: {
+          get: (contentType: string) => (contentType = 'image/klv'),
+        },
+      });
+      const result = validateImgRequestHeader('/assets/klv-logo.png', 2000);
+      await clock.tickAsync(5000);
+
+      await expect(result).resolves.toEqual(expected);
+    });
+    test('return false if url type is not "image"', async () => {
+      const expected = false;
+      (global.fetch = jest.fn(() =>
+        Promise.resolve({
+          json: () => Promise.resolve({ headers: '/klv' }),
+        }),
+      ) as jest.Mock).mockReturnValueOnce({
+        headers: {
+          get: (contentType: string) => (contentType = 'klv'),
+        },
+      });
+      const result = validateImgRequestHeader('/assets/klv-logo.png', 2000);
+      await clock.tickAsync(5000);
+
+      await expect(result).resolves.toEqual(expected);
+    });
+  });
+  describe('test doIf function', () => {
+    test('return Promise void', async () => {
+      const expected = undefined;
+      const result = doIf(
+        () => true,
+        () => undefined,
+        () => true,
+        100,
+        200,
+      );
+      await clock.tickAsync(5000);
+
+      await expect(result).resolves.toBe(expected);
+    });
+  });
+  describe('test asyncDoIf function', () => {
+    (api.get as jest.Mock).mockReturnValue(mocks.addressList);
+    const request = async () => {
+      return await api.get({
+        route: 'address/list',
+      });
+    };
+    let results: any;
+    test('Return Promise void', async () => {
+      asyncDoIf(
+        res => (results = res),
+        err => (results = err),
+        () => request(),
+      );
+      await clock.tickAsync(5000);
+      expect(results).toStrictEqual(mocks.addressList);
     });
   });
 });

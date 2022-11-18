@@ -15,16 +15,30 @@ export interface IFilterItem {
 }
 
 export interface IFilter {
-  title: string;
+  title?: string;
+  firstItem?: string;
+  inputType?: string;
+  overFlow?: string;
   data: string[];
   onClick?(selected: string, filterType: string): void;
+  onChange?(value: string): void;
   current: string | undefined;
 }
 
-const Filter: React.FC<IFilter> = ({ title, data, onClick, current }) => {
-  const allItem = 'All';
+const Filter: React.FC<IFilter> = ({
+  title,
+  data,
+  onClick,
+  onChange,
+  current,
+  firstItem,
+  overFlow,
+  inputType = 'text',
+}) => {
+  const allItem = firstItem || 'All';
   const [selected, setSelected] = useState(current || allItem);
   const [open, setOpen] = useState(true);
+  const [dontBlur, setDontBlur] = useState(false);
   const [focus, setFocus] = useState(false);
   const [arrowOpen, setArrowOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -40,9 +54,8 @@ const Filter: React.FC<IFilter> = ({ title, data, onClick, current }) => {
         setFocus(true);
         setArrowOpen(true);
       });
-      if (title !== 'Status') {
-        focusRef.current.focus();
-      }
+
+      focusRef.current.focus();
     }
   };
 
@@ -72,9 +85,8 @@ const Filter: React.FC<IFilter> = ({ title, data, onClick, current }) => {
       }
       setSelected(item);
       openDropdown();
-      if (title !== 'Status') {
-        setFocus(true);
-      }
+
+      setFocus(true);
     };
     return (
       <Item onClick={handleClick} selected={item === selected}>
@@ -96,6 +108,9 @@ const Filter: React.FC<IFilter> = ({ title, data, onClick, current }) => {
         setInputValue(parsedValue);
       }
     }
+    if (onChange) {
+      onChange(value);
+    }
   };
 
   const getDataArray = () => [allItem].concat(data);
@@ -113,28 +128,37 @@ const Filter: React.FC<IFilter> = ({ title, data, onClick, current }) => {
   const contentProps = {
     ref: contentRef,
     open,
-    onClick: title !== 'Status' ? () => openDropdown() : () => arrowOnClick(),
+    onClick: () => openDropdown(),
   };
 
   const selectorProps = {
     ref: selectorRef,
     open,
+    overFlow,
     onClick: () => closeDropDown(),
   };
+
   return (
     <Container>
       <span>{title}</span>
-      <Content {...contentProps}>
-        {focus && title !== 'Status' && (
+      <Content
+        onMouseEnter={() => setDontBlur(true)}
+        onMouseLeave={() => setDontBlur(false)}
+        {...contentProps}
+      >
+        {focus && (
           <HiddenInput
+            onBlur={() => !dontBlur && closeDropDown()}
             value={inputValue}
-            type="text"
+            type={title !== 'Status' ? inputType : 'button'}
             ref={focusRef}
             show={focus}
-            onChange={e => handleChange(e)}
+            onChange={handleChange}
           />
         )}
-        <span>{open && selected ? selected : ''}</span>
+        <span style={{ overflow: overFlow ? overFlow : 'hidden' }}>
+          {open && selected ? selected : ''}
+        </span>
         <ArrowDownContainer onClick={() => arrowOnClick()}>
           <ArrowDown />
         </ArrowDownContainer>

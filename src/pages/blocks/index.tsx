@@ -8,7 +8,7 @@ import {
   yesterdayStatisticsCall,
 } from '@/services/apiCalls';
 import { IBlock, IBlocks, ICard } from '@/types/blocks';
-import { IPagination } from '@/types/index';
+import { IPagination, IRowSection } from '@/types/index';
 import {
   formatAmount,
   getAge,
@@ -45,13 +45,13 @@ const Blocks: React.FC<IBlocks> = ({
 
   const [blocks, setBlocks] = useState(defaultBlocks);
   const [statistics, setStatistics] = useState(defaultStatistics);
-  const [blocksInterval, setBlocksInterval] = useState(blocksWatcherInterval);
+  const [blocksInterval, setBlocksInterval] = useState(0);
 
-  const requestBlocks = async (page: number) => {
+  const requestBlocks = async (page: number, limit: number) => {
     let response = { data: { blocks } };
 
     await Promise.allSettled([
-      blockCall(page),
+      blockCall(page, limit),
       yesterdayStatisticsCall(),
       totalStatisticsCall(),
     ]).then(responses => {
@@ -195,7 +195,7 @@ const Blocks: React.FC<IBlocks> = ({
     'Block Rewards',
   ];
 
-  const rowSections = (block: IBlock): JSX.Element[] => {
+  const rowSections = (block: IBlock): IRowSection[] => {
     const {
       nonce,
       size,
@@ -210,32 +210,77 @@ const Blocks: React.FC<IBlocks> = ({
     } = block;
 
     const sections = [
-      <Link href={`/block/${nonce}`} key={nonce}>
-        {String(nonce)}
-      </Link>,
-      <React.Fragment key={size}>{size.toLocaleString()} Bytes</React.Fragment>,
-      <Link
-        href={`/validator/${producerOwnerAddress}`}
-        key={producerOwnerAddress}
-      >
-        {parseAddress(producerName, 12)}
-      </Link>,
-      <small key={timestamp}>
-        {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
-      </small>,
-      <React.Fragment key={txCount}>{txCount}</React.Fragment>,
-      <small key={txBurnedFees}>{`${formatAmount(
-        (txBurnedFees || 0) / 10 ** precision,
-      )} KLV`}</small>,
-      <small key={kAppFees}>
-        {formatAmount((kAppFees || 0) / 10 ** precision)} KLV
-      </small>,
-      <small key={txFees}>
-        {formatAmount((txFees || 0) / 10 ** precision)} KLV
-      </small>,
-      <strong key={blockRewards}>
-        {formatAmount((blockRewards || 0) / 10 ** precision)} KLV
-      </strong>,
+      {
+        element: (
+          <Link href={`/block/${nonce}`} key={nonce}>
+            {String(nonce)}
+          </Link>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <React.Fragment key={size}>
+            {size.toLocaleString()} Bytes
+          </React.Fragment>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <Link
+            href={`/validator/${producerOwnerAddress}`}
+            key={producerOwnerAddress}
+          >
+            {parseAddress(producerName, 12)}
+          </Link>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <small key={timestamp}>
+            {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
+          </small>
+        ),
+        span: 1,
+      },
+      {
+        element: <React.Fragment key={txCount}>{txCount}</React.Fragment>,
+        span: 1,
+      },
+      {
+        element: (
+          <small key={txBurnedFees}>{`${formatAmount(
+            (txBurnedFees || 0) / 10 ** precision,
+          )} KLV`}</small>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <small key={kAppFees}>
+            {formatAmount((kAppFees || 0) / 10 ** precision)} KLV
+          </small>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <small key={txFees}>
+            {formatAmount((txFees || 0) / 10 ** precision)} KLV
+          </small>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <strong key={blockRewards}>
+            {formatAmount((blockRewards || 0) / 10 ** precision)} KLV
+          </strong>
+        ),
+        span: 1,
+      },
     ];
 
     return sections;
@@ -247,9 +292,9 @@ const Blocks: React.FC<IBlocks> = ({
     data: blocks as any[],
     rowSections,
     scrollUp: true,
-    totalPages: pagination.totalPages,
+    totalPages: pagination?.totalPages ?? 1,
     dataName: 'blocks',
-    request: (page: number) => requestBlocks(page),
+    request: (page: number, limit: number) => requestBlocks(page, limit),
     interval: blocksInterval,
     intervalController: setBlocksInterval,
   };

@@ -15,6 +15,11 @@ const data = [
   { value: 500, date: 10 },
 ];
 
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
+}));
 describe('Area Chart', () => {
   const mockedClientHeight = 100;
   const mockedClientWidth = 100;

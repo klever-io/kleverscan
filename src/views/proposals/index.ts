@@ -1,15 +1,7 @@
-import { default as DefaultInput } from '@/components/Inputt';
+import { default as DefaultInput } from '@/components/InputGlobal';
 import styled from 'styled-components';
 
-export const Container = styled.div`
-  padding: 3rem 10rem 5rem 10rem;
-
-  background-color: ${props => props.theme.background};
-
-  @media (max-width: 768px) {
-    padding: 3rem 1rem 5rem 1rem;
-  }
-`;
+export const Container = styled.div``;
 
 export const Header = styled.section`
   margin-bottom: 1rem;
@@ -20,7 +12,7 @@ export const Header = styled.section`
   justify-content: space-between;
   align-items: center;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -81,7 +73,7 @@ export const CardContainer = styled.section`
   font-size: 14px;
   line-height: 24px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
   }
 `;

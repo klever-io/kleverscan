@@ -3,19 +3,21 @@ import { getStatusIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
+import { useMobile } from '@/contexts/mobile';
+import { Contract, IContract, ITransferContract } from '@/types/contracts';
+import { IInnerTableProps, IRowSection, ITransaction } from '@/types/index';
 import {
-  Contract,
-  IContract,
-  IInnerTableProps,
-  ITransaction,
-  ITransferContract,
-} from '@/types/index';
+  contractTypes,
+  filteredSections,
+  getHeader,
+  initialsTableHeaders,
+} from '@/utils/contracts';
 import { capitalizeString, formatAmount, parseAddress } from '@/utils/index';
 import { CenteredRow } from '@/views/accounts/detail';
-import { useWidth } from 'contexts/width';
 import { format, fromUnixTime } from 'date-fns';
 import Link from 'next/link';
-import React from 'react';
+import { useRouter } from 'next/router';
+import React, { useCallback } from 'react';
 
 interface ITransactionsProps {
   transactions: ITransaction[];
@@ -24,16 +26,29 @@ interface ITransactionsProps {
 }
 
 const Transactions: React.FC<ITransactionsProps> = props => {
-  const getContractType = (contracts: IContract[]) =>
-    contracts.length > 1
-      ? 'Multi contract'
-      : Object.values(Contract)[contracts[0].type];
   const precision = props.precision || 6;
+  const router = useRouter();
 
-  const { isMobile } = useWidth();
+  const getContractType = useCallback(contractTypes, []);
 
-  const rowSections = (props: ITransaction): JSX.Element[] => {
-    const { hash, blockNum, timestamp, sender, contract, status } = props;
+  const getFilteredSections = (contract: IContract[]): IRowSection[] => {
+    const contractType = getContractType(contract);
+    return filteredSections(contract, contractType);
+  };
+
+  const { isMobile } = useMobile();
+
+  const rowSections = (props: ITransaction): IRowSection[] => {
+    const {
+      hash,
+      blockNum,
+      timestamp,
+      sender,
+      contract,
+      status,
+      kAppFee,
+      bandwidthFee,
+    } = props;
 
     const StatusIcon = getStatusIcon(status);
     let toAddress = '--';
@@ -50,48 +65,81 @@ const Transactions: React.FC<ITransactionsProps> = props => {
       if (parameter.assetId) {
         assetId = parameter.assetId;
       }
+      if (!parameter.assetId) assetId = 'KLV';
     }
+
     const sections = [
-      <CenteredRow className="bucketIdCopy" key={hash}>
-        <Link href={`/transaction/${hash}`}>{parseAddress(hash, 24)}</Link>
-        <Copy info="TXHash" data={hash} />
-      </CenteredRow>,
-      <Link href={`/block/${blockNum}`} key={blockNum}>
-        <a className="address">{blockNum || 0}</a>
-      </Link>,
-      <small key={timestamp}>
-        {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
-      </small>,
-      <Link href={`/account/${sender}`} key={sender}>
-        <a className="address">{parseAddress(sender, 16)}</a>
-      </Link>,
-      !isMobile ? <ArrowRight /> : <></>,
-      <Link href={`/account/${toAddress}`} key={toAddress}>
-        <a className="address">{parseAddress(toAddress, 16)}</a>
-      </Link>,
-      <Status status={status} key={status}>
-        <StatusIcon />
-        <span>{capitalizeString(status)}</span>
-      </Status>,
-      <strong key={contractType}>{contractType}</strong>,
-      <strong key={amount}>{amount}</strong>,
-      <strong key={assetId}>{assetId}</strong>,
+      {
+        element: (
+          <CenteredRow className="bucketIdCopy" key={hash}>
+            <Link href={`/transaction/${hash}`}>{parseAddress(hash, 24)}</Link>
+            <Copy info="TXHash" data={hash} />
+          </CenteredRow>
+        ),
+        span: 2,
+      },
+      {
+        element: (
+          <Link href={`/block/${blockNum}`} key={blockNum}>
+            <a className="address">{blockNum || 0}</a>
+          </Link>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <small key={timestamp}>
+            {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
+          </small>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <Link href={`/account/${sender}`} key={sender}>
+            <a className="address">{parseAddress(sender, 16)}</a>
+          </Link>
+        ),
+        span: 1,
+      },
+      { element: !isMobile ? <ArrowRight /> : <></>, span: -1 },
+      {
+        element: (
+          <Link href={`/account/${toAddress}`} key={toAddress}>
+            <a className="address">{parseAddress(toAddress, 16)}</a>
+          </Link>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <Status status={status} key={status}>
+            <StatusIcon />
+            <span>{capitalizeString(status)}</span>
+          </Status>
+        ),
+        span: 1,
+      },
+      { element: <strong key={contractType}>{contractType}</strong>, span: 1 },
+      { element: <strong key={kAppFee}>{kAppFee / 10 ** 6}</strong>, span: 1 },
+      {
+        element: <strong key={kAppFee}>{bandwidthFee / 10 ** 6}</strong>,
+        span: 1,
+      },
     ];
+
+    const filteredContract = getFilteredSections(contract);
+
+    if (router?.query?.type) {
+      sections.pop();
+      sections.pop();
+      sections.push(...filteredContract);
+    }
+
     return sections;
   };
 
-  const header = [
-    'Hash',
-    'Block',
-    'Created',
-    'From',
-    '',
-    'To',
-    'Status',
-    'Contract',
-    'Amount',
-    'Asset Id',
-  ];
+  const header = [...initialsTableHeaders, 'kApp Fee', 'Bandwidth Fee'];
 
   const transactionTableProps = props.transactionsTableProps;
 
@@ -99,9 +147,8 @@ const Transactions: React.FC<ITransactionsProps> = props => {
     ...transactionTableProps,
     rowSections: rowSections,
     data: Object.values(props.transactions) as any[],
-    header,
+    header: router?.query?.type ? getHeader(router, header) : header,
     type: 'transactions',
-    columnSpans: [2, 1, 1, 1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   };
 
   return <Table {...tableProps} />;

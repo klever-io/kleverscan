@@ -1,5 +1,5 @@
 import { createGlobalStyle } from 'styled-components';
-import theme from './theme/index';
+import darktheme from './theme/dark';
 
 export default createGlobalStyle`
   * {
@@ -11,7 +11,7 @@ export default createGlobalStyle`
   }
   
   body {
-    background: ${theme.background} !important;
+    background: ${darktheme.navbar.background};
   }
 
   a, a:hover, a:focus, a:active {
@@ -19,13 +19,13 @@ export default createGlobalStyle`
     color: inherit;
   }
   
-  @media (max-width: 1080px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     html {
       font-size: 93.75%;
     }
   }
 
-  @media (max-width: 720px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     html {
       font-size: 87.5%;
     }

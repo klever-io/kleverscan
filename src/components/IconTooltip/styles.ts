@@ -7,7 +7,8 @@ export const IconContainer = styled.div`
 export const TooltipContainer = styled.div<{ tooltip: string }>`
   position: relative;
   font-size: 0.9rem;
-  margin-left: 0.8rem;
+  margin-top: 0.4rem;
+  margin-left: 1rem;
 
   &:hover {
     svg {
@@ -15,7 +16,7 @@ export const TooltipContainer = styled.div<{ tooltip: string }>`
     }
   }
 
-  @media screen and (min-width: 1025px) {
+  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
     &:hover {
       &::before {
         content: '';
@@ -43,5 +44,9 @@ export const TooltipContainer = styled.div<{ tooltip: string }>`
         transform: translate(-50%, 40%);
       }
     }
+  }
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    margin-left: 0;
   }
 `;

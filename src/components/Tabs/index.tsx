@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import { getSelectedTab } from '@/utils/index';
+import { useRouter } from 'next/router';
+import React, { useCallback, useState } from 'react';
 import DateFilter, { IDateFilter } from '../DateFilter';
+import Filter, { IFilter } from '../Filter';
 import {
   Container,
   FilterContent,
@@ -14,6 +17,7 @@ export interface ITabs {
   onClick?(header: string, index: number): void;
   dateFilterProps?: IDateFilter;
   filterFromTo?(op: number): void;
+  showTxInTxOutFilter?: boolean;
 }
 
 const Tabs: React.FC<ITabs> = ({
@@ -22,21 +26,51 @@ const Tabs: React.FC<ITabs> = ({
   dateFilterProps,
   filterFromTo,
   children,
+  showTxInTxOutFilter = false,
 }) => {
-  const [selected, setSelected] = useState(0);
-  const [txIn, setTxIn] = useState(true);
-  const [txOut, setTxOut] = useState(false);
-
-  const OnClick = () => {
-    if (txIn === true) {
-      setTxIn(false);
-      setTxOut(true);
-    } else if (txIn === false) {
-      setTxIn(true);
-      setTxOut(false);
+  const router = useRouter();
+  const getFilterName = () => {
+    if (router.query?.fromAddress && !router.query?.toAddress) {
+      return 'Transactions Out';
+    } else if (router.query?.toAddress && !router.query?.fromAddress) {
+      return 'Transactions In';
+    } else if (router.query?.fromAddress && router.query?.toAddress) {
+      return 'All Transactions';
     }
+    return 'All Transactions';
   };
 
+  const [selected, setSelected] = useState(getSelectedTab(router.query?.tab));
+  const filterName = useCallback(getFilterName, [router.query]);
+
+  const handleClickFilterName = (filter: string) => {
+    switch (filter) {
+      case 'All Transactions':
+        filterFromTo && filterFromTo(0);
+        break;
+      case 'Transactions Out':
+        filterFromTo && filterFromTo(1);
+        break;
+      case 'Transactions In':
+        filterFromTo && filterFromTo(2);
+        break;
+
+      default:
+        filterFromTo && filterFromTo(0);
+    }
+  };
+  const filters: IFilter[] = [
+    {
+      firstItem: 'All Transactions',
+      data: ['Transactions Out', 'Transactions In'],
+      onClick: e => {
+        handleClickFilterName(e);
+      },
+      current: filterName(),
+      overFlow: 'visible',
+      inputType: 'button',
+    },
+  ];
   return (
     <Container>
       <TabContainer>
@@ -61,26 +95,12 @@ const Tabs: React.FC<ITabs> = ({
           })}
         </TabContent>
         {dateFilterProps && headers[selected] === 'Transactions' && (
-          <FilterContent>
+          <FilterContent data-testid="filter-container">
             <DateFilter {...dateFilterProps} />
-            <div className="select">
-              <select
-                className="filterFromTo"
-                onChange={e =>
-                  filterFromTo && filterFromTo(Number(e.target.value))
-                }
-              >
-                <option className="option" value={0}>
-                  All Transactions
-                </option>
-                <option className="option" value={1}>
-                  Transactions Out
-                </option>
-                <option className="option" value={2}>
-                  Transacions In
-                </option>
-              </select>
-            </div>
+            {showTxInTxOutFilter &&
+              filters.map((filter, index) => (
+                <Filter key={index} {...filter} />
+              ))}
           </FilterContent>
         )}
       </TabContainer>

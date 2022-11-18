@@ -39,6 +39,13 @@ export const ModalBody = styled.div`
   justify-content: center;
   align-items: center;
   pointer-events: none;
+  padding: 0.5rem;
+
+  div {
+    background-color: #fff;
+    padding: 0.3rem;
+    border-radius: 0.3rem;
+  }
 `;
 
 export const ModalHeader = styled.div`

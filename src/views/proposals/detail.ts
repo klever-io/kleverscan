@@ -1,4 +1,4 @@
-import { default as DefaultInput } from '@/components/Inputt';
+import { default as DefaultInput } from '@/components/InputGlobal';
 import styled from 'styled-components';
 
 interface CardVoteProps {
@@ -14,15 +14,7 @@ interface ProgressBarProps {
   background: string;
 }
 
-export const Container = styled.div`
-  padding: 3rem 10rem 5rem 10rem;
-
-  background-color: ${props => props.theme.background};
-
-  @media (max-width: 1150px) {
-    padding: 3rem 1rem 5rem 1rem;
-  }
-`;
+export const Container = styled.div``;
 
 export const Header = styled.div`
   display: flex;
@@ -31,7 +23,7 @@ export const Header = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -292,8 +284,9 @@ export const HalfRow = styled.div`
   display: flex;
   overflow: hidden;
   align-items: center;
-  width: 50%;
-  @media (max-width: 768px) {
+  width: fit-content;
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 0.1rem;
     width: 100%;
   }
@@ -302,10 +295,11 @@ export const HalfRow = styled.div`
 
 export const Row = styled.div`
   width: 100%;
+  flex-wrap: wrap;
 
   color: ${props => props.theme.black};
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     &:nth-child(1) {
       display: flex;
       flex-direction: column;
@@ -344,7 +338,7 @@ export const Row = styled.div`
 
     .iconHelp:hover {
     }
-    @media (max-width: 768px) {
+    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
       max-width: 100%;
     }
 
@@ -378,9 +372,12 @@ export const Row = styled.div`
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
+  }
+  &:nth-child(2) {
+    flex-wrap: nowrap;
   }
 `;
 
@@ -431,7 +428,7 @@ export const BalanceContainer = styled.div`
 export const NetworkParamsContainer = styled.div`
   margin-top: 0.5rem;
   display: flex;
-
+  overflow: auto;
   flex-direction: column;
 
   background-color: ${props => props.theme.accountCard.frozenBackground};
@@ -475,12 +472,9 @@ export const NetworkParamsContainer = styled.div`
       white-space: normal !important;
     }
 
-    @media (max-width: 1355px) {
+    @media (max-width: ${props => props.theme.breakpoints.tablet}) {
       flex-direction: column;
       align-items: flex-start;
-    }
-
-    @media (max-width: 980px) {
     }
   }
 `;
@@ -488,4 +482,8 @@ export const NetworkParamsContainer = styled.div`
 export const BigSpan = styled.span`
   overflow: visible !important;
   white-space: normal !important;
+`;
+
+export const EpochInfo = styled.span`
+  width: fit-content !important;
 `;

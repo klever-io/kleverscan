@@ -1,19 +1,19 @@
 import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
+import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
-import { IAccountAsset, IAsset, IBucket } from '@/types/index';
+import { IAccountAsset, IAsset, IBucket, IRowSection } from '@/types/index';
 import { parseAddress } from '@/utils/index';
 import { CenteredRow, RowContent } from '@/views/accounts/detail';
-import { useWidth } from 'contexts/width';
 import Link from 'next/link';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Status } from './styles';
 
-interface IBuckets {
+export interface IBuckets {
   assets: IAccountAsset[];
 }
 
-interface IAssetsBuckets {
+export interface IAssetsBuckets {
   asset: IAccountAsset;
   bucket: IBucket;
 }
@@ -22,96 +22,143 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
   const UINT32_MAX = 4294967295;
   const precision = 6; // default KLV precision
   const detailsCache = useRef<{ [key: string]: IAsset }>({});
-  let assetDetails: IAsset;
-  let assetsBuckets: IAssetsBuckets[] = [];
+  const [assetDetails, setAssetDetails] = useState<IAsset>();
+  const [assetsBuckets, setAssetsBuckets] = useState<IAssetsBuckets[]>([]);
 
-  assets.forEach(asset => {
-    const assetHasUnstakedBucket = asset?.buckets?.find(
-      bucket => bucket.unstakedEpoch !== UINT32_MAX,
-    );
+  useEffect(() => {
+    assets.forEach(asset => {
+      const assetHasUnstakedBucket = asset?.buckets?.find(
+        bucket => bucket.unstakedEpoch !== UINT32_MAX,
+      );
 
-    const getDetails = async () => {
-      if (detailsCache[asset.assetId]) {
-        assetDetails = detailsCache[asset.assetId];
-      } else {
-        const details = await api.get({ route: `/assets/${asset.assetId}` });
-        assetDetails = details;
-        detailsCache.current[asset.assetId] = details;
+      const getDetails = async () => {
+        if (detailsCache[asset.assetId]) {
+          setAssetDetails(detailsCache[asset.assetId]);
+        } else {
+          const details = await api.get({ route: `assets/${asset.assetId}` });
+          if (details.error !== '') {
+            return;
+          }
+          setAssetDetails(details.data.asset);
+          detailsCache.current[asset.assetId] = details;
+        }
+      };
+
+      if (assetHasUnstakedBucket) {
+        getDetails();
       }
-    };
 
-    if (assetHasUnstakedBucket) {
-      getDetails();
-    }
-
-    if (asset.buckets) {
-      assetsBuckets = [
-        ...assetsBuckets,
-        ...asset.buckets.map(bucket => {
+      if (asset.buckets) {
+        const newBuckets = asset.buckets.map(bucket => {
           return {
             asset,
             bucket,
           };
-        }),
-      ];
-    }
-  });
-  const { isMobile } = useWidth();
+        });
 
-  const rowSections = (assetBucket: IAssetsBuckets): JSX.Element[] => {
+        setAssetsBuckets(prevAssetBuckets => [
+          ...prevAssetBuckets,
+          ...newBuckets,
+        ]);
+      }
+    });
+  }, [assets]);
+
+  const { isMobile } = useMobile();
+
+  const rowSections = (assetBucket: IAssetsBuckets): IRowSection[] => {
     const { asset, bucket } = assetBucket;
 
-    const getAvaliableEpoch = async (
-      assetId: string,
-      unstakedEpoch: number,
-    ) => {
+    const getAvaliableEpoch = (assetId: string, unstakedEpoch: number) => {
       if (assetId.length < 64) {
-        return (
-          unstakedEpoch + (assetDetails?.staking?.minEpochsToWithdraw || 2)
-        );
+        return assetDetails?.staking?.minEpochsToWithdraw
+          ? unstakedEpoch + assetDetails.staking.minEpochsToWithdraw
+          : '--';
       }
-      return unstakedEpoch + 2; // Default for KLV
+      return unstakedEpoch + 2; // Default for KLV and KFI
     };
 
     const sections = [
-      <Link href={`/asset/${asset.assetId}`} key={asset.assetId}>
-        <a>{asset.assetId}</a>
-      </Link>,
-      <p key={bucket.unstakedEpoch}>
-        {(bucket.balance / 10 ** asset.precision).toLocaleString()}
-      </p>,
-      <Status staked={true} key={'true'}>
-        {'True'}
-      </Status>,
-      <span key={bucket.unstakedEpoch}>
-        {bucket.stakedEpoch.toLocaleString()}
-      </span>,
-      <RowContent key={bucket.id}>
-        <CenteredRow className="bucketIdCopy">
-          <span>{!isMobile ? bucket.id : parseAddress(bucket.id, 24)}</span>
-          <Copy info="BucketId" data={bucket.id} />
-        </CenteredRow>
-      </RowContent>,
-      <>
-        {bucket.unstakedEpoch === UINT32_MAX
-          ? '--'
-          : bucket.unstakedEpoch.toLocaleString()}
-        {bucket.unstakedEpoch === UINT32_MAX
-          ? '--'
-          : getAvaliableEpoch(
-              asset.assetId,
-              bucket.unstakedEpoch,
-            ).toLocaleString()}
-      </>,
-      <>
-        {bucket.delegation.length > 0 ? (
-          <Link href={`/account/${bucket.delegation}`}>
-            <a>{parseAddress(bucket.delegation, 22)}</a>
+      {
+        element: (
+          <Link href={`/asset/${asset.assetId}`} key={asset.assetId}>
+            <a>{asset.assetId}</a>
           </Link>
-        ) : (
-          <span>--</span>
-        )}
-      </>,
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <p key={bucket.unstakedEpoch}>
+            {(bucket.balance / 10 ** asset.precision).toLocaleString()}
+          </p>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <Status staked={true} key={'true'}>
+            {'True'}
+          </Status>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <span key={bucket.unstakedEpoch}>
+            {bucket.stakedEpoch.toLocaleString()}
+          </span>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <RowContent key={bucket.id}>
+            <CenteredRow className="bucketIdCopy">
+              <span>{!isMobile ? bucket.id : parseAddress(bucket.id, 24)}</span>
+              <Copy info="BucketId" data={bucket.id} />
+            </CenteredRow>
+          </RowContent>
+        ),
+        span: 2,
+      },
+      {
+        element: (
+          <>
+            {bucket.unstakedEpoch === UINT32_MAX
+              ? '--'
+              : bucket.unstakedEpoch.toLocaleString()}
+          </>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <>
+            {bucket.unstakedEpoch === UINT32_MAX
+              ? '--'
+              : getAvaliableEpoch(
+                  asset.assetId,
+                  bucket.unstakedEpoch,
+                ).toLocaleString()}
+          </>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <>
+            {bucket.delegation.length > 0 ? (
+              <Link href={`/account/${bucket.delegation}`}>
+                <a>{parseAddress(bucket.delegation, 22)}</a>
+              </Link>
+            ) : (
+              <span>--</span>
+            )}
+          </>
+        ),
+        span: 1,
+      },
     ];
 
     return sections;
@@ -133,7 +180,6 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
     header,
     data: assetsBuckets,
     rowSections,
-    columnSpans: [1, 1, 1, 1, 2, 1, 1, 1],
   };
 
   return <Table {...tableProps} />;

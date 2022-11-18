@@ -7,7 +7,7 @@ const theme = {
   borderLogo: '#ccc',
 
   border: '#eeeff6',
-
+  green: 'green',
   red: '#FF4465',
   rose: '#EE3F71',
   purple: '#7D3FF1',
@@ -75,11 +75,13 @@ const theme = {
 
   accountCard: {
     frozenBackground: '#F9F9FD',
+    cardStaking: '#EBF1F7',
   },
 
   chart: {
     darkBg: '#5A2A73',
     lightBg: '#aa33b5',
+    backgroundTooltip: '#fff',
   },
 
   filter: {
@@ -120,6 +122,15 @@ const theme = {
 
   dateFilter: {
     outsideBackground: 'rgba(198, 199, 235, 0.2)',
+  },
+
+  qrcodeTooltip: {
+    background: '#fff',
+  },
+
+  breakpoints: {
+    mobile: '768px',
+    tablet: '1025px',
   },
 };
 

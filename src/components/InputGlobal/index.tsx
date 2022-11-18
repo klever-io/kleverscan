@@ -4,11 +4,11 @@ import { useRouter } from 'next/router';
 import React, { KeyboardEvent, useRef, useState } from 'react';
 import { Container } from './styles';
 
-interface IInput {
+interface InputGlobal {
   className?: string;
 }
 
-const Input: React.FC<IInput> = ({ className }) => {
+const Input: React.FC<InputGlobal> = ({ className }) => {
   const [search, setSearch] = useState('');
   const [error, setError] = useState(false);
   const inputRef = useRef<any>(null);
@@ -55,6 +55,33 @@ const Input: React.FC<IInput> = ({ className }) => {
       return;
     }
 
+    if (
+      type === 'asset' &&
+      (treatedSearch.toUpperCase() === 'KFI' ||
+        treatedSearch.toUpperCase() === 'KLV' ||
+        treatedSearch.length === 8)
+    ) {
+      router.push(`/${type}/${treatedSearch}`);
+      inputRef.current.value = '';
+      return;
+    }
+
+    if (
+      type === 'asset' &&
+      treatedSearch.length >= 3 &&
+      treatedSearch.length < 9
+    ) {
+      inputRef.current.value = '';
+      router
+        .push({
+          pathname: '/assets',
+          query: `asset=${treatedSearch.toUpperCase()}`,
+        })
+        .then(() => {
+          if (router.pathname === '/assets') router.reload();
+        });
+      return;
+    }
     router.push(`/${type}/${treatedSearch}`);
     inputRef.current.value = '';
   };

@@ -42,7 +42,7 @@ export const FormSection = styled.div<{ inner?: boolean }>`
       grid-column: auto / span 2;
     `}
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: flex;
     flex-direction: column;
     gap: 2rem;
@@ -108,7 +108,7 @@ export const ButtonContainer = styled.button<IButton>`
 
   user-select: none;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 45%;
   }
 

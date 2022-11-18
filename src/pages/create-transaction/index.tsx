@@ -2,13 +2,15 @@ import { Transactions as Icon } from '@/assets/title-icons';
 import Contract from '@/components/Contract';
 import Title from '@/components/Layout/Title';
 import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
+import { useExtension } from '@/contexts/extension';
 import api from '@/services/api';
 import { ICollectionList, IKAssets, IParamList } from '@/types/index';
 import { INetworkParam, IProposalsResponse } from '@/types/proposals';
+import { useDidUpdateEffect } from '@/utils/hooks';
 import { doIf } from '@/utils/index';
-import { Container, Header } from '@/views/assets';
+import { Header } from '@/views/assets';
 import { Card } from '@/views/blocks';
-import { CardContainer } from '@/views/create-transaction';
+import { CardContainer, Container } from '@/views/create-transaction';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -24,6 +26,15 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
   const [assetsList, setAssetsLists] = useState<any>([]);
   const [kassetsList, setKAssetsList] = useState<IKAssets[]>([]);
   const router = useRouter();
+
+  const { extensionInstalled, connectExtension, walletAddress } =
+    useExtension();
+
+  useDidUpdateEffect(() => {
+    if (extensionInstalled && !walletAddress) {
+      connectExtension();
+    }
+  }, [extensionInstalled]);
 
   const getKAssets = async (address: string) => {
     const response: any = await api.get({
@@ -57,7 +68,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
       const callback = async () => {
         let address = '';
         await doIf(
-          () => (address = window.kleverWeb.getWalletAddress()),
+          async () => (address = await window.kleverWeb.getWalletAddress()),
           () => handleLogout(),
           () => window?.kleverWeb?.getWalletAddress !== undefined,
           500,

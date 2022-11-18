@@ -79,7 +79,6 @@ export const Content = styled.div<{ open: boolean }>`
 
     max-width: 6.25rem;
 
-    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 
@@ -93,7 +92,7 @@ export const Content = styled.div<{ open: boolean }>`
     transform: rotate(${props => (props.open ? 0 : 180)}deg);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
   }
 `;
@@ -152,7 +151,7 @@ export const Item = styled.div<{ selected: boolean }>`
   display: flex;
 
   align-items: center;
-
+  justify-content: center;
   background-color: ${props =>
     props.selected && transparentize(0.75, props.theme.lightGray)};
 
@@ -166,6 +165,7 @@ export const Item = styled.div<{ selected: boolean }>`
 
   p {
     font-weight: 400;
+    text-align: center;
     color: ${props =>
       props.selected
         ? props.theme.filter.item.selected
@@ -175,7 +175,8 @@ export const Item = styled.div<{ selected: boolean }>`
 
 export const HiddenInput = styled.input<{ show: boolean }>`
   width: 100%;
-  display: ${props => (props.show ? 'inline-block' : 'none')};
+  position: absolute;
+  visibility: ${props => (props.show ? 'visible' : 'hidden')};
   caret-color: ${props => props.theme.black};
   color: ${props => props.theme.black};
 `;

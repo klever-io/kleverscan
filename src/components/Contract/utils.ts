@@ -32,6 +32,13 @@ const precisionParse = async (
   const KLVPecision = 10 ** 6; // Also used for KFI
   const percentagePrecision = 10 ** 2;
 
+  const addPrecision = (payload: number, precision: number) => {
+    if (typeof payload === 'number') {
+      return payload * precision;
+    }
+    return payload;
+  };
+
   switch (contractType) {
     case 'TransferContract':
     case 'FreezeContract':
@@ -49,19 +56,34 @@ const precisionParse = async (
       break;
     case 'CreateAssetContract':
       precision = 10 ** payload.precision;
-      payload.initialSupply &&= payload.initialSupply * precision;
-      payload.maxSupply &&= payload.maxSupply * precision;
-      payload.royalties.transferFixed &&=
-        payload.royalties.transferFixed * KLVPecision;
-      payload.royalties.marketFixed &&=
-        payload.royalties.marketFixed * KLVPecision;
-      payload.royalties.marketPercentage &&=
-        payload.royalties.marketPercentage * percentagePrecision;
+
+      payload.initialSupply = addPrecision(payload.initialSupply, precision);
+
+      payload.maxSupply = addPrecision(payload.maxSupply, precision);
+
+      payload.royalties.transferFixed = addPrecision(
+        payload.royalties.transferFixed,
+        KLVPecision,
+      );
+
+      payload.royalties.marketFixed = addPrecision(
+        payload.royalties.marketFixed,
+        KLVPecision,
+      );
+
+      payload.royalties.marketPercentage = addPrecision(
+        payload.royalties.marketPercentage,
+        percentagePrecision,
+      );
+
       if (payload.royalties.transferPercentage) {
         payload.royalties.transferPercentage.forEach((item: any) => {
-          item.percentagePrecision &&=
-            item.percentagePrecision * percentagePrecision;
-          item.amount &&= item.amount * KLVPecision;
+          item.percentagePrecision = addPrecision(
+            item.percentagePrecision,
+            percentagePrecision,
+          );
+
+          addPrecision((item.amount = item.amount), KLVPecision);
         });
       }
       break;
@@ -105,13 +127,15 @@ const precisionParse = async (
       assetId = payload.assetID;
       precision = await getPrecision(assetId);
       if (precision !== undefined) {
-        payload.price &&= payload.price * 10 ** precision;
+        payload.price = addPrecision(payload.price, 10 ** precision);
       } else return;
       break;
     case 'CreateMarketplaceContract':
     case 'ConfigMarketplaceContract':
-      payload.referralPercentage &&=
-        payload.referralPercentage * percentagePrecision;
+      payload.referralPercentage = addPrecision(
+        payload.referralPercentage,
+        percentagePrecision,
+      );
   }
 
   return payload;

@@ -140,8 +140,12 @@ const FormInput: React.FC<IFormInputProps> = ({
           '\t' +
           areaRef.current.value.substring(end);
 
-        areaRef.current.selectionStart &&= start + 1;
-        areaRef.current.selectionEnd &&= end + 1;
+        if (typeof areaRef.current.selectionStart === 'number') {
+          areaRef.current.selectionStart = start + 1;
+        }
+        if (typeof areaRef.current.selectionEnd === 'number') {
+          areaRef.current.selectionEnd = end + 1;
+        }
       }
     }
   };

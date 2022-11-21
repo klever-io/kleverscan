@@ -1,4 +1,5 @@
-import { contractsList, setCharAt } from '@/utils/index';
+import { contractsList } from '@/utils/contracts';
+import { setCharAt } from '@/utils/index';
 import { Scope } from '@unform/core';
 import FormInput from 'components/Form/FormInput';
 import { Container, InputLabel } from 'components/Form/FormInput/styles';

@@ -1,18 +1,13 @@
+import { screen } from '@testing-library/react';
 import React from 'react';
 import { renderWithTheme } from '../../../test/utils';
-import Area from './index';
+import Chart, { ChartType } from '../index';
 
 const data = [
-  { value: 500, date: 1 },
-  { value: 300, date: 2 },
-  { value: 330, date: 3 },
-  { value: 400, date: 4 },
-  { value: 350, date: 5 },
-  { value: 150, date: 6 },
-  { value: 250, date: 7 },
-  { value: 350, date: 8 },
-  { value: 450, date: 9 },
-  { value: 500, date: 10 },
+  { date: '01 Nov', value: 257271 },
+  { date: '02 Nov', value: 116556 },
+  { date: '03 Nov', value: 110105 },
+  { date: '04 Nov', value: 98829 },
 ];
 
 global.ResizeObserver = jest.fn().mockImplementation(() => ({
@@ -20,7 +15,7 @@ global.ResizeObserver = jest.fn().mockImplementation(() => ({
   unobserve: jest.fn(),
   disconnect: jest.fn(),
 }));
-describe('Area Chart', () => {
+describe('Linear Chart', () => {
   const mockedClientHeight = 100;
   const mockedClientWidth = 100;
   beforeAll(() => {
@@ -31,9 +26,15 @@ describe('Area Chart', () => {
       .spyOn(HTMLElement.prototype, 'clientWidth', 'get')
       .mockReturnValue(mockedClientWidth);
   });
-
   it('should render the chart with the correct data', async () => {
-    const container = renderWithTheme(<Area data={data} bg="dark" />).container;
+    const container = renderWithTheme(
+      <Chart
+        type={ChartType.Linear}
+        data={data}
+        value="burned"
+        value2="minted"
+      />,
+    ).container;
     expect(container).toBeInTheDocument();
     const svg = document.querySelector('.recharts-surface');
     expect(svg?.nodeName).toBe('svg');

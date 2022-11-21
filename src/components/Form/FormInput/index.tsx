@@ -139,6 +139,7 @@ const FormInput: React.FC<IFormInputProps> = ({
           areaRef.current.value.substring(0, start) +
           '\t' +
           areaRef.current.value.substring(end);
+
         if (typeof areaRef.current.selectionStart === 'number') {
           areaRef.current.selectionStart = start + 1;
         }

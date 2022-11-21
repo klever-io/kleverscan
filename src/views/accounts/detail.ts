@@ -210,7 +210,7 @@ export const FrozenContainer = styled.div`
 
     strong {
       width: 10rem;
-
+      margin-right: 5px;
       font-weight: 600;
       color: ${props => props.theme.darkText};
     }

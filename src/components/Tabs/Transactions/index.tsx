@@ -4,23 +4,15 @@ import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import { useMobile } from '@/contexts/mobile';
+import { Contract, IContract, ITransferContract } from '@/types/contracts';
+import { IInnerTableProps, IRowSection, ITransaction } from '@/types/index';
 import {
-  Contract,
-  IContract,
-  IInnerTableProps,
-  IRowSection,
-  ITransaction,
-  ITransferContract,
-} from '@/types/index';
-import {
-  capitalizeString,
   contractTypes,
   filteredSections,
-  formatAmount,
   getHeader,
   initialsTableHeaders,
-  parseAddress,
-} from '@/utils/index';
+} from '@/utils/contracts';
+import { capitalizeString, formatAmount, parseAddress } from '@/utils/index';
 import { CenteredRow } from '@/views/accounts/detail';
 import { format, fromUnixTime } from 'date-fns';
 import Link from 'next/link';

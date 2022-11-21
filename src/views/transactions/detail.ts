@@ -226,3 +226,22 @@ export const Hr = styled.hr`
   padding: 0.2rem;
   border-radius: 4px;
 `;
+
+export const NestedContainerWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
+export const HeaderWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-direction: column;
+    align-items: flex-start;
+    span:nth-child(1) {
+      margin-top: 1rem;
+    }
+  }
+`;

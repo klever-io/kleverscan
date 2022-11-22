@@ -245,3 +245,18 @@ export const HeaderWrapper = styled.div`
     }
   }
 `;
+
+export const KappFeeSpan = styled.span`
+  display: flex;
+  align-items: center;
+  span {
+    margin-left: 1rem;
+    color: #7b7db2;
+    font-weight: 400;
+  }
+`;
+
+export const KappFeeFailedTx = styled.p`
+  text-decoration: line-through;
+  color: red !important;
+`;

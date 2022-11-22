@@ -61,7 +61,7 @@ import Copy from '../Copy';
 
 export const Transfer: React.FC<any> = ({ parameter: par }) => {
   const parameter = par as ITransferContract;
-  const [precision, setPrecision] = useState(1);
+  const [precision, setPrecision] = useState(0);
 
   useEffect(() => {
     const assetID = parameter?.assetId?.split('/') || [];
@@ -69,10 +69,6 @@ export const Transfer: React.FC<any> = ({ parameter: par }) => {
     const getAssetPrecision = async () => {
       setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 6);
     };
-
-    if (assetID.length > 1) {
-      return;
-    }
 
     if (assetID.length === 0 || assetID[0] === 'KLV' || assetID[0] === 'KFI') {
       setPrecision(6);

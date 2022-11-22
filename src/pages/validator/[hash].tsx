@@ -5,7 +5,6 @@ import Dropdown from '@/components/Dropdown';
 import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
 import Table, { ITable } from '@/components/Table';
-import ValidatorCards from '@/components/ValidatorCards';
 import api from '@/services/api';
 import {
   IBucket,
@@ -41,6 +40,7 @@ import {
   TableContainer,
 } from '@/views/validators/detail';
 import { GetServerSideProps } from 'next';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
@@ -64,6 +64,10 @@ interface IDelegateResponse extends IResponse {
   };
   pagination: IPagination;
 }
+
+const DynamicValidatorCards = dynamic(
+  () => import('../../components/ValidatorCards'),
+);
 
 const Validator: React.FC<IValidatorPage> = ({
   validator,
@@ -371,10 +375,7 @@ const Validator: React.FC<IValidatorPage> = ({
           <TitleContent>
             {renderLogo()}
             <TitleInformation>
-              <ValidatorTitle>
-                {renderTitle()}
-                {/* <Ranking>Rank 1</Ranking> */}
-              </ValidatorTitle>
+              <ValidatorTitle>{renderTitle()}</ValidatorTitle>
               <CenteredSubTitle>
                 <span>{blsPublicKey}</span>
                 <CopyBackground>
@@ -396,7 +397,7 @@ const Validator: React.FC<IValidatorPage> = ({
         route={'/validators'}
       />
 
-      <ValidatorCards
+      <DynamicValidatorCards
         totalStake={totalStake}
         commission={commission}
         maxDelegation={maxDelegation}

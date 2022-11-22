@@ -574,15 +574,14 @@ export const validateImgUrl = async (
 };
 
 /**
- * Checks if the contractType is Transfer, Freeze ou Unfreeze. Otherwise returns false.
+ * Checks if the contractType is Transfer or Freeze. Otherwise returns false.
  * @param contract
  * @returns boolean
  */
 export const getContractType = (contract: string): boolean => {
   if (
     contract === 'TransferContractType' ||
-    contract === 'FreezeContractType' ||
-    contract === 'UnfreezeContractType'
+    contract === 'FreezeContractType'
   ) {
     return true;
   }

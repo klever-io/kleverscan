@@ -63,6 +63,8 @@ const Form: React.FC<any> = ({
   cancelOnly,
   loading,
   setData,
+  showPayload,
+  setShowPayload,
   setIsMultisig,
   isMultisig,
   showForm,
@@ -340,6 +342,8 @@ const Form: React.FC<any> = ({
 
           {showAdvancedOpts ? (
             <AdvancedOptions
+              showPayload={showPayload}
+              setShowPayload={setShowPayload}
               setData={setData}
               setIsMultisig={setIsMultisig}
               isMultisig={isMultisig}

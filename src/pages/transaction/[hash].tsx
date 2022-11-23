@@ -369,7 +369,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
   const rawTxTheme = {
     height: '30rem',
     color: isDarkTheme ? 'white' : 'black',
-    backgroundColor: isDarkTheme ? '#0B0B1E' : 'white',
+    backgroundColor: isDarkTheme ? '#181935' : 'white',
   };
 
   const KappFeeRow: React.FC = () => {

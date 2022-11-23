@@ -117,7 +117,12 @@ export const Status = styled.div<IStatus>`
       margin: 0;
     }
   }
-
+  path {
+    fill: ${props => props.theme.white};
+  }
+  circle {
+    fill: ${props => props.theme.table.success};
+  }
   p {
     color: ${props => props.theme.table[props.status]} !important;
     text-transform: capitalize;
@@ -659,7 +664,7 @@ export const Rating = styled.p.attrs<IRatingProps>(props => ({
       ? props.theme.table.pending
       : props.theme.red};
 
-  color: ${props => props.theme.white} !important;
+  color: ${props => props.theme.true.black} !important;
   font-weight: 400;
 
   border-radius: 1rem;

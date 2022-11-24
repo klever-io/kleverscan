@@ -525,7 +525,7 @@ const Contract: React.FC<IContract> = ({
 
   const KDASelect = () => (
     <SelectContainer>
-      <SelectContent>
+      <SelectContent configITO={contractType === 'ConfigITOContract'}>
         <BalanceContainer>
           <FieldLabel>Select an asset/collection</FieldLabel>
           {!isNaN(Number(assetBalance)) && assetBalance !== null && (
@@ -534,12 +534,12 @@ const Contract: React.FC<IContract> = ({
             </BalanceLabel>
           )}
         </BalanceContainer>
-
         <Select
           options={getAssetsList(
             contractType === 'AssetTriggerContract' ? kAssets : assetsList,
             contractType,
             typeAssetTrigger,
+            ownerAddress,
           )}
           onChange={value => {
             setCollection(value);
@@ -551,15 +551,17 @@ const Contract: React.FC<IContract> = ({
         />
       </SelectContent>
 
-      {collection?.isNFT && showAssetIDInput(contractType, typeAssetTrigger) && (
-        <SelectContent>
-          <FieldLabel>Asset ID</FieldLabel>
-          <AssetIDInput
-            type="number"
-            onChange={e => (assetID = Number(e.target.value))}
-          />
-        </SelectContent>
-      )}
+      {collection?.isNFT &&
+        contractType !== 'ConfigITOContract' &&
+        showAssetIDInput(contractType, typeAssetTrigger) && (
+          <SelectContent>
+            <FieldLabel>Asset ID</FieldLabel>
+            <AssetIDInput
+              type="number"
+              onChange={e => (assetID = Number(e.target.value))}
+            />
+          </SelectContent>
+        )}
     </SelectContainer>
   );
 

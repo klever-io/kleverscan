@@ -127,7 +127,7 @@ describe('Component: Tabs/Proposals', () => {
     };
 
     const epochsStyles = {
-      color: '#7B7DB2',
+      color: theme.darkText,
     };
 
     const upVotesAndTotalStakedStyles = {
@@ -143,12 +143,12 @@ describe('Component: Tabs/Proposals', () => {
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
       fontSize: '0.95rem',
-      color: '#37DD72',
+      color: theme.green,
       fontWeight: 'bold',
     };
 
     const networkParamsStyles = {
-      color: '#7B7DB2',
+      color: theme.darkText,
     };
 
     const detailsStyles = {

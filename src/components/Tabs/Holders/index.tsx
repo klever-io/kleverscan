@@ -9,7 +9,15 @@ import { AddressContainer, RankingContainer, RankingText } from './styles';
 interface IHolder {
   holders: IBalance[];
   asset: IAsset;
-  holdersTableProps: any;
+  holdersTableProps: IHolderTableProps;
+}
+
+interface IHolderTableProps {
+  scrollUp: boolean;
+  totalPages: number;
+  dataName: string;
+  request: (page: number, limit: number) => Promise<any>;
+  page: number;
 }
 
 const Holders: React.FC<IHolder> = ({ holders, asset, holdersTableProps }) => {

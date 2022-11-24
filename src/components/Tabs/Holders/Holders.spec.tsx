@@ -45,7 +45,7 @@ describe('Component: Tabs/Holders', () => {
         />,
       );
     });
-    const headers = ['Rank', 'Address', 'Percentage', 'Amount'];
+    const headers = ['Rank', 'Address', 'Percentage', 'Frozen Amount'];
     const rank = screen.getByText('1');
     const tableBody = screen.getByTestId('table-body');
 
@@ -57,7 +57,7 @@ describe('Component: Tabs/Holders', () => {
     expect(rank).toBeInTheDocument();
   });
 
-  it('Should render the correct values for "Rank", "Address", "Percentage" and "Amount"', async () => {
+  it('Should render the correct values for "Rank", "Address", "Percentage" and " Frozen Amount"', async () => {
     await act(async () => {
       renderWithTheme(
         <Holders
@@ -67,11 +67,10 @@ describe('Component: Tabs/Holders', () => {
         />,
       );
     });
-
     const link = screen.getByRole('link', {
       name: parseAddress(mockedHoldersResponse.data.accounts[0].address, 40),
     });
-    const balance = mockedHoldersResponse.data.accounts[0].balance;
+    const balance = mockedHoldersResponse.data.accounts[0].frozenBalance;
 
     const calcPercentage = (
       (balance / klvAsset.circulatingSupply) *

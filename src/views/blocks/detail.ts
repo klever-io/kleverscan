@@ -104,7 +104,7 @@ export const CardHeaderItem = styled.div<{ selected: boolean }>`
   span {
     font-weight: 600;
     font-size: 0.95rem;
-    color: ${props => props.theme.card.assetText};
+    color: ${props => props.theme.black};
 
     opacity: ${props => (props.selected ? 1 : 0.2)};
 

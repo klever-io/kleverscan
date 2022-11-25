@@ -20,9 +20,6 @@ jest.mock('next/router', () => ({
   useRouter: jest.fn(),
 }));
 
-jest.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: key => key }),
-}));
 describe('Component: InputGlobal', () => {
   let container: HTMLElement;
   const mockRouter = {

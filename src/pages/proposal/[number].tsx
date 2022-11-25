@@ -377,7 +377,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                     <strong>Actual Epoch</strong>
                   </span>
                   <span>
-                    <span>{proposalAPI.overview.epochNumber}</span>
+                    <span>{proposalAPI?.overview?.epochNumber}</span>
                   </span>
                 </HalfRow>
               </Row>

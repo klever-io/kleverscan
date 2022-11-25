@@ -62,6 +62,15 @@ describe('test api functions', () => {
     refreshTime: 60,
   };
 
+  const paginationOnError = {
+    self: 0,
+    next: 0,
+    previous: 0,
+    perPage: 0,
+    totalPages: 0,
+    totalRecords: 0,
+  };
+
   describe('getProps function', () => {
     test('if default values are returned', () => {
       expect(getProps(defaultProps)).toStrictEqual(defaultProps);
@@ -131,6 +140,7 @@ describe('test api functions', () => {
           data: null,
           error: 'generic error',
           code: 'internal_error',
+          pagination: paginationOnError,
         });
       });
 
@@ -153,6 +163,7 @@ describe('test api functions', () => {
           data: null,
           error: 'Internal Server Error',
           code: 'internal_error',
+          pagination: paginationOnError,
         });
       });
     });
@@ -186,6 +197,7 @@ describe('test api functions', () => {
           data: null,
           error: 'generic error',
           code: 'internal_error',
+          pagination: paginationOnError,
         });
       });
 
@@ -208,6 +220,7 @@ describe('test api functions', () => {
           data: null,
           error: 'Internal Server Error',
           code: 'internal_error',
+          pagination: paginationOnError,
         });
       });
     });
@@ -246,6 +259,7 @@ describe('test api functions', () => {
           data: null,
           error: 'generic error',
           code: 'internal_error',
+          pagination: paginationOnError,
         });
       });
 
@@ -268,6 +282,7 @@ describe('test api functions', () => {
           data: null,
           error: 'Internal Server Error',
           code: 'internal_error',
+          pagination: paginationOnError,
         });
       });
     });
@@ -305,6 +320,7 @@ describe('test api functions', () => {
           data: null,
           error: 'generic error',
           code: 'internal_error',
+          pagination: paginationOnError,
         });
       });
 
@@ -327,6 +343,7 @@ describe('test api functions', () => {
           data: null,
           error: 'Internal Server Error',
           code: 'internal_error',
+          pagination: paginationOnError,
         });
       });
     });
@@ -382,6 +399,7 @@ describe('test api functions', () => {
           data: null,
           error: 'Internal Server Error',
           code: 'internal_error',
+          pagination: paginationOnError,
         });
       });
     });
@@ -406,6 +424,7 @@ describe('test api functions', () => {
         code: 'internal_error',
         data: null,
         error: 'Fetch timeout',
+        pagination: paginationOnError,
       });
     });
   });

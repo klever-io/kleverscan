@@ -92,7 +92,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
 
                 const minEpochsToWithdraw =
                   assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
-
+                const ownerAddress = assetInfo.data?.asset?.ownerAddress;
                 const {
                   assetType,
                   frozenBalance,
@@ -111,6 +111,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
                   minEpochsToWithdraw: minEpochsToWithdraw
                     ? minEpochsToWithdraw
                     : null,
+                  ownerAddress,
                 });
               },
             );

@@ -24,7 +24,6 @@ const configITOContract = (): ISection[] => {
         label: 'Max Amount',
         props: {
           type: 'number',
-          required: true,
           tooltip: 'Max amount of assets sold in the ITO',
         },
       },

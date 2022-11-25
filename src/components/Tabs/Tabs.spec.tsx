@@ -3,7 +3,10 @@ import userEvent from '@testing-library/user-event';
 import * as nextRouter from 'next/router';
 import React from 'react';
 import Tabs, { ITabs } from '.';
+import Transaction from '../../components/Tabs/Transactions';
+import { mockedTransactions } from '../../test/mocks';
 import { renderWithTheme } from '../../test/utils';
+import { IInnerTableProps } from '../../types';
 import {
   address,
   assetId,
@@ -13,7 +16,40 @@ import {
   headerTable,
   mockedAssets,
 } from './Assets/Assets.spec';
-import { mockedTransactionTab } from './Transactions/Transaction.spec';
+
+const precision = 6;
+const request = jest.fn(async (page: number, limit: number) => {
+  return Promise.resolve(mockedAPIResponse);
+});
+
+const mockedAPIResponse = {
+  data: {
+    transactions: mockedTransactions,
+  },
+  pagination: {
+    self: 1,
+    next: 2,
+    previous: 1,
+    perPage: 10,
+    totalPages: 1000,
+    totalRecords: 19348805,
+  },
+};
+
+const transactionTableProps: IInnerTableProps = {
+  scrollUp: false,
+  totalPages: 1,
+  dataName: 'transactions',
+  request,
+  query: {},
+};
+const mockedTransactionTab = (
+  <Transaction
+    transactions={mockedTransactions}
+    precision={precision}
+    transactionsTableProps={transactionTableProps}
+  />
+);
 
 const tableHeaders = ['Assets', 'Transactions'];
 

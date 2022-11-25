@@ -15,9 +15,13 @@ interface IAdvOptions {
   setData: any;
   setIsMultisig: any;
   isMultisig: boolean;
+  setShowPayload: any;
+  showPayload: boolean;
 }
 
 const AdvancedOptions: React.FC<IAdvOptions> = ({
+  setShowPayload,
+  showPayload,
   setData,
   setIsMultisig,
   isMultisig,
@@ -39,6 +43,22 @@ const AdvancedOptions: React.FC<IAdvOptions> = ({
               defaultChecked={false}
               value={String(isMultisig)}
               onClick={() => setIsMultisig(!isMultisig)}
+            />
+            <Slider />
+          </Toggle>
+          Yes
+        </ToggleContainer>
+      </FieldContainer>
+      <FieldContainer>
+        <InputLabel>Show payload?</InputLabel>
+        <ToggleContainer>
+          No
+          <Toggle>
+            <StyledInput
+              type="checkbox"
+              defaultChecked={false}
+              value={String(showPayload)}
+              onClick={() => setShowPayload(!showPayload)}
             />
             <Slider />
           </Toggle>

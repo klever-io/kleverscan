@@ -17,7 +17,7 @@ export const Container = styled.div`
   right: 0;
 
   background-color: ${props => props.theme.navbar.background};
-
+  border-bottom: 1px solid ${props => props.theme.footer.border};
   z-index: 1000;
 
   transition: top 0.1s linear;

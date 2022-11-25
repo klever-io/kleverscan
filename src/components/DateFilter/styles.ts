@@ -89,7 +89,7 @@ export const OutsideContent = styled.div`
 
   background-color: ${props =>
     props.theme.dark
-      ? props.theme.card.assetText
+      ? props.theme.input.dateFilter
       : props.theme.dateFilter.outsideBackground};
   border-radius: 0.5rem;
 

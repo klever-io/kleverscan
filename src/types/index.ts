@@ -46,6 +46,7 @@ export interface ICollectionList {
   precision?: number;
   buckets?: any[];
   minEpochsToWithdraw?: number | null;
+  ownerAddress?: string;
 }
 
 export interface IKAssets {

@@ -594,6 +594,58 @@ export const mockedHolders: IAccountAsset[] = [
       epoch: 0,
     },
   },
+  {
+    address: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+    assetId: 'KLV',
+    assetType: EnumAssetType.Fungible,
+    balance: 10000000000000,
+    precision: 6,
+    frozenBalance: 10000000000000,
+    unfrozenBalance: 0,
+    lastClaim: {
+      timestamp: 0,
+      epoch: 0,
+    },
+  },
+  {
+    address: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+    assetId: 'KLV',
+    assetType: EnumAssetType.Fungible,
+    balance: 10000000000000,
+    precision: 6,
+    frozenBalance: 10000000000000,
+    unfrozenBalance: 0,
+    lastClaim: {
+      timestamp: 0,
+      epoch: 0,
+    },
+  },
+  {
+    address: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+    assetId: 'KLV',
+    assetType: EnumAssetType.Fungible,
+    balance: 10000000000000,
+    precision: 6,
+    frozenBalance: 10000000000000,
+    unfrozenBalance: 0,
+    lastClaim: {
+      timestamp: 0,
+      epoch: 0,
+    },
+  },
+  {
+    address: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+    assetId: 'KLV',
+    assetType: EnumAssetType.Fungible,
+    balance: 10000000000000,
+    precision: 6,
+    frozenBalance: 10000000000000,
+    unfrozenBalance: 0,
+    lastClaim: {
+      timestamp: 0,
+      epoch: 0,
+    },
+  },
 ];
 
 export const mockedTransactions = [
@@ -601,6 +653,8 @@ export const mockedTransactions = [
     hash: '9854s785a325fc96520aa8c1d61669944113995dc67038a6d1beafas52147895',
     blockNum: 36552,
     timestamp: Date.now(),
+    kAppFee: 1000000,
+    bandwidthFee: 1000000,
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
     contract: [
       {
@@ -623,6 +677,8 @@ export const mockedTransactions = [
   {
     hash: '9854s785a325fc96520aa8c1d61669944113995dc67038a6d1beafs358a66587',
     blockNum: 45245,
+    kAppFee: 1000000,
+    bandwidthFee: 1000000,
     timestamp: Date.now(),
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
     contract: [
@@ -656,6 +712,8 @@ export const mockedTransactions = [
   {
     hash: '9854s785a325fc96520aa8c1d61669944113995dc67038a6d1beaf452s364863',
     blockNum: '',
+    kAppFee: 1000000,
+    bandwidthFee: 1000000,
     timestamp: Date.now(),
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
     contract: [

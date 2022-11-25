@@ -94,9 +94,8 @@ const precisionParse = async (
         payload.config.maxDelegationAmount * KLVPecision;
       break;
     case 'ConfigITOContract':
-    case 'SetITOPricesContract':
       if (payload.maxAmount) {
-        const assetId = payload.assetId ? payload.assetId : payload.assetID;
+        const assetId = payload.kda ? payload.kda : payload.assetId;
         precision = await getPrecision(assetId);
         if (precision !== undefined) {
           payload.maxAmount = payload.maxAmount * 10 ** precision;
@@ -233,6 +232,7 @@ const getAssetsList = (
   assets: any[],
   contractType: string,
   typeAssetTrigger: number | null,
+  ownerAddress: string,
 ): any[] => {
   if (contractType === 'AssetTriggerContract' && typeAssetTrigger !== null) {
     const bothCollectionNFT = [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13];
@@ -275,8 +275,9 @@ const getAssetsList = (
 
       return thereIsUnfreezedBucket && passedMinEpochs ? value : null;
     });
+  } else if (contractType === 'ConfigITOContract') {
+    return assets.filter(asset => asset.ownerAddress === ownerAddress);
   }
-
   return assets;
 };
 

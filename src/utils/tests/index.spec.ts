@@ -495,27 +495,31 @@ describe('unit tests for util funcs in index file', () => {
         index: 0,
         address:
           'klv1rquwyta7kh4jueua76xpqkfgcwsws9yadtuxtp5g2cyt5ps04cpq5ywg5x',
-        balance: 500000000000000,
+        balance: 0,
+        frozenBalance: 0,
         rank: 1,
       },
       {
         index: 1,
         address:
           'klv1edd0ymfmv9r2mxk7mdtsk4zfeql5cp9vyn7t4y4adq58vp2r9alslfglw8',
-        balance: 500000000000000,
+        balance: 0,
+        frozenBalance: 0,
         rank: 2,
       },
       {
         index: 2,
         address:
           'klv14ragd2rgqat485vu6ssh4vu9rhmc68mg6vrmkmuhdqda9eeykucqvewgsh',
-        balance: 500000000000000,
+        balance: 0,
+        frozenBalance: 0,
         rank: 3,
       },
       {
         index: 3,
         address: '',
         balance: 0,
+        frozenBalance: 0,
         rank: 0,
       },
     ];

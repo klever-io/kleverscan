@@ -12,7 +12,7 @@ describe('Component: Header/navbar', () => {
     'Transactions',
     'Assets',
     'Validators',
-    'Nodes',
+    // 'Nodes',
     'Proposals',
     'Charts',
   ];

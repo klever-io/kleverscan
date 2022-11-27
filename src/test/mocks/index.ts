@@ -56,6 +56,39 @@ export const CoinTest = [
   },
 ];
 
+export const assetsData = {
+  klv: {
+    prices: {
+      todaysPrice: null,
+      yesterdayPrice: null,
+      variation: null,
+    },
+    staking: {
+      totalStaking: 10000000000000,
+      dayBeforeTotalStaking: 5000000000000,
+    },
+    volume: null,
+    circulatingSupply: null,
+    estimatedAprYesterday: 5.5,
+    estimatedAprBeforeYesterday: 5.6,
+  },
+  kfi: {
+    prices: {
+      todaysPrice: null,
+      yesterdayPrice: null,
+      variation: null,
+    },
+    staking: {
+      totalStaking: 10000000000000,
+      dayBeforeTotalStaking: 5000000000000,
+    },
+    volume: null,
+    circulatingSupply: null,
+    estimatedAprYesterday: 5.5,
+    estimatedAprBeforeYesterday: 5.6,
+  },
+};
+
 export const mockTxItem: ITransaction = {
   chainID: '10020',
   blockNum: 123,
@@ -329,35 +362,6 @@ export const mockedTxContractComponents = {
         'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
       referralPercentage: 100,
     },
-  },
-};
-
-const assetsData = {
-  klv: {
-    prices: {
-      todaysPrice: null,
-      yesterdayPrice: null,
-      variation: null,
-    },
-    staking: {
-      totalStaking: null,
-      dayBeforeTotalStaking: null,
-    },
-    volume: null,
-    circulatingSupply: null,
-  },
-  kfi: {
-    prices: {
-      todaysPrice: null,
-      yesterdayPrice: null,
-      variation: null,
-    },
-    staking: {
-      totalStaking: null,
-      dayBeforeTotalStaking: null,
-    },
-    volume: null,
-    circulatingSupply: null,
   },
 };
 

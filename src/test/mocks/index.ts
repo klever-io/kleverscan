@@ -484,8 +484,16 @@ export const mockedHomeDataCards: IDataCards = {
   beforeYesterdayTransactions: 10,
 };
 
-export const mockedMetrics =
-  'klv_slot_at_epoch_start{chainID="100015"} 486155\nklv_slots_per_epoch{chainID="100015"} 150\nklv_current_slot{chainID="100015"} 486191\nklv_slot_duration{chainID="100015"} 4000';
+export const mockedMetrics = {
+  data: {
+    overview: {
+      slotAtEpochStart: 486155,
+      slotsPerEpoch: 150,
+      currentSlot: 486191,
+      slotDuration: 4000,
+    },
+  },
+};
 
 export const mockedStatistics = {
   data: {
@@ -500,38 +508,46 @@ export const mockedStatistics = {
 };
 
 export const mockedNewAccountsCall = {
-  yesterdayAccounts: {
-    data: {
-      number_by_day: [
-        {
-          doc_count: 33,
-        },
-      ],
-    },
+  data: {
+    number_by_day: [
+      {
+        doc_count: 33,
+      },
+    ],
   },
+
   error: '',
 };
 
 export const mockedTransactionsCall = {
-  transactions: {
-    pagination: {
-      totalRecords: 22,
-    },
+  data: {
+    transactions: {},
+  },
+  pagination: {
+    totalRecords: 23,
   },
   error: '',
 };
 
 export const mockedYesterdayTxCall = {
-  yesterdayTransactions: {
-    data: {
-      number_by_day: [
-        {
-          doc_count: 444,
-        },
-      ],
-    },
+  //TODO: Remove this when the API is fixed and probably change to comment below
+  data: {
+    transactions: {},
+  },
+  pagination: {
+    totalRecords: 23,
   },
   error: '',
+  // yesterdayTransactions: {
+  //   data: {
+  //     number_by_day: [
+  //       {
+  //         doc_count: 444,
+  //       },
+  //     ],
+  //   },
+  // },
+  // error: '',
 };
 export const klvAsset: IAsset = {
   assetType: '',

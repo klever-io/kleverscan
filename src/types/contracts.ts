@@ -321,7 +321,6 @@ export enum ITOTriggerType {
   UpdateWhitelistStatus = 'UpdateWhitelistStatus',
   AddToWhitelist = 'AddToWhitelist',
   RemoveFromWhitelist = 'RemoveFromWhitelist',
-  WipeWhitelist = 'WipeWhitelist',
   UpdateWhitelistTimes = 'UpdateWhitelistTimes',
 }
 

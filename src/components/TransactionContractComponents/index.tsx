@@ -1728,8 +1728,6 @@ export const ITOTrigger: React.FC<IContract> = ({ parameter: par }) => {
         return renderWhiteListInfo();
       case ITOTriggerType.RemoveFromWhitelist:
         return renderWhiteListInfo();
-      case ITOTriggerType.WipeWhitelist:
-        break;
       case ITOTriggerType.UpdateWhitelistTimes:
         return (
           <>

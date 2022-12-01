@@ -6,6 +6,7 @@ import { default as DefaultInput } from '../InputGlobal';
 
 interface IMobileMenu {
   opened: boolean;
+  isOpenDrawer?: boolean;
 }
 
 export const Container = styled.div`
@@ -181,7 +182,7 @@ export const MobileContainer = styled.div`
 
 export const MobileContent = styled.div<IMobileMenu>`
   padding: 1.5rem;
-
+  width: ${props => (props.isOpenDrawer ? '100%' : '')};
   height: calc(100vh - 4rem);
 
   top: 4rem;
@@ -330,3 +331,11 @@ export const MenuIcon = styled(FiMenu).attrs(props => ({
   color: props.theme.navbar.text,
   size: 24,
 }))``;
+
+export const ConnectContainer = styled.div`
+  display: flex;
+  position: fixed;
+  bottom: 1.5rem;
+  top: 0;
+  z-index: 9999 !important;
+`;

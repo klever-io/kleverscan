@@ -5,11 +5,13 @@ import { useMobile } from '@/contexts/mobile';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { QRCodeSVG } from 'qrcode.react';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { MobileNavbarItem } from '..';
 import { parseAddress } from '../../../utils';
 import OptionsContainer from '../OptionsContainer';
+import WalletHelp from '../WalletHelp';
 import {
+  BackgroundHelper,
   ButtonAndCopy,
   ConnectButton,
   ConnectContainer,
@@ -22,10 +24,13 @@ import {
   StyledTransfer,
 } from './styles';
 
-const ConnectWallet: React.FC = () => {
+interface IConnectWallet {
+  clickConnection: () => void;
+}
+const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
   const router = useRouter();
   const [displayQr, setDisplayQr] = useState(false);
-
+  const [openDrawer, setOpenDrawer] = useState(false);
   const {
     walletAddress,
     extensionLoading,
@@ -63,7 +68,6 @@ const ConnectWallet: React.FC = () => {
     if (window.innerWidth < 768) {
       return getCreateTransactionButton();
     }
-
     return (
       <NavBarOptionsItems>
         {getCreateTransactionButton()}
@@ -78,9 +82,37 @@ const ConnectWallet: React.FC = () => {
       </NavBarOptionsItems>
     );
   };
+  const handleClick = () => {
+    setOpenDrawer(true);
+  };
+  const closeMenu = () => {
+    setOpenDrawer(false);
+  };
 
+  useEffect(() => {
+    document.body.style.overflow = openDrawer ? 'hidden' : 'visible';
+  }, [openDrawer]);
   return (
     <>
+      {!extensionInstalled && (
+        <ConnectContainer>
+          <ConnectButton onClick={handleClick}>
+            How to connect Wallet
+          </ConnectButton>
+        </ConnectContainer>
+      )}
+
+      <BackgroundHelper
+        onClick={closeMenu}
+        onTouchStart={closeMenu}
+        opened={openDrawer}
+      />
+      <WalletHelp
+        closeDrawer={() => setOpenDrawer(false)}
+        opened={openDrawer}
+        clickConnectionMobile={clickConnection}
+      />
+
       {extensionInstalled && (
         <ConnectContainer>
           <ButtonAndCopy

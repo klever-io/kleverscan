@@ -1,31 +1,49 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  color: ${props => props.theme.white};
-  margin-bottom: 2.5rem;
-  padding: 1.5rem 0;
-  svg {
-    font-size: 2.75rem;
-    transform: scaleX(-1);
-  }
-  span {
-    font-size: 1.25rem;
-  }
-  p {
-    font-size: 1.5rem;
-    font-weight: bold;
+  padding: 10rem;
+
+  display: flex;
+
+  flex-direction: row;
+  justify-content: center;
+
+  background-color: ${props => props.theme.background};
+
+  div div:last-child span {
+    color: white;
   }
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    svg {
-      font-size: 2rem;
-    }
-    span {
-      font-size: 0.9rem;
-    }
-    p {
-      font-size: 1rem;
-      font-weight: bold;
+    padding: 0 3rem;
+    align-items: center;
+
+    flex-direction: column-reverse;
+  }
+`;
+
+export const MaintenanceImage = styled.img`
+  z-index: 10;
+  background: '';
+  margin: auto;
+  width: 100%;
+  height: 50vh;
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    display: none;
+  }
+`;
+
+export const Message = styled.div`
+  span {
+    color: ${props => props.theme.black};
+    font-weight: 500;
+    font-size: 5rem;
+    font-family: Rubik, sans-serif;
+
+    text-shadow: 0px 4px 0px rgba(0, 0, 0, 0.25);
+
+    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+      font-size: min(4rem, 50vw);
     }
   }
 `;

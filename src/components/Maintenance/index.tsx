@@ -1,24 +1,37 @@
-import { DataCard, DataCardValue, IconContainer } from '@/views/home';
+import { useRouter } from 'next/router';
 import React from 'react';
-import { FaWrench } from 'react-icons/fa';
-import { Container } from './styles';
+import {
+  Background,
+  Button,
+  ButtonContainer,
+  Content,
+} from '../../views/notFound';
+import { Container, Message } from './styles';
 
 const Maintenance: React.FC = () => {
+  const router = useRouter();
+
+  const handleBack = () => {
+    router.push('/');
+  };
+
   return (
-    <Container>
-      <DataCard>
-        <IconContainer>
-          <FaWrench />
-        </IconContainer>
-        <DataCardValue id="Maintenance">
-          <span>
-            We are preparing the launch of a new update in KleverChain Testnet
-            2.0, including first kapp launch enabling staking.
-          </span>
-          <p>Until then, test transactions will be temporarily halted.</p>
-        </DataCardValue>
-      </DataCard>
-    </Container>
+    <>
+      <Container>
+        <Content>
+          <Message>
+            <span>Down for Maintenance</span>
+          </Message>
+          <ButtonContainer>
+            <Button hasBackground onClick={handleBack}>
+              <span>Back to homepage</span>
+            </Button>
+          </ButtonContainer>
+        </Content>
+        {/* <MaintenanceImage /> */}
+      </Container>
+      <Background />
+    </>
   );
 };
 

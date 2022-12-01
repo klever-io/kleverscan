@@ -12,20 +12,21 @@ describe('Component: CoinCard', () => {
   const actualTPS = '30 / 300';
 
   it('Should render the CoinCard with the correct text', () => {
-    renderWithTheme(
+    const container = renderWithTheme(
       <CoinCard
         coins={CoinTest}
         actualTPS={actualTPS}
         assetsData={assetsData}
       />,
-    );
-
+    ).container;
+    const arrow: any =
+      container.firstChild?.firstChild?.firstChild?.firstChild?.lastChild;
+    fireEvent.click(arrow);
     expect(screen.getByText(CoinTest[0].shortname)).toBeInTheDocument();
     expect(screen.getByText(CoinTest[0].name)).toBeInTheDocument();
     expect(
       screen.getByText(getVariation(CoinTest[0].variation)),
     ).toBeInTheDocument();
-
     [CoinTest[0].marketCap, CoinTest[0].volume].map((item: any) => {
       expect(screen.getAllByText(getVariation(item.variation)))[0];
       expect(screen.getByText(`$ ${item.price.toLocaleString()}`));

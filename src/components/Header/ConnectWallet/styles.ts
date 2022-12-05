@@ -237,3 +237,20 @@ export const QRCodeContent = styled.div`
     border-radius: 0.2rem;
   }
 `;
+
+export const BackgroundHelper = styled.div<{ opened: boolean }>`
+  width: 100%;
+  height: 100%;
+
+  top: 0;
+  left: 0;
+
+  position: fixed;
+  visibility: ${props => (props.opened ? 'visible' : 'hidden')};
+  opacity: ${props => (props.opened ? 1 : 0)};
+
+  background-color: ${props =>
+    transparentize(props.theme.dark ? 0.85 : 0.7, props.theme.black)};
+
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+`;

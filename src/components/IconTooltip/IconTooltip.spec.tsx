@@ -1,6 +1,8 @@
+import { act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import IconTooltip from '.';
+import { StyledTransfer } from '../../components/Header/ConnectWallet/styles';
 import { renderWithTheme } from '../../test/utils';
 
 Object.assign(navigator, {
@@ -17,20 +19,18 @@ describe('Component: IconTooltip', () => {
   });
 
   it('Should render the component and IconTooltip the text when click', async () => {
-    const user = userEvent.setup();
     const { container } = renderWithTheme(
-      <IconTooltip info="Test" data="Hello World" />,
+      <IconTooltip tooltip="test" Icon={StyledTransfer} data="Hello World" />,
     );
-
+    const tooltip =
+      container.firstElementChild?.firstElementChild?.firstElementChild;
+    expect(tooltip?.nodeName).toBe('svg');
     const clickIconTooltip: any = container.firstChild;
-
-    const mockWriteText = jest.fn().mockResolvedValueOnce('clipText');
-    Object.defineProperty(navigator, 'clipboard', {
-      value: {
-        writeText: mockWriteText,
-      },
+    const iconContainer = tooltip?.parentElement;
+    const tooltipContainer = tooltip?.parentElement?.parentElement;
+    act(async () => {
+      await userEvent.hover(tooltipContainer as any);
     });
-    await user.click(clickIconTooltip);
-    expect(mockWriteText).toBeCalledWith('Hello World');
+    // TODO: find a way to hover trigger ::before and ::after since they load tooltip
   });
 });

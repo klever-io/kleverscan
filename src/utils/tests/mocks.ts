@@ -397,7 +397,7 @@ const holdersList = {
       },
       {
         address:
-          'klv14ragd2rgqat485vu6ssh4vu9rhmc68mg6vrmkmuhdqda9eeykucqvewgsh',
+          'klv14ragd2rgqat485vu6ssh4vu9rhmc68mg6vrmkmuhdqda9eeykucqvewgsz',
         assetId: 'KFI',
         assetName: 'KLEVER FINANCE',
         assetType: 0,

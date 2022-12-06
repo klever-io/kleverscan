@@ -5,6 +5,7 @@ import { exportToCsv } from '@/utils/index';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import { TbTableExport } from 'react-icons/tb';
+import { Loader } from '../Loader/styles';
 // import { VscJson } from 'react-icons/vsc';
 import Pagination from '../Pagination';
 import { PaginationContainer } from '../Pagination/styles';
@@ -86,6 +87,7 @@ const Table: React.FC<ITable> = ({
   const { isMobile } = useMobile();
   const [isTablet, setIsTablet] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingCsv, setLoadingCsv] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(defaultTotalPages);
   const [limit, setLimit] = useState<number>(10);
@@ -156,6 +158,11 @@ const Table: React.FC<ITable> = ({
     setItems(data);
   }, [data]);
 
+  const handleClickCsv = async () => {
+    setLoadingCsv(true);
+    await exportToCsv('transactions', items, router);
+    setLoadingCsv(false);
+  };
   return (
     <>
       {typeof scrollUp === 'boolean' &&
@@ -175,11 +182,15 @@ const Table: React.FC<ITable> = ({
                 </ExportLabel>
                 <ButtonsContainer>
                   <ExportButton
-                    onClick={() => exportToCsv('transactions', items, router)}
+                    onClick={() => {
+                      handleClickCsv();
+                    }}
                   >
                     <Tooltip
                       msg="CSV"
-                      Component={() => <TbTableExport size={25} />}
+                      Component={() =>
+                        loadingCsv ? <Loader /> : <TbTableExport size={25} />
+                      }
                     />
                   </ExportButton>
                   {/* <ExportButton>

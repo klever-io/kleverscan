@@ -1,4 +1,6 @@
 import Tooltip from '@/components/Tooltip';
+import { coinStyles } from '@/components/Tooltip/configs';
+import { useMobile } from '@/contexts/mobile';
 import {
   IAssetTriggerContract,
   IBuyContractPayload,
@@ -29,12 +31,14 @@ import {
 import { IRowSection } from '@/types/index';
 import { CenteredRow } from '@/views/transactions';
 import Link from 'next/link';
-import { formatAmount } from '..';
+import { formatAmount, passViewportStyles } from '..';
 
 const precision = 6; // default KLV precision
 
 const TransferSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as ITransferContract;
+
+  const { isMobile, isTablet } = useMobile();
 
   return [
     {
@@ -44,6 +48,11 @@ const TransferSections = (par: IParameter): IRowSection[] => {
             {parameter.assetId ? (
               <Tooltip
                 msg={parameter.assetId}
+                customStyles={passViewportStyles(
+                  isMobile,
+                  isTablet,
+                  ...coinStyles,
+                )}
                 minMsgLength={9}
                 Component={() => (
                   <Link href={`/asset/${parameter.assetId}`}>

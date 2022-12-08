@@ -10,6 +10,7 @@ import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
+import { multiContractStyles } from '@/components/Tooltip/configs';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
@@ -42,7 +43,12 @@ import {
   ITransferContract,
   ReducedContract,
 } from '../../types/contracts';
-import { capitalizeString, formatAmount, parseAddress } from '../../utils';
+import {
+  capitalizeString,
+  formatAmount,
+  parseAddress,
+  passViewportStyles,
+} from '../../utils';
 import {
   contractTypes,
   filteredSections,
@@ -127,25 +133,15 @@ const Transactions: React.FC<ITransactions> = ({
         msg += `${ContractsIndex[contrct]}: ${number}x\n`;
       });
 
-      const getViewport = () => {
-        const styles = { offset: { right: 54, top: 5, bottom: 0 } };
-        if (isMobile) {
-          styles.offset.right = 0;
-          styles.offset.top = 0;
-          styles.offset.bottom = 10;
-        } else if (isTablet) {
-          styles.offset.right = 54;
-          styles.offset.bottom = 10;
-        }
-        return styles;
-      };
-      const customStyles = getViewport();
-
       return (
         <aside style={{ width: 'fit-content' }}>
           <Tooltip
             msg={msg}
-            customStyles={customStyles}
+            customStyles={passViewportStyles(
+              isMobile,
+              isTablet,
+              ...multiContractStyles,
+            )}
             Component={() => (
               <MultiContractContainer>
                 {contractType}
@@ -320,33 +316,32 @@ const Transactions: React.FC<ITransactions> = ({
   );
 };
 
-export const getServerSideProps: GetServerSideProps<
-  ITransactions
-> = async context => {
-  const props: ITransactions = {
-    transactions: [],
-    pagination: {} as IPagination,
-    assets: [],
+export const getServerSideProps: GetServerSideProps<ITransactions> =
+  async context => {
+    const props: ITransactions = {
+      transactions: [],
+      pagination: {} as IPagination,
+      assets: [],
+    };
+
+    const transactions: ITransactionResponse = await api.get({
+      route: 'transaction/list',
+      query: context.query,
+    });
+
+    if (!transactions.error) {
+      props.transactions = transactions?.data?.transactions || [];
+      props.pagination = transactions?.pagination || {};
+    }
+
+    const assets: IAssetResponse = await api.get({
+      route: 'assets/kassets',
+    });
+    if (!assets.error) {
+      props.assets = assets?.data?.assets || [];
+    }
+
+    return { props };
   };
-
-  const transactions: ITransactionResponse = await api.get({
-    route: 'transaction/list',
-    query: context.query,
-  });
-
-  if (!transactions.error) {
-    props.transactions = transactions?.data?.transactions || [];
-    props.pagination = transactions?.pagination || {};
-  }
-
-  const assets: IAssetResponse = await api.get({
-    route: 'assets/kassets',
-  });
-  if (!assets.error) {
-    props.assets = assets?.data?.assets || [];
-  }
-
-  return { props };
-};
 
 export default Transactions;

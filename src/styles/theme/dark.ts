@@ -17,6 +17,9 @@ const darktheme = {
     lightBg: '#AA33B5',
     backgroundTooltip: 'rgb(255, 255, 255, 0.8)',
   },
+  line: {
+    border: '#646693',
+  },
 
   input: {
     ...theme.input,

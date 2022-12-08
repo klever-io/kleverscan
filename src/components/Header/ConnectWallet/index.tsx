@@ -6,22 +6,28 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { QRCodeSVG } from 'qrcode.react';
 import React, { useCallback, useEffect, useState } from 'react';
+import { AiOutlineClose } from 'react-icons/ai';
+import { BiLogOut, BiWalletAlt } from 'react-icons/bi';
+import { FaUserAlt } from 'react-icons/fa';
+import { IoCreateOutline } from 'react-icons/io5';
+import { MdContentCopy } from 'react-icons/md';
+import { RiArrowRightSLine } from 'react-icons/ri';
 import { MobileNavbarItem } from '..';
 import { parseAddress } from '../../../utils';
-import OptionsContainer from '../OptionsContainer';
 import WalletHelp from '../WalletHelp';
 import {
   BackgroundHelper,
-  ButtonAndCopy,
+  BackGroundUserInfo,
+  BodyContent,
   ConnectButton,
   ConnectContainer,
-  CopyContainer,
+  ContentUserInfo,
+  HeaderInfo,
   MobileStyledTransfer,
-  NavBarOptionsContainer,
-  NavBarOptionsItems,
   QRCodeContainer,
   QRCodeContent,
   StyledTransfer,
+  UserInfoContainer,
 } from './styles';
 
 interface IConnectWallet {
@@ -31,11 +37,14 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
   const router = useRouter();
   const [displayQr, setDisplayQr] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
+  const [openUserInfos, setOpenUserInfos] = useState(false);
+
   const {
     walletAddress,
     extensionLoading,
     extensionInstalled,
     connectExtension,
+    logoutExtension,
   } = useExtension();
 
   const { handleMenu } = useMobile();
@@ -64,24 +73,6 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
     }
   }, [extensionInstalled, walletAddress, router, handleMenu]);
 
-  const renderOptionsWithConnection = () => {
-    if (window.innerWidth < 768) {
-      return getCreateTransactionButton();
-    }
-    return (
-      <NavBarOptionsItems>
-        {getCreateTransactionButton()}
-        <NavBarOptionsContainer>
-          <CopyContainer>
-            {walletAddress && (
-              <Copy info="Wallet Address" data={walletAddress} />
-            )}
-          </CopyContainer>
-          <OptionsContainer isConnected={!!walletAddress} />
-        </NavBarOptionsContainer>
-      </NavBarOptionsItems>
-    );
-  };
   const handleClick = () => {
     setOpenDrawer(true);
   };
@@ -97,7 +88,8 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
       {!extensionInstalled && (
         <ConnectContainer>
           <ConnectButton onClick={handleClick}>
-            How to connect Wallet
+            <BiWalletAlt size={'1.2em'} />
+            <span>Connect</span>
           </ConnectButton>
         </ConnectContainer>
       )}
@@ -114,54 +106,109 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
       />
 
       {extensionInstalled && (
-        <ConnectContainer>
-          <ButtonAndCopy
-            onMouseOver={() => {
-              if (walletAddress) {
-                setDisplayQr(true);
-              }
-            }}
-            onMouseOut={() => setDisplayQr(false)}
-          >
-            <ConnectButton
-              onClick={() => connectExtension()}
-              key={String(extensionInstalled)}
-            >
-              {extensionLoading ? (
-                <span> Loading... </span>
-              ) : (
-                <>
-                  {walletAddress && (
-                    <Link href={`/account/${walletAddress}`}>
-                      <a>
-                        <span>{parseAddress(walletAddress, 25)}</span>
-                      </a>
-                    </Link>
-                  )}
-                  {!walletAddress && <span>Connect your wallet</span>}
-                </>
+        <ConnectContainer
+          onClick={() => connectExtension()}
+          key={String(extensionInstalled)}
+        >
+          <ConnectButton>
+            {extensionLoading ? (
+              <span> Loading... </span>
+            ) : (
+              <>
+                {walletAddress && (
+                  <div
+                    onClick={() => {
+                      if (openUserInfos) {
+                        setOpenUserInfos(false);
+                      } else {
+                        setOpenUserInfos(true);
+                      }
+                    }}
+                  >
+                    <FaUserAlt size={'1.2em'} />
+                    <small>{parseAddress(walletAddress, 15)}</small>
+                  </div>
+                )}
+                {!walletAddress && (
+                  <>
+                    <BiWalletAlt size={'1.2em'} />
+                    <span>Connect</span>
+                  </>
+                )}
+              </>
+            )}
+          </ConnectButton>
+        </ConnectContainer>
+      )}
+      {openUserInfos && (
+        <UserInfoContainer>
+          <ContentUserInfo>
+            <HeaderInfo>
+              <div>
+                <BiWalletAlt size={'1em'} />
+                <p>My Wallet</p>
+              </div>
+              <AiOutlineClose
+                onClick={() => setOpenUserInfos(false)}
+                cursor={'pointer'}
+              />
+            </HeaderInfo>
+            <QRCodeContainer>
+              {walletAddress && window.innerWidth > 768 && (
+                <QRCodeContent>
+                  <div>
+                    <QRCodeSVG value={walletAddress} size={100}></QRCodeSVG>
+                  </div>
+                </QRCodeContent>
               )}
-            </ConnectButton>
-            {window.innerWidth < 768 && (
-              <CopyContainer>
+              {walletAddress && (
+                <small>{parseAddress(walletAddress, 25)}</small>
+              )}
+            </QRCodeContainer>
+            <BodyContent>
+              <div>
+                <BiWalletAlt size={'1em'} />
+                <Link href={`/account/${walletAddress}`}>
+                  <a onClick={() => setOpenUserInfos(false)}>
+                    <p>Account</p>
+                  </a>
+                </Link>
+                <RiArrowRightSLine size={'1.2em'} />
+              </div>
+              <div>
+                <MdContentCopy size={'1em'} />
+                <p>Copy Address</p>
+                <RiArrowRightSLine size={'1.2em'} />
                 {walletAddress && (
                   <Copy info="Wallet Address" data={walletAddress} />
                 )}
-              </CopyContainer>
-            )}
-          </ButtonAndCopy>
-          {renderOptionsWithConnection()}
-        </ConnectContainer>
+              </div>
+              <div>
+                <IoCreateOutline size={'1em'} />
+                <Link href={`/create-transaction`}>
+                  <a onClick={() => setOpenUserInfos(false)}>
+                    <p>Create Transaction</p>
+                  </a>
+                </Link>
+                <RiArrowRightSLine size={'1.2em'} />
+              </div>
+              <div
+                onClick={() => {
+                  logoutExtension();
+                  setOpenUserInfos(false);
+                }}
+              >
+                <BiLogOut size={'1em'} />
+                <p>Disconnect</p>
+              </div>
+            </BodyContent>
+          </ContentUserInfo>
+        </UserInfoContainer>
       )}
-      {displayQr && walletAddress && (
-        <QRCodeContainer>
-          <QRCodeContent>
-            <div>
-              <QRCodeSVG value={walletAddress} size={100}></QRCodeSVG>
-            </div>
-          </QRCodeContent>
-        </QRCodeContainer>
-      )}
+      <BackGroundUserInfo
+        isOpen={openUserInfos}
+        onClick={() => setOpenUserInfos(false)}
+      />
     </>
   );
 };

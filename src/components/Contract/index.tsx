@@ -292,6 +292,30 @@ const Contract: React.FC<IContract> = ({
     }
   };
 
+  const parsePackInfo = (values: any) => {
+    const parsedValues = JSON.parse(JSON.stringify(values));
+
+    delete parsedValues.pack;
+
+    const packInfo: {
+      [key: string]: any;
+    } = {};
+    values.pack.forEach((item: any) => {
+      const itemContent = {
+        packs: item.packItem,
+      };
+      if (item.packCurrencyID) {
+        packInfo[item.packCurrencyID] = itemContent;
+      } else {
+        packInfo['KLV'] = itemContent;
+      }
+    });
+
+    parsedValues.packInfo = packInfo;
+
+    return parsedValues;
+  };
+
   const formSend = async (parsedPayload: any) => {
     setLoading(true);
     const parsedData = Buffer.from(data, 'utf-8').toString('base64');
@@ -356,7 +380,11 @@ const Contract: React.FC<IContract> = ({
     const payload = {
       ...parsedValues,
     };
-    const parsedPayload = await precisionParse(payload, contractType);
+    let parsedPayload = await precisionParse(payload, contractType);
+    console.log(parsedPayload);
+    if (contractType === 'ConfigITOContract' && parsedPayload?.pack) {
+      parsedPayload = parsePackInfo(parsedPayload);
+    }
     if (showPayload) {
       setOpen(true);
       setPayload({

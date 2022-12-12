@@ -202,11 +202,19 @@ const Navbar: React.FC = () => {
                   openDrawer;
                 }}
               />
-              {!extensionInstalled && <OptionsContainer />}
+              <OptionsContainer />
             </NavBarOptionsContainer>
           </DesktopContainer>
 
           <MobileContainer>
+            <ConnectContainer
+              onClick={() => {
+                handleClickConnection();
+                closeMenu();
+              }}
+            >
+              <ConnectWallet clickConnection={closeDrawer} />
+            </ConnectContainer>
             <MenuIcon onClick={handleMenu} />
           </MobileContainer>
         </Content>
@@ -234,10 +242,6 @@ const Navbar: React.FC = () => {
             />
           ))}
         </MobileNavbarItemList>
-
-        <ConnectContainer onClick={handleClickConnection}>
-          <ConnectWallet clickConnection={closeDrawer} />
-        </ConnectContainer>
       </MobileContent>
     </>
   );

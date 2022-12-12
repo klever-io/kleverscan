@@ -4,6 +4,8 @@ import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
+import { tipMobile } from '@/components/Tooltip/configs';
+import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import { IRowSection } from '@/types/index';
 import {
@@ -21,6 +23,7 @@ import {
 import {
   formatAmount,
   parseAddress,
+  passViewportStyles,
   toLocaleFixed,
   typeVoteColors,
 } from '@/utils/index';
@@ -96,6 +99,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
   const [votersList, setVotersList] = useState<IParsedVoter[]>([]);
   const [selectedFilter, setSelectedFilter] = useState('Yes');
   const [votesPercentage, setVotesPercentage] = useState('');
+  const { isMobile, isTablet } = useMobile();
 
   useEffect(() => {
     if (totalStaked) {
@@ -347,6 +351,11 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                   msg={
                     'Always check the address. Names can be the same across multiple addresses.'
                   }
+                  customStyles={passViewportStyles(
+                    isMobile,
+                    isTablet,
+                    tipMobile,
+                  )}
                 />
               </Row>
               <Row>

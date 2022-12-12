@@ -103,10 +103,9 @@ describe('Component: Header/navbar', () => {
 
     const mobile = container.firstChild?.lastChild;
     const content = container.lastChild;
-    const button: any = mobile?.lastChild?.firstChild;
+    const button: any = mobile?.lastChild?.lastChild;
     expect(mobile).toHaveStyle('position: relative');
     expect(content).toHaveStyle({ visibility: 'hidden', opacity: '0' });
-
     fireEvent.click(button);
     expect(content).toHaveStyle({ visibility: 'visible', opacity: '1' });
 
@@ -138,7 +137,7 @@ describe('Component: Header/navbar', () => {
       window.dispatchEvent(new Event('resize'));
     });
     const openMenuMobile: any =
-      container.firstChild?.lastChild?.lastChild?.firstChild;
+      container.firstChild?.lastChild?.lastChild?.lastChild;
     const mobileBackground: any = container.firstChild?.nextSibling;
     fireEvent.click(openMenuMobile);
     expect(document.body.style.overflow).toBe('hidden');

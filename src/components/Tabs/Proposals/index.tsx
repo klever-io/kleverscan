@@ -2,6 +2,7 @@ import { getStatusIcon } from '@/assets/status';
 import Table, { ITable } from '@/components/Table';
 import { CustomLink, Status } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
+import { paramsStyles } from '@/components/Tooltip/configs';
 import { useMobile } from '@/contexts/mobile';
 import { IRowSection } from '@/types/index';
 import {
@@ -9,7 +10,11 @@ import {
   IParsedProposal,
   IProposalsProps,
 } from '@/types/proposals';
-import { capitalizeString, parseAddress } from '@/utils/index';
+import {
+  capitalizeString,
+  parseAddress,
+  passViewportStyles,
+} from '@/utils/index';
 import Link from 'next/link';
 import React from 'react';
 import {
@@ -24,7 +29,7 @@ const Proposals: React.FC<IProposalsProps> = ({
   totalPages,
   request,
 }) => {
-  const { isMobile } = useMobile();
+  const { isMobile, isTablet } = useMobile();
 
   const rowSections = (props: IParsedProposal): IRowSection[] => {
     const {
@@ -81,7 +86,11 @@ const Proposals: React.FC<IProposalsProps> = ({
               Component={() => (
                 <div>{renderProposalsNetworkParams(parsedParameters)}</div>
               )}
-              customStyles={isMobile ? { offset: { left: 55 } } : {}}
+              customStyles={passViewportStyles(
+                isMobile,
+                isTablet,
+                ...paramsStyles,
+              )}
               msg={message}
             ></Tooltip>
           </span>

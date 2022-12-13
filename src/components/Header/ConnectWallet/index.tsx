@@ -1,18 +1,14 @@
 import Copy from '@/components/Copy';
-import IconTooltip from '@/components/IconTooltip';
 import { useExtension } from '@/contexts/extension';
-import { useMobile } from '@/contexts/mobile';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { QRCodeSVG } from 'qrcode.react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { BiLogOut, BiWalletAlt } from 'react-icons/bi';
 import { FaUserAlt } from 'react-icons/fa';
 import { IoCreateOutline } from 'react-icons/io5';
 import { MdContentCopy } from 'react-icons/md';
 import { RiArrowRightSLine } from 'react-icons/ri';
-import { MobileNavbarItem } from '..';
 import { parseAddress } from '../../../utils';
 import WalletHelp from '../WalletHelp';
 import {
@@ -23,10 +19,8 @@ import {
   ConnectContainer,
   ContentUserInfo,
   HeaderInfo,
-  MobileStyledTransfer,
   QRCodeContainer,
   QRCodeContent,
-  StyledTransfer,
   UserInfoContainer,
 } from './styles';
 
@@ -34,8 +28,6 @@ interface IConnectWallet {
   clickConnection: () => void;
 }
 const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
-  const router = useRouter();
-  const [displayQr, setDisplayQr] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openUserInfos, setOpenUserInfos] = useState(false);
 
@@ -46,32 +38,6 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
     connectExtension,
     logoutExtension,
   } = useExtension();
-
-  const { handleMenu } = useMobile();
-
-  const getCreateTransactionButton = useCallback(() => {
-    if (extensionInstalled && walletAddress && typeof window !== 'undefined') {
-      if (window.innerWidth < 768) {
-        const createTransactionProps = {
-          name: 'Create Transaction',
-          pathTo: '/create-transaction',
-          Icon: MobileStyledTransfer,
-          onClick: handleMenu,
-        };
-        return <MobileNavbarItem {...createTransactionProps} />;
-      } else if (window.innerWidth >= 768) {
-        const handleNavigate = () => {
-          router.push('/create-transaction');
-        };
-        const iconTooltipProps = {
-          Icon: StyledTransfer,
-          handleClick: handleNavigate,
-          tooltip: 'Create Transaction',
-        };
-        return <IconTooltip {...iconTooltipProps} />;
-      }
-    }
-  }, [extensionInstalled, walletAddress, router, handleMenu]);
 
   const handleClick = () => {
     setOpenDrawer(true);

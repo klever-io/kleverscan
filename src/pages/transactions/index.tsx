@@ -316,32 +316,33 @@ const Transactions: React.FC<ITransactions> = ({
   );
 };
 
-export const getServerSideProps: GetServerSideProps<ITransactions> =
-  async context => {
-    const props: ITransactions = {
-      transactions: [],
-      pagination: {} as IPagination,
-      assets: [],
-    };
-
-    const transactions: ITransactionResponse = await api.get({
-      route: 'transaction/list',
-      query: context.query,
-    });
-
-    if (!transactions.error) {
-      props.transactions = transactions?.data?.transactions || [];
-      props.pagination = transactions?.pagination || {};
-    }
-
-    const assets: IAssetResponse = await api.get({
-      route: 'assets/kassets',
-    });
-    if (!assets.error) {
-      props.assets = assets?.data?.assets || [];
-    }
-
-    return { props };
+export const getServerSideProps: GetServerSideProps<
+  ITransactions
+> = async context => {
+  const props: ITransactions = {
+    transactions: [],
+    pagination: {} as IPagination,
+    assets: [],
   };
+
+  const transactions: ITransactionResponse = await api.get({
+    route: 'transaction/list',
+    query: context.query,
+  });
+
+  if (!transactions.error) {
+    props.transactions = transactions?.data?.transactions || [];
+    props.pagination = transactions?.pagination || {};
+  }
+
+  const assets: IAssetResponse = await api.get({
+    route: 'assets/kassets',
+  });
+  if (!assets.error) {
+    props.assets = assets?.data?.assets || [];
+  }
+
+  return { props };
+};
 
 export default Transactions;

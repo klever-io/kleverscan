@@ -335,5 +335,5 @@ export const MenuIcon = styled(FiMenu).attrs(props => ({
 
 export const ConnectContainer = styled.div`
   display: flex;
-  z-index: 9999 !important;
+  z-index: 1000 !important;
 `;

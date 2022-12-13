@@ -42,7 +42,7 @@ const TransactionItem: React.FC<ITransaction> = ({
     const getParams = async () => {
       const precision = contractFilter?.precision ?? 6;
       if (contract) {
-        if (contractFilter?.parameter.amount) {
+        if (contractFilter?.parameter?.amount) {
           setAmount(
             toLocaleFixed(
               contractFilter?.parameter?.amount / 10 ** precision,

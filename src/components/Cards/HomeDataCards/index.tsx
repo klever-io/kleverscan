@@ -268,7 +268,6 @@ const HomeDataCards: React.FC<IDataCards> = ({
     progress: any;
     value: string | number;
   }> = ({ progress, value }) => {
-    const [show, setShow] = useState(false);
     if (progress) {
       return (
         <Percentage>

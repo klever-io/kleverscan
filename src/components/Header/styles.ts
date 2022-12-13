@@ -34,8 +34,9 @@ export const Container = styled.div`
 
 export const NavBarOptionsContainer = styled.div`
   display: flex;
+  justify-content: center;
   align-items: center;
-
+  gap: 0.5rem;
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
   }
@@ -171,18 +172,18 @@ export const IconsMenu = styled.div`
 
 export const MobileContainer = styled.div`
   margin-left: auto;
-
+  z-index: 1000 !important;
   position: relative;
   display: none;
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: flex;
+    align-items: center;
   }
 `;
 
 export const MobileContent = styled.div<IMobileMenu>`
   padding: 1.5rem;
-  width: ${props => (props.isOpenDrawer ? '100%' : '')};
   height: calc(100vh - 4rem);
 
   top: 4rem;
@@ -193,7 +194,7 @@ export const MobileContent = styled.div<IMobileMenu>`
   display: flex;
   position: fixed;
 
-  z-index: 1000 !important;
+  z-index: 10000 !important;
 
   flex-direction: column;
 
@@ -329,13 +330,10 @@ export const DropdownIcon = styled(MdArrowDropDown)`
 
 export const MenuIcon = styled(FiMenu).attrs(props => ({
   color: props.theme.navbar.text,
-  size: 24,
+  size: 25,
 }))``;
 
 export const ConnectContainer = styled.div`
   display: flex;
-  position: fixed;
-  bottom: 1.5rem;
-  top: 0;
-  z-index: 9999 !important;
+  z-index: 1000 !important;
 `;

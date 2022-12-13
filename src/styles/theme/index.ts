@@ -33,6 +33,10 @@ const theme = {
     pending: '#9D9932', //
   },
 
+  line: {
+    border: '#36374F',
+  },
+
   form: {
     background: '#FFFFFF',
     hash: '#4b4d80',

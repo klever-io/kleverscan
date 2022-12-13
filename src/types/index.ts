@@ -684,7 +684,9 @@ export interface IOffset {
   bottom?: number;
 }
 
+export type Place = 'top' | 'right' | 'bottom' | 'left';
+
 export interface ICustomStyles {
   offset?: IOffset;
-  place?: 'top' | 'right' | 'bottom' | 'left';
+  place?: Place;
 }

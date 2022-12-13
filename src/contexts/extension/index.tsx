@@ -1,7 +1,6 @@
 import { useMobile } from '@/contexts/mobile';
 import { doIf } from '@/utils/index';
 import { core } from '@klever/sdk';
-import router from 'next/router';
 import {
   createContext,
   useCallback,
@@ -42,11 +41,8 @@ export const ExtensionProvider: React.FC = ({ children }) => {
   }, []);
 
   const logoutExtension = useCallback(() => {
-    if (router.pathname.includes('/create-transaction')) {
-      window.innerWidth < 1025 && closeMenu && closeMenu();
-      router.push('/');
-    }
-  }, [router, closeMenu]);
+    setWalletAddress('');
+  }, [walletAddress]);
 
   const connectExtension = async () => {
     if (!walletAddress) {

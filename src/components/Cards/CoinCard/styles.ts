@@ -140,10 +140,13 @@ export const Description = styled(Name)<IVariation>`
 `;
 
 export const ChartContainer = styled.div`
-  width: 100%;
+  width: 18.5rem;
   margin-top: 1rem;
   margin-bottom: 1rem;
   height: 92.79px;
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 100%;
+  }
 `;
 
 export const ValueContainer = styled.div<{ isKLV?: boolean }>`
@@ -196,7 +199,7 @@ export const TitleDetails = styled.div<{ positive?: boolean }>`
 
 export const ArrowDownDiv = styled.div<{ open: boolean }>`
   position: absolute;
-  left: 45.9%;
+  left: 46.9%;
   right: 47.78%;
   cursor: pointer;
   bottom: 2.29%;
@@ -207,7 +210,14 @@ export const ArrowDownDiv = styled.div<{ open: boolean }>`
     transition: 0.2s ease;
     transform: rotate(${props => (props.open ? 0 : 180)}deg);
   }
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    left: 49%;
+  }
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    left: 48%;
+  }
 `;
+
 export const ValueDetail = styled.div<{ positive?: boolean }>`
   display: flex;
 

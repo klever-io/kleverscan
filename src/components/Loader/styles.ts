@@ -5,8 +5,8 @@ import styled from 'styled-components';
 export const Loader = styled(DefaultLoader).attrs(props => ({
   type: 'TailSpin',
   color: props.theme.violet,
-  height: 30,
-  width: 30,
+  height: 25,
+  width: 25,
 }))``;
 
 export const HomeLoader = styled(DefaultLoader).attrs(props => ({

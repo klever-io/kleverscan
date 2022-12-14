@@ -1,4 +1,3 @@
-import { getPrecision } from '@/components/Contract/utils';
 import {
   Contract,
   ContractsIndex,
@@ -581,6 +580,7 @@ export const getHeaderForCSV = (
 export const getCells = async (
   tableRowData: ITransaction,
   router: NextRouter,
+  getContextPrecision: (assetId: string) => Promise<number | void>,
 ): Promise<any[]> => {
   const {
     hash,
@@ -604,7 +604,7 @@ export const getCells = async (
 
   const getParsedAmount = async (assetId: string) => {
     const amount = parameter?.amount ?? '';
-    const precision = (await getPrecision(assetId)) ?? 6;
+    const precision = (await getContextPrecision(assetId)) ?? 6;
     return amount / 10 ** precision;
   };
 
@@ -723,15 +723,14 @@ export const getCells = async (
     case Contract.Buy:
       const buyType = parameter?.buyType || '';
       let currencyID = parameter?.currencyID || '';
-      const currencyIDPrecision =
-        (await getPrecision(parameter?.currencyID)) ?? 6;
+      const currencyIDPrecision = (await getContextPrecision(parameter?.currencyID)) ?? 6;
       let amountPrecision = 0;
 
       if (parameter?.buyType === 'ITOBuy') {
-        amountPrecision = (await getPrecision(parameter?.id)) ?? 0;
+        amountPrecision = (await getContextPrecision(parameter?.id)) ?? 0;
       } else if (parameter?.buyType === 'MarketBuy') {
         const assetBought = getAssetBought(receipts as IBuyReceipt[], sender);
-        amountPrecision = (await getPrecision(assetBought)) ?? 0;
+        amountPrecision = (await getContextPrecision(assetBought)) ?? 0;
       }
 
       const buyPrice = getBuyPrice(
@@ -754,8 +753,7 @@ export const getCells = async (
       const marketType = parameter?.marketType || '';
       currencyID = parameter?.currencyID;
       assetId = parameter?.assetId || 'KLV';
-      const precision =
-        (await getPrecision(parameter?.currencyID || 'KLV')) ?? 6;
+      const precision = (await getContextPrecision(parameter?.currencyID || 'KLV')) ?? 6;
       const price = (parameter?.price || 0) / 10 ** precision;
       amount = 1;
       cells.push(marketType, assetId, currencyID, price, amount);

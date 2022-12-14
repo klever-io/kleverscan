@@ -1,4 +1,5 @@
 import { useMobile } from '@/contexts/mobile';
+import { usePrecisions } from '@/contexts/precision';
 import { IRowSection, Query } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { exportToCsv } from '@/utils/index';
@@ -94,6 +95,7 @@ const Table: React.FC<ITable> = ({
   const [totalPages, setTotalPages] = useState(defaultTotalPages);
   const [limit, setLimit] = useState<number>(10);
   const [items, setItems] = useState(data);
+  const { getContextPrecision, setPrecisions, precisions } = usePrecisions();
   const dataRef = useRef([]) as any;
   const limits = [5, 10, 50, 100];
   const [scrollTop, setScrollTop] = useState<boolean>(false);
@@ -175,7 +177,7 @@ const Table: React.FC<ITable> = ({
 
   const handleClickCsv = async () => {
     setLoadingCsv(true);
-    await exportToCsv('transactions', items, router);
+    await exportToCsv('transactions', items, router, getContextPrecision);
     setLoadingCsv(false);
   };
 

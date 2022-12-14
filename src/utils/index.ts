@@ -810,9 +810,13 @@ const processHeaders = (router: NextRouter) => {
   return sanitizedHeaders;
 };
 
-const processRow = async (row: ITransaction, router: NextRouter) => {
+const processRow = async (
+  row: ITransaction,
+  router: NextRouter,
+  getContextPrecision: (assetId: string) => Promise<number | void>,
+) => {
   let finalVal = '';
-  const parsedRow = await getCells(row, router);
+  const parsedRow = await getCells(row, router, getContextPrecision);
   for (let j = 0; j < parsedRow.length; j++) {
     const innerValue =
       parsedRow[j] === (null || undefined) ? '' : parsedRow[j].toString();
@@ -829,6 +833,7 @@ export const exportToCsv = async (
   filename: string,
   rows: any[] | null,
   router: NextRouter,
+  getContextPrecision: (assetId: string) => Promise<number | void>,
 ): Promise<void> => {
   if (!rows || rows.length === 0) {
     window.alert('No data to export!');
@@ -840,7 +845,7 @@ export const exportToCsv = async (
       const headers = processHeaders(router);
       csvFile += headers + '\n';
     } else {
-      csvFile += await processRow(rows[i], router);
+      csvFile += await processRow(rows[i], router, getContextPrecision);
     }
   }
   if (typeof window !== undefined) {

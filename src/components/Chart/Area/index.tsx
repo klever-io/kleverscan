@@ -1,17 +1,38 @@
+import { ITooltipContent } from '@/pages/charts';
+import { toLocaleFixed } from '@/utils/index';
 import { transparentize } from 'polished';
 import React from 'react';
-import { Area, AreaChart, ResponsiveContainer, YAxis } from 'recharts';
+import { Area, AreaChart, ResponsiveContainer, Tooltip, YAxis } from 'recharts';
 import { withTheme } from 'styled-components';
 import { IChartData } from '../../../configs/home';
 import { Theme } from '../../../styles/styles';
+import { TooltipContainer } from './styles';
 
 interface IChart {
   data: IChartData[];
   theme: Theme;
   bg?: 'regular' | 'dark';
+  hasTooltip?: boolean;
 }
 
-const Chart: React.FC<IChart> = ({ data, theme, bg = 'regular' }) => {
+const CustomTooltip = ({ payload, label, active }: ITooltipContent) => {
+  if (active && payload && payload.length) {
+    return (
+      <TooltipContainer>
+        <p>{`price: ${toLocaleFixed(payload[0]?.value, 6)} U$`}</p>
+      </TooltipContainer>
+    );
+  }
+
+  return null;
+};
+
+const Chart: React.FC<IChart> = ({
+  data,
+  theme,
+  bg = 'regular',
+  hasTooltip,
+}) => {
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <ResponsiveContainer width="100%" height="110%" debounce={500}>
@@ -43,6 +64,7 @@ const Chart: React.FC<IChart> = ({ data, theme, bg = 'regular' }) => {
             fill="url(#areaBackground)"
             fillOpacity={1}
           />
+          {hasTooltip && <Tooltip content={<CustomTooltip />} />}
         </AreaChart>
       </ResponsiveContainer>
     </div>

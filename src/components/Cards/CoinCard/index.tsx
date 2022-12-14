@@ -267,7 +267,11 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, assetsData }) => {
 
                 {coin.shortname === 'KLV' ? (
                   <ChartContainer>
-                    <Chart data={coin.prices} type={ChartType.Area} />
+                    <Chart
+                      data={coin.prices}
+                      type={ChartType.Area}
+                      hasTooltip={true}
+                    />
                   </ChartContainer>
                 ) : null}
 

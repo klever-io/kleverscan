@@ -23,11 +23,16 @@ import {
   IValidator,
   IValidatorResponse,
 } from '../types';
-import { ContractsIndex, IBuyITOsTotalPrices } from '../types/contracts';
+import {
+  ContractsIndex,
+  IBuyContract,
+  IBuyContractPayload,
+  IBuyITOsTotalPrices,
+} from '../types/contracts';
 import {
   contractsList,
   getCells,
-  getHeader,
+  getHeaderForCSV,
   initialsTableHeaders,
 } from './contracts';
 
@@ -800,7 +805,7 @@ export const calcApr = (
 const processHeaders = (router: NextRouter) => {
   const deafultHeaders = [...initialsTableHeaders];
   deafultHeaders.push('kApp Fee', 'Bandwidth Fee');
-  const headers = getHeader(router, deafultHeaders);
+  const headers = getHeaderForCSV(router, deafultHeaders);
   const sanitizedHeaders = headers.filter(header => header !== '');
   return sanitizedHeaders;
 };
@@ -809,7 +814,8 @@ const processRow = async (row: ITransaction, router: NextRouter) => {
   let finalVal = '';
   const parsedRow = await getCells(row, router);
   for (let j = 0; j < parsedRow.length; j++) {
-    const innerValue = parsedRow[j] === null ? '' : parsedRow[j].toString();
+    const innerValue =
+      parsedRow[j] === (null || undefined) ? '' : parsedRow[j].toString();
 
     let result = innerValue.replace(/"/g, '""');
     if (result.search(/("|,|\n)/g) >= 0) result = '"' + result + '"';
@@ -868,6 +874,22 @@ export const getTotalAssetsPrices = (
   return ITOBuyPrices;
 };
 
+export const getAmountFromReceipts = async (
+  assetId: string,
+  contractType: number,
+  receipts: IReceipt[] | undefined,
+): Promise<number> => {
+  if (!receipts || !receipts.length) {
+    return 0;
+  }
+  const correctReceipt: any = receipts.find(
+    receipt => receipt.type === contractType,
+  );
+  const amount = Number(correctReceipt?.amount) || 0;
+  const precision = (await getPrecision(assetId)) ?? 6;
+  return amount / 10 ** precision;
+};
+
 export const calculatePermissionOperations = (
   operations: string,
 ): typeof contractsList => {
@@ -906,3 +928,75 @@ export const passViewportStyles = (
   }
   return desktopStyles;
 };
+const getBuyTotalAmount = (receipts: IBuyReceipt[], sender: string) => {
+  let value = 0;
+  if (receipts.length) {
+    receipts.forEach(receipt => {
+      if (receipt.to === sender) {
+        value += receipt?.value ?? 0;
+      }
+    });
+  }
+  return value;
+};
+
+const getITOBuyPrice = (
+  receipts: IBuyReceipt[],
+  sender: string,
+  parameter: IBuyContractPayload,
+  currencyIDPrecision: number,
+) => {
+  const txValue = receipts?.find(
+    receipt =>
+      receipt.assetId === parameter.currencyID && receipt.from === sender,
+  )?.value;
+  if (typeof txValue === 'number') {
+    return (txValue / 10 ** currencyIDPrecision).toLocaleString();
+  }
+  return 0;
+};
+
+export const getBuyAmount = (
+  receipts: IBuyReceipt[],
+  sender: string,
+  parameter: IBuyContractPayload,
+  amountPrecision: number,
+  contracts: IBuyContract[],
+): string | null => {
+  if (parameter?.buyType === 'ITOBuy') {
+    return (parameter.amount / 10 ** amountPrecision).toLocaleString();
+  }
+
+  if (parameter?.buyType === 'MarketBuy' && contracts.length < 2) {
+    // no support for multicontract
+    const parsedAmount =
+      getBuyTotalAmount(receipts, sender) / 10 ** amountPrecision;
+    if (parsedAmount !== 0) {
+      return parsedAmount.toLocaleString();
+    }
+  }
+  return null;
+};
+
+export const getBuyPrice = (
+  receipts: IBuyReceipt[],
+  sender: string,
+  parameter: IBuyContractPayload,
+  currencyIDPrecision: number,
+  contracts: IBuyContract[],
+): string | null | number => {
+  if (parameter?.buyType === 'MarketBuy') {
+    return (parameter.amount / 10 ** currencyIDPrecision).toLocaleString();
+  }
+  if (parameter?.buyType === 'ITOBuy' && contracts.length < 2) {
+    // support for multicontract in parent component
+    return getITOBuyPrice(receipts, sender, parameter, currencyIDPrecision);
+  }
+  return null;
+};
+
+export const getAssetBought = (
+  receipts: IBuyReceipt[],
+  sender: string,
+): string =>
+  receipts.find(receipt => receipt.to === sender)?.assetId?.split('/')[0] ?? '';

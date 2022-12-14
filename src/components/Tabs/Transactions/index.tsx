@@ -5,11 +5,16 @@ import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import { useMobile } from '@/contexts/mobile';
 import { Contract, IContract, ITransferContract } from '@/types/contracts';
-import { IInnerTableProps, IRowSection, ITransaction } from '@/types/index';
+import {
+  IInnerTableProps,
+  IReceipt,
+  IRowSection,
+  ITransaction,
+} from '@/types/index';
 import {
   contractTypes,
   filteredSections,
-  getHeader,
+  getHeaderForTable,
   initialsTableHeaders,
 } from '@/utils/contracts';
 import { capitalizeString, formatAmount, parseAddress } from '@/utils/index';
@@ -29,15 +34,17 @@ const Transactions: React.FC<ITransactionsProps> = props => {
   const precision = props.precision || 6;
   const router = useRouter();
 
-  const getContractType = useCallback(contractTypes, []);
-
-  const getFilteredSections = (contract: IContract[]): IRowSection[] => {
-    const contractType = getContractType(contract);
-    return filteredSections(contract, contractType);
-  };
-
   const { isMobile } = useMobile();
 
+  const getContractType = useCallback(contractTypes, []);
+
+  const getFilteredSections = (
+    contract: IContract[],
+    receipts: IReceipt[],
+  ): IRowSection[] => {
+    const contractType = getContractType(contract);
+    return filteredSections(contract, contractType, receipts);
+  };
   const rowSections = (props: ITransaction): IRowSection[] => {
     const {
       hash,
@@ -45,6 +52,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
       timestamp,
       sender,
       contract,
+      receipts,
       status,
       kAppFee,
       bandwidthFee,
@@ -128,7 +136,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
       },
     ];
 
-    const filteredContract = getFilteredSections(contract);
+    const filteredContract = getFilteredSections(contract, receipts);
 
     if (router?.query?.type) {
       sections.pop();
@@ -147,7 +155,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
     ...transactionTableProps,
     rowSections: rowSections,
     data: Object.values(props.transactions) as any[],
-    header: router?.query?.type ? getHeader(router, header) : header,
+    header: router?.query?.type ? getHeaderForTable(router, header) : header,
     type: 'transactions',
   };
 

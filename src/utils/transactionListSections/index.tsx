@@ -28,10 +28,11 @@ import {
   IVoteContract,
   IWithdrawContract,
 } from '@/types/contracts';
-import { IRowSection } from '@/types/index';
+import { IReceipt, IRowSection } from '@/types/index';
 import { CenteredRow } from '@/views/transactions';
 import Link from 'next/link';
 import { formatAmount, passViewportStyles } from '..';
+import { findReceipt } from '../findKey';
 
 const precision = 6; // default KLV precision
 
@@ -143,15 +144,19 @@ const ValidatorConfigSections = (par: IParameter): IRowSection[] => {
 
 const FreezeSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IFreezeContract;
-
   return [
     {
       element: (
+        <span key={parameter.assetId}>
+          <strong>{parameter.assetId.replace(/['"]+/g, '')}</strong>
+        </span>
+      ),
+      span: 1,
+    },
+    {
+      element: (
         <span key={parameter.amount}>
-          <strong>
-            {formatAmount(parameter.amount / 10 ** precision)}{' '}
-            {parameter.assetId.replace(/['"]+/g, '')}
-          </strong>
+          <strong>{formatAmount(parameter.amount / 10 ** precision)}</strong>
         </span>
       ),
       span: 1,
@@ -207,6 +212,7 @@ const UndelegateSections = (par: IParameter): IRowSection[] => {
 const WithdrawSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IWithdrawContract;
   const assetId = parameter?.assetId ?? 'KLV';
+
   return [
     {
       element: (
@@ -219,14 +225,25 @@ const WithdrawSections = (par: IParameter): IRowSection[] => {
   ];
 };
 
-const ClaimSections = (par: IParameter): IRowSection[] => {
+const ClaimSections = (
+  par: IParameter,
+  receipts: IReceipt[],
+): IRowSection[] => {
   const parameter = par as unknown as IClaimContract;
-
+  const assetId = findReceipt(receipts, 0, 17, 'assetId');
   return [
     {
       element: (
         <span key={parameter.claimType}>
           <small>{parameter.claimType}</small>
+        </span>
+      ),
+      span: 1,
+    },
+    {
+      element: (
+        <span>
+          <span>{assetId ?? ''}</span>
         </span>
       ),
       span: 1,
@@ -332,8 +349,8 @@ const BuySections = (par: IParameter): IRowSection[] => {
     },
     {
       element: (
-        <span key={parameter.amount}>
-          <small>{parameter.amount}</small>
+        <span key={parameter.currencyID}>
+          <small>{parameter.currencyID}</small>
         </span>
       ),
       span: 1,
@@ -345,6 +362,22 @@ const SellSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as ISellContract;
 
   return [
+    {
+      element: (
+        <span key={parameter.marketType}>
+          <small>{parameter.marketType}</small>
+        </span>
+      ),
+      span: 1,
+    },
+    {
+      element: (
+        <span key={parameter.currencyID}>
+          <small>{parameter.currencyID}</small>
+        </span>
+      ),
+      span: 1,
+    },
     {
       element: (
         <span key={parameter.assetId}>

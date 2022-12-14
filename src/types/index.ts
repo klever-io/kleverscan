@@ -59,14 +59,17 @@ export interface IKAssets {
 
 export interface ICreateAssetReceipt {
   assetId: string;
+  type: number;
 }
 
 export interface IFreezeReceipt {
   bucketId: string;
+  type: number;
 }
 
 export interface IUnfreezeReceipt {
   availableEpoch: number;
+  type: number;
 }
 
 export interface IBuyReceipt {
@@ -77,11 +80,19 @@ export interface IBuyReceipt {
   value?: number;
 }
 
+export interface IWithdrawReceipt {
+  type: number;
+  amount: string;
+  assetId: string;
+  from: string;
+}
+
 export type IReceipt =
   | ICreateAssetReceipt
   | IFreezeReceipt
   | IUnfreezeReceipt
-  | IBuyReceipt;
+  | IBuyReceipt
+  | IWithdrawReceipt;
 
 export interface ITransaction {
   hash: string;

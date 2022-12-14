@@ -220,6 +220,12 @@ export const AllSmallCardsContainer = styled.section`
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: column;
   }
+  @media (max-width: 1030px) {
+    flex-direction: column;
+  }
+  @media (max-width: 1252px) {
+    flex-direction: column;
+  }
 `;
 
 export const CardContainer = styled.section`
@@ -269,6 +275,9 @@ export const Card = styled.div<{ marginLeft?: boolean; marginRight?: boolean }>`
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     margin-right: 0;
     margin-left: 0;
+  }
+  @media (max-width: 1252px) {
+    margin-left: 0 !important;
   }
 `;
 
@@ -718,23 +727,18 @@ export const RewardsChartContent = styled.div`
   bottom: 0.6rem;
   width: 100%;
   height: 100%;
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    bottom: 0.5rem;
+  @media (max-width: 375px) {
+    bottom: 1.3rem;
+  }
+  @media (max-width: 768px) and (min-width: 376px) {
+    bottom: 1.2rem;
   }
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: 1299px) and (min-width: 1253px) {
     bottom: 1rem;
   }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    bottom: 1.4rem;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    bottom: 0.5rem;
-  }
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    bottom: 1.5rem;
+  @media (max-width: 1301px) and (min-width: 1298px) {
+    bottom: 0.8rem;
   }
 `;
 
@@ -755,13 +759,31 @@ export const VotesFooter = styled.div`
   display: flex;
   justify-content: space-between;
   position: relative;
-  bottom: 3.5rem;
+  bottom: 2rem;
   margin-left: 0.5rem;
   margin-right: 0.5rem;
   strong {
     color: #37dd72;
     font-weight: 600;
     font-size: 1.2rem;
+  }
+  @media (max-width: 1267px) and (min-width: 1253px) {
+    bottom: 3.1rem;
+  }
+  @media (max-width: 768px) and (min-width: 374px) {
+    bottom: 2.5rem;
+  }
+  @media (max-width: 1284px) and (min-width: 1267px) {
+    bottom: 3.2rem;
+  }
+  @media (max-width: 1297px) and (min-width: 1285px) {
+    bottom: 3.2rem;
+  }
+  @media (max-width: 1301px) and (min-width: 1298px) {
+    bottom: 2.5rem;
+  }
+  @media (max-width: 375px) {
+    bottom: 3.5rem;
   }
 `;
 

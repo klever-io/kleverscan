@@ -13,6 +13,9 @@ interface IChart {
   theme: Theme;
   bg?: 'regular' | 'dark';
   hasTooltip?: boolean;
+  yAxis?: boolean;
+  strokeWidth?: number;
+  height?: string;
 }
 
 const CustomTooltip = ({ payload, label, active }: ITooltipContent) => {
@@ -32,12 +35,17 @@ const Chart: React.FC<IChart> = ({
   theme,
   bg = 'regular',
   hasTooltip,
+  yAxis = false,
+  strokeWidth = 0,
+  height = '100%',
 }) => {
   return (
     <div style={{ width: '100%', height: '100%' }}>
-      <ResponsiveContainer width="100%" height="110%" debounce={500}>
+      <ResponsiveContainer width="100%" height={height} debounce={500}>
         <AreaChart data={data}>
-          <YAxis type="number" domain={['auto', 'auto']} hide={true} />
+          {yAxis && (
+            <YAxis type="number" domain={['auto', 'auto']} hide={true} />
+          )}
           <defs>
             <linearGradient id="areaBackground" x1="0" y1="0" x2="0" y2="1">
               <stop
@@ -59,7 +67,7 @@ const Chart: React.FC<IChart> = ({
           <Area
             type="monotone"
             dataKey="value"
-            strokeWidth={1}
+            strokeWidth={strokeWidth}
             stroke="#AA33B5"
             fill="url(#areaBackground)"
             fillOpacity={1}

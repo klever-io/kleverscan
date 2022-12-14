@@ -525,9 +525,9 @@ describe('Component: TransactionContractComponents', () => {
       const currencyID = screen.getByText(/KLV/i);
 
       await waitFor(() => {
-        const amount = screen.getByText('320');
+        const amount = screen.getByText('320.000000');
         expect(amount).toBeInTheDocument();
-        const price = screen.getByText('20');
+        const price = screen.getByText('20.000000');
         expect(price).toBeInTheDocument();
       });
       expect(buyType).toBeInTheDocument();

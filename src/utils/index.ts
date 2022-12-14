@@ -951,7 +951,10 @@ const getITOBuyPrice = (
       receipt.assetId === parameter.currencyID && receipt.from === sender,
   )?.value;
   if (typeof txValue === 'number') {
-    return (txValue / 10 ** currencyIDPrecision).toLocaleString();
+    return toLocaleFixed(
+      txValue / 10 ** currencyIDPrecision,
+      currencyIDPrecision,
+    );
   }
   return 0;
 };
@@ -964,7 +967,10 @@ export const getBuyAmount = (
   contracts: IBuyContract[],
 ): string | null => {
   if (parameter?.buyType === 'ITOBuy') {
-    return (parameter.amount / 10 ** amountPrecision).toLocaleString();
+    return toLocaleFixed(
+      parameter.amount / 10 ** amountPrecision,
+      amountPrecision,
+    );
   }
 
   if (parameter?.buyType === 'MarketBuy' && contracts.length < 2) {
@@ -972,7 +978,7 @@ export const getBuyAmount = (
     const parsedAmount =
       getBuyTotalAmount(receipts, sender) / 10 ** amountPrecision;
     if (parsedAmount !== 0) {
-      return parsedAmount.toLocaleString();
+      return toLocaleFixed(parsedAmount, amountPrecision);
     }
   }
   return null;
@@ -986,7 +992,10 @@ export const getBuyPrice = (
   contracts: IBuyContract[],
 ): string | null | number => {
   if (parameter?.buyType === 'MarketBuy') {
-    return (parameter.amount / 10 ** currencyIDPrecision).toLocaleString();
+    return toLocaleFixed(
+      parameter.amount / 10 ** currencyIDPrecision,
+      currencyIDPrecision,
+    );
   }
   if (parameter?.buyType === 'ITOBuy' && contracts.length < 2) {
     // support for multicontract in parent component

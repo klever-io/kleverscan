@@ -446,3 +446,21 @@ export const ExportButton = styled.button`
 export const ButtonsContainer = styled.div`
   display: flex;
 `;
+
+export const BackTopButton = styled.span<{ isHidden: boolean }>`
+  display: ${props => (props.isHidden ? 'block' : 'none')};
+  position: fixed;
+  bottom: 2rem;
+  right: 1.2rem;
+  z-index: 99;
+  border: none;
+  outline: none;
+  color: ${props => props.theme.violet};
+  cursor: pointer;
+  border-radius: 10px;
+  font-size: 35px;
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    right: 0.8rem;
+  }
+`;

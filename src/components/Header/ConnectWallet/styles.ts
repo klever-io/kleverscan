@@ -7,7 +7,11 @@ export const ConnectButton = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(to right, rgb(170, 51, 181), rgb(129, 79, 239));
+  background: linear-gradient(
+    to right,
+    ${props => props.theme.violet},
+    ${props => props.theme.purple}
+  );
   padding: 0.6rem;
   border-radius: 1.3rem;
   color: ${props => props.theme.true.white};

@@ -4,6 +4,7 @@ import { useDidUpdateEffect } from '@/utils/hooks';
 import { exportToCsv } from '@/utils/index';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
+import { BsFillArrowUpCircleFill } from 'react-icons/bs';
 import { TbTableExport } from 'react-icons/tb';
 import { Loader } from '../Loader/styles';
 // import { VscJson } from 'react-icons/vsc';
@@ -12,6 +13,7 @@ import { PaginationContainer } from '../Pagination/styles';
 import Skeleton from '../Skeleton';
 import Tooltip from '../Tooltip';
 import {
+  BackTopButton,
   Body,
   ButtonsContainer,
   Container,
@@ -93,7 +95,20 @@ const Table: React.FC<ITable> = ({
   const [limit, setLimit] = useState<number>(10);
   const [items, setItems] = useState(data);
   const dataRef = useRef([]) as any;
-  const limits = [5, 10, 30, 50];
+  const limits = [5, 10, 50, 100];
+  const [scrollTop, setScrollTop] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollTop(window.scrollY > 100);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   useEffect(() => {
     const tabletWindow = window.innerWidth <= 1025 && window.innerWidth >= 769;
@@ -102,8 +117,8 @@ const Table: React.FC<ITable> = ({
 
   const fetchData = async () => {
     if (request && dataName) {
-      const response = await request(page, limit);
       setLoading(true);
+      const response = await request(page, limit);
       if (!response.error) {
         setItems(response.data[dataName]);
         setTotalPages(response?.pagination?.totalPages || 1);
@@ -163,6 +178,11 @@ const Table: React.FC<ITable> = ({
     await exportToCsv('transactions', items, router);
     setLoadingCsv(false);
   };
+
+  const handleScrollTop = () => {
+    window.scrollTo(0, 0);
+  };
+
   return (
     <>
       {typeof scrollUp === 'boolean' &&
@@ -227,8 +247,8 @@ const Table: React.FC<ITable> = ({
           <Body {...props} data-testid="table-body">
             {loading && (
               <>
-                {Array(5)
-                  .fill(5)
+                {Array(limit)
+                  .fill(limit)
                   .map((_, index) => (
                     <Row key={String(index)} {...props}>
                       {header.map((item, index2) => (
@@ -287,6 +307,9 @@ const Table: React.FC<ITable> = ({
             </EmptyRow>
           )}
         </Container>
+        <BackTopButton onClick={handleScrollTop} isHidden={scrollTop}>
+          <BsFillArrowUpCircleFill />
+        </BackTopButton>
       </ContainerView>
       {typeof scrollUp === 'boolean' &&
         typeof totalPages === 'number' &&

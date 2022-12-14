@@ -1,6 +1,6 @@
 import { Validators as Icon } from '@/assets/cards';
 import { getStatusIcon } from '@/assets/status';
-import Detail from '@/components/Layout/Detail';
+import Detail from '@/components/Detail';
 import Progress from '@/components/Progress';
 import { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
@@ -163,30 +163,29 @@ const Validators: React.FC<IValidatorPage> = ({
   return <Detail {...detailProps} />;
 };
 
-export const getServerSideProps: GetServerSideProps<
-  IValidatorPage
-> = async () => {
-  const props: IValidatorPage = {
-    validators: [],
-    pagination: {} as IPagination,
-  };
+export const getServerSideProps: GetServerSideProps<IValidatorPage> =
+  async () => {
+    const props: IValidatorPage = {
+      validators: [],
+      pagination: {} as IPagination,
+    };
 
-  const validators: IValidatorResponse = await api.get({
-    route:
-      'validator/list?sort=elected&sort=eligible&sort=waiting&sort=inactive&sort=jailed',
-  });
+    const validators: IValidatorResponse = await api.get({
+      route:
+        'validator/list?sort=elected&sort=eligible&sort=waiting&sort=inactive&sort=jailed',
+    });
 
-  if (validators.code !== 'successful') {
+    if (validators.code !== 'successful') {
+      return { props };
+    }
+
+    if (!validators.error) {
+      const parsedValidators = parseValidators(validators);
+
+      props.validators = parsedValidators;
+      props.pagination = validators.pagination;
+    }
     return { props };
-  }
-
-  if (!validators.error) {
-    const parsedValidators = parseValidators(validators);
-
-    props.validators = parsedValidators;
-    props.pagination = validators.pagination;
-  }
-  return { props };
-};
+  };
 
 export default Validators;

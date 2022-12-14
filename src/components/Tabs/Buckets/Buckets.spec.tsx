@@ -21,7 +21,6 @@ describe('Component: Buckets Tab', () => {
     'klv18slsv4v8yxdarvvyxdwgvdeqwrna899k2vcshlrlc4xjuyjlhveqv78t8s';
   const frozenBalance = 10000000000000;
   const assetId = 'KLV';
-  const assetName = 'KLEVER';
   const assetType = 0;
   const balance = 0;
   const precision = 6;
@@ -32,7 +31,6 @@ describe('Component: Buckets Tab', () => {
   const unstakedEpoch = 55555;
   const stakedEpoch = 0;
   const delegation = '';
-  const MAX_UINT32 = 4294967295;
 
   jest.mock('next/router', () => ({
     useRouter() {

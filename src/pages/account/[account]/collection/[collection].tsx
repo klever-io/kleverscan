@@ -1,5 +1,5 @@
 import { Validators as Icon } from '@/assets/cards';
-import Detail from '@/components/Layout/Detail';
+import Detail from '@/components/Detail';
 import { ITable } from '@/components/Table';
 import { CustomLink } from '@/components/Table/styles';
 import { useMobile } from '@/contexts/mobile';

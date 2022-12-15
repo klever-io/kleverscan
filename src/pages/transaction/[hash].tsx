@@ -46,6 +46,7 @@ import {
   getTotalAssetsPrices,
   hexToString,
   isDataEmpty,
+  parseJson,
   toLocaleFixed,
 } from '@/utils/index';
 import {
@@ -59,6 +60,7 @@ import {
   CardRaw,
   CenteredRow,
   Container,
+  ExpandCenteredRow,
   Header,
   Hr,
   Input,
@@ -71,6 +73,7 @@ import { format, fromUnixTime } from 'date-fns';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
+import { BsPlus } from 'react-icons/bs';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 
@@ -99,6 +102,7 @@ interface ITransactionPage {
 
 const Transaction: React.FC<ITransactionPage> = props => {
   const [showModal, setShowModal] = useState(false);
+  const [expandData, setExpandData] = useState(false);
   const { transaction, block } = props;
   const { isDarkTheme } = useTheme();
   const [totalAssetsPrices, setTotalAssetsPrices] =
@@ -121,6 +125,9 @@ const Transaction: React.FC<ITransactionPage> = props => {
   } = transaction;
 
   const StatusIcon = getStatusIcon(status);
+
+  const renderData = () =>
+    parseJson(hexToString((data && data.length > 0 && data.join(',')) || ''));
 
   useEffect(() => {
     const getAsyncTotalAssetsPrices = async () => {
@@ -512,19 +519,26 @@ const Transaction: React.FC<ITransactionPage> = props => {
               <span>
                 <strong>Data</strong>
               </span>
-              <CenteredRow>
+
+              <ExpandCenteredRow>
                 <span>
-                  {hexToString(
-                    (data && data.length > 0 && data.join(',')) || '',
+                  {expandData ? (
+                    <pre>{renderData()}</pre>
+                  ) : (
+                    <span>{renderData()}</span>
                   )}
                 </span>
+                <BsPlus
+                  style={{ overflow: 'visible' }}
+                  onClick={() => setExpandData(!expandData)}
+                />
                 <Copy
                   data={hexToString(
                     (data && data.length > 0 && data.join(',')) || '',
                   )}
                   info="Data"
                 />
-              </CenteredRow>
+              </ExpandCenteredRow>
             </Row>
           )}
           {renderMultiContractITOBuy()}

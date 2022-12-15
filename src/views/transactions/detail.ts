@@ -211,6 +211,17 @@ export const CenteredRow = styled.div`
     text-decoration: underline;
   }
 `;
+
+export const ExpandCenteredRow = styled(CenteredRow)`
+  align-items: normal;
+  justify-content: space-between;
+`;
+
+export const IconsWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
 export const CardRaw = styled.div`
   margin: 1.25rem 1.25rem;
   font-weight: 400;

@@ -906,3 +906,12 @@ export const passViewportStyles = (
   }
   return desktopStyles;
 };
+
+export const parseJson = (data: string): string => {
+  try {
+    const json = JSON.parse(data);
+    return JSON.stringify(json, null, 2);
+  } catch (error) {
+    return data;
+  }
+};

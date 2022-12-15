@@ -214,7 +214,12 @@ export const CenteredRow = styled.div`
 
 export const ExpandCenteredRow = styled(CenteredRow)`
   align-items: normal;
-  justify-content: flex-end;
+  justify-content: space-between;
+`;
+
+export const IconsWrapper = styled.div`
+  display: flex;
+  justify-content: center;
 `;
 
 export const CardRaw = styled.div`

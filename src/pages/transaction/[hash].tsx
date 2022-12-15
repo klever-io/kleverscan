@@ -63,6 +63,7 @@ import {
   ExpandCenteredRow,
   Header,
   Hr,
+  IconsWrapper,
   Input,
   KappFeeFailedTx,
   KappFeeSpan,
@@ -528,16 +529,18 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     <span>{renderData()}</span>
                   )}
                 </span>
-                <BsPlus
-                  style={{ overflow: 'visible' }}
-                  onClick={() => setExpandData(!expandData)}
-                />
-                <Copy
-                  data={hexToString(
-                    (data && data.length > 0 && data.join(',')) || '',
-                  )}
-                  info="Data"
-                />
+                <IconsWrapper>
+                  <BsPlus
+                    style={{ overflow: 'visible', marginRight: '3px' }}
+                    onClick={() => setExpandData(!expandData)}
+                  />
+                  <Copy
+                    data={hexToString(
+                      (data && data.length > 0 && data.join(',')) || '',
+                    )}
+                    info="Data"
+                  />
+                </IconsWrapper>
               </ExpandCenteredRow>
             </Row>
           )}

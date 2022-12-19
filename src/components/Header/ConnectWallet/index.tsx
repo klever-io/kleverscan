@@ -3,6 +3,7 @@ import { useExtension } from '@/contexts/extension';
 import Link from 'next/link';
 import { QRCodeSVG } from 'qrcode.react';
 import React, { useEffect, useState } from 'react';
+import ReactDOM from 'react-dom';
 import { AiOutlineClose } from 'react-icons/ai';
 import { BiLogOut, BiWalletAlt } from 'react-icons/bi';
 import { FaUserAlt } from 'react-icons/fa';
@@ -49,6 +50,15 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
   useEffect(() => {
     document.body.style.overflow = openDrawer ? 'hidden' : 'visible';
   }, [openDrawer]);
+
+  const connectAndOpen = () => {
+    if (!walletAddress) {
+      connectExtension();
+    } else {
+      setOpenUserInfos(!openUserInfos);
+    }
+  };
+
   return (
     <>
       {!extensionInstalled && (
@@ -73,7 +83,7 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
 
       {extensionInstalled && (
         <ConnectContainer
-          onClick={() => connectExtension()}
+          onClick={() => connectAndOpen()}
           key={String(extensionInstalled)}
         >
           <ConnectButton>
@@ -82,15 +92,7 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
             ) : (
               <>
                 {walletAddress && (
-                  <div
-                    onClick={() => {
-                      if (openUserInfos) {
-                        setOpenUserInfos(false);
-                      } else {
-                        setOpenUserInfos(true);
-                      }
-                    }}
-                  >
+                  <div onClick={() => setOpenUserInfos(!openUserInfos)}>
                     <FaUserAlt size={'1.2em'} />
                     <small>{parseAddress(walletAddress, 15)}</small>
                   </div>
@@ -106,71 +108,73 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
           </ConnectButton>
         </ConnectContainer>
       )}
-      {openUserInfos && (
-        <UserInfoContainer>
-          <ContentUserInfo>
-            <HeaderInfo>
-              <div>
-                <BiWalletAlt size={'1em'} />
-                <p>My Wallet</p>
-              </div>
-              <AiOutlineClose
-                onClick={() => setOpenUserInfos(false)}
-                cursor={'pointer'}
-              />
-            </HeaderInfo>
-            <QRCodeContainer>
-              {walletAddress && window.innerWidth > 768 && (
-                <QRCodeContent>
-                  <div>
-                    <QRCodeSVG value={walletAddress} size={100}></QRCodeSVG>
-                  </div>
-                </QRCodeContent>
-              )}
-              {walletAddress && (
-                <small>{parseAddress(walletAddress, 25)}</small>
-              )}
-            </QRCodeContainer>
-            <BodyContent>
-              <div>
-                <BiWalletAlt size={'1em'} />
-                <Link href={`/account/${walletAddress}`}>
-                  <a onClick={() => setOpenUserInfos(false)}>
-                    <p>Account</p>
-                  </a>
-                </Link>
-                <RiArrowRightSLine size={'1.2em'} />
-              </div>
-              <div>
-                <MdContentCopy size={'1em'} />
-                <p>Copy Address</p>
-                <RiArrowRightSLine size={'1.2em'} />
-                {walletAddress && (
-                  <Copy info="Wallet Address" data={walletAddress} />
+      {openUserInfos &&
+        ReactDOM.createPortal(
+          <UserInfoContainer style={{ zIndex: 9999 }}>
+            <ContentUserInfo>
+              <HeaderInfo>
+                <div>
+                  <BiWalletAlt size={'1em'} />
+                  <p>My Wallet</p>
+                </div>
+                <AiOutlineClose
+                  onClick={() => setOpenUserInfos(false)}
+                  cursor={'pointer'}
+                />
+              </HeaderInfo>
+              <QRCodeContainer>
+                {walletAddress && window.innerWidth > 768 && (
+                  <QRCodeContent>
+                    <div>
+                      <QRCodeSVG value={walletAddress} size={100}></QRCodeSVG>
+                    </div>
+                  </QRCodeContent>
                 )}
-              </div>
-              <div>
-                <IoCreateOutline size={'1em'} />
-                <Link href={`/create-transaction`}>
-                  <a onClick={() => setOpenUserInfos(false)}>
-                    <p>Create Transaction</p>
-                  </a>
-                </Link>
-                <RiArrowRightSLine size={'1.2em'} />
-              </div>
-              <div
-                onClick={() => {
-                  logoutExtension();
-                  setOpenUserInfos(false);
-                }}
-              >
-                <BiLogOut size={'1em'} />
-                <p>Disconnect</p>
-              </div>
-            </BodyContent>
-          </ContentUserInfo>
-        </UserInfoContainer>
-      )}
+                {walletAddress && (
+                  <small>{parseAddress(walletAddress, 25)}</small>
+                )}
+              </QRCodeContainer>
+              <BodyContent>
+                <div>
+                  <BiWalletAlt size={'1em'} />
+                  <Link href={`/account/${walletAddress}`}>
+                    <a onClick={() => setOpenUserInfos(false)}>
+                      <p>Account</p>
+                    </a>
+                  </Link>
+                  <RiArrowRightSLine size={'1.2em'} />
+                </div>
+                <div>
+                  <MdContentCopy size={'1em'} />
+                  <p>Copy Address</p>
+                  <RiArrowRightSLine size={'1.2em'} />
+                  {walletAddress && (
+                    <Copy info="Wallet Address" data={walletAddress} />
+                  )}
+                </div>
+                <div>
+                  <IoCreateOutline size={'1em'} />
+                  <Link href={`/create-transaction`}>
+                    <a onClick={() => setOpenUserInfos(false)}>
+                      <p>Create Transaction</p>
+                    </a>
+                  </Link>
+                  <RiArrowRightSLine size={'1.2em'} />
+                </div>
+                <div
+                  onClick={() => {
+                    logoutExtension();
+                    setOpenUserInfos(false);
+                  }}
+                >
+                  <BiLogOut size={'1em'} />
+                  <p>Disconnect</p>
+                </div>
+              </BodyContent>
+            </ContentUserInfo>
+          </UserInfoContainer>,
+          window.document.body,
+        )}
       <BackGroundUserInfo
         isOpen={openUserInfos}
         onClick={() => setOpenUserInfos(false)}

@@ -19,7 +19,7 @@ interface IUsePrecisions {
 export const PrecisionProvider: React.FC = ({ children }) => {
   const [precisions, setPrecisions] = useState(initialPrecisions);
 
-  const getContextPrecision = async (assetId: string) => {
+  const getContextPrecision = async (assetId: string): Promise<number> => {
     if (assetId.includes('/')) {
       return 0;
     }
@@ -29,7 +29,9 @@ export const PrecisionProvider: React.FC = ({ children }) => {
     const newPrecision = await getPrecision(assetId);
     if (typeof newPrecision === 'number') {
       setPrecisions({ ...precisions, [assetId]: newPrecision });
+      return newPrecision;
     }
+    return 6;
   };
 
   const values = {

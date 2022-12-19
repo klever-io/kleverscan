@@ -397,7 +397,7 @@ const holdersList = {
       },
       {
         address:
-          'klv14ragd2rgqat485vu6ssh4vu9rhmc68mg6vrmkmuhdqda9eeykucqvewgsh',
+          'klv14ragd2rgqat485vu6ssh4vu9rhmc68mg6vrmkmuhdqda9eeykucqvewgsz',
         assetId: 'KFI',
         assetName: 'KLEVER FINANCE',
         assetType: 0,
@@ -501,6 +501,9 @@ const transactionsList: ITransactionResponse = {
         receipts: [
           {
             assetId: 'KLV',
+            type: 0,
+            amount: '100000000',
+            from: 'klv1862fx9d57n55k8rxprh6h7lycrppwddp5rnh3nqgguhzdl8sgl9qxl0c6h',
           },
         ],
         contract: [
@@ -539,6 +542,9 @@ const transactionsList: ITransactionResponse = {
         receipts: [
           {
             assetId: 'KLV',
+            type: 0,
+            amount: '100000000',
+            from: 'klv1862fx9d57n55k8rxprh6h7lycrppwddp5rnh3nqgguhzdl8sgl9qxl0c6h',
           },
         ],
         contract: [
@@ -570,6 +576,9 @@ const transactionsList: ITransactionResponse = {
         receipts: [
           {
             assetId: 'PVM-GVCI',
+            type: 0,
+            amount: '100000000',
+            from: 'klv1862fx9d57n55k8rxprh6h7lycrppwddp5rnh3nqgguhzdl8sgl9qxl0c6h',
           },
         ],
         contract: [

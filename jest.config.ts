@@ -6,7 +6,9 @@ const SRC_PATH = '<rootDir>/src';
 const makeModuleNameMapper = (srcPath: string) => {
   const { paths } = compilerOptions;
 
-  const aliases = {};
+  const aliases = {
+    '^.+\\.(css|less)$': '<rootDir>/config/CSSStub.js',
+  };
 
   Object.keys(paths).forEach((item, index) => {
     if (index !== 0) {

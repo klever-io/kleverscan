@@ -4,17 +4,27 @@ import { IoIosLogOut } from 'react-icons/io';
 import styled from 'styled-components';
 
 export const ConnectButton = styled.div`
-  background-color: ${props => props.theme.navbar.text};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    to right,
+    ${props => props.theme.violet},
+    ${props => props.theme.purple}
+  );
   padding: 0.6rem;
-  border-radius: 0.3rem;
-  color: ${props => props.theme.card.white};
-  font-size: 0.9rem;
+  border-radius: 1.3rem;
+  color: ${props => props.theme.true.white};
+  font-weight: 700;
+  font-size: 14px;
 
   text-align: center;
-
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   position: relative;
-
-  min-width: 10rem;
   width: 100%;
 
   cursor: pointer;
@@ -22,17 +32,22 @@ export const ConnectButton = styled.div`
   input {
     display: none;
   }
-
+  span,
+  small {
+    padding-left: 0.4rem;
+  }
   label {
     cursor: pointer;
   }
-
-  @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
-    width: 14rem;
-    &:hover > div {
-      display: flex;
-      flex-direction: column;
+  width: 9rem;
+  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+    span,
+    small {
+      display: none;
     }
+    padding: 0 0.25rem 0 0;
+    background: 0;
+    width: auto;
   }
 `;
 
@@ -217,23 +232,130 @@ export const StyledTransfer = styled(BiTransfer)`
 `;
 
 export const QRCodeContainer = styled.div`
-  position: absolute;
+  border-bottom: 1px solid ${props => props.theme.line.border};
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+  color: ${props => props.theme.black};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+    small {
+      padding-top: 0.5rem;
+    }
+  }
+`;
 
-  -webkit-box-shadow: 3px 3px 8px 5px rgba(0, 0, 0, 0.05);
-  box-shadow: 3px 3px 8px 5px rgba(0, 0, 0, 0.05);
+export const UserInfoContainer = styled.div`
+  position: fixed;
+  top: 4.4rem;
+  right: 5.6rem;
+  z-index: 10000 !important;
+  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+    right: 1rem;
+  }
+`;
+
+export const ContentUserInfo = styled.div`
+  background-color: ${props => props.theme.background};
+  display: flex;
+  flex-direction: column;
+  width: 20rem;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #404264;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  padding: 10px;
+`;
+
+export const HeaderInfo = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding-inline-start: 0.75rem;
+  padding-inline-end: 0.75rem;
+  align-items: center;
+  color: ${props => props.theme.black};
+  font-size: 16px;
+  font-weight: 700;
+  div {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+`;
+
+export const BodyContent = styled.div`
+  padding-top: 1rem;
+  width: 100%;
+  color: ${props => props.theme.navbar.text};
+
+  > div {
+    display: flex;
+    position: static;
+    align-items: center;
+    height: 2.5rem;
+    gap: 0.45rem;
+    font-size: 14px;
+    font-weight: 700;
+    padding-bottom: 0.5rem;
+    padding: 0.75rem;
+    cursor: pointer;
+  }
+  div:nth-child(2) {
+    cursor: auto;
+  }
+  > div:hover {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #404264;
+    border-radius: 0.375rem;
+    background-color: ${props => props.theme.footer.border};
+    color: ${props => props.theme.true.white};
+    path:nth-child() {
+      fill: ${props => props.theme.true.white};
+    }
+  }
+`;
+
+export const BackGroundUserInfo = styled.div<{ isOpen?: boolean }>`
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  visibility: ${props => (props.isOpen ? 'visible' : 'hidden')};
+  z-index: 100 !important;
 `;
 
 export const QRCodeContent = styled.div`
-  position: relative;
-  background-color: ${props => props.theme.qrcodeTooltip.background};
+  display: flex;
+  justify-content: center;
+  background-color: ${props => props.theme.background};
   border-radius: 1rem;
   padding: 1rem;
-  top: 5.3rem;
-  left: 0.2rem;
 
   div {
     background-color: #fff;
+    width: 114px;
     padding: 0.3rem;
     border-radius: 0.2rem;
   }
+`;
+
+export const BackgroundHelper = styled.div<{ opened: boolean }>`
+  width: 100%;
+  height: 100%;
+
+  top: 0;
+  left: 0;
+
+  position: fixed;
+  visibility: ${props => (props.opened ? 'visible' : 'hidden')};
+  opacity: ${props => (props.opened ? 1 : 0)};
+
+  background-color: ${props =>
+    transparentize(props.theme.dark ? 0.85 : 0.7, props.theme.black)};
+
+  transition: opacity 0.5s ease, visibility 0.5s ease;
 `;

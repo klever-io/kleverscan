@@ -19,7 +19,6 @@ export const Container = styled.div<{ isConnected: boolean | null }>`
   gap: 0.5rem;
 
   user-select: none;
-  margin-top: ${props => (props.isConnected === true ? 0 : '0.41rem')};
 `;
 
 export const IconContainer = styled.div`

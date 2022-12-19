@@ -203,12 +203,13 @@ export const SelectContainer = styled.div`
 
 interface ISelect {
   size?: number;
+  configITO?: boolean;
 }
 
 export const SelectContent = styled.div<ISelect>`
   display: flex;
   flex-direction: column;
-  width: calc(50% - 0.5rem);
+  width: ${props => (props.configITO ? '100%' : 'calc(50% - 0.5rem)')};
 
   max-width: ${props => (props.size ? `${props.size}%` : 'unset')};
   &:not(:first-child) {

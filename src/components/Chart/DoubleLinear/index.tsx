@@ -1,3 +1,4 @@
+import { ITooltipContent } from '@/pages/charts';
 import { formatAmount } from '@/utils/index';
 import React from 'react';
 import {
@@ -19,15 +20,6 @@ interface IChart {
   theme: Theme;
   value?: string;
   value2?: string;
-}
-
-interface ITooltipContent {
-  payload?: {
-    value: number;
-    name: string;
-  }[];
-  label?: string;
-  active?: boolean;
 }
 
 const CustomTooltip = ({ payload, label, active }: ITooltipContent) => {

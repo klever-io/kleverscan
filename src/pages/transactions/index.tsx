@@ -10,6 +10,7 @@ import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
+import { multiContractStyles } from '@/components/Tooltip/configs';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
@@ -31,6 +32,7 @@ import React, { useCallback } from 'react';
 import {
   IAsset,
   IPagination,
+  IReceipt,
   IResponse,
   IRowSection,
   ITransaction,
@@ -42,11 +44,16 @@ import {
   ITransferContract,
   ReducedContract,
 } from '../../types/contracts';
-import { capitalizeString, formatAmount, parseAddress } from '../../utils';
+import {
+  capitalizeString,
+  formatAmount,
+  parseAddress,
+  passViewportStyles,
+} from '../../utils';
 import {
   contractTypes,
   filteredSections,
-  getHeader,
+  getHeaderForTable,
   initialsTableHeaders,
 } from '../../utils/contracts';
 
@@ -92,9 +99,12 @@ const Transactions: React.FC<ITransactions> = ({
       query: { page, limit, ...router.query },
     });
 
-  const getFilteredSections = (contract: IContract[]): IRowSection[] => {
+  const getFilteredSections = (
+    contract: IContract[],
+    receipts: IReceipt[],
+  ): IRowSection[] => {
     const contractType = getContractType(contract);
-    return filteredSections(contract, contractType);
+    return filteredSections(contract, contractType, receipts);
   };
 
   const rowSections = (props: ITransaction): IRowSection[] => {
@@ -103,6 +113,7 @@ const Transactions: React.FC<ITransactions> = ({
       blockNum,
       timestamp,
       sender,
+      receipts,
       contract,
       kAppFee,
       bandwidthFee,
@@ -127,25 +138,15 @@ const Transactions: React.FC<ITransactions> = ({
         msg += `${ContractsIndex[contrct]}: ${number}x\n`;
       });
 
-      const getViewport = () => {
-        const styles = { offset: { right: 54, top: 5, bottom: 0 } };
-        if (isMobile) {
-          styles.offset.right = 0;
-          styles.offset.top = 0;
-          styles.offset.bottom = 10;
-        } else if (isTablet) {
-          styles.offset.right = 54;
-          styles.offset.bottom = 10;
-        }
-        return styles;
-      };
-      const customStyles = getViewport();
-
       return (
         <aside style={{ width: 'fit-content' }}>
           <Tooltip
             msg={msg}
-            customStyles={customStyles}
+            customStyles={passViewportStyles(
+              isMobile,
+              isTablet,
+              ...multiContractStyles,
+            )}
             Component={() => (
               <MultiContractContainer>
                 {contractType}
@@ -246,7 +247,7 @@ const Transactions: React.FC<ITransactions> = ({
         span: 1,
       },
     ];
-    const filteredContract = getFilteredSections(contract);
+    const filteredContract = getFilteredSections(contract, receipts);
 
     if (router.query.type) {
       sections.pop();
@@ -261,7 +262,7 @@ const Transactions: React.FC<ITransactions> = ({
 
   const tableProps: ITable = {
     type: 'transactions',
-    header: getHeader(router, header),
+    header: getHeaderForTable(router, header),
     data: defaultTransactions as any[],
     rowSections,
     dataName: 'transactions',

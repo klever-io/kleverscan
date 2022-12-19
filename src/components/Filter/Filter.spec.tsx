@@ -4,23 +4,14 @@ import theme from '../../styles/theme';
 import { renderWithTheme } from '../../test/utils';
 import Filter, { IFilter } from './';
 
-const data = [
-  {
-    name: 'Filter 1',
-    value: 'value 1',
-  },
-  {
-    name: 'Filter 2',
-    value: 'value 2',
-  },
-];
+const data = ['All', 'KLV', 'KFI', 'KUSD'];
 
 const filters: IFilter[] = [
   {
     title: 'Coin',
     data,
-    filterQuery: undefined,
     onClick: jest.fn(),
+    current: 'All',
   },
 ];
 
@@ -48,7 +39,7 @@ describe('Component: Filter', () => {
       if (index === 0) {
         expect(item).toHaveTextContent('All');
       } else {
-        expect(item).toHaveTextContent(filters[0].data[index - 1].name);
+        expect(item).toHaveTextContent(filters[0].data[index - 1]);
       }
     });
   });
@@ -58,7 +49,7 @@ describe('Component: Filter', () => {
     const selector: any = container.firstChild?.firstChild?.nextSibling;
 
     await user.click(selector.lastChild?.childNodes[1]);
-    expect(selector.firstChild).toHaveTextContent(data[0].name);
+    expect(selector.firstChild).toHaveTextContent(data[0]);
   });
 
   it('Should all the select element match the style', () => {

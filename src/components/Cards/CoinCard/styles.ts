@@ -56,8 +56,6 @@ export const Content = styled.div`
 export const CardContainer = styled.div`
   padding: 1.5rem;
   scroll-snap-align: start;
-
-  display: flex;
   position: relative;
 
   flex-direction: row;
@@ -142,30 +140,31 @@ export const Description = styled(Name)<IVariation>`
 `;
 
 export const ChartContainer = styled.div`
-  padding: 0 1.25rem;
-
-  height: 14.5rem;
-  width: 100%;
-
-  top: 1.5rem;
-  left: 0;
-
-  position: absolute;
+  width: 18.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  height: 92.79px;
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 100%;
+  }
 `;
 
-export const ValueContainer = styled.div`
+export const ValueContainer = styled.div<{ isKLV?: boolean }>`
+  display: grid;
   margin-top: 0.5rem;
+  grid-template-columns: ${props => (props.isKLV ? '1fr 1fr' : '1fr')};
 `;
 
-export const ValueContent = styled.div`
+export const ValueContent = styled.div<{ isDropdown?: boolean }>`
   display: flex;
-
   flex-direction: column;
 
   font-weight: 400;
   color: ${props => props.theme.lightGray};
-
   gap: 0.25rem;
+  :nth-child(even) {
+    align-items: ${props => (props.isDropdown ? 'flex-end' : '')};
+  }
 
   &:not(:last-child) {
     margin-bottom: 0.5rem;
@@ -177,12 +176,52 @@ export const ValueContent = styled.div`
   }
 `;
 
+export const TitleDetails = styled.div<{ positive?: boolean }>`
+  display: flex;
+  flex-direction: row;
+
+  span {
+    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+      font-size: 0.8rem;
+    }
+    font-size: 0.59rem;
+    padding-left: 0.5rem;
+    font-weight: 500;
+    color: ${props => {
+      if (props.positive === undefined) {
+        return props.theme.lightGray;
+      }
+
+      return props.theme.card[props.positive ? 'green' : 'red'];
+    }};
+  }
+`;
+
+export const ArrowDownDiv = styled.div<{ open: boolean }>`
+  position: absolute;
+  left: 46.9%;
+  right: 47.78%;
+  cursor: pointer;
+  bottom: 2.29%;
+  path {
+    stroke: white !important;
+  }
+  svg {
+    transition: 0.2s ease;
+    transform: rotate(${props => (props.open ? 0 : 180)}deg);
+  }
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    left: 49%;
+  }
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    left: 48%;
+  }
+`;
+
 export const ValueDetail = styled.div<{ positive?: boolean }>`
   display: flex;
 
-  flex-direction: row;
   align-items: center;
-  justify-content: space-between;
 
   color: ${props => props.theme.card.white};
 

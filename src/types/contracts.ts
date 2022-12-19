@@ -321,7 +321,6 @@ export enum ITOTriggerType {
   UpdateWhitelistStatus = 'UpdateWhitelistStatus',
   AddToWhitelist = 'AddToWhitelist',
   RemoveFromWhitelist = 'RemoveFromWhitelist',
-  WipeWhitelist = 'WipeWhitelist',
   UpdateWhitelistTimes = 'UpdateWhitelistTimes',
 }
 
@@ -556,4 +555,31 @@ export interface IContract {
 export interface IContractBuyProps extends IContract {
   sender: string;
   contracts: IBuyContract[];
+}
+
+export enum ContractsRecipesTypes {
+  Transfer,
+  CreateKDA,
+  UpdateKDA,
+  Freeze,
+  Unfreeze,
+  Proposal,
+  ProposalVote,
+  Delegate,
+  ConfigITO,
+  SetITOPrices,
+  CreateMarketplace,
+  ConfigMarketplace,
+  UpdateValidator,
+  UpdateAccountPermission,
+  KAppTransfer,
+  Sell,
+  Buy,
+  Claim,
+  Withdraw,
+  SignedBy,
+  UpdateMetadata,
+  Deposit,
+  UpdateKDAPool,
+  UpdateITO,
 }

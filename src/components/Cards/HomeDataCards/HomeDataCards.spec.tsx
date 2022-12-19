@@ -21,13 +21,17 @@ const mockedTotalAccounts = {
 jest.mock('@/services/api', () => {
   return {
     get: jest.fn(),
-    text: jest.fn(),
     getCached: jest.fn(),
   };
 });
 
 describe('Component: HomeDataCards', () => {
   beforeEach(() => {
+    window.ResizeObserver = jest.fn().mockImplementation(() => ({
+      observe: jest.fn(),
+      unobserve: jest.fn(),
+      disconnect: jest.fn(),
+    }));
     jest.clearAllMocks();
     jest.useFakeTimers();
   });
@@ -40,6 +44,9 @@ describe('Component: HomeDataCards', () => {
     coinsData,
     yesterdayTransactions,
     yesterdayAccounts,
+    beforeYesterdayTransactions,
+    block,
+    assetsData,
   } = mockedHomeDataCards;
 
   it('Should render the "Total Accounts", "Total Transactions", "Live/Peak TPS", and "Epoch Remaining Time" cards with values', () => {
@@ -52,29 +59,30 @@ describe('Component: HomeDataCards', () => {
         coinsData={coinsData}
         yesterdayTransactions={yesterdayTransactions}
         yesterdayAccounts={yesterdayAccounts}
+        beforeYesterdayTransactions={beforeYesterdayTransactions}
+        assetsData={assetsData}
+        block={block}
       />,
     );
+    const totalAccountsLabel = screen.getByText(/Total Accounts/i);
+    const totalTxsLabel = screen.getByText(/Total Transactions/i);
+    const tpsLabel = screen.getByText(/Live\/Peak TPS/i);
+    const epochRemainingTimeLabel = screen.getByText(/Epoch Remaining Time/i);
 
-    const totalAccounts = screen.getByText(/Total Accounts/i);
-    const totalTxs = screen.getByText(/Total Transactions/i);
-    const tps = screen.getByText(/Live\/Peak TPS/i);
-    const epochRemainingTime = screen.getByText(/Epoch Remaining Time/i);
+    expect(totalAccountsLabel).toBeInTheDocument();
+    expect(totalTxsLabel).toBeInTheDocument();
+    expect(tpsLabel).toBeInTheDocument();
+    expect(epochRemainingTimeLabel).toBeInTheDocument();
+
+    const totalAccounts = screen.getByText(/100/);
+    const totalTx = screen.getByText(/20,000/i);
+    const tps = screen.getByText(/0 \/ 3000/i);
+    const epochRemainingTime = screen.getByText(/two days/i);
 
     expect(totalAccounts).toBeInTheDocument();
-    expect(totalTxs).toBeInTheDocument();
+    expect(totalTx).toBeInTheDocument();
     expect(tps).toBeInTheDocument();
     expect(epochRemainingTime).toBeInTheDocument();
-
-    expect(totalAccounts.nextSibling).toHaveTextContent(
-      mockTotalAccounts.toLocaleString(),
-    );
-    expect(totalTxs.nextSibling).toHaveTextContent(
-      totalTransactions.toLocaleString(),
-    );
-    expect(tps.nextSibling).toHaveTextContent(mockTps.toLocaleString());
-    expect(epochRemainingTime.nextSibling).toHaveTextContent(
-      epochInfo.remainingTime.toLocaleString(),
-    );
   });
 
   it('Should render the total accounts and transactions in the last 24h', () => {
@@ -87,6 +95,9 @@ describe('Component: HomeDataCards', () => {
         coinsData={coinsData}
         yesterdayTransactions={yesterdayTransactions}
         yesterdayAccounts={yesterdayAccounts}
+        beforeYesterdayTransactions={beforeYesterdayTransactions}
+        assetsData={assetsData}
+        block={block}
       />,
     );
 
@@ -109,32 +120,40 @@ describe('Component: HomeDataCards', () => {
         coinsData={coinsData}
         yesterdayTransactions={yesterdayTransactions}
         yesterdayAccounts={yesterdayAccounts}
+        beforeYesterdayTransactions={beforeYesterdayTransactions}
+        assetsData={assetsData}
+        block={block}
       />,
     );
 
+    const statistics = { ...mockedStatistics };
+    const metrics = { ...mockedMetrics };
+    const totalAccs = { ...mockedTotalAccounts, error: '' };
+    const transactions = { ...mockedTransactionsCall, error: '' };
+    const yesterdayTx = { ...mockedYesterdayTxCall, error: '' };
+    const yesterdayAccs = { ...mockedNewAccountsCall, error: '' };
+
     (api.get as jest.Mock)
       .mockReturnValueOnce(mockedStatistics)
-      .mockReturnValueOnce(mockedTotalAccounts);
+      .mockReturnValueOnce(mockedMetrics);
 
-    (api.text as jest.Mock).mockReturnValueOnce(mockedMetrics);
     (api.getCached as jest.Mock)
-      .mockReturnValueOnce(mockedNewAccountsCall)
-      .mockReturnValueOnce(mockedTransactionsCall)
-      .mockReturnValueOnce(mockedYesterdayTxCall);
+      .mockReturnValueOnce(totalAccs)
+      .mockReturnValueOnce(yesterdayAccs)
+      .mockReturnValueOnce(transactions)
+      .mockReturnValueOnce(yesterdayTx);
 
     await waitFor(
       () => {
         expect(api.get).toHaveBeenCalled();
-        expect(api.get).toHaveReturnedWith(mockedStatistics);
-        expect(api.get).toHaveReturnedWith(mockedTotalAccounts);
-
-        expect(api.text).toHaveBeenCalled();
-        expect(api.text).toHaveReturnedWith(mockedMetrics);
+        expect(api.get).toHaveReturnedWith(statistics);
+        expect(api.get).nthReturnedWith(2, metrics);
 
         expect(api.getCached).toHaveBeenCalled();
-        expect(api.getCached).toHaveReturnedWith(mockedNewAccountsCall);
-        expect(api.getCached).nthReturnedWith(2, mockedTransactionsCall);
-        expect(api.getCached).nthReturnedWith(3, mockedYesterdayTxCall);
+        expect(api.getCached).toHaveReturnedWith(totalAccs);
+        expect(api.getCached).nthReturnedWith(2, yesterdayAccs);
+        expect(api.getCached).nthReturnedWith(3, transactions);
+        expect(api.getCached).nthReturnedWith(4, yesterdayTx);
       },
       { timeout: 5000 },
     );
@@ -150,6 +169,9 @@ describe('Component: HomeDataCards', () => {
         coinsData={coinsData}
         yesterdayTransactions={yesterdayTransactions}
         yesterdayAccounts={yesterdayAccounts}
+        beforeYesterdayTransactions={beforeYesterdayTransactions}
+        assetsData={assetsData}
+        block={block}
       />,
     );
 
@@ -160,23 +182,24 @@ describe('Component: HomeDataCards', () => {
 
     (api.get as jest.Mock)
       .mockReturnValueOnce(mockedStatistics)
-      .mockReturnValueOnce(totalAccountsWithError);
+      .mockReturnValueOnce(mockedMetrics);
 
-    (api.text as jest.Mock).mockReturnValueOnce(mockedMetrics);
     (api.getCached as jest.Mock)
+      .mockReturnValueOnce(totalAccountsWithError)
       .mockReturnValueOnce(yesterdayAccs)
       .mockReturnValueOnce(transactions)
       .mockReturnValueOnce(yesterdayTx);
 
     await waitFor(
       () => {
-        expect(api.get).toHaveBeenCalled();
-        expect(api.get).toHaveNthReturnedWith(2, totalAccountsWithError);
+        expect(api.get).toBeCalled();
+        expect(api.get).toHaveBeenCalledTimes(2);
 
         expect(api.getCached).toHaveBeenCalled();
-        expect(api.getCached).toHaveReturnedWith(yesterdayAccs);
-        expect(api.getCached).nthReturnedWith(2, transactions);
-        expect(api.getCached).nthReturnedWith(3, yesterdayTx);
+        expect(api.getCached).toHaveReturnedWith(totalAccountsWithError);
+        expect(api.getCached).toHaveNthReturnedWith(2, yesterdayAccs);
+        expect(api.getCached).nthReturnedWith(3, transactions);
+        expect(api.getCached).nthReturnedWith(4, yesterdayTx);
       },
       { timeout: 5000 },
     );
@@ -185,16 +208,18 @@ describe('Component: HomeDataCards', () => {
   it("Should render the fallback variant when there's no new accounts since yesterday", () => {
     renderWithTheme(
       <HomeDataCards
-        totalAccounts={0}
+        totalAccounts={mockTotalAccounts}
         totalTransactions={totalTransactions}
-        epochInfo={epochInfo}
         tps={mockTps}
+        epochInfo={epochInfo}
         coinsData={coinsData}
         yesterdayTransactions={yesterdayTransactions}
+        beforeYesterdayTransactions={beforeYesterdayTransactions}
         yesterdayAccounts={0}
+        assetsData={assetsData}
+        block={block}
       />,
     );
-
     const totalAccounts = screen.getByText(/Total Accounts/i);
     const variant = totalAccounts.parentNode?.nextSibling?.lastChild;
     expect(variant).toBeUndefined();

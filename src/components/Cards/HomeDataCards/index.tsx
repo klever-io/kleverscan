@@ -75,9 +75,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
       Icon: Accounts,
       title: t('Total Accounts'),
       value: totalAccounts,
-      variation: `+ ${
-        newAccounts === totalAccounts ? '0%' : newAccounts.toLocaleString()
-      }`,
+      variation: `+ ${newAccounts === 0 ? '0%' : newAccounts.toLocaleString()}`,
     },
     {
       Icon: Transactions,
@@ -131,12 +129,12 @@ const HomeDataCards: React.FC<IDataCards> = ({
     }, statisticsWatcherTimeout);
 
     const cardWatcher = setInterval(async () => {
+      // case 0:
       const accountsCall = new Promise<IAccountResponse>(
         async (resolve, reject) => {
           const res = await api.getCached({
             route: 'address/list',
           });
-
           if (!res.error || res.error === '') {
             resolve(res);
           }
@@ -144,13 +142,12 @@ const HomeDataCards: React.FC<IDataCards> = ({
           reject(res.error);
         },
       );
-
+      // case 1:
       const yesterdayAccountsCall = new Promise<IYesterdayResponse>(
         async (resolve, reject) => {
           const res = await api.getCached({
             route: 'address/list/count/1',
           });
-
           if (!res.error || res.error === '') {
             resolve(res);
           }
@@ -158,13 +155,12 @@ const HomeDataCards: React.FC<IDataCards> = ({
           reject(res.error);
         },
       );
-
+      // case 2:
       const transactionsCall = new Promise<ITransactionResponse>(
         async (resolve, reject) => {
           const res = await api.getCached({
             route: 'transaction/list',
           });
-
           if (!res.error || res.error === '') {
             resolve(res);
           }
@@ -188,6 +184,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
       //   },
       // );
 
+      // case 3:
       //TODO: Remove this when the API is fixed
       const yesterdayTransactionsCall = new Promise<IAccountResponse>(
         async (resolve, reject) => {
@@ -196,7 +193,6 @@ const HomeDataCards: React.FC<IDataCards> = ({
               new Date().getTime() - 86400000
             }&enddate=${new Date().getTime()}`,
           });
-
           if (!res.error || res.error === '') {
             resolve(res);
           }
@@ -272,7 +268,6 @@ const HomeDataCards: React.FC<IDataCards> = ({
     progress: any;
     value: string | number;
   }> = ({ progress, value }) => {
-    const [show, setShow] = useState(false);
     if (progress) {
       return (
         <Percentage>

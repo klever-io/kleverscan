@@ -1,6 +1,6 @@
 import Table, { ITable } from '@/components/Table';
 import React from 'react';
-import Title from '../Title';
+import Title from '../Layout/Title';
 import { Container, Header, Input, TableContainer } from './styles';
 
 interface IDetail {

@@ -56,6 +56,39 @@ export const CoinTest = [
   },
 ];
 
+export const assetsData = {
+  klv: {
+    prices: {
+      todaysPrice: null,
+      yesterdayPrice: null,
+      variation: null,
+    },
+    staking: {
+      totalStaking: 10000000000000,
+      dayBeforeTotalStaking: 5000000000000,
+    },
+    volume: null,
+    circulatingSupply: null,
+    estimatedAprYesterday: 5.5,
+    estimatedAprBeforeYesterday: 5.6,
+  },
+  kfi: {
+    prices: {
+      todaysPrice: null,
+      yesterdayPrice: null,
+      variation: null,
+    },
+    staking: {
+      totalStaking: 10000000000000,
+      dayBeforeTotalStaking: 5000000000000,
+    },
+    volume: null,
+    circulatingSupply: null,
+    estimatedAprYesterday: 5.5,
+    estimatedAprBeforeYesterday: 5.6,
+  },
+};
+
 export const mockTxItem: ITransaction = {
   chainID: '10020',
   blockNum: 123,
@@ -71,6 +104,9 @@ export const mockTxItem: ITransaction = {
   receipts: [
     {
       assetId: 'KLV',
+      type: 0,
+      amount: '3000000',
+      from: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jquca668',
     },
   ],
   hash: 'a632bece34e0716fc465113e418f31911425783ea70624cb1555506225beeb4b',
@@ -332,35 +368,6 @@ export const mockedTxContractComponents = {
   },
 };
 
-const assetsData = {
-  klv: {
-    prices: {
-      todaysPrice: null,
-      yesterdayPrice: null,
-      variation: null,
-    },
-    staking: {
-      totalStaking: null,
-      dayBeforeTotalStaking: null,
-    },
-    volume: null,
-    circulatingSupply: null,
-  },
-  kfi: {
-    prices: {
-      todaysPrice: null,
-      yesterdayPrice: null,
-      variation: null,
-    },
-    staking: {
-      totalStaking: null,
-      dayBeforeTotalStaking: null,
-    },
-    volume: null,
-    circulatingSupply: null,
-  },
-};
-
 export const mockedHomeDataCards: IDataCards = {
   totalAccounts: 100,
   totalTransactions: 20000,
@@ -480,8 +487,16 @@ export const mockedHomeDataCards: IDataCards = {
   beforeYesterdayTransactions: 10,
 };
 
-export const mockedMetrics =
-  'klv_slot_at_epoch_start{chainID="100015"} 486155\nklv_slots_per_epoch{chainID="100015"} 150\nklv_current_slot{chainID="100015"} 486191\nklv_slot_duration{chainID="100015"} 4000';
+export const mockedMetrics = {
+  data: {
+    overview: {
+      slotAtEpochStart: 486155,
+      slotsPerEpoch: 150,
+      currentSlot: 486191,
+      slotDuration: 4000,
+    },
+  },
+};
 
 export const mockedStatistics = {
   data: {
@@ -496,38 +511,46 @@ export const mockedStatistics = {
 };
 
 export const mockedNewAccountsCall = {
-  yesterdayAccounts: {
-    data: {
-      number_by_day: [
-        {
-          doc_count: 33,
-        },
-      ],
-    },
+  data: {
+    number_by_day: [
+      {
+        doc_count: 33,
+      },
+    ],
   },
+
   error: '',
 };
 
 export const mockedTransactionsCall = {
-  transactions: {
-    pagination: {
-      totalRecords: 22,
-    },
+  data: {
+    transactions: {},
+  },
+  pagination: {
+    totalRecords: 23,
   },
   error: '',
 };
 
 export const mockedYesterdayTxCall = {
-  yesterdayTransactions: {
-    data: {
-      number_by_day: [
-        {
-          doc_count: 444,
-        },
-      ],
-    },
+  //TODO: Remove this when the API is fixed and probably change to comment below
+  data: {
+    transactions: {},
+  },
+  pagination: {
+    totalRecords: 23,
   },
   error: '',
+  // yesterdayTransactions: {
+  //   data: {
+  //     number_by_day: [
+  //       {
+  //         doc_count: 444,
+  //       },
+  //     ],
+  //   },
+  // },
+  // error: '',
 };
 export const klvAsset: IAsset = {
   assetType: '',
@@ -594,6 +617,58 @@ export const mockedHolders: IAccountAsset[] = [
       epoch: 0,
     },
   },
+  {
+    address: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+    assetId: 'KLV',
+    assetType: EnumAssetType.Fungible,
+    balance: 10000000000000,
+    precision: 6,
+    frozenBalance: 10000000000000,
+    unfrozenBalance: 0,
+    lastClaim: {
+      timestamp: 0,
+      epoch: 0,
+    },
+  },
+  {
+    address: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+    assetId: 'KLV',
+    assetType: EnumAssetType.Fungible,
+    balance: 10000000000000,
+    precision: 6,
+    frozenBalance: 10000000000000,
+    unfrozenBalance: 0,
+    lastClaim: {
+      timestamp: 0,
+      epoch: 0,
+    },
+  },
+  {
+    address: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+    assetId: 'KLV',
+    assetType: EnumAssetType.Fungible,
+    balance: 10000000000000,
+    precision: 6,
+    frozenBalance: 10000000000000,
+    unfrozenBalance: 0,
+    lastClaim: {
+      timestamp: 0,
+      epoch: 0,
+    },
+  },
+  {
+    address: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+    assetId: 'KLV',
+    assetType: EnumAssetType.Fungible,
+    balance: 10000000000000,
+    precision: 6,
+    frozenBalance: 10000000000000,
+    unfrozenBalance: 0,
+    lastClaim: {
+      timestamp: 0,
+      epoch: 0,
+    },
+  },
 ];
 
 export const mockedTransactions = [
@@ -601,6 +676,8 @@ export const mockedTransactions = [
     hash: '9854s785a325fc96520aa8c1d61669944113995dc67038a6d1beafas52147895',
     blockNum: 36552,
     timestamp: Date.now(),
+    kAppFee: 1000000,
+    bandwidthFee: 1000000,
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
     contract: [
       {
@@ -623,6 +700,8 @@ export const mockedTransactions = [
   {
     hash: '9854s785a325fc96520aa8c1d61669944113995dc67038a6d1beafs358a66587',
     blockNum: 45245,
+    kAppFee: 1000000,
+    bandwidthFee: 1000000,
     timestamp: Date.now(),
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
     contract: [
@@ -656,6 +735,8 @@ export const mockedTransactions = [
   {
     hash: '9854s785a325fc96520aa8c1d61669944113995dc67038a6d1beaf452s364863',
     blockNum: '',
+    kAppFee: 1000000,
+    bandwidthFee: 1000000,
     timestamp: Date.now(),
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
     contract: [

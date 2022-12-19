@@ -46,6 +46,7 @@ export interface ICollectionList {
   precision?: number;
   buckets?: any[];
   minEpochsToWithdraw?: number | null;
+  ownerAddress?: string;
 }
 
 export interface IKAssets {
@@ -58,14 +59,17 @@ export interface IKAssets {
 
 export interface ICreateAssetReceipt {
   assetId: string;
+  type: number;
 }
 
 export interface IFreezeReceipt {
   bucketId: string;
+  type: number;
 }
 
 export interface IUnfreezeReceipt {
   availableEpoch: number;
+  type: number;
 }
 
 export interface IBuyReceipt {
@@ -76,11 +80,19 @@ export interface IBuyReceipt {
   value?: number;
 }
 
+export interface IWithdrawReceipt {
+  type: number;
+  amount: string;
+  assetId: string;
+  from: string;
+}
+
 export type IReceipt =
   | ICreateAssetReceipt
   | IFreezeReceipt
   | IUnfreezeReceipt
-  | IBuyReceipt;
+  | IBuyReceipt
+  | IWithdrawReceipt;
 
 export interface ITransaction {
   hash: string;
@@ -683,7 +695,9 @@ export interface IOffset {
   bottom?: number;
 }
 
+export type Place = 'top' | 'right' | 'bottom' | 'left';
+
 export interface ICustomStyles {
   offset?: IOffset;
-  place?: 'top' | 'right' | 'bottom' | 'left';
+  place?: Place;
 }

@@ -1,6 +1,5 @@
 import { screen } from '@testing-library/react';
 import React from 'react';
-import theme from '../../styles/theme';
 import { mockHomeTxs } from '../../test/mocks';
 import { renderWithTheme } from '../../test/utils';
 import HomeTransactions from './';
@@ -21,7 +20,7 @@ describe('Component: HomeTransactions', () => {
     ).container;
   });
   it("Should render the Title and the empty component when don't have any transaction", () => {
-    const emptyElement = screen.getByText(/Oops! Apparently no data here./i);
+    const emptyElement = screen.getByText(/EmptyData/i);
     const link = screen.getByRole('heading');
     expect(emptyElement).toBeInTheDocument();
     expect(link).toBeInTheDocument();
@@ -30,19 +29,16 @@ describe('Component: HomeTransactions', () => {
   it('Should render the Chart container with the day(s)', () => {
     const dailyTx = screen.getByText(/Daily Transactions/i);
     expect(dailyTx.parentNode).toBeInTheDocument();
-    expect(dailyTx.nextSibling).toHaveTextContent(
-      `(${mockHomeTxs.transactionsList.length} days)`,
-    );
+    expect(dailyTx.nextSibling).toHaveTextContent('1D7D15D1M');
   });
 
   it('Should match the style for TransactionContent and TransactionEmpty', () => {
-    const txContent = screen.getByText(/Oops! Apparently no data here./i)
-      .parentNode?.parentNode;
+    const txContent = screen.getByText(/EmptyData/i).parentNode?.parentNode;
     const txContentStyle = {
       maxHeight: '27.5rem',
-      minWidth: 'fit-content',
+      overflowY: 'auto',
       padding: '1.5rem',
-      backgroundColor: theme.white,
+      minWidth: 'calc(50% - 0.5rem)',
     };
     const txEmpty = txContent?.firstChild;
     const txEmptyStyle = {

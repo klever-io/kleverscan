@@ -4,11 +4,7 @@ import React from 'react';
 import { mockedTransactions } from '../../../test/mocks';
 import { renderWithTheme } from '../../../test/utils';
 import { IInnerTableProps } from '../../../types';
-import {
-  capitalizeString,
-  formatAmount,
-  parseAddress,
-} from '../../../utils/index';
+import { capitalizeString, parseAddress } from '../../../utils/index';
 import Transaction from './';
 
 const precision = 6;
@@ -75,7 +71,8 @@ describe('Component: Tabs/Transactions', () => {
       'To',
       'Status',
       'Contract',
-      'Amount',
+      'kApp Fee',
+      'Bandwidth Fee',
     ];
     const hash = screen.getByRole('link', {
       name: parseAddress(mockedTransactions[0].hash, 24),
@@ -98,7 +95,7 @@ describe('Component: Tabs/Transactions', () => {
     expect(tableBody).toHaveStyle(tableBodyStyle);
   });
 
-  it('Should render the correct values for "Hash", "Block", "Created", "From", "To", "Status", "Contract and "Amount"', async () => {
+  it('Should render the correct values for "Hash", "Block", "Created", "From", "To", "Status", "Contract", "kApp Fee", "Bandwidth Fee"', async () => {
     await act(async () => {
       renderWithTheme(
         <Transaction
@@ -154,16 +151,12 @@ describe('Component: Tabs/Transactions', () => {
       );
     });
 
-    const { parameter } = mockedTransactions[2].contract[0] as any;
     const multiContract = screen.getByText(/Multi Contract/i);
     const blockNum = screen.getByRole('link', {
       name: parseAddress(mockedTransactions[2].hash, 24),
     }).parentNode?.parentNode?.nextSibling?.childNodes[1];
-    const formatedAmount = formatAmount(parameter?.amount / 10 ** 6);
-    const amount = screen.getByText(formatedAmount);
 
     expect(multiContract).toBeInTheDocument();
-    expect(amount).toBeInTheDocument();
     expect(blockNum).toBeInTheDocument();
     expect(blockNum).toHaveTextContent('0');
   });

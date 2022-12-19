@@ -454,7 +454,11 @@ const Asset: React.FC<IAssetPage> = ({
                     </div>
                     <div>
                       <strong>Transfer Fixed</strong>
-                      <p>{royalties.transferFixed || '--'}</p>
+                      <p>
+                        {royalties.transferFixed
+                          ? royalties.transferFixed / 10 ** 6
+                          : '--'}
+                      </p>
                     </div>
                     {royalties.transferPercentage ? (
                       royalties.transferPercentage.map(

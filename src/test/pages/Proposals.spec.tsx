@@ -53,9 +53,7 @@ describe('test proposals page', () => {
     (api.get as jest.Mock)
       .mockReturnValueOnce(networkParametersMock) // first call on ssr
       .mockReturnValueOnce(mockedProposalsList) // second call on ssr
-      .mockReturnValueOnce(mockedProposalsList) // third, fourth and fifth calls are when proposal tab is clicked, (it generates 3 repeated calls simultaneously TODO: FIX THIS)
-      .mockReturnValueOnce(mockedProposalsList)
-      .mockReturnValueOnce(mockedProposalsList)
+      .mockReturnValueOnce(mockedProposalsList) // third and fourth are when proposal tab is clicked, (it generates 3 repeated calls simultaneously TODO: FIX THIS)
       .mockReturnValueOnce(mockedProposalsListPage2); // last call is when paginate to page 2, no repeated calls are generated
     const getServerSidePropsCopy = getServerSideProps as any;
     const { props } = (await getServerSidePropsCopy({})) as any;
@@ -76,7 +74,6 @@ describe('test proposals page', () => {
     await act(async () => {
       fireEvent.click(proposalsTab);
     });
-
     expect(networkParamsTabProof).not.toBeInTheDocument();
     proposalsTabProof = screen.queryAllByText('ApprovedProposal');
     expect(proposalsTabProof.length).toEqual(3);

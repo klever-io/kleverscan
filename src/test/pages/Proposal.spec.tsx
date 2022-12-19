@@ -37,11 +37,9 @@ describe('test proposal details page', () => {
       .mockReturnValueOnce(getMockedProposal(0))
       .mockReturnValueOnce(networkParametersMock)
       .mockReturnValueOnce(overViewParametersMock)
-      .mockReturnValueOnce(getMockedProposal(0))
-      .mockReturnValueOnce(getMockedProposal(0))
       .mockReturnValueOnce(getMockedProposal(0));
 
-    const { props } = (await getServerSideProps({})) as any;
+    const { props } = (await getServerSideProps({} as any)) as any;
 
     // load page:
     await act(async () => {
@@ -159,11 +157,9 @@ describe('test proposal details page', () => {
       .mockReturnValueOnce(getMockedProposal(7))
       .mockReturnValueOnce(networkParametersMock)
       .mockReturnValueOnce(overViewParametersMock)
-      .mockReturnValueOnce(getMockedProposal(7))
-      .mockReturnValueOnce(getMockedProposal(7))
       .mockReturnValueOnce(getMockedProposal(7));
 
-    const { props } = (await getServerSideProps({})) as any;
+    const { props } = (await getServerSideProps({} as any)) as any;
 
     await act(async () => {
       renderWithTheme(<ProposalDetails {...props} />);
@@ -276,11 +272,9 @@ describe('test proposal details page', () => {
       .mockReturnValueOnce(getMockedProposal(0))
       .mockReturnValueOnce(networkParametersMock)
       .mockReturnValueOnce(overViewParametersMock)
-      .mockReturnValueOnce(getMockedProposal(0))
-      .mockReturnValueOnce(getMockedProposal(0))
       .mockReturnValueOnce(getMockedProposal(0));
 
-    const { props } = (await getServerSideProps({})) as any;
+    const { props } = (await getServerSideProps({} as any)) as any;
     await act(async () => {
       renderWithTheme(<ProposalDetails {...props} />);
     });
@@ -702,7 +696,7 @@ describe('test proposal details page', () => {
       .mockReturnValueOnce(getMockedProposal(0))
       .mockReturnValueOnce(getMockedProposal(0));
 
-    const props = await getServerSideProps({});
+    const props = await getServerSideProps({} as any);
 
     expect(props).toStrictEqual(parsedProposalResult);
   });

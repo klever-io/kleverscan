@@ -62,6 +62,8 @@ import {
   Header,
   Hr,
   Input,
+  KappFeeFailedTx,
+  KappFeeSpan,
   Row,
 } from '@/views/transactions/detail';
 import { ReceiveBackground } from '@/views/validator';
@@ -367,7 +369,25 @@ const Transaction: React.FC<ITransactionPage> = props => {
   const rawTxTheme = {
     height: '30rem',
     color: isDarkTheme ? 'white' : 'black',
-    backgroundColor: isDarkTheme ? '#0B0B1E' : 'white',
+    backgroundColor: isDarkTheme ? '#181935' : 'white',
+  };
+
+  const KappFeeRow: React.FC = () => {
+    if (status === 'fail') {
+      return (
+        <KappFeeSpan>
+          <KappFeeFailedTx>
+            {toLocaleFixed(transaction.kAppFee / 1000000, 6)}
+          </KappFeeFailedTx>
+          <span>Value not charged on failed transactions</span>
+        </KappFeeSpan>
+      );
+    }
+    return (
+      <span>
+        <p>{toLocaleFixed(kAppFee / 1000000, 6)}</p>
+      </span>
+    );
   };
 
   return (
@@ -458,11 +478,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
             <span>
               <strong>kApp Fee</strong>
             </span>
-            <span>
-              <p>
-                {toLocaleFixed(status === 'success' ? kAppFee / 1000000 : 0, 6)}
-              </p>
-            </span>
+            <KappFeeRow />
           </Row>
           <Row>
             <span>

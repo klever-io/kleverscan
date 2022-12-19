@@ -20,6 +20,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import ConfirmPayload from '../ConfirmPayload';
 import Copy from '../Copy';
 import PackInfoForm from '../CustomForm/PackInfo';
 import ParametersForm from '../CustomForm/Parameters';
@@ -80,6 +81,9 @@ const Contract: React.FC<IContract> = ({
   const [typeAssetTrigger, setTypeAssetTrigger] = useState<number | null>(null);
   const [data, setData] = useState('');
   const [isMultisig, setIsMultisig] = useState(false);
+  const [showPayload, setShowPayload] = useState(false);
+  const [payload, setPayload] = useState<any>({});
+  const [open, setOpen] = useState(false);
   const [bucketsCollection, setBucketsCollection] = useState<any>([]);
   const [bucketsList, setBucketsList] = useState<any>([]);
   const [selectedBucket, setSelectedBucket] = useState('');
@@ -288,34 +292,33 @@ const Contract: React.FC<IContract> = ({
     }
   };
 
-  const handleSubmit = async (contractValues: any) => {
-    const parsedValues: any = parseValues(
-      contractValues,
-      contractType,
-      typeAssetTrigger,
-      claimType,
-      assetID,
-      collection,
-      selectedBucket,
-      proposalId,
-      tokenChosen,
-      ITOBuy,
-      binaryOperations,
-    );
+  const parsePackInfo = (values: any) => {
+    const parsedValues = JSON.parse(JSON.stringify(values));
 
-    if (parsedValues.amount === 0) {
-      toast.error('Amount cannot be 0');
-      return;
-    }
+    delete parsedValues.pack;
 
+    const packInfo: {
+      [key: string]: any;
+    } = {};
+    values.pack.forEach((item: any) => {
+      const itemContent = {
+        packs: item.packItem,
+      };
+      if (item.packCurrencyID) {
+        packInfo[item.packCurrencyID] = itemContent;
+      } else {
+        packInfo['KLV'] = itemContent;
+      }
+    });
+
+    parsedValues.packInfo = packInfo;
+
+    return parsedValues;
+  };
+
+  const formSend = async (parsedPayload: any) => {
     setLoading(true);
-
     const parsedData = Buffer.from(data, 'utf-8').toString('base64');
-
-    const payload = {
-      ...parsedValues,
-    };
-    const parsedPayload = await precisionParse(payload, contractType);
     try {
       const unsignedTx = await core.buildTransaction(
         [
@@ -354,12 +357,57 @@ const Contract: React.FC<IContract> = ({
     }
   };
 
+  const handleSubmit = async (contractValues: any) => {
+    const parsedValues: any = parseValues(
+      contractValues,
+      contractType,
+      typeAssetTrigger,
+      claimType,
+      assetID,
+      collection,
+      selectedBucket,
+      proposalId,
+      tokenChosen,
+      ITOBuy,
+      binaryOperations,
+    );
+
+    if (parsedValues.amount === 0) {
+      toast.error('Amount cannot be 0');
+      return;
+    }
+
+    const payload = {
+      ...parsedValues,
+    };
+    let parsedPayload = await precisionParse(payload, contractType);
+    console.log(parsedPayload);
+    if (contractType === 'ConfigITOContract' && parsedPayload?.pack) {
+      parsedPayload = parsePackInfo(parsedPayload);
+    }
+    if (showPayload) {
+      setOpen(true);
+      setPayload({
+        type: contractType,
+        payload: parsedPayload,
+      });
+    } else {
+      formSend(parsedPayload);
+    }
+  };
+
+  const handleSend = async () => {
+    await formSend(payload.payload);
+    setOpen(false);
+  };
   const formProps = {
     sections: formSections,
     onSubmit: handleSubmit,
     loading,
     setData,
     setIsMultisig,
+    setShowPayload,
+    showPayload,
     isMultisig,
   };
 
@@ -505,7 +553,7 @@ const Contract: React.FC<IContract> = ({
 
   const KDASelect = () => (
     <SelectContainer>
-      <SelectContent>
+      <SelectContent configITO={contractType === 'ConfigITOContract'}>
         <BalanceContainer>
           <FieldLabel>Select an asset/collection</FieldLabel>
           {!isNaN(Number(assetBalance)) && assetBalance !== null && (
@@ -514,12 +562,12 @@ const Contract: React.FC<IContract> = ({
             </BalanceLabel>
           )}
         </BalanceContainer>
-
         <Select
           options={getAssetsList(
             contractType === 'AssetTriggerContract' ? kAssets : assetsList,
             contractType,
             typeAssetTrigger,
+            ownerAddress,
           )}
           onChange={value => {
             setCollection(value);
@@ -531,15 +579,17 @@ const Contract: React.FC<IContract> = ({
         />
       </SelectContent>
 
-      {collection?.isNFT && showAssetIDInput(contractType, typeAssetTrigger) && (
-        <SelectContent>
-          <FieldLabel>Asset ID</FieldLabel>
-          <AssetIDInput
-            type="number"
-            onChange={e => (assetID = Number(e.target.value))}
-          />
-        </SelectContent>
-      )}
+      {collection?.isNFT &&
+        contractType !== 'ConfigITOContract' &&
+        showAssetIDInput(contractType, typeAssetTrigger) && (
+          <SelectContent>
+            <FieldLabel>Asset ID</FieldLabel>
+            <AssetIDInput
+              type="number"
+              onChange={e => (assetID = Number(e.target.value))}
+            />
+          </SelectContent>
+        )}
     </SelectContainer>
   );
 
@@ -611,11 +661,21 @@ const Contract: React.FC<IContract> = ({
 
   return (
     <Container loading={loading ? loading : undefined}>
+      {open && (
+        <ConfirmPayload
+          payload={payload}
+          closeModal={() => setOpen(false)}
+          handleConfirm={handleSend}
+        />
+      )}
       {txHash && hashComponent()}
-
       <Select
         options={contractOptions}
-        onChange={handleOption}
+        onChange={contractType => {
+          handleOption(contractType);
+          setIsMultisig(false);
+          setShowPayload(false);
+        }}
         getAssets={getAssets}
         title={'Contract'}
         precedence={1}

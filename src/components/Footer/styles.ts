@@ -14,7 +14,7 @@ export const Content = styled.div`
 
   flex-direction: row;
   gap: 5rem;
-
+  border-top: 1px solid ${props => props.theme.footer.border};
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 5rem 3rem;
 

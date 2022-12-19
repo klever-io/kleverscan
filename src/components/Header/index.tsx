@@ -4,10 +4,11 @@ import { useMobile } from '@/contexts/mobile';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ConnectWallet from './ConnectWallet';
 import OptionsContainer from './OptionsContainer';
 import {
+  ConnectContainer,
   Container,
   Content,
   DesktopContainer,
@@ -126,6 +127,7 @@ export const MobileNavbarItem: React.FC<INavbarItem> = ({
 const Navbar: React.FC = () => {
   const { mobileNavbarRef, closeMenu, handleMenu, isMobile, mobileMenuOpen } =
     useMobile();
+  const [openDrawer, setOpenDrawer] = useState(false);
   const prevScrollpos = useRef<number>(0);
   const { extensionInstalled } = useExtension();
 
@@ -145,7 +147,17 @@ const Navbar: React.FC = () => {
     }
     prevScrollpos.current = currentScrollPos;
   };
+  const handleClickConnection = () => {
+    if (openDrawer) {
+      setOpenDrawer(false);
+    } else {
+      setOpenDrawer(true);
+    }
+  };
 
+  const closeDrawer = () => {
+    setOpenDrawer(false);
+  };
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (isMobile) {
@@ -161,7 +173,6 @@ const Navbar: React.FC = () => {
       }
     };
   }, [isMobile]);
-
   return (
     <>
       <Container ref={mobileNavbarRef}>
@@ -186,24 +197,39 @@ const Navbar: React.FC = () => {
               ))}
             </IconsMenu>
             <NavBarOptionsContainer>
-              <ConnectWallet />
-              {!extensionInstalled && <OptionsContainer />}
+              <ConnectWallet
+                clickConnection={() => {
+                  openDrawer;
+                }}
+              />
+              <OptionsContainer />
             </NavBarOptionsContainer>
           </DesktopContainer>
 
           <MobileContainer>
+            <ConnectContainer
+              onClick={() => {
+                handleClickConnection();
+                closeMenu();
+              }}
+            >
+              <ConnectWallet clickConnection={closeDrawer} />
+            </ConnectContainer>
             <MenuIcon onClick={handleMenu} />
           </MobileContainer>
         </Content>
       </Container>
 
       <MobileBackground
-        onClick={closeMenu}
+        onClick={() => {
+          closeMenu();
+          setOpenDrawer(false);
+        }}
         onTouchStart={closeMenu}
         opened={mobileMenuOpen}
       />
 
-      <MobileContent opened={mobileMenuOpen}>
+      <MobileContent opened={mobileMenuOpen} isOpenDrawer={openDrawer}>
         <MobileOptions>
           <OptionsContainer />
         </MobileOptions>
@@ -216,8 +242,6 @@ const Navbar: React.FC = () => {
             />
           ))}
         </MobileNavbarItemList>
-
-        <ConnectWallet />
       </MobileContent>
     </>
   );

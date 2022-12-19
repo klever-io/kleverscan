@@ -7,8 +7,8 @@ const theme = {
   borderLogo: '#ccc',
 
   border: '#eeeff6',
-  green: 'green',
-  red: '#FF4465',
+  green: '#4EBC87',
+  red: '#F84960',
   rose: '#EE3F71',
   purple: '#7D3FF1',
   violet: '#aa33b5',
@@ -16,7 +16,7 @@ const theme = {
   lightGray: '#C6C7EB',
   lightBlue: '#585A92',
   error: '#9E1313',
-  darkText: '#7B7DB2',
+  darkText: '#515395',
   secondaryText: '#595C98',
   shadow: '#DDDEE7',
 
@@ -26,9 +26,15 @@ const theme = {
   },
 
   status: {
+    warning: '#FFE380',
+    information: '#1890FF',
     done: '#58925A',
     error: '#AA4247', //
     pending: '#9D9932', //
+  },
+
+  line: {
+    border: '#36374F',
   },
 
   form: {
@@ -49,13 +55,15 @@ const theme = {
     background: '#0B0B1E',
     socialBorder: '#2c3041',
     text: '#9b9dd1',
+    border: '#181935',
   },
 
   input: {
     placeholder: '#9c9eb9',
     activeShadow: '#7418c2',
+    dateFilter: '#181935',
     border: {
-      home: '#585a92',
+      home: '#030307',
     },
   },
 
@@ -66,7 +74,7 @@ const theme = {
     secondaryText: '#595C98',
     darkText: '#7B7DB2',
 
-    border: '#EBF1F7',
+    border: '#C6C7EB',
     green: '#86EF75',
     red: '#FF4465',
     assetText: '#27284E',
@@ -98,7 +106,10 @@ const theme = {
   },
 
   text: {
+    moonLight: '#515395',
+    midNight: '#0B0B1E',
     black: '#2e2f47',
+    twilight: '#222345',
     background: 'linear-gradient(104deg, rgb(238, 63, 113), rgb(125, 63, 241))',
     largeBackground:
       'linear-gradient(104deg, rgb(238, 63, 113), rgb(125, 63, 241), rgb(125, 63, 241), rgb(238, 63, 113))',
@@ -106,7 +117,7 @@ const theme = {
 
   table: {
     text: '#7B7DB2',
-    success: '#37DD72',
+    success: '#4EBC87',
     pending: '#FFB342',
     fail: '#FF4465',
     icon: '#9c9eb8',

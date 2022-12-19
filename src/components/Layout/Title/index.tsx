@@ -1,4 +1,4 @@
-import router from 'next/router';
+import { useRouter } from 'next/router';
 import { Container, StyledArrow } from './styles';
 
 interface ITitle {
@@ -9,6 +9,7 @@ interface ITitle {
 }
 
 const Title: React.FC<ITitle> = ({ title, Icon, route, Component }) => {
+  const router = useRouter();
   return (
     <Container>
       <div onClick={() => router.push(route ? route : '/')}>

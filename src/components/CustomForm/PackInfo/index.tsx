@@ -1,11 +1,11 @@
+import FormInput from '@/components/Form/FormInput';
 import { InfoIcon, TooltipContainer } from '@/components/Form/FormInput/styles';
-import { Scope } from '@unform/core';
-import FormInput from 'components/Form/FormInput';
 import {
   ButtonContainer,
   FormSection,
   SectionTitle,
-} from 'components/Form/styles';
+} from '@/components/Form/styles';
+import { Scope } from '@unform/core';
 import { useState } from 'react';
 
 const PackInfoForm: React.FC = () => {

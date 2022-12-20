@@ -1,5 +1,5 @@
+import { description } from '@/configs/footer';
 import { useField } from '@unform/core';
-import { description } from 'configs/footer';
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {

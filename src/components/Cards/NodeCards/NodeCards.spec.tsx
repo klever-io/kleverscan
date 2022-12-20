@@ -47,7 +47,7 @@ describe('Componenet: NodeCards', () => {
     renderWithTheme(<NodeCards cardData={mockCardData} />);
 
     await waitFor(async () => {
-      const timeAgo = screen.getAllByText(/1 sec ago/i);
+      const timeAgo = screen.getAllByText(/sec ago/i);
       const totalNodes = timeAgo[0].previousSibling;
       const mostNodes = timeAgo[1].previousSibling;
       const chart = totalNodes?.parentNode?.nextSibling;

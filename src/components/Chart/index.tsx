@@ -18,10 +18,23 @@ interface IChart {
   data: any;
   value?: string;
   value2?: string;
+  hasTooltip?: boolean;
+  yAxis?: boolean;
+  strokeWidth?: number;
+  height?: string;
 }
 
-const Chart: React.FC<IChart> = ({ type, data, value, value2 }) => {
-  const props = { data };
+const Chart: React.FC<IChart> = ({
+  type,
+  data,
+  value,
+  value2,
+  hasTooltip = false,
+  yAxis,
+  strokeWidth,
+  height,
+}) => {
+  const props = { data, hasTooltip, yAxis, strokeWidth, height };
 
   switch (type) {
     case ChartType.Area:

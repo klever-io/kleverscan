@@ -1,10 +1,11 @@
 import { INavbarItem, navbarItems } from '@/configs/navbar';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
+import { useScroll } from '@/utils/hooks';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import ConnectWallet from './ConnectWallet';
 import OptionsContainer from './OptionsContainer';
 import {
@@ -158,21 +159,9 @@ const Navbar: React.FC = () => {
   const closeDrawer = () => {
     setOpenDrawer(false);
   };
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (isMobile) {
-        window.addEventListener('scroll', handleMobileScroll);
-      } else {
-        window.removeEventListener('scroll', handleMobileScroll);
-      }
-    }
 
-    return () => {
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('scroll', handleMobileScroll);
-      }
-    };
-  }, [isMobile]);
+  useScroll(isMobile, handleMobileScroll);
+
   return (
     <>
       <Container ref={mobileNavbarRef}>

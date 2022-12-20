@@ -24,7 +24,7 @@ export const Container = styled.div`
   transition: top 0.1s linear;
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding: 1rem 2.5rem;
+    padding: 1rem 1.5rem;
 
     overflow: hidden;
 
@@ -179,6 +179,7 @@ export const MobileContainer = styled.div`
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: flex;
     align-items: center;
+    gap: 1rem;
   }
 `;
 
@@ -331,7 +332,10 @@ export const DropdownIcon = styled(MdArrowDropDown)`
 export const MenuIcon = styled(FiMenu).attrs(props => ({
   color: props.theme.navbar.text,
   size: 25,
-}))``;
+}))`
+  box-sizing: content-box;
+  padding: 0.25rem 0.5rem;
+`;
 
 export const ConnectContainer = styled.div`
   display: flex;

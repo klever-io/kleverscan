@@ -177,7 +177,7 @@ describe('Component: TransactionContractComponents', () => {
   });
 
   describe('When contract is "CreateValidator"', () => {
-    it('Should render "Owner" with the link, "Can delegate", "Comission", "Max Delegation Amount" and "Reward" with all it\'s values', () => {
+    it('Should render "Owner" with the link, "Can delegate", "Commission", "Max Delegation Amount" and "Reward" with all it\'s values', () => {
       renderWithTheme(
         <CreateValidator
           {...mockedTxContractComponents.createValidatorContract}
@@ -192,7 +192,7 @@ describe('Component: TransactionContractComponents', () => {
         name: parameter.ownerAddress,
       })[0];
       const canDelegate = screen.getByText(/Can Delegate/i);
-      const comission = screen.getByText(/Comission/i);
+      const comission = screen.getByText(/Commission/i);
       const maxDelegationAmount = screen.getByText(/Max Delegation/i);
       const reward = screen.getByText(/Reward/i);
       const rewardLink = screen.getAllByRole('link', {
@@ -525,9 +525,9 @@ describe('Component: TransactionContractComponents', () => {
       const currencyID = screen.getByText(/KLV/i);
 
       await waitFor(() => {
-        const amount = screen.getByText('320');
+        const amount = screen.getByText('320.000000');
         expect(amount).toBeInTheDocument();
-        const price = screen.getByText('20');
+        const price = screen.getByText('20.000000');
         expect(price).toBeInTheDocument();
       });
       expect(buyType).toBeInTheDocument();

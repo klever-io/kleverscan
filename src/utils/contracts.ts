@@ -1,13 +1,20 @@
-import { getPrecision } from '@/components/Contract/utils';
 import {
   Contract,
   ContractsIndex,
+  IBuyContract,
   IContract,
   IContractOption,
 } from '@/types/contracts';
 import { format, fromUnixTime } from 'date-fns';
 import { NextRouter } from 'next/router';
-import { IRowSection, ITransaction } from '../types';
+import {
+  getAmountFromReceipts,
+  getAssetBought,
+  getBuyAmount,
+  getBuyPrice,
+} from '.';
+import { IBuyReceipt, IReceipt, IRowSection, ITransaction } from '../types';
+import { findReceipt } from './findKey';
 import {
   AssetTriggerSections,
   BuySections,
@@ -268,6 +275,7 @@ export const contractsList = [
 export const filteredSections = (
   contract: IContract[],
   contractType: string,
+  receipts: IReceipt[],
 ): IRowSection[] => {
   switch (contractType) {
     case Contract.Transfer:
@@ -289,7 +297,7 @@ export const filteredSections = (
     case Contract.Withdraw:
       return WithdrawSections(contract[0].parameter);
     case Contract.Claim:
-      return ClaimSections(contract[0].parameter);
+      return ClaimSections(contract[0].parameter, receipts);
     case Contract.Unjail:
       return UnjailSections(contract[0].parameter);
     case Contract.AssetTrigger:
@@ -357,6 +365,9 @@ export enum contractTableHeaders {
   'Permission Name',
   'Deposit Type',
   'Id',
+  'Currency Id',
+  'Market Type',
+  'Price',
 }
 
 /**
@@ -365,7 +376,10 @@ export enum contractTableHeaders {
  * @param header is required to do the filter when has filter on router.query
  * @returns return a array of string with the headers based on each contract
  */
-export const getHeader = (router: NextRouter, header: string[]): string[] => {
+export const getHeaderForTable = (
+  router: NextRouter,
+  header: string[],
+): string[] => {
   let newHeaders: string[] = [];
   switch (ContractsIndex[ContractsIndex[Number(router.query.type)]]) {
     case ContractsIndex.Transfer:
@@ -384,7 +398,7 @@ export const getHeader = (router: NextRouter, header: string[]): string[] => {
       newHeaders = [contractTableHeaders[7]];
       break;
     case ContractsIndex.Freeze:
-      newHeaders = [contractTableHeaders[1]];
+      newHeaders = [contractTableHeaders[9], contractTableHeaders[1]];
       break;
     case ContractsIndex.Unfreeze:
       newHeaders = [contractTableHeaders[8]];
@@ -399,7 +413,7 @@ export const getHeader = (router: NextRouter, header: string[]): string[] => {
       newHeaders = [contractTableHeaders[9]];
       break;
     case ContractsIndex.Claim:
-      newHeaders = [contractTableHeaders[10]];
+      newHeaders = [contractTableHeaders[10], contractTableHeaders[9]];
       break;
     case ContractsIndex.Unjail:
       break;
@@ -422,10 +436,120 @@ export const getHeader = (router: NextRouter, header: string[]): string[] => {
       newHeaders = [contractTableHeaders[9]];
       break;
     case ContractsIndex.Buy:
-      newHeaders = [contractTableHeaders[14], contractTableHeaders[1]];
+      newHeaders = [contractTableHeaders[14], contractTableHeaders[20]];
       break;
     case ContractsIndex.Sell:
+      newHeaders = [
+        contractTableHeaders[21],
+        contractTableHeaders[20],
+        contractTableHeaders[9],
+      ];
+      break;
+    case ContractsIndex['Cancel Marketplace Order']:
+      newHeaders = [contractTableHeaders[15]];
+      break;
+    case ContractsIndex['Create Marketplace']:
+      newHeaders = [contractTableHeaders[2]];
+      break;
+    case ContractsIndex['Config Marketplace']:
+      newHeaders = [contractTableHeaders[16]];
+      break;
+    case ContractsIndex['Update Account Permission']:
+      newHeaders = [contractTableHeaders[17]];
+      break;
+    case ContractsIndex['Deposit']:
+      newHeaders = [contractTableHeaders[18], contractTableHeaders[19]];
+      break;
+    case ContractsIndex['ITO Trigger']:
+      newHeaders = [contractTableHeaders[17], contractTableHeaders[9]];
+      break;
+  }
+  if (router.query.type) {
+    return header.splice(0, header.length - 2).concat(newHeaders);
+  }
+
+  return header;
+};
+
+export const getHeaderForCSV = (
+  router: NextRouter,
+  header: string[],
+): string[] => {
+  let newHeaders: string[] = [];
+  switch (ContractsIndex[ContractsIndex[Number(router.query.type)]]) {
+    case ContractsIndex.Transfer:
+      newHeaders = [contractTableHeaders[0], contractTableHeaders[1]];
+      break;
+    case ContractsIndex['Create Asset']:
+      newHeaders = [contractTableHeaders[2], contractTableHeaders[3]];
+      break;
+    case ContractsIndex['Create Validator']:
+      newHeaders = [contractTableHeaders[4], contractTableHeaders[5]];
+      break;
+    case ContractsIndex['Config Validator']:
+      newHeaders = [contractTableHeaders[6]];
+      break;
+    case ContractsIndex['Validator Config']:
+      newHeaders = [contractTableHeaders[7]];
+      break;
+    case ContractsIndex.Freeze:
+      newHeaders = [contractTableHeaders[9], contractTableHeaders[1]];
+      break;
+    case ContractsIndex.Unfreeze:
+      newHeaders = [contractTableHeaders[8]];
+      break;
+    case ContractsIndex.Delegate:
+      newHeaders = [contractTableHeaders[8]];
+      break;
+    case ContractsIndex.Undelegate:
+      newHeaders = [contractTableHeaders[8]];
+      break;
+    case ContractsIndex.Withdraw:
+      newHeaders = [contractTableHeaders[9], contractTableHeaders[1]];
+      break;
+    case ContractsIndex.Claim:
+      newHeaders = [
+        contractTableHeaders[10],
+        contractTableHeaders[9],
+        contractTableHeaders[1],
+      ];
+      break;
+    case ContractsIndex.Unjail:
+      break;
+    case ContractsIndex['Asset Trigger']:
+      newHeaders = [contractTableHeaders[11]];
+      break;
+    case ContractsIndex['Set Account Name']:
+      newHeaders = [contractTableHeaders[2]];
+      break;
+    case ContractsIndex.Proposal:
+      newHeaders = [contractTableHeaders[12]];
+      break;
+    case ContractsIndex.Vote:
+      newHeaders = [contractTableHeaders[13], contractTableHeaders[1]];
+      break;
+    case ContractsIndex['Config ITO']:
       newHeaders = [contractTableHeaders[9]];
+      break;
+    case ContractsIndex['Set ITO']:
+      newHeaders = [contractTableHeaders[9]];
+      break;
+    case ContractsIndex.Buy:
+      newHeaders = [
+        contractTableHeaders[14],
+        contractTableHeaders[20],
+        contractTableHeaders[22],
+        contractTableHeaders[1],
+      ];
+      break;
+    case ContractsIndex.Sell:
+      newHeaders = [
+        contractTableHeaders[21],
+        contractTableHeaders[20],
+        contractTableHeaders[9],
+        contractTableHeaders[22],
+        contractTableHeaders[1],
+      ];
       break;
     case ContractsIndex['Cancel Marketplace Order']:
       newHeaders = [contractTableHeaders[15]];
@@ -456,17 +580,20 @@ export const getHeader = (router: NextRouter, header: string[]): string[] => {
 export const getCells = async (
   tableRowData: ITransaction,
   router: NextRouter,
-): Promise<IRowSection[]> => {
+  getContextPrecision: (assetId: string) => Promise<number | void>,
+): Promise<any[]> => {
   const {
     hash,
     blockNum,
     timestamp,
     sender,
     status,
+    receipts,
     contract,
     bandwidthFee,
     kAppFee,
   } = tableRowData;
+
   const parameter = contract[0]?.parameter as any;
   const to = parameter.toAddress || '';
   const typeString = contract[0]?.typeString || '';
@@ -477,7 +604,7 @@ export const getCells = async (
 
   const getParsedAmount = async (assetId: string) => {
     const amount = parameter?.amount ?? '';
-    const precision = (await getPrecision(assetId)) ?? 6;
+    const precision = (await getContextPrecision(assetId)) ?? 6;
     return amount / 10 ** precision;
   };
 
@@ -498,6 +625,20 @@ export const getCells = async (
   // const buyType = contract[0].parameter.buyType || '';
   // const orderID = contract[0].parameter.orderID || '';
 
+  if (contract.length > 1) {
+    return [
+      hash,
+      blockNum,
+      created,
+      sender,
+      '',
+      status,
+      'Multi Contract',
+      parsedkAppFee,
+      parsedbandwidthFee,
+    ];
+  }
+
   if (!router.query.type) {
     cells.push(parsedkAppFee, parsedbandwidthFee);
     return cells;
@@ -506,7 +647,7 @@ export const getCells = async (
   switch (contract[0].typeString) {
     case Contract.Transfer:
       const coin = parameter?.assetId || 'KLV';
-      const asyncAmount = await getParsedAmount(coin);
+      let asyncAmount = await getParsedAmount(coin);
       cells.push(coin, asyncAmount);
       break;
     case Contract.CreateAsset:
@@ -525,7 +666,8 @@ export const getCells = async (
       break;
     case Contract.Freeze:
       let amount = parameter?.amount / 10 ** 6 || '';
-      cells.push(amount);
+      let assetId = parameter?.assetId || 'KLV';
+      cells.push(assetId, amount);
       break;
     case Contract.Unfreeze:
       let bucketID = parameter?.bucketID || '';
@@ -540,12 +682,15 @@ export const getCells = async (
       cells.push(bucketID);
       break;
     case Contract.Withdraw:
-      let assetId = parameter?.assetId || 'KLV';
-      cells.push(assetId);
+      assetId = parameter?.assetId || 'KLV';
+      asyncAmount = await getAmountFromReceipts(assetId, 18, receipts);
+      cells.push(assetId, asyncAmount);
       break;
     case Contract.Claim:
       const claimType = parameter?.claimType || '';
-      cells.push(claimType);
+      assetId = findReceipt(receipts, 0, 17, 'assetId');
+      amount = await getAmountFromReceipts(assetId, 17, receipts);
+      cells.push(claimType, assetId, amount);
       break;
     case Contract.Unjail:
       cells.push(parsedkAppFee, parsedbandwidthFee);
@@ -577,11 +722,43 @@ export const getCells = async (
       break;
     case Contract.Buy:
       const buyType = parameter?.buyType || '';
-      cells.push(buyType);
+      let currencyID = parameter?.currencyID || '';
+      const currencyIDPrecision =
+        (await getContextPrecision(parameter?.currencyID)) ?? 6;
+      let amountPrecision = 0;
+
+      if (parameter?.buyType === 'ITOBuy') {
+        amountPrecision = (await getContextPrecision(parameter?.id)) ?? 0;
+      } else if (parameter?.buyType === 'MarketBuy') {
+        const assetBought = getAssetBought(receipts as IBuyReceipt[], sender);
+        amountPrecision = (await getContextPrecision(assetBought)) ?? 0;
+      }
+
+      const buyPrice = getBuyPrice(
+        receipts as IBuyReceipt[],
+        sender,
+        parameter,
+        currencyIDPrecision,
+        contract as unknown as IBuyContract[],
+      );
+      const buyAmount = getBuyAmount(
+        receipts as IBuyReceipt[],
+        sender,
+        parameter,
+        amountPrecision,
+        contract as unknown as IBuyContract[],
+      );
+      cells.push(buyType, currencyID, buyPrice, buyAmount);
       break;
     case Contract.Sell:
+      const marketType = parameter?.marketType || '';
+      currencyID = parameter?.currencyID;
       assetId = parameter?.assetId || 'KLV';
-      cells.push(assetId);
+      const precision =
+        (await getContextPrecision(parameter?.currencyID || 'KLV')) ?? 6;
+      const price = (parameter?.price || 0) / 10 ** precision;
+      amount = 1;
+      cells.push(marketType, currencyID, assetId, price, amount);
       break;
     case Contract.CancelMarketOrder:
       const orderID = parameter?.orderID || '';

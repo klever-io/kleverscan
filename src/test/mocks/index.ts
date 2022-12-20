@@ -104,6 +104,9 @@ export const mockTxItem: ITransaction = {
   receipts: [
     {
       assetId: 'KLV',
+      type: 0,
+      amount: '3000000',
+      from: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jquca668',
     },
   ],
   hash: 'a632bece34e0716fc465113e418f31911425783ea70624cb1555506225beeb4b',

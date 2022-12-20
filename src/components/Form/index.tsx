@@ -309,7 +309,7 @@ const Form: React.FC<any> = ({
       {showForm &&
         sections.map((section: any, index: number) => {
           return (
-            <>
+            <React.Fragment key={String(index)}>
               {sections.length === 1 && section.title && <FormGap />}
               <FormSection key={String(index)}>
                 <SectionTitle>
@@ -325,7 +325,7 @@ const Form: React.FC<any> = ({
                 </SectionTitle>
                 {getSectionInputs(section, index)}
               </FormSection>
-            </>
+            </React.Fragment>
           );
         })}
 

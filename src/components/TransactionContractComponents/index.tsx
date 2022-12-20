@@ -37,6 +37,10 @@ import {
 import { findKey, findReceipt } from '@/utils/findKey';
 import {
   calculatePermissionOperations,
+  getAmountFromReceipts,
+  getAssetBought,
+  getBuyAmount,
+  getBuyPrice,
   getPrecision,
   toLocaleFixed,
 } from '@/utils/index';
@@ -482,7 +486,7 @@ export const CreateValidator: React.FC<IContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Comission</strong>
+          <strong>Commission</strong>
         </span>
         <span>
           <small>{parameter?.config?.commission / 100}%</small>
@@ -783,9 +787,18 @@ export const Withdraw: React.FC<IContract> = ({ parameter: par }) => {
   );
 };
 
-export const Claim: React.FC<IContract> = ({ parameter: par }) => {
+export const Claim: React.FC<IContract> = ({ parameter: par, receipts }) => {
   const parameter = par as IClaimContract;
+  const assetId = findReceipt(receipts, 0, 17, 'assetId');
+  const [amount, setAmount] = useState(0);
 
+  useEffect(() => {
+    const getAsyncAmount = async () => {
+      const asyncAmount = await getAmountFromReceipts(assetId, 17, receipts);
+      setAmount(asyncAmount);
+    };
+    getAsyncAmount();
+  }, []);
   return (
     <>
       <Row>
@@ -806,6 +819,22 @@ export const Claim: React.FC<IContract> = ({ parameter: par }) => {
             <strong>ID</strong>
           </span>
           <span>{parameter?.id}</span>
+        </Row>
+      )}
+      {assetId && (
+        <Row>
+          <span>
+            <strong>Asset Id</strong>
+          </span>
+          <span>{assetId}</span>
+        </Row>
+      )}
+      {typeof amount === 'number' && (
+        <Row>
+          <span>
+            <strong>Amount</strong>
+          </span>
+          <span>{amount}</span>
         </Row>
       )}
     </>
@@ -1104,27 +1133,6 @@ export const Buy: React.FC<IContractBuyProps> = ({
   const [amountPrecision, setAmountPrecision] = useState(0);
   const [currencyIDPrecision, setCurrencyIDPrecision] = useState(6);
 
-  const getContractTotalAmount = () => {
-    let value = 0;
-    receipts.forEach(receipt => {
-      if (receipt.to === sender) {
-        value += receipt?.value ?? 0;
-      }
-    });
-    return value;
-  };
-
-  const getITOBuyPrice = () => {
-    const txValue = receipts?.find(
-      receipt =>
-        receipt.assetId === parameter.currencyID && receipt.from === sender,
-    )?.value;
-    if (typeof txValue === 'number') {
-      return (txValue / 10 ** currencyIDPrecision).toLocaleString();
-    }
-    return 0;
-  };
-
   useEffect(() => {
     const getPrecisions = async () => {
       if (parameter?.currencyID !== 'KLV' && parameter?.currencyID !== 'KFI') {
@@ -1135,41 +1143,12 @@ export const Buy: React.FC<IContractBuyProps> = ({
       if (parameter?.buyType === 'ITOBuy') {
         setAmountPrecision((await getPrecision(parameter?.id)) ?? 0);
       } else if (parameter?.buyType === 'MarketBuy') {
-        const assetBought =
-          receipts
-            .find(receipt => receipt.to === sender)
-            ?.assetId?.split('/')[0] ?? '';
+        const assetBought = getAssetBought(receipts, sender);
         setAmountPrecision((await getPrecision(assetBought)) ?? 0);
       }
     };
     getPrecisions();
   }, []);
-
-  const renderAmount = () => {
-    if (parameter?.buyType === 'ITOBuy') {
-      return (parameter.amount / 10 ** amountPrecision).toLocaleString();
-    }
-
-    if (parameter?.buyType === 'MarketBuy' && contracts.length < 2) {
-      // no support for multicontract
-      const parsedAmount = getContractTotalAmount() / 10 ** amountPrecision;
-      if (parsedAmount !== 0) {
-        return parsedAmount.toLocaleString();
-      }
-    }
-    return;
-  };
-
-  const renderPrice = () => {
-    if (parameter?.buyType === 'MarketBuy') {
-      return (parameter.amount / 10 ** currencyIDPrecision).toLocaleString();
-    }
-    if (parameter?.buyType === 'ITOBuy' && contracts.length < 2) {
-      // support for multicontract in parent component
-      return getITOBuyPrice();
-    }
-    return;
-  };
 
   return (
     <>
@@ -1201,13 +1180,29 @@ export const Buy: React.FC<IContractBuyProps> = ({
         <span>
           <strong>Amount</strong>
         </span>
-        <span>{renderAmount() || '--'}</span>
+        <span>
+          {getBuyAmount(
+            receipts,
+            sender,
+            parameter,
+            amountPrecision,
+            contracts,
+          ) || '--'}
+        </span>
       </Row>
       <Row>
         <span>
           <strong>Price</strong>
         </span>
-        <span>{renderPrice()}</span>
+        <span>
+          {getBuyPrice(
+            receipts,
+            sender,
+            parameter,
+            currencyIDPrecision,
+            contracts,
+          )}
+        </span>
       </Row>
     </>
   );

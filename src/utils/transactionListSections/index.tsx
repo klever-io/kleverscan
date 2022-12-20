@@ -28,10 +28,11 @@ import {
   IVoteContract,
   IWithdrawContract,
 } from '@/types/contracts';
-import { IRowSection } from '@/types/index';
+import { IReceipt, IRowSection } from '@/types/index';
 import { CenteredRow } from '@/views/transactions';
 import Link from 'next/link';
 import { formatAmount, passViewportStyles } from '..';
+import { findReceipt } from '../findKey';
 
 const precision = 6; // default KLV precision
 
@@ -39,6 +40,11 @@ const TransferSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as ITransferContract;
 
   const { isMobile, isTablet } = useMobile();
+
+  let assetId = 'KLV';
+  if (parameter.assetId?.includes('/')) {
+    assetId = parameter.assetId.split('/')[0];
+  }
 
   return [
     {
@@ -55,17 +61,17 @@ const TransferSections = (par: IParameter): IRowSection[] => {
                 )}
                 minMsgLength={9}
                 Component={() => (
-                  <Link href={`/asset/${parameter.assetId}`}>
-                    {parameter.assetId}
-                  </Link>
+                  <Link href={`/asset/${assetId}`}>{parameter.assetId}</Link>
                 )}
               ></Tooltip>
             ) : (
               <>
                 <Tooltip
                   minMsgLength={9}
-                  msg="KLV"
-                  Component={() => <Link href={`/asset/KLV`}>KLV</Link>}
+                  msg={assetId}
+                  Component={() => (
+                    <Link href={`/asset/${assetId}`}>{assetId}</Link>
+                  )}
                 ></Tooltip>
               </>
             )}
@@ -143,15 +149,19 @@ const ValidatorConfigSections = (par: IParameter): IRowSection[] => {
 
 const FreezeSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IFreezeContract;
-
   return [
     {
       element: (
+        <span key={parameter.assetId}>
+          <strong>{parameter.assetId.replace(/['"]+/g, '')}</strong>
+        </span>
+      ),
+      span: 1,
+    },
+    {
+      element: (
         <span key={parameter.amount}>
-          <strong>
-            {formatAmount(parameter.amount / 10 ** precision)}{' '}
-            {parameter.assetId.replace(/['"]+/g, '')}
-          </strong>
+          <strong>{formatAmount(parameter.amount / 10 ** precision)}</strong>
         </span>
       ),
       span: 1,
@@ -207,6 +217,7 @@ const UndelegateSections = (par: IParameter): IRowSection[] => {
 const WithdrawSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IWithdrawContract;
   const assetId = parameter?.assetId ?? 'KLV';
+
   return [
     {
       element: (
@@ -219,14 +230,25 @@ const WithdrawSections = (par: IParameter): IRowSection[] => {
   ];
 };
 
-const ClaimSections = (par: IParameter): IRowSection[] => {
+const ClaimSections = (
+  par: IParameter,
+  receipts: IReceipt[],
+): IRowSection[] => {
   const parameter = par as unknown as IClaimContract;
-
+  const assetId = findReceipt(receipts, 0, 17, 'assetId');
   return [
     {
       element: (
         <span key={parameter.claimType}>
           <small>{parameter.claimType}</small>
+        </span>
+      ),
+      span: 1,
+    },
+    {
+      element: (
+        <span>
+          <span>{assetId ?? ''}</span>
         </span>
       ),
       span: 1,
@@ -332,8 +354,8 @@ const BuySections = (par: IParameter): IRowSection[] => {
     },
     {
       element: (
-        <span key={parameter.amount}>
-          <small>{parameter.amount}</small>
+        <span key={parameter.currencyID}>
+          <small>{parameter.currencyID}</small>
         </span>
       ),
       span: 1,
@@ -344,12 +366,46 @@ const BuySections = (par: IParameter): IRowSection[] => {
 const SellSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as ISellContract;
 
+  let assetId = parameter.assetId;
+  let currencyID = parameter.currencyID;
+
+  if (parameter.assetId.includes('/')) {
+    assetId = parameter.assetId.split('/')[0];
+  }
+  if (parameter.currencyID.includes('/')) {
+    currencyID = parameter.currencyID.split('/')[0];
+  }
+
   return [
     {
       element: (
-        <span key={parameter.assetId}>
-          <small>{parameter.assetId}</small>
+        <span key={parameter.marketType}>
+          <small>{parameter.marketType}</small>
         </span>
+      ),
+      span: 1,
+    },
+    {
+      element: (
+        <Link href={`/asset/${currencyID}`}>
+          <a>
+            <span key={currencyID}>
+              <small>{parameter.currencyID}</small>
+            </span>
+          </a>
+        </Link>
+      ),
+      span: 1,
+    },
+    {
+      element: (
+        <Link href={`/asset/${assetId}`}>
+          <a>
+            <span key={assetId}>
+              <small>{parameter.assetId}</small>
+            </span>
+          </a>
+        </Link>
       ),
       span: 1,
     },

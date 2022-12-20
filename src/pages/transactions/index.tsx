@@ -32,6 +32,7 @@ import React, { useCallback } from 'react';
 import {
   IAsset,
   IPagination,
+  IReceipt,
   IResponse,
   IRowSection,
   ITransaction,
@@ -52,7 +53,7 @@ import {
 import {
   contractTypes,
   filteredSections,
-  getHeader,
+  getHeaderForTable,
   initialsTableHeaders,
 } from '../../utils/contracts';
 
@@ -98,9 +99,12 @@ const Transactions: React.FC<ITransactions> = ({
       query: { page, limit, ...router.query },
     });
 
-  const getFilteredSections = (contract: IContract[]): IRowSection[] => {
+  const getFilteredSections = (
+    contract: IContract[],
+    receipts: IReceipt[],
+  ): IRowSection[] => {
     const contractType = getContractType(contract);
-    return filteredSections(contract, contractType);
+    return filteredSections(contract, contractType, receipts);
   };
 
   const rowSections = (props: ITransaction): IRowSection[] => {
@@ -109,6 +113,7 @@ const Transactions: React.FC<ITransactions> = ({
       blockNum,
       timestamp,
       sender,
+      receipts,
       contract,
       kAppFee,
       bandwidthFee,
@@ -242,7 +247,7 @@ const Transactions: React.FC<ITransactions> = ({
         span: 1,
       },
     ];
-    const filteredContract = getFilteredSections(contract);
+    const filteredContract = getFilteredSections(contract, receipts);
 
     if (router.query.type) {
       sections.pop();
@@ -257,7 +262,7 @@ const Transactions: React.FC<ITransactions> = ({
 
   const tableProps: ITable = {
     type: 'transactions',
-    header: getHeader(router, header),
+    header: getHeaderForTable(router, header),
     data: defaultTransactions as any[],
     rowSections,
     dataName: 'transactions',

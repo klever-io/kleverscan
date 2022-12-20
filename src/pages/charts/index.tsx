@@ -14,6 +14,15 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { IResponse } from '../../types';
 
+export interface ITooltipContent {
+  payload?: {
+    value: number;
+    name: string;
+  }[];
+  label?: string;
+  active?: boolean;
+}
+
 export interface IChartData {
   date?: number;
   value: number;

@@ -1,3 +1,5 @@
+import { IReceipt } from '../types';
+
 // to be used for unique keys in the array of objects
 export const findKey = (arr: any[], keyName: string): any => {
   const result = arr.find(obj => Object.keys(obj).find(key => key === keyName));
@@ -8,11 +10,14 @@ export const findKey = (arr: any[], keyName: string): any => {
 };
 
 export const findReceipt = (
-  receipts: any[],
+  receipts: IReceipt[] | undefined,
   contractIndex: number,
   type: number,
   keyName: string,
 ): any => {
+  if (!receipts) {
+    return null;
+  }
   for (let i = 0; i < receipts.length; i++) {
     if (receipts[i].type !== type) continue;
 

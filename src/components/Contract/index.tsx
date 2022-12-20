@@ -381,7 +381,6 @@ const Contract: React.FC<IContract> = ({
       ...parsedValues,
     };
     let parsedPayload = await precisionParse(payload, contractType);
-    console.log(parsedPayload);
     if (contractType === 'ConfigITOContract' && parsedPayload?.pack) {
       parsedPayload = parsePackInfo(parsedPayload);
     }

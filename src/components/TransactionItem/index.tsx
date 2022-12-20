@@ -28,19 +28,24 @@ const TransactionItem: React.FC<ITransaction> = ({
   sender,
   status,
 }) => {
-  let contractFilter: IContract = {} as IContract;
+  let contractFilter = {} as IContract;
   const [amount, setAmount] = useState('');
-  const [assetId, setAssetId] = useState('');
 
   const StatusIcon = getStatusIcon(status);
 
   const { t } = useTranslation('transactions');
   const contractPosition = 0;
   contractFilter = contract[contractPosition] as IContract;
+  const { assetId } = contractFilter.parameter;
 
   useEffect(() => {
     const getParams = async () => {
-      const precision = contractFilter?.precision ?? 6;
+      let precision: number;
+      if (assetId === 'KLV' || assetId === 'KFI') {
+        precision = 6;
+      } else {
+        precision = contractFilter?.precision ?? 0;
+      }
       if (contract) {
         if (contractFilter?.parameter?.amount) {
           setAmount(

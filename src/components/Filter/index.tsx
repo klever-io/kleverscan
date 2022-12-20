@@ -112,7 +112,6 @@ const Filter: React.FC<IFilter> = ({
       onChange(value);
     }
   };
-  // console.log(overFlow ? 'visible' : 'hidden');
   const getDataArray = () => [allItem].concat(data);
 
   const filterArrayByInput = (input: string) => {

@@ -1,3 +1,4 @@
+import Form, { ISection } from '@/components/Form';
 import {
   InputLabel,
   Slider,
@@ -15,7 +16,6 @@ import formSection from '@/utils/formSections';
 import { parseAddress } from '@/utils/index';
 import { Card } from '@/views/blocks';
 import { core } from '@klever/sdk';
-import Form, { ISection } from 'components/Form';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';

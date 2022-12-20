@@ -441,8 +441,8 @@ export const getHeaderForTable = (
     case ContractsIndex.Sell:
       newHeaders = [
         contractTableHeaders[21],
-        contractTableHeaders[9],
         contractTableHeaders[20],
+        contractTableHeaders[9],
       ];
       break;
     case ContractsIndex['Cancel Marketplace Order']:
@@ -545,8 +545,8 @@ export const getHeaderForCSV = (
     case ContractsIndex.Sell:
       newHeaders = [
         contractTableHeaders[21],
-        contractTableHeaders[9],
         contractTableHeaders[20],
+        contractTableHeaders[9],
         contractTableHeaders[22],
         contractTableHeaders[1],
       ];
@@ -723,7 +723,8 @@ export const getCells = async (
     case Contract.Buy:
       const buyType = parameter?.buyType || '';
       let currencyID = parameter?.currencyID || '';
-      const currencyIDPrecision = (await getContextPrecision(parameter?.currencyID)) ?? 6;
+      const currencyIDPrecision =
+        (await getContextPrecision(parameter?.currencyID)) ?? 6;
       let amountPrecision = 0;
 
       if (parameter?.buyType === 'ITOBuy') {
@@ -753,10 +754,11 @@ export const getCells = async (
       const marketType = parameter?.marketType || '';
       currencyID = parameter?.currencyID;
       assetId = parameter?.assetId || 'KLV';
-      const precision = (await getContextPrecision(parameter?.currencyID || 'KLV')) ?? 6;
+      const precision =
+        (await getContextPrecision(parameter?.currencyID || 'KLV')) ?? 6;
       const price = (parameter?.price || 0) / 10 ** precision;
       amount = 1;
-      cells.push(marketType, assetId, currencyID, price, amount);
+      cells.push(marketType, currencyID, assetId, price, amount);
       break;
     case Contract.CancelMarketOrder:
       const orderID = parameter?.orderID || '';

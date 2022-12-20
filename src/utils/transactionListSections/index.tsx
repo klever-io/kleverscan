@@ -41,6 +41,11 @@ const TransferSections = (par: IParameter): IRowSection[] => {
 
   const { isMobile, isTablet } = useMobile();
 
+  let assetId = 'KLV';
+  if (parameter.assetId?.includes('/')) {
+    assetId = parameter.assetId.split('/')[0];
+  }
+
   return [
     {
       element: (
@@ -56,17 +61,17 @@ const TransferSections = (par: IParameter): IRowSection[] => {
                 )}
                 minMsgLength={9}
                 Component={() => (
-                  <Link href={`/asset/${parameter.assetId}`}>
-                    {parameter.assetId}
-                  </Link>
+                  <Link href={`/asset/${assetId}`}>{parameter.assetId}</Link>
                 )}
               ></Tooltip>
             ) : (
               <>
                 <Tooltip
                   minMsgLength={9}
-                  msg="KLV"
-                  Component={() => <Link href={`/asset/KLV`}>KLV</Link>}
+                  msg={assetId}
+                  Component={() => (
+                    <Link href={`/asset/${assetId}`}>{assetId}</Link>
+                  )}
                 ></Tooltip>
               </>
             )}
@@ -361,6 +366,16 @@ const BuySections = (par: IParameter): IRowSection[] => {
 const SellSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as ISellContract;
 
+  let assetId = parameter.assetId;
+  let currencyID = parameter.currencyID;
+
+  if (parameter.assetId.includes('/')) {
+    assetId = parameter.assetId.split('/')[0];
+  }
+  if (parameter.currencyID.includes('/')) {
+    currencyID = parameter.currencyID.split('/')[0];
+  }
+
   return [
     {
       element: (
@@ -372,17 +387,25 @@ const SellSections = (par: IParameter): IRowSection[] => {
     },
     {
       element: (
-        <span key={parameter.currencyID}>
-          <small>{parameter.currencyID}</small>
-        </span>
+        <Link href={`/asset/${currencyID}`}>
+          <a>
+            <span key={currencyID}>
+              <small>{parameter.currencyID}</small>
+            </span>
+          </a>
+        </Link>
       ),
       span: 1,
     },
     {
       element: (
-        <span key={parameter.assetId}>
-          <small>{parameter.assetId}</small>
-        </span>
+        <Link href={`/asset/${assetId}`}>
+          <a>
+            <span key={assetId}>
+              <small>{parameter.assetId}</small>
+            </span>
+          </a>
+        </Link>
       ),
       span: 1,
     },

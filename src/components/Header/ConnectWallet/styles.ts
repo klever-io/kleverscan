@@ -45,7 +45,6 @@ export const ConnectButton = styled.div`
     small {
       display: none;
     }
-    padding: 0 0.25rem 0 0;
     background: 0;
     width: auto;
   }
@@ -69,6 +68,7 @@ export const ConnectContainer = styled.div`
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     margin-left: 0;
     margin-top: auto;
+    padding-right: 0;
   }
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
@@ -232,13 +232,23 @@ export const StyledTransfer = styled(BiTransfer)`
 `;
 
 export const QRCodeContainer = styled.div`
-  border-bottom: 1px solid ${props => props.theme.line.border};
-  padding-top: 0.3rem;
-  padding-bottom: 0.3rem;
-  color: ${props => props.theme.black};
+  position: relative;
+
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  border-bottom: 1px solid ${props => props.theme.line.border};
+
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+
+  color: ${props => props.theme.true.white};
+
+  small {
+    font-weight: 400;
+  }
+
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
     small {
       padding-top: 0.5rem;
@@ -246,38 +256,54 @@ export const QRCodeContainer = styled.div`
   }
 `;
 
-export const UserInfoContainer = styled.div`
+export const UserInfoContainer = styled.div<{ openUserInfos: boolean }>`
   position: fixed;
   top: 4.4rem;
   right: 5.6rem;
   z-index: 10000 !important;
+
+  visibility: ${props => (props.openUserInfos ? 'visible' : 'hidden')};
+  opacity: ${props => (props.openUserInfos ? '1' : '0')};
+
+  transition: opacity 0.1s linear;
+
+  background-color: ${props => props.theme.card.background};
+
+  display: flex;
+  flex-direction: column;
+
+  width: 20rem;
+
+  border: 1px solid ${props => props.theme.card.border};
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+  padding: 10px;
+
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
-    right: 1rem;
+    right: unset;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    font-size: 1.3rem;
   }
 `;
 
-export const ContentUserInfo = styled.div`
-  background-color: ${props => props.theme.background};
-  display: flex;
-  flex-direction: column;
-  width: 20rem;
-  border-width: 1px;
-  border-style: solid;
-  border-color: #404264;
-  border-radius: 0.375rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  padding: 10px;
-`;
-
 export const HeaderInfo = styled.div`
+  position: relative;
+
   display: flex;
   justify-content: space-between;
+  align-items: center;
+
   padding-inline-start: 0.75rem;
   padding-inline-end: 0.75rem;
-  align-items: center;
-  color: ${props => props.theme.black};
-  font-size: 16px;
-  font-weight: 700;
+
+  color: ${props => props.theme.true.white};
+  font-size: 1.2rem;
+  font-weight: 400;
+
   div {
     display: flex;
     gap: 0.5rem;
@@ -286,34 +312,58 @@ export const HeaderInfo = styled.div`
 `;
 
 export const BodyContent = styled.div`
+  position: relative;
+
   padding-top: 1rem;
   width: 100%;
-  color: ${props => props.theme.navbar.text};
+  color: ${props => props.theme.lightGray};
 
-  > div {
-    display: flex;
-    position: static;
-    align-items: center;
-    height: 2.5rem;
-    gap: 0.45rem;
-    font-size: 14px;
-    font-weight: 700;
-    padding-bottom: 0.5rem;
-    padding: 0.75rem;
-    cursor: pointer;
+  display: flex;
+  flex-direction: column;
+
+  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+    gap: 0.5rem;
   }
-  div:nth-child(2) {
-    cursor: auto;
-  }
-  > div:hover {
-    border-width: 1px;
-    border-style: solid;
-    border-color: #404264;
+`;
+
+export const ActionItem = styled.div`
+  position: static;
+
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+
+  height: 2.5rem;
+
+  font-size: 14px;
+  font-weight: 400;
+
+  padding: 0.75rem;
+  border: 1px solid transparent;
+
+  cursor: pointer;
+
+  :hover {
+    border: 1px solid ${props => props.theme.card.border};
     border-radius: 0.375rem;
+
     background-color: ${props => props.theme.footer.border};
     color: ${props => props.theme.true.white};
+
+    font-weight: 500;
+
     path:nth-child() {
       fill: ${props => props.theme.true.white};
+    }
+  }
+  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+    font-size: 1.1rem;
+    gap: 1rem;
+  }
+
+  svg {
+    &:nth-child(3) {
+      margin-left: auto;
     }
   }
 `;
@@ -324,22 +374,35 @@ export const BackGroundUserInfo = styled.div<{ isOpen?: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
+
+  background-color: ${props => transparentize(0.5, props.theme.true.black)};
   visibility: ${props => (props.isOpen ? 'visible' : 'hidden')};
+  opacity: ${props => (props.isOpen ? 1 : 0)};
+
+  transition: all 0.1s linear;
   z-index: 100 !important;
 `;
 
 export const QRCodeContent = styled.div`
   display: flex;
   justify-content: center;
-  background-color: ${props => props.theme.background};
   border-radius: 1rem;
   padding: 1rem;
 
   div {
+    --size: 114px;
+
     background-color: #fff;
-    width: 114px;
+    width: var(--size);
+    height: var(--size);
     padding: 0.3rem;
     border-radius: 0.2rem;
+
+    svg {
+      width: 100%;
+      height: 100%;
+      margin: auto;
+    }
   }
 `;
 

@@ -11,3 +11,24 @@ export const useDidUpdateEffect = (fn: Function, inputs: Array<any>): void => {
     didMountRef.current = true;
   }, inputs);
 };
+
+export const useScroll = (
+  condition: boolean,
+  callback: (this: Window, ev: Event) => any,
+): void => {
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (condition) {
+        window.addEventListener('scroll', callback);
+      } else {
+        window.removeEventListener('scroll', callback);
+      }
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('scroll', callback);
+      }
+    };
+  }, [condition]);
+};

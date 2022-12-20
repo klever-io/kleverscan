@@ -6,13 +6,14 @@ import styled from 'styled-components';
 interface ICopyProps {
   data?: string;
   info?: string;
+  children?: React.ReactNode;
 }
 
 const IconContainer = styled.div`
   cursor: pointer;
 `;
 
-const Copy: React.FC<ICopyProps> = ({ data, info = 'Text' }) => {
+const Copy: React.FC<ICopyProps> = ({ data, info = 'Text', children }) => {
   const handleCopyInfo = async () => {
     await navigator.clipboard.writeText(String(data));
 
@@ -26,7 +27,7 @@ const Copy: React.FC<ICopyProps> = ({ data, info = 'Text' }) => {
   return (
     <Fragment>
       <IconContainer onClick={handleCopyInfo}>
-        <CopyIcon />
+        {children ? children : <CopyIcon />}
       </IconContainer>
     </Fragment>
   );

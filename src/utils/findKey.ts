@@ -18,11 +18,19 @@ export const findReceipt = (
   if (!receipts) {
     return null;
   }
-  for (let i = 0; i < receipts.length; i++) {
-    if (receipts[i].type !== type) continue;
 
-    if (i < contractIndex) continue;
+  const parsedReceiptsByType = receipts.filter(
+    receipt => receipt.type === type,
+  );
 
-    return receipts[i][keyName];
+  if (parsedReceiptsByType.length === 0) {
+    return null;
+  } else {
+    const receipt = parsedReceiptsByType.find(
+      (_, index) => index === contractIndex,
+    );
+    if (receipt) {
+      return receipt[keyName];
+    }
   }
 };

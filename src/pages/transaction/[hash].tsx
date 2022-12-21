@@ -1,4 +1,4 @@
-import { Proposal, Receive } from '@/assets/icons';
+import { Receive } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import { TransactionDetails as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
@@ -19,6 +19,7 @@ import {
   Deposit,
   Freeze,
   ITOTrigger,
+  Proposal,
   Sell,
   SetAccountName,
   SetITOPrices,

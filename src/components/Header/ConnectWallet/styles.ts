@@ -260,7 +260,7 @@ export const UserInfoContainer = styled.div<{ openUserInfos: boolean }>`
   position: fixed;
   top: 4.4rem;
   right: 5.6rem;
-  z-index: 10000 !important;
+  z-index: 1000 !important;
 
   visibility: ${props => (props.openUserInfos ? 'visible' : 'hidden')};
   opacity: ${props => (props.openUserInfos ? '1' : '0')};

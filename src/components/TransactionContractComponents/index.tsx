@@ -71,7 +71,7 @@ export const Transfer: React.FC<any> = ({ parameter: par }) => {
     const assetID = parameter?.assetId?.split('/') || [];
 
     const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 6);
+      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 0);
     };
 
     if (assetID.length === 0 || assetID[0] === 'KLV' || assetID[0] === 'KFI') {
@@ -596,13 +596,13 @@ export const Freeze: React.FC<IContract> = ({
   const parameter = par as IFreezeContract;
   const receipts = rec as IFreezeReceipt[];
 
-  const [precision, setPrecision] = useState(1);
+  const [precision, setPrecision] = useState(0);
 
   useEffect(() => {
     const assetID = parameter?.assetId?.split('/') || [];
 
     const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 6);
+      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 0);
     };
 
     if (assetID.length > 1) {
@@ -856,13 +856,13 @@ export const Unjail: React.FC<IContract> = () => {
 
 export const AssetTrigger: React.FC<IContract> = ({ parameter: par }) => {
   const parameter = par as IAssetTriggerContract;
-  const [precision, setPrecision] = useState(1);
+  const [precision, setPrecision] = useState(0);
 
   useEffect(() => {
     const assetID = parameter?.assetId?.split('/') || [];
 
     const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 6);
+      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 0);
     };
 
     if (assetID.length > 1) {
@@ -1041,13 +1041,13 @@ export const Vote: React.FC<IContract> = ({ parameter: par }) => {
 
 export const ConfigITO: React.FC<IContract> = ({ parameter: par }) => {
   const parameter = par as IConfigITOContract;
-  const [precision, setPrecision] = useState(1);
+  const [precision, setPrecision] = useState(0);
 
   useEffect(() => {
     const assetID = parameter?.assetId?.split('/') || [];
 
     const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 6);
+      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 0);
     };
 
     if (assetID.length > 1) {
@@ -1137,7 +1137,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
     const getPrecisions = async () => {
       if (parameter?.currencyID !== 'KLV' && parameter?.currencyID !== 'KFI') {
         setCurrencyIDPrecision(
-          (await getPrecision(parameter?.currencyID || 'KLV')) ?? 6,
+          (await getPrecision(parameter?.currencyID || 'KLV')) ?? 0,
         );
       }
       if (parameter?.buyType === 'ITOBuy') {
@@ -1211,11 +1211,11 @@ export const Buy: React.FC<IContractBuyProps> = ({
 export const Sell: React.FC<IContract> = ({ parameter: par }) => {
   const parameter = par as ISellContract;
 
-  const [precision, setPrecision] = useState(1);
+  const [precision, setPrecision] = useState(0);
 
   useEffect(() => {
     const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(parameter?.currencyID || 'KLV')) ?? 6);
+      setPrecision((await getPrecision(parameter?.currencyID || 'KLV')) ?? 0);
     };
 
     if (parameter?.currencyID === 'KFI') {
@@ -1263,7 +1263,7 @@ export const Sell: React.FC<IContract> = ({ parameter: par }) => {
           <strong>Price</strong>
         </span>
         <span>
-          {toLocaleFixed(parameter?.price / 10 ** precision || 0, precision)}
+          {toLocaleFixed(parameter?.price / 10 ** (precision || 0), precision)}
         </span>
       </Row>{' '}
       {parameter?.reservePrice && (
@@ -1466,7 +1466,7 @@ export const Deposit: React.FC<IContract> = ({ parameter: par }) => {
 
   useEffect(() => {
     const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(parameter?.currencyID || 'KLV')) ?? 6);
+      setPrecision((await getPrecision(parameter?.currencyID || 'KLV')) ?? 0);
     };
 
     if (parameter?.currencyID === 'KFI') {
@@ -1539,7 +1539,7 @@ export const ITOTrigger: React.FC<IContract> = ({ parameter: par }) => {
 
   useEffect(() => {
     const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(parameter?.assetID || 'KLV')) ?? 6);
+      setPrecision((await getPrecision(parameter?.assetID || 'KLV')) ?? 0);
     };
 
     if (parameter?.assetID === 'KFI') {
@@ -1564,7 +1564,7 @@ export const ITOTrigger: React.FC<IContract> = ({ parameter: par }) => {
         index
       ] as PromiseSettledResult<number>;
       if (promiseResult.status === 'fulfilled') {
-        return price / 10 ** promiseResult?.value || 0;
+        return price / 10 ** (promiseResult?.value || 0);
       }
     } catch (error) {
       return '';

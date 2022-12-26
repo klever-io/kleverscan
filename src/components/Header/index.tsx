@@ -1,5 +1,4 @@
 import { INavbarItem, navbarItems } from '@/configs/navbar';
-import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import { useScroll } from '@/utils/hooks';
 import Image from 'next/image';
@@ -130,7 +129,6 @@ const Navbar: React.FC = () => {
     useMobile();
   const [openDrawer, setOpenDrawer] = useState(false);
   const prevScrollpos = useRef<number>(0);
-  const { extensionInstalled } = useExtension();
 
   const handleMobileScroll = () => {
     const navbar = mobileNavbarRef.current;

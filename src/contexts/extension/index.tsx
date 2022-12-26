@@ -42,7 +42,17 @@ export const ExtensionProvider: React.FC = ({ children }) => {
 
   const logoutExtension = useCallback(() => {
     setWalletAddress('');
+    sessionStorage.removeItem('walletAddress');
   }, [walletAddress]);
+
+  useEffect(() => {
+    if (extensionInstalled) {
+      const address = sessionStorage.getItem('walletAddress');
+      if (address) {
+        setWalletAddress(address);
+      }
+    }
+  }, [extensionInstalled]);
 
   const connectExtension = async () => {
     if (!walletAddress) {
@@ -66,6 +76,7 @@ export const ExtensionProvider: React.FC = ({ children }) => {
 
         if (address.startsWith('klv') && address.length === 62) {
           setWalletAddress(address);
+          sessionStorage.setItem('walletAddress', address);
         } else {
           toast.error('Invalid wallet address, please switch to a klv wallet');
         }

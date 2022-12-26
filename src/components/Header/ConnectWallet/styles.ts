@@ -32,6 +32,7 @@ export const ConnectButton = styled.div`
   input {
     display: none;
   }
+
   span,
   small {
     padding-left: 0.4rem;
@@ -39,8 +40,14 @@ export const ConnectButton = styled.div`
   label {
     cursor: pointer;
   }
-  width: 9rem;
+  min-width: 9rem;
+
+  span {
+    white-space: nowrap;
+  }
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+    min-width: unset;
+
     span,
     small {
       display: none;

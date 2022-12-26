@@ -439,7 +439,7 @@ export const doIf = async (
   let interval: any;
 
   const IntervalPromise = new Promise(resolve => {
-    const interval = setInterval(() => {
+    interval = setInterval(() => {
       if (condition()) {
         resolve(
           (() => {

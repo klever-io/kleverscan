@@ -27,11 +27,10 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
   const [kassetsList, setKAssetsList] = useState<IKAssets[]>([]);
   const router = useRouter();
 
-  const { extensionInstalled, connectExtension, walletAddress } =
-    useExtension();
+  const { extensionInstalled, connectExtension } = useExtension();
 
   useDidUpdateEffect(() => {
-    if (extensionInstalled && !walletAddress) {
+    if (extensionInstalled) {
       connectExtension();
     }
   }, [extensionInstalled]);

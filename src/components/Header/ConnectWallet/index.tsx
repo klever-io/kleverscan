@@ -68,7 +68,7 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
         <ConnectContainer>
           <ConnectButton onClick={handleClick}>
             <BiWalletAlt size={'1.2em'} />
-            <span>Connect</span>
+            <span>Klever Extension</span>
           </ConnectButton>
         </ConnectContainer>
       )}

@@ -369,10 +369,10 @@ const SellSections = (par: IParameter): IRowSection[] => {
   let assetId = parameter.assetId;
   let currencyID = parameter.currencyID;
 
-  if (parameter.assetId.includes('/')) {
+  if (parameter.assetId?.includes('/')) {
     assetId = parameter.assetId.split('/')[0];
   }
-  if (parameter.currencyID.includes('/')) {
+  if (parameter.currencyID?.includes('/')) {
     currencyID = parameter.currencyID.split('/')[0];
   }
 

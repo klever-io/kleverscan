@@ -88,7 +88,7 @@ const ValidatorCards: React.FC<IValidatorCards> = ({
               <strong>Current Delegations</strong>
             </span>
             <span>
-              <p>{`(Updated: ${age} ago)`}</p>
+              <p>{`${age} ago`}</p>
             </span>
           </VotesHeader>
         </CardWrapper>

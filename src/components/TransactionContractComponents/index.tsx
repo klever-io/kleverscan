@@ -1284,7 +1284,9 @@ export const Sell: React.FC<IContract> = ({ parameter: par }) => {
           <strong>End Time</strong>
         </span>
         <span>
-          {format(fromUnixTime(parameter?.endTime), 'dd/MM/yyyy HH:mm')}
+          {parameter?.endTime
+            ? format(fromUnixTime(parameter?.endTime), 'dd/MM/yyyy HH:mm')
+            : '--'}
         </span>
       </Row>
     </>

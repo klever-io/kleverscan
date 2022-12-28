@@ -56,11 +56,13 @@ import {
   RowContent,
 } from '@/views/accounts/detail';
 import {
+  ButtonExpand,
   CardContainer,
   CardContent,
   CardRaw,
   CenteredRow,
   Container,
+  DivDataJson,
   ExpandCenteredRow,
   Header,
   Hr,
@@ -73,11 +75,9 @@ import {
 import { ReceiveBackground } from '@/views/validator';
 import { format, fromUnixTime } from 'date-fns';
 import { GetStaticPaths, GetStaticProps } from 'next';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
-import { BsPlus } from 'react-icons/bs';
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import { xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 
 interface IBlockResponse extends IResponse {
   data: {
@@ -109,7 +109,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
   const { isDarkTheme } = useTheme();
   const [totalAssetsPrices, setTotalAssetsPrices] =
     useState<IBuyITOsTotalPrices>({});
-
+  const ReactJson = dynamic(import('react-json-view'), { ssr: false });
   const {
     hash,
     status,
@@ -128,8 +128,22 @@ const Transaction: React.FC<ITransactionPage> = props => {
 
   const StatusIcon = getStatusIcon(status);
 
-  const renderData = () =>
-    parseJson(hexToString((data && data.length > 0 && data.join(',')) || ''));
+  const renderData = () => {
+    if (expandData) {
+      try {
+        return JSON.parse(
+          parseJson(
+            hexToString((data && data.length > 0 && data.join(',')) || ''),
+          ),
+        );
+      } catch (error) {
+        setExpandData(false);
+      }
+    }
+    return parseJson(
+      hexToString((data && data.length > 0 && data.join(',')) || ''),
+    );
+  };
 
   useEffect(() => {
     const getAsyncTotalAssetsPrices = async () => {
@@ -376,11 +390,23 @@ const Transaction: React.FC<ITransactionPage> = props => {
   };
 
   const rawTxTheme = {
-    height: '30rem',
-    color: isDarkTheme ? 'white' : 'black',
-    backgroundColor: isDarkTheme ? '#181935' : 'white',
+    base00: '',
+    base01: '#ddd',
+    base02: '#ddd',
+    base03: '',
+    base04: '',
+    base05: isDarkTheme ? 'white' : 'black',
+    base06: isDarkTheme ? 'white' : 'black',
+    base07: isDarkTheme ? 'white' : 'black',
+    base08: isDarkTheme ? 'white' : 'black',
+    base09: '',
+    base0A: '',
+    base0B: '',
+    base0C: '',
+    base0D: '',
+    base0E: '',
+    base0F: '',
   };
-
   const KappFeeRow: React.FC = () => {
     if (status === 'fail') {
       return (
@@ -521,20 +547,27 @@ const Transaction: React.FC<ITransactionPage> = props => {
               <span>
                 <strong>Data</strong>
               </span>
-
-              <ExpandCenteredRow>
+              <ExpandCenteredRow openJson={expandData}>
                 <span>
                   {expandData ? (
-                    <pre>{renderData()}</pre>
+                    <DivDataJson>
+                      <ReactJson
+                        src={renderData()}
+                        name={false}
+                        displayObjectSize={false}
+                        enableClipboard={true}
+                        displayDataTypes={false}
+                        theme={rawTxTheme}
+                      />
+                    </DivDataJson>
                   ) : (
                     <span>{renderData()}</span>
                   )}
                 </span>
                 <IconsWrapper>
-                  <BsPlus
-                    style={{ overflow: 'visible', marginRight: '3px' }}
-                    onClick={() => setExpandData(!expandData)}
-                  />
+                  <ButtonExpand onClick={() => setExpandData(!expandData)}>
+                    {expandData ? 'Hide' : 'Expand'}
+                  </ButtonExpand>
                   <Copy
                     data={hexToString(
                       (data && data.length > 0 && data.join(',')) || '',
@@ -557,16 +590,15 @@ const Transaction: React.FC<ITransactionPage> = props => {
       <CardContainer>
         <h3>Raw Tx</h3>
         <CardContent>
-          <CardRaw>
-            <SyntaxHighlighter
-              customStyle={rawTxTheme}
-              style={xcode}
-              language="json"
-              wrapLines={true}
-              wrapLongLines={true}
-            >
-              {JSON.stringify(transaction, null, 2)}
-            </SyntaxHighlighter>
+          <CardRaw style={{ height: '30rem' }}>
+            <ReactJson
+              src={transaction}
+              name={false}
+              displayObjectSize={false}
+              enableClipboard={true}
+              displayDataTypes={false}
+              theme={rawTxTheme}
+            />
           </CardRaw>
         </CardContent>
       </CardContainer>

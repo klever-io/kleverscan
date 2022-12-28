@@ -212,21 +212,40 @@ export const CenteredRow = styled.div`
   }
 `;
 
-export const ExpandCenteredRow = styled(CenteredRow)`
-  align-items: normal;
+export const ExpandCenteredRow = styled(CenteredRow)<{ openJson?: boolean }>`
+  align-items: ${props => (props.openJson ? 'normal' : 'center')};
   justify-content: space-between;
 `;
 
+export const DivDataJson = styled.div`
+  overflow: auto;
+  position: relative;
+  span {
+    min-width: auto !important;
+  }
+`;
 export const IconsWrapper = styled.div`
   display: flex;
   justify-content: center;
+`;
+
+export const ButtonExpand = styled.button`
+  color: ${props => props.theme.true.white};
+  margin-right: 0.3rem;
+  text-align: center;
+  width: 5.5rem;
+  height: 2rem;
+  padding: 0.4rem;
+  border-radius: 0.3rem;
+  background-color: ${props => props.theme.purple};
+  border: 1px solid ${props => props.theme.purple};
 `;
 
 export const CardRaw = styled.div`
   margin: 1.25rem 1.25rem;
   font-weight: 400;
   font-size: 0.85rem;
-
+  overflow: auto;
   flex-direction: row;
   align-items: center;
 `;

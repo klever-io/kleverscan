@@ -137,24 +137,24 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
               )}
             </QRCodeContainer>
             <BodyContent>
-              <ActionItem>
-                <BiWalletAlt size={'1.2rem'} />
-                <Link href={`/account/${walletAddress}`}>
-                  <a onClick={() => setOpenUserInfos(false)}>
+              <Link href={`/account/${walletAddress}`}>
+                <a onClick={() => setOpenUserInfos(false)}>
+                  <ActionItem>
+                    <BiWalletAlt size={'1.2rem'} />
                     <p>Account Details</p>
-                  </a>
-                </Link>
-                <RiArrowRightSLine size={'1.2em'} />
-              </ActionItem>
-              <ActionItem>
-                <IoCreateOutline size={'1.2rem'} />
-                <Link href={`/create-transaction`}>
-                  <a onClick={() => setOpenUserInfos(false)}>
+                    <RiArrowRightSLine size={'1.2em'} />
+                  </ActionItem>
+                </a>
+              </Link>
+              <Link href={`/create-transaction`}>
+                <a onClick={() => setOpenUserInfos(false)}>
+                  <ActionItem>
+                    <IoCreateOutline size={'1.2rem'} />
                     <p>Create Transaction</p>
-                  </a>
-                </Link>
-                <RiArrowRightSLine size={'1.2em'} />
-              </ActionItem>
+                    <RiArrowRightSLine size={'1.2em'} />
+                  </ActionItem>
+                </a>
+              </Link>
 
               {walletAddress && (
                 <Copy info="Wallet Address" data={walletAddress}>

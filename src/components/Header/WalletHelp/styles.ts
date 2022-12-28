@@ -35,12 +35,12 @@ export const BodyModal = styled.div`
   padding-inline-start: 1.5rem;
   padding-inline-end: 1.5rem;
   padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  padding-bottom: 10rem;
   flex: 1 1 0%;
   height: 100%;
   overflow: auto;
   color: ${props => props.theme.black};
-  h3 {
+  p {
     font-size: inherit;
     font-weight: inherit;
     padding: 10px 0px;
@@ -59,6 +59,8 @@ export const HeaderModal = styled.div`
   padding-inline-end: 1.5rem;
   padding-top: 1rem;
   padding-bottom: 1rem;
+
+  border-bottom: 1px solid ${props => props.theme.card.border};
   span {
     font-style: normal;
     font-weight: 800;
@@ -91,6 +93,6 @@ export const InformationDiv = styled.div`
 `;
 
 export const ImageContainer = styled.div`
-  padding: 10px 0px;
-  max-width: 100%;
+  width: 100%;
+  aspect-ratio: 2/1;
 `;

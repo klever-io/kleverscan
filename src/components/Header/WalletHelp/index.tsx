@@ -64,70 +64,72 @@ const WalletHelp: React.FC<IWalletDrawer> = ({
                 <Title>
                   <span>How to install Klever Extension in Google Chrome</span>
                 </Title>
-                <h3>
+                <p>
                   Klever Extension is a secure multi-crypto wallet and gateway
                   to blockchain applications. It is a non-custodial wallet to
                   anonymously store crypto-assets and connect to applications
                   from multiple blockchains including Bitcoin (BTC), Ethereum
                   (ETH), BSC (BNB), KleverChain (KLV) and Tron (TRX).
-                </h3>
-                <h3>
-                  Klever has released an open beta version of Klever Extension.
-                  Kindly, follow these steps to access Klever Extension open
-                  beta, and submit quality feedbacks for a chance to win some
-                  KLV tokens.
-                </h3>
-                <h3>
-                  <strong>Step 1</strong>: click{' '}
-                  <a href="https://klever.finance/klever-extension">here</a> ({' '}
-                  <a href="https://klever.finance/klever-extension">
-                    https://klever.finance/klever-extension
+                </p>
+                <p>
+                  It is available for Google Chrome and Chromium based browsers.
+                </p>
+                <br />
+                <p>To access the Klever Extension, follow the steps below:</p>
+                <p>
+                  <strong>Step 1</strong>:{' '}
+                  <a
+                    href="https://chrome.google.com/webstore/detail/klever-wallet/lmbifcmbofehdpolpdpnlcnanolnlkec"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Click here
                   </a>{' '}
-                  ) to open Klever Extension website.
-                </h3>
-                <h3>
-                  <strong>Step 2</strong>: Submit your Google Account email ({' '}
-                  <a href="mailto:example@gmail.com">@gmail.com</a> ) to access
-                  Klever Extension open beta. You will receive an email which
-                  confirms that you will be added to the test program within 24
-                  hours.
-                </h3>
+                  to open Klever Extension in Chrome Web Store.
+                </p>
+                <p>
+                  <strong>Step 2</strong>: Add Klever Extension to your Google
+                  Chrome browser by clicking the <strong>Add to Chrome</strong>{' '}
+                  button.
+                </p>
                 <ImageContainer>
                   <Image
-                    src="/extension/form.png"
-                    alt="Form"
+                    src="/extension/webstore.png"
+                    alt="WebStore"
                     width="800"
-                    height="235"
+                    height="420"
                   />
                 </ImageContainer>
-                <h3>
-                  <strong>Step 3</strong>: The email also contains a link to
-                  download Klever Extension. Kindly, wait 24 hours and then
-                  click the link inside the email to install Klever Extension on
-                  your Google Chrome browser. Note, you should log into Chrome
-                  Web Store with the same email you submitted in the signup
-                  form.
-                </h3>
+                <p>
+                  <strong>Step 3</strong>: Click the extension icon to open the
+                  Klever Extension. And follow the instructions to create a new
+                  wallet or import an existing wallet.
+                </p>
                 <ImageContainer>
                   <Image
-                    src="/extension/email.png"
-                    alt="Email"
-                    width="695"
-                    height="316"
+                    src="/extension/extension.png"
+                    alt="Extension"
+                    width="240"
+                    height="400"
                   />
                 </ImageContainer>
-                <h3>
-                  {
-                    "Once you've downloaded your Klever Extension from the Chrome Web Store, test the extension, and provide quality feedback to be entered into the draws to win some KLV tokens. Eligibility is very much dependent on your quality feedback."
-                  }
-                </h3>
-                <h3>
-                  To submit a <strong>feedback</strong>, kindly fill and submit
-                  the form at the bottom of the Klever Extension website:{' '}
-                  <a href="https://klever.finance/klever-extension">
-                    https://klever.finance/klever-extension
+                <p>
+                  <strong>Step 4</strong>: Once you have created a wallet, you
+                  can start using Klever Extension to connect to web
+                  applications and create transactions.
+                </p>
+                <p>
+                  Reload the page and click the <strong>Connect</strong> button
+                  to connect your wallet.
+                </p>
+                <br />
+                <p>
+                  If you have any issue with Klever Extension or you want to
+                  submit feedback, please contact Klever support at:{' '}
+                  <a href="http://support.klever.io/hc/en-us/requests/new">
+                    http://support.klever.io/hc/en-us/requests/new.
                   </a>
-                </h3>
+                </p>
               </BodyModal>
             </Container>
           </>,

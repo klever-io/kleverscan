@@ -625,21 +625,7 @@ export const getCells = async (
   // const buyType = contract[0].parameter.buyType || '';
   // const orderID = contract[0].parameter.orderID || '';
 
-  if (contract.length > 1) {
-    return [
-      hash,
-      blockNum,
-      created,
-      sender,
-      '',
-      status,
-      'Multi Contract',
-      parsedkAppFee,
-      parsedbandwidthFee,
-    ];
-  }
-
-  if (!router.query.type) {
+  if (!router.query.type && contract.length === 1) {
     cells.push(parsedkAppFee, parsedbandwidthFee);
     return cells;
   }
@@ -788,5 +774,26 @@ export const getCells = async (
     default:
       cells.push(parsedkAppFee, parsedbandwidthFee);
   }
+
+  if (contract.length > 1) {
+    const multiContract = [
+      hash,
+      blockNum,
+      created,
+      sender,
+      '',
+      status,
+      'Multi Contract',
+    ];
+
+    if (!router.query.type) {
+      multiContract.push(parsedkAppFee, parsedbandwidthFee);
+      return multiContract;
+    } else {
+      cells.slice(7).forEach(_ => multiContract.push(' '));
+    }
+    return multiContract;
+  }
+
   return cells;
 };

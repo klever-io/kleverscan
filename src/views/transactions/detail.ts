@@ -227,6 +227,10 @@ export const DivDataJson = styled.div`
 export const IconsWrapper = styled.div`
   display: flex;
   justify-content: center;
+
+  svg {
+    margin-top: 0.25rem;
+  }
 `;
 
 export const ButtonExpand = styled.button`

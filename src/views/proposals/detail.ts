@@ -487,3 +487,9 @@ export const BigSpan = styled.span`
 export const EpochInfo = styled.span`
   width: fit-content !important;
 `;
+
+export const EmptyDescription = styled.span`
+  color: ${props => props.theme.darkText};
+  font-size: 0.95rem;
+  font-weight: 400;
+`;

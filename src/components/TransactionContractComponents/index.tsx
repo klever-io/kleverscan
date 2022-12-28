@@ -50,7 +50,7 @@ import {
   FrozenContainer,
   RowContent,
 } from '@/views/accounts/detail';
-import { NetworkParamsContainer } from '@/views/proposals/detail';
+import { BigSpan, NetworkParamsContainer } from '@/views/proposals/detail';
 import {
   CenteredRow,
   HeaderWrapper,
@@ -989,7 +989,7 @@ export const Proposal: React.FC<IContract> = ({ parameter: par }) => {
         <span>
           <strong>Description</strong>
         </span>
-        <span>{parameter?.description}</span>
+        <BigSpan>{parameter?.description}</BigSpan>
       </Row>
       <Row>
         <span>

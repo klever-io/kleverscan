@@ -297,7 +297,17 @@ const ProposalSections = (par: IParameter): IRowSection[] => {
 
   return [
     {
-      element: <span key={parameter.description}>{parameter.description}</span>,
+      element: (
+        <span key={parameter.description}>
+          {parameter.description
+            ? `${
+                parameter.description.length > 48
+                  ? parameter.description.substring(0, 48).trim()
+                  : parameter.description
+              }...`
+            : '--'}
+        </span>
+      ),
       span: 1,
     },
   ];

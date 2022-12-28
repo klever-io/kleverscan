@@ -57,9 +57,6 @@ interface IContract {
   getAssets: () => void;
 }
 
-let triggerKey = 0;
-let claimKey = 0;
-let buyKey = 0;
 let assetID = 0;
 
 const Contract: React.FC<IContract> = ({
@@ -90,7 +87,6 @@ const Contract: React.FC<IContract> = ({
   const [assetBalance, setAssetBalance] = useState<number | null>(null);
   const [collection, setCollection] = useState<any>({});
   const [proposalId, setProposalId] = useState<number | null>(null);
-  const [claimLabel, setClaimLabel] = useState('Asset ID');
   const [buyLabel, setBuyLabel] = useState('Order ID');
   const [binaryOperations, setBinaryOperations] = useState([]);
 
@@ -121,16 +117,6 @@ const Contract: React.FC<IContract> = ({
       window.scrollTo(0, 0);
     }
   }, [txHash]);
-
-  useEffect(() => {
-    setFormSections([
-      ...formSection({
-        contract: 'ClaimContract',
-        address: ownerAddress,
-        claimLabel,
-      }),
-    ]);
-  }, [claimLabel]);
 
   useEffect(() => {
     setFormSections([
@@ -233,7 +219,6 @@ const Contract: React.FC<IContract> = ({
   }, [collection]);
 
   const defineBuyContract = (label: string) => {
-    buyKey += 1;
     setFormSections([
       ...formSection({
         contract: 'BuyContract',
@@ -272,7 +257,7 @@ const Contract: React.FC<IContract> = ({
           ...formSection({
             contract: selectedOption.value,
             address: ownerAddress,
-            claimLabel,
+            claimLabel: 'Asset ID',
           }),
         ]);
         break;
@@ -476,14 +461,26 @@ const Contract: React.FC<IContract> = ({
       <FieldLabel>Claim Type</FieldLabel>
       <Select
         options={claimTypes}
-        onChange={value => {
-          if (!isNaN(value?.value)) {
-            if (value.value === 0 || value.value === 1) {
-              setClaimLabel('Asset ID');
-            } else if (value.value === 2) {
-              setClaimLabel('Order ID');
+        onChange={e => {
+          if (!isNaN(e?.value)) {
+            if (e.value === 0 || e.value === 1) {
+              setFormSections([
+                ...formSection({
+                  contract: 'ClaimContract',
+                  address: ownerAddress,
+                  claimLabel: 'Asset ID',
+                }),
+              ]);
+            } else if (e.value === 2) {
+              setFormSections([
+                ...formSection({
+                  contract: 'ClaimContract',
+                  address: ownerAddress,
+                  claimLabel: 'Order ID',
+                }),
+              ]);
             }
-            setClaimType(value.value);
+            setClaimType(e.value);
           }
         }}
       />
@@ -605,18 +602,12 @@ const Contract: React.FC<IContract> = ({
         return ITOForm();
 
       default:
-        triggerKey += 1;
-        claimKey += 1;
-
         const key =
-          contractType === 'CreateAssetContract'
-            ? String(formSections)
-            : contractType === 'AssetTriggerContract'
-            ? triggerKey
-            : contractType === 'ClaimContract'
-            ? claimKey
-            : contractType === 'BuyContract'
-            ? buyKey
+          contractType === 'CreateAssetContract' ||
+          contractType === 'AssetTriggerContract' ||
+          contractType === 'ClaimContract' ||
+          contractType === 'BuyContract'
+            ? JSON.stringify(formSections)
             : contractType;
 
         return (

@@ -15,7 +15,7 @@ const createValidatorContract = (address = ''): ISection[] => {
       {
         label: 'Owner Address',
         props: {
-          value: address,
+          defaultValue: address,
           required: true,
         },
       },

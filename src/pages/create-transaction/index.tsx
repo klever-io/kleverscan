@@ -7,7 +7,6 @@ import api from '@/services/api';
 import { ICollectionList, IKAssets, IParamList } from '@/types/index';
 import { INetworkParam, IProposalsResponse } from '@/types/proposals';
 import { useDidUpdateEffect } from '@/utils/hooks';
-import { doIf } from '@/utils/index';
 import { Header } from '@/views/assets';
 import { Card } from '@/views/blocks';
 import { CardContainer, Container } from '@/views/create-transaction';
@@ -27,7 +26,8 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
   const [kassetsList, setKAssetsList] = useState<IKAssets[]>([]);
   const router = useRouter();
 
-  const { extensionInstalled, connectExtension } = useExtension();
+  const { extensionInstalled, connectExtension, logoutExtension } =
+    useExtension();
 
   useDidUpdateEffect(() => {
     if (extensionInstalled) {
@@ -64,107 +64,107 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
 
   const getAssets = async () => {
     if (typeof window !== 'undefined') {
-      const callback = async () => {
-        let address = '';
-        await doIf(
-          async () => (address = await window.kleverWeb.getWalletAddress()),
-          () => handleLogout(),
-          () => window?.kleverWeb?.getWalletAddress !== undefined,
-          500,
-        );
+      const address = sessionStorage.getItem('walletAddress') || '';
 
-        if (address) {
-          getKAssets(address);
+      if (address === '') {
+        logoutExtension();
+        toast.error('Please connect your wallet to create a transaction');
+        router.push('/');
+        return;
+      }
 
-          const account: any = await api.get({
-            route: `address/${address}`,
-          });
+      getKAssets(address);
 
-          if (account?.data?.account?.assets) {
-            const { assets, frozenBalance, balance } = account?.data?.account;
-            const list: ICollectionList[] = [];
-            const addAssetsInfo = Object.keys(account.data.account.assets).map(
-              async item => {
-                const assetInfo: any = await api.get({
-                  route: `assets/${item}`,
-                });
+      const account: any = await api.get({
+        route: `address/${address}`,
+      });
 
-                const minEpochsToWithdraw =
-                  assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
-                const ownerAddress = assetInfo.data?.asset?.ownerAddress;
-                const {
-                  assetType,
-                  frozenBalance,
-                  balance,
-                  precision,
-                  buckets,
-                } = account.data.account.assets[item];
-                list.push({
-                  label: item,
-                  value: item,
-                  isNFT: assetType === 1,
-                  balance,
-                  frozenBalance,
-                  precision,
-                  buckets,
-                  minEpochsToWithdraw: minEpochsToWithdraw
-                    ? minEpochsToWithdraw
-                    : null,
-                  ownerAddress,
-                });
-              },
-            );
+      if (
+        !account?.data?.account?.assets &&
+        account?.data?.account?.balance === 0
+      ) {
+        setAssetsLists([]);
+        return;
+      }
 
-            await Promise.all(addAssetsInfo);
+      const accountData = account?.data?.account
+        ? account.data.account
+        : {
+            assets: [],
+            frozenBalance: 0,
+            balance: 0,
+          };
 
-            if (!Object.keys(assets).includes('KLV') && balance !== 0) {
-              const assetInfo: any = await api.get({
-                route: `assets/KLV`,
-              });
+      const { assets, frozenBalance, balance } = accountData;
+      const list: ICollectionList[] = [];
+      const addAssetsInfo = Object.keys(assets).map(async item => {
+        const assetInfo: any = await api.get({
+          route: `assets/${item}`,
+        });
 
-              const minEpochsToWithdraw =
-                assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
+        const minEpochsToWithdraw =
+          assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
+        const ownerAddress = assetInfo.data?.asset?.ownerAddress;
+        const { assetType, frozenBalance, balance, precision, buckets } =
+          account.data.account.assets[item];
 
-              list.unshift({
-                label: 'KLV',
-                value: 'KLV',
-                isNFT: false,
-                balance,
-                frozenBalance: frozenBalance ? frozenBalance : 0,
-                precision: 6,
-                buckets: [],
-                minEpochsToWithdraw: minEpochsToWithdraw
-                  ? minEpochsToWithdraw
-                  : null,
-              });
-            }
+        list.push({
+          label: item,
+          value: item,
+          isNFT: assetType === 1,
+          balance,
+          frozenBalance,
+          precision,
+          buckets,
+          minEpochsToWithdraw: minEpochsToWithdraw ? minEpochsToWithdraw : null,
+          ownerAddress,
+        });
+      });
 
-            setAssetsLists(list);
-          } else if (!account?.data) {
-            setAssetsLists([]);
-          }
-        }
-      };
+      await Promise.all(addAssetsInfo);
 
-      doIf(
-        async () => await callback(),
-        () => handleLogout(),
-        () => window.kleverWeb !== undefined,
-        500,
+      if (!Object.keys(assets).includes('KLV') && balance !== 0) {
+        const assetInfo: any = await api.get({
+          route: `assets/KLV`,
+        });
+
+        const minEpochsToWithdraw =
+          assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
+
+        list.push({
+          label: 'KLV',
+          value: 'KLV',
+          isNFT: false,
+          balance,
+          frozenBalance: frozenBalance ? frozenBalance : 0,
+          precision: 6,
+          buckets: [],
+          minEpochsToWithdraw: minEpochsToWithdraw ? minEpochsToWithdraw : null,
+        });
+      }
+      list.sort((a, b) => (a.label > b.label ? 1 : -1));
+
+      const KLV = list.splice(
+        list.indexOf(
+          list.find(item => item.label === 'KLV') as ICollectionList,
+        ),
+        1,
       );
+
+      const KFI = list.splice(
+        list.indexOf(
+          list.find(item => item.label === 'KFI') as ICollectionList,
+        ),
+        1,
+      );
+
+      setAssetsLists([...KLV, ...KFI, ...list]);
     }
   };
 
   useEffect(() => {
     getAssets();
   }, []);
-
-  const handleLogout = () => {
-    if (router.pathname.includes('/create-transaction')) {
-      toast.error('Please connect your wallet to create a transaction');
-      router.push('/');
-    }
-  };
 
   return (
     <Container>

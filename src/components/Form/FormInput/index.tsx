@@ -54,12 +54,20 @@ const FormInput: React.FC<IFormInputProps> = ({
 
   const { fieldName, registerField, error } = useField(name);
 
+  const inputProps = {
+    ref: inputRef,
+    type,
+    defaultValue,
+    ...rest,
+  };
+
   const getInitialValue = useCallback(() => {
     switch (type) {
       case 'checkbox':
         if (defaultValue === undefined) {
           bool ? (defaultValue = 'true') : (defaultValue = 1);
         }
+        inputProps?.defaultValue && delete inputProps.defaultValue;
         return defaultValue;
       case 'number':
       case 'datetime-local':
@@ -67,7 +75,7 @@ const FormInput: React.FC<IFormInputProps> = ({
       default:
         return '';
     }
-  }, [type, defaultValue, bool]);
+  }, [type, defaultValue, bool, inputProps]);
 
   const [value, setValue] = useState(getInitialValue());
 
@@ -86,13 +94,6 @@ const FormInput: React.FC<IFormInputProps> = ({
       });
     }
   }, [fieldName, registerField]);
-
-  const inputProps = {
-    ref: inputRef,
-    type,
-    defaultValue,
-    ...rest,
-  };
 
   const containerProps = {
     span,

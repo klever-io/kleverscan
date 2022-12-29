@@ -457,11 +457,7 @@ describe('Contract Component', () => {
   });
 
   it('should render the Claim form contract', async () => {
-    const items = [
-      'Claim rewards or expired market orders.',
-      'Claim Type',
-      'Asset ID',
-    ];
+    const items = ['Claim rewards or expired market orders.', 'Claim Type'];
     let container: any;
     await waitFor(
       () =>

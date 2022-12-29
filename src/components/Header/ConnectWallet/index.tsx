@@ -37,7 +37,9 @@ interface IConnectWallet {
 const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openUserInfos, setOpenUserInfos] = useState(false);
-  const [balance, setBalance] = useState<any>(null);
+  const [balance, setBalance] = useState<any>({
+    klv: 0,
+  });
   const [loadingBalance, setLoadingBalance] = useState<any>(false);
 
   const {

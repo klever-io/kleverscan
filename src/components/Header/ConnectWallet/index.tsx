@@ -38,7 +38,7 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openUserInfos, setOpenUserInfos] = useState(false);
   const [balance, setBalance] = useState<any>({
-    klv: 0,
+    klv: undefined,
   });
   const [loadingBalance, setLoadingBalance] = useState<any>(false);
 
@@ -172,10 +172,10 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
 
               <ReloadContainer onClick={getAccountBalance}>
                 <BalanceContainer>
-                  <>
-                    <span>{balance['klv'] ? balance['klv'] : '---'}</span>
-                    <KLV />
-                  </>
+                  <span>
+                    {balance['klv'] !== undefined ? balance['klv'] : '---'}
+                  </span>
+                  <KLV />
                 </BalanceContainer>
                 <IoReloadSharpWrapper loading={loadingBalance}>
                   <IoReloadSharp />

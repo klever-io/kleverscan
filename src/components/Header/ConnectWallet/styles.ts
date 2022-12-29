@@ -1,7 +1,7 @@
 import { transparentize } from 'polished';
 import { BiTransfer } from 'react-icons/bi';
 import { IoIosLogOut } from 'react-icons/io';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 export const ConnectButton = styled.div`
   display: flex;
@@ -240,7 +240,7 @@ export const StyledTransfer = styled(BiTransfer)`
 
 export const QRCodeContainer = styled.div`
   position: relative;
-
+  gap: 0.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -260,6 +260,46 @@ export const QRCodeContainer = styled.div`
     small {
       padding-top: 0.5rem;
     }
+  }
+`;
+
+export const BalanceContainer = styled.span`
+  font-weight: 600;
+  color: ${props => props.theme.violet};
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  width: 100%;
+  padding: 0 3.5rem;
+`;
+
+const rotate = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+export const ReloadContainer = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: flex-end;
+  min-height: 1.5rem;
+  cursor: pointer;
+`;
+
+export const IoReloadSharpWrapper = styled.span<{ loading: boolean }>`
+  svg {
+    position: absolute;
+    float: right;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    color: ${props => props.theme.darkText};
+    animation: ${props => (props.loading ? rotate : 'none')} 1s linear infinite;
   }
 `;
 

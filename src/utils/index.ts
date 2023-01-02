@@ -1,5 +1,10 @@
 import { ISelectedDays } from '@/components/DateFilter';
 import api from '@/services/api';
+import {
+  BuyReceiptData,
+  IKAppTransferReceipt,
+  ITransferReceipt,
+} from '@/types/receipts';
 import { TFunction } from 'next-i18next';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { NextRouter } from 'next/router';
@@ -25,7 +30,6 @@ import {
 } from '../types';
 import {
   ContractsIndex,
-  IBuyContract,
   IBuyContractPayload,
   IBuyITOsTotalPrices,
 } from '../types/contracts';
@@ -35,6 +39,7 @@ import {
   getHeaderForCSV,
   initialsTableHeaders,
 } from './contracts';
+import { findNextSiblingReceipt, findPreviousSiblingReceipt } from './findKey';
 
 /**
  * Emulates CSS ellipsis by receiving a string and a limit, if the string length is bigger then the limit, the exceeded characters will be replaced by the ellipsis.
@@ -819,7 +824,9 @@ const processRow = async (
   const parsedRow = await getCells(row, router, getContextPrecision);
   for (let j = 0; j < parsedRow.length; j++) {
     const innerValue =
-      parsedRow[j] === (null || undefined) ? '' : parsedRow[j].toString();
+      parsedRow[j] === null || parsedRow[j] === undefined
+        ? ''
+        : parsedRow[j].toString();
 
     let result = innerValue.replace(/"/g, '""');
     if (result.search(/("|,|\n)/g) >= 0) result = '"' + result + '"';
@@ -933,87 +940,59 @@ export const passViewportStyles = (
   }
   return desktopStyles;
 };
-const getBuyTotalAmount = (receipts: IBuyReceipt[], sender: string) => {
-  let value = 0;
-  if (receipts.length) {
-    receipts.forEach(receipt => {
-      if (receipt.to === sender) {
-        value += receipt?.value ?? 0;
-      }
-    });
-  }
-  return value;
-};
 
-const getITOBuyPrice = (
-  receipts: IBuyReceipt[],
+export const receiverIsSender = (
   sender: string,
-  parameter: IBuyContractPayload,
-  currencyIDPrecision: number,
-) => {
-  const txValue = receipts?.find(
-    receipt =>
-      receipt.assetId === parameter.currencyID && receipt.from === sender,
-  )?.value;
-  if (typeof txValue === 'number') {
-    return toLocaleFixed(
-      txValue / 10 ** currencyIDPrecision,
-      currencyIDPrecision,
-    );
-  }
-  return 0;
-};
+  receipt: IKAppTransferReceipt | ITransferReceipt,
+): boolean => sender === receipt?.to;
 
-export const getBuyAmount = (
+export const getBuyReceipt = (
+  parameter: IBuyContractPayload,
   receipts: IBuyReceipt[],
+  contractIndex: number,
   sender: string,
-  parameter: IBuyContractPayload,
-  amountPrecision: number,
-  contracts: IBuyContract[],
-): string | null => {
-  if (parameter?.buyType === 'ITOBuy') {
-    return toLocaleFixed(
-      parameter.amount / 10 ** amountPrecision,
-      amountPrecision,
+  receiverIsSender: (
+    sender: string,
+    receipt: IKAppTransferReceipt | ITransferReceipt,
+  ) => boolean,
+): null | IKAppTransferReceipt | ITransferReceipt => {
+  let buyReceipt = null;
+  if (parameter?.buyType === 'MarketBuy') {
+    buyReceipt = findNextSiblingReceipt(
+      receipts,
+      contractIndex,
+      16,
+      14, // in MarketBuy, the formal buy receipt is 16, but it is the 14(kapp transfer) receipt that has that data we want
+      [sender],
+      receiverIsSender,
     );
+  } else if (parameter?.buyType === 'ITOBuy') {
+    buyReceipt = findPreviousSiblingReceipt(receipts, contractIndex, 2, 0); // there is no formal buy receipt in ITOBuy, but the data we want is in the 0(transfer) receipt
   }
-
-  if (parameter?.buyType === 'MarketBuy' && contracts.length < 2) {
-    // no support for multicontract
-    const parsedAmount =
-      getBuyTotalAmount(receipts, sender) / 10 ** amountPrecision;
-    if (parsedAmount !== 0) {
-      return toLocaleFixed(parsedAmount, amountPrecision);
-    }
-  }
-  return null;
+  return buyReceipt;
 };
 
 export const getBuyPrice = (
-  receipts: IBuyReceipt[],
-  sender: string,
   parameter: IBuyContractPayload,
-  currencyIDPrecision: number,
-  contracts: IBuyContract[],
-): string | null | number => {
+  buyReceipt: BuyReceiptData,
+): undefined | number => {
   if (parameter?.buyType === 'MarketBuy') {
-    return toLocaleFixed(
-      parameter.amount / 10 ** currencyIDPrecision,
-      currencyIDPrecision,
-    );
+    return parameter.amount;
+  } else if (parameter?.buyType === 'ITOBuy') {
+    return buyReceipt?.value;
   }
-  if (parameter?.buyType === 'ITOBuy' && contracts.length < 2) {
-    // support for multicontract in parent component
-    return getITOBuyPrice(receipts, sender, parameter, currencyIDPrecision);
-  }
-  return null;
 };
 
-export const getAssetBought = (
-  receipts: IBuyReceipt[],
-  sender: string,
-): string =>
-  receipts.find(receipt => receipt.to === sender)?.assetId?.split('/')[0] ?? '';
+export const getBuyAmount = (
+  parameter: IBuyContractPayload,
+  buyReceipt: BuyReceiptData,
+): undefined | number => {
+  if (parameter?.buyType === 'MarketBuy') {
+    return buyReceipt?.value;
+  } else if (parameter?.buyType === 'ITOBuy') {
+    return parameter?.amount;
+  }
+};
 
 export const parseJson = (data: string): string => {
   try {
@@ -1022,4 +1001,11 @@ export const parseJson = (data: string): string => {
   } catch (error) {
     return data;
   }
+};
+
+export const renderCorrectPath = (uriKey: string): string => {
+  if (uriKey && uriKey.startsWith('https://')) {
+    return uriKey;
+  }
+  return `https://${uriKey}`;
 };

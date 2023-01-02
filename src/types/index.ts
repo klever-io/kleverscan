@@ -140,7 +140,7 @@ export interface IContractAssetIds {
   precision?: number;
   asset?: IAsset;
   receipts?: IReceipt[];
-  contractIndex?: number;
+  contractIndex: number;
 }
 
 interface ItotalLeaderSuccessRate {

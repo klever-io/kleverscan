@@ -235,7 +235,7 @@ const ClaimSections = (
   receipts: IReceipt[],
 ): IRowSection[] => {
   const parameter = par as unknown as IClaimContract;
-  const assetId = findReceipt(receipts, 0, 17, 'assetId');
+  const assetId = findReceipt(receipts, 0, 17)?.assetId;
   return [
     {
       element: (

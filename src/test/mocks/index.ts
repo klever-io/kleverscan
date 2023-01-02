@@ -308,8 +308,12 @@ export const mockedTxContractComponents = {
     type: Contract.ValidatorConfig,
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
     parameter: {
-      name: 'Klever Config',
-      blsPublicKey: 'pubkey',
+      config: {
+        name: 'Klever Config',
+        blsPublicKey: 'pubkey',
+        uris: [{ Twitter: 'www.twitter.com' }],
+        logo: 'www.image.png',
+      },
     },
   },
   setAccountNameContract: {

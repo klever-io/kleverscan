@@ -1,6 +1,6 @@
-import { useMobile } from '@/contexts/mobile';
 import { doIf } from '@/utils/index';
 import { core } from '@klever/sdk';
+import { useRouter } from 'next/router';
 import {
   createContext,
   useCallback,
@@ -24,8 +24,7 @@ export const ExtensionProvider: React.FC = ({ children }) => {
   const [extensionInstalled, setExtensionInstalled] = useState(false);
   const [extensionLoading, setExtensionLoading] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
-
-  const { closeMenu } = useMobile();
+  const router = useRouter();
 
   useEffect(() => {
     const init = async () => {
@@ -43,6 +42,11 @@ export const ExtensionProvider: React.FC = ({ children }) => {
   const logoutExtension = useCallback(() => {
     setWalletAddress('');
     sessionStorage.removeItem('walletAddress');
+
+    if (router.pathname.includes('/create-transaction')) {
+      toast.error('Wallet Disconnected');
+      router.push('/');
+    }
   }, [walletAddress]);
 
   useEffect(() => {

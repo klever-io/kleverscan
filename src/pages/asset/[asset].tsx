@@ -16,6 +16,7 @@ import {
   IPagination,
   IResponse,
   ITransaction,
+  IUri,
 } from '@/types/index';
 import {
   filterDate,
@@ -99,7 +100,6 @@ const Asset: React.FC<IAssetPage> = ({
     name,
     logo,
     ticker,
-    uris,
     assetId,
     assetType,
     issueDate,
@@ -115,6 +115,17 @@ const Asset: React.FC<IAssetPage> = ({
     verified,
     royalties,
   } = asset;
+
+  let uris = {};
+
+  if (asset.uris && asset.uris.length > 0) {
+    (asset.uris as IUri[]).forEach(uri => {
+      uris = {
+        ...uris,
+        [uri.key]: uri.value,
+      };
+    });
+  }
 
   const cardHeaders = uris
     ? ['Overview', 'More', 'URIS', 'Staking & Royalties']

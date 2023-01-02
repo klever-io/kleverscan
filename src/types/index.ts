@@ -280,7 +280,11 @@ export interface IAsset {
   ticker: string;
   ownerAddress: string;
   logo: string;
-  uris: any;
+  uris:
+    | {
+        [key: string]: string;
+      }
+    | IUri[];
   precision: number;
   initialSupply: number;
   circulatingSupply: number;

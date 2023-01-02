@@ -560,7 +560,7 @@ export const klvAsset: IAsset = {
   ownerAddress: '',
   logo: '',
   precision: 6,
-  uris: null,
+  uris: [],
   initialSupply: 0,
   circulatingSupply: 0,
   maxSupply: 0,

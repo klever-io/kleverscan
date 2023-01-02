@@ -1,3 +1,4 @@
+import { WarningIcon } from '@/assets/calendar';
 import { Transactions as Icon } from '@/assets/title-icons';
 import Contract from '@/components/Contract';
 import Title from '@/components/Layout/Title';
@@ -9,7 +10,12 @@ import { INetworkParam, IProposalsResponse } from '@/types/proposals';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { Header } from '@/views/assets';
 import { Card } from '@/views/blocks';
-import { CardContainer, Container } from '@/views/create-transaction';
+import {
+  CardContainer,
+  Container,
+  WarningContainer,
+  WarningText,
+} from '@/views/create-transaction';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -22,7 +28,7 @@ interface IContract {
 }
 
 const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
-  const [assetsList, setAssetsLists] = useState<any>([]);
+  const [assetsList, setAssetsLists] = useState<ICollectionList[]>([]);
   const [kassetsList, setKAssetsList] = useState<IKAssets[]>([]);
   const router = useRouter();
 
@@ -168,6 +174,20 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
 
   return (
     <Container>
+      {!assetsList.find(
+        (item: ICollectionList) => item.label === 'KLV' && item.balance > 0,
+      ) && (
+        <WarningContainer>
+          <WarningIcon />
+          <WarningText>
+            Your KLV balance{' '}
+            {process.env.DEFAULT_API_HOST?.includes('testnet') && '(testnet)'}{' '}
+            {process.env.DEFAULT_API_HOST?.includes('devnet') && '(devnet)'} is
+            zero. You can preview the transaction, but you will not be able to
+            send it.
+          </WarningText>
+        </WarningContainer>
+      )}
       <Header>
         <Title Icon={Icon} title={'Create Transaction'} />
       </Header>

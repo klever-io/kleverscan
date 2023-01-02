@@ -35,6 +35,7 @@ import {
   CardVote,
   CardVoteContainer,
   Container,
+  EmptyDescription,
   FiltersValidators,
   HalfRow,
   Header,
@@ -95,6 +96,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
     No: 0,
   });
   const [votedQty, setVotedQty] = useState(0);
+  const [expandData, setExpandData] = useState(false);
   const [totalVoted, setTotalVoted] = useState(0);
   const [votersList, setVotersList] = useState<IParsedVoter[]>([]);
   const [selectedFilter, setSelectedFilter] = useState('Yes');
@@ -406,7 +408,12 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                 <span>
                   <strong>Description</strong>
                 </span>
-                <BigSpan>{description}</BigSpan>
+                {description && <BigSpan>{description}</BigSpan>}
+                {!description && (
+                  <EmptyDescription>
+                    <span>No description provided</span>
+                  </EmptyDescription>
+                )}
               </Row>
             </CardContent>
           </CardContainer>

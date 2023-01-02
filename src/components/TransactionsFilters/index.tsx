@@ -36,7 +36,7 @@ const TransactionsFilters: React.FC<ITransactionsFilters> = ({
       if (selected === 'KLV' && router.pathname === '/account/[account]') {
         setQuery({ ...query, [filterType]: selected });
       } else {
-        setQuery({ ...query, [filterType]: selected.toLowerCase() });
+        setQuery({ ...query, [filterType]: selected });
       }
     }
   };

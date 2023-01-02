@@ -235,7 +235,7 @@ const ClaimSections = (
   receipts: IReceipt[],
 ): IRowSection[] => {
   const parameter = par as unknown as IClaimContract;
-  const assetId = findReceipt(receipts, 0, 17, 'assetId');
+  const assetId = findReceipt(receipts, 0, 17)?.assetId;
   return [
     {
       element: (
@@ -297,7 +297,17 @@ const ProposalSections = (par: IParameter): IRowSection[] => {
 
   return [
     {
-      element: <span key={parameter.description}>{parameter.description}</span>,
+      element: (
+        <span key={parameter.description}>
+          {parameter.description
+            ? `${
+                parameter.description.length > 48
+                  ? parameter.description.substring(0, 48).trim()
+                  : parameter.description
+              }...`
+            : '--'}
+        </span>
+      ),
       span: 1,
     },
   ];
@@ -369,10 +379,10 @@ const SellSections = (par: IParameter): IRowSection[] => {
   let assetId = parameter.assetId;
   let currencyID = parameter.currencyID;
 
-  if (parameter.assetId.includes('/')) {
+  if (parameter.assetId?.includes('/')) {
     assetId = parameter.assetId.split('/')[0];
   }
-  if (parameter.currencyID.includes('/')) {
+  if (parameter.currencyID?.includes('/')) {
     currencyID = parameter.currencyID.split('/')[0];
   }
 

@@ -29,10 +29,10 @@ declare type AppProps = NextJsAppProps & {
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   const children = (
     <InternalThemeProvider>
+      <ToastContainer />
       <MobileProvider>
         <ExtensionProvider>
           <PrecisionProvider>
-            <ToastContainer />
             <Layout>
               <Component {...pageProps} />
             </Layout>

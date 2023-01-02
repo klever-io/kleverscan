@@ -16,6 +16,7 @@ import {
   IPagination,
   IResponse,
   ITransaction,
+  IUri,
 } from '@/types/index';
 import {
   filterDate,
@@ -48,6 +49,7 @@ import {
 } from '@/views/assets/detail';
 import { BalanceContainer, RowContent } from '@/views/proposals/detail';
 import { ReceiveBackground } from '@/views/validator';
+import { format, fromUnixTime } from 'date-fns';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -98,7 +100,6 @@ const Asset: React.FC<IAssetPage> = ({
     name,
     logo,
     ticker,
-    uris,
     assetId,
     assetType,
     issueDate,
@@ -114,6 +115,17 @@ const Asset: React.FC<IAssetPage> = ({
     verified,
     royalties,
   } = asset;
+
+  let uris = {};
+
+  if (asset.uris && asset.uris.length > 0) {
+    (asset.uris as IUri[]).forEach(uri => {
+      uris = {
+        ...uris,
+        [uri.key]: uri.value,
+      };
+    });
+  }
 
   const cardHeaders = uris
     ? ['Overview', 'More', 'URIS', 'Staking & Royalties']
@@ -388,7 +400,7 @@ const Asset: React.FC<IAssetPage> = ({
           <strong>{staking?.apr.length > 0 ? 'APR' : 'FPR'}</strong>
           <ContentScrollBar>
             {staking.interestType === 'FPRI'
-              ? staking.fpr.map((fpr, index) => (
+              ? staking.fpr.reverse().map((fpr, index) => (
                   <span key={index}>
                     <p>
                       Total Amount:{' '}
@@ -405,20 +417,24 @@ const Asset: React.FC<IAssetPage> = ({
                       )}
                     </p>
                     <p>Epoch: {fpr.epoch}</p>
-                    <p>Total Claimed: {fpr.TotalClaimed}</p>
-                  </span>
-                ))
-              : staking.apr.map((apr, index) => (
-                  <span key={index}>
                     <p>
-                      Timestamp:{' '}
+                      Total Claimed:{' '}
                       {toLocaleFixed(
-                        (apr.timestamp || 0) / 10 ** precision,
+                        (fpr.TotalClaimed || 0) / 10 ** precision,
                         precision,
                       )}
                     </p>
-                    <p>Epoch: {apr.epoch}</p>
-                    <p>Value: {apr.value}</p>
+                  </span>
+                ))
+              : staking.apr.reverse().map((apr, index) => (
+                  <span key={index}>
+                    <p>
+                      Timestamp:{' '}
+                      {format(fromUnixTime(apr.timestamp), 'MM/dd/yyyy HH:mm')}
+                    </p>
+                    <p>
+                      Value: {toLocaleFixed((apr.value || 0) / 10 ** 2, 2)}%
+                    </p>
                   </span>
                 ))}
           </ContentScrollBar>

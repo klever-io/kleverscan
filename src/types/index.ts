@@ -140,7 +140,7 @@ export interface IContractAssetIds {
   precision?: number;
   asset?: IAsset;
   receipts?: IReceipt[];
-  contractIndex?: number;
+  contractIndex: number;
 }
 
 interface ItotalLeaderSuccessRate {
@@ -280,7 +280,11 @@ export interface IAsset {
   ticker: string;
   ownerAddress: string;
   logo: string;
-  uris: any;
+  uris:
+    | {
+        [key: string]: string;
+      }
+    | IUri[];
   precision: number;
   initialSupply: number;
   circulatingSupply: number;

@@ -1,7 +1,7 @@
 import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
 import { IAsset, IBalance, IRowSection } from '@/types/index';
-import { parseAddress, toLocaleFixed } from '@/utils/index';
+import { formatAmount, parseAddress, toLocaleFixed } from '@/utils/index';
 import Link from 'next/link';
 import React from 'react';
 import { AddressContainer, RankingContainer, RankingText } from './styles';
@@ -22,7 +22,7 @@ interface IHolderTableProps {
 
 const Holders: React.FC<IHolder> = ({ holders, asset, holdersTableProps }) => {
   const rowSections = (props: IBalance): IRowSection[] => {
-    const { address, frozenBalance, index, rank } = props;
+    const { address, frozenBalance, index, rank, balance } = props;
 
     return [
       {
@@ -64,10 +64,18 @@ const Holders: React.FC<IHolder> = ({ holders, asset, holdersTableProps }) => {
         ),
         span: 1,
       },
+      {
+        element: (
+          <strong key={balance}>
+            {formatAmount(balance / 10 ** asset.precision)}
+          </strong>
+        ),
+        span: 1,
+      },
     ];
   };
 
-  const header = ['Rank', 'Address', 'Percentage', 'Frozen Amount'];
+  const header = ['Rank', 'Address', 'Percentage', 'Frozen Amount', 'Balance'];
 
   const tableProps: ITable = {
     rowSections,

@@ -99,6 +99,7 @@ const createAsset = (type: string, address = ''): ISection[] => {
             {
               label: 'Address',
               props: {
+                defaultValue: address,
                 required: true,
                 span: 2,
                 tooltip: 'Royalty receiver address',
@@ -370,6 +371,7 @@ const createAsset = (type: string, address = ''): ISection[] => {
             {
               label: 'Address',
               props: {
+                defaultValue: address,
                 required: true,
                 tooltip: 'Target Address',
               },

@@ -10,7 +10,7 @@ export enum Contract {
   Transfer = 'TransferContractType',
   CreateAsset = 'CreateAssetContractType',
   CreateValidator = 'CreateValidatorContractType',
-  ValidatorConfig = 'ConfigValidatorContractType',
+  ValidatorConfig = 'ValidatorConfigContractType',
   Freeze = 'FreezeContractType',
   Unfreeze = 'UnfreezeContractType',
   Delegate = 'DelegateContractType',
@@ -224,8 +224,13 @@ export interface IValidatorConfig {
   commission: number;
   maxDelegationAmount: number;
   logo: string;
-  uris: any;
+  uris: IValidatorConfigURI[];
   name: string;
+}
+
+export interface IValidatorConfigURI {
+  key: string;
+  value: string;
 }
 
 export interface IFreezeContract {
@@ -348,6 +353,7 @@ export interface IVoteContract {
   amount: number;
   assetId?: string;
   precision?: number;
+  type: 'Yes' | 'No';
 }
 
 export enum EnumITOStatus {
@@ -549,11 +555,15 @@ export interface IContract {
   precision?: number;
   asset?: IAsset;
   receipts?: IReceipt[];
-  contractIndex?: number;
+}
+
+export interface IIndexedContract extends IContract {
+  contractIndex: number;
 }
 
 export interface IContractBuyProps extends IContract {
   sender: string;
+  contractIndex: number;
   contracts: IBuyContract[];
 }
 

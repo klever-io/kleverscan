@@ -1,7 +1,6 @@
 import {
   Contract,
   ContractsIndex,
-  IBuyContract,
   IContract,
   IContractOption,
 } from '@/types/contracts';
@@ -9,9 +8,10 @@ import { format, fromUnixTime } from 'date-fns';
 import { NextRouter } from 'next/router';
 import {
   getAmountFromReceipts,
-  getAssetBought,
   getBuyAmount,
   getBuyPrice,
+  getBuyReceipt,
+  receiverIsSender,
 } from '.';
 import { IBuyReceipt, IReceipt, IRowSection, ITransaction } from '../types';
 import { findReceipt } from './findKey';
@@ -625,21 +625,7 @@ export const getCells = async (
   // const buyType = contract[0].parameter.buyType || '';
   // const orderID = contract[0].parameter.orderID || '';
 
-  if (contract.length > 1) {
-    return [
-      hash,
-      blockNum,
-      created,
-      sender,
-      '',
-      status,
-      'Multi Contract',
-      parsedkAppFee,
-      parsedbandwidthFee,
-    ];
-  }
-
-  if (!router.query.type) {
+  if (!router.query.type && contract.length === 1) {
     cells.push(parsedkAppFee, parsedbandwidthFee);
     return cells;
   }
@@ -688,7 +674,7 @@ export const getCells = async (
       break;
     case Contract.Claim:
       const claimType = parameter?.claimType || '';
-      assetId = findReceipt(receipts, 0, 17, 'assetId');
+      assetId = findReceipt(receipts, 0, 17)?.assetId;
       amount = await getAmountFromReceipts(assetId, 17, receipts);
       cells.push(claimType, assetId, amount);
       break;
@@ -723,31 +709,34 @@ export const getCells = async (
     case Contract.Buy:
       const buyType = parameter?.buyType || '';
       let currencyID = parameter?.currencyID || '';
-      const currencyIDPrecision =
-        (await getContextPrecision(parameter?.currencyID)) ?? 6;
+      const buyReceipt = getBuyReceipt(
+        parameter,
+        receipts as IBuyReceipt[],
+        0,
+        sender,
+        receiverIsSender,
+      );
+      let currencyIDPrecision = 6;
       let amountPrecision = 0;
-
-      if (parameter?.buyType === 'ITOBuy') {
-        amountPrecision = (await getContextPrecision(parameter?.id)) ?? 0;
-      } else if (parameter?.buyType === 'MarketBuy') {
-        const assetBought = getAssetBought(receipts as IBuyReceipt[], sender);
-        amountPrecision = (await getContextPrecision(assetBought)) ?? 0;
+      if (parameter?.currencyID !== 'KLV' && parameter?.currencyID !== 'KFI') {
+        currencyIDPrecision =
+          (await getContextPrecision(parameter?.currencyID || 'KLV')) ?? 0;
       }
+      if (parameter?.buyType === 'MarketBuy') {
+        amountPrecision =
+          (await getContextPrecision(buyReceipt?.assetId ?? '')) ?? 0;
+      } else if (parameter?.buyType === 'ITOBuy') {
+        amountPrecision = (await getContextPrecision(parameter?.id)) ?? 0;
+      }
+      let buyPrice = getBuyPrice(parameter, buyReceipt);
+      let buyAmount = getBuyAmount(parameter, buyReceipt);
 
-      const buyPrice = getBuyPrice(
-        receipts as IBuyReceipt[],
-        sender,
-        parameter,
-        currencyIDPrecision,
-        contract as unknown as IBuyContract[],
-      );
-      const buyAmount = getBuyAmount(
-        receipts as IBuyReceipt[],
-        sender,
-        parameter,
-        amountPrecision,
-        contract as unknown as IBuyContract[],
-      );
+      if (buyPrice) {
+        buyPrice = buyPrice / 10 ** currencyIDPrecision;
+      }
+      if (buyAmount) {
+        buyAmount = buyAmount / 10 ** amountPrecision;
+      }
       cells.push(buyType, currencyID, buyPrice, buyAmount);
       break;
     case Contract.Sell:
@@ -788,5 +777,26 @@ export const getCells = async (
     default:
       cells.push(parsedkAppFee, parsedbandwidthFee);
   }
+
+  if (contract.length > 1) {
+    const multiContract = [
+      hash,
+      blockNum,
+      created,
+      sender,
+      '',
+      status,
+      'Multi Contract',
+    ];
+
+    if (!router.query.type) {
+      multiContract.push(parsedkAppFee, parsedbandwidthFee);
+      return multiContract;
+    } else {
+      cells.slice(7).forEach(_ => multiContract.push(' '));
+    }
+    return multiContract;
+  }
+
   return cells;
 };

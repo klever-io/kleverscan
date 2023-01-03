@@ -523,14 +523,6 @@ export async function getPrecision(
       const { precisions } = await getPrecisionFromApi(aux);
       const newPrecisions = { ...storedPrecisions, ...precisions };
       localStorage.setItem('precisions', JSON.stringify(newPrecisions));
-      console.log(
-        assetIds.reduce((prev, current) => {
-          return {
-            ...prev,
-            [current]: storedPrecisions[current] || newPrecisions[current],
-          };
-        }, {}),
-      );
       return assetIds.reduce((prev, current) => {
         return {
           ...prev,
@@ -552,14 +544,12 @@ export async function getPrecision(
         const { precisions } = (await getPrecisionFromApi([assetId])) || 0;
         const newPrecisions = { ...storedPrecisions, ...precisions };
         localStorage.setItem('precisions', JSON.stringify(newPrecisions));
-        console.log(precisions[assetId]);
         return precisions[assetId];
       } catch (error: any) {
         console.error(error);
         throw new Error(error);
       }
     } else {
-      console.log(storedPrecisions[assetId.split('/')[0]]);
       return storedPrecisions[assetId.split('/')[0]];
     }
   } else {

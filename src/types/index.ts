@@ -705,3 +705,7 @@ export interface ICustomStyles {
   offset?: IOffset;
   place?: Place;
 }
+
+export interface IPrecisionResponse {
+  precisions: { [assetId: string]: number };
+}

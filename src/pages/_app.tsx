@@ -1,5 +1,4 @@
 import { ExtensionProvider } from '@/contexts/extension';
-import { PrecisionProvider } from '@/contexts/precision';
 import { InternalThemeProvider } from '@/contexts/theme';
 import { MobileProvider } from 'contexts/mobile';
 import { appWithTranslation, SSRConfig } from 'next-i18next';
@@ -32,13 +31,12 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
       <ToastContainer />
       <MobileProvider>
         <ExtensionProvider>
-          <PrecisionProvider>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-            <GlobalStyle />
-            <NProgress />
-          </PrecisionProvider>
+          <ToastContainer />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+          <GlobalStyle />
+          <NProgress />
         </ExtensionProvider>
       </MobileProvider>
     </InternalThemeProvider>

@@ -563,7 +563,7 @@ export async function getPrecision(
  * @returns boolean
  */
 export const regexImgUrl = (url: string): boolean => {
-  const regex = /[\/.](gif|jpg|jpeg|tiff|png|webp)$/i;
+  const regex = /[\/.](gif|jpg|jpeg|tiff|png|webp|svg)$/i;
   if (regex.test(url)) {
     return true;
   }

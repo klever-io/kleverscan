@@ -159,9 +159,10 @@ const Validator: React.FC<IValidatorPage> = ({
   const renderTitle = () => {
     return (
       <h1>
-        {name || isMobile
-          ? parseAddress(ownerAddress, 14)
-          : parseAddress(ownerAddress, 24)}
+        {name ||
+          (isMobile
+            ? parseAddress(ownerAddress, 14)
+            : parseAddress(ownerAddress, 24))}
       </h1>
     );
   };

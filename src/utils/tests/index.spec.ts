@@ -14,7 +14,7 @@ import {
   getAge,
   getContractType,
   getEpochInfo,
-  getPrecision,
+  getPrecisionFromApi,
   getSelectedTab,
   getVariation,
   hexToString,
@@ -48,6 +48,7 @@ jest.mock('@/services/api', () => {
   return {
     getCached: jest.fn(),
     get: jest.fn(),
+    post: jest.fn(),
   };
 });
 
@@ -529,11 +530,21 @@ describe('unit tests for util funcs in index file', () => {
     });
   });
 
-  describe('test getPrecision function ', () => {
+  describe('test getPrecisionFromApi function ', () => {
+    const mockPrecision = {
+      data: {
+        precisions: {
+          'PVM-GVCI': 10,
+          KLV: 6,
+        },
+      },
+      error: '',
+      code: 'successful',
+    };
     test('return precision asset', async () => {
-      (api.getCached as jest.Mock).mockReturnValueOnce(mocks.precisionAsset);
-      const precision = (await getPrecision('PVM-GVCI')) as any;
-      expect(precision).toEqual(10);
+      (api.post as jest.Mock).mockReturnValue(mockPrecision);
+      const precision = (await getPrecisionFromApi(['PVM-GVCI', 'KLV'])) as any;
+      expect(precision).toEqual({ precisions: mockPrecision.data.precisions });
     });
   });
 

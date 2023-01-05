@@ -42,17 +42,29 @@ import {
 const fnsCopySpy = { format }; // this solves a spyOn bug
 
 const precision = 6; // default klv precision
-
+const mockPrecision = {
+  data: {
+    precisions: {
+      KLV: 6,
+    },
+  },
+  error: '',
+  code: 'successful',
+};
 describe('Component: TransactionContractComponents', () => {
   describe('When contract is "Transfer"', () => {
-    it('Should render the "Amount", "to"( who receive ) with the link and the coin with the link', () => {
-      renderWithTheme(
-        <Transfer
-          {...mockedTxContractComponents.transferContract}
-          precision={precision}
-          asset={klvAsset}
-        />,
-      );
+    it('Should render the "Amount", "to"( who receive ) with the link and the coin with the link', async () => {
+      const spy = jest.spyOn(utils, 'getPrecision');
+      spy.mockReturnValue(new Promise<number>(resolve => resolve(6)));
+      await act(async () => {
+        renderWithTheme(
+          <Transfer
+            {...mockedTxContractComponents.transferContract}
+            precision={precision}
+            asset={klvAsset}
+          />,
+        );
+      });
       const {
         transferContract: { parameter },
       } = mockedTxContractComponents;
@@ -239,23 +251,25 @@ describe('Component: TransactionContractComponents', () => {
   });
 
   describe('When contract is "Freeze"', () => {
-    it('Should render "Amount" and "Bucket ID" with all it\'s values', () => {
-      renderWithTheme(
-        <Freeze
-          {...freeze1}
-          receipts={freeze1.receipts}
-          parameter={freeze1.contract[0].parameter}
-          contractIndex={0}
-        />,
-      );
-
+    it('Should render "Amount" and "Bucket ID" with all it\'s values', async () => {
+      const spy = jest.spyOn(utils, 'getPrecision');
+      spy.mockReturnValue(new Promise<number>(resolve => resolve(6)));
+      await act(async () => {
+        renderWithTheme(
+          <Freeze
+            {...freeze1}
+            receipts={freeze1.receipts}
+            parameter={freeze1.contract[0].parameter}
+            contractIndex={0}
+          />,
+        );
+      });
       [
         screen.getByText('Type'),
         screen.getByText('Asset Id'),
         screen.getByText('Amount'),
         screen.getByText('Bucket Id'),
         screen.getByText('Freeze'),
-
         screen.getByText('KLV'),
         screen.getByText('12,820.000000'),
         screen.getByText(
@@ -266,16 +280,27 @@ describe('Component: TransactionContractComponents', () => {
   });
 
   describe('When contract is "Unfreeze"', () => {
-    it('Should render "Amount" and "Bucket ID" with all it\'s values', () => {
-      renderWithTheme(
-        <Unfreeze
-          {...unfreeze1}
-          receipts={unfreeze1.receipts}
-          parameter={unfreeze1.contract[0].parameter}
-          contractIndex={0}
-        />,
+    it('Should render "Amount" and "Bucket ID" with all it\'s values', async () => {
+      const spy = jest.spyOn(utils, 'getPrecision');
+      spy.mockReturnValue(
+        new Promise<{
+          [assetId: string]: number;
+        }>(resolve =>
+          resolve({
+            KLV: 6,
+          }),
+        ),
       );
-
+      await act(async () => {
+        renderWithTheme(
+          <Unfreeze
+            {...unfreeze1}
+            receipts={unfreeze1.receipts}
+            parameter={unfreeze1.contract[0].parameter}
+            contractIndex={0}
+          />,
+        );
+      });
       [
         screen.getByText('Type'),
         screen.getByText('Asset Id'),
@@ -365,14 +390,18 @@ describe('Component: TransactionContractComponents', () => {
   });
 
   describe('When contract is "Claim"', () => {
-    it('Should render "Claim Type" and "Id" with all it\'s values', () => {
-      renderWithTheme(
-        <Claim
-          {...claim1}
-          receipts={claim1.receipts}
-          parameter={claim1.contract[0].parameter}
-        />,
-      );
+    it('Should render "Claim Type" and "Id" with all it\'s values', async () => {
+      const spy = jest.spyOn(utils, 'getPrecision');
+      spy.mockReturnValue(new Promise<number>(resolve => resolve(6)));
+      await act(async () => {
+        renderWithTheme(
+          <Claim
+            {...claim1}
+            receipts={claim1.receipts}
+            parameter={claim1.contract[0].parameter}
+          />,
+        );
+      });
       const typeLabel = screen.getByText('Type');
       const claimTypeLabel = screen.getByText('Claim Type');
       const assetIdLabel = screen.getByText('Asset Id');
@@ -508,7 +537,16 @@ describe('Component: TransactionContractComponents', () => {
   describe('When contract is "MarketBuy"', () => {
     it('Should render "Buy Type" and "Id" with all it\'s values', async () => {
       const spy = jest.spyOn(utils, 'getPrecision');
-      spy.mockReturnValue(new Promise(resolve => resolve(0)));
+      spy.mockReturnValue(
+        new Promise<{
+          [assetId: string]: number;
+        }>(resolve =>
+          resolve({
+            KLV: 6,
+            'KPNFT-13Z0': 0,
+          }),
+        ),
+      );
       await act(async () => {
         renderWithTheme(
           <Buy
@@ -568,7 +606,7 @@ describe('Component: TransactionContractComponents', () => {
   describe('When contract is "Sell"', () => {
     it('Should render "Market Type" and "Asset Id" with all it\'s values', async () => {
       const spyPrecision = jest.spyOn(utils, 'getPrecision');
-      spyPrecision.mockReturnValue(new Promise(resolve => resolve(6)));
+      spyPrecision.mockReturnValue(new Promise<number>(resolve => resolve(6)));
 
       const spyFormat = jest.spyOn(fnsCopySpy, 'format');
       spyFormat.mockReturnValue('14/11/2023 18:52');

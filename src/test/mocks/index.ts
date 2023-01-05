@@ -133,6 +133,7 @@ export const mockedTxContractComponents = {
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
     parameter: {
       amount: 100000000,
+      assetId: 'KLV',
       toAddress:
         'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jquca668',
     },

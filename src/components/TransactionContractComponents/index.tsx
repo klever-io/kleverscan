@@ -1,5 +1,7 @@
 import { KLV } from '@/assets/coins';
+import Copy from '@/components/Copy';
 import {
+  EnumTriggerTypeName,
   IAssetTriggerContract,
   IBuyContractPayload,
   ICancelMarketOrderContract,
@@ -15,6 +17,7 @@ import {
   IFreezeContract,
   IIndexedContract,
   IITOTriggerContract,
+  IParameter,
   IProposalContract,
   ISellContract,
   ISetAccountNameContract,
@@ -24,6 +27,7 @@ import {
   IUndelegateContract,
   IUnfreezeContract,
   IUpdateAccountPermissionContract,
+  IURIs,
   IValidatorConfigContract,
   IVoteContract,
   IWithdrawContract,
@@ -39,6 +43,7 @@ import {
   findPreviousSiblingReceipt,
   findReceipt,
 } from '@/utils/findKey';
+import { usePrecision } from '@/utils/hooks';
 import {
   calculatePermissionOperations,
   getBuyAmount,
@@ -59,33 +64,24 @@ import { BigSpan, NetworkParamsContainer } from '@/views/proposals/detail';
 import {
   CenteredRow,
   HeaderWrapper,
+  HoverAnchor,
   Hr,
   NestedContainerWrapper,
+  RoleDiv,
+  RoleStrong,
+  RoleWrapper,
   Row,
+  StrongWidth,
+  URIsWrapper,
 } from '@/views/transactions/detail';
 import { format, fromUnixTime } from 'date-fns';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
-import Copy from '../Copy';
 
 export const Transfer: React.FC<IIndexedContract> = ({ parameter: par }) => {
   const parameter = par as ITransferContract;
-  const [precision, setPrecision] = useState(0);
-
-  useEffect(() => {
-    const assetID = parameter?.assetId?.split('/') || [];
-
-    const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 0);
-    };
-
-    if (assetID.length === 0 || assetID[0] === 'KLV' || assetID[0] === 'KFI') {
-      setPrecision(6);
-      return;
-    }
-
-    getAssetPrecision();
-  }, []);
+  const assetID = parameter?.assetId?.split('/') || [];
+  const precision = usePrecision(assetID[0]);
 
   return (
     <>
@@ -633,28 +629,9 @@ export const Freeze: React.FC<IIndexedContract> = ({
 }) => {
   const parameter = par as IFreezeContract;
   const receipts = rec as IFreezeReceipt[];
-
-  const [precision, setPrecision] = useState(6);
+  const assetID = parameter?.assetId?.split('/') || [];
+  const precision = usePrecision(assetID[0]);
   const freezeReceipt = findReceipt(receipts, contractIndex, 3);
-
-  useEffect(() => {
-    const assetID = parameter?.assetId?.split('/') || [];
-
-    const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 0);
-    };
-
-    if (assetID.length > 1) {
-      return;
-    }
-
-    if (assetID.length === 0 || assetID[0] === 'KLV' || assetID[0] === 'KFI') {
-      setPrecision(6);
-      return;
-    }
-
-    getAssetPrecision();
-  }, []);
 
   return (
     <>
@@ -701,40 +678,11 @@ export const Unfreeze: React.FC<IIndexedContract> = ({
 }) => {
   const parameter = par as IUnfreezeContract;
   const receipts = rec as IUnfreezeReceipt[];
-  const [precision, setPrecision] = useState(6);
-  const [claimPrecision, setClaimPrecision] = useState(6);
-
-  const unfreezeReceipt = findReceipt(receipts, contractIndex, 4);
-
   const claimReceipt = findNextSiblingReceipt(receipts, contractIndex, 4, 17);
-
-  useEffect(() => {
-    const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(parameter?.assetId || 'KLV')) ?? 6);
-    };
-
-    if (parameter?.assetId === 'KFI') {
-      setPrecision(6);
-      return;
-    }
-
-    getAssetPrecision();
-  }, []);
-
-  useEffect(() => {
-    const getAssetPrecision = async () => {
-      setClaimPrecision(
-        (await getPrecision(claimReceipt?.assetIdReceived || 'KLV')) ?? 6,
-      );
-    };
-
-    if (claimReceipt?.assetIdReceived === 'KFI') {
-      setClaimPrecision(6);
-      return;
-    }
-
-    getAssetPrecision();
-  });
+  const claimPrecision = claimReceipt?.assetIdReceived || 'KLV';
+  const assetIdPrecision = parameter?.assetId || 'KLV';
+  const precision = usePrecision([claimPrecision, assetIdPrecision]);
+  const unfreezeReceipt = findReceipt(receipts, contractIndex, 4);
 
   return (
     <>
@@ -775,7 +723,10 @@ export const Unfreeze: React.FC<IIndexedContract> = ({
             <strong>Amount</strong>
           </span>
           <span>
-            {toLocaleFixed(unfreezeReceipt?.value / 10 ** precision, precision)}
+            {toLocaleFixed(
+              unfreezeReceipt?.value / 10 ** precision[assetIdPrecision],
+              precision[assetIdPrecision],
+            )}
           </span>
         </Row>
       )}
@@ -785,7 +736,7 @@ export const Unfreeze: React.FC<IIndexedContract> = ({
             <strong>Claimed Rewards</strong>
           </span>
           <span>
-            {claimReceipt.amount / 10 ** claimPrecision}{' '}
+            {claimReceipt.amount / 10 ** precision[claimPrecision]}{' '}
             {claimReceipt.assetIdReceived}
           </span>
         </Row>
@@ -799,30 +750,15 @@ export const Delegate: React.FC<IIndexedContract> = ({
   contractIndex,
 }) => {
   const parameter = par as IDelegateContract;
-  const [claimPrecision, setClaimPrecision] = useState(6);
-
-  useEffect(() => {
-    const getAssetPrecision = async () => {
-      setClaimPrecision(
-        (await getPrecision(claimReceipt?.assetIdReceived || 'KLV')) ?? 6,
-      );
-    };
-
-    if (claimReceipt?.assetIdReceived === 'KFI') {
-      setClaimPrecision(6);
-      return;
-    }
-
-    getAssetPrecision();
-  });
-
   const delegateReceipt = findReceipt(receipts, contractIndex, 7);
-
   const claimReceipt = findPreviousSiblingReceipt(
     receipts,
     contractIndex,
     7,
     17,
+  );
+  const claimPrecision = usePrecision(
+    (claimReceipt?.assetIdReceived || 'KLV') as string,
   );
 
   return (
@@ -900,22 +836,9 @@ export const Undelegate: React.FC<IIndexedContract> = ({
     7,
     17,
   );
-  const [claimPrecision, setClaimPrecision] = useState(6);
-
-  useEffect(() => {
-    const getAssetPrecision = async () => {
-      setClaimPrecision(
-        (await getPrecision(claimReceipt?.assetIdReceived || 'KLV')) ?? 6,
-      );
-    };
-
-    if (claimReceipt?.assetIdReceived === 'KFI') {
-      setClaimPrecision(6);
-      return;
-    }
-
-    getAssetPrecision();
-  });
+  const claimPrecision = usePrecision(
+    (claimReceipt?.assetIdReceived || 'KLV') as string,
+  );
 
   return (
     <>
@@ -972,10 +895,6 @@ export const Withdraw: React.FC<IIndexedContract> = ({
   contractIndex,
 }) => {
   const parameter = par as IWithdrawContract;
-  const [precision, setPrecision] = useState(6);
-  const [claimPrecision, setClaimPrecision] = useState(6);
-
-  const withdrawReceipt = findReceipt(receipts, contractIndex, 18);
 
   const claimReceipt = findPreviousSiblingReceipt(
     receipts,
@@ -983,34 +902,11 @@ export const Withdraw: React.FC<IIndexedContract> = ({
     18,
     17,
   );
+  const assetIdPrecision = parameter?.assetId || 'KLV';
+  const claimPrecision = claimReceipt?.assetIdReceived || 'KLV';
+  const precision = usePrecision([assetIdPrecision, claimPrecision]);
+  const withdrawReceipt = findReceipt(receipts, contractIndex, 18);
 
-  useEffect(() => {
-    const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(parameter?.assetId || 'KLV')) ?? 6);
-    };
-
-    if (parameter?.assetId === 'KFI') {
-      setPrecision(6);
-      return;
-    }
-
-    getAssetPrecision();
-  }, []);
-
-  useEffect(() => {
-    const getAssetPrecision = async () => {
-      setClaimPrecision(
-        (await getPrecision(claimReceipt?.assetIdReceived || 'KLV')) ?? 6,
-      );
-    };
-
-    if (claimReceipt?.assetIdReceived === 'KFI') {
-      setClaimPrecision(6);
-      return;
-    }
-
-    getAssetPrecision();
-  });
   return (
     <>
       <Row>
@@ -1034,8 +930,8 @@ export const Withdraw: React.FC<IIndexedContract> = ({
           </span>
           <span>
             {toLocaleFixed(
-              withdrawReceipt?.amount / 10 ** precision,
-              precision,
+              withdrawReceipt?.amount / 10 ** precision[assetIdPrecision],
+              precision[assetIdPrecision],
             )}{' '}
             {withdrawReceipt?.assetId}
           </span>
@@ -1049,8 +945,8 @@ export const Withdraw: React.FC<IIndexedContract> = ({
           <span>
             <CenteredRow>
               {toLocaleFixed(
-                claimReceipt.amount / 10 ** claimPrecision,
-                claimPrecision,
+                claimReceipt.amount / 10 ** precision[claimPrecision],
+                precision[claimPrecision],
               )}{' '}
               {claimReceipt.assetIdReceived}
             </CenteredRow>
@@ -1067,20 +963,10 @@ export const Claim: React.FC<IIndexedContract> = ({
 }) => {
   const parameter = par as IClaimContract;
   const claimReceipt = findReceipt(receipts, 0, 17);
-  const [precision, setPrecision] = useState(6);
+  const precision = usePrecision(
+    (claimReceipt?.assetIdReceived || 'KLV') as string,
+  );
 
-  useEffect(() => {
-    const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(claimReceipt?.assetId || 'KLV')) ?? 6);
-    };
-
-    if (parameter?.assetId === 'KFI') {
-      setPrecision(6);
-      return;
-    }
-
-    getAssetPrecision();
-  }, []);
   return (
     <>
       <Row>
@@ -1135,26 +1021,8 @@ export const AssetTrigger: React.FC<IIndexedContract> = ({
   parameter: par,
 }) => {
   const parameter = par as IAssetTriggerContract;
-  const [precision, setPrecision] = useState(0);
-
-  useEffect(() => {
-    const assetID = parameter?.assetId?.split('/') || [];
-
-    const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 0);
-    };
-
-    if (assetID.length > 1) {
-      return;
-    }
-
-    if (assetID.length === 0 || assetID[0] === 'KLV' || assetID[0] === 'KFI') {
-      setPrecision(6);
-      return;
-    }
-
-    getAssetPrecision();
-  }, []);
+  const assetID = parameter?.assetId?.split('/') || [];
+  const precision = usePrecision(assetID[0]);
 
   return (
     <>
@@ -1176,51 +1044,7 @@ export const AssetTrigger: React.FC<IIndexedContract> = ({
         </span>
         <span>{parameter?.assetId}</span>
       </Row>
-      {parameter.amount && (
-        <Row>
-          <span>
-            <strong>Amount</strong>
-          </span>
-          <span>
-            {toLocaleFixed(parameter?.amount / 10 ** precision, precision)}
-          </span>
-        </Row>
-      )}
-      {parameter.toAddress && (
-        <Row>
-          <span>
-            <strong>To</strong>
-          </span>
-          <CenteredRow>
-            {parameter?.toAddress}
-            <Copy data={parameter?.toAddress} info="address"></Copy>
-          </CenteredRow>
-        </Row>
-      )}
-      {parameter?.logo && (
-        <Row>
-          <span>
-            <strong>Logo</strong>
-          </span>
-          <span>{parameter?.logo}</span>
-        </Row>
-      )}
-      {parameter?.mime && (
-        <Row>
-          <span>
-            <strong>MIME</strong>
-          </span>
-          <span>{parameter?.mime}</span>
-        </Row>
-      )}
-      {parameter?.staking && (
-        <Row>
-          <span>
-            <strong>Staking</strong>
-          </span>
-          <span>{`Type: ${parameter?.staking?.type}  APR: ${parameter.staking?.apr}`}</span>
-        </Row>
-      )}
+      {renderAssetTriggerTypeData(parameter, precision)}
     </>
   );
 };
@@ -1341,26 +1165,8 @@ export const Vote: React.FC<IIndexedContract> = ({ parameter: par }) => {
 
 export const ConfigITO: React.FC<IIndexedContract> = ({ parameter: par }) => {
   const parameter = par as IConfigITOContract;
-  const [precision, setPrecision] = useState(0);
-
-  useEffect(() => {
-    const assetID = parameter?.assetId?.split('/') || [];
-
-    const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 0);
-    };
-
-    if (assetID.length > 1) {
-      return;
-    }
-
-    if (assetID.length === 0 || assetID[0] === 'KLV' || assetID[0] === 'KFI') {
-      setPrecision(6);
-      return;
-    }
-
-    getAssetPrecision();
-  }, []);
+  const assetID = parameter?.assetId?.split('/') || [];
+  const precision = usePrecision(assetID[0]);
 
   return (
     <>
@@ -1433,11 +1239,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
 }) => {
   const parameter = par as IBuyContractPayload;
   const receipts = rec as IBuyReceipt[];
-  const [amountPrecision, setAmountPrecision] = useState(0);
-  const [currencyIDPrecision, setCurrencyIDPrecision] = useState(6);
-
   const buyType = parameter?.buyType;
-
   const buyReceipt: any = getBuyReceipt(
     parameter,
     receipts,
@@ -1445,7 +1247,16 @@ export const Buy: React.FC<IContractBuyProps> = ({
     sender,
     receiverIsSender,
   );
-
+  const objBuyType = {
+    precision:
+      buyType === 'ITOBuy'
+        ? parameter?.id
+        : buyReceipt?.assetId.split('/')[0] ?? '',
+  };
+  const priceAssetId = parameter?.currencyID;
+  const currencyPrecision = objBuyType.precision;
+  const assetIdPrecision = priceAssetId || 'KLV';
+  const precisions = usePrecision([currencyPrecision, assetIdPrecision]);
   const getAmountAssetId = () => {
     let assetId = '';
     if (buyType === 'MarketBuy' && buyReceipt) {
@@ -1457,32 +1268,12 @@ export const Buy: React.FC<IContractBuyProps> = ({
   };
   const amountAssetId = getAmountAssetId();
 
-  const priceAssetId = parameter?.currencyID;
-
-  useEffect(() => {
-    const getPrecisions = async () => {
-      if (priceAssetId !== 'KLV' && priceAssetId !== 'KFI') {
-        setCurrencyIDPrecision(
-          (await getPrecision(priceAssetId || 'KLV')) ?? 0,
-        );
-      }
-      if (buyType === 'MarketBuy') {
-        setAmountPrecision(
-          (await getPrecision(buyReceipt?.assetId ?? '')) ?? 0,
-        );
-      } else if (buyType === 'ITOBuy') {
-        setAmountPrecision((await getPrecision(parameter?.id)) ?? 0);
-      }
-    };
-    getPrecisions();
-  }, []);
-
   const formattedPrice = () => {
     const price = getBuyPrice(parameter, buyReceipt);
     if (typeof price === 'number') {
       return toLocaleFixed(
-        price / 10 ** currencyIDPrecision,
-        currencyIDPrecision,
+        price / 10 ** precisions[assetIdPrecision],
+        precisions[assetIdPrecision],
       );
     }
     return null;
@@ -1492,7 +1283,10 @@ export const Buy: React.FC<IContractBuyProps> = ({
   const formattedAmount = () => {
     const amount = getBuyAmount(parameter, buyReceipt);
     if (typeof amount === 'number') {
-      return toLocaleFixed(amount / 10 ** amountPrecision, amountPrecision);
+      return toLocaleFixed(
+        amount / 10 ** precisions[currencyPrecision],
+        precisions[currencyPrecision],
+      );
     }
     return null;
   };
@@ -1570,9 +1364,7 @@ export const Sell: React.FC<IIndexedContract> = ({
   contractIndex,
 }) => {
   const parameter = par as ISellContract;
-
-  const [precision, setPrecision] = useState(0);
-
+  const precision = usePrecision(parameter?.currencyID || 'KLV');
   const kappTransferReceipt = findPreviousSiblingReceipt(
     receipts,
     contractIndex,
@@ -1581,20 +1373,6 @@ export const Sell: React.FC<IIndexedContract> = ({
   );
 
   const sellReceipt = findReceipt(receipts, contractIndex, 15);
-
-  useEffect(() => {
-    const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(parameter?.currencyID || 'KLV')) ?? 0);
-    };
-
-    if (parameter?.currencyID === 'KFI') {
-      setPrecision(6);
-      return;
-    }
-
-    getAssetPrecision();
-  }, []);
-
   return (
     <>
       <Row>
@@ -1889,20 +1667,7 @@ export const UpdateAccountPermission: React.FC<IIndexedContract> = ({
 
 export const Deposit: React.FC<IIndexedContract> = ({ parameter: par }) => {
   const parameter = par as IDepositContract;
-  const [precision, setPrecision] = useState(6);
-
-  useEffect(() => {
-    const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(parameter?.currencyID || 'KLV')) ?? 0);
-    };
-
-    if (parameter?.currencyID === 'KFI') {
-      setPrecision(6);
-      return;
-    }
-
-    getAssetPrecision();
-  }, []);
+  const precision = usePrecision(parameter?.currencyID || 'KLV');
 
   return (
     <>
@@ -1954,8 +1719,7 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({ parameter: par }) => {
     return initialPacksPrecisions;
   };
 
-  const [precision, setPrecision] = useState(0);
-
+  const precision = usePrecision(parameter?.assetID || 'KLV');
   type PacksPrecision =
     | PromiseSettledResult<number | undefined>[]
     | { value: number }[];
@@ -1965,24 +1729,14 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({ parameter: par }) => {
   );
 
   useEffect(() => {
-    const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(parameter?.assetID || 'KLV')) ?? 0);
-    };
-
-    if (parameter?.assetID === 'KFI') {
-      setPrecision(6);
-      return;
-    }
-
     const getPacksPrecision = async () => {
       const promises = packInfo.map(pack => {
-        return getPrecision(pack.key);
+        return getPrecision([pack.key]);
       });
-      const result = await Promise.allSettled(promises);
+      const result: any = await Promise.allSettled(promises);
       setPacksPrecision(result);
     };
     getPacksPrecision();
-    getAssetPrecision();
   }, []);
 
   const renderPackPrecision = (price: number, index: number) => {
@@ -2203,4 +1957,194 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({ parameter: par }) => {
       {renderTriggerTypeData()}
     </>
   );
+};
+
+const renderAssetTriggerTypeData: React.FC<IAssetTriggerContract> = (
+  parameter: IParameter,
+  precision: number,
+): any => {
+  const par = parameter as IAssetTriggerContract;
+  const triggerType = par?.triggerType;
+
+  const toAddressReturn = () => (
+    <Row>
+      <span>
+        <strong>To</strong>
+      </span>
+      <CenteredRow>
+        {par?.toAddress}
+        <Copy data={par?.toAddress} info="address"></Copy>
+      </CenteredRow>
+    </Row>
+  );
+
+  const amountReturn = () => (
+    <Row>
+      <span>
+        <strong>Amount</strong>
+      </span>
+      <span>{toLocaleFixed(par?.amount / 10 ** precision, precision)}</span>
+    </Row>
+  );
+
+  const roleReturn = () => (
+    <Row>
+      <span>
+        <strong>Role</strong>
+      </span>
+      <RowContent>
+        <BalanceContainer>
+          <FrozenContainer>
+            <RoleWrapper>
+              <RoleDiv>
+                <RoleStrong>Address</RoleStrong>
+                <span style={{ marginRight: '0.5rem' }}>
+                  {par.role.address}
+                </span>
+                <Copy data={par.role.address} />
+              </RoleDiv>
+
+              <RoleDiv>
+                <RoleStrong>HasRoleMint</RoleStrong>
+                <span>{String(par.role.hasRoleMint)}</span>
+              </RoleDiv>
+              <RoleDiv>
+                <RoleStrong>HasRoleSetITOPrices</RoleStrong>
+                <span>{String(par.role.hasRoleSetITOPrices)}</span>
+              </RoleDiv>
+            </RoleWrapper>
+          </FrozenContainer>
+        </BalanceContainer>
+      </RowContent>
+    </Row>
+  );
+
+  const mimeReturn = () => (
+    <Row>
+      <span>
+        <strong>MIME</strong>
+      </span>
+      <span>{par?.mime}</span>
+    </Row>
+  );
+
+  const logoReturn = () => (
+    <Row>
+      <span>
+        <strong>Logo</strong>
+      </span>
+      <HoverAnchor href={renderCorrectPath(par.logo)}>{par.logo}</HoverAnchor>
+    </Row>
+  );
+
+  const URIsReturn = () => (
+    <Row>
+      <span>
+        <strong>URIs</strong>
+      </span>
+      <RowContent>
+        <BalanceContainer>
+          <FrozenContainer>
+            {par?.uris.map((uri: IURIs, index: number) => (
+              <URIsWrapper key={index}>
+                <section>
+                  <span>{uri.key}</span>
+                </section>
+                <section>
+                  <HoverAnchor href={renderCorrectPath(uri.value)}>
+                    {uri.value}
+                  </HoverAnchor>
+                </section>
+              </URIsWrapper>
+            ))}
+          </FrozenContainer>
+        </BalanceContainer>
+      </RowContent>
+    </Row>
+  );
+
+  const updateStakingReturn = () => (
+    <Row>
+      <span>
+        <strong>Staking</strong>
+      </span>
+      <RowContent>
+        <BalanceContainer>
+          <FrozenContainer>
+            <URIsWrapper>
+              <section>
+                <StrongWidth>APR</StrongWidth>
+                <span>{par.staking?.apr}</span>
+              </section>
+              <section>
+                <StrongWidth>min Epochs To Claim</StrongWidth>
+                <span>{par.staking?.minEpochsToClaim}</span>
+              </section>
+              <section>
+                <StrongWidth>min Epochs To Unstake</StrongWidth>
+                <span>{par.staking?.minEpochsToUnstake}</span>
+              </section>
+              <section>
+                <StrongWidth>min Epochs To Withdraw</StrongWidth>
+                <span>{par.staking?.minEpochsToWithdraw}</span>
+              </section>
+              <section>
+                <StrongWidth>Type</StrongWidth>
+                <span>{par.staking?.type}</span>
+              </section>
+            </URIsWrapper>
+          </FrozenContainer>
+        </BalanceContainer>
+      </RowContent>
+    </Row>
+  );
+
+  switch (triggerType) {
+    case EnumTriggerTypeName.Mint:
+      return (
+        <>
+          {toAddressReturn()}
+          {amountReturn()}
+        </>
+      );
+    case EnumTriggerTypeName.Burn:
+      return amountReturn();
+    case EnumTriggerTypeName.Wipe:
+      return (
+        <>
+          {toAddressReturn()}
+          {amountReturn()}
+        </>
+      );
+    case EnumTriggerTypeName.Pause:
+      return null;
+    case EnumTriggerTypeName.Resume:
+      return null;
+    case EnumTriggerTypeName.ChangeOwner:
+      return toAddressReturn();
+    case EnumTriggerTypeName.AddRole:
+      return roleReturn();
+    case EnumTriggerTypeName.RemoveRole:
+      return toAddressReturn();
+    case EnumTriggerTypeName.UpdateMetadata:
+      return mimeReturn();
+    case EnumTriggerTypeName.StopNFTMint:
+      return null;
+    case EnumTriggerTypeName.UpdateLogo:
+      return logoReturn();
+    case EnumTriggerTypeName.UpdateURIs:
+      return URIsReturn();
+    case EnumTriggerTypeName.ChangeRoyaltiesReceiver:
+      return toAddressReturn();
+    case EnumTriggerTypeName.UpdateStaking:
+      return updateStakingReturn();
+    case EnumTriggerTypeName.UpdateRoyalties:
+      return null;
+    case EnumTriggerTypeName.UpdateKDAFeePool:
+      return null;
+    case EnumTriggerTypeName.StopRoyaltiesChange:
+      return null;
+    default:
+      return null;
+  }
 };

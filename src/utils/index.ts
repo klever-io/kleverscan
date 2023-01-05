@@ -23,6 +23,7 @@ import {
   IFormData,
   IMetrics,
   IPagination,
+  IPrecisionResponse,
   IReceipt,
   ITransaction,
   IValidator,
@@ -478,24 +479,83 @@ export const doIf = async (
  * @param asset
  * @returns Promise < number | undefined >
  */
-export const getPrecision = async (
-  asset: string,
-): Promise<number | undefined> => {
+export const getPrecisionFromApi = async (
+  assets: string[],
+): Promise<IPrecisionResponse> => {
   try {
-    const response = await api.getCached({ route: `assets/${asset}` });
-
+    const response = await api.post({
+      route: `assets/precisions`,
+      body: { assets },
+    });
     if (response.error) {
       const messageError =
         response.error.charAt(0).toUpperCase() + response.error.slice(1);
       toast.error(messageError);
-      return;
+      throw new Error(response.error);
     }
 
-    return response.data.asset.precision;
-  } catch (error) {
+    return response.data;
+  } catch (error: any) {
     console.error(error);
+    throw error;
   }
 };
+
+export function getPrecision<T extends string | string[]>(
+  assetIds: T,
+): T extends string ? Promise<number> : Promise<{ [assetId: string]: number }>;
+export async function getPrecision(
+  assetIds: string | string[],
+): Promise<number | { [assetId: string]: number }> {
+  const storedPrecisions: any = localStorage.getItem('precisions')
+    ? JSON.parse(localStorage.getItem('precisions') || '{}')
+    : {};
+
+  if (typeof assetIds === 'object' && assetIds.length) {
+    const aux: string[] = [];
+    assetIds.forEach(assetId => {
+      if (!Object.keys(storedPrecisions).includes(assetId)) {
+        aux.push(assetId);
+      }
+    });
+
+    try {
+      const { precisions } = await getPrecisionFromApi(aux);
+      const newPrecisions = { ...storedPrecisions, ...precisions };
+      localStorage.setItem('precisions', JSON.stringify(newPrecisions));
+      return assetIds.reduce((prev, current) => {
+        return {
+          ...prev,
+          [current]: storedPrecisions[current] || newPrecisions[current],
+        };
+      }, {});
+    } catch (error: any) {
+      console.error(error);
+      throw new Error(error);
+    }
+  } else if (typeof assetIds === 'string') {
+    const assetId = assetIds;
+
+    if (
+      !storedPrecisions ||
+      !Object.keys(storedPrecisions).includes(assetId.split('/')[0])
+    ) {
+      try {
+        const { precisions } = (await getPrecisionFromApi([assetId])) || 0;
+        const newPrecisions = { ...storedPrecisions, ...precisions };
+        localStorage.setItem('precisions', JSON.stringify(newPrecisions));
+        return precisions[assetId];
+      } catch (error: any) {
+        console.error(error);
+        throw new Error(error);
+      }
+    } else {
+      return storedPrecisions[assetId.split('/')[0]];
+    }
+  } else {
+    throw new Error('Invalid Param');
+  }
+}
 
 /**
  * Validates URL extension with regex. Accepted formats: gif|jpg|jpeg|tiff|png|webp
@@ -503,7 +563,7 @@ export const getPrecision = async (
  * @returns boolean
  */
 export const regexImgUrl = (url: string): boolean => {
-  const regex = /[\/.](gif|jpg|jpeg|tiff|png|webp)$/i;
+  const regex = /[\/.](gif|jpg|jpeg|tiff|png|webp|svg)$/i;
   if (regex.test(url)) {
     return true;
   }
@@ -815,13 +875,9 @@ const processHeaders = (router: NextRouter) => {
   return sanitizedHeaders;
 };
 
-const processRow = async (
-  row: ITransaction,
-  router: NextRouter,
-  getContextPrecision: (assetId: string) => Promise<number | void>,
-) => {
+const processRow = async (row: ITransaction, router: NextRouter) => {
   let finalVal = '';
-  const parsedRow = await getCells(row, router, getContextPrecision);
+  const parsedRow = await getCells(row, router);
   for (let j = 0; j < parsedRow.length; j++) {
     const innerValue =
       parsedRow[j] === null || parsedRow[j] === undefined
@@ -840,7 +896,6 @@ export const exportToCsv = async (
   filename: string,
   rows: any[] | null,
   router: NextRouter,
-  getContextPrecision: (assetId: string) => Promise<number | void>,
 ): Promise<void> => {
   if (!rows || rows.length === 0) {
     window.alert('No data to export!');
@@ -852,7 +907,7 @@ export const exportToCsv = async (
       const headers = processHeaders(router);
       csvFile += headers + '\n';
     } else {
-      csvFile += await processRow(rows[i], router, getContextPrecision);
+      csvFile += await processRow(rows[i], router);
     }
   }
   if (typeof window !== undefined) {
@@ -898,7 +953,7 @@ export const getAmountFromReceipts = async (
     receipt => receipt.type === contractType,
   );
   const amount = Number(correctReceipt?.amount) || 0;
-  const precision = (await getPrecision(assetId)) ?? 6;
+  const precision = (await getPrecision(assetId)) as number;
   return amount / 10 ** precision;
 };
 

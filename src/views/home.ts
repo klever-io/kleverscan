@@ -551,7 +551,7 @@ export const TransactionChart = styled(TransactionContent)`
   }
 
   &:last-child {
-    width: 100%;
+    /* width: 100%; */
   }
 `;
 
@@ -611,7 +611,7 @@ export const ListItemTimeFilter = styled.ul`
 `;
 export const ItemTimeFilter = styled.li<{ selected: boolean }>`
   color: ${props => props.theme.black};
-  border: 1px solid ${props => props.theme.black};
+  border: 1px solid ${props => props.theme.chart.lightBg};
   height: fit-content;
   padding: 0.35rem 1rem;
   font-size: 0.8rem;
@@ -635,8 +635,8 @@ export const ItemTimeFilter = styled.li<{ selected: boolean }>`
   ${props =>
     props.selected &&
     css`
-      background: ${props => props.theme.black};
-      color: ${props => props.theme.white} !important;
+      background: ${props => props.theme.chart.lightBg};
+      color: ${props => props.theme.true.white} !important;
     `};
 `;
 

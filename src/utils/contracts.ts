@@ -11,6 +11,7 @@ import {
   getBuyAmount,
   getBuyPrice,
   getBuyReceipt,
+  getPrecision,
   receiverIsSender,
 } from '.';
 import { IBuyReceipt, IReceipt, IRowSection, ITransaction } from '../types';
@@ -580,7 +581,6 @@ export const getHeaderForCSV = (
 export const getCells = async (
   tableRowData: ITransaction,
   router: NextRouter,
-  getContextPrecision: (assetId: string) => Promise<number | void>,
 ): Promise<any[]> => {
   const {
     hash,
@@ -604,7 +604,7 @@ export const getCells = async (
 
   const getParsedAmount = async (assetId: string) => {
     const amount = parameter?.amount ?? '';
-    const precision = (await getContextPrecision(assetId)) ?? 6;
+    const precision = (await getPrecision(assetId)) as number;
     return amount / 10 ** precision;
   };
 
@@ -716,17 +716,17 @@ export const getCells = async (
         sender,
         receiverIsSender,
       );
-      let currencyIDPrecision = 6;
-      let amountPrecision = 0;
+      let currencyIDPrecision: any = 6;
+      let amountPrecision: any = 0;
       if (parameter?.currencyID !== 'KLV' && parameter?.currencyID !== 'KFI') {
-        currencyIDPrecision =
-          (await getContextPrecision(parameter?.currencyID || 'KLV')) ?? 0;
+        currencyIDPrecision = await getPrecision(
+          parameter?.currencyID || 'KLV',
+        );
       }
       if (parameter?.buyType === 'MarketBuy') {
-        amountPrecision =
-          (await getContextPrecision(buyReceipt?.assetId ?? '')) ?? 0;
+        amountPrecision = await getPrecision(buyReceipt?.assetId ?? '');
       } else if (parameter?.buyType === 'ITOBuy') {
-        amountPrecision = (await getContextPrecision(parameter?.id)) ?? 0;
+        amountPrecision = await getPrecision(parameter?.id);
       }
       let buyPrice = getBuyPrice(parameter, buyReceipt);
       let buyAmount = getBuyAmount(parameter, buyReceipt);
@@ -743,8 +743,9 @@ export const getCells = async (
       const marketType = parameter?.marketType || '';
       currencyID = parameter?.currencyID;
       assetId = parameter?.assetId || 'KLV';
-      const precision =
-        (await getContextPrecision(parameter?.currencyID || 'KLV')) ?? 6;
+      const precision = (await getPrecision(
+        parameter?.currencyID || 'KLV',
+      )) as number;
       const price = (parameter?.price || 0) / 10 ** precision;
       amount = 1;
       cells.push(marketType, currencyID, assetId, price, amount);

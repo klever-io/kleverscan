@@ -1,7 +1,6 @@
 import { Receive } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import { TransactionDetails as Icon } from '@/assets/title-icons';
-import { BalanceContainer } from '@/components/Contract/styles';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
@@ -38,21 +37,17 @@ import api from '@/services/api';
 import { IBlock } from '@/types/blocks';
 import {
   Contract,
-  IBuyContractPayload,
   IBuyITOsTotalPrices,
   IIndexedContract,
 } from '@/types/contracts';
 import { IAsset, IResponse, ITransaction } from '@/types/index';
 import {
   capitalizeString,
-  getPrecision,
-  getTotalAssetsPrices,
   hexToString,
   isDataEmpty,
   parseJson,
   toLocaleFixed,
 } from '@/utils/index';
-import { FrozenContainer, RowContent } from '@/views/accounts/detail';
 import {
   ButtonExpand,
   CardContainer,
@@ -75,7 +70,7 @@ import { format, fromUnixTime } from 'date-fns';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 interface IBlockResponse extends IResponse {
   data: {
@@ -141,59 +136,6 @@ const Transaction: React.FC<ITransactionPage> = props => {
     return parseJson(
       hexToString((data && data.length > 0 && data.join(',')) || ''),
     );
-  };
-
-  useEffect(() => {
-    const getAsyncTotalAssetsPrices = async () => {
-      const ITOBuyPrices = await getITOBuyPrices();
-      if (Object.keys(ITOBuyPrices).length > 0) {
-        const totalAssetsPrices = getTotalAssetsPrices(
-          ITOBuyPrices,
-          receipts,
-          sender,
-        );
-        setTotalAssetsPrices(totalAssetsPrices);
-      }
-    };
-    getAsyncTotalAssetsPrices();
-  }, []);
-
-  const getITOBuyPrices = () => {
-    const ITOBuyObject = {};
-    for (let index = 0; index < contract.length; index++) {
-      const parameter = contract[index]?.parameter as IBuyContractPayload;
-      if (parameter?.buyType === 'ITOBuy' && parameter?.currencyID) {
-        ITOBuyObject[parameter.currencyID] = { price: 0, precision: 0 };
-        ITOBuyObject[parameter.currencyID].precision = getPrecision(
-          parameter.currencyID,
-        );
-      }
-    }
-    return ITOBuyObject;
-  };
-
-  const renderMultiContractITOBuy = () => {
-    if (Object.keys(totalAssetsPrices).length > 1) {
-      return (
-        <Row>
-          <span>
-            <strong>Total Price ITOBuy</strong>
-          </span>
-          <RowContent>
-            <BalanceContainer>
-              <FrozenContainer>
-                {Object.entries(totalAssetsPrices).map(([asset, data]) => (
-                  <div key={asset}>
-                    <strong>{asset ?? 0}</strong>
-                    <span>{data.price.toLocaleString() ?? 0}</span>
-                  </div>
-                ))}
-              </FrozenContainer>
-            </BalanceContainer>
-          </RowContent>
-        </Row>
-      );
-    }
   };
 
   const ContractComponent: React.FC<any> = ({ contracts }) => {

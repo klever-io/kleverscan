@@ -233,6 +233,11 @@ export interface IValidatorConfigURI {
   value: string;
 }
 
+export interface IURIs {
+  key: string;
+  value: string;
+}
+
 export interface IFreezeContract {
   amount: number;
   assetId: string;
@@ -302,14 +307,34 @@ export enum EnumTriggerType {
   StopRoyaltiesChange = 16,
 }
 
+export enum EnumTriggerTypeName {
+  Mint = 'Mint',
+  Burn = 'Burn',
+  Wipe = 'Wipe',
+  Pause = 'Pause',
+  Resume = 'Resume',
+  ChangeOwner = 'ChangeOwner',
+  AddRole = 'AddRole',
+  RemoveRole = 'RemoveRole',
+  UpdateMetadata = 'UpdateMetadata',
+  StopNFTMint = 'StopNFTMint',
+  UpdateLogo = 'UpdateLogo',
+  UpdateURIs = 'UpdateURIs',
+  ChangeRoyaltiesReceiver = 'ChangeRoyaltiesReceiver',
+  UpdateStaking = 'UpdateStaking',
+  UpdateRoyalties = 'UpdateRoyalties',
+  UpdateKDAFeePool = 'UpdateKDAFeePool',
+  StopRoyaltiesChange = 'StopRoyaltiesChange',
+}
+
 export interface IAssetTriggerContract {
-  triggerType: EnumTriggerType;
+  triggerType: EnumTriggerTypeName;
   assetId?: string;
   toAddress: string;
   amount: number;
   mime: string;
   logo: string;
-  uris: any;
+  uris: IURIs[];
   role: IRolesInfo;
   staking?: IStakingInfo;
   kdaPool: IKDAPool;

@@ -1,5 +1,7 @@
 import { KLV } from '@/assets/coins';
+import Copy from '@/components/Copy';
 import {
+  EnumTriggerTypeName,
   IAssetTriggerContract,
   IBuyContractPayload,
   ICancelMarketOrderContract,
@@ -15,6 +17,7 @@ import {
   IFreezeContract,
   IIndexedContract,
   IITOTriggerContract,
+  IParameter,
   IProposalContract,
   ISellContract,
   ISetAccountNameContract,
@@ -24,6 +27,7 @@ import {
   IUndelegateContract,
   IUnfreezeContract,
   IUpdateAccountPermissionContract,
+  IURIs,
   IValidatorConfigContract,
   IVoteContract,
   IWithdrawContract,
@@ -60,14 +64,19 @@ import { BigSpan, NetworkParamsContainer } from '@/views/proposals/detail';
 import {
   CenteredRow,
   HeaderWrapper,
+  HoverAnchor,
   Hr,
   NestedContainerWrapper,
+  RoleDiv,
+  RoleStrong,
+  RoleWrapper,
   Row,
+  StrongWidth,
+  URIsWrapper,
 } from '@/views/transactions/detail';
 import { format, fromUnixTime } from 'date-fns';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
-import Copy from '../Copy';
 
 export const Transfer: React.FC<IIndexedContract> = ({ parameter: par }) => {
   const parameter = par as ITransferContract;
@@ -886,6 +895,7 @@ export const Withdraw: React.FC<IIndexedContract> = ({
   contractIndex,
 }) => {
   const parameter = par as IWithdrawContract;
+
   const claimReceipt = findPreviousSiblingReceipt(
     receipts,
     contractIndex,
@@ -1034,51 +1044,7 @@ export const AssetTrigger: React.FC<IIndexedContract> = ({
         </span>
         <span>{parameter?.assetId}</span>
       </Row>
-      {parameter.amount && (
-        <Row>
-          <span>
-            <strong>Amount</strong>
-          </span>
-          <span>
-            {toLocaleFixed(parameter?.amount / 10 ** precision, precision)}
-          </span>
-        </Row>
-      )}
-      {parameter.toAddress && (
-        <Row>
-          <span>
-            <strong>To</strong>
-          </span>
-          <CenteredRow>
-            {parameter?.toAddress}
-            <Copy data={parameter?.toAddress} info="address"></Copy>
-          </CenteredRow>
-        </Row>
-      )}
-      {parameter?.logo && (
-        <Row>
-          <span>
-            <strong>Logo</strong>
-          </span>
-          <span>{parameter?.logo}</span>
-        </Row>
-      )}
-      {parameter?.mime && (
-        <Row>
-          <span>
-            <strong>MIME</strong>
-          </span>
-          <span>{parameter?.mime}</span>
-        </Row>
-      )}
-      {parameter?.staking && (
-        <Row>
-          <span>
-            <strong>Staking</strong>
-          </span>
-          <span>{`Type: ${parameter?.staking?.type}  APR: ${parameter.staking?.apr}`}</span>
-        </Row>
-      )}
+      {renderAssetTriggerTypeData(parameter, precision)}
     </>
   );
 };
@@ -1407,7 +1373,6 @@ export const Sell: React.FC<IIndexedContract> = ({
   );
 
   const sellReceipt = findReceipt(receipts, contractIndex, 15);
-
   return (
     <>
       <Row>
@@ -1992,4 +1957,194 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({ parameter: par }) => {
       {renderTriggerTypeData()}
     </>
   );
+};
+
+const renderAssetTriggerTypeData: React.FC<IAssetTriggerContract> = (
+  parameter: IParameter,
+  precision: number,
+): any => {
+  const par = parameter as IAssetTriggerContract;
+  const triggerType = par?.triggerType;
+
+  const toAddressReturn = () => (
+    <Row>
+      <span>
+        <strong>To</strong>
+      </span>
+      <CenteredRow>
+        {par?.toAddress}
+        <Copy data={par?.toAddress} info="address"></Copy>
+      </CenteredRow>
+    </Row>
+  );
+
+  const amountReturn = () => (
+    <Row>
+      <span>
+        <strong>Amount</strong>
+      </span>
+      <span>{toLocaleFixed(par?.amount / 10 ** precision, precision)}</span>
+    </Row>
+  );
+
+  const roleReturn = () => (
+    <Row>
+      <span>
+        <strong>Role</strong>
+      </span>
+      <RowContent>
+        <BalanceContainer>
+          <FrozenContainer>
+            <RoleWrapper>
+              <RoleDiv>
+                <RoleStrong>Address</RoleStrong>
+                <span style={{ marginRight: '0.5rem' }}>
+                  {par.role.address}
+                </span>
+                <Copy data={par.role.address} />
+              </RoleDiv>
+
+              <RoleDiv>
+                <RoleStrong>HasRoleMint</RoleStrong>
+                <span>{String(par.role.hasRoleMint)}</span>
+              </RoleDiv>
+              <RoleDiv>
+                <RoleStrong>HasRoleSetITOPrices</RoleStrong>
+                <span>{String(par.role.hasRoleSetITOPrices)}</span>
+              </RoleDiv>
+            </RoleWrapper>
+          </FrozenContainer>
+        </BalanceContainer>
+      </RowContent>
+    </Row>
+  );
+
+  const mimeReturn = () => (
+    <Row>
+      <span>
+        <strong>MIME</strong>
+      </span>
+      <span>{par?.mime}</span>
+    </Row>
+  );
+
+  const logoReturn = () => (
+    <Row>
+      <span>
+        <strong>Logo</strong>
+      </span>
+      <HoverAnchor href={renderCorrectPath(par.logo)}>{par.logo}</HoverAnchor>
+    </Row>
+  );
+
+  const URIsReturn = () => (
+    <Row>
+      <span>
+        <strong>URIs</strong>
+      </span>
+      <RowContent>
+        <BalanceContainer>
+          <FrozenContainer>
+            {par?.uris.map((uri: IURIs, index: number) => (
+              <URIsWrapper key={index}>
+                <section>
+                  <span>{uri.key}</span>
+                </section>
+                <section>
+                  <HoverAnchor href={renderCorrectPath(uri.value)}>
+                    {uri.value}
+                  </HoverAnchor>
+                </section>
+              </URIsWrapper>
+            ))}
+          </FrozenContainer>
+        </BalanceContainer>
+      </RowContent>
+    </Row>
+  );
+
+  const updateStakingReturn = () => (
+    <Row>
+      <span>
+        <strong>Staking</strong>
+      </span>
+      <RowContent>
+        <BalanceContainer>
+          <FrozenContainer>
+            <URIsWrapper>
+              <section>
+                <StrongWidth>APR</StrongWidth>
+                <span>{par.staking?.apr}</span>
+              </section>
+              <section>
+                <StrongWidth>min Epochs To Claim</StrongWidth>
+                <span>{par.staking?.minEpochsToClaim}</span>
+              </section>
+              <section>
+                <StrongWidth>min Epochs To Unstake</StrongWidth>
+                <span>{par.staking?.minEpochsToUnstake}</span>
+              </section>
+              <section>
+                <StrongWidth>min Epochs To Withdraw</StrongWidth>
+                <span>{par.staking?.minEpochsToWithdraw}</span>
+              </section>
+              <section>
+                <StrongWidth>Type</StrongWidth>
+                <span>{par.staking?.type}</span>
+              </section>
+            </URIsWrapper>
+          </FrozenContainer>
+        </BalanceContainer>
+      </RowContent>
+    </Row>
+  );
+
+  switch (triggerType) {
+    case EnumTriggerTypeName.Mint:
+      return (
+        <>
+          {toAddressReturn()}
+          {amountReturn()}
+        </>
+      );
+    case EnumTriggerTypeName.Burn:
+      return amountReturn();
+    case EnumTriggerTypeName.Wipe:
+      return (
+        <>
+          {toAddressReturn()}
+          {amountReturn()}
+        </>
+      );
+    case EnumTriggerTypeName.Pause:
+      return null;
+    case EnumTriggerTypeName.Resume:
+      return null;
+    case EnumTriggerTypeName.ChangeOwner:
+      return toAddressReturn();
+    case EnumTriggerTypeName.AddRole:
+      return roleReturn();
+    case EnumTriggerTypeName.RemoveRole:
+      return toAddressReturn();
+    case EnumTriggerTypeName.UpdateMetadata:
+      return mimeReturn();
+    case EnumTriggerTypeName.StopNFTMint:
+      return null;
+    case EnumTriggerTypeName.UpdateLogo:
+      return logoReturn();
+    case EnumTriggerTypeName.UpdateURIs:
+      return URIsReturn();
+    case EnumTriggerTypeName.ChangeRoyaltiesReceiver:
+      return toAddressReturn();
+    case EnumTriggerTypeName.UpdateStaking:
+      return updateStakingReturn();
+    case EnumTriggerTypeName.UpdateRoyalties:
+      return null;
+    case EnumTriggerTypeName.UpdateKDAFeePool:
+      return null;
+    case EnumTriggerTypeName.StopRoyaltiesChange:
+      return null;
+    default:
+      return null;
+  }
 };

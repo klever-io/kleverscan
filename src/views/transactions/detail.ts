@@ -294,3 +294,43 @@ export const KappFeeFailedTx = styled.p`
   text-decoration: line-through;
   color: red !important;
 `;
+
+export const URIsWrapper = styled.div`
+  display: flex;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+
+  overflow: scroll;
+`;
+
+export const RoleWrapper = styled.section`
+  display: flex;
+  flex-direction: column;
+  overflow: scroll;
+`;
+
+export const RoleDiv = styled.div`
+  display: flex !important;
+  flex-direction: row !important;
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+  }
+`;
+
+export const RoleStrong = styled.strong`
+  min-width: 7rem;
+  margin-right: 1.5rem !important;
+`;
+
+export const HoverAnchor = styled.a`
+  :hover {
+    text-decoration: underline;
+  }
+`;
+
+export const StrongWidth = styled.strong`
+  display: inline-block;
+  min-width: 15rem !important;
+`;

@@ -80,8 +80,8 @@ import React, { useEffect, useState } from 'react';
 
 export const Transfer: React.FC<IIndexedContract> = ({ parameter: par }) => {
   const parameter = par as ITransferContract;
-  const assetID = parameter?.assetId?.split('/') || [];
-  const precision = usePrecision(assetID[0]);
+  const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
+  const precision = usePrecision(assetID);
 
   return (
     <>
@@ -629,8 +629,8 @@ export const Freeze: React.FC<IIndexedContract> = ({
 }) => {
   const parameter = par as IFreezeContract;
   const receipts = rec as IFreezeReceipt[];
-  const assetID = parameter?.assetId?.split('/') || [];
-  const precision = usePrecision(assetID[0]);
+  const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
+  const precision = usePrecision(assetID);
   const freezeReceipt = findReceipt(receipts, contractIndex, 3);
 
   return (
@@ -1021,8 +1021,8 @@ export const AssetTrigger: React.FC<IIndexedContract> = ({
   parameter: par,
 }) => {
   const parameter = par as IAssetTriggerContract;
-  const assetID = parameter?.assetId?.split('/') || [];
-  const precision = usePrecision(assetID[0]);
+  const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
+  const precision = usePrecision(assetID);
 
   return (
     <>
@@ -1165,8 +1165,8 @@ export const Vote: React.FC<IIndexedContract> = ({ parameter: par }) => {
 
 export const ConfigITO: React.FC<IIndexedContract> = ({ parameter: par }) => {
   const parameter = par as IConfigITOContract;
-  const assetID = parameter?.assetId?.split('/') || [];
-  const precision = usePrecision(assetID[0]);
+  const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
+  const precision = usePrecision(assetID);
 
   return (
     <>

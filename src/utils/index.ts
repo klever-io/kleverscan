@@ -513,20 +513,27 @@ export async function getPrecision(
 
   if (typeof assetIds === 'object' && assetIds.length) {
     const aux: string[] = [];
+    const NFTs: { [assetId: string]: number } = {};
     assetIds.forEach(assetId => {
-      if (!Object.keys(storedPrecisions).includes(assetId)) {
+      if (
+        !Object.keys(storedPrecisions).includes(assetId) &&
+        !aux.includes(assetId) &&
+        assetId.split('/').length === 1
+      ) {
         aux.push(assetId);
+      } else if (assetId.split('/').length > 1) {
+        NFTs[assetId] = 0;
       }
     });
 
     try {
       const { precisions } = await getPrecisionFromApi(aux);
-      const newPrecisions = { ...storedPrecisions, ...precisions };
+      const newPrecisions = { ...storedPrecisions, ...precisions, ...NFTs };
       localStorage.setItem('precisions', JSON.stringify(newPrecisions));
       return assetIds.reduce((prev, current) => {
         return {
           ...prev,
-          [current]: storedPrecisions[current] || newPrecisions[current],
+          [current]: newPrecisions[current],
         };
       }, {});
     } catch (error: any) {
@@ -535,6 +542,10 @@ export async function getPrecision(
     }
   } else if (typeof assetIds === 'string') {
     const assetId = assetIds;
+
+    if (assetId.split('/').length === 2) {
+      return 0;
+    }
 
     if (
       !storedPrecisions ||

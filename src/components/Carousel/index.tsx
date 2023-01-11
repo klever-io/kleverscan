@@ -2,14 +2,16 @@ import React, { useRef } from 'react';
 import { ArrowLeft, ArrowRight, Container, Content } from './styles';
 
 const Carousel: React.FC = ({ children }) => {
-  const carouselRef = useRef<any>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   const handleLeft = () => {
-    carouselRef.current.scrollLeft -= carouselRef.current.offsetWidth / 2;
+    if (carouselRef.current !== null)
+      carouselRef.current.scrollLeft -= carouselRef.current.offsetWidth / 2;
   };
 
   const handleRight = () => {
-    carouselRef.current.scrollLeft += carouselRef.current.offsetWidth / 2;
+    if (carouselRef.current !== null)
+      carouselRef.current.scrollLeft += carouselRef.current.offsetWidth / 2;
   };
 
   return (

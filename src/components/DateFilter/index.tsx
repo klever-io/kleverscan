@@ -101,7 +101,7 @@ const DateFilter: React.FC<IDateFilter> = ({
   const [inputValue, setInputValue] = useState(formatInputInitialValue());
   const [buttonActive, setButtonActive] = useState(true);
 
-  const inputRef = useRef<any>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleInputFocus = useCallback(() => {
     setCalendarOpen(true);
@@ -204,7 +204,7 @@ const DateFilter: React.FC<IDateFilter> = ({
       }`,
     );
     setDate(selectedDays.start);
-    inputRef.current.blur();
+    inputRef.current?.blur();
     setCalendarOpen(false);
     setButtonActive(false);
   }, [selectedDays, filterDate]);
@@ -226,7 +226,7 @@ const DateFilter: React.FC<IDateFilter> = ({
   const handleClose = useCallback(() => {
     setDontBlur(false);
     setCalendarOpen(false);
-    inputRef.current.blur();
+    inputRef.current?.blur();
     setSelectedDays(selectedDaysInitialValue);
   }, [selectedDaysInitialValue]);
 
@@ -252,7 +252,7 @@ const DateFilter: React.FC<IDateFilter> = ({
       onMouseLeave={() => setDontBlur(false)}
     >
       <OutsideContainer>
-        <OutsideContent onClick={() => inputRef.current.focus()}>
+        <OutsideContent onClick={() => inputRef.current?.focus()}>
           <Input
             type="text"
             placeholder="Add filter by date"

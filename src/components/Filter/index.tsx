@@ -43,9 +43,9 @@ const Filter: React.FC<IFilter> = ({
   const [arrowOpen, setArrowOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
-  const contentRef = useRef<any>(null);
-  const selectorRef = useRef<any>(null);
-  const focusRef = useRef<any>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const selectorRef = useRef<HTMLDivElement>(null);
+  const focusRef = useRef<HTMLInputElement>(null);
 
   const openDropdown = () => {
     if (!focus) {
@@ -55,7 +55,7 @@ const Filter: React.FC<IFilter> = ({
         setArrowOpen(true);
       });
 
-      focusRef.current.focus();
+      focusRef.current?.focus();
     }
   };
 

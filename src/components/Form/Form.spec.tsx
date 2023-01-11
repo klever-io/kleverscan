@@ -276,7 +276,7 @@ describe('Component: Form', () => {
       'Advanced Options',
     );
 
-    await user.click(advancedOptions.parentElement as any);
+    await user.click(advancedOptions.parentElement as HTMLElement);
     await waitFor(() => {
       expect(screen.getByText('Is Multisig?')).toBeInTheDocument();
       expect(screen.getByText('Show payload?')).toBeInTheDocument();
@@ -312,7 +312,7 @@ describe('Component: Form', () => {
         />,
       );
       const advancedOptions = screen.getByText('Advanced Options');
-      await user.click(advancedOptions.parentElement as any);
+      await user.click(advancedOptions.parentElement as HTMLElement);
 
       const data = screen.getByText('Data');
       const isMultsig = screen.getByText('Is Multisig?');
@@ -347,7 +347,7 @@ describe('Component: Form', () => {
         />,
       );
       const advancedOptions = screen.getByText('Advanced Options');
-      await user.click(advancedOptions.parentElement as any);
+      await user.click(advancedOptions.parentElement as HTMLElement);
 
       const isMultsigInput = screen.getAllByRole('checkbox')[0];
       const showPayloadInput = screen.getAllByRole('checkbox')[1];
@@ -360,7 +360,7 @@ describe('Component: Form', () => {
 
       await user.click(isMultsigInput);
       await user.click(showPayloadInput);
-      await user.type(dataInput as any, 'small text');
+      await user.type(dataInput as HTMLElement, 'small text');
 
       await waitFor(() => {
         expect(isMultsigInput).toBeChecked();

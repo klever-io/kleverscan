@@ -31,21 +31,30 @@ interface ICoinCard {
   assetsData: IAssetsData;
 }
 
+interface IDropDow {
+  shortname: string;
+  volume: { price: number; variation: number };
+}
+
 const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, assetsData }) => {
   const [selectedCoin, setSelectedCoin] = useState(0);
-  const carouselRef = useRef<any>(null);
-  const cardRef = useRef<any>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const [arrowOpen, setArrowOpen] = useState(false);
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
 
-  const handleSelectCoin: any = useCallback(() => {
-    setSelectedCoin(
-      Math.floor(carouselRef.current.scrollLeft / cardRef.current.offsetWidth),
-    );
+  const handleSelectCoin = useCallback(() => {
+    if (carouselRef.current !== null && cardRef.current !== null)
+      setSelectedCoin(
+        Math.floor(
+          carouselRef.current.scrollLeft / cardRef.current.offsetWidth,
+        ),
+      );
   }, [carouselRef, cardRef]);
 
   const handleSelection = (index: number) => {
-    carouselRef.current.scrollLeft = index * cardRef.current.offsetWidth;
+    if (carouselRef.current !== null && cardRef.current !== null)
+      carouselRef.current.scrollLeft = index * cardRef.current.offsetWidth;
   };
 
   const arrowOnClick = () => {
@@ -134,7 +143,8 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, assetsData }) => {
     }
     return '--';
   };
-  const renderDropDown: React.FC<any> = coin => {
+
+  const renderDropDown: React.FC<IDropDow> = coin => {
     return (
       <>
         <ValueContent>

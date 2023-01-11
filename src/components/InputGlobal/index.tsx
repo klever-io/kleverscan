@@ -11,7 +11,7 @@ interface InputGlobal {
 const Input: React.FC<InputGlobal> = ({ className }) => {
   const [search, setSearch] = useState('');
   const [error, setError] = useState(false);
-  const inputRef = useRef<any>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation('common');
 
   const router = useRouter();
@@ -62,7 +62,7 @@ const Input: React.FC<InputGlobal> = ({ className }) => {
         treatedSearch.length === 8)
     ) {
       router.push(`/${type}/${treatedSearch}`);
-      inputRef.current.value = '';
+      if (inputRef.current !== null) inputRef.current.value = '';
       return;
     }
 
@@ -71,7 +71,7 @@ const Input: React.FC<InputGlobal> = ({ className }) => {
       treatedSearch.length >= 3 &&
       treatedSearch.length < 9
     ) {
-      inputRef.current.value = '';
+      if (inputRef.current !== null) inputRef.current.value = '';
       router
         .push({
           pathname: '/assets',
@@ -83,7 +83,7 @@ const Input: React.FC<InputGlobal> = ({ className }) => {
       return;
     }
     router.push(`/${type}/${treatedSearch}`);
-    inputRef.current.value = '';
+    if (inputRef.current !== null) inputRef.current.value = '';
   };
 
   const keyDownHandle = (event: KeyboardEvent) => {

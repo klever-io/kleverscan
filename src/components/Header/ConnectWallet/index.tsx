@@ -37,10 +37,12 @@ interface IConnectWallet {
 const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openUserInfos, setOpenUserInfos] = useState(false);
-  const [balance, setBalance] = useState<any>({
-    klv: undefined,
+  const [balance, setBalance] = useState<{
+    [assetId: string]: string | number;
+  }>({
+    klv: 0,
   });
-  const [loadingBalance, setLoadingBalance] = useState<any>(false);
+  const [loadingBalance, setLoadingBalance] = useState<boolean>(false);
 
   const {
     walletAddress,
@@ -60,7 +62,6 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
   useEffect(() => {
     document.body.style.overflow = openDrawer ? 'hidden' : 'visible';
   }, [openDrawer]);
-
   const getAccountBalance = useCallback(async () => {
     if (walletAddress) {
       setLoadingBalance(true);

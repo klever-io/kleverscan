@@ -811,10 +811,31 @@ export const mockedFetchBlocks = {
   },
 };
 
+const mockedPagination = {
+  self: 1,
+  next: 1,
+  previous: 1,
+  perPage: 10,
+  totalPages: 1,
+  totalRecords: 1,
+};
 //this function mocks /proposals/${number}
-export const getMockedProposal = (number: number, serverSide = true): any => {
+export const getMockedProposal = (number: number, voteType?: 0 | 1): any => {
   const selectedProposal = mockedProposalsList.data.proposals[number];
-  return { data: { proposal: selectedProposal } };
+
+  return {
+    data: {
+      proposal: {
+        ...selectedProposal,
+        voters:
+          voteType !== undefined
+            ? selectedProposal.voters.filter(voter => voter.type === voteType)
+            : selectedProposal.voters,
+      },
+    },
+    error: '',
+    pagination: mockedPagination,
+  };
 };
 
 export const mockedProposalsList = {

@@ -1,14 +1,19 @@
 import { getStatusIcon } from '@/assets/status';
+import Filter, { IFilter } from '@/components/Filter';
 import Table, { ITable } from '@/components/Table';
 import { CustomLink, Status } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
 import { paramsStyles } from '@/components/Tooltip/configs';
 import { useMobile } from '@/contexts/mobile';
+import { parseAllProposals } from '@/pages/proposals';
+import api from '@/services/api';
 import { IRowSection } from '@/types/index';
 import {
   IFullInfoParam,
   IParsedProposal,
+  IProposals,
   IProposalsProps,
+  IProposalsResponse,
 } from '@/types/proposals';
 import {
   capitalizeString,
@@ -16,8 +21,10 @@ import {
   passViewportStyles,
 } from '@/utils/index';
 import Link from 'next/link';
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import {
+  FilterContainer,
+  ProposalsContainer,
   ProposalStatus,
   ProposalTime,
   ProposerDescAndLink,
@@ -29,7 +36,45 @@ const Proposals: React.FC<IProposalsProps> = ({
   totalPages,
   request,
 }) => {
+  const [currentProposals, setCurrentProposals] =
+    useState<IProposals>(proposals);
+
+  const tooltipRef = useRef<any>(null);
   const { isMobile, isTablet } = useMobile();
+
+  const filters: IFilter[] = [
+    {
+      title: 'Status',
+      data: ['Active', 'Approved', 'Denied'],
+      onClick: selected => filterProposals(selected),
+      current: 'All',
+    },
+  ];
+
+  const filterProposals = async (status: string) => {
+    const actualStatus =
+      status === 'Approved'
+        ? 'ApprovedProposal'
+        : status === 'Denied'
+        ? 'DeniedProposal'
+        : status === 'Active'
+        ? 'ActiveProposal'
+        : '';
+
+    const response: IProposalsResponse = await api.get({
+      route: `proposals/list`,
+      query: {
+        status: actualStatus,
+      },
+    });
+
+    if (!response.error) {
+      const parsedProposals = parseAllProposals(response.data.proposals);
+      setCurrentProposals(parsedProposals);
+    } else {
+      setCurrentProposals([]);
+    }
+  };
 
   const rowSections = (props: IParsedProposal): IRowSection[] => {
     const {
@@ -73,12 +118,10 @@ const Proposals: React.FC<IProposalsProps> = ({
 
     const renderProposalsNetworkParamsWithToolTip = () => {
       let message = '';
-      if (parsedParameters) {
-        parsedParameters.forEach(
-          (param2, index2) =>
-            (message += `${param2.paramText}  ${param2.paramValue}` + '\n'),
-        );
-      }
+      parsedParameters?.forEach(
+        (param2, index2) =>
+          (message += `${param2.paramText}  ${param2.paramValue}` + '\n'),
+      );
       if (parsedParameters) {
         return (
           <span style={{ display: 'flex' }}>
@@ -191,7 +234,7 @@ const Proposals: React.FC<IProposalsProps> = ({
 
   const tableProps: ITable = {
     rowSections,
-    data: proposals as any[],
+    data: currentProposals as any[],
     header,
     type: 'proposals',
     scrollUp: false,
@@ -200,7 +243,16 @@ const Proposals: React.FC<IProposalsProps> = ({
     request: (page, limit) => request(page, limit),
   };
 
-  return <Table {...tableProps} />;
+  return (
+    <ProposalsContainer>
+      <FilterContainer>
+        {filters.map((filter, index) => (
+          <Filter key={String(index)} {...filter} />
+        ))}
+      </FilterContainer>
+      <Table {...tableProps} />
+    </ProposalsContainer>
+  );
 };
 
 export default Proposals;

@@ -30,11 +30,11 @@ const Tabs: React.FC<ITabs> = ({
 }) => {
   const router = useRouter();
   const getFilterName = () => {
-    if (router.query?.fromAddress && !router.query?.toAddress) {
+    if (router.query?.role === 'sender') {
       return 'Transactions Out';
-    } else if (router.query?.toAddress && !router.query?.fromAddress) {
+    } else if (router.query?.role === 'receiver') {
       return 'Transactions In';
-    } else if (router.query?.fromAddress && router.query?.toAddress) {
+    } else if (router.query?.role === '' || router.query?.role === undefined) {
       return 'All Transactions';
     }
     return 'All Transactions';

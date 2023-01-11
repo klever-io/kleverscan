@@ -1,18 +1,21 @@
 import {
   IAccountAsset,
   IAsset,
+  ICoinInfo,
   IDataCards,
   IHomeTransactions,
+  IMetrics,
   ITransaction,
-} from '../../types';
+} from '@/types';
+import { IBlock } from '@/types/blocks';
 import {
   Contract,
   EnumAssetType,
   EnumClaimType,
   EnumITOStatus,
-} from '../../types/contracts';
+} from '@/types/contracts';
 
-export const CoinTest = [
+export const CoinTest: ICoinInfo[] = [
   {
     name: 'Klever',
     shortname: 'KLV',
@@ -373,6 +376,23 @@ export const mockedTxContractComponents = {
   },
 };
 
+export const mockedMetrics = {
+  data: {
+    overview: {
+      slotAtEpochStart: 0,
+      slotsPerEpoch: 5400,
+      currentSlot: 0,
+      slotDuration: 4000,
+    } as IMetrics,
+  },
+};
+export const mockedDataMetrics = {
+  currentSlot: 0,
+  epochFinishSlot: 0,
+  epochLoadPercent: 0,
+  remainingTime: '6h',
+} as IDataMetrics;
+
 export const mockedHomeDataCards: IDataCards = {
   totalAccounts: 100,
   totalTransactions: 20000,
@@ -408,100 +428,20 @@ export const mockedHomeDataCards: IDataCards = {
     producerOwnerAddress: 'producerAddress',
     validators: ['validatorBLS'],
   },
-  tps: '0 / 3000',
-  epochInfo: {
-    currentSlot: 20,
-    epochFinishSlot: 200,
-    epochLoadPercent: 30,
-    remainingTime: 'two days',
-  },
-  assetsData: {
-    klv: {
-      prices: {
-        todaysPrice: null,
-        yesterdayPrice: null,
-        variation: null,
-      },
-      staking: {
-        totalStaking: 10000000000000,
-        dayBeforeTotalStaking: 5000000000000,
-      },
-      volume: null,
-      circulatingSupply: null,
-      estimatedAprYesterday: 5.5,
-      estimatedAprBeforeYesterday: 5.6,
-    },
-    kfi: {
-      prices: {
-        todaysPrice: null,
-        yesterdayPrice: null,
-        variation: null,
-      },
-      staking: {
-        totalStaking: 10000000000000,
-        dayBeforeTotalStaking: 5000000000000,
-      },
-      volume: null,
-      circulatingSupply: null,
-      estimatedAprYesterday: 5.5,
-      estimatedAprBeforeYesterday: 5.6,
-    },
-  },
-  coinsData: [
-    {
-      name: 'Klever',
-      shortname: 'KLV',
-      price: 0.23,
-      variation: 8,
-      marketCap: {
-        price: 97137477,
-        variation: 45.81105,
-      },
-      volume: {
-        price: 4372976,
-        variation: 0,
-      },
-      prices: [
-        { value: 0.012372596929497385 },
-        { value: 0.012404993140008574 },
-        { value: 0.012240615957263926 },
-      ],
-    },
-    {
-      name: 'Klever Finance',
-      shortname: 'KFI',
-      price: 97.78,
-      variation: 0,
-      marketCap: {
-        price: 14667000,
-        variation: 0,
-      },
-      volume: {
-        price: 0.673435,
-        variation: 0,
-      },
-      prices: [
-        {
-          value: 97.7800584108219,
-        },
-      ],
-    },
-  ],
-  yesterdayTransactions: 20,
-  yesterdayAccounts: 2,
+  actualTPS: '0 / 3000',
+  counterEpoch: 0,
+  newTransactions: 20,
+  newAccounts: 2,
   beforeYesterdayTransactions: 10,
+  metrics: mockedDataMetrics,
 };
 
-export const mockedMetrics = {
-  data: {
-    overview: {
-      slotAtEpochStart: 486155,
-      slotsPerEpoch: 150,
-      currentSlot: 486191,
-      slotDuration: 4000,
-    },
-  },
-};
+export interface IDataMetrics {
+  currentSlot: number;
+  epochFinishSlot: number;
+  epochLoadPercent: number;
+  remainingTime: string;
+}
 
 export const mockedStatistics = {
   data: {
@@ -784,7 +724,7 @@ export const mockedBlocks = [
     txCount: 0,
     txBurnedFees: 0,
   },
-];
+] as unknown as IBlock[];
 
 export const mockedFetchBlocks = {
   data: {
@@ -809,6 +749,10 @@ export const mockedFetchBlocks = {
       },
     ],
   },
+} as unknown as {
+  data: {
+    blocks: IBlock[];
+  };
 };
 
 const mockedPagination = {

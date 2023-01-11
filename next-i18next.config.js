@@ -6,7 +6,5 @@ module.exports = {
       // 'pt-BR',
     ],
     defaultLocale: 'en',
-    ignoreRoutes: ['_app', '_document'],
-    localeDetection: false,
   },
 };

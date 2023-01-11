@@ -1,9 +1,9 @@
 import React from 'react';
-import { Container } from './styles';
+import { Container, SkeletonLoader } from './styles';
 
 interface ISkeleton {
   width?: number | string;
-  height?: number;
+  height?: number | string;
 }
 
 const Skeleton: React.FC<ISkeleton> = props => {
@@ -11,9 +11,9 @@ const Skeleton: React.FC<ISkeleton> = props => {
   const height = props.height !== undefined ? props.height : 25;
 
   return (
-    <div style={{ width, height }}>
-      <Container />
-    </div>
+    <Container style={{ width, height }} data-testid="skeleton">
+      <SkeletonLoader />
+    </Container>
   );
 };
 

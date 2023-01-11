@@ -2,7 +2,6 @@ import FakeTimers from '@sinonjs/fake-timers';
 import api from '../../services/api';
 import {
   addCommasToNumber,
-  addPrecisionTransactions,
   asyncDoIf,
   breakText,
   capitalizeString,
@@ -315,7 +314,7 @@ describe('unit tests for util funcs in index file', () => {
 
   describe('test isDataEmpty function', () => {
     test('return true if array of strings is empty', () => {
-      const empty = [];
+      const empty: any[] = [];
       const data = ['3030303830'];
       const data2 = [''];
       expect(isDataEmpty(empty)).toEqual(true);
@@ -548,22 +547,6 @@ describe('unit tests for util funcs in index file', () => {
     });
   });
 
-  describe('test addPrecisionTransactions function', () => {
-    const asset = {
-      data: {
-        asset: mocks.assets[1],
-      },
-      error: '',
-      code: 'successful',
-    };
-    test('return all transactions with precision key in contracts', async () => {
-      (api.get as jest.Mock).mockReturnValueOnce(asset);
-      const { transactions } = mocks.transactionsList.data;
-      const response = addPrecisionTransactions(transactions);
-      expect(response).toEqual(transactions);
-    });
-  });
-
   describe('test fetchPartialAsset function', () => {
     let fetchPartialAssetTimeout: ReturnType<typeof setTimeout>;
     test('if pass an asset that does not exist return all assets', async () => {
@@ -657,7 +640,7 @@ describe('unit tests for util funcs in index file', () => {
     });
   });
   describe('test asyncDoIf function', () => {
-    (api.get as jest.Mock).mockReturnValue(mocks.addressList);
+    (api.get as jest.Mock).mockReturnValueOnce(mocks.addressList);
     const request = async () => {
       return await api.get({
         route: 'address/list',

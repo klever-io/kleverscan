@@ -89,6 +89,10 @@ export const CardContent = styled.div`
   }
 `;
 
+export const CardContainerSkeleton = styled(CardContainer)`
+  padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+`;
+
 export const HeaderContainer = styled.div`
   display: flex;
 
@@ -103,6 +107,10 @@ export const HeaderContent = styled(HeaderContainer)`
   width: 100%;
 
   flex-direction: column;
+`;
+
+export const HeaderContentSkeleton = styled(HeaderContent)`
+  gap: 0.25rem;
 `;
 
 export const Name = styled.div`

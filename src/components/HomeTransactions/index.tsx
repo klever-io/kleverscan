@@ -1,6 +1,5 @@
 import Chart, { ChartType } from '@/components/Chart';
 import api from '@/services/api';
-import { addPrecisionTransactions } from '@/utils/index';
 import {
   ContainerTimeFilter,
   HomeLoaderContainer,
@@ -18,26 +17,20 @@ import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  IAssetResponse,
-  IHomeTransactions,
-  ITransactionAssetIds,
+  IDailyTransaction,
+  ITransaction,
   ITransactionResponse,
 } from '../../types';
 import { HomeLoader } from '../Loader/styles';
 import TransactionItem from '../TransactionItem';
 
-const HomeTransactions: React.FC<IHomeTransactions> = ({
-  setTotalTransactions,
-  transactionsList: defaultTransactionList,
-  transactions: defaultTransactions,
-  precision,
-}) => {
+const HomeTransactions: React.FC = () => {
   const filterDays = [1, 7, 15, 30];
   const { t } = useTranslation('transactions');
   const { t: commonT } = useTranslation('common');
-  const [transactions, setTransactions] = useState(defaultTransactions);
-  const [transactionsList, setTransactionsList] = useState(
-    defaultTransactionList,
+  const [transactions, setTransactions] = useState<ITransaction[]>([]);
+  const [transactionsList, setTransactionsList] = useState<IDailyTransaction[]>(
+    [],
   );
   const [timeFilter, setTimeFilter] = useState(16);
   const [loadingDailyTxs, setLoadingDailyTxs] = useState(false);
@@ -45,18 +38,19 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
   const transactionsWatcherInterval = 4 * 1000;
 
   useEffect(() => {
-    const transactionsWatcher = setInterval(async () => {
+    const getTransactions = async () => {
       const transactions: ITransactionResponse = await api.get({
         route: 'transaction/list',
       });
-      const assets: IAssetResponse = await api.get({ route: 'assets/kassets' });
-      if (!transactions.error && !assets.error) {
-        transactions.data.transactions = addPrecisionTransactions(
-          transactions?.data?.transactions as ITransactionAssetIds[],
-        );
+      if (!transactions.error) {
         setTransactions(transactions.data.transactions);
-        setTotalTransactions(transactions.pagination.totalRecords);
       }
+    };
+
+    getTransactions();
+
+    const transactionsWatcher = setInterval(async () => {
+      getTransactions();
     }, transactionsWatcherInterval);
 
     return () => {
@@ -122,11 +116,7 @@ const HomeTransactions: React.FC<IHomeTransactions> = ({
           )}
 
           {transactions.map((transaction, index) => (
-            <TransactionItem
-              key={String(index)}
-              {...transaction}
-              precision={precision}
-            />
+            <TransactionItem key={String(index)} {...transaction} />
           ))}
         </TransactionContent>
         <TransactionChart>

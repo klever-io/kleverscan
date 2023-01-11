@@ -46,6 +46,10 @@ export const ProgressContainerSpan = styled.span`
   }
 `;
 
+export const ProgressContainerSpanSkeleton = styled(ProgressContainerSpan)`
+  gap: 3px;
+`;
+
 export const Section = styled.section`
   padding: 0 min(3%, 10rem) 10rem;
 

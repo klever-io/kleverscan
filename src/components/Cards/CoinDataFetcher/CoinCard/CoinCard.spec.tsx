@@ -1,23 +1,18 @@
 import { fireEvent, screen } from '@testing-library/react';
 import React from 'react';
-import { assetsData, CoinTest } from '../../../test/mocks';
-import { renderWithTheme } from '../../../test/utils';
-import { getVariation } from '../../../utils/index';
-import CoinCard from './';
+import CoinCard from '.';
+import { assetsData, CoinTest } from '../../../../test/mocks';
+import { renderWithTheme } from '../../../../test/utils';
+import { getVariation } from '../../../../utils/index';
 
 describe('Component: CoinCard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  const actualTPS = '30 / 300';
 
   it('Should render the CoinCard with the correct text', () => {
     const container = renderWithTheme(
-      <CoinCard
-        coins={CoinTest}
-        actualTPS={actualTPS}
-        assetsData={assetsData}
-      />,
+      <CoinCard coins={CoinTest} assetsData={assetsData} />,
     ).container;
     const arrow: any =
       container.firstChild?.firstChild?.firstChild?.firstChild?.lastChild;
@@ -35,7 +30,6 @@ describe('Component: CoinCard', () => {
 
   // it('Should have the correct styles for width and border-radius', () => {
   //   const { container } = renderWithTheme(
-  //     <CoinCard coins={CoinTest} actualTPS={actualTPS} />
   //   );
 
   //   const style = {
@@ -48,11 +42,7 @@ describe('Component: CoinCard', () => {
 
   it('Test the selector when click and scroll to select a coin', () => {
     const { container } = renderWithTheme(
-      <CoinCard
-        coins={CoinTest}
-        actualTPS={actualTPS}
-        assetsData={assetsData}
-      />,
+      <CoinCard coins={CoinTest} assetsData={assetsData} />,
     );
 
     const coinSelector: any = container.firstChild?.lastChild?.childNodes[1];

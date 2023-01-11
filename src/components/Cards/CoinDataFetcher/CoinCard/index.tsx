@@ -1,6 +1,6 @@
 import { ArrowDown } from '@/assets/icons';
 import Chart, { ChartType } from '@/components/Chart';
-import { IAssetsData, ICoinInfo } from '@/types/index';
+import { ICoinCards, ICoinInfo } from '@/types/index';
 import { getVariation } from '@/utils/index';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
@@ -25,18 +25,12 @@ import {
   ValueDetail,
 } from './styles';
 
-interface ICoinCard {
-  coins: ICoinInfo[];
-  actualTPS: string;
-  assetsData: IAssetsData;
-}
-
 interface IDropDow {
   shortname: string;
   volume: { price: number; variation: number };
 }
 
-const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, assetsData }) => {
+const CoinCard: React.FC<ICoinCards> = ({ assetsData, coins }) => {
   const [selectedCoin, setSelectedCoin] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -92,7 +86,8 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, assetsData }) => {
       if (
         typeof currentCoin?.totalStaking !== 'number' ||
         typeof currentCoin?.dayBeforeTotalStaking !== 'number' ||
-        typeof assetsData?.kfi?.prices?.todaysPrice !== 'number'
+        (coin.shortname === 'KFI' &&
+          typeof assetsData?.kfi?.prices?.todaysPrice !== 'number')
       ) {
         totalStakedInDolar = '--';
         variation = 0;
@@ -105,7 +100,10 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, assetsData }) => {
           totalStakedInDolar = (
             currentCoin.totalStaking * coin.price
           ).toLocaleString(undefined, { maximumFractionDigits: 0 });
-        } else {
+        } else if (
+          coin.shortname === 'KFI' &&
+          typeof assetsData?.kfi?.prices?.todaysPrice === 'number'
+        ) {
           totalStakedInDolar = (
             currentCoin.totalStaking * assetsData.kfi.prices.todaysPrice
           ).toLocaleString(undefined, { maximumFractionDigits: 0 });
@@ -146,78 +144,85 @@ const CoinCard: React.FC<ICoinCard> = ({ coins, actualTPS, assetsData }) => {
 
   const renderDropDown: React.FC<IDropDow> = coin => {
     return (
-      <>
-        <ValueContent>
-          <TitleDetails
-            positive={
-              coin.shortname === 'KLV'
-                ? getVariation(coin.volume.variation).includes('+')
-                : getVariation(0).includes('+')
-            }
-          >
-            <p>{t('Volume')}</p>
-            <span>{getVariation(coin.volume.variation)}</span>
-          </TitleDetails>
-          <ValueDetail>
-            {coin.shortname === 'KLV' ? (
-              <>
-                {' '}
-                <span>
-                  ${' '}
-                  {coin.volume.price.toLocaleString(undefined, {
-                    maximumFractionDigits: 2,
-                  })}
-                </span>
-              </>
-            ) : (
-              <>
-                {' '}
-                <span>
-                  $ {assetsData?.kfi?.volume?.toLocaleString() || '--'}
-                </span>
-              </>
-            )}
-          </ValueDetail>
-        </ValueContent>
-        <ValueContent isDropdown={coin.shortname === 'KLV' ? true : false}>
-          <TitleDetails
-            positive={calcPercentageDiff(coin.shortname).includes('+')}
-          >
-            <p
-              style={
-                coin.shortname === 'KLV'
-                  ? { width: '5rem', height: '1rem' }
-                  : {}
-              }
-            >
-              {t('Estimated APR')}
-            </p>
-            <span>{calcPercentageDiff(coin.shortname)}</span>
-          </TitleDetails>
-          <ValueDetail
-            positive={calcPercentageDiff(coin.shortname).includes('+')}
-          >
-            {coin.shortname === 'KLV' ? (
-              <>
-                {' '}
-                <span>
-                  {`${
-                    assetsData.klv.estimatedAprYesterday?.toFixed(4) || '--'
-                  } %`}
-                </span>
-              </>
-            ) : (
-              <>
-                <span>
-                  {`${
-                    assetsData.kfi?.estimatedAprYesterday?.toFixed(4) || '--'
-                  } ${t('KLV per KFI')}`}
-                </span>
-              </>
-            )}
-          </ValueDetail>
-        </ValueContent>
-      </>
+      assetsData && (
+        <>
+          {assetsData.klv && (
+            <ValueContent>
+              <TitleDetails
+                positive={
+                  coin.shortname === 'KLV'
+                    ? getVariation(coin.volume.variation).includes('+')
+                    : getVariation(0).includes('+')
+                }
+              >
+                <p>{t('Volume')}</p>
+                <span>{getVariation(coin.volume.variation)}</span>
+              </TitleDetails>
+              <ValueDetail>
+                {coin.shortname === 'KLV' ? (
+                  <>
+                    {' '}
+                    <span>
+                      ${' '}
+                      {coin.volume.price.toLocaleString(undefined, {
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    {' '}
+                    <span>
+                      $ {assetsData?.kfi?.volume?.toLocaleString() || '--'}
+                    </span>
+                  </>
+                )}
+              </ValueDetail>
+            </ValueContent>
+          )}
+          {assetsData.kfi && (
+            <ValueContent isDropdown={coin.shortname === 'KLV' ? true : false}>
+              <TitleDetails
+                positive={calcPercentageDiff(coin.shortname).includes('+')}
+              >
+                <p
+                  style={
+                    coin.shortname === 'KLV'
+                      ? { width: '5rem', height: '1rem' }
+                      : {}
+                  }
+                >
+                  {t('Estimated APR')}
+                </p>
+                <span>{calcPercentageDiff(coin.shortname)}</span>
+              </TitleDetails>
+              <ValueDetail
+                positive={calcPercentageDiff(coin.shortname).includes('+')}
+              >
+                {coin.shortname === 'KLV' ? (
+                  <>
+                    {' '}
+                    <span>
+                      {`${
+                        assetsData.klv.estimatedAprYesterday?.toFixed(4) || '--'
+                      } %`}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span>
+                      {`${
+                        assetsData.kfi?.estimatedAprYesterday?.toFixed(4) ||
+                        '--'
+                      } ${t('KLV per KFI')}`}
+                    </span>
+                  </>
+                )}
+              </ValueDetail>
+            </ValueContent>
+          )}
+        </>
+      )
     );
   };
 

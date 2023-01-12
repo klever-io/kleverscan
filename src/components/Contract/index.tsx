@@ -343,7 +343,7 @@ const Contract: React.FC<IContract> = ({
       }
     } catch (e: any) {
       setLoading(false);
-      console.log(`%c ${e}`, 'color: red');
+      console.warn(`%c ${e}`, 'color: red');
       toast.error(e.message ? e.message : e);
     }
   };

@@ -543,7 +543,7 @@ describe('Component: TransactionContractComponents', () => {
         }>(resolve =>
           resolve({
             KLV: 6,
-            'KPNFT-13Z0': 0,
+            'KPNFT-13Z0/1339': 0,
           }),
         ),
       );

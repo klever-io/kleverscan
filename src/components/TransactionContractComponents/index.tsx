@@ -38,6 +38,7 @@ import {
   IFreezeReceipt,
   IUnfreezeReceipt,
 } from '@/types/index';
+import { IKAppTransferReceipt } from '@/types/receipts';
 import {
   findNextSiblingReceipt,
   findPreviousSiblingReceipt,
@@ -46,9 +47,6 @@ import {
 import { usePrecision } from '@/utils/hooks';
 import {
   calculatePermissionOperations,
-  getBuyAmount,
-  getBuyPrice,
-  getBuyReceipt,
   getPrecision,
   receiverIsSender,
   renderCorrectPath,
@@ -77,6 +75,7 @@ import {
 import { format, fromUnixTime } from 'date-fns';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
+import Tooltip from '../Tooltip';
 
 export const Transfer: React.FC<IIndexedContract> = ({ parameter: par }) => {
   const parameter = par as ITransferContract;
@@ -684,6 +683,13 @@ export const Unfreeze: React.FC<IIndexedContract> = ({
   const precision = usePrecision([claimPrecision, assetIdPrecision]);
   const unfreezeReceipt = findReceipt(receipts, contractIndex, 4);
 
+  const undelegateReceipt = findPreviousSiblingReceipt(
+    receipts,
+    contractIndex,
+    4,
+    7,
+  );
+
   return (
     <>
       <Row>
@@ -741,6 +747,12 @@ export const Unfreeze: React.FC<IIndexedContract> = ({
           </span>
         </Row>
       )}
+      <Row>
+        <span>
+          <strong>Undelegated?</strong>
+        </span>
+        <span>{undelegateReceipt ? 'True' : 'False'}</span>
+      </Row>
     </>
   );
 };
@@ -815,6 +827,7 @@ export const Delegate: React.FC<IIndexedContract> = ({
                 claimPrecision,
               )}{' '}
               {claimReceipt.assetIdReceived}
+              <Tooltip msg="Delegation generates an unfreeze contract, which will trigger the freeze contract rewards, if there are any." />
             </CenteredRow>
           </span>
         </Row>
@@ -1240,57 +1253,240 @@ export const Buy: React.FC<IContractBuyProps> = ({
   const parameter = par as IBuyContractPayload;
   const receipts = rec as IBuyReceipt[];
   const buyType = parameter?.buyType;
-  const buyReceipt: any = getBuyReceipt(
-    parameter,
-    receipts,
-    contractIndex,
-    sender,
-    receiverIsSender,
-  );
-  const objBuyType = {
-    precision:
-      buyType === 'ITOBuy'
-        ? parameter?.id
-        : buyReceipt?.assetId.split('/')[0] ?? '',
-  };
-  const priceAssetId = parameter?.currencyID;
-  const currencyPrecision = objBuyType.precision;
-  const assetIdPrecision = priceAssetId || 'KLV';
-  const precisions = usePrecision([currencyPrecision, assetIdPrecision]);
-  const getAmountAssetId = () => {
-    let assetId = '';
-    if (buyType === 'MarketBuy' && buyReceipt) {
-      assetId = buyReceipt.assetId;
-    } else if (buyType === 'ITOBuy' && parameter) {
-      assetId = parameter.id;
-    }
-    return assetId;
-  };
-  const amountAssetId = getAmountAssetId();
+  let currencyId = '';
+  let assetId = '';
+  let nextKappTransferReceipt: undefined | IKAppTransferReceipt;
+  let previousKappTransferReceipt: undefined | IKAppTransferReceipt;
 
-  const formattedPrice = () => {
-    const price = getBuyPrice(parameter, buyReceipt);
-    if (typeof price === 'number') {
-      return toLocaleFixed(
-        price / 10 ** precisions[assetIdPrecision],
-        precisions[assetIdPrecision],
-      );
+  const initializeVariables = () => {
+    switch (buyType) {
+      case 'MarketBuy':
+        nextKappTransferReceipt = findNextSiblingReceipt(
+          receipts,
+          contractIndex,
+          16, // buy receipt
+          14, // kapp transfer receipt
+          [sender],
+          receiverIsSender,
+        );
+        // there won't be nextKappTransferREceipt if the buy bid is not instant buy, hence if must collect data from the previousKappTransferReceipt(which will be the receipt with correct data, but we will not find the asset the bid was offered)
+        previousKappTransferReceipt = findPreviousSiblingReceipt(
+          receipts,
+          contractIndex,
+          16,
+          14,
+        );
+        currencyId = parameter?.currencyID || 'KLV';
+        assetId =
+          nextKappTransferReceipt?.assetId ||
+          previousKappTransferReceipt?.assetId ||
+          '';
+        break;
+      case 'ITOBuy':
+        currencyId = parameter?.currencyID || 'KLV';
+        assetId = parameter?.id || '';
+        break;
+      default:
+        break;
     }
-    return null;
   };
-  const price = formattedPrice();
+  initializeVariables();
+  const precisions = usePrecision([assetId, currencyId]);
 
-  const formattedAmount = () => {
-    const amount = getBuyAmount(parameter, buyReceipt);
-    if (typeof amount === 'number') {
-      return toLocaleFixed(
-        amount / 10 ** precisions[currencyPrecision],
-        precisions[currencyPrecision],
-      );
-    }
-    return null;
+  const renderMarketBuy = () => {
+    const buyReceipt = findReceipt(receipts, contractIndex, 16);
+
+    const getStatus = () => {
+      const executed = buyReceipt?.executed;
+      if (typeof executed === 'boolean') {
+        if (executed) {
+          return 'Completed';
+        } else {
+          return 'Pending';
+        }
+      } else if (!executed && nextKappTransferReceipt) {
+        return 'Completed';
+      }
+      return null;
+    };
+
+    const getPrice = () => {
+      const price = parameter?.amount;
+      if (typeof price === 'number') {
+        return toLocaleFixed(
+          price / 10 ** precisions[currencyId],
+          precisions[currencyId],
+        );
+      }
+      return null;
+    };
+
+    const getAmount = () => {
+      const amount = nextKappTransferReceipt?.value;
+      if (typeof amount === 'number') {
+        return toLocaleFixed(
+          amount / 10 ** precisions[assetId],
+          precisions[assetId],
+        );
+      }
+      return null;
+    };
+
+    const status = getStatus();
+    const price = getPrice();
+    const amount = getAmount();
+
+    const orderId = parameter?.id;
+    const marketplaceId = buyReceipt?.marketplaceId;
+
+    return (
+      <>
+        {status && (
+          <Row>
+            <span>
+              <strong>Status</strong>
+            </span>
+            <span>{status}</span>
+          </Row>
+        )}
+        {price && (
+          <Row>
+            <span>
+              <strong>Price</strong>
+            </span>
+            <span>
+              {price} {currencyId}
+            </span>
+          </Row>
+        )}
+        {amount && (
+          <Row>
+            <span>
+              <strong>Amount</strong>
+            </span>
+            <span>
+              {amount} {assetId}
+            </span>
+          </Row>
+        )}
+        <Row>
+          <span>
+            <strong>Currency Id</strong>
+          </span>
+          <span>{currencyId}</span>
+        </Row>
+        <>
+          {assetId && nextKappTransferReceipt && (
+            <Row>
+              <span>
+                <strong>Asset Id</strong>
+              </span>
+              <span>{assetId}</span>
+            </Row>
+          )}
+          {orderId && (
+            <Row>
+              <span>
+                <strong>Order Id</strong>
+              </span>
+              <span>{orderId}</span>
+            </Row>
+          )}
+          {marketplaceId && (
+            <Row>
+              <span>
+                <strong>Marketplace Id</strong>
+              </span>
+              <span>{marketplaceId}</span>
+            </Row>
+          )}
+        </>
+      </>
+    );
   };
-  const amount = formattedAmount();
+
+  const renderITOBuy = () => {
+    const transferReceipt = findPreviousSiblingReceipt(
+      receipts,
+      contractIndex,
+      2,
+      0,
+    ); // there is no formal buy receipt in ITOBuy, but the data we want is in the 0(transfer) receipt
+
+    const getPrice = () => {
+      const price = transferReceipt?.value;
+      if (typeof price === 'number') {
+        return toLocaleFixed(
+          price / 10 ** precisions[currencyId],
+          precisions[currencyId],
+        );
+      }
+      return null;
+    };
+
+    const getAmount = () => {
+      const amount = parameter?.amount;
+      if (typeof amount === 'number') {
+        return toLocaleFixed(
+          amount / 10 ** precisions[assetId],
+          precisions[assetId],
+        );
+      }
+      return null;
+    };
+    const price = getPrice();
+    const amount = getAmount();
+
+    return (
+      <>
+        {price && (
+          <Row>
+            <span>
+              <strong>Price</strong>
+            </span>
+            <span>
+              {price} {currencyId}
+            </span>
+          </Row>
+        )}
+        {amount && (
+          <Row>
+            <span>
+              <strong>Amount</strong>
+            </span>
+            <span>
+              {amount} {assetId}
+            </span>
+          </Row>
+        )}
+        <Row>
+          <span>
+            <strong>Currency Id</strong>
+          </span>
+          <span>{currencyId}</span>
+        </Row>
+        {assetId && (
+          <Row>
+            <span>
+              <strong>Asset Id</strong>
+            </span>
+            <span>{assetId}</span>
+          </Row>
+        )}
+      </>
+    );
+  };
+
+  const renderBuyTypeData = () => {
+    switch (buyType) {
+      case 'MarketBuy':
+        return renderMarketBuy();
+      case 'ITOBuy':
+        return renderITOBuy();
+      default:
+        return null;
+    }
+  };
 
   return (
     <>
@@ -1306,54 +1502,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
         </span>
         <span>{buyType}</span>
       </Row>
-      {price && (
-        <Row>
-          <span>
-            <strong>Price</strong>
-          </span>
-          <span>
-            {price} {priceAssetId}
-          </span>
-        </Row>
-      )}
-      {amount && (
-        <Row>
-          <span>
-            <strong>Amount</strong>
-          </span>
-          <span>
-            {amount} {amountAssetId}
-          </span>
-        </Row>
-      )}
-      <Row>
-        <span>
-          <strong>Currency Id</strong>
-        </span>
-        <span>{parameter?.currencyID}</span>
-      </Row>
-      <Row>
-        <span>
-          <strong>Asset Id</strong>
-        </span>
-        <span>{amountAssetId}</span>
-      </Row>
-      {parameter.buyType === 'MarketBuy' && (
-        <>
-          <Row>
-            <span>
-              <strong>Order Id</strong>
-            </span>
-            <span>{parameter.id}</span>
-          </Row>
-          <Row>
-            <span>
-              <strong>Marketplace Id</strong>
-            </span>
-            <span>{buyReceipt?.marketplaceId}</span>
-          </Row>
-        </>
-      )}
+      {renderBuyTypeData()}
     </>
   );
 };
@@ -1421,14 +1570,16 @@ export const Sell: React.FC<IIndexedContract> = ({
         </span>
         <span>{parameter?.currencyID}</span>
       </Row>
-      <Row>
-        <span>
-          <strong>Price</strong>
-        </span>
-        <span>
-          {toLocaleFixed(parameter?.price / 10 ** (precision || 0), precision)}
-        </span>
-      </Row>{' '}
+      {parameter?.price && (
+        <Row>
+          <span>
+            <strong>Price</strong>
+          </span>
+          <span>
+            {toLocaleFixed(parameter.price / 10 ** (precision || 0), precision)}
+          </span>
+        </Row>
+      )}
       {parameter?.reservePrice && (
         <Row>
           <span>

@@ -516,6 +516,7 @@ export async function getPrecision(
     assetIds.forEach(assetId => {
       if (
         !Object.keys(storedPrecisions).includes(assetId) &&
+        assetId !== '' &&
         !aux.includes(assetId) &&
         assetId.split('/').length === 1
       ) {
@@ -556,7 +557,6 @@ export async function getPrecision(
         localStorage.setItem('precisions', JSON.stringify(newPrecisions));
         return precisions[assetId];
       } catch (error: any) {
-        console.error(error);
         throw new Error(error);
       }
     } else {

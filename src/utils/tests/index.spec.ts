@@ -72,8 +72,12 @@ describe('unit tests for util funcs in index file', () => {
 
   describe('test timestampToDate function', () => {
     test('using old dates timestamps as parameters', () => {
-      expect(timestampToDate(timestamp1)).toEqual('11/27/51287, 3:20:00 PM');
-      expect(timestampToDate(timestamp2)).toEqual('4/28/54389, 8:17:26 AM');
+      expect(timestampToDate(timestamp1)).toMatch(
+        /11\/27\/51287, 3:20:00( | )PM/,
+      );
+      expect(timestampToDate(timestamp2)).toMatch(
+        /4\/28\/54389, 8:17:26( | )AM/,
+      );
     });
   });
 

@@ -1,18 +1,24 @@
 import { Assets as Icon } from '@/assets/title-icons';
 import Chart, { ChartType } from '@/components/Chart';
 import Title from '@/components/Layout/Title';
+import { HomeLoader } from '@/components/Loader/styles';
 import api from '@/services/api';
 import { Container, Header, Input, Section } from '@/views/charts';
 import {
   ChartsContainer,
+  ContainerTimeFilter,
+  HomeLoaderContainer,
+  ItemTimeFilter,
+  ListItemTimeFilter,
   TransactionChart,
   TransactionChartContent,
 } from '@/views/home';
 import { format } from 'date-fns';
 import { GetServerSideProps } from 'next';
+import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import React from 'react';
-import { IResponse } from '../../types';
+import React, { useCallback, useEffect, useState } from 'react';
+import { IDailyTransaction, IResponse } from '../../types';
 
 export interface ITooltipContent {
   payload?: {
@@ -49,6 +55,7 @@ interface IBlockStats {
   KFI: number;
 }
 interface ICharts {
+  dailyTransactions: IDailyTransaction[];
   statistics: IBlockStats[];
 }
 
@@ -58,9 +65,52 @@ interface IStatisticsResponse extends IResponse {
   };
 }
 
-const Charts: React.FC<ICharts> = ({ statistics }) => {
+const Charts: React.FC<ICharts> = ({ statistics, dailyTransactions }) => {
   const router = useRouter();
+  const { t: commonT } = useTranslation('common');
+  const filterDays = [1, 7, 15, 30];
+  const [timeFilter, setTimeFilter] = useState(16);
+  const [loadingDailyTxs, setLoadingDailyTxs] = useState(false);
+  const [transactionsList, setTransactionsList] = useState(dailyTransactions);
 
+  const getTransactionChartData = useCallback(() => {
+    const sortedTransactionsList = transactionsList.sort(
+      (a, b) => a.key - b.key,
+    );
+    return sortedTransactionsList.map(transaction => {
+      if (transaction.key) {
+        // Create date object
+        const date = new Date(transaction.key);
+        // Set timezone to UTC
+        date.setTime(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
+        const dateString = format(date, 'dd MMM');
+        return {
+          date:
+            dateString.slice(0, 2) + ' ' + commonT(`${dateString.slice(3)}`),
+          value: transaction.doc_count,
+        };
+      }
+    });
+  }, [transactionsList]);
+
+  useEffect(() => {
+    const fetchTotalDays = async () => {
+      setLoadingDailyTxs(true);
+      try {
+        const res = await api.getCached({
+          route: `transaction/list/count/${timeFilter}`,
+        });
+        if (!res.error || res.error === '') {
+          setTransactionsList(res.data.number_by_day);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+      setLoadingDailyTxs(false);
+    };
+
+    fetchTotalDays();
+  }, [timeFilter]);
   return (
     <Container>
       <Header>
@@ -94,7 +144,35 @@ const Charts: React.FC<ICharts> = ({ statistics }) => {
               />
             </TransactionChartContent>
           </TransactionChart>
-
+          <TransactionChart>
+            <ContainerTimeFilter>
+              <span>Daily Transactions</span>
+              <ListItemTimeFilter>
+                {filterDays.map(item => (
+                  <ItemTimeFilter
+                    key={String(item)}
+                    onClick={() => setTimeFilter(item + 1)}
+                    selected={!!(timeFilter === item + 1)}
+                  >
+                    {item !== 30 ? `${String(item)}D` : '1M'}
+                  </ItemTimeFilter>
+                ))}
+              </ListItemTimeFilter>
+            </ContainerTimeFilter>
+            {loadingDailyTxs && (
+              <HomeLoaderContainer>
+                <HomeLoader />
+              </HomeLoaderContainer>
+            )}
+            {!loadingDailyTxs && (
+              <TransactionChartContent>
+                <Chart
+                  type={ChartType.Linear}
+                  data={getTransactionChartData()}
+                />
+              </TransactionChartContent>
+            )}
+          </TransactionChart>
           <TransactionChart>
             <span>KLV Rewards Pool vs KFI Rewards Pool</span>
             <TransactionChartContent>
@@ -115,12 +193,17 @@ const Charts: React.FC<ICharts> = ({ statistics }) => {
 export const getServerSideProps: GetServerSideProps<ICharts> = async () => {
   const props: ICharts = {
     statistics: [] as IBlockStats[],
+    dailyTransactions: [] as IDailyTransaction[],
   };
 
   const statistics: IStatisticsResponse = await api.get({
     route: 'block/statistics-by-day/15',
   });
-  if (!statistics.error) {
+
+  const dailyTransactions = await api.getCached({
+    route: 'transaction/list/count/15',
+  });
+  if (!statistics.error && !dailyTransactions.error) {
     props.statistics = statistics.data.block_stats_by_day
       .reverse()
       .map(stats => {
@@ -134,6 +217,9 @@ export const getServerSideProps: GetServerSideProps<ICharts> = async () => {
           KLV: stats.totalStakingRewards / 1000000,
         };
       });
+
+    const { number_by_day } = dailyTransactions.data;
+    props.dailyTransactions = number_by_day;
   }
   return { props };
 };

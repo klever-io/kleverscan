@@ -35,11 +35,18 @@ export interface IBlock {
 
 export interface IBlockCard {
   blockIndex: number;
-  precision: number;
+  nonce: number;
+  timestamp: number;
+  hash: string;
+  blockRewards: number;
+  txCount: number;
+  txBurnedFees?: number;
 }
-export interface IBlockCardList {
+export interface IBlockCardFetcher {
   blocks: IBlock[];
-  precision: number;
+  getBlocks: (
+    setBlocks: React.Dispatch<React.SetStateAction<IBlock[]>>,
+  ) => void;
 }
 
 export interface IBlockStats {

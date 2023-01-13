@@ -4,6 +4,13 @@ import React from 'react';
 import { act } from 'react-dom/test-utils';
 import theme from '../../styles/theme';
 import { klvAsset, mockedTxContractComponents } from '../../test/mocks';
+import {
+  claim1,
+  createAsset1,
+  freeze1,
+  marketbuy1,
+  unfreeze1,
+} from '../../test/mocks/transaction-page';
 import { renderWithTheme } from '../../test/utils';
 import * as utils from '../../utils';
 import { toLocaleFixed } from '../../utils';
@@ -31,20 +38,33 @@ import {
   Vote,
   Withdraw,
 } from './';
+
 const fnsCopySpy = { format }; // this solves a spyOn bug
 
 const precision = 6; // default klv precision
-
+const mockPrecision = {
+  data: {
+    precisions: {
+      KLV: 6,
+    },
+  },
+  error: '',
+  code: 'successful',
+};
 describe('Component: TransactionContractComponents', () => {
   describe('When contract is "Transfer"', () => {
-    it('Should render the "Amount", "to"( who receive ) with the link and the coin with the link', () => {
-      renderWithTheme(
-        <Transfer
-          {...mockedTxContractComponents.transferContract}
-          precision={precision}
-          asset={klvAsset}
-        />,
-      );
+    it('Should render the "Amount", "to"( who receive ) with the link and the coin with the link', async () => {
+      const spy = jest.spyOn(utils, 'getPrecision');
+      spy.mockReturnValue(new Promise<number>(resolve => resolve(6)));
+      await act(async () => {
+        renderWithTheme(
+          <Transfer
+            {...mockedTxContractComponents.transferContract}
+            precision={precision}
+            asset={klvAsset}
+          />,
+        );
+      });
       const {
         transferContract: { parameter },
       } = mockedTxContractComponents;
@@ -114,19 +134,18 @@ describe('Component: TransactionContractComponents', () => {
 
   describe('When contract is "CreateAsset"', () => {
     it('Should render the "Amount", "to"( who receive ) with the link and the coin with the link', () => {
-      const createAssetContract = {
-        ...mockedTxContractComponents.createAssetContract,
-      };
-      createAssetContract.parameter.ownerAddress = '';
       renderWithTheme(
         <CreateAsset
-          {...mockedTxContractComponents.createAssetContract}
+          sender={createAsset1.sender}
+          parameter={createAsset1.contract[0].parameter}
+          receipts={createAsset1.receipts}
+          contractIndex={0}
           precision={precision}
-          receipts={[klvAsset]}
         />,
       );
 
-      const { sender, parameter } = createAssetContract;
+      const { parameter } = createAsset1.contract[0];
+      const { sender } = createAsset1;
 
       const assetId = screen.getByText(/Asset ID/i);
       const name = screen.getByText(/Name/i);
@@ -148,7 +167,7 @@ describe('Component: TransactionContractComponents', () => {
       expect(ownerLink).toHaveAttribute('href', `/account/${sender}`);
 
       expect(assetId.parentNode?.nextSibling?.firstChild).toHaveTextContent(
-        klvAsset.assetId,
+        'BIZZZX-186R',
       );
       expect(name.parentNode?.nextSibling?.firstChild).toHaveTextContent(
         parameter.name,
@@ -232,62 +251,73 @@ describe('Component: TransactionContractComponents', () => {
   });
 
   describe('When contract is "Freeze"', () => {
-    it('Should render "Amount" and "Bucket ID" with all it\'s values', () => {
-      renderWithTheme(
-        <Freeze {...mockedTxContractComponents.freezeContract} receipts={[]} />,
-      );
-
-      const {
-        freezeContract: { sender, parameter },
-      } = mockedTxContractComponents;
-
-      const amount = screen.getByText(/Amount/i);
-      const bucketId = screen.getByText(/Bucket ID/i);
-      expect(amount).toBeInTheDocument();
-      expect(amount.parentNode?.nextSibling?.firstChild).toHaveTextContent(
-        '700.000000',
-      );
-      expect(bucketId).toBeInTheDocument();
-      expect(bucketId.parentNode?.nextSibling?.firstChild).toBeNull();
+    it('Should render "Amount" and "Bucket ID" with all it\'s values', async () => {
+      const spy = jest.spyOn(utils, 'getPrecision');
+      spy.mockReturnValue(new Promise<number>(resolve => resolve(6)));
+      await act(async () => {
+        renderWithTheme(
+          <Freeze
+            {...freeze1}
+            receipts={freeze1.receipts}
+            parameter={freeze1.contract[0].parameter}
+            contractIndex={0}
+          />,
+        );
+      });
+      [
+        screen.getByText('Type'),
+        screen.getByText('Asset Id'),
+        screen.getByText('Amount'),
+        screen.getByText('Bucket Id'),
+        screen.getByText('Freeze'),
+        screen.getByText('KLV'),
+        screen.getByText('12,820.000000'),
+        screen.getByText(
+          '88c6663e7cfa68412b89afea32b1695446874aaf7c7419ce9b770b96cedd23cd',
+        ),
+      ].forEach(value => expect(value).toBeInTheDocument());
     });
   });
 
   describe('When contract is "Unfreeze"', () => {
-    it('Should render "Amount" and "Bucket ID" with all it\'s values', () => {
-      renderWithTheme(
-        <Unfreeze
-          {...mockedTxContractComponents.unfreezeContract}
-          receipts={mockedTxContractComponents.unfreezeContract.receipts}
-        />,
+    it('Should render "Amount" and "Bucket ID" with all it\'s values', async () => {
+      const spy = jest.spyOn(utils, 'getPrecision');
+      spy.mockReturnValue(
+        new Promise<{
+          [assetId: string]: number;
+        }>(resolve =>
+          resolve({
+            KLV: 6,
+          }),
+        ),
       );
+      await act(async () => {
+        renderWithTheme(
+          <Unfreeze
+            {...unfreeze1}
+            receipts={unfreeze1.receipts}
+            parameter={unfreeze1.contract[0].parameter}
+            contractIndex={0}
+          />,
+        );
+      });
+      [
+        screen.getByText('Type'),
+        screen.getByText('Asset Id'),
+        screen.getByText('Bucket Id'),
+        screen.getByText('Available Epoch'),
+        screen.getByText('Amount'),
+        screen.getByText('Claimed Rewards'),
 
-      const {
-        unfreezeContract: { sender, parameter },
-      } = mockedTxContractComponents;
-
-      const assetId = screen.getByText(/Asset ID/i);
-      const bucketId = screen.getByText(/Bucket ID/i);
-
-      expect(assetId).toBeInTheDocument();
-      expect(assetId.parentNode?.nextSibling?.firstChild).toHaveTextContent(
-        parameter.assetId,
-      );
-      expect(bucketId).toBeInTheDocument();
-      expect(bucketId.parentNode?.nextSibling?.firstChild).toHaveTextContent(
-        `${parameter.bucketID}`,
-      );
-    });
-
-    it('Should render "--" when "Available Epoch" don\'t has any values', () => {
-      const unfreezeMock = { ...mockedTxContractComponents.unfreezeContract };
-      unfreezeMock.receipts[0].availableEpoch = 0;
-      renderWithTheme(
-        <Unfreeze {...unfreezeMock} receipts={unfreezeMock.receipts} />,
-      );
-
-      const availableEpoch = screen.getByText(/Available Epoch/i);
-      expect(availableEpoch).toBeInTheDocument();
-      expect(availableEpoch.parentElement?.nextSibling).toHaveTextContent('--');
+        screen.getByText('Unfreeze'),
+        screen.getByText('KLV'),
+        screen.getByText(
+          '8bf070552ae73864455cfc08b247f0f12d53743a3bf536e91785cba9e04fcc63',
+        ),
+        screen.getByText('729'),
+        screen.getByText('5,271.203485'),
+        screen.getByText('33.044706 KLV'),
+      ].forEach(value => expect(value).toBeInTheDocument());
     });
   });
 
@@ -360,25 +390,39 @@ describe('Component: TransactionContractComponents', () => {
   });
 
   describe('When contract is "Claim"', () => {
-    it('Should render "Claim Type" and "Id" with all it\'s values', () => {
-      renderWithTheme(
-        <Claim {...mockedTxContractComponents.claimContract} receipts={[]} />,
-      );
+    it('Should render "Claim Type" and "Id" with all it\'s values', async () => {
+      const spy = jest.spyOn(utils, 'getPrecision');
+      spy.mockReturnValue(new Promise<number>(resolve => resolve(6)));
+      await act(async () => {
+        renderWithTheme(
+          <Claim
+            {...claim1}
+            receipts={claim1.receipts}
+            parameter={claim1.contract[0].parameter}
+          />,
+        );
+      });
+      const typeLabel = screen.getByText('Type');
+      const claimTypeLabel = screen.getByText('Claim Type');
+      const assetIdLabel = screen.getByText('Asset Id');
+      const amountLabel = screen.getByText('Amount');
 
-      const {
-        claimContract: { parameter },
-      } = mockedTxContractComponents;
+      const type = screen.getByText('Claim');
+      const claimType = screen.getByText('StakingClaim');
+      const assetId = screen.getByText('KLV');
+      const amount = screen.getByText('47.573703 KLV');
 
-      const claimType = screen.getByText(/Claim Type/i);
-      const id = screen.getByText(/Id/i);
-
-      expect(claimType).toBeInTheDocument();
-      expect(claimType.parentNode?.nextSibling?.firstChild).toHaveTextContent(
-        `${parameter.claimType}`,
-      );
-      expect(id.parentNode?.nextSibling?.firstChild).toHaveTextContent(
-        `${parameter.id}`,
-      );
+      const data = [
+        typeLabel,
+        claimTypeLabel,
+        assetIdLabel,
+        amountLabel,
+        type,
+        claimType,
+        assetId,
+        amount,
+      ];
+      data.forEach(value => expect(value).toBeInTheDocument());
     });
   });
 
@@ -490,16 +534,27 @@ describe('Component: TransactionContractComponents', () => {
     });
   });
 
-  describe('When contract is "Buy"', () => {
+  describe('When contract is "MarketBuy"', () => {
     it('Should render "Buy Type" and "Id" with all it\'s values', async () => {
       const spy = jest.spyOn(utils, 'getPrecision');
-      spy.mockReturnValue(new Promise(resolve => resolve(6)));
+      spy.mockReturnValue(
+        new Promise<{
+          [assetId: string]: number;
+        }>(resolve =>
+          resolve({
+            KLV: 6,
+            'KPNFT-13Z0/1339': 0,
+          }),
+        ),
+      );
       await act(async () => {
         renderWithTheme(
           <Buy
-            {...mockedTxContractComponents.buyContract}
-            receipts={mockedTxContractComponents.ITOBuyReceipts}
-            contracts={[mockedTxContractComponents.buyContract]}
+            {...marketbuy1}
+            receipts={marketbuy1.receipts}
+            contracts={marketbuy1.contract}
+            parameter={marketbuy1.contract[0].parameter}
+            contractIndex={0}
           />,
         );
       });
@@ -508,32 +563,42 @@ describe('Component: TransactionContractComponents', () => {
         buyContract: { parameter },
       } = mockedTxContractComponents;
 
-      const buyTypeLabel = screen.getByText(/Buy Type/i);
-      const idLabel = screen.getByText('Id');
+      const typeLabel = screen.getByText('Type');
+      const buyTypeLabel = screen.getByText('Buy Type');
+      const priceLabel = screen.getByText('Price');
+      const amountLabel = screen.getByText('Amount');
       const currencyIDLabel = screen.getByText('Currency Id');
-      const amountLabel = screen.getByText(/Amount/i);
-      const priceLabel = screen.getByText(/Price/i);
+      const assetIdLabel = screen.getByText('Asset Id');
+      const orderIdLabel = screen.getByText('Order Id');
+      const marketPlaceIdLabel = screen.getByText('Marketplace Id');
 
+      expect(typeLabel).toBeInTheDocument();
       expect(buyTypeLabel).toBeInTheDocument();
-      expect(idLabel).toBeInTheDocument();
-      expect(currencyIDLabel).toBeInTheDocument();
-      expect(amountLabel).toBeInTheDocument();
       expect(priceLabel).toBeInTheDocument();
-
-      const buyType = screen.getByText(/ITOBuy/i);
-      const id = screen.getByText(/1bcf565e5263856f/i);
-      const currencyID = screen.getByText(/KLV/i);
+      expect(amountLabel).toBeInTheDocument();
+      expect(currencyIDLabel).toBeInTheDocument();
+      expect(assetIdLabel).toBeInTheDocument();
+      expect(orderIdLabel).toBeInTheDocument();
+      expect(marketPlaceIdLabel).toBeInTheDocument();
 
       await waitFor(() => {
-        const amount = screen.getByText('320.000000');
-        expect(amount).toBeInTheDocument();
-        const price = screen.getByText('20.000000');
+        const type = screen.getByText('Buy');
+        const buyType = screen.getByText('MarketBuy');
+        const price = screen.getByText('320.000000 KLV');
+        const amount = screen.getByText('1 KPNFT-13Z0/1339');
+        const currencyID = screen.getByText('KLV');
+        const assetId = screen.getByText('KPNFT-13Z0/1339');
+        const orderId = screen.getByText('c357bd00d13d9270');
+        const marketPlaceId = screen.getByText('d4f2bab340c55fde');
+        expect(type).toBeInTheDocument();
+        expect(buyType).toBeInTheDocument();
         expect(price).toBeInTheDocument();
+        expect(amount).toBeInTheDocument();
+        expect(currencyID).toBeInTheDocument();
+        expect(assetId).toBeInTheDocument();
+        expect(orderId).toBeInTheDocument();
+        expect(marketPlaceId).toBeInTheDocument();
       });
-      expect(buyType).toBeInTheDocument();
-      expect(id).toBeInTheDocument();
-      expect(currencyID).toBeInTheDocument();
-
       spy.mockRestore();
     });
   });
@@ -541,7 +606,7 @@ describe('Component: TransactionContractComponents', () => {
   describe('When contract is "Sell"', () => {
     it('Should render "Market Type" and "Asset Id" with all it\'s values', async () => {
       const spyPrecision = jest.spyOn(utils, 'getPrecision');
-      spyPrecision.mockReturnValue(new Promise(resolve => resolve(6)));
+      spyPrecision.mockReturnValue(new Promise<number>(resolve => resolve(6)));
 
       const spyFormat = jest.spyOn(fnsCopySpy, 'format');
       spyFormat.mockReturnValue('14/11/2023 18:52');
@@ -663,8 +728,8 @@ describe('Component: TransactionContractComponents', () => {
       );
 
       const { parameter } = mockedTxContractComponents.validatorConfigContract;
-      const pubKey = screen.getByText(parameter.blsPublicKey);
-      const name = screen.getByText(parameter.name);
+      const pubKey = screen.getByText(parameter.config.blsPublicKey);
+      const name = screen.getByText(parameter.config.name);
 
       expect(pubKey).toBeInTheDocument();
       expect(name).toBeInTheDocument();

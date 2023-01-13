@@ -1,12 +1,7 @@
 /* eslint @typescript-eslint/no-var-requires: "off" */
 
 const withImages = require('next-images');
-const withPlugins = require('next-compose-plugins');
 const { i18n } = require('./next-i18next.config');
-
-const images = withImages({
-  esModule: true,
-});
 
 const defaultEnvs = [
   'DEFAULT_API_HOST',
@@ -29,7 +24,7 @@ const getEnvs = () => {
   return envs;
 };
 
-module.exports = withPlugins([images], {
+module.exports = withImages({
   env: getEnvs(),
   i18n,
 });

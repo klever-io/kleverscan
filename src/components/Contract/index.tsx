@@ -1,3 +1,4 @@
+import Form, { ISection } from '@/components/Form';
 import {
   InputLabel,
   Slider,
@@ -15,7 +16,6 @@ import formSection from '@/utils/formSections';
 import { parseAddress } from '@/utils/index';
 import { Card } from '@/views/blocks';
 import { core } from '@klever/sdk';
-import Form, { ISection } from 'components/Form';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
@@ -49,17 +49,18 @@ import {
   showAssetIDInput,
 } from './utils';
 
+type ProposalsList = {
+  label: string;
+  value: number;
+};
 interface IContract {
   assetsList: ICollectionList[];
-  proposalsList: any[];
+  proposalsList: ProposalsList[];
   paramsList: IParamList[];
   kAssets: IKAssets[];
   getAssets: () => void;
 }
 
-let triggerKey = 0;
-let claimKey = 0;
-let buyKey = 0;
 let assetID = 0;
 
 const Contract: React.FC<IContract> = ({
@@ -76,10 +77,9 @@ const Contract: React.FC<IContract> = ({
   const [tokenChosen, setTokenChosen] = useState(false);
   const [ITOBuy, setITOBuy] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
-  const [ownerAddress, setOwnerAddress] = useState('');
   const [claimType, setClaimType] = useState(0);
   const [typeAssetTrigger, setTypeAssetTrigger] = useState<number | null>(null);
-  const [data, setData] = useState('');
+  const [data, setData] = useState<string>('');
   const [isMultisig, setIsMultisig] = useState(false);
   const [showPayload, setShowPayload] = useState(false);
   const [payload, setPayload] = useState<any>({});
@@ -90,12 +90,15 @@ const Contract: React.FC<IContract> = ({
   const [assetBalance, setAssetBalance] = useState<number | null>(null);
   const [collection, setCollection] = useState<any>({});
   const [proposalId, setProposalId] = useState<number | null>(null);
-  const [claimLabel, setClaimLabel] = useState('Asset ID');
   const [buyLabel, setBuyLabel] = useState('Order ID');
   const [binaryOperations, setBinaryOperations] = useState([]);
 
-  const collectionRef = useRef<any>(null);
-  const contractRef = useRef<any>(null);
+  const getOwnerAddress = () => {
+    return sessionStorage.getItem('walletAddress') || '';
+  };
+
+  const collectionRef = useRef<string | null>(null);
+  const contractRef = useRef<string | null>(null);
 
   useEffect(() => {
     setAssetBalance(null);
@@ -104,7 +107,6 @@ const Contract: React.FC<IContract> = ({
         if (window.kleverWeb) {
           (async () => {
             try {
-              setOwnerAddress(await window.kleverWeb.getWalletAddress());
             } catch (error) {
               console.error(error);
             }
@@ -125,18 +127,8 @@ const Contract: React.FC<IContract> = ({
   useEffect(() => {
     setFormSections([
       ...formSection({
-        contract: 'ClaimContract',
-        address: ownerAddress,
-        claimLabel,
-      }),
-    ]);
-  }, [claimLabel]);
-
-  useEffect(() => {
-    setFormSections([
-      ...formSection({
         contract: contractType,
-        address: ownerAddress,
+        address: getOwnerAddress(),
         assetTriggerType: typeAssetTrigger,
       }),
     ]);
@@ -155,10 +147,10 @@ const Contract: React.FC<IContract> = ({
     if (contractType === 'DelegateContract') {
       setBucketsCollection(['KFI', 'KLV']);
     } else if (contractType === 'UndelegateContract') {
-      const buckets: any = [];
-      assetsList.forEach((asset: any) => {
-        asset?.buckets.forEach((bucket: any) => {
-          if (bucket.delegation !== ownerAddress) {
+      const buckets: ProposalsList[] = [];
+      assetsList?.forEach((asset: any) => {
+        asset?.buckets?.forEach((bucket: any) => {
+          if (bucket?.delegation !== getOwnerAddress()) {
             buckets.push({
               label: parseAddress(bucket.id, 20),
               value: bucket.id,
@@ -183,12 +175,12 @@ const Contract: React.FC<IContract> = ({
   }, [collection]);
 
   useEffect(() => {
-    const buckets: any = [];
+    const buckets: ProposalsList[] = [];
 
     bucketsCollection.forEach((collection: string) => {
       assetsList.forEach((item: any) => {
         if (item.label === collection) {
-          item.buckets.forEach((bucket: any) => {
+          item?.buckets?.forEach((bucket: any) => {
             buckets.push({
               label: parseAddress(bucket.id, 20),
               value: bucket.id,
@@ -207,7 +199,7 @@ const Contract: React.FC<IContract> = ({
         ...formSection({
           contract: contractType,
           type: 'Token',
-          address: ownerAddress,
+          address: getOwnerAddress(),
         }),
       ]);
     } else {
@@ -215,7 +207,7 @@ const Contract: React.FC<IContract> = ({
         ...formSection({
           contract: contractType,
           type: 'NFT',
-          address: ownerAddress,
+          address: getOwnerAddress(),
         }),
       ]);
     }
@@ -233,11 +225,10 @@ const Contract: React.FC<IContract> = ({
   }, [collection]);
 
   const defineBuyContract = (label: string) => {
-    buyKey += 1;
     setFormSections([
       ...formSection({
         contract: 'BuyContract',
-        address: ownerAddress,
+        address: getOwnerAddress(),
         buyLabel: label,
       }),
     ]);
@@ -261,7 +252,7 @@ const Contract: React.FC<IContract> = ({
         setFormSections([
           ...formSection({
             contract: selectedOption.value,
-            address: ownerAddress,
+            address: getOwnerAddress(),
             paramsList,
           }),
         ]);
@@ -271,8 +262,8 @@ const Contract: React.FC<IContract> = ({
         setFormSections([
           ...formSection({
             contract: selectedOption.value,
-            address: ownerAddress,
-            claimLabel,
+            claimLabel: 'Asset ID',
+            address: getOwnerAddress(),
           }),
         ]);
         break;
@@ -285,7 +276,7 @@ const Contract: React.FC<IContract> = ({
         setFormSections([
           ...formSection({
             contract: selectedOption.value,
-            address: ownerAddress,
+            address: getOwnerAddress(),
           }),
         ]);
         break;
@@ -352,7 +343,7 @@ const Contract: React.FC<IContract> = ({
       }
     } catch (e: any) {
       setLoading(false);
-      console.log(`%c ${e}`, 'color: red');
+      console.warn(`%c ${e}`, 'color: red');
       toast.error(e.message ? e.message : e);
     }
   };
@@ -381,7 +372,6 @@ const Contract: React.FC<IContract> = ({
       ...parsedValues,
     };
     let parsedPayload = await precisionParse(payload, contractType);
-    console.log(parsedPayload);
     if (contractType === 'ConfigITOContract' && parsedPayload?.pack) {
       parsedPayload = parsePackInfo(parsedPayload);
     }
@@ -477,14 +467,26 @@ const Contract: React.FC<IContract> = ({
       <FieldLabel>Claim Type</FieldLabel>
       <Select
         options={claimTypes}
-        onChange={value => {
-          if (!isNaN(value?.value)) {
-            if (value.value === 0 || value.value === 1) {
-              setClaimLabel('Asset ID');
-            } else if (value.value === 2) {
-              setClaimLabel('Order ID');
+        onChange={e => {
+          if (!isNaN(e?.value)) {
+            if (e.value === 0 || e.value === 1) {
+              setFormSections([
+                ...formSection({
+                  contract: 'ClaimContract',
+                  address: getOwnerAddress(),
+                  claimLabel: 'Asset ID',
+                }),
+              ]);
+            } else if (e.value === 2) {
+              setFormSections([
+                ...formSection({
+                  contract: 'ClaimContract',
+                  address: getOwnerAddress(),
+                  claimLabel: 'Order ID',
+                }),
+              ]);
             }
-            setClaimType(value.value);
+            setClaimType(e.value);
           }
         }}
       />
@@ -567,7 +569,7 @@ const Contract: React.FC<IContract> = ({
             contractType === 'AssetTriggerContract' ? kAssets : assetsList,
             contractType,
             typeAssetTrigger,
-            ownerAddress,
+            getOwnerAddress(),
           )}
           onChange={value => {
             setCollection(value);
@@ -606,18 +608,12 @@ const Contract: React.FC<IContract> = ({
         return ITOForm();
 
       default:
-        triggerKey += 1;
-        claimKey += 1;
-
         const key =
-          contractType === 'CreateAssetContract'
-            ? String(formSections)
-            : contractType === 'AssetTriggerContract'
-            ? triggerKey
-            : contractType === 'ClaimContract'
-            ? claimKey
-            : contractType === 'BuyContract'
-            ? buyKey
+          contractType === 'CreateAssetContract' ||
+          contractType === 'AssetTriggerContract' ||
+          contractType === 'ClaimContract' ||
+          contractType === 'BuyContract'
+            ? JSON.stringify(formSections)
             : contractType;
 
         return (

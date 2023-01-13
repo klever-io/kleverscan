@@ -1,7 +1,10 @@
 import { transparentize } from 'polished';
 import styled from 'styled-components';
 
-export const Container = styled.div`
+export const Container = styled.span`
+  display: block;
+`;
+export const SkeletonLoader = styled.span`
   display: inline-block;
 
   width: 100%;

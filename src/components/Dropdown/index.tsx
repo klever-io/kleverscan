@@ -1,4 +1,5 @@
 import { IUris } from '@/types/index';
+import { renderCorrectPath } from '@/utils/index';
 import React, { useCallback, useState } from 'react';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { Container, ListUris } from './styles';
@@ -9,13 +10,6 @@ const Dropdown: React.FC<IUris> = ({ uris }) => {
     if (showMore) return <IoIosArrowUp />;
     return <IoIosArrowDown />;
   }, [showMore]);
-
-  const renderCorrectPath = useCallback((uriKey: string) => {
-    if (uriKey && uriKey.startsWith('https://')) {
-      return uriKey;
-    }
-    return `https://${uriKey}`;
-  }, []);
 
   return (
     <>

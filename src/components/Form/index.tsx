@@ -1,6 +1,12 @@
 import { parseData } from '@/utils/index';
 import { FormHandles, Scope, SubmitHandler } from '@unform/core';
-import React, { useCallback, useRef, useState } from 'react';
+import React, {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useRef,
+  useState,
+} from 'react';
 import AdvancedOptions from './AdvancedOptions';
 import FormInput from './FormInput';
 import { InfoIcon, TooltipContainer, TooltipContent } from './FormInput/styles';
@@ -52,9 +58,17 @@ interface IFormProps {
   buttonLabel?: string;
   cancelOnly?: boolean;
   children?: React.ReactNode;
+  contractName: string;
+  loading?: boolean;
+  setData?: Dispatch<SetStateAction<string>>;
+  showPayload: boolean;
+  setShowPayload?: Dispatch<SetStateAction<boolean>>;
+  setIsMultisig?: Dispatch<SetStateAction<boolean>>;
+  isMultisig: boolean;
+  showForm: boolean;
 }
 
-const Form: React.FC<any> = ({
+const Form: React.FC<IFormProps> = ({
   sections: defaultSections,
   buttonLabel,
   contractName,
@@ -309,7 +323,7 @@ const Form: React.FC<any> = ({
       {showForm &&
         sections.map((section: any, index: number) => {
           return (
-            <>
+            <React.Fragment key={String(index)}>
               {sections.length === 1 && section.title && <FormGap />}
               <FormSection key={String(index)}>
                 <SectionTitle>
@@ -325,7 +339,7 @@ const Form: React.FC<any> = ({
                 </SectionTitle>
                 {getSectionInputs(section, index)}
               </FormSection>
-            </>
+            </React.Fragment>
           );
         })}
 

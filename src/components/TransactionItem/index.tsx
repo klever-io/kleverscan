@@ -9,7 +9,12 @@ import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { ITransaction } from '../../types';
-import { getContractType, parseAddress, toLocaleFixed } from '../../utils';
+import {
+  getContractType,
+  getPrecision,
+  parseAddress,
+  toLocaleFixed,
+} from '../../utils';
 
 export interface IContract {
   type: number;
@@ -19,8 +24,8 @@ export interface IContract {
     assetId: string;
     toAddress: string;
   };
-  precision: number;
 }
+
 const TransactionItem: React.FC<ITransaction> = ({
   hash,
   timestamp,
@@ -28,19 +33,26 @@ const TransactionItem: React.FC<ITransaction> = ({
   sender,
   status,
 }) => {
-  let contractFilter: IContract = {} as IContract;
+  let contractFilter = {} as IContract;
   const [amount, setAmount] = useState('');
-  const [assetId, setAssetId] = useState('');
 
   const StatusIcon = getStatusIcon(status);
 
   const { t } = useTranslation('transactions');
   const contractPosition = 0;
   contractFilter = contract[contractPosition] as IContract;
+  let { assetId } = contractFilter.parameter;
+
+  const contractType = contract[0].typeString;
+  const checkContract = getContractType(contractType);
+
+  if (checkContract && !assetId) {
+    assetId = 'KLV';
+  }
 
   useEffect(() => {
     const getParams = async () => {
-      const precision = contractFilter?.precision ?? 6;
+      const precision = await getPrecision(assetId);
       if (contract) {
         if (contractFilter?.parameter?.amount) {
           setAmount(
@@ -52,12 +64,10 @@ const TransactionItem: React.FC<ITransaction> = ({
         }
       }
     };
-    getParams();
+    assetId && getParams();
   }, [contractFilter]);
-  const shouldRenderAssetId = () => {
-    const contractType = contract[0].typeString;
-    const checkContract = getContractType(contractType);
 
+  const shouldRenderAssetId = () => {
     if (contract.length > 1) {
       return <p>Multi Contract</p>;
     }

@@ -14,7 +14,7 @@ const makeModuleNameMapper = (srcPath: string) => {
     if (index !== 0) {
       // workaround for tests to see node_modules/@types/react
       const key = item.replace('/*', '/(.*)');
-      const path = paths[item][0].replace('/*', '/$1');
+      const path = paths[item][0].replace('./*', '$1');
       aliases[key] = srcPath + '/' + path;
     }
   });

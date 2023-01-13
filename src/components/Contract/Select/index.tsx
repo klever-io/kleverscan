@@ -34,7 +34,7 @@ const Select: React.FC<IFilter> = ({
   precedence,
   ...rest
 }) => {
-  const getAssetsEnableRef = useRef<any>(true);
+  const getAssetsEnableRef = useRef<boolean>(true);
   const Placeholder = useCallback((props: any) => {
     return <components.Placeholder {...props} />;
   }, []);

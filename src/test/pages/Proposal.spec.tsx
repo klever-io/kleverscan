@@ -1,8 +1,10 @@
-import { fireEvent, screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
 import ProposalDetails, {
+  getProposalNetworkParams,
   getServerSideProps,
+  getVotingPowers,
 } from '../../pages/proposal/[number]';
 import api from '../../services/api';
 import {
@@ -11,6 +13,7 @@ import {
   overViewParametersMock,
 } from '../../test/mocks/index';
 import { renderWithTheme } from '../../test/utils';
+import { IParsedProposal } from '../../types/proposals';
 
 jest.mock('next/router', () => ({
   useRouter() {
@@ -27,17 +30,31 @@ jest.mock('@/services/api', () => {
   };
 });
 
+const mockedApiImplementation =
+  (proposalNumber: number) => (props: { route: string; query: any }) => {
+    switch (true) {
+      case props.route.includes('proposals') === true &&
+        props.query.voteType === 0:
+        return getMockedProposal(proposalNumber, 0);
+      case props.route.includes('proposals') === true &&
+        props.query.voteType === 1:
+        return getMockedProposal(proposalNumber, 1);
+      case props.route.includes('proposals') === true &&
+        props.query.voteType === undefined:
+        return getMockedProposal(proposalNumber);
+      case props.route.includes('network-parameters'):
+        return networkParametersMock;
+      case props.route.includes('overview'):
+        return overViewParametersMock;
+    }
+  };
 describe('test proposal details page', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
   it('should render the page displaying the correct data for the mocked proposal number 0', async () => {
     // load mocked server side props:
-    (api.get as jest.Mock)
-      .mockReturnValueOnce(getMockedProposal(0))
-      .mockReturnValueOnce(networkParametersMock)
-      .mockReturnValueOnce(overViewParametersMock)
-      .mockReturnValueOnce(getMockedProposal(0));
+    (api.get as jest.Mock).mockImplementation(mockedApiImplementation(0));
 
     const { props } = (await getServerSideProps({} as any)) as any;
 
@@ -103,7 +120,7 @@ describe('test proposal details page', () => {
       expect(data).toBeVisible();
     });
 
-    const yesVotersBtn = screen.getByText(/Yes \(4\)/);
+    const yesVotersBtn = screen.getAllByText(/Yes/)[1];
     const voter0 = screen.getByText('klv1vq9f7xta...sfu3xshpmjsr');
     const voter1 = screen.getByText('klv1vq9f7xta...sfu3xshpmjs1');
     const voter2 = screen.getByText('klv1vq9f7xta...sfu3xshpmjs2');
@@ -126,11 +143,11 @@ describe('test proposal details page', () => {
       expect(yesVoterPowers[i]).toHaveTextContent(/16.667%/);
     }
 
-    const noVotersBtn = screen.getByText(/No \(2\)/);
+    const noVotersBtn = screen.getAllByText(/No/)[1];
     fireEvent.click(noVotersBtn);
 
-    const noVoter0 = screen.getByText('klv1vq9f7xta...sfu3xshpmjs4');
-    const noVoter1 = screen.getByText('klv1vq9f7xta...sfu3xshpmjs5');
+    const noVoter0 = await screen.findByText('klv1vq9f7xta...sfu3xshpmjs4');
+    const noVoter1 = await screen.findByText('klv1vq9f7xta...sfu3xshpmjs5');
     expect(noVoter0).toBeInTheDocument();
     expect(noVoter1).toBeInTheDocument();
     expect(noVoter0).toBeVisible();
@@ -145,7 +162,7 @@ describe('test proposal details page', () => {
     expect(noVoterPowers.length).toEqual(2);
 
     fireEvent.click(yesVotersBtn);
-    const newVoter0 = screen.getByText('klv1vq9f7xta...sfu3xshpmjsr');
+    const newVoter0 = await screen.findByText('klv1vq9f7xta...sfu3xshpmjsr');
     const newNoVoter0 = screen.queryByText('klv1vq9f7xta...sfu3xshpmjs4');
     expect(newVoter0).toBeInTheDocument();
     expect(newVoter0).toBeVisible();
@@ -153,13 +170,21 @@ describe('test proposal details page', () => {
   });
 
   it('should render the page displaying the correct data for the mocked proposal number 7', async () => {
-    (api.get as jest.Mock)
-      .mockReturnValueOnce(getMockedProposal(7))
-      .mockReturnValueOnce(networkParametersMock)
-      .mockReturnValueOnce(overViewParametersMock)
-      .mockReturnValueOnce(getMockedProposal(7));
+    (api.get as jest.Mock).mockImplementation(mockedApiImplementation(7));
 
-    const { props } = (await getServerSideProps({} as any)) as any;
+    const parsedParameters = getProposalNetworkParams(
+      getMockedProposal(7).data.proposal.parameters,
+      networkParametersMock.data,
+    );
+
+    const props: IParsedProposal = {
+      ...getMockedProposal(7).data.proposal,
+      votingPowers: getVotingPowers(getMockedProposal(7).data.proposal.voters),
+      parsedParameters: parsedParameters?.fullInfoParams,
+      currentNetworkParams: parsedParameters?.currentNetworkParams,
+      pagination: getMockedProposal(7).data.proposal.votersPage,
+      overview: overViewParametersMock.data.overview,
+    };
 
     await act(async () => {
       renderWithTheme(<ProposalDetails {...props} />);
@@ -211,7 +236,7 @@ describe('test proposal details page', () => {
       expect(data).toBeVisible();
     });
 
-    const yesVotersBtn = screen.getByText(/Yes \(1\)/);
+    const yesVotersBtn = screen.getAllByText(/Yes/)[1];
     const voter0 = screen.getByText('klv1vq9f7xta...sfu3xshpmjsr');
 
     const yesVoters = [voter0];
@@ -232,11 +257,14 @@ describe('test proposal details page', () => {
       expect(yesVoterPowers[i]).toHaveTextContent(/11.210%/);
     }
 
-    const noVotersBtn = screen.getByText(/No \(3\)/);
+    const noVotersBtn = screen.getAllByText(/No/)[1]
+      .parentElement as HTMLElement;
+
     fireEvent.click(noVotersBtn);
-    const noVoter1 = screen.getByText('klv1vq9f7xta...sfu3xshpmjs1');
-    const noVoter2 = screen.getByText('klv1vq9f7xta...sfu3xshpmjs2');
-    const noVoter3 = screen.getByText('klv1vq9f7xta...sfu3xshpmjs3');
+
+    const noVoter1 = await screen.findByText('klv1vq9f7xta...sfu3xshpmjs1');
+    const noVoter2 = await screen.findByText('klv1vq9f7xta...sfu3xshpmjs2');
+    const noVoter3 = await screen.findByText('klv1vq9f7xta...sfu3xshpmjs3');
     const noVoters = [noVoter1, noVoter2, noVoter3];
 
     noVoters.forEach(voter => {
@@ -260,7 +288,7 @@ describe('test proposal details page', () => {
     });
 
     fireEvent.click(yesVotersBtn);
-    const newVoter0 = screen.getByText('klv1vq9f7xta...sfu3xshpmjsr');
+    const newVoter0 = await screen.findByText('klv1vq9f7xta...sfu3xshpmjsr');
     const newNoVoter0 = screen.queryByText('klv1vq9f7xta...sfu3xshpmjs1');
     expect(newVoter0).toBeInTheDocument();
     expect(newVoter0).toBeVisible();
@@ -268,11 +296,7 @@ describe('test proposal details page', () => {
   });
 
   it('should have the correct styles', async () => {
-    (api.get as jest.Mock)
-      .mockReturnValueOnce(getMockedProposal(0))
-      .mockReturnValueOnce(networkParametersMock)
-      .mockReturnValueOnce(overViewParametersMock)
-      .mockReturnValueOnce(getMockedProposal(0));
+    (api.get as jest.Mock).mockImplementation(mockedApiImplementation(0));
 
     const { props } = (await getServerSideProps({} as any)) as any;
     await act(async () => {
@@ -341,13 +365,13 @@ describe('test proposal details page', () => {
       cursor: 'pointer',
     };
 
-    let yesVoters = screen.getByText(/Yes \(4\)/);
+    let yesVoters = screen.getAllByText(/Yes/)[1];
     let yesVotersBackground = yesVoters.parentElement;
     expect(yesVotersBackground).toBeInTheDocument();
     expect(yesVotersBackground).toBeVisible();
     expect(yesVotersBackground).toHaveStyle(selectedStyle);
 
-    let noVoters = screen.getByText(/No \(2\)/);
+    let noVoters = screen.getAllByText(/No/)[1];
     let noVotersBackground = noVoters.parentElement;
     expect(noVotersBackground).toBeInTheDocument();
     expect(noVotersBackground).toBeVisible();
@@ -364,12 +388,20 @@ describe('test proposal details page', () => {
       });
     });
     fireEvent.click(noVoters);
-    yesVoters = screen.getByText(/Yes \(4\)/);
-    yesVotersBackground = yesVoters.parentElement;
-    noVoters = screen.getByText(/No \(2\)/);
-    noVotersBackground = noVoters.parentElement;
-    expect(yesVotersBackground).toHaveStyle(notSelectedStyle);
-    expect(noVotersBackground).toHaveStyle(selectedStyle);
+    await waitFor(
+      () => {
+        yesVoters = screen.getAllByText(/Yes/)[1];
+        yesVotersBackground = yesVoters.parentElement;
+        noVoters = screen.getAllByText(/No/)[1];
+        noVotersBackground = noVoters.parentElement;
+        expect(yesVotersBackground).toHaveStyle(notSelectedStyle);
+        expect(noVotersBackground).toHaveStyle(selectedStyle);
+      },
+      {
+        timeout: 3000,
+        interval: 100,
+      },
+    );
 
     const noVotesDate = screen.getAllByText('06/24/2022 12:00');
     noVotesDate.forEach(date => {
@@ -428,22 +460,6 @@ describe('test proposal details page', () => {
             amount: 2000000000,
             timestamp: 1656082815000,
           },
-
-          {
-            address:
-              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs4',
-            type: 1,
-            amount: 2000000000,
-            timestamp: 1656082815000,
-          },
-
-          {
-            address:
-              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs5',
-            type: 1,
-            amount: 2000000000,
-            timestamp: 1656082815000,
-          },
         ],
         totalStaked: 12000000000,
         votingPowers: {
@@ -451,8 +467,6 @@ describe('test proposal details page', () => {
           klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1: 2000000000,
           klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs2: 2000000000,
           klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs3: 2000000000,
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs4: 2000000000,
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs5: 2000000000,
         },
         parameters: {
           '6': '15000000',
@@ -685,16 +699,17 @@ describe('test proposal details page', () => {
             parameter: 'Staking Rewards',
           },
         },
-        pagination: undefined,
+        pagination: {
+          next: 2,
+          perPage: 10,
+          previous: 0,
+          self: 1,
+          totalPages: 2,
+          totalRecords: 12,
+        },
       },
     };
-    (api.get as jest.Mock)
-      .mockReturnValueOnce(getMockedProposal(0))
-      .mockReturnValueOnce(networkParametersMock)
-      .mockReturnValueOnce(overViewParametersMock)
-      .mockReturnValueOnce(getMockedProposal(0))
-      .mockReturnValueOnce(getMockedProposal(0))
-      .mockReturnValueOnce(getMockedProposal(0));
+    (api.get as jest.Mock).mockImplementation(mockedApiImplementation(0));
 
     const props = await getServerSideProps({} as any);
 

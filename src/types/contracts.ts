@@ -10,7 +10,7 @@ export enum Contract {
   Transfer = 'TransferContractType',
   CreateAsset = 'CreateAssetContractType',
   CreateValidator = 'CreateValidatorContractType',
-  ValidatorConfig = 'ConfigValidatorContractType',
+  ValidatorConfig = 'ValidatorConfigContractType',
   Freeze = 'FreezeContractType',
   Unfreeze = 'UnfreezeContractType',
   Delegate = 'DelegateContractType',
@@ -224,8 +224,18 @@ export interface IValidatorConfig {
   commission: number;
   maxDelegationAmount: number;
   logo: string;
-  uris: any;
+  uris: IValidatorConfigURI[];
   name: string;
+}
+
+export interface IValidatorConfigURI {
+  key: string;
+  value: string;
+}
+
+export interface IURIs {
+  key: string;
+  value: string;
 }
 
 export interface IFreezeContract {
@@ -297,14 +307,34 @@ export enum EnumTriggerType {
   StopRoyaltiesChange = 16,
 }
 
+export enum EnumTriggerTypeName {
+  Mint = 'Mint',
+  Burn = 'Burn',
+  Wipe = 'Wipe',
+  Pause = 'Pause',
+  Resume = 'Resume',
+  ChangeOwner = 'ChangeOwner',
+  AddRole = 'AddRole',
+  RemoveRole = 'RemoveRole',
+  UpdateMetadata = 'UpdateMetadata',
+  StopNFTMint = 'StopNFTMint',
+  UpdateLogo = 'UpdateLogo',
+  UpdateURIs = 'UpdateURIs',
+  ChangeRoyaltiesReceiver = 'ChangeRoyaltiesReceiver',
+  UpdateStaking = 'UpdateStaking',
+  UpdateRoyalties = 'UpdateRoyalties',
+  UpdateKDAFeePool = 'UpdateKDAFeePool',
+  StopRoyaltiesChange = 'StopRoyaltiesChange',
+}
+
 export interface IAssetTriggerContract {
-  triggerType: EnumTriggerType;
+  triggerType: EnumTriggerTypeName;
   assetId?: string;
   toAddress: string;
   amount: number;
   mime: string;
   logo: string;
-  uris: any;
+  uris: IURIs[];
   role: IRolesInfo;
   staking?: IStakingInfo;
   kdaPool: IKDAPool;
@@ -348,6 +378,7 @@ export interface IVoteContract {
   amount: number;
   assetId?: string;
   precision?: number;
+  type: 'Yes' | 'No';
 }
 
 export enum EnumITOStatus {
@@ -549,11 +580,15 @@ export interface IContract {
   precision?: number;
   asset?: IAsset;
   receipts?: IReceipt[];
-  contractIndex?: number;
+}
+
+export interface IIndexedContract extends IContract {
+  contractIndex: number;
 }
 
 export interface IContractBuyProps extends IContract {
   sender: string;
+  contractIndex: number;
   contracts: IBuyContract[];
 }
 

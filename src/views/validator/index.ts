@@ -261,15 +261,11 @@ export const Card = styled.div<{ marginLeft?: boolean; marginRight?: boolean }>`
   gap: 1rem;
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    height: 10.5rem;
+    padding: 0.8rem;
+
     margin: 0;
     margin-top: 1rem;
-    height: 10.5rem;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding: 0.8rem;
-    margin-right: 0;
-    margin-left: 0;
   }
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
@@ -281,10 +277,12 @@ export const Card = styled.div<{ marginLeft?: boolean; marginRight?: boolean }>`
   }
 `;
 
-export const RewardsCard = styled.div<{
+interface IRewardsCardProps {
   marginLeft?: boolean;
   marginRight?: boolean;
-}>`
+}
+
+export const RewardsCard = styled.div<IRewardsCardProps>`
   width: 100%;
   padding: 1.2rem;
   margin-top: 0.5rem;
@@ -302,19 +300,7 @@ export const RewardsCard = styled.div<{
   }
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    width: 35%;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 0.8rem;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     margin: 0;
     margin-top: 1rem;
     height: 10.5rem;
@@ -414,20 +400,10 @@ export const CardSubHeader = styled.div`
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     justify-content: center;
-    span:nth-child(1) {
-      right: 9%;
-      margin-left: 0;
-    }
 
-    span:nth-child(2) {
-      position: relative;
-      left: 20%;
-      margin-right: 0;
-    }
-  }
+    font-size: 0.85rem;
+    top: 1.5rem;
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    font-size: 1.1rem;
     span:nth-child(1) {
       right: 13%;
       margin-left: 0;
@@ -436,10 +412,6 @@ export const CardSubHeader = styled.div`
       left: 18%;
       margin-right: 0;
     }
-  }
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    font-size: 0.85rem;
-    top: 1.5rem;
   }
 `;
 
@@ -458,9 +430,6 @@ export const Header = styled.div`
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     position: relative;
     right: 1rem;
   }
@@ -493,9 +462,6 @@ export const TitleContent = styled.div`
   flex-direction: row;
   align-items: center;
   gap: 0.5rem;
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    align-items: flex-start;
-  }
 `;
 
 export const TitleInformation = styled.div`
@@ -684,9 +650,11 @@ export const Rating = styled.p.attrs<IRatingProps>(props => ({
   }
 `;
 
-export const StakedIndicator = styled.div<{
+interface IStakedIndicatorProps {
   percent: number;
-}>`
+}
+
+export const StakedIndicator = styled.div<IStakedIndicatorProps>`
   display: flex;
   align-items: center;
   height: 100%;
@@ -813,21 +781,6 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
   height: 4rem;
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    width: 7.1rem;
-    height: 3.55rem;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    width: 14rem;
-    height: 7rem;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    width: 10rem;
-    height: 5rem;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 7rem;
     height: 3.5rem;
   }
@@ -864,21 +817,8 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
     color: ${props => props.theme.darkText};
 
     @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-      left: 18%;
-    }
-
-    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-      left: 29%;
-      font-size: 1rem;
-    }
-
-    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-      left: 27%;
-      font-size: 0.8rem;
-    }
-
-    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
       left: 17%;
+      font-size: 0.8rem;
     }
   }
 
@@ -892,25 +832,12 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
 
     @media (max-width: ${props => props.theme.breakpoints.mobile}) {
       transform-origin: 50% 0;
-    }
-
-    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-      transform-origin: 50% 0;
-    }
-
-    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-      transform-origin: 50% 0;
-      border: 9px solid #37dd72;
-      border-top: none;
-    }
-
-    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-      transform-origin: 50% 0;
       border: 7.5px solid #37dd72;
       border-top: none;
     }
     overflow: hidden;
   }
+
   div:nth-child(2) {
     z-index: 3;
     border-color: #ff4681;
@@ -930,12 +857,6 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
       border-radius: 100%;
       width: 8px;
       height: 8px;
-    }
-
-    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-      transform-origin: 50% 0;
-      border: 9px solid #ff4681;
-      border-top: none;
     }
 
     @media (max-width: ${props => props.theme.breakpoints.mobile}) {
@@ -980,11 +901,6 @@ export const PieData = styled.div`
   backface-visibility: hidden;
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    border: 12.5px solid;
-    border-top: none;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     border: 7.5px solid;
     border-top: none;
   }
@@ -999,28 +915,12 @@ export const ContainerVotes = styled.div`
   width: 4.5rem;
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    top: -2rem;
     width: 4.5rem;
-  }
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    strong {
-      font-size: 0.7rem !important;
-    }
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    top: 1.5rem;
     min-width: 0;
     strong {
       font-size: 0.95rem !important;
     }
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    top: 0;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    top: -2rem;
   }
   overflow: hidden;
 `;
@@ -1047,32 +947,14 @@ export const ContainerRewards = styled.span`
   width: 4.5rem;
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    width: 4.5rem;
-  }
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    top: -2rem;
     strong {
       font-size: 0.7rem !important;
     }
   }
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    top: 1.5rem;
-    Strong {
-      font-size: 0.95rem !important;
-    }
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    top: 0;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    top: -2rem;
-  }
 
   position: relative;
   height: 4rem;
-  span {
-  }
 `;
 
 export const VotersPercent = styled.span`
@@ -1080,9 +962,7 @@ export const VotersPercent = styled.span`
   font-weight: 600;
   color: #37dd72;
   display: block;
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    font-size: 1.3rem;
-  }
+
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     font-size: 1rem;
   }
@@ -1092,11 +972,12 @@ export const ContainerCircle = styled.span`
   height: 100%;
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    margin-left: 0.3rem;
-    margin-right: 0.3rem;
-  }
+    margin-left: 0.2rem;
+    margin-right: 0.2rem;
+    position: relative;
+    top: 1rem;
+    height: 12rem;
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     div,
     span {
       strong {
@@ -1104,26 +985,13 @@ export const ContainerCircle = styled.span`
       }
     }
   }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    margin-left: 0.2rem;
-    margin-right: 0.2rem;
-    position: relative;
-    top: 1rem;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    height: 12rem;
-  }
 `;
 
 export const CommissionPercent = styled.span`
   font-size: 1rem;
   font-weight: 600;
   color: #ff4681;
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    font-size: 1.3rem;
-  }
+
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     font-size: 1rem;
   }
@@ -1146,26 +1014,12 @@ export const RewardCardContentWrapper = styled.div`
     color: ${props => props.theme.darkText};
   }
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    top: -2rem;
-  }
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     bottom: 0.5rem;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     height: auto;
     bottom: 2.5rem;
     justify-content: center;
-    gap: 3rem;
     align-items: center;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    top: -0.5rem;
     gap: 1rem;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     top: 1rem;
   }
 `;

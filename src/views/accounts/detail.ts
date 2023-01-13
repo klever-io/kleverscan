@@ -140,7 +140,6 @@ export const CenteredRow = styled.div`
 
 export const BalanceContainer = styled.div`
   display: flex;
-
   flex-direction: column;
 `;
 
@@ -182,7 +181,6 @@ export const IconContainer = styled.div`
 
 export const FrozenContainer = styled.div`
   margin-top: 0.5rem;
-
   width: 100%;
 
   display: flex;

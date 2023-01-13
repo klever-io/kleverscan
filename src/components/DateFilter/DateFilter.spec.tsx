@@ -143,12 +143,12 @@ describe('Component: DateFilter', () => {
       .parentNode?.nextSibling?.firstChild?.firstChild;
     const rightArrow: any = screen.getByText(/Choose the proper date/i)
       .parentNode?.nextSibling?.firstChild?.lastChild;
-    const confirm: any = screen.getByText(/Confirm/i);
+    const confirm = screen.getByText(/Confirm/i);
 
     if (date.getDate() <= 5) {
       await user.click(arrowLeft);
-      const startDay: any = screen.getByText('18');
-      const endDay: any = screen.getByText('23');
+      const startDay = screen.getByText('18');
+      const endDay = screen.getByText('23');
 
       expect(
         screen.getByText(getMonthWithYear('lastMonth', months)),
@@ -157,8 +157,8 @@ describe('Component: DateFilter', () => {
       await user.click(endDay);
       await user.click(confirm);
     } else {
-      const startDay: any = screen.getByText(date.getDate() - 5);
-      const endDay: any = screen.getByText(date.getDate());
+      const startDay = screen.getByText(date.getDate() - 5);
+      const endDay = screen.getByText(date.getDate());
 
       await user.click(startDay);
       await user.click(endDay);
@@ -173,11 +173,11 @@ describe('Component: DateFilter', () => {
 
     await user.click(input);
 
-    const confirm: any = screen.getByText(/Confirm/i);
+    const confirm = screen.getByText(/Confirm/i);
     const date = new Date();
 
     if (date.getDate() <= 5) {
-      const startDay: any = screen.getByText(date.getDate());
+      const startDay = screen.getByText(date.getDate());
       const arrowLeft: any = screen.getByText(/Choose the proper date/i)
         .parentNode?.nextSibling?.firstChild?.firstChild;
 
@@ -187,13 +187,13 @@ describe('Component: DateFilter', () => {
       expect(
         screen.getByText(getMonthWithYear('lastMonth', months)),
       ).toBeVisible();
-      const endDay: any = screen.getByText('25');
+      const endDay = screen.getByText('25');
 
       await user.click(endDay);
       await user.click(confirm);
     } else {
-      const startDay: any = screen.getByText(date.getDate());
-      const endDay: any = screen.getByText(date.getDate() - 5);
+      const startDay = screen.getByText(date.getDate());
+      const endDay = screen.getByText(date.getDate() - 5);
       await user.click(startDay);
       await user.click(endDay);
 

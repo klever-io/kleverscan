@@ -1,8 +1,8 @@
 import Select from '@/components/Contract/Select';
+import FormInput from '@/components/Form/FormInput';
 import { InfoIcon, TooltipContainer } from '@/components/Form/FormInput/styles';
+import { ButtonContainer, FormSection } from '@/components/Form/styles';
 import { IParamList } from '@/types/index';
-import FormInput from 'components/Form/FormInput';
-import { ButtonContainer, FormSection } from 'components/Form/styles';
 import { useState } from 'react';
 import { SectionTitle } from './styles';
 

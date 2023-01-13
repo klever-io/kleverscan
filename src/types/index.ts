@@ -140,7 +140,7 @@ export interface IContractAssetIds {
   precision?: number;
   asset?: IAsset;
   receipts?: IReceipt[];
-  contractIndex?: number;
+  contractIndex: number;
 }
 
 interface ItotalLeaderSuccessRate {
@@ -280,7 +280,11 @@ export interface IAsset {
   ticker: string;
   ownerAddress: string;
   logo: string;
-  uris: any;
+  uris:
+    | {
+        [key: string]: string;
+      }
+    | IUri[];
   precision: number;
   initialSupply: number;
   circulatingSupply: number;
@@ -504,37 +508,39 @@ export interface IAssetsPrice {
 }
 
 export interface IHome {
-  transactions: ITransaction[];
   transactionsList: IDailyTransaction[];
-  epochInfo: IEpochInfo;
+  defaultEpochInfo: IEpochInfo;
   blocks: IBlock[];
-  totalAccounts: number;
-  totalTransactions: number;
+  defaultTotalAccounts: number;
   tps: string;
   coinsData: ICoinInfo[];
   yesterdayTransactions: number;
   beforeYesterdayTransactions: number;
   yesterdayAccounts: number;
   assetsData: IAssetsData;
-}
-export interface IDataCards {
-  totalAccounts: number;
-  totalTransactions: number;
-  tps: string;
-  epochInfo: IEpochInfo;
-  coinsData: ICoinInfo[];
-  yesterdayTransactions: number;
-  beforeYesterdayTransactions: number;
-  yesterdayAccounts: number;
-  assetsData: IAssetsData;
-  block: IBlock;
 }
 
-export interface IHomeTransactions {
-  setTotalTransactions: Dispatch<SetStateAction<number>>;
-  transactions: ITransaction[];
-  transactionsList: IDailyTransaction[];
-  precision: number;
+export interface IDataMetrics {
+  currentSlot: number;
+  epochFinishSlot: number;
+  epochLoadPercent: number;
+  remainingTime: string;
+}
+export interface IDataCards {
+  metrics: IDataMetrics;
+  totalAccounts: number;
+  newAccounts: number;
+  totalTransactions: number;
+  newTransactions: number;
+  beforeYesterdayTransactions: number;
+  actualTPS: string;
+  block: IBlock;
+  counterEpoch: number;
+}
+
+export interface ICoinCards {
+  coins: ICoinInfo[];
+  assetsData: IAssetsData;
 }
 export interface ITransactionResponse extends IResponse {
   data: {
@@ -700,4 +706,15 @@ export type Place = 'top' | 'right' | 'bottom' | 'left';
 export interface ICustomStyles {
   offset?: IOffset;
   place?: Place;
+}
+
+export interface IPrecisionResponse {
+  precisions: { [assetId: string]: number };
+}
+
+export interface IHomeTransactions {
+  setTotalTransactions: Dispatch<SetStateAction<number>>;
+  transactions: ITransaction[];
+  transactionsList: IDailyTransaction[];
+  precision: number;
 }

@@ -211,11 +211,45 @@ export const CenteredRow = styled.div`
     text-decoration: underline;
   }
 `;
+
+export const ExpandCenteredRow = styled(CenteredRow)<{ openJson?: boolean }>`
+  align-items: ${props => (props.openJson ? 'normal' : 'center')};
+  justify-content: space-between;
+`;
+
+export const DivDataJson = styled.div`
+  overflow: auto;
+  position: relative;
+  span {
+    min-width: auto !important;
+  }
+`;
+export const IconsWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+
+  svg {
+    margin-top: 0.25rem;
+  }
+`;
+
+export const ButtonExpand = styled.button`
+  color: ${props => props.theme.true.white};
+  margin-right: 0.3rem;
+  text-align: center;
+  width: 5.5rem;
+  height: 2rem;
+  padding: 0.4rem;
+  border-radius: 0.3rem;
+  background-color: ${props => props.theme.purple};
+  border: 1px solid ${props => props.theme.purple};
+`;
+
 export const CardRaw = styled.div`
   margin: 1.25rem 1.25rem;
   font-weight: 400;
   font-size: 0.85rem;
-
+  overflow: auto;
   flex-direction: row;
   align-items: center;
 `;
@@ -259,4 +293,44 @@ export const KappFeeSpan = styled.span`
 export const KappFeeFailedTx = styled.p`
   text-decoration: line-through;
   color: red !important;
+`;
+
+export const URIsWrapper = styled.div`
+  display: flex;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+
+  overflow: scroll;
+`;
+
+export const RoleWrapper = styled.section`
+  display: flex;
+  flex-direction: column;
+  overflow: scroll;
+`;
+
+export const RoleDiv = styled.div`
+  display: flex !important;
+  flex-direction: row !important;
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+  }
+`;
+
+export const RoleStrong = styled.strong`
+  min-width: 7rem;
+  margin-right: 1.5rem !important;
+`;
+
+export const HoverAnchor = styled.a`
+  :hover {
+    text-decoration: underline;
+  }
+`;
+
+export const StrongWidth = styled.strong`
+  display: inline-block;
+  min-width: 15rem !important;
 `;

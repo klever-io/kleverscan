@@ -1,5 +1,5 @@
+import { description } from '@/configs/footer';
 import { useField } from '@unform/core';
-import { description } from 'configs/footer';
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -51,7 +51,15 @@ const FormInput: React.FC<IFormInputProps> = ({
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const areaRef = useRef<HTMLTextAreaElement>(null);
+
   const { fieldName, registerField, error } = useField(name);
+
+  const inputProps = {
+    ref: inputRef,
+    type,
+    defaultValue,
+    ...rest,
+  };
 
   const getInitialValue = useCallback(() => {
     switch (type) {
@@ -59,6 +67,7 @@ const FormInput: React.FC<IFormInputProps> = ({
         if (defaultValue === undefined) {
           bool ? (defaultValue = 'true') : (defaultValue = 1);
         }
+        inputProps?.defaultValue && delete inputProps.defaultValue;
         return defaultValue;
       case 'number':
       case 'datetime-local':
@@ -66,7 +75,7 @@ const FormInput: React.FC<IFormInputProps> = ({
       default:
         return '';
     }
-  }, [type, defaultValue, bool]);
+  }, [type, defaultValue, bool, inputProps]);
 
   const [value, setValue] = useState(getInitialValue());
 
@@ -85,13 +94,6 @@ const FormInput: React.FC<IFormInputProps> = ({
       });
     }
   }, [fieldName, registerField]);
-
-  const inputProps = {
-    ref: inputRef,
-    type,
-    defaultValue,
-    ...rest,
-  };
 
   const containerProps = {
     span,

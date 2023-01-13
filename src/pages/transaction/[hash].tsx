@@ -1,4 +1,4 @@
-import { Proposal, Receive } from '@/assets/icons';
+import { Receive } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import { TransactionDetails as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
@@ -19,6 +19,7 @@ import {
   Deposit,
   Freeze,
   ITOTrigger,
+  Proposal,
   Sell,
   SetAccountName,
   SetITOPrices,
@@ -27,6 +28,7 @@ import {
   Unfreeze,
   Unjail,
   UpdateAccountPermission,
+  ValidatorConfig,
   Vote,
   Withdraw,
 } from '@/components/TransactionContractComponents';
@@ -35,32 +37,29 @@ import api from '@/services/api';
 import { IBlock } from '@/types/blocks';
 import {
   Contract,
-  IBuyContractPayload,
   IBuyITOsTotalPrices,
-  IContract,
+  IIndexedContract,
 } from '@/types/contracts';
 import { IAsset, IResponse, ITransaction } from '@/types/index';
 import {
   capitalizeString,
-  getPrecision,
-  getTotalAssetsPrices,
   hexToString,
   isDataEmpty,
+  parseJson,
   toLocaleFixed,
 } from '@/utils/index';
 import {
-  BalanceContainer,
-  FrozenContainer,
-  RowContent,
-} from '@/views/accounts/detail';
-import {
+  ButtonExpand,
   CardContainer,
   CardContent,
   CardRaw,
   CenteredRow,
   Container,
+  DivDataJson,
+  ExpandCenteredRow,
   Header,
   Hr,
+  IconsWrapper,
   Input,
   KappFeeFailedTx,
   KappFeeSpan,
@@ -69,10 +68,9 @@ import {
 import { ReceiveBackground } from '@/views/validator';
 import { format, fromUnixTime } from 'date-fns';
 import { GetStaticPaths, GetStaticProps } from 'next';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import { xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
+import React, { useState } from 'react';
 
 interface IBlockResponse extends IResponse {
   data: {
@@ -99,11 +97,12 @@ interface ITransactionPage {
 
 const Transaction: React.FC<ITransactionPage> = props => {
   const [showModal, setShowModal] = useState(false);
+  const [expandData, setExpandData] = useState(false);
   const { transaction, block } = props;
   const { isDarkTheme } = useTheme();
   const [totalAssetsPrices, setTotalAssetsPrices] =
     useState<IBuyITOsTotalPrices>({});
-
+  const ReactJson = dynamic(import('react-json-view'), { ssr: false });
   const {
     hash,
     status,
@@ -122,67 +121,36 @@ const Transaction: React.FC<ITransactionPage> = props => {
 
   const StatusIcon = getStatusIcon(status);
 
-  useEffect(() => {
-    const getAsyncTotalAssetsPrices = async () => {
-      const ITOBuyPrices = await getITOBuyPrices();
-      if (Object.keys(ITOBuyPrices).length > 0) {
-        const totalAssetsPrices = getTotalAssetsPrices(
-          ITOBuyPrices,
-          receipts,
-          sender,
+  const renderData = () => {
+    if (expandData) {
+      try {
+        return JSON.parse(
+          parseJson(
+            hexToString((data && data.length > 0 && data.join(',')) || ''),
+          ),
         );
-        setTotalAssetsPrices(totalAssetsPrices);
-      }
-    };
-    getAsyncTotalAssetsPrices();
-  }, []);
-
-  const getITOBuyPrices = async () => {
-    const ITOBuyObject = {};
-    for (let index = 0; index < contract.length; index++) {
-      const parameter = contract[index]?.parameter as IBuyContractPayload;
-      if (parameter?.buyType === 'ITOBuy' && parameter?.currencyID) {
-        ITOBuyObject[parameter.currencyID] = { price: 0, precision: 0 };
-        ITOBuyObject[parameter.currencyID].precision =
-          (await getPrecision(parameter.currencyID)) ?? 6;
+      } catch (error) {
+        setExpandData(false);
       }
     }
-    return ITOBuyObject;
-  };
-
-  const renderMultiContractITOBuy = () => {
-    if (Object.keys(totalAssetsPrices).length > 1) {
-      return (
-        <Row>
-          <span>
-            <strong>Total Price ITOBuy</strong>
-          </span>
-          <RowContent>
-            <BalanceContainer>
-              <FrozenContainer>
-                {Object.entries(totalAssetsPrices).map(([asset, data]) => (
-                  <div key={asset}>
-                    <strong>{asset ?? 0}</strong>
-                    <span>{data.price.toLocaleString() ?? 0}</span>
-                  </div>
-                ))}
-              </FrozenContainer>
-            </BalanceContainer>
-          </RowContent>
-        </Row>
-      );
-    }
+    return parseJson(
+      hexToString((data && data.length > 0 && data.join(',')) || ''),
+    );
   };
 
   const ContractComponent: React.FC<any> = ({ contracts }) => {
     return (
       <div>
-        {contracts.map((contract: IContract, index: number) => {
+        {contracts.map((contract: IIndexedContract, index: number) => {
           switch (contract.typeString) {
             case Contract.Transfer:
               return (
                 <div key={`${index}`}>
-                  <Transfer {...contract} receipts={receipts} />
+                  <Transfer
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
@@ -190,18 +158,36 @@ const Transaction: React.FC<ITransactionPage> = props => {
             case Contract.CreateAsset:
               return (
                 <div key={`${index}`}>
-                  <CreateAsset {...contract} receipts={receipts} />
+                  <CreateAsset
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
             case Contract.CreateValidator:
               return (
                 <div key={`${index}`}>
-                  <CreateValidator {...contract} receipts={receipts} />
+                  <CreateValidator
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
             case Contract.ValidatorConfig:
+              return (
+                <div key={`${index}`}>
+                  <ValidatorConfig
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
+                  {index < contracts.length - 1 && <Hr />}
+                </div>
+              );
             case Contract.Freeze:
               return (
                 <div key={`${index}`}>
@@ -216,84 +202,132 @@ const Transaction: React.FC<ITransactionPage> = props => {
             case Contract.Unfreeze:
               return (
                 <div key={`${index}`}>
-                  <Unfreeze {...contract} receipts={receipts} />
+                  <Unfreeze
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
             case Contract.Delegate:
               return (
                 <div key={`${index}`}>
-                  <Delegate {...contract} receipts={receipts} />
+                  <Delegate
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
             case Contract.Undelegate:
               return (
                 <div key={`${index}`}>
-                  <Undelegate {...contract} receipts={receipts} />
+                  <Undelegate
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
             case Contract.Withdraw:
               return (
                 <div key={`${index}`}>
-                  <Withdraw {...contract} receipts={receipts} />
+                  <Withdraw
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
             case Contract.Claim:
               return (
                 <div key={`${index}`}>
-                  <Claim {...contract} receipts={receipts} />
+                  <Claim
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
             case Contract.Unjail:
               return (
                 <div key={`${index}`}>
-                  <Unjail {...contract} receipts={receipts} />
+                  <Unjail
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
             case Contract.AssetTrigger:
               return (
                 <div key={`${index}`}>
-                  <AssetTrigger {...contract} receipts={receipts} />
+                  <AssetTrigger
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
             case Contract.SetAccountName:
               return (
                 <div key={`${index}`}>
-                  <SetAccountName {...contract} receipts={receipts} />
+                  <SetAccountName
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
             case Contract.Proposal:
               return (
                 <div key={`${index}`}>
-                  <Proposal {...contract} receipts={receipts} />
+                  <Proposal
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
             case Contract.Vote:
               return (
                 <div key={`${index}`}>
-                  <Vote {...contract} receipts={receipts} />
+                  <Vote
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
             case Contract.ConfigITO:
               return (
                 <div key={`${index}`}>
-                  <ConfigITO {...contract} receipts={receipts} />
+                  <ConfigITO
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
             case Contract.SetITOPrices:
               return (
                 <div key={`${index}`}>
-                  <SetITOPrices {...contract} receipts={receipts} />
+                  <SetITOPrices
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
@@ -302,6 +336,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                 <div key={`${index}`}>
                   <Buy
                     {...contract}
+                    contractIndex={index}
                     receipts={receipts}
                     sender={sender}
                     contracts={contracts}
@@ -312,49 +347,77 @@ const Transaction: React.FC<ITransactionPage> = props => {
             case Contract.Sell:
               return (
                 <div key={`${index}`}>
-                  <Sell {...contract} receipts={receipts} />
+                  <Sell
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
             case Contract.CancelMarketOrder:
               return (
                 <div key={`${index}`}>
-                  <CancelMarketOrder {...contract} receipts={receipts} />
+                  <CancelMarketOrder
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
             case Contract.CreateMarketplace:
               return (
                 <div key={`${index}`}>
-                  <CreateMarketplace {...contract} receipts={receipts} />
+                  <CreateMarketplace
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
             case Contract.ConfigMarketplace:
               return (
                 <div key={`${index}`}>
-                  <ConfigMarketplace {...contract} receipts={receipts} />
+                  <ConfigMarketplace
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
             case Contract.UpdateAccountPermission:
               return (
                 <div key={`${index}`}>
-                  <UpdateAccountPermission {...contract} receipts={receipts} />
+                  <UpdateAccountPermission
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
             case Contract.Deposit:
               return (
                 <div key={`${index}`}>
-                  <Deposit {...contract} receipts={receipts} />
+                  <Deposit
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
             case Contract.ITOTrigger:
               return (
                 <div key={`${index}`}>
-                  <ITOTrigger {...contract} receipts={receipts} />
+                  <ITOTrigger
+                    {...contract}
+                    contractIndex={index}
+                    receipts={receipts}
+                  />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
@@ -367,11 +430,23 @@ const Transaction: React.FC<ITransactionPage> = props => {
   };
 
   const rawTxTheme = {
-    height: '30rem',
-    color: isDarkTheme ? 'white' : 'black',
-    backgroundColor: isDarkTheme ? '#181935' : 'white',
+    base00: '',
+    base01: '#ddd',
+    base02: '#ddd',
+    base03: '',
+    base04: '',
+    base05: isDarkTheme ? 'white' : 'black',
+    base06: isDarkTheme ? 'white' : 'black',
+    base07: isDarkTheme ? 'white' : 'black',
+    base08: isDarkTheme ? 'white' : 'black',
+    base09: '',
+    base0A: '',
+    base0B: '',
+    base0C: '',
+    base0D: '',
+    base0E: '',
+    base0F: '',
   };
-
   const KappFeeRow: React.FC = () => {
     if (status === 'fail') {
       return (
@@ -512,22 +587,37 @@ const Transaction: React.FC<ITransactionPage> = props => {
               <span>
                 <strong>Data</strong>
               </span>
-              <CenteredRow>
+              <ExpandCenteredRow openJson={expandData}>
                 <span>
-                  {hexToString(
-                    (data && data.length > 0 && data.join(',')) || '',
+                  {expandData ? (
+                    <DivDataJson>
+                      <ReactJson
+                        src={renderData()}
+                        name={false}
+                        displayObjectSize={false}
+                        enableClipboard={true}
+                        displayDataTypes={false}
+                        theme={rawTxTheme}
+                      />
+                    </DivDataJson>
+                  ) : (
+                    <span>{renderData()}</span>
                   )}
                 </span>
-                <Copy
-                  data={hexToString(
-                    (data && data.length > 0 && data.join(',')) || '',
-                  )}
-                  info="Data"
-                />
-              </CenteredRow>
+                <IconsWrapper>
+                  <ButtonExpand onClick={() => setExpandData(!expandData)}>
+                    {expandData ? 'Hide' : 'Expand'}
+                  </ButtonExpand>
+                  <Copy
+                    data={hexToString(
+                      (data && data.length > 0 && data.join(',')) || '',
+                    )}
+                    info="Data"
+                  />
+                </IconsWrapper>
+              </ExpandCenteredRow>
             </Row>
           )}
-          {renderMultiContractITOBuy()}
         </CardContent>
       </CardContainer>
       <CardContainer>
@@ -539,16 +629,15 @@ const Transaction: React.FC<ITransactionPage> = props => {
       <CardContainer>
         <h3>Raw Tx</h3>
         <CardContent>
-          <CardRaw>
-            <SyntaxHighlighter
-              customStyle={rawTxTheme}
-              style={xcode}
-              language="json"
-              wrapLines={true}
-              wrapLongLines={true}
-            >
-              {JSON.stringify(transaction, null, 2)}
-            </SyntaxHighlighter>
+          <CardRaw style={{ height: '30rem' }}>
+            <ReactJson
+              src={transaction}
+              name={false}
+              displayObjectSize={false}
+              enableClipboard={true}
+              displayDataTypes={false}
+              theme={rawTxTheme}
+            />
           </CardRaw>
         </CardContent>
       </CardContainer>

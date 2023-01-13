@@ -5,6 +5,7 @@ import Dropdown from '@/components/Dropdown';
 import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
 import Table, { ITable } from '@/components/Table';
+import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import {
   IBucket,
@@ -154,8 +155,16 @@ const Validator: React.FC<IValidatorPage> = ({
     }
   };
 
+  const { isMobile } = useMobile();
   const renderTitle = () => {
-    return <h1>{name || parseAddress(ownerAddress, 24)}</h1>;
+    return (
+      <h1>
+        {name ||
+          (isMobile
+            ? parseAddress(ownerAddress, 14)
+            : parseAddress(ownerAddress, 24))}
+      </h1>
+    );
   };
 
   const renderMaxDelegation = () => {

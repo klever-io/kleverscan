@@ -1,5 +1,10 @@
 import { ISelectedDays } from '@/components/DateFilter';
 import api from '@/services/api';
+import {
+  BuyReceiptData,
+  IKAppTransferReceipt,
+  ITransferReceipt,
+} from '@/types/receipts';
 import { TFunction } from 'next-i18next';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { NextRouter } from 'next/router';
@@ -7,7 +12,6 @@ import { toast } from 'react-toastify';
 import {
   IAccountAsset,
   IAsset,
-  IAssetOne,
   IAssetResponse,
   IBalance,
   IBuyReceipt,
@@ -18,6 +22,7 @@ import {
   IFormData,
   IMetrics,
   IPagination,
+  IPrecisionResponse,
   IReceipt,
   ITransaction,
   IValidator,
@@ -25,7 +30,6 @@ import {
 } from '../types';
 import {
   ContractsIndex,
-  IBuyContract,
   IBuyContractPayload,
   IBuyITOsTotalPrices,
 } from '../types/contracts';
@@ -35,6 +39,7 @@ import {
   getHeaderForCSV,
   initialsTableHeaders,
 } from './contracts';
+import { findNextSiblingReceipt, findPreviousSiblingReceipt } from './findKey';
 
 /**
  * Emulates CSS ellipsis by receiving a string and a limit, if the string length is bigger then the limit, the exceeded characters will be replaced by the ellipsis.
@@ -439,7 +444,7 @@ export const doIf = async (
   let interval: any;
 
   const IntervalPromise = new Promise(resolve => {
-    const interval = setInterval(() => {
+    interval = setInterval(() => {
       if (condition()) {
         resolve(
           (() => {
@@ -473,24 +478,94 @@ export const doIf = async (
  * @param asset
  * @returns Promise < number | undefined >
  */
-export const getPrecision = async (
-  asset: string,
-): Promise<number | undefined> => {
+export const getPrecisionFromApi = async (
+  assets: string[],
+): Promise<IPrecisionResponse> => {
   try {
-    const response = await api.getCached({ route: `assets/${asset}` });
-
+    const response = await api.post({
+      route: `assets/precisions`,
+      body: { assets },
+    });
     if (response.error) {
       const messageError =
         response.error.charAt(0).toUpperCase() + response.error.slice(1);
       toast.error(messageError);
-      return;
+      throw new Error(response.error);
     }
 
-    return response.data.asset.precision;
-  } catch (error) {
+    return response.data;
+  } catch (error: any) {
     console.error(error);
+    throw error;
   }
 };
+
+export function getPrecision<T extends string | string[]>(
+  assetIds: T,
+): T extends string ? Promise<number> : Promise<{ [assetId: string]: number }>;
+export async function getPrecision(
+  assetIds: string | string[],
+): Promise<number | { [assetId: string]: number }> {
+  const storedPrecisions: any = localStorage.getItem('precisions')
+    ? JSON.parse(localStorage.getItem('precisions') || '{}')
+    : {};
+
+  if (typeof assetIds === 'object' && assetIds.length) {
+    const aux: string[] = [];
+    const NFTs: { [assetId: string]: number } = {};
+    assetIds.forEach(assetId => {
+      if (
+        !Object.keys(storedPrecisions).includes(assetId) &&
+        assetId !== '' &&
+        !aux.includes(assetId) &&
+        assetId.split('/').length === 1
+      ) {
+        aux.push(assetId);
+      } else if (assetId.split('/').length > 1) {
+        NFTs[assetId] = 0;
+      }
+    });
+
+    try {
+      const { precisions } = await getPrecisionFromApi(aux);
+      const newPrecisions = { ...storedPrecisions, ...precisions, ...NFTs };
+      localStorage.setItem('precisions', JSON.stringify(newPrecisions));
+      return assetIds.reduce((prev, current) => {
+        return {
+          ...prev,
+          [current]: newPrecisions[current],
+        };
+      }, {});
+    } catch (error: any) {
+      console.error(error);
+      throw new Error(error);
+    }
+  } else if (typeof assetIds === 'string') {
+    const assetId = assetIds;
+
+    if (assetId.split('/').length === 2) {
+      return 0;
+    }
+
+    if (
+      !storedPrecisions ||
+      !Object.keys(storedPrecisions).includes(assetId.split('/')[0])
+    ) {
+      try {
+        const { precisions } = (await getPrecisionFromApi([assetId])) || 0;
+        const newPrecisions = { ...storedPrecisions, ...precisions };
+        localStorage.setItem('precisions', JSON.stringify(newPrecisions));
+        return precisions[assetId];
+      } catch (error: any) {
+        throw new Error(error);
+      }
+    } else {
+      return storedPrecisions[assetId.split('/')[0]];
+    }
+  } else {
+    throw new Error('Invalid Param');
+  }
+}
 
 /**
  * Validates URL extension with regex. Accepted formats: gif|jpg|jpeg|tiff|png|webp
@@ -498,7 +573,7 @@ export const getPrecision = async (
  * @returns boolean
  */
 export const regexImgUrl = (url: string): boolean => {
-  const regex = /[\/.](gif|jpg|jpeg|tiff|png|webp)$/i;
+  const regex = /[\/.](gif|jpg|jpeg|tiff|png|webp|svg)$/i;
   if (regex.test(url)) {
     return true;
   }
@@ -592,38 +667,6 @@ export const getContractType = (contract: string): boolean => {
     return true;
   }
   return false;
-};
-
-/**
- * Receive a list of transactions and add precision field to the contracts of the transactions, unless the contract is Multi Transaction (transaction.contract.length > 1 case).
- * @param transactions
- * @returns ITransaction[] with precision key in contracts.
- */
-// parameter must necessarily contain assetId
-
-export const addPrecisionTransactions = (
-  transactions: ITransaction[],
-): ITransaction[] => {
-  return transactions.map(transaction => {
-    if (transaction.contract.length > 1) {
-      return transaction;
-    }
-    transaction?.contract.map(async contrct => {
-      const parameter = contrct?.parameter as any;
-      if (parameter?.assetId) {
-        const response: IAssetOne = await api.get({
-          route: `assets/${parameter?.assetId}`,
-        });
-        if (!response.error && response.code === 'successful') {
-          contrct.precision = response.data?.asset?.precision || 0;
-        }
-        return contrct;
-      }
-      contrct.precision = 6;
-      return contrct;
-    });
-    return transaction;
-  });
 };
 
 /**
@@ -810,16 +853,14 @@ const processHeaders = (router: NextRouter) => {
   return sanitizedHeaders;
 };
 
-const processRow = async (
-  row: ITransaction,
-  router: NextRouter,
-  getContextPrecision: (assetId: string) => Promise<number | void>,
-) => {
+const processRow = async (row: ITransaction, router: NextRouter) => {
   let finalVal = '';
-  const parsedRow = await getCells(row, router, getContextPrecision);
+  const parsedRow = await getCells(row, router);
   for (let j = 0; j < parsedRow.length; j++) {
     const innerValue =
-      parsedRow[j] === (null || undefined) ? '' : parsedRow[j].toString();
+      parsedRow[j] === null || parsedRow[j] === undefined
+        ? ''
+        : parsedRow[j].toString();
 
     let result = innerValue.replace(/"/g, '""');
     if (result.search(/("|,|\n)/g) >= 0) result = '"' + result + '"';
@@ -833,7 +874,6 @@ export const exportToCsv = async (
   filename: string,
   rows: any[] | null,
   router: NextRouter,
-  getContextPrecision: (assetId: string) => Promise<number | void>,
 ): Promise<void> => {
   if (!rows || rows.length === 0) {
     window.alert('No data to export!');
@@ -845,7 +885,7 @@ export const exportToCsv = async (
       const headers = processHeaders(router);
       csvFile += headers + '\n';
     } else {
-      csvFile += await processRow(rows[i], router, getContextPrecision);
+      csvFile += await processRow(rows[i], router);
     }
   }
   if (typeof window !== undefined) {
@@ -891,7 +931,7 @@ export const getAmountFromReceipts = async (
     receipt => receipt.type === contractType,
   );
   const amount = Number(correctReceipt?.amount) || 0;
-  const precision = (await getPrecision(assetId)) ?? 6;
+  const precision = (await getPrecision(assetId)) as number;
   return amount / 10 ** precision;
 };
 
@@ -933,84 +973,72 @@ export const passViewportStyles = (
   }
   return desktopStyles;
 };
-const getBuyTotalAmount = (receipts: IBuyReceipt[], sender: string) => {
-  let value = 0;
-  if (receipts.length) {
-    receipts.forEach(receipt => {
-      if (receipt.to === sender) {
-        value += receipt?.value ?? 0;
-      }
-    });
-  }
-  return value;
-};
 
-const getITOBuyPrice = (
-  receipts: IBuyReceipt[],
+export const receiverIsSender = (
   sender: string,
-  parameter: IBuyContractPayload,
-  currencyIDPrecision: number,
-) => {
-  const txValue = receipts?.find(
-    receipt =>
-      receipt.assetId === parameter.currencyID && receipt.from === sender,
-  )?.value;
-  if (typeof txValue === 'number') {
-    return toLocaleFixed(
-      txValue / 10 ** currencyIDPrecision,
-      currencyIDPrecision,
-    );
-  }
-  return 0;
-};
+  receipt: IKAppTransferReceipt | ITransferReceipt,
+): boolean => sender === receipt?.to;
 
-export const getBuyAmount = (
+export const getBuyReceipt = (
+  parameter: IBuyContractPayload,
   receipts: IBuyReceipt[],
+  contractIndex: number,
   sender: string,
-  parameter: IBuyContractPayload,
-  amountPrecision: number,
-  contracts: IBuyContract[],
-): string | null => {
-  if (parameter?.buyType === 'ITOBuy') {
-    return toLocaleFixed(
-      parameter.amount / 10 ** amountPrecision,
-      amountPrecision,
+  receiverIsSender: (
+    sender: string,
+    receipt: IKAppTransferReceipt | ITransferReceipt,
+  ) => boolean,
+): null | IKAppTransferReceipt | ITransferReceipt => {
+  let buyReceipt = null;
+  if (parameter?.buyType === 'MarketBuy') {
+    buyReceipt = findNextSiblingReceipt(
+      receipts,
+      contractIndex,
+      16,
+      14, // in MarketBuy, the formal buy receipt is 16, but it is the 14(kapp transfer) receipt that has that data we want
+      [sender],
+      receiverIsSender,
     );
+  } else if (parameter?.buyType === 'ITOBuy') {
+    buyReceipt = findPreviousSiblingReceipt(receipts, contractIndex, 2, 0); // there is no formal buy receipt in ITOBuy, but the data we want is in the 0(transfer) receipt
   }
-
-  if (parameter?.buyType === 'MarketBuy' && contracts.length < 2) {
-    // no support for multicontract
-    const parsedAmount =
-      getBuyTotalAmount(receipts, sender) / 10 ** amountPrecision;
-    if (parsedAmount !== 0) {
-      return toLocaleFixed(parsedAmount, amountPrecision);
-    }
-  }
-  return null;
+  return buyReceipt;
 };
 
 export const getBuyPrice = (
-  receipts: IBuyReceipt[],
-  sender: string,
   parameter: IBuyContractPayload,
-  currencyIDPrecision: number,
-  contracts: IBuyContract[],
-): string | null | number => {
+  buyReceipt: BuyReceiptData,
+): undefined | number => {
   if (parameter?.buyType === 'MarketBuy') {
-    return toLocaleFixed(
-      parameter.amount / 10 ** currencyIDPrecision,
-      currencyIDPrecision,
-    );
+    return parameter.amount;
+  } else if (parameter?.buyType === 'ITOBuy') {
+    return buyReceipt?.value;
   }
-  if (parameter?.buyType === 'ITOBuy' && contracts.length < 2) {
-    // support for multicontract in parent component
-    return getITOBuyPrice(receipts, sender, parameter, currencyIDPrecision);
-  }
-  return null;
 };
 
-export const getAssetBought = (
-  receipts: IBuyReceipt[],
-  sender: string,
-): string =>
-  receipts.find(receipt => receipt.to === sender)?.assetId?.split('/')[0] ?? '';
+export const getBuyAmount = (
+  parameter: IBuyContractPayload,
+  buyReceipt: BuyReceiptData,
+): undefined | number => {
+  if (parameter?.buyType === 'MarketBuy') {
+    return buyReceipt?.value;
+  } else if (parameter?.buyType === 'ITOBuy') {
+    return parameter?.amount;
+  }
+};
+
+export const parseJson = (data: string): string => {
+  try {
+    const json = JSON.parse(data);
+    return JSON.stringify(json, null, 2);
+  } catch (error) {
+    return data;
+  }
+};
+
+export const renderCorrectPath = (uriKey: string): string => {
+  if (uriKey && uriKey.startsWith('https://')) {
+    return uriKey;
+  }
+  return `https://${uriKey}`;
+};

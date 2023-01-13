@@ -45,7 +45,7 @@ const precisionParse = async (
     case 'AssetTriggerContract':
       if (payload.amount) {
         const assetId = payload.assetId ? payload.assetId : payload.kda;
-        precision = await getPrecision(assetId);
+        precision = (await getPrecision(assetId)) as number;
         if (precision !== undefined) {
           payload.amount = payload.amount * 10 ** precision;
         } else return;
@@ -96,7 +96,7 @@ const precisionParse = async (
     case 'ConfigITOContract':
       if (payload.maxAmount) {
         const assetId = payload.kda ? payload.kda : payload.assetId;
-        precision = await getPrecision(assetId);
+        precision = (await getPrecision(assetId)) as number;
         if (precision !== undefined) {
           payload.maxAmount = payload.maxAmount * 10 ** precision;
         } else return;
@@ -104,7 +104,7 @@ const precisionParse = async (
       if (payload.packInfo) {
         Object.entries(payload.packInfo).forEach(
           async ([key, packs]: [string, any]) => {
-            const packPrecision = await getPrecision(key);
+            const packPrecision = (await getPrecision(key)) as number;
 
             if (packPrecision !== undefined) {
               packs.forEach((pack: any) => {
@@ -117,14 +117,14 @@ const precisionParse = async (
       break;
     case 'BuyContract':
       assetId = payload.currencyId;
-      precision = await getPrecision(assetId);
+      precision = (await getPrecision(assetId)) as number;
       if (precision !== undefined) {
         payload.amount = payload.amount * 10 ** precision;
       } else return;
       break;
     case 'SellContract':
       assetId = payload.assetID;
-      precision = await getPrecision(assetId);
+      precision = (await getPrecision(assetId)) as number;
       if (precision !== undefined) {
         payload.price = addPrecision(payload.price, 10 ** precision);
       } else return;
@@ -443,7 +443,6 @@ const contractsDescription = {
 export {
   getType,
   getAssetsList,
-  getPrecision,
   showAssetIDInput,
   precisionParse,
   parseValues,

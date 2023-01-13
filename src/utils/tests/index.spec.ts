@@ -2,7 +2,6 @@ import FakeTimers from '@sinonjs/fake-timers';
 import api from '../../services/api';
 import {
   addCommasToNumber,
-  addPrecisionTransactions,
   asyncDoIf,
   breakText,
   capitalizeString,
@@ -14,7 +13,7 @@ import {
   getAge,
   getContractType,
   getEpochInfo,
-  getPrecision,
+  getPrecisionFromApi,
   getSelectedTab,
   getVariation,
   hexToString,
@@ -48,6 +47,7 @@ jest.mock('@/services/api', () => {
   return {
     getCached: jest.fn(),
     get: jest.fn(),
+    post: jest.fn(),
   };
 });
 
@@ -72,8 +72,12 @@ describe('unit tests for util funcs in index file', () => {
 
   describe('test timestampToDate function', () => {
     test('using old dates timestamps as parameters', () => {
-      expect(timestampToDate(timestamp1)).toEqual('11/27/51287, 3:20:00 PM');
-      expect(timestampToDate(timestamp2)).toEqual('4/28/54389, 8:17:26 AM');
+      expect(timestampToDate(timestamp1)).toMatch(
+        /11\/27\/51287, 3:20:00( | )PM/,
+      );
+      expect(timestampToDate(timestamp2)).toMatch(
+        /4\/28\/54389, 8:17:26( | )AM/,
+      );
     });
   });
 
@@ -314,7 +318,7 @@ describe('unit tests for util funcs in index file', () => {
 
   describe('test isDataEmpty function', () => {
     test('return true if array of strings is empty', () => {
-      const empty = [];
+      const empty: any[] = [];
       const data = ['3030303830'];
       const data2 = [''];
       expect(isDataEmpty(empty)).toEqual(true);
@@ -529,27 +533,21 @@ describe('unit tests for util funcs in index file', () => {
     });
   });
 
-  describe('test getPrecision function ', () => {
-    test('return precision asset', async () => {
-      (api.getCached as jest.Mock).mockReturnValueOnce(mocks.precisionAsset);
-      const precision = (await getPrecision('PVM-GVCI')) as any;
-      expect(precision).toEqual(10);
-    });
-  });
-
-  describe('test addPrecisionTransactions function', () => {
-    const asset = {
+  describe('test getPrecisionFromApi function ', () => {
+    const mockPrecision = {
       data: {
-        asset: mocks.assets[1],
+        precisions: {
+          'PVM-GVCI': 10,
+          KLV: 6,
+        },
       },
       error: '',
       code: 'successful',
     };
-    test('return all transactions with precision key in contracts', async () => {
-      (api.get as jest.Mock).mockReturnValueOnce(asset);
-      const { transactions } = mocks.transactionsList.data;
-      const response = addPrecisionTransactions(transactions);
-      expect(response).toEqual(transactions);
+    test('return precision asset', async () => {
+      (api.post as jest.Mock).mockReturnValue(mockPrecision);
+      const precision = (await getPrecisionFromApi(['PVM-GVCI', 'KLV'])) as any;
+      expect(precision).toEqual({ precisions: mockPrecision.data.precisions });
     });
   });
 
@@ -646,7 +644,7 @@ describe('unit tests for util funcs in index file', () => {
     });
   });
   describe('test asyncDoIf function', () => {
-    (api.get as jest.Mock).mockReturnValue(mocks.addressList);
+    (api.get as jest.Mock).mockReturnValueOnce(mocks.addressList);
     const request = async () => {
       return await api.get({
         route: 'address/list',

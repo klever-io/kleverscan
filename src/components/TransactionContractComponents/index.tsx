@@ -1,12 +1,13 @@
 import { KLV } from '@/assets/coins';
+import Copy from '@/components/Copy';
 import {
+  EnumTriggerTypeName,
   IAssetTriggerContract,
   IBuyContractPayload,
   ICancelMarketOrderContract,
   IClaimContract,
   IConfigITOContract,
   IConfigMarketplaceContract,
-  IContract,
   IContractBuyProps,
   ICreateAssetContract,
   ICreateMarketplaceContract,
@@ -14,7 +15,9 @@ import {
   IDelegateContract,
   IDepositContract,
   IFreezeContract,
+  IIndexedContract,
   IITOTriggerContract,
+  IParameter,
   IProposalContract,
   ISellContract,
   ISetAccountNameContract,
@@ -24,7 +27,8 @@ import {
   IUndelegateContract,
   IUnfreezeContract,
   IUpdateAccountPermissionContract,
-  IValidatorConfig,
+  IURIs,
+  IValidatorConfigContract,
   IVoteContract,
   IWithdrawContract,
 } from '@/types/contracts';
@@ -34,14 +38,18 @@ import {
   IFreezeReceipt,
   IUnfreezeReceipt,
 } from '@/types/index';
-import { findKey, findReceipt } from '@/utils/findKey';
+import { IKAppTransferReceipt } from '@/types/receipts';
+import {
+  findNextSiblingReceipt,
+  findPreviousSiblingReceipt,
+  findReceipt,
+} from '@/utils/findKey';
+import { usePrecision } from '@/utils/hooks';
 import {
   calculatePermissionOperations,
-  getAmountFromReceipts,
-  getAssetBought,
-  getBuyAmount,
-  getBuyPrice,
   getPrecision,
+  receiverIsSender,
+  renderCorrectPath,
   toLocaleFixed,
 } from '@/utils/index';
 import { getProposalNetworkParams } from '@/utils/parametersProposal';
@@ -50,37 +58,29 @@ import {
   FrozenContainer,
   RowContent,
 } from '@/views/accounts/detail';
-import { NetworkParamsContainer } from '@/views/proposals/detail';
+import { BigSpan, NetworkParamsContainer } from '@/views/proposals/detail';
 import {
   CenteredRow,
   HeaderWrapper,
+  HoverAnchor,
   Hr,
   NestedContainerWrapper,
+  RoleDiv,
+  RoleStrong,
+  RoleWrapper,
   Row,
+  StrongWidth,
+  URIsWrapper,
 } from '@/views/transactions/detail';
 import { format, fromUnixTime } from 'date-fns';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
-import Copy from '../Copy';
+import Tooltip from '../Tooltip';
 
-export const Transfer: React.FC<any> = ({ parameter: par }) => {
+export const Transfer: React.FC<IIndexedContract> = ({ parameter: par }) => {
   const parameter = par as ITransferContract;
-  const [precision, setPrecision] = useState(0);
-
-  useEffect(() => {
-    const assetID = parameter?.assetId?.split('/') || [];
-
-    const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 6);
-    };
-
-    if (assetID.length === 0 || assetID[0] === 'KLV' || assetID[0] === 'KFI') {
-      setPrecision(6);
-      return;
-    }
-
-    getAssetPrecision();
-  }, []);
+  const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
+  const precision = usePrecision(assetID);
 
   return (
     <>
@@ -138,15 +138,16 @@ export const Transfer: React.FC<any> = ({ parameter: par }) => {
   );
 };
 
-export const CreateAsset: React.FC<IContract> = ({
+export const CreateAsset: React.FC<IIndexedContract> = ({
   sender,
   parameter: par,
   receipts: rec,
+  contractIndex,
 }) => {
   const parameter = par as ICreateAssetContract;
   const receipts = rec as ICreateAssetReceipt[];
   const ownerAddress = parameter?.ownerAddress || sender;
-  const assetId = findKey(receipts, 'assetId');
+  const createAssetReceipt = findReceipt(receipts, contractIndex, 1);
 
   interface Active {
     parameter: string;
@@ -161,12 +162,14 @@ export const CreateAsset: React.FC<IContract> = ({
         </span>
         <strong>Create Asset</strong>
       </Row>
-      {assetId && (
+      {createAssetReceipt && (
         <Row>
           <span>
             <strong>Asset ID</strong>
           </span>
-          <Link href={`/asset/${assetId}`}>{assetId}</Link>
+          <Link href={`/asset/${createAssetReceipt?.assetId}`}>
+            {createAssetReceipt?.assetId}
+          </Link>
         </Row>
       )}
       <Row>
@@ -431,7 +434,7 @@ export const CreateAsset: React.FC<IContract> = ({
   );
 };
 
-export const CreateValidator: React.FC<IContract> = ({
+export const CreateValidator: React.FC<IIndexedContract> = ({
   sender,
   parameter: par,
 }) => {
@@ -519,8 +522,11 @@ export const CreateValidator: React.FC<IContract> = ({
   );
 };
 
-export const ValidatorConfig: React.FC<IContract> = ({ parameter: par }) => {
-  const parameter = par as IValidatorConfig;
+export const ValidatorConfig: React.FC<IIndexedContract> = ({
+  parameter: par,
+}) => {
+  const param = par as unknown as IValidatorConfigContract;
+  const parameter = param.config;
   return (
     <>
       <Row>
@@ -541,12 +547,14 @@ export const ValidatorConfig: React.FC<IContract> = ({ parameter: par }) => {
         </span>
         <span>{parameter?.name}</span>
       </Row>
-      <Row>
-        <span>
-          <strong>Can Delegate</strong>
-        </span>
-        <span>{parameter?.canDelegate}</span>
-      </Row>
+      {typeof parameter?.canDelegate === 'boolean' && (
+        <Row>
+          <span>
+            <strong>Can Delegate</strong>
+          </span>
+          <span>{parameter?.canDelegate ? 'True' : 'False'}</span>{' '}
+        </Row>
+      )}
       <Row>
         <span>
           <strong>Commission</strong>
@@ -576,46 +584,53 @@ export const ValidatorConfig: React.FC<IContract> = ({ parameter: par }) => {
         <span>
           <strong>Logo</strong>
         </span>
-        <span>{parameter?.logo}</span>
+        <span>
+          <a href={renderCorrectPath(parameter?.logo)}>{parameter?.logo}</a>
+        </span>
       </Row>
       <Row>
         <span>
           <strong>URIs</strong>
         </span>
-        <span>{parameter?.uris?.toString()}</span>
+        <RowContent>
+          <BalanceContainer>
+            <FrozenContainer>
+              {parameter.uris.map(
+                ({ key, value }: { key: string; value: string }) => (
+                  <div key={key}>
+                    <span>
+                      <strong>{key}</strong>
+                    </span>
+                    <span>
+                      <a
+                        href={renderCorrectPath(value)}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {value}
+                      </a>
+                    </span>
+                  </div>
+                ),
+              )}
+            </FrozenContainer>
+          </BalanceContainer>
+        </RowContent>
       </Row>
     </>
   );
 };
 
-export const Freeze: React.FC<IContract> = ({
+export const Freeze: React.FC<IIndexedContract> = ({
   parameter: par,
   contractIndex,
   receipts: rec,
 }) => {
   const parameter = par as IFreezeContract;
   const receipts = rec as IFreezeReceipt[];
-
-  const [precision, setPrecision] = useState(1);
-
-  useEffect(() => {
-    const assetID = parameter?.assetId?.split('/') || [];
-
-    const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 6);
-    };
-
-    if (assetID.length > 1) {
-      return;
-    }
-
-    if (assetID.length === 0 || assetID[0] === 'KLV' || assetID[0] === 'KFI') {
-      setPrecision(6);
-      return;
-    }
-
-    getAssetPrecision();
-  }, []);
+  const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
+  const precision = usePrecision(assetID);
+  const freezeReceipt = findReceipt(receipts, contractIndex, 3);
 
   return (
     <>
@@ -643,32 +658,37 @@ export const Freeze: React.FC<IContract> = ({
           </small>
         </span>
       </Row>
-      <Row>
-        <span>
-          <strong>Bucket ID</strong>
-        </span>
-        <span>
-          {contractIndex !== undefined &&
-            findReceipt(receipts, contractIndex, 3, 'bucketId')}
-        </span>
-      </Row>
+      {freezeReceipt && (
+        <Row>
+          <span>
+            <strong>Bucket Id</strong>
+          </span>
+          <span>{freezeReceipt?.bucketId}</span>
+        </Row>
+      )}
     </>
   );
 };
 
-export const Unfreeze: React.FC<IContract> = ({
+export const Unfreeze: React.FC<IIndexedContract> = ({
   parameter: par,
+  contractIndex,
   receipts: rec,
 }) => {
   const parameter = par as IUnfreezeContract;
   const receipts = rec as IUnfreezeReceipt[];
+  const claimReceipt = findNextSiblingReceipt(receipts, contractIndex, 4, 17);
+  const claimPrecision = claimReceipt?.assetIdReceived || 'KLV';
+  const assetIdPrecision = parameter?.assetId || 'KLV';
+  const precision = usePrecision([claimPrecision, assetIdPrecision]);
+  const unfreezeReceipt = findReceipt(receipts, contractIndex, 4);
 
-  const getAvailabeEpoch = () => {
-    return (
-      Object.values(receipts).find(item => item?.availableEpoch > 0)
-        ?.availableEpoch || '--'
-    );
-  };
+  const undelegateReceipt = findPreviousSiblingReceipt(
+    receipts,
+    contractIndex,
+    4,
+    7,
+  );
 
   return (
     <>
@@ -680,13 +700,13 @@ export const Unfreeze: React.FC<IContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Asset ID</strong>
+          <strong>Asset Id</strong>
         </span>
         <span>{parameter?.assetId || 'KLV'}</span>
       </Row>
       <Row>
         <span>
-          <strong>Bucket ID</strong>
+          <strong>Bucket Id</strong>
         </span>
         <span>
           <CenteredRow>
@@ -695,17 +715,63 @@ export const Unfreeze: React.FC<IContract> = ({
           </CenteredRow>
         </span>
       </Row>
+      {unfreezeReceipt && (
+        <Row>
+          <span>
+            <strong>Available Epoch</strong>
+          </span>
+          <span>{unfreezeReceipt?.availableEpoch}</span>
+        </Row>
+      )}
+      {unfreezeReceipt && (
+        <Row>
+          <span>
+            <strong>Amount</strong>
+          </span>
+          <span>
+            {toLocaleFixed(
+              unfreezeReceipt?.value / 10 ** precision[assetIdPrecision],
+              precision[assetIdPrecision],
+            )}
+          </span>
+        </Row>
+      )}
+      {claimReceipt && (
+        <Row>
+          <span>
+            <strong>Claimed Rewards</strong>
+          </span>
+          <span>
+            {claimReceipt.amount / 10 ** precision[claimPrecision]}{' '}
+            {claimReceipt.assetIdReceived}
+          </span>
+        </Row>
+      )}
       <Row>
         <span>
-          <strong>Available Epoch</strong>
+          <strong>Undelegated?</strong>
         </span>
-        <span>{getAvailabeEpoch()}</span>
+        <span>{undelegateReceipt ? 'True' : 'False'}</span>
       </Row>
     </>
   );
 };
-export const Delegate: React.FC<IContract> = ({ parameter: par }) => {
+export const Delegate: React.FC<IIndexedContract> = ({
+  parameter: par,
+  receipts,
+  contractIndex,
+}) => {
   const parameter = par as IDelegateContract;
+  const delegateReceipt = findReceipt(receipts, contractIndex, 7);
+  const claimReceipt = findPreviousSiblingReceipt(
+    receipts,
+    contractIndex,
+    7,
+    17,
+  );
+  const claimPrecision = usePrecision(
+    (claimReceipt?.assetIdReceived || 'KLV') as string,
+  );
 
   return (
     <>
@@ -737,12 +803,55 @@ export const Delegate: React.FC<IContract> = ({ parameter: par }) => {
           </CenteredRow>
         </span>
       </Row>
+      {delegateReceipt && (
+        <Row>
+          <span>
+            <strong>Amount Delegated</strong>
+          </span>
+          <span>
+            <CenteredRow>
+              {toLocaleFixed(delegateReceipt?.amountDelegated / 10 ** 6, 6)}
+            </CenteredRow>
+          </span>
+        </Row>
+      )}
+      {claimReceipt && (
+        <Row>
+          <span>
+            <strong>Rewards Claimed</strong>
+          </span>
+          <span>
+            <CenteredRow>
+              {toLocaleFixed(
+                claimReceipt.amount / 10 ** claimPrecision,
+                claimPrecision,
+              )}{' '}
+              {claimReceipt.assetIdReceived}
+              <Tooltip msg="Delegation generates an unfreeze contract, which will trigger the freeze contract rewards, if there are any." />
+            </CenteredRow>
+          </span>
+        </Row>
+      )}
     </>
   );
 };
 
-export const Undelegate: React.FC<IContract> = ({ parameter: par }) => {
+export const Undelegate: React.FC<IIndexedContract> = ({
+  parameter: par,
+  receipts,
+  contractIndex,
+}) => {
   const parameter = par as IUndelegateContract;
+  const undelegateReceipt = findReceipt(receipts, contractIndex, 7);
+  const claimReceipt = findPreviousSiblingReceipt(
+    receipts,
+    contractIndex,
+    7,
+    17,
+  );
+  const claimPrecision = usePrecision(
+    (claimReceipt?.assetIdReceived || 'KLV') as string,
+  );
 
   return (
     <>
@@ -763,12 +872,54 @@ export const Undelegate: React.FC<IContract> = ({ parameter: par }) => {
           </CenteredRow>
         </span>
       </Row>
+      {undelegateReceipt && (
+        <Row>
+          <span>
+            <strong>Amount</strong>
+          </span>
+          <span>
+            {toLocaleFixed(undelegateReceipt?.amountDelegated / 10 ** 6, 6)}
+          </span>
+        </Row>
+      )}
+      {claimReceipt && (
+        <Row>
+          <span>
+            <strong>Rewards Claimed</strong>
+          </span>
+          <span>
+            <CenteredRow>
+              {toLocaleFixed(
+                claimReceipt.amount / 10 ** claimPrecision,
+                claimPrecision,
+              )}{' '}
+              {claimReceipt.assetIdReceived}
+            </CenteredRow>
+          </span>
+        </Row>
+      )}
     </>
   );
 };
 
-export const Withdraw: React.FC<IContract> = ({ parameter: par }) => {
+export const Withdraw: React.FC<IIndexedContract> = ({
+  parameter: par,
+  receipts,
+  contractIndex,
+}) => {
   const parameter = par as IWithdrawContract;
+
+  const claimReceipt = findPreviousSiblingReceipt(
+    receipts,
+    contractIndex,
+    18,
+    17,
+  );
+  const assetIdPrecision = parameter?.assetId || 'KLV';
+  const claimPrecision = claimReceipt?.assetIdReceived || 'KLV';
+  const precision = usePrecision([assetIdPrecision, claimPrecision]);
+  const withdrawReceipt = findReceipt(receipts, contractIndex, 18);
+
   return (
     <>
       <Row>
@@ -777,28 +928,58 @@ export const Withdraw: React.FC<IContract> = ({ parameter: par }) => {
         </span>
         <strong>Withdraw</strong>
       </Row>
-      <Row>
-        <span>
-          <strong>Asset ID</strong>
-        </span>
-        <span>{parameter?.assetId || 'KLV'}</span>
-      </Row>
+      {receipts?.length === 0 && (
+        <Row>
+          <span>
+            <strong>Asset Id</strong>
+          </span>
+          <span>{parameter?.assetId}</span>
+        </Row>
+      )}
+      {withdrawReceipt && (
+        <Row>
+          <span>
+            <strong>Amount</strong>
+          </span>
+          <span>
+            {toLocaleFixed(
+              withdrawReceipt?.amount / 10 ** precision[assetIdPrecision],
+              precision[assetIdPrecision],
+            )}{' '}
+            {withdrawReceipt?.assetId}
+          </span>
+        </Row>
+      )}
+      {claimReceipt && (
+        <Row>
+          <span>
+            <strong>Rewards Claimed</strong>
+          </span>
+          <span>
+            <CenteredRow>
+              {toLocaleFixed(
+                claimReceipt.amount / 10 ** precision[claimPrecision],
+                precision[claimPrecision],
+              )}{' '}
+              {claimReceipt.assetIdReceived}
+            </CenteredRow>
+          </span>
+        </Row>
+      )}
     </>
   );
 };
 
-export const Claim: React.FC<IContract> = ({ parameter: par, receipts }) => {
+export const Claim: React.FC<IIndexedContract> = ({
+  parameter: par,
+  receipts,
+}) => {
   const parameter = par as IClaimContract;
-  const assetId = findReceipt(receipts, 0, 17, 'assetId');
-  const [amount, setAmount] = useState(0);
+  const claimReceipt = findReceipt(receipts, 0, 17);
+  const precision = usePrecision(
+    (claimReceipt?.assetIdReceived || 'KLV') as string,
+  );
 
-  useEffect(() => {
-    const getAsyncAmount = async () => {
-      const asyncAmount = await getAmountFromReceipts(assetId, 17, receipts);
-      setAmount(asyncAmount);
-    };
-    getAsyncAmount();
-  }, []);
   return (
     <>
       <Row>
@@ -813,35 +994,30 @@ export const Claim: React.FC<IContract> = ({ parameter: par, receipts }) => {
         </span>
         <span>{parameter?.claimType}</span>
       </Row>
-      {parameter.id && (
-        <Row>
-          <span>
-            <strong>ID</strong>
-          </span>
-          <span>{parameter?.id}</span>
-        </Row>
-      )}
-      {assetId && (
+      {claimReceipt && (
         <Row>
           <span>
             <strong>Asset Id</strong>
           </span>
-          <span>{assetId}</span>
+          <span>{claimReceipt?.assetId}</span>
         </Row>
       )}
-      {typeof amount === 'number' && (
+      {claimReceipt && typeof claimReceipt?.amount === 'number' && (
         <Row>
           <span>
             <strong>Amount</strong>
           </span>
-          <span>{amount}</span>
+          <span>
+            {toLocaleFixed(claimReceipt?.amount / 10 ** precision, precision)}{' '}
+            {claimReceipt?.assetIdReceived}
+          </span>
         </Row>
       )}
     </>
   );
 };
 
-export const Unjail: React.FC<IContract> = () => {
+export const Unjail: React.FC<IIndexedContract> = () => {
   return (
     <>
       <Row>
@@ -854,28 +1030,12 @@ export const Unjail: React.FC<IContract> = () => {
   );
 };
 
-export const AssetTrigger: React.FC<IContract> = ({ parameter: par }) => {
+export const AssetTrigger: React.FC<IIndexedContract> = ({
+  parameter: par,
+}) => {
   const parameter = par as IAssetTriggerContract;
-  const [precision, setPrecision] = useState(1);
-
-  useEffect(() => {
-    const assetID = parameter?.assetId?.split('/') || [];
-
-    const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 6);
-    };
-
-    if (assetID.length > 1) {
-      return;
-    }
-
-    if (assetID.length === 0 || assetID[0] === 'KLV' || assetID[0] === 'KFI') {
-      setPrecision(6);
-      return;
-    }
-
-    getAssetPrecision();
-  }, []);
+  const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
+  const precision = usePrecision(assetID);
 
   return (
     <>
@@ -897,56 +1057,14 @@ export const AssetTrigger: React.FC<IContract> = ({ parameter: par }) => {
         </span>
         <span>{parameter?.assetId}</span>
       </Row>
-      {parameter.amount && (
-        <Row>
-          <span>
-            <strong>Amount</strong>
-          </span>
-          <span>
-            {toLocaleFixed(parameter?.amount / 10 ** precision, precision)}
-          </span>
-        </Row>
-      )}
-      {parameter.toAddress && (
-        <Row>
-          <span>
-            <strong>To</strong>
-          </span>
-          <CenteredRow>
-            {parameter?.toAddress}
-            <Copy data={parameter?.toAddress} info="address"></Copy>
-          </CenteredRow>
-        </Row>
-      )}
-      {parameter?.logo && (
-        <Row>
-          <span>
-            <strong>Logo</strong>
-          </span>
-          <span>{parameter?.logo}</span>
-        </Row>
-      )}
-      {parameter?.mime && (
-        <Row>
-          <span>
-            <strong>MIME</strong>
-          </span>
-          <span>{parameter?.mime}</span>
-        </Row>
-      )}
-      {parameter?.staking && (
-        <Row>
-          <span>
-            <strong>Staking</strong>
-          </span>
-          <span>{`Type: ${parameter?.staking?.type}  APR: ${parameter.staking?.apr}`}</span>
-        </Row>
-      )}
+      {renderAssetTriggerTypeData(parameter, precision)}
     </>
   );
 };
 
-export const SetAccountName: React.FC<IContract> = ({ parameter: par }) => {
+export const SetAccountName: React.FC<IIndexedContract> = ({
+  parameter: par,
+}) => {
   const parameter = par as ISetAccountNameContract;
 
   return (
@@ -967,10 +1085,15 @@ export const SetAccountName: React.FC<IContract> = ({ parameter: par }) => {
   );
 };
 
-export const Proposal: React.FC<IContract> = ({ parameter: par }) => {
+export const Proposal: React.FC<IIndexedContract> = ({
+  parameter: par,
+  receipts,
+  contractIndex,
+}) => {
   const parameter = par as IProposalContract;
   const parameters = getProposalNetworkParams(parameter?.parameters);
 
+  const proposalReceipt = findReceipt(receipts, contractIndex, 5);
   return (
     <>
       <Row>
@@ -979,6 +1102,14 @@ export const Proposal: React.FC<IContract> = ({ parameter: par }) => {
         </span>
         <strong>Proposal</strong>
       </Row>
+      {proposalReceipt && (
+        <Row>
+          <span>
+            <strong>Proposal Id</strong>
+          </span>
+          <span>{proposalReceipt?.proposalId}</span>
+        </Row>
+      )}
       <Row>
         <span>
           <strong>Epoch Duration</strong>
@@ -989,7 +1120,7 @@ export const Proposal: React.FC<IContract> = ({ parameter: par }) => {
         <span>
           <strong>Description</strong>
         </span>
-        <span>{parameter?.description}</span>
+        <BigSpan>{parameter?.description}</BigSpan>
       </Row>
       <Row>
         <span>
@@ -1012,7 +1143,7 @@ export const Proposal: React.FC<IContract> = ({ parameter: par }) => {
   );
 };
 
-export const Vote: React.FC<IContract> = ({ parameter: par }) => {
+export const Vote: React.FC<IIndexedContract> = ({ parameter: par }) => {
   const parameter = par as IVoteContract;
 
   return (
@@ -1035,32 +1166,20 @@ export const Vote: React.FC<IContract> = ({ parameter: par }) => {
         </span>
         <span>{(parameter.amount / 1000000).toLocaleString()}</span>
       </Row>
+      <Row>
+        <span>
+          <strong>Vote</strong>
+        </span>
+        <span>{parameter?.type}</span>
+      </Row>
     </>
   );
 };
 
-export const ConfigITO: React.FC<IContract> = ({ parameter: par }) => {
+export const ConfigITO: React.FC<IIndexedContract> = ({ parameter: par }) => {
   const parameter = par as IConfigITOContract;
-  const [precision, setPrecision] = useState(1);
-
-  useEffect(() => {
-    const assetID = parameter?.assetId?.split('/') || [];
-
-    const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(assetID?.[0] || 'KLV')) ?? 6);
-    };
-
-    if (assetID.length > 1) {
-      return;
-    }
-
-    if (assetID.length === 0 || assetID[0] === 'KLV' || assetID[0] === 'KFI') {
-      setPrecision(6);
-      return;
-    }
-
-    getAssetPrecision();
-  }, []);
+  const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
+  const precision = usePrecision(assetID);
 
   return (
     <>
@@ -1102,7 +1221,9 @@ export const ConfigITO: React.FC<IContract> = ({ parameter: par }) => {
   );
 };
 
-export const SetITOPrices: React.FC<IContract> = ({ parameter: par }) => {
+export const SetITOPrices: React.FC<IIndexedContract> = ({
+  parameter: par,
+}) => {
   const parameter = par as ISetITOPricesContract;
   return (
     <>
@@ -1127,28 +1248,245 @@ export const Buy: React.FC<IContractBuyProps> = ({
   receipts: rec,
   contracts,
   sender,
+  contractIndex,
 }) => {
   const parameter = par as IBuyContractPayload;
-  const receipts = rec as unknown as IBuyReceipt[];
-  const [amountPrecision, setAmountPrecision] = useState(0);
-  const [currencyIDPrecision, setCurrencyIDPrecision] = useState(6);
+  const receipts = rec as IBuyReceipt[];
+  const buyType = parameter?.buyType;
+  let currencyId = '';
+  let assetId = '';
+  let nextKappTransferReceipt: undefined | IKAppTransferReceipt;
+  let previousKappTransferReceipt: undefined | IKAppTransferReceipt;
 
-  useEffect(() => {
-    const getPrecisions = async () => {
-      if (parameter?.currencyID !== 'KLV' && parameter?.currencyID !== 'KFI') {
-        setCurrencyIDPrecision(
-          (await getPrecision(parameter?.currencyID || 'KLV')) ?? 6,
+  const initializeVariables = () => {
+    switch (buyType) {
+      case 'MarketBuy':
+        nextKappTransferReceipt = findNextSiblingReceipt(
+          receipts,
+          contractIndex,
+          16, // buy receipt
+          14, // kapp transfer receipt
+          [sender],
+          receiverIsSender,
+        );
+        // there won't be nextKappTransferREceipt if the buy bid is not instant buy, hence if must collect data from the previousKappTransferReceipt(which will be the receipt with correct data, but we will not find the asset the bid was offered)
+        previousKappTransferReceipt = findPreviousSiblingReceipt(
+          receipts,
+          contractIndex,
+          16,
+          14,
+        );
+        currencyId = parameter?.currencyID || 'KLV';
+        assetId =
+          nextKappTransferReceipt?.assetId ||
+          previousKappTransferReceipt?.assetId ||
+          '';
+        break;
+      case 'ITOBuy':
+        currencyId = parameter?.currencyID || 'KLV';
+        assetId = parameter?.id || '';
+        break;
+      default:
+        break;
+    }
+  };
+  initializeVariables();
+  const precisions = usePrecision([assetId, currencyId]);
+
+  const renderMarketBuy = () => {
+    const buyReceipt = findReceipt(receipts, contractIndex, 16);
+
+    const getStatus = () => {
+      const executed = buyReceipt?.executed;
+      if (typeof executed === 'boolean') {
+        if (executed) {
+          return 'Completed';
+        } else {
+          return 'Pending';
+        }
+      } else if (!executed && nextKappTransferReceipt) {
+        return 'Completed';
+      }
+      return null;
+    };
+
+    const getPrice = () => {
+      const price = parameter?.amount;
+      if (typeof price === 'number') {
+        return toLocaleFixed(
+          price / 10 ** precisions[currencyId],
+          precisions[currencyId],
         );
       }
-      if (parameter?.buyType === 'ITOBuy') {
-        setAmountPrecision((await getPrecision(parameter?.id)) ?? 0);
-      } else if (parameter?.buyType === 'MarketBuy') {
-        const assetBought = getAssetBought(receipts, sender);
-        setAmountPrecision((await getPrecision(assetBought)) ?? 0);
-      }
+      return null;
     };
-    getPrecisions();
-  }, []);
+
+    const getAmount = () => {
+      const amount = nextKappTransferReceipt?.value;
+      if (typeof amount === 'number') {
+        return toLocaleFixed(
+          amount / 10 ** precisions[assetId],
+          precisions[assetId],
+        );
+      }
+      return null;
+    };
+
+    const status = getStatus();
+    const price = getPrice();
+    const amount = getAmount();
+
+    const orderId = parameter?.id;
+    const marketplaceId = buyReceipt?.marketplaceId;
+
+    return (
+      <>
+        {status && (
+          <Row>
+            <span>
+              <strong>Status</strong>
+            </span>
+            <span>{status}</span>
+          </Row>
+        )}
+        {price && (
+          <Row>
+            <span>
+              <strong>Price</strong>
+            </span>
+            <span>
+              {price} {currencyId}
+            </span>
+          </Row>
+        )}
+        {amount && (
+          <Row>
+            <span>
+              <strong>Amount</strong>
+            </span>
+            <span>
+              {amount} {assetId}
+            </span>
+          </Row>
+        )}
+        <Row>
+          <span>
+            <strong>Currency Id</strong>
+          </span>
+          <span>{currencyId}</span>
+        </Row>
+        <>
+          {assetId && nextKappTransferReceipt && (
+            <Row>
+              <span>
+                <strong>Asset Id</strong>
+              </span>
+              <span>{assetId}</span>
+            </Row>
+          )}
+          {orderId && (
+            <Row>
+              <span>
+                <strong>Order Id</strong>
+              </span>
+              <span>{orderId}</span>
+            </Row>
+          )}
+          {marketplaceId && (
+            <Row>
+              <span>
+                <strong>Marketplace Id</strong>
+              </span>
+              <span>{marketplaceId}</span>
+            </Row>
+          )}
+        </>
+      </>
+    );
+  };
+
+  const renderITOBuy = () => {
+    const transferReceipt = findPreviousSiblingReceipt(
+      receipts,
+      contractIndex,
+      2,
+      0,
+    ); // there is no formal buy receipt in ITOBuy, but the data we want is in the 0(transfer) receipt
+
+    const getPrice = () => {
+      const price = transferReceipt?.value;
+      if (typeof price === 'number') {
+        return toLocaleFixed(
+          price / 10 ** precisions[currencyId],
+          precisions[currencyId],
+        );
+      }
+      return null;
+    };
+
+    const getAmount = () => {
+      const amount = parameter?.amount;
+      if (typeof amount === 'number') {
+        return toLocaleFixed(
+          amount / 10 ** precisions[assetId],
+          precisions[assetId],
+        );
+      }
+      return null;
+    };
+    const price = getPrice();
+    const amount = getAmount();
+
+    return (
+      <>
+        {price && (
+          <Row>
+            <span>
+              <strong>Price</strong>
+            </span>
+            <span>
+              {price} {currencyId}
+            </span>
+          </Row>
+        )}
+        {amount && (
+          <Row>
+            <span>
+              <strong>Amount</strong>
+            </span>
+            <span>
+              {amount} {assetId}
+            </span>
+          </Row>
+        )}
+        <Row>
+          <span>
+            <strong>Currency Id</strong>
+          </span>
+          <span>{currencyId}</span>
+        </Row>
+        {assetId && (
+          <Row>
+            <span>
+              <strong>Asset Id</strong>
+            </span>
+            <span>{assetId}</span>
+          </Row>
+        )}
+      </>
+    );
+  };
+
+  const renderBuyTypeData = () => {
+    switch (buyType) {
+      case 'MarketBuy':
+        return renderMarketBuy();
+      case 'ITOBuy':
+        return renderITOBuy();
+      default:
+        return null;
+    }
+  };
 
   return (
     <>
@@ -1162,70 +1500,28 @@ export const Buy: React.FC<IContractBuyProps> = ({
         <span>
           <strong>Buy Type</strong>
         </span>
-        <span>{parameter?.buyType}</span>
+        <span>{buyType}</span>
       </Row>
-      <Row>
-        <span>
-          <strong>Id</strong>
-        </span>
-        <span>{parameter?.id}</span>
-      </Row>
-      <Row>
-        <span>
-          <strong>Currency Id</strong>
-        </span>
-        <span>{parameter?.currencyID}</span>
-      </Row>
-      <Row>
-        <span>
-          <strong>Amount</strong>
-        </span>
-        <span>
-          {getBuyAmount(
-            receipts,
-            sender,
-            parameter,
-            amountPrecision,
-            contracts,
-          ) || '--'}
-        </span>
-      </Row>
-      <Row>
-        <span>
-          <strong>Price</strong>
-        </span>
-        <span>
-          {getBuyPrice(
-            receipts,
-            sender,
-            parameter,
-            currencyIDPrecision,
-            contracts,
-          )}
-        </span>
-      </Row>
+      {renderBuyTypeData()}
     </>
   );
 };
 
-export const Sell: React.FC<IContract> = ({ parameter: par }) => {
+export const Sell: React.FC<IIndexedContract> = ({
+  parameter: par,
+  receipts,
+  contractIndex,
+}) => {
   const parameter = par as ISellContract;
+  const precision = usePrecision(parameter?.currencyID || 'KLV');
+  const kappTransferReceipt = findPreviousSiblingReceipt(
+    receipts,
+    contractIndex,
+    15,
+    14,
+  );
 
-  const [precision, setPrecision] = useState(1);
-
-  useEffect(() => {
-    const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(parameter?.currencyID || 'KLV')) ?? 6);
-    };
-
-    if (parameter?.currencyID === 'KFI') {
-      setPrecision(6);
-      return;
-    }
-
-    getAssetPrecision();
-  }, []);
-
+  const sellReceipt = findReceipt(receipts, contractIndex, 15);
   return (
     <>
       <Row>
@@ -1240,6 +1536,14 @@ export const Sell: React.FC<IContract> = ({ parameter: par }) => {
         </span>
         <span>{parameter?.marketType}</span>
       </Row>
+      {sellReceipt && (
+        <Row>
+          <span>
+            <strong>Order Id</strong>
+          </span>
+          <span>{sellReceipt?.orderId}</span>
+        </Row>
+      )}
       <Row>
         <span>
           <strong>Marketplace Id</strong>
@@ -1251,21 +1555,31 @@ export const Sell: React.FC<IContract> = ({ parameter: par }) => {
           <strong>Asset Id</strong>
         </span>
         <span>{parameter?.assetId}</span>
-      </Row>{' '}
+      </Row>
+      {kappTransferReceipt && (
+        <Row>
+          <span>
+            <strong>Amount</strong>
+          </span>
+          <span>{kappTransferReceipt?.value}</span>
+        </Row>
+      )}
       <Row>
         <span>
           <strong>Currency Id</strong>
         </span>
         <span>{parameter?.currencyID}</span>
       </Row>
-      <Row>
-        <span>
-          <strong>Price</strong>
-        </span>
-        <span>
-          {toLocaleFixed(parameter?.price / 10 ** precision || 0, precision)}
-        </span>
-      </Row>{' '}
+      {parameter?.price && (
+        <Row>
+          <span>
+            <strong>Price</strong>
+          </span>
+          <span>
+            {toLocaleFixed(parameter.price / 10 ** (precision || 0), precision)}
+          </span>
+        </Row>
+      )}
       {parameter?.reservePrice && (
         <Row>
           <span>
@@ -1284,16 +1598,22 @@ export const Sell: React.FC<IContract> = ({ parameter: par }) => {
           <strong>End Time</strong>
         </span>
         <span>
-          {format(fromUnixTime(parameter?.endTime), 'dd/MM/yyyy HH:mm')}
+          {parameter?.endTime
+            ? format(fromUnixTime(parameter?.endTime), 'dd/MM/yyyy HH:mm')
+            : '--'}
         </span>
       </Row>
     </>
   );
 };
 
-export const CancelMarketOrder: React.FC<IContract> = ({ parameter: par }) => {
+export const CancelMarketOrder: React.FC<IIndexedContract> = ({
+  parameter: par,
+  receipts,
+  contractIndex,
+}) => {
   const parameter = par as ICancelMarketOrderContract;
-
+  const cancelMarketOrderReceipt = findReceipt(receipts, contractIndex, 14);
   return (
     <>
       <Row>
@@ -1308,13 +1628,39 @@ export const CancelMarketOrder: React.FC<IContract> = ({ parameter: par }) => {
         </span>
         <span>{parameter?.orderID}</span>
       </Row>
+      {cancelMarketOrderReceipt && (
+        <>
+          <Row>
+            <span>
+              <strong>Marketplace Id</strong>
+            </span>
+            <span>{cancelMarketOrderReceipt?.marketplaceId}</span>
+          </Row>
+          <Row>
+            <span>
+              <strong>Asset Id</strong>
+            </span>
+            <span>{cancelMarketOrderReceipt?.assetId}</span>
+          </Row>
+          <Row>
+            <span>
+              <strong>Amount</strong>
+            </span>
+            <span>{cancelMarketOrderReceipt?.value}</span>
+          </Row>
+        </>
+      )}
     </>
   );
 };
 
-export const CreateMarketplace: React.FC<IContract> = ({ parameter: par }) => {
+export const CreateMarketplace: React.FC<IIndexedContract> = ({
+  parameter: par,
+  receipts,
+  contractIndex,
+}) => {
   const parameter = par as ICreateMarketplaceContract;
-
+  const createMarketplaceReceipt = findReceipt(receipts, contractIndex, 10);
   return (
     <>
       <Row>
@@ -1329,6 +1675,14 @@ export const CreateMarketplace: React.FC<IContract> = ({ parameter: par }) => {
         </span>
         <span>{parameter?.name}</span>
       </Row>
+      {createMarketplaceReceipt && (
+        <Row>
+          <span>
+            <strong>Marketplace Id</strong>
+          </span>
+          <span>{createMarketplaceReceipt?.marketplaceId}</span>
+        </Row>
+      )}
       <Row>
         <span>
           <strong>Referral Address</strong>
@@ -1339,7 +1693,9 @@ export const CreateMarketplace: React.FC<IContract> = ({ parameter: par }) => {
   );
 };
 
-export const ConfigMarketplace: React.FC<IContract> = ({ parameter: par }) => {
+export const ConfigMarketplace: React.FC<IIndexedContract> = ({
+  parameter: par,
+}) => {
   const parameter = par as IConfigMarketplaceContract;
 
   return (
@@ -1378,7 +1734,7 @@ export const ConfigMarketplace: React.FC<IContract> = ({ parameter: par }) => {
   );
 };
 
-export const UpdateAccountPermission: React.FC<IContract> = ({
+export const UpdateAccountPermission: React.FC<IIndexedContract> = ({
   parameter: par,
 }) => {
   const parameter = par as IUpdateAccountPermissionContract;
@@ -1460,22 +1816,9 @@ export const UpdateAccountPermission: React.FC<IContract> = ({
   );
 };
 
-export const Deposit: React.FC<IContract> = ({ parameter: par }) => {
+export const Deposit: React.FC<IIndexedContract> = ({ parameter: par }) => {
   const parameter = par as IDepositContract;
-  const [precision, setPrecision] = useState(6);
-
-  useEffect(() => {
-    const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(parameter?.currencyID || 'KLV')) ?? 6);
-    };
-
-    if (parameter?.currencyID === 'KFI') {
-      setPrecision(6);
-      return;
-    }
-
-    getAssetPrecision();
-  }, []);
+  const precision = usePrecision(parameter?.currencyID || 'KLV');
 
   return (
     <>
@@ -1513,7 +1856,7 @@ export const Deposit: React.FC<IContract> = ({ parameter: par }) => {
   );
 };
 
-export const ITOTrigger: React.FC<IContract> = ({ parameter: par }) => {
+export const ITOTrigger: React.FC<IIndexedContract> = ({ parameter: par }) => {
   const parameter = par as IITOTriggerContract;
 
   const packInfo = parameter?.packInfo || [];
@@ -1527,8 +1870,7 @@ export const ITOTrigger: React.FC<IContract> = ({ parameter: par }) => {
     return initialPacksPrecisions;
   };
 
-  const [precision, setPrecision] = useState(0);
-
+  const precision = usePrecision(parameter?.assetID || 'KLV');
   type PacksPrecision =
     | PromiseSettledResult<number | undefined>[]
     | { value: number }[];
@@ -1538,24 +1880,14 @@ export const ITOTrigger: React.FC<IContract> = ({ parameter: par }) => {
   );
 
   useEffect(() => {
-    const getAssetPrecision = async () => {
-      setPrecision((await getPrecision(parameter?.assetID || 'KLV')) ?? 6);
-    };
-
-    if (parameter?.assetID === 'KFI') {
-      setPrecision(6);
-      return;
-    }
-
     const getPacksPrecision = async () => {
       const promises = packInfo.map(pack => {
-        return getPrecision(pack.key);
+        return getPrecision([pack.key]);
       });
-      const result = await Promise.allSettled(promises);
+      const result: any = await Promise.allSettled(promises);
       setPacksPrecision(result);
     };
     getPacksPrecision();
-    getAssetPrecision();
   }, []);
 
   const renderPackPrecision = (price: number, index: number) => {
@@ -1564,7 +1896,7 @@ export const ITOTrigger: React.FC<IContract> = ({ parameter: par }) => {
         index
       ] as PromiseSettledResult<number>;
       if (promiseResult.status === 'fulfilled') {
-        return price / 10 ** promiseResult?.value || 0;
+        return price / 10 ** (promiseResult?.value || 0);
       }
     } catch (error) {
       return '';
@@ -1776,4 +2108,194 @@ export const ITOTrigger: React.FC<IContract> = ({ parameter: par }) => {
       {renderTriggerTypeData()}
     </>
   );
+};
+
+const renderAssetTriggerTypeData: React.FC<IAssetTriggerContract> = (
+  parameter: IParameter,
+  precision: number,
+): any => {
+  const par = parameter as IAssetTriggerContract;
+  const triggerType = par?.triggerType;
+
+  const toAddressReturn = () => (
+    <Row>
+      <span>
+        <strong>To</strong>
+      </span>
+      <CenteredRow>
+        {par?.toAddress}
+        <Copy data={par?.toAddress} info="address"></Copy>
+      </CenteredRow>
+    </Row>
+  );
+
+  const amountReturn = () => (
+    <Row>
+      <span>
+        <strong>Amount</strong>
+      </span>
+      <span>{toLocaleFixed(par?.amount / 10 ** precision, precision)}</span>
+    </Row>
+  );
+
+  const roleReturn = () => (
+    <Row>
+      <span>
+        <strong>Role</strong>
+      </span>
+      <RowContent>
+        <BalanceContainer>
+          <FrozenContainer>
+            <RoleWrapper>
+              <RoleDiv>
+                <RoleStrong>Address</RoleStrong>
+                <span style={{ marginRight: '0.5rem' }}>
+                  {par.role.address}
+                </span>
+                <Copy data={par.role.address} />
+              </RoleDiv>
+
+              <RoleDiv>
+                <RoleStrong>HasRoleMint</RoleStrong>
+                <span>{String(par.role.hasRoleMint)}</span>
+              </RoleDiv>
+              <RoleDiv>
+                <RoleStrong>HasRoleSetITOPrices</RoleStrong>
+                <span>{String(par.role.hasRoleSetITOPrices)}</span>
+              </RoleDiv>
+            </RoleWrapper>
+          </FrozenContainer>
+        </BalanceContainer>
+      </RowContent>
+    </Row>
+  );
+
+  const mimeReturn = () => (
+    <Row>
+      <span>
+        <strong>MIME</strong>
+      </span>
+      <span>{par?.mime}</span>
+    </Row>
+  );
+
+  const logoReturn = () => (
+    <Row>
+      <span>
+        <strong>Logo</strong>
+      </span>
+      <HoverAnchor href={renderCorrectPath(par.logo)}>{par.logo}</HoverAnchor>
+    </Row>
+  );
+
+  const URIsReturn = () => (
+    <Row>
+      <span>
+        <strong>URIs</strong>
+      </span>
+      <RowContent>
+        <BalanceContainer>
+          <FrozenContainer>
+            {par?.uris.map((uri: IURIs, index: number) => (
+              <URIsWrapper key={index}>
+                <section>
+                  <span>{uri.key}</span>
+                </section>
+                <section>
+                  <HoverAnchor href={renderCorrectPath(uri.value)}>
+                    {uri.value}
+                  </HoverAnchor>
+                </section>
+              </URIsWrapper>
+            ))}
+          </FrozenContainer>
+        </BalanceContainer>
+      </RowContent>
+    </Row>
+  );
+
+  const updateStakingReturn = () => (
+    <Row>
+      <span>
+        <strong>Staking</strong>
+      </span>
+      <RowContent>
+        <BalanceContainer>
+          <FrozenContainer>
+            <URIsWrapper>
+              <section>
+                <StrongWidth>APR</StrongWidth>
+                <span>{par.staking?.apr}</span>
+              </section>
+              <section>
+                <StrongWidth>min Epochs To Claim</StrongWidth>
+                <span>{par.staking?.minEpochsToClaim}</span>
+              </section>
+              <section>
+                <StrongWidth>min Epochs To Unstake</StrongWidth>
+                <span>{par.staking?.minEpochsToUnstake}</span>
+              </section>
+              <section>
+                <StrongWidth>min Epochs To Withdraw</StrongWidth>
+                <span>{par.staking?.minEpochsToWithdraw}</span>
+              </section>
+              <section>
+                <StrongWidth>Type</StrongWidth>
+                <span>{par.staking?.type}</span>
+              </section>
+            </URIsWrapper>
+          </FrozenContainer>
+        </BalanceContainer>
+      </RowContent>
+    </Row>
+  );
+
+  switch (triggerType) {
+    case EnumTriggerTypeName.Mint:
+      return (
+        <>
+          {toAddressReturn()}
+          {amountReturn()}
+        </>
+      );
+    case EnumTriggerTypeName.Burn:
+      return amountReturn();
+    case EnumTriggerTypeName.Wipe:
+      return (
+        <>
+          {toAddressReturn()}
+          {amountReturn()}
+        </>
+      );
+    case EnumTriggerTypeName.Pause:
+      return null;
+    case EnumTriggerTypeName.Resume:
+      return null;
+    case EnumTriggerTypeName.ChangeOwner:
+      return toAddressReturn();
+    case EnumTriggerTypeName.AddRole:
+      return roleReturn();
+    case EnumTriggerTypeName.RemoveRole:
+      return toAddressReturn();
+    case EnumTriggerTypeName.UpdateMetadata:
+      return mimeReturn();
+    case EnumTriggerTypeName.StopNFTMint:
+      return null;
+    case EnumTriggerTypeName.UpdateLogo:
+      return logoReturn();
+    case EnumTriggerTypeName.UpdateURIs:
+      return URIsReturn();
+    case EnumTriggerTypeName.ChangeRoyaltiesReceiver:
+      return toAddressReturn();
+    case EnumTriggerTypeName.UpdateStaking:
+      return updateStakingReturn();
+    case EnumTriggerTypeName.UpdateRoyalties:
+      return null;
+    case EnumTriggerTypeName.UpdateKDAFeePool:
+      return null;
+    case EnumTriggerTypeName.StopRoyaltiesChange:
+      return null;
+    default:
+      return null;
+  }
 };

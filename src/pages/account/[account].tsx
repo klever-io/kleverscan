@@ -51,7 +51,6 @@ interface IAccountPage {
   account: IAccount;
   transactions: ITransactionsResponse;
   priceKLV: number;
-  precisions: IAssetInfo[];
   accountAssets: IAccountAsset[];
   assets: IAsset[];
   defaultKlvPrecision: number;
@@ -88,15 +87,13 @@ interface IQueryParams {
   startDate?: string;
   endDate?: string;
   tab?: string;
-  fromAddress?: string;
-  toAddress?: string;
+  sender?: '' | 'receiver' | 'sender';
 }
 
 const Account: React.FC<IAccountPage> = ({
   account,
   transactions: transactionResponse,
   priceKLV,
-  precisions,
   assets,
   accountAssets,
   defaultKlvPrecision,
@@ -107,8 +104,6 @@ const Account: React.FC<IAccountPage> = ({
 
   const initialQueryState = {
     ...router.query,
-    fromAddress: account.address,
-    toAddress: account.address,
   };
 
   const getTabHeaders = useCallback(() => {
@@ -155,17 +150,10 @@ const Account: React.FC<IAccountPage> = ({
     const localQuery: IQueryParams = { ...router.query, page, limit };
     delete localQuery.tab;
 
-    if (localQuery.fromAddress || localQuery.toAddress) {
-      return api.get({
-        route: `transaction/list`,
-        query: localQuery,
-      });
-    } else {
-      return api.get({
-        route: `address/${account.address}/transactions`,
-        query: localQuery,
-      });
-    }
+    return api.get({
+      route: `address/${account.address}/transactions`,
+      query: localQuery,
+    });
   };
 
   const calculateTotalKLV = useCallback(() => {
@@ -220,17 +208,14 @@ const Account: React.FC<IAccountPage> = ({
   const filterFromTo = (op: number) => {
     const updatedQuery = { ...router.query };
     if (op === 0) {
+      delete updatedQuery.role;
       setQueryAndRouter({
         ...updatedQuery,
-        fromAddress: account.address,
-        toAddress: account.address,
       });
     } else if (op === 1) {
-      delete updatedQuery.toAddress;
-      setQueryAndRouter({ ...updatedQuery, fromAddress: account.address });
+      setQueryAndRouter({ ...updatedQuery, role: 'sender' });
     } else if (op === 2) {
-      delete updatedQuery.fromAddress;
-      setQueryAndRouter({ ...updatedQuery, toAddress: account.address });
+      setQueryAndRouter({ ...updatedQuery, role: 'receiver' });
     }
   };
 
@@ -420,7 +405,6 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
     account: {} as IAccount,
     priceKLV: 0,
     transactions: {} as ITransactionsResponse,
-    precisions: [],
     accountAssets: [],
     assets: [],
     defaultKlvPrecision: 6,
@@ -518,17 +502,6 @@ export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
         } else if (index === 2) {
           props.account = value.data.account;
 
-          const filterPrecisions = Object.entries(
-            value.data.account.assets,
-          ).map(
-            ([assetId, asset]: [string, any]): IAssetInfo => ({
-              assetId,
-              precision: asset.precision,
-            }),
-          );
-          const precision = 6;
-
-          props.precisions = filterPrecisions;
           props.accountAssets = Object.values(value.data.account.assets);
 
           if (responses[0].status !== 'rejected') {

@@ -1,5 +1,6 @@
 import { KLV } from '@/assets/coins';
 import Copy from '@/components/Copy';
+import Tour from '@/components/Tour';
 import { useExtension } from '@/contexts/extension';
 import api from '@/services/api';
 import { useScroll } from '@/utils/hooks';
@@ -120,31 +121,38 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
       />
 
       {extensionInstalled && (
-        <ConnectContainer
-          onClick={() => connectAndOpen()}
-          key={String(extensionInstalled)}
+        <Tour
+          guideName="connectWallet"
+          side="bottom"
+          tourTooltip="Now that you connected your wallet, click here to see more options"
+          condition={!!walletAddress}
         >
-          <ConnectButton>
-            {extensionLoading ? (
-              <span> Loading... </span>
-            ) : (
-              <>
-                {walletAddress && (
-                  <div onClick={() => setOpenUserInfos(!openUserInfos)}>
-                    <FaUserAlt size={'1.2em'} />
-                    <small>{parseAddress(walletAddress, 15)}</small>
-                  </div>
-                )}
-                {!walletAddress && (
-                  <>
-                    <BiWalletAlt size={'1.2em'} />
-                    <span>Connect</span>
-                  </>
-                )}
-              </>
-            )}
-          </ConnectButton>
-        </ConnectContainer>
+          <ConnectContainer
+            onClick={() => connectAndOpen()}
+            key={String(extensionInstalled)}
+          >
+            <ConnectButton>
+              {extensionLoading ? (
+                <span> Loading... </span>
+              ) : (
+                <>
+                  {walletAddress && (
+                    <div onClick={() => setOpenUserInfos(!openUserInfos)}>
+                      <FaUserAlt size={'1.2em'} />
+                      <small>{parseAddress(walletAddress, 15)}</small>
+                    </div>
+                  )}
+                  {!walletAddress && (
+                    <>
+                      <BiWalletAlt size={'1.2em'} />
+                      <span>Connect</span>
+                    </>
+                  )}
+                </>
+              )}
+            </ConnectButton>
+          </ConnectContainer>
+        </Tour>
       )}
       {walletAddress &&
         ReactDOM.createPortal(

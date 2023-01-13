@@ -41,7 +41,7 @@ const TransactionItem: React.FC<ITransaction> = ({
   const { t } = useTranslation('transactions');
   const contractPosition = 0;
   contractFilter = contract[contractPosition] as IContract;
-  let { assetId } = contractFilter.parameter;
+  let assetId = contractFilter?.parameter?.assetId;
 
   const contractType = contract[0].typeString;
   const checkContract = getContractType(contractType);

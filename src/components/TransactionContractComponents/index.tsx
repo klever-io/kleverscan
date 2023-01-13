@@ -537,9 +537,12 @@ export const ValidatorConfig: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Public Key</strong>
+          <strong>BLS Public Key</strong>
         </span>
-        <span>{parameter?.blsPublicKey}</span>
+        <CenteredRow>
+          <span>{parameter?.blsPublicKey}</span>
+          <Copy data={parameter?.blsPublicKey} info="public key"></Copy>
+        </CenteredRow>
       </Row>
       <Row>
         <span>
@@ -575,7 +578,7 @@ export const ValidatorConfig: React.FC<IIndexedContract> = ({
         </span>
         <span>
           <CenteredRow>
-            {parameter?.rewardAddress}
+            <span>{parameter?.rewardAddress}</span>
             <Copy data={parameter?.rewardAddress} info="address"></Copy>
           </CenteredRow>
         </span>
@@ -710,7 +713,7 @@ export const Unfreeze: React.FC<IIndexedContract> = ({
         </span>
         <span>
           <CenteredRow>
-            {parameter?.bucketID}
+            <span>{parameter?.bucketID}</span>
             <Copy data={parameter?.bucketID} info="Bucket Id"></Copy>
           </CenteredRow>
         </span>
@@ -787,7 +790,7 @@ export const Delegate: React.FC<IIndexedContract> = ({
         </span>
         <span>
           <CenteredRow>
-            {parameter?.bucketID}
+            <span>{parameter?.bucketID}</span>
             <Copy data={parameter?.bucketID} info="Bucket Id"></Copy>
           </CenteredRow>
         </span>
@@ -798,7 +801,7 @@ export const Delegate: React.FC<IIndexedContract> = ({
         </span>
         <span>
           <CenteredRow>
-            {parameter?.toAddress}
+            <span>{parameter?.toAddress}</span>
             <Copy data={parameter?.toAddress} info="Address"></Copy>
           </CenteredRow>
         </span>
@@ -810,7 +813,9 @@ export const Delegate: React.FC<IIndexedContract> = ({
           </span>
           <span>
             <CenteredRow>
-              {toLocaleFixed(delegateReceipt?.amountDelegated / 10 ** 6, 6)}
+              <span>
+                {toLocaleFixed(delegateReceipt?.amountDelegated / 10 ** 6, 6)}
+              </span>
             </CenteredRow>
           </span>
         </Row>
@@ -822,11 +827,13 @@ export const Delegate: React.FC<IIndexedContract> = ({
           </span>
           <span>
             <CenteredRow>
-              {toLocaleFixed(
-                claimReceipt.amount / 10 ** claimPrecision,
-                claimPrecision,
-              )}{' '}
-              {claimReceipt.assetIdReceived}
+              <span>
+                {toLocaleFixed(
+                  claimReceipt.amount / 10 ** claimPrecision,
+                  claimPrecision,
+                )}{' '}
+                {claimReceipt.assetIdReceived}
+              </span>
               <Tooltip msg="Delegation generates an unfreeze contract, which will trigger the freeze contract rewards, if there are any." />
             </CenteredRow>
           </span>
@@ -867,7 +874,7 @@ export const Undelegate: React.FC<IIndexedContract> = ({
         </span>
         <span>
           <CenteredRow>
-            {parameter?.bucketID}
+            <span>{parameter?.bucketID}</span>
             <Copy data={parameter?.bucketID} info="Bucket ID"></Copy>
           </CenteredRow>
         </span>
@@ -889,11 +896,13 @@ export const Undelegate: React.FC<IIndexedContract> = ({
           </span>
           <span>
             <CenteredRow>
-              {toLocaleFixed(
-                claimReceipt.amount / 10 ** claimPrecision,
-                claimPrecision,
-              )}{' '}
-              {claimReceipt.assetIdReceived}
+              <span>
+                {toLocaleFixed(
+                  claimReceipt.amount / 10 ** claimPrecision,
+                  claimPrecision,
+                )}{' '}
+                {claimReceipt.assetIdReceived}
+              </span>
             </CenteredRow>
           </span>
         </Row>
@@ -957,11 +966,13 @@ export const Withdraw: React.FC<IIndexedContract> = ({
           </span>
           <span>
             <CenteredRow>
-              {toLocaleFixed(
-                claimReceipt.amount / 10 ** precision[claimPrecision],
-                precision[claimPrecision],
-              )}{' '}
-              {claimReceipt.assetIdReceived}
+              <span>
+                {toLocaleFixed(
+                  claimReceipt.amount / 10 ** precision[claimPrecision],
+                  precision[claimPrecision],
+                )}{' '}
+                {claimReceipt.assetIdReceived}
+              </span>
             </CenteredRow>
           </span>
         </Row>
@@ -1193,7 +1204,12 @@ export const ConfigITO: React.FC<IIndexedContract> = ({ parameter: par }) => {
         <span>
           <strong>Receiver</strong>
         </span>
-        <span>{parameter?.receiverAddress}</span>
+        <CenteredRow>
+          <Link href={`/account/${parameter?.receiverAddress}`}>
+            <a>{parameter?.receiverAddress}</a>
+          </Link>
+          <Copy data={parameter?.receiverAddress} info="Bucket ID"></Copy>
+        </CenteredRow>
       </Row>
       <Row>
         <span>
@@ -2000,7 +2016,12 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({ parameter: par }) => {
             <span>
               <strong>Receiver Address</strong>
             </span>
-            <span>{parameter?.receiverAddress}</span>
+            <CenteredRow>
+              <Link href={`/account/${parameter?.receiverAddress}`}>
+                {parameter?.receiverAddress}
+              </Link>
+              <Copy data={parameter?.receiverAddress} info="Bucket ID"></Copy>
+            </CenteredRow>
           </Row>
         );
       case ITOTriggerType.UpdateMaxAmount:
@@ -2123,7 +2144,7 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerContract> = (
         <strong>To</strong>
       </span>
       <CenteredRow>
-        {par?.toAddress}
+        <span>{par?.toAddress}</span>
         <Copy data={par?.toAddress} info="address"></Copy>
       </CenteredRow>
     </Row>

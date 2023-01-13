@@ -10,6 +10,7 @@ import {
 import { IBlock } from '@/types/blocks';
 import {
   Contract,
+  ContractsIndex,
   EnumAssetType,
   EnumClaimType,
   EnumITOStatus,
@@ -254,8 +255,10 @@ export const mockedTxContractComponents = {
     },
   },
   configIcoContract: {
-    type: Contract.ConfigITO,
+    type: ContractsIndex['Config ITO'],
+    typeString: Contract.ConfigITO,
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
+    contractIndex: 0,
     parameter: {
       assetId: 'KLV',
       status: EnumITOStatus.DefaultITO,

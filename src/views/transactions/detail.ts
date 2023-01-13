@@ -95,7 +95,7 @@ export const Row = styled.div`
     border-bottom-right-radius: 0px;
   }
 
-  span:first-child {
+  > span:first-child {
     min-width: 10rem;
   }
 
@@ -125,6 +125,11 @@ export const Row = styled.div`
       color: ${props => props.theme.black};
       font-size: 0.95rem;
       font-weight: 600;
+
+      overflow: hidden;
+
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     p {

@@ -124,17 +124,37 @@ const Transaction: React.FC<ITransactionPage> = props => {
   const renderData = () => {
     if (expandData) {
       try {
-        return JSON.parse(
+        const jsonData = JSON.parse(
           parseJson(
             hexToString((data && data.length > 0 && data.join(',')) || ''),
           ),
         );
+        return (
+          <DivDataJson>
+            <ReactJson
+              src={jsonData}
+              name={false}
+              displayObjectSize={false}
+              enableClipboard={true}
+              displayDataTypes={false}
+              theme={rawTxTheme}
+            />
+          </DivDataJson>
+        );
       } catch (error) {
-        setExpandData(false);
+        return (
+          <span>
+            {hexToString((data && data.length > 0 && data.join(',')) || '')}
+          </span>
+        );
       }
     }
-    return parseJson(
-      hexToString((data && data.length > 0 && data.join(',')) || ''),
+    return (
+      <span>
+        {parseJson(
+          hexToString((data && data.length > 0 && data.join(',')) || ''),
+        )}
+      </span>
     );
   };
 
@@ -588,22 +608,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                 <strong>Data</strong>
               </span>
               <ExpandCenteredRow openJson={expandData}>
-                <span>
-                  {expandData ? (
-                    <DivDataJson>
-                      <ReactJson
-                        src={renderData()}
-                        name={false}
-                        displayObjectSize={false}
-                        enableClipboard={true}
-                        displayDataTypes={false}
-                        theme={rawTxTheme}
-                      />
-                    </DivDataJson>
-                  ) : (
-                    <span>{renderData()}</span>
-                  )}
-                </span>
+                <span>{renderData()}</span>
                 <IconsWrapper>
                   <ButtonExpand onClick={() => setExpandData(!expandData)}>
                     {expandData ? 'Hide' : 'Expand'}

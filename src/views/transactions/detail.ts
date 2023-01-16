@@ -1,5 +1,5 @@
 import { default as DefaultInput } from '@/components/InputGlobal';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export const Container = styled.div``;
 
@@ -218,8 +218,19 @@ export const CenteredRow = styled.div`
 `;
 
 export const ExpandCenteredRow = styled(CenteredRow)<{ openJson?: boolean }>`
-  align-items: ${props => (props.openJson ? 'normal' : 'center')};
+  align-items: center;
   justify-content: space-between;
+  ${props =>
+    props.openJson &&
+    css`
+      align-items: flex-start;
+
+      span {
+        align-self: center;
+        white-space: normal;
+        word-break: break-all;
+      }
+    `};
 `;
 
 export const DivDataJson = styled.div`

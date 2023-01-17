@@ -68,14 +68,12 @@ export const ConnectContainer = styled.div`
   align-items: center;
   user-select: none;
 
-  padding-right: 0.5rem;
   justify-content: flex-start;
   align-items: flex-start;
 
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     margin-left: 0;
     margin-top: auto;
-    padding-right: 0;
   }
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {

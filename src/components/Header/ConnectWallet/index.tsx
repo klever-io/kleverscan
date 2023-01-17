@@ -1,5 +1,6 @@
 import { KLV } from '@/assets/coins';
 import Copy from '@/components/Copy';
+import Tour from '@/components/Tour';
 import { useExtension } from '@/contexts/extension';
 import api from '@/services/api';
 import { useScroll } from '@/utils/hooks';
@@ -37,10 +38,12 @@ interface IConnectWallet {
 const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openUserInfos, setOpenUserInfos] = useState(false);
-  const [balance, setBalance] = useState<any>({
-    klv: undefined,
+  const [balance, setBalance] = useState<{
+    [assetId: string]: string | number;
+  }>({
+    klv: 0,
   });
-  const [loadingBalance, setLoadingBalance] = useState<any>(false);
+  const [loadingBalance, setLoadingBalance] = useState<boolean>(false);
 
   const {
     walletAddress,
@@ -99,51 +102,59 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
   return (
     <>
       {!extensionInstalled && (
-        <ConnectContainer>
-          <ConnectButton onClick={handleClick}>
-            <BiWalletAlt size={'1.2em'} />
-            <span>Klever Extension</span>
-          </ConnectButton>
-        </ConnectContainer>
+        <>
+          <ConnectContainer>
+            <ConnectButton onClick={handleClick}>
+              <BiWalletAlt size={'1.2em'} />
+              <span>Klever Extension</span>
+            </ConnectButton>
+          </ConnectContainer>
+          <BackgroundHelper
+            onClick={closeMenu}
+            onTouchStart={closeMenu}
+            opened={openDrawer}
+          />
+          <WalletHelp
+            closeDrawer={() => setOpenDrawer(false)}
+            opened={openDrawer}
+            clickConnectionMobile={clickConnection}
+          />
+        </>
       )}
 
-      <BackgroundHelper
-        onClick={closeMenu}
-        onTouchStart={closeMenu}
-        opened={openDrawer}
-      />
-      <WalletHelp
-        closeDrawer={() => setOpenDrawer(false)}
-        opened={openDrawer}
-        clickConnectionMobile={clickConnection}
-      />
-
       {extensionInstalled && (
-        <ConnectContainer
-          onClick={() => connectAndOpen()}
-          key={String(extensionInstalled)}
+        <Tour
+          guideName="connectWallet"
+          side="bottom"
+          tourTooltip="Now that you connected your wallet, click here to see more options"
+          condition={!!walletAddress}
         >
-          <ConnectButton>
-            {extensionLoading ? (
-              <span> Loading... </span>
-            ) : (
-              <>
-                {walletAddress && (
-                  <div onClick={() => setOpenUserInfos(!openUserInfos)}>
-                    <FaUserAlt size={'1.2em'} />
-                    <small>{parseAddress(walletAddress, 15)}</small>
-                  </div>
-                )}
-                {!walletAddress && (
-                  <>
-                    <BiWalletAlt size={'1.2em'} />
-                    <span>Connect</span>
-                  </>
-                )}
-              </>
-            )}
-          </ConnectButton>
-        </ConnectContainer>
+          <ConnectContainer
+            onClick={() => connectAndOpen()}
+            key={String(extensionInstalled)}
+          >
+            <ConnectButton>
+              {extensionLoading ? (
+                <span> Loading... </span>
+              ) : (
+                <>
+                  {walletAddress && (
+                    <div onClick={() => setOpenUserInfos(!openUserInfos)}>
+                      <FaUserAlt size={'1.2em'} />
+                      <small>{parseAddress(walletAddress, 15)}</small>
+                    </div>
+                  )}
+                  {!walletAddress && (
+                    <>
+                      <BiWalletAlt size={'1.2em'} />
+                      <span>Connect</span>
+                    </>
+                  )}
+                </>
+              )}
+            </ConnectButton>
+          </ConnectContainer>
+        </Tour>
       )}
       {walletAddress &&
         ReactDOM.createPortal(

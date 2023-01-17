@@ -62,7 +62,7 @@ describe('Contract Component', () => {
   });
 
   it('should render the contracts options', async () => {
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -93,7 +93,7 @@ describe('Contract Component', () => {
       'Amount',
       'Receiver Address',
     ];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -129,7 +129,7 @@ describe('Contract Component', () => {
 
   it('should render the Advanced Options form contract', async () => {
     const advancedOptionsItems = ['Data', 'Is Multisig?', 'Show payload?'];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -163,7 +163,7 @@ describe('Contract Component', () => {
       'Select an asset/collection',
       'Amount',
     ];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -203,7 +203,7 @@ describe('Contract Component', () => {
       'Select an asset/collection',
       'Select a bucket',
     ];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -243,7 +243,7 @@ describe('Contract Component', () => {
       'Receiver',
       'Select a bucket',
     ];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -294,7 +294,7 @@ describe('Contract Component', () => {
       'Transfer Fixed',
       'Properties',
     ];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -333,7 +333,7 @@ describe('Contract Component', () => {
       'Max Delegation Amount',
       'Uri',
     ];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -371,7 +371,7 @@ describe('Contract Component', () => {
       'Max Delegation Amount',
       'Uri',
     ];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -399,7 +399,7 @@ describe('Contract Component', () => {
 
   it('should render the Undelegate form contract', async () => {
     const items = ['Undelegate a bucket.', 'Select a bucket'];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -430,7 +430,7 @@ describe('Contract Component', () => {
       'Total withdraw of the chosen asset.',
       'Select an asset/collection',
     ];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -458,7 +458,7 @@ describe('Contract Component', () => {
 
   it('should render the Claim form contract', async () => {
     const items = ['Claim rewards or expired market orders.', 'Claim Type'];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -486,7 +486,7 @@ describe('Contract Component', () => {
 
   it('should render the Unjail form contract', async () => {
     const items = ['Remove bad actors…'];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -517,7 +517,7 @@ describe('Contract Component', () => {
       'A contract setting operations over a collection of assets or an NFT.',
       'Trigger Type',
     ];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -545,7 +545,7 @@ describe('Contract Component', () => {
 
   it('should render the Set Account Name form contract', async () => {
     const items = ['Set a new name for the current account.', 'Name'];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -578,7 +578,7 @@ describe('Contract Component', () => {
       'Epochs Duration',
       'Parameters',
     ];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -606,7 +606,7 @@ describe('Contract Component', () => {
 
   it('should render the Vote form contract', async () => {
     const items = ['Vote for a proposal.', 'Proposal ID', 'Amount', 'Type'];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -641,7 +641,7 @@ describe('Contract Component', () => {
       'Max Amount',
       'PackInfo',
     ];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -673,7 +673,7 @@ describe('Contract Component', () => {
       'Select an asset/collection',
       'PackInfo',
     ];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -701,7 +701,7 @@ describe('Contract Component', () => {
 
   it('should render the Buy form contract', async () => {
     const items = ['Buy tokens.', 'Order ID', 'Currency Id', 'Amount'];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -735,7 +735,7 @@ describe('Contract Component', () => {
       'End Time',
       'Reserve Price',
     ];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -763,7 +763,7 @@ describe('Contract Component', () => {
 
   it('should render the Cancel Market Order form contract', async () => {
     const items = ['Order Id'];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -796,7 +796,7 @@ describe('Contract Component', () => {
       'Referral Address',
       'Referral Percentage',
     ];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -830,7 +830,7 @@ describe('Contract Component', () => {
       'Referral Percentage',
       'Name',
     ];
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(
@@ -857,7 +857,7 @@ describe('Contract Component', () => {
   });
 
   it('should render the Update Account Permission form contract', async () => {
-    let container: any;
+    let container;
     await waitFor(
       () =>
         ({ container } = renderWithTheme(

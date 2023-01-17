@@ -67,7 +67,7 @@ export const findNextSiblingReceipt = (
   callbackArgs: any[] = [],
   callbackCheck: (...callbackArgs: any[]) => boolean = callbackArgs => true,
 ): any => {
-  if (!receipts) {
+  if (!receipts || receipts.length === 0) {
     return null;
   }
 

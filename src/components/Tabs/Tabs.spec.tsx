@@ -72,7 +72,7 @@ describe('Component: Tabs', () => {
       pathname: '',
       query: {
         tab: 'Transactions',
-        toAddress: localAddress,
+        role: 'receiver',
       },
     });
   });

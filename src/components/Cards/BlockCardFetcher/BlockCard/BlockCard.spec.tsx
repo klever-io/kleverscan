@@ -1,8 +1,9 @@
+import theme from '@/styles/theme/index';
+import { renderWithTheme } from '@/test/utils';
+import '@testing-library/jest-dom/extend-expect';
 import { screen } from '@testing-library/react';
 import React from 'react';
-import theme from '../../../styles/theme';
-import { renderWithTheme } from '../../../test/utils';
-import BlockCard from './';
+import BlockCard from '.';
 
 describe('Component: BlockCard', () => {
   const textBlockCard: string[] = ['Transactions', 'Miner', 'Burned', 'Reward'];
@@ -20,12 +21,11 @@ describe('Component: BlockCard', () => {
       <BlockCard
         hash={hash}
         nonce={nonce}
-        parentHash={''}
         timestamp={timestamp}
         txCount={txCount}
         blockRewards={blockRewards}
         txBurnedFees={txBurnedFees}
-        precision={precision}
+        blockIndex={0}
       />,
     );
 
@@ -45,12 +45,11 @@ describe('Component: BlockCard', () => {
       <BlockCard
         hash={hash}
         nonce={nonce}
-        parentHash={''}
         timestamp={timestamp}
         txCount={txCount}
         blockRewards={blockRewards}
         txBurnedFees={txBurnedFees}
-        precision={precision}
+        blockIndex={0}
       />,
     );
 
@@ -69,16 +68,17 @@ describe('Component: BlockCard', () => {
       <BlockCard
         hash={hash}
         nonce={nonce}
-        parentHash={''}
         timestamp={timestamp}
         txCount={txCount}
-        precision={precision}
+        blockRewards={blockRewards}
+        txBurnedFees={txBurnedFees}
+        blockIndex={0}
       />,
     );
 
     const burned = screen.getByText(/Burned/i).nextSibling;
     const reward = screen.getByText(/Reward/i).nextSibling;
-    expect(burned).toHaveTextContent('0');
-    expect(reward).toHaveTextContent('0');
+    expect(burned).toHaveTextContent('1.5 KLV');
+    expect(reward).toHaveTextContent('15 KLV');
   });
 });

@@ -12,7 +12,6 @@ import { toast } from 'react-toastify';
 import {
   IAccountAsset,
   IAsset,
-  IAssetOne,
   IAssetResponse,
   IBalance,
   IBuyReceipt,
@@ -517,6 +516,7 @@ export async function getPrecision(
     assetIds.forEach(assetId => {
       if (
         !Object.keys(storedPrecisions).includes(assetId) &&
+        assetId !== '' &&
         !aux.includes(assetId) &&
         assetId.split('/').length === 1
       ) {
@@ -557,7 +557,6 @@ export async function getPrecision(
         localStorage.setItem('precisions', JSON.stringify(newPrecisions));
         return precisions[assetId];
       } catch (error: any) {
-        console.error(error);
         throw new Error(error);
       }
     } else {
@@ -668,38 +667,6 @@ export const getContractType = (contract: string): boolean => {
     return true;
   }
   return false;
-};
-
-/**
- * Receive a list of transactions and add precision field to the contracts of the transactions, unless the contract is Multi Transaction (transaction.contract.length > 1 case).
- * @param transactions
- * @returns ITransaction[] with precision key in contracts.
- */
-// parameter must necessarily contain assetId
-
-export const addPrecisionTransactions = (
-  transactions: ITransaction[],
-): ITransaction[] => {
-  return transactions.map(transaction => {
-    if (transaction.contract.length > 1) {
-      return transaction;
-    }
-    transaction?.contract.map(async contrct => {
-      const parameter = contrct?.parameter as any;
-      if (parameter?.assetId) {
-        const response: IAssetOne = await api.get({
-          route: `assets/${parameter?.assetId}`,
-        });
-        if (!response.error && response.code === 'successful') {
-          contrct.precision = response.data?.asset?.precision || 0;
-        }
-        return contrct;
-      }
-      contrct.precision = 6;
-      return contrct;
-    });
-    return transaction;
-  });
 };
 
 /**

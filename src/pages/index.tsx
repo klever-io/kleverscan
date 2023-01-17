@@ -1,60 +1,60 @@
-import BlockCardList from '@/components/BlockCardList';
-import HomeDataCards from '@/components/Cards/HomeDataCards';
+import BlockCardFetcher from '@/components/Cards/BlockCardFetcher';
+import CardDataFetcher from '@/components/Cards/CardDataFetcher';
+import CoinDataFetcher from '@/components/Cards/CoinDataFetcher';
 import HomeTransactions from '@/components/HomeTransactions';
-import { Container, DataContainer, Input } from '@/views/home';
-import { GetServerSideProps } from 'next';
-import React, { useState } from 'react';
+import api from '@/services/api';
+import { IBlock } from '@/types/blocks';
+import HomeStaticProps from '@/utils/ServerSideProps/Home';
+import {
+  Container,
+  DataCardsContainer,
+  DataContainer,
+  Input,
+} from '@/views/home';
+import { GetStaticProps } from 'next';
+import React, { useCallback, useEffect } from 'react';
 import { IHome } from '../types';
-import HomeServerSideProps from '../utils/ServerSideProps/Home';
 
-const Home: React.FC<IHome> = ({
-  totalAccounts: defaultTotalAccounts,
-  totalTransactions: defaultTotalTransactions,
-  epochInfo: defaultEpochInfo,
-  tps,
-  coinsData,
-  yesterdayTransactions,
-  beforeYesterdayTransactions,
-  blocks,
-  transactionsList,
-  transactions: defaultTransactions,
-  yesterdayAccounts,
-  assetsData,
-}) => {
+const Home: React.FC<IHome> = () => {
   const precision = 6; // default KLV precision
-  const [totalTransactions, setTotalTransactions] = useState(
-    defaultTotalTransactions,
+
+  const [blocks, setBlocks] = React.useState<IBlock[]>([]);
+
+  const getBlocks = useCallback(
+    async (setBlocksScoped: React.Dispatch<React.SetStateAction<IBlock[]>>) => {
+      const res = await api.getCached({
+        route: 'block/list',
+        refreshTime: 4,
+      });
+
+      if (!res.error || res.error === '') {
+        setBlocksScoped(res.data?.blocks);
+      }
+    },
+    [],
   );
+
+  useEffect(() => {
+    getBlocks(setBlocks);
+  }, []);
+
   return (
     <Container>
       <DataContainer>
         <Input />
-        <HomeDataCards
-          block={blocks?.[0]}
-          totalAccounts={defaultTotalAccounts}
-          totalTransactions={totalTransactions}
-          epochInfo={defaultEpochInfo}
-          tps={tps}
-          coinsData={coinsData}
-          yesterdayTransactions={yesterdayTransactions}
-          beforeYesterdayTransactions={beforeYesterdayTransactions}
-          yesterdayAccounts={yesterdayAccounts}
-          assetsData={assetsData}
-        />
+
+        <DataCardsContainer>
+          <CardDataFetcher block={blocks?.[0]} />
+          <CoinDataFetcher />
+        </DataCardsContainer>
       </DataContainer>
 
-      <BlockCardList blocks={blocks} precision={precision} />
-      <HomeTransactions
-        setTotalTransactions={setTotalTransactions}
-        transactions={defaultTransactions}
-        transactionsList={transactionsList}
-        precision={precision}
-      />
+      <BlockCardFetcher blocks={blocks} getBlocks={getBlocks} />
+      <HomeTransactions />
     </Container>
   );
 };
 
-export const getServerSideProps: GetServerSideProps<IHome> =
-  HomeServerSideProps;
+export const getStaticProps: GetStaticProps = HomeStaticProps;
 
 export default Home;

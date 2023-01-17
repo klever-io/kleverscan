@@ -1,9 +1,10 @@
+import { IBlock } from '@/types/blocks';
 import { screen, waitFor } from '@testing-library/react';
-import React from 'react';
-import api from '../../services/api';
-import { mockedBlocks, mockedFetchBlocks } from '../../test/mocks';
-import { renderWithTheme } from '../../test/utils';
-import BlockCardList from './';
+import React, { Dispatch, SetStateAction } from 'react';
+import BlockCardList from '.';
+import api from '../../../services/api';
+import { mockedBlocks, mockedFetchBlocks } from '../../../test/mocks';
+import { renderWithTheme } from '../../../test/utils';
 
 jest.mock('react-i18next', () => ({
   useTranslation: jest.fn(),
@@ -45,20 +46,27 @@ jest.mock('@/services/api', () => {
     },
   ];
   return {
-    get: jest.fn(() => Promise.resolve({ data: { blocks: mockedResult } })),
+    getCached: jest.fn(() =>
+      Promise.resolve({ data: { blocks: mockedResult } }),
+    ),
   };
 });
 
 describe('Component: BlockCardList', () => {
-  (api.get as jest.Mock).mockReturnValueOnce(mockedFetchBlocks);
+  (api.getCached as jest.Mock).mockReturnValueOnce(mockedFetchBlocks);
 
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
   });
 
+  const getBlocks = jest.fn((setBlocks: Dispatch<SetStateAction<IBlock[]>>) => {
+    return api.getCached;
+  });
   it('Should render the "Title" and BlockCard Componenet', async () => {
-    renderWithTheme(<BlockCardList blocks={mockedBlocks} precision={6} />);
+    renderWithTheme(
+      <BlockCardList blocks={mockedBlocks} getBlocks={getBlocks} />,
+    );
 
     const blockTitle = screen.getByRole('heading', { name: /Blocks/i });
     const blockCard = screen.getByText(`#${mockedBlocks[0].nonce}`);
@@ -67,12 +75,19 @@ describe('Component: BlockCardList', () => {
   });
 
   it('Should fetch blocks each 4 seconds', async () => {
-    renderWithTheme(<BlockCardList blocks={mockedBlocks} precision={6} />);
+    let blockCards = renderWithTheme(
+      <BlockCardList blocks={mockedBlocks} getBlocks={getBlocks} />,
+    );
 
     await waitFor(
       () => {
-        expect(api.get).toHaveBeenCalled();
-        expect(api.get).toReturnWith(mockedFetchBlocks);
+        expect(getBlocks).toHaveBeenCalled();
+        blockCards = renderWithTheme(
+          <BlockCardList
+            blocks={mockedFetchBlocks.data.blocks}
+            getBlocks={getBlocks}
+          />,
+        );
       },
       { timeout: 5000 },
     );
@@ -80,12 +95,15 @@ describe('Component: BlockCardList', () => {
     const {
       data: { blocks },
     } = mockedFetchBlocks;
+
     const block = screen.getByText(`#${blocks[0].nonce}`);
     expect(block).toBeInTheDocument();
   });
 
   it('Should match the style for the component', () => {
-    renderWithTheme(<BlockCardList blocks={mockedBlocks} precision={6} />);
+    renderWithTheme(
+      <BlockCardList blocks={mockedBlocks} getBlocks={getBlocks} />,
+    );
     const blockTitle = screen.getByRole('heading', { name: /Blocks/i });
     const section = blockTitle.parentNode;
     const blockTitleStyle = {

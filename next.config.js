@@ -27,4 +27,5 @@ const getEnvs = () => {
 module.exports = withImages({
   env: getEnvs(),
   i18n,
+  reactStrictMode: false,
 });

@@ -49,9 +49,13 @@ import {
   showAssetIDInput,
 } from './utils';
 
+type ProposalsList = {
+  label: string;
+  value: number;
+};
 interface IContract {
   assetsList: ICollectionList[];
-  proposalsList: any[];
+  proposalsList: ProposalsList[];
   paramsList: IParamList[];
   kAssets: IKAssets[];
   getAssets: () => void;
@@ -75,7 +79,7 @@ const Contract: React.FC<IContract> = ({
   const [txHash, setTxHash] = useState<string | null>(null);
   const [claimType, setClaimType] = useState(0);
   const [typeAssetTrigger, setTypeAssetTrigger] = useState<number | null>(null);
-  const [data, setData] = useState('');
+  const [data, setData] = useState<string>('');
   const [isMultisig, setIsMultisig] = useState(false);
   const [showPayload, setShowPayload] = useState(false);
   const [payload, setPayload] = useState<any>({});
@@ -93,8 +97,8 @@ const Contract: React.FC<IContract> = ({
     return sessionStorage.getItem('walletAddress') || '';
   };
 
-  const collectionRef = useRef<any>(null);
-  const contractRef = useRef<any>(null);
+  const collectionRef = useRef<string | null>(null);
+  const contractRef = useRef<string | null>(null);
 
   useEffect(() => {
     setAssetBalance(null);
@@ -143,7 +147,7 @@ const Contract: React.FC<IContract> = ({
     if (contractType === 'DelegateContract') {
       setBucketsCollection(['KFI', 'KLV']);
     } else if (contractType === 'UndelegateContract') {
-      const buckets: any = [];
+      const buckets: ProposalsList[] = [];
       assetsList?.forEach((asset: any) => {
         asset?.buckets?.forEach((bucket: any) => {
           if (bucket?.delegation !== getOwnerAddress()) {
@@ -171,7 +175,7 @@ const Contract: React.FC<IContract> = ({
   }, [collection]);
 
   useEffect(() => {
-    const buckets: any = [];
+    const buckets: ProposalsList[] = [];
 
     bucketsCollection.forEach((collection: string) => {
       assetsList.forEach((item: any) => {
@@ -339,7 +343,7 @@ const Contract: React.FC<IContract> = ({
       }
     } catch (e: any) {
       setLoading(false);
-      console.log(`%c ${e}`, 'color: red');
+      console.warn(`%c ${e}`, 'color: red');
       toast.error(e.message ? e.message : e);
     }
   };

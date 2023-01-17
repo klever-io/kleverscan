@@ -81,12 +81,68 @@ interface IParsedVoter {
   status: string;
 }
 
+interface IProposalVoters {
+  proposalVotersProps: {
+    totalPages: number;
+    scrollUp: boolean;
+    request?: (page: number, limit: number) => Promise<any>;
+    data: IParsedVoter[];
+    dataName: string;
+  };
+}
+
+const ProposalVoters = (props: IProposalVoters) => {
+  const rowSections = (props: IParsedVote): IRowSection[] => {
+    const { status, voter, votingPower, voteDate } = props;
+
+    let sections = [{ element: <></>, span: 1 }];
+    sections = [
+      {
+        element: (
+          <CenteredRow key={voter}>
+            <Link href={`/account/${voter}`}>{parseAddress(voter, 24)}</Link>
+            <Copy data={voter} info="voter"></Copy>
+          </CenteredRow>
+        ),
+        span: 2,
+      },
+      { element: <p key={votingPower}>{votingPower}%</p>, span: 1 },
+      {
+        element: (
+          <StatusContent key={status}>
+            <AiFillCheckCircle
+              color={typeVoteColors[status]}
+              size={18}
+              style={{ marginRight: 5 }}
+            />
+            <small>{voteDate}</small>
+          </StatusContent>
+        ),
+        span: 1,
+      },
+    ];
+
+    return sections;
+  };
+
+  const proposalTableProps = props.proposalVotersProps;
+
+  const tableProps: ITable = {
+    header: ['Voter', 'Voting Power', 'Vote date'],
+    rowSections,
+    type: 'votes',
+    ...proposalTableProps,
+  };
+
+  return <Table {...tableProps} />;
+};
+
 const ProposalDetails: React.FC<IParsedProposal> = props => {
   const [status, setStatus] = useState('');
   const StatusIcon = getStatusIcon(status);
   const precision = 6;
   const proposalAPI: IParsedProposal = props;
-  const { votingPowers, totalStaked, description, pagination } = proposalAPI;
+  const { totalStaked, description, pagination } = proposalAPI;
   const [filterVoters, setFilterVoters] = useState({
     Yes: 0,
     No: 0,
@@ -98,7 +154,6 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
   const [votedQty, setVotedQty] = useState(0);
   const [expandData, setExpandData] = useState(false);
   const [totalVoted, setTotalVoted] = useState(0);
-  const [votersList, setVotersList] = useState<IParsedVoter[]>([]);
   const [selectedFilter, setSelectedFilter] = useState('Yes');
   const [votesPercentage, setVotesPercentage] = useState('');
   const { isMobile, isTablet } = useMobile();
@@ -181,25 +236,6 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
     setFilterVoters(tempFilterVoters);
   }, []);
 
-  const getQtyStatus = useCallback(
-    (status: string) => {
-      let qtyStatus = 0;
-
-      votersList.forEach((item: any) => {
-        if (item.status === status) {
-          qtyStatus += 1;
-        }
-      });
-
-      return qtyStatus;
-    },
-    [votersList],
-  );
-
-  const filterVotersList = (type: string) => {
-    return votersList.filter(vote => vote.status === type);
-  };
-
   const renderProposalParams = useCallback(() => {
     return proposalAPI?.parsedParameters.map(param => (
       <div key={param.paramIndex}>
@@ -242,46 +278,21 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
     );
   };
 
-  const rowSections = (vote: IParsedVote): IRowSection[] => {
-    const { status, voter, votingPower, voteDate } = vote;
-
-    let sections = [{ element: <></>, span: 1 }];
-    if (status === selectedFilter) {
-      sections = [
-        {
-          element: (
-            <CenteredRow key={voter}>
-              <Link href={`/account/${voter}`}>{parseAddress(voter, 24)}</Link>
-              <Copy data={voter} info="voter"></Copy>
-            </CenteredRow>
-          ),
-          span: 2,
-        },
-        { element: <p key={votingPower}>{votingPower}%</p>, span: 1 },
-        {
-          element: (
-            <StatusContent key={status}>
-              <AiFillCheckCircle
-                color={typeVoteColors[status]}
-                size={18}
-                style={{ marginRight: 5 }}
-              />
-              <small>{voteDate}</small>
-            </StatusContent>
-          ),
-          span: 1,
-        },
-      ];
+  const requestVoters = async (page: number, limit: number) => {
+    let response;
+    if (selectedFilter === 'Yes') {
+      response = await api.get({
+        route: `proposals/${proposalAPI.proposalId}`,
+        query: { pageVoters: page, limitVoters: limit, voteType: 0 },
+      });
+    } else {
+      response = await api.get({
+        route: `proposals/${proposalAPI.proposalId}`,
+        query: { pageVoters: page, limitVoters: limit, voteType: 1 },
+      });
     }
 
-    return sections;
-  };
-
-  const requestVoters = async (page: number, limit: number) => {
-    const voters = await api.get({
-      route: `proposals/${proposalAPI.proposalId}?pageVoters=${page}&limitVoters=${limit}`,
-    });
-    if (voters.error) {
+    if (response.error) {
       return {
         data: { voters: [] },
         pagination: {
@@ -295,28 +306,33 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
       };
     }
 
-    const parsedVotersResponse = voters?.data?.proposal;
+    const parsedVotersResponse = response?.data?.proposal;
     const votesFormatted = validateFormattedVotes(parsedVotersResponse);
-    setVotersList(votesFormatted);
     return {
       data: { voters: votesFormatted },
-      pagination: voters.data?.proposal?.votersPage,
+      pagination: response.data?.proposal?.votersPage,
     };
   };
 
-  const tableProps: ITable = {
-    header: ['Voter', 'Voting Power', 'Vote date'],
-    type: 'votes',
-    rowSections,
-    data: votersList,
+  const tableProps = {
     totalPages: pagination?.totalPages,
     scrollUp: false,
     request: requestVoters,
+    data: validateFormattedVotes(props),
     dataName: 'voters',
   };
 
-  const tablePropsYes = { ...tableProps, data: filterVotersList('Yes') };
-  const tablePropsNo = { ...tableProps, data: filterVotersList('No') };
+  const SelectedTabComponent: React.FC = () => {
+    switch (selectedFilter) {
+      case 'Yes':
+        return <ProposalVoters proposalVotersProps={{ ...tableProps }} />;
+
+      case 'No':
+        return <ProposalVoters proposalVotersProps={{ ...tableProps }} />;
+      default:
+        return <div />;
+    }
+  };
 
   return (
     <>
@@ -486,20 +502,14 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                       onClick={() => setSelectedFilter(item)}
                       selected={selectedFilter === item}
                     >
-                      <strong>
-                        {item} ({getQtyStatus(item)})
-                      </strong>
+                      <strong>{item}</strong>
                     </OptionValidator>
                   );
                 })}
               </FiltersValidators>
             </div>
           </ValidatorsContainer>
-          {selectedFilter === 'Yes' ? (
-            <Table {...tablePropsYes} />
-          ) : (
-            <Table {...tablePropsNo} />
-          )}
+          <SelectedTabComponent />
         </Container>
       )}
     </>
@@ -548,11 +558,12 @@ export const getProposalNetworkParams = (
 export const getServerSideProps: GetServerSideProps<IProposal> = async ({
   params,
 }) => {
-  let props: any = {};
+  let props: IParsedProposal = {} as IParsedProposal;
 
   const proposalInfosCall = new Promise(async (resolve, reject) => {
     const res = await api.get({
       route: `proposals/${params?.number}`,
+      query: { voteType: 0 },
     });
 
     if (!res.error || res.error === '') {
@@ -612,7 +623,7 @@ export const getServerSideProps: GetServerSideProps<IProposal> = async ({
   });
 
   if (!props) {
-    props = {};
+    props = {} as IParsedProposal;
   }
 
   return { props };

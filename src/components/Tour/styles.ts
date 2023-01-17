@@ -1,16 +1,42 @@
 import { transparentize } from 'polished';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-export const TourContainer = styled.div`
-  position: relative;
+interface IPlacement {
+  contentWidth: number;
+  contentHeight: number;
+  position?: {
+    left: number;
+    top: number;
+    bottom: number;
+    right: number;
+  };
+}
+
+export const TourContainer = styled.div<IPlacement>`
+  position: absolute;
+  top: ${props => props.position?.top || 0}px;
+  left: ${props => props.position?.left || 0}px;
   z-index: 2000;
   border-radius: 0.5rem;
-  width: 100%;
-  height: 100%;
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    width: 100%;
-  }
+  width: ${props => props.contentWidth}px;
+  height: ${props => props.contentHeight}px;
 `;
+
+export const PlacementReference = styled.div<{ isVisibile: boolean }>`
+  all: inherit;
+
+  ${props =>
+    props.isVisibile
+      ? css`
+          visibility: visible;
+          opacity: 1;
+        `
+      : css`
+          visibility: hidden;
+          opacity: 0;
+        `}
+`;
+
 export const ContainerAttention = styled.div`
   animation: animate 2s ease-in-out infinite;
   @keyframes animate {
@@ -30,12 +56,16 @@ export const ContainerAttention = styled.div`
   }
 `;
 export const TourContent = styled.div`
+  position: relative;
   width: fit-content;
+  z-index: 200000 !important;
+
+  isolation: isolate;
 `;
 
 export const TourBackground = styled.div<{ isOpen?: boolean }>`
   position: fixed;
-  top: 4.6rem;
+  top: 0;
   left: 0;
   width: 100%;
   height: 100%;
@@ -44,112 +74,75 @@ export const TourBackground = styled.div<{ isOpen?: boolean }>`
   visibility: ${props => (props.isOpen ? 'visible' : 'hidden')};
   opacity: ${props => (props.isOpen ? 1 : 0)};
   transition: all 0.1s linear;
-  z-index: 100 !important;
-
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    top: 5.8rem;
-  }
-
-  @media (max-width: 804px) {
-    top: 8rem;
-  }
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    top: 4.5rem;
-  }
+  z-index: 1;
 `;
 
-export const BackgroundBlockNavigation = styled.div<{ isOpen?: boolean }>`
+export const TourTooltip = styled.div<IPlacement>`
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 75%;
-  height: 4.5rem;
-
-  background-color: ${props => transparentize(1, props.theme.true.black)};
-  visibility: ${props => (props.isOpen ? 'visible' : 'hidden')};
-  opacity: ${props => (props.isOpen ? 1 : 0)};
-  transition: all 0.1s linear;
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 67%;
-    height: 6.5rem;
-  }
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    width: 64%;
-    height: 4.5rem;
-  }
-`;
-
-export const BackgroundBlockMobileBar = styled.div<{ isOpen?: boolean }>`
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 6rem;
-  height: 4.5rem;
-  background-color: ${props => transparentize(1, props.theme.true.black)};
-  visibility: ${props => (props.isOpen ? 'visible' : 'hidden')};
-  opacity: ${props => (props.isOpen ? 1 : 0)};
-  transition: all 0.1s linear;
-  z-index: 100 !important;
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 6rem;
-    height: 5rem;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 4rem;
-    height: 4rem;
-  }
-`;
-
-export const TourTooltip = styled.div<{ width: number }>`
-  position: absolute;
-  bottom: -0.5rem;
-  left: 0;
-  width: 12rem;
-  transform: translateY(100%)
-    translateX(calc(-1 * (100% - ${props => props.width}px) / 2));
-  padding: 0.8rem;
-  border-radius: 5%;
-  text-align: center;
-  background: ${props => props.theme.true.white};
-  color: ${props => props.theme.purple};
+  top: calc(${props => props.position?.bottom || 0}px + 1rem);
+  left: ${props => props.position?.left || 0}px;
+  transform: translateX(
+    calc(-1 * (100% - ${props => props.contentWidth}px) / 2)
+  );
   z-index: 1000;
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    position: fixed;
-    right: unset;
-    bottom: unset;
-    left: unset;
-    top: -4rem;
-    right: -2rem;
-    width: 10rem;
-  }
-`;
+  width: 12rem;
+  padding: 0.8rem;
 
-export const Arrow = styled.div`
-  box-sizing: border-box;
-  position: absolute;
-  left: 3.5rem;
-  top: 3rem;
-  transform: rotate(-45deg);
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    top: 3.2rem;
-    left: 0.4rem;
-  }
-  &::before {
+  border-radius: 5%;
+  text-align: center;
+
+  background: ${props => props.theme.true.white};
+  color: ${props => props.theme.purple};
+
+  user-select: none;
+
+  ::before {
     content: '';
-    width: 100%;
-    height: 100%;
-    border-width: 1rem 1rem 1rem 0;
+
+    position: absolute;
+
+    width: 1rem;
+    height: 1rem;
+    border-width: 1rem 1rem 1rem 1rem;
     border-style: solid;
     border-color: #fafafa;
 
+    z-index: -1;
+
     display: block;
+    box-sizing: border-box;
+    left: 50%;
+    top: -0.5rem;
+    transform: translateX(-50%) rotate(-45deg);
+  }
+`;
+
+export const DismissButton = styled.div`
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translateY(100%) translateX(-50%);
+
+  padding: 0.25rem 1rem 0.25rem 0.2rem;
+
+  font-size: 0.9rem;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+
+  cursor: pointer;
+
+  color: ${props => props.theme.lightGray};
+
+  border-bottom: 1px solid ${props => props.theme.lightGray};
+
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: ${props => props.theme.true.white};
+    border-bottom: 1px solid ${props => props.theme.true.white};
   }
 `;

@@ -63,6 +63,7 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
   useEffect(() => {
     document.body.style.overflow = openDrawer ? 'hidden' : 'visible';
   }, [openDrawer]);
+
   const getAccountBalance = useCallback(async () => {
     if (walletAddress) {
       setLoadingBalance(true);
@@ -101,24 +102,25 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
   return (
     <>
       {!extensionInstalled && (
-        <ConnectContainer>
-          <ConnectButton onClick={handleClick}>
-            <BiWalletAlt size={'1.2em'} />
-            <span>Klever Extension</span>
-          </ConnectButton>
-        </ConnectContainer>
+        <>
+          <ConnectContainer>
+            <ConnectButton onClick={handleClick}>
+              <BiWalletAlt size={'1.2em'} />
+              <span>Klever Extension</span>
+            </ConnectButton>
+          </ConnectContainer>
+          <BackgroundHelper
+            onClick={closeMenu}
+            onTouchStart={closeMenu}
+            opened={openDrawer}
+          />
+          <WalletHelp
+            closeDrawer={() => setOpenDrawer(false)}
+            opened={openDrawer}
+            clickConnectionMobile={clickConnection}
+          />
+        </>
       )}
-
-      <BackgroundHelper
-        onClick={closeMenu}
-        onTouchStart={closeMenu}
-        opened={openDrawer}
-      />
-      <WalletHelp
-        closeDrawer={() => setOpenDrawer(false)}
-        opened={openDrawer}
-        clickConnectionMobile={clickConnection}
-      />
 
       {extensionInstalled && (
         <Tour

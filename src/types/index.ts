@@ -507,6 +507,29 @@ export interface IAssetsPrice {
   kfiPrice: IAssetPrice;
 }
 
+export interface IPrice {
+  TotalVolume: number;
+  TotalCurrencyVolume: number;
+  Currency: string;
+  CurrencyPrice: number;
+  AveragePrice: number;
+  AverageCurrencyPrice: number;
+  Exchanges: [
+    {
+      ExchangeName: string;
+      Symbol: string;
+      Price: number;
+      Volume: number;
+      HighPrice: number;
+      LowPrice: number;
+      PriceVariation: number;
+    },
+  ];
+}
+export interface IHomeProps {
+  kfiPrices: IPrice;
+}
+
 export interface IHome {
   transactionsList: IDailyTransaction[];
   defaultEpochInfo: IEpochInfo;

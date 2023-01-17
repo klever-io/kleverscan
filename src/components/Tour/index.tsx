@@ -50,6 +50,8 @@ const Tour: React.FC<ITourProps> = ({
 
   useEffect(() => {
     if (renderCondition) {
+      document.documentElement.style.overflow = 'hidden';
+
       tooltipRef.current = createPortal(
         <TourTooltip
           contentWidth={tourContentRef.current?.clientWidth || 0}
@@ -88,14 +90,14 @@ const Tour: React.FC<ITourProps> = ({
 
   const handleClose = () => {
     localStorage.setItem(guideName, 'seen');
-    document.documentElement.style.overflow = 'visible';
+    document.documentElement.style.overflow = 'unset';
     setSeen(true);
   };
+
   useEffect(() => {
     if (localStorage.getItem(guideName) === 'seen') {
       return;
     } else {
-      document.documentElement.style.overflow = 'hidden';
       setSeen(false);
     }
   }, [guideName]);

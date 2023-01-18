@@ -3,19 +3,20 @@ import CardDataFetcher from '@/components/Cards/CardDataFetcher';
 import CoinDataFetcher from '@/components/Cards/CoinDataFetcher';
 import HomeTransactions from '@/components/HomeTransactions';
 import api from '@/services/api';
+import { IHomeProps, Service } from '@/types';
 import { IBlock } from '@/types/blocks';
-import HomeStaticProps from '@/utils/ServerSideProps/Home';
 import {
   Container,
   DataCardsContainer,
   DataContainer,
   Input,
 } from '@/views/home';
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React, { useCallback, useEffect } from 'react';
-import { IHome } from '../types';
+import nextI18NextConfig from '../../next-i18next.config';
 
-const Home: React.FC<IHome> = () => {
+const Home: React.FC<IHomeProps> = ({ kfiPrices }) => {
   const precision = 6; // default KLV precision
 
   const [blocks, setBlocks] = React.useState<IBlock[]>([]);
@@ -45,7 +46,7 @@ const Home: React.FC<IHome> = () => {
 
         <DataCardsContainer>
           <CardDataFetcher block={blocks?.[0]} />
-          <CoinDataFetcher />
+          <CoinDataFetcher kfiPrices={kfiPrices} />
         </DataCardsContainer>
       </DataContainer>
 
@@ -55,6 +56,30 @@ const Home: React.FC<IHome> = () => {
   );
 };
 
-export const getStaticProps: GetStaticProps = HomeStaticProps;
+export const getServerSideProps: GetServerSideProps = async ({
+  locale = 'en',
+}) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'blocks', 'transactions'],
+    nextI18NextConfig,
+  );
+
+  const res = await api.post({
+    route: `coinstats`,
+    service: Service.PRICE,
+    body: {
+      ID: 'kfi',
+      Name: 'kfi',
+      Currency: 'USD',
+    },
+  });
+
+  if (!res.error || res.error === '') {
+    props['kfiPrices'] = res;
+  }
+
+  return { props };
+};
 
 export default Home;

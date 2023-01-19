@@ -1,4 +1,5 @@
 import { Copy as CopyIcon } from '@/assets/icons';
+import * as clipboard from 'clipboard-polyfill';
 import React, { Fragment } from 'react';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
@@ -16,7 +17,7 @@ const IconContainer = styled.div`
 
 const Copy: React.FC<ICopyProps> = ({ data, info = 'Text', children }) => {
   const handleCopyInfo = async () => {
-    await navigator.clipboard.writeText(String(data));
+    await clipboard.writeText(String(data));
 
     toast.info(`${info} copied to clipboard`, {
       autoClose: 2000,

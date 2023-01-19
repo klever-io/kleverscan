@@ -2,11 +2,12 @@ import { KLV } from '@/assets/coins';
 import Copy from '@/components/Copy';
 import Tour from '@/components/Tour';
 import { useExtension } from '@/contexts/extension';
+import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import { useScroll } from '@/utils/hooks';
 import Link from 'next/link';
 import { QRCodeSVG } from 'qrcode.react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { AiOutlineClose } from 'react-icons/ai';
 import { BiLogOut, BiWalletAlt } from 'react-icons/bi';
@@ -24,17 +25,27 @@ import {
   BodyContent,
   ConnectButton,
   ConnectContainer,
+  ContainerAsset,
+  DropdownIcon,
   HeaderInfo,
   IoReloadSharpWrapper,
+  OtherAssetsContainer,
   QRCodeContainer,
   QRCodeContent,
   ReloadContainer,
+  SpanDropdown,
   UserInfoContainer,
 } from './styles';
 
 interface IConnectWallet {
   clickConnection: () => void;
 }
+
+interface IAssetBalance {
+  assetId: string;
+  balance: string;
+}
+
 const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openUserInfos, setOpenUserInfos] = useState(false);
@@ -43,7 +54,12 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
   }>({
     klv: 0,
   });
+  const [primaryAsset, setPrimaryAsset] = useState<IAssetBalance[]>([]);
+  const [otherAssets, setOtherAssets] = useState<IAssetBalance[]>([]);
+  const [expandAssets, setExpandAssets] = useState<boolean>(false);
   const [loadingBalance, setLoadingBalance] = useState<boolean>(false);
+  const closeTimeout = useRef<NodeJS.Timeout | null>(null);
+  const { isMobile } = useMobile();
 
   const {
     walletAddress,
@@ -72,14 +88,26 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
       });
       if (!res.error || res.error === '') {
         const klvAvailableBalance = res?.data?.account?.balance;
-        if (typeof klvAvailableBalance === 'number') {
-          setBalance({ klv: formatAmount(klvAvailableBalance / 10 ** 6) });
+        const accountAssets = res?.data?.account.assets;
+        if (accountAssets) {
+          const otherAssets: any = [];
+          Object.values(accountAssets).map((asset: any) => {
+            otherAssets.push({
+              assetId: asset.assetId,
+              balance: formatAmount(asset.balance / 10 ** asset.precision),
+            });
+          });
+          setOtherAssets(otherAssets);
+          if (typeof klvAvailableBalance === 'number') {
+            setBalance({ klv: formatAmount(klvAvailableBalance / 10 ** 6) });
+            setLoadingBalance(false);
+          }
           setLoadingBalance(false);
         }
       }
 
       if (res.error === 'cannot find account in database') {
-        setBalance({ klv: 0 });
+        setOtherAssets([{ assetId: 'KLV', balance: '0' }]);
         setLoadingBalance(false);
       }
     }
@@ -91,12 +119,47 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
 
   useScroll(openUserInfos, () => setOpenUserInfos(false));
 
+  useEffect(() => {
+    if (localStorage.getItem('primaryAsset')) {
+      const getPrimaryAsset: IAssetBalance = JSON.parse(
+        localStorage.getItem('primaryAsset') as any,
+      );
+      setPrimaryAsset([getPrimaryAsset]);
+    }
+  }, []);
+
   const connectAndOpen = () => {
     if (!walletAddress) {
       connectExtension();
     } else {
       setOpenUserInfos(!openUserInfos);
     }
+  };
+
+  const handleMouseEnter = () => {
+    closeTimeout.current !== null && clearTimeout(closeTimeout.current);
+  };
+
+  const handleMouseLeave = () => {
+    const seconds = !isMobile && !(screen.width < 1024) ? 500 : 100;
+    closeTimeout.current !== null && clearTimeout(closeTimeout.current);
+    closeTimeout.current = setTimeout(() => {
+      setExpandAssets(false);
+    }, seconds);
+  };
+
+  const dropdownProps = {
+    onMouseOver: handleMouseEnter,
+    onMouseLeave: handleMouseLeave,
+  };
+
+  const onClickSetAssetPrimary = (assetId: string, balance: string) => {
+    const assetObj = { assetId, balance };
+    localStorage.setItem('primaryAsset', JSON.stringify(assetObj));
+    const getPrimaryAsset: IAssetBalance = JSON.parse(
+      localStorage.getItem('primaryAsset') as any,
+    );
+    setPrimaryAsset([getPrimaryAsset]);
   };
 
   return (
@@ -158,7 +221,7 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
       )}
       {walletAddress &&
         ReactDOM.createPortal(
-          <UserInfoContainer openUserInfos={openUserInfos}>
+          <UserInfoContainer openUserInfos={openUserInfos} isMobile={isMobile}>
             <HeaderInfo>
               <div>
                 <BiWalletAlt size={'1em'} />
@@ -181,16 +244,63 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
                 <small>{parseAddress(walletAddress, 25)}</small>
               )}
 
-              <ReloadContainer onClick={getAccountBalance}>
+              <ReloadContainer>
                 <BalanceContainer>
-                  <span>
-                    {balance['klv'] !== undefined ? balance['klv'] : '---'}
-                  </span>
-                  <KLV />
+                  <ContainerAsset
+                    onClick={() => setExpandAssets(!expandAssets)}
+                  >
+                    {primaryAsset.length > 0 ? (
+                      <>
+                        <>
+                          <span>{primaryAsset[0].balance || '---'}</span>
+                          {primaryAsset[0].assetId === 'KLV' ? (
+                            <KLV />
+                          ) : (
+                            <span>{primaryAsset[0].assetId}</span>
+                          )}
+                        </>
+                      </>
+                    ) : (
+                      <>
+                        <span>
+                          {balance['klv'] !== undefined
+                            ? balance['klv']
+                            : '---'}
+                        </span>
+                        <KLV />
+                      </>
+                    )}
+                    <SpanDropdown {...dropdownProps}>
+                      <DropdownIcon openOtherAssets={!expandAssets} />
+                      {expandAssets && otherAssets.length > 0 && (
+                        <OtherAssetsContainer isMobile={isMobile}>
+                          {otherAssets.map((asset: any) => (
+                            <div
+                              key={asset.assetId}
+                              onClick={() => {
+                                onClickSetAssetPrimary(
+                                  asset.assetId,
+                                  asset.balance,
+                                );
+                                setExpandAssets(false);
+                              }}
+                            >
+                              <span>{asset.balance}</span>
+                              <p>{asset.assetId}</p>
+                            </div>
+                          ))}
+                        </OtherAssetsContainer>
+                      )}
+                    </SpanDropdown>
+                  </ContainerAsset>
+                  <IoReloadSharpWrapper
+                    onClick={getAccountBalance}
+                    loading={loadingBalance}
+                    openOtherAssets={!expandAssets}
+                  >
+                    <IoReloadSharp />
+                  </IoReloadSharpWrapper>
                 </BalanceContainer>
-                <IoReloadSharpWrapper loading={loadingBalance}>
-                  <IoReloadSharp />
-                </IoReloadSharpWrapper>
               </ReloadContainer>
             </QRCodeContainer>
             <BodyContent>

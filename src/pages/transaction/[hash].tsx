@@ -35,14 +35,11 @@ import {
 import { useTheme } from '@/contexts/theme/index';
 import api from '@/services/api';
 import { IBlock } from '@/types/blocks';
-import {
-  Contract,
-  IBuyITOsTotalPrices,
-  IIndexedContract,
-} from '@/types/contracts';
+import { Contract, IIndexedContract } from '@/types/contracts';
 import { IAsset, IResponse, ITransaction } from '@/types/index';
 import {
   capitalizeString,
+  formatDate,
   hexToString,
   isDataEmpty,
   parseJson,
@@ -66,7 +63,6 @@ import {
   Row,
 } from '@/views/transactions/detail';
 import { ReceiveBackground } from '@/views/validator';
-import { format, fromUnixTime } from 'date-fns';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
@@ -100,8 +96,6 @@ const Transaction: React.FC<ITransactionPage> = props => {
   const [expandData, setExpandData] = useState(false);
   const { transaction, block } = props;
   const { isDarkTheme } = useTheme();
-  const [totalAssetsPrices, setTotalAssetsPrices] =
-    useState<IBuyITOsTotalPrices>({});
   const ReactJson = dynamic(import('react-json-view'), { ssr: false });
   const {
     hash,
@@ -588,9 +582,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
               <strong>Time</strong>
             </span>
             <span>
-              <p>
-                {format(fromUnixTime(timestamp / 1000), 'dd/MM/yyyy HH:mm')}
-              </p>
+              <p>{formatDate(timestamp)}</p>
             </span>
           </Row>
           <Row>

@@ -5,6 +5,7 @@ import {
   IKAppTransferReceipt,
   ITransferReceipt,
 } from '@/types/receipts';
+import { format, fromUnixTime } from 'date-fns';
 import { TFunction } from 'next-i18next';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { NextRouter } from 'next/router';
@@ -107,6 +108,14 @@ export const getAge = (date: Date, t?: TFunction): string => {
   }
   return `${val} ${suffix}${val > 1 ? 's' : ''}`;
 };
+
+/**
+ * given a timestamp returns a human readable date string in the format MM/dd/yyyy HH:mm
+ * @param timestamp number
+ * @returns a formatted date in a string type
+ */
+export const formatDate = (timestamp: number): string =>
+  format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm');
 
 export const typeVoteColors = {
   Yes: '#B039BF',

@@ -23,7 +23,6 @@ import {
   MultiContractCounter,
 } from '@/views/transactions';
 import { Input } from '@/views/transactions/detail';
-import { format, fromUnixTime } from 'date-fns';
 import { GetServerSideProps } from 'next';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import Link from 'next/link';
@@ -47,6 +46,7 @@ import {
 import {
   capitalizeString,
   formatAmount,
+  formatDate,
   parseAddress,
   passViewportStyles,
 } from '../../utils';
@@ -188,11 +188,7 @@ const Transactions: React.FC<ITransactions> = ({
       },
 
       {
-        element: (
-          <small key={timestamp}>
-            {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
-          </small>
-        ),
+        element: <small key={timestamp}>{formatDate(timestamp)}</small>,
         span: 1,
       },
       {
@@ -321,33 +317,32 @@ const Transactions: React.FC<ITransactions> = ({
   );
 };
 
-export const getServerSideProps: GetServerSideProps<
-  ITransactions
-> = async context => {
-  const props: ITransactions = {
-    transactions: [],
-    pagination: {} as IPagination,
-    assets: [],
+export const getServerSideProps: GetServerSideProps<ITransactions> =
+  async context => {
+    const props: ITransactions = {
+      transactions: [],
+      pagination: {} as IPagination,
+      assets: [],
+    };
+
+    const transactions: ITransactionResponse = await api.get({
+      route: 'transaction/list',
+      query: context.query,
+    });
+
+    if (!transactions.error) {
+      props.transactions = transactions?.data?.transactions || [];
+      props.pagination = transactions?.pagination || {};
+    }
+
+    const assets: IAssetResponse = await api.get({
+      route: 'assets/kassets',
+    });
+    if (!assets.error) {
+      props.assets = assets?.data?.assets || [];
+    }
+
+    return { props };
   };
-
-  const transactions: ITransactionResponse = await api.get({
-    route: 'transaction/list',
-    query: context.query,
-  });
-
-  if (!transactions.error) {
-    props.transactions = transactions?.data?.transactions || [];
-    props.pagination = transactions?.pagination || {};
-  }
-
-  const assets: IAssetResponse = await api.get({
-    route: 'assets/kassets',
-  });
-  if (!assets.error) {
-    props.assets = assets?.data?.assets || [];
-  }
-
-  return { props };
-};
 
 export default Transactions;

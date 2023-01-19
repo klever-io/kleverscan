@@ -1,10 +1,9 @@
 import { screen } from '@testing-library/react';
-import { format, fromUnixTime } from 'date-fns';
 import React from 'react';
 import theme from '../../styles/theme';
 import { mockTxItem } from '../../test/mocks';
 import { renderWithTheme } from '../../test/utils';
-import { parseAddress } from '../../utils';
+import { formatDate, parseAddress } from '../../utils';
 import TransactionItem, { IContract } from './';
 
 jest.mock('react-i18next', () => ({
@@ -26,15 +25,13 @@ jest.mock('react-i18next', () => ({
 }));
 
 describe('Component: TransactionItem', () => {
-  it('Should render hash, timestamp ( formated ), sender, toAddress and amount', () => {
+  it('Should render hash, timestamp ( formatted ), sender, toAddress and amount', () => {
     renderWithTheme(<TransactionItem {...mockTxItem} precision={6} />);
 
     const contract = mockTxItem.contract[0] as IContract;
 
     const hash = screen.getByRole('link', { name: 'a632bece34e0716...' });
-    const timeStamp = screen.getByText(
-      format(fromUnixTime(mockTxItem.timestamp / 1000), 'MM/dd/yyyy HH:mm'),
-    );
+    const timeStamp = screen.getByText(formatDate(mockTxItem.timestamp));
     const sender = screen.getByRole('link', {
       name: parseAddress(mockTxItem.sender, 12),
     });

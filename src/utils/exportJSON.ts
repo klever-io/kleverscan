@@ -47,9 +47,9 @@ export const txParserSwitch = async (
 ): Promise<string | number | IContract[] | IReceipt[]> => {
   switch (key) {
     case 'bandwidthFee':
-      return (value as number) / 10 ** 6, 6;
+      return (value as number) / 10 ** 6;
     case 'kAppFee':
-      return (value as number) / 10 ** 6, 6;
+      return (value as number) / 10 ** 6;
     case 'timestamp':
       return formatDate(value as number);
     case 'contract':
@@ -80,7 +80,7 @@ export const contractParserSwitch = async (
       parameter = contract.parameter as ITransferContract;
       assetId = parameter?.assetId?.split('/')[0] || 'KLV';
       precision = await getPrecision(assetId);
-      (parameter.amount = parameter.amount / 10 ** precision), precision;
+      parameter.amount = parameter.amount / 10 ** precision;
       break;
     default:
       throw new Error('Contract type not found.');
@@ -106,8 +106,7 @@ export const receiptParserSwitch = async (
       specificReceipt = receipt as ITransferReceipt;
       assetId = specificReceipt.assetId;
       precision = await getPrecision(assetId);
-      (specificReceipt.value = specificReceipt.value / 10 ** precision),
-        precision;
+      specificReceipt.value = specificReceipt.value / 10 ** precision;
       break;
     default:
       break;

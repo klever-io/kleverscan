@@ -105,6 +105,18 @@ export const RowContent = styled.span`
   width: 100%;
 `;
 
+export const ButtonModal = styled.button`
+  color: ${props => props.theme.true.white};
+  background-color: ${props => props.theme.violet};
+  padding: 0 0.6rem;
+  border-radius: 0.5rem;
+  :active {
+    transform: translateY(0.1rem);
+  }
+  :hover {
+    opacity: 0.8;
+  }
+`;
 export const CenteredRow = styled.div`
   display: flex;
 
@@ -162,6 +174,14 @@ export const AmountContainer = styled.div`
       color: ${props => props.theme.darkText};
       margin-top: 0.2rem;
       margin-bottom: 0.2rem;
+    }
+  }
+  div:nth-child(2) {
+    display: flex;
+    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+      width: auto;
+      flex-direction: column;
+      gap: 0.5rem;
     }
   }
 `;

@@ -1,6 +1,7 @@
 import { transparentize } from 'polished';
 import { BiTransfer } from 'react-icons/bi';
 import { IoIosLogOut } from 'react-icons/io';
+import { MdArrowDropDown } from 'react-icons/md';
 import styled, { keyframes } from 'styled-components';
 
 export const ConnectButton = styled.div`
@@ -266,10 +267,114 @@ export const BalanceContainer = styled.span`
   color: ${props => props.theme.violet};
   display: flex;
   align-items: center;
-  gap: 0.5rem;
   justify-content: center;
   width: 100%;
-  padding: 0 3.5rem;
+  gap: 0.5rem;
+  padding: 0 0 0 1.5rem;
+  white-space: nowrap;
+  cursor: pointer;
+`;
+
+export const ContainerAsset = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+`;
+
+export const SpanDropdown = styled.div`
+  display: flex;
+  svg {
+    cursor: pointer;
+  }
+`;
+
+export const DropdownIcon = styled(MdArrowDropDown)<{
+  openOtherAssets: boolean;
+}>`
+  font-size: 2rem;
+  transform: rotate(${props => (props.openOtherAssets ? 0 : 180)}deg);
+`;
+
+export const FadeIn = keyframes`
+  from {
+    opacity: 0.1;
+    transform: translateX(-25%) translateY(-4px);
+
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-25%) translateY(0);
+  }
+`;
+
+export const OtherAssetsContainer = styled.div<{ isMobile?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  max-width: 30rem;
+  min-width: 10rem;
+  max-height: 15rem;
+  overflow: auto;
+  position: absolute;
+  top: ${props => (props.isMobile ? '15rem' : '13.5rem')};
+  left: ${props => (props.isMobile ? '8.5rem' : '6.2rem')};
+  padding: 0.75rem 0.75rem;
+  box-shadow: 0 0.4rem 0.8rem 0 rgba(0, 0, 0, 0.2),
+    0 0.6rem 1rem 0 rgba(0, 0, 0, 0.19);
+  background-color: ${props => props.theme.card.assetText};
+  border-radius: 0.5rem;
+  transform: translateX(-25%);
+  animation: ${FadeIn} 0.1s ease-in-out;
+  z-index: 1000;
+
+  div {
+    display: flex;
+    white-space: nowrap;
+    cursor: pointer;
+    gap: 0.4rem;
+    width: 100%;
+    max-height: 5rem;
+    min-height: 1.6rem;
+    justify-content: flex-end;
+    padding-right: 0.5rem;
+    padding-left: 0.3rem;
+    align-items: center;
+
+    :hover {
+      border-radius: 0.375rem;
+      background-color: ${props => props.theme.footer.border};
+      color: ${props => props.theme.true.white};
+      font-weight: 500;
+    }
+  }
+  span,
+  p {
+    text-overflow: ellipsis;
+    font-weight: 600;
+    color: ${props => props.theme.lightGray};
+    font-size: 0.9rem;
+  }
+
+  &::-webkit-scrollbar {
+    position: absolute;
+    height: 0.5rem;
+    width: 0.4rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 15px;
+  }
+  &:hover {
+    &::-webkit-scrollbar-thumb {
+      background: ${props => transparentize(0.75, props.theme.black)};
+    }
+  }
 `;
 
 const rotate = keyframes`
@@ -285,23 +390,27 @@ export const ReloadContainer = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
-  justify-content: flex-end;
+  justify-content: center;
   min-height: 1.5rem;
-  cursor: pointer;
 `;
 
-export const IoReloadSharpWrapper = styled.span<{ loading: boolean }>`
+export const IoReloadSharpWrapper = styled.div<{
+  loading: boolean;
+  openOtherAssets: boolean;
+}>`
   svg {
-    position: absolute;
-    float: right;
-    bottom: 0.5rem;
-    right: 0.5rem;
+    cursor: pointer;
+    margin-top: 0.3rem;
+    margin-left: auto;
     color: ${props => props.theme.darkText};
     animation: ${props => (props.loading ? rotate : 'none')} 1s linear infinite;
   }
 `;
 
-export const UserInfoContainer = styled.div<{ openUserInfos: boolean }>`
+export const UserInfoContainer = styled.div<{
+  openUserInfos: boolean;
+  isMobile: boolean;
+}>`
   position: fixed;
   top: 4.4rem;
   right: 5.6rem;
@@ -317,8 +426,8 @@ export const UserInfoContainer = styled.div<{ openUserInfos: boolean }>`
   display: flex;
   flex-direction: column;
 
-  width: 20rem;
-
+  width: ${props => (props.isMobile ? '95vw' : '20rem')};
+  max-width: 25rem;
   border: 1px solid ${props => props.theme.card.border};
   border-radius: 0.375rem;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);

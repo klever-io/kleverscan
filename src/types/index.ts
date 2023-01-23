@@ -196,16 +196,20 @@ export interface IAccount {
   collection: INfts[];
 }
 
-export interface IHolder {
+export interface IHolders {
   holders: IBalance[];
   asset: IAsset;
   holdersTableProps: IInnerTableProps;
+}
+export interface IHolder extends IAccountAsset {
+  totalBalance: number;
 }
 
 export interface IBalance {
   address: string;
   balance: number;
   frozenBalance: number;
+  totalBalance: number;
   index: number;
   rank: number;
 }

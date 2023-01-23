@@ -37,6 +37,11 @@ const darktheme = {
     white: '#ccc',
   },
 
+  modalBackground: {
+    background: '#222345',
+    title: 'linear-gradient(104deg, rgb(238, 63, 113), rgb(125, 63, 241))',
+  },
+
   qrcodeTooltip: {
     background: '#222345',
   },

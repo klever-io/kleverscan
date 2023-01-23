@@ -5,7 +5,7 @@ import Transactions from '@/components/Tabs/Transactions';
 import Validators from '@/components/Tabs/Validators';
 import api from '@/services/api';
 import { IBlock } from '@/types/blocks';
-import { toLocaleFixed } from '@/utils/index';
+import { formatDate, toLocaleFixed } from '@/utils/index';
 import {
   CardContainer,
   CardContent,
@@ -19,7 +19,6 @@ import {
   Input,
   Row,
 } from '@/views/blocks/detail';
-import { format, fromUnixTime } from 'date-fns';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import React, { useState } from 'react';
 import { IPagination, IResponse, ITransaction } from '../../types';
@@ -101,9 +100,7 @@ const Block: React.FC<IBlockPage> = ({
             <strong>Timestamp</strong>
           </CommonSpan>
           <CommonSpan>
-            <small>
-              {format(fromUnixTime(timestamp / 1000), 'dd/MM/yyyy HH:mm')}
-            </small>
+            <small>{formatDate(timestamp)}</small>
           </CommonSpan>
         </Row>
         <Row>

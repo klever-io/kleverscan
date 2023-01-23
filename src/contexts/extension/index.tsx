@@ -75,9 +75,7 @@ export const ExtensionProvider: React.FC = ({ children }) => {
           await core.initialize();
           setExtensionLoading(false);
         }
-
         const address: string = await window.kleverWeb.getWalletAddress();
-
         if (address.startsWith('klv') && address.length === 62) {
           setWalletAddress(address);
           sessionStorage.setItem('walletAddress', address);

@@ -214,6 +214,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
         paramsList={paramsList}
         getAssets={getAssets}
         kAssets={kassetsList}
+        isModal={false}
       />
     </Container>
   );

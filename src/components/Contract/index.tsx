@@ -59,6 +59,8 @@ interface IContract {
   paramsList: IParamList[];
   kAssets: IKAssets[];
   getAssets: () => void;
+  isModal: boolean;
+  modalContractType?: { value: string };
 }
 
 let assetID = 0;
@@ -69,6 +71,8 @@ const Contract: React.FC<IContract> = ({
   paramsList,
   kAssets,
   getAssets,
+  isModal,
+  modalContractType,
 }) => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
@@ -244,9 +248,15 @@ const Contract: React.FC<IContract> = ({
     }
   }, [ITOBuy]);
 
+  useEffect(() => {
+    if (isModal && modalContractType) {
+      setContractType(modalContractType.value);
+      handleOption(modalContractType);
+    }
+  }, [modalContractType]);
+
   const handleOption = (selectedOption: any) => {
     setContractType(selectedOption.value);
-
     switch (selectedOption.value) {
       case 'ProposalContract':
         setFormSections([
@@ -665,17 +675,19 @@ const Contract: React.FC<IContract> = ({
         />
       )}
       {txHash && hashComponent()}
-      <Select
-        options={contractOptions}
-        onChange={contractType => {
-          handleOption(contractType);
-          setIsMultisig(false);
-          setShowPayload(false);
-        }}
-        getAssets={getAssets}
-        title={'Contract'}
-        precedence={1}
-      />
+      {!isModal && (
+        <Select
+          options={contractOptions}
+          onChange={contractType => {
+            handleOption(contractType);
+            setIsMultisig(false);
+            setShowPayload(false);
+          }}
+          getAssets={getAssets}
+          title={'Contract'}
+          precedence={1}
+        />
+      )}
 
       {contractsDescription[contractType] && (
         <CardContainer>

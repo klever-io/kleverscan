@@ -115,6 +115,11 @@ const theme = {
       'linear-gradient(104deg, rgb(238, 63, 113), rgb(125, 63, 241), rgb(125, 63, 241), rgb(238, 63, 113))',
   },
 
+  modalBackground: {
+    background: '#EBF1F8',
+    title: '#0B0B1E',
+  },
+
   table: {
     text: '#7B7DB2',
     success: '#4EBC87',

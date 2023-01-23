@@ -1,0 +1,185 @@
+import { useExtension } from '@/contexts/extension';
+import api from '@/services/api';
+import { ICollectionList, IKAssets } from '@/types';
+import { useDidUpdateEffect } from '@/utils/hooks';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { AiOutlineClose } from 'react-icons/ai';
+import Contract from '..';
+import { Container, Content, TitleContent } from './styles';
+
+interface IModalContract {
+  title: string;
+  contractType: string;
+  openModal: boolean;
+  setOpenModal: Dispatch<SetStateAction<boolean>>;
+}
+
+const ModalContract: React.FC<IModalContract> = ({
+  title,
+  contractType,
+  openModal,
+  setOpenModal,
+}) => {
+  const [assetsList, setAssetsLists] = useState<ICollectionList[]>([]);
+  const [kassetsList, setKAssetsList] = useState<IKAssets[]>([]);
+  const { extensionInstalled, connectExtension } = useExtension();
+
+  useDidUpdateEffect(() => {
+    if (extensionInstalled) {
+      connectExtension();
+    }
+  }, [extensionInstalled]);
+
+  const getKAssets = async (address: string) => {
+    const response: any = await api.get({
+      route: `assets/kassets`,
+      query: {
+        owner: address,
+        limit: 10000,
+      },
+    });
+    if (response.error) return;
+
+    const list: IKAssets[] = [];
+
+    if (response?.data?.assets?.length > 0) {
+      response.data.assets.forEach((item: any) => {
+        list.push({
+          label: item.assetId,
+          value: item.assetId,
+          properties: item.properties,
+          isNFT: item.assetType !== 'Fungible',
+          isPaused: item.attributes.isPaused,
+        });
+      });
+
+      setKAssetsList([...list]);
+    }
+  };
+
+  const getAssets = async () => {
+    if (typeof window !== 'undefined') {
+      const address = sessionStorage.getItem('walletAddress') || '';
+
+      getKAssets(address);
+
+      const account: any = await api.get({
+        route: `address/${address}`,
+      });
+
+      if (
+        !account?.data?.account?.assets &&
+        account?.data?.account?.balance === 0
+      ) {
+        setAssetsLists([]);
+        return;
+      }
+
+      const accountData = account?.data?.account
+        ? account.data.account
+        : {
+            assets: [],
+            frozenBalance: 0,
+            balance: 0,
+          };
+
+      const { assets, frozenBalance, balance } = accountData;
+      const list: ICollectionList[] = [];
+      const addAssetsInfo = Object.keys(assets).map(async item => {
+        const assetInfo: any = await api.get({
+          route: `assets/${item}`,
+        });
+
+        const minEpochsToWithdraw =
+          assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
+        const ownerAddress = assetInfo.data?.asset?.ownerAddress;
+        const { assetType, frozenBalance, balance, precision, buckets } =
+          account.data.account.assets[item];
+
+        list.push({
+          label: item,
+          value: item,
+          isNFT: assetType === 1,
+          balance,
+          frozenBalance,
+          precision,
+          buckets,
+          minEpochsToWithdraw: minEpochsToWithdraw ? minEpochsToWithdraw : null,
+          ownerAddress,
+        });
+      });
+
+      await Promise.all(addAssetsInfo);
+
+      if (!Object.keys(assets).includes('KLV') && balance !== 0) {
+        const assetInfo: any = await api.get({
+          route: `assets/KLV`,
+        });
+
+        const minEpochsToWithdraw =
+          assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
+
+        list.push({
+          label: 'KLV',
+          value: 'KLV',
+          isNFT: false,
+          balance,
+          frozenBalance: frozenBalance ? frozenBalance : 0,
+          precision: 6,
+          buckets: [],
+          minEpochsToWithdraw: minEpochsToWithdraw ? minEpochsToWithdraw : null,
+        });
+      }
+      list.sort((a, b) => (a.label > b.label ? 1 : -1));
+
+      const KLV = list.splice(
+        list.indexOf(
+          list.find(item => item.label === 'KLV') as ICollectionList,
+        ),
+        1,
+      );
+
+      const KFI = list.splice(
+        list.indexOf(
+          list.find(item => item.label === 'KFI') as ICollectionList,
+        ),
+        1,
+      );
+
+      setAssetsLists([...KLV, ...KFI, ...list]);
+    }
+  };
+
+  useEffect(() => {
+    getAssets();
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = openModal ? 'hidden' : 'visible';
+  }, [openModal]);
+
+  return (
+    <Container onMouseDown={() => setOpenModal(false)} openModal={openModal}>
+      <Content onMouseDown={e => e.stopPropagation()}>
+        <TitleContent>
+          <h1>{title}</h1>
+          <AiOutlineClose
+            onClick={() => setOpenModal(false)}
+            cursor={'pointer'}
+          />
+        </TitleContent>
+        <Contract
+          isModal={true}
+          assetsList={assetsList}
+          proposalsList={[]}
+          paramsList={[]}
+          getAssets={getAssets}
+          kAssets={kassetsList}
+          modalContractType={{ value: contractType }}
+        />
+      </Content>
+    </Container>
+  );
+};
+
+export default ModalContract;

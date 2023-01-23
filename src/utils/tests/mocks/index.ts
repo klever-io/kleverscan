@@ -360,6 +360,7 @@ const holdersList = {
         precision: 6,
         frozenBalance: 0,
         unfrozenBalance: 0,
+        totalBalance: 500000000000000,
         lastClaim: {
           timestamp: 0,
           epoch: 0,
@@ -375,6 +376,7 @@ const holdersList = {
         precision: 6,
         frozenBalance: 0,
         unfrozenBalance: 0,
+        totalBalance: 500000000000000,
         lastClaim: {
           timestamp: 0,
           epoch: 0,
@@ -390,26 +392,11 @@ const holdersList = {
         precision: 6,
         frozenBalance: 0,
         unfrozenBalance: 0,
+        totalBalance: 500000000000000,
         lastClaim: {
           timestamp: 0,
           epoch: 0,
         },
-      },
-      {
-        address:
-          'klv14ragd2rgqat485vu6ssh4vu9rhmc68mg6vrmkmuhdqda9eeykucqvewgsz',
-        assetId: 'KFI',
-        assetName: 'KLEVER FINANCE',
-        assetType: 0,
-        balance: 2000000000000,
-        precision: 6,
-        frozenBalance: 0,
-        unfrozenBalance: 0,
-        lastClaim: {
-          timestamp: 0,
-          epoch: 0,
-        },
-        buckets: [],
       },
     ],
   },

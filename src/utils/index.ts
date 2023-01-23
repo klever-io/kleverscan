@@ -11,7 +11,6 @@ import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { NextRouter } from 'next/router';
 import { toast } from 'react-toastify';
 import {
-  IAccountAsset,
   IAsset,
   IAssetResponse,
   IBalance,
@@ -21,6 +20,7 @@ import {
   IEpochInfo,
   IFilterDater,
   IFormData,
+  IHolder,
   IMetrics,
   IPagination,
   IPrecisionResponse,
@@ -730,17 +730,18 @@ export const parseValidators = (
  * @returns IBalance[] which is the data necessary for the frontend to show the holders of an asset.
  */
 export const parseHolders = (
-  holders: IAccountAsset[] | [],
+  holders: IHolder[] | [],
   assetId: string,
   pagination: IPagination,
 ): IBalance[] =>
-  holders.map((holder: IAccountAsset, index: number) => {
+  holders.map((holder: IHolder, index: number) => {
     if (holder.assetId === assetId) {
       return {
         index,
         address: holder.address,
-        balance: 0,
+        balance: holder.balance,
         frozenBalance: holder.frozenBalance,
+        totalBalance: holder.totalBalance,
         rank: index + 1 + (pagination.self - 1) * pagination.perPage,
       };
     } else
@@ -749,6 +750,7 @@ export const parseHolders = (
         address: '',
         balance: 0,
         frozenBalance: 0,
+        totalBalance: 0,
         rank: 0,
       };
   });

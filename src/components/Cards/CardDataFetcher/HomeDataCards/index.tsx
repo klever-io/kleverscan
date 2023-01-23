@@ -48,7 +48,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
       title: t('Total Transactions'),
       value: totalTransactions,
       variation: `+ ${newTransactions.toLocaleString()}`,
-      percentage: (newTransactions * 100) / (beforeYesterdayTransactions * 100),
+      percentage: (newTransactions * 100) / beforeYesterdayTransactions - 100,
     },
   ];
 
@@ -126,7 +126,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
                   <span>{t('Last 24h')}</span>
                   <p>{variation}</p>
                   {percentage && (
-                    <ValueDetail positive={true}>
+                    <ValueDetail positive={percentage > 0}>
                       <p>{getVariation(+percentage)}</p>
                     </ValueDetail>
                   )}

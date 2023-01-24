@@ -11,6 +11,7 @@ import { IBlock, IBlocks, ICard } from '@/types/blocks';
 import { IPagination, IRowSection } from '@/types/index';
 import {
   formatAmount,
+  formatDate,
   getAge,
   parseAddress,
   toLocaleFixed,
@@ -30,7 +31,7 @@ import {
   TableHeader,
   UpdateContainer,
 } from '@/views/blocks';
-import { format, fromUnixTime } from 'date-fns';
+import { fromUnixTime } from 'date-fns';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -238,11 +239,7 @@ const Blocks: React.FC<IBlocks> = ({
         span: 1,
       },
       {
-        element: (
-          <small key={timestamp}>
-            {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
-          </small>
-        ),
+        element: <small key={timestamp}>{formatDate(timestamp)}</small>,
         span: 1,
       },
       {

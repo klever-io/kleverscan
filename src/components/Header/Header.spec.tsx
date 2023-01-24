@@ -1,4 +1,4 @@
-import { act, fireEvent, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import * as nextRouter from 'next/router';
 import React from 'react';
 import Navbar from '.';
@@ -45,6 +45,7 @@ describe('Component: Header/navbar', () => {
   });
 
   it('Should render the navbar items ( Logo, Blocks, Accounts, Transactions, Assets, Validatores and More) - desktop version', () => {
+    global.innerWidth = 1500;
     const { container } = renderWithTheme(<Navbar />);
 
     const logo = screen.getByAltText('Logo');
@@ -64,20 +65,23 @@ describe('Component: Header/navbar', () => {
   });
 
   it('Should have the correct style for the navbar items - desktop version', () => {
+    global.innerWidth = 1500;
     const { container } = renderWithTheme(<Navbar />);
 
-    const navbarItem = container.querySelector(
-      'div > div > div:nth-child(1) > div > div:nth-child(1) > div',
-    );
+    const navbarItems = screen.getAllByTestId('navbar-item');
     const style = {
       filter: 'brightness(1)',
       cursor: 'pointer',
       transition: '0.2s ease',
     };
-    expect(navbarItem).toHaveStyle(style);
+
+    navbarItems.forEach((item: any) => {
+      expect(item).toHaveStyle(style);
+    });
   });
 
   it('Should not init with dropdown menu from "More" visible and match the style for the Dropdown" - desktop version', () => {
+    global.innerWidth = 1500;
     const { container } = renderWithTheme(<Navbar />);
 
     const selector = `div > div > div:nth-child(1) > div:nth-child(6) div`;
@@ -99,11 +103,14 @@ describe('Component: Header/navbar', () => {
   });
 
   it('Should appear the navbar menu when click on the icon and when click again should disappear - mobile version', async () => {
+    global.innerWidth = 500;
+
     const { container } = renderWithTheme(<Navbar />);
 
     const mobile = container.firstChild?.lastChild;
     const content = container.lastChild;
-    const button: any = mobile?.lastChild?.lastChild;
+    const button: any = await screen.findByTestId('menu-icon');
+    await screen.debug();
     expect(mobile).toHaveStyle('position: relative');
     expect(content).toHaveStyle({ visibility: 'hidden', opacity: '0' });
     fireEvent.click(button);
@@ -114,6 +121,8 @@ describe('Component: Header/navbar', () => {
   });
 
   it('Should render the navbar items ( Logo, Blocks, Accounts, Transactions, Assets, Validatores and More) - Mobile version', () => {
+    global.innerWidth = 500;
+
     const { container } = renderWithTheme(<Navbar />);
     const logo = screen.getByAltText('Logo');
     expect(logo).toBeInTheDocument();
@@ -126,18 +135,11 @@ describe('Component: Header/navbar', () => {
   });
 
   it('Should change the overflow of the document.body when click to open mobile menu', () => {
-    const { container } = renderWithTheme(<Navbar />);
-    Object.defineProperty(window, 'innerWidth', {
-      writable: true,
-      configurable: true,
-      value: 950,
-    });
+    global.innerWidth = 500;
 
-    act(() => {
-      window.dispatchEvent(new Event('resize'));
-    });
-    const openMenuMobile: any =
-      container.firstChild?.lastChild?.lastChild?.lastChild;
+    const { container } = renderWithTheme(<Navbar />);
+
+    const openMenuMobile: any = screen.getByTestId('menu-icon');
     const mobileBackground: any = container.firstChild?.nextSibling;
     fireEvent.click(openMenuMobile);
     expect(document.body.style.overflow).toBe('hidden');

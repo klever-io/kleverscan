@@ -1,13 +1,15 @@
 import { useMobile } from '@/contexts/mobile';
 import { IRowSection, Query } from '@/types/index';
+import { exportToJson } from '@/utils/exportJSON';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { exportToCsv } from '@/utils/index';
+import Bugsnag, { NotifiableError } from '@bugsnag/js';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
 import { TbTableExport } from 'react-icons/tb';
+import { toast } from 'react-toastify';
 import { Loader } from '../Loader/styles';
-// import { VscJson } from 'react-icons/vsc';
 import Pagination from '../Pagination';
 import { PaginationContainer } from '../Pagination/styles';
 import Skeleton from '../Skeleton';
@@ -90,6 +92,7 @@ const Table: React.FC<ITable> = ({
   const [isTablet, setIsTablet] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingCsv, setLoadingCsv] = useState(false);
+  const [loadingJson, setLoadingJson] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(defaultTotalPages);
   const [limit, setLimit] = useState<number>(10);
@@ -175,12 +178,24 @@ const Table: React.FC<ITable> = ({
 
   const handleClickCsv = async () => {
     setLoadingCsv(true);
-    await exportToCsv('transactions', items, router);
+    await exportToCsv('CSV-transactions', items, router);
     setLoadingCsv(false);
   };
 
   const handleScrollTop = () => {
     window.scrollTo(0, 0);
+  };
+
+  const handleClickJson = async () => {
+    setLoadingJson(true);
+    try {
+      await exportToJson('JSON-transactions', items);
+    } catch (e) {
+      toast.error('Error exporting to JSON');
+      Bugsnag.notify(e as NotifiableError);
+    } finally {
+      setLoadingJson(false);
+    }
   };
 
   return (
@@ -201,11 +216,7 @@ const Table: React.FC<ITable> = ({
                   />
                 </ExportLabel>
                 <ButtonsContainer>
-                  <ExportButton
-                    onClick={() => {
-                      handleClickCsv();
-                    }}
-                  >
+                  <ExportButton onClick={handleClickCsv}>
                     <Tooltip
                       msg="CSV"
                       Component={() =>
@@ -213,8 +224,13 @@ const Table: React.FC<ITable> = ({
                       }
                     />
                   </ExportButton>
-                  {/* <ExportButton>
-                    <VscJson size={25} />
+                  {/* <ExportButton onClick={handleClickJson} isJson={true}>
+                    <Tooltip
+                      msg="JSON"
+                      Component={() =>
+                        loadingJson ? <Loader /> : <VscJson size={25} />
+                      }
+                    />
                   </ExportButton> */}
                 </ButtonsContainer>
               </ExportContainer>

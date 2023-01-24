@@ -1,16 +1,10 @@
 import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
-import { IAsset, IBalance, IRowSection } from '@/types/index';
+import { IBalance, IHolders, IRowSection } from '@/types/index';
 import { formatAmount, parseAddress, toLocaleFixed } from '@/utils/index';
 import Link from 'next/link';
 import React from 'react';
 import { AddressContainer, RankingContainer, RankingText } from './styles';
-
-interface IHolder {
-  holders: IBalance[];
-  asset: IAsset;
-  holdersTableProps: IHolderTableProps;
-}
 
 interface IHolderTableProps {
   scrollUp: boolean;
@@ -20,9 +14,10 @@ interface IHolderTableProps {
   page: number;
 }
 
-const Holders: React.FC<IHolder> = ({ holders, asset, holdersTableProps }) => {
+const Holders: React.FC<IHolders> = ({ holders, asset, holdersTableProps }) => {
   const rowSections = (props: IBalance): IRowSection[] => {
-    const { address, frozenBalance, index, rank, balance } = props;
+    const { address, frozenBalance, index, rank, balance, totalBalance } =
+      props;
 
     return [
       {
@@ -72,10 +67,25 @@ const Holders: React.FC<IHolder> = ({ holders, asset, holdersTableProps }) => {
         ),
         span: 1,
       },
+      {
+        element: (
+          <strong key={totalBalance}>
+            {formatAmount(totalBalance / 10 ** asset.precision)}
+          </strong>
+        ),
+        span: 1,
+      },
     ];
   };
 
-  const header = ['Rank', 'Address', 'Percentage', 'Frozen Amount', 'Balance'];
+  const header = [
+    'Rank',
+    'Address',
+    'Percentage',
+    'Frozen Amount',
+    'Balance',
+    'Total Balance',
+  ];
 
   const tableProps: ITable = {
     rowSections,

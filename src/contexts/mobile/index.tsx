@@ -7,6 +7,7 @@ interface IMobile {
   handleMenu: () => void;
   closeMenu: () => void;
   mobileNavbarRef: React.MutableRefObject<HTMLDivElement | null>;
+  width: number;
 }
 
 export const Mobile = createContext({} as IMobile);
@@ -51,8 +52,9 @@ export const MobileProvider: React.FC = ({ children }) => {
   };
 
   const values: IMobile = {
-    isMobile: isMobile,
-    isTablet: isTablet,
+    isMobile,
+    isTablet,
+    width,
     mobileMenuOpen,
     handleMenu,
     closeMenu,

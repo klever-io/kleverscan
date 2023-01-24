@@ -1,6 +1,7 @@
 import { KLV } from '@/assets/coins';
 import { Receive } from '@/assets/icons';
 import { AccountDetails as AccountIcon } from '@/assets/title-icons';
+import ModalContract from '@/components/Contract/ModalContract';
 import Copy from '@/components/Copy';
 import { ISelectedDays } from '@/components/DateFilter';
 import Title from '@/components/Layout/Title';
@@ -11,6 +12,7 @@ import Buckets from '@/components/Tabs/Buckets';
 import Transactions from '@/components/Tabs/Transactions';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import { TxsFiltersWrapper } from '@/components/TransactionsFilters/styles';
+import { useExtension } from '@/contexts/extension';
 import api, { IPrice } from '@/services/api';
 import {
   IAccount,
@@ -26,6 +28,7 @@ import { filterDate, getSelectedTab, resetDate } from '@/utils/index';
 import {
   AmountContainer,
   BalanceContainer,
+  ButtonModal,
   CenteredRow,
   Container,
   FrozenContainer,
@@ -41,7 +44,6 @@ import { GetServerSideProps } from 'next';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
-
 interface IAssetInfo {
   assetId: string;
   precision: number;
@@ -100,6 +102,11 @@ const Account: React.FC<IAccountPage> = ({
   KLVallowance,
   KFIallowance,
 }) => {
+  const [openModalTransactions, setOpenModalTransactions] =
+    useState<boolean>(false);
+  const [transactionValue, setTransactionValue] = useState<string>('');
+  const [titleModal, setTitleModal] = useState<string>('');
+  const { walletAddress } = useExtension();
   const router = useRouter();
 
   const initialQueryState = {
@@ -269,12 +276,35 @@ const Account: React.FC<IAccountPage> = ({
   const availableBalance = account.balance / 10 ** defaultKlvPrecision;
   const totalKLV = calculateTotalKLV();
   const pricedKLV = calculateTotalKLV() * priceKLV;
-
+  const showInteractionsButtons = (title: string, value: string) => {
+    let titleFormatted = '';
+    value.split(/(?=[A-Z])/).forEach((t, index) => (titleFormatted += t + ` `));
+    if (walletAddress === initialQueryState.account) {
+      return (
+        <ButtonModal
+          onClick={() => {
+            setTransactionValue(value);
+            setOpenModalTransactions(true);
+            setTitleModal(titleFormatted);
+          }}
+        >
+          {title}
+        </ButtonModal>
+      );
+    }
+    return <></>;
+  };
+  const modalOptions = {
+    contractType: transactionValue,
+    setOpenModal: setOpenModalTransactions,
+    openModal: openModalTransactions,
+    title: titleModal,
+  };
   return (
     <Container>
+      <ModalContract {...modalOptions} />
       <Header>
         <Title title="Account" Icon={AccountIcon} route={'/accounts'} />
-
         <Input />
       </Header>
       <OverviewContainer>
@@ -310,11 +340,17 @@ const Account: React.FC<IAccountPage> = ({
                   <span>KLV</span>
                 </IconContainer>
                 <div>
-                  <span>
-                    {isNaN(Number(totalKLV)) ? 0 : totalKLV.toLocaleString()}
-                  </span>
-                  {!isNaN(Number(pricedKLV)) && (
-                    <p>USD {pricedKLV.toLocaleString()}</p>
+                  <div>
+                    <span>
+                      {isNaN(Number(totalKLV)) ? 0 : totalKLV.toLocaleString()}
+                    </span>
+                    {!isNaN(Number(pricedKLV)) && (
+                      <p>USD {pricedKLV.toLocaleString()}</p>
+                    )}
+                  </div>
+                  {showInteractionsButtons(
+                    'Create Transfer',
+                    'TransferContract',
                   )}
                 </div>
               </AmountContainer>

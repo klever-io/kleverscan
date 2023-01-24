@@ -47,6 +47,7 @@ import {
 import { usePrecision } from '@/utils/hooks';
 import {
   calculatePermissionOperations,
+  formatDate,
   getPrecision,
   receiverIsSender,
   renderCorrectPath,
@@ -72,7 +73,6 @@ import {
   StrongWidth,
   URIsWrapper,
 } from '@/views/transactions/detail';
-import { format, fromUnixTime } from 'date-fns';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import Tooltip from '../Tooltip';
@@ -1614,9 +1614,7 @@ export const Sell: React.FC<IIndexedContract> = ({
           <strong>End Time</strong>
         </span>
         <span>
-          {parameter?.endTime
-            ? format(fromUnixTime(parameter?.endTime), 'dd/MM/yyyy HH:mm')
-            : '--'}
+          {parameter?.endTime ? formatDate(parameter?.endTime) : '--'}
         </span>
       </Row>
     </>

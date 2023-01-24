@@ -1,5 +1,4 @@
 import { screen, waitFor } from '@testing-library/react';
-import { format } from 'date-fns';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
 import theme from '../../styles/theme';
@@ -38,8 +37,6 @@ import {
   Vote,
   Withdraw,
 } from './';
-
-const fnsCopySpy = { format }; // this solves a spyOn bug
 
 const precision = 6; // default klv precision
 const mockPrecision = {
@@ -608,9 +605,6 @@ describe('Component: TransactionContractComponents', () => {
       const spyPrecision = jest.spyOn(utils, 'getPrecision');
       spyPrecision.mockReturnValue(new Promise<number>(resolve => resolve(6)));
 
-      const spyFormat = jest.spyOn(fnsCopySpy, 'format');
-      spyFormat.mockReturnValue('14/11/2023 18:52');
-
       await act(async () => {
         renderWithTheme(
           <Sell {...mockedTxContractComponents.sellContract} receipts={[]} />,
@@ -619,7 +613,7 @@ describe('Component: TransactionContractComponents', () => {
 
       const assetId = screen.getByText('KPNFT-13Z0/9016');
       const currencyID = screen.getByText('KLV');
-      const endTime = screen.getByText('14/11/2023 18:52');
+      const endTime = screen.getByText('01/17/2023 12:19');
       const marketType = screen.getByText('BuyItNowMarket');
       const marketplaceID = screen.getByText('d4f2bab340c55fde');
       const price = screen.getByText('450.000000');

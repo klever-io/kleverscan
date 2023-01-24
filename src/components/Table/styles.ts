@@ -425,7 +425,7 @@ export const ExportLabel = styled.div`
   padding-left: 0.2rem;
 `;
 
-export const ExportButton = styled.button`
+export const ExportButton = styled.button<{ isJson?: boolean }>`
   border-radius: 50%;
   padding: 0.125rem;
   display: grid;
@@ -438,7 +438,8 @@ export const ExportButton = styled.button`
 
   &:hover {
     svg {
-      color: ${props => props.theme.green};
+      color: ${props =>
+        props.isJson ? props.theme.status.warning : props.theme.green};
     }
   }
 `;

@@ -196,16 +196,20 @@ export interface IAccount {
   collection: INfts[];
 }
 
-export interface IHolder {
+export interface IHolders {
   holders: IBalance[];
   asset: IAsset;
   holdersTableProps: IInnerTableProps;
+}
+export interface IHolder extends IAccountAsset {
+  totalBalance: number;
 }
 
 export interface IBalance {
   address: string;
   balance: number;
   frozenBalance: number;
+  totalBalance: number;
   index: number;
   rank: number;
 }
@@ -505,6 +509,29 @@ export interface IAssetPrice {
 export interface IAssetsPrice {
   klvPrice: IAssetPrice;
   kfiPrice: IAssetPrice;
+}
+
+export interface IPrice {
+  TotalVolume: number;
+  TotalCurrencyVolume: number;
+  Currency: string;
+  CurrencyPrice: number;
+  AveragePrice: number;
+  AverageCurrencyPrice: number;
+  Exchanges: [
+    {
+      ExchangeName: string;
+      Symbol: string;
+      Price: number;
+      Volume: number;
+      HighPrice: number;
+      LowPrice: number;
+      PriceVariation: number;
+    },
+  ];
+}
+export interface IHomeProps {
+  kfiPrices: IPrice;
 }
 
 export interface IHome {

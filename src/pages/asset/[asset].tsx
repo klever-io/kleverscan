@@ -20,6 +20,7 @@ import {
 } from '@/types/index';
 import {
   filterDate,
+  formatDate,
   parseHardCodedInfo,
   parseHolders,
   resetDate,
@@ -49,7 +50,6 @@ import {
 } from '@/views/assets/detail';
 import { BalanceContainer, RowContent } from '@/views/proposals/detail';
 import { ReceiveBackground } from '@/views/validator';
-import { format, fromUnixTime } from 'date-fns';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -428,10 +428,7 @@ const Asset: React.FC<IAssetPage> = ({
                 ))
               : staking.apr.reverse().map((apr, index) => (
                   <span key={index}>
-                    <p>
-                      Timestamp:{' '}
-                      {format(fromUnixTime(apr.timestamp), 'MM/dd/yyyy HH:mm')}
-                    </p>
+                    <p>Timestamp: {formatDate(apr.timestamp)}</p>
                     <p>
                       Value: {toLocaleFixed((apr.value || 0) / 10 ** 2, 2)}%
                     </p>

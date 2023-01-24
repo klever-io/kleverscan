@@ -43,14 +43,12 @@ const NavbarItem: React.FC<INavbarItem> = ({
 }) => {
   const router = useRouter();
 
-  const { isMobile } = useMobile();
-
   const DropdownDesktop = ({ page }: IDropdownPages) => {
     return (
       <DropdownItem
         disabled={router.pathname.includes(page.name.toLowerCase())}
       >
-        <Link href={page.pathTo}>
+        <Link href={page.pathTo} data-testid="navbar-item">
           <a>
             <page.Icon />
             <span>{page.name}</span>
@@ -62,7 +60,10 @@ const NavbarItem: React.FC<INavbarItem> = ({
 
   if (name === 'More') {
     return (
-      <Item selected={router.pathname.includes(name.toLowerCase())}>
+      <Item
+        selected={router.pathname.includes(name.toLowerCase())}
+        data-testid="navbar-item"
+      >
         <span>{name}</span>
         <DropdownContainer>
           <DropdownMenu>
@@ -177,33 +178,37 @@ const Navbar: React.FC = () => {
             </a>
           </Link>
 
-          <DesktopContainer>
-            <IconsMenu>
-              {navbarItems.map((item, index) => (
-                <NavbarItem key={String(index)} {...item} />
-              ))}
-            </IconsMenu>
-            <NavBarOptionsContainer>
-              <ConnectWallet
-                clickConnection={() => {
-                  openDrawer;
-                }}
-              />
-              <OptionsContainer />
-            </NavBarOptionsContainer>
-          </DesktopContainer>
+          {!isMobile && (
+            <DesktopContainer>
+              <IconsMenu>
+                {navbarItems.map((item, index) => (
+                  <NavbarItem key={String(index)} {...item} />
+                ))}
+              </IconsMenu>
+              <NavBarOptionsContainer>
+                <ConnectWallet
+                  clickConnection={() => {
+                    openDrawer;
+                  }}
+                />
+                <OptionsContainer />
+              </NavBarOptionsContainer>
+            </DesktopContainer>
+          )}
 
-          <MobileContainer>
-            <ConnectContainer
-              onClick={() => {
-                handleClickConnection();
-                closeMenu();
-              }}
-            >
-              <ConnectWallet clickConnection={closeDrawer} />
-            </ConnectContainer>
-            <MenuIcon onClick={handleMenu} />
-          </MobileContainer>
+          {isMobile && (
+            <MobileContainer>
+              <ConnectContainer
+                onClick={() => {
+                  handleClickConnection();
+                  closeMenu();
+                }}
+              >
+                <ConnectWallet clickConnection={closeDrawer} />
+              </ConnectContainer>
+              <MenuIcon onClick={handleMenu} data-testid="menu-icon" />
+            </MobileContainer>
+          )}
         </Content>
       </Container>
 

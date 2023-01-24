@@ -344,7 +344,7 @@ export const mockedTxContractComponents = {
       marketType: 'BuyItNowMarket',
       assetId: 'KPNFT-13Z0/9016',
       currencyID: 'KLV',
-      endTime: 1699998726,
+      endTime: 1673968772000,
       marketplaceID: 'd4f2bab340c55fde',
       price: 450000000,
     },

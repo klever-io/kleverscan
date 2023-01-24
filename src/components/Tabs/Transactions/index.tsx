@@ -17,9 +17,13 @@ import {
   getHeaderForTable,
   initialsTableHeaders,
 } from '@/utils/contracts';
-import { capitalizeString, formatAmount, parseAddress } from '@/utils/index';
+import {
+  capitalizeString,
+  formatAmount,
+  formatDate,
+  parseAddress,
+} from '@/utils/index';
 import { CenteredRow } from '@/views/accounts/detail';
-import { format, fromUnixTime } from 'date-fns';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback } from 'react';
@@ -95,11 +99,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
         span: 1,
       },
       {
-        element: (
-          <small key={timestamp}>
-            {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
-          </small>
-        ),
+        element: <small key={timestamp}>{formatDate(timestamp)}</small>,
         span: 1,
       },
       {

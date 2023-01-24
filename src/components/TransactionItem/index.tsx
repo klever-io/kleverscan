@@ -4,12 +4,12 @@ import {
   TransactionData,
   TransactionRow,
 } from '@/views/home';
-import { format, fromUnixTime } from 'date-fns';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { ITransaction } from '../../types';
 import {
+  formatDate,
   getContractType,
   getPrecision,
   parseAddress,
@@ -92,9 +92,7 @@ const TransactionItem: React.FC<ITransaction> = ({
             <StatusIcon />
           </span>
         </a>
-        <span>
-          {format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm')}
-        </span>
+        <span>{formatDate(timestamp)}</span>
       </TransactionData>
       <TransactionData>
         <p>

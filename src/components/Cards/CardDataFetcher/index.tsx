@@ -180,12 +180,9 @@ const CardDataFetcher: React.FC<{ block: IBlock }> = ({ block }) => {
                 break;
 
               case 5:
-                if (responses[4].status !== 'rejected')
-                  setBeforeYesterdayTransactions(
-                    value.data?.number_by_day[0]?.doc_count -
-                      (responses[4].value as ITransactionListResponse).data
-                        ?.number_by_day[0]?.doc_count,
-                  );
+                setBeforeYesterdayTransactions(
+                  value.data?.number_by_day[1]?.doc_count,
+                );
 
                 break;
 

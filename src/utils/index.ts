@@ -28,6 +28,7 @@ import {
   ITransaction,
   IValidator,
   IValidatorResponse,
+  Service,
 } from '../types';
 import {
   ContractsIndex,
@@ -493,6 +494,7 @@ export const getPrecisionFromApi = async (
   try {
     const response = await api.post({
       route: `assets/precisions`,
+      service: Service.PROXY,
       body: { assets },
     });
     if (response.error) {

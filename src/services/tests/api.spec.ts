@@ -97,13 +97,13 @@ describe('test api functions', () => {
     test('with defaultProps', () => {
       const { route, query, service, apiVersion } = getProps(defaultProps);
       expect(getHost(route, query, service, apiVersion)).toEqual(
-        'https://api.testnet.klever.finance:443/v1.0//',
+        'https://api.testnet.klever.finance/v1.0//',
       );
     });
     test('props with query', () => {
       const { route, query, service, apiVersion } = getProps(propsQuery);
       expect(getHost(route, query, service, apiVersion)).toEqual(
-        'https://api.testnet.klever.finance:443/v1.0/transaction/list?asset=KLV&page=0&status=success&type=0',
+        'https://api.testnet.klever.finance/v1.0/transaction/list?asset=KLV&page=0&status=success&type=0',
       );
     });
   });

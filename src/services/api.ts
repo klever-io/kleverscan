@@ -24,6 +24,7 @@ export interface IProps {
   apiVersion?: string;
   service?: Service;
   refreshTime?: number;
+  useApiProxy?: boolean;
 }
 
 const pagination = {
@@ -45,6 +46,7 @@ export const getHost = (
   query: IQuery | undefined,
   service: Service | undefined,
   apiVersion: string | undefined,
+  port?: string,
 ): string => {
   const hostService = {
     [Service.PROXY]:
@@ -60,7 +62,7 @@ export const getHost = (
   };
 
   let host = hostService[service || 0];
-  let port = process.env.DEFAULT_API_PORT || '443';
+  port = process.env.DEFAULT_API_PORT || ''; // for reference: used to be 443
   let urlParam = '';
 
   if (host.substr(host.length - 1) === '/') {
@@ -154,28 +156,51 @@ export const withoutBody = async (
 
 export const withBody = async (props: IProps, method: Method): Promise<any> => {
   const request = async () => {
-    try {
-      const { route, body, query, service, apiVersion } = getProps(props);
-      const response = await fetch(getHost(route, query, service, apiVersion), {
-        method: method.toString(),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      });
+    if (props.useApiProxy) {
+      try {
+        // use next api as proxy for post requests, to avoid cors from api-gateway (when fetching prices)
+        const response = await fetch('/api', {
+          method: method.toString(),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...getProps(props),
+            method: method.toString(),
+          }),
+        });
 
-      if (!response.ok) {
-        return {
-          data: null,
-          error: (await response.json()).error,
-          code: 'internal_error',
-          pagination,
-        };
+        return response.json();
+      } catch (error) {
+        return { data: null, error, code: 'internal_error', pagination };
       }
+    } else if (!props.useApiProxy) {
+      try {
+        const { route, body, query, service, apiVersion } = getProps(props);
+        const response = await fetch(
+          getHost(route, query, service, apiVersion),
+          {
+            method: method.toString(),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+          },
+        );
 
-      return response.json();
-    } catch (error) {
-      return { data: null, error, code: 'internal_error', pagination };
+        if (!response.ok) {
+          return {
+            data: null,
+            error: (await response.json()).error,
+            code: 'internal_error',
+            pagination,
+          };
+        }
+
+        return response.json();
+      } catch (error) {
+        return { data: null, error, code: 'internal_error', pagination };
+      }
     }
   };
 

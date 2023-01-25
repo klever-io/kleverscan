@@ -88,7 +88,7 @@ describe('Contract Component', () => {
 
   it('should render the transfer form contract', async () => {
     const itemsTransfer = [
-      'Transfer assets to a given receiver.',
+      'Transfer assets to another wallet.',
       'Select an asset/collection',
       'Amount',
       'Receiver Address',
@@ -279,7 +279,7 @@ describe('Contract Component', () => {
 
   it('should render the Create Asset form contract', async () => {
     const itemsCreateAsset = [
-      'Choose between creating a Token or an NFT.',
+      'Create a new Coin(Fungible Token) or an NFT Collection.',
       'Name',
       'Ticker',
       'Owner Address',
@@ -485,7 +485,9 @@ describe('Contract Component', () => {
   });
 
   it('should render the Unjail form contract', async () => {
-    const items = ['Remove bad actors…'];
+    const items = [
+      'Unjails your validator, be sure to use only if the cause of the jail is already fixed.',
+    ];
     let container;
     await waitFor(
       () =>
@@ -573,7 +575,7 @@ describe('Contract Component', () => {
 
   it('should render the Proposal form contract', async () => {
     const items = [
-      'Create a proposal for the current project.',
+      'Create a proposal to change the blockchain parameters.',
       'Description',
       'Epochs Duration',
       'Parameters',
@@ -605,7 +607,7 @@ describe('Contract Component', () => {
   });
 
   it('should render the Vote form contract', async () => {
-    const items = ['Vote for a proposal.', 'Proposal ID', 'Amount', 'Type'];
+    const items = ['Vote in a proposal.', 'Proposal ID', 'Amount', 'Type'];
     let container;
     await waitFor(
       () =>

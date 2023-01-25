@@ -180,6 +180,7 @@ export interface IPeer {
 }
 
 export interface IAccount {
+  name?: string;
   address: string;
   nonce: number;
   balance: number;

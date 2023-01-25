@@ -89,6 +89,7 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
   const [openModalTransactions, setOpenModalTransactions] =
     useState<boolean>(false);
   const [transactionValue, setTransactionValue] = useState<string>('');
+  const [accountName, setAccountName] = useState<string>('');
   const [titleModal, setTitleModal] = useState<string>('');
 
   const [account, setAccount] = useState<IAccount>({
@@ -246,6 +247,9 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
 
     fetchData();
   }, []);
+  useEffect(() => {
+    if (account.name) setAccountName(account.name);
+  }, [accountName]);
 
   const requestTransactions = async (page: number, limit: number) => {
     const localQuery: IQueryParams = { ...router.query, page, limit };
@@ -433,7 +437,12 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
     <Container>
       <ModalContract {...modalOptions} />
       <Header>
-        <Title title="Account" Icon={AccountIcon} route={'/accounts'} />
+        <Title
+          title={accountName ? accountName : 'Account'}
+          Icon={AccountIcon}
+          route={'/accounts'}
+          isAccountOwner={!!accountName}
+        />
         <Input />
       </Header>
       <OverviewContainer>
@@ -454,6 +463,10 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
                   onClose={() => setShowModal(false)}
                 />
               </ReceiveBackground>
+              {showInteractionsButtons(
+                'Set Account Name',
+                'SetAccountNameContract',
+              )}
             </CenteredRow>
           </RowContent>
         </Row>

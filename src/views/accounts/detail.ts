@@ -108,6 +108,7 @@ export const RowContent = styled.span`
 export const ButtonModal = styled.button`
   color: ${props => props.theme.true.white};
   background-color: ${props => props.theme.violet};
+  height: 2.5rem;
   padding: 0 0.6rem;
   border-radius: 0.5rem;
   :active {

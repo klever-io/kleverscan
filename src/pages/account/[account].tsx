@@ -35,6 +35,7 @@ import {
   ButtonModal,
   CenteredRow,
   Container,
+  ContainerTabInteractions,
   FrozenContainer,
   Header,
   IconContainer,
@@ -42,12 +43,17 @@ import {
   OverviewContainer,
   Row,
   RowContent,
+  StakingRewards,
 } from '@/views/accounts/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
+export interface IStakingRewards {
+  label: string;
+  value: number;
+}
 
 interface IAccountPage {
   address: string;
@@ -91,7 +97,9 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
   const [transactionValue, setTransactionValue] = useState<string>('');
   const [accountName, setAccountName] = useState<string>('');
   const [titleModal, setTitleModal] = useState<string>('');
-
+  const [assetTriggerSelected, setAssetTriggerSelected] =
+    useState<IAccountAsset>();
+  const [stakingRewards, setStakingRewards] = useState<number>(0);
   const [account, setAccount] = useState<IAccount>({
     address: address,
     nonce: 0,
@@ -110,7 +118,6 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
     {} as IAllowanceResponse,
   );
   const [accountAssets, setAccountAssets] = useState<IAccountAsset[]>([]);
-
   const { walletAddress } = useExtension();
   const router = useRouter();
 
@@ -396,7 +403,22 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
   const SelectedTabComponent: React.FC = () => {
     switch (selectedTab) {
       case 'Assets':
-        return <Assets assets={accountAssets} address={account.address} />;
+        return (
+          <>
+            <ContainerTabInteractions>
+              {showInteractionsButtons(
+                'Create Asset',
+                'CreateAssetContract',
+                false,
+              )}
+            </ContainerTabInteractions>
+            <Assets
+              assets={accountAssets}
+              address={account.address}
+              showInteractionsButtons={showInteractionsButtons}
+            />
+          </>
+        );
       case 'Transactions':
         return <Transactions transactionsTableProps={transactionTableProps} />;
       case 'Buckets':
@@ -409,16 +431,25 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
   const availableBalance = account.balance / 10 ** defaultKlvPrecision;
   const totalKLV = calculateTotalKLV();
   const pricedKLV = calculateTotalKLV() * priceKLV;
-  const showInteractionsButtons = (title: string, value: string) => {
+  const showInteractionsButtons = (
+    title: string,
+    value: string,
+    isAssetTrigger?: boolean,
+    asset?: IAccountAsset,
+    stakingRewards?: number,
+  ) => {
     let titleFormatted = '';
     value.split(/(?=[A-Z])/).forEach((t, index) => (titleFormatted += t + ` `));
     if (walletAddress === initialQueryState.account) {
       return (
         <ButtonModal
+          isAssetTrigger={isAssetTrigger}
           onClick={() => {
+            setAssetTriggerSelected(asset);
             setTransactionValue(value);
             setOpenModalTransactions(true);
             setTitleModal(titleFormatted);
+            setStakingRewards(stakingRewards || 0);
           }}
         >
           {title}
@@ -427,11 +458,17 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
     }
     return <></>;
   };
+
   const modalOptions = {
     contractType: transactionValue,
+    setContractType: setTransactionValue,
     setOpenModal: setOpenModalTransactions,
     openModal: openModalTransactions,
     title: titleModal,
+    assetTriggerSelected: assetTriggerSelected,
+    setAssetTriggerSelected: setAssetTriggerSelected,
+    stakingRewards: stakingRewards,
+    setStakingRewards: setStakingRewards,
   };
   return (
     <Container>
@@ -525,18 +562,39 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
           <RowContent>
             <BalanceContainer>
               <FrozenContainer>
-                <div>
+                <StakingRewards>
                   <strong>Allowance</strong>
                   <span>{getKLVAllowance().toLocaleString()}</span>
-                </div>
-                <div>
+                  {showInteractionsButtons(
+                    'Allowance Claim',
+                    'ClaimContract',
+                    false,
+                    undefined,
+                    1,
+                  )}
+                </StakingRewards>
+                <StakingRewards>
                   <strong>KLV Staking</strong>
                   <span>{getKLVStaking().toLocaleString()}</span>
-                </div>
-                <div>
+                  {showInteractionsButtons(
+                    'Staking Claim',
+                    'ClaimContract',
+                    false,
+                    undefined,
+                    0,
+                  )}
+                </StakingRewards>
+                <StakingRewards>
                   <strong>KFI Staking</strong>
                   <span>{getKFIStaking().toLocaleString()}</span>
-                </div>
+                  {showInteractionsButtons(
+                    'Market Claim',
+                    'ClaimContract',
+                    false,
+                    undefined,
+                    2,
+                  )}
+                </StakingRewards>
               </FrozenContainer>
             </BalanceContainer>
           </RowContent>

@@ -244,7 +244,6 @@ const getAssetsList = (
       const newAssets: IKAssets[] = assets.filter((value: IKAssets) => {
         return value.isNFT;
       });
-
       return filterByProperties(newAssets, typeAssetTrigger);
     }
   } else if (contractType === 'FreezeContract') {

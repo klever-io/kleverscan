@@ -105,19 +105,33 @@ export const RowContent = styled.span`
   width: 100%;
 `;
 
-export const ButtonModal = styled.button`
+export const ButtonModal = styled.button<{ isAssetTrigger?: boolean }>`
   color: ${props => props.theme.true.white};
   background-color: ${props => props.theme.violet};
   height: 2.5rem;
-  padding: 0 0.6rem;
-  border-radius: 0.5rem;
+  align-self: end;
+  width: ${props => (props.isAssetTrigger ? '11rem' : 'auto')};
+  padding: 0.625rem 2rem;
+  border-radius: 4px;
+
   :active {
     transform: translateY(0.1rem);
   }
   :hover {
     opacity: 0.8;
   }
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 100%;
+  }
 `;
+
+export const ContainerTabInteractions = styled.div`
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+`;
+
 export const CenteredRow = styled.div`
   display: flex;
 
@@ -236,7 +250,18 @@ export const FrozenContainer = styled.div`
 
     span {
       color: ${props => props.theme.darkText};
+      padding-right: 1rem;
     }
+  }
+`;
+
+export const StakingRewards = styled.div`
+  display: flex;
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    button {
+      margin-top: 0.7rem;
+    }
+    flex-wrap: wrap;
   }
 `;
 

@@ -198,7 +198,7 @@ export const MobileCardItem = styled.span<{
 }>`
   display: flex;
   flex-direction: column;
-  &:last-child {
+  &:nth-child(7) {
     flex-grow: 1;
   }
 

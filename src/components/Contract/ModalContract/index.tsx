@@ -1,6 +1,6 @@
 import { useExtension } from '@/contexts/extension';
 import api from '@/services/api';
-import { ICollectionList, IKAssets } from '@/types';
+import { IAccountAsset, ICollectionList, IKAssets } from '@/types';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
@@ -10,8 +10,15 @@ import { Container, Content, TitleContent } from './styles';
 interface IModalContract {
   title: string;
   contractType: string;
+  setContractType: React.Dispatch<React.SetStateAction<string>>;
   openModal: boolean;
   setOpenModal: Dispatch<SetStateAction<boolean>>;
+  assetTriggerSelected?: IAccountAsset;
+  setAssetTriggerSelected: React.Dispatch<
+    React.SetStateAction<IAccountAsset | undefined>
+  >;
+  stakingRewards: number;
+  setStakingRewards: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const ModalContract: React.FC<IModalContract> = ({
@@ -19,11 +26,20 @@ const ModalContract: React.FC<IModalContract> = ({
   contractType,
   openModal,
   setOpenModal,
+  assetTriggerSelected,
+  setContractType,
+  setAssetTriggerSelected,
+  stakingRewards,
+  setStakingRewards,
 }) => {
   const [assetsList, setAssetsLists] = useState<ICollectionList[]>([]);
   const [kassetsList, setKAssetsList] = useState<IKAssets[]>([]);
   const { extensionInstalled, connectExtension } = useExtension();
-
+  const stakingRewardsType = {
+    0: { label: 'Staking Claim (0)', value: 0 },
+    1: { label: 'Allowance Claim (1)', value: 1 },
+    2: { label: 'Market Claim (2)', value: 2 },
+  };
   useDidUpdateEffect(() => {
     if (extensionInstalled) {
       connectExtension();
@@ -158,15 +174,19 @@ const ModalContract: React.FC<IModalContract> = ({
     document.body.style.overflow = openModal ? 'hidden' : 'visible';
   }, [openModal]);
 
+  const closeModal = () => {
+    setOpenModal(false);
+    setContractType('');
+    setAssetTriggerSelected(undefined);
+    setStakingRewards(0);
+  };
+
   return (
-    <Container onMouseDown={() => setOpenModal(false)} openModal={openModal}>
+    <Container onMouseDown={closeModal} openModal={openModal}>
       <Content onMouseDown={e => e.stopPropagation()}>
         <TitleContent>
           <h1>{title}</h1>
-          <AiOutlineClose
-            onClick={() => setOpenModal(false)}
-            cursor={'pointer'}
-          />
+          <AiOutlineClose onClick={closeModal} cursor={'pointer'} />
         </TitleContent>
         <Contract
           isModal={true}
@@ -176,6 +196,9 @@ const ModalContract: React.FC<IModalContract> = ({
           getAssets={getAssets}
           kAssets={kassetsList}
           modalContractType={{ value: contractType }}
+          assetTriggerSelected={assetTriggerSelected}
+          claimSelectedType={stakingRewardsType[stakingRewards]}
+          openModal={openModal}
         />
       </Content>
     </Container>

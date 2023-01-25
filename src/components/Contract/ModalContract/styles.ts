@@ -18,6 +18,7 @@ export const Content = styled.div`
   touch-action: manipulation;
   position: relative;
   max-height: 50rem;
+  min-height: 36rem;
   overflow: auto;
   overflow-x: hidden;
   padding: 2rem;

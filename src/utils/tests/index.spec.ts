@@ -549,35 +549,16 @@ describe('unit tests for util funcs in index file', () => {
 
   describe('test fetchPartialAsset function', () => {
     let fetchPartialAssetTimeout: ReturnType<typeof setTimeout>;
-    test('if pass an asset that does not exist return all assets', async () => {
+    test('if returns correct asset', async () => {
       (api.getCached as jest.Mock).mockReturnValueOnce({
         data: {
-          assets: mocks.assets,
+          assets: mocks.assets[0],
         },
       });
-      const result = fetchPartialAsset(
-        fetchPartialAssetTimeout,
-        'KLV',
-        mocks.assets,
-      );
+      const result = fetchPartialAsset(fetchPartialAssetTimeout, 'KFI');
       await clock.tickAsync(5000);
 
-      await expect(result).resolves.toStrictEqual(mocks.assets);
-    });
-    test('return false if asset value exist', async () => {
-      (api.getCached as jest.Mock).mockReturnValueOnce({
-        data: {
-          assets: mocks.assets,
-        },
-      });
-      const result = fetchPartialAsset(
-        fetchPartialAssetTimeout,
-        'KFI',
-        mocks.assets,
-      );
-      await clock.tickAsync(5000);
-
-      await expect(result).resolves.toEqual(false);
+      await expect(result).resolves.toStrictEqual(mocks.assets[0]);
     });
   });
 

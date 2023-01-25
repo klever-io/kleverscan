@@ -521,7 +521,10 @@ export async function getPrecision(
     ? JSON.parse(localStorage.getItem('precisions') || '{}')
     : {};
 
-  if (typeof assetIds === 'object' && assetIds.length) {
+  if (typeof assetIds === 'object' && assetIds.length !== undefined) {
+    if (assetIds.length === 0) {
+      return {};
+    }
     const aux: string[] = [];
     const NFTs: { [assetId: string]: number } = {};
     assetIds.forEach(assetId => {
@@ -537,6 +540,14 @@ export async function getPrecision(
       }
     });
 
+    if (aux.length === 0) {
+      return assetIds.reduce((prev, current) => {
+        return {
+          ...prev,
+          [current]: storedPrecisions[current],
+        };
+      }, {});
+    }
     try {
       const { precisions } = await getPrecisionFromApi(aux);
       const newPrecisions = { ...storedPrecisions, ...precisions, ...NFTs };
@@ -767,7 +778,7 @@ export const parseHolders = (
 export const fetchPartialAsset = (
   timeout: ReturnType<typeof setTimeout>,
   value: string,
-  assets: IAsset[],
+  assets?: IAsset[],
 ): Promise<IAsset[] | false> => {
   clearTimeout(timeout);
   return new Promise(res => {
@@ -775,9 +786,10 @@ export const fetchPartialAsset = (
       let response: IAssetResponse;
       if (
         value &&
-        !assets.find((asset: any) =>
-          asset.assetId.includes(value.toUpperCase()),
-        )
+        (!assets ||
+          !assets.find((asset: any) =>
+            asset.assetId.includes(value.toUpperCase()),
+          ))
       ) {
         response = await api.getCached({
           route: `assets/kassets?asset=${value}`,

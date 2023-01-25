@@ -1,6 +1,6 @@
 import { getSelectedTab } from '@/utils/index';
 import { useRouter } from 'next/router';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import DateFilter, { IDateFilter } from '../DateFilter';
 import Filter, { IFilter } from '../Filter';
 import {
@@ -40,8 +40,13 @@ const Tabs: React.FC<ITabs> = ({
     return 'All Transactions';
   };
 
-  const [selected, setSelected] = useState(getSelectedTab(router.query?.tab));
+  const [selected, setSelected] = useState<number>(0);
   const filterName = useCallback(getFilterName, [router.query]);
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    setSelected(getSelectedTab(router.query?.tab));
+  }, [router.isReady, router.query]);
 
   const handleClickFilterName = (filter: string) => {
     switch (filter) {

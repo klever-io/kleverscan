@@ -184,7 +184,8 @@ export interface IAccount {
   nonce: number;
   balance: number;
   frozenBalance: number;
-  blsPublicKey: string;
+  blsPublicKey?: string;
+  allowance?: number;
   assets: {
     [key: string]: IAccountAsset;
   };
@@ -193,7 +194,9 @@ export interface IAccount {
       [key: string]: IBucket;
     },
   ];
-  collection: INfts[];
+  collection?: INfts[];
+  timestamp: number;
+  permissions?: number[];
 }
 
 export interface IHolders {
@@ -352,7 +355,6 @@ export interface ITxQuery {
 
 export interface IInnerTableProps {
   scrollUp: boolean;
-  totalPages: number;
   dataName: string;
   request: (page: number, limit: number) => Promise<any>;
   query?: ITxQuery;

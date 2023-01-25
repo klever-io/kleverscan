@@ -11,7 +11,7 @@ import { FilterContainer } from './styles';
 interface ITransactionsFilters {
   query: NextParsedUrlQuery;
   setQuery: (newQuery: NextParsedUrlQuery) => void;
-  assets: IAsset[];
+  assets?: IAsset[];
 }
 
 const TransactionsFilters: React.FC<ITransactionsFilters> = ({
@@ -24,7 +24,7 @@ const TransactionsFilters: React.FC<ITransactionsFilters> = ({
     ContractsIndex[contractName];
   const getContractName = (): string => ContractsIndex[Number(query.type)];
 
-  const [assetFilters, setAssetsFilters] = useState(assets);
+  const [assetFilters, setAssetsFilters] = useState<IAsset[]>(assets || []);
   const handleSelected = (selected: string, filterType: string): void => {
     if (selected === 'All') {
       const updatedQuery = { ...query };
@@ -45,7 +45,7 @@ const TransactionsFilters: React.FC<ITransactionsFilters> = ({
   const filters: IFilter[] = [
     {
       title: 'Coin',
-      data: assetFilters.map(asset => asset.assetId),
+      data: assetFilters.map(asset => asset?.assetId),
       onClick: selected => handleSelected(selected, 'asset'),
       onChange: async value => {
         const response = await fetchPartialAsset(
@@ -54,7 +54,16 @@ const TransactionsFilters: React.FC<ITransactionsFilters> = ({
           assets,
         );
         if (response) {
-          setAssetsFilters([...assetFilters, ...response]);
+          const filteredAssets = [...assetFilters, ...response].reduce(
+            (map, asset) => {
+              if (!map.has(asset.assetId)) {
+                map.set(asset.assetId, asset);
+              }
+              return map;
+            },
+            new Map(),
+          );
+          setAssetsFilters(Array.from(filteredAssets.values()));
         }
       },
       current: query.asset as string | undefined,

@@ -35,7 +35,7 @@ export interface IRouterDate {
 export interface IDateFilter {
   filterDate(selectedDays: ISelectedDays): void;
   resetDate(): void;
-  empty: boolean;
+  empty?: boolean;
 }
 
 const DateFilter: React.FC<IDateFilter> = ({

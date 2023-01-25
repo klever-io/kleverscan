@@ -1,6 +1,5 @@
 import Tooltip from '@/components/Tooltip';
 import { coinStyles } from '@/components/Tooltip/configs';
-import { useMobile } from '@/contexts/mobile';
 import {
   IAssetTriggerContract,
   IBuyContractPayload,
@@ -39,7 +38,10 @@ const precision = 6; // default KLV precision
 const TransferSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as ITransferContract;
 
-  const { isMobile, isTablet } = useMobile();
+  if (typeof window === 'undefined') return [];
+
+  const isMobile = window.innerWidth <= 768;
+  const isTablet = window.innerWidth < 1025 && window.innerWidth > 768;
 
   let assetId = 'KLV';
   if (parameter.assetId?.includes('/')) {

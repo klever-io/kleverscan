@@ -38,17 +38,12 @@ const mockedAPIResponse = {
 
 const transactionTableProps: IInnerTableProps = {
   scrollUp: false,
-  totalPages: 1,
   dataName: 'transactions',
   request,
   query: {},
 };
 const mockedTransactionTab = (
-  <Transaction
-    transactions={mockedTransactions}
-    precision={precision}
-    transactionsTableProps={transactionTableProps}
-  />
+  <Transaction transactionsTableProps={transactionTableProps} />
 );
 
 const tableHeaders = ['Assets', 'Transactions'];
@@ -74,6 +69,7 @@ describe('Component: Tabs', () => {
         tab: 'Transactions',
         role: 'receiver',
       },
+      isReady: true,
     });
   });
 
@@ -149,7 +145,7 @@ describe('Component: Tabs', () => {
       expect(screen.getAllByText(header)[0]).toBeInTheDocument();
     });
 
-    const filterContainer = screen.getByTestId('filter-container');
+    const filterContainer = await screen.findByTestId('filter-container');
 
     const inOutFilter = filterContainer.lastElementChild
       ?.lastElementChild as HTMLElement;

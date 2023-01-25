@@ -29,13 +29,10 @@ import { useRouter } from 'next/router';
 import React, { useCallback } from 'react';
 
 interface ITransactionsProps {
-  transactions: ITransaction[];
-  precision?: number;
   transactionsTableProps: IInnerTableProps;
 }
 
 const Transactions: React.FC<ITransactionsProps> = props => {
-  const precision = props.precision || 6;
   const router = useRouter();
 
   const { isMobile } = useMobile();
@@ -49,6 +46,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
     const contractType = getContractType(contract);
     return filteredSections(contract, contractType, receipts);
   };
+
   const rowSections = (props: ITransaction): IRowSection[] => {
     const {
       hash,
@@ -60,12 +58,13 @@ const Transactions: React.FC<ITransactionsProps> = props => {
       status,
       kAppFee,
       bandwidthFee,
+      precision,
     } = props;
 
     const StatusIcon = getStatusIcon(status);
     let toAddress = '--';
-    let amount = '--';
     let assetId = '--';
+    let amount = '--';
 
     const contractType = getContractType(contract);
 
@@ -73,7 +72,8 @@ const Transactions: React.FC<ITransactionsProps> = props => {
       const parameter = contract[0].parameter as ITransferContract;
 
       toAddress = parameter.toAddress;
-      amount = formatAmount(parameter.amount / 10 ** precision);
+      if (precision) amount = formatAmount(parameter.amount / 10 ** precision);
+
       if (parameter.assetId) {
         assetId = parameter.assetId;
       }
@@ -153,8 +153,8 @@ const Transactions: React.FC<ITransactionsProps> = props => {
 
   const tableProps: ITable = {
     ...transactionTableProps,
-    rowSections: rowSections,
-    data: Object.values(props.transactions) as any[],
+    rowSections,
+    data: null,
     header: router?.query?.type ? getHeaderForTable(router, header) : header,
     type: 'transactions',
   };

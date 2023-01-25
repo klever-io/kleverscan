@@ -14,6 +14,7 @@ interface IAssets {
     isAssetTrigger: boolean,
     assets: IAccountAsset,
   ) => JSX.Element;
+  accountAssetOwner: any;
 }
 
 interface IAssetResponse extends IResponse {
@@ -26,6 +27,8 @@ const Assets: React.FC<IAssets> = ({
   assets,
   address,
   showInteractionsButtons,
+  accountAssetOwner,
+
 }) => {
   const header = [
     'Token',
@@ -36,7 +39,6 @@ const Assets: React.FC<IAssets> = ({
     'Frozen',
     '',
   ];
-
   const rowSections = (props: IAccountAsset): IRowSection[] => {
     const {
       assetId,
@@ -46,6 +48,9 @@ const Assets: React.FC<IAssets> = ({
       frozenBalance,
       address: ownerAddress,
     } = props;
+    const ownerAssetId = accountAssetOwner?.map(
+      (asset: { assetId: string }) => asset.assetId,
+    );
     const ticker = assetId?.split('-')[0];
     const sectionViewNfts =
       assetType === 1 ? (
@@ -93,16 +98,19 @@ const Assets: React.FC<IAssets> = ({
       { element: sectionViewNfts, span: 2 },
     ];
 
-    if (address === ownerAddress && showInteractionsButtons)
-      sections.push({
-        element: showInteractionsButtons(
-          'Asset Trigger',
-          'AssetTriggerContract',
-          true,
-          props,
-        ),
-        span: 2,
-      });
+    ownerAssetId?.forEach((asset: string) => {
+      if (asset === assetId && showInteractionsButtons)
+        sections.push({
+          element: showInteractionsButtons(
+            'Asset Trigger',
+            'AssetTriggerContract',
+            true,
+            props,
+          ),
+          span: 2,
+        });
+    });
+
     return sections;
   };
 

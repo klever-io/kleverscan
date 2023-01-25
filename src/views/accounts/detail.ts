@@ -113,7 +113,6 @@ export const ButtonModal = styled.button<{ isAssetTrigger?: boolean }>`
   width: ${props => (props.isAssetTrigger ? '11rem' : 'auto')};
   padding: 0.625rem 2rem;
   border-radius: 4px;
-
   :active {
     transform: translateY(0.1rem);
   }

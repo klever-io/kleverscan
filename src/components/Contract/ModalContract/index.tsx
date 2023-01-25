@@ -177,7 +177,7 @@ const ModalContract: React.FC<IModalContract> = ({
   const closeModal = () => {
     setOpenModal(false);
     setContractType('');
-    setAssetTriggerSelected(undefined);
+    setAssetTriggerSelected({} as IAccountAsset);
     setStakingRewards(0);
   };
 

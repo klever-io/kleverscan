@@ -118,6 +118,7 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
     {} as IAllowanceResponse,
   );
   const [accountAssets, setAccountAssets] = useState<IAccountAsset[]>([]);
+  const [accountAssetOwner, setAccountAssetOwner] = useState();
   const { walletAddress } = useExtension();
   const router = useRouter();
 
@@ -199,7 +200,22 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
         },
       );
 
-      await Promise.allSettled([pricesCall, accountCall]).then(responses => {
+      const accountAssetOwner = new Promise<any>(async (resolve, reject) => {
+        const res = await api.get({
+          route: 'assets/kassets',
+          query: { owner: `${address}` },
+        });
+        if (!res.error || res.error === '') {
+          resolve(res);
+        }
+
+        reject(res.error);
+      });
+      await Promise.allSettled([
+        pricesCall,
+        accountCall,
+        accountAssetOwner,
+      ]).then(responses => {
         responses.forEach((res, index) => {
           if (res.status === 'fulfilled') {
             const { value }: any = res;
@@ -213,6 +229,9 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
                 const prices = responses[0].value;
                 setPriceKLV(prices.symbols[0].price);
               }
+            }
+            if (index === 2) {
+              setAccountAssetOwner(value.data.assets);
             }
           }
         });
@@ -414,6 +433,7 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
             </ContainerTabInteractions>
             <Assets
               assets={accountAssets}
+              accountAssetOwner={accountAssetOwner}
               address={account.address}
               showInteractionsButtons={showInteractionsButtons}
             />
@@ -530,6 +550,7 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
                   {showInteractionsButtons(
                     'Create Transfer',
                     'TransferContract',
+                    false,
                   )}
                 </div>
               </AmountContainer>

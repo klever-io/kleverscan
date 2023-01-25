@@ -704,7 +704,11 @@ const Contract: React.FC<IContract> = ({
     (contractType !== 'AssetTriggerContract' ||
       typeAssetTrigger !== 1 ||
       !collection?.isNFT) &&
-    !(typeAssetTrigger === 1 && Object.keys(collection).length === 0);
+    !(
+      typeAssetTrigger === 1 &&
+      collection &&
+      Object.keys(collection).length === 0
+    );
 
   return (
     <Container loading={loading ? loading : undefined}>

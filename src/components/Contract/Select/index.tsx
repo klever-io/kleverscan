@@ -38,6 +38,7 @@ const Select: React.FC<IFilter> = ({
   precedence,
   collection,
   claimSelectedType,
+
   ...rest
 }) => {
   const getAssetsEnableRef = useRef<boolean>(true);

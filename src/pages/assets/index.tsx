@@ -7,6 +7,7 @@ import Table, { ITable } from '@/components/Table';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import api from '@/services/api';
 import { IAsset, IPagination, IResponse, IRowSection } from '@/types/index';
+import { useFetchPartialAsset } from '@/utils/hooks';
 import { formatAmount, parseHardCodedInfo } from '@/utils/index';
 import { Container, Header, HeaderContainer, Input } from '@/views/assets';
 import { LetterLogo, Logo } from '@/views/assets/index';
@@ -30,32 +31,17 @@ interface IAssetResponse extends IResponse {
 
 const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
   const router = useRouter();
-  const [assetFilters, setAssetsFilters] = useState(assets);
   const [filterToken, setFilterToken] = useState(router.query.asset || 'All');
 
-  let fetchPartialAssetTimeout: ReturnType<typeof setTimeout>;
+  const [filterAssets, fetchPartialAsset] = useFetchPartialAsset();
 
   const filters: IFilter[] = [
     {
       title: 'Asset',
-      data: assetFilters.map(asset => asset.assetId),
+      data: filterAssets.map(asset => asset.assetId),
       onClick: value => setFilterToken(value),
-      onChange: value => {
-        clearTimeout(fetchPartialAssetTimeout);
-        fetchPartialAssetTimeout = setTimeout(async () => {
-          let response: IAssetResponse;
-          if (
-            value &&
-            !assetFilters.find(asset =>
-              asset.assetId.includes(value.toUpperCase()),
-            )
-          ) {
-            response = await api.getCached({
-              route: `assets/kassets?asset=${value}`,
-            });
-            setAssetsFilters([...assetFilters, ...response.data.assets]);
-          }
-        }, 500);
+      onChange: async value => {
+        await fetchPartialAsset(value);
       },
       current: (filterToken as string) || undefined,
     },
@@ -67,7 +53,6 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
         route: `assets/kassets?hidden=false&page=${page}&limit=${limit}`,
         refreshTime: 21600,
       });
-      setAssetsFilters(res.data.assets);
       return res;
     } else {
       return api.getCached({
@@ -271,7 +256,6 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
     dataName: 'assets',
     scrollUp: true,
     totalPages: pagination?.totalPages || 1,
-    query: router.query,
   };
 
   return (

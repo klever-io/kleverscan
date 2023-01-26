@@ -6,7 +6,6 @@ import {
   breakText,
   capitalizeString,
   doIf,
-  fetchPartialAsset,
   filterDate,
   formatAmount,
   formatLabel,
@@ -544,21 +543,6 @@ describe('unit tests for util funcs in index file', () => {
       (api.post as jest.Mock).mockReturnValue(mockPrecision);
       const precision = (await getPrecisionFromApi(['PVM-GVCI', 'KLV'])) as any;
       expect(precision).toEqual({ precisions: mockPrecision.data.precisions });
-    });
-  });
-
-  describe('test fetchPartialAsset function', () => {
-    let fetchPartialAssetTimeout: ReturnType<typeof setTimeout>;
-    test('if returns correct asset', async () => {
-      (api.getCached as jest.Mock).mockReturnValueOnce({
-        data: {
-          assets: mocks.assets[0],
-        },
-      });
-      const result = fetchPartialAsset(fetchPartialAssetTimeout, 'KFI');
-      await clock.tickAsync(5000);
-
-      await expect(result).resolves.toStrictEqual(mocks.assets[0]);
     });
   });
 

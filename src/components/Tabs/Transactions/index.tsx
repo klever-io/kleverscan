@@ -17,6 +17,7 @@ import {
   getHeaderForTable,
   initialsTableHeaders,
 } from '@/utils/contracts';
+import { KLV_PRECISION } from '@/utils/globalVariables';
 import {
   capitalizeString,
   formatAmount,
@@ -42,9 +43,10 @@ const Transactions: React.FC<ITransactionsProps> = props => {
   const getFilteredSections = (
     contract: IContract[],
     receipts: IReceipt[],
+    precision?: number,
   ): IRowSection[] => {
     const contractType = getContractType(contract);
-    return filteredSections(contract, contractType, receipts);
+    return filteredSections(contract, contractType, receipts, precision);
   };
 
   const rowSections = (props: ITransaction): IRowSection[] => {
@@ -129,14 +131,19 @@ const Transactions: React.FC<ITransactionsProps> = props => {
         span: 1,
       },
       { element: <strong key={contractType}>{contractType}</strong>, span: 1 },
-      { element: <strong key={kAppFee}>{kAppFee / 10 ** 6}</strong>, span: 1 },
       {
-        element: <strong key={kAppFee}>{bandwidthFee / 10 ** 6}</strong>,
+        element: <strong key={kAppFee}>{kAppFee / 10 ** KLV_PRECISION}</strong>,
+        span: 1,
+      },
+      {
+        element: (
+          <strong key={kAppFee}>{bandwidthFee / 10 ** KLV_PRECISION}</strong>
+        ),
         span: 1,
       },
     ];
 
-    const filteredContract = getFilteredSections(contract, receipts);
+    const filteredContract = getFilteredSections(contract, receipts, precision);
 
     if (router?.query?.type) {
       sections.pop();

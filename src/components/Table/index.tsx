@@ -1,5 +1,5 @@
 import { useMobile } from '@/contexts/mobile';
-import { IRowSection, Query } from '@/types/index';
+import { IRowSection } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { exportToCsv } from '@/utils/index';
 import { useRouter } from 'next/router';
@@ -62,7 +62,6 @@ export interface ITable {
   totalPages?: number;
   dataName?: string;
   request?: (page: number, limit: number) => Promise<any>;
-  query?: Query;
   interval?: number;
   intervalController?: React.Dispatch<React.SetStateAction<number>>;
 }

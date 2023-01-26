@@ -68,7 +68,7 @@ export const StyledInput = styled.input<IProps>`
           position: absolute;
           top: 100;
           bottom: 0;
-          z-index: -1;
+          z-index: -2;
           pointer-events: none;
           color: transparent;
           border: none;
@@ -260,7 +260,7 @@ export const InputLabel = styled.label<ILabel>`
   font-size: smaller;
   font-weight: 600;
   transform: translate(-1rem, -2.25rem);
-  z-index: 996;
+  z-index: 1;
 
   position: absolute;
   left: 1rem;

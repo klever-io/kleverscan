@@ -87,7 +87,7 @@ export const PaginationModalContainer = styled.div.attrs(
   left: -3rem;
   transform: translateY(100%);
 
-  z-index: 10;
+  z-index: 1;
 
   border-radius: 20px;
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);

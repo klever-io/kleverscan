@@ -24,7 +24,8 @@ import { Card } from '@/views/blocks';
 import { core } from '@klever/sdk';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import ReactDOM from 'react-dom';
 import { toast } from 'react-toastify';
 import ConfirmPayload from '../ConfirmPayload';
 import Copy from '../Copy';
@@ -41,6 +42,7 @@ import {
   Container,
   ExtraOptionContainer,
   FieldLabel,
+  LoadingBackground,
   SelectContainer,
   SelectContent,
 } from './styles';
@@ -114,6 +116,14 @@ const Contract: React.FC<IContract> = ({
   };
   const collectionRef = useRef<string | null>(null);
   const contractRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (loading) {
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.documentElement.style.overflow = 'unset';
+    }
+  }, [loading]);
 
   useEffect(() => {
     const getAsset = kAssets.filter(
@@ -505,7 +515,7 @@ const Contract: React.FC<IContract> = ({
         getAssets={getAssets}
         options={assetTriggerTypes}
         onChange={value => setTypeAssetTrigger(value ? value.value : 0)}
-        precedence={2}
+        zIndex={4}
       />
     </AssetTriggerContainer>
   );
@@ -597,6 +607,7 @@ const Contract: React.FC<IContract> = ({
           onChange={(value: any) => {
             setSelectedBucket(value.value);
           }}
+          zIndex={2}
         />
       </SelectContent>
     </SelectContainer>
@@ -629,6 +640,7 @@ const Contract: React.FC<IContract> = ({
             }
           }}
           getAssets={getAssets}
+          zIndex={3}
         />
       </SelectContent>
 
@@ -711,7 +723,9 @@ const Contract: React.FC<IContract> = ({
     );
 
   return (
-    <Container loading={loading ? loading : undefined}>
+    <Container>
+      {loading &&
+        ReactDOM.createPortal(<LoadingBackground />, window.document.body)}
       {open && (
         <ConfirmPayload
           payload={payload}
@@ -730,7 +744,7 @@ const Contract: React.FC<IContract> = ({
           }}
           getAssets={getAssets}
           title={'Contract'}
-          precedence={1}
+          zIndex={5}
         />
       )}
 

@@ -453,7 +453,7 @@ export const BackTopButton = styled.span<{ isHidden: boolean }>`
   position: fixed;
   bottom: 2rem;
   right: 1.2rem;
-  z-index: 99;
+  z-index: 4;
   border: none;
   outline: none;
   color: ${props => props.theme.violet};

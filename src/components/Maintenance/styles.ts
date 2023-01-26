@@ -23,7 +23,7 @@ export const Container = styled.div`
 `;
 
 export const MaintenanceImage = styled.img`
-  z-index: 10;
+  z-index: 1;
   background: '';
   margin: auto;
   width: 100%;

@@ -137,7 +137,7 @@ export const CalendarContainer = styled.div`
   bottom: -0.5rem;
   right: 0;
   transform: translateY(100%);
-  z-index: 10;
+  z-index: 2;
   border-radius: 20px;
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
 

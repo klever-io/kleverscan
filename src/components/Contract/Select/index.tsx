@@ -23,7 +23,7 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   title?: string;
   getAssets?: () => void;
   label?: string;
-  precedence?: number; // z-index precedence
+  zIndex?: number;
   collection?: IKAssets;
   claimSelectedType?: IStakingRewards;
 }
@@ -35,7 +35,7 @@ const Select: React.FC<IFilter> = ({
   title,
   getAssets,
   label,
-  precedence,
+  zIndex,
   collection,
   claimSelectedType,
 
@@ -87,7 +87,7 @@ const Select: React.FC<IFilter> = ({
   };
 
   return (
-    <Container precedence={precedence}>
+    <Container zIndex={zIndex}>
       {label && <TitleLabel>{label}</TitleLabel>}
       <ReactSelect
         defaultValue={

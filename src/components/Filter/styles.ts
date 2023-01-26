@@ -110,7 +110,7 @@ export const SelectorContainer = styled.div<{ open: boolean }>`
   display: flex;
 
   overflow-y: auto;
-  z-index: 10;
+  z-index: 2;
 
   flex-direction: column;
 

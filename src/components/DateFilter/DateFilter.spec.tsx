@@ -102,7 +102,7 @@ describe('Component: DateFilter', () => {
       bottom: '-0.5rem',
       right: '0',
       transform: 'translateY(100%)',
-      zIndex: '10',
+      zIndex: '2',
       borderRadius: '20px',
       boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.2)',
     };

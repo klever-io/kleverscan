@@ -28,7 +28,7 @@ export const Container = styled.div`
 
     display: flex;
 
-    z-index: 1000 !important;
+    z-index: 1;
 
     align-items: center;
     justify-content: center;

@@ -4,7 +4,7 @@ export const ModalBackdrop = styled.div`
   position: fixed;
   padding: 0;
   margin: 0;
-  z-index: 98;
+  z-index: 3;
   top: 0;
   left: 0;
 

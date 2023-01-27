@@ -80,11 +80,14 @@ const Transactions: React.FC = () => {
       (transaction: ITransaction) => {
         if (transaction.contract && transaction.contract.length) {
           transaction.contract.forEach(contract => {
-            if (contract.parameter && (contract.parameter as any).assetId) {
-              assets.push((contract.parameter as any).assetId);
+            if ('assetId' in contract.parameter && contract.parameter.assetId) {
+              assets.push(contract.parameter.assetId);
             }
-            if (contract.parameter && (contract.parameter as any).currencyID) {
-              assets.push((contract.parameter as any).currencyID);
+            if (
+              'currencyID' in contract.parameter &&
+              contract.parameter.currencyID
+            ) {
+              assets.push(contract.parameter.currencyID);
             }
           });
         }

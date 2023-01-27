@@ -179,7 +179,6 @@ export const AmountContainer = styled.div`
   div {
     span {
       font-weight: 600;
-      margin-top: 0.2rem;
     }
 
     p {

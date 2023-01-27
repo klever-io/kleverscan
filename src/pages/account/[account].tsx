@@ -6,6 +6,7 @@ import Copy from '@/components/Copy';
 import { ISelectedDays } from '@/components/DateFilter';
 import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
+import Skeleton from '@/components/Skeleton';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Assets from '@/components/Tabs/Assets';
 import Buckets from '@/components/Tabs/Buckets';
@@ -119,6 +120,7 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
   );
   const [accountAssets, setAccountAssets] = useState<IAccountAsset[]>([]);
   const [accountAssetOwner, setAccountAssetOwner] = useState();
+  const [loading, setLoading] = useState<boolean>(true);
   const { walletAddress } = useExtension();
   const router = useRouter();
 
@@ -146,6 +148,7 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const emptyAccount = {
         account: {
           address: address,
@@ -269,10 +272,12 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
           });
         },
       );
+      setLoading(false);
     };
 
     fetchData();
   }, []);
+
   useEffect(() => {
     if (account.name) setAccountName(account.name);
   }, [accountName]);
@@ -292,15 +297,13 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
         if (transaction.contract && transaction.contract.length) {
           transaction.contract.forEach(contract => {
             if ('assetId' in contract.parameter && contract.parameter.assetId) {
-              transaction.precision =
-                assetPrecisions[contract.parameter.assetId];
+              assets.push(contract.parameter.assetId);
             }
             if (
               'currencyID' in contract.parameter &&
               contract.parameter.currencyID
             ) {
-              transaction.precision =
-                assetPrecisions[contract.parameter.currencyID];
+              assets.push(contract.parameter.currencyID);
             }
           });
         }
@@ -546,11 +549,19 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
                 <div>
                   <div>
                     <span>
-                      {isNaN(Number(totalKLV)) ? 0 : totalKLV.toLocaleString()}
+                      {!loading ? (
+                        totalKLV.toLocaleString()
+                      ) : (
+                        <Skeleton height={19} />
+                      )}
                     </span>
-                    {!isNaN(Number(pricedKLV)) && (
-                      <p>USD {pricedKLV.toLocaleString()}</p>
-                    )}
+                    <p>
+                      {!loading ? (
+                        <>USD {pricedKLV.toLocaleString()}</>
+                      ) : (
+                        <Skeleton height={16} />
+                      )}
+                    </p>
                   </div>
                   {showInteractionsButtons(
                     'Create Transfer',
@@ -563,18 +574,32 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
                 <div>
                   <strong>Available</strong>
                   <span>
-                    {isNaN(Number(availableBalance))
-                      ? 0
-                      : availableBalance.toLocaleString()}
+                    {!loading ? (
+                      availableBalance.toLocaleString()
+                    ) : (
+                      <Skeleton height={19} />
+                    )}
                   </span>
                 </div>
                 <div>
                   <strong>Frozen</strong>
-                  <span>{getKLVfreezeBalance().toLocaleString()}</span>
+                  <span>
+                    {!loading ? (
+                      getKLVfreezeBalance().toLocaleString()
+                    ) : (
+                      <Skeleton height={19} />
+                    )}
+                  </span>
                 </div>
                 <div>
                   <strong>Unfrozen</strong>
-                  <span>{getKLVunfreezeBalance().toLocaleString()}</span>
+                  <span>
+                    {!loading ? (
+                      getKLVunfreezeBalance().toLocaleString()
+                    ) : (
+                      <Skeleton height={19} />
+                    )}
+                  </span>
                 </div>
               </FrozenContainer>
             </BalanceContainer>
@@ -590,35 +615,53 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
               <FrozenContainer>
                 <StakingRewards>
                   <strong>Allowance</strong>
-                  <span>{getKLVAllowance().toLocaleString()}</span>
-                  {showInteractionsButtons(
-                    'Allowance Claim',
-                    'ClaimContract',
-                    false,
-                    undefined,
-                    1,
+                  {!loading ? (
+                    <>
+                      <span>{getKLVAllowance().toLocaleString()}</span>
+                      {showInteractionsButtons(
+                        'Allowance Claim',
+                        'ClaimContract',
+                        false,
+                        undefined,
+                        1,
+                      )}
+                    </>
+                  ) : (
+                    <Skeleton height={19} />
                   )}
                 </StakingRewards>
                 <StakingRewards>
                   <strong>KLV Staking</strong>
-                  <span>{getKLVStaking().toLocaleString()}</span>
-                  {showInteractionsButtons(
-                    'Staking Claim',
-                    'ClaimContract',
-                    false,
-                    undefined,
-                    0,
+                  {!loading ? (
+                    <>
+                      <span>{getKLVStaking().toLocaleString()}</span>
+                      {showInteractionsButtons(
+                        'Staking Claim',
+                        'ClaimContract',
+                        false,
+                        undefined,
+                        0,
+                      )}
+                    </>
+                  ) : (
+                    <Skeleton height={19} />
                   )}
                 </StakingRewards>
                 <StakingRewards>
                   <strong>KFI Staking</strong>
-                  <span>{getKFIStaking().toLocaleString()}</span>
-                  {showInteractionsButtons(
-                    'Market Claim',
-                    'ClaimContract',
-                    false,
-                    undefined,
-                    2,
+                  {!loading ? (
+                    <>
+                      <span>{getKFIStaking().toLocaleString()}</span>
+                      {showInteractionsButtons(
+                        'Market Claim',
+                        'ClaimContract',
+                        false,
+                        undefined,
+                        2,
+                      )}
+                    </>
+                  ) : (
+                    <Skeleton height={19} />
                   )}
                 </StakingRewards>
               </FrozenContainer>
@@ -630,13 +673,8 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
             <strong>Nonce</strong>
           </span>
           <RowContent>
-            <small>{account.nonce}</small>
+            <small>{!loading ? account.nonce : <Skeleton height={19} />}</small>
           </RowContent>
-        </Row>
-        <Row>
-          <span>
-            <strong>Transactions</strong>
-          </span>
         </Row>
       </OverviewContainer>
       <Tabs {...tabProps}>

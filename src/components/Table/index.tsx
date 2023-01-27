@@ -3,7 +3,7 @@ import { IRowSection } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { exportToCsv } from '@/utils/index';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
 import { TbTableExport } from 'react-icons/tb';
 import { Loader } from '../Loader/styles';
@@ -86,7 +86,6 @@ const Table: React.FC<ITable> = ({
   const [totalPages, setTotalPages] = useState(defaultTotalPages);
   const [limit, setLimit] = useState<number>(10);
   const [items, setItems] = useState(data);
-  const dataRef = useRef([]) as any;
   const limits = [5, 10, 50, 100];
   const [scrollTop, setScrollTop] = useState<boolean>(false);
 
@@ -108,9 +107,15 @@ const Table: React.FC<ITable> = ({
     };
   }, []);
 
+  useEffect(() => {
+    setItems(data);
+  }, [data]);
+
   const fetchData = useCallback(async () => {
     if (request && dataName) {
-      setLoading(true);
+      if (!interval) {
+        setLoading(true);
+      }
       const response = await request(page, limit);
       if (!response.error) {
         setItems(response.data[dataName]);
@@ -122,13 +127,6 @@ const Table: React.FC<ITable> = ({
     }
     setLoading(false);
   }, [page, limit, request, dataName]);
-
-  useDidUpdateEffect(() => {
-    if (!dataRef.current.length) {
-      setItems(data);
-      dataRef.current = data;
-    }
-  }, [data]);
 
   useDidUpdateEffect(() => {
     if (page !== 1 && intervalController) {
@@ -161,10 +159,6 @@ const Table: React.FC<ITable> = ({
       return () => clearInterval(intervalId);
     }
   }, [interval, limit]);
-
-  useEffect(() => {
-    setItems(data);
-  }, [data]);
 
   const handleClickCsv = async () => {
     setLoadingCsv(true);
@@ -237,7 +231,7 @@ const Table: React.FC<ITable> = ({
               })}
             </Header>
           )}
-          <Body {...props} data-testid="table-body">
+          <Body {...props} data-testid="table-body" autoUpdate={!!interval}>
             {loading && (
               <>
                 {Array(limit)
@@ -260,9 +254,13 @@ const Table: React.FC<ITable> = ({
                 let spanCount = 0;
 
                 return (
-                  <React.Fragment key={String(index)}>
+                  <React.Fragment key={JSON.stringify(item) + String(index)}>
                     {rowSections && (
-                      <Row key={String(index)} {...props} rowSections={true}>
+                      <Row
+                        key={JSON.stringify(item) + String(index)}
+                        {...props}
+                        rowSections={true}
+                      >
                         {rowSections(item)?.map(({ element, span }, index2) => {
                           let isRightAligned = false;
                           spanCount += span || 1;

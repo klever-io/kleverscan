@@ -104,10 +104,6 @@ export const Card = styled.div`
   }
 `;
 
-export const EffectsContainer = styled.div<{ autoUpdate: boolean }>`
-  ${props => (props.autoUpdate ? tableEffects : '')}
-`;
-
 const tableEffects = css`
   div > div:first-child {
     opacity: 1;

@@ -24,7 +24,6 @@ import {
   Card,
   CardContainer,
   Container,
-  EffectsContainer,
   Header,
   Input,
   TableContainer,
@@ -306,7 +305,7 @@ const Blocks: React.FC<IBlocks> = ({
 
       <CardContainer>
         {cards.map((card, index) => (
-          <CardContent key={String(index)} {...card} />
+          <CardContent key={JSON.stringify(card)} {...card} />
         ))}
       </CardContainer>
 
@@ -318,9 +317,8 @@ const Blocks: React.FC<IBlocks> = ({
             <ToggleButton active={!!blocksInterval} />
           </UpdateContainer>
         </TableHeader>
-        <EffectsContainer autoUpdate={!!blocksInterval}>
-          <Table {...tableProps} />
-        </EffectsContainer>
+
+        <Table {...tableProps} />
       </TableContainer>
     </Container>
   );

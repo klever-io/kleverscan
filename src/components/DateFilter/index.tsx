@@ -255,7 +255,7 @@ const DateFilter: React.FC<IDateFilter> = ({
         <OutsideContent onClick={() => inputRef.current?.focus()}>
           <Input
             type="text"
-            placeholder="Add filter by date"
+            placeholder="Date Filter"
             onFocus={() => handleInputFocus()}
             value={inputValue}
             ref={inputRef}

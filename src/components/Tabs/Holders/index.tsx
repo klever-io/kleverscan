@@ -1,7 +1,7 @@
 import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
 import { IBalance, IHolders, IRowSection } from '@/types/index';
-import { formatAmount, parseAddress, toLocaleFixed } from '@/utils/index';
+import { formatAmount, parseAddress } from '@/utils/index';
 import Link from 'next/link';
 import React from 'react';
 import { AddressContainer, RankingContainer, RankingText } from './styles';
@@ -51,10 +51,7 @@ const Holders: React.FC<IHolders> = ({ holders, asset, holdersTableProps }) => {
       {
         element: (
           <strong key={asset.precision}>
-            {toLocaleFixed(
-              frozenBalance / 10 ** asset.precision,
-              asset.precision,
-            )}
+            {formatAmount(frozenBalance / 10 ** asset.precision)}
           </strong>
         ),
         span: 1,

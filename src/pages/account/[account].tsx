@@ -3,7 +3,11 @@ import { Receive } from '@/assets/icons';
 import { AccountDetails as AccountIcon } from '@/assets/title-icons';
 import ModalContract from '@/components/Contract/ModalContract';
 import Copy from '@/components/Copy';
-import { ISelectedDays } from '@/components/DateFilter';
+import DateFilter, {
+  IDateFilter,
+  ISelectedDays,
+} from '@/components/DateFilter';
+import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
 import Skeleton from '@/components/Skeleton';
@@ -12,7 +16,12 @@ import Assets from '@/components/Tabs/Assets';
 import Buckets from '@/components/Tabs/Buckets';
 import Transactions from '@/components/Tabs/Transactions';
 import TransactionsFilters from '@/components/TransactionsFilters';
-import { TxsFiltersWrapper } from '@/components/TransactionsFilters/styles';
+import {
+  ContainerFilter,
+  FilterDiv,
+  RightFiltersContent,
+  TxsFiltersWrapper,
+} from '@/components/TransactionsFilters/styles';
 import { useExtension } from '@/contexts/extension';
 import api, { IPrice } from '@/services/api';
 import {
@@ -46,6 +55,7 @@ import {
   RowContent,
   StakingRewards,
 } from '@/views/accounts/detail';
+import { FilterByDate } from '@/views/transactions';
 import { ReceiveBackground } from '@/views/validator';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
@@ -418,10 +428,12 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
       resetDate: resetQueryDate,
       filterDate: filterQueryDate,
     },
-    filterFromTo,
-    showTxInTxOutFilter: true,
+    showDataFilter: false,
   };
-
+  const dateFilterProps: IDateFilter = {
+    resetDate: resetQueryDate,
+    filterDate: filterQueryDate,
+  };
   const transactionsFiltersProps = {
     query: router.query,
     setQuery: setQueryAndRouter,
@@ -487,6 +499,45 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
     return <></>;
   };
 
+  const getFilterName = () => {
+    if (router.query?.role === 'sender') {
+      return 'Transactions Out';
+    } else if (router.query?.role === 'receiver') {
+      return 'Transactions In';
+    } else if (router.query?.role === '' || router.query?.role === undefined) {
+      return 'All Transactions';
+    }
+    return 'All Transactions';
+  };
+  const filterName = useCallback(getFilterName, [router.query]);
+  const handleClickFilterName = (filter: string) => {
+    switch (filter) {
+      case 'All Transactions':
+        filterFromTo && filterFromTo(0);
+        break;
+      case 'Transactions Out':
+        filterFromTo && filterFromTo(1);
+        break;
+      case 'Transactions In':
+        filterFromTo && filterFromTo(2);
+        break;
+
+      default:
+        filterFromTo && filterFromTo(0);
+    }
+  };
+  const filters: IFilter[] = [
+    {
+      firstItem: 'All Transactions',
+      data: ['Transactions Out', 'Transactions In'],
+      onClick: e => {
+        handleClickFilterName(e);
+      },
+      current: filterName(),
+      overFlow: 'visible',
+      inputType: 'button',
+    },
+  ];
   const modalOptions = {
     contractType: transactionValue,
     setContractType: setTransactionValue,
@@ -680,9 +731,22 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
       <Tabs {...tabProps}>
         {selectedTab === 'Transactions' && (
           <TxsFiltersWrapper>
-            <TransactionsFilters
-              {...transactionsFiltersProps}
-            ></TransactionsFilters>
+            <ContainerFilter>
+              <TransactionsFilters
+                {...transactionsFiltersProps}
+              ></TransactionsFilters>
+              <RightFiltersContent>
+                <FilterDiv>
+                  <span>Transaction In/Out</span>
+                  {filters.map((filter, index) => (
+                    <Filter key={index} {...filter} />
+                  ))}
+                </FilterDiv>
+                <FilterByDate>
+                  <DateFilter {...dateFilterProps} />
+                </FilterByDate>
+              </RightFiltersContent>
+            </ContainerFilter>
           </TxsFiltersWrapper>
         )}
         <SelectedTabComponent />

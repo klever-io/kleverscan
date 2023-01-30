@@ -84,6 +84,7 @@ export const OutsideContent = styled.div`
   height: 100%;
   width: 100%;
   display: flex;
+  flex-direction: row !important;
   align-items: center;
   justify-content: center;
 
@@ -146,10 +147,10 @@ export const CalendarContainer = styled.div`
   }
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    left: 39%;
+    left: 6rem;
     bottom: -100%;
     animation: ${fadeInContainerMobile} 0.2s linear forwards;
-    width: 79% !important;
+    width: 20rem;
   }
 `;
 export const CalendarHeader = styled.div`

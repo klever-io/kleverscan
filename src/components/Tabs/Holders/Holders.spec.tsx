@@ -4,7 +4,7 @@ import { act } from 'react-dom/test-utils';
 import { klvAsset as KLVMock, mockedHolders } from '../../../test/mocks';
 import { mockedHoldersResponse } from '../../../test/mocks/tabs/holders';
 import { renderWithTheme } from '../../../test/utils';
-import { parseAddress, toLocaleFixed } from '../../../utils/index';
+import { formatAmount, parseAddress } from '../../../utils/index';
 import Holders from './';
 
 jest.mock('next/router', () => ({
@@ -78,10 +78,7 @@ describe('Component: Tabs/Holders', () => {
     ).toFixed(2);
     const percentage = screen.getAllByText(`${calcPercentage}%`)[0];
 
-    const calcAmount = toLocaleFixed(
-      balance / 10 ** klvAsset.precision,
-      klvAsset.precision,
-    );
+    const calcAmount = formatAmount(balance / 10 ** klvAsset.precision);
     const amount = screen.getAllByText(calcAmount)[0];
 
     expect(link).toBeInTheDocument();

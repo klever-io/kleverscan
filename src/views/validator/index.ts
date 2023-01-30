@@ -121,7 +121,7 @@ export const Status = styled.div<IStatus>`
     fill: ${props => props.theme.white};
   }
   circle {
-    fill: ${props => props.theme.table.success};
+    fill: ${props => props.theme.table[props.status]};
   }
   p {
     color: ${props => props.theme.table[props.status]} !important;
@@ -194,7 +194,7 @@ export const ProgressContent = styled.div<{ percent: number }>`
   justify-content: left;
   align-items: center;
   background-color: ${props =>
-    props.theme.dark ? props.theme.card.assetText : '#c47fd0'} !important;
+    props.theme.dark ? props.theme.violet : '#D4A2DD'} !important;
   border-radius: 0.25rem;
 `;
 

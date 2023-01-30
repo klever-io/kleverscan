@@ -159,7 +159,7 @@ export const withBody = async (props: IProps, method: Method): Promise<any> => {
     if (props.useApiProxy) {
       try {
         // use next api as proxy for post requests, to avoid cors from api-gateway (when fetching prices)
-        const response = await fetch('/api', {
+        const response = await fetch('/api/proxy', {
           method: method.toString(),
           headers: {
             'Content-Type': 'application/json',

@@ -1,15 +1,13 @@
 import { useMobile } from '@/contexts/mobile';
-import { IRowSection, Query } from '@/types/index';
-import { exportToJson } from '@/utils/exportJSON';
+import { IRowSection } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { exportToCsv } from '@/utils/index';
-import Bugsnag, { NotifiableError } from '@bugsnag/js';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
 import { TbTableExport } from 'react-icons/tb';
-import { toast } from 'react-toastify';
 import { Loader } from '../Loader/styles';
+// import { VscJson } from 'react-icons/vsc';
 import Pagination from '../Pagination';
 import { PaginationContainer } from '../Pagination/styles';
 import Skeleton from '../Skeleton';
@@ -64,7 +62,6 @@ export interface ITable {
   totalPages?: number;
   dataName?: string;
   request?: (page: number, limit: number) => Promise<any>;
-  query?: Query;
   interval?: number;
   intervalController?: React.Dispatch<React.SetStateAction<number>>;
 }
@@ -73,7 +70,6 @@ const Table: React.FC<ITable> = ({
   type,
   header,
   data,
-  body: Component,
   rowSections,
   request,
   scrollUp,
@@ -83,23 +79,21 @@ const Table: React.FC<ITable> = ({
   intervalController,
 }) => {
   const router = useRouter();
-  const props: ITableType = {
-    type,
-    pathname: router.pathname,
-    haveData: data?.length,
-  };
-  const { isMobile } = useMobile();
-  const [isTablet, setIsTablet] = useState(false);
+  const { isMobile, isTablet } = useMobile();
   const [loading, setLoading] = useState(false);
   const [loadingCsv, setLoadingCsv] = useState(false);
-  const [loadingJson, setLoadingJson] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(defaultTotalPages);
   const [limit, setLimit] = useState<number>(10);
   const [items, setItems] = useState(data);
-  const dataRef = useRef([]) as any;
   const limits = [5, 10, 50, 100];
   const [scrollTop, setScrollTop] = useState<boolean>(false);
+
+  const props: ITableType = {
+    type,
+    pathname: router.pathname,
+    haveData: items?.length,
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -114,13 +108,14 @@ const Table: React.FC<ITable> = ({
   }, []);
 
   useEffect(() => {
-    const tabletWindow = window.innerWidth <= 1025 && window.innerWidth >= 769;
-    setIsTablet(tabletWindow);
-  });
+    setItems(data);
+  }, [data]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (request && dataName) {
-      setLoading(true);
+      if (!interval) {
+        setLoading(true);
+      }
       const response = await request(page, limit);
       if (!response.error) {
         setItems(response.data[dataName]);
@@ -131,14 +126,7 @@ const Table: React.FC<ITable> = ({
       }
     }
     setLoading(false);
-  };
-
-  useDidUpdateEffect(() => {
-    if (!dataRef.current.length) {
-      setItems(data);
-      dataRef.current = data;
-    }
-  }, [data]);
+  }, [page, limit, request, dataName]);
 
   useDidUpdateEffect(() => {
     if (page !== 1 && intervalController) {
@@ -172,30 +160,14 @@ const Table: React.FC<ITable> = ({
     }
   }, [interval, limit]);
 
-  useEffect(() => {
-    setItems(data);
-  }, [data]);
-
   const handleClickCsv = async () => {
     setLoadingCsv(true);
-    await exportToCsv('CSV-transactions', items, router);
+    await exportToCsv('transactions', items, router);
     setLoadingCsv(false);
   };
 
   const handleScrollTop = () => {
     window.scrollTo(0, 0);
-  };
-
-  const handleClickJson = async () => {
-    setLoadingJson(true);
-    try {
-      await exportToJson('JSON-transactions', items);
-    } catch (e) {
-      toast.error('Error exporting to JSON');
-      Bugsnag.notify(e as NotifiableError);
-    } finally {
-      setLoadingJson(false);
-    }
   };
 
   return (
@@ -216,7 +188,11 @@ const Table: React.FC<ITable> = ({
                   />
                 </ExportLabel>
                 <ButtonsContainer>
-                  <ExportButton onClick={handleClickCsv}>
+                  <ExportButton
+                    onClick={() => {
+                      handleClickCsv();
+                    }}
+                  >
                     <Tooltip
                       msg="CSV"
                       Component={() =>
@@ -224,13 +200,8 @@ const Table: React.FC<ITable> = ({
                       }
                     />
                   </ExportButton>
-                  {/* <ExportButton onClick={handleClickJson} isJson={true}>
-                    <Tooltip
-                      msg="JSON"
-                      Component={() =>
-                        loadingJson ? <Loader /> : <VscJson size={25} />
-                      }
-                    />
+                  {/* <ExportButton>
+                    <VscJson size={25} />
                   </ExportButton> */}
                 </ButtonsContainer>
               </ExportContainer>
@@ -255,12 +226,12 @@ const Table: React.FC<ITable> = ({
         <Container>
           {((!isMobile && !isTablet) || !rowSections) && !!items?.length && (
             <Header {...props} key={String(header)}>
-              {header.map((item, index) => (
-                <span key={String(index)}>{item}</span>
-              ))}
+              {header.map((item, index) => {
+                return <span key={JSON.stringify(item)}>{item}</span>;
+              })}
             </Header>
           )}
-          <Body {...props} data-testid="table-body">
+          <Body {...props} data-testid="table-body" autoUpdate={!!interval}>
             {loading && (
               <>
                 {Array(limit)
@@ -283,10 +254,13 @@ const Table: React.FC<ITable> = ({
                 let spanCount = 0;
 
                 return (
-                  <React.Fragment key={String(index)}>
-                    {Component && <Component key={String(index)} {...item} />}
+                  <React.Fragment key={JSON.stringify(item) + String(index)}>
                     {rowSections && (
-                      <Row key={String(index)} {...props} rowSections={true}>
+                      <Row
+                        key={JSON.stringify(item) + String(index)}
+                        {...props}
+                        rowSections={true}
+                      >
                         {rowSections(item)?.map(({ element, span }, index2) => {
                           let isRightAligned = false;
                           spanCount += span || 1;

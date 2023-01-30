@@ -1,6 +1,5 @@
 import Tooltip from '@/components/Tooltip';
 import { coinStyles } from '@/components/Tooltip/configs';
-import { useMobile } from '@/contexts/mobile';
 import {
   IAssetTriggerContract,
   IBuyContractPayload,
@@ -31,20 +30,27 @@ import {
 import { IReceipt, IRowSection } from '@/types/index';
 import { CenteredRow } from '@/views/transactions';
 import Link from 'next/link';
-import { formatAmount, passViewportStyles } from '..';
+import { formatAmount, passViewportStyles, toLocaleFixed } from '..';
 import { findReceipt } from '../findKey';
+import { KLV_PRECISION } from '../globalVariables';
 
-const precision = 6; // default KLV precision
-
-const TransferSections = (par: IParameter): IRowSection[] => {
+const TransferSections = (
+  par: IParameter,
+  precision: number,
+): IRowSection[] => {
   const parameter = par as unknown as ITransferContract;
 
-  const { isMobile, isTablet } = useMobile();
+  if (typeof window === 'undefined') return [];
+
+  const isMobile = window.innerWidth <= 768;
+  const isTablet = window.innerWidth < 1025 && window.innerWidth > 768;
 
   let assetId = 'KLV';
   if (parameter.assetId?.includes('/')) {
     assetId = parameter.assetId.split('/')[0];
   }
+
+  if (!parameter.assetId) precision = KLV_PRECISION;
 
   return [
     {
@@ -83,7 +89,11 @@ const TransferSections = (par: IParameter): IRowSection[] => {
     {
       element: (
         <span key={parameter.amount}>
-          <strong>{formatAmount(parameter.amount / 10 ** precision)}</strong>
+          <strong>
+            {parameter.amount / 10 ** precision >= 1
+              ? formatAmount(parameter.amount / 10 ** precision)
+              : toLocaleFixed(parameter.amount / 10 ** precision, precision)}
+          </strong>
         </span>
       ),
       span: 1,
@@ -147,8 +157,10 @@ const ValidatorConfigSections = (par: IParameter): IRowSection[] => {
   ];
 };
 
-const FreezeSections = (par: IParameter): IRowSection[] => {
+const FreezeSections = (par: IParameter, precision: number): IRowSection[] => {
   const parameter = par as unknown as IFreezeContract;
+  if (!parameter.assetId) precision = KLV_PRECISION;
+
   return [
     {
       element: (
@@ -324,7 +336,7 @@ const VoteSections = (par: IParameter): IRowSection[] => {
     {
       element: (
         <span key={parameter.amount}>
-          <small>{parameter.amount / 10 ** precision}</small>
+          <small>{parameter.amount / 10 ** KLV_PRECISION}</small>
         </span>
       ),
       span: 1,

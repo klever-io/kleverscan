@@ -41,10 +41,10 @@ import {
   capitalizeString,
   formatDate,
   hexToString,
-  isDataEmpty,
   parseJson,
   toLocaleFixed,
 } from '@/utils/index';
+import { BalanceContainer, RowContent } from '@/views/accounts/detail';
 import {
   ButtonExpand,
   CardContainer,
@@ -54,6 +54,7 @@ import {
   Container,
   DivDataJson,
   ExpandCenteredRow,
+  FrozenContainer,
   Header,
   Hr,
   IconsWrapper,
@@ -92,11 +93,7 @@ interface ITransactionPage {
 }
 
 const Transaction: React.FC<ITransactionPage> = props => {
-  const [showModal, setShowModal] = useState(false);
-  const [expandData, setExpandData] = useState(false);
   const { transaction, block } = props;
-  const { isDarkTheme } = useTheme();
-  const ReactJson = dynamic(import('react-json-view'), { ssr: false });
   const {
     hash,
     status,
@@ -113,16 +110,66 @@ const Transaction: React.FC<ITransactionPage> = props => {
     nonce,
   } = transaction;
 
+  const initializeExpandData = () => {
+    if (data && data.length > 0) {
+      const expandArray: boolean[] = [];
+      data.forEach(() => {
+        expandArray.push(false);
+      });
+      return expandArray;
+    }
+    return [];
+  };
+
+  const [showModal, setShowModal] = useState(false);
+  const [expandData, setExpandData] = useState(initializeExpandData());
+  const { isDarkTheme } = useTheme();
+  const ReactJson = dynamic(import('react-json-view'), { ssr: false });
+
   const StatusIcon = getStatusIcon(status);
 
-  const renderData = () => {
-    if (expandData) {
+  const updateExpandArray = (index: number) => {
+    const newArray = [...expandData];
+    newArray[index] = !expandData[index];
+    setExpandData(newArray);
+  };
+
+  const renderAllData = () => {
+    if (!data || data.length === 0) {
+      return null;
+    }
+    if (data.length === 1) {
+      return renderOneMetadata(data, 0);
+    }
+    return renderAllMetadata(data);
+  };
+
+  const renderAllMetadata = (data: string[]) => {
+    return data.map((_, index) => (
+      <FrozenContainer key={index}>
+        {renderOneMetadata(data, index)}
+      </FrozenContainer>
+    ));
+  };
+
+  const renderOneMetadata = (data: string[], index: number) => {
+    return (
+      <ExpandCenteredRow openJson={expandData[index]}>
+        {renderData(data[index], index)}
+        <IconsWrapper>
+          <ButtonExpand onClick={() => updateExpandArray(index)}>
+            {expandData[index] ? 'Hide' : 'Expand'}
+          </ButtonExpand>
+          <Copy data={hexToString(data[index])} info="Data" />
+        </IconsWrapper>
+      </ExpandCenteredRow>
+    );
+  };
+
+  const renderData = (data: string, index: number) => {
+    if (expandData[index]) {
       try {
-        const jsonData = JSON.parse(
-          parseJson(
-            hexToString((data && data.length > 0 && data.join(',')) || ''),
-          ),
-        );
+        const jsonData = JSON.parse(parseJson(hexToString(data)));
         return (
           <DivDataJson>
             <ReactJson
@@ -136,20 +183,10 @@ const Transaction: React.FC<ITransactionPage> = props => {
           </DivDataJson>
         );
       } catch (error) {
-        return (
-          <span>
-            {hexToString((data && data.length > 0 && data.join(',')) || '')}
-          </span>
-        );
+        return <span>{hexToString(data)}</span>;
       }
     }
-    return (
-      <span>
-        {parseJson(
-          hexToString((data && data.length > 0 && data.join(',')) || ''),
-        )}
-      </span>
-    );
+    return <span>{parseJson(hexToString(data))}</span>;
   };
 
   const ContractComponent: React.FC<any> = ({ contracts }) => {
@@ -594,27 +631,14 @@ const Transaction: React.FC<ITransactionPage> = props => {
               <Copy data={signature} info="Signature" />
             </CenteredRow>
           </Row>
-          {!isDataEmpty(data || []) && (
-            <Row>
-              <span>
-                <strong>Data</strong>
-              </span>
-              <ExpandCenteredRow openJson={expandData}>
-                <span>{renderData()}</span>
-                <IconsWrapper>
-                  <ButtonExpand onClick={() => setExpandData(!expandData)}>
-                    {expandData ? 'Hide' : 'Expand'}
-                  </ButtonExpand>
-                  <Copy
-                    data={hexToString(
-                      (data && data.length > 0 && data.join(',')) || '',
-                    )}
-                    info="Data"
-                  />
-                </IconsWrapper>
-              </ExpandCenteredRow>
-            </Row>
-          )}
+          <Row>
+            <span>
+              <strong>Data</strong>
+            </span>
+            <RowContent>
+              <BalanceContainer>{renderAllData()}</BalanceContainer>
+            </RowContent>
+          </Row>
         </CardContent>
       </CardContainer>
       <CardContainer>

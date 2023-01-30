@@ -84,6 +84,7 @@ export const OutsideContent = styled.div`
   height: 100%;
   width: 100%;
   display: flex;
+  flex-direction: row !important;
   align-items: center;
   justify-content: center;
 
@@ -137,7 +138,7 @@ export const CalendarContainer = styled.div`
   bottom: -0.5rem;
   right: 0;
   transform: translateY(100%);
-  z-index: 10;
+  z-index: 2;
   border-radius: 20px;
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
 
@@ -146,10 +147,10 @@ export const CalendarContainer = styled.div`
   }
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    left: 39%;
+    left: 6rem;
     bottom: -100%;
     animation: ${fadeInContainerMobile} 0.2s linear forwards;
-    width: 79% !important;
+    width: 20rem;
   }
 `;
 export const CalendarHeader = styled.div`

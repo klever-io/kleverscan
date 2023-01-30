@@ -27,7 +27,6 @@ export const ConnectButton = styled.div`
   }
   position: relative;
   width: 100%;
-
   cursor: pointer;
 
   input {
@@ -152,7 +151,7 @@ export const LogoutContainer = styled.div`
         color: ${props => props.theme.card.white};
         padding: 0.5rem;
         border-radius: 5px;
-        z-index: 500;
+        z-index: 1;
         transform: translate(-25%, 100%);
       }
     }
@@ -201,7 +200,7 @@ export const CopyContainer = styled.div`
         color: ${props => props.theme.card.white};
         padding: 0.5rem;
         border-radius: 5px;
-        z-index: 500;
+        z-index: 1;
         transform: translate(-50%, 40%);
       }
     }
@@ -327,7 +326,7 @@ export const OtherAssetsContainer = styled.div<{ isMobile?: boolean }>`
   border-radius: 0.5rem;
   transform: translateX(-25%);
   animation: ${FadeIn} 0.1s ease-in-out;
-  z-index: 1000;
+  z-index: 2;
 
   div {
     display: flex;
@@ -414,7 +413,7 @@ export const UserInfoContainer = styled.div<{
   position: fixed;
   top: 4.4rem;
   right: 5.6rem;
-  z-index: 1000 !important;
+  z-index: 7;
 
   visibility: ${props => (props.openUserInfos ? 'visible' : 'hidden')};
   opacity: ${props => (props.openUserInfos ? '1' : '0')};
@@ -534,7 +533,7 @@ export const BackGroundUserInfo = styled.div<{ isOpen?: boolean }>`
   opacity: ${props => (props.isOpen ? 1 : 0)};
 
   transition: all 0.1s linear;
-  z-index: 100 !important;
+  z-index: 3;
 `;
 
 export const QRCodeContent = styled.div`

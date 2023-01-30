@@ -14,6 +14,7 @@ import { multiContractStyles } from '@/components/Tooltip/configs';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
+import { KLV_PRECISION } from '@/utils/globalVariables';
 import { CenteredRow } from '@/views/accounts/detail';
 import {
   Container,
@@ -23,19 +24,11 @@ import {
   MultiContractCounter,
 } from '@/views/transactions';
 import { Input } from '@/views/transactions/detail';
-import { GetServerSideProps } from 'next';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback } from 'react';
-import {
-  IAsset,
-  IPagination,
-  IReceipt,
-  IResponse,
-  IRowSection,
-  ITransaction,
-} from '../../types';
+import { IReceipt, IRowSection, ITransaction } from '../../types';
 import {
   Contract,
   ContractsIndex,
@@ -47,6 +40,7 @@ import {
   capitalizeString,
   formatAmount,
   formatDate,
+  getPrecision,
   parseAddress,
   passViewportStyles,
 } from '../../utils';
@@ -57,32 +51,8 @@ import {
   initialsTableHeaders,
 } from '../../utils/contracts';
 
-interface ITransactions {
-  transactions: ITransaction[];
-  pagination: IPagination;
-  assets: IAsset[];
-}
-
-interface ITransactionResponse extends IResponse {
-  data: {
-    transactions: ITransaction[];
-  };
-  pagination: IPagination;
-}
-
-interface IAssetResponse extends IResponse {
-  data: {
-    assets: IAsset[];
-  };
-}
-
-const Transactions: React.FC<ITransactions> = ({
-  transactions: defaultTransactions,
-  pagination,
-  assets,
-}) => {
+const Transactions: React.FC = () => {
   const router = useRouter();
-  const precision = 6; // default KLV precision
   const { isMobile, isTablet } = useMobile();
 
   const setQueryAndRouter = (newQuery: NextParsedUrlQuery) => {
@@ -93,18 +63,75 @@ const Transactions: React.FC<ITransactions> = ({
 
   const getContractType = useCallback(contractTypes, []);
 
-  const requestTransactions = async (page: number, limit?: number) =>
-    api.get({
+  const requestTransactions = async (page: number, limit: number) => {
+    while (!router.isReady) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    const localQuery = { ...router.query, page, limit };
+    const transactionsResponse = await api.get({
       route: `transaction/list`,
-      query: { page, limit, ...router.query },
+      query: localQuery,
     });
+
+    const assets: string[] = [];
+
+    transactionsResponse?.data?.transactions.forEach(
+      (transaction: ITransaction) => {
+        if (transaction.contract && transaction.contract.length) {
+          transaction.contract.forEach(contract => {
+            if ('assetId' in contract.parameter && contract.parameter.assetId) {
+              assets.push(contract.parameter.assetId);
+            }
+            if (
+              'currencyID' in contract.parameter &&
+              contract.parameter.currencyID
+            ) {
+              assets.push(contract.parameter.currencyID);
+            }
+          });
+        }
+      },
+    );
+
+    const assetPrecisions = await getPrecision(assets);
+
+    const parsedTransactions = transactionsResponse.data.transactions.map(
+      (transaction: ITransaction) => {
+        if (transaction.contract && transaction.contract.length) {
+          transaction.contract.forEach(contract => {
+            if ('assetId' in contract.parameter && contract.parameter.assetId) {
+              transaction.precision =
+                assetPrecisions[contract.parameter.assetId];
+            }
+            if (
+              'currencyID' in contract.parameter &&
+              contract.parameter.currencyID
+            ) {
+              transaction.precision =
+                assetPrecisions[contract.parameter.currencyID];
+            }
+          });
+        }
+        return transaction;
+      },
+    );
+
+    return {
+      ...transactionsResponse,
+      data: {
+        transactions: parsedTransactions,
+      },
+    };
+  };
 
   const getFilteredSections = (
     contract: IContract[],
     receipts: IReceipt[],
+    precision?: number,
   ): IRowSection[] => {
     const contractType = getContractType(contract);
-    return filteredSections(contract, contractType, receipts);
+    return filteredSections(contract, contractType, receipts, precision);
   };
 
   const rowSections = (props: ITransaction): IRowSection[] => {
@@ -118,6 +145,7 @@ const Transactions: React.FC<ITransactions> = ({
       kAppFee,
       bandwidthFee,
       status,
+      precision,
     } = props;
 
     const reduceContracts = (): ReducedContract => {
@@ -228,7 +256,7 @@ const Transactions: React.FC<ITransactions> = ({
       },
       {
         element: contractType ? (
-          <strong>{formatAmount(kAppFee / 10 ** precision)}</strong>
+          <strong>{formatAmount(kAppFee / 10 ** KLV_PRECISION)}</strong>
         ) : (
           <></>
         ),
@@ -236,14 +264,14 @@ const Transactions: React.FC<ITransactions> = ({
       },
       {
         element: !router.query.type ? (
-          <strong>{formatAmount(bandwidthFee / 10 ** precision)}</strong>
+          <strong>{formatAmount(bandwidthFee / 10 ** KLV_PRECISION)}</strong>
         ) : (
           <></>
         ),
         span: 1,
       },
     ];
-    const filteredContract = getFilteredSections(contract, receipts);
+    const filteredContract = getFilteredSections(contract, receipts, precision);
 
     if (router.query.type) {
       sections.pop();
@@ -259,13 +287,11 @@ const Transactions: React.FC<ITransactions> = ({
   const tableProps: ITable = {
     type: 'transactions',
     header: getHeaderForTable(router, header),
-    data: defaultTransactions as any[],
+    data: null,
     rowSections,
     dataName: 'transactions',
     scrollUp: true,
-    totalPages: pagination?.totalPages || 1,
     request: (page, limit) => requestTransactions(page, limit),
-    query: router.query,
   };
 
   const resetDate = () => {
@@ -286,13 +312,10 @@ const Transactions: React.FC<ITransactions> = ({
   const dateFilterProps: IDateFilter = {
     resetDate,
     filterDate,
-    empty: defaultTransactions.length === 0,
   };
 
   const transactionsFiltersProps = {
-    query: router.query,
     setQuery: setQueryAndRouter,
-    assets,
   };
 
   return (
@@ -316,33 +339,5 @@ const Transactions: React.FC<ITransactions> = ({
     </Container>
   );
 };
-
-export const getServerSideProps: GetServerSideProps<ITransactions> =
-  async context => {
-    const props: ITransactions = {
-      transactions: [],
-      pagination: {} as IPagination,
-      assets: [],
-    };
-
-    const transactions: ITransactionResponse = await api.get({
-      route: 'transaction/list',
-      query: context.query,
-    });
-
-    if (!transactions.error) {
-      props.transactions = transactions?.data?.transactions || [];
-      props.pagination = transactions?.pagination || {};
-    }
-
-    const assets: IAssetResponse = await api.get({
-      route: 'assets/kassets',
-    });
-    if (!assets.error) {
-      props.assets = assets?.data?.assets || [];
-    }
-
-    return { props };
-  };
 
 export default Transactions;

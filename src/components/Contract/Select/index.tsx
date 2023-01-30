@@ -1,3 +1,5 @@
+import { IStakingRewards } from '@/pages/account/[account]';
+import { IKAssets } from '@/types';
 import dynamic from 'next/dynamic';
 import React, { useCallback, useRef } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
@@ -21,7 +23,9 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   title?: string;
   getAssets?: () => void;
   label?: string;
-  precedence?: number; // z-index precedence
+  zIndex?: number;
+  collection?: IKAssets;
+  claimSelectedType?: IStakingRewards;
 }
 
 const Select: React.FC<IFilter> = ({
@@ -31,7 +35,10 @@ const Select: React.FC<IFilter> = ({
   title,
   getAssets,
   label,
-  precedence,
+  zIndex,
+  collection,
+  claimSelectedType,
+
   ...rest
 }) => {
   const getAssetsEnableRef = useRef<boolean>(true);
@@ -80,9 +87,13 @@ const Select: React.FC<IFilter> = ({
   };
 
   return (
-    <Container precedence={precedence}>
+    <Container zIndex={zIndex}>
       {label && <TitleLabel>{label}</TitleLabel>}
       <ReactSelect
+        defaultValue={
+          (collection && Object.keys(collection).length !== 0 && collection) ||
+          claimSelectedType
+        }
         placeholder={
           selectPlaceholder ? selectPlaceholder : `Choose ${title ? title : ''}`
         }

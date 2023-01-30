@@ -59,9 +59,19 @@ export const FilterContent = styled.div`
   > div:last-child {
     min-width: 18rem;
   }
-
+  div {
+    display: flex;
+  }
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     display: grid;
+  }
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    display: flex;
+    flex-direction: column;
+    > div:last-child {
+      width: 100%;
+    }
   }
 `;
 

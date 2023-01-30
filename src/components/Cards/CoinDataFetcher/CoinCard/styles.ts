@@ -85,7 +85,7 @@ export const CardContent = styled.div`
   }
 
   a {
-    z-index: 1;
+    z-index: 0;
   }
 `;
 
@@ -98,7 +98,7 @@ export const HeaderContainer = styled.div`
 
   flex-direction: row;
 
-  z-index: 3;
+  z-index: 0;
 `;
 
 export const HeaderContent = styled(HeaderContainer)`

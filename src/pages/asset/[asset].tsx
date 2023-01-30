@@ -88,7 +88,6 @@ interface ITransactionResponse extends IResponse {
 
 const Asset: React.FC<IAssetPage> = ({
   asset,
-  transactions: defaultTransactions,
   totalTransactions,
   holders,
   totalHoldersPage,
@@ -586,13 +585,7 @@ const Asset: React.FC<IAssetPage> = ({
   const SelectedTabComponent: React.FC = () => {
     switch (selectedTab) {
       case 'Transactions':
-        return (
-          <Transactions
-            transactions={defaultTransactions}
-            precision={precision}
-            transactionsTableProps={transactionsTableProps}
-          />
-        );
+        return <Transactions transactionsTableProps={transactionsTableProps} />;
       case 'Holders':
         return (
           <Holders
@@ -609,7 +602,6 @@ const Asset: React.FC<IAssetPage> = ({
   const dateFilterProps = {
     resetDate: resetQueryDate,
     filterDate: filterQueryDate,
-    empty: defaultTransactions.length === 0,
   };
 
   const tabProps: ITabs = {
@@ -725,20 +717,6 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
     reject(res.error);
   });
 
-  const transactionCall = new Promise<ITransactionResponse>(
-    async (resolve, reject) => {
-      const res = await api.get({
-        route: `transaction/list?asset=${assetId}&limit=5`,
-      });
-
-      if (!res.error || res.error === '') {
-        resolve(res);
-      }
-
-      reject(res.error);
-    },
-  );
-
   const holdersCall = new Promise<IHoldersResponse>(async (resolve, reject) => {
     const res = await api.get({
       route: `assets/holders/${assetId}`,
@@ -751,39 +729,31 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
     reject(res.error);
   });
 
-  await Promise.allSettled([assetCall, transactionCall, holdersCall]).then(
-    responses => {
-      responses.forEach((res, index) => {
-        if (res.status === 'fulfilled') {
-          if (index === 0) {
-            const asset: any = res.value;
-            props.asset = parseHardCodedInfo([asset.data.asset])[0];
-          } else if (index === 1) {
-            const transactions: any = res.value;
+  await Promise.allSettled([assetCall, holdersCall]).then(responses => {
+    responses.forEach((res, index) => {
+      if (res.status === 'fulfilled') {
+        if (index === 0) {
+          const asset: any = res.value;
+          props.asset = parseHardCodedInfo([asset.data.asset])[0];
+        } else if (index === 1) {
+          const holders: any = res.value;
 
-            props.transactions = transactions?.data?.transactions;
-            props.totalTransactions = transactions?.pagination?.totalRecords;
-            props.totalTransactionsPage = transactions?.pagination?.totalPages;
-          } else if (index === 2) {
-            const holders: any = res.value;
+          const unparsedHolders = holders?.data?.accounts || [];
 
-            const unparsedHolders = holders?.data?.accounts || [];
-
-            props.holders = parseHolders(
-              unparsedHolders,
-              props?.asset?.assetId,
-              holders.pagination,
-            );
-            props.totalHoldersPage = holders?.pagination?.totalPages || 1;
-            props.totalRecords = holders?.pagination?.totalRecords || 1;
-            props.page = holders?.pagination?.self || 1;
-          }
-        } else if (index == 0) {
-          assetNotFound = true;
+          props.holders = parseHolders(
+            unparsedHolders,
+            props?.asset?.assetId,
+            holders.pagination,
+          );
+          props.totalHoldersPage = holders?.pagination?.totalPages || 1;
+          props.totalRecords = holders?.pagination?.totalRecords || 1;
+          props.page = holders?.pagination?.self || 1;
         }
-      });
-    },
-  );
+      } else if (index == 0) {
+        assetNotFound = true;
+      }
+    });
+  });
 
   if (assetNotFound) {
     return redirectProps;

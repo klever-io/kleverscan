@@ -277,10 +277,11 @@ export const filteredSections = (
   contract: IContract[],
   contractType: string,
   receipts: IReceipt[],
+  precision = 0,
 ): IRowSection[] => {
   switch (contractType) {
     case Contract.Transfer:
-      return TransferSections(contract[0].parameter);
+      return TransferSections(contract[0].parameter, precision);
     case Contract.CreateAsset:
       return CreateAssetSections(contract[0].parameter);
     case Contract.CreateValidator:
@@ -288,7 +289,7 @@ export const filteredSections = (
     case Contract.ValidatorConfig:
       return ValidatorConfigSections(contract[0].parameter);
     case Contract.Freeze:
-      return FreezeSections(contract[0].parameter);
+      return FreezeSections(contract[0].parameter, precision);
     case Contract.Unfreeze:
       return UnfreezeSections(contract[0].parameter);
     case Contract.Delegate:

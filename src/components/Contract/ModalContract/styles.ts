@@ -9,7 +9,7 @@ export const Container = styled.div<{ openModal?: boolean }>`
   place-content: center;
   width: 100vw;
   height: 100vh;
-  z-index: 1000;
+  z-index: 4;
   backdrop-filter: brightness(0.3);
   visibility: ${props => (props.openModal ? 'visible' : 'hidden')};
 `;
@@ -18,6 +18,7 @@ export const Content = styled.div`
   touch-action: manipulation;
   position: relative;
   max-height: 50rem;
+  min-height: 36rem;
   overflow: auto;
   overflow-x: hidden;
   padding: 2rem;

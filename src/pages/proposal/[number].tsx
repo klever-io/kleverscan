@@ -157,7 +157,6 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
   const [selectedFilter, setSelectedFilter] = useState('Yes');
   const [votesPercentage, setVotesPercentage] = useState('');
   const { isMobile, isTablet } = useMobile();
-
   useEffect(() => {
     if (totalStaked) {
       let percentage = (totalVoted * 100) / (totalStaked / 10 ** precision);
@@ -278,41 +277,44 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
     );
   };
 
-  const requestVoters = async (page: number, limit: number) => {
-    let response;
-    if (selectedFilter === 'Yes') {
-      response = await api.get({
-        route: `proposals/${proposalAPI.proposalId}`,
-        query: { pageVoters: page, limitVoters: limit, voteType: 0 },
-      });
-    } else {
-      response = await api.get({
-        route: `proposals/${proposalAPI.proposalId}`,
-        query: { pageVoters: page, limitVoters: limit, voteType: 1 },
-      });
-    }
+  const requestVoters = useCallback(
+    async (page: number, limit: number) => {
+      let response;
+      if (selectedFilter === 'Yes') {
+        response = await api.get({
+          route: `proposals/${proposalAPI.proposalId}`,
+          query: { pageVoters: page, limitVoters: limit, voteType: 0 },
+        });
+      } else {
+        response = await api.get({
+          route: `proposals/${proposalAPI.proposalId}`,
+          query: { pageVoters: page, limitVoters: limit, voteType: 1 },
+        });
+      }
 
-    if (response.error) {
+      if (response.error) {
+        return {
+          data: { voters: [] },
+          pagination: {
+            self: 0,
+            next: 0,
+            previous: 0,
+            perPage: 0,
+            totalPages: 0,
+            totalRecords: 0,
+          },
+        };
+      }
+
+      const parsedVotersResponse = response?.data?.proposal;
+      const votesFormatted = validateFormattedVotes(parsedVotersResponse);
       return {
-        data: { voters: [] },
-        pagination: {
-          self: 0,
-          next: 0,
-          previous: 0,
-          perPage: 0,
-          totalPages: 0,
-          totalRecords: 0,
-        },
+        data: { voters: votesFormatted },
+        pagination: response.data?.proposal?.votersPage,
       };
-    }
-
-    const parsedVotersResponse = response?.data?.proposal;
-    const votesFormatted = validateFormattedVotes(parsedVotersResponse);
-    return {
-      data: { voters: votesFormatted },
-      pagination: response.data?.proposal?.votersPage,
-    };
-  };
+    },
+    [selectedFilter],
+  );
 
   const tableProps = {
     totalPages: pagination?.totalPages,
@@ -322,7 +324,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
     dataName: 'voters',
   };
 
-  const SelectedTabComponent: React.FC = () => {
+  const SelectedTabComponent: React.FC = useCallback(() => {
     switch (selectedFilter) {
       case 'Yes':
         return <ProposalVoters proposalVotersProps={{ ...tableProps }} />;
@@ -332,7 +334,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
       default:
         return <div />;
     }
-  };
+  }, [selectedFilter]);
 
   return (
     <>

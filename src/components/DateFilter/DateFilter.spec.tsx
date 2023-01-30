@@ -56,14 +56,14 @@ describe('Component: DateFilter', () => {
     renderWithTheme(<DateFilter {...props} />);
   });
 
-  it('Should render the input with the "Add filter by ', () => {
-    const input = screen.getByPlaceholderText(/Add filter by date/i);
+  it('Should render the input with the "Date Filter ', () => {
+    const input = screen.getByPlaceholderText(/Date Filter/i);
     expect(input).toBeInTheDocument();
   });
 
   it('Should render the calendar container after click on the input', async () => {
     const user = userEvent.setup();
-    const input = screen.getByPlaceholderText(/Add filter by date/i);
+    const input = screen.getByPlaceholderText(/Date Filter/i);
 
     await user.click(input);
 
@@ -82,7 +82,7 @@ describe('Component: DateFilter', () => {
       caretColor: 'transparent',
       cursor: 'pointer',
     };
-    const input = screen.getByPlaceholderText(/Add filter by date/i);
+    const input = screen.getByPlaceholderText(/Date Filter/i);
     expect(input).toHaveStyle(inputStyle);
 
     await user.click(input);
@@ -102,7 +102,7 @@ describe('Component: DateFilter', () => {
       bottom: '-0.5rem',
       right: '0',
       transform: 'translateY(100%)',
-      zIndex: '10',
+      zIndex: '2',
       borderRadius: '20px',
       boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.2)',
     };
@@ -111,7 +111,7 @@ describe('Component: DateFilter', () => {
 
   it('Should render the correct month if click on arrows to change month', async () => {
     const user = userEvent.setup();
-    const input = screen.getByPlaceholderText(/Add filter by date/i);
+    const input = screen.getByPlaceholderText(/Date Filter/i);
 
     await user.click(input);
 
@@ -134,7 +134,7 @@ describe('Component: DateFilter', () => {
 
   it('Should select the days to filter', async () => {
     const user = userEvent.setup();
-    const input = screen.getByPlaceholderText(/Add filter by date/i);
+    const input = screen.getByPlaceholderText(/Date Filter/i);
 
     await user.click(input);
 
@@ -169,7 +169,7 @@ describe('Component: DateFilter', () => {
 
   it('Should select the days to filter', async () => {
     const user = userEvent.setup();
-    const input = screen.getByPlaceholderText(/Add filter by date/i);
+    const input = screen.getByPlaceholderText(/Date Filter/i);
 
     await user.click(input);
 

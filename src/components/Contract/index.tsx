@@ -6,7 +6,13 @@ import {
   Toggle,
   ToggleContainer,
 } from '@/components/Form/FormInput/styles';
-import { ICollectionList, IKAssets, IParamList } from '@/types/index';
+import { IStakingRewards } from '@/pages/account/[account]';
+import {
+  IAccountAsset,
+  ICollectionList,
+  IKAssets,
+  IParamList,
+} from '@/types/index';
 import {
   assetTriggerTypes,
   claimTypes,
@@ -18,7 +24,8 @@ import { Card } from '@/views/blocks';
 import { core } from '@klever/sdk';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import ReactDOM from 'react-dom';
 import { toast } from 'react-toastify';
 import ConfirmPayload from '../ConfirmPayload';
 import Copy from '../Copy';
@@ -35,6 +42,7 @@ import {
   Container,
   ExtraOptionContainer,
   FieldLabel,
+  LoadingBackground,
   SelectContainer,
   SelectContent,
 } from './styles';
@@ -61,6 +69,9 @@ interface IContract {
   getAssets: () => void;
   isModal: boolean;
   modalContractType?: { value: string };
+  assetTriggerSelected?: IAccountAsset;
+  claimSelectedType?: IStakingRewards;
+  openModal?: boolean;
 }
 
 let assetID = 0;
@@ -73,6 +84,9 @@ const Contract: React.FC<IContract> = ({
   getAssets,
   isModal,
   modalContractType,
+  assetTriggerSelected,
+  claimSelectedType,
+  openModal,
 }) => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
@@ -100,9 +114,43 @@ const Contract: React.FC<IContract> = ({
   const getOwnerAddress = () => {
     return sessionStorage.getItem('walletAddress') || '';
   };
-
   const collectionRef = useRef<string | null>(null);
   const contractRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (loading) {
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.documentElement.style.overflow = 'unset';
+    }
+  }, [loading]);
+
+  useEffect(() => {
+    const getAsset = kAssets.filter(
+      asset => asset.label === assetTriggerSelected?.assetId,
+    )[0];
+    if (!getAsset) {
+      setCollection({});
+    }
+    setCollection(getAsset);
+    setClaimType(claimSelectedType?.value || 0);
+  }, [assetTriggerSelected, claimSelectedType]);
+
+  useEffect(() => {
+    if (claimType === 2) {
+      setFormSections([
+        ...formSection({
+          contract: 'ClaimContract',
+          address: getOwnerAddress(),
+          claimLabel: 'Order ID',
+        }),
+      ]);
+    }
+  }, [claimType]);
+
+  useEffect(() => {
+    if (!openModal) setTxHash(null);
+  }, [openModal]);
 
   useEffect(() => {
     setAssetBalance(null);
@@ -220,7 +268,7 @@ const Contract: React.FC<IContract> = ({
   useEffect(() => {
     setAssetBalance(collection?.balance);
     const getAssetID = async () => {
-      if (!collection.isNFT) {
+      if (!collection?.isNFT) {
         assetID = 0;
       }
     };
@@ -253,7 +301,7 @@ const Contract: React.FC<IContract> = ({
       setContractType(modalContractType.value);
       handleOption(modalContractType);
     }
-  }, [modalContractType]);
+  }, [modalContractType?.value]);
 
   const handleOption = (selectedOption: any) => {
     setContractType(selectedOption.value);
@@ -467,7 +515,7 @@ const Contract: React.FC<IContract> = ({
         getAssets={getAssets}
         options={assetTriggerTypes}
         onChange={value => setTypeAssetTrigger(value ? value.value : 0)}
-        precedence={2}
+        zIndex={4}
       />
     </AssetTriggerContainer>
   );
@@ -477,6 +525,7 @@ const Contract: React.FC<IContract> = ({
       <FieldLabel>Claim Type</FieldLabel>
       <Select
         options={claimTypes}
+        claimSelectedType={claimSelectedType}
         onChange={e => {
           if (!isNaN(e?.value)) {
             if (e.value === 0 || e.value === 1) {
@@ -487,7 +536,7 @@ const Contract: React.FC<IContract> = ({
                   claimLabel: 'Asset ID',
                 }),
               ]);
-            } else if (e.value === 2) {
+            } else if (e.value === 2 || claimType === 2) {
               setFormSections([
                 ...formSection({
                   contract: 'ClaimContract',
@@ -496,7 +545,7 @@ const Contract: React.FC<IContract> = ({
                 }),
               ]);
             }
-            setClaimType(e.value);
+            setClaimType(claimSelectedType?.value || e.value);
           }
         }}
       />
@@ -558,6 +607,7 @@ const Contract: React.FC<IContract> = ({
           onChange={(value: any) => {
             setSelectedBucket(value.value);
           }}
+          zIndex={2}
         />
       </SelectContent>
     </SelectContainer>
@@ -575,6 +625,8 @@ const Contract: React.FC<IContract> = ({
           )}
         </BalanceContainer>
         <Select
+          key={JSON.stringify(collection)}
+          collection={collection}
           options={getAssetsList(
             contractType === 'AssetTriggerContract' ? kAssets : assetsList,
             contractType,
@@ -588,6 +640,7 @@ const Contract: React.FC<IContract> = ({
             }
           }}
           getAssets={getAssets}
+          zIndex={3}
         />
       </SelectContent>
 
@@ -606,6 +659,7 @@ const Contract: React.FC<IContract> = ({
   );
 
   const renderForm = () => {
+    let key = '';
     switch (contractType) {
       case 'UpdateAccountPermissionContract':
         return permissionsForm();
@@ -616,9 +670,8 @@ const Contract: React.FC<IContract> = ({
       case 'ConfigITOContract':
       case 'SetITOPricesContract':
         return ITOForm();
-
       default:
-        const key =
+        key =
           contractType === 'CreateAssetContract' ||
           contractType === 'AssetTriggerContract' ||
           contractType === 'ClaimContract' ||
@@ -663,10 +716,16 @@ const Contract: React.FC<IContract> = ({
     (contractType !== 'AssetTriggerContract' ||
       typeAssetTrigger !== 1 ||
       !collection?.isNFT) &&
-    !(typeAssetTrigger === 1 && Object.keys(collection).length === 0);
+    !(
+      typeAssetTrigger === 1 &&
+      collection &&
+      Object.keys(collection).length === 0
+    );
 
   return (
-    <Container loading={loading ? loading : undefined}>
+    <Container>
+      {loading &&
+        ReactDOM.createPortal(<LoadingBackground />, window.document.body)}
       {open && (
         <ConfirmPayload
           payload={payload}
@@ -685,7 +744,7 @@ const Contract: React.FC<IContract> = ({
           }}
           getAssets={getAssets}
           title={'Contract'}
-          precedence={1}
+          zIndex={5}
         />
       )}
 

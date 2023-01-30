@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
+import api from '@/services/api';
+import { IAsset, IAssetResponse } from '@/types';
 import { useEffect, useRef, useState } from 'react';
 import { getPrecision } from '..';
 
@@ -55,3 +57,36 @@ export function usePrecision(
     return precision as { [assetId: string]: number };
   }
 }
+
+export const useFetchPartialAsset = (): [
+  IAsset[],
+  (value: string) => Promise<IAsset[]>,
+] => {
+  const [assets, setAssets] = useState<IAsset[]>([]);
+
+  let fetchPartialAssetTimeout: ReturnType<typeof setTimeout>;
+
+  return [
+    assets,
+    value => {
+      clearTimeout(fetchPartialAssetTimeout);
+      return new Promise(res => {
+        fetchPartialAssetTimeout = setTimeout(async () => {
+          let response: IAssetResponse;
+          if (
+            value &&
+            !assets.find(asset => asset.assetId.includes(value.toUpperCase()))
+          ) {
+            response = await api.getCached({
+              route: `assets/kassets?asset=${value}`,
+            });
+            res(response.data.assets);
+            setAssets([...assets, ...response.data.assets]);
+          } else {
+            res(assets);
+          }
+        }, 500);
+      });
+    },
+  ];
+};

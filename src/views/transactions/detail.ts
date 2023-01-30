@@ -1,5 +1,9 @@
 import { default as DefaultInput } from '@/components/InputGlobal';
-import styled, { css } from 'styled-components';
+import styled, { css, DefaultTheme, StyledComponent } from 'styled-components';
+
+interface IExpandCenteredRow {
+  openJson?: boolean;
+}
 
 export const Container = styled.div``;
 
@@ -217,16 +221,21 @@ export const CenteredRow = styled.div`
   }
 `;
 
-export const ExpandCenteredRow = styled(CenteredRow)<{ openJson?: boolean }>`
-  align-items: center;
+export const ExpandCenteredRow: StyledComponent<
+  'div',
+  DefaultTheme,
+  { openJson?: boolean | undefined },
+  never
+> = styled(CenteredRow)<{ openJson?: boolean }>`
+  align-items: flex-start !important;
   justify-content: space-between;
   ${props =>
     props.openJson &&
     css`
-      align-items: flex-start;
+      align-items: normal;
 
       span {
-        align-self: center;
+        align-self: normal;
         white-space: normal;
         word-break: break-all;
       }
@@ -349,4 +358,44 @@ export const HoverAnchor = styled.a`
 export const StrongWidth = styled.strong`
   display: inline-block;
   min-width: 15rem !important;
+`;
+
+export const FrozenContainer = styled.div`
+  margin-top: 0.5rem;
+  width: 100%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  background-color: ${props => props.theme.accountCard.frozenBackground};
+
+  border-radius: 0.75rem;
+
+  > div {
+    padding: 1.25rem 2rem;
+
+    display: flex;
+
+    flex-direction: row;
+    align-items: center;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid ${props => props.theme.card.border};
+
+      border-bottom-left-radius: 0px;
+      border-bottom-right-radius: 0px;
+    }
+
+    strong {
+      width: 10rem;
+      margin-right: 5px;
+      font-weight: 600;
+      color: ${props => props.theme.darkText};
+    }
+
+    > span {
+      color: ${props => props.theme.darkText};
+    }
+  }
 `;

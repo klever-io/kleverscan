@@ -17,6 +17,7 @@ import {
   getHeaderForTable,
   initialsTableHeaders,
 } from '@/utils/contracts';
+import { KLV_PRECISION } from '@/utils/globalVariables';
 import {
   capitalizeString,
   formatAmount,
@@ -29,13 +30,10 @@ import { useRouter } from 'next/router';
 import React, { useCallback } from 'react';
 
 interface ITransactionsProps {
-  transactions: ITransaction[];
-  precision?: number;
   transactionsTableProps: IInnerTableProps;
 }
 
 const Transactions: React.FC<ITransactionsProps> = props => {
-  const precision = props.precision || 6;
   const router = useRouter();
 
   const { isMobile } = useMobile();
@@ -45,10 +43,12 @@ const Transactions: React.FC<ITransactionsProps> = props => {
   const getFilteredSections = (
     contract: IContract[],
     receipts: IReceipt[],
+    precision?: number,
   ): IRowSection[] => {
     const contractType = getContractType(contract);
-    return filteredSections(contract, contractType, receipts);
+    return filteredSections(contract, contractType, receipts, precision);
   };
+
   const rowSections = (props: ITransaction): IRowSection[] => {
     const {
       hash,
@@ -60,12 +60,13 @@ const Transactions: React.FC<ITransactionsProps> = props => {
       status,
       kAppFee,
       bandwidthFee,
+      precision,
     } = props;
 
     const StatusIcon = getStatusIcon(status);
     let toAddress = '--';
-    let amount = '--';
     let assetId = '--';
+    let amount = '--';
 
     const contractType = getContractType(contract);
 
@@ -73,7 +74,8 @@ const Transactions: React.FC<ITransactionsProps> = props => {
       const parameter = contract[0].parameter as ITransferContract;
 
       toAddress = parameter.toAddress;
-      amount = formatAmount(parameter.amount / 10 ** precision);
+      if (precision) amount = formatAmount(parameter.amount / 10 ** precision);
+
       if (parameter.assetId) {
         assetId = parameter.assetId;
       }
@@ -129,14 +131,19 @@ const Transactions: React.FC<ITransactionsProps> = props => {
         span: 1,
       },
       { element: <strong key={contractType}>{contractType}</strong>, span: 1 },
-      { element: <strong key={kAppFee}>{kAppFee / 10 ** 6}</strong>, span: 1 },
       {
-        element: <strong key={kAppFee}>{bandwidthFee / 10 ** 6}</strong>,
+        element: <strong key={kAppFee}>{kAppFee / 10 ** KLV_PRECISION}</strong>,
+        span: 1,
+      },
+      {
+        element: (
+          <strong key={kAppFee}>{bandwidthFee / 10 ** KLV_PRECISION}</strong>
+        ),
         span: 1,
       },
     ];
 
-    const filteredContract = getFilteredSections(contract, receipts);
+    const filteredContract = getFilteredSections(contract, receipts, precision);
 
     if (router?.query?.type) {
       sections.pop();
@@ -153,8 +160,8 @@ const Transactions: React.FC<ITransactionsProps> = props => {
 
   const tableProps: ITable = {
     ...transactionTableProps,
-    rowSections: rowSections,
-    data: Object.values(props.transactions) as any[],
+    rowSections,
+    data: null,
     header: router?.query?.type ? getHeaderForTable(router, header) : header,
     type: 'transactions',
   };

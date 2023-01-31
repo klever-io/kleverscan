@@ -6,12 +6,9 @@ interface ISkeleton {
   height?: number | string;
 }
 
-const Skeleton: React.FC<ISkeleton> = props => {
-  const width = props.width !== undefined ? props.width : 120;
-  const height = props.height !== undefined ? props.height : 25;
-
+const Skeleton: React.FC<ISkeleton> = ({ width, height }) => {
   return (
-    <Container style={{ width, height }} data-testid="skeleton">
+    <Container width={width} height={height} data-testid="skeleton">
       <SkeletonLoader />
     </Container>
   );

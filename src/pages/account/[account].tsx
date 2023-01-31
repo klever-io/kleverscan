@@ -3,34 +3,49 @@ import { Receive } from '@/assets/icons';
 import { AccountDetails as AccountIcon } from '@/assets/title-icons';
 import ModalContract from '@/components/Contract/ModalContract';
 import Copy from '@/components/Copy';
-import { ISelectedDays } from '@/components/DateFilter';
+import DateFilter, {
+  IDateFilter,
+  ISelectedDays,
+} from '@/components/DateFilter';
+import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
+import Skeleton from '@/components/Skeleton';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Assets from '@/components/Tabs/Assets';
 import Buckets from '@/components/Tabs/Buckets';
 import Transactions from '@/components/Tabs/Transactions';
 import TransactionsFilters from '@/components/TransactionsFilters';
-import { TxsFiltersWrapper } from '@/components/TransactionsFilters/styles';
+import {
+  ContainerFilter,
+  FilterDiv,
+  RightFiltersContent,
+  TxsFiltersWrapper,
+} from '@/components/TransactionsFilters/styles';
 import { useExtension } from '@/contexts/extension';
 import api, { IPrice } from '@/services/api';
 import {
   IAccount,
   IAccountAsset,
-  IAsset,
-  IAssetResponse,
+  IInnerTableProps,
   IPagination,
   IResponse,
   ITransaction,
   Service,
 } from '@/types/index';
-import { filterDate, getSelectedTab, resetDate } from '@/utils/index';
+import {
+  filterDate,
+  getPrecision,
+  getSelectedTab,
+  resetDate,
+} from '@/utils/index';
 import {
   AmountContainer,
   BalanceContainer,
   ButtonModal,
   CenteredRow,
   Container,
+  ContainerTabInteractions,
   FrozenContainer,
   Header,
   IconContainer,
@@ -38,26 +53,21 @@ import {
   OverviewContainer,
   Row,
   RowContent,
+  StakingRewards,
 } from '@/views/accounts/detail';
+import { FilterByDate } from '@/views/transactions';
 import { ReceiveBackground } from '@/views/validator';
-import { GetServerSideProps } from 'next';
+import { GetStaticPaths, GetStaticProps } from 'next';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
-interface IAssetInfo {
-  assetId: string;
-  precision: number;
+export interface IStakingRewards {
+  label: string;
+  value: number;
 }
 
 interface IAccountPage {
-  account: IAccount;
-  transactions: ITransactionsResponse;
-  priceKLV: number;
-  accountAssets: IAccountAsset[];
-  assets: IAsset[];
-  defaultKlvPrecision: number;
-  KLVallowance: IAllowanceResponse;
-  KFIallowance: IAllowanceResponse;
+  address: string;
 }
 
 interface IAccountResponse extends IResponse {
@@ -92,20 +102,35 @@ interface IQueryParams {
   sender?: '' | 'receiver' | 'sender';
 }
 
-const Account: React.FC<IAccountPage> = ({
-  account,
-  transactions: transactionResponse,
-  priceKLV,
-  assets,
-  accountAssets,
-  defaultKlvPrecision,
-  KLVallowance,
-  KFIallowance,
-}) => {
+const Account: React.FC<IAccountPage> = ({ address }) => {
   const [openModalTransactions, setOpenModalTransactions] =
     useState<boolean>(false);
   const [transactionValue, setTransactionValue] = useState<string>('');
+  const [accountName, setAccountName] = useState<string>('');
   const [titleModal, setTitleModal] = useState<string>('');
+  const [assetTriggerSelected, setAssetTriggerSelected] =
+    useState<IAccountAsset>();
+  const [stakingRewards, setStakingRewards] = useState<number>(0);
+  const [account, setAccount] = useState<IAccount>({
+    address: address,
+    nonce: 0,
+    balance: 0,
+    frozenBalance: 0,
+    allowance: 0,
+    permissions: [],
+    timestamp: new Date().getTime(),
+    assets: {},
+  });
+  const [priceKLV, setPriceKLV] = useState<number>(0);
+  const [KLVAllowance, setKLVAllowance] = useState<IAllowanceResponse>(
+    {} as IAllowanceResponse,
+  );
+  const [KFIAllowance, setKFIAllowance] = useState<IAllowanceResponse>(
+    {} as IAllowanceResponse,
+  );
+  const [accountAssets, setAccountAssets] = useState<IAccountAsset[]>([]);
+  const [accountAssetOwner, setAccountAssetOwner] = useState();
+  const [loading, setLoading] = useState<boolean>(true);
   const { walletAddress } = useExtension();
   const router = useRouter();
 
@@ -113,35 +138,11 @@ const Account: React.FC<IAccountPage> = ({
     ...router.query,
   };
 
-  const getTabHeaders = useCallback(() => {
-    const headers: string[] = [];
-
-    if (account.assets && Object.values(account.assets).length > 0) {
-      headers.push('Assets');
-    }
-
-    if (transactionResponse.data?.transactions.length > 0) {
-      headers.push('Transactions');
-    }
-
-    if (Object.keys(assets).length === 0) {
-      return headers;
-    }
-
-    for (const key in accountAssets) {
-      if (accountAssets[key].buckets) {
-        headers.push('Buckets');
-        break;
-      }
-    }
-
-    return headers;
-  }, [account.assets, transactionResponse.data?.transactions]);
+  const defaultKlvPrecision = 6;
+  const headers = ['Assets', 'Transactions', 'Buckets'];
 
   const [showModal, setShowModal] = useState(false);
-  const [selectedTab, setSelectedTab] = useState<string>(
-    getTabHeaders()[getSelectedTab(router.query?.tab)],
-  );
+  const [selectedTab, setSelectedTab] = useState<string>();
 
   const setQueryAndRouter = (newQuery: NextParsedUrlQuery) => {
     router.push({ pathname: router.pathname, query: newQuery }, undefined, {
@@ -150,17 +151,201 @@ const Account: React.FC<IAccountPage> = ({
   };
 
   useEffect(() => {
+    if (!router.isReady) return;
+    setSelectedTab(headers[getSelectedTab(router.query?.tab)]);
     setQueryAndRouter(initialQueryState);
+  }, [router.isReady]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const emptyAccount = {
+        account: {
+          address: address,
+          nonce: 0,
+          balance: 0,
+          frozenBalance: 0,
+          allowance: 0,
+          permissions: [],
+          timestamp: new Date().getTime(),
+          assets: {},
+        },
+      };
+
+      const accountLength = 62;
+
+      if (!address || address.length !== accountLength) {
+        return router.push('/404');
+      }
+
+      const accountCall = new Promise<IAccountResponse>(
+        async (resolve, reject) => {
+          const res = await api.get({
+            route: `address/${address}`,
+          });
+
+          if (!res.error || res.error === '') {
+            resolve(res);
+          }
+          if (res.error === 'cannot find account in database') {
+            res.data = emptyAccount;
+            resolve(res);
+          }
+
+          reject(res.error);
+        },
+      );
+
+      const pricesCall = new Promise<IPriceResponse>(
+        async (resolve, reject) => {
+          const res = await api.post({
+            route: 'prices',
+            service: Service.PRICE,
+            body: { names: ['KLV/USD'] },
+            useApiProxy: true,
+          });
+
+          if (!res.error || res.error === '') {
+            resolve(res);
+          }
+
+          reject(res.error);
+        },
+      );
+
+      const accountAssetOwner = new Promise<any>(async (resolve, reject) => {
+        const res = await api.get({
+          route: 'assets/kassets',
+          query: { owner: `${address}` },
+        });
+        if (!res.error || res.error === '') {
+          resolve(res);
+        }
+
+        reject(res.error);
+      });
+      await Promise.allSettled([
+        pricesCall,
+        accountCall,
+        accountAssetOwner,
+      ]).then(responses => {
+        responses.forEach((res, index) => {
+          if (res.status === 'fulfilled') {
+            const { value }: any = res;
+
+            if (index === 1) {
+              setAccount(value.data.account);
+
+              setAccountAssets(Object.values(value.data.account.assets));
+
+              if (responses[0].status !== 'rejected') {
+                const prices = responses[0].value;
+                setPriceKLV(prices.symbols[0].price);
+              }
+            }
+            if (index === 2) {
+              setAccountAssetOwner(value.data.assets);
+            }
+          }
+        });
+      });
+
+      const KLVAllowancePromise = new Promise<IAllowanceResponse>(resolve =>
+        resolve(
+          api.get({
+            route: `address/${address}/allowance?assetID=KLV`,
+            service: Service.PROXY,
+          }),
+        ),
+      );
+
+      const KFIAllowancePromise = new Promise<IAllowanceResponse>(resolve =>
+        resolve(
+          api.get({
+            route: `address/${address}/allowance?assetID=KFI`,
+            service: Service.PROXY,
+          }),
+        ),
+      );
+
+      await Promise.allSettled([KLVAllowancePromise, KFIAllowancePromise]).then(
+        responses => {
+          responses.forEach((res, index) => {
+            if (res.status === 'fulfilled') {
+              const { value }: { value: IAllowanceResponse } = res;
+              if (index === 0) {
+                setKLVAllowance(value);
+              } else if (index === 1) {
+                setKFIAllowance(value);
+              }
+            }
+          });
+        },
+      );
+      setLoading(false);
+    };
+
+    fetchData();
   }, []);
+
+  useEffect(() => {
+    if (account.name) setAccountName(account.name);
+  }, [accountName]);
 
   const requestTransactions = async (page: number, limit: number) => {
     const localQuery: IQueryParams = { ...router.query, page, limit };
     delete localQuery.tab;
-
-    return api.get({
+    const transactionsResponse = await api.get({
       route: `address/${account.address}/transactions`,
       query: localQuery,
     });
+
+    const assets: string[] = [];
+
+    transactionsResponse?.data?.transactions.forEach(
+      (transaction: ITransaction) => {
+        if (transaction.contract && transaction.contract.length) {
+          transaction.contract.forEach(contract => {
+            if ('assetId' in contract.parameter && contract.parameter.assetId) {
+              assets.push(contract.parameter.assetId);
+            }
+            if (
+              'currencyID' in contract.parameter &&
+              contract.parameter.currencyID
+            ) {
+              assets.push(contract.parameter.currencyID);
+            }
+          });
+        }
+      },
+    );
+
+    const assetPrecisions = await getPrecision(assets);
+
+    const parsedTransactions = transactionsResponse.data.transactions.map(
+      (transaction: ITransaction) => {
+        if (transaction.contract && transaction.contract.length) {
+          transaction.contract.forEach(contract => {
+            if (contract.parameter && (contract.parameter as any).assetId) {
+              transaction.precision =
+                assetPrecisions[(contract.parameter as any).assetId];
+            }
+            if (contract.parameter && (contract.parameter as any).currencyID) {
+              transaction.precision =
+                assetPrecisions[(contract.parameter as any).currencyID];
+            }
+          });
+        }
+        return transaction;
+      },
+    );
+
+    return {
+      ...transactionsResponse,
+      data: {
+        transactions: parsedTransactions,
+      },
+    };
   };
 
   const calculateTotalKLV = useCallback(() => {
@@ -185,20 +370,20 @@ const Account: React.FC<IAccountPage> = ({
 
   const getKLVAllowance = (): number => {
     return (
-      (KLVallowance?.data?.result?.allowance || 0) / 10 ** defaultKlvPrecision
+      (KLVAllowance?.data?.result?.allowance || 0) / 10 ** defaultKlvPrecision
     );
   };
 
   const getKLVStaking = (): number => {
     return (
-      (KLVallowance?.data?.result?.stakingRewards || 0) /
+      (KLVAllowance?.data?.result?.stakingRewards || 0) /
       10 ** defaultKlvPrecision
     );
   };
 
   const getKFIStaking = (): number => {
     return (
-      (KFIallowance?.data?.result?.stakingRewards || 0) /
+      (KFIAllowance?.data?.result?.stakingRewards || 0) /
       10 ** defaultKlvPrecision
     );
   };
@@ -226,16 +411,15 @@ const Account: React.FC<IAccountPage> = ({
     }
   };
 
-  const transactionTableProps = {
+  const transactionTableProps: IInnerTableProps = {
     scrollUp: false,
-    totalPages: transactionResponse?.pagination?.totalPages || 0,
     dataName: 'transactions',
     request: (page: number, limit: number) => requestTransactions(page, limit),
     query: router.query,
   };
 
   const tabProps: ITabs = {
-    headers: getTabHeaders(),
+    headers,
     onClick: header => {
       setSelectedTab(header);
       setQueryAndRouter({ ...router.query, tab: header });
@@ -243,29 +427,40 @@ const Account: React.FC<IAccountPage> = ({
     dateFilterProps: {
       resetDate: resetQueryDate,
       filterDate: filterQueryDate,
-      empty: transactionResponse?.data?.transactions?.length === 0,
     },
-    filterFromTo,
-    showTxInTxOutFilter: true,
+    showDataFilter: false,
   };
-
+  const dateFilterProps: IDateFilter = {
+    resetDate: resetQueryDate,
+    filterDate: filterQueryDate,
+  };
   const transactionsFiltersProps = {
     query: router.query,
     setQuery: setQueryAndRouter,
-    assets,
   };
 
   const SelectedTabComponent: React.FC = () => {
     switch (selectedTab) {
       case 'Assets':
-        return <Assets assets={accountAssets} address={account.address} />;
-      case 'Transactions':
         return (
-          <Transactions
-            transactions={transactionResponse.data.transactions}
-            transactionsTableProps={transactionTableProps}
-          />
+          <>
+            <ContainerTabInteractions>
+              {showInteractionsButtons(
+                'Create Asset',
+                'CreateAssetContract',
+                false,
+              )}
+            </ContainerTabInteractions>
+            <Assets
+              assets={accountAssets}
+              accountAssetOwner={accountAssetOwner}
+              address={account.address}
+              showInteractionsButtons={showInteractionsButtons}
+            />
+          </>
         );
+      case 'Transactions':
+        return <Transactions transactionsTableProps={transactionTableProps} />;
       case 'Buckets':
         return <Buckets assets={accountAssets} />;
       default:
@@ -276,16 +471,25 @@ const Account: React.FC<IAccountPage> = ({
   const availableBalance = account.balance / 10 ** defaultKlvPrecision;
   const totalKLV = calculateTotalKLV();
   const pricedKLV = calculateTotalKLV() * priceKLV;
-  const showInteractionsButtons = (title: string, value: string) => {
+  const showInteractionsButtons = (
+    title: string,
+    value: string,
+    isAssetTrigger?: boolean,
+    asset?: IAccountAsset,
+    stakingRewards?: number,
+  ) => {
     let titleFormatted = '';
     value.split(/(?=[A-Z])/).forEach((t, index) => (titleFormatted += t + ` `));
     if (walletAddress === initialQueryState.account) {
       return (
         <ButtonModal
+          isAssetTrigger={isAssetTrigger}
           onClick={() => {
+            setAssetTriggerSelected(asset);
             setTransactionValue(value);
             setOpenModalTransactions(true);
             setTitleModal(titleFormatted);
+            setStakingRewards(stakingRewards || 0);
           }}
         >
           {title}
@@ -294,17 +498,67 @@ const Account: React.FC<IAccountPage> = ({
     }
     return <></>;
   };
+
+  const getFilterName = () => {
+    if (router.query?.role === 'sender') {
+      return 'Transactions Out';
+    } else if (router.query?.role === 'receiver') {
+      return 'Transactions In';
+    } else if (router.query?.role === '' || router.query?.role === undefined) {
+      return 'All Transactions';
+    }
+    return 'All Transactions';
+  };
+  const filterName = useCallback(getFilterName, [router.query]);
+  const handleClickFilterName = (filter: string) => {
+    switch (filter) {
+      case 'All Transactions':
+        filterFromTo && filterFromTo(0);
+        break;
+      case 'Transactions Out':
+        filterFromTo && filterFromTo(1);
+        break;
+      case 'Transactions In':
+        filterFromTo && filterFromTo(2);
+        break;
+
+      default:
+        filterFromTo && filterFromTo(0);
+    }
+  };
+  const filters: IFilter[] = [
+    {
+      firstItem: 'All Transactions',
+      data: ['Transactions Out', 'Transactions In'],
+      onClick: e => {
+        handleClickFilterName(e);
+      },
+      current: filterName(),
+      overFlow: 'visible',
+      inputType: 'button',
+    },
+  ];
   const modalOptions = {
     contractType: transactionValue,
+    setContractType: setTransactionValue,
     setOpenModal: setOpenModalTransactions,
     openModal: openModalTransactions,
     title: titleModal,
+    assetTriggerSelected: assetTriggerSelected,
+    setAssetTriggerSelected: setAssetTriggerSelected,
+    stakingRewards: stakingRewards,
+    setStakingRewards: setStakingRewards,
   };
   return (
     <Container>
       <ModalContract {...modalOptions} />
       <Header>
-        <Title title="Account" Icon={AccountIcon} route={'/accounts'} />
+        <Title
+          title={accountName ? accountName : 'Account'}
+          Icon={AccountIcon}
+          route={'/accounts'}
+          isAccountOwner={!!accountName}
+        />
         <Input />
       </Header>
       <OverviewContainer>
@@ -325,6 +579,10 @@ const Account: React.FC<IAccountPage> = ({
                   onClose={() => setShowModal(false)}
                 />
               </ReceiveBackground>
+              {showInteractionsButtons(
+                'Set Account Name',
+                'SetAccountNameContract',
+              )}
             </CenteredRow>
           </RowContent>
         </Row>
@@ -342,15 +600,24 @@ const Account: React.FC<IAccountPage> = ({
                 <div>
                   <div>
                     <span>
-                      {isNaN(Number(totalKLV)) ? 0 : totalKLV.toLocaleString()}
+                      {!loading ? (
+                        totalKLV.toLocaleString()
+                      ) : (
+                        <Skeleton height={19} />
+                      )}
                     </span>
-                    {!isNaN(Number(pricedKLV)) && (
-                      <p>USD {pricedKLV.toLocaleString()}</p>
-                    )}
+                    <p>
+                      {!loading ? (
+                        <>USD {pricedKLV.toLocaleString()}</>
+                      ) : (
+                        <Skeleton height={16} />
+                      )}
+                    </p>
                   </div>
                   {showInteractionsButtons(
                     'Create Transfer',
                     'TransferContract',
+                    false,
                   )}
                 </div>
               </AmountContainer>
@@ -358,18 +625,32 @@ const Account: React.FC<IAccountPage> = ({
                 <div>
                   <strong>Available</strong>
                   <span>
-                    {isNaN(Number(availableBalance))
-                      ? 0
-                      : availableBalance.toLocaleString()}
+                    {!loading ? (
+                      availableBalance.toLocaleString()
+                    ) : (
+                      <Skeleton height={19} />
+                    )}
                   </span>
                 </div>
                 <div>
                   <strong>Frozen</strong>
-                  <span>{getKLVfreezeBalance().toLocaleString()}</span>
+                  <span>
+                    {!loading ? (
+                      getKLVfreezeBalance().toLocaleString()
+                    ) : (
+                      <Skeleton height={19} />
+                    )}
+                  </span>
                 </div>
                 <div>
                   <strong>Unfrozen</strong>
-                  <span>{getKLVunfreezeBalance().toLocaleString()}</span>
+                  <span>
+                    {!loading ? (
+                      getKLVunfreezeBalance().toLocaleString()
+                    ) : (
+                      <Skeleton height={19} />
+                    )}
+                  </span>
                 </div>
               </FrozenContainer>
             </BalanceContainer>
@@ -383,18 +664,57 @@ const Account: React.FC<IAccountPage> = ({
           <RowContent>
             <BalanceContainer>
               <FrozenContainer>
-                <div>
+                <StakingRewards>
                   <strong>Allowance</strong>
-                  <span>{getKLVAllowance().toLocaleString()}</span>
-                </div>
-                <div>
+                  {!loading ? (
+                    <>
+                      <span>{getKLVAllowance().toLocaleString()}</span>
+                      {showInteractionsButtons(
+                        'Allowance Claim',
+                        'ClaimContract',
+                        false,
+                        undefined,
+                        1,
+                      )}
+                    </>
+                  ) : (
+                    <Skeleton height={19} />
+                  )}
+                </StakingRewards>
+                <StakingRewards>
                   <strong>KLV Staking</strong>
-                  <span>{getKLVStaking().toLocaleString()}</span>
-                </div>
-                <div>
+                  {!loading ? (
+                    <>
+                      <span>{getKLVStaking().toLocaleString()}</span>
+                      {showInteractionsButtons(
+                        'Staking Claim',
+                        'ClaimContract',
+                        false,
+                        undefined,
+                        0,
+                      )}
+                    </>
+                  ) : (
+                    <Skeleton height={19} />
+                  )}
+                </StakingRewards>
+                <StakingRewards>
                   <strong>KFI Staking</strong>
-                  <span>{getKFIStaking().toLocaleString()}</span>
-                </div>
+                  {!loading ? (
+                    <>
+                      <span>{getKFIStaking().toLocaleString()}</span>
+                      {showInteractionsButtons(
+                        'Market Claim',
+                        'ClaimContract',
+                        false,
+                        undefined,
+                        2,
+                      )}
+                    </>
+                  ) : (
+                    <Skeleton height={19} />
+                  )}
+                </StakingRewards>
               </FrozenContainer>
             </BalanceContainer>
           </RowContent>
@@ -404,26 +724,29 @@ const Account: React.FC<IAccountPage> = ({
             <strong>Nonce</strong>
           </span>
           <RowContent>
-            <small>{account.nonce}</small>
-          </RowContent>
-        </Row>
-        <Row>
-          <span>
-            <strong>Transactions</strong>
-          </span>
-          <RowContent>
-            <small>
-              {transactionResponse?.pagination?.totalRecords.toLocaleString()}
-            </small>
+            <small>{!loading ? account.nonce : <Skeleton height={19} />}</small>
           </RowContent>
         </Row>
       </OverviewContainer>
       <Tabs {...tabProps}>
         {selectedTab === 'Transactions' && (
           <TxsFiltersWrapper>
-            <TransactionsFilters
-              {...transactionsFiltersProps}
-            ></TransactionsFilters>
+            <ContainerFilter>
+              <TransactionsFilters
+                {...transactionsFiltersProps}
+              ></TransactionsFilters>
+              <RightFiltersContent>
+                <FilterDiv>
+                  <span>Transaction In/Out</span>
+                  {filters.map((filter, index) => (
+                    <Filter key={index} {...filter} />
+                  ))}
+                </FilterDiv>
+                <FilterByDate>
+                  <DateFilter {...dateFilterProps} />
+                </FilterByDate>
+              </RightFiltersContent>
+            </ContainerFilter>
           </TxsFiltersWrapper>
         )}
         <SelectedTabComponent />
@@ -432,168 +755,28 @@ const Account: React.FC<IAccountPage> = ({
   );
 };
 
-export const getServerSideProps: GetServerSideProps<IAccountPage> = async ({
-  params,
-}) => {
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: 'blocking',
+  };
+};
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const address = params?.account;
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
 
-  const props: IAccountPage = {
-    account: {} as IAccount,
-    priceKLV: 0,
-    transactions: {} as ITransactionsResponse,
-    accountAssets: [],
-    assets: [],
-    defaultKlvPrecision: 6,
-    KLVallowance: {} as IAllowanceResponse,
-    KFIallowance: {} as IAllowanceResponse,
-  };
-
   const accountLength = 62;
-  const address = String(params?.account);
-
-  const emptyAccount = {
-    account: {
-      address: address,
-      nonce: 0,
-      balance: 0,
-      frozenBalance: 0,
-      allowance: 0,
-      permissions: [],
-      timestamp: new Date().getTime(),
-      assets: {},
-    },
-  };
 
   if (!address || address.length !== accountLength) {
     return redirectProps;
   }
 
-  const accountCall = new Promise<IAccountResponse>(async (resolve, reject) => {
-    const res = await api.get({
-      route: `address/${address}`,
-    });
-
-    if (!res.error || res.error === '') {
-      resolve(res);
-    }
-    if (res.error === 'cannot find account in database') {
-      res.data = emptyAccount;
-      resolve(res);
-    }
-
-    reject(res.error);
-  });
-
-  const transactionsCall = new Promise<ITransactionsResponse>(
-    async (resolve, reject) => {
-      const res = await api.get({
-        route: `address/${address}/transactions`,
-      });
-
-      if (!res.error || res.error === '') {
-        resolve(res);
-      }
-
-      reject(res.error);
+  return {
+    props: {
+      address,
     },
-  );
-
-  const pricesCall = new Promise<IPriceResponse>(async (resolve, reject) => {
-    const res = await api.post({
-      route: 'prices',
-      service: Service.PRICE,
-      body: { names: ['KLV/USD'] },
-    });
-
-    if (!res.error || res.error === '') {
-      resolve(res);
-    }
-
-    reject(res.error);
-  });
-
-  const assetsCall = new Promise<IAssetResponse>(async (resolve, reject) => {
-    const res: IAssetResponse = await api.get({
-      route: 'assets/kassets',
-    });
-    if (!res.error || res.error === '') {
-      resolve(res);
-    }
-
-    reject(res.error);
-  });
-
-  await Promise.allSettled([
-    pricesCall,
-    transactionsCall,
-    accountCall,
-    assetsCall,
-  ]).then(responses => {
-    responses.forEach((res, index) => {
-      if (res.status === 'fulfilled') {
-        const { value }: any = res;
-
-        if (index === 1) {
-          props.transactions = value;
-        } else if (index === 2) {
-          props.account = value.data.account;
-
-          props.accountAssets = Object.values(value.data.account.assets);
-
-          if (responses[0].status !== 'rejected') {
-            const prices = responses[0].value;
-            props.priceKLV = prices.symbols[0].price;
-          }
-        } else if (index === 3) {
-          props.assets = value?.data?.assets || [];
-        }
-      } else if (index == 2) {
-        return redirectProps;
-      }
-    });
-  });
-
-  const precision = 6;
-  props.defaultKlvPrecision = precision; // Default KLV precision
-
-  const KLVAllowancePromise = new Promise<IAllowanceResponse>(resolve =>
-    resolve(
-      api.get({
-        route: `address/${address}/allowance?assetID=KLV`,
-        service: Service.PROXY,
-      }),
-    ),
-  );
-
-  const KFIAllowancePromise = new Promise<IAllowanceResponse>(resolve =>
-    resolve(
-      api.get({
-        route: `address/${address}/allowance?assetID=KFI`,
-        service: Service.PROXY,
-      }),
-    ),
-  );
-
-  await Promise.allSettled([KLVAllowancePromise, KFIAllowancePromise]).then(
-    responses => {
-      responses.forEach((res, index) => {
-        if (res.status === 'fulfilled') {
-          const { value }: { value: IAllowanceResponse } = res;
-          if (index === 0) {
-            props.KLVallowance = value;
-          } else if (index === 1) {
-            props.KFIallowance = value;
-          }
-        }
-      });
-    },
-  );
-
-  if (Object.keys(props.account).length === 0) {
-    props.account.address = address;
-  }
-
-  return { props };
+  };
 };
 
 export default Account;

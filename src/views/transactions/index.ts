@@ -52,12 +52,11 @@ export const FilterByDate = styled.div`
   align-items: center;
   flex-direction: row;
   margin-top: 1.4rem;
-  margin-left: 0.8rem;
-  margin-right: 0.8rem;
-
+  margin-left: 0.75rem;
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    justify-content: center;
     margin-left: 0;
+    width: 100%;
+    justify-content: center;
   }
 `;
 

@@ -1,8 +1,19 @@
 import { transparentize } from 'polished';
 import styled from 'styled-components';
 
-export const Container = styled.span`
+export const Container = styled.span<{
+  width?: number | string;
+  height?: number | string;
+}>`
   display: block;
+  height: ${props =>
+    typeof props.height === 'number'
+      ? `${props.height}px`
+      : props.height || '25px'};
+  width: ${props =>
+    typeof props.width === 'number'
+      ? `${props.width}px`
+      : props.width || '120px'};
 `;
 export const SkeletonLoader = styled.span`
   display: inline-block;

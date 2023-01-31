@@ -3,7 +3,7 @@ import CardDataFetcher from '@/components/Cards/CardDataFetcher';
 import CoinDataFetcher from '@/components/Cards/CoinDataFetcher';
 import HomeTransactions from '@/components/HomeTransactions';
 import api from '@/services/api';
-import { IHomeProps, Service } from '@/types';
+import { IHomeProps } from '@/types';
 import { IBlock } from '@/types/blocks';
 import {
   Container,
@@ -11,7 +11,7 @@ import {
   DataContainer,
   Input,
 } from '@/views/home';
-import { GetServerSideProps } from 'next';
+import { GetStaticProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React, { useCallback, useEffect } from 'react';
 import nextI18NextConfig from '../../next-i18next.config';
@@ -46,7 +46,7 @@ const Home: React.FC<IHomeProps> = ({ kfiPrices }) => {
 
         <DataCardsContainer>
           <CardDataFetcher block={blocks?.[0]} />
-          <CoinDataFetcher kfiPrices={kfiPrices} />
+          <CoinDataFetcher />
         </DataCardsContainer>
       </DataContainer>
 
@@ -56,28 +56,12 @@ const Home: React.FC<IHomeProps> = ({ kfiPrices }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({
-  locale = 'en',
-}) => {
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
   const props = await serverSideTranslations(
     locale,
     ['common', 'blocks', 'transactions'],
     nextI18NextConfig,
   );
-
-  const res = await api.post({
-    route: `coinstats`,
-    service: Service.PRICE,
-    body: {
-      ID: 'kfi',
-      Name: 'kfi',
-      Currency: 'USD',
-    },
-  });
-
-  if (!res.error || res.error === '') {
-    props['kfiPrices'] = res;
-  }
 
   return { props };
 };

@@ -29,7 +29,6 @@ const request = jest.fn(async (page: number, limit: number) => {
 
 const transactionTableProps: IInnerTableProps = {
   scrollUp: false,
-  totalPages: 1,
   dataName: 'transactions',
   request,
   query: {},
@@ -45,11 +44,7 @@ jest.mock('next/router', () => ({
 }));
 
 export const mockedTransactionTab = (
-  <Transaction
-    transactions={mockedTransactions}
-    precision={precision}
-    transactionsTableProps={transactionTableProps}
-  />
+  <Transaction transactionsTableProps={transactionTableProps} />
 );
 
 describe('Component: Tabs/Transactions', () => {
@@ -98,11 +93,7 @@ describe('Component: Tabs/Transactions', () => {
   it('Should render the correct values for "Hash", "Block", "Created", "From", "To", "Status", "Contract", "kApp Fee", "Bandwidth Fee"', async () => {
     await act(async () => {
       renderWithTheme(
-        <Transaction
-          transactions={mockedTransactions}
-          precision={precision}
-          transactionsTableProps={transactionTableProps}
-        />,
+        <Transaction transactionsTableProps={transactionTableProps} />,
       );
     });
 
@@ -143,11 +134,7 @@ describe('Component: Tabs/Transactions', () => {
   it('Should be "Multi Contract" when has more than one contract on transaction and show the "toAdress" and "Amount" when the contract is "Transfer" and "BlockNum" must be 0 as fallback', async () => {
     await act(async () => {
       renderWithTheme(
-        <Transaction
-          transactions={mockedTransactions}
-          precision={precision}
-          transactionsTableProps={transactionTableProps}
-        />,
+        <Transaction transactionsTableProps={transactionTableProps} />,
       );
     });
 

@@ -1,5 +1,4 @@
 import { act, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import * as nextRouter from 'next/router';
 import React from 'react';
 import Tabs, { ITabs } from '.';
@@ -38,26 +37,15 @@ const mockedAPIResponse = {
 
 const transactionTableProps: IInnerTableProps = {
   scrollUp: false,
-  totalPages: 1,
   dataName: 'transactions',
   request,
   query: {},
 };
 const mockedTransactionTab = (
-  <Transaction
-    transactions={mockedTransactions}
-    precision={precision}
-    transactionsTableProps={transactionTableProps}
-  />
+  <Transaction transactionsTableProps={transactionTableProps} />
 );
 
 const tableHeaders = ['Assets', 'Transactions'];
-
-const filterOptions = [
-  'Transactions Out',
-  'Transactions In',
-  'All Transactions',
-];
 
 describe('Component: Tabs', () => {
   beforeEach(() => {
@@ -74,6 +62,7 @@ describe('Component: Tabs', () => {
         tab: 'Transactions',
         role: 'receiver',
       },
+      isReady: true,
     });
   });
 
@@ -106,56 +95,6 @@ describe('Component: Tabs', () => {
       filterDate: jest.fn(),
       empty: true,
     },
-    showTxInTxOutFilter: true,
+    showDataFilter: false,
   };
-
-  it('Should change tab to transactions and change filters upon click', async () => {
-    await act(async () => {
-      renderWithTheme(<Tabs {...tabProps}>{mockedTransactionTab}</Tabs>);
-    });
-
-    tableHeaders.map(header => {
-      expect(screen.getAllByText(header)[0]).toBeInTheDocument();
-    });
-
-    await userEvent.click(screen.getByText(tableHeaders[1]));
-
-    const filterContainer = screen.getByTestId('filter-container');
-
-    expect(filterContainer).toBeInTheDocument(); // test if filter container is visible
-
-    const inOutFilter = filterContainer.lastElementChild
-      ?.lastElementChild as HTMLElement;
-
-    await userEvent.click(inOutFilter);
-
-    filterOptions.map(filter => {
-      expect(screen.getByText(filter)).toBeInTheDocument(); // test if filter options are visible
-    });
-
-    for (const filter of filterOptions) {
-      await userEvent.click(screen.getByText(filter));
-
-      expect(inOutFilter).toHaveTextContent(filter); // test if filter option is selected
-    }
-  });
-
-  it('Should change initial filter depending on router query', async () => {
-    await act(async () => {
-      renderWithTheme(<Tabs {...tabProps}>{mockedTransactionTab}</Tabs>);
-    });
-
-    tableHeaders.map(header => {
-      expect(screen.getAllByText(header)[0]).toBeInTheDocument();
-    });
-
-    const filterContainer = screen.getByTestId('filter-container');
-
-    const inOutFilter = filterContainer.lastElementChild
-      ?.lastElementChild as HTMLElement;
-
-    expect(filterContainer).toBeInTheDocument(); // test if filter container is visible
-
-    expect(inOutFilter.firstElementChild).toHaveTextContent(filterOptions[1]); // test if filter option is selected
-  });
 });

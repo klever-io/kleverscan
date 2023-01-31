@@ -19,7 +19,7 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.navbar.background};
   border-bottom: 1px solid ${props => props.theme.footer.border};
-  z-index: 1000;
+  z-index: 6;
   transition: top 0.1s linear;
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
@@ -171,7 +171,7 @@ export const IconsMenu = styled.div`
 
 export const MobileContainer = styled.div`
   margin-left: auto;
-  z-index: 1000 !important;
+  z-index: 6;
   position: relative;
   display: none;
 
@@ -194,7 +194,7 @@ export const MobileContent = styled.div<IMobileMenu>`
   display: flex;
   position: fixed;
 
-  z-index: 10000 !important;
+  z-index: 6;
 
   flex-direction: column;
 
@@ -216,7 +216,7 @@ export const MobileContent = styled.div<IMobileMenu>`
 export const MobileOptions = styled.div`
   padding: 0.5rem 0;
 
-  z-index: 10;
+  z-index: 1;
   > div {
     gap: 1.5rem;
 
@@ -243,7 +243,7 @@ export const MobileBackground = styled.div<IMobileMenu>`
 
   position: fixed;
 
-  z-index: 1000 !important;
+  z-index: 6;
 
   opacity: ${props => (props.opened ? 1 : 0)};
   visibility: ${props => (props.opened ? 'visible' : 'hidden')};
@@ -338,5 +338,5 @@ export const MenuIcon = styled(FiMenu).attrs(props => ({
 
 export const ConnectContainer = styled.div`
   display: flex;
-  z-index: 1000 !important;
+  z-index: 2;
 `;

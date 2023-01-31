@@ -29,6 +29,7 @@ export interface ITableType {
   haveData?: number;
   pathname?: string;
   rowSections?: boolean;
+  autoUpdate?: boolean;
 }
 
 export const ContainerView = styled.div`
@@ -52,24 +53,6 @@ export const Header = styled.div<ITableType>`
 
   span {
     ${props => widths[props.type]}
-  }
-`;
-
-export const Body = styled.div<ITableType>`
-  display: flex;
-  width: 100%;
-
-  min-width: fit-content;
-
-  flex-direction: column;
-  gap: 0.75rem;
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    width: ${props => (props.haveData ? 'fit-content' : 'initial')};
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    min-width: 100%;
   }
 `;
 
@@ -192,13 +175,75 @@ export const Row = styled.div<ITableType>`
     `}
 `;
 
+const tableEffects = css`
+  ${Row}:first-child {
+    opacity: 1;
+    animation-name: fadeInOpacity;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in-out;
+    animation-duration: 1s;
+
+    @keyframes fadeInOpacity {
+      0% {
+        opacity: 0;
+        transform: translateY(-100%);
+      }
+      30% {
+        opacity: 0.1;
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0%);
+      }
+    }
+  }
+
+  ${Row}:not(:first-child) {
+    opacity: 1;
+    animation-name: down;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in-out;
+    animation-duration: 1s;
+
+    @keyframes down {
+      0% {
+        transform: translateY(-100%);
+      }
+
+      100% {
+        transform: translateY(0%);
+      }
+    }
+  }
+`;
+
+export const Body = styled.div<ITableType>`
+  display: flex;
+  width: 100%;
+
+  min-width: fit-content;
+
+  flex-direction: column;
+  gap: 0.75rem;
+
+  ${props => (props.autoUpdate ? tableEffects : '')}
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    width: ${props => (props.haveData ? 'fit-content' : 'initial')};
+  }
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    min-width: 100%;
+  }
+`;
+
 export const MobileCardItem = styled.span<{
   columnSpan?: number;
   isRightAligned?: boolean;
 }>`
   display: flex;
   flex-direction: column;
-  &:last-child {
+  &:nth-child(7) {
     flex-grow: 1;
   }
 
@@ -453,7 +498,7 @@ export const BackTopButton = styled.span<{ isHidden: boolean }>`
   position: fixed;
   bottom: 2rem;
   right: 1.2rem;
-  z-index: 99;
+  z-index: 4;
   border: none;
   outline: none;
   color: ${props => props.theme.violet};

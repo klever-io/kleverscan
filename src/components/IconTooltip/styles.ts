@@ -40,7 +40,7 @@ export const TooltipContainer = styled.div<{ tooltip: string }>`
         color: ${props => props.theme.card.white};
         padding: 0.5rem;
         border-radius: 5px;
-        z-index: 500;
+        z-index: 2;
         transform: translate(-50%, 40%);
       }
     }

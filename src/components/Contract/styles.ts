@@ -1,12 +1,8 @@
-import { lighten } from 'polished';
+import { lighten, transparentize } from 'polished';
 import { BsPersonSquare } from 'react-icons/bs';
 import { IoMdCloseCircle } from 'react-icons/io';
 import { RiCopperCoinLine } from 'react-icons/ri';
 import styled, { css } from 'styled-components';
-
-interface IContainer {
-  loading?: boolean;
-}
 
 const defaultStyles = css`
   width: 100%;
@@ -26,6 +22,16 @@ const defaultStyles = css`
   transition: all 0.1s ease-in-out;
 `;
 
+export const LoadingBackground = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: ${props => transparentize(0.2, props.theme.true.black)};
+  z-index: 6;
+`;
+
 export const CloseIcon = styled(IoMdCloseCircle).attrs(props => ({
   color: props.theme.form.hash,
   size: 24,
@@ -34,12 +40,11 @@ export const CloseIcon = styled(IoMdCloseCircle).attrs(props => ({
   cursor: pointer;
 `;
 
-export const Container = styled.div<IContainer>`
+export const Container = styled.div`
   margin: auto;
   width: 90%;
   max-width: 1200px;
   padding: 2rem 0;
-  opacity: ${props => (props.loading ? 0.4 : 1)};
 
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;

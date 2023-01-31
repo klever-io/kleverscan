@@ -8,6 +8,13 @@ import React from 'react';
 interface IAssets {
   assets: IAccountAsset[];
   address: string;
+  showInteractionsButtons?: (
+    title: string,
+    value: string,
+    isAssetTrigger: boolean,
+    assets: IAccountAsset,
+  ) => JSX.Element;
+  accountAssetOwner: any;
 }
 
 interface IAssetResponse extends IResponse {
@@ -16,7 +23,13 @@ interface IAssetResponse extends IResponse {
   };
 }
 
-const Assets: React.FC<IAssets> = ({ assets, address }) => {
+const Assets: React.FC<IAssets> = ({
+  assets,
+  address,
+  showInteractionsButtons,
+  accountAssetOwner,
+
+}) => {
   const header = [
     'Token',
     'ID',
@@ -26,9 +39,18 @@ const Assets: React.FC<IAssets> = ({ assets, address }) => {
     'Frozen',
     '',
   ];
-
   const rowSections = (props: IAccountAsset): IRowSection[] => {
-    const { assetId, assetType, precision, balance, frozenBalance } = props;
+    const {
+      assetId,
+      assetType,
+      precision,
+      balance,
+      frozenBalance,
+      address: ownerAddress,
+    } = props;
+    const ownerAssetId = accountAssetOwner?.map(
+      (asset: { assetId: string }) => asset.assetId,
+    );
     const ticker = assetId?.split('-')[0];
     const sectionViewNfts =
       assetType === 1 ? (
@@ -38,7 +60,7 @@ const Assets: React.FC<IAssets> = ({ assets, address }) => {
       ) : (
         <></>
       );
-    return [
+    const sections = [
       { element: <span key={ticker}>{ticker}</span>, span: 1 },
       {
         element: (
@@ -75,6 +97,21 @@ const Assets: React.FC<IAssets> = ({ assets, address }) => {
       },
       { element: sectionViewNfts, span: 2 },
     ];
+
+    ownerAssetId?.forEach((asset: string) => {
+      if (asset === assetId && showInteractionsButtons)
+        sections.push({
+          element: showInteractionsButtons(
+            'Asset Trigger',
+            'AssetTriggerContract',
+            true,
+            props,
+          ),
+          span: 2,
+        });
+    });
+
+    return sections;
   };
 
   const tableProps: ITable = {

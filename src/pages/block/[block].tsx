@@ -25,8 +25,6 @@ import { IPagination, IResponse, ITransaction } from '../../types';
 
 interface IBlockPage {
   block: IBlock;
-  transactions: ITransaction[];
-  totalPagesTransactions: number;
 }
 
 interface IBlockResponse extends IResponse {
@@ -42,11 +40,7 @@ interface ITransactionResponse extends IResponse {
   pagination: IPagination;
 }
 
-const Block: React.FC<IBlockPage> = ({
-  block,
-  transactions: defaultTransactions,
-  totalPagesTransactions,
-}) => {
+const Block: React.FC<IBlockPage> = ({ block }) => {
   const {
     hash,
     timestamp,
@@ -255,7 +249,6 @@ const Block: React.FC<IBlockPage> = ({
 
   const transactionTableProps = {
     scrollUp: false,
-    totalPages: totalPagesTransactions || 0,
     dataName: 'transactions',
     request: (page: number, limit: number) => requestBlock(page, limit),
   };
@@ -265,11 +258,7 @@ const Block: React.FC<IBlockPage> = ({
       case 'Transactions':
         return (
           <>
-            <Transactions
-              precision={precision}
-              transactions={defaultTransactions}
-              transactionsTableProps={transactionTableProps}
-            />
+            <Transactions transactionsTableProps={transactionTableProps} />
           </>
         );
       case 'Validators':
@@ -330,8 +319,6 @@ export const getStaticProps: GetStaticProps<IBlockPage> = async ({
 }) => {
   const props: IBlockPage = {
     block: {} as IBlock,
-    totalPagesTransactions: 0,
-    transactions: [],
   };
 
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
@@ -351,15 +338,6 @@ export const getStaticProps: GetStaticProps<IBlockPage> = async ({
   }
 
   props.block = block.data.block;
-
-  const transactions: ITransactionResponse = await api.get({
-    route: `transaction/list?blockNum=${block.data.block.nonce}`,
-  });
-
-  if (!transactions.error) {
-    props.transactions = transactions.data.transactions;
-    props.totalPagesTransactions = transactions?.pagination?.totalPages || 0;
-  }
 
   return {
     props,

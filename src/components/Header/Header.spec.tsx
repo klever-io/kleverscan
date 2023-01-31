@@ -110,7 +110,6 @@ describe('Component: Header/navbar', () => {
     const mobile = container.firstChild?.lastChild;
     const content = container.lastChild;
     const button: any = await screen.findByTestId('menu-icon');
-    await screen.debug();
     expect(mobile).toHaveStyle('position: relative');
     expect(content).toHaveStyle({ visibility: 'hidden', opacity: '0' });
     fireEvent.click(button);

@@ -16,7 +16,7 @@ export const TourContainer = styled.div<IPlacement>`
   position: absolute;
   top: ${props => props.position?.top || 0}px;
   left: ${props => props.position?.left || 0}px;
-  z-index: 2000;
+  z-index: 7;
   border-radius: 0.5rem;
   width: ${props => props.contentWidth}px;
   height: ${props => props.contentHeight}px;
@@ -58,7 +58,7 @@ export const ContainerAttention = styled.div`
 export const TourContent = styled.div`
   position: relative;
   width: fit-content;
-  z-index: 200000 !important;
+  z-index: 4;
 
   isolation: isolate;
 `;
@@ -84,7 +84,7 @@ export const TourTooltip = styled.div<IPlacement>`
   transform: translateX(
     calc(-1 * (100% - ${props => props.contentWidth}px) / 2)
   );
-  z-index: 1000;
+  z-index: 7;
 
   width: 12rem;
   padding: 0.8rem;

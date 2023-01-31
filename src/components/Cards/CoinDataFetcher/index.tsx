@@ -1,10 +1,9 @@
-import api from '@/services/api';
+import api, { IPrice } from '@/services/api';
 import {
   IAssetsData,
   ICoinInfo,
   IGeckoChartResponse,
   IGeckoResponse,
-  IPrice,
   Service,
 } from '@/types';
 import { calcApr } from '@/utils';
@@ -12,7 +11,7 @@ import { useEffect, useState } from 'react';
 import CoinCard from './CoinCard';
 import CoinCardSkeleton from './CoinCardSkeleton';
 
-const CoinDataFetcher: React.FC<{ kfiPrices: IPrice }> = ({ kfiPrices }) => {
+const CoinDataFetcher: React.FC = () => {
   const [assetsData, setAssetsData] = useState<IAssetsData>({} as IAssetsData);
   const [coins, setCoins] = useState<ICoinInfo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -160,6 +159,25 @@ const CoinDataFetcher: React.FC<{ kfiPrices: IPrice }> = ({ kfiPrices }) => {
         reject(res.error);
       });
 
+      const kfiPriceCall = new Promise<IPrice>(async (resolve, reject) => {
+        const res = await api.post({
+          route: `coinstats`,
+          service: Service.PRICE,
+          body: {
+            ID: 'kfi',
+            Name: 'kfi',
+            Currency: 'USD',
+          },
+          useApiProxy: true,
+        });
+
+        if (!res.error || res.error === '') {
+          resolve(res);
+        }
+
+        reject(res.error);
+      });
+
       const promises = [
         klvDataCall,
         klvChartCall,
@@ -167,6 +185,7 @@ const CoinDataFetcher: React.FC<{ kfiPrices: IPrice }> = ({ kfiPrices }) => {
         kfiChartCall,
         klvCall,
         kfiCall,
+        kfiPriceCall,
       ];
 
       const responses = await Promise.allSettled(promises);
@@ -254,18 +273,21 @@ const CoinDataFetcher: React.FC<{ kfiPrices: IPrice }> = ({ kfiPrices }) => {
                   value?.data?.asset?.circulatingSupply / 1000000;
 
                 break;
-            }
-          }
 
-          const data = kfiPrices.Exchanges.find(
-            (exchange: any) => exchange.ExchangeName === 'Klever',
-          );
-          assetsData.kfi.volume = data?.Volume ?? null;
-          assetsData.kfi.prices.todaysPrice = data?.Price ?? null;
-          assetsData.kfi.prices.variation = data?.PriceVariation ?? null;
-          if (data?.Price && data?.PriceVariation) {
-            assetsData.kfi.prices.yesterdayPrice =
-              data?.Price - data?.PriceVariation ?? null;
+              case 6:
+                if (!value.code) {
+                  const data = value.Exchanges.find(
+                    (exchange: any) => exchange.ExchangeName === 'Klever',
+                  );
+                  assetsData.kfi.volume = data.Volume ?? null;
+                  assetsData.kfi.prices.todaysPrice = data.Price ?? null;
+                  assetsData.kfi.prices.variation = data.PriceVariation ?? null;
+                  if (data.Price && data.PriceVariation) {
+                    assetsData.kfi.prices.yesterdayPrice =
+                      data.Price - data.PriceVariation ?? null;
+                  }
+                }
+            }
           }
         },
       );

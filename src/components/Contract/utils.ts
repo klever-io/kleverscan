@@ -244,7 +244,6 @@ const getAssetsList = (
       const newAssets: IKAssets[] = assets.filter((value: IKAssets) => {
         return value.isNFT;
       });
-
       return filterByProperties(newAssets, typeAssetTrigger);
     }
   } else if (contractType === 'FreezeContract') {
@@ -416,8 +415,9 @@ const parseValues = (
 };
 
 const contractsDescription = {
-  TransferContract: 'Transfer assets to a given receiver.',
-  CreateAssetContract: 'Choose between creating a Token or an NFT.',
+  TransferContract: 'Transfer assets to another wallet.',
+  CreateAssetContract:
+    'Create a new Coin(Fungible Token) or an NFT Collection.',
   CreateValidatorContract: 'Generate a new validator.',
   ValidatorConfigContract: 'Edit the current settings for a validator.',
   FreezeContract: 'Freeze a chosen amount of an asset or collection.',
@@ -426,12 +426,13 @@ const contractsDescription = {
   UndelegateContract: 'Undelegate a bucket.',
   WithdrawContract: 'Total withdraw of the chosen asset.',
   ClaimContract: 'Claim rewards or expired market orders.',
-  UnjailContract: 'Remove bad actors…',
+  UnjailContract:
+    'Unjails your validator, be sure to use only if the cause of the jail is already fixed.',
   AssetTriggerContract:
     'A contract setting operations over a collection of assets or an NFT.',
   SetAccountNameContract: 'Set a new name for the current account.',
-  ProposalContract: 'Create a proposal for the current project.',
-  VoteContract: 'Vote for a proposal.',
+  ProposalContract: 'Create a proposal to change the blockchain parameters.',
+  VoteContract: 'Vote in a proposal.',
   ConfigITOContract: 'Set up an Initial Token Offering.',
   SetITOPricesContract: 'Set the prices for the Initial Token Offering.',
   BuyContract: 'Buy tokens.',

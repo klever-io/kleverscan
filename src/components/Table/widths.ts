@@ -4,41 +4,51 @@ const transactions = css`
   margin-right: 1.25rem;
 
   &:nth-child(1) {
-    width: 20rem;
+    min-width: 20rem;
+    max-width: 20rem;
   }
 
   &:nth-child(2) {
-    width: 5rem;
+    min-width: 5rem;
+    max-width: 5rem;
   }
 
   &:nth-child(3) {
-    width: 8rem;
+    min-width: 8rem;
+    max-width: 8rem;
   }
 
   &:nth-child(4) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
 
   &:nth-child(5) {
-    width: 1rem;
+    min-width: 1rem;
+    max-width: 1rem;
   }
 
   &:nth-child(6) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
 
   &:nth-child(7) {
-    width: 7rem;
+    min-width: 7rem;
+    max-width: 7rem;
   }
 
   &:nth-child(8) {
-    width: 8rem;
+    min-width: 8rem;
+    max-width: 8rem;
   }
   &:nth-child(9) {
-    width: 7rem;
+    min-width: 7rem;
+    max-width: 7rem;
   }
   &:nth-child(10) {
-    width: 7rem;
+    min-width: 7rem;
+    max-width: 7rem;
   }
 `;
 
@@ -49,39 +59,48 @@ const blocks = css`
   }
 
   &:nth-child(1) {
-    width: 5rem;
+    min-width: 5rem;
+    max-width: 5rem;
   }
 
   &:nth-child(2) {
-    width: 7rem;
+    min-width: 7rem;
+    max-width: 7rem;
   }
 
   &:nth-child(3) {
-    width: 12rem;
+    min-width: 12rem;
+    max-width: 12rem;
   }
 
   &:nth-child(4) {
-    width: 7rem;
+    min-width: 7rem;
+    max-width: 7rem;
   }
 
   &:nth-child(5) {
-    width: 7rem;
+    min-width: 7rem;
+    max-width: 7rem;
   }
 
   &:nth-child(6) {
-    width: 8rem;
+    min-width: 8rem;
+    max-width: 8rem;
   }
 
   &:nth-child(7) {
-    width: 7rem;
+    min-width: 7rem;
+    max-width: 7rem;
   }
 
   &:nth-child(8) {
-    width: 8rem;
+    min-width: 8rem;
+    max-width: 8rem;
   }
 
   &:nth-child(9) {
-    width: 8rem;
+    min-width: 8rem;
+    max-width: 8rem;
   }
 `;
 
@@ -89,19 +108,23 @@ const accounts = css`
   margin-right: 1.25rem;
 
   &:nth-child(1) {
-    width: 39rem;
+    min-width: 39rem;
+    max-width: 39rem;
   }
 
   &:nth-child(2) {
-    width: 8rem;
+    min-width: 8rem;
+    max-width: 8rem;
   }
 
   &:nth-child(3) {
-    width: 12rem;
+    min-width: 12rem;
+    max-width: 12rem;
   }
 
   &:nth-child(4) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
 `;
 
@@ -109,66 +132,83 @@ const assetsPage = css`
   padding-right: 0.5rem;
 
   &:nth-child(1) {
-    width: 5rem;
+    min-width: 5rem;
+    max-width: 5rem;
   }
 
   &:nth-child(2) {
-    width: 6rem;
+    min-width: 6rem;
+    max-width: 6rem;
   }
 
   &:nth-child(3) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
 
   &:nth-child(4) {
-    width: 14rem;
+    min-width: 14rem;
+    max-width: 14rem;
   }
 
   &:nth-child(5) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
 
   &:nth-child(6) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
 
   &:nth-child(7) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
 
   &:nth-child(8) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
   &:nth-child(9) {
-    width: 8rem;
+    min-width: 8rem;
+    max-width: 8rem;
   }
   &:nth-child(10) {
-    width: 8rem;
+    min-width: 8rem;
+    max-width: 8rem;
   }
   &:nth-child(11) {
-    width: 4rem;
+    min-width: 4rem;
+    max-width: 4rem;
   }
 `;
 
 const assets = css`
   margin-right: 1.25rem;
   &:nth-child(1) {
-    width: 8rem;
+    min-width: 8rem;
+    max-width: 8rem;
   }
   &:nth-child(2) {
-    width: 8rem;
+    min-width: 8rem;
+    max-width: 8rem;
   }
   &:nth-child(3) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
   &:nth-child(4) {
-    width: 8rem;
+    min-width: 8rem;
+    max-width: 8rem;
   }
   &:nth-child(5) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
   &:nth-child(6) {
-    width: 15rem;
+    min-width: 15rem;
+    max-width: 15rem;
   }
 `;
 
@@ -176,28 +216,36 @@ const buckets = css`
   margin-right: 1.25rem;
 
   &:nth-child(1) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
   &:nth-child(2) {
-    width: 8rem;
+    min-width: 8rem;
+    max-width: 8rem;
   }
   &:nth-child(3) {
-    width: 5rem;
+    min-width: 5rem;
+    max-width: 5rem;
   }
   &:nth-child(4) {
-    width: 11rem;
+    min-width: 11rem;
+    max-width: 11rem;
   }
   &:nth-child(5) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
   &:nth-child(6) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
   &:nth-child(7) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
   &:nth-child(8) {
-    width: 14rem;
+    min-width: 14rem;
+    max-width: 14rem;
   }
 `;
 
@@ -205,22 +253,27 @@ const holders = css`
   margin-right: 1.25rem;
 
   &:nth-child(1) {
-    width: 3rem;
+    min-width: 3rem;
+    max-width: 3rem;
   }
 
   &:nth-child(2) {
-    width: 27rem;
+    min-width: 27rem;
+    max-width: 27rem;
   }
 
   &:nth-child(3) {
-    width: 6rem;
+    min-width: 6rem;
+    max-width: 6rem;
   }
 
   &:nth-child(4) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
   &:nth-child(5) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
 `;
 
@@ -228,28 +281,36 @@ const validators = css`
   margin-right: 1.25rem;
 
   &:nth-child(1) {
-    width: 2rem;
+    min-width: 2rem;
+    max-width: 2rem;
   }
   &:nth-child(2) {
-    width: 15rem;
+    min-width: 15rem;
+    max-width: 15rem;
   }
   &:nth-child(3) {
-    width: 6rem;
+    min-width: 6rem;
+    max-width: 6rem;
   }
   &:nth-child(4) {
-    width: 6rem;
+    min-width: 6rem;
+    max-width: 6rem;
   }
   &:nth-child(5) {
-    width: 7rem;
+    min-width: 7rem;
+    max-width: 7rem;
   }
   &:nth-child(6) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
   &:nth-child(7) {
-    width: 6rem;
+    min-width: 6rem;
+    max-width: 6rem;
   }
   &:nth-child(8) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
 `;
 
@@ -258,16 +319,20 @@ const nodes = validators;
 const validator = css`
   margin-right: 7rem;
   &:nth-child(1) {
-    width: 15rem;
+    min-width: 15rem;
+    max-width: 15rem;
   }
   &:nth-child(2) {
-    width: 40rem;
+    min-width: 40rem;
+    max-width: 40rem;
   }
   &:nth-child(3) {
-    width: 12rem;
+    min-width: 12rem;
+    max-width: 12rem;
   }
   &:nth-child(4) {
-    width: 5rem;
+    min-width: 5rem;
+    max-width: 5rem;
   }
   &:last-child {
     margin-right: 0;
@@ -275,19 +340,23 @@ const validator = css`
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     &:nth-child(1) {
-      width: 12rem;
+      min-width: 12rem;
+      max-width: 12rem;
       max-width: 7rem;
     }
     &:nth-child(2) {
-      width: 60%;
+      min-width: 60%;
+      max-width: 60%;
       max-width: 40rem;
     }
     &:nth-child(3) {
-      width: 10rem;
+      min-width: 10rem;
+      max-width: 10rem;
       max-width: 10rem;
     }
     :nth-child(2) {
-      width: 20rem;
+      min-width: 20rem;
+      max-width: 20rem;
     }
   }
 `;
@@ -296,65 +365,81 @@ const networkParams = css`
   margin-right: 1.25rem;
 
   &:nth-child(1) {
-    width: 4rem;
+    min-width: 4rem;
+    max-width: 4rem;
   }
 
   &:nth-child(2) {
-    width: 45rem;
+    min-width: 45rem;
+    max-width: 45rem;
   }
 
   &:nth-child(3) {
-    width: 9rem;
+    min-width: 9rem;
+    max-width: 9rem;
   }
 `;
 
 const proposals = css`
   &:nth-child(1) {
-    width: 5rem;
+    min-width: 5rem;
+    max-width: 5rem;
   }
   &:nth-child(2) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
   &:nth-child(3) {
-    width: 12rem;
+    min-width: 12rem;
+    max-width: 12rem;
   }
   &:nth-child(4) {
-    width: 11rem;
+    min-width: 11rem;
+    max-width: 11rem;
   }
   &:nth-child(5) {
-    width: 12rem;
+    min-width: 12rem;
+    max-width: 12rem;
   }
   &:nth-child(6) {
-    width: 14rem;
+    min-width: 14rem;
+    max-width: 14rem;
   }
   &:nth-child(7) {
-    width: 5rem;
+    min-width: 5rem;
+    max-width: 5rem;
     margin-left: 5rem;
   }
 `;
 const votes = css`
   margin-right: 1.25rem;
   &:nth-child(1) {
-    width: 38rem;
+    min-width: 38rem;
+    max-width: 38rem;
   }
   &:nth-child(2) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
   &:nth-child(3) {
-    width: 14rem;
+    min-width: 14rem;
+    max-width: 14rem;
   }
 `;
 
 const delegations = css`
   margin-right: 1.25rem;
   &:nth-child(1) {
-    width: 12rem;
+    min-width: 12rem;
+    max-width: 12rem;
   }
   &:nth-child(2) {
-    width: 40rem;
+    min-width: 40rem;
+    max-width: 40rem;
   }
   &:nth-child(3) {
-    width: 10rem;
+    min-width: 10rem;
+    max-width: 10rem;
   }
 `;
 
@@ -362,19 +447,23 @@ const nfts = css`
   margin-right: 1.25rem;
 
   &:nth-child(1) {
-    width: 8rem;
+    min-width: 8rem;
+    max-width: 8rem;
   }
 
   &:nth-child(2) {
-    width: 12rem;
+    min-width: 12rem;
+    max-width: 12rem;
   }
 
   &:nth-child(3) {
-    width: 12rem;
+    min-width: 12rem;
+    max-width: 12rem;
   }
 
   &:nth-child(4) {
-    width: 15rem;
+    min-width: 15rem;
+    max-width: 15rem;
   }
 `;
 
@@ -382,7 +471,8 @@ const validatorsList = css`
   margin-right: 1.25rem;
 
   &:nth-child(1) {
-    width: 70rem;
+    min-width: 70rem;
+    max-width: 70rem;
   }
 `;
 

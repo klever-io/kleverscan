@@ -1,5 +1,4 @@
 import { KLV } from '@/assets/coins';
-import { Receive } from '@/assets/icons';
 import { AccountDetails as AccountIcon } from '@/assets/title-icons';
 import ModalContract from '@/components/Contract/ModalContract';
 import Copy from '@/components/Copy';
@@ -140,8 +139,6 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
 
   const defaultKlvPrecision = 6;
   const headers = ['Assets', 'Transactions', 'Buckets'];
-
-  const [showModal, setShowModal] = useState(false);
   const [selectedTab, setSelectedTab] = useState<string>();
 
   const setQueryAndRouter = (newQuery: NextParsedUrlQuery) => {
@@ -571,13 +568,7 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
               <span>{account.address}</span>
               <Copy info="Address" data={account.address} />
               <ReceiveBackground>
-                <Receive onClick={() => setShowModal(!showModal)} />
-                <QrCodeModal
-                  show={showModal}
-                  setShowModal={() => setShowModal(false)}
-                  value={account.address}
-                  onClose={() => setShowModal(false)}
-                />
+                <QrCodeModal value={account.address} isOverflow={false} />
               </ReceiveBackground>
               {showInteractionsButtons(
                 'Set Account Name',

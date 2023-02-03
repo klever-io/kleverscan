@@ -1,43 +1,46 @@
+import { Receive } from '@/assets/icons';
+import { useScroll } from '@/utils/hooks';
 import { QRCodeSVG } from 'qrcode.react';
+import React, { useState } from 'react';
+import { MdClear } from 'react-icons/md';
 import {
   ModalBackdrop,
   ModalBody,
   ModalContainer,
   ModalHeader,
-  ModalXButton,
 } from './styles';
 
 interface IQrCodeModal {
   value: string;
-  show: boolean;
-  setShowModal: React.SetStateAction<any>;
-  onClose: React.SetStateAction<any>;
+  isOverflow: boolean;
 }
 
-const QrCodeModal: React.FC<IQrCodeModal> = ({
-  value,
-  show,
-  setShowModal,
-  onClose,
-}) => {
-  return show ? (
-    <ModalBackdrop onClick={onClose}>
-      <ModalContainer onClick={e => e.stopPropagation()}>
-        <ModalHeader>
-          <ModalXButton onClick={setShowModal}>x</ModalXButton>
-        </ModalHeader>
-        <ModalBody>
-          <div>
-            <QRCodeSVG value={value}></QRCodeSVG>
-          </div>
-        </ModalBody>
-        <ModalHeader>
-          <ModalXButton></ModalXButton>
-        </ModalHeader>
-      </ModalContainer>
-    </ModalBackdrop>
-  ) : (
-    <></>
+const QrCodeModal: React.FC<IQrCodeModal> = ({ value, isOverflow }) => {
+  const [showModal, setShowModal] = useState(false);
+  useScroll(showModal, () => setShowModal(false));
+
+  return (
+    <>
+      <Receive onClick={() => setShowModal(!showModal)} />
+      {showModal && (
+        <>
+          <ModalBackdrop onClick={() => setShowModal(false)} />
+          <ModalContainer isOverflow={isOverflow}>
+            <ModalHeader>
+              <strong>
+                <div></div>
+                <MdClear onClick={() => setShowModal(false)} />
+              </strong>
+            </ModalHeader>
+            <ModalBody>
+              <div>
+                <QRCodeSVG value={value} />
+              </div>
+            </ModalBody>
+          </ModalContainer>
+        </>
+      )}
+    </>
   );
 };
 

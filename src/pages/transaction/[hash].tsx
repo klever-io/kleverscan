@@ -1,4 +1,3 @@
-import { Receive } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import { TransactionDetails as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
@@ -121,7 +120,6 @@ const Transaction: React.FC<ITransactionPage> = props => {
     return [];
   };
 
-  const [showModal, setShowModal] = useState(false);
   const [expandData, setExpandData] = useState(initializeExpandData());
   const { isDarkTheme } = useTheme();
   const ReactJson = dynamic(import('react-json-view'), { ssr: false });
@@ -537,14 +535,8 @@ const Transaction: React.FC<ITransactionPage> = props => {
             <CenteredRow>
               <span>{hash}</span>
               <Copy data={hash} info="Hash" />
-              <ReceiveBackground>
-                <Receive onClick={() => setShowModal(!showModal)} />
-                <QrCodeModal
-                  show={showModal}
-                  setShowModal={() => setShowModal(false)}
-                  value={hash}
-                  onClose={() => setShowModal(false)}
-                />
+              <ReceiveBackground isOverflow={true}>
+                <QrCodeModal value={hash} isOverflow={true} />
               </ReceiveBackground>
             </CenteredRow>
           </Row>

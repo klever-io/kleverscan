@@ -1,4 +1,3 @@
-import { Receive } from '@/assets/icons';
 import Copy from '@/components/Copy';
 import { ISelectedDays } from '@/components/DateFilter';
 import Title from '@/components/Layout/Title';
@@ -136,7 +135,6 @@ const Asset: React.FC<IAssetPage> = ({
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
   const [query, setQuery] = useState(router.query);
-  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     router.push({ pathname: router.pathname, query }, undefined, {
@@ -198,14 +196,8 @@ const Asset: React.FC<IAssetPage> = ({
                   <HoverAnchor>{ownerAddress}</HoverAnchor>
                 </Link>
                 <Copy data={ownerAddress} info="ownerAddress" />
-                <ReceiveBackground>
-                  <Receive onClick={() => setShowModal(!showModal)} />
-                  <QrCodeModal
-                    show={showModal}
-                    setShowModal={() => setShowModal(false)}
-                    value={ownerAddress}
-                    onClose={() => setShowModal(false)}
-                  />
+                <ReceiveBackground isOverflow={true}>
+                  <QrCodeModal value={ownerAddress} isOverflow={true} />
                 </ReceiveBackground>
               </CenteredRow>
             </span>

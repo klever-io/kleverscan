@@ -82,7 +82,7 @@ export const CardContent = styled.div`
 
 export const Row = styled.div`
   width: 100%;
-
+  position: relative;
   padding: 1.2rem 2rem;
 
   display: flex;

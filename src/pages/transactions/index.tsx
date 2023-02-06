@@ -80,6 +80,8 @@ const Transactions: React.FC = () => {
       (transaction: ITransaction) => {
         if (transaction.contract && transaction.contract.length) {
           transaction.contract.forEach(contract => {
+            if (contract.parameter === undefined) return;
+
             if ('assetId' in contract.parameter && contract.parameter.assetId) {
               assets.push(contract.parameter.assetId);
             }
@@ -100,6 +102,8 @@ const Transactions: React.FC = () => {
       (transaction: ITransaction) => {
         if (transaction.contract && transaction.contract.length) {
           transaction.contract.forEach(contract => {
+            if (contract.parameter === undefined) return;
+
             if ('assetId' in contract.parameter && contract.parameter.assetId) {
               transaction.precision =
                 assetPrecisions[contract.parameter.assetId];

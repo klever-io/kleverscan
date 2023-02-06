@@ -77,8 +77,9 @@ export const CopyBackground = styled.div`
   padding: 4px 5px 2px 5px;
 `;
 
-export const ReceiveBackground = styled.div`
+export const ReceiveBackground = styled.div<{ isOverflow?: boolean }>`
   background-color: ${props => props.theme.white};
+  position: ${props => (props.isOverflow ? '' : 'relative')};
   width: 34px;
   min-width: 34px;
   height: 34px;

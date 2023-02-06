@@ -1,4 +1,3 @@
-import { Receive } from '@/assets/icons/index';
 import { getStatusIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
 import Dropdown from '@/components/Dropdown';
@@ -390,14 +389,8 @@ const Validator: React.FC<IValidatorPage> = ({
                 <CopyBackground>
                   <Copy data={blsPublicKey} info="Key" />
                 </CopyBackground>
-                <ReceiveBackground>
-                  <Receive onClick={() => setShowModal(!showModal)} />
-                  <QrCodeModal
-                    show={showModal}
-                    setShowModal={() => setShowModal(false)}
-                    value={blsPublicKey}
-                    onClose={() => setShowModal(false)}
-                  />
+                <ReceiveBackground isOverflow={false}>
+                  <QrCodeModal value={blsPublicKey} isOverflow={false} />
                 </ReceiveBackground>
               </CenteredSubTitle>
             </TitleInformation>

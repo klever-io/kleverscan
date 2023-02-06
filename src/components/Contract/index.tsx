@@ -72,6 +72,7 @@ interface IContract {
   assetTriggerSelected?: IAccountAsset;
   claimSelectedType?: IStakingRewards;
   openModal?: boolean;
+  valueContract?: any;
 }
 
 let assetID = 0;
@@ -87,6 +88,7 @@ const Contract: React.FC<IContract> = ({
   assetTriggerSelected,
   claimSelectedType,
   openModal,
+  valueContract,
 }) => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
@@ -116,6 +118,18 @@ const Contract: React.FC<IContract> = ({
   };
   const collectionRef = useRef<string | null>(null);
   const contractRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (valueContract) {
+      const getAsset = assetsList.filter(
+        asset => asset.label === valueContract[0],
+      )[0];
+      if (getAsset) {
+        setCollection(getAsset);
+      }
+      setSelectedBucket(valueContract[1]);
+      setBucketsCollection([valueContract[0]]);
+    }
+  }, [valueContract]);
 
   useEffect(() => {
     if (loading) {
@@ -129,10 +143,9 @@ const Contract: React.FC<IContract> = ({
     const getAsset = kAssets.filter(
       asset => asset.label === assetTriggerSelected?.assetId,
     )[0];
-    if (!getAsset) {
-      setCollection({});
+    if (getAsset) {
+      setCollection(getAsset);
     }
-    setCollection(getAsset);
     setClaimType(claimSelectedType?.value || 0);
   }, [assetTriggerSelected, claimSelectedType]);
 
@@ -149,7 +162,10 @@ const Contract: React.FC<IContract> = ({
   }, [claimType]);
 
   useEffect(() => {
-    if (!openModal) setTxHash(null);
+    if (!openModal) {
+      setTxHash(null);
+      setCollection(undefined);
+    }
   }, [openModal]);
 
   useEffect(() => {
@@ -603,6 +619,7 @@ const Contract: React.FC<IContract> = ({
       <SelectContent>
         <FieldLabel>Select a bucket</FieldLabel>
         <Select
+          selectedBucket={selectedBucket}
           options={bucketsList}
           onChange={(value: any) => {
             setSelectedBucket(value.value);
@@ -620,7 +637,7 @@ const Contract: React.FC<IContract> = ({
           <FieldLabel>Select an asset/collection</FieldLabel>
           {!isNaN(Number(assetBalance)) && assetBalance !== null && (
             <BalanceLabel>
-              Balance: {assetBalance / 10 ** collection.precision}
+              Balance: {assetBalance / 10 ** collection?.precision}
             </BalanceLabel>
           )}
         </BalanceContainer>

@@ -272,6 +272,9 @@ const Table: React.FC<ITable> = ({
                           }
                           return (
                             <MobileCardItem
+                              isAssets={
+                                type === 'assets' || type === 'proposals'
+                              }
                               isRightAligned={
                                 (isMobile || isTablet) && isRightAligned
                               }

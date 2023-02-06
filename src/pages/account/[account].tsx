@@ -1,5 +1,4 @@
 import { KLV } from '@/assets/coins';
-import { Receive } from '@/assets/icons';
 import { AccountDetails as AccountIcon } from '@/assets/title-icons';
 import ModalContract from '@/components/Contract/ModalContract';
 import Copy from '@/components/Copy';
@@ -40,6 +39,7 @@ import {
   resetDate,
 } from '@/utils/index';
 import {
+  AccountSkeletonContainer,
   AmountContainer,
   BalanceContainer,
   ButtonModal,
@@ -57,7 +57,6 @@ import {
 } from '@/views/accounts/detail';
 import { FilterByDate } from '@/views/transactions';
 import { ReceiveBackground } from '@/views/validator';
-import { GetStaticPaths, GetStaticProps } from 'next';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -102,25 +101,15 @@ interface IQueryParams {
   sender?: '' | 'receiver' | 'sender';
 }
 
-const Account: React.FC<IAccountPage> = ({ address }) => {
+const Account: React.FC<IAccountPage> = () => {
   const [openModalTransactions, setOpenModalTransactions] =
     useState<boolean>(false);
-  const [transactionValue, setTransactionValue] = useState<string>('');
+  const [contractValue, setContractValue] = useState<string>('');
   const [accountName, setAccountName] = useState<string>('');
   const [titleModal, setTitleModal] = useState<string>('');
-  const [assetTriggerSelected, setAssetTriggerSelected] =
-    useState<IAccountAsset>();
+  const [collectionSelected, setCollectionSelected] = useState<IAccountAsset>();
   const [stakingRewards, setStakingRewards] = useState<number>(0);
-  const [account, setAccount] = useState<IAccount>({
-    address: address,
-    nonce: 0,
-    balance: 0,
-    frozenBalance: 0,
-    allowance: 0,
-    permissions: [],
-    timestamp: new Date().getTime(),
-    assets: {},
-  });
+  const [account, setAccount] = useState<IAccount>({} as IAccount);
   const [priceKLV, setPriceKLV] = useState<number>(0);
   const [KLVAllowance, setKLVAllowance] = useState<IAllowanceResponse>(
     {} as IAllowanceResponse,
@@ -129,8 +118,10 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
     {} as IAllowanceResponse,
   );
   const [accountAssets, setAccountAssets] = useState<IAccountAsset[]>([]);
-  const [accountAssetOwner, setAccountAssetOwner] = useState();
+  const [accountAssetOwner, setAccountAssetOwner] = useState([]);
+  const [valueContract, setValueContract] = useState<any>();
   const [loading, setLoading] = useState<boolean>(true);
+
   const { walletAddress } = useExtension();
   const router = useRouter();
 
@@ -140,8 +131,6 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
 
   const defaultKlvPrecision = 6;
   const headers = ['Assets', 'Transactions', 'Buckets'];
-
-  const [showModal, setShowModal] = useState(false);
   const [selectedTab, setSelectedTab] = useState<string>();
 
   const setQueryAndRouter = (newQuery: NextParsedUrlQuery) => {
@@ -149,6 +138,29 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
       shallow: true,
     });
   };
+  const getAllAssets = () => {
+    const findMissingAsset: any[] = accountAssetOwner
+      .filter(
+        (asset: IAccountAsset) =>
+          !accountAssets.find(({ assetId }) => assetId === asset.assetId),
+      )
+      .map((asset: any) => ({
+        address: asset.ownerAddress,
+        assetId: asset.assetId,
+        assetName: asset.name,
+        assetType: asset.assetType,
+        precision: asset.precision,
+        balance: 0,
+        frozenBalance: 0,
+        unfrozenBalance: 0,
+      }));
+    const allAssetsAccount = [...accountAssets, ...findMissingAsset];
+    setAccountAssets(allAssetsAccount);
+  };
+
+  useEffect(() => {
+    getAllAssets();
+  }, [accountAssetOwner]);
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -157,7 +169,10 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
   }, [router.isReady]);
 
   useEffect(() => {
+    if (!router.isReady) return;
     const fetchData = async () => {
+      const address = router.query.account as string;
+
       setLoading(true);
       const emptyAccount = {
         account: {
@@ -190,6 +205,11 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
           if (res.error === 'cannot find account in database') {
             res.data = emptyAccount;
             resolve(res);
+          }
+          if (
+            res.error.includes('could not create address from provided param')
+          ) {
+            return router.push('/404');
           }
 
           reject(res.error);
@@ -286,7 +306,7 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
     };
 
     fetchData();
-  }, []);
+  }, [router.query.account, router.isReady]);
 
   useEffect(() => {
     if (account.name) setAccountName(account.name);
@@ -306,6 +326,8 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
       (transaction: ITransaction) => {
         if (transaction.contract && transaction.contract.length) {
           transaction.contract.forEach(contract => {
+            if (contract.parameter === undefined) return;
+
             if ('assetId' in contract.parameter && contract.parameter.assetId) {
               assets.push(contract.parameter.assetId);
             }
@@ -326,13 +348,18 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
       (transaction: ITransaction) => {
         if (transaction.contract && transaction.contract.length) {
           transaction.contract.forEach(contract => {
-            if (contract.parameter && (contract.parameter as any).assetId) {
+            if (contract.parameter === undefined) return;
+
+            if ('assetId' in contract.parameter && contract.parameter.assetId) {
               transaction.precision =
-                assetPrecisions[(contract.parameter as any).assetId];
+                assetPrecisions[contract.parameter.assetId];
             }
-            if (contract.parameter && (contract.parameter as any).currencyID) {
+            if (
+              'currencyID' in contract.parameter &&
+              contract.parameter.currencyID
+            ) {
               transaction.precision =
-                assetPrecisions[(contract.parameter as any).currencyID];
+                assetPrecisions[contract.parameter.currencyID];
             }
           });
         }
@@ -462,7 +489,17 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
       case 'Transactions':
         return <Transactions transactionsTableProps={transactionTableProps} />;
       case 'Buckets':
-        return <Buckets assets={accountAssets} />;
+        return (
+          <>
+            <ContainerTabInteractions>
+              {showInteractionsButtons('Freeze', 'FreezeContract', false)}
+            </ContainerTabInteractions>
+            <Buckets
+              assets={accountAssets}
+              showInteractionsButtons={showInteractionsButtons}
+            />
+          </>
+        );
       default:
         return <div />;
     }
@@ -473,23 +510,37 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
   const pricedKLV = calculateTotalKLV() * priceKLV;
   const showInteractionsButtons = (
     title: string,
-    value: string,
+    valueContract: string,
+    value?: any,
     isAssetTrigger?: boolean,
-    asset?: IAccountAsset,
-    stakingRewards?: number,
   ) => {
     let titleFormatted = '';
-    value.split(/(?=[A-Z])/).forEach((t, index) => (titleFormatted += t + ` `));
+    valueContract
+      .split(/(?=[A-Z])/)
+      .forEach((t, index) => (titleFormatted += t + ` `));
+    const onClick = () => {
+      switch (valueContract) {
+        case 'ClaimContract':
+          setStakingRewards(value || 0);
+          break;
+        case 'AssetTriggerContract':
+          setCollectionSelected(value);
+          break;
+        default:
+          return;
+      }
+    };
     if (walletAddress === initialQueryState.account) {
       return (
         <ButtonModal
+          isLocked={valueContract === '--' && true}
           isAssetTrigger={isAssetTrigger}
           onClick={() => {
-            setAssetTriggerSelected(asset);
-            setTransactionValue(value);
-            setOpenModalTransactions(true);
+            setContractValue(valueContract);
+            setOpenModalTransactions(valueContract === '--' ? false : true);
             setTitleModal(titleFormatted);
-            setStakingRewards(stakingRewards || 0);
+            setValueContract(value);
+            onClick();
           }}
         >
           {title}
@@ -539,15 +590,17 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
     },
   ];
   const modalOptions = {
-    contractType: transactionValue,
-    setContractType: setTransactionValue,
+    contractType: contractValue,
+    setContractType: setContractValue,
     setOpenModal: setOpenModalTransactions,
     openModal: openModalTransactions,
     title: titleModal,
-    assetTriggerSelected: assetTriggerSelected,
-    setAssetTriggerSelected: setAssetTriggerSelected,
+    assetTriggerSelected: collectionSelected,
+    setAssetTriggerSelected: setCollectionSelected,
     stakingRewards: stakingRewards,
     setStakingRewards: setStakingRewards,
+    valueContract: valueContract,
+    setValueContract: setValueContract,
   };
   return (
     <Container>
@@ -568,16 +621,16 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
           </span>
           <RowContent>
             <CenteredRow>
-              <span>{account.address}</span>
+              {account.address !== undefined ? (
+                <span>{account.address}</span>
+              ) : (
+                <AccountSkeletonContainer>
+                  <Skeleton height={19} width={'100%'} />
+                </AccountSkeletonContainer>
+              )}
               <Copy info="Address" data={account.address} />
               <ReceiveBackground>
-                <Receive onClick={() => setShowModal(!showModal)} />
-                <QrCodeModal
-                  show={showModal}
-                  setShowModal={() => setShowModal(false)}
-                  value={account.address}
-                  onClose={() => setShowModal(false)}
-                />
+                <QrCodeModal value={account.address} isOverflow={false} />
               </ReceiveBackground>
               {showInteractionsButtons(
                 'Set Account Name',
@@ -672,8 +725,6 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
                       {showInteractionsButtons(
                         'Allowance Claim',
                         'ClaimContract',
-                        false,
-                        undefined,
                         1,
                       )}
                     </>
@@ -689,8 +740,6 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
                       {showInteractionsButtons(
                         'Staking Claim',
                         'ClaimContract',
-                        false,
-                        undefined,
                         0,
                       )}
                     </>
@@ -706,8 +755,6 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
                       {showInteractionsButtons(
                         'Market Claim',
                         'ClaimContract',
-                        false,
-                        undefined,
                         2,
                       )}
                     </>
@@ -753,30 +800,6 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
       </Tabs>
     </Container>
   );
-};
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  return {
-    paths: [],
-    fallback: 'blocking',
-  };
-};
-
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const address = params?.account;
-  const redirectProps = { redirect: { destination: '/404', permanent: false } };
-
-  const accountLength = 62;
-
-  if (!address || address.length !== accountLength) {
-    return redirectProps;
-  }
-
-  return {
-    props: {
-      address,
-    },
-  };
 };
 
 export default Account;

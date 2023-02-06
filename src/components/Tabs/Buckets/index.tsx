@@ -7,10 +7,16 @@ import { parseAddress } from '@/utils/index';
 import { CenteredRow, RowContent } from '@/views/accounts/detail';
 import Link from 'next/link';
 import React, { useEffect, useRef, useState } from 'react';
-import { Status } from './styles';
+import { ContractContainer, Status } from './styles';
 
 export interface IBuckets {
   assets: IAccountAsset[];
+  showInteractionsButtons?: (
+    title: string,
+    valueContract: string,
+    value?: any,
+    isAssetTrigger?: boolean,
+  ) => JSX.Element;
 }
 
 export interface IAssetsBuckets {
@@ -18,7 +24,7 @@ export interface IAssetsBuckets {
   bucket: IBucket;
 }
 
-const Buckets: React.FC<IBuckets> = ({ assets }) => {
+const Buckets: React.FC<IBuckets> = ({ assets, showInteractionsButtons }) => {
   const UINT32_MAX = 4294967295;
   const precision = 6; // default KLV precision
   const detailsCache = useRef<{ [key: string]: IAsset }>({});
@@ -68,7 +74,8 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
 
   const rowSections = (assetBucket: IAssetsBuckets): IRowSection[] => {
     const { asset, bucket } = assetBucket;
-
+    const minEpochsToUnstake = 1;
+    const minEpochsToWithdraw = 2;
     const getAvaliableEpoch = (assetId: string, unstakedEpoch: number) => {
       if (assetId.length < 64) {
         return assetDetails?.staking?.minEpochsToWithdraw
@@ -77,7 +84,122 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
       }
       return unstakedEpoch + 2; // Default for KLV and KFI
     };
+    const unfreezeEquation =
+      bucket.stakedEpoch + minEpochsToUnstake - asset.lastClaim.epoch;
+    const isUnfreezeLocked = () => {
+      return unfreezeEquation > 0;
+    };
+    const withdrawEquation =
+      bucket.unstakedEpoch - asset.lastClaim.epoch + minEpochsToWithdraw;
 
+    const isWithdrawLocked = () => {
+      if (bucket?.unstakedEpoch === 4294967295) {
+        return false;
+      }
+
+      return withdrawEquation > 0;
+    };
+    const lockedText = () => {
+      const textEquation = isWithdrawLocked()
+        ? withdrawEquation
+        : unfreezeEquation;
+      return `${
+        isWithdrawLocked() ? 'Withdraw' : 'Unfreeze'
+      } (in ${textEquation} epoch${textEquation > 1 ? 's' : ''})`;
+    };
+
+    const getDelegation = () => {
+      if (bucket.delegation) {
+        return <></>;
+      } else if (asset.assetId === 'KLV') {
+        return (
+          <>
+            {showInteractionsButtons &&
+              showInteractionsButtons('Delegate', 'DelegateContract', [
+                asset.assetId,
+                bucket.id,
+              ])}
+          </>
+        );
+      } else {
+        return <>--</>;
+      }
+    };
+    const getButton = () => {
+      if (isUnfreezeLocked() || isWithdrawLocked()) {
+        if (bucket.delegation) {
+          return (
+            <>
+              {showInteractionsButtons &&
+                showInteractionsButtons('Undelegate', 'UndelegateContract', [
+                  asset.assetId,
+                  bucket.id,
+                ])}
+              {showInteractionsButtons &&
+                showInteractionsButtons(`${lockedText()}`, '--')}
+            </>
+          );
+        }
+        return (
+          <>
+            {showInteractionsButtons &&
+              showInteractionsButtons(`${lockedText()}`, '--')}
+          </>
+        );
+      } else if (bucket.unstakedEpoch !== 4294967295) {
+        if (bucket.delegation) {
+          return (
+            <>
+              {showInteractionsButtons &&
+                showInteractionsButtons('Undelegate', 'UndelegateContract', [
+                  asset.assetId,
+                  bucket.id,
+                ])}
+              {showInteractionsButtons &&
+                showInteractionsButtons('Withdraw', 'WithdrawContract', [
+                  asset.assetId,
+                  bucket.id,
+                ])}
+            </>
+          );
+        }
+        return (
+          <>
+            {showInteractionsButtons &&
+              showInteractionsButtons('Withdraw', 'WithdrawContract', [
+                asset.assetId,
+                bucket.id,
+              ])}
+          </>
+        );
+      } else {
+        if (bucket.delegation) {
+          return (
+            <ContractContainer>
+              {showInteractionsButtons &&
+                showInteractionsButtons('Undelegate', 'UndelegateContract', [
+                  asset.assetId,
+                  bucket.id,
+                ])}
+              {showInteractionsButtons &&
+                showInteractionsButtons('Unfreeze', 'UnfreezeContract', [
+                  asset.assetId,
+                  bucket.id,
+                ])}
+            </ContractContainer>
+          );
+        }
+        return (
+          <>
+            {showInteractionsButtons &&
+              showInteractionsButtons('Unfreeze', 'UnfreezeContract', [
+                asset.assetId,
+                bucket.id,
+              ])}
+          </>
+        );
+      }
+    };
     const sections = [
       {
         element: (
@@ -149,16 +271,19 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
         element: (
           <>
             {bucket.delegation.length > 0 ? (
-              <Link href={`/account/${bucket.delegation}`}>
-                <a>{parseAddress(bucket.delegation, 22)}</a>
-              </Link>
+              <>
+                <Link href={`/account/${bucket.delegation}`}>
+                  <a>{parseAddress(bucket.delegation, 22)}</a>
+                </Link>
+              </>
             ) : (
-              <span>--</span>
+              <>{getDelegation()}</>
             )}
           </>
         ),
-        span: 1,
+        span: 2,
       },
+      { element: <> {getButton()}</>, span: 2 },
     ];
 
     return sections;
@@ -173,6 +298,7 @@ const Buckets: React.FC<IBuckets> = ({ assets }) => {
     'Unstaked Epoch',
     'Available Epoch',
     'Delegation',
+    'Actions',
   ];
 
   const tableProps: ITable = {

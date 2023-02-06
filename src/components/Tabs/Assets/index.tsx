@@ -11,8 +11,8 @@ interface IAssets {
   showInteractionsButtons?: (
     title: string,
     value: string,
-    isAssetTrigger: boolean,
     assets: IAccountAsset,
+    isAssetTrigger: boolean,
   ) => JSX.Element;
   accountAssetOwner: any;
 }
@@ -28,7 +28,6 @@ const Assets: React.FC<IAssets> = ({
   address,
   showInteractionsButtons,
   accountAssetOwner,
-
 }) => {
   const header = [
     'Token',
@@ -39,15 +38,10 @@ const Assets: React.FC<IAssets> = ({
     'Frozen',
     '',
   ];
+
   const rowSections = (props: IAccountAsset): IRowSection[] => {
-    const {
-      assetId,
-      assetType,
-      precision,
-      balance,
-      frozenBalance,
-      address: ownerAddress,
-    } = props;
+    const { assetId, assetType, precision, balance, frozenBalance, address } =
+      props;
     const ownerAssetId = accountAssetOwner?.map(
       (asset: { assetId: string }) => asset.assetId,
     );
@@ -104,13 +98,12 @@ const Assets: React.FC<IAssets> = ({
           element: showInteractionsButtons(
             'Asset Trigger',
             'AssetTriggerContract',
-            true,
             props,
+            true,
           ),
           span: 2,
         });
     });
-
     return sections;
   };
 

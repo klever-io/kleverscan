@@ -1,4 +1,3 @@
-import { Certified } from '@/assets/icons';
 import { default as DefaultInput } from '@/components/InputGlobal';
 import { transparentize } from 'polished';
 import styled from 'styled-components';
@@ -33,21 +32,6 @@ export const Title = styled.div`
 
       cursor: pointer;
     }
-  }
-`;
-
-export const VerifiedContainer = styled(Certified)`
-  position: relative;
-  top: 0;
-  left: 0;
-  transform: translate(-130%, -60%);
-
-  @media (min-width: 769px) and (max-width: 900px) {
-    transform: translate(-150%, -60%);
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    transform: translate(-150%, -60%);
   }
 `;
 
@@ -254,11 +238,10 @@ export const HoverAnchor = styled.a`
   }
 `;
 
-export const AssetHeaderContainer = styled.div<{ isVerfied: boolean }>`
+export const AssetHeaderContainer = styled.div`
   background-color: transparent !important;
   display: flex;
   flex-direction: column;
-  margin-top: ${props => (props.isVerfied ? '0' : '1rem')};
   color: ${props => props.theme.black} !important;
   &:hover {
     cursor: default;

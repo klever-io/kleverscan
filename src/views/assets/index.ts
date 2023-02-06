@@ -1,7 +1,7 @@
 import { default as DefaultInput } from '@/components/InputGlobal';
 import { ITableType } from '@/components/Table/styles';
 import widths from '@/components/Table/widths';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 export const Container = styled.div``;
 
@@ -124,24 +124,4 @@ export const Input = styled(DefaultInput)`
   background-color: ${props => props.theme.white};
 
   border-color: ${props => props.theme.lightGray};
-`;
-
-const LogoCSS = css`
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  border: 2px solid ${props => props.theme.borderLogo};
-`;
-
-export const Logo = styled.img`
-  ${LogoCSS}
-`;
-
-export const LetterLogo = styled.div`
-  ${LogoCSS}
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  text-transform: uppercase;
 `;

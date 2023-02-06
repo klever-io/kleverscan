@@ -302,6 +302,8 @@ const Account: React.FC<IAccountPage> = () => {
       (transaction: ITransaction) => {
         if (transaction.contract && transaction.contract.length) {
           transaction.contract.forEach(contract => {
+            if (contract.parameter === undefined) return;
+
             if ('assetId' in contract.parameter && contract.parameter.assetId) {
               assets.push(contract.parameter.assetId);
             }
@@ -322,13 +324,18 @@ const Account: React.FC<IAccountPage> = () => {
       (transaction: ITransaction) => {
         if (transaction.contract && transaction.contract.length) {
           transaction.contract.forEach(contract => {
-            if (contract.parameter && (contract.parameter as any).assetId) {
+            if (contract.parameter === undefined) return;
+
+            if ('assetId' in contract.parameter && contract.parameter.assetId) {
               transaction.precision =
-                assetPrecisions[(contract.parameter as any).assetId];
+                assetPrecisions[contract.parameter.assetId];
             }
-            if (contract.parameter && (contract.parameter as any).currencyID) {
+            if (
+              'currencyID' in contract.parameter &&
+              contract.parameter.currencyID
+            ) {
               transaction.precision =
-                assetPrecisions[(contract.parameter as any).currencyID];
+                assetPrecisions[contract.parameter.currencyID];
             }
           });
         }

@@ -71,7 +71,7 @@ export const Row = styled.div`
     border-bottom-right-radius: 0px;
   }
 
-  span {
+  > span {
     &:first-child {
       width: 10rem;
     }
@@ -142,7 +142,7 @@ export const CenteredRow = styled.div`
 
   width: 100%;
 
-  span {
+  > span {
     flex: 1;
 
     font-weight: 600 !important;
@@ -159,7 +159,6 @@ export const CenteredRow = styled.div`
   }
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    flex-wrap: wrap;
     width: 100%;
   }
 `;
@@ -272,4 +271,10 @@ export const HalfRow = styled.div`
     padding: 0.1rem;
     width: 100%;
   }
+`;
+
+export const AccountSkeletonContainer = styled.div`
+  min-width: 10rem;
+  width: 100%;
+  max-width: 30rem;
 `;

@@ -39,6 +39,7 @@ import {
   resetDate,
 } from '@/utils/index';
 import {
+  AccountSkeletonContainer,
   AmountContainer,
   BalanceContainer,
   ButtonModal,
@@ -56,7 +57,6 @@ import {
 } from '@/views/accounts/detail';
 import { FilterByDate } from '@/views/transactions';
 import { ReceiveBackground } from '@/views/validator';
-import { GetStaticPaths, GetStaticProps } from 'next';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -101,7 +101,7 @@ interface IQueryParams {
   sender?: '' | 'receiver' | 'sender';
 }
 
-const Account: React.FC<IAccountPage> = ({ address }) => {
+const Account: React.FC<IAccountPage> = () => {
   const [openModalTransactions, setOpenModalTransactions] =
     useState<boolean>(false);
   const [transactionValue, setTransactionValue] = useState<string>('');
@@ -110,16 +110,7 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
   const [assetTriggerSelected, setAssetTriggerSelected] =
     useState<IAccountAsset>();
   const [stakingRewards, setStakingRewards] = useState<number>(0);
-  const [account, setAccount] = useState<IAccount>({
-    address: address,
-    nonce: 0,
-    balance: 0,
-    frozenBalance: 0,
-    allowance: 0,
-    permissions: [],
-    timestamp: new Date().getTime(),
-    assets: {},
-  });
+  const [account, setAccount] = useState<IAccount>({} as IAccount);
   const [priceKLV, setPriceKLV] = useState<number>(0);
   const [KLVAllowance, setKLVAllowance] = useState<IAllowanceResponse>(
     {} as IAllowanceResponse,
@@ -154,7 +145,10 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
   }, [router.isReady]);
 
   useEffect(() => {
+    if (!router.isReady) return;
     const fetchData = async () => {
+      const address = router.query.account as string;
+
       setLoading(true);
       const emptyAccount = {
         account: {
@@ -187,6 +181,11 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
           if (res.error === 'cannot find account in database') {
             res.data = emptyAccount;
             resolve(res);
+          }
+          if (
+            res.error.includes('could not create address from provided param')
+          ) {
+            return router.push('/404');
           }
 
           reject(res.error);
@@ -283,7 +282,7 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
     };
 
     fetchData();
-  }, []);
+  }, [router.query.account, router.isReady]);
 
   useEffect(() => {
     if (account.name) setAccountName(account.name);
@@ -565,7 +564,13 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
           </span>
           <RowContent>
             <CenteredRow>
-              <span>{account.address}</span>
+              {account.address !== undefined ? (
+                <span>{account.address}</span>
+              ) : (
+                <AccountSkeletonContainer>
+                  <Skeleton height={19} width={'100%'} />
+                </AccountSkeletonContainer>
+              )}
               <Copy info="Address" data={account.address} />
               <ReceiveBackground>
                 <QrCodeModal value={account.address} isOverflow={false} />
@@ -744,30 +749,6 @@ const Account: React.FC<IAccountPage> = ({ address }) => {
       </Tabs>
     </Container>
   );
-};
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  return {
-    paths: [],
-    fallback: 'blocking',
-  };
-};
-
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const address = params?.account;
-  const redirectProps = { redirect: { destination: '/404', permanent: false } };
-
-  const accountLength = 62;
-
-  if (!address || address.length !== accountLength) {
-    return redirectProps;
-  }
-
-  return {
-    props: {
-      address,
-    },
-  };
 };
 
 export default Account;

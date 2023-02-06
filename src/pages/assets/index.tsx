@@ -1,4 +1,3 @@
-import { Certified } from '@/assets/icons';
 import { Assets as Icon } from '@/assets/title-icons';
 import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
@@ -10,7 +9,6 @@ import { IAsset, IPagination, IResponse, IRowSection } from '@/types/index';
 import { useFetchPartialAsset } from '@/utils/hooks';
 import { formatAmount, parseHardCodedInfo } from '@/utils/index';
 import { Container, Header, HeaderContainer, Input } from '@/views/assets';
-import { LetterLogo, Logo } from '@/views/assets/index';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -117,24 +115,16 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
       );
     };
 
-    const isVerified = () => {
-      if (verified) {
-        return <Certified className="isVerified" />;
-      }
-    };
-
     const sections = [
       {
         element: (
           <Link href={`/asset/${assetId}`} key={assetId}>
             <a>
               <AssetLogo
-                LetterLogo={LetterLogo}
-                isVerified={isVerified}
-                Logo={Logo}
                 logo={logo}
                 ticker={ticker}
                 name={name}
+                verified={verified}
               />
             </a>
           </Link>

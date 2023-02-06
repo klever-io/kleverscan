@@ -41,11 +41,8 @@ import {
   Header,
   HoverAnchor,
   Input,
-  LetterLogo,
-  Logo,
   Row,
   UriContainer,
-  VerifiedContainer,
 } from '@/views/assets/detail';
 import { BalanceContainer, RowContent } from '@/views/proposals/detail';
 import { ReceiveBackground } from '@/views/validator';
@@ -602,12 +599,6 @@ const Asset: React.FC<IAssetPage> = ({
     dateFilterProps,
   };
 
-  const isVerified = useCallback(() => {
-    if (verified) {
-      return <VerifiedContainer />;
-    }
-  }, [verified]);
-
   const getHeader = useMemo(() => {
     return (
       <Header>
@@ -615,15 +606,13 @@ const Asset: React.FC<IAssetPage> = ({
           Component={() => (
             <>
               <AssetLogo
-                LetterLogo={LetterLogo}
-                isVerified={isVerified}
-                Logo={Logo}
                 logo={logo}
                 ticker={ticker}
                 name={name}
+                verified={verified}
               />
               <AssetTitle>
-                <AssetHeaderContainer isVerfied={verified}>
+                <AssetHeaderContainer>
                   <h1>
                     {name} ({assetId})
                   </h1>
@@ -648,7 +637,7 @@ const Asset: React.FC<IAssetPage> = ({
         <Input />
       </Header>
     );
-  }, [assetId, assetType, isVerified, logo, name, ticker]);
+  }, [assetId, assetType, logo, name, ticker]);
 
   return (
     <Container>

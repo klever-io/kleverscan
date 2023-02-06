@@ -114,12 +114,6 @@ export const Row = styled.div<ITableType>`
       white-space: nowrap;
     }
 
-    .isVerified {
-      position: relative;
-      left: -0.9rem;
-      top: -1rem;
-    }
-
     @media (max-width: ${props => props.theme.breakpoints.mobile}) {
       overflow: hidden;
     }

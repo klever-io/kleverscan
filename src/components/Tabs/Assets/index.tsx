@@ -11,8 +11,8 @@ interface IAssets {
   showInteractionsButtons?: (
     title: string,
     value: string,
-    isAssetTrigger: boolean,
     assets: IAccountAsset,
+    isAssetTrigger: boolean,
   ) => JSX.Element;
   accountAssetOwner: any;
 }
@@ -28,7 +28,6 @@ const Assets: React.FC<IAssets> = ({
   address,
   showInteractionsButtons,
   accountAssetOwner,
-
 }) => {
   const header = [
     'Token',
@@ -104,13 +103,12 @@ const Assets: React.FC<IAssets> = ({
           element: showInteractionsButtons(
             'Asset Trigger',
             'AssetTriggerContract',
-            true,
             props,
+            true,
           ),
           span: 2,
         });
     });
-
     return sections;
   };
 

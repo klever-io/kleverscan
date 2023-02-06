@@ -26,6 +26,7 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   zIndex?: number;
   collection?: IKAssets;
   claimSelectedType?: IStakingRewards;
+  selectedBucket?: string;
 }
 
 const Select: React.FC<IFilter> = ({
@@ -38,7 +39,7 @@ const Select: React.FC<IFilter> = ({
   zIndex,
   collection,
   claimSelectedType,
-
+  selectedBucket,
   ...rest
 }) => {
   const getAssetsEnableRef = useRef<boolean>(true);
@@ -92,7 +93,8 @@ const Select: React.FC<IFilter> = ({
       <ReactSelect
         defaultValue={
           (collection && Object.keys(collection).length !== 0 && collection) ||
-          claimSelectedType
+          claimSelectedType ||
+          (selectedBucket && { label: selectedBucket })
         }
         placeholder={
           selectPlaceholder ? selectPlaceholder : `Choose ${title ? title : ''}`

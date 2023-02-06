@@ -234,11 +234,16 @@ export const Body = styled.div<ITableType>`
 export const MobileCardItem = styled.span<{
   columnSpan?: number;
   isRightAligned?: boolean;
+  isAssets?: boolean;
 }>`
   display: flex;
-  flex-direction: column;
-  &:nth-child(7) {
-    flex-grow: 1;
+  flex-direction: ${props => (props.isAssets ? 'column' : 'row')};
+  gap: 0.5rem;
+  &:nth-last-child(1) {
+    flex-grow: ${props => (props.isAssets ? '1' : '0')};
+  }
+  &:nth-last-child(2) {
+    flex-grow: ${props => (props.isAssets ? '5000' : '0')};
   }
 
   ${props =>
@@ -251,6 +256,7 @@ export const MobileCardItem = styled.span<{
       }
     `}
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    flex-direction: column;
     ${props =>
       !props.columnSpan || props.columnSpan >= 0
         ? css`
@@ -322,7 +328,7 @@ export const EmptyRow = styled(Row)`
 
 export const CustomLink = styled.a`
   align-self: end;
-  color: ${props => props.theme.text};
+  color: ${props => props.theme.true.white} !important;
   background: ${props => props.theme.violet};
   padding: 0.625rem 2.94rem;
   border-radius: 4px;

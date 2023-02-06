@@ -104,11 +104,10 @@ interface IQueryParams {
 const Account: React.FC<IAccountPage> = () => {
   const [openModalTransactions, setOpenModalTransactions] =
     useState<boolean>(false);
-  const [transactionValue, setTransactionValue] = useState<string>('');
+  const [contractValue, setContractValue] = useState<string>('');
   const [accountName, setAccountName] = useState<string>('');
   const [titleModal, setTitleModal] = useState<string>('');
-  const [assetTriggerSelected, setAssetTriggerSelected] =
-    useState<IAccountAsset>();
+  const [collectionSelected, setCollectionSelected] = useState<IAccountAsset>();
   const [stakingRewards, setStakingRewards] = useState<number>(0);
   const [account, setAccount] = useState<IAccount>({} as IAccount);
   const [priceKLV, setPriceKLV] = useState<number>(0);
@@ -120,7 +119,9 @@ const Account: React.FC<IAccountPage> = () => {
   );
   const [accountAssets, setAccountAssets] = useState<IAccountAsset[]>([]);
   const [accountAssetOwner, setAccountAssetOwner] = useState();
+  const [valueContract, setValueContract] = useState<any>();
   const [loading, setLoading] = useState<boolean>(true);
+
   const { walletAddress } = useExtension();
   const router = useRouter();
 
@@ -465,7 +466,17 @@ const Account: React.FC<IAccountPage> = () => {
       case 'Transactions':
         return <Transactions transactionsTableProps={transactionTableProps} />;
       case 'Buckets':
-        return <Buckets assets={accountAssets} />;
+        return (
+          <>
+            <ContainerTabInteractions>
+              {showInteractionsButtons('Freeze', 'FreezeContract', false)}
+            </ContainerTabInteractions>
+            <Buckets
+              assets={accountAssets}
+              showInteractionsButtons={showInteractionsButtons}
+            />
+          </>
+        );
       default:
         return <div />;
     }
@@ -476,23 +487,37 @@ const Account: React.FC<IAccountPage> = () => {
   const pricedKLV = calculateTotalKLV() * priceKLV;
   const showInteractionsButtons = (
     title: string,
-    value: string,
+    valueContract: string,
+    value?: any,
     isAssetTrigger?: boolean,
-    asset?: IAccountAsset,
-    stakingRewards?: number,
   ) => {
     let titleFormatted = '';
-    value.split(/(?=[A-Z])/).forEach((t, index) => (titleFormatted += t + ` `));
+    valueContract
+      .split(/(?=[A-Z])/)
+      .forEach((t, index) => (titleFormatted += t + ` `));
+    const onClick = () => {
+      switch (valueContract) {
+        case 'ClaimContract':
+          setStakingRewards(value || 0);
+          break;
+        case 'AssetTriggerContract':
+          setCollectionSelected(value);
+          break;
+        default:
+          return;
+      }
+    };
     if (walletAddress === initialQueryState.account) {
       return (
         <ButtonModal
+          isLocked={valueContract === '--' && true}
           isAssetTrigger={isAssetTrigger}
           onClick={() => {
-            setAssetTriggerSelected(asset);
-            setTransactionValue(value);
-            setOpenModalTransactions(true);
+            setContractValue(valueContract);
+            setOpenModalTransactions(valueContract === '--' ? false : true);
             setTitleModal(titleFormatted);
-            setStakingRewards(stakingRewards || 0);
+            setValueContract(value);
+            onClick();
           }}
         >
           {title}
@@ -542,15 +567,17 @@ const Account: React.FC<IAccountPage> = () => {
     },
   ];
   const modalOptions = {
-    contractType: transactionValue,
-    setContractType: setTransactionValue,
+    contractType: contractValue,
+    setContractType: setContractValue,
     setOpenModal: setOpenModalTransactions,
     openModal: openModalTransactions,
     title: titleModal,
-    assetTriggerSelected: assetTriggerSelected,
-    setAssetTriggerSelected: setAssetTriggerSelected,
+    assetTriggerSelected: collectionSelected,
+    setAssetTriggerSelected: setCollectionSelected,
     stakingRewards: stakingRewards,
     setStakingRewards: setStakingRewards,
+    valueContract: valueContract,
+    setValueContract: setValueContract,
   };
   return (
     <Container>
@@ -675,8 +702,6 @@ const Account: React.FC<IAccountPage> = () => {
                       {showInteractionsButtons(
                         'Allowance Claim',
                         'ClaimContract',
-                        false,
-                        undefined,
                         1,
                       )}
                     </>
@@ -692,8 +717,6 @@ const Account: React.FC<IAccountPage> = () => {
                       {showInteractionsButtons(
                         'Staking Claim',
                         'ClaimContract',
-                        false,
-                        undefined,
                         0,
                       )}
                     </>
@@ -709,8 +732,6 @@ const Account: React.FC<IAccountPage> = () => {
                       {showInteractionsButtons(
                         'Market Claim',
                         'ClaimContract',
-                        false,
-                        undefined,
                         2,
                       )}
                     </>

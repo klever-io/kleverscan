@@ -152,7 +152,7 @@ describe('Component: Tabs/Proposals', () => {
     };
 
     const detailsStyles = {
-      color: theme.black,
+      color: theme.true.white,
       fontWeight: '600',
     };
 

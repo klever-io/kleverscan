@@ -38,15 +38,10 @@ const Assets: React.FC<IAssets> = ({
     'Frozen',
     '',
   ];
+
   const rowSections = (props: IAccountAsset): IRowSection[] => {
-    const {
-      assetId,
-      assetType,
-      precision,
-      balance,
-      frozenBalance,
-      address: ownerAddress,
-    } = props;
+    const { assetId, assetType, precision, balance, frozenBalance, address } =
+      props;
     const ownerAssetId = accountAssetOwner?.map(
       (asset: { assetId: string }) => asset.assetId,
     );

@@ -118,7 +118,7 @@ const Account: React.FC<IAccountPage> = () => {
     {} as IAllowanceResponse,
   );
   const [accountAssets, setAccountAssets] = useState<IAccountAsset[]>([]);
-  const [accountAssetOwner, setAccountAssetOwner] = useState();
+  const [accountAssetOwner, setAccountAssetOwner] = useState([]);
   const [valueContract, setValueContract] = useState<any>();
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -138,6 +138,29 @@ const Account: React.FC<IAccountPage> = () => {
       shallow: true,
     });
   };
+  const getAllAssets = () => {
+    const findMissingAsset: any[] = accountAssetOwner
+      .filter(
+        (asset: IAccountAsset) =>
+          !accountAssets.find(({ assetId }) => assetId === asset.assetId),
+      )
+      .map((asset: any) => ({
+        address: asset.ownerAddress,
+        assetId: asset.assetId,
+        assetName: asset.name,
+        assetType: asset.assetType,
+        precision: asset.precision,
+        balance: 0,
+        frozenBalance: 0,
+        unfrozenBalance: 0,
+      }));
+    const allAssetsAccount = [...accountAssets, ...findMissingAsset];
+    setAccountAssets(allAssetsAccount);
+  };
+
+  useEffect(() => {
+    getAllAssets();
+  }, [accountAssetOwner]);
 
   useEffect(() => {
     if (!router.isReady) return;

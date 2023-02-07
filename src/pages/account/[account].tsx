@@ -40,6 +40,7 @@ import {
 } from '@/utils/index';
 import {
   AccountSkeletonContainer,
+  AddressContainer,
   AmountContainer,
   BalanceContainer,
   ButtonModal,
@@ -621,17 +622,19 @@ const Account: React.FC<IAccountPage> = () => {
           </span>
           <RowContent>
             <CenteredRow>
-              {account.address !== undefined ? (
-                <span>{account.address}</span>
-              ) : (
-                <AccountSkeletonContainer>
-                  <Skeleton height={19} width={'100%'} />
-                </AccountSkeletonContainer>
-              )}
-              <Copy info="Address" data={account.address} />
-              <ReceiveBackground>
-                <QrCodeModal value={account.address} isOverflow={false} />
-              </ReceiveBackground>
+              <AddressContainer>
+                {account.address !== undefined ? (
+                  <span>{account.address}</span>
+                ) : (
+                  <AccountSkeletonContainer>
+                    <Skeleton height={19} width={'100%'} />
+                  </AccountSkeletonContainer>
+                )}
+                <Copy info="Address" data={account.address} />
+                <ReceiveBackground>
+                  <QrCodeModal value={account.address} isOverflow={false} />
+                </ReceiveBackground>
+              </AddressContainer>
               {showInteractionsButtons(
                 'Set Account Name',
                 'SetAccountNameContract',
@@ -668,7 +671,7 @@ const Account: React.FC<IAccountPage> = () => {
                     </p>
                   </div>
                   {showInteractionsButtons(
-                    'Create Transfer',
+                    'Transfer',
                     'TransferContract',
                     false,
                   )}

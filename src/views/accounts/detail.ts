@@ -127,26 +127,14 @@ export const ButtonModal = styled.button<{
   cursor: ${props => (props.isLocked ? 'not-allowed' : 'pointer')};
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
+    max-width: 100%;
   }
 `;
 
-export const ContainerTabInteractions = styled.div`
+export const AddressContainer = styled.div`
   display: flex;
-  gap: 1.5rem;
-  margin-bottom: 1rem;
-`;
-
-export const CenteredRow = styled.div`
-  display: flex;
-
-  flex-direction: row;
   align-items: center;
-  flex: 1;
-
   gap: 0.5rem;
-
-  width: 100%;
-
   > span {
     flex: 1;
 
@@ -158,6 +146,21 @@ export const CenteredRow = styled.div`
     text-overflow: ellipsis;
     max-width: fit-content;
   }
+`;
+
+export const ContainerTabInteractions = styled.div`
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+`;
+
+export const CenteredRow = styled.div`
+  display: flex;
+  flex: 1;
+
+  gap: 0.5rem;
+
+  width: 100%;
 
   svg {
     cursor: pointer;
@@ -165,6 +168,7 @@ export const CenteredRow = styled.div`
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
+    flex-direction: column;
   }
 `;
 
@@ -181,6 +185,9 @@ export const AmountContainer = styled.div`
   gap: 1.5rem;
 
   div {
+    div {
+      padding-right: 5rem;
+    }
     span {
       font-weight: 600;
     }

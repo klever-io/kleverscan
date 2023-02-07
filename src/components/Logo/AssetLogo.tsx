@@ -1,22 +1,19 @@
 import { validateImgUrl } from '@/utils/index';
 import React, { useCallback, useEffect, useState } from 'react';
+import { Container, LetterLogo, Logo, Verified } from './styles';
 
 interface IAssetLogo {
-  LetterLogo: React.FunctionComponent<any>;
-  Logo: React.FunctionComponent<any>;
   logo: string;
   ticker: string;
   name: string;
-  isVerified: () => JSX.Element | undefined;
+  verified?: boolean;
 }
-const AssetLogo: React.FC<IAssetLogo> = ({
-  LetterLogo,
-  Logo,
-  logo,
-  ticker,
-  name,
-  isVerified,
-}) => {
+const AssetLogo: React.FC<IAssetLogo> = ({ logo, ticker, name, verified }) => {
+  const isVerified = () => {
+    if (verified) {
+      return <Verified />;
+    }
+  };
   const [urlIsImg, setUrlIsImg] = useState(false);
   const [error, setError] = useState(false);
   const maxRequestAwaitTime = 2000; // 2 secs
@@ -47,10 +44,10 @@ const AssetLogo: React.FC<IAssetLogo> = ({
 
   const renderLogo = (url: string) => {
     return (
-      <>
+      <Container data-testid="asset-logo-container">
         <Logo alt={`${name}-logo`} src={url} onError={() => setError(true)} />
         {isVerified()}
-      </>
+      </Container>
     );
   };
 
@@ -59,10 +56,10 @@ const AssetLogo: React.FC<IAssetLogo> = ({
   }
 
   return (
-    <>
+    <Container data-testid="asset-logo-container">
       <LetterLogo>{ticker?.split('')?.[0] || ''}</LetterLogo>
       {isVerified()}
-    </>
+    </Container>
   );
 };
 

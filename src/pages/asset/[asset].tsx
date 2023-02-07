@@ -1,4 +1,3 @@
-import { Receive } from '@/assets/icons';
 import Copy from '@/components/Copy';
 import { ISelectedDays } from '@/components/DateFilter';
 import Title from '@/components/Layout/Title';
@@ -42,11 +41,8 @@ import {
   Header,
   HoverAnchor,
   Input,
-  LetterLogo,
-  Logo,
   Row,
   UriContainer,
-  VerifiedContainer,
 } from '@/views/assets/detail';
 import { BalanceContainer, RowContent } from '@/views/proposals/detail';
 import { ReceiveBackground } from '@/views/validator';
@@ -136,7 +132,6 @@ const Asset: React.FC<IAssetPage> = ({
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
   const [query, setQuery] = useState(router.query);
-  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     router.push({ pathname: router.pathname, query }, undefined, {
@@ -198,14 +193,8 @@ const Asset: React.FC<IAssetPage> = ({
                   <HoverAnchor>{ownerAddress}</HoverAnchor>
                 </Link>
                 <Copy data={ownerAddress} info="ownerAddress" />
-                <ReceiveBackground>
-                  <Receive onClick={() => setShowModal(!showModal)} />
-                  <QrCodeModal
-                    show={showModal}
-                    setShowModal={() => setShowModal(false)}
-                    value={ownerAddress}
-                    onClose={() => setShowModal(false)}
-                  />
+                <ReceiveBackground isOverflow={true}>
+                  <QrCodeModal value={ownerAddress} isOverflow={true} />
                 </ReceiveBackground>
               </CenteredRow>
             </span>
@@ -610,12 +599,6 @@ const Asset: React.FC<IAssetPage> = ({
     dateFilterProps,
   };
 
-  const isVerified = useCallback(() => {
-    if (verified) {
-      return <VerifiedContainer />;
-    }
-  }, [verified]);
-
   const getHeader = useMemo(() => {
     return (
       <Header>
@@ -623,15 +606,13 @@ const Asset: React.FC<IAssetPage> = ({
           Component={() => (
             <>
               <AssetLogo
-                LetterLogo={LetterLogo}
-                isVerified={isVerified}
-                Logo={Logo}
                 logo={logo}
                 ticker={ticker}
                 name={name}
+                verified={verified}
               />
               <AssetTitle>
-                <AssetHeaderContainer isVerfied={verified}>
+                <AssetHeaderContainer>
                   <h1>
                     {name} ({assetId})
                   </h1>
@@ -656,7 +637,7 @@ const Asset: React.FC<IAssetPage> = ({
         <Input />
       </Header>
     );
-  }, [assetId, assetType, isVerified, logo, name, ticker]);
+  }, [assetId, assetType, logo, name, ticker]);
 
   return (
     <Container>

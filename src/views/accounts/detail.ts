@@ -71,7 +71,7 @@ export const Row = styled.div`
     border-bottom-right-radius: 0px;
   }
 
-  span {
+  > span {
     &:first-child {
       width: 10rem;
     }
@@ -105,23 +105,46 @@ export const RowContent = styled.span`
   width: 100%;
 `;
 
-export const ButtonModal = styled.button<{ isAssetTrigger?: boolean }>`
+export const ButtonModal = styled.button<{
+  isAssetTrigger?: boolean;
+  isLocked?: boolean;
+}>`
   color: ${props => props.theme.true.white};
   background-color: ${props => props.theme.violet};
   height: 2.5rem;
   align-self: end;
-  width: ${props => (props.isAssetTrigger ? '11rem' : 'auto')};
-  padding: 0.625rem 2rem;
+  min-width: ${props => (props.isAssetTrigger ? '11rem' : '13rem')};
+  max-width: 14.6rem;
+  padding: 0 2rem;
   border-radius: 4px;
   :active {
-    transform: translateY(0.1rem);
+    transform: ${props => (props.isLocked ? '' : 'translateY(0.1rem)')};
   }
   :hover {
-    opacity: 0.8;
+    opacity: ${props => (props.isLocked ? '' : '0.8')};
   }
-
+  opacity: ${props => (props.isLocked ? '0.3' : '1')};
+  cursor: ${props => (props.isLocked ? 'not-allowed' : 'pointer')};
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
+    max-width: 100%;
+  }
+`;
+
+export const AddressContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  > span {
+    flex: 1;
+
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: fit-content;
   }
 `;
 
@@ -133,34 +156,19 @@ export const ContainerTabInteractions = styled.div`
 
 export const CenteredRow = styled.div`
   display: flex;
-
-  flex-direction: row;
-  align-items: center;
   flex: 1;
 
   gap: 0.5rem;
 
   width: 100%;
 
-  span {
-    flex: 1;
-
-    font-weight: 600 !important;
-    font-size: 0.85rem !important;
-
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: fit-content;
-  }
-
   svg {
     cursor: pointer;
   }
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    flex-wrap: wrap;
     width: 100%;
+    flex-direction: column;
   }
 `;
 
@@ -177,6 +185,9 @@ export const AmountContainer = styled.div`
   gap: 1.5rem;
 
   div {
+    div {
+      padding-right: 5rem;
+    }
     span {
       font-weight: 600;
     }
@@ -249,6 +260,7 @@ export const FrozenContainer = styled.div`
     span {
       color: ${props => props.theme.darkText};
       padding-right: 1rem;
+      min-width: 10rem;
     }
   }
 `;
@@ -272,4 +284,10 @@ export const HalfRow = styled.div`
     padding: 0.1rem;
     width: 100%;
   }
+`;
+
+export const AccountSkeletonContainer = styled.div`
+  min-width: 10rem;
+  width: 100%;
+  max-width: 30rem;
 `;

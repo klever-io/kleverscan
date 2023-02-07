@@ -1,7 +1,6 @@
-import { waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { renderWithTheme } from '../../test/utils';
-import { LetterLogo, Logo, VerifiedContainer } from '../../views/assets/detail';
 import AssetLogo from './AssetLogo';
 
 describe('Component AssetLogo', () => {
@@ -9,26 +8,19 @@ describe('Component AssetLogo', () => {
   const name = 'KLEVER';
   const ticker = 'KLV';
   let verified = true;
-  const isVerified = () => {
-    if (verified) {
-      return <VerifiedContainer />;
-    }
-  };
+
   test('Should render the component and AssetLogo Verified', async () => {
-    let container: any;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
-          <AssetLogo
-            Logo={Logo}
-            LetterLogo={LetterLogo}
-            name={name}
-            ticker={ticker}
-            logo={logoUrl}
-            isVerified={isVerified}
-          />,
-        )),
+    await waitFor(() =>
+      renderWithTheme(
+        <AssetLogo
+          name={name}
+          ticker={ticker}
+          logo={logoUrl}
+          verified={verified}
+        />,
+      ),
     );
+    const container = screen.getByTestId('asset-logo-container');
     const svg = container.lastChild;
     const img = container.firstChild;
     expect(svg).toBeVisible();
@@ -41,21 +33,19 @@ describe('Component AssetLogo', () => {
   });
 
   test('Should render the component and AssetLogo not Verified', async () => {
-    let container: any;
     verified = false;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
-          <AssetLogo
-            Logo={Logo}
-            LetterLogo={LetterLogo}
-            name={name}
-            ticker={ticker}
-            logo={logoUrl}
-            isVerified={isVerified}
-          />,
-        )),
+    await waitFor(() =>
+      renderWithTheme(
+        <AssetLogo
+          name={name}
+          ticker={ticker}
+          logo={logoUrl}
+          verified={verified}
+        />,
+      ),
     );
+    const container = screen.getByTestId('asset-logo-container');
+
     const element = container.childNodes;
     const img = container.firstChild;
     expect(element).toHaveLength(1);

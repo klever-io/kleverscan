@@ -19,6 +19,8 @@ interface IModalContract {
   >;
   stakingRewards: number;
   setStakingRewards: React.Dispatch<React.SetStateAction<number>>;
+  valueContract: any;
+  setValueContract: React.Dispatch<any>;
 }
 
 const ModalContract: React.FC<IModalContract> = ({
@@ -31,6 +33,8 @@ const ModalContract: React.FC<IModalContract> = ({
   setAssetTriggerSelected,
   stakingRewards,
   setStakingRewards,
+  valueContract,
+  setValueContract,
 }) => {
   const [assetsList, setAssetsLists] = useState<ICollectionList[]>([]);
   const [kassetsList, setKAssetsList] = useState<IKAssets[]>([]);
@@ -179,6 +183,7 @@ const ModalContract: React.FC<IModalContract> = ({
     setContractType('');
     setAssetTriggerSelected({} as IAccountAsset);
     setStakingRewards(0);
+    setValueContract([]);
   };
 
   return (
@@ -199,6 +204,7 @@ const ModalContract: React.FC<IModalContract> = ({
           assetTriggerSelected={assetTriggerSelected}
           claimSelectedType={stakingRewardsType[stakingRewards]}
           openModal={openModal}
+          valueContract={valueContract}
         />
       </Content>
     </Container>

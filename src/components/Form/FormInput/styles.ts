@@ -36,6 +36,12 @@ const defaultStyles = css`
 export const StyledInput = styled.input<IProps>`
   height: ${({ type }) => (type === 'hidden' ? 0 : 3)}rem;
 
+  ${props =>
+    props.type === 'datetime-local' &&
+    css`
+      color-scheme: ${props => (props.theme.dark ? 'dark' : 'auto')};
+    `}
+
   ${defaultStyles}
 
   /* Set valid css */
@@ -224,7 +230,6 @@ export const TooltipContent = styled.div`
   border-radius: 0.2rem;
   font-size: smaller;
   visibility: hidden;
-
   @media (min-width: 950px) {
     white-space: pre;
   }
@@ -232,6 +237,10 @@ export const TooltipContent = styled.div`
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: auto;
     min-width: 18rem;
+  }
+
+  span {
+    font-weight: 500;
   }
 `;
 

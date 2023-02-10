@@ -34,6 +34,7 @@ export interface IFormInputProps
     value: any;
   }[];
   tooltip?: string;
+  maxDecimals?: number;
 }
 
 const FormInput: React.FC<IFormInputProps> = ({
@@ -47,6 +48,7 @@ const FormInput: React.FC<IFormInputProps> = ({
   defaultChecked = true,
   defaultValue,
   tooltip,
+  maxDecimals,
   ...rest
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -127,7 +129,15 @@ const FormInput: React.FC<IFormInputProps> = ({
     e.target.blur();
   };
 
-  type === 'number' && (inputProps['step'] = '0.00000001');
+  type === 'number' && (inputProps['step'] = '0.01');
+  type === 'number' &&
+    maxDecimals &&
+    (inputProps['onChange'] = ({ target }) => {
+      if (target.value.length > 2) {
+        const regex = new RegExp('^-?\\d+.\\d{0,' + maxDecimals + '}');
+        target.value = target.value?.toString()?.match(regex)?.[0] as string;
+      }
+    });
   type === 'number' && (inputProps['onWheel'] = preventScroll);
 
   const handleKey = (e: any) => {
@@ -161,7 +171,7 @@ const FormInput: React.FC<IFormInputProps> = ({
             <TooltipContainer>
               <InfoIcon />
               <TooltipContent>
-                <p>{tooltip}</p>
+                <span>{tooltip}</span>
               </TooltipContent>
             </TooltipContainer>
           )}

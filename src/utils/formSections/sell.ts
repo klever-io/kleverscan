@@ -21,13 +21,6 @@ const sellContract = (): ISection[] => {
         },
       },
       {
-        label: 'Asset ID',
-        props: {
-          required: true,
-          tooltip: 'Asset to be sold',
-        },
-      },
-      {
         label: 'Currency ID',
         props: {
           required: true,
@@ -51,9 +44,9 @@ const sellContract = (): ISection[] => {
       {
         label: 'End Time',
         props: {
-          type: 'number',
+          type: 'datetime-local',
           required: true,
-          tooltip: 'Expiration sell time (in Unix Time)',
+          tooltip: 'Expiration sell date',
         },
       },
     ],

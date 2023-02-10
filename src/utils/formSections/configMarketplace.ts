@@ -30,6 +30,7 @@ const configMarketplaceContract = (): ISection[] => {
         props: {
           type: 'number',
           tooltip: 'New referral percentage with 2 decimals',
+          maxDecimals: 2,
         },
       },
     ],

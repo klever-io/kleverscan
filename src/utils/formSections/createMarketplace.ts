@@ -22,6 +22,7 @@ const createMarketplaceContract = (): ISection[] => {
         props: {
           type: 'number',
           tooltip: 'Royalties percentage with 2 decimals',
+          maxDecimals: 2,
         },
       },
     ],

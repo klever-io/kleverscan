@@ -6,7 +6,7 @@ export const delegateContract = (): ISection[] => {
   section.push({
     fields: [
       {
-        label: 'Receiver',
+        label: 'Validator Address',
         props: {
           required: true,
           tooltip: 'Validator to whom the bucket will be delegated',

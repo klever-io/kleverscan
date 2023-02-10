@@ -129,11 +129,11 @@ const assetTriggerContract = (type?: number | null): ISection[] => {
                 fields: [
                   {
                     label: 'Label',
-                    props: { tooltip: 'Uri identifier' },
+                    props: { tooltip: 'Uri identifier ( Ex: "foo" )' },
                   },
                   {
                     label: 'Address',
-                    props: { tooltip: 'Uri address' },
+                    props: { tooltip: 'Uri address ( Ex: "http://bar.com" )' },
                   },
                 ],
               },
@@ -178,28 +178,29 @@ const assetTriggerContract = (type?: number | null): ISection[] => {
             label: 'APR',
             props: {
               type: 'number',
-              tooltip: 'Percentage',
+              tooltip: 'Anual Percentage Rate',
             },
           },
           {
             label: 'Min Epochs To Claim',
             props: {
               type: 'number',
-              tooltip: 'Minimum epochs to claim rewards',
+              tooltip: 'Minimum epochs to claim rewards ( each epoch has 6h )',
             },
           },
           {
             label: 'Min Epochs To Unstake',
             props: {
               type: 'number',
-              tooltip: 'Minimum epochs to unstake',
+              tooltip: 'Minimum epochs to unstake ( each epoch has 6h )',
             },
           },
           {
             label: 'Min Epochs To Withdraw',
             props: {
               type: 'number',
-              tooltip: 'Minimum epochs to withdraw after unstake',
+              tooltip:
+                'Minimum epochs to withdraw after unstake ( each epoch has 6h )',
             },
           },
         ],

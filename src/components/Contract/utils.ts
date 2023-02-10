@@ -151,6 +151,7 @@ const contractHaveKDA = (
     'WithdrawContract',
     'ConfigITOContract',
     'SetITOPricesContract',
+    'SellContract',
   ];
 
   if (contract === 'AssetTriggerContract' && assetTriggerType !== null) {
@@ -318,6 +319,9 @@ const parseValues = (
     if (contractType === 'AssetTriggerContract') {
       parsedValues.triggerType = typeAssetTrigger;
       parsedValues.assetId =
+        assetID !== 0 ? `${collection.value}/${assetID}` : collection.value;
+    } else if (contractType === 'SellContract') {
+      parsedValues.assetID =
         assetID !== 0 ? `${collection.value}/${assetID}` : collection.value;
     } else {
       parsedValues.kda =

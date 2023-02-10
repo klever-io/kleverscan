@@ -31,10 +31,11 @@ const validatorConfigContract = (): ISection[] => {
         },
       },
       {
-        label: 'Comission',
+        label: 'Commission',
         props: {
           type: 'number',
           tooltip: 'Validation commission with 2 decimals',
+          maxDecimals: 2,
         },
       },
       {

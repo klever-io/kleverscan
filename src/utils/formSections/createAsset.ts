@@ -159,14 +159,16 @@ const createAsset = (type: string, address = ''): ISection[] => {
               label: 'Min Epochs To Claim',
               props: {
                 type: 'number',
-                tooltip: 'Minimum amount of epochs to claim rewards',
+                tooltip:
+                  'Minimum amount of epochs to claim rewards ( each epoch has 6h )',
               },
             },
             {
               label: 'Min Epochs To Unstake',
               props: {
                 type: 'number',
-                tooltip: 'Minimum amount of epochs to unstake tokens',
+                tooltip:
+                  'Minimum amount of epochs to unstake tokens ( each epoch has 6h )',
               },
             },
             {
@@ -174,7 +176,7 @@ const createAsset = (type: string, address = ''): ISection[] => {
               props: {
                 type: 'number',
                 tooltip:
-                  'Minimum amount of epochs to withdraw tokens after unstaking',
+                  'Minimum amount of epochs to withdraw tokens after unstaking ( each epoch has 6h )',
               },
             },
           ],
@@ -387,7 +389,10 @@ const createAsset = (type: string, address = ''): ISection[] => {
               label: 'Market Percentage',
               props: {
                 type: 'number',
-                tooltip: 'Percentage KLV amount in each market transaction',
+                defaultValue: 0,
+                tooltip:
+                  'Percentage KLV amount in each market transaction ( 2 Decimals, ex: 1.52 )',
+                maxDecimals: 2,
               },
             },
             {

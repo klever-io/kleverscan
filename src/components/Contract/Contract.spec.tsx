@@ -240,7 +240,7 @@ describe('Contract Component', () => {
   it('should render the Delegate form contract', async () => {
     const itemsFreeze = [
       'Delegate a bucket to a validator.',
-      'Receiver',
+      'Validator Address',
       'Select a bucket',
     ];
     let container;
@@ -327,7 +327,7 @@ describe('Contract Component', () => {
       'Owner Address',
       'BLS Public Key',
       'Reward Address',
-      'Comission',
+      'Commission',
       'Logo',
       'Can Delegate',
       'Max Delegation Amount',
@@ -365,7 +365,7 @@ describe('Contract Component', () => {
       'Name',
       'BLS Public Key',
       'Reward Address',
-      'Comission',
+      'Commission',
       'Logo',
       'Can Delegate',
       'Max Delegation Amount',

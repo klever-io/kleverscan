@@ -37,6 +37,7 @@ interface IInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   innerSection?: ISection;
   selectPlaceholder?: string;
   tooltip?: string;
+  maxDecimals?: number;
 }
 
 export interface IFormField {
@@ -272,7 +273,7 @@ const Form: React.FC<IFormProps> = ({
                 <TooltipContainer>
                   <InfoIcon size={13} />
                   <TooltipContent>
-                    <p>{field.props.tooltip}</p>
+                    <span>{field.props.tooltip}</span>
                   </TooltipContent>
                 </TooltipContainer>
               )}

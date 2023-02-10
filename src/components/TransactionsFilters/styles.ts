@@ -7,7 +7,7 @@ export const FilterContainer = styled.div`
 
   gap: 0.75rem;
 
-  > div:last-child {
+  > div {
     min-width: 15rem;
   }
 

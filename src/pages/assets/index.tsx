@@ -31,7 +31,8 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
   const router = useRouter();
   const [filterToken, setFilterToken] = useState(router.query.asset || 'All');
 
-  const [filterAssets, fetchPartialAsset] = useFetchPartialAsset();
+  const [filterAssets, fetchPartialAsset, loading, setLoading] =
+    useFetchPartialAsset();
 
   const filters: IFilter[] = [
     {
@@ -39,9 +40,11 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
       data: filterAssets.map(asset => asset.assetId),
       onClick: value => setFilterToken(value),
       onChange: async value => {
+        setLoading(true);
         await fetchPartialAsset(value);
       },
       current: (filterToken as string) || undefined,
+      loading,
     },
   ];
 

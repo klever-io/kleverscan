@@ -1,12 +1,14 @@
 import { ArrowDown } from '@/assets/icons';
 import React, { useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
+import { Loader } from '../Loader/styles';
 import {
   ArrowDownContainer,
   Container,
   Content,
   HiddenInput,
   Item,
+  LoadContainer,
   SelectorContainer,
 } from './styles';
 
@@ -23,6 +25,7 @@ export interface IFilter {
   onClick?(selected: string, filterType: string): void;
   onChange?(value: string): void;
   current: string | undefined;
+  loading?: boolean;
 }
 
 const Filter: React.FC<IFilter> = ({
@@ -34,6 +37,7 @@ const Filter: React.FC<IFilter> = ({
   firstItem,
   overFlow,
   inputType = 'text',
+  loading,
 }) => {
   const allItem = firstItem || 'All';
   const [selected, setSelected] = useState(current || allItem);
@@ -121,7 +125,6 @@ const Filter: React.FC<IFilter> = ({
     const regex = new RegExp(`${input}`, 'gi');
     return getDataArray().filter(item => String(item).match(regex)?.[0]);
   };
-
   const filteredArray = filterArrayByInput(inputValue);
 
   const contentProps = {
@@ -135,6 +138,14 @@ const Filter: React.FC<IFilter> = ({
     open,
     overFlow,
     onClick: () => closeDropDown(),
+  };
+  const getPlaceholder = () => {
+    if (title === 'Coin' || title === 'Asset') {
+      return 'Type the token ID';
+    } else if (title === 'Contract') {
+      return 'Type the contract';
+    }
+    return '';
   };
 
   return (
@@ -152,6 +163,7 @@ const Filter: React.FC<IFilter> = ({
             type={title !== 'Status' ? inputType : 'button'}
             ref={focusRef}
             show={focus}
+            placeholder={getPlaceholder()}
             onChange={handleChange}
           />
         )}
@@ -162,9 +174,18 @@ const Filter: React.FC<IFilter> = ({
           <ArrowDown />
         </ArrowDownContainer>
         <SelectorContainer {...selectorProps}>
-          {filteredArray.map((item, index) => (
-            <SelectorItem key={String(index)} item={item} />
-          ))}
+          {!filteredArray.length && !loading ? (
+            <span>{title} not found!</span>
+          ) : (
+            filteredArray.map((item, index) => (
+              <SelectorItem key={String(index)} item={item} />
+            ))
+          )}
+          {loading && (
+            <LoadContainer>
+              <Loader />
+            </LoadContainer>
+          )}
         </SelectorContainer>
       </Content>
     </Container>

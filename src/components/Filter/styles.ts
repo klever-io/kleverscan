@@ -77,7 +77,7 @@ export const Content = styled.div<{ open: boolean }>`
   span {
     margin-top: 0.25rem;
 
-    max-width: 6.25rem;
+    max-width: 10rem;
 
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -108,7 +108,6 @@ export const SelectorContainer = styled.div<{ open: boolean }>`
 
   position: absolute;
   display: flex;
-
   overflow-y: auto;
   z-index: 2;
 
@@ -124,6 +123,11 @@ export const SelectorContainer = styled.div<{ open: boolean }>`
   animation: ${props => (props.open ? Hide : Show)} 0.2s
     cubic-bezier(0.645, 0.045, 0.355, 1);
   animation-fill-mode: forwards;
+  span {
+    padding: 0.5rem 1rem;
+    max-width: none;
+    text-align: center;
+  }
 
   &::-webkit-scrollbar {
     position: absolute;
@@ -143,6 +147,13 @@ export const SelectorContainer = styled.div<{ open: boolean }>`
       background: ${props => transparentize(0.75, props.theme.black)};
     }
   }
+`;
+
+export const LoadContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.75rem;
 `;
 
 export const Item = styled.div<{ selected: boolean }>`

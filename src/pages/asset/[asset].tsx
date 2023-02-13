@@ -591,6 +591,7 @@ const Asset: React.FC<IAssetPage> = ({
   const dateFilterProps = {
     resetDate: resetQueryDate,
     filterDate: filterQueryDate,
+    empty: false, //TODO: fix this when requests go to client side
   };
 
   const tabProps: ITabs = {
@@ -698,6 +699,20 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
     reject(res.error);
   });
 
+  const transactionCall = new Promise<ITransactionResponse>(
+    async (resolve, reject) => {
+      const res = await api.get({
+        route: `transaction/list?asset=${assetId}&limit=5`,
+      });
+
+      if (!res.error || res.error === '') {
+        resolve(res);
+      }
+
+      reject(res.error);
+    },
+  );
+
   const holdersCall = new Promise<IHoldersResponse>(async (resolve, reject) => {
     const res = await api.get({
       route: `assets/holders/${assetId}`,
@@ -710,51 +725,41 @@ export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
     reject(res.error);
   });
 
-  await Promise.allSettled([assetCall, holdersCall]).then(responses => {
-    responses.forEach((res, index) => {
-      if (res.status === 'fulfilled') {
-        if (index === 0) {
-          const asset: any = res.value;
-          props.asset = parseHardCodedInfo([asset.data.asset])[0];
-        } else if (index === 1) {
-          const holders: any = res.value;
+  await Promise.allSettled([assetCall, transactionCall, holdersCall]).then(
+    responses => {
+      responses.forEach((res, index) => {
+        if (res.status === 'fulfilled') {
+          if (index === 0) {
+            const asset: any = res.value;
+            props.asset = parseHardCodedInfo([asset.data.asset])[0];
+          } else if (index === 1) {
+            const transactions: any = res.value;
 
-          const unparsedHolders = holders?.data?.accounts || [];
+            props.transactions = transactions?.data?.transactions;
+            props.totalTransactions = transactions?.pagination?.totalRecords;
+            props.totalTransactionsPage = transactions?.pagination?.totalPages;
+          } else if (index === 2) {
+            const holders: any = res.value;
 
-          props.holders = parseHolders(
-            unparsedHolders,
-            props?.asset?.assetId,
-            holders.pagination,
-          );
-          props.totalHoldersPage = holders?.pagination?.totalPages || 1;
-          props.totalRecords = holders?.pagination?.totalRecords || 1;
-          props.page = holders?.pagination?.self || 1;
+            const unparsedHolders = holders?.data?.accounts || [];
+
+            props.holders = parseHolders(
+              unparsedHolders,
+              props?.asset?.assetId,
+              holders.pagination,
+            );
+            props.totalHoldersPage = holders?.pagination?.totalPages || 1;
+            props.totalRecords = holders?.pagination?.totalRecords || 1;
+            props.page = holders?.pagination?.self || 1;
+          }
+        } else if (index == 0) {
+          assetNotFound = true;
         }
-      } else if (index == 0) {
-        assetNotFound = true;
-      }
-    });
-  });
-
+      });
+    },
+  );
   if (assetNotFound) {
     return redirectProps;
-  }
-
-  if (props.asset.assetId === 'LMNFT-SM99') {
-    props.asset.uris = {
-      discord: '',
-      facebook: 'https://facebook.com/LoveMonsterNFT',
-      instagram: 'https://instagram.com/LoveMonsterNFT',
-      medium: '',
-      metadata:
-        'https://klever-mint.mypinata.cloud/ipfs/QmNaa2KQ6NkjjESpPHEnAow9hivnsAkq2Gd6R26cHG28Er',
-      metadataExtension: 'png',
-      metadataImage:
-        'https://klever-mint.mypinata.cloud/ipfs/QmWVmUDPBeQzv6fG93JxQxFVee8b6smFD3RQosQXJHiZTJ',
-      telegram: 'https://t.me/LoveMonsterNFT',
-      twitter: 'https://twitter.com/LoveMonsterNFT',
-      website: 'https://lovemonsternft.com',
-    };
   }
 
   return { props };

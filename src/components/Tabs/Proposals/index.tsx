@@ -9,8 +9,8 @@ import { parseAllProposals } from '@/pages/proposals';
 import api from '@/services/api';
 import { IRowSection } from '@/types/index';
 import {
-  IFullInfoParam,
   IParsedProposal,
+  IParsedProposalParam,
   IProposals,
   IProposalsProps,
   IProposalsResponse,
@@ -31,13 +31,8 @@ import {
   UpVotes,
 } from './styles';
 
-const Proposals: React.FC<IProposalsProps> = ({
-  proposals,
-  totalPages,
-  request,
-}) => {
-  const [currentProposals, setCurrentProposals] =
-    useState<IProposals>(proposals);
+const Proposals: React.FC<IProposalsProps> = ({ request }) => {
+  const [currentProposals, setCurrentProposals] = useState<IProposals>([]);
 
   const tooltipRef = useRef<any>(null);
   const { isMobile, isTablet } = useMobile();
@@ -89,7 +84,7 @@ const Proposals: React.FC<IProposalsProps> = ({
     } = props;
 
     const renderProposalsNetworkParams = (
-      fullParameters: IFullInfoParam[] | undefined,
+      fullParameters: IParsedProposalParam[] | undefined,
     ) => {
       if (!fullParameters) {
         return <></>;
@@ -234,11 +229,9 @@ const Proposals: React.FC<IProposalsProps> = ({
 
   const tableProps: ITable = {
     rowSections,
-    data: currentProposals as any[],
     header,
     type: 'proposals',
-    scrollUp: false,
-    totalPages,
+    scrollUp: true,
     dataName: 'proposals',
     request: (page, limit) => request(page, limit),
   };

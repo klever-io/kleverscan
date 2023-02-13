@@ -25,7 +25,6 @@ interface ICollectionResponse extends IResponse {
 }
 
 const Collection: React.FC<ICollectionPage> = ({
-  collection,
   pagination,
   address,
   collectionAsset,
@@ -95,7 +94,6 @@ const Collection: React.FC<ICollectionPage> = ({
     type: 'nfts',
     header,
     rowSections,
-    data: collection as any[],
     scrollUp: true,
     totalPages: pagination?.totalPages || 1,
     dataName: 'collection',
@@ -126,18 +124,6 @@ export const getServerSideProps: GetServerSideProps<ICollectionPage> = async ({
   };
   props.address = address;
 
-  const getCollection: ICollectionResponse = await api.get({
-    route: `address/${address}/collection/${collection}`,
-  });
-
-  if (getCollection.code !== 'successful') {
-    return { props };
-  }
-
-  if (!getCollection.error) {
-    props.collection = getCollection.data.collection;
-    props.pagination = getCollection.pagination;
-  }
   return { props };
 };
 

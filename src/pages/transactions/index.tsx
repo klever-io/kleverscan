@@ -291,7 +291,6 @@ const Transactions: React.FC = () => {
   const tableProps: ITable = {
     type: 'transactions',
     header: getHeaderForTable(router, header),
-    data: null,
     rowSections,
     dataName: 'transactions',
     scrollUp: true,

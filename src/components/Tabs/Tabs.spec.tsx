@@ -1,100 +1,107 @@
+import { getRequestAssets } from '@/pages/account/[account]';
+import api from '@/services/api';
 import { act, screen } from '@testing-library/react';
-import * as nextRouter from 'next/router';
+import { useRouter } from 'next/router';
 import React from 'react';
-import Tabs, { ITabs } from '.';
-import Transaction from '../../components/Tabs/Transactions';
-import { mockedTransactions } from '../../test/mocks';
+import Tabs from '.';
 import { renderWithTheme } from '../../test/utils';
-import { IInnerTableProps } from '../../types';
-import {
-  address,
-  assetId,
-  assetText,
-  balanceText,
-  frozenBalanceText,
-  headerTable,
-  mockedAssets,
-} from './Assets/Assets.spec';
+import Assets from './Assets';
+import { address, headerTable } from './Assets/Assets.spec';
+import { mockAccountResponse, mockAssetsOwnerResponse } from './Assets/mock';
 
-const precision = 6;
-const request = jest.fn(async (page: number, limit: number) => {
-  return Promise.resolve(mockedAPIResponse);
+jest.mock('next/router', () => ({
+  useRouter() {
+    return {
+      route: '/',
+      pathname: '',
+    };
+  },
+}));
+
+const router1 = () => {
+  return {
+    route: '/',
+    pathname: '',
+    query: '',
+  };
+};
+
+jest.mock('@/services/api', () => {
+  return {
+    get: jest.fn(),
+  };
 });
 
-const mockedAPIResponse = {
-  data: {
-    transactions: mockedTransactions,
-  },
-  pagination: {
-    self: 1,
-    next: 2,
-    previous: 1,
-    perPage: 10,
-    totalPages: 1000,
-    totalRecords: 19348805,
-  },
-};
+jest.mock('next/router', () => {
+  return {
+    __esModule: true,
+    useRouter: jest.fn().mockImplementation(router1),
+  };
+});
 
-const transactionTableProps: IInnerTableProps = {
-  scrollUp: false,
-  dataName: 'transactions',
-  request,
-  query: {},
-};
-const mockedTransactionTab = (
-  <Transaction transactionsTableProps={transactionTableProps} />
-);
+jest.spyOn(api, 'get').mockImplementation(params => {
+  switch (true) {
+    case params.route.includes('address'):
+      return Promise.resolve(mockAccountResponse);
+    case params.route.includes('assets'):
+      return Promise.resolve(mockAssetsOwnerResponse);
+    default:
+      return Promise.reject(new Error(`Unexpected route: ${params.route}`));
+  }
+});
 
 const tableHeaders = ['Assets', 'Transactions'];
 
 describe('Component: Tabs', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    const localAddress = address;
 
-    jest.mock('next/router');
-
-    const useRouter: any = jest.spyOn(nextRouter, 'useRouter');
-    useRouter.mockReturnValue({
-      route: '/',
-      pathname: '',
-      query: {
-        tab: 'Transactions',
-        role: 'receiver',
+    jest.mock('next/router', () => ({
+      useRouter() {
+        return {
+          route: '/',
+          pathname: '',
+        };
       },
-      isReady: true,
-    });
+    }));
   });
 
-  let tabProps: ITabs = {
-    headers: tableHeaders,
-  };
-
   it('Should render the Assets Tab correctly', async () => {
+    const router = useRouter();
+    const mockAssetsTableProps = {
+      scrollUp: false,
+      dataName: 'assets',
+      request: getRequestAssets(address),
+      query: router.query,
+    };
+    const tabProps = {
+      headers: tableHeaders,
+      dateFilterProps: {
+        resetDate: jest.fn(),
+        filterDate: jest.fn(),
+        empty: true,
+      },
+      showDataFilter: false,
+    };
     await act(async () => {
-      renderWithTheme(<Tabs {...tabProps}>{mockedAssets}</Tabs>);
+      renderWithTheme(
+        <Tabs {...tabProps}>
+          <Assets assetsTableProps={mockAssetsTableProps} address={address} />
+        </Tabs>,
+      );
     });
 
     headerTable.map(header => {
       expect(screen.getAllByText(header)[0]).toBeInTheDocument();
     });
+    const KLVs = screen.getAllByText('KLV');
+    KLVs.forEach(KLV => expect(KLV).toBeInTheDocument());
+    expect(KLVs).toHaveLength(2);
+    expect(screen.getByText('20 Mi KLV')).toBeInTheDocument();
+    expect(screen.getByText('10 Mi KLV')).toBeInTheDocument();
 
-    expect(screen.getByText(balanceText)).toBeInTheDocument();
-    expect(screen.getByText(frozenBalanceText)).toBeInTheDocument();
-    expect(screen.getByText(assetText)).toBeInTheDocument();
-
-    const idButton = screen.getByRole('link', { name: assetId });
+    const idButton = screen.getByRole('link', { name: 'KLV' });
 
     expect(idButton).toBeInTheDocument();
   });
-
-  tabProps = {
-    headers: tableHeaders,
-    dateFilterProps: {
-      resetDate: jest.fn(),
-      filterDate: jest.fn(),
-      empty: true,
-    },
-    showDataFilter: false,
-  };
 });

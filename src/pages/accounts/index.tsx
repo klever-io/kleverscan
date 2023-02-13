@@ -43,11 +43,7 @@ interface ICard {
   values: string[];
 }
 
-const Accounts: React.FC<IAccounts> = ({
-  accounts: defaultAccounts,
-  pagination,
-  createdYesterday,
-}) => {
+const Accounts: React.FC<IAccounts> = ({ pagination, createdYesterday }) => {
   const precision = 6; // default KLV precision
 
   const requestAccounts = async (page: number, limit: number) =>
@@ -157,12 +153,10 @@ const Accounts: React.FC<IAccounts> = ({
   const tableProps: ITable = {
     type: 'accounts',
     header,
-    data: defaultAccounts as any[],
     rowSections,
     request: (page, limit) => requestAccounts(page, limit),
     dataName: 'accounts',
     scrollUp: true,
-    totalPages: pagination?.totalPages || 1,
   };
 
   return (
@@ -229,7 +223,6 @@ export const getServerSideProps: GetServerSideProps<IAccounts> = async () => {
           const { value }: any = res;
           switch (index) {
             case 0:
-              props.accounts = value.data.accounts;
               props.pagination = value.pagination;
               break;
 

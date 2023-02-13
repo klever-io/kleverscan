@@ -61,7 +61,6 @@ export interface IBlockData {
 export interface IBlocks {
   blocks: IBlock[];
   statistics: IBlockData;
-  pagination: IPagination;
 }
 
 export interface IBlockResponse extends IResponse {
@@ -81,5 +80,5 @@ export interface IStatisticsResponse extends IResponse {
 export interface ICard {
   title: string;
   headers: string[];
-  values: string[];
+  values: (string | JSX.Element)[];
 }

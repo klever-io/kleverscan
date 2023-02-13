@@ -1,16 +1,15 @@
 import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
 import { useMobile } from '@/contexts/mobile';
-import api from '@/services/api';
-import { IAccountAsset, IAsset, IBucket, IRowSection } from '@/types/index';
+import { IAssetsBuckets, IInnerTableProps, IRowSection } from '@/types/index';
 import { parseAddress } from '@/utils/index';
 import { CenteredRow, RowContent } from '@/views/accounts/detail';
 import Link from 'next/link';
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { ContractContainer, Status } from './styles';
 
 export interface IBuckets {
-  assets: IAccountAsset[];
+  bucketsTableProps: IInnerTableProps;
   showInteractionsButtons?: (
     title: string,
     valueContract: string,
@@ -19,56 +18,11 @@ export interface IBuckets {
   ) => JSX.Element;
 }
 
-export interface IAssetsBuckets {
-  asset: IAccountAsset;
-  bucket: IBucket;
-}
-
-const Buckets: React.FC<IBuckets> = ({ assets, showInteractionsButtons }) => {
+const Buckets: React.FC<IBuckets> = ({
+  bucketsTableProps,
+  showInteractionsButtons,
+}) => {
   const UINT32_MAX = 4294967295;
-  const precision = 6; // default KLV precision
-  const detailsCache = useRef<{ [key: string]: IAsset }>({});
-  const [assetDetails, setAssetDetails] = useState<IAsset>();
-  const [assetsBuckets, setAssetsBuckets] = useState<IAssetsBuckets[]>([]);
-
-  useEffect(() => {
-    assets.forEach(asset => {
-      const assetHasUnstakedBucket = asset?.buckets?.find(
-        bucket => bucket.unstakedEpoch !== UINT32_MAX,
-      );
-
-      const getDetails = async () => {
-        if (detailsCache[asset.assetId]) {
-          setAssetDetails(detailsCache[asset.assetId]);
-        } else {
-          const details = await api.get({ route: `assets/${asset.assetId}` });
-          if (details.error !== '') {
-            return;
-          }
-          setAssetDetails(details.data.asset);
-          detailsCache.current[asset.assetId] = details;
-        }
-      };
-
-      if (assetHasUnstakedBucket) {
-        getDetails();
-      }
-
-      if (asset.buckets) {
-        const newBuckets = asset.buckets.map(bucket => {
-          return {
-            asset,
-            bucket,
-          };
-        });
-
-        setAssetsBuckets(prevAssetBuckets => [
-          ...prevAssetBuckets,
-          ...newBuckets,
-        ]);
-      }
-    });
-  }, [assets]);
 
   const { isMobile } = useMobile();
 
@@ -76,14 +30,7 @@ const Buckets: React.FC<IBuckets> = ({ assets, showInteractionsButtons }) => {
     const { asset, bucket } = assetBucket;
     const minEpochsToUnstake = 1;
     const minEpochsToWithdraw = 2;
-    const getAvaliableEpoch = (assetId: string, unstakedEpoch: number) => {
-      if (assetId.length < 64) {
-        return assetDetails?.staking?.minEpochsToWithdraw
-          ? unstakedEpoch + assetDetails.staking.minEpochsToWithdraw
-          : '--';
-      }
-      return unstakedEpoch + 2; // Default for KLV and KFI
-    };
+
     const unfreezeEquation =
       bucket.stakedEpoch + minEpochsToUnstake - asset.lastClaim.epoch;
     const isUnfreezeLocked = () => {
@@ -93,7 +40,7 @@ const Buckets: React.FC<IBuckets> = ({ assets, showInteractionsButtons }) => {
       bucket.unstakedEpoch - asset.lastClaim.epoch + minEpochsToWithdraw;
 
     const isWithdrawLocked = () => {
-      if (bucket?.unstakedEpoch === 4294967295) {
+      if (bucket?.unstakedEpoch === UINT32_MAX) {
         return false;
       }
 
@@ -146,7 +93,7 @@ const Buckets: React.FC<IBuckets> = ({ assets, showInteractionsButtons }) => {
               showInteractionsButtons(`${lockedText()}`, '--')}
           </>
         );
-      } else if (bucket.unstakedEpoch !== 4294967295) {
+      } else if (bucket.unstakedEpoch !== UINT32_MAX) {
         if (bucket.delegation) {
           return (
             <>
@@ -255,16 +202,7 @@ const Buckets: React.FC<IBuckets> = ({ assets, showInteractionsButtons }) => {
         span: 1,
       },
       {
-        element: (
-          <>
-            {bucket.unstakedEpoch === UINT32_MAX
-              ? '--'
-              : getAvaliableEpoch(
-                  asset.assetId,
-                  bucket.unstakedEpoch,
-                ).toLocaleString()}
-          </>
-        ),
+        element: <>{bucket?.availableEpoch}</>,
         span: 1,
       },
       {
@@ -302,9 +240,9 @@ const Buckets: React.FC<IBuckets> = ({ assets, showInteractionsButtons }) => {
   ];
 
   const tableProps: ITable = {
+    ...bucketsTableProps,
     type: 'buckets',
     header,
-    data: assetsBuckets,
     rowSections,
   };
 

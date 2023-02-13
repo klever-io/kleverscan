@@ -5,26 +5,12 @@ import Progress from '@/components/Progress';
 import { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import api from '@/services/api';
-import {
-  IPagination,
-  IRowSection,
-  IValidator,
-  IValidatorResponse,
-} from '@/types/index';
+import { IRowSection, IValidator } from '@/types/index';
 import { capitalizeString, formatAmount, parseValidators } from '@/utils/index';
-import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import React from 'react';
 
-interface IValidatorPage {
-  validators: IValidator[];
-  pagination: IPagination;
-}
-
-const Validators: React.FC<IValidatorPage> = ({
-  validators: initialValidators,
-  pagination,
-}) => {
+const Validators: React.FC = () => {
   const header = [
     'Rank',
     'Name',
@@ -146,9 +132,7 @@ const Validators: React.FC<IValidatorPage> = ({
     type: 'validators',
     header,
     rowSections,
-    data: initialValidators,
     request: (page, limit) => requestValidators(page, limit),
-    totalPages: pagination?.totalPages || 1,
     scrollUp: true,
     dataName: 'validators',
   };
@@ -162,30 +146,5 @@ const Validators: React.FC<IValidatorPage> = ({
 
   return <Detail {...detailProps} />;
 };
-
-export const getServerSideProps: GetServerSideProps<IValidatorPage> =
-  async () => {
-    const props: IValidatorPage = {
-      validators: [],
-      pagination: {} as IPagination,
-    };
-
-    const validators: IValidatorResponse = await api.get({
-      route:
-        'validator/list?sort=elected&sort=eligible&sort=waiting&sort=inactive&sort=jailed',
-    });
-
-    if (validators.code !== 'successful') {
-      return { props };
-    }
-
-    if (!validators.error) {
-      const parsedValidators = parseValidators(validators);
-
-      props.validators = parsedValidators;
-      props.pagination = validators.pagination;
-    }
-    return { props };
-  };
 
 export default Validators;

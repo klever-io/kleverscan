@@ -1,12 +1,18 @@
 import Table, { ITable } from '@/components/Table';
 import { CustomLink } from '@/components/Table/styles';
-import { IAccountAsset, IAsset, IResponse, IRowSection } from '@/types/index';
+import {
+  IAccountAsset,
+  IAsset,
+  IInnerTableProps,
+  IResponse,
+  IRowSection,
+} from '@/types/index';
 import { formatAmount } from '@/utils/index';
 import Link from 'next/link';
 import React from 'react';
 
 interface IAssets {
-  assets: IAccountAsset[];
+  assetsTableProps: IInnerTableProps;
   address: string;
   showInteractionsButtons?: (
     title: string,
@@ -14,7 +20,6 @@ interface IAssets {
     assets: IAccountAsset,
     isAssetTrigger: boolean,
   ) => JSX.Element;
-  accountAssetOwner: any;
 }
 
 interface IAssetResponse extends IResponse {
@@ -24,10 +29,9 @@ interface IAssetResponse extends IResponse {
 }
 
 const Assets: React.FC<IAssets> = ({
-  assets,
+  assetsTableProps,
   address,
   showInteractionsButtons,
-  accountAssetOwner,
 }) => {
   const header = [
     'Token',
@@ -40,11 +44,9 @@ const Assets: React.FC<IAssets> = ({
   ];
 
   const rowSections = (props: IAccountAsset): IRowSection[] => {
-    const { assetId, assetType, precision, balance, frozenBalance, address } =
+    const { assetId, assetType, precision, balance, frozenBalance, owner } =
       props;
-    const ownerAssetId = accountAssetOwner?.map(
-      (asset: { assetId: string }) => asset.assetId,
-    );
+
     const ticker = assetId?.split('-')[0];
     const sectionViewNfts =
       assetType === 1 ? (
@@ -92,26 +94,26 @@ const Assets: React.FC<IAssets> = ({
       { element: sectionViewNfts, span: 2 },
     ];
 
-    ownerAssetId?.forEach((asset: string) => {
-      if (asset === assetId && showInteractionsButtons)
-        sections.push({
-          element: showInteractionsButtons(
-            'Asset Trigger',
-            'AssetTriggerContract',
-            props,
-            true,
-          ),
-          span: 2,
-        });
-    });
+    if (owner && showInteractionsButtons) {
+      sections.push({
+        element: showInteractionsButtons(
+          'Asset Trigger',
+          'AssetTriggerContract',
+          props,
+          true,
+        ),
+        span: 2,
+      });
+    }
+
     return sections;
   };
 
   const tableProps: ITable = {
+    ...assetsTableProps,
     rowSections,
     type: 'assets',
     header,
-    data: assets,
   };
 
   return <Table {...tableProps} />;

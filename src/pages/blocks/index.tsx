@@ -1,6 +1,7 @@
 import { Blocks as Icon } from '@/assets/title-icons';
 import ToggleButton from '@/components/Button/Toggle';
 import Title from '@/components/Layout/Title';
+import Skeleton from '@/components/Skeleton';
 import Table, { ITable } from '@/components/Table';
 import {
   blockCall,
@@ -8,7 +9,7 @@ import {
   yesterdayStatisticsCall,
 } from '@/services/apiCalls';
 import { IBlock, IBlocks, ICard } from '@/types/blocks';
-import { IPagination, IRowSection } from '@/types/index';
+import { IRowSection } from '@/types/index';
 import {
   formatAmount,
   formatDate,
@@ -31,20 +32,36 @@ import {
   UpdateContainer,
 } from '@/views/blocks';
 import { fromUnixTime } from 'date-fns';
-import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
 
-const Blocks: React.FC<IBlocks> = ({
-  blocks: defaultBlocks,
-  statistics: defaultStatistics,
-  pagination,
-}) => {
+const Blocks: React.FC<IBlocks> = () => {
   const precision = 6; // default KLV precision
   const blocksWatcherInterval = 4 * 1000; // 4 secs
 
-  const [blocks, setBlocks] = useState(defaultBlocks);
-  const [statistics, setStatistics] = useState(defaultStatistics);
+  interface IBlocksStatsToday {
+    totalBlocks: number;
+    totalBurned: number;
+    totalBlockRewards: number;
+  }
+
+  interface IBlocksStatsYesterday {
+    date: number;
+    totalBlocks: number;
+    totalMinted: number;
+    totalBurned: number;
+    totalBlockRewards: number;
+    totalStakingRewards: number;
+    totalTxFees: number;
+    totalKappsFees: number;
+    totalTxRewards: number;
+  }
+
+  const [blocks, setBlocks] = useState([]);
+  const [blocksStatsYesterday, setBlocksStatsYesterday] =
+    useState<null | IBlocksStatsYesterday>(null);
+  const [blocksStatsToday, setBlockStatsToday] =
+    useState<null | IBlocksStatsToday>(null);
   const [blocksInterval, setBlocksInterval] = useState(0);
 
   const requestBlocks = async (page: number, limit: number) => {
@@ -65,21 +82,11 @@ const Blocks: React.FC<IBlocks> = ({
               break;
 
             case 1:
-              setStatistics({
-                yesterday: value.data.block_stats_by_day[0],
-                total: {
-                  totalBlocks: 0,
-                  totalBurned: 0,
-                  totalBlockRewards: 0,
-                },
-              });
+              setBlocksStatsYesterday(value.data.block_stats_by_day[0]);
               break;
 
             case 2:
-              setStatistics({
-                ...statistics,
-                total: value.data.block_stats_total,
-              });
+              setBlockStatsToday(value.data.block_stats_total);
 
             default:
               break;
@@ -113,30 +120,54 @@ const Blocks: React.FC<IBlocks> = ({
       title: 'Number of Blocks',
       headers: ['Blocks Yesterday', 'Cumulative Number'],
       values: [
-        toLocaleFixed(statistics?.yesterday?.totalBlocks, 0),
-        toLocaleFixed(statistics?.total?.totalBlocks, 0),
+        blocksStatsYesterday ? (
+          toLocaleFixed(blocksStatsYesterday?.totalBlocks, 0)
+        ) : (
+          <Skeleton />
+        ),
+        blocksStatsToday ? (
+          toLocaleFixed(blocksStatsToday?.totalBlocks, 0)
+        ) : (
+          <Skeleton />
+        ),
       ],
     },
     {
       title: 'Block Reward',
       headers: ['Reward Yesterday', 'Cumulative Revenue'],
       values: [
-        `${formatAmount(
-          statistics?.yesterday?.totalBlockRewards / 10 ** precision,
-        )} KLV`,
-        `${formatAmount(
-          statistics?.total?.totalBlockRewards / 10 ** precision,
-        )} KLV`,
+        blocksStatsYesterday ? (
+          `${formatAmount(
+            blocksStatsYesterday?.totalBlockRewards / 10 ** precision,
+          )} KLV`
+        ) : (
+          <Skeleton />
+        ),
+        blocksStatsToday ? (
+          `${formatAmount(
+            blocksStatsToday?.totalBlockRewards / 10 ** precision,
+          )} KLV`
+        ) : (
+          <Skeleton />
+        ),
       ],
     },
     {
       title: 'Stats on Burned KLV',
       headers: ['Burned Yesterday', 'Burned in Total'],
       values: [
-        `${formatAmount(
-          statistics?.yesterday?.totalBurned / 10 ** precision,
-        )} KLV`,
-        `${formatAmount(statistics?.total?.totalBurned / 10 ** precision)} KLV`,
+        blocksStatsYesterday ? (
+          `${formatAmount(
+            blocksStatsYesterday?.totalBurned / 10 ** precision,
+          )} KLV`
+        ) : (
+          <Skeleton />
+        ),
+        blocksStatsToday ? (
+          `${formatAmount(blocksStatsToday?.totalBurned / 10 ** precision)} KLV`
+        ) : (
+          <Skeleton />
+        ),
       ],
     },
   ];
@@ -285,10 +316,8 @@ const Blocks: React.FC<IBlocks> = ({
   const tableProps: ITable = {
     type: 'blocks',
     header,
-    data: blocks as any[],
     rowSections,
     scrollUp: true,
-    totalPages: pagination?.totalPages ?? 1,
     dataName: 'blocks',
     request: (page: number, limit: number) => requestBlocks(page, limit),
     interval: blocksInterval,
@@ -304,7 +333,7 @@ const Blocks: React.FC<IBlocks> = ({
       </Header>
 
       <CardContainer>
-        {cards.map((card, index) => (
+        {cards.map(card => (
           <CardContent key={JSON.stringify(card)} {...card} />
         ))}
       </CardContainer>
@@ -322,54 +351,6 @@ const Blocks: React.FC<IBlocks> = ({
       </TableContainer>
     </Container>
   );
-};
-
-export const getServerSideProps: GetServerSideProps<IBlocks> = async () => {
-  const props: IBlocks = {
-    blocks: [],
-    statistics: {
-      yesterday: { totalBlocks: 0, totalBurned: 0, totalBlockRewards: 0 },
-      total: { totalBlocks: 0, totalBurned: 0, totalBlockRewards: 0 },
-    },
-    pagination: {} as IPagination,
-  };
-
-  await Promise.allSettled([
-    blockCall(),
-    yesterdayStatisticsCall(),
-    totalStatisticsCall(),
-  ]).then(responses => {
-    responses.map((res, index) => {
-      if (res.status !== 'rejected') {
-        const { value }: any = res;
-        switch (index) {
-          case 0:
-            props.blocks = value?.data?.blocks;
-            props.pagination = value?.pagination;
-            break;
-
-          case 1:
-            props.statistics = {
-              yesterday: value?.data?.block_stats_by_day[0] || null,
-              total: {
-                totalBlocks: 0,
-                totalBurned: 0,
-                totalBlockRewards: 0,
-              },
-            };
-            break;
-
-          case 2:
-            props.statistics['total'] = value?.data?.block_stats_total;
-
-          default:
-            break;
-        }
-      }
-    });
-  });
-
-  return { props };
 };
 
 export default Blocks;

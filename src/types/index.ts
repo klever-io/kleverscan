@@ -200,6 +200,11 @@ export interface IAccount {
   permissions?: number[];
 }
 
+export interface IAssetsBuckets {
+  asset: IAccountAsset;
+  bucket: IBucket;
+}
+
 export interface IHolders {
   holders: IBalance[];
   asset: IAsset;
@@ -231,6 +236,7 @@ export interface IAccountAsset {
     epoch: number;
   };
   buckets?: IBucket[];
+  owner?: boolean;
 }
 
 export interface IAssetsHoldersResponse extends IResponse {
@@ -340,6 +346,7 @@ export interface IBucket {
   unstakedEpoch: number;
   balance: number;
   delegation: string;
+  availableEpoch: number | string;
 }
 
 // TODO: establish a pattern for filter types

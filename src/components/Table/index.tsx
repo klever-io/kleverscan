@@ -55,7 +55,6 @@ export interface ITable {
     | 'validatorsList';
 
   header: string[];
-  data: any[] | null;
   body?: any;
   rowSections?: (item: any) => IRowSection[] | undefined;
   scrollUp?: boolean;
@@ -69,7 +68,6 @@ export interface ITable {
 const Table: React.FC<ITable> = ({
   type,
   header,
-  data,
   rowSections,
   request,
   scrollUp,
@@ -85,7 +83,7 @@ const Table: React.FC<ITable> = ({
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(defaultTotalPages);
   const [limit, setLimit] = useState<number>(10);
-  const [items, setItems] = useState(data);
+  const [items, setItems] = useState([]);
   const limits = [5, 10, 50, 100];
   const [scrollTop, setScrollTop] = useState<boolean>(false);
 
@@ -106,10 +104,6 @@ const Table: React.FC<ITable> = ({
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
-  useEffect(() => {
-    setItems(data);
-  }, [data]);
 
   const fetchData = useCallback(async () => {
     if (request && dataName) {
@@ -141,14 +135,15 @@ const Table: React.FC<ITable> = ({
   }, [limit]);
 
   useDidUpdateEffect(() => {
-    if (router.query) {
-      if (page !== 1) {
-        setPage(1);
-      }
-      setLoading(true);
-      fetchData();
+    if (!router.isReady) {
+      return;
     }
-  }, [router.query]);
+    if (page !== 1) {
+      setPage(1);
+    }
+    setLoading(true);
+    fetchData();
+  }, [router.query, router.isReady]);
 
   useEffect(() => {
     if (interval) {
@@ -252,7 +247,6 @@ const Table: React.FC<ITable> = ({
               items?.length > 0 &&
               items?.map((item, index) => {
                 let spanCount = 0;
-
                 return (
                   <React.Fragment key={JSON.stringify(item) + String(index)}>
                     {rowSections && (

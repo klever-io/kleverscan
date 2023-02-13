@@ -368,7 +368,6 @@ const Validator: React.FC<IValidatorPage> = ({
   const tableProps: ITable = {
     type: 'validator',
     header,
-    data: defaultDelegators as IBucket[],
     rowSections,
     request: (page, limit) => requestValidator(page, limit),
     scrollUp: false,
@@ -428,65 +427,15 @@ export const getServerSideProps: GetServerSideProps<IValidatorPage> = async ({
 
   const address = String(hash);
 
-  const validatorCall = new Promise<IValidatorResponse>(
-    async (resolve, reject) => {
-      const res = await api.get({
-        route: `validator/${address}`,
-      });
-
-      if (!res.error || res.error === '') {
-        resolve(res);
-      }
-
-      reject(res.error);
-    },
-  );
-
-  const delegationCall = new Promise<IDelegateResponse>(
-    async (resolve, reject) => {
-      const res = await api.get({
-        route: `validator/delegated/${address}`,
-      });
-
-      if (!res.error || res.error === '') {
-        resolve(res);
-      }
-
-      reject(res.error);
-    },
-  );
-
-  await Promise.allSettled([validatorCall, delegationCall]).then(promises => {
-    promises?.forEach((res, index) => {
-      if (res.status === 'fulfilled') {
-        if (index === 0) {
-          const { value }: any = res;
-          props.validator = value?.data?.validator;
-        } else if (index === 1) {
-          const delegations: any = res.value;
-          const delegators: IBucket[] = [];
-
-          delegations?.data?.delegators?.forEach((delegation: any) => {
-            delegation?.buckets?.forEach((bucket: any) => {
-              if (bucket?.delegation === address) {
-                delegators.push({
-                  address: delegation?.address,
-                  ...bucket,
-                });
-              }
-            });
-          });
-
-          if (!delegations.error) {
-            props.pagination = delegations?.pagination;
-            props.delegators = delegators;
-          }
-        }
-      }
-    });
+  const res = await api.get({
+    route: `validator/${address}`,
   });
 
-  if (Object.keys(props.validator).length === 0) {
+  if (!res.error || res.error === '') {
+    props.validator = res?.data?.validator;
+  }
+
+  if (!props?.validator || Object.keys(props.validator).length === 0) {
     return redirectProps;
   }
 

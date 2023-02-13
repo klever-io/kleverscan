@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
+import Skeleton from '@/components/Skeleton';
 import api from '@/services/api';
 import { IAsset, IAssetResponse } from '@/types';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
@@ -131,4 +132,21 @@ export const useFetchPartialAsset = (): [
     loading,
     setLoading,
   ];
+};
+
+export const useSkeleton = (): [
+  (
+    value: string | number | undefined | JSX.Element[],
+    skeletonParams?: { height?: string | number; width?: number | string },
+  ) => Element | number | string | JSX.Element | JSX.Element[],
+  Dispatch<SetStateAction<boolean>>,
+] => {
+  const [loading, setLoading] = useState(true);
+  const isSkeleton = (
+    value: string | number | undefined | JSX.Element[],
+    skeletonParams?: { height?: string | number; width?: number | string },
+  ): Element | number | string | JSX.Element | JSX.Element[] => {
+    return !loading && value ? value : <Skeleton {...skeletonParams} />;
+  };
+  return [isSkeleton, setLoading];
 };

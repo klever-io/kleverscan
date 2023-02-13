@@ -40,8 +40,6 @@ describe('Component: Tabs/Proposals', () => {
     await act(async () => {
       renderWithTheme(
         <Proposals
-          loading={false}
-          proposals={parsedProposals}
           request={(page: number, limit: number) => request(page, limit)}
         />,
       );
@@ -78,8 +76,6 @@ describe('Component: Tabs/Proposals', () => {
     await act(async () => {
       renderWithTheme(
         <Proposals
-          loading={false}
-          proposals={parsedProposals}
           request={(page: number, limit: number) => request(page, limit)}
         />,
       );
@@ -174,8 +170,6 @@ describe('Component: Tabs/Proposals', () => {
     await act(async () => {
       renderWithTheme(
         <Proposals
-          loading={false}
-          proposals={parsedProposals}
           request={(page: number, limit: number) => emptyRequest(page, limit)}
         />,
       );
@@ -191,8 +185,6 @@ describe('Component: Tabs/Proposals', () => {
     await act(async () => {
       renderWithTheme(
         <Proposals
-          loading={false}
-          proposals={parsedProposals}
           request={(page: number, limit: number) => request(page, limit)}
         />,
       );

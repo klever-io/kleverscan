@@ -1,20 +1,10 @@
+import api from '@/services/api';
 import { screen } from '@testing-library/react';
 import React from 'react';
+import { act } from 'react-dom/test-utils';
 import { renderWithTheme } from '../../../test/utils';
 import NetworkParams from './';
-
-const mockedNetWorkParams = [
-  {
-    number: 0,
-    parameter: 'Block Rewards',
-    currentValue: '1000000',
-  },
-  {
-    number: 1,
-    parameter: 'KApp Fee for Validator Creation',
-    currentValue: '100000',
-  },
-];
+import { mockedNetworkRequestResponse } from './mock';
 
 jest.mock('next/router', () => ({
   useRouter() {
@@ -25,13 +15,24 @@ jest.mock('next/router', () => ({
   },
 }));
 
+jest.mock('@/services/api', () => {
+  return {
+    get: jest.fn(),
+  };
+});
+
 describe('Component: Tabs/NetworkParams', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    (api.get as jest.Mock).mockImplementation(
+      () => mockedNetworkRequestResponse,
+    );
   });
 
-  it("Should render the the Table and it's Body and header correctly", () => {
-    renderWithTheme(<NetworkParams networkParams={mockedNetWorkParams} />);
+  it("Should render the the Table and it's Body and header correctly", async () => {
+    await act(async () => {
+      renderWithTheme(<NetworkParams />);
+    });
 
     const headers = ['Number', 'Parameter', 'Current Value'];
     const tableBody = screen.getByTestId('table-body');
@@ -49,14 +50,23 @@ describe('Component: Tabs/NetworkParams', () => {
     });
   });
 
-  it('Should render the "Number", "Parameter" and "Current Value" with the correct', () => {
-    renderWithTheme(<NetworkParams networkParams={mockedNetWorkParams} />);
-    const number = screen.getByText(`#${mockedNetWorkParams[0].number}`);
-    const parameter = screen.getByText(mockedNetWorkParams[0].parameter);
-    const currentValue = screen.getByText(mockedNetWorkParams[0].currentValue);
+  it('Should render the "Number", "Parameter" and "Current Value" with the correct values', async () => {
+    await act(async () => {
+      renderWithTheme(<NetworkParams />);
+    });
+
+    const number = screen.getByText('#0');
+    const parameter = screen.getByText('Fee Per Data Byte');
+    const fee = screen.getByText('4000');
+    const number2 = screen.getByText('#1');
+    const parameter2 = screen.getByText('KApp Fee for Validator Creation');
+    const fee2 = screen.getAllByText('50000000000')[0];
 
     expect(number).toBeInTheDocument();
     expect(parameter).toBeInTheDocument();
-    expect(currentValue).toBeInTheDocument();
+    expect(fee).toBeInTheDocument();
+    expect(number2).toBeInTheDocument();
+    expect(parameter2).toBeInTheDocument();
+    expect(fee2).toBeInTheDocument();
   });
 });

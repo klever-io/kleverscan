@@ -1,10 +1,14 @@
+import { getRequestBuckets } from '@/pages/account/[account]';
+import api from '@/services/api';
+import { parseAddress } from '@/utils';
 import { screen } from '@testing-library/react';
 import * as nextRouter from 'next/router';
+import { useRouter } from 'next/router';
 import React from 'react';
+import { act } from 'react-dom/test-utils';
 import { renderWithTheme } from '../../../test/utils';
-import { IAccountAsset, IBucket } from '../../../types';
-import { parseAddress } from '../../../utils/index';
 import Buckets from './';
+import { mockAccountResponse, mockAssetKLVResponse } from './mock';
 
 describe('Component: Buckets Tab', () => {
   const headerTable = [
@@ -18,17 +22,11 @@ describe('Component: Buckets Tab', () => {
   ];
 
   const address =
-    'klv18slsv4v8yxdarvvyxdwgvdeqwrna899k2vcshlrlc4xjuyjlhveqv78t8s';
-  const frozenBalance = 10000000000000;
-  const assetId = 'KLV';
-  const assetType = 0;
-  const balance = 0;
+    'klv18slsv4v8yxdarvvyxdwgvdeqwrna899k2vcshlrlc4xjuyjlhveqv78t8s'; // devnet address
   const precision = 6;
-  const balanceBucket = 2000001000000;
+  const balanceBucket = 10000000000000;
   const bucketId =
-    '9deb772022e3e5e1f258bb8cb6b6cf39d460750ffa727d7414b7fb3c8c8a87a2';
-  const stakeAt = 1653329019;
-  const unstakedEpoch = 55555;
+    'f9b9af152412066175a0728b731a2310af223b7bb15a936495c1144c21fbd648';
   const stakedEpoch = 0;
   const delegation = '';
 
@@ -40,6 +38,23 @@ describe('Component: Buckets Tab', () => {
       };
     },
   }));
+
+  jest.mock('@/services/api', () => {
+    return {
+      get: jest.fn(),
+    };
+  });
+
+  jest.spyOn(api, 'get').mockImplementation(params => {
+    switch (true) {
+      case params.route.includes('address'):
+        return Promise.resolve(mockAccountResponse);
+      case params.route.includes('assets'):
+        return Promise.resolve(mockAssetKLVResponse);
+      default:
+        return Promise.reject(new Error(`Unexpected route: ${params.route}`));
+    }
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -59,34 +74,21 @@ describe('Component: Buckets Tab', () => {
     }));
   });
 
-  const buckets: IBucket[] = [
-    {
-      balance: balanceBucket,
-      delegation,
-      id: bucketId,
-      stakeAt,
-      stakedEpoch,
-      unstakedEpoch,
-    },
-  ];
+  it('Should render the Buckets Tab correctly', async () => {
+    const address =
+      'klv18slsv4v8yxdarvvyxdwgvdeqwrna899k2vcshlrlc4xjuyjlhveqv78t8s';
+    const router = useRouter();
+    const bucketsTableProps = {
+      scrollUp: true,
+      dataName: 'buckets',
+      request: getRequestBuckets(address),
+      query: router.query,
+    };
 
-  const assets: IAccountAsset[] = [
-    {
-      address,
-      assetId,
-      assetType,
-      balance,
-      buckets,
-      frozenBalance,
-      lastClaim: { timestamp: 0, epoch: 0 },
-      precision,
-      unfrozenBalance: 0,
-    },
-  ];
-
-  it('Should render the Buckets Tab correctly', () => {
-    renderWithTheme(<Buckets assets={assets} />);
-
+    // TODO: showInteractions buttons without test, maybe it's best to test it in the account page test since this function uses state management
+    await act(async () => {
+      renderWithTheme(<Buckets bucketsTableProps={bucketsTableProps} />);
+    });
     headerTable.map(header => {
       expect(screen.getByText(header)).toBeInTheDocument();
     });
@@ -97,6 +99,16 @@ describe('Component: Buckets Tab', () => {
     expect(screen.getByText(stakedEpoch.toLocaleString())).toBeInTheDocument();
     expect(screen.getByText(bucketId)).toBeInTheDocument();
 
+    expect(screen.getByText('KLV')).toBeInTheDocument();
+    expect(screen.getByText('10,000,000')).toBeInTheDocument();
+    expect(screen.getByText('True')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'f9b9af152412066175a0728b731a2310af223b7bb15a936495c1144c21fbd648',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText('klv18slsv4v...lhveqv78t8s')).toBeInTheDocument();
+
     if (delegation.length > 0) {
       expect(
         screen.getByText(parseAddress(delegation, 22)),
@@ -104,13 +116,22 @@ describe('Component: Buckets Tab', () => {
     }
   });
 
-  it('Should render the fallback value for "minEpochsToWithdraw" when don\t exist the property in assets or don\' find the bucketId', () => {
-    const newAssets = [...assets];
-    renderWithTheme(<Buckets assets={newAssets} />);
+  it('Should render the fallback value for "minEpochsToWithdraw" when don\t exist the property in assets or don\' find the bucketId', async () => {
+    const address =
+      'klv18slsv4v8yxdarvvyxdwgvdeqwrna899k2vcshlrlc4xjuyjlhveqv78t8s';
+    const router = useRouter();
+    const bucketsTableProps = {
+      scrollUp: true,
+      dataName: 'buckets',
+      request: getRequestBuckets(address),
+      query: router.query,
+    };
 
-    const unstakedEpochElement = screen.getByText(
-      unstakedEpoch.toLocaleString(),
-    );
+    await act(async () => {
+      renderWithTheme(<Buckets bucketsTableProps={bucketsTableProps} />);
+    });
+
+    const unstakedEpochElement = screen.getAllByText('--')[0];
     const minEpochsToWithdraw = unstakedEpochElement.nextElementSibling;
 
     expect(unstakedEpochElement).toBeInTheDocument();
@@ -120,15 +141,22 @@ describe('Component: Buckets Tab', () => {
     expect(minEpochsToWithdraw).toHaveTextContent('--');
   });
 
-  it('Should render the default "minEpochsToWithdraw" to KLV and when the link to "account" page when delegation has a value', () => {
-    const newAssets = [...assets];
-
+  it('Should render the default "minEpochsToWithdraw" to KLV and when the link to "account" page when delegation has a value', async () => {
+    const address =
+      'klv18slsv4v8yxdarvvyxdwgvdeqwrna899k2vcshlrlc4xjuyjlhveqv78t8s';
+    const router = useRouter();
+    const bucketsTableProps = {
+      scrollUp: true,
+      dataName: 'buckets',
+      request: getRequestBuckets(address),
+      query: router.query,
+    };
     const delegationAddress =
       'klv18slsv4v8yxdarvvyxdwgvdeqwrna899k2vcshlrlc4xjuyjlhveqv78t8s';
 
-    if (newAssets[0].buckets)
-      newAssets[0].buckets[0].delegation = delegationAddress;
-    renderWithTheme(<Buckets assets={newAssets} />);
+    await act(async () => {
+      renderWithTheme(<Buckets bucketsTableProps={bucketsTableProps} />);
+    });
 
     const link = screen.getByRole('link', {
       name: parseAddress(delegationAddress, 22),

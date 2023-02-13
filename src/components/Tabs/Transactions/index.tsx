@@ -161,7 +161,6 @@ const Transactions: React.FC<ITransactionsProps> = props => {
   const tableProps: ITable = {
     ...transactionTableProps,
     rowSections,
-    data: null,
     header: router?.query?.type ? getHeaderForTable(router, header) : header,
     type: 'transactions',
   };

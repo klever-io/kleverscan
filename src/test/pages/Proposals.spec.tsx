@@ -1,11 +1,11 @@
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import Proposals, { getServerSideProps } from '../../pages/proposals/index';
+import Proposals from '../../pages/proposals/index';
 import api from '../../services/api';
 import {
   mockedProposalsList,
   mockedProposalsListPage2,
-  networkParametersMock,
+  mockNetworkParameters,
 } from '../../test/mocks/index';
 import { renderWithTheme } from '../../test/utils';
 
@@ -23,18 +23,42 @@ jest.mock('@/services/api', () => {
     get: jest.fn(),
   };
 });
+
+const router1 = () => {
+  return {
+    route: '/',
+    pathname: '',
+    query: '',
+  };
+};
+
+jest.mock('next/router', () => {
+  return {
+    __esModule: true,
+    useRouter: jest.fn().mockImplementation(router1),
+  };
+});
+window.scrollTo = jest.fn();
+
 describe('test proposals page', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(api, 'get').mockImplementation(params => {
+      switch (true) {
+        case params.route.includes('network'):
+          return Promise.resolve(mockNetworkParameters);
+        case params.route.includes('proposals/list?page=1'):
+          return Promise.resolve(mockedProposalsList);
+        case params.route.includes('proposals/list?page=2'):
+          return Promise.resolve(mockedProposalsListPage2);
+        default:
+          return Promise.reject(new Error(`Unexpected route: ${params.route}`));
+      }
+    });
   });
   it('should get the right props from ssp and render the elements correctly', async () => {
-    (api.get as jest.Mock)
-      .mockReturnValueOnce(networkParametersMock)
-      .mockReturnValueOnce(mockedProposalsList);
-    const getServerSidePropsCopy = getServerSideProps as any;
-    const { props } = (await getServerSidePropsCopy({})) as any;
     act(() => {
-      renderWithTheme(<Proposals {...props} />);
+      renderWithTheme(<Proposals />);
     });
 
     const pageInitialText = screen.getByText(
@@ -50,15 +74,8 @@ describe('test proposals page', () => {
   });
 
   it('should paginate the proposals correctly', async () => {
-    (api.get as jest.Mock)
-      .mockReturnValueOnce(networkParametersMock) // first call on ssr
-      .mockReturnValueOnce(mockedProposalsList) // second call on ssr
-      .mockReturnValueOnce(mockedProposalsList) // third and fourth are when proposal tab is clicked, (it generates 3 repeated calls simultaneously TODO: FIX THIS)
-      .mockReturnValueOnce(mockedProposalsListPage2); // last call is when paginate to page 2, no repeated calls are generated
-    const getServerSidePropsCopy = getServerSideProps as any;
-    const { props } = (await getServerSidePropsCopy({})) as any;
-    act(() => {
-      renderWithTheme(<Proposals {...props} />);
+    await act(async () => {
+      renderWithTheme(<Proposals />);
     });
 
     const networkParamsTabProof = screen.getByText(
@@ -76,7 +93,7 @@ describe('test proposals page', () => {
     });
     expect(networkParamsTabProof).not.toBeInTheDocument();
     proposalsTabProof = screen.queryAllByText('ApprovedProposal');
-    expect(proposalsTabProof.length).toEqual(3);
+    expect(proposalsTabProof.length).toEqual(4);
     expect(networkParamsTabProof).not.toBeInTheDocument();
 
     const page1Proposal = screen.getAllByText(/0\/4,000,000/)[0];

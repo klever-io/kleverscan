@@ -86,7 +86,6 @@ const Holders: React.FC<IHolders> = ({ holders, asset, holdersTableProps }) => {
 
   const tableProps: ITable = {
     rowSections,
-    data: holders,
     header,
     type: 'holders',
     ...holdersTableProps,

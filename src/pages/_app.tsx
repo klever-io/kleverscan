@@ -1,3 +1,4 @@
+import { ContractProvider } from '@/contexts/contract';
 import { ExtensionProvider } from '@/contexts/extension';
 import { InternalThemeProvider } from '@/contexts/theme';
 import { MobileProvider } from 'contexts/mobile';
@@ -30,14 +31,16 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
     <InternalThemeProvider>
       <ToastContainer />
       <MobileProvider>
-        <ExtensionProvider>
-          <ToastContainer />
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-          <GlobalStyle />
-          <NProgress />
-        </ExtensionProvider>
+        <ContractProvider>
+          <ExtensionProvider>
+            <ToastContainer />
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+            <GlobalStyle />
+            <NProgress />
+          </ExtensionProvider>
+        </ContractProvider>
       </MobileProvider>
     </InternalThemeProvider>
   );

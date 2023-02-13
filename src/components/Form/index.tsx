@@ -1,12 +1,7 @@
+import { IFormsData, useContract } from '@/contexts/contract';
 import { parseData } from '@/utils/index';
 import { FormHandles, Scope, SubmitHandler } from '@unform/core';
-import React, {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import AdvancedOptions from './AdvancedOptions';
 import FormInput from './FormInput';
 import { InfoIcon, TooltipContainer, TooltipContent } from './FormInput/styles';
@@ -18,6 +13,7 @@ import {
   FormBody,
   FormGap,
   FormSection,
+  HiddenSubmitButton,
   SectionTitle,
 } from './styles';
 
@@ -53,40 +49,34 @@ export interface ISection {
   fields: IFormField[];
 }
 
-interface IFormProps {
+export interface IFormProps {
   sections: ISection[];
   onSubmit: (values: any) => void;
   buttonLabel?: string;
   cancelOnly?: boolean;
   children?: React.ReactNode;
-  contractName: string;
-  loading?: boolean;
-  setData?: Dispatch<SetStateAction<string>>;
-  showPayload: boolean;
-  setShowPayload?: Dispatch<SetStateAction<boolean>>;
-  setIsMultisig?: Dispatch<SetStateAction<boolean>>;
-  isMultisig: boolean;
+  loading: boolean;
+  setData: (value: string) => void;
   showForm: boolean;
+  typeAssetTrigger: number | null;
 }
 
 const Form: React.FC<IFormProps> = ({
   sections: defaultSections,
   buttonLabel,
-  contractName,
   onSubmit,
   children,
   cancelOnly,
   loading,
   setData,
-  showPayload,
-  setShowPayload,
-  setIsMultisig,
-  isMultisig,
   showForm,
+  typeAssetTrigger,
 }) => {
   const formRef = useRef<FormHandles>(null);
   const [sections, setSections] = useState(defaultSections);
   const [showAdvancedOpts, setShowAdvancedOpts] = useState(false);
+  const { formsData, setFormsData, isMultiContract, contractType } =
+    useContract();
 
   const addArrayItem = useCallback(
     (field: IFormField, sectionIndex: number, fieldIndex: number) => {
@@ -295,7 +285,13 @@ const Form: React.FC<IFormProps> = ({
 
   const handleSubmit: SubmitHandler<FormData> = (data: any) => {
     parseData(data);
-
+    if (isMultiContract) {
+      setFormsData((prevFormsData: IFormsData[]) => [
+        ...prevFormsData,
+        { data, contractType, typeAssetTrigger },
+      ]);
+      return;
+    }
     onSubmit(data);
   };
 
@@ -317,6 +313,10 @@ const Form: React.FC<IFormProps> = ({
     ];
 
     return contracts.includes(contract);
+  };
+
+  const advancedOptionsProps = {
+    setData,
   };
 
   return (
@@ -346,7 +346,7 @@ const Form: React.FC<IFormProps> = ({
 
       {showForm && children}
 
-      {sections.length > 0 || isEmptyContract(contractName) ? (
+      {sections.length > 0 || isEmptyContract(contractType) ? (
         <>
           <AdvancedOptsContainer
             onClick={() => setShowAdvancedOpts(!showAdvancedOpts)}
@@ -356,17 +356,16 @@ const Form: React.FC<IFormProps> = ({
           </AdvancedOptsContainer>
 
           {showAdvancedOpts ? (
-            <AdvancedOptions
-              showPayload={showPayload}
-              setShowPayload={setShowPayload}
-              setData={setData}
-              setIsMultisig={setIsMultisig}
-              isMultisig={isMultisig}
-            />
+            <AdvancedOptions {...advancedOptionsProps} />
           ) : null}
-          <ButtonContainer submit={!loading} type="submit" disabled={loading}>
-            Create Transaction
-          </ButtonContainer>
+
+          {!isMultiContract ? (
+            <ButtonContainer submit={!loading} type="submit" disabled={loading}>
+              Create Transaction
+            </ButtonContainer>
+          ) : (
+            <HiddenSubmitButton type="submit" disabled={loading} />
+          )}
         </>
       ) : null}
     </FormBody>

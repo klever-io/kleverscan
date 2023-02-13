@@ -3,6 +3,7 @@ import {
   StyledInput,
   Toggle,
 } from '@/components/Form/FormInput/styles';
+import { useContract } from '@/contexts/contract';
 import {
   DataField,
   ExtraOptionContainer,
@@ -12,27 +13,41 @@ import {
 } from './styles';
 
 interface IAdvOptions {
-  setData: any;
-  setIsMultisig: any;
-  isMultisig: boolean;
-  setShowPayload: any;
-  showPayload: boolean;
+  setData: (value: string) => void;
 }
 
-const AdvancedOptions: React.FC<IAdvOptions> = ({
-  setShowPayload,
-  showPayload,
-  setData,
-  setIsMultisig,
-  isMultisig,
-}) => {
+const AdvancedOptions: React.FC<IAdvOptions> = ({ setData }) => {
+  const {
+    setIsMultiContract,
+    isMultiContract,
+    setShowPayload,
+    showPayload,
+    setIsMultisig,
+    isMultisig,
+  } = useContract();
+
   return (
     <ExtraOptionContainer>
       <FieldContainer>
         <InputLabel>Data</InputLabel>
         <DataField onChange={e => setData(e.target.value.toString())} />
       </FieldContainer>
-
+      {/* <FieldContainer>
+        <InputLabel>Multiple Contract</InputLabel>
+        <ToggleContainer>
+          No
+          <Toggle>
+            <StyledInput
+              type="checkbox"
+              defaultChecked={false}
+              value={String(showPayload)}
+              onClick={() => setIsMultiContract(!isMultiContract)}
+            />
+            <Slider />
+          </Toggle>
+          Yes
+        </ToggleContainer>
+      </FieldContainer> */}
       <FieldContainer>
         <InputLabel>Is Multisig?</InputLabel>
         <ToggleContainer>

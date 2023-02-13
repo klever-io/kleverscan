@@ -1,24 +1,41 @@
 import { WarningIcon } from '@/assets/calendar';
 import { Transactions as Icon } from '@/assets/title-icons';
-import Contract from '@/components/Contract';
+import MultiContract from '@/components/Contract/MultiContract';
+import { ContainerQueueMobile } from '@/components/Contract/MultiContract/styles';
+import Select from '@/components/Contract/Select';
+import {
+  Container as ContainerContract,
+  CreateTxContainer,
+} from '@/components/Contract/styles';
+import {
+  getType,
+  parseValues,
+  precisionParse,
+} from '@/components/Contract/utils';
 import Title from '@/components/Layout/Title';
 import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
+import { IFormsData, useContract } from '@/contexts/contract';
 import { useExtension } from '@/contexts/extension';
+import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
-import { ICollectionList, IKAssets, IParamList } from '@/types/index';
+import { ICollectionList, IParamList } from '@/types/index';
 import { INetworkParam, IProposalsResponse } from '@/types/proposals';
+import { contractOptions } from '@/utils/contracts';
+import formSection from '@/utils/formSections';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { Header } from '@/views/assets';
-import { Card } from '@/views/blocks';
 import {
-  CardContainer,
   Container,
+  CreateTxCard,
+  CreateTxCardContainer,
+  QueueItemContainer,
+  QueueOutContainer,
   WarningContainer,
   WarningText,
 } from '@/views/create-transaction';
+import { core } from '@klever/sdk';
 import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { toast } from 'react-toastify';
 
 interface IContract {
@@ -27,13 +44,54 @@ interface IContract {
   paramsList?: any;
 }
 
-const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
-  const [assetsList, setAssetsLists] = useState<ICollectionList[]>([]);
-  const [kassetsList, setKAssetsList] = useState<IKAssets[]>([]);
-  const router = useRouter();
+let buyKey = 0;
 
-  const { extensionInstalled, connectExtension, logoutExtension } =
-    useExtension();
+const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
+  const { extensionInstalled, connectExtension } = useExtension();
+
+  const { isTablet } = useMobile();
+  const {
+    contractType,
+    setContractType,
+    setFormSections,
+    ownerAddress,
+    claimType,
+    claimLabel,
+    ITOBuy,
+    buyLabel,
+    setBuyLabel,
+    isMultiContract,
+    queue,
+    setQueue,
+    selectedIndex,
+    setSelectedIndex,
+    formsData,
+    setFormsData,
+    tokenChosen,
+    selectedBucket,
+    proposalId,
+    collection,
+    binaryOperations,
+    assetID,
+    assetsList,
+    setProposals,
+    setParamsList,
+    getAssets,
+    showMultiContracts,
+    setShowMultiContracts,
+    setTxHash,
+    setTxLoading,
+    isMultisig,
+    setIsMultisig,
+    setShowPayload,
+    formSections,
+    resetForms,
+  } = useContract();
+
+  useEffect(() => {
+    setProposals(proposals);
+    setParamsList(paramsList);
+  }, []);
 
   useDidUpdateEffect(() => {
     if (extensionInstalled) {
@@ -41,159 +99,201 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
     }
   }, [extensionInstalled]);
 
-  const getKAssets = async (address: string) => {
-    const response: any = await api.get({
-      route: `assets/kassets`,
-      query: {
-        owner: address,
-        limit: 10000,
-      },
-    });
-    if (response.error) return;
-
-    const list: IKAssets[] = [];
-
-    if (response?.data?.assets?.length > 0) {
-      response.data.assets.forEach((item: any) => {
-        list.push({
-          label: item.assetId,
-          value: item.assetId,
-          properties: item.properties,
-          isNFT: item.assetType !== 'Fungible',
-          isPaused: item.attributes.isPaused,
-        });
-      });
-
-      setKAssetsList([...list]);
-    }
-  };
-
-  const getAssets = async () => {
-    if (typeof window !== 'undefined') {
-      const address = sessionStorage.getItem('walletAddress') || '';
-
-      if (address === '') {
-        logoutExtension();
-        toast.error('Please connect your wallet to create a transaction');
-        router.push('/');
-        return;
-      }
-
-      getKAssets(address);
-
-      const account: any = await api.get({
-        route: `address/${address}`,
-      });
-
-      if (
-        !account?.data?.account?.assets &&
-        account?.data?.account?.balance === 0
-      ) {
-        setAssetsLists([]);
-        return;
-      }
-
-      const accountData = account?.data?.account
-        ? account.data.account
-        : {
-            assets: [],
-            frozenBalance: 0,
-            balance: 0,
-          };
-
-      const { assets, frozenBalance, balance } = accountData;
-      const list: ICollectionList[] = [];
-      const addAssetsInfo = Object.keys(assets).map(async item => {
-        const assetInfo: any = await api.get({
-          route: `assets/${item}`,
-        });
-
-        const minEpochsToWithdraw =
-          assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
-        const ownerAddress = assetInfo.data?.asset?.ownerAddress;
-        const { assetType, frozenBalance, balance, precision, buckets } =
-          account.data.account.assets[item];
-
-        list.push({
-          label: item,
-          value: item,
-          isNFT: assetType === 1,
-          balance,
-          frozenBalance,
-          precision,
-          buckets,
-          minEpochsToWithdraw: minEpochsToWithdraw ? minEpochsToWithdraw : null,
-          ownerAddress,
-        });
-      });
-
-      await Promise.all(addAssetsInfo);
-
-      if (!Object.keys(assets).includes('KLV') && balance !== 0) {
-        const assetInfo: any = await api.get({
-          route: `assets/KLV`,
-        });
-
-        const minEpochsToWithdraw =
-          assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
-
-        list.push({
-          label: 'KLV',
-          value: 'KLV',
-          isNFT: false,
-          balance,
-          frozenBalance: frozenBalance ? frozenBalance : 0,
-          precision: 6,
-          buckets: [],
-          minEpochsToWithdraw: minEpochsToWithdraw ? minEpochsToWithdraw : null,
-        });
-      }
-      list.sort((a, b) => (a.label > b.label ? 1 : -1));
-
-      const KLV = list.splice(
-        list.indexOf(
-          list.find(item => item.label === 'KLV') as ICollectionList,
-        ),
-        1,
-      );
-
-      const KFI = list.splice(
-        list.indexOf(
-          list.find(item => item.label === 'KFI') as ICollectionList,
-        ),
-        1,
-      );
-
-      setAssetsLists([...KLV, ...KFI, ...list]);
-    }
+  const defineBuyContract = (label: string) => {
+    buyKey += 1;
+    setFormSections([
+      ...formSection({
+        contract: 'BuyContract',
+        address: ownerAddress,
+        buyLabel: label,
+      }),
+    ]);
   };
 
   useEffect(() => {
-    getAssets();
-  }, []);
+    if (ITOBuy) {
+      setBuyLabel('ITO Asset ID');
+      defineBuyContract('ITO Asset ID');
+    } else {
+      setBuyLabel('Order ID');
+      defineBuyContract('Order ID');
+    }
+  }, [ITOBuy]);
+
+  const handleOption = (selectedOption: any) => {
+    setContractType(selectedOption.value);
+
+    switch (selectedOption.value) {
+      case 'ProposalContract':
+        setFormSections([
+          ...formSection({
+            contract: selectedOption.value,
+            address: ownerAddress,
+            paramsList,
+          }),
+        ]);
+        break;
+
+      case 'ClaimContract':
+        setFormSections([
+          ...formSection({
+            contract: selectedOption.value,
+            address: ownerAddress,
+            claimLabel,
+          }),
+        ]);
+        break;
+
+      case 'BuyContract':
+        defineBuyContract(buyLabel);
+        break;
+
+      default:
+        setFormSections([
+          ...formSection({
+            contract: selectedOption.value,
+            address: ownerAddress,
+          }),
+        ]);
+        break;
+    }
+  };
+
+  const editContract = (elementIndex: any) => {
+    setSelectedIndex(elementIndex);
+
+    if (isTablet && showMultiContracts) {
+      setShowMultiContracts(false);
+    }
+  };
+
+  const removeContractQueue = (contractIndex: number, e: any) => {
+    e.stopPropagation();
+
+    if (queue.length > 1) {
+      const newItems = queue.filter(
+        item => item.elementIndex !== contractIndex,
+      );
+
+      setQueue(newItems);
+      if (contractIndex === selectedIndex) {
+        setSelectedIndex(queue[0].elementIndex);
+      }
+    }
+  };
+
+  const broadcastQueue = async () => {
+    const allForms = document.querySelectorAll('form');
+    allForms.forEach((form: HTMLFormElement) => {
+      form.requestSubmit();
+    });
+  };
+
+  useDidUpdateEffect(() => {
+    const submitForm = async () => {
+      setTxLoading(true);
+      try {
+        const parseFormsData = formsData.map(
+          async ({ data, contractType, typeAssetTrigger }: IFormsData) => {
+            const parsedvalues = parseValues(
+              data,
+              contractType,
+              typeAssetTrigger,
+              claimType,
+              assetID,
+              collection,
+              selectedBucket,
+              proposalId,
+              tokenChosen,
+              ITOBuy,
+              binaryOperations,
+            );
+
+            const parsedPayload = await precisionParse(
+              parsedvalues,
+              contractType,
+            );
+
+            return { type: getType(contractType), payload: parsedPayload };
+          },
+        );
+        const parsedFormsData: any = await Promise.all(parseFormsData);
+        const parsedData = Buffer.from(parsedFormsData, 'utf-8').toString(
+          'base64',
+        );
+        const buildTxs = await core.buildTransaction(parsedFormsData, [
+          parsedData,
+        ]);
+        const signedTxs = await window.kleverWeb.signTransaction(buildTxs);
+        if (isMultisig) {
+          const blob = new Blob([JSON.stringify(signedTxs)], {
+            type: 'application/json',
+          });
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `${contractType} - Nonce: ${signedTxs.RawData.Nonce}.json`;
+          link.click();
+          window.URL.revokeObjectURL(url);
+          toast.success(
+            'Transaction built and signed, send the file to the co-owner(s)',
+          );
+        } else {
+          const response = await core.broadcastTransactions([signedTxs]);
+          setTxHash(response.data.txsHashes[0]);
+          toast.success('Transaction broadcast successfully');
+          if (response.data.txsHashes[0]) {
+            const newQueue = queue.shift();
+            setQueue([newQueue]);
+            setSelectedIndex(0);
+            resetForms();
+          }
+        }
+
+        setFormsData([]);
+      } catch (e: any) {
+        setFormsData([]);
+        toast.error(e?.message ? e.message : e);
+        console.warn(`%c ${e}`, 'color: red');
+      } finally {
+        setTxLoading(false);
+      }
+    };
+
+    if (formsData.length === queue.length) {
+      submitForm();
+    }
+  }, [formsData]);
+
+  const multiContractProps = {
+    broadcastQueue,
+    editContract,
+    removeContractQueue,
+  };
 
   return (
     <Container>
-      {!assetsList.find(
-        (item: ICollectionList) => item.label === 'KLV' && item.balance > 0,
-      ) && (
-        <WarningContainer>
-          <WarningIcon />
-          <WarningText>
-            Your KLV balance{' '}
-            {process.env.DEFAULT_API_HOST?.includes('testnet') && '(testnet)'}{' '}
-            {process.env.DEFAULT_API_HOST?.includes('devnet') && '(devnet)'} is
-            zero. You can preview the transaction, but you will not be able to
-            send it.
-          </WarningText>
-        </WarningContainer>
-      )}
+      {assetsList &&
+        !assetsList.find(
+          (item: ICollectionList) => item.label === 'KLV' && item.balance > 0,
+        ) && (
+          <WarningContainer>
+            <WarningIcon />
+            <WarningText>
+              Your KLV balance{' '}
+              {process.env.DEFAULT_API_HOST?.includes('testnet') && '(testnet)'}{' '}
+              {process.env.DEFAULT_API_HOST?.includes('devnet') && '(devnet)'}{' '}
+              is zero. You can preview the transaction, but you will not be able
+              to send it.
+            </WarningText>
+          </WarningContainer>
+        )}
       <Header>
         <Title Icon={Icon} title={'Create Transaction'} />
       </Header>
 
-      <CardContainer>
-        <Card>
+      <CreateTxCardContainer>
+        <CreateTxCard>
           <div>
             <span>
               Select a contract type, fill in the form fields and click on the
@@ -205,17 +305,49 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
               page.
             </span>
           </div>
-        </Card>
-      </CardContainer>
+        </CreateTxCard>
+      </CreateTxCardContainer>
 
-      <Contract
-        assetsList={assetsList}
-        proposalsList={proposals}
-        paramsList={paramsList}
-        getAssets={getAssets}
-        kAssets={kassetsList}
-        isModal={false}
-      />
+      <ContainerContract>
+        <Select
+          options={contractOptions}
+          onChange={contractType => {
+            handleOption(contractType);
+            setIsMultisig(false);
+            setShowPayload(false);
+          }}
+          getAssets={getAssets}
+          isDisabled={true}
+          title={'Contract'}
+          zIndex={4}
+          isModal={false}
+        />
+
+        {contractType && (
+          <CreateTxContainer isMultiContract={isMultiContract}>
+            {isMultiContract && <MultiContract {...multiContractProps} />}
+            {isTablet && isMultiContract && (
+              <ContainerQueueMobile
+                onClick={() => setShowMultiContracts(!showMultiContracts)}
+              >
+                Queue ( {queue.length} )
+              </ContainerQueueMobile>
+            )}
+            <QueueOutContainer>
+              {queue.map((item, index) => {
+                return (
+                  <QueueItemContainer
+                    key={JSON.stringify([...formSections, { itemKey: index }])}
+                    visible={item.elementIndex === selectedIndex}
+                  >
+                    {item.ref}
+                  </QueueItemContainer>
+                );
+              })}
+            </QueueOutContainer>
+          </CreateTxContainer>
+        )}
+      </ContainerContract>
     </Container>
   );
 };

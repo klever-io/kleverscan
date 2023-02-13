@@ -11,6 +11,7 @@ const theme = {
   red: '#F84960',
   rose: '#EE3F71',
   purple: '#7D3FF1',
+  lightPurple: '#B28DF6',
   violet: '#aa33b5',
   gray: '#EBEBEB',
   lightGray: '#C6C7EB',

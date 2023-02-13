@@ -1,3 +1,4 @@
+import { useContract } from '@/contexts/contract';
 import { IStakingRewards } from '@/pages/account/[account]';
 import { IKAssets } from '@/types';
 import dynamic from 'next/dynamic';
@@ -26,6 +27,8 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   zIndex?: number;
   collection?: IKAssets;
   claimSelectedType?: IStakingRewards;
+  isDisabled?: boolean;
+  isModal?: boolean;
   selectedBucket?: string;
 }
 
@@ -39,6 +42,7 @@ const Select: React.FC<IFilter> = ({
   zIndex,
   collection,
   claimSelectedType,
+  isDisabled,
   selectedBucket,
   ...rest
 }) => {
@@ -46,6 +50,8 @@ const Select: React.FC<IFilter> = ({
   const Placeholder = useCallback((props: any) => {
     return <components.Placeholder {...props} />;
   }, []);
+
+  const { isMultiContract, queue } = useContract();
 
   const CaretDownIcon = useCallback(() => {
     return <IoIosArrowDown />;
@@ -101,6 +107,7 @@ const Select: React.FC<IFilter> = ({
         }
         components={{ Placeholder, DropdownIndicator }}
         {...props}
+        isDisabled={isDisabled && isMultiContract && queue.length > 1}
       />
     </Container>
   );

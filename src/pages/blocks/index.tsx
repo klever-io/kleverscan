@@ -333,8 +333,8 @@ const Blocks: React.FC<IBlocks> = () => {
       </Header>
 
       <CardContainer>
-        {cards.map(card => (
-          <CardContent key={JSON.stringify(card)} {...card} />
+        {cards.map((card, index) => (
+          <CardContent key={index} {...card} />
         ))}
       </CardContainer>
 

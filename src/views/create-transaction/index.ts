@@ -64,4 +64,5 @@ export const QueueItemContainer = styled.div<{
 
 export const QueueOutContainer = styled.div`
   width: 100%;
+  overflow: hidden;
 `;

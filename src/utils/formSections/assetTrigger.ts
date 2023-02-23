@@ -1,12 +1,19 @@
+import { ICollectionList } from '@/types';
 import { ISection } from 'components/Form';
+import { RoyaltiesSection } from './common';
 
-const assetTriggerContract = (type?: number | null): ISection[] => {
-  const address = sessionStorage.getItem('walletAddress') || '';
+const assetTriggerContract = (
+  type?: number | null,
+  collection?: ICollectionList,
+  address = '',
+): ISection[] => {
   let section = [] as ISection[];
 
   if (isNaN(Number(type)) && type !== null) {
     return [];
   }
+
+  const isNFT = (collection && collection.isNFT) || false;
 
   section.push({
     fields: [],
@@ -205,6 +212,58 @@ const assetTriggerContract = (type?: number | null): ISection[] => {
           },
         ],
       });
+      break;
+
+    case 14:
+      section = [];
+      section.push(...RoyaltiesSection(address, isNFT));
+      break;
+    case 15:
+      section = [];
+      section.push({
+        title: 'KDA Pool',
+        objectName: 'kdaPool',
+        fields: [
+          {
+            label: 'KDA',
+            props: {
+              tooltip: 'Target Asset',
+            },
+          },
+          {
+            label: 'Admin Address',
+          },
+          {
+            label: 'Fixed Ratio for KLV',
+            objectName: 'fRatioKLV',
+            props: {
+              type: 'number',
+              tooltip: 'Fixed ratio for KLV',
+            },
+          },
+          {
+            label: 'Fixed Ratio for KDA',
+            objectName: 'fRatioKDA',
+            props: {
+              type: 'number',
+              tooltip: 'Fixed ratio for KDA',
+            },
+          },
+          {
+            label: 'Active',
+            props: {
+              type: 'checkbox',
+              toggleOptions: ['No', 'Yes'],
+              bool: true,
+              tooltip: '"Yes" if the pooling should be active',
+            },
+          },
+        ],
+      });
+      break;
+    case 16:
+    case 17:
+      section = [];
       break;
 
     default:

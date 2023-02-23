@@ -1,6 +1,6 @@
 import { useContract } from '@/contexts/contract';
 import { IStakingRewards } from '@/pages/account/[account]';
-import { IKAssets } from '@/types';
+import { ICollectionList } from '@/types';
 import dynamic from 'next/dynamic';
 import React, { useCallback, useRef } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
@@ -25,7 +25,7 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   getAssets?: () => void;
   label?: string;
   zIndex?: number;
-  collection?: IKAssets;
+  collection?: ICollectionList;
   claimSelectedType?: IStakingRewards;
   isDisabled?: boolean;
   isModal?: boolean;

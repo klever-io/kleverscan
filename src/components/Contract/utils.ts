@@ -1,4 +1,4 @@
-import { ICollectionList, IKAssets } from '@/types/index';
+import { ICollectionList } from '@/types/index';
 import { getPrecision } from '@/utils/index';
 import { TransactionType } from '@klever/sdk';
 
@@ -20,7 +20,30 @@ const getType = (rawType: string): TransactionType => {
       break;
   }
 
+  if (type === 'Depoist') {
+    // TODO:Remove upon SDK UPDATE
+    return 23;
+  }
+  if (type === 'ITOTrigger') {
+    return 24;
+  }
   return TransactionType[type];
+};
+
+const parsePackInfoPrecision = (payload: any) => {
+  if (payload.packInfo) {
+    Object.entries(payload.packInfo).forEach(
+      async ([key, { packs }]: [string, any]) => {
+        const packPrecision = (await getPrecision(key)) as number;
+
+        if (packPrecision !== undefined) {
+          packs.forEach((pack: any) => {
+            pack.price = pack.price * 10 ** packPrecision;
+          });
+        } else return;
+      },
+    );
+  }
 };
 
 const precisionParse = async (
@@ -83,7 +106,7 @@ const precisionParse = async (
             percentagePrecision,
           );
 
-          addPrecision((item.amount = item.amount), KLVPecision);
+          addPrecision(item.amount, KLVPecision);
         });
       }
       break;
@@ -101,19 +124,9 @@ const precisionParse = async (
           payload.maxAmount = payload.maxAmount * 10 ** precision;
         } else return;
       }
-      if (payload.packInfo) {
-        Object.entries(payload.packInfo).forEach(
-          async ([key, packs]: [string, any]) => {
-            const packPrecision = (await getPrecision(key)) as number;
+    case 'ITOTriggerContract':
+      parsePackInfoPrecision(payload);
 
-            if (packPrecision !== undefined) {
-              packs.forEach((pack: any) => {
-                pack.amount = pack.amount * 10 ** packPrecision;
-              });
-            } else return;
-          },
-        );
-      }
       break;
     case 'BuyContract':
       assetId = payload.currencyId;
@@ -152,6 +165,7 @@ const contractHaveKDA = (
     'ConfigITOContract',
     'SetITOPricesContract',
     'SellContract',
+    'ITOTriggerContract',
   ];
 
   if (contract === 'AssetTriggerContract' && assetTriggerType !== null) {
@@ -171,40 +185,43 @@ const contractHaveBucketId = (contract: string): boolean => {
   return contracts.includes(contract);
 };
 
-const filterByProperties = (assets: any[], typeAssetTrigger: number) => {
+const filterByProperties = (
+  assets: ICollectionList[],
+  typeAssetTrigger: number,
+) => {
   switch (typeAssetTrigger) {
     case 0:
-      return assets.filter((item: IKAssets) => {
+      return assets.filter(item => {
         return item.properties?.canMint;
       });
 
     case 1:
-      return assets.filter((item: IKAssets) => {
+      return assets.filter(item => {
         return item.properties?.canBurn;
       });
 
     case 2:
-      return assets.filter((item: IKAssets) => {
+      return assets.filter(item => {
         return item.properties?.canWipe;
       });
 
     case 3:
-      return assets.filter((item: IKAssets) => {
-        return item.properties?.canPause && !item.isPaused;
+      return assets.filter(item => {
+        return item.properties?.canPause && !item.attributes?.isPaused;
       });
 
     case 4:
-      return assets.filter((item: IKAssets) => {
-        return item.isPaused;
+      return assets.filter(item => {
+        return item.attributes?.isPaused;
       });
 
     case 5:
-      return assets.filter((item: IKAssets) => {
+      return assets.filter(item => {
         return item.properties?.canChangeOwner;
       });
 
     case 6:
-      return assets.filter((item: IKAssets) => {
+      return assets.filter(item => {
         return item.properties?.canAddRoles;
       });
 
@@ -222,15 +239,15 @@ const showAssetIDInput = (
     typeAssetTrigger !== null &&
     !isNaN(typeAssetTrigger)
   ) {
-    const doNotInput = [0, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13];
-    return !doNotInput.includes(typeAssetTrigger);
+    const singleNFTContracts = [1, 8];
+    return singleNFTContracts.includes(typeAssetTrigger);
   }
 
   return true;
 };
 
 const getAssetsList = (
-  assets: any[],
+  assets: ICollectionList[],
   contractType: string,
   typeAssetTrigger: number | null,
   ownerAddress: string,
@@ -242,7 +259,7 @@ const getAssetsList = (
     if (bothCollectionNFT.includes(typeAssetTrigger)) {
       return filterByProperties(assets, typeAssetTrigger);
     } else if (justNFT.includes(typeAssetTrigger)) {
-      const newAssets: IKAssets[] = assets.filter((value: IKAssets) => {
+      const newAssets = assets.filter((value: ICollectionList) => {
         return value.isNFT;
       });
       return filterByProperties(newAssets, typeAssetTrigger);
@@ -281,23 +298,52 @@ const getAssetsList = (
   return assets;
 };
 
+const parsePackInfo = (values: any) => {
+  const packs = values.pack;
+
+  delete values.pack;
+
+  const packInfo: {
+    [key: string]: any;
+  } = {};
+  packs.forEach((item: any) => {
+    const itemContent = {
+      packs: item.packItem,
+    };
+    if (item.packCurrencyID) {
+      packInfo[item.packCurrencyID] = itemContent;
+    } else {
+      packInfo['KLV'] = itemContent;
+    }
+  });
+
+  values.packInfo = packInfo;
+};
+
 const parseValues = (
   values: Record<string, any>,
   contractType: string,
   typeAssetTrigger: number | null,
   claimType: number,
   assetID: number,
-  collection: Record<string, any>,
+  collection: ICollectionList | undefined,
   selectedBucket: string,
   proposalId: number | null,
   tokenChosen: boolean,
   ITOBuy: boolean,
   binaryOperations: string[],
+  depositType: string | null,
+  withdrawType: number | null,
+  itoTriggerType: number | null,
+  isNFT: boolean | undefined,
 ): any => {
   const parsedValues = JSON.parse(JSON.stringify(values));
 
   if (contractType === 'TransferContract') {
     parsedValues.receiver = parsedValues.receiverAddress;
+    if (isNFT) {
+      parsedValues.amount = 1;
+    }
     delete parsedValues.receiverAddress;
   } else if (contractType === 'CreateAssetContract') {
     const oldProperties = { ...parsedValues.properties };
@@ -315,7 +361,7 @@ const parseValues = (
     parsedValues.properties = newProperties;
   }
 
-  if (contractHaveKDA(contractType, typeAssetTrigger)) {
+  if (contractHaveKDA(contractType, typeAssetTrigger) && collection) {
     if (contractType === 'AssetTriggerContract') {
       parsedValues.triggerType = typeAssetTrigger;
       parsedValues.assetId =
@@ -323,6 +369,9 @@ const parseValues = (
     } else if (contractType === 'SellContract') {
       parsedValues.assetID =
         assetID !== 0 ? `${collection.value}/${assetID}` : collection.value;
+    } else if (contractType === 'ITOTriggerContract') {
+      parsedValues.triggerType = itoTriggerType;
+      parsedValues.kda = collection.value;
     } else {
       parsedValues.kda =
         assetID !== 0 ? `${collection.value}/${assetID}` : collection.value;
@@ -379,6 +428,17 @@ const parseValues = (
         parsedValues.permissions[index].operations = newHex;
       });
     }
+  } else if (contractType === 'DepositContract') {
+    parsedValues.depositType = depositType;
+  } else if (contractType === 'WithdrawContract') {
+    parsedValues.withdrawType = withdrawType;
+  }
+
+  if (
+    contractType === 'ConfigITOContract' ||
+    (contractType === 'ITOTriggerContract' && itoTriggerType === 0)
+  ) {
+    parsePackInfo(parsedValues);
   }
 
   if (contractHaveBucketId(contractType)) {
@@ -443,6 +503,8 @@ const contractsDescription = {
   SellContract: 'Sell tokens.',
   CreateMarketplaceContract: 'Create a new Marketplace.',
   ConfigMarketplaceContract: 'Set up a Marketplace.',
+  DepositContract: 'Deposit to a KDA Pool or FPR Pool.',
+  ITOTriggerContract: 'Change the parameters of an ITO.',
 };
 
 export {

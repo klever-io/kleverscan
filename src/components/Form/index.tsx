@@ -1,4 +1,5 @@
 import { IFormsData, useContract } from '@/contexts/contract';
+import { ICollectionList } from '@/types';
 import { parseData } from '@/utils/index';
 import { FormHandles, Scope, SubmitHandler } from '@unform/core';
 import React, { useCallback, useRef, useState } from 'react';
@@ -38,11 +39,13 @@ interface IInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export interface IFormField {
   label: string;
+  objectName?: string; // when the label is not the same as the object field name
   props?: IInputProps;
 }
 
 export interface ISection {
   title?: string;
+  objectName?: string; // when the title is not the same as the object field name
   inner?: boolean;
   innerPath?: string;
   tooltip?: string;
@@ -56,9 +59,14 @@ export interface IFormProps {
   cancelOnly?: boolean;
   children?: React.ReactNode;
   loading: boolean;
-  setData: (value: string) => void;
+  setMetadata: (value: string) => void;
   showForm: boolean;
   typeAssetTrigger: number | null;
+  collection: ICollectionList | undefined;
+  assetID: number;
+  itoTriggerType: number | null;
+  isNFT: boolean | undefined;
+  metadata: string;
 }
 
 const Form: React.FC<IFormProps> = ({
@@ -68,15 +76,19 @@ const Form: React.FC<IFormProps> = ({
   children,
   cancelOnly,
   loading,
-  setData,
+  setMetadata,
   showForm,
   typeAssetTrigger,
+  collection,
+  assetID,
+  itoTriggerType,
+  isNFT,
+  metadata,
 }) => {
   const formRef = useRef<FormHandles>(null);
   const [sections, setSections] = useState(defaultSections);
   const [showAdvancedOpts, setShowAdvancedOpts] = useState(false);
-  const { formsData, setFormsData, isMultiContract, contractType } =
-    useContract();
+  const { setFormsData, isMultiContract, contractType } = useContract();
 
   const addArrayItem = useCallback(
     (field: IFormField, sectionIndex: number, fieldIndex: number) => {
@@ -192,10 +204,13 @@ const Form: React.FC<IFormProps> = ({
     const len = field.props?.length ? field.props.length : 1;
     for (let i = 0; i < len; i++) {
       fields.push(
-        <Scope path={`${section.title}[${i}]`} key={String(i)}>
+        <Scope
+          path={`${section.objectName || section.title}[${i}]`}
+          key={String(i)}
+        >
           <FormInput
             title={field.label}
-            name={field.label.replace(/\s/g, '')}
+            name={field.objectName || field.label.replace(/\s/g, '')}
             {...field.props}
           />
         </Scope>,
@@ -223,10 +238,18 @@ const Form: React.FC<IFormProps> = ({
     } else {
       if (section.title && !section.inner) {
         return (
-          <Scope path={unCapitalize(section.title.replace(/\s/g, ''))}>
+          <Scope
+            path={
+              section.objectName ||
+              unCapitalize(section.title.replace(/\s/g, ''))
+            }
+          >
             <FormInput
               title={field.label}
-              name={`${unCapitalize(field.label.replace(/\s/g, ''))}`}
+              name={
+                field.objectName ||
+                `${unCapitalize(field.label.replace(/\s/g, ''))}`
+              }
               {...field.props}
             />
           </Scope>
@@ -288,7 +311,16 @@ const Form: React.FC<IFormProps> = ({
     if (isMultiContract) {
       setFormsData((prevFormsData: IFormsData[]) => [
         ...prevFormsData,
-        { data, contractType, typeAssetTrigger },
+        {
+          data,
+          contractType,
+          typeAssetTrigger,
+          collection,
+          assetID,
+          itoTriggerType,
+          isNFT,
+          metadata,
+        },
       ]);
       return;
     }
@@ -310,13 +342,14 @@ const Form: React.FC<IFormProps> = ({
       'SetITOPricesContract',
       'SetITOPricesContract',
       'AssetTriggerContract',
+      'ITOTriggerContract',
     ];
 
     return contracts.includes(contract);
   };
 
   const advancedOptionsProps = {
-    setData,
+    setMetadata,
   };
 
   return (

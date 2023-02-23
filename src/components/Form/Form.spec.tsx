@@ -17,7 +17,7 @@ const formProps = {
   sections: [] as any[],
   onSubmit: jest.fn(),
   loading: false,
-  setData: jest.fn(),
+  setMetadata: jest.fn(),
   addToQueue: jest.fn,
   typeAssetTrigger: 0,
 };

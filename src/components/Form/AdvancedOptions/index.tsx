@@ -13,10 +13,10 @@ import {
 } from './styles';
 
 interface IAdvOptions {
-  setData: (value: string) => void;
+  setMetadata: (value: string) => void;
 }
 
-const AdvancedOptions: React.FC<IAdvOptions> = ({ setData }) => {
+const AdvancedOptions: React.FC<IAdvOptions> = ({ setMetadata }) => {
   const {
     setIsMultiContract,
     isMultiContract,
@@ -30,24 +30,24 @@ const AdvancedOptions: React.FC<IAdvOptions> = ({ setData }) => {
     <ExtraOptionContainer>
       <FieldContainer>
         <InputLabel>Data</InputLabel>
-        <DataField onChange={e => setData(e.target.value.toString())} />
+        <DataField onChange={e => setMetadata(e.target.value.toString())} />
       </FieldContainer>
-      {/* <FieldContainer>
+      <FieldContainer>
         <InputLabel>Multiple Contract</InputLabel>
         <ToggleContainer>
           No
           <Toggle>
             <StyledInput
               type="checkbox"
-              defaultChecked={false}
-              value={String(showPayload)}
+              defaultChecked={isMultiContract}
+              value={String(isMultiContract)}
               onClick={() => setIsMultiContract(!isMultiContract)}
             />
             <Slider />
           </Toggle>
           Yes
         </ToggleContainer>
-      </FieldContainer> */}
+      </FieldContainer>
       <FieldContainer>
         <InputLabel>Is Multisig?</InputLabel>
         <ToggleContainer>
@@ -55,7 +55,7 @@ const AdvancedOptions: React.FC<IAdvOptions> = ({ setData }) => {
           <Toggle>
             <StyledInput
               type="checkbox"
-              defaultChecked={false}
+              defaultChecked={isMultisig}
               value={String(isMultisig)}
               onClick={() => setIsMultisig(!isMultisig)}
             />
@@ -71,7 +71,7 @@ const AdvancedOptions: React.FC<IAdvOptions> = ({ setData }) => {
           <Toggle>
             <StyledInput
               type="checkbox"
-              defaultChecked={false}
+              defaultChecked={showPayload}
               value={String(showPayload)}
               onClick={() => setShowPayload(!showPayload)}
             />

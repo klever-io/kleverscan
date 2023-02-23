@@ -69,10 +69,6 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
     setFormsData,
     tokenChosen,
     selectedBucket,
-    proposalId,
-    collection,
-    binaryOperations,
-    assetID,
     assetsList,
     setProposals,
     setParamsList,
@@ -91,6 +87,9 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
   useEffect(() => {
     setProposals(proposals);
     setParamsList(paramsList);
+    return () => {
+      setContractType('');
+    };
   }, []);
 
   useDidUpdateEffect(() => {
@@ -194,7 +193,20 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
       setTxLoading(true);
       try {
         const parseFormsData = formsData.map(
-          async ({ data, contractType, typeAssetTrigger }: IFormsData) => {
+          async ({
+            data,
+            contractType,
+            typeAssetTrigger,
+            collection,
+            proposalId,
+            binaryOperations,
+            depositType,
+            withdrawType,
+            assetID,
+            itoTriggerType,
+            isNFT,
+            metadata,
+          }: IFormsData) => {
             const parsedvalues = parseValues(
               data,
               contractType,
@@ -207,6 +219,10 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
               tokenChosen,
               ITOBuy,
               binaryOperations,
+              depositType,
+              withdrawType,
+              itoTriggerType,
+              isNFT,
             );
 
             const parsedPayload = await precisionParse(
@@ -214,16 +230,30 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
               contractType,
             );
 
-            return { type: getType(contractType), payload: parsedPayload };
+            return {
+              type: getType(contractType),
+              payload: parsedPayload,
+              metadata,
+            };
           },
         );
+
         const parsedFormsData: any = await Promise.all(parseFormsData);
-        const parsedData = Buffer.from(parsedFormsData, 'utf-8').toString(
-          'base64',
-        );
-        const buildTxs = await core.buildTransaction(parsedFormsData, [
+        const parsedMetadata: string[] = [];
+        const parsedData = await parsedFormsData.map((data: any) => {
+          if (data.metadata) {
+            parsedMetadata.push(
+              Buffer.from(data.metadata, 'utf-8').toString('base64'),
+            );
+          }
+          delete data.metadata;
+          return data;
+        });
+
+        const buildTxs = await core.buildTransaction(
           parsedData,
-        ]);
+          parsedMetadata,
+        );
         const signedTxs = await window.kleverWeb.signTransaction(buildTxs);
         if (isMultisig) {
           const blob = new Blob([JSON.stringify(signedTxs)], {
@@ -243,14 +273,10 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
           setTxHash(response.data.txsHashes[0]);
           toast.success('Transaction broadcast successfully');
           if (response.data.txsHashes[0]) {
-            const newQueue = queue.shift();
-            setQueue([newQueue]);
-            setSelectedIndex(0);
             resetForms();
+            document.querySelector('form')?.reset();
           }
         }
-
-        setFormsData([]);
       } catch (e: any) {
         setFormsData([]);
         toast.error(e?.message ? e.message : e);
@@ -275,7 +301,8 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
     <Container>
       {assetsList &&
         !assetsList.find(
-          (item: ICollectionList) => item.label === 'KLV' && item.balance > 0,
+          (item: ICollectionList) =>
+            item.label === 'KLV' && item.balance && item.balance > 0,
         ) && (
           <WarningContainer>
             <WarningIcon />
@@ -319,7 +346,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
           getAssets={getAssets}
           isDisabled={true}
           title={'Contract'}
-          zIndex={4}
+          zIndex={5}
           isModal={false}
         />
 

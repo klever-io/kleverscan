@@ -53,7 +53,6 @@ const FormInput: React.FC<IFormInputProps> = ({
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const areaRef = useRef<HTMLTextAreaElement>(null);
-
   const { fieldName, registerField, error } = useField(name);
 
   const inputProps = {

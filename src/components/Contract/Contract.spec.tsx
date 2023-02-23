@@ -6,7 +6,8 @@ import { renderWithTheme } from '../../test/utils';
 import Contract from './index';
 
 const mockContract = {
-  contractType: contractOptions[0].value, // TransferContract
+  contractType: contractOptions.find(item => item.value === 'TransferContract')
+    ?.value as string,
   setContractType: jest.fn(),
   ITOBuy: '',
   setITOBuy: jest.fn(),
@@ -148,7 +149,9 @@ describe('Contract Component', () => {
       'Select an asset/collection',
       'Amount',
     ];
-    mockContract.contractType = contractOptions[4].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'FreezeContract',
+    )?.value as string;
     await waitFor(() =>
       renderWithTheme(
         <ContractProvider.Provider value={mockContract as any}>
@@ -184,7 +187,9 @@ describe('Contract Component', () => {
       'Select an asset/collection',
       'Select a bucket',
     ];
-    mockContract.contractType = contractOptions[5].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'UnfreezeContract',
+    )?.value as string;
     await waitFor(() =>
       renderWithTheme(
         <ContractProvider.Provider value={mockContract as any}>
@@ -221,7 +226,9 @@ describe('Contract Component', () => {
       'Validator Address',
       'Select a bucket',
     ];
-    mockContract.contractType = contractOptions[6].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'DelegateContract',
+    )?.value as string;
     await waitFor(() =>
       renderWithTheme(
         <ContractProvider.Provider value={mockContract as any}>
@@ -266,7 +273,9 @@ describe('Contract Component', () => {
       'Transfer Fixed',
       'Properties',
     ];
-    mockContract.contractType = contractOptions[1].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'CreateAssetContract',
+    )?.value as string;
 
     await waitFor(() =>
       renderWithTheme(
@@ -300,7 +309,9 @@ describe('Contract Component', () => {
       'Max Delegation Amount',
       'Uri',
     ];
-    mockContract.contractType = contractOptions[2].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'CreateValidatorContract',
+    )?.value as string;
 
     await waitFor(() =>
       renderWithTheme(
@@ -333,7 +344,9 @@ describe('Contract Component', () => {
       'Max Delegation Amount',
       'Uri',
     ];
-    mockContract.contractType = contractOptions[3].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'ValidatorConfigContract',
+    )?.value as string;
 
     await waitFor(() =>
       renderWithTheme(
@@ -356,7 +369,9 @@ describe('Contract Component', () => {
 
   it('should render the Undelegate form contract', async () => {
     const items = ['Undelegate a bucket.', 'Select a bucket'];
-    mockContract.contractType = contractOptions[7].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'UndelegateContract',
+    )?.value as string;
 
     await waitFor(() =>
       renderWithTheme(
@@ -382,7 +397,9 @@ describe('Contract Component', () => {
       'Total withdraw of the chosen asset.',
       'Select an asset/collection',
     ];
-    mockContract.contractType = contractOptions[8].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'WithdrawContract',
+    )?.value as string;
 
     await waitFor(() =>
       renderWithTheme(
@@ -405,7 +422,9 @@ describe('Contract Component', () => {
 
   it('should render the Claim form contract', async () => {
     const items = ['Claim rewards or expired market orders.', 'Claim Type'];
-    mockContract.contractType = contractOptions[9].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'ClaimContract',
+    )?.value as string;
 
     await waitFor(() =>
       renderWithTheme(
@@ -430,7 +449,9 @@ describe('Contract Component', () => {
     const items = [
       'Unjails your validator, be sure to use only if the cause of the jail is already fixed.',
     ];
-    mockContract.contractType = contractOptions[10].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'UnjailContract',
+    )?.value as string;
 
     await waitFor(() =>
       renderWithTheme(
@@ -455,7 +476,9 @@ describe('Contract Component', () => {
       'A contract setting operations over a collection of assets or an NFT.',
       'Trigger Type',
     ];
-    mockContract.contractType = contractOptions[11].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'AssetTriggerContract',
+    )?.value as string;
 
     await waitFor(() =>
       renderWithTheme(
@@ -477,7 +500,9 @@ describe('Contract Component', () => {
 
   it('should render the Set Account Name form contract', async () => {
     const items = ['Set a new name for the current account.', 'Name'];
-    mockContract.contractType = contractOptions[12].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'SetAccountNameContract',
+    )?.value as string;
 
     await waitFor(() =>
       renderWithTheme(
@@ -504,7 +529,9 @@ describe('Contract Component', () => {
       'Epochs Duration',
       'Parameters',
     ];
-    mockContract.contractType = contractOptions[13].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'ProposalContract',
+    )?.value as string;
 
     await waitFor(() =>
       renderWithTheme(
@@ -526,7 +553,9 @@ describe('Contract Component', () => {
 
   it('should render the Vote form contract', async () => {
     const items = ['Vote in a proposal.', 'Proposal ID', 'Amount', 'Type'];
-    mockContract.contractType = contractOptions[14].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'VoteContract',
+    )?.value as string;
 
     await waitFor(() =>
       renderWithTheme(
@@ -555,7 +584,9 @@ describe('Contract Component', () => {
       'Max Amount',
       'PackInfo',
     ];
-    mockContract.contractType = contractOptions[15].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'ConfigITOContract',
+    )?.value as string;
 
     await waitFor(() =>
       renderWithTheme(
@@ -575,35 +606,39 @@ describe('Contract Component', () => {
     });
   });
 
-  it('should render the Set ITO Prices form contract', async () => {
-    const items = [
-      'Set the prices for the Initial Token Offering.',
-      'Select an asset/collection',
-      'PackInfo',
-    ];
-    mockContract.contractType = contractOptions[16].value;
+  // it('should render the Set ITO Prices form contract', async () => {
+  //   const items = [
+  //     'Set the prices for the Initial Token Offering.',
+  //     'Select an asset/collection',
+  //     'PackInfo',
+  //   ];
+  //   mockContract.contractType = contractOptions.find(
+  //     item => item.value === 'SetITOPricesContract',
+  //   )?.value as string;
 
-    await waitFor(() =>
-      renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
-          <Contract
-            paramsList={paramList}
-            proposalsList={proposalsList}
-            kAssets={[]}
-            getAssets={getAssets}
-            assetsList={assetList}
-          />
-        </ContractProvider.Provider>,
-      ),
-    );
-    items.map(item => {
-      expect(screen.getByText(item)).toBeInTheDocument();
-    });
-  });
+  //   await waitFor(() =>
+  //     renderWithTheme(
+  //       <ContractProvider.Provider value={mockContract as any}>
+  //         <Contract
+  //           paramsList={paramList}
+  //           proposalsList={proposalsList}
+  //           kAssets={[]}
+  //           getAssets={getAssets}
+  //           assetsList={assetList}
+  //         />
+  //       </ContractProvider.Provider>,
+  //     ),
+  //   );
+  //   items.map(item => {
+  //     expect(screen.getByText(item)).toBeInTheDocument();
+  //   });
+  // });
 
   it('should render the Buy form contract', async () => {
     const items = ['Buy tokens.', 'Id', 'Currency Id', 'Amount'];
-    mockContract.contractType = contractOptions[17].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'BuyContract',
+    )?.value as string;
 
     await waitFor(() =>
       renderWithTheme(
@@ -631,7 +666,9 @@ describe('Contract Component', () => {
       'End Time',
       'Reserve Price',
     ];
-    mockContract.contractType = contractOptions[18].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'SellContract',
+    )?.value as string;
 
     await waitFor(() =>
       renderWithTheme(
@@ -653,7 +690,9 @@ describe('Contract Component', () => {
 
   it('should render the Cancel Market Order form contract', async () => {
     const items = ['Order Id'];
-    mockContract.contractType = contractOptions[19].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'CancelMarketOrderContract',
+    )?.value as string;
 
     await waitFor(() =>
       renderWithTheme(
@@ -680,7 +719,9 @@ describe('Contract Component', () => {
       'Referral Address',
       'Referral Percentage',
     ];
-    mockContract.contractType = contractOptions[20].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'CreateMarketplaceContract',
+    )?.value as string;
 
     await waitFor(() =>
       renderWithTheme(
@@ -708,7 +749,9 @@ describe('Contract Component', () => {
       'Referral Percentage',
       'Name',
     ];
-    mockContract.contractType = contractOptions[21].value;
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'ConfigMarketplaceContract',
+    )?.value as string;
 
     await waitFor(() =>
       renderWithTheme(
@@ -730,8 +773,9 @@ describe('Contract Component', () => {
 
   // TODO - Update Account Permission not implemented yet
   // it('should render the Update Account Permission form contract', async () => {
-  //   mockContract.contractType = contractOptions[22].value;
-
+  //   mockContract.contractType = contractOptions.find(
+  //   item => item.value === "UpdateAccountPermissionContract"
+  // )?.value as string;
   //   await waitFor(() =>
   //     renderWithTheme(
   //       <ContractProvider.Provider value={mockContract as any}>

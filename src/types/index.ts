@@ -41,20 +41,17 @@ export interface ICollectionList {
   label: string;
   value: string;
   isNFT: boolean;
-  frozenBalance: number;
-  balance: number;
+  frozenBalance?: number;
+  balance?: number;
   precision?: number;
   buckets?: any[];
   minEpochsToWithdraw?: number | null;
   ownerAddress?: string;
-}
-
-export interface IKAssets {
-  label: string;
-  value: string;
   properties?: IAssetProperties;
-  isNFT: boolean;
-  isPaused: boolean;
+  attributes?: {
+    isPaused: boolean;
+    isNFTMintStopped: boolean;
+  };
 }
 
 export interface ICreateAssetReceipt {

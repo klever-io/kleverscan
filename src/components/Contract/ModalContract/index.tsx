@@ -1,6 +1,6 @@
 import { useExtension } from '@/contexts/extension';
 import api from '@/services/api';
-import { IAccountAsset, ICollectionList, IKAssets } from '@/types';
+import { IAccountAsset, IAssetResponse, ICollectionList } from '@/types';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
@@ -37,7 +37,7 @@ const ModalContract: React.FC<IModalContract> = ({
   setValueContract,
 }) => {
   const [assetsList, setAssetsLists] = useState<ICollectionList[]>([]);
-  const [kassetsList, setKAssetsList] = useState<IKAssets[]>([]);
+  const [kassetsList, setKAssetsList] = useState<ICollectionList[]>([]);
   const { extensionInstalled, connectExtension } = useExtension();
   const stakingRewardsType = {
     0: { label: 'Staking Claim (0)', value: 0 },
@@ -51,7 +51,7 @@ const ModalContract: React.FC<IModalContract> = ({
   }, [extensionInstalled]);
 
   const getKAssets = async (address: string) => {
-    const response: any = await api.get({
+    const response: IAssetResponse = await api.get({
       route: `assets/kassets`,
       query: {
         owner: address,
@@ -60,16 +60,15 @@ const ModalContract: React.FC<IModalContract> = ({
     });
     if (response.error) return;
 
-    const list: IKAssets[] = [];
+    const list: ICollectionList[] = [];
 
     if (response?.data?.assets?.length > 0) {
-      response.data.assets.forEach((item: any) => {
+      response.data.assets.forEach(item => {
         list.push({
+          ...item,
           label: item.assetId,
           value: item.assetId,
-          properties: item.properties,
           isNFT: item.assetType !== 'Fungible',
-          isPaused: item.attributes.isPaused,
         });
       });
 

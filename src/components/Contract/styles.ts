@@ -186,10 +186,6 @@ export const ExtraOptionContainer = styled.div`
     white-space: nowrap;
     text-overflow: ellipsis;
   }
-
-  svg:last-of-type {
-    margin-left: auto;
-  }
 `;
 
 export const SelectContainer = styled.div`

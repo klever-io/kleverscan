@@ -110,10 +110,6 @@ export const contractOptions: IContractOption[] = [
     value: 'ConfigITOContract',
   },
   {
-    label: 'Set ITO Prices',
-    value: 'SetITOPricesContract',
-  },
-  {
     label: 'Buy',
     value: 'BuyContract',
   },
@@ -134,6 +130,14 @@ export const contractOptions: IContractOption[] = [
     value: 'ConfigMarketplaceContract',
   },
   {
+    label: 'Deposit',
+    value: 'DepositContract',
+  },
+  {
+    label: 'ITO Trigger',
+    value: 'ITOTriggerContract',
+  },
+  {
     label: 'Update Account Permission',
     value: 'UpdateAccountPermissionContract',
   },
@@ -150,6 +154,17 @@ export const claimTypes = [
   {
     label: 'Market Claim (2)',
     value: 2,
+  },
+];
+
+export const withdrawTypes = [
+  {
+    label: 'Staking',
+    value: 0,
+  },
+  {
+    label: 'KDA Pool',
+    value: 1,
   },
 ];
 
@@ -221,6 +236,53 @@ export const assetTriggerTypes = [
   {
     label: 'Stop Royalties Change (16)',
     value: 16,
+  },
+  {
+    label: 'Stop NFT Metadata Change (17)',
+    value: 17,
+  },
+];
+
+export const ITOTriggerTypes = [
+  {
+    label: 'SET ITO Prices (0)',
+    value: 0,
+  },
+  {
+    label: 'Update Status (1)',
+    value: 1,
+  },
+  {
+    label: 'Update Receiver Address (2)',
+    value: 2,
+  },
+  {
+    label: 'Update Max Amount (3)',
+    value: 3,
+  },
+  {
+    label: 'Update Default Limit Per Address (4)',
+    value: 4,
+  },
+  {
+    label: 'Update Times (5)',
+    value: 5,
+  },
+  {
+    label: 'Update Whitelist Status (6)',
+    value: 6,
+  },
+  {
+    label: 'Add to Whitelist (7)',
+    value: 7,
+  },
+  {
+    label: 'Remove from Whitelist (8)',
+    value: 8,
+  },
+  {
+    label: 'Update Whitelist Times (9)',
+    value: 9,
   },
 ];
 

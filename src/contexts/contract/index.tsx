@@ -3,7 +3,14 @@ import { getType } from '@/components/Contract/utils';
 import { ISection } from '@/components/Form';
 import api from '@/services/api';
 import { ContractsIndex } from '@/types/contracts';
-import { ICollectionList, IKAssets } from '@/types/index';
+import {
+  IAccount,
+  IAccountResponse,
+  IAssetOne,
+  IAssetResponse,
+  ICollectionList,
+} from '@/types/index';
+import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useRouter } from 'next/router';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -19,6 +26,15 @@ export interface IFormsData {
   data: any;
   contractType: string;
   typeAssetTrigger: number | null;
+  collection?: ICollectionList;
+  proposalId: number | null;
+  binaryOperations: string[];
+  depositType: string | null;
+  withdrawType: number | null;
+  assetID: number;
+  itoTriggerType: number | null;
+  isNFT: boolean | undefined;
+  metadata: string;
 }
 
 interface IContractContext {
@@ -35,16 +51,13 @@ interface IContractContext {
   selectedIndex: number;
   formsData: IFormsData[];
   selectedBucket: string;
-  proposalId: number | null;
-  collection: any;
-  binaryOperations: any;
   assetID: number;
   buyKey: number;
   txLoading: boolean;
   showAdvancedOpts: boolean;
   txHash: string | null;
   assetsList: ICollectionList[] | null;
-  kassetsList: IKAssets[];
+  kassetsList: ICollectionList[];
   proposals: any;
   paramsList: any;
   showMultiContracts: boolean;
@@ -63,9 +76,6 @@ interface IContractContext {
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
   setFormsData: React.Dispatch<React.SetStateAction<any>>;
   setSelectedBucket: React.Dispatch<React.SetStateAction<string>>;
-  setProposalId: React.Dispatch<React.SetStateAction<number | null>>;
-  setCollection: React.Dispatch<React.SetStateAction<any>>;
-  setBinaryOperations: React.Dispatch<React.SetStateAction<any>>;
   setAssetID: React.Dispatch<React.SetStateAction<number>>;
   setBuyKey: React.Dispatch<React.SetStateAction<number>>;
   setTxLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -74,7 +84,7 @@ interface IContractContext {
   setAssetsLists: React.Dispatch<
     React.SetStateAction<ICollectionList[] | null>
   >;
-  setKAssetsList: React.Dispatch<React.SetStateAction<IKAssets[]>>;
+  setKAssetsList: React.Dispatch<React.SetStateAction<ICollectionList[]>>;
   setProposals: React.Dispatch<React.SetStateAction<any>>;
   setParamsList: React.Dispatch<React.SetStateAction<any>>;
   setShowMultiContracts: React.Dispatch<React.SetStateAction<boolean>>;
@@ -100,9 +110,6 @@ export const ContractProvider: React.FC = ({ children }) => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [formsData, setFormsData] = useState<IFormsData[]>([]);
   const [selectedBucket, setSelectedBucket] = useState<any>([]);
-  const [proposalId, setProposalId] = useState<number | null>(null);
-  const [collection, setCollection] = useState<any>({});
-  const [binaryOperations, setBinaryOperations] = useState([]);
   const [assetID, setAssetID] = useState(0);
   const [buyKey, setBuyKey] = useState(0);
   const [txLoading, setTxLoading] = useState<boolean>(false);
@@ -111,7 +118,7 @@ export const ContractProvider: React.FC = ({ children }) => {
   const [showPayload, setShowPayload] = useState(false);
   const [isMultisig, setIsMultisig] = useState(false);
   const [assetsList, setAssetsLists] = useState<ICollectionList[] | null>(null);
-  const [kassetsList, setKAssetsList] = useState<IKAssets[]>([]);
+  const [kassetsList, setKAssetsList] = useState<ICollectionList[]>([]);
   const [proposals, setProposals] = useState<any>([]);
   const [paramsList, setParamsList] = useState<any>([]);
   const [showMultiContracts, setShowMultiContracts] = useState<boolean>(false);
@@ -120,7 +127,7 @@ export const ContractProvider: React.FC = ({ children }) => {
   const router = useRouter();
 
   const getKAssets = async (address: string) => {
-    const response: any = await api.get({
+    const response: IAssetResponse = await api.get({
       route: `assets/kassets`,
       query: {
         owner: address,
@@ -129,16 +136,15 @@ export const ContractProvider: React.FC = ({ children }) => {
     });
     if (response.error) return;
 
-    const list: IKAssets[] = [];
+    const list: ICollectionList[] = [];
 
     if (response?.data?.assets?.length > 0) {
-      response.data.assets.forEach((item: any) => {
+      response.data.assets.forEach(item => {
         list.push({
+          ...item,
           label: item.assetId,
           value: item.assetId,
-          properties: item.properties,
           isNFT: item.assetType !== 'Fungible',
-          isPaused: item.attributes.isPaused,
         });
       });
 
@@ -165,7 +171,7 @@ export const ContractProvider: React.FC = ({ children }) => {
 
       getKAssets(address);
 
-      const account: any = await api.get({
+      const account: IAccountResponse = await api.get({
         route: `address/${address}`,
       });
 
@@ -177,7 +183,7 @@ export const ContractProvider: React.FC = ({ children }) => {
         return;
       }
 
-      const accountData = account?.data?.account
+      const accountData: IAccount = account?.data?.account
         ? account.data.account
         : {
             assets: [],
@@ -188,33 +194,26 @@ export const ContractProvider: React.FC = ({ children }) => {
       const { assets, frozenBalance, balance } = accountData;
       const list: ICollectionList[] = [];
       const addAssetsInfo = Object.keys(assets).map(async item => {
-        const assetInfo: any = await api.get({
+        const assetInfo: IAssetOne = await api.get({
           route: `assets/${item}`,
         });
 
         const minEpochsToWithdraw =
           assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
-        const ownerAddress = assetInfo.data?.asset?.ownerAddress;
-        const { assetType, frozenBalance, balance, precision, buckets } =
-          account.data.account.assets[item];
 
         list.push({
+          ...assets[item],
           label: item,
           value: item,
-          isNFT: assetType === 1,
-          balance,
-          frozenBalance,
-          precision,
-          buckets,
+          isNFT: assets[item].assetType === 1,
           minEpochsToWithdraw: minEpochsToWithdraw ? minEpochsToWithdraw : null,
-          ownerAddress,
         });
       });
 
       await Promise.all(addAssetsInfo);
 
       if (!Object.keys(assets).includes('KLV') && balance !== 0) {
-        const assetInfo: any = await api.get({
+        const assetInfo: IAssetOne = await api.get({
           route: `assets/KLV`,
         });
 
@@ -224,12 +223,11 @@ export const ContractProvider: React.FC = ({ children }) => {
         list.push({
           label: 'KLV',
           value: 'KLV',
+          precision: KLV_PRECISION,
           isNFT: false,
-          balance,
-          frozenBalance: frozenBalance ? frozenBalance : 0,
-          precision: 6,
-          buckets: [],
           minEpochsToWithdraw: minEpochsToWithdraw ? minEpochsToWithdraw : null,
+          balance,
+          frozenBalance,
         });
       }
       list.sort((a, b) => (a.label > b.label ? 1 : -1));
@@ -302,7 +300,6 @@ export const ContractProvider: React.FC = ({ children }) => {
     setFormsData([]);
     setSelectedIndex(0);
     setTxLoading(false);
-    setTxHash('');
   };
 
   useEffect(() => {
@@ -336,12 +333,6 @@ export const ContractProvider: React.FC = ({ children }) => {
     setFormsData,
     selectedBucket,
     setSelectedBucket,
-    proposalId,
-    setProposalId,
-    collection,
-    setCollection,
-    binaryOperations,
-    setBinaryOperations,
     assetID,
     setAssetID,
     buyKey,

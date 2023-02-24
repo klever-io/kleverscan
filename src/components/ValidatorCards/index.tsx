@@ -1,4 +1,5 @@
 import { ArrowGreen, ArrowPink } from '@/assets/icons';
+import { KLV_PRECISION } from '@/utils/globalVariables';
 import { getAge } from '@/utils/index';
 import {
   AllSmallCardsContainer,
@@ -30,11 +31,12 @@ import {
 import { fromUnixTime } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import Chart, { ChartType } from '../Chart';
+import Skeleton from '../Skeleton';
 
 interface IValidatorCards {
-  totalStake: number;
-  commission: number;
-  maxDelegation: number;
+  totalStake: number | undefined;
+  commission: number | undefined;
+  maxDelegation: number | undefined;
 }
 
 const ValidatorCards: React.FC<IValidatorCards> = ({
@@ -42,9 +44,8 @@ const ValidatorCards: React.FC<IValidatorCards> = ({
   commission,
   maxDelegation,
 }) => {
-  const precision = 6; // default KLV precision
-  const commissionPercent = commission / 10 ** 2;
-  const votersPercent = 100 - commission / 10 ** 2;
+  const commissionPercent = (commission || 0) / 10 ** 2;
+  const votersPercent = 100 - (commission || 0) / 10 ** 2;
   const rotationPercent = (votersPercent * 180) / 10 ** 2;
   // mocked data:
   const data = [
@@ -61,7 +62,9 @@ const ValidatorCards: React.FC<IValidatorCards> = ({
   ];
   const percentVotes = '+3.75%';
   const stakedPercent =
-    (maxDelegation <= 0 ? 100 : totalStake / maxDelegation) * 100;
+    ((maxDelegation || 0) <= 0
+      ? 100
+      : (totalStake || 0) / (maxDelegation || 1)) * 100;
 
   const uptime = new Date().getTime();
   const [age, setAge] = useState(
@@ -81,84 +84,98 @@ const ValidatorCards: React.FC<IValidatorCards> = ({
   }, []);
   return (
     <AllSmallCardsContainer>
-      <Card marginLeft>
-        <CardWrapper>
-          <VotesHeader>
+      {typeof totalStake === 'number' ? (
+        <Card marginLeft>
+          <CardWrapper>
+            <VotesHeader>
+              <span>
+                <strong>Current Delegations</strong>
+              </span>
+              <span>
+                <p>{`${age} ago`}</p>
+              </span>
+            </VotesHeader>
+          </CardWrapper>
+          <RewardsChart>
+            <RewardsChartContent>
+              <Chart type={ChartType.Area} data={data} />
+            </RewardsChartContent>
+            <VotesFooter>
+              <span>{(totalStake / 10 ** KLV_PRECISION).toLocaleString()}</span>
+              <span>
+                <strong>{percentVotes}</strong>
+              </span>
+            </VotesFooter>
+          </RewardsChart>
+        </Card>
+      ) : (
+        <Skeleton width={'100%'} height={150} />
+      )}
+      {typeof commission === 'number' ? (
+        <RewardsCard marginLeft marginRight>
+          <RewardsCardHeader>
             <span>
-              <strong>Current Delegations</strong>
+              <strong>Reward Distribution Ratio</strong>
+            </span>
+          </RewardsCardHeader>
+          <CardSubHeader>
+            <span>
+              <strong>Voters</strong>
             </span>
             <span>
-              <p>{`${age} ago`}</p>
+              <strong>Commission</strong>
             </span>
-          </VotesHeader>
-        </CardWrapper>
-        <RewardsChart>
-          <RewardsChartContent>
-            <Chart type={ChartType.Area} data={data} />
-          </RewardsChartContent>
-          <VotesFooter>
-            <span>{(totalStake / 10 ** precision).toLocaleString()}</span>
-            <span>
-              <strong>{percentVotes}</strong>
-            </span>
-          </VotesFooter>
-        </RewardsChart>
-      </Card>
-      <RewardsCard marginLeft marginRight>
-        <RewardsCardHeader>
-          <span>
-            <strong>Reward Distribution Ratio</strong>
-          </span>
-        </RewardsCardHeader>
-        <CardSubHeader>
-          <span>
-            <strong>Voters</strong>
-          </span>
-          <span>
-            <strong>Commission</strong>
-          </span>
-        </CardSubHeader>
-        <RewardCardContentWrapper>
-          <ContainerVotes>
-            <SubContainerVotes>
+          </CardSubHeader>
+          <RewardCardContentWrapper>
+            <ContainerVotes>
+              <SubContainerVotes>
+                <ContainerPerCentArrow>
+                  <ArrowGreen />
+                  <VotersPercent>{votersPercent}%</VotersPercent>
+                </ContainerPerCentArrow>
+              </SubContainerVotes>
+            </ContainerVotes>
+            <ContainerCircle>
+              <HalfCirclePie rotation={`${rotationPercent}deg`}>
+                <PieData></PieData>
+                <PieData></PieData>
+              </HalfCirclePie>
+            </ContainerCircle>
+            <ContainerRewards>
               <ContainerPerCentArrow>
-                <ArrowGreen />
-                <VotersPercent>{votersPercent}%</VotersPercent>
+                <ArrowPink />
+                <CommissionPercent>{commissionPercent}%</CommissionPercent>
               </ContainerPerCentArrow>
-            </SubContainerVotes>
-          </ContainerVotes>
-          <ContainerCircle>
-            <HalfCirclePie rotation={`${rotationPercent}deg`}>
-              <PieData></PieData>
-              <PieData></PieData>
-            </HalfCirclePie>
-          </ContainerCircle>
-          <ContainerRewards>
-            <ContainerPerCentArrow>
-              <ArrowPink />
-              <CommissionPercent>{commissionPercent}%</CommissionPercent>
-            </ContainerPerCentArrow>
-          </ContainerRewards>
-        </RewardCardContentWrapper>
-      </RewardsCard>
-      <Card marginRight>
-        <CardHeader>
-          <span>
-            <strong>Delegated</strong>
-          </span>
-          <p>{`(Updated: ${age} ago)`}</p>
-        </CardHeader>
-        <EmptyProgressBar>
-          <ProgressContent percent={maxDelegation === 0 ? 0 : stakedPercent}>
-            <StakedIndicator percent={maxDelegation === 0 ? 0 : stakedPercent}>
-              {(totalStake / 10 ** precision).toLocaleString()}
-            </StakedIndicator>
-          </ProgressContent>
-          <PercentIndicator percent={maxDelegation === 0 ? 0 : stakedPercent}>
-            <p>{maxDelegation === 0 ? 0 : stakedPercent?.toFixed(0)}%</p>
-          </PercentIndicator>
-        </EmptyProgressBar>
-      </Card>
+            </ContainerRewards>
+          </RewardCardContentWrapper>
+        </RewardsCard>
+      ) : (
+        <Skeleton width={'100%'} height={150} />
+      )}
+      {typeof maxDelegation === 'number' && typeof totalStake === 'number' ? (
+        <Card marginRight>
+          <CardHeader>
+            <span>
+              <strong>Delegated</strong>
+            </span>
+            <p>{`(Updated: ${age} ago)`}</p>
+          </CardHeader>
+          <EmptyProgressBar>
+            <ProgressContent percent={maxDelegation === 0 ? 0 : stakedPercent}>
+              <StakedIndicator
+                percent={maxDelegation === 0 ? 0 : stakedPercent}
+              >
+                {(totalStake / 10 ** KLV_PRECISION).toLocaleString()}
+              </StakedIndicator>
+            </ProgressContent>
+            <PercentIndicator percent={maxDelegation === 0 ? 0 : stakedPercent}>
+              <p>{maxDelegation === 0 ? 0 : stakedPercent?.toFixed(0)}%</p>
+            </PercentIndicator>
+          </EmptyProgressBar>
+        </Card>
+      ) : (
+        <Skeleton width={'100%'} height={150} />
+      )}
     </AllSmallCardsContainer>
   );
 };

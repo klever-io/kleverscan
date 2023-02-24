@@ -4,10 +4,10 @@ import { ITable } from '@/components/Table';
 import { CustomLink } from '@/components/Table/styles';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
-import { INfts, IPagination, IResponse, IRowSection } from '@/types/index';
+import { INfts, IPagination, IRowSection } from '@/types/index';
 import { parseAddress } from '@/utils/index';
-import { GetServerSideProps } from 'next';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 interface ICollectionPage {
@@ -17,30 +17,28 @@ interface ICollectionPage {
   collectionAsset: string;
 }
 
-interface ICollectionResponse extends IResponse {
-  data: {
-    collection: INfts[];
-  };
-  pagination: IPagination;
-}
-
-const Collection: React.FC<ICollectionPage> = ({
-  pagination,
-  address,
-  collectionAsset,
-}) => {
-  // initialCollection
+const Collection: React.FC<ICollectionPage> = () => {
   const header = ['ID', 'Collection Name', 'Collection Id', 'Address', ''];
   const [isTablet, setIsTablet] = useState(false);
+  const [address, setAddress] = useState<null | string>(null);
+  const [collection, setCollection] = useState<null | string>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const tabletWindow = window.innerWidth <= 1025 && window.innerWidth >= 769;
     setIsTablet(tabletWindow);
   });
 
+  useEffect(() => {
+    if (router.isReady) {
+      setAddress(router.query.account as string);
+      setCollection(router.query.collection as string);
+    }
+  }, [router.isReady]);
+
   const requestCollection = (page: number, limit: number) =>
     api.getCached({
-      route: `address/${address}/collection/${collectionAsset}?page=${page}&limit=${limit}`,
+      route: `address/${address}/collection/${collection}?page=${page}&limit=${limit}`,
     });
 
   const { isMobile } = useMobile();
@@ -95,7 +93,6 @@ const Collection: React.FC<ICollectionPage> = ({
     header,
     rowSections,
     scrollUp: true,
-    totalPages: pagination?.totalPages || 1,
     dataName: 'collection',
     request: (page: number, limit: number) => requestCollection(page, limit),
   };
@@ -104,27 +101,11 @@ const Collection: React.FC<ICollectionPage> = ({
     title: 'NFT Collection',
     headerIcon: Icon,
     cards: undefined,
-    paginationCount: pagination?.totalPages || 1,
     tableProps,
     route: `/account/${address}`,
   };
 
-  return <Detail {...detailProps} />;
-};
-
-export const getServerSideProps: GetServerSideProps<ICollectionPage> = async ({
-  params,
-}: any) => {
-  const { account: address, collection } = params;
-  const props: ICollectionPage = {
-    collection: [],
-    pagination: {} as IPagination,
-    address: '',
-    collectionAsset: collection,
-  };
-  props.address = address;
-
-  return { props };
+  return <>{address && collection && <Detail {...detailProps} />}</>;
 };
 
 export default Collection;

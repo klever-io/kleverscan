@@ -1,16 +1,17 @@
 import { Accounts as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
+import Skeleton from '@/components/Skeleton';
 import Table, { ITable } from '@/components/Table';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import { IAccount, IPagination, IResponse, IRowSection } from '@/types/index';
+import { KLV_PRECISION } from '@/utils/globalVariables';
 import { formatAmount, getAge, parseAddress } from '@/utils/index';
 import { TableContainer } from '@/views/accounts';
 import { CenteredRow } from '@/views/accounts/detail';
 import { Card, CardContainer, Container, Header, Input } from '@/views/blocks';
 import { fromUnixTime } from 'date-fns';
-import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
@@ -40,26 +41,82 @@ interface IAccountRangeOfLastDays extends IResponse {
 interface ICard {
   title: string;
   headers: string[];
-  values: string[];
+  values: Array<string | JSX.Element>;
 }
 
-const Accounts: React.FC<IAccounts> = ({ pagination, createdYesterday }) => {
-  const precision = 6; // default KLV precision
-
+const Accounts: React.FC<IAccounts> = () => {
+  const [pagination, setPagination] = useState<null | IPagination>(null);
+  const [createdYesterday, setCreatedYesterday] = useState<null | number>(null);
   const requestAccounts = async (page: number, limit: number) =>
     await api.get({
       route: `address/list?page=${page}&limit=${limit}`,
     });
+
+  const loadInitialData = async () => {
+    const accountsCall = new Promise<IAccountResponse>(
+      async (resolve, reject) => {
+        const res = await api.get({
+          route: 'address/list',
+        });
+
+        if (!res.error || res.error === '') {
+          resolve(res);
+        }
+
+        reject(res.error);
+      },
+    );
+
+    const yesterdayAccountsCall = new Promise<IAccountRangeOfLastDays>(
+      async (resolve, reject) => {
+        const res = await api.get({
+          route: 'address/list/count/1',
+        });
+
+        if (!res.error || res.error === '') {
+          resolve(res);
+        }
+
+        reject(res.error);
+      },
+    );
+
+    await Promise.allSettled([accountsCall, yesterdayAccountsCall]).then(
+      responses => {
+        responses.map((res, index) => {
+          if (res.status !== 'rejected') {
+            const { value }: any = res;
+            switch (index) {
+              case 0:
+                setPagination(value.pagination);
+                break;
+
+              case 1:
+                setCreatedYesterday(value.data.number_by_day[0]?.doc_count);
+                break;
+
+              default:
+                break;
+            }
+          }
+        });
+      },
+    );
+  };
+
+  useEffect(() => {
+    loadInitialData();
+  }, []);
 
   const cards: ICard[] = [
     {
       title: 'Number of Accounts',
       headers: ['Accounts created in the last 24h', 'Total accounts'],
       values: [
-        createdYesterday === pagination.totalRecords
+        createdYesterday === pagination?.totalRecords
           ? '--'
-          : createdYesterday.toLocaleString(),
-        pagination.totalRecords?.toLocaleString(),
+          : createdYesterday?.toLocaleString() ?? <Skeleton />,
+        pagination?.totalRecords?.toLocaleString() ?? <Skeleton />,
       ],
     },
   ];
@@ -129,7 +186,7 @@ const Accounts: React.FC<IAccounts> = ({ pagination, createdYesterday }) => {
       {
         element: (
           <strong key={frozenBalance}>
-            {formatAmount(frozenBalance / 10 ** precision)} KLV
+            {formatAmount(frozenBalance / 10 ** KLV_PRECISION)} KLV
           </strong>
         ),
         span: 1,
@@ -141,7 +198,7 @@ const Accounts: React.FC<IAccounts> = ({ pagination, createdYesterday }) => {
       {
         element: (
           <strong key={balance}>
-            {formatAmount(balance / 10 ** precision)} KLV
+            {formatAmount(balance / 10 ** KLV_PRECISION)} KLV
           </strong>
         ),
         span: 1,
@@ -179,66 +236,6 @@ const Accounts: React.FC<IAccounts> = ({ pagination, createdYesterday }) => {
       </TableContainer>
     </Container>
   );
-};
-
-export const getServerSideProps: GetServerSideProps<IAccounts> = async () => {
-  const props: IAccounts = {
-    accounts: [],
-    pagination: {} as IPagination,
-    createdYesterday: 0,
-  };
-
-  const accountsCall = new Promise<IAccountResponse>(
-    async (resolve, reject) => {
-      const res = await api.get({
-        route: 'address/list',
-      });
-
-      if (!res.error || res.error === '') {
-        resolve(res);
-      }
-
-      reject(res.error);
-    },
-  );
-
-  const yesterdayAccountsCall = new Promise<IAccountRangeOfLastDays>(
-    async (resolve, reject) => {
-      const res = await api.get({
-        route: 'address/list/count/1',
-      });
-
-      if (!res.error || res.error === '') {
-        resolve(res);
-      }
-
-      reject(res.error);
-    },
-  );
-
-  await Promise.allSettled([accountsCall, yesterdayAccountsCall]).then(
-    responses => {
-      responses.map((res, index) => {
-        if (res.status !== 'rejected') {
-          const { value }: any = res;
-          switch (index) {
-            case 0:
-              props.pagination = value.pagination;
-              break;
-
-            case 1:
-              props.createdYesterday = value.data.number_by_day[0]?.doc_count;
-              break;
-
-            default:
-              break;
-          }
-        }
-      });
-    },
-  );
-
-  return { props };
 };
 
 export default Accounts;

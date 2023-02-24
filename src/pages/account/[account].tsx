@@ -190,7 +190,7 @@ export const getRequestAssets = (
             address: asset.ownerAddress,
             assetId: asset.assetId,
             assetName: asset.name,
-            assetType: asset.assetType,
+            assetType: asset.assetType === 'Fungible' ? 0 : 1,
             precision: asset.precision,
             balance: 0,
             frozenBalance: 0,

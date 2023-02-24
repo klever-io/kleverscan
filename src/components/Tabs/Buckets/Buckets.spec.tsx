@@ -164,6 +164,6 @@ describe('Component: Buckets Tab', () => {
 
     expect(link).toBeInTheDocument();
     expect(link).toBeVisible();
-    expect(link).toHaveAttribute('href', `/account/${delegationAddress}`);
+    expect(link).toHaveAttribute('href', `/validator/${delegationAddress}`);
   });
 });

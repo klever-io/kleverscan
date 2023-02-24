@@ -147,6 +147,7 @@ const Buckets: React.FC<IBuckets> = ({
         );
       }
     };
+
     const sections = [
       {
         element: (
@@ -210,7 +211,7 @@ const Buckets: React.FC<IBuckets> = ({
           <>
             {bucket.delegation.length > 0 ? (
               <>
-                <Link href={`/account/${bucket.delegation}`}>
+                <Link href={`/validator/${bucket.delegation}`}>
                   <a>{parseAddress(bucket.delegation, 22)}</a>
                 </Link>
               </>

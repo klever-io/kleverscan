@@ -5,6 +5,7 @@ import { exportToCsv } from '@/utils/index';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
+import { IoReloadSharp } from 'react-icons/io5';
 import { TbTableExport } from 'react-icons/tb';
 import { Loader } from '../Loader/styles';
 // import { VscJson } from 'react-icons/vsc';
@@ -24,12 +25,14 @@ import {
   ExportLabel,
   FloatContainer,
   Header,
+  IoReloadSharpWrapper,
   ITableType,
   ItemContainer,
   LimitContainer,
   LimitText,
   MobileCardItem,
   MobileHeader,
+  RetryContainer,
   Row,
 } from './styles';
 
@@ -201,6 +204,13 @@ const Table: React.FC<ITable> = ({
                 </ButtonsContainer>
               </ExportContainer>
             )}
+            <IoReloadSharpWrapper onClick={() => fetchData()} loading={loading}>
+              <Tooltip
+                msg="Refresh"
+                customStyles={{ delayShow: 800 }}
+                Component={() => <IoReloadSharp size={32} />}
+              ></Tooltip>
+            </IoReloadSharpWrapper>
             <LimitContainer>
               <span>Per page</span>
               <LimitText>
@@ -288,10 +298,17 @@ const Table: React.FC<ITable> = ({
                 );
               })}
           </Body>
+
           {!loading && (!items || items?.length === 0) && (
-            <EmptyRow {...props}>
-              <p>Oops! Apparently no data here.</p>
-            </EmptyRow>
+            <>
+              <RetryContainer onClick={() => fetchData()} loading={loading}>
+                <span>Retry</span>
+                <IoReloadSharp size={20} />
+              </RetryContainer>
+              <EmptyRow {...props}>
+                <p>Oops! Apparently no data here.</p>
+              </EmptyRow>
+            </>
           )}
         </Container>
         <BackTopButton onClick={handleScrollTop} isHidden={scrollTop}>

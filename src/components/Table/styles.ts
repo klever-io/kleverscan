@@ -1,5 +1,5 @@
 import { transparentize } from 'polished';
-import styled, { css } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 import widths from './widths';
 
 interface IStatus {
@@ -348,7 +348,7 @@ export const FloatContainer = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
 `;
 
 export const LimitContainer = styled.div`
@@ -362,7 +362,7 @@ export const LimitContainer = styled.div`
   border-radius: 7px;
   background-color: ${props => props.theme.white};
   padding: 5px;
-  margin-left: auto;
+  /* margin-left: auto; */
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     margin-bottom: 10px;
   }
@@ -508,5 +508,53 @@ export const BackTopButton = styled.span<{ isHidden: boolean }>`
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     right: 0.8rem;
+  }
+`;
+
+const rotate = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+export const IoReloadSharpWrapper = styled.div<{
+  loading: boolean;
+}>`
+  margin-left: auto;
+  margin-right: 0.5rem;
+  position: relative;
+  float: right;
+  height: fit-content;
+  width: fit-content;
+  align-items: center;
+  cursor: pointer;
+  svg {
+    margin-top: 0.3rem;
+    margin-left: auto;
+    color: ${props =>
+      props.theme.dark ? props.theme.black : props.theme.darkText};
+    animation: ${props => (props.loading ? rotate : 'none')} 1s linear infinite;
+  }
+`;
+
+export const RetryContainer = styled.div<{
+  loading: boolean;
+}>`
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  svg {
+    margin-left: 0.2rem;
+    color: ${props =>
+      props.theme.dark ? props.theme.black : props.theme.darkText};
+    animation: ${props => (props.loading ? rotate : 'none')} 1s linear infinite;
+  }
+
+  span {
+    color: ${props => props.theme.black};
   }
 `;

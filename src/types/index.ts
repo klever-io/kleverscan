@@ -740,6 +740,7 @@ export type Place = 'top' | 'right' | 'bottom' | 'left';
 export interface ICustomStyles {
   offset?: IOffset;
   place?: Place;
+  delayShow?: number;
 }
 
 export interface IPrecisionResponse {

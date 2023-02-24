@@ -7,8 +7,9 @@ interface IValidatorsProps {
 }
 
 const Validators: React.FC<IValidatorsProps> = props => {
+  const validators = props.validators;
   const requestBlockValidators = new Promise(resolve => {
-    resolve({ data: { blockValidatorList: props.validators } });
+    resolve({ data: { blockValidatorList: validators } });
   });
   const rowSections = (validatorHash: ITransaction): IRowSection[] => {
     const sections = [

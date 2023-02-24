@@ -139,6 +139,11 @@ const PermissionsForm: React.FC<IPermissionsForm> = ({
               title="Type"
               name={`permissions[${index}].type`}
               span={2}
+              type="dropdown"
+              options={[
+                { value: 0, label: 'Owner (0)' },
+                { value: 1, label: 'User (1)' },
+              ]}
             />
             {getSigners(index, itemsQuantity)}
           </FormSection>

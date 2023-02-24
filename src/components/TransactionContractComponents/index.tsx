@@ -598,7 +598,7 @@ export const ValidatorConfig: React.FC<IIndexedContract> = ({
         <RowContent>
           <BalanceContainer>
             <FrozenContainer>
-              {parameter.uris.map(
+              {parameter.uris?.map(
                 ({ key, value }: { key: string; value: string }) => (
                   <div key={key}>
                     <span>
@@ -2215,7 +2215,7 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerContract> = (
       <RowContent>
         <BalanceContainer>
           <FrozenContainer>
-            {par?.uris.map((uri: IURIs, index: number) => (
+            {par?.uris?.map((uri: IURIs, index: number) => (
               <URIsWrapper key={index}>
                 <section>
                   <span>{uri.key}</span>

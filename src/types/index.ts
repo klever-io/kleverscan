@@ -203,7 +203,6 @@ export interface IAssetsBuckets {
 }
 
 export interface IHolders {
-  holders: IBalance[];
   asset: IAsset;
   holdersTableProps: IInnerTableProps;
 }

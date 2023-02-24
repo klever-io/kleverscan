@@ -36,12 +36,7 @@ import {
   Service,
 } from '@/types/index';
 import { KLV_PRECISION, UINT32_MAX } from '@/utils/globalVariables';
-import {
-  filterDate,
-  getPrecision,
-  getSelectedTab,
-  resetDate,
-} from '@/utils/index';
+import { filterDate, getPrecision, resetDate } from '@/utils/index';
 import {
   AmountContainer,
   BalanceContainer,
@@ -272,6 +267,7 @@ export const getRequestBuckets = (
 };
 
 const Account: React.FC<IAccountPage> = () => {
+  const headers = ['Assets', 'Transactions', 'Buckets'];
   const [account, setAccount] = useState<IAccount | null>(null);
   const [priceKLV, setPriceKLV] = useState<number>(0);
   const [KLVAllowance, setKLVAllowance] = useState<IAllowanceResponse>(
@@ -285,7 +281,7 @@ const Account: React.FC<IAccountPage> = () => {
     useState<boolean>(false);
   const [titleModal, setTitleModal] = useState<string>('');
   const [stakingRewards, setStakingRewards] = useState<number>(0);
-  const [selectedTab, setSelectedTab] = useState<string>();
+  const [selectedTab, setSelectedTab] = useState<null | string>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [contractValue, setContractValue] = useState<string>('');
   const [collectionSelected, setCollectionSelected] = useState<IAccountAsset>();
@@ -297,7 +293,6 @@ const Account: React.FC<IAccountPage> = () => {
   const initialQueryState = {
     ...router.query,
   };
-  const headers = ['Assets', 'Transactions', 'Buckets'];
 
   const setQueryAndRouter = (newQuery: NextParsedUrlQuery) => {
     router.push({ pathname: router.pathname, query: newQuery }, undefined, {
@@ -307,7 +302,7 @@ const Account: React.FC<IAccountPage> = () => {
 
   useEffect(() => {
     if (!router.isReady) return;
-    setSelectedTab(headers[getSelectedTab(router.query?.tab)]);
+    setSelectedTab((router.query.tab as string) || headers[0]);
     setQueryAndRouter(initialQueryState);
   }, [router.isReady]);
 

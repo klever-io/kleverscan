@@ -3,6 +3,7 @@ import { ISelectedDays } from '@/components/DateFilter';
 import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import QrCodeModal from '@/components/QrCodeModal';
+import Skeleton from '@/components/Skeleton';
 import { EmptyRow } from '@/components/Table/styles';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Holders from '@/components/Tabs/Holders';
@@ -46,10 +47,10 @@ import {
 } from '@/views/assets/detail';
 import { BalanceContainer, RowContent } from '@/views/proposals/detail';
 import { ReceiveBackground } from '@/views/validator';
-import { GetServerSideProps } from 'next';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 interface IAssetPage {
   asset: IAsset;
@@ -82,106 +83,171 @@ interface ITransactionResponse extends IResponse {
   pagination: IPagination;
 }
 
-const Asset: React.FC<IAssetPage> = ({
-  asset,
-  totalTransactions,
-  holders,
-  totalHoldersPage,
-  totalTransactionsPage,
-  totalRecords,
-  page,
-}) => {
-  const {
-    name,
-    logo,
-    ticker,
-    assetId,
-    assetType,
-    issueDate,
-    ownerAddress,
-    precision,
-    maxSupply,
-    initialSupply,
-    circulatingSupply,
-    burnedValue,
-    staking,
-    properties,
-    attributes,
-    verified,
-    royalties,
-  } = asset;
-
-  let uris = {};
-
-  if (asset.uris && asset.uris.length > 0) {
-    (asset.uris as IUri[]).forEach(uri => {
-      uris = {
-        ...uris,
-        [uri.key]: uri.value,
-      };
-    });
-  }
-
-  const cardHeaders = uris
+const Asset: React.FC<IAssetPage> = ({}) => {
+  const router = useRouter();
+  const tableHeaders = ['Transactions', 'Holders'];
+  const [selectedTab, setSelectedTab] = useState<null | string>(null);
+  const [asset, setAsset] = useState<null | IAsset>(null);
+  const [transactionsPagination, setTransactionsPagination] =
+    useState<null | IPagination>(null);
+  const [holdersPagination, setHoldersPagination] =
+    useState<null | IPagination>(null);
+  const cardHeaders = asset?.uris
     ? ['Overview', 'More', 'URIS', 'Staking & Royalties']
     : ['Overview', 'More'];
-  const tableHeaders = ['Transactions', 'Holders'];
-
-  const router = useRouter();
-
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
-  const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
-  const [query, setQuery] = useState(router.query);
 
-  useEffect(() => {
-    router.push({ pathname: router.pathname, query }, undefined, {
+  const initialQueryState = {
+    ...router.query,
+  };
+  const setQueryAndRouter = (newQuery: NextParsedUrlQuery) => {
+    router.push({ pathname: router.pathname, query: newQuery }, undefined, {
       shallow: true,
     });
-  }, [query]);
+  };
+
+  useEffect(() => {
+    if (router?.isReady) {
+      setQueryAndRouter(initialQueryState);
+      setSelectedTab((router.query.tab as string) || tableHeaders[0]);
+    }
+  }, [router.isReady]);
 
   const requestTransactions = async (page: number, limit: number) => {
-    const newQuery = { ...query, asset: asset.assetId };
+    const newQuery = { ...router.query, asset: asset?.assetId || '' };
     return await api.get({
       route: `transaction/list`,
       query: { page, limit, ...newQuery },
     });
   };
 
+  const parseURIs = (asset: IAsset) => {
+    let uris = {};
+    if (asset.uris && asset.uris.length > 0) {
+      (asset.uris as IUri[]).forEach(uri => {
+        uris = {
+          ...uris,
+          [uri.key]: uri.value,
+        };
+      });
+      asset.uris = uris;
+    }
+  };
+
   const filterQueryDate = (selectedDays: ISelectedDays) => {
     const getFilteredDays = filterDate(selectedDays);
-    setQuery({ ...query, ...getFilteredDays });
+    setQueryAndRouter({ ...router.query, ...getFilteredDays });
   };
 
   const resetQueryDate = () => {
-    setQuery(resetDate(query));
+    const newQuery = resetDate(router.query);
+    setQueryAndRouter({ ...router.query, ...newQuery });
   };
 
   const requestAssetHolders = async (page: number, limit: number) => {
-    const response = await api.get({
-      route: `assets/holders/${asset.assetId}?page=${page}&limit=${limit}`,
-    });
+    if (asset) {
+      const response = await api.get({
+        route: `assets/holders/${asset.assetId}?page=${page}&limit=${limit}`,
+      });
 
-    let parsedHolders: IBalance[] = [];
-    if (!response.error) {
-      const holders = response.data.accounts;
-      parsedHolders = parseHolders(holders, asset.assetId, response.pagination);
+      let parsedHolders: IBalance[] = [];
+      if (!response.error) {
+        const holders = response.data.accounts;
+        parsedHolders = parseHolders(
+          holders,
+          asset.assetId,
+          response.pagination,
+        );
+      }
+
+      return { ...response, data: { accounts: parsedHolders } };
     }
-
-    return { ...response, data: { accounts: parsedHolders } };
+    return { data: { accounts: [] } };
   };
 
+  const loadInitialData = async () => {
+    if (router?.isReady) {
+      const pathRoute = router.query?.asset as string;
+      const assetId = pathRoute.split('=asset')[0];
+
+      const assetCall = new Promise<IAssetResponse>(async (resolve, reject) => {
+        const res = await api.get({
+          route: `assets/${assetId}`,
+        });
+
+        if (!res.error || res.error === '') {
+          resolve(res);
+        }
+        reject(res.error);
+      });
+
+      const transactionCall = new Promise<ITransactionResponse>(
+        async (resolve, reject) => {
+          const res = await api.get({
+            route: `transaction/list?asset=${assetId}&limit=5`,
+          });
+
+          if (!res.error || res.error === '') {
+            resolve(res);
+          }
+
+          reject(res.error);
+        },
+      );
+
+      const holdersCall = new Promise<IHoldersResponse>(
+        async (resolve, reject) => {
+          const res = await api.get({
+            route: `assets/holders/${assetId}`,
+          });
+
+          if (!res.error || res.error === '') {
+            resolve(res);
+          }
+
+          reject(res.error);
+        },
+      );
+
+      await Promise.allSettled([assetCall, transactionCall, holdersCall]).then(
+        responses => {
+          responses.forEach((res, index) => {
+            if (res.status === 'fulfilled') {
+              if (index === 0) {
+                const asset: any = res.value;
+                const parsedAsset = parseHardCodedInfo([asset?.data?.asset])[0];
+                parseURIs(parsedAsset);
+                setAsset(parsedAsset);
+              } else if (index === 1) {
+                const transactions: any = res.value;
+                setTransactionsPagination(transactions?.pagination);
+              } else if (index === 2) {
+                const holders: any = res.value;
+                setHoldersPagination(holders?.pagination);
+              }
+            }
+          });
+        },
+      );
+    }
+  };
+
+  useEffect(() => {
+    loadInitialData();
+  }, [router?.isReady]);
+
   const getIssueDate = useCallback(() => {
-    if (issueDate) {
-      return timestampToDate(issueDate);
+    if (asset?.issueDate) {
+      return timestampToDate(asset?.issueDate);
     }
 
     return '--';
-  }, [issueDate]);
+  }, [asset?.issueDate]);
 
   const Overview: React.FC = () => {
     return (
       <>
-        {ownerAddress && (
+        {asset?.ownerAddress && (
           <Row isStakingRoyalties={false}>
             <span>
               <strong>Owner</strong>
@@ -189,12 +255,12 @@ const Asset: React.FC<IAssetPage> = ({
 
             <span>
               <CenteredRow>
-                <Link href={`/account/${ownerAddress}`}>
-                  <HoverAnchor>{ownerAddress}</HoverAnchor>
+                <Link href={`/account/${asset?.ownerAddress}`}>
+                  <HoverAnchor>{asset?.ownerAddress}</HoverAnchor>
                 </Link>
-                <Copy data={ownerAddress} info="ownerAddress" />
+                <Copy data={asset?.ownerAddress} info="ownerAddress" />
                 <ReceiveBackground isOverflow={true}>
-                  <QrCodeModal value={ownerAddress} isOverflow={true} />
+                  <QrCodeModal value={asset?.ownerAddress} isOverflow={true} />
                 </ReceiveBackground>
               </CenteredRow>
             </span>
@@ -206,7 +272,14 @@ const Asset: React.FC<IAssetPage> = ({
           </span>
           <span>
             <small>
-              {toLocaleFixed(maxSupply / 10 ** precision, precision)}
+              {asset ? (
+                toLocaleFixed(
+                  asset?.maxSupply / 10 ** asset?.precision,
+                  asset?.precision,
+                )
+              ) : (
+                <Skeleton />
+              )}
             </small>
           </span>
         </Row>
@@ -216,7 +289,14 @@ const Asset: React.FC<IAssetPage> = ({
           </span>
           <span>
             <small>
-              {toLocaleFixed(initialSupply / 10 ** precision, precision)}
+              {asset ? (
+                toLocaleFixed(
+                  asset?.initialSupply / 10 ** asset?.precision,
+                  asset?.precision,
+                )
+              ) : (
+                <Skeleton />
+              )}
             </small>
           </span>
         </Row>
@@ -226,7 +306,14 @@ const Asset: React.FC<IAssetPage> = ({
           </span>
           <span>
             <small>
-              {toLocaleFixed(circulatingSupply / 10 ** precision, precision)}
+              {asset ? (
+                toLocaleFixed(
+                  asset?.circulatingSupply / 10 ** asset?.precision,
+                  asset?.precision,
+                )
+              ) : (
+                <Skeleton />
+              )}
             </small>
           </span>
         </Row>
@@ -236,7 +323,14 @@ const Asset: React.FC<IAssetPage> = ({
           </span>
           <span>
             <small>
-              {toLocaleFixed(burnedValue / 10 ** precision, precision)}
+              {asset ? (
+                toLocaleFixed(
+                  asset?.burnedValue / 10 ** asset?.precision,
+                  asset?.precision,
+                )
+              ) : (
+                <Skeleton />
+              )}
             </small>
           </span>
         </Row>
@@ -246,9 +340,13 @@ const Asset: React.FC<IAssetPage> = ({
           </span>
           <span>
             <small>
-              {toLocaleFixed(
-                (staking?.totalStaked || 0) / 10 ** precision,
-                precision,
+              {asset ? (
+                toLocaleFixed(
+                  (asset?.staking?.totalStaked || 0) / 10 ** asset?.precision,
+                  asset?.precision,
+                )
+              ) : (
+                <Skeleton />
               )}
             </small>
           </span>
@@ -257,13 +355,15 @@ const Asset: React.FC<IAssetPage> = ({
           <span>
             <strong>Holders</strong>
           </span>
-          <span>{totalRecords}</span>
+          <span>{asset ? holdersPagination?.totalRecords : <Skeleton />}</span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
             <strong>Transactions</strong>
           </span>
-          <span>{totalTransactions}</span>
+          <span>
+            {asset ? transactionsPagination?.totalRecords : <Skeleton />}
+          </span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
@@ -278,19 +378,21 @@ const Asset: React.FC<IAssetPage> = ({
   const UriComponent: React.FC = () => {
     return (
       <>
-        {Object.entries(uris).length ? (
-          Object.entries(uris).map(([key, value]: [string, any]) => (
-            <Row key={String(key)} isStakingRoyalties={false}>
-              <span>
-                <strong>{key}</strong>
-              </span>
-              <UriContainer>
-                <a href={`${value}`} target="blank">
-                  {value}
-                </a>
-              </UriContainer>
-            </Row>
-          ))
+        {Object.entries(asset?.uris || []).length ? (
+          Object.entries(asset?.uris || []).map(
+            ([key, value]: [string, any]) => (
+              <Row key={String(key)} isStakingRoyalties={false}>
+                <span>
+                  <strong>{key}</strong>
+                </span>
+                <UriContainer>
+                  <a href={`${value}`} target="blank">
+                    {value}
+                  </a>
+                </UriContainer>
+              </Row>
+            ),
+          )
         ) : (
           <EmptyRow type="assets">
             <p>No URI found</p>
@@ -307,114 +409,138 @@ const Asset: React.FC<IAssetPage> = ({
           <span>
             <strong>Issuing Time</strong>
           </span>
-          <span>{getIssueDate()}</span>
+          <span>{asset ? getIssueDate() : <Skeleton />}</span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
             <strong>Issuer</strong>
           </span>
-          <span>{ownerAddress ? ownerAddress : '--'}</span>
-          <CenteredRow>
-            <Copy data={ownerAddress} info="Issue" />
-          </CenteredRow>
+          <span>
+            {asset ? (
+              asset?.ownerAddress ? (
+                asset?.ownerAddress
+              ) : (
+                '--'
+              )
+            ) : (
+              <Skeleton />
+            )}
+          </span>
+          {asset?.ownerAddress && (
+            <CenteredRow>
+              <Copy data={asset?.ownerAddress} info="Issue" />
+            </CenteredRow>
+          )}
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
             <strong>Precision</strong>
           </span>
-          <span>{precision}</span>
+          <span>{asset ? asset.precision : <Skeleton />}</span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
             <strong>Can Freeze</strong>
           </span>
-          <span>{String(properties.canFreeze)}</span>
+          <span>
+            {asset ? String(asset.properties.canFreeze) : <Skeleton />}
+          </span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
             <strong>Can Wipe</strong>
           </span>
-          <span>{String(properties.canWipe)}</span>
+          <span>{asset ? String(asset.properties.canWipe) : <Skeleton />}</span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
             <strong>Can Pause</strong>
           </span>
-          <span>{String(properties.canPause)}</span>
+          <span>
+            {asset ? String(asset.properties.canPause) : <Skeleton />}
+          </span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
             <strong>Can Mint</strong>
           </span>
-          <span>{String(properties.canMint)}</span>
+          <span>{asset ? String(asset.properties.canMint) : <Skeleton />}</span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
             <strong>Can Burn</strong>
           </span>
-          <span>{String(properties.canBurn)}</span>
+          <span>{asset ? String(asset.properties.canBurn) : <Skeleton />}</span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
             <strong>Can Change Owner</strong>
           </span>
-          <span>{String(properties.canChangeOwner)}</span>
+          <span>
+            {asset ? String(asset.properties.canChangeOwner) : <Skeleton />}
+          </span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
             <strong>Can Add Roles</strong>
           </span>
-          <span>{String(properties.canAddRoles)}</span>
+          <span>
+            {asset ? String(asset.properties.canAddRoles) : <Skeleton />}
+          </span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
             <strong>Paused</strong>
           </span>
-          <span>{String(attributes.isPaused)}</span>
+          <span>
+            {asset ? String(asset.attributes.isPaused) : <Skeleton />}
+          </span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
             <strong>NFT Mint Stopped</strong>
           </span>
-          <span>{String(attributes.isNFTMintStopped)}</span>
+          <span>
+            {asset ? String(asset.attributes.isNFTMintStopped) : <Skeleton />}
+          </span>
         </Row>
       </>
     );
   };
   const stakingAprOrFpr = useCallback(() => {
-    if (staking?.apr || staking?.fpr) {
+    if (asset?.staking?.apr || asset?.staking?.fpr) {
       return (
         <ContentRow>
-          <strong>{staking?.apr.length > 0 ? 'APR' : 'FPR'}</strong>
+          <strong>{asset?.staking?.apr.length > 0 ? 'APR' : 'FPR'}</strong>
           <ContentScrollBar>
-            {staking.interestType === 'FPRI'
-              ? staking.fpr.reverse().map((fpr, index) => (
+            {asset?.staking.interestType === 'FPRI'
+              ? asset?.staking.fpr.reverse().map((fpr, index) => (
                   <span key={index}>
                     <p>
                       Total Amount:{' '}
                       {toLocaleFixed(
-                        (fpr.totalAmount || 0) / 10 ** precision,
-                        precision,
+                        (fpr.totalAmount || 0) / 10 ** asset?.precision,
+                        asset?.precision,
                       )}
                     </p>
                     <p>
                       Total Staked:{' '}
                       {toLocaleFixed(
-                        (fpr.totalStaked || 0) / 10 ** precision,
-                        precision,
+                        (fpr.totalStaked || 0) / 10 ** asset?.precision,
+                        asset?.precision,
                       )}
                     </p>
                     <p>Epoch: {fpr.epoch}</p>
                     <p>
                       Total Claimed:{' '}
                       {toLocaleFixed(
-                        (fpr.TotalClaimed || 0) / 10 ** precision,
-                        precision,
+                        (fpr.TotalClaimed || 0) / 10 ** asset?.precision,
+                        asset?.precision,
                       )}
                     </p>
                   </span>
                 ))
-              : staking.apr.reverse().map((apr, index) => (
+              : asset?.staking.apr.reverse().map((apr, index) => (
                   <span key={index}>
                     <p>Timestamp: {formatDate(apr.timestamp)}</p>
                     <p>
@@ -427,12 +553,12 @@ const Asset: React.FC<IAssetPage> = ({
       );
     }
     return;
-  }, [staking]);
+  }, [asset?.staking]);
 
   const StakingRoyalties: React.FC = () => {
     return (
       <>
-        {royalties && (
+        {asset?.royalties && (
           <div>
             <Row isStakingRoyalties={true}>
               <span>
@@ -443,26 +569,26 @@ const Asset: React.FC<IAssetPage> = ({
                   <FrozenContainer>
                     <div>
                       <strong>Address</strong>
-                      <p>{royalties.address || '--'}</p>
+                      <p>{asset?.royalties.address || '--'}</p>
                     </div>
                     <div>
                       <strong>Market Percentage</strong>
                       <p>
-                        {(royalties.marketPercentage &&
-                          royalties.marketPercentage / 10 ** 2) ||
+                        {(asset?.royalties.marketPercentage &&
+                          asset?.royalties.marketPercentage / 10 ** 2) ||
                           '--'}
                       </p>
                     </div>
                     <div>
                       <strong>Transfer Fixed</strong>
                       <p>
-                        {royalties.transferFixed
-                          ? royalties.transferFixed / 10 ** 6
+                        {asset?.royalties.transferFixed
+                          ? asset?.royalties.transferFixed / 10 ** 6
                           : '--'}
                       </p>
                     </div>
-                    {royalties.transferPercentage ? (
-                      royalties.transferPercentage.map(
+                    {asset?.royalties.transferPercentage ? (
+                      asset?.royalties.transferPercentage.map(
                         (transfer, index) =>
                           Object.keys(transfer).length > 0 && (
                             <div key={index}>
@@ -470,8 +596,9 @@ const Asset: React.FC<IAssetPage> = ({
                               <p>
                                 Amount:{' '}
                                 {toLocaleFixed(
-                                  (transfer.amount || 0) / 10 ** precision,
-                                  precision,
+                                  (transfer.amount || 0) /
+                                    10 ** asset?.precision,
+                                  asset?.precision,
                                 )}
                               </p>
                               <p>Percentage: {transfer.percentage}</p>
@@ -500,8 +627,9 @@ const Asset: React.FC<IAssetPage> = ({
                       <strong>Total Staked</strong>
                       <p>
                         {toLocaleFixed(
-                          (staking?.totalStaked || 0) / 10 ** precision,
-                          precision,
+                          (asset?.staking?.totalStaked || 0) /
+                            10 ** asset?.precision,
+                          asset?.precision,
                         )}
                       </p>
                     </div>
@@ -510,24 +638,25 @@ const Asset: React.FC<IAssetPage> = ({
 
                       <p>
                         {toLocaleFixed(
-                          (staking?.currentFPRAmount || 0) / 10 ** precision,
-                          precision,
+                          (asset?.staking?.currentFPRAmount || 0) /
+                            10 ** asset?.precision,
+                          asset?.precision,
                         )}
                       </p>
                     </div>
                     <div>
                       <strong>Min Epochs To Claim</strong>
 
-                      <p>{staking?.minEpochsToClaim || '--'}</p>
+                      <p>{asset?.staking?.minEpochsToClaim || '--'}</p>
                     </div>
                     <div>
                       <strong>Min Epochs To Unstake</strong>
 
-                      <p>{staking?.minEpochsToUnstake || '--'}</p>
+                      <p>{asset?.staking?.minEpochsToUnstake || '--'}</p>
                     </div>
                     <div>
                       <strong>Min Epochs To Withdraw</strong>
-                      <p>{staking?.minEpochsToWithdraw || '--'}</p>
+                      <p>{asset?.staking?.minEpochsToWithdraw || '--'}</p>
                     </div>
                     {stakingAprOrFpr()}
                   </FrozenContainer>
@@ -557,18 +686,15 @@ const Asset: React.FC<IAssetPage> = ({
 
   const transactionsTableProps = {
     scrollUp: false,
-    totalPages: totalTransactionsPage,
     dataName: 'transactions',
     request: (page: number, limit: number) => requestTransactions(page, limit),
-    query,
+    query: router.query,
   };
 
   const holdersTableProps = {
     scrollUp: false,
-    totalPages: totalHoldersPage,
     dataName: 'accounts',
     request: (page: number, limit: number) => requestAssetHolders(page, limit),
-    page,
   };
 
   const SelectedTabComponent: React.FC = () => {
@@ -576,13 +702,11 @@ const Asset: React.FC<IAssetPage> = ({
       case 'Transactions':
         return <Transactions transactionsTableProps={transactionsTableProps} />;
       case 'Holders':
-        return (
-          <Holders
-            asset={asset}
-            holders={holders}
-            holdersTableProps={holdersTableProps}
-          />
-        );
+        if (asset) {
+          return (
+            <Holders asset={asset} holdersTableProps={holdersTableProps} />
+          );
+        }
       default:
         return <div />;
     }
@@ -591,31 +715,33 @@ const Asset: React.FC<IAssetPage> = ({
   const dateFilterProps = {
     resetDate: resetQueryDate,
     filterDate: filterQueryDate,
-    empty: false, //TODO: fix this when requests go to client side
   };
 
   const tabProps: ITabs = {
     headers: tableHeaders,
-    onClick: header => setSelectedTab(header),
+    onClick: header => {
+      setSelectedTab(header);
+      setQueryAndRouter({ ...router.query, tab: header });
+    },
     dateFilterProps,
   };
 
-  const getHeader = useMemo(() => {
+  const getHeader = () => {
     return (
       <Header>
         <Title
           Component={() => (
             <>
               <AssetLogo
-                logo={logo}
-                ticker={ticker}
-                name={name}
-                verified={verified}
+                logo={asset?.logo || ''}
+                ticker={asset?.ticker || ''}
+                name={asset?.name || ''}
+                verified={asset?.verified}
               />
               <AssetTitle>
                 <AssetHeaderContainer>
                   <h1>
-                    {name} ({assetId})
+                    {asset?.name} ({asset?.assetId})
                   </h1>
                   {/* {!verified && (
                     <p>
@@ -628,21 +754,19 @@ const Asset: React.FC<IAssetPage> = ({
                     </p>
                   )} */}
                 </AssetHeaderContainer>
-                <div>{assetType}</div>
+                <div>{asset?.assetType}</div>
               </AssetTitle>
             </>
           )}
           route={'/assets'}
         />
-
         <Input />
       </Header>
     );
-  }, [assetId, assetType, logo, name, ticker]);
-
+  };
   return (
     <Container>
-      {getHeader}
+      {asset ? getHeader() : <Skeleton width={200} height={40} />}
       <CardContainer>
         <CardHeader>
           {cardHeaders.map((header, index) => (
@@ -666,103 +790,6 @@ const Asset: React.FC<IAssetPage> = ({
       </Tabs>
     </Container>
   );
-};
-
-export const getServerSideProps: GetServerSideProps<IAssetPage> = async ({
-  params,
-}) => {
-  const props: IAssetPage = {
-    asset: {} as IAsset,
-    transactions: [],
-    totalTransactions: 0,
-    totalHoldersPage: 0,
-    totalTransactionsPage: 0,
-    holders: [],
-    totalRecords: 0,
-    page: 1,
-  };
-
-  const redirectProps = { redirect: { destination: '/404', permanent: false } };
-  let assetNotFound = false;
-
-  const assetId = params?.asset;
-
-  const assetCall = new Promise<IAssetResponse>(async (resolve, reject) => {
-    const res = await api.get({
-      route: `assets/${assetId}`,
-    });
-
-    if (!res.error || res.error === '') {
-      resolve(res);
-    }
-
-    reject(res.error);
-  });
-
-  const transactionCall = new Promise<ITransactionResponse>(
-    async (resolve, reject) => {
-      const res = await api.get({
-        route: `transaction/list?asset=${assetId}&limit=5`,
-      });
-
-      if (!res.error || res.error === '') {
-        resolve(res);
-      }
-
-      reject(res.error);
-    },
-  );
-
-  const holdersCall = new Promise<IHoldersResponse>(async (resolve, reject) => {
-    const res = await api.get({
-      route: `assets/holders/${assetId}`,
-    });
-
-    if (!res.error || res.error === '') {
-      resolve(res);
-    }
-
-    reject(res.error);
-  });
-
-  await Promise.allSettled([assetCall, transactionCall, holdersCall]).then(
-    responses => {
-      responses.forEach((res, index) => {
-        if (res.status === 'fulfilled') {
-          if (index === 0) {
-            const asset: any = res.value;
-            props.asset = parseHardCodedInfo([asset.data.asset])[0];
-          } else if (index === 1) {
-            const transactions: any = res.value;
-
-            props.transactions = transactions?.data?.transactions;
-            props.totalTransactions = transactions?.pagination?.totalRecords;
-            props.totalTransactionsPage = transactions?.pagination?.totalPages;
-          } else if (index === 2) {
-            const holders: any = res.value;
-
-            const unparsedHolders = holders?.data?.accounts || [];
-
-            props.holders = parseHolders(
-              unparsedHolders,
-              props?.asset?.assetId,
-              holders.pagination,
-            );
-            props.totalHoldersPage = holders?.pagination?.totalPages || 1;
-            props.totalRecords = holders?.pagination?.totalRecords || 1;
-            props.page = holders?.pagination?.self || 1;
-          }
-        } else if (index == 0) {
-          assetNotFound = true;
-        }
-      });
-    },
-  );
-  if (assetNotFound) {
-    return redirectProps;
-  }
-
-  return { props };
 };
 
 export default Asset;

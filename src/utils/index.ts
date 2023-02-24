@@ -771,17 +771,23 @@ export const parseHolders = (
   });
 
 /**
- * Receive tab from next router query and find the selected tab.
+ * Receive a tab name(string) and the headers(array of strings) from next router query and find the number of selected tab(). If it doesn't find any number, returns 0.
  * @param tab is required to use next router query
- * @returns return number corresponding to the tab selected.
+ * @param headers is required to search tab number
+ * @returns return number corresponding to the tab selected or 0.
  */
-export const getSelectedTab = (tab: string | string[] | undefined): number => {
-  if (tab === 'Assets' || tab === undefined) {
-    return 0;
-  } else if (tab === 'Transactions') {
-    return 1;
+export const getSelectedTab = (
+  tab: string | string[] | undefined,
+  headers: string[],
+): number => {
+  if (typeof tab === 'string') {
+    const result = headers.indexOf(tab);
+    if (result === -1) {
+      return 0;
+    }
+    return result;
   }
-  return 2;
+  return 0;
 };
 
 /**

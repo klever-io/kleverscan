@@ -385,14 +385,15 @@ describe('unit tests for util funcs in index file', () => {
 
   describe('test getSelectedTab function', () => {
     test('return boolean when selecting a tab', () => {
-      const assetsTab = getSelectedTab('Assets');
-      const transactionsTab = getSelectedTab('Transactions');
-      const emptyTab = getSelectedTab(['']);
-      const emptyString = getSelectedTab('');
+      const headers = ['Assets', 'Transactions'];
+      const assetsTab = getSelectedTab('Assets', headers);
+      const transactionsTab = getSelectedTab('Transactions', headers);
+      const emptyTab = getSelectedTab([''], headers);
+      const emptyString = getSelectedTab('', headers);
       expect(assetsTab).toEqual(0);
       expect(transactionsTab).toEqual(1);
-      expect(emptyTab).toEqual(2);
-      expect(emptyString).toEqual(2);
+      expect(emptyTab).toEqual(0);
+      expect(emptyString).toEqual(0);
     });
   });
 

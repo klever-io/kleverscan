@@ -14,7 +14,7 @@ interface IHolderTableProps {
   page: number;
 }
 
-const Holders: React.FC<IHolders> = ({ holders, asset, holdersTableProps }) => {
+const Holders: React.FC<IHolders> = ({ asset, holdersTableProps }) => {
   const rowSections = (props: IBalance): IRowSection[] => {
     const { address, frozenBalance, index, rank, balance, totalBalance } =
       props;

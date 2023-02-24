@@ -2,6 +2,7 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import * as nextRouter from 'next/router';
 import React from 'react';
+import { act } from 'react-dom/test-utils';
 import { getMonthWithYear, renderWithTheme } from '../../test/utils';
 import DateFilter from './';
 
@@ -17,6 +18,7 @@ jest.mock('next/router', () => ({
       route: '/',
       pathname: '',
       query: {},
+      isReady: true,
     };
   },
 }));
@@ -37,7 +39,7 @@ const months = [
 ];
 
 describe('Component: DateFilter', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
     const useRouter = jest.spyOn(nextRouter, 'useRouter') as jest.Mock;
     useRouter.mockImplementation(() => ({
@@ -53,7 +55,9 @@ describe('Component: DateFilter', () => {
       beforePopState: jest.fn(() => null),
       prefetch: jest.fn(() => null),
     }));
-    renderWithTheme(<DateFilter {...props} />);
+    await act(async () => {
+      renderWithTheme(<DateFilter {...props} />);
+    });
   });
 
   it('Should render the input with the "Date Filter ', () => {

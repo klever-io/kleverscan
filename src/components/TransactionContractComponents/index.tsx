@@ -106,12 +106,14 @@ export const Transfer: React.FC<IIndexedContract> = ({ parameter: par }) => {
               </Link>
             </>
           ) : (
-            <>
-              <Link href={`/asset/KLV`}>
-                <KLV />
-              </Link>
-              <Link href={`/asset/KLV`}>KLV</Link>
-            </>
+            parameter?.amount && (
+              <>
+                <Link href={`/asset/KLV`}>
+                  <KLV />
+                </Link>
+                <Link href={`/asset/KLV`}>KLV</Link>
+              </>
+            )
           )}
         </CenteredRow>
       </Row>

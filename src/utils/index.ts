@@ -162,6 +162,9 @@ export const formatAmount = (number: number): string => {
  * @returns string
  */
 export const toLocaleFixed = (value: number, precision: number): string => {
+  if (Number.isNaN(value)) {
+    return '--';
+  }
   return value?.toLocaleString(undefined, {
     minimumFractionDigits: precision,
   });

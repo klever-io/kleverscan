@@ -41,3 +41,7 @@ export const SkeletonLoader = styled.span`
     }
   }
 `;
+
+export const SkeletonDiv = styled.div`
+  margin: 0.5rem;
+`;

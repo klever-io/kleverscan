@@ -1,6 +1,7 @@
 import { ArrowRight } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
+import { MultiContractToolTip } from '@/components/MultiContractToolTip';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import { useMobile } from '@/contexts/mobile';
@@ -130,7 +131,18 @@ const Transactions: React.FC<ITransactionsProps> = props => {
         ),
         span: 1,
       },
-      { element: <strong key={contractType}>{contractType}</strong>, span: 1 },
+      {
+        element:
+          contractType === 'Multi contract' ? (
+            <MultiContractToolTip
+              contract={contract}
+              contractType={contractType}
+            />
+          ) : (
+            <strong key={contractType}>{contractType}</strong>
+          ),
+        span: 1,
+      },
       {
         element: <strong key={kAppFee}>{kAppFee / 10 ** KLV_PRECISION}</strong>,
         span: 1,

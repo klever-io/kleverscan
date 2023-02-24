@@ -7,42 +7,28 @@ import DateFilter, {
   ISelectedDays,
 } from '@/components/DateFilter';
 import Title from '@/components/Layout/Title';
+import { MultiContractToolTip } from '@/components/MultiContractToolTip';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
-import Tooltip from '@/components/Tooltip';
-import { multiContractStyles } from '@/components/Tooltip/configs';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { CenteredRow } from '@/views/accounts/detail';
-import {
-  Container,
-  FilterByDate,
-  Header,
-  MultiContractContainer,
-  MultiContractCounter,
-} from '@/views/transactions';
+import { Container, FilterByDate, Header } from '@/views/transactions';
 import { Input } from '@/views/transactions/detail';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback } from 'react';
 import { IReceipt, IRowSection, ITransaction } from '../../types';
-import {
-  Contract,
-  ContractsIndex,
-  IContract,
-  ITransferContract,
-  ReducedContract,
-} from '../../types/contracts';
+import { Contract, IContract, ITransferContract } from '../../types/contracts';
 import {
   capitalizeString,
   formatAmount,
   formatDate,
   getPrecision,
   parseAddress,
-  passViewportStyles,
 } from '../../utils';
 import {
   contractTypes,
@@ -152,44 +138,6 @@ const Transactions: React.FC = () => {
       precision,
     } = props;
 
-    const reduceContracts = (): ReducedContract => {
-      const reducedContract: ReducedContract = {};
-      contract.forEach(contrct => {
-        if (!reducedContract[contrct.type]) {
-          reducedContract[contrct.type] = 1;
-        } else {
-          reducedContract[contrct.type] += 1;
-        }
-      });
-      return reducedContract;
-    };
-
-    const renderContracts = () => {
-      let msg = '';
-      Object.entries(reduceContracts()).forEach(([contrct, number]) => {
-        msg += `${ContractsIndex[contrct]}: ${number}x\n`;
-      });
-
-      return (
-        <aside style={{ width: 'fit-content' }}>
-          <Tooltip
-            msg={msg}
-            customStyles={passViewportStyles(
-              isMobile,
-              isTablet,
-              ...multiContractStyles,
-            )}
-            Component={() => (
-              <MultiContractContainer>
-                {contractType}
-                <MultiContractCounter>{contract.length}</MultiContractCounter>
-              </MultiContractContainer>
-            )}
-          ></Tooltip>
-        </aside>
-      );
-    };
-
     const StatusIcon = getStatusIcon(status);
     let toAddress = '--';
     const contractType = getContractType(contract);
@@ -252,7 +200,10 @@ const Transactions: React.FC = () => {
       {
         element:
           contractType === 'Multi contract' ? (
-            renderContracts()
+            <MultiContractToolTip
+              contract={contract}
+              contractType={contractType}
+            />
           ) : (
             <strong key={contractType}>{contractType}</strong>
           ),

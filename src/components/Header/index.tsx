@@ -1,5 +1,6 @@
 import { INavbarItem, navbarItems } from '@/configs/navbar';
 import { useMobile } from '@/contexts/mobile';
+import { getNetwork } from '@/utils';
 import { useScroll } from '@/utils/hooks';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -16,6 +17,7 @@ import {
   DropdownIcon,
   DropdownItem,
   DropdownMenu,
+  HeaderContainer,
   IconsMenu,
   Item,
   LinkStyled,
@@ -42,7 +44,6 @@ const NavbarItem: React.FC<INavbarItem> = ({
   pages = [],
 }) => {
   const router = useRouter();
-
   const DropdownDesktop = ({ page }: IDropdownPages) => {
     return (
       <DropdownItem
@@ -159,25 +160,30 @@ const Navbar: React.FC = () => {
     setOpenDrawer(false);
   };
 
+  const network = getNetwork();
   useScroll(isMobile, handleMobileScroll);
 
   return (
     <>
       <Container ref={mobileNavbarRef}>
         <Content>
-          <Link href="/">
-            <a>
-              <Logo onClick={closeMenu}>
-                <Image
-                  src="/logo-large.svg"
-                  alt="Logo"
-                  width="215"
-                  height="29"
-                />
-              </Logo>
-            </a>
-          </Link>
-
+          <HeaderContainer isMainNet={network === 'Mainnet'}>
+            <Link href="/">
+              <a>
+                <Logo onClick={closeMenu}>
+                  <Image
+                    src="/logo-large.svg"
+                    alt="Logo"
+                    width="215"
+                    height="29"
+                  />
+                </Logo>
+              </a>
+            </Link>
+            {network !== 'Mainnet' && (
+              <span>Running on KleverChain {network}</span>
+            )}
+          </HeaderContainer>
           {!isMobile && (
             <DesktopContainer>
               <IconsMenu>

@@ -1033,3 +1033,15 @@ export const renderCorrectPath = (uriKey: string): string => {
   }
   return `https://${uriKey}`;
 };
+
+export const getNetwork = (): string => {
+  const network = process.env.DEFAULT_API_HOST;
+
+  if (network?.includes('mainnet')) {
+    return 'Mainnet';
+  } else if (network?.includes('devnet')) {
+    return 'Devnet';
+  }
+
+  return 'Testnet';
+};

@@ -1,9 +1,9 @@
+import { getVariation } from '@/utils';
 import { fireEvent, screen } from '@testing-library/react';
 import React from 'react';
 import CoinCard from '.';
 import { assetsData, CoinTest } from '../../../../test/mocks';
 import { renderWithTheme } from '../../../../test/utils';
-import { getVariation } from '../../../../utils/index';
 
 describe('Component: CoinCard', () => {
   beforeEach(() => {

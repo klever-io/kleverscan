@@ -5,6 +5,18 @@ import {
   NetworkParamsIndexer,
 } from '@/types/proposals';
 
+export const getNetwork = (): string => {
+  const network = process.env.DEFAULT_API_HOST;
+
+  if (network?.includes('mainnet')) {
+    return 'Mainnet';
+  } else if (network?.includes('devnet')) {
+    return 'Devnet';
+  }
+
+  return 'Testnet';
+};
+
 export const getProposalNetworkParams = (
   params: IProposalParams,
 ): IParsedProposalParam[] => {

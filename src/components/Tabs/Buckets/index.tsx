@@ -2,7 +2,7 @@ import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
 import { useMobile } from '@/contexts/mobile';
 import { IAssetsBuckets, IInnerTableProps, IRowSection } from '@/types/index';
-import { parseAddress } from '@/utils/index';
+import { parseAddress } from '@/utils/parseValues';
 import { CenteredRow, RowContent } from '@/views/accounts/detail';
 import Link from 'next/link';
 import React from 'react';

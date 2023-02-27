@@ -44,16 +44,15 @@ import {
   findPreviousSiblingReceipt,
   findReceipt,
 } from '@/utils/findKey';
+import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import { usePrecision } from '@/utils/hooks';
+import { getProposalNetworkParams } from '@/utils/networkFunctions';
+import { getPrecision } from '@/utils/precisionFunctions';
 import {
   calculatePermissionOperations,
-  formatDate,
-  getPrecision,
   receiverIsSender,
   renderCorrectPath,
-  toLocaleFixed,
-} from '@/utils/index';
-import { getProposalNetworkParams } from '@/utils/parametersProposal';
+} from '@/utils/validateSender';
 import {
   BalanceContainer,
   FrozenContainer,

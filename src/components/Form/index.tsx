@@ -1,6 +1,6 @@
 import { IFormsData, useContract } from '@/contexts/contract';
 import { ICollectionList } from '@/types';
-import { parseData } from '@/utils/index';
+import { parseData } from '@/utils/parseValues';
 import { FormHandles, Scope, SubmitHandler } from '@unform/core';
 import React, { useCallback, useRef, useState } from 'react';
 import AdvancedOptions from './AdvancedOptions';

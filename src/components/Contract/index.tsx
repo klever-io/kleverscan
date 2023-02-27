@@ -16,7 +16,7 @@ import {
   withdrawTypes,
 } from '@/utils/contracts';
 import formSection from '@/utils/formSections';
-import { parseAddress } from '@/utils/index';
+import { parseAddress } from '@/utils/parseValues';
 import { core } from '@klever/sdk';
 import Link from 'next/link';
 import React, { useEffect, useRef, useState } from 'react';

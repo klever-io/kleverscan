@@ -1,7 +1,8 @@
 import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
 import { IBalance, IHolders, IRowSection } from '@/types/index';
-import { formatAmount, parseAddress } from '@/utils/index';
+import { formatAmount } from '@/utils/formatFunctions';
+import { parseAddress } from '@/utils/parseValues';
 import Link from 'next/link';
 import React from 'react';
 import { AddressContainer, RankingContainer, RankingText } from './styles';

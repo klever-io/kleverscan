@@ -35,8 +35,10 @@ import {
   ITransaction,
   Service,
 } from '@/types/index';
+import { filterDate } from '@/utils/formatFunctions';
 import { KLV_PRECISION, UINT32_MAX } from '@/utils/globalVariables';
-import { filterDate, getPrecision, resetDate } from '@/utils/index';
+import { getPrecision } from '@/utils/precisionFunctions';
+import { resetDate } from '@/utils/resetDate';
 import {
   AmountContainer,
   BalanceContainer,
@@ -58,6 +60,7 @@ import { ReceiveBackground } from '@/views/validator';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
+
 export interface IStakingRewards {
   label: string;
   value: number;

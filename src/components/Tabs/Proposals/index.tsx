@@ -15,11 +15,9 @@ import {
   IProposalsProps,
   IProposalsResponse,
 } from '@/types/proposals';
-import {
-  capitalizeString,
-  parseAddress,
-  passViewportStyles,
-} from '@/utils/index';
+import { capitalizeString } from '@/utils/convertString';
+import { parseAddress } from '@/utils/parseValues';
+import { passViewportStyles } from '@/utils/viewportStyles';
 import Link from 'next/link';
 import React, { useRef, useState } from 'react';
 import {

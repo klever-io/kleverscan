@@ -13,7 +13,11 @@ import { Status } from '@/components/Table/styles';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
+import { capitalizeString } from '@/utils/convertString';
+import { formatAmount, formatDate } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
+import { parseAddress } from '@/utils/parseValues';
+import { getPrecision } from '@/utils/precisionFunctions';
 import { CenteredRow } from '@/views/accounts/detail';
 import { Container, FilterByDate, Header } from '@/views/transactions';
 import { Input } from '@/views/transactions/detail';
@@ -23,13 +27,6 @@ import { useRouter } from 'next/router';
 import React, { useCallback } from 'react';
 import { IReceipt, IRowSection, ITransaction } from '../../types';
 import { Contract, IContract, ITransferContract } from '../../types/contracts';
-import {
-  capitalizeString,
-  formatAmount,
-  formatDate,
-  getPrecision,
-  parseAddress,
-} from '../../utils';
 import {
   contractTypes,
   filteredSections,

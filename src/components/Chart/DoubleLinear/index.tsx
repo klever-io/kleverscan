@@ -1,5 +1,5 @@
 import { ITooltipContent } from '@/pages/charts';
-import { formatAmount } from '@/utils/index';
+import { formatAmount } from '@/utils/formatFunctions';
 import React from 'react';
 import {
   Legend,

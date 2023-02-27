@@ -6,7 +6,7 @@ import ProposalsTab from '@/components/Tabs/Proposals';
 import api from '@/services/api';
 import { IResponse } from '@/types';
 import { IParsedProposal, IProposalsResponse } from '@/types/proposals';
-import { getProposalNetworkParams } from '@/utils/parametersProposal';
+import { getProposalNetworkParams } from '@/utils/networkFunctions';
 import { Header } from '@/views/accounts/detail';
 import { Card } from '@/views/blocks';
 import { CardContainer, Container, Input } from '@/views/proposals';

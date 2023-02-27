@@ -1,4 +1,4 @@
-import { doIf } from '@/utils/index';
+import { doIf } from '@/utils/promiseFunctions';
 import { core } from '@klever/sdk';
 import { useRouter } from 'next/router';
 import {

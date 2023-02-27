@@ -6,7 +6,9 @@ import { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import api from '@/services/api';
 import { IRowSection, IValidator } from '@/types/index';
-import { capitalizeString, formatAmount, parseValidators } from '@/utils/index';
+import { capitalizeString } from '@/utils/convertString';
+import { formatAmount } from '@/utils/formatFunctions';
+import { parseValidators } from '@/utils/parseValues';
 import Link from 'next/link';
 import React from 'react';
 

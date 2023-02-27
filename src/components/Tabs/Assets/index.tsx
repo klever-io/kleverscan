@@ -7,7 +7,7 @@ import {
   IResponse,
   IRowSection,
 } from '@/types/index';
-import { formatAmount } from '@/utils/index';
+import { formatAmount } from '@/utils/formatFunctions';
 import Link from 'next/link';
 import React from 'react';
 

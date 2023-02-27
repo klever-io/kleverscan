@@ -3,7 +3,7 @@ import Skeleton from '@/components/Skeleton';
 import api from '@/services/api';
 import { IAsset, IAssetResponse } from '@/types';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
-import { getPrecision } from '..';
+import { getPrecision } from '../precisionFunctions';
 
 export const useDidUpdateEffect = (fn: Function, inputs: Array<any>): void => {
   const didMountRef = useRef(false);

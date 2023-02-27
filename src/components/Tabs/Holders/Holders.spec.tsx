@@ -1,10 +1,11 @@
+import { formatAmount } from '@/utils/formatFunctions';
+import { parseAddress } from '@/utils/parseValues';
 import { screen } from '@testing-library/react';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
 import { klvAsset as KLVMock, mockedHolders } from '../../../test/mocks';
 import { mockedHoldersResponse } from '../../../test/mocks/tabs/holders';
 import { renderWithTheme } from '../../../test/utils';
-import { formatAmount, parseAddress } from '../../../utils/index';
 import Holders from './';
 
 jest.mock('next/router', () => ({

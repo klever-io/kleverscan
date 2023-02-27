@@ -1,9 +1,10 @@
+import { formatDate } from '@/utils/formatFunctions';
+import { parseAddress } from '@/utils/parseValues';
 import { screen } from '@testing-library/react';
 import React from 'react';
 import theme from '../../styles/theme';
 import { mockTxItem } from '../../test/mocks';
 import { renderWithTheme } from '../../test/utils';
-import { formatDate, parseAddress } from '../../utils';
 import TransactionItem, { IContract } from './';
 
 jest.mock('react-i18next', () => ({

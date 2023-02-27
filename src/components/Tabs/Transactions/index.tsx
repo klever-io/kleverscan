@@ -18,13 +18,10 @@ import {
   getHeaderForTable,
   initialsTableHeaders,
 } from '@/utils/contracts';
+import { capitalizeString } from '@/utils/convertString';
+import { formatAmount, formatDate } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
-import {
-  capitalizeString,
-  formatAmount,
-  formatDate,
-  parseAddress,
-} from '@/utils/index';
+import { parseAddress } from '@/utils/parseValues';
 import { CenteredRow } from '@/views/accounts/detail';
 import Link from 'next/link';
 import { useRouter } from 'next/router';

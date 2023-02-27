@@ -4,7 +4,9 @@ import Tour from '@/components/Tour';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
+import { formatAmount } from '@/utils/formatFunctions';
 import { useScroll } from '@/utils/hooks';
+import { parseAddress } from '@/utils/parseValues';
 import Link from 'next/link';
 import { QRCodeSVG } from 'qrcode.react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -15,7 +17,6 @@ import { FaUserAlt } from 'react-icons/fa';
 import { IoCreateOutline, IoReloadSharp } from 'react-icons/io5';
 import { MdContentCopy } from 'react-icons/md';
 import { RiArrowRightSLine } from 'react-icons/ri';
-import { formatAmount, parseAddress } from '../../../utils';
 import WalletHelp from '../WalletHelp';
 import {
   ActionItem,

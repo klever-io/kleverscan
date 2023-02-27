@@ -1,5 +1,5 @@
 import { ICollectionList } from '@/types/index';
-import { getPrecision } from '@/utils/index';
+import { getPrecision } from '@/utils/precisionFunctions';
 import { TransactionType } from '@klever/sdk';
 
 const getType = (rawType: string): TransactionType => {

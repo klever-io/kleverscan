@@ -1,7 +1,7 @@
 import { useMobile } from '@/contexts/mobile';
 import { IRowSection } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
-import { exportToCsv } from '@/utils/index';
+import { exportToCsv } from '@/utils/promiseFunctions';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';

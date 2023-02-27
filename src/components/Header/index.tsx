@@ -1,7 +1,7 @@
 import { INavbarItem, navbarItems } from '@/configs/navbar';
 import { useMobile } from '@/contexts/mobile';
-import { getNetwork } from '@/utils';
 import { useScroll } from '@/utils/hooks';
+import { getNetwork } from '@/utils/networkFunctions';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';

@@ -1,6 +1,6 @@
 import { getRequestBuckets } from '@/pages/account/[account]';
 import api from '@/services/api';
-import { parseAddress } from '@/utils';
+import { parseAddress } from '@/utils/parseValues';
 import { screen } from '@testing-library/react';
 import * as nextRouter from 'next/router';
 import { useRouter } from 'next/router';

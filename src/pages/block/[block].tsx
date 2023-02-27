@@ -5,7 +5,7 @@ import Transactions from '@/components/Tabs/Transactions';
 import Validators from '@/components/Tabs/Validators';
 import api from '@/services/api';
 import { IBlock } from '@/types/blocks';
-import { formatDate, toLocaleFixed } from '@/utils/index';
+import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import {
   CardContainer,
   CardContent,

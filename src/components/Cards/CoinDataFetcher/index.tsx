@@ -6,7 +6,7 @@ import {
   IGeckoResponse,
   Service,
 } from '@/types';
-import { calcApr } from '@/utils';
+import { calcApr } from '@/utils/calcApr';
 import { useEffect, useState } from 'react';
 import CoinCard from './CoinCard';
 import CoinCardSkeleton from './CoinCardSkeleton';

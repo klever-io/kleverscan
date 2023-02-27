@@ -18,15 +18,10 @@ import {
   ITransaction,
   IUri,
 } from '@/types/index';
-import {
-  filterDate,
-  formatDate,
-  parseHardCodedInfo,
-  parseHolders,
-  resetDate,
-  timestampToDate,
-  toLocaleFixed,
-} from '@/utils/index';
+import { filterDate, formatDate, toLocaleFixed } from '@/utils/formatFunctions';
+import { parseHardCodedInfo, parseHolders } from '@/utils/parseValues';
+import { resetDate } from '@/utils/resetDate';
+import { timestampToDate } from '@/utils/timeFunctions';
 import {
   AssetHeaderContainer,
   AssetTitle,

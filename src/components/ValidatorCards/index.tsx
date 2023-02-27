@@ -1,6 +1,6 @@
 import { ArrowGreen, ArrowPink } from '@/assets/icons';
 import { KLV_PRECISION } from '@/utils/globalVariables';
-import { getAge } from '@/utils/index';
+import { getAge } from '@/utils/timeFunctions';
 import {
   AllSmallCardsContainer,
   Card,

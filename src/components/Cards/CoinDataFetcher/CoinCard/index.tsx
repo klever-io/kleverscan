@@ -1,7 +1,7 @@
 import { ArrowDown } from '@/assets/icons';
 import Chart, { ChartType } from '@/components/Chart';
 import { ICoinCards, ICoinInfo } from '@/types/index';
-import { getVariation } from '@/utils/index';
+import { getVariation } from '@/utils';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useCallback, useRef, useState } from 'react';

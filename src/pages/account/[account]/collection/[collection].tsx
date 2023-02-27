@@ -5,7 +5,7 @@ import { CustomLink } from '@/components/Table/styles';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import { INfts, IPagination, IRowSection } from '@/types/index';
-import { parseAddress } from '@/utils/index';
+import { parseAddress } from '@/utils/parseValues';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';

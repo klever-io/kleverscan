@@ -13,14 +13,14 @@ import { IRowSection } from '@/types/index';
 import {
   formatAmount,
   formatDate,
-  getAge,
-  parseAddress,
   toLocaleFixed,
-} from '@/utils/index';
+} from '@/utils/formatFunctions';
 import {
   getStorageUpdateConfig,
   storageUpdateBlocks,
 } from '@/utils/localStorage/localStorageData';
+import { parseAddress } from '@/utils/parseValues';
+import { getAge } from '@/utils/timeFunctions';
 import {
   Card,
   CardContainer,

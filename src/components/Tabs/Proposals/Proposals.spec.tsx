@@ -1,3 +1,4 @@
+import { parseAddress } from '@/utils/parseValues';
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -9,7 +10,6 @@ import {
   mockedProposalsResponse,
 } from '../../../test/mocks/tabs/proposals';
 import { renderWithTheme } from '../../../test/utils';
-import { parseAddress } from '../../../utils/index';
 
 jest.mock('next/router', () => ({
   useRouter() {

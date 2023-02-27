@@ -25,15 +25,11 @@ import {
   IVotingPowers,
   NetworkParamsIndexer,
 } from '@/types/proposals';
+import { formatAmount, toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useSkeleton } from '@/utils/hooks';
-import {
-  formatAmount,
-  parseAddress,
-  passViewportStyles,
-  toLocaleFixed,
-  typeVoteColors,
-} from '@/utils/index';
+import { parseAddress } from '@/utils/parseValues';
+import { passViewportStyles, typeVoteColors } from '@/utils/viewportStyles';
 import {
   BalanceContainer,
   BigSpan,

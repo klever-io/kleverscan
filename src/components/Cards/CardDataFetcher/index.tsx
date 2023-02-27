@@ -8,7 +8,7 @@ import {
 } from '@/types';
 import { IBlock } from '@/types/blocks';
 import { IDataMetrics, ITransactionListResponse, Service } from '@/types/index';
-import { getEpochInfo } from '@/utils/index';
+import { getEpochInfo } from '@/utils';
 import { useEffect, useState } from 'react';
 import HomeDataCards from './HomeDataCards';
 import HomeDataCardsSkeleton from './HomeDataCardsSkeleton';

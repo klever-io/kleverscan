@@ -9,7 +9,8 @@ import {
   Service,
 } from '@/types/index';
 import { useEffect } from 'react';
-import { calcApr, getEpochInfo } from '..';
+import { getEpochInfo } from '..';
+import { calcApr } from '../calcApr';
 
 export const useHomePageData = (): IHome => {
   const props: IHome = {

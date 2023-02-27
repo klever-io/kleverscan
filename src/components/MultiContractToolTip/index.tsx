@@ -1,6 +1,6 @@
 import { useMobile } from '@/contexts/mobile';
 import { ContractsIndex, IContract } from '@/types/contracts';
-import { passViewportStyles } from '@/utils';
+import { passViewportStyles } from '@/utils/viewportStyles';
 import {
   MultiContractContainer,
   MultiContractCounter,

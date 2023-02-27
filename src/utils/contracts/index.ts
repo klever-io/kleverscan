@@ -6,16 +6,11 @@ import {
 } from '@/types/contracts';
 import { format, fromUnixTime } from 'date-fns';
 import { NextRouter } from 'next/router';
-import {
-  getAmountFromReceipts,
-  getBuyAmount,
-  getBuyPrice,
-  getBuyReceipt,
-  getPrecision,
-  receiverIsSender,
-} from '.';
-import { IBuyReceipt, IReceipt, IRowSection, ITransaction } from '../types';
-import { findReceipt } from './findKey';
+import { IBuyReceipt, IReceipt, IRowSection, ITransaction } from '../../types';
+import { getBuyAmount, getBuyPrice } from '../buyContractFunctions';
+import { findReceipt } from '../findKey';
+import { getPrecision } from '../precisionFunctions';
+import { getAmountFromReceipts, getBuyReceipt } from '../receiptsFunctions';
 import {
   AssetTriggerSections,
   BuySections,
@@ -42,7 +37,8 @@ import {
   ValidatorConfigSections,
   VoteSections,
   WithdrawSections,
-} from './transactionListSections';
+} from '../transactionListSections';
+import { receiverIsSender } from '../validateSender';
 
 export const contractOptions: IContractOption[] = [
   {

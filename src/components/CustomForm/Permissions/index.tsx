@@ -1,13 +1,13 @@
-import { contractsList } from '@/utils/contracts';
-import { setCharAt } from '@/utils/convertString';
-import { Scope } from '@unform/core';
-import FormInput from 'components/Form/FormInput';
-import { Container, InputLabel } from 'components/Form/FormInput/styles';
+import FormInput from '@/components/Form/FormInput';
+import { Container, InputLabel } from '@/components/Form/FormInput/styles';
 import {
   ButtonContainer,
   FormSection,
   SectionTitle,
-} from 'components/Form/styles';
+} from '@/components/Form/styles';
+import { contractsList } from '@/utils/contracts';
+import { setCharAt } from '@/utils/convertString';
+import { Scope } from '@unform/core';
 import { useState } from 'react';
 import { Checkbox, CheckboxContract, ContractsList } from './styles';
 

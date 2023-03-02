@@ -1,4 +1,4 @@
-import { ISection } from 'components/Form';
+import { ISection } from '@/components/Form';
 
 const validatorConfigContract = (): ISection[] => {
   const section = [] as ISection[];

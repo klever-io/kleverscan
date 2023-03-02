@@ -1,8 +1,7 @@
-import { ISection } from 'components/Form';
+import { ISection } from '@/components/Form';
 
 const transferContract = (isNFT: boolean | undefined): ISection[] => {
   let section = [] as ISection[];
-
   switch (isNFT) {
     case true:
       section = [];

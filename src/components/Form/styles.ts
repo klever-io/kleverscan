@@ -50,7 +50,7 @@ export const FormSection = styled.div<{ inner?: boolean }>`
     flex-direction: column;
     gap: 2rem;
 
-    padding: 1.5rem;
+    padding: 0.75rem;
     padding-top: 3.3rem;
 
     ${props =>
@@ -62,11 +62,10 @@ export const FormSection = styled.div<{ inner?: boolean }>`
 `;
 
 export const SectionTitle = styled.div`
-  p {
-    &:first-child {
-      font-size: 1.2rem;
-      font-weight: 600;
-    }
+  > span {
+    font-size: 1.2rem;
+    font-weight: 600;
+    min-width: fit-content;
   }
 
   width: calc(100% - 2rem);

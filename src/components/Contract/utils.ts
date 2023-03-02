@@ -1,4 +1,5 @@
 import { ICollectionList } from '@/types/index';
+import { KLV_PRECISION } from '@/utils/globalVariables';
 import { getPrecision } from '@/utils/precisionFunctions';
 import { TransactionType } from '@klever/sdk';
 
@@ -20,7 +21,7 @@ const getType = (rawType: string): TransactionType => {
       break;
   }
 
-  if (type === 'Depoist') {
+  if (type === 'Deposit') {
     // TODO:Remove upon SDK UPDATE
     return 23;
   }
@@ -46,101 +47,167 @@ const parsePackInfoPrecision = (payload: any) => {
   }
 };
 
+const parseWhitelistInfoPrecision = async (payload: any) => {
+  if (payload.whitelistInfo) {
+    const assetPrecision = (await getPrecision(payload.kda)) as number;
+
+    Object.values(payload.whitelistInfo).forEach(
+      async (whitelistInfoRequest: any) => {
+        if (assetPrecision !== undefined) {
+          whitelistInfoRequest.limit =
+            whitelistInfoRequest.limit * 10 ** assetPrecision;
+        } else return;
+      },
+    );
+  }
+};
+
+const parseSplitRoyaltiesPrecision = async (payload: any) => {
+  if (payload.royalties?.splitRoyalties === undefined) {
+    return;
+  }
+
+  Object.values(payload.royalties.splitRoyalties).forEach(
+    async (splitRoyaltiesInfo: any) => {
+      Object.keys(splitRoyaltiesInfo).forEach(key => {
+        splitRoyaltiesInfo[key] = splitRoyaltiesInfo[key] * 100; //precision 2
+      });
+    },
+  );
+};
+
 const precisionParse = async (
   payload: { [key: string]: any },
   contractType: string,
 ): Promise<any> => {
-  let precision: number | undefined;
+  let precision: number;
   let assetId = 'KLV';
-  const KLVPecision = 10 ** 6; // Also used for KFI
-  const percentagePrecision = 10 ** 2;
+  const percentagePrecision = 2;
 
-  const addPrecision = (payload: number, precision: number) => {
-    if (typeof payload === 'number') {
-      return payload * precision;
+  const addPrecision = (value: number, precision: number) => {
+    return value * 10 ** precision;
+  };
+  const addFieldPrecision = async (
+    fieldName: string,
+    precisionField: string,
+  ) => {
+    const field = payload[fieldName];
+    if (!field) return;
+
+    if (typeof field !== 'number') {
+      return;
     }
-    return payload;
+    const precision = await getPrecision(precisionField);
+
+    payload[fieldName] = addPrecision(field, precision);
+  };
+
+  const addRoyalitiesPrecision = () => {
+    if (payload?.royalties?.transferFixed === undefined) {
+      return;
+    }
+
+    payload.royalties.transferFixed = addPrecision(
+      payload.royalties.transferFixed,
+      KLV_PRECISION,
+    );
+
+    payload.royalties.marketFixed = addPrecision(
+      payload.royalties.marketFixed,
+      KLV_PRECISION,
+    );
+
+    payload.royalties.itoPercentage = addPrecision(
+      payload.royalties.itoPercentage,
+      percentagePrecision,
+    );
+
+    payload.royalties.marketPercentage = addPrecision(
+      payload.royalties.marketPercentage,
+      percentagePrecision,
+    );
+
+    payload.royalties.itoFixed = addPrecision(
+      payload.royalties.itoFixed,
+      KLV_PRECISION,
+    );
+
+    if (payload.royalties.transferPercentage) {
+      payload.royalties.transferPercentage.forEach((item: any) => {
+        item.percentage = addPrecision(item.percentage, percentagePrecision);
+
+        addPrecision(item.amount, KLV_PRECISION);
+      });
+    }
   };
 
   switch (contractType) {
     case 'TransferContract':
     case 'FreezeContract':
     case 'AssetTriggerContract':
-      if (payload.amount) {
-        const assetId = payload.assetId ? payload.assetId : payload.kda;
-        precision = (await getPrecision(assetId)) as number;
-        if (precision !== undefined) {
-          payload.amount = payload.amount * 10 ** precision;
-        } else return;
-      }
+      assetId = payload.assetId ? payload.assetId : payload.kda;
+      await addFieldPrecision('amount', assetId);
+      if (payload?.staking?.apr)
+        payload.staking.apr = addPrecision(
+          payload.staking.apr,
+          percentagePrecision,
+        );
+      parseSplitRoyaltiesPrecision(payload);
+      addRoyalitiesPrecision();
+
       break;
     case 'VoteContract':
-      payload.amount = payload.amount * KLVPecision;
+      payload.amount = payload.amount * KLV_PRECISION;
       break;
     case 'CreateAssetContract':
-      precision = 10 ** payload.precision;
+      precision = payload.precision || 0;
 
       payload.initialSupply = addPrecision(payload.initialSupply, precision);
 
       payload.maxSupply = addPrecision(payload.maxSupply, precision);
 
-      payload.royalties.transferFixed = addPrecision(
-        payload.royalties.transferFixed,
-        KLVPecision,
-      );
+      if (payload?.staking?.apr)
+        payload.staking.apr = addPrecision(
+          payload.staking.apr,
+          percentagePrecision,
+        );
 
-      payload.royalties.marketFixed = addPrecision(
-        payload.royalties.marketFixed,
-        KLVPecision,
-      );
+      addRoyalitiesPrecision();
 
-      payload.royalties.marketPercentage = addPrecision(
-        payload.royalties.marketPercentage,
-        percentagePrecision,
-      );
-
-      if (payload.royalties.transferPercentage) {
-        payload.royalties.transferPercentage.forEach((item: any) => {
-          item.percentagePrecision = addPrecision(
-            item.percentagePrecision,
-            percentagePrecision,
-          );
-
-          addPrecision(item.amount, KLVPecision);
-        });
-      }
+      parseSplitRoyaltiesPrecision(payload);
       break;
     case 'CreateValidator':
     case 'ConfigValidator':
       payload.config.comission = payload.config.comission * percentagePrecision;
       payload.config.maxDelegationAmount =
-        payload.config.maxDelegationAmount * KLVPecision;
+        payload.config.maxDelegationAmount * KLV_PRECISION;
       break;
     case 'ConfigITOContract':
       if (payload.maxAmount) {
         const assetId = payload.kda ? payload.kda : payload.assetId;
         precision = (await getPrecision(assetId)) as number;
         if (precision !== undefined) {
-          payload.maxAmount = payload.maxAmount * 10 ** precision;
+          payload.maxAmount = payload.maxAmount * precision;
         } else return;
       }
     case 'ITOTriggerContract':
       parsePackInfoPrecision(payload);
+      await parseWhitelistInfoPrecision(payload);
 
+      await addFieldPrecision('maxAmount', payload.kda);
+      await addFieldPrecision('defaultLimitPerAddress', payload.kda);
       break;
     case 'BuyContract':
       assetId = payload.currencyId;
       precision = (await getPrecision(assetId)) as number;
       if (precision !== undefined) {
-        payload.amount = payload.amount * 10 ** precision;
+        payload.amount = payload.amount * precision;
       } else return;
       break;
     case 'SellContract':
-      assetId = payload.assetID;
-      precision = (await getPrecision(assetId)) as number;
-      if (precision !== undefined) {
-        payload.price = addPrecision(payload.price, 10 ** precision);
-      } else return;
+      assetId = payload.currencyID;
+      await addFieldPrecision('price', assetId);
+      await addFieldPrecision('reservePrice', assetId);
       break;
     case 'CreateMarketplaceContract':
     case 'ConfigMarketplaceContract':
@@ -148,6 +215,14 @@ const precisionParse = async (
         payload.referralPercentage,
         percentagePrecision,
       );
+      break;
+    case 'WithdrawContract':
+      assetId = payload?.currencyId;
+      await addFieldPrecision('amount', assetId);
+      break;
+    case 'DepositContract':
+      assetId = payload?.currencyID;
+      await addFieldPrecision('amount', assetId);
   }
 
   return payload;
@@ -156,6 +231,7 @@ const precisionParse = async (
 const contractHaveKDA = (
   contract: string,
   assetTriggerType?: number | null,
+  itoTriggerType?: number | null,
 ): boolean => {
   const contracts = [
     'TransferContract',
@@ -166,9 +242,13 @@ const contractHaveKDA = (
     'SetITOPricesContract',
     'SellContract',
     'ITOTriggerContract',
+    'DepositContract',
   ];
 
   if (contract === 'AssetTriggerContract' && assetTriggerType !== null) {
+    return true;
+  }
+  if (contract === 'ITOTriggerContract' && itoTriggerType !== null) {
     return true;
   }
 
@@ -250,6 +330,7 @@ const getAssetsList = (
   assets: ICollectionList[],
   contractType: string,
   typeAssetTrigger: number | null,
+  withdrawType: number | null,
   ownerAddress: string,
 ): any[] => {
   if (contractType === 'AssetTriggerContract' && typeAssetTrigger !== null) {
@@ -272,7 +353,7 @@ const getAssetsList = (
     return assets.filter((value: ICollectionList) => {
       return !value.isNFT && value.frozenBalance !== 0;
     });
-  } else if (contractType === 'WithdrawContract') {
+  } else if (contractType === 'WithdrawContract' && withdrawType === 0) {
     return assets.filter((value: ICollectionList) => {
       let thereIsUnfreezedBucket = false;
       let passedMinEpochs = false;
@@ -299,6 +380,10 @@ const getAssetsList = (
 };
 
 const parsePackInfo = (values: any) => {
+  if (!values.pack) {
+    return;
+  }
+
   const packs = values.pack;
 
   delete values.pack;
@@ -320,6 +405,47 @@ const parsePackInfo = (values: any) => {
   values.packInfo = packInfo;
 };
 
+const parseWhitelistInfo = (values: any, defaultValue = 0) => {
+  if (!values.whitelistInfo) {
+    return;
+  }
+
+  const whitelist = values.whitelistInfo;
+
+  delete values.whitelistInfo;
+
+  const whitelistInfo: {
+    [key: string]: any;
+  } = {};
+  whitelist.forEach((item: any) => {
+    whitelistInfo[item.address] = { limit: item.limit || defaultValue };
+  });
+
+  values.whitelistInfo = whitelistInfo;
+};
+
+const parseSplitRoyalties = (values: any) => {
+  if (values.royalties?.splitRoyalties === undefined) {
+    return;
+  }
+
+  const splitRoyaltiesReference = values.royalties.splitRoyalties;
+
+  delete values.royalties.splitRoyalties;
+
+  const splitRoyalties: {
+    [key: string]: any;
+  } = {};
+
+  splitRoyaltiesReference.forEach((item: any) => {
+    const address = item.address;
+    delete item.address;
+    splitRoyalties[address] = item.royalties.splitRoyalties.splitRoyaltyValues;
+  });
+
+  values.royalties.splitRoyalties = splitRoyalties;
+};
+
 const parseValues = (
   values: Record<string, any>,
   contractType: string,
@@ -335,13 +461,12 @@ const parseValues = (
   depositType: string | null,
   withdrawType: number | null,
   itoTriggerType: number | null,
-  isNFT: boolean | undefined,
 ): any => {
   const parsedValues = JSON.parse(JSON.stringify(values));
 
   if (contractType === 'TransferContract') {
     parsedValues.receiver = parsedValues.receiverAddress;
-    if (isNFT) {
+    if (collection?.isNFT) {
       parsedValues.amount = 1;
     }
     delete parsedValues.receiverAddress;
@@ -361,11 +486,17 @@ const parseValues = (
     parsedValues.properties = newProperties;
   }
 
-  if (contractHaveKDA(contractType, typeAssetTrigger) && collection) {
+  if (
+    contractHaveKDA(contractType, typeAssetTrigger, itoTriggerType) &&
+    collection
+  ) {
     if (contractType === 'AssetTriggerContract') {
       parsedValues.triggerType = typeAssetTrigger;
       parsedValues.assetId =
         assetID !== 0 ? `${collection.value}/${assetID}` : collection.value;
+      if (typeAssetTrigger === 14) {
+        parseSplitRoyalties(parsedValues);
+      }
     } else if (contractType === 'SellContract') {
       parsedValues.assetID =
         assetID !== 0 ? `${collection.value}/${assetID}` : collection.value;
@@ -378,6 +509,7 @@ const parseValues = (
     }
   } else if (contractType === 'CreateAssetContract') {
     parsedValues.type = tokenChosen ? 0 : 1;
+    parseSplitRoyalties(parsedValues);
   } else if (contractType === 'AssetTriggerContract') {
     parsedValues.triggerType = typeAssetTrigger;
   } else if (contractType === 'ClaimContract') {
@@ -428,9 +560,13 @@ const parseValues = (
         parsedValues.permissions[index].operations = newHex;
       });
     }
-  } else if (contractType === 'DepositContract') {
+  }
+
+  if (contractType === 'DepositContract') {
     parsedValues.depositType = depositType;
-  } else if (contractType === 'WithdrawContract') {
+  }
+
+  if (contractType === 'WithdrawContract') {
     parsedValues.withdrawType = withdrawType;
   }
 
@@ -439,6 +575,16 @@ const parseValues = (
     (contractType === 'ITOTriggerContract' && itoTriggerType === 0)
   ) {
     parsePackInfo(parsedValues);
+  }
+
+  if (
+    (contractType === 'ITOTriggerContract' && itoTriggerType === 7) ||
+    contractType === 'ConfigITOContract'
+  ) {
+    parseWhitelistInfo(parsedValues);
+  }
+  if (contractType === 'ITOTriggerContract' && itoTriggerType === 8) {
+    parseWhitelistInfo(parsedValues, 1);
   }
 
   if (contractHaveBucketId(contractType)) {

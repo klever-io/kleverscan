@@ -575,65 +575,6 @@ describe('Contract Component', () => {
     });
   });
 
-  it('should render the Config ITO form contract', async () => {
-    const items = [
-      'Set up an Initial Token Offering.',
-      'Select an asset/collection',
-      'Receiver Address',
-      'Status',
-      'Max Amount',
-      'PackInfo',
-    ];
-    mockContract.contractType = contractOptions.find(
-      item => item.value === 'ConfigITOContract',
-    )?.value as string;
-
-    await waitFor(() =>
-      renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
-          <Contract
-            paramsList={paramList}
-            proposalsList={proposalsList}
-            kAssets={[]}
-            getAssets={getAssets}
-            assetsList={assetList}
-          />
-        </ContractProvider.Provider>,
-      ),
-    );
-    items.map(item => {
-      expect(screen.getByText(item)).toBeInTheDocument();
-    });
-  });
-
-  // it('should render the Set ITO Prices form contract', async () => {
-  //   const items = [
-  //     'Set the prices for the Initial Token Offering.',
-  //     'Select an asset/collection',
-  //     'PackInfo',
-  //   ];
-  //   mockContract.contractType = contractOptions.find(
-  //     item => item.value === 'SetITOPricesContract',
-  //   )?.value as string;
-
-  //   await waitFor(() =>
-  //     renderWithTheme(
-  //       <ContractProvider.Provider value={mockContract as any}>
-  //         <Contract
-  //           paramsList={paramList}
-  //           proposalsList={proposalsList}
-  //           kAssets={[]}
-  //           getAssets={getAssets}
-  //           assetsList={assetList}
-  //         />
-  //       </ContractProvider.Provider>,
-  //     ),
-  //   );
-  //   items.map(item => {
-  //     expect(screen.getByText(item)).toBeInTheDocument();
-  //   });
-  // });
-
   it('should render the Buy form contract', async () => {
     const items = ['Buy tokens.', 'Id', 'Currency Id', 'Amount'];
     mockContract.contractType = contractOptions.find(
@@ -768,6 +709,46 @@ describe('Contract Component', () => {
     );
     items.map(item => {
       expect(screen.getByText(item)).toBeInTheDocument();
+    });
+  });
+
+  it('should render the Config ITO form contract', async () => {
+    const items = [
+      'Set up an Initial Token Offering.',
+      'Select an asset/collection',
+      'Receiver Address',
+      'Status',
+      'Max Amount',
+      'PackInfo',
+    ];
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'ConfigITOContract',
+    )?.value as string;
+
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
+          <Contract
+            paramsList={paramList}
+            proposalsList={proposalsList}
+            kAssets={[]}
+            getAssets={getAssets}
+            assetsList={assetList}
+          />
+        </ContractProvider.Provider>,
+      ),
+    );
+
+    const selectAsset = screen.getByText('Choose').nextSibling?.firstChild;
+
+    if (selectAsset) {
+      fireEvent.change(selectAsset, {
+        target: { value: 'K' },
+      });
+    }
+
+    items.map(async item => {
+      expect(await screen.findByText(item)).toBeInTheDocument();
     });
   });
 

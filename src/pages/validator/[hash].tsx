@@ -16,8 +16,8 @@ import {
   IRowSection,
 } from '@/types/index';
 import { formatAmount, regexImgUrl } from '@/utils/formatFunctions';
-import { parseAddress } from '@/utils/parseValues';
 import { KLV_PRECISION } from '@/utils/globalVariables';
+import { parseAddress } from '@/utils/parseValues';
 import {
   BoldElement,
   CenteredSubTitle,

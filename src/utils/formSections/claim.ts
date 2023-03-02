@@ -1,4 +1,4 @@
-import { ISection } from 'components/Form';
+import { ISection } from '@/components/Form';
 
 const claimContract = (labelId: string): ISection[] => {
   const section = [] as ISection[];

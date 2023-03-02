@@ -1,6 +1,16 @@
-import { ISection } from 'components/Form';
+import { ISection } from '@/components/Form';
+import {
+  defaultLimitPerAddressSection,
+  maxAmountSection,
+  receiverAddressSection,
+  setTimesSection,
+  setWhitelistStatusSection,
+  statusSection,
+  whitelistSection,
+  whitelistTimesSection,
+} from './common';
 
-const ITOTriggerContract = (type?: number | null): ISection[] => {
+const ITOTriggerContract = (type?: number | null, address = ''): ISection[] => {
   const section = [] as ISection[];
 
   if (isNaN(Number(type)) && type !== null) {
@@ -8,150 +18,61 @@ const ITOTriggerContract = (type?: number | null): ISection[] => {
   }
 
   switch (type) {
-    case 0:
+    case 0: // Set Packs
       break;
-    case 1:
+    case 1: // Set Status
+      section.push(...statusSection());
+      break;
+    case 2: // Set Receiver Address
+      section.push(...receiverAddressSection(address));
+      break;
+    case 3: // Set Max Amount
+      section.push(...maxAmountSection({ required: true }));
+      break;
+    case 4: // Set Default Limit Per Address
+      section.push(...defaultLimitPerAddressSection({ required: true }));
+      break;
+    case 5: // Set Times
+      section.push(...setTimesSection({ required: true }));
+      break;
+    case 6: // Set Whitelist Status
+      section.push(...setWhitelistStatusSection({ required: true }));
+      break;
+    case 7: // Add Address to Whitelist
+      section.push(...whitelistSection({ required: true }));
+      break;
+    case 8: // Remove Address from Whitelist
       section.push({
+        title: 'Whitelist',
         fields: [
           {
-            label: 'Status',
+            label: 'Whitelist Info',
             props: {
-              required: true,
-              tooltip: 'New status of the ITO',
-              type: 'dropdown',
-              options: [
-                {
-                  label: 'DefaultITO (0)',
-                  value: 0,
-                },
-                {
-                  label: 'ActiveITO (1)',
-                  value: 1,
-                },
-                {
-                  label: 'PausedITO (2)',
-                  value: 2,
-                },
-              ],
-            },
-          },
-        ],
-      });
-
-      break;
-    case 2:
-      section.push({
-        fields: [
-          {
-            label: 'Receiver Address',
-            props: {
-              required: true,
-              tooltip: 'Address of the receiver',
-            },
-          },
-        ],
-      });
-      break;
-    case 3:
-      section.push({
-        fields: [
-          {
-            label: 'Max Amount',
-            props: {
-              required: true,
-              tooltip: 'Max amount of tokens to be sold',
+              type: 'struct',
+              array: true,
+              tooltip: 'Whitelist addresses to be removed',
+              innerSection: {
+                title: 'Whitelist Info',
+                inner: true,
+                innerPath: 'whitelistInfo',
+                fields: [
+                  {
+                    label: 'Address',
+                    props: {
+                      required: true,
+                      tooltip: 'Whitelisted address to be removed',
+                      span: 2,
+                    },
+                  },
+                ],
+              },
             },
           },
         ],
       });
       break;
-    case 4:
-      section.push({
-        fields: [
-          {
-            label: 'Default Limit Per Address',
-            props: {
-              required: true,
-              tooltip: 'Default limit per address',
-            },
-          },
-        ],
-      });
-      break;
-    case 5:
-      section.push({
-        fields: [
-          {
-            label: 'Start Time',
-            props: {
-              required: true,
-              tooltip: 'ITO start time',
-              type: 'datetime-local',
-            },
-          },
-          {
-            label: 'End Time',
-            props: {
-              required: true,
-              tooltip: 'ITO end time',
-              type: 'datetime-local',
-            },
-          },
-        ],
-      });
-      break;
-    case 6:
-      section.push({
-        fields: [
-          {
-            label: 'Whitelist Status',
-            props: {
-              required: true,
-              tooltip: 'Whitelist status',
-              type: 'dropdown',
-              options: [
-                {
-                  label: 'DefaultITO (0)',
-                  value: 0,
-                },
-                {
-                  label: 'ActiveITO (1)',
-                  value: 1,
-                },
-                {
-                  label: 'PausedITO (2)',
-                  value: 2,
-                },
-              ],
-            },
-          },
-        ],
-      });
-      break;
-    case 7:
-    case 8:
-      break;
-    case 9:
-      section.push({
-        fields: [
-          {
-            label: 'Whitelist Start Time',
-            props: {
-              required: true,
-              tooltip: 'Whitelist start time',
-              type: 'datetime-local',
-            },
-          },
-          {
-            label: 'Whitelist End Time',
-            props: {
-              required: true,
-              tooltip: 'Whitelist end time',
-              type: 'datetime-local',
-            },
-          },
-        ],
-      });
+    case 9: // Update Whitelist Time
+      section.push(...whitelistTimesSection({ required: true }));
       break;
 
     default:

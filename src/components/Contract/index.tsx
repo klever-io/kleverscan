@@ -26,6 +26,7 @@ import ConfirmPayload from '../ConfirmPayload';
 import Copy from '../Copy';
 import PackInfoForm from '../CustomForm/PackInfo';
 import ParametersForm from '../CustomForm/Parameters';
+import PermissionsForm from '../CustomForm/Permissions';
 import { Card } from '../Detail/styles';
 import Select from './Select';
 import {
@@ -75,6 +76,20 @@ interface IContractSection extends ISection {
   index?: number;
 }
 
+const kAssetContracts = [
+  'AssetTriggerContract',
+  'ConfigITOContract',
+  'ITOTriggerContract',
+  'WithdrawContract',
+  'DepositContract',
+];
+
+const collectionContracts = [
+  'ConfigITOContract',
+  'ITOTriggerContract',
+  'WithdrawContract',
+];
+
 const Contract: React.FC<IContract> = ({
   assetsList,
   proposalsList,
@@ -109,7 +124,6 @@ const Contract: React.FC<IContract> = ({
   const [typeAssetTrigger, setTypeAssetTrigger] = useState<number | null>(null);
   const [formSections, setFormSections] = useState<IContractSection[]>([]);
   const [assetID, setAssetID] = useState<number>(0);
-  const [isNFT, setIsNFT] = useState<boolean | undefined>(false);
 
   const {
     contractType,
@@ -133,7 +147,23 @@ const Contract: React.FC<IContract> = ({
   const getOwnerAddress = () => {
     return sessionStorage.getItem('walletAddress') || '';
   };
-  const keyElement = JSON.stringify([formSections, elementIndex]);
+  const keyElement = JSON.stringify([
+    formSections,
+    elementIndex,
+    contractType,
+    typeAssetTrigger,
+    claimType,
+    assetID,
+    collection,
+    selectedBucket,
+    proposalId,
+    tokenChosen,
+    ITOBuy,
+    binaryOperations,
+    depositType,
+    withdrawType,
+    itoTriggerType,
+  ]);
 
   useEffect(() => {
     if (valueContract) {
@@ -192,6 +222,15 @@ const Contract: React.FC<IContract> = ({
   }, [contractType]);
 
   useEffect(() => {
+    if (typeAssetTrigger !== null) setTypeAssetTrigger(null);
+    if (itoTriggerType !== null) setItoTriggerType(null);
+    if (claimType !== 0) setClaimType(0);
+    if (withdrawType !== null) setWithdrawType(null);
+    if (depositType !== null) setDepositType(null);
+    setFormSections([]);
+  }, [contractType]);
+
+  useEffect(() => {
     if (claimType === 2) {
       setFormSections([
         ...formSection({
@@ -222,7 +261,7 @@ const Contract: React.FC<IContract> = ({
     setFormSections([
       ...formSection({
         contract: contractType,
-        address: ownerAddress,
+        address: getOwnerAddress(),
         withdrawType,
       }),
     ]);
@@ -233,7 +272,7 @@ const Contract: React.FC<IContract> = ({
     setFormSections([
       ...formSection({
         contract: contractType,
-        address: ownerAddress,
+        address: getOwnerAddress(),
         itoTriggerType,
         collection,
       }),
@@ -241,14 +280,15 @@ const Contract: React.FC<IContract> = ({
   }, [itoTriggerType, collection]);
 
   useEffect(() => {
+    if (contractType !== 'TransferContract') return;
     setFormSections([
       ...formSection({
         contract: contractType,
         address: ownerAddress,
-        isNFT: isNFT,
+        collection,
       }),
     ]);
-  }, [isNFT]);
+  }, [collection]);
 
   useEffect(() => {
     setFormSections([
@@ -423,7 +463,6 @@ const Contract: React.FC<IContract> = ({
       depositType,
       withdrawType,
       itoTriggerType,
-      isNFT,
     );
 
     if (parsedValues.amount === 0) {
@@ -473,21 +512,16 @@ const Contract: React.FC<IContract> = ({
     collection: collection,
     assetID,
     itoTriggerType,
-    isNFT,
     metadata,
   };
 
   const permissionsForm = () => (
-    // <Form
-    //   key={contractType}
-    //   {...formProps}
-    // >
-    //   <PermissionsForm
-    //     setBinaryOperations={setBinaryOperations}
-    //     binaryOperations={binaryOperations}
-    //   />
-    // </Form>
-    <></>
+    <Form key={contractType} {...formProps}>
+      <PermissionsForm
+        setBinaryOperations={setBinaryOperations}
+        binaryOperations={binaryOperations}
+      />
+    </Form>
   );
 
   const proposalForm = () => (
@@ -533,6 +567,7 @@ const Contract: React.FC<IContract> = ({
           <Select
             options={depositOptions}
             onChange={(value: any) => setDepositType(value?.value)}
+            zIndex={4}
           />
         </SelectContent>
       </SelectContainer>
@@ -541,45 +576,50 @@ const Contract: React.FC<IContract> = ({
 
   const handleSelect = (title: any, data: any, handleState: any) => (
     <AssetTriggerContainer>
-      <InputLabel>{title}</InputLabel>
+      <InputLabel>
+        <span>{title}</span>
+      </InputLabel>
       <Select
         getAssets={getAssets}
         options={data}
         onChange={value => handleState(value ? value.value : 0)}
         zIndex={4}
+        key={contractType}
       />
     </AssetTriggerContainer>
   );
 
   const claimSelect = () => (
     <SelectContainer>
-      <FieldLabel>Claim Type</FieldLabel>
-      <Select
-        options={claimTypes}
-        claimSelectedType={claimSelectedType}
-        onChange={e => {
-          if (!isNaN(e?.value)) {
-            if (e.value === 0 || e.value === 1) {
-              setFormSections([
-                ...formSection({
-                  contract: 'ClaimContract',
-                  address: getOwnerAddress(),
-                  claimLabel: 'Asset ID',
-                }),
-              ]);
-            } else if (e.value === 2 || claimType === 2) {
-              setFormSections([
-                ...formSection({
-                  contract: 'ClaimContract',
-                  address: getOwnerAddress(),
-                  claimLabel: 'Order ID',
-                }),
-              ]);
+      <SelectContent>
+        <FieldLabel>Claim Type</FieldLabel>
+        <Select
+          options={claimTypes}
+          claimSelectedType={claimSelectedType}
+          onChange={e => {
+            if (!isNaN(e?.value)) {
+              if (e.value === 0 || e.value === 1) {
+                setFormSections([
+                  ...formSection({
+                    contract: 'ClaimContract',
+                    address: getOwnerAddress(),
+                    claimLabel: 'Asset ID',
+                  }),
+                ]);
+              } else if (e.value === 2 || claimType === 2) {
+                setFormSections([
+                  ...formSection({
+                    contract: 'ClaimContract',
+                    address: getOwnerAddress(),
+                    claimLabel: 'Order ID',
+                  }),
+                ]);
+              }
+              setClaimType(claimSelectedType?.value || e.value);
             }
-            setClaimType(claimSelectedType?.value || e.value);
-          }
-        }}
-      />
+          }}
+        />
+      </SelectContent>
     </SelectContainer>
   );
 
@@ -660,18 +700,14 @@ const Contract: React.FC<IContract> = ({
           key={JSON.stringify(collection)}
           collection={collection}
           options={getAssetsList(
-            contractType === 'AssetTriggerContract' ||
-              contractType === 'ConfigITOContract' ||
-              (contractType === 'ITOTriggerContract' && itoTriggerType === 0)
-              ? kAssets
-              : assetsList || [],
+            kAssetContracts.includes(contractType) ? kAssets : assetsList || [],
             contractType,
             typeAssetTrigger,
+            withdrawType,
             getOwnerAddress(),
           )}
           onChange={value => {
             setCollection(value);
-            setIsNFT(value?.isNFT);
             if (contractType === 'UnfreezeContract') {
               setBucketsCollection([value.value]);
             }
@@ -681,8 +717,7 @@ const Contract: React.FC<IContract> = ({
         />
       </SelectContent>
       {collection?.isNFT &&
-        contractType !== 'ConfigITOContract' &&
-        contractType !== 'ITOTriggerContract' &&
+        !collectionContracts.includes(contractType) &&
         showAssetIDInput(contractType, typeAssetTrigger) && (
           <SelectContent>
             <FieldLabel>Asset ID</FieldLabel>
@@ -705,6 +740,11 @@ const Contract: React.FC<IContract> = ({
 
       case 'ConfigITOContract':
       case 'ITOTriggerContract':
+        if (
+          collection === undefined ||
+          JSON.stringify(collection) === JSON.stringify({})
+        )
+          return;
         if (contractType === 'ITOTriggerContract' && itoTriggerType !== 0)
           return <Form key={keyElement} {...formProps} />;
         return ITOForm();
@@ -771,7 +811,8 @@ const Contract: React.FC<IContract> = ({
       )}
 
       {renderSelect()}
-      {contractHaveKDA(contractType, typeAssetTrigger) && KDASelect()}
+      {contractHaveKDA(contractType, typeAssetTrigger, itoTriggerType) &&
+        KDASelect()}
 
       {contractHaveBucketId(contractType) && bucketListSelect()}
 

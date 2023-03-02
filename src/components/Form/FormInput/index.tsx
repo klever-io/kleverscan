@@ -81,13 +81,13 @@ const FormInput: React.FC<IFormInputProps> = ({
   const [value, setValue] = useState(getInitialValue());
 
   useEffect(() => {
-    if (type !== 'textarea') {
+    if (type !== 'textarea' && type !== 'dropdown') {
       registerField({
         name: fieldName,
         ref: inputRef.current,
         path: 'value',
       });
-    } else {
+    } else if (type === 'textarea') {
       registerField({
         name: fieldName,
         ref: areaRef.current,
@@ -103,6 +103,7 @@ const FormInput: React.FC<IFormInputProps> = ({
   const selectProps = {
     title,
     selectPlaceholder,
+    name,
     ...rest,
   };
 
@@ -165,7 +166,7 @@ const FormInput: React.FC<IFormInputProps> = ({
     <Container {...containerProps}>
       {type !== 'hidden' && (
         <InputLabel disabled={inputProps.disabled}>
-          {title}{' '}
+          <span>{title} </span>
           {tooltip && (
             <TooltipContainer>
               <InfoIcon />

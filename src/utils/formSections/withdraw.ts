@@ -1,4 +1,4 @@
-import { ISection } from 'components/Form';
+import { ISection } from '@/components/Form';
 
 const withdrawContract = (type?: number | null): ISection[] => {
   const section = [] as ISection[];
@@ -26,7 +26,7 @@ const withdrawContract = (type?: number | null): ISection[] => {
         {
           label: 'Currency Id',
           props: {
-            type: 'number',
+            type: 'string',
             tooltip: 'Currency Id',
           },
         },

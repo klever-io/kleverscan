@@ -1,6 +1,6 @@
+import { ISection } from '@/components/Form';
 import { ICollectionList } from '@/types';
-import { ISection } from 'components/Form';
-import { RoyaltiesSection } from './common';
+import { royaltiesSection, stakingSection } from './common';
 
 const assetTriggerContract = (
   type?: number | null,
@@ -168,55 +168,12 @@ const assetTriggerContract = (
 
     case 13:
       section = [];
-      section.push({
-        title: 'Staking',
-        fields: [
-          {
-            label: 'Type',
-            props: {
-              type: 'checkbox',
-              toggleOptions: ['APR', 'FPR'],
-              defaultValue: 0,
-              disabled: true,
-              tooltip: '0: APR, 1: FPR',
-            },
-          },
-          {
-            label: 'APR',
-            props: {
-              type: 'number',
-              tooltip: 'Anual Percentage Rate',
-            },
-          },
-          {
-            label: 'Min Epochs To Claim',
-            props: {
-              type: 'number',
-              tooltip: 'Minimum epochs to claim rewards ( each epoch has 6h )',
-            },
-          },
-          {
-            label: 'Min Epochs To Unstake',
-            props: {
-              type: 'number',
-              tooltip: 'Minimum epochs to unstake ( each epoch has 6h )',
-            },
-          },
-          {
-            label: 'Min Epochs To Withdraw',
-            props: {
-              type: 'number',
-              tooltip:
-                'Minimum epochs to withdraw after unstake ( each epoch has 6h )',
-            },
-          },
-        ],
-      });
+      section.push(...stakingSection());
       break;
 
     case 14:
       section = [];
-      section.push(...RoyaltiesSection(address, isNFT));
+      section.push(...royaltiesSection(address, isNFT));
       break;
     case 15:
       section = [];
@@ -224,12 +181,6 @@ const assetTriggerContract = (
         title: 'KDA Pool',
         objectName: 'kdaPool',
         fields: [
-          {
-            label: 'KDA',
-            props: {
-              tooltip: 'Target Asset',
-            },
-          },
           {
             label: 'Admin Address',
           },

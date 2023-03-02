@@ -1,5 +1,5 @@
-import { ISection } from 'components/Form';
-import { RoyaltiesSection } from './common';
+import { ISection } from '@/components/Form';
+import { royaltiesSection, stakingSection } from './common';
 
 const createAsset = (type: string, address = ''): ISection[] => {
   const section = [] as ISection[];
@@ -92,52 +92,8 @@ const createAsset = (type: string, address = ''): ISection[] => {
             },
           ],
         },
-        ...RoyaltiesSection(address, false),
-        {
-          title: 'Staking',
-          fields: [
-            {
-              label: 'Type',
-              props: {
-                type: 'checkbox',
-                toggleOptions: ['APR', 'FPR'],
-                defaultValue: 0,
-                disabled: false,
-              },
-            },
-            {
-              label: 'APR',
-              props: {
-                type: 'number',
-                tooltip: 'Annual percentage rate',
-              },
-            },
-            {
-              label: 'Min Epochs To Claim',
-              props: {
-                type: 'number',
-                tooltip:
-                  'Minimum amount of epochs to claim rewards ( each epoch has 6h )',
-              },
-            },
-            {
-              label: 'Min Epochs To Unstake',
-              props: {
-                type: 'number',
-                tooltip:
-                  'Minimum amount of epochs to unstake tokens ( each epoch has 6h )',
-              },
-            },
-            {
-              label: 'Min Epochs To Withdraw',
-              props: {
-                type: 'number',
-                tooltip:
-                  'Minimum amount of epochs to withdraw tokens after unstaking ( each epoch has 6h )',
-              },
-            },
-          ],
-        },
+        ...royaltiesSection(address, false),
+        ...stakingSection(),
         {
           title: 'Roles',
           tooltip: 'Set permissions to specific address',
@@ -322,7 +278,7 @@ const createAsset = (type: string, address = ''): ISection[] => {
             },
           ],
         },
-        ...RoyaltiesSection(address, type === 'NFT'),
+        ...royaltiesSection(address, type === 'NFT'),
         {
           title: 'Roles',
           tooltip: 'Set permissions to a specific address',

@@ -65,7 +65,6 @@ export interface IFormProps {
   collection: ICollectionList | undefined;
   assetID: number;
   itoTriggerType: number | null;
-  isNFT: boolean | undefined;
   metadata: string;
 }
 
@@ -82,7 +81,6 @@ const Form: React.FC<IFormProps> = ({
   collection,
   assetID,
   itoTriggerType,
-  isNFT,
   metadata,
 }) => {
   const formRef = useRef<FormHandles>(null);
@@ -281,7 +279,7 @@ const Form: React.FC<IFormProps> = ({
         return (
           <FormSection inner key={String(index)}>
             <SectionTitle>
-              {field.label}
+              <span>{field.label}</span>
               {field.props?.tooltip && (
                 <TooltipContainer>
                   <InfoIcon size={13} />
@@ -318,7 +316,6 @@ const Form: React.FC<IFormProps> = ({
           collection,
           assetID,
           itoTriggerType,
-          isNFT,
           metadata,
         },
       ]);
@@ -361,7 +358,7 @@ const Form: React.FC<IFormProps> = ({
               {sections.length === 1 && section.title && <FormGap />}
               <FormSection key={String(index)}>
                 <SectionTitle>
-                  <p>{section.title}</p>
+                  <span>{section.title}</span>
                   {section.tooltip && (
                     <TooltipContainer>
                       <InfoIcon size={13} />

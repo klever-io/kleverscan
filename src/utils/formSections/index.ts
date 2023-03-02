@@ -1,5 +1,5 @@
+import { ISection } from '@/components/Form';
 import { ICollectionList, IParamList } from '@/types/index';
-import { ISection } from 'components/Form';
 import assetTriggerContract from './assetTrigger';
 import buyContract from './buy';
 import claimContract from './claim';
@@ -70,7 +70,6 @@ interface IFormSectionArgs {
   withdrawType?: number | null;
   collection?: ICollectionList;
   itoTriggerType?: number | null;
-  isNFT?: boolean | undefined;
 }
 
 const formSection = ({
@@ -84,13 +83,12 @@ const formSection = ({
   withdrawType,
   collection,
   itoTriggerType,
-  isNFT,
 }: IFormSectionArgs): ISection[] => {
   const contractsSections = {
     CreateAssetContract: type
       ? () => createAsset(type, address)
       : () => createAsset('NFT', address),
-    TransferContract: () => transferContract(isNFT),
+    TransferContract: () => transferContract(collection?.isNFT),
     UnfreezeContract: () => unfreezeContract(),
     FreezeContract: () => freezeContract(),
     DelegateContract: () => delegateContract(),
@@ -109,12 +107,12 @@ const formSection = ({
     ValidatorConfigContract: () => validatorConfigContract(),
     CreateValidatorContract: () => createValidatorContract(address),
     SetITOPricesContract: () => setITOContract(),
-    ConfigITOContract: () => configITOContract(),
+    ConfigITOContract: () => configITOContract(address),
     AssetTriggerContract: () =>
       assetTriggerContract(assetTriggerType, collection, address),
     UpdateAccountPermissionContract: () => updatePermissionContract(),
     DepositContract: () => depositContract(),
-    ITOTriggerContract: () => ITOTriggerContract(itoTriggerType),
+    ITOTriggerContract: () => ITOTriggerContract(itoTriggerType, address),
   };
 
   return contractsSections[contract] ? contractsSections[contract]() : [];

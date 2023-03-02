@@ -1,8 +1,9 @@
 import { Contract } from '@/contexts/contract';
+import { ICollectionList } from '@/types';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import Form from '.';
+import Form, { IFormProps, ISection } from '.';
 import theme from '../../styles/theme';
 import {
   mockAssetTriggerTx,
@@ -13,13 +14,44 @@ import {
 import {} from '../../test/mocks/index';
 import { renderWithTheme } from '../../test/utils';
 
-const formProps = {
+const collection: ICollectionList = {
+  isNFT: false,
+  label: 'Test',
+  value: 'test',
+  attributes: {
+    isNFTMintStopped: false,
+    isPaused: false,
+  },
+  balance: 0,
+  buckets: [],
+  frozenBalance: 0,
+  minEpochsToWithdraw: 0,
+  ownerAddress: '',
+  precision: 0,
+  properties: {
+    canAddRoles: false,
+    canBurn: false,
+    canChangeOwner: false,
+    canFreeze: false,
+    canMint: false,
+    canPause: false,
+    canWipe: false,
+  },
+};
+
+const formProps: IFormProps = {
   sections: [] as any[],
   onSubmit: jest.fn(),
   loading: false,
   setMetadata: jest.fn(),
-  addToQueue: jest.fn,
   typeAssetTrigger: 0,
+  collection,
+  assetID: 0,
+  itoTriggerType: 0,
+  metadata: '',
+  showForm: true,
+  buttonLabel: 'Create Transaction',
+  cancelOnly: false,
 };
 
 const contextProps = {
@@ -61,19 +93,14 @@ describe('Component: Form', () => {
 
   it('Should render the Buy Contract Form', () => {
     formProps.sections = mockBuySection;
-    renderWithTheme(
-      <Form
-        contractName={'BuyContract'}
-        key={'BuyContract'}
-        showForm={true}
-        {...formProps}
-      />,
-    );
+    renderWithTheme(<Form key={'BuyContract'} {...formProps} />);
 
     mockBuySection[0].fields.forEach(field => {
       const label = screen.getByText(field.label);
       expect(label).toBeInTheDocument();
-      expect(label.parentNode?.parentNode).toHaveStyle(formSectionStyle);
+      expect(label.parentNode?.parentNode?.parentNode).toHaveStyle(
+        formSectionStyle,
+      );
 
       if (field?.props && field?.props?.tooltip) {
         const tooltip = screen.getByText(field.props.tooltip);
@@ -97,14 +124,7 @@ describe('Component: Form', () => {
     beforeEach(() => jest.clearAllMocks());
     it('Should render the CreateAsset Form case is TOKEN', () => {
       formProps.sections = mockCreateAssetSection;
-      renderWithTheme(
-        <Form
-          contractName={'CreateAssetContract'}
-          key={'CreateAssetContract'}
-          showForm={true}
-          {...formProps}
-        />,
-      );
+      renderWithTheme(<Form key={'CreateAssetContract'} {...formProps} />);
 
       mockCreateAssetSection.forEach(section => {
         if (section?.title) {
@@ -163,14 +183,7 @@ describe('Component: Form', () => {
       formProps.sections = mockCreateAssetSection;
       const user = userEvent.setup();
 
-      renderWithTheme(
-        <Form
-          contractName={'CreateAssetContract'}
-          key={'CreateAssetContract'}
-          showForm={true}
-          {...formProps}
-        />,
-      );
+      renderWithTheme(<Form key={'CreateAssetContract'} {...formProps} />);
 
       const urisTitle = screen.getByText('Uris');
       expect(urisTitle).toBeInTheDocument();
@@ -193,14 +206,7 @@ describe('Component: Form', () => {
       formProps.sections = mockCreateAssetSection;
       const user = userEvent.setup();
 
-      renderWithTheme(
-        <Form
-          contractName={'CreateAssetContract'}
-          key={'CreateAssetContract'}
-          showForm={true}
-          {...formProps}
-        />,
-      );
+      renderWithTheme(<Form key={'CreateAssetContract'} {...formProps} />);
 
       const urisTitle = screen.getByText('Uris');
       expect(urisTitle).toBeInTheDocument();
@@ -226,16 +232,9 @@ describe('Component: Form', () => {
   });
 
   it('Should render the Asset Trigger Contract form', () => {
-    formProps.sections = mockAssetTriggerTx;
+    formProps.sections = mockAssetTriggerTx as ISection[];
 
-    renderWithTheme(
-      <Form
-        contractName={'AssetTriggerContract'}
-        key={'AssetTriggerContract'}
-        showForm={true}
-        {...formProps}
-      />,
-    );
+    renderWithTheme(<Form key={'AssetTriggerContract'} {...formProps} />);
 
     const title = screen.getByText('Roles');
     const address = screen.getByText('Address');
@@ -243,9 +242,11 @@ describe('Component: Form', () => {
     const hasRoleSetITOPrices = screen.getByText('Has Role Set ITO Prices');
 
     const hasRoleMintDefaultValue =
-      hasRoleMint.nextSibling?.firstChild?.nextSibling?.firstChild;
+      hasRoleMint.parentElement?.nextSibling?.firstChild?.nextSibling
+        ?.firstChild;
     const hasRoleSetITOPricesDefaultValue =
-      hasRoleSetITOPrices.nextSibling?.firstChild?.nextSibling?.firstChild;
+      hasRoleSetITOPrices.parentElement?.nextSibling?.firstChild?.nextSibling
+        ?.firstChild;
 
     expect(title).toBeInTheDocument();
     expect(title).toBeVisible();
@@ -264,14 +265,7 @@ describe('Component: Form', () => {
     const user = userEvent.setup();
     formProps.sections = mockTransferContract;
 
-    renderWithTheme(
-      <Form
-        contractName={'TransferContract'}
-        key={'TransferContract'}
-        showForm={true}
-        {...formProps}
-      />,
-    );
+    renderWithTheme(<Form key={'TransferContract'} {...formProps} />);
     const transferText = screen.getByText('Amount');
     const receiverAddress = screen.getByText('Receiver Address');
     const advancedOptions = screen.getByText('Advanced Options');
@@ -301,12 +295,7 @@ describe('Component: Form', () => {
     formProps.sections = [];
 
     const { container } = renderWithTheme(
-      <Form
-        contractName={'TransferContract'}
-        key={'TransferContract'}
-        showForm={true}
-        {...formProps}
-      />,
+      <Form key={'TransferContract'} {...formProps} />,
     );
 
     expect(container.firstChild?.childNodes).toHaveLength(0);
@@ -319,13 +308,7 @@ describe('Component: Form', () => {
 
       renderWithTheme(
         <Contract.Provider value={contextProps as any}>
-          <Form
-            contractName={'anyValue'}
-            key={'anyValue'}
-            showForm={true}
-            {...formProps}
-          />
-          ,
+          <Form key={'anyValue'} {...formProps} />,
         </Contract.Provider>,
       );
       const advancedOptions = screen.getByText('Advanced Options');
@@ -357,13 +340,7 @@ describe('Component: Form', () => {
 
       renderWithTheme(
         <Contract.Provider value={contextProps as any}>
-          <Form
-            contractName={'anyValue'}
-            key={'anyValue'}
-            showForm={true}
-            {...formProps}
-          />
-          ,
+          <Form key={'anyValue'} {...formProps} />,
         </Contract.Provider>,
       );
       const advancedOptions = screen.getByText('Advanced Options');

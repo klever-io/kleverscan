@@ -222,7 +222,6 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
               depositType,
               withdrawType,
               itoTriggerType,
-              isNFT,
             );
 
             const parsedPayload = await precisionParse(

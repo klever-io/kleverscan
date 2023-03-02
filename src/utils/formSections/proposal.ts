@@ -1,5 +1,5 @@
+import { ISection } from '@/components/Form';
 import { IParamList } from '@/types/index';
-import { ISection } from 'components/Form';
 
 const proposalContract = (paramsList?: IParamList[]): ISection[] => {
   const section = [] as ISection[];

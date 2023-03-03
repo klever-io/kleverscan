@@ -52,6 +52,7 @@ const formProps: IFormProps = {
   showForm: true,
   buttonLabel: 'Create Transaction',
   cancelOnly: false,
+  selectedBucket: '',
 };
 
 const contextProps = {
@@ -61,6 +62,9 @@ const contextProps = {
   setIsMultiContract: jest.fn(),
   setShowPayload: jest.fn(),
   setIsMultisig: jest.fn(),
+  kdaFee: collection,
+  setKdaFee: jest.fn(),
+  getOwnerAddress: jest.fn(),
 };
 
 describe('Component: Form', () => {
@@ -265,7 +269,11 @@ describe('Component: Form', () => {
     const user = userEvent.setup();
     formProps.sections = mockTransferContract;
 
-    renderWithTheme(<Form key={'TransferContract'} {...formProps} />);
+    renderWithTheme(
+      <Contract.Provider value={contextProps as any}>
+        <Form key={'TransferContract'} {...formProps} />
+      </Contract.Provider>,
+    );
     const transferText = screen.getByText('Amount');
     const receiverAddress = screen.getByText('Receiver Address');
     const advancedOptions = screen.getByText('Advanced Options');

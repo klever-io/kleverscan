@@ -1,9 +1,18 @@
+import Select from '@/components/Contract/Select';
+import {
+  BalanceContainer,
+  BalanceLabel,
+  FieldLabel,
+  SelectContent,
+} from '@/components/Contract/styles';
+import { getAssetsList } from '@/components/Contract/utils';
 import {
   Slider,
   StyledInput,
   Toggle,
 } from '@/components/Form/FormInput/styles';
 import { useContract } from '@/contexts/contract';
+import { useMobile } from '@/contexts/mobile';
 import {
   DataField,
   ExtraOptionContainer,
@@ -24,7 +33,49 @@ const AdvancedOptions: React.FC<IAdvOptions> = ({ setMetadata }) => {
     showPayload,
     setIsMultisig,
     isMultisig,
+    kdaFee,
+    setKdaFee,
+    assetsList,
+    getOwnerAddress,
+    getAssets,
   } = useContract();
+
+  const { isMobile } = useMobile();
+
+  const assetBalance = kdaFee?.balance || null;
+
+  const kdaSelect = () => {
+    return (
+      <FieldContainer>
+        <SelectContent>
+          <BalanceContainer>
+            <FieldLabel>KDA to pay fees:</FieldLabel>
+            {!isNaN(Number(assetBalance)) && assetBalance !== null && (
+              <BalanceLabel>
+                Balance: {assetBalance / 10 ** (kdaFee?.precision || 0)}
+              </BalanceLabel>
+            )}
+          </BalanceContainer>
+          <Select
+            key={JSON.stringify(kdaFee)}
+            collection={kdaFee}
+            options={getAssetsList(
+              assetsList || [],
+              'FreezeContract',
+              null,
+              null,
+              getOwnerAddress(),
+            )}
+            onChange={(value: any) => {
+              setKdaFee(value);
+            }}
+            getAssets={getAssets}
+            zIndex={3}
+          />
+        </SelectContent>
+      </FieldContainer>
+    );
+  };
 
   return (
     <ExtraOptionContainer>
@@ -32,6 +83,10 @@ const AdvancedOptions: React.FC<IAdvOptions> = ({ setMetadata }) => {
         <InputLabel>Data</InputLabel>
         <DataField onChange={e => setMetadata(e.target.value.toString())} />
       </FieldContainer>
+      {
+        !isMobile &&
+          kdaSelect() /* Remove this check when K5 is updated for kda Fee */
+      }
       <FieldContainer>
         <InputLabel>Multiple Contract</InputLabel>
         <ToggleContainer>

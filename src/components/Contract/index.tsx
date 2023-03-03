@@ -136,14 +136,13 @@ const Contract: React.FC<IContract> = ({
     isMultisig,
     showPayload,
     ownerAddress,
+    getOwnerAddress,
+    kdaFee,
   } = useContract();
 
   const collectionRef = useRef<any>(null);
   const contractRef = useRef<any>(null);
 
-  const getOwnerAddress = () => {
-    return sessionStorage.getItem('walletAddress') || '';
-  };
   const keyElement = JSON.stringify([
     formSections,
     elementIndex,
@@ -419,9 +418,13 @@ const Contract: React.FC<IContract> = ({
           },
         ],
         [parsedData],
+        {
+          kdaFee: kdaFee.value,
+        },
       );
 
       const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
+
       if (isMultisig) {
         const blob = new Blob([JSON.stringify(signedTx)], {
           type: 'application/json',

@@ -39,7 +39,7 @@ export interface IFormsData {
   selectedBucket: string;
 }
 
-interface IContractContext {
+export interface IContractContext {
   ITOBuy: boolean;
   tokenChosen: boolean;
   claimType: number;
@@ -60,6 +60,7 @@ interface IContractContext {
   showPayload: boolean;
   isMultisig: boolean;
   contractOptions: IContractOption[];
+  kdaFee: ICollectionList;
   setITOBuy: React.Dispatch<React.SetStateAction<boolean>>;
   setTokenChosen: React.Dispatch<React.SetStateAction<boolean>>;
   setClaimType: React.Dispatch<React.SetStateAction<number>>;
@@ -84,7 +85,9 @@ interface IContractContext {
   setShowPayload: React.Dispatch<React.SetStateAction<boolean>>;
   setIsMultisig: React.Dispatch<React.SetStateAction<boolean>>;
   setContractOptions: React.Dispatch<React.SetStateAction<IContractOption[]>>;
+  setKdaFee: React.Dispatch<React.SetStateAction<ICollectionList>>;
   getAssets: () => void;
+  getOwnerAddress: () => string;
   addToQueue: () => void;
   resetForms: () => void;
 }
@@ -100,6 +103,7 @@ export const ContractProvider: React.FC = ({ children }) => {
   const [ownerAddress, setOwnerAddress] = useState('');
   const [claimLabel, setClaimLabel] = useState('Asset ID');
   const [isMultiContract, setIsMultiContract] = useState<boolean>(false);
+  const [kdaFee, setKdaFee] = useState<ICollectionList>({} as ICollectionList);
   const [queue, setQueue] = useState<IQueue[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [formsData, setFormsData] = useState<IFormsData[]>([]);
@@ -118,6 +122,10 @@ export const ContractProvider: React.FC = ({ children }) => {
 
   const { logoutExtension } = useExtension();
   const router = useRouter();
+
+  const getOwnerAddress = () => {
+    return sessionStorage.getItem('walletAddress') || '';
+  };
 
   const getKAssets = async (address: string) => {
     const response: IAssetResponse = await api.get({
@@ -364,6 +372,9 @@ export const ContractProvider: React.FC = ({ children }) => {
     setIsMultisig,
     contractOptions,
     setContractOptions,
+    kdaFee,
+    setKdaFee,
+    getOwnerAddress,
   };
   return <Contract.Provider value={values}>{children}</Contract.Provider>;
 };

@@ -28,4 +28,9 @@ module.exports = withImages({
   env: getEnvs(),
   i18n,
   reactStrictMode: false,
+  webpack: config => {
+    config.resolve.fallback = { fs: false };
+
+    return config;
+  },
 });

@@ -33,7 +33,7 @@ import {
   WarningContainer,
   WarningText,
 } from '@/views/create-transaction';
-import { core } from '@klever/sdk';
+import { web } from '@klever/sdk';
 import { GetServerSideProps } from 'next';
 import React, { useEffect } from 'react';
 import { toast } from 'react-toastify';
@@ -249,10 +249,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
           return data;
         });
 
-        const buildTxs = await core.buildTransaction(
-          parsedData,
-          parsedMetadata,
-        );
+        const buildTxs = await web.buildTransaction(parsedData, parsedMetadata);
         const signedTxs = await window.kleverWeb.signTransaction(buildTxs);
         if (isMultisig) {
           const blob = new Blob([JSON.stringify(signedTxs)], {
@@ -268,7 +265,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
             'Transaction built and signed, send the file to the co-owner(s)',
           );
         } else {
-          const response = await core.broadcastTransactions([signedTxs]);
+          const response = await web.broadcastTransactions([signedTxs]);
           setTxHash(response.data.txsHashes[0]);
           toast.success('Transaction broadcast successfully');
           if (response.data.txsHashes[0]) {

@@ -17,7 +17,7 @@ import {
 } from '@/utils/contracts';
 import formSection from '@/utils/formSections';
 import { parseAddress } from '@/utils/parseValues';
-import { core } from '@klever/sdk';
+import { web } from '@klever/sdk';
 import Link from 'next/link';
 import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
@@ -409,7 +409,7 @@ const Contract: React.FC<IContract> = ({
     setLoading(true);
     const parsedData = Buffer.from(metadata, 'utf-8').toString('base64');
     try {
-      const unsignedTx = await core.buildTransaction(
+      const unsignedTx = await web.buildTransaction(
         [
           {
             type: getType(contractType),
@@ -435,7 +435,7 @@ const Contract: React.FC<IContract> = ({
           'Transaction built and signed, send the file to the co-owner(s)',
         );
       } else {
-        const response = await core.broadcastTransactions([signedTx]);
+        const response = await web.broadcastTransactions([signedTx]);
         setLoading(false);
         setTxHash(response.data.txsHashes[0]);
         toast.success('Transaction broadcast successfully');

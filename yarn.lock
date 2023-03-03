@@ -805,21 +805,23 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@klever/kleverweb@^1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@klever/kleverweb/-/kleverweb-1.0.3.tgz#f10e696384c493bf6727be93ee13fafa01780f86"
-  integrity sha512-j8mbqOW0kmfbL2cJQJ0lW1REwGRWAerPwBHpytoyett+J7zTIs33Ox2M0k8ibg9OiVKuHz6Qb5Mc/jXFp7Ybiw==
+"@klever/kleverweb@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@klever/kleverweb/-/kleverweb-1.1.0.tgz#995a9603bd111f50214dcbfce58147c6ca77bb67"
+  integrity sha512-Y+KUq1hEKyFFxZWjp6yCK4h1WWplf1xGL3UulmJEcoObXxtgVlfZdnmwY5aF/kWo38gTiqKsTrCd5x3VkRR3eA==
   dependencies:
     "@protobuf-ts/plugin" "^2.7.0"
 
-"@klever/sdk@3.2.4":
-  version "3.2.4"
-  resolved "https://registry.yarnpkg.com/@klever/sdk/-/sdk-3.2.4.tgz#68cf115a73f807a3c3ba21358a4445fd8a046ab0"
-  integrity sha512-3K2QM/ywjdRU8M8p1Fz+LP1uAcoumuFQIAV1ckB4vk9IPuAhpCoWDJQoIaeWeIiTk+mIuNd9stKPnjyUXndlEA==
+"@klever/sdk@^4.1.4":
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/@klever/sdk/-/sdk-4.1.4.tgz#b2d13e8e92a9803f689a6be6c545ef3d159b6a99"
+  integrity sha512-bwyYQLFbB/M1sQ9rWMd7I6443eFvwGO1s3V48PRawxO0FwqaeT8SQm3hgh3wePkxnJ4Ss8MTZ//vssmCYLuH5Q==
   dependencies:
-    "@klever/kleverweb" "^1.0.3"
+    "@klever/kleverweb" "^1.1.0"
     "@noble/ed25519" "^1.7.1"
     bech32 "^2.0.0"
+    blakejs "^1.2.1"
+    google-protobuf "^3.21.2"
 
 "@next/env@12.3.0":
   version "12.3.0"
@@ -1966,6 +1968,11 @@ big.js@^5.2.2:
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/big.js/-/big.js-5.2.2.tgz#65f0af382f578bcdc742bd9c281e9cb2d7768328"
   integrity sha512-vyL2OymJxmarO8gxMr0mhChsO9QGwhynfuu4+MHTAW6czfq9humCB7rKpUjDd9YUiDPU4mzpyupFSvOClAwbmQ==
+
+blakejs@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/blakejs/-/blakejs-1.2.1.tgz#5057e4206eadb4a97f7c0b6e197a505042fc3814"
+  integrity sha512-QXUSXI3QVc/gJME0dBpXrag1kbzOqCjCX8/b54ntNyW6sjtoqxqRk3LTmXzaJoh71zMsDCjM+47jS7XiwN/+fQ==
 
 blob-util@^2.0.2:
   version "2.0.2"
@@ -3579,6 +3586,11 @@ globby@^11.0.3:
     ignore "^5.2.0"
     merge2 "^1.4.1"
     slash "^3.0.0"
+
+google-protobuf@^3.21.2:
+  version "3.21.2"
+  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.21.2.tgz#4580a2bea8bbb291ee579d1fefb14d6fa3070ea4"
+  integrity sha512-3MSOYFO5U9mPGikIYCzK0SaThypfGgS6bHqrUGXG3DPHCrb+txNqeEcns1W0lkGfk0rCyNXm7xB9rMxnCiZOoA==
 
 graceful-fs@^4.1.6, graceful-fs@^4.2.0, graceful-fs@^4.2.9:
   version "4.2.10"

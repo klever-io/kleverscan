@@ -20,14 +20,6 @@ const getType = (rawType: string): TransactionType => {
       type = 'SellOrder';
       break;
   }
-
-  if (type === 'Deposit') {
-    // TODO:Remove upon SDK UPDATE
-    return 23;
-  }
-  if (type === 'ITOTrigger') {
-    return 24;
-  }
   return TransactionType[type];
 };
 

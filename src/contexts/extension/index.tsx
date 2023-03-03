@@ -1,5 +1,5 @@
 import { doIf } from '@/utils/promiseFunctions';
-import { core } from '@klever/sdk';
+import { web } from '@klever/sdk';
 import { useRouter } from 'next/router';
 import {
   createContext,
@@ -70,9 +70,9 @@ export const ExtensionProvider: React.FC = ({ children }) => {
       };
 
       try {
-        if (!core.isKleverWebActive()) {
+        if (!web.isKleverWebActive()) {
           setExtensionLoading(true);
-          await core.initialize();
+          await web.initialize();
           setExtensionLoading(false);
         }
         const address: string = await window.kleverWeb.getWalletAddress();

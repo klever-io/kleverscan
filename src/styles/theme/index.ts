@@ -121,6 +121,9 @@ const theme = {
     title: '#0B0B1E',
   },
 
+  circleBackground: {
+    light: '#e7e7e7',
+  },
   table: {
     text: '#7B7DB2',
     success: '#4EBC87',

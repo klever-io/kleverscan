@@ -46,6 +46,9 @@ const darktheme = {
     background: '#222345',
   },
 
+  circleBackground: {
+    light: '#222345',
+  },
   footer: {
     ...theme.footer,
     background: '#0B0B1E',

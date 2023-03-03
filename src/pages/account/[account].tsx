@@ -22,6 +22,7 @@ import {
   TxsFiltersWrapper,
 } from '@/components/TransactionsFilters/styles';
 import { useExtension } from '@/contexts/extension';
+import { useMobile } from '@/contexts/mobile';
 import api, { IPrice } from '@/services/api';
 import {
   IAccount,
@@ -37,6 +38,7 @@ import {
 } from '@/types/index';
 import { filterDate } from '@/utils/formatFunctions';
 import { KLV_PRECISION, UINT32_MAX } from '@/utils/globalVariables';
+import { parseAddress } from '@/utils/parseValues';
 import { getPrecision } from '@/utils/precisionFunctions';
 import { resetDate } from '@/utils/resetDate';
 import {
@@ -291,6 +293,7 @@ const Account: React.FC<IAccountPage> = () => {
   const [valueContract, setValueContract] = useState<any>();
 
   const { walletAddress } = useExtension();
+  const { isTablet } = useMobile();
   const router = useRouter();
 
   const initialQueryState = {
@@ -720,6 +723,16 @@ const Account: React.FC<IAccountPage> = () => {
     valueContract: valueContract,
     setValueContract: setValueContract,
   };
+
+  const getAccountAddress = () => {
+    const address = router.query.account as string;
+
+    if (isTablet && address) {
+      return parseAddress(address, 20);
+    }
+    return address && parseAddress(address, 50);
+  };
+
   return (
     <Container>
       <ModalContract {...modalOptions} />
@@ -733,13 +746,13 @@ const Account: React.FC<IAccountPage> = () => {
         <Input />
       </Header>
       <OverviewContainer>
-        <Row>
+        <Row isAddressRow={true}>
           <span>
             <strong>Address</strong>
           </span>
           <RowContent>
             <CenteredRow>
-              <span>{router.query.account as string}</span>
+              <span>{getAccountAddress()}</span>
               <Copy info="Address" data={router.query.account as string} />
               <ReceiveBackground>
                 <QrCodeModal

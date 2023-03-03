@@ -20,7 +20,6 @@ import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import { ICollectionList, IParamList } from '@/types/index';
 import { INetworkParam, IProposalsResponse } from '@/types/proposals';
-import { contractOptions } from '@/utils/contracts';
 import formSection from '@/utils/formSections';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { Header } from '@/views/assets';
@@ -68,7 +67,6 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
     formsData,
     setFormsData,
     tokenChosen,
-    selectedBucket,
     assetsList,
     setProposals,
     setParamsList,
@@ -82,6 +80,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
     setShowPayload,
     formSections,
     resetForms,
+    contractOptions,
   } = useContract();
 
   useEffect(() => {
@@ -206,6 +205,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
             itoTriggerType,
             isNFT,
             metadata,
+            selectedBucket,
           }: IFormsData) => {
             const parsedvalues = parseValues(
               data,

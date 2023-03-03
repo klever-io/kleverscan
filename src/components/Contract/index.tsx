@@ -112,7 +112,6 @@ const Contract: React.FC<IContract> = ({
   const [metadata, setMetadata] = useState<string>('');
   const [payload, setPayload] = useState<any>({});
   const [open, setOpen] = useState(false);
-  const [bucketsCollection, setBucketsCollection] = useState<any>([]);
   const [bucketsList, setBucketsList] = useState<any>([]);
   const [assetBalance, setAssetBalance] = useState<number | null>(null);
   const [collection, setCollection] = useState<ICollectionList | undefined>(
@@ -124,14 +123,12 @@ const Contract: React.FC<IContract> = ({
   const [typeAssetTrigger, setTypeAssetTrigger] = useState<number | null>(null);
   const [formSections, setFormSections] = useState<IContractSection[]>([]);
   const [assetID, setAssetID] = useState<number>(0);
-
+  const [selectedBucket, setSelectedBucket] = useState<string>('');
   const {
     contractType,
     setContractType,
     ITOBuy,
     setITOBuy,
-    selectedBucket,
-    setSelectedBucket,
     txLoading: loading,
     setTxLoading: setLoading,
     txHash,
@@ -174,7 +171,6 @@ const Contract: React.FC<IContract> = ({
         setCollection(getAsset);
       }
       setSelectedBucket(valueContract[1]);
-      setBucketsCollection([valueContract[0]]);
     }
   }, [valueContract]);
 
@@ -280,6 +276,21 @@ const Contract: React.FC<IContract> = ({
   }, [itoTriggerType, collection]);
 
   useEffect(() => {
+    if (contractType === 'UnfreezeContract') {
+      const buckets: ProposalsList[] = [];
+      assetsList?.forEach((item: any) => {
+        if (item.label === collection?.label) {
+          item?.buckets?.forEach((bucket: any) => {
+            buckets.push({
+              label: parseAddress(bucket.id, 20),
+              value: bucket.id,
+            });
+          });
+        }
+      });
+      setBucketsList(buckets);
+    }
+
     if (contractType !== 'TransferContract') return;
     setFormSections([
       ...formSection({
@@ -313,12 +324,23 @@ const Contract: React.FC<IContract> = ({
     }
 
     if (contractType === 'DelegateContract') {
-      setBucketsCollection(['KFI', 'KLV']);
+      const buckets: ProposalsList[] = [];
+      assetsList?.forEach((item: any) => {
+        if (item.label === 'KLV' || item.label === 'KFI') {
+          item?.buckets?.forEach((bucket: any) => {
+            buckets.push({
+              label: parseAddress(bucket.id, 20),
+              value: bucket.id,
+            });
+          });
+        }
+      });
+      setBucketsList(buckets);
     } else if (contractType === 'UndelegateContract') {
       const buckets: ProposalsList[] = [];
       assetsList?.forEach((asset: any) => {
         asset?.buckets?.forEach((bucket: any) => {
-          if (bucket?.delegation !== getOwnerAddress()) {
+          if (bucket?.delegation !== getOwnerAddress() && bucket.delegation) {
             buckets.push({
               label: parseAddress(bucket.id, 20),
               value: bucket.id,
@@ -327,7 +349,7 @@ const Contract: React.FC<IContract> = ({
         });
       });
 
-      setBucketsList([...buckets]);
+      setBucketsList(buckets);
     }
   }, [contractType]);
 
@@ -341,26 +363,6 @@ const Contract: React.FC<IContract> = ({
       contractRef.current = contractType;
     }
   }, [collection]);
-
-  useEffect(() => {
-    const buckets: ProposalsList[] = [];
-
-    bucketsCollection.forEach((collection: string) => {
-      assetsList &&
-        assetsList.forEach((item: any) => {
-          if (item.label === collection) {
-            item?.buckets?.forEach((bucket: any) => {
-              buckets.push({
-                label: parseAddress(bucket.id, 20),
-                value: bucket.id,
-              });
-            });
-          }
-        });
-    });
-
-    setBucketsList([...buckets]);
-  }, [bucketsCollection]);
 
   useEffect(() => {
     if (tokenChosen) {
@@ -513,6 +515,7 @@ const Contract: React.FC<IContract> = ({
     assetID,
     itoTriggerType,
     metadata,
+    selectedBucket,
   };
 
   const permissionsForm = () => (
@@ -708,9 +711,6 @@ const Contract: React.FC<IContract> = ({
           )}
           onChange={value => {
             setCollection(value);
-            if (contractType === 'UnfreezeContract') {
-              setBucketsCollection([value.value]);
-            }
           }}
           getAssets={getAssets}
           zIndex={3}

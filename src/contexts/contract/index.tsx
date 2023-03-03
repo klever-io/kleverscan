@@ -2,7 +2,7 @@ import ContractComponent from '@/components/Contract';
 import { getType } from '@/components/Contract/utils';
 import { ISection } from '@/components/Form';
 import api from '@/services/api';
-import { ContractsIndex } from '@/types/contracts';
+import { ContractsIndex, IContractOption } from '@/types/contracts';
 import {
   IAccount,
   IAccountResponse,
@@ -10,6 +10,7 @@ import {
   IAssetResponse,
   ICollectionList,
 } from '@/types/index';
+import { contractOptions as allContractOptions } from '@/utils/contracts';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useRouter } from 'next/router';
 import React, { createContext, useContext, useEffect, useState } from 'react';
@@ -35,6 +36,7 @@ export interface IFormsData {
   itoTriggerType: number | null;
   isNFT: boolean | undefined;
   metadata: string;
+  selectedBucket: string;
 }
 
 interface IContractContext {
@@ -50,19 +52,14 @@ interface IContractContext {
   isMultiContract: boolean;
   selectedIndex: number;
   formsData: IFormsData[];
-  selectedBucket: string;
-  assetID: number;
-  buyKey: number;
   txLoading: boolean;
   showAdvancedOpts: boolean;
   txHash: string | null;
   assetsList: ICollectionList[] | null;
-  kassetsList: ICollectionList[];
-  proposals: any;
-  paramsList: any;
   showMultiContracts: boolean;
   showPayload: boolean;
   isMultisig: boolean;
+  contractOptions: IContractOption[];
   setITOBuy: React.Dispatch<React.SetStateAction<boolean>>;
   setTokenChosen: React.Dispatch<React.SetStateAction<boolean>>;
   setClaimType: React.Dispatch<React.SetStateAction<number>>;
@@ -75,21 +72,18 @@ interface IContractContext {
   setIsMultiContract: React.Dispatch<React.SetStateAction<boolean>>;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
   setFormsData: React.Dispatch<React.SetStateAction<any>>;
-  setSelectedBucket: React.Dispatch<React.SetStateAction<string>>;
-  setAssetID: React.Dispatch<React.SetStateAction<number>>;
-  setBuyKey: React.Dispatch<React.SetStateAction<number>>;
   setTxLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setShowAdvancedOpts: React.Dispatch<React.SetStateAction<boolean>>;
   setTxHash: React.Dispatch<React.SetStateAction<string | null>>;
   setAssetsLists: React.Dispatch<
     React.SetStateAction<ICollectionList[] | null>
   >;
-  setKAssetsList: React.Dispatch<React.SetStateAction<ICollectionList[]>>;
   setProposals: React.Dispatch<React.SetStateAction<any>>;
   setParamsList: React.Dispatch<React.SetStateAction<any>>;
   setShowMultiContracts: React.Dispatch<React.SetStateAction<boolean>>;
   setShowPayload: React.Dispatch<React.SetStateAction<boolean>>;
   setIsMultisig: React.Dispatch<React.SetStateAction<boolean>>;
+  setContractOptions: React.Dispatch<React.SetStateAction<IContractOption[]>>;
   getAssets: () => void;
   addToQueue: () => void;
   resetForms: () => void;
@@ -109,9 +103,6 @@ export const ContractProvider: React.FC = ({ children }) => {
   const [queue, setQueue] = useState<IQueue[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [formsData, setFormsData] = useState<IFormsData[]>([]);
-  const [selectedBucket, setSelectedBucket] = useState<any>([]);
-  const [assetID, setAssetID] = useState(0);
-  const [buyKey, setBuyKey] = useState(0);
   const [txLoading, setTxLoading] = useState<boolean>(false);
   const [txHash, setTxHash] = useState<string | null>(null);
   const [showAdvancedOpts, setShowAdvancedOpts] = useState(false);
@@ -122,6 +113,8 @@ export const ContractProvider: React.FC = ({ children }) => {
   const [proposals, setProposals] = useState<any>([]);
   const [paramsList, setParamsList] = useState<any>([]);
   const [showMultiContracts, setShowMultiContracts] = useState<boolean>(false);
+  const [contractOptions, setContractOptions] =
+    useState<IContractOption[]>(allContractOptions);
 
   const { logoutExtension } = useExtension();
   const router = useRouter();
@@ -303,6 +296,25 @@ export const ContractProvider: React.FC = ({ children }) => {
   };
 
   useEffect(() => {
+    if (isMultiContract) {
+      const allowedMultiContract = [
+        'Transfer',
+        'Delegate',
+        'Undelegate',
+        'Freeze',
+        'Unfreeze',
+        'Asset Trigger',
+      ];
+      const filterContractOptions = contractOptions.filter(contract =>
+        allowedMultiContract.includes(contract.label),
+      );
+      setContractOptions(filterContractOptions);
+    }
+
+    if (!isMultiContract) {
+      setContractOptions(allContractOptions);
+    }
+
     resetForms();
   }, [isMultiContract, contractType]);
 
@@ -331,12 +343,6 @@ export const ContractProvider: React.FC = ({ children }) => {
     setSelectedIndex,
     formsData,
     setFormsData,
-    selectedBucket,
-    setSelectedBucket,
-    assetID,
-    setAssetID,
-    buyKey,
-    setBuyKey,
     txLoading,
     setTxLoading,
     txHash,
@@ -345,11 +351,7 @@ export const ContractProvider: React.FC = ({ children }) => {
     setShowAdvancedOpts,
     assetsList,
     setAssetsLists,
-    kassetsList,
-    setKAssetsList,
-    proposals,
     setProposals,
-    paramsList,
     setParamsList,
     getAssets,
     addToQueue,
@@ -360,6 +362,8 @@ export const ContractProvider: React.FC = ({ children }) => {
     isMultisig,
     resetForms,
     setIsMultisig,
+    contractOptions,
+    setContractOptions,
   };
   return <Contract.Provider value={values}>{children}</Contract.Provider>;
 };

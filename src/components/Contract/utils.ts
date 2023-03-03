@@ -562,6 +562,11 @@ const parseValues = (
     parsedValues.withdrawType = withdrawType;
   }
 
+  if (contractType === 'DelegateContract') {
+    parsedValues.receiver = parsedValues.validatorAddress;
+    delete parsedValues.validatorAddress;
+  }
+
   if (
     contractType === 'ConfigITOContract' ||
     (contractType === 'ITOTriggerContract' && itoTriggerType === 0)

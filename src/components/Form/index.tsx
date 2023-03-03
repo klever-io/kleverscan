@@ -66,6 +66,7 @@ export interface IFormProps {
   assetID: number;
   itoTriggerType: number | null;
   metadata: string;
+  selectedBucket: string;
 }
 
 const Form: React.FC<IFormProps> = ({
@@ -82,6 +83,7 @@ const Form: React.FC<IFormProps> = ({
   assetID,
   itoTriggerType,
   metadata,
+  selectedBucket,
 }) => {
   const formRef = useRef<FormHandles>(null);
   const [sections, setSections] = useState(defaultSections);
@@ -317,6 +319,7 @@ const Form: React.FC<IFormProps> = ({
           assetID,
           itoTriggerType,
           metadata,
+          selectedBucket,
         },
       ]);
       return;

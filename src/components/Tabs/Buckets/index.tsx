@@ -1,11 +1,12 @@
 import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
 import { useMobile } from '@/contexts/mobile';
+import api from '@/services/api';
 import { IAssetsBuckets, IInnerTableProps, IRowSection } from '@/types/index';
 import { parseAddress } from '@/utils/parseValues';
 import { CenteredRow, RowContent } from '@/views/accounts/detail';
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ContractContainer, Status } from './styles';
 
 export interface IBuckets {
@@ -23,21 +24,31 @@ const Buckets: React.FC<IBuckets> = ({
   showInteractionsButtons,
 }) => {
   const UINT32_MAX = 4294967295;
-
+  const [epoch, setEpoch] = useState<number>(0);
   const { isMobile } = useMobile();
+
+  const requestBlockEpoch = async () => {
+    const response = await api.get({
+      route: 'block/list',
+    });
+    const currentEpoch = response.data?.blocks[0]?.epoch;
+    setEpoch(currentEpoch);
+  };
+
+  useEffect(() => {
+    requestBlockEpoch();
+  }, []);
 
   const rowSections = (assetBucket: IAssetsBuckets): IRowSection[] => {
     const { asset, bucket } = assetBucket;
     const minEpochsToUnstake = 1;
     const minEpochsToWithdraw = 2;
 
-    const unfreezeEquation =
-      bucket.stakedEpoch + minEpochsToUnstake - asset.lastClaim.epoch;
+    const unfreezeEquation = bucket.stakedEpoch + minEpochsToUnstake - epoch;
     const isUnfreezeLocked = () => {
       return unfreezeEquation > 0;
     };
-    const withdrawEquation =
-      bucket.unstakedEpoch - asset.lastClaim.epoch + minEpochsToWithdraw;
+    const withdrawEquation = bucket.unstakedEpoch - epoch + minEpochsToWithdraw;
 
     const isWithdrawLocked = () => {
       if (bucket?.unstakedEpoch === UINT32_MAX) {
@@ -72,6 +83,7 @@ const Buckets: React.FC<IBuckets> = ({
         return <>--</>;
       }
     };
+
     const getButton = () => {
       if (isUnfreezeLocked() || isWithdrawLocked()) {
         if (bucket.delegation) {

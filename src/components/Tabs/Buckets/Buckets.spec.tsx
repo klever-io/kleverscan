@@ -8,7 +8,11 @@ import React from 'react';
 import { act } from 'react-dom/test-utils';
 import { renderWithTheme } from '../../../test/utils';
 import Buckets from './';
-import { mockAccountResponse, mockAssetKLVResponse } from './mock';
+import {
+  mockAccountResponse,
+  mockAssetKLVResponse,
+  mockBlockResponse,
+} from './mock';
 
 describe('Component: Buckets Tab', () => {
   const headerTable = [
@@ -51,6 +55,8 @@ describe('Component: Buckets Tab', () => {
         return Promise.resolve(mockAccountResponse);
       case params.route.includes('assets'):
         return Promise.resolve(mockAssetKLVResponse);
+      case params.route.includes('block'):
+        return Promise.resolve(mockBlockResponse);
       default:
         return Promise.reject(new Error(`Unexpected route: ${params.route}`));
     }

@@ -183,13 +183,19 @@ const assetTriggerContract = (
         fields: [
           {
             label: 'Admin Address',
+            props: {
+              defaultValue: address,
+              required: true,
+            },
           },
           {
             label: 'Fixed Ratio for KLV',
             objectName: 'fRatioKLV',
             props: {
               type: 'number',
-              tooltip: 'Fixed ratio for KLV',
+              tooltip:
+                'KLV ratio, the cost is calculated as (KLV ratio) / (KDA ratio) E.g.: when KLV ratio is 1 and KDA ratio is 2, the cost is 1/2 = 0.5 KLV/KDA',
+              required: true,
             },
           },
           {
@@ -197,7 +203,9 @@ const assetTriggerContract = (
             objectName: 'fRatioKDA',
             props: {
               type: 'number',
-              tooltip: 'Fixed ratio for KDA',
+              tooltip:
+                'KDA ratio, the cost is calculated as (KLV ratio) / (KDA ratio) E.g.: when KLV ratio is 1 and KDA ratio is 2, the cost is 1/2 = 0.5 KLV/KDA',
+              required: true,
             },
           },
           {

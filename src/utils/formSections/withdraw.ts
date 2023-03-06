@@ -20,14 +20,14 @@ const withdrawContract = (type?: number | null): ISection[] => {
           label: 'Amount',
           props: {
             type: 'number',
-            tooltip: 'Amount',
+            tooltip: 'Amount to be withdrawn from pool',
           },
         },
         {
           label: 'Currency Id',
           props: {
             type: 'string',
-            tooltip: 'Currency Id',
+            tooltip: 'Asset to be withdrawn from pool',
           },
         },
       );

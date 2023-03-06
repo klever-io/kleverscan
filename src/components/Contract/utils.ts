@@ -146,7 +146,18 @@ const precisionParse = async (
         );
       parseSplitRoyaltiesPrecision(payload);
       addRoyalitiesPrecision();
-
+      if (payload?.kdaPool?.fRatioKLV) {
+        payload.kdaPool.fRatioKLV = addPrecision(
+          payload.kdaPool.fRatioKLV,
+          KLV_PRECISION,
+        );
+      }
+      if (payload?.kdaPool?.fRatioKDA) {
+        payload.kdaPool.fRatioKDA = addPrecision(
+          payload.kdaPool.fRatioKDA,
+          await getPrecision(assetId),
+        );
+      }
       break;
     case 'VoteContract':
       payload.amount = payload.amount * KLV_PRECISION;

@@ -49,14 +49,14 @@ export const royaltiesSection = (
       label: 'Transfer Fixed',
       props: {
         type: 'number',
-        tooltip: 'Transfer fee details for non-fungible tokens',
+        tooltip: 'Fixed transfer fee for non-fungible tokens (in KLV)',
       },
     });
     section[0].fields.push({
       label: 'Market Percentage',
       props: {
         type: 'number',
-        tooltip: 'Market percentage fee details for non-fungible tokens',
+        tooltip: 'Market percentage fee for non-fungible tokens (in KLV)',
         maxDecimals: 2,
       },
     });
@@ -64,7 +64,7 @@ export const royaltiesSection = (
       label: 'Market Fixed',
       props: {
         type: 'number',
-        tooltip: 'Market fixed fee details for non-fungible tokens',
+        tooltip: 'Market fixed fee details for non-fungible tokens (in KLV)',
       },
     });
     section[0].fields.splice(4, 0, ...ITOFields);
@@ -101,7 +101,7 @@ export const royaltiesSection = (
                       props: {
                         type: 'number',
                         tooltip:
-                          'Percentage that the given address will receive from transfer percentage',
+                          'Percentage that the given address will receive from "transfer percentage" fee',
                         maxDecimals: 2,
                       },
                     },
@@ -110,7 +110,7 @@ export const royaltiesSection = (
                       props: {
                         type: 'number',
                         tooltip:
-                          'Percentage that the given address will receive from market percentage',
+                          'Percentage that the given address will receive from "market percentage" fee',
                         maxDecimals: 2,
                       },
                     },
@@ -119,7 +119,7 @@ export const royaltiesSection = (
                       props: {
                         type: 'number',
                         tooltip:
-                          'Percentage that the given address will receive from market fixed',
+                          'Percentage that the given address will receive from "market fixed" fee',
                         maxDecimals: 2,
                       },
                     },
@@ -128,7 +128,7 @@ export const royaltiesSection = (
                       props: {
                         type: 'number',
                         tooltip:
-                          'Percentage that the given address will receive from market percentage',
+                          'Percentage that the given address will receive from "ITO percentage" fee',
                         maxDecimals: 2,
                       },
                     },
@@ -137,7 +137,7 @@ export const royaltiesSection = (
                       props: {
                         type: 'number',
                         tooltip:
-                          'Percentage that the given address will receive from market fixed',
+                          'Percentage that the given address will receive from "ITO fixed" fee',
                         maxDecimals: 2,
                       },
                     },
@@ -157,7 +157,8 @@ export const royaltiesSection = (
       props: {
         type: 'struct',
         array: true,
-        tooltip: 'How much to be charged with fees',
+        tooltip:
+          'How much to be charged with fees in a transfer, the cost can increase or decrease depending on the amount of the transfer',
         innerSection: {
           title: 'Royalty Info',
           inner: true,
@@ -174,7 +175,7 @@ export const royaltiesSection = (
               label: 'Percentage',
               props: {
                 type: 'number',
-                tooltip: 'Fee %',
+                tooltip: 'Fee, in percentage',
                 maxDecimals: 2,
               },
             },
@@ -214,7 +215,7 @@ export const royaltiesSection = (
                       props: {
                         type: 'number',
                         tooltip:
-                          'Percentage that the given address will receive from transfer percentage',
+                          'Percentage that the given address will receive from "transfer percentage" fee',
                         maxDecimals: 2,
                       },
                     },
@@ -223,7 +224,7 @@ export const royaltiesSection = (
                       props: {
                         type: 'number',
                         tooltip:
-                          'Percentage that the given address will receive from market percentage',
+                          'Percentage that the given address will receive from "ITO percentage" fee',
                         maxDecimals: 2,
                       },
                     },
@@ -232,7 +233,7 @@ export const royaltiesSection = (
                       props: {
                         type: 'number',
                         tooltip:
-                          'Percentage that the given address will receive from market fixed',
+                          'Percentage that the given address will receive from "ITO fixed" fee',
                         maxDecimals: 2,
                       },
                     },
@@ -265,8 +266,9 @@ export const stakingSection = (): ISection[] => {
         label: 'APR',
         props: {
           type: 'number',
-          tooltip: 'Annual percentage rate',
+          tooltip: 'Annual percentage rate, in percentage, 100 = 100%',
           maxDecimals: 2,
+          min: 0,
         },
       },
       {

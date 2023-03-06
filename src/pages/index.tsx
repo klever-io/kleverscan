@@ -16,7 +16,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React, { useCallback, useEffect } from 'react';
 import nextI18NextConfig from '../../next-i18next.config';
 
-const Home: React.FC<IHomeProps> = ({ kfiPrices }) => {
+const Home: React.FC<IHomeProps> = () => {
   const precision = 6; // default KLV precision
 
   const [blocks, setBlocks] = React.useState<IBlock[]>([]);
@@ -24,7 +24,7 @@ const Home: React.FC<IHomeProps> = ({ kfiPrices }) => {
   const getBlocks = useCallback(
     async (setBlocksScoped: React.Dispatch<React.SetStateAction<IBlock[]>>) => {
       const res = await api.getCached({
-        route: 'block/list',
+        route: 'block/list?minify=true',
         refreshTime: 4,
       });
 

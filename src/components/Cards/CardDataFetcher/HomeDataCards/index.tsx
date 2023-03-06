@@ -2,7 +2,7 @@ import { Accounts, Epoch, TPS, Transactions } from '@/assets/cards';
 import Tooltip from '@/components/Tooltip';
 import { useTheme } from '@/contexts/theme';
 import { ICard, IEpochCard } from '@/types';
-import { getVariation } from '@/utils/index';
+import { getVariation } from '@/utils';
 import {
   DataCard,
   DataCardLatest,

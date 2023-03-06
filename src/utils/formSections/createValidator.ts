@@ -1,4 +1,4 @@
-import { ISection } from 'components/Form';
+import { ISection } from '@/components/Form';
 
 const createValidatorContract = (address = ''): ISection[] => {
   const section = [] as ISection[];
@@ -40,10 +40,11 @@ const createValidatorContract = (address = ''): ISection[] => {
         },
       },
       {
-        label: 'Comission',
+        label: 'Commission',
         props: {
           type: 'number',
           tooltip: 'Validation commission with 2 decimals',
+          maxDecimals: 2,
         },
       },
       {

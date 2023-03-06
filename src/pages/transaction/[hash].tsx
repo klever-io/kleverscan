@@ -36,13 +36,9 @@ import api from '@/services/api';
 import { IBlock } from '@/types/blocks';
 import { Contract, IIndexedContract } from '@/types/contracts';
 import { IAsset, IResponse, ITransaction } from '@/types/index';
-import {
-  capitalizeString,
-  formatDate,
-  hexToString,
-  parseJson,
-  toLocaleFixed,
-} from '@/utils/index';
+import { capitalizeString, hexToString } from '@/utils/convertString';
+import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
+import { parseJson } from '@/utils/parseValues';
 import { BalanceContainer, RowContent } from '@/views/accounts/detail';
 import {
   ButtonExpand,

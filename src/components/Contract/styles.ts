@@ -42,9 +42,9 @@ export const CloseIcon = styled(IoMdCloseCircle).attrs(props => ({
 
 export const Container = styled.div`
   margin: auto;
-  width: 90%;
+  margin-top: 2rem;
+  width: 100%;
   max-width: 1200px;
-  padding: 2rem 0;
 
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
@@ -186,10 +186,6 @@ export const ExtraOptionContainer = styled.div`
     white-space: nowrap;
     text-overflow: ellipsis;
   }
-
-  svg:last-of-type {
-    margin-left: auto;
-  }
 `;
 
 export const SelectContainer = styled.div`
@@ -259,11 +255,9 @@ export const BalanceContainer = styled.div`
 `;
 
 export const CardContainer = styled.div`
-  margin-top: -0.7rem;
   width: 100%;
   max-width: 1200px;
-  margin-bottom: -2rem;
-  padding: 2rem 0;
+  padding-bottom: 2rem;
 
   font-family: Rubik;
   font-family: Rubik;
@@ -280,4 +274,13 @@ export const CardContainer = styled.div`
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
   }
+`;
+
+export const CreateTxContainer = styled.div<{ isMultiContract?: boolean }>`
+  display: flex;
+  gap: 1rem;
+`;
+
+export const SectionFormContainer = styled.div`
+  width: 100%;
 `;

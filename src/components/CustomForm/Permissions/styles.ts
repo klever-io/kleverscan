@@ -20,6 +20,7 @@ export const CheckboxContract = styled.div`
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  justify-content: flex-end;
 
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10+ */

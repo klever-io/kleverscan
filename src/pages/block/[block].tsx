@@ -3,9 +3,10 @@ import Title from '@/components/Layout/Title';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Transactions from '@/components/Tabs/Transactions';
 import Validators from '@/components/Tabs/Validators';
+import Tooltip from '@/components/Tooltip';
 import api from '@/services/api';
 import { IBlock } from '@/types/blocks';
-import { formatDate, toLocaleFixed } from '@/utils/index';
+import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import {
   CardContainer,
   CardContent,
@@ -18,9 +19,17 @@ import {
   Header,
   Input,
   Row,
+  RowBlockNavigation,
+  TooltipContainer,
+  ToolTipStyle,
 } from '@/views/blocks/detail';
 import { GetStaticPaths, GetStaticProps } from 'next';
+import Link from 'next/link';
 import React, { useState } from 'react';
+import {
+  MdOutlineKeyboardArrowLeft,
+  MdOutlineKeyboardArrowRight,
+} from 'react-icons/md';
 import { IPagination, IResponse, ITransaction } from '../../types';
 
 interface IBlockPage {
@@ -77,9 +86,45 @@ const Block: React.FC<IBlockPage> = ({ block }) => {
       route: `transaction/list?page=${page}&blockNum=${nonce}&limit=${limit}`,
     });
 
+  const BlockNavigation: React.FC = () => {
+    return (
+      <TooltipContainer>
+        <Link href={`/block/${nonce - 1}`}>
+          <a>
+            <ToolTipStyle>
+              <Tooltip
+                msg="View previous block"
+                Component={MdOutlineKeyboardArrowLeft}
+              />
+            </ToolTipStyle>
+          </a>
+        </Link>
+        <Link href={`/block/${nonce + 1}`}>
+          <a>
+            <ToolTipStyle>
+              <Tooltip
+                msg="View next block"
+                Component={MdOutlineKeyboardArrowRight}
+              />
+            </ToolTipStyle>
+          </a>
+        </Link>
+      </TooltipContainer>
+    );
+  };
+
   const Overview: React.FC = () => {
     return (
       <>
+        <Row>
+          <CommonSpan>
+            <strong>Block</strong>
+          </CommonSpan>
+          <RowBlockNavigation>
+            #{nonce}
+            <BlockNavigation />
+          </RowBlockNavigation>
+        </Row>
         <Row>
           <CommonSpan>
             <strong>Hash</strong>
@@ -96,12 +141,6 @@ const Block: React.FC<IBlockPage> = ({ block }) => {
           <CommonSpan>
             <small>{formatDate(timestamp)}</small>
           </CommonSpan>
-        </Row>
-        <Row>
-          <CommonSpan>
-            <strong>Nonce</strong>
-          </CommonSpan>
-          <CommonSpan>{nonce}</CommonSpan>
         </Row>
         <Row>
           <CommonSpan>

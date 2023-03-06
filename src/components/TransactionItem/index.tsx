@@ -1,4 +1,8 @@
 import { getStatusIcon } from '@/assets/status';
+import { getContractType } from '@/utils';
+import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
+import { parseAddress } from '@/utils/parseValues';
+import { getPrecision } from '@/utils/precisionFunctions';
 import {
   TransactionAmount,
   TransactionData,
@@ -8,13 +12,6 @@ import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { ITransaction } from '../../types';
-import {
-  formatDate,
-  getContractType,
-  getPrecision,
-  parseAddress,
-  toLocaleFixed,
-} from '../../utils';
 
 export interface IContract {
   type: number;

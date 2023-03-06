@@ -1,12 +1,19 @@
-import { ISection } from 'components/Form';
+import { ISection } from '@/components/Form';
+import { ICollectionList } from '@/types';
+import { royaltiesSection, stakingSection } from './common';
 
-const assetTriggerContract = (type?: number | null): ISection[] => {
-  const address = sessionStorage.getItem('walletAddress') || '';
+const assetTriggerContract = (
+  type?: number | null,
+  collection?: ICollectionList,
+  address = '',
+): ISection[] => {
   let section = [] as ISection[];
 
   if (isNaN(Number(type)) && type !== null) {
     return [];
   }
+
+  const isNFT = (collection && collection.isNFT) || false;
 
   section.push({
     fields: [],
@@ -129,11 +136,11 @@ const assetTriggerContract = (type?: number | null): ISection[] => {
                 fields: [
                   {
                     label: 'Label',
-                    props: { tooltip: 'Uri identifier' },
+                    props: { tooltip: 'Uri identifier ( Ex: "foo" )' },
                   },
                   {
                     label: 'Address',
-                    props: { tooltip: 'Uri address' },
+                    props: { tooltip: 'Uri address ( Ex: "http://bar.com" )' },
                   },
                 ],
               },
@@ -161,49 +168,61 @@ const assetTriggerContract = (type?: number | null): ISection[] => {
 
     case 13:
       section = [];
+      section.push(...stakingSection());
+      break;
+
+    case 14:
+      section = [];
+      section.push(...royaltiesSection(address, isNFT));
+      break;
+    case 15:
+      section = [];
       section.push({
-        title: 'Staking',
+        title: 'KDA Pool',
+        objectName: 'kdaPool',
         fields: [
           {
-            label: 'Type',
+            label: 'Admin Address',
+            props: {
+              defaultValue: address,
+              required: true,
+            },
+          },
+          {
+            label: 'Fixed Ratio for KLV',
+            objectName: 'fRatioKLV',
+            props: {
+              type: 'number',
+              tooltip:
+                'KLV ratio, the cost is calculated as (KLV ratio) / (KDA ratio) E.g.: when KLV ratio is 1 and KDA ratio is 2, the cost is 1/2 = 0.5 KLV/KDA',
+              required: true,
+            },
+          },
+          {
+            label: 'Fixed Ratio for KDA',
+            objectName: 'fRatioKDA',
+            props: {
+              type: 'number',
+              tooltip:
+                'KDA ratio, the cost is calculated as (KLV ratio) / (KDA ratio) E.g.: when KLV ratio is 1 and KDA ratio is 2, the cost is 1/2 = 0.5 KLV/KDA',
+              required: true,
+            },
+          },
+          {
+            label: 'Active',
             props: {
               type: 'checkbox',
-              toggleOptions: ['APR', 'FPR'],
-              defaultValue: 0,
-              disabled: true,
-              tooltip: '0: APR, 1: FPR',
-            },
-          },
-          {
-            label: 'APR',
-            props: {
-              type: 'number',
-              tooltip: 'Percentage',
-            },
-          },
-          {
-            label: 'Min Epochs To Claim',
-            props: {
-              type: 'number',
-              tooltip: 'Minimum epochs to claim rewards',
-            },
-          },
-          {
-            label: 'Min Epochs To Unstake',
-            props: {
-              type: 'number',
-              tooltip: 'Minimum epochs to unstake',
-            },
-          },
-          {
-            label: 'Min Epochs To Withdraw',
-            props: {
-              type: 'number',
-              tooltip: 'Minimum epochs to withdraw after unstake',
+              toggleOptions: ['No', 'Yes'],
+              bool: true,
+              tooltip: '"Yes" if the pooling should be active',
             },
           },
         ],
       });
+      break;
+    case 16:
+    case 17:
+      section = [];
       break;
 
     default:

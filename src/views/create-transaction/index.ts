@@ -1,11 +1,9 @@
 import { transparentize } from 'polished';
 import styled from 'styled-components';
+import { Card, CardContainer as BlocksCardContainer } from '../blocks/index';
 
 export const CardContainer = styled.div`
-  margin: auto;
-  width: 90%;
-  max-width: 1200px;
-  margin-bottom: -2rem;
+  width: 100%;
   padding: 2rem 0;
 
   font-family: Rubik;
@@ -13,10 +11,6 @@ export const CardContainer = styled.div`
   font-style: normal;
   font-weight: normal;
   font-size: 15px;
-
-  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 100%;
-  }
 `;
 
 export const WarningContainer = styled.div`
@@ -51,4 +45,23 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2rem;
+`;
+
+export const CreateTxCard = styled(Card)`
+  max-width: 1200px;
+`;
+
+export const CreateTxCardContainer = styled(BlocksCardContainer)`
+  justify-content: center;
+`;
+
+export const QueueItemContainer = styled.div<{
+  visible: boolean;
+}>`
+  width: 100%;
+  display: ${props => (props.visible ? 'block' : 'none')};
+`;
+
+export const QueueOutContainer = styled.div`
+  width: 100%;
 `;

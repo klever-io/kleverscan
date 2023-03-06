@@ -41,20 +41,17 @@ export interface ICollectionList {
   label: string;
   value: string;
   isNFT: boolean;
-  frozenBalance: number;
-  balance: number;
+  frozenBalance?: number;
+  balance?: number;
   precision?: number;
   buckets?: any[];
   minEpochsToWithdraw?: number | null;
   ownerAddress?: string;
-}
-
-export interface IKAssets {
-  label: string;
-  value: string;
   properties?: IAssetProperties;
-  isNFT: boolean;
-  isPaused: boolean;
+  attributes?: {
+    isPaused: boolean;
+    isNFTMintStopped: boolean;
+  };
 }
 
 export interface ICreateAssetReceipt {
@@ -200,8 +197,12 @@ export interface IAccount {
   permissions?: number[];
 }
 
+export interface IAssetsBuckets {
+  asset: IAccountAsset;
+  bucket: IBucket;
+}
+
 export interface IHolders {
-  holders: IBalance[];
   asset: IAsset;
   holdersTableProps: IInnerTableProps;
 }
@@ -231,6 +232,7 @@ export interface IAccountAsset {
     epoch: number;
   };
   buckets?: IBucket[];
+  owner?: boolean;
 }
 
 export interface IAssetsHoldersResponse extends IResponse {
@@ -340,6 +342,7 @@ export interface IBucket {
   unstakedEpoch: number;
   balance: number;
   delegation: string;
+  availableEpoch: number | string;
 }
 
 // TODO: establish a pattern for filter types
@@ -736,6 +739,7 @@ export type Place = 'top' | 'right' | 'bottom' | 'left';
 export interface ICustomStyles {
   offset?: IOffset;
   place?: Place;
+  delayShow?: number;
 }
 
 export interface IPrecisionResponse {

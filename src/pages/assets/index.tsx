@@ -6,19 +6,13 @@ import Table, { ITable } from '@/components/Table';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import api from '@/services/api';
 import { IAsset, IPagination, IResponse, IRowSection } from '@/types/index';
+import { formatAmount } from '@/utils/formatFunctions';
 import { useFetchPartialAsset } from '@/utils/hooks';
-import { formatAmount, parseHardCodedInfo } from '@/utils/index';
 import { Container, Header, HeaderContainer, Input } from '@/views/assets';
-import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
-
-interface IAssetPage {
-  assets: IAsset[];
-  pagination: IPagination;
-}
 
 interface IAssetResponse extends IResponse {
   data: {
@@ -27,11 +21,12 @@ interface IAssetResponse extends IResponse {
   pagination: IPagination;
 }
 
-const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
+const Assets: React.FC = () => {
   const router = useRouter();
   const [filterToken, setFilterToken] = useState(router.query.asset || 'All');
 
-  const [filterAssets, fetchPartialAsset] = useFetchPartialAsset();
+  const [filterAssets, fetchPartialAsset, loading, setLoading] =
+    useFetchPartialAsset();
 
   const filters: IFilter[] = [
     {
@@ -39,9 +34,11 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
       data: filterAssets.map(asset => asset.assetId),
       onClick: value => setFilterToken(value),
       onChange: async value => {
+        setLoading(true);
         await fetchPartialAsset(value);
       },
       current: (filterToken as string) || undefined,
+      loading,
     },
   ];
 
@@ -239,13 +236,11 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
 
   const tableProps: ITable = {
     rowSections,
-    data: assets as any[],
     header,
     type: 'assetsPage',
     request: (page, limit) => requestAssets(page, limit),
     dataName: 'assets',
     scrollUp: true,
-    totalPages: pagination?.totalPages || 1,
   };
 
   return (
@@ -254,45 +249,16 @@ const Assets: React.FC<IAssetPage> = ({ assets, pagination }) => {
         <HeaderContainer>
           <Title title="Assets" Icon={Icon} />
           <FilterContainer>
-            {filters.map((filter, index) => (
+            {filters.map(filter => (
               <Filter key={String(filter)} {...filter} />
             ))}
           </FilterContainer>
         </HeaderContainer>
-
         <Input />
       </Header>
-
       <Table {...tableProps} />
     </Container>
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async context => {
-  const props: IAssetPage = { assets: [], pagination: {} as IPagination };
-  let assets: IAssetResponse;
-
-  if (context.query.asset) {
-    assets = await api.getCached({
-      route: `assets/kassets?hidden=false&asset=${context.query.asset}`,
-      refreshTime: 21600,
-    });
-  } else {
-    assets = await api.getCached({
-      route: 'assets/kassets?hidden=false',
-      refreshTime: 21600,
-    });
-  }
-  if (!assets.error) {
-    props.assets = assets.data.assets;
-    props.pagination = assets.pagination;
-  }
-
-  props.pagination = assets?.pagination || {};
-
-  props.assets = parseHardCodedInfo(props.assets);
-
-  return { props };
 };
 
 export default Assets;

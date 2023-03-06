@@ -1,5 +1,5 @@
 import { default as DefaultInput } from '@/components/InputGlobal';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export const Container = styled.div``;
 
@@ -52,7 +52,7 @@ export const OverviewContainer = styled.div`
   border-radius: 0.75rem;
 `;
 
-export const Row = styled.div`
+export const Row = styled.div<{ isAddressRow?: boolean }>`
   width: 100%;
 
   padding: 1.5rem 2rem;
@@ -76,8 +76,6 @@ export const Row = styled.div`
       width: 10rem;
     }
 
-    /* overflow: hidden; */
-
     text-overflow: ellipsis;
     white-space: nowrap;
     display: flex;
@@ -98,6 +96,12 @@ export const Row = styled.div`
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
+    ${props =>
+      props.isAddressRow &&
+      css`
+        flex-direction: row;
+        align-items: center;
+      `}
   }
 `;
 
@@ -127,7 +131,6 @@ export const ButtonModal = styled.button<{
   cursor: ${props => (props.isLocked ? 'not-allowed' : 'pointer')};
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
-    max-width: 100%;
   }
 `;
 
@@ -156,6 +159,7 @@ export const ContainerTabInteractions = styled.div`
 
 export const CenteredRow = styled.div`
   display: flex;
+  align-items: center;
   flex: 1;
 
   gap: 0.5rem;
@@ -168,7 +172,6 @@ export const CenteredRow = styled.div`
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
-    flex-direction: column;
   }
 `;
 

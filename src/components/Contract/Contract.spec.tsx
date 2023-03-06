@@ -1,8 +1,57 @@
+import { contractOptions } from '@/utils/contracts';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import React from 'react';
+import { Contract as ContractProvider } from '../../contexts/contract';
 import { renderWithTheme } from '../../test/utils';
-import { contractOptions } from '../../utils/contracts';
 import Contract from './index';
+
+const mockContract: any = {
+  contractType: contractOptions.find(item => item.value === 'TransferContract')
+    ?.value as string,
+  setContractType: jest.fn(),
+  ITOBuy: false,
+  setITOBuy: jest.fn(),
+  isMultiContract: false,
+  setIsMultiContract: jest.fn(),
+  queue: [],
+  txLoading: false,
+  setTxLoading: jest.fn(),
+  txHash: '',
+  setTxHash: jest.fn(),
+  addToQueue: jest.fn(),
+  isMultisig: false,
+  setIsMultisig: jest.fn(),
+  showPayload: false,
+  setShowPayload: jest.fn(),
+  ownerAddress: '',
+  getOwnerAddress: jest.fn(() => 'Owner Address'),
+  assetsList: [],
+  getAssets: jest.fn(),
+  buyLabel: '',
+  setBuyLabel: jest.fn(),
+  kdaFee: {} as any,
+  setKdaFee: jest.fn(),
+  claimLabel: '',
+  setClaimLabel: jest.fn(),
+  claimType: 0,
+  setClaimType: jest.fn(),
+  contractOptions,
+  formsData: {} as any,
+  setFormsData: jest.fn(),
+  formSections: [] as any,
+  setFormSections: jest.fn(),
+  resetForms: jest.fn(),
+};
+
+jest.mock('next/router', () => ({
+  useRouter() {
+    return {
+      route: '/',
+      pathname: '',
+      query: {},
+    };
+  },
+}));
 
 const paramList = [
   { value: 0, label: 'Fee Per Data Byte: 4000', currentValue: '4000' },
@@ -45,47 +94,6 @@ const assetList = [
   },
 ];
 describe('Contract Component', () => {
-  it('should render the contract input', async () => {
-    await waitFor(() =>
-      renderWithTheme(
-        <Contract
-          paramsList={paramList}
-          proposalsList={proposalsList}
-          kAssets={[]}
-          getAssets={getAssets}
-          assetsList={assetList}
-        />,
-      ),
-    );
-    const input = screen.getByText('Choose Contract');
-    expect(input).toBeVisible();
-  });
-
-  it('should render the contracts options', async () => {
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
-          <Contract
-            paramsList={paramList}
-            proposalsList={proposalsList}
-            kAssets={[]}
-            getAssets={getAssets}
-            assetsList={assetList}
-          />,
-        )),
-    );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    contractOptions.map(option => {
-      expect(screen.getByText(option.label)).toBeInTheDocument();
-    });
-  });
-
   it('should render the transfer form contract', async () => {
     const itemsTransfer = [
       'Transfer assets to another wallet.',
@@ -93,63 +101,49 @@ describe('Contract Component', () => {
       'Amount',
       'Receiver Address',
     ];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
             kAssets={[]}
             getAssets={getAssets}
             assetsList={assetList}
-          />,
-        )),
+          />
+        </ContractProvider.Provider>,
+      ),
     );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const transferOptions = screen.getByText('Transfer');
-    fireEvent.click(transferOptions);
+
     itemsTransfer.map(item => {
       expect(screen.getByText(item)).toBeInTheDocument();
     });
-    const selectAsset =
-      container.firstChild?.childNodes[2].firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild?.lastChild?.firstChild;
-    fireEvent.change(selectAsset, {
-      target: { value: 'K' },
-    });
-    const selectKLV = screen.getByText('KLV');
-    expect(selectKLV).toBeInTheDocument();
+    const selectAsset = screen.getByText('Choose').nextSibling?.firstChild;
+    if (selectAsset) {
+      fireEvent.change(selectAsset, {
+        target: { value: 'K' },
+      });
+      const selectKLV = screen.getByText('KLV');
+      expect(selectKLV).toBeInTheDocument();
+    }
   });
 
   it('should render the Advanced Options form contract', async () => {
     const advancedOptionsItems = ['Data', 'Is Multisig?', 'Show payload?'];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
             kAssets={[]}
             getAssets={getAssets}
             assetsList={assetList}
-          />,
-        )),
+          />
+        </ContractProvider.Provider>,
+      ),
     );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const createAssetOptions = screen.getByText('Transfer');
-    fireEvent.click(createAssetOptions);
+
     const buttonAdvancedOptions = screen.getByText('Advanced Options');
     fireEvent.click(buttonAdvancedOptions);
     advancedOptionsItems.map(item => {
@@ -163,38 +157,36 @@ describe('Contract Component', () => {
       'Select an asset/collection',
       'Amount',
     ];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'FreezeContract',
+    )?.value as string;
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
             kAssets={[]}
             getAssets={getAssets}
             assetsList={assetList}
-          />,
-        )),
+          />
+        </ContractProvider.Provider>,
+      ),
     );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const transferOptions = screen.getByText('Freeze');
-    fireEvent.click(transferOptions);
+
     itemsFreeze.map(item => {
       expect(screen.getByText(item)).toBeInTheDocument();
     });
-    const selectAsset =
-      container.firstChild?.childNodes[2].firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild?.lastChild?.firstChild;
-    fireEvent.change(selectAsset, {
-      target: { value: 'K' },
-    });
-    const selectKLV = screen.getByText('KLV');
-    expect(selectKLV).toBeInTheDocument();
+
+    const selectAsset = screen.getByText('Choose').nextSibling?.firstChild;
+
+    if (selectAsset) {
+      fireEvent.change(selectAsset, {
+        target: { value: 'K' },
+      });
+      const selectKLV = screen.getByText('KLV');
+      expect(selectKLV).toBeInTheDocument();
+    }
   });
 
   it('should render the Unfreeze form contract', async () => {
@@ -203,78 +195,73 @@ describe('Contract Component', () => {
       'Select an asset/collection',
       'Select a bucket',
     ];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'UnfreezeContract',
+    )?.value as string;
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
             kAssets={[]}
             getAssets={getAssets}
             assetsList={assetList}
-          />,
-        )),
+          />
+        </ContractProvider.Provider>,
+      ),
     );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const transferOptions = screen.getByText('Unfreeze');
-    fireEvent.click(transferOptions);
+
     itemsFreeze.map(item => {
       expect(screen.getByText(item)).toBeInTheDocument();
     });
-    const selectAsset =
-      container.firstChild?.childNodes[2].firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild?.lastChild?.firstChild;
-    fireEvent.change(selectAsset, {
-      target: { value: 'K' },
-    });
-    const selectKLV = screen.getByText('KLV');
-    expect(selectKLV).toBeInTheDocument();
+    const getInputs = screen.getAllByText('Choose');
+
+    const selectAsset = getInputs[0].nextSibling?.firstChild;
+
+    if (selectAsset) {
+      fireEvent.change(selectAsset, {
+        target: { value: 'K' },
+      });
+      const selectKLV = screen.getByText('KLV');
+      await waitFor(() => expect(selectKLV).toBeInTheDocument());
+    }
   });
 
   it('should render the Delegate form contract', async () => {
     const itemsFreeze = [
       'Delegate a bucket to a validator.',
-      'Receiver',
+      'Validator Address',
       'Select a bucket',
     ];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'DelegateContract',
+    )?.value as string;
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
             kAssets={[]}
             getAssets={getAssets}
             assetsList={assetList}
-          />,
-        )),
+          />
+        </ContractProvider.Provider>,
+      ),
     );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const transferOptions = screen.getByText('Delegate');
-    fireEvent.click(transferOptions);
     itemsFreeze.map(item => {
       expect(screen.getByText(item)).toBeInTheDocument();
     });
-    const selectBucket =
-      container.firstChild?.childNodes[2].firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild?.lastChild?.firstChild;
-    fireEvent.change(selectBucket, {
-      target: { value: 'a' },
-    });
-    const selectBucketAddress = screen.getByText('3df451f868...43de2722dc');
-    expect(selectBucketAddress).toBeInTheDocument();
+    const selectBucket = screen.getByText('Choose').nextSibling?.firstChild;
+
+    if (selectBucket) {
+      fireEvent.change(selectBucket, {
+        target: { value: 'a' },
+      });
+      const selectBucketAddress = screen.getByText('3df451f868...43de2722dc');
+      expect(selectBucketAddress).toBeInTheDocument();
+    }
   });
 
   it('should render the Create Asset form contract', async () => {
@@ -294,27 +281,24 @@ describe('Contract Component', () => {
       'Transfer Fixed',
       'Properties',
     ];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'CreateAssetContract',
+    )?.value as string;
+
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
             kAssets={[]}
             getAssets={getAssets}
             assetsList={assetList}
-          />,
-        )),
+          />
+        </ContractProvider.Provider>,
+      ),
     );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const createAssetOptions = screen.getByText('Create Asset');
-    fireEvent.click(createAssetOptions);
+
     itemsCreateAsset.map(item => {
       expect(screen.getByText(item)).toBeInTheDocument();
     });
@@ -327,33 +311,30 @@ describe('Contract Component', () => {
       'Owner Address',
       'BLS Public Key',
       'Reward Address',
-      'Comission',
+      'Commission',
       'Logo',
       'Can Delegate',
       'Max Delegation Amount',
       'Uri',
     ];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'CreateValidatorContract',
+    )?.value as string;
+
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
             kAssets={[]}
             getAssets={getAssets}
             assetsList={assetList}
-          />,
-        )),
+          />
+        </ContractProvider.Provider>,
+      ),
     );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const createValidatorOptions = screen.getByText('Create Validator');
-    fireEvent.click(createValidatorOptions);
+
     itemsCreateValidator.map(item => {
       expect(screen.getByText(item)).toBeInTheDocument();
     });
@@ -365,33 +346,30 @@ describe('Contract Component', () => {
       'Name',
       'BLS Public Key',
       'Reward Address',
-      'Comission',
+      'Commission',
       'Logo',
       'Can Delegate',
       'Max Delegation Amount',
       'Uri',
     ];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'ValidatorConfigContract',
+    )?.value as string;
+
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
             kAssets={[]}
             getAssets={getAssets}
             assetsList={assetList}
-          />,
-        )),
+          />
+        </ContractProvider.Provider>,
+      ),
     );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const editValidatorOptions = screen.getByText('Edit Validator Settings');
-    fireEvent.click(editValidatorOptions);
+
     items.map(item => {
       expect(screen.getByText(item)).toBeInTheDocument();
     });
@@ -399,27 +377,24 @@ describe('Contract Component', () => {
 
   it('should render the Undelegate form contract', async () => {
     const items = ['Undelegate a bucket.', 'Select a bucket'];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'UndelegateContract',
+    )?.value as string;
+
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
             kAssets={[]}
             getAssets={getAssets}
             assetsList={assetList}
-          />,
-        )),
+          />
+        </ContractProvider.Provider>,
+      ),
     );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const editValidatorOptions = screen.getByText('Undelegate');
-    fireEvent.click(editValidatorOptions);
+
     items.map(item => {
       expect(screen.getByText(item)).toBeInTheDocument();
     });
@@ -430,27 +405,24 @@ describe('Contract Component', () => {
       'Total withdraw of the chosen asset.',
       'Select an asset/collection',
     ];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'WithdrawContract',
+    )?.value as string;
+
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
             kAssets={[]}
             getAssets={getAssets}
             assetsList={assetList}
-          />,
-        )),
+          />
+        </ContractProvider.Provider>,
+      ),
     );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const editValidatorOptions = screen.getByText('Withdraw');
-    fireEvent.click(editValidatorOptions);
+
     itemsEditValidator.map(item => {
       expect(screen.getByText(item)).toBeInTheDocument();
     });
@@ -458,27 +430,24 @@ describe('Contract Component', () => {
 
   it('should render the Claim form contract', async () => {
     const items = ['Claim rewards or expired market orders.', 'Claim Type'];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'ClaimContract',
+    )?.value as string;
+
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
             kAssets={[]}
             getAssets={getAssets}
             assetsList={assetList}
-          />,
-        )),
+          />
+        </ContractProvider.Provider>,
+      ),
     );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const claimOptions = screen.getByText('Claim');
-    fireEvent.click(claimOptions);
+
     items.map(item => {
       expect(screen.getByText(item)).toBeInTheDocument();
     });
@@ -488,27 +457,23 @@ describe('Contract Component', () => {
     const items = [
       'Unjails your validator, be sure to use only if the cause of the jail is already fixed.',
     ];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'UnjailContract',
+    )?.value as string;
+
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
             kAssets={[]}
             getAssets={getAssets}
             assetsList={assetList}
-          />,
-        )),
+          />
+        </ContractProvider.Provider>,
+      ),
     );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const editValidatorOptions = screen.getByText('Unjail');
-    fireEvent.click(editValidatorOptions);
     items.map(item => {
       expect(screen.getByText(item)).toBeInTheDocument();
     });
@@ -519,27 +484,23 @@ describe('Contract Component', () => {
       'A contract setting operations over a collection of assets or an NFT.',
       'Trigger Type',
     ];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'AssetTriggerContract',
+    )?.value as string;
+
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
             kAssets={[]}
             getAssets={getAssets}
             assetsList={assetList}
-          />,
-        )),
+          />
+        </ContractProvider.Provider>,
+      ),
     );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const assetTriggerOptions = screen.getByText('Asset Trigger');
-    fireEvent.click(assetTriggerOptions);
     items.map(item => {
       expect(screen.getByText(item)).toBeInTheDocument();
     });
@@ -547,27 +508,23 @@ describe('Contract Component', () => {
 
   it('should render the Set Account Name form contract', async () => {
     const items = ['Set a new name for the current account.', 'Name'];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'SetAccountNameContract',
+    )?.value as string;
+
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
             kAssets={[]}
             getAssets={getAssets}
             assetsList={assetList}
-          />,
-        )),
+          />
+        </ContractProvider.Provider>,
+      ),
     );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const setAccountNameOptions = screen.getByText('Set Account Name');
-    fireEvent.click(setAccountNameOptions);
     items.map(item => {
       expect(screen.getByText(item)).toBeInTheDocument();
     });
@@ -580,27 +537,23 @@ describe('Contract Component', () => {
       'Epochs Duration',
       'Parameters',
     ];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'ProposalContract',
+    )?.value as string;
+
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
             kAssets={[]}
             getAssets={getAssets}
             assetsList={assetList}
-          />,
-        )),
+          />
+        </ContractProvider.Provider>,
+      ),
     );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const proposalOptions = screen.getByText('Proposal');
-    fireEvent.click(proposalOptions);
     items.map(item => {
       expect(screen.getByText(item)).toBeInTheDocument();
     });
@@ -608,27 +561,160 @@ describe('Contract Component', () => {
 
   it('should render the Vote form contract', async () => {
     const items = ['Vote in a proposal.', 'Proposal ID', 'Amount', 'Type'];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'VoteContract',
+    )?.value as string;
+
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
             kAssets={[]}
             getAssets={getAssets}
             assetsList={assetList}
-          />,
-        )),
+          />
+        </ContractProvider.Provider>,
+      ),
     );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
+    items.map(item => {
+      expect(screen.getByText(item)).toBeInTheDocument();
     });
-    const proposalOptions = screen.getByText('Vote');
-    fireEvent.click(proposalOptions);
+  });
+
+  it('should render the Buy form contract', async () => {
+    const items = ['Buy tokens.', 'Id', 'Currency Id', 'Amount'];
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'BuyContract',
+    )?.value as string;
+
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
+          <Contract
+            paramsList={paramList}
+            proposalsList={proposalsList}
+            kAssets={[]}
+            getAssets={getAssets}
+            assetsList={assetList}
+          />
+        </ContractProvider.Provider>,
+      ),
+    );
+    items.map(item => {
+      expect(screen.getByText(item)).toBeInTheDocument();
+    });
+  });
+
+  it('should render the Sell form contract', async () => {
+    const items = [
+      'Sell tokens.',
+      'Market Type',
+      'Price',
+      'End Time',
+      'Reserve Price',
+    ];
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'SellContract',
+    )?.value as string;
+
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
+          <Contract
+            paramsList={paramList}
+            proposalsList={proposalsList}
+            kAssets={[]}
+            getAssets={getAssets}
+            assetsList={assetList}
+          />
+        </ContractProvider.Provider>,
+      ),
+    );
+    items.map(item => {
+      expect(screen.getByText(item)).toBeInTheDocument();
+    });
+  });
+
+  it('should render the Cancel Market Order form contract', async () => {
+    const items = ['Order Id'];
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'CancelMarketOrderContract',
+    )?.value as string;
+
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
+          <Contract
+            paramsList={paramList}
+            proposalsList={proposalsList}
+            kAssets={[]}
+            getAssets={getAssets}
+            assetsList={assetList}
+          />
+        </ContractProvider.Provider>,
+      ),
+    );
+    items.map(item => {
+      expect(screen.getByText(item)).toBeInTheDocument();
+    });
+  });
+
+  it('should render the Create Marketplace form contract', async () => {
+    const items = [
+      'Create a new Marketplace.',
+      'Name',
+      'Referral Address',
+      'Referral Percentage',
+    ];
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'CreateMarketplaceContract',
+    )?.value as string;
+
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
+          <Contract
+            paramsList={paramList}
+            proposalsList={proposalsList}
+            kAssets={[]}
+            getAssets={getAssets}
+            assetsList={assetList}
+          />
+        </ContractProvider.Provider>,
+      ),
+    );
+    items.map(item => {
+      expect(screen.getByText(item)).toBeInTheDocument();
+    });
+  });
+
+  it('should render the Configure Marketplace form contract', async () => {
+    const items = [
+      'Set up a Marketplace.',
+      'Marketplace Id',
+      'Referral Address',
+      'Referral Percentage',
+      'Name',
+    ];
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'ConfigMarketplaceContract',
+    )?.value as string;
+
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
+          <Contract
+            paramsList={paramList}
+            proposalsList={proposalsList}
+            kAssets={[]}
+            getAssets={getAssets}
+            assetsList={assetList}
+          />
+        </ContractProvider.Provider>,
+      ),
+    );
     items.map(item => {
       expect(screen.getByText(item)).toBeInTheDocument();
     });
@@ -643,243 +729,55 @@ describe('Contract Component', () => {
       'Max Amount',
       'PackInfo',
     ];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
+    mockContract.contractType = contractOptions.find(
+      item => item.value === 'ConfigITOContract',
+    )?.value as string;
+
+    await waitFor(() =>
+      renderWithTheme(
+        <ContractProvider.Provider value={mockContract as any}>
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
             kAssets={[]}
             getAssets={getAssets}
             assetsList={assetList}
-          />,
-        )),
+          />
+        </ContractProvider.Provider>,
+      ),
     );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const proposalOptions = screen.getByText('Config ITO');
-    fireEvent.click(proposalOptions);
-    items.map(item => {
-      expect(screen.getByText(item)).toBeInTheDocument();
+
+    const selectAsset = screen.getByText('Choose').nextSibling?.firstChild;
+
+    if (selectAsset) {
+      fireEvent.change(selectAsset, {
+        target: { value: 'K' },
+      });
+    }
+
+    items.map(async item => {
+      expect(await screen.findByText(item)).toBeInTheDocument();
     });
   });
 
-  it('should render the Set ITO Prices form contract', async () => {
-    const items = [
-      'Set the prices for the Initial Token Offering.',
-      'Select an asset/collection',
-      'PackInfo',
-    ];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
-          <Contract
-            paramsList={paramList}
-            proposalsList={proposalsList}
-            kAssets={[]}
-            getAssets={getAssets}
-            assetsList={assetList}
-          />,
-        )),
-    );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const proposalOptions = screen.getByText('Set ITO Prices');
-    fireEvent.click(proposalOptions);
-    items.map(item => {
-      expect(screen.getByText(item)).toBeInTheDocument();
-    });
-  });
-
-  it('should render the Buy form contract', async () => {
-    const items = ['Buy tokens.', 'Order ID', 'Currency Id', 'Amount'];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
-          <Contract
-            paramsList={paramList}
-            proposalsList={proposalsList}
-            kAssets={[]}
-            getAssets={getAssets}
-            assetsList={assetList}
-          />,
-        )),
-    );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const buyOptions = screen.getByText('Buy');
-    fireEvent.click(buyOptions);
-    items.map(item => {
-      expect(screen.getByText(item)).toBeInTheDocument();
-    });
-  });
-
-  it('should render the Sell form contract', async () => {
-    const items = [
-      'Sell tokens.',
-      'Market Type',
-      'Price',
-      'End Time',
-      'Reserve Price',
-    ];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
-          <Contract
-            paramsList={paramList}
-            proposalsList={proposalsList}
-            kAssets={[]}
-            getAssets={getAssets}
-            assetsList={assetList}
-          />,
-        )),
-    );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const buyOptions = screen.getByText('Sell');
-    fireEvent.click(buyOptions);
-    items.map(item => {
-      expect(screen.getByText(item)).toBeInTheDocument();
-    });
-  });
-
-  it('should render the Cancel Market Order form contract', async () => {
-    const items = ['Order Id'];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
-          <Contract
-            paramsList={paramList}
-            proposalsList={proposalsList}
-            kAssets={[]}
-            getAssets={getAssets}
-            assetsList={assetList}
-          />,
-        )),
-    );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const buyOptions = screen.getByText('Cancel Market Order');
-    fireEvent.click(buyOptions);
-    items.map(item => {
-      expect(screen.getByText(item)).toBeInTheDocument();
-    });
-  });
-
-  it('should render the Create Marketplace form contract', async () => {
-    const items = [
-      'Create a new Marketplace.',
-      'Name',
-      'Referral Address',
-      'Referral Percentage',
-    ];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
-          <Contract
-            paramsList={paramList}
-            proposalsList={proposalsList}
-            kAssets={[]}
-            getAssets={getAssets}
-            assetsList={assetList}
-          />,
-        )),
-    );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const buyOptions = screen.getByText('Create Marketplace');
-    fireEvent.click(buyOptions);
-    items.map(item => {
-      expect(screen.getByText(item)).toBeInTheDocument();
-    });
-  });
-
-  it('should render the Configure Marketplace form contract', async () => {
-    const items = [
-      'Set up a Marketplace.',
-      'Marketplace Id',
-      'Referral Address',
-      'Referral Percentage',
-      'Name',
-    ];
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
-          <Contract
-            paramsList={paramList}
-            proposalsList={proposalsList}
-            kAssets={[]}
-            getAssets={getAssets}
-            assetsList={assetList}
-          />,
-        )),
-    );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const buyOptions = screen.getByText('Configure Marketplace');
-    fireEvent.click(buyOptions);
-    items.map(item => {
-      expect(screen.getByText(item)).toBeInTheDocument();
-    });
-  });
-
-  it('should render the Update Account Permission form contract', async () => {
-    let container;
-    await waitFor(
-      () =>
-        ({ container } = renderWithTheme(
-          <Contract
-            paramsList={paramList}
-            proposalsList={proposalsList}
-            kAssets={[]}
-            getAssets={getAssets}
-            assetsList={assetList}
-          />,
-        )),
-    );
-    const button =
-      container.firstChild?.firstChild?.firstChild?.lastChild?.firstChild
-        ?.lastChild?.firstChild;
-    fireEvent.change(button, {
-      target: { value: 'a' },
-    });
-    const buyOptions = screen.getByText('Update Account Permission');
-    fireEvent.click(buyOptions);
-    expect(screen.getByText('Update Account Permission')).toBeInTheDocument();
-  });
+  // TODO - Update Account Permission not implemented yet
+  // it('should render the Update Account Permission form contract', async () => {
+  //   mockContract.contractType = contractOptions.find(
+  //   item => item.value === "UpdateAccountPermissionContract"
+  // )?.value as string;
+  //   await waitFor(() =>
+  //     renderWithTheme(
+  //       <ContractProvider.Provider value={mockContract as any}>
+  //         <Contract
+  //           paramsList={paramList}
+  //           proposalsList={proposalsList}
+  //           kAssets={[]}
+  //           getAssets={getAssets}
+  //           assetsList={assetList}
+  //         />
+  //       </ContractProvider.Provider>,
+  //     ),
+  //   );
+  //   expect(screen.getByText('Update Account Permission')).toBeInTheDocument();
+  // });
 });

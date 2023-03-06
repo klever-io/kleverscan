@@ -1,5 +1,5 @@
 import { Service } from '@/types/index';
-import { asyncDoIf } from '../utils';
+import { asyncDoIf } from '@/utils/promiseFunctions';
 
 export enum Method {
   GET = 'GET',

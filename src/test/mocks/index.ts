@@ -767,7 +767,10 @@ const mockedPagination = {
   totalRecords: 1,
 };
 //this function mocks /proposals/${number}
-export const getMockedProposal = (number: number, voteType?: 0 | 1): any => {
+export const mockGetMockedProposal = (
+  number: number,
+  voteType?: 0 | 1,
+): any => {
   const selectedProposal = mockedProposalsList.data.proposals[number];
 
   return {
@@ -789,7 +792,8 @@ export const mockedProposalsList = {
   data: {
     proposals: [
       {
-        proposalId: 0,
+        // dont test this proposal, start by index 1
+        proposalId: 1,
         proposer:
           'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
         txHash:
@@ -866,6 +870,79 @@ export const mockedProposalsList = {
         proposer:
           'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
         txHash:
+          'e46c6e4d389de415b04417562047fe1c9492f25cc477f7a838a2d7c18392f458',
+        proposalStatus: 'ApprovedProposal',
+        parameters: {
+          '6': '15000000',
+          '7': '40000000',
+          '15': '5000000',
+          '16': '7',
+          '17': '1111',
+        },
+        description: 'Proposal to change bandwidth fee - automated test',
+        epochStart: 8207,
+        epochEnd: 8217,
+        timestamp: 0,
+        votes: { '0': 8000000000, '1': 4000000000 },
+        voters: [
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr',
+            type: 0,
+            amount: 2000000000,
+            timestamp: 1656082815000,
+          },
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1',
+            type: 0,
+            amount: 2000000000,
+            timestamp: 1656082815000,
+          },
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs2',
+            type: 0,
+            amount: 2000000000,
+            timestamp: 1656082815000,
+          },
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs3',
+            type: 0,
+            amount: 2000000000,
+            timestamp: 1656082815000,
+          },
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs4',
+            type: 1,
+            amount: 2000000000,
+            timestamp: 1656082815000,
+          },
+          {
+            address:
+              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs5',
+            type: 1,
+            amount: 2000000000,
+            timestamp: 1656082815000,
+          },
+        ],
+        totalStaked: 12000000000,
+        votersPage: {
+          self: 1,
+          next: 2,
+          previous: 0,
+          perPage: 10,
+          totalPages: 2,
+          totalRecords: 12,
+        },
+      },
+      {
+        proposalId: 2,
+        proposer:
+          'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
+        txHash:
           '9c74d9b6021e03ef58044e153731b1f5e93bb7fba787d5d2332dd277938e0a22',
         proposalStatus: 'ApprovedProposal',
         parameters: {
@@ -919,7 +996,7 @@ export const mockedProposalsList = {
         },
       },
       {
-        proposalId: 2,
+        proposalId: 3,
         proposer:
           'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
         txHash:
@@ -955,7 +1032,7 @@ export const mockedProposalsList = {
         },
       },
       {
-        proposalId: 3,
+        proposalId: 4,
         proposer:
           'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
         txHash:
@@ -991,7 +1068,7 @@ export const mockedProposalsList = {
         },
       },
       {
-        proposalId: 4,
+        proposalId: 5,
         proposer:
           'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
         txHash:
@@ -1027,7 +1104,7 @@ export const mockedProposalsList = {
         },
       },
       {
-        proposalId: 5,
+        proposalId: 6,
         proposer:
           'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
         txHash:
@@ -1063,7 +1140,7 @@ export const mockedProposalsList = {
         },
       },
       {
-        proposalId: 6,
+        proposalId: 7,
         proposer:
           'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
         txHash:
@@ -1106,7 +1183,7 @@ export const mockedProposalsList = {
         },
       },
       {
-        proposalId: 7,
+        proposalId: 8,
         proposer:
           'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
         txHash:
@@ -1164,7 +1241,7 @@ export const mockedProposalsList = {
         },
       },
       {
-        proposalId: 8,
+        proposalId: 9,
         proposer:
           'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
         txHash:
@@ -1204,7 +1281,7 @@ export const mockedProposalsList = {
         },
       },
       {
-        proposalId: 9,
+        proposalId: 10,
         proposer:
           'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
         txHash:
@@ -1579,7 +1656,7 @@ export const mockedProposalsListPage2 = {
   error: '',
   code: 'successful',
 };
-export const overViewParametersMock = {
+export const mockOverViewParameters = {
   data: {
     overview: {
       baseTxSize: 250,
@@ -1599,7 +1676,7 @@ export const overViewParametersMock = {
   code: 'successful',
 };
 
-export const networkParametersMock = {
+export const mockNetworkParameters = {
   data: {
     parameters: {
       BlockRewards: {

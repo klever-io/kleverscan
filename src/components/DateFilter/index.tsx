@@ -71,7 +71,6 @@ const DateFilter: React.FC<IDateFilter> = ({
       selectedDaysInitialValue.end = dateFromRouter.enddate;
     }
   };
-  selectDays();
 
   const formatInputInitialValue = () => {
     if (dateFromRouter.startdate.toString() === 'Invalid Date') {
@@ -98,10 +97,58 @@ const DateFilter: React.FC<IDateFilter> = ({
   const [warning, setWarning] = useState(false);
   const [firstSelection, setFirstSelection] = useState(true);
   const [dontBlur, setDontBlur] = useState(false);
-  const [inputValue, setInputValue] = useState(formatInputInitialValue());
+  const [inputValue, setInputValue] = useState('');
   const [buttonActive, setButtonActive] = useState(true);
 
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (router.isReady) {
+      selectDays();
+      setInputValue(formatInputInitialValue());
+    }
+  }, [router.query]);
+
+  useEffect(() => {
+    empty ? setWarning(true) : setWarning(false);
+  }, [empty]);
+
+  useEffect(() => {
+    setMonthDays(
+      Array.from(
+        Array(
+          new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate(), // max days in a month
+        ).keys(),
+      ).map(i => new Date(date.getFullYear(), date.getMonth(), i + 1)),
+    );
+    setStartingDay(new Date(date.getFullYear(), date.getMonth(), 1).getDay());
+  }, [date]);
+
+  useEffect(() => {
+    if (selectedDays.end) {
+      const daysBetween = Math.round(
+        (selectedDays.end.getTime() - selectedDays.start.getTime()) /
+          (1000 * 60 * 60 * 24),
+      );
+      if (daysBetween > 0) {
+        const newValues = Array.from(Array(daysBetween + 1).keys()).map(
+          i => new Date(selectedDays.start.getTime() + i * 24 * 60 * 60 * 1000),
+        );
+
+        setSelectedDays({
+          ...selectedDays,
+          values: newValues,
+        });
+        setButtonActive(true);
+      } else if (daysBetween === 0 && firstSelection) {
+        setSelectedDays({
+          ...selectedDays,
+          values: [],
+        });
+        setButtonActive(false);
+      }
+    }
+  }, [selectedDays.end]);
 
   const handleInputFocus = useCallback(() => {
     setCalendarOpen(true);
@@ -121,21 +168,6 @@ const DateFilter: React.FC<IDateFilter> = ({
     },
     [date],
   );
-
-  useEffect(() => {
-    empty ? setWarning(true) : setWarning(false);
-  }, [empty]);
-
-  useEffect(() => {
-    setMonthDays(
-      Array.from(
-        Array(
-          new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate(), // max days in a month
-        ).keys(),
-      ).map(i => new Date(date.getFullYear(), date.getMonth(), i + 1)),
-    );
-    setStartingDay(new Date(date.getFullYear(), date.getMonth(), 1).getDay());
-  }, [date]);
 
   const handleDayClick = useCallback(
     (day: Date) => {
@@ -166,32 +198,6 @@ const DateFilter: React.FC<IDateFilter> = ({
     },
     [selectedDays, firstSelection],
   );
-
-  useEffect(() => {
-    if (selectedDays.end) {
-      const daysBetween = Math.round(
-        (selectedDays.end.getTime() - selectedDays.start.getTime()) /
-          (1000 * 60 * 60 * 24),
-      );
-      if (daysBetween > 0) {
-        const newValues = Array.from(Array(daysBetween + 1).keys()).map(
-          i => new Date(selectedDays.start.getTime() + i * 24 * 60 * 60 * 1000),
-        );
-
-        setSelectedDays({
-          ...selectedDays,
-          values: newValues,
-        });
-        setButtonActive(true);
-      } else if (daysBetween === 0 && firstSelection) {
-        setSelectedDays({
-          ...selectedDays,
-          values: [],
-        });
-        setButtonActive(false);
-      }
-    }
-  }, [selectedDays.end]);
 
   const handleConfirmClick = useCallback(() => {
     filterDate(selectedDays);
@@ -246,96 +252,102 @@ const DateFilter: React.FC<IDateFilter> = ({
   ];
 
   return (
-    <Container
-      onBlur={() => !dontBlur && setCalendarOpen(false)}
-      onMouseEnter={() => setDontBlur(true)}
-      onMouseLeave={() => setDontBlur(false)}
-    >
-      <OutsideContainer>
-        <OutsideContent onClick={() => inputRef.current?.focus()}>
-          <Input
-            type="text"
-            placeholder="Date Filter"
-            onFocus={() => handleInputFocus()}
-            value={inputValue}
-            ref={inputRef}
-            readOnly={true}
-          />
-          {!inputRef.current?.value && <CalendarIcon />}
-        </OutsideContent>
-        {inputRef.current?.value && <MdClear onClick={handleClear} />}
-      </OutsideContainer>
+    <>
+      {router.isReady && (
+        <Container
+          onBlur={() => !dontBlur && setCalendarOpen(false)}
+          onMouseEnter={() => setDontBlur(true)}
+          onMouseLeave={() => setDontBlur(false)}
+        >
+          <OutsideContainer>
+            <OutsideContent onClick={() => inputRef.current?.focus()}>
+              <Input
+                type="text"
+                placeholder="Date Filter"
+                onFocus={() => handleInputFocus()}
+                value={inputValue}
+                ref={inputRef}
+                readOnly={true}
+              />
+              {!inputRef.current?.value && <CalendarIcon />}
+            </OutsideContent>
+            {inputRef.current?.value && <MdClear onClick={handleClear} />}
+          </OutsideContainer>
 
-      {calendarOpen && (
-        <CalendarContainer onMouseDown={e => e.preventDefault()}>
-          <CalendarHeader>
-            <strong>
-              <span>Date Filter</span>
-              <MdClear onClick={handleClose} />
-            </strong>
-            <p>Choose the proper date that you want to be listed down below</p>
-          </CalendarHeader>
-          <CalendarContent>
-            <MonthPicker
-              isDisabledRight={
-                date.getMonth() === currentDate.getMonth() &&
-                date.getFullYear() === currentDate.getFullYear()
-              }
-            >
-              <ArrowLeft onClick={() => handleArrowClick('left')} />
-              {months[date.getMonth()]} {date.getFullYear()}
-              <ArrowRight onClick={() => handleArrowClick('right')} />
-            </MonthPicker>
-            <DayPicker>
-              <HeaderRow>
-                {weekdays.map(day => {
-                  return <HeaderItem key={day}>{day}</HeaderItem>;
-                })}
-              </HeaderRow>
-              <DaysTable>
-                {Array.from(Array(startingDay).keys()).map(i => (
-                  <DayItem key={i} />
-                ))}
-                {monthDays.map(day => {
-                  return (
-                    <DayItem
-                      key={day.getTime()}
-                      isKey={
-                        !!selectedDays.values.find(
-                          d => d.getTime() === day.getTime(),
-                        ) &&
-                        (selectedDays.start.getTime() === day.getTime() ||
-                          selectedDays.end?.getTime() === day.getTime())
-                      }
-                      isBetween={
-                        !!selectedDays.values.find(
-                          d => d.getTime() === day.getTime(),
-                        )
-                      }
-                      isAfter={day.getTime() > currentDate.getTime()}
-                      isCurrent={day.getTime() === currentDate.getTime()}
-                      onClick={() => handleDayClick(day)}
-                    >
-                      {day.getDate()}
-                    </DayItem>
-                  );
-                })}
-              </DaysTable>
-            </DayPicker>
-            {warning && (
-              <Warning>
-                <WarningIcon />
-                <span>Nothing on this date</span>
-              </Warning>
-            )}
-            <Confirm onClick={handleConfirmClick} isActive={buttonActive}>
-              {' '}
-              Confirm
-            </Confirm>
-          </CalendarContent>
-        </CalendarContainer>
+          {calendarOpen && (
+            <CalendarContainer onMouseDown={e => e.preventDefault()}>
+              <CalendarHeader>
+                <strong>
+                  <span>Date Filter</span>
+                  <MdClear onClick={handleClose} />
+                </strong>
+                <p>
+                  Choose the proper date that you want to be listed down below
+                </p>
+              </CalendarHeader>
+              <CalendarContent>
+                <MonthPicker
+                  isDisabledRight={
+                    date.getMonth() === currentDate.getMonth() &&
+                    date.getFullYear() === currentDate.getFullYear()
+                  }
+                >
+                  <ArrowLeft onClick={() => handleArrowClick('left')} />
+                  {months[date.getMonth()]} {date.getFullYear()}
+                  <ArrowRight onClick={() => handleArrowClick('right')} />
+                </MonthPicker>
+                <DayPicker>
+                  <HeaderRow>
+                    {weekdays.map(day => {
+                      return <HeaderItem key={day}>{day}</HeaderItem>;
+                    })}
+                  </HeaderRow>
+                  <DaysTable>
+                    {Array.from(Array(startingDay).keys()).map(i => (
+                      <DayItem key={i} />
+                    ))}
+                    {monthDays.map(day => {
+                      return (
+                        <DayItem
+                          key={day.getTime()}
+                          isKey={
+                            !!selectedDays.values.find(
+                              d => d.getTime() === day.getTime(),
+                            ) &&
+                            (selectedDays.start.getTime() === day.getTime() ||
+                              selectedDays.end?.getTime() === day.getTime())
+                          }
+                          isBetween={
+                            !!selectedDays.values.find(
+                              d => d.getTime() === day.getTime(),
+                            )
+                          }
+                          isAfter={day.getTime() > currentDate.getTime()}
+                          isCurrent={day.getTime() === currentDate.getTime()}
+                          onClick={() => handleDayClick(day)}
+                        >
+                          {day.getDate()}
+                        </DayItem>
+                      );
+                    })}
+                  </DaysTable>
+                </DayPicker>
+                {warning && (
+                  <Warning>
+                    <WarningIcon />
+                    <span>Nothing on this date</span>
+                  </Warning>
+                )}
+                <Confirm onClick={handleConfirmClick} isActive={buttonActive}>
+                  {' '}
+                  Confirm
+                </Confirm>
+              </CalendarContent>
+            </CalendarContainer>
+          )}
+        </Container>
       )}
-    </Container>
+    </>
   );
 };
 

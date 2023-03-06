@@ -1,36 +1,39 @@
-import { ISection } from 'components/Form';
+import { ISection } from '@/components/Form';
+import {
+  defaultLimitPerAddressSection,
+  maxAmountSection,
+  receiverAddressSection,
+  setTimesSection,
+  setWhitelistStatusSection,
+  statusSection,
+  whitelistSection,
+  whitelistTimesSection,
+} from './common';
 
-const configITOContract = (): ISection[] => {
-  const section = [] as ISection[];
+const configITOContract = (address = ''): ISection[] => {
+  const sections = [] as ISection[];
 
-  section.push({
+  const mainSection = {
     fields: [
-      {
-        label: 'Receiver Address',
-        props: {
-          required: true,
-          tooltip: 'Wallet address that will receive the currency',
-        },
-      },
-      {
-        label: 'Status',
-        props: {
-          type: 'checkbox',
-          toggleOptions: ['Inactive', 'Active'],
-          defaultValue: 0,
-        },
-      },
-      {
-        label: 'Max Amount',
-        props: {
-          type: 'number',
-          tooltip: 'Max amount of assets sold in the ITO',
-        },
-      },
+      ...receiverAddressSection(address)[0].fields,
+      ...setTimesSection()[0].fields,
+      ...maxAmountSection()[0].fields,
+      ...statusSection()[0].fields,
     ],
-  });
+  };
+  sections.push(mainSection);
 
-  return section;
+  const whitelistConfigSection = {
+    fields: [
+      ...whitelistTimesSection()[0].fields,
+      ...defaultLimitPerAddressSection()[0].fields,
+      ...setWhitelistStatusSection()[0].fields,
+    ],
+  };
+  sections.push(whitelistConfigSection);
+
+  sections.push(...whitelistSection());
+  return sections;
 };
 
 export default configITOContract;

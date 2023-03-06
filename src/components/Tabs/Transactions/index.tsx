@@ -1,6 +1,7 @@
 import { ArrowRight } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
+import { MultiContractToolTip } from '@/components/MultiContractToolTip';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import { useMobile } from '@/contexts/mobile';
@@ -17,13 +18,10 @@ import {
   getHeaderForTable,
   initialsTableHeaders,
 } from '@/utils/contracts';
+import { capitalizeString } from '@/utils/convertString';
+import { formatAmount, formatDate } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
-import {
-  capitalizeString,
-  formatAmount,
-  formatDate,
-  parseAddress,
-} from '@/utils/index';
+import { parseAddress } from '@/utils/parseValues';
 import { CenteredRow } from '@/views/accounts/detail';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -130,7 +128,18 @@ const Transactions: React.FC<ITransactionsProps> = props => {
         ),
         span: 1,
       },
-      { element: <strong key={contractType}>{contractType}</strong>, span: 1 },
+      {
+        element:
+          contractType === 'Multi contract' ? (
+            <MultiContractToolTip
+              contract={contract}
+              contractType={contractType}
+            />
+          ) : (
+            <strong key={contractType}>{contractType}</strong>
+          ),
+        span: 1,
+      },
       {
         element: <strong key={kAppFee}>{kAppFee / 10 ** KLV_PRECISION}</strong>,
         span: 1,
@@ -161,7 +170,6 @@ const Transactions: React.FC<ITransactionsProps> = props => {
   const tableProps: ITable = {
     ...transactionTableProps,
     rowSections,
-    data: null,
     header: router?.query?.type ? getHeaderForTable(router, header) : header,
     type: 'transactions',
   };

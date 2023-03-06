@@ -1,66 +1,70 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
+import * as myRouter from 'next/router';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
-import ProposalDetails, {
-  getProposalNetworkParams,
-  getServerSideProps,
-  getVotingPowers,
-} from '../../pages/proposal/[number]';
-import api from '../../services/api';
+import ProposalDetails from '../../pages/proposal/[number]';
 import {
-  getMockedProposal,
-  networkParametersMock,
-  overViewParametersMock,
+  mockGetMockedProposal,
+  mockNetworkParameters,
+  mockOverViewParameters,
 } from '../../test/mocks/index';
 import { renderWithTheme } from '../../test/utils';
-import { IParsedProposal } from '../../types/proposals';
 
-jest.mock('next/router', () => ({
-  useRouter() {
-    return {
-      route: '/',
-      pathname: '',
-    };
-  },
-}));
+const promiseResolver = (router: any) => {
+  const routerEnd = router.route.split('/')[1];
+  switch (router.route) {
+    case `proposals/${routerEnd}`:
+      return Promise.resolve(
+        mockGetMockedProposal(routerEnd, router.query.voteType),
+      );
+    case `network/${routerEnd}`:
+      return Promise.resolve(mockNetworkParameters);
+    case `node/${routerEnd}`:
+      return Promise.resolve(mockOverViewParameters);
+    default:
+      return Promise.resolve({});
+  }
+};
+
+const router1 = () => {
+  return {
+    route: '/proposal/',
+    pathname: '',
+    query: { number: 1 },
+  };
+};
+
+const router2 = () => {
+  return {
+    route: '/proposal/',
+    pathname: '',
+    query: { number: 8 },
+  };
+};
 
 jest.mock('@/services/api', () => {
   return {
-    get: jest.fn(),
+    get: jest.fn(promiseResolver),
   };
 });
 
-const mockedApiImplementation =
-  (proposalNumber: number) => (props: { route: string; query: any }) => {
-    switch (true) {
-      case props.route.includes('proposals') === true &&
-        props.query.voteType === 0:
-        return getMockedProposal(proposalNumber, 0);
-      case props.route.includes('proposals') === true &&
-        props.query.voteType === 1:
-        return getMockedProposal(proposalNumber, 1);
-      case props.route.includes('proposals') === true &&
-        props.query.voteType === undefined:
-        return getMockedProposal(proposalNumber);
-      case props.route.includes('network-parameters'):
-        return networkParametersMock;
-      case props.route.includes('overview'):
-        return overViewParametersMock;
-    }
+jest.mock('next/router', () => {
+  return {
+    __esModule: true,
+    useRouter: jest.fn().mockImplementation(router1),
   };
+});
+
 describe('test proposal details page', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  it('should render the page displaying the correct data for the mocked proposal number 0', async () => {
-    // load mocked server side props:
-    (api.get as jest.Mock).mockImplementation(mockedApiImplementation(0));
+  it('should render the page displaying the correct data for the mocked proposal number 1', async () => {
+    const mockRouter = myRouter as { useRouter: any };
+    mockRouter.useRouter = router1;
 
-    const { props } = (await getServerSideProps({} as any)) as any;
-
-    // load page:
     await act(async () => {
-      renderWithTheme(<ProposalDetails {...props} />);
+      renderWithTheme(<ProposalDetails />);
     });
 
     const proposer = screen.getByText(
@@ -169,25 +173,12 @@ describe('test proposal details page', () => {
     expect(newNoVoter0).toEqual(null);
   });
 
-  it('should render the page displaying the correct data for the mocked proposal number 7', async () => {
-    (api.get as jest.Mock).mockImplementation(mockedApiImplementation(7));
-
-    const parsedParameters = getProposalNetworkParams(
-      getMockedProposal(7).data.proposal.parameters,
-      networkParametersMock.data,
-    );
-
-    const props: IParsedProposal = {
-      ...getMockedProposal(7).data.proposal,
-      votingPowers: getVotingPowers(getMockedProposal(7).data.proposal.voters),
-      parsedParameters: parsedParameters?.fullInfoParams,
-      currentNetworkParams: parsedParameters?.currentNetworkParams,
-      pagination: getMockedProposal(7).data.proposal.votersPage,
-      overview: overViewParametersMock.data.overview,
-    };
+  it('should render the page displaying the correct data for the mocked proposal number 8', async () => {
+    const mockRouter = myRouter as { useRouter: any };
+    mockRouter.useRouter = router2;
 
     await act(async () => {
-      renderWithTheme(<ProposalDetails {...props} />);
+      renderWithTheme(<ProposalDetails />);
     });
 
     const proposer = screen.getByText(
@@ -295,12 +286,12 @@ describe('test proposal details page', () => {
     expect(newNoVoter0).toEqual(null);
   });
 
-  it('should have the correct styles', async () => {
-    (api.get as jest.Mock).mockImplementation(mockedApiImplementation(0));
+  it('should have the correct styles for proposal number 1', async () => {
+    const mockRouter = myRouter as { useRouter: any };
+    mockRouter.useRouter = router1;
 
-    const { props } = (await getServerSideProps({} as any)) as any;
     await act(async () => {
-      renderWithTheme(<ProposalDetails {...props} />);
+      renderWithTheme(<ProposalDetails />);
     });
     const passThreshold = screen.getByText('Pass threshold');
     expect(passThreshold).toBeInTheDocument();
@@ -413,306 +404,5 @@ describe('test proposal details page', () => {
         marginRight: '5px',
       });
     });
-  });
-  it('test getServerSideProps function', async () => {
-    const parsedProposalResult = {
-      props: {
-        proposalId: 0,
-        proposer:
-          'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjpp',
-        txHash:
-          'e46c6e4d389de415b04417562047fe1c9492f25cc477f7a838a2d7c18392f458',
-        proposalStatus: 'ApprovedProposal',
-        description: 'Proposal to change bandwidth fee - automated test',
-        epochStart: 8207,
-        epochEnd: 8217,
-        timestamp: 0,
-        votes: { '0': 8000000000, '1': 4000000000 },
-        voters: [
-          {
-            address:
-              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr',
-            type: 0,
-            amount: 2000000000,
-            timestamp: 1656082815000,
-          },
-
-          {
-            address:
-              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1',
-            type: 0,
-            amount: 2000000000,
-            timestamp: 1656082815000,
-          },
-
-          {
-            address:
-              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs2',
-            type: 0,
-            amount: 2000000000,
-            timestamp: 1656082815000,
-          },
-
-          {
-            address:
-              'klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs3',
-            type: 0,
-            amount: 2000000000,
-            timestamp: 1656082815000,
-          },
-        ],
-        totalStaked: 12000000000,
-        votingPowers: {
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjsr: 2000000000,
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs1: 2000000000,
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs2: 2000000000,
-          klv1vq9f7xtazuk9y3n46ukthgf2l30ev2s0qxvs6dfp4f2e76sfu3xshpmjs3: 2000000000,
-        },
-        parameters: {
-          '6': '15000000',
-          '7': '40000000',
-          '15': '5000000',
-          '16': '7',
-          '17': '1111',
-        },
-        parsedParameters: [
-          {
-            paramIndex: '6',
-            paramLabel: 'BlockRewards',
-            paramValue: 15000000,
-            paramText: 'Block Rewards',
-          },
-          {
-            paramIndex: '7',
-            paramLabel: 'StakingRewards',
-            paramValue: 40000000,
-            paramText: 'Staking Rewards',
-          },
-          {
-            paramIndex: '15',
-            paramLabel: 'KAppFeeWithdraw',
-            paramValue: 5000000,
-            paramText: 'KApp Fee for Withdraw',
-          },
-          {
-            paramIndex: '16',
-            paramLabel: 'KAppFeeClaim',
-            paramValue: 7,
-            paramText: 'KApp Fee for Claim',
-          },
-          {
-            paramIndex: '17',
-            paramLabel: 'KAppFeeUnjail',
-            paramValue: 1111,
-            paramText: 'KApp Fee for Unjail',
-          },
-        ],
-        overview: {
-          baseTxSize: 250,
-          chainID: '108',
-          currentSlot: 2342011,
-          epochNumber: 433,
-          nonce: 2334860,
-          nonceAtEpochStart: 2331052,
-          slotAtEpochStart: 2338203,
-          slotCurrentTimestamp: 1666048444,
-          slotDuration: 4000,
-          slotsPerEpoch: 5400,
-          startTime: 1656680400,
-        },
-        currentNetworkParams: {
-          'Block Rewards': {
-            currentValue: '15000000',
-            number: 6,
-            parameter: 'Block Rewards',
-          },
-          'Fee Per Data Byte': {
-            currentValue: '4000',
-            number: 0,
-            parameter: 'Fee Per Data Byte',
-          },
-          'KApp Fee for Account Name': {
-            currentValue: '100000000',
-            number: 18,
-            parameter: 'KApp Fee for Account Name',
-          },
-          'KApp Fee for Asset Creation': {
-            currentValue: '20000000000',
-            number: 2,
-            parameter: 'KApp Fee for Asset Creation',
-          },
-          'KApp Fee for Asset Trigger': {
-            currentValue: '2000000',
-            number: 9,
-            parameter: 'KApp Fee for Asset Trigger',
-          },
-          'KApp Fee for Buy': {
-            currentValue: '1000000',
-            number: 23,
-            parameter: 'KApp Fee for Buy',
-          },
-          'KApp Fee for Cancel Market Order': {
-            currentValue: '50000000',
-            number: 25,
-            parameter: 'KApp Fee for Cancel Market Order',
-          },
-          'KApp Fee for Claim': {
-            currentValue: '1000000',
-            number: 16,
-            parameter: 'KApp Fee for Claim',
-          },
-          'KApp Fee for Config ITO': {
-            currentValue: '20000000000',
-            number: 21,
-            parameter: 'KApp Fee for Config ITO',
-          },
-          'KApp Fee for Config Marketplace': {
-            currentValue: '1000000000',
-            number: 27,
-            parameter: 'KApp Fee for Config Marketplace',
-          },
-          'KApp Fee for Delegation': {
-            currentValue: '1000000',
-            number: 13,
-            parameter: 'KApp Fee for Delegation',
-          },
-          'KApp Fee for Freeze': {
-            currentValue: '1000000',
-            number: 11,
-            parameter: 'KApp Fee for Freeze',
-          },
-          'KApp Fee for Marketplace Creation': {
-            currentValue: '50000000000',
-            number: 26,
-            parameter: 'KApp Fee for Marketplace Creation',
-          },
-          'KApp Fee for Proposal': {
-            currentValue: '500000000',
-            number: 19,
-            parameter: 'KApp Fee for Proposal',
-          },
-          'KApp Fee for Sell': {
-            currentValue: '10000000',
-            number: 24,
-            parameter: 'KApp Fee for Sell',
-          },
-          'KApp Fee for Set ITO Prices': {
-            currentValue: '1000000',
-            number: 22,
-            parameter: 'KApp Fee for Set ITO Prices',
-          },
-          'KApp Fee for Transfer': {
-            currentValue: '500000',
-            number: 8,
-            parameter: 'KApp Fee for Transfer',
-          },
-          'KApp Fee for Undelegate': {
-            currentValue: '1000000',
-            number: 14,
-            parameter: 'KApp Fee for Undelegate',
-          },
-          'KApp Fee for Unfreeze': {
-            currentValue: '1000000',
-            number: 12,
-            parameter: 'KApp Fee for Unfreeze',
-          },
-
-          'KApp Fee for Unjail': {
-            currentValue: '10000000000',
-            number: 17,
-            parameter: 'KApp Fee for Unjail',
-          },
-          'KApp Fee for Update Account Permission': {
-            currentValue: '1000000000',
-            number: 28,
-            parameter: 'KApp Fee for Update Account Permission',
-          },
-          'KApp Fee for Validator Creation': {
-            currentValue: '50000000000',
-            number: 1,
-            parameter: 'KApp Fee for Validator Creation',
-          },
-          'KApp Fee for Vote': {
-            currentValue: '1000000',
-            number: 20,
-            parameter: 'KApp Fee for Vote',
-          },
-          'KApp Fee for Validator Config': {
-            currentValue: '1000000000',
-            number: 10,
-            parameter: 'KApp Fee for Validator Config',
-          },
-          'KApp Fee for Withdraw': {
-            currentValue: '1000000',
-            number: 15,
-            parameter: 'KApp Fee for Withdraw',
-          },
-          'Leader Validator rewards percentage': {
-            currentValue: '6000',
-            number: 33,
-            parameter: 'Leader Validator rewards percentage',
-          },
-          'Max Epochs for active proposal duration': {
-            currentValue: '40',
-            number: 34,
-            parameter: 'Max Epochs for active proposal duration',
-          },
-
-          'Max Epochs to clear unclaimed': {
-            currentValue: '100',
-            number: 3,
-            parameter: 'Max Epochs to clear unclaimed',
-          },
-          'Max NFT Mint per batch': {
-            currentValue: '50',
-            number: 29,
-            parameter: 'Max NFT Mint per batch',
-          },
-          'Max bucket size': {
-            currentValue: '100',
-            number: 32,
-            parameter: 'Max bucket size',
-          },
-          'Min KFI staked to enable Proposals Kapps': {
-            currentValue: '1000000000000',
-            number: 30,
-            parameter: 'Min KFI staked to enable Proposals Kapps',
-          },
-          'Min KLV Bucket Amount': {
-            currentValue: '1000000000',
-            number: 31,
-            parameter: 'Min KLV Bucket Amount',
-          },
-          'Min Self Delegation Amount': {
-            currentValue: '1500000000000',
-            number: 4,
-            parameter: 'Min Self Delegation Amount',
-          },
-          'Min Total Delegation Amount': {
-            currentValue: '10000000000000',
-            number: 5,
-            parameter: 'Min Total Delegation Amount',
-          },
-          'Staking Rewards': {
-            currentValue: '15000000',
-            number: 7,
-            parameter: 'Staking Rewards',
-          },
-        },
-        pagination: {
-          next: 2,
-          perPage: 10,
-          previous: 0,
-          self: 1,
-          totalPages: 2,
-          totalRecords: 12,
-        },
-      },
-    };
-    (api.get as jest.Mock).mockImplementation(mockedApiImplementation(0));
-
-    const props = await getServerSideProps({} as any);
-
-    expect(props).toStrictEqual(parsedProposalResult);
   });
 });

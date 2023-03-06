@@ -1,5 +1,5 @@
+import { ISection } from '@/components/Form';
 import { IParamList } from '@/types/index';
-import { ISection } from 'components/Form';
 
 const proposalContract = (paramsList?: IParamList[]): ISection[] => {
   const section = [] as ISection[];
@@ -16,7 +16,8 @@ const proposalContract = (paramsList?: IParamList[]): ISection[] => {
         label: 'Epochs Duration',
         props: {
           required: true,
-          tooltip: 'The time the proposal will be available for voting',
+          tooltip:
+            'The time the proposal will be available for voting ( each epoch has 6h )',
         },
       },
     ],

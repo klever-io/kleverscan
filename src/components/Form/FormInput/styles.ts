@@ -36,6 +36,12 @@ const defaultStyles = css`
 export const StyledInput = styled.input<IProps>`
   height: ${({ type }) => (type === 'hidden' ? 0 : 3)}rem;
 
+  ${props =>
+    props.type === 'datetime-local' &&
+    css`
+      color-scheme: ${props => (props.theme.dark ? 'dark' : 'auto')};
+    `}
+
   ${defaultStyles}
 
   /* Set valid css */
@@ -220,27 +226,32 @@ export const TooltipContent = styled.div`
   display: inline-block;
   background-color: ${props => props.theme.form.tooltipContainer};
   padding: 0.4rem 0.5rem 0.4rem 0.5rem;
-  margin-left: 0.5rem;
+  margin-left: 1.25rem;
   border-radius: 0.2rem;
   font-size: smaller;
   visibility: hidden;
+  width: 100%;
+  max-width: fit-content;
 
-  @media (min-width: 950px) {
-    white-space: pre;
-  }
+  transform: translateY(-25%);
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    width: auto;
-    min-width: 18rem;
+  span {
+    font-weight: 300;
   }
 `;
 
 export const TooltipContainer = styled.div<{
   tooltip?: string;
 }>`
+  display: flex;
   user-select: none;
-
   position: relative;
+
+  width: calc(100% - 1rem);
+
+  > svg {
+    align-self: center;
+  }
 
   &:hover {
     div {
@@ -250,17 +261,16 @@ export const TooltipContainer = styled.div<{
 
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     font-size: 1rem;
-    max-width: 11ch;
   }
 `;
 
 export const InputLabel = styled.label<ILabel>`
   user-select: none;
-  opacity: ${props => (props.disabled ? 0.6 : 1)};
-  font-size: smaller;
-  font-weight: 600;
+
   transform: translate(-1rem, -2.25rem);
   z-index: 1;
+
+  width: 100%;
 
   position: absolute;
   left: 1rem;
@@ -271,9 +281,20 @@ export const InputLabel = styled.label<ILabel>`
 
   gap: 0.5rem;
 
-  color: ${({ theme }) => theme.darkText};
-
   transition: transform 0.2s ease;
+
+  > span,
+  p {
+    opacity: ${props => (props.disabled ? 0.6 : 1)};
+    font-size: smaller;
+    font-weight: 500;
+    color: ${({ theme }) => theme.darkText};
+    min-width: fit-content;
+  }
+
+  &:hover {
+    z-index: 2;
+  }
 
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     top: 0.8rem;

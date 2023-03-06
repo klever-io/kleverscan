@@ -1,4 +1,4 @@
-import { ISection } from 'components/Form';
+import { ISection } from '@/components/Form';
 
 const validatorConfigContract = (): ISection[] => {
   const section = [] as ISection[];
@@ -31,10 +31,11 @@ const validatorConfigContract = (): ISection[] => {
         },
       },
       {
-        label: 'Comission',
+        label: 'Commission',
         props: {
           type: 'number',
           tooltip: 'Validation commission with 2 decimals',
+          maxDecimals: 2,
         },
       },
       {

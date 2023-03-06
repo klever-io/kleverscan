@@ -1,5 +1,6 @@
+import { useField } from '@unform/core';
 import dynamic from 'next/dynamic';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
 import { components } from 'react-select';
 import { Container, HiddenInput } from './styles';
@@ -18,11 +19,13 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   options?: IDropdownItem[];
   selectPlaceholder?: string;
   title?: string;
+  name?: string;
   inputRef: React.RefObject<HTMLInputElement>;
 }
 
 const Filter: React.FC<IFilter> = ({
   options: data,
+  name,
   inputRef,
   selectPlaceholder,
   title,
@@ -32,6 +35,16 @@ const Filter: React.FC<IFilter> = ({
     label: '',
     value: '',
   });
+
+  const { fieldName, registerField, error } = useField(name || '');
+
+  useEffect(() => {
+    registerField({
+      name: fieldName,
+      ref: inputRef.current,
+      path: 'value',
+    });
+  }, [fieldName, registerField]);
 
   const Placeholder = (props: any) => {
     return <components.Placeholder {...props} />;

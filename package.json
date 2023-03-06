@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest",
-    "test-cov": "jest --coverage",
+    "test": "jest --env=./src/test/custom-test-env.ts",
+    "test-cov": "jest --coverage --env=./src/test/custom-test-env.ts",
     "test-cy": "cypress run",
     "test-cy:open": "cypress run --headed --no-exit",
     "postinstall": "husky install"
@@ -16,7 +16,7 @@
   "dependencies": {
     "@bugsnag/js": "7.16.2",
     "@bugsnag/plugin-react": "7.16.4",
-    "@klever/sdk": "3.2.4",
+    "@klever/sdk": "^4.2.1",
     "@types/ioredis": "4.28.2",
     "@types/react-leaflet-markercluster": "3.0.0",
     "@unform/core": "2.1.6",

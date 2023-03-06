@@ -1,3 +1,4 @@
+import { parseAddress } from '@/utils/parseValues';
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -9,7 +10,6 @@ import {
   mockedProposalsResponse,
 } from '../../../test/mocks/tabs/proposals';
 import { renderWithTheme } from '../../../test/utils';
-import { parseAddress } from '../../../utils/index';
 
 jest.mock('next/router', () => ({
   useRouter() {
@@ -40,8 +40,6 @@ describe('Component: Tabs/Proposals', () => {
     await act(async () => {
       renderWithTheme(
         <Proposals
-          loading={false}
-          proposals={parsedProposals}
           request={(page: number, limit: number) => request(page, limit)}
         />,
       );
@@ -78,8 +76,6 @@ describe('Component: Tabs/Proposals', () => {
     await act(async () => {
       renderWithTheme(
         <Proposals
-          loading={false}
-          proposals={parsedProposals}
           request={(page: number, limit: number) => request(page, limit)}
         />,
       );
@@ -174,8 +170,6 @@ describe('Component: Tabs/Proposals', () => {
     await act(async () => {
       renderWithTheme(
         <Proposals
-          loading={false}
-          proposals={parsedProposals}
           request={(page: number, limit: number) => emptyRequest(page, limit)}
         />,
       );
@@ -191,8 +185,6 @@ describe('Component: Tabs/Proposals', () => {
     await act(async () => {
       renderWithTheme(
         <Proposals
-          loading={false}
-          proposals={parsedProposals}
           request={(page: number, limit: number) => request(page, limit)}
         />,
       );

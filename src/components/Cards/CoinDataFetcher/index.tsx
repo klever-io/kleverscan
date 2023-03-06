@@ -6,7 +6,7 @@ import {
   IGeckoResponse,
   Service,
 } from '@/types';
-import { calcApr } from '@/utils';
+import { calcApr } from '@/utils/calcApr';
 import { useEffect, useState } from 'react';
 import CoinCard from './CoinCard';
 import CoinCardSkeleton from './CoinCardSkeleton';
@@ -137,7 +137,7 @@ const CoinDataFetcher: React.FC = () => {
 
       const klvCall = new Promise<ICoinInfo>(async (resolve, reject) => {
         const res = await api.get({
-          route: `assets/KLV`,
+          route: `assets/KLV?minify=true`,
         });
 
         if (!res.error || res.error === '') {
@@ -149,7 +149,7 @@ const CoinDataFetcher: React.FC = () => {
 
       const kfiCall = new Promise<ICoinInfo>(async (resolve, reject) => {
         const res = await api.get({
-          route: `assets/KFI`,
+          route: `assets/KFI?minify=true`,
         });
 
         if (!res.error || res.error === '') {

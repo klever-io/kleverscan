@@ -100,7 +100,6 @@ const ReactSelect = css`
 export const Container = styled.div<IContainer>`
   position: relative;
 
-  height: 100%;
   width: 100%;
   display: flex;
   z-index: ${props => props.zIndex};

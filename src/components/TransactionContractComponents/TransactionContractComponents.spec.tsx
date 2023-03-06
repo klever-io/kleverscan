@@ -1,3 +1,4 @@
+import { toLocaleFixed } from '@/utils/formatFunctions';
 import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
@@ -11,8 +12,7 @@ import {
   unfreeze1,
 } from '../../test/mocks/transaction-page';
 import { renderWithTheme } from '../../test/utils';
-import * as utils from '../../utils';
-import { toLocaleFixed } from '../../utils';
+import * as utilsPrecision from '../../utils/precisionFunctions';
 import {
   AssetTrigger,
   Buy,
@@ -51,7 +51,7 @@ const mockPrecision = {
 describe('Component: TransactionContractComponents', () => {
   describe('When contract is "Transfer"', () => {
     it('Should render the "Amount", "to"( who receive ) with the link and the coin with the link', async () => {
-      const spy = jest.spyOn(utils, 'getPrecision');
+      const spy = jest.spyOn(utilsPrecision, 'getPrecision');
       spy.mockReturnValue(new Promise<number>(resolve => resolve(6)));
       await act(async () => {
         renderWithTheme(
@@ -249,7 +249,7 @@ describe('Component: TransactionContractComponents', () => {
 
   describe('When contract is "Freeze"', () => {
     it('Should render "Amount" and "Bucket ID" with all it\'s values', async () => {
-      const spy = jest.spyOn(utils, 'getPrecision');
+      const spy = jest.spyOn(utilsPrecision, 'getPrecision');
       spy.mockReturnValue(new Promise<number>(resolve => resolve(6)));
       await act(async () => {
         renderWithTheme(
@@ -278,7 +278,7 @@ describe('Component: TransactionContractComponents', () => {
 
   describe('When contract is "Unfreeze"', () => {
     it('Should render "Amount" and "Bucket ID" with all it\'s values', async () => {
-      const spy = jest.spyOn(utils, 'getPrecision');
+      const spy = jest.spyOn(utilsPrecision, 'getPrecision');
       spy.mockReturnValue(
         new Promise<{
           [assetId: string]: number;
@@ -388,7 +388,7 @@ describe('Component: TransactionContractComponents', () => {
 
   describe('When contract is "Claim"', () => {
     it('Should render "Claim Type" and "Id" with all it\'s values', async () => {
-      const spy = jest.spyOn(utils, 'getPrecision');
+      const spy = jest.spyOn(utilsPrecision, 'getPrecision');
       spy.mockReturnValue(new Promise<number>(resolve => resolve(6)));
       await act(async () => {
         renderWithTheme(
@@ -533,7 +533,7 @@ describe('Component: TransactionContractComponents', () => {
 
   describe('When contract is "MarketBuy"', () => {
     it('Should render "Buy Type" and "Id" with all it\'s values', async () => {
-      const spy = jest.spyOn(utils, 'getPrecision');
+      const spy = jest.spyOn(utilsPrecision, 'getPrecision');
       spy.mockReturnValue(
         new Promise<{
           [assetId: string]: number;
@@ -602,7 +602,7 @@ describe('Component: TransactionContractComponents', () => {
 
   describe('When contract is "Sell"', () => {
     it('Should render "Market Type" and "Asset Id" with all it\'s values', async () => {
-      const spyPrecision = jest.spyOn(utils, 'getPrecision');
+      const spyPrecision = jest.spyOn(utilsPrecision, 'getPrecision');
       spyPrecision.mockReturnValue(new Promise<number>(resolve => resolve(6)));
 
       await act(async () => {

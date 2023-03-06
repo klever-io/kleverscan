@@ -1,11 +1,41 @@
 import { IPagination, IResponse } from '@/types/index';
 
+export interface IParsedVote {
+  status: string;
+  validator: string;
+  votingPower: string;
+  voteDate: string;
+  voter: string;
+}
+
+export interface IParsedVoter {
+  voter: string;
+  votingPower: string;
+  voteDate: string;
+  status: string;
+}
+
+export interface IParsedVoterResponse {
+  data: { voters: IParsedVoter[] };
+  pagination: IPagination;
+  error: string;
+  code: string;
+}
+
+export interface IProposalVoters {
+  proposalVotersProps: {
+    scrollUp: boolean;
+    request?: (page: number, limit: number) => Promise<any>;
+    dataName: string;
+  };
+}
+
 export interface IProposal {
   proposalId: number;
   proposer: string;
   txHash: string;
   proposalStatus: string;
-  parameters: IRawParam;
+  parameters: IProposalParams;
   description: string;
   epochStart: number;
   epochEnd: number;
@@ -15,13 +45,33 @@ export interface IProposal {
   totalStaked?: number;
   timestampStart?: number;
   timestampEnd?: number;
-  fullInfoParams?: IFullInfoParam[];
+  fullInfoNewParams?: IParsedProposalParam[];
   currentNetworkParams?: INetworkParams;
   overview: INodeOverview;
+  votersPage: IVotersPage;
 }
 
-interface INodeOverview {
+export interface IVotersPage {
+  self: number;
+  next: number;
+  previous: number;
+  perPage: number;
+  totalPages: number;
+  totalRecords: number;
+}
+
+export interface INodeOverview {
+  baseTxSize: number;
+  chainID: string;
+  currentSlot: number;
   epochNumber: number;
+  nonce: number;
+  nonceAtEpochStart: number;
+  slotAtEpochStart: number;
+  slotCurrentTimestamp: number;
+  slotDuration: number;
+  slotsPerEpoch: number;
+  startTime: number;
 }
 
 export interface IProposalsResponse extends IResponse {
@@ -31,13 +81,23 @@ export interface IProposalsResponse extends IResponse {
   pagination: IPagination;
 }
 
+export interface IProposalResponse extends IResponse {
+  data: {
+    proposal: IProposal;
+  };
+  pagination: IPagination;
+  error: string;
+}
+
 export interface IParsedProposal extends IProposal {
-  parsedParameters: IFullInfoParam[];
+  parsedParameters: IParsedProposalParam[];
   votingPowers?: IVotingPowers;
   currentNetworkParams: INetworkParams;
   pagination: IPagination;
+  totalVoted: number;
+  totalStaked: number;
+  parsedVoters: IParsedVoter[];
 }
-
 export interface IAPINetworkParams {
   parameters: {
     [key: string]: { type: string; value: string };
@@ -61,8 +121,6 @@ export interface IVotes {
 
 export interface IProposalsPage {
   networkParams: INetworkParams;
-  proposals: IParsedProposal[];
-  totalProposalsPage: number;
 }
 
 export interface INetworkParams {
@@ -80,21 +138,19 @@ export interface IProposals {
 }
 
 export interface IProposalsProps {
-  proposals: IParsedProposal[];
-  totalPages: number;
   request: (page: number, limit: number) => Promise<any>;
 }
 
-export interface IRawParam {
+export interface IProposalParams {
   [name: string]: string;
 }
 
 export interface IParsedParams {
   currentNetworkParams: INetworkParams;
-  fullInfoParams: IFullInfoParam[];
+  parsedProposalParams: IParsedProposalParam[];
 }
 
-export interface IFullInfoParam {
+export interface IParsedProposalParam {
   paramIndex: string;
   paramLabel: string;
   paramValue: number;

@@ -1,4 +1,4 @@
-import { ISection } from 'components/Form';
+import { ISection } from '@/components/Form';
 
 const configMarketplaceContract = (): ISection[] => {
   const section = [] as ISection[];
@@ -30,6 +30,7 @@ const configMarketplaceContract = (): ISection[] => {
         props: {
           type: 'number',
           tooltip: 'New referral percentage with 2 decimals',
+          maxDecimals: 2,
         },
       },
     ],

@@ -583,7 +583,7 @@ export const Main = styled.main`
   background-color: ${props => props.theme.background};
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding: 3rem 2rem 5rem;
+    padding: 3rem 1rem 5rem;
   }
 `;
 export const LayoutContainer = styled.div`

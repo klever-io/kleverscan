@@ -1,10 +1,11 @@
+import { capitalizeString } from '@/utils/convertString';
+import { parseAddress } from '@/utils/parseValues';
 import { act, screen } from '@testing-library/react';
 import { format, fromUnixTime } from 'date-fns';
 import React from 'react';
 import { mockedTransactions } from '../../../test/mocks';
 import { renderWithTheme } from '../../../test/utils';
 import { IInnerTableProps } from '../../../types';
-import { capitalizeString, parseAddress } from '../../../utils/index';
 import Transaction from './';
 
 const precision = 6;

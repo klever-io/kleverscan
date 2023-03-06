@@ -3,6 +3,7 @@ import Copy from '@/components/Copy';
 import Dropdown from '@/components/Dropdown';
 import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
+import Skeleton from '@/components/Skeleton';
 import Table, { ITable } from '@/components/Table';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
@@ -14,7 +15,9 @@ import {
   IResponse,
   IRowSection,
 } from '@/types/index';
-import { formatAmount, parseAddress, regexImgUrl } from '@/utils/index';
+import { formatAmount, regexImgUrl } from '@/utils/formatFunctions';
+import { KLV_PRECISION } from '@/utils/globalVariables';
+import { parseAddress } from '@/utils/parseValues';
 import {
   BoldElement,
   CenteredSubTitle,
@@ -39,10 +42,10 @@ import {
   CenteredRow,
   TableContainer,
 } from '@/views/validators/detail';
-import { GetServerSideProps } from 'next';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
 
 interface IValidatorPage {
@@ -69,30 +72,25 @@ const DynamicValidatorCards = dynamic(
   () => import('../../components/ValidatorCards'),
 );
 
-const Validator: React.FC<IValidatorPage> = ({
-  validator,
-  delegators: defaultDelegators,
-  pagination,
-}) => {
-  const {
-    blsPublicKey,
-    ownerAddress,
-    canDelegate,
-    commission,
-    maxDelegation,
-    rating,
-    list,
-    totalStake,
-    selfStake,
-    logo,
-    name,
-    uris,
-  } = validator;
-
+const Validator: React.FC<IValidatorPage> = () => {
+  const router = useRouter();
+  const [validator, setValidator] = useState<null | IPeer>(null);
   const [imgError, setImgError] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-
   const [rerender, setRerender] = useState(false);
+
+  useEffect(() => {
+    if (router.isReady) {
+      const requestValidator = async () => {
+        const res = await api.get({
+          route: `validator/${router.query.hash}`,
+        });
+        if (!res.error || res.error === '') {
+          setValidator(res.data.validator);
+        }
+      };
+      requestValidator();
+    }
+  }, [router.isReady]);
 
   const handleLogoError = () => {
     setImgError(true);
@@ -100,27 +98,32 @@ const Validator: React.FC<IValidatorPage> = ({
   };
 
   const renderLogo = () => {
-    if (regexImgUrl(logo) && !imgError) {
-      return (
-        <Logo
-          alt={`${name}-logo`}
-          src={logo}
-          onError={() => handleLogoError()}
-        />
-      );
+    if (validator) {
+      if (regexImgUrl(validator.logo) && !imgError) {
+        return (
+          <Logo
+            alt={`${validator.name}-logo`}
+            src={validator.logo}
+            onError={() => handleLogoError()}
+          />
+        );
+      }
+      return <LetterLogo>{validator.name?.split?.('')[0] || 'K'}</LetterLogo>;
     }
-    return <LetterLogo>{name?.split?.('')[0] || 'K'}</LetterLogo>;
+    return null;
   };
 
   const totalProduced =
-    validator?.totalLeaderSuccessRate?.numSuccess +
-    validator?.totalValidatorSuccessRate?.numSuccess;
+    (validator?.totalLeaderSuccessRate?.numSuccess || 0) +
+    (validator?.totalValidatorSuccessRate?.numSuccess || 0);
   const totalMissed =
-    validator?.totalLeaderSuccessRate?.numFailure +
-    validator?.totalValidatorSuccessRate?.numFailure;
-  const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'fail');
+    (validator?.totalLeaderSuccessRate?.numFailure || 0) +
+    (validator?.totalValidatorSuccessRate?.numFailure || 0);
+  const DelegateIcon = getStatusIcon(
+    validator?.canDelegate ? 'success' : 'fail',
+  );
 
-  const commissionPercent = commission / 10 ** 2;
+  const commissionPercent = (validator?.commission || 0) / 10 ** 2;
 
   const getListStatus = (list: string): string => {
     let status = '';
@@ -140,10 +143,10 @@ const Validator: React.FC<IValidatorPage> = ({
     return status;
   };
 
-  const ListIcon = getStatusIcon(getListStatus(list));
+  const ListIcon = getStatusIcon(getListStatus(validator?.list || ''));
 
   const getRateColor = (): string => {
-    const percent = rating / 10 ** 7;
+    const percent = (validator?.rating || 0) / 10 ** 7;
 
     if (percent > 0.8) {
       return 'green';
@@ -158,22 +161,22 @@ const Validator: React.FC<IValidatorPage> = ({
   const renderTitle = () => {
     return (
       <h1>
-        {name ||
+        {validator?.name ||
           (isMobile
-            ? parseAddress(ownerAddress, 14)
-            : parseAddress(ownerAddress, 24))}
+            ? parseAddress((router.query.hash as string) || '', 14)
+            : parseAddress((router.query.hash as string) || '', 24))}
       </h1>
     );
   };
 
   const renderMaxDelegation = () => {
     const maxDelegationWithPresicion = (
-      maxDelegation /
-      10 ** precision
+      (validator?.maxDelegation || 0) /
+      10 ** KLV_PRECISION
     ).toLocaleString();
     return (
       <p>
-        {maxDelegation !== 0 ? (
+        {validator?.maxDelegation !== 0 ? (
           `${maxDelegationWithPresicion} KLV`
         ) : (
           <IoIosInfinite />
@@ -182,15 +185,15 @@ const Validator: React.FC<IValidatorPage> = ({
     );
   };
 
-  const requestValidator = async (page: number, limit: number) => {
+  const requestValidatorDelegations = async (page: number, limit: number) => {
     const response: IDelegateResponse = await api.get({
-      route: `validator/delegated/${ownerAddress}?page=${page}&limit=${limit}`,
+      route: `validator/delegated/${router.query.hash}?page=${page}&limit=${limit}`,
     });
 
     const delegators: IBucket[] = [];
     response?.data?.delegators?.forEach(delegation => {
       delegation?.buckets?.forEach(bucket => {
-        if (bucket?.delegation === ownerAddress) {
+        if (bucket?.delegation === router.query.hash) {
           delegators.push({
             address: delegation?.address,
             ...bucket,
@@ -210,8 +213,19 @@ const Validator: React.FC<IValidatorPage> = ({
           </span>
           <span>
             <CenteredRow>
-              <Link href={`/account/${ownerAddress}`}>{ownerAddress}</Link>
-              <Copy data={ownerAddress} info="ownerAddress"></Copy>
+              {router.query.hash ? (
+                <>
+                  <Link href={`/account/${router.query.hash}`}>
+                    {router.query.hash}
+                  </Link>
+                  <Copy
+                    data={router.query.hash as string}
+                    info="ownerAddress"
+                  ></Copy>
+                </>
+              ) : (
+                <Skeleton />
+              )}
             </CenteredRow>
           </span>
         </Row>
@@ -221,9 +235,13 @@ const Validator: React.FC<IValidatorPage> = ({
               <strong>Rating</strong>
             </span>
             <span>
-              <Rating rate={getRateColor()}>
-                {((rating * 100) / 10000000).toFixed(2)}%
-              </Rating>
+              {validator ? (
+                <Rating rate={getRateColor()}>
+                  {((validator?.rating * 100) / 10000000).toFixed(2)}%
+                </Rating>
+              ) : (
+                <Skeleton />
+              )}
             </span>
           </RatingContainer>
         </Row>
@@ -233,10 +251,14 @@ const Validator: React.FC<IValidatorPage> = ({
               <span>
                 <strong>Status</strong>
               </span>
-              <Status status={getListStatus(list)}>
-                <ListIcon />
-                <span>{list}</span>
-              </Status>
+              {validator ? (
+                <Status status={getListStatus(validator?.list)}>
+                  <ListIcon />
+                  <span>{validator?.list}</span>
+                </Status>
+              ) : (
+                <Skeleton />
+              )}
             </ElementsWrapper>
           </HalfRow>
           <HalfRow>
@@ -244,10 +266,14 @@ const Validator: React.FC<IValidatorPage> = ({
               <span>
                 <strong>Can Delegate</strong>
               </span>
-              <Status status={canDelegate ? 'success' : 'fail'}>
-                <DelegateIcon />
-                <span>{canDelegate ? 'Yes' : 'No'}</span>
-              </Status>
+              {validator ? (
+                <Status status={validator.canDelegate ? 'success' : 'fail'}>
+                  <DelegateIcon />
+                  <span>{validator.canDelegate ? 'Yes' : 'No'}</span>
+                </Status>
+              ) : (
+                <Skeleton />
+              )}
             </ElementsWrapper>
           </HalfRow>
         </Row>
@@ -255,7 +281,11 @@ const Validator: React.FC<IValidatorPage> = ({
           <span>
             <strong>Max Delegation</strong>
           </span>
-          <BoldElement>{renderMaxDelegation()}</BoldElement>
+          {validator ? (
+            <BoldElement>{renderMaxDelegation()}</BoldElement>
+          ) : (
+            <Skeleton />
+          )}
         </Row>
         <Row>
           <HalfRow>
@@ -263,10 +293,19 @@ const Validator: React.FC<IValidatorPage> = ({
               <span>
                 <strong>Staked Balance</strong>
               </span>
-              <BoldElement>
-                <span>{(totalStake / 10 ** precision).toLocaleString()}</span>
-                <span> KLV</span>
-              </BoldElement>
+              {validator ? (
+                <BoldElement>
+                  <span>
+                    {(
+                      validator.totalStake /
+                      10 ** KLV_PRECISION
+                    ).toLocaleString()}
+                  </span>
+                  <span> KLV</span>
+                </BoldElement>
+              ) : (
+                <Skeleton />
+              )}
             </ElementsWrapper>
           </HalfRow>
           <HalfRow>
@@ -274,10 +313,16 @@ const Validator: React.FC<IValidatorPage> = ({
               <span>
                 <strong>Self Stake</strong>
               </span>
-              <BoldElement>
-                <span>{(selfStake / 10 ** 6).toLocaleString()}</span>
-                <span> KLV</span>
-              </BoldElement>
+              {validator ? (
+                <BoldElement>
+                  <span>
+                    {(validator?.selfStake || 0 / 10 ** 6).toLocaleString()}
+                  </span>
+                  <span> KLV</span>
+                </BoldElement>
+              ) : (
+                <Skeleton />
+              )}
             </ElementsWrapper>
           </HalfRow>
         </Row>
@@ -287,9 +332,13 @@ const Validator: React.FC<IValidatorPage> = ({
               <span>
                 <strong>Total Produced</strong>
               </span>
-              <BoldElement>
-                <p>{totalProduced?.toLocaleString()}</p>
-              </BoldElement>
+              {validator ? (
+                <BoldElement>
+                  <p>{totalProduced?.toLocaleString()}</p>
+                </BoldElement>
+              ) : (
+                <Skeleton />
+              )}
             </ElementsWrapper>
           </HalfRow>
           <HalfRow>
@@ -297,9 +346,13 @@ const Validator: React.FC<IValidatorPage> = ({
               <span>
                 <strong>Total Missed</strong>
               </span>
-              <BoldElement>
-                <p>{totalMissed?.toLocaleString()}</p>
-              </BoldElement>
+              {validator ? (
+                <BoldElement>
+                  <p>{totalMissed?.toLocaleString()}</p>
+                </BoldElement>
+              ) : (
+                <Skeleton />
+              )}
             </ElementsWrapper>
           </HalfRow>
         </Row>
@@ -308,24 +361,31 @@ const Validator: React.FC<IValidatorPage> = ({
             <span>
               <strong>Commission</strong>
             </span>
-            <BoldElement>
-              <p>{commissionPercent}%</p>
-            </BoldElement>
+            {validator ? (
+              <BoldElement>
+                <p>{commissionPercent}%</p>
+              </BoldElement>
+            ) : (
+              <Skeleton />
+            )}
           </ElementsWrapper>
         </Row>
         <Row>
           <span>
             <strong>URIS</strong>
           </span>
-          <BoldElement>
-            <Dropdown uris={uris} />
-          </BoldElement>
+          {validator ? (
+            <BoldElement>
+              <Dropdown uris={validator.uris} />
+            </BoldElement>
+          ) : (
+            <Skeleton />
+          )}
         </Row>
       </CardContent>
     );
   };
 
-  const precision = 6; // default KLV precision
   const header = ['Address', 'Bucket ID', 'Staked Epoch', 'Amount '];
 
   const rowSections = (bucket: IBucket): IRowSection[] => {
@@ -355,7 +415,7 @@ const Validator: React.FC<IValidatorPage> = ({
       {
         element: (
           <strong key={balance}>
-            {formatAmount(balance / 10 ** precision)}
+            {formatAmount(balance / 10 ** KLV_PRECISION)}
           </strong>
         ),
         span: 1,
@@ -368,11 +428,9 @@ const Validator: React.FC<IValidatorPage> = ({
   const tableProps: ITable = {
     type: 'validator',
     header,
-    data: defaultDelegators as IBucket[],
     rowSections,
-    request: (page, limit) => requestValidator(page, limit),
+    request: (page, limit) => requestValidatorDelegations(page, limit),
     scrollUp: false,
-    totalPages: pagination?.totalPages || 1,
     dataName: 'validator',
   };
 
@@ -384,15 +442,22 @@ const Validator: React.FC<IValidatorPage> = ({
             {renderLogo()}
             <TitleInformation>
               <ValidatorTitle>{renderTitle()}</ValidatorTitle>
-              <CenteredSubTitle>
-                <span>{blsPublicKey}</span>
-                <CopyBackground>
-                  <Copy data={blsPublicKey} info="Key" />
-                </CopyBackground>
-                <ReceiveBackground isOverflow={false}>
-                  <QrCodeModal value={blsPublicKey} isOverflow={false} />
-                </ReceiveBackground>
-              </CenteredSubTitle>
+              {validator ? (
+                <CenteredSubTitle>
+                  <span>{validator?.blsPublicKey}</span>
+                  <CopyBackground>
+                    <Copy data={validator?.blsPublicKey} info="Key" />
+                  </CopyBackground>
+                  <ReceiveBackground isOverflow={false}>
+                    <QrCodeModal
+                      value={validator?.blsPublicKey || ''}
+                      isOverflow={false}
+                    />
+                  </ReceiveBackground>
+                </CenteredSubTitle>
+              ) : (
+                <Skeleton />
+              )}
             </TitleInformation>
           </TitleContent>
         )}
@@ -400,9 +465,9 @@ const Validator: React.FC<IValidatorPage> = ({
       />
 
       <DynamicValidatorCards
-        totalStake={totalStake}
-        commission={commission}
-        maxDelegation={maxDelegation}
+        totalStake={validator?.totalStake}
+        commission={validator?.commission}
+        maxDelegation={validator?.maxDelegation}
       />
       <CardContainer>
         <Overview />
@@ -413,84 +478,6 @@ const Validator: React.FC<IValidatorPage> = ({
       </TableContainer>
     </Container>
   );
-};
-
-export const getServerSideProps: GetServerSideProps<IValidatorPage> = async ({
-  query: { hash },
-}) => {
-  const redirectProps = { redirect: { destination: '/404', permanent: false } };
-
-  const props: IValidatorPage = {
-    validator: {} as IPeer,
-    delegators: [],
-    pagination: {} as IPagination,
-  };
-
-  const address = String(hash);
-
-  const validatorCall = new Promise<IValidatorResponse>(
-    async (resolve, reject) => {
-      const res = await api.get({
-        route: `validator/${address}`,
-      });
-
-      if (!res.error || res.error === '') {
-        resolve(res);
-      }
-
-      reject(res.error);
-    },
-  );
-
-  const delegationCall = new Promise<IDelegateResponse>(
-    async (resolve, reject) => {
-      const res = await api.get({
-        route: `validator/delegated/${address}`,
-      });
-
-      if (!res.error || res.error === '') {
-        resolve(res);
-      }
-
-      reject(res.error);
-    },
-  );
-
-  await Promise.allSettled([validatorCall, delegationCall]).then(promises => {
-    promises?.forEach((res, index) => {
-      if (res.status === 'fulfilled') {
-        if (index === 0) {
-          const { value }: any = res;
-          props.validator = value?.data?.validator;
-        } else if (index === 1) {
-          const delegations: any = res.value;
-          const delegators: IBucket[] = [];
-
-          delegations?.data?.delegators?.forEach((delegation: any) => {
-            delegation?.buckets?.forEach((bucket: any) => {
-              if (bucket?.delegation === address) {
-                delegators.push({
-                  address: delegation?.address,
-                  ...bucket,
-                });
-              }
-            });
-          });
-
-          if (!delegations.error) {
-            props.pagination = delegations?.pagination;
-            props.delegators = delegators;
-          }
-        }
-      }
-    });
-  });
-
-  if (Object.keys(props.validator).length === 0) {
-    return redirectProps;
-  }
-
-  return { props };
 };
 
 export default Validator;

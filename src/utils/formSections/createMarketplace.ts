@@ -1,4 +1,4 @@
-import { ISection } from 'components/Form';
+import { ISection } from '@/components/Form';
 
 const createMarketplaceContract = (): ISection[] => {
   const section = [] as ISection[];
@@ -22,6 +22,7 @@ const createMarketplaceContract = (): ISection[] => {
         props: {
           type: 'number',
           tooltip: 'Royalties percentage with 2 decimals',
+          maxDecimals: 2,
         },
       },
     ],

@@ -14,8 +14,8 @@ interface ITransactionsFilters {
 const TransactionsFilters: React.FC<ITransactionsFilters> = ({ setQuery }) => {
   const router = useRouter();
   const [query, setLocalQuery] = useState<NextParsedUrlQuery>({});
-
-  const [assets, fetchPartialAsset] = useFetchPartialAsset();
+  const [assets, fetchPartialAsset, loading, setLoading] =
+    useFetchPartialAsset();
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -42,11 +42,15 @@ const TransactionsFilters: React.FC<ITransactionsFilters> = ({ setQuery }) => {
     {
       title: 'Coin',
       data: assets.map(asset => asset?.assetId),
-      onClick: selected => handleSelected(selected, 'asset'),
+      onClick: selected => {
+        handleSelected(selected, 'asset');
+      },
       onChange: async value => {
+        setLoading(true);
         await fetchPartialAsset(value);
       },
       current: query.asset as string | undefined,
+      loading,
     },
     {
       title: 'Status',

@@ -1,13 +1,13 @@
 import Table, { ITable } from '@/components/Table';
+import api from '@/services/api';
 import { IRowSection } from '@/types/index';
 import React from 'react';
-
-interface INetworkProps {
-  networkParams: INetworkParams;
-}
+import { proposalsMessages } from './proposalMessages';
 
 interface INetworkParams {
-  [index: number]: INetworkParam;
+  data: {
+    parameters: INetworkParam[];
+  };
 }
 
 interface INetworkParam {
@@ -16,7 +16,27 @@ interface INetworkParam {
   currentValue: string;
 }
 
-const NetworkParams: React.FC<INetworkProps> = ({ networkParams }) => {
+const requestNetworkParams = async (): Promise<INetworkParams> => {
+  const { data } = await api.get({ route: 'network/network-parameters' });
+
+  const networkParams: INetworkParams = { data: { parameters: [] } };
+
+  if (data) {
+    networkParams.data.parameters = Object.keys(proposalsMessages).map(
+      (key, index) => {
+        return {
+          number: index,
+          parameter: proposalsMessages[key] ? proposalsMessages[key] : '',
+          currentValue: data.parameters[key].value,
+        };
+      },
+    );
+  }
+
+  return networkParams;
+};
+
+const NetworkParams: React.FC = () => {
   const rowSections = (props: INetworkParam): IRowSection[] => {
     const { number, parameter, currentValue } = props;
 
@@ -38,9 +58,10 @@ const NetworkParams: React.FC<INetworkProps> = ({ networkParams }) => {
 
   const tableProps: ITable = {
     rowSections,
-    data: networkParams as any[],
+    dataName: 'parameters',
     header,
     type: 'networkParams',
+    request: () => requestNetworkParams(),
   };
 
   return <Table {...tableProps} />;

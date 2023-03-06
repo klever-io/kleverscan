@@ -8,7 +8,7 @@ import {
 } from '@/types';
 import { IBlock } from '@/types/blocks';
 import { IDataMetrics, ITransactionListResponse, Service } from '@/types/index';
-import { getEpochInfo } from '@/utils/index';
+import { getEpochInfo } from '@/utils';
 import { useEffect, useState } from 'react';
 import HomeDataCards from './HomeDataCards';
 import HomeDataCardsSkeleton from './HomeDataCardsSkeleton';
@@ -39,7 +39,7 @@ const CardDataFetcher: React.FC<{ block: IBlock }> = ({ block }) => {
       const transactionsCall = new Promise<ITransactionResponse>(
         async (resolve, reject) => {
           const res = await api.getCached({
-            route: 'transaction/list',
+            route: 'transaction/list?minify=true',
           });
 
           if (!res.error || res.error === '') {
@@ -265,7 +265,7 @@ const CardDataFetcher: React.FC<{ block: IBlock }> = ({ block }) => {
       const transactionsCall = new Promise<ITransactionResponse>(
         async (resolve, reject) => {
           const res = await api.getCached({
-            route: 'transaction/list',
+            route: 'transaction/list?minify=true',
           });
           if (!res.error || res.error === '') {
             resolve(res);

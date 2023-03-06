@@ -1,6 +1,5 @@
-import { receiverIsSender } from '..';
+import { findNextSiblingReceipt } from '.';
 import { IReceipt } from '../../types';
-import { findNextSiblingReceipt } from '../findKey';
 import {
   marketBuyFail1,
   marketBuyMulti1,
@@ -8,7 +7,8 @@ import {
   unfreezeWithClaimMulti1,
   unfreezeWithClaimMulti2,
   unfreezeWithClaimSingle1,
-} from './mocks/findKeyMocks';
+} from '../mocks/findKeyMocks';
+import { receiverIsSender } from '../validateSender';
 
 describe('test findNextSiblingReceipt function', () => {
   describe('early return cases', () => {

@@ -1,4 +1,4 @@
-import { ISection } from 'components/Form';
+import { ISection } from '@/components/Form';
 
 export const delegateContract = (): ISection[] => {
   const section = [] as ISection[];
@@ -6,7 +6,7 @@ export const delegateContract = (): ISection[] => {
   section.push({
     fields: [
       {
-        label: 'Receiver',
+        label: 'Validator Address',
         props: {
           required: true,
           tooltip: 'Validator to whom the bucket will be delegated',

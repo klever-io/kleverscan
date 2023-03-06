@@ -30,9 +30,10 @@ import {
 import { IReceipt, IRowSection } from '@/types/index';
 import { CenteredRow } from '@/views/transactions';
 import Link from 'next/link';
-import { formatAmount, passViewportStyles, toLocaleFixed } from '..';
 import { findReceipt } from '../findKey';
+import { formatAmount, toLocaleFixed } from '../formatFunctions';
 import { KLV_PRECISION } from '../globalVariables';
+import { passViewportStyles } from '../viewportStyles';
 
 const TransferSections = (
   par: IParameter,

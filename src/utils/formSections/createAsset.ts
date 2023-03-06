@@ -1,4 +1,5 @@
-import { ISection } from 'components/Form';
+import { ISection } from '@/components/Form';
+import { royaltiesSection, stakingSection } from './common';
 
 const createAsset = (type: string, address = ''): ISection[] => {
   const section = [] as ISection[];
@@ -91,94 +92,8 @@ const createAsset = (type: string, address = ''): ISection[] => {
             },
           ],
         },
-        {
-          title: 'Royalties',
-          tooltip:
-            'Fees for transferring and buying the token in the marketplace',
-          fields: [
-            {
-              label: 'Address',
-              props: {
-                defaultValue: address,
-                required: true,
-                span: 2,
-                tooltip: 'Royalty receiver address',
-              },
-            },
-            {
-              label: 'Transfer Percentage',
-              props: {
-                type: 'struct',
-                array: true,
-                tooltip: 'How much to be charged with fees',
-                innerSection: {
-                  title: 'Royalty Info',
-                  inner: true,
-                  innerPath: 'royalties.transferPercentage',
-                  fields: [
-                    {
-                      label: 'Amount',
-                      props: {
-                        type: 'number',
-                        tooltip: 'Max amount for that percentage',
-                      },
-                    },
-                    {
-                      label: 'Percentage',
-                      props: {
-                        type: 'number',
-                        tooltip: 'Fee % (precision 2)',
-                      },
-                    },
-                  ],
-                },
-              },
-            },
-          ],
-        },
-        {
-          title: 'Staking',
-          fields: [
-            {
-              label: 'Type',
-              props: {
-                type: 'checkbox',
-                toggleOptions: ['APR', 'FPR'],
-                defaultValue: 0,
-                disabled: true,
-              },
-            },
-            {
-              label: 'APR',
-              props: {
-                type: 'number',
-                tooltip: 'Annual percentage rate',
-              },
-            },
-            {
-              label: 'Min Epochs To Claim',
-              props: {
-                type: 'number',
-                tooltip: 'Minimum amount of epochs to claim rewards',
-              },
-            },
-            {
-              label: 'Min Epochs To Unstake',
-              props: {
-                type: 'number',
-                tooltip: 'Minimum amount of epochs to unstake tokens',
-              },
-            },
-            {
-              label: 'Min Epochs To Withdraw',
-              props: {
-                type: 'number',
-                tooltip:
-                  'Minimum amount of epochs to withdraw tokens after unstaking',
-              },
-            },
-          ],
-        },
+        ...royaltiesSection(address, false),
+        ...stakingSection(),
         {
           title: 'Roles',
           tooltip: 'Set permissions to specific address',
@@ -363,42 +278,7 @@ const createAsset = (type: string, address = ''): ISection[] => {
             },
           ],
         },
-        {
-          title: 'Royalties',
-          tooltip:
-            'Fees for transferring and buying the NFT in the marketplace',
-          fields: [
-            {
-              label: 'Address',
-              props: {
-                defaultValue: address,
-                required: true,
-                tooltip: 'Target Address',
-              },
-            },
-            {
-              label: 'Market Fixed',
-              props: {
-                type: 'number',
-                tooltip: 'Fixed KLV amount in each market transaction',
-              },
-            },
-            {
-              label: 'Market Percentage',
-              props: {
-                type: 'number',
-                tooltip: 'Percentage KLV amount in each market transaction',
-              },
-            },
-            {
-              label: 'Transfer Fixed',
-              props: {
-                type: 'number',
-                tooltip: 'Fixed KLV amount in each transfer transaction',
-              },
-            },
-          ],
-        },
+        ...royaltiesSection(address, type === 'NFT'),
         {
           title: 'Roles',
           tooltip: 'Set permissions to a specific address',

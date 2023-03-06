@@ -1,5 +1,5 @@
 import { IUris } from '@/types/index';
-import { renderCorrectPath } from '@/utils/index';
+import { renderCorrectPath } from '@/utils/validateSender';
 import React, { useCallback, useState } from 'react';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { Container, ListUris } from './styles';

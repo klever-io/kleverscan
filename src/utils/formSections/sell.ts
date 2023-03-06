@@ -1,4 +1,4 @@
-import { ISection } from 'components/Form';
+import { ISection } from '@/components/Form';
 
 const sellContract = (): ISection[] => {
   const section = [] as ISection[];
@@ -18,13 +18,6 @@ const sellContract = (): ISection[] => {
         props: {
           required: true,
           tooltip: 'Maketplace ID in which the sell order will be created',
-        },
-      },
-      {
-        label: 'Asset ID',
-        props: {
-          required: true,
-          tooltip: 'Asset to be sold',
         },
       },
       {
@@ -51,9 +44,9 @@ const sellContract = (): ISection[] => {
       {
         label: 'End Time',
         props: {
-          type: 'number',
+          type: 'datetime-local',
           required: true,
-          tooltip: 'Expiration sell time (in Unix Time)',
+          tooltip: 'Expiration sell date',
         },
       },
     ],

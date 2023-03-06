@@ -1,10 +1,17 @@
 import Select from '@/components/Contract/Select';
 import FormInput from '@/components/Form/FormInput';
-import { InfoIcon, TooltipContainer } from '@/components/Form/FormInput/styles';
-import { ButtonContainer, FormSection } from '@/components/Form/styles';
+import {
+  InfoIcon,
+  TooltipContainer,
+  TooltipContent,
+} from '@/components/Form/FormInput/styles';
+import {
+  ButtonContainer,
+  FormSection,
+  SectionTitle,
+} from '@/components/Form/styles';
 import { IParamList } from '@/types/index';
 import { useState } from 'react';
-import { SectionTitle } from './styles';
 
 interface IParamForm {
   paramsList: IParamList[];
@@ -29,11 +36,12 @@ const ParametersForm: React.FC<IParamForm> = ({ paramsList }) => {
   return (
     <FormSection>
       <SectionTitle>
-        Parameters
-        <TooltipContainer
-          tooltip={'What network parameters the proposal is aiming to change'}
-        >
+        <span>Parameters</span>
+        <TooltipContainer>
           <InfoIcon />
+          <TooltipContent>
+            What network parameters the proposal is aiming to change
+          </TooltipContent>
         </TooltipContainer>
       </SectionTitle>
 

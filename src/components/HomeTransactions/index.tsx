@@ -40,7 +40,7 @@ const HomeTransactions: React.FC = () => {
   useEffect(() => {
     const getTransactions = async () => {
       const transactions: ITransactionResponse = await api.get({
-        route: 'transaction/list',
+        route: 'transaction/list?minify=true',
       });
       if (!transactions.error) {
         setTransactions(transactions.data.transactions);

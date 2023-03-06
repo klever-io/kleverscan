@@ -1,7 +1,7 @@
 import Chart from '@/components/Chart';
 import MapSvg from '@/components/MapSvg';
 import { INodeCard } from '@/types/index';
-import { getAge } from '@/utils/index';
+import { getAge } from '@/utils/timeFunctions';
 import { Card, CardContainer } from '@/views/blocks';
 import { CardChartContainer, CardDetails } from '@/views/nodes';
 import { fromUnixTime } from 'date-fns';

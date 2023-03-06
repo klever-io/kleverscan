@@ -7,6 +7,10 @@ interface IValidatorsProps {
 }
 
 const Validators: React.FC<IValidatorsProps> = props => {
+  const validators = props.validators;
+  const requestBlockValidators = new Promise(resolve => {
+    resolve({ data: { blockValidatorList: validators } });
+  });
   const rowSections = (validatorHash: ITransaction): IRowSection[] => {
     const sections = [
       { element: <span key="validator">{validatorHash}</span>, span: 2 },
@@ -18,9 +22,10 @@ const Validators: React.FC<IValidatorsProps> = props => {
 
   const tableProps: ITable = {
     rowSections,
-    data: Object.values(props.validators) as any[],
     header,
+    dataName: 'blockValidatorList',
     type: 'validatorsList',
+    request: () => requestBlockValidators,
   };
 
   return <Table {...tableProps} />;

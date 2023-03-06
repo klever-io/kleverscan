@@ -34,6 +34,7 @@ export interface IFormInputProps
     value: any;
   }[];
   tooltip?: string;
+  maxDecimals?: number;
 }
 
 const FormInput: React.FC<IFormInputProps> = ({
@@ -47,11 +48,11 @@ const FormInput: React.FC<IFormInputProps> = ({
   defaultChecked = true,
   defaultValue,
   tooltip,
+  maxDecimals,
   ...rest
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const areaRef = useRef<HTMLTextAreaElement>(null);
-
   const { fieldName, registerField, error } = useField(name);
 
   const inputProps = {
@@ -80,13 +81,13 @@ const FormInput: React.FC<IFormInputProps> = ({
   const [value, setValue] = useState(getInitialValue());
 
   useEffect(() => {
-    if (type !== 'textarea') {
+    if (type !== 'textarea' && type !== 'dropdown') {
       registerField({
         name: fieldName,
         ref: inputRef.current,
         path: 'value',
       });
-    } else {
+    } else if (type === 'textarea') {
       registerField({
         name: fieldName,
         ref: areaRef.current,
@@ -102,6 +103,7 @@ const FormInput: React.FC<IFormInputProps> = ({
   const selectProps = {
     title,
     selectPlaceholder,
+    name,
     ...rest,
   };
 
@@ -127,7 +129,15 @@ const FormInput: React.FC<IFormInputProps> = ({
     e.target.blur();
   };
 
-  type === 'number' && (inputProps['step'] = '0.00000001');
+  type === 'number' && (inputProps['step'] = '0.01');
+  type === 'number' &&
+    maxDecimals &&
+    (inputProps['onChange'] = ({ target }) => {
+      if (target.value.length > 2) {
+        const regex = new RegExp('^-?\\d+.\\d{0,' + maxDecimals + '}');
+        target.value = target.value?.toString()?.match(regex)?.[0] as string;
+      }
+    });
   type === 'number' && (inputProps['onWheel'] = preventScroll);
 
   const handleKey = (e: any) => {
@@ -156,12 +166,12 @@ const FormInput: React.FC<IFormInputProps> = ({
     <Container {...containerProps}>
       {type !== 'hidden' && (
         <InputLabel disabled={inputProps.disabled}>
-          {title}{' '}
+          <span>{title} </span>
           {tooltip && (
             <TooltipContainer>
               <InfoIcon />
               <TooltipContent>
-                <p>{tooltip}</p>
+                <span>{tooltip}</span>
               </TooltipContent>
             </TooltipContainer>
           )}

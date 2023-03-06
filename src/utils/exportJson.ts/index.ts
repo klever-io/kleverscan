@@ -6,7 +6,8 @@ import {
   ITransferContract,
 } from '@/types/contracts';
 import { ITransferReceipt } from '@/types/receipts';
-import { formatDate, getPrecision } from '.';
+import { formatDate } from '../formatFunctions';
+import { getPrecision } from '../precisionFunctions';
 
 export const exportToJson = async (
   filename: string,

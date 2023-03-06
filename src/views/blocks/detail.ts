@@ -234,3 +234,36 @@ export const CommonSpan = styled.span`
     font-weight: 400;
   }
 `;
+
+export const RowBlockNavigation = styled(CommonSpan)`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+export const TooltipContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: auto;
+`;
+
+export const ToolTipStyle = styled.div`
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  height: 1.75rem;
+  width: 1.75rem;
+  background-color: ${props => props.theme.circleBackground.light};
+  border-radius: 10rem;
+  svg {
+    width: 20px;
+    height: 20px;
+    color: ${props => props.theme.violet};
+  }
+  > span > div {
+    max-height: 20px;
+    min-width: fit-content;
+  }
+`;

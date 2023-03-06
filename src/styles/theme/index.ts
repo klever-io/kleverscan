@@ -11,6 +11,7 @@ const theme = {
   red: '#F84960',
   rose: '#EE3F71',
   purple: '#7D3FF1',
+  lightPurple: '#B28DF6',
   violet: '#aa33b5',
   gray: '#EBEBEB',
   lightGray: '#C6C7EB',
@@ -120,6 +121,9 @@ const theme = {
     title: '#0B0B1E',
   },
 
+  circleBackground: {
+    light: '#e7e7e7',
+  },
   table: {
     text: '#7B7DB2',
     success: '#4EBC87',

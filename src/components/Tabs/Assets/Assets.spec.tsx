@@ -1,9 +1,13 @@
+import { getRequestAssets } from '@/pages/account/[account]';
+import api from '@/services/api';
 import { screen } from '@testing-library/react';
 import * as nextRouter from 'next/router';
+import { useRouter } from 'next/router';
 import React from 'react';
+import { act } from 'react-dom/test-utils';
 import { renderWithTheme } from '../../../test/utils';
-import { formatAmount } from '../../../utils/index';
 import Assets from './';
+import { mockAccountResponse, mockAssetsOwnerResponse } from './mock';
 
 export const headerTable = [
   'Token',
@@ -14,38 +18,53 @@ export const headerTable = [
   'Frozen',
 ];
 export const address =
-  'klv18slsv4v8yxdarvvyxdwgvdeqwrna899k2vcshlrlc4xjuyjlhveqv78t8s';
-const frozenBalance = 10000000000000;
-export const assetId = 'KLV';
-const assetName = 'KLEVER';
-const assetType = 0;
-const balance = 0;
-const precision = 6;
-const ticker = assetId.split('-')[0];
-export const balanceText = `${formatAmount(
-  balance / 10 ** precision,
-)} ${ticker}`;
-export const frozenBalanceText = `${formatAmount(
-  frozenBalance / 10 ** precision,
-)} ${ticker}`;
-export const assetText = assetType === 0 ? 'Fungible' : 'Non Fungible';
+  'klv18slsv4v8yxdarvvyxdwgvdeqwrna899k2vcshlrlc4xjuyjlhveqv78t8s'; //devnet account
 
-const assets = [
-  {
-    address,
-    assetId,
-    assetName,
-    assetType,
-    balance,
-    buckets: [],
-    frozenBalance,
-    lastClaim: { timestamp: 0, epoch: 0 },
-    precision,
-    unfrozenBalance: 0,
+jest.mock('next/router', () => ({
+  useRouter() {
+    return {
+      route: '/',
+      pathname: '',
+    };
   },
-];
+}));
 
-export const mockedAssets = <Assets assets={assets} address={address} />;
+const router1 = () => {
+  return {
+    route: '/',
+    pathname: '',
+    query: '',
+  };
+};
+
+jest.mock('@/services/api', () => {
+  return {
+    get: jest.fn(),
+  };
+});
+
+jest.mock('next/router', () => {
+  return {
+    __esModule: true,
+    useRouter: jest.fn().mockImplementation(router1),
+  };
+});
+
+jest.spyOn(api, 'get').mockImplementation(params => {
+  switch (true) {
+    case params.route.includes('address'):
+      return Promise.resolve(mockAccountResponse);
+    case params.route.includes('assets'):
+      return Promise.resolve(mockAssetsOwnerResponse);
+    default:
+      return Promise.reject(new Error(`Unexpected route: ${params.route}`));
+  }
+});
+
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+
 describe('Component: Assets Tab', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -75,19 +94,29 @@ describe('Component: Assets Tab', () => {
     }));
   });
 
-  it('Should render the Assets Tab correctly', () => {
-    renderWithTheme(mockedAssets);
+  it('Should render the Assets Tab correctly', async () => {
+    const router = useRouter();
+    const mockAssetsTableProps = {
+      scrollUp: false,
+      dataName: 'assets',
+      request: getRequestAssets(address),
+      query: router.query,
+    };
+
+    await act(async () => {
+      renderWithTheme(
+        <Assets assetsTableProps={mockAssetsTableProps} address={address} />,
+      );
+    });
 
     headerTable.map(header => {
       expect(screen.getByText(header)).toBeInTheDocument();
     });
-
-    expect(screen.getByText(balanceText)).toBeInTheDocument();
-    expect(screen.getByText(frozenBalanceText)).toBeInTheDocument();
-    expect(screen.getByText(assetText)).toBeInTheDocument();
-
-    const idButton = screen.getByRole('link', { name: assetId });
-
-    expect(idButton).toBeInTheDocument();
+    const KLVs = screen.getAllByText('KLV');
+    KLVs.forEach(KLV => expect(KLV).toBeInTheDocument());
+    expect(KLVs).toHaveLength(2);
+    expect(screen.getByText('Fungible')).toBeInTheDocument();
+    expect(screen.getByText('20 Mi KLV')).toBeInTheDocument();
+    expect(screen.getByText('10 Mi KLV')).toBeInTheDocument();
   });
 });

@@ -1,4 +1,4 @@
-import { validateImgUrl } from '@/utils/index';
+import { validateImgUrl } from '@/utils/imageValidate';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Container, LetterLogo, Logo, Verified } from './styles';
 

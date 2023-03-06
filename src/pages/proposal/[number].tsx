@@ -9,24 +9,27 @@ import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import { IRowSection } from '@/types/index';
 import {
-  IAPINetworkParams,
-  IFullInfoParam,
   INetworkParams,
+  INodeOverview,
   IParsedParams,
   IParsedProposal,
+  IParsedProposalParam,
+  IParsedVote,
+  IParsedVoter,
+  IParsedVoterResponse,
   IProposal,
-  IRawParam,
+  IProposalParams,
+  IProposalResponse,
+  IProposalVoters,
   IVote,
   IVotingPowers,
   NetworkParamsIndexer,
 } from '@/types/proposals';
-import {
-  formatAmount,
-  parseAddress,
-  passViewportStyles,
-  toLocaleFixed,
-  typeVoteColors,
-} from '@/utils/index';
+import { formatAmount, toLocaleFixed } from '@/utils/formatFunctions';
+import { KLV_PRECISION } from '@/utils/globalVariables';
+import { useSkeleton } from '@/utils/hooks';
+import { parseAddress } from '@/utils/parseValues';
+import { passViewportStyles, typeVoteColors } from '@/utils/viewportStyles';
 import {
   BalanceContainer,
   BigSpan,
@@ -60,41 +63,15 @@ import {
 } from '@/views/proposals/detail';
 import { CenteredRow } from '@/views/validators/detail';
 import { format, fromUnixTime } from 'date-fns';
-import { GetServerSideProps } from 'next';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { AiFillCheckCircle } from 'react-icons/ai';
 import Tooltip from '../../components/Tooltip';
 
-interface IParsedVote {
-  status: string;
-  validator: string;
-  votingPower: string;
-  voteDate: string;
-  voter: string;
-}
-
-interface IParsedVoter {
-  voter: string;
-  votingPower: string;
-  voteDate: string;
-  status: string;
-}
-
-interface IProposalVoters {
-  proposalVotersProps: {
-    totalPages: number;
-    scrollUp: boolean;
-    request?: (page: number, limit: number) => Promise<any>;
-    data: IParsedVoter[];
-    dataName: string;
-  };
-}
-
 const ProposalVoters = (props: IProposalVoters) => {
   const rowSections = (props: IParsedVote): IRowSection[] => {
     const { status, voter, votingPower, voteDate } = props;
-
     let sections = [{ element: <></>, span: 1 }];
     sections = [
       {
@@ -124,59 +101,56 @@ const ProposalVoters = (props: IProposalVoters) => {
 
     return sections;
   };
-
   const proposalTableProps = props.proposalVotersProps;
 
-  const tableProps: ITable = {
+  const tableProps2: ITable = {
     header: ['Voter', 'Voting Power', 'Vote date'],
     rowSections,
     type: 'votes',
     ...proposalTableProps,
   };
 
-  return <Table {...tableProps} />;
+  return <Table {...tableProps2} />;
 };
 
-const ProposalDetails: React.FC<IParsedProposal> = props => {
-  const [status, setStatus] = useState('');
-  const StatusIcon = getStatusIcon(status);
-  const precision = 6;
-  const proposalAPI: IParsedProposal = props;
-  const { totalStaked, description, pagination } = proposalAPI;
-  const [filterVoters, setFilterVoters] = useState({
-    Yes: 0,
-    No: 0,
-  });
-  const [filterVotersPerPagination, setFilterVotersPerPagination] = useState({
-    Yes: 0,
-    No: 0,
-  });
-  const [votedQty, setVotedQty] = useState(0);
-  const [expandData, setExpandData] = useState(false);
-  const [totalVoted, setTotalVoted] = useState(0);
+const ProposalDetails: React.FC = () => {
+  const [proposal, setProposal] = useState<null | IParsedProposal>(null);
+  const [params, setParams] = useState<null | INetworkParams>(null);
+  const [overview, setOverview] = useState<null | INodeOverview>(null);
   const [selectedFilter, setSelectedFilter] = useState('Yes');
   const [votesPercentage, setVotesPercentage] = useState('');
   const { isMobile, isTablet } = useMobile();
+  const [isSkeleton, setLoading] = useSkeleton();
+  const router = useRouter();
+
   useEffect(() => {
-    if (totalStaked) {
-      let percentage = (totalVoted * 100) / (totalStaked / 10 ** precision);
+    if (proposal) {
+      let percentage =
+        (proposal?.totalVoted * 100) /
+        (proposal?.totalStaked / 10 ** KLV_PRECISION);
       if (percentage < 0.01) {
         percentage = 0;
       }
       setVotesPercentage(percentage.toFixed(2));
     }
-  }, [totalStaked, votedQty]);
+  }, [proposal]);
 
-  const validateFormattedVotes = (votesApi = proposalAPI) => {
+  const validateFormattedVotes = (
+    proposalResponse: IProposal,
+  ): IParsedVoter[] => {
     const list: IParsedVoter[] = [];
-    const votingPowersAdd = getVotingPowers(votesApi?.voters);
-    votesApi?.voters?.forEach(voter => {
-      if (totalStaked && votingPowersAdd) {
+    if (!proposalResponse) return list;
+    const votingPowersAdd = getVotingPowers(proposalResponse.voters);
+    proposalResponse?.voters?.forEach((voter: IVote) => {
+      if (proposalResponse.totalStaked && votingPowersAdd) {
         const votesInfo = voter;
         const frozenBalance = votingPowersAdd[voter.address];
         list.push({
           voter: voter.address,
-          votingPower: ((frozenBalance * 100) / totalStaked).toFixed(3),
+          votingPower: (
+            (frozenBalance * 100) /
+            proposalResponse.totalStaked
+          ).toFixed(3),
           voteDate: format(
             fromUnixTime(votesInfo.timestamp / 1000),
             'MM/dd/yyyy HH:mm',
@@ -188,74 +162,155 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
     return list;
   };
 
-  const voteCountPerPage = () => {
-    let tempVotedQty = 0;
-    const tempFilterVoters = {
-      Yes: 0,
-      No: 0,
+  const parseProposal = (proposal: IProposalResponse) => {
+    const votesYes = (proposal.data.proposal.votes['0'] || 0) / 10 ** 6;
+    const votesNo = (proposal.data.proposal.votes['1'] || 0) / 10 ** 6;
+    return {
+      ...proposal.data.proposal,
+      votingPowers: getVotingPowers(proposal?.data?.proposal.voters),
+      pagination: proposal?.data?.proposal.votersPage,
+      votes: {
+        Yes: votesYes,
+        No: votesNo,
+      },
+      totalVoted: votesYes + votesNo,
+      parsedVoters: validateFormattedVotes(proposal.data.proposal),
     };
-    proposalAPI.voters.forEach(voter => {
-      const votesInfo = voter;
-      const typeVote = voter.type;
-      const qtyVote = votesInfo.amount / 1000000;
+  };
 
-      switch (typeVote) {
-        case 0:
-          tempVotedQty += qtyVote;
-          tempFilterVoters['Yes'] += 1;
-          break;
+  const getProposalNetworkParams = (
+    params: IProposalParams,
+    apiNetworkParams: INetworkParams,
+  ): IParsedParams | null => {
+    if (!params || !apiNetworkParams) return null;
+    const currentNetworkParams = {} as INetworkParams;
+    let parsedProposalParams: IParsedProposalParam[] = [];
 
-        case 1:
-          tempVotedQty += qtyVote;
-          tempFilterVoters['No'] += 1;
-          break;
+    if (apiNetworkParams) {
+      Object.keys(proposalsMessages).map((key, index) => {
+        currentNetworkParams[proposalsMessages[key]] = {
+          number: index,
+          parameter: proposalsMessages[key] ? proposalsMessages[key] : '',
+          currentValue: apiNetworkParams?.[key]?.value,
+        };
+      });
+    }
 
-        default:
-          break;
-      }
-    });
-    setFilterVotersPerPagination(tempFilterVoters);
-    setVotedQty(tempVotedQty);
+    if (params) {
+      parsedProposalParams = Object.entries(params).map(([index, value]) => {
+        return {
+          paramIndex: index,
+          paramLabel: NetworkParamsIndexer[index],
+          paramValue: Number(value),
+          paramText: proposalsMessages[NetworkParamsIndexer[index]],
+        };
+      });
+    }
+    return { currentNetworkParams, parsedProposalParams };
   };
 
   useEffect(() => {
-    if (proposalAPI.proposalStatus) {
-      setStatus(proposalAPI.proposalStatus);
-    }
-    const qtyVotesYes = Object.values(proposalAPI.votes)[0] / 10 ** 6 || 0;
-    const qtyVotesNo = Object.values(proposalAPI.votes)[1] / 10 ** 6 || 0;
-    const votesAmount = qtyVotesYes + qtyVotesNo;
-    const tempFilterVoters = {
-      Yes: qtyVotesYes,
-      No: qtyVotesNo,
+    const loadPageInitialData = async () => {
+      if (router.query?.number) {
+        let parsedProposal = null;
+        let params = null;
+        let overview = null;
+        const proposalInfosCall = new Promise(async (resolve, reject) => {
+          const res = await api.get({
+            route: `proposals/${router.query.number}`,
+            query: { voteType: 0 },
+          });
+
+          if (!res.error || res.error === '') {
+            resolve(res);
+          }
+          reject(res.error);
+        });
+
+        const dataParametersCall = new Promise(async (resolve, reject) => {
+          const res = await api.get({ route: 'network/network-parameters' });
+
+          if (!res.error || res.error === '') {
+            resolve(res);
+          }
+
+          reject(res.error);
+        });
+
+        const dataOverviewCall = new Promise(async (resolve, reject) => {
+          const res = await api.get({ route: 'node/overview' });
+
+          if (!res.error || res.error === '') {
+            resolve(res);
+          }
+
+          reject(res.error);
+        });
+
+        const promises = [
+          proposalInfosCall,
+          dataParametersCall,
+          dataOverviewCall,
+        ];
+        await Promise.allSettled(promises).then(responses => {
+          responses.forEach(async (res, index) => {
+            if (res.status !== 'rejected') {
+              const { value }: any = res;
+              if (index === 0) {
+                parsedProposal = parseProposal(value);
+              }
+
+              if (index === 1) {
+                const { data } = value;
+                params = data?.parameters;
+              }
+
+              if (index === 2) {
+                overview = value?.data?.overview;
+              }
+            }
+          });
+        });
+        setProposal(parsedProposal);
+        setParams(params);
+        setOverview(overview);
+        setLoading(false);
+      }
     };
-    validateFormattedVotes();
-    voteCountPerPage();
-    setTotalVoted(votesAmount);
-    setFilterVoters(tempFilterVoters);
-  }, []);
+    loadPageInitialData();
+  }, [router.query?.number]);
 
   const renderProposalParams = useCallback(() => {
-    return proposalAPI?.parsedParameters.map(param => (
-      <div key={param.paramIndex}>
-        <strong>{param.paramText}</strong>
-        <span>{param.paramValue}</span>
-        <p>
-          Current Value:{' '}
-          {props?.currentNetworkParams?.[param.paramText]?.currentValue}
-        </p>
-      </div>
-    ));
-  }, [proposalAPI]);
+    if (proposal && params) {
+      const parsedParams = getProposalNetworkParams(
+        proposal.parameters,
+        params,
+      );
+      return parsedParams?.parsedProposalParams.map(param => (
+        <div key={param.paramIndex}>
+          <strong>{param.paramText}</strong>
+          <span>{param.paramValue}</span>
+          <p>
+            Current Value:{' '}
+            {
+              parsedParams?.currentNetworkParams?.[param.paramText]
+                ?.currentValue
+            }
+          </p>
+        </div>
+      ));
+    }
+  }, [proposal, params]);
 
   const Progress: React.FC = () => {
+    if (!proposal) return null;
     return (
       <ProgressBar>
-        {Object.keys(filterVoters).map((item: any, key: number) => {
-          if (totalStaked) {
+        {Object.keys(proposal.votes).map((item: any, key: number) => {
+          if (proposal.totalStaked) {
             let percentageCard = (
-              (filterVoters[item] * 100) /
-              (totalStaked / 10 ** precision)
+              (proposal.votes[item] * 100) /
+              (proposal.totalStaked / 10 ** KLV_PRECISION)
             ).toString();
             if (Number(percentageCard) < 0.01) {
               percentageCard = '0';
@@ -278,93 +333,88 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
   };
 
   const requestVoters = useCallback(
-    async (page: number, limit: number) => {
+    async (page: number, limit: number): Promise<IParsedVoterResponse> => {
       let response;
       if (selectedFilter === 'Yes') {
         response = await api.get({
-          route: `proposals/${proposalAPI.proposalId}`,
+          route: `proposals/${router.query.number}`,
           query: { pageVoters: page, limitVoters: limit, voteType: 0 },
         });
       } else {
         response = await api.get({
-          route: `proposals/${proposalAPI.proposalId}`,
+          route: `proposals/${router.query.number}`,
           query: { pageVoters: page, limitVoters: limit, voteType: 1 },
         });
       }
-
-      if (response.error) {
-        return {
-          data: { voters: [] },
-          pagination: {
-            self: 0,
-            next: 0,
-            previous: 0,
-            perPage: 0,
-            totalPages: 0,
-            totalRecords: 0,
-          },
-        };
-      }
-
-      const parsedVotersResponse = response?.data?.proposal;
-      const votesFormatted = validateFormattedVotes(parsedVotersResponse);
+      const proposalResponse = response?.data?.proposal;
+      const votesFormatted = validateFormattedVotes(proposalResponse);
       return {
         data: { voters: votesFormatted },
         pagination: response.data?.proposal?.votersPage,
+        error: response.error,
+        code: 'successful',
       };
     },
-    [selectedFilter],
+    [selectedFilter, router.query.number],
   );
 
-  const tableProps = {
-    totalPages: pagination?.totalPages,
+  const tableProps1 = {
     scrollUp: false,
     request: requestVoters,
-    data: validateFormattedVotes(props),
     dataName: 'voters',
   };
 
   const SelectedTabComponent: React.FC = useCallback(() => {
     switch (selectedFilter) {
       case 'Yes':
-        return <ProposalVoters proposalVotersProps={{ ...tableProps }} />;
-
+        return <ProposalVoters proposalVotersProps={{ ...tableProps1 }} />;
       case 'No':
-        return <ProposalVoters proposalVotersProps={{ ...tableProps }} />;
+        return <ProposalVoters proposalVotersProps={{ ...tableProps1 }} />;
       default:
         return <div />;
     }
   }, [selectedFilter]);
 
+  const renderStatusIcon = () => {
+    let StatusIcon = null;
+    if (proposal) {
+      StatusIcon = getStatusIcon(proposal.proposalStatus);
+      return <StatusIcon />;
+    }
+    return StatusIcon;
+  };
   return (
     <>
-      {proposalAPI && (
+      {
         <Container>
           <Header>
             <Title route={'/proposals'} title="Proposal Details" />
-
             <Input />
           </Header>
           <CardContainer>
             <CardContent>
               <Row>
                 <span>
-                  <h2>Proposal #{proposalAPI.proposalId}</h2>
+                  <h2> {isSkeleton(`Proposal # ${proposal?.proposalId}`)}</h2>
                 </span>
-                <Status status={status}>
-                  <StatusIcon />
-                  <span>
-                    {status === 'ApprovedProposal' ? 'Effective' : status}
-                  </span>
-                </Status>
+                {proposal && (
+                  <Status status={proposal.proposalStatus}>
+                    {renderStatusIcon()}
+                    <span>
+                      {proposal.proposalStatus === 'ApprovedProposal'
+                        ? 'Effective'
+                        : proposal.proposalStatus}
+                    </span>
+                  </Status>
+                )}
               </Row>
               <Row>
                 <span>
                   <strong>Proposer </strong>
                 </span>
                 <span style={{ marginRight: '0.2rem' }}>
-                  <Link href={`/account/${proposalAPI.proposer}`}>
-                    <HoverLink>{proposalAPI.proposer}</HoverLink>
+                  <Link href={`/account/${proposal?.proposer}`}>
+                    <HoverLink>{isSkeleton(proposal?.proposer)}</HoverLink>
                   </Link>
                 </span>
                 <Tooltip
@@ -382,8 +432,8 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                 <span>
                   <strong>Hash</strong>
                 </span>
-                <Link href={`/transaction/${proposalAPI.txHash}`}>
-                  <HoverLink>{proposalAPI.txHash}</HoverLink>
+                <Link href={`/transaction/${proposal?.txHash}`}>
+                  <HoverLink>{isSkeleton(proposal?.txHash)}</HoverLink>
                 </Link>
               </Row>
               <Row>
@@ -392,21 +442,23 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                     <strong>Created Epoch</strong>
                   </span>
                   <span>
-                    <span>{proposalAPI.epochStart}</span>
+                    <span>{isSkeleton(proposal?.epochStart)}</span>
                   </span>
                 </HalfRow>
                 <HalfRow>
                   <span>
                     <strong>Ending Epoch</strong>
                   </span>
-                  <span style={{ color: 'red' }}>{proposalAPI.epochEnd}</span>
+                  <span style={{ color: 'red' }}>
+                    {isSkeleton(proposal?.epochEnd)}
+                  </span>
                 </HalfRow>
                 <HalfRow>
                   <span>
                     <strong>Actual Epoch</strong>
                   </span>
                   <span>
-                    <span>{proposalAPI?.overview?.epochNumber}</span>
+                    <span>{isSkeleton(overview?.epochNumber)}</span>
                   </span>
                 </HalfRow>
               </Row>
@@ -417,7 +469,7 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                 <RowContent>
                   <BalanceContainer>
                     <NetworkParamsContainer>
-                      {renderProposalParams()}
+                      {isSkeleton(renderProposalParams())}
                     </NetworkParamsContainer>
                   </BalanceContainer>
                 </RowContent>
@@ -426,11 +478,16 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                 <span>
                   <strong>Description</strong>
                 </span>
-                {description && <BigSpan>{description}</BigSpan>}
-                {!description && (
+                {proposal?.description && (
+                  <BigSpan>{proposal.description}</BigSpan>
+                )}
+                {!proposal && (
                   <EmptyDescription>
-                    <span>No description provided</span>
+                    <span>{isSkeleton(undefined)}</span>
                   </EmptyDescription>
+                )}
+                {proposal && !proposal.description && (
+                  <BigSpan>{isSkeleton('No description provided.')}</BigSpan>
                 )}
               </Row>
             </CardContent>
@@ -444,7 +501,12 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
             <VotesHeader>
               <strong>Total Voted</strong>
               <span>
-                {toLocaleFixed(totalVoted, 6)} ({votesPercentage}%)
+                {proposal &&
+                  `${toLocaleFixed(
+                    proposal.totalVoted,
+                    6,
+                  )} ${votesPercentage}%`}
+                {!proposal && isSkeleton(undefined)}
               </span>
             </VotesHeader>
 
@@ -456,21 +518,23 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                 </PassThresholdContainer>
                 <Progress />
               </PassThresholdContainer>
-              {totalStaked ? (
+              {proposal?.totalStaked ? (
                 <span>
-                  Voted: {formatAmount(totalVoted)} /{' '}
-                  {formatAmount(totalStaked / 10 ** precision)}
+                  Voted: {formatAmount(proposal.totalVoted)} /{' '}
+                  {formatAmount(proposal.totalStaked / 10 ** KLV_PRECISION)}
                 </span>
-              ) : null}
+              ) : (
+                isSkeleton(undefined)
+              )}
             </ProgressBarVotes>
 
             <CardVoteContainer>
-              {filterVoters &&
-                Object.keys(filterVoters).map((item: any, key: number) => {
-                  if (totalStaked) {
+              {proposal &&
+                Object.keys(proposal.votes).map((item: any, key: number) => {
+                  if (proposal.totalStaked) {
                     let percentageCard =
-                      (filterVoters[item] * 100) /
-                      (totalStaked / 10 ** precision);
+                      (proposal.votes[item] * 100) /
+                      (proposal.totalStaked / 10 ** KLV_PRECISION);
                     if (percentageCard < 0.01) {
                       percentageCard = 0;
                     }
@@ -482,12 +546,13 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                           {percentageCard.toFixed(2)}%
                         </PercentageText>
                         <QtyVotesText>
-                          {toLocaleFixed(filterVoters[item], 6)}
+                          {proposal && toLocaleFixed(proposal.votes[item], 6)}
                         </QtyVotesText>
                       </CardVote>
                     );
                   }
                 })}
+              {!proposal && isSkeleton(undefined)}
             </CardVoteContainer>
           </VotesContainer>
 
@@ -497,23 +562,25 @@ const ProposalDetails: React.FC<IParsedProposal> = props => {
                 <h1>Voters</h1>
               </span>
               <FiltersValidators>
-                {Object.keys(filterVotersPerPagination).map((item, key) => {
-                  return (
-                    <OptionValidator
-                      key={key}
-                      onClick={() => setSelectedFilter(item)}
-                      selected={selectedFilter === item}
-                    >
-                      <strong>{item}</strong>
-                    </OptionValidator>
-                  );
-                })}
+                {proposal &&
+                  Object.keys(proposal.votes).map((item, key) => {
+                    return (
+                      <OptionValidator
+                        key={key}
+                        onClick={() => setSelectedFilter(item)}
+                        selected={selectedFilter === item}
+                      >
+                        <strong>{item}</strong>
+                      </OptionValidator>
+                    );
+                  })}
+                {!proposal && isSkeleton(undefined)}
               </FiltersValidators>
             </div>
           </ValidatorsContainer>
           <SelectedTabComponent />
         </Container>
-      )}
+      }
     </>
   );
 };
@@ -524,111 +591,6 @@ export const getVotingPowers = (voters: IVote[]): IVotingPowers => {
     powers[voter.address] = voter?.amount;
   });
   return powers;
-};
-
-export const getProposalNetworkParams = (
-  params: IRawParam,
-  apiNetworkParams: IAPINetworkParams,
-): IParsedParams => {
-  const currentNetworkParams = {} as INetworkParams;
-  let fullInfoParams: IFullInfoParam[] = [];
-
-  if (apiNetworkParams) {
-    Object.keys(proposalsMessages).map((key, index) => {
-      currentNetworkParams[proposalsMessages[key]] = {
-        number: index,
-        parameter: proposalsMessages[key] ? proposalsMessages[key] : '',
-        currentValue: apiNetworkParams?.parameters?.[key]?.value,
-      };
-    });
-  }
-
-  if (params) {
-    fullInfoParams = Object.entries(params).map(([index, value]) => {
-      return {
-        paramIndex: index,
-        paramLabel: NetworkParamsIndexer[index],
-        paramValue: Number(value),
-        paramText: proposalsMessages[NetworkParamsIndexer[index]],
-      };
-    });
-  }
-
-  return { currentNetworkParams, fullInfoParams };
-};
-
-export const getServerSideProps: GetServerSideProps<IProposal> = async ({
-  params,
-}) => {
-  let props: IParsedProposal = {} as IParsedProposal;
-
-  const proposalInfosCall = new Promise(async (resolve, reject) => {
-    const res = await api.get({
-      route: `proposals/${params?.number}`,
-      query: { voteType: 0 },
-    });
-
-    if (!res.error || res.error === '') {
-      resolve(res);
-    }
-    reject(res.error);
-  });
-
-  const dataParametersCall = new Promise(async (resolve, reject) => {
-    const res = await api.get({ route: 'network/network-parameters' });
-
-    if (!res.error || res.error === '') {
-      resolve(res);
-    }
-
-    reject(res.error);
-  });
-
-  const dataOverviewCall = new Promise(async (resolve, reject) => {
-    const res = await api.get({ route: 'node/overview' });
-
-    if (!res.error || res.error === '') {
-      resolve(res);
-    }
-
-    reject(res.error);
-  });
-
-  const promises = [proposalInfosCall, dataParametersCall, dataOverviewCall];
-  await Promise.allSettled(promises).then(responses => {
-    responses.forEach(async (res, index) => {
-      if (res.status !== 'rejected') {
-        const { value }: any = res;
-
-        if (index === 0) {
-          props = value.data.proposal;
-          props.votingPowers = getVotingPowers(value?.data?.proposal.voters);
-          props['pagination'] = value?.data?.proposal.votersPage;
-          delete props['votersPage'];
-        }
-
-        if (index === 1) {
-          const { data } = value;
-          const parsedParameters = getProposalNetworkParams(
-            props.parameters,
-            data,
-          );
-          props.parsedParameters = parsedParameters?.fullInfoParams;
-          props.currentNetworkParams = parsedParameters?.currentNetworkParams;
-        }
-
-        if (index === 2) {
-          props.overview = value?.data?.overview;
-        }
-      }
-    });
-  });
-
-  if (!props) {
-    props = {} as IParsedProposal;
-  }
-
-  return { props };
 };
 
 export default ProposalDetails;

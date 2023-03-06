@@ -27,10 +27,9 @@ const Tabs: React.FC<ITabs> = ({
 }) => {
   const router = useRouter();
   const [selected, setSelected] = useState<number>(0);
-
   useEffect(() => {
     if (!router.isReady) return;
-    setSelected(getSelectedTab(router.query?.tab));
+    setSelected(getSelectedTab(router.query.tab, headers));
   }, [router.isReady, router.query]);
 
   return (

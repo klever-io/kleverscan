@@ -1,5 +1,6 @@
 import { IBlockCard } from '@/types/blocks';
-import { formatAmount, getAge } from '@/utils/index';
+import { formatAmount } from '@/utils/formatFunctions/';
+import { getAge } from '@/utils/timeFunctions';
 import { BlockCardContainer, BlockCardHash, BlockCardRow } from '@/views/home';
 import { fromUnixTime } from 'date-fns';
 import { useTranslation } from 'next-i18next';

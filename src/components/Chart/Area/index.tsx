@@ -1,5 +1,5 @@
 import { ITooltipContent } from '@/pages/charts';
-import { toLocaleFixed } from '@/utils/index';
+import { toLocaleFixed } from '@/utils/formatFunctions';
 import { transparentize } from 'polished';
 import React from 'react';
 import { Area, AreaChart, ResponsiveContainer, Tooltip, YAxis } from 'recharts';

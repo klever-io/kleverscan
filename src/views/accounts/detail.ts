@@ -1,5 +1,5 @@
 import { default as DefaultInput } from '@/components/InputGlobal';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export const Container = styled.div``;
 
@@ -52,7 +52,7 @@ export const OverviewContainer = styled.div`
   border-radius: 0.75rem;
 `;
 
-export const Row = styled.div`
+export const Row = styled.div<{ isAddressRow?: boolean }>`
   width: 100%;
 
   padding: 1.5rem 2rem;
@@ -76,8 +76,6 @@ export const Row = styled.div`
       width: 10rem;
     }
 
-    /* overflow: hidden; */
-
     text-overflow: ellipsis;
     white-space: nowrap;
     display: flex;
@@ -98,6 +96,12 @@ export const Row = styled.div`
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
+    ${props =>
+      props.isAddressRow &&
+      css`
+        flex-direction: row;
+        align-items: center;
+      `}
   }
 `;
 
@@ -130,23 +134,10 @@ export const ButtonModal = styled.button<{
   }
 `;
 
-export const ContainerTabInteractions = styled.div`
+export const AddressContainer = styled.div`
   display: flex;
-  gap: 1.5rem;
-  margin-bottom: 1rem;
-`;
-
-export const CenteredRow = styled.div`
-  display: flex;
-
-  flex-direction: row;
   align-items: center;
-  flex: 1;
-
   gap: 0.5rem;
-
-  width: 100%;
-
   > span {
     flex: 1;
 
@@ -158,6 +149,22 @@ export const CenteredRow = styled.div`
     text-overflow: ellipsis;
     max-width: fit-content;
   }
+`;
+
+export const ContainerTabInteractions = styled.div`
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+`;
+
+export const CenteredRow = styled.div`
+  display: flex;
+  align-items: center;
+  flex: 1;
+
+  gap: 0.5rem;
+
+  width: 100%;
 
   svg {
     cursor: pointer;
@@ -181,6 +188,9 @@ export const AmountContainer = styled.div`
   gap: 1.5rem;
 
   div {
+    div {
+      padding-right: 5rem;
+    }
     span {
       font-weight: 600;
     }

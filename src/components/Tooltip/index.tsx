@@ -43,7 +43,7 @@ const Tooltip: React.FC<ITooltipProps> = ({
               effect="solid"
               type="info"
               backgroundColor="#7B7DB2"
-              delayShow={1}
+              delayShow={customStyles?.delayShow}
               offset={customStyles?.offset}
             >
               {parsedMsgs.map((parsedMsg, index) => (

@@ -44,16 +44,15 @@ import {
   findPreviousSiblingReceipt,
   findReceipt,
 } from '@/utils/findKey';
+import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import { usePrecision } from '@/utils/hooks';
+import { getProposalNetworkParams } from '@/utils/networkFunctions';
+import { getPrecision } from '@/utils/precisionFunctions';
 import {
   calculatePermissionOperations,
-  formatDate,
-  getPrecision,
   receiverIsSender,
   renderCorrectPath,
-  toLocaleFixed,
-} from '@/utils/index';
-import { getProposalNetworkParams } from '@/utils/parametersProposal';
+} from '@/utils/validateSender';
 import {
   BalanceContainer,
   FrozenContainer,
@@ -106,12 +105,14 @@ export const Transfer: React.FC<IIndexedContract> = ({ parameter: par }) => {
               </Link>
             </>
           ) : (
-            <>
-              <Link href={`/asset/KLV`}>
-                <KLV />
-              </Link>
-              <Link href={`/asset/KLV`}>KLV</Link>
-            </>
+            parameter?.amount && (
+              <>
+                <Link href={`/asset/KLV`}>
+                  <KLV />
+                </Link>
+                <Link href={`/asset/KLV`}>KLV</Link>
+              </>
+            )
           )}
         </CenteredRow>
       </Row>
@@ -598,7 +599,7 @@ export const ValidatorConfig: React.FC<IIndexedContract> = ({
         <RowContent>
           <BalanceContainer>
             <FrozenContainer>
-              {parameter.uris.map(
+              {parameter.uris?.map(
                 ({ key, value }: { key: string; value: string }) => (
                   <div key={key}>
                     <span>
@@ -2215,7 +2216,7 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerContract> = (
       <RowContent>
         <BalanceContainer>
           <FrozenContainer>
-            {par?.uris.map((uri: IURIs, index: number) => (
+            {par?.uris?.map((uri: IURIs, index: number) => (
               <URIsWrapper key={index}>
                 <section>
                   <span>{uri.key}</span>

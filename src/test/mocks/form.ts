@@ -1,3 +1,5 @@
+import { ISection } from '@/components/Form';
+
 export const mockBuySection = [
   {
     fields: [
@@ -28,7 +30,7 @@ export const mockBuySection = [
   },
 ];
 
-export const mockCreateAssetSection = [
+export const mockCreateAssetSection: ISection[] = [
   {
     fields: [
       {

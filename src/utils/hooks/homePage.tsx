@@ -9,7 +9,8 @@ import {
   Service,
 } from '@/types/index';
 import { useEffect } from 'react';
-import { calcApr, getEpochInfo } from '..';
+import { getEpochInfo } from '..';
+import { calcApr } from '../calcApr';
 
 export const useHomePageData = (): IHome => {
   const props: IHome = {
@@ -90,7 +91,7 @@ export const useHomePageData = (): IHome => {
       const blocksCall = new Promise<IBlockResponse>(
         async (resolve, reject) => {
           const res = await api.getCached({
-            route: 'block/list',
+            route: 'block/list?minify=true',
             refreshTime: 4,
           });
 
@@ -105,7 +106,7 @@ export const useHomePageData = (): IHome => {
       const transactionsCall = new Promise<IBlockResponse>(
         async (resolve, reject) => {
           const res = await api.getCached({
-            route: 'transaction/list',
+            route: 'transaction/list?minify=true',
           });
 
           if (!res.error || res.error === '') {
@@ -280,7 +281,7 @@ export const useHomePageData = (): IHome => {
 
       const klvCall = new Promise<IAccountResponse>(async (resolve, reject) => {
         const res = await api.get({
-          route: `assets/KLV`,
+          route: `assets/KLV?minify=true`,
         });
 
         if (!res.error || res.error === '') {
@@ -292,7 +293,7 @@ export const useHomePageData = (): IHome => {
 
       const kfiCall = new Promise<IAccountResponse>(async (resolve, reject) => {
         const res = await api.get({
-          route: `assets/KFI`,
+          route: `assets/KFI?minify=true`,
         });
 
         if (!res.error || res.error === '') {

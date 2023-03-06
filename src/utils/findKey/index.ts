@@ -1,4 +1,4 @@
-import { IReceipt } from '../types';
+import { IReceipt } from '../../types';
 
 // to be used for unique keys in the array of objects
 export const findKey = (arr: any[], keyName: string): any => {

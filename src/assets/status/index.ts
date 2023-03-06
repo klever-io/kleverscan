@@ -11,9 +11,9 @@ const getStatusIcon = (status: string): any => {
       return Error;
     case 'success':
       return Success;
-    case 'pending' || 'ActiveProposal':
-      return Pending;
+    case 'pending':
     case 'ActiveProposal':
+    case 'inactive':
       return Pending;
     case 'fail':
       return Error;

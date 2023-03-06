@@ -55,6 +55,16 @@ export const Content = styled.div`
   margin: 0 auto;
 `;
 
+export const HeaderContainer = styled.span<{ isMainNet: boolean }>`
+  display: flex;
+  flex-direction: column;
+  width: ${props => (props.isMainNet ? '15rem' : '17rem')};
+  span {
+    color: ${props => props.theme.navbar.text};
+    font-size: 0.8rem;
+  }
+`;
+
 export const Logo = styled.div`
   margin-right: 0.5rem;
   min-width: 6rem;

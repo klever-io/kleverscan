@@ -1,4 +1,4 @@
-import { parseAddress } from '@/utils';
+import { parseAddress } from '@/utils/parseValues';
 import { LayoutContainer, Main } from '@/views/home';
 import Head from 'next/head';
 import { useRouter } from 'next/router';

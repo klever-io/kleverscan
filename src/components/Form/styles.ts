@@ -11,7 +11,10 @@ interface ISpaceForm {
   section?: string;
 }
 
-export const FormBody = styled(Form)``;
+export const FormBody = styled(Form)`
+  display: flex;
+  flex-direction: column;
+`;
 
 export const FormSection = styled.div<{ inner?: boolean }>`
   margin-top: 1rem;
@@ -47,7 +50,7 @@ export const FormSection = styled.div<{ inner?: boolean }>`
     flex-direction: column;
     gap: 2rem;
 
-    padding: 1.5rem;
+    padding: 0.75rem;
     padding-top: 3.3rem;
 
     ${props =>
@@ -59,11 +62,10 @@ export const FormSection = styled.div<{ inner?: boolean }>`
 `;
 
 export const SectionTitle = styled.div`
-  p {
-    &:first-child {
-      font-size: 1.2rem;
-      font-weight: 600;
-    }
+  > span {
+    font-size: 1.2rem;
+    font-weight: 600;
+    min-width: fit-content;
   }
 
   width: calc(100% - 2rem);
@@ -100,7 +102,7 @@ export const ButtonContainer = styled.button<IButton>`
   align-items: center;
   color: white;
   border-radius: 10px;
-  margin-top: ${props => (props.submit ? 1.7 : 0)}rem;
+  margin-top: 1.7rem;
   cursor: pointer;
 
   border: 0.2px solid ${({ theme }) => theme.input.border};
@@ -108,13 +110,17 @@ export const ButtonContainer = styled.button<IButton>`
 
   user-select: none;
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    width: 45%;
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 40%;
   }
 
   &[type='submit'] {
     background-color: ${props => props.theme.purple};
   }
+`;
+
+export const HiddenSubmitButton = styled.button`
+  display: none;
 `;
 
 export const AdvancedOptsContainer = styled.div`

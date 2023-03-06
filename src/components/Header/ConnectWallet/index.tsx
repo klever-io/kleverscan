@@ -4,7 +4,10 @@ import Tour from '@/components/Tour';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
+import { formatAmount } from '@/utils/formatFunctions';
 import { useScroll } from '@/utils/hooks';
+import { getNetwork } from '@/utils/networkFunctions';
+import { parseAddress } from '@/utils/parseValues';
 import Link from 'next/link';
 import { QRCodeSVG } from 'qrcode.react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -12,10 +15,11 @@ import ReactDOM from 'react-dom';
 import { AiOutlineClose } from 'react-icons/ai';
 import { BiLogOut, BiWalletAlt } from 'react-icons/bi';
 import { FaUserAlt } from 'react-icons/fa';
+import { IoMdAddCircle } from 'react-icons/io';
 import { IoCreateOutline, IoReloadSharp } from 'react-icons/io5';
 import { MdContentCopy } from 'react-icons/md';
 import { RiArrowRightSLine } from 'react-icons/ri';
-import { formatAmount, parseAddress } from '../../../utils';
+import { toast } from 'react-toastify';
 import WalletHelp from '../WalletHelp';
 import {
   ActionItem,
@@ -60,7 +64,7 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
   const [loadingBalance, setLoadingBalance] = useState<boolean>(false);
   const closeTimeout = useRef<NodeJS.Timeout | null>(null);
   const { isMobile } = useMobile();
-
+  const network = getNetwork();
   const {
     walletAddress,
     extensionLoading,
@@ -146,6 +150,23 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
     closeTimeout.current = setTimeout(() => {
       setExpandAssets(false);
     }, seconds);
+  };
+
+  const requestKLV = async () => {
+    setLoadingBalance(true);
+    const response = await api.post({
+      route: `transaction/send-user-funds/${walletAddress}`,
+    });
+
+    if (response.code === 'internal_error') {
+      toast.error('You already ordered KLV in less than 24 hours!');
+      setLoadingBalance(false);
+    } else {
+      toast.success('Test KLV request successful!');
+      setLoadingBalance(true);
+    }
+
+    setLoadingBalance(false);
   };
 
   const dropdownProps = {
@@ -322,7 +343,12 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
                   </ActionItem>
                 </a>
               </Link>
-
+              {network === 'Testnet' && (
+                <ActionItem onClick={requestKLV}>
+                  <IoMdAddCircle size={'1.2rem'} />
+                  <p>Request Test KLV</p>
+                </ActionItem>
+              )}
               {walletAddress && (
                 <Copy info="Wallet Address" data={walletAddress}>
                   <ActionItem>

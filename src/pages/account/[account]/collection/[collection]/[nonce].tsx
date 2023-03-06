@@ -1,6 +1,7 @@
 import { TransactionDetails as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
+import Skeleton from '@/components/Skeleton';
 import api from '@/services/api';
 import { IAsset, IAssetOne, IParsedAsset } from '@/types/index';
 import {
@@ -13,18 +14,45 @@ import {
   Input,
   Row,
 } from '@/views/transactions/detail';
-import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 
-const NftDetail: React.FC<IParsedAsset> = ({
-  assetId,
-  name,
-  metadata,
-  mime,
-  nonce,
-  nonceOwner,
-}) => {
+interface INonceParams {
+  collection: string;
+  nonce: string;
+  account: string;
+}
+
+const NftDetail: React.FC<IParsedAsset> = () => {
+  const [params, setParams] = useState<null | INonceParams>(null);
+  const [nonce, setNonce] = useState<null | IAsset>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (router.isReady) {
+      setParams(router.query as unknown as INonceParams);
+    }
+  }, [router.isReady]);
+
+  useEffect(() => {
+    if (params) {
+      requestNonce();
+    }
+  }, [params]);
+
+  const requestNonce = async () => {
+    if (router.isReady) {
+      const res: IAssetOne = await api.get({
+        route: `assets/${params?.collection}/${params?.nonce}`,
+      });
+      if (!res.error || res.error == '') {
+        setNonce(res.data?.asset);
+      }
+    }
+  };
+
   const isJsonString = (metadata: string) => {
     try {
       JSON.parse(metadata);
@@ -34,123 +62,120 @@ const NftDetail: React.FC<IParsedAsset> = ({
       return false;
     }
   };
-  return (
-    <Container>
-      <Header>
-        <Title
-          title="NFT Details"
-          Icon={Icon}
-          route={`/account/${nonceOwner}/collection/${assetId}`}
-        />
 
-        <Input />
-      </Header>
-      <CardContainer>
-        <h3>Overview</h3>
-        <CardContent>
-          <Row>
-            <span>
-              <strong>Address</strong>
-            </span>
-            <CenteredRow>
-              <span>{nonceOwner}</span>
-              <Copy data={nonceOwner} info="Address" />
-            </CenteredRow>
-          </Row>
-          <Row>
-            <span>
-              <strong>Collection</strong>
-            </span>
-            {name}
-          </Row>
-          <Row>
-            <span>
-              <strong>Asset ID</strong>
-            </span>
-            <span>
-              <p>{assetId}</p>
-            </span>
-          </Row>
-          <Row>
-            <span>
-              <strong>Nonce</strong>
-            </span>
-            <span>
-              <p>{nonce}</p>
-            </span>
-          </Row>
-          <Row>
-            <span>
-              <strong>Mime</strong>
-            </span>
-            <span>
-              <p>{mime || '--'}</p>
-            </span>
-          </Row>
-          {metadata && !isJsonString(metadata) && (
+  return (
+    <>
+      <Container>
+        <Header>
+          <Title
+            title="NFT Details"
+            Icon={Icon}
+            route={
+              params
+                ? `/account/${params.account}/collection/${params.collection}`
+                : '/'
+            }
+          />
+
+          <Input />
+        </Header>
+        <CardContainer>
+          <h3>Overview</h3>
+          <CardContent>
             <Row>
               <span>
-                <strong>Metadata</strong>
+                <strong>Address</strong>
               </span>
-              <span>
-                <p>{metadata}</p>
-              </span>
+              <CenteredRow>
+                {params ? (
+                  <>
+                    <span>{params.account}</span>
+                    <Copy data={params.account} info="Address" />
+                  </>
+                ) : (
+                  <Skeleton />
+                )}
+              </CenteredRow>
             </Row>
-          )}
-        </CardContent>
+            <Row>
+              <span>
+                <strong>Collection</strong>
+              </span>
+              {nonce ? nonce.name : <Skeleton />}
+            </Row>
+            <Row>
+              <span>
+                <strong>Asset ID</strong>
+              </span>
+              {params ? (
+                <span>
+                  <p>{params.collection}</p>
+                </span>
+              ) : (
+                <Skeleton />
+              )}
+            </Row>
+            <Row>
+              <span>
+                <strong>Nonce</strong>
+              </span>
+              {params ? (
+                <span>
+                  <p>{params.nonce}</p>
+                </span>
+              ) : (
+                <Skeleton />
+              )}
+            </Row>
+            <Row>
+              <span>
+                <strong>Mime</strong>
+              </span>
+              {nonce ? (
+                <span>
+                  <p>{nonce?.mime || '--'}</p>
+                </span>
+              ) : (
+                <Skeleton />
+              )}
+            </Row>
+            {nonce?.metadata && !isJsonString(nonce.metadata) && (
+              <Row>
+                <span>
+                  <strong>Metadata</strong>
+                </span>
+                <span>
+                  <p>{nonce.metadata}</p>
+                </span>
+              </Row>
+            )}
+          </CardContent>
 
-        {metadata && isJsonString(metadata) && (
-          <>
-            <h3>Metadata</h3>
-            <CardContent>
-              <CardRaw>
-                <SyntaxHighlighter
-                  customStyle={{
-                    height: '20rem',
-                    backgroundColor: '#030307',
-                    color: 'white',
-                  }}
-                  style={xcode}
-                  language="json"
-                  wrapLines={true}
-                  wrapLongLines={true}
-                >
-                  {JSON.stringify(JSON.parse(metadata), null, 2)}
-                </SyntaxHighlighter>
-              </CardRaw>
-            </CardContent>
-          </>
-        )}
-      </CardContainer>
-    </Container>
+          {nonce?.metadata && isJsonString(nonce.metadata) && (
+            <>
+              <h3>Metadata</h3>
+              <CardContent>
+                <CardRaw>
+                  <SyntaxHighlighter
+                    customStyle={{
+                      height: '20rem',
+                      backgroundColor: '#030307',
+                      color: 'white',
+                    }}
+                    style={xcode}
+                    language="json"
+                    wrapLines={true}
+                    wrapLongLines={true}
+                  >
+                    {JSON.stringify(JSON.parse(nonce.metadata), null, 2)}
+                  </SyntaxHighlighter>
+                </CardRaw>
+              </CardContent>
+            </>
+          )}
+        </CardContainer>
+      </Container>
+    </>
   );
 };
-
-export const getServerSideProps: GetServerSideProps<IAsset> = async ({
-  params,
-}) => {
-  const redirectProps = { redirect: { destination: '/404', permanent: false } };
-
-  const assetId = params?.collection;
-  const address = params?.account;
-  const nonce = params?.nonce;
-  if (!assetId || !address || !nonce) {
-    return redirectProps;
-  }
-
-  const response: IAssetOne = await api.get({
-    route: `assets/${assetId}/${nonce}`,
-  });
-
-  const props = response?.data?.asset;
-  props['nonce'] = nonce;
-  props['nonceOwner'] = address;
-
-  if (response.error || !props) {
-    return redirectProps;
-  }
-
-  return { props };
-};
-
 export default NftDetail;

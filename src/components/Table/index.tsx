@@ -1,10 +1,11 @@
 import { useMobile } from '@/contexts/mobile';
 import { IRowSection } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
-import { exportToCsv } from '@/utils/index';
+import { exportToCsv } from '@/utils/promiseFunctions';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
+import { IoReloadSharp } from 'react-icons/io5';
 import { TbTableExport } from 'react-icons/tb';
 import { Loader } from '../Loader/styles';
 // import { VscJson } from 'react-icons/vsc';
@@ -24,12 +25,14 @@ import {
   ExportLabel,
   FloatContainer,
   Header,
+  IoReloadSharpWrapper,
   ITableType,
   ItemContainer,
   LimitContainer,
   LimitText,
   MobileCardItem,
   MobileHeader,
+  RetryContainer,
   Row,
 } from './styles';
 
@@ -55,7 +58,6 @@ export interface ITable {
     | 'validatorsList';
 
   header: string[];
-  data: any[] | null;
   body?: any;
   rowSections?: (item: any) => IRowSection[] | undefined;
   scrollUp?: boolean;
@@ -69,7 +71,6 @@ export interface ITable {
 const Table: React.FC<ITable> = ({
   type,
   header,
-  data,
   rowSections,
   request,
   scrollUp,
@@ -85,7 +86,7 @@ const Table: React.FC<ITable> = ({
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(defaultTotalPages);
   const [limit, setLimit] = useState<number>(10);
-  const [items, setItems] = useState(data);
+  const [items, setItems] = useState([]);
   const limits = [5, 10, 50, 100];
   const [scrollTop, setScrollTop] = useState<boolean>(false);
 
@@ -106,10 +107,6 @@ const Table: React.FC<ITable> = ({
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
-  useEffect(() => {
-    setItems(data);
-  }, [data]);
 
   const fetchData = useCallback(async () => {
     if (request && dataName) {
@@ -141,14 +138,15 @@ const Table: React.FC<ITable> = ({
   }, [limit]);
 
   useDidUpdateEffect(() => {
-    if (router.query) {
-      if (page !== 1) {
-        setPage(1);
-      }
-      setLoading(true);
-      fetchData();
+    if (!router.isReady) {
+      return;
     }
-  }, [router.query]);
+    if (page !== 1) {
+      setPage(1);
+    }
+    setLoading(true);
+    fetchData();
+  }, [router.query, router.isReady]);
 
   useEffect(() => {
     if (interval) {
@@ -206,6 +204,13 @@ const Table: React.FC<ITable> = ({
                 </ButtonsContainer>
               </ExportContainer>
             )}
+            <IoReloadSharpWrapper onClick={() => fetchData()} loading={loading}>
+              <Tooltip
+                msg="Refresh"
+                customStyles={{ delayShow: 800 }}
+                Component={() => <IoReloadSharp size={32} />}
+              ></Tooltip>
+            </IoReloadSharpWrapper>
             <LimitContainer>
               <span>Per page</span>
               <LimitText>
@@ -252,7 +257,6 @@ const Table: React.FC<ITable> = ({
               items?.length > 0 &&
               items?.map((item, index) => {
                 let spanCount = 0;
-
                 return (
                   <React.Fragment key={JSON.stringify(item) + String(index)}>
                     {rowSections && (
@@ -294,10 +298,17 @@ const Table: React.FC<ITable> = ({
                 );
               })}
           </Body>
+
           {!loading && (!items || items?.length === 0) && (
-            <EmptyRow {...props}>
-              <p>Oops! Apparently no data here.</p>
-            </EmptyRow>
+            <>
+              <RetryContainer onClick={() => fetchData()} loading={loading}>
+                <span>Retry</span>
+                <IoReloadSharp size={20} />
+              </RetryContainer>
+              <EmptyRow {...props}>
+                <p>Oops! Apparently no data here.</p>
+              </EmptyRow>
+            </>
           )}
         </Container>
         <BackTopButton onClick={handleScrollTop} isHidden={scrollTop}>

@@ -812,10 +812,10 @@
   dependencies:
     "@protobuf-ts/plugin" "^2.7.0"
 
-"@klever/sdk@^4.1.4":
-  version "4.1.4"
-  resolved "https://registry.yarnpkg.com/@klever/sdk/-/sdk-4.1.4.tgz#b2d13e8e92a9803f689a6be6c545ef3d159b6a99"
-  integrity sha512-bwyYQLFbB/M1sQ9rWMd7I6443eFvwGO1s3V48PRawxO0FwqaeT8SQm3hgh3wePkxnJ4Ss8MTZ//vssmCYLuH5Q==
+"@klever/sdk@^4.2.1":
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@klever/sdk/-/sdk-4.2.1.tgz#0a4d5b26535b48ee0dbd33d7de472fcf29e42c0c"
+  integrity sha512-hIiEi5hgMeSBpqWqm5iRuseUxdT7mxL2MIjyBr7HZdWXFn40/KSOx5u9A+pCGV2O7gXuJtt63u01O4cryXph0g==
   dependencies:
     "@klever/kleverweb" "^1.1.0"
     "@noble/ed25519" "^1.7.1"

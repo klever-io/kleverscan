@@ -16,7 +16,7 @@
   "dependencies": {
     "@bugsnag/js": "7.16.2",
     "@bugsnag/plugin-react": "7.16.4",
-    "@klever/sdk": "^4.1.4",
+    "@klever/sdk": "^4.2.1",
     "@types/ioredis": "4.28.2",
     "@types/react-leaflet-markercluster": "3.0.0",
     "@unform/core": "2.1.6",

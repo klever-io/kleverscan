@@ -137,7 +137,7 @@ const CoinDataFetcher: React.FC = () => {
 
       const klvCall = new Promise<ICoinInfo>(async (resolve, reject) => {
         const res = await api.get({
-          route: `assets/KLV`,
+          route: `assets/KLV?minify=true`,
         });
 
         if (!res.error || res.error === '') {
@@ -149,7 +149,7 @@ const CoinDataFetcher: React.FC = () => {
 
       const kfiCall = new Promise<ICoinInfo>(async (resolve, reject) => {
         const res = await api.get({
-          route: `assets/KFI`,
+          route: `assets/KFI?minify=true`,
         });
 
         if (!res.error || res.error === '') {

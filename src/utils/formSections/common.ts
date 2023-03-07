@@ -256,10 +256,12 @@ export const stakingSection = (): ISection[] => {
     title: 'Staking',
     fields: [
       {
-        label: 'Type',
+        label: 'interestType',
         props: {
           type: 'checkbox',
           toggleOptions: ['APR', 'FPR'],
+          defaultChecked: false,
+          defaultValue: 0,
         },
       },
       {

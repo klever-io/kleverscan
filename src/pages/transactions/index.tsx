@@ -80,7 +80,7 @@ const Transactions: React.FC = () => {
 
     const assetPrecisions = await getPrecision(assets);
 
-    const parsedTransactions = transactionsResponse.data.transactions.map(
+    const parsedTransactions = transactionsResponse.data?.transactions?.map(
       (transaction: ITransaction) => {
         if (transaction.contract && transaction.contract.length) {
           transaction.contract.forEach(contract => {

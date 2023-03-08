@@ -9,6 +9,7 @@ import React, { useRef, useState } from 'react';
 import ConnectWallet from './ConnectWallet';
 import OptionsContainer from './OptionsContainer';
 import {
+  CloseSearch,
   ConnectContainer,
   Container,
   Content,
@@ -19,6 +20,7 @@ import {
   DropdownMenu,
   HeaderContainer,
   IconsMenu,
+  Input,
   Item,
   LinkStyled,
   Logo,
@@ -30,6 +32,8 @@ import {
   MobileNavbarItemList,
   MobileOptions,
   NavBarOptionsContainer,
+  SearchContainer,
+  SearchIcon,
 } from './styles';
 
 interface IDropdownPages {
@@ -127,9 +131,10 @@ export const MobileNavbarItem: React.FC<INavbarItem> = ({
 };
 
 const Navbar: React.FC = () => {
-  const { mobileNavbarRef, closeMenu, handleMenu, isMobile, mobileMenuOpen } =
+  const { mobileNavbarRef, closeMenu, handleMenu, mobileMenuOpen, isTablet } =
     useMobile();
   const [openDrawer, setOpenDrawer] = useState(false);
+  const [openSearch, setOpenSearch] = useState(false);
   const prevScrollpos = useRef<number>(0);
 
   const handleMobileScroll = () => {
@@ -161,13 +166,16 @@ const Navbar: React.FC = () => {
   };
 
   const network = getNetwork();
-  useScroll(isMobile, handleMobileScroll);
+  useScroll(isTablet, handleMobileScroll);
 
   return (
     <>
       <Container ref={mobileNavbarRef}>
-        <Content>
-          <HeaderContainer isMainNet={network === 'Mainnet'}>
+        <Content isMainNet={network === 'Mainnet'}>
+          <HeaderContainer
+            isMainNet={network === 'Mainnet'}
+            openSearch={!isTablet ? false : openSearch}
+          >
             <Link href="/">
               <a>
                 <Logo onClick={closeMenu}>
@@ -184,7 +192,7 @@ const Navbar: React.FC = () => {
               <span>Running on KleverChain {network}</span>
             )}
           </HeaderContainer>
-          {!isMobile && (
+          {!isTablet && (
             <DesktopContainer>
               <IconsMenu>
                 {navbarItems.map((item, index) => (
@@ -192,6 +200,9 @@ const Navbar: React.FC = () => {
                 ))}
               </IconsMenu>
               <NavBarOptionsContainer>
+                <SearchContainer openSearch={true}>
+                  <Input />
+                </SearchContainer>
                 <ConnectWallet
                   clickConnection={() => {
                     openDrawer;
@@ -202,17 +213,28 @@ const Navbar: React.FC = () => {
             </DesktopContainer>
           )}
 
-          {isMobile && (
-            <MobileContainer>
+          {isTablet && (
+            <MobileContainer openSearch={openSearch}>
+              <SearchContainer openSearch={openSearch}>
+                {openSearch && <Input />}
+                <CloseSearch
+                  onClick={() => setOpenSearch(false)}
+                  openSearch={openSearch}
+                />
+              </SearchContainer>
               <ConnectContainer
                 onClick={() => {
                   handleClickConnection();
                   closeMenu();
                 }}
               >
+                <SearchIcon
+                  onClick={() => setOpenSearch(!openSearch)}
+                  openSearch={openSearch}
+                />
                 <ConnectWallet clickConnection={closeDrawer} />
+                <MenuIcon onClick={handleMenu} data-testid="menu-icon" />
               </ConnectContainer>
-              <MenuIcon onClick={handleMenu} data-testid="menu-icon" />
             </MobileContainer>
           )}
         </Content>

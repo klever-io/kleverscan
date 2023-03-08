@@ -3,7 +3,7 @@ import Chart, { ChartType } from '@/components/Chart';
 import Title from '@/components/Layout/Title';
 import { HomeLoader } from '@/components/Loader/styles';
 import api from '@/services/api';
-import { Container, Header, Input, Section } from '@/views/charts';
+import { Container, Header, Section } from '@/views/charts';
 import {
   ChartsContainer,
   ContainerTimeFilter,
@@ -163,7 +163,6 @@ const Charts: React.FC<ICharts> = () => {
     <Container>
       <Header>
         <Title title="Charts" Icon={Icon} />
-        <Input />
       </Header>
       <Section>
         <ChartsContainer>

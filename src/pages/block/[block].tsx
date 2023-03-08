@@ -17,7 +17,6 @@ import {
   CommonSpan,
   Container,
   Header,
-  Input,
   Row,
   RowBlockNavigation,
   TooltipContainer,
@@ -316,7 +315,6 @@ const Block: React.FC<IBlockPage> = ({ block }) => {
     <Container>
       <Header>
         <Title title="Block Details" route="/blocks" />
-        <Input />
       </Header>
 
       <CardContainer>

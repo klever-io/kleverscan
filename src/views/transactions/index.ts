@@ -36,7 +36,7 @@ export const Header = styled.section`
     display: flex;
   }
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: column;
     div:nth-child(1) {
       width: 100%;
@@ -52,8 +52,7 @@ export const FilterByDate = styled.div`
   align-items: center;
   flex-direction: row;
   margin-top: 1.4rem;
-  margin-left: 0.75rem;
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     margin-left: 0;
     width: 100%;
     justify-content: center;

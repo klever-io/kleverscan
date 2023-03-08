@@ -43,7 +43,6 @@ import {
   HalfRow,
   Header,
   HoverLink,
-  Input,
   NetworkParamsContainer,
   OptionValidator,
   PassThresholdContainer,
@@ -389,7 +388,6 @@ const ProposalDetails: React.FC = () => {
         <Container>
           <Header>
             <Title route={'/proposals'} title="Proposal Details" />
-            <Input />
           </Header>
           <CardContainer>
             <CardContent>

@@ -51,7 +51,6 @@ import {
   FrozenContainer,
   Header,
   IconContainer,
-  Input,
   OverviewContainer,
   Row,
   RowContent,
@@ -743,7 +742,6 @@ const Account: React.FC<IAccountPage> = () => {
           route={'/accounts'}
           isAccountOwner={!!account?.name}
         />
-        <Input />
       </Header>
       <OverviewContainer>
         <Row isAddressRow={true}>

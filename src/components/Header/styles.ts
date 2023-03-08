@@ -1,4 +1,6 @@
+import { Search } from '@/assets/icons';
 import { transparentize } from 'polished';
+import { AiOutlineClose } from 'react-icons/ai';
 import { FiMenu } from 'react-icons/fi';
 import { MdArrowDropDown } from 'react-icons/md';
 import styled, { css, keyframes } from 'styled-components';
@@ -11,18 +13,16 @@ interface IMobileMenu {
 
 export const Container = styled.div`
   padding: 1rem 2rem;
-
   position: sticky;
   top: 0;
   left: 0;
   right: 0;
-
   background-color: ${props => props.theme.navbar.background};
   border-bottom: 1px solid ${props => props.theme.footer.border};
   z-index: 6;
   transition: top 0.1s linear;
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     padding: 1rem 1.5rem;
 
     overflow: hidden;
@@ -36,12 +36,12 @@ export const NavBarOptionsContainer = styled.div`
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: column;
   }
 `;
 
-export const Content = styled.div`
+export const Content = styled.div<{ isMainNet?: boolean }>`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -53,10 +53,18 @@ export const Content = styled.div`
   max-width: ${props => props.theme.maxWidth};
 
   margin: 0 auto;
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    justify-content: space-between;
+    min-height: ${props => (props.isMainNet ? '2.8rem' : '4rem')};
+  }
 `;
 
-export const HeaderContainer = styled.span<{ isMainNet: boolean }>`
-  display: flex;
+export const HeaderContainer = styled.span<{
+  isMainNet: boolean;
+  openSearch: boolean;
+}>`
+  display: ${props => (props.openSearch ? 'none' : 'flex')};
   flex-direction: column;
   width: ${props => (props.isMainNet ? '15rem' : '17rem')};
   span {
@@ -143,15 +151,59 @@ export const MobileItem = styled(Item)`
 `;
 
 export const Input = styled(DefaultInput)`
-  margin-left: auto;
-  width: 25%;
-  border-color: ${props => props.theme.darkText};
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    display: none;
+  width: 19rem;
+  background-color: ${props => props.theme.white};
+  border-color: ${props => props.theme.lightGray};
+  input {
+    &::placeholder {
+      color: ${props => props.theme.text.inputHeader};
+    }
+  }
+  input:placeholder-shown {
+    text-overflow: ellipsis;
+  }
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 100%;
   }
 `;
 
+const fadeInContainer = keyframes`
+  from {
+    opacity: 0.3;
+    transform: translateX(-50%);
+
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+export const SearchContainer = styled.div<{ openSearch: boolean }>`
+  display: ${props => (props.openSearch ? 'flex' : 'none')};
+  align-items: center;
+  width: 20vw;
+  max-width: 20rem;
+  gap: 1rem;
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 100%;
+    max-width: 65vw;
+  }
+  animation: ${fadeInContainer} 0.3s;
+`;
+
+export const CloseSearch = styled(AiOutlineClose)<{ openSearch: boolean }>`
+  display: ${props => (props.openSearch ? 'block' : 'none')};
+  color: ${props => props.theme.true.white};
+  height: 15px;
+  width: 15px;
+`;
+export const SearchIcon = styled(Search)<{ openSearch: boolean }>`
+  display: ${props => (props.openSearch ? 'none' : 'block')};
+  & path {
+    fill: ${props => props.theme.true.white};
+  }
+`;
 export const DesktopContainer = styled.div`
   display: flex;
 
@@ -160,35 +212,34 @@ export const DesktopContainer = styled.div`
   align-items: center;
   width: 100%;
   gap: 0.5rem;
-  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     display: none;
   }
 `;
 
 export const IconsMenu = styled.div`
   display: flex;
-
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
 
   gap: 1rem;
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     display: none;
   }
 `;
 
-export const MobileContainer = styled.div`
-  margin-left: auto;
+export const MobileContainer = styled.div<{ openSearch: boolean }>`
   z-index: 6;
   position: relative;
   display: none;
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    width: ${props => (props.openSearch ? '100%' : 'auto')};
     display: flex;
     align-items: center;
-    gap: 1rem;
+    justify-content: space-between;
+    gap: 0.5rem;
   }
 `;
 
@@ -289,7 +340,7 @@ export const DropdownContainer = styled.div`
 
   transform: translateY(100%);
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     left: 0.4rem;
   }
 `;
@@ -315,7 +366,7 @@ export const DropdownItem = styled.li<{ disabled: boolean }>`
   }
   cursor: ${props => (props.disabled ? 'default' : 'pointer')};
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     span {
       margin: 0 0.4rem 0 0;
     }
@@ -329,7 +380,7 @@ export const DropdownMenu = styled.ul`
   border-radius: 10px;
   gap: 0.5rem;
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     background-color: ${props => transparentize(0.7, props.theme.black)};
   }
 `;
@@ -339,7 +390,7 @@ export const DropdownIcon = styled(MdArrowDropDown)`
 `;
 
 export const MenuIcon = styled(FiMenu).attrs(props => ({
-  color: props.theme.navbar.text,
+  color: props.theme.true.white,
   size: 25,
 }))`
   box-sizing: content-box;
@@ -349,4 +400,6 @@ export const MenuIcon = styled(FiMenu).attrs(props => ({
 export const ConnectContainer = styled.div`
   display: flex;
   z-index: 2;
+  align-items: center;
+  gap: 0.3rem;
 `;

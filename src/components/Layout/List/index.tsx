@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import { IconType } from 'react-icons';
 import { BsQuestionCircleFill } from 'react-icons/bs';
-import Input from '../../InputGlobal';
 import {
   Container,
   EmptyRow,
@@ -42,9 +41,7 @@ const List: React.FC<IList> = ({
           <HeaderIcon>{Icon ? <Icon /> : <BsQuestionCircleFill />}</HeaderIcon>
           <span>{title}</span>
         </div>
-        <InputContainer>
-          <Input />
-        </InputContainer>
+        <InputContainer></InputContainer>
       </HeaderContainer>
     );
   };

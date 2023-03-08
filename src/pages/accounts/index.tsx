@@ -12,7 +12,7 @@ import { parseAddress } from '@/utils/parseValues';
 import { getAge } from '@/utils/timeFunctions';
 import { TableContainer } from '@/views/accounts';
 import { CenteredRow } from '@/views/accounts/detail';
-import { Card, CardContainer, Container, Header, Input } from '@/views/blocks';
+import { Card, CardContainer, Container, Header } from '@/views/blocks';
 import { fromUnixTime } from 'date-fns';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
@@ -222,8 +222,6 @@ const Accounts: React.FC<IAccounts> = () => {
     <Container>
       <Header>
         <Title title="Accounts" Icon={Icon} />
-
-        <Input />
       </Header>
 
       <CardContainer>

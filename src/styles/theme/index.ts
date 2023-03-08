@@ -109,6 +109,7 @@ const theme = {
   text: {
     moonLight: '#515395',
     midNight: '#0B0B1E',
+    inputHeader: '#C6C7EB',
     black: '#2e2f47',
     twilight: '#222345',
     background: 'linear-gradient(104deg, rgb(238, 63, 113), rgb(125, 63, 241))',

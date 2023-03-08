@@ -19,6 +19,7 @@ describe("test Layout and it's inner components", () => {
   };
   (useRouter as jest.Mock).mockReturnValue(mockRouter);
   it("test layout component can have new children and its loading correctly it's default children", () => {
+    global.innerWidth = 1500;
     const { container } = renderWithTheme(
       <Layout>
         <div>Hello world!</div>

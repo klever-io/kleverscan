@@ -53,7 +53,6 @@ import {
   Header,
   Hr,
   IconsWrapper,
-  Input,
   KappFeeFailedTx,
   KappFeeSpan,
   Row,
@@ -518,8 +517,6 @@ const Transaction: React.FC<ITransactionPage> = props => {
           Icon={Icon}
           route={'/transactions'}
         />
-
-        <Input />
       </Header>
       <CardContainer>
         <h3>Overview</h3>

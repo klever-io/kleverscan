@@ -355,6 +355,7 @@ export interface ITxQuery {
   end?: string;
   fromAddress?: string;
   toAddress?: string;
+  account?: string;
 }
 
 export interface IInnerTableProps {

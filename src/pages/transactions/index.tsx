@@ -20,7 +20,6 @@ import { parseAddress } from '@/utils/parseValues';
 import { getPrecision } from '@/utils/precisionFunctions';
 import { CenteredRow } from '@/views/accounts/detail';
 import { Container, FilterByDate, Header } from '@/views/transactions';
-import { Input } from '@/views/transactions/detail';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -81,7 +80,7 @@ const Transactions: React.FC = () => {
 
     const assetPrecisions = await getPrecision(assets);
 
-    const parsedTransactions = transactionsResponse.data.transactions.map(
+    const parsedTransactions = transactionsResponse.data?.transactions?.map(
       (transaction: ITransaction) => {
         if (transaction.contract && transaction.contract.length) {
           transaction.contract.forEach(contract => {
@@ -282,9 +281,7 @@ const Transactions: React.FC = () => {
             <DateFilter {...dateFilterProps} />
           </FilterByDate>
         </div>
-        <div>
-          <Input />
-        </div>
+        <div></div>
       </Header>
       <Table {...tableProps} />
     </Container>

@@ -56,7 +56,7 @@ export const Container = styled.div`
   display: block;
   position: relative;
   flex-direction: column;
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
   }
 `;
@@ -146,7 +146,7 @@ export const CalendarContainer = styled.div`
     animation: ${fadeInContainer} 0.2s linear;
   }
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     left: 6rem;
     bottom: -100%;
     animation: ${fadeInContainerMobile} 0.2s linear forwards;
@@ -201,7 +201,7 @@ export const MonthPicker = styled.div.attrs((props: MonthPickerProps) => ({
   `}
   }
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: row !important;
   }
 `;
@@ -212,7 +212,7 @@ export const DayPicker = styled.div`
   margin-top: 0.5rem;
   padding: 0 1rem;
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     margin-top: 2rem !important;
   }
 `;
@@ -224,7 +224,7 @@ export const HeaderRow = styled.div`
   border-bottom: 1px solid ${props => props.theme.navbar.text};
   font-size: 0.9rem;
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: row !important;
   }
 `;
@@ -233,7 +233,7 @@ export const HeaderItem = styled.div`
   font-weight: 400;
   color: ${props => props.theme.navbar.text};
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     margin-left: 1rem;
   }
 `;
@@ -242,7 +242,7 @@ export const DaysTable = styled.div`
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   flex-wrap: wrap;
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: row !important;
   }
 `;
@@ -296,7 +296,7 @@ export const DayItem = styled.div.attrs((props: DayItemProps) => ({
       filter: opacity(0.15);
       pointer-events: none;
     `}
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 14% !important;
     padding: 1rem 1rem;
     line-height: 0;

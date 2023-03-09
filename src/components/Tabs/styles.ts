@@ -40,7 +40,6 @@ export const ItemContainer = styled.div<{ selected: boolean }>`
   span {
     padding: 0.5rem;
     opacity: ${props => (props.selected ? 1 : 0.2)};
-
     font-weight: 600;
     font-size: 1.1rem;
 
@@ -51,10 +50,10 @@ export const ItemContainer = styled.div<{ selected: boolean }>`
   }
 `;
 
-export const FilterContent = styled.div`
+export const FilterContent = styled.div<{ showDataFilter: boolean }>`
   gap: 1rem;
   width: 100%;
-  display: flex;
+  display: ${props => (props.showDataFilter ? 'flex' : 'none')};
   align-items: center;
   > div:last-child {
     min-width: 18rem;

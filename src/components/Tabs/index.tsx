@@ -56,7 +56,7 @@ const Tabs: React.FC<ITabs> = ({
           })}
         </TabContent>
         {dateFilterProps && headers[selected] === 'Transactions' && (
-          <FilterContent>
+          <FilterContent showDataFilter={showDataFilter}>
             {showDataFilter && (
               <div>
                 <DateFilter {...dateFilterProps} />

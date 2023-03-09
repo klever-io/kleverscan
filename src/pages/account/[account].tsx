@@ -51,7 +51,6 @@ import {
   FrozenContainer,
   Header,
   IconContainer,
-  Input,
   OverviewContainer,
   Row,
   RowContent,
@@ -106,6 +105,7 @@ interface IQueryParams {
 
 export const getRequestAssets = (
   address: string,
+  tabSelected: string,
 ): ((page: number, limit: number) => Promise<IResponse>) => {
   const requestAssets = async (
     page: number,
@@ -177,7 +177,6 @@ export const getRequestAssets = (
         }
         return assets[asset];
       });
-
       if (ownedAssets.length) {
         const missingAssets: any[] = ownedAssets
           .filter(
@@ -198,12 +197,24 @@ export const getRequestAssets = (
             owner: true,
           }));
 
-        const allAssetsAccount = [...assetsArray, ...missingAssets];
-        return {
-          data: { assets: allAssetsAccount },
-          error: '',
-          code: 'error',
-        };
+        if (tabSelected === 'Assets') {
+          const allAssetsAccount = [...assetsArray];
+          return {
+            data: { assets: allAssetsAccount },
+            error: '',
+            code: 'error',
+          };
+        } else {
+          const assetsOwner = Object.keys(assets)
+            .filter(asset => assets[asset]['owner'] === true)
+            .map(asset => assets[asset]);
+          const allAssetsOwnerAccount = [...assetsOwner, ...missingAssets];
+          return {
+            data: { assets: allAssetsOwnerAccount },
+            error: '',
+            code: 'error',
+          };
+        }
       }
       return {
         data: { assets: assetsArray },
@@ -272,7 +283,7 @@ export const getRequestBuckets = (
 };
 
 const Account: React.FC<IAccountPage> = () => {
-  const headers = ['Assets', 'Transactions', 'Buckets'];
+  const headers = ['Assets', 'Owned Assets', 'Transactions', 'Buckets'];
   const [account, setAccount] = useState<IAccount | null>(null);
   const [priceKLV, setPriceKLV] = useState<number>(0);
   const [KLVAllowance, setKLVAllowance] = useState<IAllowanceResponse>(
@@ -286,7 +297,7 @@ const Account: React.FC<IAccountPage> = () => {
     useState<boolean>(false);
   const [titleModal, setTitleModal] = useState<string>('');
   const [stakingRewards, setStakingRewards] = useState<number>(0);
-  const [selectedTab, setSelectedTab] = useState<null | string>(null);
+  const [selectedTab, setSelectedTab] = useState<string>(headers[0]);
   const [loading, setLoading] = useState<boolean>(true);
   const [contractValue, setContractValue] = useState<string>('');
   const [collectionSelected, setCollectionSelected] = useState<IAccountAsset>();
@@ -459,7 +470,7 @@ const Account: React.FC<IAccountPage> = () => {
 
     const assetPrecisions = await getPrecision(assets);
 
-    const parsedTransactions = transactionsResponse.data.transactions.map(
+    const parsedTransactions = transactionsResponse.data?.transactions?.map(
       (transaction: ITransaction) => {
         if (transaction.contract && transaction.contract.length) {
           transaction.contract.forEach(contract => {
@@ -549,7 +560,10 @@ const Account: React.FC<IAccountPage> = () => {
     scrollUp: false,
     dataName: 'assets',
     request: (page: number, limit: number) =>
-      getRequestAssets(router.query.account as string)(page, limit),
+      getRequestAssets(router.query.account as string, selectedTab)(
+        page,
+        limit,
+      ),
     query: router.query,
   };
 
@@ -580,10 +594,12 @@ const Account: React.FC<IAccountPage> = () => {
     },
     showDataFilter: false,
   };
+
   const dateFilterProps: IDateFilter = {
     resetDate: resetQueryDate,
     filterDate: filterQueryDate,
   };
+
   const transactionsFiltersProps = {
     query: router.query,
     setQuery: setQueryAndRouter,
@@ -601,6 +617,17 @@ const Account: React.FC<IAccountPage> = () => {
                 false,
               )}
             </ContainerTabInteractions>
+            <Assets
+              assetsTableProps={assetsTableProps}
+              address={router.query.account as string}
+              showInteractionsButtons={showInteractionsButtons}
+            />
+          </>
+        );
+
+      case 'Owned Assets':
+        return (
+          <>
             <Assets
               assetsTableProps={assetsTableProps}
               address={router.query.account as string}
@@ -728,7 +755,7 @@ const Account: React.FC<IAccountPage> = () => {
     const address = router.query.account as string;
 
     if (isTablet && address) {
-      return parseAddress(address, 20);
+      return parseAddress(address, 15);
     }
     return address && parseAddress(address, 50);
   };
@@ -743,7 +770,6 @@ const Account: React.FC<IAccountPage> = () => {
           route={'/accounts'}
           isAccountOwner={!!account?.name}
         />
-        <Input />
       </Header>
       <OverviewContainer>
         <Row isAddressRow={true}>

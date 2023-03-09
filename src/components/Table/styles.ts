@@ -235,6 +235,7 @@ export const MobileCardItem = styled.span<{
   columnSpan?: number;
   isRightAligned?: boolean;
   isAssets?: boolean;
+  isAccountPage?: boolean;
 }>`
   display: flex;
   flex-direction: ${props => (props.isAssets ? 'column' : 'row')};

@@ -219,6 +219,10 @@ export const CenteredRow = styled.div`
   a:hover {
     text-decoration: underline;
   }
+
+  span {
+    line-height: 2rem;
+  }
 `;
 
 export const ExpandCenteredRow: StyledComponent<

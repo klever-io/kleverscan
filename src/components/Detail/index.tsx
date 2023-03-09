@@ -1,7 +1,7 @@
 import Table, { ITable } from '@/components/Table';
 import React from 'react';
 import Title from '../Layout/Title';
-import { Container, Header, Input, TableContainer } from './styles';
+import { Container, Header, TableContainer } from './styles';
 
 interface IDetail {
   title: string;
@@ -23,7 +23,6 @@ const Detail: React.FC<IDetail> = ({
     <Container>
       <Header>
         <Title title={title} Icon={Icon} route={route} />
-        <Input />
       </Header>
       <TableContainer>
         {cards && <h3>List of {title.toLowerCase()}</h3>}

@@ -12,7 +12,6 @@ import {
   Toggle,
 } from '@/components/Form/FormInput/styles';
 import { useContract } from '@/contexts/contract';
-import { useMobile } from '@/contexts/mobile';
 import {
   DataField,
   ExtraOptionContainer,
@@ -39,8 +38,6 @@ const AdvancedOptions: React.FC<IAdvOptions> = ({ setMetadata }) => {
     getOwnerAddress,
     getAssets,
   } = useContract();
-
-  const { isMobile } = useMobile();
 
   const assetBalance = kdaFee?.balance || null;
 
@@ -83,10 +80,7 @@ const AdvancedOptions: React.FC<IAdvOptions> = ({ setMetadata }) => {
         <InputLabel>Data</InputLabel>
         <DataField onChange={e => setMetadata(e.target.value.toString())} />
       </FieldContainer>
-      {
-        !isMobile &&
-          kdaSelect() /* Remove this check when K5 is updated for kda Fee */
-      }
+      {kdaSelect()}
       <FieldContainer>
         <InputLabel>Multiple Contract</InputLabel>
         <ToggleContainer>

@@ -172,8 +172,7 @@ const Table: React.FC<ITable> = ({
     <>
       {typeof scrollUp === 'boolean' &&
         typeof totalPages === 'number' &&
-        !!items &&
-        items?.length > 0 && (
+        !!items && (
           <FloatContainer>
             {dataName === 'transactions' && (
               <ExportContainer>

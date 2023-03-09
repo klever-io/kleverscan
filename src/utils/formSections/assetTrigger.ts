@@ -189,22 +189,12 @@ const assetTriggerContract = (
             },
           },
           {
-            label: 'Fixed Ratio for KLV',
-            objectName: 'fRatioKLV',
+            label: 'KDA/KLV Quotient',
+            objectName: 'quotient',
             props: {
               type: 'number',
               tooltip:
-                'KLV ratio, the cost is calculated as (KLV ratio) / (KDA ratio) E.g.: when KLV ratio is 1 and KDA ratio is 2, the cost is 1/2 = 0.5 KLV/KDA',
-              required: true,
-            },
-          },
-          {
-            label: 'Fixed Ratio for KDA',
-            objectName: 'fRatioKDA',
-            props: {
-              type: 'number',
-              tooltip:
-                'KDA ratio, the cost is calculated as (KLV ratio) / (KDA ratio) E.g.: when KLV ratio is 1 and KDA ratio is 2, the cost is 1/2 = 0.5 KLV/KDA',
+                'KDA ratio for each KLV E.g.: when KLV the quotient is 2, the cost is 2 KDA per 1 KLV',
               required: true,
             },
           },

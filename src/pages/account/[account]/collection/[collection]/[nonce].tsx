@@ -11,7 +11,6 @@ import {
   CenteredRow,
   Container,
   Header,
-  Input,
   Row,
 } from '@/views/transactions/detail';
 import { useRouter } from 'next/router';
@@ -76,8 +75,6 @@ const NftDetail: React.FC<IParsedAsset> = () => {
                 : '/'
             }
           />
-
-          <Input />
         </Header>
         <CardContainer>
           <h3>Overview</h3>

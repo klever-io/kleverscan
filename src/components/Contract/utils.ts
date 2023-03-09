@@ -1,7 +1,37 @@
 import { ICollectionList } from '@/types/index';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { getPrecision } from '@/utils/precisionFunctions';
-import { TransactionType } from '@klever/sdk';
+import {
+  IAssetTrigger,
+  IBuyOrder,
+  ICancelMarketOrder,
+  IClaim,
+  IConfigITO,
+  IConfigMarketplace,
+  IConfigValidator,
+  IContractRequest,
+  ICreateAsset,
+  ICreateMarketplace,
+  ICreateValidator,
+  IDelegate,
+  IDeposit,
+  IFreeze,
+  IITOTrigger,
+  IProposal,
+  ISellOrder,
+  ISetAccountName,
+  ISetITOPrices,
+  ITransaction,
+  ITransfer,
+  ITxOptionsRequest,
+  IUndelegate,
+  IUnfreeze,
+  IUnjail,
+  IUpdateAccountPermission,
+  IVotes,
+  IWithdraw,
+  TransactionType,
+} from '@klever/sdk';
 
 const getType = (rawType: string): TransactionType => {
   let type = rawType.substring(0, rawType.length - 8);
@@ -671,6 +701,118 @@ const contractsDescription = {
   ITOTriggerContract: 'Change the parameters of an ITO.',
 };
 
+// SDK mock while extension doesn't update
+
+interface IAccountNonce {
+  data: {
+    firstPendingNonce: number;
+    nonce: number;
+    txPending: number;
+  };
+  error: string;
+  code: string;
+}
+type IPayload =
+  | ITransfer
+  | ICreateAsset
+  | ICreateValidator
+  | IConfigValidator
+  | IFreeze
+  | IUnfreeze
+  | IDelegate
+  | IUndelegate
+  | IWithdraw
+  | IClaim
+  | IUnjail
+  | IAssetTrigger
+  | ISetAccountName
+  | IProposal
+  | IVotes
+  | IConfigITO
+  | ISetITOPrices
+  | IBuyOrder
+  | ISellOrder
+  | ICancelMarketOrder
+  | ICreateMarketplace
+  | IConfigMarketplace
+  | IUpdateAccountPermission
+  | IDeposit
+  | IITOTrigger;
+interface ITxRequest {
+  type: TransactionType;
+  sender: string;
+  nonce: number;
+  contracts: IPayload[];
+  data?: string[];
+  permID?: number;
+  kdaFee?: string;
+}
+
+const getNonce = async (): Promise<IAccountNonce> => {
+  const req = await fetch(
+    `${window.kleverWeb.provider.node}/address/${window.kleverWeb.address}/nonce`,
+  );
+
+  return (await req.json()) as IAccountNonce;
+};
+
+const buildTransaction = async (
+  contracts: IContractRequest[],
+  txData?: string[],
+  options?: ITxOptionsRequest,
+): Promise<ITransaction> => {
+  if (contracts?.length === 0) {
+    throw 'empty contracts';
+  }
+
+  const fistContractType = contracts[0]?.type;
+  const payloads = contracts.map(contract => {
+    if (contract.type != fistContractType) {
+      throw 'Multiple contracts of different types are not supported yet';
+    }
+
+    return contract.payload;
+  });
+
+  const nonce = options?.nonce
+    ? options.nonce
+    : (await getNonce())?.data?.nonce || 0;
+
+  const permID = options?.permID || 0;
+
+  const kdaFee = options?.kdaFee || '';
+
+  const txBody: ITxRequest = {
+    type: fistContractType,
+    nonce,
+    sender: window.kleverWeb.address,
+    data: txData || [],
+    permID,
+    contracts: payloads,
+    kdaFee,
+  };
+
+  const req = await fetch(
+    `${window.kleverWeb.provider.node}/transaction/send`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(txBody),
+    },
+  );
+
+  const res = await req.json();
+  if (res?.error) throw res?.error;
+
+  if (!res?.data && !res?.data?.result) {
+    throw 'failed to generate transaction';
+  }
+
+  return res.data.result as ITransaction;
+};
+
 export {
   getType,
   getAssetsList,
@@ -680,4 +822,5 @@ export {
   contractHaveKDA,
   contractHaveBucketId,
   contractsDescription,
+  buildTransaction,
 };

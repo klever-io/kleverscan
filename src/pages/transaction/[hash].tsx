@@ -53,7 +53,6 @@ import {
   Header,
   Hr,
   IconsWrapper,
-  Input,
   KappFeeFailedTx,
   KappFeeSpan,
   Row,
@@ -161,26 +160,31 @@ const Transaction: React.FC<ITransactionPage> = props => {
   };
 
   const renderData = (data: string, index: number) => {
+    const formatData = (hexData: any) => <span>{hexToString(hexData)}</span>;
+
     if (expandData[index]) {
       try {
         const jsonData = JSON.parse(parseJson(hexToString(data)));
-        return (
-          <DivDataJson>
-            <ReactJson
-              src={jsonData}
-              name={false}
-              displayObjectSize={false}
-              enableClipboard={true}
-              displayDataTypes={false}
-              theme={rawTxTheme}
-            />
-          </DivDataJson>
-        );
+        if (jsonData && typeof jsonData === 'object') {
+          return (
+            <DivDataJson>
+              <ReactJson
+                src={jsonData}
+                name={false}
+                displayObjectSize={false}
+                enableClipboard={true}
+                displayDataTypes={false}
+                theme={rawTxTheme}
+              />
+            </DivDataJson>
+          );
+        }
+        return formatData(data);
       } catch (error) {
-        return <span>{hexToString(data)}</span>;
+        return formatData(data);
       }
     }
-    return <span>{parseJson(hexToString(data))}</span>;
+    return <span>{hexToString(data)}</span>;
   };
 
   const ContractComponent: React.FC<any> = ({ contracts }) => {
@@ -518,8 +522,6 @@ const Transaction: React.FC<ITransactionPage> = props => {
           Icon={Icon}
           route={'/transactions'}
         />
-
-        <Input />
       </Header>
       <CardContainer>
         <h3>Overview</h3>

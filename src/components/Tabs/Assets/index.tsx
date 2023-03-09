@@ -47,6 +47,8 @@ const Assets: React.FC<IAssets> = ({
     const { assetId, assetType, precision, balance, frozenBalance, owner } =
       props;
 
+    const walletAddress = sessionStorage.getItem('walletAddress');
+
     const ticker = assetId?.split('-')[0];
     const sectionViewNfts =
       assetType === 1 ? (
@@ -94,7 +96,10 @@ const Assets: React.FC<IAssets> = ({
       { element: sectionViewNfts, span: 2 },
     ];
 
-    if (owner && showInteractionsButtons) {
+    if (
+      assetsTableProps.query?.account === walletAddress &&
+      showInteractionsButtons
+    ) {
       sections.push({
         element: showInteractionsButtons(
           'Asset Trigger',

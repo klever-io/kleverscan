@@ -26,7 +26,6 @@ import {
   CardContainer,
   Container,
   Header,
-  Input,
   TableContainer,
   TableHeader,
   UpdateContainer,
@@ -328,8 +327,6 @@ const Blocks: React.FC<IBlocks> = () => {
     <Container>
       <Header>
         <Title title="Blocks" Icon={Icon} />
-
-        <Input />
       </Header>
 
       <CardContainer>

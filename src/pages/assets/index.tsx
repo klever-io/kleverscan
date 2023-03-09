@@ -8,7 +8,7 @@ import api from '@/services/api';
 import { IAsset, IPagination, IResponse, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
 import { useFetchPartialAsset } from '@/utils/hooks';
-import { Container, Header, HeaderContainer, Input } from '@/views/assets';
+import { Container, Header, HeaderContainer } from '@/views/assets';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { ReactNode, useEffect, useState } from 'react';
@@ -254,7 +254,6 @@ const Assets: React.FC = () => {
             ))}
           </FilterContainer>
         </HeaderContainer>
-        <Input />
       </Header>
       <Table {...tableProps} />
     </Container>

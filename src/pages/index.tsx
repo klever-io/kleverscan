@@ -5,12 +5,7 @@ import HomeTransactions from '@/components/HomeTransactions';
 import api from '@/services/api';
 import { IHomeProps } from '@/types';
 import { IBlock } from '@/types/blocks';
-import {
-  Container,
-  DataCardsContainer,
-  DataContainer,
-  Input,
-} from '@/views/home';
+import { Container, DataCardsContainer, DataContainer } from '@/views/home';
 import { GetStaticProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React, { useCallback, useEffect } from 'react';
@@ -42,8 +37,6 @@ const Home: React.FC<IHomeProps> = () => {
   return (
     <Container>
       <DataContainer>
-        <Input />
-
         <DataCardsContainer>
           <CardDataFetcher block={blocks?.[0]} />
           <CoinDataFetcher />

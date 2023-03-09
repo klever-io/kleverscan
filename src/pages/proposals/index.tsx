@@ -9,7 +9,7 @@ import { IParsedProposal, IProposalsResponse } from '@/types/proposals';
 import { getProposalNetworkParams } from '@/utils/networkFunctions';
 import { Header } from '@/views/accounts/detail';
 import { Card } from '@/views/blocks';
-import { CardContainer, Container, Input } from '@/views/proposals';
+import { CardContainer, Container } from '@/views/proposals';
 import { useState } from 'react';
 
 export const requestProposals = async (
@@ -71,8 +71,6 @@ const Proposals: React.FC = () => {
     <Container>
       <Header>
         <Title title="Proposals" Icon={Icon} />
-
-        <Input />
       </Header>
       <CardContainer>
         <CardContent />

@@ -131,6 +131,7 @@ export const ButtonModal = styled.button<{
   cursor: ${props => (props.isLocked ? 'not-allowed' : 'pointer')};
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
+    max-width: 100%;
   }
 `;
 
@@ -172,6 +173,7 @@ export const CenteredRow = styled.div`
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
+    flex-wrap: wrap;
   }
 `;
 

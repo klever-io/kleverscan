@@ -42,12 +42,12 @@ export const TxsFiltersWrapper = styled.div`
 
 export const ContainerFilter = styled.div`
   gap: 0.75rem;
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    flex-wrap: wrap;
-  }
+  flex-wrap: wrap;
 `;
 
 export const RightFiltersContent = styled.div`
+  gap: 0.75rem;
+
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
   }

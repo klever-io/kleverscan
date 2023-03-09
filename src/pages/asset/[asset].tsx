@@ -36,7 +36,6 @@ import {
   FrozenContainer,
   Header,
   HoverAnchor,
-  Input,
   Row,
   UriContainer,
 } from '@/views/assets/detail';
@@ -755,7 +754,6 @@ const Asset: React.FC<IAssetPage> = ({}) => {
           )}
           route={'/assets'}
         />
-        <Input />
       </Header>
     );
   };

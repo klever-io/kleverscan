@@ -146,16 +146,16 @@ const precisionParse = async (
         );
       parseSplitRoyaltiesPrecision(payload);
       addRoyalitiesPrecision();
-      if (payload?.kdaPool?.fRatioKLV) {
-        payload.kdaPool.fRatioKLV = addPrecision(
-          payload.kdaPool.fRatioKLV,
-          KLV_PRECISION,
-        );
-      }
       if (payload?.kdaPool?.fRatioKDA) {
         payload.kdaPool.fRatioKDA = addPrecision(
           payload.kdaPool.fRatioKDA,
           await getPrecision(assetId),
+        );
+      }
+      if (payload?.kdaPool?.fRatioKLV) {
+        payload.kdaPool.fRatioKLV = addPrecision(
+          payload.kdaPool.fRatioKLV,
+          KLV_PRECISION,
         );
       }
       break;
@@ -499,6 +499,16 @@ const parseValues = (
         assetID !== 0 ? `${collection.value}/${assetID}` : collection.value;
       if (typeAssetTrigger === 14) {
         parseSplitRoyalties(parsedValues);
+      }
+      if (typeAssetTrigger === 15) {
+        if (parsedValues.kdaPool?.quotient) {
+          const quotient = parsedValues.kdaPool.quotient;
+
+          delete parsedValues.kdaPool.quotient;
+
+          parsedValues.kdaPool.fRatioKDA = quotient;
+          parsedValues.kdaPool.fRatioKLV = 1;
+        }
       }
     } else if (contractType === 'SellContract') {
       parsedValues.assetID =

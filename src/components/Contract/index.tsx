@@ -44,6 +44,7 @@ import {
   SelectContent,
 } from './styles';
 import {
+  buildTransaction,
   contractHaveBucketId,
   contractHaveKDA,
   contractsDescription,
@@ -410,7 +411,7 @@ const Contract: React.FC<IContract> = ({
     setLoading(true);
     const parsedData = Buffer.from(metadata, 'utf-8').toString('base64');
     try {
-      const unsignedTx = await web.buildTransaction(
+      const unsignedTx = await buildTransaction(
         [
           {
             type: getType(contractType),

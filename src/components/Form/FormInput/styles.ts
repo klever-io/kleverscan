@@ -266,7 +266,7 @@ export const TooltipContainer = styled.div<{
 
 export const InputLabel = styled.label<ILabel>`
   user-select: none;
-
+  color: ${({ theme }) => theme.darkText};
   transform: translate(-1rem, -2.25rem);
   z-index: 1;
 

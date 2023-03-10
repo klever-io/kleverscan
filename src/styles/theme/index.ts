@@ -62,6 +62,7 @@ const theme = {
   input: {
     placeholder: '#9c9eb9',
     activeShadow: '#7418c2',
+    searchBar: '#1d214a',
     dateFilter: '#181935',
     border: {
       home: '#030307',

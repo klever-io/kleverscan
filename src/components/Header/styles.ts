@@ -152,9 +152,10 @@ export const MobileItem = styled(Item)`
 
 export const Input = styled(DefaultInput)`
   width: 19rem;
-  background-color: ${props => props.theme.white};
+  background-color: ${props => props.theme.input.searchBar};
   border-color: ${props => props.theme.lightGray};
   input {
+    color: ${props => props.theme.text.inputHeader};
     &::placeholder {
       color: ${props => props.theme.text.inputHeader};
     }

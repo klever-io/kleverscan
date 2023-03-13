@@ -1,4 +1,4 @@
-import { getRequestAssets } from '@/pages/account/[account]';
+import { assetsRequest } from '@/pages/account/[account]';
 import api from '@/services/api';
 import { act, screen } from '@testing-library/react';
 import { useRouter } from 'next/router';
@@ -68,10 +68,15 @@ describe('Component: Tabs', () => {
 
   it('Should render the Assets Tab correctly', async () => {
     const router = useRouter();
+    const getRequest = (page: number, limit: number): Promise<any> => {
+      const address = router.query.account as string;
+
+      return assetsRequest(address)(page, limit);
+    };
     const mockAssetsTableProps = {
       scrollUp: false,
       dataName: 'assets',
-      request: getRequestAssets(address),
+      request: (page: number, limit: number) => getRequest(page, limit),
       query: router.query,
     };
     const tabProps = {

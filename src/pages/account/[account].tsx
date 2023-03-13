@@ -13,6 +13,7 @@ import Skeleton from '@/components/Skeleton';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Assets from '@/components/Tabs/Assets';
 import Buckets from '@/components/Tabs/Buckets';
+import ProprietaryAssets from '@/components/Tabs/ProprietaryAssets';
 import Transactions from '@/components/Tabs/Transactions';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import {
@@ -27,7 +28,6 @@ import api, { IPrice } from '@/services/api';
 import {
   IAccount,
   IAccountAsset,
-  IAsset,
   IAssetResponse,
   IAssetsBuckets,
   IInnerTableProps,
@@ -103,126 +103,71 @@ interface IQueryParams {
   sender?: '' | 'receiver' | 'sender';
 }
 
-export const getRequestAssets = (
+export const assetsRequest = (
   address: string,
-  tabSelected: string,
 ): ((page: number, limit: number) => Promise<IResponse>) => {
   const requestAssets = async (
     page: number,
     limit: number,
   ): Promise<IResponse> => {
-    let assets: IAccountAsset[] = [];
-    let ownedAssets: IAsset[] = [];
+    const accountResponse = await api.get({
+      route: `address/${address}`,
+    });
+    if (accountResponse.error) {
+      return {
+        data: { assets: null },
+        error: 'request failed',
+        code: 'error',
+      };
+    }
 
-    const accountCall = new Promise<IAccountResponse>(
-      async (resolve, reject) => {
-        const res = await api.get({
-          route: `address/${address}`,
-        });
-        if (!res.error || res.error === '') {
-          resolve(res);
-        }
+    const assets: IAccountAsset[] = accountResponse.data.account.assets;
 
-        reject(res.error);
-      },
-    );
-
-    const accountAssetsOwner = new Promise<IAssetResponse>(
-      async (resolve, reject) => {
-        const res = await api.get({
-          route: 'assets/kassets',
-          query: { owner: `${address}` },
-        });
-        if (!res.error || res.error === '') {
-          resolve(res);
-        }
-
-        reject(res.error);
-      },
-    );
-
-    await Promise.allSettled([accountCall, accountAssetsOwner]).then(
-      responses => {
-        responses.forEach((res, index) => {
-          if (res.status === 'fulfilled') {
-            const { value }: any = res;
-            if (index === 0) {
-              assets = value.data.account.assets;
-            }
-
-            if (index === 1) {
-              ownedAssets = value.data.assets;
-              Object.keys(ownedAssets).forEach(
-                ownedAsset => (ownedAssets[ownedAsset]['owner'] = true),
-              );
-            }
-          }
-        });
-      },
-    );
     if (!Object.keys(assets).length) {
       return {
         data: { assets: null },
         error: 'request failed',
         code: 'error',
       };
-    } else {
-      const assetsArray = Object.keys(assets).map(asset => {
-        if (
-          ownedAssets.some(
-            ownedAsset => ownedAsset.assetId === assets[asset].assetId,
-          )
-        ) {
-          assets[asset]['owner'] = true;
-        }
-        return assets[asset];
-      });
-      if (ownedAssets.length) {
-        const missingAssets: any[] = ownedAssets
-          .filter(
-            (ownedAsset: IAsset) =>
-              !Object.keys(assets).find(
-                assetId => assetId === ownedAsset.assetId,
-              ),
-          )
-          .map((asset: any) => ({
-            address: asset.ownerAddress,
-            assetId: asset.assetId,
-            assetName: asset.name,
-            assetType: asset.assetType === 'Fungible' ? 0 : 1,
-            precision: asset.precision,
-            balance: 0,
-            frozenBalance: 0,
-            unfrozenBalance: 0,
-            owner: true,
-          }));
+    }
 
-        if (tabSelected === 'Assets') {
-          const allAssetsAccount = [...assetsArray];
-          return {
-            data: { assets: allAssetsAccount },
-            error: '',
-            code: 'error',
-          };
-        } else {
-          const assetsOwner = Object.keys(assets)
-            .filter(asset => assets[asset]['owner'] === true)
-            .map(asset => assets[asset]);
-          const allAssetsOwnerAccount = [...assetsOwner, ...missingAssets];
-          return {
-            data: { assets: allAssetsOwnerAccount },
-            error: '',
-            code: 'error',
-          };
-        }
-      }
+    const assetsArray = Object.keys(assets).map(asset => {
+      return assets[asset];
+    });
+
+    return {
+      data: { assets: assetsArray },
+      error: '',
+      code: '',
+    };
+  };
+
+  return requestAssets;
+};
+
+export const ownedAssetsRequest = (
+  address: string,
+): ((page: number, limit: number) => Promise<IResponse>) => {
+  const requestAssets = async (
+    page: number,
+    limit: number,
+  ): Promise<IResponse> => {
+    const ownedAssetsResponse: IAssetResponse = await api.get({
+      route: 'assets/kassets',
+      query: { owner: `${address}`, page, limit },
+    });
+
+    if (ownedAssetsResponse.error) {
       return {
-        data: { assets: assetsArray },
-        error: '',
+        data: { assets: null },
+        error: 'request failed',
         code: 'error',
       };
     }
+
+    return ownedAssetsResponse;
   };
+
   return requestAssets;
 };
 
@@ -283,7 +228,6 @@ export const getRequestBuckets = (
 };
 
 const Account: React.FC<IAccountPage> = () => {
-  const headers = ['Assets', 'Owned Assets', 'Transactions', 'Buckets'];
   const [account, setAccount] = useState<IAccount | null>(null);
   const [priceKLV, setPriceKLV] = useState<number>(0);
   const [KLVAllowance, setKLVAllowance] = useState<IAllowanceResponse>(
@@ -292,6 +236,17 @@ const Account: React.FC<IAccountPage> = () => {
   const [KFIAllowance, setKFIAllowance] = useState<IAllowanceResponse>(
     {} as IAllowanceResponse,
   );
+  const [hasProprietaryAssets, setHasProprietaryAssets] =
+    useState<boolean>(false);
+
+  const getHeaders = () => {
+    const headers = ['Assets', 'Transactions', 'Buckets'];
+    if (hasProprietaryAssets) {
+      headers.splice(1, 0, 'Proprietary Assets');
+    }
+    return headers;
+  };
+  const headers = getHeaders();
 
   const [openModalTransactions, setOpenModalTransactions] =
     useState<boolean>(false);
@@ -404,11 +359,26 @@ const Account: React.FC<IAccountPage> = () => {
         ),
       );
 
+      const accountAssetsOwnerCall = new Promise<IAssetResponse>(
+        async (resolve, reject) => {
+          const res = await api.get({
+            route: 'assets/kassets',
+            query: { owner: `${address}` },
+          });
+          if (!res.error || res.error === '') {
+            resolve(res);
+          }
+
+          reject(res.error);
+        },
+      );
+
       await Promise.allSettled([
         accountCall,
         pricesCall,
         KLVAllowancePromise,
         KFIAllowancePromise,
+        accountAssetsOwnerCall,
       ]).then(responses => {
         responses.forEach((res, index) => {
           if (res.status === 'fulfilled') {
@@ -426,6 +396,8 @@ const Account: React.FC<IAccountPage> = () => {
               case 3:
                 setKFIAllowance(value);
                 break;
+              case 4:
+                setHasProprietaryAssets(value.data.assets.length > 0);
               default:
                 break;
             }
@@ -556,15 +528,26 @@ const Account: React.FC<IAccountPage> = () => {
     }
   };
 
+  const getRequest = (page: number, limit: number): Promise<any> => {
+    const address = router.query.account as string;
+
+    if (router.query.tab !== 'Proprietary Assets')
+      return assetsRequest(address)(page, limit);
+    else return ownedAssetsRequest(address)(page, limit);
+  };
+
   const assetsTableProps: IInnerTableProps = {
     scrollUp: false,
     dataName: 'assets',
-    request: (page: number, limit: number) =>
-      getRequestAssets(router.query.account as string, selectedTab)(
-        page,
-        limit,
-      ),
     query: router.query,
+    request: (page: number, limit: number) => getRequest(page, limit),
+  };
+
+  const proprietaryAssetsTableProps: IInnerTableProps = {
+    scrollUp: false,
+    dataName: 'assets',
+    query: router.query,
+    request: (page: number, limit: number) => getRequest(page, limit),
   };
 
   const transactionTableProps: IInnerTableProps = {
@@ -625,11 +608,18 @@ const Account: React.FC<IAccountPage> = () => {
           </>
         );
 
-      case 'Owned Assets':
+      case 'Proprietary Assets':
         return (
           <>
-            <Assets
-              assetsTableProps={assetsTableProps}
+            <ContainerTabInteractions>
+              {showInteractionsButtons(
+                'Create Asset',
+                'CreateAssetContract',
+                false,
+              )}
+            </ContainerTabInteractions>
+            <ProprietaryAssets
+              assetsTableProps={proprietaryAssetsTableProps}
               address={router.query.account as string}
               showInteractionsButtons={showInteractionsButtons}
             />

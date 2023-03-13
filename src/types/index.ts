@@ -236,6 +236,17 @@ export interface IAccountAsset {
   owner?: boolean;
 }
 
+export interface IProprietaryAsset {
+  assetId: string;
+  assetType: string;
+  precision: number;
+  circulatingSupply: number;
+  staking: {
+    interestType: string;
+    totalStaked: number;
+  };
+}
+
 export interface IAssetsHoldersResponse extends IResponse {
   data: {
     accounts: IAccountAsset[];
@@ -357,6 +368,7 @@ export interface ITxQuery {
   fromAddress?: string;
   toAddress?: string;
   account?: string;
+  tab?: string;
 }
 
 export interface IInnerTableProps {

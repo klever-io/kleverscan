@@ -1,34 +1,26 @@
 import Table, { ITable } from '@/components/Table';
 import { CustomLink } from '@/components/Table/styles';
 import {
-  IAccountAsset,
-  IAsset,
   IInnerTableProps,
-  IResponse,
+  IProprietaryAsset,
   IRowSection,
 } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
 import Link from 'next/link';
 import React from 'react';
 
-interface IAssets {
+interface IProprietaryAssets {
   assetsTableProps: IInnerTableProps;
   address: string;
   showInteractionsButtons?: (
     title: string,
     value: string,
-    assets: IAccountAsset,
+    assets: IProprietaryAsset,
     isAssetTrigger: boolean,
   ) => JSX.Element;
 }
 
-interface IAssetResponse extends IResponse {
-  data: {
-    asset: IAsset;
-  };
-}
-
-const Assets: React.FC<IAssets> = ({
+const ProprietaryAssets: React.FC<IProprietaryAssets> = ({
   assetsTableProps,
   address,
   showInteractionsButtons,
@@ -38,20 +30,19 @@ const Assets: React.FC<IAssets> = ({
     'ID',
     'Token Type',
     'Precision',
-    'Balance',
-    'Frozen',
+    'Circulating Supply',
+    'Frozen Balance',
     '',
   ];
 
-  const rowSections = (props: IAccountAsset): IRowSection[] => {
-    const { assetId, assetType, precision, balance, frozenBalance, owner } =
-      props;
+  const rowSections = (props: IProprietaryAsset): IRowSection[] => {
+    const { assetId, assetType, precision, circulatingSupply, staking } = props;
 
     const walletAddress = sessionStorage.getItem('walletAddress');
 
     const ticker = assetId?.split('-')[0];
     const sectionViewNfts =
-      assetType === 1 ? (
+      assetType === 'Non Fungible' ? (
         <Link href={`/account/${address}/collection/${assetId}`} key={address}>
           <CustomLink>View NFTs</CustomLink>
         </Link>
@@ -71,7 +62,7 @@ const Assets: React.FC<IAssets> = ({
       {
         element: (
           <span key={assetType}>
-            {assetType === 0 ? 'Fungible' : 'Non Fungible'}
+            {assetType === 'Fungible' ? 'Fungible' : 'Non Fungible'}
           </span>
         ),
         span: 1,
@@ -79,16 +70,17 @@ const Assets: React.FC<IAssets> = ({
       { element: <strong key={precision}>{precision}</strong>, span: 1 },
       {
         element: (
-          <strong key={balance}>
-            {formatAmount(balance / 10 ** precision)} {ticker}
+          <strong key={circulatingSupply}>
+            {formatAmount(circulatingSupply / 10 ** precision)} {ticker}
           </strong>
         ),
         span: 1,
       },
       {
         element: (
-          <strong key={frozenBalance}>
-            {formatAmount(frozenBalance / 10 ** precision)} {ticker}
+          <strong key={staking?.totalStaked || 0}>
+            {formatAmount((staking?.totalStaked || 0) / 10 ** precision)}{' '}
+            {ticker}
           </strong>
         ),
         span: 1,
@@ -96,9 +88,20 @@ const Assets: React.FC<IAssets> = ({
       { element: sectionViewNfts, span: 2 },
     ];
 
+    if (showInteractionsButtons) {
+      sections.push({
+        element: showInteractionsButtons(
+          'Asset Trigger',
+          'AssetTriggerContract',
+          props,
+          true,
+        ),
+        span: 2,
+      });
+    }
+
     return sections;
   };
-
   const tableProps: ITable = {
     ...assetsTableProps,
     rowSections,
@@ -109,4 +112,4 @@ const Assets: React.FC<IAssets> = ({
   return <Table {...tableProps} />;
 };
 
-export default Assets;
+export default ProprietaryAssets;

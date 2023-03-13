@@ -25,7 +25,7 @@ const buyContract = (labelId: string): ISection[] => {
           type: 'number',
           required: true,
           tooltip:
-            'ITOBuy: Amount to be bought, MarkeyBuy: item price / amount bidden (check precision)',
+            'ITOBuy: Amount to be bought, MarketBuy: item price / amount bidden (check precision)',
         },
       },
     ],

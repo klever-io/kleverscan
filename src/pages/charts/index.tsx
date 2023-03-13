@@ -145,7 +145,7 @@ const Charts: React.FC<ICharts> = () => {
     const fetchTotalDays = async () => {
       setLoadingDailyTxs(true);
       try {
-        const res = await api.getCached({
+        const res = await api.get({
           route: `transaction/list/count/${timeFilter}`,
         });
         if (!res.error || res.error === '') {

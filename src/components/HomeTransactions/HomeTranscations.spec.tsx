@@ -1,3 +1,4 @@
+import { HomeDataProvider } from '@/contexts/mainPage';
 import { screen } from '@testing-library/react';
 import React from 'react';
 import { mockHomeTxs } from '../../test/mocks';
@@ -8,15 +9,13 @@ mockHomeTxs.setTotalTransactions = jest.fn();
 
 describe('Component: HomeTransactions', () => {
   let container: HTMLElement;
+
   beforeEach(() => {
     jest.clearAllMocks();
     container = renderWithTheme(
-      <HomeTransactions
-        setTotalTransactions={jest.fn()}
-        transactions={[]}
-        transactionsList={mockHomeTxs.transactionsList}
-        precision={6}
-      />,
+      <HomeDataProvider>
+        <HomeTransactions />
+      </HomeDataProvider>,
     ).container;
   });
   it("Should render the Title and the empty component when don't have any transaction", () => {

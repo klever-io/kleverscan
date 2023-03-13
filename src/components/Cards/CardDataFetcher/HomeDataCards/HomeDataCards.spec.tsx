@@ -1,3 +1,4 @@
+import * as HomeData from '@/contexts/mainPage';
 import { screen } from '@testing-library/react';
 import React from 'react';
 import HomeDataCards from '.';
@@ -24,16 +25,7 @@ jest.mock('@/services/api', () => {
 });
 
 describe('Component: HomeDataCards', () => {
-  beforeEach(() => {
-    window.ResizeObserver = jest.fn().mockImplementation(() => ({
-      observe: jest.fn(),
-      unobserve: jest.fn(),
-      disconnect: jest.fn(),
-    }));
-    jest.clearAllMocks();
-    jest.useFakeTimers();
-  });
-
+  let mock;
   const {
     totalAccounts: mockTotalAccounts,
     totalTransactions,
@@ -41,10 +33,35 @@ describe('Component: HomeDataCards', () => {
     newTransactions,
     newAccounts,
     beforeYesterdayTransactions,
-    block,
+    blocks,
     counterEpoch,
     metrics,
   } = mockedHomeDataCards;
+
+  const contextValues = {
+    totalAccounts: mockTotalAccounts,
+    totalTransactions,
+    actualTPS,
+    newTransactions,
+    newAccounts,
+    beforeYesterdayTransactions,
+    blocks,
+    counterEpoch,
+    metrics,
+  };
+  beforeEach(() => {
+    window.ResizeObserver = jest.fn().mockImplementation(() => ({
+      observe: jest.fn(),
+      unobserve: jest.fn(),
+      disconnect: jest.fn(),
+    }));
+
+    mock = jest
+      .spyOn(HomeData, 'useHomeData')
+      .mockImplementation(() => contextValues as HomeData.IHomeData);
+    jest.clearAllMocks();
+    jest.useFakeTimers();
+  });
 
   const statistics = { ...mockedStatistics };
   const totalAccs = { ...mockedTotalAccounts, error: '' };
@@ -53,19 +70,7 @@ describe('Component: HomeDataCards', () => {
   const yesterdayAccs = { ...mockedNewAccountsCall, error: '' };
 
   it('Should render the "Total Accounts", "Total Transactions", "Live/Peak TPS", and "Epoch Remaining Time" cards with values', () => {
-    renderWithTheme(
-      <HomeDataCards
-        totalAccounts={mockTotalAccounts}
-        totalTransactions={totalTransactions}
-        newTransactions={newTransactions}
-        beforeYesterdayTransactions={beforeYesterdayTransactions}
-        newAccounts={newAccounts}
-        block={block}
-        actualTPS={actualTPS}
-        counterEpoch={counterEpoch}
-        metrics={metrics}
-      />,
-    );
+    renderWithTheme(<HomeDataCards />);
     const totalAccountsLabel = screen.getByText(/Total Accounts/i);
     const totalTxsLabel = screen.getByText(/Total Transactions/i);
     const tpsLabel = screen.getByText(/Live\/Peak TPS/i);
@@ -88,19 +93,7 @@ describe('Component: HomeDataCards', () => {
   });
 
   it('Should render the total accounts and transactions in the last 24h', () => {
-    renderWithTheme(
-      <HomeDataCards
-        totalAccounts={mockTotalAccounts}
-        totalTransactions={totalTransactions}
-        newTransactions={newTransactions}
-        beforeYesterdayTransactions={beforeYesterdayTransactions}
-        newAccounts={newAccounts}
-        block={block}
-        actualTPS={actualTPS}
-        counterEpoch={counterEpoch}
-        metrics={metrics}
-      />,
-    );
+    renderWithTheme(<HomeDataCards />);
 
     const variant = screen.getAllByText('Last 24h');
     const accountsCreatedSinceYesterday = variant[0].nextSibling;
@@ -112,19 +105,14 @@ describe('Component: HomeDataCards', () => {
   });
 
   it("Should render the fallback variant when there's no new accounts since yesterday", () => {
-    renderWithTheme(
-      <HomeDataCards
-        totalAccounts={mockTotalAccounts}
-        totalTransactions={totalTransactions}
-        newTransactions={newTransactions}
-        beforeYesterdayTransactions={beforeYesterdayTransactions}
-        newAccounts={0}
-        block={block}
-        actualTPS={actualTPS}
-        counterEpoch={counterEpoch}
-        metrics={metrics}
-      />,
-    );
+    const newContextValues = {
+      ...contextValues,
+      newAccounts: 0,
+    };
+    mock = jest
+      .spyOn(HomeData, 'useHomeData')
+      .mockImplementation(() => newContextValues as HomeData.IHomeData);
+    renderWithTheme(<HomeDataCards />);
     const totalAccounts = screen.getByText(/Total Accounts/i);
     const variant = totalAccounts.parentNode?.nextSibling?.lastChild;
     expect(variant).toBeUndefined();

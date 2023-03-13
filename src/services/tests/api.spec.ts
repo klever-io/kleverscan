@@ -1,6 +1,5 @@
 import { Service } from '../../types';
 import api, {
-  getCached,
   getHost,
   getProps,
   Method,
@@ -16,7 +15,6 @@ describe('test api functions', () => {
     route: '/',
     service: Service.PROXY,
     apiVersion: process.env.DEFAULT_API_VERSION || 'v1.0',
-    refreshTime: 60,
   };
 
   const props1 = {
@@ -54,12 +52,6 @@ describe('test api functions', () => {
     body: {
       names: ['KLV/USD'],
     },
-  };
-
-  const propsCached = {
-    route: 'transaction/list',
-    service: 0,
-    refreshTime: 60,
   };
 
   const paginationOnError = {
@@ -339,62 +331,6 @@ describe('test api functions', () => {
         );
 
         const res = await withText(props3, Method.GET);
-        expect(res).toStrictEqual({
-          data: null,
-          error: 'Internal Server Error',
-          code: 'internal_error',
-          pagination: paginationOnError,
-        });
-      });
-    });
-  });
-
-  describe('getCached function', () => {
-    afterEach(() => {
-      (fetch as jest.Mock).mockRestore();
-    });
-    describe('transaction/list route', () => {
-      test('successful fetch with transaction/list route', async () => {
-        (global.fetch as jest.Mock) = jest.fn(() =>
-          Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve(mocks.successfulGetCached),
-            bodyUsed: true,
-            headers: Headers,
-            redirected: false,
-            status: 200,
-            statusText: '',
-            type: 'cors',
-            url: 'https://testnet.kleverscan.org/api/data',
-          }),
-        );
-        const res = await getCached(propsCached);
-        expect(res).toStrictEqual(mocks.successfulGetCached);
-      });
-
-      test('failed fetch with transaction/list route', async () => {
-        (global.fetch as jest.Mock) = jest.fn(() =>
-          Promise.reject(mocks.getCachedObjectError),
-        );
-        const res = await getCached(props4);
-        expect(res).toStrictEqual(mocks.failedGetCachedFetch);
-      });
-
-      test('successful fetch but status not ok', async () => {
-        (global.fetch as jest.Mock) = jest.fn(() =>
-          Promise.resolve({
-            ok: false,
-            json: () => Promise.resolve({ error: 'Internal Server Error' }),
-            headers: Headers,
-            redirected: false,
-            status: 500,
-            statusText: 'Internal Server Error',
-            type: 'cors',
-            url: 'https://testnet.kleverscan.org/api/data',
-          }),
-        );
-
-        const res = await getCached(propsCached);
         expect(res).toStrictEqual({
           data: null,
           error: 'Internal Server Error',

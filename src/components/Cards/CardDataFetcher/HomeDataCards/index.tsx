@@ -1,5 +1,6 @@
 import { Accounts, Epoch, TPS, Transactions } from '@/assets/cards';
 import Tooltip from '@/components/Tooltip';
+import { useHomeData } from '@/contexts/mainPage';
 import { useTheme } from '@/contexts/theme';
 import { ICard, IEpochCard } from '@/types';
 import { getVariation } from '@/utils';
@@ -20,21 +21,26 @@ import {
   ProgressPercentage,
 } from '@/views/validators';
 import { useTranslation } from 'next-i18next';
-import { IDataCards } from '../../../../types';
 import { ValueDetail } from '../../CoinDataFetcher/CoinCard/styles';
+import HomeDataCardsSkeleton from '../HomeDataCardsSkeleton';
 
-const HomeDataCards: React.FC<IDataCards> = ({
-  metrics,
-  totalAccounts,
-  newAccounts,
-  totalTransactions,
-  newTransactions,
-  beforeYesterdayTransactions,
-  actualTPS,
-  block,
-  counterEpoch,
-}) => {
+const HomeDataCards: React.FC = ({}) => {
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
+
+  const {
+    actualTPS,
+    blocks,
+    metrics,
+    newTransactions,
+    beforeYesterdayTransactions,
+    newAccounts,
+    totalAccounts,
+    totalTransactions,
+    counterEpoch,
+    loadingCards,
+  } = useHomeData();
+
+  const block = blocks[0];
 
   const dataCards: ICard[] = [
     {
@@ -108,7 +114,7 @@ const HomeDataCards: React.FC<IDataCards> = ({
     return <p>{value?.toLocaleString()}</p>;
   };
 
-  return (
+  return !loadingCards ? (
     <DataCardsWrapper>
       <DataCardsContent>
         {dataCards.map(
@@ -157,6 +163,8 @@ const HomeDataCards: React.FC<IDataCards> = ({
         ))}
       </DataCardsContent>
     </DataCardsWrapper>
+  ) : (
+    <HomeDataCardsSkeleton />
   );
 };
 

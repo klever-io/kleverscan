@@ -1,33 +1,17 @@
 import BlockCard from '@/components/Cards/BlockCardFetcher/BlockCard';
 import Carousel from '@/components/Carousel';
-import { IBlock, IBlockCardFetcher } from '@/types/blocks';
+import { useHomeData } from '@/contexts/mainPage';
+import { IBlock } from '@/types/blocks';
 import { Section } from '@/views/home';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import BlockCardSkeleton from './BlockCardSkeleton';
 
-const BlockCardFetcher: React.FC<IBlockCardFetcher> = ({
-  blocks: defaultBlocks,
-  getBlocks,
-}) => {
-  const [blocks, setBlocks] = React.useState<IBlock[]>(defaultBlocks);
+const BlockCardFetcher: React.FC = () => {
+  const { blocks } = useHomeData();
 
   const { t } = useTranslation('blocks');
-
-  const blockWatcherInterval = 4000;
-
-  useEffect(() => {
-    const blockWatcher = setInterval(async () => {
-      try {
-        getBlocks(setBlocks);
-      } catch (error) {
-        console.error(error);
-      }
-    }, blockWatcherInterval);
-
-    return () => clearInterval(blockWatcher);
-  }, []);
 
   const getBlockCards = useCallback(() => {
     return blocks.length && blocks.length > 0

@@ -44,15 +44,13 @@ const Assets: React.FC = () => {
 
   const requestAssets = async (page: number, limit: number) => {
     if (filterToken === 'All' || filterToken === undefined) {
-      const res: IAssetResponse = await api.getCached({
+      const res: IAssetResponse = await api.get({
         route: `assets/kassets?hidden=false&page=${page}&limit=${limit}`,
-        refreshTime: 21600,
       });
       return res;
     } else {
-      return api.getCached({
+      return api.get({
         route: `assets/kassets?hidden=false&asset=${filterToken}&page=${page}&limit=${limit}`,
-        refreshTime: 21600,
       });
     }
   };
@@ -64,9 +62,8 @@ const Assets: React.FC = () => {
           shallow: true,
         });
 
-        const assets: IAssetResponse = await api.getCached({
+        const assets: IAssetResponse = await api.get({
           route: 'assets/kassets?hidden=false',
-          refreshTime: 21600,
         });
         filters[0].data = assets?.data?.assets?.map(asset => asset.assetId);
       } else {

@@ -23,7 +23,6 @@ export interface IProps {
   body?: any;
   apiVersion?: string;
   service?: Service;
-  refreshTime?: number;
   useApiProxy?: boolean;
 }
 
@@ -88,7 +87,6 @@ export const getProps = (props: IProps): IProps => {
     route: '/',
     service: Service.PROXY,
     apiVersion: process.env.DEFAULT_API_VERSION || 'v1.0',
-    refreshTime: 60,
   };
 
   const get = (target: any, name: string) => {
@@ -277,55 +275,6 @@ export const withTimeout = async (
   ]);
 };
 
-export const getCached = async (props: IProps): Promise<any> => {
-  const request = async () => {
-    try {
-      const { route, query, service, apiVersion, refreshTime } =
-        getProps(props);
-
-      const body = { route, service, refreshTime };
-
-      const response = await fetch(
-        getHost('api/data', query, Service.EXPLORER, apiVersion),
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(body),
-        },
-      );
-      if (!response.ok) {
-        return {
-          data: null,
-          error: (await response.json()).error,
-          code: 'internal_error',
-          pagination,
-        };
-      }
-
-      return response.json();
-    } catch (error) {
-      return {
-        data: null,
-        error,
-        code: 'internal_error',
-        pagination,
-      };
-    }
-  };
-
-  let result: any;
-
-  await asyncDoIf(
-    res => (result = res),
-    err => (result = Promise.resolve(err)),
-    () => request(),
-  );
-
-  return result;
-};
-
 const api = {
   get: async (props: IProps): Promise<any> =>
     withTimeout(withoutBody(props, Method.GET)),
@@ -333,7 +282,6 @@ const api = {
     withTimeout(withBody(props, Method.POST)),
   text: async (props: IProps): Promise<any> =>
     withTimeout(withText(props, Method.GET)),
-  getCached,
 };
 
 export default api;

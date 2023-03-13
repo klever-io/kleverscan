@@ -1,3 +1,4 @@
+import * as HomeData from '@/contexts/mainPage';
 import { getVariation } from '@/utils';
 import { fireEvent, screen } from '@testing-library/react';
 import React from 'react';
@@ -6,14 +7,20 @@ import { assetsData, CoinTest } from '../../../../test/mocks';
 import { renderWithTheme } from '../../../../test/utils';
 
 describe('Component: CoinCard', () => {
+  let mock;
+  const contextValues = {
+    coins: CoinTest,
+    assetsData: assetsData,
+  };
+
   beforeEach(() => {
-    jest.clearAllMocks();
+    mock = jest
+      .spyOn(HomeData, 'useHomeData')
+      .mockImplementation(() => contextValues as HomeData.IHomeData);
   });
 
   it('Should render the CoinCard with the correct text', () => {
-    const container = renderWithTheme(
-      <CoinCard coins={CoinTest} assetsData={assetsData} />,
-    ).container;
+    const container = renderWithTheme(<CoinCard />).container;
     const arrow: any =
       container.firstChild?.firstChild?.firstChild?.firstChild?.lastChild;
     fireEvent.click(arrow);
@@ -41,9 +48,7 @@ describe('Component: CoinCard', () => {
   // });
 
   it('Test the selector when click and scroll to select a coin', () => {
-    const { container } = renderWithTheme(
-      <CoinCard coins={CoinTest} assetsData={assetsData} />,
-    );
+    const { container } = renderWithTheme(<CoinCard />);
 
     const coinSelector: any = container.firstChild?.lastChild?.childNodes[1];
     fireEvent.click(coinSelector);

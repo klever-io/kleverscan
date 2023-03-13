@@ -1,4 +1,5 @@
 import Chart, { ChartType } from '@/components/Chart';
+import { useHomeData } from '@/contexts/mainPage';
 import api from '@/services/api';
 import {
   ContainerTimeFilter,
@@ -16,53 +17,26 @@ import { format } from 'date-fns';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-  IDailyTransaction,
-  ITransaction,
-  ITransactionResponse,
-} from '../../types';
+import { IDailyTransaction } from '../../types';
 import { HomeLoader } from '../Loader/styles';
 import TransactionItem from '../TransactionItem';
 
 const HomeTransactions: React.FC = () => {
   const filterDays = [1, 7, 15, 30];
   const { t } = useTranslation('transactions');
+  const { transactions } = useHomeData();
   const { t: commonT } = useTranslation('common');
-  const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [transactionsList, setTransactionsList] = useState<IDailyTransaction[]>(
     [],
   );
   const [timeFilter, setTimeFilter] = useState(16);
   const [loadingDailyTxs, setLoadingDailyTxs] = useState(false);
 
-  const transactionsWatcherInterval = 4 * 1000;
-
-  useEffect(() => {
-    const getTransactions = async () => {
-      const transactions: ITransactionResponse = await api.get({
-        route: 'transaction/list?minify=true',
-      });
-      if (!transactions.error) {
-        setTransactions(transactions.data.transactions);
-      }
-    };
-
-    getTransactions();
-
-    const transactionsWatcher = setInterval(async () => {
-      getTransactions();
-    }, transactionsWatcherInterval);
-
-    return () => {
-      clearInterval(transactionsWatcher);
-    };
-  }, []);
-
   useEffect(() => {
     const fetchTotalDays = async () => {
       setLoadingDailyTxs(true);
       try {
-        const res = await api.getCached({
+        const res = await api.get({
           route: `transaction/list/count/${timeFilter}`,
         });
         if (!res.error || res.error === '') {

@@ -1,12 +1,12 @@
-import { assetsRequest } from '@/pages/account/[account]';
+import { ownedAssetsRequest } from '@/pages/account/[account]';
 import api from '@/services/api';
 import { screen } from '@testing-library/react';
 import * as nextRouter from 'next/router';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
+import ProprietaryAssets from '.';
 import { renderWithTheme } from '../../../test/utils';
-import Assets from './';
 import { mockAccountResponse, mockAssetsOwnerResponse } from './mock';
 
 export const headerTable = [
@@ -14,8 +14,8 @@ export const headerTable = [
   'ID',
   'Token Type',
   'Precision',
-  'Balance',
-  'Frozen',
+  'Circulating Supply',
+  'Frozen Balance',
 ];
 export const address =
   'klv18slsv4v8yxdarvvyxdwgvdeqwrna899k2vcshlrlc4xjuyjlhveqv78t8s'; //devnet account
@@ -96,11 +96,13 @@ describe('Component: Assets Tab', () => {
 
   it('Should render the Assets Tab correctly', async () => {
     const router = useRouter();
+
     const getRequest = (page: number, limit: number): Promise<any> => {
       const address = router.query.account as string;
 
-      return assetsRequest(address)(page, limit);
+      return ownedAssetsRequest(address)(page, limit);
     };
+
     const mockAssetsTableProps = {
       scrollUp: false,
       dataName: 'assets',
@@ -110,18 +112,21 @@ describe('Component: Assets Tab', () => {
 
     await act(async () => {
       renderWithTheme(
-        <Assets assetsTableProps={mockAssetsTableProps} address={address} />,
+        <ProprietaryAssets
+          assetsTableProps={mockAssetsTableProps}
+          address={address}
+        />,
       );
     });
 
     headerTable.map(header => {
       expect(screen.getByText(header)).toBeInTheDocument();
     });
-    const KLVs = screen.getAllByText('KLV');
-    KLVs.forEach(KLV => expect(KLV).toBeInTheDocument());
-    expect(KLVs).toHaveLength(2);
+    const TOAs = screen.getAllByText('TOA');
+    TOAs.forEach(TOA => expect(TOA).toBeInTheDocument());
+    expect(TOAs).toHaveLength(1);
     expect(screen.getByText('Fungible')).toBeInTheDocument();
-    expect(screen.getByText('20 Mi KLV')).toBeInTheDocument();
-    expect(screen.getByText('10 Mi KLV')).toBeInTheDocument();
+    expect(screen.getByText('20 Mi TOA')).toBeInTheDocument();
+    expect(screen.getByText('0 TOA')).toBeInTheDocument();
   });
 });

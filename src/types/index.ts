@@ -3,6 +3,7 @@ import { ISO2 } from '@/utils/country';
 import { Dispatch, SetStateAction } from 'react';
 import { IBlock } from './blocks';
 import { Contract, IContract, IParameterOnlyAssetId } from './contracts';
+import { INodeOverview } from './proposals';
 
 export type Query = {
   [key: string]: any;
@@ -235,6 +236,17 @@ export interface IAccountAsset {
   owner?: boolean;
 }
 
+export interface IProprietaryAsset {
+  assetId: string;
+  assetType: string;
+  precision: number;
+  circulatingSupply: number;
+  staking: {
+    interestType: string;
+    totalStaked: number;
+  };
+}
+
 export interface IAssetsHoldersResponse extends IResponse {
   data: {
     accounts: IAccountAsset[];
@@ -356,6 +368,7 @@ export interface ITxQuery {
   fromAddress?: string;
   toAddress?: string;
   account?: string;
+  tab?: string;
 }
 
 export interface IInnerTableProps {
@@ -568,7 +581,7 @@ export interface IDataCards {
   newTransactions: number;
   beforeYesterdayTransactions: number;
   actualTPS: string;
-  block: IBlock;
+  blocks: IBlock[];
   counterEpoch: number;
 }
 
@@ -623,6 +636,15 @@ export interface IStatisticsResponse extends IResponse {
     statistics: {
       chainStatistics: IChainStatistics;
     };
+  };
+}
+
+export interface IAggregateResponse extends IResponse {
+  data: {
+    blocks: IBlock[];
+    transactions: ITransaction[];
+    statistics: IChainStatistics;
+    overview: INodeOverview;
   };
 }
 

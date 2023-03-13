@@ -37,7 +37,7 @@ const Collection: React.FC<ICollectionPage> = () => {
   }, [router.isReady]);
 
   const requestCollection = (page: number, limit: number) =>
-    api.getCached({
+    api.get({
       route: `address/${address}/collection/${collection}?page=${page}&limit=${limit}`,
     });
 

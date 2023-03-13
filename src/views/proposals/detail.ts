@@ -296,7 +296,6 @@ export const HalfRow = styled.div`
 export const Row = styled.div`
   width: 100%;
   flex-wrap: wrap;
-
   color: ${props => props.theme.black};
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
@@ -321,7 +320,6 @@ export const Row = styled.div`
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
   }
-
   span {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -373,7 +371,6 @@ export const Row = styled.div`
   }
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    flex-direction: column;
     align-items: flex-start;
   }
   &:nth-child(2) {
@@ -381,6 +378,15 @@ export const Row = styled.div`
   }
 `;
 
+export const RowDescription = styled(Row)`
+  justify-content: space-between;
+  button {
+    color: ${props => props.theme.true.white};
+  }
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    justify-content: space-between;
+  }
+`;
 export const HoverLink = styled.span`
   cursor: pointer;
   width: fit-content;
@@ -479,11 +485,22 @@ export const NetworkParamsContainer = styled.div`
   }
 `;
 
-export const BigSpan = styled.span`
-  overflow: visible !important;
-  white-space: normal !important;
+export const BigSpan = styled.span<{ expandDescription?: boolean }>`
+  white-space: ${props =>
+    props.expandDescription ? 'normal' : 'nowrap'} !important;
+  margin-top: 0.5rem;
 `;
 
+export const DescriptionContainer = styled.div<{ expandDescription?: boolean }>`
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  gap: 0.8rem;
+  overflow: hidden !important;
+  button {
+    min-width: 5.5rem;
+  }
+`;
 export const EpochInfo = styled.span`
   width: fit-content !important;
 `;

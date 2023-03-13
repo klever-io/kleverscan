@@ -95,7 +95,9 @@ export const Transfer: React.FC<IIndexedContract> = ({ parameter: par }) => {
         </span>
         <CenteredRow>
           <strong>
-            {toLocaleFixed(parameter?.amount / 10 ** precision, precision)}
+            {parameter.amount
+              ? toLocaleFixed(parameter?.amount / 10 ** precision, precision)
+              : '--'}
           </strong>
           {parameter?.assetId?.split('/')[0] &&
           parameter?.assetId?.split('/')[0] !== 'KLV' ? (

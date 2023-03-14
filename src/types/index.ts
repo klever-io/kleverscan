@@ -336,6 +336,21 @@ export interface IAsset {
   mime?: string;
 }
 
+export interface IAssetPool {
+  ownerAddress: string;
+  kda: string;
+  active: boolean;
+  klvBalance: number;
+  kdaBalance: number;
+  convertedFees: number;
+  adminAddress: string;
+  fRatioKLV: number;
+  fRatioKDA: number;
+  hidden: boolean;
+  verified: boolean;
+  ratio: number;
+}
+
 export interface IParsedAsset extends IAsset {
   nonce: string;
   nonceOwner: string;
@@ -601,6 +616,12 @@ export interface IAssetTransactionResponse extends IResponse {
     transactions: ITransactionAssetIds[];
   };
   pagination: IPagination;
+}
+
+export interface IAssetPoolResponse extends IResponse {
+  data: {
+    pool: IAssetPool;
+  };
 }
 
 export interface ITransactionListResponse extends IResponse {

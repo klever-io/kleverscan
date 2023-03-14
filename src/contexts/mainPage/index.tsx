@@ -172,8 +172,14 @@ export const HomeDataProvider: React.FC = ({ children }) => {
 
             case 2:
               const newTotalTransactions = value.pagination.totalRecords;
-              if (totalTransactions && totalTransactions < newTotalTransactions)
+              if (!totalTransactions) {
+                setTotalTransactions(newTotalTransactions);
+              } else if (
+                totalTransactions &&
+                totalTransactions < newTotalTransactions
+              )
                 setTotalTransactions(value.pagination.totalRecords);
+
               setTransactions(value.data.transactions);
               break;
             case 3:

@@ -306,6 +306,7 @@ export const ContractProvider: React.FC = ({ children }) => {
         'Freeze',
         'Unfreeze',
         'Asset Trigger',
+        'Deposit',
       ];
       const filterContractOptions = contractOptions.filter(contract =>
         allowedMultiContract.includes(contract.label),

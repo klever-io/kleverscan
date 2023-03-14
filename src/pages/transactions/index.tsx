@@ -11,6 +11,7 @@ import { MultiContractToolTip } from '@/components/MultiContractToolTip';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import TransactionsFilters from '@/components/TransactionsFilters';
+import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import { capitalizeString } from '@/utils/convertString';
@@ -273,15 +274,14 @@ const Transactions: React.FC = () => {
       <Title title="Transactions" Icon={Icon} />
 
       <Header>
-        <div>
+        <FilterContainer>
           <TransactionsFilters
             {...transactionsFiltersProps}
           ></TransactionsFilters>
           <FilterByDate>
             <DateFilter {...dateFilterProps} />
           </FilterByDate>
-        </div>
-        <div></div>
+        </FilterContainer>
       </Header>
       <Table {...tableProps} />
     </Container>

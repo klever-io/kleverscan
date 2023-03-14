@@ -203,7 +203,6 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
             withdrawType,
             assetID,
             itoTriggerType,
-            isNFT,
             metadata,
             selectedBucket,
           }: IFormsData) => {

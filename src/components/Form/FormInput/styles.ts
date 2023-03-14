@@ -115,7 +115,7 @@ export const StyledTextArea = styled.textarea<IProps>`
   min-width: 100%;
   max-width: 100%;
 
-  min-height: 5rem;
+  min-height: 10rem;
 `;
 
 export const Container = styled.div<IProps>`

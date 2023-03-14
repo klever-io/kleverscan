@@ -10,6 +10,8 @@ const proposalContract = (paramsList?: IParamList[]): ISection[] => {
         label: 'Description',
         props: {
           tooltip: 'Outline the ideas of the proposal',
+          type: 'textarea',
+          span: 2,
         },
       },
       {
@@ -18,6 +20,7 @@ const proposalContract = (paramsList?: IParamList[]): ISection[] => {
           required: true,
           tooltip:
             'The time the proposal will be available for voting ( each epoch has 6h )',
+          span: 2,
         },
       },
     ],

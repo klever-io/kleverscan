@@ -1706,6 +1706,16 @@ export const CreateMarketplace: React.FC<IIndexedContract> = ({
         </span>
         <span>{parameter?.referralAddress}</span>
       </Row>
+      <Row>
+        <span>
+          <strong>Referral Percent</strong>
+        </span>
+        <span>
+          {parameter?.referralPercentage
+            ? `${parameter.referralPercentage / 100} %`
+            : '--'}
+        </span>
+      </Row>
     </>
   );
 };
@@ -1745,7 +1755,11 @@ export const ConfigMarketplace: React.FC<IIndexedContract> = ({
         <span>
           <strong>Referral Percent</strong>
         </span>
-        <span>{parameter?.referralPercentage / 100}%</span>
+        <span>
+          {parameter?.referralPercentage
+            ? `${parameter.referralPercentage / 100} %`
+            : '--'}
+        </span>
       </Row>
     </>
   );

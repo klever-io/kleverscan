@@ -1,4 +1,5 @@
 import { Assets as Icon } from '@/assets/title-icons';
+import Copy from '@/components/Copy';
 import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
@@ -8,7 +9,12 @@ import api from '@/services/api';
 import { IAsset, IPagination, IResponse, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
 import { useFetchPartialAsset } from '@/utils/hooks';
-import { Container, Header, HeaderContainer } from '@/views/assets';
+import {
+  Container,
+  ContainerAssetId,
+  Header,
+  HeaderContainer,
+} from '@/views/assets';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { ReactNode, useEffect, useState } from 'react';
@@ -139,9 +145,12 @@ const Assets: React.FC = () => {
 
       {
         element: (
-          <Link href={`/asset/${assetId}`} key={assetId}>
-            {assetId}
-          </Link>
+          <ContainerAssetId>
+            <Link href={`/asset/${assetId}`} key={assetId}>
+              {assetId}
+            </Link>
+            <Copy info="Asset ID" data={assetId} />
+          </ContainerAssetId>
         ),
         span: 1,
       },

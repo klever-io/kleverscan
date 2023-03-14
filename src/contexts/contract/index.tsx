@@ -120,7 +120,7 @@ export const ContractProvider: React.FC = ({ children }) => {
   const [contractOptions, setContractOptions] =
     useState<IContractOption[]>(allContractOptions);
 
-  const { logoutExtension } = useExtension();
+  const { logoutExtension, extensionInstalled } = useExtension();
   const router = useRouter();
 
   const getOwnerAddress = () => {
@@ -160,100 +160,94 @@ export const ContractProvider: React.FC = ({ children }) => {
   }, [txHash]);
 
   const getAssets = async () => {
-    if (typeof window !== 'undefined') {
-      const address = sessionStorage.getItem('walletAddress') || '';
+    const address = sessionStorage.getItem('walletAddress') || '';
 
-      if (address === '' && router.pathname === '/create-transaction') {
-        logoutExtension();
-        toast.error('Please connect your wallet to create a transaction');
-        router.push('/');
-        return;
-      }
-
-      getKAssets(address);
-
-      const account: IAccountResponse = await api.get({
-        route: `address/${address}`,
-      });
-
-      if (
-        !account?.data?.account?.assets &&
-        account?.data?.account?.balance === 0
-      ) {
-        setAssetsLists([]);
-        return;
-      }
-
-      const accountData: IAccount = account?.data?.account
-        ? account.data.account
-        : {
-            assets: [],
-            frozenBalance: 0,
-            balance: 0,
-          };
-
-      const { assets, frozenBalance, balance } = accountData;
-      const list: ICollectionList[] = [];
-      const addAssetsInfo = Object.keys(assets).map(async item => {
-        const assetInfo: IAssetOne = await api.get({
-          route: `assets/${item}`,
-        });
-
-        const minEpochsToWithdraw =
-          assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
-
-        list.push({
-          ...assets[item],
-          label: item,
-          value: item,
-          isNFT: assets[item].assetType === 1,
-          minEpochsToWithdraw: minEpochsToWithdraw ? minEpochsToWithdraw : null,
-        });
-      });
-
-      await Promise.all(addAssetsInfo);
-
-      if (!Object.keys(assets).includes('KLV') && balance !== 0) {
-        const assetInfo: IAssetOne = await api.get({
-          route: `assets/KLV`,
-        });
-
-        const minEpochsToWithdraw =
-          assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
-
-        list.push({
-          label: 'KLV',
-          value: 'KLV',
-          precision: KLV_PRECISION,
-          isNFT: false,
-          minEpochsToWithdraw: minEpochsToWithdraw ? minEpochsToWithdraw : null,
-          balance,
-          frozenBalance,
-        });
-      }
-      list.sort((a, b) => (a.label > b.label ? 1 : -1));
-
-      const KLV = list.splice(
-        list.indexOf(
-          list.find(item => item.label === 'KLV') as ICollectionList,
-        ),
-        1,
-      );
-
-      const KFI = list.splice(
-        list.indexOf(
-          list.find(item => item.label === 'KFI') as ICollectionList,
-        ),
-        1,
-      );
-
-      setAssetsLists([...KLV, ...KFI, ...list]);
+    if (address === '' && router.pathname === '/create-transaction') {
+      logoutExtension && logoutExtension();
+      return;
     }
+
+    getKAssets(address);
+
+    const account: IAccountResponse = await api.get({
+      route: `address/${address}`,
+    });
+
+    if (
+      !account?.data?.account?.assets &&
+      account?.data?.account?.balance === 0
+    ) {
+      setAssetsLists([]);
+      return;
+    }
+
+    const accountData: IAccount = account?.data?.account
+      ? account.data.account
+      : {
+          assets: [],
+          frozenBalance: 0,
+          balance: 0,
+        };
+
+    const { assets, frozenBalance, balance } = accountData;
+    const list: ICollectionList[] = [];
+    const addAssetsInfo = Object.keys(assets).map(async item => {
+      const assetInfo: IAssetOne = await api.get({
+        route: `assets/${item}`,
+      });
+
+      const minEpochsToWithdraw =
+        assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
+
+      list.push({
+        ...assets[item],
+        label: item,
+        value: item,
+        isNFT: assets[item].assetType === 1,
+        minEpochsToWithdraw: minEpochsToWithdraw ? minEpochsToWithdraw : null,
+      });
+    });
+
+    await Promise.all(addAssetsInfo);
+
+    if (!Object.keys(assets).includes('KLV') && balance !== 0) {
+      const assetInfo: IAssetOne = await api.get({
+        route: `assets/KLV`,
+      });
+
+      const minEpochsToWithdraw =
+        assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
+
+      list.push({
+        label: 'KLV',
+        value: 'KLV',
+        precision: KLV_PRECISION,
+        isNFT: false,
+        minEpochsToWithdraw: minEpochsToWithdraw ? minEpochsToWithdraw : null,
+        balance,
+        frozenBalance,
+      });
+    }
+    list.sort((a, b) => (a.label > b.label ? 1 : -1));
+
+    const KLV = list.splice(
+      list.indexOf(list.find(item => item.label === 'KLV') as ICollectionList),
+      1,
+    );
+
+    const KFI = list.splice(
+      list.indexOf(list.find(item => item.label === 'KFI') as ICollectionList),
+      1,
+    );
+
+    setAssetsLists([...KLV, ...KFI, ...list]);
   };
 
   useEffect(() => {
-    getAssets();
-  }, []);
+    if (extensionInstalled) {
+      getAssets();
+    }
+  }, [extensionInstalled]);
 
   const contractProps = {
     contractType,
@@ -312,6 +306,7 @@ export const ContractProvider: React.FC = ({ children }) => {
         'Freeze',
         'Unfreeze',
         'Asset Trigger',
+        'Deposit',
       ];
       const filterContractOptions = contractOptions.filter(contract =>
         allowedMultiContract.includes(contract.label),

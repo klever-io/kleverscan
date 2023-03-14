@@ -1,10 +1,11 @@
+import { getStatusIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
 import { ISelectedDays } from '@/components/DateFilter';
 import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import QrCodeModal from '@/components/QrCodeModal';
 import Skeleton from '@/components/Skeleton';
-import { EmptyRow } from '@/components/Table/styles';
+import { EmptyRow, Status } from '@/components/Table/styles';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Holders from '@/components/Tabs/Holders';
 import Transactions from '@/components/Tabs/Transactions';
@@ -12,13 +13,18 @@ import api from '@/services/api';
 import {
   IAccountAsset,
   IAsset,
+  IAssetPool,
+  IAssetPoolResponse,
+  IAssetResponse,
   IBalance,
   IPagination,
   IResponse,
   ITransaction,
+  ITransactionResponse,
   IUri,
 } from '@/types/index';
 import { filterDate, formatDate, toLocaleFixed } from '@/utils/formatFunctions';
+import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseHardCodedInfo, parseHolders } from '@/utils/parseValues';
 import { resetDate } from '@/utils/resetDate';
 import { timestampToDate } from '@/utils/timeFunctions';
@@ -57,22 +63,9 @@ interface IAssetPage {
   page: number;
 }
 
-interface IAssetResponse extends IResponse {
-  data: {
-    asset: IAsset;
-  };
-}
-
 interface IHoldersResponse extends IResponse {
   data: {
     accounts: IAccountAsset[];
-  };
-  pagination: IPagination;
-}
-
-interface ITransactionResponse extends IResponse {
-  data: {
-    transactions: ITransaction[];
   };
   pagination: IPagination;
 }
@@ -82,6 +75,8 @@ const Asset: React.FC<IAssetPage> = ({}) => {
   const tableHeaders = ['Transactions', 'Holders'];
   const [selectedTab, setSelectedTab] = useState<null | string>(null);
   const [asset, setAsset] = useState<null | IAsset>(null);
+  const [assetPool, setAssetPool] = useState<null | IAssetPool>(null);
+
   const [transactionsPagination, setTransactionsPagination] =
     useState<null | IPagination>(null);
   const [holdersPagination, setHoldersPagination] =
@@ -89,6 +84,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
   const cardHeaders = asset?.uris
     ? ['Overview', 'More', 'URIS', 'Staking & Royalties']
     : ['Overview', 'More'];
+  assetPool && cardHeaders.push('KDA Pool');
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
 
   const initialQueryState = {
@@ -189,6 +185,20 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         },
       );
 
+      const assetPoolCall = new Promise<IAssetPoolResponse>(
+        async (resolve, reject) => {
+          const res = await api.get({
+            route: `assets/pool/${assetId}`,
+          });
+
+          if (!res.error || res.error === '') {
+            resolve(res);
+          }
+
+          reject(res.error);
+        },
+      );
+
       const holdersCall = new Promise<IHoldersResponse>(
         async (resolve, reject) => {
           const res = await api.get({
@@ -203,26 +213,32 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         },
       );
 
-      await Promise.allSettled([assetCall, transactionCall, holdersCall]).then(
-        responses => {
-          responses.forEach((res, index) => {
-            if (res.status === 'fulfilled') {
-              if (index === 0) {
-                const asset: any = res.value;
-                const parsedAsset = parseHardCodedInfo([asset?.data?.asset])[0];
-                parseURIs(parsedAsset);
-                setAsset(parsedAsset);
-              } else if (index === 1) {
-                const transactions: any = res.value;
-                setTransactionsPagination(transactions?.pagination);
-              } else if (index === 2) {
-                const holders: any = res.value;
-                setHoldersPagination(holders?.pagination);
-              }
+      await Promise.allSettled([
+        assetCall,
+        transactionCall,
+        holdersCall,
+        assetPoolCall,
+      ]).then(responses => {
+        responses.forEach((res, index) => {
+          if (res.status === 'fulfilled') {
+            if (index === 0) {
+              const asset: any = res.value;
+              const parsedAsset = parseHardCodedInfo([asset?.data?.asset])[0];
+              parseURIs(parsedAsset);
+              setAsset(parsedAsset);
+            } else if (index === 1) {
+              const transactions: any = res.value;
+              setTransactionsPagination(transactions?.pagination);
+            } else if (index === 2) {
+              const holders: any = res.value;
+              setHoldersPagination(holders?.pagination);
+            } else if (index === 3) {
+              const assetPool: any = res.value;
+              setAssetPool(assetPool.data.pool);
             }
-          });
-        },
-      );
+          }
+        });
+      });
     }
   };
 
@@ -369,6 +385,116 @@ const Asset: React.FC<IAssetPage> = ({}) => {
     );
   };
 
+  const KDAPool: React.FC = () => {
+    const isActive = assetPool?.active;
+    const ActiveIcon = getStatusIcon(isActive ? 'success' : 'fail');
+
+    return (
+      <>
+        <Row isStakingRoyalties={false}>
+          <span>
+            <strong>Owner</strong>
+          </span>
+
+          <span>
+            <CenteredRow>
+              <Link href={`/account/${assetPool?.ownerAddress}`}>
+                <HoverAnchor>{assetPool?.ownerAddress}</HoverAnchor>
+              </Link>
+              <Copy data={assetPool?.ownerAddress} info="ownerAddress" />
+              <ReceiveBackground isOverflow={true}>
+                <QrCodeModal
+                  value={assetPool?.ownerAddress as string}
+                  isOverflow={true}
+                />
+              </ReceiveBackground>
+            </CenteredRow>
+          </span>
+        </Row>
+        <Row isStakingRoyalties={false}>
+          <span>
+            <strong>Is Active</strong>
+          </span>
+          <span>
+            <small>
+              {assetPool ? (
+                <Status
+                  status={isActive ? 'success' : 'fail'}
+                  key={String(isActive)}
+                >
+                  <ActiveIcon />
+                  <p>{isActive ? 'Yes' : 'No'}</p>
+                </Status>
+              ) : (
+                <Skeleton />
+              )}
+            </small>
+          </span>
+        </Row>
+        <Row isStakingRoyalties={false}>
+          <span>
+            <strong>KLV Balance</strong>
+          </span>
+          <span>
+            <small>
+              {assetPool ? (
+                toLocaleFixed(
+                  assetPool?.klvBalance / 10 ** KLV_PRECISION,
+                  KLV_PRECISION,
+                )
+              ) : (
+                <Skeleton />
+              )}
+            </small>
+          </span>
+        </Row>
+        <Row isStakingRoyalties={false}>
+          <span>
+            <strong>KDA Balance</strong>
+          </span>
+          <span>
+            <small>
+              {assetPool && asset ? (
+                toLocaleFixed(
+                  (assetPool?.kdaBalance / 10 || 0) ** asset?.precision,
+                  asset?.precision,
+                )
+              ) : (
+                <Skeleton />
+              )}
+            </small>
+          </span>
+        </Row>
+        <Row isStakingRoyalties={false}>
+          <span>
+            <strong>Converted Fees</strong>
+          </span>
+          <span>
+            <small>
+              {assetPool ? String(assetPool.convertedFees) : <Skeleton />}
+            </small>
+          </span>
+        </Row>
+        <Row isStakingRoyalties={false}>
+          <span>
+            <strong>Admin Address</strong>
+          </span>
+          <span>
+            <small>
+              {assetPool ? String(assetPool.adminAddress) : <Skeleton />}
+            </small>
+          </span>
+        </Row>
+        <Row isStakingRoyalties={false}>
+          <span>
+            <strong>Ratio</strong>
+          </span>
+          <span>{assetPool ? String(assetPool.ratio) : <Skeleton />}</span>
+        </Row>
+      </>
+    );
+  };
+
   const UriComponent: React.FC = () => {
     return (
       <>
@@ -397,6 +523,16 @@ const Asset: React.FC<IAssetPage> = ({}) => {
   };
 
   const More: React.FC = () => {
+    const statusWithIcon = (action: boolean) => {
+      const StatusIcon = getStatusIcon(action ? 'success' : 'fail');
+
+      return (
+        <Status status={action ? 'success' : 'fail'} key={String(action)}>
+          <StatusIcon />
+          <p>{action ? 'Yes' : 'No'}</p>
+        </Status>
+      );
+    };
     return (
       <>
         <Row isStakingRoyalties={false}>
@@ -437,41 +573,51 @@ const Asset: React.FC<IAssetPage> = ({}) => {
             <strong>Can Freeze</strong>
           </span>
           <span>
-            {asset ? String(asset.properties.canFreeze) : <Skeleton />}
+            {asset ? statusWithIcon(asset.properties.canFreeze) : <Skeleton />}
           </span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
             <strong>Can Wipe</strong>
           </span>
-          <span>{asset ? String(asset.properties.canWipe) : <Skeleton />}</span>
+          <span>
+            {asset ? statusWithIcon(asset.properties.canWipe) : <Skeleton />}
+          </span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
             <strong>Can Pause</strong>
           </span>
           <span>
-            {asset ? String(asset.properties.canPause) : <Skeleton />}
+            {asset ? statusWithIcon(asset.properties.canPause) : <Skeleton />}
           </span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
             <strong>Can Mint</strong>
           </span>
-          <span>{asset ? String(asset.properties.canMint) : <Skeleton />}</span>
+          <span>
+            {asset ? statusWithIcon(asset.properties.canMint) : <Skeleton />}
+          </span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
             <strong>Can Burn</strong>
           </span>
-          <span>{asset ? String(asset.properties.canBurn) : <Skeleton />}</span>
+          <span>
+            {asset ? statusWithIcon(asset.properties.canBurn) : <Skeleton />}
+          </span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
             <strong>Can Change Owner</strong>
           </span>
           <span>
-            {asset ? String(asset.properties.canChangeOwner) : <Skeleton />}
+            {asset ? (
+              statusWithIcon(asset.properties.canChangeOwner)
+            ) : (
+              <Skeleton />
+            )}
           </span>
         </Row>
         <Row isStakingRoyalties={false}>
@@ -479,7 +625,11 @@ const Asset: React.FC<IAssetPage> = ({}) => {
             <strong>Can Add Roles</strong>
           </span>
           <span>
-            {asset ? String(asset.properties.canAddRoles) : <Skeleton />}
+            {asset ? (
+              statusWithIcon(asset.properties.canAddRoles)
+            ) : (
+              <Skeleton />
+            )}
           </span>
         </Row>
         <Row isStakingRoyalties={false}>
@@ -487,7 +637,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
             <strong>Paused</strong>
           </span>
           <span>
-            {asset ? String(asset.attributes.isPaused) : <Skeleton />}
+            {asset ? statusWithIcon(asset.attributes.isPaused) : <Skeleton />}
           </span>
         </Row>
         <Row isStakingRoyalties={false}>
@@ -495,7 +645,11 @@ const Asset: React.FC<IAssetPage> = ({}) => {
             <strong>NFT Mint Stopped</strong>
           </span>
           <span>
-            {asset ? String(asset.attributes.isNFTMintStopped) : <Skeleton />}
+            {asset ? (
+              statusWithIcon(asset.attributes.isNFTMintStopped)
+            ) : (
+              <Skeleton />
+            )}
           </span>
         </Row>
       </>
@@ -673,6 +827,8 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         return <UriComponent />;
       case 'Staking & Royalties':
         return <StakingRoyalties />;
+      case 'KDA Pool':
+        return <KDAPool />;
       default:
         return <div />;
     }

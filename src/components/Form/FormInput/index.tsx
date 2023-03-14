@@ -51,7 +51,6 @@ const FormInput: React.FC<IFormInputProps> = ({
   maxDecimals,
   ...rest
 }) => {
-  const [typeInput, setTypeInput] = useState(type);
   const inputRef = useRef<HTMLInputElement>(null);
   const areaRef = useRef<HTMLTextAreaElement>(null);
   const { fieldName, registerField, error } = useField(name);
@@ -80,12 +79,6 @@ const FormInput: React.FC<IFormInputProps> = ({
   }, [type, defaultValue, bool, inputProps]);
 
   const [value, setValue] = useState(getInitialValue());
-
-  useEffect(() => {
-    if (title === 'Description') {
-      setTypeInput('textarea');
-    }
-  }, [title]);
 
   useEffect(() => {
     if (type !== 'textarea' && type !== 'dropdown') {
@@ -171,7 +164,7 @@ const FormInput: React.FC<IFormInputProps> = ({
 
   return (
     <Container {...containerProps}>
-      {typeInput !== 'hidden' && (
+      {type !== 'hidden' && (
         <InputLabel disabled={inputProps.disabled}>
           <span>{title} </span>
           {tooltip && (
@@ -184,7 +177,7 @@ const FormInput: React.FC<IFormInputProps> = ({
           )}
         </InputLabel>
       )}
-      {typeInput === 'checkbox' && toggleOptions && (
+      {type === 'checkbox' && toggleOptions && (
         <>
           <ToggleContainer
             onChange={handleChange}
@@ -208,28 +201,28 @@ const FormInput: React.FC<IFormInputProps> = ({
           </ToggleContainer>
         </>
       )}
-      {typeInput === 'dropdown' && (
+      {type === 'dropdown' && (
         <>
           <Select {...selectProps} inputRef={inputRef} />
           {error && <span>{description}</span>}
         </>
       )}
-      {typeInput === 'textarea' && (
+      {type === 'textarea' && (
         <>
           <StyledTextArea ref={areaRef} onKeyDown={handleKey} />
           {error && <span>{description}</span>}
         </>
       )}
-      {typeInput === 'hidden' && (
+      {type === 'hidden' && (
         <>
           <StyledInput {...inputProps} />
           {error && <span>{description}</span>}
         </>
       )}
-      {typeInput !== 'checkbox' &&
-        typeInput !== 'dropdown' &&
-        typeInput !== 'textarea' &&
-        typeInput !== 'hidden' && (
+      {type !== 'checkbox' &&
+        type !== 'dropdown' &&
+        type !== 'textarea' &&
+        type !== 'hidden' && (
           <>
             <StyledInput {...inputProps} />
             {error && <span>{description}</span>}

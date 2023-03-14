@@ -118,6 +118,7 @@ const Contract: React.FC<IContract> = ({
   const [collection, setCollection] = useState<ICollectionList | undefined>(
     {} as ICollectionList,
   );
+
   const [proposalId, setProposalId] = useState<number | null>(null);
   const [depositType, setDepositType] = useState<string | null>(null);
   const [binaryOperations, setBinaryOperations] = useState([]);
@@ -520,6 +521,7 @@ const Contract: React.FC<IContract> = ({
     itoTriggerType,
     metadata,
     selectedBucket,
+    depositType,
   };
 
   const permissionsForm = () => (

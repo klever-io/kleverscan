@@ -1,6 +1,6 @@
 import { ISection } from '@/components/Form';
 
-const configMarketplaceContract = (): ISection[] => {
+const configMarketplaceContract = (address = ''): ISection[] => {
   const section = [] as ISection[];
 
   section.push({
@@ -23,6 +23,7 @@ const configMarketplaceContract = (): ISection[] => {
         label: 'Referral Address',
         props: {
           tooltip: 'New Referral Address',
+          defaultValue: address,
         },
       },
       {

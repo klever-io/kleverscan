@@ -91,7 +91,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
     };
   }, []);
 
-  useDidUpdateEffect(() => {
+  useEffect(() => {
     if (extensionInstalled) {
       connectExtension();
     }

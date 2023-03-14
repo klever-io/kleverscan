@@ -258,7 +258,8 @@ const Account: React.FC<IAccountPage> = () => {
   const [collectionSelected, setCollectionSelected] = useState<IAccountAsset>();
   const [valueContract, setValueContract] = useState<any>();
 
-  const { walletAddress } = useExtension();
+  const { walletAddress, extensionInstalled, connectExtension } =
+    useExtension();
   const { isTablet } = useMobile();
   const router = useRouter();
 
@@ -271,6 +272,12 @@ const Account: React.FC<IAccountPage> = () => {
       shallow: true,
     });
   };
+
+  useEffect(() => {
+    if (extensionInstalled) {
+      connectExtension();
+    }
+  }, [extensionInstalled]);
 
   useEffect(() => {
     if (!router.isReady) return;

@@ -95,7 +95,9 @@ export const Transfer: React.FC<IIndexedContract> = ({ parameter: par }) => {
         </span>
         <CenteredRow>
           <strong>
-            {toLocaleFixed(parameter?.amount / 10 ** precision, precision)}
+            {parameter.amount
+              ? toLocaleFixed(parameter?.amount / 10 ** precision, precision)
+              : '--'}
           </strong>
           {parameter?.assetId?.split('/')[0] &&
           parameter?.assetId?.split('/')[0] !== 'KLV' ? (
@@ -1704,6 +1706,16 @@ export const CreateMarketplace: React.FC<IIndexedContract> = ({
         </span>
         <span>{parameter?.referralAddress}</span>
       </Row>
+      <Row>
+        <span>
+          <strong>Referral Percent</strong>
+        </span>
+        <span>
+          {parameter?.referralPercentage
+            ? `${parameter.referralPercentage / 100} %`
+            : '--'}
+        </span>
+      </Row>
     </>
   );
 };
@@ -1743,7 +1755,11 @@ export const ConfigMarketplace: React.FC<IIndexedContract> = ({
         <span>
           <strong>Referral Percent</strong>
         </span>
-        <span>{parameter?.referralPercentage / 100}%</span>
+        <span>
+          {parameter?.referralPercentage
+            ? `${parameter.referralPercentage / 100} %`
+            : '--'}
+        </span>
       </Row>
     </>
   );

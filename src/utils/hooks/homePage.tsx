@@ -90,9 +90,8 @@ export const useHomePageData = (): IHome => {
 
       const blocksCall = new Promise<IBlockResponse>(
         async (resolve, reject) => {
-          const res = await api.getCached({
+          const res = await api.get({
             route: 'block/list?minify=true',
-            refreshTime: 4,
           });
 
           if (!res.error || res.error === '') {
@@ -105,7 +104,7 @@ export const useHomePageData = (): IHome => {
 
       const transactionsCall = new Promise<IBlockResponse>(
         async (resolve, reject) => {
-          const res = await api.getCached({
+          const res = await api.get({
             route: 'transaction/list?minify=true',
           });
 
@@ -119,7 +118,7 @@ export const useHomePageData = (): IHome => {
 
       const transactionsListCall = new Promise<ITransactionListResponse>(
         async (resolve, reject) => {
-          const res = await api.getCached({
+          const res = await api.get({
             route: 'transaction/list/count/15',
           });
 
@@ -133,7 +132,7 @@ export const useHomePageData = (): IHome => {
 
       const accountsCall = new Promise<IAccountResponse>(
         async (resolve, reject) => {
-          const res = await api.getCached({
+          const res = await api.get({
             route: 'address/list',
           });
 
@@ -147,7 +146,7 @@ export const useHomePageData = (): IHome => {
 
       const statisticsCall = new Promise<IAccountResponse>(
         async (resolve, reject) => {
-          const res = await api.getCached({
+          const res = await api.get({
             route: 'node/statistics',
             service: Service.PROXY,
           });
@@ -177,7 +176,7 @@ export const useHomePageData = (): IHome => {
 
       const klvDataCall = new Promise<IAccountResponse>(
         async (resolve, reject) => {
-          const res = await api.getCached({
+          const res = await api.get({
             route: 'coins/klever',
             service: Service.GECKO,
           });
@@ -192,7 +191,7 @@ export const useHomePageData = (): IHome => {
 
       const klvChartCall = new Promise<IAccountResponse>(
         async (resolve, reject) => {
-          const res = await api.getCached({
+          const res = await api.get({
             route: `coins/klever/market_chart?vs_currency=usd&days=1`,
             service: Service.GECKO,
           });
@@ -207,7 +206,7 @@ export const useHomePageData = (): IHome => {
 
       const kfiDataCall = new Promise<IAccountResponse>(
         async (resolve, reject) => {
-          const res = await api.getCached({
+          const res = await api.get({
             route: 'coins/klever-finance',
             service: Service.GECKO,
           });
@@ -222,7 +221,7 @@ export const useHomePageData = (): IHome => {
 
       const kfiChartCall = new Promise<IAccountResponse>(
         async (resolve, reject) => {
-          const res = await api.getCached({
+          const res = await api.get({
             route: `coins/klever-finance/market_chart?vs_currency=usd&days=1`,
             service: Service.GECKO,
           });
@@ -237,7 +236,7 @@ export const useHomePageData = (): IHome => {
 
       const yesterdayTransactionsCall = new Promise<IAccountResponse>(
         async (resolve, reject) => {
-          const res = await api.getCached({
+          const res = await api.get({
             route: 'transaction/list/count/1',
           });
 
@@ -251,7 +250,7 @@ export const useHomePageData = (): IHome => {
 
       const beforeYesterdayTransactionsCall = new Promise<IAccountResponse>(
         async (resolve, reject) => {
-          const res = await api.getCached({
+          const res = await api.get({
             route: `transaction/list?startdate=${
               new Date().getTime() - 86400000 * 2
             }&enddate=${new Date().getTime() - 86400000}`,
@@ -267,7 +266,7 @@ export const useHomePageData = (): IHome => {
 
       const yesterdayAccountsCall = new Promise<IAccountResponse>(
         async (resolve, reject) => {
-          const res = await api.getCached({
+          const res = await api.get({
             route: 'address/list/count/1',
           });
 

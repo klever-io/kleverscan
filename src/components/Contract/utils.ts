@@ -220,7 +220,7 @@ const precisionParse = async (
         const assetId = payload.kda ? payload.kda : payload.assetId;
         precision = (await getPrecision(assetId)) as number;
         if (precision !== undefined) {
-          payload.maxAmount = payload.maxAmount * precision;
+          payload.maxAmount = addPrecision(payload.maxAmount, precision);
         } else return;
       }
     case 'ITOTriggerContract':
@@ -234,7 +234,7 @@ const precisionParse = async (
       assetId = payload.currencyId;
       precision = (await getPrecision(assetId)) as number;
       if (precision !== undefined) {
-        payload.amount = payload.amount * precision;
+        payload.amount = addPrecision(payload.amount, precision);
       } else return;
       break;
     case 'SellContract':

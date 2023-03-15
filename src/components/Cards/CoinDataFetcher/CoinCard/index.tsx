@@ -1,10 +1,12 @@
 import { ArrowDown } from '@/assets/icons';
 import Chart, { ChartType } from '@/components/Chart';
-import { ICoinCards, ICoinInfo } from '@/types/index';
+import { useHomeData } from '@/contexts/mainPage';
+import { ICoinInfo } from '@/types/index';
 import { getVariation } from '@/utils';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useCallback, useRef, useState } from 'react';
+import CoinCardSkeleton from '../CoinCardSkeleton';
 import {
   ArrowDownDiv,
   CardContainer,
@@ -30,12 +32,14 @@ interface IDropDow {
   volume: { price: number; variation: number };
 }
 
-const CoinCard: React.FC<ICoinCards> = ({ assetsData, coins }) => {
+const CoinCard: React.FC = () => {
   const [selectedCoin, setSelectedCoin] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const [arrowOpen, setArrowOpen] = useState(false);
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
+
+  const { assetsData, coins, loadingCoins } = useHomeData();
 
   const handleSelectCoin = useCallback(() => {
     if (carouselRef.current !== null && cardRef.current !== null)
@@ -226,7 +230,7 @@ const CoinCard: React.FC<ICoinCards> = ({ assetsData, coins }) => {
     );
   };
 
-  return (
+  return !loadingCoins ? (
     <Container>
       <Content ref={carouselRef} onScroll={handleSelectCoin}>
         {coins.map((coin, index) => {
@@ -348,6 +352,8 @@ const CoinCard: React.FC<ICoinCards> = ({ assetsData, coins }) => {
         ))}
       </CoinsSelector>
     </Container>
+  ) : (
+    <CoinCardSkeleton />
   );
 };
 

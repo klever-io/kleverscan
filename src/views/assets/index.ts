@@ -125,3 +125,14 @@ export const Input = styled(DefaultInput)`
 
   border-color: ${props => props.theme.lightGray};
 `;
+
+export const ContainerAssetId = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  div {
+    max-height: 24px;
+    min-width: fit-content;
+  }
+`;

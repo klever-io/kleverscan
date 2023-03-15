@@ -110,7 +110,7 @@ export const useFetchPartialAsset = (): [
             value &&
             !assets.find(asset => asset.assetId.includes(value.toUpperCase()))
           ) {
-            response = await api.getCached({
+            response = await api.get({
               route: `assets/kassets?asset=${value}`,
             });
             if (!response.data.assets.length) {

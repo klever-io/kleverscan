@@ -122,12 +122,13 @@ export const CardContent = styled.div`
 export const Row = styled.div<{ isStakingRoyalties: boolean }>`
   width: 100%;
   padding: 1.5rem 2rem;
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: ${props => (props.isStakingRoyalties ? 'column' : 'row')};
     align-items: start;
     span:nth-child(1) {
       padding-bottom: 15px;
       padding-left: 15px;
+      min-width: 10rem;
     }
   }
   display: flex;

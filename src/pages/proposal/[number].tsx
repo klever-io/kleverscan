@@ -38,6 +38,7 @@ import {
   CardVote,
   CardVoteContainer,
   Container,
+  DescriptionContainer,
   EmptyDescription,
   FiltersValidators,
   HalfRow,
@@ -54,12 +55,14 @@ import {
   QtyVotesText,
   Row,
   RowContent,
+  RowDescription,
   StatusContent,
   ValidatorsContainer,
   VerticalLine,
   VotesContainer,
   VotesHeader,
 } from '@/views/proposals/detail';
+import { ButtonExpand } from '@/views/transactions/detail';
 import { CenteredRow } from '@/views/validators/detail';
 import { format, fromUnixTime } from 'date-fns';
 import Link from 'next/link';
@@ -118,6 +121,7 @@ const ProposalDetails: React.FC = () => {
   const [overview, setOverview] = useState<null | INodeOverview>(null);
   const [selectedFilter, setSelectedFilter] = useState('Yes');
   const [votesPercentage, setVotesPercentage] = useState('');
+  const [expandDescription, setExpandDescription] = useState(false);
   const { isMobile, isTablet } = useMobile();
   const [isSkeleton, setLoading] = useSkeleton();
   const router = useRouter();
@@ -472,12 +476,23 @@ const ProposalDetails: React.FC = () => {
                   </BalanceContainer>
                 </RowContent>
               </Row>
-              <Row>
+              <RowDescription>
                 <span>
                   <strong>Description</strong>
                 </span>
+                {proposal && proposal.description.length > 50 && (
+                  <ButtonExpand
+                    onClick={() => setExpandDescription(!expandDescription)}
+                  >
+                    {expandDescription ? 'Hide' : 'Expand'}
+                  </ButtonExpand>
+                )}
                 {proposal?.description && (
-                  <BigSpan>{proposal.description}</BigSpan>
+                  <DescriptionContainer expandDescription={expandDescription}>
+                    <BigSpan expandDescription={expandDescription}>
+                      {proposal.description}
+                    </BigSpan>
+                  </DescriptionContainer>
                 )}
                 {!proposal && (
                   <EmptyDescription>
@@ -487,7 +502,7 @@ const ProposalDetails: React.FC = () => {
                 {proposal && !proposal.description && (
                   <BigSpan>{isSkeleton('No description provided.')}</BigSpan>
                 )}
-              </Row>
+              </RowDescription>
             </CardContent>
           </CardContainer>
 

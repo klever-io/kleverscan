@@ -3,6 +3,7 @@ import { ISO2 } from '@/utils/country';
 import { Dispatch, SetStateAction } from 'react';
 import { IBlock } from './blocks';
 import { Contract, IContract, IParameterOnlyAssetId } from './contracts';
+import { INodeOverview } from './proposals';
 
 export type Query = {
   [key: string]: any;
@@ -235,6 +236,17 @@ export interface IAccountAsset {
   owner?: boolean;
 }
 
+export interface IProprietaryAsset {
+  assetId: string;
+  assetType: string;
+  precision: number;
+  circulatingSupply: number;
+  staking: {
+    interestType: string;
+    totalStaked: number;
+  };
+}
+
 export interface IAssetsHoldersResponse extends IResponse {
   data: {
     accounts: IAccountAsset[];
@@ -324,6 +336,21 @@ export interface IAsset {
   mime?: string;
 }
 
+export interface IAssetPool {
+  ownerAddress: string;
+  kda: string;
+  active: boolean;
+  klvBalance: number;
+  kdaBalance: number;
+  convertedFees: number;
+  adminAddress: string;
+  fRatioKLV: number;
+  fRatioKDA: number;
+  hidden: boolean;
+  verified: boolean;
+  ratio: number;
+}
+
 export interface IParsedAsset extends IAsset {
   nonce: string;
   nonceOwner: string;
@@ -356,6 +383,7 @@ export interface ITxQuery {
   fromAddress?: string;
   toAddress?: string;
   account?: string;
+  tab?: string;
 }
 
 export interface IInnerTableProps {
@@ -568,7 +596,7 @@ export interface IDataCards {
   newTransactions: number;
   beforeYesterdayTransactions: number;
   actualTPS: string;
-  block: IBlock;
+  blocks: IBlock[];
   counterEpoch: number;
 }
 
@@ -588,6 +616,12 @@ export interface IAssetTransactionResponse extends IResponse {
     transactions: ITransactionAssetIds[];
   };
   pagination: IPagination;
+}
+
+export interface IAssetPoolResponse extends IResponse {
+  data: {
+    pool: IAssetPool;
+  };
 }
 
 export interface ITransactionListResponse extends IResponse {
@@ -623,6 +657,15 @@ export interface IStatisticsResponse extends IResponse {
     statistics: {
       chainStatistics: IChainStatistics;
     };
+  };
+}
+
+export interface IAggregateResponse extends IResponse {
+  data: {
+    blocks: IBlock[];
+    transactions: ITransaction[];
+    statistics: IChainStatistics;
+    overview: INodeOverview;
   };
 }
 

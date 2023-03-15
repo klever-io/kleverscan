@@ -27,7 +27,7 @@ export const WarningContainer = styled.div`
   color: ${props => props.theme.darkText};
 
   svg {
-    min-width: fit-content;
+    min-width: 32px;
   }
 `;
 

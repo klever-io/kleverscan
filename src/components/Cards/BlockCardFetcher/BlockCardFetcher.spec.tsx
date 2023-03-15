@@ -1,9 +1,8 @@
-import { IBlock } from '@/types/blocks';
+import * as HomeData from '@/contexts/mainPage';
 import { screen, waitFor } from '@testing-library/react';
-import React, { Dispatch, SetStateAction } from 'react';
+import React from 'react';
 import BlockCardList from '.';
-import api from '../../../services/api';
-import { mockedBlocks, mockedFetchBlocks } from '../../../test/mocks';
+import { mockedBlocks } from '../../../test/mocks';
 import { renderWithTheme } from '../../../test/utils';
 
 jest.mock('react-i18next', () => ({
@@ -24,49 +23,22 @@ jest.mock('react-i18next', () => ({
   },
 }));
 
-jest.mock('@/services/api', () => {
-  const mockedResult = [
-    {
-      nonce: 5055,
-      timestamp: Date.now() / 1000,
-      hash: '456s2d4895be5a559c12e7c695037d930d5d5a05389fe17901ed03365s42589s',
-      blockRewards: 98,
-      blockIndex: 55,
-      txCount: 0,
-      txBurnedFees: 0,
-    },
-    {
-      nonce: 98562,
-      timestamp: Date.now() / 1000 - 500,
-      hash: '456s2d4895be5a559c12e7c695037d930d5d5a05389fe17901ed03365s42589s',
-      blockRewards: 55,
-      blockIndex: 74,
-      txCount: 0,
-      txBurnedFees: 0,
-    },
-  ];
-  return {
-    getCached: jest.fn(() =>
-      Promise.resolve({ data: { blocks: mockedResult } }),
-    ),
-  };
-});
-
 describe('Component: BlockCardList', () => {
-  (api.getCached as jest.Mock).mockReturnValueOnce(mockedFetchBlocks);
+  let mock;
 
+  const contextValues = {
+    blocks: mockedBlocks,
+  };
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
+    mock = jest
+      .spyOn(HomeData, 'useHomeData')
+      .mockImplementation(() => contextValues as HomeData.IHomeData);
   });
 
-  const getBlocks = jest.fn((setBlocks: Dispatch<SetStateAction<IBlock[]>>) => {
-    return api.getCached;
-  });
   it('Should render the "Title" and BlockCard Componenet', async () => {
-    renderWithTheme(
-      <BlockCardList blocks={mockedBlocks} getBlocks={getBlocks} />,
-    );
+    renderWithTheme(<BlockCardList />);
 
     const blockTitle = screen.getByRole('heading', { name: /Blocks/i });
     const blockCard = screen.getByText(`#${mockedBlocks[0].nonce}`);
@@ -75,35 +47,21 @@ describe('Component: BlockCardList', () => {
   });
 
   it('Should fetch blocks each 4 seconds', async () => {
-    let blockCards = renderWithTheme(
-      <BlockCardList blocks={mockedBlocks} getBlocks={getBlocks} />,
-    );
+    renderWithTheme(<BlockCardList />);
 
     await waitFor(
       () => {
-        expect(getBlocks).toHaveBeenCalled();
-        blockCards = renderWithTheme(
-          <BlockCardList
-            blocks={mockedFetchBlocks.data.blocks}
-            getBlocks={getBlocks}
-          />,
-        );
+        renderWithTheme(<BlockCardList />);
       },
       { timeout: 5000 },
     );
 
-    const {
-      data: { blocks },
-    } = mockedFetchBlocks;
-
-    const block = screen.getByText(`#${blocks[0].nonce}`);
-    expect(block).toBeInTheDocument();
+    const block = screen.getAllByText(`#${mockedBlocks[0].nonce}`);
+    expect(block).toHaveLength(2);
   });
 
   it('Should match the style for the component', () => {
-    renderWithTheme(
-      <BlockCardList blocks={mockedBlocks} getBlocks={getBlocks} />,
-    );
+    renderWithTheme(<BlockCardList />);
     const blockTitle = screen.getByRole('heading', { name: /Blocks/i });
     const section = blockTitle.parentNode;
     const blockTitleStyle = {

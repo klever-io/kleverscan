@@ -31,7 +31,7 @@ export const ExtensionProvider: React.FC = ({ children }) => {
       if (typeof window !== 'undefined') {
         await doIf(
           () => setExtensionInstalled(true),
-          () => logoutExtension(),
+          () => walletNotConnected(),
           () => window.kleverWeb !== undefined,
         );
       }
@@ -39,12 +39,30 @@ export const ExtensionProvider: React.FC = ({ children }) => {
     init();
   }, []);
 
-  const logoutExtension = useCallback(() => {
+  const logoutExtension = useCallback(async () => {
     setWalletAddress('');
     sessionStorage.removeItem('walletAddress');
 
     if (router.pathname.includes('/create-transaction')) {
       toast.error('Wallet Disconnected');
+
+      const timeout = new Promise(resolve => setTimeout(resolve, 1000));
+      await Promise.resolve(timeout);
+
+      router.push('/');
+    }
+  }, [walletAddress]);
+
+  const walletNotConnected = useCallback(async () => {
+    setWalletAddress('');
+    sessionStorage.removeItem('walletAddress');
+
+    if (router.pathname.includes('/create-transaction')) {
+      toast.error('Wallet Not Connected.');
+
+      const timeout = new Promise(resolve => setTimeout(resolve, 1000));
+      await Promise.resolve(timeout);
+
       router.push('/');
     }
   }, [walletAddress]);
@@ -59,33 +77,30 @@ export const ExtensionProvider: React.FC = ({ children }) => {
   }, [extensionInstalled]);
 
   const connectExtension = async () => {
-    if (!walletAddress) {
-      window.kleverWeb.provider = {
-        api:
-          process.env.DEFAULT_API_HOST ||
-          'https://api.testnet.klever.finance/v1.0',
-        node:
-          process.env.DEFAULT_NODE_HOST ||
-          'https://node.testnet.klever.finance',
-      };
+    window.kleverWeb.provider = {
+      api:
+        process.env.DEFAULT_API_HOST ||
+        'https://api.testnet.klever.finance/v1.0',
+      node:
+        process.env.DEFAULT_NODE_HOST || 'https://node.testnet.klever.finance',
+    };
 
-      try {
-        if (!web.isKleverWebActive()) {
-          setExtensionLoading(true);
-          await web.initialize();
-          setExtensionLoading(false);
-        }
-        const address: string = await window.kleverWeb.getWalletAddress();
-        if (address.startsWith('klv') && address.length === 62) {
-          setWalletAddress(address);
-          sessionStorage.setItem('walletAddress', address);
-        } else {
-          toast.error('Invalid wallet address, please switch to a klv wallet');
-        }
-      } catch (e) {
+    try {
+      if (!web.isKleverWebActive()) {
+        setExtensionLoading(true);
+        await web.initialize();
         setExtensionLoading(false);
-        toast.error(String(e).split(':')[1]);
       }
+      const address: string = await window.kleverWeb.getWalletAddress();
+      if (address.startsWith('klv') && address.length === 62) {
+        setWalletAddress(address);
+        sessionStorage.setItem('walletAddress', address);
+      } else {
+        toast.error('Invalid wallet address, please switch to a klv wallet');
+      }
+    } catch (e) {
+      setExtensionLoading(false);
+      toast.error(String(e).split(':')[1]);
     }
   };
 

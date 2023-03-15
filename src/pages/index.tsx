@@ -1,51 +1,30 @@
 import BlockCardFetcher from '@/components/Cards/BlockCardFetcher';
-import CardDataFetcher from '@/components/Cards/CardDataFetcher';
-import CoinDataFetcher from '@/components/Cards/CoinDataFetcher';
+import HomeDataCards from '@/components/Cards/CardDataFetcher/HomeDataCards';
+import CoinCard from '@/components/Cards/CoinDataFetcher/CoinCard';
 import HomeTransactions from '@/components/HomeTransactions';
-import api from '@/services/api';
+import { HomeDataProvider } from '@/contexts/mainPage';
 import { IHomeProps } from '@/types';
-import { IBlock } from '@/types/blocks';
 import { Container, DataCardsContainer, DataContainer } from '@/views/home';
 import { GetStaticProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import React, { useCallback, useEffect } from 'react';
+import React from 'react';
 import nextI18NextConfig from '../../next-i18next.config';
 
 const Home: React.FC<IHomeProps> = () => {
-  const precision = 6; // default KLV precision
-
-  const [blocks, setBlocks] = React.useState<IBlock[]>([]);
-
-  const getBlocks = useCallback(
-    async (setBlocksScoped: React.Dispatch<React.SetStateAction<IBlock[]>>) => {
-      const res = await api.getCached({
-        route: 'block/list?minify=true',
-        refreshTime: 4,
-      });
-
-      if (!res.error || res.error === '') {
-        setBlocksScoped(res.data?.blocks);
-      }
-    },
-    [],
-  );
-
-  useEffect(() => {
-    getBlocks(setBlocks);
-  }, []);
-
   return (
-    <Container>
-      <DataContainer>
-        <DataCardsContainer>
-          <CardDataFetcher block={blocks?.[0]} />
-          <CoinDataFetcher />
-        </DataCardsContainer>
-      </DataContainer>
+    <HomeDataProvider>
+      <Container>
+        <DataContainer>
+          <DataCardsContainer>
+            <HomeDataCards />
+            <CoinCard />
+          </DataCardsContainer>
+        </DataContainer>
 
-      <BlockCardFetcher blocks={blocks} getBlocks={getBlocks} />
-      <HomeTransactions />
-    </Container>
+        <BlockCardFetcher />
+        <HomeTransactions />
+      </Container>
+    </HomeDataProvider>
   );
 };
 

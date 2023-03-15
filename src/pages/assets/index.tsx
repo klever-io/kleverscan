@@ -1,4 +1,5 @@
 import { Assets as Icon } from '@/assets/title-icons';
+import Copy from '@/components/Copy';
 import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
@@ -8,7 +9,13 @@ import api from '@/services/api';
 import { IAsset, IPagination, IResponse, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
 import { useFetchPartialAsset } from '@/utils/hooks';
-import { Container, Header, HeaderContainer } from '@/views/assets';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
+import {
+  Container,
+  ContainerAssetId,
+  Header,
+  HeaderContainer,
+} from '@/views/assets';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { ReactNode, useEffect, useState } from 'react';
@@ -23,67 +30,72 @@ interface IAssetResponse extends IResponse {
 
 const Assets: React.FC = () => {
   const router = useRouter();
-  const [filterToken, setFilterToken] = useState(router.query.asset || 'All');
-
   const [filterAssets, fetchPartialAsset, loading, setLoading] =
     useFetchPartialAsset();
+  const [query, setQuery] = useState<NextParsedUrlQuery>({});
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    setQuery(router.query);
+  }, [router.isReady]);
+
+  const handleSelected = (selected: string, filterType: string): void => {
+    if (selected === 'All') {
+      const updatedQuery = { ...query };
+      delete updatedQuery[filterType];
+      setQuery(updatedQuery);
+    } else if (filterType === 'type') {
+      setQuery({ ...query, [filterType]: selected });
+    } else if (selected !== query[filterType]) {
+      setQuery({ ...query, [filterType]: selected });
+    }
+  };
 
   const filters: IFilter[] = [
     {
       title: 'Asset',
       data: filterAssets.map(asset => asset.assetId),
-      onClick: value => setFilterToken(value),
+      onClick: value => handleSelected(value, 'asset'),
       onChange: async value => {
         setLoading(true);
         await fetchPartialAsset(value);
       },
-      current: (filterToken as string) || undefined,
+      current: query.asset as string | undefined,
+      loading,
+    },
+    {
+      title: 'Asset Type',
+      data: ['Fungible', 'NonFungible'],
+      onClick: value => handleSelected(value, 'type'),
+      inputType: 'button',
+      current: query.type as string | undefined,
       loading,
     },
   ];
 
   const requestAssets = async (page: number, limit: number) => {
-    if (filterToken === 'All' || filterToken === undefined) {
-      const res: IAssetResponse = await api.getCached({
-        route: `assets/kassets?hidden=false&page=${page}&limit=${limit}`,
-        refreshTime: 21600,
-      });
-      return res;
-    } else {
-      return api.getCached({
-        route: `assets/kassets?hidden=false&asset=${filterToken}&page=${page}&limit=${limit}`,
-        refreshTime: 21600,
-      });
-    }
+    const localQuery = { ...query, page, limit };
+    return api.get({
+      route: `assets/kassets`,
+      query: localQuery,
+    });
   };
 
   useEffect(() => {
     const changeUrl = async () => {
-      if (filterToken === 'All') {
-        router.push({ pathname: router.pathname, query: '' }, undefined, {
+      router.push(
+        {
+          pathname: router.pathname,
+          query: query,
+        },
+        undefined,
+        {
           shallow: true,
-        });
-
-        const assets: IAssetResponse = await api.getCached({
-          route: 'assets/kassets?hidden=false',
-          refreshTime: 21600,
-        });
-        filters[0].data = assets?.data?.assets?.map(asset => asset.assetId);
-      } else {
-        router.push(
-          {
-            pathname: router.pathname,
-            query: `asset=${filterToken}`,
-          },
-          undefined,
-          {
-            shallow: true,
-          },
-        );
-      }
+        },
+      );
     };
     changeUrl();
-  }, [filterToken]);
+  }, [query]);
 
   const rowSections = (asset: IAsset): IRowSection[] => {
     const {
@@ -142,9 +154,12 @@ const Assets: React.FC = () => {
 
       {
         element: (
-          <Link href={`/asset/${assetId}`} key={assetId}>
-            {assetId}
-          </Link>
+          <ContainerAssetId>
+            <Link href={`/asset/${assetId}`} key={assetId}>
+              {assetId}
+            </Link>
+            <Copy info="Asset ID" data={assetId} />
+          </ContainerAssetId>
         ),
         span: 1,
       },
@@ -250,7 +265,7 @@ const Assets: React.FC = () => {
           <Title title="Assets" Icon={Icon} />
           <FilterContainer>
             {filters.map(filter => (
-              <Filter key={String(filter)} {...filter} />
+              <Filter key={JSON.stringify(filter)} {...filter} />
             ))}
           </FilterContainer>
         </HeaderContainer>

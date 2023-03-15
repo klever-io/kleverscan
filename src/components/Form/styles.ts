@@ -91,7 +91,7 @@ export const InputWrapper = styled.div``;
 export const FormGap = styled.div<ISpaceForm>``;
 
 export const ButtonContainer = styled.button<IButton>`
-  background-color: ${props => props.theme.darkText};
+  background-color: ${props => props.theme.violet};
   padding-top: 15px;
   padding-bottom: 15px;
   padding-left: 10px;

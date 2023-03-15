@@ -316,7 +316,7 @@ const Validator: React.FC<IValidatorPage> = () => {
               {validator ? (
                 <BoldElement>
                   <span>
-                    {(validator?.selfStake || 0 / 10 ** 6).toLocaleString()}
+                    {((validator?.selfStake || 0) / 10 ** 6).toLocaleString()}
                   </span>
                   <span> KLV</span>
                 </BoldElement>

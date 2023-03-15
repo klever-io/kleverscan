@@ -1,21 +1,231 @@
-import api, { IPrice } from '@/services/api';
+import api from '@/services/api';
 import {
+  IAccountResponse,
+  IAggregateResponse,
   IAssetsData,
   ICoinInfo,
+  IEpochInfo,
   IGeckoChartResponse,
   IGeckoResponse,
+  IPrice,
+  ITransaction,
+  ITransactionListResponse,
+  ITransactionResponse,
+  IYesterdayResponse,
   Service,
 } from '@/types';
+import { IBlock } from '@/types/blocks';
+import { getEpochInfo } from '@/utils';
 import { calcApr } from '@/utils/calcApr';
-import { useEffect, useState } from 'react';
-import CoinCard from './CoinCard';
-import CoinCardSkeleton from './CoinCardSkeleton';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
-const CoinDataFetcher: React.FC = () => {
+export interface IHomeData {
+  actualTPS: string;
+  blocks: IBlock[];
+  metrics: IEpochInfo;
+  newTransactions: number;
+  beforeYesterdayTransactions: number;
+  newAccounts: number;
+  totalAccounts: number;
+  transactions: ITransaction[];
+  totalTransactions: number;
+  counterEpoch: number;
+  assetsData: IAssetsData;
+  coins: ICoinInfo[];
+  loadingCards: boolean;
+  loadingBlocks: boolean;
+  loadingCoins: boolean;
+}
+
+export const HomeData = createContext({} as IHomeData);
+
+export const HomeDataProvider: React.FC = ({ children }) => {
+  const statisticsWatcherTimeout = 4000;
+  const cardWatcherInterval = 4 * 1000; // 4 secs
+
+  const [counterEpoch, setCounterEpoch] = useState(0);
+  const [lastPercentage, setLastPercentage] = useState<number | null>(null);
+  const [totalAccounts, setTotalAccounts] = useState(0);
+  const [transactions, setTransactions] = useState<ITransaction[]>([]);
+  const [totalTransactions, setTotalTransactions] = useState(0);
+  const [newAccounts, setNewAccounts] = useState(0);
+  const [actualTPS, setActualTPS] = useState<string>('');
+  const [blocks, setBlocks] = useState<IBlock[]>([]);
+  const [metrics, setMetrics] = useState<IEpochInfo>({
+    currentSlot: 0,
+    epochFinishSlot: 0,
+    remainingTime: '',
+    epochLoadPercent: 0,
+  });
+  const [newTransactions, setNewTransactions] = useState(0);
+  const [beforeYesterdayTransactions, setBeforeYesterdayTransactions] =
+    useState(0);
+
   const [assetsData, setAssetsData] = useState<IAssetsData>({} as IAssetsData);
   const [coins, setCoins] = useState<ICoinInfo[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingCards, setLoadingCards] = useState(true);
+  const [loadingBlocks, setLoadingBlocks] = useState(true);
+  const [loadingCoins, setLoadingCoins] = useState(true);
 
+  useEffect(() => {
+    if (metrics.epochLoadPercent === 0 && lastPercentage !== null) {
+      setCounterEpoch(counterEpoch + 1);
+    }
+    setLastPercentage(metrics.epochLoadPercent);
+  }, [metrics.epochLoadPercent]);
+
+  const getAggregate = useCallback(async () => {
+    const aggregate: IAggregateResponse = await api.get({
+      route: 'node/aggregate',
+      service: Service.PROXY,
+    });
+
+    if (!aggregate.error) {
+      const chainStatistics = aggregate.data.statistics;
+
+      setMetrics(getEpochInfo(aggregate.data.overview));
+      setActualTPS(`${chainStatistics.liveTPS} / ${chainStatistics.peakTPS}`);
+      setBlocks(aggregate.data?.blocks);
+    }
+  }, []);
+
+  const getCardsData = useCallback(async () => {
+    // case 0:
+    const accountsCall = new Promise<IAccountResponse>(
+      async (resolve, reject) => {
+        const res = await api.get({
+          route: 'address/list',
+        });
+        if (!res.error || res.error === '') {
+          resolve(res);
+        }
+
+        reject(res.error);
+      },
+    );
+    // case 1:
+    const yesterdayAccountsCall = new Promise<IYesterdayResponse>(
+      async (resolve, reject) => {
+        const res = await api.get({
+          route: 'address/list/count/1',
+        });
+        if (!res.error || res.error === '') {
+          resolve(res);
+        }
+
+        reject(res.error);
+      },
+    );
+    // case 2:
+    const transactionsCall = new Promise<ITransactionResponse>(
+      async (resolve, reject) => {
+        const res = await api.get({
+          route: 'transaction/list?minify=true',
+        });
+        if (!res.error || res.error === '') {
+          resolve(res);
+        }
+
+        reject(res.error);
+      },
+    );
+
+    // case 3:
+    const beforeYesterdayTransactionsCall =
+      new Promise<ITransactionListResponse>(async (resolve, reject) => {
+        const res = await api.get({
+          route: 'transaction/list/count/2',
+        });
+
+        if (!res.error || res.error === '') {
+          resolve(res);
+        }
+
+        reject(res.error);
+      });
+
+    const promises = [
+      accountsCall,
+      yesterdayAccountsCall,
+      transactionsCall,
+      beforeYesterdayTransactionsCall,
+    ];
+
+    await Promise.allSettled(promises).then(responses => {
+      responses.forEach((res, index) => {
+        if (res.status !== 'rejected') {
+          const { value }: any = res;
+          switch (index) {
+            case 0:
+              setTotalAccounts(value.pagination.totalRecords);
+              break;
+
+            case 1:
+              setNewAccounts(value.data.number_by_day[0].doc_count);
+              break;
+
+            case 2:
+              const newTotalTransactions = value.pagination.totalRecords;
+              if (!totalTransactions) {
+                setTotalTransactions(newTotalTransactions);
+              } else if (
+                totalTransactions &&
+                totalTransactions < newTotalTransactions
+              )
+                setTotalTransactions(value.pagination.totalRecords);
+
+              setTransactions(value.data.transactions);
+              break;
+            case 3:
+              if (value.data?.number_by_day?.length > 0)
+                setNewTransactions(value.data?.number_by_day[0]?.doc_count);
+
+              setBeforeYesterdayTransactions(
+                value.data?.number_by_day[1]?.doc_count,
+              );
+
+            default:
+              break;
+          }
+        }
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const promises = [getAggregate(), getCardsData()];
+
+      await Promise.allSettled(promises);
+
+      setLoadingCards(false);
+      setLoadingBlocks(false);
+    })();
+  }, []);
+
+  //Statistics, Tx, Blocks
+  useEffect(() => {
+    const statisticsWatcher = setInterval(async () => {
+      await getAggregate();
+    }, statisticsWatcherTimeout);
+
+    const cardWatcher = setInterval(async () => {
+      getCardsData();
+    }, cardWatcherInterval);
+
+    return () => {
+      clearInterval(statisticsWatcher);
+      clearInterval(cardWatcher);
+    };
+  }, []);
+
+  //Coins
   useEffect(() => {
     const getCoins = async () => {
       const coinsData: ICoinInfo[] = [];
@@ -77,7 +287,7 @@ const CoinDataFetcher: React.FC = () => {
 
       const klvDataCall = new Promise<IGeckoResponse>(
         async (resolve, reject) => {
-          const res = await api.getCached({
+          const res = await api.get({
             route: 'coins/klever',
             service: Service.GECKO,
           });
@@ -92,7 +302,7 @@ const CoinDataFetcher: React.FC = () => {
 
       const klvChartCall = new Promise<IGeckoChartResponse>(
         async (resolve, reject) => {
-          const res = await api.getCached({
+          const res = await api.get({
             route: `coins/klever/market_chart?vs_currency=usd&days=1`,
             service: Service.GECKO,
           });
@@ -107,7 +317,7 @@ const CoinDataFetcher: React.FC = () => {
 
       const kfiDataCall = new Promise<IGeckoResponse>(
         async (resolve, reject) => {
-          const res = await api.getCached({
+          const res = await api.get({
             route: 'coins/klever-finance',
             service: Service.GECKO,
           });
@@ -122,7 +332,7 @@ const CoinDataFetcher: React.FC = () => {
 
       const kfiChartCall = new Promise<IGeckoChartResponse>(
         async (resolve, reject) => {
-          const res = await api.getCached({
+          const res = await api.get({
             route: `coins/klever-finance/market_chart?vs_currency=usd&days=1`,
             service: Service.GECKO,
           });
@@ -294,16 +504,30 @@ const CoinDataFetcher: React.FC = () => {
 
       setCoins(coinsData);
       setAssetsData(assetsData);
-      setLoading(false);
+      setLoadingCoins(false);
     };
     getCoins();
   }, []);
 
-  return !loading ? (
-    <CoinCard coins={coins} assetsData={assetsData} />
-  ) : (
-    <CoinCardSkeleton />
-  );
+  const values: IHomeData = {
+    actualTPS,
+    blocks,
+    metrics,
+    newTransactions,
+    beforeYesterdayTransactions,
+    newAccounts,
+    totalAccounts,
+    transactions,
+    totalTransactions,
+    counterEpoch,
+    coins,
+    assetsData,
+    loadingCards,
+    loadingBlocks,
+    loadingCoins,
+  };
+
+  return <HomeData.Provider value={values}>{children}</HomeData.Provider>;
 };
 
-export default CoinDataFetcher;
+export const useHomeData = (): IHomeData => useContext(HomeData);

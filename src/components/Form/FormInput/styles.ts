@@ -115,7 +115,7 @@ export const StyledTextArea = styled.textarea<IProps>`
   min-width: 100%;
   max-width: 100%;
 
-  min-height: 20rem;
+  min-height: 10rem;
 `;
 
 export const Container = styled.div<IProps>`
@@ -266,7 +266,7 @@ export const TooltipContainer = styled.div<{
 
 export const InputLabel = styled.label<ILabel>`
   user-select: none;
-
+  color: ${({ theme }) => theme.darkText};
   transform: translate(-1rem, -2.25rem);
   z-index: 1;
 

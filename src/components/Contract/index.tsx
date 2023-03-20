@@ -126,11 +126,11 @@ const Contract: React.FC<IContract> = ({
   const [formSections, setFormSections] = useState<IContractSection[]>([]);
   const [assetID, setAssetID] = useState<number>(0);
   const [selectedBucket, setSelectedBucket] = useState<string>('');
+  const [buyType, setBuyType] = useState(true);
+
   const {
     contractType,
     setContractType,
-    ITOBuy,
-    setITOBuy,
     txLoading: loading,
     setTxLoading: setLoading,
     txHash,
@@ -156,7 +156,6 @@ const Contract: React.FC<IContract> = ({
     selectedBucket,
     proposalId,
     tokenChosen,
-    ITOBuy,
     binaryOperations,
     depositType,
     withdrawType,
@@ -174,6 +173,18 @@ const Contract: React.FC<IContract> = ({
       setSelectedBucket(valueContract[1]);
     }
   }, [valueContract]);
+
+  useEffect(() => {
+    if (contractType === 'BuyContract') {
+      setFormSections([
+        ...formSection({
+          contract: 'BuyContract',
+          address: ownerAddress,
+          buyType,
+        }),
+      ]);
+    }
+  }, [buyType, contractType]);
 
   useEffect(() => {
     if (loading) {
@@ -427,7 +438,7 @@ const Contract: React.FC<IContract> = ({
 
       const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
 
-      if (isMultisig) {
+      if (isMultisig.current) {
         const blob = new Blob([JSON.stringify(signedTx)], {
           type: 'application/json',
         });
@@ -465,7 +476,7 @@ const Contract: React.FC<IContract> = ({
       selectedBucket,
       proposalId,
       tokenChosen,
-      ITOBuy,
+      buyType,
       binaryOperations,
       depositType,
       withdrawType,
@@ -483,7 +494,7 @@ const Contract: React.FC<IContract> = ({
 
     const parsedPayload = await precisionParse(payload, contractType);
 
-    if (showPayload) {
+    if (showPayload.current) {
       setOpen(true);
       setPayload({
         type: contractType,
@@ -657,7 +668,7 @@ const Contract: React.FC<IContract> = ({
           <StyledInput
             type="checkbox"
             defaultChecked={true}
-            onClick={() => setITOBuy(!ITOBuy)}
+            onClick={() => setBuyType(!buyType)}
           />
           <Slider />
         </Toggle>

@@ -129,7 +129,11 @@ describe('Contract Component', () => {
   });
 
   it('should render the Advanced Options form contract', async () => {
-    const advancedOptionsItems = ['Data', 'Is Multisig?', 'Show payload?'];
+    const advancedOptionsItems = [
+      'Data',
+      'Does Your Account Needs Multiple Signatures?',
+      'Show payload?',
+    ];
     await waitFor(() =>
       renderWithTheme(
         <ContractProvider.Provider value={mockContract as any}>
@@ -584,7 +588,7 @@ describe('Contract Component', () => {
   });
 
   it('should render the Buy form contract', async () => {
-    const items = ['Buy tokens.', 'Id', 'Currency Id', 'Amount'];
+    const items = ['Buy tokens.', 'Order ID', 'Currency Id', 'Amount'];
     mockContract.contractType = contractOptions.find(
       item => item.value === 'BuyContract',
     )?.value as string;

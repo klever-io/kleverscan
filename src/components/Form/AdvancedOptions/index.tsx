@@ -28,9 +28,7 @@ const AdvancedOptions: React.FC<IAdvOptions> = ({ setMetadata }) => {
   const {
     setIsMultiContract,
     isMultiContract,
-    setShowPayload,
     showPayload,
-    setIsMultisig,
     isMultisig,
     kdaFee,
     setKdaFee,
@@ -98,15 +96,15 @@ const AdvancedOptions: React.FC<IAdvOptions> = ({ setMetadata }) => {
         </ToggleContainer>
       </FieldContainer>
       <FieldContainer>
-        <InputLabel>Is Multisig?</InputLabel>
+        <InputLabel>Does Your Account Needs Multiple Signatures?</InputLabel>
         <ToggleContainer>
           No
           <Toggle>
             <StyledInput
               type="checkbox"
-              defaultChecked={isMultisig}
-              value={String(isMultisig)}
-              onClick={() => setIsMultisig(!isMultisig)}
+              defaultChecked={isMultisig.current}
+              value={String(isMultisig.current)}
+              onClick={() => (isMultisig.current = !isMultisig.current)}
             />
             <Slider />
           </Toggle>
@@ -120,9 +118,9 @@ const AdvancedOptions: React.FC<IAdvOptions> = ({ setMetadata }) => {
           <Toggle>
             <StyledInput
               type="checkbox"
-              defaultChecked={showPayload}
-              value={String(showPayload)}
-              onClick={() => setShowPayload(!showPayload)}
+              defaultChecked={showPayload.current}
+              value={String(showPayload.current)}
+              onClick={() => (showPayload.current = !showPayload.current)}
             />
             <Slider />
           </Toggle>

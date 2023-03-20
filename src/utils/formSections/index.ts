@@ -66,7 +66,7 @@ interface IFormSectionArgs {
   paramsList?: IParamList[];
   assetTriggerType?: number | null;
   claimLabel?: string;
-  buyLabel?: string;
+  buyType?: boolean;
   withdrawType?: number | null;
   collection?: ICollectionList;
   itoTriggerType?: number | null;
@@ -79,7 +79,7 @@ const formSection = ({
   paramsList,
   assetTriggerType,
   claimLabel,
-  buyLabel,
+  buyType,
   withdrawType,
   collection,
   itoTriggerType,
@@ -96,7 +96,7 @@ const formSection = ({
     WithdrawContract: () => withdrawContract(withdrawType),
     ProposalContract: () => proposalContract(paramsList),
     VoteContract: () => voteContract(),
-    BuyContract: () => buyContract(buyLabel ? buyLabel : 'Id'),
+    BuyContract: () => buyContract(buyType),
     SellContract: () => sellContract(),
     CancelMarketOrderContract: () => cancelMarketOrderContract(),
     CreateMarketplaceContract: () => createMarketplaceContract(address),

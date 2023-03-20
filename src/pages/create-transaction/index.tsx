@@ -43,8 +43,6 @@ interface IContract {
   paramsList?: any;
 }
 
-let buyKey = 0;
-
 const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
   const { extensionInstalled, connectExtension } = useExtension();
 
@@ -56,9 +54,6 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
     ownerAddress,
     claimType,
     claimLabel,
-    ITOBuy,
-    buyLabel,
-    setBuyLabel,
     isMultiContract,
     queue,
     setQueue,
@@ -76,8 +71,6 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
     setTxHash,
     setTxLoading,
     isMultisig,
-    setIsMultisig,
-    setShowPayload,
     formSections,
     resetForms,
     contractOptions,
@@ -96,27 +89,6 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
       connectExtension();
     }
   }, [extensionInstalled]);
-
-  const defineBuyContract = (label: string) => {
-    buyKey += 1;
-    setFormSections([
-      ...formSection({
-        contract: 'BuyContract',
-        address: ownerAddress,
-        buyLabel: label,
-      }),
-    ]);
-  };
-
-  useEffect(() => {
-    if (ITOBuy) {
-      setBuyLabel('ITO Asset ID');
-      defineBuyContract('ITO Asset ID');
-    } else {
-      setBuyLabel('Order ID');
-      defineBuyContract('Order ID');
-    }
-  }, [ITOBuy]);
 
   const handleOption = (selectedOption: any) => {
     setContractType(selectedOption.value);
@@ -140,10 +112,6 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
             claimLabel,
           }),
         ]);
-        break;
-
-      case 'BuyContract':
-        defineBuyContract(buyLabel);
         break;
 
       default:
@@ -204,6 +172,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
             assetID,
             itoTriggerType,
             metadata,
+            buyType,
             selectedBucket,
           }: IFormsData) => {
             const parsedvalues = parseValues(
@@ -216,7 +185,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
               selectedBucket,
               proposalId,
               tokenChosen,
-              ITOBuy,
+              buyType,
               binaryOperations,
               depositType,
               withdrawType,
@@ -250,7 +219,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
 
         const buildTxs = await web.buildTransaction(parsedData, parsedMetadata);
         const signedTxs = await window.kleverWeb.signTransaction(buildTxs);
-        if (isMultisig) {
+        if (isMultisig.current) {
           const blob = new Blob([JSON.stringify(signedTxs)], {
             type: 'application/json',
           });
@@ -335,8 +304,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
           options={contractOptions}
           onChange={contractType => {
             handleOption(contractType);
-            setIsMultisig(false);
-            setShowPayload(false);
+            isMultisig.current = false;
           }}
           getAssets={getAssets}
           isDisabled={true}

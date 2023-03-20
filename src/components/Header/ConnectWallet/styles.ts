@@ -17,7 +17,7 @@ export const ConnectButton = styled.div`
   border-radius: 1.3rem;
   color: ${props => props.theme.true.white};
   font-weight: 700;
-  font-size: 14px;
+  font-size: 0.84rem;
 
   text-align: center;
   div {
@@ -33,8 +33,7 @@ export const ConnectButton = styled.div`
     display: none;
   }
 
-  span,
-  small {
+  span {
     padding-left: 0.4rem;
   }
   label {
@@ -47,13 +46,19 @@ export const ConnectButton = styled.div`
   }
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
     min-width: unset;
-
-    span,
-    small {
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+    span {
       display: none;
     }
     background: 0;
     width: auto;
+  }
+
+  :hover {
+    filter: brightness(1.2);
   }
 `;
 

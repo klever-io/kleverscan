@@ -12,9 +12,8 @@ import Link from 'next/link';
 import { QRCodeSVG } from 'qrcode.react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { AiOutlineClose } from 'react-icons/ai';
+import { AiOutlineClose, AiOutlineUser } from 'react-icons/ai';
 import { BiLogOut, BiWalletAlt } from 'react-icons/bi';
-import { FaUserAlt } from 'react-icons/fa';
 import { IoMdAddCircle } from 'react-icons/io';
 import { IoCreateOutline, IoReloadSharp } from 'react-icons/io5';
 import { MdContentCopy } from 'react-icons/md';
@@ -224,8 +223,8 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
                 <>
                   {walletAddress && (
                     <div onClick={() => setOpenUserInfos(!openUserInfos)}>
-                      <FaUserAlt size={'1.2em'} />
-                      <small>{parseAddress(walletAddress, 15)}</small>
+                      <AiOutlineUser size={'1.3em'} />
+                      <span>Show Wallet</span>
                     </div>
                   )}
                   {!walletAddress && (

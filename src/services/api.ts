@@ -111,33 +111,56 @@ export const withoutBody = async (
   method: Method,
 ): Promise<any> => {
   const request = async () => {
-    try {
-      const { route, query, service, apiVersion } = getProps(props);
+    if (props.useApiProxy) {
+      try {
+        // use next api as proxy for get requests, to avoid gecko errors (when fetching prices)
+        const response = await fetch('/api/proxy', {
+          method: Method.POST,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...getProps(props),
+            method: method.toString(),
+          }),
+        });
 
-      const response = await fetch(getHost(route, query, service, apiVersion), {
-        method: method.toString(),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+        return response.json();
+      } catch (error) {
+        return { data: null, error, code: 'internal_error', pagination };
+      }
+    } else if (!props.useApiProxy) {
+      try {
+        const { route, query, service, apiVersion } = getProps(props);
 
-      if (!response.ok) {
+        const response = await fetch(
+          getHost(route, query, service, apiVersion),
+          {
+            method: method.toString(),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        );
+
+        if (!response.ok) {
+          return {
+            data: null,
+            error: (await response.json()).error,
+            code: 'internal_error',
+            pagination,
+          };
+        }
+
+        return response.json();
+      } catch (error) {
         return {
           data: null,
-          error: (await response.json()).error,
+          error,
           code: 'internal_error',
           pagination,
         };
       }
-
-      return response.json();
-    } catch (error) {
-      return {
-        data: null,
-        error,
-        code: 'internal_error',
-        pagination,
-      };
     }
   };
 

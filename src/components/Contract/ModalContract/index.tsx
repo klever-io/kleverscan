@@ -18,7 +18,7 @@ interface IModalContract {
     React.SetStateAction<IAccountAsset | undefined>
   >;
   stakingRewards: number;
-  setStakingRewards: React.Dispatch<React.SetStateAction<number>>;
+  setStakingRewards: React.Dispatch<React.SetStateAction<any>>;
   valueContract: any;
   setValueContract: React.Dispatch<any>;
 }
@@ -40,9 +40,9 @@ const ModalContract: React.FC<IModalContract> = ({
   const [kassetsList, setKAssetsList] = useState<ICollectionList[]>([]);
   const { extensionInstalled, connectExtension } = useExtension();
   const stakingRewardsType = {
-    0: { label: 'Staking Claim (0)', value: 0 },
+    kfi: { label: 'Staking Claim (0)', value: 0, inputValue: 'KFI' },
+    klv: { label: 'Staking Claim (0)', value: 0, inputValue: 'KLV' },
     1: { label: 'Allowance Claim (1)', value: 1 },
-    2: { label: 'Market Claim (2)', value: 2 },
   };
   useDidUpdateEffect(() => {
     if (extensionInstalled) {
@@ -181,7 +181,7 @@ const ModalContract: React.FC<IModalContract> = ({
     setOpenModal(false);
     setContractType('');
     setAssetTriggerSelected({} as IAccountAsset);
-    setStakingRewards(0);
+    setStakingRewards(undefined);
     setValueContract([]);
   };
 

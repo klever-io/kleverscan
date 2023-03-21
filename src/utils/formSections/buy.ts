@@ -1,15 +1,17 @@
 import { ISection } from '@/components/Form';
 
-const buyContract = (labelId: string): ISection[] => {
+const buyContract = (buyType = true): ISection[] => {
   const section = [] as ISection[];
 
   section.push({
     fields: [
       {
-        label: labelId,
+        label: buyType ? 'Order ID' : 'ITO Asset ID',
         props: {
           required: true,
-          tooltip: 'ITOBuy: ITO Asset ID, MarketBuy: order ID',
+          tooltip: buyType
+            ? 'MarketBuy: Sell Order ID'
+            : 'ITOBuy: Asset ID of the KDA you want to buy from the ITO',
         },
       },
       {
@@ -24,8 +26,9 @@ const buyContract = (labelId: string): ISection[] => {
         props: {
           type: 'number',
           required: true,
-          tooltip:
-            'ITOBuy: Amount to be bought, MarketBuy: item price / amount bidden (check precision)',
+          tooltip: buyType
+            ? 'MarketBuy: item price / amount bidden'
+            : 'ITOBuy: Amount to be bought',
         },
       },
     ],

@@ -57,8 +57,8 @@ const formProps: IFormProps = {
 
 const contextProps = {
   isMultiContract: false,
-  showPayload: false,
-  isMultisig: false,
+  showPayload: { current: false },
+  isMultisig: { current: false },
   setIsMultiContract: jest.fn(),
   setShowPayload: jest.fn(),
   setIsMultisig: jest.fn(),
@@ -294,7 +294,9 @@ describe('Component: Form', () => {
 
     await user.click(advancedOptions.parentElement as HTMLElement);
     await waitFor(() => {
-      expect(screen.getByText('Is Multisig?')).toBeInTheDocument();
+      expect(
+        screen.getByText('Does Your Account Needs Multiple Signatures?'),
+      ).toBeInTheDocument();
       expect(screen.getByText('Show payload?')).toBeInTheDocument();
     });
   });
@@ -323,7 +325,9 @@ describe('Component: Form', () => {
       await user.click(advancedOptions.parentElement as HTMLElement);
 
       const data = screen.getByText('Data');
-      const isMultsig = screen.getByText('Is Multisig?');
+      const isMultsig = screen.getByText(
+        'Does Your Account Needs Multiple Signatures?',
+      );
       const showPayload = screen.getByText('Show payload?');
 
       const isMultsigValue =

@@ -6,4 +6,6 @@ const status: string[] = ['Success', 'Pending', 'Fail'];
 
 const contracts = Object.values(ContractsName).map(contract => contract);
 
-export { coins, status, contracts };
+const buyType: string[] = ['MarketBuy', 'ITOBuy'];
+
+export { coins, status, contracts, buyType };

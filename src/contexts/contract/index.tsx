@@ -13,7 +13,13 @@ import {
 import { contractOptions as allContractOptions } from '@/utils/contracts';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useRouter } from 'next/router';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { toast } from 'react-toastify';
 import { useExtension } from '../extension';
 
@@ -34,16 +40,15 @@ export interface IFormsData {
   withdrawType: number | null;
   assetID: number;
   itoTriggerType: number | null;
+  buyType: boolean;
   isNFT: boolean | undefined;
   metadata: string;
   selectedBucket: string;
 }
 
 export interface IContractContext {
-  ITOBuy: boolean;
   tokenChosen: boolean;
   claimType: number;
-  buyLabel: string;
   contractType: string;
   formSections: ISection[];
   ownerAddress: string;
@@ -57,14 +62,12 @@ export interface IContractContext {
   txHash: string | null;
   assetsList: ICollectionList[] | null;
   showMultiContracts: boolean;
-  showPayload: boolean;
-  isMultisig: boolean;
+  showPayload: React.MutableRefObject<boolean>;
+  isMultisig: React.MutableRefObject<boolean>;
   contractOptions: IContractOption[];
   kdaFee: ICollectionList;
-  setITOBuy: React.Dispatch<React.SetStateAction<boolean>>;
   setTokenChosen: React.Dispatch<React.SetStateAction<boolean>>;
   setClaimType: React.Dispatch<React.SetStateAction<number>>;
-  setBuyLabel: React.Dispatch<React.SetStateAction<string>>;
   setContractType: React.Dispatch<React.SetStateAction<string>>;
   setFormSections: React.Dispatch<React.SetStateAction<ISection[]>>;
   setOwnerAddress: React.Dispatch<React.SetStateAction<string>>;
@@ -82,8 +85,6 @@ export interface IContractContext {
   setProposals: React.Dispatch<React.SetStateAction<any>>;
   setParamsList: React.Dispatch<React.SetStateAction<any>>;
   setShowMultiContracts: React.Dispatch<React.SetStateAction<boolean>>;
-  setShowPayload: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsMultisig: React.Dispatch<React.SetStateAction<boolean>>;
   setContractOptions: React.Dispatch<React.SetStateAction<IContractOption[]>>;
   setKdaFee: React.Dispatch<React.SetStateAction<ICollectionList>>;
   getAssets: () => void;
@@ -94,10 +95,8 @@ export interface IContractContext {
 
 export const Contract = createContext({} as IContractContext);
 export const ContractProvider: React.FC = ({ children }) => {
-  const [ITOBuy, setITOBuy] = useState(false);
   const [tokenChosen, setTokenChosen] = useState(false);
   const [claimType, setClaimType] = useState(0);
-  const [buyLabel, setBuyLabel] = useState('Order ID');
   const [contractType, setContractType] = useState('');
   const [formSections, setFormSections] = useState<ISection[]>([]);
   const [ownerAddress, setOwnerAddress] = useState('');
@@ -110,8 +109,6 @@ export const ContractProvider: React.FC = ({ children }) => {
   const [txLoading, setTxLoading] = useState<boolean>(false);
   const [txHash, setTxHash] = useState<string | null>(null);
   const [showAdvancedOpts, setShowAdvancedOpts] = useState(false);
-  const [showPayload, setShowPayload] = useState(false);
-  const [isMultisig, setIsMultisig] = useState(false);
   const [assetsList, setAssetsLists] = useState<ICollectionList[] | null>(null);
   const [kassetsList, setKAssetsList] = useState<ICollectionList[]>([]);
   const [proposals, setProposals] = useState<any>([]);
@@ -119,6 +116,9 @@ export const ContractProvider: React.FC = ({ children }) => {
   const [showMultiContracts, setShowMultiContracts] = useState<boolean>(false);
   const [contractOptions, setContractOptions] =
     useState<IContractOption[]>(allContractOptions);
+
+  const showPayload = useRef(false);
+  const isMultisig = useRef(false);
 
   const { logoutExtension, extensionInstalled } = useExtension();
   const router = useRouter();
@@ -322,14 +322,10 @@ export const ContractProvider: React.FC = ({ children }) => {
   }, [isMultiContract, contractType]);
 
   const values: IContractContext = {
-    ITOBuy,
-    setITOBuy,
     tokenChosen,
     setTokenChosen,
     claimType,
     setClaimType,
-    buyLabel,
-    setBuyLabel,
     contractType,
     setContractType,
     formSections,
@@ -361,10 +357,8 @@ export const ContractProvider: React.FC = ({ children }) => {
     showMultiContracts,
     setShowMultiContracts,
     showPayload,
-    setShowPayload,
     isMultisig,
     resetForms,
-    setIsMultisig,
     contractOptions,
     setContractOptions,
     kdaFee,

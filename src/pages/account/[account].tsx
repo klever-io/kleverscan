@@ -65,6 +65,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 export interface IStakingRewards {
   label: string;
   value: number;
+  inputValue?: string;
 }
 
 interface IAccountPage {
@@ -665,7 +666,7 @@ const Account: React.FC<IAccountPage> = () => {
     const onClick = () => {
       switch (valueContract) {
         case 'ClaimContract':
-          setStakingRewards(value || 0);
+          setStakingRewards(value);
           break;
         case 'AssetTriggerContract':
           setCollectionSelected(value);
@@ -891,7 +892,7 @@ const Account: React.FC<IAccountPage> = () => {
                       {showInteractionsButtons(
                         'Staking Claim',
                         'ClaimContract',
-                        0,
+                        'klv',
                       )}
                     </>
                   ) : (
@@ -904,9 +905,9 @@ const Account: React.FC<IAccountPage> = () => {
                     <>
                       <span>{getKFIStaking().toLocaleString()}</span>
                       {showInteractionsButtons(
-                        'Market Claim',
+                        'Staking Claim',
                         'ClaimContract',
-                        2,
+                        'kfi',
                       )}
                     </>
                   ) : (

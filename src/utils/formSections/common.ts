@@ -39,7 +39,6 @@ export const royaltiesSection = (
         type: 'number',
         tooltip:
           'Fixed amount of the currency that will be charged from an ITO Buy',
-        maxDecimals: 2,
       },
     },
   ];

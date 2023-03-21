@@ -109,6 +109,7 @@ export interface ITransaction {
   contract: IContract[];
   receipts: IReceipt[];
   precision?: number;
+  kdaFee?: IKdaFee;
 }
 
 export interface ITransactionAssetIds {
@@ -795,4 +796,9 @@ export interface IHomeTransactions {
   transactions: ITransaction[];
   transactionsList: IDailyTransaction[];
   precision: number;
+}
+
+export interface IKdaFee {
+  kda: string;
+  amount: number;
 }

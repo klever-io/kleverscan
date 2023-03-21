@@ -403,3 +403,12 @@ export const FrozenContainer = styled.div`
     }
   }
 `;
+
+export const KdaFeeSpan = styled.span`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  span:nth-child(2) {
+    margin-top: 0.2rem;
+  }
+`;

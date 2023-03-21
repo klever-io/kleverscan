@@ -2,13 +2,13 @@ import styled from 'styled-components';
 
 export const FilterContainer = styled.div`
   display: flex;
-
+  flex-wrap: wrap;
   flex-direction: row;
 
   gap: 0.75rem;
 
   > div {
-    min-width: 15rem;
+    min-width: 13rem;
   }
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {

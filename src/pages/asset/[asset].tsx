@@ -456,7 +456,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
             <small>
               {assetPool && asset ? (
                 toLocaleFixed(
-                  (assetPool?.kdaBalance / 10 || 0) ** asset?.precision,
+                  (assetPool?.kdaBalance || 0) / 10 ** asset?.precision,
                   asset?.precision,
                 )
               ) : (

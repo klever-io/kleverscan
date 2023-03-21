@@ -4,6 +4,7 @@ import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
 import { Status } from '@/components/Table/styles';
+import Tooltip from '@/components/Tooltip';
 import {
   AssetTrigger,
   Buy,
@@ -55,6 +56,7 @@ import {
   IconsWrapper,
   KappFeeFailedTx,
   KappFeeSpan,
+  KdaFeeSpan,
   Row,
 } from '@/views/transactions/detail';
 import { ReceiveBackground } from '@/views/validator';
@@ -102,6 +104,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
     receipts,
     blockNum,
     nonce,
+    kdaFee,
   } = transaction;
 
   const initializeExpandData = () => {
@@ -603,6 +606,17 @@ const Transaction: React.FC<ITransactionPage> = props => {
             <span>
               <p>{toLocaleFixed(bandwidthFee / 1000000, 6)}</p>
             </span>
+          </Row>
+          <Row>
+            <span>
+              <strong>KDA Fee</strong>
+            </span>
+            <KdaFeeSpan>
+              <span>
+                {kdaFee?.amount} {kdaFee?.kda || 'KLV'}
+              </span>
+              <Tooltip msg="Both kApp fee and bandwidth fee were payed with KDA" />
+            </KdaFeeSpan>
           </Row>
           <Row>
             <span>

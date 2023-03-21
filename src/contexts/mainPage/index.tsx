@@ -290,6 +290,7 @@ export const HomeDataProvider: React.FC = ({ children }) => {
           const res = await api.get({
             route: 'coins/klever',
             service: Service.GECKO,
+            useApiProxy: true,
           });
 
           if (!res.error || res.error === '') {

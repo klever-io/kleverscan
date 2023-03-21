@@ -129,7 +129,7 @@ const FormInput: React.FC<IFormInputProps> = ({
     e.target.blur();
   };
 
-  type === 'number' && (inputProps['step'] = '0.01');
+  type === 'number' && (inputProps['step'] = '0.00000001');
   type === 'number' &&
     maxDecimals &&
     (inputProps['onChange'] = ({ target }) => {
@@ -137,7 +137,8 @@ const FormInput: React.FC<IFormInputProps> = ({
         const regex = new RegExp('^-?\\d+.\\d{0,' + maxDecimals + '}');
         target.value = target.value?.toString()?.match(regex)?.[0] as string;
       }
-    });
+    }) &&
+    (inputProps['step'] = String(1 / Math.pow(10, maxDecimals)));
   type === 'number' && (inputProps['onWheel'] = preventScroll);
 
   const handleKey = (e: any) => {

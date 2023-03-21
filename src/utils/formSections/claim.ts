@@ -1,6 +1,9 @@
 import { ISection } from '@/components/Form';
 
-const claimContract = (labelId: string): ISection[] => {
+const claimContract = (
+  labelId: string,
+  inputValue: string | undefined,
+): ISection[] => {
   const section = [] as ISection[];
   labelId !== '' &&
     section.push({
@@ -9,6 +12,7 @@ const claimContract = (labelId: string): ISection[] => {
           label: labelId,
           props: {
             required: true,
+            value: inputValue || undefined,
           },
         },
       ],

@@ -91,6 +91,14 @@ const collectionContracts = [
   'WithdrawContract',
 ];
 
+const emptySectionContracts = [
+  'UpdateAccountPermissionContract',
+  'UnjailContract',
+  'UnfreezeContract',
+  'UndelegateContract',
+  'SetITOPricesContract',
+];
+
 const Contract: React.FC<IContract> = ({
   assetsList,
   proposalsList,
@@ -106,7 +114,7 @@ const Contract: React.FC<IContract> = ({
   valueContract,
 }) => {
   const [tokenChosen, setTokenChosen] = useState(false);
-  const [claimType, setClaimType] = useState(0);
+  const [claimType, setClaimType] = useState<any>();
   const [withdrawType, setWithdrawType] = useState<number | null>(null);
   const [depositValue, setDepositValue] = useState<number | null>(null);
   const [itoTriggerType, setItoTriggerType] = useState<number | null>(null);
@@ -201,7 +209,7 @@ const Contract: React.FC<IContract> = ({
     if (getAsset) {
       setCollection({ ...getAsset, frozenBalance: 0, balance: 0 });
     }
-    setClaimType(claimSelectedType?.value || 0);
+    setClaimType(claimSelectedType?.value);
   }, [assetTriggerSelected, claimSelectedType]);
 
   useEffect(() => {
@@ -232,19 +240,22 @@ const Contract: React.FC<IContract> = ({
   useEffect(() => {
     if (typeAssetTrigger !== null) setTypeAssetTrigger(null);
     if (itoTriggerType !== null) setItoTriggerType(null);
-    if (claimType !== 0) setClaimType(0);
+    if (claimType !== 0) setClaimType(undefined);
     if (withdrawType !== null) setWithdrawType(null);
     if (depositType !== null) setDepositType(null);
-    setFormSections([]);
+    if (emptySectionContracts.includes(contractType)) {
+      setFormSections([]);
+    }
   }, [contractType]);
 
   useEffect(() => {
-    if (claimType === 2) {
+    if (claimType === 0 || claimType === 1) {
       setFormSections([
         ...formSection({
           contract: 'ClaimContract',
           address: getOwnerAddress(),
-          claimLabel: 'Order ID',
+          claimLabel: 'Asset ID',
+          inputValue: claimSelectedType?.inputValue || '',
         }),
       ]);
     }
@@ -614,6 +625,7 @@ const Contract: React.FC<IContract> = ({
       <SelectContent>
         <FieldLabel>Claim Type</FieldLabel>
         <Select
+          zIndex={2}
           options={claimTypes}
           claimSelectedType={claimSelectedType}
           onChange={e => {
@@ -626,7 +638,7 @@ const Contract: React.FC<IContract> = ({
                     claimLabel: 'Asset ID',
                   }),
                 ]);
-              } else if (e.value === 2 || claimType === 2) {
+              } else if (e.value === 2) {
                 setFormSections([
                   ...formSection({
                     contract: 'ClaimContract',
@@ -635,7 +647,6 @@ const Contract: React.FC<IContract> = ({
                   }),
                 ]);
               }
-              setClaimType(claimSelectedType?.value || e.value);
             }
           }}
         />

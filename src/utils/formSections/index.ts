@@ -70,6 +70,7 @@ interface IFormSectionArgs {
   withdrawType?: number | null;
   collection?: ICollectionList;
   itoTriggerType?: number | null;
+  inputValue?: string;
 }
 
 const formSection = ({
@@ -83,6 +84,7 @@ const formSection = ({
   withdrawType,
   collection,
   itoTriggerType,
+  inputValue,
 }: IFormSectionArgs): ISection[] => {
   const contractsSections = {
     CreateAssetContract: type
@@ -99,9 +101,9 @@ const formSection = ({
     BuyContract: () => buyContract(buyType),
     SellContract: () => sellContract(),
     CancelMarketOrderContract: () => cancelMarketOrderContract(),
+    ClaimContract: () => claimContract(claimLabel || '', inputValue),
     CreateMarketplaceContract: () => createMarketplaceContract(address),
     ConfigMarketplaceContract: () => configMarketplaceContract(address),
-    ClaimContract: () => claimContract(claimLabel || ''),
     UnjailContract: () => unjailContract(),
     SetAccountNameContract: () => setAccountNameContract(),
     ValidatorConfigContract: () => validatorConfigContract(),

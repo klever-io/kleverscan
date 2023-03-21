@@ -1,5 +1,5 @@
 import Filter, { IFilter } from '@/components/Filter';
-import { contracts, status } from '@/configs/transactions';
+import { buyType, contracts, status } from '@/configs/transactions';
 import { useFetchPartialAsset } from '@/utils/hooks';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { useRouter } from 'next/router';
@@ -27,12 +27,18 @@ const TransactionsFilters: React.FC<ITransactionsFilters> = ({ setQuery }) => {
   const getContractName = (): string => ContractsIndex[Number(query.type)];
 
   const handleSelected = (selected: string, filterType: string): void => {
+    const updatedQuery = { ...query };
     if (selected === 'All') {
-      const updatedQuery = { ...query };
       delete updatedQuery[filterType];
+      if (filterType === 'type') {
+        delete updatedQuery['buyType'];
+      }
       setQuery(updatedQuery);
     } else if (filterType === 'type') {
-      setQuery({ ...query, [filterType]: getContractIndex(selected) });
+      if (selected !== 'Buy') {
+        delete updatedQuery['buyType'];
+      }
+      setQuery({ ...updatedQuery, [filterType]: getContractIndex(selected) });
     } else if (selected !== query[filterType]) {
       setQuery({ ...query, [filterType]: selected });
     }
@@ -65,6 +71,16 @@ const TransactionsFilters: React.FC<ITransactionsFilters> = ({ setQuery }) => {
       current: getContractName(),
     },
   ];
+
+  if (getContractName() === 'Buy') {
+    filters.push({
+      title: 'Buy Type',
+      data: buyType,
+      inputType: 'button',
+      onClick: selected => handleSelected(selected, 'buyType'),
+      current: query.buyType as string | undefined,
+    });
+  }
 
   return (
     <FilterContainer>

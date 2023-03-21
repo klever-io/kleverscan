@@ -489,7 +489,7 @@ const parseValues = (
   selectedBucket: string,
   proposalId: number | null,
   tokenChosen: boolean,
-  ITOBuy: boolean,
+  buyType: boolean,
   binaryOperations: string[],
   depositType: string | null,
   withdrawType: number | null,
@@ -565,7 +565,7 @@ const parseValues = (
       delete parsedValues.orderID;
     }
   } else if (contractType === 'BuyContract') {
-    parsedValues.buyType = ITOBuy ? 0 : 1;
+    parsedValues.buyType = buyType ? 1 : 0;
     if (parsedValues.orderID) {
       parsedValues.id = parsedValues.orderID;
       delete parsedValues.orderID;

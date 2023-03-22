@@ -9,16 +9,16 @@ import api from '@/services/api';
 import { IAsset, IPagination, IResponse, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
 import { useFetchPartialAsset } from '@/utils/hooks';
-import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import {
   Container,
   ContainerAssetId,
   Header,
   HeaderContainer,
 } from '@/views/assets';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
 
 interface IAssetResponse extends IResponse {
@@ -32,22 +32,28 @@ const Assets: React.FC = () => {
   const router = useRouter();
   const [filterAssets, fetchPartialAsset, loading, setLoading] =
     useFetchPartialAsset();
-  const [query, setQuery] = useState<NextParsedUrlQuery>({});
 
-  useEffect(() => {
-    if (!router.isReady) return;
-    setQuery(router.query);
-  }, [router.isReady]);
+  const setQueryAndRouter = (newQuery: NextParsedUrlQuery) => {
+    router.push({ pathname: router.pathname, query: newQuery }, undefined, {
+      shallow: true,
+    });
+  };
 
-  const handleSelected = (selected: string, filterType: string): void => {
+  const handleSelected = async (
+    selected: string,
+    filterType: string,
+  ): Promise<void> => {
+    while (!router.isReady) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
     if (selected === 'All') {
-      const updatedQuery = { ...query };
+      const updatedQuery = { ...router.query };
       delete updatedQuery[filterType];
-      setQuery(updatedQuery);
+      setQueryAndRouter(updatedQuery);
     } else if (filterType === 'type') {
-      setQuery({ ...query, [filterType]: selected });
-    } else if (selected !== query[filterType]) {
-      setQuery({ ...query, [filterType]: selected });
+      setQueryAndRouter({ ...router.query, [filterType]: selected });
+    } else if (selected !== router.query[filterType]) {
+      setQueryAndRouter({ ...router.query, [filterType]: selected });
     }
   };
 
@@ -60,7 +66,7 @@ const Assets: React.FC = () => {
         setLoading(true);
         await fetchPartialAsset(value);
       },
-      current: query.asset as string | undefined,
+      current: (router.query.asset as string) || undefined,
       loading,
     },
     {
@@ -68,34 +74,22 @@ const Assets: React.FC = () => {
       data: ['Fungible', 'NonFungible'],
       onClick: value => handleSelected(value, 'type'),
       inputType: 'button',
-      current: query.type as string | undefined,
+      current: (router.query.type as string) || undefined,
       loading,
     },
   ];
 
   const requestAssets = async (page: number, limit: number) => {
-    const localQuery = { ...query, page, limit };
+    while (!router.isReady) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    const localQuery = { ...router.query, page, limit };
     return api.get({
       route: `assets/kassets`,
       query: localQuery,
     });
   };
-
-  useEffect(() => {
-    const changeUrl = async () => {
-      router.push(
-        {
-          pathname: router.pathname,
-          query: query,
-        },
-        undefined,
-        {
-          shallow: true,
-        },
-      );
-    };
-    changeUrl();
-  }, [query]);
 
   const rowSections = (asset: IAsset): IRowSection[] => {
     const {
@@ -265,7 +259,7 @@ const Assets: React.FC = () => {
           <Title title="Assets" Icon={Icon} />
           <FilterContainer>
             {filters.map(filter => (
-              <Filter key={JSON.stringify(filter)} {...filter} />
+              <Filter key={filter.current} {...filter} />
             ))}
           </FilterContainer>
         </HeaderContainer>

@@ -27,6 +27,14 @@ const getEnvs = () => {
 module.exports = withImages({
   env: getEnvs(),
   i18n,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*",
+      },
+    ],
+  },
   reactStrictMode: false,
   webpack: config => {
     config.resolve.fallback = { fs: false };

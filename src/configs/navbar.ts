@@ -6,6 +6,8 @@ import {
   TickSquare,
   TwoUser,
 } from '@/assets/icons';
+import { GiTwoCoins } from 'react-icons/gi';
+
 export interface INavbarItem {
   name: string;
   pathTo: string;
@@ -63,6 +65,11 @@ const navbarItems: INavbarItem[] = [
         name: 'Charts',
         pathTo: '/charts',
         Icon: Graph,
+      },
+      {
+        name: 'ITOs',
+        pathTo: '/itos',
+        Icon: GiTwoCoins,
       },
     ],
   },

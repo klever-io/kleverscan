@@ -10,17 +10,17 @@ import { Container, Content, TitleContent } from './styles';
 interface IModalContract {
   title: string;
   contractType: string;
-  setContractType: React.Dispatch<React.SetStateAction<string>>;
+  setContractType?: React.Dispatch<React.SetStateAction<string>>;
   openModal: boolean;
   setOpenModal: Dispatch<SetStateAction<boolean>>;
   assetTriggerSelected?: IAccountAsset;
-  setAssetTriggerSelected: React.Dispatch<
+  setAssetTriggerSelected?: React.Dispatch<
     React.SetStateAction<IAccountAsset | undefined>
   >;
-  stakingRewards: number;
-  setStakingRewards: React.Dispatch<React.SetStateAction<any>>;
-  valueContract: any;
-  setValueContract: React.Dispatch<any>;
+  stakingRewards?: number;
+  setStakingRewards?: React.Dispatch<React.SetStateAction<any>>;
+  valueContract?: any;
+  setValueContract?: React.Dispatch<any>;
 }
 
 const ModalContract: React.FC<IModalContract> = ({
@@ -179,11 +179,14 @@ const ModalContract: React.FC<IModalContract> = ({
 
   const closeModal = () => {
     setOpenModal(false);
-    setContractType('');
-    setAssetTriggerSelected({} as IAccountAsset);
-    setStakingRewards(undefined);
-    setValueContract([]);
+    setContractType && setContractType('');
+    setAssetTriggerSelected && setAssetTriggerSelected({} as IAccountAsset);
+    setStakingRewards && setStakingRewards(undefined);
+    setValueContract && setValueContract([]);
   };
+
+  const stakingSelected =
+    stakingRewardsType && stakingRewards && stakingRewardsType[stakingRewards];
 
   return (
     <Container onMouseDown={closeModal} openModal={openModal}>
@@ -201,7 +204,7 @@ const ModalContract: React.FC<IModalContract> = ({
           kAssets={kassetsList}
           modalContractType={{ value: contractType }}
           assetTriggerSelected={assetTriggerSelected}
-          claimSelectedType={stakingRewardsType[stakingRewards]}
+          claimSelectedType={stakingSelected}
           openModal={openModal}
           valueContract={valueContract}
         />

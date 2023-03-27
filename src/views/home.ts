@@ -77,7 +77,7 @@ export const Section = styled.section`
 `;
 
 export const DataContainer = styled(Section)`
-  padding: 5rem 0;
+  padding: 0 0 5rem;
   /* background-color: #40274f;
   background-image: radial-gradient(
       at 29% 76%,

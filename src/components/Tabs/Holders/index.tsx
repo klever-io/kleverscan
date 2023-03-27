@@ -1,11 +1,17 @@
 import Copy from '@/components/Copy';
+import Filter, { IFilter } from '@/components/Filter';
 import Table, { ITable } from '@/components/Table';
 import { IBalance, IHolders, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
 import { parseAddress } from '@/utils/parseValues';
 import Link from 'next/link';
 import React from 'react';
-import { AddressContainer, RankingContainer, RankingText } from './styles';
+import {
+  AddressContainer,
+  FilterContainerHolders,
+  RankingContainer,
+  RankingText,
+} from './styles';
 
 interface IHolderTableProps {
   scrollUp: boolean;
@@ -15,7 +21,12 @@ interface IHolderTableProps {
   page: number;
 }
 
-const Holders: React.FC<IHolders> = ({ asset, holdersTableProps }) => {
+const Holders: React.FC<IHolders> = ({
+  asset,
+  holdersTableProps,
+  setHolderQuery,
+  holderQuery,
+}) => {
   const rowSections = (props: IBalance): IRowSection[] => {
     const { address, frozenBalance, index, rank, balance, totalBalance } =
       props;
@@ -85,6 +96,19 @@ const Holders: React.FC<IHolders> = ({ asset, holdersTableProps }) => {
     'Total Balance',
   ];
 
+  const filters: IFilter[] = [
+    {
+      title: 'Sort By',
+      firstItem: 'Total Balance',
+      data: ['Balance', 'Frozen'],
+      onClick: value => {
+        setHolderQuery(value);
+      },
+      current: holderQuery as string | undefined,
+      inputType: 'button',
+    },
+  ];
+
   const tableProps: ITable = {
     rowSections,
     header,
@@ -92,7 +116,16 @@ const Holders: React.FC<IHolders> = ({ asset, holdersTableProps }) => {
     ...holdersTableProps,
   };
 
-  return <Table {...tableProps} />;
+  return (
+    <>
+      <FilterContainerHolders>
+        {filters.map(filter => (
+          <Filter key={JSON.stringify(filter)} {...filter} />
+        ))}
+      </FilterContainerHolders>
+      <Table {...tableProps} />
+    </>
+  );
 };
 
 export default Holders;

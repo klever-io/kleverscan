@@ -1,0 +1,80 @@
+import styled from 'styled-components';
+
+export const Pack = styled.div`
+  padding: 1rem;
+  max-width: 20rem;
+  width: 100%;
+  border-radius: 0.8rem;
+  background-color: ${props => props.theme.card.background};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  span {
+    margin: 1rem;
+  }
+`;
+
+export const PackItem = styled.div`
+  height: 6rem;
+  width: 100%;
+  padding: 1rem 0;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 0.3rem;
+  gap: 0.3rem;
+
+  p {
+    text-align: center;
+    &:first-child {
+      font-size: 1rem;
+      color: ${props => props.theme.violet};
+    }
+    &:not(:first-child) {
+      font-size: 1rem;
+    }
+    color: white;
+  }
+`;
+
+export const Cube = styled.img`
+  width: 7rem;
+  margin-bottom: -3.6rem;
+  z-index: 998;
+
+  @media (max-width: 890px) {
+    width: 5rem;
+  }
+`;
+
+export const BuyButton = styled.div`
+  width: 100%;
+  background-color: ${props => props.theme.violet};
+  border-radius: 0.4rem;
+  margin-top: 0.4rem;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  span {
+    text-align: center;
+    color: ${props => props.theme.white};
+    font-weight: bold;
+    font-size: 1rem;
+    margin: 0;
+    padding: 0.5rem 1rem;
+  }
+`;
+
+export const LoaderWrapper = styled.div`
+  padding: 0.35rem 1.4rem;
+  margin: 1rem 0.5rem 1rem 0.5rem;
+`;

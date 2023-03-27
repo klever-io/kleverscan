@@ -2,7 +2,13 @@ import { IChartData } from '@/configs/home';
 import { ISO2 } from '@/utils/country';
 import { Dispatch, SetStateAction } from 'react';
 import { IBlock } from './blocks';
-import { Contract, IContract, IParameterOnlyAssetId } from './contracts';
+import {
+  Contract,
+  IContract,
+  IPackInfo,
+  IParameterOnlyAssetId,
+  IWhitelistInfo,
+} from './contracts';
 import { INodeOverview } from './proposals';
 
 export type Query = {
@@ -207,6 +213,8 @@ export interface IAssetsBuckets {
 export interface IHolders {
   asset: IAsset;
   holdersTableProps: IInnerTableProps;
+  setHolderQuery: React.Dispatch<React.SetStateAction<string>>;
+  holderQuery: string;
 }
 export interface IHolder extends IAccountAsset {
   totalBalance: number;
@@ -335,6 +343,27 @@ export interface IAsset {
   verified: boolean;
   metadata?: string;
   mime?: string;
+}
+
+export interface IITO {
+  assetId: string;
+  isActive: boolean;
+  maxAmount: number;
+  receiverAddress: string;
+  packData: IPackInfo[];
+  isWhitelistActive: boolean;
+  whitelistInfo: IWhitelistInfo[];
+  whitelistStartTime: number;
+  whitelistEndTime: number;
+  startTime: number;
+  endTime: number;
+}
+
+export interface IParsedITO extends IITO {
+  ticker: string;
+  assetType: string;
+  precision: number;
+  assetLogo: string;
 }
 
 export interface IAssetPool {

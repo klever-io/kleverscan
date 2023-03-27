@@ -1,3 +1,4 @@
+import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import styled from 'styled-components';
 
 export const RankingContainer = styled.div`
@@ -28,4 +29,8 @@ export const AddressContainer = styled.div`
   width: 100%;
   justify-content: space-between;
   align-items: center;
+`;
+
+export const FilterContainerHolders = styled(FilterContainer)`
+  margin-bottom: 1rem;
 `;

@@ -14,7 +14,9 @@ describe('Component: Header/navbar', () => {
     'Validators',
     // 'Nodes',
     'Proposals',
+    'Multisign',
     'Charts',
+    'ITOs',
   ];
 
   jest.mock('next/router', () => ({

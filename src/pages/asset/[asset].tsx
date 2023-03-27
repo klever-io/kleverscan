@@ -77,6 +77,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
   const [asset, setAsset] = useState<null | IAsset>(null);
   const [assetPool, setAssetPool] = useState<null | IAssetPool>(null);
 
+  const [holderQuery, setHolderQuery] = useState<string>('');
   const [transactionsPagination, setTransactionsPagination] =
     useState<null | IPagination>(null);
   const [holdersPagination, setHoldersPagination] =
@@ -100,8 +101,15 @@ const Asset: React.FC<IAssetPage> = ({}) => {
     if (router?.isReady) {
       setQueryAndRouter(initialQueryState);
       setSelectedTab((router.query.tab as string) || tableHeaders[0]);
+      setHolderQuery(router.query.sortBy as string);
     }
   }, [router.isReady]);
+
+  useEffect(() => {
+    if (selectedTab !== 'Transactions' && selectedTab) {
+      setQueryAndRouter({ ...router.query, sortBy: holderQuery });
+    }
+  }, [holderQuery]);
 
   const requestTransactions = async (page: number, limit: number) => {
     const newQuery = { ...router.query, asset: asset?.assetId || '' };
@@ -135,9 +143,17 @@ const Asset: React.FC<IAssetPage> = ({}) => {
   };
 
   const requestAssetHolders = async (page: number, limit: number) => {
+    let newQuery = {
+      ...router.query,
+      sortBy: holderQuery?.toLowerCase() || '',
+    };
+    if (holderQuery === 'Total Balance') {
+      newQuery = { ...router.query, sortBy: 'total' || '' };
+    }
     if (asset) {
       const response = await api.get({
-        route: `assets/holders/${asset.assetId}?page=${page}&limit=${limit}`,
+        route: `assets/holders/${asset.assetId}`,
+        query: { page, limit, ...newQuery },
       });
 
       let parsedHolders: IBalance[] = [];
@@ -854,7 +870,12 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       case 'Holders':
         if (asset) {
           return (
-            <Holders asset={asset} holdersTableProps={holdersTableProps} />
+            <Holders
+              asset={asset}
+              holdersTableProps={holdersTableProps}
+              setHolderQuery={setHolderQuery}
+              holderQuery={holderQuery}
+            />
           );
         }
       default:
@@ -871,7 +892,11 @@ const Asset: React.FC<IAssetPage> = ({}) => {
     headers: tableHeaders,
     onClick: header => {
       setSelectedTab(header);
-      setQueryAndRouter({ ...router.query, tab: header });
+      const a = {
+        ...router.query,
+      };
+      delete a.sortBy;
+      setQueryAndRouter({ ...a, tab: header });
     },
     dateFilterProps,
   };

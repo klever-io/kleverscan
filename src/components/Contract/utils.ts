@@ -1,3 +1,4 @@
+import { IPackItem } from '@/types/contracts';
 import { ICollectionList } from '@/types/index';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { getPrecision } from '@/utils/precisionFunctions';
@@ -53,19 +54,23 @@ const getType = (rawType: string): TransactionType => {
   return TransactionType[type];
 };
 
-const parsePackInfoPrecision = (payload: any) => {
+const parsePackInfoPrecision = async (payload: any) => {
   if (payload.packInfo) {
-    Object.entries(payload.packInfo).forEach(
-      async ([key, { packs }]: [string, any]) => {
-        const packPrecision = (await getPrecision(key)) as number;
-
-        if (packPrecision !== undefined) {
-          packs.forEach((pack: any) => {
-            pack.price = pack.price * 10 ** packPrecision;
-          });
-        } else return;
-      },
-    );
+    const packAmountPrecision = (await getPrecision(payload.kda)) as number;
+    for (
+      let index = 0;
+      index < Object.entries(payload.packInfo).length;
+      index++
+    ) {
+      const [key, { packs }] = Object.entries(payload.packInfo)[index] as any;
+      const packPricePrecision = (await getPrecision(key)) as number;
+      if (packPricePrecision !== undefined) {
+        packs.forEach((pack: IPackItem) => {
+          pack.price = pack.price * 10 ** packPricePrecision;
+          pack.amount = pack.amount * 10 ** packAmountPrecision;
+        });
+      } else return;
+    }
   }
 };
 
@@ -105,7 +110,6 @@ const precisionParse = async (
   let precision: number;
   let assetId = 'KLV';
   const percentagePrecision = 2;
-
   const addPrecision = (value: number, precision: number) => {
     return value * 10 ** precision;
   };
@@ -162,7 +166,6 @@ const precisionParse = async (
       });
     }
   };
-
   switch (contractType) {
     case 'TransferContract':
     case 'FreezeContract':
@@ -217,14 +220,11 @@ const precisionParse = async (
       break;
     case 'ConfigITOContract':
       if (payload.maxAmount) {
-        const assetId = payload.kda ? payload.kda : payload.assetId;
+        const assetId = payload.kda;
         precision = (await getPrecision(assetId)) as number;
-        if (precision !== undefined) {
-          payload.maxAmount = addPrecision(payload.maxAmount, precision);
-        } else return;
       }
     case 'ITOTriggerContract':
-      parsePackInfoPrecision(payload);
+      await parsePackInfoPrecision(payload);
       await parseWhitelistInfoPrecision(payload);
 
       await addFieldPrecision('maxAmount', payload.kda);

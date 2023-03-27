@@ -6,6 +6,9 @@ import {
   TickSquare,
   TwoUser,
 } from '@/assets/icons';
+import { GiTwoCoins } from 'react-icons/gi';
+import { RiPenNibFill } from 'react-icons/ri';
+
 export interface INavbarItem {
   name: string;
   pathTo: string;
@@ -60,9 +63,19 @@ const navbarItems: INavbarItem[] = [
         Icon: Proposal,
       },
       {
+        name: 'Multisign',
+        pathTo: '/multisign',
+        Icon: RiPenNibFill,
+      },
+      {
         name: 'Charts',
         pathTo: '/charts',
         Icon: Graph,
+      },
+      {
+        name: 'ITOs',
+        pathTo: '/itos',
+        Icon: GiTwoCoins,
       },
     ],
   },

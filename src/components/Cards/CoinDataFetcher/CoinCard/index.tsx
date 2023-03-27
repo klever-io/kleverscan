@@ -313,7 +313,9 @@ const CoinCard: React.FC = () => {
                       {coin.shortname === 'KLV' ? (
                         <>
                           {' '}
-                          <span>$ {coin.marketCap.price.toLocaleString()}</span>
+                          <span>
+                            $ {coin.marketCap.price?.toLocaleString()}
+                          </span>
                         </>
                       ) : (
                         <>

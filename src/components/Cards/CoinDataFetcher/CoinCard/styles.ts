@@ -57,7 +57,7 @@ export const CardContainer = styled.div`
   padding: 1.5rem;
   scroll-snap-align: start;
   position: relative;
-
+  min-height: 17.4rem;
   flex-direction: row;
   align-items: center;
 

@@ -76,6 +76,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
   const [selectedTab, setSelectedTab] = useState<null | string>(null);
   const [asset, setAsset] = useState<null | IAsset>(null);
   const [assetPool, setAssetPool] = useState<null | IAssetPool>(null);
+
   const [holderQuery, setHolderQuery] = useState<string>('');
   const [transactionsPagination, setTransactionsPagination] =
     useState<null | IPagination>(null);

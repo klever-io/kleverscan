@@ -154,8 +154,24 @@ export const ExtraOptionContainer = styled.div`
   padding-top: 1rem;
   padding-bottom: 1rem;
 
+  animation: color-change 1s infinite;
+
+  @keyframes color-change {
+    0% {
+      color: ${props => props.theme.violet};
+    }
+    50% {
+      color: ${props => props.theme.lightPurple};
+    }
+    100% {
+      color: ${props => props.theme.purple};
+    }
+  }
+  border: 2px solid;
+  border-color: color-change;
   background-color: ${props => props.theme.white};
-  box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? '#000' : lighten(0.8, '#000'))};
+  box-shadow: 0 0 1rem 0
+    ${props => (props.theme.dark ? '#000' : lighten(0.8, '#000'))};
 
   justify-content: flex-start;
   align-items: center;
@@ -166,26 +182,21 @@ export const ExtraOptionContainer = styled.div`
 
   a {
     padding-left: 2rem;
-    color: ${props => props.theme.form.hash};
+    color: ${props =>
+      props.theme.dark ? props.theme.darkText : props.theme.form.hash};
     font-weight: 600;
 
     text-decoration: none;
-
+    animation: none;
     &:hover {
-      color: ${props => props.theme.form.hoverHash};
+      color: ${props =>
+        props.theme.dark ? props.theme.true.white : props.theme.form.hoverHash};
     }
-
-    &:visited {
-      color: ${props => props.theme.form.hash};
-      &:hover {
-        color: ${props => props.theme.form.hoverHash};
-      }
-    }
-
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
   }
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `;
 
 export const SelectContainer = styled.div`

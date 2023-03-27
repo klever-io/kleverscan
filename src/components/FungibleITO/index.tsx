@@ -156,7 +156,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
 
                 if (packInfo.packs.length === 1) {
                   return (
-                    <Row>
+                    <Row key={packItemIndex}>
                       <span>0 +</span>
                       <span>
                         {packItem.price} {packInfo.key} / {ITO.ticker}
@@ -165,7 +165,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
                   );
                 } else if (packInfo.packs.length === 2) {
                   return (
-                    <Row>
+                    <Row key={packItemIndex}>
                       <span>
                         {packItemIndex === 0
                           ? `0 - ${packItem.amount}`

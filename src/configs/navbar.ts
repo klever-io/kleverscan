@@ -7,6 +7,7 @@ import {
   TwoUser,
 } from '@/assets/icons';
 import { GiTwoCoins } from 'react-icons/gi';
+import { RiPenNibFill } from 'react-icons/ri';
 
 export interface INavbarItem {
   name: string;
@@ -60,6 +61,11 @@ const navbarItems: INavbarItem[] = [
         name: 'Proposals',
         pathTo: '/proposals',
         Icon: Proposal,
+      },
+      {
+        name: 'Multisign',
+        pathTo: '/multisign',
+        Icon: RiPenNibFill,
       },
       {
         name: 'Charts',

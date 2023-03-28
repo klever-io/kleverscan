@@ -503,6 +503,7 @@ export const HomeDataProvider: React.FC = ({ children }) => {
           if (response.status === 'rejected') {
             switch (index) {
               case 0:
+              case 1:
                 coinsData.push({
                   name: 'Klever',
                   shortname: 'KLV',

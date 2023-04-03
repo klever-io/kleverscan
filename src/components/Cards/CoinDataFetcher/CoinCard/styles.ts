@@ -89,6 +89,10 @@ export const CardContent = styled.div`
   }
 `;
 
+export const CardContentError = styled(CardContent)`
+  animation: '';
+`;
+
 export const CardContainerSkeleton = styled(CardContainer)`
   padding: 1.5rem 1.5rem 1.5rem 1.5rem;
 `;
@@ -286,4 +290,32 @@ export const CoinSelector = styled.div<{ isSelected: boolean }>`
 
   cursor: pointer;
   border-radius: 50%;
+`;
+
+export const ContainerLoading = styled.div`
+  display: flex;
+  height: 60%;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const ContentError = styled.div`
+  display: flex;
+  padding: 1rem;
+  span {
+    :hover {
+      opacity: 0.5;
+    }
+    cursor: pointer;
+    color: ${props => props.theme.card.white};
+  }
+`;
+
+export const NameError = styled(Name)`
+  span {
+    &:first-of-type {
+      cursor: text !important;
+    }
+  }
 `;

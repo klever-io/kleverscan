@@ -1,5 +1,6 @@
 import { ArrowDown } from '@/assets/icons';
 import Chart, { ChartType } from '@/components/Chart';
+import { Loader } from '@/components/Loader/styles';
 import { useHomeData } from '@/contexts/mainPage';
 import { ICoinInfo } from '@/types/index';
 import { getVariation } from '@/utils';
@@ -11,16 +12,20 @@ import {
   ArrowDownDiv,
   CardContainer,
   CardContent,
+  CardContentError,
   ChartContainer,
   CoinSelector,
   CoinsSelector,
   Container,
+  ContainerLoading,
   Content,
+  ContentError,
   Description,
   HeaderContainer,
   HeaderContent,
   IconContainer,
   Name,
+  NameError,
   TitleDetails,
   ValueContainer,
   ValueContent,
@@ -34,6 +39,7 @@ interface IDropDow {
 
 const CoinCard: React.FC = () => {
   const [selectedCoin, setSelectedCoin] = useState(0);
+  const [loadingError, setLoadingError] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const [arrowOpen, setArrowOpen] = useState(false);
@@ -230,6 +236,36 @@ const CoinCard: React.FC = () => {
     );
   };
 
+  const CoinsFetchFails: React.FC = () => {
+    if (coins.length === 0) {
+      return (
+        <CardContainer>
+          <CardContentError>
+            <HeaderContainer>
+              <HeaderContent>
+                <NameError>
+                  <span>DATA ERROR</span>
+                </NameError>
+              </HeaderContent>
+            </HeaderContainer>
+          </CardContentError>
+          <ContentError
+            onClick={() => {
+              setLoadingError(true);
+              setTimeout(() => {
+                setLoadingError(false);
+              }, 5000);
+            }}
+          >
+            <span>Click to reload card</span>
+          </ContentError>
+          <ContainerLoading>{loadingError && <Loader />}</ContainerLoading>
+        </CardContainer>
+      );
+    }
+    return <></>;
+  };
+
   return !loadingCoins ? (
     <Container>
       <Content ref={carouselRef} onScroll={handleSelectCoin}>
@@ -339,6 +375,7 @@ const CoinCard: React.FC = () => {
             </CardContainer>
           );
         })}
+        <CoinsFetchFails />
       </Content>
 
       <CoinsSelector>

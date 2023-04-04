@@ -45,7 +45,7 @@ const CoinCard: React.FC = () => {
   const [arrowOpen, setArrowOpen] = useState(false);
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
 
-  const { assetsData, coins, loadingCoins } = useHomeData();
+  const { assetsData, coins, loadingCoins, getCoins } = useHomeData();
 
   const handleSelectCoin = useCallback(() => {
     if (carouselRef.current !== null && cardRef.current !== null)
@@ -250,11 +250,10 @@ const CoinCard: React.FC = () => {
             </HeaderContainer>
           </CardContentError>
           <ContentError
-            onClick={() => {
+            onClick={async () => {
               setLoadingError(true);
-              setTimeout(() => {
-                setLoadingError(false);
-              }, 5000);
+              await getCoins();
+              setLoadingError(false);
             }}
           >
             <span>Click to reload card</span>

@@ -91,6 +91,11 @@ export const CardContent = styled.div`
 
 export const CardContentError = styled(CardContent)`
   animation: '';
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const CardContainerSkeleton = styled(CardContainer)`
@@ -303,12 +308,18 @@ export const ContainerLoading = styled.div`
 export const ContentError = styled.div`
   display: flex;
   padding: 1rem;
+  gap: 0.5rem;
   span {
     :hover {
       opacity: 0.5;
     }
     cursor: pointer;
     color: ${props => props.theme.card.white};
+  }
+  svg {
+    cursor: pointer;
+    margin-top: 0.2rem;
+    color: ${props => props.theme.darkText};
   }
 `;
 

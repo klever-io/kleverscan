@@ -1,12 +1,12 @@
 import { ArrowDown } from '@/assets/icons';
 import Chart, { ChartType } from '@/components/Chart';
-import { Loader } from '@/components/Loader/styles';
 import { useHomeData } from '@/contexts/mainPage';
 import { ICoinInfo } from '@/types/index';
 import { getVariation } from '@/utils';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useCallback, useRef, useState } from 'react';
+import { IoReloadSharp } from 'react-icons/io5';
 import CoinCardSkeleton from '../CoinCardSkeleton';
 import {
   ArrowDownDiv,
@@ -17,7 +17,6 @@ import {
   CoinSelector,
   CoinsSelector,
   Container,
-  ContainerLoading,
   Content,
   ContentError,
   Description,
@@ -238,28 +237,28 @@ const CoinCard: React.FC = () => {
 
   const CoinsFetchFails: React.FC = () => {
     if (coins.length === 0) {
-      return (
+      return !loadingError ? (
         <CardContainer>
           <CardContentError>
             <HeaderContainer>
-              <HeaderContent>
-                <NameError>
-                  <span>DATA ERROR</span>
-                </NameError>
-              </HeaderContent>
+              <NameError>
+                <span>Error while fetching data</span>
+              </NameError>
             </HeaderContainer>
+            <ContentError
+              onClick={async () => {
+                setLoadingError(true);
+                await getCoins();
+                setLoadingError(false);
+              }}
+            >
+              <span>Retry</span>
+              <IoReloadSharp />
+            </ContentError>
           </CardContentError>
-          <ContentError
-            onClick={async () => {
-              setLoadingError(true);
-              await getCoins();
-              setLoadingError(false);
-            }}
-          >
-            <span>Click to reload card</span>
-          </ContentError>
-          <ContainerLoading>{loadingError && <Loader />}</ContainerLoading>
         </CardContainer>
+      ) : (
+        <CoinCardSkeleton />
       );
     }
     return <></>;

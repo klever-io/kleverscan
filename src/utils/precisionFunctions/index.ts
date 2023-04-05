@@ -98,7 +98,7 @@ export const getPrecisionFromApi = async (
     if (response.error) {
       const messageError =
         response.error.charAt(0).toUpperCase() + response.error.slice(1);
-      toast.error(messageError);
+      toast.error(messageError, { toastId: 'Fetch timeout' });
       throw new Error(response.error);
     }
 

@@ -1539,7 +1539,6 @@ export const Sell: React.FC<IIndexedContract> = ({
     15,
     14,
   );
-
   const sellReceipt = findReceipt(receipts, contractIndex, 15);
   return (
     <>
@@ -1617,7 +1616,7 @@ export const Sell: React.FC<IIndexedContract> = ({
           <strong>End Time</strong>
         </span>
         <span>
-          {parameter?.endTime ? formatDate(parameter?.endTime) : '--'}
+          {parameter?.endTime ? formatDate(parameter?.endTime * 1000) : '--'}
         </span>
       </Row>
     </>

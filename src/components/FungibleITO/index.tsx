@@ -4,12 +4,14 @@ import Input from 'components/Input';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { IParsedITO } from 'types';
+import { Loader } from '../Loader/styles';
 import {
   AssetName,
   Button,
   Container,
   Content,
   FungibleContainer,
+  LoaderWrapper,
   PriceRange,
   PriceRangeTitle,
   Row,
@@ -44,6 +46,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
   showcase,
 }) => {
   const [amount, setAmount] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const calculateCost = (indexPackData: number, qtyPacks: number) => {
     if (ITO) {
@@ -105,6 +108,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
     };
 
     try {
+      setLoading(true);
       const unsignedTx = await web.buildTransaction([
         {
           type: 17, // Buy Order type
@@ -118,6 +122,8 @@ const FungibleITO: React.FC<IFungibleITO> = ({
     } catch (e: any) {
       console.warn(`%c ${e}`, 'color: red');
       toast.error(e.message ? e.message : e);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -140,10 +146,15 @@ const FungibleITO: React.FC<IFungibleITO> = ({
               {packInfo.key}
             </span>
           </TotalPrice>
-          {!showcase && (
+          {!showcase && !loading && (
             <Button onClick={() => handleSubmit(packInfo.key)}>
               <span>Buy Token</span>
             </Button>
+          )}
+          {loading && (
+            <LoaderWrapper>
+              <Loader />
+            </LoaderWrapper>
           )}
         </Content>
         <Content>

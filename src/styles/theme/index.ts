@@ -155,6 +155,11 @@ const theme = {
     mobile: '768px',
     tablet: '1025px',
   },
+
+  kappsDemo: {
+    dark: '#222345',
+    darker: '#16162c',
+  },
 };
 
 export default theme;

@@ -146,7 +146,7 @@ export const ItemTransaction = styled.div<{ selected: boolean }>`
 
 export const MobileItem = styled(Item)`
   justify-content: flex-end;
-
+  color: ${props => props.theme.navbar.text};
   font-size: 1.5rem;
 `;
 

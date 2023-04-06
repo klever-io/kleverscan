@@ -1,4 +1,5 @@
 import { Assets as Icon } from '@/assets/title-icons';
+import ModalContract from '@/components/Contract/ModalContract';
 import Copy from '@/components/Copy';
 import { default as FungibleITO } from '@/components/FungibleITO';
 import { Container } from '@/components/FungibleITO/styles';
@@ -17,7 +18,7 @@ import {
   AssetsList,
   ChooseAsset,
   CloseIcon,
-  CustomLink,
+  CreateITOButton,
   HashAndCopy,
   HashContent,
   Header,
@@ -49,6 +50,7 @@ const ITOsPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [txHash, setTxHash] = useState('');
   const [loading, setLoading] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const { isMobile } = useMobile();
   const { extensionInstalled, connectExtension } = useExtension();
 
@@ -103,8 +105,20 @@ const ITOsPage: React.FC = () => {
     return ITO;
   };
 
+  const requestWithLoading = async () => {
+    setLoading(true);
+    await requestITOs();
+    setLoading(false);
+  };
+
   useEffect(() => {
-    requestITOs();
+    requestWithLoading();
+  }, []);
+
+  useEffect(() => {
+    if (page > 1) {
+      requestITOs();
+    }
   }, [page]);
 
   if (extensionInstalled) {
@@ -157,65 +171,63 @@ const ITOsPage: React.FC = () => {
   };
 
   const ITOTable = () => {
-    if (ITOs.length) {
-      const filteredITOs = filterITOs(search);
-
-      return (
-        <>
-          <AssetsList>
-            <SearchContainer>
-              <Input
-                type="text"
-                value={search}
-                placeholder="Type asset name"
-                onChange={e => {
-                  setSearch(e.target.value.toUpperCase());
-                }}
-                handleConfirmClick={() => handleConfirmClick()}
-              />
-              <ITOSearchButton onClick={handleConfirmClick}>
-                Search
-              </ITOSearchButton>
-            </SearchContainer>
-            <Scrollable id="scrollableDiv">
-              <InfiniteScroll
-                style={{
-                  gap: '0.7rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  flexDirection: 'column',
-                  marginBottom: 15,
-                }}
-                dataLength={ITOs?.length}
-                next={paginateITOs}
-                hasMore={(page >= lastPage ? false : true) && !search}
-                loader={<Loader />}
-                scrollableTarget={'scrollableDiv'}
-                endMessage={'All ITOs have been loaded.'}
-              >
-                <Scroll>
-                  {filteredITOs &&
-                    filteredITOs.map((ITO: IParsedITO) => {
-                      return (
-                        <AssetContainer
-                          selected={selectedITO?.assetId === ITO.assetId}
-                          key={ITO.assetId}
-                          onClick={() => setSelectedITO(ITO)}
-                        >
-                          <IDAsset>
-                            <span>{ITO.assetId}</span>
-                          </IDAsset>
-                        </AssetContainer>
-                      );
-                    })}
-                </Scroll>
-              </InfiniteScroll>
-            </Scrollable>
-          </AssetsList>
-          {isMobile && <LineInputSection />}
-        </>
-      );
-    }
+    const filteredITOs = filterITOs(search);
+    return (
+      <>
+        <AssetsList>
+          <SearchContainer>
+            <Input
+              containerStyles={{ width: '100%' }}
+              type="text"
+              value={search}
+              placeholder="Type asset name"
+              onChange={e => {
+                setSearch(e.target.value.toUpperCase());
+              }}
+              handleConfirmClick={() => handleConfirmClick()}
+            />
+            <ITOSearchButton onClick={handleConfirmClick}>
+              Search
+            </ITOSearchButton>
+          </SearchContainer>
+          <Scrollable id="scrollableDiv">
+            <InfiniteScroll
+              style={{
+                gap: '0.7rem',
+                display: 'flex',
+                alignItems: 'center',
+                flexDirection: 'column',
+                marginBottom: 15,
+              }}
+              dataLength={ITOs?.length}
+              next={paginateITOs}
+              hasMore={(page >= lastPage ? false : true) && !search}
+              loader={<Loader />}
+              scrollableTarget={'scrollableDiv'}
+              endMessage={ITOs?.length ? 'All ITOs have been loaded.' : ''}
+            >
+              <Scroll>
+                {filteredITOs &&
+                  filteredITOs.map((ITO: IParsedITO) => {
+                    return (
+                      <AssetContainer
+                        selected={selectedITO?.assetId === ITO.assetId}
+                        key={ITO.assetId}
+                        onClick={() => setSelectedITO(ITO)}
+                      >
+                        <IDAsset>
+                          <span>{ITO.assetId}</span>
+                        </IDAsset>
+                      </AssetContainer>
+                    );
+                  })}
+              </Scroll>
+            </InfiniteScroll>
+          </Scrollable>
+        </AssetsList>
+        {isMobile && <LineInputSection />}
+      </>
+    );
   };
 
   const displayITO = () => {
@@ -269,21 +281,27 @@ const ITOsPage: React.FC = () => {
     );
   };
 
+  const modalOptions = {
+    contractType: 'ConfigITOContract',
+    setOpenModal: setModalOpen,
+    openModal: modalOpen,
+    title: 'Create ITO',
+  };
+
   return (
     <MainContainer>
       <ITOContainer>
         <Header>
           <Title title="ITOs" Icon={Icon} />
-          <Link href={{ pathname: `/create-transaction` }}>
-            <CustomLink>Create ITO</CustomLink>
-          </Link>
+          <CreateITOButton onClick={() => setModalOpen(true)}>
+            Create ITO
+          </CreateITOButton>
         </Header>
+        <ModalContract {...modalOptions} />
         <MainContent>
-          {ITOs.length ? (
-            <SideList>
-              <AssetsList>{ITOTable()}</AssetsList>
-            </SideList>
-          ) : null}
+          <SideList>
+            <AssetsList>{ITOTable()}</AssetsList>
+          </SideList>
           <ITOContent>
             <div>
               {txHash && (
@@ -300,7 +318,7 @@ const ITOsPage: React.FC = () => {
                 </HashContent>
               )}
 
-              {selectedITO && !loading ? (
+              {selectedITO ? (
                 displayITO()
               ) : (
                 <ChooseAsset>

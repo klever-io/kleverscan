@@ -12,8 +12,8 @@ export const FungibleContainer = styled.div`
   border-radius: 5px;
   justify-content: space-between;
   padding: 3rem;
-  background-color: ${props => props.theme.card.background};
-  gap: 2rem;
+  background-color: ${props =>
+    props.theme.dark ? props.theme.card.background : props.theme.white};
 
   @media (max-width: 1200px) {
     flex-direction: column;
@@ -37,7 +37,7 @@ export const Content = styled.div`
 `;
 
 export const AssetName = styled.span`
-  color: white;
+  color: ${props => props.theme.black};
   font-size: 1.8rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
@@ -56,7 +56,7 @@ export const Button = styled.div`
   cursor: pointer;
 
   span {
-    color: white;
+    color: ${props => props.theme.true.white};
     text-align: center;
     font-size: 0.9rem;
   }
@@ -74,12 +74,12 @@ export const TotalPrice = styled.div`
     font-size: 0.9rem;
 
     :first-child {
-      color: ${props => props.theme.true.white};
+      color: ${props => props.theme.black};
       font-weight: bold;
     }
 
     :nth-child(2) {
-      color: ${props => props.theme.true.white};
+      color: ${props => props.theme.black};
     }
   }
 `;
@@ -92,7 +92,7 @@ export const PriceRange = styled.div`
 `;
 
 export const PriceRangeTitle = styled.span`
-  color: ${props => props.theme.true.white};
+  color: ${props => props.theme.black};
   font-size: 0.8rem;
   margin-bottom: 0.5rem;
   font-weight: bold;
@@ -106,4 +106,11 @@ export const Row = styled.div`
   span {
     color: ${props => props.theme.darkText};
   }
+`;
+
+export const LoaderWrapper = styled.div`
+  margin-top: 0.4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;

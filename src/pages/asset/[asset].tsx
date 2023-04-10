@@ -120,8 +120,8 @@ const Asset: React.FC<IAssetPage> = ({}) => {
   };
 
   const parseURIs = (asset: IAsset) => {
-    let uris = {};
-    if (asset.uris && asset.uris.length > 0) {
+    let uris: { [key: string]: string } = {};
+    if (asset.uris instanceof Array && asset.uris.length > 0) {
       (asset.uris as IUri[]).forEach(uri => {
         uris = {
           ...uris,

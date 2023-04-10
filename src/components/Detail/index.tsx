@@ -1,6 +1,8 @@
 import Table, { ITable } from '@/components/Table';
 import React from 'react';
+import Filter, { IFilter } from '../Filter';
 import Title from '../Layout/Title';
+import { FilterContainer } from '../TransactionsFilters/styles';
 import { Container, Header, TableContainer } from './styles';
 
 interface IDetail {
@@ -9,6 +11,7 @@ interface IDetail {
   cards: any | undefined;
   tableProps: ITable;
   route?: string;
+  filters?: IFilter[];
 }
 
 const Detail: React.FC<IDetail> = ({
@@ -18,11 +21,19 @@ const Detail: React.FC<IDetail> = ({
   children,
   tableProps,
   route,
+  filters,
 }) => {
   return (
     <Container>
-      <Header>
+      <Header filterOn={!!filters}>
         <Title title={title} Icon={Icon} route={route} />
+        {filters && (
+          <FilterContainer>
+            {filters.map(filter => (
+              <Filter key={filter.current} {...filter} />
+            ))}
+          </FilterContainer>
+        )}
       </Header>
       <TableContainer>
         {cards && <h3>List of {title.toLowerCase()}</h3>}

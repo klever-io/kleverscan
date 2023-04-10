@@ -3,18 +3,22 @@ import styled from 'styled-components';
 
 export const Container = styled.div``;
 
-export const Header = styled.section`
+export const Header = styled.section<{ filterOn?: boolean }>`
   display: flex;
-  flex-direction: row;
+  flex-direction: ${props => (props.filterOn ? 'column' : 'row')};
   justify-content: space-between;
-  align-items: center;
-
+  align-items: ${props => (props.filterOn ? 'flex-start' : 'center')};
   margin-bottom: 1rem;
-
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
-
     align-items: flex-start;
+  }
+
+  div:last-child {
+    margin-top: 1.5rem;
+    div {
+      margin-top: 0;
+    }
   }
 `;
 

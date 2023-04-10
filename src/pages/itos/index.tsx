@@ -39,9 +39,102 @@ import {
   SideList,
 } from '@/views/itos';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { toast } from 'react-toastify';
+
+export const displayITOpacks = (
+  ITO: IParsedITO,
+  setTxHash: Dispatch<SetStateAction<string>>,
+): JSX.Element => {
+  return (
+    <>
+      <ITOTitle>
+        <span>{ITO && ITO?.assetId}</span>
+      </ITOTitle>
+      {ITO?.assetType === 'Fungible'
+        ? ITO?.packData?.map((packInfo: IPackInfo, packInfoIndex: number) => {
+            return (
+              <Container key={packInfoIndex}>
+                <FungibleITO
+                  packInfo={packInfo}
+                  ITO={ITO}
+                  setTxHash={setTxHash}
+                  packInfoIndex={packInfoIndex}
+                />
+              </Container>
+            );
+          })
+        : ITO?.packData?.map((item: any, index) => {
+            return (
+              <PackContainer key={index + ITO.assetId}>
+                <KeyLabel>{`Price in ${item.key}`}</KeyLabel>
+                <ItemsContainer>
+                  {item.packs.map((pack: any, index: number) => {
+                    return (
+                      <NonFungibleITO
+                        key={`${index}${item.assetId}`}
+                        pack={pack}
+                        currencyId={item.key}
+                        selectedITO={ITO}
+                        setTxHash={setTxHash}
+                      />
+                    );
+                  })}
+                </ItemsContainer>
+              </PackContainer>
+            );
+          })}
+      {!ITO?.packData && (
+        <ChooseAsset>
+          {' '}
+          <span>No packs found.</span>
+        </ChooseAsset>
+      )}
+    </>
+  );
+};
+
+export const processITOPrecisions = async (
+  ITO: IITO,
+  assetPrecision: number,
+): Promise<IITO> => {
+  ITO.packData.forEach(async packInfo => {
+    const keyPrecision = await getPrecision(packInfo.key);
+    packInfo.packs.forEach(pack => {
+      pack.price = pack.price / 10 ** keyPrecision;
+      pack.amount = pack.amount / 10 ** assetPrecision;
+    });
+  });
+  return ITO;
+};
+
+export const parseITOs = async (
+  ITOs: IITO[],
+): Promise<IParsedITO | never[]> => {
+  const assetsInput: string = ITOs.map(ITO => ITO.assetId).join(',');
+  const packsPrecisionCalls: Promise<IITO>[] = [];
+  const res = await api.get({
+    route: `assets/kassets?asset=${assetsInput}`,
+  });
+  if (!res.error || res.error === '') {
+    const assets = res.data.assets;
+    ITOs.forEach((ITO, index) => {
+      const asset = assets.find(
+        (asset: IAsset) => asset.assetId === ITOs[index].assetId,
+      );
+      ITO.maxAmount = ITO.maxAmount / 10 ** asset.precision;
+      ITO['ticker'] = asset.ticker;
+      ITO['assetType'] = asset.assetType;
+      ITO['precision'] = asset.precision;
+      ITO['assetLogo'] = asset.logo;
+      packsPrecisionCalls.push(processITOPrecisions(ITO, asset.precision));
+    });
+    await Promise.allSettled(packsPrecisionCalls);
+  }
+  return [];
+};
+
 const ITOsPage: React.FC = () => {
   const [ITOs, setITOs] = useState<IParsedITO[]>([]);
   const [search, setSearch] = useState('');

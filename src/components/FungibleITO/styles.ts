@@ -4,6 +4,9 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  min-width: 400px;
+
+  width: 100%;
 `;
 
 export const FungibleContainer = styled.div`
@@ -88,7 +91,9 @@ export const PriceRange = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  padding: 2rem;
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    padding: 2rem;
+  }
 `;
 
 export const PriceRangeTitle = styled.span`
@@ -98,13 +103,16 @@ export const PriceRangeTitle = styled.span`
   font-weight: bold;
 `;
 
-export const Row = styled.div`
+export const Row = styled.div<{ inPriceRange: boolean }>`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-
+  border: ${props => (props.inPriceRange ? props.theme.violet : 'none')} 2px
+    solid;
+  border-radius: 4px;
+  padding: 1rem;
   span {
-    color: ${props => props.theme.darkText};
+    color: ${props => props.theme.black};
   }
 `;
 

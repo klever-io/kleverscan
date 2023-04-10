@@ -9,6 +9,7 @@ import { EmptyRow, Status } from '@/components/Table/styles';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Holders from '@/components/Tabs/Holders';
 import Transactions from '@/components/Tabs/Transactions';
+import { useExtension } from '@/contexts/extension';
 import api from '@/services/api';
 import {
   IAccountAsset,
@@ -17,7 +18,9 @@ import {
   IAssetPoolResponse,
   IAssetResponse,
   IBalance,
+  IITO,
   IPagination,
+  IParsedITO,
   IResponse,
   ITransaction,
   ITransactionResponse,
@@ -29,6 +32,7 @@ import { parseHardCodedInfo, parseHolders } from '@/utils/parseValues';
 import { resetDate } from '@/utils/resetDate';
 import { timestampToDate } from '@/utils/timeFunctions';
 import {
+  AddressDiv,
   AssetHeaderContainer,
   AssetTitle,
   CardContainer,
@@ -39,18 +43,24 @@ import {
   Container,
   ContentRow,
   ContentScrollBar,
+  EllipsisSpan,
+  ExpandableRow,
+  ExpandWrapper,
   FrozenContainer,
   Header,
   HoverAnchor,
   Row,
   UriContainer,
+  WhiteListRow,
 } from '@/views/assets/detail';
 import { BalanceContainer, RowContent } from '@/views/proposals/detail';
+import { ButtonExpand } from '@/views/transactions/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
+import { displayITOpacks, parseITOs } from '../itos';
 
 interface IAssetPage {
   asset: IAsset;
@@ -70,22 +80,33 @@ interface IHoldersResponse extends IResponse {
   pagination: IPagination;
 }
 
+interface IITOResponse extends IResponse {
+  data: {
+    ito: IITO;
+  };
+  pagination: IPagination;
+}
+
 const Asset: React.FC<IAssetPage> = ({}) => {
   const router = useRouter();
   const tableHeaders = ['Transactions', 'Holders'];
   const [selectedTab, setSelectedTab] = useState<null | string>(null);
   const [asset, setAsset] = useState<null | IAsset>(null);
+  const [ITO, setITO] = useState<null | IParsedITO>(null);
   const [assetPool, setAssetPool] = useState<null | IAssetPool>(null);
+  const [expand, setExpand] = useState({ whitelist: false, packs: false });
+  const [txHash, setTxHash] = useState('');
 
   const [holderQuery, setHolderQuery] = useState<string>('');
   const [transactionsPagination, setTransactionsPagination] =
     useState<null | IPagination>(null);
   const [holdersPagination, setHoldersPagination] =
     useState<null | IPagination>(null);
-  const cardHeaders = asset?.uris
-    ? ['Overview', 'More', 'URIS', 'Staking & Royalties']
-    : ['Overview', 'More'];
+  const cardHeaders = ['Overview', 'More', 'Staking & Royalties'];
+  asset?.uris && cardHeaders.push('URIS');
   assetPool && cardHeaders.push('KDA Pool');
+  ITO && cardHeaders.push('ITO');
+
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
 
   const initialQueryState = {
@@ -130,6 +151,17 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       });
       asset.uris = uris;
     }
+  };
+
+  const statusWithIcon = (action: boolean) => {
+    const StatusIcon = getStatusIcon(action ? 'success' : 'fail');
+
+    return (
+      <Status status={action ? 'success' : 'fail'} key={String(action)}>
+        <StatusIcon />
+        <p>{action ? 'Yes' : 'No'}</p>
+      </Status>
+    );
   };
 
   const filterQueryDate = (selectedDays: ISelectedDays) => {
@@ -201,20 +233,6 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         },
       );
 
-      const assetPoolCall = new Promise<IAssetPoolResponse>(
-        async (resolve, reject) => {
-          const res = await api.get({
-            route: `assets/pool/${assetId}`,
-          });
-
-          if (!res.error || res.error === '') {
-            resolve(res);
-          }
-
-          reject(res.error);
-        },
-      );
-
       const holdersCall = new Promise<IHoldersResponse>(
         async (resolve, reject) => {
           const res = await api.get({
@@ -229,28 +247,68 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         },
       );
 
+      const ITOCall = new Promise<IITOResponse>(async (resolve, reject) => {
+        const res = await api.get({
+          route: `ito/${assetId}`,
+        });
+        if (!res.error || res.error === '') {
+          resolve(res);
+        }
+
+        reject(res.error);
+      });
+
+      const assetPoolCall = new Promise<IAssetPoolResponse>(
+        async (resolve, reject) => {
+          const res = await api.get({
+            route: `assets/pool/${assetId}`,
+          });
+
+          if (!res.error || res.error === '') {
+            resolve(res);
+          }
+
+          reject(res.error);
+        },
+      );
+
       await Promise.allSettled([
         assetCall,
         transactionCall,
         holdersCall,
+        ITOCall,
         assetPoolCall,
+        ITOCall,
       ]).then(responses => {
-        responses.forEach((res, index) => {
+        responses.forEach(async (res, index) => {
           if (res.status === 'fulfilled') {
-            if (index === 0) {
-              const asset: any = res.value;
-              const parsedAsset = parseHardCodedInfo([asset?.data?.asset])[0];
-              parseURIs(parsedAsset);
-              setAsset(parsedAsset);
-            } else if (index === 1) {
-              const transactions: any = res.value;
-              setTransactionsPagination(transactions?.pagination);
-            } else if (index === 2) {
-              const holders: any = res.value;
-              setHoldersPagination(holders?.pagination);
-            } else if (index === 3) {
-              const assetPool: any = res.value;
-              setAssetPool(assetPool.data.pool);
+            switch (index) {
+              case 0:
+                const asset: any = res.value;
+                const parsedAsset = parseHardCodedInfo([asset?.data?.asset])[0];
+                parseURIs(parsedAsset);
+                setAsset(parsedAsset);
+                break;
+              case 1:
+                const transactions: any = res.value;
+                setTransactionsPagination(transactions?.pagination);
+                break;
+              case 2:
+                const holders: any = res.value;
+                setHoldersPagination(holders?.pagination);
+                break;
+              case 3:
+                const ITOresp: any = res.value;
+                if (ITOresp?.data?.ito) {
+                  const ITO = ITOresp?.data?.ito;
+                  await parseITOs([ITO]);
+                  setITO(ITO);
+                }
+                break;
+              case 4:
+                const assetPool: any = res.value;
+                setAssetPool(assetPool.data.pool);
+                break;
             }
           }
         });
@@ -538,17 +596,182 @@ const Asset: React.FC<IAssetPage> = ({}) => {
     );
   };
 
-  const More: React.FC = () => {
-    const statusWithIcon = (action: boolean) => {
-      const StatusIcon = getStatusIcon(action ? 'success' : 'fail');
+  const ITOComponent: React.FC = () => {
+    const { extensionInstalled, connectExtension } = useExtension();
 
-      return (
-        <Status status={action ? 'success' : 'fail'} key={String(action)}>
-          <StatusIcon />
-          <p>{action ? 'Yes' : 'No'}</p>
-        </Status>
-      );
-    };
+    useEffect(() => {
+      if (extensionInstalled) {
+        connectExtension();
+      }
+    }, [extensionInstalled]);
+    return (
+      <>
+        {ITO && ITO.isActive ? (
+          <>
+            {ITO?.maxAmount ? (
+              <Row isStakingRoyalties={false}>
+                <span>
+                  <strong>Max Amount</strong>
+                </span>
+                <span>{ITO.maxAmount}</span>
+              </Row>
+            ) : null}
+            <Row isStakingRoyalties={false}>
+              <span>
+                <strong>Receiver Address</strong>
+              </span>
+
+              <AddressDiv>{ITO.receiverAddress} </AddressDiv>
+              <Copy data={ITO.receiverAddress} />
+            </Row>
+            <Row isStakingRoyalties={false}>
+              <span>
+                <strong>White List Active</strong>
+              </span>
+              <span>{statusWithIcon(ITO.isWhitelistActive)}</span>
+            </Row>
+
+            {ITO?.startTime && (
+              <Row isStakingRoyalties={false}>
+                <span>
+                  <strong>Start Time</strong>
+                </span>
+                <span>
+                  <small>{formatDate(ITO.startTime)}</small>
+                </span>
+              </Row>
+            )}
+            {ITO?.endTime && (
+              <Row isStakingRoyalties={false}>
+                <span>
+                  <strong>End Time</strong>
+                </span>
+                <span>
+                  <small>{formatDate(ITO.endTime)}</small>
+                </span>
+              </Row>
+            )}
+            {ITO?.whitelistStartTime && (
+              <Row isStakingRoyalties={false}>
+                <span>
+                  <strong>White List</strong>
+                  <br />
+                  <strong>Start Time</strong>
+                </span>
+                <span>
+                  <small>{formatDate(ITO.whitelistStartTime)}</small>
+                </span>
+              </Row>
+            )}
+            {ITO?.whitelistEndTime && (
+              <Row isStakingRoyalties={false}>
+                <span>
+                  <strong>White List</strong>
+                  <br />
+                  <strong>End Time</strong>
+                </span>
+                <span>
+                  <small>{formatDate(ITO.whitelistEndTime)}</small>
+                </span>
+              </Row>
+            )}
+            {ITO?.whitelistInfo && (
+              <WhiteListRow
+                expandVar={expand.whitelist}
+                isStakingRoyalties={false}
+              >
+                <ExpandWrapper expandVar={expand.whitelist}>
+                  <span style={{ gap: '4px' }}>
+                    <strong>White List Info</strong>
+                  </span>
+                  <span>
+                    <ButtonExpand
+                      style={{ display: 'inline' }}
+                      onClick={() =>
+                        setExpand({ ...expand, whitelist: !expand.whitelist })
+                      }
+                    >
+                      {expand.whitelist ? 'Hide' : 'Expand'}
+                    </ButtonExpand>
+                  </span>
+                </ExpandWrapper>
+                {expand.whitelist && (
+                  <div style={{ minWidth: 0, width: '100%' }}>
+                    {ITO.whitelistInfo.map((data, index) => {
+                      return (
+                        <RowContent key={index}>
+                          <BalanceContainer>
+                            <FrozenContainer>
+                              <div
+                                style={{
+                                  width: '100%',
+                                  overflow: 'visible',
+                                }}
+                              >
+                                <span>
+                                  <strong>Address</strong>
+                                </span>
+                                <EllipsisSpan>
+                                  <Link href={`/accounts/${data.address}`}>
+                                    {data.address}
+                                  </Link>
+                                  <Copy data={data.address} />
+                                </EllipsisSpan>
+                              </div>
+                              <div>
+                                <span>
+                                  <strong>Limit</strong>
+                                </span>
+                                <span>
+                                  <small>{data.limit}</small>
+                                </span>
+                              </div>
+                            </FrozenContainer>
+                          </BalanceContainer>
+                        </RowContent>
+                      );
+                    })}
+                  </div>
+                )}
+              </WhiteListRow>
+            )}
+            {ITO.packData && (
+              <ExpandableRow
+                isStakingRoyalties={false}
+                expandVar={expand.packs}
+              >
+                <ExpandWrapper
+                  expandVar={expand.packs}
+                  style={{ marginBottom: expand.packs ? '1rem' : '0' }}
+                >
+                  <span style={{ gap: '4px' }}>
+                    <strong>Packs Data</strong>
+                  </span>
+                  <span>
+                    {' '}
+                    <ButtonExpand
+                      onClick={() =>
+                        setExpand({ ...expand, packs: !expand.packs })
+                      }
+                    >
+                      {expand.packs ? 'Hide' : 'Expand'}
+                    </ButtonExpand>
+                  </span>
+                </ExpandWrapper>
+                {expand.packs && displayITOpacks(ITO, setTxHash)}
+              </ExpandableRow>
+            )}
+          </>
+        ) : (
+          <EmptyRow type="assets">
+            <p>No active ITO found</p>
+          </EmptyRow>
+        )}
+      </>
+    );
+  };
+
+  const More: React.FC = () => {
     return (
       <>
         <Row isStakingRoyalties={false}>
@@ -843,6 +1066,8 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         return <UriComponent />;
       case 'Staking & Royalties':
         return <StakingRoyalties />;
+      case 'ITO':
+        return <ITOComponent />;
       case 'KDA Pool':
         return <KDAPool />;
       default:

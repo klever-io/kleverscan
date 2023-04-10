@@ -90,6 +90,21 @@ const FungibleITO: React.FC<IFungibleITO> = ({
     }
   };
 
+  const calculatePriceRange = (
+    currentAmount: number,
+    packs: IPackItem[],
+    index: number,
+  ): boolean => {
+    if (index === 0) {
+      return currentAmount <= packs[0].amount;
+    } else if (index === packs.length - 1) {
+      return currentAmount > packs[packs.length - 2].amount;
+    }
+    return (
+      currentAmount > packs[index - 1].amount &&
+      currentAmount <= packs[index].amount
+    );
+  };
   const handleSubmit = async (currencyId: string) => {
     if (!amount) {
       toast.error('The amount field cannot be empty or zero!');
@@ -131,7 +146,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
     <Container>
       <FungibleContainer key={packInfoIndex}>
         <Content>
-          <AssetName>{ITO.assetId}</AssetName>
+          <AssetName>{`Price in ${packInfo.key}`}</AssetName>
           <Input
             type="number"
             min="0"
@@ -167,7 +182,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
 
                 if (packInfo.packs.length === 1) {
                   return (
-                    <Row key={packItemIndex}>
+                    <Row key={packItemIndex} inPriceRange={true}>
                       <span>0 +</span>
                       <span>
                         {packItem.price} {packInfo.key} / {ITO.ticker}
@@ -176,11 +191,18 @@ const FungibleITO: React.FC<IFungibleITO> = ({
                   );
                 } else if (packInfo.packs.length === 2) {
                   return (
-                    <Row key={packItemIndex}>
+                    <Row
+                      key={packItemIndex}
+                      inPriceRange={calculatePriceRange(
+                        amount,
+                        packInfo.packs,
+                        packItemIndex,
+                      )}
+                    >
                       <span>
                         {packItemIndex === 0
                           ? `0 - ${packItem.amount}`
-                          : `${packInfo.packs[0].amount} <`}
+                          : `> ${packInfo.packs[0].amount}`}
                       </span>
                       <span>
                         {packItem.price} {packInfo.key} / {ITO.ticker}
@@ -190,7 +212,14 @@ const FungibleITO: React.FC<IFungibleITO> = ({
                 }
 
                 return (
-                  <Row key={packItemIndex}>
+                  <Row
+                    key={packItemIndex}
+                    inPriceRange={calculatePriceRange(
+                      amount,
+                      packInfo.packs,
+                      packItemIndex,
+                    )}
+                  >
                     {packItemIndex === 0 && <span>0 - {packItem.amount}</span>}
                     {!isLastElement && packItemIndex > 0 && (
                       <span>
@@ -200,7 +229,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
                     )}
                     {isLastElement && (
                       <span>
-                        {packInfo.packs[packItemIndex - 1].amount} {'<'}
+                        {'>'} {packInfo.packs[packItemIndex - 1].amount}
                       </span>
                     )}
                     <span>

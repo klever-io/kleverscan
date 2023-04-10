@@ -1,5 +1,6 @@
 import { Validators as Icon } from '@/assets/cards';
 import { getStatusIcon } from '@/assets/status';
+import Copy from '@/components/Copy';
 import Detail from '@/components/Detail';
 import Progress from '@/components/Progress';
 import { ITable } from '@/components/Table';
@@ -9,6 +10,7 @@ import { IRowSection, IValidator } from '@/types/index';
 import { capitalizeString } from '@/utils/convertString';
 import { formatAmount } from '@/utils/formatFunctions';
 import { parseValidators } from '@/utils/parseValues';
+import { AddressContainer } from '@/views/validators/detail';
 import Link from 'next/link';
 import React from 'react';
 
@@ -64,9 +66,12 @@ const Validators: React.FC = () => {
             element: (
               <span key={ownerAddress}>
                 {
-                  <Link href={`validator/${ownerAddress}`}>
-                    {name ? name : parsedAddress}
-                  </Link>
+                  <AddressContainer>
+                    <Link href={`validator/${ownerAddress}`}>
+                      {name ? name : parsedAddress}
+                    </Link>
+                    <Copy data={ownerAddress} info="Validator Address" />
+                  </AddressContainer>
                 }
               </span>
             ),

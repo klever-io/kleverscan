@@ -301,3 +301,16 @@ export const TableContainer = styled.section`
     margin-top: 2rem;
   }
 `;
+
+export const AddressContainer = styled.div`
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  > div {
+    width: 24px;
+    height: 24px;
+  }
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    justify-content: flex-end;
+  }
+`;

@@ -77,11 +77,10 @@ interface IContractSection extends ISection {
   index?: number;
 }
 
-const kAssetContracts = [
+let kAssetContracts = [
   'AssetTriggerContract',
   'ConfigITOContract',
   'ITOTriggerContract',
-  'WithdrawContract',
   'DepositContract',
 ];
 
@@ -430,6 +429,22 @@ const Contract: React.FC<IContract> = ({
     }
   }, [modalContractType?.value]);
 
+  useEffect(() => {
+    if (
+      withdrawType === 0 &&
+      kAssetContracts.find(value => value == 'WithdrawContract')
+    ) {
+      kAssetContracts = kAssetContracts.filter(
+        value => value !== 'WithdrawContract',
+      );
+    } else if (
+      withdrawType === 1 &&
+      !kAssetContracts.find(value => value == 'WithdrawContract')
+    ) {
+      kAssetContracts.push('WithdrawContract');
+    }
+  }, [withdrawType]);
+
   const formSend = async (parsedPayload: any) => {
     setLoading(true);
     const parsedData = Buffer.from(metadata, 'utf-8').toString('base64');
@@ -630,6 +645,7 @@ const Contract: React.FC<IContract> = ({
           claimSelectedType={claimSelectedType}
           onChange={e => {
             if (!isNaN(e?.value)) {
+              setClaimType(e.value);
               if (e.value === 0 || e.value === 1) {
                 setFormSections([
                   ...formSection({

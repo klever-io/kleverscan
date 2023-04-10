@@ -377,14 +377,14 @@ export const ContentScrollBar = styled.div`
     flex-direction: row !important;
     flex-wrap: wrap;
     max-height: 500px;
-    min-width: 20rem;
     justify-content: center;
-    span {
+    > span {
+      min-width: 18.5rem !important;
       min-height: 100px;
       max-width: 140px;
     }
     span:nth-child(2) {
-      margin-left: 0px;
+      margin-left: 0px !important;
     }
 
     p {

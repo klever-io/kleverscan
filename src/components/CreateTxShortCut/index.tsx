@@ -81,7 +81,7 @@ const CreateTxShortcut: React.FC = () => {
 
   return (
     <Container>
-      {isMobile && <h3>Quick Transaction</h3>}
+      <h3>Quick Transaction</h3>
 
       <Content ref={contentRef}>
         {shortCutContract.map(contract => (

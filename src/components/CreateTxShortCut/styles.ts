@@ -20,11 +20,6 @@ export const Content = styled.div`
   overflow-x: scroll;
   padding-bottom: 1rem;
   padding: 0 1rem 1rem;
-
-  @media (min-width: 768px) {
-    overflow: hidden;
-    padding: 0;
-  }
 `;
 
 export const Button = styled.button`

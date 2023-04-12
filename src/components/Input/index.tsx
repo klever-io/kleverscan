@@ -4,7 +4,7 @@ import { Container } from './styles';
 interface Input extends React.InputHTMLAttributes<any> {
   type: string;
   value: string | number;
-  onBlur: () => void;
+  onBlur?: () => void;
   onChange: (e: any) => void;
   handleConfirmClick: () => void;
 }

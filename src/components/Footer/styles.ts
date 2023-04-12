@@ -140,3 +140,19 @@ export const LinkItems = styled.div`
     }
   }
 `;
+
+export const VersionBuildContainer = styled.div`
+  display: flex;
+  height: 100%;
+  align-items: flex-end;
+  p {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: ${props => props.theme.borderLogo};
+  }
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    justify-content: center;
+    margin-top: 1.5rem;
+  }
+`;

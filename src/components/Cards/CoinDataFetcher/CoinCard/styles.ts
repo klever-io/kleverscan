@@ -57,7 +57,7 @@ export const CardContainer = styled.div`
   padding: 1.5rem;
   scroll-snap-align: start;
   position: relative;
-
+  min-height: 17.4rem;
   flex-direction: row;
   align-items: center;
 
@@ -87,6 +87,15 @@ export const CardContent = styled.div`
   a {
     z-index: 0;
   }
+`;
+
+export const CardContentError = styled(CardContent)`
+  animation: '';
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const CardContainerSkeleton = styled(CardContainer)`
@@ -286,4 +295,38 @@ export const CoinSelector = styled.div<{ isSelected: boolean }>`
 
   cursor: pointer;
   border-radius: 50%;
+`;
+
+export const ContainerLoading = styled.div`
+  display: flex;
+  height: 60%;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const ContentError = styled.div`
+  display: flex;
+  padding: 1rem;
+  gap: 0.5rem;
+  span {
+    :hover {
+      opacity: 0.5;
+    }
+    cursor: pointer;
+    color: ${props => props.theme.card.white};
+  }
+  svg {
+    cursor: pointer;
+    margin-top: 0.2rem;
+    color: ${props => props.theme.darkText};
+  }
+`;
+
+export const NameError = styled(Name)`
+  span {
+    &:first-of-type {
+      cursor: text !important;
+    }
+  }
 `;

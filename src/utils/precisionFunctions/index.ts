@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 export function getPrecision<T extends string | string[]>(
   assetIds: T,
 ): T extends string ? Promise<number> : Promise<{ [assetId: string]: number }>;
+
 export async function getPrecision(
   assetIds: string | string[],
 ): Promise<number | { [assetId: string]: number }> {

@@ -63,7 +63,8 @@ describe('Component: Pagination', () => {
       const { container } = renderWithTheme(
         <Pagination {...paginationProps} />,
       );
-      const rightArrow: any = container.firstElementChild?.lastElementChild;
+      const rightArrow = container.firstElementChild
+        ?.lastElementChild as HTMLElement;
 
       fireEvent.click(rightArrow);
       expect(paginationProps.page).toBe(2);
@@ -74,7 +75,8 @@ describe('Component: Pagination', () => {
       newProps.page = 5;
       newProps.count = 500;
       const { container } = renderWithTheme(<Pagination {...newProps} />);
-      const leftArrow: any = container.firstElementChild?.firstElementChild;
+      const leftArrow = container.firstElementChild
+        ?.firstElementChild as HTMLElement;
 
       fireEvent.click(leftArrow);
       expect(paginationProps.page).toBe(4);
@@ -82,15 +84,15 @@ describe('Component: Pagination', () => {
 
     it('Should open right modal when click on right ellipsis and should desapear when unblur', () => {
       renderWithTheme(<Pagination {...paginationProps} />);
-      const rightModal: any = screen.getByText('...');
+      const rightModal = screen.getByText('...');
       fireEvent.click(rightModal);
 
       const modal = screen.getByText('Choose Page');
       expect(modal).toBeInTheDocument();
       expect(modal).toBeVisible();
 
-      const modalContainer: any =
-        modal?.parentElement?.parentElement?.parentElement;
+      const modalContainer = modal?.parentElement?.parentElement
+        ?.parentElement as HTMLElement;
       fireEvent.blur(modalContainer);
       expect(modal).not.toBeVisible();
     });
@@ -160,50 +162,47 @@ describe('User interaction tests', () => {
         <Pagination {...paginationProps} />,
       );
       // nested selectors use more code, but this guarantee all pagination elements are in the exact correct order
-      const page1 =
-        container.firstElementChild?.firstElementChild?.nextElementSibling
-          ?.firstElementChild;
+      const page1 = container.firstElementChild?.firstElementChild
+        ?.nextElementSibling?.firstElementChild as HTMLElement;
 
-      const leftEllipsis: any =
-        container.firstElementChild?.firstElementChild?.nextElementSibling
-          ?.nextElementSibling?.firstElementChild;
+      const leftEllipsis = container.firstElementChild?.firstElementChild
+        ?.nextElementSibling?.nextElementSibling
+        ?.firstElementChild as HTMLElement;
 
-      const page994 =
-        container.firstElementChild?.firstElementChild?.nextElementSibling
-          ?.nextElementSibling?.nextElementSibling?.firstElementChild;
+      const page994 = container.firstElementChild?.firstElementChild
+        ?.nextElementSibling?.nextElementSibling?.nextElementSibling
+        ?.firstElementChild as HTMLElement;
 
-      const page995 =
-        container.firstElementChild?.firstElementChild?.nextElementSibling
-          ?.nextElementSibling?.nextElementSibling?.nextElementSibling
-          ?.firstElementChild;
+      const page995 = container.firstElementChild?.firstElementChild
+        ?.nextElementSibling?.nextElementSibling?.nextElementSibling
+        ?.nextElementSibling?.firstElementChild as HTMLElement;
 
-      const page996 =
-        container.firstElementChild?.firstElementChild?.nextElementSibling
-          ?.nextElementSibling?.nextElementSibling?.nextElementSibling
-          ?.nextElementSibling?.firstElementChild;
+      const page996 = container.firstElementChild?.firstElementChild
+        ?.nextElementSibling?.nextElementSibling?.nextElementSibling
+        ?.nextElementSibling?.nextElementSibling
+        ?.firstElementChild as HTMLElement;
 
-      const page997 =
-        container.firstElementChild?.firstElementChild?.nextElementSibling
-          ?.nextElementSibling?.nextElementSibling?.nextElementSibling
-          ?.nextElementSibling?.nextElementSibling?.firstElementChild;
+      const page997 = container.firstElementChild?.firstElementChild
+        ?.nextElementSibling?.nextElementSibling?.nextElementSibling
+        ?.nextElementSibling?.nextElementSibling?.nextElementSibling
+        ?.firstElementChild as HTMLElement;
 
-      const page998 =
-        container.firstElementChild?.firstElementChild?.nextElementSibling
-          ?.nextElementSibling?.nextElementSibling?.nextElementSibling
-          ?.nextElementSibling?.nextElementSibling?.nextElementSibling
-          ?.firstElementChild;
+      const page998 = container.firstElementChild?.firstElementChild
+        ?.nextElementSibling?.nextElementSibling?.nextElementSibling
+        ?.nextElementSibling?.nextElementSibling?.nextElementSibling
+        ?.nextElementSibling?.firstElementChild as HTMLElement;
 
-      const page999 =
-        container.firstElementChild?.firstElementChild?.nextElementSibling
-          ?.nextElementSibling?.nextElementSibling?.nextElementSibling
-          ?.nextElementSibling?.nextElementSibling?.nextElementSibling
-          ?.nextElementSibling?.firstElementChild;
+      const page999 = container.firstElementChild?.firstElementChild
+        ?.nextElementSibling?.nextElementSibling?.nextElementSibling
+        ?.nextElementSibling?.nextElementSibling?.nextElementSibling
+        ?.nextElementSibling?.nextElementSibling
+        ?.firstElementChild as HTMLElement;
 
-      const page1000 =
-        container.firstElementChild?.firstElementChild?.nextElementSibling
-          ?.nextElementSibling?.nextElementSibling?.nextElementSibling
-          ?.nextElementSibling?.nextElementSibling?.nextElementSibling
-          ?.nextElementSibling?.nextElementSibling?.firstElementChild;
+      const page1000 = container.firstElementChild?.firstElementChild
+        ?.nextElementSibling?.nextElementSibling?.nextElementSibling
+        ?.nextElementSibling?.nextElementSibling?.nextElementSibling
+        ?.nextElementSibling?.nextElementSibling?.nextElementSibling
+        ?.firstElementChild as HTMLElement;
 
       expect(page1?.textContent).toBe('1');
       expect(page1?.parentElement).toHaveStyle(
@@ -258,12 +257,12 @@ describe('User interaction tests', () => {
         <Pagination {...paginationProps} />,
       );
 
-      const leftEllipsis: any =
-        container.firstElementChild?.firstElementChild?.nextElementSibling
-          ?.nextElementSibling?.firstElementChild;
-      const page994 =
-        container.firstElementChild?.firstElementChild?.nextElementSibling
-          ?.nextElementSibling?.nextElementSibling?.firstElementChild;
+      const leftEllipsis = container.firstElementChild?.firstElementChild
+        ?.nextElementSibling?.nextElementSibling
+        ?.firstElementChild as HTMLElement;
+      const page994 = container.firstElementChild?.firstElementChild
+        ?.nextElementSibling?.nextElementSibling?.nextElementSibling
+        ?.firstElementChild as HTMLElement;
 
       expect(leftEllipsis?.textContent).toBe('...');
       expect(leftEllipsis).toHaveStyle(
@@ -277,9 +276,8 @@ describe('User interaction tests', () => {
       fireEvent.click(leftEllipsis);
 
       const choosePage = screen.getByText('Choose Page');
-      const modalInput: any =
-        choosePage?.parentElement?.parentElement?.nextElementSibling
-          ?.firstElementChild;
+      const modalInput = choosePage?.parentElement?.parentElement
+        ?.nextElementSibling?.firstElementChild as HTMLInputElement;
 
       const confirmButton = screen.getByText('Confirm');
       expect(confirmButton).toHaveStyle(activeConfirmButtonStyles);

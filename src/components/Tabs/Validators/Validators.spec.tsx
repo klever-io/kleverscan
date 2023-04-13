@@ -13,11 +13,11 @@ describe('Component: Tabs/Validators', () => {
 
     jest.mock('next/router');
 
-    const useRouter: any = jest.spyOn(nextRouter, 'useRouter');
+    const useRouter = jest.spyOn(nextRouter, 'useRouter');
     useRouter.mockReturnValue({
       route: '/',
       pathname: '',
-    });
+    } as nextRouter.NextRouter);
   });
 
   it('Should render the Validators Tab correctly', async () => {

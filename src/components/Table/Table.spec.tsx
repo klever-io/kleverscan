@@ -15,7 +15,6 @@ const tableProps: ITable = {
   type: 'validators',
   header,
   rowSections: undefined,
-  data: null,
   request: page => requestValidators(page),
   totalPages: 0,
   scrollUp: true,
@@ -31,11 +30,14 @@ describe('Componenet: Table', () => {
       };
     },
   }));
-  const useRouter: any = jest.spyOn(nextRouter, 'useRouter');
-  useRouter.mockImplementation(() => ({
-    route: '/',
-    pathname: '/validators',
-  }));
+  const useRouter = jest.spyOn(nextRouter, 'useRouter');
+  useRouter.mockImplementation(
+    () =>
+      ({
+        route: '/',
+        pathname: '/validators',
+      } as nextRouter.NextRouter),
+  );
 
   beforeEach(() => {
     jest.clearAllMocks();

@@ -770,10 +770,10 @@ const mockedPagination = {
 };
 //this function mocks /proposals/${number}
 export const mockGetMockedProposal = (
-  number: number,
+  routerEnd: string,
   voteType?: 0 | 1,
 ): any => {
-  const selectedProposal = mockedProposalsList.data.proposals[number];
+  const selectedProposal = mockedProposalsList.data.proposals[routerEnd];
 
   return {
     data: {
@@ -781,7 +781,9 @@ export const mockGetMockedProposal = (
         ...selectedProposal,
         voters:
           voteType !== undefined
-            ? selectedProposal.voters.filter(voter => voter.type === voteType)
+            ? selectedProposal.voters.filter(
+                (voter: { type: number }) => voter.type === voteType,
+              )
             : selectedProposal.voters,
       },
     },

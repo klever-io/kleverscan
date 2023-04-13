@@ -5,8 +5,10 @@ import { renderWithTheme } from '../../test/utils';
 
 describe('test Carousel component', () => {
   it('should render the component and clicking the buttons should trigger useRef functions', () => {
-    const mockedRefs = jest.fn((): any => {
-      current: null;
+    const mockedRefs = jest.fn((): React.RefObject<HTMLElement> => {
+      return {
+        current: null,
+      };
     });
     jest.spyOn(React, 'useRef').mockReturnValue(mockedRefs());
 

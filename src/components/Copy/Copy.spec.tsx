@@ -15,7 +15,7 @@ describe('Component: Copy', () => {
       <Copy info="Test" data="Hello World" />,
     );
 
-    const clickCopy: any = container.firstChild;
+    const clickCopy = container.firstChild as HTMLElement;
 
     await user.click(clickCopy);
     // expect(mockedWriteText).toHaveBeenCalledWith('Hello World');

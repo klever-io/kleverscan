@@ -10,7 +10,18 @@ import {
 } from '../../test/mocks/index';
 import { renderWithTheme } from '../../test/utils';
 
-const promiseResolver = (router: any) => {
+interface CustomRouter extends myRouter.NextRouter {
+  query: {
+    [key: string]: string | string[] | undefined;
+  };
+}
+interface Router {
+  route: string;
+  query: {
+    [key: string]: 0 | 1;
+  };
+}
+const promiseResolver = (router: Router) => {
   const routerEnd = router.route.split('/')[1];
   switch (router.route) {
     case `proposals/${routerEnd}`:
@@ -60,8 +71,15 @@ describe('test proposal details page', () => {
     jest.clearAllMocks();
   });
   it('should render the page displaying the correct data for the mocked proposal number 1', async () => {
-    const mockRouter = myRouter as { useRouter: any };
-    mockRouter.useRouter = router1;
+    const mockRouter: { useRouter: () => CustomRouter } = myRouter;
+    mockRouter.useRouter = () =>
+      ({
+        asPath: '',
+        basePath: '',
+        isLocaleDomain: false,
+        push: jest.fn(),
+        ...router1(),
+      } as unknown as CustomRouter);
 
     await act(async () => {
       renderWithTheme(<ProposalDetails />);
@@ -174,8 +192,15 @@ describe('test proposal details page', () => {
   });
 
   it('should render the page displaying the correct data for the mocked proposal number 8', async () => {
-    const mockRouter = myRouter as { useRouter: any };
-    mockRouter.useRouter = router2;
+    const mockRouter: { useRouter: () => CustomRouter } = myRouter;
+    mockRouter.useRouter = () =>
+      ({
+        asPath: '',
+        basePath: '',
+        isLocaleDomain: false,
+        push: jest.fn(),
+        ...router2(),
+      } as unknown as CustomRouter);
 
     await act(async () => {
       renderWithTheme(<ProposalDetails />);
@@ -287,8 +312,15 @@ describe('test proposal details page', () => {
   });
 
   it('should have the correct styles for proposal number 1', async () => {
-    const mockRouter = myRouter as { useRouter: any };
-    mockRouter.useRouter = router1;
+    const mockRouter: { useRouter: () => CustomRouter } = myRouter;
+    mockRouter.useRouter = () =>
+      ({
+        asPath: '',
+        basePath: '',
+        isLocaleDomain: false,
+        push: jest.fn(),
+        ...router1(),
+      } as unknown as CustomRouter);
 
     await act(async () => {
       renderWithTheme(<ProposalDetails />);

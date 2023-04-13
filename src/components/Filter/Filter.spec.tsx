@@ -46,14 +46,18 @@ describe('Component: Filter', () => {
 
   it('Should correctly show the selected item after switching to another option', async () => {
     const user = userEvent.setup();
-    const selector: any = container.firstChild?.firstChild?.nextSibling;
-
-    await user.click(selector.lastChild?.childNodes[1]);
-    expect(selector.firstChild).toHaveTextContent(data[0]);
+    const selector = container.firstChild?.firstChild
+      ?.nextSibling as HTMLElement;
+    const childNodes = selector.lastChild?.childNodes;
+    if (childNodes && childNodes[1]) {
+      await user.click(childNodes[1] as HTMLElement);
+      expect(selector.firstChild).toHaveTextContent(data[0]);
+    }
   });
 
   it('Should all the select element match the style', () => {
-    const selector: any = container.firstChild?.firstChild?.nextSibling;
+    const selector = container.firstChild?.firstChild
+      ?.nextSibling as HTMLElement;
     const contentStyle = {
       position: 'relative',
       backgroundColor: theme.white,

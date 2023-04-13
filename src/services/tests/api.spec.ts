@@ -10,6 +10,11 @@ import api, {
 } from '../api';
 import mocks from './mocks';
 
+interface IPricesResponse {
+  price: number;
+  timestamp: string;
+}
+
 describe('test api functions', () => {
   const defaultProps = {
     route: '/',
@@ -407,7 +412,7 @@ describe('test api functions', () => {
             url: 'https://prices.endpoints.services.klever.io/v1/prices',
           }),
         );
-        const prices: any = await api.post({
+        const prices: IPricesResponse = await api.post({
           route: 'prices',
           service: Service.PRICE,
           body: { names: ['KLV/USD'] },
@@ -431,7 +436,7 @@ describe('test api functions', () => {
             url: 'https://node.testnet.klever.finance/node/overview',
           }),
         );
-        const metrics: any = await api.text({
+        const metrics: string = await api.text({
           route: 'node/overview',
           service: Service.PROXY,
         });

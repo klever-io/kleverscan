@@ -52,7 +52,7 @@ describe('Component: Dropdown URI', () => {
     expect(website).toHaveAttribute('href', `https://${uris[1].value}`);
     expect(twitter).toHaveAttribute('href', `https://${uris[2].value}`);
 
-    const showMore: any = container.firstChild?.lastChild;
+    const showMore = container.firstChild?.lastChild as HTMLElement;
     await user.click(showMore);
     const linkedin = screen.getByRole('link', { name: uris[3].value });
     expect(linkedin).toBeInTheDocument();

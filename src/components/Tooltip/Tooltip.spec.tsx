@@ -12,8 +12,8 @@ describe('Tooltip', () => {
     const tooltipMsg = screen.queryByText(message);
     expect(tooltipMsg).toBeInTheDocument(); // tooltip msg should always be in dom
 
-    const tooltipController: any =
-      container.firstElementChild?.firstElementChild;
+    const tooltipController = container.firstElementChild
+      ?.firstElementChild as HTMLElement;
     expect(tooltipController.nodeName).toBe('svg');
     expect(tooltipController).not.toHaveAttribute('aria-describedby');
     await waitFor(async () => {
@@ -43,8 +43,8 @@ describe('Tooltip', () => {
     const msgs = [msg1, msg2, msg3, msg4];
     msgs.forEach(msg => expect(msg).toBeInTheDocument());
 
-    const tooltipController: any =
-      container.firstElementChild?.firstElementChild;
+    const tooltipController = container.firstElementChild
+      ?.firstElementChild as HTMLElement;
     expect(tooltipController).not.toHaveAttribute('aria-describedby');
     await waitFor(async () => {
       await userEvent.hover(tooltipController);

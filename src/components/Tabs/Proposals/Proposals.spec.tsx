@@ -198,7 +198,7 @@ describe('Component: Tabs/Proposals', () => {
       visibility: 'hidden',
       opacity: 0,
     });
-    const tooltipContainer: any = tooltipTextContainer?.parentNode;
+    const tooltipContainer = tooltipTextContainer?.parentNode as HTMLElement;
     expect(tooltipContainer).toBeVisible();
     expect(tooltipTextContainer).not.toBeVisible();
 

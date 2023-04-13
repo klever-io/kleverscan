@@ -9,6 +9,10 @@ import ProprietaryAssets from '.';
 import { renderWithTheme } from '../../../test/utils';
 import { mockAccountResponse, mockAssetsOwnerResponse } from './mock';
 
+export type CustomRouter = nextRouter.NextRouter & {
+  basePath: string;
+  isLocaleDomain: boolean;
+};
 export const headerTable = [
   'Token',
   'ID',
@@ -78,20 +82,29 @@ describe('Component: Assets Tab', () => {
       },
     }));
 
-    const useRouter: any = jest.spyOn(nextRouter, 'useRouter');
-    useRouter.mockImplementation(() => ({
-      route: '/',
-      pathname: `account/${address}`,
-      query: '',
-      asPath: '',
-      push: jest.fn(),
-      events: {
-        on: jest.fn(),
-        off: jest.fn(),
-      },
-      beforePopState: jest.fn(() => null),
-      prefetch: jest.fn(() => null),
-    }));
+    const useRouter = jest.spyOn(nextRouter, 'useRouter');
+    useRouter.mockImplementation(
+      () =>
+        ({
+          route: '/',
+          pathname: `account/${address}`,
+          query: '',
+          asPath: '',
+          basePath: '',
+          isLocaleDomain: false,
+          push: jest.fn(),
+          replace: jest.fn(),
+          reload: jest.fn(),
+          back: jest.fn(),
+          prefetch: jest.fn(),
+          beforePopState: jest.fn(),
+          events: {
+            on: jest.fn(),
+            off: jest.fn(),
+            emit: jest.fn(),
+          },
+        } as unknown as CustomRouter),
+    );
   });
 
   it('Should render the Assets Tab correctly', async () => {

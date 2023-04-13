@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
 import { renderWithTheme } from '../../../test/utils';
+import { CustomRouter } from '../ProprietaryAssets/ProprietaryAssets.spec';
 import Assets from './';
 import { mockAccountResponse, mockAssetsOwnerResponse } from './mock';
 
@@ -78,20 +79,23 @@ describe('Component: Assets Tab', () => {
       },
     }));
 
-    const useRouter: any = jest.spyOn(nextRouter, 'useRouter');
-    useRouter.mockImplementation(() => ({
-      route: '/',
-      pathname: `account/${address}`,
-      query: '',
-      asPath: '',
-      push: jest.fn(),
-      events: {
-        on: jest.fn(),
-        off: jest.fn(),
-      },
-      beforePopState: jest.fn(() => null),
-      prefetch: jest.fn(() => null),
-    }));
+    const useRouter = jest.spyOn(nextRouter, 'useRouter');
+    useRouter.mockImplementation(
+      () =>
+        ({
+          route: '/',
+          pathname: `account/${address}`,
+          query: '',
+          asPath: '',
+          push: jest.fn(),
+          events: {
+            on: jest.fn(),
+            off: jest.fn(),
+          },
+          beforePopState: jest.fn(() => null),
+          prefetch: jest.fn(() => null),
+        } as unknown as CustomRouter),
+    );
   });
 
   it('Should render the Assets Tab correctly', async () => {

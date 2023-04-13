@@ -119,10 +119,10 @@ describe('Component: DateFilter', () => {
 
     await user.click(input);
 
-    const arrowLeft: any = screen.getByText(/Choose the proper date/i)
-      .parentNode?.nextSibling?.firstChild?.firstChild;
-    const rightArrow: any = screen.getByText(/Choose the proper date/i)
-      .parentNode?.nextSibling?.firstChild?.lastChild;
+    const arrowLeft = screen.getByText(/Choose the proper date/i).parentNode
+      ?.nextSibling?.firstChild?.firstChild as HTMLElement;
+    const rightArrow = screen.getByText(/Choose the proper date/i).parentNode
+      ?.nextSibling?.firstChild?.lastChild as HTMLElement;
 
     const presentMonth = getMonthWithYear('', months);
     expect(screen.getByText(presentMonth)).toHaveTextContent(presentMonth);
@@ -143,10 +143,10 @@ describe('Component: DateFilter', () => {
     await user.click(input);
 
     const date = new Date();
-    const arrowLeft: any = screen.getByText(/Choose the proper date/i)
-      .parentNode?.nextSibling?.firstChild?.firstChild;
-    const rightArrow: any = screen.getByText(/Choose the proper date/i)
-      .parentNode?.nextSibling?.firstChild?.lastChild;
+    const arrowLeft = screen.getByText(/Choose the proper date/i).parentNode
+      ?.nextSibling?.firstChild?.firstChild as HTMLElement;
+    const rightArrow = screen.getByText(/Choose the proper date/i).parentNode
+      ?.nextSibling?.firstChild?.lastChild as HTMLElement;
     const confirm = screen.getByText(/Confirm/i);
 
     if (date.getDate() <= 5) {
@@ -182,8 +182,8 @@ describe('Component: DateFilter', () => {
 
     if (date.getDate() <= 5) {
       const startDay = screen.getByText(date.getDate());
-      const arrowLeft: any = screen.getByText(/Choose the proper date/i)
-        .parentNode?.nextSibling?.firstChild?.firstChild;
+      const arrowLeft = screen.getByText(/Choose the proper date/i).parentNode
+        ?.nextSibling?.firstChild?.firstChild as HTMLElement;
 
       await user.click(startDay);
       await user.click(arrowLeft);

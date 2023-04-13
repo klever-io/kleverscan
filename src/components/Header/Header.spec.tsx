@@ -4,6 +4,11 @@ import React from 'react';
 import Navbar from '.';
 import theme from '../../styles/theme';
 import { renderWithTheme } from '../../test/utils/';
+interface StyleProps {
+  filter: string;
+  cursor: string;
+  transition: string;
+}
 
 describe('Component: Header/navbar', () => {
   const navBarItems = [
@@ -78,7 +83,7 @@ describe('Component: Header/navbar', () => {
       transition: '0.2s ease',
     };
 
-    navbarItems.forEach((item: any) => {
+    navbarItems.forEach((item: HTMLElement) => {
       expect(item).toHaveStyle(style);
     });
   });
@@ -112,7 +117,7 @@ describe('Component: Header/navbar', () => {
 
     const mobile = container.firstChild?.lastChild;
     const content = container.lastChild;
-    const button: any = await screen.findByTestId('menu-icon');
+    const button = await screen.findByTestId('menu-icon');
     expect(mobile).toHaveStyle('position: relative');
     expect(content).toHaveStyle({ visibility: 'hidden', opacity: '0' });
     fireEvent.click(button);
@@ -141,8 +146,8 @@ describe('Component: Header/navbar', () => {
 
     const { container } = renderWithTheme(<Navbar />);
 
-    const openMenuMobile: any = screen.getByTestId('menu-icon');
-    const mobileBackground: any = container.firstChild?.nextSibling;
+    const openMenuMobile = screen.getByTestId('menu-icon');
+    const mobileBackground = container.firstChild?.nextSibling as HTMLElement;
     fireEvent.click(openMenuMobile);
     expect(document.body.style.overflow).toBe('hidden');
     fireEvent.click(mobileBackground);

@@ -27,19 +27,24 @@ describe('test Promise Functions', () => {
   });
   describe('test asyncDoIf function', () => {
     (api.get as jest.Mock).mockReturnValueOnce(mocks.addressList);
+
     const request = async () => {
       return await api.get({
         route: 'address/list',
       });
     };
-    let results: any;
+
+    let results: typeof mocks.addressList;
+
     test('Return Promise void', async () => {
       asyncDoIf(
         res => (results = res),
         err => (results = err),
         () => request(),
       );
+
       await clock.tickAsync(5000);
+
       expect(results).toStrictEqual(mocks.addressList);
     });
   });

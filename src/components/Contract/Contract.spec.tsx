@@ -1,11 +1,57 @@
+import { IAsset, IFormData, IKdaFee } from '@/types';
+import { IContractOption } from '@/types/contracts';
 import { contractOptions } from '@/utils/contracts';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { Contract as ContractProvider } from '../../contexts/contract';
+import {
+  Contract as ContractProvider,
+  IContractContext,
+  IFormsData,
+} from '../../contexts/contract';
 import { renderWithTheme } from '../../test/utils';
+import { IFormField } from '../Form';
 import Contract from './index';
 
-const mockContract: any = {
+interface IContract {
+  contractType: string;
+  setContractType: (type: string) => void;
+  ITOBuy: boolean;
+  setITOBuy: (value: boolean) => void;
+  isMultiContract: boolean;
+  setIsMultiContract: (value: boolean) => void;
+  queue: [];
+  txLoading: boolean;
+  setTxLoading: (value: boolean) => void;
+  txHash: string;
+  setTxHash: (value: string) => void;
+  addToQueue: (fn: () => Promise<any>) => void;
+  isMultisig: boolean;
+  setIsMultisig: (value: boolean) => void;
+  showPayload: boolean;
+  setShowPayload: (value: boolean) => void;
+  ownerAddress: string;
+  getOwnerAddress: () => string;
+  assetsList: IAsset[];
+  getAssets: () => void;
+  buyLabel: string;
+  setBuyLabel: (value: string) => void;
+  kdaFee: IKdaFee;
+  setKdaFee: (value: IKdaFee) => void;
+  claimLabel: string;
+  setClaimLabel: (value: string) => void;
+  claimType: number;
+  setClaimType: (value: number) => void;
+  contractOptions: IContractOption[];
+  formsData: IFormData;
+  setFormsData: (
+    value: React.Dispatch<React.SetStateAction<IFormsData[]>>,
+  ) => void;
+  formSections: IFormField[];
+  setFormSections: (value: IFormField[]) => void;
+  resetForms: () => void;
+}
+
+const mockContract: IContract = {
   contractType: contractOptions.find(item => item.value === 'TransferContract')
     ?.value as string,
   setContractType: jest.fn(),
@@ -29,16 +75,16 @@ const mockContract: any = {
   getAssets: jest.fn(),
   buyLabel: '',
   setBuyLabel: jest.fn(),
-  kdaFee: {} as any,
+  kdaFee: {} as IKdaFee,
   setKdaFee: jest.fn(),
   claimLabel: '',
   setClaimLabel: jest.fn(),
   claimType: 0,
   setClaimType: jest.fn(),
   contractOptions,
-  formsData: {} as any,
+  formsData: {},
   setFormsData: jest.fn(),
-  formSections: [] as any,
+  formSections: [],
   setFormSections: jest.fn(),
   resetForms: jest.fn(),
 };
@@ -103,7 +149,9 @@ describe('Contract Component', () => {
     ];
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -136,7 +184,9 @@ describe('Contract Component', () => {
     ];
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -166,7 +216,9 @@ describe('Contract Component', () => {
     )?.value as string;
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -204,7 +256,9 @@ describe('Contract Component', () => {
     )?.value as string;
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -243,7 +297,9 @@ describe('Contract Component', () => {
     )?.value as string;
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -291,7 +347,9 @@ describe('Contract Component', () => {
 
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -327,7 +385,9 @@ describe('Contract Component', () => {
 
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -362,7 +422,9 @@ describe('Contract Component', () => {
 
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -387,7 +449,9 @@ describe('Contract Component', () => {
 
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -415,7 +479,9 @@ describe('Contract Component', () => {
 
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -440,7 +506,9 @@ describe('Contract Component', () => {
 
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -467,7 +535,9 @@ describe('Contract Component', () => {
 
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -494,7 +564,9 @@ describe('Contract Component', () => {
 
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -518,7 +590,9 @@ describe('Contract Component', () => {
 
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -547,7 +621,9 @@ describe('Contract Component', () => {
 
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -571,7 +647,9 @@ describe('Contract Component', () => {
 
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -595,7 +673,9 @@ describe('Contract Component', () => {
 
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -625,7 +705,9 @@ describe('Contract Component', () => {
 
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -649,7 +731,9 @@ describe('Contract Component', () => {
 
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -678,7 +762,9 @@ describe('Contract Component', () => {
 
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -708,7 +794,9 @@ describe('Contract Component', () => {
 
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -739,7 +827,9 @@ describe('Contract Component', () => {
 
     await waitFor(() =>
       renderWithTheme(
-        <ContractProvider.Provider value={mockContract as any}>
+        <ContractProvider.Provider
+          value={mockContract as unknown as IContractContext}
+        >
           <Contract
             paramsList={paramList}
             proposalsList={proposalsList}
@@ -771,7 +861,7 @@ describe('Contract Component', () => {
   // )?.value as string;
   //   await waitFor(() =>
   //     renderWithTheme(
-  //       <ContractProvider.Provider value={mockContract as any}>
+  //       <ContractProvider.Provider value={mockContract as unknown as IContractContext}>
   //         <Contract
   //           paramsList={paramList}
   //           proposalsList={proposalsList}

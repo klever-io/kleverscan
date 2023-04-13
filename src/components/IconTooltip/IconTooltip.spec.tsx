@@ -25,11 +25,12 @@ describe('Component: IconTooltip', () => {
     const tooltip =
       container.firstElementChild?.firstElementChild?.firstElementChild;
     expect(tooltip?.nodeName).toBe('svg');
-    const clickIconTooltip: any = container.firstChild;
+    const clickIconTooltip = container.firstChild as HTMLElement;
     const iconContainer = tooltip?.parentElement;
-    const tooltipContainer = tooltip?.parentElement?.parentElement;
+    const tooltipContainer = tooltip?.parentElement
+      ?.parentElement as HTMLElement;
     act(async () => {
-      await userEvent.hover(tooltipContainer as any);
+      await userEvent.hover(tooltipContainer);
     });
     // TODO: find a way to hover trigger ::before and ::after since they load tooltip
   });

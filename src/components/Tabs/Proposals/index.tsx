@@ -19,7 +19,7 @@ import { capitalizeString } from '@/utils/convertString';
 import { parseAddress } from '@/utils/parseValues';
 import { passViewportStyles } from '@/utils/viewportStyles';
 import Link from 'next/link';
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import {
   FilterContainer,
   ProposalsContainer,
@@ -31,8 +31,6 @@ import {
 
 const Proposals: React.FC<IProposalsProps> = ({ request }) => {
   const [currentProposals, setCurrentProposals] = useState<IProposals>([]);
-
-  const tooltipRef = useRef<any>(null);
   const { isMobile, isTablet } = useMobile();
 
   const filters: IFilter[] = [

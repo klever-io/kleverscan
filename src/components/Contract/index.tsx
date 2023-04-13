@@ -163,8 +163,8 @@ const Contract: React.FC<IContract> = ({
     kdaFee,
   } = useContract();
 
-  const collectionRef = useRef<any>(null);
-  const contractRef = useRef<any>(null);
+  const collectionRef = useRef<ICollectionList>();
+  const contractRef = useRef<string>();
 
   const keyElement = JSON.stringify([
     formSections,

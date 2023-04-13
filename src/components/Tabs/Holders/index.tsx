@@ -30,7 +30,6 @@ const Holders: React.FC<IHolders> = ({
   const rowSections = (props: IBalance): IRowSection[] => {
     const { address, frozenBalance, index, rank, balance, totalBalance } =
       props;
-
     return [
       {
         element: (
@@ -55,7 +54,7 @@ const Holders: React.FC<IHolders> = ({
       {
         element: (
           <strong key={asset.circulatingSupply}>
-            {((frozenBalance / asset.circulatingSupply) * 100).toFixed(2)}%
+            {((balance / asset.circulatingSupply) * 100).toFixed(2)}%
           </strong>
         ),
         span: 1,

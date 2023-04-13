@@ -71,7 +71,7 @@ describe('Component: Tabs/Holders', () => {
     const link = screen.getByRole('link', {
       name: parseAddress(mockedHoldersResponse.data.accounts[0].address, 40),
     });
-    const balance = mockedHoldersResponse.data.accounts[0].frozenBalance;
+    const balance = mockedHoldersResponse.data.accounts[0].balance;
 
     const calcPercentage = (
       (balance / klvAsset.circulatingSupply) *

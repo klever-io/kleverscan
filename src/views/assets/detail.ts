@@ -348,9 +348,9 @@ export const ContentRow = styled.div`
 export const ContentScrollBar = styled.div`
   width: 100%;
   overflow-x: scroll;
-
-  span {
+  > span {
     flex-direction: column;
+    min-width: 15rem !important;
     background-color: ${props => props.theme.accountCard.cardStaking};
     border: 1px solid ${props => props.theme.card.border};
     padding: 1rem;
@@ -364,7 +364,9 @@ export const ContentScrollBar = styled.div`
     position: absolute;
     height: 0.5rem;
   }
-
+  > span:nth-child(2) {
+    margin-left: 0px;
+  }
   &::-webkit-scrollbar-track {
     background-color: transparent;
   }
@@ -376,7 +378,7 @@ export const ContentScrollBar = styled.div`
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: row !important;
     flex-wrap: wrap;
-    max-height: 500px;
+    max-height: 450px;
     justify-content: center;
     > span {
       min-width: 18.5rem !important;

@@ -78,7 +78,7 @@ const contents: IContent[] = [
     infoLinks: [
       {
         name: 'WhitePaper',
-        href: 'https://bc.klever.finance/wp',
+        href: 'https://klever.org/s/Klever-Blockchain-Whitepaper-v20-lr.pdf',
       },
       { name: 'Klever News', href: 'https://klevernews.com/' },
       { name: 'Careers', href: 'https://klever.compleo.com.br/' },

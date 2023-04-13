@@ -4,12 +4,18 @@ import { Container } from './styles';
 interface Input extends React.InputHTMLAttributes<any> {
   type: string;
   value: string | number;
+  containerStyles?: Record<string, unknown>;
   onBlur?: () => void;
   onChange: (e: any) => void;
   handleConfirmClick: () => void;
 }
 
-const Input: React.FC<Input> = ({ onChange, handleConfirmClick, ...rest }) => {
+const Input: React.FC<Input> = ({
+  onChange,
+  handleConfirmClick,
+  containerStyles,
+  ...rest
+}) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -30,7 +36,7 @@ const Input: React.FC<Input> = ({ onChange, handleConfirmClick, ...rest }) => {
   };
 
   return (
-    <Container>
+    <Container style={{ ...containerStyles }}>
       <input {...inputProps} />
     </Container>
   );

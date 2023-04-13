@@ -1,6 +1,7 @@
 import Filter, { IFilter } from '@/components/Filter';
 import { buyType, contracts, status } from '@/configs/transactions';
-import { useFetchPartialAsset } from '@/utils/hooks';
+import { IAsset } from '@/types';
+import { useFetchPartial } from '@/utils/hooks';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -15,7 +16,7 @@ const TransactionsFilters: React.FC<ITransactionsFilters> = ({ setQuery }) => {
   const router = useRouter();
   const [query, setLocalQuery] = useState<NextParsedUrlQuery>({});
   const [assets, fetchPartialAsset, loading, setLoading] =
-    useFetchPartialAsset();
+    useFetchPartial<IAsset>('assets', 'assets/list', 'assetId');
 
   useEffect(() => {
     if (!router.isReady) return;

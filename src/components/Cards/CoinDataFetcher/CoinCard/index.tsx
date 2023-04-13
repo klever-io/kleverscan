@@ -6,21 +6,25 @@ import { getVariation } from '@/utils';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useCallback, useRef, useState } from 'react';
+import { IoReloadSharp } from 'react-icons/io5';
 import CoinCardSkeleton from '../CoinCardSkeleton';
 import {
   ArrowDownDiv,
   CardContainer,
   CardContent,
+  CardContentError,
   ChartContainer,
   CoinSelector,
   CoinsSelector,
   Container,
   Content,
+  ContentError,
   Description,
   HeaderContainer,
   HeaderContent,
   IconContainer,
   Name,
+  NameError,
   TitleDetails,
   ValueContainer,
   ValueContent,
@@ -34,12 +38,13 @@ interface IDropDow {
 
 const CoinCard: React.FC = () => {
   const [selectedCoin, setSelectedCoin] = useState(0);
+  const [loadingError, setLoadingError] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const [arrowOpen, setArrowOpen] = useState(false);
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
 
-  const { assetsData, coins, loadingCoins } = useHomeData();
+  const { assetsData, coins, loadingCoins, getCoins } = useHomeData();
 
   const handleSelectCoin = useCallback(() => {
     if (carouselRef.current !== null && cardRef.current !== null)
@@ -230,6 +235,35 @@ const CoinCard: React.FC = () => {
     );
   };
 
+  const CoinsFetchFails: React.FC = () => {
+    if (coins.length === 0) {
+      return !loadingError ? (
+        <CardContainer>
+          <CardContentError>
+            <HeaderContainer>
+              <NameError>
+                <span>Error while fetching data</span>
+              </NameError>
+            </HeaderContainer>
+            <ContentError
+              onClick={async () => {
+                setLoadingError(true);
+                await getCoins();
+                setLoadingError(false);
+              }}
+            >
+              <span>Retry</span>
+              <IoReloadSharp />
+            </ContentError>
+          </CardContentError>
+        </CardContainer>
+      ) : (
+        <CoinCardSkeleton />
+      );
+    }
+    return <></>;
+  };
+
   return !loadingCoins ? (
     <Container>
       <Content ref={carouselRef} onScroll={handleSelectCoin}>
@@ -313,7 +347,9 @@ const CoinCard: React.FC = () => {
                       {coin.shortname === 'KLV' ? (
                         <>
                           {' '}
-                          <span>$ {coin.marketCap.price.toLocaleString()}</span>
+                          <span>
+                            $ {coin.marketCap.price?.toLocaleString()}
+                          </span>
                         </>
                       ) : (
                         <>
@@ -337,6 +373,7 @@ const CoinCard: React.FC = () => {
             </CardContainer>
           );
         })}
+        <CoinsFetchFails />
       </Content>
 
       <CoinsSelector>

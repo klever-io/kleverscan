@@ -69,7 +69,7 @@ const contents: IContent[] = [
   {
     title: 'Klever Wallet App',
     infoLinks: [
-      { name: 'Roadmap', href: 'https://klever.finance/roadmap/' },
+      { name: 'Roadmap', href: 'https://klever.org/#roadmap' },
       { name: 'Help Center', href: 'https://support.klever.org/' },
     ],
   },

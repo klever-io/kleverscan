@@ -126,13 +126,18 @@ export const Input = styled(DefaultInput)`
   border-color: ${props => props.theme.lightGray};
 `;
 
-export const ContainerAssetId = styled.div`
+export const ContainerAssetId = styled.section`
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  overflow: hidden;
 
   div {
     max-height: 24px;
     min-width: fit-content;
+  }
+
+  a {
+    overflow: hidden;
   }
 `;

@@ -138,7 +138,7 @@ const Assets: React.FC = () => {
       {
         element: (
           <Link href={`/asset/${assetId}`} key={ticker}>
-            <a>
+            <a style={{ overflow: 'hidden' }}>
               <p>{ticker}</p>
             </a>
           </Link>

@@ -1,39 +1,104 @@
-import styled from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
+
+const animatedDropdown = keyframes`
+  0% {
+    transform: scaleY(0.8);
+    transform-origin: 0 0;
+
+    opacity: 0;
+    visibility: hidden;
+  }
+
+   to {
+    transform: scaleY(1);
+    transform-origin: 0 0;
+
+    opacity: 1;
+    visibility: visible;
+    height: fit-content;
+  }
+
+`;
 
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  padding: 1.36rem;
   gap: 1rem;
-
-  h3 {
-    color: ${props => props.theme.black};
-  }
-`;
-
-export const Content = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  position: absolute;
+  left: 0;
+  right: 0;
   width: 100%;
-  gap: 1rem;
-  overflow-x: scroll;
-  padding-bottom: 1rem;
-  padding: 0 1rem 1rem;
-`;
-
-export const Button = styled.button`
-  display: flex;
-  padding: 0.5rem 0.5rem;
+  height: 4rem;
+  margin-top: 1rem;
   background: ${props => props.theme.violet};
   color: ${props => props.theme.true.white};
-  border-radius: 10px;
-
-  span {
-    width: 8rem;
+  transition: 1000ms ease;
+  > div {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    @media (min-width: 768px) {
+      align-items: center;
+    }
   }
 
+  svg {
+    font-size: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    justify-content: center;
+    gap: 0;
+  }
+`;
+
+export const ShortCutDropdown = styled.div<{ isOpen: boolean }>`
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem 1.5rem;
+  position: absolute;
+  top: 3.5rem;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background: ${props => props.theme.violet};
+  visibility: ${props => (props.isOpen ? 'visible' : 'hidden')};
+  opacity: ${props => (props.isOpen ? 1 : 0)};
+
+  font-weight: 700;
+
+  ${props =>
+    props.isOpen &&
+    css`
+      animation: ${animatedDropdown} 0.3s ease;
+    `}
+`;
+
+export const Button = styled.button<{ isMobile?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: ${props => props.theme.true.white};
+  background: ${props => props.theme.violet};
+
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  font-weight: 700;
+  ${props =>
+    props.isMobile &&
+    css`
+      padding: 1.5rem 1rem;
+    `}
+
   &:hover {
+    background: ${props => props.theme.violet};
     filter: brightness(1.2);
+  }
+
+  &:last-child {
+    margin-right: 3rem;
   }
 `;

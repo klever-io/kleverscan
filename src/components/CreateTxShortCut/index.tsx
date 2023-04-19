@@ -1,14 +1,17 @@
+import { PlusWhite, SendWhite } from '@/assets/icons';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import React, { useEffect, useRef, useState } from 'react';
+import { RiArrowDownSLine } from 'react-icons/ri';
 import ModalContract from '../Contract/ModalContract';
 import { BackgroundHelper } from '../Header/ConnectWallet/styles';
 import WalletHelp from '../Header/WalletHelp';
-import { Button, Container, Content } from './styles';
+import { Button, Container, ShortCutDropdown } from './styles';
 
 interface IShortCutContract {
   title: string;
   type: string;
+  Icon: any;
 }
 
 const CreateTxShortcut: React.FC = () => {
@@ -17,16 +20,17 @@ const CreateTxShortcut: React.FC = () => {
   const [titleModal, setTitleModal] = useState('');
   const [valueContract, setValueContract] = useState('');
   const [openDrawer, setOpenDrawer] = useState<boolean>(false);
+  const [openDropdown, setOpenDropdown] = useState(true);
 
   const { extensionInstalled, connectExtension } = useExtension();
   const { isMobile } = useMobile();
 
   const shortCutContract: IShortCutContract[] = [
-    { title: 'Transfer', type: 'TransferContract' },
-    { title: 'Create Asset', type: 'CreateAssetContract' },
-    { title: 'Create ITO', type: 'ConfigITOContract' },
-    { title: 'Freeze', type: 'FreezeContract' },
-    { title: 'Vote', type: 'VoteContract' },
+    { title: 'Transfer', type: 'TransferContract', Icon: SendWhite },
+    { title: 'Create Asset', type: 'CreateAssetContract', Icon: PlusWhite },
+    { title: 'Create ITO', type: 'ConfigITOContract', Icon: PlusWhite },
+    { title: 'Freeze', type: 'FreezeContract', Icon: PlusWhite },
+    { title: 'Vote', type: 'VoteContract', Icon: PlusWhite },
   ];
 
   const modalOptions = {
@@ -42,7 +46,9 @@ const CreateTxShortcut: React.FC = () => {
     setOpenDrawer(false);
   };
 
-  const handleClick = (contract: IShortCutContract) => {
+  const handleClick = (contract: IShortCutContract, e: any) => {
+    e.stopPropagation();
+
     if (!extensionInstalled) {
       setOpenDrawer(true);
       return;
@@ -79,34 +85,87 @@ const CreateTxShortcut: React.FC = () => {
     document.body.style.overflow = openDrawer ? 'hidden' : 'visible';
   }, [openDrawer]);
 
-  return (
-    <Container>
-      <h3>Quick Transaction</h3>
+  const handleDropDown = (e: any) => {
+    e.stopPropagation();
+    setOpenDropdown(!openDropdown);
+  };
 
-      <Content ref={contentRef}>
-        {shortCutContract.map(contract => (
-          <Button
-            onClick={() => handleClick(contract)}
-            key={JSON.stringify(contract)}
-          >
-            <span>{contract.title}</span>
-          </Button>
-        ))}
+  const MobileVersion: React.FC = () => {
+    return (
+      <>
+        <Container onClick={handleDropDown}>
+          <div>
+            <h3>Create Transaction</h3>
+
+            <RiArrowDownSLine />
+          </div>
+
+          <ShortCutDropdown isOpen={openDropdown}>
+            {shortCutContract.map(contract => (
+              <Button
+                onClick={e => handleClick(contract, e)}
+                key={JSON.stringify(contract)}
+                isMobile={isMobile}
+              >
+                <contract.Icon />
+                {contract.title}
+              </Button>
+            ))}
+          </ShortCutDropdown>
+          <BackgroundHelper
+            onClick={closeMenu}
+            onTouchStart={closeMenu}
+            opened={openDrawer}
+          />
+          <WalletHelp
+            closeDrawer={() => setOpenDrawer(false)}
+            opened={openDrawer}
+            clickConnectionMobile={() => {
+              openDrawer;
+            }}
+          />
+        </Container>
         {extensionInstalled && <ModalContract {...modalOptions} />}
-      </Content>
-      <BackgroundHelper
-        onClick={closeMenu}
-        onTouchStart={closeMenu}
-        opened={openDrawer}
-      />
-      <WalletHelp
-        closeDrawer={() => setOpenDrawer(false)}
-        opened={openDrawer}
-        clickConnectionMobile={() => {
-          openDrawer;
-        }}
-      />
-    </Container>
+      </>
+    );
+  };
+
+  return isMobile ? (
+    <MobileVersion />
+  ) : (
+    <>
+      <Container>
+        <div>
+          <h3>Create Transaction</h3>
+
+          {isMobile && <RiArrowDownSLine />}
+          {!isMobile &&
+            shortCutContract.map(contract => (
+              <Button
+                onClick={e => handleClick(contract, e)}
+                key={JSON.stringify(contract)}
+              >
+                <contract.Icon />
+                {contract.title}
+              </Button>
+            ))}
+        </div>
+
+        <BackgroundHelper
+          onClick={closeMenu}
+          onTouchStart={closeMenu}
+          opened={openDrawer}
+        />
+        <WalletHelp
+          closeDrawer={() => setOpenDrawer(false)}
+          opened={openDrawer}
+          clickConnectionMobile={() => {
+            openDrawer;
+          }}
+        />
+      </Container>
+      {extensionInstalled && <ModalContract {...modalOptions} />}
+    </>
   );
 };
 

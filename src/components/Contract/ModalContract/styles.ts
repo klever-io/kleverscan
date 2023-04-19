@@ -6,6 +6,7 @@ export const Container = styled.div<{ openModal?: boolean }>`
   top: 0;
   left: 0;
   display: ${props => (props.openModal ? 'grid' : 'none')};
+  justify-content: center;
   place-content: center;
   width: 100vw;
   height: 100vh;

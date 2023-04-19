@@ -64,7 +64,12 @@ const Blocks: React.FC<IBlocks> = () => {
   const [blocksInterval, setBlocksInterval] = useState(0);
 
   const requestBlocks = async (page: number, limit: number) => {
-    let response = { data: { blocks } };
+    let response = {
+      data: { blocks },
+      pagination: undefined,
+      code: '',
+      error: '',
+    };
 
     await Promise.allSettled([
       blockCall(page, limit),

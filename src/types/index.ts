@@ -491,6 +491,9 @@ export interface IResponse {
   error: IError | string;
 }
 
+export interface IPaginatedResponse extends IResponse {
+  pagination?: IPagination;
+}
 interface INodePeer {
   coordenates: [number, number][];
   data: any;

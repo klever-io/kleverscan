@@ -1,10 +1,10 @@
 import Table, { ITable } from '@/components/Table';
 import api from '@/services/api';
-import { IRowSection } from '@/types/index';
+import { IPaginatedResponse, IRowSection } from '@/types/index';
 import React from 'react';
 import { proposalsMessages } from './proposalMessages';
 
-interface INetworkParams {
+interface INetworkParams extends IPaginatedResponse {
   data: {
     parameters: INetworkParam[];
   };
@@ -19,7 +19,12 @@ interface INetworkParam {
 const requestNetworkParams = async (): Promise<INetworkParams> => {
   const { data } = await api.get({ route: 'network/network-parameters' });
 
-  const networkParams: INetworkParams = { data: { parameters: [] } };
+  const networkParams: INetworkParams = {
+    data: { parameters: [] },
+    pagination: undefined,
+    code: '',
+    error: '',
+  };
 
   if (data) {
     networkParams.data.parameters = Object.keys(proposalsMessages).map(

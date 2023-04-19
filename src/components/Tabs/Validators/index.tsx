@@ -1,5 +1,5 @@
 import Table, { ITable } from '@/components/Table';
-import { IRowSection, ITransaction } from '@/types/index';
+import { IPaginatedResponse, IRowSection, ITransaction } from '@/types/index';
 import React from 'react';
 
 interface IValidatorsProps {
@@ -8,8 +8,11 @@ interface IValidatorsProps {
 
 const Validators: React.FC<IValidatorsProps> = props => {
   const validators = props.validators;
-  const requestBlockValidators = new Promise(resolve => {
-    resolve({ data: { blockValidatorList: validators } });
+  const requestBlockValidators: Promise<IPaginatedResponse> = Promise.resolve({
+    data: { blockValidatorList: validators },
+    pagination: undefined,
+    code: '',
+    error: '',
   });
   const rowSections = (validatorHash: ITransaction): IRowSection[] => {
     const sections = [

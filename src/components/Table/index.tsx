@@ -1,5 +1,5 @@
 import { useMobile } from '@/contexts/mobile';
-import { IRowSection } from '@/types/index';
+import { IPaginatedResponse, IRowSection } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { exportToCsv } from '@/utils/promiseFunctions';
 import { useRouter } from 'next/router';
@@ -58,12 +58,11 @@ export interface ITable {
     | 'validatorsList';
 
   header: string[];
-  body?: any;
   rowSections?: (item: any) => IRowSection[] | undefined;
   scrollUp?: boolean;
   totalPages?: number;
   dataName?: string;
-  request?: (page: number, limit: number) => Promise<any>;
+  request?: (page: number, limit: number) => Promise<IPaginatedResponse>;
   interval?: number;
   intervalController?: React.Dispatch<React.SetStateAction<number>>;
 }

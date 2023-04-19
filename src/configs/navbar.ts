@@ -21,6 +21,11 @@ export const heightLimit = 70; // pixels
 export const navbarHeight = 5; // rem
 export const navbarPadding = '1rem 17.5rem';
 
+const isBeta =
+  process.env.DEFAULT_NODE_HOST?.includes('devnet') ||
+  process.env.DEFAULT_NODE_HOST?.includes('testnet') ||
+  process.env.DEFAULT_IS_BETA;
+
 const navbarItems: INavbarItem[] = [
   {
     name: 'Blocks',
@@ -77,13 +82,15 @@ const navbarItems: INavbarItem[] = [
         pathTo: '/itos',
         Icon: GiTwoCoins,
       },
-      {
-        name: 'Verify',
-        pathTo: '/verify-signature',
-        Icon: TickSquare,
-      },
     ],
   },
 ];
+
+isBeta &&
+  navbarItems[navbarItems.length - 1].pages?.push({
+    name: 'Verify',
+    pathTo: '/verify-signature',
+    Icon: TickSquare,
+  });
 
 export { navbarItems };

@@ -77,11 +77,11 @@ const navbarItems: INavbarItem[] = [
         pathTo: '/itos',
         Icon: GiTwoCoins,
       },
-      {
-        name: 'Verify',
-        pathTo: '/verify-signature',
-        Icon: TickSquare,
-      },
+      // {
+      //   name: 'Verify',
+      //   pathTo: '/verify-signature',
+      //   Icon: TickSquare,
+      // },
     ],
   },
 ];

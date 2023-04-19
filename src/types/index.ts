@@ -682,6 +682,31 @@ export interface IAssetOne extends IResponse {
   };
 }
 
+export interface IAssetPage {
+  asset: IAsset;
+  transactions: ITransaction[];
+  totalTransactions: number;
+  totalTransactionsPage: number;
+  totalHoldersPage: number;
+  holders: IBalance[];
+  totalRecords: number;
+  page: number;
+}
+
+export interface IHoldersResponse extends IResponse {
+  data: {
+    accounts: IAccountAsset[];
+  };
+  pagination: IPagination;
+}
+
+export interface IITOResponse extends IResponse {
+  data: {
+    ito: IITO;
+  };
+  pagination: IPagination;
+}
+
 export interface IStatisticsResponse extends IResponse {
   data: {
     statistics: {

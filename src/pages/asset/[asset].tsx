@@ -12,17 +12,16 @@ import Transactions from '@/components/Tabs/Transactions';
 import { useExtension } from '@/contexts/extension';
 import api from '@/services/api';
 import {
-  IAccountAsset,
   IAsset,
+  IAssetOne,
+  IAssetPage,
   IAssetPool,
   IAssetPoolResponse,
-  IAssetResponse,
   IBalance,
-  IITO,
+  IHoldersResponse,
+  IITOResponse,
   IPagination,
   IParsedITO,
-  IResponse,
-  ITransaction,
   ITransactionResponse,
   IUri,
 } from '@/types/index';
@@ -61,31 +60,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { displayITOpacks, parseITOs } from '../itos';
-
-interface IAssetPage {
-  asset: IAsset;
-  transactions: ITransaction[];
-  totalTransactions: number;
-  totalTransactionsPage: number;
-  totalHoldersPage: number;
-  holders: IBalance[];
-  totalRecords: number;
-  page: number;
-}
-
-interface IHoldersResponse extends IResponse {
-  data: {
-    accounts: IAccountAsset[];
-  };
-  pagination: IPagination;
-}
-
-interface IITOResponse extends IResponse {
-  data: {
-    ito: IITO;
-  };
-  pagination: IPagination;
-}
 
 const Asset: React.FC<IAssetPage> = ({}) => {
   const router = useRouter();
@@ -208,7 +182,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       const pathRoute = router.query?.asset as string;
       const assetId = pathRoute.split('=asset')[0];
 
-      const assetCall = new Promise<IAssetResponse>(async (resolve, reject) => {
+      const assetCall = new Promise<IAssetOne>(async (resolve, reject) => {
         const res = await api.get({
           route: `assets/${assetId}`,
         });
@@ -284,29 +258,29 @@ const Asset: React.FC<IAssetPage> = ({}) => {
           if (res.status === 'fulfilled') {
             switch (index) {
               case 0:
-                const asset: any = res.value;
+                const asset = res.value as IAssetOne;
                 const parsedAsset = parseHardCodedInfo([asset?.data?.asset])[0];
                 parseURIs(parsedAsset);
                 setAsset(parsedAsset);
                 break;
               case 1:
-                const transactions: any = res.value;
+                const transactions = res.value as ITransactionResponse;
                 setTransactionsPagination(transactions?.pagination);
                 break;
               case 2:
-                const holders: any = res.value;
+                const holders = res.value as IHoldersResponse;
                 setHoldersPagination(holders?.pagination);
                 break;
               case 3:
-                const ITOresp: any = res.value;
+                const ITOresp = res.value as IITOResponse;
                 if (ITOresp?.data?.ito) {
                   const ITO = ITOresp?.data?.ito;
                   await parseITOs([ITO]);
-                  setITO(ITO);
+                  setITO(ITO as IParsedITO);
                 }
                 break;
               case 4:
-                const assetPool: any = res.value;
+                const assetPool = res.value as IAssetPoolResponse;
                 setAssetPool(assetPool.data.pool);
                 break;
             }
@@ -574,7 +548,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       <>
         {Object.entries(asset?.uris || []).length ? (
           Object.entries(asset?.uris || []).map(
-            ([key, value]: [string, any]) => (
+            ([key, value]: [string, string]) => (
               <Row key={String(key)} isStakingRoyalties={false}>
                 <span>
                   <strong>{key}</strong>

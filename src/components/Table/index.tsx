@@ -242,7 +242,7 @@ const Table: React.FC<ITable> = ({
                   .map((_, index) => (
                     <Row key={String(index)} {...props}>
                       {header.map((item, index2) => (
-                        <span key={String(index2)}>
+                        <span key={JSON.stringify(item) + String(index2)}>
                           <Skeleton width="100%" />
                         </span>
                       ))}

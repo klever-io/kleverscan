@@ -35,6 +35,7 @@ export const Container = styled.div`
   background: ${props => props.theme.violet};
   color: ${props => props.theme.true.white};
   transition: 1000ms ease;
+  z-index: -1;
   > div {
     display: flex;
     width: 100%;

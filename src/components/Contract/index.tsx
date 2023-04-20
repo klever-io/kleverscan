@@ -90,6 +90,20 @@ const collectionContracts = [
   'WithdrawContract',
 ];
 
+export const hashComponent = (
+  hash: string,
+  setHash: React.Dispatch<React.SetStateAction<string | null>>,
+): JSX.Element => (
+  <ExtraOptionContainer>
+    <Link href={`/transaction/${hash}`}>
+      <a target="_blank" rel="noopener noreferrer">
+        Hash: {hash}
+      </a>
+    </Link>
+    <Copy data={hash ? hash : ''} />
+    <CloseIcon onClick={() => setHash(null)} />
+  </ExtraOptionContainer>
+);
 const emptySectionContracts = [
   'UpdateAccountPermissionContract',
   'UnjailContract',
@@ -704,18 +718,6 @@ const Contract: React.FC<IContract> = ({
     </ExtraOptionContainer>
   );
 
-  const hashComponent = () => (
-    <ExtraOptionContainer>
-      <Link href={`/transaction/${txHash}`}>
-        <a target="_blank" rel="noopener noreferrer">
-          Hash: {txHash}
-        </a>
-      </Link>
-      <Copy data={txHash ? txHash : ''} />
-      <CloseIcon onClick={() => setTxHash(null)} />
-    </ExtraOptionContainer>
-  );
-
   const bucketListSelect = () => (
     <SelectContainer>
       <SelectContent>
@@ -842,7 +844,7 @@ const Contract: React.FC<IContract> = ({
           handleConfirm={handleSend}
         />
       )}
-      {txHash && hashComponent()}
+      {txHash && hashComponent(txHash, setTxHash)}
 
       {contractsDescription[contractType] && (
         <CardContainer>

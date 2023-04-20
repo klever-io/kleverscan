@@ -4,12 +4,14 @@ import Input from 'components/Input';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { IParsedITO } from 'types';
+import { Loader } from '../Loader/styles';
 import {
   AssetName,
   Button,
   Container,
   Content,
   FungibleContainer,
+  LoaderWrapper,
   PriceRange,
   PriceRangeTitle,
   Row,
@@ -44,6 +46,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
   showcase,
 }) => {
   const [amount, setAmount] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const calculateCost = (indexPackData: number, qtyPacks: number) => {
     if (ITO) {
@@ -87,6 +90,21 @@ const FungibleITO: React.FC<IFungibleITO> = ({
     }
   };
 
+  const calculatePriceRange = (
+    currentAmount: number,
+    packs: IPackItem[],
+    index: number,
+  ): boolean => {
+    if (index === 0) {
+      return currentAmount <= packs[0].amount;
+    } else if (index === packs.length - 1) {
+      return currentAmount > packs[packs.length - 2].amount;
+    }
+    return (
+      currentAmount > packs[index - 1].amount &&
+      currentAmount <= packs[index].amount
+    );
+  };
   const handleSubmit = async (currencyId: string) => {
     if (!amount) {
       toast.error('The amount field cannot be empty or zero!');
@@ -105,6 +123,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
     };
 
     try {
+      setLoading(true);
       const unsignedTx = await web.buildTransaction([
         {
           type: 17, // Buy Order type
@@ -118,6 +137,8 @@ const FungibleITO: React.FC<IFungibleITO> = ({
     } catch (e: any) {
       console.warn(`%c ${e}`, 'color: red');
       toast.error(e.message ? e.message : e);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -125,7 +146,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
     <Container>
       <FungibleContainer key={packInfoIndex}>
         <Content>
-          <AssetName>{ITO.assetId}</AssetName>
+          <AssetName>{`Price in ${packInfo.key}`}</AssetName>
           <Input
             type="number"
             min="0"
@@ -140,10 +161,15 @@ const FungibleITO: React.FC<IFungibleITO> = ({
               {packInfo.key}
             </span>
           </TotalPrice>
-          {!showcase && (
+          {!showcase && !loading && (
             <Button onClick={() => handleSubmit(packInfo.key)}>
               <span>Buy Token</span>
             </Button>
+          )}
+          {loading && (
+            <LoaderWrapper>
+              <Loader />
+            </LoaderWrapper>
           )}
         </Content>
         <Content>
@@ -156,7 +182,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
 
                 if (packInfo.packs.length === 1) {
                   return (
-                    <Row>
+                    <Row key={packItemIndex} inPriceRange={true}>
                       <span>0 +</span>
                       <span>
                         {packItem.price} {packInfo.key} / {ITO.ticker}
@@ -165,11 +191,18 @@ const FungibleITO: React.FC<IFungibleITO> = ({
                   );
                 } else if (packInfo.packs.length === 2) {
                   return (
-                    <Row>
+                    <Row
+                      key={packItemIndex}
+                      inPriceRange={calculatePriceRange(
+                        amount,
+                        packInfo.packs,
+                        packItemIndex,
+                      )}
+                    >
                       <span>
                         {packItemIndex === 0
                           ? `0 - ${packItem.amount}`
-                          : `${packInfo.packs[0].amount} <`}
+                          : `> ${packInfo.packs[0].amount}`}
                       </span>
                       <span>
                         {packItem.price} {packInfo.key} / {ITO.ticker}
@@ -179,7 +212,14 @@ const FungibleITO: React.FC<IFungibleITO> = ({
                 }
 
                 return (
-                  <Row key={packItemIndex}>
+                  <Row
+                    key={packItemIndex}
+                    inPriceRange={calculatePriceRange(
+                      amount,
+                      packInfo.packs,
+                      packItemIndex,
+                    )}
+                  >
                     {packItemIndex === 0 && <span>0 - {packItem.amount}</span>}
                     {!isLastElement && packItemIndex > 0 && (
                       <span>
@@ -189,7 +229,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
                     )}
                     {isLastElement && (
                       <span>
-                        {packInfo.packs[packItemIndex - 1].amount} {'<'}
+                        {'>'} {packInfo.packs[packItemIndex - 1].amount}
                       </span>
                     )}
                     <span>

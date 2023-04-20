@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import Skeleton from '@/components/Skeleton';
 import api from '@/services/api';
-import { IAsset, IAssetResponse } from '@/types';
+import { IAssetResponse, IValidatorResponse } from '@/types';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { getPrecision } from '../precisionFunctions';
 
@@ -59,16 +59,23 @@ export function usePrecision(
   }
 }
 
-export const useFetchPartialAsset = (): [
-  IAsset[],
-  (value: string) => Promise<IAsset[]>,
+type PartialResponse = IAssetResponse | IValidatorResponse;
+
+export const useFetchPartial = <T,>(
+  type: string,
+  route: string,
+  dataType: string,
+): [
+  T[],
+  (value: string) => Promise<T[]>,
   boolean,
   Dispatch<SetStateAction<boolean>>,
 ] => {
-  const [assets, setAssets] = useState<IAsset[]>([]);
-  const [assetsSearch, setAssetsSearch] = useState<IAsset[]>(() => {
+  const localStorageName = `all${type}Search`;
+  const [items, setItems] = useState<T[]>([]);
+  const [itemsSearch, setItemsSearch] = useState<T[]>(() => {
     try {
-      const storedData = localStorage.getItem('allAssetsSearch');
+      const storedData = localStorage.getItem(localStorageName);
       return storedData ? JSON.parse(storedData) : [];
     } catch (error) {
       console.error('Error parsing stored data:', error);
@@ -76,55 +83,67 @@ export const useFetchPartialAsset = (): [
     }
   });
   const [loading, setLoading] = useState<boolean>(false);
-  let fetchPartialAssetTimeout: ReturnType<typeof setTimeout>;
+  let fetchPartialTimeout: ReturnType<typeof setTimeout>;
 
   const initialState = async () => {
-    const response = await api.get({
-      route: `assets/kassets`,
-      query: { limit: 10 },
-    });
-    setAssets([...response.data.assets, ...assetsSearch]);
+    if (type !== 'validators') {
+      const response = await api.get({
+        route: `${route}`,
+        query: { limit: 10 },
+      });
+      setItems([...response.data[type], ...itemsSearch]);
+    } else {
+      setItems([...itemsSearch]);
+    }
   };
 
   useEffect(() => {
     try {
-      localStorage.setItem('allAssetsSearch', JSON.stringify(assetsSearch));
+      localStorage.setItem(localStorageName, JSON.stringify(itemsSearch));
     } catch (error) {
       console.error('Error storing data:', error);
     }
-  }, [assetsSearch]);
-  const addAssetsLocalStorage = (response: IAsset[]) => {
-    setAssetsSearch([...assetsSearch, ...response]);
+  }, [itemsSearch]);
+  const addAssetsLocalStorage = (response: T[]) => {
+    setItemsSearch([...itemsSearch, ...response]);
   };
   useEffect(() => {
     initialState();
   }, []);
   return [
-    assets,
+    items,
     value => {
-      clearTimeout(fetchPartialAssetTimeout);
+      clearTimeout(fetchPartialTimeout);
       return new Promise(res => {
-        fetchPartialAssetTimeout = setTimeout(async () => {
-          let response: IAssetResponse;
+        fetchPartialTimeout = setTimeout(async () => {
+          let response: PartialResponse;
           if (
             value &&
-            !assets.find(asset => asset.assetId.includes(value.toUpperCase()))
+            !items.find(asset =>
+              asset[dataType].toUpperCase().includes(value.toUpperCase()),
+            )
           ) {
-            response = await api.get({
-              route: `assets/kassets?asset=${value}`,
-            });
-            if (!response.data.assets.length) {
-              setAssets([...assets]);
+            if (type !== 'assets') {
+              response = await api.get({
+                route: `${route}?${dataType}=${value}`,
+              });
             } else {
-              res(response.data.assets);
-              addAssetsLocalStorage(response.data.assets);
-              setAssets([...assets, ...response.data.assets]);
+              response = await api.get({
+                route: `${route}?asset=${value}`,
+              });
             }
-            res(response.data.assets);
+            if (!response.data[type].length) {
+              setItems([...items]);
+            } else {
+              res(response.data[type]);
+              addAssetsLocalStorage(response.data[type]);
+              setItems([...items, ...response.data[type]]);
+            }
+            res(response.data[type]);
             setLoading(false);
           } else {
             setLoading(false);
-            res(assets);
+            res(items);
           }
         }, 500);
       });

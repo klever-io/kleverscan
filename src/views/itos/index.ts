@@ -47,7 +47,17 @@ export const AssetsList = styled.div`
 
 export const AssetContainer = styled.div<IAsset>`
   cursor: pointer;
-  background-color: ${props => (props.selected ? '#16162c' : '#222345')};
+  background-color: ${props => {
+    if (!props.selected && !props.theme.dark) {
+      return props.theme.white;
+    } else if (props.selected && props.theme.dark) {
+      return props.theme.kappsDemo.darker;
+    } else if (props.selected && !props.theme.dark) {
+      return props.theme.lightGray;
+    }
+    return props.theme.kappsDemo.dark;
+  }};
+
   width: 100%;
   span {
     text-align: center;
@@ -66,7 +76,6 @@ export const AssetContainer = styled.div<IAsset>`
 
 export const ITOContainer = styled.div`
   width: 100%;
-  /* padding: 1rem 1rem; */
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -95,7 +104,8 @@ export const ITOContent = styled.div`
 `;
 
 export const PackContainer = styled.div`
-  background-color: #16162c;
+  background-color: ${props =>
+    props.theme.dark ? props.theme.kappsDemo.darker : props.theme.white};
   width: 100%;
   padding: 1rem 1.8rem;
   border-radius: 0.8rem;
@@ -110,6 +120,7 @@ export const PackContainer = styled.div`
 
 export const KeyLabel = styled.span`
   font-size: 1.5rem;
+  user-select: text;
 `;
 
 export const ChooseAsset = styled.div`
@@ -139,7 +150,8 @@ export const IDAsset = styled.div`
   align-items: center;
   width: 100%;
   span {
-    color: ${props => props.theme.true.white};
+    color: ${props => props.theme.black};
+    user-select: text;
   }
 `;
 
@@ -167,7 +179,7 @@ export const HashContent = styled.div`
   align-items: center;
   background-color: ${props => props.theme.card.background};
   border-radius: 4px;
-  color: ${props => props.theme.black};
+  color: ${props => props.theme.true.white};
 `;
 
 export const HashAndCopy = styled.div`
@@ -238,6 +250,7 @@ export const Header = styled.div`
   justify-content: space-between;
   padding-left: 1rem;
   padding-right: 1rem;
+  gap: 0.5rem;
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
@@ -247,19 +260,26 @@ export const Header = styled.div`
 
 export const ITOSearchButton = styled.button`
   align-self: end;
+  min-width: 35%;
   color: ${props => props.theme.true.white} !important;
   background: ${props => props.theme.violet};
-  padding: 0.7rem 1rem;
+  padding: 0.8rem 1rem;
   border-radius: 4px;
   cursor: pointer;
   &:hover {
     opacity: 0.8;
   }
 
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: flex;
     justify-content: center;
     width: 100%;
+  }
+`;
+
+export const CreateITOButton = styled(ITOSearchButton)`
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+    min-width: 215px;
   }
 `;
 
@@ -298,6 +318,7 @@ export const ITOTitle = styled.div`
   span {
     font-weight: bolder;
     font-size: 2rem;
+    user-select: text;
   }
 `;
 

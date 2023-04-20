@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useRef, useState } from 'react';
+import CreateTxShortcut from '../CreateTxShortCut';
 import ConnectWallet from './ConnectWallet';
 import OptionsContainer from './OptionsContainer';
 import {
@@ -136,6 +137,7 @@ const Navbar: React.FC = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
   const prevScrollpos = useRef<number>(0);
+  const router = useRouter();
 
   const handleMobileScroll = () => {
     const navbar = mobileNavbarRef.current;
@@ -238,6 +240,7 @@ const Navbar: React.FC = () => {
             </MobileContainer>
           )}
         </Content>
+        {router.pathname === '/' && <CreateTxShortcut />}
       </Container>
 
       <MobileBackground

@@ -6,10 +6,11 @@ export const Container = styled.div<{ openModal?: boolean }>`
   top: 0;
   left: 0;
   display: ${props => (props.openModal ? 'grid' : 'none')};
+  justify-content: center;
   place-content: center;
   width: 100vw;
   height: 100vh;
-  z-index: 4;
+  z-index: 6;
   backdrop-filter: brightness(0.3);
   visibility: ${props => (props.openModal ? 'visible' : 'hidden')};
 `;

@@ -7,6 +7,7 @@ import {
   TwoUser,
 } from '@/assets/icons';
 import { GiTwoCoins } from 'react-icons/gi';
+import { RiPenNibFill } from 'react-icons/ri';
 
 export interface INavbarItem {
   name: string;
@@ -19,6 +20,11 @@ export interface INavbarItem {
 export const heightLimit = 70; // pixels
 export const navbarHeight = 5; // rem
 export const navbarPadding = '1rem 17.5rem';
+
+const isBeta =
+  process.env.DEFAULT_NODE_HOST?.includes('devnet') ||
+  process.env.DEFAULT_NODE_HOST?.includes('testnet') ||
+  process.env.DEFAULT_IS_BETA;
 
 const navbarItems: INavbarItem[] = [
   {
@@ -62,6 +68,11 @@ const navbarItems: INavbarItem[] = [
         Icon: Proposal,
       },
       {
+        name: 'Multisign',
+        pathTo: '/multisign',
+        Icon: RiPenNibFill,
+      },
+      {
         name: 'Charts',
         pathTo: '/charts',
         Icon: Graph,
@@ -74,5 +85,12 @@ const navbarItems: INavbarItem[] = [
     ],
   },
 ];
+
+isBeta &&
+  navbarItems[navbarItems.length - 1].pages?.push({
+    name: 'Verify',
+    pathTo: '/verify-signature',
+    Icon: TickSquare,
+  });
 
 export { navbarItems };

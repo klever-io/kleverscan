@@ -8,7 +8,7 @@ import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import api from '@/services/api';
 import { IAsset, IPagination, IResponse, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
-import { useFetchPartialAsset } from '@/utils/hooks';
+import { useFetchPartial } from '@/utils/hooks';
 import {
   Container,
   ContainerAssetId,
@@ -31,7 +31,7 @@ interface IAssetResponse extends IResponse {
 const Assets: React.FC = () => {
   const router = useRouter();
   const [filterAssets, fetchPartialAsset, loading, setLoading] =
-    useFetchPartialAsset();
+    useFetchPartial<IAsset>('assets', 'assets/list', 'assetId');
 
   const setQueryAndRouter = (newQuery: NextParsedUrlQuery) => {
     router.push({ pathname: router.pathname, query: newQuery }, undefined, {
@@ -64,7 +64,7 @@ const Assets: React.FC = () => {
       onClick: value => handleSelected(value, 'asset'),
       onChange: async value => {
         setLoading(true);
-        await fetchPartialAsset(value);
+        await fetchPartialAsset(value.toUpperCase());
       },
       current: (router.query.asset as string) || undefined,
       loading,

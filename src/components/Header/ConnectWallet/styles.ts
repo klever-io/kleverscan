@@ -579,4 +579,5 @@ export const BackgroundHelper = styled.div<{ opened: boolean }>`
     transparentize(props.theme.dark ? 0.85 : 0.7, props.theme.black)};
 
   transition: opacity 0.5s ease, visibility 0.5s ease;
+  z-index: 2;
 `;

@@ -1,3 +1,4 @@
+import { lighten } from 'polished';
 import styled from 'styled-components';
 
 export const Pack = styled.div`
@@ -5,13 +6,19 @@ export const Pack = styled.div`
   max-width: 20rem;
   width: 100%;
   border-radius: 0.8rem;
-  background-color: ${props => props.theme.card.background};
+  background-color: ${props =>
+    props.theme.dark
+      ? props.theme.card.background
+      : lighten(0.09, props.theme.lightGray)};
   display: flex;
   flex-direction: column;
   align-items: center;
   span {
     margin: 1rem;
   }
+  filter: ${props =>
+    props.theme.dark ? 'brightness(1.1)' : 'brightness(97%)'};
+  box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? '#000' : lighten(0.8, '#000'))};
 `;
 
 export const PackItem = styled.div`
@@ -35,7 +42,7 @@ export const PackItem = styled.div`
     &:not(:first-child) {
       font-size: 1rem;
     }
-    color: white;
+    color: ${props => props.theme.black};
   }
 `;
 
@@ -75,6 +82,10 @@ export const BuyButton = styled.div`
 `;
 
 export const LoaderWrapper = styled.div`
-  padding: 0.35rem 1.4rem;
-  margin: 1rem 0.5rem 1rem 0.5rem;
+  margin-top: 0.4rem;
+`;
+
+export const NFTimg = styled.img<{ imgLoading: boolean }>`
+  border-radius: 0.8rem;
+  display: ${props => (props.imgLoading ? 'none' : 'block')};
 `;

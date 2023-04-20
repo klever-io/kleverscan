@@ -25,8 +25,6 @@ export const Container = styled.div`
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     padding: 1rem 1.5rem;
 
-    overflow: hidden;
-
     justify-content: space-between;
   }
 `;
@@ -146,7 +144,7 @@ export const ItemTransaction = styled.div<{ selected: boolean }>`
 
 export const MobileItem = styled(Item)`
   justify-content: flex-end;
-
+  color: ${props => props.theme.navbar.text};
   font-size: 1.5rem;
 `;
 

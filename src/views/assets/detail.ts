@@ -122,11 +122,11 @@ export const CardContent = styled.div`
 export const Row = styled.div<{ isStakingRoyalties: boolean }>`
   width: 100%;
   padding: 1.5rem 2rem;
+  gap: 4px;
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: ${props => (props.isStakingRoyalties ? 'column' : 'row')};
-    align-items: start;
+    align-items: center;
     span:nth-child(1) {
-      padding-bottom: 15px;
       padding-left: 15px;
       min-width: 10rem;
     }
@@ -146,7 +146,7 @@ export const Row = styled.div<{ isStakingRoyalties: boolean }>`
 
   span {
     &:first-child {
-      width: 10rem;
+      min-width: 9rem;
     }
     &:nth-child(2) {
       margin-left: 1rem;
@@ -179,6 +179,41 @@ export const Row = styled.div<{ isStakingRoyalties: boolean }>`
       font-weight: 400;
     }
   }
+`;
+
+export const ExpandableRow = styled(Row)<{ expandVar: boolean }>`
+  overflow-x: auto;
+  ${props =>
+    props.expandVar &&
+    ` 
+flex-direction: column !important;
+align-items: start !important;
+`}
+`;
+
+export const WhiteListRow = styled(Row)<{ expandVar: boolean }>`
+  ${props =>
+    props.expandVar &&
+    ` 
+flex-direction: column !important;
+align-items: start !important;
+`}
+`;
+
+export const ExpandWrapper = styled.div<{ expandVar: boolean }>`
+  display: flex;
+  flex-direction: row !important;
+  align-items: center;
+
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    margin-bottom: 0.5rem;
+  }
+
+  ${props =>
+    !props.expandVar &&
+    ` 
+flex-direction: column;
+`}
 `;
 
 export const CenteredRow = styled.div`
@@ -312,7 +347,6 @@ export const FrozenContainer = styled.div`
     }
 
     span {
-      min-width: 230px;
       color: ${props => props.theme.darkText};
     }
     p {
@@ -394,6 +428,30 @@ export const ContentScrollBar = styled.div`
   &:hover {
     &::-webkit-scrollbar-thumb {
       background: ${props => transparentize(0.75, props.theme.black)};
+    }
+  }
+`;
+
+export const AddressDiv = styled.span`
+  margin-left: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+export const EllipsisSpan = styled.span`
+  max-width: 90%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 95%;
+    @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+      width: 100%;
     }
   }
 `;

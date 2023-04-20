@@ -1,12 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { validateImgUrl } from '@/utils/imageValidate';
 import { web } from '@klever/sdk';
-import NextImage from 'next/image';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { IParsedITO } from 'types';
 import { Loader } from '../Loader/styles';
-import { BuyButton, LoaderWrapper, Pack, PackItem } from './styles';
+import { BuyButton, LoaderWrapper, NFTimg, Pack, PackItem } from './styles';
 
 interface INonFungible {
   selectedITO: IParsedITO;
@@ -24,17 +22,7 @@ const NonFungibleITO: React.FC<INonFungible> = ({
   showcase,
 }) => {
   const [loading, setLoading] = useState(false);
-  const [imageSrc, setImageSrc] = useState<string>('/cube.png');
-
-  const verifyImg = async () => {
-    const timeToValidadeImg = 2000; // 2 secs
-    if (await validateImgUrl(selectedITO.assetLogo, timeToValidadeImg)) {
-      setImageSrc(selectedITO.assetLogo);
-    }
-  };
-  useEffect(() => {
-    verifyImg();
-  }, []);
+  const [imgLoading, setImgLoading] = useState(true);
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -61,10 +49,10 @@ const NonFungibleITO: React.FC<INonFungible> = ({
       const response = await web.broadcastTransactions([signedTx]);
       if (setTxHash) setTxHash(response.data.txsHashes[0]);
       toast.success('Transaction broadcast successfully');
-      setLoading(false);
     } catch (e: any) {
       console.warn(`%c ${e}`, 'color: red');
       toast.error(e.message ? e.message : e);
+    } finally {
       setLoading(false);
     }
   };
@@ -72,17 +60,21 @@ const NonFungibleITO: React.FC<INonFungible> = ({
   return (
     <Pack>
       {
-        <NextImage
-          width={226 * 0.7}
-          height={271 * 0.7}
-          style={{ borderRadius: '0.8rem', margin: '10rem' }}
-          src={imageSrc}
-          onError={e => {
-            const target = e.target as HTMLImageElement;
-            target.src = '/cube.png';
-          }}
-          alt="Pack"
-        ></NextImage>
+        <>
+          <NFTimg
+            imgLoading={imgLoading}
+            width={226 * 0.7}
+            height={271 * 0.7}
+            src={selectedITO.assetLogo}
+            onError={e => {
+              const target = e.target as HTMLImageElement;
+              target.src = '/cube.png';
+            }}
+            onLoad={() => setImgLoading(false)}
+            alt="Pack"
+          ></NFTimg>
+          {imgLoading && <Loader height={226 * 0.7} width={'86px'} />}
+        </>
       }
       <PackItem>
         <p>

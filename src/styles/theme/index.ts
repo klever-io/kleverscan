@@ -110,6 +110,7 @@ const theme = {
   text: {
     moonLight: '#515395',
     midNight: '#0B0B1E',
+    gray: '#363C69',
     inputHeader: '#C6C7EB',
     black: '#2e2f47',
     twilight: '#222345',
@@ -153,6 +154,11 @@ const theme = {
   breakpoints: {
     mobile: '768px',
     tablet: '1025px',
+  },
+
+  kappsDemo: {
+    dark: '#222345',
+    darker: '#16162c',
   },
 };
 

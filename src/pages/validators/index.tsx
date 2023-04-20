@@ -1,6 +1,8 @@
 import { Validators as Icon } from '@/assets/cards';
 import { getStatusIcon } from '@/assets/status';
+import Copy from '@/components/Copy';
 import Detail from '@/components/Detail';
+import { IFilter } from '@/components/Filter';
 import Progress from '@/components/Progress';
 import { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
@@ -8,11 +10,24 @@ import api from '@/services/api';
 import { IRowSection, IValidator } from '@/types/index';
 import { capitalizeString } from '@/utils/convertString';
 import { formatAmount } from '@/utils/formatFunctions';
+import { useFetchPartial } from '@/utils/hooks';
 import { parseValidators } from '@/utils/parseValues';
+import { AddressContainer } from '@/views/validators/detail';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React from 'react';
 
 const Validators: React.FC = () => {
+  const router = useRouter();
+  const [filterValidators, fetchPartialValidator, loading, setLoading] =
+    useFetchPartial<IValidator>('validators', 'validator/list', 'name');
+
+  const setQueryAndRouter = (newQuery: NextParsedUrlQuery) => {
+    router.push({ pathname: router.pathname, query: newQuery }, undefined, {
+      shallow: true,
+    });
+  };
   const header = [
     'Rank',
     'Name',
@@ -26,10 +41,31 @@ const Validators: React.FC = () => {
   ];
 
   const precision = 6;
+  const filters: IFilter[] = [
+    {
+      title: 'Name',
+      data: filterValidators.map(validator => validator.name || ''),
+      onClick: async value => {
+        if (value === 'All') {
+          setQueryAndRouter({});
+        } else {
+          setQueryAndRouter({ name: value });
+        }
+      },
+      onChange: async value => {
+        setLoading(true);
+        await fetchPartialValidator(value);
+      },
+      current: (router.query.name as string) || undefined,
+      loading,
+    },
+  ];
 
   const requestValidators = async (page: number, limit: number) => {
+    const localQuery = { ...router.query, page, limit };
     const validators = await api.get({
-      route: `validator/list?sort=elected&sort=eligible&sort=waiting&sort=inactive&sort=jailed&page=${page}&limit=${limit}`,
+      route: 'validator/list',
+      query: localQuery,
     });
 
     if (!validators.error) {
@@ -64,9 +100,12 @@ const Validators: React.FC = () => {
             element: (
               <span key={ownerAddress}>
                 {
-                  <Link href={`validator/${ownerAddress}`}>
-                    {name ? name : parsedAddress}
-                  </Link>
+                  <AddressContainer>
+                    <Link href={`validator/${ownerAddress}`}>
+                      {name ? name : parsedAddress}
+                    </Link>
+                    <Copy data={ownerAddress} info="Validator Address" />
+                  </AddressContainer>
                 }
               </span>
             ),
@@ -144,6 +183,7 @@ const Validators: React.FC = () => {
     headerIcon: Icon,
     cards: undefined,
     tableProps,
+    filters,
   };
 
   return <Detail {...detailProps} />;

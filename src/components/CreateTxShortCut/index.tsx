@@ -20,7 +20,7 @@ const CreateTxShortcut: React.FC = () => {
   const [titleModal, setTitleModal] = useState('');
   const [valueContract, setValueContract] = useState('');
   const [openDrawer, setOpenDrawer] = useState<boolean>(false);
-  const [openDropdown, setOpenDropdown] = useState(true);
+  const [openDropdown, setOpenDropdown] = useState(false);
 
   const { extensionInstalled, connectExtension } = useExtension();
   const { isMobile } = useMobile();

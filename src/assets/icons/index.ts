@@ -10,10 +10,12 @@ import ChevronRight from './chevron-right.svg';
 import Compass from './compass.svg';
 import Copy from './copy.svg';
 import Graph from './graph.svg';
+import PlusWhite from './plus-white.svg';
 import Plus from './plus.svg';
 import Proposal from './proposal.svg';
 import Receive from './receive.svg';
 import Search from './search.svg';
+import SendWhite from './send-white.svg';
 import Send from './send.svg';
 import TickSquare from './tick-square.svg';
 import TwoUser from './two-user.svg';
@@ -22,12 +24,14 @@ export {
   Category,
   Graph,
   Send,
+  SendWhite,
   TwoUser,
   Search,
   ArrowDown,
   ArrowRight,
   ArrowLeft,
   Plus,
+  PlusWhite,
   ChevronRight,
   Compass,
   Copy,

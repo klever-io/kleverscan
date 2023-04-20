@@ -294,7 +294,7 @@ const ITOsPage: React.FC = () => {
               }}
               dataLength={ITOs?.length}
               next={paginateITOs}
-              hasMore={(page >= lastPage ? false : true) && !search}
+              hasMore={page >= lastPage ? false : true}
               loader={<Loader />}
               scrollableTarget={'scrollableDiv'}
               endMessage={ITOs?.length ? 'All ITOs have been loaded.' : ''}
@@ -411,7 +411,7 @@ const ITOsPage: React.FC = () => {
                 </HashContent>
               )}
 
-              {selectedITO ? (
+              {selectedITO && !loading ? (
                 displayITO()
               ) : (
                 <ChooseAsset>

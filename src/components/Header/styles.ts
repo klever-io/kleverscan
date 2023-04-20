@@ -25,8 +25,6 @@ export const Container = styled.div`
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     padding: 1rem 1.5rem;
 
-    overflow: hidden;
-
     justify-content: space-between;
   }
 `;

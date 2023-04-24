@@ -327,15 +327,21 @@ export const EmptyRow = styled(Row)`
   }
 `;
 
-export const CustomLink = styled.a`
+export const CustomLink = styled.a<{ tabAsset?: boolean }>`
   align-self: end;
-  color: ${props => props.theme.true.white} !important;
-  background: ${props => props.theme.violet};
+  min-width: 13rem;
+  text-align: center;
+  color: ${props =>
+    props.tabAsset ? props.theme.black : props.theme.true.white} !important;
+  border: 2px solid ${props => props.theme.violet};
+  background: ${props => (props.tabAsset ? '' : props.theme.violet)};
   padding: 0.625rem 2.94rem;
+  font-weight: ${props => (props.tabAsset ? '500' : '600')}!important;
   border-radius: 4px;
   cursor: pointer;
   &:hover {
-    opacity: 0.8;
+    filter: brightness(1.1);
+    background: ${props => props.theme.violet};
   }
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {

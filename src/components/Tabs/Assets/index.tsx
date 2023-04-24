@@ -1,12 +1,6 @@
 import Table, { ITable } from '@/components/Table';
 import { CustomLink } from '@/components/Table/styles';
-import {
-  IAccountAsset,
-  IAsset,
-  IInnerTableProps,
-  IResponse,
-  IRowSection,
-} from '@/types/index';
+import { IAccountAsset, IInnerTableProps, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
 import Link from 'next/link';
 import React from 'react';
@@ -17,15 +11,8 @@ interface IAssets {
   showInteractionsButtons?: (
     title: string,
     value: string,
-    assets: IAccountAsset,
-    isAssetTrigger: boolean,
+    accountAsset: (string | number)[],
   ) => JSX.Element;
-}
-
-interface IAssetResponse extends IResponse {
-  data: {
-    asset: IAsset;
-  };
 }
 
 const Assets: React.FC<IAssets> = ({
@@ -46,14 +33,14 @@ const Assets: React.FC<IAssets> = ({
   const rowSections = (props: IAccountAsset): IRowSection[] => {
     const { assetId, assetType, precision, balance, frozenBalance, owner } =
       props;
-
+    const freezeContract = [assetId, balance];
     const walletAddress = sessionStorage.getItem('walletAddress');
 
     const ticker = assetId?.split('-')[0];
     const sectionViewNfts =
       assetType === 1 ? (
         <Link href={`/account/${address}/collection/${assetId}`} key={address}>
-          <CustomLink>View NFTs</CustomLink>
+          <CustomLink tabAsset={true}>View NFTs</CustomLink>
         </Link>
       ) : (
         <></>
@@ -96,6 +83,16 @@ const Assets: React.FC<IAssets> = ({
       { element: sectionViewNfts, span: 2 },
     ];
 
+    if (assetType === 0 && showInteractionsButtons) {
+      sections.push({
+        element: showInteractionsButtons(
+          'Freeze',
+          'FreezeContract',
+          freezeContract,
+        ),
+        span: 2,
+      });
+    }
     return sections;
   };
 

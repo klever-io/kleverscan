@@ -637,15 +637,10 @@ const Account: React.FC<IAccountPage> = () => {
         return <Transactions transactionsTableProps={transactionTableProps} />;
       case 'Buckets':
         return (
-          <>
-            <ContainerTabInteractions>
-              {showInteractionsButtons('Freeze', 'FreezeContract', false)}
-            </ContainerTabInteractions>
-            <Buckets
-              bucketsTableProps={bucketsTableProps}
-              showInteractionsButtons={showInteractionsButtons}
-            />
-          </>
+          <Buckets
+            bucketsTableProps={bucketsTableProps}
+            showInteractionsButtons={showInteractionsButtons}
+          />
         );
       default:
         return <div />;

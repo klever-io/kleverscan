@@ -182,7 +182,6 @@ const Contract: React.FC<IContract> = ({
     withdrawType,
     itoTriggerType,
   ]);
-
   useEffect(() => {
     if (valueContract) {
       const getAsset = assetsList?.filter(

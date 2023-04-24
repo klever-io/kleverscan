@@ -1,23 +1,28 @@
-import { ChevronRight } from '@/assets/icons';
+import { ChevronRight, Copy as CopyIcon } from '@/assets/icons';
 import {
   contents,
   description,
   IContent,
   ISocial,
   socials,
+  walletDonate,
 } from '@/configs/footer';
 import { useMobile } from '@/contexts/mobile';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useCallback } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
+import React, { useCallback, useRef, useState } from 'react';
 import packageJson from '../../../package.json';
+import Copy from '../Copy';
 import {
   Container,
   Content,
   DescriptionContainer,
+  DonateContainer,
   LinkItems,
   LinksContainer,
   LogoContainer,
+  QrCodeDropdown,
   SocialContainer,
   SocialIcon,
   VersionBuildContainer,
@@ -25,6 +30,8 @@ import {
 
 const Footer: React.FC = () => {
   const { isMobile } = useMobile();
+  const closeTimeout = useRef<NodeJS.Timeout | null>(null);
+  const [qrCodeDropDown, setQrCodeDropDown] = useState(false);
   const SocialItem: React.FC<ISocial> = ({ Icon, link }) => (
     <a target="_blank" href={link} rel="noreferrer">
       <SocialIcon>
@@ -43,6 +50,23 @@ const Footer: React.FC = () => {
 
     return reduced;
   }, []);
+
+  const handleMouseEnter = () => {
+    closeTimeout.current !== null && clearTimeout(closeTimeout.current);
+    setQrCodeDropDown(true);
+  };
+
+  const handleMouseLeave = () => {
+    closeTimeout.current !== null && clearTimeout(closeTimeout.current);
+    closeTimeout.current = setTimeout(() => {
+      setQrCodeDropDown(false);
+    }, 500);
+  };
+
+  const dropdownProps = {
+    onMouseOver: handleMouseEnter,
+    onMouseLeave: handleMouseLeave,
+  };
 
   return (
     <Container>
@@ -69,14 +93,34 @@ const Footer: React.FC = () => {
             {links.map((link, linkIndex) => (
               <LinkItems key={String(linkIndex)}>
                 <span>{link.title}</span>
-                {link.infoLinks.map((item, index) => (
-                  <Link key={String(index)} href={item.href}>
-                    <a>
-                      <ChevronRight />
-                      {item.name}
-                    </a>
-                  </Link>
-                ))}
+                {link.infoLinks.map((item, index) =>
+                  item.name === 'KLV' ? (
+                    <DonateContainer key={String(index)} {...dropdownProps}>
+                      <Copy info="Donation Address" data={walletDonate}>
+                        <p>
+                          <ChevronRight />
+                          {item.name}
+                          <CopyIcon />
+                        </p>
+                      </Copy>
+                      <QrCodeDropdown
+                        {...dropdownProps}
+                        active={qrCodeDropDown}
+                      >
+                        <div>
+                          <QRCodeSVG value={walletDonate} />
+                        </div>
+                      </QrCodeDropdown>
+                    </DonateContainer>
+                  ) : (
+                    <Link key={String(index)} href={item.href}>
+                      <a>
+                        <ChevronRight />
+                        {item.name}
+                      </a>
+                    </Link>
+                  ),
+                )}
               </LinkItems>
             ))}
           </LinksContainer>

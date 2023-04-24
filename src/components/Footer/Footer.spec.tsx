@@ -34,7 +34,10 @@ describe('Component: Footer', () => {
     contents.forEach(({ title, infoLinks }) => {
       expect(screen.getByText(title)).toBeInTheDocument();
       infoLinks.forEach(({ name, href }, index) => {
-        if (name !== 'WhitePaper') {
+        if (name === 'KLV') {
+          const paragraph = screen.getByText(name);
+          expect(paragraph).toBeInTheDocument();
+        } else if (name !== 'WhitePaper') {
           const link = screen.getByRole('link', { name });
           expect(link).toBeInTheDocument();
           expect(link).toHaveAttribute('href', href);

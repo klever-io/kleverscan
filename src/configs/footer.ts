@@ -25,6 +25,9 @@ export interface ISocial {
 const description =
   'Klever Explorer is our main platform to visualize assets, blocks, nodes, accounts and transactions in an intuitive and interactive manner. Everything happening in KleverChain can be consulted here on our Explorer.';
 
+export const walletDonate =
+  'klv1eq05kr9fhhjw9lvuprqklhr7qlu6llz775m2l8v4nme4es8trf0qdfs8rs';
+
 const socials: ISocial[] = [
   {
     Icon: Facebook,
@@ -84,6 +87,15 @@ const contents: IContent[] = [
       { name: 'Careers', href: 'https://klever.compleo.com.br/' },
       { name: 'Klever Finance', href: 'https://klever.org' },
       { name: 'Klever Docs', href: 'https://docs.klever.finance/' },
+    ],
+  },
+  {
+    title: 'Donate to Klever',
+    infoLinks: [
+      {
+        name: 'KLV',
+        href: '',
+      },
     ],
   },
 ];

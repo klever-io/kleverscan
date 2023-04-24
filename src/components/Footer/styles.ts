@@ -1,9 +1,18 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 export const Container = styled.footer`
   background-color: ${props => props.theme.footer.background};
 `;
 
+const FadeIn = keyframes`
+  from {
+    transform: translateX(0%) translateY(-2rem);
+
+  }
+  to {
+    transform: translateX(0%) translateY(0);
+  }
+`;
 export const Content = styled.div`
   max-width: ${props => props.theme.maxWidth};
   margin: 0 auto;
@@ -111,7 +120,7 @@ export const LinkItems = styled.div`
 
   span {
     padding-bottom: 1rem;
-
+    min-width: 10rem;
     font-weight: 500;
     color: white;
   }
@@ -141,6 +150,36 @@ export const LinkItems = styled.div`
   }
 `;
 
+export const DonateContainer = styled.div`
+  position: relative;
+  p {
+    display: flex;
+
+    align-items: center;
+
+    gap: 0.5rem;
+
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: ${props => props.theme.footer.text};
+
+    text-decoration: none;
+
+    transition: 0.2s ease;
+
+    > svg:not(:first-child) {
+      zoom: 0.85;
+    }
+
+    &:not(:last-child) {
+      margin-bottom: 1rem;
+    }
+
+    &:hover {
+      color: ${props => props.theme.violet};
+    }
+  }
+`;
 export const VersionBuildContainer = styled.div`
   display: flex;
   height: 100%;
@@ -154,5 +193,29 @@ export const VersionBuildContainer = styled.div`
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     justify-content: center;
     margin-top: 1.5rem;
+  }
+`;
+
+export const QrCodeDropdown = styled.div<{ active: boolean }>`
+  position: absolute;
+  width: 170px;
+  height: 170px;
+  border-radius: 20px;
+  background-color: ${props => props.theme.white};
+  bottom: 2rem;
+  display: ${props => (props.active ? 'flex' : 'none')};
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  animation: ${FadeIn} 0.1s ease-in-out;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+  div {
+    background-color: #fff;
+    padding: 0.3rem 0.3rem 0.1rem 0.3rem;
+    border-radius: 0.3rem;
+    svg {
+      cursor: default !important;
+    }
   }
 `;

@@ -635,14 +635,17 @@ const Transaction: React.FC<ITransactionPage> = props => {
               <Copy data={signature} info="Signature" />
             </CenteredRow>
           </Row>
-          <Row>
-            <span>
-              <strong>Data</strong>
-            </span>
-            <RowContent>
-              <BalanceContainer>{renderAllData()}</BalanceContainer>
-            </RowContent>
-          </Row>
+          {((data && data.length > 1) ||
+            (data?.length === 1 && data[0] !== '')) && (
+            <Row>
+              <span>
+                <strong>Data</strong>
+              </span>
+              <RowContent>
+                <BalanceContainer>{renderAllData()}</BalanceContainer>
+              </RowContent>
+            </Row>
+          )}
         </CardContent>
       </CardContainer>
       <CardContainer>

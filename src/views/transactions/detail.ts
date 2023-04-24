@@ -178,8 +178,13 @@ export const Row = styled.div`
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    margin: 1rem 10rem;
+    width: 100%;
+    padding: 1rem 1rem 1rem 10rem;
     transition: max-height 0.2s ease-out;
+
+    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+      padding: 1rem 1rem 1rem 1rem;
+    }
   }
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
@@ -411,4 +416,70 @@ export const KdaFeeSpan = styled.span`
   span:nth-child(2) {
     margin-top: 0.2rem;
   }
+`;
+
+export const ExpandRow = styled(Row)<{ expandVar: boolean }>`
+  ${props =>
+    props.expandVar &&
+    ` 
+flex-direction: column !important;
+align-items: start !important;
+`}
+`;
+
+export const AddressWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+export const EllipsisSpan = styled.span`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    /* width: 95%; */
+    @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+      width: 100%;
+    }
+  }
+`;
+
+export const StatusIconWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  strong {
+    min-width: 9rem;
+  }
+`;
+
+export const PropertiesWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-direction: column;
+  }
+  div {
+    div {
+      margin-bottom: 0.5rem;
+    }
+  }
+`;
+
+export const RoyaltiesChangeWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
 `;

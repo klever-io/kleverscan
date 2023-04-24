@@ -1,4 +1,5 @@
 import { KLV } from '@/assets/coins';
+import { statusWithIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
 import {
   EnumTriggerTypeName,
@@ -58,17 +59,23 @@ import {
   FrozenContainer,
   RowContent,
 } from '@/views/accounts/detail';
+import { ExpandWrapper } from '@/views/assets/detail';
 import { BigSpan, NetworkParamsContainer } from '@/views/proposals/detail';
 import {
+  ButtonExpand,
   CenteredRow,
+  ExpandRow,
   HeaderWrapper,
   HoverAnchor,
   Hr,
   NestedContainerWrapper,
+  PropertiesWrapper,
   RoleDiv,
   RoleStrong,
   RoleWrapper,
   Row,
+  RoyaltiesChangeWrapper,
+  StatusIconWrapper,
   StrongWidth,
   URIsWrapper,
 } from '@/views/transactions/detail';
@@ -155,7 +162,12 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
   interface Active {
     parameter: string;
   }
-  const [isActive, setIsActive] = useState({} as any);
+  const [expand, setExpand] = useState({
+    royalties: false,
+    staking: false,
+    properties: false,
+    attributes: false,
+  });
 
   return (
     <>
@@ -186,7 +198,10 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
           <strong>Owner</strong>
         </span>
         <span>
-          <Link href={`/account/${ownerAddress}`}>{ownerAddress}</Link>
+          <CenteredRow>
+            <Link href={`/account/${ownerAddress}`}>{ownerAddress}</Link>
+            <Copy data={ownerAddress} />
+          </CenteredRow>
         </span>
       </Row>
       <Row>
@@ -230,209 +245,237 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
         </span>
       </Row>
       {parameter.royalties && (
-        <>
-          <Row>
-            <div
-              onClick={() =>
-                setIsActive({
-                  ...isActive,
-                  royalties: !!!isActive?.royalties,
-                })
-              }
-              className={`accordion-${
-                isActive?.royalties ? 'active' : 'disabled'
-              }`}
-            >
-              <div className="accordionHeader">
+        <ExpandRow expandVar={expand.royalties}>
+          <ExpandWrapper expandVar={expand.royalties}>
+            <span style={{ minWidth: '10rem' }}>
+              <strong>Royalties</strong>
+            </span>
+            <span>
+              <ButtonExpand
+                onClick={() =>
+                  setExpand({
+                    ...expand,
+                    royalties: !expand.royalties,
+                  })
+                }
+              >
+                {expand?.royalties ? 'Hide' : 'Expand'}
+              </ButtonExpand>
+            </span>
+          </ExpandWrapper>
+          {expand?.royalties && (
+            <span className="panel">
+              <CenteredRow>
+                <strong>Address:&nbsp;</strong>
+                <Link href={`/account/${parameter.royalties?.address}`}>
+                  {parameter.royalties?.address}
+                </Link>
+                <Copy data={parameter.royalties?.address}></Copy>
+              </CenteredRow>
+              {parameter.royalties?.transferFixed && (
                 <span>
-                  <strong>Royalties</strong>
-                </span>
-                <span className="icon">+</span>
-              </div>
-
-              {isActive?.royalties && (
-                <span className="panel">
-                  <span>
-                    <strong>Address:&nbsp;</strong>
-                    {parameter?.royalties?.address}
-                  </span>
-                  {parameter?.royalties?.transferFixed && (
-                    <span>
-                      <strong>Transfer Fixed:&nbsp;</strong>
-                      {parameter?.royalties?.transferFixed / 1000000} KLV
-                    </span>
-                  )}
-                  {parameter?.royalties?.marketFixed && (
-                    <span>
-                      <strong>Market Fixed:&nbsp;</strong>
-                      {parameter?.royalties?.marketFixed / 1000000} KLV
-                    </span>
-                  )}
-                  {parameter?.royalties?.marketPercentage && (
-                    <span>
-                      <strong>Market Percent:&nbsp;</strong>
-                      {parameter?.royalties?.marketPercentage / 100}%
-                    </span>
-                  )}
+                  <strong>Transfer Fixed:&nbsp;</strong>
+                  {parameter?.royalties?.transferFixed / 1000000} KLV
                 </span>
               )}
-            </div>
-          </Row>
-        </>
+              {parameter?.royalties?.marketFixed && (
+                <span>
+                  <strong>Market Fixed:&nbsp;</strong>
+                  {parameter?.royalties?.marketFixed / 1000000} KLV
+                </span>
+              )}
+              {parameter?.royalties?.marketPercentage && (
+                <span>
+                  <strong>Market Percent:&nbsp;</strong>
+                  {parameter?.royalties?.marketPercentage / 100}%
+                </span>
+              )}
+            </span>
+          )}
+        </ExpandRow>
       )}
       {parameter.staking && (
-        <>
-          <Row>
-            <div
-              onClick={() =>
-                setIsActive({
-                  ...isActive,
-                  staking: !!!isActive?.staking,
-                })
-              }
-              className={`accordion-${
-                isActive?.staking ? 'active' : 'disabled'
-              }`}
-            >
-              <div className="accordionHeader">
-                <span>
-                  <strong>Staking</strong>
-                </span>
-                <span className="icon">+</span>
-              </div>
+        <ExpandRow expandVar={expand.staking}>
+          <ExpandWrapper expandVar={expand.staking}>
+            <span style={{ minWidth: '10rem' }}>
+              <strong>Staking</strong>
+            </span>
+            <span>
+              <ButtonExpand
+                onClick={() =>
+                  setExpand({
+                    ...expand,
+                    staking: !expand.staking,
+                  })
+                }
+              >
+                {expand?.staking ? 'Hide' : 'Expand'}
+              </ButtonExpand>
+            </span>
+          </ExpandWrapper>
 
-              {isActive?.staking && (
-                <span className="panel">
-                  <span>
-                    <strong>Type:&nbsp;</strong>
-                    {parameter?.staking?.type}
-                  </span>
-                  <span>
-                    <strong>APR:&nbsp;</strong>
-                    {parameter?.staking?.apr / 100}%
-                  </span>
-                  <span>
-                    <strong>Claim Type&nbsp;</strong>
-                    {parameter?.staking?.minEpochsToClaim} Epoch(s)
-                  </span>{' '}
-                  <span>
-                    <strong>Unstake Time:&nbsp;</strong>
-                    {parameter?.staking?.minEpochsToUnstake} Epoch(s)
-                  </span>{' '}
-                  <span>
-                    <strong>Withdraw Time:&nbsp;</strong>
-                    {parameter?.staking?.minEpochsToWithdraw} Epoch(s)
-                  </span>
-                </span>
-              )}
-            </div>
-          </Row>
-        </>
+          {expand?.staking && (
+            <span className="panel">
+              <span>
+                <strong>Type:&nbsp;</strong>
+                {parameter?.staking?.type}
+              </span>
+              <span>
+                <strong>APR:&nbsp;</strong>
+                {parameter?.staking?.apr / 100 || 0}%
+              </span>
+              <span>
+                <strong>Claim Type&nbsp;</strong>
+                {parameter?.staking?.minEpochsToClaim || 0} Epoch(s)
+              </span>{' '}
+              <span>
+                <strong>Unstake Time:&nbsp;</strong>
+                {parameter?.staking?.minEpochsToUnstake || 0} Epoch(s)
+              </span>{' '}
+              <span>
+                <strong>Withdraw Time:&nbsp;</strong>
+                {parameter?.staking?.minEpochsToWithdraw || 0} Epoch(s)
+              </span>
+            </span>
+          )}
+        </ExpandRow>
       )}
 
       {parameter.properties && (
-        <>
-          <Row>
-            <div
-              onClick={() =>
-                setIsActive({
-                  ...isActive,
-                  properties: !!!isActive?.properties,
-                })
-              }
-              className={`accordion-${
-                isActive?.properties ? 'active' : 'disabled'
-              }`}
-            >
-              <div className="accordionHeader">
-                <span>
-                  <strong>Properties</strong>
-                </span>
-                <span className="icon">+</span>
-              </div>
-
-              {isActive?.properties && (
-                <span className="panel">
-                  <span>
+        <ExpandRow expandVar={expand.properties}>
+          <ExpandWrapper expandVar={expand.properties}>
+            <span style={{ minWidth: '10rem' }}>
+              <strong>Properties</strong>
+            </span>
+            <span>
+              <ButtonExpand
+                onClick={() =>
+                  setExpand({
+                    ...expand,
+                    properties: !expand.properties,
+                  })
+                }
+              >
+                {expand?.properties ? 'Hide' : 'Expand'}
+              </ButtonExpand>
+            </span>
+          </ExpandWrapper>
+          {expand?.properties && (
+            <span className="panel">
+              <PropertiesWrapper>
+                <div>
+                  <StatusIconWrapper>
                     <strong>Can Freeze:&nbsp;</strong>
                     <span>
-                      {parameter?.properties?.canFreeze ? 'Yes' : 'No'}
+                      {statusWithIcon(
+                        parameter?.properties?.canFreeze ? true : false,
+                      )}
                     </span>
-                  </span>
-                  <span>
+                  </StatusIconWrapper>
+                  <StatusIconWrapper>
                     <strong>Can Mint:&nbsp;</strong>
-                    <span>{parameter?.properties?.canMint ? 'Yes' : 'No'}</span>
-                  </span>
-                  <span>
+                    <span>
+                      {statusWithIcon(
+                        parameter?.properties?.canMint ? true : false,
+                      )}
+                    </span>
+                  </StatusIconWrapper>
+                  <StatusIconWrapper>
                     <strong>Can Burn:&nbsp;</strong>
-                    <span>{parameter?.properties?.canBurn ? 'Yes' : 'No'}</span>
-                  </span>{' '}
-                  <span>
+                    <span>
+                      {statusWithIcon(
+                        parameter?.properties?.canBurn ? true : false,
+                      )}
+                    </span>
+                  </StatusIconWrapper>
+                  <StatusIconWrapper>
                     <strong>Can Pause:&nbsp;</strong>
                     <span>
-                      {parameter?.properties?.canPause ? 'Yes' : 'No'}
+                      {statusWithIcon(
+                        parameter?.properties?.canPause ? true : false,
+                      )}
                     </span>
-                  </span>
-                  <span>
+                  </StatusIconWrapper>
+                </div>
+                <div>
+                  <StatusIconWrapper>
                     <strong>Can Wipe:&nbsp;</strong>
-                    {parameter?.properties?.canWipe ? 'Yes' : 'No'}
-                  </span>
-                  <span>
+                    <span>
+                      {statusWithIcon(
+                        parameter?.properties?.canWipe ? true : false,
+                      )}
+                    </span>
+                  </StatusIconWrapper>
+                  <StatusIconWrapper>
                     <strong>Change Owner:&nbsp;</strong>
-                    {parameter?.properties?.canChangeOwner ? 'Yes' : 'No'}
-                  </span>
-                  <span>
+                    {statusWithIcon(
+                      parameter?.properties?.canChangeOwner ? true : false,
+                    )}
+                  </StatusIconWrapper>
+                  <StatusIconWrapper>
                     <strong>Add Roles:&nbsp;</strong>
-                    {parameter?.properties?.canAddRoles ? 'Yes' : 'No'}
-                  </span>
-                </span>
-              )}
-            </div>
-          </Row>
-        </>
+                    {statusWithIcon(
+                      parameter?.properties?.canAddRoles ? true : false,
+                    )}
+                  </StatusIconWrapper>
+                </div>
+              </PropertiesWrapper>
+            </span>
+          )}
+        </ExpandRow>
       )}
 
-      {parameter.attributes && (
-        <>
-          <Row>
-            <div
+      <ExpandRow expandVar={expand.attributes}>
+        <ExpandWrapper expandVar={expand.attributes}>
+          <span style={{ minWidth: '10rem' }}>
+            <strong>Attributes</strong>
+          </span>
+          <span>
+            <ButtonExpand
               onClick={() =>
-                setIsActive({
-                  ...isActive,
-                  attributes: !!!isActive?.attributes,
+                setExpand({
+                  ...expand,
+                  attributes: !expand.attributes,
                 })
               }
-              className={`accordion-${
-                isActive?.attributes ? 'active' : 'disabled'
-              }`}
             >
-              <div className="accordionHeader">
-                <span>
-                  <strong>Attributes</strong>
-                </span>
-                <span className="icon">+</span>
-              </div>
+              {expand?.attributes ? 'Hide' : 'Expand'}
+            </ButtonExpand>
+          </span>
+        </ExpandWrapper>
 
-              {isActive?.attributes && (
-                <span className="panel">
-                  <span>
-                    <strong>Is Paused:&nbsp;</strong>
-                    <span>
-                      {parameter?.attributes?.isPaused ? 'Yes' : 'No'}
-                    </span>
-                  </span>
-                  <span>
-                    <strong>Can Mint NFT:&nbsp;</strong>
-                    <span>
-                      {parameter?.attributes?.isNFTMintStopped ? 'Yes' : 'No'}
-                    </span>
-                  </span>
-                </span>
-              )}
-            </div>
-          </Row>
-        </>
-      )}
+        {expand?.attributes && (
+          <span className="panel">
+            <StatusIconWrapper>
+              <strong>Is Paused:&nbsp;</strong>
+              <span>
+                {statusWithIcon(parameter?.attributes?.isPaused ? true : false)}
+              </span>
+            </StatusIconWrapper>
+            <StatusIconWrapper>
+              <strong>Can Mint NFT:&nbsp;</strong>
+              <span>
+                {statusWithIcon(
+                  parameter?.attributes?.isNFTMintStopped ? true : false,
+                )}
+              </span>
+            </StatusIconWrapper>
+            <StatusIconWrapper>
+              <RoyaltiesChangeWrapper>
+                <strong>Royalties</strong>
+                <strong>Change Stopped:</strong>
+              </RoyaltiesChangeWrapper>
+              <span>
+                {statusWithIcon(
+                  parameter?.attributes?.isRoyaltiesChangeStopped
+                    ? true
+                    : false,
+                )}
+              </span>
+            </StatusIconWrapper>
+          </span>
+        )}
+      </ExpandRow>
     </>
   );
 };

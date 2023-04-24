@@ -146,7 +146,7 @@ export const Row = styled.div<{ isStakingRoyalties: boolean }>`
 
   span {
     &:first-child {
-      min-width: 9rem;
+      min-width: 11rem;
     }
     &:nth-child(2) {
       margin-left: 1rem;

@@ -1,3 +1,4 @@
+import { Status } from '@/components/Table/styles';
 import { ImCancelCircle } from 'react-icons/im';
 import Error from './error.svg';
 import Pending from './pending.svg';
@@ -22,4 +23,15 @@ const getStatusIcon = (status: string): any => {
   }
 };
 
-export { getStatusIcon };
+const statusWithIcon = (action: boolean): JSX.Element => {
+  const StatusIcon = getStatusIcon(action ? 'success' : 'fail');
+
+  return (
+    <Status status={action ? 'success' : 'fail'} key={String(action)}>
+      <StatusIcon />
+      <p>{action ? 'Yes' : 'No'}</p>
+    </Status>
+  );
+};
+
+export { getStatusIcon, statusWithIcon };

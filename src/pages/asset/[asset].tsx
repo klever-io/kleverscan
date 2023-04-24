@@ -1,4 +1,4 @@
-import { getStatusIcon } from '@/assets/status';
+import { getStatusIcon, statusWithIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
 import { ISelectedDays } from '@/components/DateFilter';
 import Title from '@/components/Layout/Title';
@@ -126,17 +126,6 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       });
       asset.uris = uris;
     }
-  };
-
-  const statusWithIcon = (action: boolean) => {
-    const StatusIcon = getStatusIcon(action ? 'success' : 'fail');
-
-    return (
-      <Status status={action ? 'success' : 'fail'} key={String(action)}>
-        <StatusIcon />
-        <p>{action ? 'Yes' : 'No'}</p>
-      </Status>
-    );
   };
 
   const filterQueryDate = (selectedDays: ISelectedDays) => {

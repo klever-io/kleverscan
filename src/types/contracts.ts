@@ -181,6 +181,7 @@ export interface IPropertiesInfo {
 export interface IAttributesInfo {
   isPaused: boolean;
   isNFTMintStopped: boolean;
+  isRoyaltiesChangeStopped: boolean;
 }
 
 export interface IStakingInfo {

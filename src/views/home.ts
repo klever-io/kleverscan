@@ -118,7 +118,6 @@ export const Input = styled(DefaultInput)`
 
 export const DataCardsContainer = styled.div`
   margin-top: 4rem;
-  /* flex-wrap: wrap; */
 
   display: flex;
 
@@ -532,12 +531,10 @@ export const TransactionAmount = styled.div`
 export const TransactionChart = styled(TransactionContent)`
   width: 40%;
   min-height: 22rem;
-
   position: relative;
   display: flex;
-
-  flex-direction: column;
   justify-content: space-between;
+  flex-direction: column;
 
   span {
     font-size: 1.25rem;
@@ -553,10 +550,10 @@ export const TransactionChart = styled(TransactionContent)`
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     min-height: 24.5rem;
   }
+`;
 
-  &:last-child {
-    /* width: 100%; */
-  }
+export const FixedTxChart = styled(TransactionChart)`
+  height: 22rem;
 `;
 
 export const TransactionChartContent = styled.div`
@@ -570,8 +567,34 @@ export const TransactionChartContent = styled.div`
   height: 80%;
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    bottom: -1rem;
+    bottom: 0.3rem;
     left: -0.1rem;
+  }
+`;
+
+export const DailyTxChartContent = styled(TransactionChartContent)`
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    bottom: 0rem;
+  }
+`;
+
+export const ErrorContainer = styled.div`
+  width: 100%;
+  height: 22rem;
+  gap: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const RetryContainer = styled.div`
+  gap: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  :hover {
+    cursor: pointer;
   }
 `;
 
@@ -598,20 +621,12 @@ export const ContainerTimeFilter = styled.div`
   width: 100%;
   height: fit-content;
   justify-content: space-between;
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    flex-direction: column;
-    justify-content: flex-start;
-  }
 `;
 
 export const ListItemTimeFilter = styled.ul`
   list-style: none;
   display: flex;
   justify-content: center;
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    margin-top: 0.35rem;
-  }
 `;
 export const ItemTimeFilter = styled.li<{ selected: boolean }>`
   color: ${props => props.theme.black};

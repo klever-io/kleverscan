@@ -1,23 +1,26 @@
 import { Assets as Icon } from '@/assets/title-icons';
 import Chart, { ChartType } from '@/components/Chart';
 import Title from '@/components/Layout/Title';
-import { HomeLoader } from '@/components/Loader/styles';
+import { Loader, LoaderWrapper } from '@/components/Loader/styles';
 import api from '@/services/api';
 import { Container, Header, Section } from '@/views/charts';
 import {
   ChartsContainer,
   ContainerTimeFilter,
-  HomeLoaderContainer,
+  DailyTxChartContent,
+  ErrorContainer,
+  FixedTxChart,
   ItemTimeFilter,
   ListItemTimeFilter,
-  TransactionChart,
+  RetryContainer,
   TransactionChartContent,
 } from '@/views/home';
 import { format } from 'date-fns';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
-import { IDailyTransaction, IResponse } from '../../types';
+import React, { useState } from 'react';
+import { IoReloadSharp } from 'react-icons/io5';
+import { useQuery } from 'react-query';
+import { IDailyTransaction } from '../../types';
 
 export interface ITooltipContent {
   payload?: {
@@ -58,30 +61,113 @@ interface ICharts {
   statistics: IBlockStats[];
 }
 
-interface IStatisticsResponse extends IResponse {
-  data: {
-    block_stats_by_day: IBlockStatsResponse[];
+const loadInitialData = async () => {
+  try {
+    const res = await api.get({
+      route: 'block/statistics-by-day/15',
+    });
+
+    if (!res.error || res.error === '') {
+      const formattedStatistics = res?.data?.block_stats_by_day
+        ?.reverse()
+        .map((stats: IBlockStatsResponse) => {
+          return {
+            date: format(stats.date, 'dd MMM'),
+            burned: stats.totalBurned / 1000000,
+            minted: stats.totalMinted / 1000000,
+            blocks: stats.totalBlockRewards / 1000000,
+            transactions: stats.totalTxRewards / 1000000,
+            KFI: stats.totalKappsFees / 1000000,
+            KLV: stats.totalStakingRewards / 1000000,
+          };
+        });
+      return formattedStatistics;
+    }
+    return Promise.reject(new Error(res?.error));
+  } catch (error) {
+    console.error(error);
+  }
+};
+const fetchTransactionList = async (timeFilter: number) => {
+  try {
+    const res = await api.get({
+      route: `transaction/list/count/${timeFilter}`,
+    });
+    if (!res.error || res.error === '') {
+      return res.data.number_by_day;
+    }
+    return Promise.reject(new Error(res.error));
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const onErrorHandler = () => {
+  return {
+    onError: (err: unknown): void => {
+      console.error(err);
+    },
+    retry: 3,
   };
-}
+};
 
 const Charts: React.FC<ICharts> = () => {
-  const router = useRouter();
   const { t: commonT } = useTranslation('common');
   const filterDays = [1, 7, 15, 30];
-  const [timeFilter, setTimeFilter] = useState(16);
-  const [loadingDailyTxs, setLoadingDailyTxs] = useState(true);
-  const [loading, setLoading] = useState(true);
-  const [transactionsList, setTransactionsList] = useState<
-    null | IDailyTransaction[]
-  >(null);
-  const [statistics, setStatistics] = useState<null | IBlockStats[]>(null);
+  const [timeFilter, setTimeFilter] = useState(15);
 
-  const getTransactionChartData = useCallback(() => {
-    if (transactionsList && typeof transactionsList === 'object') {
-      const sortedTransactionsList = transactionsList.sort(
-        (a, b) => a.key - b.key,
+  const {
+    isLoading: statisticsIsLoading,
+    isError: statisticsIsError,
+    data: statistics,
+    refetch: refetchStatistics,
+  } = useQuery('statistics', loadInitialData, onErrorHandler());
+
+  const {
+    isLoading: transactionListIsLoading,
+    isError: transactionListIsError,
+    data: transactionList,
+    refetch: refetchTransactionList,
+  } = useQuery(
+    ['transactionList', timeFilter],
+    () => fetchTransactionList(timeFilter),
+    onErrorHandler(),
+  );
+
+  const getStatisticsErrorContainer = () => (
+    <ErrorContainer>
+      <div>Something went wrong.</div>
+      <RetryContainer
+        onClick={refetchStatistics as React.MouseEventHandler<HTMLDivElement>}
+      >
+        <button>Retry</button>
+        <IoReloadSharp size={32} />
+      </RetryContainer>
+    </ErrorContainer>
+  );
+
+  const getTransactionListErrorContainer = () => (
+    <ErrorContainer>
+      <div>Something went wrong.</div>
+      <RetryContainer
+        onClick={
+          refetchTransactionList as React.MouseEventHandler<HTMLDivElement>
+        }
+      >
+        <button>Retry</button>
+        <IoReloadSharp size={32} />
+      </RetryContainer>
+    </ErrorContainer>
+  );
+
+  const getTransactionChartData = (
+    transactionList: null | IDailyTransaction[],
+  ) => {
+    if (transactionList && typeof transactionList === 'object') {
+      const sortedTransactionsList = transactionList.sort(
+        (a: IDailyTransaction, b: IDailyTransaction) => a.key - b.key,
       );
-      return sortedTransactionsList.map(transaction => {
+      return sortedTransactionsList.map((transaction: IDailyTransaction) => {
         if (transaction.key) {
           const date = new Date(transaction.key);
           date.setTime(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
@@ -94,71 +180,19 @@ const Charts: React.FC<ICharts> = () => {
         }
       });
     }
-  }, [transactionsList, timeFilter]);
+  };
 
-  const renderWithLoading = useCallback(
-    (loadingState: boolean, component: JSX.Element) => {
-      if (loadingState) {
-        return (
-          <HomeLoaderContainer>
-            <HomeLoader />
-          </HomeLoaderContainer>
-        );
-      }
-      return component;
-    },
-    [],
-  );
+  const renderWithLoading = (loadingState: boolean, component: JSX.Element) => {
+    if (loadingState) {
+      return (
+        <LoaderWrapper>
+          <Loader height={70} width={70} />
+        </LoaderWrapper>
+      );
+    }
+    return component;
+  };
 
-  useEffect(() => {
-    const loadInitialData = async () => {
-      try {
-        const res = await api.get({
-          route: 'block/statistics-by-day/15',
-        });
-
-        if (!res.error || res.error === '') {
-          const formattedStatistics = res?.data?.block_stats_by_day
-            ?.reverse()
-            .map((stats: IBlockStatsResponse) => {
-              return {
-                date: format(stats.date, 'dd MMM'),
-                burned: stats.totalBurned / 1000000,
-                minted: stats.totalMinted / 1000000,
-                blocks: stats.totalBlockRewards / 1000000,
-                transactions: stats.totalTxRewards / 1000000,
-                KFI: stats.totalKappsFees / 1000000,
-                KLV: stats.totalStakingRewards / 1000000,
-              };
-            });
-          setStatistics(formattedStatistics);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-      setLoading(false);
-    };
-    loadInitialData();
-  }, []);
-
-  useEffect(() => {
-    const fetchTotalDays = async () => {
-      setLoadingDailyTxs(true);
-      try {
-        const res = await api.get({
-          route: `transaction/list/count/${timeFilter}`,
-        });
-        if (!res.error || res.error === '') {
-          setTransactionsList(res.data.number_by_day);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-      setLoadingDailyTxs(false);
-    };
-
-    fetchTotalDays();
-  }, [timeFilter]);
   return (
     <Container>
       <Header>
@@ -166,36 +200,41 @@ const Charts: React.FC<ICharts> = () => {
       </Header>
       <Section>
         <ChartsContainer>
-          <TransactionChart>
+          <FixedTxChart>
             <span>Total KLV Burned vs Minted</span>
-            {renderWithLoading(
-              loading,
-              <TransactionChartContent>
-                <Chart
-                  type={ChartType.DoubleLinear}
-                  data={statistics}
-                  value="burned"
-                  value2="minted"
-                />
-              </TransactionChartContent>,
-            )}
-          </TransactionChart>
+            {statisticsIsError
+              ? getStatisticsErrorContainer()
+              : renderWithLoading(
+                  statisticsIsLoading,
+                  <TransactionChartContent>
+                    <Chart
+                      type={ChartType.DoubleLinear}
+                      data={statistics}
+                      value="burned"
+                      value2="minted"
+                    />
+                  </TransactionChartContent>,
+                )}
+          </FixedTxChart>
 
-          <TransactionChart>
+          <FixedTxChart>
             <span>Blocks Rewards vs Transactions Rewards</span>
-            {renderWithLoading(
-              loading,
-              <TransactionChartContent>
-                <Chart
-                  type={ChartType.DoubleLinear}
-                  data={statistics}
-                  value="blocks"
-                  value2="transactions"
-                />
-              </TransactionChartContent>,
-            )}
-          </TransactionChart>
-          <TransactionChart>
+            {statisticsIsError
+              ? getStatisticsErrorContainer()
+              : renderWithLoading(
+                  statisticsIsLoading,
+                  <TransactionChartContent>
+                    <Chart
+                      type={ChartType.DoubleLinear}
+                      data={statistics}
+                      value="blocks"
+                      value2="transactions"
+                    />
+                  </TransactionChartContent>,
+                )}
+          </FixedTxChart>
+
+          <FixedTxChart>
             <ContainerTimeFilter>
               <span>Daily Transactions</span>
               <ListItemTimeFilter>
@@ -210,30 +249,35 @@ const Charts: React.FC<ICharts> = () => {
                 ))}
               </ListItemTimeFilter>
             </ContainerTimeFilter>
-            {renderWithLoading(
-              loadingDailyTxs,
-              <TransactionChartContent>
-                <Chart
-                  type={ChartType.Linear}
-                  data={getTransactionChartData()}
-                />
-              </TransactionChartContent>,
-            )}
-          </TransactionChart>
-          <TransactionChart>
+            {transactionListIsError
+              ? getTransactionListErrorContainer()
+              : renderWithLoading(
+                  transactionListIsLoading,
+                  <DailyTxChartContent>
+                    <Chart
+                      type={ChartType.Linear}
+                      data={getTransactionChartData(transactionList)}
+                    />
+                  </DailyTxChartContent>,
+                )}
+          </FixedTxChart>
+
+          <FixedTxChart>
             <span>KLV Rewards Pool vs KFI Rewards Pool</span>
-            {renderWithLoading(
-              loading,
-              <TransactionChartContent>
-                <Chart
-                  type={ChartType.DoubleLinear}
-                  data={statistics}
-                  value="KFI"
-                  value2="KLV"
-                />
-              </TransactionChartContent>,
-            )}
-          </TransactionChart>
+            {statisticsIsError
+              ? getStatisticsErrorContainer()
+              : renderWithLoading(
+                  statisticsIsLoading,
+                  <TransactionChartContent>
+                    <Chart
+                      type={ChartType.DoubleLinear}
+                      data={statistics}
+                      value="KFI"
+                      value2="KLV"
+                    />
+                  </TransactionChartContent>,
+                )}
+          </FixedTxChart>
         </ChartsContainer>
       </Section>
     </Container>

@@ -4,6 +4,7 @@ import { InternalThemeProvider } from '@/contexts/theme';
 import { MobileProvider } from 'contexts/mobile';
 import { appWithTranslation, SSRConfig } from 'next-i18next';
 import type { AppProps as NextJsAppProps } from 'next/app';
+import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ToastContainer } from 'react-toastify';
@@ -11,8 +12,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import Layout from '../components/Layout';
 import NProgress from '../components/NProgress';
 import Bugsnag from '../lib/bugsnag';
-import { initGA, logPageView } from '../services/GoogleAnalytics';
 import GlobalStyle from '../styles/global';
+import * as gtag from '../utils/gtag/gtag';
 
 const queryClient = new QueryClient();
 
@@ -31,12 +32,16 @@ declare type AppProps = NextJsAppProps & {
   pageProps: SSRConfig;
 };
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
+  const router = useRouter();
   useEffect(() => {
-    if (process.env.DEFAULT_API_HOST === 'https://api.mainnet.klever.finance') {
-      initGA(process.env.GA_TRACKING_ID as string);
-      logPageView();
-    }
-  }, []);
+    const handleRouteChange = (url: URL) => {
+      gtag.pageview(url);
+    };
+    router.events.on('routeChangeComplete', handleRouteChange);
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange);
+    };
+  }, [router.events]);
 
   const children = (
     <QueryClientProvider client={queryClient}>

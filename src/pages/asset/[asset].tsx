@@ -904,13 +904,6 @@ const Asset: React.FC<IAssetPage> = ({}) => {
               ? asset?.staking.fpr.reverse().map((fpr, index) => (
                   <span key={index}>
                     <p>
-                      Total Amount:{' '}
-                      {toLocaleFixed(
-                        (fpr.totalAmount || 0) / 10 ** asset?.precision,
-                        asset?.precision,
-                      )}
-                    </p>
-                    <p>
                       Total Staked:{' '}
                       {toLocaleFixed(
                         (fpr.totalStaked || 0) / 10 ** asset?.precision,
@@ -919,9 +912,16 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                     </p>
                     <p>Epoch: {fpr.epoch}</p>
                     <p>
-                      Total Claimed:{' '}
+                      Total KLV Amount:{' '}
                       {toLocaleFixed(
-                        (fpr.TotalClaimed || 0) / 10 ** asset?.precision,
+                        (fpr.totalAmount || 0) / 10 ** KLV_PRECISION,
+                        asset?.precision,
+                      )}
+                    </p>
+                    <p>
+                      Total KLV Claimed:{' '}
+                      {toLocaleFixed(
+                        (fpr.TotalClaimed || 0) / 10 ** KLV_PRECISION,
                         asset?.precision,
                       )}
                     </p>

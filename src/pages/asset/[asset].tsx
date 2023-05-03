@@ -175,7 +175,9 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         const res = await api.get({
           route: `assets/${assetId}`,
         });
-
+        if (res?.error === 'cannot find asset in database') {
+          router.push('/404');
+        }
         if (!res.error || res.error === '') {
           resolve(res);
         }

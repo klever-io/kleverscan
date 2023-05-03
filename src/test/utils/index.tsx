@@ -2,12 +2,17 @@ import { MobileProvider } from '@/contexts/mobile';
 import { InternalThemeProvider } from '@/contexts/theme';
 import { render, RenderResult } from '@testing-library/react';
 import React from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
+
+const queryClient = new QueryClient();
 
 export const renderWithTheme = (children: JSX.Element): RenderResult => {
   return render(
-    <MobileProvider>
-      <InternalThemeProvider>{children}</InternalThemeProvider>
-    </MobileProvider>,
+    <QueryClientProvider client={queryClient}>
+      <MobileProvider>
+        <InternalThemeProvider>{children}</InternalThemeProvider>
+      </MobileProvider>
+    </QueryClientProvider>,
   );
 };
 

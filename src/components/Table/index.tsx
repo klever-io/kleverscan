@@ -3,10 +3,11 @@ import { IPaginatedResponse, IRowSection } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { exportToCsv } from '@/utils/promiseFunctions';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
 import { IoReloadSharp } from 'react-icons/io5';
 import { TbTableExport } from 'react-icons/tb';
+import { useQuery } from 'react-query';
 import { Loader } from '../Loader/styles';
 // import { VscJson } from 'react-icons/vsc';
 import Pagination from '../Pagination';
@@ -62,10 +63,19 @@ export interface ITable {
   scrollUp?: boolean;
   totalPages?: number;
   dataName?: string;
-  request?: (page: number, limit: number) => Promise<IPaginatedResponse>;
+  request: (page: number, limit: number) => Promise<IPaginatedResponse>;
   interval?: number;
   intervalController?: React.Dispatch<React.SetStateAction<number>>;
 }
+
+const onErrorHandler = () => {
+  return {
+    onError: (err: unknown): void => {
+      console.error(err);
+    },
+    retry: 3,
+  };
+};
 
 const Table: React.FC<ITable> = ({
   type,
@@ -80,14 +90,28 @@ const Table: React.FC<ITable> = ({
 }) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
-  const [loading, setLoading] = useState(false);
   const [loadingCsv, setLoadingCsv] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(defaultTotalPages);
   const [limit, setLimit] = useState<number>(10);
-  const [items, setItems] = useState([]);
   const limits = [5, 10, 50, 100];
   const [scrollTop, setScrollTop] = useState<boolean>(false);
+
+  const tableRequest = async (dataName: string | undefined): Promise<any> => {
+    const response = await request(page, limit);
+    if (!response.error && dataName) {
+      setTotalPages(response?.pagination?.totalPages || 1);
+      return response.data[dataName];
+    }
+    setPage(1);
+    return [];
+  };
+  const {
+    data: items,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useQuery('items', () => tableRequest(dataName), onErrorHandler());
 
   const props: ITableType = {
     type,
@@ -107,33 +131,15 @@ const Table: React.FC<ITable> = ({
     };
   }, []);
 
-  const fetchData = useCallback(async () => {
-    if (request && dataName) {
-      if (!interval) {
-        setLoading(true);
-      }
-      const response = await request(page, limit);
-      if (!response.error) {
-        setItems(response.data[dataName]);
-        setTotalPages(response?.pagination?.totalPages || 1);
-      } else {
-        setPage(1);
-        setItems([]);
-      }
-    }
-    setLoading(false);
-  }, [page, limit, request, dataName]);
-
   useDidUpdateEffect(() => {
     if (page !== 1 && intervalController) {
       intervalController(0);
     }
-    setLoading(true);
-    fetchData();
+    refetch();
   }, [page]);
 
   useEffect(() => {
-    fetchData();
+    refetch();
   }, [limit]);
 
   useDidUpdateEffect(() => {
@@ -143,15 +149,13 @@ const Table: React.FC<ITable> = ({
     if (page !== 1) {
       setPage(1);
     }
-    setLoading(true);
-    fetchData();
+    refetch();
   }, [router.query, router.isReady]);
 
   useEffect(() => {
     if (interval) {
-      setLoading(true);
       const intervalId = setInterval(() => {
-        fetchData();
+        refetch();
       }, interval);
       return () => clearInterval(intervalId);
     }
@@ -202,7 +206,10 @@ const Table: React.FC<ITable> = ({
                 </ButtonsContainer>
               </ExportContainer>
             )}
-            <IoReloadSharpWrapper onClick={() => fetchData()} loading={loading}>
+            <IoReloadSharpWrapper
+              onClick={() => refetch()}
+              loading={isFetching}
+            >
               <Tooltip
                 msg="Refresh"
                 customStyles={{ delayShow: 800 }}
@@ -235,7 +242,7 @@ const Table: React.FC<ITable> = ({
             </Header>
           )}
           <Body {...props} data-testid="table-body" autoUpdate={!!interval}>
-            {loading && (
+            {(interval ? isLoading : isFetching) && (
               <>
                 {Array(limit)
                   .fill(limit)
@@ -250,10 +257,10 @@ const Table: React.FC<ITable> = ({
                   ))}
               </>
             )}
-            {!loading &&
+            {(!isFetching || interval) &&
               items &&
               items?.length > 0 &&
-              items?.map((item, index) => {
+              items?.map((item: any, index: number) => {
                 let spanCount = 0;
                 return (
                   <React.Fragment key={JSON.stringify(item) + String(index)}>
@@ -297,9 +304,9 @@ const Table: React.FC<ITable> = ({
               })}
           </Body>
 
-          {!loading && (!items || items?.length === 0) && (
+          {!isFetching && (!items || items?.length === 0) && (
             <>
-              <RetryContainer onClick={() => fetchData()} loading={loading}>
+              <RetryContainer onClick={() => refetch()} loading={isFetching}>
                 <span>Retry</span>
                 <IoReloadSharp size={20} />
               </RetryContainer>

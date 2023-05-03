@@ -25,7 +25,7 @@ export interface IParsedVoterResponse {
 export interface IProposalVoters {
   proposalVotersProps: {
     scrollUp: boolean;
-    request?: (page: number, limit: number) => Promise<any>;
+    request: (page: number, limit: number) => Promise<any>;
     dataName: string;
   };
 }

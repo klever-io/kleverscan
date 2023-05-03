@@ -186,22 +186,29 @@ const Validator: React.FC<IValidatorPage> = () => {
   };
 
   const requestValidatorDelegations = async (page: number, limit: number) => {
-    const response: IDelegateResponse = await api.get({
-      route: `validator/delegated/${router.query.hash}?page=${page}&limit=${limit}`,
-    });
-
-    const delegators: IBucket[] = [];
-    response?.data?.delegators?.forEach(delegation => {
-      delegation?.buckets?.forEach(bucket => {
-        if (bucket?.delegation === router.query.hash) {
-          delegators.push({
-            address: delegation?.address,
-            ...bucket,
-          });
-        }
+    if (router?.query?.hash) {
+      const response: IDelegateResponse = await api.get({
+        route: `validator/delegated/${router.query.hash}?page=${page}&limit=${limit}`,
       });
-    });
-    return { ...response, data: { validator: delegators } };
+
+      const delegators: IBucket[] = [];
+      response?.data?.delegators?.forEach(delegation => {
+        delegation?.buckets?.forEach(bucket => {
+          if (bucket?.delegation === router.query.hash) {
+            delegators.push({
+              address: delegation?.address,
+              ...bucket,
+            });
+          }
+        });
+      });
+      return { ...response, data: { validator: delegators } };
+    }
+    return {
+      error: 'router.query not ready',
+      code: 'fail',
+      data: { validator: [] },
+    };
   };
 
   const Overview: React.FC = () => {

@@ -123,13 +123,38 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
   useScroll(openUserInfos, () => setOpenUserInfos(false));
 
   useEffect(() => {
-    if (localStorage.getItem('primaryAsset')) {
-      const getPrimaryAsset: IAssetBalance = JSON.parse(
-        localStorage.getItem('primaryAsset') as any,
-      );
-      setPrimaryAsset([getPrimaryAsset]);
+    const storagePrimaryAssets = localStorage.getItem('primaryAsset');
+    if (storagePrimaryAssets) {
+      try {
+        const getPrimaryAsset: IAssetBalance = JSON.parse(
+          storagePrimaryAssets as any,
+        );
+        setPrimaryAsset([getPrimaryAsset]);
+      } catch (error) {
+        console.error(error);
+      }
     }
-  }, []);
+  }, [otherAssets]);
+
+  useEffect(() => {
+    try {
+      const storagePrimaryAssets = localStorage.getItem('primaryAsset');
+      if (storagePrimaryAssets) {
+        const getPrimaryAsset = JSON.parse(storagePrimaryAssets as any);
+        const newPrimaryAsset = otherAssets.filter(
+          asset => asset.assetId === getPrimaryAsset.assetId,
+        );
+        if (newPrimaryAsset) {
+          localStorage.setItem(
+            'primaryAsset',
+            JSON.stringify(newPrimaryAsset[0]),
+          );
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, [otherAssets]);
 
   const connectAndOpen = () => {
     if (!walletAddress) {
@@ -163,6 +188,7 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
     } else {
       toast.success('Test KLV request successful!');
       setLoadingBalance(true);
+      getAccountBalance();
     }
 
     setLoadingBalance(false);
@@ -296,7 +322,7 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
                         <OtherAssetsContainer isMobile={isMobile}>
                           {otherAssets.map((asset: any) => (
                             <div
-                              key={asset.assetId}
+                              key={JSON.stringify(asset)}
                               onClick={() => {
                                 onClickSetAssetPrimary(
                                   asset.assetId,

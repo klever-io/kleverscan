@@ -122,3 +122,20 @@ export const toLocaleFixed = (value: number, precision: number): string => {
     minimumFractionDigits: precision,
   });
 };
+
+export const isHex = (str: string): boolean => {
+  const hexRegex = /^[0-9a-fA-F]+$/;
+  return hexRegex.test(str);
+};
+
+export const base64ToHex = (str: string): string => {
+  if (isHex(str)) {
+    return str;
+  } else {
+    const decodedBytes: Uint8Array = Buffer.from(str, 'base64');
+    const hexString: string = Array.from(decodedBytes, byte =>
+      byte.toString(16).padStart(2, '0'),
+    ).join('');
+    return hexString;
+  }
+};

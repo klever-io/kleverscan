@@ -45,7 +45,7 @@ export const FormContent = styled.form`
   gap: 1rem;
   color: ${props => props.theme.black};
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    width: 100%;
+    width: 40%;
     display: grid;
     grid-template-columns: 1fr 1fr;
     div:first-child {
@@ -54,10 +54,10 @@ export const FormContent = styled.form`
     }
     > div:nth-child(2) {
       grid-column-start: 1;
-      grid-column-end: 2;
+      grid-column-end: 3;
     }
     > div:nth-child(3) {
-      grid-column-start: 2;
+      grid-column-start: 1;
       grid-column-end: 3;
     }
     > div:nth-child(4) {
@@ -73,7 +73,7 @@ export const FormContent = styled.form`
 `;
 
 export const TextArea = styled(StyledTextArea)`
-  min-height: 6rem;
+  min-height: 8rem;
   resize: none;
   width: 10px;
   color: ${props => props.theme.darkText};
@@ -117,8 +117,11 @@ const activateAnimation = keyframes`
   } 
 `;
 
-export const Button = styled.input<{ isDisabled: boolean }>`
-  background-color: ${({ theme }) => theme.violet};
+export const Button = styled.input<{
+  isDisabled: boolean;
+  colorButton: string;
+}>`
+  background-color: ${({ theme, colorButton }) => theme[colorButton]};
   width: 100%;
   height: 3rem;
   border-radius: 0.6rem;

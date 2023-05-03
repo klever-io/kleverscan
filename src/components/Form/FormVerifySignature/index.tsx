@@ -1,5 +1,6 @@
+import { base64ToHex, isHex } from '@/utils/formatFunctions';
 import { utils } from '@klever/sdk';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
   Button,
@@ -17,26 +18,78 @@ interface IFormInputs {
 }
 
 const FormVerifySignature: React.FC = () => {
-  const {
-    register,
-    formState: { isValid, isDirty },
-    reset,
-    handleSubmit,
-  } = useForm<IFormInputs>();
+  const [isDirty, setIsDirty] = useState(false);
+  const [formValues, setFormValues] = useState<IFormInputs>({
+    message: '',
+    signature: '',
+    address: '',
+  });
 
-  const onSubmit: SubmitHandler<IFormInputs> = async ({
-    message,
-    signature,
-    address,
-  }) => {
+  useEffect(() => {
+    const { message, signature, address } = formValues;
+    if (!message && !signature && !address) {
+      setIsDirty(false);
+    }
+  }, [formValues]);
+
+  const handleChangeValues = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const fieldName = event.target.name;
+    const fieldValue = event.target.value;
+    setFormValues(current => {
+      return {
+        ...current,
+        [fieldName]: fieldValue,
+      };
+    });
+    setIsDirty(true);
+  };
+
+  const resetForm = () => {
+    setFormValues({
+      message: '',
+      signature: '',
+      address: '',
+    });
+    setIsDirty(false);
+  };
+
+  const isFormFilled = (formValues: IFormInputs): boolean => {
+    return Object.values(formValues).every(value => value !== '');
+  };
+
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     try {
-      await utils.validateSignature(message, signature, address);
-      toast.success('Success to validate signature!', {
-        autoClose: 2300,
-        pauseOnHover: false,
-        closeOnClick: true,
-        closeButton: false,
-      });
+      const validateSignature = base64ToHex(formValues.signature);
+      const validateResponse = await utils.validateSignature(
+        formValues.message,
+        validateSignature,
+        formValues.address,
+      );
+      if (!isHex(validateSignature)) {
+        toast.error('Failed to validate signature!', {
+          autoClose: 2300,
+          pauseOnHover: false,
+          closeOnClick: true,
+          closeButton: false,
+        });
+      } else if (validateResponse) {
+        toast.success('This signature is valid!', {
+          autoClose: 2300,
+          pauseOnHover: false,
+          closeOnClick: true,
+          closeButton: false,
+        });
+      } else {
+        toast.error('Invalid signature!', {
+          autoClose: 2300,
+          pauseOnHover: false,
+          closeOnClick: true,
+          closeButton: false,
+        });
+      }
     } catch (error) {
       toast.error('Failed to validate signature!', {
         autoClose: 2300,
@@ -49,14 +102,16 @@ const FormVerifySignature: React.FC = () => {
 
   return (
     <VerifySignatureContainer>
-      <FormContent onSubmit={handleSubmit(onSubmit)}>
+      <FormContent onSubmit={onSubmit}>
         <ContainerItem>
           <span>Address</span>
           <InputContainer>
             <input
+              name="address"
+              value={formValues.address}
               placeholder="Enter the address for verification"
-              {...register('address', { required: true })}
               autoComplete="off"
+              onChange={handleChangeValues}
             />
           </InputContainer>
         </ContainerItem>
@@ -64,31 +119,37 @@ const FormVerifySignature: React.FC = () => {
           <span>Message</span>
           <TextArea
             placeholder="Enter the message for verification"
-            {...register('message', { required: true })}
+            name="message"
+            value={formValues.message}
+            onChange={handleChangeValues}
           />
         </ContainerItem>
         <ContainerItem>
           <span>Signature</span>
           <TextArea
             placeholder="Enter the signature for verification"
-            {...register('signature', { required: true })}
+            name="signature"
+            value={formValues.signature}
+            onChange={handleChangeValues}
           />
         </ContainerItem>
         <ContainerItem>
           <Button
-            type="submit"
-            value="Verify Signature"
-            isDisabled={!isValid || !isDirty}
-            disabled={!isValid || !isDirty}
-          />
-        </ContainerItem>
-        <ContainerItem>
-          <Button
+            colorButton="error"
             type="button"
             value="Clear Form"
-            onClick={() => reset()}
+            onClick={() => resetForm()}
             isDisabled={!isDirty}
             disabled={!isDirty}
+          />
+        </ContainerItem>
+        <ContainerItem>
+          <Button
+            colorButton="violet"
+            type="submit"
+            value="Verify Signature"
+            isDisabled={!isFormFilled(formValues)}
+            disabled={!isFormFilled(formValues)}
           />
         </ContainerItem>
       </FormContent>

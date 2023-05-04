@@ -1,4 +1,6 @@
 import { IEpochInfo, IMetrics } from '@/types';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
+import { NextRouter } from 'next/router';
 import { secondsToHourMinSec } from './timeFunctions';
 
 /**
@@ -88,4 +90,13 @@ export const getEpochInfo = (metrics: IMetrics): IEpochInfo => {
     epochLoadPercent,
     remainingTime,
   };
+};
+
+export const setQueryAndRouter = (
+  newQuery: NextParsedUrlQuery,
+  router: NextRouter,
+): void => {
+  router.push({ pathname: router.pathname, query: newQuery }, undefined, {
+    shallow: true,
+  });
 };

@@ -1,4 +1,6 @@
+import { CustomRouter } from '@/components/Tabs/ProprietaryAssets/ProprietaryAssets.spec';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import * as myRouter from 'next/router';
 import React from 'react';
 import Proposals from '../../pages/proposals/index';
 import api from '../../services/api';
@@ -47,9 +49,9 @@ describe('test proposals page', () => {
       switch (true) {
         case params.route.includes('network'):
           return Promise.resolve(mockNetworkParameters);
-        case params.route.includes('proposals/list?page=1'):
+        case params.route.includes('proposals/list?status=&page=1'):
           return Promise.resolve(mockedProposalsList);
-        case params.route.includes('proposals/list?page=2'):
+        case params.route.includes('proposals/list?status=&page=2'):
           return Promise.resolve(mockedProposalsListPage2);
         default:
           return Promise.reject(new Error(`Unexpected route: ${params.route}`));
@@ -74,6 +76,15 @@ describe('test proposals page', () => {
   });
 
   it('should paginate the proposals correctly', async () => {
+    const mockRouter: { useRouter: () => CustomRouter } = myRouter;
+    mockRouter.useRouter = () =>
+      ({
+        asPath: '',
+        basePath: '',
+        isLocaleDomain: false,
+        push: jest.fn(),
+        ...router1(),
+      } as unknown as CustomRouter);
     await act(async () => {
       renderWithTheme(<Proposals />);
     });
@@ -95,7 +106,6 @@ describe('test proposals page', () => {
     proposalsTabProof = screen.queryAllByText('ApprovedProposal');
     expect(proposalsTabProof.length).toEqual(4);
     expect(networkParamsTabProof).not.toBeInTheDocument();
-
     const page1Proposal = screen.getAllByText(/0\/4,000,000/)[0];
     let page2Proposal = screen.queryByText(/0\/3,000,000/);
     expect(page2Proposal).toEqual(null);

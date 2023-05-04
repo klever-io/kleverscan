@@ -5,21 +5,19 @@ import { CustomLink, Status } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
 import { paramsStyles } from '@/components/Tooltip/configs';
 import { useMobile } from '@/contexts/mobile';
-import { parseAllProposals } from '@/pages/proposals';
-import api from '@/services/api';
 import { IRowSection } from '@/types/index';
 import {
   IParsedProposal,
   IParsedProposalParam,
-  IProposals,
   IProposalsProps,
-  IProposalsResponse,
 } from '@/types/proposals';
+import { setQueryAndRouter } from '@/utils';
 import { capitalizeString } from '@/utils/convertString';
 import { parseAddress } from '@/utils/parseValues';
 import { passViewportStyles } from '@/utils/viewportStyles';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import { useRouter } from 'next/router';
+import React from 'react';
 import {
   FilterContainer,
   ProposalsContainer,
@@ -30,15 +28,14 @@ import {
 } from './styles';
 
 const Proposals: React.FC<IProposalsProps> = ({ request }) => {
-  const [currentProposals, setCurrentProposals] = useState<IProposals>([]);
   const { isMobile, isTablet } = useMobile();
-
+  const router = useRouter();
   const filters: IFilter[] = [
     {
       title: 'Status',
       data: ['Active', 'Approved', 'Denied'],
       onClick: selected => filterProposals(selected),
-      current: 'All',
+      current: router?.query?.status as string,
     },
   ];
 
@@ -52,19 +49,7 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
         ? 'ActiveProposal'
         : '';
 
-    const response: IProposalsResponse = await api.get({
-      route: `proposals/list`,
-      query: {
-        status: actualStatus,
-      },
-    });
-
-    if (!response.error) {
-      const parsedProposals = parseAllProposals(response.data.proposals);
-      setCurrentProposals(parsedProposals);
-    } else {
-      setCurrentProposals([]);
-    }
+    setQueryAndRouter({ ...router.query, status: actualStatus }, router);
   };
 
   const rowSections = (props: IParsedProposal): IRowSection[] => {

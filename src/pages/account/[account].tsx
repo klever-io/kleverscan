@@ -36,6 +36,7 @@ import {
   ITransaction,
   Service,
 } from '@/types/index';
+import { setQueryAndRouter } from '@/utils';
 import { filterDate } from '@/utils/formatFunctions';
 import { KLV_PRECISION, UINT32_MAX } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
@@ -58,7 +59,6 @@ import {
 } from '@/views/accounts/detail';
 import { FilterByDate } from '@/views/transactions';
 import { ReceiveBackground } from '@/views/validator';
-import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 
@@ -268,12 +268,6 @@ const Account: React.FC<IAccountPage> = () => {
     ...router.query,
   };
 
-  const setQueryAndRouter = (newQuery: NextParsedUrlQuery) => {
-    router.push({ pathname: router.pathname, query: newQuery }, undefined, {
-      shallow: true,
-    });
-  };
-
   useEffect(() => {
     if (extensionInstalled) {
       connectExtension();
@@ -283,7 +277,7 @@ const Account: React.FC<IAccountPage> = () => {
   useEffect(() => {
     if (!router.isReady) return;
     setSelectedTab((router.query.tab as string) || headers[0]);
-    setQueryAndRouter(initialQueryState);
+    setQueryAndRouter(initialQueryState, router);
   }, [router.isReady]);
 
   useEffect(() => {
@@ -514,25 +508,28 @@ const Account: React.FC<IAccountPage> = () => {
   };
 
   const resetQueryDate = () => {
-    setQueryAndRouter(resetDate(router.query));
+    setQueryAndRouter(resetDate(router.query), router);
   };
 
   const filterQueryDate = (selectedDays: ISelectedDays) => {
     const getFilteredDays = filterDate(selectedDays);
-    setQueryAndRouter({ ...router.query, ...getFilteredDays });
+    setQueryAndRouter({ ...router.query, ...getFilteredDays }, router);
   };
 
   const filterFromTo = (op: number) => {
     const updatedQuery = { ...router.query };
     if (op === 0) {
       delete updatedQuery.role;
-      setQueryAndRouter({
-        ...updatedQuery,
-      });
+      setQueryAndRouter(
+        {
+          ...updatedQuery,
+        },
+        router,
+      );
     } else if (op === 1) {
-      setQueryAndRouter({ ...updatedQuery, role: 'sender' });
+      setQueryAndRouter({ ...updatedQuery, role: 'sender' }, router);
     } else if (op === 2) {
-      setQueryAndRouter({ ...updatedQuery, role: 'receiver' });
+      setQueryAndRouter({ ...updatedQuery, role: 'receiver' }, router);
     }
   };
 
@@ -577,7 +574,7 @@ const Account: React.FC<IAccountPage> = () => {
     headers,
     onClick: header => {
       setSelectedTab(header);
-      setQueryAndRouter({ ...router.query, tab: header });
+      setQueryAndRouter({ ...router.query, tab: header }, router);
     },
     dateFilterProps: {
       resetDate: resetQueryDate,

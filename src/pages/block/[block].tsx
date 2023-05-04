@@ -6,6 +6,7 @@ import Validators from '@/components/Tabs/Validators';
 import Tooltip from '@/components/Tooltip';
 import api from '@/services/api';
 import { IBlock } from '@/types/blocks';
+import { setQueryAndRouter } from '@/utils';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import {
   CardContainer,
@@ -24,7 +25,8 @@ import {
 } from '@/views/blocks/detail';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
 import {
   MdOutlineKeyboardArrowLeft,
   MdOutlineKeyboardArrowRight,
@@ -69,7 +71,7 @@ const Block: React.FC<IBlockPage> = ({ block }) => {
     prevRandSeed,
     randSeed,
   } = block;
-
+  const router = useRouter();
   const cardHeaders = ['Overview', 'Info'];
   const tableHeaders = ['Transactions', 'Validators'];
   const precision = 6; // default KLV precision
@@ -84,6 +86,13 @@ const Block: React.FC<IBlockPage> = ({ block }) => {
     api.get({
       route: `transaction/list?page=${page}&blockNum=${nonce}&limit=${limit}`,
     });
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    setSelectedTab((router.query.tab as string) || tableHeaders[0]);
+    setSelectedCard((router.query.card as string) || cardHeaders[0]);
+    setQueryAndRouter({ ...router.query }, router);
+  }, [router.isReady]);
 
   const BlockNavigation: React.FC = () => {
     return (
@@ -308,7 +317,10 @@ const Block: React.FC<IBlockPage> = ({ block }) => {
 
   const tabProps: ITabs = {
     headers: tableHeaders,
-    onClick: header => setSelectedTab(header),
+    onClick: header => {
+      setSelectedTab(header);
+      setQueryAndRouter({ ...router.query, tab: header }, router);
+    },
   };
 
   return (
@@ -323,7 +335,10 @@ const Block: React.FC<IBlockPage> = ({ block }) => {
             <CardHeaderItem
               key={String(index)}
               selected={selectedCard === header}
-              onClick={() => setSelectedCard(header)}
+              onClick={() => {
+                setSelectedCard(header);
+                setQueryAndRouter({ ...router.query, card: header }, router);
+              }}
             >
               <span>{header}</span>
             </CardHeaderItem>

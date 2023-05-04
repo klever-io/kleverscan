@@ -7,6 +7,7 @@ import Table, { ITable } from '@/components/Table';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import api from '@/services/api';
 import { IAsset, IPagination, IResponse, IRowSection } from '@/types/index';
+import { setQueryAndRouter } from '@/utils';
 import { formatAmount } from '@/utils/formatFunctions';
 import { useFetchPartial } from '@/utils/hooks';
 import {
@@ -15,7 +16,6 @@ import {
   Header,
   HeaderContainer,
 } from '@/views/assets';
-import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { ReactNode } from 'react';
@@ -33,12 +33,6 @@ const Assets: React.FC = () => {
   const [filterAssets, fetchPartialAsset, loading, setLoading] =
     useFetchPartial<IAsset>('assets', 'assets/list', 'assetId');
 
-  const setQueryAndRouter = (newQuery: NextParsedUrlQuery) => {
-    router.push({ pathname: router.pathname, query: newQuery }, undefined, {
-      shallow: true,
-    });
-  };
-
   const handleSelected = async (
     selected: string,
     filterType: string,
@@ -49,11 +43,11 @@ const Assets: React.FC = () => {
     if (selected === 'All') {
       const updatedQuery = { ...router.query };
       delete updatedQuery[filterType];
-      setQueryAndRouter(updatedQuery);
+      setQueryAndRouter(updatedQuery, router);
     } else if (filterType === 'type') {
-      setQueryAndRouter({ ...router.query, [filterType]: selected });
+      setQueryAndRouter({ ...router.query, [filterType]: selected }, router);
     } else if (selected !== router.query[filterType]) {
-      setQueryAndRouter({ ...router.query, [filterType]: selected });
+      setQueryAndRouter({ ...router.query, [filterType]: selected }, router);
     }
   };
 

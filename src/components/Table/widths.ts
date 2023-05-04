@@ -407,8 +407,7 @@ const proposals = css`
   }
   &:nth-child(7) {
     min-width: 5rem;
-    max-width: 5rem;
-    margin-left: 5rem;
+    margin-left: 15rem;
   }
 `;
 const votes = css`

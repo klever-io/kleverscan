@@ -14,6 +14,7 @@ import TransactionsFilters from '@/components/TransactionsFilters';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
+import { setQueryAndRouter } from '@/utils';
 import { capitalizeString } from '@/utils/convertString';
 import { formatAmount, formatDate } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
@@ -21,7 +22,6 @@ import { parseAddress } from '@/utils/parseValues';
 import { getPrecision } from '@/utils/precisionFunctions';
 import { CenteredRow } from '@/views/accounts/detail';
 import { Container, FilterByDate, Header } from '@/views/transactions';
-import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback } from 'react';
@@ -37,12 +37,6 @@ import {
 const Transactions: React.FC = () => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
-
-  const setQueryAndRouter = (newQuery: NextParsedUrlQuery) => {
-    router.push({ pathname: router.pathname, query: newQuery }, undefined, {
-      shallow: true,
-    });
-  };
 
   const getContractType = useCallback(contractTypes, []);
 
@@ -249,16 +243,19 @@ const Transactions: React.FC = () => {
     const updatedQuery = { ...router.query };
     delete updatedQuery.startdate;
     delete updatedQuery.enddate;
-    setQueryAndRouter(updatedQuery);
+    setQueryAndRouter(updatedQuery, router);
   };
   const filterDate = (selectedDays: ISelectedDays) => {
-    setQueryAndRouter({
-      ...router.query,
-      startdate: selectedDays.start.getTime().toString(),
-      enddate: selectedDays.end
-        ? (selectedDays.end.getTime() + 24 * 60 * 60 * 1000).toString()
-        : (selectedDays.start.getTime() + 24 * 60 * 60 * 1000).toString(),
-    });
+    setQueryAndRouter(
+      {
+        ...router.query,
+        startdate: selectedDays.start.getTime().toString(),
+        enddate: selectedDays.end
+          ? (selectedDays.end.getTime() + 24 * 60 * 60 * 1000).toString()
+          : (selectedDays.start.getTime() + 24 * 60 * 60 * 1000).toString(),
+      },
+      router,
+    );
   };
   const dateFilterProps: IDateFilter = {
     resetDate,

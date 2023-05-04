@@ -1,6 +1,6 @@
 import { getStatusIcon, statusWithIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
-import { ISelectedDays } from '@/components/DateFilter';
+import DateFilter, { ISelectedDays } from '@/components/DateFilter';
 import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import QrCodeModal from '@/components/QrCodeModal';
@@ -9,6 +9,12 @@ import { EmptyRow, Status } from '@/components/Table/styles';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Holders from '@/components/Tabs/Holders';
 import Transactions from '@/components/Tabs/Transactions';
+import TransactionsFilters from '@/components/TransactionsFilters';
+import {
+  ContainerFilter,
+  RightFiltersContent,
+  TxsFiltersWrapper,
+} from '@/components/TransactionsFilters/styles';
 import { useExtension } from '@/contexts/extension';
 import api from '@/services/api';
 import {
@@ -25,6 +31,7 @@ import {
   ITransactionResponse,
   IUri,
 } from '@/types/index';
+import { setQueryAndRouter } from '@/utils';
 import { filterDate, formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseHardCodedInfo, parseHolders } from '@/utils/parseValues';
@@ -53,9 +60,9 @@ import {
   WhiteListRow,
 } from '@/views/assets/detail';
 import { BalanceContainer, RowContent } from '@/views/proposals/detail';
+import { FilterByDate } from '@/views/transactions';
 import { ButtonExpand } from '@/views/transactions/detail';
 import { ReceiveBackground } from '@/views/validator';
-import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -86,23 +93,19 @@ const Asset: React.FC<IAssetPage> = ({}) => {
   const initialQueryState = {
     ...router.query,
   };
-  const setQueryAndRouter = (newQuery: NextParsedUrlQuery) => {
-    router.push({ pathname: router.pathname, query: newQuery }, undefined, {
-      shallow: true,
-    });
-  };
 
   useEffect(() => {
     if (router?.isReady) {
-      setQueryAndRouter(initialQueryState);
+      setQueryAndRouter(initialQueryState, router);
       setSelectedTab((router.query.tab as string) || tableHeaders[0]);
+      setSelectedCard((router.query.card as string) || cardHeaders[0]);
       setHolderQuery(router.query.sortBy as string);
     }
   }, [router.isReady]);
 
   useEffect(() => {
     if (selectedTab !== 'Transactions' && selectedTab) {
-      setQueryAndRouter({ ...router.query, sortBy: holderQuery });
+      setQueryAndRouter({ ...router.query, sortBy: holderQuery }, router);
     }
   }, [holderQuery]);
 
@@ -129,12 +132,12 @@ const Asset: React.FC<IAssetPage> = ({}) => {
 
   const filterQueryDate = (selectedDays: ISelectedDays) => {
     const getFilteredDays = filterDate(selectedDays);
-    setQueryAndRouter({ ...router.query, ...getFilteredDays });
+    setQueryAndRouter({ ...router.query, ...getFilteredDays }, router);
   };
 
   const resetQueryDate = () => {
     const newQuery = resetDate(router.query);
-    setQueryAndRouter({ ...router.query, ...newQuery });
+    setQueryAndRouter({ ...router.query, ...newQuery }, router);
   };
 
   const requestAssetHolders = async (page: number, limit: number) => {
@@ -1077,7 +1080,10 @@ const Asset: React.FC<IAssetPage> = ({}) => {
     resetDate: resetQueryDate,
     filterDate: filterQueryDate,
   };
-
+  const transactionsFiltersProps = {
+    query: router.query,
+    setQuery: setQueryAndRouter,
+  };
   const tabProps: ITabs = {
     headers: tableHeaders,
     onClick: header => {
@@ -1086,9 +1092,10 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         ...router.query,
       };
       delete a.sortBy;
-      setQueryAndRouter({ ...a, tab: header });
+      setQueryAndRouter({ ...a, tab: header }, router);
     },
     dateFilterProps,
+    showDataFilter: false,
   };
 
   const getHeader = () => {
@@ -1137,7 +1144,10 @@ const Asset: React.FC<IAssetPage> = ({}) => {
             <CardHeaderItem
               key={String(index)}
               selected={selectedCard === header}
-              onClick={() => setSelectedCard(header)}
+              onClick={() => {
+                setSelectedCard(header);
+                setQueryAndRouter({ ...router.query, card: header }, router);
+              }}
             >
               <span>{header}</span>
             </CardHeaderItem>
@@ -1150,6 +1160,21 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       </CardContainer>
 
       <Tabs {...tabProps}>
+        {selectedTab === 'Transactions' && (
+          <TxsFiltersWrapper>
+            <ContainerFilter>
+              <TransactionsFilters
+                disabledInput={true}
+                {...transactionsFiltersProps}
+              ></TransactionsFilters>
+              <RightFiltersContent>
+                <FilterByDate>
+                  <DateFilter {...dateFilterProps} />
+                </FilterByDate>
+              </RightFiltersContent>
+            </ContainerFilter>
+          </TxsFiltersWrapper>
+        )}
         <SelectedTabComponent />
       </Tabs>
     </Container>

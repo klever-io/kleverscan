@@ -8,12 +8,12 @@ import { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import api from '@/services/api';
 import { IRowSection, IValidator } from '@/types/index';
+import { setQueryAndRouter } from '@/utils';
 import { capitalizeString } from '@/utils/convertString';
 import { formatAmount } from '@/utils/formatFunctions';
 import { useFetchPartial } from '@/utils/hooks';
 import { parseValidators } from '@/utils/parseValues';
 import { AddressContainer } from '@/views/validators/detail';
-import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -23,11 +23,6 @@ const Validators: React.FC = () => {
   const [filterValidators, fetchPartialValidator, loading, setLoading] =
     useFetchPartial<IValidator>('validators', 'validator/list', 'name');
 
-  const setQueryAndRouter = (newQuery: NextParsedUrlQuery) => {
-    router.push({ pathname: router.pathname, query: newQuery }, undefined, {
-      shallow: true,
-    });
-  };
   const header = [
     'Rank',
     'Name',
@@ -47,9 +42,9 @@ const Validators: React.FC = () => {
       data: filterValidators.map(validator => validator.name || ''),
       onClick: async value => {
         if (value === 'All') {
-          setQueryAndRouter({});
+          setQueryAndRouter({}, router);
         } else {
-          setQueryAndRouter({ name: value });
+          setQueryAndRouter({ name: value }, router);
         }
       },
       onChange: async value => {

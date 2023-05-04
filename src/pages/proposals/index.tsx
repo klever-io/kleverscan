@@ -10,24 +10,40 @@ import { getProposalNetworkParams } from '@/utils/networkFunctions';
 import { Header } from '@/views/accounts/detail';
 import { Card } from '@/views/blocks';
 import { CardContainer, Container } from '@/views/proposals';
-import { useState } from 'react';
-
-export const requestProposals = async (
-  page: number,
-  limit: number,
-): Promise<IResponse> => {
-  const proposals: IProposalsResponse = await api.get({
-    route: `proposals/list?page=${page}&limit=${limit}`,
-  });
-
-  let parsedProposalResponse: any[] = [];
-  parsedProposalResponse = parseAllProposals(proposals?.data?.proposals);
-  return { ...proposals, data: { proposals: parsedProposalResponse } };
-};
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 
 const Proposals: React.FC = () => {
+  const router = useRouter();
   const tableHeaders = ['Network Parameters', 'Proposals'];
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
+
+  const requestProposals = async (
+    page: number,
+    limit: number,
+  ): Promise<IResponse> => {
+    const { status } = router.query;
+    const proposals: IProposalsResponse = await api.get({
+      route: `proposals/list?status=${
+        status || ''
+      }&page=${page}&limit=${limit}`,
+    });
+
+    let parsedProposalResponse: any[] = [];
+    parsedProposalResponse = parseAllProposals(proposals?.data?.proposals);
+    return { ...proposals, data: { proposals: parsedProposalResponse } };
+  };
+  const setQueryAndRouter = (newQuery: NextParsedUrlQuery): void => {
+    router.push({ pathname: router.pathname, query: newQuery }, undefined, {
+      shallow: true,
+    });
+  };
+  useEffect(() => {
+    if (!router.isReady) return;
+    setQueryAndRouter({ ...router.query });
+    setSelectedTab((router.query.tab as string) || tableHeaders[0]);
+  }, [router.isReady]);
 
   const CardContent: React.FC = () => {
     return (
@@ -64,7 +80,10 @@ const Proposals: React.FC = () => {
 
   const tabProps: ITabs = {
     headers: tableHeaders,
-    onClick: header => setSelectedTab(header),
+    onClick: header => {
+      setSelectedTab(header),
+        setQueryAndRouter({ ...router.query, tab: header });
+    },
   };
 
   return (

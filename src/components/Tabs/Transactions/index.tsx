@@ -33,7 +33,6 @@ interface ITransactionsProps {
 
 const Transactions: React.FC<ITransactionsProps> = props => {
   const router = useRouter();
-
   const { isMobile } = useMobile();
 
   const getContractType = useCallback(contractTypes, []);

@@ -26,6 +26,7 @@ export interface IFilter {
   onChange?(value: string): void;
   current: string | undefined;
   loading?: boolean;
+  disabledInput?: boolean;
 }
 
 const Filter: React.FC<IFilter> = ({
@@ -38,6 +39,7 @@ const Filter: React.FC<IFilter> = ({
   overFlow,
   inputType = 'text',
   loading,
+  disabledInput,
 }) => {
   const allItem = firstItem || 'All';
   const [selected, setSelected] = useState(current || allItem);
@@ -52,6 +54,7 @@ const Filter: React.FC<IFilter> = ({
   const focusRef = useRef<HTMLInputElement>(null);
 
   const openDropdown = () => {
+    if (disabledInput) return;
     if (!focus) {
       flushSync(() => {
         setOpen(false);
@@ -64,6 +67,7 @@ const Filter: React.FC<IFilter> = ({
   };
 
   const arrowOnClick = () => {
+    if (disabledInput) return;
     if (arrowOpen) {
       closeDropDown();
     } else {

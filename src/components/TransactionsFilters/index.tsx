@@ -3,16 +3,20 @@ import { buyType, contracts, status } from '@/configs/transactions';
 import { IAsset } from '@/types';
 import { useFetchPartial } from '@/utils/hooks';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
-import { useRouter } from 'next/router';
+import { NextRouter, useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { ContractsIndex } from '../../types/contracts';
 import { FilterContainer } from './styles';
 
 interface ITransactionsFilters {
-  setQuery: (newQuery: NextParsedUrlQuery) => void;
+  setQuery: (newQuery: NextParsedUrlQuery, router: NextRouter) => void;
+  disabledInput?: boolean;
 }
 
-const TransactionsFilters: React.FC<ITransactionsFilters> = ({ setQuery }) => {
+const TransactionsFilters: React.FC<ITransactionsFilters> = ({
+  setQuery,
+  disabledInput,
+}) => {
   const router = useRouter();
   const [query, setLocalQuery] = useState<NextParsedUrlQuery>({});
   const [assets, fetchPartialAsset, loading, setLoading] =
@@ -34,14 +38,17 @@ const TransactionsFilters: React.FC<ITransactionsFilters> = ({ setQuery }) => {
       if (filterType === 'type') {
         delete updatedQuery['buyType'];
       }
-      setQuery(updatedQuery);
+      setQuery(updatedQuery, router);
     } else if (filterType === 'type') {
       if (selected !== 'Buy') {
         delete updatedQuery['buyType'];
       }
-      setQuery({ ...updatedQuery, [filterType]: getContractIndex(selected) });
+      setQuery(
+        { ...updatedQuery, [filterType]: getContractIndex(selected) },
+        router,
+      );
     } else if (selected !== query[filterType]) {
-      setQuery({ ...query, [filterType]: selected });
+      setQuery({ ...query, [filterType]: selected }, router);
     }
   };
 
@@ -58,6 +65,7 @@ const TransactionsFilters: React.FC<ITransactionsFilters> = ({ setQuery }) => {
       },
       current: query.asset as string | undefined,
       loading,
+      disabledInput,
     },
     {
       title: 'Status',

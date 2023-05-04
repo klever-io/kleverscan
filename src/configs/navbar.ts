@@ -82,15 +82,13 @@ const navbarItems: INavbarItem[] = [
         pathTo: '/itos',
         Icon: GiTwoCoins,
       },
+      {
+        name: 'Verify',
+        pathTo: '/verify-signature',
+        Icon: TickSquare,
+      },
     ],
   },
 ];
-
-isBeta &&
-  navbarItems[navbarItems.length - 1].pages?.push({
-    name: 'Verify',
-    pathTo: '/verify-signature',
-    Icon: TickSquare,
-  });
 
 export { navbarItems };

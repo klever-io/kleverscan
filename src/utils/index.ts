@@ -92,6 +92,18 @@ export const getEpochInfo = (metrics: IMetrics): IEpochInfo => {
   };
 };
 
+/**
+ * Parse the APRI/FPRI
+ *
+ * Parse string to remove the last letter and let only the APR/FPR
+ * @param stakingType
+ * @returns string
+ */
+export const parseApr = (stakingType: string | undefined): string => {
+  if (!stakingType) return '--';
+  return stakingType.slice(0, -1);
+};
+
 export const setQueryAndRouter = (
   newQuery: NextParsedUrlQuery,
   router: NextRouter,

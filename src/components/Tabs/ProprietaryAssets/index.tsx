@@ -5,6 +5,7 @@ import {
   IProprietaryAsset,
   IRowSection,
 } from '@/types/index';
+import { parseApr } from '@/utils';
 import { formatAmount } from '@/utils/formatFunctions';
 import Link from 'next/link';
 import React from 'react';
@@ -32,13 +33,12 @@ const ProprietaryAssets: React.FC<IProprietaryAssets> = ({
     'Precision',
     'Circulating Supply',
     'Frozen Balance',
+    'Staking Type',
     '',
   ];
 
   const rowSections = (props: IProprietaryAsset): IRowSection[] => {
     const { assetId, assetType, precision, circulatingSupply, staking } = props;
-
-    const walletAddress = sessionStorage.getItem('walletAddress');
 
     const ticker = assetId?.split('-')[0];
     const sectionViewNfts =
@@ -81,6 +81,14 @@ const ProprietaryAssets: React.FC<IProprietaryAssets> = ({
           <strong key={staking?.totalStaked || 0}>
             {formatAmount((staking?.totalStaked || 0) / 10 ** precision)}{' '}
             {ticker}
+          </strong>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <strong key={JSON.stringify(staking)}>
+            {parseApr(staking?.interestType)}
           </strong>
         ),
         span: 1,

@@ -243,6 +243,9 @@ export interface IAccountAsset {
   };
   buckets?: IBucket[];
   owner?: boolean;
+  staking?: {
+    interestType: string;
+  };
 }
 
 export interface IProprietaryAsset {

@@ -31,7 +31,7 @@ import {
   ITransactionResponse,
   IUri,
 } from '@/types/index';
-import { setQueryAndRouter } from '@/utils';
+import { parseApr, setQueryAndRouter } from '@/utils';
 import { filterDate, formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseHardCodedInfo, parseHolders } from '@/utils/parseValues';
@@ -422,6 +422,14 @@ const Asset: React.FC<IAssetPage> = ({}) => {
             <strong>Market Cap</strong>
           </span>
           <span>--</span>
+        </Row>
+        <Row isStakingRoyalties={false}>
+          <span>
+            <strong>Staking Type</strong>
+          </span>
+          <span>
+            {asset ? parseApr(asset?.staking.interestType) : <Skeleton />}
+          </span>
         </Row>
       </>
     );

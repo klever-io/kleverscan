@@ -1,6 +1,7 @@
 import Table, { ITable } from '@/components/Table';
 import { CustomLink } from '@/components/Table/styles';
 import { IAccountAsset, IInnerTableProps, IRowSection } from '@/types/index';
+import { parseApr } from '@/utils';
 import { formatAmount } from '@/utils/formatFunctions';
 import Link from 'next/link';
 import React from 'react';
@@ -27,14 +28,14 @@ const Assets: React.FC<IAssets> = ({
     'Precision',
     'Balance',
     'Frozen',
+    'Staking Type',
     '',
   ];
 
   const rowSections = (props: IAccountAsset): IRowSection[] => {
-    const { assetId, assetType, precision, balance, frozenBalance, owner } =
+    const { assetId, assetType, precision, balance, frozenBalance, staking } =
       props;
     const freezeContract = [assetId, balance];
-    const walletAddress = sessionStorage.getItem('walletAddress');
 
     const ticker = assetId?.split('-')[0];
     const sectionViewNfts =
@@ -76,6 +77,14 @@ const Assets: React.FC<IAssets> = ({
         element: (
           <strong key={frozenBalance}>
             {formatAmount(frozenBalance / 10 ** precision)} {ticker}
+          </strong>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <strong key={JSON.stringify(staking)}>
+            {parseApr(staking?.interestType)}
           </strong>
         ),
         span: 1,

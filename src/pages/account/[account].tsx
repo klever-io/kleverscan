@@ -28,6 +28,7 @@ import api, { IPrice } from '@/services/api';
 import {
   IAccount,
   IAccountAsset,
+  IAssetOne,
   IAssetResponse,
   IAssetsBuckets,
   IInnerTableProps,
@@ -136,6 +137,19 @@ export const assetsRequest = (
       return assets[asset];
     });
 
+    await Promise.all(
+      assetsArray.map(async (asset, index) => {
+        try {
+          const assetResponse: IAssetOne = await api.get({
+            route: `assets/${asset.assetId}`,
+          });
+
+          assetsArray[index].staking = assetResponse.data.asset.staking;
+        } catch (error) {
+          console.error(error);
+        }
+      }),
+    );
     return {
       data: { assets: assetsArray },
       error: '',

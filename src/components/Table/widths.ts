@@ -207,8 +207,12 @@ const assets = css`
     max-width: 10rem;
   }
   &:nth-child(6) {
-    min-width: 15rem;
-    max-width: 15rem;
+    min-width: 10rem;
+    max-width: 10rem;
+  }
+  &:nth-child(7) {
+    min-width: 10rem;
+    max-width: 10rem;
   }
 `;
 

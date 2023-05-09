@@ -1,9 +1,11 @@
 import { useExtension } from '@/contexts/extension';
 import api from '@/services/api';
+import { proposalsActiveResponse } from '@/services/requests/proposals/proposals';
 import { IAccountAsset, IAssetResponse, ICollectionList } from '@/types';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
+import { useQuery } from 'react-query';
 import Contract from '..';
 import { Container, Content, TitleContent } from './styles';
 
@@ -38,6 +40,10 @@ const ModalContract: React.FC<IModalContract> = ({
 }) => {
   const [assetsList, setAssetsLists] = useState<ICollectionList[]>([]);
   const [kassetsList, setKAssetsList] = useState<ICollectionList[]>([]);
+  const { data: proposalsActive } = useQuery(
+    'proposalsActive',
+    proposalsActiveResponse,
+  );
   const { extensionInstalled, connectExtension } = useExtension();
   const stakingRewardsType = {
     kfi: { label: 'Staking Claim (0)', value: 0, inputValue: 'KFI' },
@@ -198,7 +204,7 @@ const ModalContract: React.FC<IModalContract> = ({
         <Contract
           isModal={true}
           assetsList={assetsList}
-          proposalsList={[]}
+          proposalsList={proposalsActive || []}
           paramsList={[]}
           getAssets={getAssets}
           kAssets={kassetsList}

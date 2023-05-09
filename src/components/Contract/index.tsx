@@ -602,6 +602,7 @@ const Contract: React.FC<IContract> = ({
         <Select
           options={proposalsList}
           onChange={(value: any) => setProposalId(value?.value)}
+          zIndex={2}
         />
       </SelectContent>
     </SelectContainer>

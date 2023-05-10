@@ -60,7 +60,7 @@ const Validators: React.FC = () => {
     const localQuery = { ...router.query, page, limit };
     const validators = await api.get({
       route: 'validator/list',
-      query: localQuery,
+      query: { sort: 'elected', ...localQuery },
     });
 
     if (!validators.error) {

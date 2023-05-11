@@ -1,5 +1,6 @@
 import { useMobile } from '@/contexts/mobile';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
+import { setQueryAndRouter } from '@/utils';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { exportToCsv } from '@/utils/promiseFunctions';
 import { useRouter } from 'next/router';
@@ -92,31 +93,51 @@ const Table: React.FC<ITable> = ({
   const { isMobile, isTablet } = useMobile();
   const [loadingCsv, setLoadingCsv] = useState(false);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(defaultTotalPages);
   const [limit, setLimit] = useState<number>(10);
   const limits = [5, 10, 50, 100];
   const [scrollTop, setScrollTop] = useState<boolean>(false);
 
   const tableRequest = async (dataName: string | undefined): Promise<any> => {
-    const response = await request(page, limit);
-    if (!response.error && dataName) {
-      setTotalPages(response?.pagination?.totalPages || 1);
-      return response.data[dataName];
+    let responseFormatted = {};
+    try {
+      const response = await request(
+        Number(router.query?.page) || 1,
+        Number(router.query?.limit) || 10,
+      );
+      if (!response.error && dataName) {
+        responseFormatted = {
+          items: response.data[dataName],
+          totalPages: response?.pagination?.totalPages,
+        };
+        return responseFormatted;
+      }
+      setPage(1);
+      return [];
+    } catch (error) {
+      console.error(error);
     }
-    setPage(1);
-    return [];
   };
+
   const {
-    data: items,
+    data: response,
     isLoading,
     isFetching,
     refetch,
-  } = useQuery('items', () => tableRequest(dataName), onErrorHandler());
+  } = useQuery(
+    [
+      dataName || 'items',
+      router.query?.page,
+      router.query?.limit,
+      router.pathname,
+    ],
+    () => tableRequest(dataName),
+    onErrorHandler(),
+  );
 
   const props: ITableType = {
     type,
     pathname: router.pathname,
-    haveData: items?.length,
+    haveData: response?.items?.length,
   };
 
   useEffect(() => {
@@ -163,7 +184,7 @@ const Table: React.FC<ITable> = ({
 
   const handleClickCsv = async () => {
     setLoadingCsv(true);
-    await exportToCsv('transactions', items, router);
+    await exportToCsv('transactions', response?.items, router);
     setLoadingCsv(false);
   };
 
@@ -174,8 +195,8 @@ const Table: React.FC<ITable> = ({
   return (
     <>
       {typeof scrollUp === 'boolean' &&
-        typeof totalPages === 'number' &&
-        !!items && (
+        typeof response?.totalPages === 'number' &&
+        !!response?.items && (
           <FloatContainer>
             {dataName === 'transactions' && (
               <ExportContainer>
@@ -222,8 +243,14 @@ const Table: React.FC<ITable> = ({
                 {limits.map(value => (
                   <ItemContainer
                     key={value}
-                    onClick={() => setLimit(value)}
-                    active={value === limit}
+                    onClick={() => {
+                      setLimit(value);
+                      setQueryAndRouter(
+                        { ...router.query, limit: value.toString() },
+                        router,
+                      );
+                    }}
+                    active={value === (Number(router.query?.limit) || limit)}
                   >
                     {value}
                   </ItemContainer>
@@ -234,13 +261,14 @@ const Table: React.FC<ITable> = ({
         )}
       <ContainerView>
         <Container>
-          {((!isMobile && !isTablet) || !rowSections) && !!items?.length && (
-            <Header {...props} key={String(header)}>
-              {header.map((item, index) => {
-                return <span key={JSON.stringify(item)}>{item}</span>;
-              })}
-            </Header>
-          )}
+          {((!isMobile && !isTablet) || !rowSections) &&
+            !!response?.items?.length && (
+              <Header {...props} key={String(header)}>
+                {header.map((item, index) => {
+                  return <span key={JSON.stringify(item)}>{item}</span>;
+                })}
+              </Header>
+            )}
           <Body {...props} data-testid="table-body" autoUpdate={!!interval}>
             {(interval ? isLoading : isFetching) && (
               <>
@@ -258,9 +286,9 @@ const Table: React.FC<ITable> = ({
               </>
             )}
             {(!isFetching || interval) &&
-              items &&
-              items?.length > 0 &&
-              items?.map((item: any, index: number) => {
+              response?.items &&
+              response?.items?.length > 0 &&
+              response?.items?.map((item: any, index: number) => {
                 let spanCount = 0;
                 return (
                   <React.Fragment key={JSON.stringify(item) + String(index)}>
@@ -304,7 +332,7 @@ const Table: React.FC<ITable> = ({
               })}
           </Body>
 
-          {!isFetching && (!items || items?.length === 0) && (
+          {!isFetching && (!response?.items || response?.items?.length === 0) && (
             <>
               <RetryContainer onClick={() => refetch()} loading={isFetching}>
                 <span>Retry</span>
@@ -321,15 +349,30 @@ const Table: React.FC<ITable> = ({
         </BackTopButton>
       </ContainerView>
       {typeof scrollUp === 'boolean' &&
-        typeof totalPages === 'number' &&
-        totalPages > 1 && (
+        typeof response?.totalPages === 'number' &&
+        response?.totalPages > 1 && (
           <PaginationContainer>
             <Pagination
               scrollUp={scrollUp}
-              count={totalPages}
-              page={page}
+              count={response?.totalPages}
+              page={Number(router.query?.page) || page}
               onPaginate={page => {
                 setPage(page);
+                if (page === 1) {
+                  const updatedQuery = { ...router.query };
+                  delete updatedQuery.page;
+                  setQueryAndRouter(
+                    {
+                      ...updatedQuery,
+                    },
+                    router,
+                  );
+                } else {
+                  setQueryAndRouter(
+                    { ...router.query, page: page.toString() },
+                    router,
+                  );
+                }
               }}
             />
           </PaginationContainer>

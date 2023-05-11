@@ -319,7 +319,10 @@ const Block: React.FC<IBlockPage> = ({ block }) => {
     headers: tableHeaders,
     onClick: header => {
       setSelectedTab(header);
-      setQueryAndRouter({ ...router.query, tab: header }, router);
+      const updatedQuery = { ...router.query };
+      delete updatedQuery.page;
+      delete updatedQuery.limit;
+      setQueryAndRouter({ ...updatedQuery, tab: header }, router);
     },
   };
 

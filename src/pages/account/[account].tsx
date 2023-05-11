@@ -588,7 +588,16 @@ const Account: React.FC<IAccountPage> = () => {
     headers,
     onClick: header => {
       setSelectedTab(header);
-      setQueryAndRouter({ ...router.query, tab: header }, router);
+      const updatedQuery = { ...router.query };
+      delete updatedQuery.page;
+      delete updatedQuery.limit;
+      setQueryAndRouter(
+        {
+          ...updatedQuery,
+          tab: header,
+        },
+        router,
+      );
     },
     dateFilterProps: {
       resetDate: resetQueryDate,

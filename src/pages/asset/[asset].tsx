@@ -1096,11 +1096,11 @@ const Asset: React.FC<IAssetPage> = ({}) => {
     headers: tableHeaders,
     onClick: header => {
       setSelectedTab(header);
-      const a = {
-        ...router.query,
-      };
-      delete a.sortBy;
-      setQueryAndRouter({ ...a, tab: header }, router);
+      const updatedQuery = { ...router.query };
+      delete updatedQuery.sortBy;
+      delete updatedQuery.page;
+      delete updatedQuery.limit;
+      setQueryAndRouter({ ...updatedQuery, tab: header }, router);
     },
     dateFilterProps,
     showDataFilter: false,

@@ -6,11 +6,11 @@ import ProposalsTab from '@/components/Tabs/Proposals';
 import api from '@/services/api';
 import { IResponse } from '@/types';
 import { IParsedProposal, IProposalsResponse } from '@/types/proposals';
+import { setQueryAndRouter } from '@/utils';
 import { getProposalNetworkParams } from '@/utils/networkFunctions';
 import { Header } from '@/views/accounts/detail';
 import { Card } from '@/views/blocks';
 import { CardContainer, Container } from '@/views/proposals';
-import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
@@ -34,14 +34,10 @@ const Proposals: React.FC = () => {
     parsedProposalResponse = parseAllProposals(proposals?.data?.proposals);
     return { ...proposals, data: { proposals: parsedProposalResponse } };
   };
-  const setQueryAndRouter = (newQuery: NextParsedUrlQuery): void => {
-    router.push({ pathname: router.pathname, query: newQuery }, undefined, {
-      shallow: true,
-    });
-  };
+
   useEffect(() => {
     if (!router.isReady) return;
-    setQueryAndRouter({ ...router.query });
+    setQueryAndRouter({ ...router.query }, router);
     setSelectedTab((router.query.tab as string) || tableHeaders[0]);
   }, [router.isReady]);
 
@@ -81,8 +77,11 @@ const Proposals: React.FC = () => {
   const tabProps: ITabs = {
     headers: tableHeaders,
     onClick: header => {
-      setSelectedTab(header),
-        setQueryAndRouter({ ...router.query, tab: header });
+      setSelectedTab(header);
+      const updatedQuery = { ...router.query };
+      delete updatedQuery.page;
+      delete updatedQuery.limit;
+      setQueryAndRouter({ ...updatedQuery, tab: header }, router);
     },
   };
 

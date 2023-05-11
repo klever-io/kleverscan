@@ -122,6 +122,7 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
     const precision = 6;
 
     const getPositiveVotes = () => {
+      if (!votes) return;
       let parsedPosVotes = votes['0'] / 10 ** precision;
       if (parsedPosVotes < 0.000001 || isNaN(parsedPosVotes)) {
         parsedPosVotes = 0;

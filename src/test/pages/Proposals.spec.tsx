@@ -34,6 +34,14 @@ const router1 = () => {
   };
 };
 
+const router2 = () => {
+  return {
+    route: '/',
+    pathname: '',
+    query: { page: 2 },
+  };
+};
+
 jest.mock('next/router', () => {
   return {
     __esModule: true,
@@ -114,6 +122,14 @@ describe('test proposals page', () => {
     const page2 = screen.getByText('2');
     await waitFor(() => {
       fireEvent.click(page2);
+      mockRouter.useRouter = () =>
+        ({
+          asPath: '',
+          basePath: '',
+          isLocaleDomain: false,
+          push: jest.fn(),
+          ...router2(),
+        } as unknown as CustomRouter);
     });
     expect(page1Proposal).not.toBeInTheDocument();
     page2Proposal = screen.getByText(/0\/3,000,000/);

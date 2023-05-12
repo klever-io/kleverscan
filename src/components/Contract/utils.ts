@@ -193,7 +193,7 @@ const precisionParse = async (
       }
       break;
     case 'VoteContract':
-      payload.amount = payload.amount * KLV_PRECISION;
+      payload.amount = addPrecision(payload.amount, KLV_PRECISION);
       break;
     case 'CreateAssetContract':
       precision = payload.precision || 0;

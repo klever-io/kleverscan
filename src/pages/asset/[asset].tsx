@@ -428,7 +428,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
             <strong>Staking Type</strong>
           </span>
           <span>
-            {asset ? parseApr(asset?.staking.interestType) : <Skeleton />}
+            {asset ? parseApr(asset?.staking?.interestType) : <Skeleton />}
           </span>
         </Row>
       </>

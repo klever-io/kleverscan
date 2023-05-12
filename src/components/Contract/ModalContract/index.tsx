@@ -58,7 +58,7 @@ const ModalContract: React.FC<IModalContract> = ({
 
   const getKAssets = async (address: string) => {
     const response: IAssetResponse = await api.get({
-      route: `assets/kassets`,
+      route: `assets/list`,
       query: {
         owner: address,
         limit: 10000,
@@ -85,6 +85,9 @@ const ModalContract: React.FC<IModalContract> = ({
   const getAssets = async () => {
     if (typeof window !== 'undefined') {
       const address = sessionStorage.getItem('walletAddress') || '';
+      if (!address) {
+        return;
+      }
 
       getKAssets(address);
 

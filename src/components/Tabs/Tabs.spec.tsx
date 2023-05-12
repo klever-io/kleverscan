@@ -1,5 +1,5 @@
-import { assetsRequest } from '@/pages/account/[account]';
 import api from '@/services/api';
+import { assetsRequest } from '@/services/requests/account/account';
 import { act, screen } from '@testing-library/react';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -55,23 +55,29 @@ const tableHeaders = ['Assets', 'Transactions'];
 describe('Component: Tabs', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    const router1 = () => {
+      return {
+        route: '/',
+        pathname: '',
+        query: {
+          account:
+            'klv18slsv4v8yxdarvvyxdwgvdeqwrna899k2vcshlrlc4xjuyjlhveqv78t8s',
+        },
+      };
+    };
 
-    jest.mock('next/router', () => ({
-      useRouter() {
-        return {
-          route: '/',
-          pathname: '',
-        };
-      },
-    }));
+    jest.mock('next/router', () => {
+      return {
+        __esModule: true,
+        useRouter: jest.fn().mockImplementation(router1),
+      };
+    });
   });
 
   it('Should render the Assets Tab correctly', async () => {
     const router = useRouter();
     const getRequest = (page: number, limit: number): Promise<any> => {
-      const address = router.query.account as string;
-
-      return assetsRequest(address)(page, limit);
+      return assetsRequest(router.query.account as string)(page, limit);
     };
     const mockAssetsTableProps = {
       scrollUp: false,

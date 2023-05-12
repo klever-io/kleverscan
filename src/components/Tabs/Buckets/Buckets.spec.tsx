@@ -1,5 +1,5 @@
-import { getRequestBuckets } from '@/pages/account/[account]';
 import api from '@/services/api';
+import { bucketsRequest } from '@/services/requests/account/account';
 import { parseAddress } from '@/utils/parseValues';
 import { screen } from '@testing-library/react';
 import * as nextRouter from 'next/router';
@@ -91,7 +91,7 @@ describe('Component: Buckets Tab', () => {
     const bucketsTableProps = {
       scrollUp: true,
       dataName: 'buckets',
-      request: getRequestBuckets(address),
+      request: bucketsRequest(address),
       query: router.query,
     };
 
@@ -133,7 +133,7 @@ describe('Component: Buckets Tab', () => {
     const bucketsTableProps = {
       scrollUp: true,
       dataName: 'buckets',
-      request: getRequestBuckets(address),
+      request: bucketsRequest(address),
       query: router.query,
     };
 
@@ -158,7 +158,7 @@ describe('Component: Buckets Tab', () => {
     const bucketsTableProps = {
       scrollUp: true,
       dataName: 'buckets',
-      request: getRequestBuckets(address),
+      request: bucketsRequest(address),
       query: router.query,
     };
     const delegationAddress =

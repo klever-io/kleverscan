@@ -115,7 +115,7 @@ export const parseITOs = async (
   const assetsInput: string = ITOs.map(ITO => ITO.assetId).join(',');
   const packsPrecisionCalls: Promise<IITO>[] = [];
   const res = await api.get({
-    route: `assets/kassets?asset=${assetsInput}`,
+    route: `assets/list?asset=${assetsInput}`,
   });
   if (!res.error || res.error === '') {
     const assets = res.data.assets;
@@ -164,7 +164,7 @@ const ITOsPage: React.FC = () => {
     const assetsInput: string = ITOs.map(ITO => ITO.assetId).join(',');
     const packsPrecisionCalls: Promise<IITO>[] = [];
     const res = await api.get({
-      route: `assets/kassets?asset=${assetsInput}`,
+      route: `assets/list?asset=${assetsInput}`,
     });
     if (!res.error || res.error === '') {
       const assets = res.data.assets;

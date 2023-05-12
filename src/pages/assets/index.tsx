@@ -80,7 +80,7 @@ const Assets: React.FC = () => {
 
     const localQuery = { ...router.query, page, limit };
     return api.get({
-      route: `assets/kassets`,
+      route: `assets/list`,
       query: localQuery,
     });
   };

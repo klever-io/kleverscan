@@ -77,11 +77,8 @@ const Proposals: React.FC = () => {
   const tabProps: ITabs = {
     headers: tableHeaders,
     onClick: header => {
-      setSelectedTab(header);
-      const updatedQuery = { ...router.query };
-      delete updatedQuery.page;
-      delete updatedQuery.limit;
-      setQueryAndRouter({ ...updatedQuery, tab: header }, router);
+      setSelectedTab(header),
+        setQueryAndRouter({ ...router.query, tab: header }, router);
     },
   };
 

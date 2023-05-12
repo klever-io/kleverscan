@@ -30,7 +30,7 @@ const Tabs: React.FC<ITabs> = ({
   useEffect(() => {
     if (!router.isReady) return;
     setSelected(getSelectedTab(router.query.tab, headers));
-  }, [router.isReady, router.query]);
+  }, [router.isReady, router.query, headers]);
 
   return (
     <Container>

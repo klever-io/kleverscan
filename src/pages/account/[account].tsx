@@ -24,24 +24,30 @@ import {
 } from '@/components/TransactionsFilters/styles';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
-import api, { IPrice } from '@/services/api';
+import { IPrice } from '@/services/api';
+import {
+  accountAssetsOwnerCall,
+  accountCall,
+  assetsRequest,
+  bucketsRequest,
+  KFIAllowancePromise,
+  KLVAllowancePromise,
+  ownedAssetsRequest,
+  pricesCall,
+  transactionsRequest,
+} from '@/services/requests/account/account';
 import {
   IAccount,
   IAccountAsset,
-  IAssetOne,
-  IAssetResponse,
-  IAssetsBuckets,
   IInnerTableProps,
   IPagination,
   IResponse,
   ITransaction,
-  Service,
 } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { filterDate } from '@/utils/formatFunctions';
-import { KLV_PRECISION, UINT32_MAX } from '@/utils/globalVariables';
+import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
-import { getPrecision } from '@/utils/precisionFunctions';
 import { resetDate } from '@/utils/resetDate';
 import {
   AmountContainer,
@@ -62,6 +68,7 @@ import { FilterByDate } from '@/views/transactions';
 import { ReceiveBackground } from '@/views/validator';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
 
 export interface IStakingRewards {
   label: string;
@@ -90,404 +97,66 @@ interface IPriceResponse extends IResponse {
   symbols: IPrice[];
 }
 
-interface IAllowanceResponse extends IResponse {
+export interface IAllowanceResponse extends IResponse {
   data: {
     result: { allowance: number; stakingRewards: number };
   };
 }
 
-interface IQueryParams {
-  page?: number;
-  limit?: number;
-  startDate?: string;
-  endDate?: string;
-  tab?: string;
-  sender?: '' | 'receiver' | 'sender';
-}
-
-export const assetsRequest = (
-  address: string,
-): ((page: number, limit: number) => Promise<IResponse>) => {
-  const requestAssets = async (
-    page: number,
-    limit: number,
-  ): Promise<IResponse> => {
-    const accountResponse = await api.get({
-      route: `address/${address}`,
-    });
-    if (accountResponse.error) {
-      return {
-        data: { assets: null },
-        error: 'request failed',
-        code: 'error',
-      };
-    }
-
-    const assets: IAccountAsset[] = accountResponse.data.account.assets;
-
-    if (!Object.keys(assets).length) {
-      return {
-        data: { assets: null },
-        error: 'request failed',
-        code: 'error',
-      };
-    }
-
-    const assetsArray = Object.keys(assets).map(asset => {
-      return assets[asset];
-    });
-
-    await Promise.all(
-      assetsArray.map(async (asset, index) => {
-        try {
-          const assetResponse: IAssetOne = await api.get({
-            route: `assets/${asset.assetId}`,
-          });
-
-          assetsArray[index].staking = assetResponse.data.asset.staking;
-        } catch (error) {
-          console.error(error);
-        }
-      }),
-    );
-    return {
-      data: { assets: assetsArray },
-      error: '',
-      code: '',
-    };
-  };
-
-  return requestAssets;
-};
-
-export const ownedAssetsRequest = (
-  address: string,
-): ((page: number, limit: number) => Promise<IResponse>) => {
-  const requestAssets = async (
-    page: number,
-    limit: number,
-  ): Promise<IResponse> => {
-    const ownedAssetsResponse: IAssetResponse = await api.get({
-      route: 'assets/kassets',
-      query: { owner: `${address}`, page, limit },
-    });
-
-    if (ownedAssetsResponse.error) {
-      return {
-        data: { assets: null },
-        error: 'request failed',
-        code: 'error',
-      };
-    }
-
-    return ownedAssetsResponse;
-  };
-
-  return requestAssets;
-};
-
-export const getRequestBuckets = (
-  address: string,
-): ((page: number, limit: number) => Promise<IResponse | []>) => {
-  const requestBuckets = async (
-    page: number,
-    limit: number,
-  ): Promise<IResponse | []> => {
-    const accountResponse: IAccountResponse = await api.get({
-      route: `address/${address}`,
-    });
-    if (!accountResponse) return [];
-    const bucketsTable: IAssetsBuckets[] = [];
-    const assets = accountResponse?.data?.account?.assets || {};
-    Object.keys(assets).forEach(asset => {
-      const assetHasUnstakedBucket = assets[asset]?.buckets?.find(
-        bucket => bucket.unstakedEpoch !== UINT32_MAX,
-      );
-
-      const getDetails = async () => {
-        const details = await api.get({
-          route: `assets/${assets[asset]?.assetId}`,
-        });
-        if (details.error === '') {
-          assets[asset]['minEpochsToWithdraw'] =
-            details?.data?.asset?.staking?.minEpochsToWithdraw;
-        }
-      };
-
-      if (assetHasUnstakedBucket) {
-        getDetails();
-      }
-      if (assets?.[asset]?.buckets?.length) {
-        assets?.[asset].buckets?.forEach(bucket => {
-          if (
-            bucket.unstakedEpoch === UINT32_MAX &&
-            assets?.[asset].assetId.length < 64
-          ) {
-            bucket['availableEpoch'] = asset['minEpochsToWithdraw']
-              ? bucket.unstakedEpoch + asset['minEpochsToWithdraw']
-              : '--';
-          } else {
-            bucket['availableEpoch'] = bucket.unstakedEpoch + 2; // Default for KLV and KFI
-          }
-          const assetBucket = {
-            asset: { ...assets[asset] },
-            bucket: { ...bucket },
-          };
-          bucketsTable.push(assetBucket);
-        });
-      }
-    });
-    return { data: { buckets: bucketsTable }, code: 'successful', error: '' };
-  };
-  return requestBuckets;
-};
-
 const Account: React.FC<IAccountPage> = () => {
-  const [account, setAccount] = useState<IAccount | null>(null);
-  const [priceKLV, setPriceKLV] = useState<number>(0);
-  const [KLVAllowance, setKLVAllowance] = useState<IAllowanceResponse>(
-    {} as IAllowanceResponse,
-  );
-  const [KFIAllowance, setKFIAllowance] = useState<IAllowanceResponse>(
-    {} as IAllowanceResponse,
-  );
-  const [hasProprietaryAssets, setHasProprietaryAssets] =
-    useState<boolean>(false);
-
-  const getHeaders = () => {
-    const headers = ['Assets', 'Transactions', 'Buckets'];
-    if (hasProprietaryAssets) {
-      headers.splice(1, 0, 'Proprietary Assets');
-    }
-    return headers;
-  };
-  const headers = getHeaders();
-
+  const headers = ['Assets', 'Transactions', 'Buckets'];
   const [openModalTransactions, setOpenModalTransactions] =
     useState<boolean>(false);
   const [titleModal, setTitleModal] = useState<string>('');
   const [stakingRewards, setStakingRewards] = useState<number>(0);
-  const [selectedTab, setSelectedTab] = useState<string>(headers[0]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [contractValue, setContractValue] = useState<string>('');
   const [collectionSelected, setCollectionSelected] = useState<IAccountAsset>();
   const [valueContract, setValueContract] = useState<any>();
-
   const { walletAddress, extensionInstalled, connectExtension } =
     useExtension();
   const { isTablet } = useMobile();
+  const { data: priceCall, isLoading: isLoadingPriceCall } = useQuery(
+    ['pricesCall'],
+    pricesCall,
+  );
   const router = useRouter();
 
-  const initialQueryState = {
-    ...router.query,
+  const { data: account, isLoading: isLoadingAccount } = useQuery({
+    queryKey: [`account`, router.query.account],
+    queryFn: () => accountCall(router),
+    enabled: !!router?.isReady,
+  });
+
+  const { data: KLVAllowance, isLoading: isLoadingKLVAllowance } = useQuery({
+    queryKey: [`KLVAllowance`, router.query.account],
+    queryFn: () => KLVAllowancePromise(router.query.account as string),
+    enabled: !!router?.isReady,
+  });
+
+  const { data: KFIAllowance, isLoading: isLoadingKFIAllowance } = useQuery({
+    queryKey: [`KFIAllowance`, router.query.account],
+    queryFn: () => KFIAllowancePromise(router.query.account as string),
+    enabled: !!router?.isReady,
+  });
+
+  const { data: hasProprietaryAssets } = useQuery({
+    queryKey: [`hasProprietaryAssets`, router.query.account],
+    queryFn: () => accountAssetsOwnerCall(router.query.account as string),
+    enabled: !!router?.isReady,
+  });
+
+  const getHeaders = () => {
+    if (hasProprietaryAssets) {
+      headers.splice(1, 0, 'Proprietary Assets');
+    }
   };
+  getHeaders();
 
   useEffect(() => {
     if (extensionInstalled) {
       connectExtension();
     }
   }, [extensionInstalled]);
-
-  useEffect(() => {
-    if (!router.isReady) return;
-    setSelectedTab((router.query.tab as string) || headers[0]);
-    setQueryAndRouter(initialQueryState, router);
-  }, [router.isReady]);
-
-  useEffect(() => {
-    if (!router.isReady) return;
-    const fetchData = async () => {
-      const address = router.query.account as string;
-
-      setLoading(true);
-      const emptyAccount: IAccount = {
-        address: address,
-        nonce: 0,
-        balance: 0,
-        frozenBalance: 0,
-        allowance: 0,
-        permissions: [],
-        timestamp: new Date().getTime(),
-        assets: {},
-      };
-
-      const accountLength = 62;
-
-      if (!address || address.length !== accountLength) {
-        return router.push('/404');
-      }
-      const accountCall = new Promise<IAccountResponse>(
-        async (resolve, reject) => {
-          const res = await api.get({
-            route: `address/${address}`,
-          });
-
-          if (!res.error || res.error === '') {
-            resolve(res);
-          }
-          if (res.error === 'cannot find account in database') {
-            res.data = emptyAccount;
-            setAccount(emptyAccount);
-            resolve(res);
-          }
-          if (
-            res.error.includes('could not create address from provided param')
-          ) {
-            return router.push('/404');
-          }
-
-          reject(res.error);
-        },
-      );
-
-      const pricesCall = new Promise<IPriceResponse>(
-        async (resolve, reject) => {
-          const res = await api.post({
-            route: 'prices',
-            service: Service.PRICE,
-            body: { names: ['KLV/USD'] },
-            useApiProxy: true,
-          });
-
-          if (!res.error || res.error === '') {
-            resolve(res);
-          }
-
-          reject(res.error);
-        },
-      );
-
-      const KLVAllowancePromise = new Promise<IAllowanceResponse>(resolve =>
-        resolve(
-          api.get({
-            route: `address/${address}/allowance?assetID=KLV`,
-            service: Service.PROXY,
-          }),
-        ),
-      );
-
-      const KFIAllowancePromise = new Promise<IAllowanceResponse>(resolve =>
-        resolve(
-          api.get({
-            route: `address/${address}/allowance?assetID=KFI`,
-            service: Service.PROXY,
-          }),
-        ),
-      );
-
-      const accountAssetsOwnerCall = new Promise<IAssetResponse>(
-        async (resolve, reject) => {
-          const res = await api.get({
-            route: 'assets/kassets',
-            query: { owner: `${address}` },
-          });
-          if (!res.error || res.error === '') {
-            resolve(res);
-          }
-
-          reject(res.error);
-        },
-      );
-
-      await Promise.allSettled([
-        accountCall,
-        pricesCall,
-        KLVAllowancePromise,
-        KFIAllowancePromise,
-        accountAssetsOwnerCall,
-      ]).then(responses => {
-        responses.forEach((res, index) => {
-          if (res.status === 'fulfilled') {
-            const { value }: any = res;
-            switch (index) {
-              case 0:
-                setAccount(value.data.account);
-                break;
-              case 1:
-                setPriceKLV(value.symbols[0].price);
-                break;
-              case 2:
-                setKLVAllowance(value);
-                break;
-              case 3:
-                setKFIAllowance(value);
-                break;
-              case 4:
-                setHasProprietaryAssets(value.data.assets.length > 0);
-              default:
-                break;
-            }
-          }
-        });
-      });
-      setLoading(false);
-    };
-
-    fetchData();
-  }, [router.query.account, router.isReady]);
-
-  const requestTransactions = async (page: number, limit: number) => {
-    const localQuery: IQueryParams = { ...router.query, page, limit };
-    delete localQuery.tab;
-    const transactionsResponse = await api.get({
-      route: `address/${router.query.account}/transactions`,
-      query: localQuery,
-    });
-
-    const assets: string[] = [];
-
-    transactionsResponse?.data?.transactions.forEach(
-      (transaction: ITransaction) => {
-        if (transaction.contract && transaction.contract.length) {
-          transaction.contract.forEach(contract => {
-            if (contract.parameter === undefined) return;
-
-            if ('assetId' in contract.parameter && contract.parameter.assetId) {
-              assets.push(contract.parameter.assetId);
-            }
-            if (
-              'currencyID' in contract.parameter &&
-              contract.parameter.currencyID
-            ) {
-              assets.push(contract.parameter.currencyID);
-            }
-          });
-        }
-      },
-    );
-
-    const assetPrecisions = await getPrecision(assets);
-
-    const parsedTransactions = transactionsResponse.data?.transactions?.map(
-      (transaction: ITransaction) => {
-        if (transaction.contract && transaction.contract.length) {
-          transaction.contract.forEach(contract => {
-            if (contract.parameter === undefined) return;
-
-            if ('assetId' in contract.parameter && contract.parameter.assetId) {
-              transaction.precision =
-                assetPrecisions[contract.parameter.assetId];
-            }
-            if (
-              'currencyID' in contract.parameter &&
-              contract.parameter.currencyID
-            ) {
-              transaction.precision =
-                assetPrecisions[contract.parameter.currencyID];
-            }
-          });
-        }
-        return transaction;
-      },
-    );
-
-    return {
-      ...transactionsResponse,
-      data: {
-        transactions: parsedTransactions,
-      },
-    };
-  };
 
   const calculateTotalKLV = useCallback(() => {
     // does not include Allowance and Staking
@@ -550,9 +219,18 @@ const Account: React.FC<IAccountPage> = () => {
   const getRequest = (page: number, limit: number): Promise<any> => {
     const address = router.query.account as string;
 
-    if (router.query.tab !== 'Proprietary Assets')
-      return assetsRequest(address)(page, limit);
-    else return ownedAssetsRequest(address)(page, limit);
+    switch (router.query.tab) {
+      case 'Assets':
+        return assetsRequest(address)(page, limit);
+      case 'Proprietary Assets':
+        return ownedAssetsRequest(address)(page, limit);
+      case 'Transactions':
+        return transactionsRequest(address, router.query)(page, limit);
+      case 'Buckets':
+        return bucketsRequest(address)(page, limit);
+      default:
+        return assetsRequest(address)(page, limit);
+    }
   };
 
   const assetsTableProps: IInnerTableProps = {
@@ -572,32 +250,21 @@ const Account: React.FC<IAccountPage> = () => {
   const transactionTableProps: IInnerTableProps = {
     scrollUp: false,
     dataName: 'transactions',
-    request: (page: number, limit: number) => requestTransactions(page, limit),
+    request: (page: number, limit: number) => getRequest(page, limit),
     query: router.query,
   };
 
   const bucketsTableProps: IInnerTableProps = {
     scrollUp: false,
     dataName: 'buckets',
-    request: (page: number, limit: number) =>
-      getRequestBuckets(router.query.account as string)(page, limit),
+    request: (page: number, limit: number) => getRequest(page, limit),
     query: router.query,
   };
 
   const tabProps: ITabs = {
     headers,
     onClick: header => {
-      setSelectedTab(header);
-      const updatedQuery = { ...router.query };
-      delete updatedQuery.page;
-      delete updatedQuery.limit;
-      setQueryAndRouter(
-        {
-          ...updatedQuery,
-          tab: header,
-        },
-        router,
-      );
+      setQueryAndRouter({ ...router.query, tab: header }, router);
     },
     dateFilterProps: {
       resetDate: resetQueryDate,
@@ -617,7 +284,7 @@ const Account: React.FC<IAccountPage> = () => {
   };
 
   const SelectedTabComponent: React.FC = () => {
-    switch (selectedTab) {
+    switch (router?.query?.tab || 'Assets') {
       case 'Assets':
         return (
           <>
@@ -669,7 +336,7 @@ const Account: React.FC<IAccountPage> = () => {
 
   const availableBalance = (account?.balance || 0) / 10 ** KLV_PRECISION;
   const totalKLV = calculateTotalKLV();
-  const pricedKLV = calculateTotalKLV() * priceKLV;
+  const pricedKLV = totalKLV * (priceCall || 0);
   const showInteractionsButtons = (
     title: string,
     valueContract: string,
@@ -691,7 +358,7 @@ const Account: React.FC<IAccountPage> = () => {
       }
     };
 
-    if (walletAddress === initialQueryState.account) {
+    if (walletAddress === router?.query?.account) {
       return (
         <ButtonModal
           isLocked={valueContract === '--' && true}
@@ -766,7 +433,7 @@ const Account: React.FC<IAccountPage> = () => {
 
   const getAccountAddress = () => {
     const address = router.query.account as string;
-
+    if (!address) return;
     if (isTablet && address) {
       return parseAddress(address, 15);
     }
@@ -820,14 +487,14 @@ const Account: React.FC<IAccountPage> = () => {
                 <div>
                   <div>
                     <span>
-                      {!loading ? (
+                      {!isLoadingAccount ? (
                         totalKLV.toLocaleString()
                       ) : (
                         <Skeleton height={19} />
                       )}
                     </span>
                     <p>
-                      {!loading ? (
+                      {!isLoadingAccount && !isLoadingPriceCall ? (
                         <>USD {pricedKLV.toLocaleString()}</>
                       ) : (
                         <Skeleton height={16} />
@@ -845,7 +512,7 @@ const Account: React.FC<IAccountPage> = () => {
                 <div>
                   <strong>Available</strong>
                   <span>
-                    {!loading ? (
+                    {!isLoadingAccount ? (
                       availableBalance.toLocaleString()
                     ) : (
                       <Skeleton height={19} />
@@ -855,7 +522,7 @@ const Account: React.FC<IAccountPage> = () => {
                 <div>
                   <strong>Frozen</strong>
                   <span>
-                    {!loading ? (
+                    {!isLoadingAccount ? (
                       getKLVfreezeBalance().toLocaleString()
                     ) : (
                       <Skeleton height={19} />
@@ -865,7 +532,7 @@ const Account: React.FC<IAccountPage> = () => {
                 <div>
                   <strong>Unfrozen</strong>
                   <span>
-                    {!loading ? (
+                    {!isLoadingAccount ? (
                       getKLVunfreezeBalance().toLocaleString()
                     ) : (
                       <Skeleton height={19} />
@@ -886,7 +553,7 @@ const Account: React.FC<IAccountPage> = () => {
               <FrozenContainer>
                 <StakingRewards>
                   <strong>Allowance</strong>
-                  {!loading ? (
+                  {!isLoadingKLVAllowance ? (
                     <>
                       <span>{getKLVAllowance().toLocaleString()}</span>
                       {showInteractionsButtons(
@@ -901,7 +568,7 @@ const Account: React.FC<IAccountPage> = () => {
                 </StakingRewards>
                 <StakingRewards>
                   <strong>KLV Staking</strong>
-                  {!loading ? (
+                  {!isLoadingKLVAllowance ? (
                     <>
                       <span>{getKLVStaking().toLocaleString()}</span>
                       {showInteractionsButtons(
@@ -916,7 +583,7 @@ const Account: React.FC<IAccountPage> = () => {
                 </StakingRewards>
                 <StakingRewards>
                   <strong>KFI Staking</strong>
-                  {!loading ? (
+                  {!isLoadingKFIAllowance ? (
                     <>
                       <span>{getKFIStaking().toLocaleString()}</span>
                       {showInteractionsButtons(
@@ -939,13 +606,13 @@ const Account: React.FC<IAccountPage> = () => {
           </span>
           <RowContent>
             <small>
-              {!loading ? account?.nonce : <Skeleton height={19} />}
+              {!isLoadingAccount ? account?.nonce : <Skeleton height={19} />}
             </small>
           </RowContent>
         </Row>
       </OverviewContainer>
       <Tabs {...tabProps}>
-        {selectedTab === 'Transactions' && (
+        {router?.query?.tab === 'Transactions' && (
           <TxsFiltersWrapper>
             <ContainerFilter>
               <TransactionsFilters

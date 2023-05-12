@@ -1,5 +1,5 @@
-import { assetsRequest } from '@/pages/account/[account]';
 import api from '@/services/api';
+import { assetsRequest } from '@/services/requests/account/account';
 import { screen } from '@testing-library/react';
 import * as nextRouter from 'next/router';
 import { useRouter } from 'next/router';
@@ -85,7 +85,7 @@ describe('Component: Assets Tab', () => {
         ({
           route: '/',
           pathname: `account/${address}`,
-          query: '',
+          query: { account: address },
           asPath: '',
           push: jest.fn(),
           events: {
@@ -101,9 +101,7 @@ describe('Component: Assets Tab', () => {
   it('Should render the Assets Tab correctly', async () => {
     const router = useRouter();
     const getRequest = (page: number, limit: number): Promise<any> => {
-      const address = router.query.account as string;
-
-      return assetsRequest(address)(page, limit);
+      return assetsRequest(router.query.account as string)(page, limit);
     };
     const mockAssetsTableProps = {
       scrollUp: false,

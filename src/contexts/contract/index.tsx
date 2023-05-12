@@ -129,7 +129,7 @@ export const ContractProvider: React.FC = ({ children }) => {
 
   const getKAssets = async (address: string) => {
     const response: IAssetResponse = await api.get({
-      route: `assets/kassets`,
+      route: `assets/list`,
       query: {
         owner: address,
         limit: 10000,

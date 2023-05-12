@@ -6,7 +6,8 @@ import { IAssetsBuckets, IInnerTableProps, IRowSection } from '@/types/index';
 import { parseAddress } from '@/utils/parseValues';
 import { CenteredRow, RowContent } from '@/views/accounts/detail';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useQuery } from 'react-query';
 import { ContractContainer, Status } from './styles';
 
 export interface IBuckets {
@@ -24,20 +25,17 @@ const Buckets: React.FC<IBuckets> = ({
   showInteractionsButtons,
 }) => {
   const UINT32_MAX = 4294967295;
-  const [epoch, setEpoch] = useState<number>(0);
   const { isMobile } = useMobile();
+
+  const { data: epoch } = useQuery('epoch', () => requestBlockEpoch());
 
   const requestBlockEpoch = async () => {
     const response = await api.get({
       route: 'block/list',
     });
     const currentEpoch = response.data?.blocks[0]?.epoch;
-    setEpoch(currentEpoch);
+    return currentEpoch;
   };
-
-  useEffect(() => {
-    requestBlockEpoch();
-  }, []);
 
   const rowSections = (assetBucket: IAssetsBuckets): IRowSection[] => {
     const { asset, bucket } = assetBucket;

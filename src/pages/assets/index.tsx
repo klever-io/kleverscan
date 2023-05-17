@@ -78,7 +78,7 @@ const Assets: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 100));
     }
 
-    const localQuery = { ...router.query, page, limit };
+    const localQuery = { ...router.query, page, limit, hidden: false };
     return api.get({
       route: `assets/list`,
       query: localQuery,

@@ -1,4 +1,3 @@
-import { useMobile } from '@/contexts/mobile';
 import { ReactPortal, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { IoIosClose } from 'react-icons/io';
@@ -28,11 +27,23 @@ const Tour: React.FC<ITourProps> = ({
   children,
 }) => {
   const [seen, setSeen] = useState(true);
+  const [width, setWidth] = useState(0);
   const tourContentRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<ReactPortal>();
   const backgroundRef = useRef<ReactPortal>();
   const contentRef = useRef<ReactPortal>();
-  const { width } = useMobile();
+
+  const handleResize = () => {
+    const width = window.innerWidth;
+    setWidth(width);
+  };
+
+  useEffect(() => {
+    const width = window.innerWidth;
+    window.addEventListener('resize', handleResize);
+    setWidth(width);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [handleResize]);
 
   const renderCondition =
     tourContentRef.current?.getBoundingClientRect() &&

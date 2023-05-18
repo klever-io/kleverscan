@@ -5,7 +5,6 @@ import {
   IAccountAsset,
   IAccountResponse,
   IAsset,
-  IAssetResponse,
   IAssetsBuckets,
   IBucket,
   IResponse,
@@ -105,7 +104,7 @@ export const ownedAssetsRequest = (
     page: number,
     limit: number,
   ): Promise<IResponse> => {
-    const ownedAssetsResponse: IAssetResponse = await api.get({
+    const ownedAssetsResponse = await api.get({
       route: 'assets/kassets',
       query: { owner: `${address}`, page, limit },
     });
@@ -117,8 +116,15 @@ export const ownedAssetsRequest = (
         code: 'error',
       };
     }
-
-    return ownedAssetsResponse;
+    const proprietaryAssets = {
+      data: {
+        proprietaryAssets: ownedAssetsResponse.data.assets,
+      },
+      error: '',
+      code: 'successful',
+      pagination: ownedAssetsResponse.pagination,
+    };
+    return proprietaryAssets;
   };
 
   return requestAssets;

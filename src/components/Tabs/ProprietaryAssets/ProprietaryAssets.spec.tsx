@@ -118,7 +118,7 @@ describe('Component: Assets Tab', () => {
 
     const mockAssetsTableProps = {
       scrollUp: false,
-      dataName: 'assets',
+      dataName: 'proprietaryAssets',
       request: (page: number, limit: number) => getRequest(page, limit),
       query: router.query,
     };

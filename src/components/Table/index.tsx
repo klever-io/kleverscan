@@ -124,12 +124,7 @@ const Table: React.FC<ITable> = ({
     isFetching,
     refetch,
   } = useQuery(
-    [
-      dataName || 'items',
-      router.query?.page,
-      router.query?.limit,
-      router.pathname,
-    ],
+    [dataName || 'items', JSON.stringify(router.query), router.pathname],
     () => tableRequest(dataName),
     onErrorHandler(),
   );
@@ -229,7 +224,7 @@ const Table: React.FC<ITable> = ({
             )}
             <IoReloadSharpWrapper
               onClick={() => refetch()}
-              loading={isFetching}
+              $loading={isFetching}
             >
               <Tooltip
                 msg="Refresh"
@@ -270,7 +265,7 @@ const Table: React.FC<ITable> = ({
               </Header>
             )}
           <Body {...props} data-testid="table-body" autoUpdate={!!interval}>
-            {(interval ? isLoading : isFetching) && (
+            {isLoading && (
               <>
                 {Array(limit)
                   .fill(limit)
@@ -285,8 +280,7 @@ const Table: React.FC<ITable> = ({
                   ))}
               </>
             )}
-            {(!isFetching || interval) &&
-              response?.items &&
+            {response?.items &&
               response?.items?.length > 0 &&
               response?.items?.map((item: any, index: number) => {
                 let spanCount = 0;

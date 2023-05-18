@@ -7,32 +7,43 @@ interface IMobile {
   handleMenu: () => void;
   closeMenu: () => void;
   mobileNavbarRef: React.MutableRefObject<HTMLDivElement | null>;
-  width: number;
 }
 
 export const Mobile = createContext({} as IMobile);
 
 export const MobileProvider: React.FC = ({ children }) => {
-  const [width, setWidth] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mobileNavbarRef = useRef<HTMLDivElement>(null);
 
-  const isMobile = width <= 768;
-  const isTablet = width <= 1025;
+  const isMobileCheck = (width: number) =>
+    width <= 768 ? setIsMobile(true) : setIsMobile(false);
+  const isTabletCheck = (width: number) =>
+    width <= 1025 ? setIsTablet(true) : setIsTablet(false);
 
-  const handleResize = () => setWidth(window.innerWidth);
+  const handleResize = () => {
+    const width = window.innerWidth;
+    isMobileCheck(width);
+    isTabletCheck(width);
+  };
+
+  useEffect(() => {
+    const width = window.innerWidth;
+    isMobileCheck(width);
+    isTabletCheck(width);
+  }, []);
 
   useEffect(() => {
     window.addEventListener('resize', handleResize);
-    setWidth(window.innerWidth);
     return () => window.removeEventListener('resize', handleResize);
   }, [handleResize]);
 
   useEffect(() => {
-    if (width > 1025) {
+    if (!isTablet) {
       setMobileMenuOpen(false);
     }
-  }, [width]);
+  }, [isTablet]);
 
   useEffect(() => {
     document.body.style.overflow = mobileMenuOpen ? 'hidden' : 'visible';
@@ -54,7 +65,6 @@ export const MobileProvider: React.FC = ({ children }) => {
   const values: IMobile = {
     isMobile,
     isTablet,
-    width,
     mobileMenuOpen,
     handleMenu,
     closeMenu,

@@ -24,7 +24,6 @@ import {
 } from '@/components/TransactionsFilters/styles';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
-import { IPrice } from '@/services/api';
 import {
   accountAssetsOwnerCall,
   accountCall,
@@ -36,14 +35,7 @@ import {
   pricesCall,
   transactionsRequest,
 } from '@/services/requests/account/account';
-import {
-  IAccount,
-  IAccountAsset,
-  IInnerTableProps,
-  IPagination,
-  IResponse,
-  ITransaction,
-} from '@/types/index';
+import { IAccountAsset, IInnerTableProps, IResponse } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { filterDate } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
@@ -80,23 +72,6 @@ interface IAccountPage {
   address: string;
 }
 
-interface IAccountResponse extends IResponse {
-  data: {
-    account: IAccount;
-  };
-}
-
-interface ITransactionsResponse extends IResponse {
-  data: {
-    transactions: ITransaction[];
-  };
-  pagination: IPagination;
-}
-
-interface IPriceResponse extends IResponse {
-  symbols: IPrice[];
-}
-
 export interface IAllowanceResponse extends IResponse {
   data: {
     result: { allowance: number; stakingRewards: number };
@@ -115,11 +90,12 @@ const Account: React.FC<IAccountPage> = () => {
   const { walletAddress, extensionInstalled, connectExtension } =
     useExtension();
   const { isTablet } = useMobile();
+  const router = useRouter();
+
   const { data: priceCall, isLoading: isLoadingPriceCall } = useQuery(
     ['pricesCall'],
     pricesCall,
   );
-  const router = useRouter();
 
   const { data: account, isLoading: isLoadingAccount } = useQuery({
     queryKey: [`account`, router.query.account],
@@ -216,48 +192,51 @@ const Account: React.FC<IAccountPage> = () => {
     }
   };
 
-  const getRequest = (page: number, limit: number): Promise<any> => {
-    const address = router.query.account as string;
+  const getRequest = useCallback(
+    (page: number, limit: number): Promise<any> => {
+      const address = router.query.account as string;
 
-    switch (router.query.tab) {
-      case 'Assets':
-        return assetsRequest(address)(page, limit);
-      case 'Proprietary Assets':
-        return ownedAssetsRequest(address)(page, limit);
-      case 'Transactions':
-        return transactionsRequest(address, router.query)(page, limit);
-      case 'Buckets':
-        return bucketsRequest(address)(page, limit);
-      default:
-        return assetsRequest(address)(page, limit);
-    }
-  };
+      switch (router.query.tab) {
+        case 'Assets':
+          return assetsRequest(address)(page, limit);
+        case 'Proprietary Assets':
+          return ownedAssetsRequest(address)(page, limit);
+        case 'Transactions':
+          return transactionsRequest(address, router.query)(page, limit);
+        case 'Buckets':
+          return bucketsRequest(address)(page, limit);
+        default:
+          return assetsRequest(address)(page, limit);
+      }
+    },
+    [router.query.account, router.query.tab, router.query],
+  );
 
   const assetsTableProps: IInnerTableProps = {
     scrollUp: false,
     dataName: 'assets',
     query: router.query,
-    request: (page: number, limit: number) => getRequest(page, limit),
+    request: getRequest,
   };
 
   const proprietaryAssetsTableProps: IInnerTableProps = {
     scrollUp: false,
-    dataName: 'assets',
+    dataName: 'proprietaryAssets',
     query: router.query,
-    request: (page: number, limit: number) => getRequest(page, limit),
+    request: getRequest,
   };
 
   const transactionTableProps: IInnerTableProps = {
     scrollUp: false,
     dataName: 'transactions',
-    request: (page: number, limit: number) => getRequest(page, limit),
+    request: getRequest,
     query: router.query,
   };
 
   const bucketsTableProps: IInnerTableProps = {
     scrollUp: false,
     dataName: 'buckets',
-    request: (page: number, limit: number) => getRequest(page, limit),
+    request: getRequest,
     query: router.query,
   };
 

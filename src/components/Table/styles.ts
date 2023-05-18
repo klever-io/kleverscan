@@ -528,7 +528,7 @@ const rotate = keyframes`
 `;
 
 export const IoReloadSharpWrapper = styled.div<{
-  loading: boolean;
+  $loading: boolean;
 }>`
   margin-left: auto;
   margin-right: 0.5rem;
@@ -543,7 +543,7 @@ export const IoReloadSharpWrapper = styled.div<{
     margin-left: auto;
     color: ${props =>
       props.theme.dark ? props.theme.black : props.theme.darkText};
-    animation: ${props => (props.loading ? rotate : 'none')} 1s linear infinite;
+    animation: ${props => (props.$loading ? rotate : 'none')} 1s linear infinite;
   }
 `;
 

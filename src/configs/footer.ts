@@ -90,7 +90,7 @@ const contents: IContent[] = [
     ],
   },
   {
-    title: 'Donate to Klever',
+    title: 'Donate to KleverScan',
     infoLinks: [
       {
         name: 'KLV',

@@ -28,7 +28,6 @@ import {
   VotesFooter,
   VotesHeader,
 } from '@/views/validator';
-import { fromUnixTime } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import Chart, { ChartType } from '../Chart';
 import Skeleton from '../Skeleton';
@@ -67,13 +66,11 @@ const ValidatorCards: React.FC<IValidatorCards> = ({
       : (totalStake || 0) / (maxDelegation || 1)) * 100;
 
   const uptime = new Date().getTime();
-  const [age, setAge] = useState(
-    getAge(fromUnixTime(new Date().getTime() / 1000)),
-  );
+  const [age, setAge] = useState(getAge(new Date()));
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const newAge = getAge(fromUnixTime(uptime / 1000));
+      const newAge = getAge(new Date(uptime / 1000));
 
       setAge(newAge);
     }, 1 * 1000); // 1 sec

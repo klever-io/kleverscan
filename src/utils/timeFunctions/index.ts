@@ -6,7 +6,16 @@ import { TFunction } from 'next-i18next';
  * @param t
  * @returns string
  */
-export const getAge = (date: Date, t?: TFunction): string => {
+export const getAge = (dateInput: Date, t?: TFunction): string => {
+  let date = dateInput;
+  while (new Date(date).getFullYear() < 2000) {
+    date = new Date(date.getTime() * 10 ** 3);
+  }
+
+  while (new Date(date).getFullYear() > 3000) {
+    date = new Date(date.getTime() / 10 ** 3);
+  }
+
   const diff = Math.abs(new Date().getTime() - date.getTime());
   const sec = Math.floor(diff / 1000);
   const min = Math.floor(diff / (1000 * 60));

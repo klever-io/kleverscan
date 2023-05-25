@@ -30,7 +30,6 @@ import {
   TableHeader,
   UpdateContainer,
 } from '@/views/blocks';
-import { fromUnixTime } from 'date-fns';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
 
@@ -178,13 +177,11 @@ const Blocks: React.FC<IBlocks> = () => {
 
   const CardContent: React.FC<ICard> = ({ title, headers, values }) => {
     const [uptime] = useState(new Date().getTime());
-    const [age, setAge] = useState(
-      getAge(fromUnixTime(new Date().getTime() / 1000)),
-    );
+    const [age, setAge] = useState(getAge(new Date()));
 
     useEffect(() => {
       const interval = setInterval(() => {
-        const newAge = getAge(fromUnixTime(uptime / 1000));
+        const newAge = getAge(new Date(uptime));
 
         setAge(newAge);
       }, 1 * 1000); // 1 sec

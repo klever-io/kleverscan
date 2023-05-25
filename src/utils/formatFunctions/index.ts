@@ -1,14 +1,23 @@
 import { ISelectedDays } from '@/components/DateFilter';
 import { IFilterDater } from '@/types';
-import { format, fromUnixTime } from 'date-fns';
+import { format } from 'date-fns';
 
 /**
  * given a timestamp returns a human readable date string in the format MM/dd/yyyy HH:mm
  * @param timestamp number
  * @returns a formatted date in a string type
  */
-export const formatDate = (timestamp: number): string =>
-  format(fromUnixTime(timestamp / 1000), 'MM/dd/yyyy HH:mm');
+export const formatDate = (timestamp: number): string => {
+  while (new Date(timestamp).getFullYear() < 2000) {
+    timestamp = timestamp * 10 ** 3;
+  }
+
+  while (new Date(timestamp).getFullYear() > 3000) {
+    timestamp = timestamp / 10 ** 3;
+  }
+
+  return format(new Date(timestamp), 'MM/dd/yyyy HH:mm');
+};
 
 /**
  * Formats a number and returns it's string representation in short scale (Million, Billion...) with 2 decimals points when number is not integer.

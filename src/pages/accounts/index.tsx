@@ -13,7 +13,6 @@ import { getAge } from '@/utils/timeFunctions';
 import { TableContainer } from '@/views/accounts';
 import { CenteredRow } from '@/views/accounts/detail';
 import { Card, CardContainer, Container, Header } from '@/views/blocks';
-import { fromUnixTime } from 'date-fns';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
@@ -125,13 +124,11 @@ const Accounts: React.FC<IAccounts> = () => {
 
   const CardContent: React.FC<ICard> = ({ title, headers, values }) => {
     const [uptime] = useState(new Date().getTime());
-    const [age, setAge] = useState(
-      getAge(fromUnixTime(new Date().getTime() / 1000)),
-    );
+    const [age, setAge] = useState(getAge(new Date()));
 
     useEffect(() => {
       const interval = setInterval(() => {
-        const newAge = getAge(fromUnixTime(uptime / 1000));
+        const newAge = getAge(new Date(uptime / 1000));
 
         setAge(newAge);
       }, 1 * 1000); // 1 sec

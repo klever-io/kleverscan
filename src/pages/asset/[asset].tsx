@@ -9,6 +9,7 @@ import { EmptyRow, Status } from '@/components/Table/styles';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Holders from '@/components/Tabs/Holders';
 import Transactions from '@/components/Tabs/Transactions';
+import Tooltip from '@/components/Tooltip';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import {
   ContainerFilter,
@@ -16,18 +17,23 @@ import {
   TxsFiltersWrapper,
 } from '@/components/TransactionsFilters/styles';
 import { useExtension } from '@/contexts/extension';
+import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import {
+  IAPR,
   IAsset,
   IAssetOne,
   IAssetPage,
   IAssetPool,
   IAssetPoolResponse,
   IBalance,
+  IFPR,
   IHoldersResponse,
   IITOResponse,
+  IKDAFPR,
   IPagination,
   IParsedITO,
+  IStaking,
   ITransactionResponse,
   IUri,
 } from '@/types/index';
@@ -35,6 +41,7 @@ import { parseApr, setQueryAndRouter } from '@/utils';
 import { filterDate, formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseHardCodedInfo, parseHolders } from '@/utils/parseValues';
+import { getPrecision } from '@/utils/precisionFunctions';
 import { resetDate } from '@/utils/resetDate';
 import { timestampToDate } from '@/utils/timeFunctions';
 import {
@@ -50,12 +57,25 @@ import {
   ContentRow,
   ContentScrollBar,
   EllipsisSpan,
+  EpochDepositsWrapper,
+  EpochGeneralData,
+  EpochWrapper,
   ExpandableRow,
   ExpandWrapper,
+  FallbackFPRRow,
+  FPRFrozenContainer,
+  FPRRow,
   FrozenContainer,
   Header,
+  HistoryWrapper,
   HoverAnchor,
+  NoDepositsContainer,
+  PaginationHistory,
   Row,
+  ShowDetailsButton,
+  StakingHeader,
+  StakingHeaderSpan,
+  StakingHistoryTitle,
   UriContainer,
   WhiteListRow,
 } from '@/views/assets/detail';
@@ -77,16 +97,22 @@ const Asset: React.FC<IAssetPage> = ({}) => {
   const [assetPool, setAssetPool] = useState<null | IAssetPool>(null);
   const [expand, setExpand] = useState({ whitelist: false, packs: false });
   const [txHash, setTxHash] = useState('');
+  const [FPRIndex, setFPRIndex] = useState<number>(3);
 
+  const { isMobile } = useMobile();
   const [holderQuery, setHolderQuery] = useState<string>('');
   const [transactionsPagination, setTransactionsPagination] =
     useState<null | IPagination>(null);
   const [holdersPagination, setHoldersPagination] =
     useState<null | IPagination>(null);
-  const cardHeaders = ['Overview', 'More', 'Staking & Royalties'];
+  const cardHeaders = ['Overview', 'More'];
   asset?.uris && cardHeaders.push('URIS');
   assetPool && cardHeaders.push('KDA Pool');
   ITO && cardHeaders.push('ITO');
+  cardHeaders.push('Staking & Royalties');
+  if (asset?.staking?.interestType === 'FPRI') {
+    asset?.staking && cardHeaders.push('Staking History');
+  }
 
   const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
 
@@ -167,6 +193,41 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       return { ...response, data: { accounts: parsedHolders } };
     }
     return { data: { accounts: [] } };
+  };
+
+  const getFPRDepositsPrecisions = async (
+    asset: IAsset,
+  ): Promise<{ [assetId: string]: number }> => {
+    const assetsToSearch: string[] = [];
+    asset.staking.fpr.forEach((data: IFPR) => {
+      data.kda.forEach((kda: IKDAFPR) => {
+        assetsToSearch.push(kda.kda);
+      });
+    });
+    return getPrecision(assetsToSearch);
+  };
+
+  const addPrecisionsToFPRDeposits = (
+    asset: IAsset,
+    precisions: { [assetId: string]: number },
+  ) => {
+    asset.staking.fpr.forEach((data: IFPR) => {
+      data.totalAmount = data.totalAmount / 10 ** KLV_PRECISION;
+      data.TotalClaimed = data.TotalClaimed / 10 ** KLV_PRECISION;
+      data.totalStaked = data.totalStaked / 10 ** asset.precision;
+      data.precision = asset.precision;
+      data.kda.forEach((kda: IKDAFPR) => {
+        let precision = 0;
+        Object.entries(precisions).forEach(([assetTicker, assetPrecision]) => {
+          if (assetTicker === kda.kda) {
+            precision = assetPrecision;
+          }
+        });
+        kda.totalAmount = kda.totalAmount / 10 ** precision;
+        kda.totalClaimed = kda.totalClaimed / 10 ** precision;
+        kda.precision = precision;
+      });
+    });
   };
 
   const loadInitialData = async () => {
@@ -255,6 +316,12 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                 const asset = res.value as IAssetOne;
                 const parsedAsset = parseHardCodedInfo([asset?.data?.asset])[0];
                 parseURIs(parsedAsset);
+                if (parsedAsset?.staking?.interestType === 'FPRI') {
+                  const precisions = await getFPRDepositsPrecisions(
+                    parsedAsset,
+                  );
+                  addPrecisionsToFPRDeposits(parsedAsset, precisions);
+                }
                 setAsset(parsedAsset);
                 break;
               case 1:
@@ -876,41 +943,27 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         <ContentRow>
           <strong>{asset?.staking?.apr.length > 0 ? 'APR' : 'FPR'}</strong>
           <ContentScrollBar>
-            {asset?.staking.interestType === 'FPRI'
-              ? asset?.staking.fpr.reverse().map((fpr, index) => (
-                  <span key={index}>
-                    <p>
-                      Total Staked:{' '}
-                      {toLocaleFixed(
-                        (fpr.totalStaked || 0) / 10 ** asset?.precision,
-                        asset?.precision,
-                      )}
-                    </p>
-                    <p>Epoch: {fpr.epoch}</p>
-                    <p>
-                      Total KLV Amount:{' '}
-                      {toLocaleFixed(
-                        (fpr.totalAmount || 0) / 10 ** KLV_PRECISION,
-                        asset?.precision,
-                      )}
-                    </p>
-                    <p>
-                      Total KLV Claimed:{' '}
-                      {toLocaleFixed(
-                        (fpr.TotalClaimed || 0) / 10 ** KLV_PRECISION,
-                        asset?.precision,
-                      )}
-                    </p>
-                  </span>
-                ))
-              : asset?.staking.apr.reverse().map((apr, index) => (
-                  <span key={index}>
-                    <p>Timestamp: {formatDate(apr.timestamp)}</p>
-                    <p>
-                      Value: {toLocaleFixed((apr.value || 0) / 10 ** 2, 2)}%
-                    </p>
-                  </span>
-                ))}
+            {asset?.staking.interestType === 'FPRI' ? (
+              <ShowDetailsButton
+                onClick={() => {
+                  const updatedQuery = { ...router.query };
+                  setSelectedCard('Staking History');
+                  setQueryAndRouter(
+                    { ...updatedQuery, card: 'Staking History' },
+                    router,
+                  );
+                }}
+              >
+                Show details
+              </ShowDetailsButton>
+            ) : (
+              asset?.staking.apr.reverse().map((apr, index) => (
+                <span key={index}>
+                  <p>Timestamp: {formatDate(apr.timestamp)}</p>
+                  <p>Value: {toLocaleFixed((apr.value || 0) / 10 ** 2, 2)}%</p>
+                </span>
+              ))
+            )}
           </ContentScrollBar>
         </ContentRow>
       );
@@ -1032,6 +1085,218 @@ const Asset: React.FC<IAssetPage> = ({}) => {
     );
   };
 
+  const renderHistoryContent = (historyArray: IFPR[], currentIndex: number) => (
+    <EpochWrapper>
+      <EpochGeneralData>
+        <div>
+          <strong>Epoch</strong>
+          <br />
+          <strong>{historyArray[currentIndex].epoch}</strong>
+        </div>
+        <StakingHeader>
+          <StakingHeaderSpan>
+            Total Staked of <br />
+            {asset?.name}
+            <br />
+            <strong>
+              {toLocaleFixed(
+                historyArray[currentIndex]?.totalStaked || 0,
+                historyArray[currentIndex].precision || 0,
+              )}
+            </strong>
+          </StakingHeaderSpan>
+        </StakingHeader>
+      </EpochGeneralData>
+    </EpochWrapper>
+  );
+
+  const renderStakingHistory = (historyArray: IFPR[], offset: number) => {
+    const elements: JSX.Element[] = [];
+    const fprLength = asset?.staking?.fpr?.length;
+    if (typeof fprLength !== 'number') {
+      return elements;
+    }
+
+    let currentIndex = fprLength - 1;
+    let indexEnd = fprLength - offset;
+
+    if (indexEnd < 0) {
+      indexEnd = 0;
+    }
+
+    for (currentIndex; currentIndex >= indexEnd; currentIndex--) {
+      const hasDataToRender =
+        !!historyArray[currentIndex]?.totalAmount ||
+        !!historyArray[currentIndex]?.TotalClaimed ||
+        historyArray[currentIndex]?.kda.length > 0;
+      elements.push(
+        hasDataToRender ? (
+          <FPRRow
+            key={historyArray[currentIndex].epoch}
+            isStakingRoyalties={false}
+          >
+            <HistoryWrapper>
+              {renderHistoryContent(historyArray, currentIndex)}
+              <EpochDepositsWrapper>
+                {(!!historyArray[currentIndex]?.totalAmount ||
+                  !!historyArray[currentIndex]?.TotalClaimed) && (
+                  <FPRFrozenContainer>
+                    <div>
+                      <strong>KDA</strong>
+                      <p>KLV</p>
+                    </div>
+                    <div>
+                      <strong>Total deposited</strong>
+                      {/* here is always KLV */}
+                      <p>
+                        {toLocaleFixed(
+                          historyArray[currentIndex]?.totalAmount,
+                          6,
+                        )}
+                      </p>
+                    </div>
+                    <div>
+                      <strong>Total claimed</strong>
+                      {/* here is always KLV */}
+                      <p>
+                        {toLocaleFixed(
+                          historyArray[currentIndex]?.TotalClaimed,
+                          6,
+                        )}
+                      </p>
+                    </div>
+                  </FPRFrozenContainer>
+                )}
+
+                {historyArray[currentIndex].kda.map((kda: IKDAFPR) => {
+                  return (
+                    <FPRFrozenContainer key={kda.kda}>
+                      <div>
+                        <strong>KDA</strong>
+                        <p>{kda.kda}</p>
+                      </div>
+                      <div>
+                        <strong>Total Deposited</strong>
+                        <p>
+                          {toLocaleFixed(kda?.totalAmount, kda.precision || 0)}
+                        </p>
+                      </div>
+                      <div>
+                        <strong>Total claimed</strong>
+                        <p>
+                          {toLocaleFixed(kda?.totalClaimed, kda.precision || 0)}
+                        </p>
+                      </div>
+                    </FPRFrozenContainer>
+                  );
+                })}
+              </EpochDepositsWrapper>
+            </HistoryWrapper>
+          </FPRRow>
+        ) : (
+          <FPRRow isStakingRoyalties={false}>
+            <FallbackFPRRow>
+              <HistoryWrapper>
+                <EpochDepositsWrapper>
+                  {renderHistoryContent(historyArray, currentIndex)}
+                </EpochDepositsWrapper>
+              </HistoryWrapper>
+              <NoDepositsContainer>
+                {asset?.assetId === 'KLV' || asset?.assetId === 'KFI' ? (
+                  <p>
+                    There are no deposits for KLV or KFI.
+                    <br /> They occur automatically through Kleverchain.
+                  </p>
+                ) : (
+                  <p>No deposits in this epoch.</p>
+                )}
+              </NoDepositsContainer>
+            </FallbackFPRRow>
+          </FPRRow>
+        ),
+      );
+    }
+    return elements;
+  };
+
+  const showDefaultItems = () => {
+    setFPRIndex(3);
+    window.scrollTo(0, 0);
+  };
+
+  const renderFPRHeaderMsg = () => {
+    if (asset?.assetId !== 'KLV' && asset?.assetId !== 'KFI') {
+      return (
+        <>
+          {isMobile ? (
+            <Tooltip
+              msg={`Below are the last epochs where there might be deposits of any asset in the ${asset?.name}'s FPR Pool`}
+            />
+          ) : (
+            <p>
+              Below are the last epochs where there might be deposits of any
+              asset in the {`${asset?.name}'s`} FPR Pool.
+            </p>
+          )}
+        </>
+      );
+    }
+    return (
+      <>
+        {isMobile ? (
+          <Tooltip
+            msg={`Below is the registry of the last 100 epochs of ${asset?.name} total staking.`}
+          />
+        ) : (
+          <p>
+            {`Below is the registry of the last 100 epochs of ${asset?.name} total staking.`}
+          </p>
+        )}
+      </>
+    );
+  };
+
+  const FPRHistory: React.FC<IFPR[]> = fpr => {
+    return (
+      <>
+        <StakingHistoryTitle>
+          <strong>Flexible Proportional Return - FPR</strong>
+          {renderFPRHeaderMsg()}
+        </StakingHistoryTitle>
+        {renderStakingHistory(fpr, FPRIndex)}
+        {!((asset?.staking?.fpr?.length || 0) - FPRIndex <= 0) && (
+          <PaginationHistory
+            onClick={() => setFPRIndex(asset?.staking?.fpr?.length || 0)}
+          >
+            <strong>Show more</strong>
+          </PaginationHistory>
+        )}
+        {!!((asset?.staking?.fpr?.length || 0) - FPRIndex <= 0) &&
+          !!((asset?.staking?.fpr?.length || 0) > 3) && (
+            <PaginationHistory onClick={() => showDefaultItems()}>
+              <strong>Show less</strong>
+            </PaginationHistory>
+          )}
+      </>
+    );
+  };
+
+  const APRHistory: React.FC<IAPR[]> = apr => {
+    return <></>;
+  };
+
+  interface IStakingHistoryProps {
+    staking: IStaking | undefined;
+  }
+
+  const StakingHistory: React.FC<IStakingHistoryProps> = ({ staking }) => {
+    if (!staking) return null;
+    if (asset?.staking.interestType === 'APRI') {
+      return APRHistory(staking.apr as IAPR[]);
+    }
+    return FPRHistory(staking.fpr as IFPR[]);
+  };
+
   const SelectedComponent: React.FC = () => {
     switch (selectedCard) {
       case 'Overview':
@@ -1046,6 +1311,8 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         return <ITOComponent />;
       case 'KDA Pool':
         return <KDAPool />;
+      case 'Staking History':
+        return <StakingHistory staking={asset?.staking} />;
       default:
         return <div />;
     }

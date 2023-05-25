@@ -546,6 +546,7 @@ export const klvAsset: IAsset = {
         totalStaked: 213000000000,
         TotalClaimed: 0,
         epoch: 0,
+        kda: [],
       },
     ],
     apr: [],

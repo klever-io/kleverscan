@@ -284,6 +284,28 @@ export interface IRole {
   hasRoleSetITOPrices: boolean;
 }
 
+export interface IAPR {
+  timestamp: number;
+  epoch: number;
+  value: number;
+}
+
+export interface IKDAFPR {
+  kda: string;
+  totalAmount: number;
+  totalClaimed: number;
+  precision?: number;
+}
+
+export interface IFPR {
+  totalAmount: number;
+  totalStaked: number;
+  TotalClaimed: number;
+  epoch: number;
+  precision?: number;
+  kda: IKDAFPR[];
+}
+
 export interface IStaking {
   interestType: string;
   minEpochsToWithdraw: number;
@@ -301,6 +323,7 @@ export interface IStaking {
     totalStaked: number;
     TotalClaimed: number;
     epoch: number;
+    kda: IKDAFPR[];
   }[];
   currentFPRAmount: number;
   minEpochsToClaim: number;

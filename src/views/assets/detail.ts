@@ -132,7 +132,6 @@ export const Row = styled.div<{ isStakingRoyalties: boolean }>`
     }
   }
   display: flex;
-
   flex-direction: row;
   align-items: center;
 
@@ -178,6 +177,16 @@ export const Row = styled.div<{ isStakingRoyalties: boolean }>`
       color: ${props => props.theme.darkText};
       font-weight: 400;
     }
+  }
+`;
+
+export const FPRRow = styled(Row)`
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    align-items: center;
   }
 `;
 
@@ -352,7 +361,7 @@ export const FrozenContainer = styled.div`
     p {
       font-weight: 400;
       font-size: 15px;
-      min-width: 200px;
+      min-width: 50px;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -371,6 +380,13 @@ export const FrozenContainer = styled.div`
         width: auto;
       }
     }
+  }
+`;
+
+export const FPRFrozenContainer = styled(FrozenContainer)`
+  margin: 0.5rem;
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+    min-width: 26rem;
   }
 `;
 export const ContentRow = styled.div`
@@ -455,5 +471,170 @@ export const EllipsisSpan = styled.span`
     @media (min-width: ${props => props.theme.breakpoints.mobile}) {
       width: 100%;
     }
+  }
+`;
+
+export const StakingHistoryTitle = styled.div`
+  background-color: ${props => props.theme.card.border};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2.5rem;
+  border-radius: 10px 10px 0 0;
+  max-height: 92px;
+  flex-direction: column;
+  gap: 0.3rem;
+  color: ${props => props.theme.darkText};
+  strong {
+    font-weight: 600;
+    font-size: larger;
+    color: ${props => props.theme.darkText};
+    margin-right: 0.2rem;
+  }
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-direction: row;
+    padding: 1.5rem;
+    max-height: 68px;
+    gap: 0;
+  }
+`;
+
+export const PaginationHistory = styled(StakingHistoryTitle)`
+  border-radius: 0;
+  padding: 1.5rem;
+  max-height: 30px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  strong {
+    font-size: medium;
+  }
+  :hover {
+    cursor: pointer;
+  }
+`;
+
+export const TitleWrapper = styled.div`
+  display: flex;
+
+  span:nth-child(2) {
+    margin-left: 1.5rem;
+    margin-right: 1.5rem;
+
+    padding: 0.5rem;
+    background-color: rgb(98, 99, 162);
+    border-radius: 5px;
+  }
+`;
+
+export const StakingHeader = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  color: ${props => props.theme.black};
+  p,
+  strong {
+    font-weight: 600;
+    font-size: larger;
+  }
+`;
+
+export const StakingHeaderSpan = styled.span`
+  padding-left: 0 !important;
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    padding-left: 0 !important;
+  }
+`;
+
+export const NoDepositsContainer = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-direction: row;
+    min-width: 26rem;
+  }
+
+  p {
+    text-align: center;
+  }
+`;
+export const FallbackFPRRow = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: stretch;
+  flex-direction: column;
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-direction: row;
+    width: initial;
+  }
+`;
+
+export const HistoryWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+  align-items: stretch;
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-direction: column;
+  }
+`;
+
+export const EpochDepositsWrapper = styled.div`
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+    display: flex;
+    justify-content: flex-start;
+    overflow: auto;
+  }
+`;
+
+export const EpochWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  span {
+    &:first-child {
+      @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+        min-width: 11rem;
+      }
+    }
+    &:nth-child(2) {
+      margin-left: 1rem;
+    }
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: ${props => props.theme.shadow};
+
+    strong {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: ${props => props.theme.shadow};
+    }
+  }
+`;
+
+export const EpochGeneralData = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  justify-content: center;
+  gap: 2rem;
+  min-height: 182px;
+  height: 100%;
+  background-color: ${props => props.theme.lightBlue};
+  border-radius: 10px;
+  text-align: center;
+  margin: 0.5rem;
+  color: ${props => props.theme.true.white};
+`;
+
+export const ShowDetailsButton = styled.button`
+  font-weight: 600;
+  color: ${props =>
+    props.theme.dark ? props.theme.black : props.theme.footer.border};
+  :hover {
+    text-decoration: underline;
   }
 `;

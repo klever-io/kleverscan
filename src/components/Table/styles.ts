@@ -25,7 +25,8 @@ export interface ITableType {
     | 'votes'
     | 'delegations'
     | 'nfts'
-    | 'validatorsList';
+    | 'validatorsList'
+    | 'rewards';
   haveData?: number;
   pathname?: string;
   rowSections?: boolean;

@@ -479,6 +479,20 @@ const validatorsList = css`
   }
 `;
 
+const rewards = css`
+  margin-right: 1.25rem;
+
+  &:nth-child(1) {
+    min-width: 12rem;
+    max-width: 15rem;
+  }
+
+  &:nth-child(2) {
+    min-width: 20rem;
+    max-width: 30rem;
+  }
+`;
+
 const widths = {
   transactions,
   blocks,
@@ -496,6 +510,7 @@ const widths = {
   delegations,
   nfts,
   validatorsList,
+  rewards,
 };
 
 export default widths;

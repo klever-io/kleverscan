@@ -14,7 +14,9 @@ import Tabs, { ITabs } from '@/components/Tabs';
 import Assets from '@/components/Tabs/Assets';
 import Buckets from '@/components/Tabs/Buckets';
 import ProprietaryAssets from '@/components/Tabs/ProprietaryAssets';
+import Rewards from '@/components/Tabs/Rewards';
 import Transactions from '@/components/Tabs/Transactions';
+import Tooltip from '@/components/Tooltip/index';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import {
   ContainerFilter,
@@ -33,6 +35,7 @@ import {
   KLVAllowancePromise,
   ownedAssetsRequest,
   pricesCall,
+  rewardsFPRPool,
   transactionsRequest,
 } from '@/services/requests/account/account';
 import { IAccountAsset, IInnerTableProps, IResponse } from '@/types/index';
@@ -45,12 +48,19 @@ import {
   AmountContainer,
   BalanceContainer,
   ButtonModal,
+  CardContainer,
+  CardContent,
+  CardHeader,
+  CardHeaderItem,
   CenteredRow,
   Container,
   ContainerTabInteractions,
   FrozenContainer,
+  FrozenContainerPermissions,
   Header,
   IconContainer,
+  ItemContainerPermissions,
+  ItemContentPermissions,
   OverviewContainer,
   Row,
   RowContent,
@@ -79,7 +89,7 @@ export interface IAllowanceResponse extends IResponse {
 }
 
 const Account: React.FC<IAccountPage> = () => {
-  const headers = ['Assets', 'Transactions', 'Buckets'];
+  const headers = ['Assets', 'Transactions', 'Buckets', 'Rewards'];
   const [openModalTransactions, setOpenModalTransactions] =
     useState<boolean>(false);
   const [titleModal, setTitleModal] = useState<string>('');
@@ -87,6 +97,9 @@ const Account: React.FC<IAccountPage> = () => {
   const [contractValue, setContractValue] = useState<string>('');
   const [collectionSelected, setCollectionSelected] = useState<IAccountAsset>();
   const [valueContract, setValueContract] = useState<any>();
+  const tabHeaders = ['Overview'];
+  const [selectedTabHeader, setSelectedTabHeader] = useState(tabHeaders[0]);
+
   const { walletAddress, extensionInstalled, connectExtension } =
     useExtension();
   const { isTablet } = useMobile();
@@ -133,6 +146,10 @@ const Account: React.FC<IAccountPage> = () => {
       connectExtension();
     }
   }, [extensionInstalled]);
+
+  useEffect(() => {
+    setSelectedTabHeader(tabHeaders[0]);
+  }, [account, router.isReady]);
 
   const calculateTotalKLV = useCallback(() => {
     // does not include Allowance and Staking
@@ -205,6 +222,8 @@ const Account: React.FC<IAccountPage> = () => {
           return transactionsRequest(address, router.query)(page, limit);
         case 'Buckets':
           return bucketsRequest(address)(page, limit);
+        case 'Rewards':
+          return rewardsFPRPool(address)(page, limit);
         default:
           return assetsRequest(address)(page, limit);
       }
@@ -240,10 +259,26 @@ const Account: React.FC<IAccountPage> = () => {
     query: router.query,
   };
 
+  const rewardsTableProps: IInnerTableProps = {
+    scrollUp: false,
+    dataName: 'rewards',
+    request: (page: number, limit: number) => getRequest(page, limit),
+    query: router.query,
+  };
+
   const tabProps: ITabs = {
     headers,
     onClick: header => {
-      setQueryAndRouter({ ...router.query, tab: header }, router);
+      const updatedQuery = { ...router.query };
+      delete updatedQuery.page;
+      delete updatedQuery.limit;
+      setQueryAndRouter(
+        {
+          ...updatedQuery,
+          tab: header,
+        },
+        router,
+      );
     },
     dateFilterProps: {
       resetDate: resetQueryDate,
@@ -262,6 +297,16 @@ const Account: React.FC<IAccountPage> = () => {
     setQuery: setQueryAndRouter,
   };
 
+  const SelectedComponent: React.FC = () => {
+    switch (selectedTabHeader) {
+      case 'Overview':
+        return <Overview />;
+      case 'Permission':
+        return <Permission />;
+      default:
+        return <div />;
+    }
+  };
   const SelectedTabComponent: React.FC = () => {
     switch (router?.query?.tab || 'Assets') {
       case 'Assets':
@@ -308,6 +353,8 @@ const Account: React.FC<IAccountPage> = () => {
             showInteractionsButtons={showInteractionsButtons}
           />
         );
+      case 'Rewards':
+        return <Rewards rewardsTableProps={rewardsTableProps} />;
       default:
         return <div />;
     }
@@ -410,26 +457,88 @@ const Account: React.FC<IAccountPage> = () => {
     setValueContract: setValueContract,
   };
 
-  const getAccountAddress = () => {
-    const address = router.query.account as string;
+  const getAccountAddress = (address: string) => {
     if (!address) return;
     if (isTablet && address) {
       return parseAddress(address, 15);
     }
     return address && parseAddress(address, 50);
   };
+  (account?.permissions?.length || 0) > 0 && tabHeaders.push('Permission');
+  const Permission: React.FC = () => {
+    const msg = `Owner - This is the default permission, 
+    granting the holder the ability to execute all contracts.
+    The permission can be transferred to another person and
+    shared with a certain threshold and weight.
 
-  return (
-    <Container>
-      <ModalContract {...modalOptions} />
-      <Header>
-        <Title
-          title={account?.name ? account?.name : 'Account'}
-          Icon={AccountIcon}
-          route={'/accounts'}
-          isAccountOwner={!!account?.name}
-        />
-      </Header>
+     User - This permission allows the signer to execute only
+     those contracts explicitly authorized by the permission contract,
+     based on the weight assigned to their signature. 
+    `;
+    return (
+      <OverviewContainer>
+        {account?.permissions?.map(permission => {
+          return (
+            <Row key={permission.id}>
+              <span>
+                <strong>Signer</strong>
+              </span>
+              <RowContent>
+                <BalanceContainer>
+                  <FrozenContainerPermissions>
+                    <ItemContainerPermissions>
+                      <p>{getAccountAddress(permission.signers[0].address)}</p>
+                      <Copy
+                        info="Address"
+                        data={permission.signers[0].address}
+                      />
+                    </ItemContainerPermissions>
+                    <ItemContainerPermissions>
+                      <strong>Type</strong>
+                      <ItemContentPermissions>
+                        <p>{permission.type === 0 ? 'Owner' : 'User'}</p>
+                        <Tooltip msg={msg} />
+                      </ItemContentPermissions>
+                    </ItemContainerPermissions>
+                    <ItemContainerPermissions>
+                      <strong>PermID</strong>
+                      <ItemContentPermissions>
+                        <p>{permission.id}</p>
+                      </ItemContentPermissions>
+                    </ItemContainerPermissions>
+                    <ItemContainerPermissions>
+                      <strong>Weight</strong>
+                      <ItemContentPermissions>
+                        <p>{permission.signers[0].weight}</p>
+                      </ItemContentPermissions>
+                    </ItemContainerPermissions>
+                    <ItemContainerPermissions>
+                      <strong>Threshold</strong>
+                      <ItemContentPermissions>
+                        <p>{permission.Threshold}</p>
+                      </ItemContentPermissions>
+                    </ItemContainerPermissions>
+                    <ItemContainerPermissions>
+                      <strong>Operations</strong>
+                      <ItemContentPermissions>
+                        <p>{permission.operations || '--'}</p>
+                      </ItemContentPermissions>
+                    </ItemContainerPermissions>
+                    <ItemContentPermissions rowColumnMobile={true}>
+                      <strong>Permissions Name</strong>
+                      <p>{permission.permissionName || '--'}</p>
+                    </ItemContentPermissions>
+                  </FrozenContainerPermissions>
+                </BalanceContainer>
+              </RowContent>
+            </Row>
+          );
+        })}
+      </OverviewContainer>
+    );
+  };
+  const Overview: React.FC = () => {
+    return (
       <OverviewContainer>
         <Row isAddressRow={true}>
           <span>
@@ -437,7 +546,7 @@ const Account: React.FC<IAccountPage> = () => {
           </span>
           <RowContent>
             <CenteredRow>
-              <span>{getAccountAddress()}</span>
+              <span>{getAccountAddress(router.query.account as string)}</span>
               <Copy info="Address" data={router.query.account as string} />
               <ReceiveBackground>
                 <QrCodeModal
@@ -590,6 +699,38 @@ const Account: React.FC<IAccountPage> = () => {
           </RowContent>
         </Row>
       </OverviewContainer>
+    );
+  };
+
+  return (
+    <Container>
+      <ModalContract {...modalOptions} />
+      <Header>
+        <Title
+          title={account?.name ? account?.name : 'Account'}
+          Icon={AccountIcon}
+          route={'/accounts'}
+          isAccountOwner={!!account?.name}
+        />
+      </Header>
+      <CardContainer>
+        <CardHeader>
+          {tabHeaders.map((header, index) => (
+            <CardHeaderItem
+              key={String(index)}
+              selected={selectedTabHeader === header}
+              onClick={() => {
+                setSelectedTabHeader(header);
+              }}
+            >
+              <span>{header}</span>
+            </CardHeaderItem>
+          ))}
+        </CardHeader>
+        <CardContent>
+          <SelectedComponent />
+        </CardContent>
+      </CardContainer>
       <Tabs {...tabProps}>
         {router?.query?.tab === 'Transactions' && (
           <TxsFiltersWrapper>

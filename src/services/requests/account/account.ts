@@ -74,7 +74,7 @@ export const assetsRequest = (
 
     assetsToRequest = assetsToRequest.slice(0, -1);
     const allAccountAssets = await api.get({
-      route: `assets/kassets?page=${page}&limit${limit}&asset=${assetsToRequest}`,
+      route: `assets/list?page=${page}&limit${limit}&asset=${assetsToRequest}`,
     });
     if (!allAccountAssets.error || allAccountAssets.error === '') {
       assetsArray.forEach((asset: IAsset, index) => {
@@ -344,7 +344,7 @@ export const accountAssetsOwnerCall = async (
 ): Promise<boolean | undefined> => {
   try {
     const res = await api.get({
-      route: 'assets/kassets',
+      route: 'assets/list',
       query: { owner: `${address}` },
     });
     if (!res.error || res.error === '') {
@@ -354,4 +354,77 @@ export const accountAssetsOwnerCall = async (
   } catch (error) {
     console.error(error);
   }
+};
+
+export const rewardsFPRPool = (
+  address: string,
+): ((page: number, limit: number) => Promise<IResponse | []>) => {
+  const requestBuckets = async (
+    page: number,
+    limit: number,
+  ): Promise<IResponse | []> => {
+    const accountResponse: IAccountResponse = await api.get({
+      route: `address/${address}`,
+    });
+    if (!accountResponse) return [];
+    const bucketsTable: IAssetsBuckets[] = [];
+    const assets = accountResponse?.data?.account?.assets || {};
+    Object.keys(assets).forEach(asset => {
+      const assetHasUnstakedBucket = assets[asset]?.buckets?.find(
+        (bucket: IBucket) => bucket.unstakedEpoch !== UINT32_MAX,
+      );
+
+      const getDetails = async () => {
+        const details = await api.get({
+          route: `assets/${assets[asset]?.assetId}`,
+        });
+        if (details.error === '') {
+          assets[asset]['minEpochsToWithdraw'] =
+            details?.data?.asset?.staking?.minEpochsToWithdraw;
+        }
+      };
+
+      if (assetHasUnstakedBucket) {
+        getDetails();
+      }
+      if (assets?.[asset]?.buckets?.length) {
+        assets?.[asset].buckets?.forEach((bucket: IBucket) => {
+          if (
+            bucket.unstakedEpoch === UINT32_MAX &&
+            assets?.[asset].assetId.length < 64
+          ) {
+            bucket['availableEpoch'] = asset['minEpochsToWithdraw']
+              ? bucket.unstakedEpoch + asset['minEpochsToWithdraw']
+              : '--';
+          } else {
+            bucket['availableEpoch'] = bucket.unstakedEpoch + 2; // Default for KLV and KFI
+          }
+          const assetBucket = {
+            asset: { ...assets[asset] },
+            bucket: { ...bucket },
+          };
+          bucketsTable.push(assetBucket);
+        });
+      }
+    });
+    const assetIdBuckets = Array.from(
+      new Set(bucketsTable.map(assetBucket => assetBucket.asset.assetId)),
+    );
+    const responseAll = await Promise.all(
+      assetIdBuckets.map(async assetId => {
+        const res = await api.get({
+          route: `address/${address}/allowance?assetID=${assetId}`,
+        });
+        if (!res.error || res.error === '') {
+          return {
+            allowance: res.data.result.allowance,
+            allStakingRewards: res.data.result.allStakingRewards,
+            assetId,
+          };
+        }
+      }),
+    );
+    return { data: { rewards: responseAll }, code: 'successful', error: '' };
+  };
+  return requestBuckets;
 };

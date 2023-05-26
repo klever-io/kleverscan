@@ -296,3 +296,82 @@ export const AccountSkeletonContainer = styled.div`
   width: 100%;
   max-width: 30rem;
 `;
+
+export const CardHeader = styled.div`
+  display: flex;
+
+  flex-direction: row;
+`;
+
+export const CardContainer = styled.div`
+  margin-top: 2rem;
+
+  display: flex;
+
+  flex-direction: column;
+`;
+
+export const CardContent = styled.div`
+  background-color: ${props => props.theme.white};
+
+  border-radius: 0 0.75rem 0.75rem 0.75rem;
+`;
+
+export const CardHeaderItem = styled.div<{ selected: boolean }>`
+  padding: 1rem;
+
+  background-color: ${props =>
+    props.selected ? props.theme.white : 'transparent'};
+
+  border-radius: 0.75rem 0.75rem 0 0;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+
+  span {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: ${props => props.theme.black};
+
+    opacity: ${props => (props.selected ? 1 : 0.33)};
+
+    transition: 0.2s ease;
+  }
+`;
+
+export const FrozenContainerPermissions = styled(FrozenContainer)``;
+
+export const ItemContentPermissions = styled.div<{
+  rowColumnMobile?: boolean;
+}>`
+  display: flex;
+  align-items: center;
+  gap: 0.52rem;
+  span {
+    min-width: 24px !important;
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-direction: ${props =>
+      props.rowColumnMobile ? 'column' : 'row'} !important;
+  }
+`;
+
+export const ItemContainerPermissions = styled.div`
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    /* width: 14rem; */
+  }
+  gap: 0.25rem;
+  strong {
+    width: auto !important;
+  }
+`;
+
+export const RowContentFPRPoll = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+`;

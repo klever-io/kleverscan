@@ -57,7 +57,8 @@ export interface ITable {
     | 'votes'
     | 'delegations'
     | 'nfts'
-    | 'validatorsList';
+    | 'validatorsList'
+    | 'rewards';
 
   header: string[];
   rowSections?: (item: any) => IRowSection[] | undefined;

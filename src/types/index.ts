@@ -183,7 +183,19 @@ export interface IPeer {
   totalValidatorSuccessRate: ItotalValidatorSuccessRate;
   uris: IUri[];
 }
-
+export interface IPermissions {
+  id: number;
+  type: number;
+  permissionName: string;
+  Threshold: number;
+  operations: string;
+  signers: [
+    {
+      address: string;
+      weight: number;
+    },
+  ];
+}
 export interface IAccount {
   name?: string;
   address: string;
@@ -202,7 +214,7 @@ export interface IAccount {
   ];
   collection?: INfts[];
   timestamp: number;
-  permissions?: number[];
+  permissions?: IPermissions[];
 }
 
 export interface IAssetsBuckets {
@@ -259,6 +271,17 @@ export interface IProprietaryAsset {
   };
 }
 
+export interface IRewardsAssets {
+  allowance: number;
+  allStakingRewards: [
+    {
+      assetId: string;
+      precision: number;
+      rewards: number;
+    },
+  ];
+  assetId: string;
+}
 export interface IAssetsHoldersResponse extends IResponse {
   data: {
     accounts: IAccountAsset[];

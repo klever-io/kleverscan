@@ -27,6 +27,7 @@ export const TabContent = styled.div`
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: flex;
     margin: 2rem 1rem;
+    flex-wrap: wrap;
   }
 `;
 
@@ -47,6 +48,7 @@ export const ItemContainer = styled.div<{ selected: boolean }>`
   }
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: flex;
+    margin-bottom: ${props => (props.selected ? '0.5rem' : '')};
   }
 `;
 

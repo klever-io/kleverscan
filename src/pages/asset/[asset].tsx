@@ -1203,10 +1203,15 @@ const Asset: React.FC<IAssetPage> = ({}) => {
               </HistoryWrapper>
               <NoDepositsContainer>
                 {asset?.assetId === 'KLV' || asset?.assetId === 'KFI' ? (
-                  <p>
-                    There are no deposits for KLV or KFI.
-                    <br /> They occur automatically through Kleverchain.
-                  </p>
+                  <>
+                    <p>
+                      No deposits in this epoch.
+                      <br />
+                      <br />
+                      Deposits for KLV/KFI occur automatically from each
+                      transaction.
+                    </p>
+                  </>
                 ) : (
                   <p>No deposits in this epoch.</p>
                 )}
@@ -1230,7 +1235,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         <>
           {isMobile ? (
             <Tooltip
-              msg={`Below are the last epochs where there might be deposits of any asset in the ${asset?.name}'s FPR Pool`}
+              msg={`Below are the last epochs where there might be deposits of any asset in the ${asset?.name}'s FPR Pool.`}
             />
           ) : (
             <p>
@@ -1245,12 +1250,15 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       <>
         {isMobile ? (
           <Tooltip
-            msg={`Below is the registry of the last 100 epochs of ${asset?.name} total staking.`}
+            msg={`Below is the registry of the last 100 epochs of ${asset?.name} total staking.\nHave in mind that deposits for KLV/KFI occur automatically from each transaction.`}
           />
         ) : (
-          <p>
-            {`Below is the registry of the last 100 epochs of ${asset?.name} total staking.`}
-          </p>
+          <>
+            <p>
+              {`Below is the registry of the last 100 epochs of ${asset?.name} total staking.`}
+            </p>
+            <p>{`Have in mind that deposits for KLV/KFI occur automatically from each transaction.`}</p>
+          </>
         )}
       </>
     );

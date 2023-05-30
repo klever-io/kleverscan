@@ -4,8 +4,10 @@
 name: Node.js CI
 
 on:
+  push:
+    branches: ['staging']
   pull_request:
-    branches: ['develop']
+    branches: ['staging']
 
 jobs:
   build:
@@ -26,5 +28,4 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
       - run: yarn install --frozen-lockfile
-      - run: yarn build
-      - run: yarn test
+      - run: yarn semantic-release --no-ci

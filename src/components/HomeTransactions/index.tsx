@@ -1,6 +1,8 @@
 import Chart, { ChartType } from '@/components/Chart';
 import { useHomeData } from '@/contexts/mainPage';
 import api from '@/services/api';
+import { getContractType } from '@/utils';
+import { getPrecision } from '@/utils/precisionFunctions';
 import {
   ContainerTimeFilter,
   HomeLoaderContainer,
@@ -17,14 +19,21 @@ import { format } from 'date-fns';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
-import { IDailyTransaction } from '../../types';
+import { IDailyTransaction, ITransaction } from '../../types';
 import { HomeLoader } from '../Loader/styles';
-import TransactionItem from '../TransactionItem';
+import TransactionItem, {
+  IContract,
+  TransactionItemLoading,
+} from '../TransactionItem';
 
 const HomeTransactions: React.FC = () => {
   const filterDays = [1, 7, 15, 30];
   const { t } = useTranslation('transactions');
-  const { transactions } = useHomeData();
+  const { transactions: homeTransactions } = useHomeData();
+  const [transactions, setTransactions] =
+    useState<ITransaction[]>(homeTransactions);
+  const [loading, setLoading] = useState(false);
+
   const { t: commonT } = useTranslation('common');
   const [transactionsList, setTransactionsList] = useState<IDailyTransaction[]>(
     [],
@@ -50,6 +59,42 @@ const HomeTransactions: React.FC = () => {
 
     fetchTotalDays();
   }, [timeFilter]);
+
+  useEffect(() => {
+    const assetsIds = homeTransactions.map(({ contract }) => {
+      let contractFilter = {} as IContract;
+      contractFilter = contract[0] as IContract;
+      const assetId = contractFilter?.parameter?.assetId;
+      if (assetId) {
+        return assetId.split('/')[0];
+      }
+      return 'KLV';
+    });
+
+    const addPrecisions = async () => {
+      setLoading(true);
+      const precisions = await getPrecision(assetsIds);
+      const assetsPrecision = assetsIds.map(item => {
+        return precisions[item];
+      });
+      const newTxs = homeTransactions.map((obj, index) => {
+        const contractType = obj.contract[0].typeString;
+        const checkContract = getContractType(contractType);
+
+        if (checkContract) {
+          obj.contract[0] = {
+            ...obj.contract[0],
+            precision: assetsPrecision[index],
+          };
+        }
+
+        return obj;
+      });
+      setTransactions(newTxs);
+      setLoading(false);
+    };
+    addPrecisions();
+  }, [homeTransactions]);
 
   const getTransactionChartData = useCallback(() => {
     const sortedTransactionsList = transactionsList.sort(
@@ -83,15 +128,21 @@ const HomeTransactions: React.FC = () => {
 
       <TransactionContainer>
         <TransactionContent>
-          {transactions.length === 0 && (
+          {loading &&
+            Array.from(Array(10).keys()).map(key => (
+              <TransactionItemLoading key={key} />
+            ))}
+
+          {!loading &&
+            transactions?.map(transaction => (
+              <TransactionItem key={transaction.hash} {...transaction} />
+            ))}
+
+          {!loading && transactions.length === 0 && (
             <TransactionEmpty>
               <span>{commonT('EmptyData')}</span>
             </TransactionEmpty>
           )}
-
-          {transactions.map((transaction, index) => (
-            <TransactionItem key={String(index)} {...transaction} />
-          ))}
         </TransactionContent>
         <TransactionChart>
           <ContainerTimeFilter>

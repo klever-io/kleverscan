@@ -2,7 +2,6 @@ import { getStatusIcon } from '@/assets/status';
 import { getContractType } from '@/utils';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import { parseAddress } from '@/utils/parseValues';
-import { getPrecision } from '@/utils/precisionFunctions';
 import {
   TransactionAmount,
   TransactionData,
@@ -12,6 +11,7 @@ import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { ITransaction } from '../../types';
+import Skeleton from '../Skeleton';
 
 export interface IContract {
   type: number;
@@ -21,6 +21,7 @@ export interface IContract {
     assetId: string;
     toAddress: string;
   };
+  precision?: number;
 }
 
 const TransactionItem: React.FC<ITransaction> = ({
@@ -46,10 +47,10 @@ const TransactionItem: React.FC<ITransaction> = ({
   if (checkContract && !assetId) {
     assetId = 'KLV';
   }
+  const precision = contractFilter?.precision ?? 0;
 
   useEffect(() => {
     const getParams = async () => {
-      const precision = await getPrecision(assetId);
       if (contract) {
         if (contractFilter?.parameter?.amount) {
           setAmount(
@@ -72,7 +73,8 @@ const TransactionItem: React.FC<ITransaction> = ({
       return (
         <Link href={`/asset/${assetId || 'KLV'}`}>
           <a className="clean-style">
-            {amount} {assetId || 'KLV'}
+            {amount && `${amount} ${assetId || 'KLV'}`}
+            {!amount && <Skeleton />}
           </a>
         </Link>
       );
@@ -81,7 +83,7 @@ const TransactionItem: React.FC<ITransaction> = ({
   };
 
   return (
-    <TransactionRow>
+    <TransactionRow isLoading={!!amount}>
       <TransactionData>
         <a href={`/transaction/${hash}`}>
           {`${hash.slice(0, 15)}...`}
@@ -111,6 +113,30 @@ const TransactionItem: React.FC<ITransaction> = ({
       </TransactionData>
       <TransactionAmount>
         <span>{shouldRenderAssetId()}</span>
+      </TransactionAmount>
+    </TransactionRow>
+  );
+};
+
+export const TransactionItemLoading: React.FC = () => {
+  return (
+    <TransactionRow>
+      <TransactionData loading>
+        <a href="#">
+          <Skeleton width={200} />
+        </a>
+      </TransactionData>
+      <TransactionData loading>
+        <p>
+          <strong>
+            <Skeleton width={200} />
+          </strong>
+        </p>
+      </TransactionData>
+      <TransactionAmount>
+        <span>
+          <Skeleton width={200} />
+        </span>
       </TransactionAmount>
     </TransactionRow>
   );

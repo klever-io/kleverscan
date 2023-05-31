@@ -417,7 +417,7 @@ export const TransactionContent = styled.div`
   }
 `;
 
-export const TransactionRow = styled.div`
+export const TransactionRow = styled.div<{ isLoading?: boolean }>`
   display: flex;
 
   flex-direction: row;
@@ -435,6 +435,12 @@ export const TransactionRow = styled.div`
     &:hover {
       text-decoration: underline;
     }
+    ${props =>
+      props.isLoading &&
+      css`
+        display: flex;
+        justify-content: flex-end !important;
+      `}
   }
 `;
 
@@ -451,7 +457,7 @@ export const TransactionEmpty = styled(TransactionRow)`
   }
 `;
 
-export const TransactionData = styled.div`
+export const TransactionData = styled.div<{ loading?: boolean }>`
   margin-right: 2.5rem;
 
   display: flex;
@@ -498,6 +504,11 @@ export const TransactionData = styled.div`
 
   p {
     max-width: 10rem;
+    ${props =>
+      props.loading &&
+      css`
+        max-width: 15rem;
+      `}
 
     overflow: hidden;
 

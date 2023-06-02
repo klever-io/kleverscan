@@ -1,3 +1,4 @@
+import { TickSquare } from '@/assets/icons';
 import { default as DefaultInput } from '@/components/InputGlobal';
 import styled, { css } from 'styled-components';
 
@@ -359,34 +360,149 @@ export const FrozenContainerPermissions = styled(FrozenContainer)``;
 
 export const ItemContentPermissions = styled.div<{
   rowColumnMobile?: boolean;
+  isSignersRow?: boolean;
 }>`
   display: flex;
   align-items: center;
+  width: 100%;
   gap: 0.52rem;
   span {
     min-width: 24px !important;
     width: 24px !important;
     height: 24px !important;
   }
-
+  ${props =>
+    props.isSignersRow &&
+    css`
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      li {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.2rem;
+      }
+      ul {
+        width: 100%;
+      }
+    `}
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    flex-direction: ${props =>
-      props.rowColumnMobile ? 'column' : 'row'} !important;
+    ${props =>
+      props.rowColumnMobile &&
+      css`
+        flex-direction: column !important;
+        align-items: start !important;
+      `}
   }
 `;
 
-export const ItemContainerPermissions = styled.div`
+export const ItemContainerPermissions = styled.div<{ isOperations?: boolean }>`
+  display: flex;
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    /* width: 14rem; */
+    ${props =>
+      props.isOperations &&
+      css`
+        flex-direction: column !important;
+        align-items: flex-start !important;
+      `}
   }
   gap: 0.25rem;
   strong {
     width: auto !important;
+    min-width: 5rem;
   }
+`;
+
+export const OperationsContainer = styled.div`
+  display: flex;
+  position: relative;
+  align-items: center;
+  width: 100%;
+  justify-content: flex-start;
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  flex-wrap: wrap;
+  gap: 1rem;
+`;
+
+export const OperationsContent = styled.div<{ isChecked?: boolean }>`
+  gap: 0.5rem;
+  width: 16rem;
+  border-bottom: none !important;
+  padding: 0 !important;
+  p {
+    opacity: ${({ isChecked }) => !isChecked && 0.5};
+  }
+`;
+
+export const CheckboxOperations = styled.input`
+  height: 1rem;
+  width: 1rem;
+  background: none;
+  -webkit-appearance: none;
+  border-radius: 0.2rem;
+
+  ::before {
+    content: ${({ checked }) => (checked ? "''" : "'\\2715'")};
+    color: ${({ checked, theme }) =>
+      checked ? 'transparent' : theme.true.white};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: inherit;
+    height: inherit;
+    border-radius: inherit;
+    border: 0;
+    background-color: ${({ checked, theme }) =>
+      checked ? theme.green : theme.line.border};
+    opacity: ${({ checked }) => (checked ? 1 : 0.5)};
+    background-size: contain;
+    box-shadow: none;
+  }
+`;
+
+export const ButtonExpand = styled.button`
+  position: absolute;
+  padding: 0.7rem;
+  width: 6rem;
+  top: 0;
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    top: -3rem;
+  }
+  right: 0;
+  border-radius: 0.5rem;
+  background-color: ${props => props.theme.purple};
+  color: ${props => props.theme.true.white};
+`;
+
+export const FrozenContentRewards = styled.div`
+  width: 100%;
+  &:not(:last-child) {
+    border-bottom: 1px solid ${props => props.theme.card.border};
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
+`;
+
+export const ContainerSigners = styled(ItemContentPermissions)`
+  background-color: ${({ theme }) => theme.filter.signersPermission};
+  border-radius: 0.5rem;
+  padding: 0 !important;
 `;
 
 export const RowContentFPRPoll = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
+`;
+
+export const ValidOperation = styled(TickSquare).attrs(() => ({
+  size: 10,
+}))`
+  path {
+    fill: ${({ theme }) => theme.green};
+  }
 `;

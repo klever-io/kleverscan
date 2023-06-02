@@ -31,6 +31,11 @@ const darktheme = {
     background: '#0B0B1E',
   },
 
+  filter: {
+    ...theme.filter,
+    signersPermission: '#2a2b54',
+  },
+
   card: {
     ...theme.card,
     border: '#515395',

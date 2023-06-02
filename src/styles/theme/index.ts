@@ -97,6 +97,7 @@ const theme = {
 
   filter: {
     title: '#7B7DB2',
+    signersPermission: '#EBF1F7',
     titleFocused: '#FFFFFF',
 
     border: '#C6C7EB',

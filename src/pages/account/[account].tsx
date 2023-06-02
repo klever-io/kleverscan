@@ -40,30 +40,43 @@ import {
 } from '@/services/requests/account/account';
 import { IAccountAsset, IInnerTableProps, IResponse } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
-import { filterDate } from '@/utils/formatFunctions';
+import { contractsList } from '@/utils/contracts';
+import {
+  filterDate,
+  filterOperations,
+  hexToBinary,
+} from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import { resetDate } from '@/utils/resetDate';
 import {
   AmountContainer,
   BalanceContainer,
+  ButtonExpand,
+  ButtonModal,
   CardContainer,
   CardContent,
   CardHeader,
   CardHeaderItem,
   CenteredRow,
+  CheckboxOperations,
   Container,
+  ContainerSigners,
   ContainerTabInteractions,
   FrozenContainer,
   FrozenContainerPermissions,
+  FrozenContentRewards,
   Header,
   IconContainer,
   ItemContainerPermissions,
   ItemContentPermissions,
+  OperationsContainer,
+  OperationsContent,
   OverviewContainer,
   Row,
   RowContent,
   StakingRewards,
+  ValidOperation,
 } from '@/views/accounts/detail';
 import { FilterByDate } from '@/views/transactions';
 import { ReceiveBackground } from '@/views/validator';
@@ -86,6 +99,62 @@ export interface IAllowanceResponse extends IResponse {
     result: { allowance: number; stakingRewards: number };
   };
 }
+interface IPermissionOperations {
+  id: number;
+  operations: string;
+  type: number;
+}
+
+const PermissionOperations: React.FC<IPermissionOperations> = ({
+  operations,
+  type,
+}) => {
+  const [expanded, setExpanded] = useState(false);
+  const toggleExpand = () => {
+    setExpanded(!expanded);
+  };
+  const displayOperations = expanded
+    ? contractsList
+    : contractsList.slice(0, 6);
+
+  return (
+    <OperationsContainer>
+      {operations ? (
+        displayOperations.map((item: string, key: number) => {
+          const filterResults = filterOperations(hexToBinary(operations));
+          const isChecked = filterResults[key];
+          return (
+            <OperationsContent key={contractsList[key]} isChecked={isChecked}>
+              {isChecked ? (
+                <ValidOperation />
+              ) : (
+                <CheckboxOperations
+                  checked={isChecked}
+                  type="checkbox"
+                  disabled
+                />
+              )}
+              <p>{item}</p>
+            </OperationsContent>
+          );
+        })
+      ) : (
+        <>
+          {type === 0 &&
+            displayOperations.map((item, key) => (
+              <OperationsContent key={contractsList[key]}>
+                <ValidOperation />
+                <p>{item}</p>
+              </OperationsContent>
+            ))}
+        </>
+      )}
+      <ButtonExpand onClick={toggleExpand}>
+        {expanded ? 'Hide' : 'Expand'}
+      </ButtonExpand>
+    </OperationsContainer>
+  );
+};
 
 const Account: React.FC<IAccountPage> = () => {
   const headers = ['Assets', 'Transactions', 'Buckets', 'Rewards'];
@@ -97,6 +166,7 @@ const Account: React.FC<IAccountPage> = () => {
   const [collectionSelected, setCollectionSelected] = useState<IAccountAsset>();
   const [valueContract, setValueContract] = useState<any>();
   const tabHeaders = ['Overview'];
+
   const [selectedTabHeader, setSelectedTabHeader] = useState(tabHeaders[0]);
 
   const { walletAddress, extensionInstalled, connectExtension } =
@@ -473,17 +543,32 @@ const Account: React.FC<IAccountPage> = () => {
           return (
             <Row key={permission.id}>
               <span>
-                <strong>Signer</strong>
+                <strong>PermID {permission.id}</strong>
               </span>
               <RowContent>
                 <BalanceContainer>
                   <FrozenContainerPermissions>
-                    <ItemContainerPermissions>
-                      <p>{getAccountAddress(permission.signers[0].address)}</p>
-                      <Copy
-                        info="Address"
-                        data={permission.signers[0].address}
-                      />
+                    <ItemContainerPermissions isOperations={true}>
+                      <strong>Signers</strong>
+                      <ContainerSigners
+                        isSignersRow={true}
+                        rowColumnMobile={true}
+                      >
+                        {permission.signers.map((signer, key) => (
+                          <FrozenContentRewards key={key}>
+                            <ul key={key}>
+                              <li>
+                                {getAccountAddress(signer.address)}
+                                <Copy info="Address" data={signer.address} />
+                              </li>
+                              <li>
+                                <strong>Weight</strong>
+                                {signer.weight}
+                              </li>
+                            </ul>
+                          </FrozenContentRewards>
+                        ))}
+                      </ContainerSigners>
                     </ItemContainerPermissions>
                     <ItemContainerPermissions>
                       <strong>Type</strong>
@@ -492,28 +577,17 @@ const Account: React.FC<IAccountPage> = () => {
                         <Tooltip msg={msg} />
                       </ItemContentPermissions>
                     </ItemContainerPermissions>
-                    <ItemContainerPermissions>
-                      <strong>PermID</strong>
-                      <ItemContentPermissions>
-                        <p>{permission.id}</p>
-                      </ItemContentPermissions>
-                    </ItemContainerPermissions>
-                    <ItemContainerPermissions>
-                      <strong>Weight</strong>
-                      <ItemContentPermissions>
-                        <p>{permission.signers[0].weight}</p>
-                      </ItemContentPermissions>
-                    </ItemContainerPermissions>
+
                     <ItemContainerPermissions>
                       <strong>Threshold</strong>
                       <ItemContentPermissions>
                         <p>{permission.Threshold}</p>
                       </ItemContentPermissions>
                     </ItemContainerPermissions>
-                    <ItemContainerPermissions>
+                    <ItemContainerPermissions isOperations={true}>
                       <strong>Operations</strong>
-                      <ItemContentPermissions>
-                        <p>{permission.operations || '--'}</p>
+                      <ItemContentPermissions rowColumnMobile={true}>
+                        <PermissionOperations {...permission} />
                       </ItemContentPermissions>
                     </ItemContainerPermissions>
                     <ItemContentPermissions rowColumnMobile={true}>
@@ -529,6 +603,7 @@ const Account: React.FC<IAccountPage> = () => {
       </OverviewContainer>
     );
   };
+
   const Overview: React.FC = () => {
     return (
       <OverviewContainer>

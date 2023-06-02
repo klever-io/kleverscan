@@ -1,6 +1,7 @@
 import { ISelectedDays } from '@/components/DateFilter';
 import { IFilterDater } from '@/types';
 import { format } from 'date-fns';
+import { contractsList } from '../contracts';
 
 /**
  * given a timestamp returns a human readable date string in the format MM/dd/yyyy HH:mm
@@ -147,4 +148,29 @@ export const base64ToHex = (str: string): string => {
     ).join('');
     return hexString;
   }
+};
+
+export const hexToBinary = (hex: string): string => {
+  if (!isHex(hex)) {
+    return '';
+  }
+  const binary = parseInt(hex, 16).toString(2);
+
+  return binary.padStart(hex.length * 4, '0');
+};
+
+export const filterOperations = (filterString: string): boolean[] => {
+  const reverseFilterString = filterString.split('').reverse().join('');
+  let paddedString: string = reverseFilterString;
+  if (paddedString.length !== contractsList.length) {
+    paddedString = reverseFilterString.padEnd(contractsList.length, '0');
+  }
+  const filteredContracts = contractsList.map((_contract, index) => {
+    if (paddedString[index] === '1') {
+      return true;
+    }
+    return false;
+  });
+
+  return filteredContracts;
 };

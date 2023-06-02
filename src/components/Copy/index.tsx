@@ -12,7 +12,7 @@ interface ICopyProps {
 
 const IconContainer = styled.div`
   cursor: pointer;
-  padding: 0 !important;
+  line-height: 0;
 `;
 
 const Copy: React.FC<ICopyProps> = ({ data, info = 'Text', children }) => {

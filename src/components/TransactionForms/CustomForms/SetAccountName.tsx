@@ -1,0 +1,33 @@
+import { useContract } from '@/contexts/contract';
+import React from 'react';
+import { useFormContext } from 'react-hook-form';
+import { IContractProps } from '.';
+import { FormSection } from '../../Form/styles';
+import FormInput from '../FormInput';
+import { FormBody } from '../styles';
+
+type FormData = {
+  orderId: string;
+};
+
+const SetAccountName: React.FC<IContractProps> = ({
+  formKey,
+  handleFormSubmit,
+}) => {
+  const { handleSubmit } = useFormContext<FormData>();
+  const {} = useContract();
+
+  const onSubmit = async (data: FormData) => {
+    await handleFormSubmit(data);
+  };
+
+  return (
+    <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
+      <FormSection>
+        <FormInput name="name" title="Account Name" required />
+      </FormSection>
+    </FormBody>
+  );
+};
+
+export default SetAccountName;

@@ -7,21 +7,11 @@ import {
   Container as ContainerContract,
   CreateTxContainer,
 } from '@/components/Contract/styles';
-import {
-  getType,
-  parseValues,
-  precisionParse,
-} from '@/components/Contract/utils';
+import AdvancedOptions from '@/components/Form/AdvancedOptions';
 import Title from '@/components/Layout/Title';
-import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
-import { IFormsData, useContract } from '@/contexts/contract';
+import { useContract } from '@/contexts/contract';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
-import api from '@/services/api';
-import { ICollectionList, IParamList } from '@/types/index';
-import { INetworkParam, IProposalsResponse } from '@/types/proposals';
-import formSection from '@/utils/formSections';
-import { useDidUpdateEffect } from '@/utils/hooks';
 import { Header } from '@/views/assets';
 import {
   Container,
@@ -32,57 +22,28 @@ import {
   WarningContainer,
   WarningText,
 } from '@/views/create-transaction';
-import { web } from '@klever/sdk';
-import { GetServerSideProps } from 'next';
 import React, { useEffect } from 'react';
-import { toast } from 'react-toastify';
 
-interface IContract {
-  assets?: any;
-  proposals?: any;
-  paramsList?: any;
-}
-
-const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
+const CreateTransaction: React.FC = () => {
+  const [isAccountEmpty, setIsAccountEmpty] = React.useState<boolean>(false);
   const { extensionInstalled, connectExtension } = useExtension();
 
   const { isTablet } = useMobile();
+
   const {
     contractType,
     setContractType,
-    setFormSections,
-    ownerAddress,
-    claimType,
-    claimLabel,
     isMultiContract,
     queue,
     setQueue,
     selectedIndex,
     setSelectedIndex,
-    formsData,
-    setFormsData,
-    tokenChosen,
-    assetsList,
-    setProposals,
-    setParamsList,
-    getAssets,
     showMultiContracts,
     setShowMultiContracts,
-    setTxHash,
-    setTxLoading,
     isMultisig,
-    formSections,
-    resetForms,
     contractOptions,
+    getAssets,
   } = useContract();
-
-  useEffect(() => {
-    setProposals(proposals);
-    setParamsList(paramsList);
-    return () => {
-      setContractType('');
-    };
-  }, []);
 
   useEffect(() => {
     if (extensionInstalled) {
@@ -92,37 +53,6 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
 
   const handleOption = (selectedOption: any) => {
     setContractType(selectedOption.value);
-
-    switch (selectedOption.value) {
-      case 'ProposalContract':
-        setFormSections([
-          ...formSection({
-            contract: selectedOption.value,
-            address: ownerAddress,
-            paramsList,
-          }),
-        ]);
-        break;
-
-      case 'ClaimContract':
-        setFormSections([
-          ...formSection({
-            contract: selectedOption.value,
-            address: ownerAddress,
-            claimLabel,
-          }),
-        ]);
-        break;
-
-      default:
-        setFormSections([
-          ...formSection({
-            contract: selectedOption.value,
-            address: ownerAddress,
-          }),
-        ]);
-        break;
-    }
   };
 
   const editContract = (elementIndex: any) => {
@@ -148,137 +78,39 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
     }
   };
 
-  const broadcastQueue = async () => {
-    const allForms = document.querySelectorAll('form');
-    allForms.forEach((form: HTMLFormElement) => {
-      form.requestSubmit();
-    });
-  };
-
-  useDidUpdateEffect(() => {
-    const submitForm = async () => {
-      setTxLoading(true);
-      try {
-        const parseFormsData = formsData.map(
-          async ({
-            data,
-            contractType,
-            typeAssetTrigger,
-            collection,
-            proposalId,
-            binaryOperations,
-            depositType,
-            withdrawType,
-            assetID,
-            itoTriggerType,
-            metadata,
-            buyType,
-            selectedBucket,
-          }: IFormsData) => {
-            const parsedvalues = parseValues(
-              data,
-              contractType,
-              typeAssetTrigger,
-              claimType,
-              assetID,
-              collection,
-              selectedBucket,
-              proposalId,
-              tokenChosen,
-              buyType,
-              binaryOperations,
-              depositType,
-              withdrawType,
-              itoTriggerType,
-            );
-
-            const parsedPayload = await precisionParse(
-              parsedvalues,
-              contractType,
-            );
-
-            return {
-              type: getType(contractType),
-              payload: parsedPayload,
-              metadata,
-            };
-          },
-        );
-
-        const parsedFormsData: any = await Promise.all(parseFormsData);
-        const parsedMetadata: string[] = [];
-        const parsedData = await parsedFormsData.map((data: any) => {
-          if (data.metadata) {
-            parsedMetadata.push(
-              Buffer.from(data.metadata, 'utf-8').toString('base64'),
-            );
-          }
-          delete data.metadata;
-          return data;
-        });
-
-        const buildTxs = await web.buildTransaction(parsedData, parsedMetadata);
-        const signedTxs = await window.kleverWeb.signTransaction(buildTxs);
-        if (isMultisig.current) {
-          const blob = new Blob([JSON.stringify(signedTxs)], {
-            type: 'application/json',
-          });
-          const url = window.URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = `${contractType} - Nonce: ${signedTxs.RawData.Nonce}.json`;
-          link.click();
-          window.URL.revokeObjectURL(url);
-          toast.success(
-            'Transaction built and signed, send the file to the co-owner(s)',
-          );
-        } else {
-          const response = await web.broadcastTransactions([signedTxs]);
-          setTxHash(response.data.txsHashes[0]);
-          toast.success('Transaction broadcast successfully');
-          if (response.data.txsHashes[0]) {
-            resetForms();
-            document.querySelector('form')?.reset();
-          }
-        }
-      } catch (e: any) {
-        setFormsData([]);
-        toast.error(e?.message ? e.message : e);
-        console.warn(`%c ${e}`, 'color: red');
-      } finally {
-        setTxLoading(false);
+  useEffect(() => {
+    const isAccountEmpty = async () => {
+      const assetsList = await getAssets();
+      if (
+        !assetsList.find(
+          item => item.label === 'KLV' && item.balance && item.balance > 0,
+        )
+      ) {
+        setIsAccountEmpty(true);
       }
     };
-
-    if (formsData.length === queue.length) {
-      submitForm();
-    }
-  }, [formsData]);
+    isAccountEmpty();
+  }, []);
 
   const multiContractProps = {
-    broadcastQueue,
     editContract,
     removeContractQueue,
   };
 
   return (
     <Container>
-      {assetsList &&
-        !assetsList.find(
-          (item: ICollectionList) =>
-            item.label === 'KLV' && item.balance && item.balance > 0,
-        ) && (
-          <WarningContainer>
-            <WarningIcon />
-            <WarningText>
-              Your KLV balance{' '}
-              {process.env.DEFAULT_API_HOST?.includes('testnet') && '(testnet)'}{' '}
-              {process.env.DEFAULT_API_HOST?.includes('devnet') && '(devnet)'}{' '}
-              is zero. You can preview the transaction, but you will not be able
-              to send it.
-            </WarningText>
-          </WarningContainer>
-        )}
+      {isAccountEmpty && (
+        <WarningContainer>
+          <WarningIcon />
+          <WarningText>
+            Your KLV balance{' '}
+            {process.env.DEFAULT_API_HOST?.includes('testnet') && '(testnet)'}{' '}
+            {process.env.DEFAULT_API_HOST?.includes('devnet') && '(devnet)'} is
+            zero. You can preview the transaction, but you will not be able to
+            send it.
+          </WarningText>
+        </WarningContainer>
+      )}
       <Header>
         <Title Icon={Icon} title={'Create Transaction'} />
       </Header>
@@ -302,11 +134,13 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
       <ContainerContract>
         <Select
           options={contractOptions}
+          selectedValue={contractOptions.find(
+            item => item.value === contractType,
+          )}
           onChange={contractType => {
             handleOption(contractType);
             isMultisig.current = false;
           }}
-          getAssets={getAssets}
           isDisabled={true}
           title={'Contract'}
           zIndex={5}
@@ -327,7 +161,7 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
               {queue.map((item, index) => {
                 return (
                   <QueueItemContainer
-                    key={JSON.stringify([...formSections, { itemKey: index }])}
+                    key={JSON.stringify(item.ref)}
                     visible={item.elementIndex === selectedIndex}
                   >
                     {item.ref}
@@ -337,70 +171,10 @@ const CreateTransaction: React.FC<IContract> = ({ proposals, paramsList }) => {
             </QueueOutContainer>
           </CreateTxContainer>
         )}
+        <AdvancedOptions />
       </ContainerContract>
     </Container>
   );
-};
-
-export const getServerSideProps: GetServerSideProps<any> = async () => {
-  const proposalResponse: IProposalsResponse = await api.get({
-    route: 'proposals/list',
-  });
-
-  const { data } = await api.get({ route: 'network/network-parameters' });
-
-  let networkParams = {} as INetworkParam[];
-  const paramsList = [] as IParamList[];
-
-  if (data) {
-    networkParams = Object.keys(proposalsMessages).map((key, index) => {
-      return {
-        number: index,
-        parameter: proposalsMessages[key] ? proposalsMessages[key] : '',
-        currentValue: data.parameters[key].value,
-      };
-    });
-  }
-
-  networkParams.length &&
-    networkParams?.forEach((param: INetworkParam) => {
-      paramsList.push({
-        value: param.number,
-        label: `${param.parameter}: ${param.currentValue}`,
-        currentValue: param.currentValue,
-      });
-    });
-
-  const proposals: any = [];
-
-  const descriptionProposal = (item: any) => {
-    if (item.description !== '') {
-      if (item.description.length < 40) {
-        return `${item.proposalId}: ${item.description}`;
-      }
-      return `${item.proposalId}: ${item.description.substring(0, 40)}...`;
-    }
-
-    return String(item.proposalId);
-  };
-
-  proposalResponse?.data?.proposals
-    .filter(proposal => proposal.proposalStatus === 'ActiveProposal')
-    .forEach((item: any) => {
-      proposals.push({
-        label: descriptionProposal(item),
-        value: item.proposalId,
-      });
-    });
-
-  proposals.sort((a: any, b: any) => (a.value > b.value ? 1 : -1));
-
-  const props: any = {
-    proposals: proposals,
-    paramsList: paramsList,
-  };
-
-  return { props };
 };
 
 export default CreateTransaction;

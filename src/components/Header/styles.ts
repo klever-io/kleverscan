@@ -59,12 +59,12 @@ export const Content = styled.div<{ isMainNet?: boolean }>`
 `;
 
 export const HeaderContainer = styled.span<{
-  isMainNet: boolean;
-  openSearch: boolean;
+  $isMainNet: boolean;
+  $openSearch: boolean;
 }>`
-  display: ${props => (props.openSearch ? 'none' : 'flex')};
+  display: ${props => (props.$openSearch ? 'none' : 'flex')};
   flex-direction: column;
-  width: ${props => (props.isMainNet ? '15rem' : '17rem')};
+  width: ${props => (props.$isMainNet ? '15rem' : '17rem')};
   span {
     color: ${props => props.theme.navbar.text};
     font-size: 0.8rem;
@@ -178,8 +178,8 @@ const fadeInContainer = keyframes`
   }
 `;
 
-export const SearchContainer = styled.div<{ openSearch: boolean }>`
-  display: ${props => (props.openSearch ? 'flex' : 'none')};
+export const SearchContainer = styled.div<{ $openSearch: boolean }>`
+  display: ${props => (props.$openSearch ? 'flex' : 'none')};
   align-items: center;
   width: 20vw;
   max-width: 20rem;
@@ -191,14 +191,14 @@ export const SearchContainer = styled.div<{ openSearch: boolean }>`
   animation: ${fadeInContainer} 0.3s;
 `;
 
-export const CloseSearch = styled(AiOutlineClose)<{ openSearch: boolean }>`
-  display: ${props => (props.openSearch ? 'block' : 'none')};
+export const CloseSearch = styled(AiOutlineClose)<{ $openSearch: boolean }>`
+  display: ${props => (props.$openSearch ? 'block' : 'none')};
   color: ${props => props.theme.true.white};
   height: 15px;
   width: 15px;
 `;
-export const SearchIcon = styled(Search)<{ openSearch: boolean }>`
-  display: ${props => (props.openSearch ? 'none' : 'block')};
+export const SearchIcon = styled(Search)<{ $openSearch: boolean }>`
+  display: ${props => (props.$openSearch ? 'none' : 'block')};
   & path {
     fill: ${props => props.theme.true.white};
   }
@@ -229,12 +229,12 @@ export const IconsMenu = styled.div`
   }
 `;
 
-export const MobileContainer = styled.div<{ openSearch: boolean }>`
+export const MobileContainer = styled.div<{ $openSearch: boolean }>`
   z-index: 6;
   position: relative;
   display: none;
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: ${props => (props.openSearch ? '100%' : 'auto')};
+    width: ${props => (props.$openSearch ? '100%' : 'auto')};
     display: flex;
     align-items: center;
     justify-content: space-between;

@@ -1,6 +1,6 @@
 import { transparentize } from 'polished';
 import styled from 'styled-components';
-export const Container = styled.div<{ opened?: boolean }>`
+export const Container = styled.div<{ $opened?: boolean }>`
   position: fixed;
   display: flex;
   flex-direction: column;
@@ -12,10 +12,10 @@ export const Container = styled.div<{ opened?: boolean }>`
   height: 100%;
   z-index: 6;
   background-color: ${props => props.theme.white};
-  transform: translateX(${props => (props.opened ? 0 : '100%')});
+  transform: translateX(${props => (props.$opened ? 0 : '100%')});
   transition: 0.5s ease, opacity 0.5s ease;
-  visibility: ${props => (props.opened ? 'visible' : 'hidden')};
-  opacity: ${props => (props.opened ? 1 : 0)};
+  visibility: ${props => (props.$opened ? 'visible' : 'hidden')};
+  opacity: ${props => (props.$opened ? 1 : 0)};
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;

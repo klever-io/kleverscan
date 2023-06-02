@@ -1,5 +1,6 @@
 import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
+import { useContractModal } from '@/contexts/contractModal';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import { IAssetsBuckets, IInnerTableProps, IRowSection } from '@/types/index';
@@ -12,20 +13,16 @@ import { ContractContainer, Status } from './styles';
 
 export interface IBuckets {
   bucketsTableProps: IInnerTableProps;
-  showInteractionsButtons?: (
-    title: string,
-    valueContract: string,
-    value?: any,
-    isAssetTrigger?: boolean,
-  ) => JSX.Element;
+  showInteractionButtons?: boolean;
 }
 
 const Buckets: React.FC<IBuckets> = ({
   bucketsTableProps,
-  showInteractionsButtons,
+  showInteractionButtons,
 }) => {
   const UINT32_MAX = 4294967295;
   const { isMobile } = useMobile();
+  const { getInteractionsButtons } = useContractModal();
 
   const { data: epoch } = useQuery('epoch', () => requestBlockEpoch());
 
@@ -64,19 +61,54 @@ const Buckets: React.FC<IBuckets> = ({
       } (in ${textEquation} epoch${textEquation > 1 ? 's' : ''})`;
     };
 
+    const [
+      DelegateButton,
+      UndelegateButton,
+      WithdrawButton,
+      UnfreezeButton,
+      LockedButton,
+    ] = getInteractionsButtons([
+      {
+        title: 'Delegate',
+        contractType: 'DelegateContract',
+        defaultValues: {
+          bucketId: bucket.id,
+        },
+      },
+      {
+        title: 'Undelegate',
+        contractType: 'UndelegateContract',
+        defaultValues: {
+          bucketId: bucket.id,
+        },
+      },
+      {
+        title: 'Withdraw',
+        contractType: 'WithdrawContract',
+        defaultValues: {
+          withdrawType: 0,
+          collection: asset.assetId,
+        },
+      },
+      {
+        title: 'Unfreeze',
+        contractType: 'UnfreezeContract',
+        defaultValues: {
+          collection: asset.assetId,
+          bucketId: bucket.id,
+        },
+      },
+      {
+        title: `${lockedText()}`,
+        contractType: '--',
+      },
+    ]);
+
     const getDelegation = () => {
       if (bucket.delegation) {
         return <></>;
       } else if (asset.assetId === 'KLV') {
-        return (
-          <>
-            {showInteractionsButtons &&
-              showInteractionsButtons('Delegate', 'DelegateContract', [
-                asset.assetId,
-                bucket.id,
-              ])}
-          </>
-        );
+        return <>{showInteractionButtons && <DelegateButton />}</>;
       } else {
         return <>--</>;
       }
@@ -87,74 +119,32 @@ const Buckets: React.FC<IBuckets> = ({
         if (bucket.delegation) {
           return (
             <>
-              {showInteractionsButtons &&
-                showInteractionsButtons('Undelegate', 'UndelegateContract', [
-                  asset.assetId,
-                  bucket.id,
-                ])}
-              {showInteractionsButtons &&
-                showInteractionsButtons(`${lockedText()}`, '--')}
+              {showInteractionButtons && <UndelegateButton />}
+              {showInteractionButtons && <LockedButton />}
             </>
           );
         }
-        return (
-          <>
-            {showInteractionsButtons &&
-              showInteractionsButtons(`${lockedText()}`, '--')}
-          </>
-        );
+        return <>{showInteractionButtons && <LockedButton />}</>;
       } else if (bucket.unstakedEpoch !== UINT32_MAX) {
         if (bucket.delegation) {
           return (
             <>
-              {showInteractionsButtons &&
-                showInteractionsButtons('Undelegate', 'UndelegateContract', [
-                  asset.assetId,
-                  bucket.id,
-                ])}
-              {showInteractionsButtons &&
-                showInteractionsButtons('Withdraw', 'WithdrawContract', [
-                  asset.assetId,
-                  bucket.id,
-                ])}
+              {showInteractionButtons && <UndelegateButton />}
+              {showInteractionButtons && <WithdrawButton />}
             </>
           );
         }
-        return (
-          <>
-            {showInteractionsButtons &&
-              showInteractionsButtons('Withdraw', 'WithdrawContract', [
-                asset.assetId,
-                bucket.id,
-              ])}
-          </>
-        );
+        return <>{showInteractionButtons && <WithdrawButton />}</>;
       } else {
         if (bucket.delegation) {
           return (
             <ContractContainer>
-              {showInteractionsButtons &&
-                showInteractionsButtons('Undelegate', 'UndelegateContract', [
-                  asset.assetId,
-                  bucket.id,
-                ])}
-              {showInteractionsButtons &&
-                showInteractionsButtons('Unfreeze', 'UnfreezeContract', [
-                  asset.assetId,
-                  bucket.id,
-                ])}
+              {showInteractionButtons && <UndelegateButton />}
+              {showInteractionButtons && <UnfreezeButton />}
             </ContractContainer>
           );
         }
-        return (
-          <>
-            {showInteractionsButtons &&
-              showInteractionsButtons('Unfreeze', 'UnfreezeContract', [
-                asset.assetId,
-                bucket.id,
-              ])}
-          </>
-        );
+        return <>{showInteractionButtons && <UnfreezeButton />}</>;
       }
     };
 

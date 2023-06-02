@@ -1,5 +1,6 @@
 import { useTheme } from '@/contexts/theme';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { AiFillExclamationCircle } from 'react-icons/ai';
 import { BiHelpCircle } from 'react-icons/bi';
@@ -25,6 +26,7 @@ const WalletHelp: React.FC<IWalletDrawer> = ({
   opened,
   clickConnectionMobile,
 }) => {
+  const [mounted, setMounted] = useState(false);
   const { isDarkTheme } = useTheme();
   const handleClick = () => {
     closeDrawer();
@@ -33,12 +35,18 @@ const WalletHelp: React.FC<IWalletDrawer> = ({
   const changeColor = {
     color: isDarkTheme ? 'white' : 'black',
   };
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <div>
       {typeof window !== 'undefined' &&
+        mounted &&
         ReactDOM.createPortal(
           <>
-            <Container opened={opened}>
+            <Container $opened={opened}>
               <HeaderModal>
                 <ContentHeader>
                   <BiHelpCircle size={'1.5rem'} color={changeColor.color} />

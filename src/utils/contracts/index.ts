@@ -164,6 +164,17 @@ export const withdrawTypes = [
   },
 ];
 
+export const depositTypes = [
+  {
+    label: 'FPR Deposit',
+    value: 0,
+  },
+  {
+    label: 'KDA Pool',
+    value: 1,
+  },
+];
+
 export const assetTriggerTypes = [
   {
     label: 'Mint (0)',

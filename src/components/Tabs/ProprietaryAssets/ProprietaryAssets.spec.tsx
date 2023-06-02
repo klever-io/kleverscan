@@ -54,6 +54,16 @@ jest.mock('next/router', () => {
   };
 });
 
+jest.mock('@/contexts/contractModal', () => {
+  return {
+    useContractModal: jest.fn().mockReturnValue({
+      getInteractionsButtons: jest.fn().mockImplementation(() => {
+        return [<></>];
+      }),
+    }),
+  };
+});
+
 jest.spyOn(api, 'get').mockImplementation(params => {
   switch (true) {
     case params.route.includes('address'):

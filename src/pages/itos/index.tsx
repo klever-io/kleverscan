@@ -1,5 +1,4 @@
 import { Assets as Icon } from '@/assets/title-icons';
-import ModalContract from '@/components/Contract/ModalContract';
 import Copy from '@/components/Copy';
 import { default as FungibleITO } from '@/components/FungibleITO';
 import { Container } from '@/components/FungibleITO/styles';
@@ -7,6 +6,7 @@ import Input from '@/components/Input';
 import Title from '@/components/Layout/Title';
 import { Loader } from '@/components/Loader/styles';
 import NonFungibleITO from '@/components/NonFungileITO';
+import { useContractModal } from '@/contexts/contractModal';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
@@ -18,7 +18,6 @@ import {
   AssetsList,
   ChooseAsset,
   CloseIcon,
-  CreateITOButton,
   HashAndCopy,
   HashContent,
   Header,
@@ -143,9 +142,10 @@ const ITOsPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [txHash, setTxHash] = useState('');
   const [loading, setLoading] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
   const { isMobile } = useMobile();
   const { extensionInstalled, connectExtension } = useExtension();
+
+  const { getInteractionsButtons } = useContractModal();
 
   const requestITOs = async () => {
     const res = await api.get({
@@ -374,23 +374,20 @@ const ITOsPage: React.FC = () => {
     );
   };
 
-  const modalOptions = {
-    contractType: 'ConfigITOContract',
-    setOpenModal: setModalOpen,
-    openModal: modalOpen,
-    title: 'Create ITO',
-  };
+  const [ConfigITOButton] = getInteractionsButtons([
+    {
+      title: 'Create ITO',
+      contractType: 'ConfigITOContract',
+    },
+  ]);
 
   return (
     <MainContainer>
       <ITOContainer>
         <Header>
           <Title title="ITOs" Icon={Icon} />
-          <CreateITOButton onClick={() => setModalOpen(true)}>
-            Create ITO
-          </CreateITOButton>
+          <ConfigITOButton />
         </Header>
-        <ModalContract {...modalOptions} />
         <MainContent>
           <SideList>
             <AssetsList>{ITOTable()}</AssetsList>

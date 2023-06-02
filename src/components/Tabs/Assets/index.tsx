@@ -1,5 +1,6 @@
 import Table, { ITable } from '@/components/Table';
 import { CustomLink } from '@/components/Table/styles';
+import { useContractModal } from '@/contexts/contractModal';
 import { IAccountAsset, IInnerTableProps, IRowSection } from '@/types/index';
 import { parseApr } from '@/utils';
 import { formatAmount } from '@/utils/formatFunctions';
@@ -9,17 +10,13 @@ import React from 'react';
 interface IAssets {
   assetsTableProps: IInnerTableProps;
   address: string;
-  showInteractionsButtons?: (
-    title: string,
-    value: string,
-    accountAsset: (string | number)[],
-  ) => JSX.Element;
+  showInteractionButtons?: boolean;
 }
 
 const Assets: React.FC<IAssets> = ({
   assetsTableProps,
   address,
-  showInteractionsButtons,
+  showInteractionButtons,
 }) => {
   const header = [
     'Token',
@@ -31,11 +28,11 @@ const Assets: React.FC<IAssets> = ({
     'Staking Type',
     '',
   ];
+  const { getInteractionsButtons } = useContractModal();
 
   const rowSections = (props: IAccountAsset): IRowSection[] => {
     const { assetId, assetType, precision, balance, frozenBalance, staking } =
       props;
-    const freezeContract = [assetId, balance];
 
     const ticker = assetId?.split('-')[0];
     const sectionViewNfts =
@@ -92,13 +89,16 @@ const Assets: React.FC<IAssets> = ({
       { element: sectionViewNfts, span: 2 },
     ];
 
-    if (assetType === 0 && showInteractionsButtons) {
+    const [FreezeButton] = getInteractionsButtons([
+      {
+        title: 'Freeze',
+        contractType: 'FreezeContract',
+      },
+    ]);
+
+    if (assetType === 0 && showInteractionButtons) {
       sections.push({
-        element: showInteractionsButtons(
-          'Freeze',
-          'FreezeContract',
-          freezeContract,
-        ),
+        element: <FreezeButton />,
         span: 2,
       });
     }

@@ -1,9 +1,10 @@
 // import { lighten } from 'polished';
-import { lighten } from 'polished';
+import { lighten, transparentize } from 'polished';
 import styled, { css } from 'styled-components';
 
 interface IContainer {
   zIndex?: number;
+  $error?: boolean;
 }
 
 const ReactSelect = css`
@@ -114,6 +115,15 @@ export const Container = styled.div<IContainer>`
     font-size: 0.9rem;
   }
   ${ReactSelect}
+
+  ${props =>
+    props.$error &&
+    css`
+      .react-select__control {
+        border-color: ${props => props.theme.error};
+        background-color: ${props => transparentize(0.9, props.theme.red)};
+      }
+    `}
 `;
 
 export const TitleLabel = styled.label`

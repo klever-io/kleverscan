@@ -1,12 +1,17 @@
 import { PlusWhite, SendWhite } from '@/assets/icons';
+import { useContractModal } from '@/contexts/contractModal';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import React, { useEffect, useRef, useState } from 'react';
 import { RiArrowDownSLine } from 'react-icons/ri';
-import ModalContract from '../Contract/ModalContract';
 import { BackgroundHelper } from '../Header/ConnectWallet/styles';
 import WalletHelp from '../Header/WalletHelp';
-import { Button, Container, ShortCutDropdown } from './styles';
+import {
+  Container,
+  CreateTxHeader,
+  InteractionButtonsContainer,
+  ShortCutDropdown,
+} from './styles';
 
 interface IShortCutContract {
   title: string;
@@ -15,47 +20,16 @@ interface IShortCutContract {
 }
 
 const CreateTxShortcut: React.FC = () => {
-  const [contractType, setContractType] = useState('');
-  const [openModalTransactions, setOpenModalTransactions] = useState(false);
-  const [titleModal, setTitleModal] = useState('');
-  const [valueContract, setValueContract] = useState('');
   const [openDrawer, setOpenDrawer] = useState<boolean>(false);
   const [openDropdown, setOpenDropdown] = useState(false);
 
   const { extensionInstalled, connectExtension } = useExtension();
   const { isMobile } = useMobile();
 
-  const shortCutContract: IShortCutContract[] = [
-    { title: 'Transfer', type: 'TransferContract', Icon: SendWhite },
-    { title: 'Create Asset', type: 'CreateAssetContract', Icon: PlusWhite },
-    { title: 'Create ITO', type: 'ConfigITOContract', Icon: PlusWhite },
-    { title: 'Freeze', type: 'FreezeContract', Icon: PlusWhite },
-    { title: 'Vote', type: 'VoteContract', Icon: PlusWhite },
-  ];
-
-  const modalOptions = {
-    contractType,
-    setContractType,
-    setOpenModal: setOpenModalTransactions,
-    openModal: openModalTransactions,
-    title: titleModal,
-    setValueContract,
-  };
+  const { getInteractionsButtons } = useContractModal();
 
   const closeMenu = () => {
     setOpenDrawer(false);
-  };
-
-  const handleClick = (contract: IShortCutContract, e: any) => {
-    e.stopPropagation();
-
-    if (!extensionInstalled) {
-      setOpenDrawer(true);
-      return;
-    }
-    setContractType(contract.type);
-    setOpenModalTransactions(valueContract === '--' ? false : true);
-    setTitleModal(`${contract.title} Contract`);
   };
 
   const contentRef = useRef<HTMLDivElement>(null);
@@ -90,27 +64,53 @@ const CreateTxShortcut: React.FC = () => {
     setOpenDropdown(!openDropdown);
   };
 
+  const ButtonIcons = [SendWhite, PlusWhite, PlusWhite, PlusWhite, PlusWhite];
+
+  const interactionButtonsFactory = getInteractionsButtons([
+    {
+      title: 'Transfer',
+      contractType: 'TransferContract',
+    },
+    {
+      title: 'Create Asset',
+      contractType: 'CreateAssetContract',
+    },
+    {
+      title: 'Create ITO',
+      contractType: 'ConfigITOContract',
+    },
+    {
+      title: 'Freeze',
+      contractType: 'FreezeContract',
+    },
+    {
+      title: 'Vote',
+      contractType: 'VoteContract',
+    },
+  ]);
+
+  const interactionButtons = interactionButtonsFactory.map((Button, index) => {
+    const ButtonIcon = ButtonIcons[index];
+    return <Button key={JSON.stringify(Button)}>{<ButtonIcon />}</Button>;
+  });
+
   const MobileVersion: React.FC = () => {
     return (
       <>
         <Container onClick={handleDropDown}>
-          <div>
+          <CreateTxHeader>
             <h3>Create Transaction</h3>
 
-            <RiArrowDownSLine />
-          </div>
+            <RiArrowDownSLine
+              style={{
+                transform: openDropdown ? 'rotate(180deg)' : 'rotate(0deg)',
+                transition: 'transform 1s ease-in-out',
+              }}
+            />
+          </CreateTxHeader>
 
           <ShortCutDropdown isOpen={openDropdown}>
-            {shortCutContract.map(contract => (
-              <Button
-                onClick={e => handleClick(contract, e)}
-                key={JSON.stringify(contract)}
-                isMobile={isMobile}
-              >
-                <contract.Icon />
-                {contract.title}
-              </Button>
-            ))}
+            {interactionButtons}
           </ShortCutDropdown>
           <BackgroundHelper
             onClick={closeMenu}
@@ -125,7 +125,6 @@ const CreateTxShortcut: React.FC = () => {
             }}
           />
         </Container>
-        {extensionInstalled && <ModalContract {...modalOptions} />}
       </>
     );
   };
@@ -135,21 +134,11 @@ const CreateTxShortcut: React.FC = () => {
   ) : (
     <>
       <Container>
-        <div>
+        <InteractionButtonsContainer>
           <h3>Create Transaction</h3>
 
-          {isMobile && <RiArrowDownSLine />}
-          {!isMobile &&
-            shortCutContract.map(contract => (
-              <Button
-                onClick={e => handleClick(contract, e)}
-                key={JSON.stringify(contract)}
-              >
-                <contract.Icon />
-                {contract.title}
-              </Button>
-            ))}
-        </div>
+          {interactionButtons}
+        </InteractionButtonsContainer>
 
         <BackgroundHelper
           onClick={closeMenu}
@@ -164,7 +153,6 @@ const CreateTxShortcut: React.FC = () => {
           }}
         />
       </Container>
-      {extensionInstalled && <ModalContract {...modalOptions} />}
     </>
   );
 };

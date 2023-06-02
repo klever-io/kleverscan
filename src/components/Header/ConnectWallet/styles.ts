@@ -294,10 +294,10 @@ export const SpanDropdown = styled.div`
 `;
 
 export const DropdownIcon = styled(MdArrowDropDown)<{
-  openOtherAssets: boolean;
+  $openOtherAssets: boolean;
 }>`
   font-size: 2rem;
-  transform: rotate(${props => (props.openOtherAssets ? 0 : 180)}deg);
+  transform: rotate(${props => (props.$openOtherAssets ? 0 : 180)}deg);
 `;
 
 export const FadeIn = keyframes`
@@ -399,15 +399,14 @@ export const ReloadContainer = styled.div`
 `;
 
 export const IoReloadSharpWrapper = styled.div<{
-  loading: boolean;
-  openOtherAssets: boolean;
+  $loading: boolean;
 }>`
   svg {
     cursor: pointer;
     margin-top: 0.3rem;
     margin-left: auto;
     color: ${props => props.theme.darkText};
-    animation: ${props => (props.loading ? rotate : 'none')} 1s linear infinite;
+    animation: ${props => (props.$loading ? rotate : 'none')} 1s linear infinite;
   }
 `;
 

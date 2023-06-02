@@ -86,6 +86,12 @@ export const TooltipSpace = styled.div`
   bottom: 3rem;
 `;
 
+export const SectionText = styled.p`
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: ${props => props.theme.darkText};
+`;
+
 export const InputWrapper = styled.div``;
 
 export const FormGap = styled.div<ISpaceForm>``;

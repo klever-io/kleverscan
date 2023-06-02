@@ -1,6 +1,6 @@
 import { Container } from '@/components/Input/styles';
+import { StyledTextArea } from '@/components/TransactionForms/FormInput/styles';
 import styled, { keyframes } from 'styled-components';
-import { StyledTextArea } from '../FormInput/styles';
 
 export const CardHeader = styled.div`
   display: flex;

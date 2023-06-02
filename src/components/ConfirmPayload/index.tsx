@@ -1,3 +1,4 @@
+import { useContract } from '@/contexts/contract';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 import {
@@ -8,21 +9,16 @@ import {
   DetailsRow,
 } from './styles';
 
-interface IConfirmModalProps {
-  payload: any;
-  closeModal: () => void;
-  handleConfirm: () => void;
-  handleBack?: () => void;
-  BackButtonLabel?: string;
-  singleButton?: boolean;
-}
+const ConfirmPayload: React.FC = () => {
+  const { setOpenModal: setOpen, payload, formSend } = useContract();
 
-const ConfirmPayload: React.FC<IConfirmModalProps> = ({
-  payload,
-  closeModal,
-  handleConfirm,
-  handleBack,
-}) => {
+  const handleConfirm = async () => {
+    await formSend();
+    setOpen(false);
+  };
+
+  const closeModal = () => setOpen(false);
+
   const handleClose = () => {
     closeModal();
   };
@@ -53,7 +49,10 @@ const ConfirmPayload: React.FC<IConfirmModalProps> = ({
         <ButtonsRow>
           <ButtonContainer onClick={handleClose}> Close</ButtonContainer>
           {!isDisabled() && (
-            <ButtonContainer onClick={handleConfirm} disabled={isDisabled()}>
+            <ButtonContainer
+              onClick={() => handleConfirm()}
+              disabled={isDisabled()}
+            >
               {' '}
               Send
             </ButtonContainer>

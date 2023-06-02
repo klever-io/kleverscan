@@ -110,24 +110,39 @@ export const RowContent = styled.span`
 `;
 
 export const ButtonModal = styled.button<{
-  isAssetTrigger?: boolean;
   isLocked?: boolean;
 }>`
   color: ${props => props.theme.true.white};
   background-color: ${props => props.theme.violet};
   height: 2.5rem;
+
   align-self: end;
-  min-width: ${props => (props.isAssetTrigger ? '11rem' : '13rem')};
-  max-width: 14.6rem;
-  padding: 0 2rem;
+
+  min-width: 13rem;
+  max-width: 15rem;
+
+  padding: 0 1rem;
   border-radius: 4px;
+
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+
+  > span {
+    color: ${props => props.theme.true.white} !important;
+  }
+
   :active {
     transform: ${props => (props.isLocked ? '' : 'translateY(0.1rem)')};
   }
+
   :hover {
     opacity: ${props => (props.isLocked ? '' : '0.8')};
   }
+
   opacity: ${props => (props.isLocked ? '0.3' : '1')};
+
   cursor: ${props => (props.isLocked ? 'not-allowed' : 'pointer')};
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;

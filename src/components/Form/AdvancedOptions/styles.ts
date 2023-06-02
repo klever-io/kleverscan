@@ -17,6 +17,8 @@ export const ExtraOptionContainer = styled.div`
   display: flex;
   flex-direction: column;
 
+  gap: 1rem;
+
   margin-top: 1rem;
   margin-bottom: 1rem;
   border-radius: 12px;
@@ -47,14 +49,11 @@ export const FieldContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
+  gap: 0.75rem;
+`;
 
-  &:not(:first-child) {
-    margin-top: 1rem;
-  }
-
-  label {
-    margin-bottom: 0.75rem;
-  }
+export const FlexContainer = styled.div`
+  display: flex;
 `;
 
 export const DataField = styled.textarea`

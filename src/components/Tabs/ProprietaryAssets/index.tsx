@@ -1,5 +1,6 @@
 import Table, { ITable } from '@/components/Table';
 import { CustomLink } from '@/components/Table/styles';
+import { useContractModal } from '@/contexts/contractModal';
 import {
   IInnerTableProps,
   IProprietaryAsset,
@@ -13,18 +14,13 @@ import React from 'react';
 interface IProprietaryAssets {
   assetsTableProps: IInnerTableProps;
   address: string;
-  showInteractionsButtons?: (
-    title: string,
-    value: string,
-    assets: IProprietaryAsset,
-    isAssetTrigger: boolean,
-  ) => JSX.Element;
+  showInteractionButtons?: boolean;
 }
 
 const ProprietaryAssets: React.FC<IProprietaryAssets> = ({
   assetsTableProps,
   address,
-  showInteractionsButtons,
+  showInteractionButtons,
 }) => {
   const header = [
     'Token',
@@ -36,6 +32,8 @@ const ProprietaryAssets: React.FC<IProprietaryAssets> = ({
     'Staking Type',
     '',
   ];
+
+  const { getInteractionsButtons } = useContractModal();
 
   const rowSections = (props: IProprietaryAsset): IRowSection[] => {
     const { assetId, assetType, precision, circulatingSupply, staking } = props;
@@ -96,14 +94,19 @@ const ProprietaryAssets: React.FC<IProprietaryAssets> = ({
       { element: sectionViewNfts, span: 2 },
     ];
 
-    if (showInteractionsButtons) {
+    const [AssetTriggerButton] = getInteractionsButtons([
+      {
+        title: 'Asset Trigger',
+        contractType: 'AssetTriggerContract',
+        defaultValues: {
+          assetId,
+        },
+      },
+    ]);
+
+    if (showInteractionButtons) {
       sections.push({
-        element: showInteractionsButtons(
-          'Asset Trigger',
-          'AssetTriggerContract',
-          props,
-          true,
-        ),
+        element: <AssetTriggerButton />,
         span: 2,
       });
     }

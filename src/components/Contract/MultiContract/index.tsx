@@ -14,13 +14,11 @@ import {
 } from './styles';
 
 interface IMultiContract {
-  broadcastQueue: () => void;
   removeContractQueue: (elementIndex: number, e: any) => void;
   editContract: (elementIndex: number) => void;
 }
 
 const MultiContract: React.FC<IMultiContract> = ({
-  broadcastQueue,
   editContract,
   removeContractQueue,
 }) => {
@@ -31,6 +29,7 @@ const MultiContract: React.FC<IMultiContract> = ({
     showMultiContracts,
     addToQueue,
     setShowMultiContracts,
+    submitForms,
   } = useContract();
 
   return (
@@ -83,7 +82,7 @@ const MultiContract: React.FC<IMultiContract> = ({
             New Contract
           </Button>
           {queue.length > 0 && (
-            <Button submit onClick={broadcastQueue}>
+            <Button submit onClick={submitForms}>
               Broadcast Queue
             </Button>
           )}

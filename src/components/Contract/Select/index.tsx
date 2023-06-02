@@ -2,7 +2,7 @@ import { useContract } from '@/contexts/contract';
 import { IStakingRewards } from '@/pages/account/[account]';
 import { ICollectionList } from '@/types';
 import dynamic from 'next/dynamic';
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
 import { components } from 'react-select';
 import { Container, TitleLabel } from './styles';
@@ -21,8 +21,8 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   options?: IDropdownItem[];
   selectPlaceholder?: string;
   onChange: (value: any) => void;
+  onMenuOpen?: () => void;
   title?: string;
-  getAssets?: () => void;
   label?: string;
   zIndex?: number;
   collection?: ICollectionList;
@@ -30,23 +30,28 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   isDisabled?: boolean;
   isModal?: boolean;
   selectedBucket?: string;
+  error?: boolean;
+  selectedValue?: IDropdownItem;
+  loading?: boolean;
 }
 
 const Select: React.FC<IFilter> = ({
   options,
   onChange,
+  onMenuOpen,
   selectPlaceholder,
   title,
-  getAssets,
   label,
   zIndex,
   collection,
   claimSelectedType,
   isDisabled,
   selectedBucket,
+  error,
+  loading,
+  selectedValue,
   ...rest
 }) => {
-  const getAssetsEnableRef = useRef<boolean>(true);
   const Placeholder = useCallback((props: any) => {
     return <components.Placeholder {...props} />;
   }, []);
@@ -65,36 +70,22 @@ const Select: React.FC<IFilter> = ({
     );
   }, []);
 
-  const handleChange = (value: any) => {
-    if (getAssets && getAssetsEnableRef.current) {
-      getAssets();
-    }
-
-    getAssetsEnableRef.current = true;
-    onChange(value);
-  };
-
-  const handleMenuOpen = () => {
-    getAssets && getAssets();
-    if (title !== 'Contract') getAssetsEnableRef.current = false;
-  };
-
-  const handleMenuClose = () => {
-    setTimeout(() => {
-      getAssetsEnableRef.current = true;
-    }, 200);
-  };
-
   const props = {
     classNamePrefix: 'react-select',
     options,
-    onChange: handleChange,
-    onMenuOpen: handleMenuOpen,
-    onMenuClose: handleMenuClose,
+    onChange,
+    onMenuOpen,
+  };
+
+  const getPlaceholder = () => {
+    if (loading) return 'Loading...';
+    if (selectPlaceholder) return selectPlaceholder;
+
+    return `Choose ${title ? title : ''}`;
   };
 
   return (
-    <Container zIndex={zIndex}>
+    <Container zIndex={zIndex} $error={error}>
       {label && <TitleLabel>{label}</TitleLabel>}
       <ReactSelect
         defaultValue={
@@ -102,12 +93,13 @@ const Select: React.FC<IFilter> = ({
           claimSelectedType ||
           (selectedBucket && { label: selectedBucket })
         }
-        placeholder={
-          selectPlaceholder ? selectPlaceholder : `Choose ${title ? title : ''}`
-        }
+        value={selectedValue}
+        placeholder={getPlaceholder()}
         components={{ Placeholder, DropdownIndicator }}
         {...props}
-        isDisabled={isDisabled && isMultiContract && queue.length > 1}
+        isDisabled={
+          (isDisabled && isMultiContract && queue.length > 1) || loading
+        }
       />
     </Container>
   );

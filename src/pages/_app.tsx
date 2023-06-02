@@ -1,4 +1,5 @@
 import { ContractProvider } from '@/contexts/contract';
+import { ContractModalProvider } from '@/contexts/contractModal';
 import { ExtensionProvider } from '@/contexts/extension';
 import { InternalThemeProvider } from '@/contexts/theme';
 import { MobileProvider } from 'contexts/mobile';
@@ -15,7 +16,13 @@ import Bugsnag from '../lib/bugsnag';
 import GlobalStyle from '../styles/global';
 import * as gtag from '../utils/gtag/gtag';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const ErrorBoundary =
   !process.env.BUGSNAG_DISABLED &&
@@ -48,16 +55,18 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
       <InternalThemeProvider>
         <ToastContainer />
         <MobileProvider>
-          <ContractProvider>
-            <ExtensionProvider>
-              <ToastContainer />
-              <Layout>
-                <Component {...pageProps} />
-              </Layout>
-              <GlobalStyle />
-              <NProgress />
-            </ExtensionProvider>
-          </ContractProvider>
+          <ExtensionProvider>
+            <ContractProvider>
+              <ContractModalProvider>
+                <ToastContainer />
+                <Layout>
+                  <Component {...pageProps} />
+                </Layout>
+                <GlobalStyle />
+                <NProgress />
+              </ContractModalProvider>
+            </ContractProvider>
+          </ExtensionProvider>
         </MobileProvider>
       </InternalThemeProvider>
     </QueryClientProvider>

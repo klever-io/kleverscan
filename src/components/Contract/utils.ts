@@ -128,8 +128,8 @@ const precisionParse = async (
     payload[fieldName] = addPrecision(field, precision);
   };
 
-  const addRoyalitiesPrecision = () => {
-    if (payload?.royalties?.transferFixed === undefined) {
+  const addRoyalitiesPrecision = (payload: any, assetPrecision: number) => {
+    if (payload?.royalties === undefined) {
       return;
     }
 
@@ -160,9 +160,10 @@ const precisionParse = async (
 
     if (payload.royalties.transferPercentage) {
       payload.royalties.transferPercentage.forEach((item: any) => {
+        item.amount = addPrecision(item.amount, assetPrecision);
         item.percentage = addPrecision(item.percentage, percentagePrecision);
 
-        addPrecision(item.amount, KLV_PRECISION);
+        addPrecision(item.amount, payload?.precision || 0);
       });
     }
   };
@@ -170,7 +171,7 @@ const precisionParse = async (
     case 'TransferContract':
     case 'FreezeContract':
     case 'AssetTriggerContract':
-      assetId = payload.assetId ? payload.assetId : payload.kda;
+      assetId = payload.assetId ? payload.assetId : payload.kda || 'KLV';
       await addFieldPrecision('amount', assetId);
       if (payload?.staking?.apr)
         payload.staking.apr = addPrecision(
@@ -178,7 +179,7 @@ const precisionParse = async (
           percentagePrecision,
         );
       parseSplitRoyaltiesPrecision(payload);
-      addRoyalitiesPrecision();
+      addRoyalitiesPrecision(payload, await getPrecision(assetId));
       if (payload?.kdaPool?.fRatioKDA) {
         payload.kdaPool.fRatioKDA = addPrecision(
           payload.kdaPool.fRatioKDA,
@@ -208,15 +209,20 @@ const precisionParse = async (
           percentagePrecision,
         );
 
-      addRoyalitiesPrecision();
+      addRoyalitiesPrecision(payload, payload.precision || 0);
 
       parseSplitRoyaltiesPrecision(payload);
       break;
-    case 'CreateValidator':
-    case 'ConfigValidator':
-      payload.config.comission = payload.config.comission * percentagePrecision;
-      payload.config.maxDelegationAmount =
-        payload.config.maxDelegationAmount * KLV_PRECISION;
+    case 'CreateValidatorContract':
+    case 'ConfigValidatorContract':
+      payload.commission = addPrecision(
+        payload.commission,
+        percentagePrecision,
+      );
+      payload.maxDelegationAmount = addPrecision(
+        payload.maxDelegationAmount,
+        KLV_PRECISION,
+      );
       break;
     case 'ConfigITOContract':
       if (payload.maxAmount) {
@@ -238,7 +244,7 @@ const precisionParse = async (
       } else return;
       break;
     case 'SellContract':
-      assetId = payload.currencyID;
+      assetId = payload.currencyId;
       await addFieldPrecision('price', assetId);
       await addFieldPrecision('reservePrice', assetId);
       break;
@@ -254,7 +260,7 @@ const precisionParse = async (
       await addFieldPrecision('amount', assetId);
       break;
     case 'DepositContract':
-      assetId = payload?.currencyID;
+      assetId = payload?.currencyId;
       await addFieldPrecision('amount', assetId);
   }
 
@@ -343,7 +349,7 @@ const filterByProperties = (
   }
 };
 
-const showAssetIDInput = (
+const showAssetIdInput = (
   contractType: string,
   typeAssetTrigger: number | null,
 ): boolean => {
@@ -365,7 +371,18 @@ const getAssetsList = (
   typeAssetTrigger: number | null,
   withdrawType: number | null,
   ownerAddress: string,
+  type?: 'token' | 'NFT',
 ): any[] => {
+  if (type === 'NFT') {
+    return assets.filter((value: ICollectionList) => {
+      return value.isNFT;
+    });
+  } else if (type === 'token') {
+    return assets.filter((value: ICollectionList) => {
+      return !value.isNFT;
+    });
+  }
+
   if (contractType === 'AssetTriggerContract' && typeAssetTrigger !== null) {
     const bothCollectionNFT = [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13];
     const justNFT = [8];
@@ -378,7 +395,10 @@ const getAssetsList = (
       });
       return filterByProperties(newAssets, typeAssetTrigger);
     }
-  } else if (contractType === 'FreezeContract') {
+  } else if (
+    contractType === 'FreezeContract' ||
+    contractType === 'DepositContract'
+  ) {
     return assets.filter((value: ICollectionList) => {
       return !value.isNFT;
     });
@@ -408,7 +428,10 @@ const getAssetsList = (
     });
   } else if (contractType === 'ConfigITOContract') {
     return assets.filter(asset => asset.ownerAddress === ownerAddress);
+  } else if (contractType === 'SellContract') {
+    return assets.filter((value: ICollectionList) => value.isNFT);
   }
+
   return assets;
 };
 
@@ -428,8 +451,8 @@ const parsePackInfo = (values: any) => {
     const itemContent = {
       packs: item.packItem,
     };
-    if (item.packCurrencyID) {
-      packInfo[item.packCurrencyID] = itemContent;
+    if (item.packCurrencyId) {
+      packInfo[item.packCurrencyId] = itemContent;
     } else {
       packInfo['KLV'] = itemContent;
     }
@@ -484,7 +507,7 @@ const parseValues = (
   contractType: string,
   typeAssetTrigger: number | null,
   claimType: number,
-  assetID: number,
+  assetId: number,
   collection: ICollectionList | undefined,
   selectedBucket: string,
   proposalId: number | null,
@@ -526,7 +549,7 @@ const parseValues = (
     if (contractType === 'AssetTriggerContract') {
       parsedValues.triggerType = typeAssetTrigger;
       parsedValues.assetId =
-        assetID !== 0 ? `${collection.value}/${assetID}` : collection.value;
+        assetId !== 0 ? `${collection.value}/${assetId}` : collection.value;
       if (typeAssetTrigger === 14) {
         parseSplitRoyalties(parsedValues);
       }
@@ -541,14 +564,14 @@ const parseValues = (
         }
       }
     } else if (contractType === 'SellContract') {
-      parsedValues.assetID =
-        assetID !== 0 ? `${collection.value}/${assetID}` : collection.value;
+      parsedValues.assetId =
+        assetId !== 0 ? `${collection.value}/${assetId}` : collection.value;
     } else if (contractType === 'ITOTriggerContract') {
       parsedValues.triggerType = itoTriggerType;
       parsedValues.kda = collection.value;
     } else {
       parsedValues.kda =
-        assetID !== 0 ? `${collection.value}/${assetID}` : collection.value;
+        assetId !== 0 ? `${collection.value}/${assetId}` : collection.value;
     }
   } else if (contractType === 'CreateAssetContract') {
     parsedValues.type = tokenChosen ? 0 : 1;
@@ -557,21 +580,21 @@ const parseValues = (
     parsedValues.triggerType = typeAssetTrigger;
   } else if (contractType === 'ClaimContract') {
     parsedValues.claimType = claimType;
-    if (parsedValues.assetID) {
-      parsedValues.id = parsedValues.assetID;
-      delete parsedValues.assetID;
-    } else if (parsedValues.orderID) {
-      parsedValues.id = parsedValues.orderID;
-      delete parsedValues.orderID;
+    if (parsedValues.assetId) {
+      parsedValues.id = parsedValues.assetId;
+      delete parsedValues.assetId;
+    } else if (parsedValues.orderId) {
+      parsedValues.id = parsedValues.orderId;
+      delete parsedValues.orderId;
     }
   } else if (contractType === 'BuyContract') {
     parsedValues.buyType = buyType ? 1 : 0;
-    if (parsedValues.orderID) {
-      parsedValues.id = parsedValues.orderID;
-      delete parsedValues.orderID;
-    } else if (parsedValues.iTOAssetID) {
-      parsedValues.id = parsedValues.iTOAssetID;
-      delete parsedValues.iTOAssetID;
+    if (parsedValues.orderId) {
+      parsedValues.id = parsedValues.orderId;
+      delete parsedValues.orderId;
+    } else if (parsedValues.iTOAssetId) {
+      parsedValues.id = parsedValues.iTOAssetId;
+      delete parsedValues.iTOAssetId;
     }
   } else if (contractType === 'ProposalContract') {
     if (values.parameters) {
@@ -696,7 +719,7 @@ const contractsDescription = {
   BuyContract: 'Buy tokens.',
   SellContract: 'Sell tokens.',
   CreateMarketplaceContract: 'Create a new Marketplace.',
-  ConfigMarketplaceContract: 'Set up a Marketplace.',
+  ConfigMarketplaceContract: 'Change the parameters of a existing Marketplace.',
   DepositContract: 'Deposit to a KDA Pool or FPR Pool.',
   ITOTriggerContract: 'Change the parameters of an ITO.',
 };
@@ -816,7 +839,7 @@ const buildTransaction = async (
 export {
   getType,
   getAssetsList,
-  showAssetIDInput,
+  showAssetIdInput,
   precisionParse,
   parseValues,
   contractHaveKDA,

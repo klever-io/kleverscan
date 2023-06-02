@@ -2,7 +2,7 @@ import { lighten, transparentize } from 'polished';
 import { BsPersonSquare } from 'react-icons/bs';
 import { IoMdCloseCircle } from 'react-icons/io';
 import { RiCopperCoinLine } from 'react-icons/ri';
-import styled, { css } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 const defaultStyles = css`
   width: 100%;
@@ -26,10 +26,25 @@ export const LoadingBackground = styled.div`
   position: fixed;
   top: 0;
   left: 0;
+
   width: 100vw;
   height: 100vh;
-  background-color: ${props => transparentize(0.2, props.theme.true.black)};
   z-index: 6;
+
+  background-color: ${props => transparentize(0.2, props.theme.true.black)};
+
+  display: grid;
+  place-items: center;
+
+  > div {
+    width: 10rem;
+    height: 10rem;
+
+    > svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
 `;
 
 export const CloseIcon = styled(IoMdCloseCircle).attrs(props => ({
@@ -146,29 +161,28 @@ export const InputContainer = styled.div`
   background-color: ${props => props.theme.form.background};
 `;
 
+const ColorChangeAnimation = keyframes`
+  0% {
+      filter: brightness(1.5);
+      box-shadow: 0 0 1rem 0 rgba(255, 255, 255, 0.1);
+    }
+    100% {
+      filter: brightness(1);
+      box-shadow: none;
+    }
+`;
+
 export const ExtraOptionContainer = styled.div`
   display: flex;
   margin-top: 1rem;
   margin-bottom: 1rem;
   border-radius: 12px;
   padding-top: 1rem;
-  padding-bottom: 1rem;
 
-  animation: color-change 1s infinite;
+  padding: 1rem 2rem;
 
-  @keyframes color-change {
-    0% {
-      color: ${props => props.theme.violet};
-    }
-    50% {
-      color: ${props => props.theme.lightPurple};
-    }
-    100% {
-      color: ${props => props.theme.purple};
-    }
-  }
-  border: 2px solid;
-  border-color: color-change;
+  animation: ${ColorChangeAnimation} 2s infinite;
+
   background-color: ${props => props.theme.white};
   box-shadow: 0 0 1rem 0
     ${props => (props.theme.dark ? '#000' : lighten(0.8, '#000'))};
@@ -178,39 +192,85 @@ export const ExtraOptionContainer = styled.div`
 
   gap: 1rem;
 
-  padding-right: 2rem;
-
   a {
-    padding-left: 2rem;
     color: ${props =>
       props.theme.dark ? props.theme.darkText : props.theme.form.hash};
-    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: 0.05rem;
+
+    display: flex;
+    gap: 0.25rem;
 
     text-decoration: none;
     animation: none;
+
     &:hover {
       color: ${props =>
         props.theme.dark ? props.theme.true.white : props.theme.form.hoverHash};
+    }
+
+    &:visited {
+      color: ${props =>
+        props.theme.dark ? props.theme.darkText : props.theme.form.hash};
+    }
+
+    &:active {
+      color: ${props =>
+        props.theme.dark ? props.theme.darkText : props.theme.form.hash};
+    }
+
+    svg {
+      font-size: 1.2rem;
     }
   }
 
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 1rem;
+
+    a {
+      max-width: 100%;
+      white-space: pre-wrap;
+      word-break: break-all;
+
+      display: block;
+    }
+  }
+`;
+
+export const IconsContainer = styled.div`
+  width: 100%;
+
+  display: flex;
+
+  svg:last-child {
+    margin-left: auto;
+  }
 `;
 
 export const SelectContainer = styled.div`
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   flex-direction: row;
   background-color: ${props => props.theme.white};
   padding: 1.37rem;
   border-radius: 1rem;
   margin-top: 1rem;
   width: 100%;
+  gap: 1rem;
 
   border: 0.2px solid ${({ theme }) => theme.input.border};
   box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? '#000' : lighten(0.8, '#000'))};
+
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    flex-direction: column;
+  }
 `;
 
 interface ISelect {
@@ -219,13 +279,16 @@ interface ISelect {
 }
 
 export const SelectContent = styled.div<ISelect>`
+  position: relative;
   display: flex;
   flex-direction: column;
   width: ${props => (props.configITO ? '100%' : 'calc(50% - 0.5rem)')};
 
   max-width: ${props => (props.size ? `${props.size}%` : 'unset')};
-  &:not(:first-child) {
-    margin-left: 1rem;
+
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 100%;
+    margin-left: 0;
   }
 `;
 
@@ -238,8 +301,6 @@ export const AssetTriggerContainer = styled.div`
 export const FieldLabel = styled.label`
   user-select: none;
   font-size: smaller;
-  font-weight: 600;
-  display: flex;
   color: ${({ theme }) => theme.darkText};
   margin-bottom: 0.3rem;
 `;
@@ -253,10 +314,17 @@ export const BalanceLabel = styled.label`
   margin-bottom: 0.3rem;
 `;
 
-export const AssetIDInput = styled.input`
+export const AssetIDInput = styled.input<{ $error?: boolean }>`
   height: 3rem;
 
   ${defaultStyles}
+
+  ${props =>
+    props.$error &&
+    css`
+      border: 1px solid ${props.theme.error};
+      background-color: ${transparentize(0.9, props.theme.red)};
+    `}
 `;
 
 export const BalanceContainer = styled.div`

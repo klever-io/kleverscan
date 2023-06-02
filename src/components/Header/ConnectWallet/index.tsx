@@ -317,7 +317,7 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
                       </>
                     )}
                     <SpanDropdown {...dropdownProps}>
-                      <DropdownIcon openOtherAssets={!expandAssets} />
+                      <DropdownIcon $openOtherAssets={!expandAssets} />
                       {expandAssets && otherAssets.length > 0 && (
                         <OtherAssetsContainer isMobile={isMobile}>
                           {otherAssets.map((asset: any) => (
@@ -341,8 +341,7 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
                   </ContainerAsset>
                   <IoReloadSharpWrapper
                     onClick={getAccountBalance}
-                    loading={loadingBalance}
-                    openOtherAssets={!expandAssets}
+                    $loading={loadingBalance}
                   >
                     <IoReloadSharp />
                   </IoReloadSharpWrapper>

@@ -15,6 +15,16 @@ import {
   mockBlockResponse,
 } from './mock';
 
+jest.mock('@/contexts/contractModal', () => {
+  return {
+    useContractModal: jest.fn().mockReturnValue({
+      getInteractionsButtons: jest.fn().mockImplementation(() => {
+        return Array(10).fill(() => <button />);
+      }),
+    }),
+  };
+});
+
 describe('Component: Buckets Tab', () => {
   const headerTable = [
     'Staked Values',
@@ -126,7 +136,7 @@ describe('Component: Buckets Tab', () => {
     }
   });
 
-  it('Should render the fallback value for "minEpochsToWithdraw" when don\t exist the property in assets or don\' find the bucketId', async () => {
+  it('Should render the fallback value for "minEpochsToWithdraw" when don\'t exist the property in assets or don\'t find the bucketId', async () => {
     const address =
       'klv18slsv4v8yxdarvvyxdwgvdeqwrna899k2vcshlrlc4xjuyjlhveqv78t8s';
     const router = useRouter();
@@ -138,7 +148,12 @@ describe('Component: Buckets Tab', () => {
     };
 
     await act(async () => {
-      renderWithTheme(<Buckets bucketsTableProps={bucketsTableProps} />);
+      renderWithTheme(
+        <Buckets
+          bucketsTableProps={bucketsTableProps}
+          showInteractionButtons
+        />,
+      );
     });
 
     const unstakedEpochElement = screen.getAllByText('--')[0];
@@ -165,7 +180,12 @@ describe('Component: Buckets Tab', () => {
       'klv18slsv4v8yxdarvvyxdwgvdeqwrna899k2vcshlrlc4xjuyjlhveqv78t8s';
 
     await act(async () => {
-      renderWithTheme(<Buckets bucketsTableProps={bucketsTableProps} />);
+      renderWithTheme(
+        <Buckets
+          bucketsTableProps={bucketsTableProps}
+          showInteractionButtons
+        />,
+      );
     });
 
     const link = screen.getByRole('link', {

@@ -1,18 +1,17 @@
 import { transparentize } from 'polished';
 import styled from 'styled-components';
 
-export const Container = styled.div<{ openModal?: boolean }>`
+export const Container = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  display: ${props => (props.openModal ? 'grid' : 'none')};
+  display: grid;
   justify-content: center;
   place-content: center;
   width: 100vw;
   height: 100vh;
   z-index: 6;
   backdrop-filter: brightness(0.3);
-  visibility: ${props => (props.openModal ? 'visible' : 'hidden')};
 `;
 
 export const Content = styled.div`
@@ -27,6 +26,10 @@ export const Content = styled.div`
   min-width: 60vw;
   border-radius: 1rem;
   background-color: ${props => props.theme.modalBackground.background};
+
+  display: flex;
+  flex-direction: column;
+
   h1 {
     color: ${props => props.theme.true.white};
   }

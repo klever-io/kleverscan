@@ -1,6 +1,5 @@
 import { KLV } from '@/assets/coins';
 import { AccountDetails as AccountIcon } from '@/assets/title-icons';
-import ModalContract from '@/components/Contract/ModalContract';
 import Copy from '@/components/Copy';
 import DateFilter, {
   IDateFilter,
@@ -24,6 +23,7 @@ import {
   RightFiltersContent,
   TxsFiltersWrapper,
 } from '@/components/TransactionsFilters/styles';
+import { useContractModal } from '@/contexts/contractModal';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import {
@@ -47,7 +47,6 @@ import { resetDate } from '@/utils/resetDate';
 import {
   AmountContainer,
   BalanceContainer,
-  ButtonModal,
   CardContainer,
   CardContent,
   CardHeader,
@@ -115,6 +114,11 @@ const Account: React.FC<IAccountPage> = () => {
     queryFn: () => accountCall(router),
     enabled: !!router?.isReady,
   });
+  const { getInteractionsButtons } = useContractModal();
+
+  const showInteractionButtons = Boolean(
+    walletAddress && account?.address === walletAddress,
+  );
 
   const { data: KLVAllowance, isLoading: isLoadingKLVAllowance } = useQuery({
     queryKey: [`KLVAllowance`, router.query.account],
@@ -313,16 +317,12 @@ const Account: React.FC<IAccountPage> = () => {
         return (
           <>
             <ContainerTabInteractions>
-              {showInteractionsButtons(
-                'Create Asset',
-                'CreateAssetContract',
-                false,
-              )}
+              {showInteractionButtons && <CreateAssetButton />}
             </ContainerTabInteractions>
             <Assets
               assetsTableProps={assetsTableProps}
               address={router.query.account as string}
-              showInteractionsButtons={showInteractionsButtons}
+              showInteractionButtons={showInteractionButtons}
             />
           </>
         );
@@ -331,16 +331,12 @@ const Account: React.FC<IAccountPage> = () => {
         return (
           <>
             <ContainerTabInteractions>
-              {showInteractionsButtons(
-                'Create Asset',
-                'CreateAssetContract',
-                false,
-              )}
+              {showInteractionButtons && <CreateAssetButton />}
             </ContainerTabInteractions>
             <ProprietaryAssets
               assetsTableProps={proprietaryAssetsTableProps}
               address={router.query.account as string}
-              showInteractionsButtons={showInteractionsButtons}
+              showInteractionButtons={showInteractionButtons}
             />
           </>
         );
@@ -350,7 +346,7 @@ const Account: React.FC<IAccountPage> = () => {
         return (
           <Buckets
             bucketsTableProps={bucketsTableProps}
-            showInteractionsButtons={showInteractionsButtons}
+            showInteractionButtons={showInteractionButtons}
           />
         );
       case 'Rewards':
@@ -363,46 +359,6 @@ const Account: React.FC<IAccountPage> = () => {
   const availableBalance = (account?.balance || 0) / 10 ** KLV_PRECISION;
   const totalKLV = calculateTotalKLV();
   const pricedKLV = totalKLV * (priceCall || 0);
-  const showInteractionsButtons = (
-    title: string,
-    valueContract: string,
-    value?: any,
-    isAssetTrigger?: boolean,
-  ) => {
-    let titleFormatted = '';
-    valueContract.split(/(?=[A-Z])/).forEach(t => (titleFormatted += t + ` `));
-    const onClick = () => {
-      switch (valueContract) {
-        case 'ClaimContract':
-          setStakingRewards(value);
-          break;
-        case 'AssetTriggerContract':
-          setCollectionSelected(value);
-          break;
-        default:
-          return;
-      }
-    };
-
-    if (walletAddress === router?.query?.account) {
-      return (
-        <ButtonModal
-          isLocked={valueContract === '--' && true}
-          isAssetTrigger={isAssetTrigger}
-          onClick={() => {
-            setContractValue(valueContract);
-            setOpenModalTransactions(valueContract === '--' ? false : true);
-            setTitleModal(titleFormatted);
-            setValueContract(value);
-            onClick();
-          }}
-        >
-          {title}
-        </ButtonModal>
-      );
-    }
-    return <></>;
-  };
 
   const getFilterName = () => {
     if (router.query?.role === 'sender') {
@@ -443,19 +399,6 @@ const Account: React.FC<IAccountPage> = () => {
       inputType: 'button',
     },
   ];
-  const modalOptions = {
-    contractType: contractValue,
-    setContractType: setContractValue,
-    setOpenModal: setOpenModalTransactions,
-    openModal: openModalTransactions,
-    title: titleModal,
-    assetTriggerSelected: collectionSelected,
-    setAssetTriggerSelected: setCollectionSelected,
-    stakingRewards: stakingRewards,
-    setStakingRewards: setStakingRewards,
-    valueContract: valueContract,
-    setValueContract: setValueContract,
-  };
 
   const getAccountAddress = (address: string) => {
     if (!address) return;
@@ -464,17 +407,66 @@ const Account: React.FC<IAccountPage> = () => {
     }
     return address && parseAddress(address, 50);
   };
+
+  const [
+    SetAccountNameButton,
+    TransferButton,
+    AllowanceClaimButton,
+    KLVStakingClaimButton,
+    KFIStakingClaimButton,
+    CreateAssetButton,
+  ] = getInteractionsButtons([
+    {
+      title: 'Set Account Name',
+      contractType: 'SetAccountNameContract',
+      defaultValues: {
+        name: account?.name ? account.name : '',
+      },
+    },
+    {
+      title: 'Transfer',
+      contractType: 'TransferContract',
+    },
+    {
+      title: 'Allowance Claim',
+      contractType: 'ClaimContract',
+      defaultValues: {
+        claimType: 1,
+        id: 'KLV',
+      },
+    },
+    {
+      title: 'KLV Staking Claim',
+      contractType: 'ClaimContract',
+      defaultValues: {
+        claimType: 0,
+        id: 'KLV',
+      },
+    },
+    {
+      title: 'KFI Staking Claim',
+      contractType: 'ClaimContract',
+      defaultValues: {
+        claimType: 0,
+        id: 'KFI',
+      },
+    },
+    {
+      title: 'Create Asset',
+      contractType: 'CreateAssetContract',
+    },
+  ]);
+
   (account?.permissions?.length || 0) > 0 && tabHeaders.push('Permission');
   const Permission: React.FC = () => {
     const msg = `Owner - This is the default permission, 
     granting the holder the ability to execute all contracts.
     The permission can be transferred to another person and
     shared with a certain threshold and weight.
-
-     User - This permission allows the signer to execute only
-     those contracts explicitly authorized by the permission contract,
-     based on the weight assigned to their signature. 
-    `;
+    User - This permission allows the signer to execute only
+    those contracts explicitly authorized by the permission contract,
+    based on the weight assigned to their signature. 
+      `;
     return (
       <OverviewContainer>
         {account?.permissions?.map(permission => {
@@ -554,10 +546,7 @@ const Account: React.FC<IAccountPage> = () => {
                   isOverflow={false}
                 />
               </ReceiveBackground>
-              {showInteractionsButtons(
-                'Set Account Name',
-                'SetAccountNameContract',
-              )}
+              <SetAccountNameButton />
             </CenteredRow>
           </RowContent>
         </Row>
@@ -589,11 +578,7 @@ const Account: React.FC<IAccountPage> = () => {
                       )}
                     </p>
                   </div>
-                  {showInteractionsButtons(
-                    'Transfer',
-                    'TransferContract',
-                    false,
-                  )}
+                  <TransferButton />
                 </div>
               </AmountContainer>
               <FrozenContainer>
@@ -644,11 +629,7 @@ const Account: React.FC<IAccountPage> = () => {
                   {!isLoadingKLVAllowance ? (
                     <>
                       <span>{getKLVAllowance().toLocaleString()}</span>
-                      {showInteractionsButtons(
-                        'Allowance Claim',
-                        'ClaimContract',
-                        1,
-                      )}
+                      <AllowanceClaimButton />
                     </>
                   ) : (
                     <Skeleton height={19} />
@@ -659,11 +640,7 @@ const Account: React.FC<IAccountPage> = () => {
                   {!isLoadingKLVAllowance ? (
                     <>
                       <span>{getKLVStaking().toLocaleString()}</span>
-                      {showInteractionsButtons(
-                        'Staking Claim',
-                        'ClaimContract',
-                        'klv',
-                      )}
+                      <KLVStakingClaimButton />
                     </>
                   ) : (
                     <Skeleton height={19} />
@@ -674,11 +651,7 @@ const Account: React.FC<IAccountPage> = () => {
                   {!isLoadingKFIAllowance ? (
                     <>
                       <span>{getKFIStaking().toLocaleString()}</span>
-                      {showInteractionsButtons(
-                        'Staking Claim',
-                        'ClaimContract',
-                        'kfi',
-                      )}
+                      <KFIStakingClaimButton />
                     </>
                   ) : (
                     <Skeleton height={19} />
@@ -704,7 +677,6 @@ const Account: React.FC<IAccountPage> = () => {
 
   return (
     <Container>
-      <ModalContract {...modalOptions} />
       <Header>
         <Title
           title={account?.name ? account?.name : 'Account'}

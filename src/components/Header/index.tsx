@@ -175,8 +175,8 @@ const Navbar: React.FC = () => {
       <Container ref={mobileNavbarRef}>
         <Content isMainNet={network === 'Mainnet'}>
           <HeaderContainer
-            isMainNet={network === 'Mainnet'}
-            openSearch={!isTablet ? false : openSearch}
+            $isMainNet={network === 'Mainnet'}
+            $openSearch={!isTablet ? false : openSearch}
           >
             <Link href="/">
               <a>
@@ -202,7 +202,7 @@ const Navbar: React.FC = () => {
                 ))}
               </IconsMenu>
               <NavBarOptionsContainer>
-                <SearchContainer openSearch={true}>
+                <SearchContainer $openSearch={true}>
                   <Input />
                 </SearchContainer>
                 <ConnectWallet
@@ -216,12 +216,12 @@ const Navbar: React.FC = () => {
           )}
 
           {isTablet && (
-            <MobileContainer openSearch={openSearch}>
-              <SearchContainer openSearch={openSearch}>
+            <MobileContainer $openSearch={openSearch}>
+              <SearchContainer $openSearch={openSearch}>
                 {openSearch && <Input />}
                 <CloseSearch
                   onClick={() => setOpenSearch(false)}
-                  openSearch={openSearch}
+                  $openSearch={openSearch}
                 />
               </SearchContainer>
               <ConnectContainer
@@ -232,7 +232,7 @@ const Navbar: React.FC = () => {
               >
                 <SearchIcon
                   onClick={() => setOpenSearch(!openSearch)}
-                  openSearch={openSearch}
+                  $openSearch={openSearch}
                 />
                 <ConnectWallet clickConnection={closeDrawer} />
                 <MenuIcon onClick={handleMenu} data-testid="menu-icon" />

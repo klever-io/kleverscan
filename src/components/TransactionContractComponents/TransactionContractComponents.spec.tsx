@@ -509,7 +509,7 @@ describe('Component: TransactionContractComponents', () => {
     });
   });
 
-  describe.only('When contract is "SetITOPrices"', () => {
+  describe('When contract is "SetITOPrices"', () => {
     it('Should render "Asset Id" and "Price" with all it\'s values', () => {
       renderWithTheme(
         <SetITOPrices

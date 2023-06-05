@@ -615,7 +615,11 @@ const Transaction: React.FC<ITransactionPage> = props => {
               <span>
                 {kdaFee?.amount} {kdaFee?.kda || 'KLV'}
               </span>
-              <Tooltip msg="Both kApp fee and bandwidth fee were payed with KDA" />
+              <Tooltip
+                msg={`Both kApp fee and bandwidth fee were payed with ${
+                  kdaFee?.kda || 'KLV'
+                }`}
+              />
             </KdaFeeSpan>
           </Row>
           <Row>

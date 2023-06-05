@@ -115,11 +115,11 @@ describe('Component: TransactionContractComponents', () => {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        gap: '0.5rem',
+        gap: '0.3rem',
       };
       const centeredRowStrongStyle = {
         fontSize: '1rem',
-        fontWeight: '600',
+        fontWeight: '500',
       };
       expect(row).toHaveStyle(rowStyle);
       expect(rowSpan).toHaveStyle(rowSpanStyle);

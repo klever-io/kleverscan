@@ -1017,7 +1017,9 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                                   asset?.precision,
                                 )}
                               </p>
-                              <p>Percentage: {transfer.percentage}</p>
+                              <p>
+                                Percentage: {transfer.percentage / 10 ** 2}%
+                              </p>
                             </div>
                           ),
                       )
@@ -1026,6 +1028,25 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                         <strong>Transfer Percentage</strong>
                         <p>Amount: --</p>
                         <p>Percentage: -- </p>
+                      </div>
+                    )}
+                    {asset?.royalties?.itoPercentage && (
+                      <div>
+                        <strong>ITO Percentage</strong>
+                        <p>
+                          {`${asset.royalties.itoPercentage / 10 ** 2}%` ||
+                            '--'}
+                        </p>
+                      </div>
+                    )}
+                    {asset?.royalties?.itoFixed && (
+                      <div>
+                        <strong>ITO Fixed</strong>
+                        <p>
+                          {`${
+                            asset.royalties.itoFixed / 10 ** KLV_PRECISION
+                          } KLV` || '--'}
+                        </p>
                       </div>
                     )}
                   </FrozenContainer>

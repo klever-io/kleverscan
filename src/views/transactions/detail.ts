@@ -199,11 +199,11 @@ export const CenteredRow = styled.div`
   flex-direction: row;
   align-items: center;
   width: 100%;
-  gap: 0.5rem;
+  gap: 0.3rem;
 
   strong {
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 500;
   }
 
   p {
@@ -482,4 +482,12 @@ export const PropertiesWrapper = styled.div`
 export const RoyaltiesChangeWrapper = styled.div`
   display: flex;
   flex-direction: column;
+`;
+
+export const CenteredDiv = styled.div`
+  display: flex;
+  font-weight: 600;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.2rem;
 `;

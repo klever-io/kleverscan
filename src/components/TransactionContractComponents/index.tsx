@@ -63,6 +63,7 @@ import { ExpandWrapper } from '@/views/assets/detail';
 import { BigSpan, NetworkParamsContainer } from '@/views/proposals/detail';
 import {
   ButtonExpand,
+  CenteredDiv,
   CenteredRow,
   ExpandRow,
   HeaderWrapper,
@@ -98,6 +99,12 @@ export const Transfer: React.FC<IIndexedContract> = ({ parameter: par }) => {
       </Row>
       <Row>
         <span>
+          <strong>Asset Id</strong>
+        </span>
+        <span>{parameter?.assetId || 'KLV'}</span>
+      </Row>
+      <Row>
+        <span>
           <strong>Amount</strong>
         </span>
         <CenteredRow>
@@ -108,11 +115,11 @@ export const Transfer: React.FC<IIndexedContract> = ({ parameter: par }) => {
           </strong>
           {parameter?.assetId?.split('/')[0] &&
           parameter?.assetId?.split('/')[0] !== 'KLV' ? (
-            <>
-              <Link href={`/asset/${parameter?.assetId?.split('/')[0]}`}>
+            <Link href={`/asset/${parameter?.assetId?.split('/')[0]}`}>
+              <div style={{ fontWeight: '500' }}>
                 {parameter?.assetId?.split('/')[0]}
-              </Link>
-            </>
+              </div>
+            </Link>
           ) : (
             parameter?.amount && (
               <>
@@ -125,12 +132,36 @@ export const Transfer: React.FC<IIndexedContract> = ({ parameter: par }) => {
           )}
         </CenteredRow>
       </Row>
-      <Row>
-        <span>
-          <strong>Asset Id</strong>
-        </span>
-        <span>{parameter?.assetId || 'KLV'}</span>
-      </Row>
+      {parameter?.kdaRoyalties && (
+        <>
+          <Row>
+            <span>
+              <strong>KDA Royalties</strong>
+            </span>
+            <span>
+              {toLocaleFixed(
+                parameter.kdaRoyalties / 10 ** precision,
+                precision,
+              )}{' '}
+              {parameter?.assetId}
+            </span>
+          </Row>
+          <Row>
+            <span>
+              <strong>Total paid</strong>
+            </span>
+            <CenteredRow>
+              <strong style={{ fontWeight: '600' }}>
+                {toLocaleFixed(
+                  (parameter.amount + parameter.kdaRoyalties) / 10 ** precision,
+                  precision,
+                )}{' '}
+                {parameter?.assetId}
+              </strong>
+            </CenteredRow>
+          </Row>
+        </>
+      )}
       <Row>
         <span>
           <strong>To</strong>
@@ -1353,7 +1384,11 @@ export const Buy: React.FC<IContractBuyProps> = ({
     }
   };
   initializeVariables();
-  const precisions = usePrecision([assetId, currencyId]);
+  const getPrecisionsToSearch = receipts
+    .map(receipt => receipt.assetId)
+    .filter(precision => precision !== undefined);
+
+  const precisions = usePrecision(getPrecisionsToSearch);
 
   const renderMarketBuy = () => {
     const buyReceipt = findReceipt(receipts, contractIndex, 16);
@@ -1496,11 +1531,62 @@ export const Buy: React.FC<IContractBuyProps> = ({
       }
       return null;
     };
+
+    const getTotalPrices = () => {
+      const prices = {};
+      receipts.forEach(receipt => {
+        if (receipt.from === sender) {
+          if (receipt.assetId in prices) {
+            prices[receipt.assetId] += receipt.value;
+          } else {
+            prices[receipt.assetId] = receipt.value;
+          }
+        }
+      });
+      return prices;
+    };
+
+    const parseTotalPrices = (prices: { [key: string]: number }) => {
+      return Object.keys(prices).map(assetId => ({
+        [assetId]: toLocaleFixed(
+          prices[assetId] / 10 ** precisions[assetId],
+          precisions[assetId],
+        ),
+      }));
+    };
+
     const price = getPrice();
     const amount = getAmount();
 
+    const totalPrices = getTotalPrices();
+    const parsedTotalPrices = parseTotalPrices(totalPrices);
+
     return (
       <>
+        {parsedTotalPrices.map(obj => {
+          return Object.entries(obj).map(([assetId, value]) => {
+            return (
+              <Row key={assetId}>
+                <span>
+                  <strong>
+                    Total paid in <br />
+                    {assetId}
+                  </strong>
+                </span>
+                <CenteredDiv>
+                  <span>
+                    {value} {assetId}
+                  </span>
+                  <Tooltip
+                    msg={
+                      'There might be royalties fees in the total paid price.\n To know exactly how much you are being charged check your assets royalties info in assets page.'
+                    }
+                  />
+                </CenteredDiv>
+              </Row>
+            );
+          });
+        })}
         {price && (
           <Row>
             <span>

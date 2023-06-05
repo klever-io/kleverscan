@@ -299,6 +299,8 @@ export interface IRoyalties {
       percentage: number;
     },
   ];
+  itoPercentage?: number;
+  itoFixed?: number;
 }
 
 export interface IRole {

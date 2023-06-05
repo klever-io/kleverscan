@@ -129,6 +129,7 @@ export interface ITransferContract {
   toAddress: string;
   assetId?: string;
   precision?: number;
+  kdaRoyalties?: number;
 }
 
 export enum EnumAssetType {
@@ -147,6 +148,8 @@ export interface IRoyaltiesInfo {
   transferFixed: number;
   marketPercentage: number;
   marketFixed: number;
+  itoPercentage: number;
+  itoFixed: number;
 }
 
 export interface ICreateAssetContract {

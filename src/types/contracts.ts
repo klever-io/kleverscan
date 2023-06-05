@@ -515,7 +515,7 @@ export interface IWhitelistInfo {
 
 export interface IITOTriggerContract {
   triggerType: ITOTriggerType;
-  assetID: string;
+  assetId: string;
   receiverAddress: string;
   status: string;
   maxAmount: number;

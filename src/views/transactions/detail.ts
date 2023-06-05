@@ -289,10 +289,16 @@ export const CardRaw = styled.div`
 `;
 
 export const Hr = styled.hr`
-  padding: 0.08rem;
-  background: #ebf1f7;
+  background: ${props =>
+    props.theme.dark
+      ? props.theme.card.border
+      : props.theme.modalBackground.background};
   padding: 0.2rem;
-  border-radius: 4px;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 5rem;
+  border-color: ${props =>
+    props.theme.dark ? props.theme.card.border : props.theme.white};
 `;
 
 export const NestedContainerWrapper = styled.div`
@@ -305,12 +311,24 @@ export const HeaderWrapper = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  span {
+    min-width: 10rem;
+  }
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
     span:nth-child(1) {
       margin-top: 1rem;
     }
+    span {
+      min-width: initial;
+    }
+  }
+`;
+
+export const HeaderSpan = styled.span`
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+    min-width: 10rem;
   }
 `;
 

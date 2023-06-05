@@ -497,7 +497,7 @@ const IITOTriggerSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IITOTriggerContract;
   return [
     { element: <span>{parameter?.triggerType || ''}</span>, span: 1 },
-    { element: <span>{parameter?.assetID || ''}</span>, span: 1 },
+    { element: <span>{parameter?.assetId || ''}</span>, span: 1 },
   ];
 };
 

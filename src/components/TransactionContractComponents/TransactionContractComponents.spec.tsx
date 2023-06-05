@@ -509,7 +509,7 @@ describe('Component: TransactionContractComponents', () => {
     });
   });
 
-  describe('When contract is "SetITOPrices"', () => {
+  describe.only('When contract is "SetITOPrices"', () => {
     it('Should render "Asset Id" and "Price" with all it\'s values', () => {
       renderWithTheme(
         <SetITOPrices
@@ -521,8 +521,9 @@ describe('Component: TransactionContractComponents', () => {
       const {
         setIcoPricesContract: { parameter },
       } = mockedTxContractComponents;
-
       const assetId = screen.getByText(/Asset Id/i);
+      const packInfoKLVKey = screen.getAllByText(/KLV2/);
+      expect(packInfoKLVKey.length).toEqual(4);
 
       expect(assetId).toBeInTheDocument();
       expect(assetId.parentNode?.nextSibling?.firstChild).toHaveTextContent(

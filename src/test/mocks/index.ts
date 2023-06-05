@@ -269,9 +269,38 @@ export const mockedTxContractComponents = {
     sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jsdfr741',
     parameter: {
       assetId: 'KLV',
-      packInfo: {
-        price: 245,
-      },
+      packInfo: [
+        {
+          key: 'KLV2',
+          packs: [
+            {
+              amount: 2131231,
+              price: 3131313000000,
+            },
+            {
+              amount: 110000,
+              price: 2222000000,
+            },
+          ],
+        },
+        {
+          key: 'TBLC-14IV',
+          packs: [
+            {
+              amount: 5,
+              price: 550,
+            },
+            {
+              amount: 2,
+              price: 222220,
+            },
+            {
+              amount: 6663,
+              price: 424110,
+            },
+          ],
+        },
+      ],
     },
   },
   buyContract: {

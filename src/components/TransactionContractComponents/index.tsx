@@ -18,6 +18,7 @@ import {
   IFreezeContract,
   IIndexedContract,
   IITOTriggerContract,
+  IPackInfo,
   IParameter,
   IProposalContract,
   ISellContract,
@@ -46,9 +47,12 @@ import {
   findReceipt,
 } from '@/utils/findKey';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
-import { usePrecision } from '@/utils/hooks';
+import {
+  PacksPrecision,
+  usePackInfoPrecisions,
+  usePrecision,
+} from '@/utils/hooks';
 import { getProposalNetworkParams } from '@/utils/networkFunctions';
-import { getPrecision } from '@/utils/precisionFunctions';
 import {
   calculatePermissionOperations,
   receiverIsSender,
@@ -66,6 +70,7 @@ import {
   CenteredDiv,
   CenteredRow,
   ExpandRow,
+  HeaderSpan,
   HeaderWrapper,
   HoverAnchor,
   Hr,
@@ -81,7 +86,7 @@ import {
   URIsWrapper,
 } from '@/views/transactions/detail';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Tooltip from '../Tooltip';
 
 export const Transfer: React.FC<IIndexedContract> = ({ parameter: par }) => {
@@ -1266,8 +1271,11 @@ export const Vote: React.FC<IIndexedContract> = ({ parameter: par }) => {
 
 export const ConfigITO: React.FC<IIndexedContract> = ({ parameter: par }) => {
   const parameter = par as IConfigITOContract;
-  const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
-  const precision = usePrecision(assetID);
+  const assetId = parameter?.assetId?.split('/')[0] || 'KLV';
+  const precision = usePrecision(assetId);
+  const [packsPrecision] = usePackInfoPrecisions(
+    parameter?.packInfo ? parameter.packInfo : [],
+  );
 
   return (
     <>
@@ -1310,6 +1318,14 @@ export const ConfigITO: React.FC<IIndexedContract> = ({ parameter: par }) => {
           </span>
         </Row>
       )}
+
+      {parameter.packInfo &&
+        renderPackInfoComponents(
+          parameter,
+          precision,
+          packsPrecision,
+          renderPackPrecision,
+        )}
     </>
   );
 };
@@ -1318,6 +1334,12 @@ export const SetITOPrices: React.FC<IIndexedContract> = ({
   parameter: par,
 }) => {
   const parameter = par as ISetITOPricesContract;
+  const assetId = parameter?.assetId?.split('/')[0] || 'KLV';
+  const precision = usePrecision(assetId);
+  const [packsPrecision] = usePackInfoPrecisions(
+    parameter?.packInfo ? parameter.packInfo : [],
+  );
+
   return (
     <>
       <Row>
@@ -1330,8 +1352,15 @@ export const SetITOPrices: React.FC<IIndexedContract> = ({
         <span>
           <strong>Asset Id</strong>
         </span>
-        <span>{parameter?.assetId}</span>
+        <span>{assetId}</span>
       </Row>
+      {parameter.packInfo &&
+        renderPackInfoComponents(
+          parameter,
+          precision,
+          packsPrecision,
+          renderPackPrecision,
+        )}
     </>
   );
 };
@@ -2017,49 +2046,19 @@ export const Deposit: React.FC<IIndexedContract> = ({ parameter: par }) => {
 
 export const ITOTrigger: React.FC<IIndexedContract> = ({ parameter: par }) => {
   const parameter = par as IITOTriggerContract;
-
-  const packInfo = parameter?.packInfo || [];
+  const precision = usePrecision(parameter?.assetId || 'KLV');
   const whitelistInfo = parameter?.whitelistInfo || [];
-
-  const getInitialPacksPrecisions = () => {
-    const initialPacksPrecisions = [];
-    for (let index = 0; index < packInfo.length; index++) {
-      initialPacksPrecisions.push({ value: 0 });
-    }
-    return initialPacksPrecisions;
-  };
-
-  const precision = usePrecision(parameter?.assetID || 'KLV');
-  type PacksPrecision =
-    | PromiseSettledResult<number | undefined>[]
-    | { value: number }[];
-
-  const [packsPrecision, setPacksPrecision] = useState<PacksPrecision>(
-    getInitialPacksPrecisions(),
+  const [packsPrecision] = usePackInfoPrecisions(
+    parameter?.packInfo ? parameter.packInfo : [],
   );
 
-  useEffect(() => {
-    const getPacksPrecision = async () => {
-      const promises = packInfo.map(pack => {
-        return getPrecision([pack.key]);
-      });
-      const result: any = await Promise.allSettled(promises);
-      setPacksPrecision(result);
-    };
-    getPacksPrecision();
-  }, []);
-
-  const renderPackPrecision = (price: number, index: number) => {
-    try {
-      const promiseResult = packsPrecision[
-        index
-      ] as PromiseSettledResult<number>;
-      if (promiseResult.status === 'fulfilled') {
-        return price / 10 ** (promiseResult?.value || 0);
-      }
-    } catch (error) {
-      return '';
-    }
+  const renderPackPrecision = (
+    price: number,
+    assetId: string,
+    packsPrecision: PacksPrecision,
+  ): string => {
+    const assetPrecision = packsPrecision[assetId] || 0;
+    return toLocaleFixed(price / 10 ** assetPrecision, assetPrecision) || '--';
   };
 
   const renderMaxAmount = () => {
@@ -2103,47 +2102,15 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({ parameter: par }) => {
 
     switch (triggerType) {
       case ITOTriggerType.SetITOPrices:
-        return (
-          <Row>
-            <NestedContainerWrapper>
-              {packInfo.map((pack, index) => (
-                <HeaderWrapper key={index}>
-                  <span>
-                    <strong>Pack Info</strong>
-                  </span>
-                  <RowContent>
-                    <BalanceContainer>
-                      <FrozenContainer>
-                        <section key={index}>
-                          <div>
-                            <strong>KDA</strong>
-                            <span>{pack.key}</span>
-                          </div>
-                          <Hr />
-                          {pack.packs.map((pack2, index2) => (
-                            <section key={index2}>
-                              <div>
-                                <strong>Amount</strong>
-                                <span>{pack2.amount / 10 ** precision}</span>
-                              </div>
-                              <div>
-                                <strong>Price</strong>
-                                <span>
-                                  {renderPackPrecision(pack2.price, index)}
-                                </span>
-                              </div>
-                              {index2 < pack.packs.length - 1 && <Hr />}
-                            </section>
-                          ))}
-                        </section>
-                      </FrozenContainer>
-                    </BalanceContainer>
-                  </RowContent>
-                </HeaderWrapper>
-              ))}
-            </NestedContainerWrapper>
-          </Row>
-        );
+        if (parameter?.packInfo) {
+          return renderPackInfoComponents(
+            parameter,
+            precision,
+            packsPrecision,
+            renderPackPrecision,
+          );
+        }
+        return null;
       case ITOTriggerType.UpdateStatus:
         return (
           <Row>
@@ -2267,10 +2234,111 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({ parameter: par }) => {
         <span>
           <strong>Asset Id</strong>
         </span>
-        <span>{parameter?.assetID}</span>
+        <span>{parameter?.assetId}</span>
       </Row>
       {renderTriggerTypeData()}
     </>
+  );
+};
+
+const renderPackPrecision = (
+  price: number,
+  assetId: string,
+  packsPrecision: PacksPrecision,
+): string => {
+  const assetPrecision = packsPrecision[assetId] || 0;
+  return toLocaleFixed(price / 10 ** assetPrecision, assetPrecision) || '--';
+};
+
+const renderPackInfo = (
+  packInfo: IPackInfo[],
+  precision: number,
+  packsPrecision: PacksPrecision,
+  renderPackPrecision: (
+    price: number,
+    assetId: string,
+    packsPrecision: PacksPrecision,
+  ) => string,
+): JSX.Element[] => {
+  return packInfo.map((pack: IPackInfo, index: number) => {
+    return (
+      <HeaderWrapper key={pack.key}>
+        <HeaderSpan>
+          <strong>
+            Pack Info
+            <br />
+          </strong>
+          <strong>{`(${pack.key})`}</strong>
+        </HeaderSpan>
+        <RowContent>
+          <BalanceContainer>
+            <FrozenContainer>
+              <section key={pack.key}>
+                <div>
+                  <strong>KDA</strong>
+                  <span>{pack.key}</span>
+                </div>
+                <Hr />
+                {pack.packs.map((pack2, index2: number) => (
+                  <section key={index2}>
+                    <div>
+                      <strong>Amount</strong>
+                      <span>
+                        {toLocaleFixed(
+                          pack2.amount / 10 ** precision,
+                          precision,
+                        )}
+                      </span>
+                    </div>
+                    <div>
+                      <strong>Price</strong>
+                      <span>
+                        {renderPackPrecision(
+                          pack2.price,
+                          pack.key,
+                          packsPrecision,
+                        )}{' '}
+                        {pack.key}
+                      </span>
+                    </div>
+                    {index2 < pack.packs.length - 1 && <Hr />}
+                  </section>
+                ))}
+              </section>
+            </FrozenContainer>
+          </BalanceContainer>
+        </RowContent>
+      </HeaderWrapper>
+    );
+  });
+};
+
+type ContractWithPackInfo =
+  | ISetITOPricesContract
+  | IITOTriggerContract
+  | IConfigITOContract;
+
+const renderPackInfoComponents = (
+  parameter: ContractWithPackInfo,
+  precision: number,
+  packsPrecision: PacksPrecision,
+  renderPackPrecision: (
+    price: number,
+    assetId: string,
+    packsPrecision: PacksPrecision,
+  ) => string,
+): JSX.Element => {
+  return (
+    <Row>
+      <NestedContainerWrapper>
+        {renderPackInfo(
+          parameter.packInfo,
+          precision,
+          packsPrecision,
+          renderPackPrecision,
+        )}
+      </NestedContainerWrapper>
+    </Row>
   );
 };
 

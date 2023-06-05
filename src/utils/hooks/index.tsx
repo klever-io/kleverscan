@@ -2,6 +2,7 @@
 import Skeleton from '@/components/Skeleton';
 import api from '@/services/api';
 import { IAssetResponse, IValidatorResponse } from '@/types';
+import { IPackInfo } from '@/types/contracts';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { getPrecision } from '../precisionFunctions';
 
@@ -168,4 +169,41 @@ export const useSkeleton = (): [
     return !loading && value ? value : <Skeleton {...skeletonParams} />;
   };
   return [isSkeleton, setLoading];
+};
+
+export type PacksPrecision = {
+  [key: string]: number;
+};
+
+type PackInfoHookResult = [
+  PacksPrecision,
+  Dispatch<SetStateAction<PacksPrecision>>,
+];
+
+export const usePackInfoPrecisions = (
+  packInfo: IPackInfo[],
+): PackInfoHookResult => {
+  const assetIds: string[] = [];
+  const getInitialPrecisions = () => {
+    const initialPrecisions: { [key: string]: number } = {};
+    for (let index = 0; index < packInfo.length; index++) {
+      assetIds.push(packInfo[index].key);
+      initialPrecisions[packInfo[index].key] = 0;
+    }
+    return initialPrecisions;
+  };
+
+  const [packsPrecision, setPacksPrecision] = useState<PacksPrecision>(
+    getInitialPrecisions(),
+  );
+
+  useEffect(() => {
+    const getPacksPrecision = async () => {
+      const precisions = await getPrecision(assetIds);
+      setPacksPrecision(precisions);
+    };
+    getPacksPrecision();
+  }, []);
+
+  return [packsPrecision, setPacksPrecision];
 };

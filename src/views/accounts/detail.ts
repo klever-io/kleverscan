@@ -265,12 +265,12 @@ export const FrozenContainer = styled.div`
     align-items: center;
 
     &:not(:last-child) {
-      border-bottom: 1px solid ${props => props.theme.card.border};
-
       border-bottom-left-radius: 0px;
       border-bottom-right-radius: 0px;
     }
-
+    &:not(:first-child) {
+      border-top: 1px solid ${props => props.theme.card.border};
+    }
     strong {
       width: 10rem;
       margin-right: 5px;

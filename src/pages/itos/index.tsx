@@ -1,5 +1,6 @@
 import { Assets as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
+import Filter, { IFilter } from '@/components/Filter';
 import { default as FungibleITO } from '@/components/FungibleITO';
 import { Container } from '@/components/FungibleITO/styles';
 import Input from '@/components/Input';
@@ -18,6 +19,7 @@ import {
   AssetsList,
   ChooseAsset,
   CloseIcon,
+  ConfigITOButtonWrapper,
   HashAndCopy,
   HashContent,
   Header,
@@ -38,9 +40,9 @@ import {
   SideList,
 } from '@/views/itos';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { toast } from 'react-toastify';
 
 export const displayITOpacks = (
   ITO: IParsedITO,
@@ -136,21 +138,40 @@ export const parseITOs = async (
 
 const ITOsPage: React.FC = () => {
   const [ITOs, setITOs] = useState<IParsedITO[]>([]);
-  const [search, setSearch] = useState('');
   const [lastPage, setLastPage] = useState(0);
   const [selectedITO, setSelectedITO] = useState<null | IParsedITO>(null);
   const [page, setPage] = useState(1);
   const [txHash, setTxHash] = useState('');
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
   const { isMobile } = useMobile();
   const { extensionInstalled, connectExtension } = useExtension();
 
   const { getInteractionsButtons } = useContractModal();
 
-  const requestITOs = async () => {
-    const res = await api.get({
-      route: `ito/list?page=${page}`,
+  const requestITOs = async (tempPage?: number) => {
+    const asset = router?.query?.asset ?? '';
+    const itoPage = tempPage ?? page;
+    const isActive = router?.query?.active ?? true;
+    return api.get({
+      route: `ito/list`,
+      query: { page: itoPage, active: isActive, asset },
     });
+  };
+
+  const requestITOsAndReset = async () => {
+    const res = await requestITOs(1);
+    if (!res.error || res.error === '') {
+      const newITOs = res?.data?.itos || [];
+      await parseITOs(newITOs);
+      setPage(1);
+      setLastPage(res.pagination.totalPages);
+      setITOs(newITOs);
+    }
+  };
+
+  const requestITOsAndAddMore = async () => {
+    const res = await requestITOs();
     if (!res.error || res.error === '') {
       const newITOs = res?.data?.itos || [];
       await parseITOs(newITOs);
@@ -200,17 +221,17 @@ const ITOsPage: React.FC = () => {
 
   const requestWithLoading = async () => {
     setLoading(true);
-    await requestITOs();
+    await requestITOsAndReset();
     setLoading(false);
   };
 
   useEffect(() => {
     requestWithLoading();
-  }, []);
+  }, [router?.query?.active]);
 
   useEffect(() => {
     if (page > 1) {
-      requestITOs();
+      requestITOsAndAddMore();
     }
   }, [page]);
 
@@ -218,53 +239,56 @@ const ITOsPage: React.FC = () => {
     connectExtension();
   }
 
-  // TODO: activate this commented function when query for ITOs partial name
-  // const findITO = (input: string): IParsedITO | null => {
-  //   if (ITOs) {
-  //     return ITOs.find(ITO => ITO.assetId.includes(input)) || null;
-  //   }
-  //   return null;
-  // };
-
-  const findITO = async (): Promise<IParsedITO | null> => {
-    if (ITOs) {
-      const res = await api.get({
-        route: `ito/${search}`,
-      });
-      if (!res.error || res.error === '') {
-        const ITO = res.data.ito;
-        await parseITOs([ITO]);
-        return ITO;
-      }
-      toast.error('Could not find ITO.');
-    }
-    return null;
-  };
-
-  const filterITOs = (input: string): IParsedITO[] | null => {
-    if (ITOs.length) {
-      // return ITOs.filter((ITO) => ITO.assetId.includes(input))
-      // TODO: refactor when query for ITOs partial name
-      return ITOs;
-    }
-    return null;
-  };
-
-  const handleConfirmClick = async () => {
-    setLoading(true);
-    const ITOResult = await findITO();
-    setLoading(false);
-    setSelectedITO(ITOResult);
-  };
-
   const paginateITOs = () => {
     if (page < lastPage) {
       setPage(page + 1);
     }
   };
 
+  const getActive = () => {
+    const active = router?.query?.active;
+    if (typeof active === 'undefined') {
+      router['query']['active'] = 'true';
+      return 'Active';
+    } else if (active === 'true') {
+      return 'Active';
+    }
+    router['query']['active'] = 'false';
+    return 'Inactive';
+  };
+
+  const updateSearchInput = (e: Event) => {
+    const value: string = (e.target as HTMLInputElement).value;
+    router.push({
+      pathname: router.pathname,
+      query: { ...router.query, asset: value },
+    });
+  };
+
+  const filters: IFilter[] = [
+    {
+      firstItem: 'Active',
+      data: ['Inactive'],
+      onClick: (value: string) => {
+        router.push(
+          {
+            pathname: router.pathname,
+            query: {
+              ...router.query,
+              active: value === 'Active' ? 'true' : 'false',
+            },
+          },
+          undefined,
+          {
+            shallow: true,
+          },
+        );
+      },
+      current: getActive(),
+      inputType: 'button',
+    },
+  ];
   const ITOTable = () => {
-    const filteredITOs = filterITOs(search);
     return (
       <>
         <AssetsList>
@@ -272,17 +296,18 @@ const ITOsPage: React.FC = () => {
             <Input
               containerStyles={{ width: '100%' }}
               type="text"
-              value={search}
+              value={router.query.asset as string}
               placeholder="Type asset name"
-              onChange={e => {
-                setSearch(e.target.value.toUpperCase());
-              }}
-              handleConfirmClick={() => handleConfirmClick()}
+              onChange={e => updateSearchInput(e)}
+              handleConfirmClick={() => requestWithLoading()}
             />
-            <ITOSearchButton onClick={handleConfirmClick}>
+            <ITOSearchButton onClick={requestWithLoading}>
               Search
             </ITOSearchButton>
           </SearchContainer>
+          {filters.map(filter => (
+            <Filter key={JSON.stringify(filter)} {...filter} />
+          ))}
           <Scrollable id="scrollableDiv">
             <InfiniteScroll
               style={{
@@ -300,8 +325,8 @@ const ITOsPage: React.FC = () => {
               endMessage={ITOs?.length ? 'All ITOs have been loaded.' : ''}
             >
               <Scroll>
-                {filteredITOs &&
-                  filteredITOs.map((ITO: IParsedITO) => {
+                {ITOs.length > 0 &&
+                  ITOs.map((ITO: IParsedITO) => {
                     return (
                       <AssetContainer
                         selected={selectedITO?.assetId === ITO.assetId}
@@ -386,7 +411,9 @@ const ITOsPage: React.FC = () => {
       <ITOContainer>
         <Header>
           <Title title="ITOs" Icon={Icon} />
-          <ConfigITOButton />
+          <ConfigITOButtonWrapper>
+            <ConfigITOButton />
+          </ConfigITOButtonWrapper>
         </Header>
         <MainContent>
           <SideList>

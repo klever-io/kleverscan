@@ -53,7 +53,6 @@ import {
   AmountContainer,
   BalanceContainer,
   ButtonExpand,
-  ButtonModal,
   CardContainer,
   CardContent,
   CardHeader,

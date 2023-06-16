@@ -214,14 +214,14 @@ export const Scroll = styled.div`
 `;
 
 export const Scrollable = styled.div`
-  height: 30rem;
+  height: 15rem;
   overflow-y: scroll;
   color: ${props =>
     props.theme.dark ? props.theme.true.white : props.theme.black};
 
   @media (max-width: 768px) {
-    height: 11rem;
-    min-height: 40vh;
+    height: initial;
+    max-height: 40vh;
   }
 
   ::-webkit-scrollbar {
@@ -244,7 +244,6 @@ export const Scrollable = styled.div`
 
 export const Header = styled.div`
   display: flex;
-
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
@@ -255,6 +254,13 @@ export const Header = styled.div`
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
+  }
+`;
+
+export const ConfigITOButtonWrapper = styled.span`
+  width: 100%;
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+    width: initial;
   }
 `;
 

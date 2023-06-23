@@ -120,13 +120,15 @@ export const MobileNavbarItem: React.FC<INavbarItem> = ({
   }
   return (
     <Link href={pathTo}>
-      <MobileItem
-        onClick={onClick}
-        selected={router.pathname.includes(name.toLowerCase())}
-      >
-        <span>{name}</span>
-        <Icon />
-      </MobileItem>
+      <a>
+        <MobileItem
+          onClick={onClick}
+          selected={router.pathname.includes(name.toLowerCase())}
+        >
+          <span>{name}</span>
+          <Icon />
+        </MobileItem>
+      </a>
     </Link>
   );
 };

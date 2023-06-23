@@ -1,48 +1,13 @@
 import { default as DefaultInput } from '@/components/InputGlobal';
+import {
+  CenteredRow as DefaultCenteredRow,
+  Row as DefaultRow,
+} from '@/styles/common';
 import styled, { css, DefaultTheme, StyledComponent } from 'styled-components';
 
 interface IExpandCenteredRow {
   openJson?: boolean;
 }
-
-export const Container = styled.div``;
-
-export const Header = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-`;
-
-export const Title = styled.div`
-  display: flex;
-
-  flex-direction: row;
-  align-items: center;
-
-  gap: 0.75rem;
-
-  div {
-    cursor: pointer;
-  }
-
-  svg {
-    overflow: visible;
-    position: relative;
-    left: 0.2rem;
-    top: 0.5rem;
-  }
-
-  h1 > p {
-    display: inline-block;
-  }
-`;
 
 export const Input = styled(DefaultInput)`
   margin-top: 1.1rem;
@@ -80,67 +45,7 @@ export const CardContent = styled.div`
   border-radius: 0.75rem;
 `;
 
-export const Row = styled.div`
-  width: 100%;
-  position: relative;
-  padding: 1.2rem 2rem;
-
-  display: flex;
-
-  flex-direction: row;
-  align-items: center;
-
-  color: ${props => props.theme.black};
-
-  &:not(:last-child) {
-    border-bottom: 1px solid ${props => props.theme.card.border};
-
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
-  }
-
-  > span:first-child {
-    min-width: 10rem;
-  }
-
-  span {
-    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-      max-width: 100%;
-    }
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    strong {
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: ${props => props.theme.darkText};
-    }
-
-    small {
-      font-weight: 400;
-      font-size: 0.95rem;
-      color: ${props => props.theme.darkText};
-    }
-
-    a {
-      color: ${props => props.theme.black};
-      font-size: 0.95rem;
-      font-weight: 600;
-
-      overflow: hidden;
-
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    p {
-      color: ${props => props.theme.darkText};
-      font-weight: 400;
-    }
-  }
+export const Row = styled(DefaultRow)`
   .accordion-disabled {
     display: flex;
     color: black;
@@ -173,19 +78,6 @@ export const Row = styled.div`
   /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
 
   /* Style the accordion panel. Note: hidden by default */
-  .panel {
-    gap: 1rem;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    width: 100%;
-    padding: 1rem 1rem 1rem 10rem;
-    transition: max-height 0.2s ease-out;
-
-    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-      padding: 1rem 1rem 1rem 1rem;
-    }
-  }
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
@@ -193,37 +85,25 @@ export const Row = styled.div`
   }
 `;
 
-export const CenteredRow = styled.div`
+export const Panel = styled.div`
+  gap: 1rem;
   display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100%;
+  padding: 1rem 1rem 1rem 10rem;
+  transition: max-height 0.2s ease-out;
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    padding: 1rem 1rem 1rem 1rem;
+  }
+`;
+
+export const CenteredRow = styled(DefaultCenteredRow)`
   overflow: hidden;
   flex-direction: row;
-  align-items: center;
-  width: 100%;
-  gap: 0.3rem;
 
-  strong {
-    font-size: 1rem;
-    font-weight: 500;
-  }
-
-  p {
-    font-weight: 600;
-    font-size: 0.85rem;
-  }
-
-  svg {
-    cursor: pointer;
-  }
-
-  a {
-    color: ${props => props.theme.black};
-    font-size: 1rem;
-    font-weight: 600;
-    text-decoration: none;
-  }
-  a:hover {
-    text-decoration: underline;
-  }
+  flex-wrap: nowrap;
 
   span {
     line-height: 2rem;
@@ -235,7 +115,7 @@ export const ExpandCenteredRow: StyledComponent<
   DefaultTheme,
   { openJson?: boolean | undefined },
   never
-> = styled(CenteredRow)<{ openJson?: boolean }>`
+> = styled(DefaultCenteredRow)<{ openJson?: boolean }>`
   align-items: flex-start !important;
   justify-content: space-between;
   ${props =>
@@ -436,7 +316,7 @@ export const KdaFeeSpan = styled.span`
   }
 `;
 
-export const ExpandRow = styled(Row)<{ expandVar: boolean }>`
+export const ExpandRow = styled(DefaultRow)<{ expandVar: boolean }>`
   ${props =>
     props.expandVar &&
     ` 

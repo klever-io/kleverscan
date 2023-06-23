@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 import Footer from '../Footer';
+import { FooterFixed } from '../Footer/FooterFixed';
 import Navbar from '../Header';
 
 const Layout: React.FC = ({ children }) => {
@@ -53,6 +54,7 @@ const Layout: React.FC = ({ children }) => {
       <Main>{children}</Main>
 
       <Footer />
+      <FooterFixed />
     </LayoutContainer>
   );
 };

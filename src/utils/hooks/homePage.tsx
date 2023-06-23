@@ -1,11 +1,12 @@
 import api from '@/services/api';
+import { IBlockResponse } from '@/types/blocks';
 import {
   IAccountResponse,
-  IBlockResponse,
   IGeckoChartResponse,
   IGeckoResponse,
   IHome,
   ITransactionListResponse,
+  ITransactionsResponse,
   Service,
 } from '@/types/index';
 import { useEffect } from 'react';
@@ -102,7 +103,7 @@ export const useHomePageData = (): IHome => {
         },
       );
 
-      const transactionsCall = new Promise<IBlockResponse>(
+      const transactionsCall = new Promise<ITransactionsResponse>(
         async (resolve, reject) => {
           const res = await api.get({
             route: 'transaction/list?minify=true',

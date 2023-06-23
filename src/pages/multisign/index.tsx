@@ -5,10 +5,10 @@ import { Loader } from '@/components/Loader/styles';
 import Tooltip from '@/components/Tooltip';
 import { useExtension } from '@/contexts/extension';
 import { useTheme } from '@/contexts/theme';
+import { Header } from '@/styles/common';
 import theme from '@/styles/theme';
 import { Service } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
-import { Header } from '@/views/blocks';
 import {
   ButtonContainer,
   Container,

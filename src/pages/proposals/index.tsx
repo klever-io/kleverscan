@@ -4,13 +4,12 @@ import Tabs, { ITabs } from '@/components/Tabs';
 import NetworkParams from '@/components/Tabs/NetworkParams';
 import ProposalsTab from '@/components/Tabs/Proposals';
 import api from '@/services/api';
+import { Card, Container, Header } from '@/styles/common';
 import { IResponse } from '@/types';
 import { IParsedProposal, IProposalsResponse } from '@/types/proposals';
 import { setQueryAndRouter } from '@/utils';
 import { getProposalNetworkParams } from '@/utils/networkFunctions';
-import { Header } from '@/views/accounts/detail';
-import { Card } from '@/views/blocks';
-import { CardContainer, Container } from '@/views/proposals';
+import { CardContainer } from '@/views/proposals';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 

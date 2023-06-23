@@ -1,9 +1,10 @@
 import Table, { ITable } from '@/components/Table';
+import { Container, Header } from '@/styles/common';
 import React from 'react';
 import Filter, { IFilter } from '../Filter';
 import Title from '../Layout/Title';
 import { FilterContainer } from '../TransactionsFilters/styles';
-import { Container, Header, TableContainer } from './styles';
+import { TableContainer } from './styles';
 
 interface IDetail {
   title: string;

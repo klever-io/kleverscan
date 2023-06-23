@@ -2,41 +2,6 @@ import { Container } from '@/components/Input/styles';
 import { StyledTextArea } from '@/components/TransactionForms/FormInput/styles';
 import styled, { keyframes } from 'styled-components';
 
-export const CardHeader = styled.div`
-  display: flex;
-
-  flex-direction: row;
-`;
-
-export const CardHeaderItem = styled.div<{ selected: boolean }>`
-  padding: 1rem;
-
-  background-color: ${props =>
-    props.selected ? props.theme.white : 'transparent'};
-
-  border-radius: 0.75rem 0.75rem 0 0;
-
-  cursor: pointer;
-
-  transition: 0.2s ease;
-
-  span {
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: ${props => props.theme.black};
-
-    opacity: ${props => (props.selected ? 1 : 0.33)};
-
-    transition: 0.2s ease;
-  }
-`;
-
-export const CardContent = styled.div`
-  background-color: ${props => props.theme.white};
-
-  border-radius: 0 0.75rem 0.75rem 0.75rem;
-`;
-
 export const FormContent = styled.form`
   display: flex;
   width: 100%;

@@ -1,7 +1,7 @@
 import { IChartData } from '@/configs/home';
 import { ISO2 } from '@/utils/country';
 import { Dispatch, SetStateAction } from 'react';
-import { IBlock } from './blocks';
+import { IBlock, IBlockResponse } from './blocks';
 import {
   Contract,
   IContract,
@@ -688,11 +688,22 @@ export interface ICoinCards {
   coins: ICoinInfo[];
   assetsData: IAssetsData;
 }
-export interface ITransactionResponse extends IResponse {
+export interface ITransactionsResponse extends IResponse {
   data: {
     transactions: ITransaction[];
   };
   pagination: IPagination;
+}
+
+export interface ITransactionResponse extends IResponse {
+  data: {
+    transaction: ITransaction;
+  };
+}
+
+export interface ITransactionPage {
+  transaction: ITransaction;
+  block: IBlock;
 }
 
 export interface IAssetTransactionResponse extends IResponse {
@@ -719,18 +730,13 @@ export interface IAccountResponse extends IResponse {
   pagination: IPagination;
 }
 
-export interface IBlockResponse extends IResponse {
-  data: {
-    blocks: IBlock[];
-  };
-}
-export interface IAssetResponse extends IResponse {
+export interface IAssetsResponse extends IResponse {
   data: {
     assets: IAsset[];
   };
 }
 
-export interface IAssetOne extends IResponse {
+export interface IAssetResponse extends IResponse {
   data: {
     asset: IAsset;
   };
@@ -910,3 +916,9 @@ export interface IKdaFee {
   kda: string;
   amount: number;
 }
+
+export type SearchRequest =
+  | ITransactionResponse
+  | IAssetResponse
+  | IAccountResponse
+  | IBlockResponse;

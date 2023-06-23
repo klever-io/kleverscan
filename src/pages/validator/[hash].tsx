@@ -8,6 +8,12 @@ import Table, { ITable } from '@/components/Table';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import {
+  CardContent,
+  CardHeader,
+  CardHeaderItem,
+  Container,
+} from '@/styles/common';
+import {
   IBucket,
   IDelegate,
   IPagination,
@@ -21,7 +27,6 @@ import { parseAddress } from '@/utils/parseValues';
 import {
   BoldElement,
   CenteredSubTitle,
-  Container,
   CopyBackground,
   ElementsWrapper,
   HalfRow,
@@ -38,7 +43,6 @@ import {
 } from '@/views/validator';
 import {
   CardContainer,
-  CardContent,
   CenteredRow,
   TableContainer,
 } from '@/views/validators/detail';
@@ -477,6 +481,11 @@ const Validator: React.FC<IValidatorPage> = () => {
         maxDelegation={validator?.maxDelegation}
       />
       <CardContainer>
+        <CardHeader>
+          <CardHeaderItem selected={true}>
+            <span>Overview</span>
+          </CardHeaderItem>
+        </CardHeader>
         <Overview />
       </CardContainer>
       <TableContainer>

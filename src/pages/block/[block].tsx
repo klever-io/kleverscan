@@ -5,20 +5,22 @@ import Transactions from '@/components/Tabs/Transactions';
 import Validators from '@/components/Tabs/Validators';
 import Tooltip from '@/components/Tooltip';
 import api from '@/services/api';
-import { IBlock } from '@/types/blocks';
-import { setQueryAndRouter } from '@/utils';
-import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import {
-  CardContainer,
   CardContent,
   CardHeader,
   CardHeaderItem,
+  CardTabContainer,
   CenteredRow,
-  CenteredRowSpan,
-  CommonSpan,
   Container,
   Header,
   Row,
+} from '@/styles/common';
+import { IBlock, IBlockPage, IBlockResponse } from '@/types/blocks';
+import { setQueryAndRouter } from '@/utils';
+import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
+import {
+  CenteredRowSpan,
+  CommonSpan,
   RowBlockNavigation,
   TooltipContainer,
   ToolTipStyle,
@@ -31,24 +33,7 @@ import {
   MdOutlineKeyboardArrowLeft,
   MdOutlineKeyboardArrowRight,
 } from 'react-icons/md';
-import { IPagination, IResponse, ITransaction } from '../../types';
-
-interface IBlockPage {
-  block: IBlock;
-}
-
-interface IBlockResponse extends IResponse {
-  data: {
-    block: IBlock;
-  };
-}
-
-interface ITransactionResponse extends IResponse {
-  data: {
-    transactions: ITransaction[];
-  };
-  pagination: IPagination;
-}
+import { ITransactionsResponse } from '../../types';
 
 const Block: React.FC<IBlockPage> = ({ block }) => {
   const {
@@ -82,7 +67,7 @@ const Block: React.FC<IBlockPage> = ({ block }) => {
   const requestBlock = async (
     page: number,
     limit: number,
-  ): Promise<ITransactionResponse> =>
+  ): Promise<ITransactionsResponse> =>
     api.get({
       route: `transaction/list?page=${page}&blockNum=${nonce}&limit=${limit}`,
     });
@@ -332,7 +317,7 @@ const Block: React.FC<IBlockPage> = ({ block }) => {
         <Title title="Block Details" route="/blocks" />
       </Header>
 
-      <CardContainer>
+      <CardTabContainer>
         <CardHeader>
           {cardHeaders.map((header, index) => (
             <CardHeaderItem
@@ -351,7 +336,7 @@ const Block: React.FC<IBlockPage> = ({ block }) => {
         <CardContent>
           <SelectedComponent />
         </CardContent>
-      </CardContainer>
+      </CardTabContainer>
 
       <Tabs {...tabProps}>
         <SelectedTabComponent />

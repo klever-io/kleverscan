@@ -1,8 +1,6 @@
 import { default as DefaultInput } from '@/components/InputGlobal';
 import styled from 'styled-components';
 
-export const Container = styled.div``;
-
 export const Header = styled.section`
   margin-bottom: 1rem;
 

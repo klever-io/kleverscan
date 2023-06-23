@@ -2,6 +2,7 @@ import { createGlobalStyle } from 'styled-components';
 import darktheme from './theme/dark';
 
 export default createGlobalStyle`
+
   * {
     margin: 0;
     padding: 0;
@@ -11,7 +12,7 @@ export default createGlobalStyle`
   }
   
   body {
-    background: ${darktheme.navbar.background};
+    background: ${darktheme.background};
   }
 
   a, a:hover, a:focus, a:active {
@@ -32,7 +33,7 @@ export default createGlobalStyle`
   }
 
   body, input, textarea, button {
-    font: 500 1rem Montserrat, sans-serif;
+    font: 500 1rem "Manrope", sans-serif;
   }
 
   input {
@@ -47,7 +48,7 @@ export default createGlobalStyle`
 
   h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
-    font-family: Montserrat, sans-serif;
+    font-family: "Manrope", sans-serif;
   }
 
   h1 {

@@ -95,7 +95,7 @@ describe('Component: TransactionContractComponents', () => {
 
       const rowStyle = {
         width: '100%',
-        padding: '1.2rem 2rem',
+        padding: '1.5rem 2rem',
       };
       const rowSpanStyle = {
         overflow: 'hidden',
@@ -103,8 +103,6 @@ describe('Component: TransactionContractComponents', () => {
         whiteSpace: 'nowrap',
       };
       const rowStrongStyle = {
-        fontWeight: '600',
-        fontSize: '0.95rem',
         color: theme.darkText,
       };
 
@@ -113,13 +111,12 @@ describe('Component: TransactionContractComponents', () => {
 
       const centeredRowStyle = {
         display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: '0.3rem',
+        width: '100%',
+        gap: '0.5rem',
       };
       const centeredRowStrongStyle = {
         fontSize: '1rem',
-        fontWeight: '500',
+        fontWeight: '600',
       };
       expect(row).toHaveStyle(rowStyle);
       expect(rowSpan).toHaveStyle(rowSpanStyle);

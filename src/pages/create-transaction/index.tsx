@@ -12,7 +12,7 @@ import Title from '@/components/Layout/Title';
 import { useContract } from '@/contexts/contract';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
-import { Header } from '@/views/assets';
+import { Header } from '@/styles/common';
 import {
   Container,
   CreateTxCard,

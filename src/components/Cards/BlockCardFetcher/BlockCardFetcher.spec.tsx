@@ -1,4 +1,5 @@
 import * as HomeData from '@/contexts/mainPage';
+import theme from '@/styles/theme';
 import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import BlockCardList from '.';
@@ -62,12 +63,12 @@ describe('Component: BlockCardList', () => {
 
   it('Should match the style for the component', () => {
     renderWithTheme(<BlockCardList />);
-    const blockTitle = screen.getByRole('heading', { name: /Blocks/i });
+    const blockTitle = screen.getByRole('heading', { name: /Recent Blocks/i });
     const section = blockTitle.parentNode;
     const blockTitleStyle = {
-      marginBottom: '1rem',
-      cursor: 'pointer',
+      margin: 0,
       width: 'fit-content',
+      color: theme.darkBlue,
     };
     const sectionStyle = {
       padding: '0 min(3%, 10rem) 10rem',

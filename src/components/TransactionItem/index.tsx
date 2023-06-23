@@ -6,6 +6,8 @@ import {
   TransactionAmount,
   TransactionData,
   TransactionRow,
+  TransactionStatus,
+  TransactionTimer,
 } from '@/views/home';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
@@ -35,7 +37,6 @@ const TransactionItem: React.FC<ITransaction> = ({
   const [amount, setAmount] = useState('');
 
   const StatusIcon = getStatusIcon(status);
-
   const { t } = useTranslation('transactions');
   const contractPosition = 0;
   contractFilter = contract[contractPosition] as IContract;
@@ -73,8 +74,10 @@ const TransactionItem: React.FC<ITransaction> = ({
       return (
         <Link href={`/asset/${assetId || 'KLV'}`}>
           <a className="clean-style">
-            {amount && `${amount} ${assetId || 'KLV'}`}
-            {!amount && <Skeleton />}
+            <span>
+              {amount && `${amount} ${assetId || 'KLV'}`}
+              {!amount && <Skeleton />}
+            </span>
           </a>
         </Link>
       );
@@ -85,23 +88,31 @@ const TransactionItem: React.FC<ITransaction> = ({
   return (
     <TransactionRow isLoading={!!amount}>
       <TransactionData>
-        <a href={`/transaction/${hash}`}>
-          {`${hash.slice(0, 15)}...`}
-          <span>
-            <StatusIcon />
-          </span>
-        </a>
-        <span>{formatDate(timestamp)}</span>
+        <StatusIcon />
+        <TransactionStatus isSuccess={status === 'success'}>
+          {status === 'success' ? 'Success' : 'Fail'}
+        </TransactionStatus>
       </TransactionData>
+      <TransactionTimer>
+        <span>{formatDate(timestamp)}</span>
+      </TransactionTimer>
+      <TransactionData>
+        <a href={`/transaction/${hash}`}>{`${hash.slice(0, 15)}...`}</a>
+      </TransactionData>
+      <TransactionAmount>
+        <span>{shouldRenderAssetId()}</span>
+      </TransactionAmount>
       <TransactionData>
         <p>
-          <strong>{t('From')}: </strong>
+          <span>{t('From')}: </span>
           <Link href={`/account/${sender}`}>
             <a className="clean-style">{parseAddress(sender, 12)}</a>
           </Link>
         </p>
-        <p>
-          <strong>{t('To')}: </strong>
+      </TransactionData>
+      <TransactionData>
+        <div>
+          <span>{t('To')}: </span>
           <Link href={`/account/${contractFilter?.parameter?.toAddress}`}>
             <a className="clean-style">
               {contractFilter?.parameter?.toAddress
@@ -109,11 +120,8 @@ const TransactionItem: React.FC<ITransaction> = ({
                 : '--'}
             </a>
           </Link>
-        </p>
+        </div>
       </TransactionData>
-      <TransactionAmount>
-        <span>{shouldRenderAssetId()}</span>
-      </TransactionAmount>
     </TransactionRow>
   );
 };

@@ -3,7 +3,8 @@ import Chart, { ChartType } from '@/components/Chart';
 import Title from '@/components/Layout/Title';
 import { Loader, LoaderWrapper } from '@/components/Loader/styles';
 import api from '@/services/api';
-import { Container, Header, Section } from '@/views/charts';
+import { Container, Header } from '@/styles/common';
+import { Section } from '@/views/charts';
 import {
   ChartsContainer,
   ContainerTimeFilter,

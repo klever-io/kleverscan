@@ -1,7 +1,5 @@
 import styled from 'styled-components';
 
-export const Container = styled.div``;
-
 export const MapContainer = styled.div`
   margin-bottom: 1.5rem;
 

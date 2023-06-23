@@ -1,3 +1,4 @@
+import { DefaultCardStyles } from '@/styles/common';
 import { lighten } from 'polished';
 import styled from 'styled-components';
 
@@ -5,11 +6,8 @@ export const Pack = styled.div`
   padding: 1rem;
   max-width: 20rem;
   width: 100%;
-  border-radius: 0.8rem;
-  background-color: ${props =>
-    props.theme.dark
-      ? props.theme.card.background
-      : lighten(0.09, props.theme.lightGray)};
+  ${DefaultCardStyles}
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -74,7 +72,7 @@ export const BuyButton = styled.div`
   span {
     text-align: center;
     color: ${props => props.theme.white};
-    font-weight: bold;
+    font-weight: 400;
     font-size: 1rem;
     margin: 0;
     padding: 0.5rem 1rem;

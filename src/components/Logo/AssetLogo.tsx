@@ -7,8 +7,15 @@ interface IAssetLogo {
   ticker: string;
   name: string;
   verified?: boolean;
+  invertColors?: boolean;
 }
-const AssetLogo: React.FC<IAssetLogo> = ({ logo, ticker, name, verified }) => {
+const AssetLogo: React.FC<IAssetLogo> = ({
+  logo,
+  ticker,
+  name,
+  verified,
+  invertColors,
+}) => {
   const isVerified = () => {
     if (verified) {
       return <Verified />;
@@ -57,7 +64,9 @@ const AssetLogo: React.FC<IAssetLogo> = ({ logo, ticker, name, verified }) => {
 
   return (
     <Container data-testid="asset-logo-container">
-      <LetterLogo>{ticker?.split('')?.[0] || ''}</LetterLogo>
+      <LetterLogo invertColors={invertColors}>
+        {ticker?.split('')?.[0] || '--'}
+      </LetterLogo>
       {isVerified()}
     </Container>
   );

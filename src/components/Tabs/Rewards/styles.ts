@@ -1,4 +1,4 @@
-import { FrozenContainer } from '@/views/accounts/detail';
+import { FrozenContainer } from '@/styles/common';
 import { MdKeyboardArrowDown } from 'react-icons/md';
 import styled from 'styled-components';
 

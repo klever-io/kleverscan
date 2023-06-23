@@ -1,4 +1,5 @@
 import { useContract } from '@/contexts/contract';
+import { Card } from '@/styles/common';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
@@ -6,7 +7,6 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { IoOpenOutline } from 'react-icons/io5';
 import ConfirmPayload from '../ConfirmPayload';
 import Copy from '../Copy';
-import { Card } from '../Detail/styles';
 import MetadataOptions from '../Form/Metadata';
 import { Loader } from '../Loader/styles';
 import { getContract } from '../TransactionForms/CustomForms';

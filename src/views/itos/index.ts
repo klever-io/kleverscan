@@ -1,3 +1,4 @@
+import { DefaultCardStyles } from '@/styles/common';
 import { transparentize } from 'polished';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import styled from 'styled-components';
@@ -47,6 +48,7 @@ export const AssetsList = styled.div`
 
 export const AssetContainer = styled.div<IAsset>`
   cursor: pointer;
+  ${DefaultCardStyles};
   background-color: ${props => {
     if (!props.selected && !props.theme.dark) {
       return props.theme.white;
@@ -55,7 +57,7 @@ export const AssetContainer = styled.div<IAsset>`
     } else if (props.selected && !props.theme.dark) {
       return props.theme.lightGray;
     }
-    return props.theme.kappsDemo.dark;
+    return 'unset';
   }};
 
   width: 100%;
@@ -104,8 +106,8 @@ export const ITOContent = styled.div`
 `;
 
 export const PackContainer = styled.div`
-  background-color: ${props =>
-    props.theme.dark ? props.theme.kappsDemo.darker : props.theme.white};
+  ${DefaultCardStyles}
+
   width: 100%;
   padding: 1rem 1.8rem;
   border-radius: 0.8rem;
@@ -211,6 +213,7 @@ export const Scroll = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
+  padding-right: 0.5rem;
 `;
 
 export const Scrollable = styled.div`

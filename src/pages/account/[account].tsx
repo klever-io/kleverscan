@@ -38,7 +38,19 @@ import {
   rewardsFPRPool,
   transactionsRequest,
 } from '@/services/requests/account/account';
-import { IAccountAsset, IInnerTableProps, IResponse } from '@/types/index';
+import {
+  CardContent,
+  CardHeader,
+  CardHeaderItem,
+  CardTabContainer,
+  CenteredRow,
+  Container,
+  FrozenContainer,
+  Header,
+  Row,
+  RowContent,
+} from '@/styles/common';
+import { IInnerTableProps, IResponse } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { contractsList } from '@/utils/contracts';
 import {
@@ -53,27 +65,15 @@ import {
   AmountContainer,
   BalanceContainer,
   ButtonExpand,
-  CardContainer,
-  CardContent,
-  CardHeader,
-  CardHeaderItem,
-  CenteredRow,
   CheckboxOperations,
-  Container,
   ContainerSigners,
   ContainerTabInteractions,
-  FrozenContainer,
-  FrozenContainerPermissions,
   FrozenContentRewards,
-  Header,
   IconContainer,
   ItemContainerPermissions,
   ItemContentPermissions,
   OperationsContainer,
   OperationsContent,
-  OverviewContainer,
-  Row,
-  RowContent,
   StakingRewards,
   ValidOperation,
 } from '@/views/accounts/detail';
@@ -157,13 +157,6 @@ const PermissionOperations: React.FC<IPermissionOperations> = ({
 
 const Account: React.FC<IAccountPage> = () => {
   const headers = ['Assets', 'Transactions', 'Buckets', 'Rewards'];
-  const [openModalTransactions, setOpenModalTransactions] =
-    useState<boolean>(false);
-  const [titleModal, setTitleModal] = useState<string>('');
-  const [stakingRewards, setStakingRewards] = useState<number>(0);
-  const [contractValue, setContractValue] = useState<string>('');
-  const [collectionSelected, setCollectionSelected] = useState<IAccountAsset>();
-  const [valueContract, setValueContract] = useState<any>();
   const tabHeaders = ['Overview'];
 
   const [selectedTabHeader, setSelectedTabHeader] = useState(tabHeaders[0]);
@@ -537,7 +530,7 @@ const Account: React.FC<IAccountPage> = () => {
     based on the weight assigned to their signature. 
       `;
     return (
-      <OverviewContainer>
+      <Container>
         {account?.permissions?.map(permission => {
           return (
             <Row key={permission.id}>
@@ -546,7 +539,7 @@ const Account: React.FC<IAccountPage> = () => {
               </span>
               <RowContent>
                 <BalanceContainer>
-                  <FrozenContainerPermissions>
+                  <FrozenContainer>
                     <ItemContainerPermissions isOperations={true}>
                       <strong>Signers</strong>
                       <ContainerSigners
@@ -593,19 +586,19 @@ const Account: React.FC<IAccountPage> = () => {
                       <strong>Permissions Name</strong>
                       <p>{permission.permissionName || '--'}</p>
                     </ItemContentPermissions>
-                  </FrozenContainerPermissions>
+                  </FrozenContainer>
                 </BalanceContainer>
               </RowContent>
             </Row>
           );
         })}
-      </OverviewContainer>
+      </Container>
     );
   };
 
   const Overview: React.FC = () => {
     return (
-      <OverviewContainer>
+      <Container>
         <Row isAddressRow={true}>
           <span>
             <strong>Address</strong>
@@ -745,7 +738,7 @@ const Account: React.FC<IAccountPage> = () => {
             </small>
           </RowContent>
         </Row>
-      </OverviewContainer>
+      </Container>
     );
   };
 
@@ -759,7 +752,7 @@ const Account: React.FC<IAccountPage> = () => {
           isAccountOwner={!!account?.name}
         />
       </Header>
-      <CardContainer>
+      <CardTabContainer>
         <CardHeader>
           {tabHeaders.map((header, index) => (
             <CardHeaderItem
@@ -776,7 +769,7 @@ const Account: React.FC<IAccountPage> = () => {
         <CardContent>
           <SelectedComponent />
         </CardContent>
-      </CardContainer>
+      </CardTabContainer>
       <Tabs {...tabProps}>
         {router?.query?.tab === 'Transactions' && (
           <TxsFiltersWrapper>

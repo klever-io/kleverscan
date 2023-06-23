@@ -5,6 +5,7 @@ import { MultiContractToolTip } from '@/components/MultiContractToolTip';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import { useMobile } from '@/contexts/mobile';
+import { CenteredRow } from '@/styles/common';
 import { Contract, IContract, ITransferContract } from '@/types/contracts';
 import {
   IInnerTableProps,
@@ -22,7 +23,6 @@ import { capitalizeString } from '@/utils/convertString';
 import { formatAmount, formatDate } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
-import { CenteredRow } from '@/views/accounts/detail';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback } from 'react';

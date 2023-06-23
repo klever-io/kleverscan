@@ -1,5 +1,5 @@
 import * as HomeData from '@/contexts/mainPage';
-import { screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import React from 'react';
 import HomeDataCards from '.';
 import {
@@ -73,16 +73,16 @@ describe('Component: HomeDataCards', () => {
     renderWithTheme(<HomeDataCards />);
     const totalAccountsLabel = screen.getByText(/Total Accounts/i);
     const totalTxsLabel = screen.getByText(/Total Transactions/i);
-    const tpsLabel = screen.getByText(/Live\/Peak TPS/i);
-    const epochRemainingTimeLabel = screen.getByText(/Epoch Remaining Time/i);
+    const epochRemainingTimeLabel = screen.getByText(/Time remaining/i);
 
     expect(totalAccountsLabel).toBeInTheDocument();
     expect(totalTxsLabel).toBeInTheDocument();
-    expect(tpsLabel).toBeInTheDocument();
     expect(epochRemainingTimeLabel).toBeInTheDocument();
 
     const totalAccounts = screen.getAllByText(/100/);
     const totalTx = screen.getAllByText(/20,000/i);
+    const button = screen.getByText(/Expand cards/i);
+    fireEvent.click(button);
     const tps = screen.getAllByText(/0 \/ 3000/i);
     const epochRemainingTime = screen.getAllByText(/6h/i);
 
@@ -95,13 +95,9 @@ describe('Component: HomeDataCards', () => {
   it('Should render the total accounts and transactions in the last 24h', () => {
     renderWithTheme(<HomeDataCards />);
 
-    const variant = screen.getAllByText('Last 24h');
-    const accountsCreatedSinceYesterday = variant[0].nextSibling;
-    const txSinceYesterday = variant[1].nextSibling;
-    expect(accountsCreatedSinceYesterday).toBeInTheDocument();
-    expect(txSinceYesterday).toBeInTheDocument();
-    expect(accountsCreatedSinceYesterday).toHaveTextContent('+ 2');
-    expect(txSinceYesterday).toHaveTextContent('+ 20');
+    const variant = screen.getByText('+ 20/24h');
+    expect(variant).toBeInTheDocument();
+    expect(variant).toHaveTextContent('+ 20');
   });
 
   it("Should render the fallback variant when there's no new accounts since yesterday", () => {
@@ -114,7 +110,8 @@ describe('Component: HomeDataCards', () => {
       .mockImplementation(() => newContextValues as HomeData.IHomeData);
     renderWithTheme(<HomeDataCards />);
     const totalAccounts = screen.getByText(/Total Accounts/i);
-    const variant = totalAccounts.parentNode?.nextSibling?.lastChild;
-    expect(variant).toBeUndefined();
+    const variant =
+      totalAccounts.nextSibling?.lastChild?.firstChild?.firstChild;
+    expect(variant).toBe(null);
   });
 });

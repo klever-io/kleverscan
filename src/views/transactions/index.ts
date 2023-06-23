@@ -1,49 +1,5 @@
-import { default as DefaultInput } from '@/components/InputGlobal';
 import Link from 'next/link';
 import styled from 'styled-components';
-
-export const Container = styled.div``;
-
-export const Title = styled.div`
-  display: flex;
-
-  flex-direction: row;
-  align-items: center;
-
-  gap: 0.75rem;
-
-  div {
-    cursor: pointer;
-
-    svg {
-      height: auto;
-      width: auto;
-    }
-  }
-`;
-
-export const Header = styled.section`
-  margin: 1.5rem 0;
-
-  display: flex;
-  flex-wrap: wrap;
-
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-end;
-
-  div {
-    display: flex;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    flex-direction: column;
-    div:nth-child(1) {
-      width: 100%;
-      flex-direction: column;
-    }
-  }
-`;
 
 export const FilterByDate = styled.div`
   width: fit-content;
@@ -56,32 +12,6 @@ export const FilterByDate = styled.div`
     margin-left: 0;
     width: 100%;
     justify-content: center;
-  }
-`;
-
-export const Input = styled(DefaultInput)`
-  margin-top: 1.1rem;
-
-  padding: 0.75rem 1rem;
-
-  background-color: ${props => props.theme.white};
-
-  border-color: ${props => props.theme.lightGray};
-`;
-
-export const CenteredRow = styled.span`
-  overflow: visible !important;
-  div {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-
-    gap: 0.5rem;
-    width: 100%;
-    p {
-      font-weight: 600;
-      color: ${props => props.theme.black};
-    }
   }
 `;
 

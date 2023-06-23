@@ -34,59 +34,41 @@ import {
 } from '@/components/TransactionContractComponents';
 import { useTheme } from '@/contexts/theme/index';
 import api from '@/services/api';
-import { IBlock } from '@/types/blocks';
+import {
+  CardContent,
+  CardHeader,
+  CardHeaderItem,
+  Container,
+  Header,
+  Row,
+  RowContent,
+} from '@/styles/common';
+import { ITransactionPage, ITransactionResponse } from '@/types';
+import { IBlockResponse } from '@/types/blocks';
 import { Contract, IIndexedContract } from '@/types/contracts';
-import { IAsset, IResponse, ITransaction } from '@/types/index';
 import { capitalizeString, hexToString } from '@/utils/convertString';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import { parseJson } from '@/utils/parseValues';
-import { BalanceContainer, RowContent } from '@/views/accounts/detail';
+import { BalanceContainer } from '@/views/accounts/detail';
 import {
   ButtonExpand,
   CardContainer,
-  CardContent,
   CardRaw,
   CenteredRow,
-  Container,
   DivDataJson,
   ExpandCenteredRow,
   FrozenContainer,
-  Header,
   Hr,
   IconsWrapper,
   KappFeeFailedTx,
   KappFeeSpan,
   KdaFeeSpan,
-  Row,
 } from '@/views/transactions/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React, { useState } from 'react';
-
-interface IBlockResponse extends IResponse {
-  data: {
-    block: IBlock;
-  };
-}
-
-interface ITransactionResponse extends IResponse {
-  data: {
-    transaction: ITransaction;
-  };
-}
-
-interface IAssetResponse extends IResponse {
-  data: {
-    asset: IAsset;
-  };
-}
-
-interface ITransactionPage {
-  transaction: ITransaction;
-  block: IBlock;
-}
 
 const Transaction: React.FC<ITransactionPage> = props => {
   const { transaction, block } = props;
@@ -527,7 +509,11 @@ const Transaction: React.FC<ITransactionPage> = props => {
         />
       </Header>
       <CardContainer>
-        <h3>Overview</h3>
+        <CardHeader>
+          <CardHeaderItem selected={true}>
+            <span>Overview</span>
+          </CardHeaderItem>
+        </CardHeader>
         <CardContent>
           <Row>
             <span>
@@ -653,13 +639,21 @@ const Transaction: React.FC<ITransactionPage> = props => {
         </CardContent>
       </CardContainer>
       <CardContainer>
-        <h3>Contracts</h3>
+        <CardHeader>
+          <CardHeaderItem selected={true}>
+            <span>Contracts</span>
+          </CardHeaderItem>
+        </CardHeader>
         <CardContent>
           <ContractComponent contracts={contract} sender={sender} />
         </CardContent>
       </CardContainer>
       <CardContainer>
-        <h3>Raw Tx</h3>
+        <CardHeader>
+          <CardHeaderItem selected={true}>
+            <span>Raw Tx</span>
+          </CardHeaderItem>
+        </CardHeader>
         <CardContent>
           <CardRaw style={{ height: '30rem' }}>
             <ReactJson

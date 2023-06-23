@@ -20,12 +20,20 @@ import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import {
+  CardContent,
+  CardHeader,
+  CardHeaderItem,
+  CardTabContainer,
+  CenteredRow,
+  Container,
+} from '@/styles/common';
+import {
   IAPR,
   IAsset,
-  IAssetOne,
   IAssetPage,
   IAssetPool,
   IAssetPoolResponse,
+  IAssetResponse,
   IBalance,
   IFPR,
   IHoldersResponse,
@@ -34,7 +42,7 @@ import {
   IPagination,
   IParsedITO,
   IStaking,
-  ITransactionResponse,
+  ITransactionsResponse,
   IUri,
 } from '@/types/index';
 import { parseApr, setQueryAndRouter } from '@/utils';
@@ -48,12 +56,6 @@ import {
   AddressDiv,
   AssetHeaderContainer,
   AssetTitle,
-  CardContainer,
-  CardContent,
-  CardHeader,
-  CardHeaderItem,
-  CenteredRow,
-  Container,
   ContentRow,
   ContentScrollBar,
   EllipsisSpan,
@@ -235,7 +237,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       const pathRoute = router.query?.asset as string;
       const assetId = pathRoute.split('=asset')[0];
 
-      const assetCall = new Promise<IAssetOne>(async (resolve, reject) => {
+      const assetCall = new Promise<IAssetResponse>(async (resolve, reject) => {
         const res = await api.get({
           route: `assets/${assetId}`,
         });
@@ -248,7 +250,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         reject(res.error);
       });
 
-      const transactionCall = new Promise<ITransactionResponse>(
+      const transactionCall = new Promise<ITransactionsResponse>(
         async (resolve, reject) => {
           const res = await api.get({
             route: `transaction/list?asset=${assetId}&limit=5`,
@@ -313,7 +315,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
           if (res.status === 'fulfilled') {
             switch (index) {
               case 0:
-                const asset = res.value as IAssetOne;
+                const asset = res.value as IAssetResponse;
                 const parsedAsset = parseHardCodedInfo([asset?.data?.asset])[0];
                 parseURIs(parsedAsset);
                 if (parsedAsset?.staking?.interestType === 'FPRI') {
@@ -325,7 +327,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                 setAsset(parsedAsset);
                 break;
               case 1:
-                const transactions = res.value as ITransactionResponse;
+                const transactions = res.value as ITransactionsResponse;
                 setTransactionsPagination(transactions?.pagination);
                 break;
               case 2:
@@ -1442,7 +1444,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
   return (
     <Container>
       {asset ? getHeader() : <Skeleton width={200} height={40} />}
-      <CardContainer>
+      <CardTabContainer>
         <CardHeader>
           {cardHeaders.map((header, index) => (
             <CardHeaderItem
@@ -1461,7 +1463,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         <CardContent>
           <SelectedComponent />
         </CardContent>
-      </CardContainer>
+      </CardTabContainer>
 
       <Tabs {...tabProps}>
         {selectedTab === 'Transactions' && (

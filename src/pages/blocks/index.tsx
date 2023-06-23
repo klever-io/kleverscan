@@ -8,6 +8,7 @@ import {
   totalStatisticsCall,
   yesterdayStatisticsCall,
 } from '@/services/apiCalls';
+import { Card, CardContainer, Container, Header } from '@/styles/common';
 import { IBlock, IBlocks, ICard } from '@/types/blocks';
 import { IRowSection } from '@/types/index';
 import {
@@ -21,15 +22,7 @@ import {
 } from '@/utils/localStorage/localStorageData';
 import { parseAddress } from '@/utils/parseValues';
 import { getAge } from '@/utils/timeFunctions';
-import {
-  Card,
-  CardContainer,
-  Container,
-  Header,
-  TableContainer,
-  TableHeader,
-  UpdateContainer,
-} from '@/views/blocks';
+import { TableContainer, TableHeader, UpdateContainer } from '@/views/blocks';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
 

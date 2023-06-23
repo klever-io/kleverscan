@@ -1,155 +1,5 @@
 import { TickSquare } from '@/assets/icons';
-import { default as DefaultInput } from '@/components/InputGlobal';
 import styled, { css } from 'styled-components';
-
-export const Container = styled.div``;
-
-export const Header = styled.div`
-  display: flex;
-
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-`;
-
-export const Title = styled.div`
-  display: flex;
-
-  flex-direction: row;
-  align-items: center;
-
-  gap: 0.75rem;
-
-  div {
-    cursor: pointer;
-
-    svg {
-      height: auto;
-      width: auto;
-    }
-  }
-`;
-
-export const Input = styled(DefaultInput)`
-  margin-top: 1.1rem;
-
-  padding: 0.75rem 1rem;
-
-  background-color: ${props => props.theme.white};
-
-  border-color: ${props => props.theme.lightGray};
-`;
-
-export const OverviewContainer = styled.div`
-  margin: 1.25rem 0;
-
-  background-color: ${props => props.theme.white};
-
-  border-radius: 0.75rem;
-`;
-
-export const Row = styled.div<{ isAddressRow?: boolean }>`
-  width: 100%;
-
-  padding: 1.5rem 2rem;
-
-  display: flex;
-
-  flex-direction: row;
-  align-items: center;
-
-  color: ${props => props.theme.black};
-
-  &:not(:last-child) {
-    border-bottom: 1px solid ${props => props.theme.card.border};
-
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
-  }
-
-  > span {
-    &:first-child {
-      width: 10rem;
-    }
-
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    display: flex;
-    flex-direction: column;
-
-    strong {
-      font-weight: 600;
-      color: ${props => props.theme.darkText};
-    }
-
-    small {
-      font-weight: 400;
-      font-size: 0.95rem;
-      color: ${props => props.theme.darkText};
-    }
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    flex-direction: column;
-    align-items: flex-start;
-    ${props =>
-      props.isAddressRow &&
-      css`
-        flex-direction: row;
-        align-items: center;
-      `}
-  }
-`;
-
-export const RowContent = styled.span`
-  width: 100%;
-`;
-
-export const ButtonModal = styled.button<{
-  isLocked?: boolean;
-}>`
-  color: ${props => props.theme.true.white};
-  background-color: ${props => props.theme.violet};
-  height: 2.5rem;
-
-  align-self: end;
-
-  min-width: 13rem;
-  max-width: 15rem;
-
-  padding: 0 1rem;
-  border-radius: 4px;
-
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  align-items: center;
-
-  > span {
-    color: ${props => props.theme.true.white} !important;
-  }
-
-  :active {
-    transform: ${props => (props.isLocked ? '' : 'translateY(0.1rem)')};
-  }
-
-  :hover {
-    opacity: ${props => (props.isLocked ? '' : '0.8')};
-  }
-
-  opacity: ${props => (props.isLocked ? '0.3' : '1')};
-
-  cursor: ${props => (props.isLocked ? 'not-allowed' : 'pointer')};
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 100%;
-    max-width: 100%;
-  }
-`;
 
 export const AddressContainer = styled.div`
   display: flex;
@@ -174,28 +24,10 @@ export const ContainerTabInteractions = styled.div`
   margin-bottom: 1rem;
 `;
 
-export const CenteredRow = styled.div`
-  display: flex;
-  align-items: center;
-  flex: 1;
-
-  gap: 0.5rem;
-
-  width: 100%;
-
-  svg {
-    cursor: pointer;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 100%;
-    flex-wrap: wrap;
-  }
-`;
-
 export const BalanceContainer = styled.div`
   display: flex;
   flex-direction: column;
+  width: 100%;
 `;
 
 export const AmountContainer = styled.div`
@@ -244,48 +76,6 @@ export const IconContainer = styled.div`
   }
 `;
 
-export const FrozenContainer = styled.div`
-  margin-top: 0.5rem;
-  width: 100%;
-
-  display: flex;
-
-  flex-direction: column;
-
-  background-color: ${props => props.theme.accountCard.frozenBackground};
-
-  border-radius: 0.75rem;
-
-  div {
-    padding: 1.25rem 2rem;
-
-    display: flex;
-
-    flex-direction: row;
-    align-items: center;
-
-    &:not(:last-child) {
-      border-bottom-left-radius: 0px;
-      border-bottom-right-radius: 0px;
-    }
-    &:not(:first-child) {
-      border-top: 1px solid ${props => props.theme.card.border};
-    }
-    strong {
-      width: 10rem;
-      margin-right: 5px;
-      font-weight: 600;
-      color: ${props => props.theme.darkText};
-    }
-
-    span {
-      color: ${props => props.theme.darkText};
-      padding-right: 1rem;
-      min-width: 10rem;
-    }
-  }
-`;
-
 export const StakingRewards = styled.div`
   display: flex;
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
@@ -312,51 +102,6 @@ export const AccountSkeletonContainer = styled.div`
   width: 100%;
   max-width: 30rem;
 `;
-
-export const CardHeader = styled.div`
-  display: flex;
-
-  flex-direction: row;
-`;
-
-export const CardContainer = styled.div`
-  margin-top: 2rem;
-
-  display: flex;
-
-  flex-direction: column;
-`;
-
-export const CardContent = styled.div`
-  background-color: ${props => props.theme.white};
-
-  border-radius: 0 0.75rem 0.75rem 0.75rem;
-`;
-
-export const CardHeaderItem = styled.div<{ selected: boolean }>`
-  padding: 1rem;
-
-  background-color: ${props =>
-    props.selected ? props.theme.white : 'transparent'};
-
-  border-radius: 0.75rem 0.75rem 0 0;
-
-  cursor: pointer;
-
-  transition: 0.2s ease;
-
-  span {
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: ${props => props.theme.black};
-
-    opacity: ${props => (props.selected ? 1 : 0.33)};
-
-    transition: 0.2s ease;
-  }
-`;
-
-export const FrozenContainerPermissions = styled(FrozenContainer)``;
 
 export const ItemContentPermissions = styled.div<{
   rowColumnMobile?: boolean;

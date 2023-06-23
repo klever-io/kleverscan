@@ -2,8 +2,6 @@ import { default as DefaultInput } from '@/components/InputGlobal';
 import { transparentize } from 'polished';
 import styled from 'styled-components';
 
-export const Container = styled.div``;
-
 export const Header = styled.div`
   display: flex;
 
@@ -74,49 +72,6 @@ export const AssetTitle = styled.div`
     flex-direction: column;
     align-items: flex-start;
   }
-`;
-
-export const CardContainer = styled.div`
-  margin-top: 2rem;
-
-  display: flex;
-
-  flex-direction: column;
-`;
-
-export const CardHeader = styled.div`
-  display: flex;
-
-  flex-direction: row;
-`;
-
-export const CardHeaderItem = styled.div<{ selected: boolean }>`
-  padding: 1rem;
-
-  background-color: ${props =>
-    props.selected ? props.theme.white : 'transparent'};
-
-  border-radius: 0.75rem 0.75rem 0 0;
-
-  cursor: pointer;
-
-  transition: 0.2s ease;
-
-  span {
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: ${props => props.theme.black};
-
-    opacity: ${props => (props.selected ? 1 : 0.33)};
-
-    transition: 0.2s ease;
-  }
-`;
-
-export const CardContent = styled.div`
-  background-color: ${props => props.theme.white};
-
-  border-radius: 0 0.75rem 0.75rem 0.75rem;
 `;
 
 export const Row = styled.div<{ isStakingRoyalties: boolean }>`
@@ -223,38 +178,6 @@ export const ExpandWrapper = styled.div<{ expandVar: boolean }>`
     ` 
 flex-direction: column;
 `}
-`;
-
-export const CenteredRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  gap: 0.5rem;
-
-  strong {
-    font-size: 1rem;
-    font-weight: 600;
-  }
-
-  a {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  p {
-    font-weight: 600;
-    font-size: 0.85rem;
-  }
-
-  span {
-    width: 33rem !important;
-  }
-
-  svg {
-    cursor: pointer;
-  }
 `;
 
 export const Logo = styled.img`

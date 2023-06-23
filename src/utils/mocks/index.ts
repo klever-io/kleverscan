@@ -1,5 +1,5 @@
 import { Contract } from '@/types/contracts';
-import { IAsset, ITransactionResponse } from '@/types/index';
+import { IAsset, ITransactionsResponse } from '@/types/index';
 
 const KFI: IAsset = {
   assetType: 'Fungible',
@@ -470,7 +470,7 @@ const precisionAsset = {
   code: 'successful',
 };
 
-const transactionsList: ITransactionResponse = {
+const transactionsList: ITransactionsResponse = {
   data: {
     transactions: [
       {

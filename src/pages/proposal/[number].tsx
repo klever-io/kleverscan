@@ -7,6 +7,13 @@ import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessa
 import { tipMobile } from '@/components/Tooltip/configs';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
+import {
+  CardContent,
+  CardHeader,
+  CardHeaderItem,
+  CardTabContainer,
+  Container,
+} from '@/styles/common';
 import { IRowSection } from '@/types/index';
 import {
   INetworkParams,
@@ -33,11 +40,8 @@ import { passViewportStyles, typeVoteColors } from '@/utils/viewportStyles';
 import {
   BalanceContainer,
   BigSpan,
-  CardContainer,
-  CardContent,
   CardVote,
   CardVoteContainer,
-  Container,
   DescriptionContainer,
   EmptyDescription,
   FiltersValidators,
@@ -393,7 +397,12 @@ const ProposalDetails: React.FC = () => {
           <Header>
             <Title route={'/proposals'} title="Proposal Details" />
           </Header>
-          <CardContainer>
+          <CardTabContainer>
+            <CardHeader>
+              <CardHeaderItem selected={true}>
+                <span>Overview</span>
+              </CardHeaderItem>
+            </CardHeader>
             <CardContent>
               <Row>
                 <span>
@@ -504,7 +513,7 @@ const ProposalDetails: React.FC = () => {
                 )}
               </RowDescription>
             </CardContent>
-          </CardContainer>
+          </CardTabContainer>
 
           <VotesContainer>
             <span>

@@ -1,6 +1,5 @@
 import { Accounts, Epoch, TPS, Transactions } from '@/assets/cards';
 import Skeleton from '@/components/Skeleton';
-import { useTheme } from '@/contexts/theme';
 import { ICard, IEpochCard } from '@/types';
 import {
   DataCard,
@@ -8,31 +7,46 @@ import {
   DataCardsContent,
   DataCardsWrapper,
   DataCardValue,
-  IconContainer,
   Percentage,
-  ProgressContainerSpanSkeleton,
 } from '@/views/home';
-import {
-  ProgressContainer,
-  ProgressContent,
-  ProgressIndicator,
-  ProgressPercentage,
-} from '@/views/validators';
+import { CircularProgressContainer } from '@/views/validators';
 import { useTranslation } from 'next-i18next';
-import { ValueDetail } from '../../CoinDataFetcher/CoinCard/styles';
+import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
+import GradientSVG from '../HomeDataCards/GradientSVG';
 
 const HomeDataCardsSkeleton: React.FC = () => {
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
 
   const Progress: React.FC<{ percent: number }> = ({ percent }) => {
-    const { theme } = useTheme();
+    const idCSS = 'gradient';
     return (
-      <ProgressContainer>
-        <ProgressContent>
-          <ProgressIndicator percent={percent} />
-        </ProgressContent>
-        <ProgressPercentage textColor={theme.card.white}></ProgressPercentage>
-      </ProgressContainer>
+      <CircularProgressContainer>
+        <GradientSVG />
+        <CircularProgressbar
+          counterClockwise
+          value={percent}
+          styles={buildStyles({
+            pathColor: `url(#${idCSS})`,
+            trailColor: '#404264',
+          })}
+        />
+      </CircularProgressContainer>
+    );
+  };
+
+  const PercentageComponent: React.FC<{
+    progress: any;
+    value: string | number;
+  }> = ({ progress, value }) => {
+    return (
+      <Percentage>
+        <Skeleton width={20} height={21} />
+        {progress >= 0 && (
+          <div>
+            <Progress percent={0} />
+          </div>
+        )}
+      </Percentage>
     );
   };
   const dataCards: ICard[] = [
@@ -53,15 +67,15 @@ const HomeDataCardsSkeleton: React.FC = () => {
 
   const epochCards: IEpochCard[] = [
     {
+      Icon: Epoch,
+      title: t('Epoch'),
+      value: 0,
+      progress: 0,
+    },
+    {
       Icon: TPS,
       title: t('Live/Peak TPS'),
       value: 0,
-    },
-    {
-      Icon: Epoch,
-      title: '',
-      value: 0,
-      progress: 0,
     },
   ];
 
@@ -71,27 +85,26 @@ const HomeDataCardsSkeleton: React.FC = () => {
         {dataCards.map(
           ({ Icon, title, value, variation, percentage }, index) => (
             <DataCard key={String(index)}>
-              <IconContainer>
-                <Icon viewBox="0 0 70 70" />
-              </IconContainer>
+              <span>{title}</span>
               <DataCardValue>
-                <span>{title}</span>
                 <p>
-                  <Skeleton height={19} />
+                  <Skeleton width={60} height={21} />
                 </p>
+                {!variation.includes('%') && (
+                  <DataCardLatest positive={variation.includes('+')}>
+                    {
+                      <div>
+                        <span>
+                          <Skeleton width={60} height={21} />
+                        </span>
+                        <span>
+                          <Skeleton width={60} height={21} />
+                        </span>
+                      </div>
+                    }
+                  </DataCardLatest>
+                )}
               </DataCardValue>
-              {!variation.includes('%') && (
-                <DataCardLatest positive={variation.includes('+')}>
-                  <span>{t('Last 24h')}</span>
-                  <Skeleton height={19} width={60} />
-
-                  {index === 1 && (
-                    <ValueDetail positive={true}>
-                      <Skeleton height={19} width={40} />
-                    </ValueDetail>
-                  )}
-                </DataCardLatest>
-              )}
             </DataCard>
           ),
         )}
@@ -99,35 +112,12 @@ const HomeDataCardsSkeleton: React.FC = () => {
       <DataCardsContent>
         {epochCards.map(({ Icon, title, value, progress }, index) => (
           <DataCard key={String(index)}>
-            <IconContainer>
-              <Icon viewBox="0 0 70 70" />
-            </IconContainer>
-            <DataCardValue>
-              {index === 0 ? (
+            <DataCardValue isEpoch={true}>
+              <div>
                 <span>{title}</span>
-              ) : (
-                <span>
-                  <Skeleton height={'1rem'} />
-                </span>
-              )}
-
-              <Percentage>
-                <p>
-                  <Skeleton height={19} />
-                </p>
-                {progress >= 0 && (
-                  <div>
-                    <ProgressContainerSpanSkeleton>
-                      <strong>
-                        <Skeleton height={22} />
-                      </strong>
-                      <span>
-                        <Skeleton height={15} />
-                      </span>
-                    </ProgressContainerSpanSkeleton>
-                  </div>
-                )}
-              </Percentage>
+              </div>
+              {<PercentageComponent progress={progress} value={value} />}
+              {index === 0 && <small>Time remaining</small>}
             </DataCardValue>
           </DataCard>
         ))}

@@ -1,58 +1,4 @@
-import { default as DefaultInput } from '@/components/InputGlobal';
 import styled from 'styled-components';
-
-export const Container = styled.div``;
-
-export const Header = styled.section<{ filterOn?: boolean }>`
-  display: flex;
-  flex-direction: ${props => (props.filterOn ? 'column' : 'row')};
-  justify-content: space-between;
-  align-items: ${props => (props.filterOn ? 'flex-start' : 'center')};
-  margin-bottom: 1rem;
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  div:last-child {
-    margin-top: 1.5rem;
-    div {
-      margin-top: 0;
-    }
-  }
-`;
-
-export const Title = styled.div`
-  display: flex;
-
-  flex-direction: row;
-  align-items: center;
-
-  gap: 0.75rem;
-
-  div {
-    cursor: pointer;
-
-    svg {
-      height: auto;
-      width: auto;
-    }
-  }
-`;
-
-export const Input = styled(DefaultInput)`
-  margin-top: 1.1rem;
-
-  padding: 0.75rem 1rem;
-
-  background-color: ${props => props.theme.white};
-
-  border-color: ${props => props.theme.lightGray};
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    width: 100%;
-  }
-`;
 
 export const CardContainer = styled.section`
   margin: 1.5rem 0;
@@ -65,50 +11,6 @@ export const CardContainer = styled.section`
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
-  }
-`;
-
-export const Card = styled.div`
-  width: 100%;
-  padding: 1.5rem;
-  overflow: hidden;
-
-  display: flex;
-
-  flex-direction: column;
-
-  justify-content: space-between;
-
-  background-color: ${props => props.theme.white};
-
-  border-radius: 1rem;
-
-  gap: 1rem;
-
-  div {
-    display: flex;
-
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-
-    strong {
-      font-weight: 600;
-    }
-
-    p {
-      opacity: 0.4;
-
-      font-size: 0.85rem;
-      font-weight: 400;
-      color: ${props => props.theme.darkText};
-    }
-
-    small {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: ${props => props.theme.darkText};
-    }
   }
 `;
 

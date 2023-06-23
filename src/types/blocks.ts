@@ -63,11 +63,21 @@ export interface IBlocks {
   statistics: IBlockData;
 }
 
-export interface IBlockResponse extends IResponse {
+export interface IBlocksResponse extends IResponse {
   data: {
     blocks: IBlock[];
   };
+}
+
+export interface IBlockResponse extends IResponse {
+  data: {
+    block: IBlock;
+  };
   pagination: IPagination;
+}
+
+export interface IBlockPage {
+  block: IBlock;
 }
 
 export interface IStatisticsResponse extends IResponse {

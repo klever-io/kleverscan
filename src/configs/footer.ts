@@ -77,7 +77,7 @@ const contents: IContent[] = [
     ],
   },
   {
-    title: 'Klever Ecosystem',
+    title: 'Klever.Org',
     infoLinks: [
       {
         name: 'WhitePaper',

@@ -1,42 +1,8 @@
-import { default as DefaultInput } from '@/components/InputGlobal';
 import styled from 'styled-components';
 
 interface IRatingProps {
   rate: string;
 }
-
-export const Container = styled.div``;
-
-export const Header = styled.div`
-  display: flex;
-
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-`;
-
-export const Title = styled.div`
-  display: flex;
-
-  flex-direction: row;
-  align-items: center;
-
-  gap: 0.75rem;
-
-  div {
-    svg {
-      height: auto;
-      width: auto;
-
-      cursor: pointer;
-    }
-  }
-`;
 
 export const TitleContent = styled.div`
   display: flex;
@@ -91,16 +57,6 @@ export const ValidatorDescription = styled.span`
   font-weight: 400;
 
   opacity: 0.6;
-`;
-
-export const Input = styled(DefaultInput)`
-  margin-top: 1.1rem;
-
-  padding: 0.75rem 1rem;
-
-  background-color: ${props => props.theme.white};
-
-  border-color: ${props => props.theme.lightGray};
 `;
 
 export const CardContainer = styled.div`

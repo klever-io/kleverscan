@@ -6,7 +6,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useRef, useState } from 'react';
-import CreateTxShortcut from '../CreateTxShortCut';
 import ConnectWallet from './ConnectWallet';
 import OptionsContainer from './OptionsContainer';
 import {
@@ -177,8 +176,8 @@ const Navbar: React.FC = () => {
       <Container ref={mobileNavbarRef}>
         <Content isMainNet={network === 'Mainnet'}>
           <HeaderContainer
-            $isMainNet={network === 'Mainnet'}
-            $openSearch={!isTablet ? false : openSearch}
+            isMainNet={network === 'Mainnet'}
+            openSearch={!isTablet ? false : openSearch}
           >
             <Link href="/">
               <a>
@@ -204,14 +203,8 @@ const Navbar: React.FC = () => {
                 ))}
               </IconsMenu>
               <NavBarOptionsContainer>
-                <SearchContainer $openSearch={true}>
-                  <Input />
-                </SearchContainer>
-                <ConnectWallet
-                  clickConnection={() => {
-                    openDrawer;
-                  }}
-                />
+                {router.pathname !== '/' && <Input />}
+                <ConnectWallet clickConnection={closeDrawer} />
                 <OptionsContainer />
               </NavBarOptionsContainer>
             </DesktopContainer>
@@ -232,17 +225,18 @@ const Navbar: React.FC = () => {
                   closeMenu();
                 }}
               >
-                <SearchIcon
-                  onClick={() => setOpenSearch(!openSearch)}
-                  $openSearch={openSearch}
-                />
+                {router.pathname !== '/' && (
+                  <SearchIcon
+                    onClick={() => setOpenSearch(!openSearch)}
+                    openSearch={openSearch}
+                  />
+                )}
                 <ConnectWallet clickConnection={closeDrawer} />
                 <MenuIcon onClick={handleMenu} data-testid="menu-icon" />
               </ConnectContainer>
             </MobileContainer>
           )}
         </Content>
-        {router.pathname === '/' && <CreateTxShortcut />}
       </Container>
 
       <MobileBackground

@@ -24,7 +24,6 @@ describe('Component: Footer', () => {
   it("Should render all social media links and each should have the correct address to Klever's socials pages", () => {
     const getSocials =
       container.firstChild?.firstChild?.firstChild?.childNodes[2].childNodes;
-
     getSocials?.forEach((element, index) => {
       expect(element).toHaveAttribute('href', socials[index].link);
     });
@@ -58,7 +57,6 @@ describe('Component: Footer', () => {
       border: `2px solid ${theme.footer.socialBorder}`,
       color: 'white',
     };
-
     const getSocials =
       container.firstChild?.firstChild?.firstChild?.childNodes[2].childNodes;
     getSocials?.forEach(item => {
@@ -70,9 +68,9 @@ describe('Component: Footer', () => {
     const style = {
       textDecoration: 'none',
       gap: '0.5rem',
-      fontSize: '0.9rem',
-      fontWeight: '400',
-      color: `${theme.footer.text}`,
+      fontSize: '14px',
+      fontWeight: '600',
+      color: `${theme.true.white}`,
     };
 
     const linkItem = screen.getByRole('link', { name: /Privacy Policy/i });

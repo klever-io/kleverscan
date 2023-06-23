@@ -10,7 +10,7 @@ import {
   IPrice,
   ITransaction,
   ITransactionListResponse,
-  ITransactionResponse,
+  ITransactionsResponse,
   IYesterdayResponse,
   Service,
 } from '@/types';
@@ -25,6 +25,9 @@ import {
   useState,
 } from 'react';
 
+export interface IDaysCoins {
+  [coinName: string]: string | number;
+}
 export interface IHomeData {
   actualTPS: string;
   blocks: IBlock[];
@@ -41,7 +44,7 @@ export interface IHomeData {
   loadingCards: boolean;
   loadingBlocks: boolean;
   loadingCoins: boolean;
-  getCoins: () => Promise<void>;
+  getCoins: (days: IDaysCoins) => Promise<void>;
 }
 
 export const HomeData = createContext({} as IHomeData);
@@ -67,7 +70,6 @@ export const HomeDataProvider: React.FC = ({ children }) => {
   const [newTransactions, setNewTransactions] = useState(0);
   const [beforeYesterdayTransactions, setBeforeYesterdayTransactions] =
     useState(0);
-
   const [assetsData, setAssetsData] = useState<IAssetsData>({} as IAssetsData);
   const [coins, setCoins] = useState<ICoinInfo[]>([]);
   const [loadingCards, setLoadingCards] = useState(true);
@@ -124,7 +126,7 @@ export const HomeDataProvider: React.FC = ({ children }) => {
       },
     );
     // case 2:
-    const transactionsCall = new Promise<ITransactionResponse>(
+    const transactionsCall = new Promise<ITransactionsResponse>(
       async (resolve, reject) => {
         const res = await api.get({
           route: 'transaction/list?minify=true',
@@ -227,7 +229,7 @@ export const HomeDataProvider: React.FC = ({ children }) => {
   }, []);
 
   //Coins
-  const getCoins = async () => {
+  const getCoins = async (days: IDaysCoins) => {
     const coinsData: ICoinInfo[] = [];
     const assetsData: IAssetsData = {
       klv: {
@@ -302,7 +304,9 @@ export const HomeDataProvider: React.FC = ({ children }) => {
     const klvChartCall = new Promise<IGeckoChartResponse>(
       async (resolve, reject) => {
         const res = await api.get({
-          route: `coins/klever/market_chart?vs_currency=usd&days=1`,
+          route: `coins/klever/market_chart?vs_currency=usd&days=${
+            days.KLV || 1
+          }`,
           service: Service.GECKO,
         });
 
@@ -330,7 +334,9 @@ export const HomeDataProvider: React.FC = ({ children }) => {
     const kfiChartCall = new Promise<IGeckoChartResponse>(
       async (resolve, reject) => {
         const res = await api.get({
-          route: `coins/klever-finance/market_chart?vs_currency=usd&days=1`,
+          route: `coins/klever-finance/market_chart?vs_currency=usd&days=${
+            days.KFI || 1
+          }`,
           service: Service.GECKO,
         });
 
@@ -502,7 +508,10 @@ export const HomeDataProvider: React.FC = ({ children }) => {
     setLoadingCoins(false);
   };
   useEffect(() => {
-    getCoins();
+    getCoins({
+      kfi: 1,
+      klv: 1,
+    });
   }, []);
 
   const values: IHomeData = {

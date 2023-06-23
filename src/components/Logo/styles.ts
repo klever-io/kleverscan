@@ -19,13 +19,15 @@ export const Logo = styled.img`
   ${LogoCSS}
 `;
 
-export const LetterLogo = styled.div`
+export const LetterLogo = styled.div<{ invertColors?: boolean }>`
   ${LogoCSS}
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
   text-transform: uppercase;
+  color: ${props =>
+    props.invertColors ? props.theme.white : props.theme.black};
 `;
 
 export const Verified = styled(Certified)`

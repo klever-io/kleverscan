@@ -1,8 +1,8 @@
 import { Status } from '@/components/Table/styles';
 import { ImCancelCircle } from 'react-icons/im';
-import Error from './error.svg';
+import Error from './error2.svg';
 import Pending from './pending.svg';
-import Success from './success.svg';
+import Success from './success2.svg';
 
 const getStatusIcon = (status: string): any => {
   switch (status) {

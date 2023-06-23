@@ -74,18 +74,18 @@ describe('Component: TransactionItem', () => {
     );
 
     const containerStyle = {
-      marginRight: '2.5rem',
-      gap: '0.25rem',
-      flexDirection: 'column',
+      padding: '0.4rem 0 0.4rem 0',
+      gap: '0.5rem',
+      flexDirection: 'row',
     };
     const linkStyle = {
       // textOverflow: 'ellipsis',
       // fontWeight: '6000',
-      color: `${theme.black}`,
+      color: `${theme.darkBlue}`,
     };
 
-    const transactionDataElement = container.firstChild?.firstChild;
-    const linkElement = transactionDataElement?.firstChild;
+    const transactionDataElement = container.firstChild?.lastChild;
+    const linkElement = transactionDataElement?.firstChild?.lastChild;
     expect(transactionDataElement).toHaveStyle(containerStyle);
     expect(linkElement).toHaveStyle(linkStyle);
   });
@@ -96,19 +96,19 @@ describe('Component: TransactionItem', () => {
     );
 
     const style = {
-      width: '12.5rem',
-      textAlign: 'right',
+      width: '100%',
+      padding: '0.4rem 0 0.4rem 0',
+      color: theme.darkBlue,
     };
     const spanStyle = {
-      maxWidth: '100%',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      whiteSpace: 'nowrap',
-      color: '#595C98',
+      fontWeight: 400,
+      fontSize: '0.9rem',
     };
     const transactionAmountElement = container.firstChild?.lastChild;
     expect(transactionAmountElement).toHaveStyle(style);
-    expect(transactionAmountElement?.firstChild).toHaveStyle(spanStyle);
+    expect(transactionAmountElement?.firstChild?.firstChild).toHaveStyle(
+      spanStyle,
+    );
   });
 
   it('Should render "--" as fallback when don\'t has "toAddress"', () => {

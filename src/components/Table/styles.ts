@@ -1,3 +1,4 @@
+import { DefaultCardStyles } from '@/styles/common';
 import { transparentize } from 'polished';
 import styled, { css, keyframes } from 'styled-components';
 import widths from './widths';
@@ -36,6 +37,7 @@ export interface ITableType {
 export const ContainerView = styled.div`
   overflow-x: auto;
   width: 100%;
+  margin-top: 1rem;
 `;
 
 export const Container = styled.div`
@@ -58,16 +60,13 @@ export const Header = styled.div<ITableType>`
 `;
 
 export const Row = styled.div<ITableType>`
+  ${DefaultCardStyles};
   padding: 1rem 1.5rem;
 
   display: flex;
 
   flex-direction: row;
   align-items: center;
-
-  background-color: ${props => props.theme.white};
-
-  border-radius: 0.5rem;
 
   width: 100%;
 
@@ -254,7 +253,7 @@ export const MobileCardItem = styled.span<{
       text-align: right;
       align-items: flex-end;
       span {
-        justify-content: right;
+        justify-content: flex-end;
       }
     `}
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
@@ -287,7 +286,7 @@ export const Status = styled.div<IStatus>`
   gap: 0.9rem;
 
   svg {
-    min-width: 20px;
+    min-width: 24px;
   }
 
   span {
@@ -309,11 +308,6 @@ export const Status = styled.div<IStatus>`
       color: ${props.theme.table.icon} !important;
       
     `}
-  svg {
-    path {
-      fill: ${props => props.theme.white};
-    }
-  }
 `;
 
 export const EmptyRow = styled(Row)`
@@ -357,9 +351,12 @@ export const FloatContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  margin-top: 1rem;
 `;
 
 export const LimitContainer = styled.div`
+  ${DefaultCardStyles}
   display: block;
   position: relative;
   float: right;
@@ -367,8 +364,6 @@ export const LimitContainer = styled.div`
   font-size: 15px;
   text-align: left;
   color: ${props => props.theme.black};
-  border-radius: 7px;
-  background-color: ${props => props.theme.white};
   padding: 5px;
   /* margin-left: auto; */
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
@@ -460,11 +455,10 @@ export const ItemContainer = styled.div<{
 `;
 
 export const ExportContainer = styled.div`
-  border-radius: 5px;
+  ${DefaultCardStyles}
   width: fit-content;
-  padding: 5px;
+  padding: 0.5rem;
   color: ${props => props.theme.darkText};
-  background-color: ${props => props.theme.white};
 
   font-size: 0.9rem;
   font-weight: 600;
@@ -504,7 +498,7 @@ export const ButtonsContainer = styled.div`
 export const BackTopButton = styled.span<{ isHidden: boolean }>`
   display: ${props => (props.isHidden ? 'block' : 'none')};
   position: fixed;
-  bottom: 2rem;
+  bottom: 5rem;
   right: 1.2rem;
   z-index: 4;
   border: none;

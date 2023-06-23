@@ -3,14 +3,13 @@ import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
 import Skeleton from '@/components/Skeleton';
 import api from '@/services/api';
-import { IAsset, IAssetOne, IParsedAsset } from '@/types/index';
+import { Container, Header } from '@/styles/common';
+import { IAsset, IAssetResponse, IParsedAsset } from '@/types/index';
 import {
   CardContainer,
   CardContent,
   CardRaw,
   CenteredRow,
-  Container,
-  Header,
   Row,
 } from '@/views/transactions/detail';
 import { useRouter } from 'next/router';
@@ -43,7 +42,7 @@ const NftDetail: React.FC<IParsedAsset> = () => {
 
   const requestNonce = async () => {
     if (router.isReady) {
-      const res: IAssetOne = await api.get({
+      const res: IAssetResponse = await api.get({
         route: `assets/${params?.collection}/${params?.nonce}`,
       });
       if (!res.error || res.error == '') {

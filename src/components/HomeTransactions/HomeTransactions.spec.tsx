@@ -1,9 +1,9 @@
 import { HomeDataProvider } from '@/contexts/mainPage';
 import { screen } from '@testing-library/react';
 import React from 'react';
+import HomeTransactions from '.';
 import { mockHomeTxs } from '../../test/mocks';
 import { renderWithTheme } from '../../test/utils';
-import HomeTransactions from './';
 
 mockHomeTxs.setTotalTransactions = jest.fn();
 
@@ -20,24 +20,21 @@ describe('Component: HomeTransactions', () => {
   });
   it("Should render the Title and the empty component when don't have any transaction", () => {
     const emptyElement = screen.getByText(/EmptyData/i);
-    const link = screen.getByRole('heading');
+    const title = screen.getByText('Last transactions');
     expect(emptyElement).toBeInTheDocument();
-    expect(link).toBeInTheDocument();
+    expect(title).toBeInTheDocument();
   });
 
   it('Should render the Chart container with the day(s)', () => {
-    const dailyTx = screen.getByText(/Daily Transactions/i);
+    const dailyTx = screen.getByText(/Last transactions/i);
     expect(dailyTx.parentNode).toBeInTheDocument();
-    expect(dailyTx.nextSibling).toHaveTextContent('1D7D15D1M');
+    expect(dailyTx.nextSibling).toHaveTextContent('Hide');
   });
 
   it('Should match the style for TransactionContent and TransactionEmpty', () => {
     const txContent = screen.getByText(/EmptyData/i).parentNode?.parentNode;
     const txContentStyle = {
-      maxHeight: '27.5rem',
-      overflowY: 'auto',
-      padding: '1.5rem',
-      minWidth: 'calc(50% - 0.5rem)',
+      borderRadius: '1rem',
     };
     const txEmpty = txContent?.firstChild;
     const txEmptyStyle = {

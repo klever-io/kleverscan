@@ -44,7 +44,7 @@ describe("test Layout and it's inner components", () => {
 
     const footerText = [
       'Klever Exchange',
-      'Klever Ecosystem',
+      'Klever.Org',
       'Klever Wallet App',
       'Privacy Policy',
       'Klever News',

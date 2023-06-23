@@ -1,4 +1,3 @@
-import theme from '@/styles/theme/index';
 import { renderWithTheme } from '@/test/utils';
 import '@testing-library/jest-dom/extend-expect';
 import { screen } from '@testing-library/react';
@@ -54,10 +53,9 @@ describe('Component: BlockCard', () => {
     );
 
     const style = {
-      backgroundColor: theme.white,
-      borderRadius: '1rem',
-      cursor: 'pointer',
-      padding: '1.5rem',
+      gap: '1rem',
+      display: 'grid',
+      padding: '1rem',
     };
 
     expect(container.firstChild).toHaveStyle(style);

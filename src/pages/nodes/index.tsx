@@ -5,8 +5,8 @@ import Chart, { ChartType } from '@/components/Chart';
 import Title from '@/components/Layout/Title';
 import { coinMockedData } from '@/configs/home';
 import api from '@/services/api';
+import { Container, Header } from '@/styles/common';
 import { getCountryISO3, ISO2 } from '@/utils/country';
-import { Container, Header } from '@/views/blocks';
 import {
   ChartBody,
   ChartContainer,

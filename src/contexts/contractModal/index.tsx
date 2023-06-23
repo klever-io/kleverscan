@@ -1,9 +1,9 @@
 import ModalContract, {
   IModalContract,
 } from '@/components/Contract/ModalContract';
-import { ButtonModal } from '@/views/accounts/detail';
 import { createContext, useContext, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
+import { ButtonModal } from './styles';
 
 interface IContractModal {
   getInteractionsButtons: (

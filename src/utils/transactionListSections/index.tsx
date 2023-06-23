@@ -1,5 +1,6 @@
 import Tooltip from '@/components/Tooltip';
 import { coinStyles } from '@/components/Tooltip/configs';
+import { CenteredRow } from '@/styles/common';
 import {
   IAssetTriggerContract,
   IBuyContractPayload,
@@ -28,7 +29,6 @@ import {
   IWithdrawContract,
 } from '@/types/contracts';
 import { IReceipt, IRowSection } from '@/types/index';
-import { CenteredRow } from '@/views/transactions';
 import Link from 'next/link';
 import { findReceipt } from '../findKey';
 import { formatAmount, toLocaleFixed } from '../formatFunctions';

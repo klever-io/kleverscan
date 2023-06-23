@@ -2,6 +2,10 @@ import styled, { keyframes } from 'styled-components';
 
 export const Container = styled.footer`
   background-color: ${props => props.theme.footer.background};
+  height: 100%;
+  @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    padding-top: 3rem;
+  }
 `;
 
 const FadeIn = keyframes`
@@ -16,58 +20,69 @@ const FadeIn = keyframes`
 export const Content = styled.div`
   max-width: ${props => props.theme.maxWidth};
   margin: 0 auto;
-  padding: 5rem 2rem;
+  padding: 0 1.5rem;
   justify-content: center;
-
   display: flex;
-
   flex-direction: row;
-  gap: 5rem;
-  border-top: 1px solid ${props => props.theme.footer.border};
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding: 5rem 3rem;
-
-    flex-direction: column;
+  gap: 4rem;
+  flex-direction: column;
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    padding: 0 2rem;
+    padding-bottom: 10rem;
+    height: 100%;
   }
 `;
 
 export const DescriptionContainer = styled.div`
   display: flex;
-
+  padding: 1.5rem 0 2rem 0;
   flex-direction: column;
   flex: 0 0 40%;
-
+  background: linear-gradient(
+    180deg,
+    rgba(34, 35, 69, 0.5) 0%,
+    rgba(34, 35, 69, 0) 100%
+  );
+  border-radius: 16px;
+  gap: 2rem;
   span {
-    padding: 1.25rem 0;
-
-    font-size: 0.9rem;
+    padding: 0rem 1rem;
+    text-align: center;
     font-weight: 500;
+    font-size: 1rem;
     color: white;
+    line-height: 1.25rem;
   }
+  align-items: center;
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    align-items: center;
-
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+    justify-content: start;
+    align-items: start;
+    flex: 0 0 20%;
+    padding: 0rem;
+    background: none;
     span {
-      line-height: 1.25rem;
+      text-align: start;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 20px;
     }
   }
 `;
 
 export const LogoContainer = styled.div`
-  img {
-    position: unset !important;
-    display: unset !important;
-    min-width: unset !important;
-    max-width: unset !important;
-    height: 28px !important;
-    width: 224px !important;
+  padding: 1rem 0 0 1rem;
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    padding: 0rem 0 0 1rem;
   }
 `;
 
 export const SocialContainer = styled.div`
   display: flex;
-
+  justify-content: center;
   flex-direction: row;
 
   gap: 0.75rem;
@@ -103,23 +118,23 @@ export const LinksContainer = styled.div`
 
   flex-direction: column;
   flex: 0 0 20%;
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    align-items: center;
+  :nth-child(-n + 4) {
+    border-bottom: 1px solid #222345;
+  }
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+    :nth-child(-n + 4) {
+      border-bottom: 0;
+    }
+    height: 10rem;
+    flex: 0 0 18rem;
   }
 `;
 
 export const LinkItems = styled.div`
   display: flex;
-
   flex-direction: column;
 
-  &:not(:last-child) {
-    margin-bottom: 1.75rem;
-  }
-
   span {
-    padding-bottom: 1rem;
     min-width: 10rem;
     font-weight: 500;
     color: white;
@@ -132,17 +147,13 @@ export const LinkItems = styled.div`
 
     gap: 0.5rem;
 
-    font-size: 0.9rem;
-    font-weight: 400;
-    color: ${props => props.theme.footer.text};
-
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 19px;
+    color: ${props => props.theme.true.white};
     text-decoration: none;
-
     transition: 0.2s ease;
-
-    &:not(:last-child) {
-      margin-bottom: 1rem;
-    }
+    margin-bottom: 2rem;
 
     &:hover {
       color: ${props => props.theme.violet};
@@ -159,9 +170,10 @@ export const DonateContainer = styled.div`
 
     gap: 0.5rem;
 
-    font-size: 0.9rem;
-    font-weight: 400;
-    color: ${props => props.theme.footer.text};
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 19px;
+    color: ${props => props.theme.true.white};
 
     text-decoration: none;
 
@@ -190,9 +202,9 @@ export const VersionBuildContainer = styled.div`
     color: ${props => props.theme.borderLogo};
   }
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     justify-content: center;
-    margin-top: 1.5rem;
+    padding-bottom: 6rem;
   }
 `;
 
@@ -217,5 +229,24 @@ export const QrCodeDropdown = styled.div<{ active: boolean }>`
     svg {
       cursor: default !important;
     }
+  }
+`;
+
+export const ContainerHeaderItems = styled.div`
+  display: flex;
+  align-items: center;
+  color: ${props => props.theme.true.white};
+  justify-content: space-between;
+  padding-bottom: 2rem;
+  span {
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 18px;
+  }
+  div {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    cursor: pointer;
   }
 `;

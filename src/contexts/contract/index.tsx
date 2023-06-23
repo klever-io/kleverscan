@@ -24,8 +24,8 @@ import { ContractsIndex, IContractOption } from '@/types/contracts';
 import {
   IAccount,
   IAccountResponse,
-  IAssetOne,
   IAssetResponse,
+  IAssetsResponse,
   ICollectionList,
   IFormData,
 } from '@/types/index';
@@ -200,7 +200,7 @@ export const ContractProvider: React.FC = ({ children }) => {
   const getKAssets = async () => {
     const address = sessionStorage.getItem('walletAddress') || '';
 
-    const response: IAssetResponse = await api.get({
+    const response: IAssetsResponse = await api.get({
       route: `assets/list`,
       query: {
         owner: address,
@@ -256,7 +256,7 @@ export const ContractProvider: React.FC = ({ children }) => {
 
     const { assets, frozenBalance, balance } = accountData;
     const list: ICollectionList[] = [];
-    const assetInfo: IAssetResponse = await api.get({
+    const assetInfo: IAssetsResponse = await api.get({
       route: `assets/list`,
       query: {
         asset: Object.keys(assets).join(','),
@@ -277,7 +277,7 @@ export const ContractProvider: React.FC = ({ children }) => {
     });
 
     if (!Object.keys(assets).includes('KLV') && balance !== 0) {
-      const assetInfo: IAssetOne = await api.get({
+      const assetInfo: IAssetResponse = await api.get({
         route: `assets/KLV`,
       });
 

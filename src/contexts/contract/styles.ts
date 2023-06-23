@@ -1,4 +1,4 @@
-import { IoReloadSharpWrapper } from '@/components/Header/ConnectWallet/styles';
+import { IoReloadSharpWrapper } from '@/components/AccountDetailsModal/styles';
 import styled from 'styled-components';
 
 export const ReloadWrapper = styled(IoReloadSharpWrapper)`

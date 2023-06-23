@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import Skeleton from '@/components/Skeleton';
 import api from '@/services/api';
-import { IAssetResponse, IValidatorResponse } from '@/types';
+import { IAssetsResponse, IValidatorResponse } from '@/types';
 import { IPackInfo } from '@/types/contracts';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { getPrecision } from '../precisionFunctions';
@@ -60,7 +60,7 @@ export function usePrecision(
   }
 }
 
-type PartialResponse = IAssetResponse | IValidatorResponse;
+type PartialResponse = IAssetsResponse | IValidatorResponse;
 
 export const useFetchPartial = <T,>(
   type: string,
@@ -92,7 +92,7 @@ export const useFetchPartial = <T,>(
         route: `${route}`,
         query: { limit: 10 },
       });
-      setItems([...response.data[type], ...itemsSearch]);
+      setItems([...(response?.data[type] || []), ...itemsSearch]);
     } else {
       setItems([...itemsSearch]);
     }

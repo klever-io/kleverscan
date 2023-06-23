@@ -1,7 +1,7 @@
 import { Search } from '@/assets/icons';
 import { transparentize } from 'polished';
 import { AiOutlineClose } from 'react-icons/ai';
-import { FiMenu } from 'react-icons/fi';
+import { HiOutlineMenuAlt2 } from 'react-icons/hi';
 import { MdArrowDropDown } from 'react-icons/md';
 import styled, { css, keyframes } from 'styled-components';
 import { default as DefaultInput } from '../InputGlobal';
@@ -13,18 +13,17 @@ interface IMobileMenu {
 
 export const Container = styled.div`
   padding: 1rem 2rem;
+  min-height: 3.5rem;
   position: sticky;
   top: 0;
   left: 0;
   right: 0;
-  background-color: ${props => props.theme.navbar.background};
-  border-bottom: 1px solid ${props => props.theme.footer.border};
   z-index: 6;
   transition: top 0.1s linear;
-
+  background-color: ${props => props.theme.navbar.background};
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     padding: 1rem 1.5rem;
-
+    width: 100%;
     justify-content: space-between;
   }
 `;
@@ -33,7 +32,7 @@ export const NavBarOptionsContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: column;
   }
@@ -59,15 +58,18 @@ export const Content = styled.div<{ isMainNet?: boolean }>`
 `;
 
 export const HeaderContainer = styled.span<{
-  $isMainNet: boolean;
-  $openSearch: boolean;
+  isMainNet: boolean;
+  openSearch: boolean;
 }>`
-  display: ${props => (props.$openSearch ? 'none' : 'flex')};
   flex-direction: column;
-  width: ${props => (props.$isMainNet ? '15rem' : '17rem')};
+  width: ${props => (props.isMainNet ? '15rem' : '17rem')};
+  display: ${props => (props.openSearch ? 'none' : 'flex')};
   span {
     color: ${props => props.theme.navbar.text};
     font-size: 0.8rem;
+  }
+  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    width: 20rem;
   }
 `;
 
@@ -149,7 +151,6 @@ export const MobileItem = styled(Item)`
 `;
 
 export const Input = styled(DefaultInput)`
-  width: 19rem;
   background-color: ${props => props.theme.input.searchBar};
   border-color: ${props => props.theme.lightGray};
   input {
@@ -246,7 +247,7 @@ export const MobileContent = styled.div<IMobileMenu>`
   padding: 1.5rem;
   height: calc(100vh - 4rem);
 
-  top: 4rem;
+  top: 4.5rem;
   right: 0;
 
   transform: translateX(${props => (props.opened ? 0 : '100%')});
@@ -298,7 +299,7 @@ export const MobileBackground = styled.div<IMobileMenu>`
   width: 100%;
   height: 100vh;
 
-  top: 4rem;
+  top: 4.5rem;
   left: 0;
 
   position: fixed;
@@ -388,12 +389,13 @@ export const DropdownIcon = styled(MdArrowDropDown)`
   font-size: 1.4rem;
 `;
 
-export const MenuIcon = styled(FiMenu).attrs(props => ({
+export const MenuIcon = styled(HiOutlineMenuAlt2).attrs(props => ({
   color: props.theme.true.white,
-  size: 25,
+  size: 26,
 }))`
   box-sizing: content-box;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0.3rem;
+  cursor: pointer;
 `;
 
 export const ConnectContainer = styled.div`

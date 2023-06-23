@@ -1,3 +1,4 @@
+import { DefaultCardStyles } from '@/styles/common';
 import styled from 'styled-components';
 
 export const Container = styled.div`
@@ -10,13 +11,12 @@ export const Container = styled.div`
 `;
 
 export const FungibleContainer = styled.div`
+  ${DefaultCardStyles};
   display: flex;
   flex-direction: row;
   border-radius: 5px;
   justify-content: space-between;
   padding: 3rem;
-  background-color: ${props =>
-    props.theme.dark ? props.theme.card.background : props.theme.white};
 
   @media (max-width: 1200px) {
     flex-direction: column;

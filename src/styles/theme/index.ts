@@ -3,10 +3,11 @@ const theme = {
   maxWidth: '1900px',
   background: '#EBF1F8',
   white: '#fff',
-  black: '#0B0B1E',
+  black: '#06060B',
   borderLogo: '#ccc',
 
   border: '#eeeff6',
+
   green: '#4EBC87',
   red: '#F84960',
   rose: '#EE3F71',
@@ -17,9 +18,12 @@ const theme = {
   lightGray: '#C6C7EB',
   lightBlue: '#585A92',
   error: '#9E1313',
+  darkBlue: '#0C0D1C',
+  blue: '#181935',
   darkText: '#515395',
   secondaryText: '#595C98',
   shadow: '#DDDEE7',
+
   violetPurpleGradient: 'linear-gradient(to right, #aa33b5 -25%, #7D3FF1 125%)',
 
   true: {
@@ -48,13 +52,13 @@ const theme = {
   },
 
   navbar: {
-    background: '#0B0B1E',
+    background: '#06060B',
     text: '#646693',
     mobile: '#66688f',
   },
 
   footer: {
-    background: '#0B0B1E',
+    background: '#06060B',
     socialBorder: '#2c3041',
     text: '#9b9dd1',
     border: '#181935',
@@ -63,10 +67,12 @@ const theme = {
   input: {
     placeholder: '#9c9eb9',
     activeShadow: '#7418c2',
-    searchBar: '#1d214a',
+    searchBar: '#0C0D1C',
+    borderSearchBar: '#585a92',
     dateFilter: '#181935',
     border: {
       home: '#030307',
+      search: '#7B7DB2',
     },
   },
 
@@ -78,10 +84,11 @@ const theme = {
     darkText: '#7B7DB2',
 
     border: '#C6C7EB',
-    green: '#86EF75',
-    red: '#FF4465',
+    green: '#4EBC87',
+    red: '#F84960',
     assetText: '#27284E',
     white: '#fff',
+    backGroundTooltip: 'rgba(24, 25, 53, 0.1)',
   },
 
   accountCard: {
@@ -112,7 +119,7 @@ const theme = {
   text: {
     moonLight: '#515395',
     midNight: '#0B0B1E',
-    gray: '#363C69',
+    gray: '#c6c7eb',
     inputHeader: '#C6C7EB',
     black: '#2e2f47',
     twilight: '#222345',

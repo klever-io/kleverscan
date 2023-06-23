@@ -23,6 +23,7 @@ interface ITooltipContent {
   payload?: {
     value: number;
     name: string;
+    date: string;
   }[];
   label?: string;
   active?: boolean;

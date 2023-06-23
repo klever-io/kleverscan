@@ -1,8 +1,8 @@
 import Chart from '@/components/Chart';
 import MapSvg from '@/components/MapSvg';
+import { Card, CardContainer } from '@/styles/common';
 import { INodeCard } from '@/types/index';
 import { getAge } from '@/utils/timeFunctions';
-import { Card, CardContainer } from '@/views/blocks';
 import { CardChartContainer, CardDetails } from '@/views/nodes';
 import React, { useEffect, useState } from 'react';
 

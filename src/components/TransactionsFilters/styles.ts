@@ -4,6 +4,7 @@ export const FilterContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
+  align-items: center;
 
   gap: 0.75rem;
 
@@ -11,7 +12,7 @@ export const FilterContainer = styled.div`
     min-width: 13rem;
   }
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
 
     flex-direction: column;

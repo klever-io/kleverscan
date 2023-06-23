@@ -24,14 +24,6 @@ interface IQueryParams {
   sender?: '' | 'receiver' | 'sender';
 }
 
-const defaultAllowance = {
-  data: {
-    result: { allowance: 0, stakingRewards: 0 },
-  },
-  code: '',
-  error: '',
-};
-
 export const assetsRequest = (
   address: string,
 ): ((page: number, limit: number) => Promise<IResponse>) => {

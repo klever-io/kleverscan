@@ -1,8 +1,8 @@
 import { Search } from '@/assets/icons';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
-import React, { KeyboardEvent, useRef, useState } from 'react';
-import { Container } from './styles';
+import React, { KeyboardEvent, useEffect, useRef, useState } from 'react';
+import PrePageTooltip from '../PrePageTooltip';
+import { Container, FocusBackground, SearchWrapper } from './styles';
 
 interface InputGlobal {
   className?: string;
@@ -11,79 +11,36 @@ interface InputGlobal {
 const Input: React.FC<InputGlobal> = ({ className }) => {
   const [search, setSearch] = useState('');
   const [error, setError] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation('common');
 
-  const router = useRouter();
-
   const placeholder = t('Search Address, Block, Transaction');
 
-  const getInputType = (value: string) => {
-    const addressLength = 62;
-    const txLength = 64;
-
-    if (!isNaN(Number(value)) && Number(value) !== 0) {
-      return 'block';
+  useEffect(() => {
+    function handleScroll() {
+      setShowTooltip(false);
     }
 
-    if (value.length === txLength) {
-      return 'transaction';
-    }
+    window.addEventListener('scroll', handleScroll);
 
-    if (value.length === addressLength) {
-      return 'account';
-    }
-
-    return 'asset';
-  };
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (error) {
       setError(false);
     }
-
+    if (showTooltip) {
+      setShowTooltip(false);
+    }
     setSearch(event.target.value);
   };
 
   const handleSearch = () => {
-    const treatedSearch = search.trim();
-
-    const type = getInputType(treatedSearch);
-
-    if (treatedSearch === '' || !treatedSearch || !type) {
-      setError(true);
-      return;
-    }
-
-    if (
-      type === 'asset' &&
-      (treatedSearch.toUpperCase() === 'KFI' ||
-        treatedSearch.toUpperCase() === 'KLV' ||
-        treatedSearch.length === 8)
-    ) {
-      router.push(`/${type}/${treatedSearch}`);
-      if (inputRef.current !== null) inputRef.current.value = '';
-      return;
-    }
-
-    if (
-      type === 'asset' &&
-      treatedSearch.length >= 3 &&
-      treatedSearch.length < 9
-    ) {
-      if (inputRef.current !== null) inputRef.current.value = '';
-      router
-        .push({
-          pathname: '/assets',
-          query: `asset=${treatedSearch.toUpperCase()}`,
-        })
-        .then(() => {
-          if (router.pathname === '/assets') router.reload();
-        });
-      return;
-    }
-    router.push(`/${type}/${treatedSearch}`);
-    if (inputRef.current !== null) inputRef.current.value = '';
+    setShowTooltip(true);
   };
 
   const keyDownHandle = (event: KeyboardEvent) => {
@@ -94,6 +51,13 @@ const Input: React.FC<InputGlobal> = ({ className }) => {
 
   const handleContainer = () => {
     inputRef.current?.focus();
+  };
+
+  const handleTooltipFocus = (e: any) => {
+    if (!(e.target.id === 'PrePageTooltip' || e.target.id === 'SearchIcon')) {
+      if (inputRef.current !== null) inputRef.current.value = '';
+      setShowTooltip(false);
+    }
   };
 
   const containerProps = {
@@ -109,10 +73,18 @@ const Input: React.FC<InputGlobal> = ({ className }) => {
   };
 
   return (
-    <Container {...containerProps}>
-      <input {...inputProps} />
-      <Search onClick={handleSearch} />
-    </Container>
+    <SearchWrapper>
+      <Container {...containerProps}>
+        <input {...inputProps} />
+        <Search onClick={handleSearch} id={'SearchIcon'} />
+      </Container>
+      {showTooltip && (
+        <>
+          <FocusBackground onClick={handleTooltipFocus} id="FocusBackground" />
+          <PrePageTooltip search={search} setShowTooltip={setShowTooltip} />
+        </>
+      )}
+    </SearchWrapper>
   );
 };
 

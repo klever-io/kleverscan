@@ -1,5 +1,12 @@
+import {
+  ArrowDownSquare,
+  ArrowUpSquare,
+  LineArrowUpSquare,
+} from '@/assets/icons';
 import { default as DefaultInput } from '@/components/InputGlobal';
+import { DefaultCardStyles } from '@/styles/common';
 import { lighten, transparentize } from 'polished';
+import { BiChevronDownSquare } from 'react-icons/bi';
 import styled, { css, keyframes } from 'styled-components';
 
 interface IVariation {
@@ -37,13 +44,7 @@ export const IconContainer = styled.div`
 `;
 
 export const ProgressContainerSpan = styled.span`
-  width: fit-content;
-  display: flex;
-  flex-direction: column;
-
-  strong {
-    width: fit-content;
-  }
+  position: relative;
 `;
 
 export const ProgressContainerSpanSkeleton = styled(ProgressContainerSpan)`
@@ -51,33 +52,28 @@ export const ProgressContainerSpanSkeleton = styled(ProgressContainerSpan)`
 `;
 
 export const Section = styled.section`
-  padding: 0 min(3%, 10rem) 10rem;
+  padding: 3rem 0.5rem 0 0.5rem;
 
   h1 {
-    color: ${props => props.theme.black};
+    color: ${props =>
+      props.theme.dark ? props.theme.black : props.theme.darkBlue};
     margin-bottom: 1rem;
-    cursor: pointer;
     width: fit-content;
-    &:hover {
-      text-decoration: underline;
-    }
   }
 
-  &:last-child {
-    padding-bottom: 10rem;
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    padding: 0 min(3%, 0.5rem) 5rem;
   }
+`;
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding: 5rem 5rem 0 5rem;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding: 5rem 0 0;
+export const SectionCards = styled(Section)`
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 50%;
   }
 `;
 
 export const DataContainer = styled(Section)`
-  padding: 0 0 5rem;
+  /* padding: 0 0 5rem; */
   /* background-color: #40274f;
   background-image: radial-gradient(
       at 29% 76%,
@@ -91,7 +87,15 @@ export const DataContainer = styled(Section)`
     radial-gradient(at 0% 0%, hsla(295, 57%, 46%, 1) 0, transparent 50%); */
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding: 2.5rem 0 0;
+    /* padding: 2.5rem 0 0; */
+  }
+`;
+
+export const CardContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    flex-direction: row;
   }
 `;
 
@@ -124,13 +128,16 @@ export const DataCardsContainer = styled.div`
   flex-direction: row;
   align-items: flex-start;
 
-  gap: 0.5rem;
+  gap: 4rem;
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: column;
   }
   &:nth-child(2) {
     margin-top: 4rem;
+  }
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    flex-direction: column;
   }
 `;
 
@@ -145,6 +152,10 @@ export const DataCardsWrapper = styled.div`
 
   gap: 0.5rem;
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    height: fit-content;
+  }
+  @media (min-width: 1247px) {
+    flex-direction: row;
     height: fit-content;
   }
 `;
@@ -162,6 +173,7 @@ export const DataCardsContent = styled.div`
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     height: auto;
+    flex-direction: column;
   }
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
@@ -169,19 +181,49 @@ export const DataCardsContent = styled.div`
   }
 `;
 
+export const DataCardDefaultStyles = css`
+  ${props => !props.theme.dark && DefaultCardStyles}
+  ${props =>
+    props.theme.dark &&
+    css`
+      border: 1px solid ${props.theme.card.background};
+    `};
+  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+    ${DefaultCardStyles}
+  }
+`;
+
 export const DataCard = styled.div`
   padding: 1.2rem;
-
   width: 100%;
+  height: 8rem;
 
   display: flex;
-  gap: 0.5rem;
-  flex-direction: row;
-  align-items: center;
-
-  background-color: ${props => props.theme.card.background};
+  gap: 0.25rem;
+  justify-content: center;
+  flex-direction: column;
+  border: 1px solid ${props => props.theme.footer.border};
   box-shadow: 5px 6px 5px 0px rgba(0, 0, 0, 0.1);
   border-radius: 1rem;
+  background-color: none;
+
+  ${DataCardDefaultStyles}
+  ${props => !props.theme.dark && DefaultCardStyles}
+    @media
+    screen
+    and
+    (min-width: ${props => props.theme.breakpoints.tablet}) {
+    ${DefaultCardStyles}
+  }
+  span {
+    width: fit-content;
+    height: 2rem;
+    color: ${props =>
+      props.theme.dark ? props.theme.lightGray : props.theme.darkText};
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 16px;
+  }
 `;
 
 export const EpochCard = styled.div`
@@ -200,9 +242,9 @@ export const EpochCard = styled.div`
 
 export const Percentage = styled.div`
   display: flex;
+  width: 100%;
   justify-content: space-between;
   gap: 0.55rem;
-
   span {
     color: white;
     font-weight: 600;
@@ -211,24 +253,19 @@ export const Percentage = styled.div`
   }
 `;
 
-export const DataCardValue = styled.div`
+export const DataCardValue = styled.div<{ isEpoch?: boolean }>`
   width: 100%;
-
   display: flex;
-
-  flex-direction: column;
-
-  gap: 0.25rem;
-
-  span {
-    color: ${props => props.theme.lightGray};
-    font-size: 0.85rem;
-  }
+  position: relative;
+  flex-direction: ${({ isEpoch }) => (isEpoch ? 'column' : 'row')};
 
   p {
-    color: ${props => props.theme.card.white};
-    font-weight: 600;
-    font-size: 1rem;
+    width: fit-content;
+    height: fit-content;
+    color: ${props =>
+      props.theme.dark ? props.theme.black : props.theme.darkBlue};
+    font-weight: 500;
+    font-size: 1.75rem;
   }
   div {
     display: flex;
@@ -236,24 +273,43 @@ export const DataCardValue = styled.div`
       margin-right: 0.45rem;
     }
   }
+
+  small {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 0.7rem;
+    color: ${props =>
+      props.theme.dark ? props.theme.black : props.theme.darkBlue};
+  }
 `;
 
 export const DataCardLatest = styled.div<IVariation>`
   min-width: fit-content;
   display: flex;
-
-  flex-direction: column;
+  height: 100%;
+  justify-content: center;
   align-items: flex-end;
 
   gap: 0.2rem;
-
+  padding-left: 0.5rem;
   span {
     font-size: 0.85rem;
     color: ${props => props.theme.card.secondaryText};
   }
 
   p {
-    color: ${props => props.theme.card[props.positive ? 'green' : 'red']};
+    color: ${props => (props.positive ? props.theme.green : props.theme.red)};
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px;
+    font-size: 0.9rem;
+  }
+
+  div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.4rem;
   }
 `;
 
@@ -296,24 +352,16 @@ export const BlockCardContainer = styled.div<BlockCardContainerProps>`
 
 export const BlockCardRow = styled.div`
   width: 100%;
-
-  color: ${props => props.theme.black};
-
+  padding: 0.4rem 0 0.4rem 0;
+  color: ${props =>
+    props.theme.dark ? props.theme.black : props.theme.darkBlue};
+  gap: 0.5rem;
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
 
-  &:not(:last-child) {
-    margin-bottom: 0.5rem;
-  }
-
-  &:nth-child(2) {
-    margin-bottom: 1rem;
-  }
-
-  &:last-child {
-    margin-top: 0.25rem;
+  :nth-child(even) {
+    justify-content: end;
   }
 
   strong {
@@ -323,13 +371,15 @@ export const BlockCardRow = styled.div`
   p {
     font-weight: 600;
     font-size: 0.95rem;
-    color: ${props => props.theme.darkText};
+    color: ${props =>
+      props.theme.dark ? props.theme.black : props.theme.darkBlue};
   }
 
   small {
-    font-weight: 400;
-    font-size: 0.85rem;
-    color: ${props => props.theme.darkText};
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 18px;
+    color: ${props => props.theme.navbar.text};
   }
 
   span {
@@ -348,36 +398,28 @@ export const BlockCardHash = styled.span`
   white-space: nowrap;
   font-size: 0.85rem;
 
-  color: ${props => props.theme.black};
+  color: ${props =>
+    props.theme.dark ? props.theme.black : props.theme.darkBlue};
   cursor: default;
 `;
 
 export const TransactionContainer = styled.div`
   display: flex;
-
   flex-direction: row;
-  gap: 1rem;
   justify-content: center;
-
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    flex-direction: column;
-  }
+  border-radius: 16px;
+  flex-direction: column;
+  ${DataCardDefaultStyles}
 `;
 
 export const ChartsContainer = styled(TransactionContainer)`
   flex-wrap: wrap;
+  gap: 1rem;
+  border: none;
+  ${DataCardDefaultStyles}
 `;
 
 export const TransactionContent = styled.div`
-  max-height: 27.5rem;
-  min-width: calc(50% - 0.5rem);
-
-  overflow-y: auto;
-
-  padding: 1.5rem;
-
-  background-color: ${props => props.theme.white};
-
   ${props =>
     !props.theme.dark &&
     css`
@@ -418,16 +460,18 @@ export const TransactionContent = styled.div`
 `;
 
 export const TransactionRow = styled.div<{ isLoading?: boolean }>`
-  display: flex;
-
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  overflow: hidden;
   flex-direction: row;
   align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid
+    ${props =>
+      props.theme.dark ? props.theme.footer.border : props.theme.lightGray};
+  margin-bottom: 0.5rem;
 
-  gap: 2.5rem;
-
-  &:not(:last-child) {
-    margin-bottom: 2rem;
-  }
   .clean-style {
     text-decoration: inherit;
     color: inherit;
@@ -441,6 +485,10 @@ export const TransactionRow = styled.div<{ isLoading?: boolean }>`
         display: flex;
         justify-content: flex-end !important;
       `}
+  }
+
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    height: 13rem;
   }
 `;
 
@@ -458,14 +506,18 @@ export const TransactionEmpty = styled(TransactionRow)`
 `;
 
 export const TransactionData = styled.div<{ loading?: boolean }>`
-  margin-right: 2.5rem;
-
+  width: 100%;
+  padding: 0.4rem 0 0.4rem 0;
+  color: ${props =>
+    props.theme.dark ? props.theme.black : props.theme.darkBlue};
+  gap: 0.5rem;
   display: flex;
+  flex-direction: row;
+  align-items: center;
 
-  flex-direction: column;
-
-  gap: 0.25rem;
-
+  :nth-child(even) {
+    justify-content: flex-end;
+  }
   a {
     max-width: 10rem;
 
@@ -473,7 +525,8 @@ export const TransactionData = styled.div<{ loading?: boolean }>`
     white-space: nowrap;
     font-weight: 600;
 
-    color: ${props => props.theme.black};
+    color: ${props =>
+      props.theme.dark ? props.theme.black : props.theme.darkBlue};
 
     svg {
       margin-left: 0.75rem;
@@ -483,7 +536,8 @@ export const TransactionData = styled.div<{ loading?: boolean }>`
       }
     }
     &:hover {
-      color: ${props => props.theme.black};
+      color: ${props =>
+        props.theme.dark ? props.theme.black : props.theme.darkBlue};
       filter: brightness(1.2);
       text-decoration: underline;
     }
@@ -491,9 +545,7 @@ export const TransactionData = styled.div<{ loading?: boolean }>`
 
   span {
     font-weight: 400;
-    font-size: 0.85rem;
-
-    color: ${props => props.theme.darkText};
+    font-size: 0.9rem;
   }
 
   strong {
@@ -509,23 +561,35 @@ export const TransactionData = styled.div<{ loading?: boolean }>`
       css`
         max-width: 15rem;
       `}
-
     overflow: hidden;
-
     text-overflow: ellipsis;
     white-space: nowrap;
     font-weight: 500;
     font-size: 0.9rem !important;
+    color: ${props =>
+      props.theme.dark ? props.theme.black : props.theme.darkBlue};
+  }
 
-    color: ${props => props.theme.black};
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.25rem;
+    width: 100%;
+  }
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    display: flex;
+    :nth-child(even) {
+      justify-content: end;
+    }
   }
 `;
 
-export const TransactionAmount = styled.div`
-  width: 12.5rem;
+export const TransactionTimer = styled.div`
+  display: flex;
+  width: 100%;
   margin-left: auto;
-
-  text-align: right;
+  justify-content: end;
 
   span {
     max-width: 100%;
@@ -540,6 +604,7 @@ export const TransactionAmount = styled.div`
 `;
 
 export const TransactionChart = styled(TransactionContent)`
+  ${DataCardDefaultStyles}
   width: 40%;
   min-height: 22rem;
   position: relative;
@@ -547,10 +612,13 @@ export const TransactionChart = styled(TransactionContent)`
   justify-content: space-between;
   flex-direction: column;
 
+  border-radius: 16px;
+  padding: 1.5rem;
   span {
     font-size: 1.25rem;
     font-weight: 600;
-    color: ${props => props.theme.black};
+    color: ${props =>
+      props.theme.dark ? props.theme.black : props.theme.darkBlue};
   }
 
   p {
@@ -561,6 +629,13 @@ export const TransactionChart = styled(TransactionContent)`
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     min-height: 24.5rem;
   }
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 100%;
+    height: 30rem;
+    margin: 0;
+    background-color: ${props =>
+      props.theme.dark && props.theme.input.searchBar};
+  } ;
 `;
 
 export const FixedTxChart = styled(TransactionChart)`
@@ -580,6 +655,9 @@ export const TransactionChartContent = styled.div`
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     bottom: 0.3rem;
     left: -0.1rem;
+  }
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 100%;
   }
 `;
 
@@ -610,7 +688,7 @@ export const RetryContainer = styled.div`
 `;
 
 export const Main = styled.main`
-  padding: 3rem min(5vw, 10rem) 5rem;
+  padding: 3rem min(5vw, 2rem) 5rem;
   display: block;
   margin: 0 auto;
   max-width: ${props => props.theme.maxWidth};
@@ -632,6 +710,14 @@ export const ContainerTimeFilter = styled.div`
   width: 100%;
   height: fit-content;
   justify-content: space-between;
+
+  span {
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 16px;
+    color: ${props =>
+      props.theme.dark ? props.theme.card.text : props.theme.darkText};
+  }
 `;
 
 export const ListItemTimeFilter = styled.ul`
@@ -640,12 +726,14 @@ export const ListItemTimeFilter = styled.ul`
   justify-content: center;
 `;
 export const ItemTimeFilter = styled.li<{ selected: boolean }>`
-  color: ${props => props.theme.black};
-  border: 1px solid ${props => props.theme.chart.lightBg};
+  color: ${props =>
+    props.theme.dark ? props.theme.card.text : props.theme.darkText};
   height: fit-content;
-  padding: 0.35rem 1rem;
-  font-size: 0.8rem;
-
+  padding: 0rem 0.7rem;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 16px;
+  opacity: 0.3;
   &:hover {
     cursor: pointer;
     opacity: 0.75;
@@ -665,8 +753,7 @@ export const ItemTimeFilter = styled.li<{ selected: boolean }>`
   ${props =>
     props.selected &&
     css`
-      background: ${props => props.theme.chart.lightBg};
-      color: ${props => props.theme.true.white} !important;
+      opacity: 1;
     `};
 `;
 
@@ -697,4 +784,136 @@ export const HomeLoaderContainer = styled.div`
       margin-bottom: 6rem;
     }
   }
+`;
+
+export const ArrowData = styled(ArrowUpSquare).attrs(props => ({
+  size: 17,
+}))<{ positive: boolean }>`
+  color: ${({ positive, theme }) => (positive ? theme.green : theme.red)};
+  rotate: ${({ positive }) => (positive ? '0' : '180deg')};
+`;
+
+export const ExpandData = styled.div`
+  display: flex;
+  width: 100%;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.black};
+
+  p {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 16px;
+  }
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    display: none;
+  }
+`;
+
+export const ArrowExpandData = styled(BiChevronDownSquare).attrs(() => ({
+  size: 20,
+}))``;
+
+export const ButtonExpand = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  width: 152px;
+  height: 3rem;
+  background: linear-gradient(
+    360deg,
+    rgba(123, 125, 178, 0.3) 0%,
+    rgba(123, 125, 178, 0) 83.75%
+  );
+  border-radius: 0 0 1rem 1rem;
+`;
+
+export const ContainerHide = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
+  padding-bottom: 1.5rem;
+  > h1 {
+    margin: 0;
+    font-weight: 500;
+  }
+  div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 100%;
+    cursor: pointer;
+    color: ${({ theme }) => theme.black};
+
+    svg {
+      path {
+        fill: ${({ theme }) => theme.black};
+      }
+    }
+  }
+  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    div {
+      display: none;
+    }
+  }
+`;
+
+export const TransactionAmount = styled.div`
+  display: flex;
+  min-width: 9rem;
+  width: 100%;
+  max-width: 100%;
+  justify-content: end;
+  flex-direction: row;
+  align-items: flex-start;
+  color: white;
+
+  span,
+  p {
+    border-radius: 8px;
+    padding: 4px 12px;
+    background: ${({ theme }) => (theme.dark ? theme.blue : theme.violet)};
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+`;
+
+export const TransactionStatus = styled.span<{ isSuccess: boolean }>`
+  color: ${({ theme, isSuccess }) => (isSuccess ? theme.green : theme.red)};
+  line-height: 16px;
+`;
+
+export const ViewMoreContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 3rem;
+  margin-top: 1rem;
+  color: ${({ theme }) => theme.black};
+  p {
+    margin-top: 0.2rem;
+    height: fit-content;
+  }
+`;
+
+export const ArrowDownDataCards = styled(ArrowDownSquare)<{
+  expanded: boolean;
+}>`
+  rotate: ${({ expanded }) => (expanded ? 180 : 0)}deg;
+  path {
+    fill: ${({ theme }) => theme.black};
+  }
+`;
+
+export const ArrowUpSquareHideMenu = styled(LineArrowUpSquare)<{
+  hide: boolean;
+}>`
+  rotate: ${({ hide }) => (hide ? 180 : 0)}deg;
 `;

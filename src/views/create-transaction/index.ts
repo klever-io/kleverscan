@@ -1,6 +1,6 @@
+import { Card, CardContainer as CardsContainer } from '@/styles/common';
 import { transparentize } from 'polished';
 import styled from 'styled-components';
-import { Card, CardContainer as BlocksCardContainer } from '../blocks/index';
 
 export const CardContainer = styled.div`
   width: 100%;
@@ -51,7 +51,7 @@ export const CreateTxCard = styled(Card)`
   max-width: 1200px;
 `;
 
-export const CreateTxCardContainer = styled(BlocksCardContainer)`
+export const CreateTxCardContainer = styled(CardsContainer)`
   justify-content: center;
 `;
 

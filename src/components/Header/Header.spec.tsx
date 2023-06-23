@@ -69,7 +69,9 @@ describe('Component: Header/navbar', () => {
   it(`Should have the correct style background for the navbar\'s container`, () => {
     const { container } = renderWithTheme(<Navbar />);
 
-    expect(container.firstChild).toHaveStyle(`background: ${theme.black}`);
+    expect(container.firstChild).toHaveStyle(
+      `background: ${theme.navbar.background}`,
+    );
   });
 
   it('Should have the correct style for the navbar items - desktop version', () => {

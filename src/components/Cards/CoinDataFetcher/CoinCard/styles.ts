@@ -1,6 +1,8 @@
+import { ArrowUpRightSquare, ArrowUpSquare, Currency } from '@/assets/icons';
+import { DefaultCardStyles } from '@/styles/common';
+import { DataCardDefaultStyles } from '@/views/home';
 import Image from 'next/image';
-import styled, { keyframes } from 'styled-components';
-
+import styled, { css, keyframes } from 'styled-components';
 interface IVariation {
   positive: boolean;
 }
@@ -18,11 +20,10 @@ const FadeIn = keyframes`
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
   position: relative;
-
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 100%;
+  width: 100%;
+  h1 {
+    font-size: 1.6rem;
   }
 `;
 
@@ -38,13 +39,13 @@ export const Content = styled.div`
 
   border-radius: 1rem;
   width: 21rem;
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 100%;
-  }
+  width: 100%;
   overflow-y: hidden;
   position: relative;
 
   flex-direction: row;
+  border: 1px solid #222345;
+  ${DataCardDefaultStyles}
 
   &&::-webkit-scrollbar {
     display: none;
@@ -54,36 +55,39 @@ export const Content = styled.div`
 `;
 
 export const CardContainer = styled.div`
-  padding: 1.5rem;
   scroll-snap-align: start;
   position: relative;
   min-height: 17.4rem;
   flex-direction: row;
   align-items: center;
-
-  background-color: ${props => props.theme.card.background};
-  border-radius: 1rem;
-
+  border-radius: 0.5rem;
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     min-width: 100%;
+  }
+
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 50%;
+    ${props =>
+      props.theme.dark
+        ? css`
+            background-color: ${props.theme.input.searchBar};
+            border: 1px solid #222345;
+          `
+        : css`
+            ${DefaultCardStyles}
+          `};
+    height: 24rem;
   }
 `;
 
 export const CardContent = styled.div`
-  min-width: 18.5rem;
-
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    min-width: 10.5rem;
-  }
+  min-width: 10.5rem;
   display: flex;
 
   flex-direction: column;
 
   animation: 1.5s ease 0s 1 normal none running ${FadeIn};
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 100%;
-  }
-
+  width: 100%;
   a {
     z-index: 0;
   }
@@ -104,18 +108,34 @@ export const CardContainerSkeleton = styled(CardContainer)`
 
 export const HeaderContainer = styled.div`
   display: flex;
-
+  padding: 1.5rem;
   flex-direction: row;
 
   z-index: 0;
+  ${props =>
+    props.theme.dark
+      ? css`
+          border-bottom: 1px solid #222345;
+        `
+      : css`
+          border-bottom: 1px solid ${props.theme.lightGray};
+        `};
 `;
 
-export const HeaderContent = styled(HeaderContainer)`
+export const HeaderContent = styled.div`
+  display: flex;
+  position: relative;
+  align-items: center;
   padding-left: 1rem;
 
   width: 100%;
 
-  flex-direction: column;
+  svg {
+    path {
+      fill: ${props =>
+        props.theme.dark ? props.theme.black : props.theme.darkText};
+    }
+  }
 `;
 
 export const HeaderContentSkeleton = styled(HeaderContent)`
@@ -124,12 +144,11 @@ export const HeaderContentSkeleton = styled(HeaderContent)`
 
 export const Name = styled.div`
   display: flex;
-
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
   justify-content: space-between;
 
-  color: ${props => props.theme.card.white};
+  color: ${props =>
+    props.theme.dark ? props.theme.black : props.theme.darkText};
 
   font-weight: 600;
 
@@ -139,31 +158,40 @@ export const Name = styled.div`
       cursor: pointer;
     }
   }
+
+  p {
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 16px;
+    color: ${props =>
+      props.theme.dark ? props.theme.card.text : props.theme.darkText};
+  }
 `;
 
 export const Description = styled(Name)<IVariation>`
   font-size: 0.95rem;
   font-weight: 400;
-
-  span {
-    color: ${props => props.theme.card.text};
-    font-size: 0.85rem;
+  color: ${props => props.theme.card[props.positive ? 'green' : 'red']};
+  font-weight: 500;
+  div {
+    display: flex;
+    align-items: center;
+    padding-top: 1rem;
+    gap: 0.8rem;
   }
+  span {
+    color: ${props =>
+      props.theme.dark ? props.theme.card.text : props.theme.darkText};
 
-  p {
-    color: ${props => props.theme.card[props.positive ? 'green' : 'red']};
-    font-weight: 500;
+    font-size: 0.85rem;
   }
 `;
 
 export const ChartContainer = styled.div`
-  width: 18.5rem;
   margin-top: 1rem;
   margin-bottom: 1rem;
   height: 92.79px;
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 100%;
-  }
+  width: 100%;
 `;
 
 export const ValueContainer = styled.div<{ isKLV?: boolean }>`
@@ -259,42 +287,42 @@ export const ValueDetail = styled.div<{ positive?: boolean }>`
   }
 `;
 
-export const IconContainer = styled(Image).attrs(() => ({
+export const IconContainer = styled(Image).attrs(_ => ({
   alt: 'Coin',
-  width: 50,
-  height: 50,
 }))`
   cursor: pointer;
   padding-right: 1rem;
 `;
 
 export const CoinsSelector = styled.div`
-  position: absolute;
-  bottom: -1rem;
   display: flex;
-  min-width: 0.5rem;
-  height: 0.5rem;
+  width: 79px;
+  height: 32px;
   gap: 0.5rem;
   transition: 0.5s ease;
-
-  border-radius: 50%;
+  margin-bottom: 1rem;
 `;
 
 export const CoinSelector = styled.div<{ isSelected: boolean }>`
-  min-width: 0.6rem;
-  height: 0.6rem;
-
+  min-width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.true.white};
   transition: 0.5s ease;
-
+  font-style: normal;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  gap: 0.5rem;
   background-color: ${props =>
-    props.isSelected ? props.theme.card.background : props.theme.white};
+    !props.isSelected ? props.theme.card.background : '#515395'};
 
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.3);
 
-  filter: ${props => (props.theme.dark ? 'brightness(2)' : 'none')};
-
   cursor: pointer;
-  border-radius: 50%;
+  border-radius: 8px;
 `;
 
 export const ContainerLoading = styled.div`
@@ -328,5 +356,135 @@ export const NameError = styled(Name)`
     &:first-of-type {
       cursor: text !important;
     }
+  }
+`;
+
+export const ArrowTopRight = styled(ArrowUpRightSquare).attrs(props => ({
+  color: props.theme.true.white,
+  size: 30,
+}))`
+  position: absolute;
+  right: 0;
+`;
+
+export const HeaderGraph = styled.div`
+  display: flex;
+  gap: 5rem;
+  color: ${props => props.theme.true.white};
+  padding: 0.5rem 1.5rem 0 1.5rem;
+  justify-content: space-between;
+  span {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 3rem;
+    background: none;
+    color: ${props =>
+      props.theme.dark ? props.theme.text.gray : props.theme.darkText};
+  }
+
+  p {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 1.2rem;
+    line-height: 16px;
+    color: ${props =>
+      props.theme.dark ? props.theme.black : props.theme.darkText};
+  }
+`;
+
+export const ArrowVariation = styled(ArrowUpSquare).attrs(props => ({
+  size: 17,
+}))<{ positive: boolean }>`
+  path {
+    fill: ${props => props =>
+      props.theme.card[props.positive ? 'green' : 'red']};
+  }
+  rotate: ${props => (props.positive ? '' : '180deg')};
+`;
+
+export const SetTimeContainer = styled.div`
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 1rem;
+  padding-right: 1.5rem;
+  width: 100%;
+`;
+
+export const SpanTime = styled.span<{ selected: boolean }>`
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 16px;
+  color: ${props =>
+    props.theme.dark ? props.theme.text.gray : props.theme.darkText};
+  opacity: ${({ selected }) => (selected ? '1' : ' 0.3')};
+  cursor: pointer;
+`;
+
+export const ButtonInformation = styled.button`
+  ${DataCardDefaultStyles}
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  text-align: start;
+  padding: 9px 20px;
+  margin-top: 1rem;
+  border-radius: 0.5rem;
+  color: ${({ theme }) => theme.black};
+  background-color: ${({ theme }) => theme.violet};
+  font-weight: 600;
+  font-size: 1rem;
+
+  svg {
+    path {
+      fill: ${({ theme }) => (theme.dark ? theme.true.white : theme.violet)};
+    }
+  }
+  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    width: 12.5rem;
+    height: 11.5rem;
+    margin-top: 0rem;
+    align-items: flex-start;
+    padding: 1.2rem 3rem 0.5rem 1.2rem;
+    text-align: start;
+  }
+`;
+
+export const ButtonContainer = styled.div`
+  width: 100%;
+  a {
+    width: 100%;
+  }
+  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    position: relative;
+    width: fit-content;
+    :nth-child(1) {
+      margin-bottom: 1rem;
+    }
+  }
+`;
+
+export const CurrencyIcon = styled(Currency)`
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+`;
+
+export const ContentDeskTop = styled.div`
+  display: flex;
+  width: 100%;
+  gap: 1rem;
+`;
+
+export const ContainerDesktop = styled.div`
+  display: flex;
+  width: 100%;
+  gap: 1rem;
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    display: none;
   }
 `;

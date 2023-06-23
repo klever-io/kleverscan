@@ -1,4 +1,5 @@
 import { default as DefaultInput } from '@/components/InputGlobal';
+import { DefaultCardStyles } from '@/styles/common';
 import styled from 'styled-components';
 
 interface CardVoteProps {
@@ -13,8 +14,6 @@ interface ProgressBarProps {
   widthPercentage: string;
   background: string;
 }
-
-export const Container = styled.div``;
 
 export const Header = styled.div`
   display: flex;
@@ -161,10 +160,9 @@ export const ProgressContent = styled.div`
 `;
 
 export const VotesContainer = styled.div`
-  background-color: ${props => props.theme.white};
+  ${DefaultCardStyles}
   color: ${props => props.theme.black};
 
-  border-radius: 10px;
   padding: 30px;
   margin-bottom: 1.5rem;
 `;

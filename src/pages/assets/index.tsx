@@ -6,27 +6,16 @@ import AssetLogo from '@/components/Logo/AssetLogo';
 import Table, { ITable } from '@/components/Table';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import api from '@/services/api';
-import { IAsset, IPagination, IResponse, IRowSection } from '@/types/index';
+import { Container, Header } from '@/styles/common';
+import { IAsset, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { formatAmount } from '@/utils/formatFunctions';
 import { useFetchPartial } from '@/utils/hooks';
-import {
-  Container,
-  ContainerAssetId,
-  Header,
-  HeaderContainer,
-} from '@/views/assets';
+import { ContainerAssetId } from '@/views/assets';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { ReactNode } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
-
-interface IAssetResponse extends IResponse {
-  data: {
-    assets: IAsset[];
-  };
-  pagination: IPagination;
-}
 
 const Assets: React.FC = () => {
   const router = useRouter();
@@ -249,15 +238,15 @@ const Assets: React.FC = () => {
   return (
     <Container>
       <Header>
-        <HeaderContainer>
-          <Title title="Assets" Icon={Icon} />
-          <FilterContainer>
-            {filters.map(filter => (
-              <Filter key={filter.current} {...filter} />
-            ))}
-          </FilterContainer>
-        </HeaderContainer>
+        <Title title="Assets" Icon={Icon} />
       </Header>
+
+      <FilterContainer>
+        {filters.map(filter => (
+          <Filter key={filter.current} {...filter} />
+        ))}
+      </FilterContainer>
+
       <Table {...tableProps} />
     </Container>
   );

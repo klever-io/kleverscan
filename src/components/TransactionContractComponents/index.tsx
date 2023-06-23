@@ -1,6 +1,7 @@
 import { KLV } from '@/assets/coins';
 import { statusWithIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
+import { FrozenContainer, Row, RowContent } from '@/styles/common';
 import {
   EnumTriggerTypeName,
   IAssetTriggerContract,
@@ -58,11 +59,7 @@ import {
   receiverIsSender,
   renderCorrectPath,
 } from '@/utils/validateSender';
-import {
-  BalanceContainer,
-  FrozenContainer,
-  RowContent,
-} from '@/views/accounts/detail';
+import { BalanceContainer } from '@/views/accounts/detail';
 import { ExpandWrapper } from '@/views/assets/detail';
 import { BigSpan, NetworkParamsContainer } from '@/views/proposals/detail';
 import {
@@ -75,11 +72,11 @@ import {
   HoverAnchor,
   Hr,
   NestedContainerWrapper,
+  Panel,
   PropertiesWrapper,
   RoleDiv,
   RoleStrong,
   RoleWrapper,
-  Row,
   RoyaltiesChangeWrapper,
   StatusIconWrapper,
   StrongWidth,
@@ -300,7 +297,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
             </span>
           </ExpandWrapper>
           {expand?.royalties && (
-            <span className="panel">
+            <Panel>
               <CenteredRow>
                 <strong>Address:&nbsp;</strong>
                 <Link href={`/account/${parameter.royalties?.address}`}>
@@ -326,7 +323,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
                   {parameter?.royalties?.marketPercentage / 100}%
                 </span>
               )}
-            </span>
+            </Panel>
           )}
         </ExpandRow>
       )}
@@ -351,7 +348,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
           </ExpandWrapper>
 
           {expand?.staking && (
-            <span className="panel">
+            <Panel>
               <span>
                 <strong>Type:&nbsp;</strong>
                 {parameter?.staking?.type}
@@ -372,7 +369,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
                 <strong>Withdraw Time:&nbsp;</strong>
                 {parameter?.staking?.minEpochsToWithdraw || 0} Epoch(s)
               </span>
-            </span>
+            </Panel>
           )}
         </ExpandRow>
       )}
@@ -397,7 +394,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
             </span>
           </ExpandWrapper>
           {expand?.properties && (
-            <span className="panel">
+            <Panel>
               <PropertiesWrapper>
                 <div>
                   <StatusIconWrapper>
@@ -456,7 +453,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
                   </StatusIconWrapper>
                 </div>
               </PropertiesWrapper>
-            </span>
+            </Panel>
           )}
         </ExpandRow>
       )}
@@ -481,7 +478,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
         </ExpandWrapper>
 
         {expand?.attributes && (
-          <span className="panel">
+          <Panel>
             <StatusIconWrapper>
               <strong>Is Paused:&nbsp;</strong>
               <span>
@@ -509,7 +506,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
                 )}
               </span>
             </StatusIconWrapper>
-          </span>
+          </Panel>
         )}
       </ExpandRow>
     </>

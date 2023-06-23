@@ -1,8 +1,6 @@
 import { default as DefaultInput } from '@/components/InputGlobal';
 import styled from 'styled-components';
 
-export const Container = styled.div``;
-
 export const Header = styled.div`
   display: flex;
 
@@ -159,42 +157,6 @@ export const LetterLogo = styled.div`
   justify-content: center;
   font-size: 1.75rem;
   text-transform: uppercase;
-`;
-
-export const CenteredRow = styled.div`
-  display: flex;
-  overflow: hidden;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.5rem;
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    width: 100%;
-  }
-
-  strong {
-    font-size: 1rem;
-    font-weight: 600;
-  }
-
-  p {
-    font-weight: 600;
-    font-size: 0.85rem;
-  }
-
-  svg {
-    cursor: pointer;
-  }
-
-  a {
-    color: ${props => props.theme.black};
-    font-size: 1rem;
-    font-weight: 600;
-    text-decoration: none;
-  }
-  a:hover {
-    text-decoration: underline;
-  }
 `;
 
 export const CenteredRowSpan = styled.span`

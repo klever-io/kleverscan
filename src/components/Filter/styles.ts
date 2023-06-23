@@ -1,3 +1,4 @@
+import { DefaultCardStyles } from '@/styles/common';
 import { transparentize } from 'polished';
 import styled, { keyframes } from 'styled-components';
 
@@ -39,9 +40,11 @@ const Hide = keyframes`
 
 export const Container = styled.div`
   display: flex;
-
   flex-direction: column;
+
+  width: 100%;
   min-width: 10rem;
+
   span {
     padding-bottom: 0.25rem;
 
@@ -49,9 +52,14 @@ export const Container = styled.div`
     font-weight: 600;
     font-size: 0.9rem;
   }
+
+  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+    max-width: fit-content;
+  }
 `;
 
 export const Content = styled.div<{ open: boolean }>`
+  ${DefaultCardStyles}
   width: 100%;
   height: 2.8rem;
 
@@ -65,11 +73,6 @@ export const Content = styled.div<{ open: boolean }>`
   justify-content: space-between;
   align-items: center;
 
-  background-color: ${props => props.theme.white};
-
-  border: 1px solid
-    ${props =>
-      props.theme.dark ? props.theme.card.border : props.theme.lightGray};
   border-radius: 0.5rem;
 
   cursor: pointer;

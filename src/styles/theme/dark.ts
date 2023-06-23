@@ -3,7 +3,7 @@ import theme from '.';
 const darktheme = {
   ...theme,
   dark: true,
-  background: '#0B0B1E',
+  background: '#06060B',
   white: '#181935',
   black: '#FFFF',
   darkText: '#C6C7EB',
@@ -40,6 +40,8 @@ const darktheme = {
     ...theme.card,
     border: '#515395',
     white: '#ccc',
+    green: '#86EF75',
+    red: '#FF4465',
   },
 
   modalBackground: {
@@ -56,7 +58,7 @@ const darktheme = {
   },
   footer: {
     ...theme.footer,
-    background: '#0B0B1E',
+    background: '#06060B',
   },
 
   accountCard: {

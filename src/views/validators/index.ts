@@ -53,3 +53,12 @@ export const ProgressIndicator = styled.div<{ percent: number }>`
 
   opacity: 0.6;
 `;
+
+export const CircularProgressContainer = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  right: 0.5rem;
+  top: 0.1rem;
+`;

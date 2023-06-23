@@ -5,14 +5,19 @@ import Skeleton from '@/components/Skeleton';
 import Table, { ITable } from '@/components/Table';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
+import {
+  Card,
+  CardContainer,
+  CenteredRow,
+  Container,
+  Header,
+} from '@/styles/common';
 import { IAccount, IPagination, IResponse, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import { getAge } from '@/utils/timeFunctions';
 import { TableContainer } from '@/views/accounts';
-import { CenteredRow } from '@/views/accounts/detail';
-import { Card, CardContainer, Container, Header } from '@/views/blocks';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 

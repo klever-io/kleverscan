@@ -1,12 +1,14 @@
 import { Validators as Icon } from '@/assets/cards';
 import FormVerifySignature from '@/components/Form/FormVerifySignature';
+import Title from '@/components/Layout/Title';
 import {
   CardContent,
   CardHeader,
   CardHeaderItem,
-} from '@/components/Form/FormVerifySignature/styles';
-import Title from '@/components/Layout/Title';
-import { Container, Content, Header } from '@/views/verify-signature/detail';
+  Container,
+  Header,
+} from '@/styles/common';
+import { Content } from '@/views/verify-signature/detail';
 import { useState } from 'react';
 
 const VerifySignature: React.FC = () => {

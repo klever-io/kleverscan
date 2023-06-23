@@ -14,14 +14,14 @@ import TransactionsFilters from '@/components/TransactionsFilters';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
+import { CenteredRow, Container, Header } from '@/styles/common';
 import { setQueryAndRouter } from '@/utils';
 import { capitalizeString } from '@/utils/convertString';
 import { formatAmount, formatDate } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import { getPrecision } from '@/utils/precisionFunctions';
-import { CenteredRow } from '@/views/accounts/detail';
-import { Container, FilterByDate, Header } from '@/views/transactions';
+import { FilterByDate } from '@/views/transactions';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback } from 'react';
@@ -268,18 +268,18 @@ const Transactions: React.FC = () => {
 
   return (
     <Container>
-      <Title title="Transactions" Icon={Icon} />
-
       <Header>
-        <FilterContainer>
-          <TransactionsFilters
-            {...transactionsFiltersProps}
-          ></TransactionsFilters>
-          <FilterByDate>
-            <DateFilter {...dateFilterProps} />
-          </FilterByDate>
-        </FilterContainer>
+        <Title title="Transactions" Icon={Icon} />
       </Header>
+
+      <FilterContainer>
+        <TransactionsFilters
+          {...transactionsFiltersProps}
+        ></TransactionsFilters>
+        <FilterByDate>
+          <DateFilter {...dateFilterProps} />
+        </FilterByDate>
+      </FilterContainer>
       <Table {...tableProps} />
     </Container>
   );

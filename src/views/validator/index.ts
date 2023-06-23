@@ -1,3 +1,7 @@
+import {
+  CardContainer as DefaultCardContainer,
+  DefaultCardStyles,
+} from '@/styles/common';
 import styled from 'styled-components';
 import { IFilterItem } from '../../components/Filter';
 
@@ -229,23 +233,13 @@ export const AllSmallCardsContainer = styled.section`
   }
 `;
 
-export const CardContainer = styled.section`
-  margin: 1.5rem 0;
-
-  display: flex;
-
-  flex-direction: row;
-
-  gap: 0.75rem;
+export const CardContainer = styled(DefaultCardContainer)`
   position: absolute;
   z-index: 1;
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    flex-direction: column;
-  }
 `;
 
 export const Card = styled.div<{ marginLeft?: boolean; marginRight?: boolean }>`
+  ${DefaultCardStyles}
   width: 100%;
   padding: 1.2rem;
   overflow: hidden;
@@ -257,8 +251,6 @@ export const Card = styled.div<{ marginLeft?: boolean; marginRight?: boolean }>`
   height: 8.5rem;
   justify-content: space-between;
   flex-direction: column;
-  background-color: ${props => props.theme.white};
-  border-radius: 1rem;
   gap: 1rem;
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
@@ -284,6 +276,7 @@ interface IRewardsCardProps {
 }
 
 export const RewardsCard = styled.div<IRewardsCardProps>`
+  ${DefaultCardStyles}
   width: 100%;
   padding: 1.2rem;
   margin-top: 0.5rem;
@@ -291,8 +284,6 @@ export const RewardsCard = styled.div<IRewardsCardProps>`
   margin-right: ${props => (props.marginRight ? `${0}rem` : `${1}rem`)};
   margin-bottom: 0;
   height: 8.5rem;
-  background-color: ${props => props.theme.white};
-  border-radius: 1rem;
   gap: 1rem;
 
   div {
@@ -419,8 +410,6 @@ export const CardSubHeader = styled.div`
 interface IRatingProps {
   rate: string;
 }
-
-export const Container = styled.div``;
 
 export const Header = styled.div`
   display: flex;

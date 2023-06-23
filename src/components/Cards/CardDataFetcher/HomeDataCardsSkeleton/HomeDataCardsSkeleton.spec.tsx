@@ -26,6 +26,6 @@ describe('Component: HomeDataCardsSkeleton', () => {
     const container = renderWithTheme(<HomeDataCardsSkeleton />).container;
     const skeletonsInCoinCards = screen.getAllByTestId('skeleton');
 
-    expect(skeletonsInCoinCards.length).toBe(10);
+    expect(skeletonsInCoinCards.length).toBe(8);
   });
 });

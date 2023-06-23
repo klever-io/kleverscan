@@ -1,32 +1,30 @@
 import { Accounts, Epoch, TPS, Transactions } from '@/assets/cards';
-import Tooltip from '@/components/Tooltip';
 import { useHomeData } from '@/contexts/mainPage';
-import { useTheme } from '@/contexts/theme';
+import { useMobile } from '@/contexts/mobile';
 import { ICard, IEpochCard } from '@/types';
-import { getVariation } from '@/utils';
 import {
+  ArrowData,
+  ArrowDownDataCards,
+  ButtonExpand,
   DataCard,
   DataCardLatest,
   DataCardsContent,
   DataCardsWrapper,
   DataCardValue,
-  IconContainer,
+  ExpandData,
   Percentage,
-  ProgressContainerSpan,
 } from '@/views/home';
-import {
-  ProgressContainer,
-  ProgressContent,
-  ProgressIndicator,
-  ProgressPercentage,
-} from '@/views/validators';
+import { CircularProgressContainer } from '@/views/validators';
 import { useTranslation } from 'next-i18next';
-import { ValueDetail } from '../../CoinDataFetcher/CoinCard/styles';
+import { useState } from 'react';
+import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
 import HomeDataCardsSkeleton from '../HomeDataCardsSkeleton';
+import GradientSVG from './GradientSVG';
 
 const HomeDataCards: React.FC = ({}) => {
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
-
+  const [expanded, setExpanded] = useState(false);
+  const { isMobile } = useMobile();
   const {
     actualTPS,
     blocks,
@@ -41,7 +39,6 @@ const HomeDataCards: React.FC = ({}) => {
   } = useHomeData();
 
   const block = blocks[0];
-
   const dataCards: ICard[] = [
     {
       Icon: Accounts,
@@ -60,31 +57,34 @@ const HomeDataCards: React.FC = ({}) => {
 
   const epochCards: IEpochCard[] = [
     {
+      Icon: Epoch,
+      title:
+        `${t('Epoch')}` +
+        (block?.epoch ? ` #${block.epoch + counterEpoch} ` : ' '),
+      value: metrics.remainingTime,
+      progress: metrics.epochLoadPercent,
+    },
+    {
       Icon: TPS,
       title: t('Live/Peak TPS'),
       value: actualTPS,
     },
-    {
-      Icon: Epoch,
-      title:
-        `${t('Epoch')}` +
-        (block?.epoch ? ` #${block.epoch + counterEpoch} ` : ' ') +
-        `${t('Remaining Time')}`,
-      value: metrics.remainingTime,
-      progress: metrics.epochLoadPercent,
-    },
   ];
 
   const Progress: React.FC<{ percent: number }> = ({ percent }) => {
-    const { theme } = useTheme();
-
+    const idCSS = 'gradient';
     return (
-      <ProgressContainer>
-        <ProgressContent>
-          <ProgressIndicator percent={percent} />
-        </ProgressContent>
-        <ProgressPercentage textColor={theme.card.white}></ProgressPercentage>
-      </ProgressContainer>
+      <CircularProgressContainer>
+        <GradientSVG />
+        <CircularProgressbar
+          counterClockwise
+          value={percent}
+          styles={buildStyles({
+            pathColor: `url(#${idCSS})`,
+            trailColor: '#404264',
+          })}
+        />
+      </CircularProgressContainer>
     );
   };
 
@@ -92,76 +92,64 @@ const HomeDataCards: React.FC = ({}) => {
     progress: any;
     value: string | number;
   }> = ({ progress, value }) => {
-    if (progress) {
-      return (
-        <Percentage>
-          <p>{value?.toLocaleString()}</p>
-          {progress >= 0 && (
-            <div>
-              <ProgressContainerSpan>
-                <strong>
-                  <Progress percent={metrics.epochLoadPercent} />
-                </strong>
-                <span>
-                  {metrics.epochLoadPercent.toFixed(2)}% to next epoch
-                </span>
-              </ProgressContainerSpan>
-            </div>
-          )}
-        </Percentage>
-      );
-    }
-    return <p>{value?.toLocaleString()}</p>;
+    return (
+      <Percentage>
+        <p>{value?.toLocaleString()}</p>
+        {progress >= 0 && (
+          <div>
+            <Progress percent={metrics.epochLoadPercent} />
+          </div>
+        )}
+      </Percentage>
+    );
   };
 
+  const displayCards = !isMobile
+    ? epochCards
+    : expanded
+    ? epochCards
+    : epochCards.slice(0, 1);
   return !loadingCards ? (
     <DataCardsWrapper>
       <DataCardsContent>
         {dataCards.map(
           ({ Icon, title, value, variation, percentage }, index) => (
             <DataCard key={String(index)}>
-              <IconContainer>
-                <Icon viewBox="0 0 70 70" />
-              </IconContainer>
+              <span>{title}</span>
               <DataCardValue>
-                <span>{title}</span>
                 <p>{value.toLocaleString()}</p>
+                {!variation.includes('%') && (
+                  <DataCardLatest positive={variation.includes('+')}>
+                    <div>
+                      <ArrowData positive={variation.includes('+')} />
+                      <p>{variation}/24h</p>
+                    </div>
+                  </DataCardLatest>
+                )}
               </DataCardValue>
-              {!variation.includes('%') && (
-                <DataCardLatest positive={variation.includes('+')}>
-                  <span>{t('Last 24h')}</span>
-                  <p>{variation}</p>
-                  {percentage && (
-                    <ValueDetail positive={percentage > 0}>
-                      <p>{getVariation(+percentage)}</p>
-                    </ValueDetail>
-                  )}
-                </DataCardLatest>
-              )}
             </DataCard>
           ),
         )}
       </DataCardsContent>
       <DataCardsContent>
-        {epochCards.map(({ Icon, title, value, progress }, index) => (
+        {displayCards.map(({ Icon, title, value, progress }, index) => (
           <DataCard key={String(index)}>
-            <IconContainer>
-              <Icon viewBox="0 0 70 70" />
-            </IconContainer>
-            <DataCardValue>
+            <DataCardValue isEpoch={true}>
               <div>
                 <span>{title}</span>
-                {index === 0 && (
-                  <span style={{ marginTop: '-0.25rem' }}>
-                    <Tooltip msg="Transactions per second" />
-                  </span>
-                )}
               </div>
               {<PercentageComponent progress={progress} value={value} />}
+              {index === 0 && <small>Time remaining</small>}
             </DataCardValue>
           </DataCard>
         ))}
       </DataCardsContent>
+      <ExpandData>
+        <ButtonExpand onClick={() => setExpanded(!expanded)}>
+          <ArrowDownDataCards expanded={expanded} />
+          <p>{expanded ? 'Hide Cards' : 'Expand Cards'}</p>
+        </ButtonExpand>
+      </ExpandData>
     </DataCardsWrapper>
   ) : (
     <HomeDataCardsSkeleton />

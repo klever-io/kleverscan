@@ -1,3 +1,4 @@
+import { DefaultCardStyles } from '@/styles/common';
 import styled, { css, keyframes } from 'styled-components';
 
 interface DayItemProps {
@@ -80,18 +81,15 @@ export const OutsideContainer = styled.div`
 `;
 
 export const OutsideContent = styled.div`
-  padding: 1rem 0;
+  ${DefaultCardStyles}
+  padding: 1rem;
   height: 100%;
   width: 100%;
   display: flex;
   flex-direction: row !important;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
 
-  background-color: ${props =>
-    props.theme.dark
-      ? props.theme.input.dateFilter
-      : props.theme.dateFilter.outsideBackground};
   border-radius: 0.5rem;
 
   cursor: pointer;
@@ -242,6 +240,7 @@ export const DaysTable = styled.div`
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   flex-wrap: wrap;
+  width: 100%;
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: row !important;
   }
@@ -296,11 +295,6 @@ export const DayItem = styled.div.attrs((props: DayItemProps) => ({
       filter: opacity(0.15);
       pointer-events: none;
     `}
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 14% !important;
-    padding: 1rem 1rem;
-    line-height: 0;
-  }
 `;
 
 export const Warning = styled.div`

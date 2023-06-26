@@ -384,14 +384,20 @@ const getAssetsList = (
   }
 
   if (contractType === 'AssetTriggerContract' && typeAssetTrigger !== null) {
-    const bothCollectionNFT = [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13];
+    const bothCollectionNFT = [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12];
     const justNFT = [8];
+    const justToken = [13];
 
     if (bothCollectionNFT.includes(typeAssetTrigger)) {
       return filterByProperties(assets, typeAssetTrigger);
     } else if (justNFT.includes(typeAssetTrigger)) {
       const newAssets = assets.filter((value: ICollectionList) => {
         return value.isNFT;
+      });
+      return filterByProperties(newAssets, typeAssetTrigger);
+    } else if (justToken.includes(typeAssetTrigger)) {
+      const newAssets = assets.filter((value: ICollectionList) => {
+        return !value.isNFT;
       });
       return filterByProperties(newAssets, typeAssetTrigger);
     }

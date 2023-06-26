@@ -63,6 +63,29 @@ export const parseStaking = (data: any): void => {
   data.staking.interestType = data.staking.interestType ? 1 : 0;
 };
 
+export const parseProperties = (data: any): void => {
+  if (data.properties === undefined) {
+    return;
+  }
+
+  const propertiesReference = data.properties;
+
+  delete data.properties;
+
+  if (Object.keys(propertiesReference).length === 0) return;
+
+  const properties: {
+    [key: string]: boolean;
+  } = {};
+
+  Object.keys(propertiesReference).forEach(key => {
+    const label = key;
+    properties[label] = Boolean(propertiesReference[key]);
+  });
+
+  data.properties = properties;
+};
+
 export const parseKDAFeePool = (data: any): void => {
   if (data.kdaPool === undefined) {
     return;

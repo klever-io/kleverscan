@@ -14,6 +14,7 @@ import {
 } from '../FormInput/styles';
 import { ButtonContainer, FormBody, SectionTitle } from '../styles';
 import {
+  parseProperties,
   parseSplitRoyalties,
   parseStaking,
   parseURIs,
@@ -35,6 +36,7 @@ const parseCreateAsset = (data: ICreateAsset) => {
   parseSplitRoyalties(data);
   parseURIs(data);
   parseStaking(data);
+  parseProperties(data);
 };
 
 const CreateAsset: React.FC<IContractProps> = ({
@@ -538,7 +540,7 @@ const PropertiesSection: React.FC = () => {
         title="Freeze"
         type="checkbox"
         toggleOptions={['No', 'Yes']}
-        defaultValue={true}
+        defaultValue={1}
         tooltip={tooltip.properties.canFreeze}
       />
       <FormInput
@@ -546,7 +548,7 @@ const PropertiesSection: React.FC = () => {
         title="Wipe"
         type="checkbox"
         toggleOptions={['No', 'Yes']}
-        defaultValue={false}
+        defaultValue={0}
         tooltip={tooltip.properties.canWipe}
       />
       <FormInput
@@ -554,7 +556,7 @@ const PropertiesSection: React.FC = () => {
         title="Pause"
         type="checkbox"
         toggleOptions={['No', 'Yes']}
-        defaultValue={true}
+        defaultValue={1}
         tooltip={tooltip.properties.canPause}
       />
       <FormInput
@@ -562,7 +564,7 @@ const PropertiesSection: React.FC = () => {
         title="Mint"
         type="checkbox"
         toggleOptions={['No', 'Yes']}
-        defaultValue={true}
+        defaultValue={1}
         tooltip={tooltip.properties.canMint}
       />
       <FormInput
@@ -570,7 +572,7 @@ const PropertiesSection: React.FC = () => {
         title="Burn"
         type="checkbox"
         toggleOptions={['No', 'Yes']}
-        defaultValue={true}
+        defaultValue={1}
         tooltip={tooltip.properties.canBurn}
       />
       <FormInput
@@ -578,7 +580,7 @@ const PropertiesSection: React.FC = () => {
         title="Change Owner"
         type="checkbox"
         toggleOptions={['No', 'Yes']}
-        defaultValue={true}
+        defaultValue={1}
         tooltip={tooltip.properties.canChangeOwner}
       />
       <FormInput
@@ -586,7 +588,7 @@ const PropertiesSection: React.FC = () => {
         title="Add Roles"
         type="checkbox"
         toggleOptions={['No', 'Yes']}
-        defaultValue={true}
+        defaultValue={1}
         tooltip={tooltip.properties.canAddRoles}
       />
     </FormSection>

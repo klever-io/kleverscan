@@ -8,6 +8,7 @@ import { IoOpenOutline } from 'react-icons/io5';
 import ConfirmPayload from '../ConfirmPayload';
 import Copy from '../Copy';
 import MetadataOptions from '../Form/Metadata';
+import { InlineLoader } from '../Loader';
 import { Loader } from '../Loader/styles';
 import { getContract } from '../TransactionForms/CustomForms';
 import {
@@ -26,23 +27,47 @@ export interface IContract {
   defaultValues?: any;
 }
 
-export const hashComponent = (
-  hash: string,
-  setHash: React.Dispatch<React.SetStateAction<string | null>>,
-): JSX.Element => (
-  <ExtraOptionContainer>
-    <Link href={`/transaction/${hash}`}>
-      <a target="_blank" rel="noopener noreferrer">
-        Hash: {hash}
-        <IoOpenOutline />
-      </a>
-    </Link>
-    <IconsContainer>
-      <Copy data={hash ? hash : ''} />
-      <CloseIcon onClick={() => setHash(null)} />
-    </IconsContainer>
-  </ExtraOptionContainer>
-);
+export interface IHashComponentProps {
+  hash: string | null;
+  setHash: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
+export const HashComponent: React.FC<IHashComponentProps> = ({
+  hash,
+  setHash,
+}) => {
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      await new Promise(resolve =>
+        setTimeout(resolve, 2000 + Math.random() * 1000),
+      );
+
+      setLoading(false);
+    })();
+  }, [hash]);
+
+  return (
+    <ExtraOptionContainer>
+      {!loading ? (
+        <Link href={`/transaction/${hash}`}>
+          <a target="_blank" rel="noopener noreferrer">
+            Hash: {hash}
+            <IoOpenOutline />
+          </a>
+        </Link>
+      ) : (
+        <InlineLoader />
+      )}
+      <IconsContainer>
+        {!loading && <Copy data={hash ? hash : ''} />}
+        <CloseIcon onClick={() => setHash(null)} />
+      </IconsContainer>
+    </ExtraOptionContainer>
+  );
+};
 
 const Contract: React.FC<IContract> = ({
   modalContractType,
@@ -100,6 +125,11 @@ const Contract: React.FC<IContract> = ({
     ...metadataProps,
   };
 
+  const hashProps = {
+    hash: txHash,
+    setHash: setTxHash,
+  };
+
   return (
     <Container>
       <FormProvider {...formMethods}>
@@ -111,7 +141,7 @@ const Contract: React.FC<IContract> = ({
             window.document.body,
           )}
         {openConfirmModal && <ConfirmPayload />}
-        {txHash && hashComponent(txHash, setTxHash)}
+        {txHash && <HashComponent {...hashProps} />}
 
         {contractsDescription[contractType] && (
           <CardContainer>

@@ -1,5 +1,5 @@
 import { Accounts as Icon } from '@/assets/title-icons';
-import { hashComponent } from '@/components/Contract';
+import { HashComponent } from '@/components/Contract';
 import Title from '@/components/Layout/Title';
 import { Loader } from '@/components/Loader/styles';
 import Tooltip from '@/components/Tooltip';
@@ -305,7 +305,9 @@ const Multisign: React.FC = () => {
         <Header>
           <Title title="Multisign Interface" Icon={Icon} />
         </Header>
-        {isBroadcasted && hashComponent(isBroadcasted, setIsBroadcasted)}
+        {isBroadcasted && (
+          <HashComponent hash={isBroadcasted} setHash={setIsBroadcasted} />
+        )}
         <Content loading={loading}>
           {!loading && (
             <>

@@ -72,6 +72,8 @@ import {
   HoverAnchor,
   Hr,
   NestedContainerWrapper,
+  NonceGrid,
+  NonceSpan,
   Panel,
   PropertiesWrapper,
   RoleDiv,
@@ -1581,9 +1583,37 @@ export const Buy: React.FC<IContractBuyProps> = ({
       }));
     };
 
+    const getNFTNonces = () => {
+      return receipts.filter(receipt => {
+        const assetAndNonce = receipt?.assetId?.split('/');
+        if (
+          assetAndNonce &&
+          assetAndNonce[0] === parameter.id &&
+          assetAndNonce[1] &&
+          receipt.to === sender
+        ) {
+          return assetAndNonce[1];
+        }
+      });
+    };
+
+    const renderNFTNonces = () => {
+      if (noncesReceipts.length) {
+        return (
+          <NonceGrid>
+            {noncesReceipts.map(nonceReceipt => {
+              const nonce = nonceReceipt.assetId.split('/')[1];
+              return <NonceSpan key={nonce}>{nonce}</NonceSpan>;
+            })}
+          </NonceGrid>
+        );
+      }
+      return null;
+    };
+
     const price = getPrice();
     const amount = getAmount();
-
+    const noncesReceipts = getNFTNonces();
     const totalPrices = getTotalPrices();
     const parsedTotalPrices = parseTotalPrices(totalPrices);
 
@@ -1631,6 +1661,14 @@ export const Buy: React.FC<IContractBuyProps> = ({
             <span>
               {amount} {assetId}
             </span>
+          </Row>
+        )}
+        {!!noncesReceipts.length && (
+          <Row>
+            <span>
+              <strong>NFTs Nonces</strong>
+            </span>
+            {renderNFTNonces()}
           </Row>
         )}
         <Row>

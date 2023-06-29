@@ -389,3 +389,28 @@ export const CenteredDiv = styled.div`
   align-items: center;
   gap: 0.2rem;
 `;
+
+export const NonceGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(3rem, 1fr));
+  width: 100%;
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+    grid-template-columns: repeat(8, 2fr);
+    width: initial;
+  }
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    width: initial;
+    grid-template-columns: repeat(11, 2fr);
+  }
+`;
+
+export const NonceSpan = styled.span`
+  background-color: ${props => props.theme.navbar.text};
+  width: 2.7rem;
+  height: 3.2rem;
+  display: grid;
+  place-items: center;
+  margin: 0.6rem;
+  border-radius: 4px;
+  color: ${props => props.theme.true.white};
+`;

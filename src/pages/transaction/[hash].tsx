@@ -49,6 +49,7 @@ import { Contract, IIndexedContract } from '@/types/contracts';
 import { capitalizeString, hexToString } from '@/utils/convertString';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import { parseJson } from '@/utils/parseValues';
+import { getPrecision } from '@/utils/precisionFunctions';
 import { BalanceContainer } from '@/views/accounts/detail';
 import {
   ButtonExpand,
@@ -68,7 +69,7 @@ import { ReceiveBackground } from '@/views/validator';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const Transaction: React.FC<ITransactionPage> = props => {
   const { transaction, block } = props;
@@ -88,7 +89,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
     nonce,
     kdaFee,
   } = transaction;
-
+  const [precisionTransaction, setPrecisionTransaction] = useState<number>(0);
   const initializeExpandData = () => {
     if (data && data.length > 0) {
       const expandArray: boolean[] = [];
@@ -498,7 +499,15 @@ const Transaction: React.FC<ITransactionPage> = props => {
       </span>
     );
   };
-
+  const getPrecisionTransaction = async () => {
+    if (kdaFee) {
+      const precision = await getPrecision(kdaFee.kda);
+      setPrecisionTransaction(precision);
+    }
+  };
+  useEffect(() => {
+    getPrecisionTransaction();
+  }, []);
   return (
     <Container>
       <Header>
@@ -599,7 +608,12 @@ const Transaction: React.FC<ITransactionPage> = props => {
             </span>
             <KdaFeeSpan>
               <span>
-                {kdaFee?.amount} {kdaFee?.kda || 'KLV'}
+                {kdaFee &&
+                  toLocaleFixed(
+                    kdaFee?.amount / 10 ** precisionTransaction,
+                    precisionTransaction,
+                  )}{' '}
+                {kdaFee?.kda || 'KLV'}
               </span>
               <Tooltip
                 msg={`Both kApp fee and bandwidth fee were payed with ${

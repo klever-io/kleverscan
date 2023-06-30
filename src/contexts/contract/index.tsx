@@ -28,10 +28,12 @@ import {
   IAssetsResponse,
   ICollectionList,
   IFormData,
+  INodeAccountResponse,
+  Service,
 } from '@/types/index';
 import { contractOptions as allContractOptions } from '@/utils/contracts';
 import { KLV_PRECISION } from '@/utils/globalVariables';
-import { web } from '@klever/sdk';
+import { ITransaction, web } from '@klever/sdk';
 import { useRouter } from 'next/router';
 import React, {
   createContext,
@@ -101,6 +103,7 @@ export interface IContractContext {
   kdaFee: React.MutableRefObject<ICollectionList>;
   permID: React.MutableRefObject<number>;
   openModal: boolean;
+  senderAccount: React.MutableRefObject<string | null | undefined>;
   setContractType: (contract: string) => void;
   setQueue: React.Dispatch<React.SetStateAction<any>>;
   setIsMultiContract: React.Dispatch<React.SetStateAction<boolean>>;
@@ -158,6 +161,7 @@ export const ContractProvider: React.FC = ({ children }) => {
   const formsData = useRef<IFormPayload[]>([] as IFormPayload[]);
   const kdaFee = useRef<ICollectionList>({} as ICollectionList);
   const permID = useRef<number>(0);
+  const senderAccount = useRef<string | null>();
 
   const { logoutExtension, extensionInstalled } = useExtension();
   const router = useRouter();
@@ -428,7 +432,7 @@ export const ContractProvider: React.FC = ({ children }) => {
       };
     });
     try {
-      const unsignedTx = await buildTransaction(
+      const unsignedTx: ITransaction = await buildTransaction(
         parsedPayloads,
         parsedDataArray,
         {
@@ -436,6 +440,21 @@ export const ContractProvider: React.FC = ({ children }) => {
           permID: permID.current,
         },
       );
+
+      if (isMultisig.current && senderAccount.current) {
+        const senderData: INodeAccountResponse = await api.get({
+          route: `address/${senderAccount.current}`,
+          service: Service.NODE,
+        });
+        if (senderData.error) {
+          throw new Error(senderData.code);
+        }
+        const { Address } = senderData.data.account;
+        const Nonce = senderData.data.account.Nonce || 0;
+
+        unsignedTx.RawData.Nonce = Nonce;
+        unsignedTx.RawData.Sender = Address;
+      }
 
       const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
 
@@ -743,6 +762,7 @@ export const ContractProvider: React.FC = ({ children }) => {
     useKDASelect,
     kdaFee,
     permID,
+    senderAccount,
   };
   return <Contract.Provider value={values}>{children}</Contract.Provider>;
 };

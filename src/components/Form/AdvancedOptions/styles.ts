@@ -17,7 +17,7 @@ export const ExtraOptionContainer = styled.div`
   display: flex;
   flex-direction: column;
 
-  gap: 1rem;
+  gap: 1.5rem;
 
   margin-top: 1rem;
   margin-bottom: 1rem;
@@ -37,6 +37,8 @@ export const InputLabel = styled.label`
   font-size: small;
   font-weight: 600;
 
+  width: 100%;
+
   display: flex;
   gap: 0.5rem;
 
@@ -46,14 +48,23 @@ export const InputLabel = styled.label`
 `;
 
 export const FieldContainer = styled.div`
-  display: flex;
-  flex-direction: column;
   width: 100%;
-  gap: 0.75rem;
+
+  position: relative;
+
+  &:first-of-type {
+    margin-bottom: 0.75rem;
+  }
 `;
 
 export const FlexContainer = styled.div`
   display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    flex-direction: row;
+  }
 `;
 
 export const DataField = styled.textarea`

@@ -7,9 +7,13 @@ import {
 } from '@/components/Contract/styles';
 import { getAssetsList } from '@/components/Contract/utils';
 import {
+  InfoIcon,
+  InputLabel,
   Slider,
   StyledInput,
   Toggle,
+  TooltipContainer,
+  TooltipContent,
 } from '@/components/TransactionForms/FormInput/styles';
 import { useContract } from '@/contexts/contract';
 import { ICollectionList } from '@/types';
@@ -19,16 +23,148 @@ import {
   ExtraOptionContainer,
   FieldContainer,
   FlexContainer,
-  InputLabel,
   ToggleContainer,
 } from './styles';
+
+const PermID: React.FC = () => {
+  const { permID } = useContract();
+
+  return (
+    <FieldContainer>
+      <InputLabel>
+        <span>Permission ID</span>
+        <TooltipContainer>
+          <InfoIcon />
+          <TooltipContent>
+            <span>
+              The permission ID is set by the account owner and is used to make
+              other accounts able to sign transactions on behalf of the owner.
+              <br />
+              You can find more information about permissions in your account
+              page.
+              <br />
+              If they are not set, you need to send a &quot; Update Account
+              Permisison &quot; contract
+            </span>
+          </TooltipContent>
+        </TooltipContainer>
+      </InputLabel>
+      <StyledInput
+        type="number"
+        placeholder="Permission ID"
+        defaultValue={permID.current}
+        onChange={e => {
+          permID.current = Number(e.target.value);
+        }}
+      />
+    </FieldContainer>
+  );
+};
+
+const AccountSelect: React.FC = () => {
+  const { senderAccount } = useContract();
+  const [loggedAccountIsSender, setLoggedAccountIsSender] = useState(true);
+
+  return (
+    <FlexContainer>
+      <FieldContainer>
+        <InputLabel>
+          <span>Do you want to use the current account as sender?</span>
+        </InputLabel>
+        <ToggleContainer>
+          No
+          <Toggle>
+            <StyledInput
+              type="checkbox"
+              defaultChecked={loggedAccountIsSender}
+              value={String(loggedAccountIsSender)}
+              onClick={() => {
+                setLoggedAccountIsSender(!loggedAccountIsSender);
+              }}
+            />
+            <Slider active={String(loggedAccountIsSender)} />
+          </Toggle>
+          Yes
+        </ToggleContainer>
+      </FieldContainer>
+
+      {!loggedAccountIsSender && (
+        <FieldContainer>
+          <InputLabel>
+            <span>Sender Account Address</span>
+            <TooltipContainer>
+              <InfoIcon />
+              <TooltipContent>
+                <span>
+                  The sender account address is the account that will be the
+                  sender of the transaction. It needs to be a multi-sign
+                  account.
+                  <br />
+                  Your connected address will be the one used to sign the
+                  transaction.
+                  <br />
+                  Be sure that your account has the permission to sign
+                  transactions on behalf of the sender account, otherwise the
+                  transaction will fail.
+                </span>
+              </TooltipContent>
+            </TooltipContainer>
+          </InputLabel>
+
+          <StyledInput
+            placeholder="Sender Account Address"
+            defaultValue={senderAccount.current || ''}
+            onChange={e => {
+              senderAccount.current = e.target.value;
+            }}
+          />
+        </FieldContainer>
+      )}
+    </FlexContainer>
+  );
+};
+
+const MultiSigSelect: React.FC = () => {
+  const { isMultisig } = useContract();
+
+  const [multiSig, setMultiSig] = useState<boolean>(isMultisig.current);
+
+  return (
+    <>
+      <FlexContainer>
+        <FieldContainer>
+          <InputLabel>
+            <span>Does your account needs multiple signatures?</span>
+          </InputLabel>
+          <ToggleContainer>
+            No
+            <Toggle>
+              <StyledInput
+                type="checkbox"
+                defaultChecked={isMultisig.current}
+                value={String(isMultisig.current)}
+                onClick={() => {
+                  isMultisig.current = !isMultisig.current;
+                  setMultiSig(isMultisig.current);
+                }}
+              />
+              <Slider active={String(isMultisig.current)} />
+            </Toggle>
+            Yes
+          </ToggleContainer>
+        </FieldContainer>
+        {multiSig && <PermID />}
+      </FlexContainer>
+      {multiSig && <AccountSelect />}
+    </>
+  );
+};
 
 const AdvancedOptionsContent: React.FC = () => {
   const {
     setIsMultiContract,
     isMultiContract,
     showPayload,
-    isMultisig,
     kdaFee,
     getAssets,
     getOwnerAddress,
@@ -79,31 +215,17 @@ const AdvancedOptionsContent: React.FC = () => {
     );
   };
 
-  const PermID: React.FC = () => {
-    const { permID } = useContract();
-
-    return (
-      <FieldContainer>
-        <InputLabel>Permission ID</InputLabel>
-        <StyledInput
-          type="number"
-          placeholder="Permission ID"
-          defaultValue={permID.current}
-          onChange={e => {
-            permID.current = Number(e.target.value);
-          }}
-        />
-      </FieldContainer>
-    );
-  };
-
-  const [multiSig, setMultiSig] = useState<boolean>(isMultisig.current);
+  const [localShowPayload, setLocalShowPayload] = useState<boolean>(
+    showPayload.current,
+  );
 
   return (
     <ExtraOptionContainer>
       {kdaSelect()}
       <FieldContainer>
-        <InputLabel>Multiple Contract</InputLabel>
+        <InputLabel>
+          <span>Multiple Contract</span>
+        </InputLabel>
         <ToggleContainer>
           No
           <Toggle>
@@ -113,35 +235,16 @@ const AdvancedOptionsContent: React.FC = () => {
               value={String(isMultiContract)}
               onClick={() => setIsMultiContract(!isMultiContract)}
             />
-            <Slider />
+            <Slider active={String(isMultiContract)} />
           </Toggle>
           Yes
         </ToggleContainer>
       </FieldContainer>
-      <FlexContainer key={String(isMultisig.current)}>
-        <FieldContainer>
-          <InputLabel>Does Your Account Needs Multiple Signatures?</InputLabel>
-          <ToggleContainer>
-            No
-            <Toggle>
-              <StyledInput
-                type="checkbox"
-                defaultChecked={isMultisig.current}
-                value={String(isMultisig.current)}
-                onClick={() => {
-                  isMultisig.current = !isMultisig.current;
-                  setMultiSig(isMultisig.current);
-                }}
-              />
-              <Slider />
-            </Toggle>
-            Yes
-          </ToggleContainer>
-        </FieldContainer>
-        {multiSig && <PermID />}
-      </FlexContainer>
+      <MultiSigSelect />
       <FieldContainer>
-        <InputLabel>Show payload?</InputLabel>
+        <InputLabel>
+          <span>Show payload?</span>
+        </InputLabel>
         <ToggleContainer>
           No
           <Toggle>
@@ -149,9 +252,12 @@ const AdvancedOptionsContent: React.FC = () => {
               type="checkbox"
               defaultChecked={showPayload.current}
               value={String(showPayload.current)}
-              onClick={() => (showPayload.current = !showPayload.current)}
+              onClick={() => {
+                showPayload.current = !showPayload.current;
+                setLocalShowPayload(showPayload.current);
+              }}
             />
-            <Slider />
+            <Slider active={String(localShowPayload)} />
           </Toggle>
           Yes
         </ToggleContainer>

@@ -726,6 +726,18 @@ export interface ITransactionListResponse extends IResponse {
   pagination: IPagination;
 }
 
+export interface INodeAccountResponse extends IResponse {
+  data: {
+    account: {
+      Address: string;
+      Allowance: number;
+      Balance: number;
+      Nonce?: number;
+      RootHash: string;
+    };
+  };
+}
+
 export interface IAccountResponse extends IResponse {
   pagination: IPagination;
 }

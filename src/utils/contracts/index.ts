@@ -305,7 +305,7 @@ export const contractTypes = (contracts: IContract[]): string => {
 
   return contracts.length > 1
     ? 'Multi contract'
-    : Object.values(Contract)[contracts[0].type];
+    : ContractsIndex[Number(contracts[0].type)];
 };
 
 export const contractsList = [

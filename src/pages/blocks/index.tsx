@@ -257,13 +257,13 @@ const Blocks: React.FC<IBlocks> = () => {
             href={`/validator/${producerOwnerAddress}`}
             key={producerOwnerAddress}
           >
-            {parseAddress(producerName, 12)}
+            {parseAddress(producerName, 20)}
           </Link>
         ),
         span: 1,
       },
       {
-        element: <small key={timestamp}>{formatDate(timestamp)}</small>,
+        element: <span key={timestamp}>{formatDate(timestamp)}</span>,
         span: 1,
       },
       {
@@ -272,33 +272,33 @@ const Blocks: React.FC<IBlocks> = () => {
       },
       {
         element: (
-          <small key={txBurnedFees}>{`${formatAmount(
+          <span key={txBurnedFees}>{`${formatAmount(
             (txBurnedFees || 0) / 10 ** precision,
-          )} KLV`}</small>
+          )} KLV`}</span>
         ),
         span: 1,
       },
       {
         element: (
-          <small key={kAppFees}>
+          <span key={kAppFees}>
             {formatAmount((kAppFees || 0) / 10 ** precision)} KLV
-          </small>
+          </span>
         ),
         span: 1,
       },
       {
         element: (
-          <small key={txFees}>
+          <span key={txFees}>
             {formatAmount((txFees || 0) / 10 ** precision)} KLV
-          </small>
+          </span>
         ),
         span: 1,
       },
       {
         element: (
-          <strong key={blockRewards}>
+          <span key={blockRewards}>
             {formatAmount((blockRewards || 0) / 10 ** precision)} KLV
-          </strong>
+          </span>
         ),
         span: 1,
       },

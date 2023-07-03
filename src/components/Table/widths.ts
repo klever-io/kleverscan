@@ -4,7 +4,7 @@ const transactions = css`
   margin-right: 1.25rem;
 
   &:nth-child(1) {
-    min-width: 20rem;
+    min-width: 17rem;
     max-width: 20rem;
   }
 
@@ -34,13 +34,13 @@ const transactions = css`
   }
 
   &:nth-child(7) {
-    min-width: 7rem;
-    max-width: 7rem;
+    min-width: 8rem;
+    max-width: 8rem;
   }
 
   &:nth-child(8) {
-    min-width: 8rem;
-    max-width: 8rem;
+    min-width: 12rem;
+    max-width: 12rem;
   }
   &:nth-child(9) {
     min-width: 7rem;
@@ -69,13 +69,13 @@ const blocks = css`
   }
 
   &:nth-child(3) {
-    min-width: 12rem;
-    max-width: 12rem;
+    min-width: 14rem;
+    max-width: 20rem;
   }
 
   &:nth-child(4) {
-    min-width: 7rem;
-    max-width: 7rem;
+    min-width: 12rem;
+    max-width: 20rem;
   }
 
   &:nth-child(5) {
@@ -84,23 +84,23 @@ const blocks = css`
   }
 
   &:nth-child(6) {
-    min-width: 8rem;
-    max-width: 8rem;
+    min-width: 10rem;
+    max-width: 15rem;
   }
 
   &:nth-child(7) {
-    min-width: 7rem;
-    max-width: 7rem;
+    min-width: 10rem;
+    max-width: 15rem;
   }
 
   &:nth-child(8) {
-    min-width: 8rem;
-    max-width: 8rem;
+    min-width: 10rem;
+    max-width: 15rem;
   }
 
   &:nth-child(9) {
-    min-width: 8rem;
-    max-width: 8rem;
+    min-width: 10rem;
+    max-width: 15rem;
   }
 `;
 
@@ -283,14 +283,16 @@ const holders = css`
 
 const validators = css`
   margin-right: 1.25rem;
-
+  @media (min-width: 2432px) {
+    margin-right: 0;
+  }
   &:nth-child(1) {
     min-width: 2rem;
     max-width: 2rem;
   }
   &:nth-child(2) {
-    min-width: 15rem;
-    max-width: 15rem;
+    min-width: 18rem;
+    max-width: 20rem;
   }
   &:nth-child(3) {
     min-width: 6rem;
@@ -309,12 +311,16 @@ const validators = css`
     max-width: 10rem;
   }
   &:nth-child(7) {
-    min-width: 6rem;
-    max-width: 6rem;
+    min-width: 10rem;
+    max-width: 18rem;
   }
   &:nth-child(8) {
     min-width: 10rem;
     max-width: 10rem;
+  }
+  &:nth-child(9) {
+    min-width: 15rem;
+    max-width: 15rem;
   }
 `;
 

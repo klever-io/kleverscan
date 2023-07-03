@@ -31,7 +31,7 @@ export const ProgressPercentage = styled.div<{ textColor: string }>`
 
 export const ProgressContent = styled.div`
   height: 1.5rem;
-  width: 7vw;
+  width: 10vw;
 
   position: relative;
 
@@ -40,7 +40,7 @@ export const ProgressContent = styled.div`
   border-radius: 0.25rem;
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: calc(7vw + 3rem);
+    width: 100%;
   }
 `;
 

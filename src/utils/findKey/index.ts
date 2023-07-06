@@ -1,3 +1,4 @@
+import { IKAppTransferReceipt, ITransferReceipt } from '@/types/receipts';
 import { IReceipt } from '../../types';
 
 // to be used for unique keys in the array of objects
@@ -16,7 +17,7 @@ export const findKey = (arr: any[], keyName: string): any => {
  * @param type type of the receipt
  * @returns null or receipt
  */
-export const findReceipt = (
+export const findReceiptLegacy = (
   receipts: IReceipt[] | undefined,
   contractIndex: number,
   type: number,
@@ -41,6 +42,80 @@ export const findReceipt = (
   }
   return null;
 };
+
+/**
+ *
+ * @param receipts Array of receipts
+ * @param type type of the contract
+ * @returns the first receipt that matched the contract type
+ */
+export const findReceipt = (
+  receipts: IReceipt[] | undefined,
+  type: number,
+): IReceipt | undefined => {
+  if (!receipts) {
+    return undefined;
+  }
+  return receipts.find(receipt => receipt.type === type);
+};
+
+/**
+ *
+ * @param receipts Array of receipts
+ * @param type type of the contract
+ * @param sender sender of the tx
+ * @returns the first receipt that matches the contract type and sender
+ */
+export const findReceiptWithSender = (
+  receipts: IReceipt[] | undefined,
+  type: number,
+  sender: string,
+): IReceipt | undefined => {
+  if (!receipts) {
+    return undefined;
+  }
+  return receipts.find(receipt => {
+    const typedReceipt = receipt as ITransferReceipt | IKAppTransferReceipt;
+    return receipt.type === type && typedReceipt?.from === sender;
+  });
+};
+
+/**
+ *
+ * @param receipts Array of receipts
+ * @param type type of the contract
+ * @param receiver receiver of the assetId
+ * @returns the first receipt that matches the contract type, receiver and assetId is a NFT
+ */
+
+export const findReceiptWithReceiver = (
+  receipts: IReceipt[] | undefined,
+  type: number,
+  receiver: string,
+): IReceipt | undefined => {
+  if (!receipts) {
+    return undefined;
+  }
+  return receipts.find(receipt => {
+    const typedReceipt = receipt as ITransferReceipt | IKAppTransferReceipt;
+    return (
+      receipt.type === type &&
+      typedReceipt?.to === receiver &&
+      typedReceipt.assetId.includes('/')
+    );
+  });
+};
+
+/**
+ * Used to get the receipts that match the contract index with the receipt ID. For multicontract purpose only.
+ * @param receipts
+ * @param contractIndex
+ * @returns IReceipt[]
+ */
+export const filterReceipts = (
+  receipts: IReceipt[],
+  contractIndex: number,
+): IReceipt[] => receipts.filter(receipt => receipt.cID === contractIndex);
 
 /**
  * 

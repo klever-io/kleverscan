@@ -406,10 +406,10 @@ export const NonceGrid = styled.div`
 
 export const NonceSpan = styled.span`
   background-color: ${props => props.theme.navbar.text};
-  width: 2.7rem;
+  width: 2.7rem !important;
   height: 3.2rem;
-  display: grid;
-  place-items: center;
+  align-items: center;
+  justify-content: center;
   margin: 0.6rem;
   border-radius: 4px;
   color: ${props => props.theme.true.white};

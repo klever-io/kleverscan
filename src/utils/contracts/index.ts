@@ -6,7 +6,13 @@ import {
 } from '@/types/contracts';
 import { format, fromUnixTime } from 'date-fns';
 import { NextRouter } from 'next/router';
-import { IBuyReceipt, IReceipt, IRowSection, ITransaction } from '../../types';
+import {
+  IBuyReceipt,
+  IClaimReceipt,
+  IReceipt,
+  IRowSection,
+  ITransaction,
+} from '../../types';
 import { getBuyAmount, getBuyPrice } from '../buyContractFunctions';
 import { findReceipt } from '../findKey';
 import { getPrecision } from '../precisionFunctions';
@@ -744,9 +750,11 @@ export const getCells = async (
       break;
     case Contract.Claim:
       const claimType = parameter?.claimType || '';
-      assetId = findReceipt(receipts, 0, 17)?.assetId;
+      const claimReceipt = findReceipt(receipts, 17) as
+        | IClaimReceipt
+        | undefined;
       amount = await getAmountFromReceipts(assetId, 17, receipts);
-      cells.push(claimType, assetId, amount);
+      cells.push(claimType, claimReceipt?.assetId, amount);
       break;
     case Contract.Unjail:
       cells.push(parsedkAppFee, parsedbandwidthFee);

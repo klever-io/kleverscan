@@ -1,13 +1,16 @@
 export interface ITransferReceipt {
   assetId: string;
+  cID: number;
   from: string;
   to: string;
   type: 0;
+  typeString: string;
   value: number;
 }
 
 export interface IKAppTransferReceipt {
   assetId: string;
+  cID: number;
   from: string;
   marketplaceId: string;
   orderId: string;

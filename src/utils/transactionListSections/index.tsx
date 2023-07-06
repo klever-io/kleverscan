@@ -28,7 +28,7 @@ import {
   IVoteContract,
   IWithdrawContract,
 } from '@/types/contracts';
-import { IReceipt, IRowSection } from '@/types/index';
+import { IClaimReceipt, IReceipt, IRowSection } from '@/types/index';
 import Link from 'next/link';
 import { findReceipt } from '../findKey';
 import { formatAmount, toLocaleFixed } from '../formatFunctions';
@@ -248,7 +248,7 @@ const ClaimSections = (
   receipts: IReceipt[],
 ): IRowSection[] => {
   const parameter = par as unknown as IClaimContract;
-  const assetId = findReceipt(receipts, 0, 17)?.assetId;
+  const claimReceipt = findReceipt(receipts, 17) as IClaimReceipt | undefined;
   return [
     {
       element: (
@@ -261,7 +261,7 @@ const ClaimSections = (
     {
       element: (
         <span>
-          <span>{assetId ?? ''}</span>
+          <span>{claimReceipt?.assetId ?? ''}</span>
         </span>
       ),
       span: 1,

@@ -262,6 +262,7 @@ export const claim1 = {
       signer: 'klv1nvg0w0uzwdcmt5dtt35m0e6amtejy08t7hvkq9szpa80syuklc4qtsn4z5',
       type: 19,
       weight: '1',
+      cID: 255,
     },
     {
       assetId: 'KLV',
@@ -269,6 +270,7 @@ export const claim1 = {
       to: 'klv1nvg0w0uzwdcmt5dtt35m0e6amtejy08t7hvkq9szpa80syuklc4qtsn4z5',
       type: 0,
       value: 47573703,
+      cID: 0,
     },
     {
       amount: 47573703,
@@ -277,6 +279,7 @@ export const claim1 = {
       marketplaceId: '',
       orderId: '',
       type: 17,
+      cID: 0,
     },
   ],
   contract: [

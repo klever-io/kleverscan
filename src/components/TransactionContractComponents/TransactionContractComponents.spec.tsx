@@ -132,7 +132,7 @@ describe('Component: TransactionContractComponents', () => {
         <CreateAsset
           sender={createAsset1.sender}
           parameter={createAsset1.contract[0].parameter}
-          receipts={createAsset1.receipts}
+          filteredReceipts={createAsset1.receipts}
           contractIndex={0}
           precision={precision}
         />,
@@ -252,7 +252,7 @@ describe('Component: TransactionContractComponents', () => {
         renderWithTheme(
           <Freeze
             {...freeze1}
-            receipts={freeze1.receipts}
+            filteredReceipts={freeze1.receipts}
             parameter={freeze1.contract[0].parameter}
             contractIndex={0}
           />,
@@ -289,7 +289,7 @@ describe('Component: TransactionContractComponents', () => {
         renderWithTheme(
           <Unfreeze
             {...unfreeze1}
-            receipts={unfreeze1.receipts}
+            filteredReceipts={unfreeze1.receipts}
             parameter={unfreeze1.contract[0].parameter}
             contractIndex={0}
           />,
@@ -320,7 +320,7 @@ describe('Component: TransactionContractComponents', () => {
       renderWithTheme(
         <Delegate
           {...mockedTxContractComponents.delegateContract}
-          receipts={[]}
+          filteredReceipts={[]}
         />,
       );
 
@@ -344,7 +344,7 @@ describe('Component: TransactionContractComponents', () => {
       renderWithTheme(
         <Undelegate
           {...mockedTxContractComponents.undelegateContract}
-          receipts={[]}
+          filteredReceipts={[]}
         />,
       );
 
@@ -366,7 +366,7 @@ describe('Component: TransactionContractComponents', () => {
       renderWithTheme(
         <Withdraw
           {...mockedTxContractComponents.widthdrawContract}
-          receipts={[]}
+          filteredReceipts={[]}
         />,
       );
 
@@ -391,7 +391,7 @@ describe('Component: TransactionContractComponents', () => {
         renderWithTheme(
           <Claim
             {...claim1}
-            receipts={claim1.receipts}
+            filteredReceipts={claim1.receipts}
             parameter={claim1.contract[0].parameter}
           />,
         );
@@ -423,7 +423,10 @@ describe('Component: TransactionContractComponents', () => {
   describe('When contract is "Unjail"', () => {
     it('Should render "Unjail Type"', () => {
       renderWithTheme(
-        <Unjail {...mockedTxContractComponents.unjailContract} receipts={[]} />,
+        <Unjail
+          {...mockedTxContractComponents.unjailContract}
+          filteredReceipts={[]}
+        />,
       );
       const typeLabel = screen.getByText(/Type/i);
       const type = screen.getByText('Unjail');
@@ -437,7 +440,7 @@ describe('Component: TransactionContractComponents', () => {
       renderWithTheme(
         <Proposal
           {...mockedTxContractComponents.proposalContract}
-          receipts={[]}
+          filteredReceipts={[]}
         />,
       );
 
@@ -460,7 +463,10 @@ describe('Component: TransactionContractComponents', () => {
   describe('When contract is "Vote"', () => {
     it('Should render "Proposal Id" and "Amount" with all it\'s values', () => {
       renderWithTheme(
-        <Vote {...mockedTxContractComponents.voteContract} receipts={[]} />,
+        <Vote
+          {...mockedTxContractComponents.voteContract}
+          filteredReceipts={[]}
+        />,
       );
 
       const {
@@ -484,7 +490,7 @@ describe('Component: TransactionContractComponents', () => {
       renderWithTheme(
         <ConfigITO
           {...mockedTxContractComponents.configIcoContract}
-          receipts={[]}
+          filteredReceipts={[]}
         />,
       );
 
@@ -511,7 +517,7 @@ describe('Component: TransactionContractComponents', () => {
       renderWithTheme(
         <SetITOPrices
           {...mockedTxContractComponents.setIcoPricesContract}
-          receipts={[]}
+          filteredReceipts={[]}
         />,
       );
 
@@ -546,7 +552,7 @@ describe('Component: TransactionContractComponents', () => {
         renderWithTheme(
           <Buy
             {...marketbuy1}
-            receipts={marketbuy1.receipts}
+            filteredReceipts={marketbuy1.receipts}
             contracts={marketbuy1.contract}
             parameter={marketbuy1.contract[0].parameter}
             contractIndex={0}
@@ -605,7 +611,10 @@ describe('Component: TransactionContractComponents', () => {
 
       await act(async () => {
         renderWithTheme(
-          <Sell {...mockedTxContractComponents.sellContract} receipts={[]} />,
+          <Sell
+            {...mockedTxContractComponents.sellContract}
+            filteredReceipts={[]}
+          />,
         );
       });
 
@@ -614,7 +623,7 @@ describe('Component: TransactionContractComponents', () => {
       const endTime = screen.getByText('01/17/2023 12:19');
       const marketType = screen.getByText('BuyItNowMarket');
       const marketplaceID = screen.getByText('d4f2bab340c55fde');
-      const price = screen.getByText('450.000000');
+      const price = screen.getByText(/450.000000/);
 
       const values = [
         assetId,
@@ -636,7 +645,7 @@ describe('Component: TransactionContractComponents', () => {
       renderWithTheme(
         <CancelMarketOrder
           {...mockedTxContractComponents.cancelMarketOrderContract}
-          receipts={[]}
+          filteredReceipts={[]}
         />,
       );
 
@@ -657,7 +666,7 @@ describe('Component: TransactionContractComponents', () => {
       renderWithTheme(
         <CreateMarketplace
           {...mockedTxContractComponents.createMarketplaceContract}
-          receipts={[]}
+          filteredReceipts={[]}
         />,
       );
 
@@ -684,7 +693,7 @@ describe('Component: TransactionContractComponents', () => {
       renderWithTheme(
         <ConfigMarketplace
           {...mockedTxContractComponents.configMarketplaceContract}
-          receipts={[]}
+          filteredReceipts={[]}
         />,
       );
 
@@ -715,7 +724,7 @@ describe('Component: TransactionContractComponents', () => {
       renderWithTheme(
         <ValidatorConfig
           {...mockedTxContractComponents.validatorConfigContract}
-          receipts={[]}
+          filteredReceipts={[]}
         />,
       );
 
@@ -733,7 +742,7 @@ describe('Component: TransactionContractComponents', () => {
       renderWithTheme(
         <AssetTrigger
           {...mockedTxContractComponents.assetTriggerContract}
-          receipts={[]}
+          filteredReceipts={[]}
         />,
       );
 
@@ -750,7 +759,7 @@ describe('Component: TransactionContractComponents', () => {
       renderWithTheme(
         <SetAccountName
           {...mockedTxContractComponents.setAccountNameContract}
-          receipts={[]}
+          filteredReceipts={[]}
         />,
       );
 

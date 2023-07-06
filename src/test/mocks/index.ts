@@ -15,6 +15,7 @@ import {
   EnumClaimType,
   EnumITOStatus,
 } from '@/types/contracts';
+import { ITransferReceipt } from '@/types/receipts';
 
 export const CoinTest: ICoinInfo[] = [
   {
@@ -109,10 +110,10 @@ export const mockTxItem: ITransaction = {
     {
       assetId: 'KLV',
       type: 0,
-      amount: '3000000',
+      amount: 3000000,
       from: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jquca668',
     },
-  ],
+  ] as unknown as ITransferReceipt[],
   hash: 'a632bece34e0716fc465113e418f31911425783ea70624cb1555506225beeb4b',
   sender: 'klv1hun5jj78k8563wc7e45as57dw78dfe7509rw0z29mfvy95waf9jquca668',
   timestamp: 1653331031000,

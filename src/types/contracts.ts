@@ -589,11 +589,13 @@ export interface IContract {
 
 export interface IIndexedContract extends IContract {
   contractIndex: number;
+  filteredReceipts: IReceipt[];
 }
 
 export interface IContractBuyProps extends IContract {
   sender: string;
   contractIndex: number;
+  filteredReceipts: IReceipt[];
   contracts: IBuyContract[];
 }
 

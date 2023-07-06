@@ -47,6 +47,7 @@ import { ITransactionPage, ITransactionResponse } from '@/types';
 import { IBlockResponse } from '@/types/blocks';
 import { Contract, IIndexedContract } from '@/types/contracts';
 import { capitalizeString, hexToString } from '@/utils/convertString';
+import { filterReceipts } from '@/utils/findKey';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import { parseJson } from '@/utils/parseValues';
 import { getPrecision } from '@/utils/precisionFunctions';
@@ -113,7 +114,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
     setExpandData(newArray);
   };
 
-  const renderAllData = () => {
+  const renderMetadata = () => {
     if (!data || data.length === 0) {
       return null;
     }
@@ -134,7 +135,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
   const renderOneMetadata = (data: string[], index: number) => {
     return (
       <ExpandCenteredRow openJson={expandData[index]}>
-        {renderData(data[index], index)}
+        {renderMetadataContent(data[index], index)}
         <IconsWrapper>
           <ButtonExpand onClick={() => updateExpandArray(index)}>
             {expandData[index] ? 'Hide' : 'Expand'}
@@ -145,7 +146,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
     );
   };
 
-  const renderData = (data: string, index: number) => {
+  const renderMetadataContent = (data: string, index: number) => {
     const formatData = (hexData: any) => <span>{hexToString(hexData)}</span>;
 
     if (expandData[index]) {
@@ -177,6 +178,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
     return (
       <div>
         {contracts.map((contract: IIndexedContract, index: number) => {
+          const filteredReceipts = filterReceipts(receipts, index);
           switch (contract.typeString) {
             case Contract.Transfer:
               return (
@@ -184,7 +186,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <Transfer
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -196,7 +198,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <CreateAsset
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -207,7 +209,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <CreateValidator
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -218,7 +220,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <ValidatorConfig
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -229,7 +231,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <Freeze
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -240,7 +242,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <Unfreeze
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -251,7 +253,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <Delegate
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -262,7 +264,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <Undelegate
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -273,7 +275,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <Withdraw
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -284,7 +286,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <Claim
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -295,7 +297,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <Unjail
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -306,7 +308,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <AssetTrigger
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -317,7 +319,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <SetAccountName
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -328,7 +330,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <Proposal
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -339,7 +341,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <Vote
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -350,7 +352,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <ConfigITO
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -361,7 +363,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <SetITOPrices
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -372,7 +374,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <Buy
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                     sender={sender}
                     contracts={contracts}
                   />
@@ -385,7 +387,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <Sell
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -396,7 +398,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <CancelMarketOrder
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -407,7 +409,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <CreateMarketplace
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -418,7 +420,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <ConfigMarketplace
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -429,7 +431,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <UpdateAccountPermission
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -440,7 +442,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <Deposit
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -451,7 +453,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <ITOTrigger
                     {...contract}
                     contractIndex={index}
-                    receipts={receipts}
+                    filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -646,7 +648,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                 <strong>Data</strong>
               </span>
               <RowContent>
-                <BalanceContainer>{renderAllData()}</BalanceContainer>
+                <BalanceContainer>{renderMetadata()}</BalanceContainer>
               </RowContent>
             </Row>
           )}

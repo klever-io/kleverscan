@@ -141,7 +141,6 @@ const CreateTransaction: React.FC = () => {
             handleOption(contractType);
             isMultisig.current = false;
           }}
-          isDisabled={true}
           title={'Contract'}
           zIndex={5}
           isModal={false}

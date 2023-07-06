@@ -64,39 +64,108 @@ export interface ICollectionList {
 export interface ICreateAssetReceipt {
   assetId: string;
   type: number;
+  cID: number;
 }
 
 export interface IFreezeReceipt {
-  bucketId: string;
   type: number;
+  cID: number;
+  bucketId: string;
 }
 
 export interface IUnfreezeReceipt {
+  assetId: string;
   availableEpoch: number;
-  type: number;
+  bucketId: string;
+  cID: number;
+  from: string;
+  type: 4;
+  typeString: string;
+  value: string;
+}
+
+export interface IDelegateReceipt {
+  amountDelegated: string;
+  bucketId: string;
+  cID: number;
+  delegate: string;
+  from: string;
+  type: 7;
+  typeString: 'Delegate';
 }
 
 export interface IBuyReceipt {
+  amount: number;
+  bidder: string;
+  cID: number;
+  currencyId: string;
+  executed: boolean;
+  marketplaceId: string;
+  orderId: string;
+  type: 16;
+  typeString: 'Buy';
   assetId: string;
-  type: number;
   from?: string;
   to?: string;
   value?: number;
 }
 
+export interface ISellReceipt {
+  cID: number;
+  marketplaceId: string;
+  orderId: string;
+  type: 15;
+  typeString: 'Sell';
+}
+
 export interface IWithdrawReceipt {
-  type: number;
   amount: string;
   assetId: string;
+  cID: number;
   from: string;
+  type: 18;
+  typeString: 'Withdraw';
+}
+
+export interface IClaimReceipt {
+  cID: number;
+  amount: number;
+  assetId: string;
+  assetIdReceived: string;
+  claimType: number;
+  claimTypeString: string;
+  marketplaceId: string;
+  orderId: string;
+  type: 17;
+  typeString: 'Claim';
+}
+
+export interface IProposalReceipt {
+  cID: number;
+  proposalId: string;
+  type: number;
+  typeString: string;
+}
+
+export interface ICreateMarketplaceReceipt {
+  cID: number;
+  marketplaceId: string;
+  type: 10;
+  typeString: 'CreateMarketplace';
 }
 
 export type IReceipt =
   | ICreateAssetReceipt
   | IFreezeReceipt
   | IUnfreezeReceipt
+  | IDelegateReceipt
+  | IClaimReceipt
   | IBuyReceipt
-  | IWithdrawReceipt;
+  | ISellReceipt
+  | IWithdrawReceipt
+  | IClaimReceipt
+  | IProposalReceipt
+  | ICreateMarketplaceReceipt;
 
 export interface ITransaction {
   hash: string;

@@ -344,11 +344,12 @@ export const ContractProvider: React.FC = ({ children }) => {
   const resetForms = () => {
     const contractPropsWithIndex = {
       ...contractProps,
-      elementIndex: 0,
+      elementIndex: queue.length,
     };
     setQueue([
+      ...queue,
       {
-        elementIndex: 0,
+        elementIndex: queue.length,
         contract: ContractsIndex[getType(contractType)],
         ref: <ContractComponent {...contractPropsWithIndex} />,
       },
@@ -358,26 +359,6 @@ export const ContractProvider: React.FC = ({ children }) => {
   };
 
   useEffect(() => {
-    if (isMultiContract) {
-      const allowedMultiContract = [
-        'Transfer',
-        'Delegate',
-        'Undelegate',
-        'Freeze',
-        'Unfreeze',
-        'Asset Trigger',
-        'Deposit',
-      ];
-      const filterContractOptions = contractOptions.filter(contract =>
-        allowedMultiContract.includes(contract.label),
-      );
-      setContractOptions(filterContractOptions);
-    }
-
-    if (!isMultiContract) {
-      setContractOptions(allContractOptions);
-    }
-
     resetForms();
   }, [isMultiContract, contractType]);
 

@@ -37,15 +37,22 @@ import {
 } from '@/types/contracts';
 import {
   IBuyReceipt,
+  IClaimReceipt,
   ICreateAssetReceipt,
+  ICreateMarketplaceReceipt,
+  IDelegateReceipt,
   IFreezeReceipt,
+  IProposalReceipt,
+  IReceipt,
+  ISellReceipt,
   IUnfreezeReceipt,
+  IWithdrawReceipt,
 } from '@/types/index';
-import { IKAppTransferReceipt } from '@/types/receipts';
+import { IKAppTransferReceipt, ITransferReceipt } from '@/types/receipts';
 import {
-  findNextSiblingReceipt,
-  findPreviousSiblingReceipt,
   findReceipt,
+  findReceiptWithReceiver,
+  findReceiptWithSender,
 } from '@/utils/findKey';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import {
@@ -56,7 +63,6 @@ import {
 import { getProposalNetworkParams } from '@/utils/networkFunctions';
 import {
   calculatePermissionOperations,
-  receiverIsSender,
   renderCorrectPath,
 } from '@/utils/validateSender';
 import { BalanceContainer } from '@/views/accounts/detail';
@@ -186,17 +192,16 @@ export const Transfer: React.FC<IIndexedContract> = ({ parameter: par }) => {
 export const CreateAsset: React.FC<IIndexedContract> = ({
   sender,
   parameter: par,
-  receipts: rec,
+  filteredReceipts: rec,
   contractIndex,
 }) => {
   const parameter = par as ICreateAssetContract;
-  const receipts = rec as ICreateAssetReceipt[];
+  const filteredReceipts = rec as ICreateAssetReceipt[];
   const ownerAddress = parameter?.ownerAddress || sender;
-  const createAssetReceipt = findReceipt(receipts, contractIndex, 1);
+  const createAssetReceipt = findReceipt(filteredReceipts, 1) as
+    | ICreateAssetReceipt
+    | undefined;
 
-  interface Active {
-    parameter: string;
-  }
   const [expand, setExpand] = useState({
     royalties: false,
     staking: false,
@@ -708,13 +713,15 @@ export const ValidatorConfig: React.FC<IIndexedContract> = ({
 export const Freeze: React.FC<IIndexedContract> = ({
   parameter: par,
   contractIndex,
-  receipts: rec,
+  filteredReceipts: rec,
 }) => {
   const parameter = par as IFreezeContract;
-  const receipts = rec as IFreezeReceipt[];
+  const filteredReceipts = rec as IFreezeReceipt[];
   const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
   const precision = usePrecision(assetID);
-  const freezeReceipt = findReceipt(receipts, contractIndex, 3);
+  const freezeReceipt = findReceipt(filteredReceipts, 3) as
+    | IFreezeReceipt
+    | undefined;
 
   return (
     <>
@@ -757,22 +764,20 @@ export const Freeze: React.FC<IIndexedContract> = ({
 export const Unfreeze: React.FC<IIndexedContract> = ({
   parameter: par,
   contractIndex,
-  receipts: rec,
+  filteredReceipts: rec,
 }) => {
   const parameter = par as IUnfreezeContract;
-  const receipts = rec as IUnfreezeReceipt[];
-  const claimReceipt = findNextSiblingReceipt(receipts, contractIndex, 4, 17);
+  const filteredReceipts = rec as IUnfreezeReceipt[];
+  const claimReceipt = findReceipt(filteredReceipts, 17) as
+    | IClaimReceipt
+    | undefined;
   const claimPrecision = claimReceipt?.assetIdReceived || 'KLV';
   const assetIdPrecision = parameter?.assetId || 'KLV';
   const precision = usePrecision([claimPrecision, assetIdPrecision]);
-  const unfreezeReceipt = findReceipt(receipts, contractIndex, 4);
-
-  const undelegateReceipt = findPreviousSiblingReceipt(
-    receipts,
-    contractIndex,
-    4,
-    7,
-  );
+  const unfreezeReceipt = findReceipt(filteredReceipts, 4) as
+    | IUnfreezeReceipt
+    | undefined;
+  const undelegateReceipt = findReceipt(filteredReceipts, 7);
 
   return (
     <>
@@ -814,7 +819,8 @@ export const Unfreeze: React.FC<IIndexedContract> = ({
           </span>
           <span>
             {toLocaleFixed(
-              unfreezeReceipt?.value / 10 ** precision[assetIdPrecision],
+              Number(unfreezeReceipt?.value || 0) /
+                10 ** precision[assetIdPrecision],
               precision[assetIdPrecision],
             )}
           </span>
@@ -842,17 +848,15 @@ export const Unfreeze: React.FC<IIndexedContract> = ({
 };
 export const Delegate: React.FC<IIndexedContract> = ({
   parameter: par,
-  receipts,
-  contractIndex,
+  filteredReceipts,
 }) => {
   const parameter = par as IDelegateContract;
-  const delegateReceipt = findReceipt(receipts, contractIndex, 7);
-  const claimReceipt = findPreviousSiblingReceipt(
-    receipts,
-    contractIndex,
-    7,
-    17,
-  );
+  const delegateReceipt = findReceipt(filteredReceipts, 7) as
+    | IDelegateReceipt
+    | undefined;
+  const claimReceipt = findReceipt(filteredReceipts, 17) as
+    | IClaimReceipt
+    | undefined;
   const claimPrecision = usePrecision(
     (claimReceipt?.assetIdReceived || 'KLV') as string,
   );
@@ -895,7 +899,10 @@ export const Delegate: React.FC<IIndexedContract> = ({
           <span>
             <CenteredRow>
               <span>
-                {toLocaleFixed(delegateReceipt?.amountDelegated / 10 ** 6, 6)}
+                {toLocaleFixed(
+                  Number(delegateReceipt?.amountDelegated || 0) / 10 ** 6,
+                  6,
+                )}
               </span>
             </CenteredRow>
           </span>
@@ -926,17 +933,17 @@ export const Delegate: React.FC<IIndexedContract> = ({
 
 export const Undelegate: React.FC<IIndexedContract> = ({
   parameter: par,
-  receipts,
+  filteredReceipts,
   contractIndex,
 }) => {
   const parameter = par as IUndelegateContract;
-  const undelegateReceipt = findReceipt(receipts, contractIndex, 7);
-  const claimReceipt = findPreviousSiblingReceipt(
-    receipts,
-    contractIndex,
-    7,
-    17,
-  );
+  const undelegateReceipt = findReceipt(filteredReceipts, 7) as
+    | IDelegateReceipt
+    | undefined;
+  // undelegate receipt is the delegate receipt
+  const claimReceipt = findReceipt(filteredReceipts, 17) as
+    | IClaimReceipt
+    | undefined;
   const claimPrecision = usePrecision(
     (claimReceipt?.assetIdReceived || 'KLV') as string,
   );
@@ -966,7 +973,10 @@ export const Undelegate: React.FC<IIndexedContract> = ({
             <strong>Amount</strong>
           </span>
           <span>
-            {toLocaleFixed(undelegateReceipt?.amountDelegated / 10 ** 6, 6)}
+            {toLocaleFixed(
+              Number(undelegateReceipt?.amountDelegated || 0) / 10 ** 6,
+              6,
+            )}
           </span>
         </Row>
       )}
@@ -994,21 +1004,17 @@ export const Undelegate: React.FC<IIndexedContract> = ({
 
 export const Withdraw: React.FC<IIndexedContract> = ({
   parameter: par,
-  receipts,
-  contractIndex,
+  filteredReceipts,
 }) => {
   const parameter = par as IWithdrawContract;
 
-  const claimReceipt = findPreviousSiblingReceipt(
-    receipts,
-    contractIndex,
-    18,
-    17,
-  );
+  const claimReceipt = findReceipt(filteredReceipts, 17) as
+    | IClaimReceipt
+    | undefined;
   const assetIdPrecision = parameter?.assetId || 'KLV';
   const claimPrecision = claimReceipt?.assetIdReceived || 'KLV';
   const precision = usePrecision([assetIdPrecision, claimPrecision]);
-  const withdrawReceipt = findReceipt(receipts, contractIndex, 18);
+  const withdrawReceipt = findReceipt(filteredReceipts, 18) as IWithdrawReceipt;
 
   return (
     <>
@@ -1018,7 +1024,7 @@ export const Withdraw: React.FC<IIndexedContract> = ({
         </span>
         <strong>Withdraw</strong>
       </Row>
-      {receipts?.length === 0 && (
+      {filteredReceipts?.length === 0 && (
         <Row>
           <span>
             <strong>Asset Id</strong>
@@ -1033,7 +1039,8 @@ export const Withdraw: React.FC<IIndexedContract> = ({
           </span>
           <span>
             {toLocaleFixed(
-              withdrawReceipt?.amount / 10 ** precision[assetIdPrecision],
+              Number(withdrawReceipt?.amount || 0) /
+                10 ** precision[assetIdPrecision],
               precision[assetIdPrecision],
             )}{' '}
             {withdrawReceipt?.assetId}
@@ -1064,13 +1071,13 @@ export const Withdraw: React.FC<IIndexedContract> = ({
 
 export const Claim: React.FC<IIndexedContract> = ({
   parameter: par,
-  receipts,
+  filteredReceipts,
 }) => {
   const parameter = par as IClaimContract;
-  const claimReceipt = findReceipt(receipts, 0, 17);
-  const precision = usePrecision(
-    (claimReceipt?.assetIdReceived || 'KLV') as string,
-  );
+  const claimReceipt = findReceipt(filteredReceipts, 17) as
+    | IClaimReceipt
+    | undefined;
+  const precision = usePrecision(claimReceipt?.assetIdReceived || 'KLV');
 
   return (
     <>
@@ -1179,13 +1186,14 @@ export const SetAccountName: React.FC<IIndexedContract> = ({
 
 export const Proposal: React.FC<IIndexedContract> = ({
   parameter: par,
-  receipts,
-  contractIndex,
+  filteredReceipts,
 }) => {
   const parameter = par as IProposalContract;
   const parameters = getProposalNetworkParams(parameter?.parameters);
 
-  const proposalReceipt = findReceipt(receipts, contractIndex, 5);
+  const proposalReceipt = findReceipt(filteredReceipts, 5) as
+    | IProposalReceipt
+    | undefined;
   return (
     <>
       <Row>
@@ -1366,42 +1374,32 @@ export const SetITOPrices: React.FC<IIndexedContract> = ({
 
 export const Buy: React.FC<IContractBuyProps> = ({
   parameter: par,
-  receipts: rec,
-  contracts,
+  filteredReceipts: rec,
   sender,
-  contractIndex,
 }) => {
   const parameter = par as IBuyContractPayload;
-  const receipts = rec as IBuyReceipt[];
+  const filteredReceipts = rec as IBuyReceipt[];
   const buyType = parameter?.buyType;
   let currencyId = '';
   let assetId = '';
-  let nextKappTransferReceipt: undefined | IKAppTransferReceipt;
-  let previousKappTransferReceipt: undefined | IKAppTransferReceipt;
+  const senderKAppTransferReceipt = findReceiptWithSender(
+    filteredReceipts,
+    14,
+    sender,
+  ) as IKAppTransferReceipt | undefined;
+
+  const receiver = sender; // sender of tx can be the receiver of an asset
+  const receiverKAppTransferReceipt = findReceiptWithReceiver(
+    filteredReceipts,
+    14,
+    receiver,
+  ) as IKAppTransferReceipt | undefined;
 
   const initializeVariables = () => {
     switch (buyType) {
       case 'MarketBuy':
-        nextKappTransferReceipt = findNextSiblingReceipt(
-          receipts,
-          contractIndex,
-          16, // buy receipt
-          14, // kapp transfer receipt
-          [sender],
-          receiverIsSender,
-        );
-        // there won't be nextKappTransferREceipt if the buy bid is not instant buy, hence if must collect data from the previousKappTransferReceipt(which will be the receipt with correct data, but we will not find the asset the bid was offered)
-        previousKappTransferReceipt = findPreviousSiblingReceipt(
-          receipts,
-          contractIndex,
-          16,
-          14,
-        );
         currencyId = parameter?.currencyID || 'KLV';
-        assetId =
-          nextKappTransferReceipt?.assetId ||
-          previousKappTransferReceipt?.assetId ||
-          '';
+        assetId = receiverKAppTransferReceipt?.assetId || '';
         break;
       case 'ITOBuy':
         currencyId = parameter?.currencyID || 'KLV';
@@ -1412,14 +1410,15 @@ export const Buy: React.FC<IContractBuyProps> = ({
     }
   };
   initializeVariables();
-  const getPrecisionsToSearch = receipts
+  const getPrecisionsToSearch = filteredReceipts
     .map(receipt => receipt.assetId)
     .filter(precision => precision !== undefined);
-
   const precisions = usePrecision(getPrecisionsToSearch);
 
   const renderMarketBuy = () => {
-    const buyReceipt = findReceipt(receipts, contractIndex, 16);
+    const buyReceipt = findReceipt(filteredReceipts, 16) as
+      | IBuyReceipt
+      | undefined;
 
     const getStatus = () => {
       const executed = buyReceipt?.executed;
@@ -1429,7 +1428,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
         } else {
           return 'Pending';
         }
-      } else if (!executed && nextKappTransferReceipt) {
+      } else if (!executed && senderKAppTransferReceipt) {
         return 'Completed';
       }
       return null;
@@ -1439,19 +1438,19 @@ export const Buy: React.FC<IContractBuyProps> = ({
       const price = parameter?.amount;
       if (typeof price === 'number') {
         return toLocaleFixed(
-          price / 10 ** precisions[currencyId],
-          precisions[currencyId],
+          price / 10 ** (precisions[currencyId] || 0),
+          precisions[currencyId] || 0,
         );
       }
       return null;
     };
 
     const getAmount = () => {
-      const amount = nextKappTransferReceipt?.value;
+      const amount = receiverKAppTransferReceipt?.value;
       if (typeof amount === 'number') {
         return toLocaleFixed(
-          amount / 10 ** precisions[assetId],
-          precisions[assetId],
+          amount / 10 ** (precisions[assetId] || 0),
+          precisions[assetId] || 0,
         );
       }
       return null;
@@ -1501,7 +1500,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
           <span>{currencyId}</span>
         </Row>
         <>
-          {assetId && nextKappTransferReceipt && (
+          {assetId && (
             <Row>
               <span>
                 <strong>Asset Id</strong>
@@ -1531,12 +1530,9 @@ export const Buy: React.FC<IContractBuyProps> = ({
   };
 
   const renderITOBuy = () => {
-    const transferReceipt = findPreviousSiblingReceipt(
-      receipts,
-      contractIndex,
-      2,
-      0,
-    ); // there is no formal buy receipt in ITOBuy, but the data we want is in the 0(transfer) receipt
+    const transferReceipt = findReceipt(filteredReceipts, 0) as
+      | ITransferReceipt
+      | undefined; // there is no formal buy receipt in ITOBuy, but the data we want(price) is in the first transfer receipt, so the function will still work
 
     const getPrice = () => {
       const price = transferReceipt?.value;
@@ -1560,37 +1556,15 @@ export const Buy: React.FC<IContractBuyProps> = ({
       return null;
     };
 
-    const getTotalPrices = () => {
-      const prices = {};
-      receipts.forEach(receipt => {
-        if (receipt.from === sender) {
-          if (receipt.assetId in prices) {
-            prices[receipt.assetId] += receipt.value;
-          } else {
-            prices[receipt.assetId] = receipt.value;
-          }
-        }
-      });
-      return prices;
-    };
-
-    const parseTotalPrices = (prices: { [key: string]: number }) => {
-      return Object.keys(prices).map(assetId => ({
-        [assetId]: toLocaleFixed(
-          prices[assetId] / 10 ** precisions[assetId],
-          precisions[assetId],
-        ),
-      }));
-    };
-
     const getNFTNonces = () => {
-      return receipts.filter(receipt => {
-        const assetAndNonce = receipt?.assetId?.split('/');
+      return filteredReceipts.filter((receipt: IReceipt) => {
+        const possibleTransferReceipt = receipt as ITransferReceipt;
+        const assetAndNonce = possibleTransferReceipt?.assetId?.split('/');
         if (
           assetAndNonce &&
           assetAndNonce[0] === parameter.id &&
           assetAndNonce[1] &&
-          receipt.to === sender
+          possibleTransferReceipt.to === sender
         ) {
           return assetAndNonce[1];
         }
@@ -1614,43 +1588,24 @@ export const Buy: React.FC<IContractBuyProps> = ({
     const price = getPrice();
     const amount = getAmount();
     const noncesReceipts = getNFTNonces();
-    const totalPrices = getTotalPrices();
-    const parsedTotalPrices = parseTotalPrices(totalPrices);
 
     return (
       <>
-        {parsedTotalPrices.map(obj => {
-          return Object.entries(obj).map(([assetId, value]) => {
-            return (
-              <Row key={assetId}>
-                <span>
-                  <strong>
-                    Total paid in <br />
-                    {assetId}
-                  </strong>
-                </span>
-                <CenteredDiv>
-                  <span>
-                    {value} {assetId}
-                  </span>
-                  <Tooltip
-                    msg={
-                      'There might be royalties fees in the total paid price.\n To know exactly how much you are being charged check your assets royalties info in assets page.'
-                    }
-                  />
-                </CenteredDiv>
-              </Row>
-            );
-          });
-        })}
         {price && (
           <Row>
             <span>
               <strong>Price</strong>
             </span>
-            <span>
-              {price} {currencyId}
-            </span>
+            <CenteredDiv>
+              <span>
+                {price} {currencyId}
+              </span>
+              <Tooltip
+                msg={
+                  'There might be royalties fees in the total paid price.\n To know exactly how much you are being charged check your assets royalties info in assets page.'
+                }
+              />
+            </CenteredDiv>
           </Row>
         )}
         {amount && (
@@ -1721,18 +1676,16 @@ export const Buy: React.FC<IContractBuyProps> = ({
 
 export const Sell: React.FC<IIndexedContract> = ({
   parameter: par,
-  receipts,
-  contractIndex,
+  filteredReceipts,
 }) => {
   const parameter = par as ISellContract;
   const precision = usePrecision(parameter?.currencyID || 'KLV');
-  const kappTransferReceipt = findPreviousSiblingReceipt(
-    receipts,
-    contractIndex,
-    15,
-    14,
-  );
-  const sellReceipt = findReceipt(receipts, contractIndex, 15);
+  const kAppTransferReceipt = findReceipt(filteredReceipts, 14) as
+    | IKAppTransferReceipt
+    | undefined;
+  const sellReceipt = findReceipt(filteredReceipts, 15) as
+    | ISellReceipt
+    | undefined;
   return (
     <>
       <Row>
@@ -1767,12 +1720,12 @@ export const Sell: React.FC<IIndexedContract> = ({
         </span>
         <span>{parameter?.assetId}</span>
       </Row>
-      {kappTransferReceipt && (
+      {kAppTransferReceipt && (
         <Row>
           <span>
             <strong>Amount</strong>
           </span>
-          <span>{kappTransferReceipt?.value}</span>
+          <span>{kAppTransferReceipt?.value}</span>
         </Row>
       )}
       <Row>
@@ -1787,7 +1740,8 @@ export const Sell: React.FC<IIndexedContract> = ({
             <strong>Price</strong>
           </span>
           <span>
-            {toLocaleFixed(parameter.price / 10 ** (precision || 0), precision)}
+            {toLocaleFixed(parameter.price / 10 ** (precision || 0), precision)}{' '}
+            {parameter?.currencyID}
           </span>
         </Row>
       )}
@@ -1818,11 +1772,13 @@ export const Sell: React.FC<IIndexedContract> = ({
 
 export const CancelMarketOrder: React.FC<IIndexedContract> = ({
   parameter: par,
-  receipts,
-  contractIndex,
+  filteredReceipts,
 }) => {
   const parameter = par as ICancelMarketOrderContract;
-  const cancelMarketOrderReceipt = findReceipt(receipts, contractIndex, 14);
+  const kAppTransferReceipt = findReceipt(
+    filteredReceipts,
+    14,
+  ) as IKAppTransferReceipt;
   return (
     <>
       <Row>
@@ -1837,25 +1793,25 @@ export const CancelMarketOrder: React.FC<IIndexedContract> = ({
         </span>
         <span>{parameter?.orderID}</span>
       </Row>
-      {cancelMarketOrderReceipt && (
+      {kAppTransferReceipt && (
         <>
           <Row>
             <span>
               <strong>Marketplace Id</strong>
             </span>
-            <span>{cancelMarketOrderReceipt?.marketplaceId}</span>
+            <span>{kAppTransferReceipt?.marketplaceId}</span>
           </Row>
           <Row>
             <span>
               <strong>Asset Id</strong>
             </span>
-            <span>{cancelMarketOrderReceipt?.assetId}</span>
+            <span>{kAppTransferReceipt?.assetId}</span>
           </Row>
           <Row>
             <span>
               <strong>Amount</strong>
             </span>
-            <span>{cancelMarketOrderReceipt?.value}</span>
+            <span>{kAppTransferReceipt?.value}</span>
           </Row>
         </>
       )}
@@ -1865,11 +1821,13 @@ export const CancelMarketOrder: React.FC<IIndexedContract> = ({
 
 export const CreateMarketplace: React.FC<IIndexedContract> = ({
   parameter: par,
-  receipts,
-  contractIndex,
+  filteredReceipts,
 }) => {
   const parameter = par as ICreateMarketplaceContract;
-  const createMarketplaceReceipt = findReceipt(receipts, contractIndex, 10);
+  const createMarketplaceReceipt = findReceipt(
+    filteredReceipts,
+    10,
+  ) as ICreateMarketplaceReceipt;
   return (
     <>
       <Row>

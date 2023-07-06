@@ -1,5 +1,6 @@
 import { Contract } from '@/types/contracts';
 import { IAsset, ITransactionsResponse } from '@/types/index';
+import { ITransferReceipt } from '@/types/receipts';
 
 const KFI: IAsset = {
   assetType: 'Fungible',
@@ -496,7 +497,7 @@ const transactionsList: ITransactionsResponse = {
             amount: '100000000',
             from: 'klv1862fx9d57n55k8rxprh6h7lycrppwddp5rnh3nqgguhzdl8sgl9qxl0c6h',
           },
-        ],
+        ] as unknown as ITransferReceipt[],
         contract: [
           {
             sender: '',
@@ -537,7 +538,7 @@ const transactionsList: ITransactionsResponse = {
             amount: '100000000',
             from: 'klv1862fx9d57n55k8rxprh6h7lycrppwddp5rnh3nqgguhzdl8sgl9qxl0c6h',
           },
-        ],
+        ] as unknown as ITransferReceipt[],
         contract: [
           {
             sender: '',
@@ -571,7 +572,7 @@ const transactionsList: ITransactionsResponse = {
             amount: '100000000',
             from: 'klv1862fx9d57n55k8rxprh6h7lycrppwddp5rnh3nqgguhzdl8sgl9qxl0c6h',
           },
-        ],
+        ] as unknown as ITransferReceipt[],
         contract: [
           {
             sender: '',

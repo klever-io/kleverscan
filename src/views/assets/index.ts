@@ -90,7 +90,7 @@ export const ContainerAssetId = styled.section`
   align-items: center;
   gap: 0.5rem;
   overflow: hidden;
-
+  width: 100%;
   div {
     max-height: 24px;
     min-width: fit-content;
@@ -98,5 +98,13 @@ export const ContainerAssetId = styled.section`
 
   a {
     overflow: hidden;
+  }
+`;
+
+export const ContainerAssetName = styled(ContainerAssetId)`
+  justify-content: flex-end;
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    justify-content: flex-start;
   }
 `;

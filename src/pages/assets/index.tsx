@@ -11,7 +11,7 @@ import { IAsset, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { formatAmount } from '@/utils/formatFunctions';
 import { useFetchPartial } from '@/utils/hooks';
-import { ContainerAssetId } from '@/views/assets';
+import { ContainerAssetId, ContainerAssetName } from '@/views/assets';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { ReactNode } from 'react';
@@ -142,19 +142,11 @@ const Assets: React.FC = () => {
       },
       {
         element: (
-          <Link href={`/asset/${assetId}`} key={assetId}>
-            <a>
-              <p
-                style={{
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {name}
-              </p>
-            </a>
-          </Link>
+          <ContainerAssetName>
+            <Link href={`/asset/${assetId}`} key={assetId}>
+              <a>{name}</a>
+            </Link>
+          </ContainerAssetName>
         ),
         span: 1,
       },

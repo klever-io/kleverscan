@@ -45,12 +45,11 @@ export const Input = styled(DefaultInput)`
 
 export const AssetTitle = styled.div`
   display: flex;
-
   flex-direction: row;
   align-items: center;
-
+  width: 100%;
   gap: 1rem;
-
+  overflow: hidden;
   div {
     padding: 0.5rem 1rem;
 
@@ -70,8 +69,52 @@ export const AssetTitle = styled.div`
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
+
     align-items: flex-start;
   }
+`;
+
+export const CardContainer = styled.div`
+  margin-top: 2rem;
+
+  display: flex;
+
+  flex-direction: column;
+`;
+
+export const CardHeader = styled.div`
+  display: flex;
+  overflow: auto;
+  flex-direction: row;
+`;
+
+export const CardHeaderItem = styled.div<{ selected: boolean }>`
+  padding: 1rem;
+
+  background-color: ${props =>
+    props.selected ? props.theme.white : 'transparent'};
+
+  border-radius: 0.75rem 0.75rem 0 0;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+
+  span {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: ${props => props.theme.black};
+
+    opacity: ${props => (props.selected ? 1 : 0.33)};
+
+    transition: 0.2s ease;
+  }
+`;
+
+export const CardContent = styled.div`
+  background-color: ${props => props.theme.white};
+
+  border-radius: 0 0.75rem 0.75rem 0.75rem;
 `;
 
 export const Row = styled.div<{ isStakingRoyalties: boolean }>`
@@ -210,11 +253,17 @@ export const AssetHeaderContainer = styled.div`
   background-color: transparent !important;
   display: flex;
   flex-direction: column;
+  width: 100%;
   color: ${props => props.theme.black} !important;
   &:hover {
     cursor: default;
   }
-
+  h1 {
+    width: 100%;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
   p {
     margin-top: 0.25rem;
     color: ${props => props.theme.darkText} !important;

@@ -142,8 +142,8 @@ const assetsPage = css`
   }
 
   &:nth-child(3) {
-    min-width: 10rem;
-    max-width: 10rem;
+    min-width: 14rem;
+    max-width: 14rem;
   }
 
   &:nth-child(4) {
@@ -152,23 +152,23 @@ const assetsPage = css`
   }
 
   &:nth-child(5) {
-    min-width: 10rem;
-    max-width: 10rem;
+    min-width: 8rem;
+    max-width: 8rem;
   }
 
   &:nth-child(6) {
-    min-width: 10rem;
-    max-width: 10rem;
+    min-width: 12rem;
+    max-width: 12rem;
   }
 
   &:nth-child(7) {
-    min-width: 10rem;
-    max-width: 10rem;
+    min-width: 12rem;
+    max-width: 12rem;
   }
 
   &:nth-child(8) {
-    min-width: 10rem;
-    max-width: 10rem;
+    min-width: 12rem;
+    max-width: 12rem;
   }
   &:nth-child(9) {
     min-width: 8rem;
@@ -191,8 +191,8 @@ const assets = css`
     max-width: 8rem;
   }
   &:nth-child(2) {
-    min-width: 8rem;
-    max-width: 8rem;
+    min-width: 14rem;
+    max-width: 14rem;
   }
   &:nth-child(3) {
     min-width: 10rem;

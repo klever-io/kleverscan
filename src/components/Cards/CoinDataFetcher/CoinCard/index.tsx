@@ -343,7 +343,6 @@ const CoinCard: React.FC = () => {
       {!isMobile ? (
         <ContentDeskTop>
           <CoinCardSkeleton />
-          <CoinCardSkeleton />
         </ContentDeskTop>
       ) : (
         <CoinCardSkeleton />

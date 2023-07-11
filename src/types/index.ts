@@ -32,6 +32,7 @@ export interface IParamList {
   label: string;
   value: number;
   currentValue?: string;
+  parameterLabel: string;
 }
 
 interface IAssetProperties {

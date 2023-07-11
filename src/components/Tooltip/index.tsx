@@ -35,25 +35,23 @@ const Tooltip: React.FC<ITooltipProps> = ({
           </IconHelp>
         )}
         {((Component && msg.length > minMsgLength) || !Component) && (
-          <div>
-            <StyledTooltip
-              displayMsg={displayMessage}
-              id="buttonTooltip"
-              place={customStyles?.place || 'top'}
-              effect="solid"
-              type="info"
-              backgroundColor="#7B7DB2"
-              delayShow={customStyles?.delayShow}
-              offset={customStyles?.offset}
-            >
-              {parsedMsgs.map((parsedMsg, index) => (
-                <span key={index} style={{ color: 'white' }}>
-                  {parsedMsg}
-                  {index + 1 !== parsedMsgs.length && <br />}
-                </span>
-              ))}
-            </StyledTooltip>
-          </div>
+          <StyledTooltip
+            displayMsg={displayMessage}
+            id="buttonTooltip"
+            place={customStyles?.place || 'top'}
+            effect="solid"
+            type="info"
+            backgroundColor="#7B7DB2"
+            delayShow={customStyles?.delayShow}
+            offset={customStyles?.offset}
+          >
+            {parsedMsgs.map((parsedMsg, index) => (
+              <span key={index} style={{ color: 'white' }}>
+                {parsedMsg}
+                {index + 1 !== parsedMsgs.length && <br />}
+              </span>
+            ))}
+          </StyledTooltip>
         )}
       </>
     </span>

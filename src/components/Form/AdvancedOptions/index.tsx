@@ -16,6 +16,7 @@ import {
   TooltipContent,
 } from '@/components/TransactionForms/FormInput/styles';
 import { useContract } from '@/contexts/contract';
+import { useMulticontract } from '@/contexts/contract/multicontract';
 import { ICollectionList } from '@/types';
 import { useEffect, useState } from 'react';
 import { AdvancedOptsContainer, ArrowDownIcon, ArrowUpIcon } from '../styles';
@@ -161,14 +162,10 @@ const MultiSigSelect: React.FC = () => {
 };
 
 const AdvancedOptionsContent: React.FC = () => {
-  const {
-    setIsMultiContract,
-    isMultiContract,
-    showPayload,
-    kdaFee,
-    getAssets,
-    getOwnerAddress,
-  } = useContract();
+  const { showPayload, isMultisig, kdaFee, getAssets, getOwnerAddress } =
+    useContract();
+
+  const { setIsMultiContract, isMultiContract } = useMulticontract();
 
   const [assetsList, setAssetsList] = useState<ICollectionList[]>([]);
   const [kdaFeeAsset, setKdaFeeAsset] = useState<ICollectionList | null>(null);

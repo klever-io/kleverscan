@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import { ChangeEventHandler, useEffect, useMemo, useRef } from 'react';
+import { ChangeEventHandler, useEffect, useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
 import {
   Container,
@@ -87,60 +87,57 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
 
   const inputValue = name && watch(name);
 
-  const registerProps = useMemo(
-    () =>
-      name &&
-      (type !== 'number'
-        ? register(name, {
-            value: defaultValue,
-            required: {
-              value: required || false,
-              message: 'This field is required',
-            },
-            onChange: customOnChange,
-          })
-        : register(name, {
-            valueAsNumber: true,
-            value: defaultValue,
-            required: {
-              value: required || false,
-              message: 'This field is required',
-            },
-            onChange: customOnChange,
-            validate: (value: any) => {
-              if (value < (min || 0)) {
-                return `Minimum value is ${min || 0}`;
-              }
+  const registerProps =
+    name &&
+    (type !== 'number'
+      ? register(name, {
+          value: defaultValue,
+          required: {
+            value: required || false,
+            message: 'This field is required',
+          },
+          onChange: customOnChange,
+        })
+      : register(name, {
+          valueAsNumber: true,
+          value: defaultValue,
+          required: {
+            value: required || false,
+            message: 'This field is required',
+          },
+          onChange: customOnChange,
+          validate: (value: any) => {
+            if (value < (min || 0)) {
+              return `Minimum value is ${min || 0}`;
+            }
 
-              if (max && value > max) {
-                return `Maximum value is ${max || 100}`;
-              }
+            if (max && value > max) {
+              return `Maximum value is ${max || 100}`;
+            }
 
-              if (precision !== undefined && value) {
-                let parsedValue = value;
+            if (precision !== undefined && value) {
+              let parsedValue = value;
 
-                // remove scientific notation
-                if (String(value).includes('e')) {
-                  parsedValue = Number(value).toFixed(
-                    Number(String(value).split('-')[1]),
-                  );
-                }
-                const regex = new RegExp(
-                  `^-?[0-9]\\d*(\\.\\d{0,${precision}})?$`,
+              // remove scientific notation
+              if (String(value).includes('e')) {
+                parsedValue = Number(value).toFixed(
+                  Number(String(value).split('-')[1]),
                 );
-
-                if (!regex.test(parsedValue)) {
-                  return precision > 0
-                    ? `Maximum ${precision} decimals allowed`
-                    : 'Only integer numbers allowed';
-                }
               }
+              const regex = new RegExp(
+                `^-?[0-9]\\d*(\\.\\d{0,${precision}})?$`,
+              );
 
-              return true;
-            },
-          })),
-    [defaultValue, max, min, name, precision, register, required, type],
-  );
+              if (!regex.test(parsedValue)) {
+                return precision > 0
+                  ? `Maximum ${precision} decimals allowed`
+                  : 'Only integer numbers allowed';
+              }
+            }
+
+            return true;
+          },
+        }));
 
   useEffect(() => {
     return () => {

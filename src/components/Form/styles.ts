@@ -17,7 +17,6 @@ export const FormBody = styled(Form)`
 `;
 
 export const FormSection = styled.div<{ inner?: boolean }>`
-  margin-top: 1rem;
   padding: 1.5rem;
   padding-top: 3rem;
   position: relative;
@@ -96,6 +95,73 @@ export const InputWrapper = styled.div``;
 
 export const FormGap = styled.div<ISpaceForm>``;
 
+export const SubmitContainer = styled.div`
+  margin-top: 1.7rem;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2rem;
+
+  @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-direction: row;
+  }
+`;
+
+export const FeeContainer = styled.div<{ isMulticontract?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  color: ${props => props.theme.darkText};
+
+  ${props =>
+    props.isMulticontract &&
+    css`
+      flex-direction: column;
+    `}
+`;
+
+export const FeeDetailsContainer = styled.small<{ open: boolean }>`
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.2s ease-in-out;
+
+  background-color: ${props => props.theme.lightBlue};
+  color: ${props => props.theme.black};
+
+  ${props =>
+    !props.open &&
+    css`
+      display: none;
+      visibility: hidden;
+      opacity: 0.5;
+    `}
+`;
+
+export const DetailsArrowContainer = styled.span<{ isOpen: boolean }>`
+  cursor: pointer;
+  margin-left: 0.5rem;
+
+  svg {
+    transition: transform 0.2s ease-in-out;
+  }
+
+  ${props =>
+    props.isOpen &&
+    css`
+      svg {
+        transform: rotate(180deg);
+      }
+    `}
+`;
+
 export const ButtonContainer = styled.button<IButton>`
   background-color: ${props => props.theme.violet};
   padding-top: 15px;
@@ -108,7 +174,6 @@ export const ButtonContainer = styled.button<IButton>`
   align-items: center;
   color: white;
   border-radius: 10px;
-  margin-top: 1.7rem;
   cursor: pointer;
 
   border: 0.2px solid ${({ theme }) => theme.input.border};

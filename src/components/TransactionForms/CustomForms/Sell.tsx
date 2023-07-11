@@ -1,4 +1,4 @@
-import { useContract } from '@/contexts/contract';
+import { useKDASelect } from '@/utils/hooks/contract';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -25,7 +25,6 @@ const parseSell = (data: FormData) => {
 
 const Sell: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   const { handleSubmit, watch } = useFormContext<FormData>();
-  const { useKDASelect } = useContract();
   const marketType = watch('marketType');
 
   const [_, KDASelect] = useKDASelect();

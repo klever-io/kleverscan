@@ -1,26 +1,10 @@
-import ContractComponent from '@/components/Contract';
-import Select from '@/components/Contract/Select';
-import {
-  AssetIDInput,
-  BalanceContainer,
-  BalanceLabel,
-  FieldLabel,
-  SelectContainer,
-  SelectContent,
-} from '@/components/Contract/styles';
 import {
   buildTransaction,
-  getAssetsList,
   getType,
   precisionParse,
-  showAssetIdInput,
 } from '@/components/Contract/utils';
-import {
-  ErrorMessage,
-  RequiredSpan,
-} from '@/components/TransactionForms/FormInput/styles';
 import api from '@/services/api';
-import { ContractsIndex, IContractOption } from '@/types/contracts';
+import { IContractOption } from '@/types/contracts';
 import {
   IAccount,
   IAccountResponse,
@@ -42,18 +26,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { FieldError, useFormContext } from 'react-hook-form';
-import { IoReloadSharp } from 'react-icons/io5';
-import { useQuery } from 'react-query';
 import { toast } from 'react-toastify';
 import { useExtension } from '../extension';
-import { ReloadWrapper } from './styles';
-
-interface IQueue {
-  elementIndex: number;
-  contract: string;
-  ref: JSX.Element;
-}
 
 export interface IFormsData {
   data: any;
@@ -72,30 +46,15 @@ export interface IFormsData {
   selectedBucket: string;
 }
 
-interface IKDASelectProps {
-  typeAssetTrigger: number | null;
-  withdrawType: number | null;
+interface IFormPayload {
+  type: number;
+  payload: any;
+  metadata: string;
 }
-
-interface ISelectProps {
-  required?: boolean;
-}
-
-interface IKDASelect {
-  assetTriggerType?: number | null;
-  withdrawType?: number | null;
-  validateFields?: string[];
-}
-
 export interface IContractContext {
-  contractType: string;
-  queue: IQueue[];
-  isMultiContract: boolean;
-  selectedIndex: number;
   txLoading: boolean;
   showAdvancedOpts: boolean;
   txHash: string | null;
-  showMultiContracts: boolean;
   showPayload: React.MutableRefObject<boolean>;
   isMultisig: React.MutableRefObject<boolean>;
   payload: any;
@@ -104,53 +63,31 @@ export interface IContractContext {
   permID: React.MutableRefObject<number>;
   openModal: boolean;
   senderAccount: React.MutableRefObject<string | null | undefined>;
-  setContractType: (contract: string) => void;
-  setQueue: React.Dispatch<React.SetStateAction<any>>;
-  setIsMultiContract: React.Dispatch<React.SetStateAction<boolean>>;
-  setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
   setTxLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setShowAdvancedOpts: React.Dispatch<React.SetStateAction<boolean>>;
   setTxHash: React.Dispatch<React.SetStateAction<string | null>>;
-  setShowMultiContracts: React.Dispatch<React.SetStateAction<boolean>>;
   setContractOptions: React.Dispatch<React.SetStateAction<IContractOption[]>>;
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
   setPayload: React.Dispatch<React.SetStateAction<any>>;
   getAssets: () => Promise<ICollectionList[]>;
+  getKAssets: () => Promise<ICollectionList[] | undefined>;
   getOwnerAddress: () => string;
-  addToQueue: () => void;
-  resetForms: () => void;
   formSend: () => Promise<void>;
-  handleSubmit: (contractValues: any, metadata: string) => Promise<void>;
+  resetFormsData: () => void;
+  handleSubmit: (
+    contractValues: any,
+    metadata: string,
+    contractType: string,
+    queueLength: number,
+  ) => Promise<void>;
   submitForms: () => Promise<void>;
-  useKDASelect: (
-    params?: IKDASelect,
-  ) => [ICollectionList | undefined, React.FC<ISelectProps>];
 }
-
-const kAssetContracts = [
-  'AssetTriggerContract',
-  'ConfigITOContract',
-  'ITOTriggerContract',
-  'WithdrawContract',
-  'DepositContract',
-];
-
-const collectionContracts = [
-  'ConfigITOContract',
-  'ITOTriggerContract',
-  'WithdrawContract',
-];
 
 export const Contract = createContext({} as IContractContext);
 export const ContractProvider: React.FC = ({ children }) => {
-  const [contractType, setContractType] = useState('');
-  const [isMultiContract, setIsMultiContract] = useState<boolean>(false);
-  const [queue, setQueue] = useState<IQueue[]>([]);
-  const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [txLoading, setTxLoading] = useState<boolean>(false);
   const [txHash, setTxHash] = useState<string | null>(null);
   const [showAdvancedOpts, setShowAdvancedOpts] = useState(false);
-  const [showMultiContracts, setShowMultiContracts] = useState<boolean>(false);
   const [contractOptions, setContractOptions] =
     useState<IContractOption[]>(allContractOptions);
   const [openModal, setOpenModal] = useState(false);
@@ -163,7 +100,7 @@ export const ContractProvider: React.FC = ({ children }) => {
   const permID = useRef<number>(0);
   const senderAccount = useRef<string | null>();
 
-  const { logoutExtension, extensionInstalled } = useExtension();
+  const { logoutExtension } = useExtension();
   const router = useRouter();
 
   const getOwnerAddress = () => {
@@ -176,30 +113,6 @@ export const ContractProvider: React.FC = ({ children }) => {
       window.scrollTo(0, 0);
     }
   }, [txHash]);
-
-  useEffect(() => {
-    if (router.isReady) {
-      const { contract } = router.query;
-      if (contract) {
-        setContractType(contract as string);
-      }
-    }
-  }, [router.isReady]);
-
-  const setContractAndQuery = (contract: string) => {
-    setContractType(contract);
-
-    if (router.pathname !== '/create-transaction') return;
-
-    if (contract !== '')
-      router.push(`/create-transaction?contract=${contract}`, undefined, {
-        shallow: true,
-      });
-    else
-      router.push(`/create-transaction`, undefined, {
-        shallow: true,
-      });
-  };
 
   const getKAssets = async () => {
     const address = sessionStorage.getItem('walletAddress') || '';
@@ -315,53 +228,6 @@ export const ContractProvider: React.FC = ({ children }) => {
     return assetsList || ([] as ICollectionList[]);
   };
 
-  const contractProps = {
-    contractType,
-    setContractType,
-  };
-
-  const addToQueue = () => {
-    try {
-      const componenetIndex = queue[queue.length - 1].elementIndex + 1;
-      const contractPropsWithIndex = {
-        ...contractProps,
-        elementIndex: componenetIndex,
-      };
-      setQueue([
-        ...queue,
-        {
-          elementIndex: componenetIndex,
-          contract: ContractsIndex[getType(contractType)],
-          ref: <ContractComponent {...contractPropsWithIndex} />,
-        },
-      ]);
-      setSelectedIndex(componenetIndex);
-    } catch (e: any) {
-      toast.error(e.message ? e.message : e);
-    }
-  };
-
-  const resetForms = () => {
-    const contractPropsWithIndex = {
-      ...contractProps,
-      elementIndex: queue.length,
-    };
-    setQueue([
-      ...queue,
-      {
-        elementIndex: queue.length,
-        contract: ContractsIndex[getType(contractType)],
-        ref: <ContractComponent {...contractPropsWithIndex} />,
-      },
-    ]);
-    setSelectedIndex(0);
-    setTxLoading(false);
-  };
-
-  useEffect(() => {
-    resetForms();
-  }, [isMultiContract, contractType]);
-
   const parseKda = (contractValues: any, contractType: string) => {
     const parsedValues = { ...contractValues };
     if (parsedValues.collection) {
@@ -392,12 +258,6 @@ export const ContractProvider: React.FC = ({ children }) => {
       form.requestSubmit();
     });
   };
-
-  interface IFormPayload {
-    type: number;
-    payload: any;
-    metadata: string;
-  }
 
   const formSend = async () => {
     const formPayloads = formsData.current;
@@ -446,7 +306,9 @@ export const ContractProvider: React.FC = ({ children }) => {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `${contractType} - Nonce: ${signedTx.RawData.Nonce}.json`;
+        link.download = `${getOwnerAddress()} - Nonce: ${
+          signedTx.RawData.Nonce
+        }.json`;
         link.click();
         window.URL.revokeObjectURL(url);
         setTxLoading(false);
@@ -455,18 +317,27 @@ export const ContractProvider: React.FC = ({ children }) => {
         );
       } else {
         const response = await web.broadcastTransactions([signedTx]);
-        setTxLoading(false);
         setTxHash(response.data.txsHashes[0]);
         toast.success('Transaction broadcast successfully');
       }
     } catch (e: any) {
-      setTxLoading(false);
       console.warn(`%c ${e}`, 'color: red');
       toast.error(e.message ? e.message : e);
+    } finally {
+      resetFormsData();
+      setTxLoading(false);
     }
   };
 
-  const parsePayload = (data: IFormData, metadata: string) => {
+  const resetFormsData = () => {
+    formsData.current = [];
+  };
+
+  const parsePayload = (
+    data: IFormData,
+    metadata: string,
+    contractType: string,
+  ) => {
     formsData.current = [
       ...(formsData.current || []),
       {
@@ -477,23 +348,28 @@ export const ContractProvider: React.FC = ({ children }) => {
     ];
   };
 
-  const handleSubmit = async (contractValues: any, metadata: string) => {
+  const handleSubmit = async (
+    contractValues: any,
+    metadata: string,
+    contractType: string,
+    queueLength: number,
+  ) => {
     setTxLoading(true);
 
-    formsData.current = [];
     const payload = JSON.parse(
       JSON.stringify(parseKda(contractValues, contractType)),
     );
 
     await precisionParse(payload, contractType);
 
-    parsePayload(payload, metadata);
+    parsePayload(payload, metadata, contractType);
+
     if (showPayload.current) {
       setOpenModal(true);
       setPayload(formsData.current);
       setTxLoading(false);
-    } else if (isMultiContract) {
-      if (formsData.current.length === queue.length) {
+    } else if (queueLength > 1) {
+      if (formsData.current.length === queueLength) {
         formSend();
       }
     } else {
@@ -501,222 +377,7 @@ export const ContractProvider: React.FC = ({ children }) => {
     }
   };
 
-  const useKDASelect = (
-    params?: IKDASelect,
-  ): [ICollectionList | undefined, React.FC<ISelectProps>] => {
-    const [collection, setCollection] = useState<ICollectionList | undefined>(
-      {} as ICollectionList,
-    );
-    const [loading, setLoading] = useState(false);
-
-    const assetTriggerType =
-      params?.assetTriggerType !== undefined ? params?.assetTriggerType : null;
-    const withdrawType = params?.withdrawType || null;
-    const validateFields = params?.validateFields || [];
-
-    const {
-      register,
-      setValue,
-      formState: { errors },
-      getValues,
-      trigger,
-      watch,
-    } = useFormContext();
-
-    const watchCollection = watch('collection');
-
-    const {
-      data: assetsList,
-      refetch: refetchAssetsList,
-      isFetching: assetsFetching,
-    } = useQuery({
-      queryKey: 'assetsList',
-      queryFn: getAssets,
-      initialData: [],
-    });
-    const {
-      data: kassetsList,
-      refetch: refetchKassetsList,
-      isFetching: kassetsFetching,
-    } = useQuery({
-      queryKey: 'kassetsList',
-      queryFn: getKAssets,
-      initialData: [],
-    });
-
-    useEffect(() => {
-      if (!kassetsFetching && !assetsFetching && loading) {
-        setLoading(false);
-      } else if (!loading) {
-        setLoading(true);
-      }
-    }, [assetsFetching, kassetsFetching]);
-
-    const refetch = () => {
-      refetchAssetsList();
-      refetchKassetsList();
-    };
-
-    useEffect(() => {
-      if (watchCollection && watchCollection !== collection?.value) {
-        const selectedCollection = assetsList?.find(
-          asset => asset.value === watchCollection,
-        );
-        selectedCollection && setCollection(selectedCollection);
-        !selectedCollection &&
-          setCollection({
-            label: watchCollection,
-            value: watchCollection,
-          } as ICollectionList);
-      }
-    }, [watchCollection, assetsList]);
-
-    useEffect(() => {
-      validateFields.forEach(field => {
-        const value = getValues(field);
-        if (value) {
-          trigger(field);
-        }
-      });
-    }, [collection]);
-
-    let assetBalance = 0;
-    assetBalance = collection?.balance || 0;
-
-    const KDASelect: React.FC<ISelectProps> = ({ required }) => {
-      let collectionError: null | FieldError = null;
-
-      try {
-        collectionError = errors?.collection;
-      } catch (e) {
-        collectionError = null;
-      }
-
-      let assetIdError: null | FieldError = null;
-
-      try {
-        assetIdError = errors?.collectionAssetID;
-      } catch (e) {
-        assetIdError = null;
-      }
-
-      useEffect(() => {
-        register('collection', {
-          required: {
-            value: required || false,
-            message: 'This field is required',
-          },
-        });
-      }, [register]);
-
-      const showAssetIdInputConditional =
-        collection?.isNFT &&
-        !collectionContracts.includes(contractType) &&
-        showAssetIdInput(contractType, assetTriggerType);
-
-      useEffect(() => {
-        if (!showAssetIdInputConditional) {
-          setValue('collectionAssetID', '');
-        }
-      }, [showAssetIdInputConditional]);
-
-      const CollectionIDField: React.FC = () => {
-        useEffect(() => {
-          return () => {
-            (!collection?.isNFT ||
-              collectionContracts.includes(contractType) ||
-              !showAssetIdInput(contractType, assetTriggerType)) &&
-              setValue('collectionAssetID', '');
-          };
-        }, []);
-
-        return (
-          <SelectContent>
-            <FieldLabel>Asset ID</FieldLabel>
-            <AssetIDInput
-              type="number"
-              $error={Boolean(assetIdError)}
-              {...register('collectionAssetID', {
-                required: {
-                  value: true,
-                  message: 'This field is required',
-                },
-              })}
-            />
-            {assetIdError && (
-              <ErrorMessage style={{ color: 'red', fontSize: '0.8rem' }}>
-                {collectionError?.message || 'This field is required'}
-              </ErrorMessage>
-            )}
-          </SelectContent>
-        );
-      };
-
-      return (
-        <SelectContainer key={JSON.stringify(collection)}>
-          <SelectContent configITO={contractType === 'ConfigITOContract'}>
-            <BalanceContainer>
-              <FieldLabel>
-                Select an asset/collection
-                {required && <RequiredSpan> (required)</RequiredSpan>}
-              </FieldLabel>
-              <ReloadWrapper onClick={refetch} $loading={loading}>
-                <IoReloadSharp />
-              </ReloadWrapper>
-              {collection?.balance && (
-                <BalanceLabel>
-                  Balance: {assetBalance / 10 ** (collection?.precision || 0)}
-                </BalanceLabel>
-              )}
-            </BalanceContainer>
-            <Select
-              collection={collection}
-              options={getAssetsList(
-                kAssetContracts.includes(contractType)
-                  ? kassetsList || []
-                  : assetsList || [],
-                contractType,
-                assetTriggerType,
-                withdrawType,
-                getOwnerAddress(),
-              )}
-              onChange={value => {
-                setCollection(value);
-                setValue('collection', value?.value, {
-                  shouldValidate: true,
-                });
-                if (!value.isNFT) {
-                  setValue('collectionAssetID', '');
-                }
-              }}
-              loading={loading}
-              selectedValue={collection?.value ? collection : undefined}
-              zIndex={3}
-              error={Boolean(collectionError)}
-            />
-            {collectionError && (
-              <ErrorMessage style={{ color: 'red', fontSize: '0.8rem' }}>
-                {collectionError?.message || 'This field is required'}
-              </ErrorMessage>
-            )}
-          </SelectContent>
-          {showAssetIdInputConditional && <CollectionIDField />}
-        </SelectContainer>
-      );
-    };
-
-    return [collection, KDASelect];
-  };
-
   const values: IContractContext = {
-    contractType,
-    setContractType: setContractAndQuery,
-    queue,
-    setQueue,
-    isMultiContract,
-    setIsMultiContract,
-    selectedIndex,
-    setSelectedIndex,
     txLoading,
     setTxLoading,
     txHash,
@@ -724,12 +385,9 @@ export const ContractProvider: React.FC = ({ children }) => {
     showAdvancedOpts,
     setShowAdvancedOpts,
     getAssets,
-    addToQueue,
-    showMultiContracts,
-    setShowMultiContracts,
+    getKAssets,
     showPayload,
     isMultisig,
-    resetForms,
     contractOptions,
     setContractOptions,
     getOwnerAddress,
@@ -739,8 +397,8 @@ export const ContractProvider: React.FC = ({ children }) => {
     setOpenModal,
     payload,
     setPayload,
+    resetFormsData,
     submitForms,
-    useKDASelect,
     kdaFee,
     permID,
     senderAccount,

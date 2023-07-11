@@ -27,7 +27,6 @@ export const ContainerQueue = styled.div<{
   overflow-y: auto;
   backdrop-filter: brightness(1.5);
   margin-right: 0.55rem;
-  margin-top: 2rem;
 
   display: flex;
   flex-direction: column;
@@ -60,7 +59,7 @@ export const ContainerQueue = styled.div<{
 export const ContractItem = styled.div<{ selected: boolean }>`
   min-width: 11rem;
   width: 100%;
-  min-height: 5rem;
+  height: fit-content;
   padding: 0.75rem;
 
   display: flex;
@@ -86,6 +85,7 @@ export const ContractItem = styled.div<{ selected: boolean }>`
 
 export const Title = styled.h3`
   color: ${props => props.theme.black};
+  font-size: 1.1rem;
 `;
 
 export const ContractsContainer = styled.div`

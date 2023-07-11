@@ -1,28 +1,14 @@
-import { ContractProvider } from '@/contexts/contract';
-import { ContractModalProvider } from '@/contexts/contractModal';
-import { ExtensionProvider } from '@/contexts/extension';
-import { InternalThemeProvider } from '@/contexts/theme';
-import { MobileProvider } from 'contexts/mobile';
+import ContextProviders from '@/components/ContextProviders';
 import { appWithTranslation, SSRConfig } from 'next-i18next';
 import type { AppProps as NextJsAppProps } from 'next/app';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
-import { QueryClient, QueryClientProvider } from 'react-query';
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Layout from '../components/Layout';
 import NProgress from '../components/NProgress';
 import Bugsnag from '../lib/bugsnag';
 import GlobalStyle from '../styles/global';
 import * as gtag from '../utils/gtag/gtag';
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-    },
-  },
-});
 
 const ErrorBoundary =
   !process.env.BUGSNAG_DISABLED &&
@@ -51,25 +37,13 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   }, [router.events]);
 
   const children = (
-    <QueryClientProvider client={queryClient}>
-      <InternalThemeProvider>
-        <ToastContainer />
-        <MobileProvider>
-          <ExtensionProvider>
-            <ContractProvider>
-              <ContractModalProvider>
-                <ToastContainer />
-                <Layout>
-                  <Component {...pageProps} />
-                </Layout>
-                <GlobalStyle />
-                <NProgress />
-              </ContractModalProvider>
-            </ContractProvider>
-          </ExtensionProvider>
-        </MobileProvider>
-      </InternalThemeProvider>
-    </QueryClientProvider>
+    <ContextProviders>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+      <GlobalStyle />
+      <NProgress />
+    </ContextProviders>
   );
 
   return ErrorBoundary ? <ErrorBoundary>{children}</ErrorBoundary> : children;

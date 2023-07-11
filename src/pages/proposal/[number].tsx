@@ -199,6 +199,7 @@ const ProposalDetails: React.FC = () => {
           number: index,
           parameter: proposalsMessages[key] ? proposalsMessages[key] : '',
           currentValue: apiNetworkParams?.[key]?.value,
+          parameterLabel: key,
         };
       });
     }

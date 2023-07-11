@@ -131,6 +131,7 @@ export interface INetworkParam {
   number: number;
   parameter: string;
   currentValue: string;
+  parameterLabel: string;
 }
 
 export interface IProposals {
@@ -193,6 +194,8 @@ export enum NetworkParamsIndexer {
   MaxBucketSize = 32,
   LeaderValidatorRewardsPercentage = 33,
   ProposalMaxEpochsDuration = 34,
+  KAppFeeITOTrigger = 35,
+  KAppFeeDeposit = 36,
 }
 
 export interface IProposalsMessages {
@@ -231,4 +234,6 @@ export interface IProposalsMessages {
   MaxBucketSize: string;
   LeaderValidatorRewardsPercentage: string;
   ProposalMaxEpochsDuration: string;
+  KAppFeeDeposit: string;
+  KAppFeeITOTrigger: string;
 }

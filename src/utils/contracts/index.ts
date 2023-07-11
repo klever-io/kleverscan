@@ -342,6 +342,34 @@ export const contractsList = [
   'ITO Trigger',
 ];
 
+export const paramContractMap = {
+  TransferContract: 'KAppFeeTransfer',
+  CreateAssetContract: 'KAppFeeCreateAsset',
+  CreateValidatorContract: 'KAppFeeCreateValidator',
+  AssetTriggerContract: 'KAppFeeAssetTrigger',
+  ValidatorConfigContract: 'KAppFeeValidatorConfig',
+  FreezeContract: 'KAppFeeFreeze',
+  UnfreezeContract: 'KAppFeeUnfreeze',
+  DelegateContract: 'KAppFeeDelegate',
+  UndelegateContract: 'KAppFeeUndelegate',
+  WithdrawContract: 'KAppFeeWithdraw',
+  ClaimContract: 'KAppFeeClaim',
+  UnjailContract: 'KAppFeeUnjail',
+  SetAccountNameContract: 'KAppFeeSetAccountName',
+  ProposalContract: 'KAppFeeProposal',
+  VoteContract: 'KAppFeeVote',
+  ConfigITOContract: 'KAppFeeConfigITO',
+  SetITOPricesContract: 'KAppFeeSetITOPrices',
+  BuyContract: 'KAppFeeBuy',
+  SellContract: 'KAppFeeSell',
+  CancelMarketOrderContract: 'KAppFeeCancelMarketOrder',
+  CreateMarketplaceContract: 'KAppFeeCreateMarketplace',
+  ConfigMarketplaceContract: 'KAppFeeConfigMarketplace',
+  UpdateAccountPermissionContract: 'KAppFeeUpdateAccountPermission',
+  ITOTriggerContract: 'KAppFeeITOTrigger',
+  DepositContract: 'KAppFeeDeposit',
+};
+
 /**
  * Receive the contracts number to return the contract name using the Contract Enum
  * @param contracts is required to filter the contracts header based on each contract

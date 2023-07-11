@@ -1,5 +1,5 @@
-import { useContract } from '@/contexts/contract';
 import { withdrawTypes } from '@/utils/contracts';
+import { useKDASelect } from '@/utils/hooks/contract';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -16,7 +16,6 @@ type FormData = {
 
 const Withdraw: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   const { handleSubmit, watch } = useFormContext<FormData>();
-  const { useKDASelect } = useContract();
   const withdrawType: number = watch('withdrawType');
 
   const [_, KDASelect] = useKDASelect({ withdrawType });

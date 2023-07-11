@@ -1,4 +1,3 @@
-import { useContract } from '@/contexts/contract';
 import { IStakingRewards } from '@/pages/account/[account]';
 import { ICollectionList } from '@/types';
 import dynamic from 'next/dynamic';
@@ -56,8 +55,6 @@ const Select: React.FC<IFilter> = ({
     return <components.Placeholder {...props} />;
   }, []);
 
-  const { isMultiContract, queue } = useContract();
-
   const CaretDownIcon = useCallback(() => {
     return <IoIosArrowDown />;
   }, []);
@@ -97,9 +94,7 @@ const Select: React.FC<IFilter> = ({
         placeholder={getPlaceholder()}
         components={{ Placeholder, DropdownIndicator }}
         {...props}
-        isDisabled={
-          (isDisabled && isMultiContract && queue.length > 1) || loading
-        }
+        isDisabled={loading}
       />
     </Container>
   );

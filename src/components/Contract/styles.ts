@@ -57,9 +57,12 @@ export const CloseIcon = styled(IoMdCloseCircle).attrs(props => ({
 
 export const Container = styled.div`
   margin: auto;
-  margin-top: 2rem;
   width: 100%;
   max-width: 1200px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
@@ -261,7 +264,6 @@ export const SelectContainer = styled.div`
   background-color: ${props => props.theme.white};
   padding: 1.37rem;
   border-radius: 1rem;
-  margin-top: 1rem;
   width: 100%;
   gap: 1rem;
 
@@ -336,7 +338,6 @@ export const BalanceContainer = styled.div`
 export const CardContainer = styled.div`
   width: 100%;
   max-width: 1200px;
-  padding-bottom: 2rem;
 
   font-family: Rubik;
   font-family: Rubik;

@@ -32,8 +32,6 @@ export const ExtraOptionContainer = styled.div`
 
 export const InputLabel = styled.label`
   user-select: none;
-  font-size: small;
-  font-weight: 600;
 
   display: flex;
   gap: 0.5rem;
@@ -41,6 +39,10 @@ export const InputLabel = styled.label`
   color: ${({ theme }) => theme.darkText};
 
   transition: transform 0.2s ease;
+
+  > span {
+    font-size: smaller;
+  }
 `;
 
 export const FieldContainer = styled.div`

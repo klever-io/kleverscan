@@ -10,7 +10,12 @@ import {
 } from './styles';
 
 const ConfirmPayload: React.FC = () => {
-  const { setOpenModal: setOpen, payload, formSend } = useContract();
+  const {
+    setOpenModal: setOpen,
+    payload,
+    formSend,
+    resetFormsData,
+  } = useContract();
 
   const handleConfirm = async () => {
     await formSend();
@@ -20,15 +25,12 @@ const ConfirmPayload: React.FC = () => {
   const closeModal = () => setOpen(false);
 
   const handleClose = () => {
+    resetFormsData();
     closeModal();
   };
 
   const isDisabled = () => {
     return payload?.txCount || payload?.txsHashes !== undefined;
-  };
-
-  const handleGoBack = () => {
-    closeModal();
   };
 
   return (

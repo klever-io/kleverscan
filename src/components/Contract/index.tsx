@@ -1,4 +1,6 @@
 import { useContract } from '@/contexts/contract';
+import { useFees } from '@/contexts/contract/fees';
+import { useMulticontract } from '@/contexts/contract/multicontract';
 import { Card } from '@/styles/common';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
@@ -8,9 +10,11 @@ import { IoOpenOutline } from 'react-icons/io5';
 import ConfirmPayload from '../ConfirmPayload';
 import Copy from '../Copy';
 import MetadataOptions from '../Form/Metadata';
+import SubmitButton from '../Form/SubmitButton';
 import { InlineLoader } from '../Loader';
 import { Loader } from '../Loader/styles';
-import { getContract } from '../TransactionForms/CustomForms';
+import { RenderContract } from '../TransactionForms/CustomForms';
+import Select from './Select';
 import {
   CardContainer,
   CloseIcon,
@@ -23,7 +27,7 @@ import { contractsDescription } from './utils';
 
 export interface IContract {
   modalContractType?: { value: string };
-  elementIndex?: number;
+  elementId?: number;
   defaultValues?: any;
 }
 
@@ -71,20 +75,27 @@ export const HashComponent: React.FC<IHashComponentProps> = ({
 
 const Contract: React.FC<IContract> = ({
   modalContractType,
-  elementIndex = 0,
+  elementId = 0,
   defaultValues = null,
 }) => {
   const {
-    contractType,
-    setContractType,
     txLoading: loading,
     txHash,
     setTxHash,
     handleSubmit,
     openModal: openConfirmModal,
+    isMultisig,
+    contractOptions,
   } = useContract();
 
-  const [metadata, setMetadata] = useState<string>('');
+  const { metadata, setSelectedContractType, selectedContractType, queue } =
+    useMulticontract();
+  const { getKappFee } = useFees();
+
+  const [contractType, setContractType] =
+    React.useState<string>(selectedContractType);
+
+  const kappFee = getKappFee(contractType);
 
   const formMethods = useForm({
     mode: 'all',
@@ -110,19 +121,26 @@ const Contract: React.FC<IContract> = ({
     }
   }, [modalContractType?.value]);
 
-  const handleFormSubmit = async (data: any) => {
-    await handleSubmit(data, metadata);
-  };
+  useEffect(() => {
+    setSelectedContractType(contractType);
 
-  const metadataProps = {
-    metadata,
-    setMetadata,
+    return () => {
+      formMethods.reset({});
+    };
+  }, [contractType]);
+
+  const handleFormSubmit = async (data: any) => {
+    await handleSubmit(
+      data,
+      queue.find(item => item.elementId === elementId)?.metadata || '',
+      contractType,
+      queue.length,
+    );
   };
 
   const formProps = {
-    formKey: elementIndex,
+    formKey: elementId,
     handleFormSubmit,
-    ...metadataProps,
   };
 
   const hashProps = {
@@ -132,6 +150,22 @@ const Contract: React.FC<IContract> = ({
 
   return (
     <Container>
+      <Select
+        options={contractOptions}
+        selectedValue={contractOptions.find(
+          item => item.value === contractType,
+        )}
+        onChange={contractType => {
+          setContractType(contractType.value);
+
+          isMultisig.current = false;
+        }}
+        isDisabled={true}
+        title={'Contract'}
+        zIndex={5}
+        isModal={false}
+      />
+
       <FormProvider {...formMethods}>
         {loading &&
           ReactDOM.createPortal(
@@ -148,13 +182,16 @@ const Contract: React.FC<IContract> = ({
             <Card>
               <div>
                 <span>{contractsDescription[contractType]}</span>
+                <span>KApp Fee: {kappFee} KLV</span>
               </div>
             </Card>
           </CardContainer>
         )}
 
-        {getContract(contractType, formProps)}
-        <MetadataOptions {...metadataProps} />
+        <RenderContract contractName={contractType} contractProps={formProps} />
+
+        <MetadataOptions />
+        <SubmitButton />
       </FormProvider>
     </Container>
   );

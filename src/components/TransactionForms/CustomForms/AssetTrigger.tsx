@@ -1,7 +1,8 @@
-import { IMetadataOptions } from '@/components/Form/Metadata';
 import { useContract } from '@/contexts/contract';
+import { useMulticontract } from '@/contexts/contract/multicontract';
 import { ICollectionList } from '@/types';
 import { assetTriggerTypes } from '@/utils/contracts';
+import { useKDASelect } from '@/utils/hooks/contract';
 import { IAssetTrigger } from '@klever/sdk';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -23,6 +24,11 @@ import {
 } from './utils';
 import { assetTriggerTooltips as tooltip } from './utils/tooltips';
 
+export interface IMetadataOptions {
+  metadata: string;
+  setMetadata: (metadata: string) => void;
+}
+
 const parseMetadata = (data: any) => {
   if (data.data !== '') {
     delete data.data;
@@ -40,15 +46,15 @@ const parseAssetTrigger = (data: IAssetTrigger) => {
 const AssetTrigger: React.FC<IContractProps> = ({
   formKey,
   handleFormSubmit,
-  metadata,
-  setMetadata,
 }) => {
   const { handleSubmit, watch } = useFormContext<IAssetTrigger>();
-  const { useKDASelect, getOwnerAddress } = useContract();
+  const { getOwnerAddress } = useContract();
   const triggerType = watch('triggerType');
   const [collection, KDASelect] = useKDASelect({
     assetTriggerType: triggerType,
   });
+
+  const { metadata, setMetadata } = useMulticontract();
 
   const metadataProps = {
     metadata,

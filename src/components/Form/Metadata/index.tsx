@@ -1,28 +1,32 @@
-import { StyledTextArea } from '@/components/TransactionForms/FormInput/styles';
-import { useContract } from '@/contexts/contract';
-import { useState } from 'react';
 import {
-  AdvancedOptsContainer,
-  ArrowDownIcon,
-  ArrowUpIcon,
-  ButtonContainer,
-  HiddenSubmitButton,
-} from '../styles';
+  InfoIcon,
+  StyledTextArea,
+  TooltipContainer,
+  TooltipContent,
+} from '@/components/TransactionForms/FormInput/styles';
+import { useFees } from '@/contexts/contract/fees';
+import { useMulticontract } from '@/contexts/contract/multicontract';
+import { useState } from 'react';
+import { AdvancedOptsContainer, ArrowDownIcon, ArrowUpIcon } from '../styles';
 import { ExtraOptionContainer, FieldContainer, InputLabel } from './styles';
 
-export interface IMetadataOptions {
-  metadata: string;
-  setMetadata: React.Dispatch<React.SetStateAction<string>>;
-}
+const AdvancedOptionsContent: React.FC = () => {
+  const { metadata, setMetadata } = useMulticontract();
+  const { bandwidthFeeMultiplier } = useFees();
+  const tooltip = `You can add metadata to your transaction. This metadata will be stored on-chain and will be publicly visible. Each byte costs ${bandwidthFeeMultiplier} KLV`;
 
-const AdvancedOptionsContent: React.FC<IMetadataOptions> = ({
-  metadata,
-  setMetadata,
-}) => {
   return (
     <ExtraOptionContainer>
       <FieldContainer>
-        <InputLabel>Metadata</InputLabel>
+        <InputLabel>
+          <span>Metadata</span>
+          <TooltipContainer>
+            <InfoIcon />
+            <TooltipContent>
+              <span>{tooltip}</span>
+            </TooltipContent>
+          </TooltipContainer>
+        </InputLabel>
         <StyledTextArea
           value={metadata}
           onChange={e => {
@@ -36,18 +40,8 @@ const AdvancedOptionsContent: React.FC<IMetadataOptions> = ({
   );
 };
 
-const MetadataOptions: React.FC<IMetadataOptions> = ({
-  metadata,
-  setMetadata,
-}) => {
+const MetadataOptions: React.FC = () => {
   const [showMetadata, setShowMetadata] = useState(false);
-
-  const { isMultiContract, txLoading, submitForms } = useContract();
-
-  const advancedOptionsProps = {
-    metadata,
-    setMetadata,
-  };
 
   return (
     <>
@@ -56,22 +50,7 @@ const MetadataOptions: React.FC<IMetadataOptions> = ({
         {showMetadata ? <ArrowUpIcon /> : <ArrowDownIcon />}
       </AdvancedOptsContainer>
 
-      {showMetadata ? (
-        <AdvancedOptionsContent {...advancedOptionsProps} />
-      ) : null}
-
-      {!isMultiContract ? (
-        <ButtonContainer
-          submit={!txLoading}
-          type="submit"
-          disabled={txLoading}
-          onClick={submitForms}
-        >
-          Create Transaction
-        </ButtonContainer>
-      ) : (
-        <HiddenSubmitButton type="submit" disabled={false} />
-      )}
+      {showMetadata ? <AdvancedOptionsContent /> : null}
     </>
   );
 };

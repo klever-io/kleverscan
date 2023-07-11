@@ -149,6 +149,7 @@ export const URIsSection: React.FC<URIProps> = ({ tooltip: customTooltip }) => {
     control,
     name: 'uris',
   });
+
   return (
     <FormSection>
       <SectionTitle>

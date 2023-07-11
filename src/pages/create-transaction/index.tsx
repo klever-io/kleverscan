@@ -2,7 +2,6 @@ import { WarningIcon } from '@/assets/calendar';
 import { Transactions as Icon } from '@/assets/title-icons';
 import MultiContract from '@/components/Contract/MultiContract';
 import { ContainerQueueMobile } from '@/components/Contract/MultiContract/styles';
-import Select from '@/components/Contract/Select';
 import {
   Container as ContainerContract,
   CreateTxContainer,
@@ -10,6 +9,7 @@ import {
 import AdvancedOptions from '@/components/Form/AdvancedOptions';
 import Title from '@/components/Layout/Title';
 import { useContract } from '@/contexts/contract';
+import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import { Header } from '@/styles/common';
@@ -30,53 +30,23 @@ const CreateTransaction: React.FC = () => {
 
   const { isTablet } = useMobile();
 
+  const { getAssets } = useContract();
+
   const {
-    contractType,
-    setContractType,
     isMultiContract,
     queue,
     setQueue,
-    selectedIndex,
-    setSelectedIndex,
+    selectedId,
+    setSelectedId,
     showMultiContracts,
     setShowMultiContracts,
-    isMultisig,
-    contractOptions,
-    getAssets,
-  } = useContract();
+  } = useMulticontract();
 
   useEffect(() => {
     if (extensionInstalled) {
       connectExtension();
     }
   }, [extensionInstalled]);
-
-  const handleOption = (selectedOption: any) => {
-    setContractType(selectedOption.value);
-  };
-
-  const editContract = (elementIndex: any) => {
-    setSelectedIndex(elementIndex);
-
-    if (isTablet && showMultiContracts) {
-      setShowMultiContracts(false);
-    }
-  };
-
-  const removeContractQueue = (contractIndex: number, e: any) => {
-    e.stopPropagation();
-
-    if (queue.length > 1) {
-      const newItems = queue.filter(
-        item => item.elementIndex !== contractIndex,
-      );
-
-      setQueue(newItems);
-      if (contractIndex === selectedIndex) {
-        setSelectedIndex(queue[0].elementIndex);
-      }
-    }
-  };
 
   useEffect(() => {
     const isAccountEmpty = async () => {
@@ -91,11 +61,6 @@ const CreateTransaction: React.FC = () => {
     };
     isAccountEmpty();
   }, []);
-
-  const multiContractProps = {
-    editContract,
-    removeContractQueue,
-  };
 
   return (
     <Container>
@@ -132,44 +97,28 @@ const CreateTransaction: React.FC = () => {
       </CreateTxCardContainer>
 
       <ContainerContract>
-        <Select
-          options={contractOptions}
-          selectedValue={contractOptions.find(
-            item => item.value === contractType,
+        <CreateTxContainer isMultiContract={isMultiContract}>
+          {isMultiContract && <MultiContract />}
+          {isTablet && isMultiContract && (
+            <ContainerQueueMobile
+              onClick={() => setShowMultiContracts(!showMultiContracts)}
+            >
+              Queue ( {queue.length} )
+            </ContainerQueueMobile>
           )}
-          onChange={contractType => {
-            handleOption(contractType);
-            isMultisig.current = false;
-          }}
-          title={'Contract'}
-          zIndex={5}
-          isModal={false}
-        />
-
-        {contractType && (
-          <CreateTxContainer isMultiContract={isMultiContract}>
-            {isMultiContract && <MultiContract {...multiContractProps} />}
-            {isTablet && isMultiContract && (
-              <ContainerQueueMobile
-                onClick={() => setShowMultiContracts(!showMultiContracts)}
-              >
-                Queue ( {queue.length} )
-              </ContainerQueueMobile>
-            )}
-            <QueueOutContainer>
-              {queue.map((item, index) => {
-                return (
-                  <QueueItemContainer
-                    key={JSON.stringify(item.ref)}
-                    visible={item.elementIndex === selectedIndex}
-                  >
-                    {item.ref}
-                  </QueueItemContainer>
-                );
-              })}
-            </QueueOutContainer>
-          </CreateTxContainer>
-        )}
+          <QueueOutContainer>
+            {queue.map(item => {
+              return (
+                <QueueItemContainer
+                  key={JSON.stringify(item.ref)}
+                  visible={item.elementId === selectedId}
+                >
+                  {item.ref}
+                </QueueItemContainer>
+              );
+            })}
+          </QueueOutContainer>
+        </CreateTxContainer>
         <AdvancedOptions />
       </ContainerContract>
     </Container>

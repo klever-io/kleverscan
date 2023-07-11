@@ -1,4 +1,4 @@
-import { useContract } from '@/contexts/contract';
+import { useKDASelect } from '@/utils/hooks/contract';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -13,7 +13,6 @@ type FormData = {
 
 const Freeze: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   const { handleSubmit } = useFormContext<FormData>();
-  const { useKDASelect } = useContract();
   const [collection, KDASelect] = useKDASelect({
     validateFields: ['amount'],
   });

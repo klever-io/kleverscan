@@ -1,5 +1,6 @@
 import { useContract } from '@/contexts/contract';
 import { ICollectionList } from '@/types';
+import { useKDASelect } from '@/utils/hooks/contract';
 import React from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
@@ -51,7 +52,7 @@ export const parseConfigITO = (data: ConfigITOData): void => {
 
 const ConfigITO: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   const { handleSubmit, watch } = useFormContext<ConfigITOData>();
-  const { getOwnerAddress, useKDASelect } = useContract();
+  const { getOwnerAddress } = useContract();
 
   const walletAddress = getOwnerAddress();
 

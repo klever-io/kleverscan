@@ -26,8 +26,6 @@ import Withdraw from './Withdraw';
 export interface IContractProps {
   formKey: number;
   handleFormSubmit: (data: any) => Promise<void>;
-  metadata: string;
-  setMetadata: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export type SelectOption = {
@@ -35,60 +33,69 @@ export type SelectOption = {
   value: number;
 };
 
-export const getContract = (
-  contractName: string,
-  contractProps: IContractProps,
-): JSX.Element => {
-  switch (contractName) {
-    case 'TransferContract':
-      return <Transfer {...contractProps} />;
-    case 'FreezeContract':
-      return <Freeze {...contractProps} />;
-    case 'UnfreezeContract':
-      return <Unfreeze {...contractProps} />;
-    case 'DelegateContract':
-      return <Delegate {...contractProps} />;
-    case 'UndelegateContract':
-      return <Undelegate {...contractProps} />;
-    case 'ClaimContract':
-      return <Claim {...contractProps} />;
-    case 'WithdrawContract':
-      return <Withdraw {...contractProps} />;
-    case 'CreateAssetContract':
-      return <CreateAsset {...contractProps} />;
-    case 'AssetTriggerContract':
-      return <AssetTrigger {...contractProps} />;
-    case 'DepositContract':
-      return <Deposit {...contractProps} />;
-    case 'ConfigITOContract':
-      return <ConfigITO {...contractProps} />;
-    case 'ITOTriggerContract':
-      return <ITOTrigger {...contractProps} />;
-    case 'CreateMarketplaceContract':
-      return <CreateMarketplace {...contractProps} />;
-    case 'ConfigMarketplaceContract':
-      return <ConfigMarketplace {...contractProps} />;
-    case 'SellContract':
-      return <Sell {...contractProps} />;
-    case 'BuyContract':
-      return <Buy {...contractProps} />;
-    case 'CancelMarketOrderContract':
-      return <CancelMarketOrder {...contractProps} />;
-    case 'ProposalContract':
-      return <Proposal {...contractProps} />;
-    case 'VoteContract':
-      return <Vote {...contractProps} />;
-    case 'CreateValidatorContract':
-      return <CreateValidator {...contractProps} />;
-    case 'ValidatorConfigContract':
-      return <ConfigValidator {...contractProps} />;
-    case 'UnjailContract':
-      return <Unjail {...contractProps} />;
-    case 'SetAccountNameContract':
-      return <SetAccountName {...contractProps} />;
-    case 'UpdateAccountPermissionContract':
-      return <UpdateAccountPermission {...contractProps} />;
-    default:
-      return <></>;
-  }
+interface IRenderContractProps {
+  contractName: string;
+  contractProps: IContractProps;
+}
+
+export const RenderContract: React.FC<IRenderContractProps> = ({
+  contractName,
+  contractProps,
+}) => {
+  const getContractComponent = () => {
+    switch (contractName) {
+      case 'TransferContract':
+        return <Transfer {...contractProps} />;
+      case 'FreezeContract':
+        return <Freeze {...contractProps} />;
+      case 'UnfreezeContract':
+        return <Unfreeze {...contractProps} />;
+      case 'DelegateContract':
+        return <Delegate {...contractProps} />;
+      case 'UndelegateContract':
+        return <Undelegate {...contractProps} />;
+      case 'ClaimContract':
+        return <Claim {...contractProps} />;
+      case 'WithdrawContract':
+        return <Withdraw {...contractProps} />;
+      case 'CreateAssetContract':
+        return <CreateAsset {...contractProps} />;
+      case 'AssetTriggerContract':
+        return <AssetTrigger {...contractProps} />;
+      case 'DepositContract':
+        return <Deposit {...contractProps} />;
+      case 'ConfigITOContract':
+        return <ConfigITO {...contractProps} />;
+      case 'ITOTriggerContract':
+        return <ITOTrigger {...contractProps} />;
+      case 'CreateMarketplaceContract':
+        return <CreateMarketplace {...contractProps} />;
+      case 'ConfigMarketplaceContract':
+        return <ConfigMarketplace {...contractProps} />;
+      case 'SellContract':
+        return <Sell {...contractProps} />;
+      case 'BuyContract':
+        return <Buy {...contractProps} />;
+      case 'CancelMarketOrderContract':
+        return <CancelMarketOrder {...contractProps} />;
+      case 'ProposalContract':
+        return <Proposal {...contractProps} />;
+      case 'VoteContract':
+        return <Vote {...contractProps} />;
+      case 'CreateValidatorContract':
+        return <CreateValidator {...contractProps} />;
+      case 'ValidatorConfigContract':
+        return <ConfigValidator {...contractProps} />;
+      case 'UnjailContract':
+        return <Unjail {...contractProps} />;
+      case 'SetAccountNameContract':
+        return <SetAccountName {...contractProps} />;
+      case 'UpdateAccountPermissionContract':
+        return <UpdateAccountPermission {...contractProps} />;
+      default:
+        return <></>;
+    }
+  };
+
+  return getContractComponent();
 };

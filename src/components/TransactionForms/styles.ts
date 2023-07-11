@@ -14,10 +14,10 @@ interface ISpaceForm {
 export const FormBody = styled(Form)`
   display: flex;
   flex-direction: column;
+  gap: 1rem;
 `;
 
 export const FormSection = styled.div<{ inner?: boolean }>`
-  margin-top: 1rem;
   padding: 1.5rem;
   padding-top: 3rem;
   position: relative;

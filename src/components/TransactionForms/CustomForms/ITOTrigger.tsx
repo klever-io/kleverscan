@@ -1,6 +1,7 @@
 import { useContract } from '@/contexts/contract';
 import { ICollectionList } from '@/types';
 import { ITOTriggerTypes } from '@/utils/contracts';
+import { useKDASelect } from '@/utils/hooks/contract';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -25,7 +26,7 @@ const ITOTrigger: React.FC<IContractProps> = ({
   handleFormSubmit,
 }) => {
   const { handleSubmit, watch } = useFormContext<ITOTriggerData>();
-  const { getOwnerAddress, useKDASelect } = useContract();
+  const { getOwnerAddress } = useContract();
   const [collection, KDASelect] = useKDASelect();
 
   const triggerType = watch('triggerType');

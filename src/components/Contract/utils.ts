@@ -726,8 +726,10 @@ const contractsDescription = {
   SellContract: 'Sell tokens.',
   CreateMarketplaceContract: 'Create a new Marketplace.',
   ConfigMarketplaceContract: 'Change the parameters of a existing Marketplace.',
+  CancelMarketOrderContract: 'Cancel a sell order.',
   DepositContract: 'Deposit to a KDA Pool or FPR Pool.',
   ITOTriggerContract: 'Change the parameters of an ITO.',
+  UpdateAccountPermissionContract: 'Change the permissions of an account.',
 };
 
 // SDK mock while extension doesn't update
@@ -796,11 +798,7 @@ const buildTransaction = async (
 
   const fistContractType = contracts[0]?.type;
   const payloads = contracts.map(contract => {
-    if (contract.type != fistContractType) {
-      throw 'Multiple contracts of different types are not supported yet';
-    }
-
-    return contract.payload;
+    return { ...contract.payload, contractType: contract.type };
   });
 
   const nonce = options?.nonce

@@ -1,8 +1,5 @@
-import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
-import { useContract } from '@/contexts/contract';
-import api from '@/services/api';
+import { getParamsList } from '@/services/requests/proposals/proposals';
 import { IParamList } from '@/types';
-import { INetworkParam } from '@/types/proposals';
 import React from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
@@ -46,37 +43,8 @@ const parseProposal = (data: any): void => {
   data.parameters = parameters;
 };
 
-const getParamsList = async () => {
-  const { data } = await api.get({ route: 'network/network-parameters' });
-
-  let networkParams = {} as INetworkParam[];
-  const paramsList = [] as IParamList[];
-
-  if (data) {
-    networkParams = Object.keys(proposalsMessages).map((key, index) => {
-      return {
-        number: index,
-        parameter: proposalsMessages[key] ? proposalsMessages[key] : '',
-        currentValue: data.parameters[key].value,
-      };
-    });
-  }
-
-  networkParams.length &&
-    networkParams?.forEach((param: INetworkParam) => {
-      paramsList.push({
-        value: param.number,
-        label: `${param.parameter}: ${param.currentValue}`,
-        currentValue: param.currentValue,
-      });
-    });
-
-  return paramsList;
-};
-
 const Proposal: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   const { handleSubmit } = useFormContext<FormData>();
-  const {} = useContract();
 
   const { data: paramsList } = useQuery('paramsList', getParamsList);
 

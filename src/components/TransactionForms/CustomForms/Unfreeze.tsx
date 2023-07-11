@@ -1,4 +1,5 @@
 import { useContract } from '@/contexts/contract';
+import { useKDASelect } from '@/utils/hooks/contract';
 import { parseAddress } from '@/utils/parseValues';
 import React, { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -15,7 +16,7 @@ const Unfreeze: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   const [bucketsList, setBucketsList] = useState<any>([]);
 
   const { handleSubmit } = useFormContext<FormData>();
-  const { getAssets, useKDASelect } = useContract();
+  const { getAssets } = useContract();
   const [collection, KDASelect] = useKDASelect();
 
   const onSubmit = async (data: FormData) => {

@@ -1,4 +1,11 @@
+import { ArrowDown } from '@/assets/icons';
+import {
+  DetailsArrowContainer,
+  FeeContainer,
+  FeeDetailsContainer,
+} from '@/components/Form/styles';
 import { useContract } from '@/contexts/contract';
+import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useMobile } from '@/contexts/mobile';
 import React from 'react';
 import { FiPlus } from 'react-icons/fi';
@@ -13,24 +20,39 @@ import {
   Title,
 } from './styles';
 
-interface IMultiContract {
-  removeContractQueue: (elementIndex: number, e: any) => void;
-  editContract: (elementIndex: number) => void;
-}
+const FeeDetails: React.FC<{
+  isOpen: boolean;
+}> = ({ isOpen }) => {
+  const { totalBandwidthFees: bandwidthFee, totalKappFees: kappFee } =
+    useMulticontract();
 
-const MultiContract: React.FC<IMultiContract> = ({
-  editContract,
-  removeContractQueue,
-}) => {
+  return (
+    <FeeDetailsContainer open={isOpen}>
+      <span>{`${kappFee} KLV (KApp Fees)`}</span>+
+      <span>{`${bandwidthFee} KLV (Bandwidth Fees)`}</span>
+    </FeeDetailsContainer>
+  );
+};
+
+const MultiContract: React.FC = () => {
   const { isTablet } = useMobile();
+  const { submitForms } = useContract();
+
   const {
     queue,
-    selectedIndex,
-    showMultiContracts,
+    selectedId,
     addToQueue,
+    totalFees,
+    showMultiContracts,
     setShowMultiContracts,
-    submitForms,
-  } = useContract();
+    removeContractQueue,
+    editContract,
+  } = useMulticontract();
+  const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
+
+  const handleArrowDownClick = () => {
+    setIsDetailsOpen(!isDetailsOpen);
+  };
 
   return (
     <>
@@ -48,24 +70,24 @@ const MultiContract: React.FC<IMultiContract> = ({
             if (index < queue.length) {
               return (
                 <ContractItem
-                  key={item.elementIndex}
-                  selected={item.elementIndex === selectedIndex}
-                  onClick={() => editContract(item.elementIndex)}
+                  key={item.elementId}
+                  selected={item.elementId === selectedId}
+                  onClick={() => editContract(item.elementId)}
                 >
                   <Title>
-                    #{item.elementIndex + 1} - {item.contract}
+                    #{item.elementId + 1} - {item.contractName}
                   </Title>
 
                   {queue.length > 1 && (
                     <ButtonContainer>
                       <Button
                         primary
-                        onClick={() => editContract(item.elementIndex)}
+                        onClick={() => editContract(item.elementId)}
                       >
                         Edit
                       </Button>
                       <Button
-                        onClick={e => removeContractQueue(item.elementIndex, e)}
+                        onClick={e => removeContractQueue(item.elementId, e)}
                       >
                         Remove
                       </Button>
@@ -87,6 +109,19 @@ const MultiContract: React.FC<IMultiContract> = ({
             </Button>
           )}
         </ButtonsContainer>
+        <FeeContainer isMulticontract={true}>
+          <span>Estimated Fees: </span>
+          <span>
+            {totalFees.toFixed(6)} KLV{' '}
+            <DetailsArrowContainer
+              isOpen={isDetailsOpen}
+              onClick={() => handleArrowDownClick()}
+            >
+              <ArrowDown />
+            </DetailsArrowContainer>
+          </span>
+          <FeeDetails isOpen={isDetailsOpen} />
+        </FeeContainer>
       </ContainerQueue>
       <Background
         showMultiContractFull={isTablet && showMultiContracts}

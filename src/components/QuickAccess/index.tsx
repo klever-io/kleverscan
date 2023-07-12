@@ -11,9 +11,13 @@ import { CardItem, Container, IconSquarePlus, TitleContainer } from './styles';
 interface IShortCutContract {
   title: string;
   type: string;
+  openWiz?: () => void;
 }
 
-const QuickAccess: React.FC = () => {
+// TODO -> Check type for setWizard
+const QuickAccess: React.FC<{
+  setWizard: React.Dispatch<React.SetStateAction<any>>;
+}> = ({ setWizard }) => {
   const [contractType, setContractType] = useState('');
   const [openModalTransactions, setOpenModalTransactions] = useState(false);
   const [titleModal, setTitleModal] = useState('');
@@ -25,7 +29,16 @@ const QuickAccess: React.FC = () => {
 
   const quickAccessContract: IShortCutContract[] = [
     { title: 'Transfer', type: 'TransferContract' },
-    { title: 'Create Asset', type: 'CreateAssetContract' },
+    {
+      title: 'Create Token',
+      type: 'CreateAssetContract',
+      openWiz: () => setWizard('Token'),
+    },
+    {
+      title: 'Create NFT',
+      type: 'CreateAssetContract',
+      openWiz: () => setWizard('NFT'),
+    },
     { title: 'Create ITO', type: 'ConfigITOContract' },
     { title: 'Freeze', type: 'FreezeContract' },
     { title: 'Vote', type: 'VoteContract' },
@@ -44,6 +57,10 @@ const QuickAccess: React.FC = () => {
   const handleClick = (contract: IShortCutContract, e: any) => {
     if (!extensionInstalled) {
       setOpenDrawer(true);
+      return;
+    }
+    if (contract.openWiz) {
+      contract.openWiz();
       return;
     }
     setContractType(contract.type);

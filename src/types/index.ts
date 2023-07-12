@@ -359,6 +359,13 @@ export interface IAssetsHoldersResponse extends IResponse {
   pagination: IPagination;
 }
 
+export interface ISplitRoyalties {
+  address: string;
+  percentITOFixed: number;
+  percentITOPercentage: number;
+  percentTransferPercentage: number;
+}
+
 export interface IRoyalties {
   address?: string;
   marketPercentage?: number;
@@ -371,6 +378,7 @@ export interface IRoyalties {
   ];
   itoPercentage?: number;
   itoFixed?: number;
+  splitRoyalties?: ISplitRoyalties[];
 }
 
 export interface IRole {

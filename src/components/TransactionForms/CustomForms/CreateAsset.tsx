@@ -453,18 +453,21 @@ export const StakingSection: React.FC<IStakingSectionProps> = ({
         name="staking.minEpochsToClaim"
         title="Min Epochs to Claim"
         type="number"
+        precision={0}
         tooltip={tooltip.staking.minEpochsToClaim}
       />
       <FormInput
         name="staking.minEpochsToUnstake"
         title="Min Epochs to Unstake"
         type="number"
+        precision={0}
         tooltip={tooltip.staking.minEpochsToUnstake}
       />
       <FormInput
         name="staking.minEpochsToWithdraw"
         title="Min Epochs to Withdraw"
         type="number"
+        precision={0}
         tooltip={tooltip.staking.minEpochsToWithdraw}
       />
     </FormSection>

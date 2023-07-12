@@ -1,5 +1,5 @@
 import { IPackItem } from '@/types/contracts';
-import { ICollectionList } from '@/types/index';
+import { ICollectionList, ISplitRoyalties } from '@/types/index';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { getPrecision } from '@/utils/precisionFunctions';
 import {
@@ -66,8 +66,8 @@ const parsePackInfoPrecision = async (payload: any) => {
       const packPricePrecision = (await getPrecision(key)) as number;
       if (packPricePrecision !== undefined) {
         packs.forEach((pack: IPackItem) => {
-          pack.price = pack.price * 10 ** packPricePrecision;
-          pack.amount = pack.amount * 10 ** packAmountPrecision;
+          pack.price = addPrecision(pack.price, packPricePrecision);
+          pack.amount = addPrecision(pack.amount, packAmountPrecision);
         });
       } else return;
     }
@@ -81,8 +81,10 @@ const parseWhitelistInfoPrecision = async (payload: any) => {
     Object.values(payload.whitelistInfo).forEach(
       async (whitelistInfoRequest: any) => {
         if (assetPrecision !== undefined) {
-          whitelistInfoRequest.limit =
-            whitelistInfoRequest.limit * 10 ** assetPrecision;
+          whitelistInfoRequest.limit = addPrecision(
+            whitelistInfoRequest.limit,
+            assetPrecision,
+          );
         } else return;
       },
     );
@@ -103,6 +105,10 @@ const parseSplitRoyaltiesPrecision = async (payload: any) => {
   );
 };
 
+const addPrecision = (value: number, precision: number) => {
+  return Math.round(value * 10 ** precision);
+};
+
 const precisionParse = async (
   payload: { [key: string]: any },
   contractType: string,
@@ -110,9 +116,6 @@ const precisionParse = async (
   let precision: number;
   let assetId = 'KLV';
   const percentagePrecision = 2;
-  const addPrecision = (value: number, precision: number) => {
-    return value * 10 ** precision;
-  };
   const addFieldPrecision = async (
     fieldName: string,
     precisionField: string,
@@ -198,7 +201,22 @@ const precisionParse = async (
       break;
     case 'CreateAssetContract':
       precision = payload.precision || 0;
-
+      if (payload?.royalties?.splitRoyalties) {
+        payload.royalties.splitRoyalties.forEach((royalty: ISplitRoyalties) => {
+          if (royalty.percentITOPercentage) {
+            royalty.percentITOPercentage = addPrecision(
+              royalty.percentITOPercentage,
+              percentagePrecision,
+            );
+          }
+          if (royalty.percentITOFixed) {
+            royalty.percentITOFixed = addPrecision(
+              royalty.percentITOFixed,
+              percentagePrecision,
+            );
+          }
+        });
+      }
       payload.initialSupply = addPrecision(payload.initialSupply, precision);
 
       payload.maxSupply = addPrecision(payload.maxSupply, precision);

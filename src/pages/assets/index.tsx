@@ -59,6 +59,7 @@ const Assets: React.FC = () => {
       inputType: 'button',
       current: (router.query.type as string) || undefined,
       loading,
+      isHiddenInput: false,
     },
   ];
 

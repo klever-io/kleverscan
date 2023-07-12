@@ -459,6 +459,7 @@ const Account: React.FC<IAccountPage> = () => {
       current: filterName(),
       overFlow: 'visible',
       inputType: 'button',
+      isHiddenInput: false,
     },
   ];
 

@@ -36,6 +36,7 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
       data: ['Active', 'Approved', 'Denied'],
       onClick: selected => filterProposals(selected),
       current: router?.query?.status as string,
+      isHiddenInput: false,
     },
   ];
 

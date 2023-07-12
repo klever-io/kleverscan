@@ -72,6 +72,7 @@ const TransactionsFilters: React.FC<ITransactionsFilters> = ({
       data: status,
       onClick: selected => handleSelected(selected, 'status'),
       current: query.status as string | undefined,
+      isHiddenInput: false,
     },
     {
       title: 'Contract',

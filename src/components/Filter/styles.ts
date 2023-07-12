@@ -187,12 +187,18 @@ export const Item = styled.div<{ selected: boolean }>`
   }
 `;
 
-export const HiddenInput = styled.input<{ show: boolean }>`
+export const HiddenInput = styled.input<{
+  show: boolean;
+  isHiddenInput: boolean;
+}>`
   width: 100%;
   position: absolute;
   visibility: ${props => (props.show ? 'visible' : 'hidden')};
   caret-color: ${props => props.theme.black};
   color: ${props => props.theme.black};
+  &:hover {
+    cursor: ${props => (props.isHiddenInput ? 'text' : 'pointer')};
+  }
 `;
 
 export const ArrowDownContainer = styled.div`

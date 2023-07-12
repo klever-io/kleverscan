@@ -286,6 +286,7 @@ const ITOsPage: React.FC = () => {
       },
       current: getActive(),
       inputType: 'button',
+      isHiddenInput: false,
     },
   ];
   const ITOTable = () => {

@@ -27,6 +27,7 @@ export interface IFilter {
   current: string | undefined;
   loading?: boolean;
   disabledInput?: boolean;
+  isHiddenInput?: boolean;
 }
 
 const Filter: React.FC<IFilter> = ({
@@ -40,6 +41,7 @@ const Filter: React.FC<IFilter> = ({
   inputType = 'text',
   loading,
   disabledInput,
+  isHiddenInput = true,
 }) => {
   const allItem = firstItem || 'All';
   const [selected, setSelected] = useState(current || allItem);
@@ -63,6 +65,9 @@ const Filter: React.FC<IFilter> = ({
       });
 
       focusRef.current?.focus();
+    }
+    if (focus && !isHiddenInput) {
+      closeDropDown();
     }
   };
 
@@ -169,6 +174,7 @@ const Filter: React.FC<IFilter> = ({
             show={focus}
             placeholder={getPlaceholder()}
             onChange={handleChange}
+            isHiddenInput={isHiddenInput}
           />
         )}
         <span style={{ overflow: overFlow ? overFlow : 'hidden' }}>

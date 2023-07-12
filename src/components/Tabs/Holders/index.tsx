@@ -105,6 +105,7 @@ const Holders: React.FC<IHolders> = ({
       },
       current: holderQuery as string | undefined,
       inputType: 'button',
+      isHiddenInput: false,
     },
   ];
 

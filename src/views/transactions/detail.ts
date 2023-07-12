@@ -46,42 +46,17 @@ export const CardContent = styled.div`
 `;
 
 export const Row = styled(DefaultRow)`
-  .accordion-disabled {
-    display: flex;
-    color: black;
-    cursor: pointer;
-    width: 100%;
-    text-align: left;
-    border: none;
-    outline: none;
-    transition: 0.4s;
-  }
-  .accordionHeader {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-  }
-  .accordion-active {
-    display: flex;
-    flex-direction: column;
-    cursor: pointer;
-    width: 100%;
-    text-align: left;
-    border: none;
-    outline: none;
-    transition: 0.4s;
-    .icon {
-      transform: rotate(45deg);
-    }
-  }
-
-  /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
-
-  /* Style the accordion panel. Note: hidden by default */
-
+  display: inline-flex;
+  word-break: break-word;
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    flex-direction: column;
-    align-items: flex-start;
+    display: grid;
+    gap: 0.3rem;
+    grid-template-rows: repeat(auto-fit, minmax(10px, 1fr));
+    justify-items: start;
+
+    div:nth-child(2) {
+      grid-row: 3;
+    }
   }
 `;
 
@@ -116,17 +91,22 @@ export const ExpandCenteredRow: StyledComponent<
   { openJson?: boolean | undefined },
   never
 > = styled(DefaultCenteredRow)<{ openJson?: boolean }>`
-  align-items: flex-start !important;
+  display: flex;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   justify-content: space-between;
+  span {
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   ${props =>
     props.openJson &&
     css`
-      align-items: normal;
-
       span {
-        align-self: normal;
         white-space: normal;
-        word-break: break-all;
       }
     `};
 `;
@@ -135,13 +115,13 @@ export const DivDataJson = styled.div`
   overflow: auto;
   position: relative;
   span {
-    min-width: auto !important;
+    min-width: auto;
   }
 `;
 export const IconsWrapper = styled.div`
   display: flex;
   justify-content: center;
-
+  align-self: start !important;
   svg {
     margin-top: 0.25rem;
   }
@@ -149,11 +129,11 @@ export const IconsWrapper = styled.div`
 
 export const ButtonExpand = styled.button`
   color: ${props => props.theme.true.white};
+  margin-left: 0.2rem;
   margin-right: 0.3rem;
   text-align: center;
   width: 5.5rem;
   height: 2rem;
-  padding: 0.4rem;
   border-radius: 0.3rem;
   background-color: ${props => props.theme.purple};
   border: 1px solid ${props => props.theme.purple};

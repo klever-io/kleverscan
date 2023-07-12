@@ -589,6 +589,7 @@ export interface IContract {
 
 export interface IIndexedContract extends IContract {
   contractIndex: number;
+  renderMetadata: () => JSX.Element | null;
   filteredReceipts: IReceipt[];
 }
 
@@ -597,6 +598,7 @@ export interface IContractBuyProps extends IContract {
   contractIndex: number;
   filteredReceipts: IReceipt[];
   contracts: IBuyContract[];
+  renderMetadata: () => JSX.Element | null;
 }
 
 export enum ContractsRecipesTypes {

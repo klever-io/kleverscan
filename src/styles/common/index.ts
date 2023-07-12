@@ -190,7 +190,6 @@ export const Row = styled.div<{ isAddressRow?: boolean }>`
   }
 
   span {
-    display: flex;
     width: fit-content;
     max-width: 100%;
 

@@ -41,7 +41,6 @@ import {
   Container,
   Header,
   Row,
-  RowContent,
 } from '@/styles/common';
 import { ITransactionPage, ITransactionResponse } from '@/types';
 import { IBlockResponse } from '@/types/blocks';
@@ -51,7 +50,6 @@ import { filterReceipts } from '@/utils/findKey';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import { parseJson } from '@/utils/parseValues';
 import { getPrecision } from '@/utils/precisionFunctions';
-import { BalanceContainer } from '@/views/accounts/detail';
 import {
   ButtonExpand,
   CardContainer,
@@ -59,12 +57,12 @@ import {
   CenteredRow,
   DivDataJson,
   ExpandCenteredRow,
-  FrozenContainer,
   Hr,
   IconsWrapper,
   KappFeeFailedTx,
   KappFeeSpan,
   KdaFeeSpan,
+  Row as DetailRow,
 } from '@/views/transactions/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { GetStaticPaths, GetStaticProps } from 'next';
@@ -114,39 +112,30 @@ const Transaction: React.FC<ITransactionPage> = props => {
     setExpandData(newArray);
   };
 
-  const renderMetadata = () => {
-    if (!data || data.length === 0) {
-      return null;
-    }
-    if (data.length === 1) {
-      return renderOneMetadata(data, 0);
-    }
-    return renderAllMetadata(data);
-  };
-
-  const renderAllMetadata = (data: string[]) => {
-    return data.map((_, index) => (
-      <FrozenContainer key={index}>
-        {renderOneMetadata(data, index)}
-      </FrozenContainer>
-    ));
-  };
-
-  const renderOneMetadata = (data: string[], index: number) => {
+  const renderMetadata = (
+    data: string[] | undefined,
+    index: number,
+  ): JSX.Element | null => {
+    if (!data || (data && !data[index])) return null;
     return (
-      <ExpandCenteredRow openJson={expandData[index]}>
-        {renderMetadataContent(data[index], index)}
+      <DetailRow>
+        <span>
+          <strong>Metadata</strong>
+        </span>
+        <ExpandCenteredRow openJson={expandData[index]}>
+          {processMetadata(data[index], index)}
+        </ExpandCenteredRow>
         <IconsWrapper>
           <ButtonExpand onClick={() => updateExpandArray(index)}>
             {expandData[index] ? 'Hide' : 'Expand'}
           </ButtonExpand>
           <Copy data={hexToString(data[index])} info="Data" />
         </IconsWrapper>
-      </ExpandCenteredRow>
+      </DetailRow>
     );
   };
 
-  const renderMetadataContent = (data: string, index: number) => {
+  const processMetadata = (data: string, index: number) => {
     const formatData = (hexData: any) => <span>{hexToString(hexData)}</span>;
 
     if (expandData[index]) {
@@ -187,6 +176,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -199,6 +189,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -210,6 +201,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -221,6 +213,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -232,6 +225,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -243,6 +237,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -254,6 +249,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -265,6 +261,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -276,6 +273,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -287,6 +285,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -298,6 +297,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -309,6 +309,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -320,6 +321,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -331,6 +333,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -342,6 +345,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -353,6 +357,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -364,6 +369,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -377,6 +383,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     filteredReceipts={filteredReceipts}
                     sender={sender}
                     contracts={contracts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -388,6 +395,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -399,6 +407,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -409,6 +418,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   <CreateMarketplace
                     {...contract}
                     contractIndex={index}
+                    renderMetadata={() => renderMetadata(data, index)}
                     filteredReceipts={filteredReceipts}
                   />
                   {index < contracts.length - 1 && <Hr />}
@@ -421,6 +431,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -432,6 +443,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -443,6 +455,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -454,6 +467,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     {...contract}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
+                    renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
                 </div>
@@ -641,17 +655,6 @@ const Transaction: React.FC<ITransactionPage> = props => {
               <Copy data={signature} info="Signature" />
             </CenteredRow>
           </Row>
-          {((data && data.length > 1) ||
-            (data?.length === 1 && data[0] !== '')) && (
-            <Row>
-              <span>
-                <strong>Data</strong>
-              </span>
-              <RowContent>
-                <BalanceContainer>{renderMetadata()}</BalanceContainer>
-              </RowContent>
-            </Row>
-          )}
         </CardContent>
       </CardContainer>
       <CardContainer>

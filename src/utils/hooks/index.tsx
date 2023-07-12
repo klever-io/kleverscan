@@ -92,7 +92,7 @@ export const useFetchPartial = <T,>(
         route: `${route}`,
         query: { limit: 10 },
       });
-      setItems([...(response?.data[type] || []), ...itemsSearch]);
+      setItems([...(response?.data?.[type] || []), ...itemsSearch]);
     } else {
       setItems([...itemsSearch]);
     }

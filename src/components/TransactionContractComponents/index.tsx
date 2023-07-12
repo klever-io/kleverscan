@@ -94,7 +94,10 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import Tooltip from '../Tooltip';
 
-export const Transfer: React.FC<IIndexedContract> = ({ parameter: par }) => {
+export const Transfer: React.FC<IIndexedContract> = ({
+  parameter: par,
+  renderMetadata,
+}) => {
   const parameter = par as ITransferContract;
   const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
   const precision = usePrecision(assetID);
@@ -185,6 +188,7 @@ export const Transfer: React.FC<IIndexedContract> = ({ parameter: par }) => {
           </CenteredRow>
         </span>
       </Row>
+      {renderMetadata()}
     </>
   );
 };
@@ -194,6 +198,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
   parameter: par,
   filteredReceipts: rec,
   contractIndex,
+  renderMetadata,
 }) => {
   const parameter = par as ICreateAssetContract;
   const filteredReceipts = rec as ICreateAssetReceipt[];
@@ -516,6 +521,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
           </Panel>
         )}
       </ExpandRow>
+      {renderMetadata()}
     </>
   );
 };
@@ -523,6 +529,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
 export const CreateValidator: React.FC<IIndexedContract> = ({
   sender,
   parameter: par,
+  renderMetadata,
 }) => {
   const parameter = par as ICreateValidatorContract;
   const ownerAddress = parameter?.ownerAddress || sender;
@@ -604,12 +611,14 @@ export const CreateValidator: React.FC<IIndexedContract> = ({
           </CenteredRow>
         </span>
       </Row>
+      {renderMetadata()}
     </>
   );
 };
 
 export const ValidatorConfig: React.FC<IIndexedContract> = ({
   parameter: par,
+  renderMetadata,
 }) => {
   const param = par as unknown as IValidatorConfigContract;
   const parameter = param.config;
@@ -706,6 +715,7 @@ export const ValidatorConfig: React.FC<IIndexedContract> = ({
           </BalanceContainer>
         </RowContent>
       </Row>
+      {renderMetadata()}
     </>
   );
 };
@@ -714,6 +724,7 @@ export const Freeze: React.FC<IIndexedContract> = ({
   parameter: par,
   contractIndex,
   filteredReceipts: rec,
+  renderMetadata,
 }) => {
   const parameter = par as IFreezeContract;
   const filteredReceipts = rec as IFreezeReceipt[];
@@ -757,6 +768,7 @@ export const Freeze: React.FC<IIndexedContract> = ({
           <span>{freezeReceipt?.bucketId}</span>
         </Row>
       )}
+      {renderMetadata()}
     </>
   );
 };
@@ -765,6 +777,7 @@ export const Unfreeze: React.FC<IIndexedContract> = ({
   parameter: par,
   contractIndex,
   filteredReceipts: rec,
+  renderMetadata,
 }) => {
   const parameter = par as IUnfreezeContract;
   const filteredReceipts = rec as IUnfreezeReceipt[];
@@ -843,12 +856,15 @@ export const Unfreeze: React.FC<IIndexedContract> = ({
         </span>
         <span>{undelegateReceipt ? 'True' : 'False'}</span>
       </Row>
+      {renderMetadata()}
     </>
   );
 };
 export const Delegate: React.FC<IIndexedContract> = ({
   parameter: par,
   filteredReceipts,
+  contractIndex,
+  renderMetadata,
 }) => {
   const parameter = par as IDelegateContract;
   const delegateReceipt = findReceipt(filteredReceipts, 7) as
@@ -927,6 +943,7 @@ export const Delegate: React.FC<IIndexedContract> = ({
           </span>
         </Row>
       )}
+      {renderMetadata()}
     </>
   );
 };
@@ -935,6 +952,7 @@ export const Undelegate: React.FC<IIndexedContract> = ({
   parameter: par,
   filteredReceipts,
   contractIndex,
+  renderMetadata,
 }) => {
   const parameter = par as IUndelegateContract;
   const undelegateReceipt = findReceipt(filteredReceipts, 7) as
@@ -998,6 +1016,7 @@ export const Undelegate: React.FC<IIndexedContract> = ({
           </span>
         </Row>
       )}
+      {renderMetadata()}
     </>
   );
 };
@@ -1005,6 +1024,8 @@ export const Undelegate: React.FC<IIndexedContract> = ({
 export const Withdraw: React.FC<IIndexedContract> = ({
   parameter: par,
   filteredReceipts,
+  contractIndex,
+  renderMetadata,
 }) => {
   const parameter = par as IWithdrawContract;
 
@@ -1065,6 +1086,7 @@ export const Withdraw: React.FC<IIndexedContract> = ({
           </span>
         </Row>
       )}
+      {renderMetadata()}
     </>
   );
 };
@@ -1072,6 +1094,7 @@ export const Withdraw: React.FC<IIndexedContract> = ({
 export const Claim: React.FC<IIndexedContract> = ({
   parameter: par,
   filteredReceipts,
+  renderMetadata,
 }) => {
   const parameter = par as IClaimContract;
   const claimReceipt = findReceipt(filteredReceipts, 17) as
@@ -1116,7 +1139,7 @@ export const Claim: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Unjail: React.FC<IIndexedContract> = () => {
+export const Unjail: React.FC<IIndexedContract> = ({ renderMetadata }) => {
   return (
     <>
       <Row>
@@ -1125,12 +1148,14 @@ export const Unjail: React.FC<IIndexedContract> = () => {
         </span>
         <strong>Unjail</strong>
       </Row>
+      {renderMetadata()}
     </>
   );
 };
 
 export const AssetTrigger: React.FC<IIndexedContract> = ({
   parameter: par,
+  renderMetadata,
 }) => {
   const parameter = par as IAssetTriggerContract;
   const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
@@ -1157,12 +1182,14 @@ export const AssetTrigger: React.FC<IIndexedContract> = ({
         <span>{parameter?.assetId}</span>
       </Row>
       {renderAssetTriggerTypeData(parameter, precision)}
+      {renderMetadata()}
     </>
   );
 };
 
 export const SetAccountName: React.FC<IIndexedContract> = ({
   parameter: par,
+  renderMetadata,
 }) => {
   const parameter = par as ISetAccountNameContract;
 
@@ -1180,6 +1207,7 @@ export const SetAccountName: React.FC<IIndexedContract> = ({
         </span>
         <span>{parameter?.name}</span>
       </Row>
+      {renderMetadata()}
     </>
   );
 };
@@ -1187,6 +1215,8 @@ export const SetAccountName: React.FC<IIndexedContract> = ({
 export const Proposal: React.FC<IIndexedContract> = ({
   parameter: par,
   filteredReceipts,
+  contractIndex,
+  renderMetadata,
 }) => {
   const parameter = par as IProposalContract;
   const parameters = getProposalNetworkParams(parameter?.parameters);
@@ -1239,11 +1269,15 @@ export const Proposal: React.FC<IIndexedContract> = ({
           </BalanceContainer>
         </RowContent>
       </Row>
+      {renderMetadata()}
     </>
   );
 };
 
-export const Vote: React.FC<IIndexedContract> = ({ parameter: par }) => {
+export const Vote: React.FC<IIndexedContract> = ({
+  parameter: par,
+  renderMetadata,
+}) => {
   const parameter = par as IVoteContract;
 
   return (
@@ -1272,11 +1306,15 @@ export const Vote: React.FC<IIndexedContract> = ({ parameter: par }) => {
         </span>
         <span>{parameter?.type}</span>
       </Row>
+      {renderMetadata()}
     </>
   );
 };
 
-export const ConfigITO: React.FC<IIndexedContract> = ({ parameter: par }) => {
+export const ConfigITO: React.FC<IIndexedContract> = ({
+  parameter: par,
+  renderMetadata,
+}) => {
   const parameter = par as IConfigITOContract;
   const assetId = parameter?.assetId?.split('/')[0] || 'KLV';
   const precision = usePrecision(assetId);
@@ -1333,12 +1371,14 @@ export const ConfigITO: React.FC<IIndexedContract> = ({ parameter: par }) => {
           packsPrecision,
           renderPackPrecision,
         )}
+      {renderMetadata()}
     </>
   );
 };
 
 export const SetITOPrices: React.FC<IIndexedContract> = ({
   parameter: par,
+  renderMetadata,
 }) => {
   const parameter = par as ISetITOPricesContract;
   const assetId = parameter?.assetId?.split('/')[0] || 'KLV';
@@ -1368,6 +1408,7 @@ export const SetITOPrices: React.FC<IIndexedContract> = ({
           packsPrecision,
           renderPackPrecision,
         )}
+      {renderMetadata()}
     </>
   );
 };
@@ -1376,6 +1417,8 @@ export const Buy: React.FC<IContractBuyProps> = ({
   parameter: par,
   filteredReceipts: rec,
   sender,
+  contractIndex,
+  renderMetadata,
 }) => {
   const parameter = par as IBuyContractPayload;
   const filteredReceipts = rec as IBuyReceipt[];
@@ -1670,6 +1713,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
         <span>{buyType}</span>
       </Row>
       {renderBuyTypeData()}
+      {renderMetadata()}
     </>
   );
 };
@@ -1677,6 +1721,8 @@ export const Buy: React.FC<IContractBuyProps> = ({
 export const Sell: React.FC<IIndexedContract> = ({
   parameter: par,
   filteredReceipts,
+  contractIndex,
+  renderMetadata,
 }) => {
   const parameter = par as ISellContract;
   const precision = usePrecision(parameter?.currencyID || 'KLV');
@@ -1766,6 +1812,7 @@ export const Sell: React.FC<IIndexedContract> = ({
           {parameter?.endTime ? formatDate(parameter?.endTime * 1000) : '--'}
         </span>
       </Row>
+      {renderMetadata()}
     </>
   );
 };
@@ -1773,6 +1820,8 @@ export const Sell: React.FC<IIndexedContract> = ({
 export const CancelMarketOrder: React.FC<IIndexedContract> = ({
   parameter: par,
   filteredReceipts,
+  contractIndex,
+  renderMetadata,
 }) => {
   const parameter = par as ICancelMarketOrderContract;
   const kAppTransferReceipt = findReceipt(
@@ -1815,6 +1864,7 @@ export const CancelMarketOrder: React.FC<IIndexedContract> = ({
           </Row>
         </>
       )}
+      {renderMetadata()}
     </>
   );
 };
@@ -1822,6 +1872,8 @@ export const CancelMarketOrder: React.FC<IIndexedContract> = ({
 export const CreateMarketplace: React.FC<IIndexedContract> = ({
   parameter: par,
   filteredReceipts,
+  contractIndex,
+  renderMetadata,
 }) => {
   const parameter = par as ICreateMarketplaceContract;
   const createMarketplaceReceipt = findReceipt(
@@ -1866,12 +1918,14 @@ export const CreateMarketplace: React.FC<IIndexedContract> = ({
             : '--'}
         </span>
       </Row>
+      {renderMetadata()}
     </>
   );
 };
 
 export const ConfigMarketplace: React.FC<IIndexedContract> = ({
   parameter: par,
+  renderMetadata,
 }) => {
   const parameter = par as IConfigMarketplaceContract;
 
@@ -1911,12 +1965,14 @@ export const ConfigMarketplace: React.FC<IIndexedContract> = ({
             : '--'}
         </span>
       </Row>
+      {renderMetadata()}
     </>
   );
 };
 
 export const UpdateAccountPermission: React.FC<IIndexedContract> = ({
   parameter: par,
+  renderMetadata,
 }) => {
   const parameter = par as IUpdateAccountPermissionContract;
   const permission = parameter?.permissions[0];
@@ -1993,11 +2049,15 @@ export const UpdateAccountPermission: React.FC<IIndexedContract> = ({
           </BalanceContainer>
         </RowContent>
       </Row>
+      {renderMetadata()}
     </>
   );
 };
 
-export const Deposit: React.FC<IIndexedContract> = ({ parameter: par }) => {
+export const Deposit: React.FC<IIndexedContract> = ({
+  parameter: par,
+  renderMetadata,
+}) => {
   const parameter = par as IDepositContract;
   const precision = usePrecision(parameter?.currencyID || 'KLV');
 
@@ -2033,11 +2093,15 @@ export const Deposit: React.FC<IIndexedContract> = ({ parameter: par }) => {
         </span>
         <span>{parameter?.currencyID}</span>
       </Row>
+      {renderMetadata()}
     </>
   );
 };
 
-export const ITOTrigger: React.FC<IIndexedContract> = ({ parameter: par }) => {
+export const ITOTrigger: React.FC<IIndexedContract> = ({
+  parameter: par,
+  renderMetadata,
+}) => {
   const parameter = par as IITOTriggerContract;
   const precision = usePrecision(parameter?.assetId || 'KLV');
   const whitelistInfo = parameter?.whitelistInfo || [];
@@ -2230,6 +2294,7 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({ parameter: par }) => {
         <span>{parameter?.assetId}</span>
       </Row>
       {renderTriggerTypeData()}
+      {renderMetadata()}
     </>
   );
 };

@@ -59,6 +59,7 @@ describe('Component: TransactionContractComponents', () => {
             {...mockedTxContractComponents.transferContract}
             precision={precision}
             asset={klvAsset}
+            renderMetadata={() => renderMetadata(undefined, 0)}
           />,
         );
       });
@@ -87,7 +88,10 @@ describe('Component: TransactionContractComponents', () => {
 
     it('Should match the styles of the rows', () => {
       renderWithTheme(
-        <Transfer {...mockedTxContractComponents.transferContract} />,
+        <Transfer
+          {...mockedTxContractComponents.transferContract}
+          renderMetadata={() => renderMetadata(undefined, 0)}
+        />,
       );
       const row = screen.getByText(/Amount/i).parentNode?.parentNode;
       const rowSpan = row?.firstChild;
@@ -135,6 +139,7 @@ describe('Component: TransactionContractComponents', () => {
           filteredReceipts={createAsset1.receipts}
           contractIndex={0}
           precision={precision}
+          renderMetadata={() => renderMetadata(undefined, 0)}
         />,
       );
 
@@ -194,6 +199,7 @@ describe('Component: TransactionContractComponents', () => {
       renderWithTheme(
         <CreateValidator
           {...mockedTxContractComponents.createValidatorContract}
+          renderMetadata={() => renderMetadata(undefined, 0)}
         />,
       );
       const {
@@ -255,6 +261,7 @@ describe('Component: TransactionContractComponents', () => {
             filteredReceipts={freeze1.receipts}
             parameter={freeze1.contract[0].parameter}
             contractIndex={0}
+            renderMetadata={() => renderMetadata(undefined, 0)}
           />,
         );
       });
@@ -292,6 +299,7 @@ describe('Component: TransactionContractComponents', () => {
             filteredReceipts={unfreeze1.receipts}
             parameter={unfreeze1.contract[0].parameter}
             contractIndex={0}
+            renderMetadata={() => renderMetadata(undefined, 0)}
           />,
         );
       });
@@ -321,6 +329,7 @@ describe('Component: TransactionContractComponents', () => {
         <Delegate
           {...mockedTxContractComponents.delegateContract}
           filteredReceipts={[]}
+          renderMetadata={() => renderMetadata(undefined, 0)}
         />,
       );
 
@@ -345,6 +354,7 @@ describe('Component: TransactionContractComponents', () => {
         <Undelegate
           {...mockedTxContractComponents.undelegateContract}
           filteredReceipts={[]}
+          renderMetadata={() => renderMetadata(undefined, 0)}
         />,
       );
 
@@ -367,6 +377,7 @@ describe('Component: TransactionContractComponents', () => {
         <Withdraw
           {...mockedTxContractComponents.widthdrawContract}
           filteredReceipts={[]}
+          renderMetadata={() => renderMetadata(undefined, 0)}
         />,
       );
 
@@ -393,6 +404,7 @@ describe('Component: TransactionContractComponents', () => {
             {...claim1}
             filteredReceipts={claim1.receipts}
             parameter={claim1.contract[0].parameter}
+            renderMetadata={() => renderMetadata(undefined, 0)}
           />,
         );
       });
@@ -426,6 +438,7 @@ describe('Component: TransactionContractComponents', () => {
         <Unjail
           {...mockedTxContractComponents.unjailContract}
           filteredReceipts={[]}
+          renderMetadata={() => renderMetadata(undefined, 0)}
         />,
       );
       const typeLabel = screen.getByText(/Type/i);
@@ -441,6 +454,7 @@ describe('Component: TransactionContractComponents', () => {
         <Proposal
           {...mockedTxContractComponents.proposalContract}
           filteredReceipts={[]}
+          renderMetadata={() => renderMetadata(undefined, 0)}
         />,
       );
 
@@ -466,6 +480,7 @@ describe('Component: TransactionContractComponents', () => {
         <Vote
           {...mockedTxContractComponents.voteContract}
           filteredReceipts={[]}
+          renderMetadata={() => renderMetadata(undefined, 0)}
         />,
       );
 
@@ -491,6 +506,7 @@ describe('Component: TransactionContractComponents', () => {
         <ConfigITO
           {...mockedTxContractComponents.configIcoContract}
           filteredReceipts={[]}
+          renderMetadata={() => renderMetadata(undefined, 0)}
         />,
       );
 
@@ -518,6 +534,7 @@ describe('Component: TransactionContractComponents', () => {
         <SetITOPrices
           {...mockedTxContractComponents.setIcoPricesContract}
           filteredReceipts={[]}
+          renderMetadata={() => renderMetadata(undefined, 0)}
         />,
       );
 
@@ -556,6 +573,7 @@ describe('Component: TransactionContractComponents', () => {
             contracts={marketbuy1.contract}
             parameter={marketbuy1.contract[0].parameter}
             contractIndex={0}
+            renderMetadata={() => renderMetadata(undefined, 0)}
           />,
         );
       });
@@ -614,6 +632,7 @@ describe('Component: TransactionContractComponents', () => {
           <Sell
             {...mockedTxContractComponents.sellContract}
             filteredReceipts={[]}
+            renderMetadata={() => renderMetadata(undefined, 0)}
           />,
         );
       });
@@ -646,6 +665,7 @@ describe('Component: TransactionContractComponents', () => {
         <CancelMarketOrder
           {...mockedTxContractComponents.cancelMarketOrderContract}
           filteredReceipts={[]}
+          renderMetadata={() => renderMetadata(undefined, 0)}
         />,
       );
 
@@ -667,6 +687,7 @@ describe('Component: TransactionContractComponents', () => {
         <CreateMarketplace
           {...mockedTxContractComponents.createMarketplaceContract}
           filteredReceipts={[]}
+          renderMetadata={() => renderMetadata(undefined, 0)}
         />,
       );
 
@@ -694,6 +715,7 @@ describe('Component: TransactionContractComponents', () => {
         <ConfigMarketplace
           {...mockedTxContractComponents.configMarketplaceContract}
           filteredReceipts={[]}
+          renderMetadata={() => renderMetadata(undefined, 0)}
         />,
       );
 
@@ -725,6 +747,7 @@ describe('Component: TransactionContractComponents', () => {
         <ValidatorConfig
           {...mockedTxContractComponents.validatorConfigContract}
           filteredReceipts={[]}
+          renderMetadata={() => renderMetadata(undefined, 0)}
         />,
       );
 
@@ -743,6 +766,7 @@ describe('Component: TransactionContractComponents', () => {
         <AssetTrigger
           {...mockedTxContractComponents.assetTriggerContract}
           filteredReceipts={[]}
+          renderMetadata={() => renderMetadata(undefined, 0)}
         />,
       );
 
@@ -760,6 +784,7 @@ describe('Component: TransactionContractComponents', () => {
         <SetAccountName
           {...mockedTxContractComponents.setAccountNameContract}
           filteredReceipts={[]}
+          renderMetadata={() => renderMetadata(undefined, 0)}
         />,
       );
 
@@ -771,3 +796,6 @@ describe('Component: TransactionContractComponents', () => {
     });
   });
 });
+function renderMetadata(data: any, index: any): JSX.Element | null {
+  return null;
+}

@@ -1,4 +1,5 @@
 import { default as DefaultInput } from '@/components/InputGlobal';
+import { DefaultScrollBar } from '@/styles/common';
 import { darken, lighten, transparentize } from 'polished';
 import { BsInfoCircle } from 'react-icons/bs';
 import { GrRotateRight } from 'react-icons/gr';
@@ -215,23 +216,7 @@ export const TextAreaJson = styled.textarea`
     color: rgba(255, 255, 255, 0.5);
   }
 
-  ::-webkit-scrollbar {
-    width: 0.3em;
-    z-index: 1;
-  }
-  ::-webkit-scrollbar-track {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
-    box-shadow: inset 0 0 0.25rem rgba(0, 0, 0, 0.3);
-    background: transparent;
-    cursor: pointer !important;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background-color: ${props => transparentize(0.2, props.theme.violet)};
-    border-radius: 10px;
-    cursor: pointer !important;
-  }
+  ${DefaultScrollBar}
 `;
 
 export const ContentContainer = styled.div`

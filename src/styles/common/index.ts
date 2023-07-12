@@ -1,3 +1,4 @@
+import { transparentize } from 'polished';
 import styled, { css } from 'styled-components';
 
 export const Container = styled.div`
@@ -384,5 +385,25 @@ export const CardHeaderItem = styled.div<{ selected: boolean }>`
   }
   &:only-child {
     border-radius: 0.75rem 0.75rem 0 0;
+  }
+`;
+
+export const DefaultScrollBar = css`
+  ::-webkit-scrollbar {
+    width: 0.3em;
+    z-index: 1;
+  }
+  ::-webkit-scrollbar-track {
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+    box-shadow: inset 0 0 0.25rem rgba(0, 0, 0, 0.1);
+    background: transparent;
+    cursor: pointer !important;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: ${props => transparentize(0.2, props.theme.violet)};
+    border-radius: 10px;
+    cursor: pointer !important;
   }
 `;

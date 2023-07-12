@@ -12,6 +12,7 @@ const defaultEnvs = [
   'DEFAULT_EXPLORER_HOST',
   'BUGSNAG_KEY',
   'BUGSNAG_DISABLED',
+  'CANNY_BOARD_TOKEN',
 ];
 
 const getEnvs = () => {
@@ -28,14 +29,14 @@ module.exports = withImages({
   env: getEnvs(),
   i18n,
   images: {
-    formats: ["image/webp"],
+    formats: ['image/webp'],
     remotePatterns: [
       {
-          protocol: 'https',
-          hostname: '**',
-          pathname: '**',
+        protocol: 'https',
+        hostname: '**',
+        pathname: '**',
       },
-  ],
+    ],
   },
   reactStrictMode: false,
   webpack: config => {

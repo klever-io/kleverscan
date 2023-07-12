@@ -7,6 +7,7 @@ import {
   TwoUser,
 } from '@/assets/icons';
 import { GiTwoCoins } from 'react-icons/gi';
+import { MdFeedback } from 'react-icons/md';
 import { RiPenNibFill } from 'react-icons/ri';
 
 export interface INavbarItem {
@@ -82,15 +83,14 @@ const navbarItems: INavbarItem[] = [
         pathTo: '/itos',
         Icon: GiTwoCoins,
       },
+      {
+        name: 'Verify',
+        pathTo: '/verify-signature',
+        Icon: TickSquare,
+      },
+      { name: 'Feedback', pathTo: '/feedback', Icon: MdFeedback },
     ],
   },
 ];
-
-isBeta &&
-  navbarItems[navbarItems.length - 1].pages?.push({
-    name: 'Verify',
-    pathTo: '/verify-signature',
-    Icon: TickSquare,
-  });
 
 export { navbarItems };

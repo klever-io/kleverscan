@@ -60,7 +60,9 @@ export const parseStaking = (data: any): void => {
     return;
   }
 
-  data.staking.interestType = data.staking.interestType ? 1 : 0;
+  if (data.staking.interestType !== undefined) {
+    data.staking.interestType = data.staking.interestType ? 1 : 0;
+  }
 };
 
 export const parseProperties = (data: any): void => {

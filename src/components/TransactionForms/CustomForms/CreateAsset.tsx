@@ -416,8 +416,14 @@ export const StakingSection: React.FC<IStakingSectionProps> = ({
   assetTrigger = false,
   isFPR: isFPRProp,
 }) => {
-  const { watch } = useFormContext();
+  const { watch, setValue } = useFormContext();
   const isFPR = watch('staking.interestType');
+
+  useEffect(() => {
+    if (assetTrigger) {
+      setValue('staking.interestType', Number(isFPRProp));
+    }
+  }, [assetTrigger, isFPRProp, setValue]);
 
   return (
     <FormSection>

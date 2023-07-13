@@ -5,7 +5,6 @@ import React, { useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
 import { IContractProps } from '.';
-import { FormSection } from '../../Form/styles';
 import FormInput from '../FormInput';
 import {
   Container,
@@ -20,6 +19,7 @@ import {
   CheckboxContract,
   ContractsList,
   FormBody,
+  FormSection,
   SectionTitle,
 } from '../styles';
 

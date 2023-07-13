@@ -6,9 +6,13 @@ import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
 import { toast } from 'react-toastify';
 import { IContractProps } from '.';
-import { FormSection } from '../../Form/styles';
 import FormInput from '../FormInput';
-import { ButtonContainer, FormBody, SectionTitle } from '../styles';
+import {
+  ButtonContainer,
+  FormBody,
+  FormSection,
+  SectionTitle,
+} from '../styles';
 import { parseDates, parsePackInfo, parseWhitelistInfo } from './utils';
 import { ITOTooltips as tooltip } from './utils/tooltips';
 import { PackInfo, WhitelistInfo } from './utils/types';

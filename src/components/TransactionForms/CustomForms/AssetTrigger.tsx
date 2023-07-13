@@ -7,14 +7,13 @@ import { IAssetTrigger } from '@klever/sdk';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
-import { FormSection } from '../../Form/styles';
 import FormInput from '../FormInput';
 import {
   InfoIcon,
   TooltipContainer,
   TooltipContent,
 } from '../FormInput/styles';
-import { FormBody, SectionTitle } from '../styles';
+import { FormBody, FormSection, SectionTitle } from '../styles';
 import { RoyaltiesSection, StakingSection, URIsSection } from './CreateAsset';
 import {
   parseKDAFeePool,

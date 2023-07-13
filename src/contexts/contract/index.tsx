@@ -60,15 +60,17 @@ export interface IContractContext {
   payload: any;
   contractOptions: IContractOption[];
   kdaFee: React.MutableRefObject<ICollectionList>;
-  permID: React.MutableRefObject<number>;
+  permID: number;
   openModal: boolean;
-  senderAccount: React.MutableRefObject<string | null | undefined>;
+  senderAccount: string;
   setTxLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setShowAdvancedOpts: React.Dispatch<React.SetStateAction<boolean>>;
   setTxHash: React.Dispatch<React.SetStateAction<string | null>>;
   setContractOptions: React.Dispatch<React.SetStateAction<IContractOption[]>>;
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
   setPayload: React.Dispatch<React.SetStateAction<any>>;
+  setSenderAccount: React.Dispatch<React.SetStateAction<string>>;
+  setPermID: React.Dispatch<React.SetStateAction<number>>;
   getAssets: () => Promise<ICollectionList[]>;
   getKAssets: () => Promise<ICollectionList[] | undefined>;
   getOwnerAddress: () => string;
@@ -97,8 +99,7 @@ export const ContractProvider: React.FC = ({ children }) => {
   const isMultisig = useRef(false);
   const formsData = useRef<IFormPayload[]>([] as IFormPayload[]);
   const kdaFee = useRef<ICollectionList>({} as ICollectionList);
-  const permID = useRef<number>(0);
-  const senderAccount = useRef<string | null>();
+  const [permID, setPermID] = useState<number>(0);
 
   const { logoutExtension } = useExtension();
   const router = useRouter();
@@ -107,6 +108,8 @@ export const ContractProvider: React.FC = ({ children }) => {
     if (typeof window === 'undefined') return '';
     return sessionStorage.getItem('walletAddress') || '';
   };
+
+  const [senderAccount, setSenderAccount] = useState<string>(getOwnerAddress());
 
   useEffect(() => {
     if (txHash && router.pathname === '/create-transaction') {
@@ -278,13 +281,13 @@ export const ContractProvider: React.FC = ({ children }) => {
         parsedDataArray,
         {
           kdaFee: kdaFee.current.value,
-          permID: permID.current,
+          permID: permID,
         },
       );
 
-      if (isMultisig.current && senderAccount.current) {
+      if (senderAccount !== getOwnerAddress()) {
         const senderData: INodeAccountResponse = await api.get({
-          route: `address/${senderAccount.current}`,
+          route: `address/${senderAccount}`,
           service: Service.NODE,
         });
         if (senderData.error) {
@@ -401,7 +404,9 @@ export const ContractProvider: React.FC = ({ children }) => {
     submitForms,
     kdaFee,
     permID,
+    setPermID,
     senderAccount,
+    setSenderAccount,
   };
   return <Contract.Provider value={values}>{children}</Contract.Provider>;
 };

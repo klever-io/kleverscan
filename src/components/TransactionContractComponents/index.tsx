@@ -2002,7 +2002,7 @@ export const UpdateAccountPermission: React.FC<IIndexedContract> = ({
         <span>
           <strong>Threshold</strong>
         </span>
-        <span>{permission?.threshold ?? ''}</span>
+        <span>{permission?.Threshold ?? ''}</span>
       </Row>
       <Row>
         <span>

@@ -2,9 +2,8 @@ import { useContract } from '@/contexts/contract';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
-import { FormSection } from '../../Form/styles';
 import FormInput from '../FormInput';
-import { FormBody } from '../styles';
+import { FormBody, FormSection } from '../styles';
 import { percentageProps } from './utils';
 import { marketplaceTooltips as tooltip } from './utils/tooltips';
 

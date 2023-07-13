@@ -17,7 +17,7 @@ export const ExtraOptionContainer = styled.div`
   display: flex;
   flex-direction: column;
 
-  gap: 1.5rem;
+  gap: 1rem;
 
   margin-top: 1rem;
   margin-bottom: 1rem;
@@ -51,10 +51,6 @@ export const FieldContainer = styled.div`
   width: 100%;
 
   position: relative;
-
-  &:first-of-type {
-    margin-bottom: 0.75rem;
-  }
 `;
 
 export const FlexContainer = styled.div`

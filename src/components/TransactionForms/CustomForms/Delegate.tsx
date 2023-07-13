@@ -3,9 +3,8 @@ import { parseAddress } from '@/utils/parseValues';
 import React, { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps, SelectOption } from '.';
-import { FormSection } from '../../Form/styles';
 import FormInput from '../FormInput';
-import { FormBody } from '../styles';
+import { FormBody, FormSection } from '../styles';
 
 type FormData = {
   bucketId: number;

@@ -5,14 +5,18 @@ import React, { useEffect } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
 import { IContractProps } from '.';
-import { FormSection } from '../../Form/styles';
 import FormInput from '../FormInput';
 import {
   InfoIcon,
   TooltipContainer,
   TooltipContent,
 } from '../FormInput/styles';
-import { ButtonContainer, FormBody, SectionTitle } from '../styles';
+import {
+  ButtonContainer,
+  FormBody,
+  FormSection,
+  SectionTitle,
+} from '../styles';
 import {
   parseProperties,
   parseSplitRoyalties,

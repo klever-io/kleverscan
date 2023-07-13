@@ -17,8 +17,12 @@ import {
 } from '@/components/TransactionForms/FormInput/styles';
 import { useContract } from '@/contexts/contract';
 import { useMulticontract } from '@/contexts/contract/multicontract';
-import { ICollectionList } from '@/types';
+import getAccount from '@/services/requests/searchBar/account';
+import { IAccountResponse, ICollectionList, IDropdownItem } from '@/types';
+import { IAccPermission } from '@/types/contracts';
+import { parseAddress } from '@/utils/parseValues';
 import { useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
 import { AdvancedOptsContainer, ArrowDownIcon, ArrowUpIcon } from '../styles';
 import {
   ExtraOptionContainer,
@@ -28,43 +32,80 @@ import {
 } from './styles';
 
 const PermID: React.FC = () => {
-  const { permID } = useContract();
+  const { setPermID, permID, senderAccount } = useContract();
+
+  const queryFn = () => getAccount(senderAccount);
+
+  const { data: res, isFetching: loading } = useQuery({
+    queryKey: ['account', senderAccount],
+    queryFn,
+    initialData: {} as IAccountResponse,
+  });
+
+  const parsedPermissions: IDropdownItem[] = res?.data
+    ? res.data.account.permissions.map((permission: IAccPermission) => {
+        return {
+          label: `#${permission.id} - ${
+            permission.permissionName
+          } - Threshold: ${permission.Threshold} - ${
+            permission.type === 0 ? 'Owner' : 'User'
+          }`,
+          value: permission.id,
+        };
+      })
+    : [];
 
   return (
-    <FieldContainer>
-      <InputLabel>
-        <span>Permission ID</span>
-        <TooltipContainer>
-          <InfoIcon />
-          <TooltipContent>
-            <span>
-              The permission ID is set by the account owner and is used to make
-              other accounts able to sign transactions on behalf of the owner.
-              <br />
-              You can find more information about permissions in your account
-              page.
-              <br />
-              If they are not set, you need to send a &quot; Update Account
-              Permisison &quot; contract
-            </span>
-          </TooltipContent>
-        </TooltipContainer>
-      </InputLabel>
-      <StyledInput
-        type="number"
-        placeholder="Permission ID"
-        defaultValue={permID.current}
-        onChange={e => {
-          permID.current = Number(e.target.value);
-        }}
-      />
-    </FieldContainer>
+    <FlexContainer>
+      <FieldContainer>
+        <SelectContent>
+          <InputLabel>
+            <span>Permission ID ({parseAddress(senderAccount, 12)})</span>
+            <TooltipContainer>
+              <InfoIcon />
+              <TooltipContent>
+                <span>
+                  The permission ID is set by the account owner and is used to
+                  make other accounts able to sign transactions on behalf of the
+                  owner.
+                  <br />
+                  You can find more information about permissions in your
+                  account page.
+                  <br />
+                  If they are not set, you need to send an{' '}
+                  {'"Update Account Permisison"'} contract
+                </span>
+              </TooltipContent>
+            </TooltipContainer>
+          </InputLabel>
+          <Select
+            options={parsedPermissions}
+            key={JSON.stringify(parsedPermissions)}
+            onChange={(value: any) => {
+              setPermID(value.value);
+            }}
+            selectedValue={parsedPermissions.find(
+              (item: IDropdownItem) => item.value === permID,
+            )}
+            loading={loading}
+            zIndex={2}
+          />
+        </SelectContent>
+      </FieldContainer>
+    </FlexContainer>
   );
 };
 
 const AccountSelect: React.FC = () => {
-  const { senderAccount } = useContract();
+  const { setSenderAccount, getOwnerAddress, setPermID } = useContract();
   const [loggedAccountIsSender, setLoggedAccountIsSender] = useState(true);
+
+  useEffect(() => {
+    if (loggedAccountIsSender) {
+      setSenderAccount(getOwnerAddress());
+      setPermID(0);
+    }
+  }, [loggedAccountIsSender]);
 
   return (
     <FlexContainer>
@@ -114,9 +155,10 @@ const AccountSelect: React.FC = () => {
 
           <StyledInput
             placeholder="Sender Account Address"
-            defaultValue={senderAccount.current || ''}
+            defaultValue={''}
             onChange={e => {
-              senderAccount.current = e.target.value;
+              setSenderAccount(e.target.value);
+              setPermID(0);
             }}
           />
         </FieldContainer>
@@ -128,7 +170,7 @@ const AccountSelect: React.FC = () => {
 const MultiSigSelect: React.FC = () => {
   const { isMultisig } = useContract();
 
-  const [multiSig, setMultiSig] = useState<boolean>(isMultisig.current);
+  const [_, setMultiSig] = useState<boolean>(isMultisig.current);
 
   return (
     <>
@@ -154,9 +196,9 @@ const MultiSigSelect: React.FC = () => {
             Yes
           </ToggleContainer>
         </FieldContainer>
-        {multiSig && <PermID />}
       </FlexContainer>
-      {multiSig && <AccountSelect />}
+      <AccountSelect />
+      <PermID />
     </>
   );
 };

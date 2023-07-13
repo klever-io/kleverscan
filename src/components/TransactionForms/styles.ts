@@ -11,15 +11,8 @@ interface ISpaceForm {
   section?: string;
 }
 
-export const FormBody = styled(Form)`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`;
-
 export const FormSection = styled.div<{ inner?: boolean }>`
   padding: 1.5rem;
-  padding-top: 3rem;
   position: relative;
 
   display: grid;
@@ -30,10 +23,6 @@ export const FormSection = styled.div<{ inner?: boolean }>`
 
   border-radius: 1rem;
 
-  &:not(:first-child) {
-    padding-top: 5rem;
-  }
-
   border: 0.2px solid ${({ theme }) => theme.input.border};
   box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? '#000' : lighten(0.8, '#000'))};
 
@@ -43,6 +32,7 @@ export const FormSection = styled.div<{ inner?: boolean }>`
     css`
       filter: ${props.theme.dark ? 'brightness(1.1)' : 'brightness(97%)'};
       grid-column: auto / span 2;
+      padding-top: 5rem;
     `}
 
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
@@ -51,13 +41,27 @@ export const FormSection = styled.div<{ inner?: boolean }>`
     gap: 2rem;
 
     padding: 0.75rem;
-    padding-top: 3.3rem;
 
     ${props =>
       props.inner &&
       css`
+        padding-top: 5rem;
         margin-top: -1rem;
       `}
+  }
+`;
+
+export const FormBody = styled(Form)`
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  > ${FormSection} {
+    padding-top: 1.5rem;
+  }
+
+  > ${FormSection} + ${FormSection} {
+    padding-top: 5rem;
   }
 `;
 
@@ -225,4 +229,10 @@ export const Checkbox = styled.input`
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E %3Cpath d='M15.88 8.29L10 14.17l-1.88-1.88a.996.996 0 1 0-1.41 1.41l2.59 2.59c.39.39 1.02.39 1.41 0L17.3 9.7a.996.996 0 0 0 0-1.41c-.39-.39-1.03-.39-1.42 0z' fill='%23fff'/%3E %3C/svg%3E");
     }
   }
+`;
+
+export const SectionText = styled.p`
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: ${props => props.theme.darkText};
 `;

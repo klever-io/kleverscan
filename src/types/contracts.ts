@@ -489,9 +489,10 @@ export interface IAccKey {
 }
 
 export interface IAccPermission {
+  id: number;
   type: number;
   permissionName: string;
-  threshold: number;
+  Threshold: number;
   operations: string;
   signers: IAccKey[];
 }

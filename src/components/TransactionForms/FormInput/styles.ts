@@ -289,14 +289,11 @@ export const RequiredSpan = styled.span`
 export const InputLabel = styled.label<ILabel>`
   user-select: none;
   color: ${({ theme }) => theme.darkText};
-  transform: translate(-1rem, -2.25rem);
   z-index: 1;
 
   width: 100%;
 
-  position: absolute;
-  left: 1rem;
-  top: 0.9rem;
+  margin-bottom: 0.25rem;
 
   display: flex;
   align-items: center;
@@ -315,7 +312,7 @@ export const InputLabel = styled.label<ILabel>`
   }
 
   &:hover {
-    z-index: 2;
+    z-index: 3;
   }
 
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {

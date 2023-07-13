@@ -2,8 +2,7 @@ import { useContract } from '@/contexts/contract';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
-import { FormSection, SectionText } from '../../Form/styles';
-import { FormBody } from '../styles';
+import { FormBody, FormSection, SectionText } from '../styles';
 
 type FormData = {
   orderId: string;

@@ -36,8 +36,8 @@ const NotFound: React.FC = () => {
         <Number>
           <span>404</span>
         </Number>
+        <Background />
       </Container>
-      <Background />
     </>
   );
 };

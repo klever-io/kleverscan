@@ -36,6 +36,17 @@ describe('Component: Footer', () => {
         if (name === 'KLV') {
           const paragraph = screen.getByText(name);
           expect(paragraph).toBeInTheDocument();
+        } else if (name === 'Privacy Policy') {
+          const links = screen.getAllByRole('link', { name });
+          expect(links).toHaveLength(2);
+          expect(links[0]).toHaveAttribute(
+            'href',
+            'https://bitcoin.me/privacy-policy',
+          );
+          expect(links[1]).toHaveAttribute(
+            'href',
+            'https://klever.io/privacy-policy/',
+          );
         } else if (name !== 'WhitePaper') {
           const link = screen.getByRole('link', { name });
           expect(link).toBeInTheDocument();
@@ -73,7 +84,8 @@ describe('Component: Footer', () => {
       color: `${theme.true.white}`,
     };
 
-    const linkItem = screen.getByRole('link', { name: /Privacy Policy/i });
-    expect(linkItem).toHaveStyle(style);
+    const linkItem = screen.getAllByRole('link', { name: /Privacy Policy/i });
+    expect(linkItem[0]).toHaveStyle(style);
+    expect(linkItem[1]).toHaveStyle(style);
   });
 });

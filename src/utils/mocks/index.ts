@@ -10,12 +10,12 @@ const KFI: IAsset = {
   ownerAddress: '',
   logo: '',
   uris: {
-    Exchange: 'https://klever.io',
+    Exchange: 'https://bitcoin.me/',
     Github: 'https://github.com/klever-io',
     Instagram: 'https://instagram.com/klever.io',
     Twitter: 'https://twitter.com/klever_io',
-    Wallet: 'https://klever.finance/wallet',
-    Website: 'https://klever.finance',
+    Wallet: 'https://klever.io/',
+    Website: 'https://klever.org/',
     Whitepaper:
       'https://klever.finance/wp-content/uploads/2021/10/Klever_Finance_Whitepaper_v1.1.pdf',
   },

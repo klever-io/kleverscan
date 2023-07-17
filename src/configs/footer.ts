@@ -57,36 +57,40 @@ const socials: ISocial[] = [
 
 const contents: IContent[] = [
   {
-    title: 'Klever Exchange',
+    title: 'Bitcoin.me',
     infoLinks: [
-      { name: 'Privacy Policy', href: 'https://klever.io/privacy-policy' },
-      { name: 'Terms of Use', href: 'https://klever.io/terms-of-use' },
+      { name: 'Exchange', href: 'https://bitcoin.me/' },
+      { name: 'Privacy Policy', href: 'https://bitcoin.me/privacy-policy' },
+      { name: 'Terms of Use', href: 'https://bitcoin.me/terms-of-use' },
       {
         name: 'WhitePaper',
-        href: 'https://bc.klever.finance/wp',
+        href: 'https://klever.org/s/Klever-Exchange-Whitepaper-v10.pdf',
       },
-      { name: 'Trading Fees', href: 'https://klever.io/en/fees' },
-      { name: 'Token List', href: 'https://klever.io/markets' },
     ],
   },
   {
-    title: 'Klever Wallet App',
+    title: 'Klever Wallet',
     infoLinks: [
-      { name: 'Roadmap', href: 'https://klever.org/#roadmap' },
-      { name: 'Help Center', href: 'https://support.klever.org/' },
+      { name: 'Wallet', href: 'https://klever.io/' },
+      { name: 'Privacy Policy', href: 'https://klever.io/privacy-policy/' },
     ],
   },
   {
-    title: 'Klever.Org',
+    title: 'Klever Ecosystem',
     infoLinks: [
       {
         name: 'WhitePaper',
         href: 'https://klever.org/s/Klever-Blockchain-Whitepaper-v20-lr.pdf',
       },
+      {
+        name: 'Devs Community',
+        href: 'https://join.slack.com/t/klever-blockchain/shared_invite/zt-1z69ikw0g-dXtRY7eGTnyRllsCV_YGOw',
+      },
+      { name: 'Klever.Org', href: 'https://klever.org/' },
+      { name: 'Klever Docs', href: 'https://docs.klever.finance/' },
       { name: 'Klever News', href: 'https://klevernews.com/' },
       { name: 'Careers', href: 'https://klever.compleo.com.br/' },
-      { name: 'Klever Finance', href: 'https://klever.org' },
-      { name: 'Klever Docs', href: 'https://docs.klever.finance/' },
+      { name: 'Help Center', href: 'https://support.klever.org/' },
     ],
   },
   {

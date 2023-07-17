@@ -12,7 +12,7 @@ export const Container = styled.div`
 
   background-color: ${props => props.theme.background};
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     padding: 0 3rem;
     align-items: center;
 
@@ -40,7 +40,7 @@ export const Content = styled.div`
     font-weight: 400;
   }
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     margin-bottom: 1rem;
 
     align-items: center;
@@ -68,7 +68,7 @@ export const ButtonContainer = styled.div`
     text-decoration: none;
   }
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
 
     flex-direction: column;
@@ -85,7 +85,8 @@ const hoverNoBackground = css`
 
 export const Button = styled.div<{ hasBackground: boolean }>`
   padding: 1rem 2rem;
-
+  position: relative;
+  z-index: 2;
   background-color: ${props =>
     props.hasBackground ? props.theme.violet : 'transparent'};
 
@@ -105,7 +106,7 @@ export const Button = styled.div<{ hasBackground: boolean }>`
     ${props => (props.hasBackground ? hoverBackground : hoverNoBackground)};
   }
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
 
     text-align: center;
@@ -113,19 +114,21 @@ export const Button = styled.div<{ hasBackground: boolean }>`
 `;
 
 export const Background = styled(DefaultBackground)`
-  top: 50%;
+  top: 30%;
   left: 50%;
-
+  z-index: 0;
   position: absolute;
 
   transform: translate(-30%, -50%);
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     display: none;
   }
 `;
 
 export const Number = styled.div`
+  position: relative;
+  z-index: 1;
   span {
     color: ${props => props.theme.black};
     font-weight: 500;
@@ -134,7 +137,7 @@ export const Number = styled.div`
 
     text-shadow: 0px 4px 0px rgba(0, 0, 0, 0.25);
 
-    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    @media (max-width: ${props => props.theme.breakpoints.tablet}) {
       font-size: 7rem;
     }
   }

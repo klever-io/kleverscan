@@ -43,16 +43,18 @@ describe("test Layout and it's inner components", () => {
     expect(hello).toBeInTheDocument();
 
     const footerText = [
-      'Klever Exchange',
+      'Exchange',
       'Klever.Org',
-      'Klever Wallet App',
-      'Privacy Policy',
+      'Klever Wallet',
       'Klever News',
-      'Roadmap',
     ];
     footerText.forEach(item => {
       expect(screen.getByText(item)).toBeInTheDocument();
     });
+    const footerPrivacyPolicy = screen.getAllByText('Privacy Policy');
+    expect(footerPrivacyPolicy).toHaveLength(2);
+    expect(footerPrivacyPolicy[0]).toBeInTheDocument();
+    expect(footerPrivacyPolicy[1]).toBeInTheDocument();
     const layoutContainerStyles = {
       margin: 'auto',
       backgroundColor: 'rgb(235, 241, 248)',

@@ -520,13 +520,14 @@ export const mock1 = {
         ownerAddress: '',
         logo: 'https://bc.klever.finance/logo_kfi',
         uris: {
-          Exchange: 'https://klever.io',
+          Exchange: 'https://bitcoin.me/',
           Github: 'https://github.com/klever-io',
           Instagram: 'https://instagram.com/klever.io',
           Twitter: 'https://twitter.com/klever_io',
-          Wallet: 'https://klever.finance/wallet',
-          Website: 'https://klever.finance',
-          Whitepaper: 'https://bc.klever.finance/wp',
+          Wallet: 'https://klever.io/',
+          Website: 'https://klever.org/',
+          Whitepaper:
+            'https://klever.org/s/Klever-Blockchain-Whitepaper-v20-lr.pdf',
         },
         precision: 6,
         initialSupply: 21000000000000,

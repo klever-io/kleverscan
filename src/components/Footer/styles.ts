@@ -158,6 +158,9 @@ export const LinkItems = styled.div`
     &:hover {
       color: ${props => props.theme.violet};
     }
+    &:focus {
+      color: ${props => props.theme.violet};
+    }
   }
 `;
 

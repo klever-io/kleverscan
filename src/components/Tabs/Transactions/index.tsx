@@ -6,7 +6,12 @@ import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import { useMobile } from '@/contexts/mobile';
 import { CenteredRow } from '@/styles/common';
-import { Contract, IContract, ITransferContract } from '@/types/contracts';
+import {
+  Contract,
+  ContractsName,
+  IContract,
+  ITransferContract,
+} from '@/types/contracts';
 import {
   IInnerTableProps,
   IReceipt,
@@ -135,7 +140,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
               contractType={contractType}
             />
           ) : (
-            <strong key={contractType}>{contractType}</strong>
+            <strong key={contractType}>{ContractsName[contractType]}</strong>
           ),
         span: 1,
       },

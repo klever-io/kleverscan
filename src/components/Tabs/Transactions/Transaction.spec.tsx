@@ -116,7 +116,7 @@ describe('Component: Tabs/Transactions', () => {
     })[0];
     const toAddress = screen.getAllByRole('link', { name: '--' })[0];
     const componentStatus = screen.getAllByText(capitalizeString(status))[0];
-    const contactType = screen.getByText('Delegate');
+    const contactType = screen.getByText('Multi contract');
     const amount = screen.getAllByText('--');
 
     expect(linkHash).toBeInTheDocument();

@@ -26,7 +26,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback } from 'react';
 import { IReceipt, IRowSection, ITransaction } from '../../types';
-import { Contract, IContract, ITransferContract } from '../../types/contracts';
+import {
+  Contract,
+  ContractsName,
+  IContract,
+  ITransferContract,
+} from '../../types/contracts';
 import {
   contractTypes,
   filteredSections,
@@ -196,7 +201,7 @@ const Transactions: React.FC = () => {
               contractType={contractType}
             />
           ) : (
-            <strong key={contractType}>{contractType}</strong>
+            <strong key={contractType}>{ContractsName[contractType]}</strong>
           ),
         span: 1,
       },

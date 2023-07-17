@@ -309,9 +309,7 @@ export const contractTypes = (contracts: IContract[]): string => {
     return 'Unknown';
   }
 
-  return contracts.length > 1
-    ? 'Multi contract'
-    : ContractsIndex[Number(contracts[0].type)];
+  return contracts.length > 1 ? 'Multi contract' : contracts[0].typeString;
 };
 
 export const contractsList = [

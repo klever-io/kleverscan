@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 import { FieldError, useFormContext } from 'react-hook-form';
 import { IoReloadSharp } from 'react-icons/io5';
 import { useQuery } from 'react-query';
+import { toLocaleFixed } from '../formatFunctions';
 
 const kAssetContracts = [
   'AssetTriggerContract',
@@ -213,7 +214,11 @@ export const useKDASelect = (
             </ReloadWrapper>
             {collection?.balance && (
               <BalanceLabel>
-                Balance: {assetBalance / 10 ** (collection?.precision || 0)}
+                Balance:{' '}
+                {toLocaleFixed(
+                  assetBalance / 10 ** (collection?.precision || 0),
+                  collection?.precision || 0,
+                )}
               </BalanceLabel>
             )}
           </BalanceContainer>

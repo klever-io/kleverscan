@@ -3,7 +3,6 @@ import { getStatusIcon } from '@/assets/status';
 import { Loader } from '@/components/Loader/styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import {
-  IAccount,
   IAccountResponse,
   IAssetResponse,
   IRowSection,
@@ -245,22 +244,7 @@ export const AccountRowSections = (
   precision: number,
 ): IRowSection[] => {
   if (res.data || res.error === '') {
-    let { account } = res.data;
-
-    const emptyAccount: IAccount = {
-      address: account.hash,
-      nonce: 0,
-      balance: 0,
-      frozenBalance: 0,
-      allowance: 0,
-      permissions: [],
-      timestamp: new Date().getTime(),
-      assets: {},
-    };
-
-    if (res.error === 'cannot find account in database') {
-      account = emptyAccount;
-    }
+    const { account } = res.data;
 
     return [
       {

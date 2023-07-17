@@ -24,6 +24,35 @@ interface IQueryParams {
   sender?: '' | 'receiver' | 'sender';
 }
 
+export const generateEmptyAccountResponse = (
+  hash: string,
+): IAccountResponse => {
+  return {
+    data: {
+      account: {
+        address: hash as string,
+        nonce: 0,
+        balance: 0,
+        frozenBalance: 0,
+        allowance: 0,
+        permissions: [],
+        timestamp: new Date().getTime(),
+        assets: {},
+      },
+    },
+    pagination: {
+      self: 0,
+      next: 0,
+      previous: 0,
+      perPage: 0,
+      totalPages: 0,
+      totalRecords: 0,
+    },
+    error: 'cannot find account in database',
+    code: 'internal_issue',
+  };
+};
+
 export const assetsRequest = (
   address: string,
 ): ((page: number, limit: number) => Promise<IResponse>) => {
@@ -250,17 +279,6 @@ export const bucketsRequest = (
 export const accountCall = async (
   router: NextRouter,
 ): Promise<IAccount | undefined> => {
-  const emptyAccount: IAccount = {
-    address: router.query.account as string,
-    nonce: 0,
-    balance: 0,
-    frozenBalance: 0,
-    allowance: 0,
-    permissions: [],
-    timestamp: new Date().getTime(),
-    assets: {},
-  };
-
   try {
     const res = await api.get({
       route: `address/${router.query.account || ''}`,
@@ -269,7 +287,10 @@ export const accountCall = async (
       return res.data.account;
     }
     if (res.error === 'cannot find account in database') {
-      return emptyAccount;
+      const emptyAccount = generateEmptyAccountResponse(
+        router.query.account as string,
+      );
+      return emptyAccount.data.account;
     }
     if (res.error.includes('could not create address from provided param')) {
       router.push('/404');

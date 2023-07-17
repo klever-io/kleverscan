@@ -124,7 +124,7 @@ describe('test api functions', () => {
             url: 'https://api.testnet.klever.finance/v1.0/address/list',
           }),
         );
-        const res = await withoutBody(props1, Method.GET);
+        const res = await withoutBody(props1, Method.GET, 1);
         expect(res).toStrictEqual(mocks.accounts);
       });
 
@@ -132,7 +132,7 @@ describe('test api functions', () => {
         (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.reject('generic error'),
         );
-        const res = await withoutBody(props1, Method.GET);
+        const res = await withoutBody(props1, Method.GET, 1);
         expect(res).toStrictEqual({
           data: null,
           error: 'generic error',
@@ -155,7 +155,7 @@ describe('test api functions', () => {
           }),
         );
 
-        const res = await withoutBody(props1, Method.GET);
+        const res = await withoutBody(props1, Method.GET, 1);
         expect(res).toStrictEqual({
           data: null,
           error: 'Internal Server Error',
@@ -189,7 +189,7 @@ describe('test api functions', () => {
         (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.reject('generic error'),
         );
-        const res = await withoutBody(props2, Method.GET);
+        const res = await withoutBody(props2, Method.GET, 1);
         expect(res).toStrictEqual({
           data: null,
           error: 'generic error',
@@ -212,7 +212,7 @@ describe('test api functions', () => {
           }),
         );
 
-        const res = await withoutBody(props2, Method.GET);
+        const res = await withoutBody(props2, Method.GET, 1);
         expect(res).toStrictEqual({
           data: null,
           error: 'Internal Server Error',
@@ -243,7 +243,7 @@ describe('test api functions', () => {
           }),
         );
 
-        const res = await withBody(propsBody, Method.POST);
+        const res = await withBody(propsBody, Method.POST, 1);
         expect(res).toStrictEqual(mocks.account);
       });
 
@@ -251,7 +251,7 @@ describe('test api functions', () => {
         (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.reject('generic error'),
         );
-        const res = await withBody(propsBody, Method.POST);
+        const res = await withBody(propsBody, Method.POST, 1);
         expect(res).toStrictEqual({
           data: null,
           error: 'generic error',
@@ -274,7 +274,7 @@ describe('test api functions', () => {
           }),
         );
 
-        const res = await withBody(propsBody, Method.POST);
+        const res = await withBody(propsBody, Method.POST, 1);
         expect(res).toStrictEqual({
           data: null,
           error: 'Internal Server Error',
@@ -304,7 +304,7 @@ describe('test api functions', () => {
             url: 'https://node.testnet.klever.finance/node/overview',
           }),
         );
-        const res = await withText(props3, Method.GET);
+        const res = await withText(props3, Method.GET, 1);
         expect(res).toEqual(mocks.metrics);
       });
 
@@ -312,7 +312,7 @@ describe('test api functions', () => {
         (global.fetch as jest.Mock) = jest.fn(() =>
           Promise.reject('generic error'),
         );
-        const res = await withText(props3, Method.GET);
+        const res = await withText(props3, Method.GET, 1);
         expect(res).toEqual({
           data: null,
           error: 'generic error',
@@ -335,7 +335,7 @@ describe('test api functions', () => {
           }),
         );
 
-        const res = await withText(props3, Method.GET);
+        const res = await withText(props3, Method.GET, 1);
         expect(res).toStrictEqual({
           data: null,
           error: 'Internal Server Error',
@@ -351,17 +351,17 @@ describe('test api functions', () => {
       const fastPromise = new Promise(resolve => {
         setTimeout(() => {
           resolve('success');
-        }, 1000);
+        }, 10);
       });
-      await expect(withTimeout(fastPromise)).resolves.toBe('success');
+      await expect(withTimeout(fastPromise, 20)).resolves.toBe('success');
     });
     test('when the promise is not resolved in time', async () => {
       const slowPromise = new Promise(resolve => {
         setTimeout(() => {
           resolve('success');
-        }, 3000);
+        }, 30);
       });
-      await expect(withTimeout(slowPromise, 2000)).resolves.toStrictEqual({
+      await expect(withTimeout(slowPromise, 20)).resolves.toStrictEqual({
         code: 'internal_error',
         data: null,
         error: 'Fetch timeout',

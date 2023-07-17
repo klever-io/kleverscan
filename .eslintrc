@@ -13,5 +13,23 @@
     "react-hooks/exhaustive-deps": "off",
     "@next/next/link-passhref": "off",
     "@typescript-eslint/no-empty-interface": "off"
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/__tests__/**/*.[jt]s?(x)",
+        "**/?(*.)+(spec|test).[jt]s?(x)"
+      ],
+      "extends": ["plugin:testing-library/react"],
+      "rules": {
+        "testing-library/no-node-access": "warn",
+        "testing-library/no-unnecessary-act": "warn",
+        "testing-library/no-wait-for-side-effects": "warn",
+        "testing-library/no-wait-for-multiple-assertions": "warn",
+        "testing-library/no-render-in-setup": "warn",
+        "testing-library/no-container": "warn",
+        "testing-library/render-result-naming-convention": "warn"
+      }
+    }
+  ]
 }

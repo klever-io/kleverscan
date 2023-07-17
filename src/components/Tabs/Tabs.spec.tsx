@@ -1,6 +1,6 @@
 import api from '@/services/api';
 import { assetsRequest } from '@/services/requests/account/account';
-import { act, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { useRouter } from 'next/router';
 import React from 'react';
 import Tabs from '.';
@@ -104,13 +104,11 @@ describe('Component: Tabs', () => {
       },
       showDataFilter: false,
     };
-    await act(async () => {
-      renderWithTheme(
-        <Tabs {...tabProps}>
-          <Assets assetsTableProps={mockAssetsTableProps} address={address} />
-        </Tabs>,
-      );
-    });
+    renderWithTheme(
+      <Tabs {...tabProps}>
+        <Assets assetsTableProps={mockAssetsTableProps} address={address} />
+      </Tabs>,
+    );
 
     headerTable.map(header => {
       expect(screen.getAllByText(header)[0]).toBeInTheDocument();

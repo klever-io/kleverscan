@@ -325,7 +325,7 @@ const Table: React.FC<ITable> = ({
 
           {!isFetching && (!response?.items || response?.items?.length === 0) && (
             <>
-              <RetryContainer onClick={() => refetch()} loading={isFetching}>
+              <RetryContainer onClick={() => refetch()} $loading={isFetching}>
                 <span>Retry</span>
                 <IoReloadSharp size={20} />
               </RetryContainer>

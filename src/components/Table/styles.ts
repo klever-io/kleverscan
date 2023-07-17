@@ -543,7 +543,7 @@ export const IoReloadSharpWrapper = styled.div<{
 `;
 
 export const RetryContainer = styled.div<{
-  loading: boolean;
+  $loading: boolean;
 }>`
   cursor: pointer;
   display: flex;
@@ -553,7 +553,7 @@ export const RetryContainer = styled.div<{
     margin-left: 0.2rem;
     color: ${props =>
       props.theme.dark ? props.theme.black : props.theme.darkText};
-    animation: ${props => (props.loading ? rotate : 'none')} 1s linear infinite;
+    animation: ${props => (props.$loading ? rotate : 'none')} 1s linear infinite;
   }
 
   span {

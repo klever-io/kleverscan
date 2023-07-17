@@ -1,27 +1,38 @@
+import { validatorsHeaders } from '@/pages/validators';
 import { screen } from '@testing-library/react';
 import * as nextRouter from 'next/router';
 import React from 'react';
-import { act } from 'react-dom/test-utils';
 import { ITable } from '../../components/Table';
 import { renderWithTheme } from '../../test/utils';
 import Table from './';
-import { failedValidatorResponse } from './mocks';
+import { failedValidatorResponse, validatorResponse } from './mocks';
 
-const header = ['Rank', 'Name', 'Can Delegate', 'Cumulative Stake'];
+const emptyValidatorsRequest = jest
+  .fn()
+  .mockResolvedValue(failedValidatorResponse);
 
-const requestValidators = jest.fn().mockResolvedValue(failedValidatorResponse);
+const validValidatorsRequest = jest.fn().mockResolvedValue(validatorResponse);
 
-const tableProps: ITable = {
+const emptyTableProps: ITable = {
   type: 'validators',
-  header,
+  header: validatorsHeaders,
   rowSections: undefined,
-  request: page => requestValidators(page),
+  request: page => emptyValidatorsRequest(page),
   totalPages: 0,
   scrollUp: true,
   dataName: 'validators',
 };
 
-describe('Componenet: Table', () => {
+const validTableProps: ITable = {
+  type: 'validators',
+  header: validatorsHeaders,
+  rowSections: undefined,
+  request: page => validValidatorsRequest(page),
+  scrollUp: true,
+  dataName: 'validators',
+};
+
+describe('Component: Table', () => {
   jest.mock('next/router', () => ({
     useRouter() {
       return {
@@ -44,33 +55,23 @@ describe('Componenet: Table', () => {
   });
 
   it("Should NOT render the headers of the table and the empty row when there's no data", async () => {
-    await act(async () => {
-      renderWithTheme(<Table {...tableProps} />);
-    });
+    renderWithTheme(<Table {...emptyTableProps} />);
     // no more headers when failed requisition
-    header.forEach((header, index) => {
+    for await (const header of validatorsHeaders) {
       const getHeader = screen.queryByText(header);
       expect(getHeader).toEqual(null);
-    });
+    }
 
     const emptyRow = screen.getByText(/Oops! Apparently no data here./i);
     expect(emptyRow).toBeInTheDocument();
   });
 
-  it('Should match the style for the header and the empty row', async () => {
-    await act(async () => {
-      renderWithTheme(<Table {...tableProps} />);
-    });
+  it('Should render the headers of the table and the rows when there is data', async () => {
+    renderWithTheme(<Table {...validTableProps} />);
 
-    const emptyRow = screen.getByText(
-      /Oops! Apparently no data here./i,
-    ).parentNode;
-
-    const emptyRowStyle = {
-      width: '100%',
-      justifyContent: 'center',
-      alignItems: 'center',
-    };
-    expect(emptyRow).toHaveStyle(emptyRowStyle);
+    for await (const header of validatorsHeaders) {
+      const getHeader = await screen.findByText(header);
+      expect(getHeader).toBeInTheDocument();
+    }
   });
 });

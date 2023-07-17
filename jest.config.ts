@@ -24,7 +24,7 @@ export default {
   clearMocks: true,
   coverageProvider: 'v8',
   setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
-  testEnvironment: 'jsdom',
+  testEnvironment: './src/test/custom-test-env.ts',
   moduleNameMapper: makeModuleNameMapper(SRC_PATH),
   transform: {
     '^.+\\.(t|j)sx?$': ['babel-jest'],

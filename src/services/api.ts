@@ -109,6 +109,7 @@ export const getProps = (props: IProps): IProps => {
 export const withoutBody = async (
   props: IProps,
   method: Method,
+  tries = 3,
 ): Promise<any> => {
   const request = async () => {
     if (props.useApiProxy) {
@@ -170,12 +171,17 @@ export const withoutBody = async (
     res => (result = res),
     err => (result = Promise.resolve(err)),
     () => request(),
+    tries,
   );
 
   return result;
 };
 
-export const withBody = async (props: IProps, method: Method): Promise<any> => {
+export const withBody = async (
+  props: IProps,
+  method: Method,
+  tries = 3,
+): Promise<any> => {
   const request = async () => {
     if (props.useApiProxy) {
       try {
@@ -231,12 +237,17 @@ export const withBody = async (props: IProps, method: Method): Promise<any> => {
     res => (result = res),
     err => (result = Promise.resolve(err)),
     () => request(),
+    tries,
   );
 
   return result;
 };
 
-export const withText = async (props: IProps, method: Method): Promise<any> => {
+export const withText = async (
+  props: IProps,
+  method: Method,
+  tries = 3,
+): Promise<any> => {
   const request = async () => {
     try {
       const { route, query, service, apiVersion } = getProps(props);
@@ -274,6 +285,7 @@ export const withText = async (props: IProps, method: Method): Promise<any> => {
     res => (result = res),
     err => (result = Promise.resolve(err)),
     () => request(),
+    tries,
   );
 
   return result;

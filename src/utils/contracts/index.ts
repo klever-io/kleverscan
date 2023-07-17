@@ -1,22 +1,23 @@
 import {
   Contract,
   ContractsIndex,
+  ContractsName,
   IContract,
   IContractOption,
 } from '@/types/contracts';
+import { IKAppTransferReceipt } from '@/types/receipts';
 import { format, fromUnixTime } from 'date-fns';
 import { NextRouter } from 'next/router';
 import {
-  IBuyReceipt,
   IClaimReceipt,
   IReceipt,
   IRowSection,
   ITransaction,
 } from '../../types';
 import { getBuyAmount, getBuyPrice } from '../buyContractFunctions';
-import { findReceipt } from '../findKey';
+import { filterReceipts, findReceipt, findReceiptWithSender } from '../findKey';
 import { getPrecision } from '../precisionFunctions';
-import { getAmountFromReceipts, getBuyReceipt } from '../receiptsFunctions';
+import { getAmountFromReceipts } from '../receiptsFunctions';
 import {
   AssetTriggerSections,
   BuySections,
@@ -44,7 +45,6 @@ import {
   VoteSections,
   WithdrawSections,
 } from '../transactionListSections';
-import { receiverIsSender } from '../validateSender';
 
 export const contractOptions: IContractOption[] = [
   {
@@ -672,27 +672,32 @@ export const getHeaderForCSV = (
       newHeaders = [contractTableHeaders[18], contractTableHeaders[19]];
       break;
     case ContractsIndex['ITO Trigger']:
-      newHeaders = [contractTableHeaders[17], contractTableHeaders[9]];
+      newHeaders = [contractTableHeaders[11], contractTableHeaders[9]];
       break;
   }
-  if (router.query.type) {
-    return header.splice(0, header.length - 2).concat(newHeaders);
+  if (router?.query?.type) {
+    return header
+      .splice(0, header.length - 2)
+      .concat(
+        newHeaders,
+        'Multicontract',
+        `Account's Transaction Number (Nonce)`,
+      );
   }
-
-  return header;
+  return header.concat('Multicontract', `Account's Transaction Number (Nonce)`);
 };
 
-export const getCells = async (
+export const getDefaultCells = async (
   tableRowData: ITransaction,
-  router: NextRouter,
+  isMulticontract: boolean,
 ): Promise<any[]> => {
   const {
     hash,
     blockNum,
     timestamp,
     sender,
+    nonce,
     status,
-    receipts,
     contract,
     bandwidthFee,
     kAppFee,
@@ -700,17 +705,43 @@ export const getCells = async (
 
   const parameter = contract[0]?.parameter as any;
   const to = parameter.toAddress || '';
-  const typeString = contract[0]?.typeString || '';
+  const contractName = ContractsName[contract[0]?.typeString] || '';
   const created = format(fromUnixTime(timestamp / 1000), 'yyyy-MM-dd HH:mm:ss'); // csv date pattern
-  const cells = [hash, blockNum, created, sender, to, status, typeString];
   const parsedbandwidthFee = bandwidthFee / 10 ** 6;
   const parsedkAppFee = kAppFee / 10 ** 6;
+  const cells = [
+    hash,
+    blockNum,
+    created,
+    sender,
+    to,
+    status,
+    contractName,
+    parsedkAppFee,
+    parsedbandwidthFee,
+    isMulticontract,
+    nonce,
+  ];
+  return cells;
+};
 
-  const getParsedAmount = async (assetId: string) => {
-    const amount = parameter?.amount ?? '';
-    const precision = (await getPrecision(assetId)) as number;
-    return amount / 10 ** precision;
-  };
+export const getContractCells = async (
+  tableRowData: ITransaction,
+  isMulticontract: boolean,
+  index: number,
+): Promise<any[]> => {
+  const {
+    hash,
+    blockNum,
+    timestamp,
+    sender,
+    nonce,
+    status,
+    receipts,
+    contract,
+    bandwidthFee,
+    kAppFee,
+  } = tableRowData;
 
   // all data extracted:
   // const assetId = contract[0].parameter.assetId || 'KLV';
@@ -729,10 +760,19 @@ export const getCells = async (
   // const buyType = contract[0].parameter.buyType || '';
   // const orderID = contract[0].parameter.orderID || '';
 
-  if (!router.query.type && contract.length === 1) {
-    cells.push(parsedkAppFee, parsedbandwidthFee);
-    return cells;
-  }
+  const parameter = contract[0]?.parameter as any;
+  const to = parameter.toAddress || '';
+  const contractName = ContractsName[contract[0]?.typeString] || '';
+  const created = format(fromUnixTime(timestamp / 1000), 'yyyy-MM-dd HH:mm:ss'); // csv date pattern
+  const cells = [hash, blockNum, created, sender, to, status, contractName];
+  const parsedbandwidthFee = bandwidthFee / 10 ** 6;
+  const parsedkAppFee = kAppFee / 10 ** 6;
+
+  const getParsedAmount = async (assetId: string) => {
+    const amount = parameter?.amount ?? '';
+    const precision = (await getPrecision(assetId)) as number;
+    return amount / 10 ** precision;
+  };
 
   switch (contract[0].typeString) {
     case Contract.Transfer:
@@ -755,9 +795,9 @@ export const getCells = async (
       cells.push(blsPublicKey);
       break;
     case Contract.Freeze:
-      let amount = parameter?.amount / 10 ** 6 || '';
       let assetId = parameter?.assetId || 'KLV';
-      cells.push(assetId, amount);
+      asyncAmount = await getParsedAmount(assetId);
+      cells.push(assetId, asyncAmount);
       break;
     case Contract.Unfreeze:
       let bucketID = parameter?.bucketID || '';
@@ -772,17 +812,23 @@ export const getCells = async (
       cells.push(bucketID);
       break;
     case Contract.Withdraw:
+      let filteredReceipts = filterReceipts(receipts, index);
       assetId = parameter?.assetId || 'KLV';
-      asyncAmount = await getAmountFromReceipts(assetId, 18, receipts);
+      asyncAmount = await getAmountFromReceipts(assetId, 18, filteredReceipts);
       cells.push(assetId, asyncAmount);
       break;
     case Contract.Claim:
+      filteredReceipts = filterReceipts(receipts, index);
       const claimType = parameter?.claimType || '';
-      const claimReceipt = findReceipt(receipts, 17) as
+      const claimReceipt = findReceipt(filteredReceipts, 17) as
         | IClaimReceipt
         | undefined;
-      amount = await getAmountFromReceipts(assetId, 17, receipts);
-      cells.push(claimType, claimReceipt?.assetId, amount);
+      asyncAmount = await getAmountFromReceipts(
+        claimReceipt?.assetId || '',
+        17,
+        filteredReceipts,
+      );
+      cells.push(claimType, claimReceipt?.assetId, asyncAmount);
       break;
     case Contract.Unjail:
       cells.push(parsedkAppFee, parsedbandwidthFee);
@@ -801,7 +847,7 @@ export const getCells = async (
       break;
     case Contract.Vote:
       const proposalId = parameter?.proposalId || '';
-      amount = parameter?.amount / 10 ** 6 || '';
+      let amount = parameter?.amount / 10 ** 6 || '';
       cells.push(proposalId, amount);
       break;
     case Contract.ConfigITO:
@@ -815,13 +861,12 @@ export const getCells = async (
     case Contract.Buy:
       const buyType = parameter?.buyType || '';
       let currencyID = parameter?.currencyID || '';
-      const buyReceipt = getBuyReceipt(
-        parameter,
-        receipts as IBuyReceipt[],
-        0,
+      filteredReceipts = filterReceipts(receipts, index);
+      const senderKAppTransferReceipt = findReceiptWithSender(
+        filteredReceipts,
+        14,
         sender,
-        receiverIsSender,
-      );
+      ) as IKAppTransferReceipt | undefined;
       let currencyIDPrecision: any = 6;
       let amountPrecision: any = 0;
       if (parameter?.currencyID !== 'KLV' && parameter?.currencyID !== 'KFI') {
@@ -830,12 +875,18 @@ export const getCells = async (
         );
       }
       if (parameter?.buyType === 'MarketBuy') {
-        amountPrecision = await getPrecision(buyReceipt?.assetId ?? '');
+        if (status !== 'fail') {
+          amountPrecision = await getPrecision(
+            senderKAppTransferReceipt?.assetId ?? '',
+          );
+        } else {
+          amountPrecision = 0;
+        }
       } else if (parameter?.buyType === 'ITOBuy') {
-        amountPrecision = await getPrecision(parameter?.id);
+        amountPrecision = (await getPrecision(parameter?.id)) || '';
       }
-      let buyPrice = getBuyPrice(parameter, buyReceipt);
-      let buyAmount = getBuyAmount(parameter, buyReceipt);
+      let buyPrice = getBuyPrice(parameter, senderKAppTransferReceipt);
+      let buyAmount = getBuyAmount(parameter, senderKAppTransferReceipt);
 
       if (buyPrice) {
         buyPrice = buyPrice / 10 ** currencyIDPrecision;
@@ -872,38 +923,19 @@ export const getCells = async (
       cells.push(permission);
       break;
     case Contract.Deposit:
-      const depositType = parameter?.depositType || '';
+      const depositType = parameter?.depositTypeString || '';
       const id = parameter?.id || '';
       cells.push(depositType, id);
       break;
     case Contract.ITOTrigger:
       triggerType = parameter?.triggerType || '';
-      const assetID = parameter?.assetID || '';
+      const assetID = parameter?.assetId || '';
       cells.push(triggerType, assetID);
       break;
     default:
       cells.push(parsedkAppFee, parsedbandwidthFee);
   }
 
-  if (contract.length > 1) {
-    const multiContract = [
-      hash,
-      blockNum,
-      created,
-      sender,
-      '',
-      status,
-      'Multi Contract',
-    ];
-
-    if (!router.query.type) {
-      multiContract.push(parsedkAppFee, parsedbandwidthFee);
-      return multiContract;
-    } else {
-      cells.slice(7).forEach(_ => multiContract.push(' '));
-    }
-    return multiContract;
-  }
-
+  cells.push(isMulticontract, nonce);
   return cells;
 };

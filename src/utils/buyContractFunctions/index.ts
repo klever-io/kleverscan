@@ -4,23 +4,23 @@ import { BuyReceiptData } from '@/types/receipts';
 
 export const getBuyPrice = (
   parameter: IBuyContractPayload,
-  buyReceipt: BuyReceiptData,
+  buyReceipt: BuyReceiptData | undefined,
 ): undefined | number => {
   if (parameter?.buyType === 'MarketBuy') {
-    return parameter.amount;
+    return parameter.amount || 0;
   } else if (parameter?.buyType === 'ITOBuy') {
-    return buyReceipt?.value;
+    return buyReceipt?.value || 0;
   }
 };
 
 export const getBuyAmount = (
   parameter: IBuyContractPayload,
-  buyReceipt: BuyReceiptData,
+  buyReceipt: BuyReceiptData | undefined,
 ): undefined | number => {
   if (parameter?.buyType === 'MarketBuy') {
-    return buyReceipt?.value;
+    return buyReceipt?.value || 0;
   } else if (parameter?.buyType === 'ITOBuy') {
-    return parameter?.amount;
+    return parameter?.amount || 0;
   }
 };
 

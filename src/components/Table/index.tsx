@@ -1,8 +1,8 @@
 import { useMobile } from '@/contexts/mobile';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
+import { exportToCsv } from '@/utils/csv';
 import { useDidUpdateEffect } from '@/utils/hooks';
-import { exportToCsv } from '@/utils/promiseFunctions';
 import { processRowSectionsLayout } from '@/utils/table';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';

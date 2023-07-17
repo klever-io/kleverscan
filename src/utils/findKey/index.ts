@@ -118,7 +118,7 @@ export const filterReceipts = (
 ): IReceipt[] => receipts.filter(receipt => receipt.cID === contractIndex);
 
 /**
- * 
+ * LEGACY FN
  * @param receipts receipts array
  * @param contractIndex index of array of contracts(multicontract)
  * @param baseReceiptType baseReceipt is the main receipt of the contract, e.g. in a freeze contract, the freeze receipt is the baseReceipt, any other receipt will be a searchReceipt that we are looking for
@@ -181,7 +181,7 @@ export const findNextSiblingReceipt = (
   return null;
 };
 /**
- * 
+ * LEGACY FN
  * @param receipts receipts array
  * @param contractIndex index of array of contracts(multicontract)
  * @param baseReceiptType baseReceipt is the main receipt of the contract, e.g. in a freeze contract, the freeze receipt is the baseReceipt, any other receipt will be a searchReceipt that we are looking for

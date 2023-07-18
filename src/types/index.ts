@@ -727,9 +727,6 @@ export interface IPrice {
     },
   ];
 }
-export interface IHomeProps {
-  kfiPrices: IPrice;
-}
 
 export interface IHome {
   transactionsList: IDailyTransaction[];

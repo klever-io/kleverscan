@@ -440,7 +440,6 @@ export const StakingSection: React.FC<IStakingSectionProps> = ({
           </TooltipContent>
         </TooltipContainer>
       </SectionTitle>
-
       {!assetTrigger && (
         <FormInput
           name="staking.interestType"

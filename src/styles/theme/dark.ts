@@ -7,6 +7,11 @@ const darktheme = {
   white: '#181935',
   black: '#FFFF',
   darkText: '#C6C7EB',
+  legacy: {
+    ...theme.legacy,
+    background: '#0B0B1E',
+  },
+
   form: {
     ...theme.form,
     hoverHash: '#6E7099',

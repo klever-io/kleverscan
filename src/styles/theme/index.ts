@@ -26,6 +26,11 @@ const theme = {
 
   violetPurpleGradient: 'linear-gradient(to right, #aa33b5 -25%, #7D3FF1 125%)',
 
+  legacy: {
+    searchBar: '#1d214a',
+    background: '#EBF1F8',
+  },
+
   true: {
     white: '#fff',
     black: '#0B0B1E',

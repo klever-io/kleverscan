@@ -17,7 +17,6 @@ export type Query = {
 
 export enum Service {
   PROXY,
-  PRICE,
   NODE,
   GECKO,
   EXPLORER,

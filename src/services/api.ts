@@ -50,9 +50,6 @@ export const getHost = (
   const hostService = {
     [Service.PROXY]:
       process.env.DEFAULT_API_HOST || 'https://api.testnet.klever.finance',
-    [Service.PRICE]:
-      process.env.DEFAULT_PRICE_HOST ||
-      'https://prices.endpoints.services.klever.io/v1',
     [Service.NODE]:
       process.env.DEFAULT_NODE_HOST || 'https://node.testnet.klever.finance',
     [Service.GECKO]: 'https://api.coingecko.com/api/v3',

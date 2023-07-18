@@ -302,32 +302,11 @@ export const useHomePageData = (): IHome => {
 
         reject(res.error);
       });
-
-      // const klvPriceCall = new Promise<IAccountResponse>(
-      //   async (resolve, reject) => {
-      //     const res = await api.post({
-      //       route: `coinstats`,
-      //       service: Service.PRICE,
-      //       body: {
-      //         ID: '38',
-      //         Name: 'klv',
-      //         Currency: 'USD',
-      //       },
-      //     });
-
-      //     if (!res.error || res.error === '') {
-      //       resolve(res);
-      //     }
-
-      //     reject(res.error);
-      //   },
-      // );
-
       const kfiPriceCall = new Promise<IAccountResponse>(
         async (resolve, reject) => {
           const res = await api.post({
-            route: `coinstats`,
-            service: Service.PRICE,
+            route: `prices/coinstats`,
+            service: Service.PROXY,
             body: {
               ID: 'kfi',
               Name: 'kfi',
@@ -492,8 +471,8 @@ export const useHomePageData = (): IHome => {
                 break;
 
               case 14:
-                if (!value.code) {
-                  const data = value.Exchanges.find(
+                if (!value.error) {
+                  const data = value.data.prices.Exchanges.find(
                     (exchange: any) => exchange.ExchangeName === 'Klever',
                   );
                   props.assetsData.kfi.volume = data.Volume ?? null;

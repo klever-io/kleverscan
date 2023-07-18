@@ -304,13 +304,13 @@ export const accountCall = async (
 export const pricesCall = async (): Promise<number | undefined> => {
   try {
     const res = await api.post({
-      route: 'prices',
-      service: Service.PRICE,
+      route: 'prices/prices',
+      service: Service.PROXY,
       body: { names: ['KLV/USD'] },
       useApiProxy: true,
     });
     if (!res.error || res.error === '') {
-      return res?.symbols[0]?.price;
+      return res?.data?.prices?.symbols[0]?.price;
     }
     return Promise.reject(new Error(res?.error));
   } catch (error) {

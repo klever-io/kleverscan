@@ -57,6 +57,7 @@ import {
   filterDate,
   filterOperations,
   hexToBinary,
+  invertBytes,
 } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
@@ -120,7 +121,9 @@ const PermissionOperations: React.FC<IPermissionOperations> = ({
     <OperationsContainer>
       {operations ? (
         displayOperations.map((item: string, key: number) => {
-          const filterResults = filterOperations(hexToBinary(operations));
+          const filterResults = filterOperations(
+            hexToBinary(invertBytes(operations)),
+          );
           const isChecked = filterResults[key];
           return (
             <OperationsContent key={contractsList[key]} isChecked={isChecked}>

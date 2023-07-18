@@ -150,6 +150,14 @@ export const base64ToHex = (str: string): string => {
   }
 };
 
+export const invertBytes = (hex: string): string => {
+  let newHex = '';
+  for (let i = 0; i < hex.length; i += 2) {
+    newHex = hex.slice(i, i + 2) + newHex;
+  }
+  return newHex;
+};
+
 export const hexToBinary = (hex: string): string => {
   if (!isHex(hex)) {
     return '';

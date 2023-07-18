@@ -1,6 +1,7 @@
 import { useContract } from '@/contexts/contract';
 import { contractsList } from '@/utils/contracts';
 import { setCharAt } from '@/utils/convertString';
+import { invertBytes } from '@/utils/formatFunctions';
 import React, { useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
@@ -51,11 +52,12 @@ const parseBinaryToHex = (dataRef: FormData): FormData => {
     const binaryOperations =
       data.permissions[index].binaryOperations || binaryDefault;
     const hex = Number(`0b${binaryOperations}`).toString(16);
-    let newHex = hex;
-    if (newHex.length % 2 !== 0) {
-      newHex = '0' + newHex;
+    let paddedHex = hex;
+    if (paddedHex.length % 2 !== 0) {
+      paddedHex = '0' + paddedHex;
     }
-    data.permissions[index].operations = newHex;
+    const byteInvertedHex = invertBytes(paddedHex);
+    data.permissions[index].operations = byteInvertedHex;
     delete permission.binaryOperations;
   });
 

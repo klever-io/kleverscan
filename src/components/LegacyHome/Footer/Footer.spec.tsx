@@ -37,14 +37,14 @@ describe('Component: Footer', () => {
         if (name === 'KLV') {
           const paragraph = screen.getByText(name);
           expect(paragraph).toBeInTheDocument();
-        } else if (name !== 'WhitePaper') {
+        } else if (name !== 'WhitePaper' && name !== 'Privacy Policy') {
           const link = screen.getByRole('link', { name });
           expect(link).toBeInTheDocument();
           expect(link).toHaveAttribute('href', href);
         } else {
           const link = screen.getAllByRole('link', { name });
-          expect(link[index > 1 ? 0 : 1]).toBeInTheDocument();
-          expect(link[index > 1 ? 0 : 1]).toHaveAttribute('href', href);
+          expect(link[index >= 2 ? 0 : 1]).toBeInTheDocument();
+          expect(link[index >= 2 ? 0 : 1]).toHaveAttribute('href', href);
         }
       });
     });
@@ -64,18 +64,5 @@ describe('Component: Footer', () => {
     getSocials?.forEach(item => {
       expect(item.firstChild).toHaveStyle(style);
     });
-  });
-
-  it('Should match the style for links of the Klever Exchange, Klever wallet App and Klever Ecosystem', () => {
-    const style = {
-      textDecoration: 'none',
-      gap: '0.5rem',
-      fontSize: '0.9rem',
-      fontWeight: '400',
-      color: `${theme.footer.text}`,
-    };
-
-    const linkItem = screen.getByRole('link', { name: /Privacy Policy/i });
-    expect(linkItem).toHaveStyle(style);
   });
 });

@@ -1,3 +1,4 @@
+import { navbarItems as navbarItemsConfig } from '@/configs/navbar';
 import { fireEvent, screen } from '@testing-library/react';
 import * as nextRouter from 'next/router';
 import React from 'react';
@@ -11,20 +12,13 @@ interface StyleProps {
 }
 
 describe('Component: Header/navbar', () => {
-  const navBarItems = [
-    'Blocks',
-    'Accounts',
-    'Transactions',
-    'Assets',
-    'Validators',
-    // 'Nodes',
-    'Proposals',
-    'Multisign',
-    'Charts',
-    'ITOs',
-    'Verify',
-    'Feedback',
-  ];
+  const navBarItems = navbarItemsConfig
+    .map(item =>
+      item.name !== 'More'
+        ? item.name
+        : (item?.pages?.map(page => page.name) as string[]),
+    )
+    .flat();
 
   jest.mock('next/router', () => ({
     useRouter() {

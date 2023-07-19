@@ -22,7 +22,7 @@ export default async function handler(
 
     const response = await fetch(getHost(route, query, service, 'v1.0'), props);
     if (!response.ok) {
-      res.status(500).json({});
+      res.status(500).json(await response.json());
     } else {
       res.status(200).json(await response.json());
     }

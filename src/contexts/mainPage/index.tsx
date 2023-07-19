@@ -653,8 +653,8 @@ export const HomeDataProvider: React.FC = ({ children }) => {
 
     const kfiPriceCall = new Promise<IPrice>(async (resolve, reject) => {
       const res = await api.post({
-        route: `coinstats`,
-        service: Service.PRICE,
+        route: `prices/coinstats`,
+        service: Service.PROXY,
         body: {
           ID: 'kfi',
           Name: 'kfi',
@@ -766,10 +766,13 @@ export const HomeDataProvider: React.FC = ({ children }) => {
             break;
 
           case 6:
-            if (!value.code) {
-              const data = value.Exchanges.find(
+            if (!value.error) {
+              const data = value?.data?.prices?.Exchanges.find(
                 (exchange: any) => exchange.ExchangeName === 'Klever',
               );
+
+              if (!data) return;
+
               assetsData.kfi.volume = data.Volume ?? null;
               assetsData.kfi.prices.todaysPrice = data.Price ?? null;
               assetsData.kfi.prices.variation = data.PriceVariation ?? null;

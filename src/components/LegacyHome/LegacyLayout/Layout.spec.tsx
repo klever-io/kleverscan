@@ -1,3 +1,4 @@
+import { contents } from '@/configs/footer';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useRouter } from 'next/router';
@@ -42,14 +43,8 @@ describe("test Layout and it's inner components", () => {
     });
     expect(hello).toBeInTheDocument();
 
-    const footerText = [
-      'Klever Exchange',
-      'Klever.Org',
-      'Klever Wallet App',
-      'Privacy Policy',
-      'Klever News',
-      'Roadmap',
-    ];
+    const footerText = contents.map(item => item.title);
+
     footerText.forEach(item => {
       expect(screen.getByText(item)).toBeInTheDocument();
     });

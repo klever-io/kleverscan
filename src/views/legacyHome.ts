@@ -49,7 +49,7 @@ export const ProgressContainerSpanSkeleton = styled(ProgressContainerSpan)`
 `;
 
 export const Section = styled.section`
-  padding: 0 min(3%, 10rem) 10rem;
+  padding-bottom: 6rem;
 
   h1 {
     color: ${props => props.theme.black};
@@ -115,7 +115,7 @@ export const Input = styled(DefaultInput)`
 `;
 
 export const DataCardsContainer = styled.div`
-  margin-top: 4rem;
+  margin-top: 8rem;
 
   display: flex;
 

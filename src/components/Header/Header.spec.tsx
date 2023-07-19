@@ -22,6 +22,7 @@ describe('Component: Header/navbar', () => {
     'Multisign',
     'Charts',
     'ITOs',
+    'Encoding Converter',
     'Verify',
     'Feedback',
   ];

@@ -1,5 +1,6 @@
 import { ISelectedDays } from '@/components/DateFilter';
 import { IFilterDater } from '@/types';
+import { bech32 } from 'bech32';
 import { format } from 'date-fns';
 import { contractsList } from '../contracts';
 
@@ -181,4 +182,52 @@ export const filterOperations = (filterString: string): boolean[] => {
   });
 
   return filteredContracts;
+};
+
+export const utf8ToBase64 = (utf8String: string): string => {
+  const encodedString = Buffer.from(utf8String, 'utf8').toString('base64');
+  return encodedString;
+};
+
+export const base64ToUtf8 = (base64String: string): string => {
+  const decodedString = Buffer.from(base64String, 'base64').toString('utf8');
+  return decodedString;
+};
+
+export const utf8ToBech32 = (utf8String: string): string => {
+  const words = bech32.toWords(Buffer.from(utf8String, 'utf8'));
+  const encodedString = bech32.encode('bech32', words);
+  return encodedString;
+};
+
+export const bech32ToUtf8 = (bech32String: string): string => {
+  const { words } = bech32.decode(bech32String);
+  const decodedString = Buffer.from(bech32.fromWords(words)).toString('utf8');
+  return decodedString;
+};
+
+export const hexToUtf8 = (hexString: string): string => {
+  const utf8Character = decodeURIComponent(
+    hexString.replace(/\s+/g, '').replace(/[0-9a-f]{2}/g, '%$&'),
+  );
+  return utf8Character;
+};
+
+export const utf8ToHex = (utf8String: string): string => {
+  const utf8encoder = new TextEncoder();
+  const decimalValue = utf8encoder.encode(utf8String);
+  let hexValue = '';
+  for (let i = 0; i < decimalValue.length; i++) {
+    hexValue += ('0' + decimalValue[i].toString(16)).slice(-2);
+  }
+  return hexValue;
+};
+
+export const publicKeyToAddress = (publicKey: string): string => {
+  const words = bech32.toWords(Buffer.from(publicKey, 'base64'));
+  const address = bech32.encode('klv', bech32.toWords(words));
+  const privateKeyPem = Buffer.from(address, 'base64')
+    .toString('utf-8')
+    .slice(0, 64);
+  return address;
 };

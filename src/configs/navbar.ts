@@ -9,7 +9,7 @@ import {
 import { GiTwoCoins } from 'react-icons/gi';
 import { MdFeedback } from 'react-icons/md';
 import { RiPenNibFill } from 'react-icons/ri';
-
+import { TbArrowsLeftRight } from 'react-icons/tb';
 export interface INavbarItem {
   name: string;
   pathTo: string;
@@ -82,6 +82,11 @@ const navbarItems: INavbarItem[] = [
         name: 'ITOs',
         pathTo: '/itos',
         Icon: GiTwoCoins,
+      },
+      {
+        name: 'Encoding Converter',
+        pathTo: '/encoding-converter',
+        Icon: TbArrowsLeftRight,
       },
       {
         name: 'Verify',

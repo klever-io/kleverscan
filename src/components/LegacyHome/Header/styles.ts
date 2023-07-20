@@ -361,6 +361,7 @@ export const DropdownItem = styled.li<{ disabled: boolean }>`
   a {
     display: flex;
     flex-direction: row;
+    align-items: center;
     pointer-events: ${props => (props.disabled ? 'none' : 'all')};
   }
   cursor: ${props => (props.disabled ? 'default' : 'pointer')};

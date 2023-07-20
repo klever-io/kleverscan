@@ -115,7 +115,7 @@ export const Input = styled(DefaultInput)`
 `;
 
 export const DataCardsContainer = styled.div`
-  margin-top: 8rem;
+  margin-top: 4rem;
 
   display: flex;
 

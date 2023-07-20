@@ -41,11 +41,12 @@ export const getParamsList = async (): Promise<IParamList[] | undefined> => {
       return {
         number: index,
         parameter: proposalsMessages[key] ? proposalsMessages[key] : '',
-        currentValue: data.parameters[key].value,
+        currentValue: data.parameters[key]?.value,
         parameterLabel: key,
       };
     });
   }
+
   networkParams.length &&
     networkParams?.forEach((param: INetworkParam) => {
       paramsList.push({

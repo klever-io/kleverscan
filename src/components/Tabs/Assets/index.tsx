@@ -25,14 +25,22 @@ const Assets: React.FC<IAssets> = ({
     'Precision',
     'Balance',
     'Frozen',
+    'Unfrozen',
     'Staking Type',
     '',
   ];
   const { getInteractionsButtons } = useContractModal();
 
   const rowSections = (props: IAccountAsset): IRowSection[] => {
-    const { assetId, assetType, precision, balance, frozenBalance, staking } =
-      props;
+    const {
+      assetId,
+      assetType,
+      precision,
+      balance,
+      frozenBalance,
+      unfrozenBalance,
+      staking,
+    } = props;
 
     const ticker = assetId?.split('-')[0];
     const sectionViewNfts =
@@ -74,6 +82,14 @@ const Assets: React.FC<IAssets> = ({
         element: (
           <strong key={frozenBalance}>
             {formatAmount(frozenBalance / 10 ** precision)} {ticker}
+          </strong>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <strong key={unfrozenBalance}>
+            {formatAmount(unfrozenBalance / 10 ** precision)} {ticker}
           </strong>
         ),
         span: 1,

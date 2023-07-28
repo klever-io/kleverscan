@@ -232,7 +232,7 @@ const precisionParse = async (
       parseSplitRoyaltiesPrecision(payload);
       break;
     case 'CreateValidatorContract':
-    case 'ConfigValidatorContract':
+    case 'ValidatorConfigContract':
       payload.commission = addPrecision(
         payload.commission,
         percentagePrecision,

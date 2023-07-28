@@ -1,5 +1,5 @@
 import { useContract } from '@/contexts/contract';
-import { KLV_PRECISION } from '@/utils/globalVariables';
+import { KLV_PRECISION, PERCENTAGE_PRECISION } from '@/utils/globalVariables';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -57,6 +57,7 @@ const ConfigValidator: React.FC<IContractProps> = ({
           type="number"
           {...percentageProps}
           tooltip={tooltip.commission}
+          precision={PERCENTAGE_PRECISION}
         />
         <FormInput
           name="maxDelegationAmount"

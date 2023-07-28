@@ -1,5 +1,6 @@
 import Contract from '@/components/Contract';
 import { getType } from '@/components/Contract/utils';
+import { IAsset, ICollectionList } from '@/types';
 import { ContractsIndex } from '@/types/contracts';
 import { BASE_TX_SIZE } from '@/utils/globalVariables';
 import { useRouter } from 'next/router';
@@ -9,12 +10,16 @@ import { useContract } from '.';
 import { useMobile } from '../mobile';
 import { useFees } from './fees';
 
-interface IQueue {
+export interface IQueue {
   elementId: number;
   contractName: string;
   ref: JSX.Element;
   metadata: string;
   contractType: string;
+  collection?: ICollectionList;
+  royaltiesFeeAmount?: number;
+  ITOAssetId?: IAsset;
+  collectionAssetId?: number;
 }
 
 interface IMulticontract {
@@ -27,6 +32,7 @@ interface IMulticontract {
   totalBandwidthFees: number;
   totalFees: number;
   showMultiContracts: boolean;
+  parsedIndex: number;
   addToQueue: () => void;
   removeContractQueue: (contractIndex: number, e: any) => void;
   editContract: (index: number) => void;
@@ -37,6 +43,9 @@ interface IMulticontract {
   setShowMultiContracts: React.Dispatch<React.SetStateAction<boolean>>;
   setSelectedContractType: (contractType: string) => void;
   setMetadata: (metadata: string) => void;
+  setCollection: (collection: ICollectionList) => void;
+  setSelectedRoyaltiesFees: (amount: number) => void;
+  setCollectionAssetId: (id: number) => void;
 }
 
 export const MultiContractContext = createContext({} as IMulticontract);
@@ -85,6 +94,30 @@ export const MulticontractProvider: React.FC = ({ children }) => {
     setQueue(newQueue);
   };
 
+  const setSelectedRoyaltiesFees = (amount: number) => {
+    if (queue.length === 0) return;
+
+    if (amount === undefined) return;
+
+    const newQueue = [...queue];
+    if (newQueue[parsedIndex]) {
+      newQueue[parsedIndex]['royaltiesFeeAmount'] = amount;
+    }
+    setQueue(newQueue);
+  };
+
+  const setCollectionAssetId = (id: number) => {
+    if (queue.length === 0) return;
+
+    if (id === undefined) return;
+
+    const newQueue = [...queue];
+    if (newQueue[parsedIndex]) {
+      newQueue[parsedIndex]['collectionAssetId'] = id;
+    }
+    setQueue(newQueue);
+  };
+
   useEffect(() => {
     if (router.isReady) {
       const { contract } = router.query;
@@ -116,6 +149,12 @@ export const MulticontractProvider: React.FC = ({ children }) => {
 
     newQueue[parsedIndex].metadata = metadata;
 
+    setQueue(newQueue);
+  };
+
+  const setCollection = (collection: ICollectionList) => {
+    const newQueue = [...queue];
+    newQueue[parsedIndex].collection = collection;
     setQueue(newQueue);
   };
 
@@ -172,10 +211,14 @@ export const MulticontractProvider: React.FC = ({ children }) => {
     setQueue([
       {
         elementId: 0,
-        contractName: ContractsIndex[getType('TransferContract')],
-        contractType: 'TransferContract',
+        contractName:
+          queue[0]?.contractName || ContractsIndex[getType('TransferContract')],
+        contractType: queue[0]?.contractType || 'TransferContract',
         ref: <Contract {...contractPropsWithIndex} />,
         metadata: '',
+        collection: queue[0]?.collection,
+        royaltiesFeeAmount: queue[0]?.royaltiesFeeAmount,
+        collectionAssetId: queue[0]?.collectionAssetId,
       },
     ]);
     setSelectedId(0);
@@ -196,6 +239,7 @@ export const MulticontractProvider: React.FC = ({ children }) => {
     totalBandwidthFees,
     totalFees,
     showMultiContracts,
+    parsedIndex,
     addToQueue,
     editContract,
     removeContractQueue,
@@ -206,6 +250,9 @@ export const MulticontractProvider: React.FC = ({ children }) => {
     setSelectedContractType: setSelectedContractAndQuery,
     setMetadata,
     setShowMultiContracts,
+    setCollection,
+    setSelectedRoyaltiesFees,
+    setCollectionAssetId,
   };
 
   return (

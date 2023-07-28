@@ -1,9 +1,13 @@
+import { useMulticontract } from '@/contexts/contract/multicontract';
+import { calculateMarketBuyFixedFee } from '@/utils/create-transaction/fees-calculation.ts';
+import { toLocaleFixed } from '@/utils/formatFunctions';
+import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useKDASelect } from '@/utils/hooks/contract';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
-import { FormBody, FormSection } from '../styles';
+import { FormBody, FormSection, RoyaltiesContainer } from '../styles';
 import { parseDates } from './utils';
 
 type FormData = {
@@ -25,13 +29,30 @@ const parseSell = (data: FormData) => {
 const Sell: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   const { handleSubmit, watch } = useFormContext<FormData>();
   const marketType = watch('marketType');
+  const { setSelectedRoyaltiesFees } = useMulticontract();
 
-  const [_, KDASelect] = useKDASelect();
+  const [collection, KDASelect] = useKDASelect();
 
   const onSubmit = async (data: FormData) => {
     parseSell(data);
     await handleFormSubmit(data);
   };
+
+  const getMarketBuyFixedFee = () => {
+    if (!collection) {
+      return 0;
+    }
+    const marketBuyFixedFee = calculateMarketBuyFixedFee(collection);
+    return marketBuyFixedFee;
+  };
+
+  const marketBuyFixedFee = getMarketBuyFixedFee();
+
+  useEffect(() => {
+    if (marketBuyFixedFee) {
+      setSelectedRoyaltiesFees(marketBuyFixedFee);
+    }
+  }, [collection]);
 
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
@@ -82,6 +103,11 @@ const Sell: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
           required
         />
       </FormSection>
+      {marketBuyFixedFee > 0 && (
+        <RoyaltiesContainer>
+          Royalties: {`${toLocaleFixed(marketBuyFixedFee, KLV_PRECISION)} KLV`}
+        </RoyaltiesContainer>
+      )}
     </FormBody>
   );
 };

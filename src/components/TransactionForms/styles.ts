@@ -236,3 +236,7 @@ export const SectionText = styled.p`
   font-weight: 400;
   color: ${props => props.theme.darkText};
 `;
+
+export const RoyaltiesContainer = styled.div`
+  color: ${({ theme }) => theme.darkText};
+`;

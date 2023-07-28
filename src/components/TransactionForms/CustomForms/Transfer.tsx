@@ -1,9 +1,16 @@
+import { useMulticontract } from '@/contexts/contract/multicontract';
+import {
+  calculateTransferFixedFee,
+  calculateTransterPercentageFee,
+} from '@/utils/create-transaction/fees-calculation.ts';
+import { toLocaleFixed } from '@/utils/formatFunctions';
+import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useKDASelect } from '@/utils/hooks/contract';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
-import { FormBody, FormSection } from '../styles';
+import { FormBody, FormSection, RoyaltiesContainer } from '../styles';
 
 type FormData = {
   receiver: string;
@@ -12,10 +19,22 @@ type FormData = {
 };
 
 const Transfer: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
-  const { handleSubmit } = useFormContext<FormData>();
+  const { handleSubmit, watch } = useFormContext<FormData>();
   const [collection, KDASelect] = useKDASelect({
     validateFields: ['amount'],
   });
+  const { setSelectedRoyaltiesFees } = useMulticontract();
+  const amount = watch('amount');
+
+  useEffect(() => {
+    if (collection?.royalties?.transferPercentage) {
+      setSelectedRoyaltiesFees(
+        calculateTransterPercentageFee(amount, collection),
+      );
+    } else if (collection?.royalties?.transferFixed) {
+      setSelectedRoyaltiesFees(calculateTransferFixedFee(collection));
+    }
+  }, [amount, collection]);
 
   const transferParse = (data: FormData) => {
     if (collection?.isNFT) {
@@ -27,6 +46,32 @@ const Transfer: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
     transferParse(data);
     await handleFormSubmit(data);
   };
+
+  const getTransferRoyaltyFee = (): number => {
+    if (collection?.isNFT) {
+      return calculateTransferFixedFee(collection);
+    } else {
+      return calculateTransterPercentageFee(amount, collection);
+    }
+  };
+
+  const getKdaRoyalty = (): string => {
+    if (collection?.isNFT) {
+      return 'KLV';
+    }
+    return collection?.value || '';
+  };
+
+  const getRoyaltyPrecision = (): number => {
+    if (collection?.isNFT) {
+      return KLV_PRECISION;
+    }
+    return collection?.precision || 0;
+  };
+
+  const transferRoyalties = getTransferRoyaltyFee();
+  const kdaRoyalty = getKdaRoyalty();
+  const royaltyPrecision = getRoyaltyPrecision();
 
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
@@ -43,6 +88,15 @@ const Transfer: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
         )}
         <FormInput name="receiver" title="Receiver Address" required />
       </FormSection>
+      {transferRoyalties > 0 && (
+        <RoyaltiesContainer>
+          Royalties:{' '}
+          {`${toLocaleFixed(
+            transferRoyalties,
+            royaltyPrecision,
+          )} ${kdaRoyalty}`}
+        </RoyaltiesContainer>
+      )}
     </FormBody>
   );
 };

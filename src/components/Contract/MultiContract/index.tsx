@@ -5,7 +5,7 @@ import {
   FeeDetailsContainer,
 } from '@/components/Form/styles';
 import { useContract } from '@/contexts/contract';
-import { useMulticontract } from '@/contexts/contract/multicontract';
+import { IQueue, useMulticontract } from '@/contexts/contract/multicontract';
 import { useMobile } from '@/contexts/mobile';
 import React from 'react';
 import { FiPlus } from 'react-icons/fi';
@@ -20,16 +20,59 @@ import {
   Title,
 } from './styles';
 
+const queueHaveSomeRoyalties = (queue: IQueue[]) =>
+  queue.some(item => item.royaltiesFeeAmount);
+
+const sumAllRoyaltiesFees = (queue: IQueue[]) => {
+  const result = {};
+  queue.forEach(item => {
+    if (item.royaltiesFeeAmount && item.collection && !item.collection.isNFT) {
+      if (result[item?.collection?.value]) {
+        result[item.collection.value]['totalFee'] += item.royaltiesFeeAmount;
+      } else {
+        result[item.collection.value] = {};
+        result[item.collection.value]['precision'] = item.collection.precision;
+        result[item.collection.value]['totalFee'] = item.royaltiesFeeAmount;
+      }
+    } else if (item.royaltiesFeeAmount) {
+      if (result['KLV']) {
+        result['KLV']['totalFee'] += item.royaltiesFeeAmount;
+      } else {
+        result['KLV'] = {};
+        result['KLV']['totalFee'] = item.royaltiesFeeAmount;
+        result['KLV']['precision'] = 6;
+      }
+    }
+  });
+  Object.keys(result).forEach(key => {
+    result[key]['totalFee'] = result[key]['totalFee'].toFixed(
+      result[key]['precision'],
+    );
+  });
+  return result;
+};
+
 const FeeDetails: React.FC<{
   isOpen: boolean;
 }> = ({ isOpen }) => {
-  const { totalBandwidthFees: bandwidthFee, totalKappFees: kappFee } =
-    useMulticontract();
-
+  const {
+    totalBandwidthFees: bandwidthFee,
+    totalKappFees: kappFee,
+    queue,
+  } = useMulticontract();
+  const allRoyaltiesFees = sumAllRoyaltiesFees(queue);
   return (
     <FeeDetailsContainer open={isOpen}>
-      <span>{`${kappFee} KLV (KApp Fees)`}</span>+
+      <span>{`${kappFee} KLV (KApp Fees)`}</span>
       <span>{`${bandwidthFee} KLV (Bandwidth Fees)`}</span>
+      {queueHaveSomeRoyalties(queue) &&
+        Object.keys(allRoyaltiesFees).map(item => {
+          return (
+            <span
+              key={item}
+            >{`${allRoyaltiesFees[item]['totalFee']} ${item} (Royalty Fees)`}</span>
+          );
+        })}
     </FeeDetailsContainer>
   );
 };
@@ -113,6 +156,7 @@ const MultiContract: React.FC = () => {
           <span>Estimated Fees: </span>
           <span>
             {totalFees.toFixed(6)} KLV{' '}
+            {queueHaveSomeRoyalties(queue) && '+ Royalties'}
             <DetailsArrowContainer
               isOpen={isDetailsOpen}
               onClick={() => handleArrowDownClick()}

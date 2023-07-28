@@ -49,14 +49,19 @@ interface ISelectProps {
 export const useKDASelect = (
   params?: IKDASelect,
 ): [ICollectionList | undefined, React.FC<ISelectProps>] => {
-  const [collection, setCollection] = useState<ICollectionList | undefined>(
-    {} as ICollectionList,
-  );
   const [loading, setLoading] = useState(false);
 
   const { getAssets, getKAssets, getOwnerAddress } = useContract();
 
-  const { selectedContractType: contractType } = useMulticontract();
+  const {
+    selectedContractType: contractType,
+    queue,
+    setCollection,
+    setCollectionAssetId,
+    parsedIndex,
+  } = useMulticontract();
+
+  const collectionAssetId = queue[parsedIndex]?.collectionAssetId;
 
   const assetTriggerType =
     params?.assetTriggerType !== undefined ? params?.assetTriggerType : null;
@@ -73,6 +78,7 @@ export const useKDASelect = (
   } = useFormContext();
 
   const watchCollection = watch('collection');
+  const watchCollectionAssetId = watch('collectionAssetId');
 
   const {
     data: assetsList,
@@ -106,19 +112,24 @@ export const useKDASelect = (
     refetchKassetsList();
   };
 
+  const selectedCollection = assetsList?.find(
+    asset => asset.value === watchCollection,
+  );
   useEffect(() => {
-    if (watchCollection && watchCollection !== collection?.value) {
-      const selectedCollection = assetsList?.find(
-        asset => asset.value === watchCollection,
-      );
+    if (watchCollection && watchCollection !== selectedCollection?.value) {
       selectedCollection && setCollection(selectedCollection);
-      !selectedCollection &&
-        setCollection({
-          label: watchCollection,
-          value: watchCollection,
-        } as ICollectionList);
+      !selectedCollection && setCollection(watchCollection);
     }
   }, [watchCollection, assetsList]);
+
+  useEffect(() => {
+    if (
+      watchCollectionAssetId &&
+      watchCollectionAssetId !== collectionAssetId
+    ) {
+      setCollectionAssetId(watchCollectionAssetId);
+    }
+  }, [watchCollectionAssetId]);
 
   useEffect(() => {
     validateFields.forEach(field => {
@@ -127,10 +138,10 @@ export const useKDASelect = (
         trigger(field);
       }
     });
-  }, [collection]);
+  }, [selectedCollection]);
 
   let assetBalance = 0;
-  assetBalance = collection?.balance || 0;
+  assetBalance = selectedCollection?.balance || 0;
 
   const KDASelect: React.FC<ISelectProps> = ({ required }) => {
     let collectionError: null | FieldError = null;
@@ -159,7 +170,7 @@ export const useKDASelect = (
     }, [register]);
 
     const showAssetIdInputConditional =
-      collection?.isNFT &&
+      selectedCollection?.isNFT &&
       !collectionContracts.includes(contractType) &&
       showAssetIdInput(contractType, assetTriggerType);
 
@@ -170,14 +181,14 @@ export const useKDASelect = (
     }, [showAssetIdInputConditional]);
 
     const CollectionIDField: React.FC = () => {
-      useEffect(() => {
-        return () => {
-          (!collection?.isNFT ||
-            collectionContracts.includes(contractType) ||
-            !showAssetIdInput(contractType, assetTriggerType)) &&
-            setValue('collectionAssetID', '');
-        };
-      }, []);
+      // useEffect(() => {
+      //   return () => {
+      //     (!collection?.isNFT ||
+      //       collectionContracts.includes(contractType) ||
+      //       !showAssetIdInput(contractType, assetTriggerType)) &&
+      //       setValue('collectionAssetID', '');
+      //   };
+      // }, []);
 
       return (
         <SelectContent>
@@ -202,7 +213,7 @@ export const useKDASelect = (
     };
 
     return (
-      <SelectContainer key={JSON.stringify(collection)}>
+      <SelectContainer key={JSON.stringify(selectedCollection)}>
         <SelectContent configITO={contractType === 'ConfigITOContract'}>
           <BalanceContainer>
             <FieldLabel>
@@ -212,18 +223,18 @@ export const useKDASelect = (
             <ReloadWrapper onClick={refetch} $loading={loading}>
               <IoReloadSharp />
             </ReloadWrapper>
-            {collection?.balance && (
+            {selectedCollection?.balance && (
               <BalanceLabel>
                 Balance:{' '}
                 {toLocaleFixed(
-                  assetBalance / 10 ** (collection?.precision || 0),
-                  collection?.precision || 0,
+                  assetBalance / 10 ** (selectedCollection?.precision || 0),
+                  selectedCollection?.precision || 0,
                 )}
               </BalanceLabel>
             )}
           </BalanceContainer>
           <Select
-            collection={collection}
+            collection={selectedCollection}
             options={getAssetsList(
               kAssetContracts.includes(contractType)
                 ? kassetsList || []
@@ -243,7 +254,9 @@ export const useKDASelect = (
               }
             }}
             loading={loading}
-            selectedValue={collection?.value ? collection : undefined}
+            selectedValue={
+              selectedCollection?.value ? selectedCollection : undefined
+            }
             zIndex={3}
             error={Boolean(collectionError)}
           />
@@ -258,5 +271,5 @@ export const useKDASelect = (
     );
   };
 
-  return [collection, KDASelect];
+  return [selectedCollection, KDASelect];
 };

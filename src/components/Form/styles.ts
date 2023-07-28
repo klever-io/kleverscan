@@ -60,7 +60,7 @@ export const FeeDetailsContainer = styled.small<{ open: boolean }>`
   transition: opacity 0.2s ease-in-out;
 
   background-color: ${props => props.theme.lightBlue};
-  color: ${props => props.theme.black};
+  color: ${props => props.theme.lightGray};
 
   ${props =>
     !props.open &&
@@ -73,7 +73,10 @@ export const FeeDetailsContainer = styled.small<{ open: boolean }>`
 
 export const DetailsArrowContainer = styled.span<{ isOpen: boolean }>`
   cursor: pointer;
+  display: grid;
+  place-items: center;
   margin-left: 0.5rem;
+  margin-top: 0.5rem;
 
   svg {
     transition: transform 0.2s ease-in-out;

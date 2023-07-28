@@ -59,6 +59,7 @@ export interface ICollectionList {
     isPaused: boolean;
     isNFTMintStopped: boolean;
   };
+  royalties: IRoyalties | undefined;
 }
 
 export interface ICreateAssetReceipt {
@@ -368,6 +369,7 @@ export interface ISplitRoyalties {
 export interface IRoyalties {
   address?: string;
   marketPercentage?: number;
+  marketFixed?: number;
   transferFixed?: number;
   transferPercentage?: [
     {

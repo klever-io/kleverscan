@@ -193,6 +193,7 @@ export const ContractProvider: React.FC = ({ children }) => {
         value: item.assetId,
         isNFT: assets?.[item.assetId]?.assetType === 1,
         minEpochsToWithdraw: minEpochsToWithdraw ? minEpochsToWithdraw : null,
+        royalties: item.royalties || undefined,
       });
     });
 
@@ -204,6 +205,8 @@ export const ContractProvider: React.FC = ({ children }) => {
       const minEpochsToWithdraw =
         assetInfo.data?.asset?.staking?.minEpochsToWithdraw;
 
+      const royalties = assetInfo.data?.asset?.royalties;
+
       list.push({
         label: 'KLV',
         value: 'KLV',
@@ -212,6 +215,7 @@ export const ContractProvider: React.FC = ({ children }) => {
         minEpochsToWithdraw: minEpochsToWithdraw ? minEpochsToWithdraw : null,
         balance,
         frozenBalance,
+        royalties: royalties || undefined,
       });
     }
     list.sort((a, b) => (a.label > b.label ? 1 : -1));

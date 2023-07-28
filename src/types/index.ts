@@ -47,6 +47,7 @@ interface IAssetProperties {
 export interface ICollectionList {
   label: string;
   value: string;
+  assetId: string;
   isNFT: boolean;
   frozenBalance?: number;
   balance?: number;
@@ -792,6 +793,12 @@ export interface IAssetTransactionResponse extends IResponse {
 export interface IAssetPoolResponse extends IResponse {
   data: {
     pool: IAssetPool;
+  };
+}
+
+export interface IAssetPoolsReponse extends IResponse {
+  data: {
+    pools: IAssetPool[];
   };
 }
 

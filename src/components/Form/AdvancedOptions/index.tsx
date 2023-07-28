@@ -17,11 +17,14 @@ import {
 } from '@/components/TransactionForms/FormInput/styles';
 import { useContract } from '@/contexts/contract';
 import { useMulticontract } from '@/contexts/contract/multicontract';
+import { ReloadWrapper } from '@/contexts/contract/styles';
 import getAccount from '@/services/requests/searchBar/account';
 import { IAccountResponse, ICollectionList, IDropdownItem } from '@/types';
 import { IAccPermission } from '@/types/contracts';
+import { filterPoolAssets } from '@/utils/create-transaction/parseFunctions';
 import { parseAddress } from '@/utils/parseValues';
 import { useEffect, useState } from 'react';
+import { IoReloadSharp } from 'react-icons/io5';
 import { useQuery } from 'react-query';
 import { AdvancedOptsContainer, ArrowDownIcon, ArrowUpIcon } from '../styles';
 import {
@@ -206,18 +209,42 @@ const MultiSigSelect: React.FC = () => {
 const AdvancedOptionsContent: React.FC = () => {
   const { showPayload, isMultisig, kdaFee, getAssets, getOwnerAddress } =
     useContract();
+  const [loading, setLoading] = useState(false);
 
   const { setIsMultiContract, isMultiContract } = useMulticontract();
 
-  const [assetsList, setAssetsList] = useState<ICollectionList[]>([]);
-  const [kdaFeeAsset, setKdaFeeAsset] = useState<ICollectionList | null>(null);
+  const { data: assets, isFetching: assetsFetching } = useQuery({
+    queryKey: ['userAssets'],
+    queryFn: getAssets,
+    initialData: [],
+  });
 
-  useEffect(() => {
-    (async () => {
-      const newAssetsList = (await getAssets()) || [];
-      setAssetsList(newAssetsList);
-    })();
-  }, []);
+  const getAvailablePoolAssets = async () =>
+    filterPoolAssets(
+      getAssetsList(
+        assets || [],
+        'FreezeContract',
+        null,
+        null,
+        getOwnerAddress(),
+      ),
+    );
+
+  const { data: assetsPool, isFetching: assetsPoolFetching } = useQuery({
+    queryKey: ['assetsPool'],
+    queryFn: getAvailablePoolAssets,
+    initialData: [],
+    enabled: !!assets?.length,
+  });
+
+  const refetch = async () => {
+    setLoading(true);
+    await getAssets();
+    await getAvailablePoolAssets();
+    setLoading(false);
+  };
+
+  const [kdaFeeAsset, setKdaFeeAsset] = useState<ICollectionList | null>(null);
 
   const assetBalance = kdaFee?.current.balance || null;
 
@@ -227,6 +254,12 @@ const AdvancedOptionsContent: React.FC = () => {
         <SelectContent>
           <BalanceContainer key={kdaFeeAsset?.value}>
             <FieldLabel>KDA to pay fees:</FieldLabel>
+            <ReloadWrapper
+              onClick={refetch}
+              $loading={assetsPoolFetching || assetsFetching || loading}
+            >
+              <IoReloadSharp />
+            </ReloadWrapper>
             {!isNaN(Number(assetBalance)) && assetBalance !== null && (
               <BalanceLabel>
                 Balance: {assetBalance / 10 ** (kdaFee.current?.precision || 0)}
@@ -236,18 +269,13 @@ const AdvancedOptionsContent: React.FC = () => {
           <Select
             key={JSON.stringify(kdaFee.current)}
             collection={kdaFee.current}
-            options={getAssetsList(
-              assetsList || [],
-              'FreezeContract',
-              null,
-              null,
-              getOwnerAddress(),
-            )}
+            options={assetsPool}
             onChange={(value: any) => {
               kdaFee.current = value;
               setKdaFeeAsset(value);
             }}
             zIndex={2}
+            loading={assetsPoolFetching || assetsFetching || loading}
           />
         </SelectContent>
       </FieldContainer>

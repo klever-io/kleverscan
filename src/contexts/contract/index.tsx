@@ -208,6 +208,7 @@ export const ContractProvider: React.FC = ({ children }) => {
       const royalties = assetInfo.data?.asset?.royalties;
 
       list.push({
+        assetId: 'KLV',
         label: 'KLV',
         value: 'KLV',
         precision: KLV_PRECISION,

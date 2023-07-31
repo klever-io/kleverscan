@@ -19,6 +19,8 @@ type FormData = {
 
 const parseBuy = (data: FormData) => {
   data.buyType = data.buyType ? 1 : 0;
+  data.currencyId = data.currencyId.toUpperCase();
+  data.id = data.id.toUpperCase();
 };
 
 const Buy: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
@@ -76,7 +78,12 @@ const Buy: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
           required
         />
         <FormInput name="currencyId" title="Currency ID" required />
-        <FormInput name="amount" title="Amount" type="number" required />
+        <FormInput
+          name="amount"
+          title={buyType ? 'Price' : 'Amount'}
+          type="number"
+          required
+        />
       </FormSection>
       {ITOFixedFee > 0 && (
         <RoyaltiesContainer>

@@ -22,7 +22,7 @@ type FormData = {
 
 const parseSell = (data: FormData) => {
   data.marketType = data.marketType ? 1 : 0;
-
+  data.currencyId = data.currencyId.toUpperCase();
   parseDates(data);
 };
 
@@ -86,6 +86,7 @@ const Sell: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
               ? 'The price which the item can be instantly bought for.'
               : 'The price to sell the asset for.'
           }
+          required={marketType ? false : true}
         />
         {marketType && (
           <FormInput

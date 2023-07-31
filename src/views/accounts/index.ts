@@ -9,3 +9,8 @@ export const TableContainer = styled.section`
 
   gap: 1.5rem;
 `;
+
+export const SingleNFTTableContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;

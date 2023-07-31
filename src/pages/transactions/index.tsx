@@ -23,9 +23,14 @@ import { parseAddress } from '@/utils/parseValues';
 import { getPrecision } from '@/utils/precisionFunctions';
 import { FilterByDate } from '@/views/transactions';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { NextRouter, useRouter } from 'next/router';
 import React, { useCallback } from 'react';
-import { IReceipt, IRowSection, ITransaction } from '../../types';
+import {
+  IAssetTransactionResponse,
+  IReceipt,
+  IRowSection,
+  ITransaction,
+} from '../../types';
 import {
   Contract,
   ContractsName,
@@ -39,77 +44,85 @@ import {
   initialsTableHeaders,
 } from '../../utils/contracts';
 
+interface IRequestTxQuery {
+  asset?: string;
+}
+
+export const requestTransactionsDefault = async (
+  page: number,
+  limit: number,
+  router: NextRouter,
+  query?: IRequestTxQuery,
+): Promise<IAssetTransactionResponse> => {
+  while (!router.isReady) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+
+  const localQuery = { ...router.query, page, limit };
+  const transactionsResponse = await api.get({
+    route: `transaction/list`,
+    query: query ?? localQuery,
+  });
+
+  const assets: string[] = [];
+
+  transactionsResponse?.data?.transactions.forEach(
+    (transaction: ITransaction) => {
+      if (transaction.contract && transaction.contract.length) {
+        transaction.contract.forEach(contract => {
+          if (contract.parameter === undefined) return;
+
+          if ('assetId' in contract.parameter && contract.parameter.assetId) {
+            assets.push(contract.parameter.assetId);
+          }
+          if (
+            'currencyID' in contract.parameter &&
+            contract.parameter.currencyID
+          ) {
+            assets.push(contract.parameter.currencyID);
+          }
+        });
+      }
+    },
+  );
+
+  const assetPrecisions = await getPrecision(assets);
+
+  const parsedTransactions = transactionsResponse.data?.transactions?.map(
+    (transaction: ITransaction) => {
+      if (transaction.contract && transaction.contract.length) {
+        transaction.contract.forEach(contract => {
+          if (contract.parameter === undefined) return;
+
+          if ('assetId' in contract.parameter && contract.parameter.assetId) {
+            transaction.precision = assetPrecisions[contract.parameter.assetId];
+          }
+          if (
+            'currencyID' in contract.parameter &&
+            contract.parameter.currencyID
+          ) {
+            transaction.precision =
+              assetPrecisions[contract.parameter.currencyID];
+          }
+        });
+      }
+      return transaction;
+    },
+  );
+
+  return {
+    ...transactionsResponse,
+    data: {
+      transactions: parsedTransactions,
+    },
+  };
+};
+
 const Transactions: React.FC = () => {
   const router = useRouter();
-  const { isMobile, isTablet } = useMobile();
+  const { isMobile } = useMobile();
 
   const getContractType = useCallback(contractTypes, []);
-
-  const requestTransactions = async (page: number, limit: number) => {
-    while (!router.isReady) {
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-
-    const localQuery = { ...router.query, page, limit };
-    const transactionsResponse = await api.get({
-      route: `transaction/list`,
-      query: localQuery,
-    });
-
-    const assets: string[] = [];
-
-    transactionsResponse?.data?.transactions.forEach(
-      (transaction: ITransaction) => {
-        if (transaction.contract && transaction.contract.length) {
-          transaction.contract.forEach(contract => {
-            if (contract.parameter === undefined) return;
-
-            if ('assetId' in contract.parameter && contract.parameter.assetId) {
-              assets.push(contract.parameter.assetId);
-            }
-            if (
-              'currencyID' in contract.parameter &&
-              contract.parameter.currencyID
-            ) {
-              assets.push(contract.parameter.currencyID);
-            }
-          });
-        }
-      },
-    );
-
-    const assetPrecisions = await getPrecision(assets);
-
-    const parsedTransactions = transactionsResponse.data?.transactions?.map(
-      (transaction: ITransaction) => {
-        if (transaction.contract && transaction.contract.length) {
-          transaction.contract.forEach(contract => {
-            if (contract.parameter === undefined) return;
-
-            if ('assetId' in contract.parameter && contract.parameter.assetId) {
-              transaction.precision =
-                assetPrecisions[contract.parameter.assetId];
-            }
-            if (
-              'currencyID' in contract.parameter &&
-              contract.parameter.currencyID
-            ) {
-              transaction.precision =
-                assetPrecisions[contract.parameter.currencyID];
-            }
-          });
-        }
-        return transaction;
-      },
-    );
-
-    return {
-      ...transactionsResponse,
-      data: {
-        transactions: parsedTransactions,
-      },
-    };
-  };
 
   const getFilteredSections = (
     contract: IContract[],
@@ -241,7 +254,7 @@ const Transactions: React.FC = () => {
     rowSections,
     dataName: 'transactions',
     scrollUp: true,
-    request: (page, limit) => requestTransactions(page, limit),
+    request: (page, limit) => requestTransactionsDefault(page, limit, router),
   };
 
   const resetDate = () => {

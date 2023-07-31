@@ -26,27 +26,27 @@ import { TableContainer, TableHeader, UpdateContainer } from '@/views/blocks';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
 
+interface IBlocksStatsToday {
+  totalBlocks: number;
+  totalBurned: number;
+  totalBlockRewards: number;
+}
+
+interface IBlocksStatsYesterday {
+  date: number;
+  totalBlocks: number;
+  totalMinted: number;
+  totalBurned: number;
+  totalBlockRewards: number;
+  totalStakingRewards: number;
+  totalTxFees: number;
+  totalKappsFees: number;
+  totalTxRewards: number;
+}
+
 const Blocks: React.FC<IBlocks> = () => {
   const precision = 6; // default KLV precision
   const blocksWatcherInterval = 4 * 1000; // 4 secs
-
-  interface IBlocksStatsToday {
-    totalBlocks: number;
-    totalBurned: number;
-    totalBlockRewards: number;
-  }
-
-  interface IBlocksStatsYesterday {
-    date: number;
-    totalBlocks: number;
-    totalMinted: number;
-    totalBurned: number;
-    totalBlockRewards: number;
-    totalStakingRewards: number;
-    totalTxFees: number;
-    totalKappsFees: number;
-    totalTxRewards: number;
-  }
 
   const [blocks, setBlocks] = useState([]);
   const [blocksStatsYesterday, setBlocksStatsYesterday] =
@@ -114,7 +114,7 @@ const Blocks: React.FC<IBlocks> = () => {
   const cards: ICard[] = [
     {
       title: 'Number of Blocks',
-      headers: ['Blocks Yesterday', 'Cumulative Number'],
+      headers: ['Blocks 24h', 'Cumulative Number'],
       values: [
         blocksStatsYesterday ? (
           toLocaleFixed(blocksStatsYesterday?.totalBlocks, 0)
@@ -130,7 +130,7 @@ const Blocks: React.FC<IBlocks> = () => {
     },
     {
       title: 'Block Reward',
-      headers: ['Reward Yesterday', 'Cumulative Revenue'],
+      headers: ['Rewards 24h', 'Cumulative Revenue'],
       values: [
         blocksStatsYesterday ? (
           `${formatAmount(
@@ -150,7 +150,7 @@ const Blocks: React.FC<IBlocks> = () => {
     },
     {
       title: 'Stats on Burned KLV',
-      headers: ['Burned Yesterday', 'Burned in Total'],
+      headers: ['Burned 24h', 'Burned in Total'],
       values: [
         blocksStatsYesterday ? (
           `${formatAmount(

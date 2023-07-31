@@ -1,6 +1,10 @@
+import { useMulticontract } from '@/contexts/contract/multicontract';
+import { setQueryAndRouter } from '@/utils';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import dynamic from 'next/dynamic';
+import { NextRouter, useRouter } from 'next/router';
 import { ChangeEventHandler, useEffect, useRef } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { FieldValues, useFormContext, UseFormGetValues } from 'react-hook-form';
 import {
   Container,
   ErrorMessage,
@@ -49,6 +53,42 @@ export interface ICustomFormInputProps extends IBaseFormInputProps {
   onChange: ChangeEventHandler<any>;
 }
 
+export const onChangeWrapper = (
+  isMultiContract: boolean,
+  router: NextRouter,
+  getValues: UseFormGetValues<FieldValues>,
+  name: string,
+  customOnChange?: (e: any) => void,
+) => {
+  return (e: React.ChangeEvent<HTMLInputElement>): void => {
+    if (!isMultiContract) {
+      const nonEmptyValues = Object.keys(getValues())
+        .filter(key => getValues()[key] !== '')
+        .reduce((acc, curr) => {
+          return {
+            ...acc,
+            [curr]: getValues()[curr],
+          };
+        }, {});
+
+      if (name) eval(`nonEmptyValues.${name} = e.target.value`);
+
+      let newQuery: NextParsedUrlQuery = router.query?.contract
+        ? { contract: router.query?.contract }
+        : {};
+
+      newQuery = {
+        ...newQuery,
+        contractDetails: JSON.stringify(nonEmptyValues),
+      };
+
+      setQueryAndRouter(newQuery, router);
+    }
+
+    customOnChange && customOnChange(e);
+  };
+};
+
 const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   name,
   title,
@@ -70,11 +110,15 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   ...rest
 }) => {
   const areaRef = useRef<HTMLTextAreaElement | null>(null);
+  const router = useRouter();
+  const { isMultiContract } = useMulticontract();
   const {
     register,
     formState: { errors },
     watch,
     unregister,
+    setValue,
+    getValues,
   } = useFormContext();
 
   let error = null;
@@ -91,21 +135,31 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
     name &&
     (type !== 'number'
       ? register(name, {
-          value: defaultValue,
           required: {
             value: required || false,
             message: 'This field is required',
           },
-          onChange: customOnChange,
+          onChange: onChangeWrapper(
+            isMultiContract,
+            router,
+            getValues,
+            name,
+            customOnChange,
+          ),
         })
       : register(name, {
           valueAsNumber: true,
-          value: defaultValue,
           required: {
             value: required || false,
             message: 'This field is required',
           },
-          onChange: customOnChange,
+          onChange: onChangeWrapper(
+            isMultiContract,
+            router,
+            getValues,
+            name,
+            customOnChange,
+          ),
           validate: (value: any) => {
             if (value < (min || 0)) {
               return `Minimum value is ${min || 0}`;
@@ -167,6 +221,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
 
   const selectProps = {
     title,
+    onChangeWrapper,
     selectPlaceholder,
     name: name || '',
     error: Boolean(error),

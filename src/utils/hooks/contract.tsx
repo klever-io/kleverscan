@@ -16,10 +16,12 @@ import { useContract } from '@/contexts/contract';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { ReloadWrapper } from '@/contexts/contract/styles';
 import { ICollectionList } from '@/types';
+import { NextRouter, useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { FieldError, useFormContext } from 'react-hook-form';
 import { IoReloadSharp } from 'react-icons/io5';
 import { useQuery } from 'react-query';
+import { setQueryAndRouter } from '..';
 import { toLocaleFixed } from '../formatFunctions';
 
 const kAssetContracts = [
@@ -46,10 +48,32 @@ interface ISelectProps {
   required?: boolean;
 }
 
+const setQuery = async (key: string, value: string, router: NextRouter) => {
+  while (!router.isReady) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  const newQuery = {
+    ...router.query,
+  };
+
+  if (value) {
+    if (!newQuery?.contractDetails) newQuery.contractDetails = '{}';
+
+    newQuery.contractDetails = JSON.stringify({
+      ...JSON.parse(newQuery.contractDetails as string),
+      [key]: value,
+    });
+  }
+
+  setQueryAndRouter(newQuery, router);
+};
+
 export const useKDASelect = (
   params?: IKDASelect,
 ): [ICollectionList | undefined, React.FC<ISelectProps>] => {
   const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
 
   const { getAssets, getKAssets, getOwnerAddress } = useContract();
 
@@ -77,7 +101,9 @@ export const useKDASelect = (
     watch,
   } = useFormContext();
 
-  const watchCollection = watch('collection');
+  const { isMultiContract } = useMulticontract();
+
+  const watchCollection: string = watch('collection');
   const watchCollectionAssetId = watch('collectionAssetId');
 
   const {
@@ -118,7 +144,6 @@ export const useKDASelect = (
   useEffect(() => {
     if (watchCollection && watchCollection !== selectedCollection?.value) {
       selectedCollection && setCollection(selectedCollection);
-      !selectedCollection && setCollection(watchCollection);
     }
   }, [watchCollection, assetsList]);
 
@@ -174,21 +199,12 @@ export const useKDASelect = (
       !collectionContracts.includes(contractType) &&
       showAssetIdInput(contractType, assetTriggerType);
 
-    useEffect(() => {
-      if (!showAssetIdInputConditional) {
-        setValue('collectionAssetID', '');
-      }
-    }, [showAssetIdInputConditional]);
-
     const CollectionIDField: React.FC = () => {
-      // useEffect(() => {
-      //   return () => {
-      //     (!collection?.isNFT ||
-      //       collectionContracts.includes(contractType) ||
-      //       !showAssetIdInput(contractType, assetTriggerType)) &&
-      //       setValue('collectionAssetID', '');
-      //   };
-      // }, []);
+      const onBlurHandler = async (e: any) => {
+        if (!isMultiContract) {
+          await setQuery('collectionAssetID', e.target.value, router);
+        }
+      };
 
       return (
         <SelectContent>
@@ -201,6 +217,7 @@ export const useKDASelect = (
                 value: true,
                 message: 'This field is required',
               },
+              onBlur: onBlurHandler,
             })}
           />
           {assetIdError && (
@@ -210,6 +227,27 @@ export const useKDASelect = (
           )}
         </SelectContent>
       );
+    };
+
+    useEffect(() => {
+      router.isReady &&
+        router.query.collection &&
+        setCollection(
+          assetsList?.find(
+            asset => asset.value === router.query.collection?.toString(),
+          ),
+        );
+    }, [router, assetsList]);
+
+    const onChangeHandler = async (value: ICollectionList) => {
+      if (!isMultiContract) await setQuery('collection', value?.value, router);
+      setCollection(value);
+      setValue('collection', value?.value, {
+        shouldValidate: true,
+      });
+      if (!value.isNFT) {
+        setValue('collectionAssetID', '');
+      }
     };
 
     return (
@@ -244,15 +282,7 @@ export const useKDASelect = (
               withdrawType,
               getOwnerAddress(),
             )}
-            onChange={value => {
-              setCollection(value);
-              setValue('collection', value?.value, {
-                shouldValidate: true,
-              });
-              if (!value.isNFT) {
-                setValue('collectionAssetID', '');
-              }
-            }}
+            onChange={onChangeHandler}
             loading={loading}
             selectedValue={
               selectedCollection?.value ? selectedCollection : undefined

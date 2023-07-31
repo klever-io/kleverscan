@@ -364,3 +364,8 @@ export const CreateTxContainer = styled.div<{ isMultiContract?: boolean }>`
 export const SectionFormContainer = styled.div`
   width: 100%;
 `;
+
+export const FormActions = styled.div`
+  display: flex;
+  gap: 1rem;
+`;

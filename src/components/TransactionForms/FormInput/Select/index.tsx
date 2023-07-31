@@ -1,8 +1,11 @@
+import { useMulticontract } from '@/contexts/contract/multicontract';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IoIosArrowDown } from 'react-icons/io';
 import { components } from 'react-select';
+import { onChangeWrapper } from '..';
 import { Container, HiddenInput } from './styles';
 
 const ReactSelect = dynamic(() => import('react-select'), {
@@ -36,7 +39,13 @@ const Filter: React.FC<IFilter> = ({
     register,
     formState: { errors },
     setValue,
+    getValues,
   } = useFormContext();
+
+  const { isMultiContract } = useMulticontract();
+
+  const router = useRouter();
+
   const [selected, setSelected] = useState<IDropdownItem | undefined>(
     undefined,
   );
@@ -55,6 +64,14 @@ const Filter: React.FC<IFilter> = ({
     );
   };
   const handleSelect = (selected: any) => {
+    const e = {
+      target: {
+        name,
+        value: selected.value,
+      },
+    } as React.ChangeEvent<HTMLInputElement>;
+    onChangeWrapper(isMultiContract, router, getValues, name)(e);
+
     setSelected(selected);
     setValue(name, selected.value, { shouldValidate: true });
   };

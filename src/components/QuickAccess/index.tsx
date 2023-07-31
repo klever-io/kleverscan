@@ -1,5 +1,4 @@
 import { useExtension } from '@/contexts/extension';
-import { useMobile } from '@/contexts/mobile';
 import React, { useEffect, useState } from 'react';
 import ModalContract, { IModalContract } from '../Contract/ModalContract';
 import { BackgroundHelper } from '../Header/ConnectWallet/styles';
@@ -21,11 +20,9 @@ const QuickAccess: React.FC<{
   const [contractType, setContractType] = useState('');
   const [openModalTransactions, setOpenModalTransactions] = useState(false);
   const [titleModal, setTitleModal] = useState('');
-  const [valueContract, setValueContract] = useState('');
   const [openDrawer, setOpenDrawer] = useState<boolean>(false);
 
   const { extensionInstalled, connectExtension } = useExtension();
-  const { isMobile } = useMobile();
 
   const quickAccessContract: IShortCutContract[] = [
     { title: 'Transfer', type: 'TransferContract' },
@@ -64,7 +61,7 @@ const QuickAccess: React.FC<{
       return;
     }
     setContractType(contract.type);
-    setOpenModalTransactions(valueContract === '--' ? false : true);
+    setOpenModalTransactions(true);
     setTitleModal(`${contract.title} Contract`);
   };
 

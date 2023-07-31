@@ -1,14 +1,22 @@
 import { useContract } from '@/contexts/contract';
 import { useFees } from '@/contexts/contract/fees';
-import { useMulticontract } from '@/contexts/contract/multicontract';
+import { IQueue, useMulticontract } from '@/contexts/contract/multicontract';
 import { Card } from '@/styles/common';
+import { setQueryAndRouter } from '@/utils';
+import { useForceUpdate } from '@/utils/hooks';
+import * as clipboard from 'clipboard-polyfill';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { FormProvider, useForm } from 'react-hook-form';
+import { AiOutlineClear } from 'react-icons/ai';
+import { FiShare2 } from 'react-icons/fi';
 import { IoOpenOutline } from 'react-icons/io5';
+import { toast } from 'react-toastify';
 import ConfirmPayload from '../ConfirmPayload';
 import Copy from '../Copy';
+import { Button } from '../CreateTxShortCut/styles';
 import MetadataOptions from '../Form/Metadata';
 import SubmitButton from '../Form/SubmitButton';
 import { InlineLoader } from '../Loader';
@@ -20,6 +28,7 @@ import {
   CloseIcon,
   Container,
   ExtraOptionContainer,
+  FormActions,
   IconsContainer,
   LoadingBackground,
 } from './styles';
@@ -88,14 +97,17 @@ const Contract: React.FC<IContract> = ({
     contractOptions,
   } = useContract();
 
-  const { metadata, setSelectedContractType, selectedContractType, queue } =
-    useMulticontract();
+  const {
+    setSelectedContractAndQuery,
+    selectedContractType,
+    queue,
+    isMultiContract,
+  } = useMulticontract();
   const { getKappFee } = useFees();
+  const router = useRouter();
+  const forceUpdate = useForceUpdate();
 
-  const [contractType, setContractType] =
-    React.useState<string>(selectedContractType);
-
-  const kappFee = getKappFee(contractType);
+  const kappFee = getKappFee(selectedContractType);
 
   const formMethods = useForm({
     mode: 'all',
@@ -113,29 +125,62 @@ const Contract: React.FC<IContract> = ({
   useEffect(() => {
     if (modalContractType) {
       setTxHash(null);
-      setContractType(modalContractType.value);
+      setSelectedContractAndQuery(modalContractType.value);
 
       return () => {
-        setContractType('');
+        setSelectedContractAndQuery('');
       };
     }
   }, [modalContractType?.value]);
 
   useEffect(() => {
-    setSelectedContractType(contractType);
-
-    return () => {
-      formMethods.reset({});
-    };
-  }, [contractType]);
+    if (!isMultiContract && router.isReady && !router.query) {
+      setQueryAndRouter(
+        {
+          contract: selectedContractType,
+          contractDetails: JSON.stringify(formMethods.getValues()),
+        },
+        router,
+      );
+    }
+  }, [isMultiContract, router.isReady]);
 
   const handleFormSubmit = async (data: any) => {
     await handleSubmit(
       data,
-      queue.find(item => item.elementId === elementId)?.metadata || '',
-      contractType,
+      queue.find((item: IQueue) => item.elementId === elementId)?.metadata ||
+        '',
+      selectedContractType,
       queue.length,
     );
+  };
+
+  const handleClear = () => {
+    formMethods.reset({});
+    setQueryAndRouter({ contract: selectedContractType }, router);
+    forceUpdate();
+  };
+
+  const changeHandler = (contractType: any) => {
+    setSelectedContractAndQuery(contractType.value);
+    formMethods.reset({});
+
+    isMultisig.current = false;
+  };
+
+  const handleShare = async () => {
+    try {
+      if (navigator.share)
+        await navigator.share({
+          url: window.location.href,
+        });
+      else {
+        await clipboard.writeText(window.location.href);
+        toast.info('Contract link copied to clipboard');
+      }
+    } catch (e) {
+      console.warn(e);
+    }
   };
 
   const formProps = {
@@ -153,13 +198,9 @@ const Contract: React.FC<IContract> = ({
       <Select
         options={contractOptions}
         selectedValue={contractOptions.find(
-          item => item.value === contractType,
+          item => item.value === selectedContractType,
         )}
-        onChange={contractType => {
-          setContractType(contractType.value);
-
-          isMultisig.current = false;
-        }}
+        onChange={changeHandler}
         isDisabled={true}
         title={'Contract'}
         zIndex={5}
@@ -177,18 +218,32 @@ const Contract: React.FC<IContract> = ({
         {openConfirmModal && <ConfirmPayload />}
         {txHash && <HashComponent {...hashProps} />}
 
-        {contractsDescription[contractType] && (
+        {contractsDescription[selectedContractType] && (
           <CardContainer>
             <Card>
               <div>
-                <span>{contractsDescription[contractType]}</span>
+                <span>{contractsDescription[selectedContractType]}</span>
                 <span>KApp Fee: {kappFee} KLV</span>
               </div>
             </Card>
           </CardContainer>
         )}
 
-        <RenderContract contractName={contractType} contractProps={formProps} />
+        <RenderContract
+          contractName={selectedContractType}
+          contractProps={formProps}
+        />
+
+        <FormActions>
+          <Button onClick={handleClear}>
+            <AiOutlineClear />
+            Clear Contract
+          </Button>
+          <Button onClick={handleShare}>
+            <FiShare2 />
+            Share Contract
+          </Button>
+        </FormActions>
 
         <MetadataOptions />
         <SubmitButton />

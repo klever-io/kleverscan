@@ -1,5 +1,7 @@
 import { useExtension } from '@/contexts/extension';
+import { setQueryAndRouter } from '@/utils';
 import { useDidUpdateEffect } from '@/utils/hooks';
+import { useRouter } from 'next/router';
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import Contract from '..';
@@ -19,6 +21,8 @@ const ModalContract: React.FC<IModalContract> = ({
   defaultValues,
 }) => {
   const { extensionInstalled, connectExtension } = useExtension();
+  const router = useRouter();
+
   useDidUpdateEffect(() => {
     if (extensionInstalled) {
       connectExtension();
@@ -27,6 +31,7 @@ const ModalContract: React.FC<IModalContract> = ({
 
   const closeModal = () => {
     setOpenModal(false);
+    setQueryAndRouter({}, router);
   };
 
   const contractProps = {

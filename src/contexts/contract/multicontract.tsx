@@ -1,7 +1,8 @@
-import Contract from '@/components/Contract';
+import Contract, { IContract } from '@/components/Contract';
 import { getType } from '@/components/Contract/utils';
 import { IAsset, ICollectionList } from '@/types';
 import { ContractsIndex } from '@/types/contracts';
+import { setQueryAndRouter } from '@/utils';
 import { BASE_TX_SIZE } from '@/utils/globalVariables';
 import { useRouter } from 'next/router';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
@@ -41,9 +42,9 @@ interface IMulticontract {
   setSelectedId: React.Dispatch<React.SetStateAction<number>>;
   setIsMultiContract: React.Dispatch<React.SetStateAction<boolean>>;
   setShowMultiContracts: React.Dispatch<React.SetStateAction<boolean>>;
-  setSelectedContractType: (contractType: string) => void;
+  setSelectedContractAndQuery: (contractType: string) => void;
   setMetadata: (metadata: string) => void;
-  setCollection: (collection: ICollectionList) => void;
+  setCollection: (collection?: ICollectionList) => void;
   setSelectedRoyaltiesFees: (amount: number) => void;
   setCollectionAssetId: (id: number) => void;
 }
@@ -118,28 +119,17 @@ export const MulticontractProvider: React.FC = ({ children }) => {
     setQueue(newQueue);
   };
 
-  useEffect(() => {
-    if (router.isReady) {
-      const { contract } = router.query;
-      if (contract) {
-        setSelectedContractAndQuery(contract as string);
-      }
-    }
-  }, [router.isReady]);
-
   const setSelectedContractAndQuery = (contract: string) => {
     setSelectedContractType(contract);
-
     if (router.pathname !== '/create-transaction') return;
 
-    if (contract !== '')
-      router.push(`/create-transaction?contract=${contract}`, undefined, {
-        shallow: true,
-      });
-    else
-      router.push(`/create-transaction`, undefined, {
-        shallow: true,
-      });
+    if (contract !== '') {
+      const newQuery = {
+        contract: contract,
+      };
+
+      setQueryAndRouter(newQuery, router);
+    }
   };
 
   const metadata = queue[parsedIndex]?.metadata;
@@ -152,7 +142,7 @@ export const MulticontractProvider: React.FC = ({ children }) => {
     setQueue(newQueue);
   };
 
-  const setCollection = (collection: ICollectionList) => {
+  const setCollection = (collection?: ICollectionList) => {
     const newQueue = [...queue];
     newQueue[parsedIndex].collection = collection;
     setQueue(newQueue);
@@ -205,20 +195,34 @@ export const MulticontractProvider: React.FC = ({ children }) => {
   };
 
   const resetForms = () => {
-    const contractPropsWithIndex = {
+    const contractPropsWithIndex: IContract = {
       elementId: 0,
+      defaultValues: JSON.parse(
+        (router.query?.contractDetails as string) || '{}',
+      ),
     };
+
+    const selectedContractType =
+      (router.query?.contract as string) || 'TransferContract';
+
+    const contractTypeProps = {
+      contractType: isMultiContract
+        ? queue[0]?.contractType
+        : selectedContractType,
+      contractName: isMultiContract
+        ? queue[0]?.contractName
+        : ContractsIndex[getType(selectedContractType)],
+    };
+
     setQueue([
       {
         elementId: 0,
-        contractName:
-          queue[0]?.contractName || ContractsIndex[getType('TransferContract')],
-        contractType: queue[0]?.contractType || 'TransferContract',
         ref: <Contract {...contractPropsWithIndex} />,
         metadata: '',
         collection: queue[0]?.collection,
         royaltiesFeeAmount: queue[0]?.royaltiesFeeAmount,
         collectionAssetId: queue[0]?.collectionAssetId,
+        ...contractTypeProps,
       },
     ]);
     setSelectedId(0);
@@ -226,8 +230,12 @@ export const MulticontractProvider: React.FC = ({ children }) => {
   };
 
   useEffect(() => {
-    resetForms();
-  }, [isMultiContract]);
+    if (router.isReady) resetForms();
+
+    if (isMultiContract) {
+      setQueryAndRouter({}, router);
+    }
+  }, [isMultiContract, router.isReady]);
 
   const values = {
     queue,
@@ -247,7 +255,7 @@ export const MulticontractProvider: React.FC = ({ children }) => {
     setQueue,
     setSelectedId,
     setIsMultiContract,
-    setSelectedContractType: setSelectedContractAndQuery,
+    setSelectedContractAndQuery,
     setMetadata,
     setShowMultiContracts,
     setCollection,

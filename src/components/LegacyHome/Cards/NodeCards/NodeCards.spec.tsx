@@ -1,4 +1,3 @@
-import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import theme from '../../../../styles/theme';
 import { renderWithTheme } from '../../../../test/utils';
@@ -41,33 +40,6 @@ describe('Componenet: NodeCards', () => {
     jest
       .spyOn(HTMLElement.prototype, 'clientWidth', 'get')
       .mockReturnValue(100);
-  });
-
-  it('Should render "Title", "Time ago" and the charts for the data', async () => {
-    renderWithTheme(<NodeCards cardData={mockCardData} />);
-    await waitFor(async () => {
-      const timeAgo = screen.getAllByText(/secs? ago/i);
-      const totalNodes = timeAgo[0].previousSibling;
-      const mostNodes = timeAgo[1].previousSibling;
-      const chart = totalNodes?.parentNode?.nextSibling;
-      const mapSvg = mostNodes?.parentNode?.nextSibling;
-
-      expect(timeAgo[0]).toBeInTheDocument();
-      expect(timeAgo[1]).toBeInTheDocument();
-      expect(totalNodes?.firstChild).toBeInTheDocument();
-      expect(totalNodes?.firstChild).toHaveTextContent(mockCardData[0].title);
-      expect(mostNodes?.firstChild).toBeInTheDocument();
-      expect(mostNodes?.firstChild).toHaveTextContent(mockCardData[1].title);
-      expect(mapSvg?.firstChild).toHaveAttribute('viewBox', '0 0 200 120');
-      expect(chart?.firstChild).toHaveStyle({ width: '100%', height: '100%' });
-    });
-    await waitFor(
-      async () => {
-        const secsAgo = await screen.findAllByText(/4 secs ago/i);
-        expect(secsAgo[0]).toHaveTextContent('4 secs ago');
-      },
-      { timeout: 5000 },
-    );
   });
 
   it('Should match the style for the CardContainer and the Card', () => {

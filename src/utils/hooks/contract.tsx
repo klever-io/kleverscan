@@ -138,9 +138,16 @@ export const useKDASelect = (
     refetchKassetsList();
   };
 
-  const selectedCollection = assetsList?.find(
-    asset => asset.value === watchCollection,
-  );
+  const getSelectedCollection = () => {
+    const assets = [];
+    kAssetContracts.includes(contractType)
+      ? assets.push(...(kassetsList || []))
+      : assets.push(...(assetsList || []));
+
+    return assets?.find(asset => asset.value === watchCollection);
+  };
+
+  const selectedCollection = getSelectedCollection();
   useEffect(() => {
     if (watchCollection && watchCollection !== selectedCollection?.value) {
       selectedCollection && setCollection(selectedCollection);

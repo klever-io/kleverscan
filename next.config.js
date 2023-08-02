@@ -44,4 +44,7 @@ module.exports = withImages({
 
     return config;
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 });

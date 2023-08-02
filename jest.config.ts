@@ -29,4 +29,9 @@ export default {
   transform: {
     '^.+\\.(t|j)sx?$': ['babel-jest'],
   },
+  globals: {
+    'ts-jest': {
+      tsconfig: 'tsconfig.spec.json',
+    },
+  },
 };

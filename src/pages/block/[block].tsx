@@ -33,7 +33,7 @@ import {
   MdOutlineKeyboardArrowLeft,
   MdOutlineKeyboardArrowRight,
 } from 'react-icons/md';
-import { ITransactionsResponse } from '../../types';
+import { ITransactionsResponse, NotFound } from '../../types';
 
 const Block: React.FC<IBlockPage> = ({ block }) => {
   const {
@@ -361,7 +361,9 @@ export const getStaticProps: GetStaticProps<IBlockPage> = async ({
     block: {} as IBlock,
   };
 
-  const redirectProps = { redirect: { destination: '/404', permanent: false } };
+  const redirectProps: NotFound = {
+    notFound: true,
+  };
 
   const blockNonce = Number(params?.block);
 

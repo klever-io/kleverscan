@@ -42,7 +42,7 @@ import {
   Header,
   Row,
 } from '@/styles/common';
-import { ITransactionPage, ITransactionResponse } from '@/types';
+import { ITransactionPage, ITransactionResponse, NotFound } from '@/types';
 import { IBlockResponse } from '@/types/blocks';
 import { Contract, IIndexedContract } from '@/types/contracts';
 import { capitalizeString, hexToString } from '@/utils/convertString';
@@ -702,7 +702,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps: GetStaticProps<ITransactionPage> = async ({
   params,
 }) => {
-  const redirectProps = { redirect: { destination: '/404', permanent: false } };
+  const redirectProps: NotFound = {
+    notFound: true,
+  };
 
   const hash = params?.hash;
   if (!hash) {

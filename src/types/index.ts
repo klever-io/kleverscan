@@ -1017,3 +1017,7 @@ export type SearchRequest =
   | IAssetResponse
   | IAccountResponse
   | IBlockResponse;
+
+export interface NotFound {
+  notFound: true;
+}

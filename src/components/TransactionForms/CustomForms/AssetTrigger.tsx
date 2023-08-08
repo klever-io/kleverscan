@@ -171,7 +171,7 @@ const getAssetTriggerForm = (
           />
           <FormInput
             name="receiver"
-            title="Receiver"
+            title="NFT Holder Address"
             required
             defaultValue={walletAddress}
             tooltip={tooltip.receiver}

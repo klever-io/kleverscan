@@ -44,7 +44,11 @@ const TransactionsFilters: React.FC<ITransactionsFilters> = ({
         delete updatedQuery['buyType'];
       }
       setQuery(
-        { ...updatedQuery, [filterType]: getContractIndex(selected) },
+        {
+          ...updatedQuery,
+          page: String(1),
+          [filterType]: getContractIndex(selected),
+        },
         router,
       );
     } else if (selected !== query[filterType]) {

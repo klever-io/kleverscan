@@ -4,18 +4,13 @@ import { default as DefaultBackground } from '../assets/not-found.svg';
 
 export const Container = styled.div`
   padding: 10rem;
-
   display: flex;
-
   flex-direction: row;
   justify-content: space-between;
-
-  background-color: ${props => props.theme.background};
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     padding: 0 3rem;
     align-items: center;
-
     flex-direction: column-reverse;
   }
 `;

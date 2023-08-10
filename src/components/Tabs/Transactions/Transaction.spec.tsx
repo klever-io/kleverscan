@@ -114,7 +114,8 @@ describe('Component: Tabs/Transactions', () => {
     const componenetSender = screen.getAllByRole('link', {
       name: parseAddress(mockedTransactions[0].sender, 16),
     })[0];
-    const toAddress = screen.getAllByRole('link', { name: '--' })[0];
+
+    const toAddress = screen.getAllByTestId('toAddressEmpty')[0];
     const componentStatus = screen.getAllByText(capitalizeString(status))[0];
     const contactType = screen.getByText('Multi contract');
     const amount = screen.getAllByText('--');

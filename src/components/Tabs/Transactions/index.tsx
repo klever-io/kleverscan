@@ -5,6 +5,7 @@ import { MultiContractToolTip } from '@/components/MultiContractToolTip';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import { useMobile } from '@/contexts/mobile';
+import { toAddressSectionElement } from '@/pages/transactions';
 import { CenteredRow } from '@/styles/common';
 import {
   Contract,
@@ -116,11 +117,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
       },
       { element: !isMobile ? <ArrowRight /> : <></>, span: -1 },
       {
-        element: (
-          <Link href={`/account/${toAddress}`} key={toAddress}>
-            <a className="address">{parseAddress(toAddress, 16)}</a>
-          </Link>
-        ),
+        element: toAddressSectionElement(toAddress),
         span: 1,
       },
       {

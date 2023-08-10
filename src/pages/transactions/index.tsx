@@ -48,6 +48,21 @@ interface IRequestTxQuery {
   asset?: string;
 }
 
+export const toAddressSectionElement = (toAddress: string): JSX.Element => {
+  if (toAddress === '--') {
+    return (
+      <span data-testid="toAddressEmpty" style={{ cursor: 'default' }}>
+        {toAddress}
+      </span>
+    );
+  }
+  return (
+    <Link href={`/account/${toAddress}`} key={toAddress}>
+      <a className="address">{parseAddress(toAddress, 16)}</a>
+    </Link>
+  );
+};
+
 export const requestTransactionsDefault = async (
   page: number,
   limit: number,
@@ -190,11 +205,7 @@ const Transactions: React.FC = () => {
       },
       { element: !isMobile ? <ArrowRight /> : <></>, span: -1 },
       {
-        element: (
-          <Link href={`/account/${toAddress}`} key={toAddress}>
-            <a className="address">{parseAddress(toAddress, 16)}</a>
-          </Link>
-        ),
+        element: toAddressSectionElement(toAddress),
         span: 1,
       },
       {

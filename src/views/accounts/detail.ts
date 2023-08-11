@@ -110,7 +110,7 @@ export const ItemContentPermissions = styled.div<{
   display: flex;
   align-items: center;
   width: 100%;
-  gap: 0.52rem;
+  border: none !important;
   span {
     min-width: 24px !important;
     width: 24px !important;
@@ -176,7 +176,7 @@ export const OperationsContainer = styled.div`
 export const OperationsContent = styled.div<{ isChecked?: boolean }>`
   gap: 0.5rem;
   width: 16rem;
-  border-bottom: none !important;
+  border: none !important;
   padding: 0 !important;
   p {
     opacity: ${({ isChecked }) => !isChecked && 0.5};

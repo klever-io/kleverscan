@@ -505,12 +505,19 @@ const ProposalDetails: React.FC = () => {
                   </DescriptionContainer>
                 )}
                 {!proposal && (
-                  <EmptyDescription>
-                    <span>{isSkeleton(undefined)}</span>
-                  </EmptyDescription>
+                  <>
+                    <DescriptionContainer
+                      expandDescription={expandDescription}
+                    ></DescriptionContainer>
+                    <EmptyDescription>
+                      <BigSpan>{isSkeleton(undefined)}</BigSpan>
+                    </EmptyDescription>
+                  </>
                 )}
                 {proposal && !proposal.description && (
-                  <BigSpan>{isSkeleton('No description provided.')}</BigSpan>
+                  <DescriptionContainer expandDescription={expandDescription}>
+                    <BigSpan>{isSkeleton('No description provided.')}</BigSpan>{' '}
+                  </DescriptionContainer>
                 )}
               </RowDescription>
             </CardContent>

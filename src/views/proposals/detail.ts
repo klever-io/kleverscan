@@ -279,12 +279,12 @@ export const OptionValidator = styled.div<OptionValidatorProps>`
 `;
 
 export const HalfRow = styled.div`
+  width: 33%;
   display: flex;
   overflow: hidden;
   align-items: center;
-  width: fit-content;
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     padding: 0.1rem;
     width: 100%;
   }
@@ -492,7 +492,7 @@ export const BigSpan = styled.span<{ expandDescription?: boolean }>`
 export const DescriptionContainer = styled.div<{ expandDescription?: boolean }>`
   display: flex;
   width: 100%;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 0.8rem;
   overflow: hidden !important;
   button {
@@ -504,6 +504,8 @@ export const EpochInfo = styled.span`
 `;
 
 export const EmptyDescription = styled.span`
+  display: flex;
+  justify-content: flex-start;
   color: ${props => props.theme.darkText};
   font-size: 0.95rem;
   font-weight: 400;

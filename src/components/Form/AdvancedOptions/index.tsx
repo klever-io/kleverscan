@@ -35,7 +35,7 @@ import {
 } from './styles';
 
 const PermID: React.FC = () => {
-  const { setPermID, permID, senderAccount } = useContract();
+  const { setPermID, permID, senderAccount, getOwnerAddress } = useContract();
 
   const queryFn = () => getAccount(senderAccount);
 
@@ -45,18 +45,22 @@ const PermID: React.FC = () => {
     initialData: {} as IAccountResponse,
   });
 
-  const parsedPermissions: IDropdownItem[] = res?.data
-    ? res.data.account.permissions.map((permission: IAccPermission) => {
-        return {
+  const parsedPermissions: IDropdownItem[] = [];
+
+  if (res?.data)
+    res.data.account.permissions.map((permission: IAccPermission) => {
+      if (
+        permission.signers.some(signer => signer.address === getOwnerAddress())
+      )
+        parsedPermissions.push({
           label: `#${permission.id} - ${
             permission.permissionName
           } - Threshold: ${permission.Threshold} - ${
             permission.type === 0 ? 'Owner' : 'User'
           }`,
           value: permission.id,
-        };
-      })
-    : [];
+        });
+    });
 
   return (
     <FlexContainer>
@@ -87,9 +91,13 @@ const PermID: React.FC = () => {
             onChange={(value: any) => {
               setPermID(value.value);
             }}
-            selectedValue={parsedPermissions.find(
-              (item: IDropdownItem) => item.value === permID,
-            )}
+            selectedValue={
+              parsedPermissions.length > 0
+                ? parsedPermissions.find(
+                    (item: IDropdownItem) => item.value === permID,
+                  )
+                : undefined
+            }
             loading={loading}
             zIndex={2}
           />

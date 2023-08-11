@@ -32,7 +32,7 @@ export const FormSection = styled.div<{ inner?: boolean }>`
     css`
       filter: ${props.theme.dark ? 'brightness(1.1)' : 'brightness(97%)'};
       grid-column: auto / span 2;
-      padding-top: 5rem;
+      padding-top: 5rem !important;
     `}
 
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
@@ -51,13 +51,18 @@ export const FormSection = styled.div<{ inner?: boolean }>`
   }
 `;
 
-export const FormBody = styled(Form)`
+export const FormBody = styled(Form)<{ inner?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 2rem;
 
   > ${FormSection} {
     padding-top: 1.5rem;
+    ${props =>
+      props.inner &&
+      css`
+        padding-top: 5rem;
+      `}
   }
 
   > ${FormSection} + ${FormSection} {

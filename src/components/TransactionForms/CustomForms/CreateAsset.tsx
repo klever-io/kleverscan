@@ -155,7 +155,7 @@ export const URIsSection: React.FC<URIProps> = ({ tooltip: customTooltip }) => {
   });
 
   return (
-    <FormSection>
+    <FormSection inner>
       <SectionTitle>
         <span>URIs</span>
         <TooltipContainer>
@@ -430,7 +430,7 @@ export const StakingSection: React.FC<IStakingSectionProps> = ({
   }, [assetTrigger, isFPRProp, setValue]);
 
   return (
-    <FormSection>
+    <FormSection inner>
       <SectionTitle>
         <span>Staking</span>
         <TooltipContainer>

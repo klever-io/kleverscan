@@ -372,7 +372,7 @@ export const CenteredDiv = styled.div`
 
 export const NonceGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(3rem, 1fr));
+  grid-template-columns: repeat(auto-fit, 3rem);
   width: 100%;
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
     grid-template-columns: repeat(8, 2fr);
@@ -385,6 +385,8 @@ export const NonceGrid = styled.div`
 `;
 
 export const NonceSpan = styled.span`
+  display: grid;
+  place-items: center;
   background-color: ${props => props.theme.navbar.text};
   width: 2.7rem !important;
   height: 3.2rem;

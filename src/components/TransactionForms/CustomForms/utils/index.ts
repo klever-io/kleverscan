@@ -115,7 +115,7 @@ export const parsePackInfo = (data: any): void => {
   const packInfo: PackInfo = {};
 
   packInfoReference.forEach((item: any) => {
-    const label = item.currencyId;
+    const label = item.currencyId.toUpperCase();
     packInfo[label] = {
       packs: item.packs,
     };

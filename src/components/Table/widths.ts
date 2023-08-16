@@ -499,6 +499,31 @@ const rewards = css`
   }
 `;
 
+const marketplaces = css`
+  margin-right: 1.25rem;
+
+  &:nth-child(1) {
+    min-width: 12rem;
+    max-width: 14rem;
+  }
+  &:nth-child(2) {
+    min-width: 16rem;
+    max-width: 18rem;
+  }
+  &:nth-child(3) {
+    min-width: 14rem;
+    max-width: 16rem;
+  }
+  &:nth-child(4) {
+    min-width: 14rem;
+    max-width: 16rem;
+  }
+  &:nth-child(5) {
+    min-width: 10rem;
+    max-width: 12rem;
+  }
+`;
+
 const widths = {
   transactions,
   blocks,
@@ -517,6 +542,7 @@ const widths = {
   nfts,
   validatorsList,
   rewards,
+  marketplaces,
 };
 
 export default widths;

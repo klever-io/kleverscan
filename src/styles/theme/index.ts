@@ -149,6 +149,11 @@ const theme = {
     icon: '#9c9eb8',
   },
 
+  warning: {
+    background: '#fde69388',
+    text: '#c5821e',
+  },
+
   button: {
     background: 'linear-gradient(132deg, rgb(238, 63, 113), rgb(125, 63, 241))',
   },

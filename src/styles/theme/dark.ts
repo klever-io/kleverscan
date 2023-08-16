@@ -70,5 +70,10 @@ const darktheme = {
     frozenBackground: '#222345',
     cardStaking: '#4b4d80',
   },
+
+  warning: {
+    background: '#95865188',
+    text: '#eb9c27',
+  },
 };
 export default darktheme;

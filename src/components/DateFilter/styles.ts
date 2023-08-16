@@ -299,7 +299,7 @@ export const DayItem = styled.div.attrs((props: DayItemProps) => ({
 
 export const Warning = styled.div`
   display: flex;
-  background-color: #ffe38088;
+  background-color: ${props => props.theme.warning.background};
   align-items: center;
   padding: 0.5rem;
   border-radius: 0.5rem;
@@ -308,7 +308,7 @@ export const Warning = styled.div`
   gap: 1rem;
   span {
     font-size: 0.9rem;
-    color: ${props => props.theme.table.pending};
+    color: ${props => props.theme.warning.text};
   }
 `;
 

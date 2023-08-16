@@ -7,7 +7,7 @@ import {
   TwoUser,
 } from '@/assets/icons';
 import { GiTwoCoins } from 'react-icons/gi';
-import { MdFeedback } from 'react-icons/md';
+import { MdFeedback, MdOutlineLocalMall } from 'react-icons/md';
 import { RiPenNibFill } from 'react-icons/ri';
 import { TbArrowsLeftRight } from 'react-icons/tb';
 export interface INavbarItem {
@@ -92,6 +92,11 @@ const navbarItems: INavbarItem[] = [
         name: 'Verify',
         pathTo: '/verify-signature',
         Icon: TickSquare,
+      },
+      {
+        name: 'Marketplaces',
+        pathTo: '/marketplaces',
+        Icon: MdOutlineLocalMall,
       },
       { name: 'Feedback', pathTo: '/feedback', Icon: MdFeedback },
     ],

@@ -24,6 +24,7 @@ describe('Component: Header/navbar', () => {
     'ITOs',
     'Encoding Converter',
     'Verify',
+    'Marketplaces',
     'Feedback',
   ];
 

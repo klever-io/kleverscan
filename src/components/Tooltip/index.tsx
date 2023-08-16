@@ -36,6 +36,7 @@ const Tooltip: React.FC<ITooltipProps> = ({
         )}
         {((Component && msg.length > minMsgLength) || !Component) && (
           <StyledTooltip
+            key={String(displayMessage)}
             displayMsg={displayMessage}
             id="buttonTooltip"
             place={customStyles?.place || 'top'}

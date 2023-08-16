@@ -407,3 +407,9 @@ export const DefaultScrollBar = css`
     cursor: pointer !important;
   }
 `;
+
+export const FlexSpan = styled.span`
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+`;

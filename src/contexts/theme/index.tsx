@@ -26,6 +26,13 @@ export const InternalThemeProvider: React.FC = ({ children }) => {
     localStorage.setItem('isDarkTheme', String(!isDarkTheme));
   };
 
+  useEffect(() => {
+    const prefersDarkMode = window.matchMedia(
+      '(prefers-color-scheme: dark)',
+    ).matches;
+    setIsDarkTheme(prefersDarkMode);
+  }, []);
+
   const values: ITheme = {
     toggleDarkTheme,
     isDarkTheme,

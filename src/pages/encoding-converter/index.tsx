@@ -12,8 +12,10 @@ import {
   Header,
 } from '@/styles/common';
 import {
+  addressToPublicKey,
   base64ToUtf8,
   hexToUtf8,
+  publicKeyToAddress,
   utf8ToBase64,
   utf8ToHex,
 } from '@/utils/formatFunctions';
@@ -24,6 +26,7 @@ const EncodingConverter: React.FC = () => {
   const cardHeaders = [
     'Base64 / UTF8',
     'Hex / UTF8',
+    'PublicKey / Address',
     'PEM File / Address - PrivateKey',
   ];
   const [selectedCard, setSelectedCard] = useState<string>(cardHeaders[0]);
@@ -61,6 +64,20 @@ const EncodingConverter: React.FC = () => {
         return <FormEncodingConverter {...hexUtf8Props} />;
       case 'PEM File / Address - PrivateKey':
         return <FormPEMFileConverter />;
+      case 'PublicKey / Address':
+        const publicKeyAddressPorps: IPropsEncodingConverter = {
+          titleTextArea: {
+            encoding: 'PublicKey',
+            decoding: 'Address',
+          },
+          placeHolder: {
+            encoding: 'Enter your publicKey values here...',
+            decoding: 'Enter your address values here...',
+          },
+          encoded: publicKeyToAddress,
+          decoding: addressToPublicKey,
+        };
+        return <FormEncodingConverter {...publicKeyAddressPorps} />;
       default:
         return <div />;
     }

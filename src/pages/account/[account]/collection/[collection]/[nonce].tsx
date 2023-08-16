@@ -10,7 +10,7 @@ import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import { useMobile } from '@/contexts/mobile';
 import { requestTransactionsDefault } from '@/pages/transactions';
-import api from '@/services/api';
+import { requestNonce } from '@/services/requests/account/collection-nonce';
 import { Container, Header } from '@/styles/common';
 import {
   Contract,
@@ -19,8 +19,6 @@ import {
   ITransferContract,
 } from '@/types/contracts';
 import {
-  IAsset,
-  IAssetResponse,
   IParsedAsset,
   IReceipt,
   IRowSection,
@@ -46,7 +44,8 @@ import {
 } from '@/views/transactions/detail';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useQuery } from 'react-query';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 
@@ -57,25 +56,21 @@ interface INonceParams {
 }
 
 const NftDetail: React.FC<IParsedAsset> = () => {
-  const [params, setParams] = useState<null | INonceParams>(null);
-  const [nonce, setNonce] = useState<null | IAsset>(null);
   const [showRawData, setShowRawData] = useState(false);
   const router = useRouter();
 
+  const { data: nonce, isLoading } = useQuery({
+    queryKey: [
+      `nftDetail-${router.query.nonce}`,
+      router.query.collection,
+      router.query.nonce,
+    ],
+    queryFn: () => requestNonce(router),
+    enabled: !!router?.isReady,
+  });
+
   const { isMobile } = useMobile();
   const getContractType = useCallback(contractTypes, []);
-
-  useEffect(() => {
-    if (router.isReady) {
-      setParams(router.query as unknown as INonceParams);
-    }
-  }, [router.isReady]);
-
-  useEffect(() => {
-    if (params) {
-      requestNonce();
-    }
-  }, [params]);
 
   const header = [...initialsTableHeaders, 'kApp Fee', 'Bandwidth Fee'];
   const getFilteredSections = (
@@ -208,19 +203,8 @@ const NftDetail: React.FC<IParsedAsset> = () => {
     scrollUp: true,
     request: (page, limit) =>
       requestTransactionsDefault(page, limit, router, {
-        asset: `${params?.collection}/${params?.nonce}`,
+        asset: `${router.query.collection}/${router.query.nonce}`,
       }),
-  };
-
-  const requestNonce = async () => {
-    if (router.isReady) {
-      const res: IAssetResponse = await api.get({
-        route: `assets/${params?.collection}/${params?.nonce}`,
-      });
-      if (!res.error || res.error == '') {
-        setNonce(res.data?.asset);
-      }
-    }
   };
 
   const isJsonString = (metadata: string) => {
@@ -261,8 +245,8 @@ const NftDetail: React.FC<IParsedAsset> = () => {
             title="NFT Details"
             Icon={Icon}
             route={
-              params
-                ? `/account/${params.account}/collection/${params.collection}`
+              router.isReady
+                ? `/account/${router.query.account}/collection/${router.query.collection}`
                 : '/'
             }
           />
@@ -270,56 +254,59 @@ const NftDetail: React.FC<IParsedAsset> = () => {
         <CardContainer>
           <h3>Overview</h3>
           <CardContent>
-            <Row>
+            <Row isLoading={!!router.isReady}>
               <span>
                 <strong>Address</strong>
               </span>
               <CenteredRow>
-                {params ? (
+                {router.isReady ? (
                   <>
-                    <span>{params.account}</span>
-                    <Copy data={params.account} info="Address" />
+                    <span>{router.query.account}</span>
+                    <Copy
+                      data={router.query.account as string}
+                      info="Address"
+                    />
                   </>
                 ) : (
                   <Skeleton />
                 )}
               </CenteredRow>
             </Row>
-            <Row>
+            <Row isLoading={isLoading}>
               <span>
                 <strong>Collection</strong>
               </span>
-              {nonce ? nonce.name : <Skeleton />}
+              <span>{!isLoading ? nonce?.name : <Skeleton />}</span>
             </Row>
-            <Row>
+            <Row isLoading={!!router.isReady}>
               <span>
                 <strong>Asset ID</strong>
               </span>
-              {params ? (
+              {router.isReady ? (
                 <span>
-                  <p>{params.collection}</p>
+                  <p>{router.query.collection}</p>
                 </span>
               ) : (
                 <Skeleton />
               )}
             </Row>
-            <Row>
+            <Row isLoading={!!router.isReady}>
               <span>
                 <strong>Nonce</strong>
               </span>
-              {params ? (
+              {router.isReady ? (
                 <span>
-                  <p>{params.nonce}</p>
+                  <p>{router.query.nonce}</p>
                 </span>
               ) : (
                 <Skeleton />
               )}
             </Row>
-            <Row>
+            <Row isLoading={isLoading}>
               <span>
                 <strong>Mime</strong>
               </span>
-              {nonce ? (
+              {!isLoading ? (
                 <span>
                   <p>{nonce?.mime || '--'}</p>
                 </span>
@@ -328,13 +315,17 @@ const NftDetail: React.FC<IParsedAsset> = () => {
               )}
             </Row>
             {nonce?.metadata && !isJsonString(nonce.metadata) && (
-              <Row>
+              <Row isLoading={isLoading}>
                 <span>
                   <strong>Metadata</strong>
                 </span>
-                <span>
-                  <p>{nonce.metadata}</p>
-                </span>
+                {!isLoading ? (
+                  <span>
+                    <p>{nonce.metadata}</p>
+                  </span>
+                ) : (
+                  <Skeleton />
+                )}
               </Row>
             )}
           </CardContent>
@@ -355,7 +346,7 @@ const NftDetail: React.FC<IParsedAsset> = () => {
               </CardContent>
             </>
           )}
-          {params && (
+          {router.isReady && (
             <SingleNFTTableContainer>
               <h3>Asset Transactions</h3>
               <Table {...tableProps} />

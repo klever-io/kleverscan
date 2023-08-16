@@ -45,9 +45,16 @@ export const CardContent = styled.div`
   border-radius: 0.75rem;
 `;
 
-export const Row = styled(DefaultRow)`
+export const Row = styled(DefaultRow)<{ isLoading?: boolean }>`
   display: inline-flex;
   word-break: break-word;
+  ${({ isLoading }) =>
+    isLoading &&
+    css`
+      span {
+        width: 50%;
+      }
+    `}
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     display: grid;
     gap: 0.3rem;
@@ -80,7 +87,8 @@ export const CenteredRow = styled(DefaultCenteredRow)`
 
   flex-wrap: nowrap;
 
-  span {
+  > span {
+    width: fit-content;
     line-height: 2rem;
   }
 `;

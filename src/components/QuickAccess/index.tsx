@@ -39,6 +39,8 @@ const QuickAccess: React.FC<{
     { title: 'Create ITO', type: 'ConfigITOContract' },
     { title: 'Freeze', type: 'FreezeContract' },
     { title: 'Vote', type: 'VoteContract' },
+    { title: 'Proposal', type: 'ProposalContract' },
+    { title: 'Create Validator', type: 'CreateValidatorContract' },
   ];
 
   const modalOptions: IModalContract = {

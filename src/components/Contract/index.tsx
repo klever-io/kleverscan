@@ -83,7 +83,6 @@ export const HashComponent: React.FC<IHashComponentProps> = ({
 };
 
 const Contract: React.FC<IContract> = ({
-  modalContractType,
   elementId = 0,
   defaultValues = null,
 }) => {
@@ -102,6 +101,8 @@ const Contract: React.FC<IContract> = ({
     selectedContractType,
     queue,
     isMultiContract,
+    clearQuery,
+    isModal,
   } = useMulticontract();
   const { getKappFee } = useFees();
   const router = useRouter();
@@ -121,17 +122,6 @@ const Contract: React.FC<IContract> = ({
       document.documentElement.style.overflow = 'unset';
     }
   }, [loading]);
-
-  useEffect(() => {
-    if (modalContractType) {
-      setTxHash(null);
-      setSelectedContractAndQuery(modalContractType.value);
-
-      return () => {
-        setSelectedContractAndQuery('');
-      };
-    }
-  }, [modalContractType?.value]);
 
   useEffect(() => {
     if (!isMultiContract && router.isReady && !router.query) {
@@ -157,7 +147,7 @@ const Contract: React.FC<IContract> = ({
 
   const handleClear = () => {
     formMethods.reset({});
-    setQueryAndRouter({ contract: selectedContractType }, router);
+    clearQuery();
     forceUpdate();
   };
 
@@ -169,13 +159,20 @@ const Contract: React.FC<IContract> = ({
   };
 
   const handleShare = async () => {
+    const query = new URLSearchParams({
+      contract: selectedContractType,
+      contractDetails: JSON.stringify(formMethods.getValues()),
+    }).toString();
+
+    const url = `${window.location.origin}/create-transaction?${query}`;
+
     try {
       if (navigator.share)
         await navigator.share({
-          url: window.location.href,
+          url,
         });
       else {
-        await clipboard.writeText(window.location.href);
+        await clipboard.writeText(url);
         toast.info('Contract link copied to clipboard');
       }
     } catch (e) {
@@ -195,17 +192,19 @@ const Contract: React.FC<IContract> = ({
 
   return (
     <Container>
-      <Select
-        options={contractOptions}
-        selectedValue={contractOptions.find(
-          item => item.value === selectedContractType,
-        )}
-        onChange={changeHandler}
-        isDisabled={true}
-        title={'Contract'}
-        zIndex={5}
-        isModal={false}
-      />
+      {!isModal && (
+        <Select
+          options={contractOptions}
+          selectedValue={contractOptions.find(
+            item => item.value === selectedContractType,
+          )}
+          onChange={changeHandler}
+          isDisabled={true}
+          title={'Contract'}
+          zIndex={5}
+          isModal={false}
+        />
+      )}
 
       <FormProvider {...formMethods}>
         {loading &&

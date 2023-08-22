@@ -108,9 +108,21 @@ export const setQueryAndRouter = (
   newQuery: NextParsedUrlQuery,
   router: NextRouter,
 ): void => {
-  router.push({ pathname: router.pathname, query: newQuery }, undefined, {
-    shallow: true,
-  });
+  router.query = {
+    ...router.query,
+    ...newQuery,
+  };
+
+  router.push(
+    {
+      pathname: router.pathname,
+      query: router.query,
+    },
+    undefined,
+    {
+      shallow: true,
+    },
+  );
 };
 
 export const sleep = (ms: number): Promise<void> =>

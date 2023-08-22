@@ -39,7 +39,7 @@ const SelectIcons: React.FC<IFooterItems> = ({ name, icon, url }) => {
   );
 };
 
-export const FooterFixed: React.FC = () => {
+export const MobileNavBar: React.FC = () => {
   const footerItems: IFooterItems[] = [
     {
       name: 'Home',

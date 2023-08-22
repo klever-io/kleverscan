@@ -19,13 +19,14 @@ interface IConnectWallet {
 }
 
 const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
-  const [openDrawer, setOpenDrawer] = useState(false);
   const [openUserInfos, setOpenUserInfos] = useState(false);
   const {
     walletAddress,
     extensionLoading,
     extensionInstalled,
     connectExtension,
+    openDrawer,
+    setOpenDrawer,
   } = useExtension();
 
   const handleClick = () => {

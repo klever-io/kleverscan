@@ -1,27 +1,35 @@
+import AdvancedOptions from '@/components/Form/AdvancedOptions';
+import { useMulticontract } from '@/contexts/contract/multicontract';
+import { useContractModal } from '@/contexts/contractModal';
 import { useExtension } from '@/contexts/extension';
-import { setQueryAndRouter } from '@/utils';
 import { useDidUpdateEffect } from '@/utils/hooks';
-import { useRouter } from 'next/router';
-import { Dispatch, SetStateAction, useEffect } from 'react';
+import { QueueItemContainer } from '@/views/create-transaction';
+import { useEffect } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
-import Contract from '..';
 import { Container, Content, TitleContent } from './styles';
 
 export interface IModalContract {
   title: string;
   contractType: string;
-  setOpenModal: Dispatch<SetStateAction<boolean>>;
   defaultValues?: any;
 }
 
 const ModalContract: React.FC<IModalContract> = ({
   title,
   contractType,
-  setOpenModal,
   defaultValues,
 }) => {
   const { extensionInstalled, connectExtension } = useExtension();
-  const router = useRouter();
+  const {
+    queue,
+    selectedId,
+    setSelectedContractAndQuery,
+    clearQuery,
+    setIsModal,
+    resetForms,
+  } = useMulticontract();
+
+  const { setOpenModal } = useContractModal();
 
   useDidUpdateEffect(() => {
     if (extensionInstalled) {
@@ -30,19 +38,19 @@ const ModalContract: React.FC<IModalContract> = ({
   }, [extensionInstalled]);
 
   const closeModal = () => {
+    clearQuery();
     setOpenModal(false);
-    setQueryAndRouter({}, router);
-  };
-
-  const contractProps = {
-    modalContractType: { value: contractType },
-    defaultValues,
   };
 
   useEffect(() => {
+    setSelectedContractAndQuery(contractType);
+    setIsModal(true);
+    resetForms(defaultValues);
+
     document.documentElement.style.overflow = 'hidden';
     return () => {
       document.documentElement.style.overflow = 'unset';
+      setIsModal(false);
     };
   }, []);
 
@@ -53,7 +61,17 @@ const ModalContract: React.FC<IModalContract> = ({
           <h1>{title}</h1>
           <AiOutlineClose onClick={closeModal} cursor={'pointer'} />
         </TitleContent>
-        <Contract {...contractProps} />
+        {queue.map(item => {
+          return (
+            <QueueItemContainer
+              key={JSON.stringify(item.ref)}
+              visible={item.elementId === selectedId}
+            >
+              {item.ref}
+            </QueueItemContainer>
+          );
+        })}
+        <AdvancedOptions />
       </Content>
     </Container>
   );

@@ -16,6 +16,8 @@ export const CardContainer = styled.div`
 export const WarningContainer = styled.div`
   display: flex;
   align-items: center;
+  justify-content: center;
+
   gap: 1rem;
 
   padding: 1rem 2rem;
@@ -36,9 +38,12 @@ export const WarningText = styled.p`
   font-style: normal;
   font-weight: normal;
   font-size: 15px;
-  line-height: 18px;
-  text-align: center;
-  padding: 1rem 0;
+  line-height: 22px;
+
+  a {
+    color: ${props => props.theme.violet};
+    text-decoration: underline;
+  }
 `;
 
 export const Container = styled.div`

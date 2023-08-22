@@ -64,7 +64,34 @@ const CreateTransaction: React.FC = () => {
 
   return (
     <Container>
-      {isAccountEmpty && (
+      {!extensionInstalled && (
+        <WarningContainer>
+          <WarningIcon />
+          <WarningText>
+            Your wallet is not connected. You can preview the transaction, but
+            you will not be able to send it.
+            <p>
+              To send transactions{' '}
+              <a
+                href="https://chrome.google.com/webstore/detail/klever-wallet/lmbifcmbofehdpolpdpnlcnanolnlkec"
+                target="_blank"
+                rel="noreferrer"
+              >
+                download the Klever Extension
+              </a>{' '}
+              if you are in a desktop.
+            </p>
+            <p>
+              Or enter this page via{' '}
+              <a href="https://www.klever.io/" target="_blank" rel="noreferrer">
+                the Klever Wallet App internal browser
+              </a>{' '}
+              if you are in a mobile device.
+            </p>
+          </WarningText>
+        </WarningContainer>
+      )}
+      {extensionInstalled && isAccountEmpty && (
         <WarningContainer>
           <WarningIcon />
           <WarningText>

@@ -264,7 +264,7 @@ export const BackGroundUserInfo = styled.div<{ isOpen?: boolean }>`
   opacity: ${props => (props.isOpen ? 1 : 0)};
 
   transition: all 0.1s linear;
-  z-index: 3;
+  z-index: 5;
 `;
 
 export const BackgroundHelper = styled.div<{ opened: boolean }>`

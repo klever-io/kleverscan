@@ -8,7 +8,7 @@ export const Container = styled.footer`
   bottom: 0;
   background: #0b0b1e;
 
-  z-index: 6;
+  z-index: 5;
 
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     display: none;

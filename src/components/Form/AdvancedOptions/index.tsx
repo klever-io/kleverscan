@@ -219,7 +219,7 @@ const AdvancedOptionsContent: React.FC = () => {
     useContract();
   const [loading, setLoading] = useState(false);
 
-  const { setIsMultiContract, isMultiContract } = useMulticontract();
+  const { setIsMultiContract, isMultiContract, isModal } = useMulticontract();
 
   const { data: assets, isFetching: assetsFetching } = useQuery({
     queryKey: ['userAssets'],
@@ -297,24 +297,26 @@ const AdvancedOptionsContent: React.FC = () => {
   return (
     <ExtraOptionContainer>
       {kdaSelect()}
-      <FieldContainer>
-        <InputLabel>
-          <span>Multiple Contract</span>
-        </InputLabel>
-        <ToggleContainer>
-          No
-          <Toggle>
-            <StyledInput
-              type="checkbox"
-              defaultChecked={isMultiContract}
-              value={String(isMultiContract)}
-              onClick={() => setIsMultiContract(!isMultiContract)}
-            />
-            <Slider active={String(isMultiContract)} />
-          </Toggle>
-          Yes
-        </ToggleContainer>
-      </FieldContainer>
+      {!isModal && (
+        <FieldContainer>
+          <InputLabel>
+            <span>Multiple Contract</span>
+          </InputLabel>
+          <ToggleContainer>
+            No
+            <Toggle>
+              <StyledInput
+                type="checkbox"
+                defaultChecked={isMultiContract}
+                value={String(isMultiContract)}
+                onClick={() => setIsMultiContract(!isMultiContract)}
+              />
+              <Slider active={String(isMultiContract)} />
+            </Toggle>
+            Yes
+          </ToggleContainer>
+        </FieldContainer>
+      )}
       <MultiSigSelect />
       <FieldContainer>
         <InputLabel>

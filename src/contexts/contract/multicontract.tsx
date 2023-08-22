@@ -34,10 +34,11 @@ interface IMulticontract {
   totalFees: number;
   showMultiContracts: boolean;
   parsedIndex: number;
+  isModal: boolean;
   addToQueue: () => void;
   removeContractQueue: (contractIndex: number, e: any) => void;
   editContract: (index: number) => void;
-  resetForms: () => void;
+  resetForms: (defaultValues?: any) => void;
   setQueue: React.Dispatch<React.SetStateAction<IQueue[]>>;
   setSelectedId: React.Dispatch<React.SetStateAction<number>>;
   setIsMultiContract: React.Dispatch<React.SetStateAction<boolean>>;
@@ -47,6 +48,8 @@ interface IMulticontract {
   setCollection: (collection?: ICollectionList) => void;
   setSelectedRoyaltiesFees: (amount: number) => void;
   setCollectionAssetId: (id: number) => void;
+  setIsModal: React.Dispatch<React.SetStateAction<boolean>>;
+  clearQuery: () => void;
 }
 
 export const MultiContractContext = createContext({} as IMulticontract);
@@ -56,6 +59,7 @@ export const MulticontractProvider: React.FC = ({ children }) => {
   const [queue, setQueue] = useState<IQueue[]>([]);
   const [selectedId, setSelectedId] = useState<number>(0);
   const [showMultiContracts, setShowMultiContracts] = useState<boolean>(false);
+  const [isModal, setIsModal] = useState<boolean>(false);
 
   const indexRef = useRef<number>(0);
 
@@ -121,7 +125,6 @@ export const MulticontractProvider: React.FC = ({ children }) => {
 
   const setSelectedContractAndQuery = (contract: string) => {
     setSelectedContractType(contract);
-    if (router.pathname !== '/create-transaction') return;
 
     if (contract !== '') {
       const newQuery = {
@@ -129,6 +132,17 @@ export const MulticontractProvider: React.FC = ({ children }) => {
       };
 
       setQueryAndRouter(newQuery, router);
+    }
+  };
+
+  const clearQuery = () => {
+    delete router.query['contractDetails'];
+
+    if (router.pathname === '/create-transaction') {
+      setQueryAndRouter({ contract: selectedContractType }, router);
+    } else {
+      delete router.query['contract'];
+      setQueryAndRouter({}, router);
     }
   };
 
@@ -194,11 +208,12 @@ export const MulticontractProvider: React.FC = ({ children }) => {
     }
   };
 
-  const resetForms = () => {
+  const resetForms = (defaultValues?: any) => {
     const contractPropsWithIndex: IContract = {
       elementId: 0,
       defaultValues: JSON.parse(
-        (router.query?.contractDetails as string) || '{}',
+        (router.query?.contractDetails as string) ||
+          JSON.stringify(defaultValues || {}),
       ),
     };
 
@@ -248,6 +263,7 @@ export const MulticontractProvider: React.FC = ({ children }) => {
     totalFees,
     showMultiContracts,
     parsedIndex,
+    isModal,
     addToQueue,
     editContract,
     removeContractQueue,
@@ -261,6 +277,8 @@ export const MulticontractProvider: React.FC = ({ children }) => {
     setCollection,
     setSelectedRoyaltiesFees,
     setCollectionAssetId,
+    setIsModal,
+    clearQuery,
   };
 
   return (

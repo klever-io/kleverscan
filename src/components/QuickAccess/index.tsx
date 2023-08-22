@@ -1,8 +1,6 @@
 import { useExtension } from '@/contexts/extension';
 import React, { useEffect, useState } from 'react';
 import ModalContract, { IModalContract } from '../Contract/ModalContract';
-import { BackgroundHelper } from '../Header/ConnectWallet/styles';
-import WalletHelp from '../Header/WalletHelp';
 import { Title } from '../InputGlobal/HomeInput/styles';
 import { Carousel } from './Carousel';
 import { CardItem, Container, IconSquarePlus, TitleContainer } from './styles';
@@ -20,7 +18,6 @@ const QuickAccess: React.FC<{
   const [contractType, setContractType] = useState('');
   const [openModalTransactions, setOpenModalTransactions] = useState(false);
   const [titleModal, setTitleModal] = useState('');
-  const [openDrawer, setOpenDrawer] = useState<boolean>(false);
 
   const { extensionInstalled, connectExtension } = useExtension();
 
@@ -45,19 +42,10 @@ const QuickAccess: React.FC<{
 
   const modalOptions: IModalContract = {
     contractType,
-    setOpenModal: setOpenModalTransactions,
     title: titleModal,
   };
 
-  const closeMenu = () => {
-    setOpenDrawer(false);
-  };
-
   const handleClick = (contract: IShortCutContract, e: any) => {
-    if (!extensionInstalled) {
-      setOpenDrawer(true);
-      return;
-    }
     if (contract.openWiz) {
       contract.openWiz();
       return;
@@ -90,21 +78,7 @@ const QuickAccess: React.FC<{
           </CardItem>
         ))}
       </Carousel>
-      <BackgroundHelper
-        onClick={closeMenu}
-        onTouchStart={closeMenu}
-        opened={openDrawer}
-      />
-      <WalletHelp
-        closeDrawer={() => setOpenDrawer(false)}
-        opened={openDrawer}
-        clickConnectionMobile={() => {
-          openDrawer;
-        }}
-      />
-      {extensionInstalled && openModalTransactions && (
-        <ModalContract {...modalOptions} />
-      )}
+      {openModalTransactions && <ModalContract {...modalOptions} />}
     </Container>
   );
 };

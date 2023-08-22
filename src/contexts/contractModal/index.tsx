@@ -1,6 +1,7 @@
 import ModalContract, {
   IModalContract,
 } from '@/components/Contract/ModalContract';
+import { useRouter } from 'next/router';
 import { createContext, useContext, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { ButtonModal } from './styles';
@@ -10,6 +11,7 @@ interface IContractModal {
     params: IUseInteractionButton[],
     isLeftAligned?: boolean,
   ) => React.FC[];
+  setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface IUseInteractionButton {
@@ -27,12 +29,27 @@ export const ContractModalProvider: React.FC = ({ children }) => {
   const [modalOptions, setModalOptions] = useState<IModalContract>({
     title: '',
     contractType: 'TransferContract',
-    setOpenModal,
   });
+
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const checkInitialUrl = () => {
+    if (
+      router.query &&
+      router.query.contract &&
+      router.pathname !== '/create-transaction'
+    ) {
+      setOpenModal(true);
+    }
+  };
+
+  useEffect(() => {
+    checkInitialUrl();
+  }, [router.isReady]);
 
   const getInteractionsButtons = (
     params: IUseInteractionButton[],
@@ -46,7 +63,6 @@ export const ContractModalProvider: React.FC = ({ children }) => {
 
         const modalOptions: IModalContract = {
           contractType,
-          setOpenModal,
           defaultValues,
           title,
         };
@@ -72,7 +88,7 @@ export const ContractModalProvider: React.FC = ({ children }) => {
     return buttons;
   };
 
-  const values: IContractModal = { getInteractionsButtons };
+  const values: IContractModal = { getInteractionsButtons, setOpenModal };
 
   return (
     <ContractModal.Provider value={values}>

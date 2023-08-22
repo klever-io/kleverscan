@@ -50,7 +50,7 @@ interface IAssetBalance {
 }
 
 const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
-  const [openDrawer, setOpenDrawer] = useState(false);
+  const { openDrawer, setOpenDrawer } = useExtension();
   const [openUserInfos, setOpenUserInfos] = useState(false);
   const [balance, setBalance] = useState<{
     [assetId: string]: string | number;

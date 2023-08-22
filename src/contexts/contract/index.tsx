@@ -101,7 +101,8 @@ export const ContractProvider: React.FC = ({ children }) => {
   const kdaFee = useRef<ICollectionList>({} as ICollectionList);
   const [permID, setPermID] = useState<number>(0);
 
-  const { logoutExtension } = useExtension();
+  const { extensionInstalled, walletAddress, setOpenDrawer } = useExtension();
+
   const router = useRouter();
 
   const getOwnerAddress = () => {
@@ -151,7 +152,6 @@ export const ContractProvider: React.FC = ({ children }) => {
     const address = sessionStorage.getItem('walletAddress') || '';
 
     if (address === '' && router.pathname === '/create-transaction') {
-      logoutExtension && logoutExtension();
       return [] as ICollectionList[];
     }
 
@@ -260,7 +260,27 @@ export const ContractProvider: React.FC = ({ children }) => {
     return parsedValues;
   };
 
+  const checkExtensionInstalled = () => {
+    return extensionInstalled;
+  };
+
+  const checkExtensionLoggedIn = () => {
+    return walletAddress !== '';
+  };
+
   const submitForms = async () => {
+    if (!checkExtensionInstalled()) {
+      setOpenDrawer(true);
+      return;
+    }
+
+    if (!checkExtensionLoggedIn()) {
+      toast.error(
+        'Wallet not connected. Please connect your wallet and refresh the page. The transaction data will not be lost.',
+      );
+      return;
+    }
+
     const allForms = document.querySelectorAll('form');
     allForms.forEach((form: HTMLFormElement) => {
       form.requestSubmit();

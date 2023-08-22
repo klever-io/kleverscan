@@ -253,7 +253,7 @@ export const AssetHeaderContainer = styled.div`
   background-color: transparent !important;
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: fit-content;
   color: ${props => props.theme.black} !important;
   &:hover {
     cursor: default;

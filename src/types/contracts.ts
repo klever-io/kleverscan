@@ -39,7 +39,7 @@ export enum ContractsName {
   TransferContractType = 'Transfer',
   CreateAssetContractType = 'Create Asset',
   CreateValidatorContractType = 'Create Validator',
-  ConfigValidatorContractType = 'Config Validator',
+  ValidatorConfigContractType = 'Config Validator',
   FreezeContractType = 'Freeze',
   UnfreezeContractType = 'Unfreeze',
   DelegateContractType = 'Delegate',

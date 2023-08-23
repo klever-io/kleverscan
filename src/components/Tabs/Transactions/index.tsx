@@ -41,15 +41,29 @@ const Transactions: React.FC<ITransactionsProps> = props => {
   const router = useRouter();
   const { isMobile } = useMobile();
 
+  const defaultHeader = [...initialsTableHeaders, 'kApp Fee', 'Bandwidth Fee'];
+  const queryHeader = getHeaderForTable(router, defaultHeader);
   const getContractType = useCallback(contractTypes, []);
-
   const getFilteredSections = (
     contract: IContract[],
     receipts: IReceipt[],
     precision?: number,
   ): IRowSection[] => {
     const contractType = getContractType(contract);
-    return filteredSections(contract, contractType, receipts, precision);
+    const filteredSectionsResult = filteredSections(
+      contract,
+      contractType,
+      receipts,
+      precision,
+    );
+    if (contractType === 'Multi contract') {
+      const extraHeadersLength =
+        queryHeader.length - initialsTableHeaders.length;
+      return Array(extraHeadersLength)
+        .fill(extraHeadersLength)
+        .map(_ => ({ element: <span>--</span>, span: 1 }));
+    }
+    return filteredSectionsResult;
   };
 
   const rowSections = (props: ITransaction): IRowSection[] => {
@@ -154,7 +168,6 @@ const Transactions: React.FC<ITransactionsProps> = props => {
     ];
 
     const filteredContract = getFilteredSections(contract, receipts, precision);
-
     if (router?.query?.type) {
       sections.pop();
       sections.pop();
@@ -164,14 +177,12 @@ const Transactions: React.FC<ITransactionsProps> = props => {
     return sections;
   };
 
-  const header = [...initialsTableHeaders, 'kApp Fee', 'Bandwidth Fee'];
-
   const transactionTableProps = props.transactionsTableProps;
 
   const tableProps: ITable = {
     ...transactionTableProps,
     rowSections,
-    header: router?.query?.type ? getHeaderForTable(router, header) : header,
+    header: router?.query?.type ? queryHeader : defaultHeader,
     type: 'transactions',
   };
 

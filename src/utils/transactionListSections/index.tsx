@@ -261,7 +261,7 @@ const ClaimSections = (
     {
       element: (
         <span>
-          <span>{claimReceipt?.assetId ?? ''}</span>
+          <span>{claimReceipt?.assetId ?? '--'}</span>
         </span>
       ),
       span: 1,
@@ -488,8 +488,15 @@ const UpdateAccountPermissionContractSections = (
 const DepositSections = (par: IParameter): IRowSection[] => {
   const parameter = par as unknown as IDepositContract;
   return [
-    { element: <span>{parameter?.depositType || ''}</span>, span: 1 },
-    { element: <span>{parameter?.id || ''}</span>, span: 1 },
+    {
+      element: (
+        <span>
+          {parameter?.depositTypeString === 'FPRDeposit' ? 'FPR' : 'KDA Pool'}
+        </span>
+      ),
+      span: 1,
+    },
+    { element: <span>{parameter?.id || '--'}</span>, span: 1 },
   ];
 };
 

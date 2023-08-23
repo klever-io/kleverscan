@@ -81,10 +81,25 @@ export const Panel = styled.div`
   }
 `;
 
+export const RoyaltiesTransferPercentage = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  > div {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+    p {
+      color: ${({ theme }) => theme.true.white};
+    }
+  }
+`;
+
 export const CenteredRow = styled(DefaultCenteredRow)`
   overflow: hidden;
   flex-direction: row;
-
   flex-wrap: nowrap;
 
   > span {

@@ -415,7 +415,7 @@ describe('Component: TransactionContractComponents', () => {
 
       const type = screen.getByText('Claim');
       const claimType = screen.getByText('StakingClaim');
-      const assetId = screen.getByText('KLV');
+      const assetIdReceived = screen.getByText('Asset Id Received');
       const amount = screen.getByText('47.573703 KLV');
 
       const data = [
@@ -425,7 +425,7 @@ describe('Component: TransactionContractComponents', () => {
         amountLabel,
         type,
         claimType,
-        assetId,
+        assetIdReceived,
         amount,
       ];
       data.forEach(value => expect(value).toBeInTheDocument());

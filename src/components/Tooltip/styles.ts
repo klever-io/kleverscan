@@ -6,3 +6,7 @@ export const StyledTooltip = styled(ReactTooltip)<{ displayMsg: boolean }>`
   display: ${props => (props.displayMsg ? 'initial' : 'none')} !important;
   word-wrap: break-word;
 `;
+
+export const ToolTipSpan = styled.span`
+  height: 24px;
+`;

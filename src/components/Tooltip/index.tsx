@@ -1,7 +1,7 @@
 import { IconHelp } from '@/assets/help';
 import { ICustomStyles } from '@/types/index';
 import React, { useState } from 'react';
-import { StyledTooltip } from './styles';
+import { StyledTooltip, ToolTipSpan } from './styles';
 
 interface ITooltipProps {
   msg: string;
@@ -19,7 +19,7 @@ const Tooltip: React.FC<ITooltipProps> = ({
   const [displayMessage, setDisplayMessage] = useState(false);
   const parsedMsgs = msg.split('\n');
   return (
-    <span
+    <ToolTipSpan
       onMouseOver={() => setDisplayMessage(true)}
       onMouseLeave={() => setDisplayMessage(false)}
     >
@@ -55,7 +55,7 @@ const Tooltip: React.FC<ITooltipProps> = ({
           </StyledTooltip>
         )}
       </>
-    </span>
+    </ToolTipSpan>
   );
 };
 

@@ -88,6 +88,7 @@ import {
   RoleStrong,
   RoleWrapper,
   RoyaltiesChangeWrapper,
+  RoyaltiesTransferPercentage,
   StatusIconWrapper,
   StrongWidth,
   URIsWrapper,
@@ -393,6 +394,37 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
                   {parameter?.royalties?.marketPercentage / 100}%
                 </span>
               )}
+              <CenteredRow>
+                {parameter?.royalties?.itoFixed && (
+                  <>
+                    <strong>ITO Fixed:&nbsp;</strong>
+                    <span>{parameter?.royalties?.itoFixed / 1000000} KLV</span>
+                  </>
+                )}
+              </CenteredRow>
+              <CenteredRow>
+                {parameter?.royalties?.itoPercentage && (
+                  <>
+                    <strong>ITO Percentage:&nbsp;</strong>
+                    <span>{parameter?.royalties?.itoPercentage / 100}%</span>
+                  </>
+                )}
+              </CenteredRow>
+              {parameter?.royalties?.transferPercentage && (
+                <RoyaltiesTransferPercentage>
+                  <strong>Transfer Percentage:&nbsp;</strong>
+                  <div>
+                    {parameter?.royalties?.transferPercentage.map(
+                      (data, index) => (
+                        <span key={index}>
+                          <p>Amount: {data.amount}</p>
+                          <p>Percentage: {data.percentage / 100}%</p>
+                        </span>
+                      ),
+                    )}
+                  </div>
+                </RoyaltiesTransferPercentage>
+              )}
             </Panel>
           )}
         </ExpandRow>
@@ -680,6 +712,7 @@ export const ValidatorConfig: React.FC<IIndexedContract> = ({
 }) => {
   const param = par as unknown as IValidatorConfigContract;
   const parameter = param.config;
+
   return (
     <>
       <Row>
@@ -701,14 +734,14 @@ export const ValidatorConfig: React.FC<IIndexedContract> = ({
         <span>
           <strong>Name</strong>
         </span>
-        <span>{parameter?.name}</span>
+        <span>{parameter?.name || '--'}</span>
       </Row>
       {typeof parameter?.canDelegate === 'boolean' && (
         <Row>
           <span>
             <strong>Can Delegate</strong>
           </span>
-          <span>{parameter?.canDelegate ? 'True' : 'False'}</span>{' '}
+          <span>{statusWithIcon(parameter?.canDelegate)}</span>{' '}
         </Row>
       )}
       <Row>
@@ -741,38 +774,47 @@ export const ValidatorConfig: React.FC<IIndexedContract> = ({
           <strong>Logo</strong>
         </span>
         <span>
-          <a href={renderCorrectPath(parameter?.logo)}>{parameter?.logo}</a>
+          {parameter.logo ? (
+            <a href={renderCorrectPath(parameter?.logo)}>{parameter?.logo}</a>
+          ) : (
+            <span>--</span>
+          )}
         </span>
       </Row>
       <Row>
         <span>
           <strong>URIs</strong>
         </span>
-        <RowContent>
-          <BalanceContainer>
-            <FrozenContainer>
-              {parameter.uris?.map(
-                ({ key, value }: { key: string; value: string }) => (
-                  <div key={key}>
-                    <span>
-                      <strong>{key}</strong>
-                    </span>
-                    <span>
-                      <a
-                        href={renderCorrectPath(value)}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {value}
-                      </a>
-                    </span>
-                  </div>
-                ),
-              )}
-            </FrozenContainer>
-          </BalanceContainer>
-        </RowContent>
+        {parameter.uris.length !== 0 ? (
+          parameter.uris?.map(
+            ({ key, value }: { key: string; value: string }) => (
+              <RowContent key={key}>
+                <BalanceContainer>
+                  <FrozenContainer>
+                    <div>
+                      <span>
+                        <strong>{key}</strong>
+                      </span>
+                      <span>
+                        <a
+                          href={renderCorrectPath(value)}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {value}
+                        </a>
+                      </span>
+                    </div>
+                  </FrozenContainer>
+                </BalanceContainer>
+              </RowContent>
+            ),
+          )
+        ) : (
+          <span>--</span>
+        )}
       </Row>
+
       {renderMetadata()}
     </>
   );
@@ -960,7 +1002,9 @@ export const Delegate: React.FC<IIndexedContract> = ({
         </span>
         <span>
           <CenteredRow>
-            <span>{parameter?.toAddress}</span>
+            <Link href={`/account/${parameter?.toAddress}`}>
+              <a>{parameter?.toAddress}</a>
+            </Link>
             <Copy data={parameter?.toAddress} info="Address"></Copy>
           </CenteredRow>
         </span>
@@ -994,12 +1038,29 @@ export const Delegate: React.FC<IIndexedContract> = ({
                   claimReceipt.amount / 10 ** claimPrecision,
                   claimPrecision,
                 )}{' '}
-                {claimReceipt.assetIdReceived}
               </span>
+              {claimReceipt.assetIdReceived === 'KLV' && <KLV />}
+              {claimReceipt.assetIdReceived}
               <Tooltip msg="Delegation generates an unfreeze contract, which will trigger the freeze contract rewards, if there are any." />
             </CenteredRow>
           </span>
         </Row>
+      )}
+      {claimReceipt && (
+        <>
+          <Row>
+            <span>
+              <strong>MarketPlace ID</strong>
+            </span>
+            <span>{claimReceipt.marketplaceId || '--'}</span>
+          </Row>
+          <Row>
+            <span>
+              <strong>OrderId</strong>
+            </span>
+            <span>{claimReceipt.orderId || '--'}</span>
+          </Row>
+        </>
       )}
       {renderMetadata()}
     </>
@@ -1068,12 +1129,43 @@ export const Undelegate: React.FC<IIndexedContract> = ({
                   claimReceipt.amount / 10 ** claimPrecision,
                   claimPrecision,
                 )}{' '}
-                {claimReceipt.assetIdReceived}
               </span>
+              {claimReceipt.assetIdReceived === 'KLV' && <KLV />}
+              {claimReceipt.assetIdReceived}
             </CenteredRow>
           </span>
         </Row>
       )}
+      <>
+        <Row>
+          <span>
+            <strong>AssetID Received</strong>
+          </span>
+          <span>{claimReceipt?.assetIdReceived || '--'}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>AssetID</strong>
+          </span>
+          <span>{claimReceipt?.assetId || '--'}</span>
+        </Row>
+        {claimReceipt?.marketplaceId && (
+          <Row>
+            <span>
+              <strong>MarketPlace ID</strong>
+            </span>
+            <span>{claimReceipt.marketplaceId || '--'}</span>
+          </Row>
+        )}
+        {claimReceipt?.orderId && (
+          <Row>
+            <span>
+              <strong>OrderId</strong>
+            </span>
+            <span>{claimReceipt.orderId || '--'}</span>
+          </Row>
+        )}
+      </>
       {renderMetadata()}
     </>
   );
@@ -1111,21 +1203,26 @@ export const Withdraw: React.FC<IIndexedContract> = ({
           <span>{parameter?.assetId}</span>
         </Row>
       )}
-      {withdrawReceipt && (
-        <Row>
-          <span>
-            <strong>Amount</strong>
-          </span>
-          <span>
-            {toLocaleFixed(
-              Number(withdrawReceipt?.amount || 0) /
-                10 ** precision[assetIdPrecision],
-              precision[assetIdPrecision],
-            )}{' '}
-            {withdrawReceipt?.assetId}
-          </span>
-        </Row>
-      )}
+
+      <Row>
+        <span>
+          <strong>Amount</strong>
+        </span>
+        <span>
+          {toLocaleFixed(
+            Number(withdrawReceipt?.amount || parameter.amount || 0) /
+              10 ** precision[assetIdPrecision],
+            precision[assetIdPrecision],
+          )}{' '}
+          {withdrawReceipt?.assetId || parameter.currencyID}
+        </span>
+      </Row>
+      <Row>
+        <span>
+          <strong>Withdraw Type</strong>
+        </span>
+        <span>{parameter.withdrawType || '--'}</span>
+      </Row>
       {claimReceipt && (
         <Row>
           <span>
@@ -1138,12 +1235,43 @@ export const Withdraw: React.FC<IIndexedContract> = ({
                   claimReceipt.amount / 10 ** precision[claimPrecision],
                   precision[claimPrecision],
                 )}{' '}
-                {claimReceipt.assetIdReceived}
               </span>
+              {claimReceipt.assetIdReceived === 'KLV' && <KLV />}
+              {claimReceipt.assetIdReceived}
             </CenteredRow>
           </span>
         </Row>
       )}
+      <>
+        <Row>
+          <span>
+            <strong>AssetID Received</strong>
+          </span>
+          <span>{claimReceipt?.assetIdReceived || '--'}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>AssetID</strong>
+          </span>
+          <span>{claimReceipt?.assetId || '--'}</span>
+        </Row>
+        {claimReceipt?.marketplaceId && (
+          <Row>
+            <span>
+              <strong>MarketPlace ID</strong>
+            </span>
+            <span>{claimReceipt.marketplaceId || '--'}</span>
+          </Row>
+        )}
+        {claimReceipt?.orderId && (
+          <Row>
+            <span>
+              <strong>OrderId</strong>
+            </span>
+            <span>{claimReceipt.orderId || '--'}</span>
+          </Row>
+        )}
+      </>
       {renderMetadata()}
     </>
   );
@@ -1189,10 +1317,34 @@ export const Claim: React.FC<IIndexedContract> = ({
           </span>
           <span>
             {toLocaleFixed(claimReceipt?.amount / 10 ** precision, precision)}{' '}
-            {claimReceipt?.assetIdReceived}
+            {claimReceipt.assetIdReceived}
           </span>
         </Row>
       )}
+      <>
+        <Row>
+          <span>
+            <strong>Asset Id Received</strong>
+          </span>
+          <span>{claimReceipt?.assetIdReceived || '--'}</span>
+        </Row>
+        {claimReceipt?.marketplaceId && (
+          <Row>
+            <span>
+              <strong>MarketPlace ID</strong>
+            </span>
+            <span>{claimReceipt.marketplaceId || '--'}</span>
+          </Row>
+        )}
+        {claimReceipt?.orderId && (
+          <Row>
+            <span>
+              <strong>OrderId</strong>
+            </span>
+            <span>{claimReceipt.orderId || '--'}</span>
+          </Row>
+        )}
+      </>
     </>
   );
 };
@@ -1515,7 +1667,6 @@ export const Buy: React.FC<IContractBuyProps> = ({
     .map(receipt => receipt.assetId)
     .filter(precision => precision !== undefined);
   const precisions = usePrecision(getPrecisionsToSearch);
-
   const renderMarketBuy = () => {
     const buyReceipt = findReceipt(filteredReceipts, 16) as
       | IBuyReceipt
@@ -1650,8 +1801,8 @@ export const Buy: React.FC<IContractBuyProps> = ({
       const amount = parameter?.amount;
       if (typeof amount === 'number') {
         return toLocaleFixed(
-          amount / 10 ** precisions[assetId],
-          precisions[assetId],
+          amount / 10 ** (precisions[assetId] || 0),
+          precisions[assetId] || 0,
         );
       }
       return null;

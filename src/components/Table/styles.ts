@@ -323,7 +323,9 @@ export const EmptyRow = styled(Row)`
   }
 `;
 
-export const CustomLink = styled.a<{ tabAsset?: boolean }>`
+export const CustomLink = styled.a<{
+  tabAsset?: boolean;
+}>`
   align-self: end;
   min-width: 13rem;
   text-align: center;

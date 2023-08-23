@@ -392,24 +392,24 @@ const networkParams = css`
 
 const proposals = css`
   &:nth-child(1) {
-    min-width: 5rem;
-    max-width: 5rem;
+    min-width: 7rem;
+    max-width: 8rem;
   }
   &:nth-child(2) {
-    min-width: 10rem;
-    max-width: 10rem;
+    min-width: 15rem;
+    max-width: 16rem;
   }
   &:nth-child(3) {
-    min-width: 12rem;
-    max-width: 12rem;
+    min-width: 14rem;
+    max-width: 15rem;
   }
   &:nth-child(4) {
-    min-width: 11rem;
-    max-width: 11rem;
+    min-width: 14rem;
+    max-width: 15rem;
   }
   &:nth-child(5) {
-    min-width: 12rem;
-    max-width: 12rem;
+    min-width: 15rem;
+    max-width: 18rem;
   }
   &:nth-child(6) {
     min-width: 14rem;
@@ -417,7 +417,6 @@ const proposals = css`
   }
   &:nth-child(7) {
     min-width: 5rem;
-    margin-left: 15rem;
   }
 `;
 const votes = css`

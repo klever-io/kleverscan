@@ -82,7 +82,7 @@ describe('Component: Tabs/Proposals', () => {
     });
     const proposalNumber = screen.getByText('#0');
     const proposer = screen.getAllByText(
-      parseAddress(parsedProposals[0].proposer, 14),
+      parseAddress(parsedProposals[0].proposer, 20),
     )[0];
     const epochStart = screen.getAllByText(/Created Epoch/i)[0];
     const epochEnd = screen.getAllByText(/Ending Epoch/i)[0];

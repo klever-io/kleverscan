@@ -65,6 +65,19 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
       parsedParameters,
     } = props;
 
+    const getProposalStatusColor = () => {
+      switch (proposalStatus) {
+        case 'ApprovedProposal':
+          return 'success';
+        case 'DeniedProposal':
+          return 'fail';
+        case 'ActiveProposal':
+          return 'pending';
+        default:
+          return 'text';
+      }
+    };
+
     const renderProposalsNetworkParams = (
       fullParameters: IParsedProposalParam[] | undefined,
     ) => {
@@ -146,7 +159,7 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
         element: (
           <ProposerDescAndLink key={proposer}>
             <Link href={`/account/${proposer}`}>
-              <a>{parseAddress(proposer, 14)}</a>
+              <a>{parseAddress(proposer, 20)}</a>
             </Link>
           </ProposerDescAndLink>
         ),
@@ -173,7 +186,7 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
       },
       {
         element: (
-          <Status status={proposalStatus} key={proposalStatus}>
+          <Status status={getProposalStatusColor()} key={proposalStatus}>
             <StatusIcon />
             <ProposalStatus>{capitalizeString(proposalStatus)}</ProposalStatus>
           </Status>
@@ -197,6 +210,7 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
         span: 2,
       },
     ];
+
     return sections;
   };
 

@@ -23,7 +23,14 @@ import {
 const queueHaveSomeRoyalties = (queue: IQueue[]) =>
   queue.some(item => item.royaltiesFeeAmount);
 
-const sumAllRoyaltiesFees = (queue: IQueue[]) => {
+export const sumAllRoyaltiesFees = (
+  queue: IQueue[],
+): {
+  [key: string]: {
+    totalFee: string;
+    precision: number;
+  };
+} => {
   const result = {};
   queue.forEach(item => {
     if (item.royaltiesFeeAmount && item.collection && !item.collection.isNFT) {

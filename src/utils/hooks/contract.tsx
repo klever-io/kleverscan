@@ -83,6 +83,7 @@ export const useKDASelect = (
     setCollection,
     setCollectionAssetId,
     parsedIndex,
+    isMultiContract,
   } = useMulticontract();
 
   const collectionAssetId = queue[parsedIndex]?.collectionAssetId;
@@ -100,8 +101,6 @@ export const useKDASelect = (
     trigger,
     watch,
   } = useFormContext();
-
-  const { isMultiContract } = useMulticontract();
 
   const watchCollection: string = watch('collection');
   const watchCollectionAssetId = watch('collectionAssetId');
@@ -137,7 +136,6 @@ export const useKDASelect = (
     refetchAssetsList();
     refetchKassetsList();
   };
-
   const getSelectedCollection = () => {
     const assets = [];
     kAssetContracts.includes(contractType)
@@ -148,20 +146,14 @@ export const useKDASelect = (
   };
 
   const selectedCollection = getSelectedCollection();
-  useEffect(() => {
-    if (watchCollection && watchCollection !== selectedCollection?.value) {
-      selectedCollection && setCollection(selectedCollection);
-    }
-  }, [watchCollection, assetsList]);
 
   useEffect(() => {
-    if (
-      watchCollectionAssetId &&
-      watchCollectionAssetId !== collectionAssetId
-    ) {
-      setCollectionAssetId(watchCollectionAssetId);
-    }
-  }, [watchCollectionAssetId]);
+    selectedCollection && setCollection(selectedCollection);
+  }, [assetsList, selectedCollection]);
+
+  useEffect(() => {
+    collectionAssetId && setCollectionAssetId(watchCollectionAssetId);
+  }, [watchCollectionAssetId, collectionAssetId]);
 
   useEffect(() => {
     validateFields.forEach(field => {

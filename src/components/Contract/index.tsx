@@ -14,13 +14,13 @@ import { AiOutlineClear } from 'react-icons/ai';
 import { FiShare2 } from 'react-icons/fi';
 import { IoOpenOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
-import ConfirmPayload from '../ConfirmPayload';
 import Copy from '../Copy';
 import { Button } from '../CreateTxShortCut/styles';
 import MetadataOptions from '../Form/Metadata';
 import SubmitButton from '../Form/SubmitButton';
 import { InlineLoader } from '../Loader';
 import { Loader } from '../Loader/styles';
+import ConfirmPayload from '../Modals/ConfirmPayload';
 import { RenderContract } from '../TransactionForms/CustomForms';
 import Select from './Select';
 import {
@@ -91,7 +91,6 @@ const Contract: React.FC<IContract> = ({
     txHash,
     setTxHash,
     handleSubmit,
-    openModal: openConfirmModal,
     isMultisig,
     contractOptions,
   } = useContract();
@@ -214,7 +213,7 @@ const Contract: React.FC<IContract> = ({
             </LoadingBackground>,
             window.document.body,
           )}
-        {openConfirmModal && <ConfirmPayload />}
+        <ConfirmPayload />
         {txHash && <HashComponent {...hashProps} />}
 
         {contractsDescription[selectedContractType] && (

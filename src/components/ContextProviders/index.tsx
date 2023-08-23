@@ -1,5 +1,6 @@
 import { ContractProvider } from '@/contexts/contract';
 import { FeesProvider } from '@/contexts/contract/fees';
+import { ModalsProvider } from '@/contexts/contract/modals';
 import { MulticontractProvider } from '@/contexts/contract/multicontract';
 import { ContractModalProvider } from '@/contexts/contractModal';
 import { ExtensionProvider } from '@/contexts/extension';
@@ -23,13 +24,15 @@ const ContextProviders: React.FC = ({ children }) => {
         <ToastContainer />
         <MobileProvider>
           <ExtensionProvider>
-            <ContractProvider>
+            <ModalsProvider>
               <FeesProvider>
                 <MulticontractProvider>
-                  <ContractModalProvider>{children}</ContractModalProvider>
+                  <ContractProvider>
+                    <ContractModalProvider>{children}</ContractModalProvider>
+                  </ContractProvider>
                 </MulticontractProvider>
               </FeesProvider>
-            </ContractProvider>
+            </ModalsProvider>
           </ExtensionProvider>
         </MobileProvider>
       </InternalThemeProvider>

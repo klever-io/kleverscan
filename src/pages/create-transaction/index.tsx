@@ -8,6 +8,7 @@ import {
 } from '@/components/Contract/styles';
 import AdvancedOptions from '@/components/Form/AdvancedOptions';
 import Title from '@/components/Layout/Title';
+import WarningModal from '@/components/Modals/Warning';
 import { useContract } from '@/contexts/contract';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
@@ -24,6 +25,8 @@ import {
 } from '@/views/create-transaction';
 import React, { useEffect } from 'react';
 
+const warningMessage = `You don't have enough currency. Please check the amount of your transaction as well as the fee cost.`;
+
 const CreateTransaction: React.FC = () => {
   const [isAccountEmpty, setIsAccountEmpty] = React.useState<boolean>(false);
   const { extensionInstalled, connectExtension } = useExtension();
@@ -35,9 +38,7 @@ const CreateTransaction: React.FC = () => {
   const {
     isMultiContract,
     queue,
-    setQueue,
     selectedId,
-    setSelectedId,
     showMultiContracts,
     setShowMultiContracts,
   } = useMulticontract();
@@ -148,6 +149,7 @@ const CreateTransaction: React.FC = () => {
         </CreateTxContainer>
         <AdvancedOptions />
       </ContainerContract>
+      <WarningModal message={warningMessage} />
     </Container>
   );
 };

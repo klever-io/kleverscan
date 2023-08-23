@@ -1,4 +1,5 @@
 import { useContract } from '@/contexts/contract';
+import { useModal } from '@/contexts/contract/modals';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 import {
@@ -7,22 +8,19 @@ import {
   Container,
   Content,
   DetailsRow,
-} from './styles';
+} from '../styles';
 
 const ConfirmPayload: React.FC = () => {
-  const {
-    setOpenModal: setOpen,
-    payload,
-    formSend,
-    resetFormsData,
-  } = useContract();
+  const { payload, formSend, resetFormsData } = useContract();
+
+  const { setShowPayloadOpen, showPayloadOpen } = useModal();
 
   const handleConfirm = async () => {
     await formSend();
-    setOpen(false);
+    setShowPayloadOpen(false);
   };
 
-  const closeModal = () => setOpen(false);
+  const closeModal = () => setShowPayloadOpen(false);
 
   const handleClose = () => {
     resetFormsData();
@@ -34,7 +32,7 @@ const ConfirmPayload: React.FC = () => {
   };
 
   return (
-    <Container onMouseDown={handleClose}>
+    <Container onMouseDown={handleClose} open={showPayloadOpen}>
       <Content onMouseDown={e => e.stopPropagation()}>
         <h1>Transaction Payload:</h1>
         <DetailsRow>

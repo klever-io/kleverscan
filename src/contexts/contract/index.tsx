@@ -1,3 +1,4 @@
+import { sumAllRoyaltiesFees } from '@/components/Contract/MultiContract';
 import {
   buildTransaction,
   getType,
@@ -26,8 +27,11 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useQuery } from 'react-query';
 import { toast } from 'react-toastify';
 import { useExtension } from '../extension';
+import { useModal } from './modals';
+import { useMulticontract } from './multicontract';
 
 export interface IFormsData {
   data: any;
@@ -61,13 +65,12 @@ export interface IContractContext {
   contractOptions: IContractOption[];
   kdaFee: React.MutableRefObject<ICollectionList>;
   permID: number;
-  openModal: boolean;
   senderAccount: string;
+  ignoreCheckAmount: React.MutableRefObject<boolean>;
   setTxLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setShowAdvancedOpts: React.Dispatch<React.SetStateAction<boolean>>;
   setTxHash: React.Dispatch<React.SetStateAction<string | null>>;
   setContractOptions: React.Dispatch<React.SetStateAction<IContractOption[]>>;
-  setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
   setPayload: React.Dispatch<React.SetStateAction<any>>;
   setSenderAccount: React.Dispatch<React.SetStateAction<string>>;
   setPermID: React.Dispatch<React.SetStateAction<number>>;
@@ -92,14 +95,18 @@ export const ContractProvider: React.FC = ({ children }) => {
   const [showAdvancedOpts, setShowAdvancedOpts] = useState(false);
   const [contractOptions, setContractOptions] =
     useState<IContractOption[]>(allContractOptions);
-  const [openModal, setOpenModal] = useState(false);
   const [payload, setPayload] = useState<any>({});
 
   const showPayload = useRef(false);
   const isMultisig = useRef(false);
   const formsData = useRef<IFormPayload[]>([] as IFormPayload[]);
+  const ignoreCheckAmount = useRef(false);
   const kdaFee = useRef<ICollectionList>({} as ICollectionList);
   const [permID, setPermID] = useState<number>(0);
+
+  const { queue, totalFees } = useMulticontract();
+
+  const { setWarningOpen, setShowPayloadOpen } = useModal();
 
   const { extensionInstalled, walletAddress, setOpenDrawer } = useExtension();
 
@@ -287,8 +294,68 @@ export const ContractProvider: React.FC = ({ children }) => {
     });
   };
 
+  const { data: assetsList } = useQuery({
+    queryKey: 'assetsList',
+    queryFn: getAssets,
+    initialData: [],
+  });
+
+  const amountAndFeesGreaterThanBalance = (): boolean => {
+    const formPayloads = formsData.current;
+
+    const totalCosts = formPayloads.reduce(
+      (acc, formPayload) => {
+        if (!formPayload.payload?.amount) {
+          return acc;
+        }
+        if (!formPayload.payload?.kda) {
+          acc['KLV'] += formPayload.payload.amount;
+          return acc;
+        }
+
+        acc[formPayload.payload.kda] = formPayload.payload.amount;
+        return acc;
+      },
+      {
+        KLV: 0,
+      },
+    );
+    totalCosts['KLV'] += totalFees * 10 ** KLV_PRECISION;
+
+    Object.entries(sumAllRoyaltiesFees(queue)).forEach(
+      ([assetId, { precision, totalFee }]) => {
+        const fee = Number(totalFee) * 10 ** precision;
+
+        if (totalCosts[assetId]) {
+          totalCosts[assetId] += fee;
+        } else {
+          totalCosts[assetId] = fee;
+        }
+      },
+    );
+
+    for (const assetId in totalCosts) {
+      const amount = totalCosts[assetId];
+
+      const asset = assetsList?.find(item => item.assetId === assetId);
+
+      if ((asset?.balance || 0) < amount) {
+        setWarningOpen(true);
+        setTxLoading(false);
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const formSend = async () => {
     const formPayloads = formsData.current;
+
+    if (!ignoreCheckAmount.current && !amountAndFeesGreaterThanBalance()) {
+      return;
+    }
+
     setTxLoading(true);
     const parsedDataArray: string[] = [];
     const parsedPayloads = formPayloads.map(formPayload => {
@@ -353,12 +420,13 @@ export const ContractProvider: React.FC = ({ children }) => {
       toast.error(e.message ? e.message : e);
     } finally {
       resetFormsData();
-      setTxLoading(false);
     }
   };
 
   const resetFormsData = () => {
+    ignoreCheckAmount.current = false;
     formsData.current = [];
+    setTxLoading(false);
   };
 
   const parsePayload = (
@@ -393,7 +461,7 @@ export const ContractProvider: React.FC = ({ children }) => {
     parsePayload(payload, metadata, contractType);
 
     if (showPayload.current) {
-      setOpenModal(true);
+      setShowPayloadOpen(true);
       setPayload(formsData.current);
       setTxLoading(false);
     } else if (queueLength > 1) {
@@ -421,8 +489,6 @@ export const ContractProvider: React.FC = ({ children }) => {
     getOwnerAddress,
     formSend,
     handleSubmit,
-    openModal,
-    setOpenModal,
     payload,
     setPayload,
     resetFormsData,
@@ -432,6 +498,7 @@ export const ContractProvider: React.FC = ({ children }) => {
     setPermID,
     senderAccount,
     setSenderAccount,
+    ignoreCheckAmount,
   };
   return <Contract.Provider value={values}>{children}</Contract.Provider>;
 };

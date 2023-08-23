@@ -7,7 +7,6 @@ import { BASE_TX_SIZE } from '@/utils/globalVariables';
 import { useRouter } from 'next/router';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useContract } from '.';
 import { useMobile } from '../mobile';
 import { useFees } from './fees';
 
@@ -162,8 +161,6 @@ export const MulticontractProvider: React.FC = ({ children }) => {
     setQueue(newQueue);
   };
 
-  const { setTxLoading } = useContract();
-
   const addToQueue = () => {
     try {
       const componentIndex = ++indexRef.current;
@@ -241,7 +238,6 @@ export const MulticontractProvider: React.FC = ({ children }) => {
       },
     ]);
     setSelectedId(0);
-    setTxLoading(false);
   };
 
   useEffect(() => {

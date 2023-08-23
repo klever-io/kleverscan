@@ -51,10 +51,12 @@ import {
 import { IKAppTransferReceipt, ITransferReceipt } from '@/types/receipts';
 import {
   findReceipt,
+  findReceiptWithAssetId,
   findReceiptWithReceiver,
   findReceiptWithSender,
 } from '@/utils/findKey';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
+import { KLV_PRECISION } from '@/utils/globalVariables';
 import {
   PacksPrecision,
   usePackInfoPrecisions,
@@ -96,11 +98,79 @@ import Tooltip from '../Tooltip';
 
 export const Transfer: React.FC<IIndexedContract> = ({
   parameter: par,
+  filteredReceipts: rec,
   renderMetadata,
 }) => {
   const parameter = par as ITransferContract;
   const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
   const precision = usePrecision(assetID);
+  const filteredReceipts = rec as ITransferReceipt[];
+
+  const hasTransferPercentageRoyalties = parameter?.kdaRoyalties;
+  const getTransferPercentageRoyalties = () => parameter?.kdaRoyalties || 0;
+
+  const hasTransferFixedRoyalties = parameter?.assetId?.split('/')[1];
+  const getTransferFixedRoyaltiesReceipt = () => {
+    if (hasTransferFixedRoyalties) {
+      return findReceiptWithAssetId(filteredReceipts, 0, 'KLV');
+    }
+  };
+
+  const getCorrectKDARoyalty = () => {
+    if (hasTransferPercentageRoyalties) {
+      return (
+        <Row>
+          <span>
+            <strong>Transfer</strong>
+            <br />
+            <strong>Percentage</strong>
+            <br />
+            <strong>Royalties</strong>
+          </span>
+          <span>
+            {toLocaleFixed(
+              getTransferPercentageRoyalties() / 10 ** precision,
+              precision,
+            )}{' '}
+            {parameter?.assetId}
+          </span>
+          &nbsp;
+          <Tooltip
+            msg={`Charged a percentage amount from the sender when ${parameter?.assetId} is transferred to another acount.`}
+          />
+        </Row>
+      );
+    }
+    if (hasTransferFixedRoyalties) {
+      const transferFixedRoyalties = getTransferFixedRoyaltiesReceipt() as
+        | ITransferReceipt
+        | undefined;
+      if (transferFixedRoyalties) {
+        return (
+          <Row>
+            <span>
+              <strong>Transfer Fixed</strong>
+              <br />
+              <strong>Royalties</strong>
+            </span>
+            <span>
+              {toLocaleFixed(
+                transferFixedRoyalties.value / 10 ** KLV_PRECISION,
+                KLV_PRECISION,
+              )}{' '}
+              {'KLV'}
+            </span>
+            &nbsp;
+            <Tooltip
+              msg={`Charged from the sender a fixed amount of KLV  every time someone transfers ${
+                parameter?.assetId?.split('/')[0]
+              } from one account to another.`}
+            />
+          </Row>
+        );
+      }
+    }
+  };
 
   return (
     <>
@@ -145,36 +215,6 @@ export const Transfer: React.FC<IIndexedContract> = ({
           )}
         </CenteredRow>
       </Row>
-      {parameter?.kdaRoyalties && (
-        <>
-          <Row>
-            <span>
-              <strong>KDA Royalties</strong>
-            </span>
-            <span>
-              {toLocaleFixed(
-                parameter.kdaRoyalties / 10 ** precision,
-                precision,
-              )}{' '}
-              {parameter?.assetId}
-            </span>
-          </Row>
-          <Row>
-            <span>
-              <strong>Total paid</strong>
-            </span>
-            <CenteredRow>
-              <strong style={{ fontWeight: '600' }}>
-                {toLocaleFixed(
-                  (parameter.amount + parameter.kdaRoyalties) / 10 ** precision,
-                  precision,
-                )}{' '}
-                {parameter?.assetId}
-              </strong>
-            </CenteredRow>
-          </Row>
-        </>
-      )}
       <Row>
         <span>
           <strong>To</strong>
@@ -188,6 +228,24 @@ export const Transfer: React.FC<IIndexedContract> = ({
           </CenteredRow>
         </span>
       </Row>
+      {getCorrectKDARoyalty()}
+      {hasTransferPercentageRoyalties && (
+        <Row>
+          <span>
+            <strong>Total paid</strong>
+          </span>
+          <CenteredRow>
+            <strong style={{ fontWeight: '600' }}>
+              {toLocaleFixed(
+                (parameter.amount + getTransferPercentageRoyalties()) /
+                  10 ** precision,
+                precision,
+              )}{' '}
+              {parameter?.assetId}
+            </strong>
+          </CenteredRow>
+        </Row>
+      )}
       {renderMetadata()}
     </>
   );
@@ -1725,13 +1783,45 @@ export const Sell: React.FC<IIndexedContract> = ({
   renderMetadata,
 }) => {
   const parameter = par as ISellContract;
+  const assetId = parameter?.assetId || 'KLV';
   const precision = usePrecision(parameter?.currencyID || 'KLV');
-  const kAppTransferReceipt = findReceipt(filteredReceipts, 14) as
-    | IKAppTransferReceipt
-    | undefined;
+  const kAppTransferReceipt = findReceiptWithAssetId(
+    filteredReceipts,
+    14,
+    assetId,
+  ) as IKAppTransferReceipt | undefined;
   const sellReceipt = findReceipt(filteredReceipts, 15) as
     | ISellReceipt
     | undefined;
+
+  const hasMarketFixedRoyalties = findReceiptWithAssetId(
+    filteredReceipts,
+    14,
+    'KLV',
+  ) as IKAppTransferReceipt | undefined;
+  const getMarketFixedRoyalties = () => {
+    if (hasMarketFixedRoyalties) {
+      return (
+        <Row>
+          <span>
+            <strong>Market Fixed</strong>
+            <br />
+            <strong>Royalties</strong>
+          </span>
+          <span>
+            {toLocaleFixed(
+              hasMarketFixedRoyalties.value / 10 ** KLV_PRECISION,
+              KLV_PRECISION,
+            )}{' '}
+            {'KLV'}
+          </span>
+          &nbsp;
+          <Tooltip msg="Paid by the seller the moment this order was placed." />
+        </Row>
+      );
+    }
+  };
+
   return (
     <>
       <Row>
@@ -1812,6 +1902,7 @@ export const Sell: React.FC<IIndexedContract> = ({
           {parameter?.endTime ? formatDate(parameter?.endTime * 1000) : '--'}
         </span>
       </Row>
+      {getMarketFixedRoyalties()}
       {renderMetadata()}
     </>
   );

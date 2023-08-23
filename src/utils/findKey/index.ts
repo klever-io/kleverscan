@@ -106,6 +106,20 @@ export const findReceiptWithReceiver = (
   });
 };
 
+export const findReceiptWithAssetId = (
+  receipts: IReceipt[] | undefined,
+  type: number,
+  assetId: string,
+): IReceipt | undefined => {
+  if (!receipts) {
+    return undefined;
+  }
+  return receipts.find(receipt => {
+    const typedReceipt = receipt as ITransferReceipt;
+    return receipt.type === type && typedReceipt.assetId === assetId;
+  });
+};
+
 /**
  * Used to get the receipts that match the contract index with the receipt ID. For multicontract purpose only.
  * @param receipts

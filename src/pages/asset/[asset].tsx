@@ -990,10 +990,20 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                       <p>{asset?.royalties.address || '--'}</p>
                     </div>
                     <div>
+                      <strong>Market Fixed</strong>
+                      <p>
+                        {(asset?.royalties.marketFixed &&
+                          `${
+                            asset?.royalties.marketFixed / 10 ** KLV_PRECISION
+                          } KLV`) ||
+                          '--'}
+                      </p>
+                    </div>
+                    <div>
                       <strong>Market Percentage</strong>
                       <p>
                         {(asset?.royalties.marketPercentage &&
-                          asset?.royalties.marketPercentage / 10 ** 2) ||
+                          `${asset?.royalties.marketPercentage / 10 ** 2}%`) ||
                           '--'}
                       </p>
                     </div>
@@ -1001,7 +1011,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                       <strong>Transfer Fixed</strong>
                       <p>
                         {asset?.royalties.transferFixed
-                          ? asset?.royalties.transferFixed / 10 ** 6
+                          ? `${asset?.royalties.transferFixed / 10 ** 6} KLV`
                           : '--'}
                       </p>
                     </div>

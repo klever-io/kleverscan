@@ -796,7 +796,7 @@ export interface IAssetPoolResponse extends IResponse {
   };
 }
 
-export interface IAssetPoolsReponse extends IResponse {
+export interface IAssetPoolsResponse extends IResponse {
   data: {
     pools: IAssetPool[];
   };

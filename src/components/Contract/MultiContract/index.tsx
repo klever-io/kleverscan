@@ -62,16 +62,20 @@ export const sumAllRoyaltiesFees = (
 const FeeDetails: React.FC<{
   isOpen: boolean;
 }> = ({ isOpen }) => {
-  const {
-    totalBandwidthFees: bandwidthFee,
-    totalKappFees: kappFee,
-    queue,
-  } = useMulticontract();
+  const { processFeesMsgs, queue, kdaFeePoolIsFetching } = useMulticontract();
+  const { totalKappFeesMsg, totalBandwidthFeesMsg } = processFeesMsgs();
   const allRoyaltiesFees = sumAllRoyaltiesFees(queue);
   return (
     <FeeDetailsContainer open={isOpen}>
-      <span>{`${kappFee} KLV (KApp Fees)`}</span>
-      <span>{`${bandwidthFee} KLV (Bandwidth Fees)`}</span>
+      {kdaFeePoolIsFetching ? (
+        'Calculating conversion...'
+      ) : (
+        <>
+          <span>{`${totalKappFeesMsg} (KApp Fee)`}</span>
+          <span>{`${totalBandwidthFeesMsg} (Bandwidth Fee)`}</span>{' '}
+        </>
+      )}
+
       {queueHaveSomeRoyalties(queue) &&
         Object.keys(allRoyaltiesFees).map(item => {
           return (
@@ -92,14 +96,15 @@ const MultiContract: React.FC = () => {
     queue,
     selectedId,
     addToQueue,
-    totalFees,
     showMultiContracts,
     setShowMultiContracts,
     removeContractQueue,
     editContract,
+    processFeesMsgs,
+    kdaFeePoolIsFetching,
   } = useMulticontract();
   const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
-
+  const { totalFeesMsg } = processFeesMsgs();
   const handleArrowDownClick = () => {
     setIsDetailsOpen(!isDetailsOpen);
   };
@@ -160,17 +165,22 @@ const MultiContract: React.FC = () => {
           )}
         </ButtonsContainer>
         <FeeContainer isMulticontract={true}>
-          <span>Estimated Fees: </span>
-          <span>
-            {totalFees.toFixed(6)} KLV{' '}
-            {queueHaveSomeRoyalties(queue) && '+ Royalties'}
-            <DetailsArrowContainer
-              isOpen={isDetailsOpen}
-              onClick={() => handleArrowDownClick()}
-            >
-              <ArrowDown />
-            </DetailsArrowContainer>
-          </span>
+          <div>
+            <span>Estimated Fees: </span>
+            {kdaFeePoolIsFetching ? (
+              'Calculating conversion...'
+            ) : (
+              <span>{totalFeesMsg}</span>
+            )}
+          </div>
+
+          {queueHaveSomeRoyalties(queue) && '+ Royalties'}
+          <DetailsArrowContainer
+            isOpen={isDetailsOpen}
+            onClick={() => handleArrowDownClick()}
+          >
+            <ArrowDown />
+          </DetailsArrowContainer>
           <FeeDetails isOpen={isDetailsOpen} />
         </FeeContainer>
       </ContainerQueue>

@@ -34,7 +34,6 @@ export const SubmitContainer = styled.div`
 
 export const FeeContainer = styled.div<{ isMulticontract?: boolean }>`
   display: flex;
-  align-items: center;
   gap: 0.5rem;
 
   color: ${props => props.theme.darkText};

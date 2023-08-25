@@ -1,8 +1,7 @@
 import Tooltip from '@/components/Tooltip';
 import { useContract } from '@/contexts/contract';
-import { useFees } from '@/contexts/contract/fees';
 import { useMulticontract } from '@/contexts/contract/multicontract';
-import { BASE_TX_SIZE, KLV_PRECISION } from '@/utils/globalVariables';
+import { FlexSpan } from '@/styles/common';
 import {
   ButtonContainer,
   FeeContainer,
@@ -12,16 +11,11 @@ import {
 
 const SubmitButton: React.FC = () => {
   const { txLoading, submitForms } = useContract();
-  const { metadata } = useMulticontract();
-  const { isMultiContract, selectedContractType } = useMulticontract();
+  const { isMultiContract, processFeesMsgs, kdaFeePoolIsFetching } =
+    useMulticontract();
 
-  const { getKappFee, bandwidthFeeMultiplier } = useFees();
-  const kappFee = getKappFee(selectedContractType);
-
-  const metadataSize = metadata?.length || 0;
-
-  const bandwidthFee = (BASE_TX_SIZE + metadataSize) * bandwidthFeeMultiplier;
-  const totalFee = kappFee + bandwidthFee;
+  const { totalFeesMsg, totalKappFeesMsg, totalBandwidthFeesMsg } =
+    processFeesMsgs();
 
   return !isMultiContract ? (
     <SubmitContainer>
@@ -34,14 +28,19 @@ const SubmitButton: React.FC = () => {
         Create Transaction
       </ButtonContainer>
       <FeeContainer>
-        <span>Estimated Fees: {totalFee.toFixed(KLV_PRECISION)} KLV</span>
-        <Tooltip
-          msg={`${kappFee.toFixed(
-            KLV_PRECISION,
-          )} KLV (KApp Fee) + ${bandwidthFee.toFixed(
-            KLV_PRECISION,
-          )} KLV (Bandwidth Fee)`}
-        />
+        <FlexSpan>
+          <span>Estimated Fees: </span>
+          {kdaFeePoolIsFetching ? (
+            'Calculating conversion...'
+          ) : (
+            <>
+              <span>{totalFeesMsg}</span>
+              <Tooltip
+                msg={`${totalKappFeesMsg} (KApp Fee) + ${totalBandwidthFeesMsg} (Bandwidth Fee)`}
+              />
+            </>
+          )}
+        </FlexSpan>
       </FeeContainer>
     </SubmitContainer>
   ) : (

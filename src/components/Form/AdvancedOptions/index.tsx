@@ -19,7 +19,7 @@ import { useContract } from '@/contexts/contract';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { ReloadWrapper } from '@/contexts/contract/styles';
 import getAccount from '@/services/requests/searchBar/account';
-import { IAccountResponse, ICollectionList, IDropdownItem } from '@/types';
+import { IAccountResponse, IDropdownItem } from '@/types';
 import { IAccPermission } from '@/types/contracts';
 import { filterPoolAssets } from '@/utils/create-transaction/parseFunctions';
 import { parseAddress } from '@/utils/parseValues';
@@ -219,7 +219,13 @@ const AdvancedOptionsContent: React.FC = () => {
     useContract();
   const [loading, setLoading] = useState(false);
 
-  const { setIsMultiContract, isMultiContract, isModal } = useMulticontract();
+  const {
+    setIsMultiContract,
+    isMultiContract,
+    kdaFeeAsset,
+    setKdaFeeAsset,
+    isModal,
+  } = useMulticontract();
 
   const { data: assets, isFetching: assetsFetching } = useQuery({
     queryKey: ['userAssets'],
@@ -252,15 +258,13 @@ const AdvancedOptionsContent: React.FC = () => {
     setLoading(false);
   };
 
-  const [kdaFeeAsset, setKdaFeeAsset] = useState<ICollectionList | null>(null);
-
   const assetBalance = kdaFee?.current.balance || null;
 
   const kdaSelect = () => {
     return (
       <FieldContainer>
         <SelectContent>
-          <BalanceContainer key={kdaFeeAsset?.value}>
+          <BalanceContainer key={kdaFeeAsset?.assetId}>
             <FieldLabel>KDA to pay fees:</FieldLabel>
             <ReloadWrapper
               onClick={refetch}
@@ -280,7 +284,7 @@ const AdvancedOptionsContent: React.FC = () => {
             options={assetsPool}
             onChange={(value: any) => {
               kdaFee.current = value;
-              setKdaFeeAsset(value);
+              setKdaFeeAsset(value || null);
             }}
             zIndex={2}
             loading={assetsPoolFetching || assetsFetching || loading}

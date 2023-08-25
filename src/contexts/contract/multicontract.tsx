@@ -1,11 +1,13 @@
 import Contract, { IContract } from '@/components/Contract';
 import { getType } from '@/components/Contract/utils';
-import { IAsset, ICollectionList } from '@/types';
+import { getParsedAssetPool } from '@/services/requests/pool/pool';
+import { IAsset, IAssetPool, ICollectionList } from '@/types';
 import { ContractsIndex } from '@/types/contracts';
 import { setQueryAndRouter } from '@/utils';
-import { BASE_TX_SIZE } from '@/utils/globalVariables';
+import { BASE_TX_SIZE, KLV_PRECISION } from '@/utils/globalVariables';
 import { useRouter } from 'next/router';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { useQuery } from 'react-query';
 import { toast } from 'react-toastify';
 import { useMobile } from '../mobile';
 import { useFees } from './fees';
@@ -22,6 +24,12 @@ export interface IQueue {
   collectionAssetId?: number;
 }
 
+export interface IFeesMsgs {
+  totalFeesMsg: string;
+  totalKappFeesMsg: string;
+  totalBandwidthFeesMsg: string;
+}
+
 interface IMulticontract {
   queue: IQueue[];
   selectedId: number;
@@ -33,7 +41,9 @@ interface IMulticontract {
   totalFees: number;
   showMultiContracts: boolean;
   parsedIndex: number;
+  kdaFeeAsset: ICollectionList | null;
   isModal: boolean;
+  kdaFeePoolIsFetching: boolean;
   addToQueue: () => void;
   removeContractQueue: (contractIndex: number, e: any) => void;
   editContract: (index: number) => void;
@@ -47,6 +57,8 @@ interface IMulticontract {
   setCollection: (collection?: ICollectionList) => void;
   setSelectedRoyaltiesFees: (amount: number) => void;
   setCollectionAssetId: (id: number) => void;
+  setKdaFeeAsset: React.Dispatch<React.SetStateAction<ICollectionList | null>>;
+  processFeesMsgs: () => IFeesMsgs;
   setIsModal: React.Dispatch<React.SetStateAction<boolean>>;
   clearQuery: () => void;
 }
@@ -58,12 +70,19 @@ export const MulticontractProvider: React.FC = ({ children }) => {
   const [queue, setQueue] = useState<IQueue[]>([]);
   const [selectedId, setSelectedId] = useState<number>(0);
   const [showMultiContracts, setShowMultiContracts] = useState<boolean>(false);
+  const [kdaFeeAsset, setKdaFeeAsset] = useState<ICollectionList | null>(null);
   const [isModal, setIsModal] = useState<boolean>(false);
 
   const indexRef = useRef<number>(0);
 
   const { getKappFee, bandwidthFeeMultiplier } = useFees();
   const { isTablet } = useMobile();
+
+  const { data: kdaFeePool, isFetching: kdaFeePoolIsFetching } = useQuery({
+    queryKey: ['kdaFeePool', kdaFeeAsset],
+    queryFn: () => getParsedAssetPool(kdaFeeAsset?.assetId || ''),
+    enabled: !!kdaFeeAsset && kdaFeeAsset?.assetId !== 'KLV',
+  });
 
   const baseBandwidthFee = BASE_TX_SIZE * bandwidthFeeMultiplier;
 
@@ -78,6 +97,45 @@ export const MulticontractProvider: React.FC = ({ children }) => {
   }, 0);
 
   const totalFees = totalKappFees + totalBandwidthFees;
+
+  const getFeesInKDA = (fee: number, kdaFeePool: IAssetPool): number => {
+    const KDAPrecision = kdaFeeAsset?.precision || 0;
+    const feesWithRatio = (fee * kdaFeePool.fRatioKDA) / kdaFeePool.fRatioKLV;
+    const feesWithoutKLVPrecision = feesWithRatio * 10 ** KLV_PRECISION;
+    const feesWithKDAPrecision = feesWithoutKLVPrecision / 10 ** KDAPrecision;
+    return feesWithKDAPrecision;
+  };
+
+  const getEstimatedFees = () => {
+    if (kdaFeeAsset && kdaFeePool) {
+      return {
+        totalFees: getFeesInKDA(totalFees, kdaFeePool),
+        totalKappFees: getFeesInKDA(totalKappFees, kdaFeePool),
+        totalBandwidthFees: getFeesInKDA(totalBandwidthFees, kdaFeePool),
+        kda: kdaFeePool.kda,
+        precision: kdaFeeAsset?.precision || 0,
+      };
+    } else {
+      return {
+        totalFees,
+        totalKappFees,
+        totalBandwidthFees,
+        kda: 'KLV',
+        precision: KLV_PRECISION,
+      };
+    }
+  };
+
+  const processFeesMsgs = (): IFeesMsgs => {
+    const estimatedFees = getEstimatedFees();
+    const { totalFees, totalKappFees, totalBandwidthFees, kda, precision } =
+      estimatedFees;
+    return {
+      totalFeesMsg: `${totalFees.toFixed(precision)} ${kda}`,
+      totalKappFeesMsg: `${totalKappFees.toFixed(precision)}  ${kda}`,
+      totalBandwidthFeesMsg: `${totalBandwidthFees.toFixed(precision)} ${kda}`,
+    };
+  };
 
   const router = useRouter();
 
@@ -259,7 +317,9 @@ export const MulticontractProvider: React.FC = ({ children }) => {
     totalFees,
     showMultiContracts,
     parsedIndex,
+    kdaFeeAsset,
     isModal,
+    kdaFeePoolIsFetching,
     addToQueue,
     editContract,
     removeContractQueue,
@@ -273,6 +333,8 @@ export const MulticontractProvider: React.FC = ({ children }) => {
     setCollection,
     setSelectedRoyaltiesFees,
     setCollectionAssetId,
+    setKdaFeeAsset,
+    processFeesMsgs,
     setIsModal,
     clearQuery,
   };

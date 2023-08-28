@@ -40,7 +40,7 @@ export const ItemsContent = styled.div`
 `;
 
 export const IconContainer = styled.div<{
-  itemSelected: boolean;
+  $itemSelected: boolean;
   blockIcon: boolean;
 }>`
   display: flex;
@@ -48,12 +48,13 @@ export const IconContainer = styled.div<{
   align-items: center;
   gap: 0.25rem;
 
-  color: ${({ itemSelected, theme }) =>
-    itemSelected ? theme.true.white : theme.navbar.text};
+  color: ${({ $itemSelected, theme }) =>
+    $itemSelected ? theme.true.white : theme.navbar.text};
 `;
+
 export const StyledImage = styled(Image)<{
-  itemSelected: boolean;
+  $itemSelected: boolean;
 }>`
-  filter: ${({ itemSelected }) =>
-    itemSelected ? 'brightness(0) invert(1)' : 'none'};
+  filter: ${({ $itemSelected }) =>
+    $itemSelected ? 'brightness(0) invert(1)' : 'none'};
 `;

@@ -21,11 +21,11 @@ const SelectIcons: React.FC<IFooterItems> = ({ name, icon, url }) => {
       <Link href={url}>
         <a>
           <IconContainer
-            itemSelected={router.pathname === url}
+            $itemSelected={router.pathname === url}
             blockIcon={name === 'Blocks'}
           >
             <StyledImage
-              itemSelected={router.pathname === url}
+              $itemSelected={router.pathname === url}
               src={icon}
               alt={`nav-${icon}`}
               width={24}

@@ -33,7 +33,7 @@ export const WarningContainer = styled.div`
   }
 `;
 
-export const WarningText = styled.p`
+export const WarningText = styled.div`
   font-family: Rubik;
   font-style: normal;
   font-weight: normal;

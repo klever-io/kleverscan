@@ -221,7 +221,6 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
 
   const selectProps = {
     title,
-    onChangeWrapper,
     selectPlaceholder,
     name: name || '',
     error: Boolean(error),

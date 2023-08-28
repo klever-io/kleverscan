@@ -1,9 +1,9 @@
 import { IPackInfo, IPackItem } from '@/types/contracts';
 import { web } from '@klever/sdk';
-import Input from 'components/Input';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { IParsedITO } from 'types';
+import Input from '../Input';
 import { Loader } from '../Loader/styles';
 import {
   AssetName,

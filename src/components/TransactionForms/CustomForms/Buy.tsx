@@ -1,6 +1,6 @@
 import { useContract } from '@/contexts/contract';
 import { useMulticontract } from '@/contexts/contract/multicontract';
-import getAsset from '@/services/requests/asset/asset';
+import { getAsset } from '@/services/requests/asset';
 import { calculateITOBuyFixedFee } from '@/utils/create-transaction/fees-calculation.ts';
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';

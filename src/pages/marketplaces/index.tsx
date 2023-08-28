@@ -2,7 +2,7 @@ import { Accounts as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
-import { getMarketplaces } from '@/services/requests/marketplace/marketplace';
+import { getMarketplaces } from '@/services/requests/marketplace';
 import { Container, FlexSpan, Header } from '@/styles/common';
 import { IMarketplace } from '@/types/marketplaces';
 import { PERCENTAGE_PRECISION } from '@/utils/globalVariables';

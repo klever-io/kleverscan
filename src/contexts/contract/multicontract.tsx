@@ -1,6 +1,6 @@
 import Contract, { IContract } from '@/components/Contract';
 import { getType } from '@/components/Contract/utils';
-import { getParsedAssetPool } from '@/services/requests/pool/pool';
+import { getParsedAssetPool } from '@/services/requests/pool';
 import { IAsset, IAssetPool, ICollectionList } from '@/types';
 import { ContractsIndex } from '@/types/contracts';
 import { setQueryAndRouter } from '@/utils';

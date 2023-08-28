@@ -5,7 +5,7 @@ import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Table, { ITable } from '@/components/Table';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
-import api from '@/services/api';
+import { requestAssetsQuery } from '@/services/requests/assets';
 import { Container, Header } from '@/styles/common';
 import { IAsset, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
@@ -62,18 +62,6 @@ const Assets: React.FC = () => {
       isHiddenInput: false,
     },
   ];
-
-  const requestAssets = async (page: number, limit: number) => {
-    while (!router.isReady) {
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-
-    const localQuery = { ...router.query, page, limit, hidden: false };
-    return api.get({
-      route: `assets/list`,
-      query: localQuery,
-    });
-  };
 
   const rowSections = (asset: IAsset): IRowSection[] => {
     const {
@@ -223,7 +211,7 @@ const Assets: React.FC = () => {
     rowSections,
     header,
     type: 'assetsPage',
-    request: (page, limit) => requestAssets(page, limit),
+    request: (page, limit) => requestAssetsQuery(page, limit, router),
     dataName: 'assets',
     scrollUp: true,
   };

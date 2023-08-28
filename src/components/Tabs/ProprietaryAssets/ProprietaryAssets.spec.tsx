@@ -1,5 +1,5 @@
 import api from '@/services/api';
-import { ownedAssetsRequest } from '@/services/requests/account/account';
+import { ownedAssetsRequest } from '@/services/requests/account';
 import { screen } from '@testing-library/react';
 import * as nextRouter from 'next/router';
 import { useRouter } from 'next/router';

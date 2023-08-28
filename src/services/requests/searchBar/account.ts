@@ -1,6 +1,6 @@
 import api from '@/services/api';
 import { IAccountResponse } from '@/types';
-import { generateEmptyAccountResponse } from '../account/account';
+import { generateEmptyAccountResponse } from '../account';
 
 const getAccount = async (hash: string): Promise<IAccountResponse> => {
   const res = await api.get({

@@ -1,6 +1,7 @@
 import api from '@/services/api';
-import { IPrecisionResponse, Service } from '@/types';
+import { IAsset, IFPR, IKDAFPR, IPrecisionResponse, Service } from '@/types';
 import { toast } from 'react-toastify';
+import { KLV_PRECISION } from '../globalVariables';
 
 export function getPrecision<T extends string | string[]>(
   assetIds: T,
@@ -107,4 +108,39 @@ export const getPrecisionFromApi = async (
     console.error(error);
     throw error;
   }
+};
+
+export const getFPRDepositsPrecisions = async (
+  asset: IAsset,
+): Promise<{ [assetId: string]: number }> => {
+  const assetsToSearch: string[] = [];
+  asset.staking.fpr.forEach((data: IFPR) => {
+    data.kda.forEach((kda: IKDAFPR) => {
+      assetsToSearch.push(kda.kda);
+    });
+  });
+  return getPrecision(assetsToSearch);
+};
+
+export const addPrecisionsToFPRDeposits = (
+  asset: IAsset,
+  precisions: { [assetId: string]: number },
+): any => {
+  asset.staking.fpr.forEach((data: IFPR) => {
+    data.totalAmount = data.totalAmount / 10 ** KLV_PRECISION;
+    data.TotalClaimed = data.TotalClaimed / 10 ** KLV_PRECISION;
+    data.totalStaked = data.totalStaked / 10 ** asset.precision;
+    data.precision = asset.precision;
+    data.kda.forEach((kda: IKDAFPR) => {
+      let precision = 0;
+      Object.entries(precisions).forEach(([assetTicker, assetPrecision]) => {
+        if (assetTicker === kda.kda) {
+          precision = assetPrecision;
+        }
+      });
+      kda.totalAmount = kda.totalAmount / 10 ** precision;
+      kda.totalClaimed = kda.totalClaimed / 10 ** precision;
+      kda.precision = precision;
+    });
+  });
 };

@@ -1,7 +1,7 @@
-import getAsset from '@/services/requests/asset/asset';
+import { getAsset } from '@/services/requests/asset';
 import getAccount from '@/services/requests/searchBar/account';
 import getBlock from '@/services/requests/searchBar/block';
-import getTransaction from '@/services/requests/transaction/transaction';
+import getTransaction from '@/services/requests/transaction';
 import {
   IAccountResponse,
   IAssetResponse,

@@ -4,7 +4,7 @@ import {
   IMarketplaceResponse,
   IMarketplacesResponse,
 } from '@/types/marketplaces';
-import { requestAssets } from '../assets/assets';
+import { requestAssets } from '../assets';
 
 export const getMarketplaces = async (): Promise<IMarketplacesResponse> => {
   const res: IMarketplacesResponse = await api.get({

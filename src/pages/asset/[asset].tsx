@@ -20,6 +20,13 @@ import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import {
+  assetCall,
+  assetPoolCall,
+  holdersCall,
+  ITOCall,
+  transactionCall,
+} from '@/services/requests/asset';
+import {
   CardContent,
   CardHeader,
   CardHeaderItem,
@@ -29,27 +36,16 @@ import {
 } from '@/styles/common';
 import {
   IAPR,
-  IAsset,
   IAssetPage,
-  IAssetPool,
-  IAssetPoolResponse,
-  IAssetResponse,
   IBalance,
   IFPR,
-  IHoldersResponse,
-  IITOResponse,
   IKDAFPR,
-  IPagination,
-  IParsedITO,
   IStaking,
-  ITransactionsResponse,
-  IUri,
 } from '@/types/index';
 import { parseApr, setQueryAndRouter } from '@/utils';
 import { filterDate, formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
-import { parseHardCodedInfo, parseHolders } from '@/utils/parseValues';
-import { getPrecision } from '@/utils/precisionFunctions';
+import { parseHolders } from '@/utils/parseValues';
 import { resetDate } from '@/utils/resetDate';
 import { timestampToDate } from '@/utils/timeFunctions';
 import {
@@ -88,25 +84,47 @@ import { ReceiveBackground } from '@/views/validator';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { displayITOpacks, parseITOs } from '../itos';
+import { useQuery } from 'react-query';
+import { displayITOpacks } from '../itos';
 
 const Asset: React.FC<IAssetPage> = ({}) => {
   const router = useRouter();
+  const { data: asset } = useQuery({
+    queryKey: [`asset`, router.query.asset],
+    queryFn: () => assetCall(router),
+    enabled: !!router?.isReady,
+  });
+  const { data: transactionsPagination } = useQuery({
+    queryKey: [`transactionAsset`, router.query.asset],
+    queryFn: () => transactionCall(router.query.asset as string),
+    enabled: !!router?.isReady,
+  });
+
+  const { data: holdersPagination } = useQuery({
+    queryKey: [`holdersAsset`, router.query.asset],
+    queryFn: () => holdersCall(router.query.asset as string),
+    enabled: !!router?.isReady,
+  });
+
+  const { data: ITO } = useQuery({
+    queryKey: [`ITOasset`, router.query.asset],
+    queryFn: () => ITOCall(router.query.asset as string),
+    enabled: !!router?.isReady,
+  });
+
+  const { data: assetPool } = useQuery({
+    queryKey: [`assetPool`, router.query.asset],
+    queryFn: () => assetPoolCall(router.query.asset as string),
+    enabled: !!router?.isReady,
+  });
   const tableHeaders = ['Transactions', 'Holders'];
   const [selectedTab, setSelectedTab] = useState<null | string>(null);
-  const [asset, setAsset] = useState<null | IAsset>(null);
-  const [ITO, setITO] = useState<null | IParsedITO>(null);
-  const [assetPool, setAssetPool] = useState<null | IAssetPool>(null);
   const [expand, setExpand] = useState({ whitelist: false, packs: false });
   const [txHash, setTxHash] = useState('');
   const [FPRIndex, setFPRIndex] = useState<number>(3);
 
   const { isMobile } = useMobile();
   const [holderQuery, setHolderQuery] = useState<string>('');
-  const [transactionsPagination, setTransactionsPagination] =
-    useState<null | IPagination>(null);
-  const [holdersPagination, setHoldersPagination] =
-    useState<null | IPagination>(null);
   const cardHeaders = ['Overview', 'More'];
   asset?.uris && cardHeaders.push('URIS');
   assetPool && cardHeaders.push('KDA Pool');
@@ -143,19 +161,6 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       route: `transaction/list`,
       query: { page, limit, ...newQuery },
     });
-  };
-
-  const parseURIs = (asset: IAsset) => {
-    let uris = {};
-    if (asset.uris && Object.keys(asset.uris).length > 0) {
-      (asset.uris as IUri[]).forEach(uri => {
-        uris = {
-          ...uris,
-          [uri.key]: uri.value,
-        };
-      });
-      asset.uris = uris;
-    }
   };
 
   const filterQueryDate = (selectedDays: ISelectedDays) => {
@@ -196,166 +201,6 @@ const Asset: React.FC<IAssetPage> = ({}) => {
     }
     return { data: { accounts: [] } };
   };
-
-  const getFPRDepositsPrecisions = async (
-    asset: IAsset,
-  ): Promise<{ [assetId: string]: number }> => {
-    const assetsToSearch: string[] = [];
-    asset.staking.fpr.forEach((data: IFPR) => {
-      data.kda.forEach((kda: IKDAFPR) => {
-        assetsToSearch.push(kda.kda);
-      });
-    });
-    return getPrecision(assetsToSearch);
-  };
-
-  const addPrecisionsToFPRDeposits = (
-    asset: IAsset,
-    precisions: { [assetId: string]: number },
-  ) => {
-    asset.staking.fpr.forEach((data: IFPR) => {
-      data.totalAmount = data.totalAmount / 10 ** KLV_PRECISION;
-      data.TotalClaimed = data.TotalClaimed / 10 ** KLV_PRECISION;
-      data.totalStaked = data.totalStaked / 10 ** asset.precision;
-      data.precision = asset.precision;
-      data.kda.forEach((kda: IKDAFPR) => {
-        let precision = 0;
-        Object.entries(precisions).forEach(([assetTicker, assetPrecision]) => {
-          if (assetTicker === kda.kda) {
-            precision = assetPrecision;
-          }
-        });
-        kda.totalAmount = kda.totalAmount / 10 ** precision;
-        kda.totalClaimed = kda.totalClaimed / 10 ** precision;
-        kda.precision = precision;
-      });
-    });
-  };
-
-  const loadInitialData = async () => {
-    if (router?.isReady) {
-      const pathRoute = router.query?.asset as string;
-      const assetId = pathRoute.split('=asset')[0];
-
-      const assetCall = new Promise<IAssetResponse>(async (resolve, reject) => {
-        const res = await api.get({
-          route: `assets/${assetId}`,
-        });
-        if (res?.error === 'cannot find asset in database') {
-          router.push('/404');
-        }
-        if (!res.error || res.error === '') {
-          resolve(res);
-        }
-        reject(res.error);
-      });
-
-      const transactionCall = new Promise<ITransactionsResponse>(
-        async (resolve, reject) => {
-          const res = await api.get({
-            route: `transaction/list?asset=${assetId}&limit=5`,
-          });
-
-          if (!res.error || res.error === '') {
-            resolve(res);
-          }
-
-          reject(res.error);
-        },
-      );
-
-      const holdersCall = new Promise<IHoldersResponse>(
-        async (resolve, reject) => {
-          const res = await api.get({
-            route: `assets/holders/${assetId}`,
-          });
-
-          if (!res.error || res.error === '') {
-            resolve(res);
-          }
-
-          reject(res.error);
-        },
-      );
-
-      const ITOCall = new Promise<IITOResponse>(async (resolve, reject) => {
-        const res = await api.get({
-          route: `ito/${assetId}`,
-        });
-        if (!res.error || res.error === '') {
-          resolve(res);
-        }
-
-        reject(res.error);
-      });
-
-      const assetPoolCall = new Promise<IAssetPoolResponse>(
-        async (resolve, reject) => {
-          const res = await api.get({
-            route: `assets/pool/${assetId}`,
-          });
-
-          if (!res.error || res.error === '') {
-            resolve(res);
-          }
-
-          reject(res.error);
-        },
-      );
-
-      await Promise.allSettled([
-        assetCall,
-        transactionCall,
-        holdersCall,
-        ITOCall,
-        assetPoolCall,
-        ITOCall,
-      ]).then(responses => {
-        responses.forEach(async (res, index) => {
-          if (res.status === 'fulfilled') {
-            switch (index) {
-              case 0:
-                const asset = res.value as IAssetResponse;
-                const parsedAsset = parseHardCodedInfo([asset?.data?.asset])[0];
-                parseURIs(parsedAsset);
-                if (parsedAsset?.staking?.interestType === 'FPRI') {
-                  const precisions = await getFPRDepositsPrecisions(
-                    parsedAsset,
-                  );
-                  addPrecisionsToFPRDeposits(parsedAsset, precisions);
-                }
-                setAsset(parsedAsset);
-                break;
-              case 1:
-                const transactions = res.value as ITransactionsResponse;
-                setTransactionsPagination(transactions?.pagination);
-                break;
-              case 2:
-                const holders = res.value as IHoldersResponse;
-                setHoldersPagination(holders?.pagination);
-                break;
-              case 3:
-                const ITOresp = res.value as IITOResponse;
-                if (ITOresp?.data?.ito) {
-                  const ITO = ITOresp?.data?.ito;
-                  await parseITOs([ITO]);
-                  setITO(ITO as IParsedITO);
-                }
-                break;
-              case 4:
-                const assetPool = res.value as IAssetPoolResponse;
-                setAssetPool(assetPool.data.pool);
-                break;
-            }
-          }
-        });
-      });
-    }
-  };
-
-  useEffect(() => {
-    loadInitialData();
-  }, [router?.isReady]);
 
   const getIssueDate = useCallback(() => {
     if (asset?.issueDate) {

@@ -37,7 +37,7 @@ import {
   pricesCall,
   rewardsFPRPool,
   transactionsRequest,
-} from '@/services/requests/account/account';
+} from '@/services/requests/account';
 import {
   CardContent,
   CardHeader,

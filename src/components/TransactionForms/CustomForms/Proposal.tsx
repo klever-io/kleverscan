@@ -1,4 +1,4 @@
-import { getParamsList } from '@/services/requests/proposals/proposals';
+import { getParamsList } from '@/services/requests/proposals';
 import { IParamList } from '@/types';
 import React from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';

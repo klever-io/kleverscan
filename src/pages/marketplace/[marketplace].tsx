@@ -5,10 +5,7 @@ import BuyCard from '@/components/Marketplace/Buycard';
 import { BuyCardSkeleton } from '@/components/Marketplace/BuyCardSkeleton';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
-import {
-  getBuyCards,
-  getMarketplace,
-} from '@/services/requests/marketplace/marketplace';
+import { getBuyCards, getMarketplace } from '@/services/requests/marketplace';
 import {
   CardContent,
   CardHeader,

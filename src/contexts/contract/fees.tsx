@@ -1,6 +1,6 @@
 //create context
 
-import { getParamsList } from '@/services/requests/proposals/proposals';
+import { getParamsList } from '@/services/requests/proposals';
 import { paramContractMap } from '@/utils/contracts';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { createContext, useContext } from 'react';

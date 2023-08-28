@@ -1,5 +1,5 @@
 import api from '@/services/api';
-import { bucketsRequest } from '@/services/requests/account/account';
+import { bucketsRequest } from '@/services/requests/account';
 import { parseAddress } from '@/utils/parseValues';
 import { screen } from '@testing-library/react';
 import * as nextRouter from 'next/router';

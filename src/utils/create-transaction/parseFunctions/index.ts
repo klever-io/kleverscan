@@ -1,4 +1,4 @@
-import { getSomeAssetsPool } from '@/services/requests/pool/pool';
+import { getSomeAssetsPool } from '@/services/requests/pool';
 import { ICollectionList } from '@/types';
 
 export const filterPoolAssets = async (

@@ -5,6 +5,8 @@ import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
 import Skeleton from '@/components/Skeleton';
 import Table, { ITable } from '@/components/Table';
+import { useContractModal } from '@/contexts/contractModal';
+import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import {
@@ -30,6 +32,7 @@ import {
   CopyBackground,
   ElementsWrapper,
   HalfRow,
+  InteractionsValidatorContainer,
   LetterLogo,
   Logo,
   Rating,
@@ -82,6 +85,8 @@ const Validator: React.FC<IValidatorPage> = () => {
   const [imgError, setImgError] = useState(false);
   const [rerender, setRerender] = useState(false);
 
+  const { extensionInstalled, walletAddress } = useExtension();
+
   useEffect(() => {
     if (router.isReady) {
       const requestValidator = async () => {
@@ -128,23 +133,22 @@ const Validator: React.FC<IValidatorPage> = () => {
   );
 
   const commissionPercent = (validator?.commission || 0) / 10 ** 2;
-
   const getListStatus = (list: string): string => {
-    let status = '';
     switch (list) {
       case 'elected':
       case 'eligible':
-        return (status = 'success');
+        return 'success';
       case 'waiting':
-        return (status = 'pending');
+        return 'pending';
       case 'leaving':
       case 'inactive':
       case 'observer':
-        return (status = 'inactive');
+        return 'inactive';
       case 'jailed':
-        return (status = 'fail');
+        return 'fail';
+      default:
+        return 'text';
     }
-    return status;
   };
 
   const ListIcon = getStatusIcon(getListStatus(validator?.list || ''));
@@ -161,7 +165,7 @@ const Validator: React.FC<IValidatorPage> = () => {
     }
   };
 
-  const { isMobile } = useMobile();
+  const { isMobile, isTablet } = useMobile();
   const renderTitle = () => {
     return (
       <h1>
@@ -172,6 +176,20 @@ const Validator: React.FC<IValidatorPage> = () => {
       </h1>
     );
   };
+
+  const { getInteractionsButtons } = useContractModal();
+  const [ConfigValidatorButton, UnjailValidatorButton] = getInteractionsButtons(
+    [
+      {
+        title: 'Config Validator',
+        contractType: 'ValidatorConfigContract',
+      },
+      {
+        title: 'Unjail Validator',
+        contractType: 'UnjailContract',
+      },
+    ],
+  );
 
   const renderMaxDelegation = () => {
     const maxDelegationWithPresicion = (
@@ -445,6 +463,20 @@ const Validator: React.FC<IValidatorPage> = () => {
     dataName: 'validator',
   };
 
+  const InteractionsButtonsComponenet: React.FC = () => {
+    const routerAddress = router.query?.hash || '';
+    if (!!extensionInstalled && routerAddress === walletAddress) {
+      return (
+        <InteractionsValidatorContainer>
+          <ConfigValidatorButton />
+          {validator?.list === 'jailed' && <UnjailValidatorButton />}
+        </InteractionsValidatorContainer>
+      );
+    }
+
+    return <></>;
+  };
+
   return (
     <Container>
       <Title
@@ -469,11 +501,13 @@ const Validator: React.FC<IValidatorPage> = () => {
               ) : (
                 <Skeleton />
               )}
+              {!isMobile && <InteractionsButtonsComponenet />}
             </TitleInformation>
           </TitleContent>
         )}
         route={'/validators'}
       />
+      {isMobile && <InteractionsButtonsComponenet />}
 
       <DynamicValidatorCards
         totalStake={validator?.totalStake}

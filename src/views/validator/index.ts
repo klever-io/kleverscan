@@ -27,7 +27,6 @@ export const LetterLogo = styled.div`
 
 export const CenteredSubTitle = styled.div`
   display: flex;
-  margin-top: 0.3rem;
   flex-direction: row;
   align-items: center;
   flex: 1;
@@ -138,6 +137,15 @@ export const Status = styled.div<IStatus>`
       color: ${props.theme.table.icon} !important;
       
     `}
+`;
+
+export const InteractionsValidatorContainer = styled.div`
+  display: flex;
+  gap: 0.3rem;
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-wrap: wrap;
+  }
 `;
 
 export const BoldElement = styled.div`

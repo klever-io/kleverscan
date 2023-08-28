@@ -9,6 +9,7 @@ const getStatusIcon = (status: string): any => {
     case 'ApprovedProposal':
       return Success;
     case 'DeniedProposal':
+    case 'fail':
       return Error;
     case 'success':
       return Success;
@@ -16,8 +17,6 @@ const getStatusIcon = (status: string): any => {
     case 'ActiveProposal':
     case 'inactive':
       return Pending;
-    case 'fail':
-      return Error;
     default:
       return ImCancelCircle;
   }

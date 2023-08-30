@@ -4,7 +4,7 @@ import { ICollectionList } from '@/types';
 import { assetTriggerTypes } from '@/utils/contracts';
 import { useKDASelect } from '@/utils/hooks/contract';
 import { IAssetTrigger } from '@klever/sdk';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
@@ -46,7 +46,7 @@ const AssetTrigger: React.FC<IContractProps> = ({
   formKey,
   handleFormSubmit,
 }) => {
-  const { handleSubmit, watch } = useFormContext<IAssetTrigger>();
+  const { handleSubmit, watch, reset } = useFormContext<IAssetTrigger>();
   const { getOwnerAddress } = useContract();
   const triggerType = watch('triggerType');
   const [collection, KDASelect] = useKDASelect({
@@ -66,6 +66,12 @@ const AssetTrigger: React.FC<IContractProps> = ({
     parseAssetTrigger(data);
     await handleFormSubmit(data);
   };
+
+  useEffect(() => {
+    reset({
+      triggerType,
+    });
+  }, [triggerType]);
 
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>

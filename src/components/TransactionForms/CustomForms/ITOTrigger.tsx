@@ -2,7 +2,7 @@ import { useContract } from '@/contexts/contract';
 import { ICollectionList } from '@/types';
 import { ITOTriggerTypes } from '@/utils/contracts';
 import { useKDASelect } from '@/utils/hooks/contract';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
@@ -24,7 +24,7 @@ const ITOTrigger: React.FC<IContractProps> = ({
   formKey,
   handleFormSubmit,
 }) => {
-  const { handleSubmit, watch } = useFormContext<ITOTriggerData>();
+  const { handleSubmit, watch, reset } = useFormContext<ITOTriggerData>();
   const { getOwnerAddress } = useContract();
   const [collection, KDASelect] = useKDASelect();
 
@@ -35,6 +35,12 @@ const ITOTrigger: React.FC<IContractProps> = ({
     parseConfigITO(data);
     await handleFormSubmit(data);
   };
+
+  useEffect(() => {
+    reset({
+      triggerType,
+    });
+  }, [triggerType]);
 
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>

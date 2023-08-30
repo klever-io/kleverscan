@@ -17,21 +17,21 @@ export const InternalThemeProvider: React.FC = ({ children }) => {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
 
   useEffect(() => {
-    const isDarkTheme = localStorage.getItem('isDarkTheme') === 'true';
-    setIsDarkTheme(isDarkTheme);
+    const isDarkTheme = localStorage.getItem('isDarkTheme');
+    if (isDarkTheme === 'true') {
+      setIsDarkTheme(true);
+    } else if (isDarkTheme === null) {
+      const prefersDarkMode = window.matchMedia(
+        '(prefers-color-scheme: dark)',
+      ).matches;
+      setIsDarkTheme(prefersDarkMode);
+    }
   }, []);
 
   const toggleDarkTheme = () => {
     setIsDarkTheme(!isDarkTheme);
     localStorage.setItem('isDarkTheme', String(!isDarkTheme));
   };
-
-  useEffect(() => {
-    const prefersDarkMode = window.matchMedia(
-      '(prefers-color-scheme: dark)',
-    ).matches;
-    setIsDarkTheme(prefersDarkMode);
-  }, []);
 
   const values: ITheme = {
     toggleDarkTheme,

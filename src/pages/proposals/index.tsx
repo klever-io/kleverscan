@@ -3,12 +3,9 @@ import Title from '@/components/Layout/Title';
 import Tabs, { ITabs } from '@/components/Tabs';
 import NetworkParams from '@/components/Tabs/NetworkParams';
 import ProposalsTab from '@/components/Tabs/Proposals';
-import api from '@/services/api';
+import { requestProposals } from '@/services/requests/proposals';
 import { Card, Container, Header } from '@/styles/common';
-import { IResponse } from '@/types';
-import { IParsedProposal, IProposalsResponse } from '@/types/proposals';
 import { setQueryAndRouter } from '@/utils';
-import { getProposalNetworkParams } from '@/utils/networkFunctions';
 import { CardContainer } from '@/views/proposals';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -17,22 +14,6 @@ const Proposals: React.FC = () => {
   const router = useRouter();
   const tableHeaders = ['Network Parameters', 'Proposals'];
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
-
-  const requestProposals = async (
-    page: number,
-    limit: number,
-  ): Promise<IResponse> => {
-    const { status } = router.query;
-    const proposals: IProposalsResponse = await api.get({
-      route: `proposals/list?status=${
-        status || ''
-      }&page=${page}&limit=${limit}`,
-    });
-
-    let parsedProposalResponse: any[] = [];
-    parsedProposalResponse = parseAllProposals(proposals?.data?.proposals);
-    return { ...proposals, data: { proposals: parsedProposalResponse } };
-  };
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -94,20 +75,6 @@ const Proposals: React.FC = () => {
       </Tabs>
     </Container>
   );
-};
-
-export const parseAllProposals = (
-  arrayOfProposals: any[],
-): IParsedProposal[] | [] => {
-  if (arrayOfProposals) {
-    arrayOfProposals.forEach((proposal, index) => {
-      arrayOfProposals[index].parsedParameters = getProposalNetworkParams(
-        proposal.parameters,
-      );
-    });
-    return arrayOfProposals;
-  }
-  return [];
 };
 
 export default Proposals;

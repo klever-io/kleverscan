@@ -8,6 +8,11 @@ import { tipMobile } from '@/components/Tooltip/configs';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import {
+  dataNetworkParams,
+  dataOverviewCall,
+  dataProposalCall,
+} from '@/services/requests/proposals';
+import {
   CardContent,
   CardHeader,
   CardHeaderItem,
@@ -17,21 +22,15 @@ import {
 import { IRowSection } from '@/types/index';
 import {
   INetworkParams,
-  INodeOverview,
   IParsedParams,
-  IParsedProposal,
   IParsedProposalParam,
   IParsedVote,
-  IParsedVoter,
   IParsedVoterResponse,
-  IProposal,
   IProposalParams,
-  IProposalResponse,
   IProposalVoters,
-  IVote,
-  IVotingPowers,
   NetworkParamsIndexer,
 } from '@/types/proposals';
+import { validateFormattedVotes } from '@/utils';
 import { formatAmount, toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useSkeleton } from '@/utils/hooks';
@@ -68,11 +67,11 @@ import {
 } from '@/views/proposals/detail';
 import { ButtonExpand } from '@/views/transactions/detail';
 import { CenteredRow } from '@/views/validators/detail';
-import { format, fromUnixTime } from 'date-fns';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { AiFillCheckCircle } from 'react-icons/ai';
+import { useQuery } from 'react-query';
 import Tooltip from '../../components/Tooltip';
 
 const ProposalVoters = (props: IProposalVoters) => {
@@ -120,15 +119,23 @@ const ProposalVoters = (props: IProposalVoters) => {
 };
 
 const ProposalDetails: React.FC = () => {
-  const [proposal, setProposal] = useState<null | IParsedProposal>(null);
-  const [params, setParams] = useState<null | INetworkParams>(null);
-  const [overview, setOverview] = useState<null | INodeOverview>(null);
   const [selectedFilter, setSelectedFilter] = useState('Yes');
   const [votesPercentage, setVotesPercentage] = useState('');
   const [expandDescription, setExpandDescription] = useState(false);
   const { isMobile, isTablet } = useMobile();
   const [isSkeleton, setLoading] = useSkeleton();
   const router = useRouter();
+
+  const { data: overview } = useQuery({
+    queryKey: 'proposalOverview',
+    queryFn: () => dataOverviewCall(),
+  });
+  const { data: proposal } = useQuery({
+    queryKey: 'proposalsCall',
+    queryFn: () => dataProposalCall(router),
+    enabled: !!router.isReady,
+  });
+  const { data: params } = useQuery('paramsList', dataNetworkParams);
 
   useEffect(() => {
     if (proposal) {
@@ -139,51 +146,9 @@ const ProposalDetails: React.FC = () => {
         percentage = 0;
       }
       setVotesPercentage(percentage.toFixed(2));
+      setLoading(false);
     }
   }, [proposal]);
-
-  const validateFormattedVotes = (
-    proposalResponse: IProposal,
-  ): IParsedVoter[] => {
-    const list: IParsedVoter[] = [];
-    if (!proposalResponse) return list;
-    const votingPowersAdd = getVotingPowers(proposalResponse.voters);
-    proposalResponse?.voters?.forEach((voter: IVote) => {
-      if (proposalResponse.totalStaked && votingPowersAdd) {
-        const votesInfo = voter;
-        const frozenBalance = votingPowersAdd[voter.address];
-        list.push({
-          voter: voter.address,
-          votingPower: (
-            (frozenBalance * 100) /
-            proposalResponse.totalStaked
-          ).toFixed(3),
-          voteDate: format(
-            fromUnixTime(votesInfo.timestamp / 1000),
-            'MM/dd/yyyy HH:mm',
-          ),
-          status: votesInfo.type === 0 ? 'Yes' : 'No',
-        });
-      }
-    });
-    return list;
-  };
-
-  const parseProposal = (proposal: IProposalResponse) => {
-    const votesYes = (proposal.data.proposal.votes['0'] || 0) / 10 ** 6;
-    const votesNo = (proposal.data.proposal.votes['1'] || 0) / 10 ** 6;
-    return {
-      ...proposal.data.proposal,
-      votingPowers: getVotingPowers(proposal?.data?.proposal.voters),
-      pagination: proposal?.data?.proposal.votersPage,
-      votes: {
-        Yes: votesYes,
-        No: votesNo,
-      },
-      totalVoted: votesYes + votesNo,
-      parsedVoters: validateFormattedVotes(proposal.data.proposal),
-    };
-  };
 
   const getProposalNetworkParams = (
     params: IProposalParams,
@@ -216,77 +181,6 @@ const ProposalDetails: React.FC = () => {
     }
     return { currentNetworkParams, parsedProposalParams };
   };
-
-  useEffect(() => {
-    const loadPageInitialData = async () => {
-      if (router.query?.number) {
-        let parsedProposal = null;
-        let params = null;
-        let overview = null;
-        const proposalInfosCall = new Promise(async (resolve, reject) => {
-          const res = await api.get({
-            route: `proposals/${router.query.number}`,
-            query: { voteType: 0 },
-          });
-
-          if (!res.error || res.error === '') {
-            resolve(res);
-          }
-          reject(res.error);
-        });
-
-        const dataParametersCall = new Promise(async (resolve, reject) => {
-          const res = await api.get({ route: 'network/network-parameters' });
-
-          if (!res.error || res.error === '') {
-            resolve(res);
-          }
-
-          reject(res.error);
-        });
-
-        const dataOverviewCall = new Promise(async (resolve, reject) => {
-          const res = await api.get({ route: 'node/overview' });
-
-          if (!res.error || res.error === '') {
-            resolve(res);
-          }
-
-          reject(res.error);
-        });
-
-        const promises = [
-          proposalInfosCall,
-          dataParametersCall,
-          dataOverviewCall,
-        ];
-        await Promise.allSettled(promises).then(responses => {
-          responses.forEach(async (res, index) => {
-            if (res.status !== 'rejected') {
-              const { value }: any = res;
-              if (index === 0) {
-                parsedProposal = parseProposal(value);
-              }
-
-              if (index === 1) {
-                const { data } = value;
-                params = data?.parameters;
-              }
-
-              if (index === 2) {
-                overview = value?.data?.overview;
-              }
-            }
-          });
-        });
-        setProposal(parsedProposal);
-        setParams(params);
-        setOverview(overview);
-        setLoading(false);
-      }
-    };
-    loadPageInitialData();
-  }, [router.query?.number]);
 
   const renderProposalParams = useCallback(() => {
     if (proposal && params) {
@@ -391,6 +285,7 @@ const ProposalDetails: React.FC = () => {
     }
     return StatusIcon;
   };
+
   return (
     <>
       {
@@ -613,14 +508,6 @@ const ProposalDetails: React.FC = () => {
       }
     </>
   );
-};
-
-export const getVotingPowers = (voters: IVote[]): IVotingPowers => {
-  const powers = {};
-  voters?.forEach(voter => {
-    powers[voter.address] = voter?.amount;
-  });
-  return powers;
 };
 
 export default ProposalDetails;

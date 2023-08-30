@@ -8,6 +8,9 @@ import {
   IValidator,
   IValidatorResponse,
 } from '@/types';
+import { IParsedProposal, IProposalResponse } from '@/types/proposals';
+import { getVotingPowers, validateFormattedVotes } from '..';
+import { getProposalNetworkParams } from '../networkFunctions';
 
 /**
  *  Receives an IAccountAsset[] (which comes from an IAssetsHoldersResponse) and returns a new array of objects only with index, address, balance and rank properties.
@@ -153,4 +156,34 @@ export const parseJson = (data: string): string => {
   } catch (error) {
     return data;
   }
+};
+
+export const parseProposal = (proposal: IProposalResponse): any => {
+  const votesYes = (proposal.data.proposal.votes['0'] || 0) / 10 ** 6;
+  const votesNo = (proposal.data.proposal.votes['1'] || 0) / 10 ** 6;
+  return {
+    ...proposal.data.proposal,
+    votingPowers: getVotingPowers(proposal?.data?.proposal.voters),
+    pagination: proposal?.data?.proposal.votersPage,
+    votes: {
+      Yes: votesYes,
+      No: votesNo,
+    },
+    totalVoted: votesYes + votesNo,
+    parsedVoters: validateFormattedVotes(proposal.data.proposal),
+  };
+};
+
+export const parseAllProposals = (
+  arrayOfProposals: any[],
+): IParsedProposal[] | [] => {
+  if (arrayOfProposals) {
+    arrayOfProposals.forEach((proposal, index) => {
+      arrayOfProposals[index].parsedParameters = getProposalNetworkParams(
+        proposal.parameters,
+      );
+    });
+    return arrayOfProposals;
+  }
+  return [];
 };

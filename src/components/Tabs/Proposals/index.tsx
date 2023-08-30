@@ -230,7 +230,7 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
     type: 'proposals',
     scrollUp: true,
     dataName: 'proposals',
-    request: (page, limit) => request(page, limit),
+    request: (page, limit) => request(page, limit, router),
   };
 
   return (

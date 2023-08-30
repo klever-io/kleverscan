@@ -1,9 +1,8 @@
-import { parseAddress } from '@/utils/parseValues';
+import { parseAddress, parseAllProposals } from '@/utils/parseValues';
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import Proposals from '.';
-import { parseAllProposals } from '../../../pages/proposals';
 import theme from '../../../styles/theme';
 import {
   emptyProposalsResponse,

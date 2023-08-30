@@ -1,4 +1,5 @@
 import { IPagination, IResponse } from '@/types/index';
+import { NextRouter } from 'next/router';
 
 export interface IParsedVote {
   status: string;
@@ -139,7 +140,7 @@ export interface IProposals {
 }
 
 export interface IProposalsProps {
-  request: (page: number, limit: number) => Promise<any>;
+  request: (page: number, limit: number, router: NextRouter) => Promise<any>;
 }
 
 export interface IProposalParams {

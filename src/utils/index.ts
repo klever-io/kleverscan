@@ -1,4 +1,11 @@
 import { IEpochInfo, IMetrics } from '@/types';
+import {
+  IParsedVoter,
+  IProposal,
+  IVote,
+  IVotingPowers,
+} from '@/types/proposals';
+import { format, fromUnixTime } from 'date-fns';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { NextRouter } from 'next/router';
 import { secondsToHourMinSec } from './timeFunctions';
@@ -127,3 +134,38 @@ export const setQueryAndRouter = (
 
 export const sleep = (ms: number): Promise<void> =>
   new Promise(resolve => setTimeout(resolve, ms));
+
+export const getVotingPowers = (voters: IVote[]): IVotingPowers => {
+  const powers = {};
+  voters?.forEach(voter => {
+    powers[voter.address] = voter?.amount;
+  });
+  return powers;
+};
+
+export const validateFormattedVotes = (
+  proposalResponse: IProposal,
+): IParsedVoter[] => {
+  const list: IParsedVoter[] = [];
+  if (!proposalResponse) return list;
+  const votingPowersAdd = getVotingPowers(proposalResponse.voters);
+  proposalResponse?.voters?.forEach((voter: IVote) => {
+    if (proposalResponse.totalStaked && votingPowersAdd) {
+      const votesInfo = voter;
+      const frozenBalance = votingPowersAdd[voter.address];
+      list.push({
+        voter: voter.address,
+        votingPower: (
+          (frozenBalance * 100) /
+          proposalResponse.totalStaked
+        ).toFixed(3),
+        voteDate: format(
+          fromUnixTime(votesInfo.timestamp / 1000),
+          'MM/dd/yyyy HH:mm',
+        ),
+        status: votesInfo.type === 0 ? 'Yes' : 'No',
+      });
+    }
+  });
+  return list;
+};

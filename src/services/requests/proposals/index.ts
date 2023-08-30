@@ -1,7 +1,14 @@
 import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
 import api from '@/services/api';
-import { IParamList } from '@/types';
-import { INetworkParam, IProposalsResponse } from '@/types/proposals';
+import { IParamList, IResponse } from '@/types';
+import {
+  INetworkParam,
+  INetworkParams,
+  INodeOverview,
+  IProposalsResponse,
+} from '@/types/proposals';
+import { parseAllProposals, parseProposal } from '@/utils/parseValues';
+import { NextRouter } from 'next/router';
 
 export const proposalsActiveResponse = async (): Promise<void> => {
   const proposalResponse: IProposalsResponse = await api.get({
@@ -58,4 +65,57 @@ export const getParamsList = async (): Promise<IParamList[] | undefined> => {
     });
 
   return paramsList;
+};
+
+export const dataOverviewCall = async (): Promise<
+  INodeOverview | undefined
+> => {
+  try {
+    const proposalResponse: IResponse = await api.get({
+      route: 'node/overview',
+    });
+    return proposalResponse.data.overview;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const dataNetworkParams = async (): Promise<
+  INetworkParams | undefined
+> => {
+  try {
+    const res = await api.get({
+      route: 'network/network-parameters',
+    });
+    return res;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const dataProposalCall = async (router: NextRouter): Promise<any> => {
+  try {
+    const res = await api.get({
+      route: `proposals/${router.query.number}`,
+      query: { voteType: 0 },
+    });
+    return parseProposal(res);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const requestProposals = async (
+  page: number,
+  limit: number,
+  router: NextRouter,
+): Promise<IResponse> => {
+  const { status } = router.query;
+  const proposals: IProposalsResponse = await api.get({
+    route: `proposals/list?status=${status || ''}&page=${page}&limit=${limit}`,
+  });
+
+  let parsedProposalResponse: any[] = [];
+  parsedProposalResponse = parseAllProposals(proposals?.data?.proposals);
+  return { ...proposals, data: { proposals: parsedProposalResponse } };
 };

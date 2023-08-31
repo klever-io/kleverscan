@@ -18,7 +18,7 @@ import {
 } from '@/types/index';
 import { contractOptions as allContractOptions } from '@/utils/contracts';
 import { KLV_PRECISION } from '@/utils/globalVariables';
-import { ITransaction, web } from '@klever/sdk';
+import { web } from '@klever/sdk';
 import { useRouter } from 'next/router';
 import React, {
   createContext,
@@ -55,12 +55,14 @@ interface IFormPayload {
   payload: any;
   metadata: string;
 }
+
 export interface IContractContext {
   txLoading: boolean;
   showAdvancedOpts: boolean;
   txHash: string | null;
   showPayload: React.MutableRefObject<boolean>;
   isMultisig: React.MutableRefObject<boolean>;
+  signTxMultiSign: React.MutableRefObject<boolean>;
   payload: any;
   contractOptions: IContractOption[];
   kdaFee: React.MutableRefObject<ICollectionList>;
@@ -99,6 +101,7 @@ export const ContractProvider: React.FC = ({ children }) => {
 
   const showPayload = useRef(false);
   const isMultisig = useRef(false);
+  const signTxMultiSign = useRef(false);
   const formsData = useRef<IFormPayload[]>([] as IFormPayload[]);
   const ignoreCheckAmount = useRef(false);
   const kdaFee = useRef<ICollectionList>({} as ICollectionList);
@@ -368,49 +371,81 @@ export const ContractProvider: React.FC = ({ children }) => {
       };
     });
     try {
-      const unsignedTx: ITransaction = await buildTransaction(
-        parsedPayloads,
-        parsedDataArray,
-        {
-          kdaFee: kdaFee.current.value,
-          permID: permID,
-        },
-      );
-
+      let nonce;
       if (senderAccount !== getOwnerAddress()) {
         const senderData: INodeAccountResponse = await api.get({
           route: `address/${senderAccount}`,
           service: Service.NODE,
         });
-        if (senderData.error) {
-          throw new Error(senderData.code);
+        if (!senderData.error) {
+          nonce = senderData.data.account.Nonce || 0;
         }
-        const { Address } = senderData.data.account;
-        const Nonce = senderData.data.account.Nonce || 0;
-
-        unsignedTx.RawData.Nonce = Nonce;
-        unsignedTx.RawData.Sender = Address;
       }
 
-      const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
+      const unsignedTx = await buildTransaction(
+        parsedPayloads,
+        parsedDataArray,
+        {
+          kdaFee: kdaFee.current.value,
+          permID: permID,
+          nonce,
+          sender: senderAccount ?? null,
+        },
+      );
+
+      const {
+        result: { RawData },
+        txHash,
+      } = unsignedTx;
 
       if (isMultisig.current) {
-        const blob = new Blob([JSON.stringify(signedTx)], {
-          type: 'application/json',
+        let parseMultisignTransaction;
+        const senderAddress =
+          senderAccount !== getOwnerAddress()
+            ? senderAccount
+            : getOwnerAddress();
+        if (signTxMultiSign.current) {
+          const signedTx = await window.kleverWeb.signTransaction(
+            unsignedTx.result,
+          );
+          const { RawData, Signature } = signedTx;
+
+          parseMultisignTransaction = {
+            hash: txHash,
+            address: senderAddress,
+            raw: {
+              rawData: RawData,
+              Signature,
+            },
+          };
+        } else {
+          parseMultisignTransaction = {
+            hash: txHash,
+            address: senderAddress,
+            raw: {
+              rawData: unsignedTx.result.RawData,
+              Signature: [],
+            },
+          };
+        }
+
+        const multiSignRes: any = await api.post({
+          route: 'transaction',
+          service: Service.MULTISIGN,
+          body: parseMultisignTransaction,
         });
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${getOwnerAddress()} - Nonce: ${
-          signedTx.RawData.Nonce
-        }.json`;
-        link.click();
-        window.URL.revokeObjectURL(url);
+
+        if (multiSignRes.error) {
+          toast.error('Something went wrong, please try again');
+          return;
+        }
+
         setTxLoading(false);
-        toast.success(
-          'Transaction built and signed, send the file to the co-owner(s)',
-        );
+        toast.success('Transaction built and signed');
       } else {
+        const signedTx = await window.kleverWeb.signTransaction(
+          unsignedTx.result,
+        );
         const response = await web.broadcastTransactions([signedTx]);
         setTxHash(response.data.txsHashes[0]);
         toast.success('Transaction broadcast successfully');
@@ -443,7 +478,6 @@ export const ContractProvider: React.FC = ({ children }) => {
       },
     ];
   };
-
   const handleSubmit = async (
     contractValues: any,
     metadata: string,
@@ -484,6 +518,7 @@ export const ContractProvider: React.FC = ({ children }) => {
     getKAssets,
     showPayload,
     isMultisig,
+    signTxMultiSign,
     contractOptions,
     setContractOptions,
     getOwnerAddress,

@@ -1,5 +1,5 @@
+import { InputFile } from '@/components/MultsignComponent/styles';
 import { StyledTextArea } from '@/components/TransactionForms/FormInput/styles';
-import { InputFile } from '@/views/multisign';
 import styled, { css } from 'styled-components';
 
 export const FormEncodingContainer = styled.form`

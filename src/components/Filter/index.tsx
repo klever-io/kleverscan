@@ -28,6 +28,7 @@ export interface IFilter {
   loading?: boolean;
   disabledInput?: boolean;
   isHiddenInput?: boolean;
+  maxWidth?: boolean;
 }
 
 const Filter: React.FC<IFilter> = ({
@@ -42,6 +43,7 @@ const Filter: React.FC<IFilter> = ({
   loading,
   disabledInput,
   isHiddenInput = true,
+  maxWidth,
 }) => {
   const allItem = firstItem || 'All';
   const [selected, setSelected] = useState(current || allItem);
@@ -158,7 +160,7 @@ const Filter: React.FC<IFilter> = ({
   };
 
   return (
-    <Container>
+    <Container maxWidth={maxWidth}>
       <span>{title}</span>
       <Content
         onMouseEnter={() => setDontBlur(true)}
@@ -183,20 +185,22 @@ const Filter: React.FC<IFilter> = ({
         <ArrowDownContainer onClick={() => arrowOnClick()}>
           <ArrowDown />
         </ArrowDownContainer>
-        <SelectorContainer {...selectorProps}>
-          {!filteredArray.length && !loading ? (
-            <span>{title} not found!</span>
-          ) : (
-            filteredArray.map((item, index) => (
-              <SelectorItem key={String(index)} item={item} />
-            ))
-          )}
-          {loading && (
-            <LoadContainer>
-              <Loader />
-            </LoadContainer>
-          )}
-        </SelectorContainer>
+        {focus && (
+          <SelectorContainer {...selectorProps}>
+            {!filteredArray.length && !loading ? (
+              <span>{title} not found!</span>
+            ) : (
+              filteredArray.map((item, index) => (
+                <SelectorItem key={String(index)} item={item} />
+              ))
+            )}
+            {loading && (
+              <LoadContainer>
+                <Loader />
+              </LoadContainer>
+            )}
+          </SelectorContainer>
+        )}
       </Content>
     </Container>
   );

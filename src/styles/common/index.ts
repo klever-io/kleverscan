@@ -343,6 +343,7 @@ export const CardTabContainer = styled.div`
 
 export const CardContent = styled.div`
   ${DefaultCardStyles};
+  width: 100%;
 
   border-radius: 0 0.75rem 0.75rem 0.75rem;
 `;

@@ -804,12 +804,20 @@ const getNonce = async (): Promise<IAccountNonce> => {
 
   return (await req.json()) as IAccountNonce;
 };
+export interface ITransactionResult {
+  result: ITransaction;
+  txHash: string;
+}
+
+interface ITxOptionsWithSender extends ITxOptionsRequest {
+  sender?: string | null;
+}
 
 const buildTransaction = async (
   contracts: IContractRequest[],
   txData?: string[],
-  options?: ITxOptionsRequest,
-): Promise<ITransaction> => {
+  options?: ITxOptionsWithSender,
+): Promise<ITransactionResult> => {
   if (contracts?.length === 0) {
     throw 'empty contracts';
   }
@@ -830,7 +838,7 @@ const buildTransaction = async (
   const txBody: ITxRequest = {
     type: fistContractType,
     nonce,
-    sender: window.kleverWeb.address,
+    sender: options?.sender ?? window.kleverWeb.address,
     data: txData || [],
     permID,
     contracts: payloads,
@@ -855,7 +863,7 @@ const buildTransaction = async (
     throw 'failed to generate transaction';
   }
 
-  return res.data.result as ITransaction;
+  return res.data;
 };
 
 export {

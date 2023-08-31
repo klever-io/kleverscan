@@ -24,6 +24,7 @@ export interface IProps {
   apiVersion?: string;
   service?: Service;
   useApiProxy?: boolean;
+  requestMode?: RequestMode;
 }
 
 const pagination = {
@@ -53,6 +54,9 @@ export const getHost = (
     [Service.NODE]:
       process.env.DEFAULT_NODE_HOST || 'https://node.testnet.klever.finance',
     [Service.GECKO]: 'https://api.coingecko.com/api/v3',
+    [Service.MULTISIGN]:
+      process.env.DEFAULT_API_MULTISIGN ||
+      'https://multisign.testnet.klever.finance',
     [Service.EXPLORER]:
       process.env.DEFAULT_EXPLORER_HOST || 'https://testnet.kleverscan.org',
   };
@@ -130,6 +134,7 @@ export const withoutBody = async (
     } else if (!props.useApiProxy) {
       try {
         const { route, query, service, apiVersion } = getProps(props);
+        const requestMode: RequestMode = props?.requestMode ?? 'cors';
 
         const response = await fetch(
           getHost(route, query, service, apiVersion),
@@ -138,6 +143,7 @@ export const withoutBody = async (
             headers: {
               'Content-Type': 'application/json',
             },
+            mode: requestMode,
           },
         );
 
@@ -201,6 +207,8 @@ export const withBody = async (
     } else if (!props.useApiProxy) {
       try {
         const { route, body, query, service, apiVersion } = getProps(props);
+        const requestMode: RequestMode = props?.requestMode ?? 'cors';
+
         const response = await fetch(
           getHost(route, query, service, apiVersion),
           {
@@ -209,19 +217,40 @@ export const withBody = async (
               'Content-Type': 'application/json',
             },
             body: JSON.stringify(body),
+            mode: requestMode,
           },
         );
+        let resJson;
+
+        try {
+          resJson = await response.json();
+        } catch (error) {
+          if (!response.ok) {
+            return {
+              data: null,
+              error: 'Could not parse response',
+              code: 'internal_error',
+              pagination,
+            };
+          }
+
+          return {
+            data: null,
+            error: '',
+            code: '',
+          };
+        }
 
         if (!response.ok) {
           return {
             data: null,
-            error: (await response.json()).error,
+            error: resJson.error,
             code: 'internal_error',
             pagination,
           };
         }
 
-        return response.json();
+        return resJson;
       } catch (error) {
         return { data: null, error, code: 'internal_error', pagination };
       }

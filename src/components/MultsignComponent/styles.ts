@@ -19,6 +19,10 @@ export const Title = styled.h1`
 `;
 
 export const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
   margin: auto;
   padding: 2rem 0;
   width: 90%;
@@ -30,18 +34,60 @@ export const Container = styled.div`
   height: 100%;
 `;
 
-export const Content = styled.div<{ loading: boolean }>`
+export const Content = styled.div<{ loading: boolean; isJSONFile?: boolean }>`
   height: 60%;
   min-height: 50vh;
-
   display: flex;
   flex-direction: column;
-  align-items: ${props => (props.loading ? 'center' : 'flex-end')};
+  align-items: flex-start;
   gap: 2rem;
 
-  padding-top: 2rem;
+  overflow: auto;
+
+  z-index: 5;
 
   width: 100%;
+
+  ${DefaultScrollBar}
+  ::-webkit-scrollbar {
+    height: 0.3em;
+  }
+
+  ${props =>
+    props.isJSONFile &&
+    css`
+      padding: 2rem 0;
+      border: 1px solid
+        ${props =>
+          props.theme.dark ? props.theme.footer.border : props.theme.lightGray};
+      background: ${props =>
+        props.theme.dark ? props.theme.navbar.background : props.theme.white};
+    `}
+`;
+
+export const MultiSigList = styled.div`
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  align-items: center;
+
+  padding: 1rem;
+  border-bottom: 1px solid
+    ${props =>
+      props.theme.dark ? props.theme.footer.border : props.theme.lightGray};
+  width: 100%;
+  height: 7rem;
+  > div {
+    width: 100%;
+    > div {
+      min-width: 50%;
+    }
+  }
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-direction: column;
+    padding: 6rem 2rem;
+  }
 `;
 
 export const ContentTitle = styled.section`
@@ -103,11 +149,8 @@ export const InputFile = styled.div<{ isDragging: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40vw;
+  max-width: 30rem;
 
-  @media (max-width: 830px) {
-    width: 80vw;
-  }
   border: 1px dashed ${props => props.theme.card.border};
   border-radius: 0.5rem;
   background-color: ${props =>
@@ -149,6 +192,10 @@ export const InputFile = styled.div<{ isDragging: boolean }>`
     color: #f372ff;
     font-weight: 500;
   }
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    max-width: 100%;
+  }
 `;
 
 export const ErrorContainer = styled.div`
@@ -169,34 +216,62 @@ export const ErrorContainer = styled.div`
   color: ${props => props.theme.black};
 `;
 
-export const DragContainer = styled.div`
+export const DragContainer = styled.div<{ isHidden?: boolean }>`
   width: 100%;
+  ${props =>
+    props.isHidden &&
+    css`
+      display: none;
+    `}
 `;
 
-export const ButtonContainer = styled.div`
+export const ButtonsContainerApi = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 2rem;
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    flex-direction: column;
+    width: 100%;
+  }
+`;
+
+const DefaultButtonStyles = css`
   display: flex;
   justify-content: center;
-  align-items: center;
-  width: 40vw;
-  @media (max-width: 830px) {
-    width: 80vw;
-  }
-  button {
-    margin-bottom: 5px;
-    padding: 1rem 0.85rem;
-    box-sizing: border-box;
-    margin-left: 0.2rem;
-    margin-right: 0.2rem;
+  min-width: 10rem;
+  padding: 1rem;
+  color: ${props => props.theme.true.white} !important;
+  background: ${props => props.theme.violet};
+  border-radius: 4px;
+  &:disabled {
+    background: ${props => props.theme.kappsDemo.dark};
+    user-select: none;
+    cursor: not-allowed;
 
-    align-self: end;
-    color: ${props => props.theme.true.white} !important;
-    background: ${props => props.theme.violet};
-    border-radius: 4px;
-    cursor: pointer;
     &:hover {
-      opacity: 0.8;
+      opacity: 1;
     }
   }
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 100%;
+  }
+`;
+
+export const MultisignButton = styled.button<{
+  disabled?: boolean;
+  isJsonButton?: boolean;
+}>`
+  ${DefaultButtonStyles}
+
+  ${props =>
+    props.isJsonButton &&
+    css`
+      background-color: ${props => props.theme.purple};
+    `}
 `;
 
 export const TextAreaJson = styled.textarea`
@@ -221,12 +296,15 @@ export const TextAreaJson = styled.textarea`
 
 export const ContentContainer = styled.div`
   display: flex;
+  width: 100%;
   justify-content: center;
   margin-bottom: 2rem;
   gap: 0.5rem;
 
-  @media (max-width: 830px) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 `;
 
@@ -236,6 +314,11 @@ export const LeftContentContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   text-align: center;
+  width: 45%;
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    width: 95%;
+  }
 `;
 
 export const RightContentContainer = styled.div`
@@ -244,6 +327,8 @@ export const RightContentContainer = styled.div`
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
+  width: 45%;
+
   h3 {
     color: ${props => props.theme.violet};
     margin: 0.5rem;
@@ -276,9 +361,12 @@ export const RightContentContainer = styled.div`
     width: 100%;
     max-width: 40vw;
     overflow: auto;
-    @media (max-width: 830px) {
-      max-width: 80vw;
+    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+      max-width: 95%;
     }
+  }
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    width: 95%;
   }
 `;
 
@@ -374,4 +462,39 @@ export const Input = styled(DefaultInput)`
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
   }
+`;
+
+export const EmptyMultisign = styled.div`
+  display: flex;
+  font-weight: 600;
+  font-size: 1.2rem;
+  justify-content: center;
+  width: 100%;
+  padding: 2rem 0;
+  /* border: 1px solid red; */
+  box-shadow: 0 0px 5px 4px
+    ${props =>
+      props.theme.dark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.1)'};
+  color: ${props => props.theme.black};
+`;
+
+export const ButtonContainer = styled.div`
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+
+  &:not(:first-child) {
+    justify-content: flex-end;
+  }
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    flex-direction: column;
+  }
+`;
+
+export const ImportJsonButton = styled.label`
+  ${DefaultButtonStyles};
+  cursor: pointer;
+
+  background-color: ${props => props.theme.purple};
 `;

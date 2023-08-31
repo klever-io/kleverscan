@@ -3,6 +3,7 @@ import { TransactionDetails as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
+import Skeleton from '@/components/Skeleton';
 import { Status } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
 import {
@@ -42,8 +43,13 @@ import {
   Header,
   Row,
 } from '@/styles/common';
-import { ITransactionPage, ITransactionResponse, NotFound } from '@/types';
-import { IBlockResponse } from '@/types/blocks';
+import {
+  IKdaFee,
+  ITransactionPage,
+  ITransactionResponse,
+  NotFound,
+} from '@/types';
+import { IBlock, IBlockResponse } from '@/types/blocks';
 import { Contract, IIndexedContract } from '@/types/contracts';
 import { capitalizeString, hexToString } from '@/utils/convertString';
 import { filterReceipts } from '@/utils/findKey';
@@ -63,12 +69,279 @@ import {
   KappFeeSpan,
   KdaFeeSpan,
   Row as DetailRow,
+  SignatureContainer,
+  SignatureItem,
 } from '@/views/transactions/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
+
+interface IRawTxTheme {
+  base00: string;
+  base01: string;
+  base02: string;
+  base03: string;
+  base04: string;
+  base05: string;
+  base06: string;
+  base07: string;
+  base08: string;
+  base09: string;
+  base0A: string;
+  base0B: string;
+  base0C: string;
+  base0D: string;
+  base0E: string;
+  base0F: string;
+}
+
+export interface IOverviewDetails {
+  hash: string | undefined;
+  StatusIcon?: any;
+  status?: string;
+  resultCode?: string;
+  block?: IBlock;
+  blockNum?: number;
+  nonce: number | undefined;
+  sender: string | undefined;
+  KappFeeRow?: React.FC;
+  bandwidthFee: number | undefined;
+  kdaFee?: IKdaFee | undefined;
+  precisionTransaction?: number | undefined;
+  timestamp?: number;
+  signature: string | string[] | undefined;
+  ThresholdComponent?: React.FC;
+  loading?: boolean;
+  MultiSignList?: React.FC;
+}
+
+export const getRawTxTheme = (isDarkTheme = false): IRawTxTheme => {
+  return {
+    base00: '',
+    base01: '#ddd',
+    base02: '#ddd',
+    base03: '',
+    base04: '',
+    base05: isDarkTheme ? 'white' : 'black',
+    base06: isDarkTheme ? 'white' : 'black',
+    base07: isDarkTheme ? 'white' : 'black',
+    base08: isDarkTheme ? 'white' : 'black',
+    base09: '',
+    base0A: '',
+    base0B: '',
+    base0C: '',
+    base0D: '',
+    base0E: '',
+    base0F: '',
+  };
+};
+
+export const OverviewDetails: React.FC<IOverviewDetails> = ({
+  hash,
+  StatusIcon,
+  status,
+  resultCode,
+  block,
+  blockNum,
+  nonce,
+  sender,
+  KappFeeRow,
+  bandwidthFee,
+  kdaFee,
+  precisionTransaction,
+  timestamp,
+  signature,
+  ThresholdComponent,
+  loading = false,
+  MultiSignList,
+}) => {
+  const [expandSignature, setExpandSignature] = useState(false);
+
+  const handleExpandSignature = () => {
+    setExpandSignature(!expandSignature);
+  };
+
+  return (
+    <>
+      <CardContent>
+        {MultiSignList && <MultiSignList />}
+        <Row>
+          <span>
+            <strong>Hash</strong>
+          </span>
+          {loading ? (
+            <Skeleton />
+          ) : (
+            <CenteredRow>
+              <span>{hash}</span>
+              <Copy data={hash} info="Hash" />
+              <ReceiveBackground isOverflow={true}>
+                <QrCodeModal value={hash || ''} isOverflow={true} />
+              </ReceiveBackground>
+            </CenteredRow>
+          )}
+        </Row>
+        {ThresholdComponent && (
+          <Row>
+            <span>
+              <strong>Threshold</strong>
+            </span>
+            <CenteredRow>
+              {loading ? <Skeleton /> : <ThresholdComponent />}
+            </CenteredRow>
+          </Row>
+        )}
+        {status && StatusIcon && (
+          <Row>
+            <span>
+              <strong>Status</strong>
+            </span>
+            <Status status={status}>
+              <StatusIcon />
+              <span>{capitalizeString(status)}</span>
+            </Status>
+          </Row>
+        )}
+        {resultCode && (
+          <Row>
+            <span>
+              <strong>Result Code</strong>
+            </span>
+            <span>
+              <p>{resultCode}</p>
+            </span>
+          </Row>
+        )}
+        {block && (
+          <Row>
+            <span>
+              <strong>Epoch</strong>
+            </span>
+            <span>
+              <p>{block?.epoch}</p>
+            </span>
+          </Row>
+        )}
+        {blockNum && (
+          <Row>
+            <span>
+              <strong>Block Number</strong>
+            </span>
+            <span>
+              <p>{blockNum || 0}</p>
+            </span>
+          </Row>
+        )}
+        <Row>
+          <span>
+            <strong>Nonce</strong>
+          </span>
+          <span>{loading ? <Skeleton /> : <p>{nonce}</p>}</span>
+        </Row>
+        <Row>
+          <span>
+            <strong>From</strong>
+          </span>
+          {loading ? (
+            <Skeleton />
+          ) : (
+            <span>
+              <CenteredRow>
+                <Link href={`/account/${sender || ''}`}>{sender || ''}</Link>
+                <Copy data={sender} info="Sender" />
+              </CenteredRow>
+            </span>
+          )}
+        </Row>
+        {KappFeeRow && (
+          <Row>
+            <span>
+              <strong>kApp Fee</strong>
+            </span>
+            <KappFeeRow />
+          </Row>
+        )}
+        <Row>
+          <span>
+            <strong>Bandwidth Fee</strong>
+          </span>
+          <span>
+            {loading ? (
+              <Skeleton />
+            ) : (
+              <p>{toLocaleFixed((bandwidthFee ?? 0) / 1000000, 6)}</p>
+            )}
+          </span>
+        </Row>
+        <Row>
+          <span>
+            <strong>KDA Fee</strong>
+          </span>
+          <KdaFeeSpan>
+            {loading ? (
+              <Skeleton />
+            ) : (
+              <>
+                <span>
+                  {kdaFee &&
+                    toLocaleFixed(
+                      kdaFee?.amount / 10 ** (precisionTransaction || 0),
+                      precisionTransaction || 0,
+                    )}{' '}
+                  {kdaFee?.kda || 'KLV'}
+                </span>
+                <Tooltip
+                  msg={`Both kApp fee and bandwidth fee were payed with ${
+                    kdaFee?.kda || 'KLV'
+                  }`}
+                />
+              </>
+            )}
+          </KdaFeeSpan>
+        </Row>
+        {timestamp && (
+          <Row>
+            <span>
+              <strong>Time</strong>
+            </span>
+            <span>
+              <p>{formatDate(timestamp)}</p>
+            </span>
+          </Row>
+        )}
+        <Row>
+          <span>
+            <strong>Signature</strong>
+          </span>
+          <CenteredRow>
+            {loading ? (
+              <Skeleton />
+            ) : (
+              <>
+                <SignatureContainer isExpanded={expandSignature}>
+                  {!!signature?.length &&
+                    (signature as string[])?.map((item: string) => (
+                      <SignatureItem key={item}>
+                        <span style={{ overflow: 'hidden' }}>{item}</span>
+                        {item && <Copy data={item} info="Signature" />}
+                      </SignatureItem>
+                    ))}
+                </SignatureContainer>
+              </>
+            )}
+          </CenteredRow>
+          {!!signature?.length && (
+            <ButtonExpand onClick={handleExpandSignature}>
+              {expandSignature ? 'Collapse' : 'Expand'}
+            </ButtonExpand>
+          )}
+        </Row>
+      </CardContent>
+    </>
+  );
+};
 
 const Transaction: React.FC<ITransactionPage> = props => {
   const { transaction, block } = props;
@@ -150,7 +423,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                 displayObjectSize={false}
                 enableClipboard={true}
                 displayDataTypes={false}
-                theme={rawTxTheme}
+                theme={getRawTxTheme(isDarkTheme)}
               />
             </DivDataJson>
           );
@@ -480,24 +753,6 @@ const Transaction: React.FC<ITransactionPage> = props => {
     );
   };
 
-  const rawTxTheme = {
-    base00: '',
-    base01: '#ddd',
-    base02: '#ddd',
-    base03: '',
-    base04: '',
-    base05: isDarkTheme ? 'white' : 'black',
-    base06: isDarkTheme ? 'white' : 'black',
-    base07: isDarkTheme ? 'white' : 'black',
-    base08: isDarkTheme ? 'white' : 'black',
-    base09: '',
-    base0A: '',
-    base0B: '',
-    base0C: '',
-    base0D: '',
-    base0E: '',
-    base0F: '',
-  };
   const KappFeeRow: React.FC = () => {
     if (status === 'fail') {
       return (
@@ -524,6 +779,24 @@ const Transaction: React.FC<ITransactionPage> = props => {
   useEffect(() => {
     getPrecisionTransaction();
   }, []);
+
+  const overviewProps = {
+    hash,
+    StatusIcon,
+    status,
+    resultCode,
+    block,
+    blockNum,
+    nonce,
+    sender,
+    KappFeeRow,
+    bandwidthFee,
+    kdaFee,
+    precisionTransaction,
+    timestamp,
+    signature,
+  };
+
   return (
     <Container>
       <Header>
@@ -539,123 +812,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
             <span>Overview</span>
           </CardHeaderItem>
         </CardHeader>
-        <CardContent>
-          <Row>
-            <span>
-              <strong>Hash</strong>
-            </span>
-            <CenteredRow>
-              <span>{hash}</span>
-              <Copy data={hash} info="Hash" />
-              <ReceiveBackground isOverflow={true}>
-                <QrCodeModal value={hash} isOverflow={true} />
-              </ReceiveBackground>
-            </CenteredRow>
-          </Row>
-          <Row>
-            <span>
-              <strong>Status</strong>
-            </span>
-            <Status status={status}>
-              <StatusIcon />
-              <span>{capitalizeString(status)}</span>
-            </Status>
-          </Row>
-          <Row>
-            <span>
-              <strong>Result Code</strong>
-            </span>
-            <span>
-              <p>{resultCode}</p>
-            </span>
-          </Row>
-          <Row>
-            <span>
-              <strong>Epoch</strong>
-            </span>
-            <span>
-              <p>{block?.epoch}</p>
-            </span>
-          </Row>
-          <Row>
-            <span>
-              <strong>Block Number</strong>
-            </span>
-            <span>
-              <p>{blockNum || 0}</p>
-            </span>
-          </Row>
-          <Row>
-            <span>
-              <strong>Nonce</strong>
-            </span>
-            <span>
-              <p>{nonce}</p>
-            </span>
-          </Row>
-          <Row>
-            <span>
-              <strong>From</strong>
-            </span>
-            <span>
-              <CenteredRow>
-                <Link href={`/account/${sender}`}>{sender}</Link>
-                <Copy data={sender} info="Sender" />
-              </CenteredRow>
-            </span>
-          </Row>
-          <Row>
-            <span>
-              <strong>kApp Fee</strong>
-            </span>
-            <KappFeeRow />
-          </Row>
-          <Row>
-            <span>
-              <strong>Bandwidth Fee</strong>
-            </span>
-            <span>
-              <p>{toLocaleFixed(bandwidthFee / 1000000, 6)}</p>
-            </span>
-          </Row>
-          <Row>
-            <span>
-              <strong>KDA Fee</strong>
-            </span>
-            <KdaFeeSpan>
-              <span>
-                {kdaFee &&
-                  toLocaleFixed(
-                    kdaFee?.amount / 10 ** precisionTransaction,
-                    precisionTransaction,
-                  )}{' '}
-                {kdaFee?.kda || 'KLV'}
-              </span>
-              <Tooltip
-                msg={`Both kApp fee and bandwidth fee were payed with ${
-                  kdaFee?.kda || 'KLV'
-                }`}
-              />
-            </KdaFeeSpan>
-          </Row>
-          <Row>
-            <span>
-              <strong>Time</strong>
-            </span>
-            <span>
-              <p>{formatDate(timestamp)}</p>
-            </span>
-          </Row>
-          <Row>
-            <span>
-              <strong>Signature</strong>
-            </span>
-            <CenteredRow>
-              <span>{signature}</span>
-              <Copy data={signature} info="Signature" />
-            </CenteredRow>
-          </Row>
-        </CardContent>
+        <OverviewDetails {...overviewProps} />
       </CardContainer>
       <CardContainer>
         <CardHeader>
@@ -681,7 +838,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
               displayObjectSize={false}
               enableClipboard={true}
               displayDataTypes={false}
-              theme={rawTxTheme}
+              theme={getRawTxTheme(isDarkTheme)}
             />
           </CardRaw>
         </CardContent>

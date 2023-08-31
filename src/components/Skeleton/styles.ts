@@ -9,16 +9,16 @@ export const Container = styled.span<{
   height: ${props =>
     typeof props.height === 'number'
       ? `${props.height}px`
-      : props.height || '25px'};
+      : props.height || '25px'} !important;
   width: ${props =>
     typeof props.width === 'number'
       ? `${props.width}px`
-      : props.width || '120px'};
+      : props.width || '120px'} !important;
 `;
 export const SkeletonLoader = styled.span`
   display: inline-block;
 
-  width: 100%;
+  width: 100% !important;
   height: 100%;
 
   background: ${() =>

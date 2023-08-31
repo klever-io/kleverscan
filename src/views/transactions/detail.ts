@@ -29,6 +29,7 @@ export const Input = styled(DefaultInput)`
 
 export const CardContainer = styled.div`
   margin-top: 2rem;
+  width: 100%;
 
   display: flex;
 
@@ -418,4 +419,24 @@ export const NonceSpan = styled.span`
   margin: 0.6rem;
   border-radius: 4px;
   color: ${props => props.theme.true.white};
+`;
+
+export const SignatureContainer = styled.div<{ isExpanded: boolean }>`
+  display: flex;
+
+  flex-direction: column;
+  max-height: 5rem;
+  gap: 1rem;
+
+  ${({ isExpanded }) =>
+    isExpanded &&
+    css`
+      max-height: fit-content;
+    `}
+`;
+
+export const SignatureItem = styled.div`
+  display: grid;
+  grid-template-columns: repeat(1, 1fr) auto;
+  gap: 1rem;
 `;

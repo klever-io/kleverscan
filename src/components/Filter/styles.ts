@@ -1,6 +1,6 @@
 import { DefaultCardStyles } from '@/styles/common';
 import { transparentize } from 'polished';
-import styled, { keyframes } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 const Show = keyframes`
   0% {
@@ -38,7 +38,7 @@ const Hide = keyframes`
   }
 `;
 
-export const Container = styled.div`
+export const Container = styled.div<{ maxWidth?: boolean }>`
   display: flex;
   flex-direction: column;
 
@@ -56,6 +56,12 @@ export const Container = styled.div`
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
     max-width: fit-content;
   }
+
+  ${props =>
+    props.maxWidth &&
+    css`
+      max-width: 100% !important;
+    `}
 `;
 
 export const Content = styled.div<{ open: boolean }>`

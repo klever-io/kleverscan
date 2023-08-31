@@ -179,9 +179,10 @@ const AccountSelect: React.FC = () => {
 };
 
 const MultiSigSelect: React.FC = () => {
-  const { isMultisig } = useContract();
+  const { isMultisig, signTxMultiSign } = useContract();
 
   const [_, setMultiSig] = useState<boolean>(isMultisig.current);
+  const [signTx, setSignTx] = useState<boolean>(isMultisig.current);
 
   return (
     <>
@@ -208,6 +209,33 @@ const MultiSigSelect: React.FC = () => {
           </ToggleContainer>
         </FieldContainer>
       </FlexContainer>
+      {isMultisig.current && (
+        <>
+          <FlexContainer>
+            <FieldContainer>
+              <InputLabel>
+                <span>Do you want to sign transaction now ?</span>
+              </InputLabel>
+              <ToggleContainer>
+                No
+                <Toggle>
+                  <StyledInput
+                    type="checkbox"
+                    defaultChecked={false}
+                    value={String(signTxMultiSign.current)}
+                    onClick={() => {
+                      signTxMultiSign.current = !signTxMultiSign.current;
+                      setSignTx(signTxMultiSign.current);
+                    }}
+                  />
+                  <Slider active={String(signTxMultiSign.current)} />
+                </Toggle>
+                Yes
+              </ToggleContainer>
+            </FieldContainer>
+          </FlexContainer>
+        </>
+      )}
       <AccountSelect />
       <PermID />
     </>

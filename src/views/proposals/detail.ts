@@ -1,6 +1,6 @@
 import { default as DefaultInput } from '@/components/InputGlobal';
 import { DefaultCardStyles } from '@/styles/common';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 interface CardVoteProps {
   color: string;
@@ -178,9 +178,16 @@ export const VotesHeader = styled.div`
   }
 `;
 
-export const ProgressBarVotes = styled.div`
+export const ProgressBarVotes = styled.div<{ width?: string }>`
   margin-top: 2rem;
   margin-bottom: 2rem;
+
+  ${props =>
+    props?.width &&
+    css`
+      width: ${props.width};
+      margin-top: 0;
+    `}
 
   span {
     opacity: 0.6;

@@ -10,6 +10,7 @@ interface IProps {
   toggle?: boolean;
   type?: string;
   zIndex?: number;
+  logoWarning?: boolean;
 }
 
 interface ILabel {
@@ -65,6 +66,7 @@ export const StyledInput = styled.input<IProps>`
         `
       : null}
 
+  
   ${({ type }) =>
     type === 'hidden'
       ? css`
@@ -76,6 +78,18 @@ export const StyledInput = styled.input<IProps>`
           color: transparent;
           border: none;
           outline: none;
+        `
+      : null}
+
+${({ theme, logoWarning }) =>
+    logoWarning
+      ? css`
+          color: ${theme.status.warning} !important;
+          border: 1px solid ${theme.status.warning} !important;
+          background-color: transparent !important;
+          + label {
+            color: ${theme.status.warning} !important;
+          }
         `
       : null}
 
@@ -320,11 +334,17 @@ export const InputLabel = styled.label<ILabel>`
   }
 `;
 
-export const ErrorMessage = styled.span`
+export const ErrorMessage = styled.span<{ warning?: boolean }>`
   color: ${({ theme }) => theme.error};
   font-size: 0.85rem;
   font-weight: 400;
   position: absolute;
   bottom: -1rem;
   left: 0;
+
+  ${({ theme, warning }) =>
+    warning &&
+    css`
+      color: ${theme.status.warning} !important;
+    `}
 `;

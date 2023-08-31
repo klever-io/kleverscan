@@ -1,7 +1,8 @@
 import { useContract } from '@/contexts/contract';
 import { KLV_PRECISION } from '@/utils/globalVariables';
+import { validateImgUrl } from '@/utils/imageValidate';
 import { ICreateAsset } from '@klever/sdk';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
 import { IContractProps } from '.';
@@ -87,13 +88,38 @@ const BasicInfoSection: React.FC<ISectionProps> = ({
   isNFT,
   walletAddress,
 }) => {
+  const [logoError, setLogoError] = useState<string | null>(null);
   const { watch, trigger } = useFormContext<ICreateAsset>();
   const precision = watch('precision');
+  const logo = watch('logo');
+
+  let logoTimeout: ReturnType<typeof setTimeout>;
 
   useEffect(() => {
     trigger('initialSupply');
     trigger('maxSupply');
   }, [precision, trigger]);
+
+  const isValidLogo = async () => {
+    const logoErrorMsg =
+      'The logo link is invalid, which could lead to your logo not being displayed.';
+    try {
+      if (!!logo) {
+        const isValid = await validateImgUrl(logo, 2000);
+        if (!isValid) {
+          setLogoError(logoErrorMsg);
+          return;
+        }
+      }
+      setLogoError(null);
+    } catch (error) {
+      setLogoError(logoErrorMsg);
+    }
+  };
+
+  useEffect(() => {
+    isValidLogo();
+  }, [logo]);
 
   return (
     <FormSection>
@@ -138,7 +164,13 @@ const BasicInfoSection: React.FC<ISectionProps> = ({
         tooltip={tooltip.maxSupply}
         precision={precision}
       />
-      <FormInput name="logo" title="Logo" span={2} tooltip={tooltip.logo} />
+      <FormInput
+        name="logo"
+        title="Logo"
+        span={2}
+        tooltip={tooltip.logo}
+        logoError={logoError}
+      />
     </FormSection>
   );
 };

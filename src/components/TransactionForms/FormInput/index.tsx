@@ -43,6 +43,7 @@ export interface IBaseFormInputProps
   zIndex?: number;
   precision?: number;
   customOnChange?: (e: any) => void;
+  logoError?: string | null;
 }
 
 export interface IFormInputProps extends IBaseFormInputProps {
@@ -107,6 +108,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   customOnChange,
   onChange,
   precision = 8,
+  logoError = null,
   ...rest
 }) => {
   const areaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -201,6 +203,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
 
   const areaProps = {
     error: Boolean(error),
+    logoWarning: logoError !== null ? true : false,
     value: rest.value,
     onChange: onChange as ChangeEventHandler<HTMLTextAreaElement>,
   };
@@ -313,9 +316,15 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
         type !== 'hidden' && <StyledInput {...inputProps} />}
 
       {error && (
-        <ErrorMessage style={{ color: 'red', fontSize: '0.8rem' }}>
+        <ErrorMessage
+          style={{ color: 'red', fontSize: '0.8rem' }}
+          warning={title === 'Logo'}
+        >
           {error?.message}
         </ErrorMessage>
+      )}
+      {logoError && (
+        <ErrorMessage warning={!!logoError}>{logoError}</ErrorMessage>
       )}
     </Container>
   );

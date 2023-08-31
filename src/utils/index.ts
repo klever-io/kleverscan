@@ -111,10 +111,19 @@ export const parseApr = (stakingType: string | undefined): string => {
   return stakingType.slice(0, -1);
 };
 
+interface ISetQueryAndRouterOptions {
+  clearQuery?: boolean;
+}
+
 export const setQueryAndRouter = (
   newQuery: NextParsedUrlQuery,
   router: NextRouter,
+  options?: ISetQueryAndRouterOptions,
 ): void => {
+  if (options?.clearQuery) {
+    router.query = {};
+  }
+
   router.query = {
     ...router.query,
     ...newQuery,

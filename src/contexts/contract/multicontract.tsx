@@ -188,7 +188,9 @@ export const MulticontractProvider: React.FC = ({ children }) => {
         contract: contract,
       };
 
-      setQueryAndRouter(newQuery, router);
+      setQueryAndRouter(newQuery, router, {
+        clearQuery: true,
+      });
     }
   };
 

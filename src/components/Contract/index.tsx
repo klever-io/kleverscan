@@ -97,7 +97,6 @@ const Contract: React.FC<IContract> = ({
 
   const {
     setSelectedContractAndQuery,
-    selectedContractType,
     queue,
     isMultiContract,
     clearQuery,
@@ -107,7 +106,11 @@ const Contract: React.FC<IContract> = ({
   const router = useRouter();
   const forceUpdate = useForceUpdate();
 
-  const kappFee = getKappFee(selectedContractType);
+  const currentContract = queue.find(
+    (item: IQueue) => item.elementId === elementId,
+  ) as IQueue;
+
+  const kappFee = getKappFee(currentContract?.contractType);
 
   const formMethods = useForm({
     mode: 'all',
@@ -126,7 +129,7 @@ const Contract: React.FC<IContract> = ({
     if (!isMultiContract && router.isReady && !router.query) {
       setQueryAndRouter(
         {
-          contract: selectedContractType,
+          contract: currentContract?.contractType,
           contractDetails: JSON.stringify(formMethods.getValues()),
         },
         router,
@@ -137,9 +140,8 @@ const Contract: React.FC<IContract> = ({
   const handleFormSubmit = async (data: any) => {
     await handleSubmit(
       data,
-      queue.find((item: IQueue) => item.elementId === elementId)?.metadata ||
-        '',
-      selectedContractType,
+      currentContract?.metadata || '',
+      currentContract?.contractType,
       queue.length,
     );
   };
@@ -159,7 +161,7 @@ const Contract: React.FC<IContract> = ({
 
   const handleShare = async () => {
     const query = new URLSearchParams({
-      contract: selectedContractType,
+      contract: currentContract?.contractType,
       contractDetails: JSON.stringify(formMethods.getValues()),
     }).toString();
 
@@ -195,7 +197,7 @@ const Contract: React.FC<IContract> = ({
         <Select
           options={contractOptions}
           selectedValue={contractOptions.find(
-            item => item.value === selectedContractType,
+            item => item.value === currentContract?.contractType,
           )}
           onChange={changeHandler}
           isDisabled={true}
@@ -216,11 +218,13 @@ const Contract: React.FC<IContract> = ({
         <ConfirmPayload />
         {txHash && <HashComponent {...hashProps} />}
 
-        {contractsDescription[selectedContractType] && (
+        {contractsDescription[currentContract?.contractType] && (
           <CardContainer>
             <Card>
               <div>
-                <span>{contractsDescription[selectedContractType]}</span>
+                <span>
+                  {contractsDescription[currentContract?.contractType]}
+                </span>
                 <span>KApp Fee: {kappFee} KLV</span>
               </div>
             </Card>
@@ -228,7 +232,7 @@ const Contract: React.FC<IContract> = ({
         )}
 
         <RenderContract
-          contractName={selectedContractType}
+          contractName={currentContract?.contractType}
           contractProps={formProps}
         />
 

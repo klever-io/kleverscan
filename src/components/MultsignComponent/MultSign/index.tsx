@@ -70,7 +70,7 @@ const MultisignWithApi: React.FC<{
       requestDecoded({
         RawData: {
           ...multiSignData?.find((e: IMultisignData) => e.hash === selectedHash)
-            .raw,
+            .raw?.RawData,
         },
       }),
     initialData: {},

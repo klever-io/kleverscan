@@ -1,4 +1,4 @@
-import { useContract } from '@/contexts/contract';
+import { useExtension } from '@/contexts/extension';
 import { ICollectionList } from '@/types';
 import { ITOTriggerTypes } from '@/utils/contracts';
 import { useKDASelect } from '@/utils/hooks/contract';
@@ -25,11 +25,10 @@ const ITOTrigger: React.FC<IContractProps> = ({
   handleFormSubmit,
 }) => {
   const { handleSubmit, watch, reset } = useFormContext<ITOTriggerData>();
-  const { getOwnerAddress } = useContract();
+  const { walletAddress } = useExtension();
   const [collection, KDASelect] = useKDASelect();
 
   const triggerType = watch('triggerType');
-  const walletAddress = getOwnerAddress();
 
   const onSubmit = async (data: ITOTriggerData) => {
     parseConfigITO(data);

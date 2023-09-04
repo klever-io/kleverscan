@@ -6,8 +6,6 @@ import { ChartDailyTransactions } from '@/components/HomeTransactions/ChartDaily
 import { HomeInput } from '@/components/InputGlobal/HomeInput';
 import QuickAccess from '@/components/QuickAccess';
 import Wizard from '@/components/Wizard';
-// import WizCreateNFT from '@/components/WIzard/createNFT';
-import { useExtension } from '@/contexts/extension';
 import { HomeDataProvider } from '@/contexts/mainPage';
 import { useMobile } from '@/contexts/mobile';
 import {
@@ -20,17 +18,10 @@ import React, { useEffect, useState } from 'react';
 
 const Home: React.FC = () => {
   const [wizard, setWizard] = useState(null);
-  const { extensionInstalled, connectExtension } = useExtension();
 
   useEffect(() => {
     document.body.style.overflow = !!wizard ? 'hidden' : 'visible';
   }, [wizard]);
-
-  useEffect(() => {
-    if (extensionInstalled) {
-      connectExtension();
-    }
-  }, [extensionInstalled]);
 
   const wizProps = {
     isOpen: wizard,

@@ -1,4 +1,5 @@
 import { useContract } from '@/contexts/contract';
+import { useExtension } from '@/contexts/extension';
 import { parseAddress } from '@/utils/parseValues';
 import React, { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -18,7 +19,8 @@ const Undelegate: React.FC<IContractProps> = ({
   const [bucketsList, setBucketsList] = useState<any>([]);
 
   const { handleSubmit } = useFormContext<FormData>();
-  const { getAssets, getOwnerAddress } = useContract();
+  const { getAssets } = useContract();
+  const { walletAddress } = useExtension();
 
   const onSubmit = async (data: FormData) => {
     await handleFormSubmit(data);
@@ -30,7 +32,7 @@ const Undelegate: React.FC<IContractProps> = ({
       const buckets: SelectOption[] = [];
       assetsList?.forEach((asset: any) => {
         asset?.buckets?.forEach((bucket: any) => {
-          if (bucket?.delegation !== getOwnerAddress() && bucket.delegation) {
+          if (bucket?.delegation !== walletAddress && bucket.delegation) {
             buckets.push({
               label: parseAddress(bucket.id, 20),
               value: bucket.id,

@@ -11,9 +11,9 @@ import { toast } from 'react-toastify';
 
 interface IExtension {
   extensionInstalled: boolean;
-  connectExtension: () => void;
+  connectExtension: () => Promise<void>;
   logoutExtension: () => void;
-  walletAddress: string | null;
+  walletAddress: string;
   extensionLoading: boolean;
   openDrawer: boolean;
   setOpenDrawer: React.Dispatch<React.SetStateAction<boolean>>;
@@ -24,7 +24,7 @@ export const Extension = createContext({} as IExtension);
 export const ExtensionProvider: React.FC = ({ children }) => {
   const [extensionInstalled, setExtensionInstalled] = useState(false);
   const [extensionLoading, setExtensionLoading] = useState(false);
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [walletAddress, setWalletAddress] = useState<string>('');
   const [openDrawer, setOpenDrawer] = useState(false);
 
   useEffect(() => {

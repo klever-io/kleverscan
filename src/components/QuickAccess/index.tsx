@@ -1,5 +1,4 @@
-import { useExtension } from '@/contexts/extension';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import ModalContract, { IModalContract } from '../Contract/ModalContract';
 import { Title } from '../InputGlobal/HomeInput/styles';
 import { Carousel } from './Carousel';
@@ -18,8 +17,6 @@ const QuickAccess: React.FC<{
   const [contractType, setContractType] = useState('');
   const [openModalTransactions, setOpenModalTransactions] = useState(false);
   const [titleModal, setTitleModal] = useState('');
-
-  const { extensionInstalled, connectExtension } = useExtension();
 
   const quickAccessContract: IShortCutContract[] = [
     { title: 'Transfer', type: 'TransferContract' },
@@ -50,16 +47,11 @@ const QuickAccess: React.FC<{
       contract.openWiz();
       return;
     }
+
     setContractType(contract.type);
     setOpenModalTransactions(true);
     setTitleModal(`${contract.title} Contract`);
   };
-
-  useEffect(() => {
-    if (extensionInstalled) {
-      connectExtension();
-    }
-  }, [extensionInstalled]);
 
   return (
     <Container>

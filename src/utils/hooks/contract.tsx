@@ -15,6 +15,7 @@ import {
 import { useContract } from '@/contexts/contract';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { ReloadWrapper } from '@/contexts/contract/styles';
+import { useExtension } from '@/contexts/extension';
 import { ICollectionList } from '@/types';
 import { NextRouter, useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -75,7 +76,8 @@ export const useKDASelect = (
 
   const router = useRouter();
 
-  const { getAssets, getKAssets, getOwnerAddress } = useContract();
+  const { getAssets, getKAssets } = useContract();
+  const { walletAddress } = useExtension();
 
   const {
     selectedContractType: contractType,
@@ -279,7 +281,7 @@ export const useKDASelect = (
               contractType,
               assetTriggerType,
               withdrawType,
-              getOwnerAddress(),
+              walletAddress,
             )}
             onChange={onChangeHandler}
             loading={loading}

@@ -78,7 +78,6 @@ export interface IContractContext {
   setPermID: React.Dispatch<React.SetStateAction<number>>;
   getAssets: () => Promise<ICollectionList[]>;
   getKAssets: () => Promise<ICollectionList[] | undefined>;
-  getOwnerAddress: () => string;
   formSend: () => Promise<void>;
   resetFormsData: () => void;
   handleSubmit: (
@@ -115,12 +114,13 @@ export const ContractProvider: React.FC = ({ children }) => {
 
   const router = useRouter();
 
-  const getOwnerAddress = () => {
-    if (typeof window === 'undefined') return '';
-    return sessionStorage.getItem('walletAddress') || '';
-  };
+  const [senderAccount, setSenderAccount] = useState<string>('');
 
-  const [senderAccount, setSenderAccount] = useState<string>(getOwnerAddress());
+  useEffect(() => {
+    if (walletAddress !== '' && senderAccount === '') {
+      setSenderAccount(walletAddress);
+    }
+  }, [walletAddress]);
 
   useEffect(() => {
     if (txHash && router.pathname === '/create-transaction') {
@@ -129,12 +129,14 @@ export const ContractProvider: React.FC = ({ children }) => {
   }, [txHash]);
 
   const getKAssets = async () => {
-    const address = sessionStorage.getItem('walletAddress') || '';
+    if (walletAddress === '') {
+      return [] as ICollectionList[];
+    }
 
     const response: IAssetsResponse = await api.get({
       route: `assets/list`,
       query: {
-        owner: address,
+        owner: walletAddress,
         limit: 10000,
       },
     });
@@ -159,14 +161,12 @@ export const ContractProvider: React.FC = ({ children }) => {
   };
 
   const getAssets = async () => {
-    const address = sessionStorage.getItem('walletAddress') || '';
-
-    if (address === '' && router.pathname === '/create-transaction') {
+    if (walletAddress === '') {
       return [] as ICollectionList[];
     }
 
     const account: IAccountResponse = await api.get({
-      route: `address/${address}`,
+      route: `address/${walletAddress}`,
     });
 
     if (
@@ -372,7 +372,7 @@ export const ContractProvider: React.FC = ({ children }) => {
     });
     try {
       let nonce;
-      if (senderAccount !== getOwnerAddress()) {
+      if (senderAccount !== walletAddress) {
         const senderData: INodeAccountResponse = await api.get({
           route: `address/${senderAccount}`,
           service: Service.NODE,
@@ -401,9 +401,7 @@ export const ContractProvider: React.FC = ({ children }) => {
       if (isMultisig.current) {
         let parseMultisignTransaction;
         const senderAddress =
-          senderAccount !== getOwnerAddress()
-            ? senderAccount
-            : getOwnerAddress();
+          senderAccount !== walletAddress ? senderAccount : walletAddress;
         if (signTxMultiSign.current) {
           const signedTx = await window.kleverWeb.signTransaction(
             unsignedTx.result,
@@ -521,7 +519,6 @@ export const ContractProvider: React.FC = ({ children }) => {
     signTxMultiSign,
     contractOptions,
     setContractOptions,
-    getOwnerAddress,
     formSend,
     handleSubmit,
     payload,

@@ -2,7 +2,6 @@ import AdvancedOptions from '@/components/Form/AdvancedOptions';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useContractModal } from '@/contexts/contractModal';
 import { useExtension } from '@/contexts/extension';
-import { useDidUpdateEffect } from '@/utils/hooks';
 import { QueueItemContainer } from '@/views/create-transaction';
 import { useEffect } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
@@ -31,7 +30,7 @@ const ModalContract: React.FC<IModalContract> = ({
 
   const { setOpenModal } = useContractModal();
 
-  useDidUpdateEffect(() => {
+  useEffect(() => {
     if (extensionInstalled) {
       connectExtension();
     }

@@ -1,5 +1,5 @@
-import { useContract } from '@/contexts/contract';
 import { useMulticontract } from '@/contexts/contract/multicontract';
+import { useExtension } from '@/contexts/extension';
 import { ICollectionList } from '@/types';
 import { assetTriggerTypes } from '@/utils/contracts';
 import { useKDASelect } from '@/utils/hooks/contract';
@@ -47,7 +47,7 @@ const AssetTrigger: React.FC<IContractProps> = ({
   handleFormSubmit,
 }) => {
   const { handleSubmit, watch, reset } = useFormContext<IAssetTrigger>();
-  const { getOwnerAddress } = useContract();
+  const { walletAddress } = useExtension();
   const triggerType = watch('triggerType');
   const [collection, KDASelect] = useKDASelect({
     assetTriggerType: triggerType,
@@ -59,8 +59,6 @@ const AssetTrigger: React.FC<IContractProps> = ({
     metadata,
     setMetadata,
   };
-
-  const walletAddress = getOwnerAddress();
 
   const onSubmit = async (data: IAssetTrigger) => {
     parseAssetTrigger(data);

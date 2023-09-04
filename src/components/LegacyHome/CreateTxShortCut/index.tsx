@@ -1,6 +1,5 @@
 import { PlusWhite, SendWhite } from '@/assets/icons';
 import { useContractModal } from '@/contexts/contractModal';
-import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import React, { useEffect, useRef, useState } from 'react';
 import { RiArrowDownSLine } from 'react-icons/ri';
@@ -23,7 +22,6 @@ const CreateTxShortcut: React.FC = () => {
   const [openDrawer, setOpenDrawer] = useState<boolean>(false);
   const [openDropdown, setOpenDropdown] = useState(false);
 
-  const { extensionInstalled, connectExtension } = useExtension();
   const { isTablet } = useMobile();
 
   const { getInteractionsButtons } = useContractModal();
@@ -33,12 +31,6 @@ const CreateTxShortcut: React.FC = () => {
   };
 
   const contentRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (extensionInstalled) {
-      connectExtension();
-    }
-  }, [extensionInstalled]);
 
   useEffect(() => {
     if (contentRef.current) {

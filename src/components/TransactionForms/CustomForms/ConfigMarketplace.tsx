@@ -1,4 +1,4 @@
-import { useContract } from '@/contexts/contract';
+import { useExtension } from '@/contexts/extension';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -17,9 +17,8 @@ const ConfigMarketplace: React.FC<IContractProps> = ({
   handleFormSubmit,
 }) => {
   const { handleSubmit } = useFormContext<FormData>();
-  const { getOwnerAddress } = useContract();
 
-  const walletAddress = getOwnerAddress();
+  const { walletAddress } = useExtension();
 
   const onSubmit = async (data: FormData) => {
     await handleFormSubmit(data);

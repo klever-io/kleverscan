@@ -1,4 +1,4 @@
-import { useContract } from '@/contexts/contract';
+import { useExtension } from '@/contexts/extension';
 import { ICollectionList } from '@/types';
 import { useKDASelect } from '@/utils/hooks/contract';
 import React from 'react';
@@ -56,9 +56,8 @@ export const parseConfigITO = (data: ConfigITOData): void => {
 
 const ConfigITO: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   const { handleSubmit, watch } = useFormContext<ConfigITOData>();
-  const { getOwnerAddress } = useContract();
 
-  const walletAddress = getOwnerAddress();
+  const { walletAddress } = useExtension();
 
   const [collection, KDASelect] = useKDASelect({
     validateFields: ['maxAmount', 'defaultLimitPerAddress'],

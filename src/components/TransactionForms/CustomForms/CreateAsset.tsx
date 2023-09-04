@@ -1,4 +1,4 @@
-import { useContract } from '@/contexts/contract';
+import { useExtension } from '@/contexts/extension';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { validateImgUrl } from '@/utils/imageValidate';
 import { ICreateAsset } from '@klever/sdk';
@@ -49,9 +49,7 @@ const CreateAsset: React.FC<IContractProps> = ({
   handleFormSubmit,
 }) => {
   const { handleSubmit, watch } = useFormContext<ICreateAsset>();
-  const { getOwnerAddress } = useContract();
-
-  const walletAddress = getOwnerAddress();
+  const { walletAddress } = useExtension();
 
   const isNFT = Boolean(watch('type'));
 

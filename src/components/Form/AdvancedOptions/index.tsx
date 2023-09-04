@@ -18,6 +18,7 @@ import {
 import { useContract } from '@/contexts/contract';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { ReloadWrapper } from '@/contexts/contract/styles';
+import { useExtension } from '@/contexts/extension';
 import getAccount from '@/services/requests/searchBar/account';
 import { IAccountResponse, IDropdownItem } from '@/types';
 import { IAccPermission } from '@/types/contracts';
@@ -35,7 +36,8 @@ import {
 } from './styles';
 
 const PermID: React.FC = () => {
-  const { setPermID, permID, senderAccount, getOwnerAddress } = useContract();
+  const { setPermID, permID, senderAccount } = useContract();
+  const { walletAddress } = useExtension();
 
   const queryFn = () => getAccount(senderAccount);
 
@@ -49,9 +51,7 @@ const PermID: React.FC = () => {
 
   if (res?.data)
     res.data.account.permissions.map((permission: IAccPermission) => {
-      if (
-        permission.signers.some(signer => signer.address === getOwnerAddress())
-      )
+      if (permission.signers.some(signer => signer.address === walletAddress))
         parsedPermissions.push({
           label: `#${permission.id} - ${
             permission.permissionName
@@ -108,12 +108,13 @@ const PermID: React.FC = () => {
 };
 
 const AccountSelect: React.FC = () => {
-  const { setSenderAccount, getOwnerAddress, setPermID } = useContract();
+  const { setSenderAccount, setPermID } = useContract();
+  const { walletAddress } = useExtension();
   const [loggedAccountIsSender, setLoggedAccountIsSender] = useState(true);
 
   useEffect(() => {
     if (loggedAccountIsSender) {
-      setSenderAccount(getOwnerAddress());
+      setSenderAccount(walletAddress);
       setPermID(0);
     }
   }, [loggedAccountIsSender]);
@@ -243,8 +244,9 @@ const MultiSigSelect: React.FC = () => {
 };
 
 const AdvancedOptionsContent: React.FC = () => {
-  const { showPayload, isMultisig, kdaFee, getAssets, getOwnerAddress } =
-    useContract();
+  const { showPayload, isMultisig, kdaFee, getAssets } = useContract();
+  const { walletAddress } = useExtension();
+
   const [loading, setLoading] = useState(false);
 
   const {
@@ -263,13 +265,7 @@ const AdvancedOptionsContent: React.FC = () => {
 
   const getAvailablePoolAssets = async () =>
     filterPoolAssets(
-      getAssetsList(
-        assets || [],
-        'FreezeContract',
-        null,
-        null,
-        getOwnerAddress(),
-      ),
+      getAssetsList(assets || [], 'FreezeContract', null, null, walletAddress),
     );
 
   const { data: assetsPool, isFetching: assetsPoolFetching } = useQuery({

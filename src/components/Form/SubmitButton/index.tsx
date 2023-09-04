@@ -1,6 +1,7 @@
 import Tooltip from '@/components/Tooltip';
 import { useContract } from '@/contexts/contract';
 import { useMulticontract } from '@/contexts/contract/multicontract';
+import { useExtension } from '@/contexts/extension';
 import { FlexSpan } from '@/styles/common';
 import {
   ButtonContainer,
@@ -14,8 +15,18 @@ const SubmitButton: React.FC = () => {
   const { isMultiContract, processFeesMsgs, kdaFeePoolIsFetching } =
     useMulticontract();
 
+  const { extensionInstalled, connectExtension } = useExtension();
+
   const { totalFeesMsg, totalKappFeesMsg, totalBandwidthFeesMsg } =
     processFeesMsgs();
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    if (extensionInstalled) {
+      await connectExtension();
+    }
+    submitForms();
+  };
 
   return !isMultiContract ? (
     <SubmitContainer>
@@ -23,7 +34,7 @@ const SubmitButton: React.FC = () => {
         submit={!txLoading}
         type="submit"
         disabled={txLoading}
-        onClick={submitForms}
+        onClick={handleSubmit}
       >
         Create Transaction
       </ButtonContainer>

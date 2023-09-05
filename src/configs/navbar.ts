@@ -8,6 +8,7 @@ import {
 } from '@/assets/icons';
 import { GiTwoCoins } from 'react-icons/gi';
 import { MdFeedback, MdOutlineLocalMall } from 'react-icons/md';
+import { RiPenNibFill } from 'react-icons/ri';
 import { TbArrowsLeftRight } from 'react-icons/tb';
 export interface INavbarItem {
   name: string;
@@ -67,11 +68,11 @@ const navbarItems: INavbarItem[] = [
         pathTo: '/proposals',
         Icon: Proposal,
       },
-      // {
-      //   name: 'Multisign',
-      //   pathTo: '/multisign',
-      //   Icon: RiPenNibFill,
-      // },
+      {
+        name: 'Multisign',
+        pathTo: '/multisign',
+        Icon: RiPenNibFill,
+      },
       {
         name: 'Charts',
         pathTo: '/charts',

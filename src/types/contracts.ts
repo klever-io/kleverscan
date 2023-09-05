@@ -341,6 +341,7 @@ export interface IAssetTriggerContract {
   logo: string;
   uris: IURIs[];
   role: IRolesInfo;
+  royalties: IRoyaltiesInfo;
   staking?: IStakingInfo;
   kdaPool: IKDAPool;
   precision?: number;

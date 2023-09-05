@@ -223,7 +223,11 @@ export const Row = styled.div<{ isAddressRow?: boolean }>`
       font-weight: 400;
     }
   }
-
+  > strong {
+    min-width: 8rem;
+    font-weight: 600;
+    color: ${props => props.theme.darkText};
+  }
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: column;
     align-items: flex-start;
@@ -238,6 +242,7 @@ export const Row = styled.div<{ isAddressRow?: boolean }>`
 
 export const RowContent = styled.div`
   width: 100%;
+  min-width: 30%;
 `;
 
 export const CenteredRow = styled.div`
@@ -295,10 +300,10 @@ export const FrozenContainer = styled.div`
   flex-direction: column;
 
   background-color: ${props => props.theme.accountCard.frozenBackground};
-
   border-radius: 0.75rem;
 
   div {
+    overflow: hidden;
     padding: 1.25rem 2rem;
 
     display: flex;
@@ -311,7 +316,7 @@ export const FrozenContainer = styled.div`
       border-bottom-right-radius: 0px;
     }
     &:not(:first-child) {
-      border-top: 1px solid ${props => props.theme.card.border};
+      /* border-top: 1px solid ${props => props.theme.card.border}; */
     }
     strong {
       width: 10rem;

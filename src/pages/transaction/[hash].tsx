@@ -580,6 +580,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
                 <div key={`${index}`}>
                   <AssetTrigger
                     {...contract}
+                    sender={sender}
                     contractIndex={index}
                     filteredReceipts={filteredReceipts}
                     renderMetadata={() => renderMetadata(data, index)}

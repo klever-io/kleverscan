@@ -242,13 +242,17 @@ export const URIsWrapper = styled.div`
 export const RoleWrapper = styled.section`
   display: flex;
   flex-direction: column;
-  overflow: scroll;
+  overflow: auto;
 `;
 
 export const RoleDiv = styled.div`
   display: flex !important;
   flex-direction: row !important;
 
+  > div {
+    width: 10rem;
+    padding: 0;
+  }
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     align-items: flex-start !important;
     flex-direction: column !important;

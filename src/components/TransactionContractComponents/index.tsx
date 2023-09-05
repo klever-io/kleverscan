@@ -97,6 +97,41 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import Tooltip from '../Tooltip';
 
+const getNFTNonces = (
+  filteredReceipts: IBuyReceipt[],
+  parameter: any,
+  sender: string,
+) => {
+  return filteredReceipts.filter((receipt: IReceipt) => {
+    const possibleTransferReceipt = receipt as ITransferReceipt;
+    const assetAndNonce = possibleTransferReceipt?.assetId?.split('/');
+    if (assetAndNonce && assetAndNonce.length >= 2) {
+      if (
+        assetAndNonce[0] === parameter.id ||
+        (parameter.assetId && possibleTransferReceipt.to === sender)
+      ) {
+        return assetAndNonce[1];
+      }
+    } else {
+      return null;
+    }
+  });
+};
+
+const renderNFTNonces = (noncesReceipts: IBuyReceipt[]) => {
+  if (noncesReceipts.length) {
+    return (
+      <NonceGrid>
+        {noncesReceipts.map((nonceReceipt: { assetId: string }) => {
+          const nonce = nonceReceipt.assetId.split('/')[1];
+          return <NonceSpan key={nonce}>{nonce}</NonceSpan>;
+        })}
+      </NonceGrid>
+    );
+  }
+  return null;
+};
+
 export const Transfer: React.FC<IIndexedContract> = ({
   parameter: par,
   filteredReceipts: rec,
@@ -1366,10 +1401,14 @@ export const Unjail: React.FC<IIndexedContract> = ({ renderMetadata }) => {
 export const AssetTrigger: React.FC<IIndexedContract> = ({
   parameter: par,
   renderMetadata,
+  filteredReceipts: rec,
+  sender,
 }) => {
   const parameter = par as IAssetTriggerContract;
   const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
   const precision = usePrecision(assetID);
+  const filteredReceipts = rec as IBuyReceipt[];
+  const noncesReceipts = getNFTNonces(filteredReceipts, parameter, sender);
 
   return (
     <>
@@ -1391,6 +1430,14 @@ export const AssetTrigger: React.FC<IIndexedContract> = ({
         </span>
         <span>{parameter?.assetId}</span>
       </Row>
+      {!!noncesReceipts.length && (
+        <Row>
+          <span>
+            <strong>NFTs Nonces</strong>
+          </span>
+          {renderNFTNonces(noncesReceipts)}
+        </Row>
+      )}
       {renderAssetTriggerTypeData(parameter, precision)}
       {renderMetadata()}
     </>
@@ -1635,6 +1682,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
   const buyType = parameter?.buyType;
   let currencyId = '';
   let assetId = '';
+
   const senderKAppTransferReceipt = findReceiptWithSender(
     filteredReceipts,
     14,
@@ -1808,38 +1856,9 @@ export const Buy: React.FC<IContractBuyProps> = ({
       return null;
     };
 
-    const getNFTNonces = () => {
-      return filteredReceipts.filter((receipt: IReceipt) => {
-        const possibleTransferReceipt = receipt as ITransferReceipt;
-        const assetAndNonce = possibleTransferReceipt?.assetId?.split('/');
-        if (
-          assetAndNonce &&
-          assetAndNonce[0] === parameter.id &&
-          assetAndNonce[1] &&
-          possibleTransferReceipt.to === sender
-        ) {
-          return assetAndNonce[1];
-        }
-      });
-    };
-
-    const renderNFTNonces = () => {
-      if (noncesReceipts.length) {
-        return (
-          <NonceGrid>
-            {noncesReceipts.map(nonceReceipt => {
-              const nonce = nonceReceipt.assetId.split('/')[1];
-              return <NonceSpan key={nonce}>{nonce}</NonceSpan>;
-            })}
-          </NonceGrid>
-        );
-      }
-      return null;
-    };
-
     const price = getPrice();
     const amount = getAmount();
-    const noncesReceipts = getNFTNonces();
+    const noncesReceipts = getNFTNonces(filteredReceipts, parameter, sender);
 
     return (
       <>
@@ -1875,7 +1894,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
             <span>
               <strong>NFTs Nonces</strong>
             </span>
-            {renderNFTNonces()}
+            {renderNFTNonces(noncesReceipts)}
           </Row>
         )}
         <Row>
@@ -2670,11 +2689,83 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerContract> = (
     </Row>
   );
 
+  const kdaPoolReturn = () => (
+    <Row>
+      <strong>KDAPool</strong>
+      <RowContent>
+        <BalanceContainer>
+          <FrozenContainer>
+            <RoleWrapper>
+              <RoleDiv>
+                <StrongWidth>Active</StrongWidth>
+                <span>{par.kdaPool.active ? 'true' : 'false'}</span>
+              </RoleDiv>
+              <RoleDiv>
+                <StrongWidth>Admin Address</StrongWidth>
+                <span>{par.kdaPool.adminAddress}</span>
+                <Copy data={par.kdaPool.adminAddress} />
+              </RoleDiv>
+              <RoleDiv>
+                <StrongWidth>fRationKDA</StrongWidth>
+                <span>{par.kdaPool.fRatioKDA}</span>
+              </RoleDiv>
+              <RoleDiv>
+                <StrongWidth>fRationKLV</StrongWidth>
+                <span>{par.kdaPool.fRatioKLV}</span>
+              </RoleDiv>
+              <RoleDiv>
+                <StrongWidth>KDA</StrongWidth>
+                <span>{par.kdaPool.kda}</span>
+              </RoleDiv>
+            </RoleWrapper>
+          </FrozenContainer>
+        </BalanceContainer>
+      </RowContent>
+    </Row>
+  );
+
+  const royaltiesReturn = () => (
+    <Row>
+      <strong>Royalties</strong>
+      <RowContent>
+        <BalanceContainer>
+          <FrozenContainer>
+            <RoleWrapper>
+              <RoleDiv>
+                <StrongWidth>Address</StrongWidth>
+                <span>{par.royalties.address || '--'}</span>
+                <Copy data={par.royalties.address} />
+              </RoleDiv>
+              <RoleDiv>
+                <StrongWidth>ITO Fixed</StrongWidth>
+                <span>{par.royalties.itoFixed || '--'}</span>
+              </RoleDiv>
+              <RoleDiv>
+                <StrongWidth>ITO Percentage</StrongWidth>
+                <span>{par.royalties.itoPercentage / 100 || 0}%</span>
+              </RoleDiv>
+              <RoleDiv>
+                <StrongWidth>Market Fixed</StrongWidth>
+                <span>{par.royalties.marketFixed || '--'}</span>
+              </RoleDiv>
+              <RoleDiv>
+                <StrongWidth>Market Percentage</StrongWidth>
+                <span>{par.royalties.marketPercentage / 100 || 0}%</span>
+              </RoleDiv>
+              <RoleDiv>
+                <StrongWidth>Transfer Fixed</StrongWidth>
+                <span>{par.royalties.transferFixed || '--'}</span>
+              </RoleDiv>
+            </RoleWrapper>
+          </FrozenContainer>
+        </BalanceContainer>
+      </RowContent>
+    </Row>
+  );
+
   const roleReturn = () => (
     <Row>
-      <span>
-        <strong>Role</strong>
-      </span>
+      <strong>Role</strong>
       <RowContent>
         <BalanceContainer>
           <FrozenContainer>
@@ -2689,11 +2780,11 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerContract> = (
 
               <RoleDiv>
                 <RoleStrong>HasRoleMint</RoleStrong>
-                <span>{String(par.role.hasRoleMint)}</span>
+                <span>{statusWithIcon(par.role.hasRoleMint)}</span>
               </RoleDiv>
               <RoleDiv>
                 <RoleStrong>HasRoleSetITOPrices</RoleStrong>
-                <span>{String(par.role.hasRoleSetITOPrices)}</span>
+                <span>{statusWithIcon(par.role.hasRoleSetITOPrices)}</span>
               </RoleDiv>
             </RoleWrapper>
           </FrozenContainer>
@@ -2822,9 +2913,9 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerContract> = (
     case EnumTriggerTypeName.UpdateStaking:
       return updateStakingReturn();
     case EnumTriggerTypeName.UpdateRoyalties:
-      return null;
+      return royaltiesReturn();
     case EnumTriggerTypeName.UpdateKDAFeePool:
-      return null;
+      return kdaPoolReturn();
     case EnumTriggerTypeName.StopRoyaltiesChange:
       return null;
     default:

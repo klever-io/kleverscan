@@ -19,7 +19,7 @@ describe('Component: Header/navbar', () => {
     'Validators',
     // 'Nodes',
     'Proposals',
-    'Multisign',
+    // 'Multisign',
     'Charts',
     'ITOs',
     'Encoding Converter',

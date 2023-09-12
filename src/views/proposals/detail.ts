@@ -178,7 +178,10 @@ export const VotesHeader = styled.div`
   }
 `;
 
-export const ProgressBarVotes = styled.div<{ width?: string }>`
+export const ProgressBarVotes = styled.div<{
+  width?: string;
+  noMarginBottom?: boolean;
+}>`
   margin-top: 2rem;
   margin-bottom: 2rem;
 
@@ -187,6 +190,11 @@ export const ProgressBarVotes = styled.div<{ width?: string }>`
     css`
       width: ${props.width};
       margin-top: 0;
+    `}
+  ${props =>
+    props?.noMarginBottom &&
+    css`
+      margin-bottom: 0;
     `}
 
   span {

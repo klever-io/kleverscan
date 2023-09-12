@@ -8,11 +8,9 @@ import { Service } from '@/types';
 import { getPrecision } from '@/utils/precisionFunctions';
 import {
   PassThresholdContainer,
-  PassThresholdText,
   ProgressBar,
   ProgressBarContent,
   ProgressBarVotes,
-  VerticalLine,
 } from '@/views/proposals/detail';
 import {
   CardContainer,
@@ -257,12 +255,8 @@ export const OverviewInfo: React.FC<IMultisignOverview> = ({
   const ThresholdComponent: React.FC = () => {
     return (
       <>
-        <ProgressBarVotes width={'60%'}>
+        <ProgressBarVotes width={'60%'} noMarginBottom>
           <PassThresholdContainer>
-            <PassThresholdContainer>
-              <PassThresholdText>Pass threshold</PassThresholdText>
-              <VerticalLine />
-            </PassThresholdContainer>
             <Progress />
           </PassThresholdContainer>
         </ProgressBarVotes>

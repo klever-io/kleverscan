@@ -259,7 +259,7 @@ export const WizardButton = styled.button<{
   }
 
   :disabled {
-    background: lightgray;
+    background: ${props => props.theme.lightBlue};
     cursor: not-allowed;
   }
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
@@ -343,7 +343,6 @@ export const CardContainer = styled.div`
 `;
 
 export const GenericCardContainer = styled.div<{
-  margin?: number;
   alignCenter?: boolean;
 }>`
   display: flex;
@@ -423,6 +422,7 @@ export const GenericInput = styled.input<{
   align?: string;
   error?: boolean | null;
   addPadding?: boolean;
+  isUpperCase?: boolean;
 }>`
   line-height: 2rem;
   height: 4rem;
@@ -464,6 +464,11 @@ export const GenericInput = styled.input<{
       border-radius: 10px;
       background: ${transparentize(0.8, props.theme.error)};
     `};
+  ${props =>
+    props.isUpperCase &&
+    css`
+      text-transform: uppercase;
+    `}
 `;
 
 export const ErrorMessage = styled.div`
@@ -949,7 +954,11 @@ export const StepsContainer = styled.div<{ advancedSteps?: boolean }>`
   }
 `;
 
-export const StepsItem = styled.div<{ isDone: boolean; selected: boolean }>`
+export const StepsItem = styled.div<{
+  isDone: boolean;
+  selected: boolean;
+  isUpperCase?: boolean;
+}>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -970,6 +979,11 @@ export const StepsItem = styled.div<{ isDone: boolean; selected: boolean }>`
     props.selected &&
     css`
       border-color: #fff;
+    `}
+  ${props =>
+    props.isUpperCase &&
+    css`
+      text-transform: uppercase;
     `}
 `;
 
@@ -1024,6 +1038,31 @@ export const DesktopBasicSteps = styled.div`
   }
 `;
 
+export const DesktopStepsLabel = styled.div<{ isUpperCase?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  cursor: pointer;
+  > span {
+    font-weight: 500;
+    line-height: 1rem;
+  }
+  > span:first-child {
+    font-size: 0.95rem;
+    color: #646693;
+  }
+
+  > span:last-child {
+    font-size: 1.2rem;
+    color: #fff;
+    ${props =>
+      props.isUpperCase &&
+      css`
+        text-transform: uppercase;
+      `}
+  }
+`;
+
 export const StepsItemContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -1047,23 +1086,6 @@ export const StepsItemContainerDesktop = styled.div<{ selected: boolean }>`
   color: ${props => (props.selected ? '#fff' : '#646693')};
 
   > div:last-child {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-    cursor: pointer;
-    > span {
-      font-weight: 500;
-      line-height: 1rem;
-    }
-    > span:first-child {
-      font-size: 0.95rem;
-      color: #646693;
-    }
-
-    > span:last-child {
-      font-size: 1.2rem;
-      color: #fff;
-    }
   }
 `;
 

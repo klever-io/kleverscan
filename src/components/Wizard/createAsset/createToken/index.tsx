@@ -29,6 +29,7 @@ import {
   CreateAssetStakingStep,
   CreateAssetThirdStep,
   DesktopStepsComponent,
+  infinitySymbol,
   propertiesCommonDefaultValues,
   StepsBasics,
   URIsSection,
@@ -215,7 +216,7 @@ const WizCreateToken: React.FC<any> = ({
     defaultValues: {
       ...propertiesCommonDefaultValues,
       precision: 2,
-      initialSupply: 0,
+      initialSupply: '',
     },
   });
   const { handleSubmit, watch } = methods;
@@ -259,8 +260,8 @@ const WizCreateToken: React.FC<any> = ({
     parseAddress(ownerAddress, 14),
     assetPrecision,
     assetInitialSupply || 0,
-    assetMaxSupply || 0,
-    parseAddress(assetImage, 14),
+    assetMaxSupply || infinitySymbol,
+    parseAddress(assetImage, 14) || '--',
   ];
 
   const stepsCompProps = {

@@ -23,6 +23,7 @@ import {
   CreateAssetSevenStep,
   CreateAssetThirdStep,
   DesktopStepsComponent,
+  infinitySymbol,
   propertiesCommonDefaultValues,
   StepsBasics,
   URIsSection,
@@ -231,8 +232,8 @@ const WizCreateNFT: React.FC<any> = ({
     assetName,
     assetTicker,
     parseAddress(ownerAddress || '', 14),
-    assetMaxSupply || 0,
-    parseAddress(assetImage || '', 14),
+    assetMaxSupply || infinitySymbol,
+    parseAddress(assetImage || '', 14) || '--',
   ];
 
   const stepsCompProps = {

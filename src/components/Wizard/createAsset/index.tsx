@@ -35,6 +35,7 @@ import {
   DefaultSettingsContainer,
   DefaultSettingsOptions,
   DesktopBasicSteps,
+  DesktopStepsLabel,
   ErrorInputContainer,
   ErrorMessage,
   GenericAddressCard,
@@ -163,7 +164,7 @@ export const propertiesCommonDefaultValues = {
   name: '',
   ticker: '',
   ownerAddress: '',
-  maxSupply: 0,
+  maxSupply: '',
   logo: '',
   properties: {
     canAddRoles: true,
@@ -175,6 +176,8 @@ export const propertiesCommonDefaultValues = {
     canWipe: false,
   },
 };
+
+export const infinitySymbol = '\u221e';
 
 export const ButtonsComponent: React.FC<IButtonsComponenets> = ({
   buttonsProps: { handleStep, next, previousStep },
@@ -205,7 +208,7 @@ export const ButtonsComponent: React.FC<IButtonsComponenets> = ({
       {noNextButton ? (
         <></>
       ) : (
-        <WizardButton type="button" onClick={handleClick}>
+        <WizardButton type="button" onClick={handleClick} disabled={!!!next}>
           <p>Next</p>
           <WizardRightArrow />
         </WizardButton>
@@ -304,6 +307,10 @@ export const CreateAssetSecondStep: React.FC<IAssetInformations> = ({
             autoFocus={true}
             {...register('name', {
               required: { value: true, message: 'This field is required' },
+              pattern: {
+                value: /^[^\s]+(\s+[^\s]+)*$/,
+                message: 'Cannot start/end with blank space',
+              },
             })}
           />
 
@@ -343,7 +350,7 @@ export const CreateAssetThirdStep: React.FC<IAssetInformations> = ({
   };
 
   return (
-    <GenericCardContainer margin={20}>
+    <GenericCardContainer>
       <div>
         <p>Basic information</p>
         <p>STEP {currentStep}</p>
@@ -355,11 +362,24 @@ export const CreateAssetThirdStep: React.FC<IAssetInformations> = ({
           error={error}
           type="text"
           autoFocus={true}
+          isUpperCase
           {...register('ticker', {
             required: { value: true, message: 'This field is required' },
             minLength: {
               value: 3,
               message: 'Must have at least 3 characteres',
+            },
+            pattern: {
+              value: /^[^\s]*$/,
+              message: 'Cannot contain any spaces in the ticker',
+            },
+            validate: (value: string) => {
+              if (
+                value.toUpperCase() === 'KLV' ||
+                value.toUpperCase() === 'KFI'
+              ) {
+                return 'Ticker cannot be KLV nor KFI';
+              }
             },
           })}
         />
@@ -434,7 +454,7 @@ export const CreateAssetFourthStep: React.FC<IAssetInformations> = ({
   };
 
   return (
-    <GenericCardContainer margin={19}>
+    <GenericCardContainer>
       <div>
         <p>Basic information</p>
         <p>STEP {currentStep}</p>
@@ -598,7 +618,7 @@ export const CreateAssetRoyaltyAddress: React.FC<IWizardComponents> = ({
   };
 
   return (
-    <GenericCardContainer margin={19}>
+    <GenericCardContainer>
       <div>
         <p>Advanced Option</p>
         <p>STEP 2/5</p>
@@ -723,7 +743,7 @@ const CreateAssetRoyaltyITOToken: React.FC<any> = ({ buttonsProps }) => {
   }
 
   return (
-    <GenericCardContainer margin={20}>
+    <GenericCardContainer>
       <div>
         <p>Advanced Option</p>
         <p>STEP 3/5</p>
@@ -801,7 +821,7 @@ const CreateAssetRoyaltyITONFT: React.FC<any> = ({ buttonsProps }) => {
   }
 
   return (
-    <GenericCardContainer margin={20}>
+    <GenericCardContainer>
       <div>
         <p>Advanced Option</p>
         <p>STEP 3/5</p>
@@ -960,7 +980,7 @@ export const CreateAssetRoyaltyTransferPerc: React.FC<IWizardComponents> = ({
   }, []);
 
   return (
-    <GenericCardContainer margin={18} alignCenter>
+    <GenericCardContainer alignCenter>
       <div>
         <p>Transfer Percentage</p>
         <p key={fields.length}>
@@ -1118,7 +1138,7 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
   }, []);
 
   return !splitRoyalties ? (
-    <GenericCardContainer margin={18}>
+    <GenericCardContainer>
       <div>
         <p>ADVANCED OPTION</p>
         <p>Split Royalties</p>
@@ -1147,7 +1167,7 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
       <ButtonsComponent buttonsProps={buttonsProps} noNextButton />
     </GenericCardContainer>
   ) : (
-    <GenericCardContainer margin={18} alignCenter>
+    <GenericCardContainer alignCenter>
       <div>
         <p>Split Royalties</p>
         <p key={fields.length}>
@@ -1355,7 +1375,7 @@ export const CreateAssetRoyaltySteps: React.FC<IWizardComponents> = ({
   }, [currentStep]);
 
   return !royalties ? (
-    <GenericCardContainer margin={18}>
+    <GenericCardContainer>
       <div>
         <p>ADVANCED OPTIONS</p>
         <p>Royalties</p>
@@ -1480,13 +1500,13 @@ export const CreateAssetSixStep: React.FC<IWizardComponents> = ({
   };
 
   return (
-    <GenericCardContainer margin={21}>
+    <GenericCardContainer>
       <div>
         <p>Basic information</p>
         <p>STEP 5/7</p>
       </div>
       <div>
-        <p>Initial Supply of {ticker || ''}</p>
+        <p>Initial Supply of {ticker}</p>
         <p>
           The initial amount refers to the quantity of tokens that will be
           minted at the beginning of the token creation process.
@@ -1540,7 +1560,7 @@ export const CreateAssetSevenStep: React.FC<IAssetInformations> = ({
   };
 
   return (
-    <GenericCardContainer margin={22}>
+    <GenericCardContainer>
       <div>
         <p>Basic information</p>
         <p>STEP 6/7</p>
@@ -1593,7 +1613,7 @@ export const CreateAssetEightStep: React.FC<IAssetInformations> = ({
   };
 
   return (
-    <GenericCardContainer margin={18}>
+    <GenericCardContainer>
       <div>
         <p>Basic information</p>
         <p>STEP {currentStep}</p>
@@ -1687,7 +1707,7 @@ export const URIsSection: React.FC<IAssetInformations> = ({
   }, []);
 
   return !addUri ? (
-    <GenericCardContainer margin={18}>
+    <GenericCardContainer>
       <div>
         <p>ADVANCED OPTIONS</p>
         <p>URI</p>
@@ -1724,7 +1744,7 @@ export const URIsSection: React.FC<IAssetInformations> = ({
       <ButtonsComponent buttonsProps={buttonsProps} noNextButton />
     </GenericCardContainer>
   ) : (
-    <GenericCardContainer margin={18} alignCenter>
+    <GenericCardContainer alignCenter>
       <div>
         <p>URI</p>
         <p key={fields.length}>
@@ -1823,7 +1843,7 @@ const SelectStakingTypeComponent: React.FC<IWizardStakingComponents> = ({
   };
 
   return (
-    <GenericCardContainer margin={18}>
+    <GenericCardContainer>
       <div>
         <p>STAKING</p>
         <p>STEP 1</p>
@@ -1905,7 +1925,7 @@ const StakingStepsGeneric: React.FC<IWizardStakingComponents> = ({
   };
 
   return (
-    <GenericCardContainer margin={22}>
+    <GenericCardContainer>
       <div>
         <p>STAKING</p>
         <p>{renderStakingStep()}</p>
@@ -1970,7 +1990,7 @@ const StakingStepsGenericAprFprOne: React.FC<IWizardStakingComponents> = ({
   };
 
   return (
-    <GenericCardContainer margin={22}>
+    <GenericCardContainer>
       <div>
         <p>STAKING</p>
         <p>{renderStakingStep()}</p>
@@ -2037,7 +2057,7 @@ const StakingStepsGenericAprFprTwo: React.FC<IWizardStakingComponents> = ({
   };
 
   return (
-    <GenericCardContainer margin={22}>
+    <GenericCardContainer>
       <div>
         <p>STAKING</p>
         <p>{renderStakingStep()}</p>
@@ -2104,7 +2124,7 @@ const StakingStepsGenericAprFprThree: React.FC<IWizardStakingComponents> = ({
   };
 
   return (
-    <GenericCardContainer margin={22}>
+    <GenericCardContainer>
       <div>
         <p>STAKING</p>
         <p>{renderStakingStep()}</p>
@@ -2204,7 +2224,7 @@ export const CreateAssetStakingStep: React.FC<IWizardComponents> = ({
   }, [currentStep]);
 
   return !staking ? (
-    <GenericCardContainer margin={18}>
+    <GenericCardContainer>
       <div>
         <p>ADVANCED OPTIONS</p>
         <p>STAKING</p>
@@ -2291,7 +2311,7 @@ export const CreateAssetAddRoles: React.FC<IAssetInformations> = ({
   }, []);
 
   return !addRole ? (
-    <GenericCardContainer margin={18}>
+    <GenericCardContainer>
       <div>
         <p>ADVANCED OPTIONS</p>
         <p>ROLES</p>
@@ -2323,7 +2343,7 @@ export const CreateAssetAddRoles: React.FC<IAssetInformations> = ({
       <ButtonsComponent buttonsProps={buttonsProps} noNextButton />
     </GenericCardContainer>
   ) : (
-    <GenericCardContainer margin={18}>
+    <GenericCardContainer>
       <div>
         <p>Roles</p>
         <p key={fields.length}>
@@ -2424,7 +2444,7 @@ export const CreateAssetPropertiesStep: React.FC<IAssetInformations> = ({
   };
 
   return (
-    <GenericCardContainer margin={18.5}>
+    <GenericCardContainer>
       <div>
         <p>ADVANCED OPTIONS</p>
         <p>PROPERTIES</p>
@@ -2477,7 +2497,7 @@ export const CreateAssetPreConfimStep: React.FC<IAssetInformations> = ({
   };
 
   return (
-    <GenericCardContainer margin={18}>
+    <GenericCardContainer>
       <div>
         <p>Basic information</p>
         <p>Already</p>
@@ -2604,11 +2624,11 @@ export const TransactionDetails2: React.FC<{
         </ConfirmCardBasisInfo>
         <ConfirmCardBasisInfo secondary>
           <span>{assetText} ticker</span>
-          <span>{ticker}</span>
+          <span>{ticker.toUpperCase()}</span>
         </ConfirmCardBasisInfo>
         <ConfirmCardBasisInfo secondary>
           <span>Max Supply</span>
-          <span>{maxSupply ? maxSupply : '\u221e'}</span>
+          <span>{maxSupply ? maxSupply : infinitySymbol}</span>
         </ConfirmCardBasisInfo>
 
         <ConfirmCardBasisInfo secondary>
@@ -2719,7 +2739,7 @@ export const ConfirmTransaction: React.FC<IWizardConfirmProps> = ({
 
   return (
     <>
-      <GenericCardContainer margin={40}>
+      <GenericCardContainer>
         <div>
           <p>Create {assetText.charAt}</p>
           <p>Review</p>
@@ -2737,7 +2757,7 @@ export const ConfirmTransaction: React.FC<IWizardConfirmProps> = ({
             </div>
             <ConfirmCardBasisInfo>
               <span>Max supply</span>
-              <span>{maxSupply ? maxSupply : '\u221e'}</span>
+              <span>{maxSupply ? maxSupply : infinitySymbol}</span>
             </ConfirmCardBasisInfo>
             {additionalFields && (
               <ConfirmCardBasisInfo>
@@ -2896,12 +2916,17 @@ export const DesktopStepsComponent: React.FC<any> = ({
                       {selectedStep - 1 <= index && index + 1}
                       {selectedStep - 1 > index && <WhiteTick />}
                     </StepsItem>
-                    <div onClick={() => handleSelectStep(index)}>
+                    <DesktopStepsLabel
+                      onClick={() => handleSelectStep(index)}
+                      isUpperCase={basicStepsLabels[index]
+                        .toLowerCase()
+                        .includes('ticker')}
+                    >
                       <span>{basicStepsLabels[index]}</span>
                       <span>
                         {steps[index].isDone ? basicStepsInfo[index] : ''}
                       </span>
-                    </div>
+                    </DesktopStepsLabel>
                   </StepsItemContainerDesktop>
                 );
               }

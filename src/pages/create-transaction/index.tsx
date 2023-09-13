@@ -29,7 +29,8 @@ const warningMessage = `You don't have enough currency. Please check the amount 
 
 const CreateTransaction: React.FC = () => {
   const [isAccountEmpty, setIsAccountEmpty] = React.useState<boolean>(false);
-  const { extensionInstalled, connectExtension } = useExtension();
+  const { extensionInstalled, connectExtension, walletAddress } =
+    useExtension();
 
   const { isTablet } = useMobile();
 
@@ -58,10 +59,12 @@ const CreateTransaction: React.FC = () => {
         )
       ) {
         setIsAccountEmpty(true);
+      } else {
+        setIsAccountEmpty(false);
       }
     };
     isAccountEmpty();
-  }, []);
+  }, [walletAddress]);
 
   return (
     <Container>

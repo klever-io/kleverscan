@@ -131,12 +131,14 @@ const BasicInfoSection: React.FC<ISectionProps> = ({
         tooltip={tooltip.ticker}
         required
       />
-      <FormInput
-        name="ownerAddress"
-        title="Owner Address"
-        defaultValue={walletAddress}
-        required
-      />
+      {walletAddress && (
+        <FormInput
+          name="ownerAddress"
+          title="Owner Address"
+          defaultValue={walletAddress}
+          required
+        />
+      )}
       {!isNFT && (
         <FormInput
           name="precision"
@@ -243,14 +245,16 @@ export const RoyaltiesSection: React.FC<ISectionProps> = props => {
         </TooltipContainer>
       </SectionTitle>
 
-      <FormInput
-        name="royalties.address"
-        title="Address"
-        span={2}
-        defaultValue={walletAddress}
-        tooltip={tooltip.royalties.address}
-        required
-      />
+      {walletAddress && (
+        <FormInput
+          name="royalties.address"
+          title="Address"
+          span={2}
+          defaultValue={walletAddress}
+          tooltip={tooltip.royalties.address}
+          required
+        />
+      )}
       {isNFT && (
         <FormInput
           name="royalties.transferFixed"

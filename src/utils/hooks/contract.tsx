@@ -115,6 +115,7 @@ export const useKDASelect = (
     queryKey: 'assetsList',
     queryFn: getAssets,
     initialData: [],
+    enabled: walletAddress !== '',
   });
   const {
     data: kassetsList,
@@ -124,6 +125,7 @@ export const useKDASelect = (
     queryKey: 'kassetsList',
     queryFn: getKAssets,
     initialData: [],
+    enabled: walletAddress !== '',
   });
 
   useEffect(() => {

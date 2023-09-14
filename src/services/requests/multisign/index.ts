@@ -5,16 +5,15 @@ import { ITransaction as ITransactionDecoded } from '@/types/index';
 import { ITransaction } from '@klever/sdk';
 import { toast } from 'react-toastify';
 
-export const requestMultisign = async (): Promise<any> => {
+export const requestMultisign = async (walletAddress: string): Promise<any> => {
   try {
-    const getWallet = sessionStorage.getItem('walletAddress');
-    if (!!!getWallet) {
+    if (!!!walletAddress) {
       toast.warning('No wallet connected!');
       return [];
     }
 
     const response = await api.get({
-      route: `transaction/by-address/${getWallet}`,
+      route: `transaction/by-address/${walletAddress}`,
       service: Service.MULTISIGN,
     });
     if (response.error) {

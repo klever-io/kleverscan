@@ -44,11 +44,11 @@ const MultisignWithApi: React.FC<{
   setTxHash: React.Dispatch<React.SetStateAction<string | null>>;
 }> = ({ setTxHash }) => {
   const [selectedHash, setSelectedHash] = useState<string>('');
-  const [walletAddress, setWalletAddress] = useState<string>();
   const [signBcastTransaction, setSignBcastTransaction] = useState(false);
   const [draggingOverlayCount, setDragginOverlayCount] = useState(0);
 
-  const { extensionInstalled, connectExtension } = useExtension();
+  const { extensionInstalled, connectExtension, walletAddress } =
+    useExtension();
 
   const { isDarkTheme } = useTheme();
 
@@ -60,8 +60,9 @@ const MultisignWithApi: React.FC<{
 
   const { data: multiSignData, isFetching: loading } = useQuery({
     queryKey: ['multiSignData'],
-    queryFn: () => requestMultisign(),
+    queryFn: () => requestMultisign(walletAddress),
     initialData: [] as IMultisignData[],
+    enabled: !!walletAddress,
   });
 
   const { data: decodedData } = useQuery({
@@ -74,18 +75,12 @@ const MultisignWithApi: React.FC<{
         },
       }),
     initialData: {},
+    enabled: !!walletAddress,
   });
 
   useEffect(() => {
     setSelectedHash(multiSignData[0]?.hash);
   }, [multiSignData]);
-
-  useEffect(() => {
-    const getWalletAddress = sessionStorage.getItem('walletAddress');
-    if (getWalletAddress) {
-      setWalletAddress(getWalletAddress);
-    }
-  }, []);
 
   const overviewInfoProps = {
     multiSignData: {
@@ -129,7 +124,7 @@ const MultisignWithApi: React.FC<{
       );
     }
 
-    if (walletAddress && !loading && !!!multiSignData.length) {
+    if (walletAddress && !loading && !multiSignData.length) {
       return (
         <EmptyTransaction
           msg={'There are no pending transactions with multisignatures'}
@@ -149,8 +144,12 @@ const MultisignWithApi: React.FC<{
           window.document.body,
         )}
       <RenderMultisignComponent />
-      <ButtonsComponent {...buttonsProps} />
-      <DecodedRawData {...decodedRawProps} />
+      {!!walletAddress && multiSignData.length && (
+        <>
+          <ButtonsComponent {...buttonsProps} />
+          <DecodedRawData {...decodedRawProps} />
+        </>
+      )}
     </Content>
   );
 };

@@ -13,6 +13,7 @@ const defaultEnvs = [
   'BUGSNAG_KEY',
   'BUGSNAG_DISABLED',
   'CANNY_BOARD_TOKEN',
+  'DEFAULT_API_MULTISIGN',
 ];
 
 const getEnvs = () => {

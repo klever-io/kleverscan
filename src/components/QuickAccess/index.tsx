@@ -40,6 +40,7 @@ const QuickAccess: React.FC<{
   const modalOptions: IModalContract = {
     contractType,
     title: titleModal,
+    closeQuickAccessModal: setOpenModalTransactions,
   };
 
   const handleClick = (contract: IShortCutContract, e: any) => {

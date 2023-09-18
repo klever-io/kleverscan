@@ -11,12 +11,14 @@ export interface IModalContract {
   title: string;
   contractType: string;
   defaultValues?: any;
+  closeQuickAccessModal?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ModalContract: React.FC<IModalContract> = ({
   title,
   contractType,
   defaultValues,
+  closeQuickAccessModal,
 }) => {
   const { extensionInstalled, connectExtension } = useExtension();
   const {
@@ -39,6 +41,7 @@ const ModalContract: React.FC<IModalContract> = ({
   const closeModal = () => {
     clearQuery();
     setOpenModal(false);
+    closeQuickAccessModal && closeQuickAccessModal(false);
   };
 
   useEffect(() => {

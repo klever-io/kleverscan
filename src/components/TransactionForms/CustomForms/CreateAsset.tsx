@@ -32,7 +32,6 @@ interface IPrecisionProps {
 }
 interface ISectionProps {
   isNFT?: boolean;
-  walletAddress?: string;
   precision?: number;
 }
 
@@ -49,7 +48,6 @@ const CreateAsset: React.FC<IContractProps> = ({
   handleFormSubmit,
 }) => {
   const { handleSubmit, watch } = useFormContext<ICreateAsset>();
-  const { walletAddress } = useExtension();
 
   const isNFT = Boolean(watch('type'));
 
@@ -60,7 +58,7 @@ const CreateAsset: React.FC<IContractProps> = ({
     await handleFormSubmit(data);
   };
 
-  const sectionProps = { isNFT, walletAddress, precision };
+  const sectionProps = { isNFT, precision };
 
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
@@ -82,15 +80,12 @@ const CreateAsset: React.FC<IContractProps> = ({
   );
 };
 
-const BasicInfoSection: React.FC<ISectionProps> = ({
-  isNFT,
-  walletAddress,
-}) => {
+const BasicInfoSection: React.FC<ISectionProps> = ({ isNFT }) => {
   const [logoError, setLogoError] = useState<string | null>(null);
-  const { watch, trigger } = useFormContext<ICreateAsset>();
+  const { watch, trigger, setValue } = useFormContext<ICreateAsset>();
+  const { walletAddress } = useExtension();
   const precision = watch('precision');
   const logo = watch('logo');
-
   let logoTimeout: ReturnType<typeof setTimeout>;
 
   useEffect(() => {
@@ -131,14 +126,12 @@ const BasicInfoSection: React.FC<ISectionProps> = ({
         tooltip={tooltip.ticker}
         required
       />
-      {walletAddress && (
-        <FormInput
-          name="ownerAddress"
-          title="Owner Address"
-          defaultValue={walletAddress}
-          required
-        />
-      )}
+      <FormInput
+        name="ownerAddress"
+        title="Owner Address"
+        required
+        watchChange={walletAddress}
+      />
       {!isNFT && (
         <FormInput
           name="precision"
@@ -227,7 +220,8 @@ export const URIsSection: React.FC<URIProps> = ({ tooltip: customTooltip }) => {
 };
 
 export const RoyaltiesSection: React.FC<ISectionProps> = props => {
-  const { isNFT, walletAddress } = props;
+  const { isNFT } = props;
+  const { walletAddress } = useExtension();
   let precision = 8;
   if (props?.precision !== undefined) {
     precision = props.precision;
@@ -244,17 +238,14 @@ export const RoyaltiesSection: React.FC<ISectionProps> = props => {
           </TooltipContent>
         </TooltipContainer>
       </SectionTitle>
-
-      {walletAddress && (
-        <FormInput
-          name="royalties.address"
-          title="Address"
-          span={2}
-          defaultValue={walletAddress}
-          tooltip={tooltip.royalties.address}
-          required
-        />
-      )}
+      <FormInput
+        name="royalties.address"
+        title="Address"
+        span={2}
+        tooltip={tooltip.royalties.address}
+        watchChange={walletAddress}
+        required
+      />
       {isNFT && (
         <FormInput
           name="royalties.transferFixed"

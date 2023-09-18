@@ -63,12 +63,12 @@ const CreateTransaction: React.FC = () => {
         setIsAccountEmpty(false);
       }
     };
-    isAccountEmpty();
+    walletAddress && isAccountEmpty();
   }, [walletAddress]);
 
   return (
     <Container>
-      {!extensionInstalled && (
+      {extensionInstalled === false && (
         <WarningContainer>
           <WarningIcon />
           <WarningText>

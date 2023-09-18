@@ -10,7 +10,7 @@ import {
 import { toast } from 'react-toastify';
 
 interface IExtension {
-  extensionInstalled: boolean;
+  extensionInstalled: boolean | undefined;
   connectExtension: () => Promise<void>;
   logoutExtension: () => void;
   walletAddress: string;
@@ -22,7 +22,7 @@ interface IExtension {
 export const Extension = createContext({} as IExtension);
 
 export const ExtensionProvider: React.FC = ({ children }) => {
-  const [extensionInstalled, setExtensionInstalled] = useState(false);
+  const [extensionInstalled, setExtensionInstalled] = useState<boolean>();
   const [extensionLoading, setExtensionLoading] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string>('');
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -32,8 +32,12 @@ export const ExtensionProvider: React.FC = ({ children }) => {
       if (typeof window !== 'undefined') {
         await doIf(
           () => setExtensionInstalled(true),
-          () => logoutExtension(),
+          () => {
+            logoutExtension();
+            setExtensionInstalled(false);
+          },
           () => window.kleverWeb !== undefined,
+          1500, //timeout
         );
       }
     };

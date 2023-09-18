@@ -110,7 +110,7 @@ const getAssetTriggerForm = (
             name="receiver"
             title="Receiver"
             required
-            defaultValue={walletAddress}
+            watchChange={walletAddress}
             tooltip={tooltip.receiver}
           />
           <FormInput name="amount" title="Amount" type="number" required />
@@ -129,7 +129,7 @@ const getAssetTriggerForm = (
             name="receiver"
             title="Receiver"
             required
-            defaultValue={walletAddress}
+            watchChange={walletAddress}
             tooltip={tooltip.receiver}
           />
           <FormInput name="amount" title="Amount" type="number" required />
@@ -146,7 +146,7 @@ const getAssetTriggerForm = (
             name="receiver"
             title="Receiver"
             required
-            defaultValue={walletAddress}
+            watchChange={walletAddress}
             tooltip={tooltip.receiver}
           />
         </FormSection>
@@ -160,7 +160,7 @@ const getAssetTriggerForm = (
             name="receiver"
             title="Receiver"
             required
-            defaultValue={walletAddress}
+            watchChange={walletAddress}
             tooltip={tooltip.receiver}
           />
         </FormSection>
@@ -177,7 +177,7 @@ const getAssetTriggerForm = (
             name="receiver"
             title="NFT Holder Address"
             required
-            defaultValue={walletAddress}
+            watchChange={walletAddress}
             tooltip={tooltip.receiver}
           />
           <FormInput
@@ -214,7 +214,7 @@ const getAssetTriggerForm = (
             name="receiver"
             title="Receiver"
             required
-            defaultValue={walletAddress}
+            watchChange={walletAddress}
             tooltip={tooltip.receiver}
           />
         </FormSection>
@@ -229,7 +229,6 @@ const getAssetTriggerForm = (
     case 14:
       return (
         <RoyaltiesSection
-          walletAddress={walletAddress}
           isNFT={collection.isNFT}
           precision={collection.precision}
         />
@@ -240,7 +239,7 @@ const getAssetTriggerForm = (
           <FormInput
             name="kdaPool.adminAddress"
             title="Admin Address"
-            defaultValue={walletAddress}
+            watchChange={walletAddress}
             required
           />
           <FormInput

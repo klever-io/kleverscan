@@ -1,4 +1,5 @@
 import { useContract } from '@/contexts/contract';
+import { useExtension } from '@/contexts/extension';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -27,6 +28,7 @@ const CreateValidator: React.FC<IContractProps> = ({
   formKey,
   handleFormSubmit,
 }) => {
+  const { walletAddress } = useExtension();
   const { handleSubmit } = useFormContext<FormData>();
   const {} = useContract();
 
@@ -39,7 +41,12 @@ const CreateValidator: React.FC<IContractProps> = ({
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
       <FormSection>
         <FormInput name="name" title="Validator Name" required />
-        <FormInput name="address" title="Owner Address" required />
+        <FormInput
+          name="address"
+          title="Owner Address"
+          watchChange={walletAddress}
+          required
+        />
         <FormInput name="blsPublicKey" title="BLS Public Key" required />
         <FormInput
           name="rewardAddress"

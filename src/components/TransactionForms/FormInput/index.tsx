@@ -44,6 +44,7 @@ export interface IBaseFormInputProps
   precision?: number;
   customOnChange?: (e: any) => void;
   logoError?: string | null;
+  watchChange?: any;
 }
 
 export interface IFormInputProps extends IBaseFormInputProps {
@@ -109,6 +110,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   onChange,
   precision = 8,
   logoError = null,
+  watchChange,
   ...rest
 }) => {
   const areaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -130,6 +132,10 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   } catch (e) {
     error = null;
   }
+
+  useEffect(() => {
+    name && setValue(name, watchChange);
+  }, [watchChange]);
 
   const inputValue = name && watch(name);
 

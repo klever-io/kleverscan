@@ -32,7 +32,7 @@ const ConfigMarketplace: React.FC<IContractProps> = ({
         <FormInput
           name="referralAddress"
           title="New Referral Address"
-          defaultValue={walletAddress}
+          watchChange={walletAddress}
         />
         <FormInput
           name="referralPercentage"

@@ -30,7 +30,7 @@ const CreateMarketplace: React.FC<IContractProps> = ({
         <FormInput
           name="referralAddress"
           title="Referral Address"
-          defaultValue={walletAddress}
+          watchChange={walletAddress}
           tooltip="Address that will receive the referral percentage"
         />
         <FormInput

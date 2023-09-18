@@ -125,7 +125,6 @@ export const setQueryAndRouter = (
   }
 
   router.query = {
-    ...router.query,
     ...newQuery,
   };
 

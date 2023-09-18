@@ -106,7 +106,7 @@ const PermissionsSection: React.FC = () => {
   });
 
   return (
-    <FormSection>
+    <FormSection inner>
       <SectionTitle>Permissions</SectionTitle>
 
       {fields.map((field, permissionIndex) => {

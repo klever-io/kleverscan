@@ -7,35 +7,32 @@ import {
   ContainerHide,
   SectionCards,
   TransactionContainer,
+  TransactionEmpty,
   ViewMoreContainer,
 } from '@/views/home';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import React, { useCallback, useState } from 'react';
-import BlockCardSkeleton from './BlockCardSkeleton';
+import React, { useState } from 'react';
 
 const BlockCardFetcher: React.FC = () => {
   const { blocks } = useHomeData();
+  const { t: commonT } = useTranslation('common');
   const [hideMenu, setHideMenu] = useState(false);
   const { t } = useTranslation('blocks');
 
-  const getBlockCards = useCallback(() => {
-    return blocks.length && blocks.length > 0
-      ? blocks.map((block: IBlock, index) => {
-          return (
-            <BlockCard blockIndex={index} key={block.hash + index} {...block} />
-          );
-        })
-      : new Array(10)
-          .fill(0)
-          .map((_, index) => <BlockCardSkeleton key={index} index={index} />);
-  }, []);
   const getBlocks = () => {
-    return blocks.map((block: IBlock, index) => {
-      return (
-        <BlockCard blockIndex={index} key={block.hash + index} {...block} />
-      );
-    });
+    if (blocks && blocks.length) {
+      return blocks.map((block: IBlock, index) => {
+        return (
+          <BlockCard blockIndex={index} key={block.hash + index} {...block} />
+        );
+      });
+    }
+    return (
+      <TransactionEmpty>
+        <span>{commonT('EmptyData')}</span>
+      </TransactionEmpty>
+    );
   };
 
   return (

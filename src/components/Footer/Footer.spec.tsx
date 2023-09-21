@@ -66,7 +66,7 @@ describe('Component: Footer', () => {
       height: '2.5rem',
       display: 'flex',
       border: `2px solid ${theme.footer.socialBorder}`,
-      color: 'white',
+      color: `${theme.true.black}`,
     };
     const getSocials =
       container.firstChild?.firstChild?.firstChild?.childNodes[2].childNodes;
@@ -77,11 +77,15 @@ describe('Component: Footer', () => {
 
   it('Should match the style for links of the Klever Exchange, Klever wallet App and Klever Ecosystem', () => {
     const style = {
-      textDecoration: 'none',
+      display: 'flex',
+      alignItems: 'center',
       gap: '0.5rem',
-      fontSize: '14px',
       fontWeight: '600',
-      color: `${theme.true.white}`,
+      fontSize: '14px',
+      lineHeight: '19px',
+      textDecoration: 'none',
+      transition: '0.2s ease',
+      marginBottom: '2rem',
     };
 
     const linkItem = screen.getAllByRole('link', { name: /Privacy Policy/i });

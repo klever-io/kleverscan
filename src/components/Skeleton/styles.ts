@@ -13,7 +13,7 @@ export const Container = styled.span<{
   width: ${props =>
     typeof props.width === 'number'
       ? `${props.width}px`
-      : props.width || '120px'} !important;
+      : props.width || '120px'};
 `;
 export const SkeletonLoader = styled.span`
   display: inline-block;

@@ -1,18 +1,19 @@
 import { DefaultCardStyles } from '@/styles/common';
-import { CiSquarePlus } from 'react-icons/ci';
 import styled from 'styled-components';
 
 export const Container = styled.div`
   width: 100%;
   color: white;
-  padding: 0rem 0 0rem 0.5rem;
+  padding: 2.5rem 0 0 1rem;
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    padding: 2rem 0 0 1rem;
+  }
 `;
 
 export const TitleContainer = styled.div`
   padding-bottom: 1rem;
   small {
-    color: ${props =>
-      props.theme.dark ? props.theme.lightGray : props.theme.darkText};
+    color: ${props => props.theme.navbar.text};
     width: auto;
     font-weight: 400;
     font-size: 0.9rem;
@@ -22,38 +23,34 @@ export const TitleContainer = styled.div`
 
 export const CardItem = styled.div`
   ${DefaultCardStyles}
-  position: relative;
   display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-
-  padding: 9px 20px 16px;
-  width: 10.5rem;
-  height: 10.5rem;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0 20px 10px;
+  width: 8.5rem;
+  height: 8.125rem;
   margin-bottom: 1rem;
 
   background: ${props => props.theme.dark && props.theme.blue};
   border-radius: 0.5rem;
-
   cursor: pointer;
   p {
-    color: ${props =>
-      props.theme.dark ? props.theme.true.white : props.theme.darkText};
-    font-weight: 680;
-    font-size: 1rem;
-    line-height: 19px;
-  }
-
-  svg {
-    color: ${props =>
-      props.theme.dark ? props.theme.true.white : props.theme.violet};
+    color: ${props => props.theme.black};
+    font-weight: 700;
+    font-size: 0.9rem;
   }
 `;
+export const PlusIcon = styled.div`
+  align-self: flex-end;
+  padding-top: 1rem;
+  color: black;
 
-export const IconSquarePlus = styled(CiSquarePlus).attrs(() => ({
-  size: 35,
-}))`
-  position: absolute;
-  right: 1.5rem;
-  top: 1rem;
+  svg {
+    path {
+      fill: ${props =>
+        props.theme.dark
+          ? props.theme.true.white
+          : props.theme.violet} !important;
+    }
+  }
 `;

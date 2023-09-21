@@ -56,17 +56,28 @@ describe("test Layout and it's inner components", () => {
     expect(footerPrivacyPolicy[0]).toBeInTheDocument();
     expect(footerPrivacyPolicy[1]).toBeInTheDocument();
     const layoutContainerStyles = {
+      display: 'block',
       margin: 'auto',
-      backgroundColor: 'rgb(235, 241, 248)',
       position: 'relative',
+      visibility: 'visible',
+      backgroundColor: '#F4F4F4',
     };
 
     const mainStyles = {
-      padding: '3rem min(5vw, 10rem) 5rem',
       display: 'block',
       margin: '0px auto',
-      maxWidth: '1900px',
-      backgroundColor: 'rgb(235, 241, 248)',
+      'margin-top': '0px',
+      'margin-right': 'auto',
+      'margin-bottom': '0px',
+      'margin-left': 'auto',
+      padding: '1rem',
+      'padding-top': '1rem',
+      'padding-right': '1rem',
+      'padding-bottom': '1rem',
+      'padding-left': '1rem',
+      'max-width': '1900px',
+      visibility: 'visible',
+      backgroundColor: '#F4F4F4',
     };
 
     const layoutContainer = container.firstElementChild;

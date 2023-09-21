@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import SquarePlus from '../../../public/SquarePlus.svg';
 import ModalContract, { IModalContract } from '../Contract/ModalContract';
 import { Title } from '../InputGlobal/HomeInput/styles';
 import { Carousel } from './Carousel';
-import { CardItem, Container, IconSquarePlus, TitleContainer } from './styles';
+import { CardItem, Container, PlusIcon, TitleContainer } from './styles';
 
 interface IShortCutContract {
   title: string;
@@ -66,7 +67,9 @@ const QuickAccess: React.FC<{
             key={JSON.stringify(contract.title)}
             onClick={e => handleClick(contract, e)}
           >
-            <IconSquarePlus />
+            <PlusIcon>
+              <SquarePlus />
+            </PlusIcon>
             <p>{contract.title}</p>
           </CardItem>
         ))}

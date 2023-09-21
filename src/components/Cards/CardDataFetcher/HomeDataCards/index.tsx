@@ -1,17 +1,24 @@
 import { Accounts, Epoch, TPS, Transactions } from '@/assets/cards';
 import { useHomeData } from '@/contexts/mainPage';
 import { useMobile } from '@/contexts/mobile';
-import { ICard, IEpochCard } from '@/types';
+import { IEpochCard } from '@/types';
+import { IDataCard } from '@/types/home';
 import {
   ArrowData,
   ArrowDownDataCards,
   ButtonExpand,
+  CardBackground,
+  CardIcon,
+  CardIconContainer,
   DataCard,
+  DataCardContent,
   DataCardLatest,
   DataCardsContent,
   DataCardsWrapper,
   DataCardValue,
   ExpandData,
+  MobileCardsContainer,
+  MobileEpoch,
   Percentage,
 } from '@/views/home';
 import { CircularProgressContainer } from '@/views/validators';
@@ -20,11 +27,10 @@ import { useState } from 'react';
 import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
 import HomeDataCardsSkeleton from '../HomeDataCardsSkeleton';
 import GradientSVG from './GradientSVG';
-
 const HomeDataCards: React.FC = ({}) => {
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
   const [expanded, setExpanded] = useState(false);
-  const { isMobile } = useMobile();
+  const { isMobile, isTablet } = useMobile();
   const {
     actualTPS,
     blocks,
@@ -37,22 +43,30 @@ const HomeDataCards: React.FC = ({}) => {
     counterEpoch,
     loadingCards,
   } = useHomeData();
-
+  const icons = [
+    [
+      '/homeCards/transactionsIcon.svg',
+      '/homeCards/transactionsBackground.svg',
+    ],
+    ['/homeCards/accountsIcon.svg', '/homeCards/accountsBackground.svg'],
+    ['/homeCards/tpsIcon.svg', '/homeCards/tpsBackground.svg'],
+  ];
   const block = blocks[0];
-  const dataCards: ICard[] = [
+
+  const dataCards: IDataCard[] = [
+    {
+      Icon: Transactions,
+      title: t('Total Transactions'),
+      value: totalTransactions,
+      variation: `+ ${newTransactions.toLocaleString()}`,
+    },
     {
       Icon: Accounts,
       title: t('Total Accounts'),
       value: totalAccounts,
       variation: `+ ${newAccounts === 0 ? '0%' : newAccounts.toLocaleString()}`,
     },
-    {
-      Icon: Transactions,
-      title: t('Total Transactions'),
-      value: totalTransactions,
-      variation: `+ ${newTransactions.toLocaleString()}`,
-      percentage: (newTransactions * 100) / beforeYesterdayTransactions - 100,
-    },
+    { title: t('Live/Peak TPS'), value: actualTPS, Icon: TPS },
   ];
 
   const epochCards: IEpochCard[] = [
@@ -63,11 +77,6 @@ const HomeDataCards: React.FC = ({}) => {
         (block?.epoch ? ` #${block.epoch + counterEpoch} ` : ' '),
       value: metrics.remainingTime,
       progress: metrics.epochLoadPercent,
-    },
-    {
-      Icon: TPS,
-      title: t('Live/Peak TPS'),
-      value: actualTPS,
     },
   ];
 
@@ -89,12 +98,12 @@ const HomeDataCards: React.FC = ({}) => {
   };
 
   const PercentageComponent: React.FC<{
-    progress: any;
-    value: string | number;
+    progress?: any;
+    value?: string | number;
   }> = ({ progress, value }) => {
     return (
       <Percentage>
-        <p>{value?.toLocaleString()}</p>
+        <p className="epochSeconds">{value?.toLocaleString()}</p>
         {progress >= 0 && (
           <div>
             <Progress percent={metrics.epochLoadPercent} />
@@ -105,44 +114,146 @@ const HomeDataCards: React.FC = ({}) => {
   };
 
   const displayCards = !isMobile
-    ? epochCards
+    ? dataCards
     : expanded
-    ? epochCards
-    : epochCards.slice(0, 1);
+    ? dataCards
+    : dataCards.slice(0, 1);
   return !loadingCards ? (
     <DataCardsWrapper>
       <DataCardsContent>
-        {dataCards.map(
-          ({ Icon, title, value, variation, percentage }, index) => (
-            <DataCard key={String(index)}>
-              <span>{title}</span>
-              <DataCardValue>
-                <p>{value.toLocaleString()}</p>
-                {!variation.includes('%') && (
-                  <DataCardLatest positive={variation.includes('+')}>
+        {isTablet && !isMobile && (
+          <>
+            <MobileCardsContainer>
+              {epochCards.map(({ title, value, progress }, index) => (
+                <DataCard key={String(index)} className="epoch">
+                  <DataCardValue isEpoch={true}>
+                    <PercentageComponent progress={progress} />
+                    <MobileEpoch>
+                      <span>{title}</span>
+                      <PercentageComponent value={value} />
+                      {index === 0 && <small>Time remaining</small>}
+                    </MobileEpoch>
+                  </DataCardValue>
+                </DataCard>
+              ))}
+              {
+                <DataCard>
+                  <CardIconContainer>
+                    <CardIcon src="/homeCards/tpsIcon.svg" />
+                    <CardBackground src="/homeCards/tpsBackground.svg" />
+                  </CardIconContainer>
+                  <div>
+                    <span>{dataCards[2].title}</span>
+                    <DataCardValue>
+                      <p>{dataCards[2].value.toLocaleString()}</p>
+                      {dataCards[2].variation &&
+                        !dataCards[2].variation.includes('%') && (
+                          <DataCardLatest
+                            positive={dataCards[2].variation.includes('+')}
+                          >
+                            <ArrowData
+                              positive={dataCards[2].variation.includes('+')}
+                            />
+                            <p>{dataCards[2].variation}/24h</p>
+                          </DataCardLatest>
+                        )}
+                    </DataCardValue>
+                  </div>
+                </DataCard>
+              }
+            </MobileCardsContainer>
+            <MobileCardsContainer>
+              {displayCards
+                .slice(0, 2)
+                .map(({ title, value, variation }, index) => (
+                  <DataCard key={String(index)}>
+                    <CardIconContainer>
+                      <CardIcon src={icons[index][0]} />
+                      <CardBackground src={icons[index][1]} />
+                    </CardIconContainer>
                     <div>
-                      <ArrowData positive={variation.includes('+')} />
-                      <p>{variation}/24h</p>
+                      <span>{title}</span>
+                      <DataCardValue>
+                        <p>{value.toLocaleString()}</p>
+                        {variation && !variation.includes('%') && (
+                          <DataCardLatest positive={variation.includes('+')}>
+                            <ArrowData positive={variation.includes('+')} />
+                            <p>{variation}/24h</p>
+                          </DataCardLatest>
+                        )}
+                      </DataCardValue>
                     </div>
-                  </DataCardLatest>
-                )}
-              </DataCardValue>
-            </DataCard>
-          ),
+                  </DataCard>
+                ))}
+            </MobileCardsContainer>
+          </>
         )}
-      </DataCardsContent>
-      <DataCardsContent>
-        {displayCards.map(({ Icon, title, value, progress }, index) => (
-          <DataCard key={String(index)}>
-            <DataCardValue isEpoch={true}>
+        {isMobile &&
+          epochCards.map(({ title, value, progress }, index) => (
+            <>
+              <DataCard key={String(index)} className="epoch">
+                <DataCardValue isEpoch={true}>
+                  <PercentageComponent progress={progress} />
+                  <MobileEpoch>
+                    <span>{title}</span>
+                    <PercentageComponent value={value} />
+                    {index === 0 && <small>Time remaining</small>}
+                  </MobileEpoch>
+                </DataCardValue>
+              </DataCard>
+              {displayCards.map(({ title, value, variation }, index) => (
+                <DataCard key={String(index)}>
+                  <CardIconContainer>
+                    <CardIcon src={icons[index][0]} />
+                    <CardBackground src={icons[index][1]} />
+                  </CardIconContainer>
+                  <DataCardContent>
+                    <span>{title}</span>
+                    <DataCardValue>
+                      <p>{value.toLocaleString()}</p>
+                      {variation && !variation.includes('%') && (
+                        <DataCardLatest positive={variation.includes('+')}>
+                          <ArrowData positive={variation.includes('+')} />
+                          <p>{variation}/24h</p>
+                        </DataCardLatest>
+                      )}
+                    </DataCardValue>
+                  </DataCardContent>
+                </DataCard>
+              ))}
+            </>
+          ))}
+        {!isTablet &&
+          epochCards.map(({ Icon, title, value, progress }, index) => (
+            <DataCard key={String(index)} className="epoch">
+              <span>{title}</span>
+              <DataCardValue isEpoch={true}>
+                {<PercentageComponent progress={progress} value={value} />}
+              </DataCardValue>
+              {index === 0 && <small>Time remaining</small>}
+            </DataCard>
+          ))}
+        {!isTablet &&
+          displayCards.map(({ Icon, title, value, variation }, index) => (
+            <DataCard key={String(index)}>
+              <CardIconContainer>
+                <CardIcon src={icons[index][0]} />
+                <CardBackground src={icons[index][1]} />
+              </CardIconContainer>
               <div>
                 <span>{title}</span>
+                <DataCardValue>
+                  <p>{value.toLocaleString()}</p>
+                  {variation && !variation.includes('%') && (
+                    <DataCardLatest positive={variation.includes('+')}>
+                      <ArrowData positive={variation.includes('+')} />
+                      <p>{variation}/24h</p>
+                    </DataCardLatest>
+                  )}
+                </DataCardValue>
               </div>
-              {<PercentageComponent progress={progress} value={value} />}
-              {index === 0 && <small>Time remaining</small>}
-            </DataCardValue>
-          </DataCard>
-        ))}
+            </DataCard>
+          ))}
       </DataCardsContent>
       <ExpandData>
         <ButtonExpand onClick={() => setExpanded(!expanded)}>

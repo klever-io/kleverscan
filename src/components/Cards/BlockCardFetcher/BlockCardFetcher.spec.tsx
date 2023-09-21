@@ -66,12 +66,19 @@ describe('Component: BlockCardList', () => {
     const blockTitle = screen.getByRole('heading', { name: /Recent Blocks/i });
     const section = blockTitle.parentNode;
     const blockTitleStyle = {
-      margin: 0,
-      width: 'fit-content',
-      color: theme.darkBlue,
+      display: 'block',
+      'font-size': '1.5rem',
+      'font-weight': '500',
+      color: `${theme.darkBlue}`,
+      margin: '0px',
+      'margin-top': '0px',
+      'margin-right': '0px',
+      'margin-bottom': '0px',
+      'margin-left': '0px',
+      visibility: 'visible',
     };
     const sectionStyle = {
-      padding: '0 min(3%, 10rem) 10rem',
+      padding: '1.5rem 0px',
     };
 
     expect(blockTitle).toHaveStyle(blockTitleStyle);

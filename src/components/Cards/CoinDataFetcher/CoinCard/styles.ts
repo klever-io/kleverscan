@@ -29,27 +29,28 @@ export const Container = styled.div`
 
 export const Content = styled.div`
   display: flex;
-  box-shadow: 5px 6px 5px 0px rgba(0, 0, 0, 0.1);
-
-  overflow-x: auto;
+  width: 100%;
+  overflow-x: hidden;
   scroll-behavior: smooth !important;
-
+  border-radius: ${props => (props.theme.dark ? 0 : '1rem')};
   scroll-snap-type: x mandatory;
   scroll-snap-stop: always;
 
-  border-radius: 1rem;
   width: 21rem;
   width: 100%;
   overflow-y: hidden;
   position: relative;
 
   flex-direction: row;
-  border: 1px solid #222345;
+  border: 1px solid
+    ${props => (props.theme.dark ? props.theme.true.black : 'none')} !important;
   ${DataCardDefaultStyles}
-
+  background-color: ${props =>
+    props.theme.dark ? 'transparent' : props.theme.true.white} !important;
   &&::-webkit-scrollbar {
     display: none;
   }
+
   scrollbar-width: none;
   -ms-overflow-style: none;
 `;
@@ -58,36 +59,23 @@ export const CardContainer = styled.div`
   scroll-snap-align: start;
   position: relative;
   min-height: 17.4rem;
-  flex-direction: row;
   align-items: center;
   border-radius: 0.5rem;
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    min-width: 100%;
-  }
-
+  min-width: 100%;
+  background-color: ${props =>
+    props.theme.dark ? 'transparent' : props.theme.true.white} !important;
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 50%;
-    ${props =>
-      props.theme.dark
-        ? css`
-            background-color: ${props.theme.input.searchBar};
-            border: 1px solid #222345;
-          `
-        : css`
-            ${DefaultCardStyles}
-          `};
+    min-width: initial;
+    width: 49%;
     height: 24rem;
   }
 `;
 
 export const CardContent = styled.div`
-  min-width: 10.5rem;
   display: flex;
-
   flex-direction: column;
-
+  min-width: 100%;
   animation: 1.5s ease 0s 1 normal none running ${FadeIn};
-  width: 100%;
   a {
     z-index: 0;
   }
@@ -104,6 +92,14 @@ export const CardContentError = styled(CardContent)`
 
 export const CardContainerSkeleton = styled(CardContainer)`
   padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+  ${props =>
+    props.theme.dark
+      ? css`
+          background-color: ${props.theme.true.newBlack} !important;
+        `
+      : css`
+          ${DefaultCardStyles}
+        `};
 `;
 
 export const HeaderContainer = styled.div`
@@ -133,22 +129,21 @@ export const HeaderContent = styled.div`
   svg {
     path {
       fill: ${props =>
-        props.theme.dark ? props.theme.black : props.theme.darkText};
+        props.theme.dark ? props.theme.true.white : props.theme.true.black};
     }
   }
 `;
 
 export const HeaderContentSkeleton = styled(HeaderContent)`
-  gap: 0.25rem;
+  gap: 2rem;
 `;
 
 export const Name = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-
   color: ${props =>
-    props.theme.dark ? props.theme.black : props.theme.darkText};
+    props.theme.dark ? props.theme.true.white : props.theme.true.black};
 
   font-weight: 600;
 
@@ -177,7 +172,7 @@ export const Description = styled(Name)<IVariation>`
     display: flex;
     align-items: center;
     padding-top: 1rem;
-    gap: 0.8rem;
+    gap: 0.3rem;
   }
   span {
     color: ${props =>
@@ -192,6 +187,11 @@ export const ChartContainer = styled.div`
   margin-bottom: 1rem;
   height: 92.79px;
   width: 100%;
+`;
+
+export const ChartContainerSkeleton = styled(ChartContainer)`
+  height: initial;
+  min-height: 92.79px;
 `;
 
 export const ValueContainer = styled.div<{ isKLV?: boolean }>`
@@ -321,6 +321,8 @@ export const CoinSelector = styled.div<{ isSelected: boolean }>`
 
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.3);
 
+  -webkit-user-select: none; /* Safari */
+  user-select: none; /* Standard syntax */
   cursor: pointer;
   border-radius: 8px;
 `;
@@ -389,7 +391,7 @@ export const HeaderGraph = styled.div`
     font-size: 1.2rem;
     line-height: 16px;
     color: ${props =>
-      props.theme.dark ? props.theme.black : props.theme.darkText};
+      props.theme.dark ? props.theme.true.white : props.theme.true.black};
   }
 `;
 
@@ -410,7 +412,14 @@ export const SetTimeContainer = styled.div`
   justify-content: flex-end;
   padding: 1rem;
   padding-right: 1.5rem;
-  width: 100%;
+`;
+
+export const SetTimeContainerLoaderWrapper = styled.div`
+  position: absolute;
+  right: 10rem;
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+    right: 9.3rem;
+  }
 `;
 
 export const SpanTime = styled.span<{ selected: boolean }>`
@@ -426,7 +435,7 @@ export const SpanTime = styled.span<{ selected: boolean }>`
 export const ButtonInformation = styled.button`
   ${DataCardDefaultStyles}
   display: flex;
-  width: 100%;
+  width: 15rem;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
@@ -434,10 +443,16 @@ export const ButtonInformation = styled.button`
   padding: 9px 20px;
   margin-top: 1rem;
   border-radius: 0.5rem;
-  color: ${({ theme }) => theme.black};
-  background-color: ${({ theme }) => theme.violet};
-  font-weight: 600;
-  font-size: 1rem;
+  color: ${props => props.theme.true.white};
+  background-color: ${({ theme }) =>
+    theme.dark && theme.true.newBlack} !important;
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    background-color: ${({ theme }) => theme.violet} !important;
+    width: 100%;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+  font-size: 1.25rem;
 
   svg {
     path {
@@ -445,15 +460,15 @@ export const ButtonInformation = styled.button`
     }
   }
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    width: 12.5rem;
     height: 11.5rem;
     margin-top: 0rem;
     align-items: flex-start;
     padding: 1.2rem 3rem 0.5rem 1.2rem;
     text-align: start;
+    color: ${props => props.theme.black};
   }
 `;
-
+export const InfoSquareIcon = styled.img``;
 export const ButtonContainer = styled.div`
   width: 100%;
   a {
@@ -476,14 +491,14 @@ export const CurrencyIcon = styled(Currency)`
 
 export const ContentDeskTop = styled.div`
   display: flex;
+  justify-content: space-around;
   width: 100%;
-  gap: 1rem;
 `;
 
 export const ContainerDesktop = styled.div`
   display: flex;
   width: 100%;
-  gap: 1rem;
+  gap: 0.5rem;
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     display: none;
   }

@@ -1,21 +1,25 @@
+import { ArrowDropdown } from '@/assets/icons';
 import { INavbarItem, navbarItems } from '@/configs/navbar';
 import { useMobile } from '@/contexts/mobile';
+import { useTheme } from '@/contexts/theme';
 import { useScroll } from '@/utils/hooks';
 import { getNetwork } from '@/utils/networkFunctions';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useRef, useState } from 'react';
+import NetworkRedirectButton from '../NetworkRedirectButton';
 import ConnectWallet from './ConnectWallet';
 import OptionsContainer from './OptionsContainer';
 import {
   CloseSearch,
   ConnectContainer,
+  ConnectionWrapper,
   Container,
   Content,
   DesktopContainer,
+  DesktopSubWrapper,
   DropdownContainer,
-  DropdownIcon,
   DropdownItem,
   DropdownMenu,
   HeaderContainer,
@@ -31,9 +35,9 @@ import {
   MobileItem,
   MobileNavbarItemList,
   MobileOptions,
-  NavBarOptionsContainer,
   SearchContainer,
   SearchIcon,
+  SearchIconWrapper,
 } from './styles';
 
 interface IDropdownPages {
@@ -55,7 +59,6 @@ const NavbarItem: React.FC<INavbarItem> = ({
       >
         <Link href={page.pathTo} data-testid="navbar-item">
           <a>
-            <page.Icon />
             <span>{page.name}</span>
           </a>
         </Link>
@@ -77,9 +80,7 @@ const NavbarItem: React.FC<INavbarItem> = ({
             ))}
           </DropdownMenu>
         </DropdownContainer>
-        <span>
-          <DropdownIcon />
-        </span>
+        <ArrowDropdown />
       </Item>
     );
   }
@@ -91,7 +92,6 @@ const NavbarItem: React.FC<INavbarItem> = ({
         href={pathTo}
       >
         <Item selected={router.pathname.includes(name.toLowerCase())}>
-          <Icon />
           <span>{name}</span>
         </Item>
       </LinkStyled>
@@ -125,7 +125,6 @@ export const MobileNavbarItem: React.FC<INavbarItem> = ({
           selected={router.pathname.includes(name.toLowerCase())}
         >
           <span>{name}</span>
-          <Icon />
         </MobileItem>
       </a>
     </Link>
@@ -133,12 +132,19 @@ export const MobileNavbarItem: React.FC<INavbarItem> = ({
 };
 
 const Navbar: React.FC = () => {
-  const { mobileNavbarRef, closeMenu, handleMenu, mobileMenuOpen, isTablet } =
-    useMobile();
+  const {
+    mobileNavbarRef,
+    closeMenu,
+    handleMenu,
+    mobileMenuOpen,
+    isTablet,
+    isMobile,
+  } = useMobile();
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
   const prevScrollpos = useRef<number>(0);
   const router = useRouter();
+  const { isDarkTheme } = useTheme();
 
   const handleMobileScroll = () => {
     const navbar = mobileNavbarRef.current;
@@ -183,7 +189,7 @@ const Navbar: React.FC = () => {
               <a>
                 <Logo onClick={closeMenu}>
                   <Image
-                    src="/logo-large.svg"
+                    src={isDarkTheme ? '/logo-large.svg' : '/NewLogo.svg'}
                     alt="Logo"
                     width="215"
                     height="29"
@@ -196,48 +202,81 @@ const Navbar: React.FC = () => {
             )}
           </HeaderContainer>
           {!isTablet && (
-            <DesktopContainer>
-              <IconsMenu>
-                {navbarItems.map((item, index) => (
-                  <NavbarItem key={String(index)} {...item} />
-                ))}
-              </IconsMenu>
-              <NavBarOptionsContainer>
-                {router.pathname !== '/' && <Input />}
-                <ConnectWallet clickConnection={closeDrawer} />
-                <OptionsContainer />
-              </NavBarOptionsContainer>
-            </DesktopContainer>
+            <>
+              <DesktopContainer>
+                <IconsMenu>
+                  {navbarItems.map((item, index) => (
+                    <NavbarItem key={String(index)} {...item} />
+                  ))}
+                </IconsMenu>
+                <DesktopSubWrapper>
+                  {router.pathname !== '/' && <Input />}
+                  <ConnectWallet clickConnection={closeDrawer} />
+                  <NetworkRedirectButton />
+                  <OptionsContainer />
+                </DesktopSubWrapper>
+              </DesktopContainer>
+            </>
           )}
 
-          {isTablet && (
-            <MobileContainer $openSearch={openSearch}>
-              <SearchContainer $openSearch={openSearch}>
-                {openSearch && <Input />}
-                <CloseSearch
-                  onClick={() => setOpenSearch(false)}
-                  $openSearch={openSearch}
-                />
-              </SearchContainer>
-              <ConnectContainer
-                onClick={() => {
-                  handleClickConnection();
-                  closeMenu();
-                }}
-              >
+          <MobileContainer $openSearch={openSearch}>
+            <SearchContainer $openSearch={openSearch}>
+              {openSearch && (
+                <Input setOpenSearch={setOpenSearch} openSearch={openSearch} />
+              )}
+
+              <CloseSearch
+                onClick={() => setOpenSearch(false)}
+                $openSearch={openSearch}
+              />
+            </SearchContainer>
+            {!isMobile && (
+              <>
                 {router.pathname !== '/' && (
-                  <SearchIcon
+                  <SearchIconWrapper
                     onClick={() => setOpenSearch(!openSearch)}
                     openSearch={openSearch}
-                  />
+                  >
+                    <SearchIcon />
+                  </SearchIconWrapper>
                 )}
-                <ConnectWallet clickConnection={closeDrawer} />
-                <MenuIcon onClick={handleMenu} data-testid="menu-icon" />
-              </ConnectContainer>
-            </MobileContainer>
-          )}
+                <ConnectContainer
+                  onClick={() => {
+                    handleClickConnection();
+                    closeMenu();
+                  }}
+                >
+                  <ConnectWallet clickConnection={closeDrawer} />
+                </ConnectContainer>
+                <NetworkRedirectButton />
+              </>
+            )}
+
+            <MenuIcon onClick={handleMenu} data-testid="menu-icon" />
+          </MobileContainer>
         </Content>
       </Container>
+      {isMobile && (
+        <ConnectionWrapper>
+          <ConnectContainer
+            onClick={() => {
+              handleClickConnection();
+              closeMenu();
+            }}
+          >
+            <ConnectWallet clickConnection={closeDrawer} />
+            {router.pathname !== '/' && (
+              <SearchIconWrapper
+                onClick={() => setOpenSearch(!openSearch)}
+                openSearch={openSearch}
+              >
+                <SearchIcon />
+              </SearchIconWrapper>
+            )}
+          </ConnectContainer>
+          <NetworkRedirectButton />
+        </ConnectionWrapper>
+      )}
 
       <MobileBackground
         onClick={() => {
@@ -249,10 +288,10 @@ const Navbar: React.FC = () => {
       />
 
       <MobileContent opened={mobileMenuOpen} isOpenDrawer={openDrawer}>
-        <MobileOptions>
-          <OptionsContainer />
-        </MobileOptions>
         <MobileNavbarItemList>
+          <MobileOptions>
+            <OptionsContainer />
+          </MobileOptions>
           {navbarItems.map((item, index) => (
             <MobileNavbarItem
               key={String(index)}

@@ -41,7 +41,7 @@ const WalletHelp: React.FC<IWalletDrawer> = ({
   }, []);
 
   return (
-    <div>
+    <div style={{ position: 'absolute' }}>
       {typeof window !== 'undefined' &&
         mounted &&
         ReactDOM.createPortal(

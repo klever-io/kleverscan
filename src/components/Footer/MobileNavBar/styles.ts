@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export const Container = styled.footer`
   position: fixed;
@@ -16,6 +16,7 @@ export const Container = styled.footer`
 `;
 export const ItemsContainer = styled.div`
   display: flex;
+  background-color: ${props => props.theme.white};
   align-items: center;
   justify-content: center;
   width: 100%;
@@ -49,12 +50,21 @@ export const IconContainer = styled.div<{
   gap: 0.25rem;
 
   color: ${({ $itemSelected, theme }) =>
-    $itemSelected ? theme.true.white : theme.navbar.text};
+    $itemSelected ? theme.black : theme.navbar.text};
 `;
 
 export const StyledImage = styled(Image)<{
   $itemSelected: boolean;
 }>`
-  filter: ${({ $itemSelected }) =>
-    $itemSelected ? 'brightness(0) invert(1)' : 'none'};
+  ${props =>
+    !props.theme.dark &&
+    css`
+      filter: ${$itemSelected => ($itemSelected ? 'brightness(0)' : 'none')};
+    `}
+  ${props =>
+    props.theme.dark &&
+    css`
+      filter: ${$itemSelected =>
+        $itemSelected ? 'brightness(0) invert(1)' : 'none'};
+    `}
 `;

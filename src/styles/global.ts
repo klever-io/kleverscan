@@ -1,5 +1,4 @@
 import { createGlobalStyle } from 'styled-components';
-import darktheme from './theme/dark';
 
 export default createGlobalStyle`
 
@@ -8,11 +7,11 @@ export default createGlobalStyle`
     padding: 0;
     box-sizing: border-box;
     scroll-behavior: smooth;
-
   }
-  
+
+
   body {
-    background: ${darktheme.background};
+    background: ${props => props.theme.background};
   }
 
   a, a:hover, a:focus, a:active {

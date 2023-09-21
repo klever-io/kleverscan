@@ -24,12 +24,39 @@ import { useQuery } from 'react-query';
 import { IDailyTransaction } from '../../types';
 
 export interface ITooltipContent {
+  label?: string;
+  active?: boolean;
+  payload?: any;
+}
+
+export interface ITooltipTxsData extends ITooltipContent {
+  payload?: {
+    payload: {
+      date: number;
+      value: number;
+    };
+    value: number;
+  }[];
+}
+
+export interface IDoubleChart {
+  dateNow: string;
+  datePast: string;
+  valueNow: number;
+  valuePast: number;
+}
+
+export interface ITooltipDoubleTxsData extends ITooltipContent {
+  payload?: {
+    payload: IDoubleChart;
+  }[];
+}
+
+export interface ITooltipPriceData extends ITooltipContent {
   payload?: {
     value: number;
     name: string;
   }[];
-  label?: string;
-  active?: boolean;
 }
 
 export interface IChartData {

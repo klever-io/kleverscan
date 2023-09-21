@@ -34,12 +34,17 @@ describe('Component: HomeTransactions', () => {
   it('Should match the style for TransactionContent and TransactionEmpty', () => {
     const txContent = screen.getByText(/EmptyData/i).parentNode?.parentNode;
     const txContentStyle = {
-      borderRadius: '1rem',
+      display: 'block',
+      'box-shadow': '0 0 0.5rem - 0.125rem #bbbcde',
+      'border-radius': '1rem',
+      visibility: 'visible',
     };
     const txEmpty = txContent?.firstChild;
     const txEmptyStyle = {
-      width: '27.5rem',
       height: '20rem',
+      gridTemplateColumns: 'initial',
+      justifyContent: 'center',
+      alignItems: 'center',
     };
 
     expect(txContent).toHaveStyle(txContentStyle);

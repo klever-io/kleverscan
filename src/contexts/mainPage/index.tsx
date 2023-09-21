@@ -11,14 +11,18 @@ import {
   ITransaction,
   ITransactionListResponse,
   ITransactionsResponse,
+  IValidatorsResponse,
   IYesterdayResponse,
   Service,
 } from '@/types';
 import { IBlock } from '@/types/blocks';
+import { IProposalsResponse } from '@/types/proposals';
 import { getEpochInfo } from '@/utils';
 import { calcApr } from '@/utils/calcApr';
 import {
   createContext,
+  Dispatch,
+  SetStateAction,
   useCallback,
   useContext,
   useEffect,
@@ -29,7 +33,7 @@ export interface IDaysCoins {
   [coinName: string]: string | number;
 }
 export interface IHomeData {
-  actualTPS: string;
+  actualTPS: number;
   blocks: IBlock[];
   metrics: IEpochInfo;
   newTransactions: number;
@@ -44,8 +48,13 @@ export interface IHomeData {
   loadingCards: boolean;
   loadingBlocks: boolean;
   loadingCoins: boolean;
+  setLoadingCoins: Dispatch<SetStateAction<boolean>>;
   getCoins: (days: IDaysCoins) => Promise<void>;
   legacyGetCoins: () => Promise<void>;
+  totalProposals: number;
+  activeProposals: number;
+  totalValidators: number;
+  activeValidators: number;
 }
 
 export const HomeData = createContext({} as IHomeData);
@@ -60,7 +69,7 @@ export const HomeDataProvider: React.FC = ({ children }) => {
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [totalTransactions, setTotalTransactions] = useState(0);
   const [newAccounts, setNewAccounts] = useState(0);
-  const [actualTPS, setActualTPS] = useState<string>('');
+  const [actualTPS, setActualTPS] = useState<number>(0);
   const [blocks, setBlocks] = useState<IBlock[]>([]);
   const [metrics, setMetrics] = useState<IEpochInfo>({
     currentSlot: 0,
@@ -76,6 +85,10 @@ export const HomeDataProvider: React.FC = ({ children }) => {
   const [loadingCards, setLoadingCards] = useState(true);
   const [loadingBlocks, setLoadingBlocks] = useState(true);
   const [loadingCoins, setLoadingCoins] = useState(true);
+  const [totalProposals, setTotalProposals] = useState(0);
+  const [activeProposals, setActiveProposals] = useState(0);
+  const [totalValidators, setTotalValidators] = useState(0);
+  const [activeValidators, setActiveValidators] = useState(0);
 
   useEffect(() => {
     if (metrics.epochLoadPercent === 0 && lastPercentage !== null) {
@@ -94,7 +107,7 @@ export const HomeDataProvider: React.FC = ({ children }) => {
       const chainStatistics = aggregate.data.statistics;
 
       setMetrics(getEpochInfo(aggregate.data.overview));
-      setActualTPS(`${chainStatistics.liveTPS} / ${chainStatistics.peakTPS}`);
+      setActualTPS(chainStatistics.liveTPS / chainStatistics.peakTPS);
       setBlocks(aggregate.data?.blocks);
     }
   }, []);
@@ -154,11 +167,69 @@ export const HomeDataProvider: React.FC = ({ children }) => {
         reject(res.error);
       });
 
+    // case 4:
+    const proposalsCall = new Promise<IProposalsResponse>(
+      async (resolve, reject) => {
+        const res = await api.get({
+          route: 'proposals/list',
+        });
+        if (!res.error || res.error === '') {
+          resolve(res);
+        }
+        reject(res.error);
+      },
+    );
+
+    // case 5:
+    const activeProposalsCall = new Promise<IProposalsResponse>(
+      async (resolve, reject) => {
+        const res = await api.get({
+          route: 'proposals/list',
+          query: { status: 'ActiveProposal' },
+        });
+        if (!res.error || res.error === '') {
+          resolve(res);
+        }
+        reject(res.error);
+      },
+    );
+
+    // case 6:
+    const totalValidators = new Promise<IValidatorsResponse>(
+      async (resolve, reject) => {
+        const res = await api.get({
+          route: 'validator/list',
+        });
+        if (!res.error || res.error === '') {
+          resolve(res);
+        }
+        reject(res.error);
+      },
+    );
+
+    // case 7:
+    const totalActiveValidators = new Promise<IValidatorsResponse>(
+      async (resolve, reject) => {
+        const res = await api.get({
+          route: 'validator/list',
+          query: { list: 'eligible' },
+        });
+        if (!res.error || res.error === '') {
+          resolve(res);
+        }
+        reject(res.error);
+      },
+    );
+
     const promises = [
       accountsCall,
       yesterdayAccountsCall,
       transactionsCall,
       beforeYesterdayTransactionsCall,
+      proposalsCall,
+      activeProposalsCall,
+      totalValidators,
+      totalActiveValidators,
     ];
 
     await Promise.allSettled(promises).then(responses => {
@@ -193,6 +264,27 @@ export const HomeDataProvider: React.FC = ({ children }) => {
               setBeforeYesterdayTransactions(
                 value.data?.number_by_day[1]?.doc_count,
               );
+              break;
+            case 4:
+              if (typeof value.pagination.totalRecords === 'number') {
+                setTotalProposals(value.pagination.totalRecords);
+              }
+              break;
+            case 5:
+              if (typeof value.pagination.totalRecords === 'number') {
+                setActiveProposals(value.pagination.totalRecords);
+              }
+              break;
+            case 6:
+              if (typeof value.pagination.totalRecords === 'number') {
+                setTotalValidators(value.pagination.totalRecords);
+              }
+              break;
+            case 7:
+              if (typeof value.pagination.totalRecords === 'number') {
+                setActiveValidators(value.pagination.totalRecords);
+              }
+              break;
 
             default:
               break;
@@ -814,6 +906,11 @@ export const HomeDataProvider: React.FC = ({ children }) => {
     loadingCards,
     loadingBlocks,
     loadingCoins,
+    setLoadingCoins,
+    totalProposals,
+    activeProposals,
+    totalValidators,
+    activeValidators,
     getCoins,
     legacyGetCoins,
   };

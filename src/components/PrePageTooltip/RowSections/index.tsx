@@ -100,7 +100,7 @@ export const TransactionRowSections = (
         .parameter as unknown as ITransferContract;
       return parameter?.toAddress ? (
         <UnderlineSpan>
-          <Link href={`/address/${parameter?.toAddress}`}>
+          <Link href={`/account/${parameter?.toAddress}`}>
             {parameter?.toAddress}
           </Link>
         </UnderlineSpan>
@@ -140,7 +140,7 @@ export const TransactionRowSections = (
           <SpanWrapper>
             From:{' '}
             <UnderlineSpan>
-              <Link href={`/address/${transaction.sender}`}>
+              <Link href={`/account/${transaction.sender}`}>
                 {transaction.sender}
               </Link>
             </UnderlineSpan>
@@ -245,7 +245,6 @@ export const AccountRowSections = (
 ): IRowSection[] => {
   if (res.data || res.error === '') {
     const { account } = res.data;
-
     return [
       {
         element: (
@@ -258,7 +257,7 @@ export const AccountRowSections = (
       },
       {
         element: (
-          <HashSpan>
+          <HashSpan style={{ maxWidth: '20rem' }}>
             <Link href={`/account/${account.address}`}>{account.address}</Link>
           </HashSpan>
         ),
@@ -297,6 +296,16 @@ export const AccountRowSections = (
               )}
             </TxTypeSpan>
           </>
+        ),
+        span: 1,
+      },
+      {
+        element: (
+          <SpanWrapperBottom>
+            {`Account total assets: ${
+              Object.keys(account.assets)?.length || 0
+            }`}
+          </SpanWrapperBottom>
         ),
         span: 1,
       },
@@ -344,7 +353,13 @@ export const BlockRowSections = (
       {
         element: (
           <SpanWrapper>
-            Miner: <UnderlineSpan>{block.producerName}</UnderlineSpan>
+            Miner:{' '}
+            <UnderlineSpan>
+              {' '}
+              <Link href={`account/${block.producerOwnerAddress}`}>
+                {block.producerName || block.producerOwnerAddress}
+              </Link>
+            </UnderlineSpan>
           </SpanWrapper>
         ),
         span: 1,

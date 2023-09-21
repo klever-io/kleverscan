@@ -56,13 +56,6 @@ export const CardContainer = styled.section`
 `;
 
 export const DefaultCardStyles = css`
-  border: 1px solid
-    ${props =>
-      props.theme.dark ? props.theme.footer.border : props.theme.lightGray};
-  box-shadow: 0 6px 5px 0px
-    ${props =>
-      props.theme.dark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.1)'};
-  border-radius: 1rem;
   background-color: ${props =>
     props.theme.dark ? props.theme.navbar.background : props.theme.white};
 `;

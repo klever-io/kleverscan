@@ -564,6 +564,13 @@ export interface IValidatorResponse extends IResponse {
   pagination: IPagination;
 }
 
+export interface IValidatorsResponse extends IResponse {
+  data: {
+    networkTotalStake: number;
+    validators: IValidator[];
+  };
+}
+
 export interface IDelegationsResponse {
   totalStake: number;
   ownerAddress: string;
@@ -679,6 +686,11 @@ export interface ICoinInfo {
 export interface IDailyTransaction {
   doc_count: number;
   key: number;
+}
+
+export interface IParsedDailyTransaction {
+  value: number;
+  date: string;
 }
 
 export interface IAssetStaking {

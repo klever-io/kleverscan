@@ -1,12 +1,13 @@
-import { InfoSquare } from '@/assets/icons';
 import Chart, { ChartType } from '@/components/Chart';
+import { PriceTooltip } from '@/components/Chart/Tooltips';
+import { Loader } from '@/components/Loader/styles';
 import { useHomeData } from '@/contexts/mainPage';
 import { useMobile } from '@/contexts/mobile';
 import { ICoinInfo } from '@/types';
 import { getVariation } from '@/utils';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { IoReloadSharp } from 'react-icons/io5';
 import CoinCardSkeleton from '../CoinCardSkeleton';
 import {
@@ -31,9 +32,11 @@ import {
   HeaderContent,
   HeaderGraph,
   IconContainer,
+  InfoSquareIcon,
   Name,
   NameError,
   SetTimeContainer,
+  SetTimeContainerLoaderWrapper,
   SpanTime,
 } from './styles';
 
@@ -58,23 +61,25 @@ const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
   const { getCoins, assetsData } = useHomeData();
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
   const [daysSelected, setSelectedDays] = useState<string | number>(1);
-  const timeGraph = [1, 30, 'ALL'];
+  const [switchCardLoading, setSwitchCardLoading] = useState(false);
+  const timeGraph = [1, 30, 180];
 
-  const handleClick = (time: string | number) => {
-    if (time === 'ALL') {
-      coinDays.current = {
-        ...coinDays.current,
-        [shortname]: 'max',
-      };
-    } else {
-      coinDays.current = {
-        ...coinDays.current,
-        [shortname]: time,
-      };
-    }
-    getCoins(coinDays.current);
+  const handleClick = async (time: string | number) => {
+    coinDays.current = {
+      ...coinDays.current,
+      [shortname]: time,
+    };
     setSelectedDays(time);
   };
+
+  useEffect(() => {
+    (async () => {
+      setSwitchCardLoading(true);
+      await getCoins(coinDays.current);
+      setSwitchCardLoading(false);
+    })();
+  }, [daysSelected]);
+
   return (
     <CardContainer ref={cardRef}>
       <CardContent>
@@ -156,25 +161,27 @@ const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
           <Chart
             data={prices}
             type={ChartType.Area}
-            hasTooltip={true}
+            CustomTooltip={PriceTooltip}
             strokeWidth={1}
             yAxis={true}
             height={'130%'}
           />
         </ChartContainer>
         <SetTimeContainer>
+          {switchCardLoading && (
+            <SetTimeContainerLoaderWrapper>
+              <Loader height={22} width={21} />
+            </SetTimeContainerLoaderWrapper>
+          )}
           {timeGraph.map((time, key) => (
             <SpanTime
               key={String(key)}
               onClick={() => {
                 handleClick(time);
               }}
-              selected={
-                daysSelected === time ||
-                (daysSelected === 'max' && time === 'ALL')
-              }
+              selected={daysSelected === time}
             >
-              {time === 'ALL' ? time : `${time}D`}
+              {`${time}D`}
             </SpanTime>
           ))}
         </SetTimeContainer>
@@ -254,26 +261,28 @@ const CoinCard: React.FC = () => {
     return <></>;
   };
 
-  return !loadingCoins ? (
+  return (
     <Container>
       {!isTablet ? (
         <ContainerDesktop>
-          <div>
-            {coinsName.map((coin, index) => (
-              <ButtonContainer key={index}>
-                <a
-                  target="_blank"
-                  href={`https://bitcoin.me/en/trade/${coin}-USDT`}
-                  rel="noreferrer"
-                >
-                  <ButtonInformation>
-                    {`Where to exchange or buy ${coin}`}
-                    <CurrencyIcon />
-                  </ButtonInformation>
-                </a>
-              </ButtonContainer>
-            ))}
-          </div>
+          {!loadingCoins && (
+            <div>
+              {coinsName.map((coin, index) => (
+                <ButtonContainer key={index}>
+                  <a
+                    target="_blank"
+                    href={`https://bitcoin.me/en/trade/${coin}-USDT`}
+                    rel="noreferrer"
+                  >
+                    <ButtonInformation>
+                      {`Where to exchange or buy ${coin}`}
+                      <CurrencyIcon />
+                    </ButtonInformation>
+                  </a>
+                </ButtonContainer>
+              ))}
+            </div>
+          )}
           <ContentDeskTop>
             {coins.map((coin, index) => (
               <RenderCoinsCard
@@ -307,47 +316,43 @@ const CoinCard: React.FC = () => {
               </CoinSelector>
             ))}
           </CoinsSelector>
-          <Content ref={carouselRef} onScroll={handleSelectCoin}>
-            {coins.map((coin, index) => (
-              <RenderCoinsCard
-                renderKfiMarketCap={renderKfiMarketCap}
-                cardRef={cardRef}
-                coinDays={coinDays}
-                coin={coin}
-                key={index}
-              />
-            ))}
-          </Content>
-          <ButtonContainer>
-            <a
-              target="_blank"
-              href={`https://bitcoin.me/en/trade/${
-                selectedCoin === 0 ? 'KLV' : 'KFI'
-              }-USDT`}
-              rel="noreferrer"
-            >
-              <ButtonInformation>
-                {selectedCoin === 0
-                  ? 'Where to exchange or buy KLV'
-                  : 'Where to exchange or buy KFI'}
-                <InfoSquare />
-              </ButtonInformation>
-            </a>
-          </ButtonContainer>
+          {!loadingCoins ? (
+            <Content ref={carouselRef} onScroll={handleSelectCoin}>
+              {coins.map((coin, index) => (
+                <RenderCoinsCard
+                  renderKfiMarketCap={renderKfiMarketCap}
+                  cardRef={cardRef}
+                  coinDays={coinDays}
+                  coin={coin}
+                  key={index}
+                />
+              ))}
+            </Content>
+          ) : (
+            <CoinCardSkeleton />
+          )}
+          {!loadingCoins && (
+            <ButtonContainer>
+              <a
+                target="_blank"
+                href={`https://bitcoin.me/en/trade/${
+                  selectedCoin === 0 ? 'KLV' : 'KFI'
+                }-USDT`}
+                rel="noreferrer"
+              >
+                <ButtonInformation>
+                  {selectedCoin === 0
+                    ? 'Where to exchange or buy KLV'
+                    : 'Where to exchange or buy KFI'}
+                  <InfoSquareIcon src="/InfoSquare.svg" />
+                </ButtonInformation>
+              </a>
+            </ButtonContainer>
+          )}
         </>
       )}
       <CoinsFetchFails />
     </Container>
-  ) : (
-    <>
-      {!isMobile ? (
-        <ContentDeskTop>
-          <CoinCardSkeleton />
-        </ContentDeskTop>
-      ) : (
-        <CoinCardSkeleton />
-      )}
-    </>
   );
 };
 

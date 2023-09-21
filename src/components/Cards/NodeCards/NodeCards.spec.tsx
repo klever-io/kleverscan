@@ -1,5 +1,4 @@
 import React from 'react';
-import theme from '../../../styles/theme';
 import { renderWithTheme } from '../../../test/utils';
 import { INodeCard } from '../../../types';
 import NodeCards from './';
@@ -56,9 +55,6 @@ describe('Component: NodeCards', () => {
       padding: '1.5rem',
       overflow: 'hidden',
       display: 'flex',
-      justifyContent: 'space-between',
-      backgroundColor: theme.white,
-      borderRadius: '1rem',
       gap: '1rem',
     };
 

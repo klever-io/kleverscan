@@ -1,5 +1,5 @@
 import { parseAddress } from '@/utils/parseValues';
-import { LayoutContainer, Main } from '@/views/home';
+import { HeaderGradient, LayoutContainer, Main } from '@/views/home';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -50,7 +50,7 @@ const Layout: React.FC = ({ children }) => {
       </Head>
 
       <Navbar />
-
+      {pathname === '/' && <HeaderGradient />}
       <Main>{children}</Main>
 
       <Footer />

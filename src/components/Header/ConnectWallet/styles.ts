@@ -3,56 +3,41 @@ import { BiTransfer } from 'react-icons/bi';
 import { IoIosLogOut } from 'react-icons/io';
 import styled, { keyframes } from 'styled-components';
 
-export const ConnectButton = styled.div`
+export const ConnectButton = styled.div<{
+  walletAddress?: boolean;
+  loading?: boolean;
+}>`
   display: flex;
+  gap: 0.6rem;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(
-    to right,
-    ${props => props.theme.violet},
-    ${props => props.theme.purple}
-  );
-  padding: 0.6rem;
-  border-radius: 1.3rem;
-  color: ${props => props.theme.true.white};
   font-weight: 700;
-  font-size: 0.84rem;
-
+  font-size: 0.75rem;
+  padding: ${props => (props.loading ? '0.6rem' : '0.3rem 0.5rem')};
+  border-radius: 0.5rem;
   text-align: center;
-  div {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
   position: relative;
-  width: 100%;
   cursor: pointer;
+  color: ${props => props.theme.true.white};
+  background: ${props => (props.walletAddress ? 'none' : props.theme.violet)};
 
   input {
     display: none;
   }
 
   span {
-    padding-left: 0.4rem;
+    white-space: nowrap;
   }
   label {
     cursor: pointer;
   }
-  min-width: 9rem;
 
-  span {
-    white-space: nowrap;
-  }
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
     min-width: unset;
     svg {
       width: 18px;
       height: 18px;
     }
-    span {
-      display: none;
-    }
-    background: 0;
     width: auto;
   }
 
@@ -61,6 +46,7 @@ export const ConnectButton = styled.div`
   }
 `;
 
+export const WalletIcon = styled.img``;
 export const ButtonAndCopy = styled.div`
   display: flex;
   align-items: center;
@@ -68,10 +54,9 @@ export const ButtonAndCopy = styled.div`
 
 export const ConnectContainer = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   user-select: none;
-
   justify-content: flex-start;
   align-items: flex-start;
 
@@ -282,5 +267,31 @@ export const BackgroundHelper = styled.div<{ opened: boolean }>`
     transparentize(props.theme.dark ? 0.85 : 0.7, props.theme.black)};
 
   transition: opacity 0.5s ease, visibility 0.5s ease;
-  z-index: 2;
+  z-index: 3;
+`;
+
+export const ConnectedWallet = styled.div`
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+
+  ::after {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background-color: ${props => props.theme.green};
+    content: '';
+    position: absolute;
+    left: 98%;
+    bottom: 2.2rem;
+  }
+`;
+
+export const GraySpan = styled.span`
+  color: ${props =>
+    props.theme.dark ? props.theme.true.white : props.theme.navbar.text};
+`;
+
+export const BlackSpan = styled.span`
+  color: ${props => props.theme.black};
 `;

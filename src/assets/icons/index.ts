@@ -1,6 +1,7 @@
 import ArrowPink from './arrow-down-pink.svg';
 import ArrowDownSquare from './arrow-down-square.svg';
 import ArrowDown from './arrow-down.svg';
+import ArrowDropdown from './arrow-dropdown.svg';
 import ArrowLeft from './arrow-left.svg';
 import ArrowRight from './arrow-right.svg';
 import ArrowGreen from './arrow-up-green.svg';
@@ -60,6 +61,7 @@ export {
   Receive,
   ArrowGreen,
   ArrowPink,
+  ArrowDropdown,
   Certified,
   WizardLeftArrow,
   WizardRightArrow,

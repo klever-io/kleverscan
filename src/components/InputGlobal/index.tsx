@@ -1,21 +1,30 @@
 import { Search } from '@/assets/icons';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
 import React, { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import PrePageTooltip from '../PrePageTooltip';
-import { Container, FocusBackground, SearchWrapper } from './styles';
+import { Container, FocusBackground } from './styles';
 
 interface InputGlobal {
   className?: string;
+  setOpenSearch?: React.Dispatch<React.SetStateAction<boolean>>;
+  openSearch?: boolean;
 }
 
-const Input: React.FC<InputGlobal> = ({ className }) => {
+const Input: React.FC<InputGlobal> = ({
+  className,
+  setOpenSearch,
+  openSearch,
+}) => {
   const [search, setSearch] = useState('');
   const [error, setError] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation('common');
 
-  const placeholder = t('Search Address, Block, Transaction');
+  const placeholder = t('Search Address, Block, Transaction, Asset');
+
+  const router = useRouter();
 
   useEffect(() => {
     function handleScroll() {
@@ -28,6 +37,12 @@ const Input: React.FC<InputGlobal> = ({ className }) => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  useEffect(() => {
+    if (openSearch) {
+      handleContainer();
+    }
+  }, [openSearch]);
 
   const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (error) {
@@ -61,6 +76,7 @@ const Input: React.FC<InputGlobal> = ({ className }) => {
   };
 
   const containerProps = {
+    isInHomePage: router.pathname === '/',
     className,
     onClick: handleContainer,
   };
@@ -70,21 +86,29 @@ const Input: React.FC<InputGlobal> = ({ className }) => {
     placeholder,
     onChange: handleInput,
     onKeyDown: keyDownHandle,
+    setOpenSearch: setOpenSearch,
   };
 
   return (
-    <SearchWrapper>
+    <>
       <Container {...containerProps}>
         <input {...inputProps} />
         <Search onClick={handleSearch} id={'SearchIcon'} />
+        {showTooltip && (
+          <>
+            <FocusBackground
+              onClick={handleTooltipFocus}
+              id="FocusBackground"
+            />
+            <PrePageTooltip
+              search={search}
+              setShowTooltip={setShowTooltip}
+              isInHomePage={containerProps.isInHomePage}
+            />
+          </>
+        )}
       </Container>
-      {showTooltip && (
-        <>
-          <FocusBackground onClick={handleTooltipFocus} id="FocusBackground" />
-          <PrePageTooltip search={search} setShowTooltip={setShowTooltip} />
-        </>
-      )}
-    </SearchWrapper>
+    </>
   );
 };
 

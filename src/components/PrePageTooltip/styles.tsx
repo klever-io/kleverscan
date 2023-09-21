@@ -1,18 +1,21 @@
 import { AiOutlineClose } from 'react-icons/ai';
 import styled, { css } from 'styled-components';
 
-export const TooltipBody = styled.article`
+export const TooltipBody = styled.article<{ isInHomePage: boolean }>`
   position: absolute;
   z-index: 7;
   background-color: ${props =>
     props.theme.dark ? props.theme.black : props.theme.footer.border};
   border-radius: 8px;
-  transform: translate(-5%, 100%);
-  left: 0;
-  bottom: -1rem;
+  transform: ${props =>
+    props.isInHomePage ? 'translate(-5%, 112%)' : 'translate(-5%, 112%)'};
+  left: 1rem;
+  bottom: 1rem;
 
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
-    transform: translate(0, 100%);
+    transform: ${props =>
+      props.isInHomePage ? 'translate(0%, 112%)' : 'translate(0%, 112%)'};
+    left: 0rem;
   }
 
   :after {
@@ -33,15 +36,19 @@ export const TooltipBody = styled.article`
 export const LeaveButton = styled(AiOutlineClose)`
   position: absolute;
   text-align: right;
-  color: ${props => props.theme.white};
+  fill: ${props => props.theme.white};
   top: 22px;
   :hover {
     cursor: pointer;
   }
+  fill: ${props => props.theme.white} !important;
+  path {
+    fill: ${props => props.theme.white} !important;
+  }
   z-index: 1;
-  left: 315px;
+  left: 326px;
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
-    left: 362px;
+    left: 373px;
   }
 `;
 export const TooltipWrapper = styled.div`

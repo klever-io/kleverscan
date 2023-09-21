@@ -1,6 +1,11 @@
 import { useTheme } from '@/contexts/theme';
-import Language from './Language';
-import { Container, IconContainer, MoonIcon, SunIcon } from './styles';
+import {
+  Container,
+  IconContainer,
+  MoonIcon,
+  SelectedMode,
+  SunIcon,
+} from './styles';
 
 interface IOptionsContainer {
   isConnected?: boolean;
@@ -13,9 +18,11 @@ const OptionsContainer: React.FC<IOptionsContainer> = ({
 
   return (
     <Container isConnected={isConnected}>
-      <Language />
+      {/* <Language /> */}
       <IconContainer onClick={() => theme.toggleDarkTheme()}>
-        {theme.isDarkTheme ? <MoonIcon /> : <SunIcon />}
+        <SelectedMode />
+        <SunIcon />
+        <MoonIcon />
       </IconContainer>
     </Container>
   );

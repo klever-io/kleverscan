@@ -15,6 +15,7 @@ import {
   DataContainer,
 } from '@/views/home';
 import React, { useEffect, useState } from 'react';
+import ProposalValidatorWrapper from './NewCards';
 
 const Home: React.FC = () => {
   const [wizard, setWizard] = useState(null);
@@ -33,15 +34,15 @@ const Home: React.FC = () => {
   return (
     <HomeDataProvider>
       <Container>
-        {!!wizard && <Wizard {...wizProps} />}
         <HomeInput />
+        {!!wizard && <Wizard {...wizProps} />}
         <QuickAccess setWizard={setWizard} />
         <DataContainer>
           <DataCardsContainer>
             <HomeDataCards />
-            {!isMobile && <ChartDailyTransactions />}
             <CoinCard />
-            {isMobile && <ChartDailyTransactions />}
+            <ProposalValidatorWrapper />
+            <ChartDailyTransactions />
           </DataCardsContainer>
         </DataContainer>
         <CardContainer>

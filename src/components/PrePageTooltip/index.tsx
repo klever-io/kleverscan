@@ -36,6 +36,7 @@ import {
 export interface IPrePageTooltip {
   search: string;
   setShowTooltip: React.Dispatch<React.SetStateAction<boolean>>;
+  isInHomePage: boolean;
 }
 
 const getInputType = (value: string) => {
@@ -64,6 +65,7 @@ const getInputType = (value: string) => {
 const PrePageTooltip: React.FC<IPrePageTooltip> = ({
   search,
   setShowTooltip,
+  isInHomePage,
 }) => {
   const [precision, setPrecision] = useState(0);
   const trimmedSearch = search.trim().toLowerCase();
@@ -179,7 +181,11 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
 
   let spanCount = 0;
   return (
-    <TooltipBody id="PrePageTooltip" onClick={e => e.stopPropagation()}>
+    <TooltipBody
+      id="PrePageTooltip"
+      onClick={e => e.stopPropagation()}
+      isInHomePage={isInHomePage}
+    >
       {!isLoading && <LeaveButton onClick={() => setShowTooltip(false)} />}
       {isLoading && (
         <LoaderWrapper>
@@ -210,7 +216,7 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
           <ErrorTitle>Error</ErrorTitle>
           <ErrorContent>
             Sorry, we cannot search with the text you provided. Try checking the
-            correct name and length of the asset, block or hash.
+            correct name and length of the address, asset, block or hash.
           </ErrorContent>
         </ErrorWrapper>
       )}

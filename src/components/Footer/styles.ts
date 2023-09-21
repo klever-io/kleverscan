@@ -1,7 +1,6 @@
 import styled, { keyframes } from 'styled-components';
 
 export const Container = styled.footer`
-  background-color: ${props => props.theme.footer.background};
   height: 100%;
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
     padding-top: 3rem;
@@ -20,40 +19,46 @@ const FadeIn = keyframes`
 export const Content = styled.div`
   max-width: ${props => props.theme.maxWidth};
   margin: 0 auto;
+  margin-top: 7rem;
   padding: 0 1.5rem;
-  justify-content: center;
   display: flex;
+  justify-content: center;
   flex-direction: row;
   gap: 4rem;
   flex-direction: column;
+  text-align: center;
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: row;
-    justify-content: flex-start;
+    justify-content: center;
     flex-wrap: wrap;
     padding: 0 2rem;
-    padding-bottom: 10rem;
     height: 100%;
   }
-`;
 
+  ::after {
+    content: '';
+    width: 18rem;
+    height: 18rem;
+  }
+`;
 export const DescriptionContainer = styled.div`
   display: flex;
   padding: 1.5rem 0 2rem 0;
   flex-direction: column;
   flex: 0 0 40%;
-  background: linear-gradient(
-    180deg,
-    rgba(34, 35, 69, 0.5) 0%,
-    rgba(34, 35, 69, 0) 100%
-  );
+  background: ${props =>
+    props.theme.dark
+      ? 'linear-gradient(180deg, rgba(34, 35, 69, 0.5) 0%, rgba(34, 35, 69, 0) 100%)'
+      : 'linear-gradient(180deg, rgba(34, 35, 69, 0.1) 0%, rgba(34, 35, 69, 0) 100%)'};
   border-radius: 16px;
   gap: 2rem;
+  color: ${props =>
+    props.theme.dark ? props.theme.true.white : props.theme.true.black};
   span {
     padding: 0rem 1rem;
     text-align: center;
-    font-weight: 500;
+    font-weight: 400;
     font-size: 1rem;
-    color: white;
     line-height: 1.25rem;
   }
   align-items: center;
@@ -66,17 +71,17 @@ export const DescriptionContainer = styled.div`
     background: none;
     span {
       text-align: start;
-      font-weight: 400;
-      font-size: 14px;
+      font-size: 0.9rem;
       line-height: 20px;
     }
   }
 `;
 
 export const LogoContainer = styled.div`
-  padding: 1rem 0 0 1rem;
+  display: grid;
+  padding: 0rem 1rem;
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
-    padding: 0rem 0 0 1rem;
+    padding: 0rem 1rem;
   }
 `;
 
@@ -99,8 +104,9 @@ export const SocialIcon = styled.div`
 
   border: 2px solid ${props => props.theme.footer.socialBorder};
   border-radius: 50%;
-
-  color: white;
+  background-color: ${props => props.theme.true.black};
+  color: ${props =>
+    props.theme.dark ? props.theme.true.white : props.theme.true.black};
   font-size: 0.85rem;
 
   cursor: pointer;
@@ -133,24 +139,19 @@ export const LinksContainer = styled.div`
 export const LinkItems = styled.div`
   display: flex;
   flex-direction: column;
-
+  color: ${props =>
+    props.theme.dark ? props.theme.true.white : props.theme.true.black};
   span {
-    min-width: 10rem;
     font-weight: 500;
-    color: white;
   }
 
   a {
     display: flex;
-
     align-items: center;
-
     gap: 0.5rem;
-
     font-weight: 600;
     font-size: 14px;
     line-height: 19px;
-    color: ${props => props.theme.true.white};
     text-decoration: none;
     transition: 0.2s ease;
     margin-bottom: 2rem;
@@ -176,16 +177,11 @@ export const DonateContainer = styled.div`
     font-weight: 600;
     font-size: 14px;
     line-height: 19px;
-    color: ${props => props.theme.true.white};
-
     text-decoration: none;
-
     transition: 0.2s ease;
-
     > svg:not(:first-child) {
       zoom: 0.85;
     }
-
     &:not(:last-child) {
       margin-bottom: 1rem;
     }
@@ -202,7 +198,7 @@ export const VersionBuildContainer = styled.div`
   p {
     font-size: 0.75rem;
     font-weight: 500;
-    color: ${props => props.theme.borderLogo};
+    color: ${props => props.theme.black};
   }
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
@@ -238,10 +234,10 @@ export const QrCodeDropdown = styled.div<{ active: boolean }>`
 export const ContainerHeaderItems = styled.div`
   display: flex;
   align-items: center;
-  color: ${props => props.theme.true.white};
   justify-content: space-between;
   padding-bottom: 2rem;
   span {
+    color: #b7bdc6;
     font-weight: 500;
     font-size: 24px;
     line-height: 18px;

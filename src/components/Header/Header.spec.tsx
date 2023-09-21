@@ -71,10 +71,7 @@ describe('Component: Header/navbar', () => {
 
   it(`Should have the correct style background for the navbar\'s container`, () => {
     const { container } = renderWithTheme(<Navbar />);
-
-    expect(container.firstChild).toHaveStyle(
-      `background: ${theme.navbar.background}`,
-    );
+    expect(container.firstChild).toHaveStyle(`background: ${theme.white}`);
   });
 
   it('Should have the correct style for the navbar items - desktop version', () => {
@@ -83,7 +80,10 @@ describe('Component: Header/navbar', () => {
 
     const navbarItems = screen.getAllByTestId('navbar-item');
     const style = {
-      filter: 'brightness(1)',
+      display: 'flex',
+      alignItems: 'center',
+      position: 'relative',
+      gap: '0.5rem',
       cursor: 'pointer',
       transition: '0.2s ease',
     };
@@ -100,15 +100,15 @@ describe('Component: Header/navbar', () => {
     const selector = `div > div > div:nth-child(1) > div:nth-child(6) div`;
     const dropDownContainer = container.querySelector(selector);
     const dropDownMenu = container.querySelector(`${selector} ul`);
-
     const dropDownContainerStyle = {
       display: 'none',
       position: 'absolute',
     };
     const dropDownMenuStyle = {
-      width: 'max-content',
-      background: theme.black,
-      color: theme.navbar.text,
+      display: 'block',
+      backgroundColor: `${theme.white}`,
+      'border-radius': '10px',
+      visibility: 'visible',
     };
 
     expect(dropDownContainer).toHaveStyle(dropDownContainerStyle);
@@ -148,14 +148,9 @@ describe('Component: Header/navbar', () => {
 
   it('Should change the overflow of the document.body when click to open mobile menu', () => {
     global.innerWidth = 500;
-
     const { container } = renderWithTheme(<Navbar />);
-
     const openMenuMobile = screen.getByTestId('menu-icon');
-    const mobileBackground = container.firstChild?.nextSibling as HTMLElement;
     fireEvent.click(openMenuMobile);
     expect(document.body.style.overflow).toBe('hidden');
-    fireEvent.click(mobileBackground);
-    expect(document.body.style.overflow).toBe('visible');
   });
 });

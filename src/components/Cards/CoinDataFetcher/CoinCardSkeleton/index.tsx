@@ -4,88 +4,48 @@ import React from 'react';
 import {
   CardContainerSkeleton,
   CardContent,
-  ChartContainer,
+  ChartContainerSkeleton,
   Container,
   Content,
-  Description,
   HeaderContainer,
   HeaderContentSkeleton,
   Name,
-  TitleDetails,
-  ValueContainer,
-  ValueContent,
-  ValueDetail,
 } from '../CoinCard/styles';
 
 const CoinCardSkeleton: React.FC = () => {
   return (
     <Container>
-      <Content>
-        <CardContainerSkeleton>
-          <CardContent>
-            <Link href={`#`}>
-              <a>
-                <HeaderContainer>
-                  <Skeleton width={60} height={50} />
+      <Content style={{ marginBottom: '1rem' }}>
+        {Array(2)
+          .fill(2)
+          .map((_, index) => (
+            <CardContainerSkeleton key={index}>
+              <CardContent>
+                <Link href={`#`}>
+                  <a>
+                    <HeaderContainer>
+                      <Skeleton width={70} height={60} />
 
-                  <HeaderContentSkeleton>
-                    <Name>
-                      <span>
-                        <Skeleton width={60} height={21} />
-                      </span>
-                      <span>
-                        <Skeleton height={21} />
-                      </span>
-                    </Name>
-                    <Description positive={true}>
-                      <span>
-                        <Skeleton width={60} height={16} />
-                      </span>
-                      <p>
-                        <Skeleton height={19} />
-                      </p>
-                    </Description>
-                  </HeaderContentSkeleton>
-                </HeaderContainer>
-              </a>
-            </Link>
+                      <HeaderContentSkeleton>
+                        <Name>
+                          <span style={{ marginBottom: '0.5rem' }}>
+                            <Skeleton width={60} height={21} />
+                          </span>
+                          <span>
+                            <Skeleton height={21} />
+                          </span>
+                        </Name>
+                      </HeaderContentSkeleton>
+                    </HeaderContainer>
+                  </a>
+                </Link>
 
-            <ChartContainer>
-              <Skeleton height={100} width={'100%'} />
-            </ChartContainer>
-
-            <ValueContainer isKLV={true}>
-              <ValueContent>
-                <TitleDetails positive={true}>
-                  <p>
-                    <Skeleton height={16} width={72} />
-                  </p>
-                  <span>
-                    <Skeleton height={16} width={40} />
-                  </span>
-                </TitleDetails>
-                <ValueDetail>
-                  <span>
-                    <Skeleton height={19} />
-                  </span>
-                </ValueDetail>
-              </ValueContent>
-              <ValueContent isDropdown={true}>
-                <TitleDetails positive={true}>
-                  <p>
-                    <Skeleton height={16} width={72} />
-                  </p>
-                  <span>
-                    <Skeleton height={16} width={40} />
-                  </span>
-                </TitleDetails>
-                <ValueDetail>
-                  <Skeleton height={19} />
-                </ValueDetail>
-              </ValueContent>
-            </ValueContainer>
-          </CardContent>
-        </CardContainerSkeleton>
+                <ChartContainerSkeleton>
+                  <Skeleton height={180} width={'100%'} />
+                </ChartContainerSkeleton>
+              </CardContent>
+            </CardContainerSkeleton>
+          ))}
       </Content>
     </Container>
   );

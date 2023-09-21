@@ -2,16 +2,19 @@ import { AccountDetailsModal } from '@/components/AccountDetailsModal';
 import Tour from '@/components/Tour';
 import { useExtension } from '@/contexts/extension';
 import { useScroll } from '@/utils/hooks';
+import { parseAddress } from '@/utils/parseValues';
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { AiOutlineUser } from 'react-icons/ai';
-import { BiWalletAlt } from 'react-icons/bi';
 import WalletHelp from '../WalletHelp';
 import {
   BackgroundHelper,
   BackGroundUserInfo,
+  BlackSpan,
   ConnectButton,
   ConnectContainer,
+  ConnectedWallet,
+  GraySpan,
+  WalletIcon,
 } from './styles';
 
 interface IConnectWallet {
@@ -56,8 +59,8 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
         <>
           <ConnectContainer>
             <ConnectButton onClick={handleClick}>
-              <BiWalletAlt size={'1.2em'} />
-              <span>Klever Extension</span>
+              <WalletIcon src="/Wallet.svg" />
+              <span>Connect wallet</span>
             </ConnectButton>
           </ConnectContainer>
           <BackgroundHelper
@@ -80,31 +83,35 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
           tourTooltip="Now that you connected your wallet, click here to see more options"
           condition={!!walletAddress}
         >
-          <ConnectContainer
+          <ConnectButton
             onClick={() => connectAndOpen()}
             key={String(extensionInstalled)}
+            walletAddress={!!walletAddress}
           >
-            <ConnectButton>
-              {extensionLoading ? (
-                <span> Loading... </span>
-              ) : (
-                <>
-                  {walletAddress && (
-                    <div onClick={() => setOpenUserInfos(!openUserInfos)}>
-                      <AiOutlineUser size={'1.3em'} />
-                      <span>Show Wallet</span>
-                    </div>
-                  )}
-                  {!walletAddress && (
-                    <>
-                      <BiWalletAlt size={'1.2em'} />
-                      <span>Connect</span>
-                    </>
-                  )}
-                </>
-              )}
-            </ConnectButton>
-          </ConnectContainer>
+            {extensionLoading ? (
+              <ConnectButton loading={extensionLoading}>
+                {' '}
+                Loading...{' '}
+              </ConnectButton>
+            ) : (
+              <>
+                {walletAddress && (
+                  <ConnectedWallet
+                    onClick={() => setOpenUserInfos(!openUserInfos)}
+                  >
+                    <GraySpan>Connected Wallet</GraySpan>
+                    <BlackSpan>{parseAddress(walletAddress, 12)}</BlackSpan>
+                  </ConnectedWallet>
+                )}
+                {!walletAddress && (
+                  <>
+                    <WalletIcon src="/Wallet.svg" />
+                    <span>Connect Wallet</span>
+                  </>
+                )}
+              </>
+            )}
+          </ConnectButton>
         </Tour>
       )}
       {walletAddress &&

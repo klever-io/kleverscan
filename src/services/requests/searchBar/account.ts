@@ -7,7 +7,7 @@ const getAccount = async (hash: string): Promise<IAccountResponse> => {
     route: `address/${hash}`,
   });
 
-  if (res.error === 'cannot find account in database') {
+  if (res.error === 'Cannot find account in database.') {
     return generateEmptyAccountResponse(hash);
   }
 

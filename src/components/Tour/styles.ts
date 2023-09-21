@@ -50,10 +50,6 @@ export const ContainerAttention = styled.div`
       filter: brightness(0.7);
     }
   }
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    background: ${props => props.theme.violet};
-    border-radius: 10%;
-  }
 `;
 export const TourContent = styled.div`
   position: relative;
@@ -82,8 +78,14 @@ export const TourTooltip = styled.div<IPlacement>`
   top: calc(${props => props.position?.bottom || 0}px + 1rem);
   left: ${props => props.position?.left || 0}px;
   transform: translateX(
-    calc(-1 * (100% - ${props => props.contentWidth}px) / 2)
+    calc(-1 * (70% - ${props => props.contentWidth}px) / 2)
   );
+
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+    transform: translateX(
+      calc(-1 * (100% - ${props => props.contentWidth}px) / 2)
+    );
+  }
   z-index: 7;
 
   width: 12rem;

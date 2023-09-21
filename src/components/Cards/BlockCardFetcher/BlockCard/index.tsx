@@ -1,7 +1,15 @@
+import { useMobile } from '@/contexts/mobile';
 import { IBlockCard } from '@/types/blocks';
 import { formatAmount } from '@/utils/formatFunctions/';
 import { getAge } from '@/utils/timeFunctions';
-import { BlockCardHash, BlockCardRow, TransactionRow } from '@/views/home';
+import {
+  BlockCardHash,
+  BlockCardLogo,
+  BlockCardRow,
+  CardBackground,
+  TransactionContainerContent,
+  TransactionRow,
+} from '@/views/home';
 import { fromUnixTime } from 'date-fns';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
@@ -15,43 +23,86 @@ const BlockCard: React.FC<IBlockCard> = ({
   blockIndex,
   txCount,
   txBurnedFees,
+  producerLogo,
 }) => {
   const { t } = useTranslation('blocks');
   const { t: commonT } = useTranslation('common');
+  const { isMobile } = useMobile();
 
   const precision = 6; // default KLV precision
 
   return (
     <TransactionRow>
-      <Link href={`/block/${nonce}`}>
-        <a>
+      {!isMobile && <CardBackground src="/homeCards/blocks.svg" />}
+      <TransactionContainerContent>
+        <BlockCardRow>
+          <Link href={`/block/${nonce}`}>
+            <a>
+              <strong>#{nonce}</strong>
+            </a>
+          </Link>
+          <small>
+            {getAge(fromUnixTime(timestamp / 1000), commonT)}{' '}
+            {commonT('Date.Elapsed Time')}
+          </small>
+        </BlockCardRow>
+        <BlockCardRow>
+          <div>
+            <p>{t('Miner')}:</p>
+            <BlockCardHash>
+              <strong>{hash}</strong>
+            </BlockCardHash>
+          </div>
+          <BlockCardLogo
+            src={producerLogo ? producerLogo : '/homeCards/blocks.svg'}
+          />
+        </BlockCardRow>
+        {!isMobile && (
           <BlockCardRow>
-            <strong>#{nonce}</strong>
+            <div>
+              <p>{commonT('Titles.Transactions')}:</p>
+              <span>{txCount}</span>
+            </div>
+
+            <div>
+              <p>{t('Burned')}:</p>
+              <span>
+                {formatAmount((txBurnedFees || 0) / 10 ** precision)} KLV
+              </span>
+            </div>
+            <div>
+              <p>{t('Reward')}:</p>
+              <span>
+                {formatAmount((blockRewards || 0) / 10 ** precision)} KLV
+              </span>
+            </div>
           </BlockCardRow>
-        </a>
-      </Link>
-      <BlockCardRow>
-        <small>
-          {getAge(fromUnixTime(timestamp / 1000), commonT)}{' '}
-          {commonT('Date.Elapsed Time')}
-        </small>
-      </BlockCardRow>
-      <BlockCardRow>
-        <p>{t('Miner')}:</p>
-        <BlockCardHash> {hash}</BlockCardHash>
-      </BlockCardRow>
-      <BlockCardRow>
-        <p>{t('Burned')}:</p>
-        <span>{formatAmount((txBurnedFees || 0) / 10 ** precision)} KLV</span>
-      </BlockCardRow>
-      <BlockCardRow>
-        <p>{commonT('Titles.Transactions')}:</p>
-        <span>{txCount}</span>
-      </BlockCardRow>
-      <BlockCardRow>
-        <p>{t('Reward')}:</p>
-        <span>{formatAmount((blockRewards || 0) / 10 ** precision)} KLV</span>
-      </BlockCardRow>
+        )}
+        {isMobile && (
+          <>
+            <BlockCardRow>
+              <div>
+                <p>{commonT('Titles.Transactions')}:</p>
+                <span>{txCount}</span>
+              </div>
+            </BlockCardRow>
+            <BlockCardRow>
+              <div>
+                <p>{t('Burned')}:</p>
+                <span>
+                  {formatAmount((txBurnedFees || 0) / 10 ** precision)} KLV
+                </span>
+              </div>
+              <div>
+                <p>{t('Reward')}:</p>
+                <span>
+                  {formatAmount((blockRewards || 0) / 10 ** precision)} KLV
+                </span>
+              </div>
+            </BlockCardRow>
+          </>
+        )}
+      </TransactionContainerContent>
     </TransactionRow>
   );
 };

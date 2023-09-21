@@ -304,7 +304,6 @@ export const CardContainer = styled.div`
         display: flex;
         align-items: center;
         width: fit-content;
-        /* border: 1px solid white; */
         border-radius: 20%;
         padding: 0.2rem;
 

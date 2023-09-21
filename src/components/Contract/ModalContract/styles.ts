@@ -21,7 +21,7 @@ export const Content = styled.div`
   min-height: 36rem;
   overflow: auto;
   overflow-x: hidden;
-  padding: 2rem;
+  padding: 0.4rem;
   max-width: 95vw;
   min-width: 60vw;
   border-radius: 1rem;
@@ -29,6 +29,10 @@ export const Content = styled.div`
 
   display: flex;
   flex-direction: column;
+
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+    padding: 2rem;
+  }
 
   h1 {
     color: ${props => props.theme.true.white};
@@ -75,7 +79,7 @@ export const TitleContent = styled.div`
     height: 1.3rem;
 
     @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-      right: 2rem;
+      right: 1rem;
     }
   }
 `;

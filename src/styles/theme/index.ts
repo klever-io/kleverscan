@@ -1,7 +1,7 @@
 const theme = {
   dark: false,
   maxWidth: '1900px',
-  background: '#EBF1F8',
+  background: '#F4F4F4',
   white: '#fff',
   black: '#06060B',
   borderLogo: '#ccc',
@@ -34,6 +34,7 @@ const theme = {
   true: {
     white: '#fff',
     black: '#0B0B1E',
+    newBlack: '#06060b',
   },
 
   status: {
@@ -84,7 +85,7 @@ const theme = {
   card: {
     background: '#222345',
     text: '#C6C7EB',
-
+    gray: '#F0F0F0',
     secondaryText: '#595C98',
     darkText: '#7B7DB2',
 

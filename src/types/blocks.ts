@@ -31,6 +31,7 @@ export interface IBlock {
   producerName: string;
   validators: string[];
   producerOwnerAddress: string;
+  producerLogo: string;
 }
 
 export interface IBlockCard {
@@ -41,6 +42,7 @@ export interface IBlockCard {
   blockRewards: number;
   txCount: number;
   txBurnedFees?: number;
+  producerLogo: string;
 }
 export interface IBlockCardFetcher {
   blocks: IBlock[];

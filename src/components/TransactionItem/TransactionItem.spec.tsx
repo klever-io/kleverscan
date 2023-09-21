@@ -2,7 +2,6 @@ import { formatDate } from '@/utils/formatFunctions';
 import { parseAddress } from '@/utils/parseValues';
 import { screen } from '@testing-library/react';
 import React from 'react';
-import theme from '../../styles/theme';
 import { mockTxItem } from '../../test/mocks';
 import { renderWithTheme } from '../../test/utils';
 import TransactionItem, { IContract } from './';
@@ -74,18 +73,21 @@ describe('Component: TransactionItem', () => {
     );
 
     const containerStyle = {
-      padding: '0.4rem 0 0.4rem 0',
-      gap: '0.5rem',
-      flexDirection: 'row',
+      display: 'block',
+      visibility: 'visible',
     };
     const linkStyle = {
-      // textOverflow: 'ellipsis',
-      // fontWeight: '6000',
-      color: `${theme.darkBlue}`,
+      display: 'flex',
+      'align-items': 'center',
+      'justify-content': 'end',
+      gap: '0.25rem',
+      width: '100%',
+      'margin-left': 'auto',
+      visibility: 'visible',
     };
-
     const transactionDataElement = container.firstChild?.lastChild;
     const linkElement = transactionDataElement?.firstChild?.lastChild;
+
     expect(transactionDataElement).toHaveStyle(containerStyle);
     expect(linkElement).toHaveStyle(linkStyle);
   });
@@ -96,13 +98,16 @@ describe('Component: TransactionItem', () => {
     );
 
     const style = {
-      width: '100%',
-      padding: '0.4rem 0 0.4rem 0',
-      color: theme.darkBlue,
+      display: 'block',
+      visibility: 'visible',
     };
     const spanStyle = {
-      fontWeight: 400,
-      fontSize: '0.9rem',
+      display: 'flex',
+      'align-items': 'center',
+      'justify-content': 'flex-start',
+      gap: '0.25rem',
+      width: '100%',
+      visibility: 'visible',
     };
     const transactionAmountElement = container.firstChild?.lastChild;
     expect(transactionAmountElement).toHaveStyle(style);

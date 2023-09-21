@@ -59,17 +59,36 @@ describe('Component: Filter', () => {
     const selector = container.firstChild?.firstChild
       ?.nextSibling as HTMLElement;
     const contentStyle = {
-      position: 'relative',
       backgroundColor: theme.white,
-      border: `1px solid ${theme.lightGray}`,
+      display: 'flex',
+      'background-color': 'rgb(255, 255, 255)',
+      width: '100%',
+      height: '2.8rem',
+      padding: '0.5rem 0px 0.5rem 1rem',
+      'padding-top': '0.5rem',
+      'padding-right': '0px',
+      'padding-bottom': '0.5rem',
+      'padding-left': '1rem',
+      position: 'relative',
+      'flex-direction': 'row',
+      'justify-content': 'space-between',
+      'align-items': 'center',
+      'border-radius': '0.5rem',
       cursor: 'pointer',
+      visibility: 'visible',
     };
-    // const selectorContainer = {
-    //   width: '100%',
-    //   position: 'absolute',
-    //   gap: '0.25rem',
-    // };
+
+    const selectorContainer = {
+      display: 'block',
+      padding: '0.5rem 1rem',
+      'padding-top': '0.5rem',
+      'padding-right': '1rem',
+      'padding-bottom': '0.5rem',
+      'padding-left': '1rem',
+      'margin-top': '0px',
+      visibility: 'visible',
+    };
     expect(selector).toHaveStyle(contentStyle);
-    // expect(selector.lastChild).toHaveStyle(selectorContainer);
+    expect(selector.lastChild).toHaveStyle(selectorContainer);
   });
 });

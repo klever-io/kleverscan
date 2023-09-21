@@ -1,5 +1,4 @@
 import ContextProviders from '@/components/ContextProviders';
-import LegacyLayout from '@/components/LegacyHome/LegacyLayout';
 import { appWithTranslation, SSRConfig } from 'next-i18next';
 import type { AppProps as NextJsAppProps } from 'next/app';
 import { useRouter } from 'next/router';
@@ -29,10 +28,7 @@ declare type AppProps = NextJsAppProps & {
 };
 
 const LayoutWrapper: React.FC = ({ children }) => {
-  if (process.env.DEFAULT_API_HOST?.includes('devnet')) {
-    return <Layout>{children}</Layout>;
-  }
-  return <LegacyLayout>{children}</LegacyLayout>;
+  return <Layout>{children}</Layout>;
 };
 
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {

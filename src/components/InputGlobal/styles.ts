@@ -1,17 +1,15 @@
-import { DefaultCardStyles } from '@/styles/common';
 import styled, { css } from 'styled-components';
 
-export const SearchWrapper = styled.div`
-  position: relative;
-`;
-
-export const Container = styled.div`
-  ${DefaultCardStyles}
+export const Container = styled.div<{ isInHomePage: boolean }>`
+  background-color: ${props =>
+    props.theme.dark ? props.theme.footer.background : props.theme.true.white};
   position: relative;
   padding: 0.75rem 1rem;
   display: flex;
   width: 100%;
-
+  min-width: 11rem;
+  max-width: 20rem;
+  border: none;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
@@ -20,10 +18,18 @@ export const Container = styled.div`
   mix-blend-mode: normal;
   cursor: text;
 
+  border: 1px solid ${props => props.theme.white && props.theme.lightGray};
   ${props =>
     props.theme.dark &&
     css`
       border: 1px solid ${({ theme }) => theme.input.borderSearchBar};
+    `}
+
+  ${props =>
+    props.isInHomePage &&
+    css`
+      max-width: initial;
+      width: 100%;
     `}
 
   transition: 0.2s ease;
@@ -31,12 +37,10 @@ export const Container = styled.div`
     width: 100%;
     min-width: 5rem;
 
-    font-size: 0.9rem;
-
-    color: ${props => props.theme.input.border.search};
+    color: ${props => props.theme.input.border.search} !important;
 
     &::placeholder {
-      color: ${props => props.theme.darkText};
+      color: ${props => props.theme.input.border.search};
     }
 
     &::selection {

@@ -16,7 +16,7 @@ const Input: React.FC<InputGlobal> = ({ className }) => {
 
   const router = useRouter();
 
-  const placeholder = t('Search Address, Block, Transaction');
+  const placeholder = t('Search Address, Block, Transaction, Asset');
 
   const getInputType = (value: string) => {
     const addressLength = 62;

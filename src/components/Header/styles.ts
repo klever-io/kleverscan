@@ -2,7 +2,6 @@ import { Search } from '@/assets/icons';
 import { transparentize } from 'polished';
 import { AiOutlineClose } from 'react-icons/ai';
 import { HiOutlineMenuAlt2 } from 'react-icons/hi';
-import { MdArrowDropDown } from 'react-icons/md';
 import styled, { css, keyframes } from 'styled-components';
 import { default as DefaultInput } from '../InputGlobal';
 
@@ -12,17 +11,18 @@ interface IMobileMenu {
 }
 
 export const Container = styled.div`
-  padding: 1rem 2rem;
-  min-height: 3.5rem;
+  padding: 0.75rem 1.5rem;
+  min-height: 2.5rem;
   position: sticky;
   top: 0;
   left: 0;
   right: 0;
   z-index: 6;
   transition: top 0.1s linear;
-  background-color: ${props => props.theme.navbar.background};
+  background-color: ${props =>
+    props.theme.dark ? props.theme.footer.background : props.theme.true.white};
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    padding: 1rem 1.5rem;
+    padding: 0.75rem 1.5rem;
     width: 100%;
     justify-content: space-between;
   }
@@ -32,9 +32,11 @@ export const NavBarOptionsContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1rem;
+  gap: 2rem;
+  width: 30vw;
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: column;
+    gap: 2rem;
   }
 `;
 
@@ -42,19 +44,13 @@ export const Content = styled.div<{ isMainNet?: boolean }>`
   display: flex;
   flex-direction: row;
   align-items: center;
-
   position: relative;
-
-  gap: 0.5rem;
+  justify-content: space-between;
+  gap: 1.5rem;
 
   max-width: ${props => props.theme.maxWidth};
 
   margin: 0 auto;
-
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    justify-content: space-between;
-    min-height: ${props => (props.isMainNet ? '2.8rem' : '4rem')};
-  }
 `;
 
 export const HeaderContainer = styled.span<{
@@ -69,14 +65,23 @@ export const HeaderContainer = styled.span<{
     font-size: 0.8rem;
   }
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    width: 20rem;
+    width: 18rem;
   }
 `;
 
 export const Logo = styled.div`
   margin-right: 0.5rem;
   min-width: 6rem;
-
+  display: flex;
+  align-items: center;
+  span {
+    fill: ${props => props.theme.dark && props.theme.true.white};
+    svg {
+      path {
+        fill: ${props => props.theme.dark && props.theme.true.white};
+      }
+    }
+  }
   cursor: pointer;
 `;
 
@@ -94,19 +99,19 @@ export const Item = styled.div<{ selected: boolean }>`
 
   transition: 0.2s ease;
 
-  filter: brightness(${props => (props.selected ? 2.5 : 1)});
-
-  &:hover {
-    ${props =>
-      !props.selected &&
-      css`
-        filter: brightness(1.5);
-      `};
-  }
-
   span {
-    color: ${props => props.theme.navbar.text};
-    font-weight: 600;
+    color: ${props =>
+      props.theme.dark ? props.theme.true.white : props.theme.true.black};
+  }
+  svg {
+    path {
+      fill: ${props =>
+        props.theme.dark ? props.theme.true.white : props.theme.true.black};
+    }
+  }
+  &:hover > span {
+    filter: brightness(4);
+    color: ${props => props.theme.blue};
   }
 
   &:hover > div {
@@ -145,13 +150,13 @@ export const ItemTransaction = styled.div<{ selected: boolean }>`
 `;
 
 export const MobileItem = styled(Item)`
-  justify-content: flex-end;
+  justify-content: flex-start;
   color: ${props => props.theme.navbar.text};
   font-size: 1.5rem;
 `;
 
 export const Input = styled(DefaultInput)`
-  background-color: ${props => props.theme.input.searchBar};
+  background-color: ${props => props.theme.white};
   border-color: ${props => props.theme.lightGray};
   input {
     color: ${props => props.theme.text.inputHeader};
@@ -184,7 +189,7 @@ export const SearchContainer = styled.div<{ $openSearch: boolean }>`
   align-items: center;
   width: 20vw;
   max-width: 20rem;
-  gap: 1rem;
+  gap: 0.2rem;
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;
     max-width: 65vw;
@@ -194,27 +199,47 @@ export const SearchContainer = styled.div<{ $openSearch: boolean }>`
 
 export const CloseSearch = styled(AiOutlineClose)<{ $openSearch: boolean }>`
   display: ${props => (props.$openSearch ? 'block' : 'none')};
-  color: ${props => props.theme.true.white};
-  height: 15px;
-  width: 15px;
+  color: ${props => props.theme.black};
+  padding: 0.3rem;
+
+  height: 1.7rem;
+  width: 1.7rem;
+  cursor: pointer;
 `;
-export const SearchIcon = styled(Search)<{ $openSearch: boolean }>`
-  display: ${props => (props.$openSearch ? 'none' : 'block')};
+export const SearchIcon = styled(Search)`
   & path {
-    fill: ${props => props.theme.true.white};
+    fill: ${props => props.theme.black};
   }
+  cursor: pointer;
+  overflow: visible;
+`;
+
+export const SearchIconWrapper = styled.div<{ openSearch: boolean }>`
+  display: ${props => (props.openSearch ? 'none' : 'grid')};
+  padding: 0.5rem;
+  place-items: center;
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    padding: 1rem;
+  }
+  cursor: pointer;
 `;
 export const DesktopContainer = styled.div`
   display: flex;
-
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  gap: 0.5rem;
+  gap: 1rem;
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     display: none;
   }
+`;
+
+export const DesktopSubWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
 `;
 
 export const IconsMenu = styled.div`
@@ -222,9 +247,8 @@ export const IconsMenu = styled.div`
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
-
   gap: 1rem;
-
+  align-content: flex-start;
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     display: none;
   }
@@ -234,6 +258,12 @@ export const MobileContainer = styled.div<{ $openSearch: boolean }>`
   z-index: 6;
   position: relative;
   display: none;
+  svg {
+    path {
+      color: ${props => props.theme.dark && props.theme.true.white};
+      fill: ${props => props.theme.dark && props.theme.true.white};
+    }
+  }
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: ${props => (props.$openSearch ? '100%' : 'auto')};
     display: flex;
@@ -245,9 +275,8 @@ export const MobileContainer = styled.div<{ $openSearch: boolean }>`
 
 export const MobileContent = styled.div<IMobileMenu>`
   padding: 1.5rem;
-  height: calc(100vh - 4rem);
+  height: 100vh;
 
-  top: 4.5rem;
   right: 0;
 
   transform: translateX(${props => (props.opened ? 0 : '100%')});
@@ -255,13 +284,14 @@ export const MobileContent = styled.div<IMobileMenu>`
   display: flex;
   position: fixed;
 
-  z-index: 6;
+  z-index: 12;
 
   flex-direction: column;
 
   gap: 1.5rem;
 
-  background-color: ${props => props.theme.navbar.background};
+  background-color: ${props =>
+    props.theme.dark ? props.theme.navbar.background : props.theme.true.white};
 
   transition: 0.3s ease-out;
 
@@ -291,21 +321,39 @@ export const MobileNavbarItemList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-
   overflow-y: auto;
+  padding-right: 0.5rem;
+  margin-bottom: 10rem;
+  &::-webkit-scrollbar {
+    position: absolute;
+    width: 0.25rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+    margin: 0.75rem;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 15px;
+  }
+
+  &:hover {
+    &::-webkit-scrollbar-thumb {
+      background: ${props => transparentize(0.75, props.theme.black)};
+    }
+  }
 `;
 
 export const MobileBackground = styled.div<IMobileMenu>`
   width: 100%;
   height: 100vh;
 
-  top: 4.5rem;
   left: 0;
 
   position: fixed;
 
   z-index: 6;
-
   opacity: ${props => (props.opened ? 1 : 0)};
   visibility: ${props => (props.opened ? 'visible' : 'hidden')};
 
@@ -331,10 +379,8 @@ export const DropdownContainer = styled.div`
   position: absolute;
   bottom: 0;
   right: 0.4vw;
-
+  top: 0;
   animation: ${expand} 0.2s ease;
-
-  background-color: ${props => props.theme.navbar.background};
 
   border-radius: 0 0 0.5rem 0.5rem;
 
@@ -348,18 +394,19 @@ export const DropdownItem = styled.li<{ disabled: boolean }>`
   display: flex;
   gap: 0.5rem;
   list-style: none;
-
   align-items: center;
-
-  &:hover {
-    filter: brightness(1.8);
-  }
   padding: 0.4rem 0.7rem;
   span {
-    margin: 0 0.4rem 0 0.4em;
+    &:hover {
+      filter: brightness(4);
+      color: ${props => props.theme.blue};
+    }
+    font-weight: 500;
+    width: 100%;
   }
 
   a {
+    width: 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -376,32 +423,53 @@ export const DropdownItem = styled.li<{ disabled: boolean }>`
 
 export const DropdownMenu = styled.ul`
   width: max-content;
-  background-color: ${props => props.theme.navbar.background};
-  color: ${props => props.theme.navbar.text};
+  background-color: ${props =>
+    props.theme.dark ? '#181935' : props.theme.true.white};
   border-radius: 10px;
-  gap: 0.5rem;
-
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    background-color: ${props => transparentize(0.7, props.theme.black)};
-  }
-`;
-
-export const DropdownIcon = styled(MdArrowDropDown)`
-  font-size: 1.4rem;
 `;
 
 export const MenuIcon = styled(HiOutlineMenuAlt2).attrs(props => ({
-  color: props.theme.true.white,
+  color: props.theme.true.black,
   size: 26,
 }))`
   box-sizing: content-box;
-  padding: 0.25rem 0.3rem;
+  padding: 0.3rem 0;
+  margin-left: 1.5rem;
+  min-width: 2rem;
   cursor: pointer;
 `;
 
 export const ConnectContainer = styled.div`
   display: flex;
-  z-index: 2;
+  z-index: 5;
   align-items: center;
   gap: 0.3rem;
+  span {
+    color: ${props => props.theme.dark && props.theme.true.white};
+  }
+
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+    z-index: 12;
+  }
+`;
+
+export const SvgWrapper = styled.div`
+  align-items: center;
+  gap: 0.3rem;
+  display: flex;
+  justify-content: center;
+`;
+
+export const ConnectionWrapper = styled.div`
+  width: 100%;
+  position: relative;
+  z-index: 3;
+  padding: 0.75rem 1.5rem;
+  border-top: 1px solid
+    ${props => (props.theme.dark ? props.theme.blue : props.theme.lightGray)};
+  border-bottom: 1px solid
+    ${props => (props.theme.dark ? props.theme.blue : props.theme.lightGray)};
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;

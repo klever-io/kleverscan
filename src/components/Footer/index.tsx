@@ -8,6 +8,7 @@ import {
   walletDonate,
 } from '@/configs/footer';
 import { useMobile } from '@/contexts/mobile';
+import { useTheme } from '@/contexts/theme';
 import { ArrowUpSquareHideMenu } from '@/views/home';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -92,7 +93,7 @@ const FooterItems: React.FC<IContent> = link => {
 
 const Footer: React.FC = () => {
   const { isMobile } = useMobile();
-
+  const { isDarkTheme } = useTheme();
   const SocialItem: React.FC<ISocial> = ({ Icon, link }) => (
     <a target="_blank" href={link} rel="noreferrer">
       <SocialIcon>
@@ -106,7 +107,12 @@ const Footer: React.FC = () => {
       <Content>
         <DescriptionContainer>
           <LogoContainer>
-            <Image src="/logo-large.svg" alt="Logo" width="215" height="29" />
+            <Image
+              src={isDarkTheme ? '/logo-large.svg' : '/Logo.svg'}
+              alt="Logo"
+              width="215"
+              height="29"
+            />
           </LogoContainer>
           <span>{description}</span>
           {!isMobile && (

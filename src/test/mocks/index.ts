@@ -459,6 +459,7 @@ export const mockedHomeDataCards: IDataCards = {
       softwareVersion: '0',
       chainID: '10008',
       producerName: 'producerName',
+      producerLogo: '',
       producerOwnerAddress: 'producerAddress',
       validators: ['validatorBLS'],
     },

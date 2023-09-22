@@ -301,6 +301,7 @@ export const ContractProvider: React.FC = ({ children }) => {
     queryKey: 'assetsList',
     queryFn: getAssets,
     initialData: [],
+    enabled: !!walletAddress,
   });
 
   const amountAndFeesGreaterThanBalance = (): boolean => {

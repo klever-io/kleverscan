@@ -81,6 +81,7 @@ export const onChangeWrapper = (
 
       newQuery = {
         ...newQuery,
+        ...router.query,
         contractDetails: JSON.stringify(nonEmptyValues),
       };
 

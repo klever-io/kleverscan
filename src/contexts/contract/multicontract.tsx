@@ -186,6 +186,7 @@ export const MulticontractProvider: React.FC = ({ children }) => {
     if (contract !== '') {
       const newQuery = {
         contract: contract,
+        ...router.query,
       };
 
       setQueryAndRouter(newQuery, router, {
@@ -196,12 +197,11 @@ export const MulticontractProvider: React.FC = ({ children }) => {
 
   const clearQuery = () => {
     delete router.query['contractDetails'];
-
     if (router.pathname === '/create-transaction') {
       setQueryAndRouter({ contract: selectedContractType }, router);
     } else {
       delete router.query['contract'];
-      setQueryAndRouter({}, router);
+      setQueryAndRouter({ ...router.query }, router);
     }
   };
 

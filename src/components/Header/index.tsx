@@ -156,9 +156,9 @@ const Navbar: React.FC = () => {
     }
 
     if (prevScrollpos.current > currentScrollPos) {
-      navbar.style.top = '0';
+      navbar.style.transform = 'translateY(0)';
     } else {
-      navbar.style.top = '-4.5rem';
+      navbar.style.transform = 'translateY(-100%)';
     }
     prevScrollpos.current = currentScrollPos;
   };
@@ -255,28 +255,29 @@ const Navbar: React.FC = () => {
             <MenuIcon onClick={handleMenu} data-testid="menu-icon" />
           </MobileContainer>
         </Content>
+
+        {isMobile && (
+          <ConnectionWrapper>
+            <ConnectContainer
+              onClick={() => {
+                handleClickConnection();
+                closeMenu();
+              }}
+            >
+              <ConnectWallet clickConnection={closeDrawer} />
+              {router.pathname !== '/' && (
+                <SearchIconWrapper
+                  onClick={() => setOpenSearch(!openSearch)}
+                  openSearch={openSearch}
+                >
+                  <SearchIcon />
+                </SearchIconWrapper>
+              )}
+            </ConnectContainer>
+            <NetworkRedirectButton />
+          </ConnectionWrapper>
+        )}
       </Container>
-      {isMobile && (
-        <ConnectionWrapper>
-          <ConnectContainer
-            onClick={() => {
-              handleClickConnection();
-              closeMenu();
-            }}
-          >
-            <ConnectWallet clickConnection={closeDrawer} />
-            {router.pathname !== '/' && (
-              <SearchIconWrapper
-                onClick={() => setOpenSearch(!openSearch)}
-                openSearch={openSearch}
-              >
-                <SearchIcon />
-              </SearchIconWrapper>
-            )}
-          </ConnectContainer>
-          <NetworkRedirectButton />
-        </ConnectionWrapper>
-      )}
 
       <MobileBackground
         onClick={() => {

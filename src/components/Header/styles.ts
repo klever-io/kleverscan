@@ -11,18 +11,17 @@ interface IMobileMenu {
 }
 
 export const Container = styled.div`
-  padding: 0.75rem 1.5rem;
+  padding: 0;
   min-height: 2.5rem;
   position: sticky;
   top: 0;
   left: 0;
   right: 0;
   z-index: 6;
-  transition: top 0.1s linear;
+  transition: transform 0.1s linear;
   background-color: ${props =>
     props.theme.dark ? props.theme.footer.background : props.theme.true.white};
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    padding: 0.75rem 1.5rem;
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
     justify-content: space-between;
   }
@@ -47,10 +46,9 @@ export const Content = styled.div<{ isMainNet?: boolean }>`
   position: relative;
   justify-content: space-between;
   gap: 1.5rem;
-
   max-width: ${props => props.theme.maxWidth};
-
   margin: 0 auto;
+  padding: 0.75rem 1.5rem;
 `;
 
 export const HeaderContainer = styled.span<{
@@ -323,7 +321,10 @@ export const MobileNavbarItemList = styled.div`
   gap: 1.5rem;
   overflow-y: auto;
   padding-right: 0.5rem;
-  margin-bottom: 10rem;
+  margin-bottom: 15rem;
+  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
+    margin-bottom: 10rem;
+  }
   &::-webkit-scrollbar {
     position: absolute;
     width: 0.25rem;
@@ -442,6 +443,7 @@ export const MenuIcon = styled(HiOutlineMenuAlt2).attrs(props => ({
 export const ConnectContainer = styled.div`
   display: flex;
   z-index: 5;
+  position: sticky;
   align-items: center;
   gap: 0.3rem;
   span {

@@ -62,6 +62,9 @@ export const CardContainer = styled.div`
   align-items: center;
   border-radius: 0.5rem;
   min-width: 100%;
+  border: 1px solid
+    ${props => (props.theme.dark ? props.theme.card.background : 'transparent')};
+  border-radius: 1rem;
   background-color: ${props =>
     props.theme.dark ? 'transparent' : props.theme.true.white} !important;
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
@@ -75,6 +78,7 @@ export const CardContent = styled.div`
   display: flex;
   flex-direction: column;
   min-width: 100%;
+
   animation: 1.5s ease 0s 1 normal none running ${FadeIn};
   a {
     z-index: 0;

@@ -44,6 +44,8 @@ export const Content = styled.div`
 export const DescriptionContainer = styled.div`
   display: flex;
   padding: 1.5rem 0 2rem 0;
+  position: relative;
+  bottom: 0.2rem;
   flex-direction: column;
   flex: 0 0 40%;
   background: ${props =>

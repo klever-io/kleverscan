@@ -1,3 +1,4 @@
+import { useTheme } from '@/contexts/theme';
 import { getAsset } from '@/services/requests/asset';
 import getAccount from '@/services/requests/searchBar/account';
 import getBlock from '@/services/requests/searchBar/block';
@@ -14,6 +15,7 @@ import { ITransferContract } from '@/types/contracts';
 import { getPrecision } from '@/utils/precisionFunctions';
 import { processRowSectionsLayout } from '@/utils/table';
 import React, { useEffect, useState } from 'react';
+import { LuSearchX } from 'react-icons/lu';
 import { useQuery } from 'react-query';
 import { Loader } from '../Loader/styles';
 import {
@@ -23,12 +25,14 @@ import {
   TransactionRowSections,
 } from './RowSections';
 import {
+  BiggerTitleSpan,
   CardItem,
   ErrorContent,
   ErrorTitle,
   ErrorWrapper,
   LeaveButton,
   LoaderWrapper,
+  TitleSpan,
   TooltipBody,
   TooltipWrapper,
 } from './styles';
@@ -70,6 +74,7 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
   const [precision, setPrecision] = useState(0);
   const trimmedSearch = search.trim().toLowerCase();
   const type = getInputType(trimmedSearch);
+  const { isDarkTheme } = useTheme();
   const canSearch = () => {
     if (trimmedSearch === '' || !trimmedSearch || !type) {
       return false;
@@ -128,19 +133,35 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
 
   const getCorrectRowSections = (data: SearchRequest): IRowSection[] => {
     if (isAsset()) {
-      return AssetRowSections(data as IAssetResponse, precision);
+      return AssetRowSections(
+        data as IAssetResponse,
+        precision,
+        setShowTooltip,
+      );
     }
 
     if (isAccount()) {
-      return AccountRowSections(data as IAccountResponse, precision);
+      return AccountRowSections(
+        data as IAccountResponse,
+        precision,
+        setShowTooltip,
+      );
     }
 
     if (isTransaction()) {
-      return TransactionRowSections(data as ITransactionResponse, precision);
+      return TransactionRowSections(
+        data as ITransactionResponse,
+        precision,
+        setShowTooltip,
+      );
     }
 
     if (isBlock()) {
-      return BlockRowSections(data as IBlockResponse, precision);
+      return BlockRowSections(
+        data as IBlockResponse,
+        precision,
+        setShowTooltip,
+      );
     }
     return [];
   };
@@ -222,8 +243,14 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
       )}
       {!isLoading && canSearchResult && !data?.data && (
         <ErrorWrapper>
-          <ErrorTitle>Error</ErrorTitle>
-          <ErrorContent>{data?.error || 'Unknown Error'}</ErrorContent>
+          <BiggerTitleSpan>
+            <span>No Results Found</span>
+            <LuSearchX style={{ fontSize: '2rem' }} />
+          </BiggerTitleSpan>
+          <TitleSpan>
+            There are no results for your search. Consider trying a different
+            query.
+          </TitleSpan>
         </ErrorWrapper>
       )}
     </TooltipBody>

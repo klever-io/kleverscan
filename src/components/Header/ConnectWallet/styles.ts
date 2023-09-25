@@ -8,12 +8,12 @@ export const ConnectButton = styled.div<{
   loading?: boolean;
 }>`
   display: flex;
-  gap: 0.6rem;
+  gap: 0.4rem;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   font-size: 0.75rem;
-  padding: ${props => (props.loading ? '0.6rem' : '0.3rem 0.5rem')};
+  padding: ${props => (props.loading ? '0.6rem' : '0.4rem 0.6rem;')};
   border-radius: 0.5rem;
   text-align: center;
   position: relative;

@@ -12,11 +12,13 @@ import { ContractsName, ITransferContract } from '@/types/contracts';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions/index';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import Link from 'next/link';
+import { SetStateAction } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
 import {
   AssetNameWrapper,
   AssetTypeSpan,
   DateSpan,
+  DivWrapper,
   FailSpan,
   HashSpan,
   HoverDiv,
@@ -34,17 +36,23 @@ import {
   UnderlineSpan,
 } from '../styles';
 
-const getRedirectButton = (path: string) => (
-  <Link href={path}>
-    <RedirectSVG>
-      <Redirect />
-    </RedirectSVG>
-  </Link>
+const getRedirectButton = (
+  path: string,
+  setShowTooltip: React.Dispatch<SetStateAction<boolean>>,
+) => (
+  <div onClick={() => setShowTooltip(false)}>
+    <Link href={path}>
+      <RedirectSVG>
+        <Redirect />
+      </RedirectSVG>
+    </Link>
+  </div>
 );
 
 export const TransactionRowSections = (
   res: ITransactionResponse,
   precision: number,
+  setShowTooltip: React.Dispatch<SetStateAction<boolean>>,
 ): IRowSection[] => {
   if (res.data || res.error === '') {
     const { transaction } = res.data;
@@ -54,7 +62,7 @@ export const TransactionRowSections = (
         const Status = getStatusIcon('success');
         return (
           <SuccessSpan>
-            <Status width={50} />
+            <Status width={50} style={{ cursor: 'default' }} />
             <span>Success</span>
           </SuccessSpan>
         );
@@ -62,7 +70,7 @@ export const TransactionRowSections = (
       const Status = getStatusIcon('fail');
       return (
         <FailSpan>
-          <Status width={50} />
+          <Status width={50} style={{ cursor: 'default' }} />
           <span>Fail</span>
         </FailSpan>
       );
@@ -99,7 +107,7 @@ export const TransactionRowSections = (
       const parameter = transaction.contract[0]
         .parameter as unknown as ITransferContract;
       return parameter?.toAddress ? (
-        <UnderlineSpan>
+        <UnderlineSpan onClick={() => setShowTooltip(false)}>
           <Link href={`/account/${parameter?.toAddress}`}>
             {parameter?.toAddress}
           </Link>
@@ -114,7 +122,10 @@ export const TransactionRowSections = (
         element: (
           <TitleWrapper>
             <TitleSpan>Transaction Summary</TitleSpan>
-            {getRedirectButton(`/transaction/${transaction.hash}`)}
+            {getRedirectButton(
+              `/transaction/${transaction.hash}`,
+              setShowTooltip,
+            )}
           </TitleWrapper>
         ),
         span: 2,
@@ -126,7 +137,7 @@ export const TransactionRowSections = (
       { element: <DateSpan>{date}</DateSpan>, span: 1 },
       {
         element: (
-          <HashSpan>
+          <HashSpan onClick={() => setShowTooltip(false)}>
             <Link href={`/transaction/${transaction.hash}`}>
               {transaction.hash}
             </Link>
@@ -139,7 +150,7 @@ export const TransactionRowSections = (
         element: (
           <SpanWrapper>
             From:{' '}
-            <UnderlineSpan>
+            <UnderlineSpan onClick={() => setShowTooltip(false)}>
               <Link href={`/account/${transaction.sender}`}>
                 {transaction.sender}
               </Link>
@@ -163,6 +174,7 @@ export const TransactionRowSections = (
 export const AssetRowSections = (
   res: IAssetResponse,
   precision: number,
+  setShowTooltip: React.Dispatch<SetStateAction<boolean>>,
 ): IRowSection[] => {
   if (res.data || res.error === '') {
     const { asset } = res.data;
@@ -172,14 +184,14 @@ export const AssetRowSections = (
         element: (
           <TitleWrapper>
             <TitleSpan>Token Summary</TitleSpan>
-            {getRedirectButton(`/asset/${asset.assetId}`)}
+            {getRedirectButton(`/asset/${asset.assetId}`, setShowTooltip)}
           </TitleWrapper>
         ),
         span: 2,
       },
       {
         element: (
-          <HoverDiv>
+          <HoverDiv onClick={() => setShowTooltip(false)}>
             <Link href={`/asset/${asset.assetId}`}>
               <LogoWrapper>
                 <AssetLogo
@@ -242,22 +254,36 @@ export const AssetRowSections = (
 export const AccountRowSections = (
   res: IAccountResponse,
   precision: number,
+  setShowTooltip: React.Dispatch<SetStateAction<boolean>>,
 ): IRowSection[] => {
   if (res.data || res.error === '') {
     const { account } = res.data;
+
+    const getAccountTotalAssets = () => {
+      const KLV = account.balance > 0 ? 1 : 0;
+      const otherAssets = Object.keys(account.assets)?.length || 0;
+      const KLVinAssets = account.assets['KLV'];
+      if (KLVinAssets) {
+        return otherAssets;
+      }
+      return otherAssets + KLV;
+    };
     return [
       {
         element: (
           <TitleWrapper>
             <TitleSpan>Account Resume</TitleSpan>
-            {getRedirectButton(`/account/${account.address}`)}
+            {getRedirectButton(`/account/${account.address}`, setShowTooltip)}
           </TitleWrapper>
         ),
         span: 2,
       },
       {
         element: (
-          <HashSpan style={{ maxWidth: '20rem' }}>
+          <HashSpan
+            style={{ maxWidth: '20rem' }}
+            onClick={() => setShowTooltip(false)}
+          >
             <Link href={`/account/${account.address}`}>{account.address}</Link>
           </HashSpan>
         ),
@@ -265,7 +291,7 @@ export const AccountRowSections = (
       },
       {
         element: (
-          <HoverDiv>
+          <HoverDiv onClick={() => setShowTooltip(false)}>
             <Link href={'/asset/klv'}>
               <LogoWrapper>
                 <AssetLogo
@@ -301,13 +327,11 @@ export const AccountRowSections = (
       },
       {
         element: (
-          <SpanWrapperBottom>
-            {`Account total assets: ${
-              Object.keys(account.assets)?.length || 0
-            }`}
-          </SpanWrapperBottom>
+          <DivWrapper>
+            {`Account total assets: ${getAccountTotalAssets()}`}
+          </DivWrapper>
         ),
-        span: 1,
+        span: 2,
       },
     ];
   }
@@ -321,6 +345,7 @@ export const AccountRowSections = (
 export const BlockRowSections = (
   res: IAccountResponse,
   precision: number,
+  setShowTooltip: React.Dispatch<React.SetStateAction<boolean>>,
 ): IRowSection[] => {
   if (res.data || res.error === '') {
     const { block } = res.data;
@@ -330,7 +355,7 @@ export const BlockRowSections = (
         element: (
           <TitleWrapper>
             <TitleSpan>Block Summary</TitleSpan>
-            {getRedirectButton(`/block/${block.nonce}`)}
+            {getRedirectButton(`/block/${block.nonce}`, setShowTooltip)}
           </TitleWrapper>
         ),
         span: 2,
@@ -339,7 +364,7 @@ export const BlockRowSections = (
         element: (
           <SpanWrapper>
             Nonce:{' '}
-            <HashSpan>
+            <HashSpan onClick={() => setShowTooltip(false)}>
               <Link href={`/block/${block.nonce}`}>{`#${block.nonce}`}</Link>
             </HashSpan>
           </SpanWrapper>
@@ -354,7 +379,7 @@ export const BlockRowSections = (
         element: (
           <SpanWrapper>
             Miner:{' '}
-            <UnderlineSpan>
+            <UnderlineSpan onClick={() => setShowTooltip(false)}>
               {' '}
               <Link href={`account/${block.producerOwnerAddress}`}>
                 {block.producerName || block.producerOwnerAddress}
@@ -366,8 +391,8 @@ export const BlockRowSections = (
       },
       {
         element: (
-          <HoverDiv>
-            <Link href={`/block/${block.nonce}`}>
+          <HoverDiv onClick={() => setShowTooltip(false)}>
+            <Link href={`/account/${block.producerOwnerAddress}`}>
               <LogoWrapper>
                 <AssetLogo
                   logo={block?.producerLogo || '--'}

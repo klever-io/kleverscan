@@ -116,11 +116,16 @@ const Footer: React.FC = () => {
           </LogoContainer>
           <span>{description}</span>
           {!isMobile && (
-            <SocialContainer>
-              {socials.map((social, index) => (
-                <SocialItem key={String(index)} {...social} />
-              ))}
-            </SocialContainer>
+            <>
+              <SocialContainer>
+                {socials.map((social, index) => (
+                  <SocialItem key={String(index)} {...social} />
+                ))}
+              </SocialContainer>
+              <VersionBuildContainer>
+                <p>BUILD VERSION {packageJson.version}</p>
+              </VersionBuildContainer>
+            </>
           )}
         </DescriptionContainer>
 

@@ -82,10 +82,13 @@ export const LoaderWrapper = styled.div`
   place-items: center;
   padding: 1.5rem;
   font-weight: 600;
-  color: ${props => props.theme.status.error};
+  color: ${props => props.theme.white};
 `;
 
-export const ErrorWrapper = styled(LoaderWrapper)``;
+export const ErrorWrapper = styled(LoaderWrapper)`
+  text-align: center;
+  place-items: initial;
+`;
 
 export const ErrorContent = styled.div`
   align-self: start;
@@ -94,6 +97,8 @@ export const ErrorContent = styled.div`
 export const ErrorTitle = styled.h4`
   font-weight: 800;
   font-size: larger;
+  display: grid;
+  place-items: center;
 `;
 
 export const CardItem = styled.span<{
@@ -135,6 +140,15 @@ export const CardItem = styled.span<{
 export const TitleSpan = styled.span`
   color: ${props => props.theme.white};
   font-weight: 700;
+`;
+
+export const BiggerTitleSpan = styled.span`
+  font-size: larger;
+  font-weight: 800;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
 `;
 const SpanDefault = styled.span`
   font-weight: 700;

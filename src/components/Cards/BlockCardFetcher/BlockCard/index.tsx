@@ -48,9 +48,9 @@ const BlockCard: React.FC<IBlockCard> = ({
         </BlockCardRow>
         <BlockCardRow>
           <div>
-            <p>{t('Miner')}:</p>
-            <BlockCardHash>
-              <strong>{hash}</strong>
+            <p>{t('Hash')}:</p>
+            <BlockCardHash style={{ textDecoration: 'initial' }}>
+              <strong style={{ textDecoration: 'initial' }}>{hash}</strong>
             </BlockCardHash>
           </div>
           <BlockCardLogo

@@ -8,6 +8,6 @@ describe('Component: CoinCardSkeleton', () => {
     const container = renderWithTheme(<CoinCardSkeleton />).container;
     const skeletonsInCoinCards = screen.getAllByTestId('skeleton');
 
-    expect(skeletonsInCoinCards.length).toBe(24);
+    expect(skeletonsInCoinCards.length).toBe(8);
   });
 });

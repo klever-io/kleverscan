@@ -11,6 +11,9 @@ describe('Component: CoinCard', () => {
   const contextValues = {
     coins: CoinTest,
     assetsData: assetsData,
+    getCoins: (days: HomeData.IDaysCoins) => {
+      return;
+    },
   };
 
   beforeEach(() => {

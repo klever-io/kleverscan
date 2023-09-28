@@ -157,7 +157,20 @@ const Table: React.FC<ITable> = ({
     refetch();
   }, [page]);
 
+  const resetRouterPage = () => {
+    const updatedQuery = { ...router.query };
+    delete updatedQuery.page;
+    setQueryAndRouter(
+      {
+        ...updatedQuery,
+      },
+      router,
+    );
+  };
+
   useEffect(() => {
+    setPage(1);
+    resetRouterPage();
     refetch();
   }, [limit]);
 
@@ -351,14 +364,7 @@ const Table: React.FC<ITable> = ({
               onPaginate={page => {
                 setPage(page);
                 if (page === 1) {
-                  const updatedQuery = { ...router.query };
-                  delete updatedQuery.page;
-                  setQueryAndRouter(
-                    {
-                      ...updatedQuery,
-                    },
-                    router,
-                  );
+                  resetRouterPage();
                 } else {
                   setQueryAndRouter(
                     { ...router.query, page: page.toString() },

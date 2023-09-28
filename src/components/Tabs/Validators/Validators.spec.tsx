@@ -17,7 +17,8 @@ describe('Component: Tabs/Validators', () => {
     useRouter.mockReturnValue({
       route: '/',
       pathname: '',
-    } as nextRouter.NextRouter);
+      push: jest.fn(),
+    } as unknown as nextRouter.NextRouter);
   });
 
   it('Should render the Validators Tab correctly', async () => {

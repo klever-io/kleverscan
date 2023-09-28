@@ -38,6 +38,7 @@ describe('Component: Table', () => {
       return {
         route: '/',
         pathname: '',
+        push: jest.fn(),
       };
     },
   }));
@@ -47,7 +48,8 @@ describe('Component: Table', () => {
       ({
         route: '/',
         pathname: '/validators',
-      } as nextRouter.NextRouter),
+        push: jest.fn(),
+      } as unknown as nextRouter.NextRouter),
   );
 
   beforeEach(() => {

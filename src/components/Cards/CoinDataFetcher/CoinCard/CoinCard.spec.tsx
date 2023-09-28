@@ -22,7 +22,7 @@ describe('Component: CoinCard', () => {
       .mockImplementation(() => contextValues as HomeData.IHomeData);
   });
 
-  it('Should render the CoinCard with the correct text', () => {
+  it('Should render the CoinCard with the correct text', async () => {
     const container = renderWithTheme(<CoinCard />).container;
     expect(screen.getAllByText(CoinTest[0].shortname)).toHaveLength(2);
     expect(screen.getByText(CoinTest[0].name)).toBeInTheDocument();

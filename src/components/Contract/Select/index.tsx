@@ -32,6 +32,7 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: boolean;
   selectedValue?: IDropdownItem;
   loading?: boolean;
+  defaultValue?: any;
 }
 
 const Select: React.FC<IFilter> = ({
@@ -49,6 +50,7 @@ const Select: React.FC<IFilter> = ({
   error,
   loading,
   selectedValue,
+  defaultValue,
   ...rest
 }) => {
   const Placeholder = useCallback((props: any) => {
@@ -88,7 +90,8 @@ const Select: React.FC<IFilter> = ({
         defaultValue={
           (collection && Object.keys(collection).length !== 0 && collection) ||
           claimSelectedType ||
-          (selectedBucket && { label: selectedBucket })
+          (selectedBucket && { label: selectedBucket }) ||
+          defaultValue
         }
         value={selectedValue}
         placeholder={getPlaceholder()}

@@ -170,6 +170,16 @@ const theme = {
   qrcodeTooltip: {
     background: '#fff',
   },
+  wizard: {
+    background: '#F2F2F2',
+    subTitle: '#0B0B1E',
+    genericInfoCard: '#F2F2F2',
+    steps: '#aa33b5',
+    stepsBackground: '#fff',
+    stepsLine: '#D7D8DD',
+    isDone: '#4ebc87',
+    cardAddress: '#fff',
+  },
 
   breakpoints: {
     mobile: '768px',

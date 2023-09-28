@@ -281,7 +281,9 @@ const WizCreateNFT: React.FC<any> = ({
         },
       ]);
 
-      const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
+      const signedTx = await window.kleverWeb.signTransaction(
+        unsignedTx.result,
+      );
       const response = await web.broadcastTransactions([signedTx]);
       setTxHash(response.data.txsHashes[0]);
       window.scrollTo(0, 0);

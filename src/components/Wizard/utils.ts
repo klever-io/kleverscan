@@ -146,6 +146,78 @@ export const createNFT = {
   },
 };
 
+export const createITO = {
+  commomValues: {
+    assetType: 15,
+    additionalValues: false,
+    basicTotalSteps: 7,
+  },
+  welcome: {
+    title: 'Set up an Initial Token Offering',
+    description:
+      'To set up an Initial Token Offering we will guide you through a few steps.',
+    tooltip: 'What is a ITO?',
+    kleverTip:
+      'An ITO stands for "Initial Token Offering", a fundraising method for issuing and selling new Klever Digital Assets (KDA).',
+    transactionCost: '20,000',
+    timeEstimated: '10min',
+  },
+  name: {
+    currentStep: '1/7',
+    title: 'Which token do you want to set up ITO?',
+    description:
+      'Select a token from the list below. Only tokens owned by you will be listed.',
+  },
+  receiverAddress: {
+    currentStep: '2/7',
+    formValue: 'receiverAddress',
+    title: 'What is your receiver address?',
+    description:
+      'This address will be the main royalties receiver from the sold tokens.',
+  },
+  itoTime: {
+    currentStep: '3/7',
+    nameTime: 'startTime',
+    title: 'Set start / end time ITO',
+    formValue: 'startTime',
+    description:
+      'The duration of the ITO refers to the time period during which your token will be available for purchase in the initial offering.',
+  },
+  maxAmount: {
+    currentStep: '4/7',
+    title: 'Max Amount',
+    description: 'Max amount of tokens to be sold in the ITO',
+    kleverTip:
+      'Maximum amount of tokens that will be offered for sale in this initial offeringn',
+  },
+  status: {
+    currentStep: '5/7',
+    title: 'Status',
+    description: 'Sets the status of the ITO',
+  },
+  whitelistSettings: {
+    currentStep: '6/7',
+    title: 'Whitelist Settings',
+    description: 'Sets the status of the ITO',
+  },
+
+  transactionSuccess: {
+    description: 'When confirmed on the blockchain, your ITO will be created.',
+    secondDescription: 'The ITO contract is generated after this confirmation.',
+  },
+  stepsInformations: {
+    basicStepsLabels: [
+      'Asset / Collection',
+      'Receiver Address',
+      'ITO Time',
+      'Max Amount',
+      'Status',
+      'Pack Info',
+      'Whitelist Settings',
+    ],
+  },
+};
+
 export const parseRoles = (data: unknown): void => {
   if ((data as any)?.roles && (data as any)?.roles[0]?.address) {
     return;

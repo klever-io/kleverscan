@@ -241,7 +241,6 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   const { ref, ...registerRest } = registerProps || {};
 
   const preventScroll = (e: any) => {
-    e.preventDefault();
     e.target.blur();
   };
 

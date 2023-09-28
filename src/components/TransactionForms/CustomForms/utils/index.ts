@@ -202,6 +202,39 @@ export const parseDates = (data: any): void => {
   }
 };
 
+export const parseKda = (contractValues: any, contractType: string) => {
+  const parsedValues = { ...contractValues };
+  if (parsedValues.collection) {
+    parsedValues['kda'] = parsedValues.collection;
+    delete parsedValues.collection;
+  }
+  if (parsedValues.collectionAssetID) {
+    parsedValues['kda'] += `/${parsedValues.collectionAssetID}`;
+  }
+  if ('collectionAssetID' in parsedValues) {
+    delete parsedValues.collectionAssetID;
+  }
+
+  if (
+    contractType === 'AssetTriggerContract' ||
+    contractType === 'SellContract'
+  ) {
+    parsedValues['assetId'] = parsedValues['kda'];
+
+    delete parsedValues.kda;
+  }
+  return parsedValues;
+};
+
+export const parseUndefinedValues = (contractValues: any) => {
+  if (!contractValues.startTime) {
+    delete contractValues.startTime;
+  }
+  if (!contractValues.endTime) {
+    delete contractValues.endTime;
+  }
+};
+
 export const percentageProps = {
   min: 0,
   max: 100,

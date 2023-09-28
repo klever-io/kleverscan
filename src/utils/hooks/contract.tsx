@@ -243,7 +243,8 @@ export const useKDASelect = (
     }, [router, assetsList]);
 
     const onChangeHandler = async (value: ICollectionList) => {
-      if (!isMultiContract) await setQuery('collection', value?.value, router);
+      if (!isMultiContract && router.pathname !== '/')
+        await setQuery('collection', value?.value, router);
       setCollection(value);
       setValue('collection', value?.value, {
         shouldValidate: true,

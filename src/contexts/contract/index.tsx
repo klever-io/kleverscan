@@ -4,6 +4,7 @@ import {
   getType,
   precisionParse,
 } from '@/components/Contract/utils';
+import { parseKda } from '@/components/TransactionForms/CustomForms/utils';
 import api from '@/services/api';
 import { IContractOption } from '@/types/contracts';
 import {
@@ -244,30 +245,6 @@ export const ContractProvider: React.FC = ({ children }) => {
     const assetsList = [...KLV, ...KFI, ...list];
 
     return assetsList || ([] as ICollectionList[]);
-  };
-
-  const parseKda = (contractValues: any, contractType: string) => {
-    const parsedValues = { ...contractValues };
-    if (parsedValues.collection) {
-      parsedValues['kda'] = parsedValues.collection;
-      delete parsedValues.collection;
-    }
-    if (parsedValues.collectionAssetID) {
-      parsedValues['kda'] += `/${parsedValues.collectionAssetID}`;
-    }
-    if ('collectionAssetID' in parsedValues) {
-      delete parsedValues.collectionAssetID;
-    }
-
-    if (
-      contractType === 'AssetTriggerContract' ||
-      contractType === 'SellContract'
-    ) {
-      parsedValues['assetId'] = parsedValues['kda'];
-
-      delete parsedValues.kda;
-    }
-    return parsedValues;
   };
 
   const checkExtensionInstalled = () => {

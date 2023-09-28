@@ -31,7 +31,11 @@ const QuickAccess: React.FC<{
       type: 'CreateAssetContract',
       openWiz: () => setWizard('NFT'),
     },
-    { title: 'Create ITO', type: 'ConfigITOContract' },
+    {
+      title: 'Create ITO',
+      type: 'ConfigITOContract',
+      openWiz: () => setWizard('ITO'),
+    },
     { title: 'Freeze', type: 'FreezeContract' },
     { title: 'Vote', type: 'VoteContract' },
     { title: 'Proposal', type: 'ProposalContract' },

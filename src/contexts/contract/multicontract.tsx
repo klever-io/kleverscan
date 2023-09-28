@@ -45,6 +45,7 @@ interface IMulticontract {
   isModal: boolean;
   kdaFeePoolIsFetching: boolean;
   addToQueue: () => void;
+  setSelectedContractType: (contractType: string) => void;
   removeContractQueue: (contractIndex: number, e: any) => void;
   editContract: (index: number) => void;
   resetForms: (defaultValues?: any) => void;
@@ -322,6 +323,7 @@ export const MulticontractProvider: React.FC = ({ children }) => {
     kdaFeeAsset,
     isModal,
     kdaFeePoolIsFetching,
+    setSelectedContractType,
     addToQueue,
     editContract,
     removeContractQueue,

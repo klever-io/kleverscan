@@ -1,6 +1,5 @@
 import {
   WhiteTick,
-  WizardInfoSquare,
   WizardLeftArrow,
   WizardPlusSquare,
   WizardRightArrow,
@@ -13,10 +12,10 @@ import { parseAddress } from '@/utils/parseValues';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
-import { BsClock } from 'react-icons/bs';
 import { FiPlusSquare } from 'react-icons/fi';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { IoArrowForward } from 'react-icons/io5';
+import { WizCreateITO } from '../createITO/configITO';
 import { checkEmptyField, formatPrecision, validateUrl } from '../utils';
 import WizCreateNFT from './createNFT';
 import WizCreateToken from './createToken';
@@ -43,6 +42,8 @@ import {
   GenericInfoCard,
   GenericInput,
   HashContainer,
+  IconWizardClock,
+  IconWizardInfoSquare,
   InfoCard,
   PrecicionsContainer,
   PrecisionCard,
@@ -192,6 +193,16 @@ export const ButtonsComponent: React.FC<IButtonsComponenets> = ({
     }
   };
 
+  const handleKeyPress = (event: KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      trigger();
+      if (next && handleStep) {
+        handleStep(prev => prev + 1);
+      }
+    }
+  };
+
   const handlePreviousStep = () => {
     if (previousStep) {
       previousStep(prev => prev - 1);
@@ -199,6 +210,13 @@ export const ButtonsComponent: React.FC<IButtonsComponenets> = ({
     }
     handleStep && handleStep(prev => prev - 1);
   };
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyPress);
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [handleStep, next, trigger]);
 
   return (
     <ButtonsContainer isRow={isRow}>
@@ -236,30 +254,22 @@ export const CreateAssetFirstStep: React.FC<IAssetInformations> = ({
         <span>{description}</span>
 
         <span>
-          <WizardInfoSquare />
+          <IconWizardInfoSquare />
           {tooltip}
         </span>
         <GenericInfoCard>{kleverTip}</GenericInfoCard>
       </div>
       <div>
         <span>
-          To finalize this process, a{' '}
-          <Link
-            href="https://docs.klever.finance/about-our-technology/klv-and-k-tokens/create-a-kda"
-            target="_blank"
-          >
-            <a target="_blank" rel="noopener noreferrer">
-              transaction
-            </a>
-          </Link>{' '}
-          will be carried out with a cost of {transactionCost} KLV.
+          To finalize this process, a transaction will be carried out with a
+          cost of {transactionCost} KLV.
         </span>
         <WizardButton onClick={() => handleStep(prev => prev + 1)} fullWidth>
           <p>I&apos;m ready, I want to start</p>
           <WizardRightArrow />
         </WizardButton>
         <span>
-          <BsClock />
+          <IconWizardClock />
           Estimated time <strong>{timeEstimated}</strong>
         </span>
       </div>
@@ -1159,7 +1169,7 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
           </WizardButton>
         </ButtonsContainer>
         <InfoCard>
-          <WizardInfoSquare />
+          <IconWizardInfoSquare />
           What is Split Royalties ?
         </InfoCard>
         <GenericInfoCard>Royalty receiver address</GenericInfoCard>
@@ -1398,7 +1408,7 @@ export const CreateAssetRoyaltySteps: React.FC<IWizardComponents> = ({
         </ButtonsContainer>
 
         <InfoCard>
-          <WizardInfoSquare />
+          <IconWizardInfoSquare />
           What is royalty?
         </InfoCard>
         <GenericInfoCard>
@@ -1732,7 +1742,7 @@ export const URIsSection: React.FC<IAssetInformations> = ({
           </WizardButton>
         </ButtonsContainer>
         <InfoCard>
-          <WizardInfoSquare />
+          <IconWizardInfoSquare />
           What is an URI ?
         </InfoCard>
         <GenericInfoCard>
@@ -2241,7 +2251,7 @@ export const CreateAssetStakingStep: React.FC<IWizardComponents> = ({
         </ButtonsContainer>
 
         <InfoCard>
-          <WizardInfoSquare />
+          <IconWizardInfoSquare />
           What is staking?
         </InfoCard>
         <GenericInfoCard>
@@ -2333,7 +2343,7 @@ export const CreateAssetAddRoles: React.FC<IAssetInformations> = ({
           </WizardButton>
         </ButtonsContainer>
         <InfoCard>
-          <WizardInfoSquare />
+          <IconWizardInfoSquare />
           What is a Role?
         </InfoCard>
         <GenericInfoCard>
@@ -2866,6 +2876,7 @@ export const DesktopStepsComponent: React.FC<any> = ({
   advancedStepsIndex,
   basicStepsLabels,
   basicStepsInfo,
+  titleName = 'Basic Information',
   isNFT = true,
 }) => {
   const { isMobile, isTablet } = useMobile();
@@ -2883,6 +2894,9 @@ export const DesktopStepsComponent: React.FC<any> = ({
     if (selectedStep < assetStep) {
       setShowBasicSteps(false);
     }
+    if (!advancedStepsLabels) {
+      setShowBasicSteps(false);
+    }
   }, [selectedStep]);
 
   if (!isMobile && !isTablet && selectedStep !== 0) {
@@ -2890,7 +2904,7 @@ export const DesktopStepsComponent: React.FC<any> = ({
       <StepsContainerDesktop>
         <DesktopBasicSteps>
           <div>
-            <span>Basic Information</span>
+            <span>{titleName}</span>
             <span>STEPS</span>
           </div>
           <button
@@ -2933,42 +2947,45 @@ export const DesktopStepsComponent: React.FC<any> = ({
             })}
           </StepsContainer>
         </StepsExpandedContainer>
-        <AdvancedStepsDesktop darkText={selectedStep < 9}>
-          <div>
-            <span>Advanced Options</span>
-            <span>STEPS</span>
-          </div>
-          <StepsExpandedContainer
-            isHidden={selectedStep < 9 && !showBasicSteps}
-          >
-            <StepsContainer>
-              {advancedStepsLabels.map((_: string, index: number) => {
-                if (index < basicTotalSteps) {
-                  return (
-                    <StepsItemContainerDesktop
-                      key={index}
-                      selected={selectedStep - 1 === index}
-                    >
-                      <StepsItem
-                        isDone={selectedStep > advancedStepsIndex[index]}
-                        selected={selectedStep === advancedStepsIndex[index]}
+        {advancedStepsLabels && (
+          <AdvancedStepsDesktop darkText={selectedStep < 9}>
+            <div>
+              <span>Advanced Options</span>
+              <span>STEPS</span>
+            </div>
+            <StepsExpandedContainer
+              isHidden={selectedStep < 9 && !showBasicSteps}
+            >
+              <StepsContainer>
+                {advancedStepsLabels.map((_: string, index: number) => {
+                  if (index < basicTotalSteps) {
+                    return (
+                      <StepsItemContainerDesktop
+                        key={index}
+                        selected={selectedStep - 1 === index}
                       >
-                        {selectedStep <= advancedStepsIndex[index] && index + 1}
-                        {selectedStep > advancedStepsIndex[index] && (
-                          <WhiteTick />
-                        )}
-                      </StepsItem>
-                      <div>
-                        <span>{advancedStepsLabels[index]}</span>
-                        <span />
-                      </div>
-                    </StepsItemContainerDesktop>
-                  );
-                }
-              })}
-            </StepsContainer>
-          </StepsExpandedContainer>
-        </AdvancedStepsDesktop>
+                        <StepsItem
+                          isDone={selectedStep > advancedStepsIndex[index]}
+                          selected={selectedStep === advancedStepsIndex[index]}
+                        >
+                          {selectedStep <= advancedStepsIndex[index] &&
+                            index + 1}
+                          {selectedStep > advancedStepsIndex[index] && (
+                            <WhiteTick />
+                          )}
+                        </StepsItem>
+                        <div>
+                          <span>{advancedStepsLabels[index]}</span>
+                          <span />
+                        </div>
+                      </StepsItemContainerDesktop>
+                    );
+                  }
+                })}
+              </StepsContainer>
+            </StepsExpandedContainer>
+          </AdvancedStepsDesktop>
+        )}
       </StepsContainerDesktop>
     );
   }
@@ -3021,7 +3038,9 @@ const CreateAssetWizard: React.FC<any> = ({ isOpen, txHash, setTxHash }) => {
     if (isOpen === 'NFT') {
       return <WizCreateNFT {...stepsProps} />;
     }
-
+    if (isOpen === 'ITO') {
+      return <WizCreateITO {...stepsProps} />;
+    }
     return <></>;
   };
 

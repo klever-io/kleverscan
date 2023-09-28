@@ -71,6 +71,18 @@ const darktheme = {
     cardStaking: '#4b4d80',
   },
 
+  wizard: {
+    ...theme.wizard,
+    background: '#06060b',
+    subTitle: '#c6c7eb',
+    genericInfoCard:
+      'linear-gradient(180deg, rgba(34, 35, 69, 0.5) 0%, rgba(34, 35, 69, 0) 100%)',
+    steps: '#fff',
+    stepsBackground: 'rgba(24, 25, 53, 0.5)',
+    stepsLine: '#646693',
+    cardAddress: '#222345',
+  },
+
   warning: {
     background: '#95865188',
     text: '#eb9c27',

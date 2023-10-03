@@ -10,7 +10,7 @@ export const parseSplitRoyalties = (data: any): void => {
   }
   if (
     data.royalties?.splitRoyalties === undefined ||
-    data.royalties?.splitRoyalties?.length
+    !data.royalties?.splitRoyalties?.length
   ) {
     return;
   }
@@ -28,7 +28,6 @@ export const parseSplitRoyalties = (data: any): void => {
     delete item.address;
     splitRoyalties[address] = item;
   });
-
   data.royalties.splitRoyalties = splitRoyalties;
 };
 

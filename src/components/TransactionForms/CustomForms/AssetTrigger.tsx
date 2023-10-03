@@ -3,6 +3,7 @@ import { useExtension } from '@/contexts/extension';
 import { ICollectionList } from '@/types';
 import { assetTriggerTypes } from '@/utils/contracts';
 import { useKDASelect } from '@/utils/hooks/contract';
+import { deepCopyObject } from '@/utils/objectFunctions';
 import { IAssetTrigger } from '@klever/sdk';
 import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -61,8 +62,9 @@ const AssetTrigger: React.FC<IContractProps> = ({
   };
 
   const onSubmit = async (data: IAssetTrigger) => {
-    parseAssetTrigger(data);
-    await handleFormSubmit(data);
+    const dataDeepCopy = deepCopyObject(data);
+    parseAssetTrigger(dataDeepCopy);
+    await handleFormSubmit(dataDeepCopy);
   };
 
   useEffect(() => {

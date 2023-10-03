@@ -73,9 +73,9 @@ export interface IWizardComponents {
   handleStep: React.Dispatch<React.SetStateAction<number>>;
   previousStep?: React.Dispatch<React.SetStateAction<number>>;
   selectedStep?: number;
-  showAdvancedSteps?: () => void;
-  setAddAdvanced?: React.Dispatch<React.SetStateAction<boolean>>;
+  handleAdvancedSteps?: () => void;
   isNFT?: boolean;
+  isLastStep?: boolean;
 }
 
 interface IAssetInformations extends IWizardComponents {
@@ -97,6 +97,7 @@ export interface IWizardConfirmProps
   extends IWizardComponents,
     IAssetInformations {
   txHash: string;
+  fromAdvancedSteps: boolean;
 }
 
 interface IWizardStakingComponents {
@@ -109,6 +110,7 @@ interface IButtonsComponenets {
     handleStep: React.Dispatch<React.SetStateAction<number>>;
     previousStep?: React.Dispatch<React.SetStateAction<number>>;
     next: boolean;
+    isLastStep?: boolean;
   };
   noNextButton?: boolean;
   showAdvanced?: boolean;
@@ -226,7 +228,7 @@ export const ButtonsComponent: React.FC<IButtonsComponenets> = ({
       {noNextButton ? (
         <></>
       ) : (
-        <WizardButton type="button" onClick={handleClick} disabled={!!!next}>
+        <WizardButton type="button" onClick={handleClick} disabled={!next}>
           <p>Next</p>
           <WizardRightArrow />
         </WizardButton>
@@ -1164,7 +1166,7 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
           >
             Yes
           </WizardButton>
-          <WizardButton secondary centered onClick={() => handleStep(13)}>
+          <WizardButton secondary centered onClick={() => handleStep(10)}>
             No
           </WizardButton>
         </ButtonsContainer>
@@ -1506,7 +1508,7 @@ export const CreateAssetSixStep: React.FC<IWizardComponents> = ({
 
   const buttonsProps = {
     handleStep,
-    next: !!!error,
+    next: !error,
   };
 
   return (
@@ -1566,7 +1568,7 @@ export const CreateAssetSevenStep: React.FC<IAssetInformations> = ({
 
   const buttonsProps = {
     handleStep,
-    next: !!!error,
+    next: !error,
   };
 
   return (
@@ -1619,7 +1621,7 @@ export const CreateAssetEightStep: React.FC<IAssetInformations> = ({
 
   const buttonsProps = {
     handleStep,
-    next: !!!error,
+    next: !error,
   };
 
   return (
@@ -2445,14 +2447,14 @@ export const CreateAssetAddRoles: React.FC<IAssetInformations> = ({
 export const CreateAssetPropertiesStep: React.FC<IAssetInformations> = ({
   informations: { title, description },
   handleStep,
+  isLastStep = false,
 }) => {
   const { watch, register } = useFormContext();
-
   const buttonsProps = {
     handleStep,
     next: true,
+    isLastStep,
   };
-
   return (
     <GenericCardContainer>
       <div>
@@ -2473,9 +2475,8 @@ export const CreateAssetPropertiesStep: React.FC<IAssetInformations> = ({
                 }}
               >
                 <CheckBoxInput
-                  {...register(`properties.${property.property}`, {
-                    value: property.isDefaultChecked,
-                  })}
+                  defaultChecked={property.isDefaultChecked}
+                  {...register(`properties.${property.property}`)}
                 />
                 <Tooltip msg={property.tooltip} />
               </div>
@@ -2492,7 +2493,7 @@ export const CreateAssetPropertiesStep: React.FC<IAssetInformations> = ({
 export const CreateAssetPreConfimStep: React.FC<IAssetInformations> = ({
   informations: { assetType },
   handleStep,
-  setAddAdvanced,
+  handleAdvancedSteps,
 }) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const buttonsProps = {
@@ -2502,8 +2503,8 @@ export const CreateAssetPreConfimStep: React.FC<IAssetInformations> = ({
 
   const assetText = assetType === 0 ? 'token' : 'NFT';
 
-  const handleAdvancedSteps = () => {
-    setAddAdvanced && setAddAdvanced(true);
+  const handleAdvancedStepsWrapper = () => {
+    handleAdvancedSteps && handleAdvancedSteps();
   };
 
   return (
@@ -2520,7 +2521,7 @@ export const CreateAssetPreConfimStep: React.FC<IAssetInformations> = ({
 
         <PreConfirmOptions
           onClick={() => {
-            handleStep(prev => prev + 1);
+            handleStep(prev => prev + (assetText === 'NFT' ? 5 : 6));
           }}
         >
           <div>
@@ -2534,7 +2535,7 @@ export const CreateAssetPreConfimStep: React.FC<IAssetInformations> = ({
           </div>
           <WizardRightArrow />
         </PreConfirmOptions>
-        <PreConfirmOptions secondary onClick={handleAdvancedSteps}>
+        <PreConfirmOptions secondary onClick={handleAdvancedStepsWrapper}>
           <div>
             <span>I want to add advanced settings</span>
             <span>
@@ -2711,6 +2712,7 @@ export const TransactionDetails3: React.FC<{ assetType?: number }> = ({
 export const ConfirmTransaction: React.FC<IWizardConfirmProps> = ({
   informations: { assetType, additionalFields },
   handleStep,
+  fromAdvancedSteps,
 }) => {
   const { watch } = useFormContext();
   const name = watch('name');
@@ -2734,6 +2736,14 @@ export const ConfirmTransaction: React.FC<IWizardConfirmProps> = ({
     };
     getImage();
   }, []);
+
+  const handlePreviousStep = () => {
+    if (fromAdvancedSteps) {
+      handleStep(prev => prev - 1);
+    } else {
+      handleStep(assetText === 'NFT' ? 6 : 8);
+    }
+  };
 
   const renderLogo = () => {
     if (validImage) {
@@ -2795,7 +2805,7 @@ export const ConfirmTransaction: React.FC<IWizardConfirmProps> = ({
           <TransactionDetails3 assetType={assetType} />
         </ReviewContainer>
         <ButtonsContainer isRow>
-          <BackArrowSpan onClick={() => handleStep(prev => prev - 1)}>
+          <BackArrowSpan onClick={handlePreviousStep}>
             <WizardLeftArrow />
           </BackArrowSpan>
           <WizardButton type="submit">
@@ -3022,13 +3032,13 @@ export const ConfirmSuccessTransaction: React.FC<{ txHash: string }> = ({
 
 // TODO -> types
 const CreateAssetWizard: React.FC<any> = ({ isOpen, txHash, setTxHash }) => {
-  const [addAdvancedSteps, setAddAdvanced] = useState(false);
+  const [fromAdvancedSteps, setFromAdvancedSteps] = useState(false);
 
   const stepsProps = {
-    setAddAdvanced,
-    addAdvancedSteps,
     setTxHash,
     txHash,
+    fromAdvancedSteps,
+    setFromAdvancedSteps,
   };
 
   const CreateContractWizard: React.FC = () => {

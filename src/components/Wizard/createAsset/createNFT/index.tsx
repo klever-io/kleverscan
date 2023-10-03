@@ -32,78 +32,45 @@ import { createNFT, parseRoles } from '../../utils';
 import { WizardBody } from '../styles';
 
 const WizCreateNFT: React.FC<any> = ({
-  showAdvancedSteps,
-  setAdvancedSteps,
-  advancedSteps,
-  setAddAdvanced,
-  addAdvancedSteps,
   setTxHash,
   txHash,
+  fromAdvancedSteps,
+  setFromAdvancedSteps,
 }) => {
   const [selectedStep, setSelectedStep] = useState(0);
   const assetInfo = createNFT;
 
+  const handleAdvancedSteps = () => {
+    setSelectedStep(prevStep => prevStep + 1);
+  };
+
   const stepsProps = {
     handleStep: setSelectedStep,
     selectedStep: selectedStep,
-    showAdvancedSteps,
-    setAddAdvanced,
-    addAdvancedSteps,
+    handleAdvancedSteps,
     isNFT: true,
+  };
+
+  const lastStepProps = {
+    ...stepsProps,
+    isLastStep: true,
+    setFromAdvancedSteps,
   };
 
   const confirmProps = {
     ...stepsProps,
     txHash: '',
+    fromAdvancedSteps,
   };
 
   const {
-    commomValues: { assetType, basicTotalSteps },
+    commomValues: { basicTotalSteps },
     stepsInformations: {
       basicStepsLabels,
       advancedStepsIndex,
       advancedStepsLabels,
     },
   } = assetInfo;
-
-  const advancedStepsCont = [
-    {
-      key: 'selectAssetUris',
-      label: 'Select Asset URIs',
-      isDone: false,
-      component: (
-        <URIsSection {...stepsProps} informations={assetInfo.commomValues} />
-      ),
-    },
-    {
-      key: 'selectroyaltiesSteps',
-      label: 'Select Asset Royalties Steps',
-      isDone: false,
-      component: <CreateAssetRoyaltySteps {...stepsProps} />,
-    },
-    {
-      key: 'selectAssetRoles',
-      label: 'Select Asset Roles',
-      isDone: false,
-      component: (
-        <CreateAssetAddRoles
-          {...stepsProps}
-          informations={assetInfo.commomValues}
-        />
-      ),
-    },
-    {
-      key: 'selectAssetProperties',
-      label: 'Select Asset Properties',
-      isDone: false,
-      component: (
-        <CreateAssetPropertiesStep
-          {...stepsProps}
-          informations={assetInfo.advancedSteps.properties}
-        />
-      ),
-    },
-  ];
 
   const [steps, setSteps] = useState([
     {
@@ -175,6 +142,42 @@ const WizCreateNFT: React.FC<any> = ({
       ),
     },
     {
+      key: 'selectAssetUris',
+      label: 'Select Asset URIs',
+      isDone: false,
+      component: (
+        <URIsSection {...stepsProps} informations={assetInfo.commomValues} />
+      ),
+    },
+    {
+      key: 'selectroyaltiesSteps',
+      label: 'Select Asset Royalties Steps',
+      isDone: false,
+      component: <CreateAssetRoyaltySteps {...stepsProps} />,
+    },
+    {
+      key: 'selectAssetRoles',
+      label: 'Select Asset Roles',
+      isDone: false,
+      component: (
+        <CreateAssetAddRoles
+          {...stepsProps}
+          informations={assetInfo.commomValues}
+        />
+      ),
+    },
+    {
+      key: 'selectAssetProperties',
+      label: 'Select Asset Properties',
+      isDone: false,
+      component: (
+        <CreateAssetPropertiesStep
+          {...lastStepProps}
+          informations={assetInfo.advancedSteps.properties}
+        />
+      ),
+    },
+    {
       key: 'confirmTransaction',
       label: 'Confirm Transaction',
       isDone: false,
@@ -215,15 +218,6 @@ const WizCreateNFT: React.FC<any> = ({
   const ownerAddress = watch('ownerAddress');
 
   useEffect(() => {
-    if (addAdvancedSteps) {
-      const newSteps = steps;
-      newSteps.splice(7, 0, ...advancedStepsCont);
-      setSteps(newSteps);
-      setSelectedStep(7);
-    }
-  }, [addAdvancedSteps]);
-
-  useEffect(() => {
     if (selectedStep === steps.length) return;
     setActiveStep(steps[selectedStep]);
   }, [selectedStep]);
@@ -246,8 +240,6 @@ const WizCreateNFT: React.FC<any> = ({
 
   const deskStepsProps = {
     ...stepsCompProps,
-    advancedSteps,
-    setAdvancedSteps,
     basicStepsLabels,
     basicStepsInfo,
     selectedStep,

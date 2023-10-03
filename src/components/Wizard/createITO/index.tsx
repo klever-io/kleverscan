@@ -1143,7 +1143,7 @@ export const CreateWhitelistedAddress: React.FC<IWizardComponents> = ({
   } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'whitelistedAddress',
+    name: 'whitelistInfo',
   });
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -1161,10 +1161,10 @@ export const CreateWhitelistedAddress: React.FC<IWizardComponents> = ({
 
   try {
     errorWhitelistedAddress = eval(
-      `errors?.whitelist.address[${currentIndex}]?.address`,
+      `errors?.whitelistInfo[${currentIndex}].address`,
     );
     errorWhitelistedLimit = eval(
-      `errors?.whitelist.address[${currentIndex}]?.limit`,
+      `errors?.whitelistInfo[${currentIndex}].limit`,
     );
   } catch {
     errorWhitelistedAddress = null;
@@ -1201,7 +1201,7 @@ export const CreateWhitelistedAddress: React.FC<IWizardComponents> = ({
           error={errorWhitelistedLimit}
           type="text"
           autoFocus={true}
-          {...register(`whitelist.address[${currentIndex}].address`)}
+          {...register(`whitelistInfo[${currentIndex}].address`)}
           placeholder="Address"
         />
         <p>Whitelisted address</p>
@@ -1211,7 +1211,7 @@ export const CreateWhitelistedAddress: React.FC<IWizardComponents> = ({
         <GenericInput
           error={errorWhitelistedLimit}
           type="number"
-          {...register(`whitelist.address[${currentIndex}].limit`, {
+          {...register(`whitelistInfo[${currentIndex}].limit`, {
             valueAsNumber: true,
           })}
           placeholder="Limit"

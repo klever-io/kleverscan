@@ -39,26 +39,34 @@ import { WizardBody } from '../styles';
 
 // TODO -> Check state setadvancedsteps
 const WizCreateToken: React.FC<any> = ({
-  setAdvancedSteps,
-  advancedSteps,
-  setAddAdvanced,
-  addAdvancedSteps,
   setTxHash,
   txHash,
+  fromAdvancedSteps,
+  setFromAdvancedSteps,
 }) => {
   const [selectedStep, setSelectedStep] = useState(0);
   const assetInfo = createToken;
 
+  const handleAdvancedSteps = () => {
+    setSelectedStep(prevStep => prevStep + 1);
+  };
+
   const stepsProps = {
     handleStep: setSelectedStep,
     selectedStep: selectedStep,
-    setAddAdvanced,
-    addAdvancedSteps,
+    handleAdvancedSteps,
+  };
+
+  const lastStepProps = {
+    ...stepsProps,
+    isLastStep: true,
+    fromAdvancedSteps,
   };
 
   const confirmProps = {
     ...stepsProps,
     txHash: '',
+    fromAdvancedSteps,
   };
 
   const {
@@ -69,51 +77,6 @@ const WizCreateToken: React.FC<any> = ({
       advancedStepsLabels,
     },
   } = assetInfo;
-
-  const advancedStepsCont = [
-    {
-      key: 'selectAssetUris',
-      label: 'Select Asset URIs',
-      isDone: false,
-      component: (
-        <URIsSection {...stepsProps} informations={assetInfo.commomValues} />
-      ),
-    },
-    {
-      key: 'selectAssetStakingType',
-      label: 'Select Asset Staking Type',
-      isDone: false,
-      component: <CreateAssetStakingStep {...stepsProps} />,
-    },
-    {
-      key: 'selectroyaltiesSteps',
-      label: 'Select Asset Royalties Steps',
-      isDone: false,
-      component: <CreateAssetRoyaltySteps {...stepsProps} />,
-    },
-    {
-      key: 'selectAssetRoles',
-      label: 'Select Asset Roles',
-      isDone: false,
-      component: (
-        <CreateAssetAddRoles
-          {...stepsProps}
-          informations={assetInfo.commomValues}
-        />
-      ),
-    },
-    {
-      key: 'selectAssetProperties',
-      label: 'Select Asset Properties',
-      isDone: false,
-      component: (
-        <CreateAssetPropertiesStep
-          {...stepsProps}
-          informations={assetInfo.advancedSteps.properties}
-        />
-      ),
-    },
-  ];
 
   const [steps, setSteps] = useState([
     {
@@ -197,6 +160,48 @@ const WizCreateToken: React.FC<any> = ({
       ),
     },
     {
+      key: 'selectAssetUris',
+      label: 'Select Asset URIs',
+      isDone: false,
+      component: (
+        <URIsSection {...stepsProps} informations={assetInfo.commomValues} />
+      ),
+    },
+    {
+      key: 'selectAssetStakingType',
+      label: 'Select Asset Staking Type',
+      isDone: false,
+      component: <CreateAssetStakingStep {...stepsProps} />,
+    },
+    {
+      key: 'selectroyaltiesSteps',
+      label: 'Select Asset Royalties Steps',
+      isDone: false,
+      component: <CreateAssetRoyaltySteps {...stepsProps} />,
+    },
+    {
+      key: 'selectAssetRoles',
+      label: 'Select Asset Roles',
+      isDone: false,
+      component: (
+        <CreateAssetAddRoles
+          {...stepsProps}
+          informations={assetInfo.commomValues}
+        />
+      ),
+    },
+    {
+      key: 'selectAssetProperties',
+      label: 'Select Asset Properties',
+      isDone: false,
+      component: (
+        <CreateAssetPropertiesStep
+          {...lastStepProps}
+          informations={assetInfo.advancedSteps.properties}
+        />
+      ),
+    },
+    {
       key: 'confirmTransaction',
       label: 'Confirm Transaction',
       isDone: false,
@@ -241,15 +246,6 @@ const WizCreateToken: React.FC<any> = ({
   const assetImage = watch('logo');
 
   useEffect(() => {
-    if (addAdvancedSteps) {
-      const newSteps = steps;
-      newSteps.splice(9, 0, ...advancedStepsCont);
-      setSteps(newSteps);
-      setSelectedStep(9);
-    }
-  }, [addAdvancedSteps]);
-
-  useEffect(() => {
     if (selectedStep === steps.length) return;
     setActiveStep(steps[selectedStep]);
   }, [selectedStep]);
@@ -274,8 +270,6 @@ const WizCreateToken: React.FC<any> = ({
 
   const deskStepsProps = {
     ...stepsCompProps,
-    advancedSteps,
-    setAdvancedSteps,
     basicStepsLabels,
     basicStepsInfo,
     selectedStep,

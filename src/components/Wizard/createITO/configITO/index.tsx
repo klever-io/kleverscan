@@ -193,15 +193,14 @@ export const WizCreateITO: React.FC<any> = ({
 
   const onSubmit = async (data: ConfigITOData) => {
     const contractType = 'ConfigITOContract';
-    const packInfo = parsePackInfo(data);
-    const whitelistInfo = parseWhitelistInfo(data);
     parseDates(data);
     parseUndefinedValues(data);
+    parseWhitelistInfo(data);
+    parsePackInfo(data);
     const payload = JSON.parse(JSON.stringify(parseKda(data, contractType)));
     await precisionParse(payload, contractType);
     const parseTransaction = {
       ...payload,
-      whitelistInfo,
     };
     try {
       const { result: unsignedTx } = await buildTransaction([

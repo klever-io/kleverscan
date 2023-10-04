@@ -360,6 +360,7 @@ export const FloatContainer = styled.div`
 
 export const LimitContainer = styled.div`
   ${DefaultCardStyles}
+  margin-left: auto;
   display: block;
   position: relative;
   float: right;
@@ -528,13 +529,14 @@ const rotate = keyframes`
 export const IoReloadSharpWrapper = styled.div<{
   $loading: boolean;
 }>`
-  margin-left: auto;
-  margin-right: 0.5rem;
-  position: relative;
-  float: right;
+  position: absolute;
+  right: 0.5rem;
+  bottom: -0.75rem;
+
   height: fit-content;
-  width: fit-content;
-  align-items: center;
+
+  transform: translateY(50%);
+
   cursor: pointer;
   svg {
     margin-top: 0.3rem;

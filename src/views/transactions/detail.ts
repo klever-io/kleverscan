@@ -170,6 +170,8 @@ export const CardRaw = styled.div`
   overflow: auto;
   flex-direction: row;
   align-items: center;
+
+  max-height: 30rem;
 `;
 
 export const Hr = styled.hr`

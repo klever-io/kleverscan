@@ -23,15 +23,20 @@ export const TabContainer = styled.div`
 export const TabContent = styled.div`
   display: flex;
   margin: 2rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  gap: 1rem;
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    display: flex;
     margin: 2rem 1rem;
-    flex-wrap: wrap;
   }
 `;
 
 export const ItemContainer = styled.div<{ selected: boolean }>`
+  display: flex;
+  margin-bottom: ${props => (props.selected ? '0.5rem' : '')};
+
   position: relative;
 
   cursor: pointer;
@@ -44,11 +49,9 @@ export const ItemContainer = styled.div<{ selected: boolean }>`
     font-weight: 600;
     font-size: 1.1rem;
 
+    white-space: nowrap;
+
     transition: 0.2s ease;
-  }
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    display: flex;
-    margin-bottom: ${props => (props.selected ? '0.5rem' : '')};
   }
 `;
 
@@ -80,7 +83,7 @@ export const Indicator = styled.div<{ selected: boolean }>`
   width: 100%;
   height: 3px;
 
-  bottom: -0.5rem;
+  bottom: 0;
 
   position: absolute;
 

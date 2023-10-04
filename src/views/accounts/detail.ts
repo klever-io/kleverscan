@@ -30,6 +30,28 @@ export const BalanceContainer = styled.div`
   width: 100%;
 `;
 
+export const BalanceKLVValue = styled.span`
+  display: flex;
+
+  align-items: center;
+  gap: 1rem;
+`;
+
+export const BalanceTransferContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  button {
+    align-self: center;
+  }
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+`;
+
 export const AmountContainer = styled.div`
   display: flex;
 
@@ -38,9 +60,6 @@ export const AmountContainer = styled.div`
   gap: 1.5rem;
 
   div {
-    div {
-      padding-right: 5rem;
-    }
     span {
       font-weight: 600;
     }

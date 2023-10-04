@@ -154,10 +154,12 @@ export const MobileItem = styled(Item)`
 `;
 
 export const Input = styled(DefaultInput)`
-  background-color: ${props => props.theme.white};
   border-color: ${props => props.theme.lightGray};
+  padding: 0.5rem 1rem;
+  max-width: 30rem;
   input {
     color: ${props => props.theme.text.inputHeader};
+    font-size: 0.9rem;
     &::placeholder {
       color: ${props => props.theme.text.inputHeader};
     }
@@ -235,13 +237,16 @@ export const DesktopContainer = styled.div`
 
 export const DesktopSubWrapper = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   gap: 1.5rem;
+
+  width: 100%;
 `;
 
 export const IconsMenu = styled.div`
   display: flex;
+  width: 100%;
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
@@ -321,10 +326,11 @@ export const MobileNavbarItemList = styled.div`
   gap: 1.5rem;
   overflow-y: auto;
   padding-right: 0.5rem;
-  margin-bottom: 15rem;
-  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
-    margin-bottom: 10rem;
-  }
+  margin-bottom: 10rem;
+  padding-bottom: 3rem;
+
+  mask-image: linear-gradient(to bottom, black 85%, transparent);
+
   &::-webkit-scrollbar {
     position: absolute;
     width: 0.25rem;

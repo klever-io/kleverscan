@@ -485,6 +485,18 @@ export const TransactionContent = styled.div`
     }
   }
 
+  &:not(:first-child) {
+    border: none;
+    border-top: 2px solid
+      ${props =>
+        props.theme.dark ? props.theme.card.background : props.theme.darkBlue};
+    border-radius: 0 0 1rem 1rem;
+  }
+
+  &:first-child {
+    border: none;
+  }
+
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     overflow: auto;
 
@@ -640,12 +652,16 @@ export const TransactionChart = styled(TransactionContent)`
   flex-direction: column;
   background-color: ${props => props.theme.dark && 'transparent'} !important;
 
+  padding: 1rem;
+
   border-radius: 16px;
+
   span {
-    font-size: 1.25rem;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 16px;
     color: ${props =>
-      props.theme.dark ? props.theme.black : props.theme.darkBlue};
+      props.theme.dark ? props.theme.card.text : props.theme.darkText};
   }
 
   p {
@@ -671,16 +687,13 @@ export const TransactionChartContent = styled.div`
   overflow: hidden;
   bottom: 0;
   position: absolute;
-  width: 100%;
+  width: calc(100% - 2rem);
   height: 80%;
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     position: absolute;
     bottom: 0.3rem;
     left: -0.1rem;
-  }
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 100%;
   }
 `;
 
@@ -733,13 +746,6 @@ export const ContainerTimeFilter = styled.div`
   height: fit-content;
   justify-content: space-between;
   padding: 1.5rem;
-  span {
-    font-weight: 700;
-    font-size: 14px;
-    line-height: 16px;
-    color: ${props =>
-      props.theme.dark ? props.theme.card.text : props.theme.darkText};
-  }
 `;
 
 export const ListItemTimeFilter = styled.ul`

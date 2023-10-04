@@ -310,7 +310,7 @@ export const DecodedRawData: React.FC<IDecodedRawData> = ({
           </CardHeaderItem>
         </CardHeader>
         <CardContent>
-          <CardRaw style={{ height: '30rem' }}>
+          <CardRaw>
             <DivDataJson>
               <ReactJson
                 src={decodedTx}

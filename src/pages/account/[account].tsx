@@ -65,6 +65,8 @@ import { resetDate } from '@/utils/resetDate';
 import {
   AmountContainer,
   BalanceContainer,
+  BalanceKLVValue,
+  BalanceTransferContainer,
   ButtonExpand,
   CheckboxOperations,
   ContainerSigners,
@@ -603,7 +605,7 @@ const Account: React.FC<IAccountPage> = () => {
   const Overview: React.FC = () => {
     return (
       <Container>
-        <Row isAddressRow={true}>
+        <Row isMobileRow>
           <span>
             <strong>Address</strong>
           </span>
@@ -628,19 +630,27 @@ const Account: React.FC<IAccountPage> = () => {
           <RowContent>
             <BalanceContainer>
               <AmountContainer>
-                <IconContainer>
-                  <KLV />
-                  <span>KLV</span>
-                </IconContainer>
-                <div>
+                {!isTablet && (
+                  <IconContainer>
+                    <KLV />
+                    <span>KLV</span>
+                  </IconContainer>
+                )}
+                <BalanceTransferContainer>
                   <div>
-                    <span>
+                    <BalanceKLVValue>
                       {!isLoadingAccount ? (
                         totalKLV.toLocaleString()
                       ) : (
                         <Skeleton height={19} />
                       )}
-                    </span>
+                      {isTablet && (
+                        <IconContainer>
+                          <KLV />
+                          <span>KLV</span>
+                        </IconContainer>
+                      )}
+                    </BalanceKLVValue>
                     <p>
                       {!isLoadingAccount && !isLoadingPriceCall ? (
                         <>USD {pricedKLV.toLocaleString()}</>
@@ -650,7 +660,7 @@ const Account: React.FC<IAccountPage> = () => {
                     </p>
                   </div>
                   <TransferButton />
-                </div>
+                </BalanceTransferContainer>
               </AmountContainer>
               <FrozenContainer>
                 <div>

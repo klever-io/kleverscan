@@ -28,18 +28,20 @@ const Detail: React.FC<IDetail> = ({
     <Container>
       <Header filterOn={!!filters}>
         <Title title={title} Icon={Icon} route={route} />
-        {filters && (
-          <FilterContainer>
-            {filters.map(filter => (
-              <Filter key={filter.current} {...filter} />
-            ))}
-          </FilterContainer>
-        )}
       </Header>
-      <TableContainer>
-        {cards && <h3>List of {title.toLowerCase()}</h3>}
-        {children}
-      </TableContainer>
+      {filters && (
+        <FilterContainer>
+          {filters.map(filter => (
+            <Filter key={filter.current} {...filter} />
+          ))}
+        </FilterContainer>
+      )}
+      {(cards || children) && (
+        <TableContainer>
+          {cards && <h3>List of {title.toLowerCase()}</h3>}
+          {children}
+        </TableContainer>
+      )}
       <Table {...tableProps} />
     </Container>
   );

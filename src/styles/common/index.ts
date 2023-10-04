@@ -155,7 +155,7 @@ export const tableEffects = css`
   }
 `;
 
-export const Row = styled.div<{ isAddressRow?: boolean }>`
+export const Row = styled.div<{ isMobileRow?: boolean }>`
   width: 100%;
 
   padding: 1.5rem 2rem;
@@ -225,7 +225,7 @@ export const Row = styled.div<{ isAddressRow?: boolean }>`
     flex-direction: column;
     align-items: flex-start;
     ${props =>
-      props.isAddressRow &&
+      props.isMobileRow &&
       css`
         flex-direction: row;
         align-items: center;

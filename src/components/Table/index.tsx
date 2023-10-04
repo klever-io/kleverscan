@@ -168,7 +168,7 @@ const Table: React.FC<ITable> = ({
     );
   };
 
-  useEffect(() => {
+  useDidUpdateEffect(() => {
     setPage(1);
     resetRouterPage();
     refetch();
@@ -238,16 +238,6 @@ const Table: React.FC<ITable> = ({
                 </ButtonsContainer>
               </ExportContainer>
             )}
-            <IoReloadSharpWrapper
-              onClick={() => refetch()}
-              $loading={isFetching}
-            >
-              <Tooltip
-                msg="Refresh"
-                customStyles={{ delayShow: 800 }}
-                Component={() => <IoReloadSharp size={32} />}
-              ></Tooltip>
-            </IoReloadSharpWrapper>
             <LimitContainer>
               <span>Per page</span>
               <LimitText>
@@ -267,6 +257,15 @@ const Table: React.FC<ITable> = ({
                   </ItemContainer>
                 ))}
               </LimitText>
+              <IoReloadSharpWrapper $loading={isFetching}>
+                <Tooltip
+                  msg="Refresh"
+                  customStyles={{ delayShow: 800 }}
+                  Component={() => (
+                    <IoReloadSharp size={20} onClick={() => refetch()} />
+                  )}
+                ></Tooltip>
+              </IoReloadSharpWrapper>
             </LimitContainer>
           </FloatContainer>
         )}

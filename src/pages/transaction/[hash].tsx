@@ -832,7 +832,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
           </CardHeaderItem>
         </CardHeader>
         <CardContent>
-          <CardRaw style={{ height: '30rem' }}>
+          <CardRaw>
             <ReactJson
               src={transaction}
               name={false}

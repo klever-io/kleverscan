@@ -42,6 +42,7 @@ export const createToken = {
       "If no value is specified now, the initial max amount will be set to infinity. This value can be adjusted later, but use with caution and consider the impact on the token's value and usability.",
   },
   logo: {
+    assetType: 0,
     currentStep: '7/7',
   },
   advancedSteps: {

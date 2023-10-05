@@ -156,9 +156,9 @@ const Navbar: React.FC = () => {
     }
 
     if (prevScrollpos.current > currentScrollPos) {
-      navbar.style.transform = 'translateY(0)';
+      navbar.style.top = '0';
     } else {
-      navbar.style.transform = 'translateY(-100%)';
+      navbar.style.top = '-10rem';
     }
     prevScrollpos.current = currentScrollPos;
   };

@@ -18,7 +18,7 @@ export const Container = styled.div`
   left: 0;
   right: 0;
   z-index: 6;
-  transition: transform 0.1s linear;
+  transition: top 0.1s linear;
   background-color: ${props =>
     props.theme.dark ? props.theme.footer.background : props.theme.true.white};
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {

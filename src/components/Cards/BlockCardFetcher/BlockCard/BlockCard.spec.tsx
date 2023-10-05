@@ -14,6 +14,10 @@ describe('Component: BlockCard', () => {
   const nonce = 262522;
   const txCount = 146;
   const blockRewards = 15000000;
+  const producerLogo = '';
+  const producerOwnerAddress =
+    'klv16sd7crk4jlc8csrv7lwskqrpjgjklvcsmlhexuesa9p6a3dm57rs5vh0hq';
+  const producerName = '';
 
   it('Should render the BlockCard with the correct text', () => {
     renderWithTheme(
@@ -25,13 +29,16 @@ describe('Component: BlockCard', () => {
         blockRewards={blockRewards}
         txBurnedFees={txBurnedFees}
         blockIndex={0}
+        producerLogo={producerLogo}
+        producerOwnerAddress={producerOwnerAddress}
+        producerName={producerName}
       />,
     );
 
     // expect(
     //   screen.getByText(getAge(fromUnixTime(timestamp / 1000)) + ' ago'),
     // ).toBeInTheDocument();
-    expect(screen.getByText(hash)).toBeInTheDocument();
+    expect(screen.getByText(producerOwnerAddress)).toBeInTheDocument();
     expect(screen.getByText(`#${nonce}`)).toBeInTheDocument();
 
     // textBlockCard.forEach((item: string) => {
@@ -49,6 +56,9 @@ describe('Component: BlockCard', () => {
         blockRewards={blockRewards}
         txBurnedFees={txBurnedFees}
         blockIndex={0}
+        producerLogo={producerLogo}
+        producerOwnerAddress={producerOwnerAddress}
+        producerName={producerName}
       />,
     );
 
@@ -71,6 +81,9 @@ describe('Component: BlockCard', () => {
         blockRewards={blockRewards}
         txBurnedFees={txBurnedFees}
         blockIndex={0}
+        producerLogo={producerLogo}
+        producerOwnerAddress={producerOwnerAddress}
+        producerName={producerName}
       />,
     );
 

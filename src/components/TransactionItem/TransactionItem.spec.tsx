@@ -29,11 +29,10 @@ describe('Component: TransactionItem', () => {
     renderWithTheme(<TransactionItem {...mockTxItem} precision={6} />);
 
     const contract = mockTxItem.contract[0] as IContract;
-
     const hash = screen.getByRole('link', { name: 'a632bece34e0716...' });
     const timeStamp = screen.getByText(formatDate(mockTxItem.timestamp));
     const sender = screen.getByRole('link', {
-      name: parseAddress(mockTxItem.sender, 12),
+      name: `From: ${parseAddress(mockTxItem.sender, 12)}`,
     });
     const toAddressTx = screen.getByRole('link', {
       name: parseAddress(contract.parameter.toAddress, 12),
@@ -52,7 +51,7 @@ describe('Component: TransactionItem', () => {
 
     const hash = screen.getByRole('link', { name: 'a632bece34e0716...' });
     const sender = screen.getByRole('link', {
-      name: parseAddress(mockTxItem.sender, 12),
+      name: `From: ${parseAddress(mockTxItem.sender, 12)}`,
     });
 
     const toAddressTx = screen.getByRole('link', {

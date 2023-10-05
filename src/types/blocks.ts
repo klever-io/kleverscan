@@ -43,6 +43,8 @@ export interface IBlockCard {
   txCount: number;
   txBurnedFees?: number;
   producerLogo: string;
+  producerOwnerAddress: string;
+  producerName: string;
 }
 export interface IBlockCardFetcher {
   blocks: IBlock[];

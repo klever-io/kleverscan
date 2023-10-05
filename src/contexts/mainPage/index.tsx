@@ -15,7 +15,7 @@ import {
   IYesterdayResponse,
   Service,
 } from '@/types';
-import { IBlock } from '@/types/blocks';
+import { IBlock, IBlocksResponse } from '@/types/blocks';
 import { IProposalsResponse } from '@/types/proposals';
 import { getEpochInfo } from '@/utils';
 import { calcApr } from '@/utils/calcApr';
@@ -108,7 +108,17 @@ export const HomeDataProvider: React.FC = ({ children }) => {
 
       setMetrics(getEpochInfo(aggregate.data.overview));
       setActualTPS(chainStatistics.liveTPS / chainStatistics.peakTPS);
-      setBlocks(aggregate.data?.blocks);
+      // setBlocks(aggregate.data?.blocks); uncomment when backend improve minified
+    }
+  }, []);
+
+  const getBlocks = useCallback(async () => {
+    const blocks: IBlocksResponse = await api.get({
+      route: 'block/list',
+      service: Service.PROXY,
+    });
+    if (!blocks.error) {
+      setBlocks(blocks.data?.blocks);
     }
   }, []);
 
@@ -308,7 +318,8 @@ export const HomeDataProvider: React.FC = ({ children }) => {
   //Statistics, Tx, Blocks
   useEffect(() => {
     const statisticsWatcher = setInterval(async () => {
-      await getAggregate();
+      const promises = [getAggregate(), getBlocks()];
+      await Promise.allSettled(promises);
     }, statisticsWatcherTimeout);
 
     const cardWatcher = setInterval(async () => {

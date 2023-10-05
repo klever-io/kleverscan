@@ -116,7 +116,9 @@ const TransactionItem: React.FC<ITransaction> = ({
         </TransactionData>
         <TransactionData>
           <p>
-            <a href={`/transaction/${hash}`}>{`${hash.slice(0, 15)}...`}</a>
+            <Link href={`/transaction/${hash}`}>
+              <a>{`${hash.slice(0, 15)}...`}</a>
+            </Link>
           </p>
           <TransactionAmount>
             <span>{shouldRenderAssetId()}</span>
@@ -124,10 +126,13 @@ const TransactionItem: React.FC<ITransaction> = ({
         </TransactionData>
         <TransactionData>
           <p>
-            <span>{t('From')}: </span>
-            <Link href={`/account/${sender}`}>
-              <a className="clean-style">{parseAddress(sender, 12)}</a>
-            </Link>
+            <span>
+              <Link href={`/account/${sender}`}>
+                <a className="clean-style">
+                  {t('From')}: {parseAddress(sender, 12)}
+                </a>
+              </Link>
+            </span>
           </p>
           <div>
             <span>{t('To')}: </span>

@@ -419,13 +419,13 @@ export const BlockCardRow = styled.div`
   }
 `;
 export const BlockCardLogo = styled.img`
-  border: 1px solid ${props => props.theme.card.background};
+  border: 2px solid ${props => props.theme.black};
   border-radius: 100%;
-  width: 3rem;
-  height: 3rem;
+  width: 2.5rem;
+  height: 2.5rem;
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 2rem;
-    height: 2rem;
+    width: 3rem;
+    height: 3rem;
   }
 `;
 export const BlockCardHash = styled.span`
@@ -509,6 +509,7 @@ export const TransactionContent = styled.div`
 `;
 
 export const TransactionRow = styled.div<{ isLoading?: boolean }>`
+  height: 10rem;
   display: grid;
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
     grid-template-columns: 3rem 1fr;
@@ -535,10 +536,6 @@ export const TransactionRow = styled.div<{ isLoading?: boolean }>`
         display: flex;
         justify-content: flex-end !important;
       `}
-  }
-
-  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
-    height: 13rem;
   }
 `;
 export const TransactionContainerContent = styled.div`
@@ -1027,4 +1024,8 @@ export const VariationText = styled.div<{ positive: boolean }>`
   display: flex;
   gap: 0.3rem;
   align-items: center;
+`;
+
+export const Anchor = styled.a`
+  cursor: pointer;
 `;

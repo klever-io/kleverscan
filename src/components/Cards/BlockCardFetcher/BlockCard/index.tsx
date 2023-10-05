@@ -1,8 +1,11 @@
+import { LetterLogo } from '@/components/Logo/styles';
 import { useMobile } from '@/contexts/mobile';
 import { IBlockCard } from '@/types/blocks';
 import { formatAmount } from '@/utils/formatFunctions/';
+import { validateImgUrl } from '@/utils/imageValidate';
 import { getAge } from '@/utils/timeFunctions';
 import {
+  Anchor,
   BlockCardHash,
   BlockCardLogo,
   BlockCardRow,
@@ -13,7 +16,7 @@ import {
 import { fromUnixTime } from 'date-fns';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 const BlockCard: React.FC<IBlockCard> = ({
   nonce,
@@ -23,13 +26,51 @@ const BlockCard: React.FC<IBlockCard> = ({
   blockIndex,
   txCount,
   txBurnedFees,
+  producerOwnerAddress,
   producerLogo,
+  producerName,
 }) => {
   const { t } = useTranslation('blocks');
   const { t: commonT } = useTranslation('common');
   const { isMobile } = useMobile();
 
   const precision = 6; // default KLV precision
+  const maxRequestAwaitTime = 3000;
+  const [img, setImg] = useState(false);
+  const [error, setError] = useState(false);
+
+  const handleImageError = () => {
+    setError(true);
+  };
+
+  const renderLogo = () => {
+    if (img && !error) {
+      return (
+        <Anchor href={`/validator/${producerOwnerAddress}`}>
+          <BlockCardLogo
+            src={producerLogo}
+            onError={handleImageError}
+          ></BlockCardLogo>
+        </Anchor>
+      );
+    }
+    return (
+      <Anchor href={`/validator/${producerOwnerAddress}`}>
+        <LetterLogo>{producerName?.split[0] || 'K'}</LetterLogo>
+      </Anchor>
+    );
+  };
+
+  useEffect(() => {
+    (async () => {
+      if (producerLogo) {
+        const isImg = await validateImgUrl(producerLogo, maxRequestAwaitTime);
+        if (isImg) {
+          setImg(true);
+        }
+      }
+    })();
+  }, [producerLogo]);
 
   return (
     <TransactionRow>
@@ -48,14 +89,16 @@ const BlockCard: React.FC<IBlockCard> = ({
         </BlockCardRow>
         <BlockCardRow>
           <div>
-            <p>{t('Hash')}:</p>
-            <BlockCardHash style={{ textDecoration: 'initial' }}>
-              <strong style={{ textDecoration: 'initial' }}>{hash}</strong>
+            <p>{t('Miner')}:</p>
+            <BlockCardHash>
+              <strong>
+                <a href={`/account/${producerOwnerAddress}`}>
+                  {producerName || producerOwnerAddress}
+                </a>
+              </strong>
             </BlockCardHash>
           </div>
-          <BlockCardLogo
-            src={producerLogo ? producerLogo : '/homeCards/blocks.svg'}
-          />
+          {renderLogo()}
         </BlockCardRow>
         {!isMobile && (
           <BlockCardRow>

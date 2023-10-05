@@ -423,10 +423,6 @@ export const BlockCardLogo = styled.img`
   border-radius: 100%;
   width: 2.5rem;
   height: 2.5rem;
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 3rem;
-    height: 3rem;
-  }
 `;
 export const BlockCardHash = styled.span`
   max-width: 5rem;
@@ -487,10 +483,10 @@ export const TransactionContent = styled.div`
 
   &:not(:first-child) {
     border: none;
-    border-top: 2px solid
+    border: 2px solid
       ${props =>
-        props.theme.dark ? props.theme.card.background : props.theme.darkBlue};
-    border-radius: 0 0 1rem 1rem;
+        props.theme.dark ? props.theme.card.background : 'transparent'};
+    border-radius: 1rem;
   }
 
   &:first-child {
@@ -509,7 +505,7 @@ export const TransactionContent = styled.div`
 `;
 
 export const TransactionRow = styled.div<{ isLoading?: boolean }>`
-  height: 10rem;
+  height: 12rem;
   display: grid;
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
     grid-template-columns: 3rem 1fr;

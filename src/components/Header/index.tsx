@@ -220,6 +220,14 @@ const Navbar: React.FC = () => {
           )}
 
           <MobileContainer $openSearch={openSearch}>
+            {isMobile && router.pathname !== '/' && (
+              <SearchIconWrapper
+                onClick={() => setOpenSearch(!openSearch)}
+                openSearch={openSearch}
+              >
+                <SearchIcon />
+              </SearchIconWrapper>
+            )}
             <SearchContainer $openSearch={openSearch}>
               {openSearch && (
                 <Input setOpenSearch={setOpenSearch} openSearch={openSearch} />
@@ -265,14 +273,6 @@ const Navbar: React.FC = () => {
               }}
             >
               <ConnectWallet clickConnection={closeDrawer} />
-              {router.pathname !== '/' && (
-                <SearchIconWrapper
-                  onClick={() => setOpenSearch(!openSearch)}
-                  openSearch={openSearch}
-                >
-                  <SearchIcon />
-                </SearchIconWrapper>
-              )}
             </ConnectContainer>
             <NetworkRedirectButton />
           </ConnectionWrapper>

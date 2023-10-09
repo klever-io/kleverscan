@@ -6,12 +6,9 @@ import { renderWithTheme } from '../../test/utils';
 import Footer from './';
 
 describe('Component: Footer', () => {
-  let container: HTMLElement;
-  beforeEach(() => {
-    container = renderWithTheme(<Footer />).container;
-  });
-
   it('Should render the footer with the Klever logo and description', () => {
+    renderWithTheme(<Footer />).container;
+
     const footerDesc =
       'Klever Explorer is our main platform to visualize assets, blocks, nodes, accounts and transactions in an intuitive and interactive manner. Everything happening in KleverChain can be consulted here on our Explorer.';
     const logo = screen.getByRole('img');
@@ -22,14 +19,18 @@ describe('Component: Footer', () => {
   });
 
   it("Should render all social media links and each should have the correct address to Klever's socials pages", () => {
-    const getSocials =
-      container.firstChild?.firstChild?.firstChild?.childNodes[2].childNodes;
-    getSocials?.forEach((element, index) => {
+    renderWithTheme(<Footer />).container;
+
+    const socialItems = screen.getAllByTestId('social-item');
+
+    socialItems?.forEach((element, index) => {
       expect(element).toHaveAttribute('href', socials[index].link);
     });
   });
 
   it('Should render all the links for Klever Exchange, Klever wallet App and Klever Ecosystem', () => {
+    renderWithTheme(<Footer />).container;
+
     contents.forEach(({ title, infoLinks }) => {
       expect(screen.getByText(title)).toBeInTheDocument();
       infoLinks.forEach(({ name, href }, index) => {
@@ -61,6 +62,8 @@ describe('Component: Footer', () => {
   });
 
   it('Should match the style for socials icons', () => {
+    renderWithTheme(<Footer />).container;
+
     const style = {
       width: '2.5rem',
       height: '2.5rem',
@@ -68,14 +71,16 @@ describe('Component: Footer', () => {
       border: `2px solid ${theme.footer.socialBorder}`,
       color: `${theme.true.black}`,
     };
-    const getSocials =
-      container.firstChild?.firstChild?.firstChild?.childNodes[2].childNodes;
-    getSocials?.forEach(item => {
+    const socialItems = screen.getAllByTestId('social-item');
+
+    socialItems?.forEach(item => {
       expect(item.firstChild).toHaveStyle(style);
     });
   });
 
   it('Should match the style for links of the Klever Exchange, Klever wallet App and Klever Ecosystem', () => {
+    renderWithTheme(<Footer />).container;
+
     const style = {
       display: 'flex',
       alignItems: 'center',

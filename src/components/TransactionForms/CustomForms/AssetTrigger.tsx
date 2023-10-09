@@ -4,7 +4,7 @@ import { ICollectionList } from '@/types';
 import { assetTriggerTypes } from '@/utils/contracts';
 import { useKDASelect } from '@/utils/hooks/contract';
 import { deepCopyObject } from '@/utils/objectFunctions';
-import { IAssetTrigger } from '@klever/sdk';
+import { IAssetTrigger } from '@klever/sdk-web';
 import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';

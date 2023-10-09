@@ -12,7 +12,7 @@ import {
   parseWhitelistInfo,
 } from '@/components/TransactionForms/CustomForms/utils';
 import { parseAddress } from '@/utils/parseValues';
-import { web } from '@klever/sdk';
+import { web } from '@klever/sdk-web';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';

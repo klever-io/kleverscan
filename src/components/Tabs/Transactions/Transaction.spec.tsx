@@ -143,9 +143,7 @@ describe('Component: Tabs/Transactions', () => {
     });
 
     const multiContract = screen.getByText(/Multi Contract/i);
-    const blockNum = screen.getByRole('link', {
-      name: parseAddress(mockedTransactions[2].hash, 24),
-    }).parentNode?.parentNode?.nextSibling?.childNodes[1];
+    const blockNum = screen.getAllByTestId('blockNum')[2];
 
     expect(multiContract).toBeInTheDocument();
     expect(blockNum).toBeInTheDocument();

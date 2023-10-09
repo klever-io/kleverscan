@@ -1,7 +1,7 @@
 import { useExtension } from '@/contexts/extension';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { validateImgUrl } from '@/utils/imageValidate';
-import { ICreateAsset } from '@klever/sdk';
+import { ICreateAsset } from '@klever/sdk-web';
 import React, { useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';

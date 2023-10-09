@@ -1,3 +1,4 @@
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import theme from '../../styles/theme';
@@ -16,25 +17,29 @@ const filters: IFilter[] = [
 ];
 
 describe('Component: Filter', () => {
-  let container: HTMLElement;
-
   beforeEach(() => {
     jest.clearAllMocks();
-    container = renderWithTheme(<Filter {...filters[0]} />).container;
   });
-
   it('Should render the title and the selector', () => {
+    const container = renderWithTheme(<Filter {...filters[0]} />).container;
+
     const title = container.firstChild?.firstChild;
-    const selector = container.firstChild?.firstChild?.nextSibling;
+    const selector = screen.getByTestId('selector');
     expect(title).toBeInTheDocument();
     expect(selector).toBeInTheDocument();
   });
 
-  it('Should have all the select options and init with the default value ( All )', () => {
-    const selector = container.firstChild?.firstChild?.nextSibling;
-    expect(selector?.firstChild).toBeInTheDocument();
+  it('Should have all the select options and init with the default value ( All )', async () => {
+    const container = renderWithTheme(<Filter {...filters[0]} />).container;
+    const user = userEvent.setup();
 
-    selector?.lastChild?.childNodes.forEach((item, index) => {
+    const selector = screen.getByTestId('selector');
+
+    await user.click(selector as HTMLElement);
+
+    const selectorItems = await screen.findAllByTestId('selector-item');
+
+    selectorItems.forEach((item, index) => {
       expect(item).toBeInTheDocument();
       if (index === 0) {
         expect(item).toBeInTheDocument();
@@ -45,19 +50,26 @@ describe('Component: Filter', () => {
   });
 
   it('Should correctly show the selected item after switching to another option', async () => {
+    const container = renderWithTheme(<Filter {...filters[0]} />).container;
+
     const user = userEvent.setup();
-    const selector = container.firstChild?.firstChild
-      ?.nextSibling as HTMLElement;
-    const childNodes = selector.lastChild?.childNodes;
-    if (childNodes && childNodes[1]) {
-      await user.click(childNodes[1] as HTMLElement);
-      expect(selector.firstChild).toHaveTextContent(data[0]);
+    const selector = screen.getByTestId('selector');
+
+    await user.click(selector as HTMLElement);
+
+    const selectorItems = await screen.findAllByTestId('selector-item');
+    if (selectorItems && selectorItems[1]) {
+      await user.click(selectorItems[1] as HTMLElement);
+      const itemText = screen.getByText(data[0]);
+      expect(itemText).toBeInTheDocument();
     }
   });
 
   it('Should all the select element match the style', () => {
-    const selector = container.firstChild?.firstChild
-      ?.nextSibling as HTMLElement;
+    const container = renderWithTheme(<Filter {...filters[0]} />).container;
+
+    const selector = screen.getByTestId('selector');
+
     const contentStyle = {
       backgroundColor: theme.white,
       display: 'flex',

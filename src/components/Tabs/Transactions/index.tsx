@@ -112,7 +112,9 @@ const Transactions: React.FC<ITransactionsProps> = props => {
       {
         element: (
           <Link href={`/block/${blockNum}`} key={blockNum}>
-            <a className="address">{blockNum || 0}</a>
+            <a className="address" data-testid="blockNum">
+              {blockNum || 0}
+            </a>
           </Link>
         ),
         span: 1,

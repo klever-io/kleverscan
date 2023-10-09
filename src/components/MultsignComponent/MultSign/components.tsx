@@ -17,7 +17,7 @@ import {
   CardRaw,
   DivDataJson,
 } from '@/views/transactions/detail';
-import { ITransaction, web } from '@klever/sdk';
+import { ITransaction, web } from '@klever/sdk-web';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';

@@ -32,7 +32,7 @@ import {
   IVotes,
   IWithdraw,
   TransactionType,
-} from '@klever/sdk';
+} from '@klever/sdk-web';
 
 const getType = (rawType: string): TransactionType => {
   let type = rawType.substring(0, rawType.length - 8);

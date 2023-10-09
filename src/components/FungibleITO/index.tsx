@@ -1,5 +1,5 @@
 import { IPackInfo, IPackItem } from '@/types/contracts';
-import { web } from '@klever/sdk';
+import { web } from '@klever/sdk-web';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { IParsedITO } from 'types';

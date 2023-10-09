@@ -8,7 +8,7 @@ import {
 } from '@/services/requests/multisign';
 import { ITransaction as ITransactionDecoded } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
-import { ITransaction } from '@klever/sdk';
+import { ITransaction } from '@klever/sdk-web';
 import { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useQuery } from 'react-query';

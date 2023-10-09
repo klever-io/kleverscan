@@ -91,7 +91,10 @@ const NavbarItem: React.FC<INavbarItem> = ({
         disabled={router.pathname.includes(name.toLowerCase())}
         href={pathTo}
       >
-        <Item selected={router.pathname.includes(name.toLowerCase())}>
+        <Item
+          selected={router.pathname.includes(name.toLowerCase())}
+          data-testid="navbar-item"
+        >
           <span>{name}</span>
         </Item>
       </LinkStyled>
@@ -123,6 +126,7 @@ export const MobileNavbarItem: React.FC<INavbarItem> = ({
         <MobileItem
           onClick={onClick}
           selected={router.pathname.includes(name.toLowerCase())}
+          data-testid="mobile-navbar-item"
         >
           <span>{name}</span>
         </MobileItem>

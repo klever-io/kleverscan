@@ -104,7 +104,11 @@ const Filter: React.FC<IFilter> = ({
       setFocus(true);
     };
     return (
-      <Item onClick={handleClick} selected={item === selected}>
+      <Item
+        onClick={handleClick}
+        selected={item === selected}
+        data-testid="selector-item"
+      >
         <p>{item}</p>
       </Item>
     );
@@ -165,6 +169,7 @@ const Filter: React.FC<IFilter> = ({
       <Content
         onMouseEnter={() => setDontBlur(true)}
         onMouseLeave={() => setDontBlur(false)}
+        data-testid="selector"
         {...contentProps}
       >
         {focus && (

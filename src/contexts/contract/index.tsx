@@ -19,7 +19,7 @@ import {
 } from '@/types/index';
 import { contractOptions as allContractOptions } from '@/utils/contracts';
 import { KLV_PRECISION } from '@/utils/globalVariables';
-import { web } from '@klever/sdk';
+import { web } from '@klever/sdk-web';
 import { useRouter } from 'next/router';
 import React, {
   createContext,

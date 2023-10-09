@@ -38,7 +38,7 @@ const NetworkRedirectButton: React.FC = () => {
   };
   return (
     <ButtonContainer>
-      <ButtonItem selected={false} data-testid="navbar-item">
+      <ButtonItem selected={false}>
         {sanitizeNetworkName(currentNetwork)}
         <NetworkDropdown>
           <ButtonDropdownMenu>

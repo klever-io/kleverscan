@@ -1,5 +1,5 @@
 import { doIf } from '@/utils/promiseFunctions';
-import { web } from '@klever/sdk';
+import { web } from '@klever/sdk-web';
 import {
   createContext,
   useCallback,

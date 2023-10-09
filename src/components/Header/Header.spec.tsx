@@ -11,7 +11,7 @@ interface StyleProps {
 }
 
 describe('Component: Header/navbar', () => {
-  const navBarItems = [
+  const desktopNavBarItems = [
     'Blocks',
     'Accounts',
     'Transactions',
@@ -19,6 +19,9 @@ describe('Component: Header/navbar', () => {
     'Validators',
     // 'Nodes',
     'Proposals',
+  ];
+
+  const moreItems = [
     'Multisign',
     'Charts',
     'ITOs',
@@ -27,6 +30,8 @@ describe('Component: Header/navbar', () => {
     'Marketplaces',
     'Feedback',
   ];
+
+  const mobileNavBarItems = [...desktopNavBarItems, ...moreItems];
 
   jest.mock('next/router', () => ({
     useRouter() {
@@ -62,10 +67,10 @@ describe('Component: Header/navbar', () => {
     const logo = screen.getByAltText('Logo');
     expect(logo).toBeInTheDocument();
 
-    const navbar = container.firstChild?.childNodes[1];
-    navbar?.childNodes.forEach((element, index) => {
-      expect(element).toBeInTheDocument();
-      expect(element).toHaveTextContent(navBarItems[index]);
+    const navbarElements = screen.getAllByTestId('navbar-item');
+
+    desktopNavBarItems.forEach((item, index) => {
+      expect(navbarElements[index]).toHaveTextContent(item);
     });
   });
 
@@ -78,7 +83,7 @@ describe('Component: Header/navbar', () => {
     global.innerWidth = 1500;
     const { container } = renderWithTheme(<Navbar />);
 
-    const navbarItems = screen.getAllByTestId('navbar-item');
+    const navbarElements = screen.getAllByTestId('navbar-item');
     const style = {
       display: 'flex',
       alignItems: 'center',
@@ -88,7 +93,7 @@ describe('Component: Header/navbar', () => {
       transition: '0.2s ease',
     };
 
-    navbarItems.forEach((item: HTMLElement) => {
+    navbarElements.forEach((item: HTMLElement) => {
       expect(item).toHaveStyle(style);
     });
   });
@@ -138,12 +143,11 @@ describe('Component: Header/navbar', () => {
     const { container } = renderWithTheme(<Navbar />);
     const logo = screen.getByAltText('Logo');
     expect(logo).toBeInTheDocument();
-    container.firstChild?.nextSibling?.nextSibling?.firstChild?.nextSibling?.childNodes.forEach(
-      (element, index) => {
-        expect(element).toBeInTheDocument();
-        expect(element).toHaveTextContent(navBarItems[index]);
-      },
-    );
+    const navbarElements = screen.getAllByTestId('mobile-navbar-item');
+
+    mobileNavBarItems.forEach((item, index) => {
+      expect(navbarElements[index]).toHaveTextContent(item);
+    });
   });
 
   it('Should change the overflow of the document.body when click to open mobile menu', () => {

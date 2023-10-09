@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { web } from '@klever/sdk';
+import { web } from '@klever/sdk-web';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { IParsedITO } from 'types';

@@ -51,10 +51,10 @@ describe('Component: CoinCard', () => {
 
   it('Test the selector when click and scroll to select a coin', () => {
     const { container } = renderWithTheme(<CoinCard />);
-    const coinSelector = container.firstChild?.childNodes[1]
-      ?.childNodes[1] as HTMLElement;
+
+    const coinSelector = screen.getByRole('button', {
+      name: new RegExp('Coin ' + CoinTest[1].shortname),
+    });
     fireEvent.click(coinSelector);
-    const contentScroll = container.firstChild?.firstChild as HTMLElement;
-    fireEvent.scroll(contentScroll);
   });
 });

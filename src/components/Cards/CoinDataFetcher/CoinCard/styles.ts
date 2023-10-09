@@ -307,7 +307,7 @@ export const CoinsSelector = styled.div`
   margin-bottom: 1rem;
 `;
 
-export const CoinSelector = styled.div<{ isSelected: boolean }>`
+export const CoinSelector = styled.button<{ isSelected: boolean }>`
   min-width: 100%;
   height: 100%;
   display: flex;

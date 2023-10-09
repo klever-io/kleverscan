@@ -44,11 +44,8 @@ describe('Component AssetLogo', () => {
         />,
       ),
     );
-    const container = screen.getByTestId('asset-logo-container');
 
-    const element = container.childNodes;
-    const img = container.firstChild;
-    expect(element).toHaveLength(1);
+    const img = screen.getByRole('img');
     expect(img).toBeVisible();
     expect(img).toHaveAttribute('src', '/assets/klv-logo.png');
     expect(img).toHaveAttribute('alt', 'KLEVER-logo');

@@ -1,5 +1,5 @@
 import { base64ToHex, isHex } from '@/utils/formatFunctions';
-import { utils } from '@klever/sdk';
+import { web } from '@klever/sdk-web';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
@@ -63,7 +63,7 @@ const FormVerifySignature: React.FC = () => {
     event.preventDefault();
     try {
       const validateSignature = base64ToHex(formValues.signature);
-      const validateResponse = await utils.validateSignature(
+      const validateResponse = await web.validateSignature(
         formValues.message,
         validateSignature,
         formValues.address,

@@ -50,9 +50,11 @@ import {
 } from '@/types/index';
 import { IKAppTransferReceipt, ITransferReceipt } from '@/types/receipts';
 import {
+  extractValuesFromReceipts,
+  findAllReceiptsWithSender,
+  findNFTReceipt,
   findReceipt,
   findReceiptWithAssetId,
-  findReceiptWithReceiver,
   findReceiptWithSender,
 } from '@/utils/findKey';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
@@ -1689,18 +1691,15 @@ export const Buy: React.FC<IContractBuyProps> = ({
     sender,
   ) as IKAppTransferReceipt | undefined;
 
-  const receiver = sender; // sender of tx can be the receiver of an asset
-  const receiverKAppTransferReceipt = findReceiptWithReceiver(
-    filteredReceipts,
-    14,
-    receiver,
-  ) as IKAppTransferReceipt | undefined;
+  const NFTKAppTransferReceipt = findNFTReceipt(filteredReceipts, 14) as
+    | IKAppTransferReceipt
+    | undefined;
 
   const initializeVariables = () => {
     switch (buyType) {
       case 'MarketBuy':
         currencyId = parameter?.currencyID || 'KLV';
-        assetId = receiverKAppTransferReceipt?.assetId || '';
+        assetId = NFTKAppTransferReceipt?.assetId || '';
         break;
       case 'ITOBuy':
         currencyId = parameter?.currencyID || 'KLV';
@@ -1711,6 +1710,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
     }
   };
   initializeVariables();
+
   const getPrecisionsToSearch = filteredReceipts
     .map(receipt => receipt.assetId)
     .filter(precision => precision !== undefined);
@@ -1746,7 +1746,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
     };
 
     const getAmount = () => {
-      const amount = receiverKAppTransferReceipt?.value;
+      const amount = NFTKAppTransferReceipt?.value;
       if (typeof amount === 'number') {
         return toLocaleFixed(
           amount / 10 ** (precisions[assetId] || 0),
@@ -1830,19 +1830,52 @@ export const Buy: React.FC<IContractBuyProps> = ({
   };
 
   const renderITOBuy = () => {
-    const transferReceipt = findReceipt(filteredReceipts, 0) as
-      | ITransferReceipt
-      | undefined; // there is no formal buy receipt in ITOBuy, but the data we want(price) is in the first transfer receipt, so the function will still work
+    const getITOBuyPrices = () => {
+      const transferReceipts = findAllReceiptsWithSender(
+        filteredReceipts,
+        0,
+        sender,
+      );
+      if (!transferReceipts) return;
+      const allPricesSum = extractValuesFromReceipts(
+        transferReceipts as ITransferReceipt[],
+        'assetId',
+      );
+      const precisionAllPricesSum = {};
+      Object.keys(allPricesSum).forEach(
+        key =>
+          (precisionAllPricesSum[key] = toLocaleFixed(
+            allPricesSum[key] / 10 ** precisions[currencyId],
+            precisions[currencyId],
+          )),
+      );
+      return precisionAllPricesSum;
+    };
 
-    const getPrice = () => {
-      const price = transferReceipt?.value;
-      if (typeof price === 'number') {
-        return toLocaleFixed(
-          price / 10 ** precisions[currencyId],
-          precisions[currencyId],
+    const renderITOBuyPrices = () => {
+      const prices = getITOBuyPrices();
+      if (!prices) return;
+      return Object.keys(prices).map(key => {
+        return (
+          <Row key={key}>
+            <span>
+              <strong>Total paid</strong>
+              <br />
+              <strong>in {key}</strong>
+            </span>
+            <CenteredDiv>
+              <span>
+                {prices[key]} {currencyId}
+              </span>
+              <Tooltip
+                msg={
+                  'There might be royalties fees in the total paid price.\n To know exactly how much you are being charged check your assets royalties info in assets page.'
+                }
+              />
+            </CenteredDiv>
+          </Row>
         );
-      }
-      return null;
+      });
     };
 
     const getAmount = () => {
@@ -1856,36 +1889,19 @@ export const Buy: React.FC<IContractBuyProps> = ({
       return null;
     };
 
-    const price = getPrice();
     const amount = getAmount();
     const noncesReceipts = getNFTNonces(filteredReceipts, parameter, sender);
 
     return (
       <>
-        {price && (
-          <Row>
-            <span>
-              <strong>Price</strong>
-            </span>
-            <CenteredDiv>
-              <span>
-                {price} {currencyId}
-              </span>
-              <Tooltip
-                msg={
-                  'There might be royalties fees in the total paid price.\n To know exactly how much you are being charged check your assets royalties info in assets page.'
-                }
-              />
-            </CenteredDiv>
-          </Row>
-        )}
+        {renderITOBuyPrices()}
         {amount && (
           <Row>
             <span>
               <strong>Amount</strong>
             </span>
             <span>
-              {amount} {assetId}
+              {amount} <a href={`/asset/${assetId}`}>{assetId}</a>
             </span>
           </Row>
         )}
@@ -1908,7 +1924,9 @@ export const Buy: React.FC<IContractBuyProps> = ({
             <span>
               <strong>Asset Id</strong>
             </span>
-            <span>{assetId}</span>
+            <a href={`/asset/${assetId}`}>
+              <span>{assetId}</span>
+            </a>
           </Row>
         )}
       </>

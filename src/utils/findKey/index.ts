@@ -80,6 +80,35 @@ export const findReceiptWithSender = (
   });
 };
 
+export const findAllReceiptsWithSender = (
+  receipts: IReceipt[] | undefined,
+  type: number,
+  sender: string,
+): IReceipt[] | undefined => {
+  if (!receipts) {
+    return undefined;
+  }
+  return receipts.filter(receipt => {
+    const typedReceipt = receipt as ITransferReceipt | IKAppTransferReceipt;
+    return receipt.type === type && typedReceipt?.from === sender;
+  });
+};
+
+export const extractValuesFromReceipts = (
+  receipts: ITransferReceipt[],
+  keyToFind: string,
+): Record<string, number> => {
+  const result = {};
+  receipts.forEach(receipt => {
+    if (receipt[keyToFind] in result) {
+      result[receipt[keyToFind]] += receipt.value;
+    } else {
+      result[receipt[keyToFind]] = receipt.value;
+    }
+  });
+  return result;
+};
+
 /**
  *
  * @param receipts Array of receipts
@@ -117,6 +146,19 @@ export const findReceiptWithAssetId = (
   return receipts.find(receipt => {
     const typedReceipt = receipt as ITransferReceipt;
     return receipt.type === type && typedReceipt.assetId === assetId;
+  });
+};
+
+export const findNFTReceipt = (
+  receipts: IReceipt[] | undefined,
+  type: number,
+): IReceipt | undefined => {
+  if (!receipts) {
+    return undefined;
+  }
+  return receipts.find(receipt => {
+    const typedReceipt = receipt as IKAppTransferReceipt;
+    return receipt.type === type && typedReceipt.assetId.split('/')[1];
   });
 };
 

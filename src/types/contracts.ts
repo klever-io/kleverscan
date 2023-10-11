@@ -445,6 +445,14 @@ export interface IBuyContractPayload {
   precision?: number;
 }
 
+export interface IITOBuyParameter {
+  buyType: 'ITOBuy';
+}
+
+export interface IMarketBuyParameter {}
+
+export type IBuyContractParameter = IITOBuyParameter | IMarketBuyParameter;
+
 export enum EnumMarketType {
   BuyItNowMarket = 0,
   AuctionMarket = 1,

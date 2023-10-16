@@ -223,9 +223,13 @@ export const ToolTipStyle = styled.div`
     width: 20px;
     height: 20px;
     color: ${props => props.theme.violet};
+    display: grid;
   }
   > span > div {
-    max-height: 20px;
     min-width: fit-content;
+  }
+  span {
+    display: grid;
+    place-items: center;
   }
 `;

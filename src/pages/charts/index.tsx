@@ -162,31 +162,24 @@ const Charts: React.FC<ICharts> = () => {
     onErrorHandler(),
   );
 
-  const getStatisticsErrorContainer = () => (
-    <ErrorContainer>
-      <div>Something went wrong.</div>
-      <RetryContainer
-        onClick={refetchStatistics as React.MouseEventHandler<HTMLDivElement>}
-      >
-        <button>Retry</button>
-        <IoReloadSharp size={32} />
-      </RetryContainer>
-    </ErrorContainer>
-  );
+  const errorWithRetryComponent = (onClick: typeof refetchStatistics) => {
+    return (
+      <ErrorContainer>
+        <div>Something went wrong.</div>
+        <RetryContainer
+          onClick={onClick as React.MouseEventHandler<HTMLDivElement>}
+        >
+          <button>Retry</button>
+          <IoReloadSharp size={32} />
+        </RetryContainer>
+      </ErrorContainer>
+    );
+  };
 
-  const getTransactionListErrorContainer = () => (
-    <ErrorContainer>
-      <div>Something went wrong.</div>
-      <RetryContainer
-        onClick={
-          refetchTransactionList as React.MouseEventHandler<HTMLDivElement>
-        }
-      >
-        <button>Retry</button>
-        <IoReloadSharp size={32} />
-      </RetryContainer>
-    </ErrorContainer>
-  );
+  const getStatisticsErrorContainer = () =>
+    errorWithRetryComponent(refetchStatistics);
+  const getTransactionListErrorContainer = () =>
+    errorWithRetryComponent(refetchTransactionList);
 
   const getTransactionChartData = (
     transactionList: null | IDailyTransaction[],

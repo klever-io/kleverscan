@@ -438,19 +438,20 @@ export const BlockCardHash = styled.span`
 `;
 
 export const TransactionContainer = styled.div`
+  ${DataCardDefaultStyles};
   display: flex;
   justify-content: center;
   border-radius: 16px;
   flex-direction: column;
-  ${DataCardDefaultStyles};
   background-color: ${props => props.theme.dark && 'transparent'} !important;
 `;
 
 export const ChartsContainer = styled(TransactionContainer)`
+  ${DataCardDefaultStyles}
   flex-wrap: wrap;
   gap: 1rem;
   border: none;
-  ${DataCardDefaultStyles}
+  background-color: transparent !important;
 `;
 
 export const TransactionContent = styled.div`
@@ -481,17 +482,7 @@ export const TransactionContent = styled.div`
     }
   }
 
-  &:not(:first-child) {
-    border: none;
-    border: 2px solid
-      ${props =>
-        props.theme.dark ? props.theme.card.background : 'transparent'};
-    border-radius: 1rem;
-  }
-
-  &:first-child {
-    border: none;
-  }
+  border-radius: 1rem;
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     overflow: auto;
@@ -665,6 +656,12 @@ export const TransactionChart = styled(TransactionContent)`
 
 export const FixedTxChart = styled(TransactionChart)`
   height: 22rem;
+
+  ${({ theme }) =>
+    !theme.dark &&
+    css`
+      box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.8);
+    `}
 `;
 
 export const TransactionChartContent = styled.div`
@@ -694,6 +691,7 @@ export const ErrorContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  color: ${props => props.theme.darkText};
 `;
 
 export const RetryContainer = styled.div`
@@ -703,6 +701,10 @@ export const RetryContainer = styled.div`
   align-items: center;
   :hover {
     cursor: pointer;
+  }
+
+  > button {
+    color: ${props => props.theme.darkText};
   }
 `;
 

@@ -1,27 +1,31 @@
-# klever-explorer
+# KleverScan
+
+KleverScan is an explorer for the Klever Blockchain.
 
 ## Running the project
 
 ```bash
-    git clone git@github.com:klever-io/klever-explorer.git
+    git clone git@github.com:klever-io/kleverscan.git
 
-    cd klever-explorer
+    cd kleverscan
 
     yarn
 
     yarn dev
 ```
 
-### then open localhost:3000
+## Contributing
 
-<br/><hr/><br/>
+Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting a pull request.
 
-## Adding Translations
+## Code of Conduct
 
-Flow example:
+Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating in our community.
 
-1. add the language in the next-i18next.config.js file in the locales
+## License
 
-2. duplicate the `"en"` folder inside `public/locales` and rename to match the locale
+This project is licensed under the terms of the [GNU GPLv3](LICENSE).
 
-3. translate the english copy to the new language
+## Support
+
+If you have any questions or issues, please feel free to reach out to us on our [Slack Channel](https://join.slack.com/t/klever-blockchain/shared_invite/zt-1z69ikw0g-dXtRY7eGTnyRllsCV_YGOw) or through our [Forum](https://forum.klever.org/).

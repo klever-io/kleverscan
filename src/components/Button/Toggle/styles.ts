@@ -17,7 +17,7 @@ export const ToggleButtonIcon = styled.button<{
   active: boolean;
   hasIcon: boolean;
 }>`
-  height: 1.1rem;
+  height: 17px;
   width: 17px;
   position: relative;
   left: 3px;

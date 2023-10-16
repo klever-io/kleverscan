@@ -4,6 +4,7 @@ import { useContractModal } from '@/contexts/contractModal';
 import { IAccountAsset, IInnerTableProps, IRowSection } from '@/types/index';
 import { parseApr } from '@/utils';
 import { formatAmount } from '@/utils/formatFunctions';
+import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React from 'react';
 
@@ -18,6 +19,7 @@ const Assets: React.FC<IAssets> = ({
   address,
   showInteractionButtons,
 }) => {
+  const { t } = useTranslation('accounts');
   const header = [
     'Token',
     'ID',
@@ -46,7 +48,9 @@ const Assets: React.FC<IAssets> = ({
     const sectionViewNfts =
       assetType === 1 ? (
         <Link href={`/account/${address}/collection/${assetId}`} key={address}>
-          <CustomLink tabAsset={true}>View NFTs</CustomLink>
+          <CustomLink tabAsset={true}>
+            {t('accounts:SingleAccount.Buttons.ViewNFTs')}
+          </CustomLink>
         </Link>
       ) : (
         <></>
@@ -107,7 +111,7 @@ const Assets: React.FC<IAssets> = ({
 
     const [FreezeButton] = getInteractionsButtons([
       {
-        title: 'Freeze',
+        title: t('accounts:SingleAccount.Buttons.Freeze'),
         contractType: 'FreezeContract',
       },
     ]);

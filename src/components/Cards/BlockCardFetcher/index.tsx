@@ -17,8 +17,8 @@ import React, { useState } from 'react';
 const BlockCardFetcher: React.FC = () => {
   const { blocks } = useHomeData();
   const { t: commonT } = useTranslation('common');
-  const [hideMenu, setHideMenu] = useState(false);
   const { t } = useTranslation('blocks');
+  const [hideMenu, setHideMenu] = useState(false);
 
   const getBlocks = () => {
     if (blocks && blocks.length) {
@@ -52,7 +52,11 @@ const BlockCardFetcher: React.FC = () => {
               <a>
                 <ViewMoreContainer>
                   <PlusSquare />
-                  <p>View all blocks</p>
+                  <p>
+                    {commonT('Cards.ViewAll', { type: 'os' }) +
+                      ' ' +
+                      commonT('Titles.Blocks')}
+                  </p>
                 </ViewMoreContainer>
               </a>
             </Link>

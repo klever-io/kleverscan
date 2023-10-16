@@ -6,13 +6,15 @@
     "Total Transactions": "Total de Transações",
     "Live/Peak TPS": "Atual/Pico de TPS",
     "Epoch": "Época",
-    "Remaining Time": "Tempo Restante",
+    "Time remaining": "Tempo Restante",
     "Last 24h": "Últimas 24h",
     "Market Cap": "Capitalização",
+    "Price": "Preço",
     "Volume": "Volume",
     "Total Staked": "Total Congelado",
     "Estimated APR": "APR Estimado",
-    "KLV per KFI": "KLV por KFI"
+    "KLV per KFI": "KLV por KFI",
+    "ViewAll": "Ver Tod{{type}} {{type}}"
   },
   "Titles": {
     "Assets": "Ativos",
@@ -21,6 +23,13 @@
     "Transactions": "Transações",
     "Validators": "Validadores",
     "Proposals": "Propostas"
+  },
+  "Tabs": {
+    "Overview": "Visão Geral"
+  },
+  "Buttons": {
+    "Expand": "Expandir",
+    "Hide": "Ocultar"
   },
   "Date": {
     "Elapsed Time": "atrás",

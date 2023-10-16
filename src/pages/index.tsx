@@ -8,7 +8,7 @@ const ExportedHome: React.FC = () => <Home />;
 export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
   const props = await serverSideTranslations(
     locale,
-    ['common', 'blocks', 'transactions'],
+    ['common', 'blocks', 'transactions', 'home'],
     nextI18NextConfig,
   );
 

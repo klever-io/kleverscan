@@ -1,6 +1,7 @@
 import Table, { ITable } from '@/components/Table';
 import { IInnerTableProps, IRewardsAssets, IRowSection } from '@/types/index';
 import { KLV_PRECISION } from '@/utils/globalVariables';
+import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import {
@@ -16,6 +17,7 @@ interface IRewards {
 
 const Rewards: React.FC<IRewards> = ({ rewardsTableProps }) => {
   const [expanded, setExpanded] = useState({});
+  const { t } = useTranslation('common');
   const headers = ['Asset Id', 'Rewards'];
 
   const toggleExpand = (assetId: string) => {
@@ -63,7 +65,11 @@ const Rewards: React.FC<IRewards> = ({ rewardsTableProps }) => {
               )}
               {allStakingRewards.length > 3 && (
                 <ButtonContent onClick={() => toggleExpand(assetId)}>
-                  <p>{expanded[assetId] ? 'Hide' : 'Expand'}</p>
+                  <p>
+                    {expanded[assetId]
+                      ? t('Buttons.Hide')
+                      : t('Buttons.Expand')}
+                  </p>
                   <ArrowExpand expended={expanded[assetId]} />
                 </ButtonContent>
               )}

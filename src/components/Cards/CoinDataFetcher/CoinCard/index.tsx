@@ -1,3 +1,4 @@
+import { InfoSquare } from '@/assets/icons';
 import Chart, { ChartType } from '@/components/Chart';
 import { PriceTooltip } from '@/components/Chart/Tooltips';
 import { Loader } from '@/components/Loader/styles';
@@ -32,7 +33,6 @@ import {
   HeaderContent,
   HeaderGraph,
   IconContainer,
-  InfoSquareIcon,
   Name,
   NameError,
   SetTimeContainer,
@@ -104,7 +104,7 @@ const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
         </Link>
         <HeaderGraph>
           <div>
-            <span>Price</span>
+            <span>{t('Price')}</span>
             <p>
               ${' '}
               {shortname === 'KLV'
@@ -190,6 +190,7 @@ const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
   );
 };
 const CoinCard: React.FC = () => {
+  const { t } = useTranslation('home');
   const coinsName = ['KLV', 'KFI'];
   const [selectedCoin, setSelectedCoin] = useState(0);
   const [loadingError, setLoadingError] = useState(false);
@@ -226,9 +227,6 @@ const CoinCard: React.FC = () => {
     return '--';
   };
 
-  const handleClickTime = (days: ICoinTimes) => {
-    getCoins(days);
-  };
   const CoinsFetchFails: React.FC = () => {
     if (coins.length === 0) {
       return loadingError ? (
@@ -275,7 +273,7 @@ const CoinCard: React.FC = () => {
                     rel="noreferrer"
                   >
                     <ButtonInformation>
-                      {`Where to exchange or buy ${coin}`}
+                      {t('CardBuy', { asset: coin })}
                       <CurrencyIcon />
                     </ButtonInformation>
                   </a>
@@ -342,9 +340,9 @@ const CoinCard: React.FC = () => {
               >
                 <ButtonInformation>
                   {selectedCoin === 0
-                    ? 'Where to exchange or buy KLV'
-                    : 'Where to exchange or buy KFI'}
-                  <InfoSquareIcon src="/InfoSquare.svg" />
+                    ? t('CardBuy', { asset: 'KLV' })
+                    : t('CardBuy', { asset: 'KFI' })}
+                  <InfoSquare />
                 </ButtonInformation>
               </a>
             </ButtonContainer>

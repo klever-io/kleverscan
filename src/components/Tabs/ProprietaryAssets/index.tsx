@@ -8,6 +8,7 @@ import {
 } from '@/types/index';
 import { parseApr } from '@/utils';
 import { formatAmount } from '@/utils/formatFunctions';
+import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React from 'react';
 
@@ -32,7 +33,7 @@ const ProprietaryAssets: React.FC<IProprietaryAssets> = ({
     'Staking Type',
     '',
   ];
-
+  const { t } = useTranslation('accounts');
   const { getInteractionsButtons } = useContractModal();
 
   const rowSections = (props: IProprietaryAsset): IRowSection[] => {
@@ -42,7 +43,9 @@ const ProprietaryAssets: React.FC<IProprietaryAssets> = ({
     const sectionViewNfts =
       assetType === 'Non Fungible' ? (
         <Link href={`/account/${address}/collection/${assetId}`} key={address}>
-          <CustomLink>View NFTs</CustomLink>
+          <CustomLink>
+            {t('accounts:SingleAccount.Buttons.ViewNFTs')}
+          </CustomLink>
         </Link>
       ) : (
         <></>
@@ -96,7 +99,7 @@ const ProprietaryAssets: React.FC<IProprietaryAssets> = ({
 
     const [AssetTriggerButton] = getInteractionsButtons([
       {
-        title: 'Asset Trigger',
+        title: t('accounts:SingleAccount.Buttons.AssetTrigger'),
         contractType: 'AssetTriggerContract',
         defaultValues: {
           assetId,

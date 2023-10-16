@@ -1,0 +1,50 @@
+{
+  "SingleAccount": {
+    "Title": "Account",
+    "Tabs": {
+      "Permission": "Permission",
+      "ProprietaryAssets": "Proprietary Assets",
+      "Transactions": "Transactions",
+      "Buckets": "Buckets",
+      "Rewards": "Rewards"
+    },
+    "Content": {
+      "Address": "Address",
+      "Balance": {
+        "Balance": "Balance",
+        "Available": "Available",
+        "Frozen": "Frozen",
+        "Unfrozen": "Unfrozen"
+      },
+      "RewardsAvailable": {
+        "Rewards": "Rewards",
+        "Available": "Available",
+        "Allowance": "Allowance",
+        "Staking": " {{asset}} Staking"
+      },
+      "Nonce": "Nonce"
+    },
+    "Buttons": {
+      "SetAccountName": "Set Account Name",
+      "Allowance": "Allowance Claim",
+      "StakingClaim": "{{asset}} Staking Claim",
+      "CreateAsset": "Create Asset",
+      "ViewNFTs": "View NFTs",
+      "Delegate": "Delegate",
+      "Undelegate": "Undelegate",
+      "WithDraw": "WithDraw",
+      "Transfer": "Transfer",
+      "Freeze": "Freeze",
+      "AssetTrigger": "Asset Trigger",
+      "Unfreeze": "Unfreeze"
+    },
+    "PermissionsTab": {
+      "Signers": "Signers",
+      "Weight": "Weight",
+      "Type": "Type",
+      "Threshold": "Threshold",
+      "Operations": "Operations",
+      "PermissionsName": "Permissions Name"
+    }
+  }
+}

@@ -173,14 +173,15 @@ export const ItemContainerPermissions = styled.div<{ isOperations?: boolean }>`
   }
   gap: 0.25rem;
   strong {
-    width: auto !important;
-    min-width: 5rem;
+    max-width: 9rem;
+    min-width: 9rem;
   }
 `;
 
 export const OperationsContainer = styled.div`
   display: flex;
   position: relative;
+  padding: 0rem !important;
   align-items: center;
   width: 100%;
   justify-content: flex-start;
@@ -269,4 +270,9 @@ export const ValidOperation = styled(TickSquare).attrs(() => ({
   path {
     fill: ${({ theme }) => theme.green};
   }
+`;
+
+export const RewardsAvailableContainer = styled.div`
+  display: flex;
+  flex-direction: column;
 `;

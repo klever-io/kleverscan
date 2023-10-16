@@ -20,7 +20,7 @@ describe('Component: HomeTransactions', () => {
   });
   it("Should render the Title and the empty component when don't have any transaction", () => {
     const emptyElement = screen.getByText(/EmptyData/i);
-    const title = screen.getByText('Last transactions');
+    const title = screen.getByText('Last Transactions');
     expect(emptyElement).toBeInTheDocument();
     expect(title).toBeInTheDocument();
   });

@@ -1,3 +1,4 @@
+import { useTranslation } from 'next-i18next';
 import React, { useState } from 'react';
 import SquarePlus from '../../../public/SquarePlus.svg';
 import ModalContract, { IModalContract } from '../Contract/ModalContract';
@@ -15,6 +16,7 @@ interface IShortCutContract {
 const QuickAccess: React.FC<{
   setWizard: React.Dispatch<React.SetStateAction<any>>;
 }> = ({ setWizard }) => {
+  const { t } = useTranslation('home');
   const [contractType, setContractType] = useState('');
   const [openModalTransactions, setOpenModalTransactions] = useState(false);
   const [titleModal, setTitleModal] = useState('');
@@ -62,8 +64,8 @@ const QuickAccess: React.FC<{
   return (
     <Container>
       <TitleContainer>
-        <Title>Quick access</Title>
-        <small>Interact with the blockchain through Explorer</small>
+        <Title>{t('QuickAccess')}</Title>
+        <small>{t('QuickAccess Description')}</small>
       </TitleContainer>
       <Carousel>
         {quickAccessContract.map(contract => (

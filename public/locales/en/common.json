@@ -6,13 +6,15 @@
     "Total Transactions": "Total Transactions",
     "Live/Peak TPS": "Live/Peak TPS",
     "Epoch": "Epoch",
-    "Remaining Time": "Remaining Time",
+    "Time remaining": "Time remaining",
     "Last 24h": "Last 24h",
     "Market Cap": "Market Cap",
+    "Price": "Price",
     "Volume": "Volume",
     "Total Staked": "Total Staked",
     "Estimated APR": "Estimated APR",
-    "KLV per KFI": "KLV per KFI"
+    "KLV per KFI": "KLV per KFI",
+    "ViewAll": "View all"
   },
   "Titles": {
     "Assets": "Assets",
@@ -21,6 +23,13 @@
     "Transactions": "Transactions",
     "Validators": "Validators",
     "Proposals": "Proposals"
+  },
+  "Tabs": {
+    "Overview": "Overview"
+  },
+  "Buttons": {
+    "Expand": "Expand",
+    "Hide": "Hide"
   },
   "Date": {
     "Elapsed Time": "ago",

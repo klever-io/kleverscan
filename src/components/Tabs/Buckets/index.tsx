@@ -6,6 +6,7 @@ import api from '@/services/api';
 import { CenteredRow, RowContent } from '@/styles/common';
 import { IAssetsBuckets, IInnerTableProps, IRowSection } from '@/types/index';
 import { parseAddress } from '@/utils/parseValues';
+import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React from 'react';
 import { useQuery } from 'react-query';
@@ -22,6 +23,7 @@ const Buckets: React.FC<IBuckets> = ({
 }) => {
   const UINT32_MAX = 4294967295;
   const { isMobile } = useMobile();
+  const { t } = useTranslation('accounts');
   const { getInteractionsButtons } = useContractModal();
 
   const { data: epoch } = useQuery('epoch', () => requestBlockEpoch());
@@ -57,7 +59,9 @@ const Buckets: React.FC<IBuckets> = ({
         ? withdrawEquation
         : unfreezeEquation;
       return `${
-        isWithdrawLocked() ? 'Withdraw' : 'Unfreeze'
+        isWithdrawLocked()
+          ? t('SingleAccount.Buttons.WithDraw')
+          : t('SingleAccount.Buttons.Unfreeze')
       } (in ${textEquation} epoch${textEquation > 1 ? 's' : ''})`;
     };
 
@@ -69,21 +73,21 @@ const Buckets: React.FC<IBuckets> = ({
       LockedButton,
     ] = getInteractionsButtons([
       {
-        title: 'Delegate',
+        title: t('SingleAccount.Buttons.Delegate'),
         contractType: 'DelegateContract',
         defaultValues: {
           bucketId: bucket.id,
         },
       },
       {
-        title: 'Undelegate',
+        title: t('SingleAccount.Buttons.Undelegate'),
         contractType: 'UndelegateContract',
         defaultValues: {
           bucketId: bucket.id,
         },
       },
       {
-        title: 'Withdraw',
+        title: t('SingleAccount.Buttons.WithDraw'),
         contractType: 'WithdrawContract',
         defaultValues: {
           withdrawType: 0,
@@ -91,7 +95,7 @@ const Buckets: React.FC<IBuckets> = ({
         },
       },
       {
-        title: 'Unfreeze',
+        title: t('SingleAccount.Buttons.Unfreeze'),
         contractType: 'UnfreezeContract',
         defaultValues: {
           collection: asset.assetId,

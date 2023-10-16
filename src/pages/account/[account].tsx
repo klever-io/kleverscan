@@ -77,14 +77,19 @@ import {
   ItemContentPermissions,
   OperationsContainer,
   OperationsContent,
+  RewardsAvailableContainer,
   StakingRewards,
   ValidOperation,
 } from '@/views/accounts/detail';
 import { FilterByDate } from '@/views/transactions';
 import { ReceiveBackground } from '@/views/validator';
+import { GetStaticPaths, GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 export interface IStakingRewards {
   label: string;
@@ -112,6 +117,7 @@ const PermissionOperations: React.FC<IPermissionOperations> = ({
   type,
 }) => {
   const [expanded, setExpanded] = useState(false);
+  const { t } = useTranslation('common');
   const toggleExpand = () => {
     setExpanded(!expanded);
   };
@@ -154,18 +160,22 @@ const PermissionOperations: React.FC<IPermissionOperations> = ({
         </>
       )}
       <ButtonExpand onClick={toggleExpand}>
-        {expanded ? 'Hide' : 'Expand'}
+        {expanded ? t('common:Buttons.Hide') : t('common:Buttons.Expand')}
       </ButtonExpand>
     </OperationsContainer>
   );
 };
 
 const Account: React.FC<IAccountPage> = () => {
-  const headers = ['Assets', 'Transactions', 'Buckets', 'Rewards'];
-  const tabHeaders = ['Overview'];
-
+  const { t } = useTranslation(['common', 'accounts']);
+  const headers = [
+    t('common:Titles.Assets'),
+    t('common:Titles.Transactions'),
+    t('accounts:SingleAccount.Tabs.Buckets'),
+    t('accounts:SingleAccount.Tabs.Rewards'),
+  ];
+  const tabHeaders = [t('common:Tabs.Overview')];
   const [selectedTabHeader, setSelectedTabHeader] = useState(tabHeaders[0]);
-
   const { walletAddress, extensionInstalled, connectExtension } =
     useExtension();
   const { isTablet } = useMobile();
@@ -207,7 +217,7 @@ const Account: React.FC<IAccountPage> = () => {
 
   const getHeaders = () => {
     if (hasProprietaryAssets) {
-      headers.splice(1, 0, 'Proprietary Assets');
+      headers.splice(1, 0, t('accounts:SingleAccount.Tabs.ProprietaryAssets'));
     }
   };
   getHeaders();
@@ -285,15 +295,15 @@ const Account: React.FC<IAccountPage> = () => {
       const address = router.query.account as string;
 
       switch (router.query.tab) {
-        case 'Assets':
+        case t('common:Titles.Assets'):
           return assetsRequest(address)(page, limit);
-        case 'Proprietary Assets':
+        case t('accounts:SingleAccount.Tabs.ProprietaryAssets'):
           return ownedAssetsRequest(address)(page, limit);
-        case 'Transactions':
+        case t('common:Titles.Transactions'):
           return transactionsRequest(address, router.query)(page, limit);
-        case 'Buckets':
+        case t('accounts:SingleAccount.Tabs.Buckets'):
           return bucketsRequest(address)(page, limit);
-        case 'Rewards':
+        case t('accounts:SingleAccount.Tabs.Rewards'):
           return rewardsFPRPool(address)(page, limit);
         default:
           return assetsRequest(address)(page, limit);
@@ -370,17 +380,17 @@ const Account: React.FC<IAccountPage> = () => {
 
   const SelectedComponent: React.FC = () => {
     switch (selectedTabHeader) {
-      case 'Overview':
+      case t('common:Tabs.Overview'):
         return <Overview />;
-      case 'Permission':
+      case t('accounts:SingleAccount.Tabs.Permission'):
         return <Permission />;
       default:
         return <div />;
     }
   };
   const SelectedTabComponent: React.FC = () => {
-    switch (router?.query?.tab || 'Assets') {
-      case 'Assets':
+    switch (router?.query?.tab || t('common:Titles.Assets')) {
+      case t('common:Titles.Assets'):
         return (
           <>
             <ContainerTabInteractions>
@@ -394,7 +404,7 @@ const Account: React.FC<IAccountPage> = () => {
           </>
         );
 
-      case 'Proprietary Assets':
+      case t('accounts:SingleAccount.Tabs.ProprietaryAssets'):
         return (
           <>
             <ContainerTabInteractions>
@@ -407,16 +417,16 @@ const Account: React.FC<IAccountPage> = () => {
             />
           </>
         );
-      case 'Transactions':
+      case t('common:Titles.Transactions'):
         return <Transactions transactionsTableProps={transactionTableProps} />;
-      case 'Buckets':
+      case t('accounts:SingleAccount.Tabs.Buckets'):
         return (
           <Buckets
             bucketsTableProps={bucketsTableProps}
             showInteractionButtons={showInteractionButtons}
           />
         );
-      case 'Rewards':
+      case t('accounts:SingleAccount.Tabs.Rewards'):
         return <Rewards rewardsTableProps={rewardsTableProps} />;
       default:
         return <div />;
@@ -485,18 +495,18 @@ const Account: React.FC<IAccountPage> = () => {
     CreateAssetButton,
   ] = getInteractionsButtons([
     {
-      title: 'Set Account Name',
+      title: t('accounts:SingleAccount.Buttons.SetAccountName'),
       contractType: 'SetAccountNameContract',
       defaultValues: {
         name: account?.name ? account.name : '',
       },
     },
     {
-      title: 'Transfer',
+      title: t('accounts:SingleAccount.Buttons.Transfer'),
       contractType: 'TransferContract',
     },
     {
-      title: 'Allowance Claim',
+      title: t('accounts:SingleAccount.Buttons.Allowance'),
       contractType: 'ClaimContract',
       defaultValues: {
         claimType: 1,
@@ -504,7 +514,7 @@ const Account: React.FC<IAccountPage> = () => {
       },
     },
     {
-      title: 'KLV Staking Claim',
+      title: t('accounts:SingleAccount.Buttons.StakingClaim', { asset: 'KLV' }),
       contractType: 'ClaimContract',
       defaultValues: {
         claimType: 0,
@@ -512,7 +522,7 @@ const Account: React.FC<IAccountPage> = () => {
       },
     },
     {
-      title: 'KFI Staking Claim',
+      title: t('accounts:SingleAccount.Buttons.StakingClaim', { asset: 'KFI' }),
       contractType: 'ClaimContract',
       defaultValues: {
         claimType: 0,
@@ -520,12 +530,13 @@ const Account: React.FC<IAccountPage> = () => {
       },
     },
     {
-      title: 'Create Asset',
+      title: t('accounts:SingleAccount.Buttons.CreateAsset'),
       contractType: 'CreateAssetContract',
     },
   ]);
 
-  (account?.permissions?.length || 0) > 0 && tabHeaders.push('Permission');
+  (account?.permissions?.length || 0) > 0 &&
+    tabHeaders.push(t('accounts:SingleAccount.Tabs.Permission'));
   const Permission: React.FC = () => {
     const msg = `Owner - This is the default permission, 
     granting the holder the ability to execute all contracts.
@@ -547,7 +558,9 @@ const Account: React.FC<IAccountPage> = () => {
                 <BalanceContainer>
                   <FrozenContainer>
                     <ItemContainerPermissions isOperations={true}>
-                      <strong>Signers</strong>
+                      <strong>
+                        {t('accounts:SingleAccount.PermissionsTab.Signers')}
+                      </strong>
                       <ContainerSigners
                         isSignersRow={true}
                         rowColumnMobile={true}
@@ -560,7 +573,11 @@ const Account: React.FC<IAccountPage> = () => {
                                 <Copy info="Address" data={signer.address} />
                               </li>
                               <li>
-                                <strong>Weight</strong>
+                                <strong>
+                                  {t(
+                                    'accounts:SingleAccount.PermissionsTab.Weight',
+                                  )}
+                                </strong>
                                 {signer.weight}
                               </li>
                             </ul>
@@ -569,7 +586,9 @@ const Account: React.FC<IAccountPage> = () => {
                       </ContainerSigners>
                     </ItemContainerPermissions>
                     <ItemContainerPermissions>
-                      <strong>Type</strong>
+                      <strong>
+                        {t('accounts:SingleAccount.PermissionsTab.Type')}
+                      </strong>
                       <ItemContentPermissions>
                         <p>{permission.type === 0 ? 'Owner' : 'User'}</p>
                         <Tooltip msg={msg} />
@@ -577,21 +596,31 @@ const Account: React.FC<IAccountPage> = () => {
                     </ItemContainerPermissions>
 
                     <ItemContainerPermissions>
-                      <strong>Threshold</strong>
+                      <strong>
+                        {t('accounts:SingleAccount.PermissionsTab.Threshold')}
+                      </strong>
                       <ItemContentPermissions>
                         <p>{permission.Threshold}</p>
                       </ItemContentPermissions>
                     </ItemContainerPermissions>
                     <ItemContainerPermissions isOperations={true}>
-                      <strong>Operations</strong>
+                      <strong>
+                        {t('accounts:SingleAccount.PermissionsTab.Operations')}
+                      </strong>
                       <ItemContentPermissions rowColumnMobile={true}>
                         <PermissionOperations {...permission} />
                       </ItemContentPermissions>
                     </ItemContainerPermissions>
-                    <ItemContentPermissions rowColumnMobile={true}>
-                      <strong>Permissions Name</strong>
-                      <p>{permission.permissionName || '--'}</p>
-                    </ItemContentPermissions>
+                    <ItemContainerPermissions>
+                      <strong>
+                        {t(
+                          'accounts:SingleAccount.PermissionsTab.PermissionsName',
+                        )}
+                      </strong>
+                      <ItemContentPermissions rowColumnMobile={true}>
+                        <p>{permission.permissionName || '--'}</p>
+                      </ItemContentPermissions>
+                    </ItemContainerPermissions>
                   </FrozenContainer>
                 </BalanceContainer>
               </RowContent>
@@ -607,7 +636,7 @@ const Account: React.FC<IAccountPage> = () => {
       <Container>
         <Row isMobileRow>
           <span>
-            <strong>Address</strong>
+            <strong>{t('accounts:SingleAccount.Content.Address')}</strong>
           </span>
           <RowContent>
             <CenteredRow>
@@ -625,7 +654,9 @@ const Account: React.FC<IAccountPage> = () => {
         </Row>
         <Row>
           <span>
-            <strong>Balance</strong>
+            <strong>
+              {t('accounts:SingleAccount.Content.Balance.Balance')}
+            </strong>
           </span>
           <RowContent>
             <BalanceContainer>
@@ -664,7 +695,9 @@ const Account: React.FC<IAccountPage> = () => {
               </AmountContainer>
               <FrozenContainer>
                 <div>
-                  <strong>Available</strong>
+                  <strong>
+                    {t('accounts:SingleAccount.Content.Balance.Available')}
+                  </strong>
                   <span>
                     {!isLoadingAccount ? (
                       availableBalance.toLocaleString()
@@ -674,7 +707,9 @@ const Account: React.FC<IAccountPage> = () => {
                   </span>
                 </div>
                 <div>
-                  <strong>Frozen</strong>
+                  <strong>
+                    {t('accounts:SingleAccount.Content.Balance.Frozen')}
+                  </strong>
                   <span>
                     {!isLoadingAccount ? (
                       getKLVfreezeBalance().toLocaleString()
@@ -684,7 +719,9 @@ const Account: React.FC<IAccountPage> = () => {
                   </span>
                 </div>
                 <div>
-                  <strong>Unfrozen</strong>
+                  <strong>
+                    {t('accounts:SingleAccount.Content.Balance.Unfrozen')}
+                  </strong>
                   <span>
                     {!isLoadingAccount ? (
                       getKLVunfreezeBalance().toLocaleString()
@@ -699,14 +736,24 @@ const Account: React.FC<IAccountPage> = () => {
         </Row>
         <Row>
           <span>
-            <strong>Rewards</strong>
-            <strong>Available</strong>
+            <RewardsAvailableContainer>
+              <strong>
+                {t('accounts:SingleAccount.Content.RewardsAvailable.Rewards')}
+              </strong>
+              <strong>
+                {t('accounts:SingleAccount.Content.RewardsAvailable.Available')}
+              </strong>
+            </RewardsAvailableContainer>
           </span>
           <RowContent>
             <BalanceContainer>
               <FrozenContainer>
                 <StakingRewards>
-                  <strong>Allowance</strong>
+                  <strong>
+                    {t(
+                      'accounts:SingleAccount.Content.RewardsAvailable.Allowance',
+                    )}
+                  </strong>
                   {!isLoadingKLVAllowance ? (
                     <>
                       <span>{getKLVAllowance().toLocaleString()}</span>
@@ -717,7 +764,12 @@ const Account: React.FC<IAccountPage> = () => {
                   )}
                 </StakingRewards>
                 <StakingRewards>
-                  <strong>KLV Staking</strong>
+                  <strong>
+                    {t(
+                      'accounts:SingleAccount.Content.RewardsAvailable.Staking',
+                      { asset: 'KLV' },
+                    )}
+                  </strong>
                   {!isLoadingKLVAllowance ? (
                     <>
                       <span>{getKLVStaking().toLocaleString()}</span>
@@ -728,7 +780,12 @@ const Account: React.FC<IAccountPage> = () => {
                   )}
                 </StakingRewards>
                 <StakingRewards>
-                  <strong>KFI Staking</strong>
+                  <strong>
+                    {t(
+                      'accounts:SingleAccount.Content.RewardsAvailable.Staking',
+                      { asset: 'KFI' },
+                    )}
+                  </strong>
                   {!isLoadingKFIAllowance ? (
                     <>
                       <span>{getKFIStaking().toLocaleString()}</span>
@@ -744,7 +801,7 @@ const Account: React.FC<IAccountPage> = () => {
         </Row>
         <Row>
           <span>
-            <strong>Nonce</strong>
+            <strong>{t('accounts:SingleAccount.Content.Nonce')}</strong>
           </span>
           <RowContent>
             <small>
@@ -760,7 +817,9 @@ const Account: React.FC<IAccountPage> = () => {
     <Container>
       <Header>
         <Title
-          title={account?.name ? account?.name : 'Account'}
+          title={
+            account?.name ? account?.name : t('accounts:SingleAccount.Title')
+          }
           Icon={AccountIcon}
           route={'/accounts'}
           isAccountOwner={!!account?.name}
@@ -785,7 +844,8 @@ const Account: React.FC<IAccountPage> = () => {
         </CardContent>
       </CardTabContainer>
       <Tabs {...tabProps}>
-        {router?.query?.tab === 'Transactions' && (
+        {router?.query?.tab ===
+          t('accounts:SingleAccount.Tabs.Transactions') && (
           <TxsFiltersWrapper>
             <ContainerFilter>
               <TransactionsFilters
@@ -809,6 +869,23 @@ const Account: React.FC<IAccountPage> = () => {
       </Tabs>
     </Container>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'accounts'],
+    nextI18nextConfig,
+  );
+
+  return { props };
+};
+
+export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
+  return {
+    paths: [], //indicates that no page needs be created at build time
+    fallback: 'blocking', //indicates the type of fallback
+  };
 };
 
 export default Account;

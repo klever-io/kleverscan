@@ -67,7 +67,7 @@ const HomeTransactions: React.FC = () => {
   return (
     <SectionCards>
       <ContainerHide>
-        <h1>{t('Last transactions')}</h1>
+        <h1>{t('Last Transactions')}</h1>
         <div onClick={() => setHideMenu(!hideMenu)}>
           <p>{hideMenu ? 'Show' : 'Hide'}</p>
           <ArrowUpSquareHideMenu hide={hideMenu} />
@@ -95,7 +95,11 @@ const HomeTransactions: React.FC = () => {
               <a>
                 <ViewMoreContainer>
                   <PlusSquare />
-                  <p>View all transactions</p>
+                  <p>
+                    {commonT('Cards.ViewAll', { type: 'as' }) +
+                      ' ' +
+                      commonT('Titles.Transactions')}
+                  </p>
                 </ViewMoreContainer>
               </a>
             </Link>

@@ -186,8 +186,8 @@ export const MulticontractProvider: React.FC = ({ children }) => {
 
     if (contract !== '') {
       const newQuery = {
-        contract: contract,
         ...router.query,
+        contract: contract,
       };
 
       setQueryAndRouter(newQuery, router, {

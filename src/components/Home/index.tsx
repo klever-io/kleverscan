@@ -7,7 +7,6 @@ import { HomeInput } from '@/components/InputGlobal/HomeInput';
 import QuickAccess from '@/components/QuickAccess';
 import Wizard from '@/components/Wizard';
 import { HomeDataProvider } from '@/contexts/mainPage';
-import { useMobile } from '@/contexts/mobile';
 import {
   CardContainer,
   Container,
@@ -30,7 +29,6 @@ const Home: React.FC = () => {
     closeModal: setWizard,
   };
 
-  const { isMobile } = useMobile();
   return (
     <HomeDataProvider>
       <Container>

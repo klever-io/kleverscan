@@ -24,7 +24,11 @@ const BlockCardFetcher: React.FC = () => {
     if (blocks && blocks.length) {
       return blocks.map((block: IBlock, index) => {
         return (
-          <BlockCard blockIndex={index} key={block.hash + index} {...block} />
+          <BlockCard
+            blockIndex={index}
+            key={JSON.stringify(block)}
+            {...block}
+          />
         );
       });
     }

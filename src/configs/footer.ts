@@ -57,18 +57,6 @@ const socials: ISocial[] = [
 
 const contents: IContent[] = [
   {
-    title: 'Bitcoin.me',
-    infoLinks: [
-      { name: 'Exchange', href: 'https://bitcoin.me/' },
-      { name: 'Terms of Use', href: 'https://bitcoin.me/terms-of-use' },
-      { name: 'Privacy Policy', href: 'https://bitcoin.me/privacy-policy' },
-      {
-        name: 'WhitePaper',
-        href: 'https://klever.org/s/Klever-Exchange-Whitepaper-v10.pdf',
-      },
-    ],
-  },
-  {
     title: 'Klever Wallet',
     infoLinks: [
       { name: 'Wallet', href: 'https://klever.io/' },

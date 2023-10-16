@@ -34,10 +34,8 @@ describe('Component: HomeTransactions', () => {
   it('Should match the style for TransactionContent and TransactionEmpty', () => {
     const txContent = screen.getByText(/EmptyData/i).parentNode?.parentNode;
     const txContentStyle = {
-      display: 'block',
-      'box-shadow': '0 0 0.5rem - 0.125rem #bbbcde',
-      'border-radius': '1rem',
-      visibility: 'visible',
+      display: 'flex',
+      'border-radius': '16px',
     };
     const txEmpty = txContent?.firstChild;
     const txEmptyStyle = {

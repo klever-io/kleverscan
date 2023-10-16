@@ -1,6 +1,7 @@
 import { Accounts, Epoch, TPS, Transactions } from '@/assets/cards';
 import { useHomeData } from '@/contexts/mainPage';
 import { useMobile } from '@/contexts/mobile';
+import { useTheme } from '@/contexts/theme';
 import { IEpochCard } from '@/types';
 import { IDataCard } from '@/types/home';
 import {
@@ -31,6 +32,7 @@ const HomeDataCards: React.FC = ({}) => {
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
   const [expanded, setExpanded] = useState(false);
   const { isMobile, isTablet } = useMobile();
+  const { isDarkTheme } = useTheme();
   const {
     actualTPS,
     blocks,
@@ -90,7 +92,7 @@ const HomeDataCards: React.FC = ({}) => {
           value={percent}
           styles={buildStyles({
             pathColor: `url(#${idCSS})`,
-            trailColor: '#404264',
+            trailColor: `${isDarkTheme ? '#404264' : '#F4F4F4'}`,
           })}
         />
       </CircularProgressContainer>

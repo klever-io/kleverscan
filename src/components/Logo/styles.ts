@@ -9,8 +9,8 @@ export const Container = styled.div`
 const LogoCSS = css`
   position: relative;
 
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2rem;
+  height: 2rem;
   border-radius: 50%;
   border: 2px solid ${props => props.theme.borderLogo};
 `;

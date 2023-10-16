@@ -63,9 +63,9 @@ describe('Component: BlockCard', () => {
     );
 
     const style = {
-      gap: '1rem',
       display: 'grid',
-      padding: '1rem',
+      overflow: 'hidden',
+      alignItems: 'center',
     };
 
     expect(container.firstChild).toHaveStyle(style);

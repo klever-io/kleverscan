@@ -7,7 +7,6 @@ import {
   ContainerHide,
   SectionCards,
   TransactionContainer,
-  TransactionContent,
   TransactionEmpty,
   ViewMoreContainer,
 } from '@/views/home';
@@ -77,23 +76,21 @@ const HomeTransactions: React.FC = () => {
       <TransactionContainer>
         {!hideMenu && (
           <>
-            <TransactionContent>
-              {loading &&
-                Array.from(Array(10).keys()).map(key => (
-                  <TransactionItemLoading key={key} />
-                ))}
+            {loading &&
+              Array.from(Array(10).keys()).map(key => (
+                <TransactionItemLoading key={key} />
+              ))}
 
-              {!loading &&
-                transactions?.map(transaction => (
-                  <TransactionItem key={transaction.hash} {...transaction} />
-                ))}
+            {!loading &&
+              transactions?.map(transaction => (
+                <TransactionItem key={transaction.hash} {...transaction} />
+              ))}
 
-              {!loading && transactions.length === 0 && (
-                <TransactionEmpty>
-                  <span>{commonT('EmptyData')}</span>
-                </TransactionEmpty>
-              )}
-            </TransactionContent>
+            {!loading && transactions.length === 0 && (
+              <TransactionEmpty>
+                <span>{commonT('EmptyData')}</span>
+              </TransactionEmpty>
+            )}
             <Link href={'/transactions'}>
               <a>
                 <ViewMoreContainer>

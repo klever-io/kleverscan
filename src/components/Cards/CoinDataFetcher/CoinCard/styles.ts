@@ -450,6 +450,9 @@ export const ButtonInformation = styled.button`
   color: ${props => props.theme.true.white};
   background-color: ${({ theme }) =>
     theme.dark && theme.true.newBlack} !important;
+  :hover {
+    opacity: 0.55;
+  }
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     background-color: ${({ theme }) => theme.violet} !important;
     width: 100%;

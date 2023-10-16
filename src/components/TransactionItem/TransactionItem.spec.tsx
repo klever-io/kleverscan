@@ -29,13 +29,15 @@ describe('Component: TransactionItem', () => {
     renderWithTheme(<TransactionItem {...mockTxItem} precision={6} />);
 
     const contract = mockTxItem.contract[0] as IContract;
-    const hash = screen.getByRole('link', { name: 'a632bece34e0716...' });
+    const hash = screen.getByRole('link', {
+      name: 'a632bece34e0716fc465113e418f31...',
+    });
     const timeStamp = screen.getByText(formatDate(mockTxItem.timestamp));
     const sender = screen.getByRole('link', {
-      name: `From: ${parseAddress(mockTxItem.sender, 12)}`,
+      name: `From: ${parseAddress(mockTxItem.sender, 26)}`,
     });
     const toAddressTx = screen.getByRole('link', {
-      name: parseAddress(contract.parameter.toAddress, 12),
+      name: `To: ${parseAddress(contract.parameter.toAddress, 15)}`,
     });
 
     expect(hash).toBeInTheDocument();
@@ -49,13 +51,15 @@ describe('Component: TransactionItem', () => {
 
     const contract = mockTxItem.contract[0] as IContract;
 
-    const hash = screen.getByRole('link', { name: 'a632bece34e0716...' });
+    const hash = screen.getByRole('link', {
+      name: 'a632bece34e0716fc465113e418f31...',
+    });
     const sender = screen.getByRole('link', {
-      name: `From: ${parseAddress(mockTxItem.sender, 12)}`,
+      name: `From: ${parseAddress(mockTxItem.sender, 26)}`,
     });
 
     const toAddressTx = screen.getByRole('link', {
-      name: parseAddress(contract.parameter?.toAddress, 12),
+      name: `To: ${parseAddress(contract.parameter.toAddress, 15)}`,
     });
 
     expect(hash).toHaveAttribute('href', `/transaction/${mockTxItem.hash}`);
@@ -72,14 +76,14 @@ describe('Component: TransactionItem', () => {
     );
 
     const containerStyle = {
-      display: 'block',
+      display: 'flex',
       visibility: 'visible',
     };
     const linkStyle = {
       display: 'flex',
       'align-items': 'center',
       'justify-content': 'end',
-      gap: '0.25rem',
+      gap: '0.4rem',
       width: '100%',
       'margin-left': 'auto',
       visibility: 'visible',
@@ -97,15 +101,14 @@ describe('Component: TransactionItem', () => {
     );
 
     const style = {
-      display: 'block',
+      display: 'flex',
       visibility: 'visible',
     };
     const spanStyle = {
       display: 'flex',
       'align-items': 'center',
       'justify-content': 'flex-start',
-      gap: '0.25rem',
-      width: '100%',
+      gap: '0.4rem',
       visibility: 'visible',
     };
     const transactionAmountElement = container.firstChild?.lastChild;
@@ -124,7 +127,7 @@ describe('Component: TransactionItem', () => {
     };
     renderWithTheme(<TransactionItem {...txItem} precision={6} />);
 
-    const toAddress = screen.getByText(/To:/i).nextSibling?.firstChild;
-    expect(toAddress).toHaveTextContent('--');
+    const toAddress = screen.getByText('To: --');
+    expect(toAddress).toBeInTheDocument();
   });
 });

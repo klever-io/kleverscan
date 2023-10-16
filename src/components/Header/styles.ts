@@ -98,8 +98,7 @@ export const Item = styled.div<{ selected: boolean }>`
   transition: 0.2s ease;
 
   span {
-    color: ${props =>
-      props.theme.dark ? props.theme.true.white : props.theme.true.black};
+    color: ${({ theme, selected }) => (selected ? theme.violet : theme.black)};
   }
   svg {
     path {
@@ -108,8 +107,7 @@ export const Item = styled.div<{ selected: boolean }>`
     }
   }
   &:hover > span {
-    filter: brightness(4);
-    color: ${props => props.theme.blue};
+    color: ${props => props.theme.violet};
   }
 
   &:hover > div {
@@ -385,7 +383,7 @@ export const DropdownContainer = styled.div`
   display: none;
   position: absolute;
   bottom: 0;
-  right: 0.4vw;
+  right: -5vw;
   top: 0;
   animation: ${expand} 0.2s ease;
 
@@ -404,9 +402,9 @@ export const DropdownItem = styled.li<{ disabled: boolean }>`
   align-items: center;
   padding: 0.4rem 0.7rem;
   span {
+    color: ${({ theme, disabled }) => (disabled ? theme.violet : theme.black)};
     &:hover {
-      filter: brightness(4);
-      color: ${props => props.theme.blue};
+      color: ${({ theme }) => theme.violet};
     }
     font-weight: 500;
     width: 100%;
@@ -430,6 +428,7 @@ export const DropdownItem = styled.li<{ disabled: boolean }>`
 
 export const DropdownMenu = styled.ul`
   width: max-content;
+  padding: 0.7rem;
   background-color: ${props =>
     props.theme.dark ? '#181935' : props.theme.true.white};
   border-radius: 10px;

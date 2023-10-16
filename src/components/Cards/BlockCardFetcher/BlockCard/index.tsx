@@ -75,7 +75,7 @@ const BlockCard: React.FC<IBlockCard> = ({
   return (
     <TransactionRow>
       {!isMobile && <CardBackground src="/homeCards/blocks.svg" />}
-      <TransactionContainerContent>
+      <TransactionContainerContent isBlocks={true}>
         <BlockCardRow>
           <Link href={`/block/${nonce}`}>
             <a>

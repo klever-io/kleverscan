@@ -12,9 +12,12 @@ export const CardContent = styled.div`
   border: 1px solid
     ${props => (props.theme.dark ? props.theme.card.background : 'none')};
   hr {
+    display: block;
     height: 60%;
-    color: ${props => (props.theme.dark ? props.theme.lightGray : '#D7D8DD')};
+    background: ${props =>
+      props.theme.dark ? props.theme.lightGray : '#D7D8DD'};
     width: 1px;
+    border: 0;
   }
   padding: 1rem;
   border-radius: 1rem;

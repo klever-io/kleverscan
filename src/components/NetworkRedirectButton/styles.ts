@@ -41,6 +41,7 @@ export const ButtonItem = styled(Item)`
 
 export const NetworkDropdown = styled(DropdownContainer)`
   animation: none;
+  right: 0.4vw;
 `;
 
 export const ButtonDropdownMenu = styled(DropdownMenu)`

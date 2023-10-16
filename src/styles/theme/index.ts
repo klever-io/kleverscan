@@ -23,7 +23,7 @@ const theme = {
   darkText: '#515395',
   secondaryText: '#595C98',
   shadow: '#DDDEE7',
-
+  divisorLine: '#D7D8DD',
   violetPurpleGradient: 'linear-gradient(to right, #aa33b5 -25%, #7D3FF1 125%)',
 
   legacy: {

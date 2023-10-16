@@ -39,6 +39,9 @@ export const CardItem = styled.div`
     font-weight: 700;
     font-size: 0.9rem;
   }
+  :hover {
+    opacity: 0.55;
+  }
 `;
 export const PlusIcon = styled.div`
   align-self: flex-end;

@@ -9,6 +9,7 @@ import {
   CardIconContainer,
   SpanWithLimit,
   TransactionAmount,
+  TransactionContainerContent,
   TransactionData,
   TransactionIcon,
   TransactionRow,
@@ -102,7 +103,7 @@ const TransactionItem: React.FC<ITransaction> = ({
           <TransactionIcon src="/homeCards/transaction.svg" />
         </CardIconContainer>
       )}
-      <div>
+      <TransactionContainerContent>
         <TransactionData>
           <div className="status-icon">
             <StatusIcon />
@@ -117,7 +118,11 @@ const TransactionItem: React.FC<ITransaction> = ({
         <TransactionData>
           <p>
             <Link href={`/transaction/${hash}`}>
-              <a>{`${hash.slice(0, 15)}...`}</a>
+              <a>
+                {isMobile
+                  ? `${hash.slice(0, 15)}...`
+                  : `${hash.slice(0, 30)}...`}
+              </a>
             </Link>
           </p>
           <TransactionAmount>
@@ -129,23 +134,27 @@ const TransactionItem: React.FC<ITransaction> = ({
             <span>
               <Link href={`/account/${sender}`}>
                 <a className="clean-style">
-                  {t('From')}: {parseAddress(sender, 12)}
+                  {t('From')}:{' '}
+                  {isMobile
+                    ? parseAddress(sender, 12)
+                    : parseAddress(sender, 26)}
                 </a>
               </Link>
             </span>
           </p>
-          <div>
-            <span>{t('To')}: </span>
-            <Link href={`/account/${contractFilter?.parameter?.toAddress}`}>
-              <a className="clean-style">
-                {contractFilter?.parameter?.toAddress
+
+          <Link href={`/account/${contractFilter?.parameter?.toAddress}`}>
+            <a className="clean-style">
+              {t('To')}:{' '}
+              {contractFilter?.parameter?.toAddress
+                ? isMobile
                   ? parseAddress(contractFilter?.parameter?.toAddress, 12)
-                  : '--'}
-              </a>
-            </Link>
-          </div>
+                  : parseAddress(contractFilter?.parameter?.toAddress, 15)
+                : '--'}
+            </a>
+          </Link>
         </TransactionData>
-      </div>
+      </TransactionContainerContent>
     </TransactionRow>
   );
 };

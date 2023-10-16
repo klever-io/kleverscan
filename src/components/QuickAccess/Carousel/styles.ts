@@ -1,4 +1,3 @@
-import { transparentize } from 'polished';
 import styled from 'styled-components';
 export const CarouselItem = styled.div``;
 
@@ -7,10 +6,11 @@ export const SliderContainer = styled.div`
   gap: 1rem;
   overflow-x: auto;
   scroll-behavior: smooth;
-
+  mask-image: linear-gradient(to right, black 90%, transparent);
   &::-webkit-scrollbar {
     position: absolute;
     width: 0.25rem;
+    height: 0.35rem;
   }
 
   &::-webkit-scrollbar-track {
@@ -24,7 +24,7 @@ export const SliderContainer = styled.div`
 
   &:hover {
     &::-webkit-scrollbar-thumb {
-      background: ${props => transparentize(0.75, props.theme.black)};
+      background: ${props => props.theme.violet};
     }
   }
 `;

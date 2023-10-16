@@ -385,7 +385,6 @@ export const BlockCardContainer = styled.div<BlockCardContainerProps>`
 
 export const BlockCardRow = styled.div`
   width: 100%;
-  padding: 0.4rem 0 0.4rem 0;
   color: ${props =>
     props.theme.dark ? props.theme.black : props.theme.darkBlue};
   display: flex;
@@ -421,11 +420,12 @@ export const BlockCardRow = styled.div`
 export const BlockCardLogo = styled.img`
   border: 2px solid ${props => props.theme.black};
   border-radius: 100%;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2rem;
+  height: 2rem;
 `;
 export const BlockCardHash = styled.span`
-  max-width: 5rem;
+  width: 100%;
+  max-width: 20rem;
   overflow: hidden;
   text-decoration: underline;
   text-overflow: ellipsis;
@@ -505,20 +505,17 @@ export const TransactionContent = styled.div`
 `;
 
 export const TransactionRow = styled.div<{ isLoading?: boolean }>`
-  height: 12rem;
   display: grid;
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
     grid-template-columns: 3rem 1fr;
+    padding-left: 1rem;
   }
   grid-template-columns: 1fr;
   overflow: hidden;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
   border-bottom: 1px solid
     ${props =>
       props.theme.dark ? props.theme.footer.border : props.theme.lightGray};
-  margin-bottom: 0.5rem;
   .clean-style {
     /* text-decoration: inherit; */
     color: inherit;
@@ -534,9 +531,14 @@ export const TransactionRow = styled.div<{ isLoading?: boolean }>`
       `}
   }
 `;
-export const TransactionContainerContent = styled.div`
+export const TransactionContainerContent = styled.div<{ isBlocks?: boolean }>`
   display: flex;
   flex-direction: column;
+  padding: 1rem;
+  gap: ${({ isBlocks }) => (isBlocks ? '0.88rem' : '1rem')};
+  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    height: 9rem;
+  }
 `;
 export const TransactionEmpty = styled(TransactionRow)`
   height: 20rem;
@@ -553,21 +555,15 @@ export const TransactionEmpty = styled(TransactionRow)`
 
 export const TransactionData = styled.div<{ loading?: boolean }>`
   width: 100%;
-  padding: 0.4rem 0 0.4rem 0;
   color: ${props =>
     props.theme.dark ? props.theme.black : props.theme.darkBlue};
-  gap: 0.5rem;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-
-  :nth-child(even) {
-    justify-content: flex-end;
-  }
+  align-items: center;
   a {
-    text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 10rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
     font-weight: 600;
     color: ${props =>
       props.theme.dark ? props.theme.black : props.theme.darkBlue};
@@ -602,18 +598,13 @@ export const TransactionData = styled.div<{ loading?: boolean }>`
   div {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    gap: 0.25rem;
-    width: 100%;
+    gap: 0.4rem;
   }
   .status-icon {
     justify-content: flex-start;
   }
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
     display: flex;
-    :nth-child(even) {
-      justify-content: end;
-    }
   }
 `;
 
@@ -681,8 +672,7 @@ export const TransactionChartContent = styled.div`
   bottom: 0;
   position: absolute;
   width: calc(100% - 2rem);
-  height: 80%;
-
+  height: 68%;
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     position: absolute;
     bottom: 0.3rem;
@@ -888,19 +878,13 @@ export const ContainerHide = styled.div`
 
 export const TransactionAmount = styled.div`
   display: flex;
-  min-width: 9rem;
-  width: 100%;
-  max-width: 100%;
-  justify-content: end;
-  flex-direction: row;
+  padding: 4px 12px;
   align-items: flex-start;
-  color: white;
-
+  gap: 10px;
+  border-radius: 8px;
+  background: ${({ theme }) => (theme.dark ? theme.blue : theme.card.gray)};
   span,
   p {
-    border-radius: 8px;
-    padding: 4px 12px;
-    background: ${({ theme }) => (theme.dark ? theme.blue : theme.card.gray)};
     color: ${({ theme }) => theme.black};
     white-space: nowrap;
     overflow: hidden;
@@ -924,6 +908,9 @@ export const ViewMoreContainer = styled.div`
   p {
     margin-top: 0.2rem;
     height: fit-content;
+  }
+  :hover {
+    opacity: 0.55;
   }
 `;
 

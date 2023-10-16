@@ -39,12 +39,8 @@ describe('Component: Footer', () => {
           expect(paragraph).toBeInTheDocument();
         } else if (name === 'Privacy Policy') {
           const links = screen.getAllByRole('link', { name });
-          expect(links).toHaveLength(2);
+          expect(links).toHaveLength(1);
           expect(links[0]).toHaveAttribute(
-            'href',
-            'https://bitcoin.me/privacy-policy',
-          );
-          expect(links[1]).toHaveAttribute(
             'href',
             'https://klever.io/privacy-policy/',
           );
@@ -52,10 +48,6 @@ describe('Component: Footer', () => {
           const link = screen.getByRole('link', { name });
           expect(link).toBeInTheDocument();
           expect(link).toHaveAttribute('href', href);
-        } else {
-          const link = screen.getAllByRole('link', { name });
-          expect(link[index > 1 ? 0 : 1]).toBeInTheDocument();
-          expect(link[index > 1 ? 0 : 1]).toHaveAttribute('href', href);
         }
       });
     });
@@ -95,6 +87,5 @@ describe('Component: Footer', () => {
 
     const linkItem = screen.getAllByRole('link', { name: /Privacy Policy/i });
     expect(linkItem[0]).toHaveStyle(style);
-    expect(linkItem[1]).toHaveStyle(style);
   });
 });

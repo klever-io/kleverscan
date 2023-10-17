@@ -447,6 +447,8 @@ export const MenuIcon = styled(HiOutlineMenuAlt2).attrs(props => ({
 
 export const ConnectContainer = styled.div`
   display: flex;
+  max-width: 10rem;
+  width: 100%;
   z-index: 5;
   position: sticky;
   align-items: center;

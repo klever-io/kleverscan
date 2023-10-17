@@ -1,19 +1,22 @@
 import { transparentize } from 'polished';
 import { BiTransfer } from 'react-icons/bi';
 import { IoIosLogOut } from 'react-icons/io';
-import styled, { keyframes } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 export const ConnectButton = styled.div<{
   walletAddress?: boolean;
   loading?: boolean;
 }>`
+  max-width: 15rem;
+  width: 100%;
   display: flex;
   gap: 0.4rem;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   font-size: 0.75rem;
-  padding: ${props => (props.loading ? '0.6rem' : '0.4rem 0.6rem;')};
+  height: 2rem;
+  padding: 0.5rem 1rem;
   border-radius: 0.5rem;
   text-align: center;
   position: relative;
@@ -33,17 +36,51 @@ export const ConnectButton = styled.div<{
   }
 
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
-    min-width: unset;
     svg {
       width: 18px;
       height: 18px;
     }
-    width: auto;
   }
 
   :hover {
     filter: brightness(1.2);
   }
+
+  ${({ loading }) =>
+    loading &&
+    css`
+      overflow: hidden;
+      &&::before {
+        content: '';
+        background: conic-gradient(transparent, 280deg, white, transparent);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        aspect-ratio: 1;
+        width: 100%;
+        animation: rotate 1.5s linear infinite;
+      }
+
+      &::after {
+        content: '';
+        background: inherit;
+        position: absolute;
+        inset: 3px;
+        border-radius: 5px;
+        height: calc(100% - 2 * 3px);
+        width: calc(100% - 2 * 3px);
+      }
+
+      @keyframes rotate {
+        from {
+          transform: translate(-50%, -50%) scale(1.4) rotate(0turn);
+        }
+        to {
+          transform: translate(-50%, -50%) scale(1.4) rotate(1turn);
+        }
+      }
+    `}
 `;
 
 export const WalletIcon = styled.img``;

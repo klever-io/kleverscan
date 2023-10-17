@@ -87,12 +87,10 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
             onClick={() => connectAndOpen()}
             key={String(extensionInstalled)}
             walletAddress={!!walletAddress}
+            loading={extensionLoading}
           >
             {extensionLoading ? (
-              <ConnectButton loading={extensionLoading}>
-                {' '}
-                Loading...{' '}
-              </ConnectButton>
+              <span style={{ zIndex: 2 }}>Waiting Extension...</span>
             ) : (
               <>
                 {walletAddress && (

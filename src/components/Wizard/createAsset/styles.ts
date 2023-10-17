@@ -233,6 +233,7 @@ export const WizardButton = styled.button<{
   secondary?: boolean;
   centered?: boolean;
   fullWidth?: boolean;
+  infoStep?: boolean;
 }>`
   display: flex;
   position: relative;
@@ -269,6 +270,12 @@ export const WizardButton = styled.button<{
       props?.fullWidth &&
       css`
         max-width: 100%;
+      `}
+    ${({ infoStep }) =>
+      infoStep &&
+      css`
+        max-width: 100%;
+        width: calc(50% - 8px);
       `}
   }
 `;
@@ -658,22 +665,23 @@ export const PrecisionCard = styled.div<{ isSelected: boolean }>`
   cursor: pointer;
 
   padding: 1.34rem 0.93rem;
-  background-color: #181935;
+  background-color: ${({ theme }) =>
+    theme.dark ? '#181935' : theme.true.white};
   border-radius: 0.5rem;
-  color: white !important;
-  font-size: 1.2rem !important;
+  color: ${({ theme }) => theme.black};
+  font-size: 1rem;
   font-weight: 700;
   transition: 200ms ease;
   ${props =>
     props.isSelected &&
     css`
-      filter: brightness(1.5);
-      border: 1px solid #aa33b5;
+      border: 1px solid ${({ theme }) => theme.violet};
+      color: ${({ theme }) => theme.violet};
     `}
 
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 4rem;
-    height: 3.8rem;
+    width: 4.313rem;
+    height: 3.875rem;
   }
 `;
 

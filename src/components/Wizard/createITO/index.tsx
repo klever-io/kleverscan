@@ -533,10 +533,11 @@ export const CreatePackInfoSteps: React.FC<IAssetITOInformations> = ({
       <div>
         <p>Would you like to enable and configure Pack Info for now?</p>
         <ButtonsContainer>
-          <WizardButton centered onClick={() => setPackInfo(true)}>
+          <WizardButton infoStep centered onClick={() => setPackInfo(true)}>
             Yes
           </WizardButton>
           <WizardButton
+            infoStep
             secondary
             centered
             onClick={() => handleStep(prev => prev + 1)}
@@ -880,10 +881,11 @@ export const CreateWhiteListSettingsSteps: React.FC<IAssetITOInformations> = ({
           Would you like to enable and configure Whitelist addresses for now?
         </p>
         <ButtonsContainer>
-          <WizardButton centered onClick={() => setPackInfo(true)}>
+          <WizardButton infoStep centered onClick={() => setPackInfo(true)}>
             Yes
           </WizardButton>
           <WizardButton
+            infoStep
             secondary
             centered
             onClick={() => handleStep(prev => prev + 1)}
@@ -1113,10 +1115,11 @@ export const WhitelistAddressSteps: React.FC<IWizardComponents> = ({
       <div>
         <p>Would you like to enable and configure Whitelist address for now?</p>
         <ButtonsContainer>
-          <WizardButton centered onClick={() => setPackInfo(true)}>
+          <WizardButton infoStep centered onClick={() => setPackInfo(true)}>
             Yes
           </WizardButton>
           <WizardButton
+            infoStep
             secondary
             centered
             onClick={() => handleStep(prev => prev + 1)}

@@ -1397,10 +1397,11 @@ export const CreateAssetRoyaltySteps: React.FC<IWizardComponents> = ({
           Would you like to enable and configure royalties for {ticker} now?
         </p>
         <ButtonsContainer>
-          <WizardButton centered onClick={() => setRoyalties(true)}>
+          <WizardButton infoStep centered onClick={() => setRoyalties(true)}>
             Yes
           </WizardButton>
           <WizardButton
+            infoStep
             secondary
             centered
             onClick={() => handleStep(prev => prev + 1)}
@@ -1727,6 +1728,7 @@ export const URIsSection: React.FC<IAssetInformations> = ({
         <p>Do you want to add URIs to your {assetText} now?</p>
         <ButtonsContainer columnDirection>
           <WizardButton
+            infoStep
             centered
             onClick={() => {
               setAddUri(true);
@@ -1735,6 +1737,7 @@ export const URIsSection: React.FC<IAssetInformations> = ({
             Yes
           </WizardButton>
           <WizardButton
+            infoStep
             secondary
             centered
             onClick={() => handleStep(prev => prev + 1)}
@@ -2243,10 +2246,15 @@ export const CreateAssetStakingStep: React.FC<IWizardComponents> = ({
       <div>
         <p>Would you like to enable and configure staking for {ticker} now?</p>
         <ButtonsContainer>
-          <WizardButton centered onClick={() => setStaking(true)}>
+          <WizardButton infoStep centered onClick={() => setStaking(true)}>
             Yes
           </WizardButton>
-          <WizardButton secondary centered onClick={() => handleStep(11)}>
+          <WizardButton
+            infoStep
+            secondary
+            centered
+            onClick={() => handleStep(11)}
+          >
             No
           </WizardButton>
         </ButtonsContainer>
@@ -2332,10 +2340,11 @@ export const CreateAssetAddRoles: React.FC<IAssetInformations> = ({
           Would you like to create roles to manage your {ticker} {assetText}
         </p>
         <ButtonsContainer>
-          <WizardButton centered onClick={() => setAddRole(true)}>
+          <WizardButton infoStep centered onClick={() => setAddRole(true)}>
             Yes
           </WizardButton>
           <WizardButton
+            infoStep
             secondary
             centered
             onClick={() => handleStep(prev => prev + 1)}

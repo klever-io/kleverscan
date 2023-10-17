@@ -4,7 +4,7 @@ KleverScan is an explorer for the Klever Blockchain.
 
 ## Running the project
 
-```bash
+```shell
     git clone git@github.com:klever-io/kleverscan.git
 
     cd kleverscan

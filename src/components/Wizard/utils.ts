@@ -72,7 +72,7 @@ export const createToken = {
       'Token Image',
     ],
     advancedStepsIndex: [9, 10, 11, 12, 13],
-    advancedStepsLabels: ['URI', 'STAKING', 'ROYALTIES', 'ROLES', 'PROPERTIES'],
+    advancedStepsLabels: ['Uri', 'Staking', 'Royalties', 'Roles', 'Properties'],
   },
 };
 
@@ -143,7 +143,7 @@ export const createNFT = {
       'NFT Image',
     ],
     advancedStepsIndex: [7, 8, 9, 10],
-    advancedStepsLabels: ['URI', 'ROYALTIES', 'ROLES', 'PROPERTIES'],
+    advancedStepsLabels: ['Uri', 'Royalties', 'Roles', 'Properties'],
   },
 };
 

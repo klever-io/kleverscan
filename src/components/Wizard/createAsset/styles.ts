@@ -1108,6 +1108,12 @@ export const StepsItemContainerDesktop = styled.div<{ selected: boolean }>`
   color: ${props => (props.selected ? '#fff' : '#646693')};
 
   > div:last-child {
+    span {
+      color: ${props => (props.theme.dark ? '#fff' : '#646693')};
+      @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+        text-transform: uppercase;
+      }
+    }
   }
 `;
 
@@ -1126,16 +1132,11 @@ export const AdvancedStepsDesktop = styled.div<{ darkText?: boolean }>`
   > div:first-child {
     font-weight: 500;
     color: #aa33b5;
-    > span:last-child {
-      font-size: 0.7rem;
-      color: ${({ theme }) =>
-        theme.dark ? theme.true.white : theme.navbar.text} !important;
-    }
-
     font-size: 1rem;
     gap: 0.5rem;
     > span:last-child {
-      color: #fff;
+      color: ${({ theme }) =>
+        theme.dark ? theme.true.white : theme.navbar.text};
       font-size: 0.7rem;
     }
   }

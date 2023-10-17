@@ -748,11 +748,10 @@ export const ConfirmCardBasics = styled.div<{
   tokenInfo?: boolean;
 }>`
   display: flex;
-  color: #fff;
+  color: ${({ theme }) => theme.black};
   flex-direction: column;
-  background: #222345;
-  backdrop-filter: contrast(20%);
-  /* padding: 1.56rem; */
+  background: ${({ theme }) =>
+    theme.dark ? theme.card.background : theme.true.white};
   border-radius: 10px;
   ${props =>
     props?.tokenInfo &&
@@ -776,7 +775,6 @@ export const ConfirmCardBasics = styled.div<{
       > span:last-child {
         font-weight: 400;
         font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.6);
         > span {
           color: red;
         }
@@ -815,7 +813,7 @@ export const ConfirmCardBasisInfo = styled.div<{ secondary?: boolean }>`
   font-weight: 500;
 
   > span:first-child {
-    color: #c6c7eb;
+    color: ${({ theme }) => (theme.dark ? theme.lightGray : theme.navbar.text)};
   }
 
   > span:last-child {
@@ -824,7 +822,7 @@ export const ConfirmCardBasisInfo = styled.div<{ secondary?: boolean }>`
     align-items: center;
     font-size: 1rem;
     font-weight: 700;
-    color: #fff;
+    color: ${({ theme }) => theme.black};
     > strong {
       font-weight: 400;
       font-family: 0.7rem;
@@ -1304,7 +1302,19 @@ export const PropertiesItem = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  border: 1px solid #404264;
+  svg {
+    path {
+      fill: ${({ theme }) => theme.black};
+    }
+  }
+  ${({ theme }) =>
+    theme.dark
+      ? css`
+          border: 1px solid #404264;
+        `
+      : css`
+          background-color: ${({ theme }) => theme.true.white};
+        `}
   max-width: 15rem;
   width: 45%;
   height: 8rem;

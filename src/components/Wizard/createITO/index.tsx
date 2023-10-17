@@ -1372,16 +1372,16 @@ export const TransactionDetails: React.FC = () => {
   return (
     <ReviewContainer>
       <span>TRANSACTION DETAILS</span>
-      <ConfirmCardBasics secondary>
-        <ConfirmCardBasisInfo secondary>
+      <ConfirmCardBasics>
+        <ConfirmCardBasisInfo>
           <span>Transaction</span>
           <span>Config ITO</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>From</span>
           <span>{parseAddress(walletAddress || '', 12)}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Fee</span>
           <span>20,000 KLV</span>
         </ConfirmCardBasisInfo>
@@ -1400,22 +1400,22 @@ export const TransactionDetails2: React.FC = () => {
   return (
     <ReviewContainer>
       <span> SET UP ITO</span>
-      <ConfirmCardBasics secondary>
-        <ConfirmCardBasisInfo secondary>
+      <ConfirmCardBasics>
+        <ConfirmCardBasisInfo>
           <span>Receiver Address</span>
           <span>{parseAddress(receiverAddress, 12)}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>ITO Time</span>
           <span>
             {startTime || '--'} to {endTime || '--'}
           </span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Max Amount</span>
           <span>{maxAmount}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Status</span>
           <span>{status}</span>
         </ConfirmCardBasisInfo>

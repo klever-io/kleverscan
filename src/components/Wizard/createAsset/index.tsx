@@ -1179,7 +1179,7 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
       <ButtonsComponent buttonsProps={buttonsProps} noNextButton />
     </GenericCardContainer>
   ) : (
-    <GenericCardContainer alignCenter>
+    <GenericCardContainer>
       <div>
         <p>Split Royalties</p>
         <p key={fields.length}>
@@ -1758,7 +1758,7 @@ export const URIsSection: React.FC<IAssetInformations> = ({
       <ButtonsComponent buttonsProps={buttonsProps} noNextButton />
     </GenericCardContainer>
   ) : (
-    <GenericCardContainer alignCenter>
+    <GenericCardContainer>
       <div>
         <p>URI</p>
         <p key={fields.length}>
@@ -2598,16 +2598,16 @@ export const TransactionDetails: React.FC = () => {
   return (
     <ReviewContainer>
       <span>TRANSACTION DETAILS</span>
-      <ConfirmCardBasics secondary>
-        <ConfirmCardBasisInfo secondary>
+      <ConfirmCardBasics>
+        <ConfirmCardBasisInfo>
           <span>Transaction</span>
           <span>Create Asset</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>From</span>
           <span>{parseAddress(address, 12)}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Fee</span>
           <span>20,000 KLV</span>
         </ConfirmCardBasisInfo>
@@ -2636,25 +2636,25 @@ export const TransactionDetails2: React.FC<{
   return (
     <ReviewContainer>
       <span>{(assetText as string).toUpperCase()} BASIC SETTINGS</span>
-      <ConfirmCardBasics secondary>
-        <ConfirmCardBasisInfo secondary>
+      <ConfirmCardBasics>
+        <ConfirmCardBasisInfo>
           <span>{assetText} name</span>
           <span>{name}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>{assetText} ticker</span>
           <span>{ticker.toUpperCase()}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Max Supply</span>
           <span>{maxSupply ? maxSupply : infinitySymbol}</span>
         </ConfirmCardBasisInfo>
 
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>URI {assetText} image</span>
           <span>{logo || '--'}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Owner address</span>
           <span>{parseAddress(address, 12)}</span>
         </ConfirmCardBasisInfo>
@@ -2673,42 +2673,42 @@ export const TransactionDetails3: React.FC<{ assetType?: number }> = ({
   return (
     <ReviewContainer>
       <span>{assetText} DEFAULT SETTINGS</span>
-      <ConfirmCardBasics secondary>
+      <ConfirmCardBasics>
         {assetType === 0 && (
-          <ConfirmCardBasisInfo secondary>
+          <ConfirmCardBasisInfo>
             <span>Staking</span>
             <span>--</span>
           </ConfirmCardBasisInfo>
         )}
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Roles</span>
           <span>--</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Can Freeze?</span>
           <span>{properties?.canFreeze ? 'Yes' : 'No'}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Can burn?</span>
           <span>{properties?.canBurn ? 'Yes' : 'No'}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Can Pause?</span>
           <span>{properties?.canPause ? 'Yes' : 'No'}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Can add roles?</span>
           <span>{properties?.canAddRoles ? 'Yes' : 'No'}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Can Mint?</span>
           <span>{properties?.canMint ? 'Yes' : 'No'}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Can Change Owner?</span>
           <span>{properties?.canChangeOwner ? 'Yes' : 'No'}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Can Wipe?</span>
           <span>{properties?.canWipe ? 'Yes' : 'No'}</span>
         </ConfirmCardBasisInfo>

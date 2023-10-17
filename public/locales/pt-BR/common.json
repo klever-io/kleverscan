@@ -1,0 +1,62 @@
+{
+  "EmptyData": "Ainda não existem dados.",
+  "Search Address, Block, Transaction": "Pesquisar Endereço, Bloco, Transação, Ativo",
+  "Cards": {
+    "Total Accounts": "Total de Contas",
+    "Total Transactions": "Total de Transações",
+    "Live/Peak TPS": "Atual/Pico de TPS",
+    "Epoch": "Época",
+    "Time remaining": "Tempo Restante",
+    "Last 24h": "Últimas 24h",
+    "Market Cap": "Capitalização",
+    "Price": "Preço",
+    "Volume": "Volume",
+    "Total Staked": "Total Congelado",
+    "Estimated APR": "APR Estimado",
+    "KLV per KFI": "KLV por KFI",
+    "ViewAll": "Ver Tod{{type}} {{type}}"
+  },
+  "Titles": {
+    "Assets": "Ativos",
+    "Accounts": "Contas",
+    "Blocks": "Blocos",
+    "Transactions": "Transações",
+    "Validators": "Validadores",
+    "Proposals": "Propostas"
+  },
+  "Tabs": {
+    "Overview": "Visão Geral"
+  },
+  "Buttons": {
+    "Expand": "Expandir",
+    "Hide": "Ocultar"
+  },
+  "Date": {
+    "Elapsed Time": "atrás",
+    "Today": "Hoje",
+    "Yesterday": "Ontem",
+    "Day": "Dia",
+    "Time": {
+      "sec": "seg",
+      "min": "min",
+      "day": "dia",
+      "hour": "hora",
+      "minute": "minuto",
+      "second": "segundo"
+    },
+    "Months": {
+      "Jan": "Jan",
+      "Feb": "Fev",
+      "Mar": "Mar",
+      "Apr": "Abr",
+      "May": "Mai",
+      "Jun": "Jun",
+      "Jul": "Jul",
+      "Aug": "Ago",
+      "Sep": "Set",
+      "Oct": "Out",
+      "Nov": "Nov",
+      "Dec": "Dez"
+    }
+  }
+}

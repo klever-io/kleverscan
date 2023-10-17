@@ -1,0 +1,50 @@
+{
+  "SingleAccount": {
+    "Title": "Conta",
+    "Tabs": {
+      "Permission": "Permissão",
+      "ProprietaryAssets": "Ativos da Conta",
+      "Transactions": "Transações",
+      "Buckets": "Buckets",
+      "Rewards": "Recompensas"
+    },
+    "Content": {
+      "Address": "Endereço",
+      "Balance": {
+        "Balance": "Saldo",
+        "Available": "Disponível",
+        "Frozen": "Congelado",
+        "Unfrozen": "Descongelado"
+      },
+      "RewardsAvailable": {
+        "Rewards": "Recompensas",
+        "Available": "Disponíveis",
+        "Allowance": "Permissão",
+        "Staking": "Participação de {{asset}}"
+      },
+      "Nonce": "Nonce"
+    },
+    "Buttons": {
+      "SetAccountName": "Definir Nome da Conta",
+      "Allowance": "Reivindicar Permissão",
+      "StakingClaim": "Reivindicação de {{asset}}",
+      "CreateAsset": "Criar Ativo",
+      "ViewNFTs": "Ver NFTs",
+      "Delegate": "Delegar",
+      "Undelegate": "Cancelar Delegação",
+      "WithDraw": "Retirar",
+      "Transfer": "Transferir",
+      "Freeze": "Congelar",
+      "AssetTrigger": "Ações no Ativo",
+      "Unfreeze": "Descongelar"
+    },
+    "PermissionsTab": {
+      "Signers": "Signatários",
+      "Weight": "Peso",
+      "Type": "Tipo",
+      "Threshold": "Limite",
+      "Operations": "Operações",
+      "PermissionsName": "Nome das Permissões"
+    }
+  }
+}

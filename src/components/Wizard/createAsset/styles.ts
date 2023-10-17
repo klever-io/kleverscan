@@ -1044,7 +1044,7 @@ export const DesktopBasicSteps = styled.div`
   display: flex;
   justify-content: space-between;
   svg {
-    color: #fff;
+    color: ${({ theme }) => theme.black};
     font-size: 1.5rem;
   }
   > div:first-child {
@@ -1126,11 +1126,11 @@ export const AdvancedStepsDesktop = styled.div<{ darkText?: boolean }>`
   > div:first-child {
     font-weight: 500;
     color: #aa33b5;
-    ${props =>
-      props?.darkText &&
-      css`
-        filter: brightness(0.6);
-      `}
+    > span:last-child {
+      font-size: 0.7rem;
+      color: ${({ theme }) =>
+        theme.dark ? theme.true.white : theme.navbar.text} !important;
+    }
 
     font-size: 1rem;
     gap: 0.5rem;

@@ -4,7 +4,6 @@ import {
   getType,
   precisionParse,
 } from '@/components/Contract/utils';
-import { parseKda } from '@/components/TransactionForms/CustomForms/utils';
 import api from '@/services/api';
 import { IContractOption } from '@/types/contracts';
 import {
@@ -247,6 +246,30 @@ export const ContractProvider: React.FC = ({ children }) => {
     return assetsList || ([] as ICollectionList[]);
   };
 
+  const parseKda = (contractValues: any, contractType: string) => {
+    const parsedValues = { ...contractValues };
+    if (parsedValues.collection) {
+      parsedValues['kda'] = parsedValues.collection;
+      delete parsedValues.collection;
+    }
+    if (parsedValues.collectionAssetId) {
+      parsedValues['kda'] += `/${parsedValues.collectionAssetId}`;
+    }
+    if ('collectionAssetId' in parsedValues) {
+      delete parsedValues.collectionAssetId;
+    }
+
+    if (
+      contractType === 'AssetTriggerContract' ||
+      contractType === 'SellContract'
+    ) {
+      parsedValues['assetId'] = parsedValues['kda'];
+
+      delete parsedValues.kda;
+    }
+    return parsedValues;
+  };
+
   const checkExtensionInstalled = () => {
     return extensionInstalled;
   };
@@ -371,11 +394,6 @@ export const ContractProvider: React.FC = ({ children }) => {
         },
       );
 
-      const {
-        result: { RawData },
-        txHash,
-      } = unsignedTx;
-
       if (isMultisig.current) {
         let parseMultisignTransaction;
         const senderAddress =
@@ -387,7 +405,7 @@ export const ContractProvider: React.FC = ({ children }) => {
           const { RawData, Signature } = signedTx;
 
           parseMultisignTransaction = {
-            hash: txHash,
+            hash: unsignedTx.txHash,
             address: senderAddress,
             raw: {
               rawData: RawData,
@@ -396,7 +414,7 @@ export const ContractProvider: React.FC = ({ children }) => {
           };
         } else {
           parseMultisignTransaction = {
-            hash: txHash,
+            hash: unsignedTx.txHash,
             address: senderAddress,
             raw: {
               rawData: unsignedTx.result.RawData,

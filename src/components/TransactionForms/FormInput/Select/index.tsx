@@ -24,6 +24,7 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   title?: string;
   name: string;
   error?: boolean;
+  handleScrollBottom?: () => void;
 }
 
 const Filter: React.FC<IFilter> = ({
@@ -33,6 +34,7 @@ const Filter: React.FC<IFilter> = ({
   title,
   error,
   value,
+  handleScrollBottom,
   ...rest
 }) => {
   const {
@@ -94,6 +96,7 @@ const Filter: React.FC<IFilter> = ({
         options={data}
         onChange={e => handleSelect(e)}
         value={selected?.value !== undefined ? selected : undefined}
+        onMenuScrollToBottom={handleScrollBottom}
       />
 
       <HiddenInput

@@ -838,6 +838,29 @@ export interface IAccountResponse extends IResponse {
   pagination: IPagination;
 }
 
+export interface ICollectionIdListResponse extends IResponse {
+  data: {
+    collection: {
+      address: string;
+      assetId: string;
+      collection: string;
+      nftNonce: number;
+      assetName: string;
+      assetType: number;
+      balance: number;
+      precision: number;
+      frozenBalance: number;
+      unfrozenBalance: number;
+      lastClaim: {
+        timestamp: number;
+        epoch: number;
+      };
+      buckets: IBucket[];
+      stakingType: number;
+    }[];
+  };
+}
+
 export interface IAssetsResponse extends IResponse {
   data: {
     assets: IAsset[];

@@ -169,18 +169,6 @@ export const MulticontractProvider: React.FC = ({ children }) => {
     setQueue(newQueue);
   };
 
-  const setCollectionAssetId = (id: number) => {
-    if (queue.length === 0) return;
-
-    if (id === undefined) return;
-
-    const newQueue = [...queue];
-    if (newQueue[parsedIndex]) {
-      newQueue[parsedIndex]['collectionAssetId'] = id;
-    }
-    setQueue(newQueue);
-  };
-
   const setSelectedContractAndQuery = (contract: string) => {
     setSelectedContractType(contract);
 
@@ -219,6 +207,18 @@ export const MulticontractProvider: React.FC = ({ children }) => {
   const setCollection = (collection?: ICollectionList) => {
     const newQueue = [...queue];
     newQueue[parsedIndex].collection = collection;
+    setQueue(newQueue);
+  };
+
+  const setCollectionAssetId = (id: number) => {
+    if (queue.length === 0) return;
+
+    if (id === undefined) return;
+
+    const newQueue = [...queue];
+    if (newQueue[parsedIndex]) {
+      newQueue[parsedIndex]['collectionAssetId'] = id;
+    }
     setQueue(newQueue);
   };
 

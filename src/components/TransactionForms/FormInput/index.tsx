@@ -44,6 +44,7 @@ export interface IBaseFormInputProps
   precision?: number;
   customOnChange?: (e: any) => void;
   logoError?: string | null;
+  handleScrollBottom?: () => void;
   watchChange?: any;
 }
 
@@ -111,6 +112,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   onChange,
   precision = 8,
   logoError = null,
+  handleScrollBottom,
   watchChange,
   ...rest
 }) => {
@@ -235,6 +237,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
     name: name || '',
     error: Boolean(error),
     value: inputValue,
+    handleScrollBottom,
     ...rest,
   };
 

@@ -1,6 +1,5 @@
 import Select from '@/components/Contract/Select';
 import {
-  AssetIDInput,
   BalanceContainer,
   BalanceLabel,
   FieldLabel,
@@ -16,7 +15,8 @@ import { useContract } from '@/contexts/contract';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { ReloadWrapper } from '@/contexts/contract/styles';
 import { useExtension } from '@/contexts/extension';
-import { ICollectionList } from '@/types';
+import { collectionListCall } from '@/services/requests/collection';
+import { ICollectionList, IDropdownItem } from '@/types';
 import { NextRouter, useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { FieldError, useFormContext } from 'react-hook-form';
@@ -49,7 +49,11 @@ interface ISelectProps {
   required?: boolean;
 }
 
-const setQuery = async (key: string, value: string, router: NextRouter) => {
+export const setQuery = async (
+  key: string,
+  value: string,
+  router: NextRouter,
+): Promise<void> => {
   while (!router.isReady) {
     await new Promise(resolve => setTimeout(resolve, 100));
   }
@@ -65,7 +69,6 @@ const setQuery = async (key: string, value: string, router: NextRouter) => {
       [key]: value,
     });
   }
-
   setQueryAndRouter(newQuery, router);
 };
 
@@ -73,7 +76,6 @@ export const useKDASelect = (
   params?: IKDASelect,
 ): [ICollectionList | undefined, React.FC<ISelectProps>] => {
   const [loading, setLoading] = useState(false);
-
   const router = useRouter();
 
   const { getAssets, getKAssets } = useContract();
@@ -117,6 +119,14 @@ export const useKDASelect = (
     initialData: [],
     enabled: walletAddress !== '',
   });
+
+  const { data: collectionIdList, isFetching: collectionIdListFetching } =
+    useQuery({
+      queryKey: ['collectionList', watchCollection],
+      queryFn: () => collectionListCall(router, walletAddress),
+      initialData: [],
+    });
+
   const {
     data: kassetsList,
     refetch: refetchKassetsList,
@@ -127,6 +137,22 @@ export const useKDASelect = (
     initialData: [],
     enabled: walletAddress !== '',
   });
+
+  const [options, setOptions] = useState<IDropdownItem[]>([]);
+
+  useEffect(() => {
+    setOptions(
+      getAssetsList(
+        kAssetContracts.includes(contractType)
+          ? kassetsList || []
+          : assetsList || [],
+        contractType,
+        assetTriggerType,
+        withdrawType,
+        walletAddress,
+      ),
+    );
+  }, [walletAddress, assetsList, kassetsList]);
 
   useEffect(() => {
     if (!kassetsFetching && !assetsFetching && loading) {
@@ -209,19 +235,28 @@ export const useKDASelect = (
         }
       };
 
+      const selectedCollectionId = collectionIdList?.filter(
+        e => e.value === watchCollectionAssetId,
+      )[0] || { label: '', value: '' };
+
+      const collectionIdChangeHandler = async (value: any) => {
+        if (!isMultiContract)
+          await setQuery('collectionAssetId', value?.value, router);
+        setCollectionAssetId(value?.value);
+        setValue('collectionAssetId', value?.value, {
+          shouldValidate: true,
+        });
+      };
       return (
         <SelectContent>
           <FieldLabel>Asset ID</FieldLabel>
-          <AssetIDInput
-            type="number"
-            $error={Boolean(assetIdError)}
-            {...register('collectionAssetID', {
-              required: {
-                value: true,
-                message: 'This field is required',
-              },
-              onBlur: onBlurHandler,
-            })}
+          <Select
+            options={collectionIdList}
+            onChange={collectionIdChangeHandler}
+            loading={collectionIdListFetching}
+            selectedValue={selectedCollectionId}
+            zIndex={3}
+            error={Boolean(assetIdError)}
           />
           {assetIdError && (
             <ErrorMessage style={{ color: 'red', fontSize: '0.8rem' }}>
@@ -247,11 +282,25 @@ export const useKDASelect = (
         await setQuery('collection', value?.value, router);
       setCollection(value);
       setValue('collection', value?.value, {
-        shouldValidate: true,
+        shouldValidate: false,
       });
       if (!value.isNFT) {
-        setValue('collectionAssetID', '');
+        setValue('collectionAssetId', '');
       }
+    };
+
+    const handleCreate = async (inputValue: string) => {
+      const newValue = {
+        label: inputValue.toUpperCase(),
+        value: inputValue.toUpperCase(),
+      };
+      if (!isMultiContract && router.pathname !== '/')
+        await setQuery('collection', newValue.value, router);
+      setValue('collection', newValue.value, {
+        shouldValidate: false,
+      });
+      setCollection(newValue as ICollectionList);
+      setOptions(prev => [...prev, newValue]);
     };
 
     return (
@@ -277,19 +326,19 @@ export const useKDASelect = (
           </BalanceContainer>
           <Select
             collection={selectedCollection}
-            options={getAssetsList(
-              kAssetContracts.includes(contractType)
-                ? kassetsList || []
-                : assetsList || [],
-              contractType,
-              assetTriggerType,
-              withdrawType,
-              walletAddress,
-            )}
+            options={options}
             onChange={onChangeHandler}
+            onCreateOption={handleCreate}
             loading={loading}
             selectedValue={
-              selectedCollection?.value ? selectedCollection : undefined
+              selectedCollection?.value
+                ? selectedCollection
+                : queue[0].collection
+                ? {
+                    label: queue[0].collection?.label || '',
+                    value: queue[0].collection?.value || '',
+                  }
+                : undefined
             }
             zIndex={3}
             error={Boolean(collectionError)}

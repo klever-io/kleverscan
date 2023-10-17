@@ -33,12 +33,15 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   selectedValue?: IDropdownItem;
   loading?: boolean;
   defaultValue?: any;
+  noOptionsMessage?: any;
+  onCreateOption?: (value: any) => void;
 }
 
 const Select: React.FC<IFilter> = ({
   options,
   onChange,
   onMenuOpen,
+  noOptionsMessage,
   selectPlaceholder,
   title,
   label,
@@ -50,6 +53,7 @@ const Select: React.FC<IFilter> = ({
   error,
   loading,
   selectedValue,
+  onCreateOption,
   defaultValue,
   ...rest
 }) => {
@@ -74,6 +78,8 @@ const Select: React.FC<IFilter> = ({
     options,
     onChange,
     onMenuOpen,
+    noOptionsMessage,
+    onCreateOption,
   };
 
   const getPlaceholder = () => {

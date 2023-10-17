@@ -14,7 +14,6 @@ const ConfirmPayload: React.FC = () => {
   const { payload, formSend, resetFormsData } = useContract();
 
   const { setShowPayloadOpen, showPayloadOpen } = useModal();
-
   const handleConfirm = async () => {
     await formSend();
     setShowPayloadOpen(false);

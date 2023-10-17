@@ -2,6 +2,7 @@ import {
   WizardCheckSquare,
   WizardFailSquare,
   WizardInfoSquare,
+  WizardRightArrow,
 } from '@/assets/icons';
 import { transparentize } from 'polished';
 import { BsClock } from 'react-icons/bs';
@@ -234,7 +235,9 @@ export const WizardButton = styled.button<{
   fullWidth?: boolean;
 }>`
   display: flex;
+  position: relative;
   align-items: center;
+  justify-content: center;
   padding: 0.9rem;
   background: ${props => (props.secondary ? '#404264' : '#aa33b5')};
   justify-content: ${props => props.centered && 'center'};
@@ -270,6 +273,11 @@ export const WizardButton = styled.button<{
   }
 `;
 
+export const WizardRightArrowSVG = styled(WizardRightArrow)`
+  position: absolute;
+  right: 2rem;
+`;
+
 export const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -299,13 +307,15 @@ export const CardContainer = styled.div`
       gap: 1rem;
       text-decoration-line: underline;
       > span {
+        background-color: red;
         display: flex;
         align-items: center;
         width: fit-content;
         border-radius: 20%;
         padding: 0.2rem;
-
         svg {
+          height: 2em;
+          width: 2em;
           font-size: 1.2rem;
         }
       }
@@ -477,7 +487,9 @@ export const ErrorMessage = styled.div`
 export const GenericInfoCard = styled.div`
   padding: 1rem;
   font-size: 0.82rem;
-  background: ${({ theme }) => theme.wizard.genericInfoCard};
+
+  background: ${({ theme }) =>
+    theme.dark ? theme.wizard.genericInfoCard : theme.true.white};
 `;
 
 export const AddressesContainer = styled.div`
@@ -962,7 +974,7 @@ export const StepsItem = styled.div<{
   height: 2.25rem;
   border-radius: 50%;
   border: 1.5px solid #646693;
-  color: ${({ theme }) => theme.wizard.steps};
+  color: ${({ theme }) => (theme.dark ? theme.true.white : theme.navbar.text)};
   background: ${props => props.theme.background};
   z-index: 2;
   ${props =>
@@ -978,6 +990,7 @@ export const StepsItem = styled.div<{
   ${props =>
     props.selected &&
     css`
+      color: ${({ theme }) => theme.wizard.steps};
       border-color: ${({ theme }) => theme.wizard.steps};
     `}
   ${props =>
@@ -1033,7 +1046,8 @@ export const DesktopBasicSteps = styled.div`
 
     > span:last-child {
       font-size: 0.7rem;
-      color: #fff;
+      color: ${({ theme }) =>
+        theme.dark ? theme.true.white : theme.navbar.text};
     }
   }
 `;
@@ -1328,7 +1342,7 @@ export const BackArrowSpan = styled.div`
   background: #404264;
   width: 3.5rem;
   height: 3rem;
-  border-radius: 25%;
+  border-radius: 0.5rem;
   padding: 0.84rem;
   cursor: pointer;
 `;

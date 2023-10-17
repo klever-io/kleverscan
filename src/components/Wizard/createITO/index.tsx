@@ -1,4 +1,4 @@
-import { WizardLeftArrow, WizardRightArrow } from '@/assets/icons';
+import { WizardLeftArrow } from '@/assets/icons';
 import Select from '@/components/Contract/Select';
 import { statusOptions } from '@/components/TransactionForms/CustomForms/ConfigITO';
 import { useMulticontract } from '@/contexts/contract/multicontract';
@@ -36,6 +36,7 @@ import {
   WizardButton,
   WizardConfirmLogo,
   WizardFailAddressCheck,
+  WizardRightArrowSVG,
 } from '../createAsset/styles';
 import { checkEmptyField } from '../utils';
 
@@ -653,7 +654,7 @@ const CreatePackCurrencyID: React.FC<IWizardComponents> = ({
               isHidden={fields.length <= 1}
             >
               <span>Next</span>
-              <WizardRightArrow />
+              <WizardRightArrowSVG />
             </BorderedButton>
           </div>
           <BorderedButton
@@ -798,7 +799,7 @@ export const CreatePacks: React.FC<IPackInfoITO> = ({ packInfoIndex }) => {
             isHidden={fields.length <= 1}
           >
             <span>Next</span>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </BorderedButton>
         </div>
         <BorderedButton
@@ -1250,7 +1251,7 @@ export const CreateWhitelistedAddress: React.FC<IWizardComponents> = ({
             isHidden={fields.length <= 1}
           >
             <span>Next</span>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </BorderedButton>
         </div>
         <BorderedButton

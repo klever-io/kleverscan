@@ -2,7 +2,6 @@ import {
   WhiteTick,
   WizardLeftArrow,
   WizardPlusSquare,
-  WizardRightArrow,
   WizardTxSuccess,
 } from '@/assets/icons';
 import Tooltip from '@/components/Tooltip';
@@ -66,6 +65,7 @@ import {
   WizardButton,
   WizardConfirmLogo,
   WizardFailAddressCheck,
+  WizardRightArrowSVG,
   WizardTxSuccessComponent,
 } from './styles';
 
@@ -230,7 +230,7 @@ export const ButtonsComponent: React.FC<IButtonsComponenets> = ({
       ) : (
         <WizardButton type="button" onClick={handleClick} disabled={!next}>
           <p>Next</p>
-          <WizardRightArrow />
+          <WizardRightArrowSVG />
         </WizardButton>
       )}
     </ButtonsContainer>
@@ -268,10 +268,10 @@ export const CreateAssetFirstStep: React.FC<IAssetInformations> = ({
         </span>
         <WizardButton onClick={() => handleStep(prev => prev + 1)} fullWidth>
           <p>I&apos;m ready, I want to start</p>
-          <WizardRightArrow />
+          <WizardRightArrowSVG />
         </WizardButton>
         <span>
-          <IconWizardClock />
+          <IconWizardClock style={{ height: '1rem', width: '1rem' }} />
           Estimated time <strong>{timeEstimated}</strong>
         </span>
       </div>
@@ -1063,7 +1063,7 @@ export const CreateAssetRoyaltyTransferPerc: React.FC<IWizardComponents> = ({
             isHidden={fields.length <= 1}
           >
             <span>Next</span>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </BorderedButton>
         </div>
         <BorderedButton
@@ -1296,7 +1296,7 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
             isHidden={fields.length <= 1}
           >
             <span>Next</span>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </BorderedButton>
         </div>
         <BorderedButton
@@ -1822,7 +1822,7 @@ export const URIsSection: React.FC<IAssetInformations> = ({
             isHidden={fields.length <= 1}
           >
             <span>Next</span>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </BorderedButton>
         </div>
         <BorderedButton
@@ -1878,7 +1878,7 @@ const SelectStakingTypeComponent: React.FC<IWizardStakingComponents> = ({
                 earned annually on an investment
               </span>
             </div>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </PreConfirmOptions>
           <PreConfirmOptions
             secondary
@@ -1896,7 +1896,7 @@ const SelectStakingTypeComponent: React.FC<IWizardStakingComponents> = ({
                 into the FPR pool.
               </span>
             </div>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </PreConfirmOptions>
         </StakingTypeContainer>
       </div>
@@ -2424,7 +2424,7 @@ export const CreateAssetAddRoles: React.FC<IAssetInformations> = ({
             isHidden={fields.length <= 1}
           >
             <span>Next</span>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </BorderedButton>
         </div>
         <BorderedButton
@@ -2532,7 +2532,7 @@ export const CreateAssetPreConfimStep: React.FC<IAssetInformations> = ({
               settings in default options.
             </span>
           </div>
-          <WizardRightArrow />
+          <WizardRightArrowSVG />
         </PreConfirmOptions>
         <PreConfirmOptions secondary onClick={handleAdvancedStepsWrapper}>
           <div>
@@ -2542,7 +2542,7 @@ export const CreateAssetPreConfimStep: React.FC<IAssetInformations> = ({
               Roles,Proprieties.
             </span>
           </div>
-          <WizardRightArrow />
+          <WizardRightArrowSVG />
         </PreConfirmOptions>
         <DefaultSettingsContainer
           showAdvanced={showAdvanced}
@@ -3021,7 +3021,7 @@ export const ConfirmSuccessTransaction: React.FC<{ txHash: string }> = ({
                 {txHash}
               </span>
             </div>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </HashContainer>
         </a>
       </Link>

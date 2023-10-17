@@ -93,6 +93,10 @@ export const InformationDiv = styled.div`
 `;
 
 export const ImageContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f4f4f4;
   width: 100%;
   aspect-ratio: 2/1;
 `;

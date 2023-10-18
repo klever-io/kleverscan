@@ -4,7 +4,9 @@ import {
   WizardPlusSquare,
   WizardTxSuccess,
 } from '@/assets/icons';
+import WalletHelp from '@/components/Header/WalletHelp';
 import Tooltip from '@/components/Tooltip';
+import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import { validateImgUrl } from '@/utils/imageValidate';
 import { parseAddress } from '@/utils/parseValues';
@@ -60,6 +62,7 @@ import {
   StepsItem,
   StepsItemContainer,
   StepsItemContainerDesktop,
+  UnderscoreConnect,
   UriButtonsContainer,
   WizardAddressCheck,
   WizardButton,
@@ -181,6 +184,32 @@ export const propertiesCommonDefaultValues = {
 };
 
 export const infinitySymbol = '\u221e';
+
+export const ConnectButtonComponent: React.FC = () => {
+  const [openWalletHelp, setOpenWalletHelp] = useState(false);
+  const { connectExtension, extensionInstalled, walletAddress } =
+    useExtension();
+
+  const handleClick = () => {
+    if (!extensionInstalled) setOpenWalletHelp(true);
+    if (extensionInstalled && !walletAddress) connectExtension();
+  };
+  return extensionInstalled && walletAddress ? (
+    <></>
+  ) : (
+    <>
+      <p>
+        You are not connected to your wallet, do you want to{' '}
+        <UnderscoreConnect onClick={handleClick}>connect?</UnderscoreConnect>
+      </p>
+      <WalletHelp
+        closeDrawer={() => setOpenWalletHelp(false)}
+        opened={openWalletHelp}
+        clickConnectionMobile={() => setOpenWalletHelp(false)}
+      />
+    </>
+  );
+};
 
 export const ButtonsComponent: React.FC<IButtonsComponenets> = ({
   buttonsProps: { handleStep, next, previousStep },
@@ -566,6 +595,7 @@ export const CreateAssetFourthStep: React.FC<IAssetInformations> = ({
           </div>
         )}
       </ChangedAddressContainer>
+      <ConnectButtonComponent />
       <ButtonsComponent buttonsProps={buttonsProps} />
     </GenericCardContainer>
   );

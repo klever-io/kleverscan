@@ -12,7 +12,11 @@ import { useFieldArray, useFormContext } from 'react-hook-form';
 import { FiPlusSquare } from 'react-icons/fi';
 import { IoArrowForward } from 'react-icons/io5';
 import { useQuery } from 'react-query';
-import { ButtonsComponent, IWizardComponents } from '../createAsset';
+import {
+  ButtonsComponent,
+  ConnectButtonComponent,
+  IWizardComponents,
+} from '../createAsset';
 import {
   AddressesContainer,
   BackArrowSpan,
@@ -112,6 +116,7 @@ export const CreateITOSecondStep: React.FC<IAssetITOInformations> = ({
         <p>{description}</p>
         <ErrorInputContainer>
           <KDASelect required />
+          <ConnectButtonComponent />
           {error && <ErrorMessage>{error?.message}</ErrorMessage>}
         </ErrorInputContainer>
       </div>

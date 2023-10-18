@@ -10,7 +10,7 @@ export const Container = styled.div<{ $opened?: boolean }>`
   bottom: 0px;
   width: 41rem;
   height: 100%;
-  z-index: 6;
+  z-index: 8;
   background-color: ${props => props.theme.white};
   transform: translateX(${props => (props.$opened ? 0 : '100%')});
   transition: 0.5s ease, opacity 0.5s ease;

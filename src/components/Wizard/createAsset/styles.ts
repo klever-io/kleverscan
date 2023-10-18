@@ -1520,3 +1520,7 @@ export const IconWizardClock = styled(BsClock)`
     fill: ${({ theme }) => theme.black};
   }
 `;
+
+export const UnderscoreConnect = styled.u`
+  cursor: pointer;
+`;

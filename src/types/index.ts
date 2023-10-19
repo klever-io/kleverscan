@@ -694,8 +694,8 @@ export interface IParsedDailyTransaction {
 }
 
 export interface IAssetStaking {
-  totalStaking: number | null;
-  dayBeforeTotalStaking: number | null;
+  totalStaking: number | null | undefined;
+  dayBeforeTotalStaking: number | null | undefined;
 }
 
 export interface IAssetsData {
@@ -704,12 +704,12 @@ export interface IAssetsData {
 }
 
 export interface IAssetData {
-  prices: IAssetPrice;
-  staking: IAssetStaking;
-  volume: number | null;
-  circulatingSupply: number | null;
-  estimatedAprYesterday: number;
-  estimatedAprBeforeYesterday: number;
+  prices?: IAssetPrice | undefined;
+  staking?: IAssetStaking | undefined;
+  volume?: number | null;
+  circulatingSupply?: number | null;
+  estimatedAprYesterday?: number | undefined;
+  estimatedAprBeforeYesterday?: number | undefined;
 }
 
 export interface IAssetPrice {

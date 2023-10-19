@@ -11,12 +11,6 @@ const data = [
   { x: 110, y: 280, z: 200 },
 ];
 
-global.ResizeObserver = jest.fn().mockImplementation(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-}));
-
 describe('Scatter Chart', () => {
   const mockedClientHeight = 100;
   const mockedClientWidth = 100;

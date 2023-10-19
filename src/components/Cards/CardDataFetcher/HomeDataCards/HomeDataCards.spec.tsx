@@ -50,15 +50,9 @@ describe('Component: HomeDataCards', () => {
     metrics,
   };
   beforeEach(() => {
-    window.ResizeObserver = jest.fn().mockImplementation(() => ({
-      observe: jest.fn(),
-      unobserve: jest.fn(),
-      disconnect: jest.fn(),
-    }));
-
     mock = jest
       .spyOn(HomeData, 'useHomeData')
-      .mockImplementation(() => contextValues as HomeData.IHomeData);
+      .mockImplementation(() => contextValues as unknown as HomeData.IHomeData);
     jest.clearAllMocks();
     jest.useFakeTimers();
   });
@@ -107,7 +101,9 @@ describe('Component: HomeDataCards', () => {
     };
     mock = jest
       .spyOn(HomeData, 'useHomeData')
-      .mockImplementation(() => newContextValues as HomeData.IHomeData);
+      .mockImplementation(
+        () => newContextValues as unknown as HomeData.IHomeData,
+      );
     renderWithTheme(<HomeDataCards />);
     const totalAccounts = screen.getByText(/Total Accounts/i);
     const variant =

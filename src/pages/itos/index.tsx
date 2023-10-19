@@ -235,9 +235,11 @@ const ITOsPage: React.FC = () => {
     }
   }, [page]);
 
-  if (extensionInstalled) {
-    connectExtension();
-  }
+  useEffect(() => {
+    if (extensionInstalled) {
+      connectExtension();
+    }
+  }, [extensionInstalled]);
 
   const paginateITOs = () => {
     if (page < lastPage) {

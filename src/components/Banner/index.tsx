@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { BannerContainer, ButtonClose } from './styled';
 
-interface ReturnHeath {
+interface IResultsHeath {
   name: string;
   status: string;
   message: string;
@@ -13,20 +13,20 @@ interface IHeathReturn {
   code: string;
   data: {
     health: {
-      results: ReturnHeath[];
+      results: IResultsHeath[];
     };
   };
   error: string;
 }
 
-const healthRequest = async (): Promise<ReturnHeath[]> => {
+const healthRequest = async (): Promise<IResultsHeath[]> => {
   const res: IHeathReturn = await api.get({
     route: 'health',
   });
   return res.data.health.results;
 };
 
-const BannerResult: React.FC<ReturnHeath> = (data: ReturnHeath) => {
+const BannerResult: React.FC<IResultsHeath> = (data: IResultsHeath) => {
   const [openBanner, setOpenBanner] = useState<boolean>();
 
   const handleClick = () => {

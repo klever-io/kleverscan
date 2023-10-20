@@ -3,6 +3,7 @@ import { HeaderGradient, LayoutContainer, Main } from '@/views/home';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
+import Banner from '../Banner';
 import Footer from '../Footer';
 import { MobileNavBar } from '../Footer/MobileNavBar';
 import Navbar from '../Header';
@@ -51,6 +52,7 @@ const Layout: React.FC = ({ children }) => {
 
       <Navbar />
       {pathname === '/' && <HeaderGradient />}
+      <Banner />
       <Main>{children}</Main>
 
       <Footer />

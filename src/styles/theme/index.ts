@@ -88,7 +88,7 @@ const theme = {
     gray: '#F0F0F0',
     secondaryText: '#595C98',
     darkText: '#7B7DB2',
-
+    bannerError: '#850516',
     border: '#C6C7EB',
     green: '#4EBC87',
     red: '#F84960',

@@ -10,4 +10,7 @@ export const StyledTooltip = styled(ReactTooltip)<{ displayMsg: boolean }>`
 
 export const ToolTipSpan = styled.span`
   height: 24px;
+  div > span {
+    white-space: normal;
+  }
 `;

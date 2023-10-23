@@ -58,9 +58,7 @@ const BuyCard: React.FC<IBuyCard> = ({
       <LoaderWrapper>
         <TooltipWrapper>
           <Tooltip
-            msg={
-              'The image refers to the entire collection, not to the NFT being sold. NFT metadata can be added later.'
-            }
+            msg={`The image refers to the entire collection, not to the NFT being sold.\n NFT metadata can be added later.`}
           />
         </TooltipWrapper>
         {buyCardsLoading ? (

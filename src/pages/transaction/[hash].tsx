@@ -293,7 +293,7 @@ export const OverviewDetails: React.FC<IOverviewDetails> = ({
                   {kdaFee?.kda || 'KLV'}
                 </span>
                 <Tooltip
-                  msg={`Both kApp fee and bandwidth fee were payed with ${
+                  msg={`Both kApp fee and bandwidth fee\n were payed with ${
                     kdaFee?.kda || 'KLV'
                   }`}
                 />

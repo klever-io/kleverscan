@@ -25,14 +25,6 @@ import { useQuery } from 'react-query';
 import { setQueryAndRouter } from '..';
 import { toLocaleFixed } from '../formatFunctions';
 
-const kAssetContracts = [
-  'AssetTriggerContract',
-  'ConfigITOContract',
-  'ITOTriggerContract',
-  'WithdrawContract',
-  'DepositContract',
-];
-
 const collectionContracts = [
   'ConfigITOContract',
   'ITOTriggerContract',
@@ -68,6 +60,14 @@ export const setQuery = async (
       ...JSON.parse(newQuery.contractDetails as string),
       [key]: value,
     });
+  } else {
+    if (!newQuery?.contractDetails) return;
+
+    const contractDetails = JSON.parse(newQuery.contractDetails as string);
+    if (!contractDetails[key]) return;
+
+    delete contractDetails[key];
+    newQuery.contractDetails = JSON.stringify(contractDetails);
   }
   setQueryAndRouter(newQuery, router);
 };
@@ -77,6 +77,12 @@ export const useKDASelect = (
 ): [ICollectionList | undefined, React.FC<ISelectProps>] => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const kAssetContracts = [
+    'AssetTriggerContract',
+    'ConfigITOContract',
+    'ITOTriggerContract',
+    'DepositContract',
+  ];
 
   const { getAssets, getKAssets } = useContract();
   const { walletAddress } = useExtension();
@@ -94,8 +100,18 @@ export const useKDASelect = (
 
   const assetTriggerType =
     params?.assetTriggerType !== undefined ? params?.assetTriggerType : null;
-  const withdrawType = params?.withdrawType || null;
+  const withdrawType =
+    params?.withdrawType !== undefined ? params?.withdrawType : null;
   const validateFields = params?.validateFields || [];
+
+  if (withdrawType === 1 && !kAssetContracts.includes('WithdrawContract')) {
+    kAssetContracts.push('WithdrawContract');
+  } else if (withdrawType === 0) {
+    const index = kAssetContracts.indexOf('WithdrawContract');
+    if (index > -1) {
+      kAssetContracts.splice(index, 1);
+    }
+  }
 
   const {
     register,
@@ -152,7 +168,8 @@ export const useKDASelect = (
         walletAddress,
       ),
     );
-  }, [walletAddress, assetsList, kassetsList]);
+    setCollectionValue(undefined);
+  }, [walletAddress, assetsList, kassetsList, assetTriggerType, withdrawType]);
 
   useEffect(() => {
     if (!kassetsFetching && !assetsFetching && loading) {
@@ -161,6 +178,24 @@ export const useKDASelect = (
       setLoading(true);
     }
   }, [assetsFetching, kassetsFetching]);
+
+  const setCollectionValue = async (value?: ICollectionList) => {
+    if (!value) {
+      await setQuery('collection', '', router);
+      setCollection(undefined);
+      setValue('collection', '', {
+        shouldValidate: true,
+      });
+      return;
+    }
+
+    if (!isMultiContract && router.pathname !== '/')
+      await setQuery('collection', value?.value, router);
+    setCollection(value);
+    setValue('collection', value?.value, {
+      shouldValidate: false,
+    });
+  };
 
   const refetch = () => {
     refetchAssetsList();
@@ -229,12 +264,6 @@ export const useKDASelect = (
       showAssetIdInput(contractType, assetTriggerType);
 
     const CollectionIDField: React.FC = () => {
-      const onBlurHandler = async (e: any) => {
-        if (!isMultiContract) {
-          await setQuery('collectionAssetID', e.target.value, router);
-        }
-      };
-
       const selectedCollectionId = collectionIdList?.filter(
         e => e.value === watchCollectionAssetId,
       )[0] || { label: '', value: '' };
@@ -278,29 +307,10 @@ export const useKDASelect = (
     }, [router, assetsList]);
 
     const onChangeHandler = async (value: ICollectionList) => {
-      if (!isMultiContract && router.pathname !== '/')
-        await setQuery('collection', value?.value, router);
-      setCollection(value);
-      setValue('collection', value?.value, {
-        shouldValidate: false,
-      });
+      setCollectionValue(value);
       if (!value.isNFT) {
         setValue('collectionAssetId', '');
       }
-    };
-
-    const handleCreate = async (inputValue: string) => {
-      const newValue = {
-        label: inputValue.toUpperCase(),
-        value: inputValue.toUpperCase(),
-      };
-      if (!isMultiContract && router.pathname !== '/')
-        await setQuery('collection', newValue.value, router);
-      setValue('collection', newValue.value, {
-        shouldValidate: false,
-      });
-      setCollection(newValue as ICollectionList);
-      setOptions(prev => [...prev, newValue]);
     };
 
     return (
@@ -328,7 +338,6 @@ export const useKDASelect = (
             collection={selectedCollection}
             options={options}
             onChange={onChangeHandler}
-            onCreateOption={handleCreate}
             loading={loading}
             selectedValue={
               selectedCollection?.value

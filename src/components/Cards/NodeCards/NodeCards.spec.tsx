@@ -3,11 +3,6 @@ import { renderWithTheme } from '../../../test/utils';
 import { INodeCard } from '../../../types';
 import NodeCards from './';
 
-global.ResizeObserver = jest.fn().mockImplementation(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-}));
 const mockCardData: INodeCard[] = [
   {
     title: 'Total Nodes',

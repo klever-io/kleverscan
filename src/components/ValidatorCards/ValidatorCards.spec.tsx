@@ -12,11 +12,6 @@ describe('test ValidatorCards component', () => {
       .spyOn(HTMLElement.prototype, 'clientWidth', 'get')
       .mockReturnValue(100);
     jest.clearAllMocks();
-    window.ResizeObserver = jest.fn().mockImplementation(() => ({
-      observe: jest.fn(),
-      unobserve: jest.fn(),
-      disconnect: jest.fn(),
-    }));
   });
   afterAll(() => {
     jest.clearAllMocks();

@@ -47,7 +47,7 @@ const BannerResult: React.FC<IResultsHeath> = (data: IResultsHeath) => {
 
   return (
     <>
-      {openBanner && data.status !== 'OK' && (
+      {openBanner && data.status !== 'OK' && data.message && (
         <BannerContainer status={data.status === 'ALERT'}>
           <p>{data.status + ':' + data.message}</p>
           <ButtonClose onClick={handleClick} />

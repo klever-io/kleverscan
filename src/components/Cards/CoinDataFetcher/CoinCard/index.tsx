@@ -208,7 +208,6 @@ const CoinCard: React.FC = () => {
   const { t } = useTranslation('home');
   const coinsName = ['KLV', 'KFI'];
   const [selectedCoin, setSelectedCoin] = useState(0);
-  const [loadingError, setLoadingError] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const coinDays = useRef<ICoinTimes>({
@@ -270,7 +269,7 @@ const CoinCard: React.FC = () => {
     },
   ]);
 
-  const refetchCoin = [klvChartResult.refetch, kfiChartResult.refetch];
+  const refetchCoinsCall = [klvChartResult.refetch, kfiChartResult.refetch];
 
   if (kfiDataInfo.data) {
     kfiDataInfo.data.volume = kfiPricesInfo.data?.kfiVolume;
@@ -340,7 +339,7 @@ const CoinCard: React.FC = () => {
 
   const CoinsFetchFails: React.FC = () => {
     if (coins.length === 0) {
-      return loadingError ? (
+      return klvChartResult.isError && kfiChartResult.isError ? (
         <CardContainer>
           <CardContentError>
             <HeaderContainer>
@@ -350,9 +349,7 @@ const CoinCard: React.FC = () => {
             </HeaderContainer>
             <ContentError
               onClick={async () => {
-                setLoadingError(true);
-                coinDays.current.KLV = 0;
-                setLoadingError(false);
+                refetchCoinsCall.forEach(refetchCoin => refetchCoin());
               }}
             >
               <span>Retry</span>
@@ -394,7 +391,7 @@ const CoinCard: React.FC = () => {
               <RenderCoinsCard
                 renderKfiMarketCap={renderKfiMarketCap}
                 assetsData={assetsData}
-                refetchCoin={refetchCoin[index]}
+                refetchCoin={refetchCoinsCall[index]}
                 coinDays={coinDays}
                 cardRef={cardRef}
                 coin={coin}
@@ -430,7 +427,7 @@ const CoinCard: React.FC = () => {
                 <RenderCoinsCard
                   renderKfiMarketCap={renderKfiMarketCap}
                   assetsData={assetsData}
-                  refetchCoin={refetchCoin[index]}
+                  refetchCoin={refetchCoinsCall[index]}
                   cardRef={cardRef}
                   coinDays={coinDays}
                   coin={coin}

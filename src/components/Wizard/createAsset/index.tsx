@@ -591,9 +591,9 @@ export const CreateAssetFourthStep: React.FC<IAssetInformations> = ({
               })}
               placeholder={parseAddress(address, 14)}
             />
-            {!isTablet && !isMobile && <AddressValidationIcon error={error} />}
           </div>
         )}
+        {!isTablet && !isMobile && <AddressValidationIcon error={error} />}
       </ChangedAddressContainer>
       <ConnectButtonComponent />
       <ButtonsComponent buttonsProps={buttonsProps} />

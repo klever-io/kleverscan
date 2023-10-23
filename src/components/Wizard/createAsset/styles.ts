@@ -494,7 +494,7 @@ export const ErrorMessage = styled.div`
 export const GenericInfoCard = styled.div`
   padding: 1rem;
   font-size: 0.82rem;
-
+  border-radius: 1rem;
   background: ${({ theme }) =>
     theme.dark ? theme.wizard.genericInfoCard : theme.true.white};
 `;
@@ -864,7 +864,7 @@ export const CheckBoxInput = styled.input.attrs(() => ({
     border-radius: 50%;
     top: 2px;
     bottom: 2px;
-    left: 2px;
+    left: 0;
     background: ${props => props.theme.true.white};
     transition: 0.5s;
     transform: translate(15%, 0);
@@ -872,6 +872,7 @@ export const CheckBoxInput = styled.input.attrs(() => ({
 
   &:checked:before {
     transform: translate(100%, 0);
+    left: 5.5px;
   }
 `;
 

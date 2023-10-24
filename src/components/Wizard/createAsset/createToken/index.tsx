@@ -5,6 +5,7 @@ import {
 } from '@/components/Contract/utils';
 import {
   parseSplitRoyalties,
+  parseStringToNumberSupply,
   parseURIs,
 } from '@/components/TransactionForms/CustomForms/utils';
 import { parseAddress } from '@/utils/parseValues';
@@ -278,11 +279,11 @@ const WizCreateToken: React.FC<any> = ({
   };
 
   const onSubmit = async (data: any) => {
+    parseStringToNumberSupply(data);
     const parsedUris = parseURIs(data);
     const parsedRoles = parseRoles(data);
     parseSplitRoyalties(data);
     const contractyType = 'CreateAssetContract';
-
     await precisionParse(data, contractyType);
     if (!data?.royalties) {
       data['royalties'] = { address: data?.ownerAddress };

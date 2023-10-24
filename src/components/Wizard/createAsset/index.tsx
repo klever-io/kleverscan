@@ -8,6 +8,7 @@ import WalletHelp from '@/components/Header/WalletHelp';
 import Tooltip from '@/components/Tooltip';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
+import { formatNumberDecimal } from '@/utils/formatFunctions';
 import { validateImgUrl } from '@/utils/imageValidate';
 import { parseAddress } from '@/utils/parseValues';
 import Link from 'next/link';
@@ -1525,7 +1526,7 @@ export const CreateAssetSixStep: React.FC<IWizardComponents> = ({
     register,
     formState: { errors },
   } = useFormContext();
-
+  const [inputValue, setInputValue] = useState('');
   const ticker = watch('ticker');
   const initialSupply = watch('initialSupply');
 
@@ -1541,7 +1542,9 @@ export const CreateAssetSixStep: React.FC<IWizardComponents> = ({
     handleStep,
     next: !error,
   };
-
+  const handleInputChange = (e: { target: { value: string } }) => {
+    setInputValue(formatNumberDecimal(e.target.value));
+  };
   return (
     <GenericCardContainer>
       <div>
@@ -1556,12 +1559,14 @@ export const CreateAssetSixStep: React.FC<IWizardComponents> = ({
         </p>
         <GenericInput
           error={error}
-          type="number"
+          type="text"
           placeholder="0"
           autoFocus={true}
+          value={inputValue}
           {...register('initialSupply', {
             pattern: { value: /\d+/g, message: 'Only numbers are allowed' },
           })}
+          onChange={handleInputChange}
           align={'right'}
         />
         {error && <ErrorMessage>{error?.message}</ErrorMessage>}
@@ -1586,6 +1591,7 @@ export const CreateAssetSevenStep: React.FC<IAssetInformations> = ({
     register,
     formState: { errors },
   } = useFormContext();
+  const [inputValue, setInputValue] = useState('');
   const ticker = watch('ticker');
   const maxSupply = watch('maxSupply');
 
@@ -1602,6 +1608,10 @@ export const CreateAssetSevenStep: React.FC<IAssetInformations> = ({
     next: !error,
   };
 
+  const handleInputChange = (e: { target: { value: string } }) => {
+    setInputValue(formatNumberDecimal(e.target.value));
+  };
+
   return (
     <GenericCardContainer>
       <div>
@@ -1613,12 +1623,13 @@ export const CreateAssetSevenStep: React.FC<IAssetInformations> = ({
         <p>{description}</p>
         <GenericInput
           error={error}
-          type="number"
+          type="text"
+          value={inputValue}
           placeholder="0"
           {...register('maxSupply', {
-            pattern: { value: /\d+/g, message: 'Value must be only numbers' },
-            valueAsNumber: true,
+            pattern: { value: /\d+/g, message: 'Only numbers are allowed' },
           })}
+          onChange={handleInputChange}
           align={'right'}
         />
         {error && <ErrorMessage>{error?.message}</ErrorMessage>}

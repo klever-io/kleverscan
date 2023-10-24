@@ -1466,14 +1466,14 @@ export const HashContainer = styled.div`
   word-break: break-all;
   word-wrap: break-word;
   flex-wrap: wrap;
-  background: #404264;
+  background: ${({ theme }) => (theme.dark ? '#404264' : '#fff')};
   cursor: pointer;
 
   > div {
     display: flex;
     flex-direction: column;
     max-width: 70%;
-    color: #fff;
+    color: ${({ theme }) => (theme.dark ? '#fff' : '#646693')};
     gap: 1rem;
     > span:nth-child(1) {
       font-size: 1rem;
@@ -1481,7 +1481,7 @@ export const HashContainer = styled.div`
       line-height: normal;
     }
     > span:nth-child(2) {
-      color: #c6c7eb;
+      color: ${({ theme }) => (theme.dark ? '#c6c7eb' : theme.black)};
       font-size: 0.9rem;
       font-weight: 700;
       line-height: 1.2rem;

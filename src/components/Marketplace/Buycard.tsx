@@ -4,13 +4,13 @@ import { useContractModal } from '@/contexts/contractModal';
 import { IAsset } from '@/types';
 import { IMarketplaceAsset } from '@/types/marketplaces';
 import {
-  CardLogo,
   GridItemButton,
   GridItemFlex,
   LoaderWrapper,
   MainItemsDiv,
   TooltipWrapper,
 } from '@/views/marketplaces/detail';
+import Image from 'next/image';
 import { useState } from 'react';
 import { UseQueryResult } from 'react-query';
 
@@ -66,7 +66,8 @@ const BuyCard: React.FC<IBuyCard> = ({
         {buyCardsLoading ? (
           <Loader height={75} width={75} />
         ) : (
-          <CardLogo
+          <Image
+            alt="collection-logo"
             src={
               isError
                 ? '/no-logo.png'

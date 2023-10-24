@@ -25,6 +25,7 @@ import { getAge } from '@/utils/timeFunctions';
 import { TableContainer, TableHeader, UpdateContainer } from '@/views/blocks';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
 
 interface IBlocksStatsToday {
   totalBlocks: number;
@@ -47,51 +48,15 @@ interface IBlocksStatsYesterday {
 const Blocks: React.FC<IBlocks> = () => {
   const precision = 6; // default KLV precision
   const blocksWatcherInterval = 4 * 1000; // 4 secs
-
-  const [blocks, setBlocks] = useState([]);
-  const [blocksStatsYesterday, setBlocksStatsYesterday] =
-    useState<null | IBlocksStatsYesterday>(null);
-  const [blocksStatsToday, setBlockStatsToday] =
-    useState<null | IBlocksStatsToday>(null);
   const [blocksInterval, setBlocksInterval] = useState(0);
-
-  const requestBlocks = async (page: number, limit: number) => {
-    let response = {
-      data: { blocks },
-      pagination: undefined,
-      code: '',
-      error: '',
-    };
-
-    await Promise.allSettled([
-      blockCall(page, limit),
-      yesterdayStatisticsCall(),
-      totalStatisticsCall(),
-    ]).then(responses => {
-      responses.map((res, index) => {
-        if (res.status !== 'rejected') {
-          const { value }: any = res;
-          switch (index) {
-            case 0:
-              response = value;
-              setBlocks(value.data.blocks);
-              break;
-
-            case 1:
-              setBlocksStatsYesterday(value.data.block_stats_by_day[0]);
-              break;
-
-            case 2:
-              setBlockStatsToday(value.data.block_stats_total);
-
-            default:
-              break;
-          }
-        }
-      });
-    });
-    return response;
-  };
+  const { data: blocksStatsToday } = useQuery(
+    'statisticsCall',
+    totalStatisticsCall,
+  );
+  const { data: blocksStatsYesterday } = useQuery(
+    'yesterdayStatisticsCall',
+    yesterdayStatisticsCall,
+  );
 
   const updateBlocks = useCallback(async () => {
     const newState = storageUpdateBlocks(!!blocksInterval);
@@ -116,12 +81,12 @@ const Blocks: React.FC<IBlocks> = () => {
       title: 'Number of Blocks',
       headers: ['Blocks 24h', 'Cumulative Number'],
       values: [
-        blocksStatsYesterday ? (
+        blocksStatsYesterday?.totalBlocks ? (
           toLocaleFixed(blocksStatsYesterday?.totalBlocks, 0)
         ) : (
           <Skeleton />
         ),
-        blocksStatsToday ? (
+        blocksStatsToday?.totalBlocks ? (
           toLocaleFixed(blocksStatsToday?.totalBlocks, 0)
         ) : (
           <Skeleton />
@@ -134,7 +99,7 @@ const Blocks: React.FC<IBlocks> = () => {
       values: [
         blocksStatsYesterday ? (
           `${formatAmount(
-            blocksStatsYesterday?.totalBlockRewards / 10 ** precision,
+            blocksStatsYesterday?.totalBlockRewards || 0 / 10 ** precision,
           )} KLV`
         ) : (
           <Skeleton />
@@ -154,7 +119,7 @@ const Blocks: React.FC<IBlocks> = () => {
       values: [
         blocksStatsYesterday ? (
           `${formatAmount(
-            blocksStatsYesterday?.totalBurned / 10 ** precision,
+            blocksStatsYesterday?.totalBurned || 0 / 10 ** precision,
           )} KLV`
         ) : (
           <Skeleton />
@@ -313,7 +278,7 @@ const Blocks: React.FC<IBlocks> = () => {
     rowSections,
     scrollUp: true,
     dataName: 'blocks',
-    request: (page: number, limit: number) => requestBlocks(page, limit),
+    request: (page: number, limit: number) => blockCall(page, limit),
     interval: blocksInterval,
     intervalController: setBlocksInterval,
   };

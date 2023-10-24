@@ -247,46 +247,17 @@ export const InfoIcon = styled(BsQuestionCircleFill)`
   color: ${({ theme }) => theme.darkText};
 `;
 
-export const TooltipContent = styled.div`
-  &:hover {
-    visibility: visible;
-  }
-  color: ${props => props.theme.form.tooltip};
-  position: absolute;
-  display: inline-block;
-  background-color: ${props => props.theme.form.tooltipContainer};
-  padding: 0.4rem 0.5rem 0.4rem 0.5rem;
-  margin-left: 1.25rem;
-  border-radius: 0.2rem;
-  font-size: smaller;
-  visibility: hidden;
-  width: 100%;
-  max-width: fit-content;
-
-  transform: translateY(-25%);
-
-  span {
-    font-weight: 300;
-  }
-`;
-
 export const TooltipContainer = styled.div<{
   tooltip?: string;
 }>`
   display: flex;
   user-select: none;
-  position: relative;
-
   width: fit-content;
 
-  > svg {
+  svg {
     align-self: center;
-  }
-
-  &:hover {
-    width: calc(100% - 1rem);
-    div {
-      visibility: visible;
+    path {
+      fill: ${props => props.theme.form.tooltipContainer};
     }
   }
 

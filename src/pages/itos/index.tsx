@@ -11,9 +11,12 @@ import { useContractModal } from '@/contexts/contractModal';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
+import {
+  processITOPrecisions,
+  requestAssetsList,
+} from '@/services/requests/ito';
 import { IAsset, IITO, IParsedITO } from '@/types';
 import { IPackInfo } from '@/types/contracts';
-import { getPrecision } from '@/utils/precisionFunctions';
 import {
   AssetContainer,
   AssetsList,
@@ -43,6 +46,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { useQuery } from 'react-query';
 
 export const displayITOpacks = (
   ITO: IParsedITO,
@@ -96,46 +100,6 @@ export const displayITOpacks = (
   );
 };
 
-export const processITOPrecisions = async (
-  ITO: IITO,
-  assetPrecision: number,
-): Promise<IITO> => {
-  ITO.packData.forEach(async packInfo => {
-    const keyPrecision = await getPrecision(packInfo.key);
-    packInfo.packs.forEach(pack => {
-      pack.price = pack.price / 10 ** keyPrecision;
-      pack.amount = pack.amount / 10 ** assetPrecision;
-    });
-  });
-  return ITO;
-};
-
-export const parseITOs = async (
-  ITOs: IITO[],
-): Promise<IParsedITO | never[]> => {
-  const assetsInput: string = ITOs.map(ITO => ITO.assetId).join(',');
-  const packsPrecisionCalls: Promise<IITO>[] = [];
-  const res = await api.get({
-    route: `assets/list?asset=${assetsInput}`,
-  });
-  if (!res.error || res.error === '') {
-    const assets = res.data.assets;
-    ITOs.forEach((ITO, index) => {
-      const asset = assets.find(
-        (asset: IAsset) => asset.assetId === ITOs[index].assetId,
-      );
-      ITO.maxAmount = ITO.maxAmount / 10 ** asset.precision;
-      ITO['ticker'] = asset.ticker;
-      ITO['assetType'] = asset.assetType;
-      ITO['precision'] = asset.precision;
-      ITO['assetLogo'] = asset.logo;
-      packsPrecisionCalls.push(processITOPrecisions(ITO, asset.precision));
-    });
-    await Promise.allSettled(packsPrecisionCalls);
-  }
-  return [];
-};
-
 const ITOsPage: React.FC = () => {
   const [ITOs, setITOs] = useState<IParsedITO[]>([]);
   const [lastPage, setLastPage] = useState(0);
@@ -148,6 +112,12 @@ const ITOsPage: React.FC = () => {
   const { extensionInstalled, connectExtension } = useExtension();
 
   const { getInteractionsButtons } = useContractModal();
+
+  const { data: assetsList, isLoading: assetListLoading } = useQuery({
+    queryKey: [`${page}-assetsList`],
+    queryFn: () => requestAssetsList(ITOs as IITO[]),
+    enabled: !!ITOs,
+  });
 
   const requestITOs = async (tempPage?: number) => {
     const asset = router?.query?.asset ?? '';
@@ -203,20 +173,6 @@ const ITOsPage: React.FC = () => {
       await Promise.allSettled(packsPrecisionCalls);
     }
     return [];
-  };
-
-  const processITOPrecisions = async (
-    ITO: IITO,
-    assetPrecision: number,
-  ): Promise<IITO> => {
-    ITO.packData.forEach(async packInfo => {
-      const keyPrecision = await getPrecision(packInfo.key);
-      packInfo.packs.forEach(pack => {
-        pack.price = pack.price / 10 ** keyPrecision;
-        pack.amount = pack.amount / 10 ** assetPrecision;
-      });
-    });
-    return ITO;
   };
 
   const requestWithLoading = async () => {

@@ -4,9 +4,9 @@ import { useContractModal } from '@/contexts/contractModal';
 import { IAsset } from '@/types';
 import { IMarketplaceAsset } from '@/types/marketplaces';
 import {
-  CardLogo,
   GridItemButton,
   GridItemFlex,
+  ImageWrapper,
   LoaderWrapper,
   MainItemsDiv,
   TooltipWrapper,
@@ -67,11 +67,11 @@ const BuyCard: React.FC<IBuyCard> = ({
         {buyCardsLoading ? (
           <Loader height={75} width={75} />
         ) : (
-          <CardLogo>
+          <ImageWrapper>
             <Image
               loader={({ src }) => src}
-              width={75}
-              height={75}
+              width={85}
+              height={85}
               alt="Collection Logo"
               src={
                 isError
@@ -81,7 +81,7 @@ const BuyCard: React.FC<IBuyCard> = ({
               }
               onError={() => setIsError(true)}
             />
-          </CardLogo>
+          </ImageWrapper>
         )}
       </LoaderWrapper>
       <GridItemFlex>

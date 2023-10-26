@@ -217,7 +217,7 @@ export const Scroll = styled.div`
 `;
 
 export const Scrollable = styled.div`
-  height: 15rem;
+  height: 22rem;
   overflow-y: scroll;
   color: ${props =>
     props.theme.dark ? props.theme.true.white : props.theme.black};

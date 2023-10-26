@@ -1084,7 +1084,7 @@ export const Delegate: React.FC<IIndexedContract> = ({
           </span>
         </Row>
       )}
-      {claimReceipt && (
+      {claimReceipt && claimReceipt.marketplaceId && (
         <>
           <Row>
             <span>

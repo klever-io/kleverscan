@@ -3,18 +3,24 @@ import { IAsset, IITO, IParsedITO } from '@/types';
 import { getPrecision } from '@/utils/precisionFunctions';
 import { NextRouter } from 'next/router';
 
-export const requestITOs = async (
-  tempPage?: number,
-  router?: NextRouter,
-  page?: number,
+export const requestITOss = async (
+  router: NextRouter,
+  pageParam = 1,
 ): Promise<any | void> => {
   const asset = router?.query?.asset ?? '';
-  const itoPage = tempPage ?? page;
   const isActive = router?.query?.active ?? true;
-  return api.get({
-    route: `ito/list`,
-    query: { page: itoPage, active: isActive, asset },
-  });
+  try {
+    const itosResponse = await api.get({
+      route: `ito/list`,
+      query: { page: pageParam, active: isActive, asset },
+    });
+    if (!itosResponse.error || itosResponse.error === '') {
+      return itosResponse;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  return;
 };
 
 export const requestAssetsList = async (data: IITO[]): Promise<any | void> => {
@@ -23,11 +29,12 @@ export const requestAssetsList = async (data: IITO[]): Promise<any | void> => {
       const assetsInput: string = data
         .map((ITO: IITO) => ITO.assetId)
         .join(',');
+
       const res = await api.get({
         route: `assets/list?asset=${assetsInput}`,
       });
       if (!res.error || res.error === '') {
-        return res;
+        return res.data.assets;
       }
     } catch (error) {
       console.error(error);

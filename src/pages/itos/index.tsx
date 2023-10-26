@@ -10,10 +10,10 @@ import NonFungibleITO from '@/components/NonFungileITO';
 import { useContractModal } from '@/contexts/contractModal';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
-import api from '@/services/api';
 import {
   processITOPrecisions,
   requestAssetsList,
+  requestITOss,
 } from '@/services/requests/ito';
 import { IAsset, IITO, IParsedITO } from '@/types';
 import { IPackInfo } from '@/types/contracts';
@@ -44,9 +44,9 @@ import {
 } from '@/views/itos';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useQuery } from 'react-query';
+import { useInfiniteQuery, useQuery } from 'react-query';
 
 export const displayITOpacks = (
   ITO: IParsedITO,
@@ -101,67 +101,63 @@ export const displayITOpacks = (
 };
 
 const ITOsPage: React.FC = () => {
-  const [ITOs, setITOs] = useState<IParsedITO[]>([]);
-  const [lastPage, setLastPage] = useState(0);
   const [selectedITO, setSelectedITO] = useState<null | IParsedITO>(null);
-  const [page, setPage] = useState(1);
   const [txHash, setTxHash] = useState('');
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { isMobile } = useMobile();
   const { extensionInstalled, connectExtension } = useExtension();
 
   const { getInteractionsButtons } = useContractModal();
 
-  const { data: assetsList, isLoading: assetListLoading } = useQuery({
-    queryKey: [`${page}-assetsList`],
-    queryFn: () => requestAssetsList(ITOs as IITO[]),
-    enabled: !!ITOs,
+  const {
+    data,
+    fetchNextPage,
+    isFetching,
+    hasNextPage,
+    isLoading: isLoadingITos,
+    refetch: refetchITos,
+  } = useInfiniteQuery(
+    'ITOss',
+    ({ pageParam = 1 }) => requestITOss(router, pageParam),
+    {
+      getNextPageParam: lastPage => {
+        if (lastPage) {
+          const { self, totalPages } = lastPage?.pagination;
+          if (totalPages > self) {
+            return self + 1;
+          }
+        }
+      },
+    },
+  );
+  const itemsITOs = useMemo(() => {
+    return data?.pages.reduce((acc, page) => {
+      return [...acc, ...page.data.itos];
+    }, []);
+  }, [data]);
+
+  const {
+    data: assetsList,
+    isLoading: assetListLoading,
+    refetch: refetchAssetsList,
+    isFetching: isFetchingAssets,
+  } = useQuery({
+    queryKey: `assetList-${itemsITOs}`,
+    queryFn: () => requestAssetsList(itemsITOs as IITO[]),
+    enabled: !!itemsITOs,
   });
 
-  const requestITOs = async (tempPage?: number) => {
-    const asset = router?.query?.asset ?? '';
-    const itoPage = tempPage ?? page;
-    const isActive = router?.query?.active ?? true;
-    return api.get({
-      route: `ito/list`,
-      query: { page: itoPage, active: isActive, asset },
-    });
-  };
+  useEffect(() => {
+    parseITOs();
+    refetchAssetsList();
+  }, [itemsITOs, isFetching, assetsList]);
 
-  const requestITOsAndReset = async () => {
-    const res = await requestITOs(1);
-    if (!res.error || res.error === '') {
-      const newITOs = res?.data?.itos || [];
-      await parseITOs(newITOs);
-      setPage(1);
-      setLastPage(res.pagination.totalPages);
-      setITOs(newITOs);
-    }
-  };
-
-  const requestITOsAndAddMore = async () => {
-    const res = await requestITOs();
-    if (!res.error || res.error === '') {
-      const newITOs = res?.data?.itos || [];
-      await parseITOs(newITOs);
-      const allITOs = [...ITOs, ...newITOs];
-      setLastPage(res.pagination.totalPages);
-      setITOs(allITOs);
-    }
-  };
-
-  const parseITOs = async (ITOs: IITO[]): Promise<IParsedITO | never[]> => {
-    const assetsInput: string = ITOs.map(ITO => ITO.assetId).join(',');
-    const packsPrecisionCalls: Promise<IITO>[] = [];
-    const res = await api.get({
-      route: `assets/list?asset=${assetsInput}`,
-    });
-    if (!res.error || res.error === '') {
-      const assets = res.data.assets;
-      ITOs.forEach((ITO, index) => {
-        const asset = assets.find(
-          (asset: IAsset) => asset.assetId === ITOs[index].assetId,
+  const parseITOs = async (): Promise<IParsedITO | never[]> => {
+    if (itemsITOs && assetsList && !isFetchingAssets) {
+      const packsPrecisionCalls: Promise<IITO>[] = [];
+      itemsITOs.forEach((ITO: IITO, index: number) => {
+        const asset = assetsList.find(
+          (asset: IAsset) => asset.assetId === itemsITOs[index].assetId,
         );
         ITO.maxAmount = ITO.maxAmount / 10 ** asset.precision;
         ITO['ticker'] = asset.ticker;
@@ -176,9 +172,8 @@ const ITOsPage: React.FC = () => {
   };
 
   const requestWithLoading = async () => {
-    setLoading(true);
-    await requestITOsAndReset();
-    setLoading(false);
+    refetchITos();
+    refetchAssetsList();
   };
 
   useEffect(() => {
@@ -186,22 +181,10 @@ const ITOsPage: React.FC = () => {
   }, [router?.query?.active]);
 
   useEffect(() => {
-    if (page > 1) {
-      requestITOsAndAddMore();
-    }
-  }, [page]);
-
-  useEffect(() => {
     if (extensionInstalled) {
       connectExtension();
     }
   }, [extensionInstalled]);
-
-  const paginateITOs = () => {
-    if (page < lastPage) {
-      setPage(page + 1);
-    }
-  };
 
   const getActive = () => {
     const active = router?.query?.active;
@@ -221,6 +204,8 @@ const ITOsPage: React.FC = () => {
       pathname: router.pathname,
       query: { ...router.query, asset: value },
     });
+    refetchITos();
+    refetchAssetsList();
   };
 
   const filters: IFilter[] = [
@@ -276,16 +261,23 @@ const ITOsPage: React.FC = () => {
                 flexDirection: 'column',
                 marginBottom: 15,
               }}
-              dataLength={ITOs?.length}
-              next={paginateITOs}
-              hasMore={page >= lastPage ? false : true}
+              dataLength={itemsITOs?.length || 0}
+              next={() => {
+                fetchNextPage();
+              }}
+              hasMore={!!hasNextPage}
               loader={<Loader />}
               scrollableTarget={'scrollableDiv'}
-              endMessage={ITOs?.length ? 'All ITOs have been loaded.' : ''}
+              endMessage={
+                itemsITOs && itemsITOs?.length
+                  ? 'All ITOs have been loaded.'
+                  : ''
+              }
             >
               <Scroll>
-                {ITOs.length > 0 &&
-                  ITOs.map((ITO: IParsedITO) => {
+                {itemsITOs &&
+                  itemsITOs.length > 0 &&
+                  itemsITOs.map((ITO: IParsedITO) => {
                     return (
                       <AssetContainer
                         selected={selectedITO?.assetId === ITO.assetId}
@@ -394,12 +386,14 @@ const ITOsPage: React.FC = () => {
                 </HashContent>
               )}
 
-              {selectedITO && !loading ? (
+              {selectedITO && !isLoadingITos ? (
                 displayITO()
               ) : (
                 <ChooseAsset>
-                  {!selectedITO && !loading && <span>Choose an asset</span>}
-                  {loading && <Loader height={70} width={100} />}
+                  {!selectedITO && !isLoadingITos && (
+                    <span>Choose an asset</span>
+                  )}
+                  {isLoadingITos && <Loader height={70} width={100} />}
                 </ChooseAsset>
               )}
             </div>

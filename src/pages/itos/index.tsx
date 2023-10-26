@@ -11,9 +11,9 @@ import { useContractModal } from '@/contexts/contractModal';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import {
-  parseITOs,
+  parseITOsRequest,
   requestAssetsList,
-  requestITOss,
+  requestITOs,
 } from '@/services/requests/ito';
 import { IParsedITO } from '@/types';
 import { IPackInfo } from '@/types/contracts';
@@ -119,9 +119,9 @@ const ITOsPage: React.FC = () => {
   } = useInfiniteQuery(
     'ITOss',
     async ({ pageParam = 1 }) => {
-      const dataITOs = await requestITOss(router, pageParam);
+      const dataITOs = await requestITOs(router, pageParam);
       const assets = await requestAssetsList(dataITOs);
-      await parseITOs(dataITOs, assets);
+      await parseITOsRequest(dataITOs, assets);
       return dataITOs;
     },
     {

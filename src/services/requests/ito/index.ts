@@ -1,9 +1,9 @@
 import api from '@/services/api';
-import { IAsset, IITO, IITOResponse } from '@/types';
+import { IAsset, IITO, IITOsResponse } from '@/types';
 import { getPrecision } from '@/utils/precisionFunctions';
 import { NextRouter } from 'next/router';
 
-export const requestITOss = async (
+export const requestITOs = async (
   router: NextRouter,
   pageParam = 1,
 ): Promise<any | void> => {
@@ -24,7 +24,7 @@ export const requestITOss = async (
 };
 
 export const requestAssetsList = async (
-  data: IITOResponse,
+  data: IITOsResponse,
 ): Promise<any | void> => {
   if (data) {
     try {
@@ -58,8 +58,8 @@ export const processITOPrecisions = async (
   return ITO;
 };
 
-export const parseITOs = async (
-  itemsITOs: IITOResponse,
+export const parseITOsRequest = async (
+  itemsITOs: IITOsResponse,
   assetsList: any[],
 ): Promise<void> => {
   if (itemsITOs && assetsList) {

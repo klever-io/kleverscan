@@ -60,7 +60,7 @@ export const TooltipWrapper = styled.div`
   height: 100%;
 `;
 
-export const CardLogo = styled.img`
+export const CardLogo = styled.div`
   width: 5rem;
   height: 5rem;
   border-radius: 50%;

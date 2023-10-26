@@ -11,6 +11,7 @@ import {
   MainItemsDiv,
   TooltipWrapper,
 } from '@/views/marketplaces/detail';
+import Image from 'next/image';
 import { useState } from 'react';
 import { UseQueryResult } from 'react-query';
 
@@ -66,15 +67,21 @@ const BuyCard: React.FC<IBuyCard> = ({
         {buyCardsLoading ? (
           <Loader height={75} width={75} />
         ) : (
-          <CardLogo
-            src={
-              isError
-                ? '/no-logo.png'
-                : getCorrectLogo(marketplaceAsset?.assetId.split('/')[0]) ||
-                  '/no-logo.png'
-            }
-            onError={() => setIsError(true)}
-          />
+          <CardLogo>
+            <Image
+              loader={({ src }) => src}
+              width={75}
+              height={75}
+              alt="Collection Logo"
+              src={
+                isError
+                  ? '/no-logo.png'
+                  : getCorrectLogo(marketplaceAsset?.assetId.split('/')[0]) ||
+                    '/no-logo.png'
+              }
+              onError={() => setIsError(true)}
+            />
+          </CardLogo>
         )}
       </LoaderWrapper>
       <GridItemFlex>

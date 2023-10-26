@@ -4,7 +4,6 @@ import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
-import { tipMobile } from '@/components/Tooltip/configs';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import {
@@ -35,7 +34,7 @@ import { formatAmount, toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useSkeleton } from '@/utils/hooks';
 import { parseAddress } from '@/utils/parseValues';
-import { passViewportStyles, typeVoteColors } from '@/utils/viewportStyles';
+import { typeVoteColors } from '@/utils/viewportStyles';
 import {
   BalanceContainer,
   BigSpan,
@@ -328,11 +327,6 @@ const ProposalDetails: React.FC = () => {
                   msg={
                     'Always check the address. Names can be the same across multiple addresses.'
                   }
-                  customStyles={passViewportStyles(
-                    isMobile,
-                    isTablet,
-                    tipMobile,
-                  )}
                 />
               </Row>
               <Row>

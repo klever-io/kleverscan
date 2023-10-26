@@ -125,6 +125,7 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
                 ...paramsStyles,
               )}
               msg={message}
+              maxVw={100}
             ></Tooltip>
           </span>
         );

@@ -170,12 +170,11 @@ export const Transfer: React.FC<IIndexedContract> = ({
               getTransferPercentageRoyalties() / 10 ** precision,
               precision,
             )}{' '}
-            {parameter?.assetId}
+            {parameter?.assetId}{' '}
+            <Tooltip
+              msg={`Charged a percentage amount from the sender\n when ${parameter?.assetId} is transferred to another account.`}
+            />
           </span>
-          &nbsp;
-          <Tooltip
-            msg={`Charged a percentage amount from the sender when ${parameter?.assetId} is transferred to another acount.`}
-          />
         </Row>
       );
     }
@@ -197,13 +196,13 @@ export const Transfer: React.FC<IIndexedContract> = ({
                 KLV_PRECISION,
               )}{' '}
               {'KLV'}
+              &nbsp;
+              <Tooltip
+                msg={`Charged from the sender a fixed amount of KLV\n  every time someone transfers ${
+                  parameter?.assetId?.split('/')[0]
+                } from one account to another.`}
+              />
             </span>
-            &nbsp;
-            <Tooltip
-              msg={`Charged from the sender a fixed amount of KLV  every time someone transfers ${
-                parameter?.assetId?.split('/')[0]
-              } from one account to another.`}
-            />
           </Row>
         );
       }
@@ -1078,7 +1077,9 @@ export const Delegate: React.FC<IIndexedContract> = ({
               </span>
               {claimReceipt.assetIdReceived === 'KLV' && <KLV />}
               {claimReceipt.assetIdReceived}
-              <Tooltip msg="Delegation generates an unfreeze contract, which will trigger the freeze contract rewards, if there are any." />
+              <Tooltip
+                msg={`Delegation generates an unfreeze contract,\n which will trigger the freeze contract rewards, if there are any.`}
+              />
             </CenteredRow>
           </span>
         </Row>

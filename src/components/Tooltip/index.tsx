@@ -8,6 +8,7 @@ interface ITooltipProps {
   Component?: React.FC;
   customStyles?: ICustomStyles;
   minMsgLength?: number;
+  maxVw?: number;
 }
 
 const Tooltip: React.FC<ITooltipProps> = ({
@@ -15,6 +16,7 @@ const Tooltip: React.FC<ITooltipProps> = ({
   Component,
   customStyles,
   minMsgLength = 0,
+  maxVw,
 }) => {
   const [displayMessage, setDisplayMessage] = useState(false);
   const parsedMsgs = msg.split('\n');
@@ -22,6 +24,7 @@ const Tooltip: React.FC<ITooltipProps> = ({
     <ToolTipSpan
       onMouseOver={() => setDisplayMessage(true)}
       onMouseLeave={() => setDisplayMessage(false)}
+      maxVw={maxVw}
     >
       {/* tooltip component probably will need a specific outside wrapper for each case  */}
       <>

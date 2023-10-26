@@ -25,7 +25,7 @@ const coinTablet = {
 export const coinStyles = [coinMobile, coinTablet];
 
 //proposals page network params
-const paramsMobile = { offset: { right: 200 }, place: 'left' as Place };
+const paramsMobile = { offset: { right: 170 }, place: 'left' as Place };
 const paramsTablet = { offset: { right: 200 }, place: 'left' as Place };
 const paramsDesktop = { offset: { left: 50 } };
 export const paramsStyles = [paramsMobile, paramsTablet, paramsDesktop];

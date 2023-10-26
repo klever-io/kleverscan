@@ -11,11 +11,11 @@ import { useContractModal } from '@/contexts/contractModal';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import {
-  processITOPrecisions,
+  parseITOs,
   requestAssetsList,
   requestITOss,
 } from '@/services/requests/ito';
-import { IAsset, IITO, IParsedITO } from '@/types';
+import { IParsedITO } from '@/types';
 import { IPackInfo } from '@/types/contracts';
 import {
   AssetContainer,
@@ -46,7 +46,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useInfiniteQuery, useQuery } from 'react-query';
+import { useInfiniteQuery } from 'react-query';
 
 export const displayITOpacks = (
   ITO: IParsedITO,
@@ -111,14 +111,19 @@ const ITOsPage: React.FC = () => {
 
   const {
     data,
-    fetchNextPage,
+    fetchNextPage: nextPageITOs,
     isFetching,
     hasNextPage,
-    isLoading: isLoadingITos,
-    refetch: refetchITos,
+    isLoading: isLoadingITOs,
+    refetch: refetchITOs,
   } = useInfiniteQuery(
     'ITOss',
-    ({ pageParam = 1 }) => requestITOss(router, pageParam),
+    async ({ pageParam = 1 }) => {
+      const dataITOs = await requestITOss(router, pageParam);
+      const assets = await requestAssetsList(dataITOs);
+      await parseITOs(dataITOs, assets);
+      return dataITOs;
+    },
     {
       getNextPageParam: lastPage => {
         if (lastPage) {
@@ -128,52 +133,18 @@ const ITOsPage: React.FC = () => {
           }
         }
       },
+      enabled: !!router.isReady,
     },
   );
+
   const itemsITOs = useMemo(() => {
     return data?.pages.reduce((acc, page) => {
       return [...acc, ...page.data.itos];
     }, []);
   }, [data]);
 
-  const {
-    data: assetsList,
-    isLoading: assetListLoading,
-    refetch: refetchAssetsList,
-    isFetching: isFetchingAssets,
-  } = useQuery({
-    queryKey: `assetList-${itemsITOs}`,
-    queryFn: () => requestAssetsList(itemsITOs as IITO[]),
-    enabled: !!itemsITOs,
-  });
-
-  useEffect(() => {
-    parseITOs();
-    refetchAssetsList();
-  }, [itemsITOs, isFetching, assetsList]);
-
-  const parseITOs = async (): Promise<IParsedITO | never[]> => {
-    if (itemsITOs && assetsList && !isFetchingAssets) {
-      const packsPrecisionCalls: Promise<IITO>[] = [];
-      itemsITOs.forEach((ITO: IITO, index: number) => {
-        const asset = assetsList.find(
-          (asset: IAsset) => asset.assetId === itemsITOs[index].assetId,
-        );
-        ITO.maxAmount = ITO.maxAmount / 10 ** asset.precision;
-        ITO['ticker'] = asset.ticker;
-        ITO['assetType'] = asset.assetType;
-        ITO['precision'] = asset.precision;
-        ITO['assetLogo'] = asset.logo;
-        packsPrecisionCalls.push(processITOPrecisions(ITO, asset.precision));
-      });
-      await Promise.allSettled(packsPrecisionCalls);
-    }
-    return [];
-  };
-
   const requestWithLoading = async () => {
-    refetchITos();
-    refetchAssetsList();
+    refetchITOs();
   };
 
   useEffect(() => {
@@ -204,8 +175,7 @@ const ITOsPage: React.FC = () => {
       pathname: router.pathname,
       query: { ...router.query, asset: value },
     });
-    refetchITos();
-    refetchAssetsList();
+    refetchITOs();
   };
 
   const filters: IFilter[] = [
@@ -226,6 +196,7 @@ const ITOsPage: React.FC = () => {
             shallow: true,
           },
         );
+        refetchITOs();
       },
       current: getActive(),
       inputType: 'button',
@@ -263,7 +234,7 @@ const ITOsPage: React.FC = () => {
               }}
               dataLength={itemsITOs?.length || 0}
               next={() => {
-                fetchNextPage();
+                nextPageITOs();
               }}
               hasMore={!!hasNextPage}
               loader={<Loader />}
@@ -386,14 +357,14 @@ const ITOsPage: React.FC = () => {
                 </HashContent>
               )}
 
-              {selectedITO && !isLoadingITos ? (
+              {selectedITO && !isLoadingITOs ? (
                 displayITO()
               ) : (
                 <ChooseAsset>
-                  {!selectedITO && !isLoadingITos && (
+                  {!selectedITO && !isLoadingITOs && (
                     <span>Choose an asset</span>
                   )}
-                  {isLoadingITos && <Loader height={70} width={100} />}
+                  {isLoadingITOs && <Loader height={70} width={100} />}
                 </ChooseAsset>
               )}
             </div>

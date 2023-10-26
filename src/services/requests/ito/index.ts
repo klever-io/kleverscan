@@ -1,5 +1,5 @@
 import api from '@/services/api';
-import { IAsset, IITO, IParsedITO } from '@/types';
+import { IAsset, IITO, IITOResponse } from '@/types';
 import { getPrecision } from '@/utils/precisionFunctions';
 import { NextRouter } from 'next/router';
 
@@ -23,10 +23,12 @@ export const requestITOss = async (
   return;
 };
 
-export const requestAssetsList = async (data: IITO[]): Promise<any | void> => {
+export const requestAssetsList = async (
+  data: IITOResponse,
+): Promise<any | void> => {
   if (data) {
     try {
-      const assetsInput: string = data
+      const assetsInput: string = data.data.itos
         .map((ITO: IITO) => ITO.assetId)
         .join(',');
 
@@ -57,18 +59,14 @@ export const processITOPrecisions = async (
 };
 
 export const parseITOs = async (
-  ITOs: IITO[],
-): Promise<IParsedITO | never[]> => {
-  const assetsInput: string = ITOs.map(ITO => ITO.assetId).join(',');
-  const packsPrecisionCalls: Promise<IITO>[] = [];
-  const res = await api.get({
-    route: `assets/list?asset=${assetsInput}`,
-  });
-  if (!res.error || res.error === '') {
-    const assets = res.data.assets;
-    ITOs.forEach((ITO, index) => {
-      const asset = assets.find(
-        (asset: IAsset) => asset.assetId === ITOs[index].assetId,
+  itemsITOs: IITOResponse,
+  assetsList: any[],
+): Promise<void> => {
+  if (itemsITOs && assetsList) {
+    const packsPrecisionCalls: Promise<IITO>[] = [];
+    itemsITOs.data.itos.forEach((ITO: IITO, index: number) => {
+      const asset = assetsList.find(
+        (asset: IAsset) => asset.assetId === itemsITOs.data.itos[index].assetId,
       );
       ITO.maxAmount = ITO.maxAmount / 10 ** asset.precision;
       ITO['ticker'] = asset.ticker;
@@ -79,5 +77,4 @@ export const parseITOs = async (
     });
     await Promise.allSettled(packsPrecisionCalls);
   }
-  return [];
 };

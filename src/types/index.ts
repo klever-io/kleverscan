@@ -893,7 +893,7 @@ export interface IHoldersResponse extends IResponse {
 
 export interface IITOResponse extends IResponse {
   data: {
-    ito: IITO;
+    itos: IITO[];
   };
   pagination: IPagination;
 }

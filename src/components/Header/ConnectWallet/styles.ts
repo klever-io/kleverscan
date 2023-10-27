@@ -5,7 +5,7 @@ import styled, { css, keyframes } from 'styled-components';
 
 export const ConnectButton = styled.div<{
   walletAddress?: boolean;
-  loading?: boolean;
+  $loading?: boolean;
 }>`
   max-width: 15rem;
   width: 100%;
@@ -46,8 +46,8 @@ export const ConnectButton = styled.div<{
     filter: brightness(1.2);
   }
 
-  ${({ loading }) =>
-    loading &&
+  ${({ $loading }) =>
+    $loading &&
     css`
       overflow: hidden;
       &&::before {

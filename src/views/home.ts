@@ -544,7 +544,7 @@ export const TransactionEmpty = styled(TransactionRow)`
   }
 `;
 
-export const TransactionData = styled.div<{ loading?: boolean }>`
+export const TransactionData = styled.div<{ $loading?: boolean }>`
   width: 100%;
   color: ${props =>
     props.theme.dark ? props.theme.black : props.theme.darkBlue};
@@ -576,7 +576,7 @@ export const TransactionData = styled.div<{ loading?: boolean }>`
 
   p {
     ${props =>
-      props.loading &&
+      props.$loading &&
       css`
         max-width: 15rem;
       `}
@@ -801,9 +801,9 @@ export const HomeLoaderContainer = styled.div`
 
 export const ArrowData = styled(ArrowUpSquare).attrs(props => ({
   size: 17,
-}))<{ positive: boolean }>`
-  color: ${({ positive, theme }) => (positive ? theme.green : theme.red)};
-  rotate: ${({ positive }) => (positive ? '0' : '180deg')};
+}))<{ $positive: boolean }>`
+  color: ${({ $positive, theme }) => ($positive ? theme.green : theme.red)};
+  rotate: ${({ $positive }) => ($positive ? '0' : '180deg')};
 `;
 
 export const ExpandData = styled.div`
@@ -917,18 +917,18 @@ export const ViewMoreContainer = styled.div`
 `;
 
 export const ArrowDownDataCards = styled(ArrowDownSquare)<{
-  expanded: boolean;
+  $expanded: boolean;
 }>`
-  rotate: ${({ expanded }) => (expanded ? 180 : 0)}deg;
+  rotate: ${({ $expanded }) => ($expanded ? 180 : 0)}deg;
   path {
     fill: ${({ theme }) => theme.black};
   }
 `;
 
 export const ArrowUpSquareHideMenu = styled(LineArrowUpSquare)<{
-  hide: boolean;
+  $hide: boolean;
 }>`
-  rotate: ${({ hide }) => (hide ? 180 : 0)}deg;
+  rotate: ${({ $hide }) => ($hide ? 180 : 0)}deg;
 
   path {
     fill: ${({ theme }) => theme.black};
@@ -1004,8 +1004,8 @@ export const Last24Text = styled.div`
   margin-left: 0.1rem;
 `;
 
-export const VariationText = styled.div<{ positive: boolean }>`
-  color: ${props => (props.positive ? props.theme.green : props.theme.red)};
+export const VariationText = styled.div<{ $positive: boolean }>`
+  color: ${props => (props.$positive ? props.theme.green : props.theme.red)};
   display: flex;
   gap: 0.3rem;
   align-items: center;

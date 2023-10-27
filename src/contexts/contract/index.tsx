@@ -106,7 +106,7 @@ export const ContractProvider: React.FC = ({ children }) => {
   const kdaFee = useRef<ICollectionList>({} as ICollectionList);
   const [permID, setPermID] = useState<number>(0);
 
-  const { queue, totalFees } = useMulticontract();
+  const { queue, totalFees, selectedContractType } = useMulticontract();
 
   const { setWarningOpen, setShowPayloadOpen } = useModal();
 
@@ -443,6 +443,15 @@ export const ContractProvider: React.FC = ({ children }) => {
         const response = await web.broadcastTransactions([signedTx]);
         setTxHash(response.data.txsHashes[0]);
         toast.success('Transaction broadcast successfully');
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'send_transaction', {
+            event_category: 'transaction',
+            event_label: 'send_transaction',
+            hash: response.data.txsHashes[0],
+            sender: senderAccount,
+            transaction_type: selectedContractType,
+          });
+        }
       }
     } catch (e: any) {
       console.warn(`%c ${e}`, 'color: red');

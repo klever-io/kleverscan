@@ -15,7 +15,7 @@ import {
   requestAssetsList,
   requestITOs,
 } from '@/services/requests/ito';
-import { IParsedITO } from '@/types';
+import { IITOsResponse, IParsedITO } from '@/types';
 import { IPackInfo } from '@/types/contracts';
 import {
   AssetContainer,
@@ -44,7 +44,7 @@ import {
 } from '@/views/itos';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useInfiniteQuery } from 'react-query';
 
@@ -109,6 +109,21 @@ const ITOsPage: React.FC = () => {
 
   const { getInteractionsButtons } = useContractModal();
 
+  const requestInfiniteQuery = async ({ pageParam = 1 }) => {
+    const dataITOs = await requestITOs(router, pageParam);
+    const assets = await requestAssetsList(dataITOs);
+    await parseITOsRequest(dataITOs, assets);
+    return dataITOs;
+  };
+
+  const nextPageRequest = (lastPage: IITOsResponse) => {
+    if (lastPage) {
+      const { self, totalPages } = lastPage?.pagination;
+      if (totalPages > self) {
+        return self + 1;
+      }
+    }
+  };
   const {
     data,
     fetchNextPage: nextPageITOs,
@@ -116,32 +131,14 @@ const ITOsPage: React.FC = () => {
     hasNextPage,
     isLoading: isLoadingITOs,
     refetch: refetchITOs,
-  } = useInfiniteQuery(
-    'ITOss',
-    async ({ pageParam = 1 }) => {
-      const dataITOs = await requestITOs(router, pageParam);
-      const assets = await requestAssetsList(dataITOs);
-      await parseITOsRequest(dataITOs, assets);
-      return dataITOs;
-    },
-    {
-      getNextPageParam: lastPage => {
-        if (lastPage) {
-          const { self, totalPages } = lastPage?.pagination;
-          if (totalPages > self) {
-            return self + 1;
-          }
-        }
-      },
-      enabled: !!router.isReady,
-    },
-  );
+  } = useInfiniteQuery('ITOss', requestInfiniteQuery, {
+    getNextPageParam: nextPageRequest,
+    enabled: !!router.isReady,
+  });
 
-  const itemsITOs = useMemo(() => {
-    return data?.pages.reduce((acc, page) => {
-      return [...acc, ...page.data.itos];
-    }, []);
-  }, [data]);
+  const itemsITOs = data?.pages.reduce((acc: any, page) => {
+    return [...acc, ...page.data.itos];
+  }, []);
 
   const requestWithLoading = async () => {
     refetchITOs();

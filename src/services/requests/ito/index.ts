@@ -26,7 +26,7 @@ export const requestITOs = async (
 export const requestAssetsList = async (
   data: IITOsResponse,
 ): Promise<any | void> => {
-  if (data) {
+  if (data.data.itos.length !== 0) {
     try {
       const assetsInput: string = data.data.itos
         .map((ITO: IITO) => ITO.assetId)

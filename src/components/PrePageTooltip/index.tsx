@@ -64,6 +64,10 @@ const getInputType = (value: string) => {
   if (value.length >= 8 && value.length <= 15) {
     return 'asset';
   }
+
+  if (value.length < 8) {
+    return 'asset';
+  }
 };
 
 const PrePageTooltip: React.FC<IPrePageTooltip> = ({
@@ -76,14 +80,14 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
   const type = getInputType(trimmedSearch);
   const { isDarkTheme } = useTheme();
   const canSearch = () => {
-    if (trimmedSearch === '' || !trimmedSearch || !type) {
+    if (!type) {
       return false;
     }
     return true;
   };
   const canSearchResult = canSearch();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: trimmedSearch,
     queryFn: () => getCorrectQueryFn(),
     enabled: canSearchResult,

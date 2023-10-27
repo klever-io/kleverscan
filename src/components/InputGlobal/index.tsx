@@ -48,9 +48,7 @@ const Input: React.FC<InputGlobal> = ({
     if (error) {
       setError(false);
     }
-    if (showTooltip) {
-      setShowTooltip(false);
-    }
+    setShowTooltip(true);
     setSearch(event.target.value);
   };
 

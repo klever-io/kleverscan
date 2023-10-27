@@ -53,7 +53,7 @@ const Blocks: React.FC<IBlocks> = () => {
     'statisticsCall',
     totalStatisticsCall,
   );
-  const { data: blocksStatsYesterday } = useQuery(
+  const { data: blocksStatsYesterday, refetch } = useQuery(
     'yesterdayStatisticsCall',
     yesterdayStatisticsCall,
   );
@@ -64,6 +64,15 @@ const Blocks: React.FC<IBlocks> = () => {
       setBlocksInterval(blocksWatcherInterval);
     } else {
       setBlocksInterval(0);
+    }
+  }, [blocksInterval]);
+
+  useEffect(() => {
+    if (blocksInterval) {
+      const intervalId = setInterval(() => {
+        refetch();
+      }, blocksWatcherInterval);
+      return () => clearInterval(intervalId);
     }
   }, [blocksInterval]);
 

@@ -41,6 +41,7 @@ export interface IPrePageTooltip {
   search: string;
   setShowTooltip: React.Dispatch<React.SetStateAction<boolean>>;
   isInHomePage: boolean;
+  handleSearch: (value: string) => void;
 }
 
 const getInputType = (value: string) => {
@@ -61,11 +62,7 @@ const getInputType = (value: string) => {
   if (value.toUpperCase() === 'KLV' || value.toUpperCase() === 'KFI') {
     return 'asset';
   }
-  if (value.length >= 8 && value.length <= 15) {
-    return 'asset';
-  }
-
-  if (value.length < 8) {
+  if (value.length <= 15) {
     return 'asset';
   }
 };
@@ -74,6 +71,7 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
   search,
   setShowTooltip,
   isInHomePage,
+  handleSearch,
 }) => {
   const [precision, setPrecision] = useState(0);
   const trimmedSearch = search.trim().toLowerCase();
@@ -81,6 +79,7 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
   const { isDarkTheme } = useTheme();
   const canSearch = () => {
     if (!type) {
+      handleSearch('');
       return false;
     }
     return true;
@@ -93,6 +92,9 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
     enabled: canSearchResult,
   });
 
+  if (!isLoading && canSearchResult && !data?.data) {
+    handleSearch('');
+  }
   const isAsset = () => {
     if (type === 'asset') {
       return true;
@@ -141,6 +143,7 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
         data as IAssetResponse,
         precision,
         setShowTooltip,
+        handleSearch,
       );
     }
 
@@ -149,6 +152,7 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
         data as IAccountResponse,
         precision,
         setShowTooltip,
+        handleSearch,
       );
     }
 
@@ -157,6 +161,7 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
         data as ITransactionResponse,
         precision,
         setShowTooltip,
+        handleSearch,
       );
     }
 
@@ -165,6 +170,7 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
         data as IBlockResponse,
         precision,
         setShowTooltip,
+        handleSearch,
       );
     }
     return [];

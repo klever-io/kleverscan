@@ -45,7 +45,7 @@ export interface IBaseFormInputProps
   customOnChange?: (e: any) => void;
   logoError?: string | null;
   handleScrollBottom?: () => void;
-  watchChange?: any;
+  dynamicInitialValue?: any;
 }
 
 export interface IFormInputProps extends IBaseFormInputProps {
@@ -113,7 +113,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   precision = 8,
   logoError = null,
   handleScrollBottom,
-  watchChange,
+  dynamicInitialValue,
   ...rest
 }) => {
   const areaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -137,8 +137,8 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   }
 
   useEffect(() => {
-    name && setValue(name, watchChange);
-  }, [watchChange]);
+    name && setValue(name, dynamicInitialValue);
+  }, [dynamicInitialValue]);
 
   const inputValue = name && watch(name);
 

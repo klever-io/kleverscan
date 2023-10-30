@@ -21,7 +21,7 @@ export const Content = styled.div`
   min-height: 36rem;
   overflow: auto;
   overflow-x: hidden;
-  padding: 0.4rem;
+  padding: 1rem;
   max-width: 95vw;
   min-width: 60vw;
   border-radius: 1rem;

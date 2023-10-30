@@ -13,24 +13,30 @@ interface ITheme {
 
 export const ThemeContext = createContext({} as ITheme);
 
+const setDarkThemePreference = (isDark: boolean) => {
+  localStorage.setItem('isDarkTheme', String(isDark));
+};
+
 export const InternalThemeProvider: React.FC = ({ children }) => {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
 
   useEffect(() => {
-    const isDarkTheme = localStorage.getItem('isDarkTheme');
-    if (isDarkTheme === 'true') {
+    const storedIsDarkTheme = localStorage.getItem('isDarkTheme');
+    if (storedIsDarkTheme === 'true') {
       setIsDarkTheme(true);
-    } else if (isDarkTheme === null) {
+    } else if (storedIsDarkTheme === null) {
       const prefersDarkMode = window.matchMedia(
         '(prefers-color-scheme: dark)',
       ).matches;
+      setDarkThemePreference(prefersDarkMode);
       setIsDarkTheme(prefersDarkMode);
     }
   }, []);
 
   const toggleDarkTheme = () => {
-    setIsDarkTheme(!isDarkTheme);
-    localStorage.setItem('isDarkTheme', String(!isDarkTheme));
+    const newIsDarkTheme = !isDarkTheme;
+    setIsDarkTheme(newIsDarkTheme);
+    setDarkThemePreference(newIsDarkTheme);
   };
 
   const values: ITheme = {

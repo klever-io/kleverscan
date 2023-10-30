@@ -112,7 +112,7 @@ const getAssetTriggerForm = (
             name="receiver"
             title="Receiver"
             required
-            watchChange={walletAddress}
+            dynamicInitialValue={walletAddress}
             tooltip={tooltip.receiver}
           />
           <FormInput name="amount" title="Amount" type="number" required />
@@ -131,7 +131,7 @@ const getAssetTriggerForm = (
             name="receiver"
             title="Receiver"
             required
-            watchChange={walletAddress}
+            dynamicInitialValue={walletAddress}
             tooltip={tooltip.receiver}
           />
           <FormInput name="amount" title="Amount" type="number" required />
@@ -148,7 +148,7 @@ const getAssetTriggerForm = (
             name="receiver"
             title="Receiver"
             required
-            watchChange={walletAddress}
+            dynamicInitialValue={walletAddress}
             tooltip={tooltip.receiver}
           />
         </FormSection>
@@ -162,7 +162,7 @@ const getAssetTriggerForm = (
             name="receiver"
             title="Receiver"
             required
-            watchChange={walletAddress}
+            dynamicInitialValue={walletAddress}
             tooltip={tooltip.receiver}
           />
         </FormSection>
@@ -179,7 +179,7 @@ const getAssetTriggerForm = (
             name="receiver"
             title="NFT Holder Address"
             required
-            watchChange={walletAddress}
+            dynamicInitialValue={walletAddress}
             tooltip={tooltip.receiver}
           />
           <FormInput
@@ -216,7 +216,7 @@ const getAssetTriggerForm = (
             name="receiver"
             title="Receiver"
             required
-            watchChange={walletAddress}
+            dynamicInitialValue={walletAddress}
             tooltip={tooltip.receiver}
           />
         </FormSection>
@@ -241,7 +241,7 @@ const getAssetTriggerForm = (
           <FormInput
             name="kdaPool.adminAddress"
             title="Admin Address"
-            watchChange={walletAddress}
+            dynamicInitialValue={walletAddress}
             required
           />
           <FormInput
@@ -256,7 +256,7 @@ const getAssetTriggerForm = (
             title="Active"
             type="checkbox"
             toggleOptions={['No', 'Yes']}
-            defaultValue={true}
+            dynamicInitialValue={true}
             bool
             tooltip={tooltip.updateKdaPool.active}
           />

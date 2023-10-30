@@ -130,7 +130,7 @@ const BasicInfoSection: React.FC<ISectionProps> = ({ isNFT }) => {
         name="ownerAddress"
         title="Owner Address"
         required
-        watchChange={walletAddress}
+        dynamicInitialValue={walletAddress}
       />
       {!isNFT && (
         <FormInput
@@ -243,7 +243,7 @@ export const RoyaltiesSection: React.FC<ISectionProps> = props => {
         title="Address"
         span={2}
         tooltip={tooltip.royalties.address}
-        watchChange={walletAddress}
+        dynamicInitialValue={walletAddress}
         required
       />
       {isNFT && (
@@ -578,7 +578,7 @@ const PropertiesSection: React.FC = () => {
         title="Freeze"
         type="checkbox"
         toggleOptions={['No', 'Yes']}
-        watchChange={true}
+        dynamicInitialValue={true}
         tooltip={tooltip.properties.canFreeze}
       />
       <FormInput
@@ -586,7 +586,7 @@ const PropertiesSection: React.FC = () => {
         title="Wipe"
         type="checkbox"
         toggleOptions={['No', 'Yes']}
-        watchChange={false}
+        dynamicInitialValue={false}
         tooltip={tooltip.properties.canWipe}
       />
       <FormInput
@@ -594,7 +594,7 @@ const PropertiesSection: React.FC = () => {
         title="Pause"
         type="checkbox"
         toggleOptions={['No', 'Yes']}
-        watchChange={true}
+        dynamicInitialValue={true}
         tooltip={tooltip.properties.canPause}
       />
       <FormInput
@@ -602,7 +602,7 @@ const PropertiesSection: React.FC = () => {
         title="Mint"
         type="checkbox"
         toggleOptions={['No', 'Yes']}
-        watchChange={true}
+        dynamicInitialValue={true}
         tooltip={tooltip.properties.canMint}
       />
       <FormInput
@@ -610,7 +610,7 @@ const PropertiesSection: React.FC = () => {
         title="Burn"
         type="checkbox"
         toggleOptions={['No', 'Yes']}
-        watchChange={true}
+        dynamicInitialValue={true}
         tooltip={tooltip.properties.canBurn}
       />
       <FormInput
@@ -618,7 +618,7 @@ const PropertiesSection: React.FC = () => {
         title="Change Owner"
         type="checkbox"
         toggleOptions={['No', 'Yes']}
-        watchChange={true}
+        dynamicInitialValue={true}
         tooltip={tooltip.properties.canChangeOwner}
       />
       <FormInput
@@ -626,7 +626,7 @@ const PropertiesSection: React.FC = () => {
         title="Add Roles"
         type="checkbox"
         toggleOptions={['No', 'Yes']}
-        watchChange={true}
+        dynamicInitialValue={true}
         tooltip={tooltip.properties.canAddRoles}
       />
     </FormSection>

@@ -44,7 +44,7 @@ const CreateValidator: React.FC<IContractProps> = ({
         <FormInput
           name="address"
           title="Owner Address"
-          watchChange={walletAddress}
+          dynamicInitialValue={walletAddress}
           required
         />
         <FormInput name="blsPublicKey" title="BLS Public Key" required />

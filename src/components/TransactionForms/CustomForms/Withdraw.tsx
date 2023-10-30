@@ -46,7 +46,7 @@ const Withdraw: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
                 tooltip="Amount to be withdrawn from the pool"
               />
               <FormInput
-                name="currencyId"
+                name="currencyId" // although the doc says it is currencyID, using currencyId still works, changing it now will break many things
                 title="Currency ID"
                 tooltip="Asset to be withdrawn from the pool"
               />

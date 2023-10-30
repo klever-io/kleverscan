@@ -42,7 +42,7 @@ const CreateValidator: React.FC<IContractProps> = ({
       <FormSection>
         <FormInput name="name" title="Validator Name" required />
         <FormInput
-          name="address"
+          name="ownerAddress"
           title="Owner Address"
           watchChange={walletAddress}
           required

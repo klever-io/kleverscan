@@ -96,7 +96,7 @@ const MainSection: React.FC<ISectionProps> = ({
         name="receiverAddress"
         title="Receiver Address"
         span={2}
-        watchChange={walletAddress}
+        dynamicInitialValue={walletAddress}
         tooltip={tooltip.receiverAddress}
         required
       />

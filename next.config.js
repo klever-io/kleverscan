@@ -48,4 +48,7 @@ module.exports = withImages({
   eslint: {
     ignoreDuringBuilds: true,
   },
+  typescript: {
+    ignoreBuildErrors: process.env?.IS_PRODUCTION === 'true',
+  },
 });

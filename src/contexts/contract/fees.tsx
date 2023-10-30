@@ -14,7 +14,10 @@ interface IFees {
 export const FeeContext = createContext({} as IFees);
 
 export const FeesProvider: React.FC = ({ children }) => {
-  const { data: paramsList } = useQuery('paramsList', getParamsList);
+  const { data: paramsList } = useQuery(
+    'feesProviderParamsList',
+    getParamsList,
+  );
 
   const getKappFee = (contractType: string) => {
     return (

@@ -87,7 +87,7 @@ export const dataNetworkParams = async (): Promise<
     const res = await api.get({
       route: 'network/network-parameters',
     });
-    return res;
+    return res?.data?.parameters;
   } catch (error) {
     console.error(error);
   }

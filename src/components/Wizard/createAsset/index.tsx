@@ -594,7 +594,9 @@ export const CreateAssetFourthStep: React.FC<IAssetInformations> = ({
             />
           </div>
         )}
-        {!isTablet && !isMobile && <AddressValidationIcon error={error} />}
+        {!isTablet && !isMobile && changeOwnerAddress && (
+          <AddressValidationIcon error={error} />
+        )}
       </ChangedAddressContainer>
       <ConnectButtonComponent />
       <ButtonsComponent buttonsProps={buttonsProps} />

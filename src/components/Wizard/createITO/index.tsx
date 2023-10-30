@@ -282,7 +282,9 @@ export const CreateITOThirdStep: React.FC<IAssetITOInformations> = ({
             />
           </div>
         )}
-        {!isTablet && !isMobile && <AddressValidationIcon error={error} />}
+        {!isTablet && !isMobile && changeReceiveAddress && (
+          <AddressValidationIcon error={error} />
+        )}
       </ChangedAddressContainer>
       <ButtonsComponent buttonsProps={buttonsProps} />
     </GenericCardContainer>

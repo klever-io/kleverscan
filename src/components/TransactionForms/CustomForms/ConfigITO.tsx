@@ -183,7 +183,7 @@ export const WhitelistSection: React.FC = () => {
         <span>Whitelist</span>
       </SectionTitle>
       {fields.map((field, index) => (
-        <FormSection key={field.id} inner>
+        <FormSection key={field.id} inner style={{ top: '2.5rem' }}>
           <SectionTitle>
             <HiTrash onClick={() => remove(index)} />
             Whitelisted Address {index + 1}
@@ -243,7 +243,7 @@ export const PackInfoSection: React.FC = () => {
         const currencyId = watch(`packInfo[${index}].currencyId`);
 
         return (
-          <FormSection key={field.id} inner>
+          <FormSection key={field.id} inner style={{ top: '2.5rem' }}>
             <SectionTitle>
               <HiTrash onClick={() => removePackInfo(index)} />
               Pack Info for {getOrder(index + 1)} Currency{' '}

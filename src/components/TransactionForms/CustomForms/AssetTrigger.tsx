@@ -284,6 +284,7 @@ export const AddRoleSection: React.FC = () => {
         </TooltipContainer>
       </SectionTitle>
       <FormInput
+        paddingTop={true}
         name={`role.address`}
         title={`Address`}
         span={2}

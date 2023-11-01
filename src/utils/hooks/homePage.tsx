@@ -92,7 +92,7 @@ export const useHomePageData = (): IHome => {
       const blocksCall = new Promise<IBlockResponse>(
         async (resolve, reject) => {
           const res = await api.get({
-            route: 'block/list?minify=true',
+            route: '/node/aggregate?blockMinified=false',
           });
 
           if (!res.error || res.error === '') {

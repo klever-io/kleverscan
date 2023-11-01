@@ -22,6 +22,7 @@ import {
   AccountRowSections,
   AssetRowSections,
   BlockRowSections,
+  setSessionStorage,
   TransactionRowSections,
 } from './RowSections';
 import {
@@ -41,7 +42,6 @@ export interface IPrePageTooltip {
   search: string;
   setShowTooltip: React.Dispatch<React.SetStateAction<boolean>>;
   isInHomePage: boolean;
-  handleSearch: (value: string) => void;
 }
 
 const getInputType = (value: string) => {
@@ -71,15 +71,14 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
   search,
   setShowTooltip,
   isInHomePage,
-  handleSearch,
 }) => {
   const [precision, setPrecision] = useState(0);
   const trimmedSearch = search.trim().toLowerCase();
   const type = getInputType(trimmedSearch);
   const { isDarkTheme } = useTheme();
   const canSearch = () => {
-    if (!type) {
-      handleSearch('');
+    if (trimmedSearch === '' || !trimmedSearch || !type) {
+      setSessionStorage('');
       return false;
     }
     return true;
@@ -93,8 +92,9 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
   });
 
   if (!isLoading && canSearchResult && !data?.data) {
-    handleSearch('');
+    setSessionStorage('');
   }
+
   const isAsset = () => {
     if (type === 'asset') {
       return true;
@@ -143,7 +143,6 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
         data as IAssetResponse,
         precision,
         setShowTooltip,
-        handleSearch,
       );
     }
 
@@ -152,7 +151,6 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
         data as IAccountResponse,
         precision,
         setShowTooltip,
-        handleSearch,
       );
     }
 
@@ -161,7 +159,6 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
         data as ITransactionResponse,
         precision,
         setShowTooltip,
-        handleSearch,
       );
     }
 
@@ -170,7 +167,6 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
         data as IBlockResponse,
         precision,
         setShowTooltip,
-        handleSearch,
       );
     }
     return [];

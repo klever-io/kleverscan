@@ -18,7 +18,6 @@ const Input: React.FC<InputGlobal> = ({
 }) => {
   const [search, setSearch] = useState('');
   const [error, setError] = useState(false);
-  const [linkPage, setLinkPage] = useState('');
   const [showTooltip, setShowTooltip] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation('common');
@@ -50,16 +49,13 @@ const Input: React.FC<InputGlobal> = ({
       setError(false);
     }
     setShowTooltip(true);
-    setSearch(event.target.value.trim().toLowerCase());
+    setSearch(event.target.value);
   };
 
-  const handleSearch = (value: string) => {
-    setLinkPage(value);
-  };
-
-  const keyDownHandle = (event: KeyboardEvent) => {
-    if (event.key === 'Enter') {
-      if (linkPage !== '') router.push(linkPage);
+  const handleSearch = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.type === 'click') {
+      const link = sessionStorage.getItem('linkSearch') || '';
+      if (link !== '') router.push(link);
     }
   };
 
@@ -69,13 +65,8 @@ const Input: React.FC<InputGlobal> = ({
 
   const handleTooltipFocus = (e: any) => {
     if (!(e.target.id === 'PrePageTooltip' || e.target.id === 'SearchIcon')) {
-      // if (inputRef.current !== null) inputRef.current.value = '';
       setShowTooltip(false);
     }
-  };
-
-  const handleClick = () => {
-    setShowTooltip(true);
   };
 
   const containerProps = {
@@ -88,9 +79,8 @@ const Input: React.FC<InputGlobal> = ({
     ref: inputRef,
     placeholder,
     onChange: handleInput,
-    onKeyDown: keyDownHandle,
+    onKeyDown: handleSearch,
     setOpenSearch: setOpenSearch,
-    onClick: handleClick,
   };
 
   return (
@@ -105,7 +95,6 @@ const Input: React.FC<InputGlobal> = ({
               id="FocusBackground"
             />
             <PrePageTooltip
-              handleSearch={handleSearch}
               search={search}
               setShowTooltip={setShowTooltip}
               isInHomePage={containerProps.isInHomePage}

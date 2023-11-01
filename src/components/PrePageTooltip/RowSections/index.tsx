@@ -49,15 +49,18 @@ const getRedirectButton = (
   </div>
 );
 
+export const setSessionStorage = (link: string): void => {
+  sessionStorage.setItem('linkSearch', link);
+};
+
 export const TransactionRowSections = (
   res: ITransactionResponse,
   precision: number,
   setShowTooltip: React.Dispatch<SetStateAction<boolean>>,
-  handleSearch: (value: string) => void,
 ): IRowSection[] => {
   if (res.data || res.error === '') {
     const { transaction } = res.data;
-    handleSearch(`/transaction/${transaction.hash}`);
+    setSessionStorage(`/transaction/${transaction.hash}`);
     const getTxStatus = () => {
       if (transaction.status === 'success') {
         const Status = getStatusIcon('success');
@@ -176,11 +179,10 @@ export const AssetRowSections = (
   res: IAssetResponse,
   precision: number,
   setShowTooltip: React.Dispatch<SetStateAction<boolean>>,
-  handleSearch: (value: string) => void,
 ): IRowSection[] => {
   if (res.data || res.error === '') {
     const { asset } = res.data;
-    handleSearch(`/asset/${asset.assetId}`);
+    setSessionStorage(`/asset/${asset.assetId}`);
     return [
       {
         element: (
@@ -257,7 +259,6 @@ export const AccountRowSections = (
   res: IAccountResponse,
   precision: number,
   setShowTooltip: React.Dispatch<SetStateAction<boolean>>,
-  handleSearch: (value: string) => void,
 ): IRowSection[] => {
   if (res.data || res.error === '') {
     const { account } = res.data;
@@ -271,7 +272,7 @@ export const AccountRowSections = (
       }
       return otherAssets + KLV;
     };
-    handleSearch(`/account/${account.address}`);
+    setSessionStorage(`/account/${account.address}`);
     return [
       {
         element: (
@@ -350,17 +351,16 @@ export const BlockRowSections = (
   res: IAccountResponse,
   precision: number,
   setShowTooltip: React.Dispatch<React.SetStateAction<boolean>>,
-  handleSearch: (value: string) => void,
 ): IRowSection[] => {
   if (res.data || res.error === '') {
     const { block } = res.data;
     const date = formatDate(block.timestamp);
-    handleSearch(`/block/${block.nonce}`);
+    setSessionStorage(`/block/${block.nonce}`);
     return [
       {
         element: (
           <TitleWrapper>
-            <TitleSpan>Block Summaryy</TitleSpan>
+            <TitleSpan>Block Summary</TitleSpan>
             {getRedirectButton(`/block/${block.nonce}`, setShowTooltip)}
           </TitleWrapper>
         ),

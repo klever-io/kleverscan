@@ -93,7 +93,7 @@ const getITOTriggerForm = (
             name="receiverAddress"
             title="Receiver Address"
             span={2}
-            watchChange={walletAddress}
+            dynamicInitialValue={walletAddress}
             tooltip={tooltip.receiverAddress}
             required
           />

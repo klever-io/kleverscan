@@ -1,4 +1,4 @@
-import { WizardLeftArrow, WizardRightArrow } from '@/assets/icons';
+import { WizardLeftArrow } from '@/assets/icons';
 import Select from '@/components/Contract/Select';
 import { statusOptions } from '@/components/TransactionForms/CustomForms/ConfigITO';
 import { KDASelect } from '@/components/TransactionForms/KDASelect';
@@ -12,7 +12,11 @@ import { useFieldArray, useFormContext } from 'react-hook-form';
 import { FiPlusSquare } from 'react-icons/fi';
 import { IoArrowForward } from 'react-icons/io5';
 import { useQuery } from 'react-query';
-import { ButtonsComponent, IWizardComponents } from '../createAsset';
+import {
+  ButtonsComponent,
+  ConnectButtonComponent,
+  IWizardComponents,
+} from '../createAsset';
 import {
   AddressesContainer,
   BackArrowSpan,
@@ -36,6 +40,7 @@ import {
   WizardButton,
   WizardConfirmLogo,
   WizardFailAddressCheck,
+  WizardRightArrowSVG,
 } from '../createAsset/styles';
 import { checkEmptyField } from '../utils';
 
@@ -110,6 +115,7 @@ export const CreateITOSecondStep: React.FC<IAssetITOInformations> = ({
         <p>{description}</p>
         <ErrorInputContainer>
           <KDASelect required />
+          <ConnectButtonComponent />
           {error && <ErrorMessage>{error?.message}</ErrorMessage>}
         </ErrorInputContainer>
       </div>
@@ -275,7 +281,9 @@ export const CreateITOThirdStep: React.FC<IAssetITOInformations> = ({
             />
           </div>
         )}
-        {!isTablet && !isMobile && <AddressValidationIcon error={error} />}
+        {!isTablet && !isMobile && changeReceiveAddress && (
+          <AddressValidationIcon error={error} />
+        )}
       </ChangedAddressContainer>
       <ButtonsComponent buttonsProps={buttonsProps} />
     </GenericCardContainer>
@@ -531,10 +539,11 @@ export const CreatePackInfoSteps: React.FC<IAssetITOInformations> = ({
       <div>
         <p>Would you like to enable and configure Pack Info for now?</p>
         <ButtonsContainer>
-          <WizardButton centered onClick={() => setPackInfo(true)}>
+          <WizardButton infoStep centered onClick={() => setPackInfo(true)}>
             Yes
           </WizardButton>
           <WizardButton
+            infoStep
             secondary
             centered
             onClick={() => handleStep(prev => prev + 1)}
@@ -652,7 +661,7 @@ const CreatePackCurrencyID: React.FC<IWizardComponents> = ({
               isHidden={fields.length <= 1}
             >
               <span>Next</span>
-              <WizardRightArrow />
+              <WizardRightArrowSVG />
             </BorderedButton>
           </div>
           <BorderedButton
@@ -797,7 +806,7 @@ export const CreatePacks: React.FC<IPackInfoITO> = ({ packInfoIndex }) => {
             isHidden={fields.length <= 1}
           >
             <span>Next</span>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </BorderedButton>
         </div>
         <BorderedButton
@@ -878,10 +887,11 @@ export const CreateWhiteListSettingsSteps: React.FC<IAssetITOInformations> = ({
           Would you like to enable and configure Whitelist addresses for now?
         </p>
         <ButtonsContainer>
-          <WizardButton centered onClick={() => setPackInfo(true)}>
+          <WizardButton infoStep centered onClick={() => setPackInfo(true)}>
             Yes
           </WizardButton>
           <WizardButton
+            infoStep
             secondary
             centered
             onClick={() => handleStep(prev => prev + 1)}
@@ -1111,10 +1121,11 @@ export const WhitelistAddressSteps: React.FC<IWizardComponents> = ({
       <div>
         <p>Would you like to enable and configure Whitelist address for now?</p>
         <ButtonsContainer>
-          <WizardButton centered onClick={() => setPackInfo(true)}>
+          <WizardButton infoStep centered onClick={() => setPackInfo(true)}>
             Yes
           </WizardButton>
           <WizardButton
+            infoStep
             secondary
             centered
             onClick={() => handleStep(prev => prev + 1)}
@@ -1249,7 +1260,7 @@ export const CreateWhitelistedAddress: React.FC<IWizardComponents> = ({
             isHidden={fields.length <= 1}
           >
             <span>Next</span>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </BorderedButton>
         </div>
         <BorderedButton
@@ -1367,16 +1378,16 @@ export const TransactionDetails: React.FC = () => {
   return (
     <ReviewContainer>
       <span>TRANSACTION DETAILS</span>
-      <ConfirmCardBasics secondary>
-        <ConfirmCardBasisInfo secondary>
+      <ConfirmCardBasics>
+        <ConfirmCardBasisInfo>
           <span>Transaction</span>
           <span>Config ITO</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>From</span>
           <span>{parseAddress(walletAddress || '', 12)}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Fee</span>
           <span>20,000 KLV</span>
         </ConfirmCardBasisInfo>
@@ -1395,22 +1406,22 @@ export const TransactionDetails2: React.FC = () => {
   return (
     <ReviewContainer>
       <span> SET UP ITO</span>
-      <ConfirmCardBasics secondary>
-        <ConfirmCardBasisInfo secondary>
+      <ConfirmCardBasics>
+        <ConfirmCardBasisInfo>
           <span>Receiver Address</span>
           <span>{parseAddress(receiverAddress, 12)}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>ITO Time</span>
           <span>
             {startTime || '--'} to {endTime || '--'}
           </span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Max Amount</span>
           <span>{maxAmount}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Status</span>
           <span>{status}</span>
         </ConfirmCardBasisInfo>

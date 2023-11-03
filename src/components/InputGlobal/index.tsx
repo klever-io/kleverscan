@@ -17,9 +17,9 @@ const Input: React.FC<InputGlobal> = ({
   openSearch,
 }) => {
   const [search, setSearch] = useState('');
-  const [error, setError] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const timeoutId = useRef<NodeJS.Timeout>();
   const { t } = useTranslation('common');
 
   const placeholder = t('Search Address, Block, Transaction, Asset');
@@ -44,12 +44,18 @@ const Input: React.FC<InputGlobal> = ({
     }
   }, [openSearch]);
 
-  const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (error) {
-      setError(false);
+  const debounce = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (timeoutId.current) {
+      clearTimeout(timeoutId.current);
     }
+    timeoutId.current = setTimeout(() => {
+      setSearch(event.target.value);
+    }, 1000);
+  };
+
+  const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setShowTooltip(true);
-    setSearch(event.target.value);
+    debounce(event);
   };
 
   const handleSearch = (event: KeyboardEvent) => {

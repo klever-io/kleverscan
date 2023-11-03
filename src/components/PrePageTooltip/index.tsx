@@ -77,7 +77,7 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
   const type = getInputType(trimmedSearch);
   const { isDarkTheme } = useTheme();
   const canSearch = () => {
-    if (trimmedSearch === '' || !trimmedSearch || !type) {
+    if (!type) {
       setSessionStorage('');
       return false;
     }

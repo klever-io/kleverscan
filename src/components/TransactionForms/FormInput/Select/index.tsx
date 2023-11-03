@@ -3,12 +3,10 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { IoIosArrowDown } from 'react-icons/io';
-import { components } from 'react-select';
 import { onChangeWrapper } from '..';
 import { Container, HiddenInput } from './styles';
 
-const ReactSelect = dynamic(() => import('react-select'), {
+const BaseSelect = dynamic(() => import('@/components/Select'), {
   ssr: false,
   loading: () => null,
 });
@@ -52,19 +50,6 @@ const Filter: React.FC<IFilter> = ({
     undefined,
   );
 
-  const Placeholder = (props: any) => {
-    return <components.Placeholder {...props} />;
-  };
-  const CaretDownIcon = () => {
-    return <IoIosArrowDown />;
-  };
-  const DropdownIndicator = (props: any) => {
-    return (
-      <components.DropdownIndicator {...props}>
-        <CaretDownIcon />
-      </components.DropdownIndicator>
-    );
-  };
   const handleSelect = (selected: any) => {
     const e = {
       target: {
@@ -87,12 +72,11 @@ const Filter: React.FC<IFilter> = ({
 
   return (
     <Container $error={error}>
-      <ReactSelect
+      <BaseSelect
         classNamePrefix="react-select"
         placeholder={
           selectPlaceholder ? selectPlaceholder : `Choose ${title ? title : ''}`
         }
-        components={{ Placeholder, DropdownIndicator }}
         options={data}
         onChange={e => handleSelect(e)}
         value={selected?.value !== undefined ? selected : undefined}

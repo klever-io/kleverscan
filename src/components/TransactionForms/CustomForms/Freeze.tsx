@@ -1,8 +1,9 @@
-import { useKDASelect } from '@/utils/hooks/contract';
+import { useMulticontract } from '@/contexts/contract/multicontract';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
+import { KDASelect } from '../KDASelect';
 import { FormBody, FormSection } from '../styles';
 
 type FormData = {
@@ -12,9 +13,9 @@ type FormData = {
 
 const Freeze: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   const { handleSubmit } = useFormContext<FormData>();
-  const [collection, KDASelect] = useKDASelect({
-    validateFields: ['amount'],
-  });
+  const { queue } = useMulticontract();
+
+  const collection = queue[formKey].collection;
 
   const onSubmit = async (data: FormData) => {
     await handleFormSubmit(data);
@@ -22,7 +23,7 @@ const Freeze: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
 
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
-      <KDASelect />
+      <KDASelect validateFields={['amount']} />
       <FormSection>
         <FormInput
           name="amount"

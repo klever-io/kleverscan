@@ -1,9 +1,9 @@
 import { withdrawTypes } from '@/utils/contracts';
-import { useKDASelect } from '@/utils/hooks/contract';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
+import { KDASelect } from '../KDASelect';
 import { FormBody, FormSection } from '../styles';
 
 type FormData = {
@@ -16,8 +16,6 @@ type FormData = {
 const Withdraw: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   const { handleSubmit, watch } = useFormContext<FormData>();
   const withdrawType: number = watch('withdrawType');
-
-  const [_, KDASelect] = useKDASelect({ withdrawType });
 
   const onSubmit = async (data: FormData) => {
     await handleFormSubmit(data);
@@ -36,7 +34,7 @@ const Withdraw: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
       </FormSection>
       {(withdrawType === 0 || withdrawType === 1) && (
         <>
-          <KDASelect />
+          <KDASelect withdrawType={withdrawType} />
           {withdrawType === 1 && (
             <FormSection>
               <FormInput

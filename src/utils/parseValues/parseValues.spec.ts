@@ -61,6 +61,7 @@ describe('test parseValues', () => {
         totalProduced: 586576,
         totalMissed: 1824,
         commission: 0,
+        maxDelegation: 10000000000000,
       },
       {
         ownerAddress:
@@ -77,6 +78,7 @@ describe('test parseValues', () => {
         totalProduced: 436141,
         totalMissed: 1096,
         commission: 0,
+        maxDelegation: 10000000000000,
       },
     ];
     test('if correct array is returned', () => {

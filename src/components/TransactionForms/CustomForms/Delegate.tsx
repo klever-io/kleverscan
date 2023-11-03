@@ -1,5 +1,8 @@
 import { useContract } from '@/contexts/contract';
 import { validatorsCall } from '@/services/requests/validators';
+import { IValidator } from '@/types';
+import { KLV_PRECISION, PERCENTAGE_PRECISION } from '@/utils/globalVariables';
+import { useDebounce } from '@/utils/hooks';
 import { parseAddress } from '@/utils/parseValues';
 import React, { useEffect, useState } from 'react';
 import { FieldError, useFormContext } from 'react-hook-form';
@@ -15,6 +18,9 @@ type FormData = {
 
 const Delegate: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   const [bucketsList, setBucketsList] = useState<any>([]);
+  const [typedName, setTypedName] = useState<string>('');
+
+  const debouncedName = useDebounce(typedName, 500);
 
   const { handleSubmit } = useFormContext<FormData>();
   const { getAssets } = useContract();
@@ -55,8 +61,8 @@ const Delegate: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   }, []);
 
   const { data: validatorsList, fetchNextPage } = useInfiniteQuery(
-    ['validatorsList'],
-    ({ pageParam = 1 }) => validatorsCall(pageParam),
+    ['validatorsList', debouncedName],
+    ({ pageParam = 1 }) => validatorsCall(pageParam, debouncedName),
     {
       getNextPageParam: lastPage => {
         if (lastPage) {
@@ -73,18 +79,22 @@ const Delegate: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
     fetchNextPage();
   };
 
-  const parsePagesValues = validatorsList?.pages.map(value => {
-    return value?.data?.validators.map((e: any) => {
-      if (e.name) {
-        return { label: e.name, value: e.ownerAddress };
-      }
-      return { label: e.parsedAddress, value: e.ownerAddress };
-    });
-  });
-
-  const parseValidatorsOptions = [].concat(
-    ...(parsePagesValues?.map(e => e) || []),
+  const parsePagesValues = validatorsList?.pages.flatMap(page =>
+    page.data.validators.map((validator: IValidator) => ({
+      label: `${validator.name || validator.parsedAddress} - status: ${
+        validator.status
+      } - delegated KLV: ${validator.staked / 10 ** KLV_PRECISION} (max: ${
+        validator.maxDelegation === 0
+          ? '∞'
+          : validator.maxDelegation / 10 ** KLV_PRECISION
+      }) - commission: ${validator.commission / 10 ** PERCENTAGE_PRECISION}%`,
+      value: validator.ownerAddress,
+    })),
   );
+
+  const handleInputChange = (newValue: string) => {
+    setTypedName(newValue);
+  };
 
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
@@ -102,9 +112,11 @@ const Delegate: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
           span={2}
           tooltip="Validator to whom the bucket will be delegated"
           required
+          creatable
           type="dropdown"
-          options={parseValidatorsOptions}
+          options={parsePagesValues}
           handleScrollBottom={handleScrollBottom}
+          onInputChange={handleInputChange}
         />
       </FormSection>
     </FormBody>

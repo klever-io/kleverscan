@@ -1,8 +1,14 @@
 import { IoIosArrowDown } from 'react-icons/io';
 import ReactSelect, { components, Props } from 'react-select';
+import Creatable from 'react-select/creatable';
 import { Container } from './styles';
 
-const BaseSelect: React.FC<Props> = props => {
+interface IBaseSelectProps extends Props {
+  creatable?: boolean;
+}
+
+const BaseSelect: React.FC<IBaseSelectProps> = props => {
+  const { creatable } = props;
   const Placeholder = (props: any) => {
     return <components.Placeholder {...props} />;
   };
@@ -16,14 +22,25 @@ const BaseSelect: React.FC<Props> = props => {
       </components.DropdownIndicator>
     );
   };
+
   return (
-    <Container>
-      <ReactSelect
-        classNamePrefix="react-select"
-        placeholder=""
-        components={{ Placeholder, DropdownIndicator }}
-        {...props}
-      />
+    <Container $creatable={creatable}>
+      {creatable ? (
+        <Creatable
+          classNamePrefix="react-select"
+          placeholder=""
+          components={{ Placeholder, DropdownIndicator }}
+          formatCreateLabel={inputValue => `Create custom: "${inputValue}"`}
+          {...props}
+        />
+      ) : (
+        <ReactSelect
+          classNamePrefix="react-select"
+          placeholder=""
+          components={{ Placeholder, DropdownIndicator }}
+          {...props}
+        />
+      )}
     </Container>
   );
 };

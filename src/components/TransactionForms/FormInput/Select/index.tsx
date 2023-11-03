@@ -22,7 +22,9 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   title?: string;
   name: string;
   error?: boolean;
+  onInputChange?: (e: any) => void;
   handleScrollBottom?: () => void;
+  creatable?: boolean;
 }
 
 const Filter: React.FC<IFilter> = ({
@@ -33,6 +35,8 @@ const Filter: React.FC<IFilter> = ({
   error,
   value,
   handleScrollBottom,
+  onInputChange,
+  creatable,
   ...rest
 }) => {
   const {
@@ -73,14 +77,15 @@ const Filter: React.FC<IFilter> = ({
   return (
     <Container $error={error}>
       <BaseSelect
-        classNamePrefix="react-select"
         placeholder={
           selectPlaceholder ? selectPlaceholder : `Choose ${title ? title : ''}`
         }
         options={data}
         onChange={e => handleSelect(e)}
+        onInputChange={onInputChange}
         value={selected?.value !== undefined ? selected : undefined}
         onMenuScrollToBottom={handleScrollBottom}
+        creatable={creatable}
       />
 
       <HiddenInput

@@ -53,6 +53,8 @@ export interface IBaseFormInputProps
   logoError?: string | null;
   handleScrollBottom?: () => void;
   watchChange?: any;
+  onInputChange?: (e: any) => void;
+  creatable?: boolean;
 }
 
 export interface IFormInputProps extends IBaseFormInputProps {
@@ -123,6 +125,8 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   max,
   customOnChange,
   onChange,
+  onInputChange,
+  creatable,
   precision = 8,
   logoError = null,
   handleScrollBottom,
@@ -256,6 +260,8 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
     error: Boolean(error),
     value: inputValue,
     handleScrollBottom,
+    onInputChange,
+    creatable,
     ...rest,
   };
 

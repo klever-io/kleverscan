@@ -1,8 +1,10 @@
 // import { lighten } from 'polished';
-import { lighten } from 'polished';
-import styled, { css } from 'styled-components';
+import { lighten, transparentize } from 'polished';
+import styled from 'styled-components';
 
-const ReactSelect = css`
+export const Container = styled.div<{
+  $creatable?: boolean;
+}>`
   .react-select {
     margin: 0.25rem 0;
     width: 100%;
@@ -93,8 +95,9 @@ const ReactSelect = css`
   .react-select--is-disabled {
     filter: opacity(0.5) grayscale(0.75) brightness(1.1);
   }
-`;
 
-export const Container = styled.div`
-  ${ReactSelect}
+  .react-select__option:last-child {
+    color: ${props =>
+      props.$creatable && transparentize(0.5, props.theme.darkText)};
+  }
 `;

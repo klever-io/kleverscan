@@ -51,6 +51,10 @@ export const FormSection = styled.div<{ inner?: boolean }>`
   }
 `;
 
+export const FormSection2 = styled(FormSection)<{ inner?: boolean }>`
+  top: 2.5rem;
+`;
+
 export const FormBody = styled(Form)<{ inner?: boolean }>`
   display: flex;
   flex-direction: column;

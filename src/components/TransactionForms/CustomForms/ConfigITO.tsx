@@ -11,6 +11,7 @@ import {
   ButtonContainer,
   FormBody,
   FormSection,
+  FormSection2,
   SectionTitle,
 } from '../styles';
 import { parseDates, parsePackInfo, parseWhitelistInfo } from './utils';
@@ -183,7 +184,7 @@ export const WhitelistSection: React.FC = () => {
         <span>Whitelist</span>
       </SectionTitle>
       {fields.map((field, index) => (
-        <FormSection key={field.id} inner style={{ top: '2.5rem' }}>
+        <FormSection2 key={field.id} inner style={{ top: '2.5rem' }}>
           <SectionTitle>
             <HiTrash onClick={() => remove(index)} />
             Whitelisted Address {index + 1}
@@ -201,7 +202,7 @@ export const WhitelistSection: React.FC = () => {
             span={2}
             tooltip={tooltip.whitelistInfo.limit}
           />
-        </FormSection>
+        </FormSection2>
       ))}
       <ButtonContainer type="button" onClick={() => append({})}>
         Add Address

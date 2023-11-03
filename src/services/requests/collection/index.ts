@@ -6,6 +6,7 @@ import { NextRouter } from 'next/router';
 export const collectionListCall = async (
   router: NextRouter,
   walletAddress: string,
+  partialId?: string,
 ): Promise<IDropdownItem[] | undefined> => {
   try {
     const parseCollection = JSON.parse(
@@ -13,7 +14,9 @@ export const collectionListCall = async (
     ).collection;
 
     const res: ICollectionIdListResponse = await api.get({
-      route: `address/${walletAddress}/collection/${parseCollection}`,
+      route: `address/${walletAddress}/collection/${parseCollection}?page=${
+        partialId ? Number(partialId) : 0
+      }`,
     });
 
     if (!res.error || res.error === '') {

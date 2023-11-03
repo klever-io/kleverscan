@@ -20,6 +20,7 @@ import { useExtension } from '@/contexts/extension';
 import { collectionListCall } from '@/services/requests/collection';
 import { ICollectionList, IDropdownItem } from '@/types';
 import { toLocaleFixed } from '@/utils/formatFunctions';
+import { useDebounce } from '@/utils/hooks';
 import { setQuery } from '@/utils/hooks/contract';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
@@ -288,6 +289,9 @@ export const KDASelect: React.FC<ISelectProps> = props => {
 
 const CollectionIDField: React.FC = () => {
   const [isCustom, setIsCustom] = useState(false);
+  const [collectionInputValue, setCollectionInputValue] = useState('');
+  const [collectionIdData, setCollectionIdData] = useState<IDropdownItem[]>([]);
+  const debouncedCollectionInput = useDebounce(collectionInputValue, 500);
   const router = useRouter();
   const { walletAddress } = useExtension();
   const { setCollectionAssetId, isMultiContract } = useMulticontract();
@@ -301,14 +305,21 @@ const CollectionIDField: React.FC = () => {
   const watchCollection: string = watch('collection');
   const watchCollectionAssetId = watch('collectionAssetId');
 
-  const { data: collectionIdList, isFetching: collectionIdListFetching } =
-    useQuery({
-      queryKey: ['collectionList', watchCollection],
-      queryFn: () => collectionListCall(router, walletAddress),
-      initialData: [],
-    });
+  const { isLoading: collectionIdListLoading } = useQuery({
+    queryKey: ['collectionList', watchCollection, debouncedCollectionInput],
+    queryFn: () =>
+      collectionListCall(router, walletAddress, debouncedCollectionInput),
+    initialData: [],
+    onSuccess: newData => {
+      if (!newData) return;
 
-  const selectedCollectionId = collectionIdList?.filter(
+      setCollectionIdData(prevData => {
+        return [...prevData, ...newData];
+      });
+    },
+  });
+
+  const selectedCollectionId = collectionIdData?.filter(
     e => e.value === watchCollectionAssetId,
   )[0] || { label: watchCollectionAssetId, value: watchCollectionAssetId } || {
       label: '',
@@ -330,6 +341,10 @@ const CollectionIDField: React.FC = () => {
     setValue('collectionAssetId', value?.value, {
       shouldValidate: true,
     });
+  };
+
+  const handleInputChange = (newValue: string) => {
+    setCollectionInputValue(newValue);
   };
 
   return (
@@ -361,9 +376,10 @@ const CollectionIDField: React.FC = () => {
         />
       ) : (
         <Select
-          options={collectionIdList}
+          options={collectionIdData}
           onChange={collectionIdChangeHandler}
-          loading={collectionIdListFetching}
+          onInputChange={handleInputChange}
+          loading={collectionIdListLoading}
           selectedValue={selectedCollectionId}
           zIndex={3}
           error={Boolean(assetIdError)}

@@ -19,6 +19,10 @@ export const BannerContainer = styled(Container)<{ status: boolean }>`
   z-index: 1;
 `;
 
+export const BannerParagraph = styled.p`
+  word-break: break-all;
+`;
+
 export const ButtonClose = styled(GrFormClose).attrs(props => ({
   size: 20,
 }))`

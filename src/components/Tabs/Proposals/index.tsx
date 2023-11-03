@@ -205,7 +205,9 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
       {
         element: (
           <Link href={{ pathname: `/proposal/${proposalId}` }} key={proposalId}>
-            <CustomLink>Details</CustomLink>
+            <a>
+              <CustomLink>Details </CustomLink>
+            </a>
           </Link>
         ),
         span: 2,

@@ -50,7 +50,7 @@ const homeGetBlocksCall = async (): Promise<
 > => {
   try {
     const blocks: IBlocksResponse = await api.get({
-      route: 'block/list',
+      route: 'node/aggregate?blockMinified=false',
       service: Service.PROXY,
     });
     if (!blocks.error) {

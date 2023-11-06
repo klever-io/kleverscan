@@ -203,12 +203,15 @@ const Table: React.FC<ITable> = ({
     window.scrollTo(0, 0);
   };
 
+  const limitSectionMargin =
+    dataName !== 'transactions' ? '-5.5rem' : undefined;
+
   return (
     <>
       {typeof scrollUp === 'boolean' &&
         typeof response?.totalPages === 'number' &&
         !!response?.items && (
-          <FloatContainer>
+          <FloatContainer marginTop={limitSectionMargin}>
             {dataName === 'transactions' && (
               <ExportContainer>
                 <ExportLabel>

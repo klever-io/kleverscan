@@ -349,13 +349,17 @@ export const CustomLink = styled.a<{
   }
 `;
 
-export const FloatContainer = styled.div`
+export const FloatContainer = styled.div<{ marginTop?: string | undefined }>`
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  margin-top: 1rem;
+  margin-top: ${({ marginTop }) => (marginTop ? marginTop : '1rem')};
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    margin-top: 0;
+  }
 `;
 
 export const LimitContainer = styled.div`

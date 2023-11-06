@@ -192,6 +192,14 @@ export const WizCreateITO: React.FC<any> = ({
   ];
 
   const onSubmit = async (data: ConfigITOData) => {
+    const dateIto = new Date(data.startTime);
+    const dateNow = new Date();
+    if (dateIto.getTime() <= dateNow.getTime()) {
+      toast.info(
+        'Start time must be in the future, if you want to start now, leave the field blank',
+      );
+      return;
+    }
     const contractType = 'ConfigITOContract';
     parseDates(data);
     parseUndefinedValues(data);

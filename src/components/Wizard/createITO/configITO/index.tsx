@@ -11,6 +11,8 @@ import {
   parseUndefinedValues,
   parseWhitelistInfo,
 } from '@/components/TransactionForms/CustomForms/utils';
+import { useExtension } from '@/contexts/extension';
+import { gtagEvent } from '@/utils/gtag';
 import { parseAddress } from '@/utils/parseValues';
 import { web } from '@klever/sdk-web';
 import { useEffect, useState } from 'react';
@@ -50,6 +52,8 @@ export const WizCreateITO: React.FC<any> = ({
     setAddAdvanced,
     addAdvancedSteps,
   };
+
+  const { walletAddress } = useExtension();
 
   const confirmProps = {
     ...stepsProps,
@@ -214,6 +218,14 @@ export const WizCreateITO: React.FC<any> = ({
       setTxHash(response.data.txsHashes[0]);
       window.scrollTo(0, 0);
       toast.success('Transaction broadcast successfully');
+
+      gtagEvent('send_transaction_wizard', {
+        event_category: 'transaction',
+        event_label: 'send_transaction_wizard',
+        hash: response.data.txsHashes[0],
+        sender: walletAddress,
+        transaction_type: 'ConfigITOContract',
+      });
     } catch (error: any) {
       console.error(error);
       toast.error(error);

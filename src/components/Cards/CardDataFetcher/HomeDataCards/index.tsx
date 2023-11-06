@@ -154,7 +154,7 @@ const HomeDataCards: React.FC = ({}) => {
                             positive={dataCards[2].variation.includes('+')}
                           >
                             <ArrowData
-                              positive={dataCards[2].variation.includes('+')}
+                              $positive={dataCards[2].variation.includes('+')}
                             />
                             <p>{dataCards[2].variation}/24h</p>
                           </DataCardLatest>
@@ -179,7 +179,7 @@ const HomeDataCards: React.FC = ({}) => {
                         <p>{value.toLocaleString()}</p>
                         {variation && !variation.includes('%') && (
                           <DataCardLatest positive={variation.includes('+')}>
-                            <ArrowData positive={variation.includes('+')} />
+                            <ArrowData $positive={variation.includes('+')} />
                             <p>{variation}/24h</p>
                           </DataCardLatest>
                         )}
@@ -215,7 +215,7 @@ const HomeDataCards: React.FC = ({}) => {
                       <p>{value.toLocaleString()}</p>
                       {variation && !variation.includes('%') && (
                         <DataCardLatest positive={variation.includes('+')}>
-                          <ArrowData positive={variation.includes('+')} />
+                          <ArrowData $positive={variation.includes('+')} />
                           <p>{variation}/24h</p>
                         </DataCardLatest>
                       )}
@@ -248,7 +248,7 @@ const HomeDataCards: React.FC = ({}) => {
                   <p>{value.toLocaleString()}</p>
                   {variation && !variation.includes('%') && (
                     <DataCardLatest positive={variation.includes('+')}>
-                      <ArrowData positive={variation.includes('+')} />
+                      <ArrowData $positive={variation.includes('+')} />
                       <p>{variation}/24h</p>
                     </DataCardLatest>
                   )}
@@ -259,7 +259,7 @@ const HomeDataCards: React.FC = ({}) => {
       </DataCardsContent>
       <ExpandData>
         <ButtonExpand onClick={() => setExpanded(!expanded)}>
-          <ArrowDownDataCards expanded={expanded} />
+          <ArrowDownDataCards $expanded={expanded} />
           <p>{expanded ? 'Hide Cards' : 'Expand Cards'}</p>
         </ButtonExpand>
       </ExpandData>

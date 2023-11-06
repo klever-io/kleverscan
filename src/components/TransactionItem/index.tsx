@@ -162,12 +162,12 @@ const TransactionItem: React.FC<ITransaction> = ({
 export const TransactionItemLoading: React.FC = () => {
   return (
     <TransactionRow>
-      <TransactionData loading>
+      <TransactionData $loading>
         <a href="#">
           <Skeleton width={50} />
         </a>
       </TransactionData>
-      <TransactionData loading>
+      <TransactionData $loading>
         <p>
           <strong>
             <Skeleton width={50} />

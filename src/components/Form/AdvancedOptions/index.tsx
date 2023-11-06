@@ -6,6 +6,7 @@ import {
   SelectContent,
 } from '@/components/Contract/styles';
 import { getAssetsList } from '@/components/Contract/utils';
+import Tooltip from '@/components/Tooltip';
 import {
   InfoIcon,
   InputLabel,
@@ -13,7 +14,6 @@ import {
   StyledInput,
   Toggle,
   TooltipContainer,
-  TooltipContent,
 } from '@/components/TransactionForms/FormInput/styles';
 import { useContract } from '@/contexts/contract';
 import { useMulticontract } from '@/contexts/contract/multicontract';
@@ -35,6 +35,14 @@ import {
   ToggleContainer,
 } from './styles';
 
+const tooltipPermissionID = `The permission ID is set by the account owner and is used to make other accounts able to sign transactions on behalf of the owner.
+You can find more information about permissions in your account page. If they are not set,
+you need to send an "Update Account Permission" contract`;
+
+const tooltipAccount = `The sender account address is the account that will be the
+sender of the transaction. It needs to be a multi-sign account. Your connected address will be the one used to sign the transaction.
+Be sure that your account has the permission to sign transactions on behalf of the sender account, otherwise the transaction will fail.
+`;
 const PermID: React.FC = () => {
   const { setPermID, permID, senderAccount } = useContract();
   const { walletAddress } = useExtension();
@@ -69,20 +77,9 @@ const PermID: React.FC = () => {
           <InputLabel>
             <span>Permission ID ({parseAddress(senderAccount, 12)})</span>
             <TooltipContainer>
-              <InfoIcon />
-              <TooltipContent>
-                <span>
-                  The permission ID is set by the account owner and is used to
-                  make other accounts able to sign transactions on behalf of the
-                  owner.
-                  <br />
-                  You can find more information about permissions in your
-                  account page.
-                  <br />
-                  If they are not set, you need to send an{' '}
-                  {'"Update Account Permisison"'} contract
-                </span>
-              </TooltipContent>
+              <Tooltip msg={tooltipPermissionID}>
+                <InfoIcon />
+              </Tooltip>
             </TooltipContainer>
           </InputLabel>
           <Select
@@ -147,21 +144,9 @@ const AccountSelect: React.FC = () => {
           <InputLabel>
             <span>Sender Account Address</span>
             <TooltipContainer>
-              <InfoIcon />
-              <TooltipContent>
-                <span>
-                  The sender account address is the account that will be the
-                  sender of the transaction. It needs to be a multi-sign
-                  account.
-                  <br />
-                  Your connected address will be the one used to sign the
-                  transaction.
-                  <br />
-                  Be sure that your account has the permission to sign
-                  transactions on behalf of the sender account, otherwise the
-                  transaction will fail.
-                </span>
-              </TooltipContent>
+              <Tooltip msg={tooltipAccount}>
+                <InfoIcon />
+              </Tooltip>
             </TooltipContainer>
           </InputLabel>
 

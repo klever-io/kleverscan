@@ -9,11 +9,6 @@ const data = [
   { date: '04 Nov', value: 98829 },
 ];
 
-global.ResizeObserver = jest.fn().mockImplementation(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-}));
 describe('Linear Chart', () => {
   const mockedClientHeight = 100;
   const mockedClientWidth = 100;

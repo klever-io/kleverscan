@@ -239,3 +239,18 @@ export const percentageProps = {
   max: 100,
   precision: 2,
 };
+
+export const parseStringToNumberSupply = (data: any): void => {
+  if (data.maxSupply !== '') {
+    const maxSupply = parseInt(data.maxSupply.replace(/,/g, ''), 10);
+    data.maxSupply = maxSupply;
+  }
+  if (data.initialSupply === '') {
+    const initialSupply = parseInt(data.initialSupply.replace(/,/g, ''), 10);
+    data.initialSupply = initialSupply;
+  }
+  if (data.maxAmount === '') {
+    const maxAmount = parseInt(data.maxAmount.replace(/,/g, ''), 10);
+    data.maxAmount = maxAmount;
+  }
+};

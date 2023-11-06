@@ -112,6 +112,10 @@ interface IPermissionOperations {
   type: number;
 }
 
+const EmptyComponent: React.FC = () => {
+  return <></>;
+};
+
 const PermissionOperations: React.FC<IPermissionOperations> = ({
   operations,
   type,
@@ -493,47 +497,53 @@ const Account: React.FC<IAccountPage> = () => {
     KLVStakingClaimButton,
     KFIStakingClaimButton,
     CreateAssetButton,
-  ] = getInteractionsButtons([
-    {
-      title: t('accounts:SingleAccount.Buttons.SetAccountName'),
-      contractType: 'SetAccountNameContract',
-      defaultValues: {
-        name: account?.name ? account.name : '',
-      },
-    },
-    {
-      title: t('accounts:SingleAccount.Buttons.Transfer'),
-      contractType: 'TransferContract',
-    },
-    {
-      title: t('accounts:SingleAccount.Buttons.Allowance'),
-      contractType: 'ClaimContract',
-      defaultValues: {
-        claimType: 1,
-        id: 'KLV',
-      },
-    },
-    {
-      title: t('accounts:SingleAccount.Buttons.StakingClaim', { asset: 'KLV' }),
-      contractType: 'ClaimContract',
-      defaultValues: {
-        claimType: 0,
-        id: 'KLV',
-      },
-    },
-    {
-      title: t('accounts:SingleAccount.Buttons.StakingClaim', { asset: 'KFI' }),
-      contractType: 'ClaimContract',
-      defaultValues: {
-        claimType: 0,
-        id: 'KFI',
-      },
-    },
-    {
-      title: t('accounts:SingleAccount.Buttons.CreateAsset'),
-      contractType: 'CreateAssetContract',
-    },
-  ]);
+  ] = showInteractionButtons
+    ? getInteractionsButtons([
+        {
+          title: t('accounts:SingleAccount.Buttons.SetAccountName'),
+          contractType: 'SetAccountNameContract',
+          defaultValues: {
+            name: account?.name ? account.name : '',
+          },
+        },
+        {
+          title: t('accounts:SingleAccount.Buttons.Transfer'),
+          contractType: 'TransferContract',
+        },
+        {
+          title: t('accounts:SingleAccount.Buttons.Allowance'),
+          contractType: 'ClaimContract',
+          defaultValues: {
+            claimType: 1,
+            id: 'KLV',
+          },
+        },
+        {
+          title: t('accounts:SingleAccount.Buttons.StakingClaim', {
+            asset: 'KLV',
+          }),
+          contractType: 'ClaimContract',
+          defaultValues: {
+            claimType: 0,
+            id: 'KLV',
+          },
+        },
+        {
+          title: t('accounts:SingleAccount.Buttons.StakingClaim', {
+            asset: 'KFI',
+          }),
+          contractType: 'ClaimContract',
+          defaultValues: {
+            claimType: 0,
+            id: 'KFI',
+          },
+        },
+        {
+          title: t('accounts:SingleAccount.Buttons.CreateAsset'),
+          contractType: 'CreateAssetContract',
+        },
+      ])
+    : Array.from({ length: 6 }, () => EmptyComponent);
 
   (account?.permissions?.length || 0) > 0 &&
     tabHeaders.push(t('accounts:SingleAccount.Tabs.Permission'));

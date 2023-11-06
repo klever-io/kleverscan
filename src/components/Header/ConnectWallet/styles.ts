@@ -311,7 +311,7 @@ export const ConnectedWallet = styled.div`
   display: flex;
   align-items: flex-start;
   flex-direction: column;
-
+  position: relative;
   ::after {
     width: 0.5rem;
     height: 0.5rem;
@@ -319,8 +319,7 @@ export const ConnectedWallet = styled.div`
     background-color: ${props => props.theme.green};
     content: '';
     position: absolute;
-    left: 98%;
-    bottom: 2.2rem;
+    right: -15px;
   }
 `;
 

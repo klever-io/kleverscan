@@ -1,6 +1,5 @@
 import { ArrowDown } from '@/assets/icons';
 import React, { useRef, useState } from 'react';
-import { flushSync } from 'react-dom';
 import { Loader } from '../Loader/styles';
 import {
   ArrowDownContainer,
@@ -22,7 +21,7 @@ export interface IFilter {
   inputType?: string;
   overFlow?: string;
   data: string[];
-  onClick?(selected: string, filterType: string): void;
+  onClick?(selected: string): void;
   onChange?(value: string): void;
   current: string | undefined;
   loading?: boolean;
@@ -49,8 +48,6 @@ const Filter: React.FC<IFilter> = ({
   const [selected, setSelected] = useState(current || allItem);
   const [open, setOpen] = useState(true);
   const [dontBlur, setDontBlur] = useState(false);
-  const [focus, setFocus] = useState(false);
-  const [arrowOpen, setArrowOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
   const contentRef = useRef<HTMLDivElement>(null);
@@ -59,49 +56,36 @@ const Filter: React.FC<IFilter> = ({
 
   const openDropdown = () => {
     if (disabledInput) return;
-    if (!focus) {
-      flushSync(() => {
-        setOpen(false);
-        setFocus(true);
-        setArrowOpen(true);
-      });
-
+    if (open) {
+      setOpen(false);
       focusRef.current?.focus();
     }
-    if (focus && !isHiddenInput) {
+    if (!open && !isHiddenInput) {
       closeDropDown();
     }
   };
 
   const arrowOnClick = () => {
     if (disabledInput) return;
-    if (arrowOpen) {
+    if (!open) {
       closeDropDown();
     } else {
-      setArrowOpen(true);
       setOpen(false);
-      setFocus(true);
     }
   };
 
   const closeDropDown = () => {
-    setArrowOpen(false);
     setOpen(true);
-    setFocus(false);
     setInputValue('');
   };
 
   const SelectorItem: React.FC<IFilterItem> = ({ item }) => {
     const handleClick = () => {
       if (onClick) {
-        onClick(item, '');
-        // dont know why, but need to pass a string in this onClick fn, any string just for TS purposes
-        // since the fn calls are all with hard coded 2nd parameter in the parent component
+        onClick(item);
       }
       setSelected(item);
       openDropdown();
-
-      setFocus(true);
     };
     return (
       <Item
@@ -172,13 +156,13 @@ const Filter: React.FC<IFilter> = ({
         data-testid="selector"
         {...contentProps}
       >
-        {focus && (
+        {!open && (
           <HiddenInput
             onBlur={() => !dontBlur && closeDropDown()}
             value={inputValue}
             type={title !== 'Status' ? inputType : 'button'}
             ref={focusRef}
-            show={focus}
+            show={!open}
             placeholder={getPlaceholder()}
             onChange={handleChange}
             isHiddenInput={isHiddenInput}
@@ -190,7 +174,7 @@ const Filter: React.FC<IFilter> = ({
         <ArrowDownContainer onClick={() => arrowOnClick()}>
           <ArrowDown />
         </ArrowDownContainer>
-        {focus && (
+        {!open && (
           <SelectorContainer {...selectorProps}>
             {!filteredArray.length && !loading ? (
               <span>{title} not found!</span>

@@ -1,6 +1,7 @@
 import ContextProviders from '@/components/ContextProviders';
 import { appWithTranslation, SSRConfig } from 'next-i18next';
 import type { AppProps as NextJsAppProps } from 'next/app';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
@@ -44,13 +45,21 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   }, [router.events]);
 
   const children = (
-    <ContextProviders>
-      <LayoutWrapper>
-        <Component {...pageProps} />
-      </LayoutWrapper>
-      <GlobalStyle />
-      <NProgress />
-    </ContextProviders>
+    <>
+      <Head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
+      </Head>
+      <ContextProviders>
+        <LayoutWrapper>
+          <Component {...pageProps} />
+        </LayoutWrapper>
+        <GlobalStyle />
+        <NProgress />
+      </ContextProviders>
+    </>
   );
 
   return ErrorBoundary ? <ErrorBoundary>{children}</ErrorBoundary> : children;

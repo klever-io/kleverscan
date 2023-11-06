@@ -4,13 +4,14 @@ import { useContractModal } from '@/contexts/contractModal';
 import { IAsset } from '@/types';
 import { IMarketplaceAsset } from '@/types/marketplaces';
 import {
-  CardLogo,
   GridItemButton,
   GridItemFlex,
+  ImageWrapper,
   LoaderWrapper,
   MainItemsDiv,
   TooltipWrapper,
 } from '@/views/marketplaces/detail';
+import Image from 'next/image';
 import { useState } from 'react';
 import { UseQueryResult } from 'react-query';
 
@@ -58,23 +59,27 @@ const BuyCard: React.FC<IBuyCard> = ({
       <LoaderWrapper>
         <TooltipWrapper>
           <Tooltip
-            msg={
-              'The image refers to the entire collection, not to the NFT being sold. NFT metadata can be added later.'
-            }
+            msg={`The image refers to the entire collection, not to the NFT being sold.\n NFT metadata can be added later.`}
           />
         </TooltipWrapper>
         {buyCardsLoading ? (
           <Loader height={75} width={75} />
         ) : (
-          <CardLogo
-            src={
-              isError
-                ? '/no-logo.png'
-                : getCorrectLogo(marketplaceAsset?.assetId.split('/')[0]) ||
-                  '/no-logo.png'
-            }
-            onError={() => setIsError(true)}
-          />
+          <ImageWrapper>
+            <Image
+              loader={({ src }) => src}
+              width={85}
+              height={85}
+              alt="Collection Logo"
+              src={
+                isError
+                  ? '/no-logo.png'
+                  : getCorrectLogo(marketplaceAsset?.assetId.split('/')[0]) ||
+                    '/no-logo.png'
+              }
+              onError={() => setIsError(true)}
+            />
+          </ImageWrapper>
         )}
       </LoaderWrapper>
       <GridItemFlex>

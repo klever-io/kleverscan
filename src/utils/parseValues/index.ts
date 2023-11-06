@@ -1,10 +1,14 @@
+import api from '@/services/api';
+import { processITOPrecisions } from '@/services/requests/ito';
 import {
   IAsset,
   IBalance,
   IDelegationsResponse,
   IFormData,
   IHolder,
+  IITO,
   IPagination,
+  IParsedITO,
   IValidator,
   IValidatorResponse,
 } from '@/types';
@@ -184,6 +188,32 @@ export const parseAllProposals = (
       );
     });
     return arrayOfProposals;
+  }
+  return [];
+};
+
+export const parseITOs = async (
+  ITOs: IITO[],
+): Promise<IParsedITO | never[]> => {
+  const assetsInput: string = ITOs.map(ITO => ITO.assetId).join(',');
+  const packsPrecisionCalls: Promise<IITO>[] = [];
+  const res = await api.get({
+    route: `assets/list?asset=${assetsInput}`,
+  });
+  if (!res.error || res.error === '') {
+    const assets = res.data.assets;
+    ITOs.forEach((ITO, index) => {
+      const asset = assets.find(
+        (asset: IAsset) => asset.assetId === ITOs[index].assetId,
+      );
+      ITO.maxAmount = ITO.maxAmount / 10 ** asset.precision;
+      ITO['ticker'] = asset.ticker;
+      ITO['assetType'] = asset.assetType;
+      ITO['precision'] = asset.precision;
+      ITO['assetLogo'] = asset.logo;
+      packsPrecisionCalls.push(processITOPrecisions(ITO, asset.precision));
+    });
+    await Promise.allSettled(packsPrecisionCalls);
   }
   return [];
 };

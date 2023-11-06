@@ -18,8 +18,12 @@ import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import { getAge } from '@/utils/timeFunctions';
 import { TableContainer } from '@/views/accounts';
+import { GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 interface IAccounts {
   accounts: IAccount[];
@@ -53,6 +57,7 @@ interface ICard {
 const Accounts: React.FC<IAccounts> = () => {
   const [pagination, setPagination] = useState<null | IPagination>(null);
   const [createdYesterday, setCreatedYesterday] = useState<null | number>(null);
+  const { t } = useTranslation(['common', 'accounts']);
   const requestAccounts = async (page: number, limit: number) =>
     await api.get({
       route: `address/list?page=${page}&limit=${limit}`,
@@ -116,8 +121,11 @@ const Accounts: React.FC<IAccounts> = () => {
 
   const cards: ICard[] = [
     {
-      title: 'Number of Accounts',
-      headers: ['Accounts created in the last 24h', 'Total accounts'],
+      title: t('accounts:AccountsPage.Number of Accounts'),
+      headers: [
+        t('accounts:AccountsPage.Accounts created in the last 24h'),
+        t('common:Cards.Total Accounts'),
+      ],
       values: [
         createdYesterday === pagination?.totalRecords
           ? '--'
@@ -223,7 +231,7 @@ const Accounts: React.FC<IAccounts> = () => {
   return (
     <Container>
       <Header>
-        <Title title="Accounts" Icon={Icon} />
+        <Title title={t('common:Titles.Accounts')} Icon={Icon} />
       </Header>
 
       <CardContainer>
@@ -238,6 +246,16 @@ const Accounts: React.FC<IAccounts> = () => {
       </TableContainer>
     </Container>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'accounts'],
+    nextI18nextConfig,
+  );
+
+  return { props };
 };
 
 export default Accounts;

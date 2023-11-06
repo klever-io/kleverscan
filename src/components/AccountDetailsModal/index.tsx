@@ -147,35 +147,13 @@ export const AccountDetailsModal: React.FC<IAccountDetailsModal> = ({
     const storagePrimaryAssets = localStorage.getItem('primaryAsset');
     if (storagePrimaryAssets) {
       try {
-        const getPrimaryAsset: IAssetBalance = JSON.parse(
-          storagePrimaryAssets as any,
-        );
+        const getPrimaryAsset: IAssetBalance = JSON.parse(storagePrimaryAssets);
         setPrimaryAsset([getPrimaryAsset]);
       } catch (error) {
         console.error(error);
       }
     }
-  }, [otherAssets]);
-
-  useEffect(() => {
-    try {
-      const storagePrimaryAssets = localStorage.getItem('primaryAsset');
-      if (storagePrimaryAssets) {
-        const getPrimaryAsset = JSON.parse(storagePrimaryAssets as any);
-        const newPrimaryAsset = otherAssets.filter(
-          asset => asset.assetId === getPrimaryAsset.assetId,
-        );
-        if (newPrimaryAsset) {
-          localStorage.setItem(
-            'primaryAsset',
-            JSON.stringify(newPrimaryAsset[0]),
-          );
-        }
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }, [otherAssets]);
+  }, []);
 
   useEffect(() => {
     getAccountBalance();

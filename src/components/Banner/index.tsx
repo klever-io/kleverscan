@@ -1,7 +1,7 @@
 import api from '@/services/api';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
-import { BannerContainer, ButtonClose } from './styled';
+import { BannerContainer, BannerParagraph, ButtonClose } from './styled';
 
 interface IResultsHeath {
   name: string;
@@ -49,7 +49,7 @@ const BannerResult: React.FC<IResultsHeath> = (data: IResultsHeath) => {
     <>
       {openBanner && data.status !== 'OK' && data.message && (
         <BannerContainer status={data.status === 'ALERT'}>
-          <p>{data.status + ':' + data.message}</p>
+          <BannerParagraph>{data.status + ':' + data.message}</BannerParagraph>
           <ButtonClose onClick={handleClick} />
         </BannerContainer>
       )}

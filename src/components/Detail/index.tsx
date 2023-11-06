@@ -32,7 +32,7 @@ const Detail: React.FC<IDetail> = ({
       {filters && (
         <FilterContainer>
           {filters.map(filter => (
-            <Filter key={filter.current} {...filter} />
+            <Filter key={JSON.stringify(filter)} {...filter} />
           ))}
         </FilterContainer>
       )}

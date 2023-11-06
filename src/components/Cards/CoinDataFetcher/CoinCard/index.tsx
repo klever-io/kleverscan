@@ -129,7 +129,7 @@ const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
             >
               <div>
                 <ArrowVariation
-                  positive={
+                  $positive={
                     shortname === 'KLV'
                       ? getVariation(variation).includes('+')
                       : getVariation(

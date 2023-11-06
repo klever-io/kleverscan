@@ -108,8 +108,8 @@ export const ChartDailyTransactions: React.FC = () => {
                 <span>24h</span>
               </Last24Text>
             </Last24hTxs>
-            <VariationText positive={variation.includes('+')}>
-              <ArrowVariation positive={variation.includes('+')} />
+            <VariationText $positive={variation.includes('+')}>
+              <ArrowVariation $positive={variation.includes('+')} />
               {variation}
             </VariationText>
           </div>

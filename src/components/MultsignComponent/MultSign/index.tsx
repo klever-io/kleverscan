@@ -40,7 +40,7 @@ export interface IMultisignData {
   error?: any;
 }
 
-const MultisignWithApi: React.FC<{
+const MultisignComponent: React.FC<{
   setTxHash: React.Dispatch<React.SetStateAction<string | null>>;
 }> = ({ setTxHash }) => {
   const [selectedHash, setSelectedHash] = useState<string>('');
@@ -135,7 +135,7 @@ const MultisignWithApi: React.FC<{
   };
 
   return (
-    <Content loading={false}>
+    <Content $loading={false}>
       {signBcastTransaction &&
         ReactDOM.createPortal(
           <LoadingBackground>
@@ -154,4 +154,4 @@ const MultisignWithApi: React.FC<{
   );
 };
 
-export default MultisignWithApi;
+export default MultisignComponent;

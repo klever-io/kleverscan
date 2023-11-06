@@ -11,7 +11,6 @@ import {
   ButtonContainer,
   FormBody,
   FormSection,
-  FormSection2,
   SectionTitle,
 } from '../styles';
 import { parseDates, parsePackInfo, parseWhitelistInfo } from './utils';
@@ -172,7 +171,7 @@ const WhitelistConfigSection: React.FC<ISectionProps> = ({
   );
 };
 
-export const WhitelistSection: React.FC = () => {
+export const WhitelistSection: React.FC<{ top?: number }> = ({ top }) => {
   const { control } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
@@ -184,7 +183,7 @@ export const WhitelistSection: React.FC = () => {
         <span>Whitelist</span>
       </SectionTitle>
       {fields.map((field, index) => (
-        <FormSection2 key={field.id} inner style={{ top: '2.5rem' }}>
+        <FormSection key={field.id} inner top={top}>
           <SectionTitle>
             <HiTrash onClick={() => remove(index)} />
             Whitelisted Address {index + 1}
@@ -202,7 +201,7 @@ export const WhitelistSection: React.FC = () => {
             span={2}
             tooltip={tooltip.whitelistInfo.limit}
           />
-        </FormSection2>
+        </FormSection>
       ))}
       <ButtonContainer type="button" onClick={() => append({})}>
         Add Address
@@ -211,7 +210,7 @@ export const WhitelistSection: React.FC = () => {
   );
 };
 
-export const PackInfoSection: React.FC = () => {
+export const PackInfoSection: React.FC<{ top?: number }> = ({ top }) => {
   const { control, watch } = useFormContext();
   const {
     fields,
@@ -244,7 +243,7 @@ export const PackInfoSection: React.FC = () => {
         const currencyId = watch(`packInfo[${index}].currencyId`);
 
         return (
-          <FormSection key={field.id} inner style={{ top: '2.5rem' }}>
+          <FormSection key={field.id} inner top={top}>
             <SectionTitle>
               <HiTrash onClick={() => removePackInfo(index)} />
               Pack Info for {getOrder(index + 1)} Currency{' '}

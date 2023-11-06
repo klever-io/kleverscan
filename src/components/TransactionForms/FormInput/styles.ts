@@ -11,7 +11,7 @@ interface IProps {
   type?: string;
   zIndex?: number;
   logoWarning?: boolean;
-  paddingTop?: boolean;
+  paddingTop?: number;
 }
 
 interface ILabel {
@@ -170,7 +170,7 @@ export const Container = styled.div<IProps>`
   ${props =>
     css`
       grid-column: auto / span ${props.span};
-      padding-top: ${props.paddingTop ? '2rem' : 0};
+      padding-top: ${props.paddingTop ? props.paddingTop : 0}rem;
     `}
 
   > span {

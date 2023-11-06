@@ -32,7 +32,7 @@ export interface IBaseFormInputProps
   toggleOptions?: [string, string];
   bool?: boolean;
   span?: number;
-  paddingTop?: boolean;
+  paddingTop?: number;
   selectPlaceholder?: string;
   options?: {
     label: string;

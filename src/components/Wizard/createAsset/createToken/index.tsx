@@ -8,6 +8,7 @@ import {
   parseURIs,
 } from '@/components/TransactionForms/CustomForms/utils';
 import { useExtension } from '@/contexts/extension';
+import { gtagEvent } from '@/utils/gtag';
 import { parseAddress } from '@/utils/parseValues';
 import { web } from '@klever/sdk-web';
 import { useEffect, useState } from 'react';
@@ -317,15 +318,13 @@ const WizCreateToken: React.FC<any> = ({
       setTxHash(response.data.txsHashes[0]);
       window.scrollTo(0, 0);
       toast.success('Transaction broadcast successfully');
-      if (typeof window.gtag === 'function') {
-        window.gtag('event', 'send_transaction_wizard', {
-          event_category: 'transaction',
-          event_label: 'send_transaction_wizard',
-          hash: response.data.txsHashes[0],
-          sender: walletAddress,
-          transaction_type: 'CreateAssetContract',
-        });
-      }
+      gtagEvent('send_transaction_wizard', {
+        event_category: 'transaction',
+        event_label: 'send_transaction_wizard',
+        hash: response.data.txsHashes[0],
+        sender: walletAddress,
+        transaction_type: 'CreateAssetContract',
+      });
     } catch (error) {
       console.error(error);
       toast.error(error);

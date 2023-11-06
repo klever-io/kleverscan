@@ -273,15 +273,17 @@ export const TooltipContainer = styled.div<{
 }>`
   display: flex;
   user-select: none;
+  position: relative;
   width: fit-content;
-
-  svg {
+  > svg {
     align-self: center;
-    path {
-      fill: ${props => props.theme.form.tooltipContainer};
+  }
+  &:hover {
+    width: calc(100% - 1rem);
+    div {
+      visibility: visible;
     }
   }
-
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     font-size: 1rem;
   }

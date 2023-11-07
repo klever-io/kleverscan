@@ -898,6 +898,13 @@ export interface IITOResponse extends IResponse {
   pagination: IPagination;
 }
 
+export interface IITOsResponse extends IResponse {
+  data: {
+    itos: IITO[];
+  };
+  pagination: IPagination;
+}
+
 export interface IStatisticsResponse extends IResponse {
   data: {
     statistics: {

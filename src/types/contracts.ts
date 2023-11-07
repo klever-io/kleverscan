@@ -196,7 +196,7 @@ export interface IStakingInfo {
 }
 
 export interface IKDAPool {
-  kda: string;
+  kda: string; // only appears on transaction return, don't use it when creating tx
   active: boolean;
   adminAddress: string;
   fRatioKLV: number;

@@ -70,7 +70,7 @@ const HomeTransactions: React.FC = () => {
         <h1>{t('Last Transactions')}</h1>
         <div onClick={() => setHideMenu(!hideMenu)}>
           <p>{hideMenu ? 'Show' : 'Hide'}</p>
-          <ArrowUpSquareHideMenu hide={hideMenu} />
+          <ArrowUpSquareHideMenu $hide={hideMenu} />
         </div>
       </ContainerHide>
       <TransactionContainer>

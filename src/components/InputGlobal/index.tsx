@@ -86,7 +86,6 @@ const Input: React.FC<InputGlobal> = ({
     placeholder,
     onChange: handleInput,
     onKeyDown: keyDownHandle,
-    setOpenSearch: setOpenSearch,
   };
 
   return (

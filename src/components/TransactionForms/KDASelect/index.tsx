@@ -144,7 +144,8 @@ export const KDASelect: React.FC<IKDASelect> = props => {
 
   const setCollectionValue = async (value?: ICollectionList) => {
     if (!isMultiContract && router.pathname !== '/')
-      await setQuery('collection', value?.value || '', router);
+      value?.value &&
+        (await setQuery('collection', value?.value || '', router));
 
     setCollection(value?.value ? value : undefined);
     setValue('collection', value?.value || '');
@@ -209,13 +210,23 @@ export const KDASelect: React.FC<IKDASelect> = props => {
     showAssetIdInput(contractType, assetTriggerType);
 
   useEffect(() => {
-    router.isReady &&
-      router.query.collection &&
-      setCollection(
-        assetsList?.find(
-          asset => asset.value === router.query.collection?.toString(),
-        ),
+    if (router.isReady && router.query.contractDetails) {
+      const contractDetails = JSON.parse(
+        router.query.contractDetails as string,
       );
+      const routerCollectionLabel = contractDetails?.collection;
+      const routerCollection = assetsList?.find(
+        asset => asset.value === routerCollectionLabel,
+      );
+
+      setCollection(routerCollection);
+      setValue('collection', routerCollection?.assetId || '');
+
+      if (contractDetails?.collectionAssetId) {
+        setCollectionAssetId(Number(contractDetails?.collectionAssetId));
+        setValue('collectionAssetId', contractDetails?.collectionAssetId);
+      }
+    }
   }, [router, assetsList]);
 
   const onChangeHandler = async (value: ICollectionList) => {

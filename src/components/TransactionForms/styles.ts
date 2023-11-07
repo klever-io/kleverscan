@@ -11,7 +11,7 @@ interface ISpaceForm {
   section?: string;
 }
 
-export const FormSection = styled.div<{ inner?: boolean }>`
+export const FormSection = styled.div<{ inner?: boolean; top?: number }>`
   padding: 1.5rem;
   position: relative;
 
@@ -33,6 +33,12 @@ export const FormSection = styled.div<{ inner?: boolean }>`
       filter: ${props.theme.dark ? 'brightness(1.1)' : 'brightness(97%)'};
       grid-column: auto / span 2;
       padding-top: 5rem !important;
+    `}
+
+  ${props =>
+    props.top &&
+    css`
+      top: ${props.top}rem;
     `}
 
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {

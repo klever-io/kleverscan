@@ -90,6 +90,7 @@ const Delegate: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
       <FormSection>
         <FormInput
+          zIndex={3}
           name="bucketId"
           title="Bucket"
           type="dropdown"

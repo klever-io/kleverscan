@@ -70,7 +70,7 @@ export const HomeDataProvider: React.FC = ({ children }) => {
       refetchInterval: watcherTimeout,
     },
     {
-      queryKey: 'accountsData',
+      queryKey: 'yesterdayAccountsData',
       queryFn: homeYesterdayAccountsCall,
       refetchInterval: watcherTimeout,
     },

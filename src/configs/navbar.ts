@@ -98,7 +98,11 @@ const navbarItems: INavbarItem[] = [
         pathTo: '/marketplaces',
         Icon: MdOutlineLocalMall,
       },
-      { name: 'Feedback', pathTo: '/feedback', Icon: MdFeedback },
+      {
+        name: 'Feedback',
+        pathTo: 'https://forum.klever.org/c/kleverchain/requests/7',
+        Icon: MdFeedback,
+      },
     ],
   },
 ];

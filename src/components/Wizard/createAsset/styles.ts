@@ -483,6 +483,11 @@ export const GenericInput = styled.input<{
     css`
       text-transform: uppercase;
     `}
+
+  &:disabled {
+    background: ${props => transparentize(0.8, props.theme.gray)};
+    cursor: not-allowed;
+  }
 `;
 
 export const ErrorMessage = styled.div`
@@ -1524,4 +1529,14 @@ export const IconWizardClock = styled(BsClock)`
 
 export const UnderscoreConnect = styled.u`
   cursor: pointer;
+`;
+
+export const ConfigITOStartTime = styled.p`
+  display: flex;
+  justify-content: space-between;
+
+  > span {
+    display: flex;
+    gap: 1rem;
+  }
 `;

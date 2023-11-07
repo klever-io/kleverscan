@@ -15,6 +15,7 @@ import { useQuery } from 'react-query';
 import {
   ButtonsComponent,
   ConnectButtonComponent,
+  infinitySymbol,
   IWizardComponents,
 } from '../createAsset';
 import {
@@ -23,6 +24,7 @@ import {
   BorderedButton,
   ButtonsContainer,
   ChangedAddressContainer,
+  ConfigITOStartTime,
   ConfirmCardBasics,
   ConfirmCardBasisInfo,
   ConfirmCardImage,
@@ -75,6 +77,7 @@ export const propertiesCommonDefaultValuesITO = {
   endTime: '',
   maxAmount: 0,
   status: 1,
+  startTimeStartNow: false,
 };
 
 const infinity = '\u221e';
@@ -297,11 +300,18 @@ export const CreateITOFourthStep: React.FC<IAssetITOInformations> = ({
 }) => {
   const {
     register,
+    setValue,
     formState: { errors },
     watch,
   } = useFormContext();
+
+  const handlerStartTime = (e: { target: { checked: boolean } }) => {
+    setValue('startTimeStartNow', e.target.checked);
+  };
+
   const collection = watch('collection');
   const watchStartTime = watch('startTime');
+  const watchStartTimeNow = watch('startTimeStartNow');
   let errorStartTime = null;
   let errorEndTime = null;
   try {
@@ -324,13 +334,20 @@ export const CreateITOFourthStep: React.FC<IAssetITOInformations> = ({
       <div>
         <p>What is the duration of the {collection} ITO?</p>
         <p>{description}</p>
-        <p>Start Time</p>
+        <ConfigITOStartTime>
+          Start Time
+          <span>
+            Start right now?
+            <input type="checkbox" onChange={handlerStartTime} />
+          </span>
+        </ConfigITOStartTime>
         <ErrorInputContainer>
           <GenericInput
             error={errorStartTime}
             type="datetime-local"
             autoFocus={true}
             {...register('startTime')}
+            disabled={watchStartTimeNow}
           />
 
           {errorStartTime && (
@@ -1401,9 +1418,12 @@ export const TransactionDetails2: React.FC = () => {
   const { watch } = useFormContext();
   const receiverAddress = watch('receiverAddress');
   const startTime = watch('startTime');
+  const startTimeNow = watch('startTimeStartNow');
   const endTime = watch('endTime');
   const maxAmount = watch('maxAmount');
   const status = watch('status');
+
+  const startTimeValue = startTimeNow ? 'Now' : '--';
   return (
     <ReviewContainer>
       <span> SET UP ITO</span>
@@ -1415,7 +1435,7 @@ export const TransactionDetails2: React.FC = () => {
         <ConfirmCardBasisInfo>
           <span>ITO Time</span>
           <span>
-            {startTime || '--'} to {endTime || '--'}
+            {startTime || startTimeValue} to {endTime || infinitySymbol}
           </span>
         </ConfirmCardBasisInfo>
         <ConfirmCardBasisInfo>

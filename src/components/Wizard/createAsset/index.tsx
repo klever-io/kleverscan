@@ -258,7 +258,7 @@ export const ButtonsComponent: React.FC<IButtonsComponenets> = ({
       {noNextButton ? (
         <></>
       ) : (
-        <WizardButton type="button" onClick={handleClick} disabled={!next}>
+        <WizardButton type="button" onClick={handleClick} isDisabled={!next}>
           <p>Next</p>
           <WizardRightArrowSVG />
         </WizardButton>

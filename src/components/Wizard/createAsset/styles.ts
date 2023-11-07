@@ -234,6 +234,7 @@ export const WizardButton = styled.button<{
   centered?: boolean;
   fullWidth?: boolean;
   infoStep?: boolean;
+  isDisabled?: boolean;
 }>`
   display: flex;
   position: relative;
@@ -260,10 +261,12 @@ export const WizardButton = styled.button<{
     font-size: 0.87rem;
   }
 
-  :disabled {
-    background: ${props => props.theme.lightBlue};
-    cursor: not-allowed;
-  }
+  ${props =>
+    props.isDisabled &&
+    css`
+      background: ${props => props.theme.lightBlue};
+      cursor: not-allowed;
+    `}
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
     max-width: calc(22rem - 6rem);
     ${props =>

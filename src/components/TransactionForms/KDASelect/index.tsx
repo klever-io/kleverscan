@@ -20,7 +20,7 @@ import { useExtension } from '@/contexts/extension';
 import { collectionListCall } from '@/services/requests/collection';
 import { ICollectionList, IDropdownItem } from '@/types';
 import { toLocaleFixed } from '@/utils/formatFunctions';
-import { useDebounce } from '@/utils/hooks';
+import { useDebounce, useDidUpdateEffect } from '@/utils/hooks';
 import { setQuery } from '@/utils/hooks/contract';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
@@ -38,13 +38,10 @@ interface IKDASelect {
   assetTriggerType?: number | null;
   withdrawType?: number | null;
   validateFields?: string[];
-}
-
-interface ISelectProps extends IKDASelect {
   required?: boolean;
 }
 
-export const KDASelect: React.FC<ISelectProps> = props => {
+export const KDASelect: React.FC<IKDASelect> = props => {
   const { required } = props;
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -146,21 +143,11 @@ export const KDASelect: React.FC<ISelectProps> = props => {
   }, [assetsFetching, kassetsFetching]);
 
   const setCollectionValue = async (value?: ICollectionList) => {
-    if (!value) {
-      await setQuery('collection', '', router);
-      setCollection(undefined);
-      setValue('collection', '', {
-        shouldValidate: true,
-      });
-      return;
-    }
-
     if (!isMultiContract && router.pathname !== '/')
-      await setQuery('collection', value?.value, router);
-    setCollection(value);
-    setValue('collection', value?.value, {
-      shouldValidate: false,
-    });
+      await setQuery('collection', value?.value || '', router);
+
+    setCollection(value?.value ? value : undefined);
+    setValue('collection', value?.value || '');
   };
 
   const refetch = () => {
@@ -187,13 +174,14 @@ export const KDASelect: React.FC<ISelectProps> = props => {
     collectionAssetId && setCollectionAssetId(watchCollectionAssetId);
   }, [watchCollectionAssetId, collectionAssetId]);
 
-  useEffect(() => {
+  useDidUpdateEffect(() => {
     validateFields.forEach(field => {
       const value = getValues(field);
       if (value) {
         trigger(field);
       }
     });
+    trigger('collection');
   }, [selectedCollection]);
 
   let assetBalance = 0;

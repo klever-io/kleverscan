@@ -87,16 +87,12 @@ export const CreateITOSecondStep: React.FC<IAssetITOInformations> = ({
   handleStep,
 }) => {
   const { setSelectedContractType } = useMulticontract();
-  const { watch } = useFormContext();
+  const {
+    formState: { errors },
+    watch,
+  } = useFormContext();
+
   const collection = watch('collection');
-
-  let error = null;
-
-  try {
-    error = eval(`errors?.collection`);
-  } catch {
-    error = null;
-  }
 
   useEffect(() => {
     setSelectedContractType('ConfigITOContract');
@@ -104,7 +100,7 @@ export const CreateITOSecondStep: React.FC<IAssetITOInformations> = ({
 
   const buttonsProps = {
     handleStep,
-    next: !!(!error && checkEmptyField(collection)),
+    next: !!(!errors?.collection && checkEmptyField(collection)),
   };
 
   return (
@@ -119,7 +115,6 @@ export const CreateITOSecondStep: React.FC<IAssetITOInformations> = ({
         <ErrorInputContainer>
           <KDASelect required />
           <ConnectButtonComponent />
-          {error && <ErrorMessage>{error?.message}</ErrorMessage>}
         </ErrorInputContainer>
       </div>
       <ButtonsComponent buttonsProps={buttonsProps} />

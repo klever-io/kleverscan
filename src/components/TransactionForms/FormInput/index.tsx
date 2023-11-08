@@ -157,7 +157,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   }
 
   useEffect(() => {
-    name && setValue(name, dynamicInitialValue);
+    name && dynamicInitialValue && setValue(name, dynamicInitialValue);
   }, [dynamicInitialValue]);
 
   const inputValue = name && watch(name);
@@ -166,6 +166,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
     name &&
     (type !== 'number' && isCustom.value !== 'number'
       ? register(name, {
+          value: getValues(name) || defaultValue || '',
           required: {
             value: required || false,
             message: 'This field is required',
@@ -179,6 +180,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
           ),
         })
       : register(name, {
+          value: getValues(name) || defaultValue || '',
           valueAsNumber: true,
           required: {
             value: required || false,

@@ -1,3 +1,4 @@
+import { useInputSearch } from '@/contexts/inputSearch';
 import { useTheme } from '@/contexts/theme';
 import { getAsset } from '@/services/requests/asset';
 import getAccount from '@/services/requests/searchBar/account';
@@ -22,7 +23,6 @@ import {
   AccountRowSections,
   AssetRowSections,
   BlockRowSections,
-  setSessionStorage,
   TransactionRowSections,
 } from './RowSections';
 import {
@@ -74,11 +74,11 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
 }) => {
   const [precision, setPrecision] = useState(0);
   const trimmedSearch = search.trim().toLowerCase();
+  const { setLinkValue } = useInputSearch();
   const type = getInputType(trimmedSearch);
   const { isDarkTheme } = useTheme();
   const canSearch = () => {
     if (!type) {
-      setSessionStorage('');
       return false;
     }
     return true;
@@ -92,7 +92,9 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
   });
 
   if (!isLoading && canSearchResult && !data?.data) {
-    setSessionStorage('');
+    setLinkValue(trimmedSearch, '');
+  } else {
+    setLinkValue(trimmedSearch, type);
   }
 
   const isAsset = () => {

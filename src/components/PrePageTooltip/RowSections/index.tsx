@@ -49,10 +49,6 @@ const getRedirectButton = (
   </div>
 );
 
-export const setSessionStorage = (link: string): void => {
-  sessionStorage.setItem('linkSearch', link);
-};
-
 export const TransactionRowSections = (
   res: ITransactionResponse,
   precision: number,
@@ -60,7 +56,6 @@ export const TransactionRowSections = (
 ): IRowSection[] => {
   if (res.data || res.error === '') {
     const { transaction } = res.data;
-    setSessionStorage(`/transaction/${transaction.hash}`);
     const getTxStatus = () => {
       if (transaction.status === 'success') {
         const Status = getStatusIcon('success');
@@ -182,7 +177,7 @@ export const AssetRowSections = (
 ): IRowSection[] => {
   if (res.data || res.error === '') {
     const { asset } = res.data;
-    setSessionStorage(`/asset/${asset.assetId}`);
+
     return [
       {
         element: (
@@ -272,7 +267,7 @@ export const AccountRowSections = (
       }
       return otherAssets + KLV;
     };
-    setSessionStorage(`/account/${account.address}`);
+
     return [
       {
         element: (
@@ -355,7 +350,7 @@ export const BlockRowSections = (
   if (res.data || res.error === '') {
     const { block } = res.data;
     const date = formatDate(block.timestamp);
-    setSessionStorage(`/block/${block.nonce}`);
+
     return [
       {
         element: (

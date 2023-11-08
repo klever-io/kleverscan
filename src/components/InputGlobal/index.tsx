@@ -1,4 +1,5 @@
 import { Search } from '@/assets/icons';
+import { useInputSearch } from '@/contexts/inputSearch';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import React, { KeyboardEvent, useEffect, useRef, useState } from 'react';
@@ -20,10 +21,10 @@ const Input: React.FC<InputGlobal> = ({
   const [showTooltip, setShowTooltip] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const timeoutId = useRef<NodeJS.Timeout>();
+  const { searchValue } = useInputSearch();
   const { t } = useTranslation('common');
 
   const placeholder = t('Search Address, Block, Transaction, Asset');
-
   const router = useRouter();
 
   useEffect(() => {
@@ -60,8 +61,7 @@ const Input: React.FC<InputGlobal> = ({
 
   const handleSearch = (event: KeyboardEvent) => {
     if (event.key === 'Enter' || event.type === 'click') {
-      const link = sessionStorage.getItem('linkSearch') || '';
-      if (link !== '') router.push(link);
+      if (searchValue !== '') router.push(searchValue);
     }
   };
 

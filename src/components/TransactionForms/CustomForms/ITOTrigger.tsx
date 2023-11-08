@@ -1,11 +1,12 @@
+import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
 import { ICollectionList } from '@/types';
 import { ITOTriggerTypes } from '@/utils/contracts';
-import { useKDASelect } from '@/utils/hooks/contract';
 import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
+import { KDASelect } from '../KDASelect';
 import { FormBody, FormSection } from '../styles';
 import {
   ConfigITOData,
@@ -26,7 +27,10 @@ const ITOTrigger: React.FC<IContractProps> = ({
 }) => {
   const { handleSubmit, watch, reset } = useFormContext<ITOTriggerData>();
   const { walletAddress } = useExtension();
-  const [collection, KDASelect] = useKDASelect();
+
+  const { queue } = useMulticontract();
+
+  const collection = queue[formKey].collection;
 
   const triggerType = watch('triggerType');
 
@@ -68,7 +72,7 @@ const getITOTriggerForm = (
 ) => {
   switch (triggerType) {
     case 0:
-      return <PackInfoSection />;
+      return <PackInfoSection top={2} />;
     case 1:
       return (
         <FormSection>
@@ -154,9 +158,9 @@ const getITOTriggerForm = (
         </FormSection>
       );
     case 7:
-      return <WhitelistSection />;
+      return <WhitelistSection top={2.5} />;
     case 8:
-      return <WhitelistSection />;
+      return <WhitelistSection top={2.5} />;
     case 9:
       return (
         <FormSection>

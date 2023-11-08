@@ -212,3 +212,22 @@ export const useForceUpdate = (): (() => void) => {
   const [value, setValue] = useState(0);
   return () => setValue(value => value + 1);
 };
+
+export const useDebounce = <T extends unknown>(
+  value: T,
+  delay: number,
+): T | undefined => {
+  const [debouncedValue, setDebouncedValue] = useState<T | undefined>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return (): void => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};

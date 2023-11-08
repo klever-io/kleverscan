@@ -2,6 +2,7 @@ import {
   WizardCheckSquare,
   WizardFailSquare,
   WizardInfoSquare,
+  WizardRightArrow,
 } from '@/assets/icons';
 import { transparentize } from 'polished';
 import { BsClock } from 'react-icons/bs';
@@ -232,9 +233,13 @@ export const WizardButton = styled.button<{
   secondary?: boolean;
   centered?: boolean;
   fullWidth?: boolean;
+  infoStep?: boolean;
+  isDisabled?: boolean;
 }>`
   display: flex;
+  position: relative;
   align-items: center;
+  justify-content: center;
   padding: 0.9rem;
   background: ${props => (props.secondary ? '#404264' : '#aa33b5')};
   justify-content: ${props => props.centered && 'center'};
@@ -256,10 +261,12 @@ export const WizardButton = styled.button<{
     font-size: 0.87rem;
   }
 
-  :disabled {
-    background: ${props => props.theme.lightBlue};
-    cursor: not-allowed;
-  }
+  ${props =>
+    props.isDisabled &&
+    css`
+      background: ${props => props.theme.lightBlue};
+      cursor: not-allowed;
+    `}
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
     max-width: calc(22rem - 6rem);
     ${props =>
@@ -267,7 +274,18 @@ export const WizardButton = styled.button<{
       css`
         max-width: 100%;
       `}
+    ${({ infoStep }) =>
+      infoStep &&
+      css`
+        max-width: 100%;
+        width: calc(50% - 8px);
+      `}
   }
+`;
+
+export const WizardRightArrowSVG = styled(WizardRightArrow)`
+  position: absolute;
+  right: 2rem;
 `;
 
 export const CardContainer = styled.div`
@@ -299,13 +317,15 @@ export const CardContainer = styled.div`
       gap: 1rem;
       text-decoration-line: underline;
       > span {
+        background-color: red;
         display: flex;
         align-items: center;
         width: fit-content;
         border-radius: 20%;
         padding: 0.2rem;
-
         svg {
+          height: 2em;
+          width: 2em;
           font-size: 1.2rem;
         }
       }
@@ -466,6 +486,11 @@ export const GenericInput = styled.input<{
     css`
       text-transform: uppercase;
     `}
+
+  &:disabled {
+    background: ${props => transparentize(0.8, props.theme.gray)};
+    cursor: not-allowed;
+  }
 `;
 
 export const ErrorMessage = styled.div`
@@ -477,7 +502,9 @@ export const ErrorMessage = styled.div`
 export const GenericInfoCard = styled.div`
   padding: 1rem;
   font-size: 0.82rem;
-  background: ${({ theme }) => theme.wizard.genericInfoCard};
+  border-radius: 1rem;
+  background: ${({ theme }) =>
+    theme.dark ? theme.wizard.genericInfoCard : theme.true.white};
 `;
 
 export const AddressesContainer = styled.div`
@@ -646,22 +673,23 @@ export const PrecisionCard = styled.div<{ isSelected: boolean }>`
   cursor: pointer;
 
   padding: 1.34rem 0.93rem;
-  background-color: #181935;
+  background-color: ${({ theme }) =>
+    theme.dark ? '#181935' : theme.true.white};
   border-radius: 0.5rem;
-  color: white !important;
-  font-size: 1.2rem !important;
+  color: ${({ theme }) => theme.black};
+  font-size: 1rem;
   font-weight: 700;
   transition: 200ms ease;
   ${props =>
     props.isSelected &&
     css`
-      filter: brightness(1.5);
-      border: 1px solid #aa33b5;
+      border: 1px solid ${({ theme }) => theme.violet};
+      color: ${({ theme }) => theme.violet};
     `}
 
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 4rem;
-    height: 3.8rem;
+    width: 4.313rem;
+    height: 3.875rem;
   }
 `;
 
@@ -728,11 +756,10 @@ export const ConfirmCardBasics = styled.div<{
   tokenInfo?: boolean;
 }>`
   display: flex;
-  color: #fff;
+  color: ${({ theme }) => theme.black};
   flex-direction: column;
-  background: #222345;
-  backdrop-filter: contrast(20%);
-  /* padding: 1.56rem; */
+  background: ${({ theme }) =>
+    theme.dark ? theme.card.background : theme.true.white};
   border-radius: 10px;
   ${props =>
     props?.tokenInfo &&
@@ -756,7 +783,6 @@ export const ConfirmCardBasics = styled.div<{
       > span:last-child {
         font-weight: 400;
         font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.6);
         > span {
           color: red;
         }
@@ -795,7 +821,7 @@ export const ConfirmCardBasisInfo = styled.div<{ secondary?: boolean }>`
   font-weight: 500;
 
   > span:first-child {
-    color: #c6c7eb;
+    color: ${({ theme }) => (theme.dark ? theme.lightGray : theme.navbar.text)};
   }
 
   > span:last-child {
@@ -804,7 +830,7 @@ export const ConfirmCardBasisInfo = styled.div<{ secondary?: boolean }>`
     align-items: center;
     font-size: 1rem;
     font-weight: 700;
-    color: #fff;
+    color: ${({ theme }) => theme.black};
     > strong {
       font-weight: 400;
       font-family: 0.7rem;
@@ -846,7 +872,7 @@ export const CheckBoxInput = styled.input.attrs(() => ({
     border-radius: 50%;
     top: 2px;
     bottom: 2px;
-    left: 2px;
+    left: 0;
     background: ${props => props.theme.true.white};
     transition: 0.5s;
     transform: translate(15%, 0);
@@ -854,6 +880,7 @@ export const CheckBoxInput = styled.input.attrs(() => ({
 
   &:checked:before {
     transform: translate(100%, 0);
+    left: 5.5px;
   }
 `;
 
@@ -962,7 +989,7 @@ export const StepsItem = styled.div<{
   height: 2.25rem;
   border-radius: 50%;
   border: 1.5px solid #646693;
-  color: ${({ theme }) => theme.wizard.steps};
+  color: ${({ theme }) => (theme.dark ? theme.true.white : theme.navbar.text)};
   background: ${props => props.theme.background};
   z-index: 2;
   ${props =>
@@ -978,6 +1005,7 @@ export const StepsItem = styled.div<{
   ${props =>
     props.selected &&
     css`
+      color: ${({ theme }) => theme.wizard.steps};
       border-color: ${({ theme }) => theme.wizard.steps};
     `}
   ${props =>
@@ -1023,7 +1051,7 @@ export const DesktopBasicSteps = styled.div`
   display: flex;
   justify-content: space-between;
   svg {
-    color: #fff;
+    color: ${({ theme }) => theme.black};
     font-size: 1.5rem;
   }
   > div:first-child {
@@ -1033,7 +1061,8 @@ export const DesktopBasicSteps = styled.div`
 
     > span:last-child {
       font-size: 0.7rem;
-      color: #fff;
+      color: ${({ theme }) =>
+        theme.dark ? theme.true.white : theme.navbar.text};
     }
   }
 `;
@@ -1086,6 +1115,12 @@ export const StepsItemContainerDesktop = styled.div<{ selected: boolean }>`
   color: ${props => (props.selected ? '#fff' : '#646693')};
 
   > div:last-child {
+    span {
+      color: ${props => (props.theme.dark ? '#fff' : '#646693')};
+      @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+        text-transform: uppercase;
+      }
+    }
   }
 `;
 
@@ -1104,16 +1139,11 @@ export const AdvancedStepsDesktop = styled.div<{ darkText?: boolean }>`
   > div:first-child {
     font-weight: 500;
     color: #aa33b5;
-    ${props =>
-      props?.darkText &&
-      css`
-        filter: brightness(0.6);
-      `}
-
     font-size: 1rem;
     gap: 0.5rem;
     > span:last-child {
-      color: #fff;
+      color: ${({ theme }) =>
+        theme.dark ? theme.true.white : theme.navbar.text};
       font-size: 0.7rem;
     }
   }
@@ -1281,7 +1311,19 @@ export const PropertiesItem = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  border: 1px solid #404264;
+  svg {
+    path {
+      fill: ${({ theme }) => theme.black};
+    }
+  }
+  ${({ theme }) =>
+    theme.dark
+      ? css`
+          border: 1px solid #404264;
+        `
+      : css`
+          background-color: ${({ theme }) => theme.true.white};
+        `}
   max-width: 15rem;
   width: 45%;
   height: 8rem;
@@ -1328,7 +1370,7 @@ export const BackArrowSpan = styled.div`
   background: #404264;
   width: 3.5rem;
   height: 3rem;
-  border-radius: 25%;
+  border-radius: 0.5rem;
   padding: 0.84rem;
   cursor: pointer;
 `;
@@ -1432,14 +1474,14 @@ export const HashContainer = styled.div`
   word-break: break-all;
   word-wrap: break-word;
   flex-wrap: wrap;
-  background: #404264;
+  background: ${({ theme }) => (theme.dark ? '#404264' : '#fff')};
   cursor: pointer;
 
   > div {
     display: flex;
     flex-direction: column;
     max-width: 70%;
-    color: #fff;
+    color: ${({ theme }) => (theme.dark ? '#fff' : '#646693')};
     gap: 1rem;
     > span:nth-child(1) {
       font-size: 1rem;
@@ -1447,7 +1489,7 @@ export const HashContainer = styled.div`
       line-height: normal;
     }
     > span:nth-child(2) {
-      color: #c6c7eb;
+      color: ${({ theme }) => (theme.dark ? '#c6c7eb' : theme.black)};
       font-size: 0.9rem;
       font-weight: 700;
       line-height: 1.2rem;
@@ -1485,5 +1527,19 @@ export const IconWizardInfoSquare = styled(WizardInfoSquare)`
 export const IconWizardClock = styled(BsClock)`
   > path {
     fill: ${({ theme }) => theme.black};
+  }
+`;
+
+export const UnderscoreConnect = styled.u`
+  cursor: pointer;
+`;
+
+export const ConfigITOStartTime = styled.p`
+  display: flex;
+  justify-content: space-between;
+
+  > span {
+    display: flex;
+    gap: 1rem;
   }
 `;

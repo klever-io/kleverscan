@@ -34,7 +34,7 @@ export const Container = styled.div`
   height: 100%;
 `;
 
-export const Content = styled.div<{ loading: boolean; isJSONFile?: boolean }>`
+export const Content = styled.div<{ $loading: boolean; isJSONFile?: boolean }>`
   height: 60%;
   min-height: 50vh;
   display: flex;

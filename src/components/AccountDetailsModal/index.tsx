@@ -143,38 +143,30 @@ export const AccountDetailsModal: React.FC<IAccountDetailsModal> = ({
     onMouseOver: handleMouseEnter,
     onMouseLeave: handleMouseLeave,
   };
-  useEffect(() => {
-    const storagePrimaryAssets = localStorage.getItem('primaryAsset');
-    if (storagePrimaryAssets) {
-      try {
-        const getPrimaryAsset: IAssetBalance = JSON.parse(
-          storagePrimaryAssets as any,
-        );
-        setPrimaryAsset([getPrimaryAsset]);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  }, [otherAssets]);
 
-  useEffect(() => {
+  const updatePrimaryAsset = () => {
+    const storagePrimaryAssets = localStorage.getItem('primaryAsset');
+    if (!storagePrimaryAssets) {
+      return;
+    }
     try {
-      const storagePrimaryAssets = localStorage.getItem('primaryAsset');
-      if (storagePrimaryAssets) {
-        const getPrimaryAsset = JSON.parse(storagePrimaryAssets as any);
-        const newPrimaryAsset = otherAssets.filter(
-          asset => asset.assetId === getPrimaryAsset.assetId,
-        );
-        if (newPrimaryAsset) {
-          localStorage.setItem(
-            'primaryAsset',
-            JSON.stringify(newPrimaryAsset[0]),
-          );
-        }
-      }
+      const getPrimaryAsset: IAssetBalance = JSON.parse(storagePrimaryAssets);
+      setPrimaryAsset([getPrimaryAsset]);
     } catch (error) {
       console.error(error);
     }
+
+    const getPrimaryAsset = JSON.parse(storagePrimaryAssets);
+    const newPrimaryAsset = otherAssets.find(
+      asset => asset.assetId === getPrimaryAsset.assetId,
+    );
+    if (newPrimaryAsset) {
+      localStorage.setItem('primaryAsset', JSON.stringify(newPrimaryAsset));
+    }
+  };
+
+  useEffect(() => {
+    updatePrimaryAsset();
   }, [otherAssets]);
 
   useEffect(() => {

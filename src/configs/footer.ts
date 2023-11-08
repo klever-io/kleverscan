@@ -71,6 +71,10 @@ const contents: IContent[] = [
         href: 'https://klever.org/s/Klever-Blockchain-Whitepaper-v20-lr.pdf',
       },
       {
+        name: 'Forum',
+        href: 'https://forum.klever.org/',
+      },
+      {
         name: 'Devs Community',
         href: 'https://join.slack.com/t/klever-blockchain/shared_invite/zt-1z69ikw0g-dXtRY7eGTnyRllsCV_YGOw',
       },

@@ -2,11 +2,13 @@ import {
   WhiteTick,
   WizardLeftArrow,
   WizardPlusSquare,
-  WizardRightArrow,
   WizardTxSuccess,
 } from '@/assets/icons';
+import WalletHelp from '@/components/Header/WalletHelp';
 import Tooltip from '@/components/Tooltip';
+import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
+import { formatNumberDecimal } from '@/utils/formatFunctions';
 import { validateImgUrl } from '@/utils/imageValidate';
 import { parseAddress } from '@/utils/parseValues';
 import Link from 'next/link';
@@ -61,11 +63,13 @@ import {
   StepsItem,
   StepsItemContainer,
   StepsItemContainerDesktop,
+  UnderscoreConnect,
   UriButtonsContainer,
   WizardAddressCheck,
   WizardButton,
   WizardConfirmLogo,
   WizardFailAddressCheck,
+  WizardRightArrowSVG,
   WizardTxSuccessComponent,
 } from './styles';
 
@@ -182,6 +186,32 @@ export const propertiesCommonDefaultValues = {
 
 export const infinitySymbol = '\u221e';
 
+export const ConnectButtonComponent: React.FC = () => {
+  const [openWalletHelp, setOpenWalletHelp] = useState(false);
+  const { connectExtension, extensionInstalled, walletAddress } =
+    useExtension();
+
+  const handleClick = () => {
+    if (!extensionInstalled) setOpenWalletHelp(true);
+    if (extensionInstalled && !walletAddress) connectExtension();
+  };
+  return extensionInstalled && walletAddress ? (
+    <></>
+  ) : (
+    <>
+      <p>
+        You are not connected to your wallet, do you want to{' '}
+        <UnderscoreConnect onClick={handleClick}>connect?</UnderscoreConnect>
+      </p>
+      <WalletHelp
+        closeDrawer={() => setOpenWalletHelp(false)}
+        opened={openWalletHelp}
+        clickConnectionMobile={() => setOpenWalletHelp(false)}
+      />
+    </>
+  );
+};
+
 export const ButtonsComponent: React.FC<IButtonsComponenets> = ({
   buttonsProps: { handleStep, next, previousStep },
   noNextButton = false,
@@ -228,9 +258,9 @@ export const ButtonsComponent: React.FC<IButtonsComponenets> = ({
       {noNextButton ? (
         <></>
       ) : (
-        <WizardButton type="button" onClick={handleClick} disabled={!next}>
+        <WizardButton type="button" onClick={handleClick} isDisabled={!next}>
           <p>Next</p>
-          <WizardRightArrow />
+          <WizardRightArrowSVG />
         </WizardButton>
       )}
     </ButtonsContainer>
@@ -268,10 +298,10 @@ export const CreateAssetFirstStep: React.FC<IAssetInformations> = ({
         </span>
         <WizardButton onClick={() => handleStep(prev => prev + 1)} fullWidth>
           <p>I&apos;m ready, I want to start</p>
-          <WizardRightArrow />
+          <WizardRightArrowSVG />
         </WizardButton>
         <span>
-          <IconWizardClock />
+          <IconWizardClock style={{ height: '1rem', width: '1rem' }} />
           Estimated time <strong>{timeEstimated}</strong>
         </span>
       </div>
@@ -562,10 +592,13 @@ export const CreateAssetFourthStep: React.FC<IAssetInformations> = ({
               })}
               placeholder={parseAddress(address, 14)}
             />
-            {!isTablet && !isMobile && <AddressValidationIcon error={error} />}
           </div>
         )}
+        {!isTablet && !isMobile && changeOwnerAddress && (
+          <AddressValidationIcon error={error} />
+        )}
       </ChangedAddressContainer>
+      <ConnectButtonComponent />
       <ButtonsComponent buttonsProps={buttonsProps} />
     </GenericCardContainer>
   );
@@ -1063,7 +1096,7 @@ export const CreateAssetRoyaltyTransferPerc: React.FC<IWizardComponents> = ({
             isHidden={fields.length <= 1}
           >
             <span>Next</span>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </BorderedButton>
         </div>
         <BorderedButton
@@ -1179,7 +1212,7 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
       <ButtonsComponent buttonsProps={buttonsProps} noNextButton />
     </GenericCardContainer>
   ) : (
-    <GenericCardContainer alignCenter>
+    <GenericCardContainer>
       <div>
         <p>Split Royalties</p>
         <p key={fields.length}>
@@ -1296,7 +1329,7 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
             isHidden={fields.length <= 1}
           >
             <span>Next</span>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </BorderedButton>
         </div>
         <BorderedButton
@@ -1397,10 +1430,11 @@ export const CreateAssetRoyaltySteps: React.FC<IWizardComponents> = ({
           Would you like to enable and configure royalties for {ticker} now?
         </p>
         <ButtonsContainer>
-          <WizardButton centered onClick={() => setRoyalties(true)}>
+          <WizardButton infoStep centered onClick={() => setRoyalties(true)}>
             Yes
           </WizardButton>
           <WizardButton
+            infoStep
             secondary
             centered
             onClick={() => handleStep(prev => prev + 1)}
@@ -1494,7 +1528,7 @@ export const CreateAssetSixStep: React.FC<IWizardComponents> = ({
     register,
     formState: { errors },
   } = useFormContext();
-
+  const [inputValue, setInputValue] = useState('');
   const ticker = watch('ticker');
   const initialSupply = watch('initialSupply');
 
@@ -1510,7 +1544,9 @@ export const CreateAssetSixStep: React.FC<IWizardComponents> = ({
     handleStep,
     next: !error,
   };
-
+  const handleInputChange = (e: { target: { value: string } }) => {
+    setInputValue(formatNumberDecimal(e.target.value));
+  };
   return (
     <GenericCardContainer>
       <div>
@@ -1525,12 +1561,14 @@ export const CreateAssetSixStep: React.FC<IWizardComponents> = ({
         </p>
         <GenericInput
           error={error}
-          type="number"
+          type="text"
           placeholder="0"
           autoFocus={true}
+          value={inputValue}
           {...register('initialSupply', {
             pattern: { value: /\d+/g, message: 'Only numbers are allowed' },
           })}
+          onChange={handleInputChange}
           align={'right'}
         />
         {error && <ErrorMessage>{error?.message}</ErrorMessage>}
@@ -1555,6 +1593,7 @@ export const CreateAssetSevenStep: React.FC<IAssetInformations> = ({
     register,
     formState: { errors },
   } = useFormContext();
+  const [inputValue, setInputValue] = useState('');
   const ticker = watch('ticker');
   const maxSupply = watch('maxSupply');
 
@@ -1571,6 +1610,10 @@ export const CreateAssetSevenStep: React.FC<IAssetInformations> = ({
     next: !error,
   };
 
+  const handleInputChange = (e: { target: { value: string } }) => {
+    setInputValue(formatNumberDecimal(e.target.value));
+  };
+
   return (
     <GenericCardContainer>
       <div>
@@ -1582,12 +1625,13 @@ export const CreateAssetSevenStep: React.FC<IAssetInformations> = ({
         <p>{description}</p>
         <GenericInput
           error={error}
-          type="number"
+          type="text"
+          value={inputValue}
           placeholder="0"
           {...register('maxSupply', {
-            pattern: { value: /\d+/g, message: 'Value must be only numbers' },
-            valueAsNumber: true,
+            pattern: { value: /\d+/g, message: 'Only numbers are allowed' },
           })}
+          onChange={handleInputChange}
           align={'right'}
         />
         {error && <ErrorMessage>{error?.message}</ErrorMessage>}
@@ -1727,6 +1771,7 @@ export const URIsSection: React.FC<IAssetInformations> = ({
         <p>Do you want to add URIs to your {assetText} now?</p>
         <ButtonsContainer columnDirection>
           <WizardButton
+            infoStep
             centered
             onClick={() => {
               setAddUri(true);
@@ -1735,6 +1780,7 @@ export const URIsSection: React.FC<IAssetInformations> = ({
             Yes
           </WizardButton>
           <WizardButton
+            infoStep
             secondary
             centered
             onClick={() => handleStep(prev => prev + 1)}
@@ -1755,7 +1801,7 @@ export const URIsSection: React.FC<IAssetInformations> = ({
       <ButtonsComponent buttonsProps={buttonsProps} noNextButton />
     </GenericCardContainer>
   ) : (
-    <GenericCardContainer alignCenter>
+    <GenericCardContainer>
       <div>
         <p>URI</p>
         <p key={fields.length}>
@@ -1822,7 +1868,7 @@ export const URIsSection: React.FC<IAssetInformations> = ({
             isHidden={fields.length <= 1}
           >
             <span>Next</span>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </BorderedButton>
         </div>
         <BorderedButton
@@ -1878,7 +1924,7 @@ const SelectStakingTypeComponent: React.FC<IWizardStakingComponents> = ({
                 earned annually on an investment
               </span>
             </div>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </PreConfirmOptions>
           <PreConfirmOptions
             secondary
@@ -1896,7 +1942,7 @@ const SelectStakingTypeComponent: React.FC<IWizardStakingComponents> = ({
                 into the FPR pool.
               </span>
             </div>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </PreConfirmOptions>
         </StakingTypeContainer>
       </div>
@@ -2243,10 +2289,15 @@ export const CreateAssetStakingStep: React.FC<IWizardComponents> = ({
       <div>
         <p>Would you like to enable and configure staking for {ticker} now?</p>
         <ButtonsContainer>
-          <WizardButton centered onClick={() => setStaking(true)}>
+          <WizardButton infoStep centered onClick={() => setStaking(true)}>
             Yes
           </WizardButton>
-          <WizardButton secondary centered onClick={() => handleStep(11)}>
+          <WizardButton
+            infoStep
+            secondary
+            centered
+            onClick={() => handleStep(11)}
+          >
             No
           </WizardButton>
         </ButtonsContainer>
@@ -2332,10 +2383,11 @@ export const CreateAssetAddRoles: React.FC<IAssetInformations> = ({
           Would you like to create roles to manage your {ticker} {assetText}
         </p>
         <ButtonsContainer>
-          <WizardButton centered onClick={() => setAddRole(true)}>
+          <WizardButton infoStep centered onClick={() => setAddRole(true)}>
             Yes
           </WizardButton>
           <WizardButton
+            infoStep
             secondary
             centered
             onClick={() => handleStep(prev => prev + 1)}
@@ -2424,7 +2476,7 @@ export const CreateAssetAddRoles: React.FC<IAssetInformations> = ({
             isHidden={fields.length <= 1}
           >
             <span>Next</span>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </BorderedButton>
         </div>
         <BorderedButton
@@ -2532,7 +2584,7 @@ export const CreateAssetPreConfimStep: React.FC<IAssetInformations> = ({
               settings in default options.
             </span>
           </div>
-          <WizardRightArrow />
+          <WizardRightArrowSVG />
         </PreConfirmOptions>
         <PreConfirmOptions secondary onClick={handleAdvancedStepsWrapper}>
           <div>
@@ -2542,7 +2594,7 @@ export const CreateAssetPreConfimStep: React.FC<IAssetInformations> = ({
               Roles,Proprieties.
             </span>
           </div>
-          <WizardRightArrow />
+          <WizardRightArrowSVG />
         </PreConfirmOptions>
         <DefaultSettingsContainer
           showAdvanced={showAdvanced}
@@ -2589,16 +2641,16 @@ export const TransactionDetails: React.FC = () => {
   return (
     <ReviewContainer>
       <span>TRANSACTION DETAILS</span>
-      <ConfirmCardBasics secondary>
-        <ConfirmCardBasisInfo secondary>
+      <ConfirmCardBasics>
+        <ConfirmCardBasisInfo>
           <span>Transaction</span>
           <span>Create Asset</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>From</span>
           <span>{parseAddress(address, 12)}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Fee</span>
           <span>20,000 KLV</span>
         </ConfirmCardBasisInfo>
@@ -2627,25 +2679,25 @@ export const TransactionDetails2: React.FC<{
   return (
     <ReviewContainer>
       <span>{(assetText as string).toUpperCase()} BASIC SETTINGS</span>
-      <ConfirmCardBasics secondary>
-        <ConfirmCardBasisInfo secondary>
+      <ConfirmCardBasics>
+        <ConfirmCardBasisInfo>
           <span>{assetText} name</span>
           <span>{name}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>{assetText} ticker</span>
           <span>{ticker.toUpperCase()}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Max Supply</span>
           <span>{maxSupply ? maxSupply : infinitySymbol}</span>
         </ConfirmCardBasisInfo>
 
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>URI {assetText} image</span>
           <span>{logo || '--'}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Owner address</span>
           <span>{parseAddress(address, 12)}</span>
         </ConfirmCardBasisInfo>
@@ -2664,42 +2716,42 @@ export const TransactionDetails3: React.FC<{ assetType?: number }> = ({
   return (
     <ReviewContainer>
       <span>{assetText} DEFAULT SETTINGS</span>
-      <ConfirmCardBasics secondary>
+      <ConfirmCardBasics>
         {assetType === 0 && (
-          <ConfirmCardBasisInfo secondary>
+          <ConfirmCardBasisInfo>
             <span>Staking</span>
             <span>--</span>
           </ConfirmCardBasisInfo>
         )}
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Roles</span>
           <span>--</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Can Freeze?</span>
           <span>{properties?.canFreeze ? 'Yes' : 'No'}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Can burn?</span>
           <span>{properties?.canBurn ? 'Yes' : 'No'}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Can Pause?</span>
           <span>{properties?.canPause ? 'Yes' : 'No'}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Can add roles?</span>
           <span>{properties?.canAddRoles ? 'Yes' : 'No'}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Can Mint?</span>
           <span>{properties?.canMint ? 'Yes' : 'No'}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Can Change Owner?</span>
           <span>{properties?.canChangeOwner ? 'Yes' : 'No'}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Can Wipe?</span>
           <span>{properties?.canWipe ? 'Yes' : 'No'}</span>
         </ConfirmCardBasisInfo>
@@ -3021,7 +3073,7 @@ export const ConfirmSuccessTransaction: React.FC<{ txHash: string }> = ({
                 {txHash}
               </span>
             </div>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </HashContainer>
         </a>
       </Link>

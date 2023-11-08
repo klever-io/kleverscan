@@ -31,7 +31,7 @@ const Wizard: React.FC<any> = ({ isOpen, closeModal }) => {
             closeModal(null);
           }}
         >
-          <AiOutlineClose size={'1.3rem'} />
+          <AiOutlineClose size={'1.66rem'} />
         </CloseModal>
       </WizardContainer>
     </WizardModal>

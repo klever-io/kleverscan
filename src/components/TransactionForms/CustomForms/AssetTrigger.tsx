@@ -2,7 +2,6 @@ import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
 import { ICollectionList } from '@/types';
 import { assetTriggerTypes } from '@/utils/contracts';
-import { useKDASelect } from '@/utils/hooks/contract';
 import { deepCopyObject } from '@/utils/objectFunctions';
 import { IAssetTrigger } from '@klever/sdk-web';
 import React, { useEffect } from 'react';
@@ -14,6 +13,7 @@ import {
   TooltipContainer,
   TooltipContent,
 } from '../FormInput/styles';
+import { KDASelect } from '../KDASelect';
 import { FormBody, FormSection, SectionTitle } from '../styles';
 import { RoyaltiesSection, StakingSection, URIsSection } from './CreateAsset';
 import {
@@ -50,11 +50,10 @@ const AssetTrigger: React.FC<IContractProps> = ({
   const { handleSubmit, watch, reset } = useFormContext<IAssetTrigger>();
   const { walletAddress } = useExtension();
   const triggerType = watch('triggerType');
-  const [collection, KDASelect] = useKDASelect({
-    assetTriggerType: triggerType,
-  });
 
-  const { metadata, setMetadata } = useMulticontract();
+  const { metadata, setMetadata, queue } = useMulticontract();
+
+  const collection = queue[formKey].collection;
 
   const metadataProps = {
     metadata,
@@ -85,7 +84,7 @@ const AssetTrigger: React.FC<IContractProps> = ({
           required
         />
       </FormSection>
-      <KDASelect required />
+      <KDASelect required assetTriggerType={triggerType} />
       {triggerType !== undefined &&
         collection &&
         getAssetTriggerForm(
@@ -284,6 +283,7 @@ export const AddRoleSection: React.FC = () => {
         </TooltipContainer>
       </SectionTitle>
       <FormInput
+        paddingTop={2}
         name={`role.address`}
         title={`Address`}
         span={2}

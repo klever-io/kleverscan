@@ -45,7 +45,7 @@ const BlockCardFetcher: React.FC = () => {
         <h1>{t('Recent Blocks')}</h1>
         <div onClick={() => setHideMenu(!hideMenu)}>
           <p>{hideMenu ? 'Show' : 'Hide'}</p>
-          <ArrowUpSquareHideMenu hide={hideMenu} />
+          <ArrowUpSquareHideMenu $hide={hideMenu} />
         </div>
       </ContainerHide>
       <TransactionContainer>

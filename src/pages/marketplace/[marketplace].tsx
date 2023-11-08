@@ -33,7 +33,7 @@ import {
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery, UseQueryResult } from 'react-query';
 
 export interface IBuyCard {
@@ -192,17 +192,16 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
           marketplaceAssets &&
           Object.keys(marketplaceAssets).map(assetId => {
             return (
-              <>
+              <React.Fragment key={assetId}>
                 {!buyCardsLoading && marketplaceAssets && (
                   <BuyCard
-                    key={assetId}
                     // precisionQueries={precisionQueries}
                     marketplaceAsset={marketplaceAssets[assetId]}
                     buyCardsLoading={buyCardsLoading}
                     assets={assets}
                   />
                 )}
-              </>
+              </React.Fragment>
             );
           })}
         {buyCardsLoading &&

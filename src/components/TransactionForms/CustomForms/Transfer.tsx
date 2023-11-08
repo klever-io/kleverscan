@@ -5,11 +5,11 @@ import {
 } from '@/utils/create-transaction/fees-calculation.ts';
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
-import { useKDASelect } from '@/utils/hooks/contract';
 import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
+import { KDASelect } from '../KDASelect';
 import { FormBody, FormSection, RoyaltiesContainer } from '../styles';
 
 type FormData = {
@@ -20,11 +20,10 @@ type FormData = {
 
 const Transfer: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   const { handleSubmit, watch } = useFormContext<FormData>();
-  const [collection, KDASelect] = useKDASelect({
-    validateFields: ['amount'],
-  });
-  const { setSelectedRoyaltiesFees } = useMulticontract();
+  const { setSelectedRoyaltiesFees, queue } = useMulticontract();
   const amount = watch('amount');
+
+  const collection = queue[formKey].collection;
 
   useEffect(() => {
     if (collection?.royalties?.transferPercentage) {
@@ -75,7 +74,7 @@ const Transfer: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
 
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
-      <KDASelect />
+      <KDASelect validateFields={['amount']} />
       <FormSection>
         {!collection?.isNFT && (
           <FormInput

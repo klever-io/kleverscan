@@ -11,6 +11,7 @@ interface IProps {
   type?: string;
   zIndex?: number;
   logoWarning?: boolean;
+  paddingTop?: number;
 }
 
 interface ILabel {
@@ -169,6 +170,7 @@ export const Container = styled.div<IProps>`
   ${props =>
     css`
       grid-column: auto / span ${props.span};
+      padding-top: ${props.paddingTop ? props.paddingTop : 0}rem;
     `}
 
   > span {
@@ -273,15 +275,17 @@ export const TooltipContainer = styled.div<{
 }>`
   display: flex;
   user-select: none;
+  position: relative;
   width: fit-content;
-
-  svg {
+  > svg {
     align-self: center;
-    path {
-      fill: ${props => props.theme.form.tooltipContainer};
+  }
+  &:hover {
+    width: calc(100% - 1rem);
+    div {
+      visibility: visible;
     }
   }
-
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     font-size: 1rem;
   }
@@ -307,6 +311,8 @@ export const InputLabel = styled.label<ILabel>`
   gap: 0.5rem;
 
   transition: transform 0.2s ease;
+
+  z-index: 3;
 
   > span,
   p {
@@ -340,3 +346,44 @@ export const ErrorMessage = styled.span<{ warning?: boolean }>`
       color: ${theme.status.warning} !important;
     `}
 `;
+
+export const DropdownCustomLabel = styled(InputLabel)`
+  margin: 0;
+  > span {
+    margin-left: auto;
+  }
+`;
+
+export const DropdownCustomLabelSelectStyles = {
+  control: (base: any): any => ({
+    ...base,
+    height: '22px !important',
+    minWidth: '4rem',
+    minHeight: '22px !important',
+    padding: '0 !important',
+    fontSize: '0.8rem',
+    lineHeight: '0.8rem',
+  }),
+  valueContainer: (base: any): any => ({
+    ...base,
+    padding: '0 0.25rem 0 0.5rem',
+    margin: '-0.35rem 0 0 0 ',
+    lineHeight: '0.8rem',
+    height: '2rem',
+  }),
+  indicatorSeparator: (base: any): any => ({
+    ...base,
+    display: 'none',
+  }),
+  dropdownIndicator: (base: any): any => ({
+    ...base,
+    padding: '0 0.5rem 0 0',
+    margin: '-0.35rem 0 0 0 ',
+  }),
+  option: (base: any): any => ({
+    ...base,
+    fontSize: '0.8rem',
+    lineHeight: '0.8rem',
+    padding: '0.25rem',
+  }),
+};

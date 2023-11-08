@@ -599,6 +599,7 @@ export interface IValidator {
   totalMissed: number;
   canDelegate: boolean;
   commission: number;
+  maxDelegation: number;
 }
 
 export interface IChainStatistics {
@@ -694,8 +695,8 @@ export interface IParsedDailyTransaction {
 }
 
 export interface IAssetStaking {
-  totalStaking: number | null;
-  dayBeforeTotalStaking: number | null;
+  totalStaking: number | null | undefined;
+  dayBeforeTotalStaking: number | null | undefined;
 }
 
 export interface IAssetsData {
@@ -704,12 +705,12 @@ export interface IAssetsData {
 }
 
 export interface IAssetData {
-  prices: IAssetPrice;
-  staking: IAssetStaking;
-  volume: number | null;
-  circulatingSupply: number | null;
-  estimatedAprYesterday: number;
-  estimatedAprBeforeYesterday: number;
+  prices?: IAssetPrice | undefined;
+  staking?: IAssetStaking | undefined;
+  volume?: number | null;
+  circulatingSupply?: number | null;
+  estimatedAprYesterday?: number | undefined;
+  estimatedAprBeforeYesterday?: number | undefined;
 }
 
 export interface IAssetPrice {
@@ -894,6 +895,13 @@ export interface IHoldersResponse extends IResponse {
 export interface IITOResponse extends IResponse {
   data: {
     ito: IITO;
+  };
+  pagination: IPagination;
+}
+
+export interface IITOsResponse extends IResponse {
+  data: {
+    itos: IITO[];
   };
   pagination: IPagination;
 }

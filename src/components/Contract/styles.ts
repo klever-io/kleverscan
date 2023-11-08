@@ -305,6 +305,12 @@ export const FieldLabel = styled.label`
   font-size: smaller;
   color: ${({ theme }) => theme.darkText};
   margin-bottom: 0.3rem;
+
+  display: flex;
+
+  span {
+    min-width: fit-content;
+  }
 `;
 
 export const BalanceLabel = styled.label`

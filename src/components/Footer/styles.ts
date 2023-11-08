@@ -37,8 +37,10 @@ export const Content = styled.div`
 
   ::after {
     content: '';
+    position: relative;
+    top: 10rem;
     width: 18rem;
-    height: 18rem;
+    height: 10rem;
   }
 `;
 export const DescriptionContainer = styled.div`

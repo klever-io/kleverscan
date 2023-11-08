@@ -1,4 +1,3 @@
-import { parseITOs } from '@/pages/itos';
 import api from '@/services/api';
 import {
   IAsset,
@@ -12,7 +11,7 @@ import {
   ITransactionsResponse,
   IUri,
 } from '@/types';
-import { parseHardCodedInfo } from '@/utils/parseValues';
+import { parseHardCodedInfo, parseITOs } from '@/utils/parseValues';
 import {
   addPrecisionsToFPRDeposits,
   getFPRDepositsPrecisions,

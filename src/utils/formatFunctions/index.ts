@@ -222,3 +222,19 @@ export const addressToPublicKey = (address: string): string => {
   const publicKey = Buffer.from(bech32.fromWords(decode.words)).toString('hex');
   return publicKey;
 };
+
+export const formatNumberDecimal = (value: string): string => {
+  // Remove any characters that are not digits
+  const cleanNumber = value.replace(/\D/g, '');
+
+  let formattedNumber = '';
+  for (let i = 0; i < cleanNumber.length; i++) {
+    if (i > 0 && i % 3 === 0) {
+      formattedNumber = ',' + formattedNumber;
+    }
+    formattedNumber =
+      cleanNumber.charAt(cleanNumber.length - 1 - i) + formattedNumber;
+  }
+
+  return formattedNumber;
+};

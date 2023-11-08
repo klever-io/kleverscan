@@ -1,9 +1,9 @@
 import { withdrawTypes } from '@/utils/contracts';
-import { useKDASelect } from '@/utils/hooks/contract';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
+import { KDASelect } from '../KDASelect';
 import { FormBody, FormSection } from '../styles';
 
 type FormData = {
@@ -16,8 +16,6 @@ type FormData = {
 const Withdraw: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   const { handleSubmit, watch } = useFormContext<FormData>();
   const withdrawType: number = watch('withdrawType');
-
-  const [_, KDASelect] = useKDASelect({ withdrawType });
 
   const onSubmit = async (data: FormData) => {
     await handleFormSubmit(data);
@@ -36,7 +34,7 @@ const Withdraw: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
       </FormSection>
       {(withdrawType === 0 || withdrawType === 1) && (
         <>
-          <KDASelect />
+          <KDASelect withdrawType={withdrawType} />
           {withdrawType === 1 && (
             <FormSection>
               <FormInput
@@ -46,7 +44,7 @@ const Withdraw: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
                 tooltip="Amount to be withdrawn from the pool"
               />
               <FormInput
-                name="currencyId"
+                name="currencyId" // although the doc says it is currencyID, using currencyId still works, changing it now will break many things
                 title="Currency ID"
                 tooltip="Asset to be withdrawn from the pool"
               />

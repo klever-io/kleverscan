@@ -1,24 +1,30 @@
-import { WizardLeftArrow, WizardRightArrow } from '@/assets/icons';
+import { WizardLeftArrow } from '@/assets/icons';
 import Select from '@/components/Contract/Select';
 import { statusOptions } from '@/components/TransactionForms/CustomForms/ConfigITO';
+import { KDASelect } from '@/components/TransactionForms/KDASelect';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import { getAsset } from '@/services/requests/asset';
-import { useKDASelect } from '@/utils/hooks/contract';
 import { parseAddress } from '@/utils/parseValues';
 import { useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { FiPlusSquare } from 'react-icons/fi';
 import { IoArrowForward } from 'react-icons/io5';
 import { useQuery } from 'react-query';
-import { ButtonsComponent, IWizardComponents } from '../createAsset';
+import {
+  ButtonsComponent,
+  ConnectButtonComponent,
+  infinitySymbol,
+  IWizardComponents,
+} from '../createAsset';
 import {
   AddressesContainer,
   BackArrowSpan,
   BorderedButton,
   ButtonsContainer,
   ChangedAddressContainer,
+  ConfigITOStartTime,
   ConfirmCardBasics,
   ConfirmCardBasisInfo,
   ConfirmCardImage,
@@ -36,6 +42,7 @@ import {
   WizardButton,
   WizardConfirmLogo,
   WizardFailAddressCheck,
+  WizardRightArrowSVG,
 } from '../createAsset/styles';
 import { checkEmptyField } from '../utils';
 
@@ -70,6 +77,7 @@ export const propertiesCommonDefaultValuesITO = {
   endTime: '',
   maxAmount: 0,
   status: 1,
+  startTimeStartNow: false,
 };
 
 const infinity = '\u221e';
@@ -79,17 +87,12 @@ export const CreateITOSecondStep: React.FC<IAssetITOInformations> = ({
   handleStep,
 }) => {
   const { setSelectedContractType } = useMulticontract();
-  const [_, KDASelect] = useKDASelect();
-  const { watch } = useFormContext();
+  const {
+    formState: { errors },
+    watch,
+  } = useFormContext();
+
   const collection = watch('collection');
-
-  let error = null;
-
-  try {
-    error = eval(`errors?.collection`);
-  } catch {
-    error = null;
-  }
 
   useEffect(() => {
     setSelectedContractType('ConfigITOContract');
@@ -97,7 +100,7 @@ export const CreateITOSecondStep: React.FC<IAssetITOInformations> = ({
 
   const buttonsProps = {
     handleStep,
-    next: !!(!error && checkEmptyField(collection)),
+    next: !!(!errors?.collection && checkEmptyField(collection)),
   };
 
   return (
@@ -111,7 +114,7 @@ export const CreateITOSecondStep: React.FC<IAssetITOInformations> = ({
         <p>{description}</p>
         <ErrorInputContainer>
           <KDASelect required />
-          {error && <ErrorMessage>{error?.message}</ErrorMessage>}
+          <ConnectButtonComponent />
         </ErrorInputContainer>
       </div>
       <ButtonsComponent buttonsProps={buttonsProps} />
@@ -276,7 +279,9 @@ export const CreateITOThirdStep: React.FC<IAssetITOInformations> = ({
             />
           </div>
         )}
-        {!isTablet && !isMobile && <AddressValidationIcon error={error} />}
+        {!isTablet && !isMobile && changeReceiveAddress && (
+          <AddressValidationIcon error={error} />
+        )}
       </ChangedAddressContainer>
       <ButtonsComponent buttonsProps={buttonsProps} />
     </GenericCardContainer>
@@ -289,11 +294,18 @@ export const CreateITOFourthStep: React.FC<IAssetITOInformations> = ({
 }) => {
   const {
     register,
+    setValue,
     formState: { errors },
     watch,
   } = useFormContext();
+
+  const handlerStartTime = (e: { target: { checked: boolean } }) => {
+    setValue('startTimeStartNow', e.target.checked);
+  };
+
   const collection = watch('collection');
   const watchStartTime = watch('startTime');
+  const watchStartTimeNow = watch('startTimeStartNow');
   let errorStartTime = null;
   let errorEndTime = null;
   try {
@@ -316,13 +328,20 @@ export const CreateITOFourthStep: React.FC<IAssetITOInformations> = ({
       <div>
         <p>What is the duration of the {collection} ITO?</p>
         <p>{description}</p>
-        <p>Start Time</p>
+        <ConfigITOStartTime>
+          Start Time
+          <span>
+            Start right now?
+            <input type="checkbox" onChange={handlerStartTime} />
+          </span>
+        </ConfigITOStartTime>
         <ErrorInputContainer>
           <GenericInput
             error={errorStartTime}
             type="datetime-local"
             autoFocus={true}
             {...register('startTime')}
+            disabled={watchStartTimeNow}
           />
 
           {errorStartTime && (
@@ -532,10 +551,11 @@ export const CreatePackInfoSteps: React.FC<IAssetITOInformations> = ({
       <div>
         <p>Would you like to enable and configure Pack Info for now?</p>
         <ButtonsContainer>
-          <WizardButton centered onClick={() => setPackInfo(true)}>
+          <WizardButton infoStep centered onClick={() => setPackInfo(true)}>
             Yes
           </WizardButton>
           <WizardButton
+            infoStep
             secondary
             centered
             onClick={() => handleStep(prev => prev + 1)}
@@ -653,7 +673,7 @@ const CreatePackCurrencyID: React.FC<IWizardComponents> = ({
               isHidden={fields.length <= 1}
             >
               <span>Next</span>
-              <WizardRightArrow />
+              <WizardRightArrowSVG />
             </BorderedButton>
           </div>
           <BorderedButton
@@ -798,7 +818,7 @@ export const CreatePacks: React.FC<IPackInfoITO> = ({ packInfoIndex }) => {
             isHidden={fields.length <= 1}
           >
             <span>Next</span>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </BorderedButton>
         </div>
         <BorderedButton
@@ -879,10 +899,11 @@ export const CreateWhiteListSettingsSteps: React.FC<IAssetITOInformations> = ({
           Would you like to enable and configure Whitelist addresses for now?
         </p>
         <ButtonsContainer>
-          <WizardButton centered onClick={() => setPackInfo(true)}>
+          <WizardButton infoStep centered onClick={() => setPackInfo(true)}>
             Yes
           </WizardButton>
           <WizardButton
+            infoStep
             secondary
             centered
             onClick={() => handleStep(prev => prev + 1)}
@@ -1112,10 +1133,11 @@ export const WhitelistAddressSteps: React.FC<IWizardComponents> = ({
       <div>
         <p>Would you like to enable and configure Whitelist address for now?</p>
         <ButtonsContainer>
-          <WizardButton centered onClick={() => setPackInfo(true)}>
+          <WizardButton infoStep centered onClick={() => setPackInfo(true)}>
             Yes
           </WizardButton>
           <WizardButton
+            infoStep
             secondary
             centered
             onClick={() => handleStep(prev => prev + 1)}
@@ -1250,7 +1272,7 @@ export const CreateWhitelistedAddress: React.FC<IWizardComponents> = ({
             isHidden={fields.length <= 1}
           >
             <span>Next</span>
-            <WizardRightArrow />
+            <WizardRightArrowSVG />
           </BorderedButton>
         </div>
         <BorderedButton
@@ -1368,16 +1390,16 @@ export const TransactionDetails: React.FC = () => {
   return (
     <ReviewContainer>
       <span>TRANSACTION DETAILS</span>
-      <ConfirmCardBasics secondary>
-        <ConfirmCardBasisInfo secondary>
+      <ConfirmCardBasics>
+        <ConfirmCardBasisInfo>
           <span>Transaction</span>
           <span>Config ITO</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>From</span>
           <span>{parseAddress(walletAddress || '', 12)}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Fee</span>
           <span>20,000 KLV</span>
         </ConfirmCardBasisInfo>
@@ -1390,28 +1412,31 @@ export const TransactionDetails2: React.FC = () => {
   const { watch } = useFormContext();
   const receiverAddress = watch('receiverAddress');
   const startTime = watch('startTime');
+  const startTimeNow = watch('startTimeStartNow');
   const endTime = watch('endTime');
   const maxAmount = watch('maxAmount');
   const status = watch('status');
+
+  const startTimeValue = startTimeNow ? 'Now' : '--';
   return (
     <ReviewContainer>
       <span> SET UP ITO</span>
-      <ConfirmCardBasics secondary>
-        <ConfirmCardBasisInfo secondary>
+      <ConfirmCardBasics>
+        <ConfirmCardBasisInfo>
           <span>Receiver Address</span>
           <span>{parseAddress(receiverAddress, 12)}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>ITO Time</span>
           <span>
-            {startTime || '--'} to {endTime || '--'}
+            {startTime || startTimeValue} to {endTime || infinitySymbol}
           </span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Max Amount</span>
           <span>{maxAmount}</span>
         </ConfirmCardBasisInfo>
-        <ConfirmCardBasisInfo secondary>
+        <ConfirmCardBasisInfo>
           <span>Status</span>
           <span>{status}</span>
         </ConfirmCardBasisInfo>

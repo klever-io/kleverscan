@@ -1715,6 +1715,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
   const getPrecisionsToSearch = filteredReceipts
     .map(receipt => receipt.assetId)
     .filter(precision => precision !== undefined);
+  getPrecisionsToSearch.push(currencyId, assetId);
   const precisions = usePrecision(getPrecisionsToSearch);
   const renderMarketBuy = () => {
     const buyReceipt = findReceipt(filteredReceipts, 16) as

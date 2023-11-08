@@ -1,6 +1,6 @@
 const GradientSVG: React.FC = () => {
   const idCSS = 'gradient';
-  const gradientTransform = `rotate(180)deg`;
+  const gradientTransform = `rotate(180)`;
   return (
     <svg style={{ height: '100%', width: '100%' }}>
       <defs>

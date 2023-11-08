@@ -1,10 +1,11 @@
 import { useContract } from '@/contexts/contract';
-import { useKDASelect } from '@/utils/hooks/contract';
+import { useMulticontract } from '@/contexts/contract/multicontract';
 import { parseAddress } from '@/utils/parseValues';
 import React, { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps, SelectOption } from '.';
 import FormInput from '../FormInput';
+import { KDASelect } from '../KDASelect';
 import { FormBody, FormSection } from '../styles';
 
 type FormData = {
@@ -16,7 +17,9 @@ const Unfreeze: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
 
   const { handleSubmit } = useFormContext<FormData>();
   const { getAssets } = useContract();
-  const [collection, KDASelect] = useKDASelect();
+  const { queue } = useMulticontract();
+
+  const collection = queue[formKey].collection;
 
   const onSubmit = async (data: FormData) => {
     await handleFormSubmit(data);

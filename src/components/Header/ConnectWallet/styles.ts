@@ -7,7 +7,7 @@ export const ConnectButton = styled.div<{
   walletAddress?: boolean;
   $loading?: boolean;
 }>`
-  max-width: 15rem;
+  max-width: 10rem;
   width: 100%;
   display: flex;
   gap: 0.4rem;

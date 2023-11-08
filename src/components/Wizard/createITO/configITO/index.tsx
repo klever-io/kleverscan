@@ -33,6 +33,7 @@ import {
   ConfirmSuccessTransaction,
   CreateAssetFirstStep,
   DesktopStepsComponent,
+  infinitySymbol,
   StepsBasics,
 } from '../../createAsset';
 import { WizardBody } from '../../createAsset/styles';
@@ -159,8 +160,12 @@ export const WizCreateITO: React.FC<any> = ({
   const endTime = watch('endTime');
   const maxAmount = watch('maxAmount');
   const status = watch('status');
+  const startTimeNow = watch('startTimeStartNow');
 
-  const itoTimeFormatted = (time: string): string => {
+  const itoTimeFormatted = (time: string, isInfinity = false): string => {
+    if (!time && isInfinity) {
+      return infinitySymbol;
+    }
     if (!time) {
       return '--';
     }
@@ -190,12 +195,28 @@ export const WizCreateITO: React.FC<any> = ({
   const basicStepsInfo = [
     collection,
     parseAddress(receiverAddress, 14),
-    `${itoTimeFormatted(startTime)} to ${itoTimeFormatted(endTime)}`,
+    `${
+      startTimeNow ? 'Now' : itoTimeFormatted(startTime)
+    } to ${itoTimeFormatted(endTime, true)}`,
     maxAmount || 0,
     status || 1,
   ];
 
   const onSubmit = async (data: ConfigITOData) => {
+    if (data.startTimeStartNow) {
+      delete data.startTimeStartNow;
+      delete data.startTime;
+    } else if (!data.startTimeStartNow && data.startTime) {
+      const dateIto = new Date(data?.startTime);
+      const dateNow = new Date();
+      if (dateIto.getTime() <= dateNow.getTime()) {
+        toast.info(
+          'Start time must be in the future, if you want to start now, leave the field blank',
+        );
+        return;
+      }
+    }
+
     const contractType = 'ConfigITOContract';
     parseDates(data);
     parseUndefinedValues(data);

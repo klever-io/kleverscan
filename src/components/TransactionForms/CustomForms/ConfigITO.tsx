@@ -29,8 +29,9 @@ export type ConfigITOData = {
   whitelistInfo: WhitelistInfo;
   whitelistStartTime: number;
   whitelistEndTime: number;
-  startTime: number;
+  startTime?: number;
   endTime: number;
+  startTimeStartNow?: boolean;
 };
 
 interface ISectionProps {

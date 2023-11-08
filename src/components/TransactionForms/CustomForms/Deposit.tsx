@@ -1,9 +1,9 @@
 import { depositTypes } from '@/utils/contracts';
-import { useKDASelect } from '@/utils/hooks/contract';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
+import { KDASelect } from '../KDASelect';
 import { FormBody, FormSection } from '../styles';
 
 type FormData = {
@@ -16,8 +16,6 @@ type FormData = {
 const Deposit: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   const { handleSubmit, watch } = useFormContext<FormData>();
   const depositType: number = watch('depositType');
-
-  const [_, KDASelect] = useKDASelect();
 
   const onSubmit = async (data: FormData) => {
     await handleFormSubmit(data);

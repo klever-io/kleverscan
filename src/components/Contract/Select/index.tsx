@@ -20,6 +20,7 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   options?: IDropdownItem[];
   selectPlaceholder?: string;
   onChange: (value: any) => void;
+  onInputChange?: (value: any) => void;
   onMenuOpen?: () => void;
   title?: string;
   label?: string;
@@ -40,6 +41,7 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
 const Select: React.FC<IFilter> = ({
   options,
   onChange,
+  onInputChange,
   onMenuOpen,
   noOptionsMessage,
   selectPlaceholder,
@@ -80,6 +82,7 @@ const Select: React.FC<IFilter> = ({
     onMenuOpen,
     noOptionsMessage,
     onCreateOption,
+    onInputChange,
   };
 
   const getPlaceholder = () => {
@@ -102,8 +105,8 @@ const Select: React.FC<IFilter> = ({
         value={selectedValue}
         placeholder={getPlaceholder()}
         components={{ Placeholder, DropdownIndicator }}
-        {...props}
         isDisabled={loading}
+        {...props}
       />
     </Container>
   );

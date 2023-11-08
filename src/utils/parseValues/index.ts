@@ -88,6 +88,7 @@ export const parseValidators = (
         totalProduced,
         totalMissed,
         commission: delegation.commission,
+        maxDelegation: delegation.maxDelegation,
       };
     },
   );

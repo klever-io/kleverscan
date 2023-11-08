@@ -1,12 +1,13 @@
+import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
 import { ICollectionList } from '@/types';
-import { useKDASelect } from '@/utils/hooks/contract';
 import React from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
 import { toast } from 'react-toastify';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
+import { KDASelect } from '../KDASelect';
 import {
   ButtonContainer,
   FormBody,
@@ -59,9 +60,9 @@ const ConfigITO: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
 
   const { walletAddress } = useExtension();
 
-  const [collection, KDASelect] = useKDASelect({
-    validateFields: ['maxAmount', 'defaultLimitPerAddress'],
-  });
+  const { queue } = useMulticontract();
+
+  const collection = queue[formKey].collection;
 
   const onSubmit = async (data: ConfigITOData) => {
     try {
@@ -77,7 +78,10 @@ const ConfigITO: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
 
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
-      <KDASelect required />
+      <KDASelect
+        required
+        validateFields={['maxAmount', 'defaultLimitPerAddress']}
+      />
       <MainSection {...sectionProps} />
       <WhitelistConfigSection {...sectionProps} />
       <WhitelistSection />

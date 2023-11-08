@@ -2,11 +2,11 @@ import { useMulticontract } from '@/contexts/contract/multicontract';
 import { calculateMarketBuyFixedFee } from '@/utils/create-transaction/fees-calculation.ts';
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
-import { useKDASelect } from '@/utils/hooks/contract';
 import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
+import { KDASelect } from '../KDASelect';
 import { FormBody, FormSection, RoyaltiesContainer } from '../styles';
 import { parseDates } from './utils';
 
@@ -29,9 +29,9 @@ const parseSell = (data: FormData) => {
 const Sell: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   const { handleSubmit, watch } = useFormContext<FormData>();
   const marketType = watch('marketType');
-  const { setSelectedRoyaltiesFees } = useMulticontract();
+  const { setSelectedRoyaltiesFees, queue } = useMulticontract();
 
-  const [collection, KDASelect] = useKDASelect();
+  const collection = queue[formKey].collection;
 
   const onSubmit = async (data: FormData) => {
     parseSell(data);

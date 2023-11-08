@@ -1,11 +1,11 @@
 import { WizardLeftArrow } from '@/assets/icons';
 import Select from '@/components/Contract/Select';
 import { statusOptions } from '@/components/TransactionForms/CustomForms/ConfigITO';
+import { KDASelect } from '@/components/TransactionForms/KDASelect';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import { getAsset } from '@/services/requests/asset';
-import { useKDASelect } from '@/utils/hooks/contract';
 import { parseAddress } from '@/utils/parseValues';
 import { useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
@@ -84,7 +84,6 @@ export const CreateITOSecondStep: React.FC<IAssetITOInformations> = ({
   handleStep,
 }) => {
   const { setSelectedContractType } = useMulticontract();
-  const [_, KDASelect] = useKDASelect();
   const { watch } = useFormContext();
   const collection = watch('collection');
 

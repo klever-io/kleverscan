@@ -3,10 +3,12 @@ import { setQueryAndRouter } from '@/utils';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import dynamic from 'next/dynamic';
 import { NextRouter, useRouter } from 'next/router';
-import { ChangeEventHandler, useEffect, useRef } from 'react';
+import { ChangeEventHandler, useEffect, useRef, useState } from 'react';
 import { FieldValues, useFormContext, UseFormGetValues } from 'react-hook-form';
 import {
   Container,
+  DropdownCustomLabel,
+  DropdownCustomLabelSelectStyles,
   ErrorMessage,
   InfoIcon,
   InputLabel,
@@ -21,6 +23,11 @@ import {
 } from './styles';
 
 const Select = dynamic(() => import('./Select'), {
+  ssr: false,
+  loading: () => null,
+});
+
+const DropdownCustomLabelSelect = dynamic(() => import('@/components/Select'), {
   ssr: false,
   loading: () => null,
 });
@@ -46,6 +53,8 @@ export interface IBaseFormInputProps
   customOnChange?: (e: any) => void;
   logoError?: string | null;
   handleScrollBottom?: () => void;
+  onInputChange?: (e: any) => void;
+  creatable?: boolean;
   dynamicInitialValue?: any;
 }
 
@@ -56,6 +65,12 @@ export interface IFormInputProps extends IBaseFormInputProps {
 export interface ICustomFormInputProps extends IBaseFormInputProps {
   onChange: ChangeEventHandler<any>;
 }
+
+export const customDropdownOptions = [
+  { label: 'No', value: 'no' },
+  { label: 'Text', value: 'text' },
+  { label: 'Number', value: 'number' },
+];
 
 export const onChangeWrapper = (
   isMultiContract: boolean,
@@ -112,6 +127,8 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   max,
   customOnChange,
   onChange,
+  onInputChange,
+  creatable,
   precision = 8,
   logoError = null,
   handleScrollBottom,
@@ -119,6 +136,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   ...rest
 }) => {
   const areaRef = useRef<HTMLTextAreaElement | null>(null);
+  const [isCustom, setIsCustom] = useState(customDropdownOptions[0]);
   const router = useRouter();
   const { isMultiContract } = useMulticontract();
   const {
@@ -146,7 +164,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
 
   const registerProps =
     name &&
-    (type !== 'number'
+    (type !== 'number' && isCustom.value !== 'number'
       ? register(name, {
           required: {
             value: required || false,
@@ -174,6 +192,10 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
             customOnChange,
           ),
           validate: (value: any) => {
+            if (Number.isNaN(value)) {
+              return 'Only numbers allowed';
+            }
+
             if (value < (min || 0)) {
               return `Minimum value is ${min || 0}`;
             }
@@ -210,7 +232,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
     return () => {
       name && unregister(name);
     };
-  }, [name, unregister]);
+  }, [name, unregister, isCustom]);
 
   const areaProps = {
     error: Boolean(error),
@@ -241,6 +263,8 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
     error: Boolean(error),
     value: inputValue,
     handleScrollBottom,
+    onInputChange,
+    creatable,
     ...rest,
   };
 
@@ -250,7 +274,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
     e.target.blur();
   };
 
-  type === 'number' &&
+  (type === 'number' || isCustom.value === 'number') &&
     (inputProps = {
       ...inputProps,
       step: 1 / 10 ** precision,
@@ -285,7 +309,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
         <InputLabel disabled={inputProps.disabled}>
           <span>
             {title || name}
-            {required && <RequiredSpan> (required)</RequiredSpan>}
+            {required && <RequiredSpan>(required)</RequiredSpan>}
           </span>
           {tooltip && (
             <TooltipContainer>
@@ -294,6 +318,20 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
                 <span>{tooltip}</span>
               </TooltipContent>
             </TooltipContainer>
+          )}
+          {type === 'dropdown' && (
+            <DropdownCustomLabel>
+              <span>Custom value?</span>
+              <DropdownCustomLabelSelect
+                options={customDropdownOptions}
+                value={isCustom}
+                onChange={(e: any) => {
+                  setIsCustom(e) as any;
+                }}
+                styles={DropdownCustomLabelSelectStyles}
+                isSearchable={false}
+              />
+            </DropdownCustomLabel>
           )}
         </InputLabel>
       )}
@@ -309,7 +347,9 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
           </ToggleContainer>
         </>
       )}
-      {type === 'dropdown' && <Select {...selectProps} />}
+      {type === 'dropdown' && isCustom.value === 'no' && (
+        <Select {...selectProps} />
+      )}
       {type === 'textarea' && (
         <StyledTextArea
           onKeyDown={handleKey}
@@ -323,7 +363,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
       )}
       {type === 'hidden' && <StyledInput {...inputProps} />}
       {type !== 'checkbox' &&
-        type !== 'dropdown' &&
+        (type !== 'dropdown' || isCustom.value !== 'no') &&
         type !== 'textarea' &&
         type !== 'hidden' && <StyledInput {...inputProps} />}
 

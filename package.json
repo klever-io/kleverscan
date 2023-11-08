@@ -11,8 +11,7 @@
     "test:debug-speed": "jest --config=./jest-slow-report.config.ts",
     "test:debug-heap": "jest --logHeapUsage",
     "test-cov": "jest --coverage",
-    "postinstall": "husky install",
-    "release": "semantic-release"
+    "postinstall": "husky install"
   },
   "dependencies": {
     "@bugsnag/js": "7.16.2",
@@ -54,14 +53,10 @@
     "react-toastify": "8.0.3",
     "react-tooltip": "4.2.21",
     "recharts": "2.0.10",
-    "semantic-release": "17",
     "styled-components": "5.3.0",
     "svg-path-bounds": "1.0.2"
   },
   "devDependencies": {
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/git": "^10.0.1",
-    "@semantic-release/npm": "6",
     "@sinonjs/fake-timers": "9.1.2",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "12.1.4",

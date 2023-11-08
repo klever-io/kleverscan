@@ -376,7 +376,7 @@ const showAssetIdInput = (
     typeAssetTrigger !== null &&
     !isNaN(typeAssetTrigger)
   ) {
-    const singleNFTContracts = [1, 8];
+    const singleNFTContracts = [1, 2, 8];
     return singleNFTContracts.includes(typeAssetTrigger);
   }
 

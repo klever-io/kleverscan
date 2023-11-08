@@ -33,18 +33,19 @@ const HomeDataCards: React.FC = ({}) => {
   const [expanded, setExpanded] = useState(false);
   const { isMobile, isTablet } = useMobile();
   const { isDarkTheme } = useTheme();
+
   const {
     actualTPS,
     blocks,
     metrics,
     newTransactions,
     beforeYesterdayTransactions,
-    newAccounts,
+    newAccounts = 0,
     totalAccounts,
     totalTransactions,
-    counterEpoch,
     loadingCards,
   } = useHomeData();
+
   const icons = [
     [
       '/homeCards/transactionsIcon.svg',
@@ -53,19 +54,19 @@ const HomeDataCards: React.FC = ({}) => {
     ['/homeCards/accountsIcon.svg', '/homeCards/accountsBackground.svg'],
     ['/homeCards/tpsIcon.svg', '/homeCards/tpsBackground.svg'],
   ];
-  const block = blocks[0];
+  const block = blocks && blocks[0];
 
   const dataCards: IDataCard[] = [
     {
       Icon: Transactions,
       title: t('Total Transactions'),
-      value: totalTransactions,
+      value: totalTransactions || 0,
       variation: `+ ${newTransactions.toLocaleString()}`,
     },
     {
       Icon: Accounts,
       title: t('Total Accounts'),
-      value: totalAccounts,
+      value: totalAccounts || 0,
       variation: `+ ${newAccounts === 0 ? '0%' : newAccounts.toLocaleString()}`,
     },
     { title: t('Live/Peak TPS'), value: actualTPS, Icon: TPS },
@@ -74,9 +75,7 @@ const HomeDataCards: React.FC = ({}) => {
   const epochCards: IEpochCard[] = [
     {
       Icon: Epoch,
-      title:
-        `${t('Epoch')}` +
-        (block?.epoch ? ` #${block.epoch + counterEpoch} ` : ' '),
+      title: `${t('Epoch')}` + (block?.epoch ? ` #${block.epoch} ` : ' '),
       value: metrics.remainingTime,
       progress: metrics.epochLoadPercent,
     },
@@ -154,7 +153,7 @@ const HomeDataCards: React.FC = ({}) => {
                             positive={dataCards[2].variation.includes('+')}
                           >
                             <ArrowData
-                              positive={dataCards[2].variation.includes('+')}
+                              $positive={dataCards[2].variation.includes('+')}
                             />
                             <p>{dataCards[2].variation}/24h</p>
                           </DataCardLatest>
@@ -179,7 +178,7 @@ const HomeDataCards: React.FC = ({}) => {
                         <p>{value.toLocaleString()}</p>
                         {variation && !variation.includes('%') && (
                           <DataCardLatest positive={variation.includes('+')}>
-                            <ArrowData positive={variation.includes('+')} />
+                            <ArrowData $positive={variation.includes('+')} />
                             <p>{variation}/24h</p>
                           </DataCardLatest>
                         )}
@@ -215,7 +214,7 @@ const HomeDataCards: React.FC = ({}) => {
                       <p>{value.toLocaleString()}</p>
                       {variation && !variation.includes('%') && (
                         <DataCardLatest positive={variation.includes('+')}>
-                          <ArrowData positive={variation.includes('+')} />
+                          <ArrowData $positive={variation.includes('+')} />
                           <p>{variation}/24h</p>
                         </DataCardLatest>
                       )}
@@ -245,10 +244,10 @@ const HomeDataCards: React.FC = ({}) => {
               <div>
                 <span>{title}</span>
                 <DataCardValue>
-                  <p>{value.toLocaleString()}</p>
+                  <p>{value?.toLocaleString()}</p>
                   {variation && !variation.includes('%') && (
                     <DataCardLatest positive={variation.includes('+')}>
-                      <ArrowData positive={variation.includes('+')} />
+                      <ArrowData $positive={variation.includes('+')} />
                       <p>{variation}/24h</p>
                     </DataCardLatest>
                   )}
@@ -259,7 +258,7 @@ const HomeDataCards: React.FC = ({}) => {
       </DataCardsContent>
       <ExpandData>
         <ButtonExpand onClick={() => setExpanded(!expanded)}>
-          <ArrowDownDataCards expanded={expanded} />
+          <ArrowDownDataCards $expanded={expanded} />
           <p>{expanded ? 'Hide Cards' : 'Expand Cards'}</p>
         </ButtonExpand>
       </ExpandData>

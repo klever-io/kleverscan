@@ -11,6 +11,7 @@ interface IProps {
   type?: string;
   zIndex?: number;
   logoWarning?: boolean;
+  paddingTop?: number;
 }
 
 interface ILabel {
@@ -169,6 +170,7 @@ export const Container = styled.div<IProps>`
   ${props =>
     css`
       grid-column: auto / span ${props.span};
+      padding-top: ${props.paddingTop ? props.paddingTop : 0}rem;
     `}
 
   > span {
@@ -273,15 +275,17 @@ export const TooltipContainer = styled.div<{
 }>`
   display: flex;
   user-select: none;
+  position: relative;
   width: fit-content;
-
-  svg {
+  > svg {
     align-self: center;
-    path {
-      fill: ${props => props.theme.form.tooltipContainer};
+  }
+  &:hover {
+    width: calc(100% - 1rem);
+    div {
+      visibility: visible;
     }
   }
-
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     font-size: 1rem;
   }

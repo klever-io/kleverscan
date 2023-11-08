@@ -60,7 +60,7 @@ const FooterItems: React.FC<IContent> = link => {
           {isMobile && (
             <div onClick={() => setHideMenu(!hideMenu)}>
               <p>{hideMenu ? 'Show' : 'Hide'}</p>
-              <ArrowUpSquareHideMenu hide={hideMenu} />
+              <ArrowUpSquareHideMenu $hide={hideMenu} />
             </div>
           )}
         </ContainerHeaderItems>

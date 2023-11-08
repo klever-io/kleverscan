@@ -39,6 +39,7 @@ export interface IBaseFormInputProps
   toggleOptions?: [string, string];
   bool?: boolean;
   span?: number;
+  paddingTop?: number;
   selectPlaceholder?: string;
   options?: {
     label: string;
@@ -114,6 +115,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   type,
   toggleOptions,
   span,
+  paddingTop,
   bool,
   selectPlaceholder,
   defaultChecked = true,
@@ -251,6 +253,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   };
 
   const containerProps = {
+    paddingTop,
     span,
     zIndex,
   };

@@ -12,9 +12,6 @@ import {
 const NetworkRedirectButton: React.FC = () => {
   const currentNetwork = getNetwork().toLowerCase();
   const availableNetworks = ['mainnet', 'testnet'];
-  const remainingNetworks = availableNetworks.filter(
-    network => network.toLowerCase() !== currentNetwork.toLowerCase(),
-  );
 
   const sanitizedNetworknames = {
     ['mainnet']: 'MainNet',
@@ -44,7 +41,7 @@ const NetworkRedirectButton: React.FC = () => {
           <ButtonDropdownMenu>
             {availableNetworks.map(item => {
               return (
-                <>
+                <React.Fragment key={item}>
                   <a
                     href={getNetworkPath(item)}
                     data-testid="network-navbar-item"
@@ -55,7 +52,7 @@ const NetworkRedirectButton: React.FC = () => {
                       {sanitizeNetworkName(item)}
                     </ButtonDropdownItem>
                   </a>
-                </>
+                </React.Fragment>
               );
             })}
           </ButtonDropdownMenu>

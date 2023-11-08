@@ -239,6 +239,7 @@ export const RoyaltiesSection: React.FC<ISectionProps> = props => {
         </TooltipContainer>
       </SectionTitle>
       <FormInput
+        paddingTop={2}
         name="royalties.address"
         title="Address"
         span={2}

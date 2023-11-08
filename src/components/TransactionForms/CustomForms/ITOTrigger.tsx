@@ -72,7 +72,7 @@ const getITOTriggerForm = (
 ) => {
   switch (triggerType) {
     case 0:
-      return <PackInfoSection />;
+      return <PackInfoSection top={2} />;
     case 1:
       return (
         <FormSection>
@@ -158,9 +158,9 @@ const getITOTriggerForm = (
         </FormSection>
       );
     case 7:
-      return <WhitelistSection />;
+      return <WhitelistSection top={2.5} />;
     case 8:
-      return <WhitelistSection />;
+      return <WhitelistSection top={2.5} />;
     case 9:
       return (
         <FormSection>

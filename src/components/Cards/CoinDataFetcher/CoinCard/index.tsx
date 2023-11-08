@@ -2,14 +2,28 @@ import { InfoSquare } from '@/assets/icons';
 import Chart, { ChartType } from '@/components/Chart';
 import { PriceTooltip } from '@/components/Chart/Tooltips';
 import { Loader } from '@/components/Loader/styles';
-import { useHomeData } from '@/contexts/mainPage';
 import { useMobile } from '@/contexts/mobile';
-import { ICoinInfo } from '@/types';
+import {
+  homeKfiCall,
+  homeKfiChartCall,
+  homeKfiDataCall,
+  homeKfiPriceCall,
+  homeKlvCall,
+  homeKlvChartCall,
+  homeKlvDataCall,
+} from '@/services/requests/home';
+import {
+  IAssetsData,
+  ICoinInfo,
+  IGeckoChartResponse,
+  IGeckoResponse,
+} from '@/types';
 import { getVariation } from '@/utils';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { IoReloadSharp } from 'react-icons/io5';
+import { useQueries } from 'react-query';
 import CoinCardSkeleton from '../CoinCardSkeleton';
 import {
   ArrowTopRight,
@@ -49,6 +63,8 @@ interface IPropsRenderCoinsCard {
   cardRef: React.RefObject<HTMLDivElement>;
   renderKfiMarketCap: () => string;
   coinDays: React.MutableRefObject<ICoinTimes>;
+  assetsData: IAssetsData;
+  refetchCoin: () => void;
 }
 
 interface ICoinTimes {
@@ -56,9 +72,15 @@ interface ICoinTimes {
 }
 
 const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
-  const { coin, renderKfiMarketCap, coinDays, cardRef } = props;
+  const {
+    coin,
+    renderKfiMarketCap,
+    coinDays,
+    cardRef,
+    assetsData,
+    refetchCoin,
+  } = props;
   const { shortname, name, price, variation, marketCap, prices } = coin;
-  const { getCoins, assetsData } = useHomeData();
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
   const [daysSelected, setSelectedDays] = useState<string | number>(1);
   const [switchCardLoading, setSwitchCardLoading] = useState(false);
@@ -70,15 +92,8 @@ const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
       [shortname]: time,
     };
     setSelectedDays(time);
+    refetchCoin();
   };
-
-  useEffect(() => {
-    (async () => {
-      setSwitchCardLoading(true);
-      await getCoins(coinDays.current);
-      setSwitchCardLoading(false);
-    })();
-  }, [daysSelected]);
 
   return (
     <CardContainer ref={cardRef}>
@@ -193,15 +208,13 @@ const CoinCard: React.FC = () => {
   const { t } = useTranslation('home');
   const coinsName = ['KLV', 'KFI'];
   const [selectedCoin, setSelectedCoin] = useState(0);
-  const [loadingError, setLoadingError] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
-  const { coins, loadingCoins, getCoins, assetsData } = useHomeData();
   const coinDays = useRef<ICoinTimes>({
     KLV: 1,
     KFI: 1,
   });
-  const { isMobile, isTablet } = useMobile();
+  const { isTablet } = useMobile();
   const handleSelectCoin = useCallback(() => {
     if (carouselRef.current !== null && cardRef.current !== null)
       setSelectedCoin(
@@ -213,6 +226,103 @@ const CoinCard: React.FC = () => {
     if (carouselRef.current !== null && cardRef.current !== null)
       carouselRef.current.scrollLeft = index * cardRef.current.offsetWidth;
   };
+
+  const queryFnKlvChart = () => homeKlvChartCall(coinDays.current);
+  const queryFnKfiChart = () => homeKfiChartCall(coinDays.current);
+
+  const [
+    klvDataResult,
+    klvChartResult,
+    kfiDataResult,
+    kfiChartResult,
+    klvDataInfo,
+    kfiDataInfo,
+    kfiPricesInfo,
+  ] = useQueries([
+    {
+      queryKey: 'klvData',
+      queryFn: homeKlvDataCall,
+    },
+    {
+      queryKey: 'klvChartData',
+      queryFn: queryFnKlvChart,
+    },
+    {
+      queryKey: 'kfiData',
+      queryFn: homeKfiDataCall,
+    },
+    {
+      queryKey: 'kfiChartData',
+      queryFn: queryFnKfiChart,
+    },
+    {
+      queryKey: 'klvDataInfo',
+      queryFn: homeKlvCall,
+    },
+    {
+      queryKey: 'kfiDataInfo',
+      queryFn: homeKfiCall,
+    },
+    {
+      queryKey: 'klvPricesCall',
+      queryFn: homeKfiPriceCall,
+    },
+  ]);
+
+  const refetchCoinsCall = [klvChartResult.refetch, kfiChartResult.refetch];
+
+  if (kfiDataInfo.data) {
+    kfiDataInfo.data.volume = kfiPricesInfo.data?.kfiVolume;
+    if (kfiDataInfo.data.prices) {
+      kfiDataInfo.data.prices.todaysPrice =
+        kfiPricesInfo.data?.kfiPricesTodaysPrice || null;
+      kfiDataInfo.data.prices.variation =
+        kfiPricesInfo.data?.kfiPricesVariation || null;
+      kfiDataInfo.data.prices.yesterdayPrice =
+        kfiPricesInfo.data?.kfipricesYesterdayPrice || null;
+    }
+  }
+  const assetsData = {
+    klv: { ...klvDataInfo.data },
+    kfi: { ...kfiDataInfo.data },
+  };
+
+  const coins: ICoinInfo[] = [];
+
+  const addCoins = (
+    name: string,
+    shortname: string,
+    response: IGeckoResponse | undefined,
+    chart: IGeckoChartResponse | undefined,
+  ) => {
+    coins.push({
+      name,
+      shortname,
+      price: response?.market_data?.current_price.usd || 0,
+      variation: response?.market_data?.price_change_percentage_24h || 0,
+      marketCap: {
+        price: response?.market_data?.market_cap.usd || 0,
+        variation: response?.market_data?.market_cap_change_percentage_24h || 0,
+      },
+      volume: {
+        price: response?.market_data?.total_volume.usd || 0,
+        variation: 0,
+      },
+      prices: chart?.prices?.map(item => ({ value: item[1] })) || [],
+    });
+  };
+
+  addCoins('Klever', 'KLV', klvDataResult.data, klvChartResult.data);
+  addCoins('Klever Finance', 'KFI', kfiDataResult.data, kfiChartResult.data);
+
+  const coinsLoadingBool = [
+    klvDataResult.isLoading,
+    klvChartResult.isLoading,
+    kfiDataResult.isLoading,
+    kfiChartResult.isLoading,
+  ];
+
+  const boolChecker = (arr: boolean[]) => arr.some(Boolean);
 
   const renderKfiMarketCap = () => {
     if (
@@ -229,7 +339,7 @@ const CoinCard: React.FC = () => {
 
   const CoinsFetchFails: React.FC = () => {
     if (coins.length === 0) {
-      return loadingError ? (
+      return klvChartResult.isError && kfiChartResult.isError ? (
         <CardContainer>
           <CardContentError>
             <HeaderContainer>
@@ -239,12 +349,7 @@ const CoinCard: React.FC = () => {
             </HeaderContainer>
             <ContentError
               onClick={async () => {
-                setLoadingError(true);
-                await getCoins({
-                  kfi: 1,
-                  klv: 1,
-                });
-                setLoadingError(false);
+                refetchCoinsCall.forEach(refetchCoin => refetchCoin());
               }}
             >
               <span>Retry</span>
@@ -263,7 +368,7 @@ const CoinCard: React.FC = () => {
     <Container>
       {!isTablet ? (
         <ContainerDesktop>
-          {!loadingCoins && (
+          {!boolChecker(coinsLoadingBool) && (
             <div>
               {coinsName.map((coin, index) => (
                 <ButtonContainer key={index}>
@@ -285,6 +390,8 @@ const CoinCard: React.FC = () => {
             {coins.map((coin, index) => (
               <RenderCoinsCard
                 renderKfiMarketCap={renderKfiMarketCap}
+                assetsData={assetsData}
+                refetchCoin={refetchCoinsCall[index]}
                 coinDays={coinDays}
                 cardRef={cardRef}
                 coin={coin}
@@ -314,11 +421,13 @@ const CoinCard: React.FC = () => {
               </CoinSelector>
             ))}
           </CoinsSelector>
-          {!loadingCoins ? (
+          {!boolChecker(coinsLoadingBool) ? (
             <Content ref={carouselRef} onScroll={handleSelectCoin}>
               {coins.map((coin, index) => (
                 <RenderCoinsCard
                   renderKfiMarketCap={renderKfiMarketCap}
+                  assetsData={assetsData}
+                  refetchCoin={refetchCoinsCall[index]}
                   cardRef={cardRef}
                   coinDays={coinDays}
                   coin={coin}
@@ -329,7 +438,7 @@ const CoinCard: React.FC = () => {
           ) : (
             <CoinCardSkeleton />
           )}
-          {!loadingCoins && (
+          {!boolChecker(coinsLoadingBool) && (
             <ButtonContainer>
               <a
                 target="_blank"

@@ -20,14 +20,19 @@ import {
   utf8ToHex,
 } from '@/utils/formatFunctions';
 import { Content } from '@/views/verify-signature/detail';
+import { GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useState } from 'react';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 const EncodingConverter: React.FC = () => {
+  const { t } = useTranslation('encodingConverter');
   const cardHeaders = [
     'Base64 / UTF8',
     'Hex / UTF8',
-    'PublicKey / Address',
-    'PEM File / Address - PrivateKey',
+    ` ${t('PublicKey')} / ${t('Address')}`,
+    `${t('PEM File')}  / ${t('Address')} - ${t('PrivateKey')} `,
   ];
   const [selectedCard, setSelectedCard] = useState<string>(cardHeaders[0]);
 
@@ -42,7 +47,7 @@ const EncodingConverter: React.FC = () => {
           },
           placeHolder: {
             encoding: placeHolderUTF8,
-            decoding: 'Enter your Base64-encoded data here...',
+            decoding: 'Enter your Base64 encoded data here...',
           },
           decoding: base64ToUtf8,
           encoded: utf8ToBase64,
@@ -106,6 +111,16 @@ const EncodingConverter: React.FC = () => {
       </Content>
     </Container>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['encodingConverter', 'table'],
+    nextI18nextConfig,
+  );
+
+  return { props };
 };
 
 export default EncodingConverter;

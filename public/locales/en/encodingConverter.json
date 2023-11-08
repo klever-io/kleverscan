@@ -1,0 +1,11 @@
+{
+  "Encoding Converter": "Encoding Converter",
+  "Encode": "Encode",
+  "Decode": "Decode",
+  "Reset": "Reset",
+  "PrivateKey": "PrivateKey",
+  "PublicKey": "PublicKey",
+  "PEM File": "PEM File",
+  "Address": "Address",
+  "PlaceHolder": "Enter your {{data}} encoded {{text}} here..."
+}

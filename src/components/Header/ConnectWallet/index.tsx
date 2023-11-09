@@ -59,7 +59,13 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
         <>
           <ConnectContainer>
             <ConnectButton onClick={handleClick}>
-              <Image src="/Wallet.svg" alt="Wallet" loader={({ src }) => src} />
+              <Image
+                src="/Wallet.svg"
+                alt="Wallet"
+                loader={({ src }) => src}
+                width={25}
+                height={25}
+              />
               <span>Connect wallet</span>
             </ConnectButton>
           </ConnectContainer>
@@ -104,10 +110,13 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
                 {!walletAddress && (
                   <>
                     <Image
+                      width={25}
+                      height={25}
                       src="/Wallet.svg"
                       alt="Wallet"
                       loader={({ src }) => src}
                     />
+
                     <span>Connect Wallet</span>
                   </>
                 )}

@@ -37,3 +37,16 @@ export const Verified = styled(Certified)`
 
   transform: translate(50%, 50%);
 `;
+
+export const NextImageWrapper = styled.div`
+  border-radius: 50%;
+  border: 2px solid ${props => props.theme.borderLogo} !important;
+  width: 2.1rem;
+  height: 2.1rem;
+  img {
+    border: 2px solid ${props => props.theme.borderLogo} !important;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+  }
+`;

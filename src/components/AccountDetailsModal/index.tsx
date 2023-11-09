@@ -149,19 +149,25 @@ export const AccountDetailsModal: React.FC<IAccountDetailsModal> = ({
     if (!storagePrimaryAssets) {
       return;
     }
+
+    if (storagePrimaryAssets === 'undefined') {
+      localStorage.removeItem('primaryAsset');
+      return;
+    }
+
     try {
       const getPrimaryAsset: IAssetBalance = JSON.parse(storagePrimaryAssets);
       setPrimaryAsset([getPrimaryAsset]);
+
+      const newPrimaryAsset = otherAssets.find(
+        asset => asset.assetId === getPrimaryAsset.assetId,
+      );
+
+      if (newPrimaryAsset) {
+        localStorage.setItem('primaryAsset', JSON.stringify(newPrimaryAsset));
+      }
     } catch (error) {
       console.error(error);
-    }
-
-    const getPrimaryAsset = JSON.parse(storagePrimaryAssets);
-    const newPrimaryAsset = otherAssets.find(
-      asset => asset.assetId === getPrimaryAsset.assetId,
-    );
-    if (newPrimaryAsset) {
-      localStorage.setItem('primaryAsset', JSON.stringify(newPrimaryAsset));
     }
   };
 

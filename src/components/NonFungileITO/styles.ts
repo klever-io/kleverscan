@@ -72,8 +72,3 @@ export const BuyButton = styled.div`
 export const LoaderWrapper = styled.div`
   margin-top: 0.4rem;
 `;
-
-export const NFTimg = styled.img<{ imgLoading: boolean }>`
-  border-radius: 0.8rem;
-  display: ${props => (props.imgLoading ? 'none' : 'block')};
-`;

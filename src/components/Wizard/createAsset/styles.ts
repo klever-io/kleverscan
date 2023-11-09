@@ -803,15 +803,6 @@ export const ConfirmCardImage = styled.div`
   text-transform: uppercase;
 `;
 
-export const WizardConfirmLogo = styled.img`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-`;
-
 export const ConfirmCardBasisInfo = styled.div<{ secondary?: boolean }>`
   display: flex;
   padding: 1.56rem;

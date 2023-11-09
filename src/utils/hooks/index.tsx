@@ -124,6 +124,7 @@ export const useFetchPartial = <T,>(
               asset[dataType].toUpperCase().includes(value.toUpperCase()),
             )
           ) {
+            setLoading(true);
             if (type !== 'assets') {
               response = await api.get({
                 route: `${route}?${dataType}=${value}`,
@@ -143,8 +144,8 @@ export const useFetchPartial = <T,>(
             res(response.data[type]);
             setLoading(false);
           } else {
-            setLoading(false);
             res(items);
+            setLoading(false);
           }
         }, 500);
       });

@@ -1,4 +1,4 @@
-import { transparentize } from 'polished';
+import { lighten, transparentize } from 'polished';
 import styled, { css } from 'styled-components';
 
 interface IPlacement {
@@ -38,6 +38,9 @@ export const PlacementReference = styled.div<{ isVisibile: boolean }>`
 `;
 
 export const ContainerAttention = styled.div`
+  display: grid;
+  place-items: center;
+
   animation: animate 2s ease-in-out infinite;
   @keyframes animate {
     0% {
@@ -94,8 +97,8 @@ export const TourTooltip = styled.div<IPlacement>`
   border-radius: 5%;
   text-align: center;
 
-  background: ${props => props.theme.true.white};
-  color: ${props => props.theme.purple};
+  background: ${props => lighten(0.2, props.theme.purple)};
+  color: ${props => props.theme.true.black};
 
   user-select: none;
 
@@ -108,7 +111,7 @@ export const TourTooltip = styled.div<IPlacement>`
     height: 1rem;
     border-width: 1rem 1rem 1rem 1rem;
     border-style: solid;
-    border-color: #fafafa;
+    border-color: ${props => lighten(0.2, props.theme.purple)};
 
     z-index: -1;
 

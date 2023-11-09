@@ -224,7 +224,7 @@ const Assets: React.FC = () => {
 
       <FilterContainer>
         {filters.map(filter => (
-          <Filter key={JSON.stringify(filter)} {...filter} />
+          <Filter key={filter.title} {...filter} />
         ))}
       </FilterContainer>
 

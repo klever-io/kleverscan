@@ -1,4 +1,5 @@
 import { useDidUpdateEffect } from '@/utils/hooks';
+import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
 import { BsArrowLeft, BsArrowRight } from 'react-icons/bs';
 import { toast } from 'react-toastify';
@@ -42,6 +43,7 @@ const FormEncodingConverter: React.FC<IPropsEncodingConverter> = ({
     encoding: '',
     decoding: '',
   });
+  const { t } = useTranslation('encodingConverter');
   const [selectedTextArea, setSelectedTextArea] = useState('');
 
   const handleChangeValues = (
@@ -108,17 +110,17 @@ const FormEncodingConverter: React.FC<IPropsEncodingConverter> = ({
             selected={selectedTextArea === 'Encoding'}
           >
             <BsArrowLeft />
-            <Button type="button" value="Encode" />
+            <Button type="button" value={t('Encode')} />
           </ContentButton>
           <ContentButton
             onClick={onClickDecoding}
             selected={selectedTextArea === 'Decoding'}
           >
-            <Button type="button" value="Decode" />
+            <Button type="button" value={t('Decode')} />
             <BsArrowRight />
           </ContentButton>
           <ContentButton onClick={resetForm}>
-            <Button type="button" value="Reset" />
+            <Button type="button" value={t('Reset')} />
           </ContentButton>
         </ContainerButtons>
 
@@ -139,14 +141,13 @@ const FormEncodingConverter: React.FC<IPropsEncodingConverter> = ({
 
 const FormPEMFileConverter: React.FC = () => {
   const [pemFile, setPemFile] = useState('');
-  const [address, setAddress] = useState('');
   const [password, setPassword] = useState('');
   const [open, setOpen] = useState(false);
   const [isDragging, setDragging] = useState(false);
   const [draggingOverlayCount, setDragginOverlayCount] = useState(0);
+  const { t } = useTranslation('encodingConverter');
   const checkIsEncrypted = () => {
     if (pemFile.includes('ENCRYPTED')) {
-      // setOpen(true);
       return true;
     }
     return false;
@@ -207,7 +208,6 @@ const FormPEMFileConverter: React.FC = () => {
     }
 
     setPemFile(pk);
-    setAddress(wallet);
   };
   const setUserConfigs = () => {
     const user = validatePemFile();
@@ -236,7 +236,6 @@ const FormPEMFileConverter: React.FC = () => {
     const contents = parserPemFile(pemFile);
     if (contents === '') {
       resetData();
-      // toast.error('Invalid PEM file.');
       toast.error('PEM File Encrypted.');
       return false;
     }
@@ -328,9 +327,7 @@ const FormPEMFileConverter: React.FC = () => {
   useDidUpdateEffect(() => {
     const encrypt = checkIsEncrypted();
     if (pemFile && !encrypt) {
-      // setUserConfigs();
     } else if (pemFile && encrypt) {
-      // setOpen(true);
       setPemFile('PEM File Encrypted.');
     }
   }, [pemFile]);
@@ -380,7 +377,7 @@ PrivateKey: ${privateKeyPem}
     <VerifySignatureContainer>
       <FormEncodingContainer>
         <ContainerItem>
-          <span>PEM File</span>
+          <span>{t('PEM File')}</span>
           <div
             onDragEnter={handleDragEnter}
             onDragLeave={handleDragLeave}
@@ -393,8 +390,8 @@ PrivateKey: ${privateKeyPem}
                 <>
                   <input id="input" type="file" accept=".pem" />
                   <span>
-                    Drag and drop your file here,{' '}
-                    <label htmlFor="input">select file</label>
+                    {t('PEM File Placeholder')},{' '}
+                    <label htmlFor="input">{t('Select File')}</label>
                   </span>
                 </>
               }
@@ -417,7 +414,7 @@ PrivateKey: ${privateKeyPem}
           </ContentButton>
         </ContainerButtons>
         <ContainerItem>
-          <span>Address/PrivateKey</span>
+          <span>{`${t('Address')}/${t('PrivateKey')}`}</span>
           <EncodingTextArea
             name="data"
             value={removePEMHeaders() || ''}

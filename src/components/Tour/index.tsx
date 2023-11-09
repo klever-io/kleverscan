@@ -29,9 +29,10 @@ const Tour: React.FC<ITourProps> = ({
   const [seen, setSeen] = useState(true);
   const [width, setWidth] = useState(0);
   const tourContentRef = useRef<HTMLDivElement>(null);
-  const tooltipRef = useRef<ReactPortal>();
-  const backgroundRef = useRef<ReactPortal>();
-  const contentRef = useRef<ReactPortal>();
+
+  const [tourTooltipPortal, setTourTooltipPortal] = useState<ReactPortal>();
+  const [backgroundPortal, setBackgroundPortal] = useState<ReactPortal>();
+  const [contentPortal, setContentPortal] = useState<ReactPortal>();
 
   const handleResize = () => {
     const width = window.innerWidth;
@@ -45,56 +46,59 @@ const Tour: React.FC<ITourProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, [handleResize]);
 
-  const renderCondition =
-    tourContentRef.current?.getBoundingClientRect() &&
-    JSON.stringify(tourContentRef.current.getBoundingClientRect()) !==
-      JSON.stringify({
-        x: 0,
-        y: 0,
-        width: 0,
-        height: 0,
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0,
-      });
-
   useEffect(() => {
+    const renderCondition =
+      tourContentRef.current?.getBoundingClientRect() &&
+      JSON.stringify(tourContentRef.current.getBoundingClientRect()) !==
+        JSON.stringify({
+          x: 0,
+          y: 0,
+          width: 0,
+          height: 0,
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+        });
+
     if (renderCondition) {
       document.documentElement.style.overflow = 'hidden';
 
-      tooltipRef.current = createPortal(
-        <TourTooltip
-          contentWidth={tourContentRef.current?.clientWidth || 0}
-          contentHeight={tourContentRef.current?.clientHeight || 0}
-          position={tourContentRef.current?.getBoundingClientRect()}
-        >
-          {tourTooltip}
-          <DismissButton onClick={handleClose}>
-            <IoIosClose size={'1.2rem'} />
-            <span>Dismiss</span>
-          </DismissButton>
-        </TourTooltip>,
-        document.body,
+      setTourTooltipPortal(
+        createPortal(
+          <TourTooltip
+            contentWidth={tourContentRef.current?.clientWidth || 0}
+            contentHeight={tourContentRef.current?.clientHeight || 0}
+            position={tourContentRef.current?.getBoundingClientRect()}
+          >
+            {tourTooltip}
+            <DismissButton onClick={handleClose}>
+              <IoIosClose size={'1.2rem'} />
+              <span>Dismiss</span>
+            </DismissButton>
+          </TourTooltip>,
+          document.body,
+        ),
       );
 
-      backgroundRef.current = createPortal(
-        <TourBackground isOpen={!seen} />,
-        document.body,
+      setBackgroundPortal(
+        createPortal(<TourBackground isOpen={!seen} />, document.body),
       );
 
-      contentRef.current = createPortal(
-        <TourContainer
-          key={String(seen)}
-          contentWidth={tourContentRef.current?.clientWidth || 0}
-          contentHeight={tourContentRef.current?.clientHeight || 0}
-          position={tourContentRef.current?.getBoundingClientRect()}
-        >
-          <ContainerAttention>
-            <TourContent onClick={handleClose}>{children}</TourContent>
-          </ContainerAttention>
-        </TourContainer>,
-        document.body,
+      setContentPortal(
+        createPortal(
+          <TourContainer
+            key={String(seen)}
+            contentWidth={tourContentRef.current?.clientWidth || 0}
+            contentHeight={tourContentRef.current?.clientHeight || 0}
+            position={tourContentRef.current?.getBoundingClientRect()}
+          >
+            <ContainerAttention>
+              <TourContent onClick={handleClose}>{children}</TourContent>
+            </ContainerAttention>
+          </TourContainer>,
+          document.body,
+        ),
       );
     }
   }, [tourContentRef.current, width]);
@@ -121,9 +125,9 @@ const Tour: React.FC<ITourProps> = ({
           <PlacementReference ref={tourContentRef} isVisibile={seen}>
             {children}
           </PlacementReference>
-          {contentRef.current}
-          {tooltipRef.current}
-          {backgroundRef.current}
+          {contentPortal}
+          {tourTooltipPortal}
+          {backgroundPortal}
         </>
       )}
     </>

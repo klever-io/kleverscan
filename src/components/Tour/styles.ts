@@ -70,7 +70,7 @@ export const TourBackground = styled.div<{ isOpen?: boolean }>`
   visibility: ${props => (props.isOpen ? 'visible' : 'hidden')};
   opacity: ${props => (props.isOpen ? 1 : 0)};
   transition: all 0.1s linear;
-  z-index: 1;
+  z-index: 5;
 `;
 
 export const TourTooltip = styled.div<IPlacement>`

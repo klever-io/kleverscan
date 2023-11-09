@@ -223,49 +223,54 @@ const Navbar: React.FC = () => {
             </>
           )}
 
-          <MobileContainer $openSearch={openSearch}>
-            {isMobile && router.pathname !== '/' && (
-              <SearchIconWrapper
-                onClick={() => setOpenSearch(!openSearch)}
-                openSearch={openSearch}
-              >
-                <SearchIcon />
-              </SearchIconWrapper>
-            )}
-            <SearchContainer $openSearch={openSearch}>
-              {openSearch && (
-                <Input setOpenSearch={setOpenSearch} openSearch={openSearch} />
+          {isTablet && (
+            <MobileContainer $openSearch={openSearch}>
+              {isMobile && router.pathname !== '/' && (
+                <SearchIconWrapper
+                  onClick={() => setOpenSearch(!openSearch)}
+                  openSearch={openSearch}
+                >
+                  <SearchIcon />
+                </SearchIconWrapper>
+              )}
+              <SearchContainer $openSearch={openSearch}>
+                {openSearch && (
+                  <Input
+                    setOpenSearch={setOpenSearch}
+                    openSearch={openSearch}
+                  />
+                )}
+
+                <CloseSearch
+                  onClick={() => setOpenSearch(false)}
+                  $openSearch={openSearch}
+                />
+              </SearchContainer>
+              {!isMobile && (
+                <>
+                  {router.pathname !== '/' && (
+                    <SearchIconWrapper
+                      onClick={() => setOpenSearch(!openSearch)}
+                      openSearch={openSearch}
+                    >
+                      <SearchIcon />
+                    </SearchIconWrapper>
+                  )}
+                  <ConnectContainer
+                    onClick={() => {
+                      handleClickConnection();
+                      closeMenu();
+                    }}
+                  >
+                    <ConnectWallet clickConnection={closeDrawer} />
+                  </ConnectContainer>
+                  <NetworkRedirectButton />
+                </>
               )}
 
-              <CloseSearch
-                onClick={() => setOpenSearch(false)}
-                $openSearch={openSearch}
-              />
-            </SearchContainer>
-            {!isMobile && (
-              <>
-                {router.pathname !== '/' && (
-                  <SearchIconWrapper
-                    onClick={() => setOpenSearch(!openSearch)}
-                    openSearch={openSearch}
-                  >
-                    <SearchIcon />
-                  </SearchIconWrapper>
-                )}
-                <ConnectContainer
-                  onClick={() => {
-                    handleClickConnection();
-                    closeMenu();
-                  }}
-                >
-                  <ConnectWallet clickConnection={closeDrawer} />
-                </ConnectContainer>
-                <NetworkRedirectButton />
-              </>
-            )}
-
-            <MenuIcon onClick={handleMenu} data-testid="menu-icon" />
-          </MobileContainer>
+              <MenuIcon onClick={handleMenu} data-testid="menu-icon" />
+            </MobileContainer>
+          )}
         </Content>
 
         {isMobile && (

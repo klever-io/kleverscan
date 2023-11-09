@@ -8,15 +8,20 @@ import { IMarketplace } from '@/types/marketplaces';
 import { PERCENTAGE_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import { TableTitle } from '@/views/marketplaces';
+import { GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import React from 'react';
+import nextI18nextConfig from '../../../next-i18next.config';
 const Marketplaces: React.FC = () => {
+  const { t } = useTranslation('marketPlaces');
   const marketplacesHeader = [
     'Id',
-    'Name',
-    'Owner Address',
-    'Referral Address',
-    'Referral Percentage',
+    `${t('Name')}`,
+    `${t('Owner Address')}`,
+    `${t('Referral Address')}`,
+    `${t('Referral Percentage')}`,
   ];
 
   const marketplacesRowSections = (marketplace: IMarketplace) => {
@@ -94,12 +99,22 @@ const Marketplaces: React.FC = () => {
   return (
     <Container>
       <Header>
-        <Title title="Marketplaces" Icon={Icon} />
+        <Title title={t('Marketplaces')} Icon={Icon} />
       </Header>
-      <TableTitle>List of Marketplaces</TableTitle>
+      <TableTitle>{t('List of Marketplaces')}</TableTitle>
       <Table {...tableProps} />
     </Container>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['marketPlaces'],
+    nextI18nextConfig,
+  );
+
+  return { props };
 };
 
 export default Marketplaces;

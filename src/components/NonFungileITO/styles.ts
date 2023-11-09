@@ -44,16 +44,6 @@ export const PackItem = styled.div`
   }
 `;
 
-export const Cube = styled.img`
-  width: 7rem;
-  margin-bottom: -3.6rem;
-  z-index: 998;
-
-  @media (max-width: 890px) {
-    width: 5rem;
-  }
-`;
-
 export const BuyButton = styled.div`
   width: 100%;
   background-color: ${props => props.theme.violet};

@@ -15,10 +15,6 @@ const LogoCSS = css`
   border: 2px solid ${props => props.theme.borderLogo};
 `;
 
-export const Logo = styled.img`
-  ${LogoCSS}
-`;
-
 export const LetterLogo = styled.div<{ invertColors?: boolean }>`
   ${LogoCSS}
   display: flex;

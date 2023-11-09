@@ -417,12 +417,7 @@ export const BlockCardRow = styled.div`
     gap: 0.2rem;
   }
 `;
-export const BlockCardLogo = styled.img`
-  border: 2px solid ${props => props.theme.black};
-  border-radius: 100%;
-  width: 2rem;
-  height: 2rem;
-`;
+
 export const BlockCardHash = styled.span`
   width: 100%;
   max-width: 20rem;
@@ -1013,4 +1008,9 @@ export const VariationText = styled.div<{ $positive: boolean }>`
 
 export const Anchor = styled.a`
   cursor: pointer;
+`;
+
+export const NextImageWrapper = styled.div`
+  border-radius: 50%;
+  border: 2px solid ${props => props.theme.borderLogo};
 `;

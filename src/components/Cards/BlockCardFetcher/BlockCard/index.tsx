@@ -7,14 +7,15 @@ import { getAge } from '@/utils/timeFunctions';
 import {
   Anchor,
   BlockCardHash,
-  BlockCardLogo,
   BlockCardRow,
   CardBackground,
+  NextImageWrapper,
   TransactionContainerContent,
   TransactionRow,
 } from '@/views/home';
 import { fromUnixTime } from 'date-fns';
 import { useTranslation } from 'next-i18next';
+import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
@@ -47,10 +48,16 @@ const BlockCard: React.FC<IBlockCard> = ({
     if (img && !error) {
       return (
         <Anchor href={`/validator/${producerOwnerAddress}`}>
-          <BlockCardLogo
-            src={producerLogo}
-            onError={handleImageError}
-          ></BlockCardLogo>
+          <NextImageWrapper>
+            <Image
+              src={producerLogo}
+              alt="Logo of the block producer"
+              onError={handleImageError}
+              width={30}
+              height={30}
+              style={{ borderRadius: '50%', border: '2px solid black' }}
+            ></Image>
+          </NextImageWrapper>
         </Anchor>
       );
     }

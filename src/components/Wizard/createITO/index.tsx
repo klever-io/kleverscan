@@ -1347,6 +1347,7 @@ export const AssetDetails: React.FC = () => {
             height={40}
             objectPosition="center"
             style={{ borderRadius: '10px' }}
+            loader={({ src, width }) => `${src}?w=${width}`}
           />
         </ConfirmCardImage>
       );

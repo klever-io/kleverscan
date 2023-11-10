@@ -72,6 +72,7 @@ const NonFungibleITO: React.FC<INonFungible> = ({
             }}
             onLoad={() => setImgLoading(false)}
             alt="Pack"
+            loader={({ src, width }) => `${src}?w=${width}`}
           ></Image>
           {imgLoading && <Loader height={226 * 0.7} width={'86px'} />}
         </>

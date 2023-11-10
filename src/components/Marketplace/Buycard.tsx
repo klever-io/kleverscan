@@ -67,7 +67,7 @@ const BuyCard: React.FC<IBuyCard> = ({
         ) : (
           <ImageWrapper>
             <Image
-              loader={({ src }) => src}
+              loader={({ src, width }) => `${src}?w=${width}`}
               width={85}
               height={85}
               alt="Collection Logo"

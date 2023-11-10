@@ -2807,6 +2807,7 @@ export const ConfirmTransaction: React.FC<IWizardConfirmProps> = ({
             height={40}
             objectPosition="center"
             style={{ borderRadius: '10px' }}
+            loader={({ src, width }) => `${src}?w=${width}`}
           />
         </ConfirmCardImage>
       );

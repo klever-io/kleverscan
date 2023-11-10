@@ -9,7 +9,6 @@ export const Container = styled.div`
 
 const LogoCSS = css`
   position: relative;
-
   width: 2rem;
   height: 2rem;
   border-radius: 50%;

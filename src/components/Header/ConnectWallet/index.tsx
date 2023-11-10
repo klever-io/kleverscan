@@ -62,7 +62,7 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
               <Image
                 src="/Wallet.svg"
                 alt="Wallet"
-                loader={({ src }) => src}
+                loader={({ src, width }) => `${src}?w=${width}`}
                 width={25}
                 height={25}
               />
@@ -114,7 +114,7 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
                       height={25}
                       src="/Wallet.svg"
                       alt="Wallet"
-                      loader={({ src }) => src}
+                      loader={({ src, width }) => `${src}?w=${width}`}
                     />
 
                     <span>Connect Wallet</span>

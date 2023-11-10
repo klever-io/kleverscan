@@ -56,6 +56,7 @@ const BlockCard: React.FC<IBlockCard> = ({
               width={30}
               height={30}
               style={{ borderRadius: '50%', border: '2px solid black' }}
+              loader={({ src, width }) => `${src}?w=${width}`}
             ></Image>
           </NextImageWrapper>
         </Anchor>

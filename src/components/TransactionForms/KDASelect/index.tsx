@@ -20,7 +20,7 @@ import { useExtension } from '@/contexts/extension';
 import { collectionListCall } from '@/services/requests/collection';
 import { ICollectionList, IDropdownItem } from '@/types';
 import { toLocaleFixed } from '@/utils/formatFunctions';
-import { useDebounce, useDidUpdateEffect } from '@/utils/hooks';
+import { useDebounce } from '@/utils/hooks';
 import { setQuery } from '@/utils/hooks/contract';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
@@ -75,14 +75,6 @@ export const KDASelect: React.FC<IKDASelect> = props => {
     isMultiContract,
   } = useMulticontract();
 
-  const collectionAssetId = queue[parsedIndex]?.collectionAssetId;
-
-  const assetTriggerType =
-    props?.assetTriggerType !== undefined ? props?.assetTriggerType : null;
-  const withdrawType =
-    props?.withdrawType !== undefined ? props?.withdrawType : null;
-  const validateFields = props?.validateFields || [];
-
   const {
     register,
     setValue,
@@ -92,11 +84,20 @@ export const KDASelect: React.FC<IKDASelect> = props => {
     watch,
   } = useFormContext();
 
-  const watchCollection: string = watch('collection');
   const watchCollectionAssetId = watch('collectionAssetId');
 
+  const collectionAssetId = queue[parsedIndex]?.collectionAssetId;
+
+  const assetTriggerType =
+    props?.assetTriggerType !== undefined ? props?.assetTriggerType : null;
+  const withdrawType =
+    props?.withdrawType !== undefined ? props?.withdrawType : null;
+  const validateFields = props?.validateFields || [];
+
+  const selectedCollection = queue[parsedIndex]?.collection;
+
   const {
-    data: assetsList,
+    data: accountAssetsList,
     refetch: refetchAssetsList,
     isFetching: assetsFetching,
   } = useQuery({
@@ -119,20 +120,29 @@ export const KDASelect: React.FC<IKDASelect> = props => {
 
   const [options, setOptions] = useState<IDropdownItem[]>([]);
 
+  const assetsList = useMemo(() => {
+    return kAssetContracts.includes(contractType)
+      ? kassetsList || []
+      : accountAssetsList || [];
+  }, [accountAssetsList, kassetsList, contractType]);
+
   useEffect(() => {
     setOptions(
       getAssetsList(
-        kAssetContracts.includes(contractType)
-          ? kassetsList || []
-          : assetsList || [],
+        assetsList,
         contractType,
         assetTriggerType,
         withdrawType,
         walletAddress,
       ),
     );
-    setCollectionValue(undefined);
-  }, [walletAddress, assetsList, kassetsList, assetTriggerType, withdrawType]);
+  }, [
+    walletAddress,
+    accountAssetsList,
+    kassetsList,
+    assetTriggerType,
+    withdrawType,
+  ]);
 
   useEffect(() => {
     if (!kassetsFetching && !assetsFetching && loading) {
@@ -149,33 +159,7 @@ export const KDASelect: React.FC<IKDASelect> = props => {
 
     setCollection(value?.value ? value : undefined);
     setValue('collection', value?.value || '');
-  };
 
-  const refetch = () => {
-    refetchAssetsList();
-    refetchKassetsList();
-  };
-
-  const getSelectedCollection = () => {
-    const assets = [];
-    kAssetContracts.includes(contractType)
-      ? assets.push(...(kassetsList || []))
-      : assets.push(...(assetsList || []));
-
-    return assets?.find(asset => asset.value === watchCollection);
-  };
-
-  const selectedCollection = getSelectedCollection();
-
-  useEffect(() => {
-    selectedCollection && setCollection(selectedCollection);
-  }, [assetsList, selectedCollection]);
-
-  useEffect(() => {
-    collectionAssetId && setCollectionAssetId(watchCollectionAssetId);
-  }, [watchCollectionAssetId, collectionAssetId]);
-
-  useDidUpdateEffect(() => {
     validateFields.forEach(field => {
       const value = getValues(field);
       if (value) {
@@ -183,7 +167,16 @@ export const KDASelect: React.FC<IKDASelect> = props => {
       }
     });
     trigger('collection');
-  }, [selectedCollection]);
+  };
+
+  const refetch = () => {
+    refetchAssetsList();
+    refetchKassetsList();
+  };
+
+  useEffect(() => {
+    collectionAssetId && setCollectionAssetId(watchCollectionAssetId);
+  }, [watchCollectionAssetId, collectionAssetId]);
 
   let assetBalance = 0;
   assetBalance = selectedCollection?.balance || 0;
@@ -237,7 +230,7 @@ export const KDASelect: React.FC<IKDASelect> = props => {
   };
 
   return (
-    <SelectContainer key={JSON.stringify(selectedCollection)}>
+    <SelectContainer key={selectedCollection?.assetId}>
       <SelectContent configITO={contractType === 'ConfigITOContract'}>
         <BalanceContainer>
           <FieldLabel>

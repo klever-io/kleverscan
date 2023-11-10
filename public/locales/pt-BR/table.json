@@ -1,5 +1,14 @@
 {
   "Address": "Endereço",
   "Staked": "Congelado",
-  "Balance": "Saldo"
+  "Balance": "Saldo",
+  "Name": "Nome",
+  "Type": "Tipo",
+  "InitialSupply": "Fornecimento Inicial",
+  "MaxSupply": "Fornecimento Máximo",
+  "CirculatingSupply": "Fornecimento Circulante",
+  "RewardsType": "Tipo de Recompensas",
+  "Precision": "Precisão",
+  "Fungible": "Fungível",
+  "NonFungible": "Não Fungível"
 }

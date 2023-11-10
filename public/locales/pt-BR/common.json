@@ -29,7 +29,9 @@
   },
   "Buttons": {
     "Expand": "Expandir",
-    "Hide": "Ocultar"
+    "Hide": "Ocultar",
+    "All": "Todos",
+    "Asset Type": "Tipo de Ativo"
   },
   "Date": {
     "Elapsed Time": "atrás",

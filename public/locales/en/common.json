@@ -29,7 +29,9 @@
   },
   "Buttons": {
     "Expand": "Expand",
-    "Hide": "Hide"
+    "Hide": "Hide",
+    "All": "All",
+    "Asset Type": "Asset Type"
   },
   "Date": {
     "Elapsed Time": "ago",

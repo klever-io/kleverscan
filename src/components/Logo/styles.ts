@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components';
 
 export const Container = styled.div`
   width: fit-content;
+  height: fit-content;
   position: relative;
 `;
 

@@ -59,9 +59,11 @@ const AssetLogo: React.FC<IAssetLogo> = ({
             objectFit="cover"
             objectPosition="center"
             alt={`${name}-logo`}
+            width={2.1}
+            height={2.1}
             src={url}
             onError={() => setError(true)}
-            loader={({ src }) => src}
+            loader={({ src, width }) => `${src}?w=${width}`}
           />
         </NextImageWrapper>
         {isVerified()}

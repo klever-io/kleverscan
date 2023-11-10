@@ -1,8 +1,6 @@
 import styled, { css } from 'styled-components';
 
 export const PaginationContainer = styled.div`
-  margin-top: 1rem;
-
   width: 100%;
 
   display: flex;

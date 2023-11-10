@@ -216,7 +216,8 @@ const Table: React.FC<ITable> = ({
       haveAllText: false,
       customCss: {
         container: 'min-width: 7rem; gap: 0',
-        content: 'height: 2.5rem; border-radius: 8px;',
+        content:
+          'height: 2.5rem; border-radius: 8px; border: 1px solid #404264;',
       },
     },
   ];
@@ -234,7 +235,7 @@ const Table: React.FC<ITable> = ({
 
   const renderExportNReloadComponent = () => {
     const refreshTableWrapperMargin =
-      dataName !== 'transactions' ? '-0.5rem' : undefined;
+      dataName !== 'transactions' ? '-1.8rem' : undefined;
     return (
       <ExportnReloadContainer>
         {dataName === 'transactions' && (

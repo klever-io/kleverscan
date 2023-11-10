@@ -576,11 +576,13 @@ export const RefreshTableWrapper = styled.div<{
     animation: ${props => (props.$loading ? rotate : 'none')} 1s linear infinite;
   }
 
-  ${({ marginTop }) =>
-    marginTop &&
-    css`
-      margin-top: ${marginTop};
-    `}
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    ${({ marginTop }) =>
+      marginTop &&
+      css`
+        margin-top: ${marginTop};
+      `}
+  }
 `;
 
 export const ExportnReloadContainer = styled.div`

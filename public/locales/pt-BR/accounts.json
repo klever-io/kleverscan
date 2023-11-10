@@ -46,5 +46,10 @@
       "Operations": "Operações",
       "PermissionsName": "Nome das Permissões"
     }
+  },
+  "AccountsPage": {
+    "Number of Accounts": "Numero de Contas",
+    "Accounts created in the last 24h": "Contas criadas nas últimas 24 horas",
+    "List Of Accounts": "Lista de Contas"
   }
 }

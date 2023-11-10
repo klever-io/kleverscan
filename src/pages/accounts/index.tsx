@@ -18,8 +18,12 @@ import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import { getAge } from '@/utils/timeFunctions';
 import { TableContainer } from '@/views/accounts';
+import { GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 interface IAccounts {
   accounts: IAccount[];
@@ -53,6 +57,7 @@ interface ICard {
 const Accounts: React.FC<IAccounts> = () => {
   const [pagination, setPagination] = useState<null | IPagination>(null);
   const [createdYesterday, setCreatedYesterday] = useState<null | number>(null);
+  const { t } = useTranslation(['common', 'accounts', 'table']);
   const requestAccounts = async (page: number, limit: number) =>
     await api.get({
       route: `address/list?page=${page}&limit=${limit}`,
@@ -116,8 +121,11 @@ const Accounts: React.FC<IAccounts> = () => {
 
   const cards: ICard[] = [
     {
-      title: 'Number of Accounts',
-      headers: ['Accounts created in the last 24h', 'Total accounts'],
+      title: t('accounts:AccountsPage.Number of Accounts'),
+      headers: [
+        t('accounts:AccountsPage.Accounts created in the last 24h'),
+        t('common:Cards.Total Accounts'),
+      ],
       values: [
         createdYesterday === pagination?.totalRecords
           ? '--'
@@ -129,11 +137,11 @@ const Accounts: React.FC<IAccounts> = () => {
 
   const CardContent: React.FC<ICard> = ({ title, headers, values }) => {
     const [uptime] = useState(new Date().getTime());
-    const [age, setAge] = useState(getAge(new Date()));
+    const [age, setAge] = useState(getAge(new Date(), t));
 
     useEffect(() => {
       const interval = setInterval(() => {
-        const newAge = getAge(new Date(uptime / 1000));
+        const newAge = getAge(new Date(uptime / 1000), t);
 
         setAge(newAge);
       }, 1 * 1000); // 1 sec
@@ -149,7 +157,9 @@ const Accounts: React.FC<IAccounts> = () => {
           <span>
             <strong>{title}</strong>
           </span>
-          <p>{age} ago</p>
+          <p>
+            {age} {t('common:Date.Elapsed Time')}
+          </p>
         </div>
         <div>
           <span>
@@ -167,7 +177,12 @@ const Accounts: React.FC<IAccounts> = () => {
     );
   };
 
-  const header = ['Address', 'KLV Staked', 'Nonce', 'KLV Balance'];
+  const header = [
+    `${t('table:Address')}`,
+    `KLV ${t('table:Staked')}`,
+    'Nonce',
+    `KLV ${t('table:Balance')}`,
+  ];
 
   const { isMobile } = useMobile();
 
@@ -223,7 +238,7 @@ const Accounts: React.FC<IAccounts> = () => {
   return (
     <Container>
       <Header>
-        <Title title="Accounts" Icon={Icon} />
+        <Title title={t('common:Titles.Accounts')} Icon={Icon} />
       </Header>
 
       <CardContainer>
@@ -233,11 +248,21 @@ const Accounts: React.FC<IAccounts> = () => {
       </CardContainer>
 
       <TableContainer>
-        <h3>List of accounts</h3>
+        <h3>{t('accounts:AccountsPage.List Of Accounts')}</h3>
         <Table {...tableProps} />
       </TableContainer>
     </Container>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'accounts', 'table'],
+    nextI18nextConfig,
+  );
+
+  return { props };
 };
 
 export default Accounts;

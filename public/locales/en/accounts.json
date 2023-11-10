@@ -46,5 +46,10 @@
       "Operations": "Operations",
       "PermissionsName": "Permissions Name"
     }
+  },
+  "AccountsPage": {
+    "Number of Accounts": "Number of Accounts",
+    "Accounts created in the last 24h": "Accounts created in the last 24h",
+    "List Of Accounts": "List Of Accounts"
   }
 }

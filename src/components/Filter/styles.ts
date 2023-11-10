@@ -38,7 +38,10 @@ const Hide = keyframes`
   }
 `;
 
-export const Container = styled.div<{ maxWidth?: boolean }>`
+export const Container = styled.div<{
+  maxWidth?: boolean;
+  customCss?: string;
+}>`
   display: flex;
   flex-direction: column;
 
@@ -62,9 +65,18 @@ export const Container = styled.div<{ maxWidth?: boolean }>`
     css`
       max-width: 100% !important;
     `}
+
+  ${({ customCss }) =>
+    customCss &&
+    css`
+      ${customCss};
+    `}
 `;
 
-export const Content = styled.div<{ open: boolean }>`
+export const Content = styled.div<{
+  open: boolean;
+  customCss?: string;
+}>`
   ${DefaultCardStyles}
   width: 100%;
   height: 2.8rem;
@@ -100,6 +112,8 @@ export const Content = styled.div<{ open: boolean }>`
 
     transform: rotate(${props => (props.open ? 0 : 180)}deg);
   }
+
+  ${({ customCss }) => customCss && css``}
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;

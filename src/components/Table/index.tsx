@@ -1,3 +1,4 @@
+import { ExportCsvIcon, RefreshIcon } from '@/assets/icons';
 import { useMobile } from '@/contexts/mobile';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
@@ -8,8 +9,8 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
 import { IoReloadSharp } from 'react-icons/io5';
-import { TbTableExport } from 'react-icons/tb';
 import { useQuery } from 'react-query';
+import Filter from '../Filter';
 import { Loader } from '../Loader/styles';
 // import { VscJson } from 'react-icons/vsc';
 import Pagination from '../Pagination';
@@ -25,18 +26,16 @@ import {
   EmptyRow,
   ExportButton,
   ExportContainer,
-  ExportLabel,
-  FloatContainer,
+  ExportnReloadContainer,
   Header,
-  IoReloadSharpWrapper,
   ITableType,
-  ItemContainer,
   LimitContainer,
-  LimitText,
   MobileCardItem,
   MobileHeader,
+  RefreshTableWrapper,
   RetryContainer,
   Row,
+  TableActionsContainer,
 } from './styles';
 
 export interface ITable {
@@ -97,7 +96,7 @@ const Table: React.FC<ITable> = ({
   const [loadingCsv, setLoadingCsv] = useState(false);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState<number>(10);
-  const limits = [5, 10, 50, 100];
+  const limits = ['5', '10', '50', '100'];
   const [scrollTop, setScrollTop] = useState<boolean>(false);
 
   const tableRequest = async (dataName: string | undefined): Promise<any> => {
@@ -203,75 +202,77 @@ const Table: React.FC<ITable> = ({
     window.scrollTo(0, 0);
   };
 
-  const limitSectionMargin =
-    dataName !== 'transactions' ? '-5.5rem' : undefined;
+  const limitData = [
+    {
+      title: '',
+      data: limits,
+      onClick: (value: string) => {
+        setLimit(+value);
+        setQueryAndRouter({ ...router.query, limit: value }, router);
+      },
+      current: router.query?.limit ? String(router.query.limit) : limits[1],
+      loading: false,
+      maxWidth: false,
+      haveAllText: false,
+      customCss: {
+        container: 'min-width: 7rem; gap: 0',
+        content: 'height: 2.5rem; border-radius: 8px;',
+      },
+    },
+  ];
+
+  const renderLimitComponent = () => {
+    return (
+      <LimitContainer>
+        <span>Per page</span>
+        {limitData.map(filter => (
+          <Filter key={filter.title} {...filter} />
+        ))}
+      </LimitContainer>
+    );
+  };
+
+  const renderExportNReloadComponent = () => {
+    const refreshTableWrapperMargin =
+      dataName !== 'transactions' ? '-0.5rem' : undefined;
+    return (
+      <ExportnReloadContainer>
+        {dataName === 'transactions' && (
+          <ExportContainer>
+            <ButtonsContainer>
+              <ExportButton
+                onClick={() => {
+                  handleClickCsv();
+                }}
+              >
+                <Tooltip
+                  msg="CSV"
+                  Component={() =>
+                    loadingCsv ? <Loader /> : <ExportCsvIcon size={20} />
+                  }
+                />
+              </ExportButton>
+              <span>Export .csv</span>
+            </ButtonsContainer>
+          </ExportContainer>
+        )}
+        <RefreshTableWrapper
+          $loading={isFetching}
+          marginTop={refreshTableWrapperMargin}
+        >
+          <Tooltip
+            msg="Refresh"
+            customStyles={{ delayShow: 800 }}
+            Component={() => <RefreshIcon onClick={() => refetch()} />}
+          ></Tooltip>
+        </RefreshTableWrapper>
+        {isTablet && renderLimitComponent()}
+      </ExportnReloadContainer>
+    );
+  };
 
   return (
     <>
-      {typeof scrollUp === 'boolean' &&
-        typeof response?.totalPages === 'number' &&
-        !!response?.items && (
-          <FloatContainer marginTop={limitSectionMargin}>
-            {dataName === 'transactions' && (
-              <ExportContainer>
-                <ExportLabel>
-                  <Tooltip
-                    msg="Current filters will be applied."
-                    Component={() => (
-                      <div style={{ cursor: 'help' }}>Export</div>
-                    )}
-                  />
-                </ExportLabel>
-                <ButtonsContainer>
-                  <ExportButton
-                    onClick={() => {
-                      handleClickCsv();
-                    }}
-                  >
-                    <Tooltip
-                      msg="CSV"
-                      Component={() =>
-                        loadingCsv ? <Loader /> : <TbTableExport size={25} />
-                      }
-                    />
-                  </ExportButton>
-                  {/* <ExportButton>
-                    <VscJson size={25} />
-                  </ExportButton> */}
-                </ButtonsContainer>
-              </ExportContainer>
-            )}
-            <LimitContainer>
-              <span>Per page</span>
-              <LimitText>
-                {limits.map(value => (
-                  <ItemContainer
-                    key={value}
-                    onClick={() => {
-                      setLimit(value);
-                      setQueryAndRouter(
-                        { ...router.query, limit: value.toString() },
-                        router,
-                      );
-                    }}
-                    active={value === (Number(router.query?.limit) || limit)}
-                  >
-                    {value}
-                  </ItemContainer>
-                ))}
-              </LimitText>
-              <IoReloadSharpWrapper $loading={isFetching}>
-                <Tooltip
-                  msg="Refresh"
-                  customStyles={{ delayShow: 800 }}
-                  Component={() => (
-                    <IoReloadSharp size={20} onClick={() => refetch()} />
-                  )}
-                ></Tooltip>
-              </IoReloadSharpWrapper>
-            </LimitContainer>
-          </FloatContainer>
-        )}
       <ContainerView>
         <Container>
           {((!isMobile && !isTablet) || !rowSections) &&
@@ -358,24 +359,29 @@ const Table: React.FC<ITable> = ({
       {typeof scrollUp === 'boolean' &&
         typeof response?.totalPages === 'number' &&
         response?.totalPages > 1 && (
-          <PaginationContainer>
-            <Pagination
-              scrollUp={scrollUp}
-              count={response?.totalPages}
-              page={Number(router.query?.page) || page}
-              onPaginate={page => {
-                setPage(page);
-                if (page === 1) {
-                  resetRouterPage();
-                } else {
-                  setQueryAndRouter(
-                    { ...router.query, page: page.toString() },
-                    router,
-                  );
-                }
-              }}
-            />
-          </PaginationContainer>
+          <TableActionsContainer>
+            {!isMobile && !isTablet && renderExportNReloadComponent()}
+            <PaginationContainer>
+              <Pagination
+                scrollUp={scrollUp}
+                count={response?.totalPages}
+                page={Number(router.query?.page) || page}
+                onPaginate={page => {
+                  setPage(page);
+                  if (page === 1) {
+                    resetRouterPage();
+                  } else {
+                    setQueryAndRouter(
+                      { ...router.query, page: page.toString() },
+                      router,
+                    );
+                  }
+                }}
+              />
+            </PaginationContainer>
+            {isTablet && renderExportNReloadComponent()}
+            {!isMobile && !isTablet && renderLimitComponent()}
+          </TableActionsContainer>
         )}
     </>
   );

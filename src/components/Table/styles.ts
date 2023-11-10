@@ -349,23 +349,23 @@ export const CustomLink = styled.a<{
   }
 `;
 
-export const FloatContainer = styled.div<{ marginTop?: string | undefined }>`
+export const FloatContainer = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  margin-top: ${({ marginTop }) => (marginTop ? marginTop : '1rem')};
-
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    margin-top: 0;
-  }
+  margin-top: 1rem;
 `;
 
 export const LimitContainer = styled.div`
   ${DefaultCardStyles}
+  background: transparent;
   margin-left: auto;
-  display: block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
   position: relative;
   float: right;
   width: fit-content;
@@ -464,6 +464,11 @@ export const ItemContainer = styled.div<{
 
 export const ExportContainer = styled.div`
   ${DefaultCardStyles}
+  background: transparent;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
   width: fit-content;
   padding: 0.5rem;
   color: ${props => props.theme.darkText};
@@ -472,7 +477,7 @@ export const ExportContainer = styled.div`
   font-weight: 600;
   height: fit-content;
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    margin-bottom: 10px;
+    /* margin-bottom: 10px; */
   }
 `;
 
@@ -482,9 +487,9 @@ export const ExportLabel = styled.div`
 
 export const ExportButton = styled.button<{ isJson?: boolean }>`
   border-radius: 50%;
-  padding: 0.125rem;
+  padding: 0 0.125rem 0.125rem 0.125rem;
   display: grid;
-  place-items: center;
+  /* place-items: center; */
   transition: color 0.5s linear;
   svg {
     transition: inherit;
@@ -501,6 +506,10 @@ export const ExportButton = styled.button<{ isJson?: boolean }>`
 
 export const ButtonsContainer = styled.div`
   display: flex;
+  height: 3rem;
+  > span {
+    align-self: center;
+  }
 `;
 
 export const BackTopButton = styled.span<{ isHidden: boolean }>`
@@ -548,6 +557,60 @@ export const IoReloadSharpWrapper = styled.div<{
     color: ${props =>
       props.theme.dark ? props.theme.black : props.theme.darkText};
     animation: ${props => (props.$loading ? rotate : 'none')} 1s linear infinite;
+  }
+`;
+
+export const RefreshTableWrapper = styled.div<{
+  $loading: boolean;
+  marginTop?: string | undefined;
+}>`
+  transform: translateY(50%);
+  align-self: start;
+
+  cursor: pointer;
+  svg {
+    margin-top: -0.2rem;
+    margin-left: auto;
+    color: ${props =>
+      props.theme.dark ? props.theme.white : props.theme.darkText};
+    animation: ${props => (props.$loading ? rotate : 'none')} 1s linear infinite;
+  }
+
+  ${({ marginTop }) =>
+    marginTop &&
+    css`
+      margin-top: ${marginTop};
+    `}
+`;
+
+export const ExportnReloadContainer = styled.div`
+  display: flex;
+  max-width: 40rem;
+  width: 100%;
+  justify-content: space-around;
+  align-items: center;
+  gap: 1rem;
+
+  > div > div:first-child {
+    display: flex;
+    gap: 1rem;
+  }
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    max-width: fit-content;
+  }
+`;
+
+export const TableActionsContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    flex-direction: row;
+    width: 80%;
+    align-self: center;
   }
 `;
 

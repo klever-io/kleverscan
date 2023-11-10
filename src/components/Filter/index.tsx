@@ -28,6 +28,11 @@ export interface IFilter {
   disabledInput?: boolean;
   isHiddenInput?: boolean;
   maxWidth?: boolean;
+  haveAllText?: boolean;
+  customCss?: {
+    container?: string;
+    content?: string;
+  };
 }
 
 const Filter: React.FC<IFilter> = ({
@@ -43,6 +48,8 @@ const Filter: React.FC<IFilter> = ({
   disabledInput,
   isHiddenInput = true,
   maxWidth,
+  haveAllText = true,
+  customCss,
 }) => {
   const allItem = firstItem || 'All';
   const [selected, setSelected] = useState(current || allItem);
@@ -115,7 +122,12 @@ const Filter: React.FC<IFilter> = ({
       onChange(value);
     }
   };
-  const getDataArray = () => [allItem].concat(data);
+  const getDataArray = () => {
+    if (haveAllText) {
+      return [allItem].concat(data);
+    }
+    return data;
+  };
 
   const filterArrayByInput = (input: string) => {
     if (input === '') {
@@ -148,13 +160,14 @@ const Filter: React.FC<IFilter> = ({
   };
 
   return (
-    <Container maxWidth={maxWidth}>
+    <Container maxWidth={maxWidth} customCss={customCss?.container}>
       <span>{title}</span>
       <Content
         onMouseEnter={() => setDontBlur(true)}
         onMouseLeave={() => setDontBlur(false)}
         data-testid="selector"
         {...contentProps}
+        customCss={customCss?.content}
       >
         {!open && (
           <HiddenInput

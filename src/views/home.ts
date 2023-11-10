@@ -1013,4 +1013,5 @@ export const Anchor = styled.a`
 export const NextImageWrapper = styled.div`
   border-radius: 50%;
   border: 2px solid ${props => props.theme.borderLogo};
+  display: flex;
 `;

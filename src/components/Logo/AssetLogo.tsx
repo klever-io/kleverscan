@@ -1,7 +1,12 @@
 import { validateImgUrl } from '@/utils/imageValidate';
 import Image from 'next/image';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Container, LetterLogo, NextImageWrapper, Verified } from './styles';
+import {
+  Container,
+  LetterLogo,
+  NextImageWrapperLogo,
+  Verified,
+} from './styles';
 
 interface IAssetLogo {
   logo: string;
@@ -53,7 +58,7 @@ const AssetLogo: React.FC<IAssetLogo> = ({
   const renderLogo = (url: string) => {
     return (
       <Container data-testid="asset-logo-container">
-        <NextImageWrapper>
+        <NextImageWrapperLogo>
           <Image
             layout="fill"
             objectFit="cover"
@@ -65,7 +70,7 @@ const AssetLogo: React.FC<IAssetLogo> = ({
             onError={() => setError(true)}
             loader={({ src, width }) => `${src}?w=${width}`}
           />
-        </NextImageWrapper>
+        </NextImageWrapperLogo>
         {isVerified()}
       </Container>
     );

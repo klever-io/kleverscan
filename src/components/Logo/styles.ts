@@ -34,7 +34,7 @@ export const Verified = styled(Certified)`
   transform: translate(50%, 50%);
 `;
 
-export const NextImageWrapper = styled.div`
+export const NextImageWrapperLogo = styled.div`
   border-radius: 50%;
   border: 2px solid ${props => props.theme.borderLogo} !important;
   width: 2.1rem;

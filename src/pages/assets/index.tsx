@@ -12,10 +12,13 @@ import { setQueryAndRouter } from '@/utils';
 import { formatAmount } from '@/utils/formatFunctions';
 import { useFetchPartial } from '@/utils/hooks';
 import { ContainerAssetId, ContainerAssetName } from '@/views/assets';
+import { GetStaticProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { ReactNode } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 const Assets: React.FC = () => {
   const router = useRouter();
@@ -231,6 +234,16 @@ const Assets: React.FC = () => {
       <Table {...tableProps} />
     </Container>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'assets', 'table'],
+    nextI18nextConfig,
+  );
+
+  return { props };
 };
 
 export default Assets;

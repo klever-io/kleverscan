@@ -1,3 +1,4 @@
+import { MultiContractModalInfo } from '@/components/Contract/MultiContract/styles';
 import Select from '@/components/Contract/Select';
 import {
   BalanceContainer,
@@ -10,6 +11,7 @@ import Tooltip from '@/components/Tooltip';
 import {
   InfoIcon,
   InputLabel,
+  ModalCreateTxLink,
   Slider,
   StyledInput,
   Toggle,
@@ -24,6 +26,8 @@ import { IAccountResponse, IDropdownItem } from '@/types';
 import { IAccPermission } from '@/types/contracts';
 import { filterPoolAssets } from '@/utils/create-transaction/parseFunctions';
 import { parseAddress } from '@/utils/parseValues';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { IoReloadSharp } from 'react-icons/io5';
 import { useQuery } from 'react-query';
@@ -307,29 +311,40 @@ const AdvancedOptionsContent: React.FC = () => {
     showPayload.current,
   );
 
+  const router = useRouter();
+
   return (
     <ExtraOptionContainer>
       {kdaSelect()}
-      {!isModal && (
-        <FieldContainer>
-          <InputLabel>
-            <span>Multiple Contract</span>
-          </InputLabel>
-          <ToggleContainer>
-            No
-            <Toggle>
-              <StyledInput
-                type="checkbox"
-                defaultChecked={isMultiContract}
-                value={String(isMultiContract)}
-                onClick={() => setIsMultiContract(!isMultiContract)}
-              />
-              <Slider active={String(isMultiContract)} />
-            </Toggle>
-            Yes
-          </ToggleContainer>
-        </FieldContainer>
-      )}
+      <FieldContainer>
+        <InputLabel>
+          <span>Multiple Contract</span>
+        </InputLabel>
+        <ToggleContainer>
+          No
+          <Toggle>
+            <StyledInput
+              type="checkbox"
+              defaultChecked={isMultiContract}
+              value={String(isMultiContract)}
+              onClick={() => setIsMultiContract(!isMultiContract)}
+              disabled={isModal}
+            />
+            <Slider active={String(isMultiContract)} disabled={isModal} />
+          </Toggle>
+          Yes
+          {isModal && (
+            <MultiContractModalInfo>
+              <Tooltip msg="You cannot create a multiple contract using the modal. Go to the `Create Transaction` to create one" />
+              <Link
+                href={{ pathname: '/create-transaction', query: router.query }}
+              >
+                <ModalCreateTxLink>Create Transaction</ModalCreateTxLink>
+              </Link>
+            </MultiContractModalInfo>
+          )}
+        </ToggleContainer>
+      </FieldContainer>
       <MultiSigSelect />
       <FieldContainer>
         <InputLabel>

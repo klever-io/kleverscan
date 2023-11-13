@@ -226,3 +226,7 @@ export const Button = styled.button<{
     background: ${props => props.theme.border};
   }
 `;
+
+export const MultiContractModalInfo = styled.div`
+  display: flex;
+`;

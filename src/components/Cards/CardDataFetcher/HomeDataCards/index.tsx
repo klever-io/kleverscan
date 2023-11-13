@@ -1,4 +1,8 @@
 import { Accounts, Epoch, TPS, Transactions } from '@/assets/cards';
+import {
+  NextImageCardWrapper,
+  StackedImageWrapper,
+} from '@/components/Home/NewCards/style';
 import { useHomeData } from '@/contexts/mainPage';
 import { useMobile } from '@/contexts/mobile';
 import { useTheme } from '@/contexts/theme';
@@ -24,6 +28,7 @@ import {
 } from '@/views/home';
 import { CircularProgressContainer } from '@/views/validators';
 import { useTranslation } from 'next-i18next';
+import Image from 'next/image';
 import { useState } from 'react';
 import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
 import HomeDataCardsSkeleton from '../HomeDataCardsSkeleton';
@@ -132,17 +137,33 @@ const HomeDataCards: React.FC = ({}) => {
                     <MobileEpoch>
                       <span>{title}</span>
                       <PercentageComponent value={value} />
-                      {index === 0 && <small>Time remaining</small>}
+                      <small>Time remaining</small>
                     </MobileEpoch>
                   </DataCardValue>
                 </DataCard>
               ))}
               {
                 <DataCard>
-                  <CardIconContainer>
-                    <CardIcon src="/homeCards/tpsIcon.svg" />
-                    <CardBackground src="/homeCards/tpsBackground.svg" />
-                  </CardIconContainer>
+                  <StackedImageWrapper>
+                    <NextImageCardWrapper>
+                      <Image
+                        src="/homeCards/tpsIcon.svg"
+                        alt="tps icon"
+                        width={32}
+                        height={32}
+                        loader={({ src, width }) => `${src}?w=${width}`}
+                      />
+                    </NextImageCardWrapper>
+                    <NextImageCardWrapper>
+                      <Image
+                        src="/homeCards/tpsBackground.svg"
+                        alt="tps icon background"
+                        width={44}
+                        height={44}
+                        loader={({ src, width }) => `${src}?w=${width}`}
+                      />
+                    </NextImageCardWrapper>
+                  </StackedImageWrapper>
                   <div>
                     <span>{dataCards[2].title}</span>
                     <DataCardValue>
@@ -168,10 +189,26 @@ const HomeDataCards: React.FC = ({}) => {
                 .slice(0, 2)
                 .map(({ title, value, variation }, index) => (
                   <DataCard key={String(index)}>
-                    <CardIconContainer>
-                      <CardIcon src={icons[index][0]} />
-                      <CardBackground src={icons[index][1]} />
-                    </CardIconContainer>
+                    <StackedImageWrapper>
+                      <NextImageCardWrapper>
+                        <Image
+                          src={icons[index][0]}
+                          alt="tps icon background"
+                          width={32}
+                          height={32}
+                          loader={({ src, width }) => `${src}?w=${width}`}
+                        />
+                      </NextImageCardWrapper>
+                      <NextImageCardWrapper>
+                        <Image
+                          src={icons[index][1]}
+                          alt="tps icon background"
+                          width={44}
+                          height={44}
+                          loader={({ src, width }) => `${src}?w=${width}`}
+                        />
+                      </NextImageCardWrapper>
+                    </StackedImageWrapper>
                     <div>
                       <span>{title}</span>
                       <DataCardValue>

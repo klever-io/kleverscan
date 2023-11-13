@@ -8,7 +8,6 @@ import {
   Anchor,
   BlockCardHash,
   BlockCardRow,
-  CardBackground,
   NextImageWrapper,
   TransactionContainerContent,
   TransactionRow,
@@ -82,7 +81,15 @@ const BlockCard: React.FC<IBlockCard> = ({
 
   return (
     <TransactionRow>
-      {!isMobile && <CardBackground src="/homeCards/blocks.svg" />}
+      {!isMobile && (
+        <Image
+          src="/homeCards/blocks.svg"
+          alt="generic block icon"
+          width={48}
+          height={48}
+          loader={({ src, width }) => `${src}?w=${width}`}
+        />
+      )}
       <TransactionContainerContent isBlocks={true}>
         <BlockCardRow>
           <Link href={`/block/${nonce}`}>

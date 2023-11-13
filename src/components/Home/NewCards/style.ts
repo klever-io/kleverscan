@@ -87,6 +87,10 @@ export const NextImageValidatorWrapper = styled.div`
   }
 `;
 
+export const NextImageCardWrapper = styled(NextImageValidatorWrapper)`
+  padding-right: 1rem;
+`;
+
 export const StackedImageWrapper = styled.div`
   display: flex;
   align-items: center;

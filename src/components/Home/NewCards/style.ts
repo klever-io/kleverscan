@@ -77,3 +77,18 @@ export const Title = styled.span`
 export const NewCardsIconContainer = styled(CardIconContainer)`
   width: 4rem;
 `;
+
+export const NextImageValidatorWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  :nth-child(1) {
+    position: absolute;
+  }
+`;
+
+export const StackedImageWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;

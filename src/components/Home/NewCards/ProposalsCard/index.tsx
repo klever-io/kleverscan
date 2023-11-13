@@ -1,11 +1,12 @@
 import { HomeData } from '@/contexts/mainPage';
-import { CardBackground, CardIcon } from '@/views/home';
+import Image from 'next/image';
 import React, { useContext } from 'react';
 import {
   CardContainer,
   CardContent,
   CardSection,
-  NewCardsIconContainer,
+  NextImageValidatorWrapper,
+  StackedImageWrapper,
   Title,
 } from '../style';
 const ProposalsCard: React.FC = () => {
@@ -15,10 +16,26 @@ const ProposalsCard: React.FC = () => {
     <CardContainer>
       <Title>Proposals</Title>
       <CardContent>
-        <NewCardsIconContainer>
-          <CardBackground src="/homeCards/proposalsBackground.svg" />
-          <CardIcon src="/homeCards/proposalsIcon.svg" />
-        </NewCardsIconContainer>
+        <StackedImageWrapper>
+          <NextImageValidatorWrapper>
+            <Image
+              src="/homeCards/proposalsIcon.svg"
+              alt="Proposals icon"
+              width={32}
+              height={32}
+              loader={({ src, width }) => `${src}?w=${width}`}
+            />
+          </NextImageValidatorWrapper>
+          <NextImageValidatorWrapper>
+            <Image
+              src="/homeCards/proposalsBackground.svg"
+              alt="Proposals icon background"
+              width={48}
+              height={48}
+              loader={({ src, width }) => `${src}?w=${width}`}
+            />
+          </NextImageValidatorWrapper>
+        </StackedImageWrapper>
         <CardSection>
           <span>Live Proposals</span>
           <span>{activeProposals}</span>

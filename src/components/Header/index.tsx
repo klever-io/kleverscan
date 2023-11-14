@@ -197,6 +197,7 @@ const Navbar: React.FC = () => {
                     alt="Logo"
                     width="215"
                     height="29"
+                    loader={({ src, width }) => `${src}?w=${width}`}
                   />
                 </Logo>
               </a>

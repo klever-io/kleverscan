@@ -29,11 +29,7 @@ const statusWithIcon = (action: boolean, t: TFunction): JSX.Element => {
   return (
     <Status status={action ? 'success' : 'fail'} key={String(action)}>
       <StatusIcon />
-      <p>
-        {action
-          ? `${t('common:Statements.Yes')}`
-          : `${t('common:Statements.No')}`}
-      </p>
+      <p>{action ? `${t('Statements.Yes')}` : `${t('Statements.No')}`}</p>
     </Status>
   );
 };

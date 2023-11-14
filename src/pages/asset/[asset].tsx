@@ -122,7 +122,10 @@ const Asset: React.FC<IAssetPage> = ({}) => {
     queryFn: () => assetPoolCall(router.query.asset as string),
     enabled: !!router?.isReady,
   });
-  const tableHeaders = ['Transactions', 'Holders'];
+  const tableHeaders = [
+    `${t('common:Titles.Transactions')}`,
+    `${t('common:Tabs.Holders')}`,
+  ];
   const [selectedTab, setSelectedTab] = useState<null | string>(null);
   const [expand, setExpand] = useState({ whitelist: false, packs: false });
   const [txHash, setTxHash] = useState('');
@@ -860,7 +863,9 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                   );
                 }}
               >
-                Show details
+                {t('common:Buttons.Show', {
+                  type: `${t('assets:Staking.Details')}`,
+                })}
               </ShowDetailsButton>
             ) : (
               asset?.staking.apr.reverse().map((apr, index) => (
@@ -890,11 +895,11 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                 <BalanceContainer>
                   <FrozenContainer>
                     <div>
-                      <strong>Address</strong>
+                      <strong>{t('table:Address')}</strong>
                       <p>{asset?.royalties.address || '--'}</p>
                     </div>
                     <div>
-                      <strong>Market Fixed</strong>
+                      <strong>{t('assets:Staking.Market Fixed')}</strong>
                       <p>
                         {(asset?.royalties.marketFixed &&
                           `${
@@ -904,7 +909,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                       </p>
                     </div>
                     <div>
-                      <strong>Market Percentage</strong>
+                      <strong> {t('assets:Staking.Market Percentage')}</strong>
                       <p>
                         {(asset?.royalties.marketPercentage &&
                           `${asset?.royalties.marketPercentage / 10 ** 2}%`) ||
@@ -912,7 +917,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                       </p>
                     </div>
                     <div>
-                      <strong>Transfer Fixed</strong>
+                      <strong>{t('assets:Staking.Transfer Fixed')}</strong>
                       <p>
                         {asset?.royalties.transferFixed
                           ? `${asset?.royalties.transferFixed / 10 ** 6} KLV`
@@ -924,9 +929,12 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                         (transfer, index) =>
                           Object.keys(transfer).length > 0 && (
                             <div key={index}>
-                              <strong>Transfer Percentage</strong>
+                              <strong>
+                                {' '}
+                                {t('assets:Staking.Transfer Percentage')}
+                              </strong>
                               <p>
-                                Amount:{' '}
+                                {t('table:Amount')}:{' '}
                                 {toLocaleFixed(
                                   (transfer.amount || 0) /
                                     10 ** asset?.precision,
@@ -934,21 +942,25 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                                 )}
                               </p>
                               <p>
-                                Percentage: {transfer.percentage / 10 ** 2}%
+                                {t('assets:Staking.Percentage')}:{' '}
+                                {transfer.percentage / 10 ** 2}%
                               </p>
                             </div>
                           ),
                       )
                     ) : (
                       <div>
-                        <strong>Transfer Percentage</strong>
-                        <p>Amount: --</p>
-                        <p>Percentage: -- </p>
+                        <strong>
+                          {' '}
+                          {t('assets:Staking.Transfer Percentage')}
+                        </strong>
+                        <p>{t('table:Amount')}: --</p>
+                        <p>{t('assets:Staking.Percentage')}: -- </p>
                       </div>
                     )}
                     {asset?.royalties?.itoPercentage && (
                       <div>
-                        <strong>ITO Percentage</strong>
+                        <strong>ITO {t('assets:Staking.Percentage')}</strong>
                         <p>
                           {`${asset.royalties.itoPercentage / 10 ** 2}%` ||
                             '--'}
@@ -957,7 +969,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                     )}
                     {asset?.royalties?.itoFixed && (
                       <div>
-                        <strong>ITO Fixed</strong>
+                        <strong>ITO {t('assets:Staking.Fixed')}</strong>
                         <p>
                           {`${
                             asset.royalties.itoFixed / 10 ** KLV_PRECISION
@@ -977,7 +989,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                 <BalanceContainer>
                   <FrozenContainer>
                     <div>
-                      <strong>Total Staked</strong>
+                      <strong>{t('common:Cards.Total Staked')}</strong>
                       <p>
                         {toLocaleFixed(
                           (asset?.staking?.totalStaked || 0) /
@@ -987,7 +999,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                       </p>
                     </div>
                     <div>
-                      <strong>Current FPR Amount</strong>
+                      <strong>{t('assets:Staking.Current FPR Amount')}</strong>
 
                       <p>
                         {toLocaleFixed(
@@ -998,17 +1010,26 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                       </p>
                     </div>
                     <div>
-                      <strong>Min Epochs To Claim</strong>
+                      <strong>
+                        {' '}
+                        {t('assets:Staking.Min Epochs To Claim')}
+                      </strong>
 
                       <p>{asset?.staking?.minEpochsToClaim || '--'}</p>
                     </div>
                     <div>
-                      <strong>Min Epochs To Unstake</strong>
+                      <strong>
+                        {' '}
+                        {t('assets:Staking.Min Epochs To Unstake')}
+                      </strong>
 
                       <p>{asset?.staking?.minEpochsToUnstake || '--'}</p>
                     </div>
                     <div>
-                      <strong>Min Epochs To Withdraw</strong>
+                      <strong>
+                        {' '}
+                        {t('assets:Staking.Min Epochs To Withdraw')}
+                      </strong>
                       <p>{asset?.staking?.minEpochsToWithdraw || '--'}</p>
                     </div>
                     {stakingAprOrFpr()}
@@ -1032,7 +1053,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         </div>
         <StakingHeader>
           <StakingHeaderSpan>
-            Total Staked of <br />
+            {t('common:Cards.Total Staked')} {t('assets:Staking.Of')} <br />
             {asset?.name}
             <br />
             <strong>
@@ -1142,15 +1163,14 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                 {asset?.assetId === 'KLV' || asset?.assetId === 'KFI' ? (
                   <>
                     <p>
-                      No deposits in this epoch.
+                      {t('assets:Staking.No Deposits')}
                       <br />
                       <br />
-                      Deposits for KLV/KFI occur automatically from each
-                      transaction.
+                      {t('assets:Staking.Info Deposits KLVorKFI')}
                     </p>
                   </>
                 ) : (
-                  <p>No deposits in this epoch.</p>
+                  <p>{t('assets:Staking.No Deposits')}</p>
                 )}
               </NoDepositsContainer>
             </FallbackFPRRow>
@@ -1172,13 +1192,10 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         <>
           {isMobile ? (
             <Tooltip
-              msg={`Below are the last epochs where there might be deposits of any asset in the ${asset?.name}'s FPR Pool.`}
+              msg={t('assets:Staking.InfoOtherAssets', { asset: asset?.name })}
             />
           ) : (
-            <p>
-              Below are the last epochs where there might be deposits of any
-              asset in the {`${asset?.name}'s`} FPR Pool.
-            </p>
+            <p>{t('assets:Staking.InfoOtherAssets', { asset: asset?.name })}</p>
           )}
         </>
       );
@@ -1187,14 +1204,11 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       <>
         {isMobile ? (
           <Tooltip
-            msg={`Below is the registry of the last 100 epochs of ${asset?.name} total staking.\nHave in mind that deposits for KLV/KFI occur automatically from each transaction.`}
+            msg={t('assets:Staking.InfoKLVorKFI', { asset: asset?.name })}
           />
         ) : (
           <>
-            <p>
-              {`Below is the registry of the last 100 epochs of ${asset?.name} total staking.`}
-            </p>
-            <p>{`Have in mind that deposits for KLV/KFI occur automatically from each transaction.`}</p>
+            <p>{t('assets:Staking.InfoKLVorKFI', { asset: asset?.name })}</p>
           </>
         )}
       </>
@@ -1205,7 +1219,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
     return (
       <>
         <StakingHistoryTitle>
-          <strong>Flexible Proportional Return - FPR</strong>
+          <strong>{t('assets:Staking.Title History', { type: 'FPR' })}</strong>
           {renderFPRHeaderMsg()}
         </StakingHistoryTitle>
         {renderStakingHistory(fpr, FPRIndex)}
@@ -1213,7 +1227,11 @@ const Asset: React.FC<IAssetPage> = ({}) => {
           <PaginationHistory
             onClick={() => setFPRIndex(asset?.staking?.fpr?.length || 0)}
           >
-            <strong>Show more</strong>
+            <strong>
+              {t('common:Buttons.Show', {
+                type: `${t('common:Tabs.More').toLowerCase()}`,
+              })}
+            </strong>
           </PaginationHistory>
         )}
         {!!((asset?.staking?.fpr?.length || 0) - FPRIndex <= 0) &&
@@ -1278,9 +1296,9 @@ const Asset: React.FC<IAssetPage> = ({}) => {
 
   const SelectedTabComponent: React.FC = () => {
     switch (selectedTab) {
-      case 'Transactions':
+      case `${t('common:Titles.Transactions')}`:
         return <Transactions transactionsTableProps={transactionsTableProps} />;
-      case 'Holders':
+      case `${t('common:Tabs.Holders')}`:
         if (asset) {
           return (
             <Holders
@@ -1380,7 +1398,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       </CardTabContainer>
 
       <Tabs {...tabProps}>
-        {selectedTab === 'Transactions' && (
+        {selectedTab === `${t('common:Titles.Transactions')}` && (
           <TxsFiltersWrapper>
             <ContainerFilter>
               <TransactionsFilters

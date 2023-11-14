@@ -326,7 +326,7 @@ export const FrozenContainer = styled.div`
       border-bottom-right-radius: 0px;
     }
     strong {
-      min-width: 200px;
+      min-width: 15rem;
       font-weight: 600;
       color: ${props => props.theme.darkText};
     }

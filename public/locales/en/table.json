@@ -12,5 +12,6 @@
   "Fungible": "Fungible",
   "NonFungible": "NonFungible",
   "Owner": "Owner",
-  "Limit": "Limit"
+  "Limit": "Limit",
+  "Amount": "Amount"
 }

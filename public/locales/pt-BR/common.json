@@ -25,13 +25,31 @@
     "Proposals": "Propostas"
   },
   "Tabs": {
-    "Overview": "Visão Geral"
+    "Overview": "Visão Geral",
+    "More": "Mais"
   },
   "Buttons": {
     "Expand": "Expandir",
     "Hide": "Ocultar",
     "All": "Todos",
-    "Asset Type": "Tipo de Ativo"
+    "Asset Type": "Tipo de Ativo",
+    "Show": "Mostrar {{type}}"
+  },
+  "Properties": {
+    "Can": "Pode {{type}}",
+    "Freeze": "Congelar",
+    "Wipe": "Limpar",
+    "Pause": "Pausar",
+    "Mint": "Criar",
+    "Burn": "Queimar",
+    "Change Owner": "Alterar Proprietário",
+    "Add Roles": "Adicionar Funções",
+    "Paused": "Pausado",
+    "NFT Mint Stopped": "Criação de NFT interrompida"
+  },
+  "Statements": {
+    "Yes": "Sim",
+    "No": "Não"
   },
   "Date": {
     "Elapsed Time": "atrás",

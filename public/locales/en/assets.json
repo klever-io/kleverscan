@@ -1,1 +1,30 @@
-{}
+{
+  "Overview": {
+    "Burned Value": "Burned Value",
+    "Holders": "Holders",
+    "Staking Type": "Staking Type"
+  },
+  "More": {
+    "Issuing Time": "Issuing Time",
+    "Issuer": "Issuer"
+  },
+  "ITO": {
+    "Max Amount": "Max Amount",
+    "Receiver Address": "Receiver Address",
+    "White List Active": "White List Active",
+    "Start Time": "Start Time",
+    "End Time": "End Time",
+    "White List": "White List",
+    "White List Start Time": "White List Start Time",
+    "White List End Time": "White List End Time",
+    "White List Info": "White List Info",
+    "Packs Data": "Packs Data",
+    "Price In": "Price In {{asset}}",
+    "Buy Token": "Buy Token",
+    "Buy Pack": "Buy Pack",
+    "No packs found": "No packs found",
+    "Price Range": "Price Range",
+    "You will pay": "You will pay",
+    "It will cost": "It will cost"
+  }
+}

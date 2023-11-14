@@ -10,5 +10,7 @@
   "RewardsType": "Tipo de Recompensas",
   "Precision": "Precisão",
   "Fungible": "Fungível",
-  "NonFungible": "Não Fungível"
+  "NonFungible": "Não Fungível",
+  "Owner": "Proprietário",
+  "Limit": "Limite"
 }

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { web } from '@klever/sdk-web';
+import { TFunction } from 'next-i18next';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { IParsedITO } from 'types';
@@ -12,6 +13,7 @@ interface INonFungible {
   currencyId: string;
   setTxHash?: (e: string) => any;
   showcase?: boolean;
+  t: TFunction;
 }
 
 const NonFungibleITO: React.FC<INonFungible> = ({
@@ -20,6 +22,7 @@ const NonFungibleITO: React.FC<INonFungible> = ({
   currencyId,
   setTxHash,
   showcase,
+  t,
 }) => {
   const [loading, setLoading] = useState(false);
   const [imgLoading, setImgLoading] = useState(true);
@@ -91,7 +94,7 @@ const NonFungibleITO: React.FC<INonFungible> = ({
               </LoaderWrapper>
             ) : (
               <BuyButton onClick={() => handleSubmit()}>
-                <span>Buy Pack</span>
+                <span>{t('assets:ITO.Buy Pack')}</span>
               </BuyButton>
             )}
           </>

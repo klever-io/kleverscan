@@ -1,0 +1,30 @@
+{
+  "Overview": {
+    "Burned Value": "Valor Queimado",
+    "Holders": "Detentores",
+    "Staking Type": "Tipo de Staking"
+  },
+  "More": {
+    "Issuing Time": "Tempo de Emissão",
+    "Issuer": "Emissor"
+  },
+  "ITO": {
+    "Max Amount": "Quantidade Máxima",
+    "Receiver Address": "Endereço do Destinatário",
+    "White List Active": "Lista de Permissões Ativa",
+    "Start Time": "Hora de Início",
+    "End Time": "Hora de Término",
+    "White List": "Lista de Permissões",
+    "White List Start Time": "Hora de Início da Lista de Permissões",
+    "White List End Time": "Hora de Término da Lista de Permissões",
+    "White List Info": "Informações da Lista de Permissões",
+    "Packs Data": "Dados de Pacotes",
+    "Price In": "Preço em {{asset}}",
+    "Buy Token": "Comprar Token",
+    "Buy Pack": "Comprar Pack",
+    "No packs found": "Nenhum pacote encontrado.",
+    "Price Range": "Faixa de Preço",
+    "You will pay": "Você pagará",
+    "It will cost": "Isso vai custar"
+  }
+}

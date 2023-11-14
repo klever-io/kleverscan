@@ -275,6 +275,16 @@ export const DataCardValue = styled.div<{ isEpoch?: boolean }>`
   position: relative;
   align-items: center;
   flex-wrap: wrap;
+  margin-left: 0;
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    ${props =>
+      props.isEpoch &&
+      css`
+        margin-left: 0.77rem;
+      `}
+  }
+
   p {
     width: fit-content;
     height: fit-content;

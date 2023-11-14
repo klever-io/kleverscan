@@ -11,9 +11,6 @@ import {
   ArrowData,
   ArrowDownDataCards,
   ButtonExpand,
-  CardBackground,
-  CardIcon,
-  CardIconContainer,
   DataCard,
   DataCardContent,
   DataCardLatest,
@@ -75,6 +72,29 @@ const HomeDataCards: React.FC = ({}) => {
     },
     { title: t('Live/Peak TPS'), value: actualTPS, Icon: TPS },
   ];
+
+  const DefaultCards: React.FC<{ index: number }> = ({ index }) => (
+    <StackedImageWrapper>
+      <NextImageCardWrapper>
+        <Image
+          src={icons[index][0]}
+          alt="tps icon background"
+          width={32}
+          height={32}
+          loader={({ src, width }) => `${src}?w=${width}`}
+        />
+      </NextImageCardWrapper>
+      <NextImageCardWrapper>
+        <Image
+          src={icons[index][1]}
+          alt="tps icon background"
+          width={44}
+          height={44}
+          loader={({ src, width }) => `${src}?w=${width}`}
+        />
+      </NextImageCardWrapper>
+    </StackedImageWrapper>
+  );
 
   const Progress: React.FC<{ percent: number }> = ({ percent }) => {
     const idCSS = 'gradient';
@@ -200,26 +220,7 @@ const HomeDataCards: React.FC = ({}) => {
                 .slice(0, 2)
                 .map(({ title, value, variation }, index) => (
                   <DataCard key={String(index)}>
-                    <StackedImageWrapper>
-                      <NextImageCardWrapper>
-                        <Image
-                          src={icons[index][0]}
-                          alt="tps icon background"
-                          width={32}
-                          height={32}
-                          loader={({ src, width }) => `${src}?w=${width}`}
-                        />
-                      </NextImageCardWrapper>
-                      <NextImageCardWrapper>
-                        <Image
-                          src={icons[index][1]}
-                          alt="tps icon background"
-                          width={44}
-                          height={44}
-                          loader={({ src, width }) => `${src}?w=${width}`}
-                        />
-                      </NextImageCardWrapper>
-                    </StackedImageWrapper>
+                    <DefaultCards index={index} />
                     <div>
                       <span>{title}</span>
                       <DataCardValue>
@@ -242,10 +243,7 @@ const HomeDataCards: React.FC = ({}) => {
             <EpochCardMobile />
             {displayCards.map(({ title, value, variation }, index) => (
               <DataCard key={String(index)}>
-                <CardIconContainer>
-                  <CardIcon src={icons[index][0]} />
-                  <CardBackground src={icons[index][1]} />
-                </CardIconContainer>
+                <DefaultCards index={index} />
                 <DataCardContent>
                   <span>{title}</span>
                   <DataCardValue>
@@ -265,12 +263,9 @@ const HomeDataCards: React.FC = ({}) => {
         {!isTablet && (
           <>
             <EpochCard />
-            {displayCards.map(({ Icon, title, value, variation }, index) => (
+            {displayCards.map(({ title, value, variation }, index) => (
               <DataCard key={String(index)}>
-                <CardIconContainer>
-                  <CardIcon src={icons[index][0]} />
-                  <CardBackground src={icons[index][1]} />
-                </CardIconContainer>
+                <DefaultCards index={index} />
                 <div>
                   <span>{title}</span>
                   <DataCardValue>

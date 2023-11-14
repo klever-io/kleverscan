@@ -326,12 +326,21 @@ export const OverviewDetails: React.FC<IOverviewDetails> = ({
                       <>
                         <SignatureSpan isExpanded={expandSignature}>
                           {item}
+                          {expandSignature && (
+                            <Copy
+                              data={item}
+                              info="Signature"
+                              style={{
+                                display: 'inline-block',
+                                margin: '0.2rem',
+                                verticalAlign: 'middle',
+                              }}
+                            />
+                          )}
                         </SignatureSpan>
-                        <Copy
-                          data={item}
-                          info="Signature"
-                          style={{ display: 'inline' }}
-                        />
+                        {!expandSignature && (
+                          <Copy data={item} info="Signature" />
+                        )}
                       </>
                     ))}
                 </SignatureContainer>

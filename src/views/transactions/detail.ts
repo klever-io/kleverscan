@@ -431,15 +431,6 @@ export const SignatureContainer = styled.div<{ isExpanded: boolean }>`
   display: flex;
   gap: 0.2rem;
   overflow: hidden;
-  /* flex-direction: column;
-  max-height: 5rem;
-  gap: 1rem;
-
-  ${({ isExpanded }) =>
-    isExpanded &&
-    css`
-      max-height: fit-content;
-    `} */
 `;
 
 export const SignatureItem = styled.div`
@@ -452,7 +443,16 @@ export const SignatureWrapper = styled.div`
 `;
 
 export const SignatureSpan = styled.span<{ isExpanded: boolean }>`
-  overflow: 'hidden' !important;
-  width: 100% !important;
-  /* width: ${props => (props.isExpanded ? 'unset' : 'unset')} */
+  width: 100%;
+  ${props =>
+    props.isExpanded &&
+    css`
+      overflow: visible !important;
+      white-space: normal !important;
+      word-wrap: break-word;
+    `}
+`;
+
+export const CopyWrapper = styled.span`
+  margin-left: 0.1rem;
 `;

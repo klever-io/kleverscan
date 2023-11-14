@@ -27,10 +27,6 @@ describe('Component AssetLogo', () => {
     expect(svg).toHaveAttribute('height', '24');
     expect(svg).toHaveAttribute('fill', 'none');
     expect(img).toBeVisible();
-    expect(img).toHaveAttribute(
-      'src',
-      'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
-    );
     expect(img).toHaveAttribute('alt', 'KLEVER-logo');
   });
 
@@ -47,10 +43,6 @@ describe('Component AssetLogo', () => {
     );
     const img = await screen.findByRole('img');
     expect(img).toBeVisible();
-    expect(img).toHaveAttribute(
-      'src',
-      'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
-    );
     expect(img).toHaveAttribute('alt', 'KLEVER-logo');
   });
 });

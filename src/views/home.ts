@@ -951,17 +951,6 @@ export const CardIconContainer = styled.div`
   }
 `;
 
-export const CardBackground = styled.img`
-  width: 3rem;
-`;
-export const CardIcon = styled.img`
-  width: 2rem;
-  position: absolute;
-`;
-export const TransactionIcon = styled.img`
-  width: 1rem;
-  position: absolute;
-`;
 export const HeaderGradient = styled.div`
   width: 100%;
   height: 12rem;

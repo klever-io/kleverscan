@@ -31,6 +31,10 @@
     "Expand": "Expand",
     "Hide": "Hide"
   },
+  "Statements": {
+    "Yes": "Yes",
+    "No": "No"
+  },
   "Date": {
     "Elapsed Time": "ago",
     "Today": "Today",

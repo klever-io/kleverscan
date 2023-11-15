@@ -1,1 +1,15 @@
-{}
+{
+  "Votes": "Votes",
+  "TotalVoted": "Total Voted",
+  "PassThreshold": "Pass Threshold",
+  "CreateEpoch": "Create Epoch",
+  "EndingEpoch": "Ending Epoch",
+  "ActualEpoch": "Actual Epoch",
+  "NetworkParameters": "Network Parameters",
+  "CurrentValue": "Current Value",
+  "NoDescription": "No description provided.",
+  "Description": "Description",
+  "FeePerDataByte": "Fee Per Data Byte",
+  "Voted": "Voted",
+  "Voters": "Voters"
+}

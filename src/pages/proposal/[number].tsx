@@ -66,11 +66,15 @@ import {
 } from '@/views/proposals/detail';
 import { ButtonExpand } from '@/views/transactions/detail';
 import { CenteredRow } from '@/views/validators/detail';
+import { GetStaticPaths, GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { AiFillCheckCircle } from 'react-icons/ai';
 import { useQuery } from 'react-query';
+import nextI18nextConfig from '../../../next-i18next.config';
 import Tooltip from '../../components/Tooltip';
 
 const ProposalVoters = (props: IProposalVoters) => {
@@ -118,13 +122,19 @@ const ProposalVoters = (props: IProposalVoters) => {
 };
 
 const ProposalDetails: React.FC = () => {
-  const [selectedFilter, setSelectedFilter] = useState('Yes');
+  const { t } = useTranslation(['common', 'proposals']);
+  const [selectedFilter, setSelectedFilter] = useState(
+    `${t('common:Statements.Yes')}`,
+  );
   const [votesPercentage, setVotesPercentage] = useState('');
   const [expandDescription, setExpandDescription] = useState(false);
   const { isMobile, isTablet } = useMobile();
   const [isSkeleton, setLoading] = useSkeleton();
   const router = useRouter();
-
+  const filter = [
+    `${t('common:Statements.Yes')}`,
+    `${t('common:Statements.No')}`,
+  ];
   const { data: overview } = useQuery({
     queryKey: 'proposalOverview',
     queryFn: () => dataOverviewCall(),
@@ -192,7 +202,7 @@ const ProposalDetails: React.FC = () => {
           <strong>{param.paramText}</strong>
           <span>{param.paramValue}</span>
           <p>
-            Current Value:{' '}
+            {t('proposals:CurrentValue')}:{' '}
             {
               parsedParams?.currentNetworkParams?.[param.paramText]
                 ?.currentValue
@@ -236,7 +246,7 @@ const ProposalDetails: React.FC = () => {
   const requestVoters = useCallback(
     async (page: number, limit: number): Promise<IParsedVoterResponse> => {
       let response;
-      if (selectedFilter === 'Yes') {
+      if (selectedFilter === `${t('common:Statements.Yes')}`) {
         response = await api.get({
           route: `proposals/${router.query.number}`,
           query: { pageVoters: page, limitVoters: limit, voteType: 0 },
@@ -267,9 +277,9 @@ const ProposalDetails: React.FC = () => {
 
   const SelectedTabComponent: React.FC = useCallback(() => {
     switch (selectedFilter) {
-      case 'Yes':
+      case `${t('common:Statements.Yes')}`:
         return <ProposalVoters proposalVotersProps={{ ...tableProps1 }} />;
-      case 'No':
+      case `${t('common:Statements.No')}`:
         return <ProposalVoters proposalVotersProps={{ ...tableProps1 }} />;
       default:
         return <div />;
@@ -295,7 +305,7 @@ const ProposalDetails: React.FC = () => {
           <CardTabContainer>
             <CardHeader>
               <CardHeaderItem selected={true}>
-                <span>Overview</span>
+                <span>{t('common:Tabs.Overview')}</span>
               </CardHeaderItem>
             </CardHeader>
             <CardContent>
@@ -316,7 +326,7 @@ const ProposalDetails: React.FC = () => {
               </Row>
               <Row>
                 <span>
-                  <strong>Proposer </strong>
+                  <strong>Proposer</strong>
                 </span>
                 <span style={{ marginRight: '0.2rem' }}>
                   <Link href={`/account/${proposal?.proposer}`}>
@@ -340,7 +350,7 @@ const ProposalDetails: React.FC = () => {
               <Row>
                 <HalfRow>
                   <span>
-                    <strong>Created Epoch</strong>
+                    <strong>{t('proposals:CreateEpoch')}</strong>
                   </span>
                   <span>
                     <span>{isSkeleton(proposal?.epochStart)}</span>
@@ -348,7 +358,7 @@ const ProposalDetails: React.FC = () => {
                 </HalfRow>
                 <HalfRow>
                   <span>
-                    <strong>Ending Epoch</strong>
+                    <strong> {t('proposals:EndingEpoch')}</strong>
                   </span>
                   <span style={{ color: 'red' }}>
                     {isSkeleton(proposal?.epochEnd)}
@@ -356,7 +366,7 @@ const ProposalDetails: React.FC = () => {
                 </HalfRow>
                 <HalfRow>
                   <span>
-                    <strong>Actual Epoch</strong>
+                    <strong>{t('proposals:ActualEpoch')}</strong>
                   </span>
                   <span>
                     <span>{isSkeleton(overview?.epochNumber)}</span>
@@ -365,7 +375,7 @@ const ProposalDetails: React.FC = () => {
               </Row>
               <Row>
                 <span>
-                  <strong>Network Parameters</strong>
+                  <strong>{t('proposals:NetworkParameters')}</strong>
                 </span>
                 <RowContent>
                   <BalanceContainer>
@@ -377,13 +387,15 @@ const ProposalDetails: React.FC = () => {
               </Row>
               <RowDescription>
                 <span>
-                  <strong>Description</strong>
+                  <strong>{t('proposals:Description')}</strong>
                 </span>
                 {proposal && proposal.description.length > 50 && (
                   <ButtonExpand
                     onClick={() => setExpandDescription(!expandDescription)}
                   >
-                    {expandDescription ? 'Hide' : 'Expand'}
+                    {expandDescription
+                      ? `${t('common:Buttons.Hide')}`
+                      : `${t('common:Button.Expand')}`}
                   </ButtonExpand>
                 )}
                 {proposal?.description && (
@@ -405,7 +417,9 @@ const ProposalDetails: React.FC = () => {
                 )}
                 {proposal && !proposal.description && (
                   <DescriptionContainer expandDescription={expandDescription}>
-                    <BigSpan>{isSkeleton('No description provided.')}</BigSpan>{' '}
+                    <BigSpan>
+                      {isSkeleton(t('proposals:NoDescription'))}
+                    </BigSpan>{' '}
                   </DescriptionContainer>
                 )}
               </RowDescription>
@@ -414,11 +428,11 @@ const ProposalDetails: React.FC = () => {
 
           <VotesContainer>
             <span>
-              <h3>Votes</h3>
+              <h3>{t('proposals:Votes')}</h3>
             </span>
 
             <VotesHeader>
-              <strong>Total Voted</strong>
+              <strong>{t('proposals:TotalVoted')}</strong>
               <span>
                 {proposal &&
                   `${toLocaleFixed(
@@ -432,14 +446,16 @@ const ProposalDetails: React.FC = () => {
             <ProgressBarVotes>
               <PassThresholdContainer>
                 <PassThresholdContainer>
-                  <PassThresholdText>Pass threshold</PassThresholdText>
+                  <PassThresholdText>
+                    {t('proposals:PassThreshold')}
+                  </PassThresholdText>
                   <VerticalLine />
                 </PassThresholdContainer>
                 <Progress />
               </PassThresholdContainer>
               {proposal?.totalStaked ? (
                 <span>
-                  Voted: {formatAmount(proposal.totalVoted)} /{' '}
+                  {t('proposals:Voted')} : {formatAmount(proposal.totalVoted)} /{' '}
                   {formatAmount(proposal.totalStaked / 10 ** KLV_PRECISION)}
                 </span>
               ) : (
@@ -457,10 +473,9 @@ const ProposalDetails: React.FC = () => {
                     if (percentageCard < 0.01) {
                       percentageCard = 0;
                     }
-
                     return (
                       <CardVote key={key} color={typeVoteColors[item]}>
-                        <span>{item}</span>
+                        <span>{filter[key]}</span>
                         <PercentageText>
                           {percentageCard.toFixed(2)}%
                         </PercentageText>
@@ -478,21 +493,19 @@ const ProposalDetails: React.FC = () => {
           <ValidatorsContainer>
             <div>
               <span>
-                <h1>Voters</h1>
+                <h1>{t('proposals:Voters')}</h1>
               </span>
               <FiltersValidators>
                 {proposal &&
-                  Object.keys(proposal.votes).map((item, key) => {
-                    return (
-                      <OptionValidator
-                        key={key}
-                        onClick={() => setSelectedFilter(item)}
-                        selected={selectedFilter === item}
-                      >
-                        <strong>{item}</strong>
-                      </OptionValidator>
-                    );
-                  })}
+                  filter.map((item, key) => (
+                    <OptionValidator
+                      key={key}
+                      onClick={() => setSelectedFilter(item)}
+                      selected={selectedFilter === item}
+                    >
+                      <strong>{item}</strong>
+                    </OptionValidator>
+                  ))}
                 {!proposal && isSkeleton(undefined)}
               </FiltersValidators>
             </div>
@@ -502,6 +515,23 @@ const ProposalDetails: React.FC = () => {
       }
     </>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'proposals'],
+    nextI18nextConfig,
+  );
+
+  return { props };
+};
+
+export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
+  return {
+    paths: [], //indicates that no page needs be created at build time
+    fallback: 'blocking', //indicates the type of fallback
+  };
 };
 
 export default ProposalDetails;

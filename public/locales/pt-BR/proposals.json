@@ -1,1 +1,15 @@
-{}
+{
+  "Votes": "Votos",
+  "TotalVoted": "Total Votado",
+  "PassThreshold": "Limite de Passagem",
+  "CreateEpoch": "Criar Época",
+  "EndingEpoch": "Época Final",
+  "ActualEpoch": "Época Atual",
+  "NetworkParameters": "Parâmetros de Rede",
+  "CurrentValue": "Valor Atual",
+  "NoDescription": "Nenhuma descrição fornecida.",
+  "Description": "Descrição",
+  "FeePerDataByte": "Taxa por Byte de Dados",
+  "Voted": "Votado",
+  "Voters": "Eleitores"
+}

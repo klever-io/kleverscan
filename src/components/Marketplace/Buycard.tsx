@@ -34,7 +34,7 @@ const BuyCard: React.FC<IBuyCard> = ({
   const { getInteractionsButtons } = useContractModal();
   const [BuyButton] = getInteractionsButtons([
     {
-      title: `${t('ButtonMarketPlace')}`,
+      title: `${t('ButtonMarketplace')}`,
       contractType: 'BuyContract',
       defaultValues: {
         buyType: 1,

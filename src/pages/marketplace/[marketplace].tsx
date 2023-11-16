@@ -223,7 +223,10 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
   return (
     <Container>
       <Header>
-        <Title title="Marketplace Details" route="/marketplaces" />
+        <Title
+          title={t('marketPlaces:MarketplaceDetails')}
+          route="/marketplaces"
+        />
       </Header>
       <CardTabContainer>
         <CardHeader>

@@ -6,7 +6,7 @@
   "ListOfMarketplaces": "List of Marketplaces",
   "Marketplaces": "Marketplaces",
   "MarketplaceDetails": "Marketplace Details",
-  "MarketPlaceType": "Marketplace {{type}}",
-  "ButtonMarketPlace": "Place Buy Order",
+  "MarketplaceType": "Marketplace {{type}}",
+  "ButtonMarketplace": "Place Buy Order",
   "NoOrders": "No sell orders yet"
 }

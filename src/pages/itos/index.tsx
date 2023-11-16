@@ -42,15 +42,20 @@ import {
   SearchContainer,
   SideList,
 } from '@/views/itos';
+import { GetStaticProps } from 'next';
+import { TFunction, useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useInfiniteQuery } from 'react-query';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 export const displayITOpacks = (
   ITO: IParsedITO,
   setTxHash: Dispatch<SetStateAction<string>>,
+  t: TFunction,
 ): JSX.Element => {
   return (
     <>
@@ -73,7 +78,7 @@ export const displayITOpacks = (
         : ITO?.packData?.map((item: any, index) => {
             return (
               <PackContainer key={index + ITO.assetId}>
-                <KeyLabel>{`Price in ${item.key}`}</KeyLabel>
+                <KeyLabel>{`${t('priceIn')} ${item.key}`}</KeyLabel>
                 <ItemsContainer>
                   {item.packs.map((pack: any, index: number) => {
                     return (
@@ -93,7 +98,7 @@ export const displayITOpacks = (
       {!ITO?.packData && (
         <ChooseAsset>
           {' '}
-          <span>No packs found.</span>
+          <span>{t('noPacksFound')}</span>
         </ChooseAsset>
       )}
     </>
@@ -106,6 +111,8 @@ const ITOsPage: React.FC = () => {
   const router = useRouter();
   const { isMobile } = useMobile();
   const { extensionInstalled, connectExtension } = useExtension();
+
+  const { t } = useTranslation('itos');
 
   const { getInteractionsButtons } = useContractModal();
 
@@ -158,12 +165,12 @@ const ITOsPage: React.FC = () => {
     const active = router?.query?.active;
     if (typeof active === 'undefined') {
       router['query']['active'] = 'true';
-      return 'Active';
+      return t('status.active');
     } else if (active === 'true') {
-      return 'Active';
+      return t('status.active');
     }
     router['query']['active'] = 'false';
-    return 'Inactive';
+    return t('status.inactive');
   };
 
   const updateSearchInput = (e: Event) => {
@@ -177,8 +184,8 @@ const ITOsPage: React.FC = () => {
 
   const filters: IFilter[] = [
     {
-      firstItem: 'Active',
-      data: ['Inactive'],
+      firstItem: t('status.active'),
+      data: [t('status.inactive')],
       onClick: (value: string) => {
         router.push(
           {
@@ -209,12 +216,12 @@ const ITOsPage: React.FC = () => {
               containerStyles={{ width: '100%' }}
               type="text"
               value={router.query.asset as string}
-              placeholder="Type asset name"
+              placeholder={t('searchInput')}
               onChange={e => updateSearchInput(e)}
               handleConfirmClick={() => requestWithLoading()}
             />
             <ITOSearchButton onClick={requestWithLoading}>
-              Search
+              {t('searchButton')}
             </ITOSearchButton>
           </SearchContainer>
           {filters.map(filter => (
@@ -237,9 +244,7 @@ const ITOsPage: React.FC = () => {
               loader={<Loader />}
               scrollableTarget={'scrollableDiv'}
               endMessage={
-                itemsITOs && itemsITOs?.length
-                  ? 'All ITOs have been loaded.'
-                  : ''
+                itemsITOs && itemsITOs?.length ? t('loadedAllITO') : ''
               }
             >
               <Scroll>
@@ -291,7 +296,7 @@ const ITOsPage: React.FC = () => {
           : selectedITO?.packData?.map((item: any, index) => {
               return (
                 <PackContainer key={index + selectedITO.assetId}>
-                  <KeyLabel>{`Price in ${item.key}`}</KeyLabel>
+                  <KeyLabel>{`${t('priceIn')} ${item.key}`}</KeyLabel>
                   <ItemsContainer>
                     {item.packs.map((pack: any, index: number) => {
                       return (
@@ -311,7 +316,7 @@ const ITOsPage: React.FC = () => {
         {!selectedITO?.packData && (
           <ChooseAsset>
             {' '}
-            <span>No packs found.</span>
+            <span>{t('noPacksFound')}</span>
           </ChooseAsset>
         )}
       </>
@@ -320,7 +325,7 @@ const ITOsPage: React.FC = () => {
 
   const [ConfigITOButton] = getInteractionsButtons([
     {
-      title: 'Create ITO',
+      title: t('createITOButton'),
       contractType: 'ConfigITOContract',
     },
   ]);
@@ -359,7 +364,7 @@ const ITOsPage: React.FC = () => {
               ) : (
                 <ChooseAsset>
                   {!selectedITO && !isLoadingITOs && (
-                    <span>Choose an asset</span>
+                    <span>{t('chooseAsset')}</span>
                   )}
                   {isLoadingITOs && <Loader height={70} width={100} />}
                 </ChooseAsset>
@@ -370,6 +375,16 @@ const ITOsPage: React.FC = () => {
       </ITOContainer>
     </MainContainer>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['itos'],
+    nextI18nextConfig,
+  );
+
+  return { props };
 };
 
 export default ITOsPage;

@@ -1,0 +1,20 @@
+{
+  "chooseAsset": "Choose an asset",
+  "searchInput": "Type asset name",
+  "searchButton": "Search",
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "loadedAllITO": "All ITOs have been loaded",
+  "createITOButton": "Create ITO",
+  "noPacksFound": "No packs found",
+  "noEmptyOrZeroToastError": "The amount field cannot be empty or zero!",
+  "successBroadcastTxToast": "Transaction broadcast successfully",
+  "priceIn": "Price in",
+  "costText": "It will cost",
+  "payText": "You will pay",
+  "buyToken": "Buy Token",
+  "buyPack": "Buy Pack",
+  "priceRange": "Price Range"
+}

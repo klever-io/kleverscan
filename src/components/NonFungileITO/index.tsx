@@ -1,8 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { web } from '@klever/sdk-web';
+import { GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { IParsedITO } from 'types';
+import nextI18nextConfig from '../../../next-i18next.config';
 import { Loader } from '../Loader/styles';
 import { BuyButton, LoaderWrapper, NFTimg, Pack, PackItem } from './styles';
 
@@ -23,6 +27,8 @@ const NonFungibleITO: React.FC<INonFungible> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [imgLoading, setImgLoading] = useState(true);
+
+  const { t } = useTranslation('itos');
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -48,7 +54,7 @@ const NonFungibleITO: React.FC<INonFungible> = ({
       const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
       const response = await web.broadcastTransactions([signedTx]);
       if (setTxHash) setTxHash(response.data.txsHashes[0]);
-      toast.success('Transaction broadcast successfully');
+      toast.success(t('successBroadcastTxToast'));
     } catch (e: any) {
       console.warn(`%c ${e}`, 'color: red');
       toast.error(e.message ? e.message : e);
@@ -91,7 +97,7 @@ const NonFungibleITO: React.FC<INonFungible> = ({
               </LoaderWrapper>
             ) : (
               <BuyButton onClick={() => handleSubmit()}>
-                <span>Buy Pack</span>
+                <span>{t('buyPack')}</span>
               </BuyButton>
             )}
           </>
@@ -99,6 +105,16 @@ const NonFungibleITO: React.FC<INonFungible> = ({
       </PackItem>
     </Pack>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['itos'],
+    nextI18nextConfig,
+  );
+
+  return { props };
 };
 
 export default NonFungibleITO;

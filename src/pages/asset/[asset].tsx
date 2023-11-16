@@ -81,10 +81,14 @@ import { BalanceContainer, RowContent } from '@/views/proposals/detail';
 import { FilterByDate } from '@/views/transactions';
 import { ButtonExpand } from '@/views/transactions/detail';
 import { ReceiveBackground } from '@/views/validator';
+import { GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
+import nextI18nextConfig from '../../../next-i18next.config';
 import { displayITOpacks } from '../itos';
 
 const Asset: React.FC<IAssetPage> = ({}) => {
@@ -488,6 +492,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
 
   const ITOComponent: React.FC = () => {
     const { extensionInstalled, connectExtension } = useExtension();
+    const { t } = useTranslation('itos');
 
     useEffect(() => {
       if (extensionInstalled) {
@@ -648,7 +653,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                     </ButtonExpand>
                   </span>
                 </ExpandWrapper>
-                {expand.packs && displayITOpacks(ITO, setTxHash)}
+                {expand.packs && displayITOpacks(ITO, setTxHash, t)}
               </ExpandableRow>
             )}
           </>
@@ -1340,6 +1345,16 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       </Tabs>
     </Container>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['itos'],
+    nextI18nextConfig,
+  );
+
+  return { props };
 };
 
 export default Asset;

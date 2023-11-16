@@ -1,8 +1,12 @@
 import { IPackInfo, IPackItem } from '@/types/contracts';
 import { web } from '@klever/sdk-web';
+import { GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { IParsedITO } from 'types';
+import nextI18nextConfig from '../../../next-i18next.config';
 import Input from '../Input';
 import { Loader } from '../Loader/styles';
 import {
@@ -47,6 +51,8 @@ const FungibleITO: React.FC<IFungibleITO> = ({
 }) => {
   const [amount, setAmount] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  const { t } = useTranslation('itos');
 
   const calculateCost = (indexPackData: number, qtyPacks: number) => {
     if (ITO) {
@@ -107,7 +113,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
   };
   const handleSubmit = async (currencyId: string) => {
     if (!amount) {
-      toast.error('The amount field cannot be empty or zero!');
+      toast.error(t('noEmptyOrZeroToastError'));
       return;
     }
 
@@ -133,7 +139,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
       const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
       const response = await web.broadcastTransactions([signedTx]);
       if (setTxHash) setTxHash(response.data.txsHashes[0]);
-      toast.success('Transaction broadcast successfully');
+      toast.success(t('successBroadcastTxToast'));
     } catch (e: any) {
       console.warn(`%c ${e}`, 'color: red');
       toast.error(e.message ? e.message : e);
@@ -146,7 +152,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
     <Container>
       <FungibleContainer key={packInfoIndex}>
         <Content>
-          <AssetName>{`Price in ${packInfo.key}`}</AssetName>
+          <AssetName>{`${t('priceIn')} ${packInfo.key}`}</AssetName>
           <Input
             type="number"
             min="0"
@@ -155,7 +161,11 @@ const FungibleITO: React.FC<IFungibleITO> = ({
             handleConfirmClick={() => undefined}
           />
           <TotalPrice>
-            {showcase ? <span>It will cost</span> : <span>You will pay</span>}{' '}
+            {showcase ? (
+              <span>{t('costText')}</span>
+            ) : (
+              <span>{t('payText')}</span>
+            )}{' '}
             <span>
               {calculateCost(packInfoIndex, packInfo.packs.length)}{' '}
               {packInfo.key}
@@ -163,7 +173,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
           </TotalPrice>
           {!showcase && !loading && (
             <Button onClick={() => handleSubmit(packInfo.key)}>
-              <span>Buy Token</span>
+              <span>{t('buyToken')}</span>
             </Button>
           )}
           {loading && (
@@ -174,7 +184,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
         </Content>
         <Content>
           <PriceRange>
-            <PriceRangeTitle>Price Range</PriceRangeTitle>
+            <PriceRangeTitle>{t('priceRange')}</PriceRangeTitle>
             {packInfo.packs.map(
               (packItem: IPackItem, packItemIndex: number) => {
                 const isLastElement =
@@ -244,6 +254,16 @@ const FungibleITO: React.FC<IFungibleITO> = ({
       </FungibleContainer>
     </Container>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['itos'],
+    nextI18nextConfig,
+  );
+
+  return { props };
 };
 
 export default FungibleITO;

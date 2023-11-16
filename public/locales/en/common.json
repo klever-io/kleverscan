@@ -31,7 +31,9 @@
   },
   "Buttons": {
     "Expand": "Expand",
-    "Hide": "Hide"
+    "Hide": "Hide",
+    "Details": "Details",
+    "Status": "Status"
   },
   "Statements": {
     "Yes": "Yes",

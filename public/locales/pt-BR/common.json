@@ -31,7 +31,9 @@
   },
   "Buttons": {
     "Expand": "Expandir",
-    "Hide": "Ocultar"
+    "Hide": "Ocultar",
+    "Details": "Detalhes",
+    "Status": "Estado"
   },
   "Statements": {
     "Yes": "Sim",

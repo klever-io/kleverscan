@@ -1,8 +1,12 @@
 {
   "Name": "name",
-  "Owner Address": "Owner Address",
-  "Referral Address": "Referral Address",
-  "Referral Percentage": "Referral Percentage",
-  "List of Marketplaces": "List of Marketplaces",
-  "Marketplaces": "Marketplaces"
+  "OwnerAddress": "Owner Address",
+  "ReferralAddress": "Referral Address",
+  "ReferralPercentage": "Referral Percentage",
+  "ListOfMarketplaces": "List of Marketplaces",
+  "Marketplaces": "Marketplaces",
+  "MarketplaceDetails": "Marketplace Details",
+  "MarketPlaceType": "Marketplace {{type}}",
+  "ButtonMarketPlace": "Place Buy Order",
+  "NoOrders": "No sell orders yet"
 }

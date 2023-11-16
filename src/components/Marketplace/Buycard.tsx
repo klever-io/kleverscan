@@ -11,6 +11,7 @@ import {
   MainItemsDiv,
   TooltipWrapper,
 } from '@/views/marketplaces/detail';
+import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import { useState } from 'react';
 import { UseQueryResult } from 'react-query';
@@ -28,11 +29,12 @@ const BuyCard: React.FC<IBuyCard> = ({
   buyCardsLoading,
   assets,
 }) => {
+  const { t } = useTranslation('marketPlaces');
   const [isError, setIsError] = useState(false);
   const { getInteractionsButtons } = useContractModal();
   const [BuyButton] = getInteractionsButtons([
     {
-      title: 'Place Buy Order',
+      title: `${t('ButtonMarketPlace')}`,
       contractType: 'BuyContract',
       defaultValues: {
         buyType: 1,

@@ -19,9 +19,9 @@ const Marketplaces: React.FC = () => {
   const marketplacesHeader = [
     'Id',
     `${t('Name')}`,
-    `${t('Owner Address')}`,
-    `${t('Referral Address')}`,
-    `${t('Referral Percentage')}`,
+    `${t('OwnerAddress')}`,
+    `${t('ReferralAddress')}`,
+    `${t('ReferralPercentage')}`,
   ];
 
   const marketplacesRowSections = (marketplace: IMarketplace) => {
@@ -101,7 +101,7 @@ const Marketplaces: React.FC = () => {
       <Header>
         <Title title={t('Marketplaces')} Icon={Icon} />
       </Header>
-      <TableTitle>{t('List of Marketplaces')}</TableTitle>
+      <TableTitle>{t('ListOfMarketplaces')}</TableTitle>
       <Table {...tableProps} />
     </Container>
   );

@@ -22,7 +22,9 @@
     "Blocks": "Blocos",
     "Transactions": "Transações",
     "Validators": "Validadores",
-    "Proposals": "Propostas"
+    "Proposals": "Propostas",
+    "Proposal": "Proposta",
+    "Proposal Details": "Detalhes da Proposta"
   },
   "Tabs": {
     "Overview": "Visão Geral"

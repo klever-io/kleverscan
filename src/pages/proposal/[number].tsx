@@ -300,7 +300,10 @@ const ProposalDetails: React.FC = () => {
       {
         <Container>
           <Header>
-            <Title route={'/proposals'} title="Proposal Details" />
+            <Title
+              route={'/proposals'}
+              title={t('common:Titles.Proposal Details')}
+            />
           </Header>
           <CardTabContainer>
             <CardHeader>
@@ -311,7 +314,14 @@ const ProposalDetails: React.FC = () => {
             <CardContent>
               <Row>
                 <span>
-                  <h2> {isSkeleton(`Proposal # ${proposal?.proposalId}`)}</h2>
+                  <h2>
+                    {' '}
+                    {isSkeleton(
+                      `${t('common:Titles.Proposal')} # ${
+                        proposal?.proposalId
+                      }`,
+                    )}
+                  </h2>
                 </span>
                 {proposal && (
                   <Status status={proposal.proposalStatus}>
@@ -326,7 +336,7 @@ const ProposalDetails: React.FC = () => {
               </Row>
               <Row>
                 <span>
-                  <strong>Proposer</strong>
+                  <strong>{t('proposals:Proposer')}</strong>
                 </span>
                 <span style={{ marginRight: '0.2rem' }}>
                   <Link href={`/account/${proposal?.proposer}`}>

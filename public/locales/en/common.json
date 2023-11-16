@@ -22,7 +22,9 @@
     "Blocks": "Blocks",
     "Transactions": "Transactions",
     "Validators": "Validators",
-    "Proposals": "Proposals"
+    "Proposals": "Proposals",
+    "Proposal": "Proposal",
+    "Proposal Details": "Proposals Details"
   },
   "Tabs": {
     "Overview": "Overview"

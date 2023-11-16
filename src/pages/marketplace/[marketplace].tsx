@@ -103,7 +103,7 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
         <Row>
           <CommonSpan>
             <strong>
-              {t('marketPlaces:MarketPlaceType', {
+              {t('marketPlaces:MarketplaceType', {
                 type: `${t('marketPlaces:Name')}`,
               })}
             </strong>
@@ -114,7 +114,7 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
         </Row>
         <Row>
           <CommonSpan>
-            <strong>{t('marketPlaces:MarketPlaceType', { type: 'Id' })}</strong>
+            <strong>{t('marketplaces:MarketplaceType', { type: 'Id' })}</strong>
           </CommonSpan>
           <CommonSpan>
             <MktplaceCenteredRow>
@@ -125,7 +125,7 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
         </Row>
         <Row>
           <CommonSpan>
-            <strong>{t('marketPlaces:OwnerAddress')}</strong>
+            <strong>{t('marketplaces:OwnerAddress')}</strong>
           </CommonSpan>
           <MktplaceCenteredRow style={{ overflow: 'hidden' }}>
             <Link

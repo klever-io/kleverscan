@@ -65,7 +65,7 @@ const Proposals: React.FC = () => {
   return (
     <Container>
       <Header>
-        <Title title="Proposals" Icon={Icon} />
+        <Title title={t('common:Titles.Proposals')} Icon={Icon} />
       </Header>
       <CardContainer>
         <CardContent />

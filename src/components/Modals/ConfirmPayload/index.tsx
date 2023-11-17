@@ -15,7 +15,7 @@ import {
 import { DetailsRow, ErrorMessage, HiddenTextArea } from './styles';
 
 const ConfirmPayload: React.FC = () => {
-  const { payload, formSend, resetFormsData } = useContract();
+  const { payload, formSend, resetFormsData, setPayload } = useContract();
 
   const { setShowPayloadOpen, showPayloadOpen } = useModal();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -26,6 +26,7 @@ const ConfirmPayload: React.FC = () => {
   const [payloadText, setPayloadText] = useState(
     JSON.stringify(payload, null, '\t'),
   );
+  const oldPayload = useRef(payload);
 
   useEffect(() => {
     if (payload) {
@@ -56,6 +57,7 @@ const ConfirmPayload: React.FC = () => {
 
     setIsValid(true);
     setError('');
+    setPayload(JSON.parse(payloadText));
   };
 
   const handleConfirm = async () => {
@@ -76,6 +78,7 @@ const ConfirmPayload: React.FC = () => {
   const closeModal = () => setShowPayloadOpen(false);
 
   const handleClose = () => {
+    setPayload(oldPayload.current);
     resetFormsData();
     closeModal();
   };

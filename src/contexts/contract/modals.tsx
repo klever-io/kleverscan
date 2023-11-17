@@ -1,6 +1,6 @@
 //create context
 
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 interface IModalContext {
   setWarningOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -14,6 +14,14 @@ export const ModalContext = createContext({} as IModalContext);
 export const ModalsProvider: React.FC = ({ children }) => {
   const [warningOpen, setWarningOpen] = useState<boolean>(false);
   const [showPayloadOpen, setShowPayloadOpen] = useState(false);
+
+  useEffect(() => {
+    if (showPayloadOpen) {
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.documentElement.style.overflow = 'unset';
+    }
+  }, [showPayloadOpen]);
 
   const values: IModalContext = {
     setWarningOpen,

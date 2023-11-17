@@ -153,6 +153,7 @@ const ConfirmPayload: React.FC = () => {
                 setIsValid(false);
                 setError('');
                 setPayloadText(e.target.value);
+                e.target.style.height = 'auto';
                 e.target.style.height = e.target.scrollHeight + 'px';
               }}
               spellCheck={false}

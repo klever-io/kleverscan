@@ -8,6 +8,7 @@ import { useExtension } from '@/contexts/extension';
 import { gtagEvent } from '@/utils/gtag';
 import { parseAddress } from '@/utils/parseValues';
 import { web } from '@klever/sdk-web';
+import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -16,14 +17,14 @@ import {
   ConfirmTransaction,
   CreateAssetAddRoles,
   CreateAssetEightStep,
-  CreateAssetFirstStep,
-  CreateAssetFourthStep,
+  CreateAssetMaxSupplyStep,
+  CreateAssetNameStep,
+  CreateAssetOwnerAddressStep,
   CreateAssetPreConfimStep,
   CreateAssetPropertiesStep,
   CreateAssetRoyaltySteps,
-  CreateAssetSecondStep,
-  CreateAssetSevenStep,
-  CreateAssetThirdStep,
+  CreateAssetTickerStep,
+  CreateAssetWelcomeStep,
   DesktopStepsComponent,
   infinitySymbol,
   propertiesCommonDefaultValues,
@@ -48,11 +49,14 @@ const WizCreateNFT: React.FC<any> = ({
     setSelectedStep(prevStep => prevStep + 1);
   };
 
+  const { t } = useTranslation(['common', 'wizards']);
+
   const stepsProps = {
     handleStep: setSelectedStep,
     selectedStep: selectedStep,
     handleAdvancedSteps,
     isNFT: true,
+    t,
   };
 
   const lastStepProps = {
@@ -82,7 +86,7 @@ const WizCreateNFT: React.FC<any> = ({
       label: 'Create Asset Information',
       isDone: false,
       component: (
-        <CreateAssetFirstStep
+        <CreateAssetWelcomeStep
           {...stepsProps}
           informations={assetInfo.welcome}
         />
@@ -93,7 +97,7 @@ const WizCreateNFT: React.FC<any> = ({
       label: 'Select Asset Name',
       isDone: false,
       component: (
-        <CreateAssetSecondStep {...stepsProps} informations={assetInfo.name} />
+        <CreateAssetNameStep {...stepsProps} informations={assetInfo.name} />
       ),
     },
     {
@@ -101,7 +105,10 @@ const WizCreateNFT: React.FC<any> = ({
       label: 'Select Asset Ticker',
       isDone: false,
       component: (
-        <CreateAssetThirdStep {...stepsProps} informations={assetInfo.ticker} />
+        <CreateAssetTickerStep
+          {...stepsProps}
+          informations={assetInfo.ticker}
+        />
       ),
     },
     {
@@ -109,7 +116,7 @@ const WizCreateNFT: React.FC<any> = ({
       label: 'Select Asset Owner Address',
       isDone: false,
       component: (
-        <CreateAssetFourthStep
+        <CreateAssetOwnerAddressStep
           {...stepsProps}
           informations={assetInfo.ownerAddress}
         />
@@ -120,7 +127,7 @@ const WizCreateNFT: React.FC<any> = ({
       label: 'Select Asset Max Supply',
       isDone: false,
       component: (
-        <CreateAssetSevenStep
+        <CreateAssetMaxSupplyStep
           {...stepsProps}
           informations={assetInfo.maxSupply}
         />

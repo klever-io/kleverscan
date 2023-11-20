@@ -1,0 +1,113 @@
+{
+  "common": {
+    "txCost": "To finalize this process, a transaction will be carried out with a cost of",
+    "readyText": "I'm ready, I want to start",
+    "estimatedTime": "Estimated time",
+    "step": "Step",
+    "address": "Address",
+    "useConnectedAddress": "Use my connected wallet address",
+    "useAnotherAddress": "Use another KDA address",
+    "previous": "Previous",
+    "next": "Next",
+    "remove": "Remove",
+    "addAnother": "Add another {{text}}",
+    "basicOptions": {
+      "basicInfoText": "Basic information",
+      "ownerAddress": "Owner Address",
+      "whatTickerPrecison": "What will be {{ticker}} precision?",
+      "precisionHint": "Token precision refers to the number of decimal places that can be used to represent fractional amounts of a token.",
+      "kleverPrecisionTip": "Klever Tip: Token precision is an important consideration when creating a token because it affects the usability and divisibility of the token.",
+      "initialSupplyOf": "Initial Supply of {{ticker}}",
+      "initialSupplyHint": "The initial amount refers to the quantity of tokens that will be minted at the beginning of the token creation process.",
+      "kleverInitialSupplyTip": "If not specified, no tokens will be minted at the time of asset creation. The initial amount can be adjusted later through minting, which can be controlled through the token's smart contract.",
+      "maxSupplyOf": "Max. Supply of {{ticker}}"
+    },
+    "advancedOptions": {
+      "eachAdvancedOption": "Advanced Option",
+      "allAdvancedOption": "ADVANCED OPTIONS",
+      "royalties": {
+        "royalties": "Royalties",
+        "enableRoyalties": " Would you like to enable and configure royalties {{ticker}} now?",
+        "royaltiesInfo": "This address will be the receiver of royalties",
+        "setTheValuesITORoyalties": "Set the values for the {{ticker}} ITO's royalties",
+        "whatIsRoyalty": " What is royalty?",
+        "whatIsRoyaltyA": "Crypto payouts designed to proffer creators a cut of secondary sales of their asset",
+        "nowChooseReceiverAddress": "Now you will choose the value of the royalties that the address selected will receive",
+        "percentageITOBuy": "Percentage of the currency that will be charged from an ITO Buy - ( precision 2, 100 = 100% )",
+        "fixedAmountITOBuy": "Fixed amount of the currency that will be charged from an ITO Buy",
+        "transferPercentage": "Transfer Percentage",
+        "fillAmountPercentage": "Please fill the Token amount and percentage",
+        "percentageValueTransfers": " You can also set a percentage value for transfers of {{ticker}}, the percentage can be different for certain amount threshoulds",
+        "amountHint": "Amount - Min value of the threshold that triggers the transfer fee",
+        "percentageHint": "Percentage - Percentage fee amount for that amount",
+        "removePercentage": "Remove Percentage",
+        "addPercentage": "Add another Percentage",
+        "splitRoyalties": "Split Royalties",
+        "wantToSplitRoyalties": "Do you want to split royalties to your token now?",
+        "whatSplitRoyalties": "What is Split Royalties ?",
+        "royaltyReceiverAddress": "Royalty receiver address",
+        "howRoyaltiesSplit": "How the royalties are split",
+        "transferPercentageReceiverAddressFee": " Percentage that the given address will receive from 'transfer percentage' fee. ( Precision 2, 100 = 100%)",
+        "itoPercentageReceiverAddressFee": "Percentage that the given address receive from 'ITO percentage' fee. ( Precision 2, 100 = 100%)",
+        "itoFixedReceiverAddressFee": "Percentage that the given address will receive from 'ITO fixed' fee. ( Precision 2, 100 = 100%)"
+      }
+    }
+  },
+  "createAssetCommon": {
+    "ticker": {
+      "kleverTip": "Klever Tip: Try to find a Ticker that is not being used by any relevant projects."
+    }
+  },
+  "createToken": {
+    "welcome": {
+      "title": "Create a fungible token",
+      "description": "To create a KDA fungible token we will guide you through a few steps.",
+      "tooltip": "What is a fungible token?",
+      "kleverTip": "Physical money and cryptocurrencies are fungible, which means they can be traded or exchanged for one another."
+    },
+    "name": {
+      "title": "What will be the name of your token?",
+      "description": "Examples of token names: Bitcoin, Ethereum, Matic, Klever...Don't worry, you will have the opportunity to choose the ticker name next.",
+      "kleverTip": "Klever Tip: Choose the name carefully, it will most likely be your brand on the blockchain."
+    },
+    "ticker": {
+      "title": "What is your token's ticker?",
+      "description": "Now you will choose your ticker, it will represent your token in wallets and exchanges. Examples of Ticker names: BTC, ETH, KLV, BNB..."
+    },
+    "ownerAddress": {
+      "description": "This address will be the token manager and will be able to edit some settings. Only the Owner of the token can do this."
+    },
+    "maxSupply": {
+      "description": "The max amount is the upper limit for the total supply of tokens that can be minted",
+      "kleverTip": "If no value is specified now, the initial max amount will be set to infinity. This value can be adjusted later, but use with caution and consider the impact on the token's value and usability."
+    },
+    "advancedSteps": {
+      "properties": {
+        "title": "Review or change your token's properties.",
+        "description": "The settings will only be applied after creating the token, so they don't affect the settings you made during this process."
+      }
+    },
+    "transactionSuccess": {
+      "description": "When confirmed on the blockchain, your token will be created.",
+      "secondDescription": "The token contract is generated after this confirmation."
+    },
+    "stepsInformations": {
+      "basicStepsLabels": {
+        "tokenName": "Token Name",
+        "tokenTicker": "Token Ticker",
+        "ownerAddress": "Owner Address",
+        "tokenPrecision": "Token Precision",
+        "initialSupply": "Initial Supply",
+        "maxSupply": "Max Supply",
+        "tokenImage": "Token Image"
+      },
+      "advancedStepsLabels": {
+        "uri": "Uri",
+        "staking": "Staking",
+        "royalties": "Royalties",
+        "roles": "Roles",
+        "properties": "Properties"
+      }
+    }
+  }
+}

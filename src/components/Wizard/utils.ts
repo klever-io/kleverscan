@@ -1,79 +1,137 @@
-export const createToken = {
+import { TFunction } from 'next-i18next';
+
+interface ICreateToken {
   commomValues: {
-    assetType: 0,
-    additionalFields: true,
-    basicTotalSteps: 7,
-  },
+    assetType: number;
+    additionalFields: boolean;
+    basicTotalSteps: number;
+  };
   welcome: {
-    title: 'Create a fungible token',
-    description:
-      'To create a KDA fungible token we will guide you through a few steps.',
-    tooltip: 'What is a fungible token?',
-    kleverTip:
-      'Physical money and cryptocurrencies are fungible, which means they can be traded or exchanged for one another.',
-    transactionCost: '20,000',
-    timeEstimated: '10min',
-  },
+    title: string;
+    description: string;
+    tooltip: string;
+    kleverTip: string;
+    transactionCost: string;
+    timeEstimated: string;
+  };
   name: {
-    currentStep: '1/7',
-    title: 'What will be the name of your token?',
-    description:
-      "Examples of token names: Bitcoin, Ethereum, Matic, Klever...Don't worry, you will have the opportunity to choose the ticker name next.",
-    kleverTip:
-      'Klever Tip: Choose the name carefully, it will most likely be your brand on the blockchain.',
-  },
+    currentStep: string;
+    title: string;
+    description: string;
+    kleverTip: string;
+  };
   ticker: {
-    currentStep: '2/7',
-    title: "What is your token's ticker?",
-    description:
-      'Now you will choose your ticker, it will represent your token in wallets and exchanges. Examples of Ticker names: BTC, ETH, KLV, BNB...',
-  },
+    currentStep: string;
+    title: string;
+    description: string;
+  };
   ownerAddress: {
-    currentStep: '3/7',
-    formValue: 'ownerAddress',
-    description:
-      'This address will be the token manager and will be able to edit some settings. Only the Owner of the token can do this.',
-  },
+    currentStep: string;
+    formValue: string;
+    description: string;
+  };
   maxSupply: {
-    currentStep: '6/7',
-    description:
-      'The max amount is the upper limit for the total supply of tokens that can be minted',
-    kleverTip:
-      "If no value is specified now, the initial max amount will be set to infinity. This value can be adjusted later, but use with caution and consider the impact on the token's value and usability.",
-  },
+    currentStep: string;
+    description: string;
+    kleverTip: string;
+  };
   logo: {
-    assetType: 0,
-    currentStep: '7/7',
-  },
+    assetType: 0;
+    currentStep: string;
+  };
   advancedSteps: {
     uris: {
-      currentStep: 'URI',
-    },
+      currentStep: string;
+    };
     properties: {
-      title: "Review or change your token's properties.",
-      description:
-        "The settings will only be applied after creating the token, so they don't affect the settings you made during this process.",
-    },
-  },
+      title: string;
+      description: string;
+    };
+  };
   transactionSuccess: {
-    description:
-      'When confirmed on the blockchain, your token will be created.',
-    secondDescription:
-      'The token contract is generated after this confirmation.',
-  },
+    description: string;
+    secondDescription: string;
+  };
   stepsInformations: {
-    basicStepsLabels: [
-      'Token Name',
-      'Token Ticker',
-      'Owner Address',
-      'Token Precision',
-      'Initial Supply',
-      'Max Supply',
-      'Token Image',
-    ],
-    advancedStepsIndex: [9, 10, 11, 12, 13],
-    advancedStepsLabels: ['Uri', 'Staking', 'Royalties', 'Roles', 'Properties'],
-  },
+    basicStepsLabels: string[];
+    advancedStepsIndex: number[];
+    advancedStepsLabels: string[];
+  };
+}
+
+export const createToken = (t: TFunction): ICreateToken => {
+  return {
+    commomValues: {
+      assetType: 0,
+      additionalFields: true,
+      basicTotalSteps: 7,
+    },
+    welcome: {
+      title: t('wizards:welcome.title'),
+      description: t('wizards:welcome.description'),
+      tooltip: t('wizards:welcome.tooltip'),
+      kleverTip: t('wizards:welcome.kleverTip'),
+      transactionCost: '20,000',
+      timeEstimated: '10min',
+    },
+    name: {
+      currentStep: '1/7',
+      title: t('wizards:name.title'),
+      description: t('wizards:name.description'),
+      kleverTip: t('wizards:name.kleverTip'),
+    },
+    ticker: {
+      currentStep: '2/7',
+      title: t('wizards:ticker.title'),
+      description: t('wizards:ticker.description'),
+    },
+    ownerAddress: {
+      currentStep: '3/7',
+      formValue: 'ownerAddress',
+      description: t('wizards:ownerAddress.description'),
+    },
+    maxSupply: {
+      currentStep: '6/7',
+      description: t('wizards:maxSupply.description'),
+      kleverTip: t('wizards:maxSupply.kleverTip'),
+    },
+    logo: {
+      assetType: 0,
+      currentStep: '7/7',
+    },
+    advancedSteps: {
+      uris: {
+        currentStep: 'URI',
+      },
+      properties: {
+        title: t('wizards:advancedSteps.properties.title'),
+        description: t('wizards:advancedSteps.properties.description'),
+      },
+    },
+    transactionSuccess: {
+      description: t('wizards:transactionSuccess.description'),
+      secondDescription: t('wizards:transactionSuccess.secondDescription'),
+    },
+    stepsInformations: {
+      basicStepsLabels: [
+        t('wizards:stepsInformations.basicStepsLabels.tokenName'),
+        t('wizards:stepsInformations.basicStepsLabels.tokenTicker'),
+        t('wizards:stepsInformations.basicStepsLabels.ownerAddress'),
+        t('wizards:stepsInformations.basicStepsLabels.tokenPrecision'),
+        t('wizards:stepsInformations.basicStepsLabels.initialSupply'),
+        t('wizards:stepsInformations.basicStepsLabels.maxSupply'),
+        t('wizards:stepsInformations.basicStepsLabels.tokenImage'),
+      ],
+      advancedStepsIndex: [9, 10, 11, 12, 13],
+      advancedStepsLabels: [
+        t('wizards:stepsInformations.advancedStepsLabels.uri'),
+        t('wizards:stepsInformations.advancedStepsLabels.staking'),
+        t('wizards:stepsInformations.advancedStepsLabels.royalties'),
+        t('wizards:stepsInformations.advancedStepsLabels.roles'),
+        t('wizards:stepsInformations.advancedStepsLabels.properties'),
+      ],
+    },
+  };
 };
 
 export const createNFT = {

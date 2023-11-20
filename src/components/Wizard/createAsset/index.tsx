@@ -11,6 +11,7 @@ import { useMobile } from '@/contexts/mobile';
 import { formatNumberDecimal } from '@/utils/formatFunctions';
 import { validateImgUrl } from '@/utils/imageValidate';
 import { parseAddress } from '@/utils/parseValues';
+import { TFunction } from 'next-i18next';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
@@ -80,6 +81,7 @@ export interface IWizardComponents {
   handleAdvancedSteps?: () => void;
   isNFT?: boolean;
   isLastStep?: boolean;
+  t: TFunction;
 }
 
 interface IAssetInformations extends IWizardComponents {
@@ -267,7 +269,7 @@ export const ButtonsComponent: React.FC<IButtonsComponenets> = ({
   );
 };
 
-export const CreateAssetFirstStep: React.FC<IAssetInformations> = ({
+export const CreateAssetWelcomeStep: React.FC<IAssetInformations> = ({
   informations: {
     title,
     description,
@@ -277,6 +279,7 @@ export const CreateAssetFirstStep: React.FC<IAssetInformations> = ({
     timeEstimated,
   },
   handleStep,
+  t,
 }) => {
   return (
     <CardContainer>
@@ -293,25 +296,25 @@ export const CreateAssetFirstStep: React.FC<IAssetInformations> = ({
       </div>
       <div>
         <span>
-          To finalize this process, a transaction will be carried out with a
-          cost of {transactionCost} KLV.
+          {t('wizards:common.txCost')} {transactionCost} KLV.
         </span>
         <WizardButton onClick={() => handleStep(prev => prev + 1)} fullWidth>
-          <p>I&apos;m ready, I want to start</p>
+          <p>{t('wizards:common.readyText')}</p>
           <WizardRightArrowSVG />
         </WizardButton>
         <span>
           <IconWizardClock style={{ height: '1rem', width: '1rem' }} />
-          Estimated time <strong>{timeEstimated}</strong>
+          {t('wizards:common.estimatedTime')} <strong>{timeEstimated}</strong>
         </span>
       </div>
     </CardContainer>
   );
 };
 
-export const CreateAssetSecondStep: React.FC<IAssetInformations> = ({
+export const CreateAssetNameStep: React.FC<IAssetInformations> = ({
   informations: { currentStep, title, description, kleverTip },
   handleStep,
+  t,
 }) => {
   const {
     register,
@@ -336,8 +339,10 @@ export const CreateAssetSecondStep: React.FC<IAssetInformations> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>Basic information</p>
-        <p>STEP {currentStep}</p>
+        <p>{t('common:wizard.basicInfoText')}</p>
+        <p>
+          {t('wizards:common.step')} {currentStep}
+        </p>
       </div>
       <div>
         <p>{title}</p>
@@ -358,19 +363,17 @@ export const CreateAssetSecondStep: React.FC<IAssetInformations> = ({
 
           {error && <ErrorMessage>{error?.message}</ErrorMessage>}
         </ErrorInputContainer>
-        <GenericInfoCard>
-          Klever Tip: Choose the name carefully, it will most likely be your
-          brand on the blockchain.
-        </GenericInfoCard>
+        <GenericInfoCard>{kleverTip}</GenericInfoCard>
       </div>
       <ButtonsComponent buttonsProps={buttonsProps} />
     </GenericCardContainer>
   );
 };
 
-export const CreateAssetThirdStep: React.FC<IAssetInformations> = ({
-  informations: { currentStep, title, description, kleverTip },
+export const CreateAssetTickerStep: React.FC<IAssetInformations> = ({
+  informations: { currentStep, title, description },
   handleStep,
+  t,
 }) => {
   const {
     register,
@@ -394,8 +397,10 @@ export const CreateAssetThirdStep: React.FC<IAssetInformations> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>Basic information</p>
-        <p>STEP {currentStep}</p>
+        <p>{t('wizards:common.basicInforText')}</p>
+        <p>
+          {t('wizards:common.step')} {currentStep}
+        </p>
       </div>
       <div>
         <p>{title}</p>
@@ -428,8 +433,7 @@ export const CreateAssetThirdStep: React.FC<IAssetInformations> = ({
         {error && <ErrorMessage>{error?.message}</ErrorMessage>}
 
         <GenericInfoCard>
-          Klever Tip: Try to find a Ticker that is not being used by any
-          relevant projects.
+          {t('wizards:createAssetCommon.ticker.kleverTip')}
         </GenericInfoCard>
       </div>
 
@@ -438,9 +442,10 @@ export const CreateAssetThirdStep: React.FC<IAssetInformations> = ({
   );
 };
 
-export const CreateAssetFourthStep: React.FC<IAssetInformations> = ({
+export const CreateAssetOwnerAddressStep: React.FC<IAssetInformations> = ({
   informations: { currentStep, description, formValue },
   handleStep,
+  t,
 }) => {
   const [address, setAddress] = useState('');
   const [changeOwnerAddress, setChangeOwnerAddress] = useState(false);
@@ -498,11 +503,13 @@ export const CreateAssetFourthStep: React.FC<IAssetInformations> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>Basic information</p>
-        <p>STEP {currentStep}</p>
+        <p>{t('wizards:common.basicInforText')}</p>
+        <p>
+          {t('wizards:common.step')} {currentStep}
+        </p>
       </div>
       <div>
-        <p>Owner Address</p>
+        <p>{t('wizards:common.ownerAddress')}</p>
         <p>{description}</p>
 
         <AddressesContainer>
@@ -512,7 +519,7 @@ export const CreateAssetFourthStep: React.FC<IAssetInformations> = ({
           >
             <div>
               <div>
-                Use my connected wallet address
+                {t('wizards:common.useConnectedAddress')}
                 {isTablet && <span>{parseAddress(address, 14)}</span>}
               </div>
               <input
@@ -531,7 +538,7 @@ export const CreateAssetFourthStep: React.FC<IAssetInformations> = ({
             onClick={() => handleChange(true, 1)}
           >
             <div>
-              Use another KDA address
+              {t('wizards:common.useAnotherAddress')}
               <input
                 type="radio"
                 name="ownerAddress"
@@ -574,7 +581,7 @@ export const CreateAssetFourthStep: React.FC<IAssetInformations> = ({
       <ChangedAddressContainer>
         {changeOwnerAddress && !isTablet && (
           <div>
-            Owner Address
+            {t('wizards:common.ownerAddress')}
             <GenericInput
               error={error}
               type="text"
@@ -607,6 +614,7 @@ export const CreateAssetFourthStep: React.FC<IAssetInformations> = ({
 export const CreateAssetRoyaltyAddress: React.FC<IWizardComponents> = ({
   handleStep,
   previousStep,
+  t,
 }) => {
   const [address, setAddress] = useState('');
   const [changeOwnerAddress, setChangeOwnerAddress] = useState(false);
@@ -665,12 +673,12 @@ export const CreateAssetRoyaltyAddress: React.FC<IWizardComponents> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>Advanced Option</p>
-        <p>STEP 2/5</p>
+        <p>{t('wizards:common.advancedOptions.eachAdvancedText')}</p>
+        <p>{t('wizards:common.step')} 2/5</p>
       </div>
       <div>
-        <p>Address</p>
-        <p>This address will be the receiver of royalties</p>
+        <p>{t('wizards:common.address')}</p>
+        <p>{t('wizards:common.advancedOptions.royalties.royaltiesInfo')}</p>
 
         <AddressesContainer>
           <GenericAddressCard
@@ -679,7 +687,7 @@ export const CreateAssetRoyaltyAddress: React.FC<IWizardComponents> = ({
           >
             <div>
               <div>
-                Use my connected wallet address
+                {t('wizards:common.useConnectedAddress')}
                 {isTablet && <span>{parseAddress(address, 14)}</span>}
               </div>
               <input
@@ -698,7 +706,7 @@ export const CreateAssetRoyaltyAddress: React.FC<IWizardComponents> = ({
             onClick={() => handleChange(true, 1)}
           >
             <div>
-              Use another KDA address
+              {t('wizards:common.useAnotherWallet')}
               <input
                 type="radio"
                 name="royalties.address"
@@ -741,7 +749,7 @@ export const CreateAssetRoyaltyAddress: React.FC<IWizardComponents> = ({
       <ChangedAddressContainer>
         {changeOwnerAddress && !isTablet && (
           <div>
-            Owner Address
+            {t('wizards:common.ownerAddress')}
             <GenericInput
               error={error}
               type="text"
@@ -768,13 +776,13 @@ export const CreateAssetRoyaltyAddress: React.FC<IWizardComponents> = ({
   );
 };
 
-const CreateAssetRoyaltyITOToken: React.FC<any> = ({ buttonsProps }) => {
+const CreateAssetRoyaltyITOToken: React.FC<any> = ({ buttonsProps, t }) => {
   const {
     register,
     watch,
     formState: { errors },
   } = useFormContext();
-  // TODO -> VALIDATION
+
   const ticker = watch('ticker');
   let errorTransferPercentage = null;
   let errorTransferFixed = null;
@@ -790,14 +798,20 @@ const CreateAssetRoyaltyITOToken: React.FC<any> = ({ buttonsProps }) => {
   return (
     <GenericCardContainer>
       <div>
-        <p>Advanced Option</p>
-        <p>STEP 3/5</p>
+        <p>{t('wizards:common.advancedOptions.eachAdvancedText')}</p>
+        <p>{t('wizards:common.step')} 3/5</p>
       </div>
       <div>
-        <p>Set the values for the {ticker} ITO&apos;s royalties</p>
         <p>
-          Now you will choose the value of the royalties that the address
-          selected will receive.
+          {t(
+            'wizards:common.advancedOptions.royalties.setTheValuesITORoyalties',
+            { ticker },
+          )}
+        </p>
+        <p>
+          {t(
+            'wizards:common.advancedOptions.royalties.nowChooseReceiverAddress',
+          )}
         </p>
         <GenericInput
           error={errorTransferPercentage}
@@ -810,10 +824,7 @@ const CreateAssetRoyaltyITOToken: React.FC<any> = ({ buttonsProps }) => {
             valueAsNumber: true,
           })}
         />
-        <p>
-          Percentage of the currency that will be charged from an ITO Buy - (
-          precision 2, 100 = 100% )
-        </p>
+        <p>{t('wizad:common.advancedOptions.royalties.percentageITOBuy')}</p>
         {errorTransferPercentage && (
           <ErrorMessage>{errorTransferPercentage?.message}</ErrorMessage>
         )}
@@ -826,7 +837,7 @@ const CreateAssetRoyaltyITOToken: React.FC<any> = ({ buttonsProps }) => {
             valueAsNumber: true,
           })}
         />
-        <p>Fixed amount of the currency that will be charged from an ITO Buy</p>
+        <p>{t('wizad:common.advancedOptions.royalties.fixedAmountITOBuy')}</p>
         {errorTransferFixed && (
           <ErrorMessage>{errorTransferFixed?.message}</ErrorMessage>
         )}
@@ -837,6 +848,7 @@ const CreateAssetRoyaltyITOToken: React.FC<any> = ({ buttonsProps }) => {
   );
 };
 
+// TODO -> Check translation for the NFT
 const CreateAssetRoyaltyITONFT: React.FC<any> = ({ buttonsProps }) => {
   const {
     register,
@@ -958,21 +970,28 @@ const CreateAssetRoyaltyITONFT: React.FC<any> = ({ buttonsProps }) => {
 export const CreateAssetRoyaltyITOPerc: React.FC<IWizardComponents> = ({
   handleStep,
   isNFT,
+  t,
 }) => {
   const buttonsProps = {
     handleStep,
     next: true,
   };
 
+  const props = {
+    buttonsProps,
+    t,
+  };
+
   if (!isNFT) {
-    return <CreateAssetRoyaltyITOToken buttonsProps={buttonsProps} />;
+    return <CreateAssetRoyaltyITOToken {...props} />;
   } else {
-    return <CreateAssetRoyaltyITONFT buttonsProps={buttonsProps} />;
+    return <CreateAssetRoyaltyITONFT {...props} />;
   }
 };
 
 export const CreateAssetRoyaltyTransferPerc: React.FC<IWizardComponents> = ({
   handleStep,
+  t,
 }) => {
   const {
     control,
@@ -1027,16 +1046,23 @@ export const CreateAssetRoyaltyTransferPerc: React.FC<IWizardComponents> = ({
   return (
     <GenericCardContainer alignCenter>
       <div>
-        <p>Transfer Percentage</p>
+        <p>
+          {t('wizards:common.advancedOptions.royalties.transferPercentage')}
+        </p>
         <p key={fields.length}>
-          Transfer Percentage {currentIndex + 1}/{fields.length}
+          {t('wizards:common.advancedOptions.royalties.transferPercentage')}{' '}
+          {currentIndex + 1}/{fields.length}
         </p>
       </div>
       <div key={currentIndex}>
-        <p>Please fill the Token amount and percentage</p>
         <p>
-          You can also set a percentage value for transfers of {ticker}, the
-          percentage can be different for certain amount threshoulds
+          {t('wizards:common.advancedOptions.royalties.fillAmountPercentage')}
+        </p>
+        <p>
+          {t(
+            'wizards:common.advancedOptions.royalties.percentageValuesTransfers',
+            { ticker },
+          )}
         </p>
         <GenericInput
           error={errorTransferPercAmount}
@@ -1046,9 +1072,7 @@ export const CreateAssetRoyaltyTransferPerc: React.FC<IWizardComponents> = ({
           })}
           placeholder="Amount"
         />
-        <p>
-          Amount - Min value of the threshold that triggers the transfer fee
-        </p>
+        <p>{t('wizards:common.advancedOptions.royalties.amountHint')}</p>
         {errorTransferPercAmount && (
           <ErrorMessage>{errorTransferPercAmount?.message}</ErrorMessage>
         )}
@@ -1066,7 +1090,7 @@ export const CreateAssetRoyaltyTransferPerc: React.FC<IWizardComponents> = ({
           )}
           placeholder="Percentage"
         />
-        <p>Percentage - Percentage fee amount for that amount</p>
+        <p>{t('wizards:common.advancedOptions.royalties.percentageHint')}</p>
         {errorTransferPerc && (
           <ErrorMessage>{errorTransferPerc?.message}</ErrorMessage>
         )}
@@ -1076,7 +1100,7 @@ export const CreateAssetRoyaltyTransferPerc: React.FC<IWizardComponents> = ({
           isHidden={fields.length <= 1}
           fullWidth
         >
-          Remove Percentage
+          {t('wizards:common.advancedOptions.royalties.removePercentage')}
         </BorderedButton>
       </div>
       <UriButtonsContainer>
@@ -1088,14 +1112,14 @@ export const CreateAssetRoyaltyTransferPerc: React.FC<IWizardComponents> = ({
           >
             <WizardLeftArrow />
 
-            <span>Previous</span>
+            <span>{t('wizards:common.previous')}</span>
           </BorderedButton>
           <BorderedButton
             type="button"
             onClick={handleNextIndex}
             isHidden={fields.length <= 1}
           >
-            <span>Next</span>
+            <span>{t('wizards:common.next')}</span>
             <WizardRightArrowSVG />
           </BorderedButton>
         </div>
@@ -1107,7 +1131,9 @@ export const CreateAssetRoyaltyTransferPerc: React.FC<IWizardComponents> = ({
           }}
           fullWidth
         >
-          <span>Add another Percentage</span>
+          <span>
+            {t('wizards:common.advancedOptions.royalties.addPercentage')}
+          </span>
           <FiPlusSquare />
         </BorderedButton>
         <ButtonsComponent buttonsProps={buttonsProps} />
@@ -1118,6 +1144,7 @@ export const CreateAssetRoyaltyTransferPerc: React.FC<IWizardComponents> = ({
 
 export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
   handleStep,
+  t,
 }) => {
   const {
     control,
@@ -1132,7 +1159,6 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
   const [splitRoyalties, setSplitRoyalties] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // TODO - CHECK VALIDATION
   let errorsplitAddres = null;
   let errorSplitTransferPerc = null;
   let errorSplitITOPerc = null;
@@ -1185,11 +1211,13 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
   return !splitRoyalties ? (
     <GenericCardContainer>
       <div>
-        <p>ADVANCED OPTION</p>
-        <p>Split Royalties</p>
+        <p>{t('wizards:common.advancedOptions.eachAdvancedText')}</p>
+        <p>{t('wizards:common.advancedOptions.royalties.splitRoyalties')}</p>
       </div>
       <div>
-        <p>Do you want to split royalties to your token now?</p>
+        <p>
+          {t('wizards:common.advancedOptions.royalties.wantToSplitRoyalties')}
+        </p>
         <ButtonsContainer columnDirection>
           <WizardButton
             centered
@@ -1197,30 +1225,33 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
               setSplitRoyalties(true);
             }}
           >
-            Yes
+            {t('common:yes')}
           </WizardButton>
           <WizardButton secondary centered onClick={() => handleStep(10)}>
-            No
+            {t('common:no')}
           </WizardButton>
         </ButtonsContainer>
         <InfoCard>
           <IconWizardInfoSquare />
-          What is Split Royalties ?
+          {t('wizards:common.advancedOptions.royalties.whatSplitRoyaltie')}
         </InfoCard>
-        <GenericInfoCard>Royalty receiver address</GenericInfoCard>
+        <GenericInfoCard>
+          {t('wizards:common.advancedOptions.royalties.royaltyReceiverAddress')}
+        </GenericInfoCard>
       </div>
       <ButtonsComponent buttonsProps={buttonsProps} noNextButton />
     </GenericCardContainer>
   ) : (
     <GenericCardContainer>
       <div>
-        <p>Split Royalties</p>
+        <p>{t('wizards:common.advancedOptions.royalties.splitRoyalties')}</p>
         <p key={fields.length}>
-          Split Royalties {currentIndex + 1}/{fields.length}
+          {t('wizards:common.advancedOptions.royalties.splitRoyalties')}{' '}
+          {currentIndex + 1}/{fields.length}
         </p>
       </div>
       <div key={currentIndex}>
-        <p>How the royalties are split</p>
+        <p>{t('wizards:common.advancedOptions.royalties.howRoyaltiesSplit')}</p>
         <GenericInput
           error={errorsplitAddres}
           type="text"
@@ -1237,7 +1268,9 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
           })}
           placeholder="Address"
         />
-        <p>Royalty receiver address</p>
+        <p>
+          {t('wizards:common.advancedOptions.royalties.royaltyReceiverAddress')}
+        </p>
         {errorsplitAddres && (
           <ErrorMessage>{errorsplitAddres?.message}</ErrorMessage>
         )}
@@ -1255,8 +1288,9 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
           placeholder="Transfer Percentage"
         />
         <p>
-          Percentage that the given address will receive from &quot;transfer
-          percentage&quot; fee. ( Precision 2, 100 = 100%)
+          {t(
+            'wizards:common.advancedOptions.royalties.transferPercentageReiceiverAddressFee',
+          )}
         </p>
         {errorSplitTransferPerc && (
           <ErrorMessage>{errorSplitTransferPerc?.message}</ErrorMessage>
@@ -1276,8 +1310,9 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
           placeholder="ITO Percentage"
         />
         <p>
-          Percentage that the given address will receive from &quot;ITO
-          percentage&quot; fee. ( Precision 2, 100 = 100%)
+          {t(
+            'wizards:common.advancedOptions.royalties.itoPercentageReceiverAddressFee',
+          )}
         </p>
         {errorSplitITOPerc && (
           <ErrorMessage>{errorSplitITOPerc?.message}</ErrorMessage>
@@ -1297,8 +1332,9 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
           placeholder="ITO Fixed"
         />
         <p>
-          Percentage that the given address will receive from &quot;ITO
-          fixed&quot; fee. ( Precision 2, 100 = 100%)
+          {t(
+            'wizards:common.advancedOptions.royalties.itoFixedReceiverAddressFee',
+          )}
         </p>
         {errorSplitITOFixed && (
           <ErrorMessage>{errorSplitITOFixed?.message}</ErrorMessage>
@@ -1309,7 +1345,7 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
           isHidden={fields.length <= 1}
           fullWidth
         >
-          Remove
+          {t('wizards:common.remove')}
         </BorderedButton>
       </div>
       <UriButtonsContainer>
@@ -1321,14 +1357,14 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
           >
             <WizardLeftArrow />
 
-            <span>Previous</span>
+            <span>{t('wizards:common.previous')}</span>
           </BorderedButton>
           <BorderedButton
             type="button"
             onClick={handleNextIndex}
             isHidden={fields.length <= 1}
           >
-            <span>Next</span>
+            <span>{t('wizards:common.next')}</span>
             <WizardRightArrowSVG />
           </BorderedButton>
         </div>
@@ -1340,7 +1376,7 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
           }}
           fullWidth
         >
-          <span>Add another URI</span>
+          <span>{t('wizards:common.addAnother', { text: 'URI' })}</span>
           <FiPlusSquare />
         </BorderedButton>
         <ButtonsComponent buttonsProps={buttonsProps} />
@@ -1352,6 +1388,7 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
 export const CreateAssetRoyaltySteps: React.FC<IWizardComponents> = ({
   handleStep,
   isNFT = false,
+  t,
 }) => {
   const { watch } = useFormContext();
   const [royalties, setRoyalties] = useState(false);
@@ -1361,12 +1398,20 @@ export const CreateAssetRoyaltySteps: React.FC<IWizardComponents> = ({
     handleStep(prev => prev - 1);
   };
 
+  const commonProps = {
+    handleStep: setCurrentStep,
+    previousStep: handleStep,
+    t,
+  };
+
   const tokenTransferRoyalties = [
     {
       key: 'selectRolyaltyTransferPerc',
       label: 'Select Rolyalty Transfer Perc',
       isDone: false,
-      component: <CreateAssetRoyaltyTransferPerc handleStep={setCurrentStep} />,
+      component: (
+        <CreateAssetRoyaltyTransferPerc handleStep={setCurrentStep} t={t} />
+      ),
     },
   ];
 
@@ -1375,26 +1420,19 @@ export const CreateAssetRoyaltySteps: React.FC<IWizardComponents> = ({
       key: 'selectRolyaltyAddress',
       label: 'Select Rolyalty Address',
       isDone: false,
-      component: (
-        <CreateAssetRoyaltyAddress
-          handleStep={setCurrentStep}
-          previousStep={handleStep}
-        />
-      ),
+      component: <CreateAssetRoyaltyAddress {...commonProps} />,
     },
     {
       key: 'selectRolyaltyITOPerc',
       label: 'Select Rolyalty ITO Perc',
       isDone: false,
-      component: (
-        <CreateAssetRoyaltyITOPerc handleStep={setCurrentStep} isNFT={isNFT} />
-      ),
+      component: <CreateAssetRoyaltyITOPerc {...commonProps} isNFT={isNFT} />,
     },
     {
       key: 'selectSplitRolyalty',
       label: 'Select Split Rolyalty',
       isDone: false,
-      component: <CreateAssetSplitRoyalties handleStep={handleStep} />,
+      component: <CreateAssetSplitRoyalties {...commonProps} />,
     },
   ]);
 
@@ -1422,16 +1460,14 @@ export const CreateAssetRoyaltySteps: React.FC<IWizardComponents> = ({
   return !royalties ? (
     <GenericCardContainer>
       <div>
-        <p>ADVANCED OPTIONS</p>
-        <p>Royalties</p>
+        <p>{t('wizards:common.advancedOptions.allAdvancedOption')}</p>
+        <p>{t('wizards:common.advancedOptions.royalties.royalties')}</p>
       </div>
       <div>
-        <p>
-          Would you like to enable and configure royalties for {ticker} now?
-        </p>
+        <p>{t('wizards:common.advancedOptions.royalties.enalbeRoyalties')}</p>
         <ButtonsContainer>
           <WizardButton infoStep centered onClick={() => setRoyalties(true)}>
-            Yes
+            {t('common:yes')}
           </WizardButton>
           <WizardButton
             infoStep
@@ -1439,17 +1475,16 @@ export const CreateAssetRoyaltySteps: React.FC<IWizardComponents> = ({
             centered
             onClick={() => handleStep(prev => prev + 1)}
           >
-            No
+            {t('common:no')}
           </WizardButton>
         </ButtonsContainer>
 
         <InfoCard>
           <IconWizardInfoSquare />
-          What is royalty?
+          {t('wizards:common.advancedOptions.royalties.whatisRoyalty')}
         </InfoCard>
         <GenericInfoCard>
-          Crypto payouts designed to proffer creators a cut of secondary sales
-          of their asset
+          {t('wizards:common.advancedOptions.royalties.whatisRoyaltyA')}
         </GenericInfoCard>
       </div>
       <ButtonsComponent buttonsProps={buttonsProps} noNextButton />
@@ -1459,8 +1494,9 @@ export const CreateAssetRoyaltySteps: React.FC<IWizardComponents> = ({
   );
 };
 
-export const CreateAssetFiveStep: React.FC<IWizardComponents> = ({
+export const CreatePreicisonStep: React.FC<IWizardComponents> = ({
   handleStep,
+  t,
 }) => {
   const { setValue, watch } = useFormContext();
   const precisionWatcher = watch('precision');
@@ -1481,15 +1517,14 @@ export const CreateAssetFiveStep: React.FC<IWizardComponents> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>Basic information</p>
-        <p>STEP 4/7</p>
+        <p>{t('wizards:common.basicOptions.basicInfoText')}</p>
+        <p>{t('wizards:common.step')} 4/7</p>
       </div>
       <div>
-        <p>What will be {ticker} precision?</p>
         <p>
-          Token precision refers to the number of decimal places that can be
-          used to represent fractional amounts of a token.
+          {t('wizards:common.basicOptions.whatTickerPrecision', { ticker })}
         </p>
+        <p>{t('wizards:common.basicOptions.precisionHint')}</p>
         <PrecisionContainer key={precision}>
           <div>
             <p>{ticker}</p>
@@ -1510,9 +1545,7 @@ export const CreateAssetFiveStep: React.FC<IWizardComponents> = ({
           ))}
         </PrecicionsContainer>
         <GenericInfoCard>
-          Klever Tip: Token precision is an important consideration when
-          creating a token because it affects the usability and divisibility of
-          the token.
+          {t('wizards:common.basicOptions.kleverPrecisionTip')}
         </GenericInfoCard>
       </div>
       <ButtonsComponent buttonsProps={buttonsProps} />
@@ -1520,8 +1553,9 @@ export const CreateAssetFiveStep: React.FC<IWizardComponents> = ({
   );
 };
 
-export const CreateAssetSixStep: React.FC<IWizardComponents> = ({
+export const CreateAssetInitialSupplyStep: React.FC<IWizardComponents> = ({
   handleStep,
+  t,
 }) => {
   const {
     watch,
@@ -1550,15 +1584,12 @@ export const CreateAssetSixStep: React.FC<IWizardComponents> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>Basic information</p>
-        <p>STEP 5/7</p>
+        <p>{t('wizards:common.basicOptions.basicInfoText')}</p>
+        <p>{t('wizards:common.step')} 5/7</p>
       </div>
       <div>
-        <p>Initial Supply of {ticker}</p>
-        <p>
-          The initial amount refers to the quantity of tokens that will be
-          minted at the beginning of the token creation process.
-        </p>
+        <p>{t('wizards:common.basicOptions.initialSupplyOf', { ticker })}</p>
+        <p>{t('wizards:common.basicOptions.initialSupplyHint')}</p>
         <GenericInput
           error={error}
           type="text"
@@ -1574,9 +1605,7 @@ export const CreateAssetSixStep: React.FC<IWizardComponents> = ({
         {error && <ErrorMessage>{error?.message}</ErrorMessage>}
 
         <GenericInfoCard>
-          If not specified, no tokens will be minted at the time of asset
-          creation. The initial amount can be adjusted later through minting,
-          which can be controlled through the token&apos;s smart contract.
+          {t('wizards:common.basicOptions.kleverInitialSupplyTip')}
         </GenericInfoCard>
       </div>
       <ButtonsComponent buttonsProps={buttonsProps} />
@@ -1584,9 +1613,10 @@ export const CreateAssetSixStep: React.FC<IWizardComponents> = ({
   );
 };
 
-export const CreateAssetSevenStep: React.FC<IAssetInformations> = ({
+export const CreateAssetMaxSupplyStep: React.FC<IAssetInformations> = ({
   informations: { description, kleverTip },
   handleStep,
+  t,
 }) => {
   const {
     watch,
@@ -1617,8 +1647,8 @@ export const CreateAssetSevenStep: React.FC<IAssetInformations> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>Basic information</p>
-        <p>STEP 6/7</p>
+        <p>{t('wizards:common.basicOptions.basicInfoText')}</p>
+        <p>{t('wizards:common.step')} 6/7</p>
       </div>
       <div>
         <p>Max. Supply of {ticker}</p>

@@ -26,6 +26,7 @@ import {
 import { formatAmount, regexImgUrl } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
+import { NextImageWrapper } from '@/views/home';
 import {
   BoldElement,
   CenteredSubTitle,
@@ -34,7 +35,6 @@ import {
   HalfRow,
   InteractionsValidatorContainer,
   LetterLogo,
-  Logo,
   Rating,
   RatingContainer,
   ReceiveBackground,
@@ -50,6 +50,7 @@ import {
   TableContainer,
 } from '@/views/validators/detail';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -103,18 +104,23 @@ const Validator: React.FC<IValidatorPage> = () => {
 
   const handleLogoError = () => {
     setImgError(true);
-    setRerender(!rerender);
   };
 
   const renderLogo = () => {
     if (validator) {
       if (regexImgUrl(validator.logo) && !imgError) {
         return (
-          <Logo
-            alt={`${validator.name}-logo`}
-            src={validator.logo}
-            onError={() => handleLogoError()}
-          />
+          <NextImageWrapper>
+            <Image
+              alt={`${validator.name}-logo`}
+              width={50}
+              height={50}
+              style={{ borderRadius: '50%', border: '2px solid #ccc' }}
+              src={validator.logo}
+              onError={() => handleLogoError()}
+              loader={({ src, width }) => `${src}?w=${width}`}
+            />
+          </NextImageWrapper>
         );
       }
       return <LetterLogo>{validator.name?.split?.('')[0] || 'K'}</LetterLogo>;

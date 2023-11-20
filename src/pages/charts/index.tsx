@@ -17,10 +17,13 @@ import {
   TransactionChartContent,
 } from '@/views/home';
 import { format } from 'date-fns';
+import { GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React, { useState } from 'react';
 import { IoReloadSharp } from 'react-icons/io5';
 import { useQuery } from 'react-query';
+import nextI18nextConfig from '../../../next-i18next.config';
 import { IDailyTransaction } from '../../types';
 
 export interface ITooltipContent {
@@ -141,6 +144,7 @@ const onErrorHandler = () => {
 
 const Charts: React.FC<ICharts> = () => {
   const { t: commonT } = useTranslation('common');
+  const { t } = useTranslation(['charts']);
   const filterDays = [1, 7, 15, 30];
   const [timeFilter, setTimeFilter] = useState(15);
 
@@ -222,7 +226,7 @@ const Charts: React.FC<ICharts> = () => {
       <Section>
         <ChartsContainer>
           <FixedTxChart>
-            <span>Total KLV Burned vs Minted</span>
+            <span>{t('charts:toalKlvBurnedMinted')}</span>
             {statisticsIsError
               ? getStatisticsErrorContainer()
               : renderWithLoading(
@@ -239,7 +243,7 @@ const Charts: React.FC<ICharts> = () => {
           </FixedTxChart>
 
           <FixedTxChart>
-            <span>Blocks Rewards vs Transactions Rewards</span>
+            <span>{t('charts:blocksRewardsVsTransactions')}</span>
             {statisticsIsError
               ? getStatisticsErrorContainer()
               : renderWithLoading(
@@ -257,7 +261,7 @@ const Charts: React.FC<ICharts> = () => {
 
           <FixedTxChart>
             <ContainerTimeFilter>
-              <span>Daily Transactions</span>
+              <span>{commonT('dailyTransactions')}</span>
               <ListItemTimeFilter>
                 {filterDays.map(item => (
                   <ItemTimeFilter
@@ -284,7 +288,7 @@ const Charts: React.FC<ICharts> = () => {
           </FixedTxChart>
 
           <FixedTxChart>
-            <span>KLV Rewards Pool vs KFI Rewards Pool</span>
+            <span>{t('charts:klvRewardsPoolVsKFIRewardsPool')}</span>
             {statisticsIsError
               ? getStatisticsErrorContainer()
               : renderWithLoading(
@@ -303,6 +307,16 @@ const Charts: React.FC<ICharts> = () => {
       </Section>
     </Container>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['charts', 'common'],
+    nextI18nextConfig,
+  );
+
+  return { props };
 };
 
 export default Charts;

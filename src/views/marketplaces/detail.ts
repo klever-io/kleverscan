@@ -39,12 +39,6 @@ export const GridItemButton = styled.div`
   }
 `;
 
-export const ImgBackground = styled.img`
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-`;
-
 export const LoaderWrapper = styled.div`
   display: grid;
   place-items: center;

@@ -1,3 +1,4 @@
+import { useInputSearch } from '@/contexts/inputSearch';
 import { useTheme } from '@/contexts/theme';
 import { getAsset } from '@/services/requests/asset';
 import getAccount from '@/services/requests/searchBar/account';
@@ -61,7 +62,7 @@ const getInputType = (value: string) => {
   if (value.toUpperCase() === 'KLV' || value.toUpperCase() === 'KFI') {
     return 'asset';
   }
-  if (value.length >= 8 && value.length <= 15) {
+  if (value.length <= 15) {
     return 'asset';
   }
 };
@@ -73,21 +74,28 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
 }) => {
   const [precision, setPrecision] = useState(0);
   const trimmedSearch = search.trim().toLowerCase();
+  const { setLinkValue } = useInputSearch();
   const type = getInputType(trimmedSearch);
   const { isDarkTheme } = useTheme();
   const canSearch = () => {
-    if (trimmedSearch === '' || !trimmedSearch || !type) {
+    if (!type) {
       return false;
     }
     return true;
   };
   const canSearchResult = canSearch();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: trimmedSearch,
     queryFn: () => getCorrectQueryFn(),
     enabled: canSearchResult,
   });
+
+  if (!isLoading && canSearchResult && !data?.data) {
+    setLinkValue(trimmedSearch, '');
+  } else {
+    setLinkValue(trimmedSearch, type);
+  }
 
   const isAsset = () => {
     if (type === 'asset') {

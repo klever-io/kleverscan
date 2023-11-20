@@ -11,6 +11,7 @@ import { useMobile } from '@/contexts/mobile';
 import { formatNumberDecimal } from '@/utils/formatFunctions';
 import { validateImgUrl } from '@/utils/imageValidate';
 import { parseAddress } from '@/utils/parseValues';
+import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
@@ -67,7 +68,6 @@ import {
   UriButtonsContainer,
   WizardAddressCheck,
   WizardButton,
-  WizardConfirmLogo,
   WizardFailAddressCheck,
   WizardRightArrowSVG,
   WizardTxSuccessComponent,
@@ -2800,7 +2800,15 @@ export const ConfirmTransaction: React.FC<IWizardConfirmProps> = ({
     if (validImage) {
       return (
         <ConfirmCardImage>
-          <WizardConfirmLogo src={logo} />
+          <Image
+            alt="logo"
+            src={logo}
+            width={40}
+            height={40}
+            objectPosition="center"
+            style={{ borderRadius: '10px' }}
+            loader={({ src, width }) => `${src}?w=${width}`}
+          />
         </ConfirmCardImage>
       );
     }

@@ -63,11 +63,12 @@ export const CircularProgressContainer = styled.div`
   top: 0.1rem;
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     position: relative;
-    width: 4.2rem;
+    width: 4.6rem;
     height: 5.5rem;
-    left: -12.8rem;
+    right: 12.4rem;
   }
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    width: 5.5rem;
+    width: 5.8rem;
+    right: 12.8rem;
   }
 `;

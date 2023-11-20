@@ -5,13 +5,6 @@ import {
 import styled from 'styled-components';
 import { IFilterItem } from '../../components/Filter';
 
-export const Logo = styled.img`
-  width: 3.354rem;
-  height: 3.354rem;
-  border-radius: 50%;
-  border: 2px solid #ccc;
-`;
-
 export const LetterLogo = styled.div`
   width: 3.354rem;
   min-width: 3.354rem;

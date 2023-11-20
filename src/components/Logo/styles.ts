@@ -3,20 +3,16 @@ import styled, { css } from 'styled-components';
 
 export const Container = styled.div`
   width: fit-content;
+  height: fit-content;
   position: relative;
 `;
 
 const LogoCSS = css`
   position: relative;
-
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
   border: 2px solid ${props => props.theme.borderLogo};
-`;
-
-export const Logo = styled.img`
-  ${LogoCSS}
 `;
 
 export const LetterLogo = styled.div<{ invertColors?: boolean }>`
@@ -36,4 +32,17 @@ export const Verified = styled(Certified)`
   top: -1rem;
 
   transform: translate(50%, 50%);
+`;
+
+export const NextImageWrapperLogo = styled.div`
+  border-radius: 50%;
+  border: 2px solid ${props => props.theme.borderLogo} !important;
+  width: 2.1rem;
+  height: 2.1rem;
+  img {
+    border: 2px solid ${props => props.theme.borderLogo} !important;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+  }
 `;

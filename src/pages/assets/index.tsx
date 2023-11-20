@@ -59,7 +59,7 @@ const Assets: React.FC = () => {
     },
     {
       title: `${t('common:Buttons.Asset Type')}`,
-      data: [`${t('table:Fungible')}`, `${t('table:NonFungible')}`],
+      data: [`Fungible`, `NonFungible`],
       onClick: value => handleSelected(value, 'type'),
       inputType: 'button',
       current: (router.query.type as string) || undefined,

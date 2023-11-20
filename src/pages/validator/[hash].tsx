@@ -49,12 +49,16 @@ import {
   CenteredRow,
   TableContainer,
 } from '@/views/validators/detail';
+import { GetStaticPaths, GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 interface IValidatorPage {
   validator: IPeer;
@@ -81,6 +85,7 @@ const DynamicValidatorCards = dynamic(
 );
 
 const Validator: React.FC<IValidatorPage> = () => {
+  const { t } = useTranslation(['validators', 'common']);
   const router = useRouter();
   const [validator, setValidator] = useState<null | IPeer>(null);
   const [imgError, setImgError] = useState(false);
@@ -244,7 +249,7 @@ const Validator: React.FC<IValidatorPage> = () => {
       <CardContent>
         <Row>
           <span>
-            <strong>Owner Address</strong>
+            <strong>{t('validators:OwnerAddress')}</strong>
           </span>
           <span>
             <CenteredRow>
@@ -267,7 +272,7 @@ const Validator: React.FC<IValidatorPage> = () => {
         <Row>
           <RatingContainer>
             <span>
-              <strong>Rating</strong>
+              <strong>{t('validators:Rating')}</strong>
             </span>
             <span>
               {validator ? (
@@ -284,7 +289,7 @@ const Validator: React.FC<IValidatorPage> = () => {
           <HalfRow>
             <ElementsWrapper>
               <span>
-                <strong>Status</strong>
+                <strong>{t('validators:Status')}</strong>
               </span>
               {validator ? (
                 <Status status={getListStatus(validator?.list)}>
@@ -299,7 +304,7 @@ const Validator: React.FC<IValidatorPage> = () => {
           <HalfRow>
             <ElementsWrapper>
               <span>
-                <strong>Can Delegate</strong>
+                <strong>{t('validators:CanDelegate')}</strong>
               </span>
               {validator ? (
                 <Status status={validator.canDelegate ? 'success' : 'fail'}>
@@ -314,7 +319,7 @@ const Validator: React.FC<IValidatorPage> = () => {
         </Row>
         <Row>
           <span>
-            <strong>Max Delegation</strong>
+            <strong>{t('validators:MaxDelegation')}</strong>
           </span>
           {validator ? (
             <BoldElement>{renderMaxDelegation()}</BoldElement>
@@ -326,7 +331,7 @@ const Validator: React.FC<IValidatorPage> = () => {
           <HalfRow>
             <ElementsWrapper>
               <span>
-                <strong>Staked Balance</strong>
+                <strong>{t('validators:StakedBalance')}</strong>
               </span>
               {validator ? (
                 <BoldElement>
@@ -346,7 +351,7 @@ const Validator: React.FC<IValidatorPage> = () => {
           <HalfRow>
             <ElementsWrapper>
               <span>
-                <strong>Self Stake</strong>
+                <strong>{t('validators:SelfStake')}</strong>
               </span>
               {validator ? (
                 <BoldElement>
@@ -365,7 +370,7 @@ const Validator: React.FC<IValidatorPage> = () => {
           <HalfRow>
             <ElementsWrapper>
               <span>
-                <strong>Total Produced</strong>
+                <strong> {t('validators:TotalProduced')}</strong>
               </span>
               {validator ? (
                 <BoldElement>
@@ -379,7 +384,7 @@ const Validator: React.FC<IValidatorPage> = () => {
           <HalfRow>
             <ElementsWrapper>
               <span>
-                <strong>Total Missed</strong>
+                <strong>{t('validators:TotalMissed')}</strong>
               </span>
               {validator ? (
                 <BoldElement>
@@ -394,7 +399,7 @@ const Validator: React.FC<IValidatorPage> = () => {
         <Row>
           <ElementsWrapper>
             <span>
-              <strong>Commission</strong>
+              <strong> {t('validators:Commission')}</strong>
             </span>
             {validator ? (
               <BoldElement>
@@ -523,7 +528,7 @@ const Validator: React.FC<IValidatorPage> = () => {
       <CardContainer>
         <CardHeader>
           <CardHeaderItem selected={true}>
-            <span>Overview</span>
+            <span>{t('common:Tabs.Overview')}</span>
           </CardHeaderItem>
         </CardHeader>
         <Overview />
@@ -534,6 +539,23 @@ const Validator: React.FC<IValidatorPage> = () => {
       </TableContainer>
     </Container>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'validators'],
+    nextI18nextConfig,
+  );
+
+  return { props };
+};
+
+export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
+  return {
+    paths: [], //indicates that no page needs be created at build time
+    fallback: 'blocking', //indicates the type of fallback
+  };
 };
 
 export default Validator;

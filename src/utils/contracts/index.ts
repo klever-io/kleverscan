@@ -7,6 +7,7 @@ import {
 } from '@/types/contracts';
 import { IKAppTransferReceipt } from '@/types/receipts';
 import { format, fromUnixTime } from 'date-fns';
+import { TFunction } from 'next-i18next';
 import { NextRouter } from 'next/router';
 import {
   IClaimReceipt,
@@ -436,43 +437,63 @@ export const filteredSections = (
   }
 };
 
-export const initialsTableHeaders = [
-  'Hash',
-  'Block',
-  'Created',
-  'From',
-  '',
-  'To',
-  'Status',
-  'Contract',
-];
+export const initialsTableHeaders = (t: TFunction): string[] => {
+  const initial = [
+    'Hash',
+    'Block',
+    'Created',
+    'From',
+    '',
+    'To',
+    'Status',
+    'Contract',
+  ];
+  const translations: string[] = [];
+  initial.forEach(key => {
+    if (!key) {
+      translations.push('');
+    } else {
+      translations.push(t(`Transactions.${key}`));
+    }
+  });
+  return translations;
+};
 
-export enum contractTableHeaders {
-  'Coin',
-  'Amount',
-  'Name',
-  'Ticker',
-  'Reward Address',
-  'Can Delegate',
-  'BLS public key',
-  'Public Key',
-  'Bucket Id',
-  'Asset Id',
-  'Claim Type',
-  'Trigger Type',
-  'Description',
-  'Proposal Id',
-  'Buy Type',
-  'Order Id',
-  'Marketplace Id',
-  'Permission Name',
-  'Deposit Type',
-  'Id',
-  'Currency Id',
-  'Market Type',
-  'Price',
+export enum tableHeaders {
+  Coin = 'Coin',
+  Amount = 'Amount',
+  Name = 'Name',
+  Ticker = 'Ticker',
+  RewardAddress = 'Reward Address',
+  CanDelegate = 'Can Delegate',
+  BLSpublicKey = 'BLS public key',
+  PublicKey = 'Public Key',
+  BucketId = 'Bucket Id',
+  AssetId = 'Asset Id',
+  ClaimType = 'Claim Type',
+  TriggerType = 'Trigger Type',
+  Description = 'Description',
+  ProposalId = 'Proposal Id',
+  BuyType = 'Buy Type',
+  OrderId = 'Order Id',
+  MarketplaceId = 'Marketplace Id',
+  PermissionName = 'Permission Name',
+  DepositType = 'Deposit Type',
+  Id = 'Id',
+  CurrencyId = 'Currency Id',
+  MarketType = 'Market Type',
+  Price = 'Price',
 }
+const translateTableHeaders = (t: TFunction) => {
+  const tableHeadersArray = Object.values(tableHeaders);
+  const translations: Record<string, string> = {};
 
+  tableHeadersArray.forEach(key => {
+    translations[key] = t(`Transactions.${key}`);
+  });
+
+  return Object.values(translations);
+};
 /**
  * Receive the header of the table and the NextJS Router
  * @param router is required to filter using the router.query when it exists
@@ -482,89 +503,87 @@ export enum contractTableHeaders {
 export const getHeaderForTable = (
   router: NextRouter,
   header: string[],
+  t: TFunction,
 ): string[] => {
+  const tableHeaders = translateTableHeaders(t);
   let newHeaders: string[] = [];
   switch (ContractsIndex[ContractsIndex[Number(router.query.type)]]) {
     case ContractsIndex.Transfer:
-      newHeaders = [contractTableHeaders[0], contractTableHeaders[1]];
+      newHeaders = [tableHeaders[0], tableHeaders[1]];
       break;
     case ContractsIndex['Create Asset']:
-      newHeaders = [contractTableHeaders[2], contractTableHeaders[3]];
+      newHeaders = [tableHeaders[2], tableHeaders[3]];
       break;
     case ContractsIndex['Create Validator']:
-      newHeaders = [contractTableHeaders[4], contractTableHeaders[5]];
+      newHeaders = [tableHeaders[4], tableHeaders[5]];
       break;
     case ContractsIndex['Config Validator']:
-      newHeaders = [contractTableHeaders[6]];
+      newHeaders = [tableHeaders[6]];
       break;
     case ContractsIndex['Validator Config']:
-      newHeaders = [contractTableHeaders[7]];
+      newHeaders = [tableHeaders[7]];
       break;
     case ContractsIndex.Freeze:
-      newHeaders = [contractTableHeaders[9], contractTableHeaders[1]];
+      newHeaders = [tableHeaders[9], tableHeaders[1]];
       break;
     case ContractsIndex.Unfreeze:
-      newHeaders = [contractTableHeaders[8]];
+      newHeaders = [tableHeaders[8]];
       break;
     case ContractsIndex.Delegate:
-      newHeaders = [contractTableHeaders[8]];
+      newHeaders = [tableHeaders[8]];
       break;
     case ContractsIndex.Undelegate:
-      newHeaders = [contractTableHeaders[8]];
+      newHeaders = [tableHeaders[8]];
       break;
     case ContractsIndex.Withdraw:
-      newHeaders = [contractTableHeaders[9]];
+      newHeaders = [tableHeaders[9]];
       break;
     case ContractsIndex.Claim:
-      newHeaders = [contractTableHeaders[10], contractTableHeaders[9]];
+      newHeaders = [tableHeaders[10], tableHeaders[9]];
       break;
     case ContractsIndex.Unjail:
       break;
     case ContractsIndex['Asset Trigger']:
-      newHeaders = [contractTableHeaders[11]];
+      newHeaders = [tableHeaders[11]];
       break;
     case ContractsIndex['Set Account Name']:
-      newHeaders = [contractTableHeaders[2]];
+      newHeaders = [tableHeaders[2]];
       break;
     case ContractsIndex.Proposal:
-      newHeaders = [contractTableHeaders[12]];
+      newHeaders = [tableHeaders[12]];
       break;
     case ContractsIndex.Vote:
-      newHeaders = [contractTableHeaders[13], contractTableHeaders[1]];
+      newHeaders = [tableHeaders[13], tableHeaders[1]];
       break;
     case ContractsIndex['Config ITO']:
-      newHeaders = [contractTableHeaders[9]];
+      newHeaders = [tableHeaders[9]];
       break;
     case ContractsIndex['Set ITO']:
-      newHeaders = [contractTableHeaders[9]];
+      newHeaders = [tableHeaders[9]];
       break;
     case ContractsIndex.Buy:
-      newHeaders = [contractTableHeaders[14], contractTableHeaders[20]];
+      newHeaders = [tableHeaders[14], tableHeaders[20]];
       break;
     case ContractsIndex.Sell:
-      newHeaders = [
-        contractTableHeaders[21],
-        contractTableHeaders[20],
-        contractTableHeaders[9],
-      ];
+      newHeaders = [tableHeaders[21], tableHeaders[20], tableHeaders[9]];
       break;
     case ContractsIndex['Cancel Marketplace Order']:
-      newHeaders = [contractTableHeaders[15]];
+      newHeaders = [tableHeaders[15]];
       break;
     case ContractsIndex['Create Marketplace']:
-      newHeaders = [contractTableHeaders[2]];
+      newHeaders = [tableHeaders[2]];
       break;
     case ContractsIndex['Config Marketplace']:
-      newHeaders = [contractTableHeaders[16]];
+      newHeaders = [tableHeaders[16]];
       break;
     case ContractsIndex['Update Account Permission']:
-      newHeaders = [contractTableHeaders[17]];
+      newHeaders = [tableHeaders[17]];
       break;
     case ContractsIndex['Deposit']:
-      newHeaders = [contractTableHeaders[18], contractTableHeaders[19]];
+      newHeaders = [tableHeaders[18], tableHeaders[19]];
       break;
     case ContractsIndex['ITO Trigger']:
-      newHeaders = [contractTableHeaders[17], contractTableHeaders[9]];
+      newHeaders = [tableHeaders[17], tableHeaders[9]];
       break;
   }
   if (router.query.type) {
@@ -577,100 +596,98 @@ export const getHeaderForTable = (
 export const getHeaderForCSV = (
   router: NextRouter,
   header: string[],
+  t: TFunction,
 ): string[] => {
+  const tableHeaders = translateTableHeaders(t);
   let newHeaders: string[] = [];
   switch (ContractsIndex[ContractsIndex[Number(router.query.type)]]) {
     case ContractsIndex.Transfer:
-      newHeaders = [contractTableHeaders[0], contractTableHeaders[1]];
+      newHeaders = [tableHeaders[0], tableHeaders[1]];
       break;
     case ContractsIndex['Create Asset']:
-      newHeaders = [contractTableHeaders[2], contractTableHeaders[3]];
+      newHeaders = [tableHeaders[2], tableHeaders[3]];
       break;
     case ContractsIndex['Create Validator']:
-      newHeaders = [contractTableHeaders[4], contractTableHeaders[5]];
+      newHeaders = [tableHeaders[4], tableHeaders[5]];
       break;
     case ContractsIndex['Config Validator']:
-      newHeaders = [contractTableHeaders[6]];
+      newHeaders = [tableHeaders[6]];
       break;
     case ContractsIndex['Validator Config']:
-      newHeaders = [contractTableHeaders[7]];
+      newHeaders = [tableHeaders[7]];
       break;
     case ContractsIndex.Freeze:
-      newHeaders = [contractTableHeaders[9], contractTableHeaders[1]];
+      newHeaders = [tableHeaders[9], tableHeaders[1]];
       break;
     case ContractsIndex.Unfreeze:
-      newHeaders = [contractTableHeaders[8]];
+      newHeaders = [tableHeaders[8]];
       break;
     case ContractsIndex.Delegate:
-      newHeaders = [contractTableHeaders[8]];
+      newHeaders = [tableHeaders[8]];
       break;
     case ContractsIndex.Undelegate:
-      newHeaders = [contractTableHeaders[8]];
+      newHeaders = [tableHeaders[8]];
       break;
     case ContractsIndex.Withdraw:
-      newHeaders = [contractTableHeaders[9], contractTableHeaders[1]];
+      newHeaders = [tableHeaders[9], tableHeaders[1]];
       break;
     case ContractsIndex.Claim:
-      newHeaders = [
-        contractTableHeaders[10],
-        contractTableHeaders[9],
-        contractTableHeaders[1],
-      ];
+      newHeaders = [tableHeaders[10], tableHeaders[9], tableHeaders[1]];
       break;
     case ContractsIndex.Unjail:
       break;
     case ContractsIndex['Asset Trigger']:
-      newHeaders = [contractTableHeaders[11]];
+      newHeaders = [tableHeaders[11]];
       break;
     case ContractsIndex['Set Account Name']:
-      newHeaders = [contractTableHeaders[2]];
+      newHeaders = [tableHeaders[2]];
       break;
     case ContractsIndex.Proposal:
-      newHeaders = [contractTableHeaders[12]];
+      newHeaders = [tableHeaders[12]];
       break;
     case ContractsIndex.Vote:
-      newHeaders = [contractTableHeaders[13], contractTableHeaders[1]];
+      newHeaders = [tableHeaders[13], tableHeaders[1]];
       break;
     case ContractsIndex['Config ITO']:
-      newHeaders = [contractTableHeaders[9]];
+      newHeaders = [tableHeaders[9]];
       break;
     case ContractsIndex['Set ITO']:
-      newHeaders = [contractTableHeaders[9]];
+      newHeaders = [tableHeaders[9]];
       break;
     case ContractsIndex.Buy:
       newHeaders = [
-        contractTableHeaders[14],
-        contractTableHeaders[20],
-        contractTableHeaders[22],
-        contractTableHeaders[1],
+        tableHeaders[14],
+        tableHeaders[20],
+        tableHeaders[22],
+        tableHeaders[1],
       ];
       break;
     case ContractsIndex.Sell:
       newHeaders = [
-        contractTableHeaders[21],
-        contractTableHeaders[20],
-        contractTableHeaders[9],
-        contractTableHeaders[22],
-        contractTableHeaders[1],
+        tableHeaders[21],
+        tableHeaders[20],
+        tableHeaders[9],
+        tableHeaders[22],
+        tableHeaders[1],
       ];
       break;
     case ContractsIndex['Cancel Marketplace Order']:
-      newHeaders = [contractTableHeaders[15]];
+      newHeaders = [tableHeaders[15]];
       break;
     case ContractsIndex['Create Marketplace']:
-      newHeaders = [contractTableHeaders[2]];
+      newHeaders = [tableHeaders[2]];
       break;
     case ContractsIndex['Config Marketplace']:
-      newHeaders = [contractTableHeaders[16]];
+      newHeaders = [tableHeaders[16]];
       break;
     case ContractsIndex['Update Account Permission']:
-      newHeaders = [contractTableHeaders[17]];
+      newHeaders = [tableHeaders[17]];
       break;
     case ContractsIndex['Deposit']:
-      newHeaders = [contractTableHeaders[18], contractTableHeaders[19]];
+      newHeaders = [tableHeaders[18], tableHeaders[19]];
       break;
     case ContractsIndex['ITO Trigger']:
-      newHeaders = [contractTableHeaders[11], contractTableHeaders[9]];
+      newHeaders = [tableHeaders[11], tableHeaders[9]];
       break;
   }
   if (router?.query?.type) {

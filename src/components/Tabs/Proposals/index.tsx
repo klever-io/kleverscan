@@ -15,6 +15,7 @@ import { setQueryAndRouter } from '@/utils';
 import { capitalizeString } from '@/utils/convertString';
 import { parseAddress } from '@/utils/parseValues';
 import { passViewportStyles } from '@/utils/viewportStyles';
+import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -28,6 +29,7 @@ import {
 } from './styles';
 
 const Proposals: React.FC<IProposalsProps> = ({ request }) => {
+  const { t } = useTranslation('table');
   const { isMobile, isTablet } = useMobile();
   const router = useRouter();
   const filters: IFilter[] = [
@@ -218,12 +220,12 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
   };
 
   const header = [
-    'Number',
-    'Proposer',
-    'Time',
-    'Upvotes/Total Staked',
-    'Status',
-    'Network Parameters',
+    `${t('Proposals.Number')}`,
+    `${t('Proposals.Proposer')}`,
+    `${t('Proposals.Time')}`,
+    `${t('Proposals.Upvotes/Total Staked')}`,
+    `${t('Transactions.Status')}`,
+    `${t('Proposals.Network Parameters')}`,
     '',
   ];
 

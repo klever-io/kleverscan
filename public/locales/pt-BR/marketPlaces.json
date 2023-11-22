@@ -1,6 +1,6 @@
 {
   "Name": "Nome",
-  "Owner Address": "Endereço do Proprietário",
+  "OwnerAddress": "Endereço do Proprietário",
   "ReferralAddress": "Endereço de Indicação",
   "ReferralPercentage": "Percentual de Indicação",
   "ListOfMarketplaces": "Lista de Mercados",

@@ -7,8 +7,11 @@ import { requestProposals } from '@/services/requests/proposals';
 import { Card, Container, Header } from '@/styles/common';
 import { setQueryAndRouter } from '@/utils';
 import { CardContainer } from '@/views/proposals';
+import { GetStaticProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 const Proposals: React.FC = () => {
   const router = useRouter();
@@ -75,6 +78,16 @@ const Proposals: React.FC = () => {
       </Tabs>
     </Container>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'proposals', 'table'],
+    nextI18nextConfig,
+  );
+
+  return { props };
 };
 
 export default Proposals;

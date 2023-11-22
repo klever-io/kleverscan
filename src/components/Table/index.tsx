@@ -4,6 +4,7 @@ import { setQueryAndRouter } from '@/utils';
 import { exportToCsv } from '@/utils/csv';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { processRowSectionsLayout } from '@/utils/table';
+import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
@@ -92,6 +93,7 @@ const Table: React.FC<ITable> = ({
   interval,
   intervalController,
 }) => {
+  const { t } = useTranslation('table');
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
   const [loadingCsv, setLoadingCsv] = useState(false);
@@ -195,7 +197,7 @@ const Table: React.FC<ITable> = ({
 
   const handleClickCsv = async () => {
     setLoadingCsv(true);
-    await exportToCsv('transactions', response?.items, router);
+    await exportToCsv('transactions', response?.items, router, t);
     setLoadingCsv(false);
   };
 

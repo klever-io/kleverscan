@@ -287,8 +287,8 @@ const validators = css`
     margin-right: 0;
   }
   &:nth-child(1) {
-    min-width: 2rem;
-    max-width: 2rem;
+    min-width: 5rem;
+    max-width: 5rem;
   }
   &:nth-child(2) {
     min-width: 18rem;

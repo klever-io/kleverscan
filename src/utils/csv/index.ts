@@ -1,4 +1,5 @@
 import { ITransaction } from '@/types';
+import { TFunction } from 'next-i18next';
 import { NextRouter } from 'next/router';
 import {
   getContractCells,
@@ -7,10 +8,10 @@ import {
   initialsTableHeaders,
 } from '../contracts';
 
-const processHeaders = (router: NextRouter) => {
-  const deafultHeaders = [...initialsTableHeaders];
-  deafultHeaders.push('kApp Fee', 'Bandwidth Fee');
-  const headers = getHeaderForCSV(router, deafultHeaders);
+const processHeaders = (router: NextRouter, t: TFunction) => {
+  const deafultHeaders = [...initialsTableHeaders(t)];
+  deafultHeaders.push(t('Blocks.kApp Fees'), t('Transactions.Bandwidth Fee'));
+  const headers = getHeaderForCSV(router, deafultHeaders, t);
   const sanitizedHeaders = headers.filter(header => header !== '');
   return sanitizedHeaders;
 };
@@ -68,6 +69,7 @@ export const exportToCsv = async (
   filename: string,
   rows: ITransaction[] | null,
   router: NextRouter,
+  t: TFunction,
 ): Promise<void> => {
   if (!rows || rows.length === 0) {
     window.alert('No data to export!');
@@ -80,7 +82,7 @@ export const exportToCsv = async (
     const isMulticontract = rows[i]?.contract.length > 1;
 
     if (i === -1) {
-      const headers = processHeaders(router);
+      const headers = processHeaders(router, t);
       csvFile += headers + '\n';
       continue;
     }

@@ -61,16 +61,16 @@ describe('Component: Tabs/Transactions', () => {
     });
 
     const headers = [
-      'Hash',
-      'Block',
-      'Created',
-      'From',
+      'Transactions.Hash',
+      'Transactions.Block',
+      'Transactions.Created',
+      'Transactions.From',
       '',
-      'To',
-      'Status',
-      'Contract',
-      'kApp Fee',
-      'Bandwidth Fee',
+      'Transactions.To',
+      'Transactions.Status',
+      'Transactions.Contract',
+      'Blocks.kApp Fees',
+      'Transactions.Bandwidth Fee',
     ];
     const hash = screen.getByRole('link', {
       name: parseAddress(mockedTransactions[0].hash, 24),
@@ -82,7 +82,6 @@ describe('Component: Tabs/Transactions', () => {
       flexDirection: 'column',
       gap: '0.75rem',
     };
-
     headers.forEach(name => {
       if (!name) return;
       const header = screen.getAllByText(name)[0];

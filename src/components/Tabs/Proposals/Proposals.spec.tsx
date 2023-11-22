@@ -47,12 +47,12 @@ describe('Component: Tabs/Proposals', () => {
 
     const proposalNumber = screen.getByText('#0');
     const headers = [
-      'Number',
-      'Proposer',
-      'Time',
-      'Upvotes/Total Staked',
-      'Status',
-      'Network Parameters',
+      'Proposals.Number',
+      'Proposals.Proposer',
+      'Proposals.Time',
+      'Proposals.Upvotes/Total Staked',
+      'Transactions.Status',
+      'Proposals.Network Parameters',
     ];
 
     const tableBody = screen.getByTestId('table-body');
@@ -86,8 +86,9 @@ describe('Component: Tabs/Proposals', () => {
     )[0];
     const epochStart = screen.getAllByText(/Created Epoch/i)[0];
     const epochEnd = screen.getAllByText(/Ending Epoch/i)[0];
-    const upVotesAndTotalStaked = screen.getAllByText('Upvotes/Total Staked')[0]
-      .nextSibling?.firstChild;
+    const upVotesAndTotalStaked = screen.getAllByText(
+      'Proposals.Upvotes/Total Staked',
+    )[0].nextSibling?.firstChild;
     const status = screen.getAllByText('ApprovedProposal')[0];
     const details = screen.getAllByText('Details')[0];
 

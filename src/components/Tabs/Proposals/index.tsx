@@ -15,6 +15,7 @@ import { setQueryAndRouter } from '@/utils';
 import { capitalizeString } from '@/utils/convertString';
 import { parseAddress } from '@/utils/parseValues';
 import { passViewportStyles } from '@/utils/viewportStyles';
+import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -28,11 +29,12 @@ import {
 } from './styles';
 
 const Proposals: React.FC<IProposalsProps> = ({ request }) => {
+  const { t } = useTranslation(['common', 'proposals']);
   const { isMobile, isTablet } = useMobile();
   const router = useRouter();
   const filters: IFilter[] = [
     {
-      title: 'Status',
+      title: `${t('common:Buttons.Status')}`,
       data: ['Active', 'Approved', 'Denied'],
       onClick: selected => filterProposals(selected),
       current: router?.query?.status as string,
@@ -206,7 +208,7 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
         element: (
           <Link href={{ pathname: `/proposal/${proposalId}` }} key={proposalId}>
             <a>
-              <CustomLink>Details </CustomLink>
+              <CustomLink> {t('common:Buttons.Details')}</CustomLink>
             </a>
           </Link>
         ),
@@ -222,7 +224,7 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
     'Proposer',
     'Time',
     'Upvotes/Total Staked',
-    'Status',
+    `${t('common:Buttons.Status')}`,
     'Network Parameters',
     '',
   ];

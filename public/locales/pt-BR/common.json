@@ -23,7 +23,9 @@
     "Blocks": "Blocos",
     "Transactions": "Transações",
     "Validators": "Validadores",
-    "Proposals": "Propostas"
+    "Proposals": "Propostas",
+    "Proposal": "Proposta",
+    "Proposal Details": "Detalhes da Proposta"
   },
   "Tabs": {
     "Overview": "Visão Geral",
@@ -35,7 +37,9 @@
     "Hide": "Ocultar",
     "All": "Todos",
     "Asset Type": "Tipo de Ativo",
-    "Show": "Mostrar {{type}}"
+    "Show": "Mostrar {{type}}",
+    "Details": "Detalhes",
+    "Status": "Estado"
   },
   "Properties": {
     "Can": "Pode {{type}}",
@@ -54,6 +58,7 @@
     "No": "Não"
   },
   "Date": {
+    "Updated": "Atualizado",
     "Elapsed Time": "atrás",
     "Today": "Hoje",
     "Yesterday": "Ontem",

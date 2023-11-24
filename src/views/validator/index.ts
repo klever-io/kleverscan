@@ -513,7 +513,7 @@ export const Row = styled.div`
   span {
     text-transform: capitalize;
     &:first-child {
-      width: 10rem;
+      width: 13rem;
     }
 
     @media (max-width: ${props => props.theme.breakpoints.mobile}) {

@@ -23,17 +23,23 @@
     "Blocks": "Blocos",
     "Transactions": "Transações",
     "Validators": "Validadores",
-    "Proposals": "Propostas"
+    "Proposals": "Propostas",
+    "Proposal": "Proposta",
+    "Proposal Details": "Detalhes da Proposta"
   },
   "Tabs": {
-    "Overview": "Visão Geral"
+    "Overview": "Visão Geral",
+    "More": "Mais",
+    "Holders": "Detentores"
   },
   "Buttons": {
     "Expand": "Expandir",
     "Hide": "Ocultar",
     "All": "Todos",
     "Asset Type": "Tipo de Ativo",
-    "Show": "Mostrar {{type}}"
+    "Show": "Mostrar {{type}}",
+    "Details": "Detalhes",
+    "Status": "Estado"
   },
   "Properties": {
     "Can": "Pode {{type}}",
@@ -45,13 +51,14 @@
     "Change Owner": "Alterar Proprietário",
     "Add Roles": "Adicionar Funções",
     "Paused": "Pausado",
-    "NFT Mint Stopped": "Cunhagem de NFT Parada"
+    "NFT Mint Stopped": "Criação de NFT interrompida"
   },
   "Statements": {
     "Yes": "Sim",
     "No": "Não"
   },
   "Date": {
+    "Updated": "Atualizado",
     "Elapsed Time": "atrás",
     "Today": "Hoje",
     "Yesterday": "Ontem",

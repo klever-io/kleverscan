@@ -1,1 +1,17 @@
-{}
+{
+  "Votes": "Votos",
+  "TotalVoted": "Total Votado",
+  "PassThreshold": "Limite para aprovação",
+  "CreateEpoch": "Criar Época",
+  "EndingEpoch": "Época Final",
+  "ActualEpoch": "Época Atual",
+  "NetworkParameters": "Parâmetros de Rede",
+  "CurrentValue": "Valor Atual",
+  "NoDescription": "Nenhuma descrição fornecida.",
+  "Description": "Descrição",
+  "FeePerDataByte": "Taxa por Byte de Dados",
+  "Voted": "Votado",
+  "Voters": "Eleitores",
+  "Proposer": "Proponente",
+  "ProposalsInfo": "O comitê é composto por detentores de KFI que são responsáveis por modificar parâmetros dinâmicos, como recompensas de bloco e taxas de transação na rede KLV. Cada detentor de KFI que possui KFI congelados tem o direito de iniciar e votar em propostas. Uma proposta é adotada contanto que receba votos de pelo menos metade de todos os KFI congelados pela rede. A proposta adotada aplicará suas mudanças nos parâmetros da rede no próximo período."
+}

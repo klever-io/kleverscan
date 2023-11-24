@@ -53,6 +53,7 @@ describe('Component: Tabs/Proposals', () => {
       'Proposals.Upvotes/Total Staked',
       'Transactions.Status',
       'Proposals.Network Parameters',
+      'common:Buttons.Status',
     ];
 
     const tableBody = screen.getByTestId('table-body');
@@ -80,6 +81,7 @@ describe('Component: Tabs/Proposals', () => {
         />,
       );
     });
+
     const proposalNumber = screen.getByText('#0');
     const proposer = screen.getAllByText(
       parseAddress(parsedProposals[0].proposer, 20),
@@ -90,7 +92,7 @@ describe('Component: Tabs/Proposals', () => {
       'Proposals.Upvotes/Total Staked',
     )[0].nextSibling?.firstChild;
     const status = screen.getAllByText('ApprovedProposal')[0];
-    const details = screen.getAllByText('Details')[0];
+    const details = screen.getAllByText('common:Buttons.Details')[0];
 
     expect(proposalNumber).toBeInTheDocument();
     expect(proposer).toBeInTheDocument();

@@ -29,12 +29,13 @@ import {
 } from './styles';
 
 const Proposals: React.FC<IProposalsProps> = ({ request }) => {
-  const { t } = useTranslation('table');
+  const { t: tableT } = useTranslation('table');
+  const { t } = useTranslation(['common', 'proposals']);
   const { isMobile, isTablet } = useMobile();
   const router = useRouter();
   const filters: IFilter[] = [
     {
-      title: 'Status',
+      title: `${t('common:Buttons.Status')}`,
       data: ['Active', 'Approved', 'Denied'],
       onClick: selected => filterProposals(selected),
       current: router?.query?.status as string,
@@ -208,7 +209,7 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
         element: (
           <Link href={{ pathname: `/proposal/${proposalId}` }} key={proposalId}>
             <a>
-              <CustomLink>Details </CustomLink>
+              <CustomLink> {t('common:Buttons.Details')}</CustomLink>
             </a>
           </Link>
         ),
@@ -220,12 +221,13 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
   };
 
   const header = [
-    `${t('Proposals.Number')}`,
-    `${t('Proposals.Proposer')}`,
-    `${t('Proposals.Time')}`,
-    `${t('Proposals.Upvotes/Total Staked')}`,
-    `${t('Transactions.Status')}`,
-    `${t('Proposals.Network Parameters')}`,
+    `${tableT('Proposals.Number')}`,
+    `${tableT('Proposals.Proposer')}`,
+    `${tableT('Proposals.Time')}`,
+    `${tableT('Proposals.Upvotes/Total Staked')}`,
+    `${tableT('Transactions.Status')}`,
+    `${tableT('Proposals.Network Parameters')}`,
+    `${t('common:Buttons.Status')}`,
     '',
   ];
 

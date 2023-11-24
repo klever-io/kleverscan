@@ -153,7 +153,7 @@ export const IconsWrapper = styled.div`
 
 export const ButtonExpand = styled.button`
   color: ${props => props.theme.true.white};
-  margin-left: 0.2rem;
+  margin-left: 0.4rem;
   margin-right: 0.3rem;
   text-align: center;
   width: 5.5rem;
@@ -429,20 +429,30 @@ export const NonceSpan = styled.span`
 
 export const SignatureContainer = styled.div<{ isExpanded: boolean }>`
   display: flex;
-
-  flex-direction: column;
-  max-height: 5rem;
-  gap: 1rem;
-
-  ${({ isExpanded }) =>
-    isExpanded &&
-    css`
-      max-height: fit-content;
-    `}
+  gap: 0.2rem;
+  overflow: hidden;
 `;
 
 export const SignatureItem = styled.div`
   display: grid;
-  grid-template-columns: repeat(1, 1fr) auto;
   gap: 1rem;
+`;
+
+export const SignatureWrapper = styled.div`
+  display: flex;
+`;
+
+export const SignatureSpan = styled.span<{ isExpanded: boolean }>`
+  width: 100%;
+  ${props =>
+    props.isExpanded &&
+    css`
+      overflow: visible !important;
+      white-space: normal !important;
+      word-wrap: break-word;
+    `}
+`;
+
+export const CopyWrapper = styled.span`
+  margin-left: 0.1rem;
 `;

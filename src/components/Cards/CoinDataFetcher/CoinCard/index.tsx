@@ -377,7 +377,7 @@ const CoinCard: React.FC = () => {
                 <ButtonContainer key={index}>
                   <a
                     target="_blank"
-                    href={`https://bitcoin.me/en/trade/${coin}-USDT`}
+                    href={`https://bitcoin.me/us/trade/${coin}-USDT`}
                     rel="noreferrer"
                   >
                     <ButtonInformation>

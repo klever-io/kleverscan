@@ -1,5 +1,6 @@
 import { IPackInfo, IPackItem } from '@/types/contracts';
 import { web } from '@klever/sdk-web';
+import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { IParsedITO } from 'types';
@@ -45,6 +46,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
   setTxHash,
   showcase,
 }) => {
+  const { t } = useTranslation('assets');
   const [amount, setAmount] = useState(0);
   const [loading, setLoading] = useState(false);
 
@@ -146,7 +148,9 @@ const FungibleITO: React.FC<IFungibleITO> = ({
     <Container>
       <FungibleContainer key={packInfoIndex}>
         <Content>
-          <AssetName>{`Price in ${packInfo.key}`}</AssetName>
+          <AssetName>
+            {t('ITO.Price In', { asset: `${packInfo.key}` })}
+          </AssetName>
           <Input
             type="number"
             min="0"
@@ -155,7 +159,11 @@ const FungibleITO: React.FC<IFungibleITO> = ({
             handleConfirmClick={() => undefined}
           />
           <TotalPrice>
-            {showcase ? <span>It will cost</span> : <span>You will pay</span>}{' '}
+            {showcase ? (
+              <span>{t('ITO.It will cost')}</span>
+            ) : (
+              <span>{t('ITO.You will pay')}</span>
+            )}{' '}
             <span>
               {calculateCost(packInfoIndex, packInfo.packs.length)}{' '}
               {packInfo.key}
@@ -163,7 +171,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
           </TotalPrice>
           {!showcase && !loading && (
             <Button onClick={() => handleSubmit(packInfo.key)}>
-              <span>Buy Token</span>
+              <span>{t('ITO.Buy Token')}</span>
             </Button>
           )}
           {loading && (
@@ -174,7 +182,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
         </Content>
         <Content>
           <PriceRange>
-            <PriceRangeTitle>Price Range</PriceRangeTitle>
+            <PriceRangeTitle>{t('ITO.Price Range')}</PriceRangeTitle>
             {packInfo.packs.map(
               (packItem: IPackItem, packItemIndex: number) => {
                 const isLastElement =

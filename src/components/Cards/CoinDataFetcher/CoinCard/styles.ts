@@ -475,7 +475,6 @@ export const ButtonInformation = styled.button`
     color: ${props => props.theme.black};
   }
 `;
-export const InfoSquareIcon = styled.img``;
 export const ButtonContainer = styled.div`
   width: 100%;
   a {

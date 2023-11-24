@@ -70,7 +70,7 @@ import {
   KdaFeeSpan,
   Row as DetailRow,
   SignatureContainer,
-  SignatureItem,
+  SignatureSpan,
 } from '@/views/transactions/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { GetStaticPaths, GetStaticProps } from 'next';
@@ -323,10 +323,25 @@ export const OverviewDetails: React.FC<IOverviewDetails> = ({
                 <SignatureContainer isExpanded={expandSignature}>
                   {!!signature?.length &&
                     (signature as string[])?.map((item: string) => (
-                      <SignatureItem key={item}>
-                        <span style={{ overflow: 'hidden' }}>{item}</span>
-                        {item && <Copy data={item} info="Signature" />}
-                      </SignatureItem>
+                      <>
+                        <SignatureSpan isExpanded={expandSignature}>
+                          {item}
+                          {expandSignature && (
+                            <Copy
+                              data={item}
+                              info="Signature"
+                              style={{
+                                display: 'inline-block',
+                                margin: '0.2rem',
+                                verticalAlign: 'middle',
+                              }}
+                            />
+                          )}
+                        </SignatureSpan>
+                        {!expandSignature && (
+                          <Copy data={item} info="Signature" />
+                        )}
+                      </>
                     ))}
                 </SignatureContainer>
               </>

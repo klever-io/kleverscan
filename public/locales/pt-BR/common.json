@@ -1,6 +1,7 @@
 {
   "EmptyData": "Ainda não existem dados.",
   "Search Address, Block, Transaction": "Pesquisar Endereço, Bloco, Transação, Ativo",
+  "dailyTransactions": "Transações Diárias",
   "Cards": {
     "Total Accounts": "Total de Contas",
     "Total Transactions": "Total de Transações",
@@ -22,16 +23,42 @@
     "Blocks": "Blocos",
     "Transactions": "Transações",
     "Validators": "Validadores",
-    "Proposals": "Propostas"
+    "Proposals": "Propostas",
+    "Proposal": "Proposta",
+    "Proposal Details": "Detalhes da Proposta"
   },
   "Tabs": {
-    "Overview": "Visão Geral"
+    "Overview": "Visão Geral",
+    "More": "Mais",
+    "Holders": "Detentores"
   },
   "Buttons": {
     "Expand": "Expandir",
-    "Hide": "Ocultar"
+    "Hide": "Ocultar",
+    "All": "Todos",
+    "Asset Type": "Tipo de Ativo",
+    "Show": "Mostrar {{type}}",
+    "Details": "Detalhes",
+    "Status": "Estado"
+  },
+  "Properties": {
+    "Can": "Pode {{type}}",
+    "Freeze": "Congelar",
+    "Wipe": "Limpar",
+    "Pause": "Pausar",
+    "Mint": "Cunhar",
+    "Burn": "Queimar",
+    "Change Owner": "Alterar Proprietário",
+    "Add Roles": "Adicionar Funções",
+    "Paused": "Pausado",
+    "NFT Mint Stopped": "Criação de NFT interrompida"
+  },
+  "Statements": {
+    "Yes": "Sim",
+    "No": "Não"
   },
   "Date": {
+    "Updated": "Atualizado",
     "Elapsed Time": "atrás",
     "Today": "Hoje",
     "Yesterday": "Ontem",

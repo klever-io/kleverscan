@@ -56,7 +56,6 @@ export const TransactionRowSections = (
 ): IRowSection[] => {
   if (res.data || res.error === '') {
     const { transaction } = res.data;
-
     const getTxStatus = () => {
       if (transaction.status === 'success') {
         const Status = getStatusIcon('success');
@@ -268,6 +267,7 @@ export const AccountRowSections = (
       }
       return otherAssets + KLV;
     };
+
     return [
       {
         element: (
@@ -350,6 +350,7 @@ export const BlockRowSections = (
   if (res.data || res.error === '') {
     const { block } = res.data;
     const date = formatDate(block.timestamp);
+
     return [
       {
         element: (

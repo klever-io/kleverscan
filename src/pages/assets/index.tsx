@@ -12,13 +12,18 @@ import { setQueryAndRouter } from '@/utils';
 import { formatAmount } from '@/utils/formatFunctions';
 import { useFetchPartial } from '@/utils/hooks';
 import { ContainerAssetId, ContainerAssetName } from '@/views/assets';
+import { GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { ReactNode } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 const Assets: React.FC = () => {
   const router = useRouter();
+  const { t } = useTranslation(['common', 'assets', 'table']);
   const [filterAssets, fetchPartialAsset, loading, setLoading] =
     useFetchPartial<IAsset>('assets', 'assets/list', 'assetId');
 
@@ -42,7 +47,7 @@ const Assets: React.FC = () => {
 
   const filters: IFilter[] = [
     {
-      title: 'Asset',
+      title: `${t('common:Titles.Assets')}`,
       data: filterAssets.map(asset => asset.assetId),
       onClick: value => handleSelected(value, 'asset'),
       onChange: async value => {
@@ -53,8 +58,8 @@ const Assets: React.FC = () => {
       loading,
     },
     {
-      title: 'Asset Type',
-      data: ['Fungible', 'NonFungible'],
+      title: `${t('common:Buttons.Asset Type')}`,
+      data: [`Fungible`, `NonFungible`],
       onClick: value => handleSelected(value, 'type'),
       inputType: 'button',
       current: (router.query.type as string) || undefined,
@@ -197,14 +202,14 @@ const Assets: React.FC = () => {
     '',
     'Token',
     'ID',
-    'Name',
-    'Type',
-    'Initial Supply',
-    'Max Supply',
-    'Circulating Supply',
-    'Total Staked',
-    'Rewards Type',
-    'Precision',
+    `${t('table:Name')}`,
+    `${t('table:Type')}`,
+    `${t('table:InitialSupply')}`,
+    `${t('table:MaxSupply')}`,
+    `${t('table:CirculatingSupply')}`,
+    `${t('common:Cards.Total Staked')}`,
+    `${t('table:RewardsType')}`,
+    `${t('table:Precision')}`,
   ];
 
   const tableProps: ITable = {
@@ -219,7 +224,7 @@ const Assets: React.FC = () => {
   return (
     <Container>
       <Header>
-        <Title title="Assets" Icon={Icon} />
+        <Title title={t('common:Titles.Assets')} Icon={Icon} />
       </Header>
 
       <FilterContainer>
@@ -231,6 +236,16 @@ const Assets: React.FC = () => {
       <Table {...tableProps} />
     </Container>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'assets', 'table'],
+    nextI18nextConfig,
+  );
+
+  return { props };
 };
 
 export default Assets;

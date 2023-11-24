@@ -37,7 +37,7 @@ export const ContentButton = styled.div<{ selected?: boolean }>`
   border-radius: 0.3rem;
   align-items: center;
   justify-content: center;
-  width: 5rem;
+  width: 6.5rem;
 
   height: 2rem;
   gap: 0.4rem;
@@ -94,6 +94,6 @@ export const EncodingTextArea = styled(StyledTextArea)`
 `;
 
 export const Input = styled(InputFile)`
-  width: 100%;
+  max-width: 100%;
   height: 100%;
 `;

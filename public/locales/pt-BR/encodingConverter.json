@@ -1,0 +1,21 @@
+{
+  "Encoding Converter": "Conversor de Codificação",
+  "Encode": "Codificar",
+  "Decode": "Decodificar",
+  "Reset": "Redefinir",
+  "PrivateKey": "Chave Privada",
+  "PublicKey": "Chave Publica",
+  "PEM File": "Arquivo PEM",
+  "Address": "Endereço",
+  "Data": "dados",
+  "Values": "valores",
+  "Text": "texto",
+  "PronomePossessivo": {
+    "masculino": "do seu",
+    "feminino": "da sua"
+  },
+  "PlaceHolderEncoded": "Digite aqui seus {{text}} em {{converter}}...",
+  "PlaceHolderValues": "Digite aqui os {{data}} {{type}} {{key}}...",
+  "PEM File Placeholder": "Arraste e solte seu arquivo aqui",
+  "Select File": "selecionar arquivo"
+}

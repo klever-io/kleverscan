@@ -83,7 +83,6 @@ export const ConnectButton = styled.div<{
     `}
 `;
 
-export const WalletIcon = styled.img``;
 export const ButtonAndCopy = styled.div`
   display: flex;
   align-items: center;

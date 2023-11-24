@@ -112,6 +112,7 @@ const Footer: React.FC = () => {
               alt="Logo"
               width="215"
               height="29"
+              loader={({ src, width }) => `${src}?w=${width}`}
             />
           </LogoContainer>
           <span>{description}</span>

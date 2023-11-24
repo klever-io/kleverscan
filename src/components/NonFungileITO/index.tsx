@@ -3,12 +3,13 @@ import { web } from '@klever/sdk-web';
 import { GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import Image from 'next/image';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { IParsedITO } from 'types';
 import nextI18nextConfig from '../../../next-i18next.config';
 import { Loader } from '../Loader/styles';
-import { BuyButton, LoaderWrapper, NFTimg, Pack, PackItem } from './styles';
+import { BuyButton, LoaderWrapper, Pack, PackItem } from './styles';
 
 interface INonFungible {
   selectedITO: IParsedITO;
@@ -27,6 +28,7 @@ const NonFungibleITO: React.FC<INonFungible> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [imgLoading, setImgLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
 
   const { t } = useTranslation('itos');
 
@@ -67,18 +69,17 @@ const NonFungibleITO: React.FC<INonFungible> = ({
     <Pack>
       {
         <>
-          <NFTimg
-            imgLoading={imgLoading}
+          <Image
             width={226 * 0.7}
             height={271 * 0.7}
-            src={selectedITO.assetLogo}
-            onError={e => {
-              const target = e.target as HTMLImageElement;
-              target.src = '/cube.png';
+            src={imageError ? '/cube.png' : selectedITO.assetLogo}
+            onError={() => {
+              setImageError(true);
             }}
             onLoad={() => setImgLoading(false)}
             alt="Pack"
-          ></NFTimg>
+            loader={({ src, width }) => `${src}?w=${width}`}
+          ></Image>
           {imgLoading && <Loader height={226 * 0.7} width={'86px'} />}
         </>
       }

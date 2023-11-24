@@ -1,6 +1,7 @@
 {
   "EmptyData": "Ainda não existem dados.",
   "Search Address, Block, Transaction": "Pesquisar Endereço, Bloco, Transação, Ativo",
+  "dailyTransactions": "Transações Diárias",
   "Cards": {
     "Total Accounts": "Total de Contas",
     "Total Transactions": "Total de Transações",
@@ -22,16 +23,25 @@
     "Blocks": "Blocos",
     "Transactions": "Transações",
     "Validators": "Validadores",
-    "Proposals": "Propostas"
+    "Proposals": "Propostas",
+    "Proposal": "Proposta",
+    "Proposal Details": "Detalhes da Proposta"
   },
   "Tabs": {
     "Overview": "Visão Geral"
   },
   "Buttons": {
     "Expand": "Expandir",
-    "Hide": "Ocultar"
+    "Hide": "Ocultar",
+    "Details": "Detalhes",
+    "Status": "Estado"
+  },
+  "Statements": {
+    "Yes": "Sim",
+    "No": "Não"
   },
   "Date": {
+    "Updated": "Atualizado",
     "Elapsed Time": "atrás",
     "Today": "Hoje",
     "Yesterday": "Ontem",

@@ -1,5 +1,6 @@
 import { base64ToHex, isHex } from '@/utils/formatFunctions';
 import { web } from '@klever/sdk-web';
+import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
@@ -18,6 +19,7 @@ interface IFormInputs {
 }
 
 const FormVerifySignature: React.FC = () => {
+  const { t } = useTranslation('verify');
   const [isDirty, setIsDirty] = useState(false);
   const [formValues, setFormValues] = useState<IFormInputs>({
     message: '',
@@ -104,30 +106,39 @@ const FormVerifySignature: React.FC = () => {
     <VerifySignatureContainer>
       <FormContent onSubmit={onSubmit}>
         <ContainerItem>
-          <span>Address</span>
+          <span>{t('Address')}</span>
           <InputContainer>
             <input
               name="address"
               value={formValues.address}
-              placeholder="Enter the address for verification"
+              placeholder={t('PlaceHolder', {
+                type: `${t('Address').toLowerCase()}`,
+                vogal: 'o',
+              })}
               autoComplete="off"
               onChange={handleChangeValues}
             />
           </InputContainer>
         </ContainerItem>
         <ContainerItem>
-          <span>Message</span>
+          <span>{t('Message')}</span>
           <TextArea
-            placeholder="Enter the message for verification"
+            placeholder={t('PlaceHolder', {
+              type: `${t('Message').toLowerCase()}`,
+              vogal: 'a',
+            })}
             name="message"
             value={formValues.message}
             onChange={handleChangeValues}
           />
         </ContainerItem>
         <ContainerItem>
-          <span>Signature</span>
+          <span>{t('Signature')}</span>
           <TextArea
-            placeholder="Enter the signature for verification"
+            placeholder={t('PlaceHolder', {
+              type: `${t('Signature').toLowerCase()}`,
+              vogal: 'a',
+            })}
             name="signature"
             value={formValues.signature}
             onChange={handleChangeValues}
@@ -137,7 +148,7 @@ const FormVerifySignature: React.FC = () => {
           <Button
             colorButton="error"
             type="button"
-            value="Clear Form"
+            value={t('Clear Form')}
             onClick={() => resetForm()}
             isDisabled={!isDirty}
             disabled={!isDirty}
@@ -147,7 +158,7 @@ const FormVerifySignature: React.FC = () => {
           <Button
             colorButton="violet"
             type="submit"
-            value="Verify Signature"
+            value={`${t('Verify')} ${t('Signature')}`}
             isDisabled={!isFormFilled(formValues)}
             disabled={!isFormFilled(formValues)}
           />

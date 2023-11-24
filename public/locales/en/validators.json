@@ -1,4 +1,19 @@
 {
   "Transactions": "Transactions",
-  "Daily Transactions": "Daily Transactions"
+  "Daily Transactions": "Daily Transactions",
+  "OwnerAddress": "Owner Address",
+  "Rating": "Rating",
+  "Status": "Status",
+  "MaxDelegation": "Max Delegation",
+  "StakedBalance": "Staked Balance",
+  "TotalProduced": "Total Produced",
+  "Commission": "Commission",
+  "ListOfDelegations": "List of delegations",
+  "CanDelegate": "Can Delegate",
+  "SelfStake": "Self Stake",
+  "TotalMissed": "Total Missed",
+  "CurrentDelegations": "Current Delegations",
+  "RewardsRatio": "Rewards Distribution Ratio",
+  "Voters": "Voters",
+  "Delegated": "Delelgated"
 }

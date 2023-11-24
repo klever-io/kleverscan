@@ -1,4 +1,19 @@
 {
-  "Transactions": "Transactions",
-  "Daily Transactions": "Daily Transactions"
+  "Transactions": "Transações",
+  "Daily Transactions": "Transações Diárias",
+  "OwnerAddress": "Endereço do Proprietário",
+  "Rating": "Classificação",
+  "Status": "Status",
+  "MaxDelegation": "Delegação Máxima",
+  "StakedBalance": "Saldo Delegado",
+  "TotalProduced": "Total Produzido",
+  "Commission": "Comissão",
+  "ListOfDelegations": "Lista de delegações",
+  "CanDelegate": "Pode Delegar",
+  "SelfStake": "Auto Delegação",
+  "TotalMissed": "Total de Perdas",
+  "CurrentDelegations": "Delegações Atuais",
+  "RewardsRatio": "Proporção de Distribuição de Recompensas",
+  "Voters": "Eleitores",
+  "Delegated": "Delegado"
 }

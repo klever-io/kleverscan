@@ -93,6 +93,7 @@ const Contract: React.FC<IContract> = ({
     handleSubmit,
     isMultisig,
     contractOptions,
+    payload,
   } = useContract();
 
   const {
@@ -215,7 +216,7 @@ const Contract: React.FC<IContract> = ({
             </LoadingBackground>,
             window.document.body,
           )}
-        <ConfirmPayload />
+        {payload && <ConfirmPayload />}
         {txHash && <HashComponent {...hashProps} />}
 
         {contractsDescription[currentContract?.contractType] && (

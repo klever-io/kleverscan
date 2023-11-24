@@ -45,18 +45,11 @@ interface IDropdownPages {
   onClick?: () => void;
 }
 
-const NavbarItem: React.FC<INavbarItem> = ({
-  name,
-  Icon,
-  pathTo,
-  pages = [],
-}) => {
+const NavbarItem: React.FC<INavbarItem> = ({ name, pathTo, pages = [] }) => {
   const router = useRouter();
   const DropdownDesktop = ({ page }: IDropdownPages) => {
     return (
-      <DropdownItem
-        disabled={router.pathname.includes(page.name.toLowerCase())}
-      >
+      <DropdownItem disabled={router.pathname === page.pathTo}>
         <Link href={page.pathTo} data-testid="navbar-item">
           <a>
             <span>{page.name}</span>
@@ -68,10 +61,7 @@ const NavbarItem: React.FC<INavbarItem> = ({
 
   if (name === 'More') {
     return (
-      <Item
-        selected={router.pathname.includes(name.toLowerCase())}
-        data-testid="navbar-item"
-      >
+      <Item selected={router.pathname === pathTo} data-testid="navbar-item">
         <span>{name}</span>
         <DropdownContainer>
           <DropdownMenu>
@@ -120,12 +110,13 @@ export const MobileNavbarItem: React.FC<INavbarItem> = ({
       </>
     );
   }
+
   return (
     <Link href={pathTo}>
       <a>
         <MobileItem
           onClick={onClick}
-          selected={router.pathname.includes(name.toLowerCase())}
+          selected={router.pathname === pathTo}
           data-testid="mobile-navbar-item"
         >
           <span>{name}</span>
@@ -197,6 +188,7 @@ const Navbar: React.FC = () => {
                     alt="Logo"
                     width="215"
                     height="29"
+                    loader={({ src, width }) => `${src}?w=${width}`}
                   />
                 </Logo>
               </a>

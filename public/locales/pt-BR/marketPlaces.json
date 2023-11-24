@@ -1,0 +1,12 @@
+{
+  "Name": "Nome",
+  "Owner Address": "Endereço do Proprietário",
+  "ReferralAddress": "Endereço de Indicação",
+  "ReferralPercentage": "Percentual de Indicação",
+  "ListOfMarketplaces": "Lista de Mercados",
+  "Marketplaces": "Mercados",
+  "MarketplaceDetails": "Detalhes do Marketplace",
+  "MarketPlaceType": "{{type}} do Mercado",
+  "ButtonMarketPlace": "Fazer Pedido de Compra",
+  "NoOrders": "Ainda não há ordens de venda"
+}

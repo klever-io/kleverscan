@@ -79,7 +79,7 @@ export interface IContractContext {
   setPermID: React.Dispatch<React.SetStateAction<number>>;
   getAssets: () => Promise<ICollectionList[]>;
   getKAssets: () => Promise<ICollectionList[] | undefined>;
-  formSend: () => Promise<void>;
+  formSend: (payload?: IFormPayload[]) => Promise<void>;
   resetFormsData: () => void;
   handleSubmit: (
     contractValues: any,
@@ -354,8 +354,8 @@ export const ContractProvider: React.FC = ({ children }) => {
     return true;
   };
 
-  const formSend = async () => {
-    const formPayloads = formsData.current;
+  const formSend = async (payload?: IFormPayload[]) => {
+    const formPayloads = payload || formsData.current;
 
     if (!ignoreCheckAmount.current && !amountAndFeesGreaterThanBalance()) {
       return;

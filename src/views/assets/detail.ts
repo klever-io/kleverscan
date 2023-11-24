@@ -144,14 +144,12 @@ export const Row = styled.div<{ isStakingRoyalties: boolean }>`
   span {
     &:first-child {
       min-width: 11rem;
+      max-width: 11rem;
     }
     &:nth-child(2) {
       margin-left: 1rem;
     }
     overflow: hidden;
-
-    text-overflow: ellipsis;
-    white-space: nowrap;
 
     strong {
       font-weight: 600;
@@ -212,6 +210,12 @@ export const ExpandWrapper = styled.div<{ expandVar: boolean }>`
   flex-direction: row !important;
   align-items: center;
 
+  span {
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: normal !important;
+  }
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
     margin-bottom: 0.5rem;
   }
@@ -221,13 +225,6 @@ export const ExpandWrapper = styled.div<{ expandVar: boolean }>`
     ` 
 flex-direction: column;
 `}
-`;
-
-export const Logo = styled.img`
-  width: 3.354rem;
-  height: 3.354rem;
-  border-radius: 50%;
-  border: 2px solid ${props => props.theme.borderLogo};
 `;
 
 export const LetterLogo = styled.div`
@@ -322,7 +319,7 @@ export const FrozenContainer = styled.div`
       border-bottom-right-radius: 0px;
     }
     strong {
-      min-width: 200px;
+      min-width: 15rem;
       font-weight: 600;
       color: ${props => props.theme.darkText};
     }

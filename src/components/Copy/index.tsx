@@ -8,6 +8,7 @@ interface ICopyProps {
   data?: string;
   info?: string;
   children?: React.ReactNode;
+  style?: Record<string, unknown>;
 }
 
 const IconContainer = styled.div`
@@ -15,7 +16,12 @@ const IconContainer = styled.div`
   line-height: 0;
 `;
 
-const Copy: React.FC<ICopyProps> = ({ data, info = 'Text', children }) => {
+const Copy: React.FC<ICopyProps> = ({
+  data,
+  info = 'Text',
+  children,
+  style,
+}) => {
   const handleCopyInfo = async () => {
     await clipboard.writeText(String(data));
 
@@ -28,7 +34,7 @@ const Copy: React.FC<ICopyProps> = ({ data, info = 'Text', children }) => {
 
   return (
     <Fragment>
-      <IconContainer onClick={handleCopyInfo}>
+      <IconContainer onClick={handleCopyInfo} style={style}>
         {children ? children : <CopyIcon />}
       </IconContainer>
     </Fragment>

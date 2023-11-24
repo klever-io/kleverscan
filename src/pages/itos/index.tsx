@@ -42,6 +42,7 @@ import {
   SearchContainer,
   SideList,
 } from '@/views/itos';
+import { TFunction, useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
@@ -51,6 +52,7 @@ import { useInfiniteQuery } from 'react-query';
 export const displayITOpacks = (
   ITO: IParsedITO,
   setTxHash: Dispatch<SetStateAction<string>>,
+  t: TFunction,
 ): JSX.Element => {
   return (
     <>
@@ -73,7 +75,9 @@ export const displayITOpacks = (
         : ITO?.packData?.map((item: any, index) => {
             return (
               <PackContainer key={index + ITO.assetId}>
-                <KeyLabel>{`Price in ${item.key}`}</KeyLabel>
+                <KeyLabel>
+                  {t('assets:ITO.Price In', { asset: `${item.key}` })}
+                </KeyLabel>
                 <ItemsContainer>
                   {item.packs.map((pack: any, index: number) => {
                     return (
@@ -83,6 +87,7 @@ export const displayITOpacks = (
                         currencyId={item.key}
                         selectedITO={ITO}
                         setTxHash={setTxHash}
+                        t={t}
                       />
                     );
                   })}
@@ -93,7 +98,7 @@ export const displayITOpacks = (
       {!ITO?.packData && (
         <ChooseAsset>
           {' '}
-          <span>No packs found.</span>
+          <span>{t('assets:ITO.No packs found')}</span>
         </ChooseAsset>
       )}
     </>
@@ -101,6 +106,7 @@ export const displayITOpacks = (
 };
 
 const ITOsPage: React.FC = () => {
+  const { t } = useTranslation('assets');
   const [selectedITO, setSelectedITO] = useState<null | IParsedITO>(null);
   const [txHash, setTxHash] = useState('');
   const router = useRouter();
@@ -291,7 +297,9 @@ const ITOsPage: React.FC = () => {
           : selectedITO?.packData?.map((item: any, index) => {
               return (
                 <PackContainer key={index + selectedITO.assetId}>
-                  <KeyLabel>{`Price in ${item.key}`}</KeyLabel>
+                  <KeyLabel>
+                    {t('asset:ITO.Price In', { asset: `${item.key}` })}
+                  </KeyLabel>
                   <ItemsContainer>
                     {item.packs.map((pack: any, index: number) => {
                       return (
@@ -301,6 +309,7 @@ const ITOsPage: React.FC = () => {
                           currencyId={item.key}
                           selectedITO={selectedITO}
                           setTxHash={setTxHash}
+                          t={t}
                         />
                       );
                     })}
@@ -311,7 +320,7 @@ const ITOsPage: React.FC = () => {
         {!selectedITO?.packData && (
           <ChooseAsset>
             {' '}
-            <span>No packs found.</span>
+            <span>{t('ITO.No packs found')}</span>
           </ChooseAsset>
         )}
       </>

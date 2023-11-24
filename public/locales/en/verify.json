@@ -1,0 +1,8 @@
+{
+  "Verify": "Verify",
+  "Address": "Address",
+  "Message": "Message",
+  "Signature": "Signature",
+  "PlaceHolder": "Enter the {{type}} for verification",
+  "Clear Form": "Clear Form"
+}

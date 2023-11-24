@@ -275,6 +275,16 @@ export const DataCardValue = styled.div<{ isEpoch?: boolean }>`
   position: relative;
   align-items: center;
   flex-wrap: wrap;
+  margin-left: 0;
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    ${props =>
+      props.isEpoch &&
+      css`
+        margin-left: 0.77rem;
+      `}
+  }
+
   p {
     width: fit-content;
     height: fit-content;
@@ -417,12 +427,7 @@ export const BlockCardRow = styled.div`
     gap: 0.2rem;
   }
 `;
-export const BlockCardLogo = styled.img`
-  border: 2px solid ${props => props.theme.black};
-  border-radius: 100%;
-  width: 2rem;
-  height: 2rem;
-`;
+
 export const BlockCardHash = styled.span`
   width: 100%;
   max-width: 20rem;
@@ -946,17 +951,6 @@ export const CardIconContainer = styled.div`
   }
 `;
 
-export const CardBackground = styled.img`
-  width: 3rem;
-`;
-export const CardIcon = styled.img`
-  width: 2rem;
-  position: absolute;
-`;
-export const TransactionIcon = styled.img`
-  width: 1rem;
-  position: absolute;
-`;
 export const HeaderGradient = styled.div`
   width: 100%;
   height: 12rem;
@@ -1013,4 +1007,10 @@ export const VariationText = styled.div<{ $positive: boolean }>`
 
 export const Anchor = styled.a`
   cursor: pointer;
+`;
+
+export const NextImageWrapper = styled.div`
+  border-radius: 50%;
+  border: 2px solid ${props => props.theme.borderLogo};
+  display: flex;
 `;

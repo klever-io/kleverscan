@@ -31,10 +31,13 @@ import {
   MktplaceCenteredRow,
 } from '@/views/marketplaces/detail';
 import { GetStaticPaths, GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useQuery, UseQueryResult } from 'react-query';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 export interface IBuyCard {
   marketplaceAsset: IMarketplaceAsset;
@@ -45,6 +48,7 @@ export interface IBuyCard {
 
 const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
   const serversideMarketplaceResponse = props;
+  const { t } = useTranslation(['common', 'marketPlaces']);
   const pagination = props.pagination;
   const router = useRouter();
   const [page, setPage] = useState(1);
@@ -98,7 +102,11 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
       <>
         <Row>
           <CommonSpan>
-            <strong>Marketplace Name</strong>
+            <strong>
+              {t('marketPlaces:MarketplaceType', {
+                type: `${t('marketPlaces:Name')}`,
+              })}
+            </strong>
           </CommonSpan>
           <MktplaceCenteredRow>
             <CenteredRowSpan>{serversideMarketplace.name}</CenteredRowSpan>
@@ -106,7 +114,7 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
         </Row>
         <Row>
           <CommonSpan>
-            <strong> Marketplace Id</strong>
+            <strong>{t('marketplaces:MarketplaceType', { type: 'Id' })}</strong>
           </CommonSpan>
           <CommonSpan>
             <MktplaceCenteredRow>
@@ -117,7 +125,7 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
         </Row>
         <Row>
           <CommonSpan>
-            <strong>Owner Address</strong>
+            <strong>{t('marketplaces:OwnerAddress')}</strong>
           </CommonSpan>
           <MktplaceCenteredRow style={{ overflow: 'hidden' }}>
             <Link
@@ -134,7 +142,7 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
         </Row>
         <Row>
           <CommonSpan>
-            <strong>Referral Address</strong>
+            <strong>{t('marketPlaces:ReferralAddress')}</strong>
           </CommonSpan>
           <MktplaceCenteredRow style={{ overflow: 'hidden' }}>
             {serversideMarketplace.referralAddress ? (
@@ -156,7 +164,7 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
         </Row>
         <Row>
           <CommonSpan>
-            <strong>Referral Percentage</strong>
+            <strong>{t('marketPlaces:ReferralPercentage')}</strong>
           </CommonSpan>
           <CommonSpan>
             <small>
@@ -182,7 +190,7 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
       return (
         <DefaultReturn>
           <WarningIcon />
-          <span>No sell orders yet</span>
+          <span>{t('marketPlaces:NoOrders')}</span>
         </DefaultReturn>
       );
     }
@@ -215,12 +223,15 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
   return (
     <Container>
       <Header>
-        <Title title="Marketplace Details" route="/marketplaces" />
+        <Title
+          title={t('marketPlaces:MarketplaceDetails')}
+          route="/marketplaces"
+        />
       </Header>
       <CardTabContainer>
         <CardHeader>
           <CardHeaderItem selected={true}>
-            <span>Overview</span>
+            <span>{t('common:Tabs.Overview')}</span>
           </CardHeaderItem>
         </CardHeader>
         <CardContent>
@@ -246,20 +257,23 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
   );
 };
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const paths: string[] = [];
-
+export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
   return {
-    paths,
-    fallback: 'blocking',
+    paths: [], //indicates that no page needs be created at build time
+    fallback: 'blocking', //indicates the type of fallback
   };
 };
 
 export const getStaticProps: GetStaticProps<IMarketplaceResponse> = async ({
   params,
+  locale = 'en',
 }) => {
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
-
+  const translations = await serverSideTranslations(
+    locale,
+    ['common', 'marketPlaces'],
+    nextI18nextConfig,
+  );
   let props = {} as IMarketplaceResponse;
 
   const marketplaceId = params?.marketplace;
@@ -273,8 +287,10 @@ export const getStaticProps: GetStaticProps<IMarketplaceResponse> = async ({
   if (!marketplaceResponse?.data?.assets) {
     return redirectProps;
   }
-  props = marketplaceResponse;
-  return { props };
+
+  props = { ...marketplaceResponse }; // Coloque apenas os dados da API
+
+  return { props: { ...props, ...translations } }; // Retorna props combinado com translations
 };
 
 export default MarketplaceDetails;

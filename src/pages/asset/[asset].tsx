@@ -81,7 +81,7 @@ import { BalanceContainer, RowContent } from '@/views/proposals/detail';
 import { FilterByDate } from '@/views/transactions';
 import { ButtonExpand } from '@/views/transactions/detail';
 import { ReceiveBackground } from '@/views/validator';
-import { GetStaticProps } from 'next';
+import { GetStaticPaths, GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
@@ -1345,6 +1345,13 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       </Tabs>
     </Container>
   );
+};
+
+export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
+  return {
+    paths: [], //indicates that no page needs be created at build time
+    fallback: 'blocking', //indicates the type of fallback
+  };
 };
 
 export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {

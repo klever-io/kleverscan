@@ -23,14 +23,22 @@
     "Blocks": "Blocos",
     "Transactions": "Transações",
     "Validators": "Validadores",
-    "Proposals": "Propostas"
+    "Proposals": "Propostas",
+    "Proposal": "Proposta",
+    "Proposal Details": "Detalhes da Proposta"
   },
   "Tabs": {
     "Overview": "Visão Geral"
   },
   "Buttons": {
     "Expand": "Expandir",
-    "Hide": "Ocultar"
+    "Hide": "Ocultar",
+    "Details": "Detalhes",
+    "Status": "Estado"
+  },
+  "Statements": {
+    "Yes": "Sim",
+    "No": "Não"
   },
   "Date": {
     "Elapsed Time": "atrás",

@@ -5,21 +5,23 @@ import { getContractType } from '@/utils';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import { parseAddress } from '@/utils/parseValues';
 import {
-  CardBackground,
-  CardIconContainer,
   SpanWithLimit,
   TransactionAmount,
   TransactionContainerContent,
   TransactionData,
-  TransactionIcon,
   TransactionRow,
   TransactionStatus,
   TransactionTimer,
 } from '@/views/home';
 import { useTranslation } from 'next-i18next';
+import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { ITransaction } from '../../types';
+import {
+  NextImageCardWrapper,
+  StackedImageWrapper,
+} from '../Home/NewCards/style';
 import Skeleton from '../Skeleton';
 
 export interface IContract {
@@ -57,10 +59,6 @@ const TransactionItem: React.FC<ITransaction> = ({
     assetId = 'KLV';
   }
   const precision = contractFilter?.precision ?? 0;
-  const transactionIcon = [
-    '/homeCards/transactionsBackground.svg',
-    '/homeCards/transaction.svg',
-  ];
   useEffect(() => {
     const getParams = async () => {
       if (contract) {
@@ -98,10 +96,26 @@ const TransactionItem: React.FC<ITransaction> = ({
   return (
     <TransactionRow isLoading={!!amount}>
       {!isMobile && (
-        <CardIconContainer>
-          <CardBackground src="/homeCards/transactionsBackground.svg" />
-          <TransactionIcon src="/homeCards/transaction.svg" />
-        </CardIconContainer>
+        <StackedImageWrapper>
+          <NextImageCardWrapper>
+            <Image
+              src="/homeCards/transactionsBackground.svg"
+              alt="transaction icon background"
+              width={44}
+              height={44}
+              loader={({ src, width }) => `${src}?w=${width}`}
+            />
+          </NextImageCardWrapper>
+          <NextImageCardWrapper>
+            <Image
+              src="/homeCards/transaction.svg"
+              alt="transaction icon"
+              width={18}
+              height={18}
+              loader={({ src, width }) => `${src}?w=${width}`}
+            />
+          </NextImageCardWrapper>
+        </StackedImageWrapper>
       )}
       <TransactionContainerContent>
         <TransactionData>

@@ -1,11 +1,12 @@
 import { HomeData } from '@/contexts/mainPage';
-import { CardBackground, CardIcon } from '@/views/home';
+import Image from 'next/image';
 import React, { useContext } from 'react';
 import {
   CardContainer,
   CardContent,
   CardSection,
-  NewCardsIconContainer,
+  NextImageValidatorWrapper,
+  StackedImageWrapper,
   Title,
 } from '../style';
 
@@ -15,10 +16,26 @@ const ValidatorsCard: React.FC = () => {
     <CardContainer>
       <Title>Validators</Title>
       <CardContent>
-        <NewCardsIconContainer>
-          <CardIcon src="/homeCards/validatorsIcon.svg" />
-          <CardBackground src="/homeCards/validatorsBackground.svg" />
-        </NewCardsIconContainer>
+        <StackedImageWrapper>
+          <NextImageValidatorWrapper>
+            <Image
+              src="/homeCards/validatorsIcon.svg"
+              alt="Validators icon"
+              width={32}
+              height={32}
+              loader={({ src, width }) => `${src}?w=${width}`}
+            />
+          </NextImageValidatorWrapper>
+          <NextImageValidatorWrapper>
+            <Image
+              src="/homeCards/validatorsBackground.svg"
+              alt="Validators icon background"
+              width={48}
+              height={48}
+              loader={({ src, width }) => `${src}?w=${width}`}
+            />
+          </NextImageValidatorWrapper>
+        </StackedImageWrapper>
         <CardSection>
           <span>Active Vals.</span>
           <span>{activeValidators}</span>

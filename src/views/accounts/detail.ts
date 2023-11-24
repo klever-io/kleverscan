@@ -129,6 +129,7 @@ export const ItemContentPermissions = styled.div<{
   display: flex;
   align-items: center;
   width: 100%;
+  gap: 0.2rem;
   border: none !important;
   span {
     min-width: 24px !important;
@@ -174,7 +175,7 @@ export const ItemContainerPermissions = styled.div<{ isOperations?: boolean }>`
   gap: 0.25rem;
   strong {
     max-width: 9rem;
-    min-width: 9rem;
+    min-width: 2rem;
   }
 `;
 
@@ -275,4 +276,16 @@ export const ValidOperation = styled(TickSquare).attrs(() => ({
 export const RewardsAvailableContainer = styled.div`
   display: flex;
   flex-direction: column;
+`;
+
+export const FrozenContainerLi = styled.li`
+  div {
+    padding: 0;
+  }
+`;
+
+export const Em = styled.em`
+  font-style: normal;
+  min-width: 8rem;
+  margin-right: 5px;
 `;

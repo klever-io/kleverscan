@@ -51,7 +51,7 @@ describe('Component: Tabs/Proposals', () => {
       'Proposer',
       'Time',
       'Upvotes/Total Staked',
-      'Status',
+      'common:Buttons.Status',
       'Network Parameters',
     ];
 
@@ -80,6 +80,7 @@ describe('Component: Tabs/Proposals', () => {
         />,
       );
     });
+
     const proposalNumber = screen.getByText('#0');
     const proposer = screen.getAllByText(
       parseAddress(parsedProposals[0].proposer, 20),
@@ -89,7 +90,7 @@ describe('Component: Tabs/Proposals', () => {
     const upVotesAndTotalStaked = screen.getAllByText('Upvotes/Total Staked')[0]
       .nextSibling?.firstChild;
     const status = screen.getAllByText('ApprovedProposal')[0];
-    const details = screen.getAllByText('Details')[0];
+    const details = screen.getAllByText('common:Buttons.Details')[0];
 
     expect(proposalNumber).toBeInTheDocument();
     expect(proposer).toBeInTheDocument();

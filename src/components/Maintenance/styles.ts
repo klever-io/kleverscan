@@ -22,17 +22,6 @@ export const Container = styled.div`
   }
 `;
 
-export const MaintenanceImage = styled.img`
-  z-index: 1;
-  background: '';
-  margin: auto;
-  width: 100%;
-  height: 50vh;
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    display: none;
-  }
-`;
-
 export const Message = styled.div`
   span {
     color: ${props => props.theme.black};

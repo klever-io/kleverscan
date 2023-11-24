@@ -140,13 +140,6 @@ export const Row = styled.div`
   }
 `;
 
-export const Logo = styled.img`
-  width: 3.354rem;
-  height: 3.354rem;
-  border-radius: 50%;
-  border: 2px solid ${props => props.theme.borderLogo};
-`;
-
 export const LetterLogo = styled.div`
   width: 3.354rem;
   height: 3.354rem;

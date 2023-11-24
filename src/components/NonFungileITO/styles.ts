@@ -44,16 +44,6 @@ export const PackItem = styled.div`
   }
 `;
 
-export const Cube = styled.img`
-  width: 7rem;
-  margin-bottom: -3.6rem;
-  z-index: 998;
-
-  @media (max-width: 890px) {
-    width: 5rem;
-  }
-`;
-
 export const BuyButton = styled.div`
   width: 100%;
   background-color: ${props => props.theme.violet};
@@ -81,9 +71,4 @@ export const BuyButton = styled.div`
 
 export const LoaderWrapper = styled.div`
   margin-top: 0.4rem;
-`;
-
-export const NFTimg = styled.img<{ imgLoading: boolean }>`
-  border-radius: 0.8rem;
-  display: ${props => (props.imgLoading ? 'none' : 'block')};
 `;

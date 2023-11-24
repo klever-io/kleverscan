@@ -3,6 +3,7 @@ import Tour from '@/components/Tour';
 import { useExtension } from '@/contexts/extension';
 import { useScroll } from '@/utils/hooks';
 import { parseAddress } from '@/utils/parseValues';
+import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import WalletHelp from '../WalletHelp';
@@ -14,7 +15,6 @@ import {
   ConnectContainer,
   ConnectedWallet,
   GraySpan,
-  WalletIcon,
 } from './styles';
 
 interface IConnectWallet {
@@ -59,7 +59,13 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
         <>
           <ConnectContainer>
             <ConnectButton onClick={handleClick}>
-              <WalletIcon src="/Wallet.svg" />
+              <Image
+                src="/Wallet.svg"
+                alt="Wallet"
+                loader={({ src, width }) => `${src}?w=${width}`}
+                width={25}
+                height={25}
+              />
               <span>Connect wallet</span>
             </ConnectButton>
           </ConnectContainer>
@@ -103,7 +109,14 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
                 )}
                 {!walletAddress && (
                   <>
-                    <WalletIcon src="/Wallet.svg" />
+                    <Image
+                      width={25}
+                      height={25}
+                      src="/Wallet.svg"
+                      alt="Wallet"
+                      loader={({ src, width }) => `${src}?w=${width}`}
+                    />
+
                     <span>Connect Wallet</span>
                   </>
                 )}

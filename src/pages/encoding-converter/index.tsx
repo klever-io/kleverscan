@@ -20,19 +20,27 @@ import {
   utf8ToHex,
 } from '@/utils/formatFunctions';
 import { Content } from '@/views/verify-signature/detail';
+import { GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useState } from 'react';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 const EncodingConverter: React.FC = () => {
+  const { t } = useTranslation('encodingConverter');
   const cardHeaders = [
     'Base64 / UTF8',
     'Hex / UTF8',
-    'PublicKey / Address',
-    'PEM File / Address - PrivateKey',
+    ` ${t('PublicKey')} / ${t('Address')}`,
+    `${t('PEM File')}  / ${t('Address')} - ${t('PrivateKey')} `,
   ];
   const [selectedCard, setSelectedCard] = useState<string>(cardHeaders[0]);
 
   const SelectedComponent: React.FC = () => {
-    const placeHolderUTF8 = 'Enter your UTF-8 encoded text here...';
+    const placeHolderUTF8 = `${t('PlaceHolderEncoded', {
+      text: `${t('Text')}`,
+      converter: `${t('UTF8')}`,
+    })}`;
     switch (selectedCard) {
       case 'Base64 / UTF8':
         const base64Utf8Props: IPropsEncodingConverter = {
@@ -42,7 +50,10 @@ const EncodingConverter: React.FC = () => {
           },
           placeHolder: {
             encoding: placeHolderUTF8,
-            decoding: 'Enter your Base64-encoded data here...',
+            decoding: `${t('PlaceHolderEncoded', {
+              text: `${t('Data')}`,
+              converter: `${t('Base64')}`,
+            })}`,
           },
           decoding: base64ToUtf8,
           encoded: utf8ToBase64,
@@ -56,23 +67,34 @@ const EncodingConverter: React.FC = () => {
           },
           placeHolder: {
             encoding: placeHolderUTF8,
-            decoding: 'Enter your hexadecimal values here...',
+            decoding: `${t('PlaceHolderEncoded', {
+              text: `${t('Values')}`,
+              converter: `${t('hexadecimal')}`,
+            })}`,
           },
           decoding: hexToUtf8,
           encoded: utf8ToHex,
         };
         return <FormEncodingConverter {...hexUtf8Props} />;
-      case 'PEM File / Address - PrivateKey':
+      case `${t('PEM File')}  / ${t('Address')} - ${t('PrivateKey')} `:
         return <FormPEMFileConverter />;
-      case 'PublicKey / Address':
+      case ` ${t('PublicKey')} / ${t('Address')}`:
         const publicKeyAddressPorps: IPropsEncodingConverter = {
           titleTextArea: {
-            encoding: 'PublicKey',
-            decoding: 'Address',
+            encoding: `${t('PublicKey')}`,
+            decoding: `${t('Address')}`,
           },
           placeHolder: {
-            encoding: 'Enter your publicKey values here...',
-            decoding: 'Enter your address values here...',
+            encoding: `${t('PlaceHolderValues', {
+              data: `${t('Values')}`,
+              key: `${t('PublicKey')}`,
+              type: `${t('PronomePossessivo.feminino')}`,
+            })}`,
+            decoding: `${t('PlaceHolderValues', {
+              data: `${t('Values')}`,
+              key: `${t('Address')}`,
+              type: `${t('PronomePossessivo.masculino')}`,
+            })}`,
           },
           encoded: publicKeyToAddress,
           decoding: addressToPublicKey,
@@ -86,7 +108,7 @@ const EncodingConverter: React.FC = () => {
   return (
     <Container>
       <Header>
-        <Title title="Encoding Converter" />
+        <Title title={t('Encoding Converter')} />
       </Header>
       <Content>
         <CardHeader>
@@ -106,6 +128,16 @@ const EncodingConverter: React.FC = () => {
       </Content>
     </Container>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['encodingConverter', 'table'],
+    nextI18nextConfig,
+  );
+
+  return { props };
 };
 
 export default EncodingConverter;

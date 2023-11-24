@@ -30,6 +30,9 @@ const SelectIcons: React.FC<IFooterItems> = ({ name, icon, url }) => {
               alt={`nav-${icon}`}
               width={24}
               height={24}
+              loader={({ src, width }: { src: string; width: number }) =>
+                `${src}?w=${width}`
+              }
             />
             <p>{name}</p>
           </IconContainer>

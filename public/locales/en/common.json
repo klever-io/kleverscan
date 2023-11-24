@@ -1,6 +1,7 @@
 {
   "EmptyData": "Oops! Apparently no data here.",
   "Search Address, Block, Transaction": "Search Address, Block, Transaction, Asset",
+  "dailyTransactions": "Daily Transactions",
   "Cards": {
     "Total Accounts": "Total Accounts",
     "Total Transactions": "Total Transactions",
@@ -22,16 +23,42 @@
     "Blocks": "Blocks",
     "Transactions": "Transactions",
     "Validators": "Validators",
-    "Proposals": "Proposals"
+    "Proposals": "Proposals",
+    "Proposal": "Proposal",
+    "Proposal Details": "Proposals Details"
   },
   "Tabs": {
-    "Overview": "Overview"
+    "Overview": "Overview",
+    "More": "More",
+    "Holders": "Holders"
   },
   "Buttons": {
     "Expand": "Expand",
-    "Hide": "Hide"
+    "Hide": "Hide",
+    "All": "All",
+    "Asset Type": "Asset Type",
+    "Show": "Show {{type}}",
+    "Details": "Details",
+    "Status": "Status"
+  },
+  "Properties": {
+    "Can": "Can {{type}}",
+    "Freeze": "Freeze",
+    "Wipe": "Wipe",
+    "Pause": "Pause",
+    "Mint": "Mint",
+    "Burn": "Burn",
+    "Change Owner": "Change Owner",
+    "Add Roles": "Add Roles",
+    "Paused": "Paused",
+    "NFT Mint Stopped": "NFT mint Stopped"
+  },
+  "Statements": {
+    "Yes": "Yes",
+    "No": "No"
   },
   "Date": {
+    "Updated": "Updated",
     "Elapsed Time": "ago",
     "Today": "Today",
     "Yesterday": "Yesterday",

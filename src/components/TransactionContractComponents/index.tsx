@@ -20,7 +20,6 @@ import {
   IIndexedContract,
   IITOTriggerContract,
   IPackInfo,
-  IParameter,
   IProposalContract,
   ISellContract,
   ISetAccountNameContract,
@@ -95,9 +94,17 @@ import {
   StrongWidth,
   URIsWrapper,
 } from '@/views/transactions/detail';
+import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useState } from 'react';
+import { TFunction } from 'react-i18next';
 import Tooltip from '../Tooltip';
+
+interface IAssetTriggerTypeData {
+  parameter: IAssetTriggerContract;
+  precision: number;
+  t: TFunction<'common', undefined>;
+}
 
 const getNFTNonces = (
   filteredReceipts: IBuyReceipt[],
@@ -295,6 +302,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
   contractIndex,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('common');
   const parameter = par as ICreateAssetContract;
   const filteredReceipts = rec as ICreateAssetReceipt[];
   const ownerAddress = parameter?.ownerAddress || sender;
@@ -540,6 +548,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
                     <span>
                       {statusWithIcon(
                         parameter?.properties?.canFreeze ? true : false,
+                        t,
                       )}
                     </span>
                   </StatusIconWrapper>
@@ -548,6 +557,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
                     <span>
                       {statusWithIcon(
                         parameter?.properties?.canMint ? true : false,
+                        t,
                       )}
                     </span>
                   </StatusIconWrapper>
@@ -556,6 +566,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
                     <span>
                       {statusWithIcon(
                         parameter?.properties?.canBurn ? true : false,
+                        t,
                       )}
                     </span>
                   </StatusIconWrapper>
@@ -564,6 +575,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
                     <span>
                       {statusWithIcon(
                         parameter?.properties?.canPause ? true : false,
+                        t,
                       )}
                     </span>
                   </StatusIconWrapper>
@@ -574,6 +586,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
                     <span>
                       {statusWithIcon(
                         parameter?.properties?.canWipe ? true : false,
+                        t,
                       )}
                     </span>
                   </StatusIconWrapper>
@@ -581,12 +594,14 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
                     <strong>Change Owner:&nbsp;</strong>
                     {statusWithIcon(
                       parameter?.properties?.canChangeOwner ? true : false,
+                      t,
                     )}
                   </StatusIconWrapper>
                   <StatusIconWrapper>
                     <strong>Add Roles:&nbsp;</strong>
                     {statusWithIcon(
                       parameter?.properties?.canAddRoles ? true : false,
+                      t,
                     )}
                   </StatusIconWrapper>
                 </div>
@@ -620,7 +635,10 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
             <StatusIconWrapper>
               <strong>Is Paused:&nbsp;</strong>
               <span>
-                {statusWithIcon(parameter?.attributes?.isPaused ? true : false)}
+                {statusWithIcon(
+                  parameter?.attributes?.isPaused ? true : false,
+                  t,
+                )}
               </span>
             </StatusIconWrapper>
             <StatusIconWrapper>
@@ -628,6 +646,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
               <span>
                 {statusWithIcon(
                   parameter?.attributes?.isNFTMintStopped ? true : false,
+                  t,
                 )}
               </span>
             </StatusIconWrapper>
@@ -641,6 +660,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
                   parameter?.attributes?.isRoyaltiesChangeStopped
                     ? true
                     : false,
+                  t,
                 )}
               </span>
             </StatusIconWrapper>
@@ -746,6 +766,7 @@ export const ValidatorConfig: React.FC<IIndexedContract> = ({
   parameter: par,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('common');
   const param = par as unknown as IValidatorConfigContract;
   const parameter = param.config;
 
@@ -777,7 +798,7 @@ export const ValidatorConfig: React.FC<IIndexedContract> = ({
           <span>
             <strong>Can Delegate</strong>
           </span>
-          <span>{statusWithIcon(parameter?.canDelegate)}</span>{' '}
+          <span>{statusWithIcon(parameter?.canDelegate, t)}</span>{' '}
         </Row>
       )}
       <Row>
@@ -1407,6 +1428,7 @@ export const AssetTrigger: React.FC<IIndexedContract> = ({
   filteredReceipts: rec,
   sender,
 }) => {
+  const { t } = useTranslation('common');
   const parameter = par as IAssetTriggerContract;
   const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
   const precision = usePrecision(assetID);
@@ -1441,7 +1463,7 @@ export const AssetTrigger: React.FC<IIndexedContract> = ({
           {renderNFTNonces(noncesReceipts)}
         </Row>
       )}
-      {renderAssetTriggerTypeData(parameter, precision)}
+      {renderAssetTriggerTypeData({ parameter, precision, t })}
       {renderMetadata()}
     </>
   );
@@ -2681,11 +2703,12 @@ const renderPackInfoComponents = (
   );
 };
 
-const renderAssetTriggerTypeData: React.FC<IAssetTriggerContract> = (
-  parameter: IParameter,
-  precision: number,
-): any => {
-  const par = parameter as IAssetTriggerContract;
+const renderAssetTriggerTypeData: React.FC<IAssetTriggerTypeData> = ({
+  parameter,
+  precision,
+  t,
+}): any => {
+  const par = parameter;
   const triggerType = par?.triggerType;
 
   const toAddressReturn = () => (
@@ -2800,11 +2823,11 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerContract> = (
 
               <RoleDiv>
                 <RoleStrong>HasRoleMint</RoleStrong>
-                <span>{statusWithIcon(par.role.hasRoleMint)}</span>
+                <span>{statusWithIcon(par.role.hasRoleMint, t)}</span>
               </RoleDiv>
               <RoleDiv>
                 <RoleStrong>HasRoleSetITOPrices</RoleStrong>
-                <span>{statusWithIcon(par.role.hasRoleSetITOPrices)}</span>
+                <span>{statusWithIcon(par.role.hasRoleSetITOPrices, t)}</span>
               </RoleDiv>
             </RoleWrapper>
           </FrozenContainer>

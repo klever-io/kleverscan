@@ -178,8 +178,9 @@ export const Row = styled.div<{ isMobileRow?: boolean }>`
 
   > span {
     &:first-child {
-      width: 10rem;
+      width: 11rem;
       flex-direction: column;
+      white-space: normal;
     }
   }
 

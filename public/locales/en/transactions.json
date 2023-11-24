@@ -3,5 +3,160 @@
   "Daily Transactions": "Daily Transactions",
   "From": "From",
   "To": "To",
-  "Last Transactions": "Last Transactions"
+  "Last Transactions": "Last Transactions",
+  "Threshold": "Threshold",
+  "ResultCode": "Result Code",
+  "Epoch": "Epoch",
+  "BlockNumber": "Block Number",
+  "Nonce": "Nonce",
+  "KDAFee": "KDA Fee",
+  "Signature": "Signature",
+  "Collapse": "Collapse",
+  "Type": "Type",
+  "AssetId": "Asset Id",
+  "Precision": "Precision",
+  "Royalties": "Royalties",
+  "Address": "Address",
+  "Amount": "Amount",
+  "Unjail": "Unjail",
+  "Transfer": {
+    "Transfer": "Transfer",
+    "Percentage": "Percentage",
+    "Transfer Fixed": "Transfer Fixed",
+    "Total paid": "Total paid"
+  },
+  "CreateAsset": {
+    "Create Asset": "Create Asset",
+    "Name": "Name",
+    "Owner": "Owner",
+    "Ticker": "Ticker",
+    "Initial Supply": "Initial Supply",
+    "Max Supply": "Max Supply",
+    "Market Fixed": "Market Fixed",
+    "Market Percent": "Market Percent",
+    "ITO": "ITO {{type}}",
+    "Fixed": "Fixed",
+    "Transfer Percentage": "Transfer Percentage",
+    "Staking": "Staking",
+    "Claim Type": "Claim Type",
+    "Unstake Time": "Unstake Time",
+    "Withdraw Time": "Withdraw Time",
+    "Properties": "Properties",
+    "Attributes": "Attributes",
+    "Is Paused": "Is Paused",
+    "Can Mint NFT": "Can Mint NFT",
+    "Change Stopped": "Change Stopped"
+  },
+  "CreateValidator": {
+    "Create Validator": "Create Validator",
+    "Logo": "Logo",
+    "Can Delegate": "Can Delegate",
+    "Commission": "Commission",
+    "Max Delegation": "Max Delegation",
+    "Reward Address": "Reward Address"
+  },
+  "ValidatorConfig": {
+    "Validator Config": "Validator Config",
+    "BLS Public Key": "BLS Public Key"
+  },
+  "FreezeUnfreeze": {
+    "Freeze": "Freeze",
+    "Bucket Id": "Bucket Id",
+    "Unfreeze": "Unfreeze",
+    "Available Epoch": "Available Epoch",
+    "Claimed Rewards": "Claimed Rewards",
+    "Undelegated": "Undelegated"
+  },
+  "DelegateUndelegate": {
+    "Delegate": "Delegate",
+    "Undelegate": "Undelegate",
+    "Amount Delegated": "Amount Delegated",
+    "Rewards Claimed": "Rewards Claimed",
+    "Marketplace ID": "Marketplace ID",
+    "OrderId": "OrderId",
+    "AssetID Received": "AssetID Received"
+  },
+  "Withdraw": {
+    "Withdraw": "Withdraw",
+    "Withdraw Type": "Withdraw Type"
+  },
+  "Claim": {
+    "Claim": "Claim",
+    "Claim Type": "Claim Type",
+    "Asset Id Received": "Asset Id Received"
+  },
+  "AssetTrigger": {
+    "Asset Trigger": "Asset Trigger",
+    "Trigger Type": "Trigger Type",
+    "NFTs Nonces": "NFTs Nonces",
+    "KDAPool": "KDAPool",
+    "Active": "Active",
+    "Admin Address": "Admin Address",
+    "fRationKDA": "fRationKDA",
+    "fRationKLV": "fRationKLV",
+    "Role": "Role",
+    "HasRoleMint": "HasRoleMint",
+    "HasRoleSetITOPrices": "HasRoleSetITOPrices",
+    "MIME": "MIME",
+    "Min Epochs To": "min Epochs To {{type}}",
+    "Unstake": "Unstake"
+  },
+  "SetAccountName": "Set Account Name",
+  "Proposal": {
+    "Proposal": "Proposal",
+    "Proposal Id": "Proposal Id",
+    "Epoch Duration": "Epoch Duration",
+    "Description": "Description",
+    "Parameters": "Parameters"
+  },
+  "Vote": "Vote",
+  "ConfigITO": {
+    "Config ITO": "Config ITO",
+    "Receiver": "Receiver",
+    "Status": "Status",
+    "Max Amount": "Max Amount"
+  },
+  "SetITOPrices": {
+    "Set ITO Prices": "Set ITO Prices"
+  },
+  "Buy": {
+    "Buy": "Buy",
+    "Price": "Price",
+    "Currency Id": "Currency Id",
+    "Order Id": "Order Id",
+    "in": "in",
+    "Buy Type": "Buy Type",
+    "Sell": "Sell",
+    "Market Type": "Market Type",
+    "Reserve Price": "Reserve Price",
+    "End Time": "End Time",
+    "Start Time": "Start Time"
+  },
+  "ConfigMarketplace": "Config Marketplace",
+  "CancelMarketOrder": "Cancel Market Order",
+  "CreateMarketplace": "Create Marketplace",
+  "ReferralAddress": "Referral Address",
+  "ReferralPercent": "Referral Percent",
+  "UpdateAccountPermission": {
+    "Update Account Permission": "Update Account Permission",
+    "Permission Name": "Permission Name",
+    "Permission Type": "Permission Type",
+    "Operations": "Operations",
+    "Signers": "Signers"
+  },
+  "Deposit": {
+    "Deposit": "Deposit",
+    "Deposit Type": "Deposit Type"
+  },
+  "ITOTrigger": {
+    "ITO Trigger": "ITO Trigger",
+    "White List Info": "White List Info",
+    "Receiver Address": "Receiver Address",
+    "Default Limit": "Default Limit",
+    "Per Address": "per Address",
+    "White List Status": "White List Status",
+    "White List": "White List",
+    "Pack Info": "Pack Info"
+  },
+  "Limit": "Limit"
 }

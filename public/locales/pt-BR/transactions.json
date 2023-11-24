@@ -3,5 +3,160 @@
   "Daily Transactions": "Transações Diárias",
   "From": "De",
   "To": "Para",
-  "Last Transactions": "Últimas Transações"
+  "Last Transactions": "Últimas Transações",
+  "Threshold": "limite",
+  "ResultCode": "Código do Resultado",
+  "Epoch": "Época",
+  "BlockNumber": "Número do Bloco",
+  "Nonce": "Número Único",
+  "KDAFee": "Taxa KDA",
+  "Signature": "Assinatura",
+  "Collapse": "Recolher",
+  "Type": "Tipo",
+  "AssetId": "ID do Ativo",
+  "Precision": "Precisão",
+  "Royalties": "Royalties",
+  "Address": "Endereço",
+  "Amount": "Quantidade",
+  "Unjail": "Desprender",
+  "Transfer": {
+    "Transfer": "Transferir",
+    "Percentage": "Porcentagem",
+    "Transfer Fixed": "Transferência Fixa",
+    "Total paid": "Total Pago"
+  },
+  "CreateAsset": {
+    "Create Asset": "Criar Ativo",
+    "Name": "Nome",
+    "Owner": "Proprietário",
+    "Ticker": "Ticker",
+    "Initial Supply": "Fornecimento Inicial",
+    "Max Supply": "Fornecimento Máximo",
+    "Market Fixed": "Mercado Fixo",
+    "Market Percent": "Porcentagem do Mercado",
+    "ITO": "ITO {{type}}",
+    "Fixed": "Fixo",
+    "Transfer Percentage": "Porcentagem de Transferência",
+    "Staking": "Apostar",
+    "Claim Type": "Tipo de Reclamação",
+    "Unstake Time": "Tempo de Desbloqueio",
+    "Withdraw Time": "Tempo de Retirada",
+    "Properties": "Propriedades",
+    "Attributes": "Atributos",
+    "Is Paused": "Está Pausado",
+    "Can Mint NFT": "Pode Criar NFT",
+    "Change Stopped": "Parar Mudança"
+  },
+  "CreateValidator": {
+    "Create Validator": "Criar Validador",
+    "Logo": "Logotipo",
+    "Can Delegate": "Pode Delegar",
+    "Commission": "Comissão",
+    "Max Delegation": "Delegação Máxima",
+    "Reward Address": "Endereço de Recompensa"
+  },
+  "ValidatorConfig": {
+    "Validator Config": "Configuração do Validador",
+    "BLS Public Key": "Chave Pública BLS"
+  },
+  "FreezeUnfreeze": {
+    "Freeze": "Congelar",
+    "Bucket Id": "ID do Bucket",
+    "Unfreeze": "Descongelar",
+    "Available Epoch": "Época Disponível",
+    "Claimed Rewards": "Recompensas Reivindicadas",
+    "Undelegated": "Não Delegado"
+  },
+  "DelegateUndelegate": {
+    "Delegate": "Delegar",
+    "Undelegate": "Revogar Delegação",
+    "Amount Delegated": "Quantidade Delegada",
+    "Rewards Claimed": "Recompensas Reivindicadas",
+    "Marketplace ID": "ID do Marketplace",
+    "OrderId": "ID do Pedido",
+    "AssetID Received": "ID do Ativo Recebido"
+  },
+  "Withdraw": {
+    "Withdraw": "Retirar",
+    "Withdraw Type": "Tipo de Retirada"
+  },
+  "Claim": {
+    "Claim": "Reivindicar",
+    "Claim Type": "Tipo de Reivindicação",
+    "Asset Id Received": "ID do Ativo Recebido"
+  },
+  "AssetTrigger": {
+    "Asset Trigger": "Gatilho do Ativo",
+    "Trigger Type": "Tipo de Gatilho",
+    "NFTs Nonces": "NFTs Nonces",
+    "KDAPool": "Piscina KDA",
+    "Active": "Ativo",
+    "Admin Address": "Endereço do Administrador",
+    "fRationKDA": "fRationKDA",
+    "fRationKLV": "fRationKLV",
+    "Role": "Função",
+    "HasRoleMint": "Possui Função de Criar",
+    "HasRoleSetITOPrices": "Possui Função de Configurar Preços do ITO",
+    "MIME": "MIME",
+    "Min Epochs To": "Mínimo de Épocas para {{type}}",
+    "Unstake": "Desbloquear"
+  },
+  "SetAccountName": "Definir Nome da Conta",
+  "Proposal": {
+    "Proposal": "Proposta",
+    "Proposal Id": "ID da Proposta",
+    "Epoch Duration": "Duração da Época",
+    "Description": "Descrição",
+    "Parameters": "Parâmetros"
+  },
+  "Vote": "Votar",
+  "ConfigITO": {
+    "Config ITO": "Configurar ITO",
+    "Receiver": "Receptor",
+    "Status": "Status",
+    "Max Amount": "Valor Máximo"
+  },
+  "SetITOPrices": {
+    "Set ITO Prices": "Definir Preços do ITO"
+  },
+  "Buy": {
+    "Buy": "Comprar",
+    "Price": "Preço",
+    "Currency Id": "ID da Moeda",
+    "Order Id": "ID do Pedido",
+    "in": "em",
+    "Buy Type": "Tipo de Compra",
+    "Sell": "Vender",
+    "Market Type": "Tipo de Mercado",
+    "Reserve Price": "Preço de Reserva",
+    "End Time": "Hora de Fim",
+    "Start Time": "Hora de Início"
+  },
+  "ConfigMarketplace": "Configurar Marketplace",
+  "CancelMarketOrder": "Cancelar Pedido do Marketplace",
+  "CreateMarketplace": "Criar Marketplace",
+  "ReferralAddress": "Endereço de Referência",
+  "ReferralPercent": "Porcentagem de Referência",
+  "UpdateAccountPermission": {
+    "Update Account Permission": "Atualizar Permissão da Conta",
+    "Permission Name": "Nome da Permissão",
+    "Permission Type": "Tipo de Permissão",
+    "Operations": "Operações",
+    "Signers": "Assinantes"
+  },
+  "Deposit": {
+    "Deposit": "Depósito",
+    "Deposit Type": "Tipo de Depósito"
+  },
+  "ITOTrigger": {
+    "ITO Trigger": "Gatilho do ITO",
+    "White List Info": "Informação da Lista Branca",
+    "Receiver Address": "Endereço do Receptor",
+    "Default Limit": "Limite Padrão",
+    "Per Address": "por Endereço",
+    "White List Status": "Status da Lista Branca",
+    "White List": "Lista Branca",
+    "Pack Info": "Informações do Pacote"
+  },
+  "Limit": "Limite"
 }

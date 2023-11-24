@@ -288,9 +288,9 @@ export const getStaticProps: GetStaticProps<IMarketplaceResponse> = async ({
     return redirectProps;
   }
 
-  props = { ...marketplaceResponse }; // Coloque apenas os dados da API
+  props = { ...marketplaceResponse };
 
-  return { props: { ...props, ...translations } }; // Retorna props combinado com translations
+  return { props: { ...props, ...translations } };
 };
 
 export default MarketplaceDetails;

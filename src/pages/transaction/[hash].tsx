@@ -74,9 +74,12 @@ import {
 } from '@/views/transactions/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { GetStaticPaths, GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 interface IRawTxTheme {
   base00: string;
@@ -157,6 +160,7 @@ export const OverviewDetails: React.FC<IOverviewDetails> = ({
   loading = false,
   MultiSignList,
 }) => {
+  const { t } = useTranslation(['table', 'transactions', 'common']);
   const [expandSignature, setExpandSignature] = useState(false);
 
   const handleExpandSignature = () => {
@@ -169,7 +173,7 @@ export const OverviewDetails: React.FC<IOverviewDetails> = ({
         {MultiSignList && <MultiSignList />}
         <Row>
           <span>
-            <strong>Hash</strong>
+            <strong>{t('table:Transactions.Hash')}</strong>
           </span>
           {loading ? (
             <Skeleton />
@@ -186,7 +190,7 @@ export const OverviewDetails: React.FC<IOverviewDetails> = ({
         {ThresholdComponent && (
           <Row>
             <span>
-              <strong>Threshold</strong>
+              <strong>{t('transactions:Threshold')}</strong>
             </span>
             <CenteredRow>
               {loading ? <Skeleton /> : <ThresholdComponent />}
@@ -196,7 +200,7 @@ export const OverviewDetails: React.FC<IOverviewDetails> = ({
         {status && StatusIcon && (
           <Row>
             <span>
-              <strong>Status</strong>
+              <strong>{t('table:Transactions.Status')}</strong>
             </span>
             <Status status={status}>
               <StatusIcon />
@@ -207,7 +211,7 @@ export const OverviewDetails: React.FC<IOverviewDetails> = ({
         {resultCode && (
           <Row>
             <span>
-              <strong>Result Code</strong>
+              <strong>{t('transactions:ResultCode')}</strong>
             </span>
             <span>
               <p>{resultCode}</p>
@@ -217,7 +221,7 @@ export const OverviewDetails: React.FC<IOverviewDetails> = ({
         {block && (
           <Row>
             <span>
-              <strong>Epoch</strong>
+              <strong>{t('transactions:Epoch')}</strong>
             </span>
             <span>
               <p>{block?.epoch}</p>
@@ -227,7 +231,7 @@ export const OverviewDetails: React.FC<IOverviewDetails> = ({
         {blockNum && (
           <Row>
             <span>
-              <strong>Block Number</strong>
+              <strong>{t('transactions:BlockNumber')}</strong>
             </span>
             <span>
               <p>{blockNum || 0}</p>
@@ -236,13 +240,13 @@ export const OverviewDetails: React.FC<IOverviewDetails> = ({
         )}
         <Row>
           <span>
-            <strong>Nonce</strong>
+            <strong>{t('transactions:Nonce')}</strong>
           </span>
           <span>{loading ? <Skeleton /> : <p>{nonce}</p>}</span>
         </Row>
         <Row>
           <span>
-            <strong>From</strong>
+            <strong>{t('transactions:From')}</strong>
           </span>
           {loading ? (
             <Skeleton />
@@ -258,14 +262,14 @@ export const OverviewDetails: React.FC<IOverviewDetails> = ({
         {KappFeeRow && (
           <Row>
             <span>
-              <strong>kApp Fee</strong>
+              <strong>{t('table:Blocks.kApp Fees')}</strong>
             </span>
             <KappFeeRow />
           </Row>
         )}
         <Row>
           <span>
-            <strong>Bandwidth Fee</strong>
+            <strong>{t('table:Transactions.Bandwidth Fee')}</strong>
           </span>
           <span>
             {loading ? (
@@ -277,7 +281,7 @@ export const OverviewDetails: React.FC<IOverviewDetails> = ({
         </Row>
         <Row>
           <span>
-            <strong>KDA Fee</strong>
+            <strong>{t('transactions:KDAFee')}</strong>
           </span>
           <KdaFeeSpan>
             {loading ? (
@@ -304,7 +308,7 @@ export const OverviewDetails: React.FC<IOverviewDetails> = ({
         {timestamp && (
           <Row>
             <span>
-              <strong>Time</strong>
+              <strong>{t('table:Proposals.Time')}</strong>
             </span>
             <span>
               <p>{formatDate(timestamp)}</p>
@@ -313,7 +317,7 @@ export const OverviewDetails: React.FC<IOverviewDetails> = ({
         )}
         <Row>
           <span>
-            <strong>Signature</strong>
+            <strong>{t('transactions:Signature')}</strong>
           </span>
           <CenteredRow>
             {loading ? (
@@ -334,7 +338,9 @@ export const OverviewDetails: React.FC<IOverviewDetails> = ({
           </CenteredRow>
           {!!signature?.length && (
             <ButtonExpand onClick={handleExpandSignature}>
-              {expandSignature ? 'Collapse' : 'Expand'}
+              {expandSignature
+                ? `${t('transactions:Collapse')}`
+                : `${t('common:Buttons.Expand')}`}
             </ButtonExpand>
           )}
         </Row>
@@ -848,22 +854,26 @@ const Transaction: React.FC<ITransactionPage> = props => {
   );
 };
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const paths: string[] = [];
-
+export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
   return {
-    paths,
-    fallback: 'blocking',
+    paths: [], //indicates that no page needs be created at build time
+    fallback: 'blocking', //indicates the type of fallback
   };
 };
 
 export const getStaticProps: GetStaticProps<ITransactionPage> = async ({
   params,
+  locale = 'en',
 }) => {
   const redirectProps: NotFound = {
     notFound: true,
   };
-
+  const translations = await serverSideTranslations(
+    locale,
+    ['common', 'transactions', 'table'],
+    nextI18nextConfig,
+  );
+  let props = {} as ITransactionPage;
   const hash = params?.hash;
   if (!hash) {
     return redirectProps;
@@ -880,13 +890,11 @@ export const getStaticProps: GetStaticProps<ITransactionPage> = async ({
     route: `block/by-nonce/${transaction?.data?.transaction?.blockNum}`,
   });
 
-  const props: ITransactionPage = {
+  props = {
     transaction: transaction.data.transaction,
     block: block?.data?.block || {},
   };
 
-  return {
-    props,
-  };
+  return { props: { ...props, ...translations } };
 };
 export default Transaction;

@@ -1,5 +1,6 @@
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { setQueryAndRouter } from '@/utils';
+import { useTranslation } from 'next-i18next';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import dynamic from 'next/dynamic';
 import { NextRouter, useRouter } from 'next/router';
@@ -135,6 +136,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   dynamicInitialValue,
   ...rest
 }) => {
+  const { t } = useTranslation('transactions');
   const areaRef = useRef<HTMLTextAreaElement | null>(null);
   const [isCustom, setIsCustom] = useState(customDropdownOptions[0]);
   const router = useRouter();
@@ -168,7 +170,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
       ? register(name, {
           required: {
             value: required || false,
-            message: 'This field is required',
+            message: `${t('CreateTransactions.This field is required')}`,
           },
           onChange: onChangeWrapper(
             isMultiContract,
@@ -182,7 +184,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
           valueAsNumber: true,
           required: {
             value: required || false,
-            message: 'This field is required',
+            message: `${t('CreateTransactions.This field is required')}`,
           },
           onChange: onChangeWrapper(
             isMultiContract,
@@ -309,7 +311,11 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
         <InputLabel disabled={inputProps.disabled}>
           <span>
             {title || name}
-            {required && <RequiredSpan>(required)</RequiredSpan>}
+            {required && (
+              <RequiredSpan>
+                (`${t('CreateTransactions.Required')}`)
+              </RequiredSpan>
+            )}
           </span>
           {tooltip && (
             <TooltipContainer>
@@ -321,7 +327,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
           )}
           {type === 'dropdown' && (
             <DropdownCustomLabel>
-              <span>Custom value?</span>
+              <span>{t('CreateTransactions.Custom value')}</span>
               <DropdownCustomLabelSelect
                 options={customDropdownOptions}
                 value={isCustom}

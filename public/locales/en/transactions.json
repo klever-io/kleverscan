@@ -181,7 +181,7 @@
   "AdvancedOptions": {
     "Advanced Options": "Advanced Options",
     "Multiple Contract": "Multiple Contract",
-    "Show payload": "Show payload?",
+    "Show payload": "Show/Edit payload?",
     "Balance": "Balance:",
     "KDA to pay fees": "KDA to pay fees:",
     "Sign transaction": "Do you want to sign transaction now ?",
@@ -190,7 +190,8 @@
     "Use Current account": "Do you want to use the current account as sender?",
     "Permission ID": "Permission ID",
     "TooltipPermissionID": "The permission ID is set by the account owner and is used to make other accounts able to sign transactions on behalf of the owner. You can find more information about permissions in your account page. If they are not set, you need to send an 'Update Account Permission' contract",
-    "TooltipAccount": "The sender account address is the account that will be the sender of the transaction. It needs to be a multi-sign account. Your connected address will be the one used to sign the transaction. Be sure that your account has the permission to sign transactions on behalf of the sender account, otherwise the transaction will fail"
+    "TooltipAccount": "The sender account address is the account that will be the sender of the transaction. It needs to be a multi-sign account. Your connected address will be the one used to sign the transaction. Be sure that your account has the permission to sign transactions on behalf of the sender account, otherwise the transaction will fail",
+    "ShowPayloadTooltip": "The payload is the contract data that will be sent to be built and broadcast to the blockchain. If you want to edit it, you can do it here."
   },
   "Contract": {
     "Clear Contract": "Clear Contract",

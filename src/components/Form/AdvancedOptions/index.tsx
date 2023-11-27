@@ -237,6 +237,7 @@ const AdvancedOptionsContent: React.FC = () => {
   const { showPayload, isMultisig, kdaFee, getAssets } = useContract();
   const { walletAddress } = useExtension();
   const yes = commonT('Statements.Yes');
+  const showPayloadTooltip = t('AdvancedOptions.ShowPayloadTooltip');
   const no = commonT('Statements.No');
   const [loading, setLoading] = useState(false);
 
@@ -341,6 +342,11 @@ const AdvancedOptionsContent: React.FC = () => {
       <FieldContainer>
         <InputLabel>
           <span>{t('AdvancedOptions.Show payload')}</span>
+          <TooltipContainer>
+            <Tooltip msg={showPayloadTooltip}>
+              <InfoIcon />
+            </Tooltip>
+          </TooltipContainer>
         </InputLabel>
         <ToggleContainer>
           {no}

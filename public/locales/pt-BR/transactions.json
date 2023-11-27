@@ -181,7 +181,7 @@
   "AdvancedOptions": {
     "Advanced Options": "Opções Avançadas",
     "Multiple Contract": "Contrato Múltiplo",
-    "Show payload": "Mostrar payload?",
+    "Show payload": "Mostrar/Editar payload?",
     "Balance": "Saldo:",
     "KDA to pay fees": "KDA para pagar taxas:",
     "Sign transaction": "Você deseja assinar a transação agora?",
@@ -190,7 +190,8 @@
     "Use Current account": "Você deseja usar a conta atual como remetente?",
     "Permission ID": "ID de Permissão",
     "TooltipPermissionID": "O ID de permissão é definido pelo proprietário da conta e é usado para que outras contas possam assinar transações em nome do proprietário. Você pode encontrar mais informações sobre permissões na página da sua conta. Se elas não estiverem definidas, você precisa enviar um contrato 'Update Account Permission'.",
-    "TooltipAccount": "O endereço da conta remetente é a conta que será o remetente da transação. Precisa ser uma conta de várias assinaturas. Seu endereço conectado será usado para assinar a transação. Certifique-se de que sua conta tenha permissão para assinar transações em nome da conta remetente, caso contrário a transação falhará."
+    "TooltipAccount": "O endereço da conta remetente é a conta que será o remetente da transação. Precisa ser uma conta de várias assinaturas. Seu endereço conectado será usado para assinar a transação. Certifique-se de que sua conta tenha permissão para assinar transações em nome da conta remetente, caso contrário a transação falhará.",
+    "ShowPayloadTooltip": "O payload é o conjunto de dados do contrato que será enviado para ser construído e transmitido para o blockchain. Se desejar editá-lo, você pode fazê-lo aqui."
   },
   "Contract": {
     "Clear Contract": "Limpar Contrato",

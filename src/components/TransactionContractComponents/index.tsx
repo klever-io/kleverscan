@@ -103,6 +103,7 @@ type RenderAssetTriggerTypeDataProps = {
   parameter: IAssetTriggerContract;
   precision: number;
   t: TFunction;
+  commonT: TFunction;
 };
 
 const getNFTNonces = (
@@ -691,7 +692,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
               <span>
                 {statusWithIcon(
                   parameter?.attributes?.isPaused ? true : false,
-                  t,
+                  commonT,
                 )}
               </span>
             </StatusIconWrapper>
@@ -700,7 +701,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
               <span>
                 {statusWithIcon(
                   parameter?.attributes?.isNFTMintStopped ? true : false,
-                  t,
+                  commonT,
                 )}
               </span>
             </StatusIconWrapper>
@@ -714,7 +715,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
                   parameter?.attributes?.isRoyaltiesChangeStopped
                     ? true
                     : false,
-                  t,
+                  commonT,
                 )}
               </span>
             </StatusIconWrapper>
@@ -1491,6 +1492,7 @@ export const AssetTrigger: React.FC<IIndexedContract> = ({
   sender,
 }) => {
   const { t } = useTranslation('transactions');
+  const { t: commonT } = useTranslation('common');
   const parameter = par as IAssetTriggerContract;
   const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
   const precision = usePrecision(assetID);
@@ -1525,7 +1527,7 @@ export const AssetTrigger: React.FC<IIndexedContract> = ({
           {renderNFTNonces(noncesReceipts)}
         </Row>
       )}
-      {renderAssetTriggerTypeData({ parameter, precision, t })}
+      {renderAssetTriggerTypeData({ parameter, precision, t, commonT })}
       {renderMetadata()}
     </>
   );
@@ -2795,6 +2797,7 @@ const renderAssetTriggerTypeData: React.FC<RenderAssetTriggerTypeDataProps> = ({
   parameter,
   precision,
   t,
+  commonT,
 }): any => {
   const par = parameter;
   const triggerType = par?.triggerType;
@@ -2918,11 +2921,13 @@ const renderAssetTriggerTypeData: React.FC<RenderAssetTriggerTypeDataProps> = ({
 
               <RoleDiv>
                 <RoleStrong>t{t('AssetTrigger.HasRoleMin')}</RoleStrong>
-                <span>{statusWithIcon(par.role.hasRoleMint, t)}</span>
+                <span>{statusWithIcon(par.role.hasRoleMint, commonT)}</span>
               </RoleDiv>
               <RoleDiv>
                 <RoleStrong>{t('AssetTrigger.HasRoleSetITOPrices')}</RoleStrong>
-                <span>{statusWithIcon(par.role.hasRoleSetITOPrices, t)}</span>
+                <span>
+                  {statusWithIcon(par.role.hasRoleSetITOPrices, commonT)}
+                </span>
               </RoleDiv>
             </RoleWrapper>
           </FrozenContainer>

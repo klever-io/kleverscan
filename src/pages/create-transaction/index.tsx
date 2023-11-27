@@ -23,11 +23,16 @@ import {
   WarningContainer,
   WarningText,
 } from '@/views/create-transaction';
+import { GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React, { useEffect } from 'react';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 const warningMessage = `You don't have enough currency. Please check the amount of your transaction as well as the fee cost.`;
 
 const CreateTransaction: React.FC = () => {
+  const { t } = useTranslation(['common', 'transactions']);
   const [isAccountEmpty, setIsAccountEmpty] = React.useState<boolean>(false);
   const { extensionInstalled, connectExtension, walletAddress } =
     useExtension();
@@ -115,13 +120,11 @@ const CreateTransaction: React.FC = () => {
         <CreateTxCard>
           <div>
             <span>
-              Select a contract type, fill in the form fields and click on the
-              &quot;Create Transaction&quot; button. A Klever Extension window
-              will appear and you will fill in your wallet password. At the end,
-              the hash of your transaction will be generated. You can view your
-              transaction details on the{' '}
-              <a href="https://kleverscan.org/transactions/">Transactions</a>{' '}
-              page.
+              {t('transactions:CreateTransactions.CreateTransactionInfo')}
+              <a href="https://kleverscan.org/transactions/">
+                {t('common:Titles.Transactions').toLowerCase()}
+              </a>{' '}
+              {t('transactions:CreateTransactions.Page')}
             </span>
           </div>
         </CreateTxCard>
@@ -134,7 +137,7 @@ const CreateTransaction: React.FC = () => {
             <ContainerQueueMobile
               onClick={() => setShowMultiContracts(!showMultiContracts)}
             >
-              Queue ( {queue.length} )
+              {t('transactions:CreateTransactions.Queue')} ( {queue.length} )
             </ContainerQueueMobile>
           )}
           <QueueOutContainer>
@@ -155,6 +158,16 @@ const CreateTransaction: React.FC = () => {
       <WarningModal message={warningMessage} />
     </Container>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'transactions', 'table'],
+    nextI18nextConfig,
+  );
+
+  return { props };
 };
 
 export default CreateTransaction;

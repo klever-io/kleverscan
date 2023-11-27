@@ -167,7 +167,9 @@
     "Select an asset/collection": "Select an asset/collection",
     "Custom value": "Custom value?",
     "This field is required": "This field is required",
-    "Required": "required"
+    "Required": "required",
+    "Validator Address": "Validator Address",
+    "TooltipValidator": "Validator to whom the bucket will be delegated"
   },
   "MultiContract": {
     "Tx Queue": "Tx Queue",
@@ -222,5 +224,6 @@
     "DepositContract": "Deposit to a KDA Pool or FPR Pool.",
     "ITOTriggerContract": "Change the parameters of an ITO.",
     "UpdateAccountPermissionContract": "Change the permissions of an account."
-  }
+  },
+  "Bucket": "Bucket"
 }

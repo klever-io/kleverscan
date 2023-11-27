@@ -222,5 +222,6 @@
     "DepositContract": "Depositar em um Pool de KDA ou FPR.",
     "ITOTriggerContract": "Alterar os parâmetros de um ITO.",
     "UpdateAccountPermissionContract": "Alterar as permissões de uma conta."
-  }
+  },
+  "Bucket": "Bucket"
 }

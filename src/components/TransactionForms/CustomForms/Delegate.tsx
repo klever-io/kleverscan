@@ -4,6 +4,7 @@ import { IValidator } from '@/types';
 import { KLV_PRECISION, PERCENTAGE_PRECISION } from '@/utils/globalVariables';
 import { useDebounce } from '@/utils/hooks';
 import { parseAddress } from '@/utils/parseValues';
+import { useTranslation } from 'next-i18next';
 import React, { useEffect, useState } from 'react';
 import { FieldError, useFormContext } from 'react-hook-form';
 import { useInfiniteQuery } from 'react-query';
@@ -17,6 +18,7 @@ type FormData = {
 };
 
 const Delegate: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+  const { t } = useTranslation('transactions');
   const [bucketsList, setBucketsList] = useState<any>([]);
   const [typedName, setTypedName] = useState<string>('');
 
@@ -102,16 +104,16 @@ const Delegate: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
         <FormInput
           zIndex={3}
           name="bucketId"
-          title="Bucket"
+          title={t('Bucket')}
           type="dropdown"
           options={bucketsList}
           required
         />
         <FormInput
           name="receiver"
-          title="Validator Address"
+          title={t('CreateTransactions.Validator Address')}
           span={2}
-          tooltip="Validator to whom the bucket will be delegated"
+          tooltip={t('CreateTransactions.TooltipValidator')}
           required
           creatable
           type="dropdown"

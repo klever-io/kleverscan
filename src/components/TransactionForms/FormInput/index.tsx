@@ -312,9 +312,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
           <span>
             {title || name}
             {required && (
-              <RequiredSpan>
-                (`${t('CreateTransactions.Required')}`)
-              </RequiredSpan>
+              <RequiredSpan>({t('CreateTransactions.Required')})</RequiredSpan>
             )}
           </span>
           {tooltip && (

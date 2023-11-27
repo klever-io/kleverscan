@@ -1,4 +1,5 @@
 import { useMulticontract } from '@/contexts/contract/multicontract';
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -12,6 +13,7 @@ type FormData = {
 };
 
 const Freeze: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+  const { t } = useTranslation('transactions');
   const { handleSubmit } = useFormContext<FormData>();
   const { queue } = useMulticontract();
 
@@ -27,7 +29,7 @@ const Freeze: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
       <FormSection>
         <FormInput
           name="amount"
-          title="Amount"
+          title={t('Amount')}
           type="number"
           tooltip="Amount to be frozen"
           precision={collection?.precision}

@@ -13,7 +13,7 @@
   "Signature": "Signature",
   "Collapse": "Collapse",
   "Type": "Type",
-  "AssetId": "Asset Id",
+  "AssetId": "Asset ID",
   "Precision": "Precision",
   "Royalties": "Royalties",
   "Address": "Address",
@@ -163,7 +163,11 @@
     "WarningMessage": "You don't have enough currency. Please check the amount of your transaction as well as the fee cost.",
     "CreateTransactionInfo": "Select a contract type, fill in the form fields and click on the 'Create Transaction' button. A Klever Extension window will appear and you will fill in your wallet password. At the end, the hash of your transaction will be generated. You can view your transaction details on the",
     "Page": "page",
-    "Queue": "Queue"
+    "Queue": "Queue",
+    "Select an asset/collection": "Select an asset/collection",
+    "Custom value": "Custom value?",
+    "This field is required": "This field is required",
+    "Required": "required"
   },
   "MultiContract": {
     "Tx Queue": "Tx Queue",

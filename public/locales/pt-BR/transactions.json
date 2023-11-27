@@ -163,7 +163,11 @@
     "WarningMessage": "Você não possui moeda suficiente. Verifique o valor da sua transação e o custo da taxa.",
     "CreateTransactionInfo": "Selecione um tipo de contrato, preencha os campos do formulário e clique no botão 'Criar Transação'. Uma janela da Extensão Klever aparecerá e você preencherá a senha da sua carteira. No final, o hash da sua transação será gerado. Você pode visualizar os detalhes da sua transação na",
     "Page": "página",
-    "Queue": "Fila"
+    "Queue": "Fila",
+    "Select an asset/collection": "Selecione um ativo/coleção",
+    "Custom value": "Valor customizado?",
+    "This field is required": "Este campo é obrigatório",
+    "Required": "obrigatório"
   },
   "MultiContract": {
     "Tx Queue": "Fila de Transações",

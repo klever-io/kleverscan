@@ -158,5 +158,64 @@
     "White List": "Lista Branca",
     "Pack Info": "Informações do Pacote"
   },
-  "Limit": "Limite"
+  "Limit": "Limite",
+  "CreateTransactions": {
+    "WarningMessage": "Você não possui moeda suficiente. Verifique o valor da sua transação e o custo da taxa.",
+    "CreateTransactionInfo": "Selecione um tipo de contrato, preencha os campos do formulário e clique no botão 'Criar Transação'. Uma janela da Extensão Klever aparecerá e você preencherá a senha da sua carteira. No final, o hash da sua transação será gerado. Você pode visualizar os detalhes da sua transação na",
+    "Page": "página",
+    "Queue": "Fila"
+  },
+  "MultiContract": {
+    "Tx Queue": "Fila de Transações",
+    "Edit": "Editar",
+    "Remove": "Remover",
+    "New Contract": "Novo Contrato",
+    "Broadcast Queue": "Fila de Transmissão",
+    "Estimated Fees": "Taxas Estimadas:",
+    "Calculating conversion": "Calculando conversão..."
+  },
+  "AdvancedOptions": {
+    "Advanced Options": "Opções Avançadas",
+    "Multiple Contract": "Contrato Múltiplo",
+    "Show payload": "Mostrar payload?",
+    "Balance": "Saldo:",
+    "KDA to pay fees": "KDA para pagar taxas:",
+    "Sign transaction": "Você deseja assinar a transação agora?",
+    "Multiple Signatures": "Sua conta precisa de múltiplas assinaturas?",
+    "Sender Account Address": "Endereço da Conta Remetente",
+    "Use Current account": "Você deseja usar a conta atual como remetente?",
+    "Permission ID": "ID de Permissão",
+    "TooltipPermissionID": "O ID de permissão é definido pelo proprietário da conta e é usado para que outras contas possam assinar transações em nome do proprietário. Você pode encontrar mais informações sobre permissões na página da sua conta. Se elas não estiverem definidas, você precisa enviar um contrato 'Update Account Permission'.",
+    "TooltipAccount": "O endereço da conta remetente é a conta que será o remetente da transação. Precisa ser uma conta de várias assinaturas. Seu endereço conectado será usado para assinar a transação. Certifique-se de que sua conta tenha permissão para assinar transações em nome da conta remetente, caso contrário a transação falhará."
+  },
+  "Contract": {
+    "Clear Contract": "Limpar Contrato",
+    "Share Contract": "Compartilhar Contrato",
+    "KApp Fee": "Taxa kApp:",
+    "TransferContract": "Transferir ativos para outra carteira.",
+    "CreateAssetContract": "Criar uma nova Moeda (Token Fungível) ou uma Coleção NFT.",
+    "CreateValidatorContract": "Gerar um novo validador.",
+    "ValidatorConfigContract": "Editar as configurações atuais de um validador.",
+    "FreezeContract": "Congelar uma quantidade escolhida de um ativo ou coleção.",
+    "UnfreezeContract": "Descongelar um bucket de um ativo ou coleção.",
+    "DelegateContract": "Delegar um bucket para um validador.",
+    "UndelegateContract": "Cancelar a delegação de um bucket.",
+    "WithdrawContract": "Retirada total do ativo escolhido.",
+    "ClaimContract": "Reivindicar recompensas ou ordens de mercado expiradas.",
+    "UnjailContract": "Libertar o seu validador, certifique-se de usar apenas se a causa da prisão já estiver corrigida.",
+    "AssetTriggerContract": "Um contrato que configura operações sobre uma coleção de ativos ou um NFT.",
+    "SetAccountNameContract": "Definir um novo nome para a conta atual.",
+    "ProposalContract": "Criar uma proposta para alterar os parâmetros do blockchain.",
+    "VoteContract": "Votar em uma proposta.",
+    "ConfigITOContract": "Configurar uma Oferta Inicial de Tokens.",
+    "SetITOPricesContract": "Definir os preços para a Oferta Inicial de Tokens.",
+    "BuyContract": "Comprar tokens.",
+    "SellContract": "Vender tokens.",
+    "CreateMarketplaceContract": "Criar um novo Marketplace.",
+    "ConfigMarketplaceContract": "Alterar os parâmetros de um Marketplace existente.",
+    "CancelMarketOrderContract": "Cancelar uma ordem de venda.",
+    "DepositContract": "Depositar em um Pool de KDA ou FPR.",
+    "ITOTriggerContract": "Alterar os parâmetros de um ITO.",
+    "UpdateAccountPermissionContract": "Alterar as permissões de uma conta."
+  }
 }

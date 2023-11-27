@@ -165,6 +165,15 @@
     "Page": "page",
     "Queue": "Queue"
   },
+  "MultiContract": {
+    "Tx Queue": "Tx Queue",
+    "Edit": "Edit",
+    "Remove": "Remove",
+    "New Contract": "New Contract",
+    "Broadcast Queue": "Broadcast Queue",
+    "Estimated Fees": "Estimated Fees:",
+    "Calculating conversion": "Calculating conversion..."
+  },
   "AdvancedOptions": {
     "Advanced Options": "Advanced Options",
     "Multiple Contract": "Multiple Contract",
@@ -178,5 +187,35 @@
     "Permission ID": "Permission ID",
     "TooltipPermissionID": "The permission ID is set by the account owner and is used to make other accounts able to sign transactions on behalf of the owner. You can find more information about permissions in your account page. If they are not set, you need to send an 'Update Account Permission' contract",
     "TooltipAccount": "The sender account address is the account that will be the sender of the transaction. It needs to be a multi-sign account. Your connected address will be the one used to sign the transaction. Be sure that your account has the permission to sign transactions on behalf of the sender account, otherwise the transaction will fail"
+  },
+  "Contract": {
+    "Clear Contract": "Clear Contract",
+    "Share Contract": "Share Contract",
+    "KApp Fee": "KApp Fee:",
+    "TransferContract": "Transfer assets to another wallet.",
+    "CreateAssetContract": "Create a new Coin(Fungible Token) or an NFT Collection.",
+    "CreateValidatorContract": "Generate a new validator.",
+    "ValidatorConfigContract": "Edit the current settings for a validator.",
+    "FreezeContract": "Freeze a chosen amount of an asset or collection.",
+    "UnfreezeContract": "Unfreeze a bucket of an asset or collection.",
+    "DelegateContract": "Delegate a bucket to a validator.",
+    "UndelegateContract": "Undelegate a bucket.",
+    "WithdrawContract": "Total withdraw of the chosen asset.",
+    "ClaimContract": "Claim rewards or expired market orders.",
+    "UnjailContract": "Unjails your validator, be sure to use only if the cause of the jail is already fixed.",
+    "AssetTriggerContract": "A contract setting operations over a collection of assets or an NFT.",
+    "SetAccountNameContract": "Set a new name for the current account.",
+    "ProposalContract": "Create a proposal to change the blockchain parameters.",
+    "VoteContract": "Vote in a proposal.",
+    "ConfigITOContract": "Set up an Initial Token Offering.",
+    "SetITOPricesContract": "Set the prices for the Initial Token Offering.",
+    "BuyContract": "Buy tokens.",
+    "SellContract": "Sell tokens.",
+    "CreateMarketplaceContract": "Create a new Marketplace.",
+    "ConfigMarketplaceContract": "Change the parameters of an existing Marketplace.",
+    "CancelMarketOrderContract": "Cancel a sell order.",
+    "DepositContract": "Deposit to a KDA Pool or FPR Pool.",
+    "ITOTriggerContract": "Change the parameters of an ITO.",
+    "UpdateAccountPermissionContract": "Change the permissions of an account."
   }
 }

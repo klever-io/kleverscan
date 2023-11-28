@@ -111,7 +111,10 @@
     "HasRoleSetITOPrices": "Possui Função de Configurar Preços do ITO",
     "MIME": "MIME",
     "Min Epochs To": "Mínimo de Épocas para {{type}}",
-    "Unstake": "Desbloquear"
+    "Unstake": "Desbloquear",
+    "Asset Trigger Type": "Tipo de Ativação de Ativo",
+    "NFT Holder Address": "Endereço do Detentor de NFT",
+    "KDA/KLV Quotient": "Quociente KDA/KLV"
   },
   "SetAccountName": "Definir Nome da Conta",
   "Proposal": {

@@ -111,7 +111,10 @@
     "HasRoleSetITOPrices": "HasRoleSetITOPrices",
     "MIME": "MIME",
     "Min Epochs To": "min Epochs To {{type}}",
-    "Unstake": "Unstake"
+    "Unstake": "Unstake",
+    "Asset Trigger Type": "Asset Trigger Type",
+    "NFT Holder Address": "NFT Holder Address",
+    "KDA/KLV Quotient": "KDA/KLV Quotient"
   },
   "SetAccountName": "Set Account Name",
   "Proposal": {

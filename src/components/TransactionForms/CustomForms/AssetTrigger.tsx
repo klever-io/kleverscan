@@ -4,6 +4,7 @@ import { ICollectionList } from '@/types';
 import { assetTriggerTypes } from '@/utils/contracts';
 import { deepCopyObject } from '@/utils/objectFunctions';
 import { IAssetTrigger } from '@klever/sdk-web';
+import { TFunction, useTranslation } from 'next-i18next';
 import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -47,6 +48,7 @@ const AssetTrigger: React.FC<IContractProps> = ({
   formKey,
   handleFormSubmit,
 }) => {
+  const { t } = useTranslation('transactions');
   const { handleSubmit, watch, reset } = useFormContext<IAssetTrigger>();
   const { walletAddress } = useExtension();
   const triggerType = watch('triggerType');
@@ -77,7 +79,7 @@ const AssetTrigger: React.FC<IContractProps> = ({
       <FormSection>
         <FormInput
           name="triggerType"
-          title="Asset Trigger Type"
+          title={t('AssetTrigger.Asset Trigger Type')}
           type="dropdown"
           zIndex={4}
           options={assetTriggerTypes}
@@ -92,6 +94,7 @@ const AssetTrigger: React.FC<IContractProps> = ({
           collection,
           walletAddress,
           metadataProps,
+          t,
         )}
     </FormBody>
   );
@@ -102,6 +105,7 @@ const getAssetTriggerForm = (
   collection: ICollectionList,
   walletAddress: string,
   { metadata, setMetadata }: IMetadataOptions,
+  t: TFunction,
 ) => {
   switch (triggerType) {
     case 0:
@@ -109,18 +113,18 @@ const getAssetTriggerForm = (
         <FormSection>
           <FormInput
             name="receiver"
-            title="Receiver"
+            title={t('ConfigITO.Receiver')}
             required
             dynamicInitialValue={walletAddress}
             tooltip={tooltip.receiver}
           />
-          <FormInput name="amount" title="Amount" type="number" required />
+          <FormInput name="amount" title={t('Amount')} type="number" required />
         </FormSection>
       );
     case 1:
       return (
         <FormSection>
-          <FormInput name="amount" title="Amount" type="number" required />
+          <FormInput name="amount" title={t('Amount')} type="number" required />
         </FormSection>
       );
     case 2:
@@ -128,12 +132,12 @@ const getAssetTriggerForm = (
         <FormSection>
           <FormInput
             name="receiver"
-            title="Receiver"
+            title={t('ConfigITO.Receiver')}
             required
             dynamicInitialValue={walletAddress}
             tooltip={tooltip.receiver}
           />
-          <FormInput name="amount" title="Amount" type="number" required />
+          <FormInput name="amount" title={t('Amount')} type="number" required />
         </FormSection>
       );
     case 3:
@@ -145,7 +149,7 @@ const getAssetTriggerForm = (
         <FormSection>
           <FormInput
             name="receiver"
-            title="Receiver"
+            title={t('ConfigITO.Receiver')}
             required
             dynamicInitialValue={walletAddress}
             tooltip={tooltip.receiver}
@@ -159,7 +163,7 @@ const getAssetTriggerForm = (
         <FormSection>
           <FormInput
             name="receiver"
-            title="Receiver"
+            title={t('ConfigITO.Receiver')}
             required
             dynamicInitialValue={walletAddress}
             tooltip={tooltip.receiver}
@@ -171,12 +175,14 @@ const getAssetTriggerForm = (
         <FormSection>
           <FormInput
             name="mime"
-            title="Mime"
+            title={t('AssetTrigger.MIME')
+              .toLowerCase()
+              .replace(/\b\w/g, char => char.toUpperCase())}
             tooltip={tooltip.updateMetadata.mime}
           />
           <FormInput
             name="receiver"
-            title="NFT Holder Address"
+            title={t('AssetTrigger.NFT Holder Address')}
             required
             dynamicInitialValue={walletAddress}
             tooltip={tooltip.receiver}
@@ -201,7 +207,7 @@ const getAssetTriggerForm = (
         <FormSection>
           <FormInput
             name="logo"
-            title="Logo"
+            title={t('CreateValidator.Logo')}
             tooltip={tooltip.updateLogo.logo}
           />
         </FormSection>
@@ -213,7 +219,7 @@ const getAssetTriggerForm = (
         <FormSection>
           <FormInput
             name="receiver"
-            title="Receiver"
+            title={t('ConfigITO.Receiver')}
             required
             dynamicInitialValue={walletAddress}
             tooltip={tooltip.receiver}
@@ -239,20 +245,20 @@ const getAssetTriggerForm = (
         <FormSection>
           <FormInput
             name="kdaPool.adminAddress"
-            title="Admin Address"
+            title={t('AssetTrigger.Admin Address')}
             dynamicInitialValue={walletAddress}
             required
           />
           <FormInput
             name="kdaPool.quotient"
-            title="KDA/KLV Quotient"
+            title={t('AssetTrigger.KDA/KLV Quotient')}
             type="number"
             required
             tooltip={tooltip.updateKdaPool.quotient}
           />
           <FormInput
             name="kdaPool.active"
-            title="Active"
+            title={t('AssetTrigger.Active')}
             type="checkbox"
             toggleOptions={['No', 'Yes']}
             dynamicInitialValue={true}
@@ -271,10 +277,12 @@ const getAssetTriggerForm = (
 };
 
 export const AddRoleSection: React.FC = () => {
+  const { t } = useTranslation('transactions');
+  const { t: commonT } = useTranslation('common');
   return (
     <FormSection>
       <SectionTitle>
-        <span>Role</span>
+        <span>{t('AssetTrigger.Role')}</span>
         <TooltipContainer>
           <InfoIcon size={13} />
           <TooltipContent>
@@ -285,22 +293,28 @@ export const AddRoleSection: React.FC = () => {
       <FormInput
         paddingTop={2}
         name={`role.address`}
-        title={`Address`}
+        title={t('Address')}
         span={2}
         tooltip={tooltip.role.address}
       />
       <FormInput
         name={`role.hasRoleMint`}
-        title={`Has Role Mint`}
+        title={t('AssetTrigger.HasRoleMint')}
         type="checkbox"
-        toggleOptions={['No', 'Yes']}
+        toggleOptions={[
+          `${commonT('Statements.No')}`,
+          `${commonT('Statements.Yes')}`,
+        ]}
         tooltip={tooltip.role.hasRoleMint}
       />
       <FormInput
         name={`role.hasRoleSetITOPrices`}
-        title={`Has Role Set ITO Prices`}
+        title={t('AssetTrigger.HasRoleSetITOPrices')}
         type="checkbox"
-        toggleOptions={['No', 'Yes']}
+        toggleOptions={[
+          `${commonT('Statements.No')}`,
+          `${commonT('Statements.Yes')}`,
+        ]}
         tooltip={tooltip.role.hasRoleSetITOPrices}
       />
     </FormSection>

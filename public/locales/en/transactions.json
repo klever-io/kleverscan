@@ -169,7 +169,8 @@
     "This field is required": "This field is required",
     "Required": "required",
     "Validator Address": "Validator Address",
-    "TooltipValidator": "Validator to whom the bucket will be delegated"
+    "TooltipValidator": "Validator to whom the bucket will be delegated",
+    "Choose": "Choose"
   },
   "MultiContract": {
     "Tx Queue": "Tx Queue",

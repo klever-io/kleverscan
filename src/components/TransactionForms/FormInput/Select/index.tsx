@@ -1,4 +1,5 @@
 import { useMulticontract } from '@/contexts/contract/multicontract';
+import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -39,6 +40,7 @@ const Filter: React.FC<IFilter> = ({
   creatable,
   ...rest
 }) => {
+  const { t } = useTranslation('transactions');
   const {
     register,
     formState: { errors },
@@ -78,7 +80,9 @@ const Filter: React.FC<IFilter> = ({
     <Container $error={error}>
       <BaseSelect
         placeholder={
-          selectPlaceholder ? selectPlaceholder : `Choose ${title ? title : ''}`
+          selectPlaceholder
+            ? selectPlaceholder
+            : `${t('CreateTransactions.Choose')} ${title ? title : ''}`
         }
         options={data}
         onChange={e => handleSelect(e)}

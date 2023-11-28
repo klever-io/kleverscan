@@ -123,8 +123,8 @@
   "Buy": {
     "Buy": "Buy",
     "Price": "Price",
-    "Currency Id": "Currency Id",
-    "Order Id": "Order Id",
+    "Currency Id": "Currency ID",
+    "Order Id": "Order ID",
     "in": "in",
     "Buy Type": "Buy Type",
     "Sell": "Sell",

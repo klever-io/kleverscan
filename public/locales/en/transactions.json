@@ -20,6 +20,7 @@
   "Amount": "Amount",
   "Unjail": "Unjail",
   "Loading": "Loading...",
+  "OwnerAddress": "Owner Address",
   "Transfer": {
     "Transfer": "Transfer",
     "Percentage": "Percentage",
@@ -46,7 +47,17 @@
     "Attributes": "Attributes",
     "Is Paused": "Is Paused",
     "Can Mint NFT": "Can Mint NFT",
-    "Change Stopped": "Change Stopped"
+    "Change Stopped": "Change Stopped",
+    "Label": "Label",
+    "Add URI": "Add URI",
+    "Add": "Add",
+    "Split Royalties": "Split Royalties",
+    "Percent Over": "Percentage Over {{type}}",
+    "Interest Type": "Interest Type",
+    "Roles": "Roles",
+    "HasRoleMint": "Has Role Mint",
+    "HasRoleITO": "Has Role Set ITO Prices",
+    "Add Role": "Add Role"
   },
   "CreateValidator": {
     "Create Validator": "Create Validator",
@@ -171,7 +182,10 @@
     "Required": "required",
     "Validator Address": "Validator Address",
     "TooltipValidator": "Validator to whom the bucket will be delegated",
-    "Choose": "Choose"
+    "Choose": "Choose",
+    "Asset Type": "Asset type",
+    "logoErrorMsg": "The logo link is invalid, which could lead to your logo not being displayed.",
+    "Basic Info": "Basic Info"
   },
   "MultiContract": {
     "Tx Queue": "Tx Queue",

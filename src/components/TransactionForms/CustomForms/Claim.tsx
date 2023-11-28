@@ -1,5 +1,6 @@
 import { useContract } from '@/contexts/contract';
 import { claimTypes } from '@/utils/contracts';
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -12,6 +13,7 @@ type FormData = {
 };
 
 const Claim: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+  const { t } = useTranslation('transactions');
   const { handleSubmit, watch } = useFormContext<FormData>();
   const {} = useContract();
   const claimType = watch('claimType');
@@ -25,7 +27,7 @@ const Claim: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
       <FormSection>
         <FormInput
           name="claimType"
-          title="Claim Type"
+          title={t('CreateAsset.Claim Type')}
           type="dropdown"
           options={claimTypes}
           required
@@ -33,7 +35,11 @@ const Claim: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
         <FormInput
           name="id"
           span={2}
-          title={claimType === 2 ? 'Order ID' : 'Asset ID'}
+          title={
+            claimType === 2
+              ? `${t('DelegateUndelegate.OrderId')}`
+              : `${t('AssetId')}`
+          }
           required
         />
       </FormSection>

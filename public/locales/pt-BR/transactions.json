@@ -19,6 +19,7 @@
   "Address": "Endereço",
   "Amount": "Quantidade",
   "Unjail": "Desprender",
+  "Loading": "Carregando...",
   "Transfer": {
     "Transfer": "Transferir",
     "Percentage": "Porcentagem",
@@ -167,7 +168,10 @@
     "Select an asset/collection": "Selecione um ativo/coleção",
     "Custom value": "Valor customizado?",
     "This field is required": "Este campo é obrigatório",
-    "Required": "obrigatório"
+    "Required": "obrigatório",
+    "Validator Address": "Endereço do Validador",
+    "TooltipValidator": "Validador para quem o bucket será delegado",
+    "Choose": "Escolher"
   },
   "MultiContract": {
     "Tx Queue": "Fila de Transações",

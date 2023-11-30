@@ -163,6 +163,8 @@
   "CreateMarketplace": "Create Marketplace",
   "ReferralAddress": "Referral Address",
   "ReferralPercent": "Referral Percent",
+  "NewReferralPercentage": "New Referral Percentage",
+  "NewReferralAddress": "New Referral Address",
   "UpdateAccountPermission": {
     "Update Account Permission": "Update Account Permission",
     "Permission Name": "Permission Name",

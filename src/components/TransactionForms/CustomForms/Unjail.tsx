@@ -1,4 +1,5 @@
 import { useContract } from '@/contexts/contract';
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -9,6 +10,7 @@ type FormData = {
 };
 
 const Unjail: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+  const { t } = useTranslation('transactions');
   const { handleSubmit } = useFormContext<FormData>();
   const {} = useContract();
 
@@ -19,7 +21,7 @@ const Unjail: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
       <FormSection>
-        <SectionText>No aditional data needed.</SectionText>
+        <SectionText>{t('NoData')}</SectionText>
       </FormSection>
     </FormBody>
   );

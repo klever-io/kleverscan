@@ -70,7 +70,8 @@
   },
   "ValidatorConfig": {
     "Validator Config": "Configuração do Validador",
-    "BLS Public Key": "Chave Pública BLS"
+    "BLS Public Key": "Chave Pública BLS",
+    "Validator Name": "Nome do Validador"
   },
   "FreezeUnfreeze": {
     "Freeze": "Congelar",

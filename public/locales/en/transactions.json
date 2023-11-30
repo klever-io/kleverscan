@@ -70,7 +70,8 @@
   },
   "ValidatorConfig": {
     "Validator Config": "Validator Config",
-    "BLS Public Key": "BLS Public Key"
+    "BLS Public Key": "BLS Public Key",
+    "Validator Name": "Validator Name"
   },
   "FreezeUnfreeze": {
     "Freeze": "Freeze",

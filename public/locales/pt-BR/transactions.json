@@ -156,7 +156,8 @@
     "Market Type": "Tipo de Mercado",
     "Reserve Price": "Preço de Reserva",
     "End Time": "Hora de Fim",
-    "Start Time": "Hora de Início"
+    "Start Time": "Hora de Início",
+    "ITO Asset ID": "ID do Ativo ITO"
   },
   "ConfigMarketplace": "Configurar Marketplace",
   "CancelMarketOrder": "Cancelar Pedido do Marketplace",

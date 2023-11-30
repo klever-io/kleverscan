@@ -156,7 +156,8 @@
     "Market Type": "Market Type",
     "Reserve Price": "Reserve Price",
     "End Time": "End Time",
-    "Start Time": "Start Time"
+    "Start Time": "Start Time",
+    "ITO Asset ID": "ITO Asset ID"
   },
   "ConfigMarketplace": "Config Marketplace",
   "CancelMarketOrder": "Cancel Market Order",

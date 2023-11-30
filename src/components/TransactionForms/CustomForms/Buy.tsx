@@ -4,6 +4,7 @@ import { getAsset } from '@/services/requests/asset';
 import { calculateITOBuyFixedFee } from '@/utils/create-transaction/fees-calculation.ts';
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
+import { useTranslation } from 'next-i18next';
 import React, { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -24,6 +25,7 @@ const parseBuy = (data: FormData) => {
 };
 
 const Buy: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+  const { t } = useTranslation('transactions');
   const { handleSubmit, watch } = useFormContext<FormData>();
   const {} = useContract();
   const buyType = watch('buyType');
@@ -68,19 +70,19 @@ const Buy: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
       <FormSection>
         <FormInput
           name="buyType"
-          title="Buy Type"
+          title={t('Buy.Buy Type')}
           type="checkbox"
           toggleOptions={['ITO Buy', 'Market Buy']}
         />
         <FormInput
           name="id"
-          title={buyType ? 'Order ID' : 'ITO Asset ID'}
+          title={buyType ? `${t('Buy.Order Id')}` : `${t('Buy.ITO Asset ID')}`}
           required
         />
         <FormInput name="currencyId" title="Currency ID" required />
         <FormInput
           name="amount"
-          title={buyType ? 'Price' : 'Amount'}
+          title={buyType ? `${t('Buy.Price')}` : `${t('Amount')}`}
           type="number"
           required
         />

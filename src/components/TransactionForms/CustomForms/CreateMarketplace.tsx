@@ -1,4 +1,5 @@
 import { useExtension } from '@/contexts/extension';
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -16,6 +17,7 @@ const CreateMarketplace: React.FC<IContractProps> = ({
   formKey,
   handleFormSubmit,
 }) => {
+  const { t } = useTranslation('transactions');
   const { handleSubmit } = useFormContext<FormData>();
   const { walletAddress } = useExtension();
 
@@ -29,13 +31,13 @@ const CreateMarketplace: React.FC<IContractProps> = ({
         <FormInput name="name" title="Name" required />
         <FormInput
           name="referralAddress"
-          title="Referral Address"
+          title={t('ReferralAddress')}
           dynamicInitialValue={walletAddress}
           tooltip="Address that will receive the referral percentage"
         />
         <FormInput
           name="referralPercentage"
-          title="Referral Percentage"
+          title={t('ReferralPercent')}
           type="number"
           tooltip={tooltip.referralPercentage}
           {...percentageProps}

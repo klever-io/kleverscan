@@ -128,8 +128,19 @@
   "ConfigITO": {
     "Config ITO": "Configurar ITO",
     "Receiver": "Receptor",
-    "Status": "Status",
-    "Max Amount": "Valor Máximo"
+    "Status": "Estado",
+    "Max Amount": "Valor Máximo",
+    "Whitelist": "Lista de Permissões",
+    "Whitelisted Address": "Endereço na Lista de Permissões",
+    "Whitelist Settings": "Configurações da Lista de Permissões",
+    "Whitelist Start Time": "Horário de Início da Lista de Permissões",
+    "Whitelist End Time": "Horário de Término da Lista de Permissões",
+    "Default Limit Per Address": "Limite Padrão por Endereço",
+    "Whitelist Status": "Status da Lista de Permissões",
+    "Add Address": "Adicionar Endereço",
+    "Add Pack": "Adicionar Pacote",
+    "Packs": "Pacotes",
+    "Pack": "Pacote"
   },
   "SetITOPrices": {
     "Set ITO Prices": "Definir Preços do ITO"
@@ -171,7 +182,11 @@
     "Per Address": "por Endereço",
     "White List Status": "Status da Lista Branca",
     "White List": "Lista Branca",
-    "Pack Info": "Informações do Pacote"
+    "Pack Info": "Informações do Pacote",
+    "Pack Info for": "Informações do Pacote para",
+    "Pack Currency ID": "ID da Moeda do Pacote",
+    "Add Packs in another currency": "Adicionar pacotes em outra moeda",
+    "Add Pack Info": "Adicionar Informações do Pacote"
   },
   "Limit": "Limite",
   "CreateTransactions": {

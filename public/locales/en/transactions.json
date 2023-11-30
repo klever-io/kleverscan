@@ -129,7 +129,18 @@
     "Config ITO": "Config ITO",
     "Receiver": "Receiver",
     "Status": "Status",
-    "Max Amount": "Max Amount"
+    "Max Amount": "Max Amount",
+    "Whitelist": "Whitelist",
+    "Whitelisted Address": "Whitelisted Address",
+    "Whitelist Settings": "Whitelist Settings",
+    "Whitelist Start Time": "Whitelist Start Time",
+    "Whitelist End Time": "Whitelist End Time",
+    "Default Limit Per Address": "Default Limit Per Address",
+    "Whitelist Status": "Whitelist Status",
+    "Add Address": "Add Address",
+    "Add Pack": "Add Pack",
+    "Packs": "Packs",
+    "Pack": "Pack"
   },
   "SetITOPrices": {
     "Set ITO Prices": "Set ITO Prices"
@@ -171,7 +182,11 @@
     "Per Address": "per Address",
     "White List Status": "White List Status",
     "White List": "White List",
-    "Pack Info": "Pack Info"
+    "Pack Info": "Pack Info",
+    "Pack Info for": "Pack Info for",
+    "Pack Currency ID": "Pack Currency ID",
+    "Add Packs in another currency": "Add packs in another currency",
+    "Add Pack Info": "Add Pack Info"
   },
   "Limit": "Limit",
   "CreateTransactions": {

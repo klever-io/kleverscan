@@ -1,6 +1,7 @@
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
 import { ICollectionList } from '@/types';
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
@@ -95,11 +96,12 @@ const MainSection: React.FC<ISectionProps> = ({
   walletAddress,
   collection,
 }) => {
+  const { t } = useTranslation('transactions');
   return (
     <FormSection>
       <FormInput
         name="receiverAddress"
-        title="Receiver Address"
+        title={t('ITOTrigger.Receiver Address')}
         span={2}
         dynamicInitialValue={walletAddress}
         tooltip={tooltip.receiverAddress}
@@ -107,26 +109,26 @@ const MainSection: React.FC<ISectionProps> = ({
       />
       <FormInput
         name="startTime"
-        title="Start Time"
+        title={t('Buy.Start Time')}
         type="datetime-local"
         tooltip={tooltip.startTime}
       />
       <FormInput
         name="endTime"
-        title="End Time"
+        title={t('Buy.End Time')}
         type="datetime-local"
         tooltip={tooltip.endTime}
       />
       <FormInput
         name="maxAmount"
-        title="Max Amount"
+        title={t('ConfigITO.Max Amount')}
         type="number"
         tooltip={tooltip.maxAmount}
         precision={collection?.isNFT ? 0 : collection?.precision}
       />
       <FormInput
         name="status"
-        title="Status"
+        title={t('ConfigITO.Status')}
         type="dropdown"
         options={statusOptions}
         tooltip={tooltip.status}
@@ -140,33 +142,34 @@ const WhitelistConfigSection: React.FC<ISectionProps> = ({
   walletAddress,
   collection,
 }) => {
+  const { t } = useTranslation('transactions');
   return (
     <FormSection>
       <SectionTitle>
-        <span>Whitelist Settings</span>
+        <span>{t('ConfigITO.Whitelist Settings')}</span>
       </SectionTitle>
       <FormInput
         name="whitelistStartTime"
-        title="Whitelist Start Time"
+        title={t('ConfigITO.Whitelist Start Time')}
         type="datetime-local"
         tooltip={tooltip.whitelistStartTime}
       />
       <FormInput
         name="whitelistEndTime"
-        title="Whitelist End Time"
+        title={t('ConfigITO.Whitelist End Time')}
         type="datetime-local"
         tooltip={tooltip.whitelistEndTime}
       />
       <FormInput
         name="defaultLimitPerAddress"
-        title="Default Limit Per Address"
+        title={t('ConfigITO.Default Limit Per Address')}
         type="number"
         tooltip={tooltip.defaultLimitPerAddress}
         precision={collection?.isNFT ? 0 : collection?.precision}
       />
       <FormInput
         name="whitelistStatus"
-        title="Whitelist Status"
+        title={t('ConfigITO.Whitelist Status')}
         type="dropdown"
         options={statusOptions}
         defaultValue={0}
@@ -177,6 +180,7 @@ const WhitelistConfigSection: React.FC<ISectionProps> = ({
 };
 
 export const WhitelistSection: React.FC<{ top?: number }> = ({ top }) => {
+  const { t } = useTranslation('transactions');
   const { control } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
@@ -185,23 +189,23 @@ export const WhitelistSection: React.FC<{ top?: number }> = ({ top }) => {
   return (
     <FormSection>
       <SectionTitle>
-        <span>Whitelist</span>
+        <span>{t('ConfigITO.Whitelist')}</span>
       </SectionTitle>
       {fields.map((field, index) => (
         <FormSection key={field.id} inner top={top}>
           <SectionTitle>
             <HiTrash onClick={() => remove(index)} />
-            Whitelisted Address {index + 1}
+            {t('ConfigITO.Whitelisted Address')} {index + 1}
           </SectionTitle>
           <FormInput
             name={`whitelistInfo[${index}].address`}
-            title={`Address`}
+            title={t('Address')}
             span={2}
             tooltip={tooltip.whitelistInfo.address}
           />
           <FormInput
             name={`whitelistInfo[${index}].limit`}
-            title={`Limit`}
+            title={t('Limit')}
             type="number"
             span={2}
             tooltip={tooltip.whitelistInfo.limit}
@@ -209,13 +213,15 @@ export const WhitelistSection: React.FC<{ top?: number }> = ({ top }) => {
         </FormSection>
       ))}
       <ButtonContainer type="button" onClick={() => append({})}>
-        Add Address
+        {t('ConfigITO.Add Address')}
       </ButtonContainer>
     </FormSection>
   );
 };
 
 export const PackInfoSection: React.FC<{ top?: number }> = ({ top }) => {
+  const { t } = useTranslation('transactions');
+  const { t: commonT } = useTranslation('common');
   const { control, watch } = useFormContext();
   const {
     fields,
@@ -229,20 +235,20 @@ export const PackInfoSection: React.FC<{ top?: number }> = ({ top }) => {
   const getOrder = (num: number) => {
     switch (num) {
       case 1:
-        return '1st';
+        return commonT('Order.1st');
       case 2:
-        return '2nd';
+        return commonT('Order.2nd');
       case 3:
-        return '3rd';
+        return commonT('Order.3rd');
       default:
-        return `${num}th`;
+        return commonT('Order.th', { num });
     }
   };
 
   return (
     <FormSection>
       <SectionTitle>
-        <span>Pack Info</span>
+        <span>{t('ITOTrigger.Pack Info')}</span>
       </SectionTitle>
       {fields.map((field, index) => {
         const currencyId = watch(`packInfo[${index}].currencyId`);
@@ -251,12 +257,12 @@ export const PackInfoSection: React.FC<{ top?: number }> = ({ top }) => {
           <FormSection key={field.id} inner top={top}>
             <SectionTitle>
               <HiTrash onClick={() => removePackInfo(index)} />
-              Pack Info for {getOrder(index + 1)} Currency{' '}
+              {t('ITOTrigger.Pack Info for')} {getOrder(index + 1)} Currency{' '}
               {currencyId ? `(${currencyId})` : ''}
             </SectionTitle>
             <FormInput
               name={`packInfo[${index}].currencyId`}
-              title="Pack Currency ID"
+              title={t('ITOTrigger.Pack Currency ID')}
               span={2}
               tooltip={tooltip.packInfo.packCurrency}
             />
@@ -265,13 +271,16 @@ export const PackInfoSection: React.FC<{ top?: number }> = ({ top }) => {
         );
       })}
       <ButtonContainer type="button" onClick={() => appendPackInfo({})}>
-        {fields.length > 0 ? 'Add Packs in another currency' : 'Add Pack Info'}
+        {fields.length > 0
+          ? `${t('ITOTrigger.Add Packs in another currency')}`
+          : `${t('ITOTrigger.Add Pack Info')}`}
       </ButtonContainer>
     </FormSection>
   );
 };
 
 const PackSection = ({ packInfoIndex }: { packInfoIndex: number }) => {
+  const { t } = useTranslation('transactions');
   const { control } = useFormContext();
   const {
     fields,
@@ -284,24 +293,24 @@ const PackSection = ({ packInfoIndex }: { packInfoIndex: number }) => {
   return (
     <FormSection inner>
       <SectionTitle>
-        <span>Packs</span>
+        <span>{t('ConfigITO.Packs')}</span>
       </SectionTitle>
       {fields.map((field, index) => (
         <FormSection key={field.id} inner>
           <SectionTitle>
             <HiTrash onClick={() => removePack(index)} />
-            Pack {index + 1}
+            {t('ConfigITO.Pack')} {index + 1}
           </SectionTitle>
           <FormInput
             name={`packInfo[${packInfoIndex}].packs[${index}].amount`}
-            title={`Amount`}
+            title={t('Amount')}
             type="number"
             tooltip={tooltip.packInfo.packItem.amount}
             required
           />
           <FormInput
             name={`packInfo[${packInfoIndex}].packs[${index}].price`}
-            title={`Price`}
+            title={t('Buy.Price')}
             type="number"
             tooltip={tooltip.packInfo.packItem.price}
             required
@@ -309,7 +318,7 @@ const PackSection = ({ packInfoIndex }: { packInfoIndex: number }) => {
         </FormSection>
       ))}
       <ButtonContainer type="button" onClick={() => appendPack({})}>
-        Add Pack
+        {t('ConfigITO.Add Pack')}
       </ButtonContainer>
     </FormSection>
   );

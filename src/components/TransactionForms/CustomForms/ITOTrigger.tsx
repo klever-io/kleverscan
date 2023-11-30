@@ -2,8 +2,10 @@ import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
 import { ICollectionList } from '@/types';
 import { ITOTriggerTypes } from '@/utils/contracts';
+import { useTranslation } from 'next-i18next';
 import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
+import { TFunction } from 'react-i18next';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
 import { KDASelect } from '../KDASelect';
@@ -25,6 +27,7 @@ const ITOTrigger: React.FC<IContractProps> = ({
   formKey,
   handleFormSubmit,
 }) => {
+  const { t } = useTranslation('transactions');
   const { handleSubmit, watch, reset } = useFormContext<ITOTriggerData>();
   const { walletAddress } = useExtension();
 
@@ -50,7 +53,7 @@ const ITOTrigger: React.FC<IContractProps> = ({
       <FormSection>
         <FormInput
           name="triggerType"
-          title="ITO Trigger Type"
+          title={t('ITOTrigger.ITO Trigger Type')}
           type="dropdown"
           zIndex={4}
           options={ITOTriggerTypes}
@@ -60,7 +63,7 @@ const ITOTrigger: React.FC<IContractProps> = ({
       {triggerType !== undefined && <KDASelect />}
       {triggerType !== undefined &&
         collection &&
-        getITOTriggerForm(triggerType, walletAddress, collection)}
+        getITOTriggerForm(triggerType, walletAddress, collection, t)}
     </FormBody>
   );
 };
@@ -69,6 +72,7 @@ const getITOTriggerForm = (
   triggerType: number,
   walletAddress: string,
   collection: ICollectionList,
+  t: TFunction,
 ) => {
   switch (triggerType) {
     case 0:
@@ -78,7 +82,7 @@ const getITOTriggerForm = (
         <FormSection>
           <FormInput
             name="status"
-            title="Status"
+            title={t('ConfigITO.Status')}
             type="dropdown"
             options={statusOptions}
             tooltip={tooltip.status}
@@ -91,7 +95,7 @@ const getITOTriggerForm = (
         <FormSection>
           <FormInput
             name="receiverAddress"
-            title="Receiver Address"
+            title={t('ITOTrigger.Receiver Address')}
             span={2}
             dynamicInitialValue={walletAddress}
             tooltip={tooltip.receiverAddress}
@@ -104,7 +108,7 @@ const getITOTriggerForm = (
         <FormSection>
           <FormInput
             name="maxAmount"
-            title="Max Amount"
+            title={t('ConfigITO.Max Amount')}
             type="number"
             precision={collection?.isNFT ? 0 : collection?.precision}
             tooltip={tooltip.maxAmount}
@@ -117,7 +121,7 @@ const getITOTriggerForm = (
         <FormSection>
           <FormInput
             name="defaultLimitPerAddress"
-            title="Default Limit Per Address"
+            title={t('ConfigITO.Default Limit Per Address')}
             type="number"
             precision={collection?.isNFT ? 0 : collection?.precision}
             tooltip={tooltip.defaultLimitPerAddress}
@@ -130,14 +134,14 @@ const getITOTriggerForm = (
         <FormSection>
           <FormInput
             name="startTime"
-            title="Start Time"
+            title={t('Buy.Start Time')}
             type="datetime-local"
             tooltip={tooltip.startTime}
             required
           />
           <FormInput
             name="endTime"
-            title="End Time"
+            title={t('Buy.End Time')}
             type="datetime-local"
             tooltip={tooltip.endTime}
             required
@@ -149,7 +153,7 @@ const getITOTriggerForm = (
         <FormSection>
           <FormInput
             name="whitelistStatus"
-            title="Whitelist Status"
+            title={t('ConfigITO.Whitelist Status')}
             type="dropdown"
             options={statusOptions}
             tooltip={tooltip.whitelistStatus}
@@ -166,14 +170,14 @@ const getITOTriggerForm = (
         <FormSection>
           <FormInput
             name="whitelistStartTime"
-            title="Whitelist Start Time"
+            title={t('ConfigITO.Whitelist Start Time')}
             type="datetime-local"
             tooltip={tooltip.whitelistStartTime}
             required
           />
           <FormInput
             name="whitelistEndTime"
-            title="Whitelist End Time"
+            title={t('ConfigITO.Whitelist End Time')}
             type="datetime-local"
             tooltip={tooltip.whitelistEndTime}
             required

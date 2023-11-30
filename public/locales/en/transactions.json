@@ -176,6 +176,7 @@
   },
   "ITOTrigger": {
     "ITO Trigger": "ITO Trigger",
+    "ITO Trigger Type": "ITO Trigger Type",
     "White List Info": "White List Info",
     "Receiver Address": "Receiver Address",
     "Default Limit": "Default Limit",

@@ -175,8 +175,9 @@
     "Deposit Type": "Tipo de Depósito"
   },
   "ITOTrigger": {
-    "ITO Trigger": "Gatilho do ITO",
-    "White List Info": "Informação da Lista Branca",
+    "ITO Trigger": "Acionador ITO",
+    "ITO Trigger Type": "Tipo de Acionador ITO",
+    "White List Info": "Informações da Lista Branca",
     "Receiver Address": "Endereço do Receptor",
     "Default Limit": "Limite Padrão",
     "Per Address": "por Endereço",

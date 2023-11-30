@@ -175,11 +175,20 @@
   "NewReferralPercentage": "Nova Porcentagem de Indicação",
   "NewReferralAddress": "Novo Endereço de Indicação",
   "UpdateAccountPermission": {
+    "Permissions": "Permissões",
+    "Permission": "Permissão",
     "Update Account Permission": "Atualizar Permissão da Conta",
     "Permission Name": "Nome da Permissão",
     "Permission Type": "Tipo de Permissão",
     "Operations": "Operações",
-    "Signers": "Assinantes"
+    "Signers": "Assinantes",
+    "Signer": "Assinante",
+    "Tooltip Permission": "As operações do contrato permitidas por esta permissão.",
+    "All": "Todos",
+    "Add Permission": "Adicionar Permissão",
+    "Signature Weight": "Peso da Assinatura",
+    "Remove Signer": "Remover Assinante",
+    "Add Signer": "Adicionar Assinante"
   },
   "Deposit": {
     "Deposit": "Depósito",

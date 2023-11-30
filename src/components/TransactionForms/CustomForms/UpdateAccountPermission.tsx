@@ -2,6 +2,7 @@ import { useContract } from '@/contexts/contract';
 import { contractsList } from '@/utils/contracts';
 import { setCharAt } from '@/utils/convertString';
 import { invertBytes } from '@/utils/formatFunctions';
+import { useTranslation } from 'next-i18next';
 import React, { useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
@@ -92,6 +93,7 @@ const UpdateAccountPermission: React.FC<IContractProps> = ({
 };
 
 const PermissionsSection: React.FC = () => {
+  const { t } = useTranslation('transactions');
   const { control, watch, setValue } = useFormContext();
   const [binaryOperations, setBinaryOperations] =
     useState<string>(binaryDefault);
@@ -107,7 +109,7 @@ const PermissionsSection: React.FC = () => {
 
   return (
     <FormSection inner>
-      <SectionTitle>Permissions</SectionTitle>
+      <SectionTitle>{t('UpdateAccountPermission.Permissions')}</SectionTitle>
 
       {fields.map((field, permissionIndex) => {
         const binaryOperations = watch(
@@ -120,17 +122,17 @@ const PermissionsSection: React.FC = () => {
           <FormSection inner key={field.id}>
             <SectionTitle>
               <HiTrash onClick={() => removePermission(permissionIndex)} />
-              Permission {permissionIndex + 1}
+              {t('UpdateAccountPermission.Permission')} {permissionIndex + 1}
             </SectionTitle>
             <FormInput
-              title="Permission Name"
+              title={t('UpdateAccountPermission.Permission Name')}
               name={`permissions[${permissionIndex}].permissionName`}
               span={2}
               tooltip="An identifier name for the permission."
               required
             />
             <FormInput
-              title="Threshold"
+              title={t('Threshold')}
               name={`permissions[${permissionIndex}].threshold`}
               type="number"
               span={2}
@@ -138,7 +140,7 @@ const PermissionsSection: React.FC = () => {
               required
             />
             <FormInput
-              title="Type"
+              title={t('Type')}
               name={`permissions[${permissionIndex}].type`}
               span={2}
               type="dropdown"
@@ -151,12 +153,12 @@ const PermissionsSection: React.FC = () => {
             {type === 1 && (
               <Container span={2}>
                 <InputLabel>
-                  Operations
+                  {t('UpdateAccountPermission.Operations')}
                   <TooltipContainer>
                     <InfoIcon size={13} />
                     <TooltipContent>
                       <span>
-                        The contract operations allowed by this permission.
+                        {t('UpdateAccountPermission.Tooltip Permission')}
                       </span>
                     </TooltipContent>
                   </TooltipContainer>
@@ -180,7 +182,7 @@ const PermissionsSection: React.FC = () => {
                       }}
                     />
 
-                    <span>All</span>
+                    <span>{t('UpdateAccountPermission.All')}</span>
                   </CheckboxContract>
                   {contractsList.map((item: any, contractIndex: number) => {
                     return (
@@ -233,7 +235,7 @@ const PermissionsSection: React.FC = () => {
           appendPermission({});
         }}
       >
-        Add Permission
+        {t('UpdateAccountPermission.Add Permission')}
       </ButtonContainer>
     </FormSection>
   );
@@ -244,6 +246,7 @@ interface SignersSectionProps {
 }
 
 const SignersSection: React.FC<SignersSectionProps> = ({ permissionIndex }) => {
+  const { t } = useTranslation('transactions');
   const { control } = useFormContext();
   const {
     fields,
@@ -257,33 +260,33 @@ const SignersSection: React.FC<SignersSectionProps> = ({ permissionIndex }) => {
   return (
     <FormSection inner>
       <SectionTitle>
-        <span>Signers</span>
+        <span>{t('UpdateAccountPermission.Tooltip Permission')}</span>
       </SectionTitle>
       {fields.map((field, index) => (
         <FormSection inner key={field.id}>
           <SectionTitle>
             <HiTrash onClick={() => removeSigner(index)} />
-            Signer {index + 1}
+            {t('UpdateAccountPermission.Signer')} {index + 1}
           </SectionTitle>
           <FormInput
-            title="Address"
+            title={t('Address')}
             name={`permissions[${permissionIndex}].signers[${index}].address`}
             required
           />
           <FormInput
-            title="Signature Weight"
+            title={t('UpdateAccountPermission.Signature Weight')}
             name={`permissions[${permissionIndex}].signers[${index}].weight`}
             type="number"
             tooltip="How much this signer contributes towards the threshold."
             required
           />
           <ButtonContainer type="button" onClick={() => removeSigner(index)}>
-            Remove Signer
+            {t('UpdateAccountPermission.Remove Signer')}
           </ButtonContainer>
         </FormSection>
       ))}
       <ButtonContainer type="button" onClick={() => appendSigner({})}>
-        Add Signer
+        {t('UpdateAccountPermission.Add Signer')}
       </ButtonContainer>
     </FormSection>
   );

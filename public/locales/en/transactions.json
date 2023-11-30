@@ -175,11 +175,20 @@
   "NewReferralPercentage": "New Referral Percentage",
   "NewReferralAddress": "New Referral Address",
   "UpdateAccountPermission": {
+    "Permissions": "Permissions",
+    "Permission": "Permission",
     "Update Account Permission": "Update Account Permission",
     "Permission Name": "Permission Name",
     "Permission Type": "Permission Type",
     "Operations": "Operations",
-    "Signers": "Signers"
+    "Signers": "Signers",
+    "Signer": "Signer",
+    "Tooltip Permission": "The contract operations allowed by this permission.",
+    "All": "All",
+    "Add Permission": "Add Permission",
+    "Signature Weight": "Signature Weight",
+    "Remove Signer": "Remove Signer",
+    "Add Signer": "Add Signer"
   },
   "Deposit": {
     "Deposit": "Deposit",

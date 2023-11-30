@@ -1,4 +1,5 @@
 import { useContract } from '@/contexts/contract';
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -13,6 +14,7 @@ const SetAccountName: React.FC<IContractProps> = ({
   formKey,
   handleFormSubmit,
 }) => {
+  const { t } = useTranslation('transactions');
   const { handleSubmit } = useFormContext<FormData>();
   const {} = useContract();
 
@@ -23,7 +25,7 @@ const SetAccountName: React.FC<IContractProps> = ({
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
       <FormSection>
-        <FormInput name="name" title="Account Name" required />
+        <FormInput name="name" title={t('AccountName')} required />
       </FormSection>
     </FormBody>
   );

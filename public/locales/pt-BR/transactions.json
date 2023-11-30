@@ -120,6 +120,7 @@
     "KDA/KLV Quotient": "Quociente KDA/KLV"
   },
   "SetAccountName": "Definir Nome da Conta",
+  "AccountName": "Nome da Conta",
   "Proposal": {
     "Proposal": "Proposta",
     "Proposal Id": "ID da Proposta",

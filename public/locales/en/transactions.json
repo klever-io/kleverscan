@@ -120,6 +120,7 @@
     "KDA/KLV Quotient": "KDA/KLV Quotient"
   },
   "SetAccountName": "Set Account Name",
+  "AccountName": "Account Name",
   "Proposal": {
     "Proposal": "Proposal",
     "Proposal Id": "Proposal ID",

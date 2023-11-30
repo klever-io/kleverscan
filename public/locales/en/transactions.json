@@ -119,7 +119,7 @@
   "SetAccountName": "Set Account Name",
   "Proposal": {
     "Proposal": "Proposal",
-    "Proposal Id": "Proposal Id",
+    "Proposal Id": "Proposal ID",
     "Epoch Duration": "Epoch Duration",
     "Description": "Description",
     "Parameters": "Parameters",

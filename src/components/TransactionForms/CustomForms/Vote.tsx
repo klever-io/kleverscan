@@ -1,6 +1,7 @@
 import api from '@/services/api';
 import { IProposalsResponse } from '@/types/proposals';
 import { KLV_PRECISION } from '@/utils/globalVariables';
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useQuery } from 'react-query';
@@ -19,6 +20,7 @@ const parseVote = (data: FormData) => {
 };
 
 const Vote: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+  const { t } = useTranslation('transactions');
   const { handleSubmit } = useFormContext<FormData>();
 
   const getProposals = async () => {
@@ -63,7 +65,7 @@ const Vote: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
       <FormSection>
         <FormInput
           name="proposalId"
-          title="Proposal ID"
+          title={t('Proposal.Proposal Id')}
           type="dropdown"
           options={proposals}
           required
@@ -73,7 +75,7 @@ const Vote: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
       <FormSection>
         <FormInput
           name="amount"
-          title="Amount"
+          title={t('Amount')}
           type="number"
           tooltip="Vote weight depends on the amount of KFI held, the KFI is not spent."
           precision={KLV_PRECISION}
@@ -81,7 +83,7 @@ const Vote: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
         />
         <FormInput
           name="type"
-          title="Type"
+          title={t('Type')}
           type="checkbox"
           toggleOptions={['In Favor', 'Against']}
         />

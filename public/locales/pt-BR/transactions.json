@@ -65,7 +65,8 @@
     "Can Delegate": "Pode Delegar",
     "Commission": "Comissão",
     "Max Delegation": "Delegação Máxima",
-    "Reward Address": "Endereço de Recompensa"
+    "Reward Address": "Endereço de Recompensa",
+    "Max Delegation Amount": "Valor Máximo de Delegação"
   },
   "ValidatorConfig": {
     "Validator Config": "Configuração do Validador",

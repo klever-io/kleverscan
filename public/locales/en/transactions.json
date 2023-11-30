@@ -65,7 +65,8 @@
     "Can Delegate": "Can Delegate",
     "Commission": "Commission",
     "Max Delegation": "Max Delegation",
-    "Reward Address": "Reward Address"
+    "Reward Address": "Reward Address",
+    "Max Delegation Amount": "Max Delegation Amount"
   },
   "ValidatorConfig": {
     "Validator Config": "Validator Config",

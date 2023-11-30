@@ -122,7 +122,11 @@
     "Proposal Id": "ID da Proposta",
     "Epoch Duration": "Duração da Época",
     "Description": "Descrição",
-    "Parameters": "Parâmetros"
+    "Parameters": "Parâmetros",
+    "Which Network": "Quais parâmetros de rede a proposta tem como objetivo alterar",
+    "Parameter": "Parâmetro",
+    "Proposed Value": "Valor Proposto",
+    "Add Parameter": "Adicionar Parâmetro"
   },
   "Vote": "Votar",
   "ConfigITO": {

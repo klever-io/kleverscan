@@ -1,5 +1,6 @@
 import { getParamsList } from '@/services/requests/proposals';
 import { IParamList } from '@/types';
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
@@ -48,6 +49,7 @@ const parseProposal = (data: any): void => {
 };
 
 const Proposal: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+  const { t } = useTranslation('transactions');
   const { handleSubmit } = useFormContext<FormData>();
 
   const { data: paramsList } = useQuery('paramsList', getParamsList);
@@ -62,14 +64,14 @@ const Proposal: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
       <FormSection>
         <FormInput
           name="description"
-          title="Description"
+          title={t('Proposal.Description')}
           type="textarea"
           span={2}
           tooltip="Outline of the proposal"
         />
         <FormInput
           name="epochsDuration"
-          title="Epochs Duration"
+          title={t('Proposal.Epoch Duration')}
           type="number"
           span={2}
           max={paramsList?.[34].currentValue || 40}
@@ -91,6 +93,7 @@ interface IParametersProps {
 export const ParametersSection: React.FC<IParametersProps> = ({
   paramsList = [],
 }) => {
+  const { t } = useTranslation('transactions');
   const { control } = useFormContext();
 
   const { fields, append, remove } = useFieldArray({
@@ -100,13 +103,11 @@ export const ParametersSection: React.FC<IParametersProps> = ({
   return (
     <FormSection>
       <SectionTitle>
-        <span>Parameters</span>
+        <span>{t('Proposal.Parameters')}</span>
         <TooltipContainer>
           <InfoIcon size={13} />
           <TooltipContent>
-            <span>
-              Which network parameters the proposal is aiming to change
-            </span>
+            <span>{t('Proposal.Which Network')}</span>
           </TooltipContent>
         </TooltipContainer>
       </SectionTitle>
@@ -114,22 +115,22 @@ export const ParametersSection: React.FC<IParametersProps> = ({
         <FormSection key={field.id} inner>
           <SectionTitle>
             <HiTrash onClick={() => remove(index)} />
-            Parameter {index + 1}
+            {t('Proposal.Parameter')} {index + 1}
           </SectionTitle>
           <FormInput
             name={`parameters[${index}].label`}
-            title={`Parameter`}
+            title={t('Proposal.Parameter')}
             type="dropdown"
             options={paramsList}
           />
           <FormInput
             name={`parameters[${index}].value`}
-            title={`Proposed Value`}
+            title={t('Proposal.Proposed Value')}
           />
         </FormSection>
       ))}
       <ButtonContainer type="button" onClick={() => append({})}>
-        Add Parameter
+        {t('Proposal.Add Parameter')}
       </ButtonContainer>
     </FormSection>
   );

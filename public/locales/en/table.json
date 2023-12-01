@@ -1,0 +1,17 @@
+{
+  "Address": "Address",
+  "Staked": "Staked",
+  "Balance": "Balance",
+  "Name": "Name",
+  "Type": "Type",
+  "InitialSupply": "Initial Supply",
+  "MaxSupply": "Max Supply",
+  "CirculatingSupply": "Circulating Supply",
+  "RewardsType": "Rewards Type",
+  "Precision": "Precision",
+  "Fungible": "Fungible",
+  "NonFungible": "NonFungible",
+  "Owner": "Owner",
+  "Limit": "Limit",
+  "Amount": "Amount"
+}

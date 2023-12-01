@@ -106,6 +106,7 @@ const WalletHelp: React.FC<IWalletDrawer> = ({
                     alt="WebStore"
                     width="800"
                     height="420"
+                    loader={({ src, width }) => `${src}?w=${width}`}
                   />
                 </ImageContainer>
                 <p>
@@ -119,6 +120,7 @@ const WalletHelp: React.FC<IWalletDrawer> = ({
                     alt="Extension"
                     width="240"
                     height="400"
+                    loader={({ src, width }) => `${src}?w=${width}`}
                   />
                 </ImageContainer>
                 <p>

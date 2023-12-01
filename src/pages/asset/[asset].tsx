@@ -81,14 +81,19 @@ import { BalanceContainer, RowContent } from '@/views/proposals/detail';
 import { FilterByDate } from '@/views/transactions';
 import { ButtonExpand } from '@/views/transactions/detail';
 import { ReceiveBackground } from '@/views/validator';
+import { GetStaticPaths, GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
+import nextI18nextConfig from '../../../next-i18next.config';
 import { displayITOpacks } from '../itos';
 
 const Asset: React.FC<IAssetPage> = ({}) => {
   const router = useRouter();
+  const { t } = useTranslation(['common', 'assets']);
   const { data: asset } = useQuery({
     queryKey: [`asset`, router.query.asset],
     queryFn: () => assetCall(router),
@@ -117,7 +122,10 @@ const Asset: React.FC<IAssetPage> = ({}) => {
     queryFn: () => assetPoolCall(router.query.asset as string),
     enabled: !!router?.isReady,
   });
-  const tableHeaders = ['Transactions', 'Holders'];
+  const tableHeaders = [
+    `${t('common:Titles.Transactions')}`,
+    `${t('common:Tabs.Holders')}`,
+  ];
   const [selectedTab, setSelectedTab] = useState<null | string>(null);
   const [expand, setExpand] = useState({ whitelist: false, packs: false });
   const [txHash, setTxHash] = useState('');
@@ -125,7 +133,10 @@ const Asset: React.FC<IAssetPage> = ({}) => {
 
   const { isMobile } = useMobile();
   const [holderQuery, setHolderQuery] = useState<string>('');
-  const cardHeaders = ['Overview', 'More'];
+  const cardHeaders = [
+    `${t('common:Tabs.Overview')}`,
+    `${t('common:Tabs.More')}`,
+  ];
   asset?.uris && cardHeaders.push('URIS');
   assetPool && cardHeaders.push('KDA Pool');
   ITO && cardHeaders.push('ITO');
@@ -216,7 +227,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         {asset?.ownerAddress && (
           <Row isStakingRoyalties={false}>
             <span>
-              <strong>Owner</strong>
+              <strong>{t('table:Owner')}</strong>
             </span>
 
             <span>
@@ -234,7 +245,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         )}
         <Row isStakingRoyalties={false}>
           <span>
-            <strong>Max Supply</strong>
+            <strong>{t('table:MaxSupply')}</strong>
           </span>
           <span>
             <small>
@@ -251,7 +262,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
-            <strong>Initial Supply</strong>
+            <strong>{t('table:InitialSupply')}</strong>
           </span>
           <span>
             <small>
@@ -285,7 +296,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
-            <strong>Burned Value</strong>
+            <strong>{t('assets:Overview.Burned Value')}</strong>
           </span>
           <span>
             <small>
@@ -302,7 +313,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
-            <strong>Total Staked</strong>
+            <strong>{t('common:Cards.Total Staked')}</strong>
           </span>
           <span>
             <small>
@@ -319,13 +330,13 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
-            <strong>Holders</strong>
+            <strong>{t('assets:Overview.Holders')}</strong>
           </span>
           <span>{asset ? holdersPagination?.totalRecords : <Skeleton />}</span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
-            <strong>Transactions</strong>
+            <strong>{t('common:Titles.Transactions')}</strong>
           </span>
           <span>
             {asset ? transactionsPagination?.totalRecords : <Skeleton />}
@@ -333,13 +344,13 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
-            <strong>Market Cap</strong>
+            <strong>{t('common:Cards.Market Cap')}</strong>
           </span>
           <span>--</span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
-            <strong>Staking Type</strong>
+            <strong>{t('assets:Overview.Staking Type')}</strong>
           </span>
           <span>
             {asset ? parseApr(asset?.staking?.interestType) : <Skeleton />}
@@ -387,7 +398,11 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                   key={String(isActive)}
                 >
                   <ActiveIcon />
-                  <p>{isActive ? 'Yes' : 'No'}</p>
+                  <p>
+                    {isActive
+                      ? `${t('common:Statements.Yes')}`
+                      : `${t('common:Statements.No')}`}
+                  </p>
                 </Status>
               ) : (
                 <Skeleton />
@@ -501,30 +516,29 @@ const Asset: React.FC<IAssetPage> = ({}) => {
             {ITO?.maxAmount ? (
               <Row isStakingRoyalties={false}>
                 <span>
-                  <strong>Max Amount</strong>
+                  <strong>{t('assets:ITO.Max Amount')}</strong>
                 </span>
                 <span>{ITO.maxAmount}</span>
               </Row>
             ) : null}
             <Row isStakingRoyalties={false}>
               <span>
-                <strong>Receiver Address</strong>
+                <strong>{t('assets:ITO.Receiver Address')}</strong>
               </span>
-
-              <AddressDiv>{ITO.receiverAddress} </AddressDiv>
+              <AddressDiv>{ITO.receiverAddress}</AddressDiv>
               <Copy data={ITO.receiverAddress} />
             </Row>
             <Row isStakingRoyalties={false}>
               <span>
-                <strong>White List Active</strong>
+                <strong>{t('assets:ITO.White List Active')}</strong>
               </span>
-              <span>{statusWithIcon(ITO.isWhitelistActive)}</span>
+              <span>{statusWithIcon(ITO.isWhitelistActive, t)}</span>
             </Row>
 
             {ITO?.startTime && (
               <Row isStakingRoyalties={false}>
                 <span>
-                  <strong>Start Time</strong>
+                  <strong>{t('assets:ITO.Start Time')}</strong>
                 </span>
                 <span>
                   <small>{formatDate(ITO.startTime)}</small>
@@ -534,7 +548,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
             {ITO?.endTime && (
               <Row isStakingRoyalties={false}>
                 <span>
-                  <strong>End Time</strong>
+                  <strong>{t('assets:ITO.End Time')}</strong>
                 </span>
                 <span>
                   <small>{formatDate(ITO.endTime)}</small>
@@ -544,9 +558,9 @@ const Asset: React.FC<IAssetPage> = ({}) => {
             {ITO?.whitelistStartTime && (
               <Row isStakingRoyalties={false}>
                 <span>
-                  <strong>White List</strong>
+                  <strong>{t('assets:ITO.White List')}</strong>
                   <br />
-                  <strong>Start Time</strong>
+                  <strong>{t('assets:ITO.Start Time')}</strong>
                 </span>
                 <span>
                   <small>{formatDate(ITO.whitelistStartTime)}</small>
@@ -556,9 +570,9 @@ const Asset: React.FC<IAssetPage> = ({}) => {
             {ITO?.whitelistEndTime && (
               <Row isStakingRoyalties={false}>
                 <span>
-                  <strong>White List</strong>
+                  <strong>{t('assets:ITO.White List')}</strong>
                   <br />
-                  <strong>End Time</strong>
+                  <strong>{t('assets:ITO.End Time')}</strong>
                 </span>
                 <span>
                   <small>{formatDate(ITO.whitelistEndTime)}</small>
@@ -572,7 +586,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
               >
                 <ExpandWrapper expandVar={expand.whitelist}>
                   <span style={{ gap: '4px' }}>
-                    <strong>White List Info</strong>
+                    <strong>{t('assets:ITO.White List Info')}</strong>
                   </span>
                   <span>
                     <ButtonExpand
@@ -581,7 +595,9 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                         setExpand({ ...expand, whitelist: !expand.whitelist })
                       }
                     >
-                      {expand.whitelist ? 'Hide' : 'Expand'}
+                      {expand.whitelist
+                        ? `${t('common:Buttons.Hide')}`
+                        : `${t('common:Buttons.Expand')}`}
                     </ButtonExpand>
                   </span>
                 </ExpandWrapper>
@@ -599,7 +615,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                                 }}
                               >
                                 <span>
-                                  <strong>Address</strong>
+                                  <strong>{t('table:Address')}</strong>
                                 </span>
                                 <EllipsisSpan>
                                   <Link href={`/accounts/${data.address}`}>
@@ -610,7 +626,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                               </div>
                               <div>
                                 <span>
-                                  <strong>Limit</strong>
+                                  <strong>{t('table:Limit')}</strong>
                                 </span>
                                 <span>
                                   <small>{data.limit}</small>
@@ -635,7 +651,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                   style={{ marginBottom: expand.packs ? '1rem' : '0' }}
                 >
                   <span style={{ gap: '4px' }}>
-                    <strong>Packs Data</strong>
+                    <strong>{t('assets:ITO.Packs Data')}</strong>
                   </span>
                   <span>
                     {' '}
@@ -644,11 +660,13 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                         setExpand({ ...expand, packs: !expand.packs })
                       }
                     >
-                      {expand.packs ? 'Hide' : 'Expand'}
+                      {expand.packs
+                        ? `${t('common:Buttons.Hide')}`
+                        : `${t('common:Buttons.Expand')}`}
                     </ButtonExpand>
                   </span>
                 </ExpandWrapper>
-                {expand.packs && displayITOpacks(ITO, setTxHash)}
+                {expand.packs && displayITOpacks(ITO, setTxHash, t)}
               </ExpandableRow>
             )}
           </>
@@ -666,13 +684,13 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       <>
         <Row isStakingRoyalties={false}>
           <span>
-            <strong>Issuing Time</strong>
+            <strong>{t('assets:More.Issuing Time')}</strong>
           </span>
           <span>{asset ? getIssueDate() : <Skeleton />}</span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
-            <strong>Issuer</strong>
+            <strong>{t('assets:More.Issuer')}</strong>
           </span>
           <span>
             {asset ? (
@@ -693,57 +711,21 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
-            <strong>Precision</strong>
+            <strong>{t('table:Precision')}</strong>
           </span>
           <span>{asset ? asset.precision : <Skeleton />}</span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
-            <strong>Can Freeze</strong>
-          </span>
-          <span>
-            {asset ? statusWithIcon(asset.properties.canFreeze) : <Skeleton />}
-          </span>
-        </Row>
-        <Row isStakingRoyalties={false}>
-          <span>
-            <strong>Can Wipe</strong>
-          </span>
-          <span>
-            {asset ? statusWithIcon(asset.properties.canWipe) : <Skeleton />}
-          </span>
-        </Row>
-        <Row isStakingRoyalties={false}>
-          <span>
-            <strong>Can Pause</strong>
-          </span>
-          <span>
-            {asset ? statusWithIcon(asset.properties.canPause) : <Skeleton />}
-          </span>
-        </Row>
-        <Row isStakingRoyalties={false}>
-          <span>
-            <strong>Can Mint</strong>
-          </span>
-          <span>
-            {asset ? statusWithIcon(asset.properties.canMint) : <Skeleton />}
-          </span>
-        </Row>
-        <Row isStakingRoyalties={false}>
-          <span>
-            <strong>Can Burn</strong>
-          </span>
-          <span>
-            {asset ? statusWithIcon(asset.properties.canBurn) : <Skeleton />}
-          </span>
-        </Row>
-        <Row isStakingRoyalties={false}>
-          <span>
-            <strong>Can Change Owner</strong>
+            <strong>
+              {t('common:Properties.Can', {
+                type: `${t('common:Properties.Freeze')}`,
+              })}
+            </strong>
           </span>
           <span>
             {asset ? (
-              statusWithIcon(asset.properties.canChangeOwner)
+              statusWithIcon(asset.properties.canFreeze, t)
             ) : (
               <Skeleton />
             )}
@@ -751,11 +733,27 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
-            <strong>Can Add Roles</strong>
+            <strong>
+              {t('common:Properties.Can', {
+                type: `${t('common:Properties.Wipe')}`,
+              })}
+            </strong>
+          </span>
+          <span>
+            {asset ? statusWithIcon(asset.properties.canWipe, t) : <Skeleton />}
+          </span>
+        </Row>
+        <Row isStakingRoyalties={false}>
+          <span>
+            <strong>
+              {t('common:Properties.Can', {
+                type: `${t('common:Properties.Pause')}`,
+              })}
+            </strong>
           </span>
           <span>
             {asset ? (
-              statusWithIcon(asset.properties.canAddRoles)
+              statusWithIcon(asset.properties.canPause, t)
             ) : (
               <Skeleton />
             )}
@@ -763,19 +761,83 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
-            <strong>Paused</strong>
+            <strong>
+              {t('common:Properties.Can', {
+                type: `${t('common:Properties.Mint')}`,
+              })}
+            </strong>
           </span>
           <span>
-            {asset ? statusWithIcon(asset.attributes.isPaused) : <Skeleton />}
+            {asset ? statusWithIcon(asset.properties.canMint, t) : <Skeleton />}
           </span>
         </Row>
         <Row isStakingRoyalties={false}>
           <span>
-            <strong>NFT Mint Stopped</strong>
+            <strong>
+              {t('common:Properties.Can', {
+                type: `${t('common:Properties.Burn')}`,
+              })}
+            </strong>
+          </span>
+          <span>
+            {asset ? statusWithIcon(asset.properties.canBurn, t) : <Skeleton />}
+          </span>
+        </Row>
+        <Row isStakingRoyalties={false}>
+          <span>
+            <strong>
+              {t('common:Properties.Can', {
+                type: `${t('common:Properties.Change Owner')}`,
+              })}
+            </strong>
           </span>
           <span>
             {asset ? (
-              statusWithIcon(asset.attributes.isNFTMintStopped)
+              statusWithIcon(asset.properties.canChangeOwner, t)
+            ) : (
+              <Skeleton />
+            )}
+          </span>
+        </Row>
+        <Row isStakingRoyalties={false}>
+          <span>
+            <strong>
+              {t('common:Properties.Can', {
+                type: `${t('common:Properties.Add Roles')}`,
+              })}
+            </strong>
+          </span>
+          <span>
+            {asset ? (
+              statusWithIcon(asset.properties.canAddRoles, t)
+            ) : (
+              <Skeleton />
+            )}
+          </span>
+        </Row>
+        <Row isStakingRoyalties={false}>
+          <span>
+            <strong>
+              {t('common:Properties.Can', {
+                type: `${t('common:Properties.Pause')}`,
+              })}
+            </strong>
+          </span>
+          <span>
+            {asset ? (
+              statusWithIcon(asset.attributes.isPaused, t)
+            ) : (
+              <Skeleton />
+            )}
+          </span>
+        </Row>
+        <Row isStakingRoyalties={false}>
+          <span>
+            <strong>{t('common:Properties.NFT Mint Stopped')}</strong>
+          </span>
+          <span>
+            {asset ? (
+              statusWithIcon(asset.attributes.isNFTMintStopped, t)
             ) : (
               <Skeleton />
             )}
@@ -801,7 +863,9 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                   );
                 }}
               >
-                Show details
+                {t('common:Buttons.Show', {
+                  type: `${t('assets:Staking.Details')}`,
+                })}
               </ShowDetailsButton>
             ) : (
               asset?.staking.apr.reverse().map((apr, index) => (
@@ -831,11 +895,11 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                 <BalanceContainer>
                   <FrozenContainer>
                     <div>
-                      <strong>Address</strong>
+                      <strong>{t('table:Address')}</strong>
                       <p>{asset?.royalties.address || '--'}</p>
                     </div>
                     <div>
-                      <strong>Market Fixed</strong>
+                      <strong>{t('assets:Staking.Market Fixed')}</strong>
                       <p>
                         {(asset?.royalties.marketFixed &&
                           `${
@@ -845,7 +909,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                       </p>
                     </div>
                     <div>
-                      <strong>Market Percentage</strong>
+                      <strong> {t('assets:Staking.Market Percentage')}</strong>
                       <p>
                         {(asset?.royalties.marketPercentage &&
                           `${asset?.royalties.marketPercentage / 10 ** 2}%`) ||
@@ -853,7 +917,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                       </p>
                     </div>
                     <div>
-                      <strong>Transfer Fixed</strong>
+                      <strong>{t('assets:Staking.Transfer Fixed')}</strong>
                       <p>
                         {asset?.royalties.transferFixed
                           ? `${asset?.royalties.transferFixed / 10 ** 6} KLV`
@@ -865,9 +929,12 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                         (transfer, index) =>
                           Object.keys(transfer).length > 0 && (
                             <div key={index}>
-                              <strong>Transfer Percentage</strong>
+                              <strong>
+                                {' '}
+                                {t('assets:Staking.Transfer Percentage')}
+                              </strong>
                               <p>
-                                Amount:{' '}
+                                {t('table:Amount')}:{' '}
                                 {toLocaleFixed(
                                   (transfer.amount || 0) /
                                     10 ** asset?.precision,
@@ -875,21 +942,25 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                                 )}
                               </p>
                               <p>
-                                Percentage: {transfer.percentage / 10 ** 2}%
+                                {t('assets:Staking.Percentage')}:{' '}
+                                {transfer.percentage / 10 ** 2}%
                               </p>
                             </div>
                           ),
                       )
                     ) : (
                       <div>
-                        <strong>Transfer Percentage</strong>
-                        <p>Amount: --</p>
-                        <p>Percentage: -- </p>
+                        <strong>
+                          {' '}
+                          {t('assets:Staking.Transfer Percentage')}
+                        </strong>
+                        <p>{t('table:Amount')}: --</p>
+                        <p>{t('assets:Staking.Percentage')}: -- </p>
                       </div>
                     )}
                     {asset?.royalties?.itoPercentage && (
                       <div>
-                        <strong>ITO Percentage</strong>
+                        <strong>ITO {t('assets:Staking.Percentage')}</strong>
                         <p>
                           {`${asset.royalties.itoPercentage / 10 ** 2}%` ||
                             '--'}
@@ -898,7 +969,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                     )}
                     {asset?.royalties?.itoFixed && (
                       <div>
-                        <strong>ITO Fixed</strong>
+                        <strong>ITO {t('assets:Staking.Fixed')}</strong>
                         <p>
                           {`${
                             asset.royalties.itoFixed / 10 ** KLV_PRECISION
@@ -918,7 +989,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                 <BalanceContainer>
                   <FrozenContainer>
                     <div>
-                      <strong>Total Staked</strong>
+                      <strong>{t('common:Cards.Total Staked')}</strong>
                       <p>
                         {toLocaleFixed(
                           (asset?.staking?.totalStaked || 0) /
@@ -928,7 +999,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                       </p>
                     </div>
                     <div>
-                      <strong>Current FPR Amount</strong>
+                      <strong>{t('assets:Staking.Current FPR Amount')}</strong>
 
                       <p>
                         {toLocaleFixed(
@@ -939,17 +1010,26 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                       </p>
                     </div>
                     <div>
-                      <strong>Min Epochs To Claim</strong>
+                      <strong>
+                        {' '}
+                        {t('assets:Staking.Min Epochs To Claim')}
+                      </strong>
 
                       <p>{asset?.staking?.minEpochsToClaim || '--'}</p>
                     </div>
                     <div>
-                      <strong>Min Epochs To Unstake</strong>
+                      <strong>
+                        {' '}
+                        {t('assets:Staking.Min Epochs To Unstake')}
+                      </strong>
 
                       <p>{asset?.staking?.minEpochsToUnstake || '--'}</p>
                     </div>
                     <div>
-                      <strong>Min Epochs To Withdraw</strong>
+                      <strong>
+                        {' '}
+                        {t('assets:Staking.Min Epochs To Withdraw')}
+                      </strong>
                       <p>{asset?.staking?.minEpochsToWithdraw || '--'}</p>
                     </div>
                     {stakingAprOrFpr()}
@@ -973,7 +1053,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         </div>
         <StakingHeader>
           <StakingHeaderSpan>
-            Total Staked of <br />
+            {t('common:Cards.Total Staked')} {t('assets:Staking.Of')} <br />
             {asset?.name}
             <br />
             <strong>
@@ -1083,15 +1163,14 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                 {asset?.assetId === 'KLV' || asset?.assetId === 'KFI' ? (
                   <>
                     <p>
-                      No deposits in this epoch.
+                      {t('assets:Staking.No Deposits')}
                       <br />
                       <br />
-                      Deposits for KLV/KFI occur automatically from each
-                      transaction.
+                      {t('assets:Staking.Info Deposits KLVorKFI')}
                     </p>
                   </>
                 ) : (
-                  <p>No deposits in this epoch.</p>
+                  <p>{t('assets:Staking.No Deposits')}</p>
                 )}
               </NoDepositsContainer>
             </FallbackFPRRow>
@@ -1113,13 +1192,10 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         <>
           {isMobile ? (
             <Tooltip
-              msg={`Below are the last epochs where there might be deposits of any asset in the ${asset?.name}'s FPR Pool.`}
+              msg={t('assets:Staking.InfoOtherAssets', { asset: asset?.name })}
             />
           ) : (
-            <p>
-              Below are the last epochs where there might be deposits of any
-              asset in the {`${asset?.name}'s`} FPR Pool.
-            </p>
+            <p>{t('assets:Staking.InfoOtherAssets', { asset: asset?.name })}</p>
           )}
         </>
       );
@@ -1128,14 +1204,11 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       <>
         {isMobile ? (
           <Tooltip
-            msg={`Below is the registry of the last 100 epochs of ${asset?.name} total staking.\nHave in mind that deposits for KLV/KFI occur automatically from each transaction.`}
+            msg={t('assets:Staking.InfoKLVorKFI', { asset: asset?.name })}
           />
         ) : (
           <>
-            <p>
-              {`Below is the registry of the last 100 epochs of ${asset?.name} total staking.`}
-            </p>
-            <p>{`Have in mind that deposits for KLV/KFI occur automatically from each transaction.`}</p>
+            <p>{t('assets:Staking.InfoKLVorKFI', { asset: asset?.name })}</p>
           </>
         )}
       </>
@@ -1146,7 +1219,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
     return (
       <>
         <StakingHistoryTitle>
-          <strong>Flexible Proportional Return - FPR</strong>
+          <strong>{t('assets:Staking.Title History', { type: 'FPR' })}</strong>
           {renderFPRHeaderMsg()}
         </StakingHistoryTitle>
         {renderStakingHistory(fpr, FPRIndex)}
@@ -1154,7 +1227,11 @@ const Asset: React.FC<IAssetPage> = ({}) => {
           <PaginationHistory
             onClick={() => setFPRIndex(asset?.staking?.fpr?.length || 0)}
           >
-            <strong>Show more</strong>
+            <strong>
+              {t('common:Buttons.Show', {
+                type: `${t('common:Tabs.More').toLowerCase()}`,
+              })}
+            </strong>
           </PaginationHistory>
         )}
         {!!((asset?.staking?.fpr?.length || 0) - FPRIndex <= 0) &&
@@ -1185,9 +1262,9 @@ const Asset: React.FC<IAssetPage> = ({}) => {
 
   const SelectedComponent: React.FC = () => {
     switch (selectedCard) {
-      case 'Overview':
+      case `${t('common:Tabs.Overview')}`:
         return <Overview />;
-      case 'More':
+      case `${t('common:Tabs.More')}`:
         return <More />;
       case 'URIS':
         return <UriComponent />;
@@ -1219,9 +1296,9 @@ const Asset: React.FC<IAssetPage> = ({}) => {
 
   const SelectedTabComponent: React.FC = () => {
     switch (selectedTab) {
-      case 'Transactions':
+      case `${t('common:Titles.Transactions')}`:
         return <Transactions transactionsTableProps={transactionsTableProps} />;
-      case 'Holders':
+      case `${t('common:Tabs.Holders')}`:
         if (asset) {
           return (
             <Holders
@@ -1321,7 +1398,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       </CardTabContainer>
 
       <Tabs {...tabProps}>
-        {selectedTab === 'Transactions' && (
+        {selectedTab === `${t('common:Titles.Transactions')}` && (
           <TxsFiltersWrapper>
             <ContainerFilter>
               <TransactionsFilters
@@ -1340,6 +1417,23 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       </Tabs>
     </Container>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'assets', 'table'],
+    nextI18nextConfig,
+  );
+
+  return { props };
+};
+
+export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
+  return {
+    paths: [], //indicates that no page needs be created at build time
+    fallback: 'blocking', //indicates the type of fallback
+  };
 };
 
 export default Asset;

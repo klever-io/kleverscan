@@ -7,6 +7,7 @@ import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import { getAsset } from '@/services/requests/asset';
 import { parseAddress } from '@/utils/parseValues';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { FiPlusSquare } from 'react-icons/fi';
@@ -40,7 +41,6 @@ import {
   UriButtonsContainer,
   WizardAddressCheck,
   WizardButton,
-  WizardConfirmLogo,
   WizardFailAddressCheck,
   WizardRightArrowSVG,
 } from '../createAsset/styles';
@@ -1340,7 +1340,15 @@ export const AssetDetails: React.FC = () => {
     if (logo) {
       return (
         <ConfirmCardImage>
-          <WizardConfirmLogo src={logo} />
+          <Image
+            alt="logo"
+            src={logo}
+            width={40}
+            height={40}
+            objectPosition="center"
+            style={{ borderRadius: '10px' }}
+            loader={({ src, width }) => `${src}?w=${width}`}
+          />
         </ConfirmCardImage>
       );
     }

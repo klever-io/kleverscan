@@ -4,6 +4,7 @@ import { ModalsProvider } from '@/contexts/contract/modals';
 import { MulticontractProvider } from '@/contexts/contract/multicontract';
 import { ContractModalProvider } from '@/contexts/contractModal';
 import { ExtensionProvider } from '@/contexts/extension';
+import { InputSearchProvider } from '@/contexts/inputSearch';
 import { MobileProvider } from '@/contexts/mobile';
 import { InternalThemeProvider } from '@/contexts/theme';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -28,7 +29,9 @@ const ContextProviders: React.FC = ({ children }) => {
               <FeesProvider>
                 <MulticontractProvider>
                   <ContractProvider>
-                    <ContractModalProvider>{children}</ContractModalProvider>
+                    <InputSearchProvider>
+                      <ContractModalProvider>{children}</ContractModalProvider>
+                    </InputSearchProvider>
                   </ContractProvider>
                 </MulticontractProvider>
               </FeesProvider>

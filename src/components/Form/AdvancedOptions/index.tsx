@@ -43,6 +43,9 @@ const tooltipAccount = `The sender account address is the account that will be t
 sender of the transaction. It needs to be a multi-sign account. Your connected address will be the one used to sign the transaction.
 Be sure that your account has the permission to sign transactions on behalf of the sender account, otherwise the transaction will fail.
 `;
+
+const showPayloadTooltip = `The payload is the contract data that will be sent to be built and broadcast to the blockchain. If you want to edit it, you can do it here.`;
+
 const PermID: React.FC = () => {
   const { setPermID, permID, senderAccount } = useContract();
   const { walletAddress } = useExtension();
@@ -333,7 +336,12 @@ const AdvancedOptionsContent: React.FC = () => {
       <MultiSigSelect />
       <FieldContainer>
         <InputLabel>
-          <span>Show payload?</span>
+          <span>Show/Edit payload?</span>
+          <TooltipContainer>
+            <Tooltip msg={showPayloadTooltip}>
+              <InfoIcon />
+            </Tooltip>
+          </TooltipContainer>
         </InputLabel>
         <ToggleContainer>
           No

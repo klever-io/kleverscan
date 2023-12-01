@@ -11,7 +11,8 @@ import { useMobile } from '@/contexts/mobile';
 import { formatNumberDecimal } from '@/utils/formatFunctions';
 import { validateImgUrl } from '@/utils/imageValidate';
 import { parseAddress } from '@/utils/parseValues';
-import { TFunction } from 'next-i18next';
+import { TFunction, useTranslation } from 'next-i18next';
+import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
@@ -68,7 +69,6 @@ import {
   UriButtonsContainer,
   WizardAddressCheck,
   WizardButton,
-  WizardConfirmLogo,
   WizardFailAddressCheck,
   WizardRightArrowSVG,
   WizardTxSuccessComponent,
@@ -1225,10 +1225,10 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
               setSplitRoyalties(true);
             }}
           >
-            {t('common:yes')}
+            Statements
           </WizardButton>
           <WizardButton secondary centered onClick={() => handleStep(10)}>
-            {t('common:no')}
+            {t('common:Statements.No')}
           </WizardButton>
         </ButtonsContainer>
         <InfoCard>
@@ -1467,7 +1467,7 @@ export const CreateAssetRoyaltySteps: React.FC<IWizardComponents> = ({
         <p>{t('wizards:common.advancedOptions.royalties.enalbeRoyalties')}</p>
         <ButtonsContainer>
           <WizardButton infoStep centered onClick={() => setRoyalties(true)}>
-            {t('common:yes')}
+            Statements
           </WizardButton>
           <WizardButton
             infoStep
@@ -1742,6 +1742,7 @@ export const URIsSection: React.FC<IAssetInformations> = ({
   informations: { assetType },
   handleStep,
 }) => {
+  const { t: commonT } = useTranslation('common');
   const {
     control,
     register,
@@ -1807,7 +1808,7 @@ export const URIsSection: React.FC<IAssetInformations> = ({
               setAddUri(true);
             }}
           >
-            Yes
+            {commonT('common:Statements.Yes')}
           </WizardButton>
           <WizardButton
             infoStep
@@ -1815,7 +1816,7 @@ export const URIsSection: React.FC<IAssetInformations> = ({
             centered
             onClick={() => handleStep(prev => prev + 1)}
           >
-            No
+            {commonT('common:Statements.No')}
           </WizardButton>
         </ButtonsContainer>
         <InfoCard>
@@ -2250,6 +2251,7 @@ const StakingStepsGenericAprFprThree: React.FC<IWizardStakingComponents> = ({
 export const CreateAssetStakingStep: React.FC<IWizardComponents> = ({
   handleStep,
 }) => {
+  const { t: commonT } = useTranslation('common');
   const { watch } = useFormContext();
   const [staking, setStaking] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -2320,7 +2322,7 @@ export const CreateAssetStakingStep: React.FC<IWizardComponents> = ({
         <p>Would you like to enable and configure staking for {ticker} now?</p>
         <ButtonsContainer>
           <WizardButton infoStep centered onClick={() => setStaking(true)}>
-            Yes
+            {commonT('common:Statements.Yes')}
           </WizardButton>
           <WizardButton
             infoStep
@@ -2328,7 +2330,7 @@ export const CreateAssetStakingStep: React.FC<IWizardComponents> = ({
             centered
             onClick={() => handleStep(11)}
           >
-            No
+            {commonT('common:Statements.No')}
           </WizardButton>
         </ButtonsContainer>
 
@@ -2353,6 +2355,7 @@ export const CreateAssetAddRoles: React.FC<IAssetInformations> = ({
   informations: { assetType },
   handleStep,
 }) => {
+  const { t: commonT } = useTranslation('common');
   const [addRole, setAddRole] = useState(false);
   const {
     watch,
@@ -2414,7 +2417,7 @@ export const CreateAssetAddRoles: React.FC<IAssetInformations> = ({
         </p>
         <ButtonsContainer>
           <WizardButton infoStep centered onClick={() => setAddRole(true)}>
-            Yes
+            {commonT('common:Statements.Yes')}
           </WizardButton>
           <WizardButton
             infoStep
@@ -2422,7 +2425,7 @@ export const CreateAssetAddRoles: React.FC<IAssetInformations> = ({
             centered
             onClick={() => handleStep(prev => prev + 1)}
           >
-            No
+            {commonT('common:Statements.No')}
           </WizardButton>
         </ButtonsContainer>
         <InfoCard>
@@ -2576,6 +2579,7 @@ export const CreateAssetPreConfimStep: React.FC<IAssetInformations> = ({
   handleStep,
   handleAdvancedSteps,
 }) => {
+  const { t: commonT } = useTranslation('common');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const buttonsProps = {
     handleStep,
@@ -2647,12 +2651,12 @@ export const CreateAssetPreConfimStep: React.FC<IAssetInformations> = ({
           <div>
             <span> - </span>
             <span> - </span>
-            <span>Yes</span>
-            <span>Yes</span>
-            <span>Yes</span>
-            <span>No</span>
-            <span>Yes</span>
-            <span>Yes</span>
+            <span> {commonT('common:Statements.No')}</span>
+            <span> {commonT('common:Statements.No')}</span>
+            <span> {commonT('common:Statements.No')}</span>
+            <span> {commonT('common:Statements.Yes')}</span>
+            <span> {commonT('common:Statements.No')}</span>
+            <span> {commonT('common:Statements.No')}</span>
           </div>
         </DefaultSettingsOptions>
       </div>
@@ -2830,7 +2834,15 @@ export const ConfirmTransaction: React.FC<IWizardConfirmProps> = ({
     if (validImage) {
       return (
         <ConfirmCardImage>
-          <WizardConfirmLogo src={logo} />
+          <Image
+            alt="logo"
+            src={logo}
+            width={40}
+            height={40}
+            objectPosition="center"
+            style={{ borderRadius: '10px' }}
+            loader={({ src, width }) => `${src}?w=${width}`}
+          />
         </ConfirmCardImage>
       );
     }

@@ -7,12 +7,20 @@ import { requestProposals } from '@/services/requests/proposals';
 import { Card, Container, Header } from '@/styles/common';
 import { setQueryAndRouter } from '@/utils';
 import { CardContainer } from '@/views/proposals';
+import { GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 const Proposals: React.FC = () => {
+  const { t } = useTranslation(['common', 'proposals']);
   const router = useRouter();
-  const tableHeaders = ['Network Parameters', 'Proposals'];
+  const tableHeaders = [
+    `${t('proposals:NetworkParameters')}`,
+    `${t('common:Titles.Proposals')}`,
+  ];
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
 
   useEffect(() => {
@@ -25,15 +33,7 @@ const Proposals: React.FC = () => {
     return (
       <Card>
         <div>
-          <span>
-            The committee is made up of KFI holders who are responsible for
-            modifying dynamic parameters such as block rewards and transaction
-            fees on the KLV network. Each KFI holder who has KFI frozen is
-            entitled to initiate and vote for proposals. A proposal is adopted
-            as long as it is voted for by at least half of all the KFI frozen by
-            the network. The adopted proposal will apply its changes to network
-            parameters in the next epoch.
-          </span>
+          <span>{t('proposals:ProposalsInfo')}</span>
         </div>
       </Card>
     );
@@ -41,9 +41,9 @@ const Proposals: React.FC = () => {
 
   const SelectedTabComponent: React.FC = () => {
     switch (selectedTab) {
-      case 'Network Parameters':
+      case `${t('proposals:NetworkParameters')}`:
         return <NetworkParams />;
-      case 'Proposals':
+      case `${t('common:Titles.Proposals')}`:
         return (
           <>
             <ProposalsTab request={requestProposals} />
@@ -65,7 +65,7 @@ const Proposals: React.FC = () => {
   return (
     <Container>
       <Header>
-        <Title title="Proposals" Icon={Icon} />
+        <Title title={t('common:Titles.Proposals')} Icon={Icon} />
       </Header>
       <CardContainer>
         <CardContent />
@@ -75,6 +75,16 @@ const Proposals: React.FC = () => {
       </Tabs>
     </Container>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'proposals'],
+    nextI18nextConfig,
+  );
+
+  return { props };
 };
 
 export default Proposals;

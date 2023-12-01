@@ -105,6 +105,9 @@ const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
                 src={`/coins/${shortname.toLowerCase()}.png`}
                 width={50}
                 height={50}
+                loader={({ src, width }: { src: string; width: number }) =>
+                  `${src}?w=${width}`
+                }
               />
 
               <HeaderContent>
@@ -374,7 +377,7 @@ const CoinCard: React.FC = () => {
                 <ButtonContainer key={index}>
                   <a
                     target="_blank"
-                    href={`https://bitcoin.me/en/trade/${coin}-USDT`}
+                    href={`https://bitcoin.me/us/trade/${coin}-USDT`}
                     rel="noreferrer"
                   >
                     <ButtonInformation>
@@ -416,6 +419,9 @@ const CoinCard: React.FC = () => {
                   src={`/coins/${coin.shortname.toLowerCase()}.png`}
                   width={20}
                   height={20}
+                  loader={({ src, width }: { src: string; width: number }) =>
+                    `${src}?w=${width}`
+                  }
                 />
                 <p>{coin.shortname}</p>
               </CoinSelector>

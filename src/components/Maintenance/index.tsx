@@ -28,7 +28,6 @@ const Maintenance: React.FC = () => {
             </Button>
           </ButtonContainer>
         </Content>
-        {/* <MaintenanceImage /> */}
       </Container>
       <Background />
     </>

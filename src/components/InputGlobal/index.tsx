@@ -1,4 +1,5 @@
 import { Search } from '@/assets/icons';
+import { useInputSearch } from '@/contexts/inputSearch';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import React, { KeyboardEvent, useEffect, useRef, useState } from 'react';
@@ -17,13 +18,13 @@ const Input: React.FC<InputGlobal> = ({
   openSearch,
 }) => {
   const [search, setSearch] = useState('');
-  const [error, setError] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const timeoutId = useRef<NodeJS.Timeout>();
+  const { searchValue } = useInputSearch();
   const { t } = useTranslation('common');
 
   const placeholder = t('Search Address, Block, Transaction, Asset');
-
   const router = useRouter();
 
   useEffect(() => {
@@ -44,23 +45,23 @@ const Input: React.FC<InputGlobal> = ({
     }
   }, [openSearch]);
 
+  const debounce = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (timeoutId.current) {
+      clearTimeout(timeoutId.current);
+    }
+    timeoutId.current = setTimeout(() => {
+      setSearch(event.target.value);
+    }, 1000);
+  };
+
   const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (error) {
-      setError(false);
-    }
-    if (showTooltip) {
-      setShowTooltip(false);
-    }
-    setSearch(event.target.value);
-  };
-
-  const handleSearch = () => {
     setShowTooltip(true);
+    debounce(event);
   };
 
-  const keyDownHandle = (event: KeyboardEvent) => {
-    if (event.key === 'Enter') {
-      handleSearch();
+  const handleSearch = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.type === 'click') {
+      if (searchValue !== '') router.push(searchValue);
     }
   };
 
@@ -70,7 +71,6 @@ const Input: React.FC<InputGlobal> = ({
 
   const handleTooltipFocus = (e: any) => {
     if (!(e.target.id === 'PrePageTooltip' || e.target.id === 'SearchIcon')) {
-      if (inputRef.current !== null) inputRef.current.value = '';
       setShowTooltip(false);
     }
   };
@@ -85,7 +85,8 @@ const Input: React.FC<InputGlobal> = ({
     ref: inputRef,
     placeholder,
     onChange: handleInput,
-    onKeyDown: keyDownHandle,
+    onKeyDown: handleSearch,
+    setOpenSearch: setOpenSearch,
   };
 
   return (

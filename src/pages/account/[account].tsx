@@ -71,6 +71,8 @@ import {
   CheckboxOperations,
   ContainerSigners,
   ContainerTabInteractions,
+  Em,
+  FrozenContainerLi,
   FrozenContentRewards,
   IconContainer,
   ItemContainerPermissions,
@@ -578,16 +580,16 @@ const Account: React.FC<IAccountPage> = () => {
                         {permission.signers.map((signer, key) => (
                           <FrozenContentRewards key={key}>
                             <ul key={key}>
-                              <li>
-                                {getAccountAddress(signer.address)}
+                              <FrozenContainerLi>
+                                <Em>{getAccountAddress(signer.address)}</Em>
                                 <Copy info="Address" data={signer.address} />
-                              </li>
+                              </FrozenContainerLi>
                               <li>
-                                <strong>
+                                <Em>
                                   {t(
                                     'accounts:SingleAccount.PermissionsTab.Weight',
                                   )}
-                                </strong>
+                                </Em>
                                 {signer.weight}
                               </li>
                             </ul>

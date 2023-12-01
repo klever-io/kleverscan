@@ -25,14 +25,14 @@ describe('test ValidatorCards component', () => {
       />,
     );
 
-    const currentDelegationsLabel = screen.getByText(/Current Delegations/i);
-    const currentDelegationsTime = screen.getAllByText(/secs? ago/i)[0];
+    const currentDelegationsLabel = screen.getByText(/CurrentDelegations/i);
+    const currentDelegationsTime = screen.getAllByText(
+      /Date.Time.Sec? Date.Elapsed Time/i,
+    )[0];
     const currentDelegationsValue = screen.getAllByText(/10,000,000/i)[0];
     const currentDelegationsPercentage = screen.getByText(/\+3\.75%/i);
 
-    const rewardDistributionRatioLabel = screen.getByText(
-      /Reward Distribution Ratio/i,
-    );
+    const rewardDistributionRatioLabel = screen.getByText(/RewardsRatio/i);
     const rewardDistributionRatioVotersLabel = screen.getByText(/Voters/i);
     const rewardDistributionRatioCommissionLabel =
       screen.getByText(/Commission/i);
@@ -40,7 +40,9 @@ describe('test ValidatorCards component', () => {
     const rewardDistributionRatioCommissionValue = screen.getByText(/20%/i);
 
     const delegatedLabel = screen.getByText(/Delegated/i);
-    const delegatedTime = screen.getAllByText(/secs? ago/i)[1];
+    const delegatedTime = screen.getAllByText(
+      /Date.Time.Sec? Date.Elapsed Time/i,
+    )[1];
     const delegatedValue = screen.getAllByText(/10,000,000/i)[1];
     const delegatedPercentage = screen.getByText(/100%/i);
 

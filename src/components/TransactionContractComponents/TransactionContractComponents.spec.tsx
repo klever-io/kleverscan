@@ -146,14 +146,14 @@ describe('Component: TransactionContractComponents', () => {
       const { parameter } = createAsset1.contract[0];
       const { sender } = createAsset1;
 
-      const assetId = screen.getByText(/Asset ID/i);
-      const name = screen.getByText(/Name/i);
-      const owner = screen.getByText(/Owner/i);
+      const assetId = screen.getByText(/AssetId/i);
+      const name = screen.getByText(/CreateAsset.Name/i);
+      const owner = screen.getByText(/CreateAsset.Owner/i);
       const ownerLink = screen.getByRole('link', { name: sender });
-      const token = screen.getByText(/Ticker/i);
+      const token = screen.getByText(/CreateAsset.Ticker/i);
       const precisionAsset = screen.getByText(/Precision/i);
-      const initialSupply = screen.getByText(/Initial Supply/i);
-      const maxSupply = screen.getByText(/Max Supply/i);
+      const initialSupply = screen.getByText(/CreateAsset.Initial Supply/i);
+      const maxSupply = screen.getByText(/CreateAsset.Max Supply/i);
 
       expect(assetId).toBeInTheDocument();
       expect(name).toBeInTheDocument();
@@ -267,10 +267,10 @@ describe('Component: TransactionContractComponents', () => {
       });
       [
         screen.getByText('Type'),
-        screen.getByText('Asset Id'),
+        screen.getByText('AssetId'),
         screen.getByText('Amount'),
-        screen.getByText('Bucket Id'),
-        screen.getByText('Freeze'),
+        screen.getByText('FreezeUnfreeze.Bucket Id'),
+        screen.getByText('FreezeUnfreeze.Freeze'),
         screen.getByText('KLV'),
         screen.getByText('12,820.000000'),
         screen.getByText(
@@ -305,13 +305,13 @@ describe('Component: TransactionContractComponents', () => {
       });
       [
         screen.getByText('Type'),
-        screen.getByText('Asset Id'),
-        screen.getByText('Bucket Id'),
-        screen.getByText('Available Epoch'),
+        screen.getByText('AssetId'),
+        screen.getByText('FreezeUnfreeze.Bucket Id'),
+        screen.getByText('FreezeUnfreeze.Available Epoch'),
         screen.getByText('Amount'),
-        screen.getByText('Claimed Rewards'),
+        screen.getByText('FreezeUnfreeze.Claimed Rewards'),
 
-        screen.getByText('Unfreeze'),
+        screen.getByText('FreezeUnfreeze.Unfreeze'),
         screen.getByText('KLV'),
         screen.getByText(
           '8bf070552ae73864455cfc08b247f0f12d53743a3bf536e91785cba9e04fcc63',
@@ -385,7 +385,7 @@ describe('Component: TransactionContractComponents', () => {
         widthdrawContract: { parameter },
       } = mockedTxContractComponents;
 
-      const assetId = screen.getByText(/Asset ID/i);
+      const assetId = screen.getAllByText(/AssetId/i)[0];
 
       expect(assetId).toBeInTheDocument();
       expect(assetId.parentNode?.nextSibling?.firstChild).toHaveTextContent(
@@ -409,13 +409,13 @@ describe('Component: TransactionContractComponents', () => {
         );
       });
       const typeLabel = screen.getByText('Type');
-      const claimTypeLabel = screen.getByText('Claim Type');
-      const assetIdLabel = screen.getByText('Asset Id');
+      const claimTypeLabel = screen.getByText('CreateAsset.Claim Type');
+      const assetIdLabel = screen.getByText('AssetId');
       const amountLabel = screen.getByText('Amount');
 
-      const type = screen.getByText('Claim');
+      const type = screen.getByText('Claim.Claim');
       const claimType = screen.getByText('StakingClaim');
-      const assetIdReceived = screen.getByText('Asset Id Received');
+      const assetIdReceived = screen.getByText('Claim.Asset Id Received');
       const amount = screen.getByText('47.573703 KLV');
 
       const data = [
@@ -514,7 +514,7 @@ describe('Component: TransactionContractComponents', () => {
         configIcoContract: { parameter },
       } = mockedTxContractComponents;
 
-      const assetId = screen.getByText(/Asset Id/i);
+      const assetId = screen.getByText(/AssetId/i);
       const status = screen.getByText(/Status/i);
 
       expect(assetId).toBeInTheDocument();
@@ -541,7 +541,7 @@ describe('Component: TransactionContractComponents', () => {
       const {
         setIcoPricesContract: { parameter },
       } = mockedTxContractComponents;
-      const assetId = screen.getByText(/Asset Id/i);
+      const assetId = screen.getByText(/AssetId/i);
       const packInfoKLVKey = screen.getAllByText(/KLV2/);
       expect(packInfoKLVKey.length).toEqual(4);
 
@@ -583,13 +583,15 @@ describe('Component: TransactionContractComponents', () => {
       } = mockedTxContractComponents;
 
       const typeLabel = screen.getByText('Type');
-      const buyTypeLabel = screen.getByText('Buy Type');
-      const priceLabel = screen.getByText('Price');
+      const buyTypeLabel = screen.getByText('Buy.Buy Type');
+      const priceLabel = screen.getByText('Buy.Price');
       const amountLabel = screen.getByText('Amount');
-      const currencyIDLabel = screen.getByText('Currency Id');
-      const assetIdLabel = screen.getByText('Asset Id');
-      const orderIdLabel = screen.getByText('Order Id');
-      const marketPlaceIdLabel = screen.getByText('Marketplace Id');
+      const currencyIDLabel = screen.getByText('Buy.Currency Id');
+      const assetIdLabel = screen.getByText('AssetId');
+      const orderIdLabel = screen.getByText('Buy.Order Id');
+      const marketPlaceIdLabel = screen.getByText(
+        'DelegateUndelegate.Marketplace ID',
+      );
 
       expect(typeLabel).toBeInTheDocument();
       expect(buyTypeLabel).toBeInTheDocument();
@@ -601,7 +603,7 @@ describe('Component: TransactionContractComponents', () => {
       expect(marketPlaceIdLabel).toBeInTheDocument();
 
       await waitFor(() => {
-        const type = screen.getByText('Buy');
+        const type = screen.getByText('Buy.Buy Type');
         const buyType = screen.getByText('MarketBuy');
         const price = screen.getByText('320.000000 KLV');
         const amount = screen.getByText('1 KPNFT-13Z0/1339');

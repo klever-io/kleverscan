@@ -1339,7 +1339,7 @@ export const Withdraw: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Withdraw Type</strong>
+          <strong>{t('Withdraw.Withdraw Type')}</strong>
         </span>
         <span>{parameter.withdrawType || '--'}</span>
       </Row>
@@ -1915,9 +1915,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
           {marketplaceId && (
             <Row>
               <span>
-                <strong>
-                  Marketplace Id{t('DelegateUndelegate.Marketplace ID')}
-                </strong>
+                <strong>{t('DelegateUndelegate.Marketplace ID')}</strong>
               </span>
               <span>{marketplaceId}</span>
             </Row>

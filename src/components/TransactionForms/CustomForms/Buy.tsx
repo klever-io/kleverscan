@@ -79,7 +79,7 @@ const Buy: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
           title={buyType ? `${t('Buy.Order Id')}` : `${t('Buy.ITO Asset ID')}`}
           required
         />
-        <FormInput name="currencyId" title="Currency ID" required />
+        <FormInput name="currencyId" title={t('Buy.Currency Id')} required />
         <FormInput
           name="amount"
           title={buyType ? `${t('Buy.Price')}` : `${t('Amount')}`}

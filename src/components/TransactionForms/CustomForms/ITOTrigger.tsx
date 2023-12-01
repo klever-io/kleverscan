@@ -72,7 +72,7 @@ const getITOTriggerForm = (
   triggerType: number,
   walletAddress: string,
   collection: ICollectionList,
-  t: TFunction,
+  t: TFunction<'transactions', undefined>,
 ) => {
   switch (triggerType) {
     case 0:

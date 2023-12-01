@@ -28,13 +28,30 @@
     "Proposal Details": "Proposals Details"
   },
   "Tabs": {
-    "Overview": "Overview"
+    "Overview": "Overview",
+    "More": "More",
+    "Holders": "Holders"
   },
   "Buttons": {
     "Expand": "Expand",
     "Hide": "Hide",
+    "All": "All",
+    "Asset Type": "Asset Type",
+    "Show": "Show {{type}}",
     "Details": "Details",
     "Status": "Status"
+  },
+  "Properties": {
+    "Can": "Can {{type}}",
+    "Freeze": "Freeze",
+    "Wipe": "Wipe",
+    "Pause": "Pause",
+    "Mint": "Mint",
+    "Burn": "Burn",
+    "Change Owner": "Change Owner",
+    "Add Roles": "Add Roles",
+    "Paused": "Paused",
+    "NFT Mint Stopped": "NFT mint Stopped"
   },
   "Statements": {
     "Yes": "Yes",

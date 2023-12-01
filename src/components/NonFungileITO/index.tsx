@@ -1,13 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { web } from '@klever/sdk-web';
-import { GetStaticProps } from 'next';
-import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { TFunction } from 'next-i18next';
 import Image from 'next/image';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { IParsedITO } from 'types';
-import nextI18nextConfig from '../../../next-i18next.config';
 import { Loader } from '../Loader/styles';
 import { BuyButton, LoaderWrapper, Pack, PackItem } from './styles';
 
@@ -17,6 +14,7 @@ interface INonFungible {
   currencyId: string;
   setTxHash?: (e: string) => any;
   showcase?: boolean;
+  t: TFunction;
 }
 
 const NonFungibleITO: React.FC<INonFungible> = ({
@@ -25,12 +23,11 @@ const NonFungibleITO: React.FC<INonFungible> = ({
   currencyId,
   setTxHash,
   showcase,
+  t,
 }) => {
   const [loading, setLoading] = useState(false);
   const [imgLoading, setImgLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
-
-  const { t } = useTranslation('itos');
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -98,7 +95,7 @@ const NonFungibleITO: React.FC<INonFungible> = ({
               </LoaderWrapper>
             ) : (
               <BuyButton onClick={() => handleSubmit()}>
-                <span>{t('buyPack')}</span>
+                <span>{t('assets:ITO.Buy Pack')}</span>
               </BuyButton>
             )}
           </>
@@ -106,16 +103,6 @@ const NonFungibleITO: React.FC<INonFungible> = ({
       </PackItem>
     </Pack>
   );
-};
-
-export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
-  const props = await serverSideTranslations(
-    locale,
-    ['itos'],
-    nextI18nextConfig,
-  );
-
-  return { props };
 };
 
 export default NonFungibleITO;

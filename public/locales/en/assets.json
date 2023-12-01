@@ -1,0 +1,52 @@
+{
+  "Overview": {
+    "Burned Value": "Burned Value",
+    "Holders": "Holders",
+    "Staking Type": "Staking Type"
+  },
+  "More": {
+    "Issuing Time": "Issuing Time",
+    "Issuer": "Issuer"
+  },
+  "ITO": {
+    "Max Amount": "Max Amount",
+    "Receiver Address": "Receiver Address",
+    "White List Active": "White List Active",
+    "Start Time": "Start Time",
+    "End Time": "End Time",
+    "White List": "White List",
+    "White List Start Time": "White List Start Time",
+    "White List End Time": "White List End Time",
+    "White List Info": "White List Info",
+    "Packs Data": "Packs Data",
+    "Price In": "Price In {{asset}}",
+    "Buy Token": "Buy Token",
+    "Buy Pack": "Buy Pack",
+    "No packs found": "No packs found",
+    "Price Range": "Price Range",
+    "You will pay": "You will pay",
+    "It will cost": "It will cost"
+  },
+  "Staking": {
+    "Details": "Details",
+    "Fixed": "Fixed",
+    "Market Fixed": "Market Fixed",
+    "Market Percentage": "Market Percentage",
+    "Transfer Fixed": "Transfer Fixed",
+    "Transfer Percentage": "Transfer Percentage",
+    "Percentage": "Percentage",
+    "Current FPR Amount": "Current FPR Amount",
+    "Min Epochs To Claim": "Min Epochs To Claim",
+    "Min Epochs To Unstake": "Min Epochs To Unstake",
+    "Min Epochs To Withdraw": "Min Epochs To With",
+    "InfoOtherAssets": "Below are the last epochs where there might be deposits of any asset in the {{asset}}'s FPR Pool.",
+    "InfoKLVorKFI": "Below is the registry of the last 100 epochs of {{asset}} total staking.\nHave in mind that deposits for KLV/KFI occur automatically from each transaction.",
+    "Title History": "Flexible Proportional Return - {{type}}",
+    "No Deposits": "No deposits in this epoch.",
+    "Info Deposits KLVorKFI": " Deposits for KLV/KFI occur automatically from each transaction.",
+    "Of": "of",
+    "Total deposited": "Total deposited",
+    "Total claimed": "Total claimed",
+    "Show less": "Show less"
+  }
+}

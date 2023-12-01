@@ -39,10 +39,22 @@ export const Content = styled.div`
   }
   padding: 2rem;
   height: fit-content;
-  max-width: 90vw;
-  min-width: 50vw;
+  width: clamp(50vw, 90vw, 90vw);
   border-radius: 1rem;
   background-color: ${props => props.theme.card.background};
+`;
+
+export const ContentHeader = styled.div`
+  width: 100%;
+  display: flex;
+
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+
+  > h1 {
+    align-self: center;
+  }
 `;
 
 export const DetailsRow = styled.pre`

@@ -1,12 +1,9 @@
 import { IPackInfo, IPackItem } from '@/types/contracts';
 import { web } from '@klever/sdk-web';
-import { GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { IParsedITO } from 'types';
-import nextI18nextConfig from '../../../next-i18next.config';
 import Input from '../Input';
 import { Loader } from '../Loader/styles';
 import {
@@ -49,10 +46,9 @@ const FungibleITO: React.FC<IFungibleITO> = ({
   setTxHash,
   showcase,
 }) => {
+  const { t } = useTranslation('assets');
   const [amount, setAmount] = useState(0);
   const [loading, setLoading] = useState(false);
-
-  const { t } = useTranslation('itos');
 
   const calculateCost = (indexPackData: number, qtyPacks: number) => {
     if (ITO) {
@@ -152,7 +148,9 @@ const FungibleITO: React.FC<IFungibleITO> = ({
     <Container>
       <FungibleContainer key={packInfoIndex}>
         <Content>
-          <AssetName>{`${t('priceIn')} ${packInfo.key}`}</AssetName>
+          <AssetName>
+            {t('ITO.Price In', { asset: `${packInfo.key}` })}
+          </AssetName>
           <Input
             type="number"
             min="0"
@@ -162,9 +160,9 @@ const FungibleITO: React.FC<IFungibleITO> = ({
           />
           <TotalPrice>
             {showcase ? (
-              <span>{t('costText')}</span>
+              <span>{t('ITO.It will cost')}</span>
             ) : (
-              <span>{t('payText')}</span>
+              <span>{t('ITO.You will pay')}</span>
             )}{' '}
             <span>
               {calculateCost(packInfoIndex, packInfo.packs.length)}{' '}
@@ -173,7 +171,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
           </TotalPrice>
           {!showcase && !loading && (
             <Button onClick={() => handleSubmit(packInfo.key)}>
-              <span>{t('buyToken')}</span>
+              <span>{t('ITO.Buy Token')}</span>
             </Button>
           )}
           {loading && (
@@ -184,7 +182,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
         </Content>
         <Content>
           <PriceRange>
-            <PriceRangeTitle>{t('priceRange')}</PriceRangeTitle>
+            <PriceRangeTitle>{t('ITO.Price Range')}</PriceRangeTitle>
             {packInfo.packs.map(
               (packItem: IPackItem, packItemIndex: number) => {
                 const isLastElement =
@@ -254,16 +252,6 @@ const FungibleITO: React.FC<IFungibleITO> = ({
       </FungibleContainer>
     </Container>
   );
-};
-
-export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
-  const props = await serverSideTranslations(
-    locale,
-    ['itos'],
-    nextI18nextConfig,
-  );
-
-  return { props };
 };
 
 export default FungibleITO;

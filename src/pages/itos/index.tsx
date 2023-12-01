@@ -88,6 +88,7 @@ export const displayITOpacks = (
                         currencyId={item.key}
                         selectedITO={ITO}
                         setTxHash={setTxHash}
+                        t={t}
                       />
                     );
                   })}
@@ -106,13 +107,12 @@ export const displayITOpacks = (
 };
 
 const ITOsPage: React.FC = () => {
+  const { t } = useTranslation('itos');
   const [selectedITO, setSelectedITO] = useState<null | IParsedITO>(null);
   const [txHash, setTxHash] = useState('');
   const router = useRouter();
   const { isMobile } = useMobile();
   const { extensionInstalled, connectExtension } = useExtension();
-
-  const { t } = useTranslation('itos');
 
   const { getInteractionsButtons } = useContractModal();
 
@@ -192,7 +192,7 @@ const ITOsPage: React.FC = () => {
             pathname: router.pathname,
             query: {
               ...router.query,
-              active: value === 'Active' ? 'true' : 'false',
+              active: value === `${t('status.active')}` ? 'true' : 'false',
             },
           },
           undefined,
@@ -306,6 +306,7 @@ const ITOsPage: React.FC = () => {
                           currencyId={item.key}
                           selectedITO={selectedITO}
                           setTxHash={setTxHash}
+                          t={t}
                         />
                       );
                     })}

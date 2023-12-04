@@ -1,9 +1,10 @@
 import { TFunction } from 'next-i18next';
 
-interface ICreateToken {
+interface ICreateWizard {
   commomValues: {
     assetType: number;
-    additionalFields: boolean;
+    additionalFields?: boolean;
+    additionalValues?: boolean;
     basicTotalSteps: number;
   };
   welcome: {
@@ -18,7 +19,28 @@ interface ICreateToken {
     currentStep: string;
     title: string;
     description: string;
-    kleverTip: string;
+    kleverTip?: string;
+  };
+  transactionSuccess: {
+    description: string;
+    secondDescription: string;
+  };
+  stepsInformations: {
+    basicStepsLabels: string[];
+    advancedStepsIndex: number[];
+    advancedStepsLabels: string[];
+  };
+}
+
+interface ICreateAsset extends ICreateWizard {
+  advancedSteps: {
+    uris: {
+      currentStep: string;
+    };
+    properties: {
+      title: string;
+      description: string;
+    };
   };
   ticker: {
     currentStep: string;
@@ -36,30 +58,43 @@ interface ICreateToken {
     kleverTip: string;
   };
   logo: {
-    assetType: 0;
+    assetType?: 0;
     currentStep: string;
   };
-  advancedSteps: {
-    uris: {
-      currentStep: string;
-    };
-    properties: {
-      title: string;
-      description: string;
-    };
-  };
-  transactionSuccess: {
+}
+interface ICreateITO extends ICreateWizard {
+  whitelistSettings: {
+    currentStep: string;
+    title: string;
     description: string;
-    secondDescription: string;
   };
-  stepsInformations: {
-    basicStepsLabels: string[];
-    advancedStepsIndex: number[];
-    advancedStepsLabels: string[];
+  receiverAddress: {
+    currentStep: string;
+    formValue: string;
+    title: string;
+    description: string;
+  };
+  itoTime: {
+    currentStep: string;
+    nameTime: string;
+    title: string;
+    formValue: string;
+    description: string;
+  };
+  maxAmount: {
+    currentStep: string;
+    title: string;
+    description: string;
+    kleverTip: string;
+  };
+  status: {
+    currentStep: string;
+    title: string;
+    description: string;
   };
 }
 
-export const createToken = (t: TFunction): ICreateToken => {
+export const createToken = (t: TFunction): ICreateAsset => {
   return {
     commomValues: {
       assetType: 0,
@@ -67,33 +102,33 @@ export const createToken = (t: TFunction): ICreateToken => {
       basicTotalSteps: 7,
     },
     welcome: {
-      title: t('wizards:welcome.title'),
-      description: t('wizards:welcome.description'),
-      tooltip: t('wizards:welcome.tooltip'),
-      kleverTip: t('wizards:welcome.kleverTip'),
+      title: t('wizards:createToken.welcome.title'),
+      description: t('wizards:createToken.welcome.description'),
+      tooltip: t('wizards:createToken.welcome.tooltip'),
+      kleverTip: t('wizards:createToken.welcome.kleverTip'),
       transactionCost: '20,000',
       timeEstimated: '10min',
     },
     name: {
       currentStep: '1/7',
-      title: t('wizards:name.title'),
-      description: t('wizards:name.description'),
-      kleverTip: t('wizards:name.kleverTip'),
+      title: t('wizards:createToken.name.title'),
+      description: t('wizards:createToken.name.description'),
+      kleverTip: t('wizards:createToken.name.kleverTip'),
     },
     ticker: {
       currentStep: '2/7',
-      title: t('wizards:ticker.title'),
-      description: t('wizards:ticker.description'),
+      title: t('wizards:createToken.ticker.title'),
+      description: t('wizards:createToken.ticker.description'),
     },
     ownerAddress: {
       currentStep: '3/7',
       formValue: 'ownerAddress',
-      description: t('wizards:ownerAddress.description'),
+      description: t('wizards:createToken.ownerAddress.description'),
     },
     maxSupply: {
       currentStep: '6/7',
-      description: t('wizards:maxSupply.description'),
-      kleverTip: t('wizards:maxSupply.kleverTip'),
+      description: t('wizards:createToken.maxSupply.description'),
+      kleverTip: t('wizards:createToken.maxSupply.kleverTip'),
     },
     logo: {
       assetType: 0,
@@ -104,177 +139,203 @@ export const createToken = (t: TFunction): ICreateToken => {
         currentStep: 'URI',
       },
       properties: {
-        title: t('wizards:advancedSteps.properties.title'),
-        description: t('wizards:advancedSteps.properties.description'),
+        title: t('wizards:createToken.advancedSteps.properties.title'),
+        description: t(
+          'wizards:createToken.advancedSteps.properties.description',
+        ),
       },
     },
     transactionSuccess: {
-      description: t('wizards:transactionSuccess.description'),
-      secondDescription: t('wizards:transactionSuccess.secondDescription'),
+      description: t('wizards:createToken.transactionSuccess.description'),
+      secondDescription: t(
+        'wizards:createToken.transactionSuccess.secondDescription',
+      ),
     },
     stepsInformations: {
       basicStepsLabels: [
-        t('wizards:stepsInformations.basicStepsLabels.tokenName'),
-        t('wizards:stepsInformations.basicStepsLabels.tokenTicker'),
-        t('wizards:stepsInformations.basicStepsLabels.ownerAddress'),
-        t('wizards:stepsInformations.basicStepsLabels.tokenPrecision'),
-        t('wizards:stepsInformations.basicStepsLabels.initialSupply'),
-        t('wizards:stepsInformations.basicStepsLabels.maxSupply'),
-        t('wizards:stepsInformations.basicStepsLabels.tokenImage'),
+        t('wizards:createToken.stepsInformations.basicStepsLabels.tokenName'),
+        t('wizards:createToken.stepsInformations.basicStepsLabels.tokenTicker'),
+        t(
+          'wizards:createToken.stepsInformations.basicStepsLabels.ownerAddress',
+        ),
+        t(
+          'wizards:createToken.stepsInformations.basicStepsLabels.tokenPrecision',
+        ),
+        t(
+          'wizards:createToken.stepsInformations.basicStepsLabels.initialSupply',
+        ),
+        t('wizards:createToken.stepsInformations.basicStepsLabels.maxSupply'),
+        t('wizards:createToken.stepsInformations.basicStepsLabels.tokenImage'),
       ],
       advancedStepsIndex: [9, 10, 11, 12, 13],
       advancedStepsLabels: [
-        t('wizards:stepsInformations.advancedStepsLabels.uri'),
-        t('wizards:stepsInformations.advancedStepsLabels.staking'),
-        t('wizards:stepsInformations.advancedStepsLabels.royalties'),
-        t('wizards:stepsInformations.advancedStepsLabels.roles'),
-        t('wizards:stepsInformations.advancedStepsLabels.properties'),
+        t('wizards:createToken.stepsInformations.advancedStepsLabels.uri'),
+        t('wizards:createToken.stepsInformations.advancedStepsLabels.staking'),
+        t(
+          'wizards:createToken.stepsInformations.advancedStepsLabels.royalties',
+        ),
+        t('wizards:createToken.stepsInformations.advancedStepsLabels.roles'),
+        t(
+          'wizards:createToken.stepsInformations.advancedStepsLabels.properties',
+        ),
       ],
     },
   };
 };
 
-export const createNFT = {
-  commomValues: {
-    assetType: 1,
-    additionalValues: false,
-    basicTotalSteps: 5,
-  },
-  welcome: {
-    title: 'Create a NFT',
-    description: 'To create a KDA NFT we will guide you through a few steps.',
-    tooltip: 'What is a NFT?',
-    kleverTip: 'NFTs are tokens used to represent ownership of unique items',
-    transactionCost: '20,000',
-    timeEstimated: '10min',
-  },
-  name: {
-    currentStep: '1/5',
-    title: 'What will be the name of your NFT?',
-    description:
-      "Examples of token names: Bitcoin, Ethereum, Matic, Klever...Don't worry, you will have the opportunity to choose the ticker name next.",
-    kleverTip:
-      'Klever Tip: Choose the name carefully, it will most likely be your brand on the blockchain.',
-  },
-  ticker: {
-    currentStep: '2/5',
-    title: 'What is your NFT ticker?',
-    description:
-      'Now you will choose your ticker, it will represent your NFT in wallets and exchanges. Examples of Ticker names: BTC, ETH, KLV, BNB...',
-  },
-  ownerAddress: {
-    currentStep: '3/5',
-    formValue: 'ownerAddress',
-    description:
-      'This address will be the NFT manager and will be able to edit some settings. Only the Owner of the NFT can do this.',
-  },
-  maxSupply: {
-    currentStep: '4/7',
-    description:
-      'The max amount is the upper limit for the total supply of NFT that can be minted',
-    kleverTip:
-      'If no value is specified now, the initial max amount will be set to infinity. This value can be adjusted later, but use with caution and consider the impact on the NFT value.',
-  },
-  logo: {
-    currentStep: '5/5',
-  },
-  advancedSteps: {
-    uris: {
-      currentStep: 'URI',
+export const createNFT = (t: TFunction): ICreateAsset => {
+  return {
+    commomValues: {
+      assetType: 1,
+      additionalValues: false,
+      basicTotalSteps: 5,
     },
-    properties: {
-      title: "Review or change your NFT's properties.",
-      description:
-        "The settings will only be applied after creating the NFT, so they don't affect the settings you made during this process.",
+    welcome: {
+      title: t('wizards:createNFT.welcome.title'),
+      description: t('wizards:createNFT.welcome.description'),
+      tooltip: t('wizards:createNFT.welcome.tooltip'),
+      kleverTip: t('wizards:createNFT.welcome.kleverTip'),
+      transactionCost: '20,000',
+      timeEstimated: '10min',
     },
-  },
-  transactionSuccess: {
-    description: 'When confirmed on the blockchain, your NFT will be created.',
-    secondDescription: 'The NFT contract is generated after this confirmation.',
-  },
-  stepsInformations: {
-    basicStepsLabels: [
-      'NFT Name',
-      'NFT Ticker',
-      'Owner Address',
-      'Max Supply',
-      'NFT Image',
-    ],
-    advancedStepsIndex: [7, 8, 9, 10],
-    advancedStepsLabels: ['Uri', 'Royalties', 'Roles', 'Properties'],
-  },
+    name: {
+      currentStep: '1/5',
+      title: t('wizards:createNFT.name.title'),
+      description: t('wizards:createNFT.name.description'),
+      kleverTip: t('wizards:createNFT.name.kleverTip'),
+    },
+    ticker: {
+      currentStep: '2/5',
+      title: t('wizards:createNFT.ticker.title'),
+      description: t('wizards:createNFT.ticker.description'),
+    },
+    ownerAddress: {
+      currentStep: '3/5',
+      formValue: 'ownerAddress',
+      description: t('wizards:createNFT.ownerAddress.description'),
+    },
+    maxSupply: {
+      currentStep: '4/7',
+      description: t('wizards:createNFT.maxSupply.description'),
+      kleverTip: t('wizards:createNFT.maxSupply.kleverTip'),
+    },
+    logo: {
+      currentStep: '5/5',
+    },
+    advancedSteps: {
+      uris: {
+        currentStep: 'URI',
+      },
+      properties: {
+        title: t('wizards:createNFT.advancedSteps.properties.title'),
+        description: t(
+          'wizards:createNFT.advancedSteps.properties.description',
+        ),
+      },
+    },
+    transactionSuccess: {
+      description: t(
+        'wizards:createNFT.advancedSteps.transactionSuccess.description',
+      ),
+      secondDescription: t(
+        'wizards:createNFT.advancedSteps.transactionSuccess.secondDescription',
+      ),
+    },
+    stepsInformations: {
+      basicStepsLabels: [
+        t('wizards:createNFT.stepsInformations.basicStepsLabels.tokenName'),
+        t('wizards:createNFT.stepsInformations.basicStepsLabels.tokenTicker'),
+        t('wizards:createNFT.stepsInformations.basicStepsLabels.ownerAddress'),
+        t('wizards:createNFT.stepsInformations.basicStepsLabels.maxSupply'),
+        t('wizards:createNFT.stepsInformations.basicStepsLabels.tokenImage'),
+      ],
+      advancedStepsIndex: [7, 8, 9, 10],
+      advancedStepsLabels: [
+        'Uri',
+        'Royalties',
+        t('wizards:createNFT.stepsInformations.advancedStepsLabels.roles'),
+        t('wizards:createNFT.stepsInformations.advancedStepsLabels.properties'),
+      ],
+    },
+  };
 };
 
-export const createITO = {
-  commomValues: {
-    assetType: 15,
-    additionalValues: false,
-    basicTotalSteps: 7,
-  },
-  welcome: {
-    title: 'Set up an Initial Token Offering',
-    description:
-      'To set up an Initial Token Offering we will guide you through a few steps.',
-    tooltip: 'What is a ITO?',
-    kleverTip:
-      'An ITO stands for "Initial Token Offering", a fundraising method for issuing and selling new Klever Digital Assets (KDA).',
-    transactionCost: '20,000',
-    timeEstimated: '10min',
-  },
-  name: {
-    currentStep: '1/7',
-    title: 'Which token do you want to set up ITO?',
-    description:
-      'Select a token from the list below. Only tokens owned by you will be listed.',
-  },
-  receiverAddress: {
-    currentStep: '2/7',
-    formValue: 'receiverAddress',
-    title: 'What is your receiver address?',
-    description:
-      'This address will be the main royalties receiver from the sold tokens.',
-  },
-  itoTime: {
-    currentStep: '3/7',
-    nameTime: 'startTime',
-    title: 'Set start / end time ITO',
-    formValue: 'startTime',
-    description:
-      'The duration of the ITO refers to the time period during which your token will be available for purchase in the initial offering.',
-  },
-  maxAmount: {
-    currentStep: '4/7',
-    title: 'Max Amount',
-    description: 'Max amount of tokens to be sold in the ITO',
-    kleverTip:
-      'Maximum amount of tokens that will be offered for sale in this initial offeringn',
-  },
-  status: {
-    currentStep: '5/7',
-    title: 'Status',
-    description: 'Sets the status of the ITO',
-  },
-  whitelistSettings: {
-    currentStep: '6/7',
-    title: 'Whitelist Settings',
-    description: 'Sets the status of the ITO',
-  },
+export const createITO = (t: TFunction): ICreateITO => {
+  return {
+    commomValues: {
+      assetType: 15,
+      additionalValues: false,
+      basicTotalSteps: 7,
+    },
+    welcome: {
+      title: t('wizards:CreateITO.welcome.title'),
+      description: t('wizards:CreateITO.welcome.description'),
+      tooltip: t('wizards:CreateITO.welcome.tooltip'),
+      kleverTip: t('wizards:CreateITO.welcome.kleverTip'),
+      transactionCost: '20,000',
+      timeEstimated: '10min',
+    },
+    name: {
+      currentStep: '1/7',
+      title: t('wizards:CreateITO.name.title'),
+      description: t('wizards:CreateITO.welcome.description'),
+    },
+    receiverAddress: {
+      currentStep: '2/7',
+      formValue: 'receiverAddress',
+      title: t('wizards:CreateITO.receiverAddress.'),
+      description: t('wizards:CreateITO.receiverAddress.description'),
+    },
+    itoTime: {
+      currentStep: '3/7',
+      nameTime: 'startTime',
+      title: t('wizards:CreateITO.itoTime.title'),
+      formValue: 'startTime',
+      description: t('wizards:CreateITO.itoTime.description'),
+    },
+    maxAmount: {
+      currentStep: '4/7',
+      title: t('wizards:CreateITO.maxAmount.title'),
+      description: t('wizards:CreateITO.maxAmount.description'),
+      kleverTip: t('wizards:CreateITO.maxAmount.kleverTip'),
+    },
+    status: {
+      currentStep: '5/7',
+      title: t('wizards:CreateITO.status.title'),
+      description: t('wizards:CreateITO.status.description'),
+    },
+    whitelistSettings: {
+      currentStep: '6/7',
+      title: t('wizards:CreateITO.whitelistSettings.title'),
+      description: t('wizards:CreateITO.whitelistSettings.description'),
+    },
 
-  transactionSuccess: {
-    description: 'When confirmed on the blockchain, your ITO will be created.',
-    secondDescription: 'The ITO contract is generated after this confirmation.',
-  },
-  stepsInformations: {
-    basicStepsLabels: [
-      'Asset / Collection',
-      'Receiver Address',
-      'ITO Time',
-      'Max Amount',
-      'Status',
-      'Pack Info',
-      'Whitelist Settings',
-    ],
-  },
+    transactionSuccess: {
+      description: t('wizards:CreateITO.transactionSuccess.description'),
+      secondDescription: t(
+        'wizards:CreateITO.transactionSuccess.secondDescription',
+      ),
+    },
+    stepsInformations: {
+      basicStepsLabels: [
+        t(
+          'wizards:CreateITO.stepsInformations.basicStepsLabels.asset/collection',
+        ),
+        t(
+          'wizards:CreateITO.stepsInformations.basicStepsLabels.receiverAddress',
+        ),
+        t('wizards:CreateITO.stepsInformations.basicStepsLabels.itoTime'),
+        t('wizards:CreateITO.stepsInformations.basicStepsLabels.maxAmount'),
+        t('wizards:CreateITO.stepsInformations.basicStepsLabels.Status'),
+        t('wizards:CreateITO.stepsInformations.basicStepsLabels.packInfo'),
+        t(
+          'wizards:CreateITO.stepsInformations.basicStepsLabels.whitelistSettings',
+        ),
+      ],
+      advancedStepsIndex: [],
+      advancedStepsLabels: [],
+    },
+  };
 };
 
 export const parseRoles = (data: unknown): void => {

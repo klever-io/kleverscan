@@ -43,6 +43,8 @@
     "Status": "Estado"
   },
   "Properties": {
+    "Staking": "Participação",
+    "Roles": "Funções",
     "Can": "Pode {{type}}",
     "Freeze": "Congelar",
     "Wipe": "Limpar",

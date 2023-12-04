@@ -1,52 +1,287 @@
 {
-  "welcome": {
-    "title": "Crie um token fungível",
-    "description": "Para criar um token fungível KDA, vamos guiá-lo através de alguns passos.",
-    "tooltip": "O que é um token fungível?",
-    "kleverTip": "Dinheiro físico e criptomoedas são fungíveis, o que significa que podem ser negociados ou trocados entre si."
-  },
-  "name": {
-    "title": "Qual será o nome do seu token?",
-    "description": "Exemplos de nomes de tokens: Bitcoin, Ethereum, Matic, Klever... Não se preocupe, você terá a oportunidade de escolher o nome do símbolo a seguir.",
-    "kleverTip": "Dica Klever: Escolha o nome cuidadosamente, provavelmente será a sua marca na blockchain."
-  },
-  "ticker": {
-    "title": "Qual é o símbolo do seu token?",
-    "description": "Agora você escolherá o símbolo, que representará seu token em carteiras e exchanges. Exemplos de símbolos: BTC, ETH, KLV, BNB..."
-  },
-  "ownerAddress": {
-    "description": "Este endereço será o gerenciador do token e poderá editar algumas configurações. Apenas o proprietário do token pode fazer isso."
-  },
-  "maxSupply": {
-    "description": "A quantidade máxima é o limite superior para o fornecimento total de tokens que podem ser cunhados.",
-    "kleverTip": "Se nenhum valor for especificado agora, a quantidade máxima inicial será definida como infinito. Este valor pode ser ajustado posteriormente, mas use com cautela e considere o impacto no valor e na usabilidade do token."
-  },
-  "advancedSteps": {
-    "properties": {
-      "title": "Revise ou altere as propriedades do seu token.",
-      "description": "As configurações só serão aplicadas após a criação do token, para que não afetem as configurações feitas durante este processo."
+  "common": {
+    "txCost": "Para finalizar este processo, uma transação será realizada com um custo de",
+    "readyText": "Estou pronto, quero começar",
+    "estimatedTime": "Tempo estimado",
+    "step": "Passo",
+    "address": "Endereço",
+    "useConnectedAddress": "Usar o endereço da minha carteira conectada",
+    "useAnotherAddress": "Usar outro endereço de KDA",
+    "previous": "Anterior",
+    "next": "Próximo",
+    "remove": "Remover",
+    "addAnother": "Adicionar outro {{text}}",
+    "already": "Já",
+    "name": "nome",
+    "ticker": "ticker",
+    "precision": "Precisão",
+    "maxSupply": "Oferta Máxima",
+    "maxSupplyOf": "Oferta Máxima de {{ticker}}",
+    "URI": "URI da imagem do {{assetText}}",
+    "imageTicker": "Você já possui uma imagem para representar {{ticker}} {{assetText}}",
+    "imageInfo": "Inclua um URI com um ícone a ser usado pelo {{assetText}} (jpg, png, svg). Faça o melhor para gerar uma imagem quadrada com pelo menos 400x400px.",
+    "uriPlaceholder": "Cole seu URI de imagem aqui",
+    "imageTooltip": "Se não informado, um ícone genérico com a primeira letra do ticker será exibido. Você pode alterar isso posteriormente através de uma nova transação.",
+    "preConfirmInfo": "Você já pode gerar o seu {{assetText}} se quiser. O que você deseja fazer?",
+    "generateWithBasicInformation": "Quero gerar o {{assetText}} com essas informações básicas",
+    "basicInformationConfirm": "Ao usar essa opção, você gerará seu {{assetText}} com configurações avançadas em opções padrão.",
+    "addAdvancedSettings": "Quero adicionar configurações avançadas",
+    "advancedSettingsConfirm": "Use esta opção se quiser configurar URIs, Staking, Funções, Propriedades.",
+    "showAllDefaultSettings": "Mostrar todas as configurações padrão",
+    "errorMessage": {
+      "required": "Este campo é obrigatório",
+      "blankSpace": "Não pode começar/terminar com espaço em branco",
+      "minLength": "Deve ter pelo menos 3 caracteres",
+      "noSpaceTicker": "Não pode conter espaços no ticker",
+      "cannotBeKLVnorKFI": "O ticker não pode ser KLV nem KFI",
+      "charactersField": "Este campo deve ter {{number}} caracteres",
+      "onlyNumbers": "Apenas números são permitidos",
+      "validURI": "Insira um URI válido"
+    },
+    "basicOptions": {
+      "basicInfoText": "Informações básicas",
+      "ownerAddress": "Endereço do proprietário",
+      "whatTickerPrecison": "Qual será a precisão de {{ticker}}?",
+      "precisionHint": "A precisão do token refere-se ao número de casas decimais que podem ser usadas para representar quantidades fracionárias de um token.",
+      "kleverPrecisionTip": "Dica Klever: A precisão do token é uma consideração importante ao criar um token, pois afeta a usabilidade e a divisibilidade do token.",
+      "initialSupplyOf": "Oferta Inicial de {{ticker}}",
+      "initialSupplyHint": "A quantidade inicial refere-se à quantidade de tokens que serão criados no início do processo de criação do token.",
+      "kleverInitialSupplyTip": "Se não especificado, nenhum token será criado no momento da criação do ativo. A quantidade inicial pode ser ajustada posteriormente por meio da criação, que pode ser controlada por meio do contrato inteligente do token.",
+      "maxSupplyOf": "Oferta Máxima de {{ticker}}"
+    },
+    "transactionDetails": {
+      "transactionDetails": "DETALHES DA TRANSAÇÃO",
+      "defaultSettings": "CONFIGURAÇÕES PADRÃO",
+      "transaction": "Transação",
+      "createAsset": "Criar Ativo",
+      "from": "de",
+      "fee": "Taxa",
+      "basicSettings": "CONFIGURAÇÕES BÁSICAS"
+    },
+    "advancedOptions": {
+      "eachAdvancedOption": "Opção Avançada",
+      "allAdvancedOption": "OPÇÕES AVANÇADAS",
+      "roles": {
+        "roles": "Funções",
+        "role": "Função",
+        "enableRoles": "Gostaria de criar funções para gerenciar seu {{ticker}} {{assetText}}",
+        "whatIs": "O que é uma Função?",
+        "setPermission": "Conjunto de permissões que você pode adicionar a um endereço específico",
+        "enterAddress": "Digite o endereço que será adicionado para aplicar as permissões",
+        "allowedToMintCoins": "Será permitido criar moedas?",
+        "allowedToSetPrice": "Será permitido definir o preço no ITO",
+        "tooltip": "Não se preocupe, essas regras podem ser alteradas posteriormente em 'Adicionar função' no Trigger do Ativo pelo Proprietário do {{assetText}}",
+        "remove": "Remover Função",
+        "addAnother": "Adicionar outra Função"
+      },
+      "properties": {
+        "properties": "Propriedades",
+        "tooltipFreeze": "Travar tokens para gerar recompensas",
+        "tooltipPause": "Parar transações",
+        "tooltipBurn": "Eliminar parte da circulação de tokens",
+        "tooltipAddRoles": "Define se funções podem ser aplicadas a endereços que não foram definidos durante o processo de criação do token",
+        "tooltipMint": "Criar novos tokens usando um processo de criação",
+        "tooltipChangeOwner": "Dá a opção de mudar o proprietário do ativo",
+        "tooltipWipe": "Queimar os tokens de uma conta suspeita e devolvê-los ao proprietário"
+      },
+      "URI": {
+        "URI": "URI",
+        "doYouWantAdd": "Você deseja adicionar URIs ao seu {{assetText}} agora?",
+        "whatIsAnURI": "O que é um URI",
+        "tooltip": "Abreviação de 'Uniform Resource Identifier' — é uma sequência de caracteres que distingue um recurso de outro. Por exemplo, “https://kleverscan.org“",
+        "fillTokenURIs": "Por favor, preencha os URIs do Token e rótulos",
+        "labelURL": "Insira o rótulo que identifica este URL. Exemplo: Whitepaper, Github, Website...",
+        "exampleURI": "Insira o URI correspondente ao rótulo acima. Ex: https://kleverscan.org",
+        "removeURI": "Remover URI",
+        "addURI": "Adicionar outro URI"
+      },
+      "royalties": {
+        "royalties": "Royalties",
+        "statements": "Declarações",
+        "enableRoyalties": "Gostaria de habilitar e configurar royalties {{ticker}} agora?",
+        "royaltiesInfo": "Este endereço será o receptor dos royalties",
+        "setTheValuesITORoyalties": "Defina os valores para os royalties do {{ticker}} ITO",
+        "whatIsRoyalty": "O que é royalties?",
+        "whatIsRoyaltyA": "Pagamentos cripto projetados para oferecer aos criadores uma parcela das vendas secundárias de seu ativo",
+        "nowChooseReceiverAddress": "Agora você escolherá o valor dos royalties que o endereço selecionado receberá",
+        "percentageITOBuy": "Porcentagem da moeda que será cobrada de uma Compra no ITO - (precisão 2, 100 = 100%)",
+        "fixedAmountITOBuy": "Valor fixo da moeda que será cobrado de uma Compra no ITO",
+        "transferPercentage": "Porcentagem de Transferência",
+        "fillAmountPercentage": "Por favor, preencha a quantidade de Token e a porcentagem",
+        "percentageValueTransfers": "Você também pode definir um valor percentual para transferências de {{ticker}}, a porcentagem pode ser diferente para determinados limites de quantidade",
+        "amountHint": "Quantidade - Valor mínimo do limite que aciona a taxa de transferência",
+        "percentageHint": "Porcentagem - Valor da taxa percentual para essa quantidade",
+        "removePercentage": "Remover Porcentagem",
+        "addPercentage": "Adicionar outra Porcentagem",
+        "splitRoyalties": "Dividir Royalties",
+        "wantToSplitRoyalties": "Gostaria de dividir os royalties do seu token agora?",
+        "whatSplitRoyalties": "O que é Dividir Royalties?",
+        "royaltyReceiverAddress": "Endereço receptor de royalties",
+        "howRoyaltiesSplit": "Como os royalties são divididos",
+        "transferPercentageReceiverAddressFee": "Porcentagem que o endereço dado receberá da taxa de 'porcentagem de transferência'. (Precisão 2, 100 = 100%)",
+        "itoPercentageReceiverAddressFee": "Porcentagem que o endereço dado receberá da taxa 'ITO percentage'. (Precisão 2, 100 = 100%)",
+        "itoFixedReceiverAddressFee": "Porcentagem que o endereço dado receberá da taxa 'ITO fixed'. (Precisão 2, 100 = 100%)"
+      }
+    },
+    "confirm": {
+      "create": "Criar {{type}}",
+      "review": "Revisão",
+      "reviewAsset": "Revise as configurações do seu {{assetText}}",
+      "confirmTransaction": "Confirmar Transação"
     }
   },
-  "transactionSuccess": {
-    "description": "Quando confirmado na blockchain, seu token será criado.",
-    "secondDescription": "O contrato do token é gerado após essa confirmação."
+  "createAssetCommon": {
+    "ticker": {
+      "kleverTip": "Dica Klever: Tente encontrar um Ticker que não está sendo usado por projetos relevantes."
+    }
   },
-  "stepsInformations": {
-    "basicStepsLabels": {
-      "tokenName": "Nome do Token",
-      "tokenTicker": "Símbolo do Token",
-      "ownerAddress": "Endereço do Proprietário",
-      "tokenPrecision": "Precisão do Token",
-      "initialSupply": "Fornecimento Inicial",
-      "maxSupply": "Fornecimento Máximo",
-      "tokenImage": "Imagem do Token"
+  "createToken": {
+    "welcome": {
+      "title": "Criar um token fungível",
+      "description": "Para criar um token KDA fungível, iremos guiá-lo através de alguns passos.",
+      "tooltip": "O que é um token fungível?",
+      "kleverTip": "Dinheiro físico e criptomoedas são fungíveis, o que significa que podem ser negociados ou trocados uns pelos outros."
     },
-    "advancedStepsLabels": {
-      "uri": "URI",
-      "staking": "Staking",
-      "royalties": "Royalties",
-      "roles": "Funções",
-      "properties": "Propriedades"
+    "name": {
+      "title": "Qual será o nome do seu token?",
+      "description": "Exemplos de nomes de tokens: Bitcoin, Ethereum, Matic, Klever... Não se preocupe, você terá a oportunidade de escolher o nome do ticker em seguida.",
+      "kleverTip": "Dica Klever: Escolha o nome cuidadosamente, provavelmente será sua marca na blockchain."
+    },
+    "ticker": {
+      "title": "Qual é o ticker do seu token?",
+      "description": "Agora você escolherá seu ticker, que representará seu token em carteiras e exchanges. Exemplos de nomes de tickers: BTC, ETH, KLV, BNB..."
+    },
+    "ownerAddress": {
+      "description": "Este endereço será o gerenciador do token e poderá editar algumas configurações. Apenas o proprietário do token pode fazer isso."
+    },
+    "maxSupply": {
+      "description": "A quantidade máxima é o limite superior para o fornecimento total de tokens que podem ser criados",
+      "kleverTip": "Se nenhum valor for especificado agora, a quantidade máxima inicial será definida como infinito. Esse valor pode ser ajustado posteriormente, mas use com cautela e considere o impacto no valor e na usabilidade do token."
+    },
+    "advancedSteps": {
+      "properties": {
+        "title": "Revisar ou alterar as propriedades do seu token.",
+        "description": "As configurações só serão aplicadas após a criação do token, para que não afetem as configurações feitas durante este processo."
+      }
+    },
+    "transactionSuccess": {
+      "description": "Quando confirmado na blockchain, seu token será criado.",
+      "secondDescription": "O contrato do token é gerado após esta confirmação."
+    },
+    "stepsInformations": {
+      "basicStepsLabels": {
+        "tokenName": "Nome do Token",
+        "tokenTicker": "Ticker do Token",
+        "ownerAddress": "Endereço do Proprietário",
+        "tokenPrecision": "Precisão do Token",
+        "initialSupply": "Fornecimento Inicial",
+        "maxSupply": "Fornecimento Máximo",
+        "tokenImage": "Imagem do Token"
+      },
+      "advancedStepsLabels": {
+        "uri": "URI",
+        "staking": "Staking",
+        "royalties": "Royalties",
+        "roles": "Funções",
+        "properties": "Propriedades"
+      }
+    }
+  },
+  "createNFT": {
+    "welcome": {
+      "title": "Criar um NFT",
+      "description": "Para criar um NFT KDA, iremos guiá-lo através de alguns passos.",
+      "tooltip": "O que é um NFT?",
+      "kleverTip": "NFTs são tokens usados para representar a propriedade de itens únicos."
+    },
+    "name": {
+      "title": "Qual será o nome do seu NFT?",
+      "description": "Exemplos de nomes de tokens: Bitcoin, Ethereum, Matic, Klever... Não se preocupe, você terá a oportunidade de escolher o nome do ticker em seguida.",
+      "kleverTip": "Dica Klever: Escolha o nome cuidadosamente, provavelmente será sua marca na blockchain."
+    },
+    "ticker": {
+      "title": "Qual é o ticker do seu NFT?",
+      "description": "Agora você escolherá seu ticker, que representará seu NFT em carteiras e exchanges. Exemplos de nomes de tickers: BTC, ETH, KLV, BNB..."
+    },
+    "ownerAddress": {
+      "description": "Este endereço será o gerenciador do NFT e poderá editar algumas configurações. Apenas o proprietário do NFT pode fazer isso."
+    },
+    "maxSupply": {
+      "description": "A quantidade máxima é o limite superior para o fornecimento total de NFT que podem ser criados",
+      "kleverTip": "Se nenhum valor for especificado agora, a quantidade máxima inicial será definida como infinito. Este valor pode ser ajustado posteriormente, mas use com cautela e considere o impacto no valor do NFT."
+    },
+    "advancedSteps": {
+      "properties": {
+        "title": "Revisar ou alterar as propriedades do seu NFT.",
+        "description": "As configurações só serão aplicadas após a criação do NFT, para que não afetem as configurações feitas durante este processo."
+      }
+    },
+    "transactionSuccess": {
+      "description": "Quando confirmado na blockchain, seu NFT será criado.",
+      "secondDescription": "O contrato do NFT é gerado após esta confirmação."
+    },
+    "stepsInformations": {
+      "basicStepsLabels": {
+        "tokenName": "Nome do NFT",
+        "tokenTicker": "Ticker do NFT",
+        "ownerAddress": "Endereço do Proprietário",
+        "maxSupply": "Fornecimento Máximo",
+        "tokenImage": "Imagem do NFT"
+      },
+      "advancedStepsLabels": {
+        "uri": "URI",
+        "royalties": "Royalties",
+        "roles": "Funções",
+        "properties": "Propriedades"
+      }
+    }
+  },
+  "createITO": {
+    "welcome": {
+      "title": "Configurar uma Oferta Inicial de Token",
+      "description": "Para configurar uma Oferta Inicial de Token, iremos guiá-lo através de alguns passos.",
+      "tooltip": "O que é uma ITO?",
+      "kleverTip": "Uma ITO significa 'Oferta Inicial de Token', um método de arrecadação de fundos para emissão e venda de novos Ativos Digitais Klever (KDA)."
+    },
+    "name": {
+      "title": "Qual token você quer configurar para a ITO?",
+      "description": "Selecione um token da lista abaixo. Apenas os tokens de sua propriedade serão listados."
+    },
+    "receiverAddress": {
+      "title": "Qual é o seu endereço de recebimento?",
+      "description": "Este endereço será o principal receptor de royalties dos tokens vendidos."
+    },
+    "itoTime": {
+      "description": "A duração da ITO refere-se ao período durante o qual seu token estará disponível para compra na oferta inicial.",
+      "title": "Definir tempo de início / fim da ITO"
+    },
+    "maxAmount": {
+      "title": "Quantidade Máxima",
+      "description": "Quantidade máxima de tokens a serem vendidos na ITO",
+      "kleverTip": "Quantidade máxima de tokens que serão oferecidos à venda nesta oferta inicial."
+    },
+    "status": {
+      "title": "Status",
+      "description": "Define o status da ITO"
+    },
+    "whitelistSettings": {
+      "title": "Configurações da Lista Branca",
+      "description": "Define o status da lista branca na ITO"
+    },
+    "transactionSuccess": {
+      "description": "Quando confirmado na blockchain, sua ITO será criada.",
+      "secondDescription": "O contrato da ITO é gerado após esta confirmação."
+    },
+    "stepsInformations": {
+      "basicStepsLabels": {
+        "asset/collection": "Ativo / Coleção",
+        "receiverAddress": "Endereço do Receptor",
+        "itoTime": "Tempo da ITO",
+        "maxAmount": "Quantidade Máxima",
+        "Status": "Status",
+        "packInfo": "Informações do Pacote",
+        "whitelistSettings": "Configurações da Lista Branca"
+      }
     }
   }
 }

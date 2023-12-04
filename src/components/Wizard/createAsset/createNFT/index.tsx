@@ -40,16 +40,15 @@ const WizCreateNFT: React.FC<any> = ({
   fromAdvancedSteps,
   setFromAdvancedSteps,
 }) => {
+  const { t } = useTranslation(['common', 'wizards']);
   const [selectedStep, setSelectedStep] = useState(0);
-  const assetInfo = createNFT;
+  const assetInfo = createNFT(t);
 
   const { walletAddress } = useExtension();
 
   const handleAdvancedSteps = () => {
     setSelectedStep(prevStep => prevStep + 1);
   };
-
-  const { t } = useTranslation(['common', 'wizards']);
 
   const stepsProps = {
     handleStep: setSelectedStep,

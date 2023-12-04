@@ -11,6 +11,33 @@
     "next": "Next",
     "remove": "Remove",
     "addAnother": "Add another {{text}}",
+    "already": "Already",
+    "name": "name",
+    "ticker": "ticker",
+    "precision": "Precision",
+    "maxSupply": "Max Supply",
+    "maxSupplyOf": "Max. Supply of {{ticker}}",
+    "URI": "URI {{assetText}} image",
+    "imageTicker": "Do you already have an image to represent {{ticker}} {{assetText}}",
+    "imageInfo": "Include an URI with an icon to be used by the{{assetText}} (jpg, png, svg). Do your best to generate a square image and at least 400x400px.",
+    "uriPlaceholder": "Paste your image URI here",
+    "imageTooltip": "If not informed, a generic Icon with the first letter of the Ticker will be displayed. You can change this later through a new transaction.",
+    "preConfirmInfo": "You can already generate your {{assetText}} if you want. What do you want to do?",
+    "generateWithBasicInformation": " I want to generate the {{assetText}} with this basic information",
+    "basicInformationConfirm": "Using this option you will generate your {{assetText}} with advanced settings in default options.",
+    "addAdvancedSettings": "I want to add advanced settings",
+    "advancedSettingsConfirm": "Use this option if you want to configure URIs, Staking, Roles,Proprieties.",
+    "showAllDefaultSettings": "Show all default settings",
+    "errorMessage": {
+      "required": "This field is required",
+      "blankSpace": "Cannot start/end with blank space",
+      "minLength": "Must have at least 3 characters",
+      "noSpaceTicker": "Cannot contain any spaces in the ticker",
+      "cannotBeKLVnorKFI": "Ticker cannot be KLV nor KFI",
+      "charactersField": "This field must have {{number}} characters",
+      "onlyNumbers": "Only numbers are allowed",
+      "validURI": "Enter a valid URI"
+    },
     "basicOptions": {
       "basicInfoText": "Basic information",
       "ownerAddress": "Owner Address",
@@ -22,11 +49,55 @@
       "kleverInitialSupplyTip": "If not specified, no tokens will be minted at the time of asset creation. The initial amount can be adjusted later through minting, which can be controlled through the token's smart contract.",
       "maxSupplyOf": "Max. Supply of {{ticker}}"
     },
+    "transactionDetails": {
+      "transactionDetails": "TRANSACTION DETAILS",
+      "defaultSettings": "DEFAULT SETTINGS",
+      "transaction": "Transaction",
+      "createAsset": "Create Asset",
+      "from": "from",
+      "fee": "Fee",
+      "basicSettings": "BASIC SETTINGS"
+    },
     "advancedOptions": {
       "eachAdvancedOption": "Advanced Option",
       "allAdvancedOption": "ADVANCED OPTIONS",
+      "roles": {
+        "roles": "Roles",
+        "role": "Role",
+        "enableRoles": "Would you like to create roles to manage your {{ticker}} {{assetText}}",
+        "whatIs": "What is a Role?",
+        "setPermission": "Set of permissions that you can add to a specific address",
+        "enterAddress": "Enter the address that will be added to apply the permissions",
+        "allowedToMintCoins": "Will be allowed to mint coins?",
+        "allowedToSetPrice": "Will be allowed to set the price in the ITO",
+        "tooltip": "Don't worry, these rules can be changed later in 'Add role' in the Asset Trigger by the {{assetText}} Owner",
+        "remove": "Remove Role",
+        "addAnother": "Add another Role"
+      },
+      "properties": {
+        "properties": "Properties",
+        "tooltipFreeze": "Lock up tokens to generate rewards",
+        "tooltipPause": "Stop transactions",
+        "tooltipBurn": "Eliminate part of the token circulation",
+        "tooltipAddRoles": "Defines whether roles can be applied to addresses that weren’t defined during the token creation process",
+        "tooltipMint": "Create new tokens using a mint process",
+        "tooltipChangeOwner": "Gives the option of changing the asset owner",
+        "tooltipWipe": "Burn the tokens from a suspicious account and send them back to owner"
+      },
+      "URI": {
+        "URI": "URI",
+        "doYouWantAdd": "Do you want to add URIs to your {{assetText}} now?",
+        "whatIsAnURI": "What is an URI",
+        "tooltip": "Short for “Uniform Resource Identifier” — is a sequence of characters that distinguishes one resource from another. For example, “https://kleverscan.org“",
+        "fillTokenURIs": "Please fill the Token URIs and labels",
+        "labelURL": "Enter the label that identifies this URL. Example: Whitepaper, Github, Website...",
+        "exampleURI": "Enter the URI corresponding to the label above. E.g: https://kleverscan.org",
+        "removeURI": "Remove URI",
+        "addURI": "Add another URI"
+      },
       "royalties": {
         "royalties": "Royalties",
+        "statements": "Statements",
         "enableRoyalties": " Would you like to enable and configure royalties {{ticker}} now?",
         "royaltiesInfo": "This address will be the receiver of royalties",
         "setTheValuesITORoyalties": "Set the values for the {{ticker}} ITO's royalties",
@@ -51,6 +122,12 @@
         "itoPercentageReceiverAddressFee": "Percentage that the given address receive from 'ITO percentage' fee. ( Precision 2, 100 = 100%)",
         "itoFixedReceiverAddressFee": "Percentage that the given address will receive from 'ITO fixed' fee. ( Precision 2, 100 = 100%)"
       }
+    },
+    "confirm": {
+      "create": "Create {{type}}",
+      "review": "Review",
+      "reviewAsset": "Review your {{assetText}} settings",
+      "confirmTransaction": "Confirm Transaction"
     }
   },
   "createAssetCommon": {
@@ -107,6 +184,103 @@
         "royalties": "Royalties",
         "roles": "Roles",
         "properties": "Properties"
+      }
+    }
+  },
+  "createNFT": {
+    "welcome": {
+      "title": "Create a NFT",
+      "description": "To create a KDA NFT we will guide you through a few steps.",
+      "tooltip": "What is a NFT?",
+      "kleverTip": "NFTs are tokens used to represent ownership of unique items"
+    },
+    "name": {
+      "title": "What will be the name of your NFT?",
+      "description": "Examples of token names: Bitcoin, Ethereum, Matic, Klever...Don't worry, you will have the opportunity to choose the ticker name next.",
+      "kleverTip": "Klever Tip: Choose the name carefully, it will most likely be your brand on the blockchain."
+    },
+    "ticker": {
+      "title": "What is your NFT ticker?",
+      "description": "Now you will choose your ticker, it will represent your NFT in wallets and exchanges. Examples of Ticker names: BTC, ETH, KLV, BNB..."
+    },
+    "ownerAddress": {
+      "description": "This address will be the NFT manager and will be able to edit some settings. Only the Owner of the NFT can do this."
+    },
+    "maxSupply": {
+      "description": "The max amount is the upper limit for the total supply of NFT that can be minted",
+      "kleverTip": "If no value is specified now, the initial max amount will be set to infinity. This value can be adjusted later, but use with caution and consider the impact on the NFT value."
+    },
+    "advancedSteps": {
+      "properties": {
+        "title": "Review or change your NFT's properties.",
+        "description": "The settings will only be applied after creating the NFT, so they don't affect the settings you made during this process."
+      }
+    },
+    "transactionSuccess": {
+      "description": "When confirmed on the blockchain, your NFT will be created.",
+      "secondDescription": "The NFT contract is generated after this confirmation."
+    },
+    "stepsInformations": {
+      "basicStepsLabels": {
+        "tokenName": "NFT Name",
+        "tokenTicker": "NFT Ticker",
+        "ownerAddress": "Owner Address",
+        "maxSupply": "Max Supply",
+        "tokenImage": "NFT Image"
+      },
+      "advancedStepsLabels": {
+        "uri": "Uri",
+        "royalties": "Royalties",
+        "roles": "Roles",
+        "properties": "Properties"
+      }
+    }
+  },
+  "createITO": {
+    "welcome": {
+      "title": "Set up an Initial Token Offering",
+      "description": "To set up an Initial Token Offering we will guide you through a few steps.",
+      "tooltip": "What is a ITO?",
+      "kleverTip": "An ITO stands for 'Initial Token Offering', a fundraising method for issuing and selling new Klever Digital Assets (KDA)."
+    },
+    "name": {
+      "title": "Which token do you want to set up ITO?",
+      "description": "Select a token from the list below. Only tokens owned by you will be listed."
+    },
+    "receiverAddress": {
+      "title": "What is your receiver address?",
+      "description": "This address will be the main royalties receiver from the sold tokens."
+    },
+    "itoTime": {
+      "description": "The duration of the ITO refers to the time period during which your token will be available for purchase in the initial offering.",
+      "title": "Set start / end time ITO"
+    },
+    "maxAmount": {
+      "title": "Max Amount",
+      "description": "Max amount of tokens to be sold in the ITO",
+      "kleverTip": "Maximum amount of tokens that will be offered for sale in this initial offeringn"
+    },
+    "status": {
+      "title": "Status",
+      "description": "Sets the status of the ITO"
+    },
+    "whitelistSettings": {
+      "title": "Whitelist Settings",
+      "description": "Sets the status of the ITO"
+    },
+    "transactionSuccess": {
+      "description": "When confirmed on the blockchain, your ITO will be created.",
+      "secondDescription": "The ITO contract is generated after this confirmation."
+    },
+    "stepsInformations": {
+      "basicStepsLabels": {
+        "asset/collection": "Asset / Collection",
+        "receiverAddress": "Receiver Address",
+        "itoTime": "ITO Time",
+        "maxAmount": "Max Amount",
+        "Status": "Status",
+        "packInfo": "Pack Info",
+        "whitelistSettings": "Whitelist Settings"
       }
     }
   }

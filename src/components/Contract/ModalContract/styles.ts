@@ -10,7 +10,7 @@ export const Container = styled.div`
   place-content: center;
   width: 100vw;
   height: 100vh;
-  z-index: 6;
+  z-index: 5;
   backdrop-filter: brightness(0.3);
 `;
 

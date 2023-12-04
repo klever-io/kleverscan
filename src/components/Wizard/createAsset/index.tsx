@@ -1259,7 +1259,7 @@ export const CreateAssetSplitRoyalties: React.FC<IWizardComponents> = ({
               setSplitRoyalties(true);
             }}
           >
-            Statements
+            {t('wizards:common.advancedOptions.royalties.statements')}
           </WizardButton>
           <WizardButton secondary centered onClick={() => handleStep(10)}>
             {t('common:Statements.No')}
@@ -1961,6 +1961,7 @@ const SelectStakingTypeComponent: React.FC<IWizardStakingComponents> = ({
   handleStep,
   setCurrentStep,
 }) => {
+  const { t } = useTranslation('wizards');
   const { setValue } = useFormContext();
 
   const buttonsProps = {
@@ -1971,11 +1972,11 @@ const SelectStakingTypeComponent: React.FC<IWizardStakingComponents> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>STAKING</p>
-        <p>STEP 1</p>
+        <p>{t('common.advancedOptions.staking.staking').toUpperCase()}</p>
+        <p>{t('common.step')} 1</p>
       </div>
       <div>
-        <p>What reward model do you want to offer?</p>
+        <p>{t('common.advancedOptions.staking.whatRewardModel')}</p>
 
         <StakingTypeContainer>
           <PreConfirmOptions
@@ -1987,11 +1988,7 @@ const SelectStakingTypeComponent: React.FC<IWizardStakingComponents> = ({
           >
             <div>
               <span>APR</span>
-              <span>
-                APR staking stands for Annual Percentage Rate. It is a
-                well-known term in the market that represents the percentage
-                earned annually on an investment
-              </span>
+              <span>{t('common.advancedOptions.staking.aprInfo')}</span>
             </div>
             <WizardRightArrowSVG />
           </PreConfirmOptions>
@@ -2004,12 +2001,7 @@ const SelectStakingTypeComponent: React.FC<IWizardStakingComponents> = ({
           >
             <div>
               <span>FPR</span>
-              <span>
-                FPR stands for Flexibe Proportional Return. It is a new modality
-                of staking that the Klever ecosystem offers and is a way for
-                owners to distribute rewards to their holders through deposits
-                into the FPR pool.
-              </span>
+              <span>{t('common.advancedOptions.staking.fprInfo')}</span>
             </div>
             <WizardRightArrowSVG />
           </PreConfirmOptions>
@@ -2023,6 +2015,7 @@ const SelectStakingTypeComponent: React.FC<IWizardStakingComponents> = ({
 const StakingStepsGeneric: React.FC<IWizardStakingComponents> = ({
   setCurrentStep,
 }) => {
+  const { t } = useTranslation('wizards');
   const {
     register,
     watch,
@@ -2032,9 +2025,9 @@ const StakingStepsGeneric: React.FC<IWizardStakingComponents> = ({
   const stakingType = stakingTypeNum === 0 ? 'APR' : 'FPR';
   const renderStakingStep = () => {
     if (stakingType === 'APR') {
-      return `${stakingType} STEP 2/5`;
+      return `${stakingType} ${t('common.step')} 2/5`;
     }
-    return `${stakingType} STEP  1/3`;
+    return `${stakingType} ${t('common.step')}  1/3`;
   };
 
   let error = null;
@@ -2053,31 +2046,29 @@ const StakingStepsGeneric: React.FC<IWizardStakingComponents> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>STAKING</p>
+        <p>{t('common.advancedOptions.staking.staking').toUpperCase()}</p>
         <p>{renderStakingStep()}</p>
       </div>
       <div>
-        <p>APR Rate (%)</p>
-        <p>
-          Inform the percentage to be paid in your staking. Remember it is an
-          annual income.
-        </p>
+        <p>{t('common.advancedOptions.staking.aprRate')}</p>
+        <p>{t('common.advancedOptions.staking.aprRateInfo')}</p>
         <GenericInput
           error={error}
           align={'center'}
           type="number"
           placeholder="0"
           {...register('staking.apr', {
-            pattern: { value: /\d+/g, message: 'Value must be only numbers' },
+            pattern: {
+              value: /\d+/g,
+              message: t('common.errorMessage.onlyNumbersValue'),
+            },
             valueAsNumber: true,
           })}
         />
         {error && <ErrorMessage>{error?.message}</ErrorMessage>}
 
         <GenericInfoCard>
-          For example purposes. Let&apos;s assume that you opt for a Staking
-          with 12% APR, this will represent an interest of 1% per month and
-          0.033% per day.
+          {t('common.advancedOptions.staking.tooltipStepGeneric')}
         </GenericInfoCard>
       </div>
       <ButtonsComponent buttonsProps={buttonsProps} />
@@ -2088,6 +2079,7 @@ const StakingStepsGeneric: React.FC<IWizardStakingComponents> = ({
 const StakingStepsGenericAprFprOne: React.FC<IWizardStakingComponents> = ({
   setCurrentStep,
 }) => {
+  const { t } = useTranslation('wizards');
   const {
     register,
     watch,
@@ -2097,9 +2089,9 @@ const StakingStepsGenericAprFprOne: React.FC<IWizardStakingComponents> = ({
   const stakingType = stakingTypeNum === 0 ? 'APR' : 'FPR';
   const renderStakingStep = () => {
     if (stakingType === 'APR') {
-      return `${stakingType} STEP 3/5`;
+      return `${stakingType} ${t('common.step')} 3/5`;
     }
-    return `${stakingType} STEP 1/3`;
+    return `${stakingType} ${t('common.step')} 1/3`;
   };
 
   let error = null;
@@ -2118,23 +2110,21 @@ const StakingStepsGenericAprFprOne: React.FC<IWizardStakingComponents> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>STAKING</p>
+        <p>{t('common.advancedOptions.staking.staking').toUpperCase()}</p>
         <p>{renderStakingStep()}</p>
       </div>
       <div>
-        <p>
-          What is the minimum time your users should wait to unstake your assets
-        </p>
-        <p>
-          Remember that time on the blockchain is contact in Epochs. Each epoch
-          represents approximately 6 hours.
-        </p>
+        <p>{t('common.advancedOptions.staking.whatIsTheMinimum')}</p>
+        <p>{t('common.advancedOptions.staking.eachEpoch')}</p>
         <GenericInput
           error={error}
           type="number"
           placeholder="0"
           {...register('staking.minEpochsToClaim', {
-            pattern: { value: /\d+/g, message: 'Value must be only numbers' },
+            pattern: {
+              value: /\d+/g,
+              message: t('common.errorMessage.onlyNumbersValue'),
+            },
             valueAsNumber: true,
           })}
           align={'center'}
@@ -2142,8 +2132,7 @@ const StakingStepsGenericAprFprOne: React.FC<IWizardStakingComponents> = ({
         {error && <ErrorMessage>{error?.message}</ErrorMessage>}
 
         <GenericInfoCard>
-          Each day corresponds to 4 epochs. If you want to put a minimum period
-          of 3 days, this would represent 12 epochs.
+          {t('common.advancedOptions.staking.tooltipAprFpr')}
         </GenericInfoCard>
       </div>
       <ButtonsComponent buttonsProps={buttonsProps} />
@@ -2154,6 +2143,7 @@ const StakingStepsGenericAprFprOne: React.FC<IWizardStakingComponents> = ({
 const StakingStepsGenericAprFprTwo: React.FC<IWizardStakingComponents> = ({
   setCurrentStep,
 }) => {
+  const { t } = useTranslation('wizards');
   const {
     register,
     watch,
@@ -2164,9 +2154,9 @@ const StakingStepsGenericAprFprTwo: React.FC<IWizardStakingComponents> = ({
   const stakingType = stakingTypeNum === 0 ? 'APR' : 'FPR';
   const renderStakingStep = () => {
     if (stakingType === 'APR') {
-      return `${stakingType} STEP 4/5`;
+      return `${stakingType} ${t('common.step')} 4/5`;
     }
-    return `${stakingType} STEP 2/3`;
+    return `${stakingType} ${t('common.step')} 2/3`;
   };
 
   let error = null;
@@ -2185,23 +2175,21 @@ const StakingStepsGenericAprFprTwo: React.FC<IWizardStakingComponents> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>STAKING</p>
+        <p>{t('common.advancedOptions.staking.staking').toUpperCase()}</p>
         <p>{renderStakingStep()}</p>
       </div>
       <div>
-        <p>
-          What is the minimum time your users should wait to claim your interest
-        </p>
-        <p>
-          Remember that time on the blockchain is contact in Epochs. Each epoch
-          represents approximately 6 hours.
-        </p>
+        <p>{t('common.advancedOptions.staking.whatIsTheMinTime')}</p>
+        <p>{t('common.advancedOptions.staking.eachEpoch')}</p>
         <GenericInput
           error={error}
           type="number"
           placeholder="0"
           {...register('staking.minEpochsToUnstake', {
-            pattern: { value: /\d+/g, message: 'Value must be only numbers' },
+            pattern: {
+              value: /\d+/g,
+              message: t('common.errorMessage.onlyNumbersValue'),
+            },
             valueAsNumber: true,
           })}
           align={'center'}
@@ -2209,8 +2197,7 @@ const StakingStepsGenericAprFprTwo: React.FC<IWizardStakingComponents> = ({
         {error && <ErrorMessage>{error?.message}</ErrorMessage>}
 
         <GenericInfoCard>
-          Each day corresponds to 4 epochs. If you want to put a minimum period
-          of 3 days, this would represent 12 epochs.
+          {t('common.advancedOptions.staking.tooltipAprFpr')}
         </GenericInfoCard>
       </div>
       <ButtonsComponent buttonsProps={buttonsProps} />
@@ -2221,6 +2208,7 @@ const StakingStepsGenericAprFprTwo: React.FC<IWizardStakingComponents> = ({
 const StakingStepsGenericAprFprThree: React.FC<IWizardStakingComponents> = ({
   setCurrentStep,
 }) => {
+  const { t } = useTranslation('wizards');
   const {
     register,
     watch,
@@ -2231,9 +2219,9 @@ const StakingStepsGenericAprFprThree: React.FC<IWizardStakingComponents> = ({
   const stakingType = stakingTypeNum === 0 ? 'APR' : 'FPR';
   const renderStakingStep = () => {
     if (stakingType === 'APR') {
-      return `${stakingType} STEP 5/5`;
+      return `${stakingType} ${t('common.step')} 5/5`;
     }
-    return `${stakingType} STEP 3/3`;
+    return `${stakingType} ${t('common.step')} 3/3`;
   };
 
   let error = null;
@@ -2252,18 +2240,12 @@ const StakingStepsGenericAprFprThree: React.FC<IWizardStakingComponents> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>STAKING</p>
+        <p>{t('common.advancedOptions.staking.staking').toUpperCase()}</p>
         <p>{renderStakingStep()}</p>
       </div>
       <div>
-        <p>
-          How long will the user have to wait until he can withdraw his balance
-          after unstaking?
-        </p>
-        <p>
-          Remember that time on the blockchain is contact in Epochs. Each epoch
-          represents approximately 6 hours.
-        </p>
+        <p>{t('common.advancedOptions.staking.howLongWill')}</p>
+        <p>{t('common.advancedOptions.staking.eachEpoch')}</p>
         <GenericInput
           error={error}
           type="number"
@@ -2277,8 +2259,7 @@ const StakingStepsGenericAprFprThree: React.FC<IWizardStakingComponents> = ({
         {error && <ErrorMessage>{error?.message}</ErrorMessage>}
 
         <GenericInfoCard>
-          Each day corresponds to 4 epochs. If you want to put a minimum period
-          of 3 days, this would represent 12 epochs.
+          {t('common.advancedOptions.staking.tooltipAprFpr')}
         </GenericInfoCard>
       </div>
       <ButtonsComponent buttonsProps={buttonsProps} />
@@ -2288,8 +2269,8 @@ const StakingStepsGenericAprFprThree: React.FC<IWizardStakingComponents> = ({
 
 export const CreateAssetStakingStep: React.FC<IWizardComponents> = ({
   handleStep,
+  t,
 }) => {
-  const { t: commonT } = useTranslation('common');
   const { watch } = useFormContext();
   const [staking, setStaking] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -2353,14 +2334,20 @@ export const CreateAssetStakingStep: React.FC<IWizardComponents> = ({
   return !staking ? (
     <GenericCardContainer>
       <div>
-        <p>ADVANCED OPTIONS</p>
-        <p>STAKING</p>
+        <p>{t('wizards:common.advancedOptions.allAdvancedOption')}</p>
+        <p>
+          {t('wizards:common.advancedOptions.staking.staking').toUpperCase()}
+        </p>
       </div>
       <div>
-        <p>Would you like to enable and configure staking for {ticker} now?</p>
+        <p>
+          {t('wizards:common.advancedOptions.staking.enableStaking', {
+            ticker,
+          })}
+        </p>
         <ButtonsContainer>
           <WizardButton infoStep centered onClick={() => setStaking(true)}>
-            {commonT('common:Statements.Yes')}
+            {t('common:Statements.Yes')}
           </WizardButton>
           <WizardButton
             infoStep
@@ -2368,18 +2355,16 @@ export const CreateAssetStakingStep: React.FC<IWizardComponents> = ({
             centered
             onClick={() => handleStep(11)}
           >
-            {commonT('common:Statements.No')}
+            {t('common:Statements.No')}
           </WizardButton>
         </ButtonsContainer>
 
         <InfoCard>
           <IconWizardInfoSquare />
-          What is staking?
+          {t('wizards:common.advancedOptions.staking.whatIsStaking')}
         </InfoCard>
         <GenericInfoCard>
-          Staking is when you lock crypto assets for a set period of time to
-          help support the operation of a blockchain. In return for staking your
-          crypto, you earn more cryptocurrency.
+          {t('wizards:common.advancedOptions.staking.tooltip')}
         </GenericInfoCard>
       </div>
       <ButtonsComponent buttonsProps={buttonsProps} noNextButton />

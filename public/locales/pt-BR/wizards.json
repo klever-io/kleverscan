@@ -36,7 +36,8 @@
       "cannotBeKLVnorKFI": "O ticker não pode ser KLV nem KFI",
       "charactersField": "Este campo deve ter {{number}} caracteres",
       "onlyNumbers": "Apenas números são permitidos",
-      "validURI": "Insira um URI válido"
+      "validURI": "Insira um URI válido",
+      "onlyNumbersValue": "O valor deve conter apenas números"
     },
     "basicOptions": {
       "basicInfoText": "Informações básicas",
@@ -61,6 +62,23 @@
     "advancedOptions": {
       "eachAdvancedOption": "Opção Avançada",
       "allAdvancedOption": "OPÇÕES AVANÇADAS",
+      "staking": {
+        "staking": "Staking",
+        "enableStaking": "Gostaria de habilitar e configurar staking para {{ticker}} agora?",
+        "whatIsStaking": "O que é staking?",
+        "tooltip": "Staking é quando você bloqueia ativos criptográficos por um período determinado para ajudar a suportar a operação de uma blockchain. Em troca do staking de suas criptomoedas, você ganha mais criptomoedas.",
+        "whatRewardModel": "Qual modelo de recompensa você deseja oferecer?",
+        "aprInfo": " APR (Taxa Anual Percentual) no staking é uma terminologia conhecida no mercado que representa a porcentagem ganha anualmente sobre um investimento.",
+        "fprInfo": " FPR (Retorno Proporcional Flexível) é uma nova modalidade de staking oferecida pelo ecossistema Klever e é uma maneira para os proprietários distribuírem recompensas aos seus detentores por meio de depósitos na pool FPR.",
+        "aprRate": "Taxa APR (%)",
+        "aprRateInfo": "Informe a porcentagem a ser paga no seu staking. Lembre-se de que é uma renda anual.",
+        "tooltipStepGeneric": "Para fins de exemplo, suponhamos que você opte por um Staking com 12% de APR, isso representará um juro de 1% ao mês e 0,033% ao dia.",
+        "whatIsTheMinimum": "Qual é o tempo mínimo que seus usuários devem esperar para desbloquear seus ativos",
+        "eachEpoch": "Lembre-se de que o tempo na blockchain é medido em Épocas. Cada época representa aproximadamente 6 horas.",
+        "tooltipAprFpr": "Cada dia corresponde a 4 épocas. Se você deseja definir um período mínimo de 3 dias, isso representaria 12 épocas.",
+        "whatIsTheMinTime": "Qual é o tempo mínimo que seus usuários devem esperar para reivindicar seu interesse",
+        "howLongWill": "Quanto tempo o usuário terá que esperar até poder sacar seu saldo após o desbloqueio?"
+      },
       "roles": {
         "roles": "Funções",
         "role": "Função",

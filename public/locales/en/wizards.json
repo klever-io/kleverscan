@@ -36,7 +36,8 @@
       "cannotBeKLVnorKFI": "Ticker cannot be KLV nor KFI",
       "charactersField": "This field must have {{number}} characters",
       "onlyNumbers": "Only numbers are allowed",
-      "validURI": "Enter a valid URI"
+      "validURI": "Enter a valid URI",
+      "onlyNumbersValue": "Value must be only numbers"
     },
     "basicOptions": {
       "basicInfoText": "Basic information",
@@ -61,6 +62,23 @@
     "advancedOptions": {
       "eachAdvancedOption": "Advanced Option",
       "allAdvancedOption": "ADVANCED OPTIONS",
+      "staking": {
+        "staking": "Staking",
+        "enableStaking": "Would you like to enable and configure staking for {{ticker}} now?",
+        "whatIsStaking": "What is staking?",
+        "tooltip": "Staking is when you lock crypto assets for a set period of time to help support the operation of a blockchain. In return for staking your crypto, you earn more cryptocurrency.",
+        "whatRewardModel": "What reward model do you want to offer?",
+        "aprInfo": " APR staking stands for Annual Percentage Rate. It is a well-known term in the market that represents the percentage earned annually on an investment",
+        "fprInfo": " FPR stands for Flexibe Proportional Return. It is a new modality of staking that the Klever ecosystem offers and is a way for owners to distribute rewards to their holders through deposits into the FPR pool.",
+        "aprRate": "APR Rate (%)",
+        "aprRateInfo": " Inform the percentage to be paid in your staking. Remember it is an annual income.",
+        "tooltipStepGeneric": "For example purposes. Let's assume that you opt for a Staking with 12% APR, this will represent an interest of 1% per month and 0.033% per day.",
+        "whatIsTheMinimum": "What is the minimum time your users should wait to unstake your assets",
+        "eachEpoch": "Remember that time on the blockchain is contact in Epochs. Each epoch represents approximately 6 hours.",
+        "tooltipAprFpr": "Each day corresponds to 4 epochs. If you want to put a minimum period of 3 days, this would represent 12 epochs.",
+        "whatIsTheMinTime": "What is the minimum time your users should wait to claim your interest",
+        "howLongWill": "How long will the user have to wait until he can withdraw his balance after unstaking?"
+      },
       "roles": {
         "roles": "Roles",
         "role": "Role",

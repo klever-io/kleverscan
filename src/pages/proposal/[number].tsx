@@ -405,7 +405,7 @@ const ProposalDetails: React.FC = () => {
                   >
                     {expandDescription
                       ? `${t('common:Buttons.Hide')}`
-                      : `${t('common:Button.Expand')}`}
+                      : `${t('common:Buttons.Expand')}`}
                   </ButtonExpand>
                 )}
                 {proposal?.description && (

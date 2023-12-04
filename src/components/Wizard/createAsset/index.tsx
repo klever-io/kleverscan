@@ -234,6 +234,7 @@ export const ButtonsComponent: React.FC<IButtonsComponenets> = ({
   noNextButton = false,
   isRow = true,
 }) => {
+  const { t } = useTranslation('wizards');
   const { trigger } = useFormContext();
   const handleClick = () => {
     trigger();
@@ -276,7 +277,7 @@ export const ButtonsComponent: React.FC<IButtonsComponenets> = ({
         <></>
       ) : (
         <WizardButton type="button" onClick={handleClick} isDisabled={!next}>
-          <p>Next</p>
+          <p>{t('common.next')}</p>
           <WizardRightArrowSVG />
         </WizardButton>
       )}

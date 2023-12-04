@@ -48,7 +48,7 @@ export const WizCreateITO: React.FC<any> = ({
 }) => {
   const { t } = useTranslation(['wizard', 'common']);
   const [selectedStep, setSelectedStep] = useState(0);
-  const itoInfo = createITO;
+  const itoInfo = createITO(t);
   const stepsProps = {
     handleStep: setSelectedStep,
     selectedStep: selectedStep,

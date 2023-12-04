@@ -1,7 +1,9 @@
 import AdvancedOptions from '@/components/Form/AdvancedOptions';
+import WarningModal from '@/components/Modals/Warning';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useContractModal } from '@/contexts/contractModal';
 import { useExtension } from '@/contexts/extension';
+import { warningMessage } from '@/pages/create-transaction';
 import { QueueItemContainer } from '@/views/create-transaction';
 import { useEffect } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
@@ -75,6 +77,7 @@ const ModalContract: React.FC<IModalContract> = ({
         })}
         <AdvancedOptions />
       </Content>
+      <WarningModal message={warningMessage} />
     </Container>
   );
 };

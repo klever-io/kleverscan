@@ -25,7 +25,7 @@ import {
 } from '@/views/create-transaction';
 import React, { useEffect } from 'react';
 
-const warningMessage = `You don't have enough currency. Please check the amount of your transaction as well as the fee cost.`;
+export const warningMessage = `You don't have enough currency. Please check the amount of your transaction as well as the fee cost.`;
 
 const CreateTransaction: React.FC = () => {
   const [isAccountEmpty, setIsAccountEmpty] = React.useState<boolean>(false);

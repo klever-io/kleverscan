@@ -50,7 +50,6 @@ const PermID: React.FC = () => {
   });
 
   const parsedPermissions: IDropdownItem[] = [];
-
   if (res?.data)
     res.data.account.permissions.map((permission: IAccPermission) => {
       if (permission.signers.some(signer => signer.address === walletAddress))
@@ -170,7 +169,7 @@ const MultiSigSelect: React.FC = () => {
   const no = commonT('Statements.No');
   const { isMultisig, signTxMultiSign } = useContract();
 
-  const [_, setMultiSig] = useState<boolean>(isMultisig.current);
+  const [multiSig, setMultiSig] = useState<boolean>(isMultisig.current);
   const [signTx, setSignTx] = useState<boolean>(isMultisig.current);
 
   return (
@@ -189,6 +188,10 @@ const MultiSigSelect: React.FC = () => {
                 value={String(isMultisig.current)}
                 onClick={() => {
                   isMultisig.current = !isMultisig.current;
+                  if (!!multiSig) {
+                    signTxMultiSign.current = false;
+                    setSignTx(false);
+                  }
                   setMultiSig(isMultisig.current);
                 }}
               />
@@ -217,7 +220,7 @@ const MultiSigSelect: React.FC = () => {
                       setSignTx(signTxMultiSign.current);
                     }}
                   />
-                  <Slider active={String(signTxMultiSign.current)} />
+                  <Slider active={String(signTx)} />
                 </Toggle>
                 {yes}
               </ToggleContainer>

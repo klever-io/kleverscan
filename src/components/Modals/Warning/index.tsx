@@ -14,7 +14,7 @@ interface IModal {
 }
 
 const WarningModal: React.FC<IModal> = ({ message }) => {
-  const { formSend, ignoreCheckAmount } = useContract();
+  const { formSend, ignoreCheckAmount, resetFormsData } = useContract();
 
   const { setWarningOpen, warningOpen } = useModal();
 
@@ -27,6 +27,7 @@ const WarningModal: React.FC<IModal> = ({ message }) => {
   const closeModal = () => setWarningOpen(false);
 
   const handleClose = () => {
+    resetFormsData();
     closeModal();
   };
 

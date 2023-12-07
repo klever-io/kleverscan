@@ -443,14 +443,14 @@ const ProposalDetails: React.FC = () => {
                   </DescriptionContainer>
                 )}
               </RowDescription>
-              {/* {proposal && proposal.proposalStatus === 'ActiveProposal' && ( */}
-              <Row>
-                <span>
-                  <strong>Vote Contract</strong>
-                </span>
-                <VoteButton />
-              </Row>
-              {/* )} */}
+              {proposal && proposal.proposalStatus === 'ActiveProposal' && (
+                <Row>
+                  <span>
+                    <strong>Vote Now</strong>
+                  </span>
+                  <VoteButton />
+                </Row>
+              )}
             </CardContent>
           </CardTabContainer>
 

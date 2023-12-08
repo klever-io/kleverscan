@@ -308,46 +308,58 @@ export const ContractProvider: React.FC = ({ children }) => {
   const amountAndFeesGreaterThanBalance = (): boolean => {
     const formPayloads = formsData.current;
 
-    const totalCosts = formPayloads.reduce(
-      (acc, formPayload) => {
-        if (!formPayload.payload?.amount) {
+    if (formPayloads[0].type !== 14) {
+      const totalCosts = formPayloads.reduce(
+        (acc, formPayload) => {
+          if (!formPayload.payload?.amount) {
+            return acc;
+          }
+          if (!formPayload.payload?.kda) {
+            acc['KLV'] += formPayload.payload.amount;
+            return acc;
+          }
+
+          acc[formPayload.payload.kda] = formPayload.payload.amount;
           return acc;
+        },
+        {
+          KLV: 0,
+        },
+      );
+      totalCosts['KLV'] += totalFees * 10 ** KLV_PRECISION;
+
+      Object.entries(sumAllRoyaltiesFees(queue)).forEach(
+        ([assetId, { precision, totalFee }]) => {
+          const fee = Number(totalFee) * 10 ** precision;
+
+          if (totalCosts[assetId]) {
+            totalCosts[assetId] += fee;
+          } else {
+            totalCosts[assetId] = fee;
+          }
+        },
+      );
+      for (const assetId in totalCosts) {
+        const amount = totalCosts[assetId];
+        const asset = assetsList?.find(item => item.assetId === assetId);
+        if ((asset?.balance || 0) < amount) {
+          setWarningOpen(true);
+          setTxLoading(false);
+          return false;
         }
-        if (!formPayload.payload?.kda) {
-          acc['KLV'] += formPayload.payload.amount;
-          return acc;
+      }
+    } else {
+      const kfiAmount = formPayloads.map(asset => ({
+        KFI: asset.payload.amount,
+      }))[0];
+      for (const assetId in kfiAmount) {
+        const amount = kfiAmount[assetId];
+        const asset = assetsList?.find(item => item.assetId === assetId);
+        if ((asset?.balance || 0) < amount) {
+          setWarningOpen(true);
+          setTxLoading(false);
+          return false;
         }
-
-        acc[formPayload.payload.kda] = formPayload.payload.amount;
-        return acc;
-      },
-      {
-        KLV: 0,
-      },
-    );
-    totalCosts['KLV'] += totalFees * 10 ** KLV_PRECISION;
-
-    Object.entries(sumAllRoyaltiesFees(queue)).forEach(
-      ([assetId, { precision, totalFee }]) => {
-        const fee = Number(totalFee) * 10 ** precision;
-
-        if (totalCosts[assetId]) {
-          totalCosts[assetId] += fee;
-        } else {
-          totalCosts[assetId] = fee;
-        }
-      },
-    );
-
-    for (const assetId in totalCosts) {
-      const amount = totalCosts[assetId];
-
-      const asset = assetsList?.find(item => item.assetId === assetId);
-
-      if ((asset?.balance || 0) < amount) {
-        setWarningOpen(true);
-        setTxLoading(false);
-        return false;
       }
     }
 

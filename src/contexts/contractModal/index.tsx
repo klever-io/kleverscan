@@ -4,6 +4,7 @@ import ModalContract, {
 import { useRouter } from 'next/router';
 import { createContext, useContext, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
+import { useMulticontract } from '../contract/multicontract';
 import { ButtonModal } from './styles';
 
 interface IContractModal {
@@ -24,7 +25,7 @@ export const ContractModal = createContext({} as IContractModal);
 
 export const ContractModalProvider: React.FC = ({ children }) => {
   const [mounted, setMounted] = useState(false);
-
+  const { setSelectedContractType } = useMulticontract();
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [modalOptions, setModalOptions] = useState<IModalContract>({
     title: '',
@@ -70,6 +71,7 @@ export const ContractModalProvider: React.FC = ({ children }) => {
         const handleClick = () => {
           setOpenModal(() => (contractType === '--' ? false : true));
           setModalOptions(() => modalOptions);
+          setSelectedContractType(contractType);
         };
 
         return (

@@ -48,7 +48,7 @@ interface IMulticontract {
   setSelectedContractType: (contractType: string) => void;
   removeContractQueue: (contractIndex: number, e: any) => void;
   editContract: (index: number) => void;
-  resetForms: (defaultValues?: any) => void;
+  resetForms: (defaultValues?: any, contractType?: string) => void;
   setQueue: React.Dispatch<React.SetStateAction<IQueue[]>>;
   setSelectedId: React.Dispatch<React.SetStateAction<number>>;
   setIsMultiContract: React.Dispatch<React.SetStateAction<boolean>>;
@@ -156,7 +156,6 @@ export const MulticontractProvider: React.FC = ({ children }) => {
 
     setQueue(newQueue);
   };
-
   const setSelectedRoyaltiesFees = (amount: number) => {
     if (queue.length === 0) return;
 
@@ -170,9 +169,8 @@ export const MulticontractProvider: React.FC = ({ children }) => {
   };
 
   const setSelectedContractAndQuery = (contract: string) => {
-    setSelectedContractType(contract);
-
-    if (contract !== '') {
+    if (contract !== '' && router.pathname === '/') {
+      setSelectedContractType(contract);
       const newQuery = {
         contract: contract,
       };
@@ -265,7 +263,7 @@ export const MulticontractProvider: React.FC = ({ children }) => {
     }
   };
 
-  const resetForms = (defaultValues?: any) => {
+  const resetForms = (defaultValues?: any, contractType?: string) => {
     const contractPropsWithIndex: IContract = {
       elementId: 0,
       defaultValues: JSON.parse(
@@ -275,7 +273,7 @@ export const MulticontractProvider: React.FC = ({ children }) => {
     };
 
     const selectedContractType =
-      (router.query?.contract as string) || 'TransferContract';
+      (router.query?.contract as string) || contractType || 'TransferContract';
 
     const contractTypeProps = {
       contractType: isMultiContract

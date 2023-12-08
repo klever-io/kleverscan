@@ -7,6 +7,7 @@ import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import { getAsset } from '@/services/requests/asset';
 import { parseAddress } from '@/utils/parseValues';
+import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
@@ -85,6 +86,7 @@ const infinity = '\u221e';
 export const CreateITOSecondStep: React.FC<IAssetITOInformations> = ({
   informations: { currentStep, title, description, kleverTip },
   handleStep,
+  t,
 }) => {
   const { setSelectedContractType } = useMulticontract();
   const {
@@ -106,8 +108,10 @@ export const CreateITOSecondStep: React.FC<IAssetITOInformations> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>SET UP ITO</p>
-        <p>STEP {currentStep}</p>
+        <p>{t('wizards:createITO.steps.setUpITO').toUpperCase()}</p>
+        <p>
+          {t('wizards:common.step')} {currentStep}
+        </p>
       </div>
       <div>
         <p>{title}</p>
@@ -125,6 +129,7 @@ export const CreateITOSecondStep: React.FC<IAssetITOInformations> = ({
 export const CreateITOThirdStep: React.FC<IAssetITOInformations> = ({
   informations: { currentStep, title, description, formValue },
   handleStep,
+  t,
 }) => {
   const [address, setAddress] = useState('');
   const [changeReceiveAddress, setChangeReceiveAddress] = useState(false);
@@ -183,11 +188,13 @@ export const CreateITOThirdStep: React.FC<IAssetITOInformations> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>SET UP ITO</p>
-        <p>STEP {currentStep}</p>
+        <p>{t('wizards:createITO.steps.setUpITO').toUpperCase()}</p>
+        <p>
+          {t('wizards:common.step')} {currentStep}
+        </p>
       </div>
       <div>
-        <p>Who will receive {collection} royalties?</p>
+        <p>{t('wizards:createITO.steps.whoWill', { collection })}</p>
         <p>{description}</p>
 
         <AddressesContainer>
@@ -197,7 +204,7 @@ export const CreateITOThirdStep: React.FC<IAssetITOInformations> = ({
           >
             <div>
               <div>
-                Use my connected wallet address
+                {t('wizards:common.useConnectedAddress')}
                 {isTablet && <span>{parseAddress(address, 14)}</span>}
               </div>
               <input
@@ -216,7 +223,7 @@ export const CreateITOThirdStep: React.FC<IAssetITOInformations> = ({
             onClick={() => handleChange(true, 1)}
           >
             <div>
-              Use another KDA address
+              {t('wizards:common.useAnotherAddress')}
               <input
                 type="radio"
                 name="receiverAddress"
@@ -237,15 +244,21 @@ export const CreateITOThirdStep: React.FC<IAssetITOInformations> = ({
                     {...register('receiverAddress', {
                       required: {
                         value: true,
-                        message: 'This field is required',
+                        message: t('wizards:common.errorMessage.required'),
                       },
                       minLength: {
                         value: 62,
-                        message: 'This field must have 62 characters',
+                        message: t(
+                          'wizards:common.errorMessage.charactersField',
+                          { number: '62' },
+                        ),
                       },
                       maxLength: {
                         value: 62,
-                        message: 'This field must have 62 characters',
+                        message: t(
+                          'wizards:common.errorMessage.charactersField',
+                          { number: '62' },
+                        ),
                       },
                     })}
                   />
@@ -259,20 +272,27 @@ export const CreateITOThirdStep: React.FC<IAssetITOInformations> = ({
       <ChangedAddressContainer>
         {changeReceiveAddress && !isTablet && (
           <div>
-            Receive Address
+            {t('wizards:createITO.steps.receiveAddress')}
             <GenericInput
               error={error}
               type="text"
               autoFocus={changeReceiveAddress}
               {...register('receiverAddress', {
-                required: { value: true, message: 'This field is required' },
+                required: {
+                  value: true,
+                  message: t('wizards:common.errorMessage.required'),
+                },
                 minLength: {
                   value: 62,
-                  message: 'This field must have 62 characters',
+                  message: t('wizards:common.errorMessage.charactersField', {
+                    number: '62',
+                  }),
                 },
                 maxLength: {
                   value: 62,
-                  message: 'This field must have 62 characters',
+                  message: t('wizards:common.errorMessage.charactersField', {
+                    number: '62',
+                  }),
                 },
               })}
               placeholder={parseAddress(address, 14)}
@@ -291,6 +311,7 @@ export const CreateITOThirdStep: React.FC<IAssetITOInformations> = ({
 export const CreateITOFourthStep: React.FC<IAssetITOInformations> = ({
   informations: { currentStep, title, description },
   handleStep,
+  t,
 }) => {
   const {
     register,
@@ -322,16 +343,19 @@ export const CreateITOFourthStep: React.FC<IAssetITOInformations> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>SET UP ITO</p>
-        <p>STEP {currentStep}</p>
+        <p>{t('wizards:createITO.steps.setUpITO').toUpperCase()}</p>
+        <p>
+          {' '}
+          {t('wizards:common.step')} {currentStep}
+        </p>
       </div>
       <div>
-        <p>What is the duration of the {collection} ITO?</p>
+        <p>{t('wizards:createITO.steps.durationITO', { collection })}</p>
         <p>{description}</p>
         <ConfigITOStartTime>
-          Start Time
+          {t('wizards:createITO.steps.startTime')}
           <span>
-            Start right now?
+            {t('wizards:createITO.steps.startTimeRightNow')}
             <input type="checkbox" onChange={handlerStartTime} />
           </span>
         </ConfigITOStartTime>
@@ -347,7 +371,7 @@ export const CreateITOFourthStep: React.FC<IAssetITOInformations> = ({
           {errorStartTime && (
             <ErrorMessage>{errorStartTime?.message}</ErrorMessage>
           )}
-          <p>End Time</p>
+          <p>{t('wizards:createITO.steps.endTime')}</p>
           <GenericInput
             error={errorEndTime}
             type="datetime-local"
@@ -368,8 +392,7 @@ export const CreateITOFourthStep: React.FC<IAssetITOInformations> = ({
           {errorEndTime && <ErrorMessage>{errorEndTime?.message}</ErrorMessage>}
         </ErrorInputContainer>
         <GenericInfoCard>
-          Klever Tip: If you leave this field blank, this ITO will be open from
-          now until the status is changed to PausedITO
+          Klever Tip: {t('wizards:createITO.steps.tooltipTimeITO')}
         </GenericInfoCard>
       </div>
       <ButtonsComponent buttonsProps={buttonsProps} />
@@ -380,6 +403,7 @@ export const CreateITOFourthStep: React.FC<IAssetITOInformations> = ({
 export const CreateITOSixStep: React.FC<IAssetITOInformations> = ({
   informations: { currentStep, title, description },
   handleStep,
+  t,
 }) => {
   const {
     register,
@@ -417,13 +441,14 @@ export const CreateITOSixStep: React.FC<IAssetITOInformations> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>SET UP ITO</p>
-        <p>STEP {currentStep}</p>
+        <p> {t('wizards:createITO.steps.setUpITO').toUpperCase()}</p>
+        <p>
+          {' '}
+          {t('wizards:common.step')} {currentStep}
+        </p>
       </div>
       <div>
-        <p>
-          What is the amount of tokens that will be sold in {collection} ITO?
-        </p>
+        <p>{t('wizards:createITO.steps.whatIsTheAmount', { collection })}</p>
         <p>{description}</p>
         <ErrorInputContainer>
           <GenericInput
@@ -441,9 +466,9 @@ export const CreateITOSixStep: React.FC<IAssetITOInformations> = ({
           {error && <ErrorMessage>{error?.message}</ErrorMessage>}
         </ErrorInputContainer>
         <GenericInfoCard>
-          Klever Tip: If you leave this field blank, all the max supply of{' '}
-          <strong>{data?.data.asset.maxSupply || infinity}</strong> will be
-          available during the ITO.
+          Klever Tip: {t('wizards:createITO.steps.tooltipAmountOne')}{' '}
+          <strong>{data?.data.asset.maxSupply || infinity}</strong>{' '}
+          {t('wizards:createITO.steps.tooltipAmountTwo')}
         </GenericInfoCard>
       </div>
       <ButtonsComponent buttonsProps={buttonsProps} />
@@ -454,6 +479,7 @@ export const CreateITOSixStep: React.FC<IAssetITOInformations> = ({
 export const CreateITOSevenStep: React.FC<IAssetITOInformations> = ({
   informations: { currentStep, title, description },
   handleStep,
+  t,
 }) => {
   const {
     register,
@@ -484,11 +510,13 @@ export const CreateITOSevenStep: React.FC<IAssetITOInformations> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>SET UP ITO</p>
-        <p>STEP {currentStep}</p>
+        <p>{t('wizards:createITO.steps.setUpITO').toUpperCase()}</p>
+        <p>
+          {t('wizards:common.step')} {currentStep}
+        </p>
       </div>
       <div>
-        <p>What is the initial {collection} ITO Status?</p>
+        <p>{t('wizards:createITO.steps.initialITOStatus', { collection })}</p>
         <p>{description}</p>
         <ErrorInputContainer>
           <Select
@@ -500,8 +528,7 @@ export const CreateITOSevenStep: React.FC<IAssetITOInformations> = ({
           {error && <ErrorMessage>{error?.message}</ErrorMessage>}
         </ErrorInputContainer>
         <GenericInfoCard>
-          Klever Tip: You can even initialize an ITO with paused status and
-          enable it in the future if you want to.
+          Klever Tip: {t('wizards:createITO.steps.tooltipStatus')}
         </GenericInfoCard>
       </div>
       <ButtonsComponent buttonsProps={buttonsProps} />
@@ -512,6 +539,7 @@ export const CreateITOSevenStep: React.FC<IAssetITOInformations> = ({
 export const CreatePackInfoSteps: React.FC<IAssetITOInformations> = ({
   informations: { assetType },
   handleStep,
+  t,
 }) => {
   const { watch } = useFormContext();
   const [packInfo, setPackInfo] = useState(false);
@@ -530,6 +558,7 @@ export const CreatePackInfoSteps: React.FC<IAssetITOInformations> = ({
         <CreatePackCurrencyID
           handleStep={handleStep}
           previousStep={handleStep}
+          t={t}
         />
       ),
     },
@@ -545,14 +574,14 @@ export const CreatePackInfoSteps: React.FC<IAssetITOInformations> = ({
   return !packInfo ? (
     <GenericCardContainer>
       <div>
-        <p>SET UP ITO</p>
-        <p>Pack Info</p>
+        <p>{t('wizards:createITO.steps.setUpITO').toUpperCase()}</p>
+        <p>{t('wizards:createITO.steps.packInfo')}</p>
       </div>
       <div>
-        <p>Would you like to enable and configure Pack Info for now?</p>
+        <p>{t('wizards:createITO.steps.packInfoForNow')}</p>
         <ButtonsContainer>
           <WizardButton infoStep centered onClick={() => setPackInfo(true)}>
-            Yes
+            {t('common:Statements.Yes')}
           </WizardButton>
           <WizardButton
             infoStep
@@ -560,18 +589,16 @@ export const CreatePackInfoSteps: React.FC<IAssetITOInformations> = ({
             centered
             onClick={() => handleStep(prev => prev + 1)}
           >
-            No
+            {t('common:Statements.No')}
           </WizardButton>
         </ButtonsContainer>
 
         <InfoCard>
           <IconWizardInfoSquare />
-          What is Pack Info?
+          {t('wizards:createITO.steps.whatIsPackInfo')}
         </InfoCard>
         <GenericInfoCard>
-          Refers to information about different packages of tokens that
-          investors can purchase during the Initial Token Offering. These
-          packages offer various benefits based on the amount of investment.
+          {t('wizards:createITO.steps.tooltipPackInfo')}
         </GenericInfoCard>
       </div>
       <ButtonsComponent buttonsProps={buttonsProps} noNextButton />
@@ -584,6 +611,7 @@ export const CreatePackInfoSteps: React.FC<IAssetITOInformations> = ({
 const CreatePackCurrencyID: React.FC<IWizardComponents> = ({
   handleStep,
   previousStep,
+  t,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const { control, watch, register } = useFormContext();
@@ -627,13 +655,17 @@ const CreatePackCurrencyID: React.FC<IWizardComponents> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>SET UP ITO</p>
+        <p>{t('wizards:createITO.steps.setUpITO').toUpperCase()}</p>
         <p>
-          Packs Info {currentIndex + 1}/{fields.length}
+          {t('wizards:createITO.steps.packsInfo')} {currentIndex + 1}/
+          {fields.length}
         </p>
       </div>
       <div>
-        <p>Pack Info for {getOrder(currentIndex + 1)} Currency </p>
+        <p>
+          {t('wizards:createITO.steps.packInfoFor')}{' '}
+          {getOrder(currentIndex + 1)} {t('wizards:createITO.steps.currency')}{' '}
+        </p>
         <div key={`packInfo[${currentIndex}].currencyId`}>
           <GenericInput
             type="text"
@@ -641,7 +673,7 @@ const CreatePackCurrencyID: React.FC<IWizardComponents> = ({
             placeholder="Pack Currency ID"
             {...register(`packInfo[${currentIndex}].currencyId`)}
           />
-          <p>Defines the currency in which the pack will be sold</p>
+          <p>{t('wizards:createITO.steps.currencyInfo')}</p>
         </div>
         <BorderedButton
           type="button"
@@ -654,7 +686,7 @@ const CreatePackCurrencyID: React.FC<IWizardComponents> = ({
           isHidden={fields.length <= 1}
           fullWidth
         >
-          Remove Pack
+          {t('wizards:createITO.steps.removePack')}
         </BorderedButton>
         <UriButtonsContainer>
           <div>
@@ -665,14 +697,14 @@ const CreatePackCurrencyID: React.FC<IWizardComponents> = ({
             >
               <WizardLeftArrow />
 
-              <span>Previous</span>
+              <span>{t('wizards:common.previous')}</span>
             </BorderedButton>
             <BorderedButton
               type="button"
               onClick={handleNextIndex}
               isHidden={fields.length <= 1}
             >
-              <span>Next</span>
+              <span>{t('wizards:common.next')}</span>
               <WizardRightArrowSVG />
             </BorderedButton>
           </div>
@@ -684,7 +716,7 @@ const CreatePackCurrencyID: React.FC<IWizardComponents> = ({
             }}
             fullWidth
           >
-            <span>Add another Pack Info</span>
+            <span> {t('wizards:createITO.steps.addAnotherPack')}</span>
             <FiPlusSquare />
           </BorderedButton>
         </UriButtonsContainer>
@@ -702,7 +734,7 @@ export const CreatePacks: React.FC<IPackInfoITO> = ({ packInfoIndex }) => {
     watch,
     formState: { errors },
   } = useFormContext();
-
+  const { t } = useTranslation('wizards');
   const { fields, append, remove } = useFieldArray({
     control,
     name: `packInfo[${packInfoIndex}].packs`,
@@ -742,13 +774,16 @@ export const CreatePacks: React.FC<IPackInfoITO> = ({ packInfoIndex }) => {
   return (
     <GenericCardContainer>
       <div>
-        <p>Create Packs</p>
+        <p>{t('createITO.steps.createPacks')}</p>
         <p key={fields.length}>
-          Packs {currentIndex + 1}/{fields.length}
+          {t('createITO.steps.packs')} {currentIndex + 1}/{fields.length}
         </p>
       </div>
       <div key={`packInfo[${packInfoIndex}].packs[${currentIndex}]`}>
-        <p>Pack Info for {packInfoIndex + 1}</p>
+        <p>
+          {' '}
+          {t('createITO.steps.packInfoFor')} {packInfoIndex + 1}
+        </p>
         <GenericInput
           error={errorPackAmount}
           type="number"
@@ -761,10 +796,7 @@ export const CreatePacks: React.FC<IPackInfoITO> = ({ packInfoIndex }) => {
           )}
           placeholder="Amount"
         />
-        <p>
-          For NFTs: Amount sold; For Token: Min amount for that price to be
-          applied
-        </p>
+        <p>{t('createITO.steps.forNFTS')}</p>
         {errorPackAmount && (
           <ErrorMessage>{errorPackAmount?.message}</ErrorMessage>
         )}
@@ -782,7 +814,7 @@ export const CreatePacks: React.FC<IPackInfoITO> = ({ packInfoIndex }) => {
           )}
           placeholder="Price"
         />
-        <p>For NFTs: Price for each NFT; For Tokens: Price for that amount.</p>
+        <p>{t('createITO.steps.forNFTS/Tokens')}</p>
         {errorPackPrice && (
           <ErrorMessage>{errorPackPrice?.message}</ErrorMessage>
         )}
@@ -799,7 +831,7 @@ export const CreatePacks: React.FC<IPackInfoITO> = ({ packInfoIndex }) => {
         isHidden={fields.length <= 1}
         fullWidth
       >
-        Remove Pack
+        {t('createITO.steps.removePack')}
       </BorderedButton>
       <UriButtonsContainer>
         <div>
@@ -810,14 +842,14 @@ export const CreatePacks: React.FC<IPackInfoITO> = ({ packInfoIndex }) => {
           >
             <WizardLeftArrow />
 
-            <span>Previous</span>
+            <span>{t('common.previous')}</span>
           </BorderedButton>
           <BorderedButton
             type="button"
             onClick={handleNextIndex}
             isHidden={fields.length <= 1}
           >
-            <span>Next</span>
+            <span>{t('common.next')}</span>
             <WizardRightArrowSVG />
           </BorderedButton>
         </div>
@@ -829,7 +861,7 @@ export const CreatePacks: React.FC<IPackInfoITO> = ({ packInfoIndex }) => {
           }}
           fullWidth
         >
-          <span>Add another Pack</span>
+          <span>{t('createITO.steps.addAnotherPack')}</span>
           <FiPlusSquare />
         </BorderedButton>
       </UriButtonsContainer>
@@ -840,6 +872,7 @@ export const CreatePacks: React.FC<IPackInfoITO> = ({ packInfoIndex }) => {
 export const CreateWhiteListSettingsSteps: React.FC<IAssetITOInformations> = ({
   informations: { assetType },
   handleStep,
+  t,
 }) => {
   const { watch } = useFormContext();
   const [whitelist, setPackInfo] = useState(false);
@@ -856,6 +889,7 @@ export const CreateWhiteListSettingsSteps: React.FC<IAssetITOInformations> = ({
       isDone: false,
       component: (
         <WhitelistStartTimeStep
+          t={t}
           handleStep={setCurrentStep}
           previousStep={handleStep}
         />
@@ -865,19 +899,21 @@ export const CreateWhiteListSettingsSteps: React.FC<IAssetITOInformations> = ({
       key: 'selectWhitelistLimitAddress',
       label: 'Select limit per Address',
       isDone: false,
-      component: <WhitelistDefaultLimitStep handleStep={setCurrentStep} />,
+      component: (
+        <WhitelistDefaultLimitStep handleStep={setCurrentStep} t={t} />
+      ),
     },
     {
       key: 'selectWhitelistLimitAddress',
       label: 'Select limit per Address',
       isDone: false,
-      component: <WhitelistStatusStep handleStep={setCurrentStep} />,
+      component: <WhitelistStatusStep handleStep={setCurrentStep} t={t} />,
     },
     {
       key: 'selectWhitelistAddAddress',
       label: 'Select whitelist add address',
       isDone: false,
-      component: <WhitelistAddressSteps handleStep={handleStep} />,
+      component: <WhitelistAddressSteps handleStep={handleStep} t={t} />,
     },
   ]);
 
@@ -891,16 +927,14 @@ export const CreateWhiteListSettingsSteps: React.FC<IAssetITOInformations> = ({
   return !whitelist ? (
     <GenericCardContainer>
       <div>
-        <p>SET UP ITO</p>
-        <p>Whitelist add address</p>
+        <p>{t('wizards:createITO.steps.setUpITO').toUpperCase()}</p>
+        <p>{t('wizards:createITO.steps.whitelistAddAddress')}</p>
       </div>
       <div>
-        <p>
-          Would you like to enable and configure Whitelist addresses for now?
-        </p>
+        <p>{t('wizards:createITO.steps.configureWhitelistAddresses')}</p>
         <ButtonsContainer>
           <WizardButton infoStep centered onClick={() => setPackInfo(true)}>
-            Yes
+            {t('common:Statements.Yes')}
           </WizardButton>
           <WizardButton
             infoStep
@@ -908,19 +942,16 @@ export const CreateWhiteListSettingsSteps: React.FC<IAssetITOInformations> = ({
             centered
             onClick={() => handleStep(prev => prev + 1)}
           >
-            No
+            {t('common:Statements.Yes')}
           </WizardButton>
         </ButtonsContainer>
 
         <InfoCard>
           <IconWizardInfoSquare />
-          What is Whitelist?
+          {t('wizards:createITO.steps.whatIsWhitelist')}
         </InfoCard>
         <GenericInfoCard>
-          What is a whitelist? Refers to a list of individuals or entities that
-          have been pre-approved or given permission to participate in the token
-          sale. Being on the whitelist typically grants these participants the
-          ability to purchase tokens during the ITO period.
+          {t('wizards:createITO.steps.tooltipWhitelist')}
         </GenericInfoCard>
       </div>
       <ButtonsComponent buttonsProps={buttonsProps} noNextButton />
@@ -933,6 +964,7 @@ export const CreateWhiteListSettingsSteps: React.FC<IAssetITOInformations> = ({
 export const WhitelistStartTimeStep: React.FC<IWizardComponents> = ({
   handleStep,
   previousStep,
+  t,
 }) => {
   const {
     register,
@@ -958,11 +990,11 @@ export const WhitelistStartTimeStep: React.FC<IWizardComponents> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>SET UP ITO</p>
-        <p>STEP 1/4</p>
+        <p>{t('wizards:createITO.steps.setUpITO').toUpperCase()}</p>
+        <p>{t('wizards:common.step')} 1/4</p>
       </div>
       <div>
-        <p>Whitelist Settings</p>
+        <p>{t('wizards:createITO.steps.whitelistSettings')}</p>
         <ErrorInputContainer>
           <GenericInput
             error={errorStartTime}
@@ -970,7 +1002,7 @@ export const WhitelistStartTimeStep: React.FC<IWizardComponents> = ({
             autoFocus={true}
             {...register('whitelistStartTime')}
           />
-          <p>Whitelist start time</p>
+          <p>{t('wizards:createITO.steps.whitelistStartTime')}</p>
           {errorStartTime && (
             <ErrorMessage>{errorStartTime?.message}</ErrorMessage>
           )}
@@ -981,7 +1013,7 @@ export const WhitelistStartTimeStep: React.FC<IWizardComponents> = ({
             autoFocus={true}
             {...register('whitelistEndTime')}
           />
-          <p>Whitelist end time</p>
+          <p>{t('wizards:createITO.steps.whitelistEndTime')}</p>
           {errorEndTime && <ErrorMessage>{errorEndTime?.message}</ErrorMessage>}
         </ErrorInputContainer>
       </div>
@@ -992,6 +1024,7 @@ export const WhitelistStartTimeStep: React.FC<IWizardComponents> = ({
 
 export const WhitelistDefaultLimitStep: React.FC<IWizardComponents> = ({
   handleStep,
+  t,
 }) => {
   const {
     register,
@@ -1014,12 +1047,12 @@ export const WhitelistDefaultLimitStep: React.FC<IWizardComponents> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>SET UP ITO</p>
-        <p>STEP 3/4</p>
+        <p>{t('wizards:createITO.steps.setUpITO').toUpperCase()}</p>
+        <p>{t('wizards:common.step')} 3/4</p>
       </div>
       <div>
-        <p>Whitelist Settings</p>
-        <p>Default Limit Per Address</p>
+        <p>{t('wizards:createITO.steps.whitelistSettings')}</p>
+        <p>{t('wizards:createITO.steps.defaultLimit')}</p>
         <ErrorInputContainer>
           <GenericInput
             error={error}
@@ -1038,6 +1071,7 @@ export const WhitelistDefaultLimitStep: React.FC<IWizardComponents> = ({
 
 export const WhitelistStatusStep: React.FC<IWizardComponents> = ({
   handleStep,
+  t,
 }) => {
   statusOptions;
   const {
@@ -1067,12 +1101,12 @@ export const WhitelistStatusStep: React.FC<IWizardComponents> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>SET UP ITO</p>
-        <p>STEP 4/4</p>
+        <p>{t('wizards:createITO.steps.setUpITO').toUpperCase()}</p>
+        <p>{t('wizards:common.step')} 4/4</p>
       </div>
       <div>
-        <p>Whitelist Settings</p>
-        <p>Whitelist Status</p>
+        <p>{t('wizards:createITO.steps.whitelistSettings')}</p>
+        <p>{t('wizards:createITO.steps.whitelistStatus')}</p>
         <ErrorInputContainer>
           <Select
             onChange={onChangeHandler}
@@ -1083,8 +1117,7 @@ export const WhitelistStatusStep: React.FC<IWizardComponents> = ({
           {error && <ErrorMessage>{error?.message}</ErrorMessage>}
         </ErrorInputContainer>
         <GenericInfoCard>
-          Klever Tip: You can even initialize an ITO with paused status and
-          enable it in the future if you want to.
+          Klever Tip: {t('wizards:createITO.steps.tooltipStatusWhitelist')}
         </GenericInfoCard>
       </div>
       <ButtonsComponent buttonsProps={buttonsProps} />
@@ -1094,6 +1127,7 @@ export const WhitelistStatusStep: React.FC<IWizardComponents> = ({
 
 export const WhitelistAddressSteps: React.FC<IWizardComponents> = ({
   handleStep,
+  t,
 }) => {
   const { watch } = useFormContext();
   const [whitelist, setPackInfo] = useState(false);
@@ -1110,6 +1144,7 @@ export const WhitelistAddressSteps: React.FC<IWizardComponents> = ({
       isDone: false,
       component: (
         <CreateWhitelistedAddress
+          t={t}
           handleStep={handleStep}
           previousStep={handleStep}
         />
@@ -1127,14 +1162,14 @@ export const WhitelistAddressSteps: React.FC<IWizardComponents> = ({
   return !whitelist ? (
     <GenericCardContainer>
       <div>
-        <p>SET UP ITO</p>
-        <p>Whitelist settings</p>
+        <p>{t('wizards:createITO.steps.setUpITO').toUpperCase()}</p>
+        <p>{t('wizards:createITO.steps.whitelistSettings')}</p>
       </div>
       <div>
-        <p>Would you like to enable and configure Whitelist address for now?</p>
+        <p>{t('wizards:createITO.steps.whitelistAddressInfo')}</p>
         <ButtonsContainer>
           <WizardButton infoStep centered onClick={() => setPackInfo(true)}>
-            Yes
+            {t('common:Statements.Yes')}
           </WizardButton>
           <WizardButton
             infoStep
@@ -1142,7 +1177,7 @@ export const WhitelistAddressSteps: React.FC<IWizardComponents> = ({
             centered
             onClick={() => handleStep(prev => prev + 1)}
           >
-            No
+            {t('common:Statements.No')}
           </WizardButton>
         </ButtonsContainer>
       </div>
@@ -1156,6 +1191,7 @@ export const WhitelistAddressSteps: React.FC<IWizardComponents> = ({
 export const CreateWhitelistedAddress: React.FC<IWizardComponents> = ({
   handleStep,
   previousStep,
+  t,
 }) => {
   const {
     control,
@@ -1211,13 +1247,14 @@ export const CreateWhitelistedAddress: React.FC<IWizardComponents> = ({
   return (
     <GenericCardContainer alignCenter key={currentIndex}>
       <div>
-        <p>Whitelist</p>
+        <p>{t('wizards:createITO.steps.whitelist')}</p>
         <p key={fields.length}>
-          Whitelisted Address {currentIndex + 1}/{fields.length}
+          {t('wizards:createITO.steps.whitelistedAddress')} {currentIndex + 1}/
+          {fields.length}
         </p>
       </div>
       <div>
-        <p>Please fill the Whitelist address and limit</p>
+        <p>{t('wizards:createITO.steps.whitelistAddressAndLimit')}</p>
         <p></p>
         <GenericInput
           error={errorWhitelistedLimit}
@@ -1226,7 +1263,7 @@ export const CreateWhitelistedAddress: React.FC<IWizardComponents> = ({
           {...register(`whitelistInfo[${currentIndex}].address`)}
           placeholder="Address"
         />
-        <p>Whitelisted address</p>
+        <p>{t('wizards:createITO.steps.whitelistedAddress')}</p>
         {errorWhitelistedAddress && (
           <ErrorMessage>{errorWhitelistedAddress?.message}</ErrorMessage>
         )}
@@ -1238,10 +1275,7 @@ export const CreateWhitelistedAddress: React.FC<IWizardComponents> = ({
           })}
           placeholder="Limit"
         />
-        <p>
-          Max amount of tokens that can be purchased by the address during the
-          whitelist
-        </p>
+        <p>{t('wizards:createITO.steps.maxAmountOfTokens')}</p>
         {errorWhitelistedLimit && (
           <ErrorMessage>{errorWhitelistedLimit?.message}</ErrorMessage>
         )}
@@ -1252,7 +1286,7 @@ export const CreateWhitelistedAddress: React.FC<IWizardComponents> = ({
           isHidden={fields.length <= 1}
           fullWidth
         >
-          Remove Address
+          {t('wizards:createITO.steps.removeAddress')}
         </BorderedButton>
       </div>
       <UriButtonsContainer>
@@ -1264,14 +1298,14 @@ export const CreateWhitelistedAddress: React.FC<IWizardComponents> = ({
           >
             <WizardLeftArrow />
 
-            <span>Previous</span>
+            <span>{t('wizards:common.previous')}</span>
           </BorderedButton>
           <BorderedButton
             type="button"
             onClick={handleNextIndex}
             isHidden={fields.length <= 1}
           >
-            <span>Next</span>
+            <span>{t('wizards:common.next')}</span>
             <WizardRightArrowSVG />
           </BorderedButton>
         </div>
@@ -1283,7 +1317,7 @@ export const CreateWhitelistedAddress: React.FC<IWizardComponents> = ({
           }}
           fullWidth
         >
-          <span>Add another Address</span>
+          <span>{t('wizards:createITO.steps.addAnotherAddress')}</span>
           <FiPlusSquare />
         </BorderedButton>
         <ButtonsComponent buttonsProps={buttonsProps} />
@@ -1294,19 +1328,17 @@ export const CreateWhitelistedAddress: React.FC<IWizardComponents> = ({
 
 export const ConfirmTransaction: React.FC<IWizardComponents> = ({
   handleStep,
+  t,
 }) => {
   return (
     <>
       <GenericCardContainer>
         <div>
-          <p>Create ITO</p>
-          <p>Review</p>
+          <p>{t('wizards:createITO.steps.createITO')}</p>
+          <p>{t('wizards:createITO.steps.review')}</p>
         </div>
         <ReviewContainer>
-          <p>
-            Review your Initial Token Offer settings and confirm the transaction
-            to finalize creation.
-          </p>
+          <p>{t('wizards:createITO.steps.reviewInfo')}</p>
           <ConfirmCardBasics tokenInfo>
             <AssetDetails />
           </ConfirmCardBasics>
@@ -1318,7 +1350,7 @@ export const ConfirmTransaction: React.FC<IWizardComponents> = ({
             <WizardLeftArrow />
           </BackArrowSpan>
           <WizardButton type="submit">
-            <p>Confirm Transaction</p>
+            <p>{t('wizards:common.confirm.confirmTransaction')}</p>
             <span>
               <IoArrowForward />
             </span>
@@ -1330,6 +1362,7 @@ export const ConfirmTransaction: React.FC<IWizardComponents> = ({
 };
 
 export const AssetDetails: React.FC = () => {
+  const { t } = useTranslation('wizards');
   const { watch } = useFormContext();
   const collection = watch('collection');
   const { data, isLoading } = useQuery({
@@ -1367,21 +1400,25 @@ export const AssetDetails: React.FC = () => {
             </div>
           </div>
           <ConfirmCardBasisInfo>
-            <span>Max supply</span>
+            <span>{t('common.maxSupply')}</span>
             <span>{asset.maxSupply ? asset.maxSupply : infinity}</span>
           </ConfirmCardBasisInfo>
           <ConfirmCardBasisInfo>
-            <span>Initial supply</span>
+            <span>
+              {t(
+                'createToken.stepsInformations.basicStepsLabels.initialSupply',
+              )}
+            </span>
             <span>{asset.initialSupply ? asset.initialSupply : 0}</span>
           </ConfirmCardBasisInfo>
           <ConfirmCardBasisInfo>
-            <span>Precision</span>
+            <span>{t('common.precision')}</span>
             <span>
               <span>{asset.precision || 0} </span>
             </span>
           </ConfirmCardBasisInfo>
           <ConfirmCardBasisInfo>
-            <span>Owner address</span>
+            <span>{t('common.basicOptions.ownerAddress')}</span>
             <span>{parseAddress(asset.ownerAddress, 14)}</span>
           </ConfirmCardBasisInfo>
         </>
@@ -1394,21 +1431,22 @@ export const AssetDetails: React.FC = () => {
 };
 
 export const TransactionDetails: React.FC = () => {
+  const { t } = useTranslation('wizards');
   const { walletAddress } = useExtension();
   return (
     <ReviewContainer>
-      <span>TRANSACTION DETAILS</span>
+      <span>{t('common.transactionDetails.transactionDetails')}</span>
       <ConfirmCardBasics>
         <ConfirmCardBasisInfo>
-          <span>Transaction</span>
-          <span>Config ITO</span>
+          <span>{t('common.transactionDetails.transaction')}</span>
+          <span>{t('createITO.steps.configITO')}</span>
         </ConfirmCardBasisInfo>
         <ConfirmCardBasisInfo>
-          <span>From</span>
+          <span>{t('common.transactionDetails.from')}</span>
           <span>{parseAddress(walletAddress || '', 12)}</span>
         </ConfirmCardBasisInfo>
         <ConfirmCardBasisInfo>
-          <span>Fee</span>
+          <span>{t('common.transactionDetails.fee')}</span>
           <span>20,000 KLV</span>
         </ConfirmCardBasisInfo>
       </ConfirmCardBasics>
@@ -1417,6 +1455,7 @@ export const TransactionDetails: React.FC = () => {
 };
 
 export const TransactionDetails2: React.FC = () => {
+  const { t } = useTranslation('wizards');
   const { watch } = useFormContext();
   const receiverAddress = watch('receiverAddress');
   const startTime = watch('startTime');
@@ -1428,24 +1467,32 @@ export const TransactionDetails2: React.FC = () => {
   const startTimeValue = startTimeNow ? 'Now' : '--';
   return (
     <ReviewContainer>
-      <span> SET UP ITO</span>
+      <span>{t('createITO.steps.setUpITO')}</span>
       <ConfirmCardBasics>
         <ConfirmCardBasisInfo>
-          <span>Receiver Address</span>
+          <span>
+            {t('createITO.stepsInformations.basicStepsLabels.receiverAddress')}
+          </span>
           <span>{parseAddress(receiverAddress, 12)}</span>
         </ConfirmCardBasisInfo>
         <ConfirmCardBasisInfo>
-          <span>ITO Time</span>
+          <span>
+            {t('createITO.stepsInformations.basicStepsLabels.itoTime')}
+          </span>
           <span>
             {startTime || startTimeValue} to {endTime || infinitySymbol}
           </span>
         </ConfirmCardBasisInfo>
         <ConfirmCardBasisInfo>
-          <span>Max Amount</span>
+          <span>
+            {t('createITO.stepsInformations.basicStepsLabels.maxAmount')}
+          </span>
           <span>{maxAmount}</span>
         </ConfirmCardBasisInfo>
         <ConfirmCardBasisInfo>
-          <span>Status</span>
+          <span>
+            {t('createITO.stepsInformations.basicStepsLabels.status')}
+          </span>
           <span>{status}</span>
         </ConfirmCardBasisInfo>
       </ConfirmCardBasics>

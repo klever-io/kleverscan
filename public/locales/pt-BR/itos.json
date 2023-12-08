@@ -1,0 +1,20 @@
+{
+  "chooseAsset": "Escolha um ativo",
+  "searchInput": "Digite o nome do ativo",
+  "searchButton": "Buscar",
+  "status": {
+    "active": "Ativo",
+    "inactive": "Inativo"
+  },
+  "loadedAllITO": "Todos os ITOs foram carregados",
+  "createITOButton": "Criar ITO",
+  "noPacksFound": "Nenhum pacote encontrado",
+  "noEmptyOrZeroToastError": "A quantidade não pode estar vazio nem ser zero!",
+  "successBroadcastTxToast": "Transação realizada com sucesso",
+  "priceIn": "Preço em",
+  "costText": "Isso custará",
+  "payText": "Você pagará",
+  "buyToken": "Comprar Token",
+  "buyPack": "Comprar Pacote",
+  "priceRange": "Faixa de Preço"
+}

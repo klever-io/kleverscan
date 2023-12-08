@@ -53,7 +53,7 @@ const NonFungibleITO: React.FC<INonFungible> = ({
       const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
       const response = await web.broadcastTransactions([signedTx]);
       if (setTxHash) setTxHash(response.data.txsHashes[0]);
-      toast.success('Transaction broadcast successfully');
+      toast.success(t('successBroadcastTxToast'));
     } catch (e: any) {
       console.warn(`%c ${e}`, 'color: red');
       toast.error(e.message ? e.message : e);

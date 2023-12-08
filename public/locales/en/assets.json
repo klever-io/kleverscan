@@ -44,6 +44,9 @@
     "Title History": "Flexible Proportional Return - {{type}}",
     "No Deposits": "No deposits in this epoch.",
     "Info Deposits KLVorKFI": " Deposits for KLV/KFI occur automatically from each transaction.",
-    "Of": "of"
+    "Of": "of",
+    "Total deposited": "Total deposited",
+    "Total claimed": "Total claimed",
+    "Show less": "Show less"
   }
 }

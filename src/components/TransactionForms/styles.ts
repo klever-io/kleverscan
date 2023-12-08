@@ -27,6 +27,7 @@ export const FormSection = styled.div<{ inner?: boolean; top?: number }>`
   box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? '#000' : lighten(0.8, '#000'))};
 
   background-color: ${props => props.theme.white};
+
   ${props =>
     props.inner &&
     css`
@@ -250,4 +251,17 @@ export const SectionText = styled.p`
 
 export const RoyaltiesContainer = styled.div`
   color: ${({ theme }) => theme.darkText};
+`;
+
+export const SpanMessage = styled.span`
+  position: absolute;
+  color: ${({ theme }) => theme.darkText};
+  font-weight: 400;
+  font-size: 0.9rem;
+  right: 1rem;
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    right: 0;
+    left: 10.5rem;
+    top: 5rem;
+  } ;
 `;

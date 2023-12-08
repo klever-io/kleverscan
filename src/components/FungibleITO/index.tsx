@@ -109,7 +109,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
   };
   const handleSubmit = async (currencyId: string) => {
     if (!amount) {
-      toast.error('The amount field cannot be empty or zero!');
+      toast.error(t('noEmptyOrZeroToastError'));
       return;
     }
 
@@ -135,7 +135,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
       const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
       const response = await web.broadcastTransactions([signedTx]);
       if (setTxHash) setTxHash(response.data.txsHashes[0]);
-      toast.success('Transaction broadcast successfully');
+      toast.success(t('successBroadcastTxToast'));
     } catch (e: any) {
       console.warn(`%c ${e}`, 'color: red');
       toast.error(e.message ? e.message : e);

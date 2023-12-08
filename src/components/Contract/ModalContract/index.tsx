@@ -49,7 +49,7 @@ const ModalContract: React.FC<IModalContract> = ({
   useEffect(() => {
     setSelectedContractAndQuery(contractType);
     setIsModal(true);
-    resetForms(defaultValues);
+    resetForms(defaultValues, contractType);
 
     document.documentElement.style.overflow = 'hidden';
     return () => {

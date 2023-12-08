@@ -1,6 +1,7 @@
 {
   "EmptyData": "Ainda não existem dados.",
   "Search Address, Block, Transaction": "Pesquisar Endereço, Bloco, Transação, Ativo",
+  "transactionBroadcastSuccess": "Transação realizada com sucesso",
   "dailyTransactions": "Transações Diárias",
   "Cards": {
     "Total Accounts": "Total de Contas",
@@ -42,6 +43,8 @@
     "Status": "Estado"
   },
   "Properties": {
+    "Staking": "Participação",
+    "Roles": "Funções",
     "Can": "Pode {{type}}",
     "Freeze": "Congelar",
     "Wipe": "Limpar",

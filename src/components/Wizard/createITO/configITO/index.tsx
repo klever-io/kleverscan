@@ -15,6 +15,7 @@ import { useExtension } from '@/contexts/extension';
 import { gtagEvent } from '@/utils/gtag';
 import { parseAddress } from '@/utils/parseValues';
 import { web } from '@klever/sdk-web';
+import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -31,7 +32,7 @@ import {
 } from '..';
 import {
   ConfirmSuccessTransaction,
-  CreateAssetFirstStep,
+  CreateAssetWelcomeStep,
   DesktopStepsComponent,
   infinitySymbol,
   StepsBasics,
@@ -45,13 +46,15 @@ export const WizCreateITO: React.FC<any> = ({
   setTxHash,
   txHash,
 }) => {
+  const { t } = useTranslation(['wizard', 'common']);
   const [selectedStep, setSelectedStep] = useState(0);
-  const itoInfo = createITO;
+  const itoInfo = createITO(t);
   const stepsProps = {
     handleStep: setSelectedStep,
     selectedStep: selectedStep,
     setAddAdvanced,
     addAdvancedSteps,
+    t,
   };
 
   const { walletAddress } = useExtension();
@@ -72,7 +75,10 @@ export const WizCreateITO: React.FC<any> = ({
       label: 'Create ITO Information',
       isDone: false,
       component: (
-        <CreateAssetFirstStep {...stepsProps} informations={itoInfo.welcome} />
+        <CreateAssetWelcomeStep
+          {...stepsProps}
+          informations={itoInfo.welcome}
+        />
       ),
     },
     {

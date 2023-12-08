@@ -1,5 +1,4 @@
 import { useTheme } from '@/contexts/theme';
-import Language from './Language';
 import {
   Container,
   IconContainer,
@@ -19,7 +18,7 @@ const OptionsContainer: React.FC<IOptionsContainer> = ({
 
   return (
     <Container isConnected={isConnected}>
-      <Language />
+      {/* <Language /> */}
       <IconContainer onClick={() => theme.toggleDarkTheme()}>
         <SelectedMode />
         <SunIcon />

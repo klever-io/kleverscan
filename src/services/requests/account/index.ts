@@ -441,3 +441,25 @@ export const rewardsFPRPool = (
   };
   return requestBuckets;
 };
+
+export const myAccountCall = async (
+  walletAddress: string,
+): Promise<IAccount | undefined> => {
+  try {
+    const res = await api.get({
+      route: `address/${walletAddress || ''}`,
+    });
+    if (!res.error || res.error === '') {
+      return res.data.account;
+    }
+    if (res.error === 'cannot find account in database') {
+      const emptyAccount = generateEmptyAccountResponse(
+        walletAddress as string,
+      );
+      return emptyAccount.data.account;
+    }
+    return Promise.reject(new Error(res?.error));
+  } catch (error) {
+    console.error(error);
+  }
+};

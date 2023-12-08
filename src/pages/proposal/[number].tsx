@@ -4,7 +4,8 @@ import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
 import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
-import { useMobile } from '@/contexts/mobile';
+import Tooltip from '@/components/Tooltip';
+import { useContractModal } from '@/contexts/contractModal';
 import api from '@/services/api';
 import {
   dataNetworkParams,
@@ -75,7 +76,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { AiFillCheckCircle } from 'react-icons/ai';
 import { useQuery } from 'react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
-import Tooltip from '../../components/Tooltip';
 
 const ProposalVoters = (props: IProposalVoters) => {
   const rowSections = (props: IParsedVote): IRowSection[] => {
@@ -128,7 +128,6 @@ const ProposalDetails: React.FC = () => {
   );
   const [votesPercentage, setVotesPercentage] = useState('');
   const [expandDescription, setExpandDescription] = useState(false);
-  const { isMobile, isTablet } = useMobile();
   const [isSkeleton, setLoading] = useSkeleton();
   const router = useRouter();
   const filter = [
@@ -145,6 +144,17 @@ const ProposalDetails: React.FC = () => {
     enabled: !!router.isReady,
   });
   const { data: params } = useQuery('paramsList', dataNetworkParams);
+  const { getInteractionsButtons } = useContractModal();
+  const [VoteButton] = getInteractionsButtons([
+    {
+      title: `${t('Vote Contract')}`,
+      contractType: 'VoteContract',
+      defaultValues: {
+        proposalId: router.query.number,
+        type: 0,
+      },
+    },
+  ]);
 
   useEffect(() => {
     if (proposal) {
@@ -433,6 +443,14 @@ const ProposalDetails: React.FC = () => {
                   </DescriptionContainer>
                 )}
               </RowDescription>
+              {proposal && proposal.proposalStatus === 'ActiveProposal' && (
+                <Row>
+                  <span>
+                    <strong>Vote Now</strong>
+                  </span>
+                  <VoteButton />
+                </Row>
+              )}
             </CardContent>
           </CardTabContainer>
 

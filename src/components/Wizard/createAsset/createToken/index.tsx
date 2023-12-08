@@ -12,6 +12,7 @@ import { useExtension } from '@/contexts/extension';
 import { gtagEvent } from '@/utils/gtag';
 import { parseAddress } from '@/utils/parseValues';
 import { web } from '@klever/sdk-web';
+import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -20,17 +21,17 @@ import {
   ConfirmTransaction,
   CreateAssetAddRoles,
   CreateAssetEightStep,
-  CreateAssetFirstStep,
-  CreateAssetFiveStep,
-  CreateAssetFourthStep,
+  CreateAssetInitialSupplyStep,
+  CreateAssetMaxSupplyStep,
+  CreateAssetNameStep,
+  CreateAssetOwnerAddressStep,
   CreateAssetPreConfimStep,
   CreateAssetPropertiesStep,
   CreateAssetRoyaltySteps,
-  CreateAssetSecondStep,
-  CreateAssetSevenStep,
-  CreateAssetSixStep,
   CreateAssetStakingStep,
-  CreateAssetThirdStep,
+  CreateAssetTickerStep,
+  CreateAssetWelcomeStep,
+  CreatePreicisonStep,
   DesktopStepsComponent,
   infinitySymbol,
   propertiesCommonDefaultValues,
@@ -48,8 +49,10 @@ const WizCreateToken: React.FC<any> = ({
   setFromAdvancedSteps,
 }) => {
   const [selectedStep, setSelectedStep] = useState(0);
-  const assetInfo = createToken;
   const { walletAddress } = useExtension();
+  const { t } = useTranslation(['common', 'wizards']);
+
+  const assetInfo = createToken(t);
 
   const handleAdvancedSteps = () => {
     setSelectedStep(prevStep => prevStep + 1);
@@ -59,6 +62,7 @@ const WizCreateToken: React.FC<any> = ({
     handleStep: setSelectedStep,
     selectedStep: selectedStep,
     handleAdvancedSteps,
+    t,
   };
 
   const lastStepProps = {
@@ -88,7 +92,7 @@ const WizCreateToken: React.FC<any> = ({
       label: 'Create Asset Information',
       isDone: false,
       component: (
-        <CreateAssetFirstStep
+        <CreateAssetWelcomeStep
           {...stepsProps}
           informations={assetInfo.welcome}
         />
@@ -99,7 +103,7 @@ const WizCreateToken: React.FC<any> = ({
       label: 'Select Asset Name',
       isDone: false,
       component: (
-        <CreateAssetSecondStep {...stepsProps} informations={assetInfo.name} />
+        <CreateAssetNameStep {...stepsProps} informations={assetInfo.name} />
       ),
     },
     {
@@ -107,7 +111,10 @@ const WizCreateToken: React.FC<any> = ({
       label: 'Select Asset Ticker',
       isDone: false,
       component: (
-        <CreateAssetThirdStep {...stepsProps} informations={assetInfo.ticker} />
+        <CreateAssetTickerStep
+          {...stepsProps}
+          informations={assetInfo.ticker}
+        />
       ),
     },
     {
@@ -115,7 +122,7 @@ const WizCreateToken: React.FC<any> = ({
       label: 'Select Asset Owner Address',
       isDone: false,
       component: (
-        <CreateAssetFourthStep
+        <CreateAssetOwnerAddressStep
           {...stepsProps}
           informations={assetInfo.ownerAddress}
         />
@@ -125,20 +132,20 @@ const WizCreateToken: React.FC<any> = ({
       key: 'selectAssetPrecision',
       label: 'Select Asset Precision',
       isDone: false,
-      component: <CreateAssetFiveStep {...stepsProps} />,
+      component: <CreatePreicisonStep {...stepsProps} />,
     },
     {
       key: 'selectAssetInitialSupply',
       label: 'Select Asset Initial Supply',
       isDone: false,
-      component: <CreateAssetSixStep {...stepsProps} />,
+      component: <CreateAssetInitialSupplyStep {...stepsProps} />,
     },
     {
       key: 'selectAssetMaxSupply',
       label: 'Select Asset Max Supply',
       isDone: false,
       component: (
-        <CreateAssetSevenStep
+        <CreateAssetMaxSupplyStep
           {...stepsProps}
           informations={assetInfo.maxSupply}
         />
@@ -318,7 +325,7 @@ const WizCreateToken: React.FC<any> = ({
       const response = await web.broadcastTransactions([signedTx]);
       setTxHash(response.data.txsHashes[0]);
       window.scrollTo(0, 0);
-      toast.success('Transaction broadcast successfully');
+      toast.success(t('common:transactionBroadcastSuccess'));
       gtagEvent('send_transaction_wizard', {
         event_category: 'transaction',
         event_label: 'send_transaction_wizard',

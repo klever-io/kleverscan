@@ -525,3 +525,43 @@ export const EmptyDescription = styled.span`
   font-size: 0.95rem;
   font-weight: 400;
 `;
+
+export const FormContainer = styled.form`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 20rem;
+  gap: 1.5rem;
+  color: ${({ theme }) => theme.darkText};
+`;
+
+export const ContainerForm = styled.div`
+  display: flex;
+  flex-direction: column;
+  span {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+`;
+
+export const InputAmount = styled.input`
+  width: 15%;
+  padding: 0.5rem 1rem;
+  border: 1px solid ${({ theme }) => theme.darkText};
+  border-radius: 0.5rem;
+
+  color: ${({ theme }) => theme.darkText};
+
+  background-color: transparent;
+
+  box-shadow: unset;
+
+  font-weight: 500;
+
+  transition: all 0.1s ease-in-out;
+`;
+
+export const InputSubmit = styled.input`
+  color: ${({ theme }) => theme.darkText};
+`;

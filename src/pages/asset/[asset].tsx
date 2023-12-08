@@ -503,6 +503,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
 
   const ITOComponent: React.FC = () => {
     const { extensionInstalled, connectExtension } = useExtension();
+    const { t } = useTranslation('itos');
 
     useEffect(() => {
       if (extensionInstalled) {
@@ -1104,7 +1105,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                       <p>KLV</p>
                     </div>
                     <div>
-                      <strong>Total deposited</strong>
+                      <strong>{t('assets:Staking.Total Deposited')}</strong>
                       {/* here is always KLV */}
                       <p>
                         {toLocaleFixed(
@@ -1114,7 +1115,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                       </p>
                     </div>
                     <div>
-                      <strong>Total claimed</strong>
+                      <strong>{t('assets:Staking.Total claimed')}</strong>
                       {/* here is always KLV */}
                       <p>
                         {toLocaleFixed(
@@ -1134,13 +1135,13 @@ const Asset: React.FC<IAssetPage> = ({}) => {
                         <p>{kda.kda}</p>
                       </div>
                       <div>
-                        <strong>Total Deposited</strong>
+                        <strong>{t('assets:Staking.Total Deposited')}</strong>
                         <p>
                           {toLocaleFixed(kda?.totalAmount, kda.precision || 0)}
                         </p>
                       </div>
                       <div>
-                        <strong>Total claimed</strong>
+                        <strong>{t('assets:Staking.Total claimed')}</strong>
                         <p>
                           {toLocaleFixed(kda?.totalClaimed, kda.precision || 0)}
                         </p>

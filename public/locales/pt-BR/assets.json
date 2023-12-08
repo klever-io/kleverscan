@@ -44,6 +44,9 @@
     "Title History": "Retorno Proporcional Flexível - {{type}}",
     "No Deposits": "Sem depósitos nesta época.",
     "Info Deposits KLVorKFI": "Depósitos para KLV/KFI ocorrem automaticamente a partir de cada transação.",
-    "Of": "de"
+    "Of": "de",
+    "Total deposited": "Total depositado",
+    "Total claimed": "Total reivindicado",
+    "Show less": "Mostrar menos"
   }
 }

@@ -1,12 +1,15 @@
+import { useExtension } from '@/contexts/extension';
 import api from '@/services/api';
+import { myAccountCall } from '@/services/requests/account';
 import { IProposalsResponse } from '@/types/proposals';
+import { formatAmount } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useQuery } from 'react-query';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
-import { FormBody, FormSection } from '../styles';
+import { FormBody, FormSection, SpanMessage } from '../styles';
 
 type FormData = {
   proposalId: number;
@@ -50,8 +53,13 @@ const Vote: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
 
     return proposals.sort((a: any, b: any) => (a.value > b.value ? 1 : -1));
   };
-
+  const { walletAddress } = useExtension();
   const { data: proposals } = useQuery('proposals', getProposals);
+  const { data: account, isLoading: isLoadingAccount } = useQuery({
+    queryKey: [`account`],
+    queryFn: () => myAccountCall(walletAddress),
+    enabled: !!walletAddress,
+  });
 
   const onSubmit = async (data: FormData) => {
     parseVote(data);
@@ -85,6 +93,12 @@ const Vote: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
           type="checkbox"
           toggleOptions={['In Favor', 'Against']}
         />
+        <SpanMessage>
+          Your KFI amount:{' '}
+          {formatAmount(
+            (account?.assets['KFI'].balance || 0) / 10 ** KLV_PRECISION,
+          )}
+        </SpanMessage>
       </FormSection>
     </FormBody>
   );

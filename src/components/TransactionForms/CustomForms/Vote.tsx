@@ -96,7 +96,9 @@ const Vote: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
         <SpanMessage>
           Your KFI amount:{' '}
           {formatAmount(
-            (account?.assets['KFI'].balance || 0) / 10 ** KLV_PRECISION,
+            (account?.assets['KFI'].buckets?.map(bucket => bucket.balance)[0] ||
+              0) /
+              10 ** KLV_PRECISION,
           )}
         </SpanMessage>
       </FormSection>

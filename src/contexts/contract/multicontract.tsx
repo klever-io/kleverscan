@@ -169,7 +169,10 @@ export const MulticontractProvider: React.FC = ({ children }) => {
   };
 
   const setSelectedContractAndQuery = (contract: string) => {
-    if (contract !== '' && router.pathname === '/') {
+    if (
+      (contract !== '' && router.pathname === '/') ||
+      router.pathname === '/create-transaction'
+    ) {
       setSelectedContractType(contract);
       const newQuery = {
         contract: contract,

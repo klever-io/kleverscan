@@ -31,7 +31,6 @@ export const FormSection = styled.div<{ inner?: boolean; top?: number }>`
   ${props =>
     props.inner &&
     css`
-      filter: ${props.theme.dark ? 'brightness(1.1)' : 'brightness(97%)'};
       grid-column: auto / span 2;
       padding-top: 5rem !important;
     `}

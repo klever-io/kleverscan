@@ -354,8 +354,10 @@ export const ContractProvider: React.FC = ({ children }) => {
       }))[0];
       for (const assetId in kfiAmount) {
         const amount = kfiAmount[assetId];
-        const asset = assetsList?.find(item => item.assetId === assetId);
-        if ((asset?.balance || 0) < amount) {
+        const asset = assetsList
+          ?.find(item => item.assetId === assetId)
+          ?.buckets?.map(bucket => bucket.balance)[0];
+        if ((asset || 0) < amount) {
           setWarningOpen(true);
           setTxLoading(false);
           return false;

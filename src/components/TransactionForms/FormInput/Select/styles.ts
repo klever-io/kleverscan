@@ -2,7 +2,7 @@
 import { transparentize } from 'polished';
 import styled, { css } from 'styled-components';
 
-export const Container = styled.div<{ $error?: boolean }>`
+export const Container = styled.div<{ $error?: boolean; isOpenMenu?: boolean }>`
   position: relative;
 
   height: 100%;
@@ -10,8 +10,7 @@ export const Container = styled.div<{ $error?: boolean }>`
   display: flex;
 
   flex-direction: column;
-
-  z-index: 2;
+  z-index: ${({ isOpenMenu }) => (isOpenMenu ? 10 : 2)};
   span {
     padding-bottom: 0.25rem;
 

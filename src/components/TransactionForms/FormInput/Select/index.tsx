@@ -49,7 +49,7 @@ const Filter: React.FC<IFilter> = ({
   const { isMultiContract } = useMulticontract();
 
   const router = useRouter();
-
+  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [selected, setSelected] = useState<IDropdownItem | undefined>(
     undefined,
   );
@@ -75,11 +75,13 @@ const Filter: React.FC<IFilter> = ({
   }, [value]);
 
   return (
-    <Container $error={error}>
+    <Container $error={error} isOpenMenu={isSelectOpen}>
       <BaseSelect
         placeholder={
           selectPlaceholder ? selectPlaceholder : `Choose ${title ? title : ''}`
         }
+        onMenuOpen={() => setIsSelectOpen(true)}
+        onMenuClose={() => setIsSelectOpen(false)}
         options={data}
         onChange={e => handleSelect(e)}
         onInputChange={onInputChange}

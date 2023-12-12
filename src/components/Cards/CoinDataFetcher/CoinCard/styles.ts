@@ -401,12 +401,12 @@ export const HeaderGraph = styled.div`
 
 export const ArrowVariation = styled(ArrowUpSquare).attrs(props => ({
   size: 17,
-}))<{ positive: boolean }>`
+}))<{ isPositive: boolean }>`
   path {
     fill: ${props => props =>
-      props.theme.card[props.positive ? 'green' : 'red']};
+      props.theme.card[props.isPositive ? 'green' : 'red']};
   }
-  rotate: ${props => (props.positive ? '' : '180deg')};
+  rotate: ${props => (props.isPositive ? '' : '180deg')};
 `;
 
 export const SetTimeContainer = styled.div`

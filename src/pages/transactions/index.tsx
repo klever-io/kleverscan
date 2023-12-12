@@ -22,9 +22,13 @@ import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import { getPrecision } from '@/utils/precisionFunctions';
 import { FilterByDate } from '@/views/transactions';
+import { GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { NextRouter, useRouter } from 'next/router';
 import React, { useCallback } from 'react';
+import nextI18nextConfig from '../../../next-i18next.config';
 import {
   IAssetTransactionResponse,
   IReceipt,
@@ -134,11 +138,16 @@ export const requestTransactionsDefault = async (
 };
 
 const Transactions: React.FC = () => {
+  const { t } = useTranslation('table');
   const router = useRouter();
   const { isMobile } = useMobile();
 
-  const defaultHeader = [...initialsTableHeaders, 'kApp Fee', 'Bandwidth Fee'];
-  const queryHeader = getHeaderForTable(router, defaultHeader);
+  const defaultHeader = [
+    ...initialsTableHeaders(t),
+    t('Blocks.kApp Fees'),
+    t('Transactions.Bandwidth Fee'),
+  ];
+  const queryHeader = getHeaderForTable(router, defaultHeader, t);
   const getContractType = useCallback(contractTypes, []);
   const getFilteredSections = (
     contract: IContract[],
@@ -323,6 +332,16 @@ const Transactions: React.FC = () => {
       <Table {...tableProps} />
     </Container>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'table'],
+    nextI18nextConfig,
+  );
+
+  return { props };
 };
 
 export default Transactions;

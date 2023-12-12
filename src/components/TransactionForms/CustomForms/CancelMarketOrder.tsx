@@ -1,4 +1,5 @@
 import { useContract } from '@/contexts/contract';
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -13,6 +14,7 @@ const CancelMarketOrder: React.FC<IContractProps> = ({
   formKey,
   handleFormSubmit,
 }) => {
+  const { t } = useTranslation('transactions');
   const { handleSubmit } = useFormContext<FormData>();
   const {} = useContract();
 
@@ -25,7 +27,7 @@ const CancelMarketOrder: React.FC<IContractProps> = ({
       <FormSection>
         <FormInput
           name="orderId"
-          title="Order ID"
+          title={t('Buy.Order Id')}
           tooltip='ID generated on "Sell" Contract'
           required
         />

@@ -29,6 +29,7 @@ import { capitalizeString } from '@/utils/convertString';
 import { formatAmount, formatDate } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
+import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback } from 'react';
@@ -38,11 +39,16 @@ interface ITransactionsProps {
 }
 
 const Transactions: React.FC<ITransactionsProps> = props => {
+  const { t } = useTranslation('table');
   const router = useRouter();
   const { isMobile } = useMobile();
 
-  const defaultHeader = [...initialsTableHeaders, 'kApp Fee', 'Bandwidth Fee'];
-  const queryHeader = getHeaderForTable(router, defaultHeader);
+  const defaultHeader = [
+    ...initialsTableHeaders(t),
+    t('Blocks.kApp Fees'),
+    t('Transactions.Bandwidth Fee'),
+  ];
+  const queryHeader = getHeaderForTable(router, defaultHeader, t);
   const getContractType = useCallback(contractTypes, []);
   const getFilteredSections = (
     contract: IContract[],

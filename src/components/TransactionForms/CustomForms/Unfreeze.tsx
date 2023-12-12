@@ -1,6 +1,7 @@
 import { useContract } from '@/contexts/contract';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { parseAddress } from '@/utils/parseValues';
+import { useTranslation } from 'next-i18next';
 import React, { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps, SelectOption } from '.';
@@ -13,6 +14,7 @@ type FormData = {
 };
 
 const Unfreeze: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+  const { t } = useTranslation('transactions');
   const [bucketsList, setBucketsList] = useState<any>([]);
 
   const { handleSubmit } = useFormContext<FormData>();
@@ -50,7 +52,7 @@ const Unfreeze: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
       <FormSection>
         <FormInput
           name="bucketId"
-          title="bucket"
+          title={t('Bucket')}
           type="dropdown"
           options={bucketsList}
           required

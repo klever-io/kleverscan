@@ -886,7 +886,7 @@ const Account: React.FC<IAccountPage> = () => {
 export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
   const props = await serverSideTranslations(
     locale,
-    ['common', 'accounts'],
+    ['common', 'accounts', 'table'],
     nextI18nextConfig,
   );
 

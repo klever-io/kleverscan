@@ -2,6 +2,7 @@ import { useMulticontract } from '@/contexts/contract/multicontract';
 import { calculateMarketBuyFixedFee } from '@/utils/create-transaction/fees-calculation.ts';
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
+import { useTranslation } from 'next-i18next';
 import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -27,6 +28,7 @@ const parseSell = (data: FormData) => {
 };
 
 const Sell: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+  const { t } = useTranslation('transactions');
   const { handleSubmit, watch } = useFormContext<FormData>();
   const marketType = watch('marketType');
   const { setSelectedRoyaltiesFees, queue } = useMulticontract();
@@ -60,26 +62,26 @@ const Sell: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
       <FormSection>
         <FormInput
           name="marketType"
-          title="Market Type"
+          title={t('Buy.Market Type')}
           type="checkbox"
           toggleOptions={['Instant Sell', 'Auction']}
           tooltip="Instant Sell: Sell the asset for a fixed price. Auction: Sell the asset to the highest bidder."
         />
         <FormInput
           name="marketplaceId"
-          title="Marketplace ID"
+          title={t('DelegateUndelegate.Marketplace ID')}
           tooltip="The ID of the marketplace to sell the asset on."
           required
         />
         <FormInput
           name="currencyId"
-          title="Currency ID"
+          title={t('Buy.Currency Id')}
           tooltip="The ID of the currency to sell the asset for."
           required
         />
         <FormInput
           name="price"
-          title="Price"
+          title={t('Buy.Price')}
           type="number"
           tooltip={
             marketType
@@ -91,14 +93,14 @@ const Sell: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
         {marketType && (
           <FormInput
             name="reservePrice"
-            title="Reserve Price"
+            title={t('Buy.Reserve Price')}
             type="number"
             tooltip="The minimum auction price for the asset."
           />
         )}
         <FormInput
           name="endTime"
-          title="End Time"
+          title={t('Buy.End Time')}
           type="datetime-local"
           tooltip="Expiration sell date"
           required

@@ -35,7 +35,11 @@ describe('Component: Tabs/NetworkParams', () => {
       renderWithTheme(<NetworkParams />);
     });
 
-    const headers = ['Number', 'Parameter', 'Current Value'];
+    const headers = [
+      'Proposals.Number',
+      'Proposals.Parameter',
+      'Proposals.Current Value',
+    ];
     const tableBody = screen.getByTestId('table-body');
 
     const tableBodyStyle = {

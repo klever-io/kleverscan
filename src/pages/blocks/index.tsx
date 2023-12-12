@@ -23,9 +23,13 @@ import {
 import { parseAddress } from '@/utils/parseValues';
 import { getAge } from '@/utils/timeFunctions';
 import { TableContainer, TableHeader, UpdateContainer } from '@/views/blocks';
+import { GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 interface IBlocksStatsToday {
   totalBlocks: number;
@@ -46,6 +50,7 @@ interface IBlocksStatsYesterday {
 }
 
 const Blocks: React.FC<IBlocks> = () => {
+  const { t } = useTranslation(['blocks', 'common', 'table']);
   const precision = 6; // default KLV precision
   const blocksWatcherInterval = 4 * 1000; // 4 secs
   const [blocksInterval, setBlocksInterval] = useState(0);
@@ -183,15 +188,15 @@ const Blocks: React.FC<IBlocks> = () => {
   };
 
   const header = [
-    'Block',
-    'Block size',
-    'Produced by',
-    'Created',
-    'Tx Count',
-    'Burned Fees',
-    'kApp Fees',
-    'Fee Rewards',
-    'Block Rewards',
+    `${t('table:Transactions.Block')}`,
+    `${t('table:Blocks.Block Size')}`,
+    `${t('table:Blocks.Produced by')}`,
+    `${t('table:Transactions.Created')}`,
+    `${t('table:Blocks.Tx Count')}`,
+    `${t('table:Blocks.Burned Fees')}`,
+    `${t('table:Blocks.kApp Fees')}`,
+    `${t('table:Blocks.Fee Rewards')}`,
+    `${t('table:Blocks.Block Rewards')}`,
   ];
 
   const rowSections = (block: IBlock): IRowSection[] => {
@@ -317,6 +322,16 @@ const Blocks: React.FC<IBlocks> = () => {
       </TableContainer>
     </Container>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'blocks', 'table'],
+    nextI18nextConfig,
+  );
+
+  return { props };
 };
 
 export default Blocks;

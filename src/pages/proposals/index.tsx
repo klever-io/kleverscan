@@ -80,7 +80,7 @@ const Proposals: React.FC = () => {
 export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
   const props = await serverSideTranslations(
     locale,
-    ['common', 'proposals'],
+    ['common', 'proposals', 'table'],
     nextI18nextConfig,
   );
 

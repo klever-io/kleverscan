@@ -1,6 +1,7 @@
 import { useContract } from '@/contexts/contract';
 import { useExtension } from '@/contexts/extension';
 import { KLV_PRECISION } from '@/utils/globalVariables';
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -28,6 +29,7 @@ const CreateValidator: React.FC<IContractProps> = ({
   formKey,
   handleFormSubmit,
 }) => {
+  const { t } = useTranslation('transactions');
   const { walletAddress } = useExtension();
   const { handleSubmit } = useFormContext<FormData>();
   const {} = useContract();
@@ -43,39 +45,43 @@ const CreateValidator: React.FC<IContractProps> = ({
         <FormInput name="name" title="Validator Name" required />
         <FormInput
           name="ownerAddress"
-          title="Owner Address"
+          title={t('OwnerAddress')}
           dynamicInitialValue={walletAddress}
           required
         />
         <FormInput name="blsPublicKey" title="BLS Public Key" required />
         <FormInput
           name="rewardAddress"
-          title="Reward Address"
+          title={t('CreateValidator.Reward Address')}
           tooltip={tooltip.rewardAddress}
           required
         />
         <FormInput
           name="canDelegate"
-          title="Can Delegate"
+          title={t('CreateValidator.Can Delegate')}
           type="checkbox"
           toggleOptions={['No', 'Yes']}
           tooltip={tooltip.canDelegate}
         />
         <FormInput
           name="commission"
-          title="Commission"
+          title={t('CreateValidator.Commission')}
           type="number"
           {...percentageProps}
           tooltip={tooltip.commission}
         />
         <FormInput
           name="maxDelegationAmount"
-          title="Max Delegation Amount"
+          title={t('CreateValidator.Max Delegation Amount')}
           type="number"
           tooltip={tooltip.maxDelegationAmount}
           precision={KLV_PRECISION}
         />
-        <FormInput name="logo" title="Logo" tooltip={tooltip.logo} />
+        <FormInput
+          name="logo"
+          title={t('CreateValidator.Logo')}
+          tooltip={tooltip.logo}
+        />
       </FormSection>
       <URIsSection tooltip={tooltip.URIs} />
     </FormBody>

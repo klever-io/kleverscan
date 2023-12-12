@@ -1,4 +1,5 @@
 import { depositTypes } from '@/utils/contracts';
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -14,6 +15,7 @@ type FormData = {
 };
 
 const Deposit: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+  const { t } = useTranslation('transactions');
   const { handleSubmit, watch } = useFormContext<FormData>();
   const depositType: number = watch('depositType');
 
@@ -26,7 +28,7 @@ const Deposit: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
       <FormSection>
         <FormInput
           name="depositType"
-          title="Deposit Type"
+          title={t('Deposit.Deposit Type')}
           type="dropdown"
           options={depositTypes}
           zIndex={4}
@@ -39,7 +41,7 @@ const Deposit: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
           <FormSection>
             <FormInput
               name="amount"
-              title="Amount"
+              title={t('Amount')}
               type="number"
               tooltip={`Amount to be deposited into the ${
                 depositType ? 'KDA Fee' : 'FPR'
@@ -48,7 +50,7 @@ const Deposit: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
             />
             <FormInput
               name="currencyId"
-              title="Currency ID"
+              title={t('Buy.Currency Id')}
               tooltip={`Asset to be deposited into the ${
                 depositType ? 'KDA Fee' : 'FPR'
               } pool`}

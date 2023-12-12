@@ -24,6 +24,7 @@ import { IAccountResponse, IDropdownItem } from '@/types';
 import { IAccPermission } from '@/types/contracts';
 import { filterPoolAssets } from '@/utils/create-transaction/parseFunctions';
 import { parseAddress } from '@/utils/parseValues';
+import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 import { IoReloadSharp } from 'react-icons/io5';
 import { useQuery } from 'react-query';
@@ -35,21 +36,11 @@ import {
   ToggleContainer,
 } from './styles';
 
-const tooltipPermissionID = `The permission ID is set by the account owner and is used to make other accounts able to sign transactions on behalf of the owner.
-You can find more information about permissions in your account page. If they are not set,
-you need to send an "Update Account Permission" contract`;
-
-const tooltipAccount = `The sender account address is the account that will be the
-sender of the transaction. It needs to be a multi-sign account. Your connected address will be the one used to sign the transaction.
-Be sure that your account has the permission to sign transactions on behalf of the sender account, otherwise the transaction will fail.
-`;
-
-const showPayloadTooltip = `The payload is the contract data that will be sent to be built and broadcast to the blockchain. If you want to edit it, you can do it here.`;
-
 const PermID: React.FC = () => {
+  const { t } = useTranslation('transactions');
   const { setPermID, permID, senderAccount } = useContract();
   const { walletAddress } = useExtension();
-
+  const tooltipPermissionID = t('AdvanceOptions.TooltipPermissionID');
   const queryFn = () => getAccount(senderAccount);
 
   const { data: res, isFetching: loading } = useQuery({
@@ -77,7 +68,10 @@ const PermID: React.FC = () => {
       <FieldContainer>
         <SelectContent>
           <InputLabel>
-            <span>Permission ID ({parseAddress(senderAccount, 12)})</span>
+            <span>
+              {t('AdvancedOptions.Permission ID')} (
+              {parseAddress(senderAccount, 12)})
+            </span>
             <TooltipContainer>
               <Tooltip msg={tooltipPermissionID}>
                 <InfoIcon />
@@ -107,10 +101,12 @@ const PermID: React.FC = () => {
 };
 
 const AccountSelect: React.FC = () => {
+  const { t } = useTranslation('transactions');
+  const { t: commonT } = useTranslation('common');
   const { setSenderAccount, setPermID } = useContract();
   const { walletAddress } = useExtension();
   const [loggedAccountIsSender, setLoggedAccountIsSender] = useState(true);
-
+  const tooltipAccount = t('AdvanceOptions.TooltipAccount');
   useEffect(() => {
     if (loggedAccountIsSender) {
       setSenderAccount(walletAddress);
@@ -122,10 +118,10 @@ const AccountSelect: React.FC = () => {
     <FlexContainer>
       <FieldContainer>
         <InputLabel>
-          <span>Do you want to use the current account as sender?</span>
+          <span>{t('AdvancedOptions.Use Current account')}</span>
         </InputLabel>
         <ToggleContainer>
-          No
+          {commonT('Statements.No')}
           <Toggle>
             <StyledInput
               type="checkbox"
@@ -137,14 +133,14 @@ const AccountSelect: React.FC = () => {
             />
             <Slider active={String(loggedAccountIsSender)} />
           </Toggle>
-          Yes
+          {commonT('Statements.Yes')}
         </ToggleContainer>
       </FieldContainer>
 
       {!loggedAccountIsSender && (
         <FieldContainer>
           <InputLabel>
-            <span>Sender Account Address</span>
+            <span>{t('AdvancedOptions.Sender Account Address')}</span>
             <TooltipContainer>
               <Tooltip msg={tooltipAccount}>
                 <InfoIcon />
@@ -153,7 +149,7 @@ const AccountSelect: React.FC = () => {
           </InputLabel>
 
           <StyledInput
-            placeholder="Sender Account Address"
+            placeholder={t('AdvancedOptions.Sender Account Address')}
             defaultValue={''}
             onChange={e => {
               setSenderAccount(e.target.value);
@@ -167,6 +163,10 @@ const AccountSelect: React.FC = () => {
 };
 
 const MultiSigSelect: React.FC = () => {
+  const { t } = useTranslation('transactions');
+  const { t: commonT } = useTranslation('common');
+  const yes = commonT('Statements.Yes');
+  const no = commonT('Statements.No');
   const { isMultisig, signTxMultiSign } = useContract();
 
   const [multiSig, setMultiSig] = useState<boolean>(isMultisig.current);
@@ -177,10 +177,10 @@ const MultiSigSelect: React.FC = () => {
       <FlexContainer>
         <FieldContainer>
           <InputLabel>
-            <span>Does your account needs multiple signatures?</span>
+            <span>{t('AdvancedOptions.Multiple Signatures')}</span>
           </InputLabel>
           <ToggleContainer>
-            No
+            {no}
             <Toggle>
               <StyledInput
                 type="checkbox"
@@ -197,7 +197,7 @@ const MultiSigSelect: React.FC = () => {
               />
               <Slider active={String(isMultisig.current)} />
             </Toggle>
-            Yes
+            {yes}
           </ToggleContainer>
         </FieldContainer>
       </FlexContainer>
@@ -206,10 +206,10 @@ const MultiSigSelect: React.FC = () => {
           <FlexContainer>
             <FieldContainer>
               <InputLabel>
-                <span>Do you want to sign transaction now?</span>
+                <span>{t('AdvancedOptions.Sign transaction')}</span>
               </InputLabel>
               <ToggleContainer>
-                No
+                {no}
                 <Toggle>
                   <StyledInput
                     type="checkbox"
@@ -222,7 +222,7 @@ const MultiSigSelect: React.FC = () => {
                   />
                   <Slider active={String(signTx)} />
                 </Toggle>
-                Yes
+                {yes}
               </ToggleContainer>
             </FieldContainer>
           </FlexContainer>
@@ -235,9 +235,13 @@ const MultiSigSelect: React.FC = () => {
 };
 
 const AdvancedOptionsContent: React.FC = () => {
+  const { t } = useTranslation('transactions');
+  const { t: commonT } = useTranslation('common');
   const { showPayload, isMultisig, kdaFee, getAssets } = useContract();
   const { walletAddress } = useExtension();
-
+  const yes = commonT('Statements.Yes');
+  const showPayloadTooltip = t('AdvancedOptions.ShowPayloadTooltip');
+  const no = commonT('Statements.No');
   const [loading, setLoading] = useState(false);
 
   const {
@@ -280,7 +284,7 @@ const AdvancedOptionsContent: React.FC = () => {
       <FieldContainer>
         <SelectContent>
           <BalanceContainer key={kdaFeeAsset?.assetId}>
-            <FieldLabel>KDA to pay fees:</FieldLabel>
+            <FieldLabel>{t('AdvancedOptions.KDA to pay fees')}</FieldLabel>
             <ReloadWrapper
               onClick={refetch}
               $loading={assetsPoolFetching || assetsFetching || loading}
@@ -289,7 +293,8 @@ const AdvancedOptionsContent: React.FC = () => {
             </ReloadWrapper>
             {!isNaN(Number(assetBalance)) && assetBalance !== null && (
               <BalanceLabel>
-                Balance: {assetBalance / 10 ** (kdaFee.current?.precision || 0)}
+                {t('AdvancedOptions.Balance')}{' '}
+                {assetBalance / 10 ** (kdaFee.current?.precision || 0)}
               </BalanceLabel>
             )}
           </BalanceContainer>
@@ -319,10 +324,10 @@ const AdvancedOptionsContent: React.FC = () => {
       {!isModal && (
         <FieldContainer>
           <InputLabel>
-            <span>Multiple Contract</span>
+            <span>{t('AdvancedOptions.Multiple Contract')}</span>
           </InputLabel>
           <ToggleContainer>
-            No
+            {no}
             <Toggle>
               <StyledInput
                 type="checkbox"
@@ -332,14 +337,14 @@ const AdvancedOptionsContent: React.FC = () => {
               />
               <Slider active={String(isMultiContract)} />
             </Toggle>
-            Yes
+            {yes}
           </ToggleContainer>
         </FieldContainer>
       )}
       <MultiSigSelect />
       <FieldContainer>
         <InputLabel>
-          <span>Show/Edit payload?</span>
+          <span>{t('AdvancedOptions.Show payload')}</span>
           <TooltipContainer>
             <Tooltip msg={showPayloadTooltip}>
               <InfoIcon />
@@ -347,7 +352,7 @@ const AdvancedOptionsContent: React.FC = () => {
           </TooltipContainer>
         </InputLabel>
         <ToggleContainer>
-          No
+          {no}
           <Toggle>
             <StyledInput
               type="checkbox"
@@ -360,7 +365,7 @@ const AdvancedOptionsContent: React.FC = () => {
             />
             <Slider active={String(localShowPayload)} />
           </Toggle>
-          Yes
+          {yes}
         </ToggleContainer>
       </FieldContainer>
     </ExtraOptionContainer>
@@ -368,6 +373,7 @@ const AdvancedOptionsContent: React.FC = () => {
 };
 
 const AdvancedOptions: React.FC = () => {
+  const { t } = useTranslation('transactions');
   const [showAdvancedOpts, setShowAdvancedOpts] = useState(false);
 
   return (
@@ -375,7 +381,7 @@ const AdvancedOptions: React.FC = () => {
       <AdvancedOptsContainer
         onClick={() => setShowAdvancedOpts(!showAdvancedOpts)}
       >
-        <span>Advanced Options</span>
+        <span>{t('AdvancedOptions.Advanced Options')}</span>
         {showAdvancedOpts ? <ArrowUpIcon /> : <ArrowDownIcon />}
       </AdvancedOptsContainer>
 

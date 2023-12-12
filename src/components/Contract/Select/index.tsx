@@ -1,5 +1,6 @@
 import { IStakingRewards } from '@/pages/account/[account]';
 import { ICollectionList } from '@/types';
+import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
 import React, { useCallback } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
@@ -59,6 +60,7 @@ const Select: React.FC<IFilter> = ({
   defaultValue,
   ...rest
 }) => {
+  const { t } = useTranslation('transactions');
   const Placeholder = useCallback((props: any) => {
     return <components.Placeholder {...props} />;
   }, []);
@@ -86,10 +88,10 @@ const Select: React.FC<IFilter> = ({
   };
 
   const getPlaceholder = () => {
-    if (loading) return 'Loading...';
+    if (loading) return `${t('Loading')}`;
     if (selectPlaceholder) return selectPlaceholder;
 
-    return `Choose ${title ? title : ''}`;
+    return `${t('CreateTransactions.Choose')} ${title ? title : ''}`;
   };
 
   return (

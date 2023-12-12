@@ -29,6 +29,7 @@ import {
 } from './styles';
 
 const Proposals: React.FC<IProposalsProps> = ({ request }) => {
+  const { t: tableT } = useTranslation('table');
   const { t } = useTranslation(['common', 'proposals']);
   const { isMobile, isTablet } = useMobile();
   const router = useRouter();
@@ -220,12 +221,13 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
   };
 
   const header = [
-    'Number',
-    'Proposer',
-    'Time',
-    'Upvotes/Total Staked',
+    `${tableT('Proposals.Number')}`,
+    `${tableT('Proposals.Proposer')}`,
+    `${tableT('Proposals.Time')}`,
+    `${tableT('Proposals.Upvotes/Total Staked')}`,
+    `${tableT('Transactions.Status')}`,
+    `${tableT('Proposals.Network Parameters')}`,
     `${t('common:Buttons.Status')}`,
-    'Network Parameters',
     '',
   ];
 

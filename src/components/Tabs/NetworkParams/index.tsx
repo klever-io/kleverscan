@@ -1,6 +1,7 @@
 import Table, { ITable } from '@/components/Table';
 import api from '@/services/api';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { proposalsMessages } from './proposalMessages';
 
@@ -42,6 +43,7 @@ const requestNetworkParams = async (): Promise<INetworkParams> => {
 };
 
 const NetworkParams: React.FC = () => {
+  const { t } = useTranslation('table');
   const rowSections = (props: INetworkParam): IRowSection[] => {
     const { number, parameter, currentValue } = props;
 
@@ -59,7 +61,11 @@ const NetworkParams: React.FC = () => {
     ];
   };
 
-  const header = ['Number', 'Parameter', 'Current Value'];
+  const header = [
+    `${t('Proposals.Number')}`,
+    `${t('Proposals.Parameter')}`,
+    `${t('Proposals.Current Value')}`,
+  ];
 
   const tableProps: ITable = {
     rowSections,

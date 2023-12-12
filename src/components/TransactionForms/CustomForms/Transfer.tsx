@@ -5,6 +5,7 @@ import {
 } from '@/utils/create-transaction/fees-calculation.ts';
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
+import { useTranslation } from 'next-i18next';
 import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -19,6 +20,7 @@ type FormData = {
 };
 
 const Transfer: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+  const { t } = useTranslation('transactions');
   const { handleSubmit, watch } = useFormContext<FormData>();
   const { setSelectedRoyaltiesFees, queue } = useMulticontract();
   const amount = watch('amount');
@@ -79,13 +81,17 @@ const Transfer: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
         {!collection?.isNFT && (
           <FormInput
             name="amount"
-            title="Amount"
+            title={t('Amount')}
             type="number"
             required
             precision={collection?.precision}
           />
         )}
-        <FormInput name="receiver" title="Receiver Address" required />
+        <FormInput
+          name="receiver"
+          title={t('ITOTrigger.Receiver Address')}
+          required
+        />
       </FormSection>
       {transferRoyalties > 0 && (
         <RoyaltiesContainer>

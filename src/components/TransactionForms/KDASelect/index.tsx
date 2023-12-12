@@ -22,6 +22,7 @@ import { ICollectionList, IDropdownItem } from '@/types';
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import { useDebounce } from '@/utils/hooks';
 import { setQuery } from '@/utils/hooks/contract';
+import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { FieldError, useFormContext } from 'react-hook-form';
@@ -42,6 +43,7 @@ interface IKDASelect {
 }
 
 export const KDASelect: React.FC<IKDASelect> = props => {
+  const { t } = useTranslation('transactions');
   const { required } = props;
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -192,7 +194,7 @@ export const KDASelect: React.FC<IKDASelect> = props => {
     register('collection', {
       required: {
         value: required || false,
-        message: 'This field is required',
+        message: `${t('CreateTransactions.This field is required')}`,
       },
     });
   }, [register]);
@@ -234,15 +236,17 @@ export const KDASelect: React.FC<IKDASelect> = props => {
       <SelectContent configITO={contractType === 'ConfigITOContract'}>
         <BalanceContainer>
           <FieldLabel>
-            Select an asset/collection
-            {required && <RequiredSpan> (required)</RequiredSpan>}
+            {t('CreateTransactions.Select an asset/collection')}
+            {required && (
+              <RequiredSpan> ({t('CreateTransactions.Required')})</RequiredSpan>
+            )}
           </FieldLabel>
           <ReloadWrapper onClick={refetch} $loading={loading}>
             <IoReloadSharp />
           </ReloadWrapper>
           {selectedCollection?.balance && (
             <BalanceLabel>
-              Balance:{' '}
+              {t('AdvancedOptions.Balance')}{' '}
               {toLocaleFixed(
                 assetBalance / 10 ** (selectedCollection?.precision || 0),
                 selectedCollection?.precision || 0,
@@ -270,7 +274,8 @@ export const KDASelect: React.FC<IKDASelect> = props => {
         />
         {collectionError && (
           <ErrorMessage style={{ color: 'red', fontSize: '0.8rem' }}>
-            {collectionError?.message || 'This field is required'}
+            {collectionError?.message ||
+              `${t('CreateTransactions.This field is required')}`}
           </ErrorMessage>
         )}
       </SelectContent>
@@ -280,6 +285,7 @@ export const KDASelect: React.FC<IKDASelect> = props => {
 };
 
 const CollectionIDField: React.FC = () => {
+  const { t } = useTranslation('transactions');
   const [isCustom, setIsCustom] = useState(false);
   const [collectionInputValue, setCollectionInputValue] = useState('');
   const [collectionIdData, setCollectionIdData] = useState<IDropdownItem[]>([]);
@@ -342,9 +348,9 @@ const CollectionIDField: React.FC = () => {
   return (
     <SelectContent>
       <FieldLabel>
-        <span>Asset ID</span>
+        <span>{t('AssetId')}</span>
         <DropdownCustomLabel>
-          <span>Custom value?</span>
+          <span>{t('CreateTransactions.Custom value')}</span>
           <input
             type="checkbox"
             checked={isCustom}
@@ -359,7 +365,7 @@ const CollectionIDField: React.FC = () => {
           {...register('collectionAssetId', {
             required: {
               value: true,
-              message: 'This field is required',
+              message: `${t('CreateTransactions.This field is required')}`,
             },
             onChange: e => {
               collectionIdChangeHandler(e.target);
@@ -379,7 +385,8 @@ const CollectionIDField: React.FC = () => {
       )}
       {assetIdError && (
         <ErrorMessage style={{ color: 'red', fontSize: '0.8rem' }}>
-          {assetIdError?.message || 'This field is required'}
+          {assetIdError?.message ||
+            `${t('CreateTransactions.This field is required')}`}
         </ErrorMessage>
       )}
     </SelectContent>

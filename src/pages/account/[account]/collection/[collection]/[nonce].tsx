@@ -42,6 +42,7 @@ import {
   CenteredRow,
   Row,
 } from '@/views/transactions/detail';
+import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
@@ -56,6 +57,7 @@ interface INonceParams {
 }
 
 const NftDetail: React.FC<IParsedAsset> = () => {
+  const { t } = useTranslation('table');
   const [showRawData, setShowRawData] = useState(false);
   const router = useRouter();
 
@@ -72,7 +74,11 @@ const NftDetail: React.FC<IParsedAsset> = () => {
   const { isMobile } = useMobile();
   const getContractType = useCallback(contractTypes, []);
 
-  const header = [...initialsTableHeaders, 'kApp Fee', 'Bandwidth Fee'];
+  const header = [
+    ...initialsTableHeaders(t),
+    t('Blocks.kApp Fees'),
+    t('Transactions.Bandwidth Fee'),
+  ];
   const getFilteredSections = (
     contract: IContract[],
     receipts: IReceipt[],
@@ -197,7 +203,7 @@ const NftDetail: React.FC<IParsedAsset> = () => {
 
   const tableProps: ITable = {
     type: 'transactions',
-    header: getHeaderForTable(router, header),
+    header: getHeaderForTable(router, header, t),
     rowSections,
     dataName: 'transactions',
     scrollUp: true,

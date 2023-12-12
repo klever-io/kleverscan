@@ -2,6 +2,7 @@ import { useExtension } from '@/contexts/extension';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { validateImgUrl } from '@/utils/imageValidate';
 import { ICreateAsset } from '@klever/sdk-web';
+import { useTranslation } from 'next-i18next';
 import React, { useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
@@ -47,6 +48,7 @@ const CreateAsset: React.FC<IContractProps> = ({
   formKey,
   handleFormSubmit,
 }) => {
+  const { t } = useTranslation('transactions');
   const { handleSubmit, watch } = useFormContext<ICreateAsset>();
 
   const isNFT = Boolean(watch('type'));
@@ -65,7 +67,7 @@ const CreateAsset: React.FC<IContractProps> = ({
       <FormSection>
         <FormInput
           name="type"
-          title="Asset Type"
+          title={t('CreateTransactions.Asset Type')}
           type="checkbox"
           toggleOptions={['Token', 'NFT']}
         />
@@ -81,6 +83,7 @@ const CreateAsset: React.FC<IContractProps> = ({
 };
 
 const BasicInfoSection: React.FC<ISectionProps> = ({ isNFT }) => {
+  const { t } = useTranslation('transactions');
   const [logoError, setLogoError] = useState<string | null>(null);
   const { watch, trigger, setValue } = useFormContext<ICreateAsset>();
   const { walletAddress } = useExtension();
@@ -94,19 +97,17 @@ const BasicInfoSection: React.FC<ISectionProps> = ({ isNFT }) => {
   }, [precision, trigger]);
 
   const isValidLogo = async () => {
-    const logoErrorMsg =
-      'The logo link is invalid, which could lead to your logo not being displayed.';
     try {
       if (!!logo) {
         const isValid = await validateImgUrl(logo, 2000);
         if (!isValid) {
-          setLogoError(logoErrorMsg);
+          setLogoError(t('CreateTransactions.logoErrorMsg'));
           return;
         }
       }
       setLogoError(null);
     } catch (error) {
-      setLogoError(logoErrorMsg);
+      setLogoError(t('CreateTransactions.logoErrorMsg'));
     }
   };
 
@@ -117,25 +118,25 @@ const BasicInfoSection: React.FC<ISectionProps> = ({ isNFT }) => {
   return (
     <FormSection>
       <SectionTitle>
-        <span>Basic Info</span>
+        <span>{t('CreateTransactions.Basic Info')}</span>
       </SectionTitle>
-      <FormInput name="name" title="Name" required />
+      <FormInput name="name" title={t('CreateAsset.Name')} required />
       <FormInput
         name="ticker"
-        title="Ticker"
+        title={t('CreateAsset.Ticker')}
         tooltip={tooltip.ticker}
         required
       />
       <FormInput
         name="ownerAddress"
-        title="Owner Address"
+        title={t('OwnerAddress')}
         required
         dynamicInitialValue={walletAddress}
       />
       {!isNFT && (
         <FormInput
           name="precision"
-          title="Precision"
+          title={t('Precision')}
           type="number"
           tooltip={tooltip.precision}
           required
@@ -144,7 +145,7 @@ const BasicInfoSection: React.FC<ISectionProps> = ({ isNFT }) => {
       {!isNFT && (
         <FormInput
           name="initialSupply"
-          title="Initial Supply"
+          title={t('CreateAsset.Initial Supply')}
           type="number"
           tooltip={tooltip.initialSupply}
           precision={precision}
@@ -152,14 +153,14 @@ const BasicInfoSection: React.FC<ISectionProps> = ({ isNFT }) => {
       )}
       <FormInput
         name="maxSupply"
-        title="Max Supply"
+        title={t('CreateAsset.Max Supply')}
         type="number"
         tooltip={tooltip.maxSupply}
         precision={precision}
       />
       <FormInput
         name="logo"
-        title="Logo"
+        title={t('CreateValidator.Logo')}
         span={2}
         tooltip={tooltip.logo}
         logoError={logoError}
@@ -173,6 +174,7 @@ interface URIProps {
 }
 
 export const URIsSection: React.FC<URIProps> = ({ tooltip: customTooltip }) => {
+  const { t } = useTranslation('transactions');
   const { control } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
@@ -198,14 +200,14 @@ export const URIsSection: React.FC<URIProps> = ({ tooltip: customTooltip }) => {
           </SectionTitle>
           <FormInput
             name={`uris[${index}].label`}
-            title={`Label`}
+            title={t('CreateAsset.Label')}
             span={2}
             tooltip={tooltip.uris.label}
             required
           />
           <FormInput
             name={`uris[${index}].value`}
-            title={`Address`}
+            title={t('Address')}
             span={2}
             tooltip={tooltip.uris.address}
             required
@@ -213,13 +215,14 @@ export const URIsSection: React.FC<URIProps> = ({ tooltip: customTooltip }) => {
         </FormSection>
       ))}
       <ButtonContainer type="button" onClick={() => append({})}>
-        Add URI
+        {t('CreateAsset.Add Uri')}
       </ButtonContainer>
     </FormSection>
   );
 };
 
 export const RoyaltiesSection: React.FC<ISectionProps> = props => {
+  const { t } = useTranslation('transactions');
   const { isNFT } = props;
   const { walletAddress } = useExtension();
   let precision = 8;
@@ -241,7 +244,7 @@ export const RoyaltiesSection: React.FC<ISectionProps> = props => {
       <FormInput
         paddingTop={2}
         name="royalties.address"
-        title="Address"
+        title={t('Address')}
         span={2}
         tooltip={tooltip.royalties.address}
         dynamicInitialValue={walletAddress}
@@ -250,7 +253,7 @@ export const RoyaltiesSection: React.FC<ISectionProps> = props => {
       {isNFT && (
         <FormInput
           name="royalties.transferFixed"
-          title="Transfer Fixed"
+          title={t('Transfer.Transfer Fixed')}
           type="number"
           precision={KLV_PRECISION}
           tooltip={tooltip.royalties.transferFixed}
@@ -259,7 +262,7 @@ export const RoyaltiesSection: React.FC<ISectionProps> = props => {
       {isNFT && (
         <FormInput
           name="royalties.marketPercentage"
-          title="Market Percentage"
+          title={t('CreateAsset.Market Percent')}
           type="number"
           {...percentageProps}
           tooltip={tooltip.royalties.marketPercentage}
@@ -268,7 +271,7 @@ export const RoyaltiesSection: React.FC<ISectionProps> = props => {
       {isNFT && (
         <FormInput
           name="royalties.marketFixed"
-          title="Market Fixed"
+          title={t('CreateAsset.Market Fixed')}
           type="number"
           precision={KLV_PRECISION}
           tooltip={tooltip.royalties.marketFixed}
@@ -276,14 +279,14 @@ export const RoyaltiesSection: React.FC<ISectionProps> = props => {
       )}
       <FormInput
         name="royalties.itoPercentage"
-        title="ITO Percentage"
+        title={t('CreateAsset.ITO', { type: `${t('Transfer.Percentage')}` })}
         type="number"
         {...percentageProps}
         tooltip={tooltip.royalties.itoPercentage}
       />
       <FormInput
         name="royalties.itoFixed"
-        title="ITO Fixed"
+        title={t('CreateAsset.ITO', { type: `${t('CreateAsset.Fixed')}` })}
         type="number"
         precision={KLV_PRECISION}
         tooltip={tooltip.royalties.itoFixed}
@@ -298,6 +301,7 @@ export const RoyaltiesSection: React.FC<ISectionProps> = props => {
 const TransferPercentageSection: React.FC<IPrecisionProps> = ({
   precision,
 }) => {
+  const { t } = useTranslation('transactions');
   const { control, watch, trigger, getValues } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
@@ -311,7 +315,7 @@ const TransferPercentageSection: React.FC<IPrecisionProps> = ({
   return (
     <FormSection inner>
       <SectionTitle>
-        <span>Transfer Percentage</span>
+        <span>{t('CreateAsset.Transfer Percentage')}</span>
         <TooltipContainer>
           <InfoIcon size={13} />
           <TooltipContent>
@@ -323,11 +327,11 @@ const TransferPercentageSection: React.FC<IPrecisionProps> = ({
         <FormSection key={field.id} inner>
           <SectionTitle>
             <HiTrash onClick={() => remove(index)} />
-            Transfer Percentage {index + 1}
+            {t('CreateAsset.Transfer Percentage')} {index + 1}
           </SectionTitle>
           <FormInput
             name={`royalties.transferPercentage[${index}].amount`}
-            title={`Amount`}
+            title={t('Amount')}
             type="number"
             tooltip={tooltip.royalties.transferPercentage.amount}
             precision={precision}
@@ -335,7 +339,7 @@ const TransferPercentageSection: React.FC<IPrecisionProps> = ({
           />
           <FormInput
             name={`royalties.transferPercentage[${index}].percentage`}
-            title={`Percentage`}
+            title={t('Transfer.Percentage')}
             type="number"
             tooltip={tooltip.royalties.transferPercentage.percentage}
             {...percentageProps}
@@ -344,13 +348,14 @@ const TransferPercentageSection: React.FC<IPrecisionProps> = ({
         </FormSection>
       ))}
       <ButtonContainer type="button" onClick={() => append({})}>
-        Add
+        {t('CreateAsset.Add')}
       </ButtonContainer>
     </FormSection>
   );
 };
 
 const SplitRoyaltiesSection: React.FC<ISectionProps> = ({ isNFT }) => {
+  const { t } = useTranslation('transactions');
   const { control } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
@@ -359,7 +364,7 @@ const SplitRoyaltiesSection: React.FC<ISectionProps> = ({ isNFT }) => {
   return (
     <FormSection inner>
       <SectionTitle>
-        <span>Split Royalties</span>
+        <span>{t('CreateAsset.Split Royalties')}</span>
         <TooltipContainer>
           <InfoIcon size={13} />
           <TooltipContent>
@@ -371,11 +376,11 @@ const SplitRoyaltiesSection: React.FC<ISectionProps> = ({ isNFT }) => {
         <FormSection key={field.id} inner>
           <SectionTitle>
             <HiTrash onClick={() => remove(index)} />
-            Split Royalties {index + 1}
+            {t('CreateAsset.Split Royalties')} {index + 1}
           </SectionTitle>
           <FormInput
             name={`royalties.splitRoyalties[${index}].address`}
-            title={`Address`}
+            title={t('Address')}
             span={2}
             tooltip={tooltip.royalties.splitRoyalties.address}
             required
@@ -383,7 +388,9 @@ const SplitRoyaltiesSection: React.FC<ISectionProps> = ({ isNFT }) => {
           {!isNFT && (
             <FormInput
               name={`royalties.splitRoyalties[${index}].percentTransferPercentage`}
-              title={`Percentage over Transfer Percentage`}
+              title={t('CreateAsset.Percentage Over', {
+                type: `${t('CreateAsset.Transfer Percentage')}`,
+              })}
               type="number"
               tooltip={
                 tooltip.royalties.splitRoyalties.percentTransferPercentage
@@ -394,7 +401,9 @@ const SplitRoyaltiesSection: React.FC<ISectionProps> = ({ isNFT }) => {
           {isNFT && (
             <FormInput
               name={`royalties.splitRoyalties[${index}].percentTransferFixed`}
-              title={`Percentage over Transfer Fixed`}
+              title={t('CreateAsset.Percentage Over', {
+                type: `${t('Transfer.Transfer Fixed')}`,
+              })}
               type="number"
               tooltip={tooltip.royalties.splitRoyalties.percentTransferFixed}
               {...percentageProps}
@@ -403,7 +412,9 @@ const SplitRoyaltiesSection: React.FC<ISectionProps> = ({ isNFT }) => {
           {isNFT && (
             <FormInput
               name={`royalties.splitRoyalties[${index}].percentMarketPercentage`}
-              title={`Percentage over Market Percentage`}
+              title={t('CreateAsset.Percentage Over', {
+                type: `${t('CreateAsset.Market Percent')}`,
+              })}
               tooltip={tooltip.royalties.splitRoyalties.percentMarketPercentage}
               {...percentageProps}
             />
@@ -411,27 +422,37 @@ const SplitRoyaltiesSection: React.FC<ISectionProps> = ({ isNFT }) => {
           {isNFT && (
             <FormInput
               name={`royalties.splitRoyalties[${index}].percentMarketFixed`}
-              title={`Percentage over Market Fixed`}
+              title={t('CreateAsset.Percentage Over', {
+                type: `${t('CreateAsset.Market Fixed')}`,
+              })}
               tooltip={tooltip.royalties.splitRoyalties.percentMarketFixed}
               {...percentageProps}
             />
           )}
           <FormInput
             name={`royalties.splitRoyalties[${index}].percentITOPercentage`}
-            title={`Percentage over ITO Percentage`}
+            title={t('CreateAsset.Percentage Over', {
+              type: `${t('CreateAsset.ITO', {
+                type: `${t('Transfer.Percentage')}`,
+              })}`,
+            })}
             tooltip={tooltip.royalties.splitRoyalties.percentItoPercentage}
             {...percentageProps}
           />
           <FormInput
             name={`royalties.splitRoyalties[${index}].percentITOFixed`}
-            title={`Percentage over ITO Fixed`}
+            title={t('CreateAsset.Percentage Over', {
+              type: `${t('CreateAsset.ITO', {
+                type: `${t('CreateAsset.Fixed')}`,
+              })}`,
+            })}
             tooltip={tooltip.royalties.splitRoyalties.percentItoFixed}
             {...percentageProps}
           />
         </FormSection>
       ))}
       <ButtonContainer type="button" onClick={() => append({})}>
-        Add
+        {t('CreateAsset.Add')}
       </ButtonContainer>
     </FormSection>
   );
@@ -446,6 +467,7 @@ export const StakingSection: React.FC<IStakingSectionProps> = ({
   assetTrigger = false,
   isFPR: isFPRProp,
 }) => {
+  const { t } = useTranslation('transactions');
   const { watch, setValue } = useFormContext();
   const isFPR = watch('staking.interestType');
 
@@ -458,7 +480,7 @@ export const StakingSection: React.FC<IStakingSectionProps> = ({
   return (
     <FormSection inner>
       <SectionTitle>
-        <span>Staking</span>
+        <span>{t('CreateAsset.Staking')}</span>
         <TooltipContainer>
           <InfoIcon size={13} />
           <TooltipContent>
@@ -469,7 +491,7 @@ export const StakingSection: React.FC<IStakingSectionProps> = ({
       {!assetTrigger && (
         <FormInput
           name="staking.interestType"
-          title="Interest Type"
+          title={t('CreateAsset.Interest Type')}
           type="checkbox"
           toggleOptions={['APR', 'FPR']}
         />
@@ -486,21 +508,25 @@ export const StakingSection: React.FC<IStakingSectionProps> = ({
       )}
       <FormInput
         name="staking.minEpochsToClaim"
-        title="Min Epochs to Claim"
+        title={t('AssetTrigger.Min Epochs To', { type: t('Claim.Claim') })}
         type="number"
         precision={0}
         tooltip={tooltip.staking.minEpochsToClaim}
       />
       <FormInput
         name="staking.minEpochsToUnstake"
-        title="Min Epochs to Unstake"
+        title={t('AssetTrigger.Min Epochs To', {
+          type: t('AssetTrigger.Unstake'),
+        })}
         type="number"
         precision={0}
         tooltip={tooltip.staking.minEpochsToUnstake}
       />
       <FormInput
         name="staking.minEpochsToWithdraw"
-        title="Min Epochs to Withdraw"
+        title={t('AssetTrigger.Min Epochs To', {
+          type: t('Withdraw.Withdraw'),
+        })}
         type="number"
         precision={0}
         tooltip={tooltip.staking.minEpochsToWithdraw}
@@ -510,6 +536,8 @@ export const StakingSection: React.FC<IStakingSectionProps> = ({
 };
 
 export const RolesSection: React.FC = () => {
+  const { t } = useTranslation('transactions');
+  const { t: commonT } = useTranslation('common');
   const { control } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
@@ -518,7 +546,7 @@ export const RolesSection: React.FC = () => {
   return (
     <FormSection>
       <SectionTitle>
-        <span>Roles</span>
+        <span>{t('CreateAsset.Roles')}</span>
         <TooltipContainer>
           <InfoIcon size={13} />
           <TooltipContent>
@@ -530,42 +558,50 @@ export const RolesSection: React.FC = () => {
         <FormSection key={field.id} inner>
           <SectionTitle>
             <HiTrash onClick={() => remove(index)} />
-            Role {index + 1}
+            {t('AssetTrigger.Role')} {index + 1}
           </SectionTitle>
           <FormInput
             name={`roles[${index}].address`}
-            title={`Address`}
+            title={t('Address')}
             span={2}
             tooltip={tooltip.roles.address}
           />
           <FormInput
             name={`roles[${index}].hasRoleMint`}
-            title={`Has Role Mint`}
+            title={t('CreateAsset.HasRoleMint')}
             type="checkbox"
-            toggleOptions={['No', 'Yes']}
+            toggleOptions={[
+              `${commonT('Statements.No')}`,
+              `${commonT('Statements.Yes')}`,
+            ]}
             tooltip={tooltip.roles.hasRoleMint}
           />
           <FormInput
             name={`roles[${index}].hasRoleSetITOPrices`}
-            title={`Has Role Set ITO Prices`}
+            title={t('CreateAsset.HasRoleITO')}
             type="checkbox"
-            toggleOptions={['No', 'Yes']}
+            toggleOptions={[
+              `${commonT('Statements.No')}`,
+              `${commonT('Statements.Yes')}`,
+            ]}
             tooltip={tooltip.roles.hasRoleSetITOPrices}
           />
         </FormSection>
       ))}
       <ButtonContainer type="button" onClick={() => append({})}>
-        Add Role
+        {t('CreateAsset.Add Role')}
       </ButtonContainer>
     </FormSection>
   );
 };
 
 const PropertiesSection: React.FC = () => {
+  const { t } = useTranslation('transactions');
+  const { t: commonT } = useTranslation('common');
   return (
     <FormSection>
       <SectionTitle>
-        <span>Properties</span>
+        <span>{t('CreateAsset.Properties')}</span>
         <TooltipContainer>
           <InfoIcon size={13} />
           <TooltipContent>
@@ -576,57 +612,78 @@ const PropertiesSection: React.FC = () => {
 
       <FormInput
         name="properties.canFreeze"
-        title="Freeze"
+        title={commonT('Properties.Freeze')}
         type="checkbox"
-        toggleOptions={['No', 'Yes']}
+        toggleOptions={[
+          `${commonT('Statements.No')}`,
+          `${commonT('Statements.Yes')}`,
+        ]}
         dynamicInitialValue={true}
         tooltip={tooltip.properties.canFreeze}
       />
       <FormInput
         name="properties.canWipe"
-        title="Wipe"
+        title={commonT('Properties.Wipe')}
         type="checkbox"
-        toggleOptions={['No', 'Yes']}
+        toggleOptions={[
+          `${commonT('Statements.No')}`,
+          `${commonT('Statements.Yes')}`,
+        ]}
         dynamicInitialValue={false}
         tooltip={tooltip.properties.canWipe}
       />
       <FormInput
         name="properties.canPause"
-        title="Pause"
+        title={commonT('Properties.Pause')}
         type="checkbox"
-        toggleOptions={['No', 'Yes']}
+        toggleOptions={[
+          `${commonT('Statements.No')}`,
+          `${commonT('Statements.Yes')}`,
+        ]}
         dynamicInitialValue={true}
         tooltip={tooltip.properties.canPause}
       />
       <FormInput
         name="properties.canMint"
-        title="Mint"
+        title={commonT('Properties.Mint')}
         type="checkbox"
-        toggleOptions={['No', 'Yes']}
+        toggleOptions={[
+          `${commonT('Statements.No')}`,
+          `${commonT('Statements.Yes')}`,
+        ]}
         dynamicInitialValue={true}
         tooltip={tooltip.properties.canMint}
       />
       <FormInput
         name="properties.canBurn"
-        title="Burn"
+        title={commonT('Properties.Burn')}
         type="checkbox"
-        toggleOptions={['No', 'Yes']}
+        toggleOptions={[
+          `${commonT('Statements.No')}`,
+          `${commonT('Statements.Yes')}`,
+        ]}
         dynamicInitialValue={true}
         tooltip={tooltip.properties.canBurn}
       />
       <FormInput
         name="properties.canChangeOwner"
-        title="Change Owner"
+        title={commonT('Properties.Change Owner')}
         type="checkbox"
-        toggleOptions={['No', 'Yes']}
+        toggleOptions={[
+          `${commonT('Statements.No')}`,
+          `${commonT('Statements.Yes')}`,
+        ]}
         dynamicInitialValue={true}
         tooltip={tooltip.properties.canChangeOwner}
       />
       <FormInput
         name="properties.canAddRoles"
-        title="Add Roles"
+        title={commonT('Properties.Add Roles')}
         type="checkbox"
-        toggleOptions={['No', 'Yes']}
+        toggleOptions={[
+          `${commonT('Statements.No')}`,
+          `${commonT('Statements.Yes')}`,
+        ]}
         dynamicInitialValue={true}
         tooltip={tooltip.properties.canAddRoles}
       />

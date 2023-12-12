@@ -1,4 +1,5 @@
 import { withdrawTypes } from '@/utils/contracts';
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -14,6 +15,7 @@ type FormData = {
 };
 
 const Withdraw: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+  const { t } = useTranslation('transactions');
   const { handleSubmit, watch } = useFormContext<FormData>();
   const withdrawType: number = watch('withdrawType');
 
@@ -26,7 +28,7 @@ const Withdraw: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
       <FormSection>
         <FormInput
           name="withdrawType"
-          title="Withdraw Type"
+          title={t('Withdraw.Withdraw Type')}
           type="dropdown"
           options={withdrawTypes}
           zIndex={3}
@@ -39,13 +41,13 @@ const Withdraw: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
             <FormSection>
               <FormInput
                 name="amount"
-                title="Amount"
+                title={t('Amount')}
                 type="number"
                 tooltip="Amount to be withdrawn from the pool"
               />
               <FormInput
                 name="currencyId" // although the doc says it is currencyID, using currencyId still works, changing it now will break many things
-                title="Currency ID"
+                title={t('Buy.Currency Id')}
                 tooltip="Asset to be withdrawn from the pool"
               />
             </FormSection>

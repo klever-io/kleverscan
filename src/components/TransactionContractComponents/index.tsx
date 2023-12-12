@@ -94,17 +94,17 @@ import {
   StrongWidth,
   URIsWrapper,
 } from '@/views/transactions/detail';
-import { useTranslation } from 'next-i18next';
+import { TFunction, useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useState } from 'react';
-import { TFunction } from 'react-i18next';
 import Tooltip from '../Tooltip';
 
-interface IAssetTriggerTypeData {
+type RenderAssetTriggerTypeDataProps = {
   parameter: IAssetTriggerContract;
   precision: number;
-  t: TFunction<'common', undefined>;
-}
+  t: TFunction;
+  commonT: TFunction;
+};
 
 const getNFTNonces = (
   filteredReceipts: IBuyReceipt[],
@@ -146,6 +146,7 @@ export const Transfer: React.FC<IIndexedContract> = ({
   filteredReceipts: rec,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as ITransferContract;
   const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
   const precision = usePrecision(assetID);
@@ -166,11 +167,11 @@ export const Transfer: React.FC<IIndexedContract> = ({
       return (
         <Row>
           <span>
-            <strong>Transfer</strong>
+            <strong>{t('Transfer.Transfer')}</strong>
             <br />
-            <strong>Percentage</strong>
+            <strong>{t('Transfer.Percentage')}</strong>
             <br />
-            <strong>Royalties</strong>
+            <strong>{t('Royalties')}</strong>
           </span>
           <span>
             {toLocaleFixed(
@@ -193,9 +194,9 @@ export const Transfer: React.FC<IIndexedContract> = ({
         return (
           <Row>
             <span>
-              <strong>Transfer Fixed</strong>
+              <strong> {t('Transfer.Transfer Fixed')}</strong>
               <br />
-              <strong>Royalties</strong>
+              <strong>{t('Royalties')}</strong>
             </span>
             <span>
               {toLocaleFixed(
@@ -220,19 +221,19 @@ export const Transfer: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Transfer</strong>
+        <strong>{t('Transfer.Transfer')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Asset Id</strong>
+          <strong>{t('AssetId')}</strong>
         </span>
         <span>{parameter?.assetId || 'KLV'}</span>
       </Row>
       <Row>
         <span>
-          <strong>Amount</strong>
+          <strong>{t('Amount')}</strong>
         </span>
         <CenteredRow>
           <strong>
@@ -261,7 +262,7 @@ export const Transfer: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>To</strong>
+          <strong>{t('To')}</strong>
         </span>
         <span>
           <CenteredRow>
@@ -276,7 +277,7 @@ export const Transfer: React.FC<IIndexedContract> = ({
       {hasTransferPercentageRoyalties && (
         <Row>
           <span>
-            <strong>Total paid</strong>
+            <strong>{t('Transfer.Total paid')}</strong>
           </span>
           <CenteredRow>
             <strong style={{ fontWeight: '600' }}>
@@ -302,7 +303,8 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
   contractIndex,
   renderMetadata,
 }) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('transactions');
+  const { t: commonT } = useTranslation('common');
   const parameter = par as ICreateAssetContract;
   const filteredReceipts = rec as ICreateAssetReceipt[];
   const ownerAddress = parameter?.ownerAddress || sender;
@@ -321,14 +323,14 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Create Asset</strong>
+        <strong>{t('CreateAsset.Create Asset')}</strong>
       </Row>
       {createAssetReceipt && (
         <Row>
           <span>
-            <strong>Asset ID</strong>
+            <strong>{t('AssetId')}</strong>
           </span>
           <Link href={`/asset/${createAssetReceipt?.assetId}`}>
             {createAssetReceipt?.assetId}
@@ -337,13 +339,13 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
       )}
       <Row>
         <span>
-          <strong>Name</strong>
+          <strong>{t('CreateAsset.Name')}</strong>
         </span>
         <span>{parameter.name}</span>
       </Row>
       <Row>
         <span>
-          <strong>Owner</strong>
+          <strong>{t('CreateAsset.Owner')}</strong>
         </span>
         <span>
           <CenteredRow>
@@ -354,13 +356,13 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Ticker</strong>
+          <strong>{t('CreateAsset.Ticker')}</strong>
         </span>
         <span>{parameter.ticker}</span>
       </Row>
       <Row>
         <span>
-          <strong>Precision</strong>
+          <strong>{t('Precision')}</strong>
         </span>
         <span>
           <p>{parameter.precision}</p>
@@ -368,7 +370,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Initial Supply</strong>
+          <strong>{t('CreateAsset.Initial Supply')}</strong>
         </span>
         <span>
           <small>
@@ -381,7 +383,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Max Supply</strong>
+          <strong>{t('CreateAsset.Max Supply')}</strong>
         </span>
         <span>
           <small>
@@ -396,7 +398,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
         <ExpandRow expandVar={expand.royalties}>
           <ExpandWrapper expandVar={expand.royalties}>
             <span style={{ minWidth: '10rem' }}>
-              <strong>Royalties</strong>
+              <strong>{t('Royalties')}</strong>
             </span>
             <span>
               <ButtonExpand
@@ -407,14 +409,16 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
                   })
                 }
               >
-                {expand?.royalties ? 'Hide' : 'Expand'}
+                {expand?.royalties
+                  ? `${commonT('Buttons.Hide')}`
+                  : `${commonT('Buttons.Expand')}`}
               </ButtonExpand>
             </span>
           </ExpandWrapper>
           {expand?.royalties && (
             <Panel>
               <CenteredRow>
-                <strong>Address:&nbsp;</strong>
+                <strong>{t('Address')}:&nbsp;</strong>
                 <Link href={`/account/${parameter.royalties?.address}`}>
                   {parameter.royalties?.address}
                 </Link>
@@ -422,26 +426,31 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
               </CenteredRow>
               {parameter.royalties?.transferFixed && (
                 <span>
-                  <strong>Transfer Fixed:&nbsp;</strong>
+                  <strong>{t('Transfer.Transfer Fixed')}:&nbsp;</strong>
                   {parameter?.royalties?.transferFixed / 1000000} KLV
                 </span>
               )}
               {parameter?.royalties?.marketFixed && (
                 <span>
-                  <strong>Market Fixed:&nbsp;</strong>
+                  <strong>{t('CreateAsset.Market Fixed')}:&nbsp;</strong>
                   {parameter?.royalties?.marketFixed / 1000000} KLV
                 </span>
               )}
               {parameter?.royalties?.marketPercentage && (
                 <span>
-                  <strong>Market Percent:&nbsp;</strong>
+                  <strong>{t('CreateAsset.Market Percent')}:&nbsp;</strong>
                   {parameter?.royalties?.marketPercentage / 100}%
                 </span>
               )}
               <CenteredRow>
                 {parameter?.royalties?.itoFixed && (
                   <>
-                    <strong>ITO Fixed:&nbsp;</strong>
+                    <strong>
+                      {t('CreateAsset.ITO', {
+                        type: `${t('CreateAsset.Fixed')}`,
+                      })}
+                      :&nbsp;
+                    </strong>
                     <span>{parameter?.royalties?.itoFixed / 1000000} KLV</span>
                   </>
                 )}
@@ -449,20 +458,31 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
               <CenteredRow>
                 {parameter?.royalties?.itoPercentage && (
                   <>
-                    <strong>ITO Percentage:&nbsp;</strong>
+                    <strong>
+                      {t('CreateAsset.ITO', {
+                        type: `${t('Transfer.Percentage')}`,
+                      })}
+                      :&nbsp;
+                    </strong>
                     <span>{parameter?.royalties?.itoPercentage / 100}%</span>
                   </>
                 )}
               </CenteredRow>
               {parameter?.royalties?.transferPercentage && (
                 <RoyaltiesTransferPercentage>
-                  <strong>Transfer Percentage:&nbsp;</strong>
+                  <strong>{t('CreateAsset.Transfer Percentage')}:&nbsp;</strong>
                   <div>
                     {parameter?.royalties?.transferPercentage.map(
                       (data, index) => (
                         <span key={index}>
-                          <p>Amount: {data.amount}</p>
-                          <p>Percentage: {data.percentage / 100}%</p>
+                          <p>
+                            {' '}
+                            {t('Amount')}: {data.amount}
+                          </p>
+                          <p>
+                            {' '}
+                            {t('Transfer.Percentage')}: {data.percentage / 100}%
+                          </p>
                         </span>
                       ),
                     )}
@@ -477,7 +497,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
         <ExpandRow expandVar={expand.staking}>
           <ExpandWrapper expandVar={expand.staking}>
             <span style={{ minWidth: '10rem' }}>
-              <strong>Staking</strong>
+              <strong>{t('CreateAsset.Staking')}</strong>
             </span>
             <span>
               <ButtonExpand
@@ -488,7 +508,9 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
                   })
                 }
               >
-                {expand?.staking ? 'Hide' : 'Expand'}
+                {expand?.staking
+                  ? `${commonT('Buttons.Hide')}`
+                  : `${commonT('Buttons.Expand')}`}
               </ButtonExpand>
             </span>
           </ExpandWrapper>
@@ -496,7 +518,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
           {expand?.staking && (
             <Panel>
               <span>
-                <strong>Type:&nbsp;</strong>
+                <strong>{t('Type')}:&nbsp;</strong>
                 {parameter?.staking?.type}
               </span>
               <span>
@@ -504,15 +526,15 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
                 {parameter?.staking?.apr / 100 || 0}%
               </span>
               <span>
-                <strong>Claim Type&nbsp;</strong>
+                <strong>{t('CreateAsset.Claim Type')}&nbsp;</strong>
                 {parameter?.staking?.minEpochsToClaim || 0} Epoch(s)
               </span>{' '}
               <span>
-                <strong>Unstake Time:&nbsp;</strong>
+                <strong>{t('CreateAsset.Unstake Time')}:&nbsp;</strong>
                 {parameter?.staking?.minEpochsToUnstake || 0} Epoch(s)
               </span>{' '}
               <span>
-                <strong>Withdraw Time:&nbsp;</strong>
+                <strong>{t('CreateAsset.Withdraw Time')}:&nbsp;</strong>
                 {parameter?.staking?.minEpochsToWithdraw || 0} Epoch(s)
               </span>
             </Panel>
@@ -524,7 +546,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
         <ExpandRow expandVar={expand.properties}>
           <ExpandWrapper expandVar={expand.properties}>
             <span style={{ minWidth: '10rem' }}>
-              <strong>Properties</strong>
+              <strong>{t('CreateAsset.Properties')}</strong>
             </span>
             <span>
               <ButtonExpand
@@ -535,7 +557,9 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
                   })
                 }
               >
-                {expand?.properties ? 'Hide' : 'Expand'}
+                {expand?.properties
+                  ? `${commonT('Buttons.Hide')}`
+                  : `${commonT('Buttons.Expand')}`}
               </ButtonExpand>
             </span>
           </ExpandWrapper>
@@ -544,64 +568,93 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
               <PropertiesWrapper>
                 <div>
                   <StatusIconWrapper>
-                    <strong>Can Freeze:&nbsp;</strong>
+                    <strong>
+                      {commonT('Properties.Can', {
+                        type: `${commonT('Properties.Freeze')}`,
+                      })}
+                      :&nbsp;
+                    </strong>
                     <span>
                       {statusWithIcon(
                         parameter?.properties?.canFreeze ? true : false,
-                        t,
+                        commonT,
                       )}
                     </span>
                   </StatusIconWrapper>
                   <StatusIconWrapper>
-                    <strong>Can Mint:&nbsp;</strong>
+                    <strong>
+                      {' '}
+                      {commonT('Properties.Can', {
+                        type: `${commonT('Properties.Mint')}`,
+                      })}
+                      :&nbsp;
+                    </strong>
                     <span>
                       {statusWithIcon(
                         parameter?.properties?.canMint ? true : false,
-                        t,
+                        commonT,
                       )}
                     </span>
                   </StatusIconWrapper>
                   <StatusIconWrapper>
-                    <strong>Can Burn:&nbsp;</strong>
+                    <strong>
+                      {' '}
+                      {commonT('Properties.Can', {
+                        type: `${commonT('Properties.Burn')}`,
+                      })}
+                      :&nbsp;
+                    </strong>
                     <span>
                       {statusWithIcon(
                         parameter?.properties?.canBurn ? true : false,
-                        t,
+                        commonT,
                       )}
                     </span>
                   </StatusIconWrapper>
                   <StatusIconWrapper>
-                    <strong>Can Pause:&nbsp;</strong>
+                    <strong>
+                      {' '}
+                      {commonT('Properties.Can', {
+                        type: `${commonT('Properties.Pause')}`,
+                      })}
+                      :&nbsp;
+                    </strong>
                     <span>
                       {statusWithIcon(
                         parameter?.properties?.canPause ? true : false,
-                        t,
+                        commonT,
                       )}
                     </span>
                   </StatusIconWrapper>
                 </div>
                 <div>
                   <StatusIconWrapper>
-                    <strong>Can Wipe:&nbsp;</strong>
+                    <strong>
+                      {' '}
+                      {commonT('Properties.Can', {
+                        type: `${commonT('Properties.Wipe')}`,
+                      })}
+                      :&nbsp;
+                    </strong>
                     <span>
                       {statusWithIcon(
                         parameter?.properties?.canWipe ? true : false,
-                        t,
+                        commonT,
                       )}
                     </span>
                   </StatusIconWrapper>
                   <StatusIconWrapper>
-                    <strong>Change Owner:&nbsp;</strong>
+                    <strong>{commonT('Properties.Change Owner')}:&nbsp;</strong>
                     {statusWithIcon(
                       parameter?.properties?.canChangeOwner ? true : false,
-                      t,
+                      commonT,
                     )}
                   </StatusIconWrapper>
                   <StatusIconWrapper>
-                    <strong>Add Roles:&nbsp;</strong>
+                    <strong>{commonT('Properties.Add Roles')}:&nbsp;</strong>
                     {statusWithIcon(
                       parameter?.properties?.canAddRoles ? true : false,
-                      t,
+                      commonT,
                     )}
                   </StatusIconWrapper>
                 </div>
@@ -614,7 +667,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
       <ExpandRow expandVar={expand.attributes}>
         <ExpandWrapper expandVar={expand.attributes}>
           <span style={{ minWidth: '10rem' }}>
-            <strong>Attributes</strong>
+            <strong>{t('CreateAsset.Attributes')}</strong>
           </span>
           <span>
             <ButtonExpand
@@ -625,7 +678,9 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
                 })
               }
             >
-              {expand?.attributes ? 'Hide' : 'Expand'}
+              {expand?.attributes
+                ? `${commonT('Buttons.Hide')}`
+                : `${commonT('Buttons.Expand')}`}
             </ButtonExpand>
           </span>
         </ExpandWrapper>
@@ -633,34 +688,34 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
         {expand?.attributes && (
           <Panel>
             <StatusIconWrapper>
-              <strong>Is Paused:&nbsp;</strong>
+              <strong>{t('CreateAsset.Is Paused')}:&nbsp;</strong>
               <span>
                 {statusWithIcon(
                   parameter?.attributes?.isPaused ? true : false,
-                  t,
+                  commonT,
                 )}
               </span>
             </StatusIconWrapper>
             <StatusIconWrapper>
-              <strong>Can Mint NFT:&nbsp;</strong>
+              <strong> {t('CreateAsset.Can Mint NFT')}:&nbsp;</strong>
               <span>
                 {statusWithIcon(
                   parameter?.attributes?.isNFTMintStopped ? true : false,
-                  t,
+                  commonT,
                 )}
               </span>
             </StatusIconWrapper>
             <StatusIconWrapper>
               <RoyaltiesChangeWrapper>
-                <strong>Royalties</strong>
-                <strong>Change Stopped:</strong>
+                <strong>{t('Royalties')}</strong>
+                <strong>{t('CreateAsset.Change Stopped')}:</strong>
               </RoyaltiesChangeWrapper>
               <span>
                 {statusWithIcon(
                   parameter?.attributes?.isRoyaltiesChangeStopped
                     ? true
                     : false,
-                  t,
+                  commonT,
                 )}
               </span>
             </StatusIconWrapper>
@@ -677,6 +732,7 @@ export const CreateValidator: React.FC<IIndexedContract> = ({
   parameter: par,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as ICreateValidatorContract;
   const ownerAddress = parameter?.ownerAddress || sender;
 
@@ -685,13 +741,13 @@ export const CreateValidator: React.FC<IIndexedContract> = ({
       {' '}
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Create Validator</strong>
+        <strong>{t('CreateValidator.Create Validator')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Name</strong>
+          <strong>{t('CreateAsset.Name')}</strong>
         </span>
         <span>
           <p>{parameter?.config?.name}</p>
@@ -699,7 +755,7 @@ export const CreateValidator: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Owner</strong>
+          <strong>{t('CreateAsset.Owner')}</strong>
         </span>
         <span>
           <Link href={`/account/${ownerAddress}`}>{ownerAddress}</Link>
@@ -708,7 +764,7 @@ export const CreateValidator: React.FC<IIndexedContract> = ({
       {parameter?.config?.logo && (
         <Row>
           <span>
-            <strong>Logo</strong>
+            <strong>{t('CreateValidator.Logo')}</strong>
           </span>
           <span>
             <CenteredRow>
@@ -720,7 +776,7 @@ export const CreateValidator: React.FC<IIndexedContract> = ({
       )}
       <Row>
         <span>
-          <strong>Can Delegate</strong>
+          <strong>{t('CreateValidator.Can Delegate')}</strong>
         </span>
         <span>
           <p>{parameter?.config?.canDelegate ? 'True' : 'False'}</p>
@@ -728,7 +784,7 @@ export const CreateValidator: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Commission</strong>
+          <strong>{t('CreateValidator.Commission')}</strong>
         </span>
         <span>
           <small>{parameter?.config?.commission / 100}%</small>
@@ -736,7 +792,7 @@ export const CreateValidator: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Max Delegation</strong>
+          <strong>{t('CreateValidator.Max Delegation')}</strong>
         </span>
         <span>
           <small>
@@ -746,7 +802,7 @@ export const CreateValidator: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Reward Address</strong>
+          <strong>{t('CreateValidator.Reward Address')}</strong>
         </span>
         <span>
           <CenteredRow>
@@ -766,7 +822,8 @@ export const ValidatorConfig: React.FC<IIndexedContract> = ({
   parameter: par,
   renderMetadata,
 }) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('transactions');
+  const { t: commonT } = useTranslation('common');
   const param = par as unknown as IValidatorConfigContract;
   const parameter = param.config;
 
@@ -774,13 +831,13 @@ export const ValidatorConfig: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Validator Config</strong>
+        <strong>{t('ValidatorConfig.Validator Config')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>BLS Public Key</strong>
+          <strong>{t('ValidatorConfig.BLS Public Key')}</strong>
         </span>
         <CenteredRow>
           <span>{parameter?.blsPublicKey}</span>
@@ -789,27 +846,27 @@ export const ValidatorConfig: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Name</strong>
+          <strong>{t('CreateAsset.Name')}</strong>
         </span>
         <span>{parameter?.name || '--'}</span>
       </Row>
       {typeof parameter?.canDelegate === 'boolean' && (
         <Row>
           <span>
-            <strong>Can Delegate</strong>
+            <strong>{t('CreateValidator.Can Delegate')}</strong>
           </span>
-          <span>{statusWithIcon(parameter?.canDelegate, t)}</span>{' '}
+          <span>{statusWithIcon(parameter?.canDelegate, commonT)}</span>{' '}
         </Row>
       )}
       <Row>
         <span>
-          <strong>Commission</strong>
+          <strong>{t('CreateValidator.Commission')}</strong>
         </span>
         <span>{parameter?.commission / 100}%</span>
       </Row>
       <Row>
         <span>
-          <strong>Max Delegation</strong>
+          <strong>{t('CreateValidator.Max Delegation')}</strong>
         </span>
         <span>
           {toLocaleFixed(parameter?.maxDelegationAmount / 1000000, 6)}
@@ -817,7 +874,7 @@ export const ValidatorConfig: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Reward Address</strong>
+          <strong>{t('CreateValidator.Reward Address')}</strong>
         </span>
         <span>
           <CenteredRow>
@@ -828,7 +885,7 @@ export const ValidatorConfig: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Logo</strong>
+          <strong>{t('CreateValidator.Logo')}</strong>
         </span>
         <span>
           {parameter.logo ? (
@@ -883,6 +940,7 @@ export const Freeze: React.FC<IIndexedContract> = ({
   filteredReceipts: rec,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as IFreezeContract;
   const filteredReceipts = rec as IFreezeReceipt[];
   const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
@@ -895,13 +953,13 @@ export const Freeze: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Freeze</strong>
+        <strong>{t('FreezeUnfreeze.Freeze')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Asset Id</strong>
+          <strong>{t('AssetId')}</strong>
         </span>
         <span>
           <small>{parameter?.assetId || 'KLV'}</small>
@@ -909,7 +967,7 @@ export const Freeze: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Amount</strong>
+          <strong>{t('Amount')}</strong>
         </span>
         <span>
           <small>
@@ -920,7 +978,7 @@ export const Freeze: React.FC<IIndexedContract> = ({
       {freezeReceipt && (
         <Row>
           <span>
-            <strong>Bucket Id</strong>
+            <strong>{t('FreezeUnfreeze.Bucket Id')}</strong>
           </span>
           <span>{freezeReceipt?.bucketId}</span>
         </Row>
@@ -936,6 +994,7 @@ export const Unfreeze: React.FC<IIndexedContract> = ({
   filteredReceipts: rec,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as IUnfreezeContract;
   const filteredReceipts = rec as IUnfreezeReceipt[];
   const claimReceipt = findReceipt(filteredReceipts, 17) as
@@ -953,19 +1012,19 @@ export const Unfreeze: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Unfreeze</strong>
+        <strong>{t('FreezeUnfreeze.Unfreeze')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Asset Id</strong>
+          <strong>{t('AssetId')}</strong>
         </span>
         <span>{parameter?.assetId || 'KLV'}</span>
       </Row>
       <Row>
         <span>
-          <strong>Bucket Id</strong>
+          <strong>{t('FreezeUnfreeze.Bucket Id')}</strong>
         </span>
         <span>
           <CenteredRow>
@@ -977,7 +1036,7 @@ export const Unfreeze: React.FC<IIndexedContract> = ({
       {unfreezeReceipt && (
         <Row>
           <span>
-            <strong>Available Epoch</strong>
+            <strong>{t('FreezeUnfreeze.Available Epoch')}</strong>
           </span>
           <span>{unfreezeReceipt?.availableEpoch}</span>
         </Row>
@@ -985,7 +1044,7 @@ export const Unfreeze: React.FC<IIndexedContract> = ({
       {unfreezeReceipt && (
         <Row>
           <span>
-            <strong>Amount</strong>
+            <strong>{t('Amount')}</strong>
           </span>
           <span>
             {toLocaleFixed(
@@ -999,7 +1058,7 @@ export const Unfreeze: React.FC<IIndexedContract> = ({
       {claimReceipt && (
         <Row>
           <span>
-            <strong>Claimed Rewards</strong>
+            <strong>{t('FreezeUnfreeze.Claimed Rewards')}</strong>
           </span>
           <span>
             {claimReceipt.amount / 10 ** precision[claimPrecision]}{' '}
@@ -1009,7 +1068,7 @@ export const Unfreeze: React.FC<IIndexedContract> = ({
       )}
       <Row>
         <span>
-          <strong>Undelegated?</strong>
+          <strong>{t('FreezeUnfreeze.Undelegated')}?</strong>
         </span>
         <span>{undelegateReceipt ? 'True' : 'False'}</span>
       </Row>
@@ -1023,6 +1082,7 @@ export const Delegate: React.FC<IIndexedContract> = ({
   contractIndex,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as IDelegateContract;
   const delegateReceipt = findReceipt(filteredReceipts, 7) as
     | IDelegateReceipt
@@ -1038,13 +1098,13 @@ export const Delegate: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Delegate</strong>
+        <strong>{t('DelegateUndelegate.Delegate')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Bucket ID</strong>
+          <strong>{t('FreezeUnfreeze.Bucket ID')}</strong>
         </span>
         <span>
           <CenteredRow>
@@ -1055,7 +1115,7 @@ export const Delegate: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>To</strong>
+          <strong>{t('To')}</strong>
         </span>
         <span>
           <CenteredRow>
@@ -1069,7 +1129,7 @@ export const Delegate: React.FC<IIndexedContract> = ({
       {delegateReceipt && (
         <Row>
           <span>
-            <strong>Amount Delegated</strong>
+            <strong>{t('DelegateUndelegate.Amount Delegated')}</strong>
           </span>
           <span>
             <CenteredRow>
@@ -1086,7 +1146,7 @@ export const Delegate: React.FC<IIndexedContract> = ({
       {claimReceipt && (
         <Row>
           <span>
-            <strong>Rewards Claimed</strong>
+            <strong>{t('DelegateUndelegate.Rewards Claimed')}</strong>
           </span>
           <span>
             <CenteredRow>
@@ -1109,13 +1169,13 @@ export const Delegate: React.FC<IIndexedContract> = ({
         <>
           <Row>
             <span>
-              <strong>MarketPlace ID</strong>
+              <strong>{t('DelegateUndelegate.Marketplace ID')}</strong>
             </span>
             <span>{claimReceipt.marketplaceId || '--'}</span>
           </Row>
           <Row>
             <span>
-              <strong>OrderId</strong>
+              <strong>{t('DelegateUndelegate.OrderId')}</strong>
             </span>
             <span>{claimReceipt.orderId || '--'}</span>
           </Row>
@@ -1132,6 +1192,7 @@ export const Undelegate: React.FC<IIndexedContract> = ({
   contractIndex,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as IUndelegateContract;
   const undelegateReceipt = findReceipt(filteredReceipts, 7) as
     | IDelegateReceipt
@@ -1148,13 +1209,13 @@ export const Undelegate: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Undelegate</strong>
+        <strong>{t('DelegateUndelegate.Undelegate')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Bucket ID</strong>
+          <strong>{t('FreezeUnfreeze.Bucket ID')}</strong>
         </span>
         <span>
           <CenteredRow>
@@ -1166,7 +1227,7 @@ export const Undelegate: React.FC<IIndexedContract> = ({
       {undelegateReceipt && (
         <Row>
           <span>
-            <strong>Amount</strong>
+            <strong>{t('Amount')}</strong>
           </span>
           <span>
             {toLocaleFixed(
@@ -1179,7 +1240,7 @@ export const Undelegate: React.FC<IIndexedContract> = ({
       {claimReceipt && (
         <Row>
           <span>
-            <strong>Rewards Claimed</strong>
+            <strong>{t('DelegateUndelegate.Rewards Claimed')}</strong>
           </span>
           <span>
             <CenteredRow>
@@ -1198,20 +1259,20 @@ export const Undelegate: React.FC<IIndexedContract> = ({
       <>
         <Row>
           <span>
-            <strong>AssetID Received</strong>
+            <strong>{t('DelegateUndelegate.AssetID Received')}</strong>
           </span>
           <span>{claimReceipt?.assetIdReceived || '--'}</span>
         </Row>
         <Row>
           <span>
-            <strong>AssetID</strong>
+            <strong>{t('AssetId')}</strong>
           </span>
           <span>{claimReceipt?.assetId || '--'}</span>
         </Row>
         {claimReceipt?.marketplaceId && (
           <Row>
             <span>
-              <strong>MarketPlace ID</strong>
+              <strong>{t('DelegateUndelegate.Marketplace ID')}</strong>
             </span>
             <span>{claimReceipt.marketplaceId || '--'}</span>
           </Row>
@@ -1219,7 +1280,7 @@ export const Undelegate: React.FC<IIndexedContract> = ({
         {claimReceipt?.orderId && (
           <Row>
             <span>
-              <strong>OrderId</strong>
+              <strong>{t('DelegateUndelegate.OrderId')}</strong>
             </span>
             <span>{claimReceipt.orderId || '--'}</span>
           </Row>
@@ -1236,8 +1297,8 @@ export const Withdraw: React.FC<IIndexedContract> = ({
   contractIndex,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as IWithdrawContract;
-
   const claimReceipt = findReceipt(filteredReceipts, 17) as
     | IClaimReceipt
     | undefined;
@@ -1250,14 +1311,14 @@ export const Withdraw: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Withdraw</strong>
+        <strong>{t('Withdraw.Withdraw')}</strong>
       </Row>
       {filteredReceipts?.length === 0 && (
         <Row>
           <span>
-            <strong>Asset Id</strong>
+            <strong>{t('AssetId')}</strong>
           </span>
           <span>{parameter?.assetId}</span>
         </Row>
@@ -1265,7 +1326,7 @@ export const Withdraw: React.FC<IIndexedContract> = ({
 
       <Row>
         <span>
-          <strong>Amount</strong>
+          <strong>{t('Amount')}</strong>
         </span>
         <span>
           {toLocaleFixed(
@@ -1278,14 +1339,14 @@ export const Withdraw: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Withdraw Type</strong>
+          <strong>{t('Withdraw.Withdraw Type')}</strong>
         </span>
         <span>{parameter.withdrawType || '--'}</span>
       </Row>
       {claimReceipt && (
         <Row>
           <span>
-            <strong>Rewards Claimed</strong>
+            <strong>{t('DelegateUndelegate.Rewards Claimed')}</strong>
           </span>
           <span>
             <CenteredRow>
@@ -1304,20 +1365,20 @@ export const Withdraw: React.FC<IIndexedContract> = ({
       <>
         <Row>
           <span>
-            <strong>AssetID Received</strong>
+            <strong>{t('DelegateUndelegate.AssetID Received')}</strong>
           </span>
           <span>{claimReceipt?.assetIdReceived || '--'}</span>
         </Row>
         <Row>
           <span>
-            <strong>AssetID</strong>
+            <strong>{t('AssetId')}</strong>
           </span>
           <span>{claimReceipt?.assetId || '--'}</span>
         </Row>
         {claimReceipt?.marketplaceId && (
           <Row>
             <span>
-              <strong>MarketPlace ID</strong>
+              <strong>{t('DelegateUndelegate.MarketPlace ID')}</strong>
             </span>
             <span>{claimReceipt.marketplaceId || '--'}</span>
           </Row>
@@ -1325,7 +1386,7 @@ export const Withdraw: React.FC<IIndexedContract> = ({
         {claimReceipt?.orderId && (
           <Row>
             <span>
-              <strong>OrderId</strong>
+              <strong>{t('DelegateUndelegate.OrderId')}</strong>
             </span>
             <span>{claimReceipt.orderId || '--'}</span>
           </Row>
@@ -1341,6 +1402,7 @@ export const Claim: React.FC<IIndexedContract> = ({
   filteredReceipts,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as IClaimContract;
   const claimReceipt = findReceipt(filteredReceipts, 17) as
     | IClaimReceipt
@@ -1351,20 +1413,20 @@ export const Claim: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Claim</strong>
+        <strong>{t('Claim.Claim')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Claim Type</strong>
+          <strong>{t('CreateAsset.Claim Type')}</strong>
         </span>
         <span>{parameter?.claimType}</span>
       </Row>
       {claimReceipt && (
         <Row>
           <span>
-            <strong>Asset Id</strong>
+            <strong>{t('AssetId')}</strong>
           </span>
           <span>{claimReceipt?.assetId}</span>
         </Row>
@@ -1372,7 +1434,7 @@ export const Claim: React.FC<IIndexedContract> = ({
       {claimReceipt && typeof claimReceipt?.amount === 'number' && (
         <Row>
           <span>
-            <strong>Amount</strong>
+            <strong>{t('Amount')}</strong>
           </span>
           <span>
             {toLocaleFixed(claimReceipt?.amount / 10 ** precision, precision)}{' '}
@@ -1383,14 +1445,14 @@ export const Claim: React.FC<IIndexedContract> = ({
       <>
         <Row>
           <span>
-            <strong>Asset Id Received</strong>
+            <strong>{t('Claim.Asset Id Received')}</strong>
           </span>
           <span>{claimReceipt?.assetIdReceived || '--'}</span>
         </Row>
         {claimReceipt?.marketplaceId && (
           <Row>
             <span>
-              <strong>MarketPlace ID</strong>
+              <strong>{t('DelegateUndelegate.MarketPlace ID')}</strong>
             </span>
             <span>{claimReceipt.marketplaceId || '--'}</span>
           </Row>
@@ -1398,7 +1460,7 @@ export const Claim: React.FC<IIndexedContract> = ({
         {claimReceipt?.orderId && (
           <Row>
             <span>
-              <strong>OrderId</strong>
+              <strong>{t('DelegateUndelegate.OrderId')}</strong>
             </span>
             <span>{claimReceipt.orderId || '--'}</span>
           </Row>
@@ -1409,13 +1471,14 @@ export const Claim: React.FC<IIndexedContract> = ({
 };
 
 export const Unjail: React.FC<IIndexedContract> = ({ renderMetadata }) => {
+  const { t } = useTranslation('transactions');
   return (
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Unjail</strong>
+        <strong>{t('Unjail')}</strong>
       </Row>
       {renderMetadata()}
     </>
@@ -1428,7 +1491,8 @@ export const AssetTrigger: React.FC<IIndexedContract> = ({
   filteredReceipts: rec,
   sender,
 }) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('transactions');
+  const { t: commonT } = useTranslation('common');
   const parameter = par as IAssetTriggerContract;
   const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
   const precision = usePrecision(assetID);
@@ -1439,31 +1503,31 @@ export const AssetTrigger: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Asset Trigger</strong>
+        <strong>{t('AssetTrigger.Asset Trigger')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Trigger Type</strong>
+          <strong>{t('AssetTrigger.Trigger Type')}</strong>
         </span>
         <span>{parameter?.triggerType}</span>
       </Row>
       <Row>
         <span>
-          <strong>Asset ID</strong>
+          <strong>{t('AssetId')}</strong>
         </span>
         <span>{parameter?.assetId}</span>
       </Row>
       {!!noncesReceipts.length && (
         <Row>
           <span>
-            <strong>NFTs Nonces</strong>
+            <strong>{t('AssetTrigger.NFTs Nonces')}</strong>
           </span>
           {renderNFTNonces(noncesReceipts)}
         </Row>
       )}
-      {renderAssetTriggerTypeData({ parameter, precision, t })}
+      {renderAssetTriggerTypeData({ parameter, precision, t, commonT })}
       {renderMetadata()}
     </>
   );
@@ -1473,19 +1537,20 @@ export const SetAccountName: React.FC<IIndexedContract> = ({
   parameter: par,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as ISetAccountNameContract;
 
   return (
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Set Account Name</strong>
+        <strong>{t('SetAccountName')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Name</strong>
+          <strong>{t('Name')}</strong>
         </span>
         <span>{parameter?.name}</span>
       </Row>
@@ -1500,6 +1565,7 @@ export const Proposal: React.FC<IIndexedContract> = ({
   contractIndex,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as IProposalContract;
   const parameters = getProposalNetworkParams(parameter?.parameters);
 
@@ -1510,33 +1576,33 @@ export const Proposal: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Proposal</strong>
+        <strong>{t('Proposal.Proposal')}</strong>
       </Row>
       {proposalReceipt && (
         <Row>
           <span>
-            <strong>Proposal Id</strong>
+            <strong>{t('Proposal.Proposal Id')}</strong>
           </span>
           <span>{proposalReceipt?.proposalId}</span>
         </Row>
       )}
       <Row>
         <span>
-          <strong>Epoch Duration</strong>
+          <strong>{t('Proposal.Epoch Duration')}</strong>
         </span>
         <span>{parameter?.epochsDuration}</span>
       </Row>
       <Row>
         <span>
-          <strong>Description</strong>
+          <strong>{t('Proposal.Description')}</strong>
         </span>
         <BigSpan>{parameter?.description}</BigSpan>
       </Row>
       <Row>
         <span>
-          <strong>Parameters</strong>
+          <strong>{t('Proposal.Parameters')}</strong>
         </span>
         <RowContent>
           <BalanceContainer>
@@ -1560,31 +1626,32 @@ export const Vote: React.FC<IIndexedContract> = ({
   parameter: par,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as IVoteContract;
 
   return (
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Vote</strong>
+        <strong>{t('Vote')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Proposal Id</strong>
+          <strong>{t('Proposal.Proposal Id')}</strong>
         </span>
         <span>{parameter?.proposalId}</span>
       </Row>
       <Row>
         <span>
-          <strong>Amount</strong>
+          <strong>{t('Amount')}</strong>
         </span>
         <span>{(parameter.amount / 1000000).toLocaleString()}</span>
       </Row>
       <Row>
         <span>
-          <strong>Vote</strong>
+          <strong>{t('Vote')}</strong>
         </span>
         <span>{parameter?.type}</span>
       </Row>
@@ -1597,6 +1664,7 @@ export const ConfigITO: React.FC<IIndexedContract> = ({
   parameter: par,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as IConfigITOContract;
   const assetId = parameter?.assetId?.split('/')[0] || 'KLV';
   const precision = usePrecision(assetId);
@@ -1608,13 +1676,13 @@ export const ConfigITO: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Config ITO</strong>
+        <strong>{t('ConfigITO.Config ITO')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Receiver</strong>
+          <strong>{t('ConfigITO.Receiver')}</strong>
         </span>
         <CenteredRow>
           <Link href={`/account/${parameter?.receiverAddress}`}>
@@ -1625,20 +1693,20 @@ export const ConfigITO: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Asset Id</strong>
+          <strong>{t('AssetId')}</strong>
         </span>
         <span>{parameter?.assetId}</span>
       </Row>
       <Row>
         <span>
-          <strong>Status</strong>
+          <strong>{t('ConfigITO.Status')}</strong>
         </span>
         <span>{parameter?.status}</span>
       </Row>
       {parameter?.maxAmount && (
         <Row>
           <span>
-            <strong>Max Amount</strong>
+            <strong>{t('ConfigITO.Max Amount')}</strong>
           </span>
           <span>
             {toLocaleFixed(parameter?.maxAmount / 10 ** precision, precision)}
@@ -1651,6 +1719,7 @@ export const ConfigITO: React.FC<IIndexedContract> = ({
           parameter,
           precision,
           packsPrecision,
+          t,
           renderPackPrecision,
         )}
       {renderMetadata()}
@@ -1662,6 +1731,7 @@ export const SetITOPrices: React.FC<IIndexedContract> = ({
   parameter: par,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as ISetITOPricesContract;
   const assetId = parameter?.assetId?.split('/')[0] || 'KLV';
   const precision = usePrecision(assetId);
@@ -1673,13 +1743,13 @@ export const SetITOPrices: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Set ITO Prices</strong>
+        <strong>{t('SetITOPrices.Set ITO Prices')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Asset Id</strong>
+          <strong>{t('AssetId')}</strong>
         </span>
         <span>{assetId}</span>
       </Row>
@@ -1688,6 +1758,7 @@ export const SetITOPrices: React.FC<IIndexedContract> = ({
           parameter,
           precision,
           packsPrecision,
+          t,
           renderPackPrecision,
         )}
       {renderMetadata()}
@@ -1702,6 +1773,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
   contractIndex,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as IBuyContractPayload;
   const filteredReceipts = rec as IBuyReceipt[];
   const buyType = parameter?.buyType;
@@ -1792,7 +1864,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
         {status && (
           <Row>
             <span>
-              <strong>Status</strong>
+              <strong>{t('ConfigITO.Status')}</strong>
             </span>
             <span>{status}</span>
           </Row>
@@ -1800,7 +1872,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
         {price && (
           <Row>
             <span>
-              <strong>Price</strong>
+              <strong>{t('Buy.Price')}</strong>
             </span>
             <span>
               {price} {currencyId}
@@ -1810,7 +1882,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
         {amount && (
           <Row>
             <span>
-              <strong>Amount</strong>
+              <strong>{t('Amount')}</strong>
             </span>
             <span>
               {amount} {assetId}
@@ -1819,7 +1891,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
         )}
         <Row>
           <span>
-            <strong>Currency Id</strong>
+            <strong>{t('Buy.Currency Id')}</strong>
           </span>
           <span>{currencyId}</span>
         </Row>
@@ -1827,7 +1899,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
           {assetId && (
             <Row>
               <span>
-                <strong>Asset Id</strong>
+                <strong>{t('AssetId')}</strong>
               </span>
               <span>{assetId}</span>
             </Row>
@@ -1835,7 +1907,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
           {orderId && (
             <Row>
               <span>
-                <strong>Order Id</strong>
+                <strong>{t('Buy.Order Id')}</strong>
               </span>
               <span>{orderId}</span>
             </Row>
@@ -1843,7 +1915,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
           {marketplaceId && (
             <Row>
               <span>
-                <strong>Marketplace Id</strong>
+                <strong>{t('DelegateUndelegate.Marketplace ID')}</strong>
               </span>
               <span>{marketplaceId}</span>
             </Row>
@@ -1883,9 +1955,12 @@ export const Buy: React.FC<IContractBuyProps> = ({
         return (
           <Row key={key}>
             <span>
-              <strong>Total paid</strong>
+              <strong>{t('Transfer.Total paid')}</strong>
               <br />
-              <strong>in {key}</strong>
+              <strong>
+                {t('Buy.in')}
+                {key}
+              </strong>
             </span>
             <CenteredDiv>
               <span>
@@ -1922,7 +1997,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
         {amount && (
           <Row>
             <span>
-              <strong>Amount</strong>
+              <strong>{t('Amount')}</strong>
             </span>
             <span>
               {amount} <a href={`/asset/${assetId}`}>{assetId}</a>
@@ -1932,21 +2007,21 @@ export const Buy: React.FC<IContractBuyProps> = ({
         {!!noncesReceipts.length && (
           <Row>
             <span>
-              <strong>NFTs Nonces</strong>
+              <strong>{t('AssetTrigger.NFTs Nonces')}</strong>
             </span>
             {renderNFTNonces(noncesReceipts)}
           </Row>
         )}
         <Row>
           <span>
-            <strong>Currency Id</strong>
+            <strong>{t('Buy.Currency Id')}</strong>
           </span>
           <span>{currencyId}</span>
         </Row>
         {assetId && (
           <Row>
             <span>
-              <strong>Asset Id</strong>
+              <strong>{t('AssetId')}</strong>
             </span>
             <a href={`/asset/${assetId}`}>
               <span>{assetId}</span>
@@ -1972,13 +2047,13 @@ export const Buy: React.FC<IContractBuyProps> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Buy</strong>
+        <strong>{t('Buy.Buy')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Buy Type</strong>
+          <strong>{t('Buy.Buy Type')}</strong>
         </span>
         <span>{buyType}</span>
       </Row>
@@ -1994,6 +2069,7 @@ export const Sell: React.FC<IIndexedContract> = ({
   contractIndex,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as ISellContract;
   const assetId = parameter?.assetId || 'KLV';
   const precision = usePrecision(parameter?.currencyID || 'KLV');
@@ -2016,9 +2092,9 @@ export const Sell: React.FC<IIndexedContract> = ({
       return (
         <Row>
           <span>
-            <strong>Market Fixed</strong>
+            <strong>{t('CreateAsset.Market Fixed')}</strong>
             <br />
-            <strong>Royalties</strong>
+            <strong>{t('Royalties')}</strong>
           </span>
           <span>
             {toLocaleFixed(
@@ -2038,54 +2114,54 @@ export const Sell: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Sell</strong>
+        <strong>{t('Buy.Sell')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Market Type</strong>
+          <strong>{t('Buy.Market Type')}</strong>
         </span>
         <span>{parameter?.marketType}</span>
       </Row>
       {sellReceipt && (
         <Row>
           <span>
-            <strong>Order Id</strong>
+            <strong>{t('Buy.Order Id')}</strong>
           </span>
           <span>{sellReceipt?.orderId}</span>
         </Row>
       )}
       <Row>
         <span>
-          <strong>Marketplace Id</strong>
+          <strong>{t('DelegateUndelegate.paidMarketplace ID')}</strong>
         </span>
         <span>{parameter?.marketplaceID}</span>
       </Row>
       <Row>
         <span>
-          <strong>Asset Id</strong>
+          <strong>{t('AssetId')}</strong>
         </span>
         <span>{parameter?.assetId}</span>
       </Row>
       {kAppTransferReceipt && (
         <Row>
           <span>
-            <strong>Amount</strong>
+            <strong>{t('Amount')}</strong>
           </span>
           <span>{kAppTransferReceipt?.value}</span>
         </Row>
       )}
       <Row>
         <span>
-          <strong>Currency Id</strong>
+          <strong>{t('Buy.Currency Id')}</strong>
         </span>
         <span>{parameter?.currencyID}</span>
       </Row>
       {parameter?.price && (
         <Row>
           <span>
-            <strong>Price</strong>
+            <strong>{t('Buy.Price')}</strong>
           </span>
           <span>
             {toLocaleFixed(parameter.price / 10 ** (precision || 0), precision)}{' '}
@@ -2096,7 +2172,7 @@ export const Sell: React.FC<IIndexedContract> = ({
       {parameter?.reservePrice && (
         <Row>
           <span>
-            <strong>Reserve Price</strong>
+            <strong>{t('Buy.Reserve Price')}</strong>
           </span>
           <span>
             {toLocaleFixed(
@@ -2108,7 +2184,7 @@ export const Sell: React.FC<IIndexedContract> = ({
       )}
       <Row>
         <span>
-          <strong>End Time</strong>
+          <strong>{t('Buy.End Time')}</strong>
         </span>
         <span>
           {parameter?.endTime ? formatDate(parameter?.endTime * 1000) : '--'}
@@ -2126,6 +2202,7 @@ export const CancelMarketOrder: React.FC<IIndexedContract> = ({
   contractIndex,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as ICancelMarketOrderContract;
   const kAppTransferReceipt = findReceipt(
     filteredReceipts,
@@ -2135,13 +2212,13 @@ export const CancelMarketOrder: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Cancel Market Order</strong>
+        <strong>{t('CancelMarketOrder')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Order Id</strong>
+          <strong>{t('Buy.Order Id')}</strong>
         </span>
         <span>{parameter?.orderID}</span>
       </Row>
@@ -2149,19 +2226,19 @@ export const CancelMarketOrder: React.FC<IIndexedContract> = ({
         <>
           <Row>
             <span>
-              <strong>Marketplace Id</strong>
+              <strong>{t('DelegateUndelegate.Marketplace ID')}</strong>
             </span>
             <span>{kAppTransferReceipt?.marketplaceId}</span>
           </Row>
           <Row>
             <span>
-              <strong>Asset Id</strong>
+              <strong>{t('AssetId')}</strong>
             </span>
             <span>{kAppTransferReceipt?.assetId}</span>
           </Row>
           <Row>
             <span>
-              <strong>Amount</strong>
+              <strong>{t('Amount')}</strong>
             </span>
             <span>{kAppTransferReceipt?.value}</span>
           </Row>
@@ -2178,6 +2255,7 @@ export const CreateMarketplace: React.FC<IIndexedContract> = ({
   contractIndex,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as ICreateMarketplaceContract;
   const createMarketplaceReceipt = findReceipt(
     filteredReceipts,
@@ -2187,33 +2265,33 @@ export const CreateMarketplace: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Create Marketplace</strong>
+        <strong>{t('CreateMarketplace')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Name</strong>
+          <strong>{t('CreateAsset.Name')}</strong>
         </span>
         <span>{parameter?.name}</span>
       </Row>
       {createMarketplaceReceipt && (
         <Row>
           <span>
-            <strong>Marketplace Id</strong>
+            <strong>{t('DelegateUndelegate.Marketplace ID')}</strong>
           </span>
           <span>{createMarketplaceReceipt?.marketplaceId}</span>
         </Row>
       )}
       <Row>
         <span>
-          <strong>Referral Address</strong>
+          <strong>{t('ReferralAddress')}</strong>
         </span>
         <span>{parameter?.referralAddress}</span>
       </Row>
       <Row>
         <span>
-          <strong>Referral Percent</strong>
+          <strong>{t('ReferralPercent')}</strong>
         </span>
         <span>
           {parameter?.referralPercentage
@@ -2230,37 +2308,38 @@ export const ConfigMarketplace: React.FC<IIndexedContract> = ({
   parameter: par,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as IConfigMarketplaceContract;
 
   return (
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Config Marketplace</strong>
+        <strong>{t('ConfigMarketplace')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Name</strong>
+          <strong>{t('CreateAsset.Name')}</strong>
         </span>
         <span>{parameter?.name}</span>
       </Row>
       <Row>
         <span>
-          <strong>Marketplace Id</strong>
+          <strong>{t('DelegateUndelegate.Marketplace ID')}</strong>
         </span>
         <span>{parameter?.marketplaceID}</span>
       </Row>
       <Row>
         <span>
-          <strong>Referral Address</strong>
+          <strong>{t('ReferralAddress')}</strong>
         </span>
         <span>{parameter?.referralAddress}</span>
       </Row>
       <Row>
         <span>
-          <strong>Referral Percent</strong>
+          <strong>{t('ReferralPercent')}</strong>
         </span>
         <span>
           {parameter?.referralPercentage
@@ -2277,6 +2356,7 @@ export const UpdateAccountPermission: React.FC<IIndexedContract> = ({
   parameter: par,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as IUpdateAccountPermissionContract;
   const permission = parameter?.permissions[0];
   const operations = calculatePermissionOperations(permission?.operations);
@@ -2285,31 +2365,33 @@ export const UpdateAccountPermission: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Update Account Permission</strong>
+        <strong>
+          {t('UpdateAccountPermission.Update Account Permission')}
+        </strong>
       </Row>
       <Row>
         <span>
-          <strong>Permission Name</strong>
+          <strong>{t('UpdateAccountPermission.Permission Name')}</strong>
         </span>
         <span>{permission?.permissionName ?? ''}</span>
       </Row>
       <Row>
         <span>
-          <strong>Permission Type</strong>
+          <strong>{t('UpdateAccountPermission.Permission Type')}</strong>
         </span>
         <span>{permission?.type ?? ''}</span>
       </Row>
       <Row>
         <span>
-          <strong>Threshold</strong>
+          <strong>{t('Threshold')}</strong>
         </span>
         <span>{permission?.Threshold ?? ''}</span>
       </Row>
       <Row>
         <span>
-          <strong>Operations</strong>
+          <strong>{t('UpdateAccountPermission.Operations')}</strong>
         </span>
         <RowContent>
           <BalanceContainer>
@@ -2323,7 +2405,7 @@ export const UpdateAccountPermission: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Signers</strong>
+          <strong>{t('UpdateAccountPermission.Signers')}</strong>
         </span>
         <RowContent>
           <BalanceContainer>
@@ -2361,6 +2443,7 @@ export const Deposit: React.FC<IIndexedContract> = ({
   parameter: par,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as IDepositContract;
   const precision = usePrecision(parameter?.currencyID || 'KLV');
 
@@ -2368,13 +2451,13 @@ export const Deposit: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>Deposit</strong>
+        <strong>{t('Deposit.Deposit')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Deposit Type</strong>
+          <strong>{t('Deposit.Deposit Type')}</strong>
         </span>
         <span>{parameter?.depositTypeString}</span>
       </Row>
@@ -2386,13 +2469,13 @@ export const Deposit: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Amount</strong>
+          <strong>{t('Amount')}</strong>
         </span>
         <span>{parameter?.amount / 10 ** precision}</span>
       </Row>
       <Row>
         <span>
-          <strong>Currency Id</strong>
+          <strong>{t('Buy.Currency Id')}</strong>
         </span>
         <span>{parameter?.currencyID}</span>
       </Row>
@@ -2405,6 +2488,7 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({
   parameter: par,
   renderMetadata,
 }) => {
+  const { t } = useTranslation('transactions');
   const parameter = par as IITOTriggerContract;
   const precision = usePrecision(parameter?.assetId || 'KLV');
   const whitelistInfo = parameter?.whitelistInfo || [];
@@ -2432,7 +2516,7 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({
     return (
       <Row>
         <span>
-          <strong>White List Info</strong>
+          <strong>{t('ITOTrigger.White List Info')}</strong>
         </span>
         <RowContent>
           <BalanceContainer>
@@ -2440,11 +2524,11 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({
               {whitelistInfo.map((info, index) => (
                 <section key={info.address}>
                   <div key={info.address}>
-                    <strong>Address</strong>
+                    <strong>{t('Address')}</strong>
                     <span>{info.address}</span>
                   </div>
                   <div>
-                    <strong>Limit</strong>
+                    <strong>{t('Limit')}</strong>
                     <span>{info.limit}</span>
                   </div>
                   {index < whitelistInfo.length - 1 && <Hr />}
@@ -2467,6 +2551,7 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({
             parameter,
             precision,
             packsPrecision,
+            t,
             renderPackPrecision,
           );
         }
@@ -2475,7 +2560,7 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({
         return (
           <Row>
             <span>
-              <strong>Status</strong>
+              <strong>{t('ConfigITO.Status')}</strong>
             </span>
             <span>{parameter?.status}</span>
           </Row>
@@ -2484,7 +2569,7 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({
         return (
           <Row>
             <span>
-              <strong>Receiver Address</strong>
+              <strong>{t('ITOTrigger.Receiver Address')}</strong>
             </span>
             <CenteredRow>
               <Link href={`/account/${parameter?.receiverAddress}`}>
@@ -2498,7 +2583,7 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({
         return (
           <Row>
             <span>
-              <strong>Max Amount</strong>
+              <strong>{t('ConfigITO.Max Amount')}</strong>
             </span>
             <span>{renderMaxAmount()}</span>
           </Row>
@@ -2508,9 +2593,9 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({
           <Row>
             <span>
               <strong>
-                Default Limit
+                {t('ITOTrigger.Default Limit')}
                 <br />
-                per Address
+                {t('ITOTrigger.per Address')}
               </strong>
             </span>
             <span>{parameter?.defaultLimitPerAddress}</span>
@@ -2521,13 +2606,13 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({
           <>
             <Row>
               <span>
-                <strong>Start Time</strong>
+                <strong>{t('Buy.Start Time')}</strong>
               </span>
               <span>{parameter?.startTime}</span>
             </Row>
             <Row>
               <span>
-                <strong>End time</strong>
+                <strong>{t('Buy.End time')}</strong>
               </span>
               <span>{parameter?.endTime}</span>
             </Row>
@@ -2537,7 +2622,7 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({
         return (
           <Row>
             <span>
-              <strong>White List Status</strong>
+              <strong>{t('ITOTrigger.White List Status')}</strong>
             </span>
             <span>{parameter?.whitelistStatus}</span>
           </Row>
@@ -2552,9 +2637,9 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({
             <Row>
               <span>
                 <strong>
-                  White List
+                  {t('ITOTrigger.White List')}
                   <br />
-                  Start Time
+                  {t('Buy.Start Time')}
                 </strong>
               </span>
               <span>{parameter?.whitelistStartTime}</span>
@@ -2562,9 +2647,9 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({
             <Row>
               <span>
                 <strong>
-                  White List
+                  {t('ITOTrigger.White List')}
                   <br />
-                  End Time
+                  {t('Buy.End Time')}
                 </strong>
               </span>
               <span>{parameter?.whitelistEndTime}</span>
@@ -2580,19 +2665,19 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
-          <strong>Type</strong>
+          <strong>{t('Type')}</strong>
         </span>
-        <strong>ITO Trigger</strong>
+        <strong>{t('AssetTrigger.ITO Trigger')}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Trigger Type</strong>
+          <strong>{t('AssetTrigger.Trigger Type')}</strong>
         </span>
         <strong>{parameter?.triggerType}</strong>
       </Row>
       <Row>
         <span>
-          <strong>Asset Id</strong>
+          <strong>{t('AssetId')}</strong>
         </span>
         <span>{parameter?.assetId}</span>
       </Row>
@@ -2615,6 +2700,7 @@ const renderPackInfo = (
   packInfo: IPackInfo[],
   precision: number,
   packsPrecision: PacksPrecision,
+  t: TFunction,
   renderPackPrecision: (
     price: number,
     assetId: string,
@@ -2626,7 +2712,7 @@ const renderPackInfo = (
       <HeaderWrapper key={pack.key}>
         <HeaderSpan>
           <strong>
-            Pack Info
+            {t('ITOTrigger.Pack Info')}
             <br />
           </strong>
           <strong>{`(${pack.key})`}</strong>
@@ -2643,7 +2729,7 @@ const renderPackInfo = (
                 {pack.packs.map((pack2, index2: number) => (
                   <section key={index2}>
                     <div>
-                      <strong>Amount</strong>
+                      <strong>{t('Amount')}</strong>
                       <span>
                         {toLocaleFixed(
                           pack2.amount / 10 ** precision,
@@ -2652,7 +2738,7 @@ const renderPackInfo = (
                       </span>
                     </div>
                     <div>
-                      <strong>Price</strong>
+                      <strong>{t('Buy.Price')}</strong>
                       <span>
                         {renderPackPrecision(
                           pack2.price,
@@ -2683,6 +2769,7 @@ const renderPackInfoComponents = (
   parameter: ContractWithPackInfo,
   precision: number,
   packsPrecision: PacksPrecision,
+  t: TFunction,
   renderPackPrecision: (
     price: number,
     assetId: string,
@@ -2696,6 +2783,7 @@ const renderPackInfoComponents = (
           parameter.packInfo,
           precision,
           packsPrecision,
+          t,
           renderPackPrecision,
         )}
       </NestedContainerWrapper>
@@ -2703,10 +2791,11 @@ const renderPackInfoComponents = (
   );
 };
 
-const renderAssetTriggerTypeData: React.FC<IAssetTriggerTypeData> = ({
+const renderAssetTriggerTypeData: React.FC<RenderAssetTriggerTypeDataProps> = ({
   parameter,
   precision,
   t,
+  commonT,
 }): any => {
   const par = parameter;
   const triggerType = par?.triggerType;
@@ -2714,7 +2803,7 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerTypeData> = ({
   const toAddressReturn = () => (
     <Row>
       <span>
-        <strong>To</strong>
+        <strong>{t('To')}</strong>
       </span>
       <CenteredRow>
         <span>{par?.toAddress}</span>
@@ -2726,7 +2815,7 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerTypeData> = ({
   const amountReturn = () => (
     <Row>
       <span>
-        <strong>Amount</strong>
+        <strong>{t('Amount')}</strong>
       </span>
       <span>{toLocaleFixed(par?.amount / 10 ** precision, precision)}</span>
     </Row>
@@ -2734,26 +2823,26 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerTypeData> = ({
 
   const kdaPoolReturn = () => (
     <Row>
-      <strong>KDAPool</strong>
+      <strong>{t('AssetTrigger.KDAPool')}</strong>
       <RowContent>
         <BalanceContainer>
           <FrozenContainer>
             <RoleWrapper>
               <RoleDiv>
-                <StrongWidth>Active</StrongWidth>
+                <StrongWidth>{t('AssetTrigger.Active')}</StrongWidth>
                 <span>{par.kdaPool.active ? 'true' : 'false'}</span>
               </RoleDiv>
               <RoleDiv>
-                <StrongWidth>Admin Address</StrongWidth>
+                <StrongWidth>{t('AssetTrigger.Admin Address')}</StrongWidth>
                 <span>{par.kdaPool.adminAddress}</span>
                 <Copy data={par.kdaPool.adminAddress} />
               </RoleDiv>
               <RoleDiv>
-                <StrongWidth>fRationKDA</StrongWidth>
+                <StrongWidth>{t('AssetTrigger.fRationKDA')}</StrongWidth>
                 <span>{par.kdaPool.fRatioKDA}</span>
               </RoleDiv>
               <RoleDiv>
-                <StrongWidth>fRationKLV</StrongWidth>
+                <StrongWidth>{t('AssetTrigger.fRationKLV')}</StrongWidth>
                 <span>{par.kdaPool.fRatioKLV}</span>
               </RoleDiv>
               <RoleDiv>
@@ -2769,34 +2858,41 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerTypeData> = ({
 
   const royaltiesReturn = () => (
     <Row>
-      <strong>Royalties</strong>
+      <strong>{t('Royalties')}</strong>
       <RowContent>
         <BalanceContainer>
           <FrozenContainer>
             <RoleWrapper>
               <RoleDiv>
-                <StrongWidth>Address</StrongWidth>
+                <StrongWidth>{t('Address')}</StrongWidth>
                 <span>{par.royalties.address || '--'}</span>
                 <Copy data={par.royalties.address} />
               </RoleDiv>
               <RoleDiv>
-                <StrongWidth>ITO Fixed</StrongWidth>
+                <StrongWidth>
+                  {t('CreateAsset.ITO', { type: `${t('CreateAsset.Fixed')}` })}
+                </StrongWidth>
                 <span>{par.royalties.itoFixed || '--'}</span>
               </RoleDiv>
               <RoleDiv>
-                <StrongWidth>ITO Percentage</StrongWidth>
+                <StrongWidth>
+                  ITO Percentage
+                  {t('CreateAsset.ITO', {
+                    type: `${t('Transfer.Percentage')}`,
+                  })}
+                </StrongWidth>
                 <span>{par.royalties.itoPercentage / 100 || 0}%</span>
               </RoleDiv>
               <RoleDiv>
-                <StrongWidth>Market Fixed</StrongWidth>
+                <StrongWidth>{t('CreateAsset.Market Fixed')}</StrongWidth>
                 <span>{par.royalties.marketFixed || '--'}</span>
               </RoleDiv>
               <RoleDiv>
-                <StrongWidth>Market Percentage</StrongWidth>
+                <StrongWidth>{t('CreateAsset.Market Percentage')}</StrongWidth>
                 <span>{par.royalties.marketPercentage / 100 || 0}%</span>
               </RoleDiv>
               <RoleDiv>
-                <StrongWidth>Transfer Fixed</StrongWidth>
+                <StrongWidth>{t('Transfer.Transfer Fixed')}</StrongWidth>
                 <span>{par.royalties.transferFixed || '--'}</span>
               </RoleDiv>
             </RoleWrapper>
@@ -2808,13 +2904,13 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerTypeData> = ({
 
   const roleReturn = () => (
     <Row>
-      <strong>Role</strong>
+      <strong>{t('AssetTrigger.Role')}</strong>
       <RowContent>
         <BalanceContainer>
           <FrozenContainer>
             <RoleWrapper>
               <RoleDiv>
-                <RoleStrong>Address</RoleStrong>
+                <RoleStrong>{t('Address')}</RoleStrong>
                 <span style={{ marginRight: '0.5rem' }}>
                   {par.role.address}
                 </span>
@@ -2822,12 +2918,14 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerTypeData> = ({
               </RoleDiv>
 
               <RoleDiv>
-                <RoleStrong>HasRoleMint</RoleStrong>
-                <span>{statusWithIcon(par.role.hasRoleMint, t)}</span>
+                <RoleStrong>t{t('AssetTrigger.HasRoleMin')}</RoleStrong>
+                <span>{statusWithIcon(par.role.hasRoleMint, commonT)}</span>
               </RoleDiv>
               <RoleDiv>
-                <RoleStrong>HasRoleSetITOPrices</RoleStrong>
-                <span>{statusWithIcon(par.role.hasRoleSetITOPrices, t)}</span>
+                <RoleStrong>{t('AssetTrigger.HasRoleSetITOPrices')}</RoleStrong>
+                <span>
+                  {statusWithIcon(par.role.hasRoleSetITOPrices, commonT)}
+                </span>
               </RoleDiv>
             </RoleWrapper>
           </FrozenContainer>
@@ -2839,7 +2937,7 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerTypeData> = ({
   const mimeReturn = () => (
     <Row>
       <span>
-        <strong>MIME</strong>
+        <strong>{t('AssetTrigger.MIME')}</strong>
       </span>
       <span>{par?.mime}</span>
     </Row>
@@ -2848,7 +2946,7 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerTypeData> = ({
   const logoReturn = () => (
     <Row>
       <span>
-        <strong>Logo</strong>
+        <strong>{t('CreateValidator.Logo')}</strong>
       </span>
       <HoverAnchor href={renderCorrectPath(par.logo)}>{par.logo}</HoverAnchor>
     </Row>
@@ -2883,7 +2981,7 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerTypeData> = ({
   const updateStakingReturn = () => (
     <Row>
       <span>
-        <strong>Staking</strong>
+        <strong>{t('CreateAsset.Staking')}</strong>
       </span>
       <RowContent>
         <BalanceContainer>
@@ -2894,19 +2992,31 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerTypeData> = ({
                 <span>{par.staking?.apr}</span>
               </section>
               <section>
-                <StrongWidth>min Epochs To Claim</StrongWidth>
+                <StrongWidth>
+                  {t('AssetTrigger.Min Epochs To', {
+                    type: `${t('Claim.Claim')}`,
+                  })}
+                </StrongWidth>
                 <span>{par.staking?.minEpochsToClaim}</span>
               </section>
               <section>
-                <StrongWidth>min Epochs To Unstake</StrongWidth>
+                <StrongWidth>
+                  {t('AssetTrigger.Min Epochs To', {
+                    type: `${t('AssetTrigger.Unstake')}`,
+                  })}
+                </StrongWidth>
                 <span>{par.staking?.minEpochsToUnstake}</span>
               </section>
               <section>
-                <StrongWidth>min Epochs To Withdraw</StrongWidth>
+                <StrongWidth>
+                  {t('AssetTrigger.Min Epochs To', {
+                    type: `${t('Withdraw.Withdraw')}`,
+                  })}
+                </StrongWidth>
                 <span>{par.staking?.minEpochsToWithdraw}</span>
               </section>
               <section>
-                <StrongWidth>Type</StrongWidth>
+                <StrongWidth>{t('Type')}</StrongWidth>
                 <span>{par.staking?.type}</span>
               </section>
             </URIsWrapper>

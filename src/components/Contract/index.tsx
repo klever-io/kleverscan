@@ -5,6 +5,7 @@ import { Card } from '@/styles/common';
 import { setQueryAndRouter } from '@/utils';
 import { useForceUpdate } from '@/utils/hooks';
 import * as clipboard from 'clipboard-polyfill';
+import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -86,6 +87,7 @@ const Contract: React.FC<IContract> = ({
   elementId = 0,
   defaultValues = null,
 }) => {
+  const { t } = useTranslation('transactions');
   const {
     txLoading: loading,
     txHash,
@@ -223,10 +225,10 @@ const Contract: React.FC<IContract> = ({
           <CardContainer>
             <Card>
               <div>
+                <span>{t(`Contract.${currentContract?.contractType}`)}</span>
                 <span>
-                  {contractsDescription[currentContract?.contractType]}
+                  {t('Contract.KApp Fee')} {kappFee} KLV
                 </span>
-                <span>KApp Fee: {kappFee} KLV</span>
               </div>
             </Card>
           </CardContainer>
@@ -240,11 +242,11 @@ const Contract: React.FC<IContract> = ({
         <FormActions>
           <Button onClick={handleClear}>
             <AiOutlineClear />
-            Clear Contract
+            {t('Contract.Clear Contract')}
           </Button>
           <Button onClick={handleShare}>
             <FiShare2 />
-            Share Contract
+            {t('Contract.Share Contract')}
           </Button>
         </FormActions>
 

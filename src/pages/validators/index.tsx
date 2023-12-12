@@ -15,21 +15,27 @@ import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useFetchPartial } from '@/utils/hooks';
 import { parseValidators } from '@/utils/parseValues';
 import { AddressContainer } from '@/views/validators/detail';
+import { GetStaticProps } from 'next';
+import { TFunction, useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
+import nextI18nextConfig from '../../../next-i18next.config';
 
-export const validatorsHeaders = [
-  'Rank',
-  'Name',
-  'Rating',
-  'Status',
-  'Stake',
-  'Commission',
-  'Produced / Missed',
-  'Can Delegate',
-  'Cumulative Stake',
-];
+export const validatorsHeaders = (t: TFunction): string[] => {
+  return [
+    `${t('Validators.Rank')}`,
+    `${t('Name')}`,
+    `${t('Validators.Rating')}`,
+    `${t('Transactions.Status')}`,
+    `${t('Validators.Stake')}`,
+    `${t('Validators.Commission')}`,
+    `${t('Validators.Produced / Missed')}`,
+    `${t('Transactions.Can Delegate')}`,
+    `${t('Validators.Cumulative Stake')}`,
+  ];
+};
 
 const validatorsRowSections = (
   validator: IValidator,
@@ -125,6 +131,7 @@ const validatorsRowSections = (
 };
 
 const Validators: React.FC = () => {
+  const { t: tableT } = useTranslation('table');
   const router = useRouter();
   const [filterValidators, fetchPartialValidator, loading, setLoading] =
     useFetchPartial<IValidator>('validators', 'validator/list', 'name');
@@ -166,7 +173,7 @@ const Validators: React.FC = () => {
 
   const tableProps: ITable = {
     type: 'validators',
-    header: validatorsHeaders,
+    header: validatorsHeaders(tableT),
     rowSections: validatorsRowSections,
     request: (page, limit) => requestValidators(page, limit),
     scrollUp: true,
@@ -182,6 +189,16 @@ const Validators: React.FC = () => {
   };
 
   return <Detail {...detailProps} />;
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'validators', 'table'],
+    nextI18nextConfig,
+  );
+
+  return { props };
 };
 
 export default Validators;

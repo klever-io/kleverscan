@@ -87,7 +87,7 @@ const WalletHelp: React.FC<IWalletDrawer> = ({
                 <p>
                   <strong>Step 1</strong>:{' '}
                   <a
-                    href="https://chrome.google.com/webstore/detail/klever-wallet/lmbifcmbofehdpolpdpnlcnanolnlkec"
+                    href="https://chromewebstore.google.com/detail/klever-wallet/ifclboecfhkjbpmhgehodcjpciihhmif"
                     target="_blank"
                     rel="noreferrer"
                   >

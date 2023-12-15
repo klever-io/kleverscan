@@ -77,7 +77,7 @@ const CreateTransaction: React.FC = () => {
             <p>
               To send transactions{' '}
               <a
-                href="https://chrome.google.com/webstore/detail/klever-wallet/lmbifcmbofehdpolpdpnlcnanolnlkec"
+                href="https://chromewebstore.google.com/detail/klever-wallet/ifclboecfhkjbpmhgehodcjpciihhmif"
                 target="_blank"
                 rel="noreferrer"
               >

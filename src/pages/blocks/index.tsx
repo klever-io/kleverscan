@@ -263,7 +263,7 @@ const Blocks: React.FC<IBlocks> = () => {
       {
         element: (
           <span key={txFees}>
-            {formatAmount((txFees || 0) / 10 ** precision)} KLV
+            {formatAmount(((txFees || 0) * 0.5) / 10 ** precision)} KLV
           </span>
         ),
         span: 1,

@@ -205,7 +205,7 @@ export const ToggleContainer = styled.div<IProps>`
   user-select: none;
 `;
 
-export const Slider = styled.div<{ active?: string }>`
+export const Slider = styled.div<{ active?: string; disabled?: boolean }>`
   position: absolute;
   cursor: pointer;
   top: 0;
@@ -229,6 +229,13 @@ export const Slider = styled.div<{ active?: string }>`
     transition: 0.4s;
     border-radius: 50%;
   }
+
+  ${({ disabled }) =>
+    disabled &&
+    css`
+      background: #ccc;
+      cursor: not-allowed;
+    `}
 `;
 
 export const Toggle = styled.label`
@@ -387,3 +394,9 @@ export const DropdownCustomLabelSelectStyles = {
     padding: '0.25rem',
   }),
 };
+
+export const ModalCreateTxLink = styled.a`
+  margin-left: 0.5rem;
+  cursor: pointer;
+  color: ${props => props.theme.purple};
+`;

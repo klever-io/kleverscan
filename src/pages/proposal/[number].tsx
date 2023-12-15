@@ -381,7 +381,7 @@ const ProposalDetails: React.FC = () => {
                     <strong> {t('proposals:EndingEpoch')}</strong>
                   </span>
                   <span style={{ color: 'red' }}>
-                    {isSkeleton(proposal?.epochEnd)}
+                    {isSkeleton(proposal?.epochEnd - 1)}
                   </span>
                 </HalfRow>
                 <HalfRow>

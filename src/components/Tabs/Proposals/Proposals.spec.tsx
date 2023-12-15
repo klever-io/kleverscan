@@ -95,7 +95,7 @@ describe('Component: Tabs/Proposals', () => {
     expect(proposalNumber).toBeInTheDocument();
     expect(proposer).toBeInTheDocument();
     expect(epochStart).toHaveTextContent('Created Epoch: 8207');
-    expect(epochEnd).toHaveTextContent('Ending Epoch: 8217');
+    expect(epochEnd).toHaveTextContent('Ending Epoch: 8216');
     expect(upVotesAndTotalStaked).toHaveTextContent('8,000/12,000');
     expect(status).toBeInTheDocument();
     expect(details).toBeInTheDocument();

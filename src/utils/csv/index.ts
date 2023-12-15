@@ -9,6 +9,9 @@ import {
 
 const processHeaders = (router: NextRouter) => {
   const deafultHeaders = [...initialsTableHeaders];
+  if (!router.query.type) {
+    deafultHeaders.push('Amount', 'AssetId');
+  }
   deafultHeaders.push('kApp Fee', 'Bandwidth Fee');
   const headers = getHeaderForCSV(router, deafultHeaders);
   const sanitizedHeaders = headers.filter(header => header !== '');

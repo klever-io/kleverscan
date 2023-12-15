@@ -172,7 +172,7 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
         element: (
           <ProposalTime key={`${epochStart}/${epochEnd}`}>
             <small>Created Epoch: {epochStart}</small>
-            <small className="endTime">Ending Epoch: {epochEnd}</small>
+            <small className="endTime">Ending Epoch: {epochEnd - 1}</small>
           </ProposalTime>
         ),
         span: 1,

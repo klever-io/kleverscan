@@ -685,6 +685,12 @@ export const getHeaderForCSV = (
   return header.concat('Multicontract', `Account's Transaction Number (Nonce)`);
 };
 
+const getParsedAmount = async (parameter: any, assetId: string) => {
+  const amount = parameter?.amount ?? '';
+  const precision = (await getPrecision(assetId)) as number;
+  return amount / 10 ** precision;
+};
+
 export const getDefaultCells = async (
   tableRowData: ITransaction,
   isMulticontract: boolean,
@@ -696,15 +702,101 @@ export const getDefaultCells = async (
     sender,
     nonce,
     status,
+    receipts,
     contract,
     bandwidthFee,
     kAppFee,
   } = tableRowData;
 
+  const amountContract = [];
   const parameter = contract[0]?.parameter as any;
+  const assetId: any = parameter.assetId || '';
+  switch (contract[0].typeString) {
+    case Contract.Transfer:
+      const coin = parameter?.assetId || 'KLV';
+      let asyncAmount = await getParsedAmount(parameter, coin);
+      amountContract.push(asyncAmount);
+      break;
+
+    case Contract.Freeze:
+      let assetId = parameter?.assetId || 'KLV';
+      asyncAmount = await getParsedAmount(parameter, assetId);
+      amountContract.push(asyncAmount);
+      break;
+    case Contract.Withdraw:
+      let filteredReceipts = filterReceipts(receipts, contract[0].type);
+      assetId = parameter?.assetId || 'KLV';
+      asyncAmount = await getAmountFromReceipts(assetId, 18, filteredReceipts);
+      amountContract.push(asyncAmount);
+      break;
+    case Contract.Claim:
+      filteredReceipts = filterReceipts(receipts, contract[0].type);
+      const claimReceipt = findReceipt(filteredReceipts, 17) as
+        | IClaimReceipt
+        | undefined;
+      asyncAmount = await getAmountFromReceipts(
+        claimReceipt?.assetId || '',
+        17,
+        filteredReceipts,
+      );
+      amountContract.push(asyncAmount);
+      break;
+    case Contract.Vote:
+      let amount = parameter?.amount / 10 ** 6 || 0;
+      amountContract.push(amount);
+      break;
+    case Contract.Buy:
+      let currencyID = parameter?.currencyID || '';
+      filteredReceipts = filterReceipts(receipts, contract[0].type);
+      const senderKAppTransferReceipt = findReceiptWithSender(
+        filteredReceipts,
+        14,
+        sender,
+      ) as IKAppTransferReceipt | undefined;
+      let currencyIDPrecision: any = 6;
+      let amountPrecision: any = 0;
+      if (parameter?.currencyID !== 'KLV' && parameter?.currencyID !== 'KFI') {
+        currencyIDPrecision = await getPrecision(
+          parameter?.currencyID || 'KLV',
+        );
+      }
+      if (parameter?.buyType === 'MarketBuy') {
+        if (status !== 'fail') {
+          amountPrecision = await getPrecision(
+            senderKAppTransferReceipt?.assetId ?? '',
+          );
+        } else {
+          amountPrecision = 0;
+        }
+      } else if (parameter?.buyType === 'ITOBuy') {
+        amountPrecision = (await getPrecision(parameter?.id)) || '';
+      }
+      let buyPrice = getBuyPrice(parameter, senderKAppTransferReceipt);
+      let buyAmount = getBuyAmount(parameter, senderKAppTransferReceipt);
+
+      if (buyPrice) {
+        buyPrice = buyPrice / 10 ** currencyIDPrecision;
+      }
+      if (buyAmount) {
+        buyAmount = buyAmount / 10 ** amountPrecision;
+      }
+      amountContract.push(buyAmount);
+      break;
+    case Contract.Sell:
+      currencyID = parameter?.currencyID;
+      assetId = parameter?.assetId || 'KLV';
+      const precision = (await getPrecision(
+        parameter?.currencyID || 'KLV',
+      )) as number;
+      const price = (parameter?.price || 0) / 10 ** precision;
+      amount = 1;
+      amountContract.push(price);
+      break;
+    default:
+  }
   const to = parameter.toAddress || '';
   const contractName = ContractsName[contract[0]?.typeString] || '';
-  const created = format(fromUnixTime(timestamp / 1000), 'yyyy-MM-dd HH:mm:ss'); // csv date pattern
+  const created = format(fromUnixTime(timestamp), 'yyyy-MM-dd HH:mm:ss'); // csv date pattern
   const parsedbandwidthFee = bandwidthFee / 10 ** 6;
   const parsedkAppFee = kAppFee / 10 ** 6;
   const cells = [
@@ -715,6 +807,8 @@ export const getDefaultCells = async (
     to,
     status,
     contractName,
+    amountContract,
+    assetId,
     parsedkAppFee,
     parsedbandwidthFee,
     isMulticontract,
@@ -761,21 +855,15 @@ export const getContractCells = async (
   const parameter = contract[0]?.parameter as any;
   const to = parameter.toAddress || '';
   const contractName = ContractsName[contract[0]?.typeString] || '';
-  const created = format(fromUnixTime(timestamp / 1000), 'yyyy-MM-dd HH:mm:ss'); // csv date pattern
+  const created = format(fromUnixTime(timestamp), 'yyyy-MM-dd HH:mm:ss'); // csv date pattern
   const cells = [hash, blockNum, created, sender, to, status, contractName];
   const parsedbandwidthFee = bandwidthFee / 10 ** 6;
   const parsedkAppFee = kAppFee / 10 ** 6;
 
-  const getParsedAmount = async (assetId: string) => {
-    const amount = parameter?.amount ?? '';
-    const precision = (await getPrecision(assetId)) as number;
-    return amount / 10 ** precision;
-  };
-
   switch (contract[0].typeString) {
     case Contract.Transfer:
       const coin = parameter?.assetId || 'KLV';
-      let asyncAmount = await getParsedAmount(coin);
+      let asyncAmount = await getParsedAmount(parameter, coin);
       cells.push(coin, asyncAmount);
       break;
     case Contract.CreateAsset:
@@ -794,7 +882,7 @@ export const getContractCells = async (
       break;
     case Contract.Freeze:
       let assetId = parameter?.assetId || 'KLV';
-      asyncAmount = await getParsedAmount(assetId);
+      asyncAmount = await getParsedAmount(parameter, assetId);
       cells.push(assetId, asyncAmount);
       break;
     case Contract.Unfreeze:

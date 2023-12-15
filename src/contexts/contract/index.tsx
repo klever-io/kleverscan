@@ -356,7 +356,7 @@ export const ContractProvider: React.FC = ({ children }) => {
         const amount = kfiAmount[assetId];
         const asset = assetsList
           ?.find(item => item.assetId === assetId)
-          ?.buckets?.map(bucket => bucket.balance)[0];
+          ?.buckets?.reduce((acc, current) => acc + current.balance, 0);
         if ((asset || 0) < amount) {
           setWarningOpen(true);
           setTxLoading(false);

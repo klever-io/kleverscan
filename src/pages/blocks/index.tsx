@@ -108,14 +108,14 @@ const Blocks: React.FC<IBlocks> = () => {
       values: [
         blocksStatsYesterday ? (
           `${formatAmount(
-            blocksStatsYesterday?.totalBlockRewards || 0 / 10 ** precision,
+            (blocksStatsYesterday?.totalBlockRewards || 0) / 10 ** precision,
           )} KLV`
         ) : (
           <Skeleton />
         ),
         blocksStatsToday ? (
           `${formatAmount(
-            blocksStatsToday?.totalBlockRewards / 10 ** precision,
+            (blocksStatsYesterday?.totalBlockRewards || 0) / 10 ** precision,
           )} KLV`
         ) : (
           <Skeleton />
@@ -128,13 +128,15 @@ const Blocks: React.FC<IBlocks> = () => {
       values: [
         blocksStatsYesterday ? (
           `${formatAmount(
-            blocksStatsYesterday?.totalBurned || 0 / 10 ** precision,
+            (blocksStatsYesterday?.totalBurned || 0) / 10 ** precision,
           )} KLV`
         ) : (
           <Skeleton />
         ),
         blocksStatsToday ? (
-          `${formatAmount(blocksStatsToday?.totalBurned / 10 ** precision)} KLV`
+          `${formatAmount(
+            (blocksStatsToday?.totalBurned || 0) / 10 ** precision,
+          )} KLV`
         ) : (
           <Skeleton />
         ),

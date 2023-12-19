@@ -58,7 +58,11 @@ const MultisignComponent: React.FC<{
     }
   }, [extensionInstalled]);
 
-  const { data: multiSignData, isFetching: loading } = useQuery({
+  const {
+    data: multiSignData,
+    isFetching: loading,
+    refetch: refetchMultisignData,
+  } = useQuery({
     queryKey: ['multiSignData'],
     queryFn: () => requestMultisign(walletAddress),
     initialData: [] as IMultisignData[],
@@ -98,9 +102,11 @@ const MultisignComponent: React.FC<{
   const buttonsProps = {
     setSignBcastTransaction,
     multiSignData: {
-      ...multiSignData[0],
+      ...(multiSignData?.find((e: IMultisignData) => e.hash === selectedHash) ||
+        multiSignData[0]),
       decodedTx: decodedData,
     },
+    refetchMultisignData,
     setTxHash,
     draggingOverlayCount,
     setDragginOverlayCount,
@@ -109,7 +115,8 @@ const MultisignComponent: React.FC<{
 
   const decodedRawProps = {
     multiSignData: {
-      ...multiSignData[0],
+      ...(multiSignData?.find((e: IMultisignData) => e.hash === selectedHash) ||
+        multiSignData[0]),
       decodedTx: decodedData,
     },
     isDarkTheme,

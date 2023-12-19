@@ -89,10 +89,11 @@ const Banner: React.FC = () => {
   });
 
   useEffect(() => {
-    Bugsnag.start({
-      apiKey: process.env.BUGSNAG_KEY || '7bf586baa26d4d454069c96573fa0b08',
-      plugins: [new BugsnagPluginReact(React)],
-    });
+    !process.env.BUGSNAG_DISABLED &&
+      Bugsnag.start({
+        apiKey: process.env.BUGSNAG_KEY || '7bf586baa26d4d454069c96573fa0b08',
+        plugins: [new BugsnagPluginReact(React)],
+      });
   }, []);
 
   return !loading ? (

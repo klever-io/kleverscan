@@ -56,6 +56,7 @@ interface IMultisignButtons {
   draggingOverlayCount: number;
   setDragginOverlayCount: React.Dispatch<React.SetStateAction<number>>;
   setSelectedHash: React.Dispatch<React.SetStateAction<string>>;
+  refetchMultisignData: () => void;
 }
 
 interface IDecodedRawData {
@@ -335,6 +336,7 @@ export const ButtonsComponent: React.FC<IMultisignButtons> = ({
   draggingOverlayCount,
   setDragginOverlayCount,
   setSelectedHash,
+  refetchMultisignData,
 }) => {
   const multisignTotalWeight =
     multiSignData?.signers?.filter(e => e.signed)?.length || 0;
@@ -367,6 +369,8 @@ export const ButtonsComponent: React.FC<IMultisignButtons> = ({
         }
 
         toast.success('Transaction signed successfully');
+
+        refetchMultisignData();
       }
     } catch (error) {
       toast.error('Something went wrong, please try again');

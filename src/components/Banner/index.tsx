@@ -1,5 +1,7 @@
 import api from '@/services/api';
-import { useEffect, useState } from 'react';
+import Bugsnag from '@bugsnag/js';
+import BugsnagPluginReact from '@bugsnag/plugin-react';
+import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { BannerContainer, BannerParagraph, ButtonClose } from './styled';
 
@@ -20,6 +22,8 @@ interface IHeathReturn {
 }
 
 const errorMessage = {
+  WARNING:
+    "Warning: It appears that the server response time is slightly above the expected rate at the moment. We're working to optimize this. Your patience is appreciated as we fine-tune performance.",
   ALERT:
     "We're facing a temporary performance issue affecting server response time. Our team is actively resolving this issue. We apologize for the inconvenience.",
   CRITICAL:
@@ -27,10 +31,22 @@ const errorMessage = {
 };
 
 const healthRequest = async (): Promise<IResultsHeath[]> => {
-  const res: IHeathReturn = await api.get({
-    route: 'health',
-  });
-  return res.data.health.results;
+  try {
+    const res: IHeathReturn = await api.get({
+      route: 'health',
+    });
+
+    const message = res.data.health.results.map(value => value.message);
+    message.forEach(element => {
+      if (element !== '') {
+        Bugsnag.notify(new Error(element));
+        console.warn(element);
+      }
+    });
+    return res.data.health.results;
+  } catch (error) {
+    throw error;
+  }
 };
 
 const BannerResult: React.FC<IResultsHeath> = (data: IResultsHeath) => {
@@ -71,6 +87,13 @@ const Banner: React.FC = () => {
     queryKey: ['healthRequest'],
     queryFn: healthRequest,
   });
+
+  useEffect(() => {
+    Bugsnag.start({
+      apiKey: process.env.BUGSNAG_KEY || '7bf586baa26d4d454069c96573fa0b08',
+      plugins: [new BugsnagPluginReact(React)],
+    });
+  }, []);
 
   return !loading ? (
     <>

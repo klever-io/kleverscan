@@ -395,6 +395,7 @@ export const ButtonsComponent: React.FC<IMultisignButtons> = ({
         toast.success('Transaction broadcast successfully');
         setTxHash(multiSignData.hash);
         window.scrollTo(0, 0);
+        refetchMultisignData();
       }
     } catch (error) {
       toast.error('Something went wrong, please try again');

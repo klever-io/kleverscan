@@ -14,6 +14,7 @@ import ChevronRight from './chevron-right.svg';
 import Compass from './compass.svg';
 import Copy from './copy.svg';
 import Currency from './currency.svg';
+import ExportCsvIcon from './exportCsvIcon.svg';
 import Graph from './graph.svg';
 import InfoSquare from './info-square.svg';
 import LineArrowUpSquare from './line-arrow-up-square.svg';
@@ -23,6 +24,7 @@ import Plus from './plus.svg';
 import Proposal from './proposal.svg';
 import Receive from './receive.svg';
 import Redirect from './redirect.svg';
+import RefreshIcon from './refreshIcon.svg';
 import Search from './search.svg';
 import SendWhite from './send-white.svg';
 import Send from './send.svg';
@@ -80,4 +82,6 @@ export {
   LineArrowUpSquare,
   PlusSquare,
   Currency,
+  ExportCsvIcon,
+  RefreshIcon,
 };

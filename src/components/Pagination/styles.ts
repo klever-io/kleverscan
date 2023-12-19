@@ -1,8 +1,6 @@
 import styled, { css } from 'styled-components';
 
 export const PaginationContainer = styled.div`
-  margin-top: 1rem;
-
   width: 100%;
 
   display: flex;
@@ -13,13 +11,20 @@ export const PaginationContainer = styled.div`
 
 export const Container = styled.div`
   display: flex;
+  max-width: 40rem;
+  width: 100%;
 
   flex-direction: row;
   align-items: center;
+  justify-content: space-around;
 
   gap: 0.5rem;
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     gap: 0;
+  }
+
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    max-width: fit-content;
   }
 `;
 

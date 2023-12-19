@@ -19,6 +19,13 @@ interface IHeathReturn {
   error: string;
 }
 
+const errorMessage = {
+  ALERT:
+    "We're facing a temporary performance issue affecting server response time. Our team is actively resolving this issue. We apologize for the inconvenience.",
+  CRITICAL:
+    "We regret to inform you that we're experiencing issues establishing a connection with the server right now. Our technical team is aware of the problem and is working to resolve it as quickly as possible. Please wait a while and try again.",
+};
+
 const healthRequest = async (): Promise<IResultsHeath[]> => {
   const res: IHeathReturn = await api.get({
     route: 'health',
@@ -49,7 +56,9 @@ const BannerResult: React.FC<IResultsHeath> = (data: IResultsHeath) => {
     <>
       {openBanner && data.status !== 'OK' && data.message && (
         <BannerContainer status={data.status === 'ALERT'}>
-          <BannerParagraph>{data.status + ':' + data.message}</BannerParagraph>
+          <BannerParagraph>{`Status ${data.name} request: ${
+            errorMessage[data.status]
+          }`}</BannerParagraph>
           <ButtonClose onClick={handleClick} />
         </BannerContainer>
       )}

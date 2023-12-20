@@ -162,13 +162,19 @@ export const ContractProvider: React.FC = ({ children }) => {
   };
 
   const getAssets = async () => {
+    let account: IAccountResponse;
     if (walletAddress === '') {
       return [] as ICollectionList[];
     }
-
-    const account: IAccountResponse = await api.get({
-      route: `address/${walletAddress}`,
-    });
+    if (senderAccount !== '') {
+      account = await api.get({
+        route: `address/${senderAccount}`,
+      });
+    } else {
+      account = await api.get({
+        route: `address/${walletAddress}`,
+      });
+    }
 
     if (
       !account?.data?.account?.assets &&
@@ -298,12 +304,16 @@ export const ContractProvider: React.FC = ({ children }) => {
     });
   };
 
-  const { data: assetsList } = useQuery({
+  const { data: assetsList, refetch: refetchAssetsList } = useQuery({
     queryKey: 'assetsList',
     queryFn: getAssets,
     initialData: [],
     enabled: !!walletAddress,
   });
+
+  useEffect(() => {
+    refetchAssetsList();
+  }, [senderAccount]);
 
   const amountAndFeesGreaterThanBalance = (): boolean => {
     const formPayloads = formsData.current;

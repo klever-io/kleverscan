@@ -63,7 +63,7 @@ export const KDASelect: React.FC<IKDASelect> = props => {
     return baseContracts;
   }, [props?.withdrawType]);
 
-  const { getAssets, getKAssets } = useContract();
+  const { getAssets, getKAssets, senderAccount } = useContract();
   const { walletAddress } = useExtension();
 
   const {
@@ -196,6 +196,10 @@ export const KDASelect: React.FC<IKDASelect> = props => {
       },
     });
   }, [register]);
+
+  useEffect(() => {
+    refetch();
+  }, [senderAccount]);
 
   const showAssetIdInputConditional =
     selectedCollection?.isNFT &&

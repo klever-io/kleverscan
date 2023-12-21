@@ -1,10 +1,11 @@
+import { useContract } from '@/contexts/contract';
 import { useExtension } from '@/contexts/extension';
 import api from '@/services/api';
 import { myAccountCall } from '@/services/requests/account';
 import { IProposalsResponse } from '@/types/proposals';
 import { formatAmount } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useQuery } from 'react-query';
 import { IContractProps } from '.';
@@ -54,10 +55,16 @@ const Vote: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
     return proposals.sort((a: any, b: any) => (a.value > b.value ? 1 : -1));
   };
   const { walletAddress } = useExtension();
+  const { senderAccount } = useContract();
   const { data: proposals } = useQuery('proposals', getProposals);
-  const { data: account, isLoading: isLoadingAccount } = useQuery({
+  const {
+    data: account,
+    isLoading: isLoadingAccount,
+    refetch,
+  } = useQuery({
     queryKey: [`account`],
-    queryFn: () => myAccountCall(walletAddress),
+    queryFn: () =>
+      myAccountCall(senderAccount !== '' ? senderAccount : walletAddress),
     enabled: !!walletAddress,
   });
 
@@ -66,6 +73,9 @@ const Vote: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
     await handleFormSubmit(data);
   };
 
+  useEffect(() => {
+    refetch();
+  }, [senderAccount]);
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
       <FormSection>
@@ -96,7 +106,7 @@ const Vote: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
         <SpanMessage>
           Your KFI amount:{' '}
           {formatAmount(
-            (account?.assets['KFI'].buckets?.reduce(
+            (account?.assets['KFI']?.buckets?.reduce(
               (acc, current) => acc + current.balance,
               0,
             ) || 0) /

@@ -19,7 +19,7 @@ const Undelegate: React.FC<IContractProps> = ({
   const [bucketsList, setBucketsList] = useState<any>([]);
 
   const { handleSubmit } = useFormContext<FormData>();
-  const { getAssets } = useContract();
+  const { getAssets, senderAccount } = useContract();
   const { walletAddress } = useExtension();
 
   const onSubmit = async (data: FormData) => {
@@ -44,7 +44,7 @@ const Undelegate: React.FC<IContractProps> = ({
       setBucketsList(buckets);
     };
     getBuckets();
-  }, []);
+  }, [senderAccount]);
 
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>

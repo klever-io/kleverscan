@@ -23,7 +23,7 @@ const Delegate: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   const debouncedName = useDebounce(typedName, 500);
 
   const { handleSubmit } = useFormContext<FormData>();
-  const { getAssets } = useContract();
+  const { getAssets, senderAccount } = useContract();
 
   const onSubmit = async (data: FormData) => {
     await handleFormSubmit(data);
@@ -58,7 +58,7 @@ const Delegate: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
       setBucketsList(buckets);
     };
     fetchBuckets();
-  }, []);
+  }, [senderAccount]);
 
   const { data: validatorsList, fetchNextPage } = useInfiniteQuery(
     ['validatorsList', debouncedName],

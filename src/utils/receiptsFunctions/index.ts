@@ -42,6 +42,6 @@ export const getAmountFromReceipts = async (
     receipt => receipt.type === contractType,
   );
   const amount = Number(correctReceipt?.amount) || 0;
-  const precision = (await getPrecision(assetId)) as number;
+  const precision = (await getPrecision(assetId || 'KLV')) as number;
   return amount / 10 ** precision;
 };

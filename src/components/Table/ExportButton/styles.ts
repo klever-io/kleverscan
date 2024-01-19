@@ -50,7 +50,7 @@ export const DropdownItem = styled.button`
   }
 `;
 
-export const ExportButtonContainer = styled.button<{ isJson?: boolean }>`
+export const ExportButtonContainer = styled.div<{ isJson?: boolean }>`
   border-radius: 50%;
   position: relative;
   padding: 0.125rem;
@@ -64,4 +64,25 @@ export const ExportButtonContainer = styled.button<{ isJson?: boolean }>`
         props.isJson ? props.theme.status.warning : props.theme.green};
     }
   }
+`;
+
+export const ExportProgressBar = styled.div<{ progress: number }>`
+  width: ${props => props.progress}%;
+  height: 5px;
+  background-color: ${props => props.theme.purple};
+  transition: width 0.1s linear;
+`;
+
+export const ExportProgressContainer = styled.div`
+  background-color: ${props => props.theme.gray};
+  width: 100%;
+`;
+export const ExportProgressText = styled.p`
+  color: ${props => props.theme.true.black};
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  margin: 0;
+  padding: 0.5rem;
+  text-align: center;
 `;

@@ -58,6 +58,10 @@ export async function getPrecision(
   } else if (typeof assetIds === 'string') {
     const assetId = assetIds;
 
+    if (assetId === '') {
+      throw new Error('Empty Asset ID');
+    }
+
     if (assetId.split('/').length === 2) {
       return 0;
     }

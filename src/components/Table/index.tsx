@@ -91,10 +91,11 @@ const Table: React.FC<ITable> = ({
 }) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState<number>(10);
   const limits = [5, 10, 50, 100];
   const [scrollTop, setScrollTop] = useState<boolean>(false);
+
+  const page = Number(router.query?.page) || 1;
+  const limit = Number(router.query?.limit) || 10;
 
   const tableRequest = async (page: number, limit: number): Promise<any> => {
     let responseFormatted = {};
@@ -107,7 +108,7 @@ const Table: React.FC<ITable> = ({
         };
         return responseFormatted;
       }
-      setPage(1);
+      // setPage(1);
       return [];
     } catch (error) {
       console.error(error);
@@ -154,33 +155,6 @@ const Table: React.FC<ITable> = ({
     refetch();
   }, [page]);
 
-  const resetRouterPage = () => {
-    const updatedQuery = { ...router.query };
-    delete updatedQuery.page;
-    setQueryAndRouter(
-      {
-        ...updatedQuery,
-      },
-      router,
-    );
-  };
-
-  useDidUpdateEffect(() => {
-    setPage(1);
-    resetRouterPage();
-    refetch();
-  }, [limit]);
-
-  useDidUpdateEffect(() => {
-    if (!router.isReady) {
-      return;
-    }
-    if (page !== 1) {
-      setPage(1);
-    }
-    refetch();
-  }, [router.query, router.isReady]);
-
   useEffect(() => {
     if (interval) {
       const intervalId = setInterval(() => {
@@ -214,6 +188,7 @@ const Table: React.FC<ITable> = ({
                   <ExportButton
                     items={response?.items}
                     tableRequest={tableRequest}
+                    totalRecords={response?.totalPages * limit || 10000}
                   />
                   {/* <ExportButton>
                     <VscJson size={25} />
@@ -228,11 +203,11 @@ const Table: React.FC<ITable> = ({
                   <ItemContainer
                     key={value}
                     onClick={() => {
-                      setLimit(value);
                       setQueryAndRouter(
-                        { ...router.query, limit: value.toString() },
+                        { ...router.query, limit: value.toString(), page: '1' },
                         router,
                       );
+                      refetch();
                     }}
                     active={value === (Number(router.query?.limit) || limit)}
                   >
@@ -344,15 +319,10 @@ const Table: React.FC<ITable> = ({
               count={response?.totalPages}
               page={Number(router.query?.page) || page}
               onPaginate={page => {
-                setPage(page);
-                if (page === 1) {
-                  resetRouterPage();
-                } else {
-                  setQueryAndRouter(
-                    { ...router.query, page: page.toString() },
-                    router,
-                  );
-                }
+                setQueryAndRouter(
+                  { ...router.query, page: page.toString() },
+                  router,
+                );
               }}
             />
           </PaginationContainer>

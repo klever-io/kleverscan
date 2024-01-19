@@ -1,21 +1,19 @@
 import { useMobile } from '@/contexts/mobile';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
-import { exportToCsv } from '@/utils/csv';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { processRowSectionsLayout } from '@/utils/table';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
 import { IoReloadSharp } from 'react-icons/io5';
-import { TbTableExport } from 'react-icons/tb';
 import { useQuery } from 'react-query';
-import { Loader } from '../Loader/styles';
 // import { VscJson } from 'react-icons/vsc';
 import Pagination from '../Pagination';
 import { PaginationContainer } from '../Pagination/styles';
 import Skeleton from '../Skeleton';
 import Tooltip from '../Tooltip';
+import ExportButton from './ExportButton';
 import {
   BackTopButton,
   Body,
@@ -23,7 +21,6 @@ import {
   Container,
   ContainerView,
   EmptyRow,
-  ExportButton,
   ExportContainer,
   ExportLabel,
   FloatContainer,
@@ -94,19 +91,15 @@ const Table: React.FC<ITable> = ({
 }) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
-  const [loadingCsv, setLoadingCsv] = useState(false);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState<number>(10);
   const limits = [5, 10, 50, 100];
   const [scrollTop, setScrollTop] = useState<boolean>(false);
 
-  const tableRequest = async (dataName: string | undefined): Promise<any> => {
+  const tableRequest = async (page: number, limit: number): Promise<any> => {
     let responseFormatted = {};
     try {
-      const response = await request(
-        Number(router.query?.page) || 1,
-        Number(router.query?.limit) || 10,
-      );
+      const response = await request(page, limit);
       if (!response.error && dataName) {
         responseFormatted = {
           items: response.data[dataName],
@@ -128,7 +121,11 @@ const Table: React.FC<ITable> = ({
     refetch,
   } = useQuery(
     [dataName || 'items', JSON.stringify(router.query), router.pathname],
-    () => tableRequest(dataName),
+    () =>
+      tableRequest(
+        Number(router.query?.page) || 1,
+        Number(router.query?.limit) || 10,
+      ),
     onErrorHandler(),
   );
 
@@ -193,12 +190,6 @@ const Table: React.FC<ITable> = ({
     }
   }, [interval, limit]);
 
-  const handleClickCsv = async () => {
-    setLoadingCsv(true);
-    await exportToCsv('transactions', response?.items, router);
-    setLoadingCsv(false);
-  };
-
   const handleScrollTop = () => {
     window.scrollTo(0, 0);
   };
@@ -221,17 +212,9 @@ const Table: React.FC<ITable> = ({
                 </ExportLabel>
                 <ButtonsContainer>
                   <ExportButton
-                    onClick={() => {
-                      handleClickCsv();
-                    }}
-                  >
-                    <Tooltip
-                      msg="CSV"
-                      Component={() =>
-                        loadingCsv ? <Loader /> : <TbTableExport size={25} />
-                      }
-                    />
-                  </ExportButton>
+                    items={response?.items}
+                    tableRequest={tableRequest}
+                  />
                   {/* <ExportButton>
                     <VscJson size={25} />
                   </ExportButton> */}

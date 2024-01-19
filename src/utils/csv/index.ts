@@ -128,6 +128,7 @@ export const exportToCsv = async (
     }
     generateCSVFile(csvFile, filename);
   } catch (error) {
+    console.error(error);
     toast.error(
       'Error exporting CSV, try exporting successful transactions only',
     );

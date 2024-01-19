@@ -714,88 +714,122 @@ export const getDefaultCells = async (
 
   const amountContract = [];
   const parameter = contract[0]?.parameter as any;
-  const assetId: any = parameter.assetId || '';
+  let assetId: any = parameter.assetId || '';
+
   switch (contract[0].typeString) {
     case Contract.Transfer:
-      const coin = parameter?.assetId || 'KLV';
-      let asyncAmount = await getParsedAmount(parameter, coin);
-      amountContract.push(asyncAmount);
-      break;
-
+      try {
+        const coin = parameter?.assetId || 'KLV';
+        const asyncAmount = await getParsedAmount(parameter, coin);
+        amountContract.push(asyncAmount);
+        break;
+      } catch (e) {
+        console.error(Contract.Transfer, e);
+        throw new Error();
+      }
     case Contract.Freeze:
-      let assetId = parameter?.assetId || 'KLV';
-      asyncAmount = await getParsedAmount(parameter, assetId);
-      amountContract.push(asyncAmount);
-      break;
+      try {
+        const assetId = parameter?.assetId || 'KLV';
+        const asyncAmount = await getParsedAmount(parameter, assetId);
+        amountContract.push(asyncAmount);
+        break;
+      } catch (e) {
+        console.error(Contract.Freeze, e);
+        throw new Error();
+      }
     case Contract.Withdraw:
-      let filteredReceipts = filterReceipts(receipts, contract[0].type);
-      assetId = parameter?.assetId || 'KLV';
-      asyncAmount = await getAmountFromReceipts(assetId, 18, filteredReceipts);
-      amountContract.push(asyncAmount);
-      break;
-    case Contract.Claim:
-      filteredReceipts = filterReceipts(receipts, contract[0].type);
-      const claimReceipt = findReceipt(filteredReceipts, 17) as
-        | IClaimReceipt
-        | undefined;
-      asyncAmount = await getAmountFromReceipts(
-        claimReceipt?.assetId || '',
-        17,
-        filteredReceipts,
-      );
-      amountContract.push(asyncAmount);
-      break;
-    case Contract.Vote:
-      let amount = parameter?.amount / 10 ** 6 || 0;
-      amountContract.push(amount);
-      break;
-    case Contract.Buy:
-      let currencyID = parameter?.currencyID || '';
-      filteredReceipts = filterReceipts(receipts, contract[0].type);
-      const senderKAppTransferReceipt = findReceiptWithSender(
-        filteredReceipts,
-        14,
-        sender,
-      ) as IKAppTransferReceipt | undefined;
-      let currencyIDPrecision: any = 6;
-      let amountPrecision: any = 0;
-      if (parameter?.currencyID !== 'KLV' && parameter?.currencyID !== 'KFI') {
-        currencyIDPrecision = await getPrecision(
-          parameter?.currencyID || 'KLV',
+      try {
+        const filteredReceipts = filterReceipts(receipts, contract[0].type);
+        assetId = parameter?.assetId || 'KLV';
+        const asyncAmount = await getAmountFromReceipts(
+          assetId,
+          18,
+          filteredReceipts,
         );
+        amountContract.push(asyncAmount);
+        break;
+      } catch (e) {
+        console.error(Contract.Withdraw, e);
+        throw new Error();
       }
-      if (parameter?.buyType === 'MarketBuy') {
-        if (status !== 'fail') {
-          amountPrecision = await getPrecision(
-            senderKAppTransferReceipt?.assetId ?? '',
-          );
-        } else {
-          amountPrecision = 0;
+    case Contract.Claim:
+      try {
+        const filteredReceipts = filterReceipts(receipts, contract[0].type);
+        const claimReceipt = findReceipt(filteredReceipts, 17) as
+          | IClaimReceipt
+          | undefined;
+        const asyncAmount = await getAmountFromReceipts(
+          claimReceipt?.assetId || '',
+          17,
+          filteredReceipts,
+        );
+        amountContract.push(asyncAmount);
+        break;
+      } catch (e) {
+        console.error(Contract.Claim, e);
+        throw new Error();
+      }
+    case Contract.Vote:
+      try {
+        const amount = parameter?.amount / 10 ** 6 || 0;
+        amountContract.push(amount);
+        break;
+      } catch (e) {
+        console.error(Contract.Vote, e);
+        throw new Error();
+      }
+    case Contract.Buy:
+      try {
+        const currencyID = parameter?.currencyID || 'KLV';
+        const filteredReceipts = filterReceipts(receipts, contract[0].type);
+        const senderKAppTransferReceipt = findReceiptWithSender(
+          filteredReceipts,
+          14,
+          sender,
+        ) as IKAppTransferReceipt | undefined;
+        let currencyIDPrecision: any = 6;
+        let amountPrecision: any = 0;
+        if (currencyID !== 'KLV' && currencyID !== 'KFI') {
+          currencyIDPrecision = await getPrecision(currencyID || 'KLV');
         }
-      } else if (parameter?.buyType === 'ITOBuy') {
-        amountPrecision = (await getPrecision(parameter?.id)) || '';
-      }
-      let buyPrice = getBuyPrice(parameter, senderKAppTransferReceipt);
-      let buyAmount = getBuyAmount(parameter, senderKAppTransferReceipt);
+        if (parameter?.buyType === 'MarketBuy') {
+          if (status !== 'fail') {
+            amountPrecision = await getPrecision(
+              senderKAppTransferReceipt?.assetId ?? 'KLV',
+            );
+          } else {
+            amountPrecision = 0;
+          }
+        } else if (parameter?.buyType === 'ITOBuy') {
+          amountPrecision = (await getPrecision(parameter?.id)) || 0;
+        }
+        let buyPrice = getBuyPrice(parameter, senderKAppTransferReceipt);
+        let buyAmount = getBuyAmount(parameter, senderKAppTransferReceipt);
 
-      if (buyPrice) {
-        buyPrice = buyPrice / 10 ** currencyIDPrecision;
+        if (buyPrice) {
+          buyPrice = buyPrice / 10 ** currencyIDPrecision;
+        }
+        if (buyAmount) {
+          buyAmount = buyAmount / 10 ** amountPrecision;
+        }
+        amountContract.push(buyAmount);
+        break;
+      } catch (e) {
+        console.error(Contract.Buy, e);
+        throw new Error();
       }
-      if (buyAmount) {
-        buyAmount = buyAmount / 10 ** amountPrecision;
-      }
-      amountContract.push(buyAmount);
-      break;
     case Contract.Sell:
-      currencyID = parameter?.currencyID;
-      assetId = parameter?.assetId || 'KLV';
-      const precision = (await getPrecision(
-        parameter?.currencyID || 'KLV',
-      )) as number;
-      const price = (parameter?.price || 0) / 10 ** precision;
-      amount = 1;
-      amountContract.push(price);
-      break;
+      try {
+        const currencyID = parameter?.currencyID || 'KLV';
+        assetId = parameter?.assetId || 'KLV';
+        const precision = (await getPrecision(currencyID || 'KLV')) as number;
+        const price = (parameter?.price || 0) / 10 ** precision;
+        amountContract.push(price);
+        break;
+      } catch (e) {
+        console.error(Contract.Sell, e);
+        throw new Error();
+      }
     default:
   }
   const to = parameter.toAddress || '';

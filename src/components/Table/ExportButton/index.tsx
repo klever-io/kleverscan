@@ -5,12 +5,20 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { TbTableExport } from 'react-icons/tb';
 import { toast } from 'react-toastify';
-import { DropdownItem, DropdownMenu, ExportButtonContainer } from './styles';
+import {
+  DropdownItem,
+  DropdownMenu,
+  ExportButtonContainer,
+  ExportProgressBar,
+  ExportProgressContainer,
+  ExportProgressText,
+} from './styles';
 
 const ExportButton: React.FC<{
   items: any;
   tableRequest: (page: number, limit: number) => Promise<any>;
-}> = ({ items, tableRequest }) => {
+  totalRecords?: number;
+}> = ({ items, tableRequest, totalRecords }) => {
   const router = useRouter();
   const [loadingCsv, setLoadingCsv] = useState(false);
   const [open, setOpen] = useState(false);
@@ -19,24 +27,38 @@ const ExportButton: React.FC<{
     await exportToCsv('transactions', items, router);
     setLoadingCsv(false);
   };
+  const [progress, setProgress] = useState(0);
 
   const exportAll = async () => {
     setLoadingCsv(true);
+    setProgress(0);
     const limit = 100;
-    const promises = [];
-    for (let page = 1; page <= 100; page++) {
-      promises.push(
-        tableRequest(page, limit).then(res => ({ page, items: res?.items })),
-      );
-    }
+    const totalPages = totalRecords ? Math.ceil(totalRecords / limit) : 100;
+    const batchSize = 5;
+    let allResults: any[] = [];
 
     try {
-      const res = await Promise.all(promises);
+      for (let i = 0; i < totalPages; i += batchSize) {
+        const promises = [];
+        for (let j = i; j < Math.min(i + batchSize, totalPages); j++) {
+          const page = j + 1;
+          promises.push(
+            tableRequest(page, limit).then(res => ({
+              page,
+              items: res?.items,
+            })),
+          );
+        }
 
-      res.sort((a, b) => a.page - b.page);
+        const batchResults = await Promise.all(promises);
+        allResults = allResults.concat(batchResults);
+        setProgress(((i + batchSize) / totalPages) * 100);
+      }
 
-      const pageOrderedItems = res.flatMap(r => (r.items ? r.items : []));
-
+      allResults.sort((a, b) => a.page - b.page);
+      const pageOrderedItems = allResults.flatMap(r =>
+        r.items ? r.items : [],
+      );
       await exportToCsv('transactions', pageOrderedItems, router);
     } catch (error) {
       console.error(error);
@@ -67,8 +89,21 @@ const ExportButton: React.FC<{
           e.stopPropagation();
         }}
       >
-        <DropdownItem onClick={exportCurrent}>Current Page</DropdownItem>
-        <DropdownItem onClick={exportAll}>All Pages</DropdownItem>
+        <DropdownItem disabled={loadingCsv} onClick={exportCurrent}>
+          Current Page
+        </DropdownItem>
+        <DropdownItem disabled={loadingCsv} onClick={exportAll}>
+          All Pages
+        </DropdownItem>
+
+        {loadingCsv && (
+          <>
+            <ExportProgressText>Getting Data...</ExportProgressText>
+            <ExportProgressContainer>
+              <ExportProgressBar progress={progress} />
+            </ExportProgressContainer>
+          </>
+        )}
       </DropdownMenu>
     </ExportButtonContainer>
   );

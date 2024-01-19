@@ -687,8 +687,12 @@ export const getHeaderForCSV = (
 
 const getParsedAmount = async (parameter: any, assetId: string) => {
   const amount = parameter?.amount ?? '';
-  const precision = (await getPrecision(assetId)) as number;
-  return amount / 10 ** precision;
+  try {
+    const precision = (await getPrecision(assetId)) as number;
+    return amount / 10 ** precision;
+  } catch (error) {
+    return amount;
+  }
 };
 
 export const getDefaultCells = async (

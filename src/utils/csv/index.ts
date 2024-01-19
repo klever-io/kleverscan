@@ -1,5 +1,6 @@
 import { ITransaction } from '@/types';
 import { NextRouter } from 'next/router';
+import { toast } from 'react-toastify';
 import {
   getContractCells,
   getDefaultCells,
@@ -76,52 +77,59 @@ export const exportToCsv = async (
     window.alert('No data to export!');
     return;
   }
-  let csvFile = '';
-  for (let i = -1; i < rows.length; i++) {
-    const rowContract = rows[i]?.contract || [];
-    const isDefaultHeaders = !router?.query?.type;
-    const isMulticontract = rows[i]?.contract.length > 1;
 
-    if (i === -1) {
-      const headers = processHeaders(router);
-      csvFile += headers + '\n';
-      continue;
-    }
+  try {
+    let csvFile = '';
+    for (let i = -1; i < rows.length; i++) {
+      const rowContract = rows[i]?.contract || [];
+      const isDefaultHeaders = !router?.query?.type;
+      const isMulticontract = rows[i]?.contract.length > 1;
 
-    if (isDefaultHeaders) {
-      if (isMulticontract) {
-        for (let j = 0; j < rowContract.length; j++) {
-          const rowWithFilteredContract = {
-            ...rows[i],
-            contract: [rows[i]?.contract[j]],
-          };
-          csvFile += await processDefaultRow(rowWithFilteredContract, true);
-        }
-      } else {
-        csvFile += await processDefaultRow(rows[i]);
+      if (i === -1) {
+        const headers = processHeaders(router);
+        csvFile += headers + '\n';
+        continue;
       }
-      continue;
-    }
 
-    if (!isDefaultHeaders) {
-      if (isMulticontract) {
-        for (let j = 0; j < rowContract.length; j++) {
-          if (rows[i]?.contract[j].type === Number(router.query.type)) {
+      if (isDefaultHeaders) {
+        if (isMulticontract) {
+          for (let j = 0; j < rowContract.length; j++) {
             const rowWithFilteredContract = {
               ...rows[i],
               contract: [rows[i]?.contract[j]],
             };
-            csvFile += await processContractRow(
-              rowWithFilteredContract,
-              true,
-              j,
-            );
+            csvFile += await processDefaultRow(rowWithFilteredContract, true);
           }
+        } else {
+          csvFile += await processDefaultRow(rows[i]);
         }
-      } else {
-        csvFile += await processContractRow(rows[i]);
+        continue;
+      }
+
+      if (!isDefaultHeaders) {
+        if (isMulticontract) {
+          for (let j = 0; j < rowContract.length; j++) {
+            if (rows[i]?.contract[j].type === Number(router.query.type)) {
+              const rowWithFilteredContract = {
+                ...rows[i],
+                contract: [rows[i]?.contract[j]],
+              };
+              csvFile += await processContractRow(
+                rowWithFilteredContract,
+                true,
+                j,
+              );
+            }
+          }
+        } else {
+          csvFile += await processContractRow(rows[i]);
+        }
       }
     }
+    generateCSVFile(csvFile, filename);
+  } catch (error) {
+    toast.error(
+      'Error exporting CSV, try exporting successful transactions only',
+    );
   }
-  generateCSVFile(csvFile, filename);
 };

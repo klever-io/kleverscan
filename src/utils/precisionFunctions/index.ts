@@ -71,7 +71,7 @@ export async function getPrecision(
         const newPrecisions = { ...storedPrecisions, ...precisions };
         localStorage.setItem('precisions', JSON.stringify(newPrecisions));
         if (precisions[assetId] === undefined) {
-          throw new Error('This asset does not exist');
+          throw new Error(`This asset does not exist - ${assetId}`);
         }
         return precisions[assetId];
       } catch (error: any) {

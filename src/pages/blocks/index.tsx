@@ -115,7 +115,7 @@ const Blocks: React.FC<IBlocks> = () => {
         ),
         blocksStatsToday ? (
           `${formatAmount(
-            (blocksStatsYesterday?.totalBlockRewards || 0) / 10 ** precision,
+            (blocksStatsToday?.totalBlockRewards || 0) / 10 ** precision,
           )} KLV`
         ) : (
           <Skeleton />

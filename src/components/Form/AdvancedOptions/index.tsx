@@ -111,7 +111,7 @@ const PermID: React.FC = () => {
 };
 
 const AccountSelect: React.FC = () => {
-  const { setSenderAccount, setPermID } = useContract();
+  const { setSenderAccount, setPermID, getAssets } = useContract();
   const { walletAddress } = useExtension();
   const [loggedAccountIsSender, setLoggedAccountIsSender] = useState(true);
 
@@ -162,6 +162,7 @@ const AccountSelect: React.FC = () => {
             onChange={e => {
               setSenderAccount(e.target.value);
               setPermID(0);
+              getAssets();
             }}
           />
         </FieldContainer>

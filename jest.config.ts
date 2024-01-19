@@ -6,6 +6,7 @@ const SRC_PATH = '<rootDir>/src';
 const makeModuleNameMapper = (srcPath: string) => {
   const { paths } = compilerOptions;
   const aliases = {
+    '@bugsnag/js': '@bugsnag/browser',
     '^.+\\.(css|less)$': '<rootDir>/config/CSSStub.js',
   };
 

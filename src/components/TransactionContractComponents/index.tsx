@@ -24,6 +24,7 @@ import {
   ISellContract,
   ISetAccountNameContract,
   ISetITOPricesContract,
+  ISmartContract,
   ITOTriggerType,
   ITransferContract,
   IUndelegateContract,
@@ -2597,6 +2598,52 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({
         <span>{parameter?.assetId}</span>
       </Row>
       {renderTriggerTypeData()}
+      {renderMetadata()}
+    </>
+  );
+};
+
+export const SmartContract: React.FC<IIndexedContract> = ({
+  parameter: par,
+  renderMetadata,
+}) => {
+  const parameter = par as ISmartContract;
+
+  return (
+    <>
+      <Row>
+        <span>
+          <strong>Address</strong>
+        </span>
+        <strong>{parameter?.address}</strong>
+      </Row>
+      <Row>
+        <span>
+          <strong>Type</strong>
+        </span>
+        <span>{parameter?.typeName.slice(2)}</span>
+      </Row>
+      {Object.entries(parameter?.callValue || {}).length > 0 && (
+        <Row>
+          <span>
+            <strong>Call Values</strong>
+          </span>
+          <RowContent>
+            <BalanceContainer>
+              <NetworkParamsContainer>
+                {Object.entries(parameter?.callValue || {}).map(
+                  ([key, value]) => (
+                    <div key={key}>
+                      <strong>{key}</strong>
+                      <span>{value}</span>
+                    </div>
+                  ),
+                )}
+              </NetworkParamsContainer>
+            </BalanceContainer>
+          </RowContent>
+        </Row>
+      )}
       {renderMetadata()}
     </>
   );

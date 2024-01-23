@@ -19,6 +19,7 @@ import {
   ISellContract,
   ISetAccountNameContract,
   ISetITOPricesContract,
+  ISmartContract,
   ITransferContract,
   IUndelegateContract,
   IUnfreezeContract,
@@ -508,6 +509,19 @@ const IITOTriggerSections = (par: IParameter): IRowSection[] => {
   ];
 };
 
+const SmartContractSections = (par: IParameter): IRowSection[] => {
+  const parameter = par as unknown as ISmartContract;
+
+  return [
+    {
+      element: (
+        <span key={parameter?.type}>{parameter?.typeName.slice(2) || ''}</span>
+      ),
+      span: 1,
+    },
+  ];
+};
+
 export {
   TransferSections,
   CreateValidatorSections,
@@ -534,4 +548,5 @@ export {
   UpdateAccountPermissionContractSections,
   DepositSections,
   IITOTriggerSections,
+  SmartContractSections,
 };

@@ -15,6 +15,7 @@ import ITOTrigger from './ITOTrigger';
 import Proposal from './Proposal';
 import Sell from './Sell';
 import SetAccountName from './SetAccountName';
+import SmartContract from './SmartContract';
 import Transfer from './Transfer';
 import Undelegate from './Undelegate';
 import Unfreeze from './Unfreeze';
@@ -92,6 +93,8 @@ export const RenderContract: React.FC<IRenderContractProps> = ({
         return <SetAccountName {...contractProps} />;
       case 'UpdateAccountPermissionContract':
         return <UpdateAccountPermission {...contractProps} />;
+      case 'SmartContract':
+        return <SmartContract {...contractProps} />;
       default:
         return <></>;
     }

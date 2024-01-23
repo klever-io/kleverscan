@@ -24,6 +24,7 @@ import {
   Sell,
   SetAccountName,
   SetITOPrices,
+  SmartContract,
   Transfer,
   Undelegate,
   Unfreeze,
@@ -759,6 +760,16 @@ const Transaction: React.FC<ITransactionPage> = props => {
                     renderMetadata={() => renderMetadata(data, index)}
                   />
                   {index < contracts.length - 1 && <Hr />}
+                </div>
+              );
+            case Contract.SmartContract:
+              return (
+                <div key={`${index}`}>
+                  <SmartContract
+                    {...contract}
+                    contractIndex={index}
+                    renderMetadata={() => renderMetadata(data, index)}
+                  />
                 </div>
               );
             default:

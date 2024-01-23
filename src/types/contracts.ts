@@ -32,6 +32,7 @@ export enum Contract {
   UpdateAccountPermission = 'UpdateAccountPermissionContractType',
   Deposit = 'DepositContractType',
   ITOTrigger = 'ITOTriggerContractType',
+  SmartContract = 'SmartContractType',
 }
 
 //used in Filter Contracts
@@ -61,6 +62,7 @@ export enum ContractsName {
   UpdateAccountPermissionContractType = 'Update Account Permission',
   DepositContractType = 'Deposit',
   ITOTriggerContractType = 'ITO Trigger',
+  SmartContractType = 'Smart Contract',
 }
 
 export enum ContractsIndex {
@@ -89,6 +91,7 @@ export enum ContractsIndex {
   'Update Account Permission',
   'Deposit',
   'ITO Trigger',
+  'Smart Contract' = 99,
 }
 
 export interface ReducedContract {
@@ -117,6 +120,7 @@ export interface ReducedContract {
   [22]?: number;
   [23]?: number;
   [24]?: number;
+  [25]?: number;
 }
 
 export interface IContractOption {
@@ -539,6 +543,15 @@ export interface IITOTriggerContract {
   endTime: number;
 }
 
+export interface ISmartContract {
+  type: number;
+  typeName: string;
+  address: string;
+  callValue: {
+    key: number;
+  };
+}
+
 export type IParameter =
   | ITransferContract
   | ICreateAssetContract
@@ -563,7 +576,8 @@ export type IParameter =
   | IConfigMarketplaceContract
   | IUpdateAccountPermissionContract
   | IDepositContract
-  | IITOTriggerContract;
+  | IITOTriggerContract
+  | ISmartContract;
 
 export type IParameterOnlyAssetId =
   | ITransferContract

@@ -140,3 +140,17 @@ export const marketplaceTooltips = {
   referralPercentage:
     'Percentage of the sale that will be sent to the referral address, in the range of 0 to 100, precision of 2 decimal places',
 };
+
+export const smartContractTooltips = {
+  callValue: {
+    title: 'Assets to be sent to the smart contract',
+    label: 'Asset Id',
+    value: 'Amount of assets to be sent',
+  },
+  arguments: {
+    title: 'Values to be passed to the smart contract',
+    value: 'Value of the parameter',
+    function: 'Function to be called',
+  },
+  data: 'Binary data to be passed to the smart contract',
+};

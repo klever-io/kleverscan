@@ -144,6 +144,10 @@ export const contractOptions: IContractOption[] = [
     label: 'Update Account Permission',
     value: 'UpdateAccountPermissionContract',
   },
+  {
+    label: 'Smart Contract',
+    value: 'SmartContract',
+  },
 ];
 export const claimTypes = [
   {
@@ -367,6 +371,7 @@ export const paramContractMap = {
   UpdateAccountPermissionContract: 'KAppFeeUpdateAccountPermission',
   ITOTriggerContract: 'KAppFeeITOTrigger',
   DepositContract: 'KAppFeeDeposit',
+  SmartContract: 'KAppFeeSmartContract',
 };
 
 /**

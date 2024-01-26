@@ -38,4 +38,5 @@ export const proposalsMessages: IProposalsMessages = {
   ProposalMaxEpochsDuration: 'Max Epochs for active proposal duration',
   KAppFeeDeposit: 'KApp Fee for Deposit',
   KAppFeeITOTrigger: 'KApp Fee for ITO Trigger',
+  KAppFeeSmartContract: 'KApp Fee for Smart Contract Deploy and Invoke',
 };

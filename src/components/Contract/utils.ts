@@ -49,6 +49,8 @@ const getType = (rawType: string): TransactionType => {
       break;
     case 'Sell':
       type = 'SellOrder';
+    case 'Smart':
+      type = 'SmartContract';
       break;
   }
   return TransactionType[type];
@@ -748,6 +750,7 @@ const contractsDescription = {
   DepositContract: 'Deposit to a KDA Pool or FPR Pool.',
   ITOTriggerContract: 'Change the parameters of an ITO.',
   UpdateAccountPermissionContract: 'Change the permissions of an account.',
+  SmartContract: 'Deploy or Invoke a smart contract.',
 };
 
 // SDK mock while extension doesn't update

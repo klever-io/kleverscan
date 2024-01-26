@@ -1,21 +1,65 @@
 import { useMulticontract } from '@/contexts/contract/multicontract';
-import {
-  calculateTransferFixedFee,
-  calculateTransterPercentageFee,
-} from '@/utils/create-transaction/fees-calculation.ts';
-import { toLocaleFixed } from '@/utils/formatFunctions';
-import { KLV_PRECISION } from '@/utils/globalVariables';
-import React, { useEffect } from 'react';
-import { useFormContext } from 'react-hook-form';
+import React from 'react';
+import { useFieldArray, useFormContext } from 'react-hook-form';
+import { HiTrash } from 'react-icons/hi';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
-import { KDASelect } from '../KDASelect';
-import { FormBody, FormSection, RoyaltiesContainer } from '../styles';
+import {
+  InfoIcon,
+  TooltipContainer,
+  TooltipContent,
+} from '../FormInput/styles';
+import {
+  ButtonContainer,
+  FormBody,
+  FormSection,
+  SectionTitle,
+} from '../styles';
+import { smartContractTooltips as tooltip } from './utils/tooltips';
 
 type FormData = {
-  receiver: string;
-  amount: number;
-  kda: string;
+  scType: number;
+  address: string;
+  function?: string;
+  arguments?: {
+    value: string | number;
+  }[];
+  callValue: {
+    [coin: string]: number;
+  };
+};
+
+const parseFunctionArguments = (data: FormData, setMetadata: any) => {
+  const { arguments: args } = data;
+
+  let { function: func } = data;
+  func = Buffer.from(func || '').toString('hex');
+
+  const parsedArgs = (args || []).map(value => {
+    const { value: argValue } = value;
+
+    return typeof argValue === 'string'
+      ? Buffer.from(argValue).toString('hex')
+      : argValue.toString(16);
+  });
+  const parsedData = `${func}@${parsedArgs.join('@')}`;
+
+  delete data.arguments;
+  delete data.function;
+
+  setMetadata(parsedData);
+};
+
+const parseCallValue = (data: FormData) => {
+  const { callValue } = data;
+  const newCallValue = {};
+
+  ((callValue as unknown as any[]) || []).forEach(value => {
+    const { label, amount } = value;
+    newCallValue[label] = amount;
+  });
+
+  data.callValue = newCallValue;
 };
 
 const SmartContract: React.FC<IContractProps> = ({
@@ -23,83 +67,151 @@ const SmartContract: React.FC<IContractProps> = ({
   handleFormSubmit,
 }) => {
   const { handleSubmit, watch } = useFormContext<FormData>();
-  const { setSelectedRoyaltiesFees, queue } = useMulticontract();
-  const amount = watch('amount');
+  const { metadata, setMetadata, queue } = useMulticontract();
 
-  const collection = queue[formKey].collection;
+  const scType = watch('scType');
 
-  useEffect(() => {
-    if (collection?.royalties?.transferPercentage) {
-      setSelectedRoyaltiesFees(
-        calculateTransterPercentageFee(amount, collection),
-      );
-    } else if (collection?.royalties?.transferFixed) {
-      setSelectedRoyaltiesFees(calculateTransferFixedFee(collection));
-    }
-  }, [amount, collection]);
+  const onSubmit = async (dataRef: FormData) => {
+    const data = JSON.parse(JSON.stringify(dataRef));
 
-  const transferParse = (data: FormData) => {
-    if (collection?.isNFT) {
-      data['amount'] = 1;
-    }
-  };
-
-  const onSubmit = async (data: FormData) => {
-    transferParse(data);
+    parseFunctionArguments(data, setMetadata);
+    parseCallValue(data);
     await handleFormSubmit(data);
   };
 
-  const getTransferRoyaltyFee = (): number => {
-    if (collection?.isNFT) {
-      return calculateTransferFixedFee(collection);
-    } else {
-      return calculateTransterPercentageFee(amount, collection);
-    }
-  };
-
-  const getKdaRoyalty = (): string => {
-    if (collection?.isNFT) {
-      return 'KLV';
-    }
-    return collection?.value || '';
-  };
-
-  const getRoyaltyPrecision = (): number => {
-    if (collection?.isNFT) {
-      return KLV_PRECISION;
-    }
-    return collection?.precision || 0;
-  };
-
-  const transferRoyalties = getTransferRoyaltyFee();
-  const kdaRoyalty = getKdaRoyalty();
-  const royaltyPrecision = getRoyaltyPrecision();
-
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
-      <KDASelect validateFields={['amount']} />
       <FormSection>
-        {!collection?.isNFT && (
+        <FormInput
+          name="address"
+          span={2}
+          title="Contract Address"
+          tooltip="The contract address to call."
+          required
+        />
+
+        <FormInput
+          name="scType"
+          title="Operation"
+          type="dropdown"
+          tooltip="Deploy a new contract or call an existing contract."
+          options={[
+            { label: 'Deploy', value: 0 },
+            { label: 'Invoke', value: 1 },
+          ]}
+          required
+        />
+
+        {scType === 0 && (
           <FormInput
-            name="amount"
-            title="Amount"
-            type="number"
+            title="Data"
+            type="textarea"
+            value={metadata}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              setMetadata(e.target.value)
+            }
             required
-            precision={collection?.precision}
+            span={2}
+            tooltip={tooltip.data}
           />
         )}
-        <FormInput name="receiver" title="Receiver Address" required />
+        {scType === 1 && <ArgumentsSection />}
+        {scType === 1 && <CallValueSection />}
       </FormSection>
-      {transferRoyalties > 0 && (
-        <RoyaltiesContainer>
-          Royalties:{' '}
-          {`${toLocaleFixed(
-            transferRoyalties,
-            royaltyPrecision,
-          )} ${kdaRoyalty}`}
-        </RoyaltiesContainer>
-      )}
     </FormBody>
+  );
+};
+
+export const ArgumentsSection: React.FC = () => {
+  const { control } = useFormContext();
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'arguments',
+  });
+
+  return (
+    <FormSection inner>
+      <SectionTitle>
+        <span>Arguments</span>
+        <TooltipContainer>
+          <InfoIcon size={13} />
+          <TooltipContent>
+            <span>{tooltip.arguments.title}</span>
+          </TooltipContent>
+        </TooltipContainer>
+      </SectionTitle>
+      <FormInput
+        name="function"
+        title="Function"
+        span={2}
+        tooltip={tooltip.arguments.function}
+        required
+      />
+      {fields.map((field, index) => (
+        <FormSection key={field.id} inner>
+          <SectionTitle>
+            <HiTrash onClick={() => remove(index)} />
+            Parameter {index + 1}
+          </SectionTitle>
+          <FormInput
+            name={`arguments[${index}].value`}
+            title={`Value`}
+            type="custom"
+            tooltip={tooltip.arguments.value}
+            required
+          />
+        </FormSection>
+      ))}
+      <ButtonContainer type="button" onClick={() => append({})}>
+        Add Parameter
+      </ButtonContainer>
+    </FormSection>
+  );
+};
+
+export const CallValueSection: React.FC = () => {
+  const { control } = useFormContext();
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'callValue',
+  });
+
+  return (
+    <FormSection inner>
+      <SectionTitle>
+        <span>Tokens to Send</span>
+        <TooltipContainer>
+          <InfoIcon size={13} />
+          <TooltipContent>
+            <span>{tooltip.callValue.title}</span>
+          </TooltipContent>
+        </TooltipContainer>
+      </SectionTitle>
+      {fields.map((field, index) => (
+        <FormSection key={field.id} inner>
+          <SectionTitle>
+            <HiTrash onClick={() => remove(index)} />
+            Parameter {index + 1}
+          </SectionTitle>
+          <FormInput
+            name={`callValue[${index}].label`}
+            title={`Asset Id`}
+            tooltip={tooltip.callValue.label}
+            required
+          />
+          <FormInput
+            name={`callValue[${index}].amount`}
+            title={`Amount`}
+            type="number"
+            tooltip={tooltip.callValue.value}
+            required
+          />
+        </FormSection>
+      ))}
+      <ButtonContainer type="button" onClick={() => append({})}>
+        Add Parameter
+      </ButtonContainer>
+    </FormSection>
   );
 };
 

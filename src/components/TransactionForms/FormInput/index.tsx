@@ -66,10 +66,14 @@ export interface ICustomFormInputProps extends IBaseFormInputProps {
   onChange: ChangeEventHandler<any>;
 }
 
-export const customDropdownOptions = [
-  { label: 'No', value: 'no' },
+export const customOptions = [
   { label: 'Text', value: 'text' },
   { label: 'Number', value: 'number' },
+];
+
+export const customDropdownOptions = [
+  { label: 'No', value: 'no' },
+  ...customOptions,
 ];
 
 export const onChangeWrapper = (
@@ -136,7 +140,9 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   ...rest
 }) => {
   const areaRef = useRef<HTMLTextAreaElement | null>(null);
-  const [isCustom, setIsCustom] = useState(customDropdownOptions[0]);
+  const [isCustom, setIsCustom] = useState(
+    type === 'dropdown' ? customDropdownOptions[0] : customOptions[0],
+  );
   const router = useRouter();
   const { isMultiContract } = useMulticontract();
   const {
@@ -319,11 +325,15 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
               </TooltipContent>
             </TooltipContainer>
           )}
-          {type === 'dropdown' && (
+          {(type === 'dropdown' || type === 'custom') && (
             <DropdownCustomLabel>
-              <span>Custom value?</span>
+              <span>
+                {type === 'dropdown' ? `Custom value?` : 'Input Type'}
+              </span>
               <DropdownCustomLabelSelect
-                options={customDropdownOptions}
+                options={
+                  type === 'dropdown' ? customDropdownOptions : customOptions
+                }
                 value={isCustom}
                 onChange={(e: any) => {
                   setIsCustom(e) as any;

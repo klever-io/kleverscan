@@ -197,6 +197,7 @@ export enum NetworkParamsIndexer {
   ProposalMaxEpochsDuration = 34,
   KAppFeeITOTrigger = 35,
   KAppFeeDeposit = 36,
+  KAppFeeSmartContract = 37,
 }
 
 export interface IProposalsMessages {
@@ -237,4 +238,5 @@ export interface IProposalsMessages {
   ProposalMaxEpochsDuration: string;
   KAppFeeDeposit: string;
   KAppFeeITOTrigger: string;
+  KAppFeeSmartContract: string;
 }

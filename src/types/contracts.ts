@@ -548,7 +548,7 @@ export interface ISmartContract {
   typeName: string;
   address: string;
   callValue: {
-    key: number;
+    [coin: string]: number;
   };
 }
 

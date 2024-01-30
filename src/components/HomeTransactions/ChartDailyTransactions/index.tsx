@@ -95,6 +95,7 @@ export const ChartDailyTransactions: React.FC = () => {
   const variationCalc =
     last24h - (transactionsList?.[transactionsList?.length - 2]?.valueNow || 0);
   const variation = getVariation(variationCalc / 100);
+
   return (
     <Container>
       <h1>{t('Daily Transactions')}</h1>
@@ -109,7 +110,7 @@ export const ChartDailyTransactions: React.FC = () => {
               </Last24Text>
             </Last24hTxs>
             <VariationText $positive={variation.includes('+')}>
-              <ArrowVariation $positive={variation.includes('+')} />
+              <ArrowVariation isPositive={variation.includes('+')} />
               {variation}
             </VariationText>
           </div>

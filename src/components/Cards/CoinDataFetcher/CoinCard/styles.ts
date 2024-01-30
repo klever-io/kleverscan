@@ -403,10 +403,9 @@ export const ArrowVariation = styled(ArrowUpSquare).attrs(props => ({
   size: 17,
 }))<{ isPositive: boolean }>`
   path {
-    fill: ${props => props =>
-      props.theme.card[props.isPositive ? 'green' : 'red']};
+    fill: ${({ isPositive, theme }) => (isPositive ? theme.green : theme.red)};
   }
-  rotate: ${props => (props.isPositive ? '' : '180deg')};
+  rotate: ${({ isPositive }) => (isPositive ? '' : '180deg')};
 `;
 
 export const SetTimeContainer = styled.div`

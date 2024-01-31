@@ -1,6 +1,7 @@
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
 import { ICollectionList } from '@/types';
+import { useRouter } from 'next/router';
 import React from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
@@ -14,7 +15,12 @@ import {
   FormSection,
   SectionTitle,
 } from '../styles';
-import { parseDates, parsePackInfo, parseWhitelistInfo } from './utils';
+import {
+  parseDates,
+  parsePackInfo,
+  parseWhitelistInfo,
+  removeWrapper,
+} from './utils';
 import { ITOTooltips as tooltip } from './utils/tooltips';
 import { PackInfo, WhitelistInfo } from './utils/types';
 
@@ -177,7 +183,8 @@ const WhitelistConfigSection: React.FC<ISectionProps> = ({
 };
 
 export const WhitelistSection: React.FC<{ top?: number }> = ({ top }) => {
-  const { control } = useFormContext();
+  const { control, getValues } = useFormContext();
+  const router = useRouter();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'whitelistInfo',
@@ -190,7 +197,11 @@ export const WhitelistSection: React.FC<{ top?: number }> = ({ top }) => {
       {fields.map((field, index) => (
         <FormSection key={field.id} inner top={top}>
           <SectionTitle>
-            <HiTrash onClick={() => remove(index)} />
+            <HiTrash
+              onClick={() =>
+                removeWrapper({ index, remove, getValues, router })
+              }
+            />
             Whitelisted Address {index + 1}
           </SectionTitle>
           <FormInput

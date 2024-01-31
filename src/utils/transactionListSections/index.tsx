@@ -515,7 +515,7 @@ const SmartContractSections = (par: IParameter): IRowSection[] => {
   return [
     {
       element: (
-        <span key={parameter?.type}>{parameter?.typeName.slice(2) || ''}</span>
+        <span key={parameter?.type}>{parameter?.typeName?.slice(2) || ''}</span>
       ),
       span: 1,
     },

@@ -303,7 +303,7 @@ export const RequiredSpan = styled.span`
     props.theme.dark ? props.theme.lightBlue : props.theme.lightGray};
 `;
 
-export const InputLabel = styled.label<ILabel>`
+export const InputLabelRow = styled.label<ILabel>`
   user-select: none;
   color: ${({ theme }) => theme.darkText};
   z-index: 1;
@@ -337,6 +337,12 @@ export const InputLabel = styled.label<ILabel>`
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     top: 0.8rem;
   }
+`;
+
+export const InputLabel = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 `;
 
 export const ErrorMessage = styled.span<{ warning?: boolean }>`
@@ -394,6 +400,15 @@ export const DropdownCustomLabelSelectStyles = {
     padding: '0.25rem',
   }),
 };
+
+export const ValidateButton = styled.button`
+  color: ${({ theme }) => theme.true.white};
+  background-color: ${({ theme }) => theme.purple};
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+
+  margin-left: auto;
+`;
 
 export const ModalCreateTxLink = styled.a`
   margin-left: 0.5rem;

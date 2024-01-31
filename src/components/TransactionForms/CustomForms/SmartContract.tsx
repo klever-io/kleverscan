@@ -1,4 +1,6 @@
 import { useMulticontract } from '@/contexts/contract/multicontract';
+import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 import React from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
@@ -14,7 +16,9 @@ import {
   FormBody,
   FormSection,
   SectionTitle,
+  SelectContainer,
 } from '../styles';
+import { removeWrapper } from './utils';
 import { smartContractTooltips as tooltip } from './utils/tooltips';
 
 type FormData = {
@@ -22,12 +26,18 @@ type FormData = {
   address: string;
   function?: string;
   arguments?: {
-    value: string | number;
+    type: 'string' | 'number' | 'array' | 'object';
+    value: string | number | any[] | Record<string, any>;
   }[];
   callValue: {
     [coin: string]: number;
   };
 };
+
+const ReactSelect = dynamic(() => import('react-select'), {
+  ssr: false,
+  loading: () => null,
+});
 
 const parseFunctionArguments = (data: FormData, setMetadata: any) => {
   const { arguments: args } = data;
@@ -115,6 +125,15 @@ const SmartContract: React.FC<IContractProps> = ({
             tooltip={tooltip.data}
           />
         )}
+        {scType === 1 && (
+          <FormInput
+            name="function"
+            title="Function"
+            span={2}
+            tooltip={tooltip.arguments.function}
+            required
+          />
+        )}
         {scType === 1 && <ArgumentsSection />}
         {scType === 1 && <CallValueSection />}
       </FormSection>
@@ -123,7 +142,8 @@ const SmartContract: React.FC<IContractProps> = ({
 };
 
 export const ArgumentsSection: React.FC = () => {
-  const { control } = useFormContext();
+  const { control, getValues } = useFormContext();
+  const router = useRouter();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'arguments',
@@ -140,37 +160,70 @@ export const ArgumentsSection: React.FC = () => {
           </TooltipContent>
         </TooltipContainer>
       </SectionTitle>
-      <FormInput
-        name="function"
-        title="Function"
-        span={2}
-        tooltip={tooltip.arguments.function}
-        required
-      />
-      {fields.map((field, index) => (
-        <FormSection key={field.id} inner>
-          <SectionTitle>
-            <HiTrash onClick={() => remove(index)} />
-            Parameter {index + 1}
-          </SectionTitle>
-          <FormInput
-            name={`arguments[${index}].value`}
-            title={`Value`}
-            type="custom"
-            tooltip={tooltip.arguments.value}
-            required
-          />
-        </FormSection>
-      ))}
-      <ButtonContainer type="button" onClick={() => append({})}>
-        Add Parameter
-      </ButtonContainer>
+      {fields.map((field: any, index) => {
+        let placeholder = '';
+
+        switch (field.type) {
+          case 'text':
+            placeholder = 'E.g. some text';
+            break;
+          case 'number':
+            placeholder = 'E.g. 01';
+            break;
+          case 'array':
+            placeholder = 'E.g. ["value1", "value2"]';
+            break;
+          case 'object':
+            break;
+        }
+
+        return (
+          <FormSection key={field.id} inner>
+            <SectionTitle>
+              <HiTrash
+                onClick={() =>
+                  removeWrapper({ index, remove, getValues, router })
+                }
+              />
+              Argument {index + 1}
+            </SectionTitle>
+            <FormInput
+              name={`arguments[${index}].value`}
+              title={`Value ${index + 1} (${field.type})`}
+              type={field.type}
+              placeholder={placeholder}
+              tooltip={tooltip.arguments.value}
+              required
+            />
+          </FormSection>
+        );
+      })}
+      <SelectContainer>
+        <ReactSelect
+          classNamePrefix="react-select"
+          onChange={(newValue: any) => {
+            append({
+              type: newValue.value,
+              value: '',
+            });
+          }}
+          value={null}
+          options={[
+            { label: 'Text', value: 'text' },
+            { label: 'Number', value: 'number' },
+            { label: 'Array', value: 'array' },
+            { label: 'Object', value: 'object' },
+          ]}
+          placeholder="Add Parameter"
+        />
+      </SelectContainer>
     </FormSection>
   );
 };
 
 export const CallValueSection: React.FC = () => {
-  const { control } = useFormContext();
+  const { control, getValues } = useFormContext();
+  const router = useRouter();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'callValue',
@@ -190,7 +243,11 @@ export const CallValueSection: React.FC = () => {
       {fields.map((field, index) => (
         <FormSection key={field.id} inner>
           <SectionTitle>
-            <HiTrash onClick={() => remove(index)} />
+            <HiTrash
+              onClick={() =>
+                removeWrapper({ index, remove, getValues, router })
+              }
+            />
             Parameter {index + 1}
           </SectionTitle>
           <FormInput

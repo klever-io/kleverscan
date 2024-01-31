@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { NextRouter, useRouter } from 'next/router';
 import { ChangeEventHandler, useEffect, useRef, useState } from 'react';
 import { FieldValues, useFormContext, UseFormGetValues } from 'react-hook-form';
+import { toast } from 'react-toastify';
 import {
   Container,
   DropdownCustomLabel,
@@ -12,6 +13,7 @@ import {
   ErrorMessage,
   InfoIcon,
   InputLabel,
+  InputLabelRow,
   RequiredSpan,
   Slider,
   StyledInput,
@@ -20,6 +22,7 @@ import {
   ToggleContainer,
   TooltipContainer,
   TooltipContent,
+  ValidateButton,
 } from './styles';
 
 const Select = dynamic(() => import('./Select'), {
@@ -76,6 +79,25 @@ export const customDropdownOptions = [
   ...customOptions,
 ];
 
+export const cleanEmptyValues = (
+  obj: Record<string, any>,
+): Record<string, any> => {
+  return Object.entries(obj)
+    .filter(
+      ([_key, value]) =>
+        value !== '' &&
+        value !== null &&
+        value !== undefined &&
+        !Number.isNaN(value),
+    )
+    .reduce((acc, [currKey, currValue]) => {
+      return {
+        ...acc,
+        [currKey]: currValue,
+      };
+    }, {});
+};
+
 export const onChangeWrapper = (
   isMultiContract: boolean,
   router: NextRouter,
@@ -84,30 +106,26 @@ export const onChangeWrapper = (
   customOnChange?: (e: any) => void,
 ) => {
   return (e: React.ChangeEvent<HTMLInputElement>): void => {
-    if (!isMultiContract) {
-      const nonEmptyValues = Object.keys(getValues())
-        .filter(key => getValues()[key] !== '')
-        .reduce((acc, curr) => {
-          return {
-            ...acc,
-            [curr]: getValues()[curr],
-          };
-        }, {});
-
-      if (name) eval(`nonEmptyValues.${name} = e.target.value`);
-
-      let newQuery: NextParsedUrlQuery = router.query?.contract
-        ? { contract: router.query?.contract }
-        : {};
-
-      newQuery = {
-        ...newQuery,
-        ...router.query,
-        contractDetails: JSON.stringify(nonEmptyValues),
-      };
-
-      setQueryAndRouter(newQuery, router);
+    if (isMultiContract) {
+      customOnChange && customOnChange(e);
+      return;
     }
+
+    const nonEmptyValues = cleanEmptyValues(getValues());
+
+    if (name) eval(`nonEmptyValues.${name} = e.target.value`);
+
+    let newQuery: NextParsedUrlQuery = router.query?.contract
+      ? { contract: router.query?.contract }
+      : {};
+
+    newQuery = {
+      ...newQuery,
+      ...router.query,
+      contractDetails: JSON.stringify(nonEmptyValues),
+    };
+
+    setQueryAndRouter(newQuery, router);
 
     customOnChange && customOnChange(e);
   };
@@ -244,6 +262,13 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
     error: Boolean(error),
     logoWarning: logoError !== null ? true : false,
     value: rest.value,
+    placeholder:
+      type === 'object' && !rest.placeholder
+        ? `E.g. {
+  "key1": "value1",
+  "key2": "value2"
+    }`
+        : '',
     onChange: onChange as ChangeEventHandler<HTMLTextAreaElement>,
   };
 
@@ -288,7 +313,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
     });
 
   const handleKey = (e: any) => {
-    if (e.key === 'Tab' && type === 'textarea') {
+    if (e.key === 'Tab' && (type === 'textarea' || type === 'object')) {
       e.preventDefault();
       if (areaRef.current) {
         const start = e.target.selectionStart;
@@ -312,19 +337,22 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   return (
     <Container {...containerProps}>
       {type !== 'hidden' && (
-        <InputLabel disabled={inputProps.disabled}>
-          <span>
-            {title || name}
-            {required && <RequiredSpan>(required)</RequiredSpan>}
-          </span>
-          {tooltip && (
-            <TooltipContainer>
-              <InfoIcon />
-              <TooltipContent>
-                <span>{tooltip}</span>
-              </TooltipContent>
-            </TooltipContainer>
-          )}
+        <InputLabelRow disabled={inputProps.disabled}>
+          <InputLabel>
+            <span>
+              {title || name}
+              {required && <RequiredSpan> (required)</RequiredSpan>}
+            </span>
+            {tooltip && (
+              <TooltipContainer>
+                <InfoIcon />
+                <TooltipContent>
+                  <span>{tooltip}</span>
+                </TooltipContent>
+              </TooltipContainer>
+            )}
+          </InputLabel>
+
           {(type === 'dropdown' || type === 'custom') && (
             <DropdownCustomLabel>
               <span>
@@ -343,7 +371,29 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
               />
             </DropdownCustomLabel>
           )}
-        </InputLabel>
+          {type === 'object' && (
+            <ValidateButton
+              type="button"
+              onClick={() => {
+                if (areaRef.current) {
+                  try {
+                    areaRef.current.value = JSON.stringify(
+                      JSON.parse(areaRef.current.value),
+                      null,
+                      2,
+                    );
+                    toast.success('JSON validated successfully');
+                  } catch (e) {
+                    toast.error('Invalid JSON');
+                    console.error(e);
+                  }
+                }
+              }}
+            >
+              Validate JSON
+            </ValidateButton>
+          )}
+        </InputLabelRow>
       )}
       {type === 'checkbox' && toggleOptions && (
         <>
@@ -360,7 +410,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
       {type === 'dropdown' && isCustom.value === 'no' && (
         <Select {...selectProps} />
       )}
-      {type === 'textarea' && (
+      {(type === 'textarea' || type === 'object') && (
         <StyledTextArea
           onKeyDown={handleKey}
           {...areaProps}
@@ -375,6 +425,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
       {type !== 'checkbox' &&
         (type !== 'dropdown' || isCustom.value !== 'no') &&
         type !== 'textarea' &&
+        type !== 'object' &&
         type !== 'hidden' && <StyledInput {...inputProps} />}
 
       {error && (

@@ -42,8 +42,7 @@ const ReactSelect = dynamic(() => import('react-select'), {
 const parseFunctionArguments = (data: FormData, setMetadata: any) => {
   const { arguments: args } = data;
 
-  let { function: func } = data;
-  func = Buffer.from(func || '').toString('hex');
+  const { function: func } = data;
 
   const parsedArgs = (args || []).map(value => {
     const { value: argValue } = value;
@@ -93,26 +92,18 @@ const SmartContract: React.FC<IContractProps> = ({
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
       <FormSection>
         <FormInput
-          name="address"
-          span={2}
-          title="Contract Address"
-          tooltip="The contract address to call."
-          required
-        />
-
-        <FormInput
           name="scType"
           title="Operation"
           type="dropdown"
           tooltip="Deploy a new contract or call an existing contract."
           options={[
-            { label: 'Deploy', value: 0 },
-            { label: 'Invoke', value: 1 },
+            { label: 'Deploy', value: 1 },
+            { label: 'Invoke', value: 0 },
           ]}
           required
         />
 
-        {scType === 0 && (
+        {scType === 1 && (
           <FormInput
             title="Data"
             type="textarea"
@@ -125,7 +116,17 @@ const SmartContract: React.FC<IContractProps> = ({
             tooltip={tooltip.data}
           />
         )}
-        {scType === 1 && (
+
+        {scType === 0 && (
+          <FormInput
+            name="address"
+            span={2}
+            title="Contract Address"
+            tooltip="The contract address to call."
+            required
+          />
+        )}
+        {scType === 0 && (
           <FormInput
             name="function"
             title="Function"
@@ -134,8 +135,8 @@ const SmartContract: React.FC<IContractProps> = ({
             required
           />
         )}
-        {scType === 1 && <ArgumentsSection />}
-        {scType === 1 && <CallValueSection />}
+        {scType === 0 && <ArgumentsSection />}
+        {scType === 0 && <CallValueSection />}
       </FormSection>
     </FormBody>
   );

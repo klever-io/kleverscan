@@ -2621,7 +2621,11 @@ export const SmartContract: React.FC<IIndexedContract> = ({
         <span>
           <strong>Contract Address</strong>
         </span>
-        <strong>{scAddress}</strong>
+
+        <CenteredRow>
+          <span>{scAddress}</span>
+          <Copy data={scAddress} info="address"></Copy>
+        </CenteredRow>
       </Row>
       <Row>
         <span>

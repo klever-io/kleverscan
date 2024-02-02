@@ -188,6 +188,7 @@ export interface ITransaction {
   receipts: IReceipt[];
   precision?: number;
   kdaFee?: IKdaFee;
+  logs?: any;
 }
 
 export interface ITransactionAssetIds {

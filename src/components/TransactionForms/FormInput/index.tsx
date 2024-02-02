@@ -14,7 +14,6 @@ import {
   FileInput,
   InfoIcon,
   InputLabel,
-  InputLabelRow,
   RequiredSpan,
   Slider,
   StyledInput,
@@ -371,21 +370,19 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   return (
     <Container {...containerProps}>
       {type !== 'hidden' && (
-        <InputLabelRow disabled={inputProps.disabled}>
-          <InputLabel>
-            <span>
-              {title || name}
-              {required && <RequiredSpan> (required)</RequiredSpan>}
-            </span>
-            {tooltip && (
-              <TooltipContainer>
-                <InfoIcon />
-                <TooltipContent>
-                  <span>{tooltip}</span>
-                </TooltipContent>
-              </TooltipContainer>
-            )}
-          </InputLabel>
+        <InputLabel disabled={inputProps.disabled}>
+          <span>
+            {title || name}
+            {required && <RequiredSpan>(required)</RequiredSpan>}
+          </span>
+          {tooltip && (
+            <TooltipContainer>
+              <InfoIcon />
+              <TooltipContent>
+                <span>{tooltip}</span>
+              </TooltipContent>
+            </TooltipContainer>
+          )}
 
           {(type === 'dropdown' || type === 'custom') && (
             <DropdownCustomLabel>
@@ -427,7 +424,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
               Validate JSON
             </ValidateButton>
           )}
-        </InputLabelRow>
+        </InputLabel>
       )}
       {type === 'checkbox' && toggleOptions && (
         <>

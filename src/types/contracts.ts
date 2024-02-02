@@ -615,6 +615,7 @@ export interface IIndexedContract extends IContract {
   contractIndex: number;
   renderMetadata: () => JSX.Element | null;
   filteredReceipts: IReceipt[];
+  logs?: any;
 }
 
 export interface IContractBuyProps extends IContract {

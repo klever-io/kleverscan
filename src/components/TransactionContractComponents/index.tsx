@@ -2606,16 +2606,22 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({
 export const SmartContract: React.FC<IIndexedContract> = ({
   parameter: par,
   renderMetadata,
+  logs,
 }) => {
   const parameter = par as ISmartContract;
+
+  const scAddress =
+    logs?.events
+      .map((event: any) => (event.address !== '' ? event.address : ''))
+      .filter((value: any) => value !== '')[0] || '';
 
   return (
     <>
       <Row>
         <span>
-          <strong>Address</strong>
+          <strong>Contract Address</strong>
         </span>
-        <strong>{parameter?.address}</strong>
+        <strong>{scAddress}</strong>
       </Row>
       <Row>
         <span>

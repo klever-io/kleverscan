@@ -142,15 +142,25 @@ export const marketplaceTooltips = {
 };
 
 export const smartContractTooltips = {
-  callValue: {
-    title: 'Assets to be sent to the smart contract',
-    label: 'Asset Id',
-    value: 'Amount of assets to be sent',
+  data: 'Binary data to be passed to the smart contract',
+  address: 'Address of the smart contract',
+  deployAddress: 'Address of the owner of the smart contract',
+  properties: {
+    title: 'Choose the properties the new token will have',
+    upgradable: 'The smart contract can be upgraded',
+    readable: 'The smart contract can be read',
+    payable: 'The smart contract can receive assets',
+    payableBySC:
+      'The smart contract can receive assets from another smart contract',
   },
   arguments: {
     title: 'Values to be passed to the smart contract',
     value: 'Value of the parameter',
     function: 'Function to be called',
   },
-  data: 'Binary data to be passed to the smart contract',
+  callValue: {
+    title: 'Assets to be sent to the smart contract',
+    label: 'Asset Id',
+    value: 'Amount of assets to be sent',
+  },
 };

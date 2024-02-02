@@ -11,6 +11,7 @@ import {
   DropdownCustomLabel,
   DropdownCustomLabelSelectStyles,
   ErrorMessage,
+  FileInput,
   InfoIcon,
   InputLabel,
   InputLabelRow,
@@ -103,10 +104,11 @@ export const onChangeWrapper = (
   router: NextRouter,
   getValues: UseFormGetValues<FieldValues>,
   name: string,
+  type?: string,
   customOnChange?: (e: any) => void,
 ) => {
   return (e: React.ChangeEvent<HTMLInputElement>): void => {
-    if (isMultiContract) {
+    if (isMultiContract || type === 'file') {
       customOnChange && customOnChange(e);
       return;
     }
@@ -161,6 +163,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   const [isCustom, setIsCustom] = useState(
     type === 'dropdown' ? customDropdownOptions[0] : customOptions[0],
   );
+  const [dragging, setDragging] = useState(false);
   const router = useRouter();
   const { isMultiContract } = useMulticontract();
   const {
@@ -199,6 +202,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
             router,
             getValues,
             name,
+            type,
             customOnChange,
           ),
         })
@@ -213,6 +217,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
             router,
             getValues,
             name,
+            type,
             customOnChange,
           ),
           validate: (value: any) => {
@@ -312,6 +317,18 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
       onWheel: preventScroll,
     });
 
+  type === 'file' &&
+    (inputProps = {
+      ...inputProps,
+      onDrop: (e: any) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        e.target.files = e.dataTransfer.files;
+        onChange && onChange(e);
+      },
+    });
+
   const handleKey = (e: any) => {
     if (e.key === 'Tab' && (type === 'textarea' || type === 'object')) {
       e.preventDefault();
@@ -332,6 +349,23 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
         }
       }
     }
+  };
+
+  const preventEvent = (event: any) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
+  const handleDragEnter = (event: any) => {
+    preventEvent(event);
+
+    setDragging(true);
+  };
+
+  const handleDragLeave = (event: any) => {
+    preventEvent(event);
+
+    setDragging(false);
   };
 
   return (
@@ -421,11 +455,22 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
           }}
         />
       )}
+      {type === 'file' && (
+        <FileInput
+          {...inputProps}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDragOver={preventEvent}
+          onMouseLeave={() => setDragging(false)}
+          Dragging={dragging}
+        />
+      )}
       {type === 'hidden' && <StyledInput {...inputProps} />}
       {type !== 'checkbox' &&
         (type !== 'dropdown' || isCustom.value !== 'no') &&
         type !== 'textarea' &&
         type !== 'object' &&
+        type !== 'file' &&
         type !== 'hidden' && <StyledInput {...inputProps} />}
 
       {error && (

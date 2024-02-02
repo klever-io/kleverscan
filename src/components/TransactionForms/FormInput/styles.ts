@@ -122,6 +122,39 @@ ${({ theme, logoWarning }) =>
   }
 `;
 
+export const FileInput = styled.input<{ Dragging: boolean }>`
+  ${defaultStyles}
+
+  border-style: dashed;
+
+  height: 5rem;
+  line-height: 3.75rem;
+
+  &::-webkit-file-upload-button {
+    display: none;
+  }
+  &::before {
+    content: 'Browse Files';
+    display: inline;
+
+    max-width: 10rem;
+    background: ${({ theme }) => theme.violet};
+    color: ${({ theme }) => theme.true.white};
+    padding: 0.5rem 1rem;
+    margin: 0 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+  }
+
+  ${({ theme, Dragging }) =>
+    Dragging
+      ? css`
+          border-color: ${theme.violet};
+          background-color: ${transparentize(0.9, theme.violet)};
+        `
+      : null}
+`;
+
 export const StyledTextArea = styled.textarea<IProps>`
   ${defaultStyles}
 

@@ -1,3 +1,4 @@
+import { IAssetBalance } from '@/components/AccountDetailsModal';
 import { IAllowanceResponse } from '@/pages/account/[account]';
 import api from '@/services/api';
 import {
@@ -11,6 +12,7 @@ import {
   ITransaction,
   Service,
 } from '@/types';
+import { formatAmount } from '@/utils/formatFunctions';
 import { UINT32_MAX } from '@/utils/globalVariables';
 import { getPrecision } from '@/utils/precisionFunctions';
 import { NextRouter } from 'next/router';
@@ -462,4 +464,49 @@ export const myAccountCall = async (
   } catch (error) {
     console.error(error);
   }
+};
+
+export interface IAccountBalance {
+  otherAssets: IAssetBalance[];
+  balance: { klv: string };
+}
+
+export const getAccountBalanceRequest = async (
+  walletAddress: string,
+  setLoadingBalance: React.Dispatch<React.SetStateAction<boolean>>,
+): Promise<IAccountBalance> => {
+  if (!walletAddress) {
+    // Return a default value or throw an error if walletAddress is not provided
+    throw new Error('Wallet address is required');
+  }
+  setLoadingBalance(true); // setLoadingBalance might not be necessary with React Query
+  const res: IAccountResponse = await api.get({
+    route: `address/${walletAddress}`,
+  });
+  if (res.error) {
+    if (res.error === 'cannot find account in database') {
+      // Handle error or return default value
+      return {
+        otherAssets: [{ assetId: 'KLV', balance: '0' }],
+        balance: { klv: '0' },
+      };
+    }
+    throw new Error(res.error.toString());
+  }
+
+  const klvAvailableBalance = res?.data?.account?.balance;
+  const accountAssets = res?.data?.account.assets;
+  const otherAssets: IAssetBalance[] = accountAssets
+    ? Object.values(accountAssets).map(asset => ({
+        assetId: asset.assetId,
+        balance: formatAmount(asset.balance / 10 ** asset.precision),
+      }))
+    : [];
+
+  const balance =
+    typeof klvAvailableBalance === 'number'
+      ? { klv: formatAmount(klvAvailableBalance / 10 ** 6) }
+      : { klv: '0' };
+
+  return { otherAssets, balance };
 };

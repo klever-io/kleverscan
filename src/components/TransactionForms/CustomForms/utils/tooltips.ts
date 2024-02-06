@@ -153,6 +153,7 @@ export const smartContractTooltips = {
     payableBySC:
       'The smart contract can receive assets from another smart contract',
   },
+  abi: 'ABI of the smart contract',
   arguments: {
     title: 'Values to be passed to the smart contract',
     value: 'Value of the parameter',

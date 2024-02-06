@@ -1,9 +1,11 @@
 import { useMulticontract } from '@/contexts/contract/multicontract';
+import { ABI, ABITypeMap } from '@/types/contracts';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
+import { toast } from 'react-toastify';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
 import {
@@ -59,6 +61,13 @@ const parseFunctionArguments = (data: FormData, setMetadata: any) => {
   const parsedArgs = (args || []).map(value => {
     const { value: argValue } = value;
 
+    if (typeof argValue === 'number' && isNaN(argValue)) {
+      return '';
+    }
+    if (argValue === null || argValue === undefined) {
+      return '';
+    }
+
     return typeof argValue === 'string'
       ? Buffer.from(argValue).toString('hex')
       : argValue.toString(16);
@@ -69,6 +78,59 @@ const parseFunctionArguments = (data: FormData, setMetadata: any) => {
   delete data.function;
 
   setMetadata(parsedData);
+};
+
+const mapType = (abiType: string) => {
+  for (const [key, values] of Object.entries(ABITypeMap)) {
+    if (
+      values.includes(abiType.toLowerCase()) ||
+      values.includes(
+        abiType.replace(/^(Option|optional)<|>$/g, '').toLowerCase(),
+      ) ||
+      values.includes(
+        abiType
+          .replace(/^(Option|optional)<|>$/g, '')
+          .split('<')[0]
+          .toLowerCase(),
+      )
+    ) {
+      return key;
+    } else if (
+      values.includes(
+        abiType
+          .replace(/^(Option|optional)<|>$/g, '')
+          .split('<')[0]
+          .toLowerCase(),
+      )
+    ) {
+      return 'object';
+    }
+  }
+  return 'string';
+};
+
+const parseAbi = (abi: string) => {
+  const parsedAbi: ABI = JSON.parse(abi);
+
+  const result = {};
+  parsedAbi.endpoints.forEach(endpoint => {
+    if (endpoint.mutability === 'readonly') return;
+
+    const funcName = endpoint.name;
+    const inputs = endpoint.inputs.reduce((acc, input) => {
+      const isOptional = input.type.toLowerCase().startsWith('option');
+      const cleanType = isOptional
+        ? (input.type.match(/<(.*)>/) || [])[1]
+        : input.type;
+      acc[input.name] = {
+        type: mapType(cleanType),
+        required: !isOptional,
+      };
+      return acc;
+    }, {});
+    result[funcName] = inputs;
+  });
+  return result;
 };
 
 const parseCallValue = (data: FormData) => {
@@ -83,6 +145,17 @@ const parseCallValue = (data: FormData) => {
   data.callValue = newCallValue;
 };
 
+interface ABIFunctionMap {
+  [functionName: string]: ABIFunction;
+}
+
+type ABIFunction = {
+  [argumentName: string]: {
+    type: string;
+    required: boolean;
+  };
+};
+
 const SmartContract: React.FC<IContractProps> = ({
   formKey,
   handleFormSubmit,
@@ -91,9 +164,12 @@ const SmartContract: React.FC<IContractProps> = ({
   const { metadata, setMetadata, queue } = useMulticontract();
 
   const [fileData, setFileData] = React.useState<string>('');
+  const [functions, setFunctions] = React.useState<ABIFunctionMap>({});
   const [propertiesString, setPropertiesString] = React.useState<string>(
     (0x506).toString(2),
   );
+
+  const func: ABIFunction = functions[watch('function') || ''];
 
   const scType = watch('scType');
 
@@ -166,14 +242,48 @@ const SmartContract: React.FC<IContractProps> = ({
         )}
         {scType === 0 && (
           <FormInput
+            title="Contract ABI"
+            type="file"
+            accept=".json"
+            span={2}
+            tooltip={tooltip.abi}
+            onChange={async (e: any) => {
+              const abi = await (e.target.files[0] as File).text();
+
+              try {
+                setFunctions(parseAbi(abi));
+              } catch (error) {
+                toast.error('Invalid ABI file');
+                console.error(error);
+                e.target.value = '';
+                return;
+              }
+            }}
+            onClick={(e: any) => {
+              setFunctions({});
+              e.target.value = '';
+            }}
+          />
+        )}
+        {scType === 0 && (
+          <FormInput
             name="function"
             title="Function"
+            type={Object.keys(functions).length > 0 ? 'dropdown' : 'text'}
+            options={
+              Object.keys(functions).length > 0
+                ? Object.keys(functions).map(func => ({
+                    label: func,
+                    value: func,
+                  }))
+                : []
+            }
             span={2}
             tooltip={tooltip.arguments.function}
             required
           />
         )}
-        {scType === 0 && <ArgumentsSection />}
+        {scType === 0 && <ArgumentsSection function={func} />}
         {scType === 0 && <CallValueSection />}
       </FormSection>
     </FormBody>
@@ -291,13 +401,34 @@ export const PropertiesSection: React.FC<IProperties> = ({
   );
 };
 
-export const ArgumentsSection: React.FC = () => {
+interface IArguments {
+  function: ABIFunction;
+}
+
+export const ArgumentsSection: React.FC<IArguments> = ({ function: func }) => {
   const { control, getValues } = useFormContext();
   const router = useRouter();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'arguments',
   });
+
+  useEffect(() => {
+    if (func) {
+      fields.forEach(_ => {
+        remove();
+      });
+
+      append(
+        Object.keys(func).map(key => ({
+          name: key,
+          type: func[key].type,
+          value: func[key].type === 'number' ? NaN : '',
+          required: func[key].required,
+        })),
+      );
+    }
+  }, [func]);
 
   return (
     <FormSection inner>
@@ -339,11 +470,16 @@ export const ArgumentsSection: React.FC = () => {
             </SectionTitle>
             <FormInput
               name={`arguments[${index}].value`}
-              title={`Value ${index + 1} (${field.type})`}
+              title={
+                field.name
+                  ? `${field.name} (${field.type})`
+                  : `Value ${index + 1} (${field.type})`
+              }
               type={field.type}
               placeholder={placeholder}
               tooltip={tooltip.arguments.value}
-              required
+              required={field.required}
+              canBeNaN
             />
           </FormSection>
         );

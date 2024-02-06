@@ -838,6 +838,7 @@ export interface INodeAccountResponse extends IResponse {
 
 export interface IAccountResponse extends IResponse {
   pagination: IPagination;
+  data: { account: IAccount };
 }
 
 export interface ICollectionIdListResponse extends IResponse {

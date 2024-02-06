@@ -93,7 +93,7 @@ const Filter: React.FC<IFilter> = ({
       <HiddenInput
         {...rest}
         type="text"
-        value={selected?.value}
+        value={selected?.value !== undefined ? selected.value : ''}
         {...register(name)}
       />
     </Container>

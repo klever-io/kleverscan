@@ -1,5 +1,6 @@
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { setQueryAndRouter } from '@/utils';
+import { useDidUpdateEffect } from '@/utils/hooks';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import dynamic from 'next/dynamic';
 import { NextRouter, useRouter } from 'next/router';
@@ -59,6 +60,7 @@ export interface IBaseFormInputProps
   onInputChange?: (e: any) => void;
   creatable?: boolean;
   dynamicInitialValue?: any;
+  canBeNaN?: boolean;
 }
 
 export interface IFormInputProps extends IBaseFormInputProps {
@@ -156,6 +158,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   logoError = null,
   handleScrollBottom,
   dynamicInitialValue,
+  canBeNaN = false,
   ...rest
 }) => {
   const areaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -173,6 +176,14 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
     setValue,
     getValues,
   } = useFormContext();
+
+  useDidUpdateEffect(() => {
+    if (type === 'dropdown') {
+      setIsCustom(customDropdownOptions[0]);
+    } else {
+      setIsCustom(customOptions[0]);
+    }
+  }, [type]);
 
   let error = null;
 
@@ -220,7 +231,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
             customOnChange,
           ),
           validate: (value: any) => {
-            if (Number.isNaN(value)) {
+            if (!canBeNaN && Number.isNaN(value)) {
               return 'Only numbers allowed';
             }
 

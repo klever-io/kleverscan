@@ -652,3 +652,61 @@ export enum ContractsRecipesTypes {
   UpdateKDAPool,
   UpdateITO,
 }
+
+interface EndpointInput {
+  name: string;
+  type: string; // Simplified, in reality, this could be more specific or an enum.
+  multi_arg?: boolean;
+}
+
+interface Endpoint {
+  name: string;
+  mutability: 'mutable' | 'readonly';
+  inputs: EndpointInput[];
+  outputs: any[]; // Simplified, outputs could be more detailed based on specific needs.
+  payableInTokens?: string[];
+}
+
+export interface ABI {
+  name: string;
+  constructor: {
+    inputs: any[];
+    outputs: any[];
+  };
+  endpoints: Endpoint[];
+  types: {
+    [key: string]: {
+      type: string;
+      fields?: {
+        name: string;
+        type: string;
+      }[];
+      variants?: {
+        name: string;
+        fields: {
+          name: string;
+          discriminant: number;
+        }[];
+      }[];
+    };
+  };
+}
+
+export const ABITypeMap = {
+  number: ['BigUint', 'BigInt', 'u32', 'u64', 'u128', 'i32', 'i64', 'i128'].map(
+    type => type.toLowerCase(),
+  ),
+  string: [
+    'TokenIdentifier',
+    'String',
+    'Address',
+    'Bytes',
+    'Hash',
+    'PublicKey',
+    'Signature',
+    'ManagedBuffer',
+  ].map(type => type.toLowerCase()),
+  array: ['Vec', 'Tuple', 'Array', 'List', 'ManagedVec'].map(type =>
+    type.toLowerCase(),
+  ),
+};

@@ -146,7 +146,8 @@ export const smartContractTooltips = {
   address: 'Address of the smart contract',
   deployAddress: 'Address of the owner of the smart contract',
   properties: {
-    title: 'Choose the properties the new token will have',
+    title:
+      "Choose the properties the Smart Contract will have. They can't be changed after the contract is deployed",
     upgradable: 'The smart contract can be upgraded',
     readable: 'The smart contract can be read',
     payable: 'The smart contract can receive assets',

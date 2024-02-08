@@ -62,6 +62,7 @@ export interface IBaseFormInputProps
   dynamicInitialValue?: any;
   canBeNaN?: boolean;
   titleLess?: boolean;
+  disableCustom?: boolean;
 }
 
 export interface IFormInputProps extends IBaseFormInputProps {
@@ -161,6 +162,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   dynamicInitialValue,
   canBeNaN = false,
   titleLess = false,
+  disableCustom = false,
   ...rest
 }) => {
   const areaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -325,7 +327,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   (type === 'number' || isCustom.value === 'number') &&
     (inputProps = {
       ...inputProps,
-      step: 1 / 10 ** precision,
+      step: 1 / 10 ** (precision || 0),
       onWheel: preventScroll,
     });
 
@@ -397,7 +399,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
             </TooltipContainer>
           )}
 
-          {(type === 'dropdown' || type === 'custom') && (
+          {(type === 'dropdown' || type === 'custom') && !disableCustom && (
             <DropdownCustomLabel>
               <span>
                 {type === 'dropdown' ? `Custom value?` : 'Input Type'}

@@ -133,7 +133,7 @@ export const NamedKDASelect: React.FC<IKDASelect> = props => {
     refetch();
   }, [senderAccount]);
 
-  const showAssetIdInputConditional = collection?.isNFT || true;
+  const showAssetIdInputConditional = collection?.isNFT;
 
   return (
     <SelectContainer key={collection?.assetId} span={2}>

@@ -1,4 +1,5 @@
 import { useMulticontract } from '@/contexts/contract/multicontract';
+import { useExtension } from '@/contexts/extension';
 import { ABI, ABITypeMap } from '@/types/contracts';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -170,22 +171,29 @@ const SmartContract: React.FC<IContractProps> = ({
   formKey,
   handleFormSubmit,
 }) => {
-  const { handleSubmit, watch } = useFormContext<FormData>();
+  const { handleSubmit, watch, setValue } = useFormContext<FormData>();
   const { metadata, setMetadata, queue } = useMulticontract();
+  const { walletAddress } = useExtension();
 
   const [fileData, setFileData] = React.useState<string>('');
-  const [functions, setFunctions] = React.useState<ABIFunctionMap>({
-    '': {
-      arguments: {},
-    },
-  });
+  const [functions, setFunctions] = React.useState<ABIFunctionMap>({});
   const [propertiesString, setPropertiesString] = React.useState<string>(
     (0x506).toString(2),
   );
 
-  const func: ABIFunction = functions[watch('function') || ''];
+  const func: ABIFunction = functions?.[watch('function') || ''];
+
+  const hasFunctions = Object.keys(functions).length > 0;
 
   const scType = watch('scType');
+
+  useEffect(() => {
+    if (scType === 1) {
+      setValue('address', walletAddress);
+    } else {
+      setValue('address', '');
+    }
+  }, [scType]);
 
   const onSubmit = async (dataRef: FormData) => {
     const data = JSON.parse(JSON.stringify(dataRef));
@@ -210,13 +218,15 @@ const SmartContract: React.FC<IContractProps> = ({
             { label: 'Invoke', value: 0 },
           ]}
           required
+          disableCustom
         />
 
         <FormInput
           name="address"
+          dynamicInitialValue={scType === 0 ? '' : walletAddress}
           span={2}
-          title={scType === 0 ? 'Contract Address' : 'Contract Owner Address'}
-          tooltip={scType === 0 ? tooltip.address : tooltip.deployAddress}
+          title={scType === 1 ? 'Contract Address' : 'Contract Owner Address'}
+          tooltip={scType === 1 ? tooltip.address : tooltip.deployAddress}
           required
         />
 
@@ -224,6 +234,7 @@ const SmartContract: React.FC<IContractProps> = ({
           <FormInput
             title="Contract Binary"
             type="file"
+            accept=".wasm"
             onChange={(e: any) => {
               const reader = new FileReader();
               reader.onload = (e: any) => {
@@ -274,11 +285,7 @@ const SmartContract: React.FC<IContractProps> = ({
               }
             }}
             onClick={(e: any) => {
-              setFunctions({
-                '': {
-                  arguments: {},
-                },
-              });
+              setFunctions({});
               e.target.value = '';
             }}
           />
@@ -287,9 +294,9 @@ const SmartContract: React.FC<IContractProps> = ({
           <FormInput
             name="function"
             title="Function"
-            type={Object.keys(functions).length > 0 ? 'dropdown' : 'text'}
+            type={hasFunctions ? 'dropdown' : 'text'}
             options={
-              Object.keys(functions).length > 0
+              hasFunctions
                 ? Object.keys(functions).map(func => ({
                     label: func,
                     value: func,
@@ -302,9 +309,10 @@ const SmartContract: React.FC<IContractProps> = ({
           />
         )}
         {scType === 0 && <ArgumentsSection arguments={func?.arguments} />}
-        {scType === 0 && (
-          <CallValueSection allowedAssets={func?.allowedAssets || ['*']} />
-        )}
+        {scType === 0 &&
+          ((hasFunctions && func?.allowedAssets) || !hasFunctions) && (
+            <CallValueSection allowedAssets={func?.allowedAssets} />
+          )}
       </FormSection>
     </FormBody>
   );
@@ -421,7 +429,7 @@ export const PropertiesSection: React.FC<IProperties> = ({
 };
 
 interface IArguments {
-  arguments: ABIFunctionArguments;
+  arguments?: ABIFunctionArguments;
 }
 
 export const ArgumentsSection: React.FC<IArguments> = ({ arguments: args }) => {
@@ -503,31 +511,33 @@ export const ArgumentsSection: React.FC<IArguments> = ({ arguments: args }) => {
           </FormSection>
         );
       })}
-      <SelectContainer>
-        <ReactSelect
-          classNamePrefix="react-select"
-          onChange={(newValue: any) => {
-            append({
-              type: newValue.value,
-              value: '',
-            });
-          }}
-          value={null}
-          options={[
-            { label: 'Text', value: 'text' },
-            { label: 'Number', value: 'number' },
-            { label: 'Array', value: 'array' },
-            { label: 'Object', value: 'object' },
-          ]}
-          placeholder="Add Parameter"
-        />
-      </SelectContainer>
+      {args === undefined && (
+        <SelectContainer>
+          <ReactSelect
+            classNamePrefix="react-select"
+            onChange={(newValue: any) => {
+              append({
+                type: newValue.value,
+                value: '',
+              });
+            }}
+            value={null}
+            options={[
+              { label: 'Text', value: 'text' },
+              { label: 'Number', value: 'number' },
+              { label: 'Array', value: 'array' },
+              { label: 'Object', value: 'object' },
+            ]}
+            placeholder="Add Argument"
+          />
+        </SelectContainer>
+      )}
     </FormSection>
   );
 };
 
 interface IAllowedAssets {
-  allowedAssets: string[];
+  allowedAssets?: string[];
 }
 
 export const CallValueSection: React.FC<IAllowedAssets> = ({
@@ -562,33 +572,31 @@ export const CallValueSection: React.FC<IAllowedAssets> = ({
         </TooltipContainer>
       </SectionTitle>
       {fields.map((field, index) => (
-        <>
-          <FormSection key={field.id} inner>
-            <SectionTitle>
-              <HiTrash
-                onClick={() =>
-                  removeWrapper({ index, remove, getValues, router })
-                }
-              />
-              Parameter {index + 1}
-            </SectionTitle>
+        <FormSection key={field.id} inner>
+          <SectionTitle>
+            <HiTrash
+              onClick={() =>
+                removeWrapper({ index, remove, getValues, router })
+              }
+            />
+            Token {index + 1}
+          </SectionTitle>
 
-            <NamedKDASelect
-              name={`callValue[${index}].label`}
-              allowedAssets={allowedAssets}
-            />
-            <FormInput
-              name={`callValue[${index}].amount`}
-              title={`Amount`}
-              type="number"
-              tooltip={tooltip.callValue.value}
-              required
-            />
-          </FormSection>
-        </>
+          <NamedKDASelect
+            name={`callValue[${index}].label`}
+            allowedAssets={allowedAssets}
+          />
+          <FormInput
+            name={`callValue[${index}].amount`}
+            title={`Amount`}
+            type="number"
+            tooltip={tooltip.callValue.value}
+            required
+          />
+        </FormSection>
       ))}
       <ButtonContainer type="button" onClick={() => append({})}>
-        Add Parameter
+        Add Token
       </ButtonContainer>
     </FormSection>
   );

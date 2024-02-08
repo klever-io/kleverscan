@@ -13,6 +13,7 @@ import {
   TooltipContainer,
   TooltipContent,
 } from '../FormInput/styles';
+import { NamedKDASelect } from '../KDASelect/Named';
 import {
   ButtonContainer,
   FormBody,
@@ -109,7 +110,7 @@ const mapType = (abiType: string) => {
   return 'string';
 };
 
-const parseAbi = (abi: string) => {
+const parseAbi = (abi: string): ABIFunctionMap => {
   const parsedAbi: ABI = JSON.parse(abi);
 
   const result = {};
@@ -128,7 +129,11 @@ const parseAbi = (abi: string) => {
       };
       return acc;
     }, {});
-    result[funcName] = inputs;
+
+    result[funcName] = { arguments: {} };
+
+    result[funcName].arguments = inputs;
+    result[funcName].allowedAssets = endpoint.payableInTokens;
   });
   return result;
 };
@@ -149,11 +154,16 @@ interface ABIFunctionMap {
   [functionName: string]: ABIFunction;
 }
 
-type ABIFunction = {
+interface ABIFunctionArguments {
   [argumentName: string]: {
     type: string;
     required: boolean;
   };
+}
+
+type ABIFunction = {
+  allowedAssets?: string[];
+  arguments: ABIFunctionArguments;
 };
 
 const SmartContract: React.FC<IContractProps> = ({
@@ -164,7 +174,11 @@ const SmartContract: React.FC<IContractProps> = ({
   const { metadata, setMetadata, queue } = useMulticontract();
 
   const [fileData, setFileData] = React.useState<string>('');
-  const [functions, setFunctions] = React.useState<ABIFunctionMap>({});
+  const [functions, setFunctions] = React.useState<ABIFunctionMap>({
+    '': {
+      arguments: {},
+    },
+  });
   const [propertiesString, setPropertiesString] = React.useState<string>(
     (0x506).toString(2),
   );
@@ -260,7 +274,11 @@ const SmartContract: React.FC<IContractProps> = ({
               }
             }}
             onClick={(e: any) => {
-              setFunctions({});
+              setFunctions({
+                '': {
+                  arguments: {},
+                },
+              });
               e.target.value = '';
             }}
           />
@@ -283,8 +301,10 @@ const SmartContract: React.FC<IContractProps> = ({
             required
           />
         )}
-        {scType === 0 && <ArgumentsSection function={func} />}
-        {scType === 0 && <CallValueSection />}
+        {scType === 0 && <ArgumentsSection arguments={func?.arguments} />}
+        {scType === 0 && (
+          <CallValueSection allowedAssets={func?.allowedAssets || ['*']} />
+        )}
       </FormSection>
     </FormBody>
   );
@@ -341,7 +361,6 @@ export const PropertiesSection: React.FC<IProperties> = ({
       .toString(16)
       .padStart(4, '0');
 
-    const metadataProperties = metadata.split('@')[2] || '0506';
     const newMetadataProperties =
       metadata.split('@').slice(0, 2).join('@') + '@' + newPropertiesHex;
 
@@ -402,10 +421,10 @@ export const PropertiesSection: React.FC<IProperties> = ({
 };
 
 interface IArguments {
-  function: ABIFunction;
+  arguments: ABIFunctionArguments;
 }
 
-export const ArgumentsSection: React.FC<IArguments> = ({ function: func }) => {
+export const ArgumentsSection: React.FC<IArguments> = ({ arguments: args }) => {
   const { control, getValues } = useFormContext();
   const router = useRouter();
   const { fields, append, remove } = useFieldArray({
@@ -414,21 +433,21 @@ export const ArgumentsSection: React.FC<IArguments> = ({ function: func }) => {
   });
 
   useEffect(() => {
-    if (func) {
+    if (args) {
       fields.forEach(_ => {
         remove();
       });
 
       append(
-        Object.keys(func).map(key => ({
+        Object.keys(args).map(key => ({
           name: key,
-          type: func[key].type,
-          value: func[key].type === 'number' ? NaN : '',
-          required: func[key].required,
+          type: args[key].type,
+          value: args[key].type === 'number' ? NaN : '',
+          required: args[key].required,
         })),
       );
     }
-  }, [func]);
+  }, [args]);
 
   return (
     <FormSection inner>
@@ -507,13 +526,29 @@ export const ArgumentsSection: React.FC<IArguments> = ({ function: func }) => {
   );
 };
 
-export const CallValueSection: React.FC = () => {
+interface IAllowedAssets {
+  allowedAssets: string[];
+}
+
+export const CallValueSection: React.FC<IAllowedAssets> = ({
+  allowedAssets,
+}) => {
   const { control, getValues } = useFormContext();
   const router = useRouter();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'callValue',
   });
+
+  useEffect(() => {
+    if (allowedAssets) {
+      fields.forEach(_ => {
+        remove();
+      });
+
+      append({});
+    }
+  }, [allowedAssets]);
 
   return (
     <FormSection inner>
@@ -527,29 +562,30 @@ export const CallValueSection: React.FC = () => {
         </TooltipContainer>
       </SectionTitle>
       {fields.map((field, index) => (
-        <FormSection key={field.id} inner>
-          <SectionTitle>
-            <HiTrash
-              onClick={() =>
-                removeWrapper({ index, remove, getValues, router })
-              }
+        <>
+          <FormSection key={field.id} inner>
+            <SectionTitle>
+              <HiTrash
+                onClick={() =>
+                  removeWrapper({ index, remove, getValues, router })
+                }
+              />
+              Parameter {index + 1}
+            </SectionTitle>
+
+            <NamedKDASelect
+              name={`callValue[${index}].label`}
+              allowedAssets={allowedAssets}
             />
-            Parameter {index + 1}
-          </SectionTitle>
-          <FormInput
-            name={`callValue[${index}].label`}
-            title={`Asset Id`}
-            tooltip={tooltip.callValue.label}
-            required
-          />
-          <FormInput
-            name={`callValue[${index}].amount`}
-            title={`Amount`}
-            type="number"
-            tooltip={tooltip.callValue.value}
-            required
-          />
-        </FormSection>
+            <FormInput
+              name={`callValue[${index}].amount`}
+              title={`Amount`}
+              type="number"
+              tooltip={tooltip.callValue.value}
+              required
+            />
+          </FormSection>
+        </>
       ))}
       <ButtonContainer type="button" onClick={() => append({})}>
         Add Parameter

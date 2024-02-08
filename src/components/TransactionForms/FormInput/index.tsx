@@ -61,6 +61,7 @@ export interface IBaseFormInputProps
   creatable?: boolean;
   dynamicInitialValue?: any;
   canBeNaN?: boolean;
+  titleLess?: boolean;
 }
 
 export interface IFormInputProps extends IBaseFormInputProps {
@@ -159,6 +160,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   handleScrollBottom,
   dynamicInitialValue,
   canBeNaN = false,
+  titleLess = false,
   ...rest
 }) => {
   const areaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -231,7 +233,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
             customOnChange,
           ),
           validate: (value: any) => {
-            if (!canBeNaN && Number.isNaN(value)) {
+            if (!canBeNaN && required && Number.isNaN(value)) {
               return 'Only numbers allowed';
             }
 
@@ -380,7 +382,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
 
   return (
     <Container {...containerProps}>
-      {type !== 'hidden' && (
+      {type !== 'hidden' && !titleLess && (
         <InputLabel disabled={inputProps.disabled}>
           <span>
             {title || name}

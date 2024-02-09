@@ -162,6 +162,13 @@ export const NamedKDASelect: React.FC<IKDASelect> = props => {
           selectPlaceholder="Select an asset/collection"
           options={options}
           required={required}
+          selectFilter={item => {
+            const filtered = item;
+            filtered.label = item.label.split('/')[0];
+            filtered.value = item.label.split('/')[0];
+
+            return item;
+          }}
           titleLess
         />
         {collectionError && (
@@ -247,8 +254,6 @@ const CollectionIDField: React.FC<{ name: string }> = props => {
 
     const nonEmptyValues = cleanEmptyValues(getValues());
 
-    nonEmptyValues[name] = newValue;
-
     let newQuery: NextParsedUrlQuery = router.query?.contract
       ? { contract: router.query?.contract }
       : {};
@@ -283,13 +288,7 @@ const CollectionIDField: React.FC<{ name: string }> = props => {
         <AssetIDInput
           type="number"
           $error={Boolean(assetIdError)}
-          {...register('collectionAssetId', {
-            required: {
-              value: true,
-              message: 'This field is required',
-            },
-            onChange: e => collectionIdChangeHandler(e.target),
-          })}
+          onChange={e => collectionIdChangeHandler(e.target)}
         />
       ) : (
         <Select

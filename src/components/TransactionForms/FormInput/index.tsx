@@ -63,6 +63,7 @@ export interface IBaseFormInputProps
   canBeNaN?: boolean;
   titleLess?: boolean;
   disableCustom?: boolean;
+  selectFilter?: (e: any) => any;
 }
 
 export interface IFormInputProps extends IBaseFormInputProps {
@@ -163,6 +164,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   canBeNaN = false,
   titleLess = false,
   disableCustom = false,
+  selectFilter,
   ...rest
 }) => {
   const areaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -315,6 +317,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
     handleScrollBottom,
     onInputChange,
     creatable,
+    selectFilter,
     ...rest,
   };
 

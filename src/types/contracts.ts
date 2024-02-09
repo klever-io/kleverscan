@@ -667,6 +667,26 @@ interface Endpoint {
   payableInTokens?: string[];
 }
 
+export type ABIStruct = {
+  type: string;
+  fields?: ABIStructField[];
+  variants?: ABIVariant[];
+};
+export type ABIStructField = {
+  name: string;
+  type: string;
+};
+
+type ABIVariant = {
+  name: string;
+  fields: ABIVariantField[];
+};
+
+type ABIVariantField = {
+  name: string;
+  discriminant: number;
+};
+
 export interface ABI {
   name: string;
   constructor: {
@@ -674,22 +694,7 @@ export interface ABI {
     outputs: any[];
   };
   endpoints: Endpoint[];
-  types: {
-    [key: string]: {
-      type: string;
-      fields?: {
-        name: string;
-        type: string;
-      }[];
-      variants?: {
-        name: string;
-        fields: {
-          name: string;
-          discriminant: number;
-        }[];
-      }[];
-    };
-  };
+  types: Map<string, ABIStruct>;
 }
 
 export const ABITypeMap = {

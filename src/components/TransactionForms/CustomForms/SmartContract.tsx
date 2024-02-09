@@ -1,6 +1,6 @@
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
-import { ABI, ABITypeMap } from '@/types/contracts';
+import { ABI, ABIStruct, ABIStructField, ABITypeMap } from '@/types/contracts';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
@@ -35,13 +35,34 @@ type FormData = {
   address: string;
   function?: string;
   arguments?: {
-    type: 'string' | 'number' | 'array' | 'object';
+    type: 'string' | 'number' | 'array' | string;
     value: string | number | any[] | Record<string, any>;
   }[];
   callValue: {
     [coin: string]: number;
   };
 };
+
+interface ABIMap {
+  functions?: ABIFunctionMap;
+  structs?: Map<string, ABIStruct>;
+}
+
+interface ABIFunctionMap {
+  [functionName: string]: ABIFunction;
+}
+
+type ABIFunction = {
+  allowedAssets?: string[];
+  arguments: ABIFunctionArguments;
+};
+
+interface ABIFunctionArguments {
+  [argumentName: string]: {
+    type: string;
+    required: boolean;
+  };
+}
 
 const bitValuesBytes0_1 = {
   payable: 2,
@@ -111,7 +132,31 @@ const mapType = (abiType: string) => {
   return 'string';
 };
 
-const parseAbi = (abi: string): ABIFunctionMap => {
+const parseAbiStructs = (abi: string): Map<string, ABIStruct> => {
+  const parsedAbi: ABI = JSON.parse(abi);
+
+  const result = new Map<string, ABIStruct>();
+  Object.keys(parsedAbi?.types).forEach(typeItem => {
+    if (parsedAbi?.types[typeItem].type !== 'struct') return;
+
+    const struct = typeItem;
+    const structFields = parsedAbi?.types[typeItem].fields.reduce(
+      (acc: ABIStruct, field: ABIStructField) => {
+        acc[field.name] = {
+          type: mapType(field.type),
+          required: true,
+        };
+        return acc;
+      },
+      {},
+    );
+
+    result.set(struct, structFields);
+  });
+
+  return result;
+};
+const parseAbiFunctions = (abi: string): ABIFunctionMap => {
   const parsedAbi: ABI = JSON.parse(abi);
 
   const result = {};
@@ -151,22 +196,6 @@ const parseCallValue = (data: FormData) => {
   data.callValue = newCallValue;
 };
 
-interface ABIFunctionMap {
-  [functionName: string]: ABIFunction;
-}
-
-interface ABIFunctionArguments {
-  [argumentName: string]: {
-    type: string;
-    required: boolean;
-  };
-}
-
-type ABIFunction = {
-  allowedAssets?: string[];
-  arguments: ABIFunctionArguments;
-};
-
 const SmartContract: React.FC<IContractProps> = ({
   formKey,
   handleFormSubmit,
@@ -176,10 +205,12 @@ const SmartContract: React.FC<IContractProps> = ({
   const { walletAddress } = useExtension();
 
   const [fileData, setFileData] = React.useState<string>('');
-  const [functions, setFunctions] = React.useState<ABIFunctionMap>({});
+  const [abi, setAbi] = React.useState<ABIMap | null>(null);
   const [propertiesString, setPropertiesString] = React.useState<string>(
     (0x506).toString(2),
   );
+
+  const functions = abi?.functions || {};
 
   const func: ABIFunction = functions?.[watch('function') || ''];
 
@@ -203,6 +234,31 @@ const SmartContract: React.FC<IContractProps> = ({
     }
     parseCallValue(data);
     await handleFormSubmit(data);
+  };
+
+  const handleImportAbi = async (e: any) => {
+    const abi = await (e.target.files[0] as File).text();
+
+    const data = {};
+    const functions = parseAbiFunctions(abi);
+
+    if (Object.keys(functions).length > 0) {
+      data['functions'] = functions;
+    }
+
+    const structs = parseAbiStructs(abi);
+    if (Object.keys(structs).length > 0) {
+      data['structs'] = structs;
+    }
+
+    try {
+      setAbi(data);
+    } catch (error) {
+      toast.error('Invalid ABI file');
+      console.error(error);
+      e.target.value = '';
+      return;
+    }
   };
 
   return (
@@ -272,20 +328,9 @@ const SmartContract: React.FC<IContractProps> = ({
             accept=".json"
             span={2}
             tooltip={tooltip.abi}
-            onChange={async (e: any) => {
-              const abi = await (e.target.files[0] as File).text();
-
-              try {
-                setFunctions(parseAbi(abi));
-              } catch (error) {
-                toast.error('Invalid ABI file');
-                console.error(error);
-                e.target.value = '';
-                return;
-              }
-            }}
+            onChange={handleImportAbi}
             onClick={(e: any) => {
-              setFunctions({});
+              setAbi(null);
               e.target.value = '';
             }}
           />

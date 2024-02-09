@@ -25,6 +25,7 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   onInputChange?: (e: any) => void;
   handleScrollBottom?: () => void;
   creatable?: boolean;
+  selectFilter?: (e: any) => any;
 }
 
 const Filter: React.FC<IFilter> = ({
@@ -37,6 +38,7 @@ const Filter: React.FC<IFilter> = ({
   handleScrollBottom,
   onInputChange,
   creatable,
+  selectFilter,
   ...rest
 }) => {
   const {
@@ -71,7 +73,10 @@ const Filter: React.FC<IFilter> = ({
 
   useEffect(() => {
     if (value !== undefined && data !== undefined && data.length > 0) {
-      const selected = data?.find(item => item.value === value);
+      let selected = data?.find(item => item.value === value);
+      if (selectFilter && selected) {
+        selected = selectFilter(selected);
+      }
       selected && setSelected(selected);
     }
   }, [value, data]);

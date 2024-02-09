@@ -1,5 +1,6 @@
 import { getParamsList } from '@/services/requests/proposals';
 import { IParamList } from '@/types';
+import { useRouter } from 'next/router';
 import React from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
@@ -17,6 +18,7 @@ import {
   FormSection,
   SectionTitle,
 } from '../styles';
+import { removeWrapper } from './utils';
 
 type FormData = {
   description: string;
@@ -91,7 +93,8 @@ interface IParametersProps {
 export const ParametersSection: React.FC<IParametersProps> = ({
   paramsList = [],
 }) => {
-  const { control } = useFormContext();
+  const { control, getValues } = useFormContext();
+  const router = useRouter();
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -113,7 +116,11 @@ export const ParametersSection: React.FC<IParametersProps> = ({
       {fields.map((field, index) => (
         <FormSection key={field.id} inner>
           <SectionTitle>
-            <HiTrash onClick={() => remove(index)} />
+            <HiTrash
+              onClick={() =>
+                removeWrapper({ index, remove, getValues, router })
+              }
+            />
             Parameter {index + 1}
           </SectionTitle>
           <FormInput

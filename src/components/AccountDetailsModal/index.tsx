@@ -2,25 +2,22 @@ import { KLV } from '@/assets/coins';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
-import { formatAmount } from '@/utils/formatFunctions';
+import {
+  getAccountBalanceRequest,
+  IAccountBalance,
+} from '@/services/requests/account';
 import { getNetwork } from '@/utils/networkFunctions';
 import { parseAddress } from '@/utils/parseValues';
 import Link from 'next/link';
 import { QRCodeSVG } from 'qrcode.react';
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { BiLogOut, BiWalletAlt } from 'react-icons/bi';
 import { IoMdAddCircle } from 'react-icons/io';
 import { IoCreateOutline, IoReloadSharp } from 'react-icons/io5';
 import { MdContentCopy } from 'react-icons/md';
 import { RiArrowRightSLine } from 'react-icons/ri';
+import { useQuery } from 'react-query';
 import { toast } from 'react-toastify';
 import Copy from '../Copy';
 import {
@@ -39,7 +36,7 @@ import {
   UserInfoContainer,
 } from './styles';
 
-interface IAssetBalance {
+export interface IAssetBalance {
   assetId: string;
   balance: string;
 }
@@ -55,50 +52,27 @@ export const AccountDetailsModal: React.FC<IAccountDetailsModal> = ({
 }) => {
   const [primaryAsset, setPrimaryAsset] = useState<IAssetBalance[]>([]);
   const [expandAssets, setExpandAssets] = useState<boolean>(false);
-  const [otherAssets, setOtherAssets] = useState<IAssetBalance[]>([]);
   const closeTimeout = useRef<NodeJS.Timeout | null>(null);
   const [loadingBalance, setLoadingBalance] = useState<boolean>(false);
-  const [balance, setBalance] = useState<{
-    [assetId: string]: string | number;
-  }>({
-    klv: 0,
-  });
   const { walletAddress, connectExtension, logoutExtension } = useExtension();
   const { isMobile } = useMobile();
   const network = getNetwork();
 
-  const getAccountBalance = useCallback(async () => {
-    if (walletAddress) {
-      setLoadingBalance(true);
-      const res = await api.get({
-        route: `address/${walletAddress}`,
-      });
-      if (!res.error || res.error === '') {
-        const klvAvailableBalance = res?.data?.account?.balance;
-        const accountAssets = res?.data?.account.assets;
-        if (accountAssets) {
-          const otherAssets: any = [];
-          Object.values(accountAssets).map((asset: any) => {
-            otherAssets.push({
-              assetId: asset.assetId,
-              balance: formatAmount(asset.balance / 10 ** asset.precision),
-            });
-          });
-          setOtherAssets(otherAssets);
-          if (typeof klvAvailableBalance === 'number') {
-            setBalance({ klv: formatAmount(klvAvailableBalance / 10 ** 6) });
-            setLoadingBalance(false);
-          }
-          setLoadingBalance(false);
-        }
-      }
+  const { data, refetch: getAccountBalance } = useQuery<IAccountBalance>({
+    queryKey: ['accountBalance', walletAddress],
+    queryFn: () => getAccountBalanceRequest(walletAddress, setLoadingBalance),
+    enabled: !!walletAddress,
+    onSettled: () => {
+      setLoadingBalance(false);
+    },
+  });
 
-      if (res.error === 'cannot find account in database') {
-        setOtherAssets([{ assetId: 'KLV', balance: '0' }]);
-        setLoadingBalance(false);
-      }
-    }
-  }, [walletAddress]);
+  const { balance, otherAssets } = data || {
+    balance: {
+      klv: '--',
+    },
+    otherAssets: [],
+  };
 
   const requestKLV = async () => {
     setLoadingBalance(true);
@@ -217,9 +191,7 @@ export const AccountDetailsModal: React.FC<IAccountDetailsModal> = ({
                 </>
               ) : (
                 <>
-                  <span>
-                    {balance['klv'] !== undefined ? balance['klv'] : '---'}
-                  </span>
+                  <span>{balance['klv']}</span>
                   <KLV />
                 </>
               )}
@@ -244,7 +216,7 @@ export const AccountDetailsModal: React.FC<IAccountDetailsModal> = ({
               </SpanDropdown>
             </ContainerAsset>
             <IoReloadSharpWrapper
-              onClick={getAccountBalance}
+              onClick={() => getAccountBalance()}
               $loading={loadingBalance}
             >
               <IoReloadSharp />

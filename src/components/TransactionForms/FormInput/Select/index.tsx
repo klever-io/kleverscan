@@ -20,11 +20,12 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   options?: IDropdownItem[];
   selectPlaceholder?: string;
   title?: string;
-  name: string;
+  name?: string;
   error?: boolean;
   onInputChange?: (e: any) => void;
   handleScrollBottom?: () => void;
   creatable?: boolean;
+  selectFilter?: (e: any) => any;
 }
 
 const Filter: React.FC<IFilter> = ({
@@ -37,6 +38,7 @@ const Filter: React.FC<IFilter> = ({
   handleScrollBottom,
   onInputChange,
   creatable,
+  selectFilter,
   ...rest
 }) => {
   const {
@@ -55,6 +57,8 @@ const Filter: React.FC<IFilter> = ({
   );
 
   const handleSelect = (selected: any) => {
+    if (name === undefined) return;
+
     const e = {
       target: {
         name,
@@ -68,11 +72,14 @@ const Filter: React.FC<IFilter> = ({
   };
 
   useEffect(() => {
-    if (value !== undefined) {
-      const selected = data?.find(item => item.value === value);
+    if (value !== undefined && data !== undefined && data.length > 0) {
+      let selected = data?.find(item => item.value === value);
+      if (selectFilter && selected) {
+        selected = selectFilter(selected);
+      }
       selected && setSelected(selected);
     }
-  }, [value]);
+  }, [value, data]);
 
   return (
     <Container $error={error} isOpenMenu={isSelectOpen}>
@@ -90,12 +97,14 @@ const Filter: React.FC<IFilter> = ({
         creatable={creatable}
       />
 
-      <HiddenInput
-        {...rest}
-        type="text"
-        value={selected?.value}
-        {...register(name)}
-      />
+      {name && (
+        <HiddenInput
+          {...rest}
+          type="text"
+          value={selected?.value !== undefined ? selected.value : ''}
+          {...register(name)}
+        />
+      )}
     </Container>
   );
 };

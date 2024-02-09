@@ -257,7 +257,7 @@ export const IconsContainer = styled.div`
   }
 `;
 
-export const SelectContainer = styled.div`
+export const SelectContainer = styled.div<{ span?: number }>`
   display: flex;
   align-items: flex-end;
   flex-direction: row;
@@ -266,6 +266,11 @@ export const SelectContainer = styled.div`
   border-radius: 1rem;
   width: 100%;
   gap: 1rem;
+
+  ${props =>
+    css`
+      grid-column: auto / span ${props.span};
+    `}
 
   border: 0.2px solid ${({ theme }) => theme.input.border};
   box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? '#000' : lighten(0.8, '#000'))};

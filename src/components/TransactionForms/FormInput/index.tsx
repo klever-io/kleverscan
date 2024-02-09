@@ -1,15 +1,18 @@
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { setQueryAndRouter } from '@/utils';
+import { useDidUpdateEffect } from '@/utils/hooks';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import dynamic from 'next/dynamic';
 import { NextRouter, useRouter } from 'next/router';
 import { ChangeEventHandler, useEffect, useRef, useState } from 'react';
 import { FieldValues, useFormContext, UseFormGetValues } from 'react-hook-form';
+import { toast } from 'react-toastify';
 import {
   Container,
   DropdownCustomLabel,
   DropdownCustomLabelSelectStyles,
   ErrorMessage,
+  FileInput,
   InfoIcon,
   InputLabel,
   RequiredSpan,
@@ -20,6 +23,7 @@ import {
   ToggleContainer,
   TooltipContainer,
   TooltipContent,
+  ValidateButton,
 } from './styles';
 
 const Select = dynamic(() => import('./Select'), {
@@ -56,6 +60,10 @@ export interface IBaseFormInputProps
   onInputChange?: (e: any) => void;
   creatable?: boolean;
   dynamicInitialValue?: any;
+  canBeNaN?: boolean;
+  titleLess?: boolean;
+  disableCustom?: boolean;
+  selectFilter?: (e: any) => any;
 }
 
 export interface IFormInputProps extends IBaseFormInputProps {
@@ -66,44 +74,64 @@ export interface ICustomFormInputProps extends IBaseFormInputProps {
   onChange: ChangeEventHandler<any>;
 }
 
-export const customDropdownOptions = [
-  { label: 'No', value: 'no' },
+export const customOptions = [
   { label: 'Text', value: 'text' },
   { label: 'Number', value: 'number' },
 ];
+
+export const customDropdownOptions = [
+  { label: 'No', value: 'no' },
+  ...customOptions,
+];
+
+export const cleanEmptyValues = (
+  obj: Record<string, any>,
+): Record<string, any> => {
+  return Object.entries(obj)
+    .filter(
+      ([_key, value]) =>
+        value !== '' &&
+        value !== null &&
+        value !== undefined &&
+        !Number.isNaN(value),
+    )
+    .reduce((acc, [currKey, currValue]) => {
+      return {
+        ...acc,
+        [currKey]: currValue,
+      };
+    }, {});
+};
 
 export const onChangeWrapper = (
   isMultiContract: boolean,
   router: NextRouter,
   getValues: UseFormGetValues<FieldValues>,
   name: string,
+  type?: string,
   customOnChange?: (e: any) => void,
 ) => {
   return (e: React.ChangeEvent<HTMLInputElement>): void => {
-    if (!isMultiContract) {
-      const nonEmptyValues = Object.keys(getValues())
-        .filter(key => getValues()[key] !== '')
-        .reduce((acc, curr) => {
-          return {
-            ...acc,
-            [curr]: getValues()[curr],
-          };
-        }, {});
-
-      if (name) eval(`nonEmptyValues.${name} = e.target.value`);
-
-      let newQuery: NextParsedUrlQuery = router.query?.contract
-        ? { contract: router.query?.contract }
-        : {};
-
-      newQuery = {
-        ...newQuery,
-        ...router.query,
-        contractDetails: JSON.stringify(nonEmptyValues),
-      };
-
-      setQueryAndRouter(newQuery, router);
+    if (isMultiContract || type === 'file') {
+      customOnChange && customOnChange(e);
+      return;
     }
+
+    const nonEmptyValues = cleanEmptyValues(getValues());
+
+    if (name) eval(`nonEmptyValues.${name} = e.target.value`);
+
+    let newQuery: NextParsedUrlQuery = router.query?.contract
+      ? { contract: router.query?.contract }
+      : {};
+
+    newQuery = {
+      ...newQuery,
+      ...router.query,
+      contractDetails: JSON.stringify(nonEmptyValues),
+    };
+
+    setQueryAndRouter(newQuery, router);
 
     customOnChange && customOnChange(e);
   };
@@ -133,10 +161,17 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   logoError = null,
   handleScrollBottom,
   dynamicInitialValue,
+  canBeNaN = false,
+  titleLess = false,
+  disableCustom = false,
+  selectFilter,
   ...rest
 }) => {
   const areaRef = useRef<HTMLTextAreaElement | null>(null);
-  const [isCustom, setIsCustom] = useState(customDropdownOptions[0]);
+  const [isCustom, setIsCustom] = useState(
+    type === 'dropdown' ? customDropdownOptions[0] : customOptions[0],
+  );
+  const [dragging, setDragging] = useState(false);
   const router = useRouter();
   const { isMultiContract } = useMulticontract();
   const {
@@ -147,6 +182,14 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
     setValue,
     getValues,
   } = useFormContext();
+
+  useDidUpdateEffect(() => {
+    if (type === 'dropdown') {
+      setIsCustom(customDropdownOptions[0]);
+    } else {
+      setIsCustom(customOptions[0]);
+    }
+  }, [type]);
 
   let error = null;
 
@@ -175,6 +218,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
             router,
             getValues,
             name,
+            type,
             customOnChange,
           ),
         })
@@ -189,10 +233,11 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
             router,
             getValues,
             name,
+            type,
             customOnChange,
           ),
           validate: (value: any) => {
-            if (Number.isNaN(value)) {
+            if (!canBeNaN && required && Number.isNaN(value)) {
               return 'Only numbers allowed';
             }
 
@@ -238,6 +283,13 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
     error: Boolean(error),
     logoWarning: logoError !== null ? true : false,
     value: rest.value,
+    placeholder:
+      type === 'object' && !rest.placeholder
+        ? `E.g. {
+  "key1": "value1",
+  "key2": "value2"
+    }`
+        : '',
     onChange: onChange as ChangeEventHandler<HTMLTextAreaElement>,
   };
 
@@ -265,6 +317,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
     handleScrollBottom,
     onInputChange,
     creatable,
+    selectFilter,
     ...rest,
   };
 
@@ -277,12 +330,24 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   (type === 'number' || isCustom.value === 'number') &&
     (inputProps = {
       ...inputProps,
-      step: 1 / 10 ** precision,
+      step: 1 / 10 ** (precision || 0),
       onWheel: preventScroll,
     });
 
+  type === 'file' &&
+    (inputProps = {
+      ...inputProps,
+      onDrop: (e: any) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        e.target.files = e.dataTransfer.files;
+        onChange && onChange(e);
+      },
+    });
+
   const handleKey = (e: any) => {
-    if (e.key === 'Tab' && type === 'textarea') {
+    if (e.key === 'Tab' && (type === 'textarea' || type === 'object')) {
       e.preventDefault();
       if (areaRef.current) {
         const start = e.target.selectionStart;
@@ -303,9 +368,26 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
     }
   };
 
+  const preventEvent = (event: any) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
+  const handleDragEnter = (event: any) => {
+    preventEvent(event);
+
+    setDragging(true);
+  };
+
+  const handleDragLeave = (event: any) => {
+    preventEvent(event);
+
+    setDragging(false);
+  };
+
   return (
     <Container {...containerProps}>
-      {type !== 'hidden' && (
+      {type !== 'hidden' && !titleLess && (
         <InputLabel disabled={inputProps.disabled}>
           <span>
             {title || name}
@@ -319,11 +401,16 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
               </TooltipContent>
             </TooltipContainer>
           )}
-          {type === 'dropdown' && (
+
+          {(type === 'dropdown' || type === 'custom') && !disableCustom && (
             <DropdownCustomLabel>
-              <span>Custom value?</span>
+              <span>
+                {type === 'dropdown' ? `Custom value?` : 'Input Type'}
+              </span>
               <DropdownCustomLabelSelect
-                options={customDropdownOptions}
+                options={
+                  type === 'dropdown' ? customDropdownOptions : customOptions
+                }
                 value={isCustom}
                 onChange={(e: any) => {
                   setIsCustom(e) as any;
@@ -332,6 +419,28 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
                 isSearchable={false}
               />
             </DropdownCustomLabel>
+          )}
+          {type === 'object' && (
+            <ValidateButton
+              type="button"
+              onClick={() => {
+                if (areaRef.current) {
+                  try {
+                    areaRef.current.value = JSON.stringify(
+                      JSON.parse(areaRef.current.value),
+                      null,
+                      2,
+                    );
+                    toast.success('JSON validated successfully');
+                  } catch (e) {
+                    toast.error('Invalid JSON');
+                    console.error(e);
+                  }
+                }
+              }}
+            >
+              Validate JSON
+            </ValidateButton>
           )}
         </InputLabel>
       )}
@@ -350,7 +459,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
       {type === 'dropdown' && isCustom.value === 'no' && (
         <Select {...selectProps} />
       )}
-      {type === 'textarea' && (
+      {(type === 'textarea' || type === 'object') && (
         <StyledTextArea
           onKeyDown={handleKey}
           {...areaProps}
@@ -361,10 +470,22 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
           }}
         />
       )}
+      {type === 'file' && (
+        <FileInput
+          {...inputProps}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDragOver={preventEvent}
+          onMouseLeave={() => setDragging(false)}
+          Dragging={dragging}
+        />
+      )}
       {type === 'hidden' && <StyledInput {...inputProps} />}
       {type !== 'checkbox' &&
         (type !== 'dropdown' || isCustom.value !== 'no') &&
         type !== 'textarea' &&
+        type !== 'object' &&
+        type !== 'file' &&
         type !== 'hidden' && <StyledInput {...inputProps} />}
 
       {error && (

@@ -122,6 +122,39 @@ ${({ theme, logoWarning }) =>
   }
 `;
 
+export const FileInput = styled.input<{ Dragging: boolean }>`
+  ${defaultStyles}
+
+  border-style: dashed;
+
+  height: 5rem;
+  line-height: 3.75rem;
+
+  &::-webkit-file-upload-button {
+    display: none;
+  }
+  &::before {
+    content: 'Browse Files';
+    display: inline;
+
+    max-width: 10rem;
+    background: ${({ theme }) => theme.violet};
+    color: ${({ theme }) => theme.true.white};
+    padding: 0.5rem 1rem;
+    margin: 0 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+  }
+
+  ${({ theme, Dragging }) =>
+    Dragging
+      ? css`
+          border-color: ${theme.violet};
+          background-color: ${transparentize(0.9, theme.violet)};
+        `
+      : null}
+`;
+
 export const StyledTextArea = styled.textarea<IProps>`
   ${defaultStyles}
 
@@ -306,7 +339,7 @@ export const RequiredSpan = styled.span`
 export const InputLabel = styled.label<ILabel>`
   user-select: none;
   color: ${({ theme }) => theme.darkText};
-  z-index: 1;
+  position: relative;
 
   width: 100%;
 
@@ -394,6 +427,15 @@ export const DropdownCustomLabelSelectStyles = {
     padding: '0.25rem',
   }),
 };
+
+export const ValidateButton = styled.button`
+  color: ${({ theme }) => theme.true.white};
+  background-color: ${({ theme }) => theme.purple};
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+
+  margin-left: auto;
+`;
 
 export const ModalCreateTxLink = styled.a`
   margin-left: 0.5rem;

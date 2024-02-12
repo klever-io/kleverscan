@@ -1,6 +1,6 @@
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
-import { ABI, ABIStruct, ABIStructField, ABITypeMap } from '@/types/contracts';
+import { ABI, ABIStruct, ABITypeMap } from '@/types/contracts';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
@@ -35,8 +35,9 @@ type FormData = {
   address: string;
   function?: string;
   arguments?: {
-    type: 'string' | 'number' | 'array' | string;
     value: string | number | any[] | Record<string, any>;
+    type: 'string' | 'number' | 'array' | string;
+    raw_type: string;
   }[];
   callValue: {
     [coin: string]: number;
@@ -45,7 +46,7 @@ type FormData = {
 
 interface ABIMap {
   functions?: ABIFunctionMap;
-  structs?: Map<string, ABIStruct>;
+  structs?: Record<string, ABIStruct>;
 }
 
 interface ABIFunctionMap {
@@ -60,6 +61,7 @@ type ABIFunction = {
 interface ABIFunctionArguments {
   [argumentName: string]: {
     type: string;
+    raw_type: string;
     required: boolean;
   };
 }
@@ -76,19 +78,62 @@ const bitValuesBytes2_3 = {
 
 const toggleOptions: [string, string] = ['False', 'True'];
 
-const parseFunctionArguments = (data: FormData, setMetadata: any) => {
+const parseABIValue = (value: any, type: string) => {
+  switch (type) {
+    case 'u64':
+    case 'i64':
+      const parsedValue = value.toString(16).padStart(16, '0');
+      return parsedValue;
+    case 'u32':
+    case 'i32':
+    case 'usize':
+    case 'isize':
+      return value.toString(16).padStart(8, '0');
+    case 'u16':
+    case 'i16':
+      return value.toString(16).padStart(4, '0');
+    case 'u8':
+    case 'i8':
+      return value.toString(16).padStart(2, '0');
+
+    default:
+      return value;
+  }
+};
+const parseFunctionArguments = (
+  data: FormData,
+  setMetadata: any,
+  abi: ABIMap | null,
+) => {
   const { arguments: args } = data;
 
   const { function: func } = data;
 
   const parsedArgs = (args || []).map(value => {
-    const { value: argValue } = value;
+    const { value: argValue, type, raw_type } = value;
 
     if (typeof argValue === 'number' && isNaN(argValue)) {
       return '';
     }
     if (argValue === null || argValue === undefined) {
       return '';
+    }
+
+    if (type === 'object' && abi !== null) {
+      const argument = JSON.parse(argValue as string);
+      const struct = abi.structs?.[raw_type];
+      if (struct) {
+        const structFields: string[] = Object.entries(struct?.fields || []).map(
+          ([key, v]) => {
+            const objectValue = argument[v.name];
+            const objectType = v.type;
+            const parsedValue = parseABIValue(objectValue, objectType);
+            return parsedValue;
+          },
+        );
+
+        return structFields.join('');
+      }
     }
 
     return typeof argValue === 'string'
@@ -104,54 +149,33 @@ const parseFunctionArguments = (data: FormData, setMetadata: any) => {
 };
 
 const mapType = (abiType: string) => {
+  const isOptional = abiType.toLowerCase().startsWith('option');
+  let cleanType = isOptional ? (abiType.match(/<(.*)>/) || [])[1] : abiType;
+
+  cleanType = cleanType.toLowerCase();
+
+  cleanType = cleanType.split('<')[0];
+
   for (const [key, values] of Object.entries(ABITypeMap)) {
-    if (
-      values.includes(abiType.toLowerCase()) ||
-      values.includes(
-        abiType.replace(/^(Option|optional)<|>$/g, '').toLowerCase(),
-      ) ||
-      values.includes(
-        abiType
-          .replace(/^(Option|optional)<|>$/g, '')
-          .split('<')[0]
-          .toLowerCase(),
-      )
-    ) {
+    if (values.includes(cleanType)) {
       return key;
-    } else if (
-      values.includes(
-        abiType
-          .replace(/^(Option|optional)<|>$/g, '')
-          .split('<')[0]
-          .toLowerCase(),
-      )
-    ) {
-      return 'object';
     }
   }
-  return 'string';
+
+  return 'object';
 };
 
-const parseAbiStructs = (abi: string): Map<string, ABIStruct> => {
+const parseAbiStructs = (abi: string): Record<string, ABIStruct> => {
   const parsedAbi: ABI = JSON.parse(abi);
 
-  const result = new Map<string, ABIStruct>();
+  const result = {} as Record<string, ABIStruct>;
   Object.keys(parsedAbi?.types).forEach(typeItem => {
     if (parsedAbi?.types[typeItem].type !== 'struct') return;
 
     const struct = typeItem;
-    const structFields = parsedAbi?.types[typeItem].fields.reduce(
-      (acc: ABIStruct, field: ABIStructField) => {
-        acc[field.name] = {
-          type: mapType(field.type),
-          required: true,
-        };
-        return acc;
-      },
-      {},
-    );
+    const structFields = parsedAbi?.types[typeItem];
 
-    result.set(struct, structFields);
+    result[struct] = structFields;
   });
 
   return result;
@@ -159,28 +183,27 @@ const parseAbiStructs = (abi: string): Map<string, ABIStruct> => {
 const parseAbiFunctions = (abi: string): ABIFunctionMap => {
   const parsedAbi: ABI = JSON.parse(abi);
 
-  const result = {};
+  const result: ABIFunctionMap = {};
   parsedAbi.endpoints.forEach(endpoint => {
     if (endpoint.mutability === 'readonly') return;
 
     const funcName = endpoint.name;
     const inputs = endpoint.inputs.reduce((acc, input) => {
       const isOptional = input.type.toLowerCase().startsWith('option');
-      const cleanType = isOptional
-        ? (input.type.match(/<(.*)>/) || [])[1]
-        : input.type;
       acc[input.name] = {
-        type: mapType(cleanType),
+        type: mapType(input.type),
         required: !isOptional,
+        raw_type: input.type,
       };
       return acc;
-    }, {});
+    }, {} as ABIFunctionArguments);
 
     result[funcName] = { arguments: {} };
 
     result[funcName].arguments = inputs;
     result[funcName].allowedAssets = endpoint.payableInTokens;
   });
+
   return result;
 };
 
@@ -218,6 +241,17 @@ const SmartContract: React.FC<IContractProps> = ({
 
   const scType = watch('scType');
 
+  const onSubmit = async (dataRef: FormData) => {
+    const data = JSON.parse(JSON.stringify(dataRef));
+
+    if (scType === 0) {
+      parseFunctionArguments(data, setMetadata, abi);
+    }
+    parseCallValue(data);
+    return;
+    await handleFormSubmit(data);
+  };
+
   useEffect(() => {
     if (scType === 1) {
       setValue('address', walletAddress);
@@ -225,16 +259,6 @@ const SmartContract: React.FC<IContractProps> = ({
       setValue('address', '');
     }
   }, [scType]);
-
-  const onSubmit = async (dataRef: FormData) => {
-    const data = JSON.parse(JSON.stringify(dataRef));
-
-    if (scType === 0) {
-      parseFunctionArguments(data, setMetadata);
-    }
-    parseCallValue(data);
-    await handleFormSubmit(data);
-  };
 
   const handleImportAbi = async (e: any) => {
     const abi = await (e.target.files[0] as File).text();
@@ -495,6 +519,7 @@ export const ArgumentsSection: React.FC<IArguments> = ({ arguments: args }) => {
         Object.keys(args).map(key => ({
           name: key,
           type: args[key].type,
+          raw_type: args[key].raw_type,
           value: args[key].type === 'number' ? NaN : '',
           required: args[key].required,
         })),
@@ -570,8 +595,8 @@ export const ArgumentsSection: React.FC<IArguments> = ({ arguments: args }) => {
             options={[
               { label: 'Text', value: 'text' },
               { label: 'Number', value: 'number' },
-              { label: 'Array', value: 'array' },
-              { label: 'Object', value: 'object' },
+              // { label: 'Array', value: 'array' }, // Can't parse without ABI
+              // { label: 'Object', value: 'object' },
             ]}
             placeholder="Add Argument"
           />

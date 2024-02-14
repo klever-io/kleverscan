@@ -544,8 +544,8 @@ export interface IITOTriggerContract {
 }
 
 export interface ISmartContract {
-  type: number;
-  typeName: string;
+  type: string;
+  typeValue: number;
   address: string;
   callValue: {
     [coin: string]: number;

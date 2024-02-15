@@ -177,7 +177,11 @@ const parseFunctionArguments = (
     if (typeof argValue === 'string') {
       return Buffer.from(argValue).toString('hex');
     } else if (typeof argValue === 'number') {
-      return argValue.toString(16);
+      const parsedNumber = argValue.toString(16);
+      if (parsedNumber.length % 2 !== 0) {
+        return `0${parsedNumber}`;
+      }
+      return parsedNumber;
     } else if (typeof argValue === 'boolean') {
       return argValue ? '01' : '00';
     }

@@ -366,10 +366,6 @@ export const InputLabel = styled.label<ILabel>`
   &:hover {
     z-index: 3;
   }
-
-  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
-    top: 0.8rem;
-  }
 `;
 
 export const ErrorMessage = styled.span<{ warning?: boolean }>`

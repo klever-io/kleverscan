@@ -2631,7 +2631,7 @@ export const SmartContract: React.FC<IIndexedContract> = ({
         <span>
           <strong>Type</strong>
         </span>
-        <span>{parameter?.typeName.slice(2)}</span>
+        <span>{(parameter?.type || '').slice(2)}</span>
       </Row>
       {Object.entries(parameter?.callValue || {}).length > 0 && (
         <Row>

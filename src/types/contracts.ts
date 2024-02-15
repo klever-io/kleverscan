@@ -687,12 +687,19 @@ type ABIVariantField = {
   discriminant: number;
 };
 
+type Constructor = {
+  docs?: string[];
+  payableInTokens?: string[];
+  inputs: {
+    name: string;
+    type: string;
+  }[];
+  outputs: any[];
+};
+
 export interface ABI {
   name: string;
-  constructor: {
-    inputs: any[];
-    outputs: any[];
-  };
+  constructor: Constructor;
   endpoints: Endpoint[];
   types: Map<string, ABIStruct>;
 }

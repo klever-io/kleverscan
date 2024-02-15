@@ -142,7 +142,7 @@ export const marketplaceTooltips = {
 };
 
 export const smartContractTooltips = {
-  data: 'Binary data to be passed to the smart contract',
+  data: 'Binary data to be passed to the smart contract. Only .wasm files are allowed',
   address: 'Address of the smart contract',
   deployAddress: 'Address of the owner of the smart contract',
   properties: {

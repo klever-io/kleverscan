@@ -51,6 +51,7 @@ type FormData = {
 
 interface ABIMap {
   functions?: ABIFunctionMap;
+  construct: ABIFunction;
   structs?: Record<string, ABIStruct>;
 }
 
@@ -134,6 +135,8 @@ const parseFunctionArguments = (
   data: FormData,
   setMetadata: any,
   abi: ABIMap | null,
+  scType: number,
+  metadata: string,
 ) => {
   const { arguments: args } = data;
 
@@ -150,9 +153,14 @@ const parseFunctionArguments = (
     }
 
     if (type === 'object' && abi !== null) {
-      const argument = JSON.parse(argValue as string);
+      let argument = {};
+      try {
+        argument = JSON.parse(argValue as string);
+      } catch (error) {
+        return '';
+      }
       const struct = abi.structs?.[raw_type];
-      if (struct) {
+      if (struct && argument !== null) {
         const structFields: string[] = Object.entries(struct?.fields || []).map(
           ([key, v]) => {
             const objectValue = argument[v.name];
@@ -167,17 +175,31 @@ const parseFunctionArguments = (
     }
 
     if (typeof argValue === 'string') {
-      Buffer.from(argValue).toString('hex');
-    } else {
-      argValue.toString(16);
+      return Buffer.from(argValue).toString('hex');
+    } else if (typeof argValue === 'number') {
+      return argValue.toString(16);
+    } else if (typeof argValue === 'boolean') {
+      return argValue ? '01' : '00';
     }
   });
-  const parsedData = `${func}@${parsedArgs.join('@')}`;
 
-  delete data.arguments;
-  delete data.function;
+  if (scType === 1) {
+    let parsedData = metadata.split('@').slice(0, 3).join('@');
 
-  setMetadata(parsedData);
+    if (parsedArgs.length > 0) {
+      parsedData += `@${parsedArgs.join('@')}`;
+      setMetadata(parsedData);
+    }
+    return;
+  } else {
+    const parsedData = `${func}@${parsedArgs.join('@')}`;
+
+    delete data.arguments;
+    delete data.function;
+
+    setMetadata(parsedData);
+    return;
+  }
 };
 
 const mapType = (abiType: string) => {
@@ -212,10 +234,12 @@ const parseAbiStructs = (abi: string): Record<string, ABIStruct> => {
 
   return result;
 };
-const parseAbiFunctions = (abi: string): ABIFunctionMap => {
+const parseAbiFunctions = (
+  abi: string,
+): { functions: ABIFunctionMap; constructor: ABIFunction } => {
   const parsedAbi: ABI = JSON.parse(abi);
 
-  const result: ABIFunctionMap = {};
+  const functions: ABIFunctionMap = {};
   parsedAbi.endpoints.forEach(endpoint => {
     if (endpoint.mutability === 'readonly') return;
 
@@ -230,13 +254,32 @@ const parseAbiFunctions = (abi: string): ABIFunctionMap => {
       return acc;
     }, {} as ABIFunctionArguments);
 
-    result[funcName] = { arguments: {} };
+    functions[funcName] = { arguments: {} };
 
-    result[funcName].arguments = inputs;
-    result[funcName].allowedAssets = endpoint.payableInTokens;
+    functions[funcName].arguments = inputs;
+    functions[funcName].allowedAssets = endpoint.payableInTokens;
   });
 
-  return result;
+  let constructor: ABIFunction = {
+    arguments: {},
+  };
+
+  if (parsedAbi.constructor.inputs.length > 0) {
+    constructor = {
+      arguments: parsedAbi.constructor.inputs.reduce((acc, input) => {
+        const isOptional = input.type.toLowerCase().startsWith('option');
+        acc[input.name] = {
+          type: mapType(input.type),
+          required: !isOptional,
+          raw_type: input.type,
+        };
+        return acc;
+      }, {} as ABIFunctionArguments),
+      allowedAssets: parsedAbi.constructor.payableInTokens,
+    };
+  }
+
+  return { functions, constructor };
 };
 
 const parseCallValue = (data: FormData) => {
@@ -255,7 +298,8 @@ const SmartContract: React.FC<IContractProps> = ({
   formKey,
   handleFormSubmit,
 }) => {
-  const { handleSubmit, watch, setValue } = useFormContext<FormData>();
+  const { handleSubmit, watch, setValue, getValues } =
+    useFormContext<FormData>();
   const { metadata, setMetadata, queue } = useMulticontract();
   const { walletAddress } = useExtension();
 
@@ -265,20 +309,23 @@ const SmartContract: React.FC<IContractProps> = ({
     (0x506).toString(2),
   );
 
+  const scType = watch('scType');
+
   const functions = abi?.functions || {};
 
-  const func: ABIFunction = functions?.[watch('function') || ''];
+  const func: ABIFunction =
+    scType === 1
+      ? abi?.constructor || {
+          arguments: {},
+        }
+      : functions?.[watch('function') || ''];
 
   const hasFunctions = Object.keys(functions).length > 0;
-
-  const scType = watch('scType');
 
   const onSubmit = async (dataRef: FormData) => {
     const data = JSON.parse(JSON.stringify(dataRef));
 
-    if (scType === 0) {
-      parseFunctionArguments(data, setMetadata, abi);
-    }
+    parseFunctionArguments(data, setMetadata, abi, scType, metadata);
     parseCallValue(data);
     await handleFormSubmit(data);
   };
@@ -294,12 +341,14 @@ const SmartContract: React.FC<IContractProps> = ({
   const handleImportAbi = async (e: any) => {
     const abi = await (e.target.files[0] as File).text();
 
-    const data = {};
-    const functions = parseAbiFunctions(abi);
+    const data = {} as ABIMap;
+    const { functions, constructor } = parseAbiFunctions(abi);
 
     if (Object.keys(functions).length > 0) {
       data['functions'] = functions;
     }
+
+    data['construct'] = constructor;
 
     const structs = parseAbiStructs(abi);
     if (Object.keys(structs).length > 0) {
@@ -314,6 +363,10 @@ const SmartContract: React.FC<IContractProps> = ({
       e.target.value = '';
       return;
     }
+  };
+
+  const handleInputChange = (e: React.FocusEvent<HTMLInputElement>) => {
+    parseFunctionArguments(getValues(), setMetadata, abi, scType, metadata);
   };
 
   return (
@@ -376,20 +429,21 @@ const SmartContract: React.FC<IContractProps> = ({
             setPropertiesString={setPropertiesString}
           />
         )}
-        {scType === 0 && (
-          <FormInput
-            title="Contract ABI"
-            type="file"
-            accept=".json"
-            span={2}
-            tooltip={tooltip.abi}
-            onChange={handleImportAbi}
-            onClick={(e: any) => {
-              setAbi(null);
-              e.target.value = '';
-            }}
-          />
-        )}
+        {scType === 0 ||
+          (scType === 1 && fileData.length > 0 && (
+            <FormInput
+              title="Contract ABI"
+              type="file"
+              accept=".json"
+              span={2}
+              tooltip={tooltip.abi}
+              onChange={handleImportAbi}
+              onClick={(e: any) => {
+                setAbi(null);
+                e.target.value = '';
+              }}
+            />
+          ))}
         {scType === 0 && (
           <FormInput
             name="function"
@@ -408,11 +462,26 @@ const SmartContract: React.FC<IContractProps> = ({
             required
           />
         )}
-        {scType === 0 && <ArgumentsSection arguments={func?.arguments} />}
-        {scType === 0 &&
-          ((hasFunctions && func?.allowedAssets) || !hasFunctions) && (
-            <CallValueSection allowedAssets={func?.allowedAssets} />
-          )}
+        {scType === 0 ||
+          (scType === 1 && fileData.length > 0 && (
+            <ArgumentsSection
+              arguments={
+                scType === 1 ? abi?.construct?.arguments || {} : func?.arguments
+              }
+              handleInputChange={handleInputChange}
+            />
+          ))}
+        {(scType === 0 && hasFunctions && func?.allowedAssets) ||
+          !hasFunctions ||
+          (scType === 1 && fileData.length > 0 && (
+            <CallValueSection
+              allowedAssets={
+                scType === 1
+                  ? abi?.construct?.allowedAssets
+                  : func?.allowedAssets
+              }
+            />
+          ))}
       </FormSection>
     </FormBody>
   );
@@ -530,9 +599,13 @@ export const PropertiesSection: React.FC<IProperties> = ({
 
 interface IArguments {
   arguments?: ABIFunctionArguments;
+  handleInputChange: (e: React.FocusEvent<HTMLInputElement>) => void;
 }
 
-export const ArgumentsSection: React.FC<IArguments> = ({ arguments: args }) => {
+export const ArgumentsSection: React.FC<IArguments> = ({
+  arguments: args,
+  handleInputChange,
+}) => {
   const { control, getValues } = useFormContext();
   const router = useRouter();
   const { fields, append, remove } = useFieldArray({
@@ -603,10 +676,12 @@ export const ArgumentsSection: React.FC<IArguments> = ({ arguments: args }) => {
                   ? `${field.name} (${field.type})`
                   : `Value ${index + 1} (${field.type})`
               }
+              customOnChange={handleInputChange}
               type={field.type}
               placeholder={placeholder}
               tooltip={tooltip.arguments.value}
               required={field.required}
+              toggleOptions={['False', 'True']}
               canBeNaN
             />
           </FormSection>
@@ -626,6 +701,7 @@ export const ArgumentsSection: React.FC<IArguments> = ({ arguments: args }) => {
             options={[
               { label: 'Text', value: 'text' },
               { label: 'Number', value: 'number' },
+              { label: 'Boolean', value: 'checkbox' },
               // { label: 'Array', value: 'array' }, // Can't parse without ABI
               // { label: 'Object', value: 'object' },
             ]}

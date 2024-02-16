@@ -353,6 +353,10 @@ export function encodeLengthPlusData(value: string | any[]) {
     data = value;
   }
 
+  if (data.length === 0) {
+    return '';
+  }
+
   const length = data.length.toString(16).padStart(8, '0');
 
   const dataHex = Array.from(data)

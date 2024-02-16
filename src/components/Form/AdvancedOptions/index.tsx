@@ -63,7 +63,7 @@ const PermID: React.FC = () => {
   });
 
   const parsedPermissions: IDropdownItem[] = [];
-  if (res?.data)
+  if (res?.data?.account?.permissions)
     res.data.account.permissions.map((permission: IAccPermission) => {
       if (permission.signers.some(signer => signer.address === walletAddress))
         parsedPermissions.push({

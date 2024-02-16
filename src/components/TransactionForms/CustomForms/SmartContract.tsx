@@ -43,6 +43,7 @@ type FormData = {
     value: string | number | any[] | Record<string, any>;
     type: 'string' | 'number' | 'array' | string;
     raw_type: string;
+    required: boolean;
   }[];
   callValue: {
     [coin: string]: number;
@@ -85,7 +86,9 @@ const bitValuesBytes2_3 = {
 const toggleOptions: [string, string] = ['False', 'True'];
 
 const parseABIValue = (value: any, type: string) => {
-  switch (type) {
+  const outerType = type.split('<')[0];
+
+  switch (outerType) {
     case 'u64':
     case 'i64':
       if (value < 0) {
@@ -121,11 +124,14 @@ const parseABIValue = (value: any, type: string) => {
     case 'ManagedBuffer':
     case 'BoxedBytes':
     case '&[u8]':
-    case 'Vec<u8>':
+    case 'Vec':
     case 'String':
     case '&str':
     case 'bytes':
     case 'TokenIdentifier':
+    case 'List':
+    case 'Array':
+    case 'Address':
       return encodeLengthPlusData(value);
     default:
       return value;
@@ -142,8 +148,10 @@ const parseFunctionArguments = (
 
   const { function: func } = data;
 
+  let parsedValue = '';
+
   const parsedArgs = (args || []).map(value => {
-    const { value: argValue, type, raw_type } = value;
+    const { value: argValue, type, raw_type, required } = value;
 
     if (typeof argValue === 'number' && isNaN(argValue)) {
       return '';
@@ -151,6 +159,9 @@ const parseFunctionArguments = (
     if (argValue === null || argValue === undefined) {
       return '';
     }
+
+    delete data.arguments;
+    delete data.function;
 
     if (type === 'object' && abi !== null) {
       let argument = {};
@@ -170,21 +181,70 @@ const parseFunctionArguments = (
           },
         );
 
-        return structFields.join('');
+        parsedValue = structFields.join('');
+
+        if (parsedValue === '') {
+          return '';
+        }
+        if (!required) {
+          parsedValue = `01${parsedValue}`;
+        }
+
+        return parsedValue;
       }
     }
 
-    if (typeof argValue === 'string') {
-      return Buffer.from(argValue).toString('hex');
-    } else if (typeof argValue === 'number') {
-      const parsedNumber = argValue.toString(16);
-      if (parsedNumber.length % 2 !== 0) {
-        return `0${parsedNumber}`;
+    if (!required && type !== 'array' && type !== 'object') {
+      parsedValue = parseABIValue(argValue, getCleanType(raw_type));
+      if (parsedValue === '') {
+        return '';
       }
-      return parsedNumber;
-    } else if (typeof argValue === 'boolean') {
-      return argValue ? '01' : '00';
+      parsedValue = `01${parsedValue}`;
+    } else {
+      if (type === 'string' && typeof argValue === 'string') {
+        parsedValue = Buffer.from(argValue).toString('hex');
+      } else if (type === 'number') {
+        const parsedNumber = Number(argValue).toString(16);
+        if (parsedNumber.length % 2 !== 0) {
+          parsedValue = `0${parsedNumber}`;
+        }
+        parsedValue = parsedNumber;
+      } else if (type === 'checkbox') {
+        parsedValue = argValue ? '01' : '00';
+      } else if (type === 'array') {
+        let argument = [];
+        try {
+          argument = JSON.parse(argValue as string);
+        } catch (error) {
+          return '';
+        }
+
+        if (!Array.isArray(argument) || argument.length === 0) {
+          return '';
+        }
+        const parsedArray = (argument as any[]).map(value => {
+          const isOptional = raw_type.toLowerCase().startsWith('option');
+
+          const nonOptionalType = isOptional
+            ? (raw_type.match(/<(.*)>/) || [])[1]
+            : raw_type;
+
+          const arrayType = nonOptionalType.split('<')[1].split('>')[0];
+          return parseABIValue(value, arrayType);
+        });
+
+        parsedValue = parsedArray.join('');
+
+        if (parsedValue === '') {
+          return '';
+        }
+        parsedValue = `01${parsedValue}`;
+
+        return parsedValue;
+      }
     }
+
+    return parsedValue;
   });
 
   if (scType === 1) {
@@ -196,6 +256,10 @@ const parseFunctionArguments = (
     }
     return;
   } else {
+    if (parsedArgs.length === 0) {
+      setMetadata(func);
+      return;
+    }
     const parsedData = `${func}@${parsedArgs.join('@')}`;
 
     delete data.arguments;
@@ -206,13 +270,19 @@ const parseFunctionArguments = (
   }
 };
 
-const mapType = (abiType: string) => {
+const getCleanType = (abiType: string) => {
   const isOptional = abiType.toLowerCase().startsWith('option');
   let cleanType = isOptional ? (abiType.match(/<(.*)>/) || [])[1] : abiType;
 
   cleanType = cleanType.toLowerCase();
 
   cleanType = cleanType.split('<')[0];
+
+  return cleanType;
+};
+
+const mapType = (abiType: string) => {
+  const cleanType = getCleanType(abiType);
 
   for (const [key, values] of Object.entries(ABITypeMap)) {
     if (values.includes(cleanType)) {
@@ -249,7 +319,7 @@ const parseAbiFunctions = (
 
     const funcName = endpoint.name;
     const inputs = endpoint.inputs.reduce((acc, input) => {
-      const isOptional = input.type.toLowerCase().startsWith('option');
+      const isOptional = input.type.startsWith('Option');
       acc[input.name] = {
         type: mapType(input.type),
         required: !isOptional,
@@ -373,6 +443,14 @@ const SmartContract: React.FC<IContractProps> = ({
     parseFunctionArguments(getValues(), setMetadata, abi, scType, metadata);
   };
 
+  const showAbiAndArgumentsCondition =
+    scType === 0 || (scType === 1 && fileData.length > 0);
+
+  const callValuesCondition =
+    (scType === 0 && hasFunctions && func?.allowedAssets) ||
+    !hasFunctions ||
+    (scType === 1 && fileData.length > 0);
+
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
       <FormSection>
@@ -393,8 +471,8 @@ const SmartContract: React.FC<IContractProps> = ({
           name="address"
           dynamicInitialValue={scType === 0 ? '' : walletAddress}
           span={2}
-          title={scType === 1 ? 'Contract Address' : 'Contract Owner Address'}
-          tooltip={scType === 1 ? tooltip.address : tooltip.deployAddress}
+          title={scType === 0 ? 'Contract Address' : 'Contract Owner Address'}
+          tooltip={scType === 0 ? tooltip.address : tooltip.deployAddress}
           required
         />
 
@@ -433,21 +511,20 @@ const SmartContract: React.FC<IContractProps> = ({
             setPropertiesString={setPropertiesString}
           />
         )}
-        {scType === 0 ||
-          (scType === 1 && fileData.length > 0 && (
-            <FormInput
-              title="Contract ABI"
-              type="file"
-              accept=".json"
-              span={2}
-              tooltip={tooltip.abi}
-              onChange={handleImportAbi}
-              onClick={(e: any) => {
-                setAbi(null);
-                e.target.value = '';
-              }}
-            />
-          ))}
+        {showAbiAndArgumentsCondition && (
+          <FormInput
+            title="Contract ABI"
+            type="file"
+            accept=".json"
+            span={2}
+            tooltip={tooltip.abi}
+            onChange={handleImportAbi}
+            onClick={(e: any) => {
+              setAbi(null);
+              e.target.value = '';
+            }}
+          />
+        )}
         {scType === 0 && (
           <FormInput
             name="function"
@@ -466,26 +543,23 @@ const SmartContract: React.FC<IContractProps> = ({
             required
           />
         )}
-        {scType === 0 ||
-          (scType === 1 && fileData.length > 0 && (
-            <ArgumentsSection
-              arguments={
-                scType === 1 ? abi?.construct?.arguments || {} : func?.arguments
-              }
-              handleInputChange={handleInputChange}
-            />
-          ))}
-        {(scType === 0 && hasFunctions && func?.allowedAssets) ||
-          !hasFunctions ||
-          (scType === 1 && fileData.length > 0 && (
-            <CallValueSection
-              allowedAssets={
-                scType === 1
-                  ? abi?.construct?.allowedAssets
-                  : func?.allowedAssets
-              }
-            />
-          ))}
+        {showAbiAndArgumentsCondition && (
+          <ArgumentsSection
+            key={JSON.stringify(functions)}
+            arguments={
+              scType === 1 ? abi?.construct?.arguments || {} : func?.arguments
+            }
+            structs={abi?.structs}
+            handleInputChange={handleInputChange}
+          />
+        )}
+        {callValuesCondition && (
+          <CallValueSection
+            allowedAssets={
+              scType === 1 ? abi?.construct?.allowedAssets : func?.allowedAssets
+            }
+          />
+        )}
       </FormSection>
     </FormBody>
   );
@@ -603,11 +677,51 @@ export const PropertiesSection: React.FC<IProperties> = ({
 
 interface IArguments {
   arguments?: ABIFunctionArguments;
+  structs?: Record<string, ABIStruct>;
   handleInputChange: (e: React.FocusEvent<HTMLInputElement>) => void;
 }
 
+const getInitialValue = (
+  type: string,
+  rawType: string,
+  structs?: Record<string, ABIStruct>,
+  inner = false,
+) => {
+  if (type === 'number') {
+    return inner ? 0 : NaN;
+  }
+  if (type === 'checkbox') {
+    return false;
+  }
+  if (type === 'array') {
+    return [];
+  }
+
+  if (type === 'object') {
+    if (!structs) {
+      return '';
+    }
+    const struct = structs[rawType];
+    const initialObjectValue = {};
+
+    Object.entries(struct?.fields || []).forEach(([key, v]) => {
+      const initialValue = getInitialValue(
+        mapType(v.type),
+        v.type,
+        structs,
+        true,
+      );
+      initialObjectValue[v.name] = initialValue;
+    });
+
+    return JSON.stringify(initialObjectValue, null, 2);
+  }
+  return '';
+};
+
 export const ArgumentsSection: React.FC<IArguments> = ({
   arguments: args,
+  structs,
   handleInputChange,
 }) => {
   const { control, getValues } = useFormContext();
@@ -618,17 +732,18 @@ export const ArgumentsSection: React.FC<IArguments> = ({
   });
 
   useEffect(() => {
-    if (args) {
-      fields.forEach(_ => {
-        remove();
-      });
+    fields.forEach(_ => {
+      remove();
+    });
+    handleInputChange({} as any);
 
+    if (args) {
       append(
         Object.keys(args).map(key => ({
           name: key,
           type: args[key].type,
           raw_type: args[key].raw_type,
-          value: args[key].type === 'number' ? NaN : '',
+          value: getInitialValue(args[key].type, args[key].raw_type, structs),
           required: args[key].required,
         })),
       );
@@ -706,8 +821,6 @@ export const ArgumentsSection: React.FC<IArguments> = ({
               { label: 'Text', value: 'text' },
               { label: 'Number', value: 'number' },
               { label: 'Boolean', value: 'checkbox' },
-              // { label: 'Array', value: 'array' }, // Can't parse without ABI
-              // { label: 'Object', value: 'object' },
             ]}
             placeholder="Add Argument"
           />

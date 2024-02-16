@@ -8,6 +8,7 @@ import {
   IRowSection,
   ITransactionResponse,
 } from '@/types';
+import { IBlockResponse } from '@/types/blocks';
 import { ContractsName, ITransferContract } from '@/types/contracts';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions/index';
 import { KLV_PRECISION } from '@/utils/globalVariables';
@@ -343,7 +344,7 @@ export const AccountRowSections = (
 };
 
 export const BlockRowSections = (
-  res: IAccountResponse,
+  res: IBlockResponse,
   precision: number,
   setShowTooltip: React.Dispatch<React.SetStateAction<boolean>>,
 ): IRowSection[] => {

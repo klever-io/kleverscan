@@ -43,6 +43,7 @@ type FormData = {
     value: string | number | any[] | Record<string, any>;
     type: 'string' | 'number' | 'array' | string;
     raw_type: string;
+    required: boolean;
   }[];
   callValue: {
     [coin: string]: number;
@@ -85,7 +86,9 @@ const bitValuesBytes2_3 = {
 const toggleOptions: [string, string] = ['False', 'True'];
 
 const parseABIValue = (value: any, type: string) => {
-  switch (type) {
+  const outerType = type.split('<')[0];
+
+  switch (outerType) {
     case 'u64':
     case 'i64':
       if (value < 0) {
@@ -121,11 +124,14 @@ const parseABIValue = (value: any, type: string) => {
     case 'ManagedBuffer':
     case 'BoxedBytes':
     case '&[u8]':
-    case 'Vec<u8>':
+    case 'Vec':
     case 'String':
     case '&str':
     case 'bytes':
     case 'TokenIdentifier':
+    case 'List':
+    case 'Array':
+    case 'Address':
       return encodeLengthPlusData(value);
     default:
       return value;
@@ -142,8 +148,10 @@ const parseFunctionArguments = (
 
   const { function: func } = data;
 
+  let parsedValue = '';
+
   const parsedArgs = (args || []).map(value => {
-    const { value: argValue, type, raw_type } = value;
+    const { value: argValue, type, raw_type, required } = value;
 
     if (typeof argValue === 'number' && isNaN(argValue)) {
       return '';
@@ -151,6 +159,9 @@ const parseFunctionArguments = (
     if (argValue === null || argValue === undefined) {
       return '';
     }
+
+    delete data.arguments;
+    delete data.function;
 
     if (type === 'object' && abi !== null) {
       let argument = {};
@@ -170,10 +181,70 @@ const parseFunctionArguments = (
           },
         );
 
-        return structFields.join('');
+        parsedValue = structFields.join('');
+
+        if (parsedValue === '') {
+          return '';
+        }
+        if (!required) {
+          parsedValue = `01${parsedValue}`;
+        }
+
+        return parsedValue;
       }
     }
-    return parseABIValue(argValue, raw_type);
+
+    if (!required && type !== 'array' && type !== 'object') {
+      parsedValue = parseABIValue(argValue, getCleanType(raw_type));
+      if (parsedValue === '') {
+        return '';
+      }
+      parsedValue = `01${parsedValue}`;
+    } else {
+      if (type === 'string' && typeof argValue === 'string') {
+        parsedValue = Buffer.from(argValue).toString('hex');
+      } else if (type === 'number') {
+        const parsedNumber = Number(argValue).toString(16);
+        if (parsedNumber.length % 2 !== 0) {
+          parsedValue = `0${parsedNumber}`;
+        }
+        parsedValue = parsedNumber;
+      } else if (type === 'checkbox') {
+        parsedValue = argValue ? '01' : '00';
+      } else if (type === 'array') {
+        let argument = [];
+        try {
+          argument = JSON.parse(argValue as string);
+        } catch (error) {
+          return '';
+        }
+
+        if (!Array.isArray(argument) || argument.length === 0) {
+          return '';
+        }
+        const parsedArray = (argument as any[]).map(value => {
+          const isOptional = raw_type.toLowerCase().startsWith('option');
+
+          const nonOptionalType = isOptional
+            ? (raw_type.match(/<(.*)>/) || [])[1]
+            : raw_type;
+
+          const arrayType = nonOptionalType.split('<')[1].split('>')[0];
+          return parseABIValue(value, arrayType);
+        });
+
+        parsedValue = parsedArray.join('');
+
+        if (parsedValue === '') {
+          return '';
+        }
+        parsedValue = `01${parsedValue}`;
+
+        return parsedValue;
+      }
+    }
+
+    return parsedValue;
   });
 
   if (scType === 1) {
@@ -199,13 +270,19 @@ const parseFunctionArguments = (
   }
 };
 
-const mapType = (abiType: string) => {
+const getCleanType = (abiType: string) => {
   const isOptional = abiType.toLowerCase().startsWith('option');
   let cleanType = isOptional ? (abiType.match(/<(.*)>/) || [])[1] : abiType;
 
   cleanType = cleanType.toLowerCase();
 
   cleanType = cleanType.split('<')[0];
+
+  return cleanType;
+};
+
+const mapType = (abiType: string) => {
+  const cleanType = getCleanType(abiType);
 
   for (const [key, values] of Object.entries(ABITypeMap)) {
     if (values.includes(cleanType)) {
@@ -242,7 +319,7 @@ const parseAbiFunctions = (
 
     const funcName = endpoint.name;
     const inputs = endpoint.inputs.reduce((acc, input) => {
-      const isOptional = input.type.toLowerCase().startsWith('option');
+      const isOptional = input.type.startsWith('Option');
       acc[input.name] = {
         type: mapType(input.type),
         required: !isOptional,
@@ -394,8 +471,8 @@ const SmartContract: React.FC<IContractProps> = ({
           name="address"
           dynamicInitialValue={scType === 0 ? '' : walletAddress}
           span={2}
-          title={scType === 1 ? 'Contract Address' : 'Contract Owner Address'}
-          tooltip={scType === 1 ? tooltip.address : tooltip.deployAddress}
+          title={scType === 0 ? 'Contract Address' : 'Contract Owner Address'}
+          tooltip={scType === 0 ? tooltip.address : tooltip.deployAddress}
           required
         />
 

@@ -864,19 +864,19 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@klever/kleverweb@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@klever/kleverweb/-/kleverweb-1.1.0.tgz#995a9603bd111f50214dcbfce58147c6ca77bb67"
-  integrity sha512-Y+KUq1hEKyFFxZWjp6yCK4h1WWplf1xGL3UulmJEcoObXxtgVlfZdnmwY5aF/kWo38gTiqKsTrCd5x3VkRR3eA==
+"@klever/kleverweb@^1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@klever/kleverweb/-/kleverweb-1.2.2.tgz#ce00d43034ffce6deed21af6b7508189bcb166d9"
+  integrity sha512-uE90qJmi9jSSA6bvnjKtlFXv7juBTvvIc1Qzf8TgdSpj+U7KFtAR+ZD14oZAt4sO20kmJi1EgYc4reXRaum0GQ==
   dependencies:
     "@protobuf-ts/plugin" "^2.7.0"
 
-"@klever/sdk-web@^1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@klever/sdk-web/-/sdk-web-1.0.4.tgz#ed4b0ee44bd62bb15154aad67dce6fc6ea659510"
-  integrity sha512-O/CKX1TQGGNF9H4lyXNZSjtw+L7VNBO4iuNiMIaA9uVqgKPIRJ0qrNmjVlsYZxy7VLzaBVo13bC84GXbCwPSrw==
+"@klever/sdk-web@^1.0.7":
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/@klever/sdk-web/-/sdk-web-1.0.7.tgz#757f84c649fb17873769e761c7e7f111e69aae45"
+  integrity sha512-pyYYGdRCGYR8ILJ5gXNtvd9sHoj5BfNtP70C1gr1lt3H2NGrlul1hfZ08UXtD5nUGISFhq35WKWxgPnpZU54lQ==
   dependencies:
-    "@klever/kleverweb" "^1.1.0"
+    "@klever/kleverweb" "^1.2.2"
 
 "@next/env@12.3.0":
   version "12.3.0"

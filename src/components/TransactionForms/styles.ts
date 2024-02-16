@@ -2,6 +2,7 @@ import { Form } from '@unform/web';
 import { lighten } from 'polished';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import styled, { css } from 'styled-components';
+import { ReactSelectStyles } from '../Contract/Select/styles';
 
 interface IButton {
   submit?: boolean;
@@ -151,6 +152,10 @@ export const ButtonContainer = styled.button<IButton>`
     opacity: 0.5;
     cursor: not-allowed;
   }
+`;
+
+export const SelectContainer = styled.div`
+  ${ReactSelectStyles}
 `;
 
 export const HiddenSubmitButton = styled.button`

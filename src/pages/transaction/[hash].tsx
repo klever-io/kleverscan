@@ -24,6 +24,7 @@ import {
   Sell,
   SetAccountName,
   SetITOPrices,
+  SmartContract,
   Transfer,
   Undelegate,
   Unfreeze,
@@ -48,6 +49,7 @@ import {
   ITransactionPage,
   ITransactionResponse,
   NotFound,
+  Service,
 } from '@/types';
 import { IBlock, IBlockResponse } from '@/types/blocks';
 import { Contract, IIndexedContract } from '@/types/contracts';
@@ -761,6 +763,17 @@ const Transaction: React.FC<ITransactionPage> = props => {
                   {index < contracts.length - 1 && <Hr />}
                 </div>
               );
+            case Contract.SmartContract:
+              return (
+                <div key={`${index}`}>
+                  <SmartContract
+                    {...contract}
+                    logs={transaction?.logs}
+                    contractIndex={index}
+                    renderMetadata={() => renderMetadata(data, index)}
+                  />
+                </div>
+              );
             default:
               return <div />;
           }
@@ -887,16 +900,28 @@ export const getStaticProps: GetStaticProps<ITransactionPage> = async ({
   const transaction: ITransactionResponse = await api.get({
     route: `transaction/${hash}`,
   });
+
   const tx = transaction?.data?.transaction;
   if (transaction.error || (!tx?.blockNum && !tx?.nonce && !tx?.sender)) {
     return redirectProps;
+  }
+
+  if (tx?.contract.some(contract => contract.type == 99)) {
+    const nodeTransaction: any = await api.get({
+      service: Service.NODE,
+      route: `transaction/${hash}?withResults=true`,
+    });
+
+    const logs = nodeTransaction?.data?.transaction?.logs;
+
+    tx['logs'] = logs;
   }
   const block: IBlockResponse = await api.get({
     route: `block/by-nonce/${transaction?.data?.transaction?.blockNum}`,
   });
 
   const props: ITransactionPage = {
-    transaction: transaction.data.transaction,
+    transaction: tx,
     block: block?.data?.block || {},
   };
 

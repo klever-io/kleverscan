@@ -7,7 +7,7 @@ interface IContainer {
   $error?: boolean;
 }
 
-const ReactSelect = css`
+export const ReactSelectStyles = css`
   .react-select {
     margin: 0.25rem 0;
     width: 100%;
@@ -114,7 +114,7 @@ export const Container = styled.div<IContainer>`
     font-weight: 600;
     font-size: 0.9rem;
   }
-  ${ReactSelect}
+  ${ReactSelectStyles}
 
   ${props =>
     props.$error &&

@@ -36,6 +36,7 @@ import {
   SellSections,
   SetAccountNameSections,
   SetITOPricesSections,
+  SmartContractSections,
   TransferSections,
   UndelegateSections,
   UnfreezeSections,
@@ -142,6 +143,10 @@ export const contractOptions: IContractOption[] = [
   {
     label: 'Update Account Permission',
     value: 'UpdateAccountPermissionContract',
+  },
+  {
+    label: 'Smart Contract',
+    value: 'SmartContract',
   },
 ];
 export const claimTypes = [
@@ -366,6 +371,7 @@ export const paramContractMap = {
   UpdateAccountPermissionContract: 'KAppFeeUpdateAccountPermission',
   ITOTriggerContract: 'KAppFeeITOTrigger',
   DepositContract: 'KAppFeeDeposit',
+  SmartContract: 'KAppFeeSmartContract',
 };
 
 /**
@@ -431,6 +437,8 @@ export const filteredSections = (
       return DepositSections(contract[0].parameter);
     case Contract.ITOTrigger:
       return IITOTriggerSections(contract[0].parameter);
+    case Contract.SmartContract:
+      return SmartContractSections(contract[0].parameter);
     default:
       return [];
   }
@@ -471,6 +479,7 @@ export enum contractTableHeaders {
   'Currency Id',
   'Market Type',
   'Price',
+  'Type',
 }
 
 /**
@@ -565,6 +574,8 @@ export const getHeaderForTable = (
       break;
     case ContractsIndex['ITO Trigger']:
       newHeaders = [contractTableHeaders[17], contractTableHeaders[9]];
+    case ContractsIndex['Smart Contract']:
+      newHeaders = [contractTableHeaders[23]];
       break;
   }
   if (router.query.type) {

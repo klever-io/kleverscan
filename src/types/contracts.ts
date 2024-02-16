@@ -705,9 +705,20 @@ export interface ABI {
 }
 
 export const ABITypeMap = {
-  number: ['BigUint', 'BigInt', 'u32', 'u64', 'u128', 'i32', 'i64', 'i128'].map(
-    type => type.toLowerCase(),
-  ),
+  number: [
+    'BigUint',
+    'BigInt',
+    'u8',
+    'u16',
+    'u32',
+    'u64',
+    'i8',
+    'i16',
+    'i32',
+    'i64',
+    'usize',
+    'isize',
+  ].map(type => type.toLowerCase()),
   string: [
     'TokenIdentifier',
     'String',
@@ -717,8 +728,13 @@ export const ABITypeMap = {
     'PublicKey',
     'Signature',
     'ManagedBuffer',
+    'BoxedBytes',
+    '&[u8]',
+    'Vec<u8>',
+    '&str',
+    'bytes',
+    'ManagedVec',
   ].map(type => type.toLowerCase()),
-  array: ['Vec', 'Tuple', 'Array', 'List', 'ManagedVec'].map(type =>
-    type.toLowerCase(),
-  ),
+  array: ['Tuple', 'Array', 'List'].map(type => type.toLowerCase()),
+  checkbox: ['bool'],
 };

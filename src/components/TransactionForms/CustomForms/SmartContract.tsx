@@ -173,18 +173,7 @@ const parseFunctionArguments = (
         return structFields.join('');
       }
     }
-
-    if (typeof argValue === 'string') {
-      return Buffer.from(argValue).toString('hex');
-    } else if (typeof argValue === 'number') {
-      const parsedNumber = argValue.toString(16);
-      if (parsedNumber.length % 2 !== 0) {
-        return `0${parsedNumber}`;
-      }
-      return parsedNumber;
-    } else if (typeof argValue === 'boolean') {
-      return argValue ? '01' : '00';
-    }
+    return parseABIValue(argValue, raw_type);
   });
 
   if (scType === 1) {
@@ -196,6 +185,10 @@ const parseFunctionArguments = (
     }
     return;
   } else {
+    if (parsedArgs.length === 0) {
+      setMetadata(func);
+      return;
+    }
     const parsedData = `${func}@${parsedArgs.join('@')}`;
 
     delete data.arguments;
@@ -373,6 +366,14 @@ const SmartContract: React.FC<IContractProps> = ({
     parseFunctionArguments(getValues(), setMetadata, abi, scType, metadata);
   };
 
+  const showAbiAndArgumentsCondition =
+    scType === 0 || (scType === 1 && fileData.length > 0);
+
+  const callValuesCondition =
+    (scType === 0 && hasFunctions && func?.allowedAssets) ||
+    !hasFunctions ||
+    (scType === 1 && fileData.length > 0);
+
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
       <FormSection>
@@ -433,21 +434,20 @@ const SmartContract: React.FC<IContractProps> = ({
             setPropertiesString={setPropertiesString}
           />
         )}
-        {scType === 0 ||
-          (scType === 1 && fileData.length > 0 && (
-            <FormInput
-              title="Contract ABI"
-              type="file"
-              accept=".json"
-              span={2}
-              tooltip={tooltip.abi}
-              onChange={handleImportAbi}
-              onClick={(e: any) => {
-                setAbi(null);
-                e.target.value = '';
-              }}
-            />
-          ))}
+        {showAbiAndArgumentsCondition && (
+          <FormInput
+            title="Contract ABI"
+            type="file"
+            accept=".json"
+            span={2}
+            tooltip={tooltip.abi}
+            onChange={handleImportAbi}
+            onClick={(e: any) => {
+              setAbi(null);
+              e.target.value = '';
+            }}
+          />
+        )}
         {scType === 0 && (
           <FormInput
             name="function"
@@ -466,26 +466,23 @@ const SmartContract: React.FC<IContractProps> = ({
             required
           />
         )}
-        {scType === 0 ||
-          (scType === 1 && fileData.length > 0 && (
-            <ArgumentsSection
-              arguments={
-                scType === 1 ? abi?.construct?.arguments || {} : func?.arguments
-              }
-              handleInputChange={handleInputChange}
-            />
-          ))}
-        {(scType === 0 && hasFunctions && func?.allowedAssets) ||
-          !hasFunctions ||
-          (scType === 1 && fileData.length > 0 && (
-            <CallValueSection
-              allowedAssets={
-                scType === 1
-                  ? abi?.construct?.allowedAssets
-                  : func?.allowedAssets
-              }
-            />
-          ))}
+        {showAbiAndArgumentsCondition && (
+          <ArgumentsSection
+            key={JSON.stringify(functions)}
+            arguments={
+              scType === 1 ? abi?.construct?.arguments || {} : func?.arguments
+            }
+            structs={abi?.structs}
+            handleInputChange={handleInputChange}
+          />
+        )}
+        {callValuesCondition && (
+          <CallValueSection
+            allowedAssets={
+              scType === 1 ? abi?.construct?.allowedAssets : func?.allowedAssets
+            }
+          />
+        )}
       </FormSection>
     </FormBody>
   );
@@ -603,11 +600,51 @@ export const PropertiesSection: React.FC<IProperties> = ({
 
 interface IArguments {
   arguments?: ABIFunctionArguments;
+  structs?: Record<string, ABIStruct>;
   handleInputChange: (e: React.FocusEvent<HTMLInputElement>) => void;
 }
 
+const getInitialValue = (
+  type: string,
+  rawType: string,
+  structs?: Record<string, ABIStruct>,
+  inner = false,
+) => {
+  if (type === 'number') {
+    return inner ? 0 : NaN;
+  }
+  if (type === 'checkbox') {
+    return false;
+  }
+  if (type === 'array') {
+    return [];
+  }
+
+  if (type === 'object') {
+    if (!structs) {
+      return '';
+    }
+    const struct = structs[rawType];
+    const initialObjectValue = {};
+
+    Object.entries(struct?.fields || []).forEach(([key, v]) => {
+      const initialValue = getInitialValue(
+        mapType(v.type),
+        v.type,
+        structs,
+        true,
+      );
+      initialObjectValue[v.name] = initialValue;
+    });
+
+    return JSON.stringify(initialObjectValue, null, 2);
+  }
+  return '';
+};
+
 export const ArgumentsSection: React.FC<IArguments> = ({
   arguments: args,
+  structs,
   handleInputChange,
 }) => {
   const { control, getValues } = useFormContext();
@@ -618,17 +655,18 @@ export const ArgumentsSection: React.FC<IArguments> = ({
   });
 
   useEffect(() => {
-    if (args) {
-      fields.forEach(_ => {
-        remove();
-      });
+    fields.forEach(_ => {
+      remove();
+    });
+    handleInputChange({} as any);
 
+    if (args) {
       append(
         Object.keys(args).map(key => ({
           name: key,
           type: args[key].type,
           raw_type: args[key].raw_type,
-          value: args[key].type === 'number' ? NaN : '',
+          value: getInitialValue(args[key].type, args[key].raw_type, structs),
           required: args[key].required,
         })),
       );
@@ -706,8 +744,6 @@ export const ArgumentsSection: React.FC<IArguments> = ({
               { label: 'Text', value: 'text' },
               { label: 'Number', value: 'number' },
               { label: 'Boolean', value: 'checkbox' },
-              // { label: 'Array', value: 'array' }, // Can't parse without ABI
-              // { label: 'Object', value: 'object' },
             ]}
             placeholder="Add Argument"
           />

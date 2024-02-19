@@ -36,16 +36,18 @@ const ReactSelect = dynamic(() => import('react-select'), {
   loading: () => null,
 });
 
+interface Argument {
+  value: string | number | any[] | Record<string, any>;
+  type: 'string' | 'number' | 'array' | string;
+  raw_type: string;
+  required: boolean;
+}
+
 type FormData = {
   scType: number;
   address: string;
   function?: string;
-  arguments?: {
-    value: string | number | any[] | Record<string, any>;
-    type: 'string' | 'number' | 'array' | string;
-    raw_type: string;
-    required: boolean;
-  }[];
+  arguments?: Argument[];
   callValue: {
     [coin: string]: number;
   };
@@ -139,6 +141,114 @@ const parseABIValue = (value: any, type: string, shouldValidate = true) => {
       return value;
   }
 };
+
+const getParsedArguments = (
+  args: Argument[] | undefined,
+  abi: ABIMap | null,
+) => {
+  return (args || []).map(value => {
+    return parseArgument(value.value, value.raw_type, abi);
+  });
+};
+
+const parseArgument = (value: any, raw_type: string, abi: ABIMap | null) => {
+  let parsedValue = '';
+
+  const required = !raw_type.startsWith('Option');
+  const type = getJSType(raw_type);
+
+  if (typeof value === 'number' && isNaN(value)) {
+    return '';
+  }
+  if (value === null || value === undefined) {
+    return '';
+  }
+
+  if (type === 'object' && abi !== null) {
+    let argument = {};
+    try {
+      argument = JSON.parse(value as string);
+    } catch (error) {
+      return '';
+    }
+    const struct = abi.structs?.[raw_type];
+    if (struct && argument !== null) {
+      const structFields: string[] = Object.entries(struct?.fields || []).map(
+        ([key, v]) => {
+          const objectValue = argument[v.name];
+          const objectType = v.type;
+          const parsedValue = parseABIValue(objectValue, objectType);
+          return parsedValue;
+        },
+      );
+
+      parsedValue = structFields.join('');
+
+      if (parsedValue === '') {
+        return '';
+      }
+      if (!required) {
+        parsedValue = `01${parsedValue}`;
+      }
+
+      return parsedValue;
+    }
+  }
+
+  if (!required && type !== 'array' && type !== 'object') {
+    parsedValue = parseABIValue(value, raw_type);
+    if (parsedValue === '') {
+      return '';
+    }
+    parsedValue = `01${parsedValue}`;
+  } else {
+    if (type === 'string' && typeof value === 'string') {
+      parsedValue = Buffer.from(value).toString('hex');
+    } else if (type === 'number') {
+      let parsedNumber = Number(value).toString(16);
+      if (parsedNumber?.length % 2 !== 0) {
+        parsedNumber = `0${parsedNumber}`;
+      }
+      parsedValue = parsedNumber;
+    } else if (type === 'checkbox') {
+      parsedValue = value ? '01' : '00';
+    } else if (type === 'array') {
+      let argument = [];
+      try {
+        argument = JSON.parse(value as string);
+      } catch (error) {
+        return '';
+      }
+
+      if (!Array.isArray(argument) || argument?.length === 0) {
+        return '';
+      }
+      const parsedArray = (argument as any[]).map(value => {
+        const isOptional = raw_type.toLowerCase().startsWith('option');
+
+        const nonOptionalType = isOptional
+          ? (raw_type.match(/<(.*)>/) || [])[1]
+          : raw_type;
+
+        const arrayType = nonOptionalType.split('<')[1].split('>')[0];
+        return parseABIValue(value, arrayType);
+      });
+
+      parsedValue = encodeLengthPlusData(parsedArray);
+
+      if (parsedValue === '') {
+        return '';
+      }
+      if (!required) {
+        parsedValue = `01${parsedValue}`;
+      }
+
+      return parsedValue;
+    }
+  }
+  return parsedValue;
+};
+
 const parseFunctionArguments = (
   data: FormData,
   setMetadata: any,
@@ -151,109 +261,10 @@ const parseFunctionArguments = (
 
   const { function: func } = data;
 
-  let parsedValue = '';
+  delete data.arguments;
+  delete data.function;
 
-  const parsedArgs = (args || []).map(value => {
-    const { value: argValue, type, raw_type, required } = value;
-
-    if (typeof argValue === 'number' && isNaN(argValue)) {
-      return '';
-    }
-    if (argValue === null || argValue === undefined) {
-      return '';
-    }
-
-    delete data.arguments;
-    delete data.function;
-
-    if (type === 'object' && abi !== null) {
-      let argument = {};
-      try {
-        argument = JSON.parse(argValue as string);
-      } catch (error) {
-        return '';
-      }
-      const struct = abi.structs?.[raw_type];
-      if (struct && argument !== null) {
-        const structFields: string[] = Object.entries(struct?.fields || []).map(
-          ([key, v]) => {
-            const objectValue = argument[v.name];
-            const objectType = v.type;
-            const parsedValue = parseABIValue(
-              objectValue,
-              objectType,
-              shouldValidate,
-            );
-            return parsedValue;
-          },
-        );
-
-        parsedValue = structFields.join('');
-
-        if (parsedValue === '') {
-          return '';
-        }
-        if (!required) {
-          parsedValue = `01${parsedValue}`;
-        }
-
-        return parsedValue;
-      }
-    }
-
-    if (!required && type !== 'array' && type !== 'object') {
-      parsedValue = parseABIValue(argValue, raw_type, shouldValidate);
-      if (parsedValue === '') {
-        return '';
-      }
-      parsedValue = `01${parsedValue}`;
-    } else {
-      if (type === 'string' && typeof argValue === 'string') {
-        parsedValue = Buffer.from(argValue).toString('hex');
-      } else if (type === 'number') {
-        let parsedNumber = Number(argValue).toString(16);
-        if (parsedNumber?.length % 2 !== 0) {
-          parsedNumber = `0${parsedNumber}`;
-        }
-        parsedValue = parsedNumber;
-      } else if (type === 'checkbox') {
-        parsedValue = argValue ? '01' : '00';
-      } else if (type === 'array') {
-        let argument = [];
-        try {
-          argument = JSON.parse(argValue as string);
-        } catch (error) {
-          return '';
-        }
-
-        if (!Array.isArray(argument) || argument?.length === 0) {
-          return '';
-        }
-        const parsedArray = (argument as any[]).map(value => {
-          const isOptional = raw_type.toLowerCase().startsWith('option');
-
-          const nonOptionalType = isOptional
-            ? (raw_type.match(/<(.*)>/) || [])[1]
-            : raw_type;
-
-          const arrayType = nonOptionalType.split('<')[1].split('>')[0];
-          return parseABIValue(value, arrayType, shouldValidate);
-        });
-
-        parsedValue = encodeLengthPlusData(parsedArray);
-
-        if (parsedValue === '') {
-          return '';
-        }
-        if (!required) {
-          parsedValue = `01${parsedValue}`;
-        }
-
-        return parsedValue;
-      }
-    }
-    return parsedValue;
-  });
+  const parsedArgs = getParsedArguments(args, abi);
 
   if (scType === 1) {
     let parsedData = metadata.split('@').slice(0, 3).join('@');
@@ -292,7 +303,7 @@ const getCleanType = (abiType: string, toLower = true) => {
   return cleanType;
 };
 
-const mapType = (abiType: string) => {
+const getJSType = (abiType: string) => {
   const cleanType = getCleanType(abiType);
 
   for (const [key, values] of Object.entries(ABITypeMap)) {
@@ -332,7 +343,7 @@ const parseAbiFunctions = (
     const inputs = endpoint.inputs.reduce((acc, input) => {
       const isOptional = input.type.startsWith('Option');
       acc[input.name] = {
-        type: mapType(input.type),
+        type: getJSType(input.type),
         required: !isOptional,
         raw_type: input.type,
       };
@@ -354,7 +365,7 @@ const parseAbiFunctions = (
       arguments: parsedAbi.constructor.inputs.reduce((acc, input) => {
         const isOptional = input.type.toLowerCase().startsWith('option');
         acc[input.name] = {
-          type: mapType(input.type),
+          type: getJSType(input.type),
           required: !isOptional,
           raw_type: input.type,
         };
@@ -724,7 +735,7 @@ const getInitialValue = (
 
     Object.entries(struct?.fields || []).forEach(([key, v]) => {
       const initialValue = getInitialValue(
-        mapType(v.type),
+        getJSType(v.type),
         v.type,
         structs,
         true,

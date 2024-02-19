@@ -211,9 +211,9 @@ const parseFunctionArguments = (
       if (type === 'string' && typeof argValue === 'string') {
         parsedValue = Buffer.from(argValue).toString('hex');
       } else if (type === 'number') {
-        const parsedNumber = Number(argValue).toString(16);
-        if (parsedNumber.length % 2 !== 0) {
-          parsedValue = `0${parsedNumber}`;
+        let parsedNumber = Number(argValue).toString(16);
+        if (parsedNumber?.length % 2 !== 0) {
+          parsedNumber = `0${parsedNumber}`;
         }
         parsedValue = parsedNumber;
       } else if (type === 'checkbox') {
@@ -226,7 +226,7 @@ const parseFunctionArguments = (
           return '';
         }
 
-        if (!Array.isArray(argument) || argument.length === 0) {
+        if (!Array.isArray(argument) || argument?.length === 0) {
           return '';
         }
         const parsedArray = (argument as any[]).map(value => {
@@ -252,20 +252,19 @@ const parseFunctionArguments = (
         return parsedValue;
       }
     }
-
     return parsedValue;
   });
 
   if (scType === 1) {
     let parsedData = metadata.split('@').slice(0, 3).join('@');
 
-    if (parsedArgs.length > 0) {
+    if (parsedArgs?.length > 0) {
       parsedData += `@${parsedArgs.join('@')}`;
       setMetadata(parsedData);
     }
     return;
   } else {
-    if (parsedArgs.length === 0) {
+    if (parsedArgs?.length === 0) {
       setMetadata(func);
       return;
     }
@@ -350,7 +349,7 @@ const parseAbiFunctions = (
     arguments: {},
   };
 
-  if (parsedAbi.constructor.inputs.length > 0) {
+  if (parsedAbi.constructor.inputs?.length > 0) {
     constructor = {
       arguments: parsedAbi.constructor.inputs.reduce((acc, input) => {
         const isOptional = input.type.toLowerCase().startsWith('option');
@@ -406,7 +405,7 @@ const SmartContract: React.FC<IContractProps> = ({
         }
       : functions?.[watch('function') || ''];
 
-  const hasFunctions = Object.keys(functions).length > 0;
+  const hasFunctions = Object.keys(functions)?.length > 0;
 
   const onSubmit = async (dataRef: FormData) => {
     const data = JSON.parse(JSON.stringify(dataRef));
@@ -430,14 +429,14 @@ const SmartContract: React.FC<IContractProps> = ({
     const data = {} as ABIMap;
     const { functions, constructor } = parseAbiFunctions(abi);
 
-    if (Object.keys(functions).length > 0) {
+    if (Object.keys(functions)?.length > 0) {
       data['functions'] = functions;
     }
 
     data['construct'] = constructor;
 
     const structs = parseAbiStructs(abi);
-    if (Object.keys(structs).length > 0) {
+    if (Object.keys(structs)?.length > 0) {
       data['structs'] = structs;
     }
 
@@ -463,12 +462,12 @@ const SmartContract: React.FC<IContractProps> = ({
   };
 
   const showAbiAndArgumentsCondition =
-    scType === 0 || (scType === 1 && fileData.length > 0);
+    scType === 0 || (scType === 1 && fileData?.length > 0);
 
   const callValuesCondition =
     (scType === 0 && hasFunctions && func?.allowedAssets) ||
     !hasFunctions ||
-    (scType === 1 && fileData.length > 0);
+    (scType === 1 && fileData?.length > 0);
 
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
@@ -524,7 +523,7 @@ const SmartContract: React.FC<IContractProps> = ({
             tooltip={tooltip.data}
           />
         )}
-        {scType === 1 && fileData.length > 0 && (
+        {scType === 1 && fileData?.length > 0 && (
           <PropertiesSection
             propertiesString={propertiesString}
             setPropertiesString={setPropertiesString}

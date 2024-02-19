@@ -1,4 +1,4 @@
-import { encodeBigNumber, twosComplement } from '.';
+import { encodeAddress, encodeBigNumber, twosComplement } from '.';
 
 describe('utils', () => {
   it('should return 2 complement of number 1', () => {
@@ -28,5 +28,16 @@ describe('utils', () => {
   it('should encode BigInt positive and larger than half max correctly', () => {
     const value = 255;
     expect(encodeBigNumber(value)).toBe('0000000200ff');
+  });
+});
+
+describe('encodeAddress', () => {
+  it('should encode address correctly', () => {
+    const address =
+      'klv1fpwjz234gy8aaae3gx0e8q9f52vymzzn3z5q0s5h60pvktzx0n0qwvtux5';
+    const encoded = encodeAddress(address);
+    expect(encoded).toBe(
+      '485d212a35410fdef731419f9380a9a2984d885388a807c297d3c2cb2c467cde',
+    );
   });
 });

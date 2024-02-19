@@ -1,4 +1,5 @@
 import { setQueryAndRouter } from '@/utils';
+import { bech32 } from 'bech32';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { cleanEmptyValues } from '../../FormInput';
 import { PackInfo, WhitelistInfo } from './types';
@@ -372,4 +373,35 @@ export function toByteArray(str: string) {
     byteArray.push(code & 0xff);
   }
   return byteArray;
+}
+
+export function encodeAddress(value: string, shouldValidate = true) {
+  let decoded;
+
+  try {
+    decoded = bech32.decode(value);
+  } catch (err: any) {
+    if (shouldValidate) {
+      throw new Error(err);
+    }
+    return value;
+  }
+
+  const prefix = decoded.prefix;
+  if (prefix != 'klv') {
+    if (shouldValidate) {
+      throw new Error('Invalid prefix');
+    }
+    return value;
+  }
+
+  const pubkey = Buffer.from(bech32.fromWords(decoded.words));
+  if (pubkey.length != 32) {
+    if (shouldValidate) {
+      throw new Error('Invalid pubkey length');
+    }
+    return value;
+  }
+
+  return pubkey.toString('hex');
 }

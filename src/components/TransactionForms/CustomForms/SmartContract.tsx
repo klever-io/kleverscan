@@ -23,6 +23,7 @@ import {
   SelectContainer,
 } from '../styles';
 import {
+  encodeAddress,
   encodeBigNumber,
   encodeLengthPlusData,
   removeWrapper,
@@ -85,8 +86,8 @@ const bitValuesBytes2_3 = {
 
 const toggleOptions: [string, string] = ['False', 'True'];
 
-const parseABIValue = (value: any, type: string) => {
-  const outerType = type.split('<')[0];
+const parseABIValue = (value: any, type: string, shouldValidate = true) => {
+  const outerType = getCleanType(type, false).split('<')[0];
 
   switch (outerType) {
     case 'u64':
@@ -131,8 +132,9 @@ const parseABIValue = (value: any, type: string) => {
     case 'TokenIdentifier':
     case 'List':
     case 'Array':
-    case 'Address':
       return encodeLengthPlusData(value);
+    case 'Address':
+      return encodeAddress(value, shouldValidate);
     default:
       return value;
   }
@@ -143,6 +145,7 @@ const parseFunctionArguments = (
   abi: ABIMap | null,
   scType: number,
   metadata: string,
+  shouldValidate = true,
 ) => {
   const { arguments: args } = data;
 
@@ -176,7 +179,11 @@ const parseFunctionArguments = (
           ([key, v]) => {
             const objectValue = argument[v.name];
             const objectType = v.type;
-            const parsedValue = parseABIValue(objectValue, objectType);
+            const parsedValue = parseABIValue(
+              objectValue,
+              objectType,
+              shouldValidate,
+            );
             return parsedValue;
           },
         );
@@ -195,7 +202,7 @@ const parseFunctionArguments = (
     }
 
     if (!required && type !== 'array' && type !== 'object') {
-      parsedValue = parseABIValue(argValue, getCleanType(raw_type));
+      parsedValue = parseABIValue(argValue, raw_type, shouldValidate);
       if (parsedValue === '') {
         return '';
       }
@@ -230,15 +237,17 @@ const parseFunctionArguments = (
             : raw_type;
 
           const arrayType = nonOptionalType.split('<')[1].split('>')[0];
-          return parseABIValue(value, arrayType);
+          return parseABIValue(value, arrayType, shouldValidate);
         });
 
-        parsedValue = parsedArray.join('');
+        parsedValue = encodeLengthPlusData(parsedArray);
 
         if (parsedValue === '') {
           return '';
         }
-        parsedValue = `01${parsedValue}`;
+        if (!required) {
+          parsedValue = `01${parsedValue}`;
+        }
 
         return parsedValue;
       }
@@ -270,14 +279,17 @@ const parseFunctionArguments = (
   }
 };
 
-const getCleanType = (abiType: string) => {
+const getCleanType = (abiType: string, toLower = true) => {
   const isOptional = abiType.toLowerCase().startsWith('option');
   let cleanType = isOptional ? (abiType.match(/<(.*)>/) || [])[1] : abiType;
 
-  cleanType = cleanType.toLowerCase();
+  cleanType = cleanType;
 
   cleanType = cleanType.split('<')[0];
 
+  if (toLower) {
+    cleanType = cleanType.toLowerCase();
+  }
   return cleanType;
 };
 
@@ -440,7 +452,14 @@ const SmartContract: React.FC<IContractProps> = ({
   };
 
   const handleInputChange = (e: React.FocusEvent<HTMLInputElement>) => {
-    parseFunctionArguments(getValues(), setMetadata, abi, scType, metadata);
+    parseFunctionArguments(
+      getValues(),
+      setMetadata,
+      abi,
+      scType,
+      metadata,
+      false,
+    );
   };
 
   const showAbiAndArgumentsCondition =

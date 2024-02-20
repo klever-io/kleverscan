@@ -5,7 +5,12 @@ import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import dynamic from 'next/dynamic';
 import { NextRouter, useRouter } from 'next/router';
 import { ChangeEventHandler, useEffect, useRef, useState } from 'react';
-import { FieldValues, useFormContext, UseFormGetValues } from 'react-hook-form';
+import {
+  ChangeHandler,
+  FieldValues,
+  useFormContext,
+  UseFormGetValues,
+} from 'react-hook-form';
 import { toast } from 'react-toastify';
 import {
   Container,
@@ -290,17 +295,20 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   "key2": "value2"
     }`
         : '',
-    onChange: onChange as ChangeEventHandler<HTMLTextAreaElement>,
   };
 
   let inputProps = {
     type,
     defaultValue,
     ...areaProps,
-    onChange: onChange as ChangeEventHandler<HTMLInputElement>,
     ...registerProps,
     ...rest,
   };
+
+  if (onChange) {
+    inputProps['onChange'] = onChange as ChangeHandler;
+    areaProps['onChange'] = onChange as ChangeHandler;
+  }
 
   const containerProps = {
     paddingTop,
@@ -449,7 +457,11 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
           <ToggleContainer disabled={inputProps.disabled}>
             {toggleOptions.length > 1 && toggleOptions[0]}
             <Toggle>
-              <StyledInput {...inputProps} required={false} />
+              <StyledInput
+                {...inputProps}
+                required={false}
+                value={String(!!inputValue)}
+              />
               <Slider active={String(!!inputValue)} />
             </Toggle>
             {toggleOptions.length > 1 && toggleOptions[1]}

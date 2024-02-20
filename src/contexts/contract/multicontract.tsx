@@ -93,7 +93,7 @@ export const MulticontractProvider: React.FC = ({ children }) => {
 
   const totalBandwidthFees = queue.reduce((acc, curr) => {
     return (
-      acc + curr.metadata.length * bandwidthFeeMultiplier + baseBandwidthFee
+      acc + curr?.metadata?.length * bandwidthFeeMultiplier + baseBandwidthFee
     );
   }, 0);
 

@@ -349,10 +349,12 @@ const SmartContract: React.FC<IContractProps> = ({
   };
 
   if (hasFunctions)
-    formInputProps['options'] = Object.keys(functions).map(func => ({
-      label: func,
-      value: func,
-    }));
+    formInputProps['options'] =
+      functions &&
+      Object.keys(functions).map(func => ({
+        label: func,
+        value: func,
+      }));
 
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>

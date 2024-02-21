@@ -10,7 +10,14 @@ import { getNetwork } from '@/utils/networkFunctions';
 import { parseAddress } from '@/utils/parseValues';
 import Link from 'next/link';
 import { QRCodeSVG } from 'qrcode.react';
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { BiLogOut, BiWalletAlt } from 'react-icons/bi';
 import { IoMdAddCircle } from 'react-icons/io';
@@ -67,12 +74,13 @@ export const AccountDetailsModal: React.FC<IAccountDetailsModal> = ({
     },
   });
 
-  const { balance, otherAssets } = data || {
-    balance: {
-      klv: '--',
-    },
-    otherAssets: [],
-  };
+  const { balance, otherAssets } = useMemo(() => {
+    if (data) {
+      const { balance, otherAssets } = data;
+      return { balance, otherAssets };
+    }
+    return { balance: {}, otherAssets: [] };
+  }, [data]);
 
   const requestKLV = async () => {
     setLoadingBalance(true);

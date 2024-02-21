@@ -1,8 +1,9 @@
 import { useMulticontract } from '@/contexts/contract/multicontract';
-import { useExtension } from '@/contexts/extension';
 import { ABI, ABIStruct } from '@/types/contracts';
+import { useDidUpdateEffect } from '@/utils/hooks';
+import { getNetwork } from '@/utils/networkFunctions';
 import { abiEncoder, utils } from '@klever/sdk-web';
-import React, { useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import FormInput from '../../FormInput';
@@ -71,9 +72,11 @@ const parseFunctionArguments = (
 
   if (scType === 1) {
     // Deploy
-    let contractBinaryAndParams = metadata.split('@').slice(0, 3).join('@');
-
+    if (metadata?.length === 0) {
+      return;
+    }
     if (parsedArgsString?.length > 0) {
+      let contractBinaryAndParams = metadata.split('@').slice(0, 3).join('@');
       contractBinaryAndParams += `@${parsedArgsString}`;
       setMetadata(contractBinaryAndParams);
     }
@@ -261,29 +264,32 @@ const SmartContract: React.FC<IContractProps> = ({
   formKey,
   handleFormSubmit,
 }) => {
-  const { handleSubmit, watch, setValue, getValues } =
-    useFormContext<FormData>();
-  const { metadata, setMetadata, queue } = useMulticontract();
-  const { walletAddress } = useExtension();
+  const { handleSubmit, watch, getValues } = useFormContext<FormData>();
+  const { metadata, setMetadata } = useMulticontract();
 
   const [fileData, setFileData] = React.useState<string>('');
   const [abi, setAbi] = React.useState<ABIMap | null>(null);
   const [propertiesString, setPropertiesString] = React.useState<string>(
     (0x506).toString(2),
   );
+  const network = getNetwork();
 
   const scType = watch('scType');
 
-  const functions = abi?.functions || {};
+  useDidUpdateEffect(() => {
+    setMetadata('');
+  }, [scType]);
 
-  const func: ABIFunction =
+  const functions = useMemo(() => abi?.functions || undefined, [abi]);
+
+  const func: ABIFunction | undefined =
     scType === 1
       ? abi?.constructor || {
           arguments: {},
         }
       : functions?.[watch('function') || ''];
 
-  const hasFunctions = Object.keys(functions)?.length > 0;
+  const hasFunctions = functions && Object.keys(functions)?.length > 0;
 
   const onSubmit = async (dataRef: FormData) => {
     const data = JSON.parse(JSON.stringify(dataRef));
@@ -292,14 +298,6 @@ const SmartContract: React.FC<IContractProps> = ({
     parseCallValue(data);
     await handleFormSubmit(data);
   };
-
-  useEffect(() => {
-    if (scType === 1) {
-      setValue('address', walletAddress);
-    } else {
-      setValue('address', '');
-    }
-  }, [scType]);
 
   const handleImportAbi = async (e: any) => {
     const abi = await (e.target.files[0] as File).text();
@@ -332,6 +330,7 @@ const SmartContract: React.FC<IContractProps> = ({
     parseFunctionArguments(getValues(), setMetadata, abi, scType, metadata);
   };
 
+  const showAddressCondition = network === 'Testnet' || scType === 0;
   const showAbiAndArgumentsCondition =
     scType === 0 || (scType === 1 && fileData?.length > 0);
 
@@ -339,6 +338,21 @@ const SmartContract: React.FC<IContractProps> = ({
     (scType === 0 && hasFunctions && func?.allowedAssets) ||
     !hasFunctions ||
     (scType === 1 && fileData?.length > 0);
+
+  const formInputProps = {
+    name: 'function',
+    title: 'Function',
+    type: hasFunctions ? 'dropdown' : 'text',
+    span: 2,
+    tooltip: tooltip.arguments.function,
+    required: true,
+  };
+
+  if (hasFunctions)
+    formInputProps['options'] = Object.keys(functions).map(func => ({
+      label: func,
+      value: func,
+    }));
 
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
@@ -356,14 +370,15 @@ const SmartContract: React.FC<IContractProps> = ({
           disableCustom
         />
 
-        <FormInput
-          name="address"
-          dynamicInitialValue={scType === 0 ? '' : walletAddress}
-          span={2}
-          title={scType === 0 ? 'Contract Address' : 'Contract Owner Address'}
-          tooltip={scType === 0 ? tooltip.address : tooltip.deployAddress}
-          required
-        />
+        {showAddressCondition && (
+          <FormInput
+            name="address"
+            span={2}
+            title={scType === 0 ? 'Contract Address' : 'Contract Owner Address'}
+            tooltip={scType === 0 ? tooltip.address : tooltip.deployAddress}
+            required
+          />
+        )}
 
         {scType === 1 && (
           <FormInput
@@ -414,29 +429,13 @@ const SmartContract: React.FC<IContractProps> = ({
             }}
           />
         )}
-        {scType === 0 && (
-          <FormInput
-            name="function"
-            title="Function"
-            type={hasFunctions ? 'dropdown' : 'text'}
-            options={
-              hasFunctions
-                ? Object.keys(functions).map(func => ({
-                    label: func,
-                    value: func,
-                  }))
-                : []
-            }
-            span={2}
-            tooltip={tooltip.arguments.function}
-            required
-          />
-        )}
+        {scType === 0 && <FormInput {...formInputProps} />}
         {showAbiAndArgumentsCondition && (
           <ArgumentsSection
-            key={JSON.stringify(functions)}
             arguments={
-              scType === 1 ? abi?.construct?.arguments || {} : func?.arguments
+              scType === 1
+                ? abi?.construct?.arguments || undefined
+                : func?.arguments || undefined
             }
             structs={abi?.structs}
             handleInputChange={handleInputChange}

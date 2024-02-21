@@ -185,11 +185,11 @@ export const ContractProvider: React.FC = ({ children }) => {
 
     const accountData: IAccount = account?.data?.account
       ? account.data.account
-      : {
+      : ({
           assets: [],
           frozenBalance: 0,
           balance: 0,
-        };
+        } as unknown as IAccount);
 
     const { assets, frozenBalance, balance } = accountData;
     const list: ICollectionList[] = [];

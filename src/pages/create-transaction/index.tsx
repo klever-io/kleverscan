@@ -141,7 +141,7 @@ const CreateTransaction: React.FC = () => {
             {queue.map(item => {
               return (
                 <QueueItemContainer
-                  key={JSON.stringify(item.ref)}
+                  key={item.elementId}
                   visible={item.elementId === selectedId}
                 >
                   {item.ref}

@@ -188,6 +188,7 @@ export interface ITransaction {
   receipts: IReceipt[];
   precision?: number;
   kdaFee?: IKdaFee;
+  logs?: any;
 }
 
 export interface ITransactionAssetIds {
@@ -837,6 +838,7 @@ export interface INodeAccountResponse extends IResponse {
 
 export interface IAccountResponse extends IResponse {
   pagination: IPagination;
+  data: { account: IAccount };
 }
 
 export interface ICollectionIdListResponse extends IResponse {

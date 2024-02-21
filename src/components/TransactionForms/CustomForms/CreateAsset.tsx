@@ -2,6 +2,7 @@ import { useExtension } from '@/contexts/extension';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { validateImgUrl } from '@/utils/imageValidate';
 import { ICreateAsset } from '@klever/sdk-web';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
@@ -24,6 +25,7 @@ import {
   parseStaking,
   parseURIs,
   percentageProps,
+  removeWrapper,
 } from './utils';
 import { assetsTooltip as tooltip } from './utils/tooltips';
 
@@ -173,7 +175,8 @@ interface URIProps {
 }
 
 export const URIsSection: React.FC<URIProps> = ({ tooltip: customTooltip }) => {
-  const { control } = useFormContext();
+  const { control, getValues } = useFormContext();
+  const router = useRouter();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'uris',
@@ -193,7 +196,11 @@ export const URIsSection: React.FC<URIProps> = ({ tooltip: customTooltip }) => {
       {fields.map((field, index) => (
         <FormSection key={field.id} inner>
           <SectionTitle>
-            <HiTrash onClick={() => remove(index)} />
+            <HiTrash
+              onClick={() =>
+                removeWrapper({ index, remove, getValues, router })
+              }
+            />
             URI {index + 1}
           </SectionTitle>
           <FormInput
@@ -298,7 +305,8 @@ export const RoyaltiesSection: React.FC<ISectionProps> = props => {
 const TransferPercentageSection: React.FC<IPrecisionProps> = ({
   precision,
 }) => {
-  const { control, watch, trigger, getValues } = useFormContext();
+  const { control, trigger, getValues } = useFormContext();
+  const router = useRouter();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'transferPercentage',
@@ -322,7 +330,11 @@ const TransferPercentageSection: React.FC<IPrecisionProps> = ({
       {fields.map((field, index) => (
         <FormSection key={field.id} inner>
           <SectionTitle>
-            <HiTrash onClick={() => remove(index)} />
+            <HiTrash
+              onClick={() =>
+                removeWrapper({ index, remove, getValues, router })
+              }
+            />
             Transfer Percentage {index + 1}
           </SectionTitle>
           <FormInput
@@ -351,7 +363,8 @@ const TransferPercentageSection: React.FC<IPrecisionProps> = ({
 };
 
 const SplitRoyaltiesSection: React.FC<ISectionProps> = ({ isNFT }) => {
-  const { control } = useFormContext();
+  const { control, getValues } = useFormContext();
+  const router = useRouter();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'splitRoyalties',
@@ -370,7 +383,11 @@ const SplitRoyaltiesSection: React.FC<ISectionProps> = ({ isNFT }) => {
       {fields.map((field, index) => (
         <FormSection key={field.id} inner>
           <SectionTitle>
-            <HiTrash onClick={() => remove(index)} />
+            <HiTrash
+              onClick={() =>
+                removeWrapper({ index, remove, getValues, router })
+              }
+            />
             Split Royalties {index + 1}
           </SectionTitle>
           <FormInput
@@ -510,7 +527,8 @@ export const StakingSection: React.FC<IStakingSectionProps> = ({
 };
 
 export const RolesSection: React.FC = () => {
-  const { control } = useFormContext();
+  const { control, getValues } = useFormContext();
+  const router = useRouter();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'roles',
@@ -529,7 +547,11 @@ export const RolesSection: React.FC = () => {
       {fields.map((field, index) => (
         <FormSection key={field.id} inner>
           <SectionTitle>
-            <HiTrash onClick={() => remove(index)} />
+            <HiTrash
+              onClick={() =>
+                removeWrapper({ index, remove, getValues, router })
+              }
+            />
             Role {index + 1}
           </SectionTitle>
           <FormInput

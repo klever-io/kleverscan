@@ -140,3 +140,29 @@ export const marketplaceTooltips = {
   referralPercentage:
     'Percentage of the sale that will be sent to the referral address, in the range of 0 to 100, precision of 2 decimal places',
 };
+
+export const smartContractTooltips = {
+  data: 'Binary data to be passed to the smart contract. Only .wasm files are allowed',
+  address: 'Address of the smart contract',
+  deployAddress: 'Address of the owner of the smart contract',
+  properties: {
+    title:
+      "Choose the properties the Smart Contract will have. They can't be changed after the contract is deployed",
+    upgradable: 'The smart contract can be upgraded',
+    readable: 'The smart contract can be read',
+    payable: 'The smart contract can receive assets',
+    payableBySC:
+      'The smart contract can receive assets from another smart contract',
+  },
+  abi: 'ABI of the smart contract',
+  arguments: {
+    title: 'Values to be passed to the smart contract',
+    value: 'Value of the parameter',
+    function: 'Function to be called',
+  },
+  callValue: {
+    title: 'Assets to be sent to the smart contract',
+    label: 'Asset Id',
+    value: 'Amount of assets to be sent',
+  },
+};

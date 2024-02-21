@@ -1,3 +1,6 @@
+import { setQueryAndRouter } from '@/utils';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
+import { cleanEmptyValues } from '../../FormInput';
 import { PackInfo, WhitelistInfo } from './types';
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
@@ -254,3 +257,42 @@ export const parseStringToNumberSupply = (data: any): void => {
     data.maxAmount = maxAmount;
   }
 };
+
+interface RemoveWrapperParams {
+  index: number;
+  remove: (index: number) => void;
+  getValues: () => any;
+  router: any;
+}
+
+export const removeWrapper = ({
+  index,
+  remove,
+  getValues,
+  router,
+}: RemoveWrapperParams) => {
+  remove(index);
+
+  const nonEmptyValues = cleanEmptyValues(getValues());
+
+  let newQuery: NextParsedUrlQuery = router.query?.contract
+    ? { contract: router.query?.contract }
+    : {};
+
+  newQuery = {
+    ...newQuery,
+    ...router.query,
+    contractDetails: JSON.stringify(nonEmptyValues),
+  };
+
+  setQueryAndRouter(newQuery, router);
+};
+
+export function toByteArray(str: string) {
+  const byteArray = [];
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i);
+    byteArray.push(code & 0xff);
+  }
+  return byteArray;
+}

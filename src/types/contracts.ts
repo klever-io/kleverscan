@@ -32,6 +32,7 @@ export enum Contract {
   UpdateAccountPermission = 'UpdateAccountPermissionContractType',
   Deposit = 'DepositContractType',
   ITOTrigger = 'ITOTriggerContractType',
+  SmartContract = 'SmartContractType',
 }
 
 //used in Filter Contracts
@@ -61,6 +62,7 @@ export enum ContractsName {
   UpdateAccountPermissionContractType = 'Update Account Permission',
   DepositContractType = 'Deposit',
   ITOTriggerContractType = 'ITO Trigger',
+  SmartContractType = 'Smart Contract',
 }
 
 export enum ContractsIndex {
@@ -89,6 +91,7 @@ export enum ContractsIndex {
   'Update Account Permission',
   'Deposit',
   'ITO Trigger',
+  'Smart Contract' = 99,
 }
 
 export interface ReducedContract {
@@ -117,6 +120,7 @@ export interface ReducedContract {
   [22]?: number;
   [23]?: number;
   [24]?: number;
+  [25]?: number;
 }
 
 export interface IContractOption {
@@ -539,6 +543,15 @@ export interface IITOTriggerContract {
   endTime: number;
 }
 
+export interface ISmartContract {
+  type: string;
+  typeValue: number;
+  address: string;
+  callValue: {
+    [coin: string]: number;
+  };
+}
+
 export type IParameter =
   | ITransferContract
   | ICreateAssetContract
@@ -563,7 +576,8 @@ export type IParameter =
   | IConfigMarketplaceContract
   | IUpdateAccountPermissionContract
   | IDepositContract
-  | IITOTriggerContract;
+  | IITOTriggerContract
+  | ISmartContract;
 
 export type IParameterOnlyAssetId =
   | ITransferContract
@@ -601,6 +615,7 @@ export interface IIndexedContract extends IContract {
   contractIndex: number;
   renderMetadata: () => JSX.Element | null;
   filteredReceipts: IReceipt[];
+  logs?: any;
 }
 
 export interface IContractBuyProps extends IContract {
@@ -637,3 +652,132 @@ export enum ContractsRecipesTypes {
   UpdateKDAPool,
   UpdateITO,
 }
+
+interface EndpointInput {
+  name: string;
+  type: string; // Simplified, in reality, this could be more specific or an enum.
+  multi_arg?: boolean;
+}
+
+interface Endpoint {
+  name: string;
+  mutability: 'mutable' | 'readonly';
+  inputs: EndpointInput[];
+  outputs: any[]; // Simplified, outputs could be more detailed based on specific needs.
+  payableInTokens?: string[];
+}
+
+export type ABIStruct = {
+  type: string;
+  fields?: ABIStructField[];
+  variants?: ABIVariant[];
+};
+export type ABIStructField = {
+  name: string;
+  type: string;
+};
+
+type ABIVariant = {
+  name: string;
+  fields: ABIVariantField[];
+};
+
+type ABIVariantField = {
+  name: string;
+  discriminant: number;
+};
+
+type Constructor = {
+  docs?: string[];
+  payableInTokens?: string[];
+  inputs: {
+    name: string;
+    type: string;
+  }[];
+  outputs: any[];
+};
+
+export interface ABI {
+  name: string;
+  constructor: Constructor;
+  endpoints: Endpoint[];
+  types: Map<string, ABIStruct>;
+}
+
+export const RUST_TYPES = [
+  'u64',
+  'i64',
+  'u32',
+  'i32',
+  'usize',
+  'isize',
+  'u16',
+  'i16',
+  'u8',
+  'i8',
+  'BigUint',
+  'BigInt',
+  'bool',
+  'ManagedBuffer',
+  'BoxedBytes',
+  '&[u8]',
+  'Vec',
+  'String',
+  '&str',
+  'bytes',
+  'TokenIdentifier',
+  'Address',
+  'List',
+  'Array',
+];
+
+export const RUST_TYPES_WITH_OPTION = [
+  'u64',
+  'Option<u64>',
+  'i64',
+  'Option<i64>',
+  'u32',
+  'Option<u32>',
+  'i32',
+  'Option<i32>',
+  'usize',
+  'Option<usize>',
+  'isize',
+  'Option<isize>',
+  'u16',
+  'Option<u16>',
+  'i16',
+  'Option<i16>',
+  'u8',
+  'Option<u8>',
+  'i8',
+  'Option<i8>',
+  'BigUint',
+  'Option<BigUint>',
+  'BigInt',
+  'Option<BigInt>',
+  'bool',
+  'Option<bool>',
+  'ManagedBuffer',
+  'Option<ManagedBuffer>',
+  'BoxedBytes',
+  'Option<BoxedBytes>',
+  '&[u8]',
+  'Option<&[u8]>',
+  'Vec',
+  'Option<Vec>',
+  'String',
+  'Option<String>',
+  '&str',
+  'Option<&str>',
+  'bytes',
+  'Option<bytes>',
+  'TokenIdentifier',
+  'Option<TokenIdentifier>',
+  'Address',
+  'Option<Address>',
+  'List',
+  'Option<List>',
+  'Array',
+  'Option<Array>',
+];

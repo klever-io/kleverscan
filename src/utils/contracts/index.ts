@@ -1,3 +1,4 @@
+import { isBeta } from '@/configs/navbar';
 import {
   Contract,
   ContractsIndex,
@@ -148,7 +149,8 @@ export const contractOptions: IContractOption[] = [
     label: 'Smart Contract',
     value: 'SmartContract',
   },
-];
+].filter(contract => isBeta || contract.value !== 'SmartContract');
+
 export const claimTypes = [
   {
     label: 'Staking Claim (0)',

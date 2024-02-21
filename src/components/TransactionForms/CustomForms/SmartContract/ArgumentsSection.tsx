@@ -1,4 +1,4 @@
-import { ABIStruct, RUST_TYPES } from '@/types/contracts';
+import { ABIStruct, RUST_TYPES_WITH_OPTION } from '@/types/contracts';
 import { utils } from '@klever/sdk-web';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -67,19 +67,14 @@ export const ArgumentsSection: React.FC<IArguments> = ({
 }) => {
   const { control, getValues } = useFormContext();
   const router = useRouter();
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control,
     name: 'arguments',
   });
 
   useEffect(() => {
-    fields.forEach(_ => {
-      remove();
-    });
-    handleInputChange({} as any);
-
     if (args) {
-      append(
+      replace(
         Object.keys(args).map(key => ({
           name: key,
           type: args[key].type,
@@ -88,6 +83,7 @@ export const ArgumentsSection: React.FC<IArguments> = ({
           required: args[key].required,
         })),
       );
+      handleInputChange({} as any);
     }
   }, [args]);
 
@@ -136,6 +132,7 @@ export const ArgumentsSection: React.FC<IArguments> = ({
                   ? `${field.name} (${field.type})`
                   : `Value ${index + 1} (${field.type})`
               }
+              dynamicInitialValue={field.value}
               customOnChange={handleInputChange}
               type={field.type}
               placeholder={placeholder}
@@ -151,7 +148,7 @@ export const ArgumentsSection: React.FC<IArguments> = ({
         <SelectContainer>
           <ReactSelect
             classNamePrefix="react-select"
-            onChange={(newValue: any) => {
+            onInputChange={(newValue: any) => {
               append({
                 type: utils.getJSType(newValue.value),
                 raw_type: newValue.value,
@@ -159,7 +156,7 @@ export const ArgumentsSection: React.FC<IArguments> = ({
               });
             }}
             value={null}
-            options={RUST_TYPES.map(type => ({
+            options={RUST_TYPES_WITH_OPTION.map(type => ({
               label: `${type} (${utils.getJSType(type)})`,
               value: type,
             }))}

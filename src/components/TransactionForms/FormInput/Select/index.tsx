@@ -29,7 +29,7 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 const Filter: React.FC<IFilter> = ({
-  options: data,
+  options,
   name,
   selectPlaceholder,
   title,
@@ -72,14 +72,14 @@ const Filter: React.FC<IFilter> = ({
   };
 
   useEffect(() => {
-    if (value !== undefined && data !== undefined && data.length > 0) {
-      let selected = data?.find(item => item.value === value);
+    if (value !== undefined && options !== undefined && options.length > 0) {
+      let selected = options?.find(item => item.value === value);
       if (selectFilter && selected) {
         selected = selectFilter(selected);
       }
       selected && setSelected(selected);
     }
-  }, [value, data]);
+  }, [value, options]);
 
   return (
     <Container $error={error} isOpenMenu={isSelectOpen}>
@@ -89,7 +89,7 @@ const Filter: React.FC<IFilter> = ({
         }
         onMenuOpen={() => setIsSelectOpen(true)}
         onMenuClose={() => setIsSelectOpen(false)}
-        options={data}
+        options={options}
         onChange={e => handleSelect(e)}
         onInputChange={onInputChange}
         value={selected?.value !== undefined ? selected : undefined}

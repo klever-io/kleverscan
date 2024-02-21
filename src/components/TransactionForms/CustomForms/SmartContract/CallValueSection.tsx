@@ -22,18 +22,14 @@ export const CallValueSection: React.FC<IAllowedAssets> = ({
 }) => {
   const { control, getValues } = useFormContext();
   const router = useRouter();
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control,
     name: 'callValue',
   });
 
   useEffect(() => {
     if (allowedAssets) {
-      fields.forEach(_ => {
-        remove();
-      });
-
-      append({});
+      replace([{}]);
     }
   }, [allowedAssets]);
 

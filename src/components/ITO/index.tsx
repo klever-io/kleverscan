@@ -3,15 +3,15 @@ import { Container } from '@/components/FungibleITO/styles';
 import NonFungibleITO from '@/components/NonFungileITO';
 import { IParsedITO } from '@/types';
 import { IPackInfo } from '@/types/contracts';
+import { TFunction } from 'next-i18next';
+import { Dispatch, SetStateAction } from 'react';
 import {
   ChooseAsset,
   ItemsContainer,
   ITOTitle,
   KeyLabel,
   PackContainer,
-} from '@/views/launchpad';
-import { TFunction } from 'next-i18next';
-import { Dispatch, SetStateAction } from 'react';
+} from './styles';
 
 export const displayITOpacks = (
   ITO: IParsedITO,

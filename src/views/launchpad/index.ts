@@ -41,9 +41,9 @@ export const ParticipateButton = styled.a`
   text-decoration: none;
 
   cursor: pointer;
-  transition: 0.3s;
+  transition: 0.2s;
 
   &:hover {
-    background-color: ${({ theme }) => theme.purple};
+    filter: brightness(1.2);
   }
 `;

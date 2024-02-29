@@ -15,7 +15,7 @@ interface IAssetLogo {
   verified?: boolean;
   invertColors?: boolean;
 }
-const AssetLogo: React.FC<IAssetLogo> = ({
+export const AssetLogo: React.FC<IAssetLogo> = ({
   logo,
   ticker,
   name,

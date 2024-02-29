@@ -190,6 +190,10 @@ const theme = {
     dark: '#222345',
     darker: '#16162c',
   },
+
+  faq: {
+    border: '#2e2e2e',
+  },
 };
 
 export default theme;

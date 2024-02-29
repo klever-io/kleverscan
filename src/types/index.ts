@@ -482,6 +482,7 @@ export interface IITO {
   assetId: string;
   isActive: boolean;
   maxAmount: number;
+  mintedAmount?: number;
   receiverAddress: string;
   packData: IPackInfo[];
   isWhitelistActive: boolean;
@@ -493,6 +494,9 @@ export interface IITO {
 }
 
 export interface IParsedITO extends IITO {
+  name: string;
+  logo: string;
+  verified: boolean;
   ticker: string;
   assetType: string;
   precision: number;

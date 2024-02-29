@@ -714,9 +714,10 @@ export const RetryContainer = styled.div`
 `;
 
 export const Main = styled.main`
+  position: relative;
   display: block;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0 1rem;
   max-width: ${props => props.theme.maxWidth};
   background-color: ${props => props.theme.background};
 

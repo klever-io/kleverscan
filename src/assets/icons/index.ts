@@ -7,6 +7,7 @@ import ArrowRight from './arrow-right.svg';
 import ArrowGreen from './arrow-up-green.svg';
 import ArrowUpRightSquare from './arrow-up-right-square.svg';
 import ArrowUpSquare from './arrow-up-square.svg';
+import Arrow from './arrow.svg';
 import Calendar from './calendar.svg';
 import Category from './category.svg';
 import Certified from './Certified.svg';
@@ -16,6 +17,7 @@ import Copy from './copy.svg';
 import Currency from './currency.svg';
 import Graph from './graph.svg';
 import InfoSquare from './info-square.svg';
+import LaunchPadPlus from './launchpad-plus.svg';
 import LineArrowUpSquare from './line-arrow-up-square.svg';
 import PlusSquare from './plus-square.svg';
 import PlusWhite from './plus-white.svg';
@@ -40,6 +42,7 @@ import WizardRightArrow from './wizard-right-arrow.svg';
 import WizardTxSuccess from './wizard-tx-success.svg';
 
 export {
+  Arrow,
   ArrowDownSquare,
   Category,
   Graph,
@@ -79,5 +82,6 @@ export {
   InfoSquare,
   LineArrowUpSquare,
   PlusSquare,
+  LaunchPadPlus,
   Currency,
 };

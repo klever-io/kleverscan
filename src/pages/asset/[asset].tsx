@@ -23,13 +23,13 @@ import {
   CardHeader,
   CardHeaderItem,
   CardTabContainer,
-  Container,
 } from '@/styles/common';
 import { IAssetPage, IBalance } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { filterDate } from '@/utils/formatFunctions';
 import { parseHolders } from '@/utils/parseValues';
 import { resetDate } from '@/utils/resetDate';
+import { AssetPageContainer } from '@/views/assets';
 import { FilterByDate } from '@/views/transactions';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -229,8 +229,8 @@ const Asset: React.FC<IAssetPage> = ({}) => {
   };
 
   return (
-    <Container>
-      <AssetSummary asset={asset} />
+    <AssetPageContainer>
+      <AssetSummary asset={asset} ITO={ITO} />
       <CardTabContainer>
         <CardHeader>
           {cardHeaders.map((header, index) => (
@@ -270,7 +270,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
         )}
         <SelectedTabComponent />
       </Tabs>
-    </Container>
+    </AssetPageContainer>
   );
 };
 

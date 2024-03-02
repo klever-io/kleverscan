@@ -18,6 +18,21 @@ export const ITOContainer = styled.div`
   user-select: none;
 `;
 
+export const TableHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+`;
+
+export const TableTitle = styled.h2`
+  color: ${({ theme }) => theme.black};
+
+  font-size: 1.5rem;
+  font-weight: 700;
+`;
+
 export const TableContainer = styled.div`
   padding: 2%;
 

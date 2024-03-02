@@ -43,37 +43,6 @@ export const Input = styled(DefaultInput)`
   border-color: ${props => props.theme.lightGray};
 `;
 
-export const AssetTitle = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 100%;
-  gap: 1rem;
-  overflow: hidden;
-  div {
-    padding: 0.5rem 1rem;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    background-color: ${props => props.theme.card.assetText};
-
-    color: ${props => props.theme.true.white};
-    font-weight: 400;
-    font-size: 0.85rem;
-
-    border-radius: 1rem;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    flex-direction: column;
-
-    align-items: flex-start;
-  }
-`;
-
 export const CardContainer = styled.div`
   margin-top: 2rem;
 
@@ -243,35 +212,6 @@ export const HoverAnchor = styled.a`
   &:hover {
     text-decoration: underline;
     cursor: pointer;
-  }
-`;
-
-export const AssetHeaderContainer = styled.div`
-  background-color: transparent !important;
-  display: flex;
-  flex-direction: column;
-  width: fit-content;
-  color: ${props => props.theme.black} !important;
-  &:hover {
-    cursor: default;
-  }
-  h1 {
-    width: 100%;
-    white-space: normal;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-  }
-  p {
-    margin-top: 0.25rem;
-    color: ${props => props.theme.darkText} !important;
-  }
-
-  a {
-    color: ${props => props.theme.black} !important;
-    font-weight: 600;
-    &:hover {
-      text-decoration: underline;
-    }
   }
 `;
 

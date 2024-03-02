@@ -3,12 +3,13 @@ import styled from 'styled-components';
 export const BannerContainer = styled.div`
   display: flex;
   align-items: center;
-  padding: 30px 10px;
+  padding: 56px 0;
 
   min-height: 40vh;
 
   @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     min-height: 60vh;
+    max-height: 665px;
     padding: 0 114px 56px;
   }
 
@@ -39,6 +40,8 @@ export const Content = styled.div`
 
   display: flex;
   flex-direction: column;
+  text-align: center;
+  align-items: center;
   gap: 24px;
 
   @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
@@ -50,12 +53,13 @@ export const Content = styled.div`
 export const Title = styled.h1`
   color: ${({ theme }) => theme.true.white};
   font-weight: 700;
-  font-size: 3rem;
-  line-height: 1.2;
+  font-size: 3.75rem;
+  line-height: 1;
   letter-spacing: 1px;
 
   @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     font-size: 5rem;
+    line-height: 1.2;
   }
 `;
 

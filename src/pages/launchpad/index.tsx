@@ -4,7 +4,7 @@ import { LaunchPadFAQ } from '@/components/LaunchPad/FAQ';
 import { LaunchPadFAQCards } from '@/components/LaunchPad/FAQCards';
 import { LearnBanner } from '@/components/LaunchPad/LearnBanner';
 import AssetLogo from '@/components/Logo/AssetLogo';
-import Table, { ITable } from '@/components/Table';
+import Table, { ITable } from '@/components/NewTable';
 import { useContractModal } from '@/contexts/contractModal';
 import { useExtension } from '@/contexts/extension';
 import {
@@ -21,6 +21,8 @@ import {
   MainContainer,
   ParticipateButton,
   TableContainer,
+  TableHeader,
+  TableTitle,
 } from '@/views/launchpad';
 import { GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -192,7 +194,7 @@ const ITOsPage: React.FC = () => {
 
   const header = [
     '',
-    'Name',
+    'Project Name',
     'ID',
     'Best KLV Rate',
     'Type',
@@ -218,6 +220,9 @@ const ITOsPage: React.FC = () => {
         <LaunchPadBanner />
         <LaunchPadFAQCards />
         <TableContainer>
+          <TableHeader>
+            <TableTitle>Live Projects</TableTitle>
+          </TableHeader>
           <Table {...tableProps} />
         </TableContainer>
         <LearnBanner />

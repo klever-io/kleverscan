@@ -9,6 +9,6 @@ export const FAQContainer = styled.div`
   gap: 24px;
 
   @media screen and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: 0 5% 0 3%;
+    padding: 0;
   }
 `;

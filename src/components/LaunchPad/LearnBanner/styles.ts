@@ -21,6 +21,7 @@ export const Content = styled.div`
   display: flex;
   flex-direction: column-reverse;
   justify-content: space-between;
+  gap: 24px;
 
   @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     flex-direction: row;

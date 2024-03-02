@@ -14,13 +14,16 @@ interface IAssetLogo {
   name: string;
   verified?: boolean;
   invertColors?: boolean;
+  size?: number;
 }
+
 export const AssetLogo: React.FC<IAssetLogo> = ({
   logo,
   ticker,
   name,
   verified,
   invertColors,
+  size = 24,
 }) => {
   const isVerified = () => {
     if (verified) {
@@ -57,15 +60,13 @@ export const AssetLogo: React.FC<IAssetLogo> = ({
 
   const renderLogo = (url: string) => {
     return (
-      <Container data-testid="asset-logo-container">
+      <Container data-testid="asset-logo-container" size={size}>
         <NextImageWrapperLogo>
           <Image
             layout="fill"
             objectFit="cover"
             objectPosition="center"
             alt={`${name}-logo`}
-            width={2.1}
-            height={2.1}
             src={url}
             onError={() => setError(true)}
             loader={({ src, width }) => `${src}?w=${width}`}
@@ -81,7 +82,7 @@ export const AssetLogo: React.FC<IAssetLogo> = ({
   }
 
   return (
-    <Container data-testid="asset-logo-container">
+    <Container data-testid="asset-logo-container" size={size}>
       <LetterLogo invertColors={invertColors}>
         {ticker?.split('')?.[0] || '--'}
       </LetterLogo>

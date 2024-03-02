@@ -1,5 +1,6 @@
 import { ITableType } from '@/components/Table/styles';
 import widths from '@/components/Table/widths';
+import { Container } from '@/styles/common';
 import styled from 'styled-components';
 
 export const Title = styled.div`
@@ -106,5 +107,11 @@ export const ContainerAssetName = styled(ContainerAssetId)`
 
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     justify-content: flex-start;
+  }
+`;
+
+export const AssetPageContainer = styled(Container)`
+  @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    padding: 0 98px;
   }
 `;

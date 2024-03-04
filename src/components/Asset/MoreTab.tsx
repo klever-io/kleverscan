@@ -1,7 +1,6 @@
 import { statusWithIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
 import Skeleton from '@/components/Skeleton';
-import { CenteredRow } from '@/styles/common';
 import { timestampToDate } from '@/utils/timeFunctions';
 import { Row } from '@/views/assets/detail';
 import { useTranslation } from 'next-i18next';
@@ -21,32 +20,30 @@ export const MoreTab: React.FC<AssetProps> = ({ asset }) => {
 
   return (
     <>
-      <Row isStakingRoyalties={false}>
+      <Row isStakingRoyalties={false} span={2}>
         <span>
           <strong>{t('assets:More.Issuing Time')}</strong>
         </span>
         <span>{asset ? getIssueDate() : <Skeleton />}</span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row isStakingRoyalties={false} span={2}>
         <span>
           <strong>{t('assets:More.Issuer')}</strong>
         </span>
-        <span>
+        <div>
           {asset ? (
             asset?.ownerAddress ? (
-              asset?.ownerAddress
+              <>
+                <span>{asset?.ownerAddress}</span>
+                <Copy data={asset?.ownerAddress} info="Issue" />
+              </>
             ) : (
               '--'
             )
           ) : (
             <Skeleton />
           )}
-        </span>
-        {asset?.ownerAddress && (
-          <CenteredRow>
-            <Copy data={asset?.ownerAddress} info="Issue" />
-          </CenteredRow>
-        )}
+        </div>
       </Row>
       <Row isStakingRoyalties={false}>
         <span>

@@ -3,7 +3,6 @@ import Copy from '@/components/Copy';
 import QrCodeModal from '@/components/QrCodeModal';
 import Skeleton from '@/components/Skeleton';
 import { Status } from '@/components/Table/styles';
-import { CenteredRow } from '@/styles/common';
 import { IAssetPool } from '@/types';
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
@@ -26,25 +25,23 @@ export const KDAPoolTab: React.FC<KDAPoolTabProps> = ({ asset, assetPool }) => {
 
   return (
     <>
-      <Row isStakingRoyalties={false}>
+      <Row isStakingRoyalties={false} span={2}>
         <span>
           <strong>Owner</strong>
         </span>
 
-        <span>
-          <CenteredRow>
-            <Link href={`/account/${assetPool?.ownerAddress}`}>
-              <HoverAnchor>{assetPool?.ownerAddress}</HoverAnchor>
-            </Link>
-            <Copy data={assetPool?.ownerAddress} info="ownerAddress" />
-            <ReceiveBackground isOverflow={true}>
-              <QrCodeModal
-                value={assetPool?.ownerAddress as string}
-                isOverflow={true}
-              />
-            </ReceiveBackground>
-          </CenteredRow>
-        </span>
+        <div>
+          <Link href={`/account/${assetPool?.ownerAddress}`}>
+            <HoverAnchor>{assetPool?.ownerAddress}</HoverAnchor>
+          </Link>
+          <Copy data={assetPool?.ownerAddress} info="ownerAddress" />
+          <ReceiveBackground isOverflow={true}>
+            <QrCodeModal
+              value={assetPool?.ownerAddress as string}
+              isOverflow={true}
+            />
+          </ReceiveBackground>
+        </div>
       </Row>
       <Row isStakingRoyalties={false}>
         <span>
@@ -114,21 +111,17 @@ export const KDAPoolTab: React.FC<KDAPoolTabProps> = ({ asset, assetPool }) => {
           </small>
         </span>
       </Row>
-      <Row isStakingRoyalties={false}>
-        <span>
-          <strong>Admin Address</strong>
-        </span>
-        <span>
-          <small>
-            {assetPool ? String(assetPool.adminAddress) : <Skeleton />}
-          </small>
-        </span>
-      </Row>
-      <Row isStakingRoyalties={false}>
+      <Row isStakingRoyalties={false} span={2}>
         <span>
           <strong>Ratio</strong>
         </span>
         <span>{assetPool ? String(assetPool.ratio) : <Skeleton />}</span>
+      </Row>
+      <Row isStakingRoyalties={false} span={2}>
+        <span>
+          <strong>Admin Address</strong>
+        </span>
+        <div>{assetPool ? String(assetPool.adminAddress) : <Skeleton />}</div>
       </Row>
     </>
   );

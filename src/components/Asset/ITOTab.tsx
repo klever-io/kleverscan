@@ -1,12 +1,11 @@
 import { statusWithIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
 import { displayITOpacks } from '@/components/ITO';
-import { EmptyRow } from '@/components/Table/styles';
 import { useExtension } from '@/contexts/extension';
 import { IParsedITO } from '@/types';
 import { formatDate } from '@/utils/formatFunctions';
 import {
-  AddressDiv,
+  AssetEmptyRow,
   EllipsisSpan,
   ExpandableRow,
   ExpandWrapper,
@@ -42,19 +41,21 @@ export const ITOTab: React.FC<ITOTabProps> = ({ ITO }) => {
       {ITO && ITO.isActive ? (
         <>
           {ITO?.maxAmount ? (
-            <Row isStakingRoyalties={false}>
+            <Row isStakingRoyalties={false} span={2}>
               <span>
                 <strong>{t('assets:ITO.Max Amount')}</strong>
               </span>
               <span>{ITO.maxAmount}</span>
             </Row>
           ) : null}
-          <Row isStakingRoyalties={false}>
+          <Row isStakingRoyalties={false} span={2}>
             <span>
               <strong>{t('assets:ITO.Receiver Address')}</strong>
             </span>
-            <AddressDiv>{ITO.receiverAddress}</AddressDiv>
-            <Copy data={ITO.receiverAddress} />
+            <div>
+              <span>{ITO.receiverAddress}</span>
+              <Copy data={ITO.receiverAddress} />
+            </div>
           </Row>
           <Row isStakingRoyalties={false}>
             <span>
@@ -196,9 +197,9 @@ export const ITOTab: React.FC<ITOTabProps> = ({ ITO }) => {
           )}
         </>
       ) : (
-        <EmptyRow type="assets">
+        <AssetEmptyRow type="assets">
           <p>No active ITO found</p>
-        </EmptyRow>
+        </AssetEmptyRow>
       )}
     </>
   );

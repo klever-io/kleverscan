@@ -1,5 +1,5 @@
 import { EmptyRow } from '@/components/Table/styles';
-import { Row, UriContainer } from '@/views/assets/detail';
+import { Row } from '@/views/assets/detail';
 import React from 'react';
 import { AssetProps } from './OverviewTab';
 
@@ -9,15 +9,15 @@ export const UrisTab: React.FC<AssetProps> = ({ asset }) => {
       {Object.entries(asset?.uris || []).length ? (
         Object.entries(asset?.uris || []).map(
           ([key, value]: [string, string]) => (
-            <Row key={String(key)} isStakingRoyalties={false}>
+            <Row key={String(key)} isStakingRoyalties={false} span={2}>
               <span>
                 <strong>{key}</strong>
               </span>
-              <UriContainer>
+              <div>
                 <a href={`${value}`} target="blank">
                   {value}
                 </a>
-              </UriContainer>
+              </div>
             </Row>
           ),
         )

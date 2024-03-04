@@ -2,7 +2,6 @@ import Copy from '@/components/Copy';
 import QrCodeModal from '@/components/QrCodeModal';
 import Skeleton from '@/components/Skeleton';
 import { holdersCall, transactionCall } from '@/services/requests/asset';
-import { CenteredRow } from '@/styles/common';
 import { IAsset } from '@/types';
 import { parseApr } from '@/utils';
 import { toLocaleFixed } from '@/utils/formatFunctions';
@@ -37,22 +36,20 @@ export const OverviewTab: React.FC<AssetProps> = ({ asset }) => {
   return (
     <>
       {asset?.ownerAddress && (
-        <Row isStakingRoyalties={false}>
+        <Row isStakingRoyalties={false} span={2}>
           <span>
             <strong>{t('table:Owner')}</strong>
           </span>
 
-          <span>
-            <CenteredRow>
-              <Link href={`/account/${asset?.ownerAddress}`}>
-                <HoverAnchor>{asset?.ownerAddress}</HoverAnchor>
-              </Link>
-              <Copy data={asset?.ownerAddress} info="ownerAddress" />
-              <ReceiveBackground isOverflow={true}>
-                <QrCodeModal value={asset?.ownerAddress} isOverflow={true} />
-              </ReceiveBackground>
-            </CenteredRow>
-          </span>
+          <div>
+            <Link href={`/account/${asset?.ownerAddress}`}>
+              <HoverAnchor>{asset?.ownerAddress}</HoverAnchor>
+            </Link>
+            <Copy data={asset?.ownerAddress} info="ownerAddress" />
+            <ReceiveBackground isOverflow={true}>
+              <QrCodeModal value={asset?.ownerAddress} isOverflow={true} />
+            </ReceiveBackground>
+          </div>
         </Row>
       )}
       <Row isStakingRoyalties={false}>

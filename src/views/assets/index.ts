@@ -1,7 +1,7 @@
 import { ITableType } from '@/components/Table/styles';
 import widths from '@/components/Table/widths';
-import { Container } from '@/styles/common';
-import styled from 'styled-components';
+import { CardContent, CardHeaderItem, Container } from '@/styles/common';
+import styled, { css } from 'styled-components';
 
 export const Title = styled.div`
   display: flex;
@@ -113,5 +113,36 @@ export const ContainerAssetName = styled(ContainerAssetId)`
 export const AssetPageContainer = styled(Container)`
   @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     padding: 0 98px;
+  }
+`;
+
+export const AssetCardHeaderItem = styled(CardHeaderItem)`
+  background: none;
+
+  &:last-of-type,
+  &:first-of-type {
+    border: none;
+  }
+
+  span {
+    transition: none;
+
+    ${props =>
+      props.selected &&
+      css`
+        border-bottom: 2px solid ${props => props.theme.violet};
+      `}
+  }
+`;
+
+export const AssetCardContent = styled(CardContent)`
+  background: none;
+
+  display: grid;
+
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    grid-template-columns: repeat(2, 1fr);
   }
 `;

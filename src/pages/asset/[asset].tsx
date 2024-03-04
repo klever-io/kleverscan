@@ -7,7 +7,7 @@ import { StakingHistoryTab } from '@/components/Asset/StakingHistoryTab';
 import { StakingRoyaltiesTab } from '@/components/Asset/StakingRoyaltiesTab';
 import { UrisTab } from '@/components/Asset/URIsTab';
 import DateFilter, { ISelectedDays } from '@/components/DateFilter';
-import Tabs, { ITabs } from '@/components/Tabs';
+import Tabs, { ITabs } from '@/components/NewTabs';
 import Holders from '@/components/Tabs/Holders';
 import Transactions from '@/components/Tabs/Transactions';
 import TransactionsFilters from '@/components/TransactionsFilters';
@@ -18,18 +18,17 @@ import {
 } from '@/components/TransactionsFilters/styles';
 import api from '@/services/api';
 import { assetCall, assetPoolCall, ITOCall } from '@/services/requests/asset';
-import {
-  CardContent,
-  CardHeader,
-  CardHeaderItem,
-  CardTabContainer,
-} from '@/styles/common';
+import { CardHeader, CardTabContainer } from '@/styles/common';
 import { IAssetPage, IBalance } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { filterDate } from '@/utils/formatFunctions';
 import { parseHolders } from '@/utils/parseValues';
 import { resetDate } from '@/utils/resetDate';
-import { AssetPageContainer } from '@/views/assets';
+import {
+  AssetCardContent,
+  AssetCardHeaderItem,
+  AssetPageContainer,
+} from '@/views/assets';
 import { FilterByDate } from '@/views/transactions';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -234,7 +233,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       <CardTabContainer>
         <CardHeader>
           {cardHeaders.map((header, index) => (
-            <CardHeaderItem
+            <AssetCardHeaderItem
               key={String(index)}
               selected={selectedCard === header}
               onClick={() => {
@@ -243,13 +242,13 @@ const Asset: React.FC<IAssetPage> = ({}) => {
               }}
             >
               <span>{header}</span>
-            </CardHeaderItem>
+            </AssetCardHeaderItem>
           ))}
         </CardHeader>
 
-        <CardContent>
+        <AssetCardContent>
           <SelectedComponent />
-        </CardContent>
+        </AssetCardContent>
       </CardTabContainer>
 
       <Tabs {...tabProps}>

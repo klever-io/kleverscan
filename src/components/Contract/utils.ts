@@ -49,6 +49,7 @@ const getType = (rawType: string): TransactionType => {
       break;
     case 'Sell':
       type = 'SellOrder';
+      break;
     case 'Smart':
       type = 'SmartContract';
       break;

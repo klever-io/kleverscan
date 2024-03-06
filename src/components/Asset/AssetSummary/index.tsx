@@ -5,7 +5,9 @@ import { PlusIcon } from '@/components/QuickAccess/styles';
 import Skeleton from '@/components/Skeleton';
 import { useMobile } from '@/contexts/mobile';
 import { IParsedITO } from '@/types';
+import Image from 'next/image';
 import Link from 'next/link';
+import { AssetITOSummary } from './AssetITOSummary';
 import {
   About,
   AssetHeaderContainer,
@@ -21,7 +23,7 @@ import {
   SocialNetworks,
 } from './style';
 
-interface AssetSummaryProps extends AssetProps {
+export interface AssetSummaryProps extends AssetProps {
   ITO: IParsedITO | undefined;
 }
 
@@ -76,13 +78,16 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
               </SocialNetworks>
             </LeftSide>
             <RightSide>
+              <AssetITOSummary asset={asset} ITO={ITO} />
               {!isTablet && (
-                <BackgroundImage
-                  src={asset?.logo || ''}
-                  alt={asset?.name}
-                  width={550}
-                  height={450}
-                />
+                <BackgroundImage>
+                  <Image
+                    src={asset?.logo || ''}
+                    alt={asset?.name}
+                    width={550}
+                    height={450}
+                  />
+                </BackgroundImage>
               )}
             </RightSide>
           </Header>

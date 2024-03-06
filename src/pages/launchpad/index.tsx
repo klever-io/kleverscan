@@ -13,6 +13,7 @@ import {
   requestITOs,
 } from '@/services/requests/ito';
 import { IITOResponse, IParsedITO, IRowSection } from '@/types';
+import { IPackInfo } from '@/types/contracts';
 import { formatAmount } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { ContainerAssetId } from '@/views/assets';
@@ -32,6 +33,22 @@ import { useRouter } from 'next/router';
 import { ReactNode, useEffect } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
 import nextI18nextConfig from '../../../next-i18next.config';
+
+export function getBestKLVRate(packData: IPackInfo[]): number | undefined {
+  let bestKLVRate: number | undefined = undefined;
+  if (packData) {
+    packData.forEach(pack => {
+      if (pack.key === 'KLV') {
+        pack.packs.forEach(p => {
+          if (!bestKLVRate || p.price < bestKLVRate) {
+            bestKLVRate = p.price / 10 ** KLV_PRECISION;
+          }
+        });
+      }
+    });
+  }
+  return bestKLVRate;
+}
 
 const ITOsPage: React.FC = () => {
   const { t } = useTranslation('itos');
@@ -74,18 +91,7 @@ const ITOsPage: React.FC = () => {
       whitelistEndTime,
     } = asset;
 
-    let bestKLVRate: number | undefined = undefined;
-    if (packData) {
-      packData.forEach(pack => {
-        if (pack.key === 'KLV') {
-          pack.packs.forEach(p => {
-            if (!bestKLVRate || p.price < bestKLVRate) {
-              bestKLVRate = p.price / 10 ** KLV_PRECISION;
-            }
-          });
-        }
-      });
-    }
+    const bestKLVRate = getBestKLVRate(packData);
 
     const access = Date.now() < whitelistEndTime ? 'Whitelist Only' : 'Public';
 

@@ -120,7 +120,7 @@ export const ITOTooltips = {
     packItem: {
       amount:
         'For NFTs: Amount sold; For token: Min amount for that price to be applied',
-      price: 'For NFTs: Price for that amount; For Tokens: Price of each token',
+      price: 'Price of each asset for that amount.',
     },
   },
 };

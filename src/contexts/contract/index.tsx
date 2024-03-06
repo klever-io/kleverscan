@@ -134,31 +134,41 @@ export const ContractProvider: React.FC = ({ children }) => {
       return [] as ICollectionList[];
     }
 
-    const response: IAssetsResponse = await api.get({
-      route: `assets/list`,
-      query: {
-        owner: walletAddress,
-        limit: 10000,
-      },
-    });
-    if (response.error) return;
-
     const list: ICollectionList[] = [];
 
-    if (response?.data?.assets?.length > 0) {
-      response.data.assets.forEach(item => {
-        list.push({
-          ...item,
-          label: item.assetId,
-          value: item.assetId,
-          isNFT: item.assetType !== 'Fungible',
-        });
+    let page = 1;
+    while (page !== -1) {
+      const response: IAssetsResponse = await api.get({
+        route: `assets/list`,
+        query: {
+          owner: walletAddress,
+          limit: 100,
+          page,
+        },
       });
+      if (response.error) return;
 
-      const kAssetsList = [...list];
+      if (response?.data?.assets?.length > 0) {
+        response.data.assets.forEach(item => {
+          list.push({
+            ...item,
+            label: item.assetId,
+            value: item.assetId,
+            isNFT: item.assetType !== 'Fungible',
+          });
+        });
+      }
 
-      return kAssetsList;
+      page =
+        (response?.pagination?.self || 0) <
+        (response?.pagination?.totalPages || 0)
+          ? page + 1
+          : -1;
     }
+
+    const kAssetsList = [...list];
+
+    return kAssetsList;
   };
 
   const getAssets = async () => {

@@ -269,7 +269,7 @@ export const KDASelect: React.FC<IKDASelect> = props => {
                 }
               : undefined
           }
-          zIndex={3}
+          zIndex={4}
           error={Boolean(collectionError)}
         />
         {collectionError && (
@@ -377,7 +377,7 @@ const CollectionIDField: React.FC = () => {
           onInputChange={handleInputChange}
           loading={collectionIdListLoading}
           selectedValue={selectedCollectionId}
-          zIndex={3}
+          zIndex={4}
           error={Boolean(assetIdError)}
         />
       )}

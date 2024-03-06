@@ -457,11 +457,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
           <ToggleContainer disabled={inputProps.disabled}>
             {toggleOptions.length > 1 && toggleOptions[0]}
             <Toggle>
-              <StyledInput
-                {...inputProps}
-                required={false}
-                value={String(!!inputValue)}
-              />
+              <StyledInput {...inputProps} required={false} />
               <Slider active={String(!!inputValue)} />
             </Toggle>
             {toggleOptions.length > 1 && toggleOptions[1]}

@@ -102,7 +102,7 @@ const PermID: React.FC = () => {
                 : undefined
             }
             loading={loading}
-            zIndex={2}
+            zIndex={4}
           />
         </SelectContent>
       </FieldContainer>
@@ -306,7 +306,7 @@ const AdvancedOptionsContent: React.FC = () => {
               kdaFee.current = value;
               setKdaFeeAsset(value || null);
             }}
-            zIndex={2}
+            zIndex={4}
             loading={assetsPoolFetching || assetsFetching || loading}
           />
         </SelectContent>

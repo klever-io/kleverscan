@@ -266,10 +266,6 @@ export const CenteredRow = styled.div`
     white-space: nowrap;
   }
 
-  a:hover {
-    text-decoration: underline;
-  }
-
   p {
     font-weight: 600;
     font-size: 0.85rem;

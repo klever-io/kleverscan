@@ -9,6 +9,7 @@ import {
   IAssetsBuckets,
   IAssetsResponse,
   IBucket,
+  IPaginatedResponse,
   IResponse,
   ITransaction,
   Service,
@@ -229,7 +230,7 @@ export const bucketsRequest = (
   const requestBuckets = async (
     page: number,
     limit: number,
-  ): Promise<IResponse | []> => {
+  ): Promise<IPaginatedResponse | []> => {
     const accountResponse: IAccountResponse = await api.get({
       route: `address/${address}`,
     });
@@ -241,22 +242,12 @@ export const bucketsRequest = (
       asset => assets[asset]?.buckets?.length,
     );
 
-    const assetsDetails: IAsset[] = [];
+    const assetsDetailsRes: IAssetsResponse = await api.get({
+      route: `assets/list`,
+      query: { asset: assetsWithBuckets, page, limit },
+    });
 
-    let assetDetailsPage = 1;
-    while (assetDetailsPage !== -1) {
-      const assetsDetailsRes: IAssetsResponse = await api.get({
-        route: `assets/list`,
-        query: { asset: assetsWithBuckets, page: assetDetailsPage },
-      });
-
-      assetsDetails.push(...assetsDetailsRes?.data?.assets);
-      assetDetailsPage =
-        (assetsDetailsRes?.pagination?.self || 0) <
-        (assetsDetailsRes?.pagination?.totalPages || 0)
-          ? assetDetailsPage + 1
-          : -1;
-    }
+    const assetsDetails = assetsDetailsRes?.data?.assets;
 
     for (const assetDetails of assetsDetails) {
       const asset = assets[assetDetails.assetId];
@@ -271,7 +262,12 @@ export const bucketsRequest = (
       }
     }
 
-    return { data: { buckets: bucketsTable }, code: 'successful', error: '' };
+    return {
+      data: { buckets: bucketsTable },
+      pagination: assetsDetailsRes.pagination,
+      code: 'successful',
+      error: '',
+    };
   };
   return requestBuckets;
 };

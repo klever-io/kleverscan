@@ -268,7 +268,7 @@
       "packs": "Packs",
       "createPacks": "Create Packs",
       "forNFTS": "For NFTs: Amount sold; For Token: Min amount for that price to be applied",
-      "forNFTS/Tokens": "For NFTs: Price for each NFT; For Tokens: Price for that amount.",
+      "forNFTS/Tokens": "Price of each asset for that amount.",
       "currencyInfo": "Defines the currency in which the pack will be sold",
       "removePack": "Remove Pack",
       "addAnotherPack": "Add another Pack Info",

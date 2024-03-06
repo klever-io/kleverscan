@@ -330,6 +330,9 @@ export interface IAccountAsset {
   owner?: boolean;
   staking?: {
     interestType: string;
+    minEpochsToWithdraw?: number;
+    minEpochsToUnstake?: number;
+    minEpochsToClaim?: number;
   };
 }
 
@@ -868,7 +871,7 @@ export interface ICollectionIdListResponse extends IResponse {
   };
 }
 
-export interface IAssetsResponse extends IResponse {
+export interface IAssetsResponse extends IPaginatedResponse {
   data: {
     assets: IAsset[];
   };

@@ -142,6 +142,24 @@ const renderNFTNonces = (noncesReceipts: IBuyReceipt[]) => {
   return null;
 };
 
+const renderAssetId = (parameter: any) => {
+  return parameter?.assetId?.split('/')[0] &&
+    parameter?.assetId?.split('/')[0] !== 'KLV' ? (
+    <Link href={`/asset/${parameter?.assetId?.split('/')[0]}`}>
+      <a style={{ fontWeight: '500' }}>{parameter?.assetId?.split('/')[0]}</a>
+    </Link>
+  ) : (
+    parameter?.amount && (
+      <>
+        <Link href={`/asset/KLV`}>
+          <KLV />
+        </Link>
+        <Link href={`/asset/KLV`}>KLV</Link>
+      </>
+    )
+  );
+};
+
 export const Transfer: React.FC<IIndexedContract> = ({
   parameter: par,
   filteredReceipts: rec,
@@ -229,7 +247,7 @@ export const Transfer: React.FC<IIndexedContract> = ({
         <span>
           <strong>Asset Id</strong>
         </span>
-        <span>{parameter?.assetId || 'KLV'}</span>
+        {renderAssetId(parameter)}
       </Row>
       <Row>
         <span>
@@ -241,23 +259,7 @@ export const Transfer: React.FC<IIndexedContract> = ({
               ? toLocaleFixed(parameter?.amount / 10 ** precision, precision)
               : '--'}
           </strong>
-          {parameter?.assetId?.split('/')[0] &&
-          parameter?.assetId?.split('/')[0] !== 'KLV' ? (
-            <Link href={`/asset/${parameter?.assetId?.split('/')[0]}`}>
-              <div style={{ fontWeight: '500' }}>
-                {parameter?.assetId?.split('/')[0]}
-              </div>
-            </Link>
-          ) : (
-            parameter?.amount && (
-              <>
-                <Link href={`/asset/KLV`}>
-                  <KLV />
-                </Link>
-                <Link href={`/asset/KLV`}>KLV</Link>
-              </>
-            )
-          )}
+          {renderAssetId(parameter)}
         </CenteredRow>
       </Row>
       <Row>
@@ -904,9 +906,7 @@ export const Freeze: React.FC<IIndexedContract> = ({
         <span>
           <strong>Asset Id</strong>
         </span>
-        <span>
-          <small>{parameter?.assetId || 'KLV'}</small>
-        </span>
+        {renderAssetId(parameter)}
       </Row>
       <Row>
         <span>
@@ -962,7 +962,7 @@ export const Unfreeze: React.FC<IIndexedContract> = ({
         <span>
           <strong>Asset Id</strong>
         </span>
-        <span>{parameter?.assetId || 'KLV'}</span>
+        {renderAssetId(parameter)}
       </Row>
       <Row>
         <span>
@@ -1260,7 +1260,7 @@ export const Withdraw: React.FC<IIndexedContract> = ({
           <span>
             <strong>Asset Id</strong>
           </span>
-          <span>{parameter?.assetId}</span>
+          {renderAssetId(parameter)}
         </Row>
       )}
 
@@ -1454,7 +1454,7 @@ export const AssetTrigger: React.FC<IIndexedContract> = ({
         <span>
           <strong>Asset ID</strong>
         </span>
-        <span>{parameter?.assetId}</span>
+        {renderAssetId(parameter)}
       </Row>
       {!!noncesReceipts.length && (
         <Row>
@@ -1628,7 +1628,7 @@ export const ConfigITO: React.FC<IIndexedContract> = ({
         <span>
           <strong>Asset Id</strong>
         </span>
-        <span>{parameter?.assetId}</span>
+        {renderAssetId(parameter)}
       </Row>
       <Row>
         <span>
@@ -1830,7 +1830,9 @@ export const Buy: React.FC<IContractBuyProps> = ({
               <span>
                 <strong>Asset Id</strong>
               </span>
-              <span>{assetId}</span>
+              <span>
+                <a href={`/asset/${assetId}`}>{assetId}</a>
+              </span>
             </Row>
           )}
           {orderId && (
@@ -2067,7 +2069,7 @@ export const Sell: React.FC<IIndexedContract> = ({
         <span>
           <strong>Asset Id</strong>
         </span>
-        <span>{parameter?.assetId}</span>
+        {renderAssetId(parameter)}
       </Row>
       {kAppTransferReceipt && (
         <Row>
@@ -2595,7 +2597,7 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({
         <span>
           <strong>Asset Id</strong>
         </span>
-        <span>{parameter?.assetId}</span>
+        {renderAssetId(parameter)}
       </Row>
       {renderTriggerTypeData()}
       {renderMetadata()}
@@ -2774,7 +2776,9 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerTypeData> = ({
         <strong>To</strong>
       </span>
       <CenteredRow>
-        <span>{par?.toAddress}</span>
+        <Link href={`/account/${par?.toAddress}`}>
+          <a>{par?.toAddress}</a>
+        </Link>
         <Copy data={par?.toAddress} info="address"></Copy>
       </CenteredRow>
     </Row>

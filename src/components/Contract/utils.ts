@@ -49,6 +49,7 @@ const getType = (rawType: string): TransactionType => {
       break;
     case 'Sell':
       type = 'SellOrder';
+      break;
     case 'Smart':
       type = 'SmartContract';
       break;
@@ -388,7 +389,7 @@ const showAssetIdInput = (
 const getAssetsList = (
   assets: ICollectionList[],
   contractType: string,
-  typeAssetTrigger: number | null,
+  assetTriggerType: number | null,
   withdrawType: number | null,
   ownerAddress: string,
   type?: 'token' | 'NFT',
@@ -403,23 +404,23 @@ const getAssetsList = (
     });
   }
 
-  if (contractType === 'AssetTriggerContract' && typeAssetTrigger !== null) {
+  if (contractType === 'AssetTriggerContract' && assetTriggerType !== null) {
     const bothCollectionNFT = [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12];
     const justNFT = [8];
     const justToken = [13];
 
-    if (bothCollectionNFT.includes(typeAssetTrigger)) {
-      return filterByProperties(assets, typeAssetTrigger);
-    } else if (justNFT.includes(typeAssetTrigger)) {
+    if (bothCollectionNFT.includes(assetTriggerType)) {
+      return filterByProperties(assets, assetTriggerType);
+    } else if (justNFT.includes(assetTriggerType)) {
       const newAssets = assets.filter((value: ICollectionList) => {
         return value.isNFT;
       });
-      return filterByProperties(newAssets, typeAssetTrigger);
-    } else if (justToken.includes(typeAssetTrigger)) {
+      return filterByProperties(newAssets, assetTriggerType);
+    } else if (justToken.includes(assetTriggerType)) {
       const newAssets = assets.filter((value: ICollectionList) => {
         return !value.isNFT;
       });
-      return filterByProperties(newAssets, typeAssetTrigger);
+      return filterByProperties(newAssets, assetTriggerType);
     }
   } else if (
     contractType === 'FreezeContract' ||

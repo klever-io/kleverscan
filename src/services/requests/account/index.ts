@@ -7,7 +7,9 @@ import {
   IAccountResponse,
   IAsset,
   IAssetsBuckets,
+  IAssetsResponse,
   IBucket,
+  IPaginatedResponse,
   IResponse,
   ITransaction,
   Service,
@@ -228,52 +230,44 @@ export const bucketsRequest = (
   const requestBuckets = async (
     page: number,
     limit: number,
-  ): Promise<IResponse | []> => {
+  ): Promise<IPaginatedResponse | []> => {
     const accountResponse: IAccountResponse = await api.get({
       route: `address/${address}`,
     });
     if (!accountResponse) return [];
     const bucketsTable: IAssetsBuckets[] = [];
     const assets = accountResponse?.data?.account?.assets || {};
-    Object.keys(assets).forEach(asset => {
-      const assetHasUnstakedBucket = assets[asset]?.buckets?.find(
-        (bucket: IBucket) => bucket.unstakedEpoch !== UINT32_MAX,
-      );
 
-      const getDetails = async () => {
-        const details = await api.get({
-          route: `assets/${assets[asset]?.assetId}`,
-        });
-        if (details.error === '') {
-          assets[asset]['minEpochsToWithdraw'] =
-            details?.data?.asset?.staking?.minEpochsToWithdraw;
-        }
-      };
+    const assetsWithBuckets = Object.keys(assets).filter(
+      asset => assets[asset]?.buckets?.length,
+    );
 
-      if (assetHasUnstakedBucket) {
-        getDetails();
-      }
-      if (assets?.[asset]?.buckets?.length) {
-        assets?.[asset].buckets?.forEach((bucket: IBucket) => {
-          if (
-            bucket.unstakedEpoch === UINT32_MAX &&
-            assets?.[asset].assetId.length < 64
-          ) {
-            bucket['availableEpoch'] = asset['minEpochsToWithdraw']
-              ? bucket.unstakedEpoch + asset['minEpochsToWithdraw']
-              : '--';
-          } else {
-            bucket['availableEpoch'] = bucket.unstakedEpoch + 2; // Default for KLV and KFI
-          }
-          const assetBucket = {
-            asset: { ...assets[asset] },
-            bucket: { ...bucket },
-          };
-          bucketsTable.push(assetBucket);
-        });
-      }
+    const assetsDetailsRes: IAssetsResponse = await api.get({
+      route: `assets/list`,
+      query: { asset: assetsWithBuckets, page, limit },
     });
-    return { data: { buckets: bucketsTable }, code: 'successful', error: '' };
+
+    const assetsDetails = assetsDetailsRes?.data?.assets;
+
+    for (const assetDetails of assetsDetails) {
+      const asset = assets[assetDetails.assetId];
+
+      asset.staking = assetDetails.staking;
+
+      for (const bucket of asset.buckets || []) {
+        bucketsTable.push({
+          asset: { ...asset },
+          bucket: { ...bucket },
+        });
+      }
+    }
+
+    return {
+      data: { buckets: bucketsTable },
+      pagination: assetsDetailsRes.pagination,
+      code: 'successful',
+      error: '',
+    };
   };
   return requestBuckets;
 };

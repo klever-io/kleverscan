@@ -38,8 +38,9 @@ const Buckets: React.FC<IBuckets> = ({
 
   const rowSections = (assetBucket: IAssetsBuckets): IRowSection[] => {
     const { asset, bucket } = assetBucket;
-    const minEpochsToUnstake = 1;
-    const minEpochsToWithdraw = 2;
+
+    const minEpochsToUnstake = asset.staking?.minEpochsToUnstake ?? 1;
+    const minEpochsToWithdraw = asset.staking?.minEpochsToWithdraw ?? 2;
 
     const unfreezeEquation = bucket.stakedEpoch + minEpochsToUnstake - epoch;
     const isUnfreezeLocked = () => {
@@ -54,13 +55,14 @@ const Buckets: React.FC<IBuckets> = ({
 
       return withdrawEquation > 0;
     };
+
     const lockedText = () => {
       const textEquation = isWithdrawLocked()
         ? withdrawEquation
         : unfreezeEquation;
       return `${
         isWithdrawLocked()
-          ? t('SingleAccount.Buttons.WithDraw')
+          ? t('SingleAccount.Buttons.Withdraw')
           : t('SingleAccount.Buttons.Unfreeze')
       } (in ${textEquation} epoch${textEquation > 1 ? 's' : ''})`;
     };
@@ -87,7 +89,7 @@ const Buckets: React.FC<IBuckets> = ({
         },
       },
       {
-        title: t('SingleAccount.Buttons.WithDraw'),
+        title: t('SingleAccount.Buttons.Withdraw'),
         contractType: 'WithdrawContract',
         defaultValues: {
           withdrawType: 0,

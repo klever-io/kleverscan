@@ -38,11 +38,14 @@ interface ISectionProps {
 }
 
 const parseCreateAsset = (data: ICreateAsset) => {
-  data.type = data.type ? 1 : 0;
-  parseSplitRoyalties(data);
-  parseURIs(data);
-  parseStaking(data);
-  parseProperties(data);
+  const dataCopy = JSON.parse(JSON.stringify(data));
+  dataCopy.type = dataCopy.type ? 1 : 0;
+  parseSplitRoyalties(dataCopy);
+  parseURIs(dataCopy);
+  parseStaking(dataCopy);
+  parseProperties(dataCopy);
+
+  return dataCopy;
 };
 
 const CreateAsset: React.FC<IContractProps> = ({
@@ -56,8 +59,8 @@ const CreateAsset: React.FC<IContractProps> = ({
   const precision = watch('precision');
 
   const onSubmit = async (data: ICreateAsset) => {
-    parseCreateAsset(data);
-    await handleFormSubmit(data);
+    const dataCopy = parseCreateAsset(data);
+    await handleFormSubmit(dataCopy);
   };
 
   const sectionProps = { isNFT, precision };

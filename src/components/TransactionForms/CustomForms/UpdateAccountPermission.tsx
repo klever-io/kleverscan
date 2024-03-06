@@ -2,7 +2,7 @@ import { useContract } from '@/contexts/contract';
 import { contractsList } from '@/utils/contracts';
 import { setCharAt } from '@/utils/convertString';
 import { invertBytes } from '@/utils/formatFunctions';
-import React, { useState } from 'react';
+import React from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
 import { IContractProps } from '.';
@@ -93,8 +93,6 @@ const UpdateAccountPermission: React.FC<IContractProps> = ({
 
 const PermissionsSection: React.FC = () => {
   const { control, watch, setValue } = useFormContext();
-  const [binaryOperations, setBinaryOperations] =
-    useState<string>(binaryDefault);
 
   const {
     fields,
@@ -166,6 +164,7 @@ const PermissionsSection: React.FC = () => {
                     <Checkbox
                       type="checkbox"
                       checked={binaryOperations === maxBinaryDefault}
+                      value={String(binaryOperations === maxBinaryDefault)}
                       onChange={() => {
                         if (binaryOperations === maxBinaryDefault) {
                           setValue(
@@ -192,6 +191,11 @@ const PermissionsSection: React.FC = () => {
                               binaryOperations.length - (contractIndex + 1),
                             ) === '1'
                           }
+                          value={String(
+                            binaryOperations?.charAt(
+                              binaryOperations.length - (contractIndex + 1),
+                            ) === '1',
+                          )}
                           onChange={e => {
                             let binaryOperationsAux;
 

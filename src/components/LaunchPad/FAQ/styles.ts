@@ -48,6 +48,6 @@ export const Content = styled.div`
   flex-direction: column;
 
   @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    max-width: 550px;
+    width: 550px;
   }
 `;

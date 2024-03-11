@@ -9,10 +9,6 @@ export const Head = styled.div`
 
   cursor: pointer;
 
-  &:not(:last-child) {
-    border-bottom: 1px solid ${({ theme }) => theme.faq.border};
-  }
-
   svg {
     path {
       fill: ${({ theme }) => theme.black};
@@ -31,19 +27,30 @@ export const Title = styled.h3`
 `;
 
 export const Body = styled.p<{ isOpen: boolean }>`
-  color: ${({ theme }) => theme.secondaryText};
+  color: ${({ theme }) => theme.black};
 
-  display: none;
+  padding: 0 24px;
+
   visibility: hidden;
-  font-weight: 400;
+  opacity: 0;
+  transform: translateY(-10px) scaleY(0);
+  height: 0;
+  font-weight: 500;
   font-size: 0.875rem;
-  line-height: 1rem;
+  line-height: 1.25rem;
+
+  transition: transform 0.1s ease-in-out, opacity 0.1s ease-in-out,
+    visibility 0.1s ease-in-out;
 
   ${({ isOpen }) =>
     isOpen &&
     css`
-      display: block;
       visibility: visible;
+      opacity: 1;
+      transform: translateY(0) scaleY(1);
+
+      height: auto;
+      padding: 24px;
     `}
 `;
 
@@ -51,10 +58,15 @@ export const CardContainer = styled.div`
   background-size: cover;
 
   margin: auto;
+  width: 100%;
 
   display: flex;
   flex-direction: column;
   justify-content: center;
 
   gap: 8px;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid ${({ theme }) => theme.faq.border};
+  }
 `;

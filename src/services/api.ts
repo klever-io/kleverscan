@@ -27,6 +27,11 @@ export interface IProps {
   requestMode?: RequestMode;
 }
 
+export interface IDirectusRequestProps {
+  requestParams: any[];
+  requestFunction: string;
+}
+
 const pagination = {
   self: 0,
   next: 0,
@@ -59,6 +64,7 @@ export const getHost = (
       'https://multisign.testnet.klever.finance',
     [Service.EXPLORER]:
       process.env.DEFAULT_EXPLORER_HOST || 'https://testnet.kleverscan.org',
+    [Service.CDN]: process.env.DEFAULT_CDN_HOST || 'https://cdn.klever.io',
   };
 
   let host = hostService[service || 0];
@@ -268,6 +274,40 @@ export const withBody = async (
 
   return result;
 };
+export const withDirectus = async (
+  props: IDirectusRequestProps,
+  tries = 3,
+): Promise<any> => {
+  const request = async () => {
+    try {
+      // use next api as proxy for post requests, to avoid cors from api-gateway (when fetching prices)
+      const response = await fetch('/api/directus', {
+        method: Method.POST,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...props,
+        }),
+      });
+
+      return response.json();
+    } catch (error) {
+      return { data: null, error, code: 'internal_error', pagination };
+    }
+  };
+
+  let result: any;
+
+  await asyncDoIf(
+    res => (result = res),
+    err => (result = Promise.resolve(err)),
+    () => request(),
+    tries,
+  );
+
+  return result;
+};
 
 export const withText = async (
   props: IProps,
@@ -343,6 +383,8 @@ const api = {
     withTimeout(withBody(props, Method.POST)),
   text: async (props: IProps): Promise<any> =>
     withTimeout(withText(props, Method.GET)),
+  directus: async (props: IDirectusRequestProps): Promise<any> =>
+    withTimeout(withDirectus(props)),
 };
 
 export default api;

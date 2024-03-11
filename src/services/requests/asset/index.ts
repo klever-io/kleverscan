@@ -36,6 +36,20 @@ export const getAsset = async (assetId: string): Promise<IAssetResponse> =>
     route: `assets/${assetId}`,
   });
 
+export const assetInfoCall = async (router: NextRouter): Promise<any> => {
+  try {
+    const assetId = router.query?.asset as string;
+
+    const res = await api.directus({
+      requestFunction: 'readItem',
+      requestParams: ['asset_info', assetId],
+    });
+
+    return res;
+  } catch (error) {
+    console.error(error);
+  }
+};
 export const assetCall = async (
   router: NextRouter,
 ): Promise<IAsset | undefined> => {

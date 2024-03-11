@@ -21,6 +21,7 @@ export enum Service {
   GECKO,
   EXPLORER,
   MULTISIGN,
+  CDN,
 }
 
 export interface IDropdownItem {

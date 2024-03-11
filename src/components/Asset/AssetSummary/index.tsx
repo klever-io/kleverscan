@@ -4,9 +4,12 @@ import AssetLogo from '@/components/Logo/AssetLogo';
 import { PlusIcon } from '@/components/QuickAccess/styles';
 import Skeleton from '@/components/Skeleton';
 import { useMobile } from '@/contexts/mobile';
+import { assetInfoCall } from '@/services/requests/asset';
 import { IParsedITO } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useQuery } from 'react-query';
 import { AssetITOSummary } from './AssetITOSummary';
 import {
   About,
@@ -30,6 +33,13 @@ export interface AssetSummaryProps extends AssetProps {
 export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
   const socialNetworks = Object.values(asset?.uris || {});
   const { isTablet } = useMobile();
+  const router = useRouter();
+
+  const { data: asset_info } = useQuery({
+    queryKey: [`assetInfo`, router.query.asset],
+    queryFn: () => assetInfoCall(router),
+    enabled: !!router?.isReady,
+  });
 
   return (
     <>
@@ -93,17 +103,7 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
           </Header>
           <About>
             <h2>About the project</h2>
-            <p>
-              Bitcoin was the first decentralized digital currency based on
-              blockchain technology. It was created in 2008 by an anonymous
-              programmer known as Satoshi Nakamoto, who released the white paper
-              in a cryptography mailing list and later open sourced the software
-              that implements the protocol.Bitcoin was the first decentralized
-              digital currency based on blockchain technology. It was created in
-              2008 by an anonymous programmer known as Satoshi Nakamoto, who
-              released the white paper in a cryptography mailing list and later
-              open sourced the software that implements the protocol.
-            </p>
+            <p>{asset_info?.project_description}</p>
           </About>
         </Container>
       ) : (

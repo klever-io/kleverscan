@@ -11,7 +11,7 @@ export const Container = styled.div`
 
   color: ${props => props.theme.black};
 
-  div {
+  > div:first-of-type {
     cursor: pointer;
   }
 `;

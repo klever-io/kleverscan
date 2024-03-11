@@ -21,7 +21,7 @@ import {
   LeftSide,
   RightSide,
   SocialNetworks,
-} from './style';
+} from './styles';
 
 export interface AssetSummaryProps extends AssetProps {
   ITO: IParsedITO | undefined;
@@ -60,7 +60,7 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
                     </AssetTitle>
                   </>
                 )}
-                route={'/assets'}
+                route={-1}
               />
               <Description>
                 Start collecting funds and change the future of your project

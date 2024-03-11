@@ -34,14 +34,19 @@ import { ReactNode, useEffect } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
 import nextI18nextConfig from '../../../next-i18next.config';
 
-export function getBestKLVRate(packData: IPackInfo[]): number | undefined {
+export function getBestKLVRate(
+  packData: IPackInfo[],
+  precision: number,
+): number | undefined {
   let bestKLVRate: number | undefined = undefined;
   if (packData) {
     packData.forEach(pack => {
       if (pack.key === 'KLV') {
         pack.packs.forEach(p => {
-          if (!bestKLVRate || p.price < bestKLVRate) {
-            bestKLVRate = p.price / 10 ** KLV_PRECISION;
+          const rate =
+            (p.price * 10 ** precision) / (p.amount * 10 ** KLV_PRECISION);
+          if (!bestKLVRate || rate < bestKLVRate) {
+            bestKLVRate = rate;
           }
         });
       }
@@ -91,7 +96,7 @@ const ITOsPage: React.FC = () => {
       whitelistEndTime,
     } = asset;
 
-    const bestKLVRate = getBestKLVRate(packData);
+    const bestKLVRate = getBestKLVRate(packData, precision);
 
     const access = Date.now() < whitelistEndTime ? 'Whitelist Only' : 'Public';
 

@@ -3,18 +3,21 @@ import { FAQContainer } from './styles';
 
 const FAQCards = [
   {
-    title: 'What is Klever LaunchPad?',
+    title: 'What is Klever ITO?',
     description:
-      "Before getting started, let's dig into KleverPad and what it stands for",
+      'Klever ITO is a token launch platform for decentralized projects.',
+    buttonLabel: 'Read more on Klever Forum',
   },
   {
-    title: 'Tier System',
-    description: 'Get to know more about the ITO allocation system here',
+    title: 'Why Create on KleverChain?',
+    description:
+      'KleverChain: User-friendly, secure, scalable platform with strong community support.',
+    buttonLabel: 'Read more on Klever Forum',
   },
   {
-    title: 'How to get started',
-    description:
-      'Time for action! This guide enlights you on your blockchain gaming path',
+    title: 'How to create an ITO on KleverChain?',
+    description: 'Initial Token Offering in easy 6-steps with KleverScan',
+    buttonLabel: 'Learn how to create an ITO',
   },
 ];
 

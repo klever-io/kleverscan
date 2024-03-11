@@ -21,6 +21,7 @@ export const Content = styled.div`
   display: flex;
   flex-direction: column-reverse;
   justify-content: space-between;
+  align-items: center;
   gap: 32px;
 
   @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
@@ -36,9 +37,8 @@ export const RightSide = styled.div`
 
   img {
     border-radius: 16px;
-    object-fit: cover;
+    object-fit: contain;
 
-    max-height: 350px;
     max-width: 80%;
   }
 `;
@@ -80,20 +80,24 @@ export const Description = styled.p`
   letter-spacing: 1px;
 `;
 
-export const Buttons = styled.div`
+export const Links = styled.div`
   display: flex;
   gap: 20px;
   margin-top: 20px;
 `;
 
-export const Button = styled.button<{ secondary?: boolean }>`
-  padding: 14px 26px;
-  border-radius: 24px;
-  border: 1px solid ${({ theme }) => theme.violet};
-  background-color: ${({ theme, secondary }) =>
-    !secondary ? theme.violet : 'transparent'};
-  color: ${({ theme, secondary }) =>
-    secondary ? theme.black : theme.true.white};
+export const LinkStyle = styled.a`
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.black};
+
+  width: 145px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 
   cursor: pointer;
 
@@ -102,7 +106,14 @@ export const Button = styled.button<{ secondary?: boolean }>`
   line-height: 1rem;
 
   transition: 0.3s;
-  &:hover {
+  &:hover,
+  &:focus,
+  &:active {
+    color: ${({ theme }) => theme.black};
     filter: brightness(1.2);
+  }
+
+  &:last-child {
+    width: unset;
   }
 `;

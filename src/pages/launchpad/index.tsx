@@ -3,6 +3,7 @@ import { LaunchPadBanner } from '@/components/LaunchPad/Banner';
 import { LaunchPadFAQ } from '@/components/LaunchPad/FAQ';
 import { LaunchPadFAQCards } from '@/components/LaunchPad/FAQCards';
 import { LearnBanner } from '@/components/LaunchPad/LearnBanner';
+import { WalletBanner } from '@/components/LaunchPad/WalletBanner';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Table, { ITable } from '@/components/NewTable';
 import { useContractModal } from '@/contexts/contractModal';
@@ -103,7 +104,7 @@ const ITOsPage: React.FC = () => {
     const renderTotalAmount = (): ReactNode => {
       return (
         <strong>
-          {maxAmount !== 0 ? (
+          {!(maxAmount === 0 || Number.isNaN(maxAmount)) ? (
             formatAmount(maxAmount / 10 ** precision)
           ) : (
             <IoIosInfinite />
@@ -237,6 +238,7 @@ const ITOsPage: React.FC = () => {
           <Table {...tableProps} />
         </TableContainer>
         <LearnBanner />
+        <WalletBanner />
         <LaunchPadFAQ />
       </ITOContainer>
     </MainContainer>

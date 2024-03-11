@@ -45,7 +45,7 @@ export const Content = styled.div`
   gap: 24px;
 
   @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    max-width: 40%;
+    max-width: 50%;
     padding-top: 72px;
   }
 `;
@@ -57,9 +57,14 @@ export const Title = styled.h1`
   line-height: 1;
   letter-spacing: 1px;
 
+  > strong {
+    color: ${({ theme }) => theme.violet};
+  }
+
   @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     font-size: 5rem;
     line-height: 1.2;
+    text-align: left;
   }
 `;
 
@@ -69,12 +74,18 @@ export const Description = styled.p`
   font-size: 1.5rem;
   line-height: 1.875rem;
   letter-spacing: 1px;
+
+  @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    text-align: left;
+  }
 `;
 
 export const Buttons = styled.div`
   display: flex;
   gap: 20px;
   margin-top: 20px;
+
+  width: 100%;
 `;
 
 export const Button = styled.button<{ secondary?: boolean }>`

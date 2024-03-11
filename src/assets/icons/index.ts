@@ -1,3 +1,5 @@
+import AppGalery from './app-gallery.svg';
+import Apple from './apple.svg';
 import ArrowPink from './arrow-down-pink.svg';
 import ArrowDownSquare from './arrow-down-square.svg';
 import ArrowDown from './arrow-down.svg';
@@ -15,6 +17,7 @@ import ChevronRight from './chevron-right.svg';
 import Compass from './compass.svg';
 import Copy from './copy.svg';
 import Currency from './currency.svg';
+import GooglePlay from './google-play.svg';
 import Graph from './graph.svg';
 import InfoSquare from './info-square.svg';
 import LaunchPadPlus from './launchpad-plus.svg';
@@ -23,6 +26,7 @@ import PlusSquare from './plus-square.svg';
 import PlusWhite from './plus-white.svg';
 import Plus from './plus.svg';
 import Proposal from './proposal.svg';
+import QRCode from './qr-code.svg';
 import Receive from './receive.svg';
 import Redirect from './redirect.svg';
 import Search from './search.svg';
@@ -84,4 +88,8 @@ export {
   PlusSquare,
   LaunchPadPlus,
   Currency,
+  Apple,
+  GooglePlay,
+  AppGalery,
+  QRCode,
 };

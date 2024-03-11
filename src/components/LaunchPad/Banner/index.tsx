@@ -11,14 +11,17 @@ export const LaunchPadBanner: React.FC = () => {
   return (
     <BannerContainer>
       <Content>
-        <Title>A new era of crowdfund is starting now</Title>
+        <Title>
+          Initial Token Offering (ITO) <strong>Simplified</strong>
+        </Title>
         <Description>
-          Start collecting funds and change the future of your project with our
-          comunity
+          Raise money for your blockchain project by selling tokens in an
+          Initial Token Offering (ITO). Give buyers special accesss or services
+          in the project, offering real value to investors and users.
         </Description>
         <Buttons>
-          <Button>Apply for funding</Button>
-          <Button secondary>Create Asset</Button>
+          <Button>Have a project? Apply here</Button>
+          <Button secondary>Don’t have a project yet? Start here</Button>
         </Buttons>
       </Content>
     </BannerContainer>

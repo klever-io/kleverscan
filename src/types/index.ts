@@ -493,8 +493,8 @@ export interface IITO {
   whitelistInfo: IWhitelistInfo[];
   whitelistStartTime: number;
   whitelistEndTime: number;
-  startTime: number;
-  endTime: number;
+  startTime?: number;
+  endTime?: number;
 }
 
 export interface IParsedITO extends IITO {

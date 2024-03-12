@@ -1,3 +1,4 @@
+import { queryDirectus } from '@/services/directus';
 import * as directus from '@directus/sdk';
 import { NextApiRequest, NextApiResponse } from 'next';
 
@@ -8,10 +9,7 @@ export default async function handler(
   try {
     const { requestFunction, requestParams } = req.body;
 
-    const client = directus
-      .createDirectus(process.env.DEFAULT_CDN_HOST || 'https://cdn.klever.io')
-      .with(directus.rest())
-      .with(directus.staticToken(process.env.DIRECTUS_STATIC_TOKEN || ''));
+    const client = queryDirectus();
 
     const response = await client.request(
       directus[requestFunction](...requestParams),

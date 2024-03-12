@@ -3,13 +3,17 @@ import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import { PlusIcon } from '@/components/QuickAccess/styles';
 import Skeleton from '@/components/Skeleton';
+import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import { assetInfoCall } from '@/services/requests/asset';
 import { IParsedITO } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import ReactDOM from 'react-dom';
 import { useQuery } from 'react-query';
+import { ApplyFormModal } from './ApplyFormModal';
 import { AssetITOSummary } from './AssetITOSummary';
 import {
   About,
@@ -22,6 +26,7 @@ import {
   Description,
   Header,
   LeftSide,
+  ParticipateButton,
   RightSide,
   SocialNetworks,
 } from './styles';
@@ -31,9 +36,18 @@ export interface AssetSummaryProps extends AssetProps {
 }
 
 export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
+  const [openApplyFormModal, setOpenApplyFormModal] = useState(false);
   const socialNetworks = Object.values(asset?.uris || {});
   const { isTablet } = useMobile();
   const router = useRouter();
+  const { walletAddress, connectExtension, extensionInstalled } =
+    useExtension();
+
+  useEffect(() => {
+    if (extensionInstalled) {
+      connectExtension();
+    }
+  }, [extensionInstalled]);
 
   const { data: asset_info } = useQuery({
     queryKey: [`assetInfo`, router.query.asset],
@@ -72,11 +86,17 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
                 )}
                 route={-1}
               />
-              <Description>
-                Start collecting funds and change the future of your project
-                with our comunity. Start collecting funds and change the future
-                of your project with our comunity
-              </Description>
+              {asset_info?.short_description ? (
+                <Description>{asset_info?.short_description}</Description>
+              ) : null}
+              {!asset_info?.short_description && walletAddress ? (
+                <ParticipateButton
+                  type="button"
+                  onClick={() => setOpenApplyFormModal(true)}
+                >
+                  Add a description for this asset
+                </ParticipateButton>
+              ) : null}
               <SocialNetworks>
                 {socialNetworks.map(uri => (
                   <Link key={uri} href={uri}>
@@ -88,8 +108,8 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
               </SocialNetworks>
             </LeftSide>
             <RightSide>
-              <AssetITOSummary asset={asset} ITO={ITO} />
-              {!isTablet && (
+              {asset && ITO && <AssetITOSummary asset={asset} ITO={ITO} />}
+              {!isTablet && asset?.logo && (
                 <BackgroundImage>
                   <Image
                     src={asset?.logo || ''}
@@ -101,10 +121,22 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
               )}
             </RightSide>
           </Header>
-          <About>
-            <h2>About the project</h2>
-            <p>{asset_info?.project_description}</p>
-          </About>
+          {asset_info?.project_description ? (
+            <About>
+              <h2>About the project</h2>
+              <p>{asset_info?.project_description}</p>
+            </About>
+          ) : null}
+          {ReactDOM.createPortal(
+            asset && (
+              <ApplyFormModal
+                isOpenApplyFormModal={openApplyFormModal}
+                setOpenApplyFormModal={setOpenApplyFormModal}
+                asset={asset}
+              />
+            ),
+            window.document.body,
+          )}
         </Container>
       ) : (
         <Skeleton width={200} height={40} />

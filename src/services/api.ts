@@ -25,11 +25,13 @@ export interface IProps {
   service?: Service;
   useApiProxy?: boolean;
   requestMode?: RequestMode;
+  tries?: number;
 }
 
 export interface IDirectusRequestProps {
   requestParams: any[];
   requestFunction: string;
+  tries?: number;
 }
 
 const pagination = {
@@ -186,11 +188,7 @@ export const withoutBody = async (
   return result;
 };
 
-export const withBody = async (
-  props: IProps,
-  method: Method,
-  tries = 3,
-): Promise<any> => {
+export const withBody = async (props: IProps, method: Method): Promise<any> => {
   const request = async () => {
     if (props.useApiProxy) {
       try {
@@ -269,14 +267,13 @@ export const withBody = async (
     res => (result = res),
     err => (result = Promise.resolve(err)),
     () => request(),
-    tries,
+    props.tries || 3,
   );
 
   return result;
 };
 export const withDirectus = async (
   props: IDirectusRequestProps,
-  tries = 3,
 ): Promise<any> => {
   const request = async () => {
     try {
@@ -303,7 +300,7 @@ export const withDirectus = async (
     res => (result = res),
     err => (result = Promise.resolve(err)),
     () => request(),
-    tries,
+    props.tries || 3,
   );
 
   return result;

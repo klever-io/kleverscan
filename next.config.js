@@ -13,6 +13,8 @@ const defaultEnvs = [
   'BUGSNAG_KEY',
   'BUGSNAG_DISABLED',
   'DEFAULT_API_MULTISIGN',
+  'NEXT_PUBLIC_TRANSFER_ADDRESS',
+  'NEXT_PUBLIC_ADD_ASSET_INFO_VALUE',
 ];
 
 const getEnvs = () => {

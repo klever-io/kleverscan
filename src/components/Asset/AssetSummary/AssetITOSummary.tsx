@@ -1,10 +1,8 @@
 import { IPackInfo } from '@/types/contracts';
 import { useCountdown } from '@/utils/hooks';
 import { secondsToMonthDayHourMinSec } from '@/utils/timeFunctions';
-import { useMemo, useState } from 'react';
-import ReactDOM from 'react-dom';
+import { useMemo } from 'react';
 import { AssetSummaryProps } from '.';
-import { ParticipateModal } from './ParticipateModal';
 import {
   CardContainer,
   DetailsRow,
@@ -41,11 +39,15 @@ export function getBestKLVRateWintoutPrecision(
   return bestKLVRate;
 }
 
-export const AssetITOSummary: React.FC<AssetSummaryProps> = ({
+interface AssetITOProps extends AssetSummaryProps {
+  setOpenParticipateModal: (state: boolean) => void;
+}
+
+export const AssetITOSummary: React.FC<AssetITOProps> = ({
   asset,
   ITO,
+  setOpenParticipateModal,
 }) => {
-  const [openParticipateModal, setOpenParticipateModal] = useState(false);
   const remainingTime = useCountdown((ITO?.endTime || 0) * 1000);
 
   const bestAssetKLVRate = useMemo(
@@ -109,17 +111,6 @@ export const AssetITOSummary: React.FC<AssetSummaryProps> = ({
           Participate
         </ParticipateButton>
       </CardContainer>
-      {ReactDOM.createPortal(
-        asset && ITO && (
-          <ParticipateModal
-            isOpenParticipateModal={openParticipateModal}
-            setOpenParticipateModal={setOpenParticipateModal}
-            asset={asset}
-            ITO={ITO}
-          />
-        ),
-        window.document.body,
-      )}
     </>
   );
 };

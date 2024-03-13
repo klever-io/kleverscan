@@ -1,7 +1,10 @@
 import { Edit } from '@/assets/icons';
 import * as SocialIcons from '@/assets/social';
 import { AssetProps } from '@/components/Asset/OverviewTab';
+import { HashComponent } from '@/components/Contract';
+import { LoadingBackground } from '@/components/Contract/styles';
 import Title from '@/components/Layout/Title';
+import { Loader } from '@/components/Loader/styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Skeleton from '@/components/Skeleton';
 import { useExtension } from '@/contexts/extension';
@@ -15,6 +18,7 @@ import ReactDOM from 'react-dom';
 import { useQuery } from 'react-query';
 import { ApplyFormModal } from './ApplyFormModal';
 import { AssetITOSummary } from './AssetITOSummary';
+import { ParticipateModal } from './ParticipateModal';
 import {
   About,
   AssetHeaderContainer,
@@ -38,7 +42,11 @@ export interface AssetSummaryProps extends AssetProps {
 }
 
 export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
+  const [openParticipateModal, setOpenParticipateModal] = useState(false);
   const [openApplyFormModal, setOpenApplyFormModal] = useState(false);
+  const [txHash, setTxHash] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
   const { isTablet } = useMobile();
   const router = useRouter();
   const { walletAddress, connectExtension, extensionInstalled } =
@@ -82,10 +90,16 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
     enabled: !!router?.isReady,
   });
 
+  const hashProps = {
+    hash: txHash,
+    setHash: setTxHash,
+  };
+
   return (
     <>
       {asset ? (
         <Container>
+          {txHash && <HashComponent {...hashProps} />}
           <Header>
             <LeftSide>
               <Title
@@ -140,7 +154,13 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
               </SocialNetworks>
             </LeftSide>
             <RightSide>
-              {asset && ITO && <AssetITOSummary asset={asset} ITO={ITO} />}
+              {asset && ITO && (
+                <AssetITOSummary
+                  asset={asset}
+                  ITO={ITO}
+                  setOpenParticipateModal={setOpenParticipateModal}
+                />
+              )}
               {!isTablet && asset?.logo && (
                 <BackgroundImage>
                   <Image
@@ -176,10 +196,35 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
                   project_description: asset_info?.project_description,
                 }}
                 asset={asset}
+                setTxHash={setTxHash}
+                setLoading={setLoading}
               />
             ),
             window.document.body,
           )}
+
+          {ReactDOM.createPortal(
+            asset && ITO && (
+              <ParticipateModal
+                isOpenParticipateModal={openParticipateModal}
+                setOpenParticipateModal={setOpenParticipateModal}
+                asset={asset}
+                ITO={ITO}
+                setTxHash={setTxHash}
+                setLoading={setLoading}
+              />
+            ),
+            window.document.body,
+          )}
+
+          {loading
+            ? ReactDOM.createPortal(
+                <LoadingBackground>
+                  <Loader />
+                </LoadingBackground>,
+                window.document.body,
+              )
+            : null}
         </Container>
       ) : (
         <Skeleton width={200} height={40} />

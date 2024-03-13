@@ -36,6 +36,8 @@ interface ApplyFormModalProps {
     short_description: string;
     project_description: string;
   };
+  setTxHash: (txHash: string) => void;
+  setLoading: (state: boolean) => void;
 }
 
 export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
@@ -43,6 +45,8 @@ export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
   setOpenApplyFormModal,
   asset,
   defaultValues,
+  setTxHash,
+  setLoading,
 }) => {
   const [projectDescription, setProjectDescription] = useState<string>(
     defaultValues?.project_description || '',
@@ -50,8 +54,6 @@ export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
   const [shortDescription, setShortDescription] = useState<string>(
     defaultValues?.short_description || '',
   );
-  const [loading, setLoading] = useState(false);
-  const [txHash, setTxHash] = useState<string | null>(null);
 
   const shortDescriptionRef = useRef<HTMLTextAreaElement>(null);
 
@@ -66,6 +68,7 @@ export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setTxHash('');
 
     const payload = {
       receiver: process.env.NEXT_PUBLIC_TRANSFER_ADDRESS,
@@ -89,18 +92,21 @@ export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
         signedTransaction: JSON.stringify(signedTransaction),
       };
 
-      api.post({
+      const res = await api.post({
         service: Service.EXPLORER,
         route: isEdit ? 'api/edit-info' : 'api/apply',
         body: JSON.stringify(body),
         tries: 1,
       });
+
+      setTxHash && setTxHash(res?.data?.hash);
     } catch (error) {
       console.error(error);
       toast.error(error);
+    } finally {
+      setLoading(false);
+      closeModal();
     }
-
-    setLoading(false);
   };
 
   return (

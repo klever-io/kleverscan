@@ -37,6 +37,8 @@ interface ParticipateModalProps {
   setOpenParticipateModal: (state: boolean) => void;
   asset: IAsset;
   ITO: IParsedITO;
+  setTxHash: (txHash: string) => void;
+  setLoading: (state: boolean) => void;
 }
 
 export const ParticipateModal: React.FC<ParticipateModalProps> = ({
@@ -44,12 +46,12 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
   setOpenParticipateModal,
   asset,
   ITO,
+  setTxHash,
+  setLoading,
 }) => {
   const [selectedPack, setSelectedPack] = useState<string>('');
   const [assetAmount, setAssetAmount] = useState<number>(0);
   const [currencyAmount, setCurrencyAmount] = useState<number>(0);
-  const [loading, setLoading] = useState(false);
-  const [txHash, setTxHash] = useState<string | null>(null);
   const { t } = useTranslation('assets');
 
   const closeModal = () => {
@@ -200,6 +202,7 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
 
     try {
       setLoading(true);
+      setTxHash('');
       const unsignedTx = await web.buildTransaction([
         {
           type: 17, // Buy Order type
@@ -208,13 +211,15 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
       ]);
       const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
       const response = await web.broadcastTransactions([signedTx]);
-      if (setTxHash) setTxHash(response.data.txsHashes[0]);
-      toast.success(t('successBroadcastTxToast'));
+
+      setTxHash(response.data.txsHashes[0]);
+      toast.success('Transaction successfully broadcasted.');
     } catch (e: any) {
       console.warn(`%c ${e}`, 'color: red');
       toast.error(e.message ? e.message : e);
     } finally {
       setLoading(false);
+      closeModal();
     }
   };
 

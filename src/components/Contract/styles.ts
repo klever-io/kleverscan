@@ -29,7 +29,7 @@ export const LoadingBackground = styled.div`
 
   width: 100vw;
   height: 100vh;
-  z-index: 6;
+  z-index: 8;
 
   background-color: ${props => transparentize(0.2, props.theme.true.black)};
 

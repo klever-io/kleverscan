@@ -73,6 +73,7 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 24px;
+  padding-top: 40px;
 `;
 
 export const Header = styled.div`
@@ -90,7 +91,8 @@ export const Header = styled.div`
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: row;
-    padding: 80px 0;
+    padding-top: 40px;
+    padding-bottom: 80px;
   }
 `;
 

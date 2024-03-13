@@ -75,7 +75,11 @@ export const AssetITOSummary: React.FC<AssetSummaryProps> = ({
             <Label>Progress</Label>
             <ProgressBar>
               <ProgressFill
-                fillWidth={(ITO?.mintedAmount || 0) / ITO?.maxAmount}
+                fillWidth={
+                  (ITO?.mintedAmount || 0) > ITO?.maxAmount
+                    ? 1
+                    : (ITO?.mintedAmount || 0) / ITO?.maxAmount
+                }
               />
             </ProgressBar>
           </Progress>

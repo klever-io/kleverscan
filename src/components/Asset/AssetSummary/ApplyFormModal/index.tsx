@@ -5,7 +5,7 @@ import { IAsset, Service } from '@/types';
 import { web } from '@klever/sdk-web';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
   ArrowContainer,
@@ -17,7 +17,6 @@ import {
   Content,
   Header,
   Input,
-  InputContainer,
   InputRow,
   Label,
   SubmitButton,
@@ -44,6 +43,9 @@ export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
   const [shortDescription, setShortDescription] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
+
+  const shortDescriptionRef = useRef<HTMLTextAreaElement>(null);
+
   const { t } = useTranslation('assets');
 
   const closeModal = () => {
@@ -115,27 +117,30 @@ export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
 
         <BuyForm id="buyForm" onSubmit={handleSubmit}>
           <InputRow>
-            <Label>Short Description (max 255 characters)</Label>
-            <InputContainer>
-              <Input
-                value={shortDescription}
-                onChange={e => {
-                  setShortDescription(e.target.value);
-                }}
-              />
-            </InputContainer>
+            <Label>
+              Short Description (max 255 characters)
+              <span>{shortDescription.length} / 255</span>
+            </Label>
+            <Input
+              value={shortDescription}
+              onChange={e => {
+                if (e.target.value.length > 255) {
+                  return;
+                }
+                setShortDescription(e.target.value);
+              }}
+              ref={shortDescriptionRef}
+            />
           </InputRow>
 
           <InputRow>
             <Label>About the Project</Label>
-            <InputContainer>
-              <Input
-                value={projectDescription}
-                onChange={e => {
-                  setProjectDescription(e.target.value);
-                }}
-              />
-            </InputContainer>
+            <Input
+              value={projectDescription}
+              onChange={e => {
+                setProjectDescription(e.target.value);
+              }}
+            />
           </InputRow>
         </BuyForm>
         <SubmitButton type="submit" form="buyForm">

@@ -70,6 +70,10 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
       return 0;
     }
 
+    if (amount <= 0) {
+      return 0;
+    }
+
     const qtyPacks = ITO.packData.length;
 
     const packs =
@@ -121,6 +125,10 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
 
   const calculateAmountFromCost = (cost: number): number => {
     if (!ITO) {
+      return 0;
+    }
+
+    if (cost <= 0) {
       return 0;
     }
 
@@ -240,10 +248,11 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
               <Input
                 value={currencyAmount}
                 onChange={e => {
-                  setCurrencyAmount(Number(e.target.value));
-                  setAssetAmount(
-                    calculateAmountFromCost(Number(e.target.value)),
-                  );
+                  const value = Number(e.target.value);
+                  if (Number.isNaN(value)) return;
+
+                  setCurrencyAmount(value);
+                  setAssetAmount(calculateAmountFromCost(value));
                 }}
               />
               <SelectContainer>
@@ -268,10 +277,11 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
               <Input
                 value={assetAmount}
                 onChange={e => {
-                  setAssetAmount(Number(e.target.value));
-                  setCurrencyAmount(
-                    calculateCostFromAmount(Number(e.target.value)),
-                  );
+                  const value = Number(e.target.value);
+                  if (Number.isNaN(value)) return;
+
+                  setAssetAmount(value);
+                  setCurrencyAmount(calculateCostFromAmount(value));
                 }}
               />
             </InputContainer>

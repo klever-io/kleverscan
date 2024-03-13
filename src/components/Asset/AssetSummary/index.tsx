@@ -89,7 +89,9 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
               {asset_info?.short_description ? (
                 <Description>{asset_info?.short_description}</Description>
               ) : null}
-              {!asset_info?.short_description && walletAddress ? (
+              {!asset_info?.short_description &&
+              walletAddress &&
+              asset?.ownerAddress === walletAddress ? (
                 <ParticipateButton
                   type="button"
                   onClick={() => setOpenApplyFormModal(true)}

@@ -34,8 +34,10 @@ export const Content = styled.div`
   transform: translate(-50%, -50%);
   z-index: 7;
 
-  min-width: min(540px, 90%);
+  min-width: min(900px, 90%);
   min-height: min(480px, 90%);
+
+  height: fit-content;
 
   background-color: ${({ theme }) => theme.true.newBlack};
 
@@ -97,17 +99,28 @@ export const Label = styled.label`
   font-size: 0.85rem;
   font-weight: 600;
   color: ${({ theme }) => theme.true.white};
+
+  display: flex;
+  justify-content: space-between;
 `;
 
-export const Input = styled.input`
+export const Input = styled.textarea`
   color: ${({ theme }) => theme.true.white};
+  background-color: transparent;
 
-  padding: 6px 8px;
+  border-radius: 8px;
 
-  width: 100%;
+  border: 1px solid ${({ theme }) => theme.true.white};
 
-  font-size: 1.25rem;
-  line-height: 1.5rem;
+  padding: 6px;
+
+  min-width: 100%;
+  max-width: 100%;
+
+  min-height: 120px;
+
+  font-size: 1rem;
+  line-height: 1.25rem;
 `;
 
 export const InputContainer = styled.div`

@@ -129,8 +129,8 @@ export const ITOCall = async (
 
         if (
           !ITO.isActive ||
-          (ITO?.endTime && ITO.endTime > Date.now() / 1000) ||
-          (ITO?.startTime && ITO.startTime < Date.now() / 1000)
+          (ITO?.endTime && ITO.endTime < Date.now() / 1000) ||
+          (ITO?.startTime && ITO.startTime > Date.now() / 1000)
         ) {
           return undefined;
         }

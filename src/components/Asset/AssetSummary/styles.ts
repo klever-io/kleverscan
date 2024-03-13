@@ -140,6 +140,10 @@ export const SocialNetworks = styled.div`
 
 export const RightSide = styled.div`
   position: relative;
+
+  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+    min-width: 420px;
+  }
 `;
 
 export const BackgroundImage = styled.div`

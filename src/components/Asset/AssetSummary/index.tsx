@@ -84,7 +84,7 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
     }
   }, [extensionInstalled]);
 
-  const { data: asset_info } = useQuery({
+  const { data: asset_info, refetch: refetchAssetInfo } = useQuery({
     queryKey: [`assetInfo`, router.query.asset],
     queryFn: () => assetInfoCall(router),
     enabled: !!router?.isReady,
@@ -189,12 +189,14 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
           {ReactDOM.createPortal(
             asset && (
               <ApplyFormModal
+                key={JSON.stringify(asset_info) + asset.assetId}
                 isOpenApplyFormModal={openApplyFormModal}
                 setOpenApplyFormModal={setOpenApplyFormModal}
                 defaultValues={{
                   short_description: asset_info?.short_description,
                   project_description: asset_info?.project_description,
                 }}
+                refetchAssetInfo={refetchAssetInfo}
                 asset={asset}
                 setTxHash={setTxHash}
                 setLoading={setLoading}

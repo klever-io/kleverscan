@@ -38,6 +38,7 @@ interface ApplyFormModalProps {
   };
   setTxHash: (txHash: string) => void;
   setLoading: (state: boolean) => void;
+  refetchAssetInfo: () => void;
 }
 
 export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
@@ -47,6 +48,7 @@ export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
   defaultValues,
   setTxHash,
   setLoading,
+  refetchAssetInfo,
 }) => {
   const [projectDescription, setProjectDescription] = useState<string>(
     defaultValues?.project_description || '',
@@ -99,13 +101,14 @@ export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
         tries: 1,
       });
 
-      setTxHash && setTxHash(res?.data?.hash);
+      setTxHash && setTxHash(res?.hash);
     } catch (error) {
       console.error(error);
       toast.error(error);
     } finally {
       setLoading(false);
       closeModal();
+      refetchAssetInfo();
     }
   };
 

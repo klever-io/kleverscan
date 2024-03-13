@@ -193,11 +193,7 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
       buyType: 0,
       id: ITO.assetId,
       currencyId: selectedPack,
-      amount: currencyAmount * 10 ** (await getPrecision(selectedPack)),
-    };
-
-    const parsedPayload = {
-      ...payload,
+      amount: currencyAmount * 10 ** (await getPrecision(ITO.assetId)),
     };
 
     try {
@@ -206,7 +202,7 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
       const unsignedTx = await web.buildTransaction([
         {
           type: 17, // Buy Order type
-          payload: parsedPayload,
+          payload: payload,
         },
       ]);
       const signedTx = await window.kleverWeb.signTransaction(unsignedTx);

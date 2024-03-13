@@ -190,6 +190,14 @@ const theme = {
     dark: '#222345',
     darker: '#16162c',
   },
+
+  faq: {
+    border: '#2e2e2e',
+  },
+
+  ito: {
+    darkGray: '#202025',
+  },
 };
 
 export default theme;

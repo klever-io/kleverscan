@@ -20,7 +20,8 @@ export const Container = styled.div`
   z-index: 6;
   transition: top 0.1s linear;
   background-color: ${props =>
-    props.theme.dark ? props.theme.footer.background : props.theme.true.white};
+    props.theme.dark ? props.theme.background : props.theme.true.white};
+  border-bottom: 1px solid ${props => props.theme.blue};
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
     justify-content: space-between;

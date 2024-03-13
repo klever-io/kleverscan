@@ -523,6 +523,30 @@ const marketplaces = css`
   }
 `;
 
+const launchPad = css`
+  margin-right: 1.25rem;
+
+  min-width: 8rem;
+  max-width: 8rem;
+
+  &:nth-child(1) {
+    min-width: 2rem;
+    max-width: 2rem;
+  }
+  &:nth-child(2) {
+    min-width: 12rem;
+    max-width: 12rem;
+  }
+  &:nth-child(3) {
+    min-width: 10rem;
+    max-width: 10rem;
+  }
+  &:nth-child(8) {
+    min-width: 6rem;
+    max-width: 6rem;
+  }
+`;
+
 const widths = {
   transactions,
   blocks,
@@ -542,6 +566,7 @@ const widths = {
   validatorsList,
   rewards,
   marketplaces,
+  launchPad,
 };
 
 export default widths;

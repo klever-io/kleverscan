@@ -36,6 +36,26 @@ export const getAsset = async (assetId: string): Promise<IAssetResponse> =>
     route: `assets/${assetId}`,
   });
 
+export const assetInfoCall = async (router: NextRouter): Promise<any> => {
+  try {
+    const assetId = router.query?.asset as string;
+
+    const res = await api.directus({
+      requestFunction: 'readItem',
+      requestParams: [
+        'asset_info',
+        assetId,
+        {
+          fields: ['short_description', 'project_description'],
+        },
+      ],
+    });
+
+    return res;
+  } catch (error) {
+    console.error(error);
+  }
+};
 export const assetCall = async (
   router: NextRouter,
 ): Promise<IAsset | undefined> => {
@@ -106,10 +126,21 @@ export const ITOCall = async (
       const ITOresp = res as IITOResponse;
       if (ITOresp?.data?.ito) {
         const ITO = ITOresp?.data?.ito;
+
+        if (
+          !ITO.isActive ||
+          (ITO?.endTime && ITO.endTime < Date.now() / 1000) ||
+          (ITO?.startTime && ITO.startTime > Date.now() / 1000)
+        ) {
+          return undefined;
+        }
+
         await parseITOs([ITO]);
         return ITO as IParsedITO;
       }
     }
+
+    return undefined;
   } catch (error) {
     console.error(error);
   }

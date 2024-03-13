@@ -21,6 +21,7 @@ export enum Service {
   GECKO,
   EXPLORER,
   MULTISIGN,
+  CDN,
 }
 
 export interface IDropdownItem {
@@ -485,17 +486,21 @@ export interface IITO {
   assetId: string;
   isActive: boolean;
   maxAmount: number;
+  mintedAmount?: number;
   receiverAddress: string;
   packData: IPackInfo[];
   isWhitelistActive: boolean;
   whitelistInfo: IWhitelistInfo[];
   whitelistStartTime: number;
   whitelistEndTime: number;
-  startTime: number;
-  endTime: number;
+  startTime?: number;
+  endTime?: number;
 }
 
 export interface IParsedITO extends IITO {
+  name: string;
+  logo: string;
+  verified: boolean;
   ticker: string;
   assetType: string;
   precision: number;

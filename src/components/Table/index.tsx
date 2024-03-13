@@ -57,16 +57,17 @@ export interface ITable {
     | 'nfts'
     | 'validatorsList'
     | 'rewards'
-    | 'marketplaces';
+    | 'marketplaces'
+    | 'launchPad';
 
   header: string[];
   rowSections?: (item: any) => IRowSection[] | undefined;
   scrollUp?: boolean;
-  totalPages?: number;
   dataName?: string;
   request: (page: number, limit: number) => Promise<IPaginatedResponse>;
   interval?: number;
   intervalController?: React.Dispatch<React.SetStateAction<number>>;
+  showLimit?: boolean;
 }
 
 const onErrorHandler = () => {
@@ -84,10 +85,10 @@ const Table: React.FC<ITable> = ({
   rowSections,
   request,
   scrollUp,
-  totalPages: defaultTotalPages,
   dataName,
   interval,
   intervalController,
+  showLimit = true,
 }) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
@@ -172,7 +173,8 @@ const Table: React.FC<ITable> = ({
     <>
       {typeof scrollUp === 'boolean' &&
         typeof response?.totalPages === 'number' &&
-        !!response?.items && (
+        !!response?.items &&
+        showLimit && (
           <FloatContainer>
             {dataName === 'transactions' && (
               <ExportContainer>

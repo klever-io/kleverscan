@@ -232,3 +232,16 @@ export const useDebounce = <T extends unknown>(
 
   return debouncedValue;
 };
+
+export const useCountdown = (endTime: number): number => {
+  const [remainingTime, setRemainingTime] = useState(endTime - Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRemainingTime(endTime - Date.now());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [endTime]);
+
+  return remainingTime / 1000;
+};

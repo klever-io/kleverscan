@@ -97,7 +97,7 @@ export const ITOTab: React.FC<ITOTabProps> = ({ ITO }) => {
             </Row>
           )}
           {ITO?.whitelistEndTime && (
-            <Row isStakingRoyalties={false}>
+            <Row isStakingRoyalties={false} span={2}>
               <span>
                 <strong>{t('assets:ITO.White List')}</strong>
                 <br />
@@ -112,6 +112,7 @@ export const ITOTab: React.FC<ITOTabProps> = ({ ITO }) => {
             <WhiteListRow
               expandVar={expand.whitelist}
               isStakingRoyalties={false}
+              span={2}
             >
               <ExpandWrapper expandVar={expand.whitelist}>
                 <span style={{ gap: '4px' }}>
@@ -171,7 +172,11 @@ export const ITOTab: React.FC<ITOTabProps> = ({ ITO }) => {
             </WhiteListRow>
           )}
           {ITO.packData && (
-            <ExpandableRow isStakingRoyalties={false} expandVar={expand.packs}>
+            <ExpandableRow
+              isStakingRoyalties={false}
+              expandVar={expand.packs}
+              span={2}
+            >
               <ExpandWrapper
                 expandVar={expand.packs}
                 style={{ marginBottom: expand.packs ? '1rem' : '0' }}

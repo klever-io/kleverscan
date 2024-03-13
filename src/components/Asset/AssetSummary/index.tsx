@@ -1,16 +1,16 @@
+import { Edit } from '@/assets/icons';
+import * as SocialIcons from '@/assets/social';
 import { AssetProps } from '@/components/Asset/OverviewTab';
 import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
-import { PlusIcon } from '@/components/QuickAccess/styles';
 import Skeleton from '@/components/Skeleton';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import { assetInfoCall } from '@/services/requests/asset';
 import { IParsedITO } from '@/types';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useQuery } from 'react-query';
 import { ApplyFormModal } from './ApplyFormModal';
@@ -24,8 +24,10 @@ import {
   BackgroundImage,
   Container,
   Description,
+  EditContainer,
   Header,
   LeftSide,
+  LinkStyles,
   ParticipateButton,
   RightSide,
   SocialNetworks,
@@ -37,11 +39,36 @@ export interface AssetSummaryProps extends AssetProps {
 
 export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
   const [openApplyFormModal, setOpenApplyFormModal] = useState(false);
-  const socialNetworks = Object.values(asset?.uris || {});
   const { isTablet } = useMobile();
   const router = useRouter();
   const { walletAddress, connectExtension, extensionInstalled } =
     useExtension();
+
+  const getSocialNetworks = useCallback(() => {
+    const availableSocialNetworks = Object.keys(SocialIcons).map(key => key);
+
+    const matchingSocials = Object.entries(asset?.uris || {})
+      .map(([key, value]) => {
+        const matchingSocial = availableSocialNetworks.filter(social => {
+          return value.toLowerCase().includes(social.toLocaleLowerCase());
+        });
+
+        return !!matchingSocial.length
+          ? {
+              uri: value.startsWith('http') ? value : `https://${value}`,
+              social: matchingSocial[0],
+              icon: SocialIcons[matchingSocial[0]],
+            }
+          : null;
+      })
+      .filter(key => key !== null) as {
+      uri: string;
+      social: string;
+      icon: any;
+    }[];
+
+    return matchingSocials;
+  }, [asset]);
 
   useEffect(() => {
     if (extensionInstalled) {
@@ -100,12 +127,15 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
                 </ParticipateButton>
               ) : null}
               <SocialNetworks>
-                {socialNetworks.map(uri => (
-                  <Link key={uri} href={uri}>
-                    <a target="_blank" rel="noreferrer">
-                      <PlusIcon />
-                    </a>
-                  </Link>
+                {getSocialNetworks().map(social => (
+                  <LinkStyles
+                    key={social.social}
+                    href={social.uri}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <social.icon />
+                  </LinkStyles>
                 ))}
               </SocialNetworks>
             </LeftSide>
@@ -125,7 +155,14 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
           </Header>
           {asset_info?.project_description ? (
             <About>
-              <h2>About the project</h2>
+              <h2>
+                About the project
+                {walletAddress && asset?.ownerAddress === walletAddress && (
+                  <EditContainer onClick={() => setOpenApplyFormModal(true)}>
+                    <Edit />
+                  </EditContainer>
+                )}
+              </h2>
               <p>{asset_info?.project_description}</p>
             </About>
           ) : null}
@@ -134,6 +171,10 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
               <ApplyFormModal
                 isOpenApplyFormModal={openApplyFormModal}
                 setOpenApplyFormModal={setOpenApplyFormModal}
+                defaultValues={{
+                  short_description: asset_info?.short_description,
+                  project_description: asset_info?.project_description,
+                }}
                 asset={asset}
               />
             ),

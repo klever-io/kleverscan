@@ -92,11 +92,12 @@ export const Row = styled.div<{ isStakingRoyalties: boolean; span?: number }>`
   padding: 0.75rem 1rem;
   gap: 4px;
 
+  position: relative;
+
   display: flex;
   flex-direction: column;
 
   color: ${props => props.theme.black};
-  border-bottom: 1px solid ${props => props.theme.card.border};
 
   grid-column: auto / span 1;
 
@@ -144,6 +145,17 @@ export const Row = styled.div<{ isStakingRoyalties: boolean; span?: number }>`
     word-break: break-all;
   }
 
+  &:after {
+    content: '';
+    position: absolute;
+    border-bottom: 1px solid ${props => props.theme.card.border};
+    bottom: 0px;
+
+    left: 0;
+    height: 1px;
+    width: 500%;
+  }
+
   @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
     ${props =>
       props.span &&
@@ -169,7 +181,6 @@ export const FPRRow = styled(Row)`
 `;
 
 export const ExpandableRow = styled(Row)<{ expandVar: boolean }>`
-  overflow-x: auto;
   ${props =>
     props.expandVar &&
     ` 

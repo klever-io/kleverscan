@@ -32,19 +32,30 @@ interface ApplyFormModalProps {
   isOpenApplyFormModal: boolean;
   setOpenApplyFormModal: (state: boolean) => void;
   asset: IAsset;
+  defaultValues?: {
+    short_description: string;
+    project_description: string;
+  };
 }
 
 export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
   isOpenApplyFormModal,
   setOpenApplyFormModal,
   asset,
+  defaultValues,
 }) => {
-  const [projectDescription, setProjectDescription] = useState<string>('');
-  const [shortDescription, setShortDescription] = useState<string>('');
+  const [projectDescription, setProjectDescription] = useState<string>(
+    defaultValues?.project_description || '',
+  );
+  const [shortDescription, setShortDescription] = useState<string>(
+    defaultValues?.short_description || '',
+  );
   const [loading, setLoading] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
 
   const shortDescriptionRef = useRef<HTMLTextAreaElement>(null);
+
+  const isEdit = !!defaultValues;
 
   const { t } = useTranslation('assets');
 
@@ -80,7 +91,7 @@ export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
 
       api.post({
         service: Service.EXPLORER,
-        route: 'api/apply',
+        route: isEdit ? 'api/edit-info' : 'api/apply',
         body: JSON.stringify(body),
         tries: 1,
       });

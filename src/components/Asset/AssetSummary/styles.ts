@@ -106,6 +106,10 @@ export const About = styled.div`
     font-size: 1.5rem;
     font-weight: 600;
     line-height: 2rem;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   p {
@@ -114,6 +118,15 @@ export const About = styled.div`
     font-weight: 400;
     line-height: 1.5;
   }
+`;
+
+export const EditContainer = styled.div`
+  width: 32px;
+
+  display: grid;
+  place-items: center;
+
+  cursor: pointer;
 `;
 
 export const LeftSide = styled.div`
@@ -136,6 +149,25 @@ export const SocialNetworks = styled.div`
   display: flex;
   align-items: center;
   margin-top: 10px;
+
+  gap: 16px;
+`;
+
+export const LinkStyles = styled.a`
+  background-color: white;
+  display: grid;
+  place-items: center;
+
+  padding: 6px;
+  border-radius: 24px;
+
+  cursor: pointer;
+
+  svg {
+    path {
+      fill: ${({ theme }) => theme.violet};
+    }
+  }
 `;
 
 export const RightSide = styled.div`

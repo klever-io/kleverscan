@@ -17,6 +17,7 @@ import ChevronRight from './chevron-right.svg';
 import Compass from './compass.svg';
 import Copy from './copy.svg';
 import Currency from './currency.svg';
+import Edit from './edit.svg';
 import GooglePlay from './google-play.svg';
 import Graph from './graph.svg';
 import InfoSquare from './info-square.svg';
@@ -92,4 +93,5 @@ export {
   GooglePlay,
   AppGalery,
   QRCode,
+  Edit,
 };

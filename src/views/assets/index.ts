@@ -140,6 +140,9 @@ export const AssetCardHeaderItem = styled(CardHeaderItem)`
 
 export const AssetCardContent = styled(CardContent)`
   background: none;
+  overflow-x: hidden;
+
+  border-radius: unset;
 
   display: grid;
 

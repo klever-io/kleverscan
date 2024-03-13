@@ -1,6 +1,6 @@
 import { queryDirectus } from '@/services/directus';
 import { broadcastTXandCheckStatus } from '@/utils/transaction';
-import { createItem, updateItem } from '@directus/sdk';
+import { updateItem } from '@directus/sdk';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(
@@ -21,7 +21,7 @@ export default async function handler(
   let asset_info;
   try {
     const asset_info_req = await directus.request(
-      createItem('asset_info', body),
+      updateItem('asset_info', body.id, body),
     );
 
     asset_info = asset_info_req.id;

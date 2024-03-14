@@ -17,6 +17,7 @@ export default async function handler(
 
     res.status(200).json(response);
   } catch (error) {
+    console.warn('Api Key: ', process.env.DIRECTUS_API_KEY);
     console.error(error);
     res.status(500).json({ data: null, error, code: 'internal_error' });
   }

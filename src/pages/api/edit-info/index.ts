@@ -63,6 +63,7 @@ export default async function handler(
       return res.status(400).json({ errors: errors });
     }
   } catch (error) {
+    console.warn('Api Key: ', process.env.DIRECTUS_STATIC_TOKEN);
     console.error(error);
     return res.status(400).json({ errors: errors });
   }

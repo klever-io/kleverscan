@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import {
   BannerContainer,
   Button,
@@ -34,8 +35,19 @@ export const LearnBanner: React.FC = () => {
             Join KleverChain and empower your ITO today!
           </Description>
           <Buttons>
-            <Button>Apply for funding</Button>
-            <Button secondary>Create Asset</Button>
+            <Link href="/create-transaction?contract=ConfigITOContract">
+              <Button href="/create-transaction?contract=ConfigITOContract">
+                Apply for funding
+              </Button>
+            </Link>
+            <Link href="/create-transaction?contract=CreateAssetContract">
+              <Button
+                secondary
+                href="/create-transaction?contract=CreateAssetContract"
+              >
+                Create Asset
+              </Button>
+            </Link>
           </Buttons>
         </LeftSide>
 

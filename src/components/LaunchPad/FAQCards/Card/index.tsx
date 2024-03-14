@@ -7,18 +7,20 @@ import {
   Title,
 } from './styles';
 
-export const FAQCard: React.FC<{ title: string; description: string }> = ({
-  title,
-  description,
-}) => {
+export const FAQCard: React.FC<{
+  title: string;
+  description: string;
+  buttonLabel: string;
+  buttonLink: string;
+}> = ({ title, description, buttonLabel, buttonLink }) => {
   return (
     <CardContainer>
       <Content>
         <Title>{title}</Title>
         <Description>{description}</Description>
       </Content>
-      <FAQAction>
-        Learn more <Arrow />
+      <FAQAction href={buttonLink} target="_blank" rel="noopener noreferrer">
+        {buttonLabel} <Arrow />
       </FAQAction>
     </CardContainer>
   );

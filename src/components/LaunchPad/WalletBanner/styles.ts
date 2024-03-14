@@ -37,9 +37,11 @@ export const RightSide = styled.div`
 
   img {
     border-radius: 16px;
-    object-fit: contain;
-
     max-width: 80%;
+
+    @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+      object-fit: contain;
+    }
   }
 `;
 
@@ -67,13 +69,11 @@ export const Label = styled.p`
 export const Title = styled.h1`
   color: ${({ theme }) => theme.black};
   font-weight: 700;
-  font-size: 2.5rem;
-  line-height: 1;
-  letter-spacing: 1px;
+  font-size: 2rem;
 `;
 
 export const Description = styled.p`
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.darkText};
   font-weight: 300;
   font-size: 1.25rem;
   line-height: 1.875rem;

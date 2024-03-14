@@ -5,7 +5,7 @@ import { IAsset, Service } from '@/types';
 import { web } from '@klever/sdk-web';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
   ArrowContainer,
@@ -59,13 +59,25 @@ export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
 
   const shortDescriptionRef = useRef<HTMLTextAreaElement>(null);
 
-  const isEdit = !!defaultValues;
+  const isEdit = !!defaultValues?.short_description;
 
   const { t } = useTranslation('assets');
 
   const closeModal = () => {
     setOpenApplyFormModal(false);
   };
+
+  useEffect(() => {
+    if (isOpenApplyFormModal) {
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.documentElement.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.documentElement.style.overflow = 'unset';
+    };
+  }, [isOpenApplyFormModal]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -102,13 +114,13 @@ export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
       });
 
       setTxHash && setTxHash(res?.hash);
+      refetchAssetInfo();
+      closeModal();
     } catch (error) {
       console.error(error);
       toast.error(error);
     } finally {
       setLoading(false);
-      closeModal();
-      refetchAssetInfo();
     }
   };
 

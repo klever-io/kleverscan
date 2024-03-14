@@ -137,7 +137,7 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
                   type="button"
                   onClick={() => setOpenApplyFormModal(true)}
                 >
-                  Add a description for this asset
+                  Add a description
                 </ParticipateButton>
               ) : null}
               <SocialNetworks>
@@ -154,7 +154,7 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
               </SocialNetworks>
             </LeftSide>
             <RightSide>
-              {asset && ITO && (
+              {asset && ITO && asset.assetType === 'Fungible' && (
                 <AssetITOSummary
                   asset={asset}
                   ITO={ITO}

@@ -7,7 +7,7 @@ import { getPrecision } from '@/utils/precisionFunctions';
 import { web } from '@klever/sdk-web';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
   ArrowContainer,
@@ -57,6 +57,18 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
   const closeModal = () => {
     setOpenParticipateModal(false);
   };
+
+  useEffect(() => {
+    if (isOpenParticipateModal) {
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.documentElement.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.documentElement.style.overflow = 'unset';
+    };
+  }, [isOpenParticipateModal]);
 
   const getOptions = () => {
     return (
@@ -210,12 +222,12 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
 
       setTxHash(response.data.txsHashes[0]);
       toast.success('Transaction successfully broadcasted.');
+      closeModal();
     } catch (e: any) {
       console.warn(`%c ${e}`, 'color: red');
       toast.error(e.message ? e.message : e);
     } finally {
       setLoading(false);
-      closeModal();
     }
   };
 

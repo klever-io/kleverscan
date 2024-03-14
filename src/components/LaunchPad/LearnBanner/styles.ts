@@ -75,33 +75,10 @@ export const Description = styled.p`
   color: ${({ theme }) => theme.darkText};
   font-weight: 300;
   font-size: 1.25rem;
-  line-height: 1.875rem;
-  letter-spacing: 1px;
 `;
 
 export const Buttons = styled.div`
   display: flex;
   gap: 20px;
   margin-top: 20px;
-`;
-
-export const Button = styled.a<{ secondary?: boolean }>`
-  padding: 14px 26px;
-  border-radius: 24px;
-  border: 1px solid ${({ theme }) => theme.violet};
-  background-color: ${({ theme, secondary }) =>
-    !secondary ? theme.violet : 'transparent'};
-  color: ${({ theme, secondary }) =>
-    secondary ? theme.black : theme.true.white};
-
-  cursor: pointer;
-
-  font-weight: 400;
-  font-size: 0.875rem;
-  line-height: 1rem;
-
-  transition: 0.3s;
-  &:hover {
-    filter: brightness(1.2);
-  }
 `;

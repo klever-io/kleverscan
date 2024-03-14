@@ -2,16 +2,15 @@ import { Apple, GooglePlay } from '@/assets/icons';
 import { useMobile } from '@/contexts/mobile';
 import Image from 'next/image';
 import { FaChrome } from 'react-icons/fa';
+import { Button } from '../Banner/styles';
+import { Description, Label, Title } from '../LearnBanner/styles';
 import {
   BannerContainer,
   Content,
-  Description,
-  Label,
   LeftSide,
   Links,
   LinkStyle,
   RightSide,
-  Title,
 } from './styles';
 
 const links = [
@@ -49,14 +48,24 @@ export const WalletBanner: React.FC = () => {
             seamless access across blockchains. Elevate your digital
             assets&apos; visibility and control with Klever Wallet
           </Description>
-          <Links>
-            {links.map((link, index) => (
-              <LinkStyle href={link.href} key={link.href}>
-                {link.icon}
-                {link.text}
-              </LinkStyle>
-            ))}
-          </Links>
+          {!isTablet ? (
+            <Links>
+              {links.map((link, index) => (
+                <LinkStyle href={link.href} key={link.href}>
+                  {link.icon}
+                  {link.text}
+                </LinkStyle>
+              ))}
+            </Links>
+          ) : (
+            <Button
+              href="https://onelink.to/455hxv"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Download Now!
+            </Button>
+          )}
         </LeftSide>
 
         <RightSide>

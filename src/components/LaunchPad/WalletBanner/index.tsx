@@ -1,6 +1,7 @@
-import { AppGalery, Apple, GooglePlay, QRCode } from '@/assets/icons';
+import { Apple, GooglePlay } from '@/assets/icons';
+import { useMobile } from '@/contexts/mobile';
 import Image from 'next/image';
-import Link from 'next/link';
+import { FaChrome } from 'react-icons/fa';
 import {
   BannerContainer,
   Content,
@@ -17,21 +18,23 @@ const links = [
   {
     icon: <Apple />,
     text: 'App Store',
-    href: '#',
+    href: 'https://apps.apple.com/tt/app/klever-wallet/id1615064243',
   },
   {
     icon: <GooglePlay />,
     text: 'Google Play',
-    href: '#',
+    href: 'https://play.google.com/store/apps/details?id=finance.klever.bitcoin.wallet',
   },
   {
-    icon: <AppGalery />,
-    text: 'App Gallery',
-    href: '#',
+    icon: <FaChrome size={20} />,
+    text: 'Web Store',
+    href: 'https://chromewebstore.google.com/detail/klever-wallet/ifclboecfhkjbpmhgehodcjpciihhmif',
   },
 ];
 
 export const WalletBanner: React.FC = () => {
+  const { isTablet } = useMobile();
+
   return (
     <BannerContainer>
       <Content>
@@ -48,16 +51,11 @@ export const WalletBanner: React.FC = () => {
           </Description>
           <Links>
             {links.map((link, index) => (
-              <Link key={index} href={link.href}>
-                <LinkStyle href={link.href}>
-                  {link.icon}
-                  {link.text}
-                </LinkStyle>
-              </Link>
+              <LinkStyle href={link.href} key={link.href}>
+                {link.icon}
+                {link.text}
+              </LinkStyle>
             ))}
-            <LinkStyle>
-              <QRCode />
-            </LinkStyle>
           </Links>
         </LeftSide>
 
@@ -65,8 +63,8 @@ export const WalletBanner: React.FC = () => {
           <Image
             src="/images/crypto-wallet.png"
             alt="Developer pointing to screen"
-            width={400}
-            height={750}
+            width={!isTablet ? 400 : 200}
+            height={!isTablet ? 750 : 375}
           />
         </RightSide>
       </Content>

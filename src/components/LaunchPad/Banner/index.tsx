@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import {
   BannerContainer,
   Button,
@@ -20,8 +21,19 @@ export const LaunchPadBanner: React.FC = () => {
           in the project, offering real value to investors and users.
         </Description>
         <Buttons>
-          <Button>Have a project? Apply here</Button>
-          <Button secondary>Don’t have a project yet? Start here</Button>
+          <Link href="/create-transaction?contract=ConfigITOContract">
+            <Button href="/create-transaction?contract=ConfigITOContract">
+              Have a project? Apply here!
+            </Button>
+          </Link>
+          <Link href="/create-transaction?contract=CreateAssetContract">
+            <Button
+              secondary
+              href="/create-transaction?contract=CreateAssetContract"
+            >
+              Don’t have a project yet? Start here!
+            </Button>
+          </Link>
         </Buttons>
       </Content>
     </BannerContainer>

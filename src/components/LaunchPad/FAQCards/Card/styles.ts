@@ -14,7 +14,7 @@ export const Content = styled.div`
 `;
 
 export const Description = styled.p`
-  color: ${({ theme }) => theme.secondaryText};
+  color: ${({ theme }) => theme.darkText};
   font-weight: 400;
   font-size: 0.875rem;
   line-height: 1rem;
@@ -26,7 +26,7 @@ export const CardContainer = styled.div`
 
   width: 100%;
   max-height: 190px;
-  max-width: 420px;
+  width: 425px;
   aspect-ratio: 2.26;
 
   padding-top: 29px;
@@ -45,6 +45,8 @@ export const FAQAction = styled.a`
   font-size: 0.75rem;
   line-height: 0.875rem;
   text-decoration: none;
+
+  margin-top: auto;
 
   display: flex;
   align-items: end;

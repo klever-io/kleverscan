@@ -20,6 +20,7 @@ export const Content = styled.div`
 
   display: flex;
   flex-direction: column-reverse;
+  align-items: center;
   justify-content: space-between;
   gap: 32px;
 
@@ -67,13 +68,11 @@ export const Label = styled.p`
 export const Title = styled.h1`
   color: ${({ theme }) => theme.black};
   font-weight: 700;
-  font-size: 2.5rem;
-  line-height: 1;
-  letter-spacing: 1px;
+  font-size: 2rem;
 `;
 
 export const Description = styled.p`
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.darkText};
   font-weight: 300;
   font-size: 1.25rem;
   line-height: 1.875rem;
@@ -86,7 +85,7 @@ export const Buttons = styled.div`
   margin-top: 20px;
 `;
 
-export const Button = styled.button<{ secondary?: boolean }>`
+export const Button = styled.a<{ secondary?: boolean }>`
   padding: 14px 26px;
   border-radius: 24px;
   border: 1px solid ${({ theme }) => theme.violet};

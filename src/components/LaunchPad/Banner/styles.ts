@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export const BannerContainer = styled.div`
   display: flex;
@@ -18,12 +18,25 @@ export const BannerContainer = styled.div`
     position: absolute;
     width: 100%;
 
+    top: 0;
     right: 0;
 
     min-height: 40vh;
 
     background-image: url('/images/launchpad-banner.png');
     background-size: cover;
+    /* creata a opacity mastk from top to bottom start at 80% of the image */
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 1) 90%,
+      rgba(0, 0, 0, 0) 100%
+    );
+
+    ${({ theme }) =>
+      !theme.dark &&
+      css`
+        filter: invert(100%) hue-rotate(180deg);
+      `};
 
     @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
       min-height: 60vh;
@@ -51,7 +64,7 @@ export const Content = styled.div`
 `;
 
 export const Title = styled.h1`
-  color: ${({ theme }) => theme.true.white};
+  color: ${({ theme }) => theme.black};
   font-weight: 700;
   font-size: 3.75rem;
   line-height: 1;
@@ -71,8 +84,8 @@ export const Title = styled.h1`
 export const Description = styled.p`
   color: ${({ theme }) => theme.darkText};
   font-weight: 300;
-  font-size: 1.5rem;
-  line-height: 1.875rem;
+  font-size: 1.25rem;
+  line-height: 1.5rem;
   letter-spacing: 1px;
 
   @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
@@ -88,7 +101,7 @@ export const Buttons = styled.div`
   width: 100%;
 `;
 
-export const Button = styled.button<{ secondary?: boolean }>`
+export const Button = styled.a<{ secondary?: boolean }>`
   padding: 14px 26px;
   border-radius: 24px;
   border: 1px solid ${({ theme }) => theme.violet};

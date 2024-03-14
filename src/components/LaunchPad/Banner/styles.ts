@@ -103,14 +103,18 @@ export const Buttons = styled.div`
 
 export const Button = styled.a<{ secondary?: boolean }>`
   padding: 14px 26px;
+
   border-radius: 24px;
   border: 1px solid ${({ theme }) => theme.violet};
+
   background-color: ${({ theme, secondary }) =>
     !secondary ? theme.violet : 'transparent'};
   color: ${({ theme, secondary }) =>
     secondary ? theme.black : theme.true.white};
 
   cursor: pointer;
+
+  text-align: center;
 
   font-weight: 400;
   font-size: 0.875rem;

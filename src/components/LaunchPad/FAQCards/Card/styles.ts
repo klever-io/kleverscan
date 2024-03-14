@@ -11,6 +11,8 @@ export const Content = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
+
+  width: 100%;
 `;
 
 export const Description = styled.p`
@@ -24,9 +26,9 @@ export const CardContainer = styled.div`
   background-image: url('/images/faq_card.svg');
   background-size: cover;
 
-  width: 100%;
-  max-height: 190px;
   width: 425px;
+  max-width: 100%;
+  min-height: 0;
   aspect-ratio: 2.26;
 
   padding-top: 29px;

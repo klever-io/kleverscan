@@ -18,6 +18,7 @@ export const Content = styled.div`
 
   padding-top: 72px;
 
+  width: 100%;
   display: flex;
   flex-direction: column-reverse;
   justify-content: space-between;
@@ -57,27 +58,6 @@ export const LeftSide = styled.div`
     max-width: 50%;
     justify-content: flex-start;
   }
-`;
-
-export const Label = styled.p`
-  color: ${({ theme }) => theme.violet};
-  font-weight: 800;
-  font-size: 1.125rem;
-  line-height: 1.875rem;
-`;
-
-export const Title = styled.h1`
-  color: ${({ theme }) => theme.black};
-  font-weight: 700;
-  font-size: 2rem;
-`;
-
-export const Description = styled.p`
-  color: ${({ theme }) => theme.darkText};
-  font-weight: 300;
-  font-size: 1.25rem;
-  line-height: 1.875rem;
-  letter-spacing: 1px;
 `;
 
 export const Links = styled.div`

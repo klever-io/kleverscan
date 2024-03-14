@@ -1,8 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { Button } from '../Banner/styles';
 import {
   BannerContainer,
-  Button,
   Buttons,
   Content,
   Description,

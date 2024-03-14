@@ -79,8 +79,8 @@ const navbarItems: INavbarItem[] = [
         Icon: Graph,
       },
       {
-        name: 'LaunchPad',
-        pathTo: '/launchpad',
+        name: 'ITOs',
+        pathTo: '/ito',
         Icon: GiTwoCoins,
       },
       {

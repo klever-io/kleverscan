@@ -94,7 +94,8 @@ export const Button = styled.button<{ secondary?: boolean }>`
   border: 1px solid ${({ theme }) => theme.violet};
   background-color: ${({ theme, secondary }) =>
     !secondary ? theme.violet : 'transparent'};
-  color: ${({ theme }) => theme.true.white};
+  color: ${({ theme, secondary }) =>
+    secondary ? theme.black : theme.true.white};
 
   cursor: pointer;
 

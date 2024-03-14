@@ -359,7 +359,7 @@ export const MobileBackground = styled.div<IMobileMenu>`
 
   position: fixed;
 
-  z-index: 6;
+  z-index: 7;
   opacity: ${props => (props.opened ? 1 : 0)};
   visibility: ${props => (props.opened ? 'visible' : 'hidden')};
 

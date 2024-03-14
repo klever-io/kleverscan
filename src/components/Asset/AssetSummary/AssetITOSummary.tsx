@@ -95,12 +95,14 @@ export const AssetITOSummary: React.FC<AssetITOProps> = ({
                 : `1  ${asset?.ticker} = ${bestAssetKLVRate} KLV`}
             </DetailsValue>
           </Rate>
-          <EndTime>
-            <Label>Remaining Time</Label>
-            <DetailsValue>
-              {secondsToMonthDayHourMinSec(remainingTime)}
-            </DetailsValue>
-          </EndTime>
+          {ITO?.endTime && (
+            <EndTime>
+              <Label>Remaining Time</Label>
+              <DetailsValue>
+                {secondsToMonthDayHourMinSec(remainingTime)}
+              </DetailsValue>
+            </EndTime>
+          )}
         </DetailsRow>
 
         <ParticipateButton

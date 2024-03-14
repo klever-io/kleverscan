@@ -203,7 +203,7 @@ const Contract: React.FC<IContract> = ({
           onChange={changeHandler}
           isDisabled={true}
           title={'Contract'}
-          zIndex={5}
+          zIndex={6}
           isModal={false}
         />
       )}

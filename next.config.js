@@ -54,4 +54,18 @@ module.exports = withImages({
   typescript: {
     ignoreBuildErrors: process.env?.IS_PRODUCTION === 'true',
   },
+  redirects: async () => {
+    return [
+      {
+        source: '/itos',
+        destination: '/ito',
+        permanent: true,
+      },
+      {
+        source: '/launchpad',
+        destination: '/ito',
+        permanent: true,
+      },
+    ];
+  },
 });

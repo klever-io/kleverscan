@@ -3,20 +3,13 @@ import styled from 'styled-components';
 export const BannerContainer = styled.div`
   display: flex;
   align-items: center;
-  padding: 0 114px 56px;
 
   min-height: 60vh;
-
-  @media (max-width: 768px) {
-    padding: 10px;
-  }
 `;
 
 export const Content = styled.div`
   position: relative;
   z-index: 1;
-
-  padding-top: 72px;
 
   width: 100%;
   display: flex;

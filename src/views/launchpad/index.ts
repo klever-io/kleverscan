@@ -14,8 +14,15 @@ export const ITOContainer = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
   user-select: none;
+  gap: 80px;
+
+  padding-top: 40px;
+
+  @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    padding-top: 80px;
+    gap: 160px;
+  }
 `;
 
 export const TableHeader = styled.div`
@@ -33,13 +40,7 @@ export const TableTitle = styled.h2`
   font-weight: 700;
 `;
 
-export const TableContainer = styled.div`
-  padding: 2%;
-
-  @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: 70px;
-  }
-`;
+export const TableContainer = styled.div``;
 
 export const ParticipateButton = styled.a`
   display: flex;

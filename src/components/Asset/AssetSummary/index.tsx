@@ -11,6 +11,7 @@ import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import { assetInfoCall } from '@/services/requests/asset';
 import { IParsedITO } from '@/types';
+import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
@@ -32,9 +33,11 @@ import {
   Header,
   LeftSide,
   LinkStyles,
+  PageTitle,
   ParticipateButton,
   RightSide,
   SocialNetworks,
+  TitleContainer,
 } from './styles';
 
 export interface AssetSummaryProps extends AssetProps {
@@ -51,6 +54,8 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
   const router = useRouter();
   const { walletAddress, connectExtension, extensionInstalled } =
     useExtension();
+
+  const { t } = useTranslation(['common', 'assets', 'table']);
 
   const getSocialNetworks = useCallback(() => {
     const availableSocialNetworks = Object.keys(SocialIcons).map(key => key);
@@ -102,32 +107,34 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
           {txHash && <HashComponent {...hashProps} />}
           <Header>
             <LeftSide>
-              <Title
-                key={asset?.assetId}
-                Component={() => (
-                  <>
-                    <AssetLogo
-                      logo={asset?.logo || ''}
-                      ticker={asset?.ticker || ''}
-                      name={asset?.name || ''}
-                      verified={asset?.verified}
-                      size={56}
-                    />
-                    <AssetTitle>
-                      <AssetHeaderContainer>
-                        <h1>{asset?.name}</h1>
-                        <AssetSubtitle>
-                          {asset?.assetId}
-                          <AssetTypeContainer>
-                            {asset?.assetType}
-                          </AssetTypeContainer>
-                        </AssetSubtitle>
-                      </AssetHeaderContainer>
-                    </AssetTitle>
-                  </>
-                )}
-                route={-1}
-              />
+              <TitleContainer>
+                <Title
+                  key={asset?.assetId}
+                  Component={() => (
+                    <PageTitle>{t('common:Titles.Asset')}</PageTitle>
+                  )}
+                />
+
+                <AssetTitle>
+                  <AssetLogo
+                    logo={asset?.logo || ''}
+                    ticker={asset?.ticker || ''}
+                    name={asset?.name || ''}
+                    verified={asset?.verified}
+                    size={56}
+                  />
+                  <AssetHeaderContainer>
+                    <h1>{asset?.name}</h1>
+                    <AssetSubtitle>
+                      {asset?.assetId}
+                      <AssetTypeContainer>
+                        {asset?.assetType}
+                      </AssetTypeContainer>
+                    </AssetSubtitle>
+                  </AssetHeaderContainer>
+                </AssetTitle>
+              </TitleContainer>
+
               <>
                 {asset_info?.short_description ? (
                   <Description>{asset_info?.short_description}</Description>

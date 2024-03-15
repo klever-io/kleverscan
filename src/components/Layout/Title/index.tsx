@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { Container, StyledArrow } from './styles';
+import { Container, IconContainer, StyledArrow } from './styles';
 
 interface ITitle {
   title?: string;
@@ -19,7 +19,7 @@ const Title: React.FC<ITitle> = ({
   const router = useRouter();
   return (
     <Container>
-      <div
+      <IconContainer
         onClick={() => {
           if (route === -1) {
             router.back();
@@ -29,7 +29,7 @@ const Title: React.FC<ITitle> = ({
         }}
       >
         <StyledArrow />
-      </div>
+      </IconContainer>
       {Icon && isAccountOwner && <Icon />}
       {title && <h1>{title}</h1>}
       {Component && <Component />}

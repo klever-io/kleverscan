@@ -7,13 +7,19 @@ export const Container = styled.div`
   flex-direction: row;
   align-items: center;
 
-  gap: 1.5rem;
+  gap: 16px;
 
   color: ${props => props.theme.black};
 
   > div:first-of-type {
     cursor: pointer;
   }
+`;
+
+export const IconContainer = styled.div`
+  display: grid;
+  place-items: center;
+  cursor: pointer;
 `;
 
 export const StyledArrow = styled(ArrowLeft)`

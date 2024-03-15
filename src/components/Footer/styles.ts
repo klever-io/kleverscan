@@ -24,9 +24,10 @@ export const Content = styled.div`
   display: flex;
   justify-content: center;
   flex-direction: row;
-  gap: 4rem;
+  gap: 24px;
   flex-direction: column;
   text-align: center;
+
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: row;
     justify-content: center;
@@ -128,6 +129,7 @@ export const LinksContainer = styled.div`
 
   flex-direction: column;
   flex: 0 0 20%;
+
   :nth-child(-n + 4) {
     border-bottom: 1px solid #222345;
   }
@@ -135,8 +137,8 @@ export const LinksContainer = styled.div`
     :nth-child(-n + 4) {
       border-bottom: 0;
     }
-    height: 10rem;
-    flex: 0 0 18rem;
+    min-height: 300px;
+    min-width: 200px;
   }
 `;
 

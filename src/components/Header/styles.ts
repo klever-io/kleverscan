@@ -47,7 +47,7 @@ export const Content = styled.div<{ isMainNet?: boolean }>`
   position: relative;
   justify-content: space-between;
   gap: 1.5rem;
-  max-width: ${props => props.theme.maxWidth};
+  max-width: ${props => props.theme.headerMaxWidth};
   margin: 0 auto;
   padding: 0.75rem 1.5rem;
 `;

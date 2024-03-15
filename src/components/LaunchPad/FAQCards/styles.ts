@@ -7,9 +7,4 @@ export const FAQContainer = styled.div`
   row-gap: 24px;
 
   width: 100%;
-  padding: 54px;
-
-  @media screen and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: 0;
-  }
 `;

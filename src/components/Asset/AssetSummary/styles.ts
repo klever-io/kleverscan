@@ -1,5 +1,15 @@
 import styled, { css } from 'styled-components';
 
+export const TitleContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+`;
+
+export const PageTitle = styled.h1`
+  font-size: 1.25rem !important;
+`;
+
 export const AssetTitle = styled.div`
   display: flex;
   flex-direction: row;
@@ -65,7 +75,6 @@ export const AssetTypeContainer = styled.div`
 export const AssetSubtitle = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 24px;
 `;
 
@@ -116,7 +125,7 @@ export const About = styled.div`
   }
 
   p {
-    color: ${({ theme }) => theme.lightGray};
+    color: ${({ theme }) => theme.darkText};
     font-size: 1rem;
     font-weight: 400;
     line-height: 1.5;
@@ -142,7 +151,7 @@ export const LeftSide = styled.div`
 `;
 
 export const Description = styled.p`
-  color: ${({ theme }) => theme.lightGray};
+  color: ${({ theme }) => theme.darkText};
 
   font-size: 1rem;
   font-weight: 500;
@@ -193,6 +202,20 @@ export const BackgroundImage = styled.div`
   top: 50%;
   left: 50%;
   transform: translateY(-40%) translateX(-50%);
+
+  img {
+    mask-image: linear-gradient(
+        to top,
+        transparent 0%,
+        white 10% 90%,
+        transparent 100%
+      ),
+      linear-gradient(to left, transparent 0%, white 10% 90%, transparent 100%);
+
+    mask-position: center;
+    mask-repeat: no-repeat;
+    mask-composite: intersect;
+  }
 `;
 
 export const Title = styled.h3`
@@ -260,6 +283,7 @@ export const ProgressBar = styled.div`
   width: 100%;
   height: 8px;
   background-color: ${({ theme }) => theme.lightGray};
+  color: ${({ theme }) => theme.darkText};
   border-radius: 4px;
 `;
 

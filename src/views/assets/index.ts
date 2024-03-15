@@ -113,10 +113,6 @@ export const ContainerAssetName = styled(ContainerAssetId)`
 export const AssetPageContainer = styled(Container)`
   max-width: 1440px;
   margin: 0 auto;
-
-  @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: 0 98px;
-  }
 `;
 
 export const AssetCardHeaderItem = styled(CardHeaderItem)`

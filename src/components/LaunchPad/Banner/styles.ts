@@ -3,14 +3,12 @@ import styled, { css } from 'styled-components';
 export const BannerContainer = styled.div`
   display: flex;
   align-items: center;
-  padding: 56px 0;
 
   min-height: 40vh;
 
   @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     min-height: 60vh;
     max-height: 665px;
-    padding: 0 114px 56px;
   }
 
   &::before {
@@ -49,8 +47,6 @@ export const Content = styled.div`
   z-index: 1;
   max-width: 100%;
 
-  padding-top: 10px;
-
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -59,7 +55,6 @@ export const Content = styled.div`
 
   @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     max-width: 50%;
-    padding-top: 72px;
   }
 `;
 

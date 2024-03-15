@@ -6,12 +6,9 @@ export const FAQContainer = styled.div`
   display: flex;
   justify-content: space-between;
 
-  padding: 0 114px;
-
   gap: 150px;
 
   @media screen and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: 10px;
     align-items: center;
     flex-direction: column;
     gap: 16px;

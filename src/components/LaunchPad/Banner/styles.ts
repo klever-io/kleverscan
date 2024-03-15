@@ -107,10 +107,15 @@ export const Button = styled.a<{ secondary?: boolean }>`
   border-radius: 24px;
   border: 1px solid ${({ theme }) => theme.violet};
 
-  background-color: ${({ theme, secondary }) =>
-    !secondary ? theme.violet : 'transparent'};
-  color: ${({ theme, secondary }) =>
-    secondary ? theme.black : theme.true.white};
+  background-color: ${({ theme }) => theme.violet};
+  color: ${({ theme }) => theme.true.white};
+
+  ${({ theme, secondary }) =>
+    secondary &&
+    css`
+      background-color: transparent;
+      color: ${theme.black};
+    `}
 
   cursor: pointer;
 

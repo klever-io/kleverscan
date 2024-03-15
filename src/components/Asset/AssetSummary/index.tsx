@@ -103,6 +103,7 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
           <Header>
             <LeftSide>
               <Title
+                key={asset?.assetId}
                 Component={() => (
                   <>
                     <AssetLogo
@@ -134,9 +135,11 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
               walletAddress &&
               asset?.ownerAddress === walletAddress ? (
                 <ParticipateButton
+                  secondary
                   type="button"
                   onClick={() => setOpenApplyFormModal(true)}
                 >
+                  <Edit />
                   Add a description
                 </ParticipateButton>
               ) : null}

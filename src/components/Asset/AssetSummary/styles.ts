@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export const AssetTitle = styled.div`
   display: flex;
@@ -81,6 +81,7 @@ export const Header = styled.div`
   justify-content: space-between;
   align-items: center;
   flex-direction: column;
+  gap: 24px;
   padding-top: 20px;
 
   h1 {
@@ -185,13 +186,13 @@ export const BackgroundImage = styled.div`
 
   object-fit: cover;
 
+  width: 550px;
+  height: 450px;
+
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translateY(-40%) translateX(-50%);
-
-  width: 550px;
-  height: 450px;
 `;
 
 export const Title = styled.h3`
@@ -293,13 +294,17 @@ export const EndTime = styled.div`
   gap: 8px;
 `;
 
-export const ParticipateButton = styled.button`
+export const ParticipateButton = styled.button<{ secondary?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
 
   padding: 14px 0;
   border-radius: 24px;
+
+  border-radius: 24px;
+  border: 1px solid ${({ theme }) => theme.violet};
 
   background-color: ${({ theme }) => theme.violet};
   color: ${({ theme }) => theme.true.white} !important;
@@ -315,4 +320,11 @@ export const ParticipateButton = styled.button`
   &:hover {
     filter: brightness(1.2);
   }
+
+  ${({ theme, secondary }) =>
+    secondary &&
+    css`
+      background-color: transparent;
+      color: ${theme.black};
+    `}
 `;

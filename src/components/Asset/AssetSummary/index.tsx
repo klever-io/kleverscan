@@ -128,21 +128,24 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
                 )}
                 route={-1}
               />
-              {asset_info?.short_description ? (
-                <Description>{asset_info?.short_description}</Description>
-              ) : null}
-              {!asset_info?.short_description &&
-              walletAddress &&
-              asset?.ownerAddress === walletAddress ? (
-                <ParticipateButton
-                  secondary
-                  type="button"
-                  onClick={() => setOpenApplyFormModal(true)}
-                >
-                  <Edit />
-                  Add a description
-                </ParticipateButton>
-              ) : null}
+              <>
+                {asset_info?.short_description ? (
+                  <Description>{asset_info?.short_description}</Description>
+                ) : null}
+                {!asset_info?.short_description &&
+                walletAddress &&
+                asset?.ownerAddress === walletAddress ? (
+                  <ParticipateButton
+                    secondary
+                    type="button"
+                    onClick={() => setOpenApplyFormModal(true)}
+                  >
+                    <Edit />
+                    Add a description
+                  </ParticipateButton>
+                ) : null}
+              </>
+
               <SocialNetworks>
                 {getSocialNetworks().map(social => (
                   <LinkStyles
@@ -168,9 +171,10 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
                 <BackgroundImage>
                   <Image
                     src={asset?.logo || ''}
-                    alt={asset?.name}
+                    alt=""
                     width={550}
                     height={450}
+                    loader={({ src, width }) => `${src}?w=${width}`}
                   />
                 </BackgroundImage>
               )}

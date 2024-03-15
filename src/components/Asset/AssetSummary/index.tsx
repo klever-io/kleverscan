@@ -103,6 +103,7 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
           <Header>
             <LeftSide>
               <Title
+                key={asset?.assetId}
                 Component={() => (
                   <>
                     <AssetLogo

@@ -1,7 +1,6 @@
 import { DefaultCardStyles } from '@/styles/common';
 import { transparentize } from 'polished';
 import styled, { css, keyframes } from 'styled-components';
-import widths from './widths';
 
 interface IStatus {
   status: string;
@@ -43,23 +42,15 @@ export const ContainerView = styled.div`
   margin-top: 1rem;
 `;
 
-export const Container = styled.div`
+export const TableBody = styled.div<{ cols: number }>`
   min-width: fit-content;
-`;
 
-export const Header = styled.div<ITableType>`
-  display: ${props => (props.haveData ? 'flex' : 'none')};
-  padding: 1rem 1.5rem;
+  display: grid;
+  grid-template-columns: ${props => `repeat(${props.cols}, 1fr)`};
+  column-width: 236px;
+  row-gap: 36px;
 
-  min-width: 100%;
-
-  color: ${props => props.theme.darkText};
-  font-weight: 600;
-  font-size: 0.85rem;
-
-  span {
-    ${props => widths[props.type]}
-  }
+  color: white;
 `;
 
 export const Row = styled.div<ITableType>`
@@ -75,20 +66,12 @@ export const Row = styled.div<ITableType>`
 
   width: 100%;
 
-  > span,
-  > a {
-    @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
-      ${props => props.rowSections && widths[props.type]};
-    }
-  }
   span,
   a {
     text-overflow: ellipsis;
     white-space: nowrap;
 
     color: ${props => props.theme.black};
-
-    ${props => !props.rowSections && widths[props.type]};
 
     a {
       color: ${props => props.theme.black};

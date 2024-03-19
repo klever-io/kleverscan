@@ -16,15 +16,12 @@ import Tooltip from '../Tooltip';
 import ExportButton from './ExportButton';
 import {
   BackTopButton,
-  Body,
   ButtonsContainer,
-  Container,
   ContainerView,
   EmptyRow,
   ExportContainer,
   ExportLabel,
   FloatContainer,
-  Header,
   IoReloadSharpWrapper,
   ITableType,
   ItemContainer,
@@ -33,7 +30,7 @@ import {
   MobileCardItem,
   MobileHeader,
   RetryContainer,
-  Row,
+  TableBody,
 } from './styles';
 
 export interface ITable {
@@ -231,71 +228,56 @@ const Table: React.FC<ITable> = ({
           </FloatContainer>
         )}
       <ContainerView>
-        <Container>
+        <TableBody cols={header.length}>
           {((!isMobile && !isTablet) || !rowSections) &&
             !!response?.items?.length && (
-              <Header {...props} key={String(header)}>
+              <React.Fragment {...props} key={String(header)}>
                 {header.map((item, index) => {
                   return <span key={JSON.stringify(item)}>{item}</span>;
                 })}
-              </Header>
+              </React.Fragment>
             )}
-          <Body {...props} data-testid="table-body" autoUpdate={!!interval}>
-            {isLoading && (
-              <>
-                {Array(limit)
-                  .fill(limit)
-                  .map((_, index) => (
-                    <Row key={String(index)} {...props}>
-                      {header.map((item, index2) => (
-                        <span key={JSON.stringify(item) + String(index2)}>
-                          <Skeleton width="100%" />
-                        </span>
-                      ))}
-                    </Row>
-                  ))}
-              </>
-            )}
-            {response?.items &&
-              response?.items?.length > 0 &&
-              response?.items?.map((item: any, index: number) => {
-                let spanCount = 0;
-                return (
-                  <React.Fragment key={JSON.stringify(item) + String(index)}>
-                    {rowSections && (
-                      <Row
-                        key={JSON.stringify(item) + String(index)}
-                        {...props}
-                        rowSections={true}
-                      >
-                        {rowSections(item)?.map(({ element, span }, index2) => {
-                          const [updatedSpanCount, isRightAligned] =
-                            processRowSectionsLayout(spanCount, span);
-                          spanCount = updatedSpanCount;
-                          return (
-                            <MobileCardItem
-                              isAssets={
-                                type === 'assets' || type === 'proposals'
-                              }
-                              isRightAligned={
-                                (isMobile || isTablet) && isRightAligned
-                              }
-                              key={String(index2) + String(index)}
-                              columnSpan={span}
-                            >
-                              {isMobile || isTablet ? (
-                                <MobileHeader>{header[index2]}</MobileHeader>
-                              ) : null}
-                              {element}
-                            </MobileCardItem>
-                          );
-                        })}
-                      </Row>
-                    )}
+          {isLoading && (
+            <>
+              {Array(limit)
+                .fill(limit)
+                .map((_, index) => (
+                  <React.Fragment key={String(index)} {...props}>
+                    {header.map((item, index2) => (
+                      <span key={JSON.stringify(item) + String(index2)}>
+                        <Skeleton width="100%" />
+                      </span>
+                    ))}
                   </React.Fragment>
-                );
-              })}
-          </Body>
+                ))}
+            </>
+          )}
+          {response?.items &&
+            response?.items?.length > 0 &&
+            response?.items?.map((item: any, index: number) => {
+              let spanCount = 0;
+              return (
+                rowSections &&
+                rowSections(item)?.map(({ element, span }, index2) => {
+                  const [updatedSpanCount, isRightAligned] =
+                    processRowSectionsLayout(spanCount, span);
+                  spanCount = updatedSpanCount;
+                  return (
+                    <MobileCardItem
+                      isAssets={type === 'assets' || type === 'proposals'}
+                      isRightAligned={(isMobile || isTablet) && isRightAligned}
+                      key={String(index2) + String(index)}
+                      columnSpan={span}
+                    >
+                      {isMobile || isTablet ? (
+                        <MobileHeader>{header[index2]}</MobileHeader>
+                      ) : null}
+                      {element}
+                    </MobileCardItem>
+                  );
+                })
+              );
+            })}
 
           {!isFetching && (!response?.items || response?.items?.length === 0) && (
             <>
@@ -308,7 +290,7 @@ const Table: React.FC<ITable> = ({
               </EmptyRow>
             </>
           )}
-        </Container>
+        </TableBody>
         <BackTopButton onClick={handleScrollTop} isHidden={scrollTop}>
           <BsFillArrowUpCircleFill />
         </BackTopButton>

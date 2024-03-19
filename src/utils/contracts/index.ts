@@ -447,14 +447,11 @@ export const filteredSections = (
 };
 
 export const initialsTableHeaders = [
-  'Hash',
-  'Block',
-  'Created',
-  'From',
-  '',
-  'To',
-  'Status',
-  'Contract',
+  'Transaction Hash',
+  'Block/Fees',
+  'From/To',
+  'Type/Amount',
+  'Misc',
 ];
 
 export enum contractTableHeaders {

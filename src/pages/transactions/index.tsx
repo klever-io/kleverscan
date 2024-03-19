@@ -1,4 +1,3 @@
-import { ArrowRight } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import { Transactions as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
@@ -8,13 +7,10 @@ import DateFilter, {
 } from '@/components/DateFilter';
 import Title from '@/components/Layout/Title';
 import { MultiContractToolTip } from '@/components/MultiContractToolTip';
-import Table, { ITable } from '@/components/Table';
-import { Status } from '@/components/Table/styles';
+import Table, { ITable } from '@/components/TableV2';
 import TransactionsFilters from '@/components/TransactionsFilters';
-import { FilterContainer } from '@/components/TransactionsFilters/styles';
-import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
-import { CenteredRow, Container, Header } from '@/styles/common';
+import { CenteredRow, Container, DoubleRow, Header } from '@/styles/common';
 import { setQueryAndRouter } from '@/utils';
 import { capitalizeString } from '@/utils/convertString';
 import { formatAmount, formatDate } from '@/utils/formatFunctions';
@@ -135,9 +131,8 @@ export const requestTransactionsDefault = async (
 
 const Transactions: React.FC = () => {
   const router = useRouter();
-  const { isMobile } = useMobile();
 
-  const defaultHeader = [...initialsTableHeaders, 'kApp Fee', 'Bandwidth Fee'];
+  const defaultHeader = [...initialsTableHeaders];
   const queryHeader = getHeaderForTable(router, defaultHeader);
   const getContractType = useCallback(contractTypes, []);
   const getFilteredSections = (
@@ -177,7 +172,7 @@ const Transactions: React.FC = () => {
     } = props;
 
     const StatusIcon = getStatusIcon(status);
-    let toAddress = '--';
+    let toAddress = '- -';
     const contractType = getContractType(contract);
 
     if (contractType === Contract.Transfer) {
@@ -189,71 +184,72 @@ const Transactions: React.FC = () => {
     const sections = [
       {
         element: (
-          <CenteredRow className="bucketIdCopy" key={hash}>
-            <Link href={`/transaction/${hash}`}>{parseAddress(hash, 24)}</Link>
-            <Copy info="TXHash" data={hash} />
-          </CenteredRow>
+          <DoubleRow key={hash}>
+            <CenteredRow className="bucketIdCopy">
+              <Link href={`/transaction/${hash}`}>
+                {parseAddress(hash, 24)}
+              </Link>
+              <Copy info="TXHash" data={hash} />
+            </CenteredRow>
+            <CenteredRow>
+              <div>{formatDate(timestamp)}</div>
+              <div>{capitalizeString(status)}</div>
+            </CenteredRow>
+          </DoubleRow>
         ),
         span: 2,
       },
       {
         element: (
-          <Link href={`/block/${blockNum || 0}`} key={blockNum}>
-            <a className="address">{blockNum || 0}</a>
-          </Link>
-        ),
-        span: 1,
-      },
+          <DoubleRow key={blockNum}>
+            <Link href={`/block/${blockNum || 0}`}>
+              <a className="address">{blockNum || 0}</a>
+            </Link>
 
-      {
-        element: <small key={timestamp}>{formatDate(timestamp)}</small>,
-        span: 1,
-      },
-      {
-        element: (
-          <Link href={`/account/${sender}`} key={sender}>
-            <a className="address">{parseAddress(sender, 16)}</a>
-          </Link>
+            <strong>
+              {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
+            </strong>
+          </DoubleRow>
         ),
         span: 1,
       },
-      { element: !isMobile ? <ArrowRight /> : <></>, span: -1 },
-      {
-        element: toAddressSectionElement(toAddress),
-        span: 1,
-      },
       {
         element: (
-          <Status status={status} key={status}>
-            <StatusIcon />
-            <span>{capitalizeString(status)}</span>
-          </Status>
+          <DoubleRow key={sender}>
+            <Link href={`/account/${sender}`}>
+              <a className="address">{parseAddress(sender, 16)}</a>
+            </Link>
+            {toAddressSectionElement(toAddress)}
+          </DoubleRow>
         ),
         span: 1,
       },
       {
         element:
           contractType === 'Multi contract' ? (
-            <MultiContractToolTip
-              contract={contract}
-              contractType={contractType}
-            />
+            <DoubleRow>
+              <MultiContractToolTip
+                contract={contract}
+                contractType={contractType}
+              />
+              <CenteredRow>- -</CenteredRow>
+            </DoubleRow>
           ) : (
-            <strong key={contractType}>{ContractsName[contractType]}</strong>
+            <DoubleRow>
+              <CenteredRow key={contractType}>
+                {ContractsName[contractType]}
+              </CenteredRow>
+              <CenteredRow>amount</CenteredRow>
+            </DoubleRow>
           ),
         span: 1,
       },
       {
         element: contractType ? (
-          <strong>{formatAmount(kAppFee / 10 ** KLV_PRECISION)}</strong>
-        ) : (
-          <></>
-        ),
-        span: 1,
-      },
-      {
-        element: !router.query.type ? (
-          <strong>{formatAmount(bandwidthFee / 10 ** KLV_PRECISION)}</strong>
+          <DoubleRow>
+            <strong>misc 1</strong>
+            <strong>misc 2</strong>
+          </DoubleRow>
         ) : (
           <></>
         ),
@@ -268,15 +264,6 @@ const Transactions: React.FC = () => {
       sections.push(...filteredContract);
     }
     return sections;
-  };
-
-  const tableProps: ITable = {
-    type: 'transactions',
-    header: queryHeader,
-    rowSections,
-    dataName: 'transactions',
-    scrollUp: true,
-    request: (page, limit) => requestTransactionsDefault(page, limit, router),
   };
 
   const resetDate = () => {
@@ -306,20 +293,35 @@ const Transactions: React.FC = () => {
     setQuery: setQueryAndRouter,
   };
 
-  return (
-    <Container>
-      <Header>
-        <Title title="Transactions" Icon={Icon} />
-      </Header>
-
-      <FilterContainer>
+  const Filters = () => {
+    return (
+      <>
         <TransactionsFilters
           {...transactionsFiltersProps}
         ></TransactionsFilters>
         <FilterByDate>
           <DateFilter {...dateFilterProps} />
         </FilterByDate>
-      </FilterContainer>
+      </>
+    );
+  };
+
+  const tableProps: ITable = {
+    type: 'transactions',
+    header: queryHeader,
+    rowSections,
+    dataName: 'transactions',
+    scrollUp: true,
+    request: (page, limit) => requestTransactionsDefault(page, limit, router),
+    Filters,
+  };
+
+  return (
+    <Container>
+      <Header>
+        <Title title="Transactions" Icon={Icon} />
+      </Header>
+
       <Table {...tableProps} />
     </Container>
   );

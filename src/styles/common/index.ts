@@ -238,6 +238,13 @@ export const RowContent = styled.div`
   min-width: 30%;
 `;
 
+export const DoubleRow = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+`;
+
 export const CenteredRow = styled.div`
   display: flex;
   align-items: center;

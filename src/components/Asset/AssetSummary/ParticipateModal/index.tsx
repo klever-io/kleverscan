@@ -100,12 +100,12 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
       ] as IPackItem[]);
 
     if (qtyPacks === 1) {
-      return amount / packs[0].price;
+      return amount * packs[0].price;
     } else if (qtyPacks === 2) {
       if (amount >= 0 && amount <= packs[0].amount) {
-        return amount / packs[0].price;
+        return amount * packs[0].price;
       } else if (amount >= packs[1].price) {
-        return amount / packs[1].price;
+        return amount * packs[1].price;
       }
     }
 
@@ -127,9 +127,9 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
 
     if (!priceIndex) {
       priceIndex = packs.length - 1;
-      cost = amount / packs[priceIndex].price;
+      cost = amount * packs[priceIndex].price;
     } else {
-      cost = amount / packs[priceIndex].price;
+      cost = amount * packs[priceIndex].price;
     }
 
     return isFloat(cost) && String(cost).length > 10

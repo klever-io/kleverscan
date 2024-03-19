@@ -2,13 +2,11 @@ import { setQueryAndRouter } from '@/utils';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import {
-  ContentRow,
   ContentScrollBar,
-  FrozenContainer,
   Row,
+  SectionTitle,
   ShowDetailsButton,
 } from '@/views/assets/detail';
-import { BalanceContainer, RowContent } from '@/views/proposals/detail';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { default as React, useCallback } from 'react';
@@ -28,7 +26,7 @@ export const StakingRoyaltiesTab: React.FC<StakingRoyaltiesTabProps> = ({
   const stakingAprOrFpr = useCallback(() => {
     if (asset?.staking?.apr || asset?.staking?.fpr) {
       return (
-        <ContentRow>
+        <Row>
           <strong>{asset?.staking?.apr.length > 0 ? 'APR' : 'FPR'}</strong>
           <ContentScrollBar>
             {asset?.staking.interestType === 'FPRI' ? (
@@ -55,7 +53,7 @@ export const StakingRoyaltiesTab: React.FC<StakingRoyaltiesTabProps> = ({
               ))
             )}
           </ContentScrollBar>
-        </ContentRow>
+        </Row>
       );
     }
     return;
@@ -65,151 +63,108 @@ export const StakingRoyaltiesTab: React.FC<StakingRoyaltiesTabProps> = ({
     <>
       {asset?.royalties && (
         <div>
-          <Row isStakingRoyalties={true}>
-            <span>
-              <strong>Royalties</strong>
-            </span>
-            <RowContent>
-              <BalanceContainer>
-                <FrozenContainer>
-                  <div>
-                    <strong>{t('table:Address')}</strong>
-                    <p>{asset?.royalties.address || '--'}</p>
-                  </div>
-                  <div>
-                    <strong>{t('assets:Staking.Market Fixed')}</strong>
-                    <p>
-                      {(asset?.royalties.marketFixed &&
-                        `${
-                          asset?.royalties.marketFixed / 10 ** KLV_PRECISION
-                        } KLV`) ||
-                        '--'}
-                    </p>
-                  </div>
-                  <div>
-                    <strong> {t('assets:Staking.Market Percentage')}</strong>
-                    <p>
-                      {(asset?.royalties.marketPercentage &&
-                        `${asset?.royalties.marketPercentage / 10 ** 2}%`) ||
-                        '--'}
-                    </p>
-                  </div>
-                  <div>
-                    <strong>{t('assets:Staking.Transfer Fixed')}</strong>
-                    <p>
-                      {asset?.royalties.transferFixed
-                        ? `${asset?.royalties.transferFixed / 10 ** 6} KLV`
-                        : '--'}
-                    </p>
-                  </div>
-                  {asset?.royalties.transferPercentage ? (
-                    asset?.royalties.transferPercentage.map(
-                      (transfer, index) =>
-                        Object.keys(transfer).length > 0 && (
-                          <div key={index}>
-                            <strong>
-                              {' '}
-                              {t('assets:Staking.Transfer Percentage')}
-                            </strong>
-                            <p>
-                              {t('table:Amount')}:{' '}
-                              {toLocaleFixed(
-                                (transfer.amount || 0) / 10 ** asset?.precision,
-                                asset?.precision,
-                              )}
-                            </p>
-                            <p>
-                              {t('assets:Staking.Percentage')}:{' '}
-                              {transfer.percentage / 10 ** 2}%
-                            </p>
-                          </div>
-                        ),
-                    )
-                  ) : (
-                    <div>
-                      <strong>
-                        {' '}
-                        {t('assets:Staking.Transfer Percentage')}
-                      </strong>
-                      <p>{t('table:Amount')}: --</p>
-                      <p>{t('assets:Staking.Percentage')}: -- </p>
-                    </div>
-                  )}
-                  {asset?.royalties?.itoPercentage && (
-                    <div>
-                      <strong>ITO {t('assets:Staking.Percentage')}</strong>
-                      <p>
-                        {`${asset.royalties.itoPercentage / 10 ** 2}%` || '--'}
-                      </p>
-                    </div>
-                  )}
-                  {asset?.royalties?.itoFixed && (
-                    <div>
-                      <strong>ITO {t('assets:Staking.Fixed')}</strong>
-                      <p>
-                        {`${
-                          asset.royalties.itoFixed / 10 ** KLV_PRECISION
-                        } KLV` || '--'}
-                      </p>
-                    </div>
-                  )}
-                </FrozenContainer>
-              </BalanceContainer>
-            </RowContent>
+          <SectionTitle>Royalties</SectionTitle>
+          <Row>
+            <strong>{t('table:Address')}</strong>
+            <p>{asset?.royalties.address || '--'}</p>
           </Row>
-          <Row isStakingRoyalties={true}>
-            <span>
-              <strong>Staking</strong>
-            </span>
-            <RowContent>
-              <BalanceContainer>
-                <FrozenContainer>
-                  <div>
-                    <strong>{t('common:Cards.Total Staked')}</strong>
+          <Row>
+            <strong>{t('assets:Staking.Market Fixed')}</strong>
+            <p>
+              {(asset?.royalties.marketFixed &&
+                `${asset?.royalties.marketFixed / 10 ** KLV_PRECISION} KLV`) ||
+                '--'}
+            </p>
+          </Row>
+          <Row>
+            <strong> {t('assets:Staking.Market Percentage')}</strong>
+            <p>
+              {(asset?.royalties.marketPercentage &&
+                `${asset?.royalties.marketPercentage / 10 ** 2}%`) ||
+                '--'}
+            </p>
+          </Row>
+          <Row>
+            <strong>{t('assets:Staking.Transfer Fixed')}</strong>
+            <p>
+              {asset?.royalties.transferFixed
+                ? `${asset?.royalties.transferFixed / 10 ** 6} KLV`
+                : '--'}
+            </p>
+          </Row>
+          {asset?.royalties.transferPercentage &&
+            asset?.royalties.transferPercentage.map(
+              (transfer, index) =>
+                Object.keys(transfer).length > 0 && (
+                  <Row key={index}>
+                    <strong> {t('assets:Staking.Transfer Percentage')}</strong>
                     <p>
+                      {t('table:Amount')}:{' '}
                       {toLocaleFixed(
-                        (asset?.staking?.totalStaked || 0) /
-                          10 ** asset?.precision,
+                        (transfer.amount || 0) / 10 ** asset?.precision,
                         asset?.precision,
                       )}
                     </p>
-                  </div>
-                  <div>
-                    <strong>{t('assets:Staking.Current FPR Amount')}</strong>
-
                     <p>
-                      {toLocaleFixed(
-                        (asset?.staking?.currentFPRAmount || 0) /
-                          10 ** asset?.precision,
-                        asset?.precision,
-                      )}
+                      {t('assets:Staking.Percentage')}:{' '}
+                      {transfer.percentage / 10 ** 2}%
                     </p>
-                  </div>
-                  <div>
-                    <strong> {t('assets:Staking.Min Epochs To Claim')}</strong>
+                  </Row>
+                ),
+            )}
+          {asset?.royalties?.itoPercentage && (
+            <Row>
+              <strong>ITO {t('assets:Staking.Percentage')}</strong>
+              <p>{`${asset.royalties.itoPercentage / 10 ** 2}%` || '--'}</p>
+            </Row>
+          )}
+          {asset?.royalties?.itoFixed && (
+            <Row>
+              <strong>ITO {t('assets:Staking.Fixed')}</strong>
+              <p>
+                {`${asset.royalties.itoFixed / 10 ** KLV_PRECISION} KLV` ||
+                  '--'}
+              </p>
+            </Row>
+          )}
 
-                    <p>{asset?.staking?.minEpochsToClaim || '--'}</p>
-                  </div>
-                  <div>
-                    <strong>
-                      {' '}
-                      {t('assets:Staking.Min Epochs To Unstake')}
-                    </strong>
+          <SectionTitle>Staking</SectionTitle>
 
-                    <p>{asset?.staking?.minEpochsToUnstake || '--'}</p>
-                  </div>
-                  <div>
-                    <strong>
-                      {' '}
-                      {t('assets:Staking.Min Epochs To Withdraw')}
-                    </strong>
-                    <p>{asset?.staking?.minEpochsToWithdraw || '--'}</p>
-                  </div>
-                  {stakingAprOrFpr()}
-                </FrozenContainer>
-              </BalanceContainer>
-            </RowContent>
+          <Row>
+            <strong>{t('common:Cards.Total Staked')}</strong>
+            <p>
+              {toLocaleFixed(
+                (asset?.staking?.totalStaked || 0) / 10 ** asset?.precision,
+                asset?.precision,
+              )}
+            </p>
           </Row>
+          <Row>
+            <strong>{t('assets:Staking.Current FPR Amount')}</strong>
+
+            <p>
+              {toLocaleFixed(
+                (asset?.staking?.currentFPRAmount || 0) /
+                  10 ** asset?.precision,
+                asset?.precision,
+              )}
+            </p>
+          </Row>
+          <Row>
+            <strong> {t('assets:Staking.Min Epochs To Claim')}</strong>
+
+            <p>{asset?.staking?.minEpochsToClaim || '--'}</p>
+          </Row>
+          <Row>
+            <strong> {t('assets:Staking.Min Epochs To Unstake')}</strong>
+
+            <p>{asset?.staking?.minEpochsToUnstake || '--'}</p>
+          </Row>
+          <Row>
+            <strong> {t('assets:Staking.Min Epochs To Withdraw')}</strong>
+            <p>{asset?.staking?.minEpochsToWithdraw || '--'}</p>
+          </Row>
+          {stakingAprOrFpr()}
         </div>
       )}
     </>

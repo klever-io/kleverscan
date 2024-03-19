@@ -205,7 +205,7 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
       buyType: 0,
       id: ITO.assetId,
       currencyId: selectedPack,
-      amount: currencyAmount * 10 ** (await getPrecision(ITO.assetId)),
+      amount: assetAmount * 10 ** (await getPrecision(ITO.assetId)),
     };
 
     try {

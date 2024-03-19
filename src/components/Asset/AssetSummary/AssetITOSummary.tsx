@@ -1,3 +1,4 @@
+import { useExtension } from '@/contexts/extension';
 import { IPackInfo } from '@/types/contracts';
 import { useCountdown } from '@/utils/hooks';
 import { secondsToMonthDayHourMinSec } from '@/utils/timeFunctions';
@@ -49,11 +50,25 @@ export const AssetITOSummary: React.FC<AssetITOProps> = ({
   setOpenParticipateModal,
 }) => {
   const remainingTime = useCountdown((ITO?.endTime || 0) * 1000);
+  const { setOpenDrawer, extensionInstalled, walletAddress, connectExtension } =
+    useExtension();
 
   const bestAssetKLVRate = useMemo(
     () => getBestKLVRateWintoutPrecision(ITO?.packData || []),
     [ITO?.packData],
   );
+
+  const handleParticipate = async () => {
+    if (!extensionInstalled) {
+      setOpenDrawer(true);
+      return;
+    }
+    if (!walletAddress) {
+      await connectExtension();
+    }
+
+    setOpenParticipateModal(true);
+  };
 
   return (
     <>
@@ -107,8 +122,9 @@ export const AssetITOSummary: React.FC<AssetITOProps> = ({
 
         <ParticipateButton
           type="button"
-          onClick={() => setOpenParticipateModal(true)}
+          onClick={() => handleParticipate()}
           disabled={!asset || !ITO}
+          secondary={!walletAddress}
         >
           Participate
         </ParticipateButton>

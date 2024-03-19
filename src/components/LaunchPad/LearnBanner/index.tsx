@@ -37,7 +37,7 @@ export const LearnBanner: React.FC = () => {
           <Buttons>
             <Link href="/create-transaction?contract=ConfigITOContract">
               <Button href="/create-transaction?contract=ConfigITOContract">
-                Apply for funding
+                Configure your ITO
               </Button>
             </Link>
             <Link href="/create-transaction?contract=CreateAssetContract">
@@ -45,7 +45,7 @@ export const LearnBanner: React.FC = () => {
                 secondary
                 href="/create-transaction?contract=CreateAssetContract"
               >
-                Create Asset
+                Create an Asset
               </Button>
             </Link>
           </Buttons>

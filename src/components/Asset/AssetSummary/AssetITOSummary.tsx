@@ -13,7 +13,6 @@ import {
   ParticipateButton,
   Progress,
   ProgressBar,
-  ProgressFill,
   Rate,
   Subtitle,
   Title,
@@ -90,15 +89,13 @@ export const AssetITOSummary: React.FC<AssetITOProps> = ({
         {ITO?.maxAmount ? (
           <Progress>
             <Label>Progress</Label>
-            <ProgressBar>
-              <ProgressFill
-                fillWidth={
-                  (ITO?.mintedAmount || 0) > ITO?.maxAmount
-                    ? 1
-                    : (ITO?.mintedAmount || 0) / ITO?.maxAmount
-                }
-              />
-            </ProgressBar>
+            <ProgressBar
+              fillWidth={
+                (ITO?.mintedAmount || 0) > ITO?.maxAmount
+                  ? 1
+                  : (ITO?.mintedAmount || 0) / ITO?.maxAmount
+              }
+            />
           </Progress>
         ) : null}
         <DetailsRow>

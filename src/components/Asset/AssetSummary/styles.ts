@@ -279,19 +279,18 @@ export const Progress = styled.div`
   gap: 8px;
 `;
 
-export const ProgressBar = styled.div`
+export const ProgressBar = styled.div<{ fillWidth: number }>`
   width: 100%;
   height: 8px;
-  background-color: ${({ theme }) => theme.lightGray};
-  color: ${({ theme }) => theme.darkText};
   border-radius: 4px;
-`;
 
-export const ProgressFill = styled.div<{ fillWidth: number }>`
-  height: 100%;
-  background-color: ${({ theme }) => theme.violet};
-  border-radius: 4px;
-  width: ${props => props.fillWidth * 100}%;
+  background-image: linear-gradient(
+    to right,
+    ${({ theme }) => theme.violet} 0%,
+    ${({ theme }) => theme.violet} ${({ fillWidth }) => fillWidth * 100}%,
+    ${({ theme }) => theme.lightGray} ${({ fillWidth }) => fillWidth * 100}%,
+    ${({ theme }) => theme.lightGray} 100%
+  );
 `;
 
 export const DetailsRow = styled.div`

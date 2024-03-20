@@ -6,8 +6,6 @@ import { LaunchPadFAQCards } from '@/components/LaunchPad/FAQCards';
 import { LearnBanner } from '@/components/LaunchPad/LearnBanner';
 import { WalletBanner } from '@/components/LaunchPad/WalletBanner';
 import AssetLogo from '@/components/Logo/AssetLogo';
-import { useContractModal } from '@/contexts/contractModal';
-import { useExtension } from '@/contexts/extension';
 import {
   parseITOsRequest,
   requestAssetsList,
@@ -31,7 +29,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { ReactNode, useEffect } from 'react';
+import { ReactNode } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
 import nextI18nextConfig from '../../../next-i18next.config';
 
@@ -59,9 +57,6 @@ export function getBestKLVRate(
 const ITOsPage: React.FC = () => {
   const { t } = useTranslation('itos');
   const router = useRouter();
-  const { extensionInstalled, connectExtension } = useExtension();
-
-  const { getInteractionsButtons } = useContractModal();
 
   const requestITOSQuery = async (
     page: number,
@@ -72,12 +67,6 @@ const ITOsPage: React.FC = () => {
     await parseITOsRequest(dataITOs, assets);
     return dataITOs;
   };
-
-  useEffect(() => {
-    if (extensionInstalled) {
-      connectExtension();
-    }
-  }, [extensionInstalled]);
 
   const rowSections = (asset: IParsedITO): IRowSection[] => {
     const {

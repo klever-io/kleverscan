@@ -87,7 +87,15 @@ export const CardContent = styled.div`
   border-radius: 0 0.75rem 0.75rem 0.75rem;
 `;
 
-export const Row = styled.div<{ isStakingRoyalties: boolean; span?: number }>`
+export const SectionTitle = styled.h2`
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: ${props => props.theme.black};
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+`;
+
+export const Row = styled.div<{ isStakingRoyalties?: boolean; span?: number }>`
   width: 100%;
   padding: 0.75rem 1rem;
   gap: 4px;

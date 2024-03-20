@@ -1,3 +1,4 @@
+import { useExtension } from '@/contexts/extension';
 import { IPackInfo } from '@/types/contracts';
 import { useCountdown } from '@/utils/hooks';
 import { secondsToMonthDayHourMinSec } from '@/utils/timeFunctions';
@@ -12,7 +13,6 @@ import {
   ParticipateButton,
   Progress,
   ProgressBar,
-  ProgressFill,
   Rate,
   Subtitle,
   Title,
@@ -49,11 +49,25 @@ export const AssetITOSummary: React.FC<AssetITOProps> = ({
   setOpenParticipateModal,
 }) => {
   const remainingTime = useCountdown((ITO?.endTime || 0) * 1000);
+  const { setOpenDrawer, extensionInstalled, walletAddress, connectExtension } =
+    useExtension();
 
   const bestAssetKLVRate = useMemo(
     () => getBestKLVRateWintoutPrecision(ITO?.packData || []),
     [ITO?.packData],
   );
+
+  const handleParticipate = async () => {
+    if (!extensionInstalled) {
+      setOpenDrawer(true);
+      return;
+    }
+    if (!walletAddress) {
+      await connectExtension();
+    }
+
+    setOpenParticipateModal(true);
+  };
 
   return (
     <>
@@ -75,15 +89,13 @@ export const AssetITOSummary: React.FC<AssetITOProps> = ({
         {ITO?.maxAmount ? (
           <Progress>
             <Label>Progress</Label>
-            <ProgressBar>
-              <ProgressFill
-                fillWidth={
-                  (ITO?.mintedAmount || 0) > ITO?.maxAmount
-                    ? 1
-                    : (ITO?.mintedAmount || 0) / ITO?.maxAmount
-                }
-              />
-            </ProgressBar>
+            <ProgressBar
+              fillWidth={
+                (ITO?.mintedAmount || 0) > ITO?.maxAmount
+                  ? 1
+                  : (ITO?.mintedAmount || 0) / ITO?.maxAmount
+              }
+            />
           </Progress>
         ) : null}
         <DetailsRow>
@@ -107,8 +119,9 @@ export const AssetITOSummary: React.FC<AssetITOProps> = ({
 
         <ParticipateButton
           type="button"
-          onClick={() => setOpenParticipateModal(true)}
+          onClick={() => handleParticipate()}
           disabled={!asset || !ITO}
+          secondary={!walletAddress}
         >
           Participate
         </ParticipateButton>

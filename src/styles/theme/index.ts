@@ -1,6 +1,7 @@
 const theme = {
   dark: false,
-  maxWidth: '1900px',
+  maxWidth: '1312px',
+  headerMaxWidth: '1900px',
   background: '#F4F4F4',
   white: '#fff',
   black: '#06060B',
@@ -189,6 +190,14 @@ const theme = {
   kappsDemo: {
     dark: '#222345',
     darker: '#16162c',
+  },
+
+  faq: {
+    border: '#2e2e2e',
+  },
+
+  ito: {
+    darkGray: '#202025',
   },
 };
 

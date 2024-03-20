@@ -27,15 +27,17 @@ const requestNetworkParams = async (): Promise<INetworkParams> => {
   };
 
   if (data) {
-    networkParams.data.parameters = Object.keys(proposalsMessages).map(
-      (key, index) => {
+    networkParams.data.parameters = Object.keys(proposalsMessages)
+      .map((key, index) => {
         return {
           number: index,
           parameter: proposalsMessages[key] ? proposalsMessages[key] : '',
-          currentValue: data.parameters[key].value,
+          currentValue: data.parameters[key]?.value
+            ? data.parameters[key].value
+            : '',
         };
-      },
-    );
+      })
+      .filter(param => param.parameter !== '' && param.currentValue !== '');
   }
 
   return networkParams;

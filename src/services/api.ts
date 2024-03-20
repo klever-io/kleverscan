@@ -25,6 +25,13 @@ export interface IProps {
   service?: Service;
   useApiProxy?: boolean;
   requestMode?: RequestMode;
+  tries?: number;
+}
+
+export interface IDirectusRequestProps {
+  requestParams: any[];
+  requestFunction: string;
+  tries?: number;
 }
 
 const pagination = {
@@ -59,6 +66,7 @@ export const getHost = (
       'https://multisign.testnet.klever.finance',
     [Service.EXPLORER]:
       process.env.DEFAULT_EXPLORER_HOST || 'https://testnet.kleverscan.org',
+    [Service.CDN]: process.env.DEFAULT_CDN_HOST || 'https://cdn.klever.io',
   };
 
   let host = hostService[service || 0];
@@ -180,11 +188,7 @@ export const withoutBody = async (
   return result;
 };
 
-export const withBody = async (
-  props: IProps,
-  method: Method,
-  tries = 3,
-): Promise<any> => {
+export const withBody = async (props: IProps, method: Method): Promise<any> => {
   const request = async () => {
     if (props.useApiProxy) {
       try {
@@ -263,7 +267,40 @@ export const withBody = async (
     res => (result = res),
     err => (result = Promise.resolve(err)),
     () => request(),
-    tries,
+    props.tries || 3,
+  );
+
+  return result;
+};
+export const withDirectus = async (
+  props: IDirectusRequestProps,
+): Promise<any> => {
+  const request = async () => {
+    try {
+      // use next api as proxy for post requests, to avoid cors from api-gateway (when fetching prices)
+      const response = await fetch('/api/directus', {
+        method: Method.POST,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...props,
+        }),
+      });
+
+      return response.json();
+    } catch (error) {
+      return { data: null, error, code: 'internal_error', pagination };
+    }
+  };
+
+  let result: any;
+
+  await asyncDoIf(
+    res => (result = res),
+    err => (result = Promise.resolve(err)),
+    () => request(),
+    props.tries || 3,
   );
 
   return result;
@@ -343,6 +380,8 @@ const api = {
     withTimeout(withBody(props, Method.POST)),
   text: async (props: IProps): Promise<any> =>
     withTimeout(withText(props, Method.GET)),
+  directus: async (props: IDirectusRequestProps): Promise<any> =>
+    withTimeout(withDirectus(props)),
 };
 
 export default api;

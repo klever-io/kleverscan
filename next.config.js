@@ -13,6 +13,10 @@ const defaultEnvs = [
   'BUGSNAG_KEY',
   'BUGSNAG_DISABLED',
   'DEFAULT_API_MULTISIGN',
+  'NEXT_PUBLIC_TRANSFER_ADDRESS',
+  'NEXT_PUBLIC_ADD_ASSET_INFO_VALUE',
+  'DIRECTUS_STATIC_TOKEN',
+  'DEFAULT_CDN_HOST',
 ];
 
 const getEnvs = () => {
@@ -49,5 +53,19 @@ module.exports = withImages({
   },
   typescript: {
     ignoreBuildErrors: process.env?.IS_PRODUCTION === 'true',
+  },
+  redirects: async () => {
+    return [
+      {
+        source: '/itos',
+        destination: '/ito',
+        permanent: true,
+      },
+      {
+        source: '/launchpad',
+        destination: '/ito',
+        permanent: true,
+      },
+    ];
   },
 });

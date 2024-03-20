@@ -28,7 +28,9 @@ export interface ITableType {
     | 'nfts'
     | 'validatorsList'
     | 'rewards'
-    | 'marketplaces';
+    | 'marketplaces'
+    | 'launchPad';
+
   haveData?: number;
   pathname?: string;
   rowSections?: boolean;
@@ -69,6 +71,8 @@ export const Row = styled.div<ITableType>`
   flex-direction: row;
   align-items: center;
 
+  font-size: 0.95rem;
+
   width: 100%;
 
   > span,
@@ -82,7 +86,6 @@ export const Row = styled.div<ITableType>`
     text-overflow: ellipsis;
     white-space: nowrap;
 
-    font-size: 0.95rem;
     color: ${props => props.theme.black};
 
     ${props => !props.rowSections && widths[props.type]};
@@ -103,7 +106,6 @@ export const Row = styled.div<ITableType>`
 
     strong {
       font-weight: 400;
-      font-size: 0.95rem;
       color: ${props => props.theme.darkText};
     }
 

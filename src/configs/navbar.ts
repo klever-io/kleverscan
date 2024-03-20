@@ -80,7 +80,7 @@ const navbarItems: INavbarItem[] = [
       },
       {
         name: 'ITOs',
-        pathTo: '/itos',
+        pathTo: '/ito',
         Icon: GiTwoCoins,
       },
       {

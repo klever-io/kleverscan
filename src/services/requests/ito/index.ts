@@ -5,14 +5,16 @@ import { NextRouter } from 'next/router';
 
 export const requestITOs = async (
   router: NextRouter,
-  pageParam = 1,
+  page: number,
+  limit: number,
 ): Promise<any | void> => {
   const asset = router?.query?.asset ?? '';
   const isActive = router?.query?.active ?? true;
+
   try {
     const itosResponse = await api.get({
       route: `ito/list`,
-      query: { page: pageParam, active: isActive, asset },
+      query: { page, limit, active: isActive, asset },
     });
     if (!itosResponse.error || itosResponse.error === '') {
       return itosResponse;
@@ -61,20 +63,32 @@ export const processITOPrecisions = async (
 export const parseITOsRequest = async (
   itemsITOs: IITOsResponse,
   assetsList: any[],
-): Promise<void> => {
+): Promise<IITOsResponse> => {
   if (itemsITOs && assetsList) {
-    const packsPrecisionCalls: Promise<IITO>[] = [];
-    itemsITOs.data.itos.forEach((ITO: IITO, index: number) => {
+    const data = itemsITOs.data.itos.map((ITO: IITO, index: number) => {
+      const item = ITO;
       const asset = assetsList.find(
         (asset: IAsset) => asset.assetId === itemsITOs.data.itos[index].assetId,
       );
-      ITO.maxAmount = ITO.maxAmount / 10 ** asset.precision;
-      ITO['ticker'] = asset.ticker;
-      ITO['assetType'] = asset.assetType;
-      ITO['precision'] = asset.precision;
-      ITO['assetLogo'] = asset.logo;
-      packsPrecisionCalls.push(processITOPrecisions(ITO, asset.precision));
+      item.maxAmount = item.maxAmount / 10 ** asset.precision;
+      item['ticker'] = asset.ticker;
+      item['assetType'] = asset.assetType;
+      item['precision'] = asset.precision;
+      item['assetLogo'] = asset.logo;
+      item['name'] = asset.name;
+      item['verified'] = asset.verified;
+      item['logo'] = asset.logo;
+
+      return item;
     });
-    await Promise.allSettled(packsPrecisionCalls);
+
+    return {
+      ...itemsITOs,
+      data: {
+        itos: data,
+      },
+    };
   }
+
+  return itemsITOs;
 };

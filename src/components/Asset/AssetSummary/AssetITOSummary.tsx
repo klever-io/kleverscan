@@ -1,5 +1,5 @@
 import { useExtension } from '@/contexts/extension';
-import { IPackInfo } from '@/types/contracts';
+import { getBestKLVRate } from '@/pages/ito';
 import { useCountdown } from '@/utils/hooks';
 import { secondsToMonthDayHourMinSec } from '@/utils/timeFunctions';
 import { useMemo } from 'react';
@@ -20,25 +20,6 @@ import {
   TotalRaisedValue,
 } from './styles';
 
-export function getBestKLVRateWintoutPrecision(
-  packData: IPackInfo[],
-): number | undefined {
-  let bestKLVRate: number | undefined = undefined;
-  if (packData) {
-    packData.forEach(pack => {
-      if (pack.key === 'KLV') {
-        pack.packs.forEach(p => {
-          const rate = p.price / p.amount;
-          if (!bestKLVRate || rate < bestKLVRate) {
-            bestKLVRate = rate;
-          }
-        });
-      }
-    });
-  }
-  return bestKLVRate;
-}
-
 interface AssetITOProps extends AssetSummaryProps {
   setOpenParticipateModal: (state: boolean) => void;
 }
@@ -53,7 +34,7 @@ export const AssetITOSummary: React.FC<AssetITOProps> = ({
     useExtension();
 
   const bestAssetKLVRate = useMemo(
-    () => getBestKLVRateWintoutPrecision(ITO?.packData || []),
+    () => getBestKLVRate(ITO?.packData || []),
     [ITO?.packData],
   );
 

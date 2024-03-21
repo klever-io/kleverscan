@@ -6,15 +6,11 @@ import { LearnBanner } from '@/components/LaunchPad/LearnBanner';
 import { WalletBanner } from '@/components/LaunchPad/WalletBanner';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Table, { ITable } from '@/components/NewTable';
-import {
-  parseITOsRequest,
-  requestAssetsList,
-  requestITOs,
-} from '@/services/requests/ito';
+import { requestITOs } from '@/services/requests/ito';
 import { IITOResponse, IParsedITO, IRowSection } from '@/types';
 import { IPackInfo } from '@/types/contracts';
 import { formatAmount } from '@/utils/formatFunctions';
-import { KLV_PRECISION } from '@/utils/globalVariables';
+import { parseITOs } from '@/utils/parseValues';
 import { ContainerAssetId } from '@/views/assets';
 import {
   ITOContainer,
@@ -33,17 +29,13 @@ import { ReactNode } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
 import nextI18nextConfig from '../../../next-i18next.config';
 
-export function getBestKLVRate(
-  packData: IPackInfo[],
-  precision: number,
-): number | undefined {
+export function getBestKLVRate(packData: IPackInfo[]): number | undefined {
   let bestKLVRate: number | undefined = undefined;
   if (packData) {
     packData.forEach(pack => {
       if (pack.key === 'KLV') {
         pack.packs.forEach(p => {
-          const rate =
-            (p.price * 10 ** precision) / (p.amount * 10 ** KLV_PRECISION);
+          const rate = p.price / p.amount;
           if (!bestKLVRate || rate < bestKLVRate) {
             bestKLVRate = rate;
           }
@@ -63,8 +55,7 @@ const ITOsPage: React.FC = () => {
     limit: number,
   ): Promise<IITOResponse> => {
     const dataITOs = await requestITOs(router, page, limit);
-    const assets = await requestAssetsList(dataITOs);
-    await parseITOsRequest(dataITOs, assets);
+    await parseITOs(dataITOs.data.itos);
     return dataITOs;
   };
 
@@ -86,7 +77,7 @@ const ITOsPage: React.FC = () => {
       whitelistEndTime,
     } = asset;
 
-    const bestKLVRate = getBestKLVRate(packData, precision);
+    const bestKLVRate = getBestKLVRate(packData);
 
     const access = Date.now() < whitelistEndTime ? 'Whitelist Only' : 'Public';
 

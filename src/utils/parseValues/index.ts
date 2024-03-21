@@ -212,6 +212,10 @@ export const parseITOs = async (
       ITO['assetType'] = asset.assetType;
       ITO['precision'] = asset.precision;
       ITO['assetLogo'] = asset.logo;
+
+      ITO['name'] = asset.name;
+      ITO['verified'] = asset.verified;
+      ITO['logo'] = asset.logo;
       packsPrecisionCalls.push(processITOPrecisions(ITO, asset.precision));
     });
     await Promise.allSettled(packsPrecisionCalls);

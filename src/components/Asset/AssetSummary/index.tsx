@@ -167,7 +167,7 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
               </SocialNetworks>
             </LeftSide>
             <RightSide>
-              {asset && ITO && asset.assetType === 'Fungible' && (
+              {asset && ITO && (
                 <AssetITOSummary
                   asset={asset}
                   ITO={ITO}

@@ -35,7 +35,7 @@ export function getBestKLVRate(packData: IPackInfo[]): number | undefined {
     packData.forEach(pack => {
       if (pack.key === 'KLV') {
         pack.packs.forEach(p => {
-          const rate = p.price / p.amount;
+          const rate = p.price;
           if (!bestKLVRate || rate < bestKLVRate) {
             bestKLVRate = rate;
           }

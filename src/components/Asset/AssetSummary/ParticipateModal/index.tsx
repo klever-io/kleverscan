@@ -22,6 +22,7 @@ import {
   InputContainer,
   InputRow,
   Label,
+  NFTSelectContainer,
   SelectContainer,
   SubmitButton,
   Title,
@@ -49,7 +50,8 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
   setTxHash,
   setLoading,
 }) => {
-  const [selectedPack, setSelectedPack] = useState<string>('');
+  const [selectedPackCurrency, setSelectedPackCurrency] = useState<string>('');
+  const [selectedPack, setSelectedPack] = useState<number>(0);
   const [assetAmount, setAssetAmount] = useState<number>(0);
   const [currencyAmount, setCurrencyAmount] = useState<number>(0);
   const { t } = useTranslation('assets');
@@ -70,13 +72,25 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
     };
   }, [isOpenParticipateModal]);
 
-  const getOptions = () => {
+  const getPackCurrencyOptions = () => {
     return (
       ITO?.packData.map(pack => ({
         label: pack.key,
         value: pack.key,
       })) || []
     );
+  };
+
+  const getPackOptions = () => {
+    const packs =
+      ITO?.packData.find(pack => {
+        return pack.key === selectedPackCurrency;
+      })?.packs || [];
+
+    return packs.map(pack => ({
+      label: `${pack.amount} ${asset.ticker}`,
+      value: pack.amount,
+    }));
   };
 
   const calculateCostFromAmount = (amount: number): number => {
@@ -91,7 +105,7 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
     const qtyPacks = ITO.packData.length;
 
     const packs =
-      ITO.packData.find(pack => pack.key === selectedPack)?.packs ||
+      ITO.packData.find(pack => pack.key === selectedPackCurrency)?.packs ||
       ([
         {
           amount: 0,
@@ -149,7 +163,7 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
     const qtyPacks = ITO.packData.length;
 
     const packs =
-      ITO.packData.find(pack => pack.key === selectedPack)?.packs ||
+      ITO.packData.find(pack => pack.key === selectedPackCurrency)?.packs ||
       ([
         {
           amount: 0,
@@ -204,7 +218,7 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
     const payload = {
       buyType: 0,
       id: ITO.assetId,
-      currencyId: selectedPack,
+      currencyId: selectedPackCurrency,
       amount: assetAmount * 10 ** (await getPrecision(ITO.assetId)),
     };
 
@@ -271,13 +285,15 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
               <SelectContainer>
                 <ReactSelect
                   classNamePrefix="react-select"
-                  options={getOptions()}
+                  options={getPackCurrencyOptions()}
                   onChange={value => {
-                    setSelectedPack((value as { value: string })?.value || '');
+                    setSelectedPackCurrency(
+                      (value as { value: string })?.value || '',
+                    );
                     setAssetAmount(calculateAmountFromCost(currencyAmount));
                   }}
-                  value={getOptions().find(
-                    option => option.value === selectedPack,
+                  value={getPackCurrencyOptions().find(
+                    option => option.value === selectedPackCurrency,
                   )}
                 />
               </SelectContainer>
@@ -286,18 +302,38 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
 
           <InputRow>
             <Label>Amount of {asset?.ticker}</Label>
-            <InputContainer>
-              <Input
-                value={assetAmount}
-                onChange={e => {
-                  const value = Number(e.target.value);
-                  if (Number.isNaN(value)) return;
+            {asset.assetType === 'Fungible' ? (
+              <InputContainer>
+                <Input
+                  value={assetAmount}
+                  onChange={e => {
+                    const value = Number(e.target.value);
+                    if (Number.isNaN(value)) return;
 
-                  setAssetAmount(value);
-                  setCurrencyAmount(calculateCostFromAmount(value));
-                }}
-              />
-            </InputContainer>
+                    setAssetAmount(value);
+                    setCurrencyAmount(calculateCostFromAmount(value));
+                  }}
+                />
+              </InputContainer>
+            ) : (
+              <NFTSelectContainer>
+                <ReactSelect
+                  classNamePrefix="react-select"
+                  options={getPackOptions()}
+                  onChange={(e: any) => {
+                    const value = Number(e.value as string);
+                    if (Number.isNaN(value)) return;
+
+                    setSelectedPack(value);
+                    setAssetAmount(value);
+                    setCurrencyAmount(calculateCostFromAmount(value));
+                  }}
+                  value={getPackOptions().find(
+                    option => option.value === selectedPack,
+                  )}
+                />
+              </NFTSelectContainer>
+            )}
           </InputRow>
         </BuyForm>
         <SubmitButton type="button" onClick={handleSubmit}>

@@ -121,6 +121,60 @@ export const InputContainer = styled.div`
   border-radius: 24px;
 `;
 
+export const NFTSelectContainer = styled.div`
+  ${ReactSelectStyles}
+
+  .react-select__dropdown-indicator {
+    padding: 0;
+  }
+
+  .react-select__control {
+    border-radius: 24px;
+    border: none;
+    min-height: unset;
+    max-height: unset;
+    height: unset;
+    padding: 9px 15px;
+
+    z-index: 2;
+
+    background-color: ${({ theme }) => theme.background};
+    border: 1px solid ${({ theme }) => theme.true.white};
+
+    &:hover {
+      box-shadow: none;
+      filter: brightness(1.1);
+    }
+  }
+  .react-select__control--is-focused {
+    box-shadow: none;
+
+    filter: brightness(1.1);
+  }
+
+  .react-select__placeholder {
+    font-size: 1.25rem;
+    line-height: 1.5rem;
+  }
+  .react-select__input-container {
+    font-size: 1.25rem;
+    line-height: 1.5rem;
+  }
+
+  .react-select__menu {
+    padding: 0 4px;
+    background-color: ${({ theme }) => theme.background};
+    color: ${props => props.theme.darkText};
+    border-radius: 24px;
+    z-index: 1;
+
+    border: 1px solid ${({ theme }) => theme.true.white};
+  }
+  .react-select__option {
+    border-radius: 24px;
+  }
+`;
+
 export const SelectContainer = styled.div`
   ${ReactSelectStyles}
   width: 140px;

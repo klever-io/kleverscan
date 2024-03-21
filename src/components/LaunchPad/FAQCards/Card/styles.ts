@@ -63,7 +63,9 @@ export const FAQAction = styled.a`
     }
   }
 
-  &:hover {
+  &:hover,
+  &:focus,
+  &:active {
     color: ${({ theme }) => theme.violet};
 
     svg {

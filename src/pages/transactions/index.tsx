@@ -1,13 +1,10 @@
-import { getStatusIcon } from '@/assets/status';
 import { Transactions as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
-import DateFilter, {
-  IDateFilter,
-  ISelectedDays,
-} from '@/components/DateFilter';
 import Title from '@/components/Layout/Title';
 import { MultiContractToolTip } from '@/components/MultiContractToolTip';
 import Table, { ITable } from '@/components/TableV2';
+import { Status, TimestampInfo } from '@/components/TableV2/styles';
+import Tooltip from '@/components/Tooltip';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import api from '@/services/api';
 import { CenteredRow, Container, DoubleRow, Header } from '@/styles/common';
@@ -17,7 +14,6 @@ import { formatAmount, formatDate } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import { getPrecision } from '@/utils/precisionFunctions';
-import { FilterByDate } from '@/views/transactions';
 import Link from 'next/link';
 import { NextRouter, useRouter } from 'next/router';
 import React, { useCallback } from 'react';
@@ -36,8 +32,8 @@ import {
 import {
   contractTypes,
   filteredSections,
-  getHeaderForTable,
-  initialsTableHeaders,
+  getLabelForTableField,
+  transactionTableHeaders,
 } from '../../utils/contracts';
 
 interface IRequestTxQuery {
@@ -132,14 +128,12 @@ export const requestTransactionsDefault = async (
 const Transactions: React.FC = () => {
   const router = useRouter();
 
-  const defaultHeader = [...initialsTableHeaders];
-  const queryHeader = getHeaderForTable(router, defaultHeader);
   const getContractType = useCallback(contractTypes, []);
-  const getFilteredSections = (
+  const getCustomFields = (
     contract: IContract[],
     receipts: IReceipt[],
     precision?: number,
-  ): IRowSection[] => {
+  ): JSX.Element[] => {
     const contractType = getContractType(contract);
     const filteredSectionsResult = filteredSections(
       contract,
@@ -148,11 +142,10 @@ const Transactions: React.FC = () => {
       precision,
     );
     if (contractType === 'Multi contract') {
-      const extraHeadersLength =
-        queryHeader.length - initialsTableHeaders.length;
+      const extraHeadersLength = 0;
       return Array(extraHeadersLength)
         .fill(extraHeadersLength)
-        .map(_ => ({ element: <span>--</span>, span: 1 }));
+        .map(_ => <span key={Math.random()}>--</span>);
     }
     return filteredSectionsResult;
   };
@@ -171,7 +164,6 @@ const Transactions: React.FC = () => {
       precision,
     } = props;
 
-    const StatusIcon = getStatusIcon(status);
     let toAddress = '- -';
     const contractType = getContractType(contract);
 
@@ -180,6 +172,8 @@ const Transactions: React.FC = () => {
 
       toAddress = parameter.toAddress;
     }
+
+    const customFields = getCustomFields(contract, receipts, precision);
 
     const sections = [
       {
@@ -192,8 +186,10 @@ const Transactions: React.FC = () => {
               <Copy info="TXHash" data={hash} />
             </CenteredRow>
             <CenteredRow>
-              <div>{formatDate(timestamp)}</div>
-              <div>{capitalizeString(status)}</div>
+              <TimestampInfo>{formatDate(timestamp)}</TimestampInfo>
+              <Status status={status.toLowerCase()}>
+                {capitalizeString(status)}
+              </Status>
             </CenteredRow>
           </DoubleRow>
         ),
@@ -205,10 +201,9 @@ const Transactions: React.FC = () => {
             <Link href={`/block/${blockNum || 0}`}>
               <a className="address">{blockNum || 0}</a>
             </Link>
-
-            <strong>
+            <span>
               {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
-            </strong>
+            </span>
           </DoubleRow>
         ),
         span: 1,
@@ -239,7 +234,16 @@ const Transactions: React.FC = () => {
               <CenteredRow key={contractType}>
                 {ContractsName[contractType]}
               </CenteredRow>
-              <CenteredRow>amount</CenteredRow>
+              <CenteredRow>
+                {getLabelForTableField(contractType)?.[0] ? (
+                  <Tooltip
+                    msg={getLabelForTableField(contractType)[0]}
+                    Component={() => <span>{customFields[0]}</span>}
+                  />
+                ) : (
+                  <span> - - </span>
+                )}
+              </CenteredRow>
             </DoubleRow>
           ),
         span: 1,
@@ -247,8 +251,22 @@ const Transactions: React.FC = () => {
       {
         element: contractType ? (
           <DoubleRow>
-            <strong>misc 1</strong>
-            <strong>misc 2</strong>
+            {getLabelForTableField(contractType)?.[1] ? (
+              <Tooltip
+                msg={getLabelForTableField(contractType)[1]}
+                Component={() => <span>{customFields[1]}</span>}
+              />
+            ) : (
+              <span> - - </span>
+            )}
+            {getLabelForTableField(contractType)?.[2] ? (
+              <Tooltip
+                msg={getLabelForTableField(contractType)[2]}
+                Component={() => <span>{customFields[2]}</span>}
+              />
+            ) : (
+              <span> - - </span>
+            )}
           </DoubleRow>
         ) : (
           <></>
@@ -256,37 +274,8 @@ const Transactions: React.FC = () => {
         span: 1,
       },
     ];
-    const filteredContract = getFilteredSections(contract, receipts, precision);
 
-    if (router.query.type) {
-      sections.pop();
-      sections.pop();
-      sections.push(...filteredContract);
-    }
     return sections;
-  };
-
-  const resetDate = () => {
-    const updatedQuery = { ...router.query };
-    delete updatedQuery.startdate;
-    delete updatedQuery.enddate;
-    setQueryAndRouter(updatedQuery, router);
-  };
-  const filterDate = (selectedDays: ISelectedDays) => {
-    setQueryAndRouter(
-      {
-        ...router.query,
-        startdate: selectedDays.start.getTime().toString(),
-        enddate: selectedDays.end
-          ? (selectedDays.end.getTime() + 24 * 60 * 60 * 1000).toString()
-          : (selectedDays.start.getTime() + 24 * 60 * 60 * 1000).toString(),
-      },
-      router,
-    );
-  };
-  const dateFilterProps: IDateFilter = {
-    resetDate,
-    filterDate,
   };
 
   const transactionsFiltersProps = {
@@ -294,21 +283,12 @@ const Transactions: React.FC = () => {
   };
 
   const Filters = () => {
-    return (
-      <>
-        <TransactionsFilters
-          {...transactionsFiltersProps}
-        ></TransactionsFilters>
-        <FilterByDate>
-          <DateFilter {...dateFilterProps} />
-        </FilterByDate>
-      </>
-    );
+    return <TransactionsFilters {...transactionsFiltersProps} />;
   };
 
   const tableProps: ITable = {
     type: 'transactions',
-    header: queryHeader,
+    header: transactionTableHeaders,
     rowSections,
     dataName: 'transactions',
     scrollUp: true,

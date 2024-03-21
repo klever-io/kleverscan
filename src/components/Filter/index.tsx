@@ -1,4 +1,4 @@
-import { ArrowDown } from '@/assets/icons';
+import { FilterArrowDown } from '@/assets/icons';
 import React, { useRef, useState } from 'react';
 import { Loader } from '../Loader/styles';
 import {
@@ -172,7 +172,7 @@ const Filter: React.FC<IFilter> = ({
           {open && selected ? selected : ''}
         </span>
         <ArrowDownContainer onClick={() => arrowOnClick()}>
-          <ArrowDown />
+          <FilterArrowDown />
         </ArrowDownContainer>
         {!open && (
           <SelectorContainer {...selectorProps}>

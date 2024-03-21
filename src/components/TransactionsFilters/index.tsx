@@ -6,6 +6,7 @@ import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { NextRouter, useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { ContractsIndex } from '../../types/contracts';
+import DateFilter from '../DateFilter';
 import { FilterContainer } from './styles';
 
 interface ITransactionsFilters {
@@ -101,6 +102,7 @@ const TransactionsFilters: React.FC<ITransactionsFilters> = ({
       {filters.map(filter => (
         <Filter key={JSON.stringify(filter)} {...filter} />
       ))}
+      <DateFilter />
     </FilterContainer>
   );
 };

@@ -1,10 +1,7 @@
 import { KLV } from '@/assets/coins';
 import { AccountDetails as AccountIcon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
-import DateFilter, {
-  IDateFilter,
-  ISelectedDays,
-} from '@/components/DateFilter';
+import DateFilter from '@/components/DateFilter';
 import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
@@ -54,14 +51,12 @@ import { IInnerTableProps, IResponse } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { contractsList } from '@/utils/contracts';
 import {
-  filterDate,
   filterOperations,
   hexToBinary,
   invertBytes,
 } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
-import { resetDate } from '@/utils/resetDate';
 import {
   AmountContainer,
   BalanceContainer,
@@ -270,15 +265,6 @@ const Account: React.FC<IAccountPage> = () => {
     );
   };
 
-  const resetQueryDate = () => {
-    setQueryAndRouter(resetDate(router.query), router);
-  };
-
-  const filterQueryDate = (selectedDays: ISelectedDays) => {
-    const getFilteredDays = filterDate(selectedDays);
-    setQueryAndRouter({ ...router.query, ...getFilteredDays }, router);
-  };
-
   const filterFromTo = (op: number) => {
     const updatedQuery = { ...router.query };
     if (op === 0) {
@@ -367,16 +353,7 @@ const Account: React.FC<IAccountPage> = () => {
         router,
       );
     },
-    dateFilterProps: {
-      resetDate: resetQueryDate,
-      filterDate: filterQueryDate,
-    },
     showDataFilter: false,
-  };
-
-  const dateFilterProps: IDateFilter = {
-    resetDate: resetQueryDate,
-    filterDate: filterQueryDate,
   };
 
   const transactionsFiltersProps = {
@@ -871,7 +848,7 @@ const Account: React.FC<IAccountPage> = () => {
                   ))}
                 </FilterDiv>
                 <FilterByDate>
-                  <DateFilter {...dateFilterProps} />
+                  <DateFilter />
                 </FilterByDate>
               </RightFiltersContent>
             </ContainerFilter>

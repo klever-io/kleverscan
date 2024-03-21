@@ -22,7 +22,7 @@ import {
 import {
   contractTypes,
   filteredSections,
-  getHeaderForTable,
+  getLabelForTableField,
   initialsTableHeaders,
 } from '@/utils/contracts';
 import { capitalizeString } from '@/utils/convertString';
@@ -42,7 +42,7 @@ const Transactions: React.FC<ITransactionsProps> = props => {
   const { isMobile } = useMobile();
 
   const defaultHeader = [...initialsTableHeaders, 'kApp Fee', 'Bandwidth Fee'];
-  const queryHeader = getHeaderForTable(router, defaultHeader);
+  const queryHeader = getLabelForTableField(router, defaultHeader);
   const getContractType = useCallback(contractTypes, []);
   const getFilteredSections = (
     contract: IContract[],

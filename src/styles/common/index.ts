@@ -241,8 +241,11 @@ export const RowContent = styled.div`
 export const DoubleRow = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 
   gap: 10px;
+
+  width: 100%;
 `;
 
 export const CenteredRow = styled.div`
@@ -257,14 +260,12 @@ export const CenteredRow = styled.div`
   overflow: visible;
 
   strong {
-    font-size: 1rem;
     font-weight: 600;
   }
 
   a {
     color: ${props => props.theme.black};
 
-    font-size: 1rem;
     font-weight: 600;
     text-decoration: none;
 
@@ -275,7 +276,6 @@ export const CenteredRow = styled.div`
 
   p {
     font-weight: 600;
-    font-size: 0.85rem;
   }
 
   svg {

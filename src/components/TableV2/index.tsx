@@ -20,13 +20,13 @@ import {
   ContainerView,
   EmptyRow,
   ExportContainer,
-  ExportLabel,
   FloatContainer,
+  HeaderItem,
   IoReloadSharpWrapper,
   ITableType,
   ItemContainer,
   LimitContainer,
-  LimitText,
+  LimitItems,
   MobileCardItem,
   MobileHeader,
   RetryContainer,
@@ -170,86 +170,70 @@ const Table: React.FC<ITable> = ({
 
   return (
     <>
-      {typeof scrollUp === 'boolean' &&
-        typeof response?.totalPages === 'number' &&
-        !!response?.items &&
-        showLimit && (
-          <FloatContainer>
-            {Filters && <Filters />}
-            <LimitContainer>
-              <span>Per page</span>
-              <LimitText>
-                {limits.map(value => (
-                  <ItemContainer
-                    key={value}
-                    onClick={() => {
-                      setQueryAndRouter(
-                        { ...router.query, limit: value.toString(), page: '1' },
-                        router,
-                      );
-                      refetch();
-                    }}
-                    active={value === (Number(router.query?.limit) || limit)}
-                  >
-                    {value}
-                  </ItemContainer>
-                ))}
-              </LimitText>
-              <IoReloadSharpWrapper $loading={isFetching}>
-                <Tooltip
-                  msg="Refresh"
-                  customStyles={{ delayShow: 800 }}
-                  Component={() => (
-                    <IoReloadSharp size={20} onClick={() => refetch()} />
-                  )}
-                ></Tooltip>
-              </IoReloadSharpWrapper>
-            </LimitContainer>
+      <FloatContainer>
+        {Filters && <Filters />}
+        <LimitContainer>
+          <span>Items Per page</span>
+          <LimitItems>
+            {limits.map(value => (
+              <ItemContainer
+                key={value}
+                onClick={() => {
+                  setQueryAndRouter(
+                    { ...router.query, limit: value.toString(), page: '1' },
+                    router,
+                  );
+                  refetch();
+                }}
+                active={value === (Number(router.query?.limit) || limit)}
+              >
+                {value}
+              </ItemContainer>
+            ))}
+          </LimitItems>
+        </LimitContainer>
 
-            {dataName === 'transactions' && (
-              <ExportContainer>
-                <ExportLabel>
-                  <Tooltip
-                    msg="Current filters will be applied."
-                    Component={() => (
-                      <div style={{ cursor: 'help' }}>Export</div>
-                    )}
-                  />
-                </ExportLabel>
-                <ButtonsContainer>
-                  <ExportButton
-                    items={response?.items}
-                    tableRequest={tableRequest}
-                    totalRecords={response?.totalPages * limit || 10000}
-                  />
-                </ButtonsContainer>
-              </ExportContainer>
-            )}
-          </FloatContainer>
-        )}
+        <ExportContainer>
+          <IoReloadSharpWrapper $loading={isFetching}>
+            <Tooltip
+              msg="Refresh"
+              Component={() => (
+                <IoReloadSharp size={20} onClick={() => refetch()} />
+              )}
+            />
+          </IoReloadSharpWrapper>
+
+          {dataName === 'transactions' && (
+            <>
+              <ButtonsContainer>
+                <ExportButton
+                  items={response?.items}
+                  tableRequest={tableRequest}
+                  totalRecords={response?.totalPages * limit || 10000}
+                />
+              </ButtonsContainer>
+            </>
+          )}
+        </ExportContainer>
+      </FloatContainer>
       <ContainerView>
         <TableBody cols={header.length}>
           {((!isMobile && !isTablet) || !rowSections) &&
-            !!response?.items?.length && (
-              <React.Fragment {...props} key={String(header)}>
-                {header.map((item, index) => {
-                  return <span key={JSON.stringify(item)}>{item}</span>;
-                })}
-              </React.Fragment>
-            )}
+            !!response?.items?.length &&
+            header.map((item, index) => {
+              return <HeaderItem key={JSON.stringify(item)}>{item}</HeaderItem>;
+            })}
           {isLoading && (
             <>
               {Array(limit)
                 .fill(limit)
-                .map((_, index) => (
-                  <React.Fragment key={String(index)} {...props}>
-                    {header.map((item, index2) => (
-                      <span key={JSON.stringify(item) + String(index2)}>
-                        <Skeleton width="100%" />
-                      </span>
-                    ))}
-                  </React.Fragment>
-                ))}
+                .map((_, index) =>
+                  header.map((item, index2) => (
+                    <span key={JSON.stringify(item) + String(index2)}>
+                      <Skeleton width="100%" />
+                    </span>
+                  )),
+                )}
             </>
           )}
           {response?.items &&
@@ -262,12 +246,14 @@ const Table: React.FC<ITable> = ({
                   const [updatedSpanCount, isRightAligned] =
                     processRowSectionsLayout(spanCount, span);
                   spanCount = updatedSpanCount;
+
                   return (
                     <MobileCardItem
                       isAssets={type === 'assets' || type === 'proposals'}
                       isRightAligned={(isMobile || isTablet) && isRightAligned}
                       key={String(index2) + String(index)}
                       columnSpan={span}
+                      isLastRow={index === limit - 1}
                     >
                       {isMobile || isTablet ? (
                         <MobileHeader>{header[index2]}</MobileHeader>

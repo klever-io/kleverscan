@@ -1,9 +1,9 @@
+import { PageDownload } from '@/assets/icons';
 import { Loader } from '@/components/Loader/styles';
 import Tooltip from '@/components/Tooltip';
 import { exportToCsv } from '@/utils/csv';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import { TbTableExport } from 'react-icons/tb';
 import { toast } from 'react-toastify';
 import {
   DropdownItem,
@@ -78,9 +78,7 @@ const ExportButton: React.FC<{
     >
       <Tooltip
         msg="CSV"
-        Component={() =>
-          loadingCsv ? <Loader /> : <TbTableExport size={25} />
-        }
+        Component={() => (loadingCsv ? <Loader /> : <PageDownload size={25} />)}
       />
 
       <DropdownMenu

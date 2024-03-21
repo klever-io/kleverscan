@@ -9,6 +9,8 @@ const theme = {
 
   border: '#eeeff6',
 
+  blueGray300: '#646693',
+  gray700: '#aaaaaa',
   green: '#4EBC87',
   red: '#F84960',
   rose: '#EE3F71',
@@ -17,6 +19,7 @@ const theme = {
   violet: '#aa33b5',
   gray: '#EBEBEB',
   lightGray: '#C6C7EB',
+  darkGray: '#545454',
   lightBlue: '#585A92',
   error: '#9E1313',
   darkBlue: '#0C0D1C',
@@ -144,6 +147,7 @@ const theme = {
     light: '#e7e7e7',
   },
   table: {
+    background: '#fff',
     text: '#7B7DB2',
     success: '#4EBC87',
     pending: '#FFB342',

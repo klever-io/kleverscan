@@ -6,6 +6,7 @@ const darktheme = {
   background: '#06060B',
   white: '#181935',
   black: '#FFFF',
+  gray700: '#B7BDC6',
   darkText: '#C6C7EB',
   legacy: {
     ...theme.legacy,
@@ -24,6 +25,11 @@ const darktheme = {
   },
   line: {
     border: '#646693',
+  },
+
+  table: {
+    ...theme.table,
+    background: '#0b0b10',
   },
 
   input: {

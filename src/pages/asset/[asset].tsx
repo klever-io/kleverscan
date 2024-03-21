@@ -223,7 +223,6 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       delete updatedQuery.limit;
       setQueryAndRouter({ ...updatedQuery, tab: header }, router);
     },
-    dateFilterProps,
     showDataFilter: false,
   };
 
@@ -261,7 +260,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
               ></TransactionsFilters>
               <RightFiltersContent>
                 <FilterByDate>
-                  <DateFilter {...dateFilterProps} />
+                  <DateFilter />
                 </FilterByDate>
               </RightFiltersContent>
             </ContainerFilter>

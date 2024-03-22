@@ -108,9 +108,13 @@ export const Input = styled.input`
 
   font-size: 1.25rem;
   line-height: 1.5rem;
+
+  &:disabled {
+    color: ${({ theme }) => theme.gray};
+  }
 `;
 
-export const InputContainer = styled.div`
+export const InputContainer = styled.div<{ disabled?: boolean }>`
   display: flex;
   gap: 8px;
   align-items: center;
@@ -138,12 +142,13 @@ export const NFTSelectContainer = styled.div`
 
     z-index: 2;
 
-    background-color: ${({ theme }) => theme.background};
+    background-color: ${({ theme }) => theme.true.newBlack};
     border: 1px solid ${({ theme }) => theme.true.white};
 
     &:hover {
       box-shadow: none;
       filter: brightness(1.1);
+      border: 1px solid ${({ theme }) => theme.true.white};
     }
   }
   .react-select__control--is-focused {
@@ -163,8 +168,8 @@ export const NFTSelectContainer = styled.div`
 
   .react-select__menu {
     padding: 0 4px;
-    background-color: ${({ theme }) => theme.background};
-    color: ${props => props.theme.darkText};
+    background-color: ${({ theme }) => theme.true.newBlack};
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
     border-radius: 24px;
     z-index: 1;
 
@@ -172,6 +177,34 @@ export const NFTSelectContainer = styled.div`
   }
   .react-select__option {
     border-radius: 24px;
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+
+    &:hover:not(:focus):not(:disabled) {
+      border: 1px solid
+        ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+    }
+  }
+
+  .react-select__single-value {
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+  }
+
+  .react-select__value-container {
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+    caret-color: ${({ theme }) =>
+      theme.dark ? theme.darkText : theme.lightGray};
+  }
+
+  .react-select__input {
+    color: ${({ theme }) =>
+      theme.dark ? theme.darkText : theme.lightGray} !important;
+  }
+
+  .react-select__dropdown-indicator {
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+    &:hover {
+      color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+    }
   }
 `;
 
@@ -203,19 +236,46 @@ export const SelectContainer = styled.div`
 
     filter: brightness(1.1);
   }
-
   .react-select__menu {
     margin: 0;
     margin-top: -36px;
     padding: 0 4px;
     padding-top: 36px;
     background-color: ${({ theme }) => theme.ito.darkGray};
-    color: ${props => props.theme.darkText};
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
     border-radius: 24px;
     z-index: 1;
   }
   .react-select__option {
     border-radius: 24px;
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+
+    &:hover:not(:focus):not(:disabled) {
+      border: 1px solid
+        ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+    }
+  }
+
+  .react-select__single-value {
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+  }
+
+  .react-select__value-container {
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+    caret-color: ${({ theme }) =>
+      theme.dark ? theme.darkText : theme.lightGray};
+  }
+
+  .react-select__input {
+    color: ${({ theme }) =>
+      theme.dark ? theme.darkText : theme.lightGray} !important;
+  }
+
+  .react-select__dropdown-indicator {
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+    &:hover {
+      color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+    }
   }
 `;
 

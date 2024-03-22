@@ -271,9 +271,10 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
         <BuyForm>
           <InputRow>
             <Label>Buy {asset?.ticker} with</Label>
-            <InputContainer>
+            <InputContainer disabled={asset.assetType === 'NonFungible'}>
               <Input
                 value={currencyAmount}
+                disabled={asset.assetType === 'NonFungible'}
                 onChange={e => {
                   const value = Number(e.target.value);
                   if (Number.isNaN(value)) return;
@@ -328,6 +329,12 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
                     setAssetAmount(value);
                     setCurrencyAmount(calculateCostFromAmount(value));
                   }}
+                  placeholder={
+                    getPackOptions().length === 0
+                      ? 'Select a currency first'
+                      : 'Select a pack'
+                  }
+                  isDisabled={getPackOptions().length === 0}
                   value={getPackOptions().find(
                     option => option.value === selectedPack,
                   )}

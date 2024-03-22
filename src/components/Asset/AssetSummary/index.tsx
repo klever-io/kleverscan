@@ -110,6 +110,7 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
               <TitleContainer>
                 <Title
                   key={asset?.assetId}
+                  route={'/assets'}
                   Component={() => (
                     <PageTitle>{t('common:Titles.Asset')}</PageTitle>
                   )}

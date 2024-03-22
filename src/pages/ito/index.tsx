@@ -1,4 +1,5 @@
 import { ParticipateModal } from '@/components/Asset/AssetSummary/ParticipateModal';
+import { HashComponent } from '@/components/Contract';
 import Copy from '@/components/Copy';
 import { LaunchPadBanner } from '@/components/LaunchPad/Banner';
 import { LaunchPadFAQ } from '@/components/LaunchPad/FAQ';
@@ -54,6 +55,7 @@ const ITOsPage: React.FC = () => {
   const {
     openParticipateModal,
     setOpenParticipateModal,
+    txHash,
     setTxHash,
     setLoading,
   } = useParticipate();
@@ -222,15 +224,23 @@ const ITOsPage: React.FC = () => {
     showLimit: false,
   };
 
+  const hashProps = {
+    hash: txHash,
+    setHash: setTxHash,
+  };
+
   return (
     <MainContainer>
       <ITOContainer>
         <LaunchPadBanner />
         <LaunchPadFAQCards />
+
         <TableContainer>
           <TableHeader>
             <TableTitle>Live Projects</TableTitle>
           </TableHeader>
+          {txHash && <HashComponent {...hashProps} />}
+
           <Table {...tableProps} />
         </TableContainer>
         <LearnBanner />

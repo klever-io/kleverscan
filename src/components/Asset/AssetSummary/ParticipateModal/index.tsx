@@ -54,8 +54,13 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
   const [selectedPack, setSelectedPack] = useState<number>(0);
   const [assetAmount, setAssetAmount] = useState<number>(0);
   const [currencyAmount, setCurrencyAmount] = useState<number>(0);
-  const { setOpenDrawer, extensionInstalled, walletAddress, connectExtension } =
-    useExtension();
+  const {
+    setOpenDrawer,
+    extensionInstalled,
+    walletAddress,
+    connectExtension,
+    checkKleverWebObject,
+  } = useExtension();
   const { t } = useTranslation('assets');
 
   const closeModal = () => {
@@ -245,7 +250,7 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
       setOpenDrawer(true);
       return;
     }
-    if (!walletAddress) {
+    if (!walletAddress || !checkKleverWebObject()) {
       await connectExtension();
     }
 
@@ -337,12 +342,6 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
               {ITO.royalties.fixed
                 ? `+ ${ITO.royalties.fixed} KLV (Fixed Royalties)`
                 : ''}
-              {ITO.royalties.percentage
-                ? ` + ${
-                    (ITO.royalties.percentage * currencyAmount) /
-                    10 ** (selectedPackData.precision || 0)
-                  } ${selectedPackCurrency} (Percentage Royalties)`
-                : ''}
             </Fees>
           </InputRow>
 
@@ -391,7 +390,7 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
         <SubmitButton
           type="button"
           onClick={handleSubmit}
-          secondary={!walletAddress}
+          secondary={!extensionInstalled}
           isDisabled={!currencyAmount || !selectedPackCurrency}
         >
           Buy now

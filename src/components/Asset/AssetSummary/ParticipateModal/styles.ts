@@ -111,8 +111,8 @@ export const Input = styled.input`
 
   width: 100%;
 
-  font-size: 1.25rem;
-  line-height: 1.5rem;
+  font-size: 1rem;
+  line-height: 1.25rem;
 
   &:disabled {
     color: ${({ theme }) => theme.gray};
@@ -128,6 +128,14 @@ export const InputContainer = styled.div<{ disabled?: boolean }>`
 
   border: 1px solid ${({ theme }) => theme.true.white};
   border-radius: 24px;
+`;
+
+export const CurrencyTicker = styled.div`
+  color: ${({ theme }) => theme.true.white};
+  padding: 0 14px;
+
+  min-width: 120px;
+  max-width: 120px;
 `;
 
 export const NFTSelectContainer = styled.div`
@@ -163,12 +171,12 @@ export const NFTSelectContainer = styled.div`
   }
 
   .react-select__placeholder {
-    font-size: 1.25rem;
-    line-height: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.25rem;
   }
   .react-select__input-container {
-    font-size: 1.25rem;
-    line-height: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.25rem;
   }
 
   .react-select__menu {
@@ -215,7 +223,8 @@ export const NFTSelectContainer = styled.div`
 
 export const SelectContainer = styled.div`
   ${ReactSelectStyles}
-  width: 140px;
+  min-width: 120px;
+  max-width: 120px;
 
   .react-select__dropdown-indicator {
     padding: 0;
@@ -298,7 +307,7 @@ export const SubmitButton = styled.button<{
   color: ${({ theme }) => theme.true.white} !important;
   border: 1px solid ${({ theme }) => theme.violet};
 
-  font-size: 1rem;
+  font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.25rem;
 

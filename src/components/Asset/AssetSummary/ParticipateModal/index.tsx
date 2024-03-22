@@ -18,6 +18,7 @@ import {
   BuyForm,
   Container,
   Content,
+  CurrencyTicker,
   Fees,
   Header,
   Input,
@@ -69,7 +70,7 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
 
   const selectedPackData = useMemo(
     () =>
-      ITO.packData.find(pack => pack.key === selectedPackCurrency) ||
+      ITO.packData?.find(pack => pack.key === selectedPackCurrency) ||
       ITO.packData?.[0] || {
         key: '',
         precision: 0,
@@ -105,7 +106,7 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
         return pack.key === selectedPackCurrency;
       })?.packs || [];
 
-    return packs.map(pack => ({
+    return packs?.map(pack => ({
       label: `${pack.amount} ${ITO.ticker}`,
       value: pack.amount,
     }));
@@ -338,11 +339,12 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
                 />
               </SelectContainer>
             </InputContainer>
-            <Fees>
-              {ITO.royalties.fixed
-                ? `+ ${ITO.royalties.fixed} KLV (Fixed Royalties)`
-                : ''}
-            </Fees>
+
+            {ITO.royalties.fixed ? (
+              <Fees>{ITO.royalties.fixed} KLV (Fixed Royalties)</Fees>
+            ) : (
+              ''
+            )}
           </InputRow>
 
           <InputRow>
@@ -359,6 +361,9 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
                     setCurrencyAmount(calculateCostFromAmount(value));
                   }}
                 />
+                {ITO.assetType === 'Fungible' ? (
+                  <CurrencyTicker>{ITO.ticker}</CurrencyTicker>
+                ) : null}
               </InputContainer>
             ) : (
               <NFTSelectContainer>
@@ -379,7 +384,7 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
                       : 'Select a pack'
                   }
                   isDisabled={getPackOptions().length === 0}
-                  value={getPackOptions().find(
+                  value={getPackOptions()?.find(
                     option => option.value === selectedPack,
                   )}
                 />

@@ -249,6 +249,7 @@ const ITOsPage: React.FC = () => {
       {ITO &&
         ReactDOM.createPortal(
           <ParticipateModal
+            key={ITO.assetId}
             isOpenParticipateModal={openParticipateModal}
             setOpenParticipateModal={setOpenParticipateModal}
             ITO={ITO}

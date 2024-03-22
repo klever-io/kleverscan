@@ -24,11 +24,12 @@ export const BannerContainer = styled.div`
     background-image: url('/images/launchpad-banner.png');
     background-size: cover;
     /* creata a opacity mastk from top to bottom start at 80% of the image */
-    mask-image: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 1) 90%,
-      rgba(0, 0, 0, 0) 100%
-    );
+    mask-image: linear-gradient(to bottom, white 90%, transparent 100%),
+      linear-gradient(to left, transparent 0%, white 10% 90%, transparent 100%);
+
+    mask-position: center;
+    mask-repeat: no-repeat;
+    mask-composite: intersect;
 
     ${({ theme }) =>
       !theme.dark &&

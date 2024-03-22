@@ -101,151 +101,154 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
   };
 
   return (
-    <>
-      {asset ? (
-        <Container>
-          {txHash && <HashComponent {...hashProps} />}
-          <Header>
-            <LeftSide>
-              <TitleContainer>
-                <Title
-                  key={asset?.assetId}
-                  route={'/assets'}
-                  Component={() => (
-                    <PageTitle>{t('common:Titles.Asset')}</PageTitle>
-                  )}
-                />
-
-                <AssetTitle>
-                  <AssetLogo
-                    logo={asset?.logo || ''}
-                    ticker={asset?.ticker || ''}
-                    name={asset?.name || ''}
-                    verified={asset?.verified}
-                    size={56}
-                  />
-                  <AssetHeaderContainer>
-                    <h1>{asset?.name}</h1>
-                    <AssetSubtitle>
-                      {asset?.assetId}
-                      <AssetTypeContainer>
-                        {asset?.assetType}
-                      </AssetTypeContainer>
-                    </AssetSubtitle>
-                  </AssetHeaderContainer>
-                </AssetTitle>
-              </TitleContainer>
-
-              <>
-                {asset_info?.short_description ? (
-                  <Description>{asset_info?.short_description}</Description>
-                ) : null}
-                {!asset_info?.short_description &&
-                walletAddress &&
-                asset?.ownerAddress === walletAddress ? (
-                  <ParticipateButton
-                    secondary
-                    type="button"
-                    onClick={() => setOpenApplyFormModal(true)}
-                  >
-                    <Edit />
-                    Add a description
-                  </ParticipateButton>
-                ) : null}
-              </>
-
-              <SocialNetworks>
-                {getSocialNetworks().map(social => (
-                  <LinkStyles
-                    key={social.social}
-                    href={social.uri}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <social.icon />
-                  </LinkStyles>
-                ))}
-              </SocialNetworks>
-            </LeftSide>
-            <RightSide>
-              {asset && ITO && (
-                <AssetITOSummary
-                  asset={asset}
-                  ITO={ITO}
-                  setOpenParticipateModal={setOpenParticipateModal}
-                />
+    <Container>
+      {txHash && <HashComponent {...hashProps} />}
+      <Header>
+        <LeftSide>
+          <TitleContainer>
+            <Title
+              key={asset?.assetId}
+              route={'/assets'}
+              Component={() => (
+                <PageTitle>{t('common:Titles.Asset')}</PageTitle>
               )}
-              {!isTablet && asset?.logo && (
-                <BackgroundImage>
-                  <Image
-                    src={asset?.logo || ''}
-                    alt=""
-                    width={550}
-                    height={450}
-                    loader={({ src, width }) => `${src}?w=${width}`}
-                  />
-                </BackgroundImage>
+            />
+
+            <AssetTitle>
+              {asset ? (
+                <AssetLogo
+                  logo={asset?.logo || ''}
+                  ticker={asset?.ticker || ''}
+                  name={asset?.name || ''}
+                  verified={asset?.verified}
+                  size={56}
+                />
+              ) : (
+                <Skeleton width={56} height={56} />
               )}
-            </RightSide>
-          </Header>
-          {asset_info?.project_description ? (
-            <About>
-              <h2>
-                About the project
-                {walletAddress && asset?.ownerAddress === walletAddress && (
-                  <EditContainer onClick={() => setOpenApplyFormModal(true)}>
-                    <Edit />
-                  </EditContainer>
+              <AssetHeaderContainer>
+                {asset ? (
+                  <h1>{asset?.name}</h1>
+                ) : (
+                  <Skeleton width={200} height={40} />
                 )}
-              </h2>
-              <p>{asset_info?.project_description}</p>
-            </About>
-          ) : null}
-          {ReactDOM.createPortal(
-            asset && (
-              <ApplyFormModal
-                key={JSON.stringify(asset_info) + asset.assetId}
-                isOpenApplyFormModal={openApplyFormModal}
-                setOpenApplyFormModal={setOpenApplyFormModal}
-                defaultValues={{
-                  short_description: asset_info?.short_description,
-                  project_description: asset_info?.project_description,
-                }}
-                refetchAssetInfo={refetchAssetInfo}
-                asset={asset}
-                setTxHash={setTxHash}
-                setLoading={setLoading}
-              />
-            ),
-            window.document.body,
-          )}
+                {asset ? (
+                  <AssetSubtitle>
+                    {asset?.assetId}
+                    <AssetTypeContainer>{asset?.assetType}</AssetTypeContainer>
+                  </AssetSubtitle>
+                ) : (
+                  <Skeleton width={'100%'} height={34} />
+                )}
+              </AssetHeaderContainer>
+            </AssetTitle>
+          </TitleContainer>
 
-          {ReactDOM.createPortal(
-            asset && ITO && (
-              <ParticipateModal
-                isOpenParticipateModal={openParticipateModal}
-                setOpenParticipateModal={setOpenParticipateModal}
-                asset={asset}
-                ITO={ITO}
-                setTxHash={setTxHash}
-                setLoading={setLoading}
-              />
-            ),
-            window.document.body,
-          )}
+          <>
+            {asset_info?.short_description ? (
+              <Description>{asset_info?.short_description}</Description>
+            ) : null}
+            {!asset_info?.short_description &&
+            walletAddress &&
+            asset?.ownerAddress === walletAddress ? (
+              <ParticipateButton
+                secondary
+                type="button"
+                onClick={() => setOpenApplyFormModal(true)}
+              >
+                <Edit />
+                Add a description
+              </ParticipateButton>
+            ) : null}
+          </>
 
-          {loading
-            ? ReactDOM.createPortal(
-                <LoadingBackground>
-                  <Loader />
-                </LoadingBackground>,
-                window.document.body,
-              )
-            : null}
-        </Container>
-      ) : (
-        <Skeleton width={200} height={40} />
-      )}
-    </>
+          <SocialNetworks>
+            {getSocialNetworks().map(social => (
+              <LinkStyles
+                key={social.social}
+                href={social.uri}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <social.icon />
+              </LinkStyles>
+            ))}
+          </SocialNetworks>
+        </LeftSide>
+        <RightSide>
+          {asset && ITO && (
+            <AssetITOSummary
+              asset={asset}
+              ITO={ITO}
+              setOpenParticipateModal={setOpenParticipateModal}
+            />
+          )}
+          {!isTablet && asset?.logo && (
+            <BackgroundImage>
+              <Image
+                src={asset?.logo || ''}
+                alt=""
+                width={550}
+                height={450}
+                loader={({ src, width }) => `${src}?w=${width}`}
+              />
+            </BackgroundImage>
+          )}
+        </RightSide>
+      </Header>
+      {asset_info?.project_description ? (
+        <About>
+          <h2>
+            About the project
+            {walletAddress && asset?.ownerAddress === walletAddress && (
+              <EditContainer onClick={() => setOpenApplyFormModal(true)}>
+                <Edit />
+              </EditContainer>
+            )}
+          </h2>
+          <p>{asset_info?.project_description}</p>
+        </About>
+      ) : null}
+      {asset &&
+        ReactDOM.createPortal(
+          <ApplyFormModal
+            key={JSON.stringify(asset_info) + asset.assetId}
+            isOpenApplyFormModal={openApplyFormModal}
+            setOpenApplyFormModal={setOpenApplyFormModal}
+            defaultValues={{
+              short_description: asset_info?.short_description,
+              project_description: asset_info?.project_description,
+            }}
+            refetchAssetInfo={refetchAssetInfo}
+            asset={asset}
+            setTxHash={setTxHash}
+            setLoading={setLoading}
+          />,
+          window.document.body,
+        )}
+
+      {asset &&
+        ITO &&
+        ReactDOM.createPortal(
+          <ParticipateModal
+            isOpenParticipateModal={openParticipateModal}
+            setOpenParticipateModal={setOpenParticipateModal}
+            asset={asset}
+            ITO={ITO}
+            setTxHash={setTxHash}
+            setLoading={setLoading}
+          />,
+          window.document.body,
+        )}
+
+      {loading
+        ? ReactDOM.createPortal(
+            <LoadingBackground>
+              <Loader />
+            </LoadingBackground>,
+            window.document.body,
+          )
+        : null}
+    </Container>
   );
 };

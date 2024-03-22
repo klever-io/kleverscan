@@ -8,7 +8,7 @@ import { getPrecision } from '@/utils/precisionFunctions';
 import { web } from '@klever/sdk-web';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
   ArrowContainer,
@@ -18,6 +18,7 @@ import {
   BuyForm,
   Container,
   Content,
+  Fees,
   Header,
   Input,
   InputContainer,
@@ -61,6 +62,17 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
     setOpenParticipateModal(false);
   };
 
+  const selectedPackData = useMemo(
+    () =>
+      ITO.packData.find(pack => pack.key === selectedPackCurrency) ||
+      ITO.packData?.[0] || {
+        key: '',
+        precision: 0,
+        packs: [],
+      },
+    [selectedPackCurrency, ITO.packData],
+  );
+
   useEffect(() => {
     if (isOpenParticipateModal) {
       document.documentElement.style.overflow = 'hidden';
@@ -95,6 +107,7 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
   };
 
   const calculateCostFromAmount = (amount: number): number => {
+    // second input
     if (!ITO) {
       return 0;
     }
@@ -103,10 +116,10 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
       return 0;
     }
 
-    const qtyPacks = ITO.packData.length;
+    const qtyPacks = selectedPackData.packs.length;
 
     const packs =
-      ITO.packData.find(pack => pack.key === selectedPackCurrency)?.packs ||
+      selectedPackData?.packs ||
       ([
         {
           amount: 0,
@@ -153,6 +166,7 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
   };
 
   const calculateAmountFromCost = (cost: number): number => {
+    //first input
     if (!ITO) {
       return 0;
     }
@@ -161,10 +175,16 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
       return 0;
     }
 
-    const qtyPacks = ITO.packData.length;
+    if (!selectedPackData) {
+      return 0;
+    }
+
+    const qtyPacks = selectedPackData.packs.length;
+
+    const assetPrecision = selectedPackData?.precision;
 
     const packs =
-      ITO.packData.find(pack => pack.key === selectedPackCurrency)?.packs ||
+      selectedPackData?.packs ||
       ([
         {
           amount: 0,
@@ -173,12 +193,12 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
       ] as IPackItem[]);
 
     if (qtyPacks === 1) {
-      return (cost * packs[0].amount) / packs[0].price;
+      return cost / packs[0].price;
     } else if (qtyPacks === 2) {
       if (cost >= 0 && cost <= packs[0].amount * packs[0].price) {
-        return (cost * packs[0].amount) / packs[0].price;
+        return cost / packs[0].price;
       } else if (cost >= packs[1].amount * packs[1].price) {
-        return (cost * packs[1].amount) / packs[1].price;
+        return cost / packs[1].price;
       }
     }
 
@@ -200,9 +220,9 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
 
     if (!priceIndex) {
       priceIndex = packs.length - 1;
-      amount = (cost * packs[priceIndex].amount) / packs[priceIndex].price;
+      amount = cost / packs[priceIndex].price;
     } else {
-      amount = (cost * packs[priceIndex].amount) / packs[priceIndex].price;
+      amount = cost / packs[priceIndex].price;
     }
 
     return isFloat(amount) && String(amount).length > 10
@@ -313,6 +333,17 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
                 />
               </SelectContainer>
             </InputContainer>
+            <Fees>
+              {ITO.royalties.fixed
+                ? `+ ${ITO.royalties.fixed} KLV (Fixed Royalties)`
+                : ''}
+              {ITO.royalties.percentage
+                ? ` + ${
+                    (ITO.royalties.percentage * currencyAmount) /
+                    10 ** (selectedPackData.precision || 0)
+                  } ${selectedPackCurrency} (Percentage Royalties)`
+                : ''}
+            </Fees>
           </InputRow>
 
           <InputRow>

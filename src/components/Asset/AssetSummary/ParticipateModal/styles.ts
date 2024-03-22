@@ -99,6 +99,11 @@ export const Label = styled.label`
   color: ${({ theme }) => theme.true.white};
 `;
 
+export const Fees = styled.div`
+  padding-left: 16px;
+  color: ${({ theme }) => theme.true.white};
+  font-size: 0.75rem;
+`;
 export const Input = styled.input`
   color: ${({ theme }) => theme.true.white};
 
@@ -297,16 +302,13 @@ export const SubmitButton = styled.button<{
   font-weight: 600;
   line-height: 1.25rem;
 
-  transition: background-color 100ms linear, color 100ms linear,
-    border 100ms linear;
+  transition: filter 100ms linear;
 
   ${({ isDisabled }) =>
     isDisabled &&
     css`
       cursor: not-allowed;
-      background-color: ${({ theme }) => theme.gray};
-      border: 1px solid ${({ theme }) => theme.gray};
-      color: ${({ theme }) => theme.true.black} !important;
+      filter: grayscale(1);
     `}
 
   ${({ theme, secondary }) =>

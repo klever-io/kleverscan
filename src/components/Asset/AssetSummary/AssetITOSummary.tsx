@@ -61,9 +61,8 @@ export const AssetITOSummary: React.FC<AssetITOProps> = ({
         <TotalRaised>
           <Label>Total Raised</Label>
           <TotalRaisedValue>
-            {(ITO?.mintedAmount || 0) / 10 ** (ITO?.precision ?? 0)}{' '}
-            {ITO?.ticker} /{' '}
-            {ITO?.maxAmount ? `${ITO?.maxAmount} ${ITO?.ticker}` : '∞'}
+            {ITO?.mintedAmount || 0} {ITO?.ticker} /{' '}
+            {ITO?.maxAmount ? `${ITO?.maxAmount || 0} ${ITO?.ticker}` : '∞'}
           </TotalRaisedValue>
         </TotalRaised>
 

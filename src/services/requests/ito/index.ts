@@ -56,6 +56,7 @@ export const processITOPrecisions = async (
       pack.price = pack.price / 10 ** keyPrecision;
       pack.amount = pack.amount / 10 ** assetPrecision;
     });
+    packInfo['precision'] = keyPrecision;
   });
   return ITO;
 };

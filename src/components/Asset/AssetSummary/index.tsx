@@ -2,19 +2,18 @@ import { Edit } from '@/assets/icons';
 import * as SocialIcons from '@/assets/social';
 import { AssetProps } from '@/components/Asset/OverviewTab';
 import { HashComponent } from '@/components/Contract';
-import { LoadingBackground } from '@/components/Contract/styles';
 import Title from '@/components/Layout/Title';
-import { Loader } from '@/components/Loader/styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Skeleton from '@/components/Skeleton';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
+import { useParticipate } from '@/contexts/participate';
 import { assetInfoCall } from '@/services/requests/asset';
 import { IParsedITO } from '@/types';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { useQuery } from 'react-query';
 import { ApplyFormModal } from './ApplyFormModal';
@@ -45,11 +44,16 @@ export interface AssetSummaryProps extends AssetProps {
 }
 
 export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
-  const [openParticipateModal, setOpenParticipateModal] = useState(false);
-  const [openApplyFormModal, setOpenApplyFormModal] = useState(false);
-  const [txHash, setTxHash] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
+  const {
+    openApplyFormModal,
+    setOpenApplyFormModal,
+    openParticipateModal,
+    setOpenParticipateModal,
+    txHash,
+    setTxHash,
+    loading,
+    setLoading,
+  } = useParticipate();
   const { isTablet } = useMobile();
   const router = useRouter();
   const { walletAddress, connectExtension, extensionInstalled } =
@@ -227,28 +231,17 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
           window.document.body,
         )}
 
-      {asset &&
-        ITO &&
+      {ITO &&
         ReactDOM.createPortal(
           <ParticipateModal
             isOpenParticipateModal={openParticipateModal}
             setOpenParticipateModal={setOpenParticipateModal}
-            asset={asset}
             ITO={ITO}
             setTxHash={setTxHash}
             setLoading={setLoading}
           />,
           window.document.body,
         )}
-
-      {loading
-        ? ReactDOM.createPortal(
-            <LoadingBackground>
-              <Loader />
-            </LoadingBackground>,
-            window.document.body,
-          )
-        : null}
     </Container>
   );
 };

@@ -1,7 +1,7 @@
 import { isFloat } from '@/components/FungibleITO';
 import { StyledArrow } from '@/components/Layout/Title/styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
-import { IAsset, IParsedITO } from '@/types';
+import { IParsedITO } from '@/types';
 import { IPackItem } from '@/types/contracts';
 import { getPrecision } from '@/utils/precisionFunctions';
 import { web } from '@klever/sdk-web';
@@ -36,7 +36,6 @@ const ReactSelect = dynamic(() => import('react-select'), {
 interface ParticipateModalProps {
   isOpenParticipateModal: boolean;
   setOpenParticipateModal: (state: boolean) => void;
-  asset: IAsset;
   ITO: IParsedITO;
   setTxHash: (txHash: string) => void;
   setLoading: (state: boolean) => void;
@@ -45,7 +44,6 @@ interface ParticipateModalProps {
 export const ParticipateModal: React.FC<ParticipateModalProps> = ({
   isOpenParticipateModal,
   setOpenParticipateModal,
-  asset,
   ITO,
   setTxHash,
   setLoading,
@@ -74,7 +72,7 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
 
   const getPackCurrencyOptions = () => {
     return (
-      ITO?.packData.map(pack => ({
+      ITO?.packData?.map(pack => ({
         label: pack.key,
         value: pack.key,
       })) || []
@@ -83,12 +81,12 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
 
   const getPackOptions = () => {
     const packs =
-      ITO?.packData.find(pack => {
+      ITO?.packData?.find(pack => {
         return pack.key === selectedPackCurrency;
       })?.packs || [];
 
     return packs.map(pack => ({
-      label: `${pack.amount} ${asset.ticker}`,
+      label: `${pack.amount} ${ITO.ticker}`,
       value: pack.amount,
     }));
   };
@@ -257,24 +255,24 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
 
         <AssetVisualization>
           <AssetLogo
-            logo={asset?.logo || ''}
-            ticker={asset?.ticker || ''}
-            name={asset?.name || ''}
-            verified={asset?.verified}
+            logo={ITO?.logo || ''}
+            ticker={ITO?.ticker || ''}
+            name={ITO?.name || ''}
+            verified={ITO?.verified}
             size={40}
           />
           <AssetName>
-            {asset?.name} ({asset?.ticker})
+            {ITO?.name} ({ITO?.ticker})
           </AssetName>
         </AssetVisualization>
 
         <BuyForm>
           <InputRow>
-            <Label>Buy {asset?.ticker} with</Label>
-            <InputContainer disabled={asset.assetType === 'NonFungible'}>
+            <Label>Buy {ITO?.ticker} with</Label>
+            <InputContainer disabled={ITO.assetType === 'NonFungible'}>
               <Input
                 value={currencyAmount}
-                disabled={asset.assetType === 'NonFungible'}
+                disabled={ITO.assetType === 'NonFungible'}
                 onChange={e => {
                   const value = Number(e.target.value);
                   if (Number.isNaN(value)) return;
@@ -302,8 +300,8 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
           </InputRow>
 
           <InputRow>
-            <Label>Amount of {asset?.ticker}</Label>
-            {asset.assetType === 'Fungible' ? (
+            <Label>Amount of {ITO?.ticker}</Label>
+            {ITO.assetType === 'Fungible' ? (
               <InputContainer>
                 <Input
                   value={assetAmount}

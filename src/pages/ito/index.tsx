@@ -1,3 +1,4 @@
+import { ParticipateModal } from '@/components/Asset/AssetSummary/ParticipateModal';
 import Copy from '@/components/Copy';
 import { LaunchPadBanner } from '@/components/LaunchPad/Banner';
 import { LaunchPadFAQ } from '@/components/LaunchPad/FAQ';
@@ -6,6 +7,7 @@ import { LearnBanner } from '@/components/LaunchPad/LearnBanner';
 import { WalletBanner } from '@/components/LaunchPad/WalletBanner';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Table, { ITable } from '@/components/NewTable';
+import { useParticipate } from '@/contexts/participate';
 import { requestITOs } from '@/services/requests/ito';
 import { IITOResponse, IParsedITO, IRowSection } from '@/types';
 import { IPackInfo } from '@/types/contracts';
@@ -25,7 +27,8 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
+import ReactDOM from 'react-dom';
 import { IoIosInfinite } from 'react-icons/io';
 import nextI18nextConfig from '../../../next-i18next.config';
 
@@ -47,6 +50,13 @@ export function getBestKLVRate(packData: IPackInfo[]): number | undefined {
 }
 
 const ITOsPage: React.FC = () => {
+  const [ITO, setITO] = useState<IParsedITO | null>(null);
+  const {
+    openParticipateModal,
+    setOpenParticipateModal,
+    setTxHash,
+    setLoading,
+  } = useParticipate();
   const { t } = useTranslation('itos');
   const router = useRouter();
 
@@ -173,9 +183,15 @@ const ITOsPage: React.FC = () => {
       },
       {
         element: (
-          <Link key={assetId} href={`/asset/${assetId}`}>
-            <ParticipateButton>Participate</ParticipateButton>
-          </Link>
+          <ParticipateButton
+            onClick={() => {
+              setITO(asset);
+              setOpenParticipateModal(true);
+            }}
+            key={name}
+          >
+            Participate
+          </ParticipateButton>
         ),
         span: 1,
       },
@@ -221,6 +237,18 @@ const ITOsPage: React.FC = () => {
         <WalletBanner />
         <LaunchPadFAQ />
       </ITOContainer>
+
+      {ITO &&
+        ReactDOM.createPortal(
+          <ParticipateModal
+            isOpenParticipateModal={openParticipateModal}
+            setOpenParticipateModal={setOpenParticipateModal}
+            ITO={ITO}
+            setTxHash={setTxHash}
+            setLoading={setLoading}
+          />,
+          window.document.body,
+        )}
     </MainContainer>
   );
 };

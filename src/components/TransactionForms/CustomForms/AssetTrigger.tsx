@@ -79,7 +79,7 @@ const AssetTrigger: React.FC<IContractProps> = ({
           name="triggerType"
           title="Asset Trigger Type"
           type="dropdown"
-          zIndex={5}
+          zIndex={4}
           options={assetTriggerTypes}
           required
         />

@@ -14,6 +14,7 @@ import {
 } from '@/types';
 import { IParsedProposal, IProposalResponse } from '@/types/proposals';
 import { getVotingPowers, validateFormattedVotes } from '..';
+import { KLV_PRECISION } from '../globalVariables';
 import { getProposalNetworkParams } from '../networkFunctions';
 
 /**
@@ -204,14 +205,24 @@ export const parseITOs = async (
   if (!res.error || res.error === '') {
     const assets = res.data.assets;
     ITOs.forEach((ITO, index) => {
-      const asset = assets.find(
+      const asset: IAsset = assets.find(
         (asset: IAsset) => asset.assetId === ITOs[index].assetId,
       );
       ITO.maxAmount = ITO.maxAmount / 10 ** asset.precision;
+      ITO.mintedAmount = (ITO.mintedAmount || 0) / 10 ** asset.precision;
       ITO['ticker'] = asset.ticker;
       ITO['assetType'] = asset.assetType;
       ITO['precision'] = asset.precision;
       ITO['assetLogo'] = asset.logo;
+
+      ITO['name'] = asset.name;
+      ITO['verified'] = asset.verified;
+      ITO['logo'] = asset.logo;
+
+      ITO['royalties'] = {
+        fixed: (asset?.royalties?.itoFixed || 0) / 10 ** KLV_PRECISION,
+        percentage: asset?.royalties?.itoPercentage || 0,
+      };
       packsPrecisionCalls.push(processITOPrecisions(ITO, asset.precision));
     });
     await Promise.allSettled(packsPrecisionCalls);

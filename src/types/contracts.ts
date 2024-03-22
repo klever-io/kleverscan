@@ -403,6 +403,7 @@ export interface IPackItem {
 }
 export interface IPackInfo {
   key: string;
+  precision?: number;
   packs: IPackItem[];
 }
 

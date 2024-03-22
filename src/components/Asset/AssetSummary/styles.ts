@@ -19,8 +19,6 @@ export const AssetTitle = styled.div`
   overflow: hidden;
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    flex-direction: column;
-
     align-items: flex-start;
   }
 `;
@@ -88,7 +86,6 @@ export const Container = styled.div`
 export const Header = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: center;
   flex-direction: column;
   gap: 24px;
   padding-top: 20px;
@@ -101,8 +98,10 @@ export const Header = styled.div`
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: row;
+    align-items: center;
     padding-top: 40px;
     padding-bottom: 80px;
+    min-height: 450px;
   }
 `;
 

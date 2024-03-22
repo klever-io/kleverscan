@@ -1,3 +1,5 @@
+import { ParticipateModal } from '@/components/Asset/AssetSummary/ParticipateModal';
+import { HashComponent } from '@/components/Contract';
 import Copy from '@/components/Copy';
 import { LaunchPadBanner } from '@/components/LaunchPad/Banner';
 import { LaunchPadFAQ } from '@/components/LaunchPad/FAQ';
@@ -6,15 +8,12 @@ import { LearnBanner } from '@/components/LaunchPad/LearnBanner';
 import { WalletBanner } from '@/components/LaunchPad/WalletBanner';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Table, { ITable } from '@/components/NewTable';
-import {
-  parseITOsRequest,
-  requestAssetsList,
-  requestITOs,
-} from '@/services/requests/ito';
+import { useParticipate } from '@/contexts/participate';
+import { requestITOs } from '@/services/requests/ito';
 import { IITOResponse, IParsedITO, IRowSection } from '@/types';
 import { IPackInfo } from '@/types/contracts';
 import { formatAmount } from '@/utils/formatFunctions';
-import { KLV_PRECISION } from '@/utils/globalVariables';
+import { parseITOs } from '@/utils/parseValues';
 import { ContainerAssetId } from '@/views/assets';
 import {
   ITOContainer,
@@ -29,21 +28,18 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
+import ReactDOM from 'react-dom';
 import { IoIosInfinite } from 'react-icons/io';
 import nextI18nextConfig from '../../../next-i18next.config';
 
-export function getBestKLVRate(
-  packData: IPackInfo[],
-  precision: number,
-): number | undefined {
+export function getBestKLVRate(packData: IPackInfo[]): number | undefined {
   let bestKLVRate: number | undefined = undefined;
   if (packData) {
     packData.forEach(pack => {
       if (pack.key === 'KLV') {
         pack.packs.forEach(p => {
-          const rate =
-            (p.price * 10 ** precision) / (p.amount * 10 ** KLV_PRECISION);
+          const rate = p.price;
           if (!bestKLVRate || rate < bestKLVRate) {
             bestKLVRate = rate;
           }
@@ -55,6 +51,14 @@ export function getBestKLVRate(
 }
 
 const ITOsPage: React.FC = () => {
+  const [ITO, setITO] = useState<IParsedITO | null>(null);
+  const {
+    openParticipateModal,
+    setOpenParticipateModal,
+    txHash,
+    setTxHash,
+    setLoading,
+  } = useParticipate();
   const { t } = useTranslation('itos');
   const router = useRouter();
 
@@ -63,8 +67,7 @@ const ITOsPage: React.FC = () => {
     limit: number,
   ): Promise<IITOResponse> => {
     const dataITOs = await requestITOs(router, page, limit);
-    const assets = await requestAssetsList(dataITOs);
-    await parseITOsRequest(dataITOs, assets);
+    await parseITOs(dataITOs.data.itos);
     return dataITOs;
   };
 
@@ -86,7 +89,7 @@ const ITOsPage: React.FC = () => {
       whitelistEndTime,
     } = asset;
 
-    const bestKLVRate = getBestKLVRate(packData, precision);
+    const bestKLVRate = getBestKLVRate(packData);
 
     const access = Date.now() < whitelistEndTime ? 'Whitelist Only' : 'Public';
 
@@ -114,7 +117,7 @@ const ITOsPage: React.FC = () => {
     const sections = [
       {
         element: (
-          <Link href={`/asset/${assetId}`} key={assetId}>
+          <Link href={`/asset/${assetId}?reference=ito`} key={assetId}>
             <a>
               <AssetLogo
                 logo={logo}
@@ -130,10 +133,8 @@ const ITOsPage: React.FC = () => {
 
       {
         element: (
-          <Link href={`/asset/${assetId}`} key={name}>
-            <a style={{ overflow: 'hidden' }}>
-              <p>{name}</p>
-            </a>
+          <Link href={`/asset/${assetId}?reference=ito`} key={name}>
+            <a style={{ overflow: 'hidden' }}>{name}</a>
           </Link>
         ),
         span: 1,
@@ -141,10 +142,10 @@ const ITOsPage: React.FC = () => {
       {
         element: (
           <ContainerAssetId>
-            <Link href={`/asset/${assetId}`} key={assetId}>
+            <Link href={`/asset/${assetId}?reference=ito`} key={assetId}>
               {assetId}
             </Link>
-            <Copy info="Asset ID" data={assetId} />
+            <Copy info="Asset ID" data={assetId} svgSize={18} />
           </ContainerAssetId>
         ),
         span: 1,
@@ -182,9 +183,15 @@ const ITOsPage: React.FC = () => {
       },
       {
         element: (
-          <Link key={assetId} href={`/asset/${assetId}`}>
-            <ParticipateButton>Participate</ParticipateButton>
-          </Link>
+          <ParticipateButton
+            onClick={() => {
+              setITO(asset);
+              setOpenParticipateModal(true);
+            }}
+            key={name}
+          >
+            Participate
+          </ParticipateButton>
         ),
         span: 1,
       },
@@ -215,21 +222,42 @@ const ITOsPage: React.FC = () => {
     showLimit: false,
   };
 
+  const hashProps = {
+    hash: txHash,
+    setHash: setTxHash,
+  };
+
   return (
     <MainContainer>
       <ITOContainer>
         <LaunchPadBanner />
         <LaunchPadFAQCards />
+
         <TableContainer>
           <TableHeader>
             <TableTitle>Live Projects</TableTitle>
           </TableHeader>
+          {txHash && <HashComponent {...hashProps} />}
+
           <Table {...tableProps} />
         </TableContainer>
         <LearnBanner />
         <WalletBanner />
         <LaunchPadFAQ />
       </ITOContainer>
+
+      {ITO &&
+        ReactDOM.createPortal(
+          <ParticipateModal
+            key={ITO.assetId}
+            isOpenParticipateModal={openParticipateModal}
+            setOpenParticipateModal={setOpenParticipateModal}
+            ITO={ITO}
+            setTxHash={setTxHash}
+            setLoading={setLoading}
+          />,
+          window.document.body,
+        )}
     </MainContainer>
   );
 };

@@ -505,6 +505,10 @@ export interface IParsedITO extends IITO {
   assetType: string;
   precision: number;
   assetLogo: string;
+  royalties: {
+    fixed: number;
+    percentage: number;
+  };
 }
 
 export interface IAssetPool {

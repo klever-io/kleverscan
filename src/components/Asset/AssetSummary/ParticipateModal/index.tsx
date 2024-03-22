@@ -1,6 +1,7 @@
 import { isFloat } from '@/components/FungibleITO';
 import { StyledArrow } from '@/components/Layout/Title/styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
+import { useExtension } from '@/contexts/extension';
 import { IParsedITO } from '@/types';
 import { IPackItem } from '@/types/contracts';
 import { getPrecision } from '@/utils/precisionFunctions';
@@ -52,6 +53,8 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
   const [selectedPack, setSelectedPack] = useState<number>(0);
   const [assetAmount, setAssetAmount] = useState<number>(0);
   const [currencyAmount, setCurrencyAmount] = useState<number>(0);
+  const { setOpenDrawer, extensionInstalled, walletAddress, connectExtension } =
+    useExtension();
   const { t } = useTranslation('assets');
 
   const closeModal = () => {
@@ -208,9 +211,22 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (!currencyAmount) {
-      toast.error(t('noEmptyOrZeroToastError'));
+    if (!selectedPackCurrency) {
+      toast.error('Please select a pack currency');
       return;
+    }
+
+    if (!currencyAmount) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+
+    if (!extensionInstalled) {
+      setOpenDrawer(true);
+      return;
+    }
+    if (!walletAddress) {
+      await connectExtension();
     }
 
     const payload = {
@@ -341,7 +357,12 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
             )}
           </InputRow>
         </BuyForm>
-        <SubmitButton type="button" onClick={handleSubmit}>
+        <SubmitButton
+          type="button"
+          onClick={handleSubmit}
+          secondary={!walletAddress}
+          isDisabled={!currencyAmount || !selectedPackCurrency}
+        >
           Buy now
         </SubmitButton>
       </Content>

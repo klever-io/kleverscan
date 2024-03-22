@@ -1,9 +1,9 @@
 import { useExtension } from '@/contexts/extension';
 import { getBestKLVRate } from '@/pages/ito';
+import { IParsedITO } from '@/types';
 import { useCountdown } from '@/utils/hooks';
 import { secondsToMonthDayHourMinSec } from '@/utils/timeFunctions';
 import { useMemo } from 'react';
-import { AssetSummaryProps } from '.';
 import {
   CardContainer,
   DetailsRow,
@@ -20,12 +20,12 @@ import {
   TotalRaisedValue,
 } from './styles';
 
-interface AssetITOProps extends AssetSummaryProps {
+interface AssetITOProps {
+  ITO: IParsedITO | undefined;
   setOpenParticipateModal: (state: boolean) => void;
 }
 
 export const AssetITOSummary: React.FC<AssetITOProps> = ({
-  asset,
   ITO,
   setOpenParticipateModal,
 }) => {
@@ -61,9 +61,9 @@ export const AssetITOSummary: React.FC<AssetITOProps> = ({
         <TotalRaised>
           <Label>Total Raised</Label>
           <TotalRaisedValue>
-            {(ITO?.mintedAmount || 0) / 10 ** (asset?.precision ?? 0)}{' '}
-            {asset?.ticker} /{' '}
-            {ITO?.maxAmount ? `${ITO?.maxAmount} ${asset?.ticker}` : '∞'}
+            {(ITO?.mintedAmount || 0) / 10 ** (ITO?.precision ?? 0)}{' '}
+            {ITO?.ticker} /{' '}
+            {ITO?.maxAmount ? `${ITO?.maxAmount} ${ITO?.ticker}` : '∞'}
           </TotalRaisedValue>
         </TotalRaised>
 
@@ -85,7 +85,7 @@ export const AssetITOSummary: React.FC<AssetITOProps> = ({
             <DetailsValue>
               {!bestAssetKLVRate
                 ? '--'
-                : `1  ${asset?.ticker} = ${bestAssetKLVRate} KLV`}
+                : `1  ${ITO?.ticker} = ${bestAssetKLVRate} KLV`}
             </DetailsValue>
           </Rate>
           {ITO?.endTime && (
@@ -101,7 +101,7 @@ export const AssetITOSummary: React.FC<AssetITOProps> = ({
         <ParticipateButton
           type="button"
           onClick={() => handleParticipate()}
-          disabled={!asset || !ITO}
+          disabled={!ITO}
           secondary={!walletAddress}
         >
           Participate

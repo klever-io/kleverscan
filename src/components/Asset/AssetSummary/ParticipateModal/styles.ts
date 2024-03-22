@@ -279,7 +279,10 @@ export const SelectContainer = styled.div`
   }
 `;
 
-export const SubmitButton = styled.button`
+export const SubmitButton = styled.button<{
+  secondary?: boolean;
+  isDisabled?: boolean;
+}>`
   display: grid;
   place-items: center;
 
@@ -288,8 +291,28 @@ export const SubmitButton = styled.button`
 
   background-color: ${({ theme }) => theme.violet};
   color: ${({ theme }) => theme.true.white} !important;
+  border: 1px solid ${({ theme }) => theme.violet};
 
   font-size: 1rem;
   font-weight: 600;
   line-height: 1.25rem;
+
+  transition: background-color 100ms linear, color 100ms linear,
+    border 100ms linear;
+
+  ${({ isDisabled }) =>
+    isDisabled &&
+    css`
+      cursor: not-allowed;
+      background-color: ${({ theme }) => theme.gray};
+      border: 1px solid ${({ theme }) => theme.gray};
+      color: ${({ theme }) => theme.true.black} !important;
+    `}
+
+  ${({ theme, secondary }) =>
+    secondary &&
+    css`
+      background-color: transparent;
+      color: ${theme.black};
+    `}
 `;

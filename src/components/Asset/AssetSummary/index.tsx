@@ -182,7 +182,6 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
         <RightSide>
           {asset && ITO && (
             <AssetITOSummary
-              asset={asset}
               ITO={ITO}
               setOpenParticipateModal={setOpenParticipateModal}
             />

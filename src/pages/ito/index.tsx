@@ -134,9 +134,7 @@ const ITOsPage: React.FC = () => {
       {
         element: (
           <Link href={`/asset/${assetId}?reference=ito`} key={name}>
-            <a style={{ overflow: 'hidden' }}>
-              <p>{name}</p>
-            </a>
+            <a style={{ overflow: 'hidden' }}>{name}</a>
           </Link>
         ),
         span: 1,
@@ -144,10 +142,10 @@ const ITOsPage: React.FC = () => {
       {
         element: (
           <ContainerAssetId>
-            <Copy info="Asset ID" data={assetId} />
             <Link href={`/asset/${assetId}?reference=ito`} key={assetId}>
               {assetId}
             </Link>
+            <Copy info="Asset ID" data={assetId} svgSize={18} />
           </ContainerAssetId>
         ),
         span: 1,

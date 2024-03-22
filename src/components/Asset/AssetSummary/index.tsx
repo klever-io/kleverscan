@@ -104,6 +104,14 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
     setHash: setTxHash,
   };
 
+  const getRoute = () => {
+    if (router.query.reference === 'ito') {
+      return '/ito';
+    } else {
+      return '/assets';
+    }
+  };
+
   return (
     <Container>
       {txHash && <HashComponent {...hashProps} />}
@@ -112,7 +120,7 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
           <TitleContainer>
             <Title
               key={asset?.assetId}
-              route={'/assets'}
+              route={getRoute()}
               Component={() => (
                 <PageTitle>{t('common:Titles.Asset')}</PageTitle>
               )}

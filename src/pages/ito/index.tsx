@@ -115,7 +115,7 @@ const ITOsPage: React.FC = () => {
     const sections = [
       {
         element: (
-          <Link href={`/asset/${assetId}`} key={assetId}>
+          <Link href={`/asset/${assetId}?reference=ito`} key={assetId}>
             <a>
               <AssetLogo
                 logo={logo}
@@ -131,7 +131,7 @@ const ITOsPage: React.FC = () => {
 
       {
         element: (
-          <Link href={`/asset/${assetId}`} key={name}>
+          <Link href={`/asset/${assetId}?reference=ito`} key={name}>
             <a style={{ overflow: 'hidden' }}>
               <p>{name}</p>
             </a>
@@ -142,7 +142,7 @@ const ITOsPage: React.FC = () => {
       {
         element: (
           <ContainerAssetId>
-            <Link href={`/asset/${assetId}`} key={assetId}>
+            <Link href={`/asset/${assetId}?reference=ito`} key={assetId}>
               {assetId}
             </Link>
             <Copy info="Asset ID" data={assetId} />

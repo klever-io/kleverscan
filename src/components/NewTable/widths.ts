@@ -537,9 +537,21 @@ const launchPad = css`
     min-width: 10rem;
     max-width: 10rem;
   }
-  &:nth-child(8) {
+  &:nth-child(3) {
+    min-width: 10rem;
+    max-width: 10rem;
+  }
+  &:nth-child(4) {
     min-width: 6rem;
     max-width: 6rem;
+  }
+  &:nth-child(5) {
+    min-width: 6rem;
+    max-width: 6rem;
+  }
+  &:nth-child(8) {
+    min-width: 5rem;
+    max-width: 5rem;
   }
 `;
 

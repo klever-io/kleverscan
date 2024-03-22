@@ -50,6 +50,7 @@ export const Container = styled.div`
 export const Header = styled.div<ITableType>`
   display: ${props => (props.haveData ? 'flex' : 'none')};
   padding: 1rem 1.5rem;
+  justify-content: space-between;
 
   min-width: 100%;
 
@@ -70,6 +71,7 @@ export const Row = styled.div<ITableType>`
 
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
 
   font-size: 0.75rem;
 

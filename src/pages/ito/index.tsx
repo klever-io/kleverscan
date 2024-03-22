@@ -144,10 +144,10 @@ const ITOsPage: React.FC = () => {
       {
         element: (
           <ContainerAssetId>
+            <Copy info="Asset ID" data={assetId} />
             <Link href={`/asset/${assetId}?reference=ito`} key={assetId}>
               {assetId}
             </Link>
-            <Copy info="Asset ID" data={assetId} />
           </ContainerAssetId>
         ),
         span: 1,

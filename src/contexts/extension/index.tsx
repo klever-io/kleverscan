@@ -17,6 +17,7 @@ interface IExtension {
   extensionLoading: boolean;
   openDrawer: boolean;
   setOpenDrawer: React.Dispatch<React.SetStateAction<boolean>>;
+  checkKleverWebObject: () => boolean;
 }
 
 export const Extension = createContext({} as IExtension);
@@ -49,15 +50,6 @@ export const ExtensionProvider: React.FC = ({ children }) => {
     sessionStorage.removeItem('walletAddress');
   }, [walletAddress]);
 
-  useEffect(() => {
-    if (extensionInstalled) {
-      const address = sessionStorage.getItem('walletAddress');
-      if (address) {
-        setWalletAddress(address);
-      }
-    }
-  }, [extensionInstalled]);
-
   const connectExtension = async () => {
     window.kleverWeb.provider = {
       api:
@@ -76,7 +68,6 @@ export const ExtensionProvider: React.FC = ({ children }) => {
       const address: string = await window.kleverWeb.getWalletAddress();
       if (address.startsWith('klv') && address.length === 62) {
         setWalletAddress(address);
-        sessionStorage.setItem('walletAddress', address);
       } else {
         toast.error('Invalid wallet address, please switch to a klv wallet');
       }
@@ -84,6 +75,10 @@ export const ExtensionProvider: React.FC = ({ children }) => {
       setExtensionLoading(false);
       toast.error(String(e).split(':')[1]);
     }
+  };
+
+  const checkKleverWebObject = () => {
+    return window.kleverWeb !== undefined;
   };
 
   const values: IExtension = {
@@ -94,6 +89,7 @@ export const ExtensionProvider: React.FC = ({ children }) => {
     extensionLoading,
     openDrawer,
     setOpenDrawer,
+    checkKleverWebObject,
   };
 
   return <Extension.Provider value={values}>{children}</Extension.Provider>;

@@ -101,7 +101,7 @@ const Tour: React.FC<ITourProps> = ({
         ),
       );
     }
-  }, [tourContentRef.current, width]);
+  }, [tourContentRef.current, width, seen, condition]);
 
   const handleClose = () => {
     localStorage.setItem(guideName, 'seen');

@@ -352,7 +352,7 @@ export const InputLabel = styled.label<ILabel>`
 
   transition: transform 0.2s ease;
 
-  z-index: 3;
+  z-index: 2;
 
   > span,
   p {
@@ -364,7 +364,7 @@ export const InputLabel = styled.label<ILabel>`
   }
 
   &:hover {
-    z-index: 3;
+    z-index: 6;
   }
 `;
 

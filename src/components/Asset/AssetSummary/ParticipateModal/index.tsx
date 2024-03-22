@@ -1,13 +1,14 @@
 import { isFloat } from '@/components/FungibleITO';
 import { StyledArrow } from '@/components/Layout/Title/styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
-import { IAsset, IParsedITO } from '@/types';
+import { useExtension } from '@/contexts/extension';
+import { IParsedITO } from '@/types';
 import { IPackItem } from '@/types/contracts';
 import { getPrecision } from '@/utils/precisionFunctions';
 import { web } from '@klever/sdk-web';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
   ArrowContainer,
@@ -17,11 +18,14 @@ import {
   BuyForm,
   Container,
   Content,
+  CurrencyTicker,
+  Fees,
   Header,
   Input,
   InputContainer,
   InputRow,
   Label,
+  NFTSelectContainer,
   SelectContainer,
   SubmitButton,
   Title,
@@ -35,7 +39,6 @@ const ReactSelect = dynamic(() => import('react-select'), {
 interface ParticipateModalProps {
   isOpenParticipateModal: boolean;
   setOpenParticipateModal: (state: boolean) => void;
-  asset: IAsset;
   ITO: IParsedITO;
   setTxHash: (txHash: string) => void;
   setLoading: (state: boolean) => void;
@@ -44,19 +47,37 @@ interface ParticipateModalProps {
 export const ParticipateModal: React.FC<ParticipateModalProps> = ({
   isOpenParticipateModal,
   setOpenParticipateModal,
-  asset,
   ITO,
   setTxHash,
   setLoading,
 }) => {
-  const [selectedPack, setSelectedPack] = useState<string>('');
+  const [selectedPackCurrency, setSelectedPackCurrency] = useState<string>('');
+  const [selectedPack, setSelectedPack] = useState<number>(0);
   const [assetAmount, setAssetAmount] = useState<number>(0);
   const [currencyAmount, setCurrencyAmount] = useState<number>(0);
+  const {
+    setOpenDrawer,
+    extensionInstalled,
+    walletAddress,
+    connectExtension,
+    checkKleverWebObject,
+  } = useExtension();
   const { t } = useTranslation('assets');
 
   const closeModal = () => {
     setOpenParticipateModal(false);
   };
+
+  const selectedPackData = useMemo(
+    () =>
+      ITO.packData?.find(pack => pack.key === selectedPackCurrency) ||
+      ITO.packData?.[0] || {
+        key: '',
+        precision: 0,
+        packs: [],
+      },
+    [selectedPackCurrency, ITO.packData],
+  );
 
   useEffect(() => {
     if (isOpenParticipateModal) {
@@ -70,16 +91,29 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
     };
   }, [isOpenParticipateModal]);
 
-  const getOptions = () => {
+  const getPackCurrencyOptions = () => {
     return (
-      ITO?.packData.map(pack => ({
+      ITO?.packData?.map(pack => ({
         label: pack.key,
         value: pack.key,
       })) || []
     );
   };
 
+  const getPackOptions = () => {
+    const packs =
+      ITO?.packData?.find(pack => {
+        return pack.key === selectedPackCurrency;
+      })?.packs || [];
+
+    return packs?.map(pack => ({
+      label: `${pack.amount} ${ITO.ticker}`,
+      value: pack.amount,
+    }));
+  };
+
   const calculateCostFromAmount = (amount: number): number => {
+    // second input
     if (!ITO) {
       return 0;
     }
@@ -88,10 +122,10 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
       return 0;
     }
 
-    const qtyPacks = ITO.packData.length;
+    const qtyPacks = selectedPackData.packs.length;
 
     const packs =
-      ITO.packData.find(pack => pack.key === selectedPack)?.packs ||
+      selectedPackData?.packs ||
       ([
         {
           amount: 0,
@@ -138,6 +172,7 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
   };
 
   const calculateAmountFromCost = (cost: number): number => {
+    //first input
     if (!ITO) {
       return 0;
     }
@@ -146,10 +181,16 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
       return 0;
     }
 
-    const qtyPacks = ITO.packData.length;
+    if (!selectedPackData) {
+      return 0;
+    }
+
+    const qtyPacks = selectedPackData.packs.length;
+
+    const assetPrecision = selectedPackData?.precision;
 
     const packs =
-      ITO.packData.find(pack => pack.key === selectedPack)?.packs ||
+      selectedPackData?.packs ||
       ([
         {
           amount: 0,
@@ -158,12 +199,12 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
       ] as IPackItem[]);
 
     if (qtyPacks === 1) {
-      return (cost * packs[0].amount) / packs[0].price;
+      return cost / packs[0].price;
     } else if (qtyPacks === 2) {
       if (cost >= 0 && cost <= packs[0].amount * packs[0].price) {
-        return (cost * packs[0].amount) / packs[0].price;
+        return cost / packs[0].price;
       } else if (cost >= packs[1].amount * packs[1].price) {
-        return (cost * packs[1].amount) / packs[1].price;
+        return cost / packs[1].price;
       }
     }
 
@@ -185,9 +226,9 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
 
     if (!priceIndex) {
       priceIndex = packs.length - 1;
-      amount = (cost * packs[priceIndex].amount) / packs[priceIndex].price;
+      amount = cost / packs[priceIndex].price;
     } else {
-      amount = (cost * packs[priceIndex].amount) / packs[priceIndex].price;
+      amount = cost / packs[priceIndex].price;
     }
 
     return isFloat(amount) && String(amount).length > 10
@@ -196,15 +237,28 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (!currencyAmount) {
-      toast.error(t('noEmptyOrZeroToastError'));
+    if (!selectedPackCurrency) {
+      toast.error('Please select a pack currency');
       return;
+    }
+
+    if (!currencyAmount) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+
+    if (!extensionInstalled) {
+      setOpenDrawer(true);
+      return;
+    }
+    if (!walletAddress || !checkKleverWebObject()) {
+      await connectExtension();
     }
 
     const payload = {
       buyType: 0,
       id: ITO.assetId,
-      currencyId: selectedPack,
+      currencyId: selectedPackCurrency,
       amount: assetAmount * 10 ** (await getPrecision(ITO.assetId)),
     };
 
@@ -243,23 +297,24 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
 
         <AssetVisualization>
           <AssetLogo
-            logo={asset?.logo || ''}
-            ticker={asset?.ticker || ''}
-            name={asset?.name || ''}
-            verified={asset?.verified}
+            logo={ITO?.logo || ''}
+            ticker={ITO?.ticker || ''}
+            name={ITO?.name || ''}
+            verified={ITO?.verified}
             size={40}
           />
           <AssetName>
-            {asset?.name} ({asset?.ticker})
+            {ITO?.name} ({ITO?.ticker})
           </AssetName>
         </AssetVisualization>
 
         <BuyForm>
           <InputRow>
-            <Label>Buy {asset?.ticker} with</Label>
-            <InputContainer>
+            <Label>Buy {ITO?.ticker} with</Label>
+            <InputContainer disabled={ITO.assetType === 'NonFungible'}>
               <Input
                 value={currencyAmount}
+                disabled={ITO.assetType === 'NonFungible'}
                 onChange={e => {
                   const value = Number(e.target.value);
                   if (Number.isNaN(value)) return;
@@ -271,36 +326,78 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
               <SelectContainer>
                 <ReactSelect
                   classNamePrefix="react-select"
-                  options={getOptions()}
+                  options={getPackCurrencyOptions()}
                   onChange={value => {
-                    setSelectedPack((value as { value: string })?.value || '');
+                    setSelectedPackCurrency(
+                      (value as { value: string })?.value || '',
+                    );
                     setAssetAmount(calculateAmountFromCost(currencyAmount));
                   }}
-                  value={getOptions().find(
-                    option => option.value === selectedPack,
+                  value={getPackCurrencyOptions().find(
+                    option => option.value === selectedPackCurrency,
                   )}
                 />
               </SelectContainer>
             </InputContainer>
+
+            {ITO.royalties.fixed ? (
+              <Fees>{ITO.royalties.fixed} KLV (Fixed Royalties)</Fees>
+            ) : (
+              ''
+            )}
           </InputRow>
 
           <InputRow>
-            <Label>Amount of {asset?.ticker}</Label>
-            <InputContainer>
-              <Input
-                value={assetAmount}
-                onChange={e => {
-                  const value = Number(e.target.value);
-                  if (Number.isNaN(value)) return;
+            <Label>Amount of {ITO?.ticker}</Label>
+            {ITO.assetType === 'Fungible' ? (
+              <InputContainer>
+                <Input
+                  value={assetAmount}
+                  onChange={e => {
+                    const value = Number(e.target.value);
+                    if (Number.isNaN(value)) return;
 
-                  setAssetAmount(value);
-                  setCurrencyAmount(calculateCostFromAmount(value));
-                }}
-              />
-            </InputContainer>
+                    setAssetAmount(value);
+                    setCurrencyAmount(calculateCostFromAmount(value));
+                  }}
+                />
+                {ITO.assetType === 'Fungible' ? (
+                  <CurrencyTicker>{ITO.ticker}</CurrencyTicker>
+                ) : null}
+              </InputContainer>
+            ) : (
+              <NFTSelectContainer>
+                <ReactSelect
+                  classNamePrefix="react-select"
+                  options={getPackOptions()}
+                  onChange={(e: any) => {
+                    const value = Number(e.value as string);
+                    if (Number.isNaN(value)) return;
+
+                    setSelectedPack(value);
+                    setAssetAmount(value);
+                    setCurrencyAmount(calculateCostFromAmount(value));
+                  }}
+                  placeholder={
+                    getPackOptions().length === 0
+                      ? 'Select a currency first'
+                      : 'Select a pack'
+                  }
+                  isDisabled={getPackOptions().length === 0}
+                  value={getPackOptions()?.find(
+                    option => option.value === selectedPack,
+                  )}
+                />
+              </NFTSelectContainer>
+            )}
           </InputRow>
         </BuyForm>
-        <SubmitButton type="button" onClick={handleSubmit}>
+        <SubmitButton
+          type="button"
+          onClick={handleSubmit}
+          secondary={!extensionInstalled}
+          isDisabled={!currencyAmount || !selectedPackCurrency}
+        >
           Buy now
         </SubmitButton>
       </Content>

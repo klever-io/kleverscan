@@ -10,7 +10,7 @@ export const Container = styled.div<{ $error?: boolean; isOpenMenu?: boolean }>`
   display: flex;
 
   flex-direction: column;
-  z-index: ${({ isOpenMenu }) => (isOpenMenu ? 10 : 2)};
+  z-index: ${({ isOpenMenu }) => (isOpenMenu ? 10 : 1)};
   span {
     padding-bottom: 0.25rem;
 

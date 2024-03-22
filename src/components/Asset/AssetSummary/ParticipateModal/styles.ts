@@ -99,6 +99,11 @@ export const Label = styled.label`
   color: ${({ theme }) => theme.true.white};
 `;
 
+export const Fees = styled.div`
+  padding-left: 16px;
+  color: ${({ theme }) => theme.true.white};
+  font-size: 0.75rem;
+`;
 export const Input = styled.input`
   color: ${({ theme }) => theme.true.white};
 
@@ -106,11 +111,15 @@ export const Input = styled.input`
 
   width: 100%;
 
-  font-size: 1.25rem;
-  line-height: 1.5rem;
+  font-size: 1rem;
+  line-height: 1.25rem;
+
+  &:disabled {
+    color: ${({ theme }) => theme.gray};
+  }
 `;
 
-export const InputContainer = styled.div`
+export const InputContainer = styled.div<{ disabled?: boolean }>`
   display: flex;
   gap: 8px;
   align-items: center;
@@ -121,9 +130,101 @@ export const InputContainer = styled.div`
   border-radius: 24px;
 `;
 
+export const CurrencyTicker = styled.div`
+  color: ${({ theme }) => theme.true.white};
+  padding: 0 14px;
+
+  min-width: 120px;
+  max-width: 120px;
+`;
+
+export const NFTSelectContainer = styled.div`
+  ${ReactSelectStyles}
+
+  .react-select__dropdown-indicator {
+    padding: 0;
+  }
+
+  .react-select__control {
+    border-radius: 24px;
+    border: none;
+    min-height: unset;
+    max-height: unset;
+    height: unset;
+    padding: 9px 15px;
+
+    z-index: 2;
+
+    background-color: ${({ theme }) => theme.true.newBlack};
+    border: 1px solid ${({ theme }) => theme.true.white};
+
+    &:hover {
+      box-shadow: none;
+      filter: brightness(1.1);
+      border: 1px solid ${({ theme }) => theme.true.white};
+    }
+  }
+  .react-select__control--is-focused {
+    box-shadow: none;
+
+    filter: brightness(1.1);
+  }
+
+  .react-select__placeholder {
+    font-size: 1rem;
+    line-height: 1.25rem;
+  }
+  .react-select__input-container {
+    font-size: 1rem;
+    line-height: 1.25rem;
+  }
+
+  .react-select__menu {
+    padding: 0 4px;
+    background-color: ${({ theme }) => theme.true.newBlack};
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+    border-radius: 24px;
+    z-index: 1;
+
+    border: 1px solid ${({ theme }) => theme.true.white};
+  }
+  .react-select__option {
+    border-radius: 24px;
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+
+    &:hover:not(:focus):not(:disabled) {
+      border: 1px solid
+        ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+    }
+  }
+
+  .react-select__single-value {
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+  }
+
+  .react-select__value-container {
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+    caret-color: ${({ theme }) =>
+      theme.dark ? theme.darkText : theme.lightGray};
+  }
+
+  .react-select__input {
+    color: ${({ theme }) =>
+      theme.dark ? theme.darkText : theme.lightGray} !important;
+  }
+
+  .react-select__dropdown-indicator {
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+    &:hover {
+      color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+    }
+  }
+`;
+
 export const SelectContainer = styled.div`
   ${ReactSelectStyles}
-  width: 140px;
+  min-width: 120px;
+  max-width: 120px;
 
   .react-select__dropdown-indicator {
     padding: 0;
@@ -149,23 +250,53 @@ export const SelectContainer = styled.div`
 
     filter: brightness(1.1);
   }
-
   .react-select__menu {
     margin: 0;
     margin-top: -36px;
     padding: 0 4px;
     padding-top: 36px;
     background-color: ${({ theme }) => theme.ito.darkGray};
-    color: ${props => props.theme.darkText};
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
     border-radius: 24px;
     z-index: 1;
   }
   .react-select__option {
     border-radius: 24px;
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+
+    &:hover:not(:focus):not(:disabled) {
+      border: 1px solid
+        ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+    }
+  }
+
+  .react-select__single-value {
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+  }
+
+  .react-select__value-container {
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+    caret-color: ${({ theme }) =>
+      theme.dark ? theme.darkText : theme.lightGray};
+  }
+
+  .react-select__input {
+    color: ${({ theme }) =>
+      theme.dark ? theme.darkText : theme.lightGray} !important;
+  }
+
+  .react-select__dropdown-indicator {
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+    &:hover {
+      color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
+    }
   }
 `;
 
-export const SubmitButton = styled.button`
+export const SubmitButton = styled.button<{
+  secondary?: boolean;
+  isDisabled?: boolean;
+}>`
   display: grid;
   place-items: center;
 
@@ -174,8 +305,25 @@ export const SubmitButton = styled.button`
 
   background-color: ${({ theme }) => theme.violet};
   color: ${({ theme }) => theme.true.white} !important;
+  border: 1px solid ${({ theme }) => theme.violet};
 
-  font-size: 1rem;
+  font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.25rem;
+
+  transition: filter 100ms linear;
+
+  ${({ isDisabled }) =>
+    isDisabled &&
+    css`
+      cursor: not-allowed;
+      filter: grayscale(1);
+    `}
+
+  ${({ theme, secondary }) =>
+    secondary &&
+    css`
+      background-color: transparent;
+      color: ${theme.black};
+    `}
 `;

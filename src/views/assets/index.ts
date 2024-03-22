@@ -89,7 +89,8 @@ export const Row = styled.div<ITableType>`
 export const ContainerAssetId = styled.section`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: space-between;
+  gap: 4px;
   overflow: hidden;
   width: 100%;
   div {

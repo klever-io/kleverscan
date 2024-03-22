@@ -121,7 +121,17 @@ export const Button = styled.a<{ secondary?: boolean }>`
   line-height: 1rem;
 
   transition: 0.3s;
-  &:hover {
+  &:hover,
+  &:focus,
+  &:active {
     filter: brightness(1.2);
+    color: ${({ theme }) => theme.true.white};
+
+    ${({ theme, secondary }) =>
+      secondary &&
+      css`
+        background-color: transparent;
+        color: ${theme.black};
+      `}
   }
 `;

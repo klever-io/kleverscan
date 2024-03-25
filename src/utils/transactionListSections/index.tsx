@@ -22,7 +22,6 @@ import {
   ITransferContract,
   IUndelegateContract,
   IUnfreezeContract,
-  IUnjailContract,
   IUpdateAccountPermissionContract,
   IValidatorConfigContract,
   IVoteContract,
@@ -33,6 +32,7 @@ import {
   ICreateAssetReceipt,
   IDelegateReceipt,
   IFreezeReceipt,
+  IProposalReceipt,
   IReceipt,
   IUnfreezeReceipt,
   IWithdrawReceipt,
@@ -267,22 +267,23 @@ const WithdrawSections = ({
   ];
 };
 
-const ClaimSections = ({ par, receipts }: IProps): JSX.Element[] => {
+const ClaimSections = ({ par, receipts, precision }: IProps): JSX.Element[] => {
   const parameter = par as unknown as IClaimContract;
   const claimReceipt = findReceipt(receipts, 17) as IClaimReceipt | undefined;
+
   return [
-    <span key={parameter?.claimType}>
-      <small>{parameter?.claimType}</small>
+    <span key={claimReceipt?.amount}>
+      {claimReceipt?.amount
+        ? formatAmountField(Number(claimReceipt?.amount), precision)
+        : null}{' '}
+      {claimReceipt?.amount ? claimReceipt?.assetId : null}
     </span>,
-    <span key={claimReceipt?.assetId}>
-      <span>{claimReceipt?.assetId ?? '--'}</span>
-    </span>,
+    <span key={parameter?.claimType}>{parameter?.claimType}</span>,
+    <span key={parameter?.id}>{parameter?.id}</span>,
   ];
 };
 
-const UnjailSections = ({ par }: IProps): JSX.Element[] => {
-  const parameter = par as IUnjailContract;
-
+const UnjailSections = (_props: IProps): JSX.Element[] => {
   return [<></>];
 };
 
@@ -290,26 +291,31 @@ const AssetTriggerSections = ({ par }: IProps): JSX.Element[] => {
   const parameter = par as unknown as IAssetTriggerContract;
 
   return [
-    <span key={parameter?.triggerType}>
-      <small>{parameter?.triggerType}</small>
-    </span>,
+    <span key={parameter?.assetId}>{parameter?.assetId}</span>,
+    <span key={parameter?.triggerType}>{parameter?.triggerType}</span>,
   ];
 };
 
 const SetAccountNameSections = ({ par }: IProps): JSX.Element[] => {
   const parameter = par as unknown as ISetAccountNameContract;
 
-  return [
-    <span key={parameter?.name}>
-      <small>{parameter?.name}</small>
-    </span>,
-  ];
+  return [<span key={parameter?.name}>{parameter?.name}</span>];
 };
 
-const ProposalSections = ({ par }: IProps): JSX.Element[] => {
+const ProposalSections = ({ par, receipts }: IProps): JSX.Element[] => {
   const parameter = par as unknown as IProposalContract;
+  const proposalReceipt = findReceipt(receipts, 5) as IProposalReceipt;
 
   return [
+    <span key={proposalReceipt?.proposalId}>
+      {proposalReceipt?.proposalId}
+    </span>,
+    <span key={parameter?.epochsDuration}>
+      {parameter?.epochsDuration} epoch
+      {parameter?.epochsDuration > 1 ? 's' : ''}(
+      {(parameter?.epochsDuration * 6) / 24} day
+      {parameter?.epochsDuration > 1 ? 's' : ''})
+    </span>,
     <span key={parameter?.description}>
       {parameter?.description
         ? `${

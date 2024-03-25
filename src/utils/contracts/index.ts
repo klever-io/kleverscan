@@ -512,20 +512,20 @@ const oldContractLabels = {
 };
 
 const contractLabels = {
-  Transfer: ['Amount'], // OK
-  'Create Asset': ['Name', 'AssetId', 'Precision'], // OK
+  Transfer: ['Amount'], //OK
+  'Create Asset': ['Name', 'AssetId', 'Precision'], //OK
   'Create Validator': ['Owner Address', 'Name', 'Can Delegate'], //OK
   'Config Validator': ['BLS public key', 'Name', 'Can Delegate'], //OK
   Freeze: ['Amount', 'Bucket Id'], //OK
   Unfreeze: ['Amount', 'Bucket Id'], //OK
   Delegate: ['Amount', 'Bucket Id', 'to Address'], //OK
   Undelegate: ['Amount', 'Bucket Id'], //OK
-  Withdraw: ['Type', 'Amount'], // OK
-  Claim: ['Claim Type', 'Asset Id / Order Id'],
-  Unjail: [],
-  'Asset Trigger': ['Asset Id', 'Trigger Type'],
-  'Set Account Name': ['Name'],
-  Proposal: ['Proposal Id', 'Description', 'Duration (in Epochs)'],
+  Withdraw: ['Type', 'Amount'], //OK
+  Claim: ['Amount', 'Claim Type', 'Asset Id / Order Id'], //OK
+  Unjail: [], //OK
+  'Asset Trigger': ['Asset Id', 'Trigger Type'], //OK
+  'Set Account Name': ['Name'], //OK
+  Proposal: ['Proposal Id', 'Duration (in Epochs)', 'Description'], //OK
   Vote: ['Proposal Id', 'Amount', 'Type'],
   'Config ITO': ['Asset Id', 'Status'],
   'Set ITO': ['Asset Id'],

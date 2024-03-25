@@ -10,15 +10,18 @@ import api from '@/services/api';
 import { CenteredRow, Container, DoubleRow, Header } from '@/styles/common';
 import { setQueryAndRouter } from '@/utils';
 import { capitalizeString } from '@/utils/convertString';
+import { findReceipt } from '@/utils/findKey';
 import { formatAmount, formatDate } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import { getPrecision } from '@/utils/precisionFunctions';
+import { TransactionType } from '@klever/sdk-web';
 import Link from 'next/link';
 import { NextRouter, useRouter } from 'next/router';
 import React, { useCallback } from 'react';
 import {
   IAssetTransactionResponse,
+  IClaimReceipt,
   IReceipt,
   IRowSection,
   ITransaction,
@@ -88,6 +91,15 @@ export const requestTransactionsDefault = async (
           ) {
             assets.push(contract.parameter.currencyID);
           }
+
+          if (contract.type === TransactionType.Claim) {
+            const claimReceipt = findReceipt(transaction.receipts, 17) as
+              | IClaimReceipt
+              | undefined;
+            if (claimReceipt?.assetIdReceived) {
+              assets.push(claimReceipt?.assetIdReceived);
+            }
+          }
         });
       }
     },
@@ -110,6 +122,15 @@ export const requestTransactionsDefault = async (
           ) {
             transaction.precision =
               assetPrecisions[contract.parameter.currencyID];
+          }
+          if (contract?.type === TransactionType.Claim) {
+            const claimReceipt = findReceipt(transaction.receipts, 17) as
+              | IClaimReceipt
+              | undefined;
+            if (claimReceipt?.assetIdReceived) {
+              transaction.precision =
+                assetPrecisions[claimReceipt.assetIdReceived];
+            }
           }
         });
       }

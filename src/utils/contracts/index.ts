@@ -383,59 +383,65 @@ export const filteredSections = (
   receipts: IReceipt[],
   precision = 0,
 ): JSX.Element[] => {
+  const props = {
+    par: contract[0].parameter,
+    receipts,
+    precision,
+  };
+
   switch (contractType) {
     case Contract.Transfer:
-      return TransferSections(contract[0].parameter, precision);
+      return TransferSections(props);
     case Contract.CreateAsset:
-      return CreateAssetSections(contract[0].parameter);
+      return CreateAssetSections(props);
     case Contract.CreateValidator:
-      return CreateValidatorSections(contract[0].parameter);
+      return CreateValidatorSections(props);
     case Contract.ValidatorConfig:
-      return ValidatorConfigSections(contract[0].parameter);
+      return ValidatorConfigSections(props);
     case Contract.Freeze:
-      return FreezeSections(contract[0].parameter, precision);
+      return FreezeSections(props);
     case Contract.Unfreeze:
-      return UnfreezeSections(contract[0].parameter);
+      return UnfreezeSections(props);
     case Contract.Delegate:
-      return DelegateSections(contract[0].parameter);
+      return DelegateSections(props);
     case Contract.Undelegate:
-      return UndelegateSections(contract[0].parameter);
+      return UndelegateSections(props);
     case Contract.Withdraw:
-      return WithdrawSections(contract[0].parameter);
+      return WithdrawSections(props);
     case Contract.Claim:
-      return ClaimSections(contract[0].parameter, receipts);
+      return ClaimSections(props);
     case Contract.Unjail:
-      return UnjailSections(contract[0].parameter);
+      return UnjailSections(props);
     case Contract.AssetTrigger:
-      return AssetTriggerSections(contract[0].parameter);
+      return AssetTriggerSections(props);
     case Contract.SetAccountName:
-      return SetAccountNameSections(contract[0].parameter);
+      return SetAccountNameSections(props);
     case Contract.Proposal:
-      return ProposalSections(contract[0].parameter);
+      return ProposalSections(props);
     case Contract.Vote:
-      return VoteSections(contract[0].parameter);
+      return VoteSections(props);
     case Contract.ConfigITO:
-      return ConfigITOSections(contract[0].parameter);
+      return ConfigITOSections(props);
     case Contract.SetITOPrices:
-      return SetITOPricesSections(contract[0].parameter);
+      return SetITOPricesSections(props);
     case Contract.Buy:
-      return BuySections(contract[0].parameter);
+      return BuySections(props);
     case Contract.Sell:
-      return SellSections(contract[0].parameter);
+      return SellSections(props);
     case Contract.CancelMarketOrder:
-      return CancelMarketOrderSections(contract[0].parameter);
+      return CancelMarketOrderSections(props);
     case Contract.CreateMarketplace:
-      return CreateMarketplaceSections(contract[0].parameter);
+      return CreateMarketplaceSections(props);
     case Contract.ConfigMarketplace:
-      return ConfigMarketplaceSections(contract[0].parameter);
+      return ConfigMarketplaceSections(props);
     case Contract.UpdateAccountPermission:
-      return UpdateAccountPermissionContractSections(contract[0].parameter);
+      return UpdateAccountPermissionContractSections(props);
     case Contract.Deposit:
-      return DepositSections(contract[0].parameter);
+      return DepositSections(props);
     case Contract.ITOTrigger:
-      return IITOTriggerSections(contract[0].parameter);
+      return IITOTriggerSections(props);
     case Contract.SmartContract:
-      return SmartContractSections(contract[0].parameter);
+      return SmartContractSections(props);
     default:
       return [];
   }
@@ -506,15 +512,15 @@ const oldContractLabels = {
 };
 
 const contractLabels = {
-  Transfer: ['Amount'], // Todos os campos de amount incluem o assetId
-  'Create Asset': ['Name', 'AssetId', 'Precision'],
-  'Create Validator': ['Owner Address', 'Name', 'Can Delegate'],
-  'Config Validator': ['Name', 'Can Delegate'],
-  Freeze: ['Amount', 'Bucket Id'],
-  Unfreeze: ['Amount', 'Bucket Id'],
-  Delegate: ['Amount', 'Bucket Id'],
-  Undelegate: ['Bucket Id'],
-  Withdraw: ['Type', 'Amount'],
+  Transfer: ['Amount'], // OK
+  'Create Asset': ['Name', 'AssetId', 'Precision'], // OK
+  'Create Validator': ['Owner Address', 'Name', 'Can Delegate'], //OK
+  'Config Validator': ['BLS public key', 'Name', 'Can Delegate'], //OK
+  Freeze: ['Amount', 'Bucket Id'], //OK
+  Unfreeze: ['Amount', 'Bucket Id'], //OK
+  Delegate: ['Amount', 'Bucket Id', 'to Address'], //OK
+  Undelegate: ['Amount', 'Bucket Id'], //OK
+  Withdraw: ['Type', 'Amount'], // OK
   Claim: ['Claim Type', 'Asset Id / Order Id'],
   Unjail: [],
   'Asset Trigger': ['Asset Id', 'Trigger Type'],

@@ -1,4 +1,5 @@
 import { useMobile } from '@/contexts/mobile';
+import { DoubleRow } from '@/styles/common';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { useDidUpdateEffect } from '@/utils/hooks';
@@ -219,7 +220,6 @@ const Table: React.FC<ITable> = ({
       <ContainerView>
         <TableBody cols={header.length}>
           {((!isMobile && !isTablet) || !rowSections) &&
-            !!response?.items?.length &&
             header.map((item, index) => {
               return <HeaderItem key={JSON.stringify(item)}>{item}</HeaderItem>;
             })}
@@ -229,9 +229,18 @@ const Table: React.FC<ITable> = ({
                 .fill(limit)
                 .map((_, index) =>
                   header.map((item, index2) => (
-                    <span key={JSON.stringify(item) + String(index2)}>
-                      <Skeleton width="100%" />
-                    </span>
+                    <MobileCardItem
+                      isAssets={type === 'assets' || type === 'proposals'}
+                      isRightAligned={isMobile || isTablet}
+                      key={String(index2) + String(index)}
+                      columnSpan={1}
+                      isLastRow={index === limit - 1}
+                    >
+                      <DoubleRow>
+                        {type === 'transactions' && <Skeleton width="100%" />}
+                        <Skeleton width="100%" />
+                      </DoubleRow>
+                    </MobileCardItem>
                   )),
                 )}
             </>

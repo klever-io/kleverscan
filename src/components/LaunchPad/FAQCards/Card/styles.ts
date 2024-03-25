@@ -51,7 +51,7 @@ export const FAQAction = styled.a`
   margin-top: auto;
 
   display: flex;
-  align-items: end;
+  align-items: center;
   gap: 2px;
 
   cursor: pointer;
@@ -60,10 +60,13 @@ export const FAQAction = styled.a`
   svg {
     path {
       transition: 0.2s;
+      fill: ${({ theme }) => theme.black};
     }
   }
 
-  &:hover {
+  &:hover,
+  &:focus,
+  &:active {
     color: ${({ theme }) => theme.violet};
 
     svg {

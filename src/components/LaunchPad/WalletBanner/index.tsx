@@ -72,8 +72,9 @@ export const WalletBanner: React.FC = () => {
           <Image
             src="/images/crypto-wallet.png"
             alt="Developer pointing to screen"
-            width={!isTablet ? 400 : 200}
-            height={!isTablet ? 750 : 375}
+            width={!isTablet ? 383 : 192}
+            height={!isTablet ? 776 : 388}
+            quality={100}
           />
         </RightSide>
       </Content>

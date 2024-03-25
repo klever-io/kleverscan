@@ -42,7 +42,7 @@ export const TableTitle = styled.h2`
 
 export const TableContainer = styled.div``;
 
-export const ParticipateButton = styled.a`
+export const LaunchpadLink = styled.a`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -54,6 +54,30 @@ export const ParticipateButton = styled.a`
   color: ${({ theme }) => theme.true.white} !important;
 
   font-weight: 700;
+  text-decoration: none;
+
+  cursor: pointer;
+  transition: 0.2s;
+
+  &:hover {
+    filter: brightness(1.2);
+  }
+`;
+
+export const ParticipateButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 14px 30px;
+  border-radius: 24px;
+
+  background-color: ${({ theme }) => theme.violet};
+  color: ${({ theme }) => theme.true.white} !important;
+
+  font-size: 0.875rem;
+  line-height: 1rem;
+  font-weight: 600;
   text-decoration: none;
 
   cursor: pointer;

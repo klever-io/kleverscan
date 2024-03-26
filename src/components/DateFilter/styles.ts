@@ -76,9 +76,12 @@ export const OutsideContent = styled.div`
   border: 1px solid ${props => props.theme.black};
   border-radius: 24px;
 
+  box-sizing: border-box;
+
   height: 32px;
-  padding: 1rem;
+  padding: 0 1rem;
   width: 100%;
+
   display: flex;
   flex-direction: row !important;
   align-items: center;
@@ -102,6 +105,7 @@ export const Input = styled.input`
   width: 75%;
   font-weight: 700;
   font-size: 0.875rem;
+  line-height: 1rem;
   color: ${props => props.theme.gray700};
 
   caret-color: transparent;

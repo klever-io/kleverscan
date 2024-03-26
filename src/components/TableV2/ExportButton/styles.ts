@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const DropdownMenu = styled.div<{ open: boolean }>`
   position: absolute;
   bottom: -1rem;
-  left: 0;
+  right: 0;
   transform: translateY(100%);
   z-index: 1;
   display: none;
@@ -21,7 +21,7 @@ export const DropdownMenu = styled.div<{ open: boolean }>`
   ::before {
     position: absolute;
     top: 0rem;
-    left: 0.25rem;
+    right: 12px;
     z-index: -1;
     display: inline-block;
     width: 0;
@@ -50,12 +50,23 @@ export const DropdownItem = styled.button`
   }
 `;
 
-export const ExportButtonContainer = styled.div<{ isJson?: boolean }>`
-  border-radius: 50%;
-  position: relative;
-  padding: 0.125rem;
+export const OutsideContainer = styled.div`
   display: grid;
   place-items: center;
+
+  width: 40px;
+  height: 40px;
+
+  background-color: ${props => props.theme.card.background};
+
+  border-radius: 8px;
+
+  cursor: pointer;
+`;
+
+export const ExportButtonContainer = styled.div<{ isJson?: boolean }>`
+  position: relative;
+
   svg {
     transition: color 0.1s linear;
     color: ${props => props.theme.table.text};

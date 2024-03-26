@@ -128,13 +128,11 @@ const ValidatorConfigSections = ({ par }: IProps): JSX.Element[] => {
 
   return [
     <span key={parameter?.config.blsPublicKey}>
-      <small>{parseAddress(parameter?.config.blsPublicKey, 16)}</small>
+      {parseAddress(parameter?.config.blsPublicKey, 16)}
     </span>,
-    <span key={parameter?.config.name}>
-      <small>{parameter?.config.name}</small>
-    </span>,
+    <span key={parameter?.config.name}>{parameter?.config.name}</span>,
     <span key={String(parameter?.config.canDelegate)}>
-      <small>{parameter?.config.canDelegate}</small>
+      {parameter?.config.canDelegate}
     </span>,
   ];
 };

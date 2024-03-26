@@ -12,6 +12,7 @@ import {
   ExportProgressBar,
   ExportProgressContainer,
   ExportProgressText,
+  OutsideContainer,
 } from './styles';
 
 const ExportButton: React.FC<{
@@ -78,7 +79,15 @@ const ExportButton: React.FC<{
     >
       <Tooltip
         msg="CSV"
-        Component={() => (loadingCsv ? <Loader /> : <PageDownload size={25} />)}
+        Component={() =>
+          loadingCsv ? (
+            <Loader />
+          ) : (
+            <OutsideContainer>
+              <PageDownload size={25} />
+            </OutsideContainer>
+          )
+        }
       />
 
       <DropdownMenu

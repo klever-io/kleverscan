@@ -17,7 +17,6 @@ import Tooltip from '../Tooltip';
 import ExportButton from './ExportButton';
 import {
   BackTopButton,
-  ButtonsContainer,
   ContainerView,
   EmptyRow,
   ExportContainer,
@@ -195,25 +194,21 @@ const Table: React.FC<ITable> = ({
         </LimitContainer>
 
         <ExportContainer>
-          <IoReloadSharpWrapper $loading={isFetching}>
-            <Tooltip
-              msg="Refresh"
-              Component={() => (
+          <Tooltip
+            msg="Refresh"
+            Component={() => (
+              <IoReloadSharpWrapper $loading={isFetching}>
                 <IoReloadSharp size={20} onClick={() => refetch()} />
-              )}
-            />
-          </IoReloadSharpWrapper>
+              </IoReloadSharpWrapper>
+            )}
+          />
 
           {dataName === 'transactions' && (
-            <>
-              <ButtonsContainer>
-                <ExportButton
-                  items={response?.items}
-                  tableRequest={tableRequest}
-                  totalRecords={response?.totalPages * limit || 10000}
-                />
-              </ButtonsContainer>
-            </>
+            <ExportButton
+              items={response?.items}
+              tableRequest={tableRequest}
+              totalRecords={response?.totalPages * limit || 10000}
+            />
           )}
         </ExportContainer>
       </FloatContainer>

@@ -244,7 +244,6 @@ export const LimitContainer = styled.div`
   font-size: 15px;
   text-align: left;
   color: ${props => props.theme.gray700};
-  padding: 5px;
   /* margin-left: auto; */
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     margin-bottom: 10px;
@@ -393,9 +392,17 @@ export const IoReloadSharpWrapper = styled.div<{
   height: fit-content;
 
   cursor: pointer;
+
+  display: grid;
+  place-items: center;
+
+  height: 40px;
+  width: 40px;
+
+  border-radius: 8px;
+
+  background-color: ${props => props.theme.card.background};
   svg {
-    margin-top: 0.3rem;
-    margin-left: auto;
     color: ${props =>
       props.theme.dark ? props.theme.black : props.theme.darkText};
     animation: ${props => (props.$loading ? rotate : 'none')} 1s linear infinite;

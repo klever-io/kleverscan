@@ -154,6 +154,7 @@ const Transactions: React.FC = () => {
     contract: IContract[],
     receipts: IReceipt[],
     precision?: number,
+    data?: string[],
   ): JSX.Element[] => {
     const contractType = getContractType(contract);
     const filteredSectionsResult = filteredSections(
@@ -161,6 +162,7 @@ const Transactions: React.FC = () => {
       contractType,
       receipts,
       precision,
+      data,
     );
     if (contractType === 'Multi contract') {
       const extraHeadersLength = 0;
@@ -183,6 +185,7 @@ const Transactions: React.FC = () => {
       bandwidthFee,
       status,
       precision,
+      data,
     } = props;
 
     let toAddress = '- -';
@@ -194,7 +197,7 @@ const Transactions: React.FC = () => {
       toAddress = parameter.toAddress;
     }
 
-    const customFields = getCustomFields(contract, receipts, precision);
+    const customFields = getCustomFields(contract, receipts, precision, data);
 
     const sections = [
       {

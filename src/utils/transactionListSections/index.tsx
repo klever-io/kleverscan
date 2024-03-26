@@ -30,6 +30,7 @@ import {
 import {
   IClaimReceipt,
   ICreateAssetReceipt,
+  ICreateMarketplaceReceipt,
   IDelegateReceipt,
   IFreezeReceipt,
   IProposalReceipt,
@@ -39,6 +40,7 @@ import {
 } from '@/types/index';
 import { parseAddress } from '@/utils/parseValues';
 import Link from 'next/link';
+import { hexToString } from '../convertString';
 import { findReceipt } from '../findKey';
 import { formatAmount, toLocaleFixed } from '../formatFunctions';
 import { KLV_PRECISION } from '../globalVariables';
@@ -47,6 +49,7 @@ interface IProps {
   par: IParameter;
   receipts: IReceipt[];
   precision: number;
+  data?: string[];
 }
 
 const formatAmountField = (
@@ -335,7 +338,10 @@ const VoteSections = ({ par }: IProps): JSX.Element[] => {
     <span key={parameter?.proposalId}>{parameter?.proposalId}</span>,
 
     <span key={parameter?.amount}>
-      <small>{parameter?.amount / 10 ** KLV_PRECISION}</small>
+      {parameter?.amount / 10 ** KLV_PRECISION}
+    </span>,
+    <span key={parameter?.type}>
+      {parameter?.type ? parameter?.type : 'Yes'}
     </span>,
   ];
 };
@@ -343,7 +349,14 @@ const VoteSections = ({ par }: IProps): JSX.Element[] => {
 const ConfigITOSections = ({ par }: IProps): JSX.Element[] => {
   const parameter = par as unknown as IConfigITOContract;
 
-  return [<span key={parameter?.assetId}>{parameter?.assetId}</span>];
+  return [
+    <span key={parameter?.assetId}>{parameter?.assetId}</span>,
+    <span key={parameter?.status}>{parameter?.status}</span>,
+    <span key={parameter?.startTime || 0}>
+      {parameter?.startTime &&
+        new Date(parameter?.startTime * 1000).toLocaleString()}{' '}
+    </span>,
+  ];
 };
 
 const SetITOPricesSections = ({ par }: IProps): JSX.Element[] => {
@@ -352,19 +365,21 @@ const SetITOPricesSections = ({ par }: IProps): JSX.Element[] => {
   return [<span key={parameter?.assetId}>{parameter?.assetId}</span>];
 };
 
-const BuySections = ({ par }: IProps): JSX.Element[] => {
+const BuySections = ({ par, precision }: IProps): JSX.Element[] => {
   const parameter = par as unknown as IBuyContractPayload;
 
   return [
     <span key={parameter?.buyType}>{parameter?.buyType}</span>,
 
-    <span key={parameter?.currencyID}>
-      <small>{parameter?.currencyID}</small>
+    <span key={parameter?.id}>{parameter?.id}</span>,
+    <span key={parameter?.amount}>
+      {formatAmountField(parameter?.amount, precision)}{' '}
+      {parameter?.amount ? parameter?.currencyID : null}
     </span>,
   ];
 };
 
-const SellSections = ({ par }: IProps): JSX.Element[] => {
+const SellSections = ({ par, precision }: IProps): JSX.Element[] => {
   const parameter = par as unknown as ISellContract;
 
   let assetId = parameter?.assetId;
@@ -378,23 +393,16 @@ const SellSections = ({ par }: IProps): JSX.Element[] => {
   }
 
   return [
-    <span key={parameter?.marketType}>
-      <small>{parameter?.marketType}</small>
-    </span>,
-    <Link href={`/asset/${currencyID}`} key={currencyID}>
-      <a>
-        <span key={currencyID}>
-          <small>{parameter?.currencyID}</small>
-        </span>
-      </a>
-    </Link>,
+    <span key={parameter?.marketType}>{parameter?.marketType}</span>,
     <Link href={`/asset/${assetId}`} key={assetId}>
       <a>
-        <span key={assetId}>
-          <small>{parameter?.assetId}</small>
-        </span>
+        <span key={assetId}>{parameter?.assetId}</span>
       </a>
     </Link>,
+    <span key={parameter?.price}>
+      {parameter?.price && formatAmountField(parameter?.price, precision)}{' '}
+      {parameter?.price && currencyID}
+    </span>,
   ];
 };
 
@@ -404,10 +412,27 @@ const CancelMarketOrderSections = ({ par }: IProps): JSX.Element[] => {
   return [<span key={parameter?.orderID}>{parameter?.orderID}</span>];
 };
 
-const CreateMarketplaceSections = ({ par }: IProps): JSX.Element[] => {
+const CreateMarketplaceSections = ({
+  par,
+  receipts,
+}: IProps): JSX.Element[] => {
   const parameter = par as unknown as ICreateMarketplaceContract;
 
-  return [<span key={parameter?.name}>{parameter?.name}</span>];
+  const createMarketplaceReceipt = findReceipt(
+    receipts,
+    10,
+  ) as ICreateMarketplaceReceipt;
+
+  return [
+    <span key={createMarketplaceReceipt?.marketplaceId}>
+      {createMarketplaceReceipt?.marketplaceId}
+    </span>,
+    <span key={parameter?.name}>{parameter?.name}</span>,
+    <span key={parameter?.referralPercentage}>
+      {' '}
+      {parameter?.referralPercentage / 10 ** 2 || 0} %
+    </span>,
+  ];
 };
 
 const ConfigMarketplaceSections = ({ par }: IProps): JSX.Element[] => {
@@ -417,42 +442,77 @@ const ConfigMarketplaceSections = ({ par }: IProps): JSX.Element[] => {
     <span key={parameter?.marketplaceID}>
       {parameter?.marketplaceID || ''}
     </span>,
-  ];
-};
-
-const UpdateAccountPermissionContractSections = (
-  par: IParameter,
-): JSX.Element[] => {
-  const parameter = par as unknown as IUpdateAccountPermissionContract;
-  return [
-    <span key={parameter?.permissions[0]?.permissionName}>
-      {parameter?.permissions[0]?.permissionName || ''}
+    <span key={parameter?.name}>{parameter?.name}</span>,
+    <span key={parameter?.referralPercentage}>
+      {parameter?.referralPercentage / 10 ** 2 || 0} %
     </span>,
   ];
 };
 
-const DepositSections = ({ par }: IProps): JSX.Element[] => {
+const UpdateAccountPermissionContractSections = ({
+  par,
+}: IProps): JSX.Element[] => {
+  const parameter = par as unknown as IUpdateAccountPermissionContract;
+
+  const permissionNames = parameter?.permissions?.map(permission =>
+    !!permission.permissionName ? permission.permissionName : '""',
+  );
+
+  let permissionsString = '';
+
+  if (permissionNames?.length > 0) {
+    permissionsString = permissionNames?.slice(0, 2).join(', ');
+
+    if (permissionNames?.length > 2)
+      permissionsString += `+ ${permissionNames?.length - 2}`;
+  }
+
+  return [<span key={permissionsString}>{permissionsString}</span>];
+};
+
+const DepositSections = ({ par, precision }: IProps): JSX.Element[] => {
   const parameter = par as unknown as IDepositContract;
+
   return [
     <span key={parameter?.depositTypeString}>
       {parameter?.depositTypeString === 'FPRDeposit' ? 'FPR' : 'KDA Pool'}
     </span>,
     <span key={parameter?.id}>{parameter?.id || '--'}</span>,
+    <span key={parameter?.amount}>
+      {parameter?.amount && formatAmountField(parameter?.amount, precision)}{' '}
+      {parameter?.currencyID || 'KLV'}
+    </span>,
   ];
 };
 
 const IITOTriggerSections = ({ par }: IProps): JSX.Element[] => {
   const parameter = par as unknown as IITOTriggerContract;
   return [
-    <span key={parameter?.triggerType}>{parameter?.triggerType || ''}</span>,
     <span key={parameter?.assetId}>{parameter?.assetId || ''}</span>,
+    <span key={parameter?.triggerType}>{parameter?.triggerType || ''}</span>,
   ];
 };
 
-const SmartContractSections = ({ par }: IProps): JSX.Element[] => {
+const SmartContractSections = ({
+  par,
+  receipts,
+  data,
+}: IProps): JSX.Element[] => {
   const parameter = par as unknown as ISmartContract;
 
-  return [<span key={parameter?.type}>{parameter?.type?.slice(2) || ''}</span>];
+  const calledFunction =
+    (parameter?.type?.slice(2) || '') === 'Invoke' &&
+    hexToString(data?.[0] || '').split('@')?.[0];
+
+  return [
+    <span key={parameter?.type}>{parameter?.type?.slice(2) || ''}</span>,
+    <span key={parameter?.address}>
+      {((parameter?.type?.slice(2) || '') === 'Invoke' &&
+        parseAddress(parameter?.address, 16)) ||
+        ''}
+    </span>,
+    <span key={String(calledFunction)}>{calledFunction}</span>,
+  ];
 };
 
 export {

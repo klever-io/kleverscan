@@ -421,6 +421,8 @@ export interface IConfigITOContract {
   maxAmount: number;
   packInfo: IPackInfo[];
   precision?: number;
+  startTime?: number;
+  endTime?: number;
 }
 
 export enum EnumBuyType {

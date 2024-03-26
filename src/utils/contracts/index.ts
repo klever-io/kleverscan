@@ -382,11 +382,13 @@ export const filteredSections = (
   contractType: string,
   receipts: IReceipt[],
   precision = 0,
+  data?: string[],
 ): JSX.Element[] => {
   const props = {
     par: contract[0].parameter,
     receipts,
     precision,
+    data,
   };
 
   switch (contractType) {
@@ -512,32 +514,32 @@ const oldContractLabels = {
 };
 
 const contractLabels = {
-  Transfer: ['Amount'], //OK
-  'Create Asset': ['Name', 'AssetId', 'Precision'], //OK
-  'Create Validator': ['Owner Address', 'Name', 'Can Delegate'], //OK
-  'Config Validator': ['BLS public key', 'Name', 'Can Delegate'], //OK
-  Freeze: ['Amount', 'Bucket Id'], //OK
-  Unfreeze: ['Amount', 'Bucket Id'], //OK
-  Delegate: ['Amount', 'Bucket Id', 'to Address'], //OK
-  Undelegate: ['Amount', 'Bucket Id'], //OK
-  Withdraw: ['Type', 'Amount'], //OK
-  Claim: ['Amount', 'Claim Type', 'Asset Id / Order Id'], //OK
-  Unjail: [], //OK
-  'Asset Trigger': ['Asset Id', 'Trigger Type'], //OK
-  'Set Account Name': ['Name'], //OK
-  Proposal: ['Proposal Id', 'Duration (in Epochs)', 'Description'], //OK
+  Transfer: ['Amount'],
+  'Create Asset': ['Name', 'AssetId', 'Precision'],
+  'Create Validator': ['Owner Address', 'Name', 'Can Delegate'],
+  'Config Validator': ['BLS public key', 'Name', 'Can Delegate'],
+  Freeze: ['Amount', 'Bucket Id'],
+  Unfreeze: ['Amount', 'Bucket Id'],
+  Delegate: ['Amount', 'Bucket Id', 'to Address'],
+  Undelegate: ['Amount', 'Bucket Id'],
+  Withdraw: ['Type', 'Amount'],
+  Claim: ['Amount', 'Claim Type', 'Asset Id / Order Id'],
+  Unjail: [],
+  'Asset Trigger': ['Asset Id', 'Trigger Type'],
+  'Set Account Name': ['Name'],
+  Proposal: ['Proposal Id', 'Duration (in Epochs)', 'Description'],
   Vote: ['Proposal Id', 'Amount', 'Type'],
-  'Config ITO': ['Asset Id', 'Status'],
+  'Config ITO': ['Asset Id', 'Status', 'Public Start Time'],
   'Set ITO': ['Asset Id'],
   Buy: ['Buy Type', 'Id', 'Price'],
   Sell: ['Market Type', 'Asset Id', 'Price'],
   'Cancel Marketplace Order': ['Order Id'],
-  'Create Marketplace': ['Name', 'Fee Percentage', 'Marketplace Id'],
-  'Config Marketplace': ['Marketplace Id', 'Fee Percentage'],
-  'Update Account Permission': ['Permission Name'],
+  'Create Marketplace': ['Marketplace Id', 'Name', 'Fee Percentage'],
+  'Config Marketplace': ['Marketplace Id', 'Name', 'Fee Percentage'],
+  'Update Account Permission': ['Permission Name(s)'],
   Deposit: ['Deposit Type', 'Target Asset', 'Amount'],
   'ITO Trigger': ['Asset Id', 'Type'],
-  'Smart Contract': ['Contract Address', 'Type', 'Function'],
+  'Smart Contract': ['Type', 'Contract Address', 'Function'],
 };
 
 export const getLabelForTableField = (

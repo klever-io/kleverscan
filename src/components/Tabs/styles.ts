@@ -55,10 +55,10 @@ export const ItemContainer = styled.div<{ selected: boolean }>`
   }
 `;
 
-export const FilterContent = styled.div<{ showDataFilter: boolean }>`
+export const FilterContent = styled.div`
   gap: 1rem;
   width: 100%;
-  display: ${props => (props.showDataFilter ? 'flex' : 'none')};
+  display: flex;
   align-items: center;
   > div:last-child {
     min-width: 18rem;

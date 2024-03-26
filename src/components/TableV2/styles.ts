@@ -224,11 +224,18 @@ export const CustomLink = styled.a<{
   }
 `;
 
+export const TableContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+`;
+
 export const FloatContainer = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: end;
+  gap: 16px;
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     display: grid;
@@ -244,7 +251,7 @@ export const LimitContainer = styled.div`
   font-size: 15px;
   text-align: left;
   color: ${props => props.theme.gray700};
-  /* margin-left: auto; */
+  margin-left: auto;
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     margin-bottom: 10px;
   }

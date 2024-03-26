@@ -1,21 +1,20 @@
 import Filter, { IFilter } from '@/components/Filter';
 import { buyType, contracts, status } from '@/configs/transactions';
 import { IAsset } from '@/types';
+import { setQueryAndRouter } from '@/utils';
 import { useFetchPartial } from '@/utils/hooks';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
-import { NextRouter, useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { ContractsIndex } from '../../types/contracts';
 import DateFilter from '../DateFilter';
 import { FilterContainer } from './styles';
 
 interface ITransactionsFilters {
-  setQuery: (newQuery: NextParsedUrlQuery, router: NextRouter) => void;
   disabledInput?: boolean;
 }
 
 const TransactionsFilters: React.FC<ITransactionsFilters> = ({
-  setQuery,
   disabledInput,
 }) => {
   const router = useRouter();
@@ -39,12 +38,12 @@ const TransactionsFilters: React.FC<ITransactionsFilters> = ({
       if (filterType === 'type') {
         delete updatedQuery['buyType'];
       }
-      setQuery(updatedQuery, router);
+      setQueryAndRouter(updatedQuery, router);
     } else if (filterType === 'type') {
       if (selected !== 'Buy') {
         delete updatedQuery['buyType'];
       }
-      setQuery(
+      setQueryAndRouter(
         {
           ...updatedQuery,
           page: String(1),
@@ -53,7 +52,7 @@ const TransactionsFilters: React.FC<ITransactionsFilters> = ({
         router,
       );
     } else if (selected !== query[filterType]) {
-      setQuery({ ...query, [filterType]: selected }, router);
+      setQueryAndRouter({ ...query, [filterType]: selected }, router);
     }
   };
 

@@ -8,7 +8,6 @@ import Tooltip from '@/components/Tooltip';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import api from '@/services/api';
 import { CenteredRow, Container, DoubleRow, Header } from '@/styles/common';
-import { setQueryAndRouter } from '@/utils';
 import { capitalizeString } from '@/utils/convertString';
 import { findReceipt } from '@/utils/findKey';
 import { formatAmount, formatDate } from '@/utils/formatFunctions';
@@ -18,7 +17,7 @@ import { getPrecision } from '@/utils/precisionFunctions';
 import { TransactionType } from '@klever/sdk-web';
 import Link from 'next/link';
 import { NextRouter, useRouter } from 'next/router';
-import React, { useCallback } from 'react';
+import React from 'react';
 import {
   IAssetTransactionResponse,
   IClaimReceipt,
@@ -44,7 +43,7 @@ interface IRequestTxQuery {
 }
 
 export const toAddressSectionElement = (toAddress: string): JSX.Element => {
-  if (toAddress === '--') {
+  if (toAddress === '- -') {
     return (
       <span data-testid="toAddressEmpty" style={{ cursor: 'default' }}>
         {toAddress}
@@ -146,178 +145,169 @@ export const requestTransactionsDefault = async (
   };
 };
 
-const Transactions: React.FC = () => {
-  const router = useRouter();
+const getContractType = contractTypes;
 
-  const getContractType = useCallback(contractTypes, []);
-  const getCustomFields = (
-    contract: IContract[],
-    receipts: IReceipt[],
-    precision?: number,
-    data?: string[],
-  ): JSX.Element[] => {
-    const contractType = getContractType(contract);
-    const filteredSectionsResult = filteredSections(
-      contract,
-      contractType,
-      receipts,
-      precision,
-      data,
-    );
-    if (contractType === 'Multi contract') {
-      const extraHeadersLength = 0;
-      return Array(extraHeadersLength)
-        .fill(extraHeadersLength)
-        .map(_ => <span key={Math.random()}>--</span>);
-    }
-    return filteredSectionsResult;
-  };
+const getCustomFields = (
+  contract: IContract[],
+  receipts: IReceipt[],
+  precision?: number,
+  data?: string[],
+): JSX.Element[] => {
+  const contractType = getContractType(contract);
+  const filteredSectionsResult = filteredSections(
+    contract,
+    contractType,
+    receipts,
+    precision,
+    data,
+  );
+  if (contractType === 'Multi contract') {
+    const extraHeadersLength = 0;
+    return Array(extraHeadersLength)
+      .fill(extraHeadersLength)
+      .map(_ => <span key={Math.random()}>--</span>);
+  }
+  return filteredSectionsResult;
+};
 
-  const rowSections = (props: ITransaction): IRowSection[] => {
-    const {
-      hash,
-      blockNum,
-      timestamp,
-      sender,
-      receipts,
-      contract,
-      kAppFee,
-      bandwidthFee,
-      status,
-      precision,
-      data,
-    } = props;
+export const transactionRowSections = (props: ITransaction): IRowSection[] => {
+  const {
+    hash,
+    blockNum,
+    timestamp,
+    sender,
+    receipts,
+    contract,
+    kAppFee,
+    bandwidthFee,
+    status,
+    precision,
+    data,
+  } = props;
 
-    let toAddress = '- -';
-    const contractType = getContractType(contract);
+  let toAddress = '- -';
+  const contractType = getContractType(contract);
 
-    if (contractType === Contract.Transfer) {
-      const parameter = contract[0].parameter as ITransferContract;
+  if (contractType === Contract.Transfer) {
+    const parameter = contract[0].parameter as ITransferContract;
 
-      toAddress = parameter.toAddress;
-    }
+    toAddress = parameter.toAddress;
+  }
 
-    const customFields = getCustomFields(contract, receipts, precision, data);
+  const customFields = getCustomFields(contract, receipts, precision, data);
 
-    const sections = [
-      {
-        element: (
-          <DoubleRow key={hash}>
-            <CenteredRow className="bucketIdCopy">
-              <Link href={`/transaction/${hash}`}>
-                {parseAddress(hash, 24)}
-              </Link>
-              <Copy info="TXHash" data={hash} />
-            </CenteredRow>
-            <CenteredRow>
-              <TimestampInfo>{formatDate(timestamp)}</TimestampInfo>
-              <Status status={status.toLowerCase()}>
-                {capitalizeString(status)}
-              </Status>
-            </CenteredRow>
-          </DoubleRow>
-        ),
-        span: 2,
-      },
-      {
-        element: (
-          <DoubleRow key={blockNum}>
-            <Link href={`/block/${blockNum || 0}`}>
-              <a className="address">{blockNum || 0}</a>
-            </Link>
-            <span>
-              {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
-            </span>
-          </DoubleRow>
-        ),
-        span: 1,
-      },
-      {
-        element: (
-          <DoubleRow key={sender}>
-            <Link href={`/account/${sender}`}>
-              <a className="address">{parseAddress(sender, 16)}</a>
-            </Link>
-            {toAddressSectionElement(toAddress)}
-          </DoubleRow>
-        ),
-        span: 1,
-      },
-      {
-        element:
-          contractType === 'Multi contract' ? (
-            <DoubleRow>
-              <MultiContractToolTip
-                contract={contract}
-                contractType={contractType}
-              />
-              <CenteredRow>- -</CenteredRow>
-            </DoubleRow>
-          ) : (
-            <DoubleRow>
-              <CenteredRow key={contractType}>
-                {ContractsName[contractType]}
-              </CenteredRow>
-              <CenteredRow>
-                {getLabelForTableField(contractType)?.[0] ? (
-                  <Tooltip
-                    msg={getLabelForTableField(contractType)[0]}
-                    Component={() => <span>{customFields[0]}</span>}
-                  />
-                ) : (
-                  <span> - - </span>
-                )}
-              </CenteredRow>
-            </DoubleRow>
-          ),
-        span: 1,
-      },
-      {
-        element: contractType ? (
+  const sections = [
+    {
+      element: (
+        <DoubleRow key={hash}>
+          <CenteredRow className="bucketIdCopy">
+            <Link href={`/transaction/${hash}`}>{parseAddress(hash, 24)}</Link>
+            <Copy info="TXHash" data={hash} />
+          </CenteredRow>
+          <CenteredRow>
+            <TimestampInfo>{formatDate(timestamp)}</TimestampInfo>
+            <Status status={status.toLowerCase()}>
+              {capitalizeString(status)}
+            </Status>
+          </CenteredRow>
+        </DoubleRow>
+      ),
+      span: 2,
+    },
+    {
+      element: (
+        <DoubleRow key={blockNum}>
+          <Link href={`/block/${blockNum || 0}`}>
+            <a className="address">{blockNum || 0}</a>
+          </Link>
+          <span>
+            {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
+          </span>
+        </DoubleRow>
+      ),
+      span: 1,
+    },
+    {
+      element: (
+        <DoubleRow key={sender}>
+          <Link href={`/account/${sender}`}>
+            <a className="address">{parseAddress(sender, 16)}</a>
+          </Link>
+          {toAddressSectionElement(toAddress)}
+        </DoubleRow>
+      ),
+      span: 1,
+    },
+    {
+      element:
+        contractType === 'Multi contract' ? (
           <DoubleRow>
-            {getLabelForTableField(contractType)?.[1] ? (
-              <Tooltip
-                msg={getLabelForTableField(contractType)[1]}
-                Component={() => <span>{customFields[1]}</span>}
-              />
-            ) : (
-              <span> - - </span>
-            )}
-            {getLabelForTableField(contractType)?.[2] ? (
-              <Tooltip
-                msg={getLabelForTableField(contractType)[2]}
-                Component={() => <span>{customFields[2]}</span>}
-              />
-            ) : (
-              <span> - - </span>
-            )}
+            <MultiContractToolTip
+              contract={contract}
+              contractType={contractType}
+            />
+            <CenteredRow>- -</CenteredRow>
           </DoubleRow>
         ) : (
-          <></>
+          <DoubleRow>
+            <CenteredRow key={contractType}>
+              {ContractsName[contractType]}
+            </CenteredRow>
+            <CenteredRow>
+              {getLabelForTableField(contractType)?.[0] ? (
+                <Tooltip
+                  msg={getLabelForTableField(contractType)[0]}
+                  Component={() => <span>{customFields[0]}</span>}
+                />
+              ) : (
+                <span> - - </span>
+              )}
+            </CenteredRow>
+          </DoubleRow>
         ),
-        span: 1,
-      },
-    ];
+      span: 1,
+    },
+    {
+      element: contractType ? (
+        <DoubleRow>
+          {getLabelForTableField(contractType)?.[1] ? (
+            <Tooltip
+              msg={getLabelForTableField(contractType)[1]}
+              Component={() => <span>{customFields[1]}</span>}
+            />
+          ) : (
+            <span> - - </span>
+          )}
+          {getLabelForTableField(contractType)?.[2] ? (
+            <Tooltip
+              msg={getLabelForTableField(contractType)[2]}
+              Component={() => <span>{customFields[2]}</span>}
+            />
+          ) : (
+            <span> - - </span>
+          )}
+        </DoubleRow>
+      ) : (
+        <></>
+      ),
+      span: 1,
+    },
+  ];
 
-    return sections;
-  };
+  return sections;
+};
 
-  const transactionsFiltersProps = {
-    setQuery: setQueryAndRouter,
-  };
-
-  const Filters = () => {
-    return <TransactionsFilters {...transactionsFiltersProps} />;
-  };
+const Transactions: React.FC = () => {
+  const router = useRouter();
 
   const tableProps: ITable = {
     type: 'transactions',
     header: transactionTableHeaders,
-    rowSections,
+    rowSections: transactionRowSections,
     dataName: 'transactions',
     scrollUp: true,
     request: (page, limit) => requestTransactionsDefault(page, limit, router),
-    Filters,
+    Filters: TransactionsFilters,
   };
 
   return (

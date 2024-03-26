@@ -449,6 +449,17 @@ export const filteredSections = (
   }
 };
 
+export const initialsTableHeaders = [
+  'Hash',
+  'Block',
+  'Created',
+  'From',
+  '',
+  'To',
+  'Status',
+  'Contract',
+];
+
 export const transactionTableHeaders = [
   'Transaction Hash',
   'Block/Fees',

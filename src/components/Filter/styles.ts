@@ -37,9 +37,12 @@ const Hide = keyframes`
   }
 `;
 
-export const Container = styled.div<{ maxWidth?: boolean }>`
+export const Container = styled.div<{ maxWidth?: boolean; open?: boolean }>`
+  position: relative;
   display: flex;
   flex-direction: column;
+
+  z-index: ${props => (props.open ? 2 : 1)};
 
   width: 100%;
   min-width: 10rem;
@@ -120,7 +123,7 @@ export const SelectorContainer = styled.div<{ open: boolean }>`
   position: absolute;
   display: flex;
   overflow-y: auto;
-  z-index: -1;
+  z-index: 1;
 
   flex-direction: column;
 

@@ -1,7 +1,6 @@
 import { KLV } from '@/assets/coins';
 import { AccountDetails as AccountIcon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
-import DateFilter from '@/components/DateFilter';
 import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
@@ -13,7 +12,6 @@ import ProprietaryAssets from '@/components/Tabs/ProprietaryAssets';
 import Rewards from '@/components/Tabs/Rewards';
 import Transactions from '@/components/Tabs/Transactions';
 import Tooltip from '@/components/Tooltip/index';
-import TransactionsFilters from '@/components/TransactionsFilters';
 import {
   ContainerFilter,
   FilterDiv,
@@ -78,7 +76,6 @@ import {
   StakingRewards,
   ValidOperation,
 } from '@/views/accounts/detail';
-import { FilterByDate } from '@/views/transactions';
 import { ReceiveBackground } from '@/views/validator';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -353,7 +350,6 @@ const Account: React.FC<IAccountPage> = () => {
         router,
       );
     },
-    showDataFilter: false,
   };
 
   const transactionsFiltersProps = {
@@ -837,9 +833,6 @@ const Account: React.FC<IAccountPage> = () => {
           t('accounts:SingleAccount.Tabs.Transactions') && (
           <TxsFiltersWrapper>
             <ContainerFilter>
-              <TransactionsFilters
-                {...transactionsFiltersProps}
-              ></TransactionsFilters>
               <RightFiltersContent>
                 <FilterDiv>
                   <span>Transaction In/Out</span>
@@ -847,9 +840,6 @@ const Account: React.FC<IAccountPage> = () => {
                     <Filter key={index} {...filter} />
                   ))}
                 </FilterDiv>
-                <FilterByDate>
-                  <DateFilter />
-                </FilterByDate>
               </RightFiltersContent>
             </ContainerFilter>
           </TxsFiltersWrapper>

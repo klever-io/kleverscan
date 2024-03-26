@@ -31,6 +31,7 @@ import {
   MobileHeader,
   RetryContainer,
   TableBody,
+  TableContainer,
 } from './styles';
 
 export interface ITable {
@@ -169,7 +170,7 @@ const Table: React.FC<ITable> = ({
   };
 
   return (
-    <>
+    <TableContainer>
       <FloatContainer>
         {Filters && <Filters />}
         <LimitContainer>
@@ -244,6 +245,8 @@ const Table: React.FC<ITable> = ({
             response?.items?.length > 0 &&
             response?.items?.map((item: any, index: number) => {
               let spanCount = 0;
+              const isLastRow = index === response?.items?.length - 1;
+
               return (
                 rowSections &&
                 rowSections(item)?.map(({ element, span }, index2) => {
@@ -257,7 +260,7 @@ const Table: React.FC<ITable> = ({
                       isRightAligned={(isMobile || isTablet) && isRightAligned}
                       key={String(index2) + String(index)}
                       columnSpan={span}
-                      isLastRow={index === limit - 1}
+                      isLastRow={isLastRow}
                     >
                       {isMobile || isTablet ? (
                         <MobileHeader>{header[index2]}</MobileHeader>
@@ -302,7 +305,7 @@ const Table: React.FC<ITable> = ({
             />
           </PaginationContainer>
         )}
-    </>
+    </TableContainer>
   );
 };
 

@@ -6,16 +6,10 @@ import { OverviewTab } from '@/components/Asset/OverviewTab';
 import { StakingHistoryTab } from '@/components/Asset/StakingHistoryTab';
 import { StakingRoyaltiesTab } from '@/components/Asset/StakingRoyaltiesTab';
 import { UrisTab } from '@/components/Asset/URIsTab';
-import DateFilter, { ISelectedDays } from '@/components/DateFilter';
+import { ISelectedDays } from '@/components/DateFilter';
 import Tabs, { ITabs } from '@/components/NewTabs';
 import Holders from '@/components/Tabs/Holders';
 import Transactions from '@/components/Tabs/Transactions';
-import TransactionsFilters from '@/components/TransactionsFilters';
-import {
-  ContainerFilter,
-  RightFiltersContent,
-  TxsFiltersWrapper,
-} from '@/components/TransactionsFilters/styles';
 import api from '@/services/api';
 import { assetCall, assetPoolCall, ITOCall } from '@/services/requests/asset';
 import { CardHeader, CardTabContainer } from '@/styles/common';
@@ -29,7 +23,6 @@ import {
   AssetCardHeaderItem,
   AssetPageContainer,
 } from '@/views/assets';
-import { FilterByDate } from '@/views/transactions';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -251,21 +244,6 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       </CardTabContainer>
 
       <Tabs {...tabProps}>
-        {selectedTab === `${t('common:Titles.Transactions')}` && (
-          <TxsFiltersWrapper>
-            <ContainerFilter>
-              <TransactionsFilters
-                disabledInput={true}
-                {...transactionsFiltersProps}
-              ></TransactionsFilters>
-              <RightFiltersContent>
-                <FilterByDate>
-                  <DateFilter />
-                </FilterByDate>
-              </RightFiltersContent>
-            </ContainerFilter>
-          </TxsFiltersWrapper>
-        )}
         <SelectedTabComponent />
       </Tabs>
     </AssetPageContainer>

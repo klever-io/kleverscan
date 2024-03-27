@@ -269,7 +269,7 @@ export const KDASelect: React.FC<IKDASelect> = props => {
                 }
               : undefined
           }
-          zIndex={4}
+          zIndex={3}
           error={Boolean(collectionError)}
         />
         {collectionError && (

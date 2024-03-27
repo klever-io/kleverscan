@@ -9,6 +9,7 @@ interface ICopyProps {
   info?: string;
   children?: React.ReactNode;
   style?: Record<string, unknown>;
+  svgSize?: number;
 }
 
 const IconContainer = styled.div`
@@ -21,6 +22,7 @@ const Copy: React.FC<ICopyProps> = ({
   info = 'Text',
   children,
   style,
+  svgSize = 24,
 }) => {
   const handleCopyInfo = async () => {
     await clipboard.writeText(String(data));
@@ -32,10 +34,12 @@ const Copy: React.FC<ICopyProps> = ({
     });
   };
 
+  const size = svgSize / 24;
+
   return (
     <Fragment>
       <IconContainer onClick={handleCopyInfo} style={style}>
-        {children ? children : <CopyIcon />}
+        {children ? children : <CopyIcon style={{ zoom: `${size}` }} />}
       </IconContainer>
     </Fragment>
   );

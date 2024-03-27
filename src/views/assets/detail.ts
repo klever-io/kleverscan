@@ -1,6 +1,7 @@
 import { default as DefaultInput } from '@/components/InputGlobal';
+import { EmptyRow } from '@/components/Table/styles';
 import { transparentize } from 'polished';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export const Header = styled.div`
   display: flex;
@@ -41,37 +42,6 @@ export const Input = styled(DefaultInput)`
   background-color: ${props => props.theme.white};
 
   border-color: ${props => props.theme.lightGray};
-`;
-
-export const AssetTitle = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 100%;
-  gap: 1rem;
-  overflow: hidden;
-  div {
-    padding: 0.5rem 1rem;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    background-color: ${props => props.theme.card.assetText};
-
-    color: ${props => props.theme.true.white};
-    font-weight: 400;
-    font-size: 0.85rem;
-
-    border-radius: 1rem;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    flex-direction: column;
-
-    align-items: flex-start;
-  }
 `;
 
 export const CardContainer = styled.div`
@@ -117,42 +87,39 @@ export const CardContent = styled.div`
   border-radius: 0 0.75rem 0.75rem 0.75rem;
 `;
 
-export const Row = styled.div<{ isStakingRoyalties: boolean }>`
+export const SectionTitle = styled.h2`
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: ${props => props.theme.black};
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+`;
+
+export const Row = styled.div<{ isStakingRoyalties?: boolean; span?: number }>`
   width: 100%;
-  padding: 1.5rem 2rem;
+  padding: 0.75rem 1rem;
   gap: 4px;
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    flex-direction: ${props => (props.isStakingRoyalties ? 'column' : 'row')};
-    align-items: center;
-    span:nth-child(1) {
-      padding-left: 15px;
-      min-width: 10rem;
-    }
-  }
+
+  position: relative;
+
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
 
   color: ${props => props.theme.black};
-  &:not(:last-child) {
-    border-bottom: 1px solid ${props => props.theme.card.border};
 
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
-  }
+  grid-column: auto / span 1;
 
-  span {
+  > span {
     &:first-child {
+      text-transform: capitalize;
+
       min-width: 11rem;
       max-width: 11rem;
-    }
-    &:nth-child(2) {
-      margin-left: 1rem;
     }
     overflow: hidden;
 
     strong {
-      font-weight: 600;
+      font-weight: 500;
       font-size: 0.95rem;
       color: ${props => props.theme.darkText};
     }
@@ -174,6 +141,41 @@ export const Row = styled.div<{ isStakingRoyalties: boolean }>`
       font-weight: 400;
     }
   }
+
+  > div {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    line-height: 1.5rem;
+    word-break: break-all;
+  }
+
+  &:after {
+    content: '';
+    position: absolute;
+    border-bottom: 1px solid ${props => props.theme.card.border};
+    bottom: 0px;
+
+    left: 0;
+    height: 1px;
+    width: 500%;
+  }
+
+  @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
+    ${props =>
+      props.span &&
+      css`
+        grid-column: auto / span ${props.span};
+      `}
+    padding: 1.5rem 2rem;
+  }
+`;
+
+export const AssetEmptyRow = styled(EmptyRow)`
+  grid-column: 1 / -1;
 `;
 
 export const FPRRow = styled(Row)`
@@ -187,7 +189,6 @@ export const FPRRow = styled(Row)`
 `;
 
 export const ExpandableRow = styled(Row)<{ expandVar: boolean }>`
-  overflow-x: auto;
   ${props =>
     props.expandVar &&
     ` 
@@ -243,35 +244,6 @@ export const HoverAnchor = styled.a`
   &:hover {
     text-decoration: underline;
     cursor: pointer;
-  }
-`;
-
-export const AssetHeaderContainer = styled.div`
-  background-color: transparent !important;
-  display: flex;
-  flex-direction: column;
-  width: fit-content;
-  color: ${props => props.theme.black} !important;
-  &:hover {
-    cursor: default;
-  }
-  h1 {
-    width: 100%;
-    white-space: normal;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-  }
-  p {
-    margin-top: 0.25rem;
-    color: ${props => props.theme.darkText} !important;
-  }
-
-  a {
-    color: ${props => props.theme.black} !important;
-    font-weight: 600;
-    &:hover {
-      text-decoration: underline;
-    }
   }
 `;
 

@@ -1,6 +1,7 @@
 import { ITableType } from '@/components/Table/styles';
 import widths from '@/components/Table/widths';
-import styled from 'styled-components';
+import { CardContent, CardHeaderItem, Container } from '@/styles/common';
+import styled, { css } from 'styled-components';
 
 export const Title = styled.div`
   display: flex;
@@ -88,7 +89,8 @@ export const Row = styled.div<ITableType>`
 export const ContainerAssetId = styled.section`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: space-between;
+  gap: 4px;
   overflow: hidden;
   width: 100%;
   div {
@@ -106,5 +108,44 @@ export const ContainerAssetName = styled(ContainerAssetId)`
 
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     justify-content: flex-start;
+  }
+`;
+
+export const AssetPageContainer = styled(Container)`
+  max-width: 1440px;
+  margin: 0 auto;
+`;
+
+export const AssetCardHeaderItem = styled(CardHeaderItem)`
+  background: none;
+
+  &:last-of-type,
+  &:first-of-type {
+    border: none;
+  }
+
+  span {
+    transition: none;
+
+    ${props =>
+      props.selected &&
+      css`
+        border-bottom: 2px solid ${props => props.theme.violet};
+      `}
+  }
+`;
+
+export const AssetCardContent = styled(CardContent)`
+  background: none;
+  overflow-x: hidden;
+
+  border-radius: unset;
+
+  display: grid;
+
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    grid-template-columns: repeat(2, 1fr);
   }
 `;

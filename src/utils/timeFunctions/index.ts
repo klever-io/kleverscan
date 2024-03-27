@@ -48,24 +48,79 @@ export const getAge = (dateInput: Date, t?: TFunction): string => {
  * @returns string
  */
 export const secondsToHourMinSec = (input: number, t?: TFunction): string => {
+  let result = '';
+
+  const isNegative = input < 0;
+
+  if (isNegative) {
+    result = '- ';
+    input = input * -1;
+  }
+
   const numSecondsInAMinute = 60;
   const numMinutesInAHour = 60;
   const numSecondsInAHour = numSecondsInAMinute * numMinutesInAHour;
-  let result = '';
 
-  const hours = Math.floor(input / numSecondsInAMinute / numMinutesInAHour);
-  let seconds = input % numSecondsInAHour;
-  const minutes = Math.floor(seconds / numSecondsInAMinute);
-  seconds = input % numSecondsInAMinute;
+  const hours = Math.floor(input / numSecondsInAHour);
+  let remainingSeconds = input % numSecondsInAHour;
+  const minutes = Math.floor(remainingSeconds / numSecondsInAMinute);
+  remainingSeconds = Math.floor(remainingSeconds % numSecondsInAMinute);
 
   if (hours > 0) {
-    result = `${hours}h`;
+    result += `${hours}h`;
   }
   if (minutes > 0) {
     result += ` ${minutes}m`;
   }
-  if (seconds > 0) {
-    result += ` ${seconds}s`;
+  if (remainingSeconds > 0) {
+    result += ` ${remainingSeconds}s`;
+  }
+
+  result += ' ';
+  return result;
+};
+
+export const secondsToMonthDayHourMinSec = (input: number): string => {
+  let result = '';
+
+  const isNegative = input < 0;
+
+  if (isNegative) {
+    result = '- ';
+    input = input * -1;
+  }
+
+  const numSecondsInAMinute = 60;
+  const numMinutesInAHour = 60;
+  const numSecondsInAHour = numSecondsInAMinute * numMinutesInAHour;
+  const numHoursInADay = 24;
+  const numDaysInAMonth = 30;
+  const numSecondsInADay = numSecondsInAHour * numHoursInADay;
+  const numSecondsInAMonth = numSecondsInADay * numDaysInAMonth;
+
+  const months = Math.floor(input / numSecondsInAMonth);
+  let remainingSeconds = input % numSecondsInAMonth;
+  const days = Math.floor(remainingSeconds / numSecondsInADay);
+  remainingSeconds = remainingSeconds % numSecondsInADay;
+  const hours = Math.floor(remainingSeconds / numSecondsInAHour);
+  remainingSeconds = remainingSeconds % numSecondsInAHour;
+  const minutes = Math.floor(remainingSeconds / numSecondsInAMinute);
+  remainingSeconds = Math.floor(remainingSeconds % numSecondsInAMinute);
+
+  if (months > 0) {
+    result += `${months}m`;
+  }
+  if (days > 0) {
+    result += ` ${days}d`;
+  }
+  if (hours > 0) {
+    result += ` ${hours}h`;
+  }
+  if (minutes > 0) {
+    result += ` ${minutes}m`;
+  }
+  if (remainingSeconds > 0) {
+    result += ` ${remainingSeconds}s`;
   }
 
   result += ' ';

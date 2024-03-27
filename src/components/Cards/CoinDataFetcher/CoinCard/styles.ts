@@ -401,7 +401,7 @@ export const HeaderGraph = styled.div`
 
 export const ArrowVariation = styled(ArrowUpSquare).attrs(props => ({
   size: 17,
-}))<{ isPositive: boolean }>`
+}))<{ $isPositive: boolean }>`
   path {
     fill: ${props => props =>
       props.theme.card[props.isPositive ? 'green' : 'red']};

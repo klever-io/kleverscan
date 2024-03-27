@@ -5,5 +5,15 @@ import Instagram from './instagram.svg';
 import Linkedin from './linkedin.svg';
 import Telegram from './telegram.svg';
 import Twitter from './twitter.svg';
+import Youtube from './youtube.svg';
 
-export { Facebook, Twitter, Discord, Instagram, Linkedin, Telegram, Github };
+export {
+  Facebook,
+  Twitter,
+  Discord,
+  Instagram,
+  Linkedin,
+  Telegram,
+  Github,
+  Youtube,
+};

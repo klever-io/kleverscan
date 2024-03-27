@@ -714,15 +714,14 @@ export const RetryContainer = styled.div`
 `;
 
 export const Main = styled.main`
+  position: relative;
   display: block;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0 16px;
   max-width: ${props => props.theme.maxWidth};
   background-color: ${props => props.theme.background};
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-  }
 `;
+
 export const LayoutContainer = styled.div`
   margin: auto;
   background-color: ${props => props.theme.background};

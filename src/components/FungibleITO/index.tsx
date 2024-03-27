@@ -27,7 +27,7 @@ interface IFungibleITO {
   setTxHash?: (e: string) => any;
 }
 
-const isFloat = (value: number) => {
+export const isFloat = (value: number): boolean => {
   if (
     typeof value === 'number' &&
     !Number.isNaN(value) &&
@@ -107,6 +107,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
       currentAmount <= packs[index].amount
     );
   };
+
   const handleSubmit = async (currencyId: string) => {
     if (!amount) {
       toast.error(t('noEmptyOrZeroToastError'));

@@ -105,6 +105,11 @@ export const MobileCardItem = styled.span<{
     align-items: center;
   }
 
+  a {
+    text-decoration: underline;
+    text-underline-offset: 0.2rem;
+  }
+
   &:nth-last-child(1) {
     flex-grow: ${props => (props.isAssets ? '1' : '0')};
   }

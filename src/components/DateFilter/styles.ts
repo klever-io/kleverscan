@@ -61,15 +61,23 @@ export const Container = styled.div`
   }
 `;
 
+export const CloseContainer = styled.div`
+  display: grid;
+  place-items: center;
+
+  svg {
+    animation: ${fadeInItem} 0.2s ease-in-out;
+    path {
+      fill: ${props => props.theme.violet} !important;
+    }
+  }
+`;
+
 export const OutsideContainer = styled.div`
   display: flex;
   width: 100%;
   align-items: center;
   gap: 1rem;
-  svg {
-    color: ${props => props.theme.navbar.text};
-    animation: ${fadeInItem} 0.2s ease-in-out;
-  }
 `;
 
 export const OutsideContent = styled.div`

@@ -1,8 +1,10 @@
 import { FilterArrowDown } from '@/assets/icons';
 import React, { useRef, useState } from 'react';
+import { AiOutlineClose } from 'react-icons/ai';
 import { Loader } from '../Loader/styles';
 import {
   ArrowDownContainer,
+  CloseContainer,
   Container,
   Content,
   HiddenInput,
@@ -98,6 +100,16 @@ const Filter: React.FC<IFilter> = ({
     );
   };
 
+  const handleClear = (e: any) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    setSelected(allItem);
+    if (onClick) {
+      onClick('');
+    }
+  };
+
   const handleChange = ({
     target: { value },
   }: {
@@ -168,10 +180,16 @@ const Filter: React.FC<IFilter> = ({
             isHiddenInput={isHiddenInput}
           />
         )}
+
         <span style={{ overflow: overFlow ? overFlow : 'hidden' }}>
           {closed && selected ? selected : ''}
         </span>
-        <ArrowDownContainer onClick={() => arrowOnClick()}>
+
+        <CloseContainer empty={selected === allItem} onClick={handleClear}>
+          <AiOutlineClose />
+        </CloseContainer>
+
+        <ArrowDownContainer onClick={() => arrowOnClick()} open={!closed}>
           <FilterArrowDown />
         </ArrowDownContainer>
         {!closed && (

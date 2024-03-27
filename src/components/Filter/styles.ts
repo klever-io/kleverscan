@@ -1,5 +1,6 @@
 import { transparentize } from 'polished';
 import styled, { css, keyframes } from 'styled-components';
+import { fadeInItem } from '../DateFilter/styles';
 
 const Show = keyframes`
   0% {
@@ -93,16 +94,6 @@ export const Content = styled.div<{ open: boolean }>`
 
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  svg {
-    transition: 0.2s ease;
-
-    transform: rotate(${props => (props.open ? 0 : 180)}deg);
-
-    path {
-      fill: ${props => props.theme.black};
-    }
   }
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
@@ -213,10 +204,42 @@ export const HiddenInput = styled.input<{
   }
 `;
 
-export const ArrowDownContainer = styled.div`
+export const CloseContainer = styled.div<{ empty: boolean }>`
   display: grid;
   place-items: center;
 
   padding: 6px;
   margin-top: 0 !important;
+  margin-left: auto;
+
+  ${props =>
+    props.empty &&
+    css`
+      display: none;
+    `}
+
+  svg {
+    animation: ${fadeInItem} 0.2s ease-in-out;
+    path {
+      fill: ${props => props.theme.violet};
+    }
+  }
+`;
+
+export const ArrowDownContainer = styled.div<{ open: boolean }>`
+  display: grid;
+  place-items: center;
+
+  padding: 6px;
+  margin-top: 0 !important;
+
+  svg {
+    transition: 0.2s ease;
+
+    transform: rotate(${props => (props.open ? 0 : 180)}deg);
+
+    path {
+      fill: ${props => props.theme.black};
+    }
+  }
 `;

@@ -3,12 +3,13 @@ import { Calendar as CalendarIcon } from '@/assets/icons';
 import { setQueryAndRouter } from '@/utils';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { MdClear } from 'react-icons/md';
+import { AiOutlineClose } from 'react-icons/ai';
 import { Container as FilterContainer } from '../Filter/styles';
 import {
   CalendarContainer,
   CalendarContent,
   CalendarHeader,
+  CloseContainer,
   Confirm,
   Container,
   DayItem,
@@ -221,19 +222,25 @@ const DateFilter: React.FC = () => {
     setButtonActive(false);
   }, [selectedDays, filterDate]);
 
-  const handleClear = useCallback(() => {
-    setInputValue('');
-    setSelectedDays({
-      start: currentDate,
-      end: currentDate,
-      values: [],
-    });
-    setFirstSelection(true);
-    setDate(currentDate);
-    setCalendarOpen(false);
+  const handleClear = useCallback(
+    e => {
+      e.stopPropagation();
+      e.preventDefault();
 
-    resetDate();
-  }, [resetDate]);
+      setInputValue('');
+      setSelectedDays({
+        start: currentDate,
+        end: currentDate,
+        values: [],
+      });
+      setFirstSelection(true);
+      setDate(currentDate);
+      setCalendarOpen(false);
+
+      resetDate();
+    },
+    [resetDate],
+  );
 
   const handleClose = useCallback(() => {
     setDontBlur(false);
@@ -276,8 +283,12 @@ const DateFilter: React.FC = () => {
               readOnly={true}
             />
             {!inputRef.current?.value && <CalendarIcon />}
+            {inputRef.current?.value && (
+              <CloseContainer>
+                <AiOutlineClose onClick={handleClear} />
+              </CloseContainer>
+            )}
           </OutsideContent>
-          {inputRef.current?.value && <MdClear onClick={handleClear} />}
         </OutsideContainer>
 
         {calendarOpen && (
@@ -285,7 +296,7 @@ const DateFilter: React.FC = () => {
             <CalendarHeader>
               <strong>
                 <h3>Date Filter</h3>
-                <MdClear onClick={handleClose} />
+                <AiOutlineClose onClick={handleClose} />
               </strong>
               <p>
                 Choose the proper date that you want to be listed down below

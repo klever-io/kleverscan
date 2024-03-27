@@ -26,7 +26,6 @@ const Tooltip: React.FC<ITooltipProps> = ({
       onMouseLeave={() => setDisplayMessage(false)}
       maxVw={maxVw}
     >
-      {/* tooltip component probably will need a specific outside wrapper for each case  */}
       <>
         {Component ? (
           <div data-tip data-for="buttonTooltip">

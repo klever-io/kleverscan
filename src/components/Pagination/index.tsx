@@ -5,7 +5,7 @@ import PaginationModal from './PaginationModal/PaginationModal';
 import { ArrowContainer, Container, ItemContainer } from './styles';
 
 interface IPagination {
-  scrollUp: boolean;
+  tableRef?: React.RefObject<HTMLDivElement>;
   count: number;
   page: number;
   onPaginate(page: number): void;
@@ -15,7 +15,7 @@ const Pagination: React.FC<IPagination> = ({
   count,
   page,
   onPaginate,
-  scrollUp,
+  tableRef,
 }) => {
   // count += 1;
   count >= 1000 ? (count = 1000) : count;
@@ -25,9 +25,7 @@ const Pagination: React.FC<IPagination> = ({
   const [showModalRight, setShowModalRight] = useState(false);
 
   useEffect(() => {
-    if (scrollUp) {
-      window.scrollTo(0, 0);
-    }
+    window.scrollTo(0, (tableRef?.current?.offsetTop || 100) - 100);
   }, [page]);
 
   const prevProps = {

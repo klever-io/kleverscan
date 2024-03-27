@@ -62,6 +62,12 @@ export const OutsideContainer = styled.div`
   border-radius: 8px;
 
   cursor: pointer;
+
+  transition: 0.2s ease;
+
+  &:hover {
+    background-color: ${props => props.theme.violet};
+  }
 `;
 
 export const ExportButtonContainer = styled.div<{ isJson?: boolean }>`

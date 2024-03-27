@@ -6,7 +6,6 @@ import { OverviewTab } from '@/components/Asset/OverviewTab';
 import { StakingHistoryTab } from '@/components/Asset/StakingHistoryTab';
 import { StakingRoyaltiesTab } from '@/components/Asset/StakingRoyaltiesTab';
 import { UrisTab } from '@/components/Asset/URIsTab';
-import { ISelectedDays } from '@/components/DateFilter';
 import Tabs, { ITabs } from '@/components/NewTabs';
 import Holders from '@/components/Tabs/Holders';
 import Transactions from '@/components/Tabs/Transactions';
@@ -15,9 +14,7 @@ import { assetCall, assetPoolCall, ITOCall } from '@/services/requests/asset';
 import { CardHeader, CardTabContainer } from '@/styles/common';
 import { IAssetPage, IBalance } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
-import { filterDate } from '@/utils/formatFunctions';
 import { parseHolders } from '@/utils/parseValues';
-import { resetDate } from '@/utils/resetDate';
 import {
   AssetCardContent,
   AssetCardHeaderItem,
@@ -100,16 +97,6 @@ const Asset: React.FC<IAssetPage> = ({}) => {
     });
   };
 
-  const filterQueryDate = (selectedDays: ISelectedDays) => {
-    const getFilteredDays = filterDate(selectedDays);
-    setQueryAndRouter({ ...router.query, ...getFilteredDays }, router);
-  };
-
-  const resetQueryDate = () => {
-    const newQuery = resetDate(router.query);
-    setQueryAndRouter({ ...router.query, ...newQuery }, router);
-  };
-
   const requestAssetHolders = async (page: number, limit: number) => {
     let newQuery = {
       ...router.query,
@@ -166,14 +153,13 @@ const Asset: React.FC<IAssetPage> = ({}) => {
   };
 
   const transactionsTableProps = {
-    scrollUp: false,
     dataName: 'transactions',
     request: (page: number, limit: number) => requestTransactions(page, limit),
     query: router.query,
   };
 
   const holdersTableProps = {
-    scrollUp: false,
+    scrollUp: true,
     dataName: 'accounts',
     request: (page: number, limit: number) => requestAssetHolders(page, limit),
   };
@@ -198,14 +184,6 @@ const Asset: React.FC<IAssetPage> = ({}) => {
     }
   };
 
-  const dateFilterProps = {
-    resetDate: resetQueryDate,
-    filterDate: filterQueryDate,
-  };
-  const transactionsFiltersProps = {
-    query: router.query,
-    setQuery: setQueryAndRouter,
-  };
   const tabProps: ITabs = {
     headers: tableHeaders,
     onClick: header => {

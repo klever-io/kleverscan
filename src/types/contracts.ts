@@ -121,6 +121,7 @@ export interface ReducedContract {
   [23]?: number;
   [24]?: number;
   [25]?: number;
+  [99]?: number;
 }
 
 export interface IContractOption {

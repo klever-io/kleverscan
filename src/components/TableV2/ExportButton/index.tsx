@@ -1,9 +1,9 @@
-import { PageDownload } from '@/assets/icons';
 import { Loader } from '@/components/Loader/styles';
 import Tooltip from '@/components/Tooltip';
 import { exportToCsv } from '@/utils/csv';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import { HiOutlineDocumentDownload } from 'react-icons/hi';
 import { toast } from 'react-toastify';
 import {
   DropdownItem,
@@ -84,7 +84,7 @@ const ExportButton: React.FC<{
             <Loader />
           ) : (
             <OutsideContainer>
-              <PageDownload size={25} />
+              <HiOutlineDocumentDownload size={24} color="white" />
             </OutsideContainer>
           )
         }

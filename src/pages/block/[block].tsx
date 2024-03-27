@@ -280,7 +280,6 @@ const Block: React.FC<IBlockPage> = ({ block }) => {
   };
 
   const transactionTableProps = {
-    scrollUp: false,
     dataName: 'transactions',
     request: (page: number, limit: number) => requestBlock(page, limit),
   };

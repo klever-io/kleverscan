@@ -60,7 +60,6 @@ export interface ITable {
 
   header: string[];
   rowSections?: (item: any) => IRowSection[] | undefined;
-  scrollUp?: boolean;
   dataName?: string;
   request: (page: number, limit: number) => Promise<IPaginatedResponse>;
   interval?: number;
@@ -83,17 +82,17 @@ const Table: React.FC<ITable> = ({
   header,
   rowSections,
   request,
-  scrollUp,
   dataName,
   interval,
   intervalController,
-  showLimit = true,
   Filters,
 }) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
   const limits = [5, 10, 50, 100];
   const [scrollTop, setScrollTop] = useState<boolean>(false);
+
+  const tableRef = React.useRef<HTMLDivElement>(null);
 
   const page = Number(router.query?.page) || 1;
   const limit = Number(router.query?.limit) || 10;
@@ -139,7 +138,7 @@ const Table: React.FC<ITable> = ({
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrollTop(window.scrollY > 100);
+      setScrollTop(window.scrollY > (tableRef.current?.offsetTop || 100));
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -166,7 +165,9 @@ const Table: React.FC<ITable> = ({
   }, [interval, limit]);
 
   const handleScrollTop = () => {
-    window.scrollTo(0, 0);
+    window.scrollTo({
+      top: (tableRef.current?.offsetTop || 100) - 100,
+    });
   };
 
   return (
@@ -174,7 +175,7 @@ const Table: React.FC<ITable> = ({
       <FloatContainer>
         {Filters && <Filters />}
         <LimitContainer>
-          <span>Items Per page</span>
+          <span>Items per page</span>
           <LimitItems>
             {limits.map(value => (
               <ItemContainer
@@ -199,7 +200,7 @@ const Table: React.FC<ITable> = ({
             msg="Refresh"
             Component={() => (
               <IoReloadSharpWrapper $loading={isFetching}>
-                <IoReloadSharp size={20} onClick={() => refetch()} />
+                <IoReloadSharp size={22} onClick={() => refetch()} />
               </IoReloadSharpWrapper>
             )}
           />
@@ -213,7 +214,7 @@ const Table: React.FC<ITable> = ({
           )}
         </ExportContainer>
       </FloatContainer>
-      <ContainerView>
+      <ContainerView ref={tableRef}>
         <TableBody cols={header.length}>
           {((!isMobile && !isTablet) || !rowSections) &&
             header.map((item, index) => {
@@ -288,23 +289,21 @@ const Table: React.FC<ITable> = ({
           <BsFillArrowUpCircleFill />
         </BackTopButton>
       </ContainerView>
-      {typeof scrollUp === 'boolean' &&
-        typeof response?.totalPages === 'number' &&
-        response?.totalPages > 1 && (
-          <PaginationContainer>
-            <Pagination
-              scrollUp={scrollUp}
-              count={response?.totalPages}
-              page={Number(router.query?.page) || page}
-              onPaginate={page => {
-                setQueryAndRouter(
-                  { ...router.query, page: page.toString() },
-                  router,
-                );
-              }}
-            />
-          </PaginationContainer>
-        )}
+      {typeof response?.totalPages === 'number' && response?.totalPages > 1 && (
+        <PaginationContainer>
+          <Pagination
+            tableRef={tableRef}
+            count={response?.totalPages}
+            page={Number(router.query?.page) || page}
+            onPaginate={page => {
+              setQueryAndRouter(
+                { ...router.query, page: page.toString() },
+                router,
+              );
+            }}
+          />
+        </PaginationContainer>
+      )}
     </TableContainer>
   );
 };

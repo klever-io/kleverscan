@@ -316,7 +316,6 @@ const Account: React.FC<IAccountPage> = () => {
   };
 
   const transactionTableProps: IInnerTableProps = {
-    scrollUp: false,
     dataName: 'transactions',
     request: getRequest,
     query: router.query,

@@ -144,6 +144,12 @@ export const MobileHeader = styled.div`
   font-size: 0.8rem;
 `;
 
+export const CustomFieldWrapper = styled.div`
+  text-decoration: underline dashed;
+  text-decoration-color: ${props => transparentize(0.5, props.theme.black)};
+  text-underline-offset: 0.2rem;
+`;
+
 export const TimestampInfo = styled.div`
   width: 14ch;
 `;
@@ -277,7 +283,7 @@ export const LimitItems = styled.div`
 export const LimitButton = styled.button<{ selected?: boolean }>`
   color: ${props => props.theme.black};
   overflow: hidden;
-  border: 1px solid ${props => props.theme.purple};
+  border: 1px solid ${props => props.theme.violet};
   height: fit-content;
   padding: 0.35rem 0.9rem;
   font-size: 0.8rem;
@@ -318,12 +324,12 @@ export const ItemContainer = styled.div<{
   justify-content: center;
 
   background-color: ${props =>
-    props.active ? props.theme.purple : 'transparent'};
+    props.active ? props.theme.violet : props.theme.blue};
 
   border-radius: 16px;
 
   color: ${props =>
-    props.active ? props.theme.true.white : props.theme.black};
+    props.active ? props.theme.true.white : props.theme.blueGray300};
 
   cursor: pointer;
 
@@ -333,7 +339,7 @@ export const ItemContainer = styled.div<{
     ${props =>
       !props.active
         ? css`
-            background-color: ${props => props.theme.purple};
+            background-color: ${props => props.theme.violet};
             color: ${props => props.theme.true.white};
           `
         : css`
@@ -409,10 +415,17 @@ export const IoReloadSharpWrapper = styled.div<{
   border-radius: 8px;
 
   background-color: ${props => props.theme.card.background};
+
+  transition: 0.2s ease;
+
   svg {
     color: ${props =>
       props.theme.dark ? props.theme.black : props.theme.darkText};
     animation: ${props => (props.$loading ? rotate : 'none')} 1s linear infinite;
+  }
+
+  &:hover {
+    background-color: ${props => props.theme.violet};
   }
 `;
 

@@ -3,7 +3,11 @@ import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
 import { MultiContractToolTip } from '@/components/MultiContractToolTip';
 import Table, { ITable } from '@/components/TableV2';
-import { Status, TimestampInfo } from '@/components/TableV2/styles';
+import {
+  CustomFieldWrapper,
+  Status,
+  TimestampInfo,
+} from '@/components/TableV2/styles';
 import Tooltip from '@/components/Tooltip';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import api from '@/services/api';
@@ -161,12 +165,6 @@ const getCustomFields = (
     precision,
     data,
   );
-  if (contractType === 'Multi contract') {
-    const extraHeadersLength = 0;
-    return Array(extraHeadersLength)
-      .fill(extraHeadersLength)
-      .map(_ => <span key={Math.random()}>--</span>);
-  }
   return filteredSectionsResult;
 };
 
@@ -257,7 +255,9 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
               {getLabelForTableField(contractType)?.[0] ? (
                 <Tooltip
                   msg={getLabelForTableField(contractType)[0]}
-                  Component={() => <span>{customFields[0]}</span>}
+                  Component={() => (
+                    <CustomFieldWrapper>{customFields[0]}</CustomFieldWrapper>
+                  )}
                 />
               ) : (
                 <span> - - </span>
@@ -273,7 +273,9 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
           {getLabelForTableField(contractType)?.[1] ? (
             <Tooltip
               msg={getLabelForTableField(contractType)[1]}
-              Component={() => <span>{customFields[1]}</span>}
+              Component={() => (
+                <CustomFieldWrapper>{customFields[1]}</CustomFieldWrapper>
+              )}
             />
           ) : (
             <span> - - </span>
@@ -281,7 +283,9 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
           {getLabelForTableField(contractType)?.[2] ? (
             <Tooltip
               msg={getLabelForTableField(contractType)[2]}
-              Component={() => <span>{customFields[2]}</span>}
+              Component={() => (
+                <CustomFieldWrapper>{customFields[2]}</CustomFieldWrapper>
+              )}
             />
           ) : (
             <span> - - </span>
@@ -305,7 +309,6 @@ const Transactions: React.FC = () => {
     header: transactionTableHeaders,
     rowSections: transactionRowSections,
     dataName: 'transactions',
-    scrollUp: true,
     request: (page, limit) => requestTransactionsDefault(page, limit, router),
     Filters: TransactionsFilters,
   };

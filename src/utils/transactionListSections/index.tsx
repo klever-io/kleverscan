@@ -115,10 +115,10 @@ const CreateValidatorSections = ({ par }: IProps): JSX.Element[] => {
       </Link>
     </span>,
     <span key={String(parameter?.config?.name)}>
-      <strong>{parameter?.config?.name}</strong>
+      {parameter?.config?.name}
     </span>,
     <span key={String(parameter?.config?.canDelegate)}>
-      <strong>{parameter?.config?.canDelegate ? 'True' : 'False'}</strong>
+      {parameter?.config?.canDelegate ? 'True' : 'False'}
     </span>,
   ];
 };

@@ -6,6 +6,8 @@ export const Container = styled.div`
 
   gap: 2rem;
 
+  padding-top: 40px;
+
   flex-direction: column;
 `;
 

@@ -178,7 +178,7 @@ const Table: React.FC<ITable> = ({
           <LimitContainer>
             <span>Items per page</span>
             <LimitItems>
-              {limits.map(value => (
+              {limits?.map(value => (
                 <ItemContainer
                   key={value}
                   onClick={() => {
@@ -224,7 +224,7 @@ const Table: React.FC<ITable> = ({
                 .fill(limit)
                 .map((_, index) => (
                   <TableRow key={String(index)}>
-                    {header.map((item, index2) => (
+                    {header?.map((item, index2) => (
                       <MobileCardItem
                         isAssets={type === 'assets' || type === 'proposals'}
                         isRightAligned={isMobile || isTablet}
@@ -245,7 +245,7 @@ const Table: React.FC<ITable> = ({
 
           {!isMobile && !isTablet && rowSections && (
             <TableRow>
-              {header.map((item, index) => (
+              {header?.map((item, index) => (
                 <HeaderItem key={JSON.stringify(item)}>{item}</HeaderItem>
               ))}
             </TableRow>

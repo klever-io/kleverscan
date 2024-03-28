@@ -1,5 +1,7 @@
 import Table, { ITable } from '@/components/TableV2';
-import { IPaginatedResponse, IRowSection, ITransaction } from '@/types/index';
+import { useMobile } from '@/contexts/mobile';
+import { IPaginatedResponse, IRowSection } from '@/types/index';
+import { parseAddress } from '@/utils/parseValues';
 import React from 'react';
 
 interface IValidatorsProps {
@@ -14,9 +16,17 @@ const Validators: React.FC<IValidatorsProps> = props => {
     code: '',
     error: '',
   });
-  const rowSections = (validatorHash: ITransaction): IRowSection[] => {
+  const { isMobile } = useMobile();
+  const rowSections = (validatorHash: string): IRowSection[] => {
     const sections = [
-      { element: <span key="validator">{validatorHash}</span>, span: 2 },
+      {
+        element: (
+          <span>
+            {isMobile ? parseAddress(validatorHash, 36) : validatorHash}
+          </span>
+        ),
+        span: 2,
+      },
     ];
     return sections;
   };

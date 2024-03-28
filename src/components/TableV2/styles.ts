@@ -154,16 +154,15 @@ export const MobileCardItem = styled.span<{
       display: flex;
       align-items: center;
     }
+    ${props =>
+      props.isLastRow
+        ? css`
+            border-bottom: none;
+          `
+        : css`
+            border-bottom: solid 1px ${props => props.theme.darkGray};
+          `}
   }
-
-  ${props =>
-    props.isLastRow
-      ? css`
-          border-bottom: none;
-        `
-      : css`
-          border-bottom: solid 1px ${props => props.theme.darkGray};
-        `}
 `;
 
 export const MobileHeader = styled.span`
@@ -383,6 +382,7 @@ export const ExportContainer = styled.div`
   height: fit-content;
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     margin-bottom: 10px;
+    place-self: end;
   }
 `;
 

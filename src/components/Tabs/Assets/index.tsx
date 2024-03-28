@@ -1,5 +1,5 @@
-import Table, { ITable } from '@/components/Table';
 import { CustomLink } from '@/components/Table/styles';
+import Table, { ITable } from '@/components/TableV2';
 import { useContractModal } from '@/contexts/contractModal';
 import { IAccountAsset, IInnerTableProps, IRowSection } from '@/types/index';
 import { parseApr } from '@/utils';
@@ -12,12 +12,14 @@ interface IAssets {
   assetsTableProps: IInnerTableProps;
   address: string;
   showInteractionButtons?: boolean;
+  Filters?: React.FC;
 }
 
 const Assets: React.FC<IAssets> = ({
   assetsTableProps,
   address,
   showInteractionButtons,
+  Filters,
 }) => {
   const { t } = useTranslation('accounts');
   const header = [
@@ -73,40 +75,39 @@ const Assets: React.FC<IAssets> = ({
         ),
         span: 1,
       },
-      { element: <strong key={precision}>{precision}</strong>, span: 1 },
+      { element: <span key={precision}>{precision}</span>, span: 1 },
       {
         element: (
-          <strong key={balance}>
+          <span key={balance}>
             {formatAmount(balance / 10 ** precision)} {ticker}
-          </strong>
+          </span>
         ),
         span: 1,
       },
       {
         element: (
-          <strong key={frozenBalance}>
+          <span key={frozenBalance}>
             {formatAmount(frozenBalance / 10 ** precision)} {ticker}
-          </strong>
+          </span>
         ),
         span: 1,
       },
       {
         element: (
-          <strong key={unfrozenBalance}>
+          <span key={unfrozenBalance}>
             {formatAmount(unfrozenBalance / 10 ** precision)} {ticker}
-          </strong>
+          </span>
         ),
         span: 1,
       },
       {
         element: (
-          <strong key={JSON.stringify(staking)}>
+          <span key={JSON.stringify(staking)}>
             {parseApr(staking?.interestType)}
-          </strong>
+          </span>
         ),
         span: 1,
       },
-      { element: sectionViewNfts, span: 2 },
     ];
 
     const [FreezeButton] = getInteractionsButtons([
@@ -116,7 +117,12 @@ const Assets: React.FC<IAssets> = ({
       },
     ]);
 
-    if (assetType === 0 && showInteractionButtons) {
+    if (assetType === 1) {
+      sections.push({
+        element: sectionViewNfts,
+        span: 2,
+      });
+    } else if (assetType === 0 && showInteractionButtons) {
       sections.push({
         element: <FreezeButton />,
         span: 2,
@@ -129,7 +135,9 @@ const Assets: React.FC<IAssets> = ({
     ...assetsTableProps,
     rowSections,
     type: 'assets',
+    showLimit: false,
     header,
+    Filters,
   };
 
   return <Table {...tableProps} />;

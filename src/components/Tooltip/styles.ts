@@ -7,7 +7,7 @@ export const StyledTooltip = styled(ReactTooltip)<{ displayMsg: boolean }>`
 `;
 
 export const ToolTipSpan = styled.span<{ maxVw: number | undefined }>`
-  height: 20px;
+  min-height: 20px;
 
   div {
     max-width: ${props => (props.maxVw ? props.maxVw : 50)}vw;

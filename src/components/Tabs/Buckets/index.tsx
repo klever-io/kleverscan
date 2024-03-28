@@ -1,7 +1,6 @@
 import Copy from '@/components/Copy';
-import Table, { ITable } from '@/components/Table';
+import Table, { ITable } from '@/components/TableV2';
 import { useContractModal } from '@/contexts/contractModal';
-import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import { CenteredRow, RowContent } from '@/styles/common';
 import { IAssetsBuckets, IInnerTableProps, IRowSection } from '@/types/index';
@@ -22,7 +21,6 @@ const Buckets: React.FC<IBuckets> = ({
   showInteractionButtons,
 }) => {
   const UINT32_MAX = 4294967295;
-  const { isMobile } = useMobile();
   const { t } = useTranslation('accounts');
   const { getInteractionsButtons } = useContractModal();
 
@@ -191,7 +189,7 @@ const Buckets: React.FC<IBuckets> = ({
         element: (
           <RowContent key={bucket.id}>
             <CenteredRow className="bucketIdCopy">
-              <span>{!isMobile ? bucket.id : parseAddress(bucket.id, 24)}</span>
+              <span>{parseAddress(bucket.id, 24)}</span>
               <Copy info="BucketId" data={bucket.id} />
             </CenteredRow>
           </RowContent>

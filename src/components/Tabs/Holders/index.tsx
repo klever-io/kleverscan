@@ -1,6 +1,6 @@
 import Copy from '@/components/Copy';
 import Filter, { IFilter } from '@/components/Filter';
-import Table, { ITable } from '@/components/Table';
+import Table, { ITable } from '@/components/TableV2';
 import { IBalance, IHolders, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
 import { parseAddress } from '@/utils/parseValues';
@@ -53,33 +53,33 @@ const Holders: React.FC<IHolders> = ({
       },
       {
         element: (
-          <strong key={asset.circulatingSupply}>
+          <span key={asset.circulatingSupply}>
             {((balance / asset.circulatingSupply) * 100).toFixed(2)}%
-          </strong>
+          </span>
         ),
         span: 1,
       },
       {
         element: (
-          <strong key={asset.precision}>
+          <span key={asset.precision}>
             {formatAmount(frozenBalance / 10 ** asset.precision)}
-          </strong>
+          </span>
         ),
         span: 1,
       },
       {
         element: (
-          <strong key={balance}>
+          <span key={balance}>
             {formatAmount(balance / 10 ** asset.precision)}
-          </strong>
+          </span>
         ),
         span: 1,
       },
       {
         element: (
-          <strong key={totalBalance}>
+          <span key={totalBalance}>
             {formatAmount(totalBalance / 10 ** asset.precision)}
-          </strong>
+          </span>
         ),
         span: 1,
       },

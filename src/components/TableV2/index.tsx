@@ -60,7 +60,7 @@ export interface ITable {
     | 'launchPad';
 
   header: string[];
-  rowSections?: (item: any) => IRowSection[] | undefined;
+  rowSections?: (item: any) => IRowSection[];
   dataName?: string;
   request: (page: number, limit: number) => Promise<IPaginatedResponse>;
   interval?: number;
@@ -87,6 +87,7 @@ const Table: React.FC<ITable> = ({
   interval,
   intervalController,
   Filters,
+  showLimit = true,
 }) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
@@ -174,26 +175,28 @@ const Table: React.FC<ITable> = ({
     <TableContainer>
       <FloatContainer>
         {Filters && <Filters />}
-        <LimitContainer>
-          <span>Items per page</span>
-          <LimitItems>
-            {limits.map(value => (
-              <ItemContainer
-                key={value}
-                onClick={() => {
-                  setQueryAndRouter(
-                    { ...router.query, limit: value.toString(), page: '1' },
-                    router,
-                  );
-                  refetch();
-                }}
-                active={value === (Number(router.query?.limit) || limit)}
-              >
-                {value}
-              </ItemContainer>
-            ))}
-          </LimitItems>
-        </LimitContainer>
+        {showLimit ? (
+          <LimitContainer>
+            <span>Items per page</span>
+            <LimitItems>
+              {limits.map(value => (
+                <ItemContainer
+                  key={value}
+                  onClick={() => {
+                    setQueryAndRouter(
+                      { ...router.query, limit: value.toString(), page: '1' },
+                      router,
+                    );
+                    refetch();
+                  }}
+                  active={value === (Number(router.query?.limit) || limit)}
+                >
+                  {value}
+                </ItemContainer>
+              ))}
+            </LimitItems>
+          </LimitContainer>
+        ) : null}
 
         <ExportContainer>
           <Tooltip
@@ -265,6 +268,22 @@ const Table: React.FC<ITable> = ({
                       const [updatedSpanCount, isRightAligned] =
                         processRowSectionsLayout(spanCount, span);
                       spanCount = updatedSpanCount;
+                      const isLastItem =
+                        rowSections(item)?.length &&
+                        index2 === rowSections(item).length - 1;
+                      let itemWidth =
+                        tableRef.current?.offsetWidth &&
+                        (tableRef.current?.offsetWidth - 32) / header.length;
+                      if (itemWidth && itemWidth > 236) {
+                        itemWidth = 236;
+                      }
+                      if (isLastItem) {
+                        itemWidth =
+                          tableRef.current?.offsetWidth &&
+                          tableRef.current?.offsetWidth -
+                            32 -
+                            (itemWidth || 0) * (header.length - 1);
+                      }
 
                       return (
                         <MobileCardItem
@@ -275,6 +294,7 @@ const Table: React.FC<ITable> = ({
                           key={String(index2) + String(index)}
                           columnSpan={span}
                           isLastRow={isLastRow}
+                          dynamicWidth={itemWidth}
                         >
                           {isMobile || isTablet ? (
                             <MobileHeader>{header[index2]}</MobileHeader>

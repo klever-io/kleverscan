@@ -63,7 +63,6 @@ import {
   ButtonExpand,
   CheckboxOperations,
   ContainerSigners,
-  ContainerTabInteractions,
   Em,
   FrozenContainerLi,
   FrozenContentRewards,
@@ -369,31 +368,25 @@ const Account: React.FC<IAccountPage> = () => {
   const SelectedTabComponent: React.FC = () => {
     switch (router?.query?.tab || t('common:Titles.Assets')) {
       case t('common:Titles.Assets'):
+        const Filters = showInteractionButtons ? CreateAssetButton : undefined;
+
         return (
-          <>
-            <ContainerTabInteractions>
-              {showInteractionButtons && <CreateAssetButton />}
-            </ContainerTabInteractions>
-            <Assets
-              assetsTableProps={assetsTableProps}
-              address={router.query.account as string}
-              showInteractionButtons={showInteractionButtons}
-            />
-          </>
+          <Assets
+            assetsTableProps={assetsTableProps}
+            address={router.query.account as string}
+            showInteractionButtons={showInteractionButtons}
+            Filters={Filters}
+          />
         );
 
       case t('accounts:SingleAccount.Tabs.ProprietaryAssets'):
         return (
-          <>
-            <ContainerTabInteractions>
-              {showInteractionButtons && <CreateAssetButton />}
-            </ContainerTabInteractions>
-            <ProprietaryAssets
-              assetsTableProps={proprietaryAssetsTableProps}
-              address={router.query.account as string}
-              showInteractionButtons={showInteractionButtons}
-            />
-          </>
+          <ProprietaryAssets
+            assetsTableProps={proprietaryAssetsTableProps}
+            address={router.query.account as string}
+            showInteractionButtons={showInteractionButtons}
+            Filters={Filters}
+          />
         );
       case t('common:Titles.Transactions'):
         return <Transactions transactionsTableProps={transactionTableProps} />;

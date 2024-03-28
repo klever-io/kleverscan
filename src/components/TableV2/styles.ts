@@ -19,6 +19,7 @@ export const ContainerView = styled.div`
 
 export const TableBody = styled.div`
   min-width: fit-content;
+  width: 100%;
 
   display: flex;
   flex-direction: column;
@@ -45,19 +46,6 @@ export const TableBody = styled.div`
     background-origin: border-box;
     background-clip: padding-box, border-box;
   }
-`;
-
-export const RowContainer = styled.div`
-  width: 100%;
-
-  display: flex;
-  flex-direction: column;
-  flex: 0 5 236px;
-
-  display: table-row;
-
-  gap: 0.25rem;
-  padding: 0.5rem 0;
 `;
 
 export const HeaderItem = styled.div`
@@ -99,6 +87,7 @@ export const MobileCardItem = styled.span<{
   isAssets?: boolean;
   isAccountPage?: boolean;
   isLastRow?: boolean;
+  dynamicWidth?: number;
 }>`
   display: flex;
   flex-direction: column;
@@ -151,7 +140,8 @@ export const MobileCardItem = styled.span<{
     display: table-cell;
 
     table-layout: auto;
-    width: 236px;
+    width: ${props =>
+      props.dynamicWidth ? `${props.dynamicWidth}px` : '236px'};
 
     padding: 12px 16px;
 
@@ -434,8 +424,6 @@ const rotate = keyframes`
 export const IoReloadSharpWrapper = styled.div<{
   $loading: boolean;
 }>`
-  height: fit-content;
-
   cursor: pointer;
 
   display: grid;

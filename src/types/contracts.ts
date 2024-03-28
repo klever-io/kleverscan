@@ -549,8 +549,11 @@ export interface ISmartContract {
   typeValue: number;
   address: string;
   callValue: {
-    [coin: string]: number;
-  };
+    asset?: string;
+    kdaRoyalties?: number;
+    klvRoyalties?: number;
+    value?: number;
+  }[];
 }
 
 export type IParameter =

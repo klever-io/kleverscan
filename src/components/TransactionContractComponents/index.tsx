@@ -2643,14 +2643,14 @@ export const SmartContract: React.FC<IIndexedContract> = ({
           <RowContent>
             <BalanceContainer>
               <NetworkParamsContainer>
-                {Object.entries(parameter?.callValue || {}).map(
-                  ([key, value]) => (
-                    <div key={key}>
-                      <strong>{key}</strong>
+                {(parameter?.callValue || []).map(({ asset, value }) => {
+                  return (
+                    <div key={asset}>
+                      <strong>{asset}</strong>
                       <span>{value}</span>
                     </div>
-                  ),
-                )}
+                  );
+                })}
               </NetworkParamsContainer>
             </BalanceContainer>
           </RowContent>

@@ -8,6 +8,8 @@ export const FilterContainer = styled.div`
 
   gap: 0.75rem;
 
+  grid-column: span 2;
+
   > div {
     min-width: 13rem;
   }

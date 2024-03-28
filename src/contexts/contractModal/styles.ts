@@ -4,21 +4,27 @@ export const ButtonModal = styled.button<{
   isLocked?: boolean;
 }>`
   color: ${props => props.theme.true.white};
-  background-color: ${props => props.theme.violet};
-  height: 2.5rem;
+  background-color: transparent;
+  border: 1px solid
+    ${props => (!props.isLocked ? props.theme.violet : props.theme.darkGray)};
+
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 
   align-self: end;
 
-  min-width: 13rem;
+  min-width: 8rem;
   max-width: 15rem;
 
-  padding: 0 1rem;
-  border-radius: 4px;
+  padding: 4px 16px;
+  border-radius: 24px;
 
   display: flex;
   gap: 1rem;
   justify-content: center;
   align-items: center;
+
+  transition: all 0.1s ease;
 
   > span {
     color: ${props => props.theme.true.white} !important;
@@ -29,7 +35,9 @@ export const ButtonModal = styled.button<{
   }
 
   :hover {
-    opacity: ${props => (props.isLocked ? '' : '0.8')};
+    background-color: ${props =>
+      props.isLocked ? props.theme.darkGray : props.theme.violet};
+    cursor: ${props => (props.isLocked ? 'not-allowed' : 'pointer')};
   }
 
   opacity: ${props => (props.isLocked ? '0.3' : '1')};

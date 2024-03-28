@@ -1,6 +1,6 @@
-import { DefaultCardStyles } from '@/styles/common';
 import { transparentize } from 'polished';
 import styled, { css, keyframes } from 'styled-components';
+import { fadeInItem } from '../DateFilter/styles';
 
 const Show = keyframes`
   0% {
@@ -38,9 +38,12 @@ const Hide = keyframes`
   }
 `;
 
-export const Container = styled.div<{ maxWidth?: boolean }>`
+export const Container = styled.div<{ maxWidth?: boolean; open?: boolean }>`
+  position: relative;
   display: flex;
   flex-direction: column;
+
+  z-index: ${props => (props.open ? 2 : 1)};
 
   width: 100%;
   min-width: 10rem;
@@ -48,9 +51,10 @@ export const Container = styled.div<{ maxWidth?: boolean }>`
   span {
     padding-bottom: 0.25rem;
 
-    color: ${props => props.theme.darkText};
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
+    color: ${props =>
+      props.theme.dark ? props.theme.gray700 : props.theme.darkGray};
   }
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
@@ -65,21 +69,21 @@ export const Container = styled.div<{ maxWidth?: boolean }>`
 `;
 
 export const Content = styled.div<{ open: boolean }>`
-  ${DefaultCardStyles}
-  width: 100%;
-  height: 2.8rem;
+  border: 1px solid ${props => props.theme.black};
+  border-radius: 24px;
 
-  padding: 0.5rem 1rem;
-  padding-right: 0;
+  height: 32px;
+  width: 100%;
+
+  padding: 8px 16px;
 
   position: relative;
   display: flex;
+  z-index: 1;
 
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-
-  border-radius: 0.5rem;
 
   cursor: pointer;
 
@@ -90,15 +94,6 @@ export const Content = styled.div<{ open: boolean }>`
 
     text-overflow: ellipsis;
     white-space: nowrap;
-
-    color: ${props => props.theme.filter.text};
-    font-weight: 600;
-  }
-
-  svg {
-    transition: 0.2s ease;
-
-    transform: rotate(${props => (props.open ? 0 : 180)}deg);
   }
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
@@ -108,26 +103,27 @@ export const Content = styled.div<{ open: boolean }>`
 
 export const SelectorContainer = styled.div<{ open: boolean }>`
   padding: 0.25rem;
+  padding-left: 0.5rem;
 
-  width: 100%;
   max-height: 15rem;
 
-  top: 2.8rem;
+  width: 100%;
+  top: 40px;
   left: 0;
 
   position: absolute;
   display: flex;
   overflow-y: auto;
-  z-index: 2;
+  z-index: 1;
 
   flex-direction: column;
 
   gap: 0.25rem;
 
-  background-color: ${props => props.theme.white};
+  background-color: ${props => props.theme.background};
 
-  border: 1px solid ${props => props.theme.lightGray};
-  border-radius: 0.5rem;
+  border: 1px solid ${props => props.theme.black};
+  border-radius: 16px;
 
   animation: ${props => (props.open ? Hide : Show)} 0.2s
     cubic-bezier(0.645, 0.045, 0.355, 1);
@@ -145,6 +141,7 @@ export const SelectorContainer = styled.div<{ open: boolean }>`
 
   &::-webkit-scrollbar-track {
     background-color: transparent;
+    margin: 16px 0;
   }
 
   &::-webkit-scrollbar-thumb {
@@ -172,8 +169,7 @@ export const Item = styled.div<{ selected: boolean }>`
 
   align-items: center;
   justify-content: center;
-  background-color: ${props =>
-    props.selected && transparentize(0.75, props.theme.lightGray)};
+  backdrop-filter: ${props => props.selected && `brightness(2)`};
 
   border-radius: 0.5rem;
 
@@ -187,9 +183,7 @@ export const Item = styled.div<{ selected: boolean }>`
     font-weight: 400;
     text-align: center;
     color: ${props =>
-      props.selected
-        ? props.theme.filter.item.selected
-        : props.theme.filter.item.text};
+      props.selected ? props.theme.filter.item.selected : props.theme.gray700};
   }
 `;
 
@@ -202,12 +196,50 @@ export const HiddenInput = styled.input<{
   visibility: ${props => (props.show ? 'visible' : 'hidden')};
   caret-color: ${props => props.theme.black};
   color: ${props => props.theme.black};
+
+  font-size: 0.875rem;
+
   &:hover {
     cursor: ${props => (props.isHiddenInput ? 'text' : 'pointer')};
   }
 `;
 
-export const ArrowDownContainer = styled.div`
-  padding: 0.5rem 1rem;
+export const CloseContainer = styled.div<{ empty: boolean }>`
+  display: grid;
+  place-items: center;
+
+  padding: 6px;
   margin-top: 0 !important;
+  margin-left: auto;
+
+  ${props =>
+    props.empty &&
+    css`
+      display: none;
+    `}
+
+  svg {
+    animation: ${fadeInItem} 0.2s ease-in-out;
+    path {
+      fill: ${props => props.theme.violet};
+    }
+  }
+`;
+
+export const ArrowDownContainer = styled.div<{ open: boolean }>`
+  display: grid;
+  place-items: center;
+
+  padding: 6px;
+  margin-top: 0 !important;
+
+  svg {
+    transition: 0.2s ease;
+
+    transform: rotate(${props => (props.open ? 0 : 180)}deg);
+
+    path {
+      fill: ${props => props.theme.black};
+    }
+  }
 `;

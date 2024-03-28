@@ -9,12 +9,7 @@ import {
 import { IKAppTransferReceipt } from '@/types/receipts';
 import { format, fromUnixTime } from 'date-fns';
 import { NextRouter } from 'next/router';
-import {
-  IClaimReceipt,
-  IReceipt,
-  IRowSection,
-  ITransaction,
-} from '../../types';
+import { IClaimReceipt, IReceipt, ITransaction } from '../../types';
 import { getBuyAmount, getBuyPrice } from '../buyContractFunctions';
 import { filterReceipts, findReceipt, findReceiptWithSender } from '../findKey';
 import { getPrecision } from '../precisionFunctions';
@@ -387,60 +382,68 @@ export const filteredSections = (
   contractType: string,
   receipts: IReceipt[],
   precision = 0,
-): IRowSection[] => {
+  data?: string[],
+): JSX.Element[] => {
+  const props = {
+    par: contract[0].parameter,
+    receipts,
+    precision,
+    data,
+  };
+
   switch (contractType) {
     case Contract.Transfer:
-      return TransferSections(contract[0].parameter, precision);
+      return TransferSections(props);
     case Contract.CreateAsset:
-      return CreateAssetSections(contract[0].parameter);
+      return CreateAssetSections(props);
     case Contract.CreateValidator:
-      return CreateValidatorSections(contract[0].parameter);
+      return CreateValidatorSections(props);
     case Contract.ValidatorConfig:
-      return ValidatorConfigSections(contract[0].parameter);
+      return ValidatorConfigSections(props);
     case Contract.Freeze:
-      return FreezeSections(contract[0].parameter, precision);
+      return FreezeSections(props);
     case Contract.Unfreeze:
-      return UnfreezeSections(contract[0].parameter);
+      return UnfreezeSections(props);
     case Contract.Delegate:
-      return DelegateSections(contract[0].parameter);
+      return DelegateSections(props);
     case Contract.Undelegate:
-      return UndelegateSections(contract[0].parameter);
+      return UndelegateSections(props);
     case Contract.Withdraw:
-      return WithdrawSections(contract[0].parameter);
+      return WithdrawSections(props);
     case Contract.Claim:
-      return ClaimSections(contract[0].parameter, receipts);
+      return ClaimSections(props);
     case Contract.Unjail:
-      return UnjailSections(contract[0].parameter);
+      return UnjailSections(props);
     case Contract.AssetTrigger:
-      return AssetTriggerSections(contract[0].parameter);
+      return AssetTriggerSections(props);
     case Contract.SetAccountName:
-      return SetAccountNameSections(contract[0].parameter);
+      return SetAccountNameSections(props);
     case Contract.Proposal:
-      return ProposalSections(contract[0].parameter);
+      return ProposalSections(props);
     case Contract.Vote:
-      return VoteSections(contract[0].parameter);
+      return VoteSections(props);
     case Contract.ConfigITO:
-      return ConfigITOSections(contract[0].parameter);
+      return ConfigITOSections(props);
     case Contract.SetITOPrices:
-      return SetITOPricesSections(contract[0].parameter);
+      return SetITOPricesSections(props);
     case Contract.Buy:
-      return BuySections(contract[0].parameter);
+      return BuySections(props);
     case Contract.Sell:
-      return SellSections(contract[0].parameter);
+      return SellSections(props);
     case Contract.CancelMarketOrder:
-      return CancelMarketOrderSections(contract[0].parameter);
+      return CancelMarketOrderSections(props);
     case Contract.CreateMarketplace:
-      return CreateMarketplaceSections(contract[0].parameter);
+      return CreateMarketplaceSections(props);
     case Contract.ConfigMarketplace:
-      return ConfigMarketplaceSections(contract[0].parameter);
+      return ConfigMarketplaceSections(props);
     case Contract.UpdateAccountPermission:
-      return UpdateAccountPermissionContractSections(contract[0].parameter);
+      return UpdateAccountPermissionContractSections(props);
     case Contract.Deposit:
-      return DepositSections(contract[0].parameter);
+      return DepositSections(props);
     case Contract.ITOTrigger:
-      return IITOTriggerSections(contract[0].parameter);
+      return IITOTriggerSections(props);
     case Contract.SmartContract:
-      return SmartContractSections(contract[0].parameter);
+      return SmartContractSections(props);
     default:
       return [];
   }
@@ -457,8 +460,16 @@ export const initialsTableHeaders = [
   'Contract',
 ];
 
+export const transactionTableHeaders = [
+  'Transaction Hash',
+  'Block/Fees',
+  'From/To',
+  'Type',
+  'Misc',
+];
+
 export enum contractTableHeaders {
-  'Coin',
+  'Asset Id',
   'Amount',
   'Name',
   'Ticker',
@@ -467,7 +478,6 @@ export enum contractTableHeaders {
   'BLS public key',
   'Public Key',
   'Bucket Id',
-  'Asset Id',
   'Claim Type',
   'Trigger Type',
   'Description',
@@ -484,107 +494,73 @@ export enum contractTableHeaders {
   'Type',
 }
 
-/**
- * Receive the header of the table and the NextJS Router
- * @param router is required to filter using the router.query when it exists
- * @param header is required to do the filter when has filter on router.query
- * @returns return a array of string with the headers based on each contract
- */
-export const getHeaderForTable = (
-  router: NextRouter,
-  header: string[],
-): string[] => {
-  let newHeaders: string[] = [];
-  switch (ContractsIndex[ContractsIndex[Number(router.query.type)]]) {
-    case ContractsIndex.Transfer:
-      newHeaders = [contractTableHeaders[0], contractTableHeaders[1]];
-      break;
-    case ContractsIndex['Create Asset']:
-      newHeaders = [contractTableHeaders[2], contractTableHeaders[3]];
-      break;
-    case ContractsIndex['Create Validator']:
-      newHeaders = [contractTableHeaders[4], contractTableHeaders[5]];
-      break;
-    case ContractsIndex['Config Validator']:
-      newHeaders = [contractTableHeaders[6]];
-      break;
-    case ContractsIndex['Validator Config']:
-      newHeaders = [contractTableHeaders[7]];
-      break;
-    case ContractsIndex.Freeze:
-      newHeaders = [contractTableHeaders[9], contractTableHeaders[1]];
-      break;
-    case ContractsIndex.Unfreeze:
-      newHeaders = [contractTableHeaders[8]];
-      break;
-    case ContractsIndex.Delegate:
-      newHeaders = [contractTableHeaders[8]];
-      break;
-    case ContractsIndex.Undelegate:
-      newHeaders = [contractTableHeaders[8]];
-      break;
-    case ContractsIndex.Withdraw:
-      newHeaders = [contractTableHeaders[9]];
-      break;
-    case ContractsIndex.Claim:
-      newHeaders = [contractTableHeaders[10], contractTableHeaders[9]];
-      break;
-    case ContractsIndex.Unjail:
-      break;
-    case ContractsIndex['Asset Trigger']:
-      newHeaders = [contractTableHeaders[11]];
-      break;
-    case ContractsIndex['Set Account Name']:
-      newHeaders = [contractTableHeaders[2]];
-      break;
-    case ContractsIndex.Proposal:
-      newHeaders = [contractTableHeaders[12]];
-      break;
-    case ContractsIndex.Vote:
-      newHeaders = [contractTableHeaders[13], contractTableHeaders[1]];
-      break;
-    case ContractsIndex['Config ITO']:
-      newHeaders = [contractTableHeaders[9]];
-      break;
-    case ContractsIndex['Set ITO']:
-      newHeaders = [contractTableHeaders[9]];
-      break;
-    case ContractsIndex.Buy:
-      newHeaders = [contractTableHeaders[14], contractTableHeaders[20]];
-      break;
-    case ContractsIndex.Sell:
-      newHeaders = [
-        contractTableHeaders[21],
-        contractTableHeaders[20],
-        contractTableHeaders[9],
-      ];
-      break;
-    case ContractsIndex['Cancel Marketplace Order']:
-      newHeaders = [contractTableHeaders[15]];
-      break;
-    case ContractsIndex['Create Marketplace']:
-      newHeaders = [contractTableHeaders[2]];
-      break;
-    case ContractsIndex['Config Marketplace']:
-      newHeaders = [contractTableHeaders[16]];
-      break;
-    case ContractsIndex['Update Account Permission']:
-      newHeaders = [contractTableHeaders[17]];
-      break;
-    case ContractsIndex['Deposit']:
-      newHeaders = [contractTableHeaders[18], contractTableHeaders[19]];
-      break;
-    case ContractsIndex['ITO Trigger']:
-      newHeaders = [contractTableHeaders[17], contractTableHeaders[9]];
-    case ContractsIndex['Smart Contract']:
-      newHeaders = [contractTableHeaders[23]];
-      break;
-  }
-  if (router.query.type) {
-    return header.splice(0, header.length - 2).concat(newHeaders);
-  }
+const oldContractLabels = {
+  Transfer: ['Asset Id', 'Amount'],
+  'Create Asset': ['Name', 'Ticker'],
+  'Create Validator': ['Reward Address', 'Can Delegate'],
+  'Config Validator': ['BLS public key'],
+  Freeze: ['Asset Id', 'Amount'],
+  Unfreeze: ['Bucket Id'],
+  Delegate: ['Bucket Id'],
+  Undelegate: ['Bucket Id'],
+  Withdraw: ['Asset Id'],
+  Claim: ['Claim Type', 'Asset Id'],
+  Unjail: [],
+  'Asset Trigger': ['Trigger Type'],
+  'Set Account Name': ['Name'],
+  Proposal: ['Description'],
+  Vote: ['Proposal Id', 'Amount'],
+  'Config ITO': ['Asset Id'],
+  'Set ITO': ['Asset Id'],
+  Buy: ['Buy Type', 'Currency Id'],
+  Sell: ['Market Type', 'Currency Id', 'Asset Id'],
+  'Cancel Marketplace Order': ['Order Id'],
+  'Create Marketplace': ['Name'],
+  'Config Marketplace': ['Marketplace Id'],
+  'Update Account Permission': ['Permission Name'],
+  Deposit: ['Deposit Type', 'Id'],
+  'ITO Trigger': ['Type'],
+  'Smart Contract': [],
+};
 
-  return header;
+const contractLabels = {
+  Transfer: ['Amount'],
+  'Create Asset': ['Name', 'AssetId', 'Precision'],
+  'Create Validator': ['Owner Address', 'Name', 'Can Delegate'],
+  'Config Validator': ['BLS public key', 'Name', 'Can Delegate'],
+  Freeze: ['Amount', 'Bucket Id'],
+  Unfreeze: ['Amount', 'Bucket Id'],
+  Delegate: ['Amount', 'Bucket Id', 'to Address'],
+  Undelegate: ['Amount', 'Bucket Id'],
+  Withdraw: ['Type', 'Amount'],
+  Claim: ['Amount', 'Claim Type', 'Asset Id / Order Id'],
+  Unjail: [],
+  'Asset Trigger': ['Asset Id', 'Trigger Type'],
+  'Set Account Name': ['Name'],
+  Proposal: ['Proposal Id', 'Duration (in Epochs)', 'Description'],
+  Vote: ['Proposal Id', 'Amount', 'Type'],
+  'Config ITO': ['Asset Id', 'Status', 'Public Start Time'],
+  'Set ITO': ['Asset Id'],
+  Buy: ['Buy Type', 'Id', 'Price'],
+  Sell: ['Market Type', 'Asset Id', 'Price'],
+  'Cancel Marketplace Order': ['Order Id'],
+  'Create Marketplace': ['Marketplace Id', 'Name', 'Fee Percentage'],
+  'Config Marketplace': ['Marketplace Id', 'Name', 'Fee Percentage'],
+  'Update Account Permission': ['Permission Name(s)'],
+  Deposit: ['Deposit Type', 'Target Asset', 'Amount'],
+  'ITO Trigger': ['Asset Id', 'Type'],
+  'Smart Contract': ['Type', 'Contract Address', 'Function'],
+};
+
+export const getLabelForTableField = (
+  contractType: string | number,
+): string[] => {
+  const type =
+    typeof contractType === 'string'
+      ? ContractsName[contractType]
+      : ContractsIndex[contractType];
+
+  return contractLabels[type] || [];
 };
 
 export const getHeaderForCSV = (

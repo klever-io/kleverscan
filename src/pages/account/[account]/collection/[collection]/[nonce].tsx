@@ -27,7 +27,7 @@ import {
 import {
   contractTypes,
   filteredSections,
-  getHeaderForTable,
+  getLabelForTableField,
   initialsTableHeaders,
 } from '@/utils/contracts';
 import { capitalizeString } from '@/utils/convertString';
@@ -197,7 +197,7 @@ const NftDetail: React.FC<IParsedAsset> = () => {
 
   const tableProps: ITable = {
     type: 'transactions',
-    header: getHeaderForTable(router, header),
+    header: getLabelForTableField(router, header),
     rowSections,
     dataName: 'transactions',
     scrollUp: true,

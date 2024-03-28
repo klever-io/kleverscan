@@ -1,13 +1,13 @@
 import { ParticipateModal } from '@/components/Asset/AssetSummary/ParticipateModal';
 import { HashComponent } from '@/components/Contract';
 import Copy from '@/components/Copy';
+import Table, { ITable } from '@/components/ITOTable';
 import { LaunchPadBanner } from '@/components/LaunchPad/Banner';
 import { LaunchPadFAQ } from '@/components/LaunchPad/FAQ';
 import { LaunchPadFAQCards } from '@/components/LaunchPad/FAQCards';
 import { LearnBanner } from '@/components/LaunchPad/LearnBanner';
 import { WalletBanner } from '@/components/LaunchPad/WalletBanner';
 import AssetLogo from '@/components/Logo/AssetLogo';
-import Table, { ITable } from '@/components/NewTable';
 import { useParticipate } from '@/contexts/participate';
 import { requestITOs } from '@/services/requests/ito';
 import { IITOResponse, IParsedITO, IRowSection } from '@/types';

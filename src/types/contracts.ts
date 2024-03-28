@@ -121,6 +121,7 @@ export interface ReducedContract {
   [23]?: number;
   [24]?: number;
   [25]?: number;
+  [99]?: number;
 }
 
 export interface IContractOption {
@@ -421,6 +422,8 @@ export interface IConfigITOContract {
   maxAmount: number;
   packInfo: IPackInfo[];
   precision?: number;
+  startTime?: number;
+  endTime?: number;
 }
 
 export enum EnumBuyType {
@@ -570,7 +573,7 @@ export type IParameter =
   | IProposalContract
   | IVoteContract
   | IConfigITOContract
-  | IBuyContract
+  | IBuyContractPayload
   | ISellContract
   | ICancelMarketOrderContract
   | ICreateMarketplaceContract

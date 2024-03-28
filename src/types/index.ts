@@ -562,9 +562,9 @@ export interface ITxQuery {
 }
 
 export interface IInnerTableProps {
-  scrollUp: boolean;
   dataName: string;
   request: (page: number, limit: number) => Promise<any>;
+  scrollUp?: boolean;
   query?: ITxQuery;
   page?: number;
 }

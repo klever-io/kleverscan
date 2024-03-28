@@ -1,7 +1,7 @@
 import { getStatusIcon } from '@/assets/status';
 import Filter, { IFilter } from '@/components/Filter';
-import Table, { ITable } from '@/components/Table';
 import { CustomLink, Status } from '@/components/Table/styles';
+import Table, { ITable } from '@/components/TableV2';
 import Tooltip from '@/components/Tooltip';
 import { paramsStyles } from '@/components/Tooltip/configs';
 import { useMobile } from '@/contexts/mobile';
@@ -171,8 +171,8 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
       {
         element: (
           <ProposalTime key={`${epochStart}/${epochEnd}`}>
-            <small>Created Epoch: {epochStart}</small>
-            <small className="endTime">Ending Epoch: {epochEnd - 1}</small>
+            <span>Created Epoch: {epochStart}</span>
+            <span className="endTime">Ending Epoch: {epochEnd - 1}</span>
           </ProposalTime>
         ),
         span: 1,
@@ -233,7 +233,6 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
     rowSections,
     header,
     type: 'proposals',
-    scrollUp: true,
     dataName: 'proposals',
     request: (page, limit) => request(page, limit, router),
   };

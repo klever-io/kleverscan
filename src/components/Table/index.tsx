@@ -68,6 +68,7 @@ export interface ITable {
   interval?: number;
   intervalController?: React.Dispatch<React.SetStateAction<number>>;
   showLimit?: boolean;
+  Filters?: React.FC;
 }
 
 const onErrorHandler = () => {
@@ -89,6 +90,7 @@ const Table: React.FC<ITable> = ({
   interval,
   intervalController,
   showLimit = true,
+  Filters,
 }) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
@@ -176,28 +178,7 @@ const Table: React.FC<ITable> = ({
         !!response?.items &&
         showLimit && (
           <FloatContainer>
-            {dataName === 'transactions' && (
-              <ExportContainer>
-                <ExportLabel>
-                  <Tooltip
-                    msg="Current filters will be applied."
-                    Component={() => (
-                      <div style={{ cursor: 'help' }}>Export</div>
-                    )}
-                  />
-                </ExportLabel>
-                <ButtonsContainer>
-                  <ExportButton
-                    items={response?.items}
-                    tableRequest={tableRequest}
-                    totalRecords={response?.totalPages * limit || 10000}
-                  />
-                  {/* <ExportButton>
-                    <VscJson size={25} />
-                  </ExportButton> */}
-                </ButtonsContainer>
-              </ExportContainer>
-            )}
+            {Filters && <Filters />}
             <LimitContainer>
               <span>Per page</span>
               <LimitText>
@@ -227,6 +208,26 @@ const Table: React.FC<ITable> = ({
                 ></Tooltip>
               </IoReloadSharpWrapper>
             </LimitContainer>
+
+            {dataName === 'transactions' && (
+              <ExportContainer>
+                <ExportLabel>
+                  <Tooltip
+                    msg="Current filters will be applied."
+                    Component={() => (
+                      <div style={{ cursor: 'help' }}>Export</div>
+                    )}
+                  />
+                </ExportLabel>
+                <ButtonsContainer>
+                  <ExportButton
+                    items={response?.items}
+                    tableRequest={tableRequest}
+                    totalRecords={response?.totalPages * limit || 10000}
+                  />
+                </ButtonsContainer>
+              </ExportContainer>
+            )}
           </FloatContainer>
         )}
       <ContainerView>

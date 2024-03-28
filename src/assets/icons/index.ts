@@ -18,11 +18,13 @@ import Compass from './compass.svg';
 import Copy from './copy.svg';
 import Currency from './currency.svg';
 import Edit from './edit.svg';
+import FilterArrowDown from './filter-arrow-down.svg';
 import GooglePlay from './google-play.svg';
 import Graph from './graph.svg';
 import InfoSquare from './info-square.svg';
 import LaunchPadPlus from './launchpad-plus.svg';
 import LineArrowUpSquare from './line-arrow-up-square.svg';
+import PageDownload from './page-download.svg';
 import PlusSquare from './plus-square.svg';
 import PlusWhite from './plus-white.svg';
 import Plus from './plus.svg';
@@ -30,6 +32,7 @@ import Proposal from './proposal.svg';
 import QRCode from './qr-code.svg';
 import Receive from './receive.svg';
 import Redirect from './redirect.svg';
+import Refresh from './refresh.svg';
 import Search from './search.svg';
 import SendWhite from './send-white.svg';
 import Send from './send.svg';
@@ -94,4 +97,7 @@ export {
   AppGalery,
   QRCode,
   Edit,
+  FilterArrowDown,
+  Refresh,
+  PageDownload,
 };

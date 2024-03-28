@@ -1,8 +1,10 @@
-import { ArrowDown } from '@/assets/icons';
+import { FilterArrowDown } from '@/assets/icons';
 import React, { useRef, useState } from 'react';
+import { AiOutlineClose } from 'react-icons/ai';
 import { Loader } from '../Loader/styles';
 import {
   ArrowDownContainer,
+  CloseContainer,
   Container,
   Content,
   HiddenInput,
@@ -46,7 +48,7 @@ const Filter: React.FC<IFilter> = ({
 }) => {
   const allItem = firstItem || 'All';
   const [selected, setSelected] = useState(current || allItem);
-  const [open, setOpen] = useState(true);
+  const [closed, setClosed] = useState(true);
   const [dontBlur, setDontBlur] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
@@ -56,26 +58,26 @@ const Filter: React.FC<IFilter> = ({
 
   const openDropdown = () => {
     if (disabledInput) return;
-    if (open) {
-      setOpen(false);
+    if (closed) {
+      setClosed(false);
       focusRef.current?.focus();
     }
-    if (!open && !isHiddenInput) {
+    if (!closed && !isHiddenInput) {
       closeDropDown();
     }
   };
 
   const arrowOnClick = () => {
     if (disabledInput) return;
-    if (!open) {
+    if (!closed) {
       closeDropDown();
     } else {
-      setOpen(false);
+      setClosed(false);
     }
   };
 
   const closeDropDown = () => {
-    setOpen(true);
+    setClosed(true);
     setInputValue('');
   };
 
@@ -96,6 +98,15 @@ const Filter: React.FC<IFilter> = ({
         <p>{item}</p>
       </Item>
     );
+  };
+
+  const handleClear = (e: any) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (onClick) {
+      onClick(allItem);
+    }
   };
 
   const handleChange = ({
@@ -128,13 +139,13 @@ const Filter: React.FC<IFilter> = ({
 
   const contentProps = {
     ref: contentRef,
-    open,
+    open: closed,
     onClick: () => openDropdown(),
   };
 
   const selectorProps = {
     ref: selectorRef,
-    open,
+    open: closed,
     overFlow,
     onClick: () => closeDropDown(),
   };
@@ -148,7 +159,7 @@ const Filter: React.FC<IFilter> = ({
   };
 
   return (
-    <Container maxWidth={maxWidth}>
+    <Container maxWidth={maxWidth} open={!closed}>
       <span>{title}</span>
       <Content
         onMouseEnter={() => setDontBlur(true)}
@@ -156,25 +167,31 @@ const Filter: React.FC<IFilter> = ({
         data-testid="selector"
         {...contentProps}
       >
-        {!open && (
+        {!closed && (
           <HiddenInput
             onBlur={() => !dontBlur && closeDropDown()}
             value={inputValue}
             type={title !== 'Status' ? inputType : 'button'}
             ref={focusRef}
-            show={!open}
+            show={!closed}
             placeholder={getPlaceholder()}
             onChange={handleChange}
             isHiddenInput={isHiddenInput}
           />
         )}
+
         <span style={{ overflow: overFlow ? overFlow : 'hidden' }}>
-          {open && selected ? selected : ''}
+          {closed && selected ? selected : ''}
         </span>
-        <ArrowDownContainer onClick={() => arrowOnClick()}>
-          <ArrowDown />
+
+        <CloseContainer empty={selected === allItem} onClick={handleClear}>
+          <AiOutlineClose />
+        </CloseContainer>
+
+        <ArrowDownContainer onClick={() => arrowOnClick()} open={!closed}>
+          <FilterArrowDown />
         </ArrowDownContainer>
-        {!open && (
+        {!closed && (
           <SelectorContainer {...selectorProps}>
             {!filteredArray.length && !loading ? (
               <span>{title} not found!</span>

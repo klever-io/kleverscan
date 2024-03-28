@@ -1,4 +1,4 @@
-import Table, { ITable } from '@/components/Table';
+import Table, { ITable } from '@/components/TableV2';
 import { IPaginatedResponse, IRowSection, ITransaction } from '@/types/index';
 import React from 'react';
 

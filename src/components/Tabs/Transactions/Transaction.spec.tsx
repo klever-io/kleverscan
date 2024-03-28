@@ -29,7 +29,6 @@ const request = jest.fn(async (page: number, limit: number) => {
 });
 
 const transactionTableProps: IInnerTableProps = {
-  scrollUp: false,
   dataName: 'transactions',
   request,
   query: {},

@@ -1,10 +1,6 @@
 import { KLV } from '@/assets/coins';
 import { AccountDetails as AccountIcon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
-import DateFilter, {
-  IDateFilter,
-  ISelectedDays,
-} from '@/components/DateFilter';
 import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
@@ -16,7 +12,6 @@ import ProprietaryAssets from '@/components/Tabs/ProprietaryAssets';
 import Rewards from '@/components/Tabs/Rewards';
 import Transactions from '@/components/Tabs/Transactions';
 import Tooltip from '@/components/Tooltip/index';
-import TransactionsFilters from '@/components/TransactionsFilters';
 import {
   ContainerFilter,
   FilterDiv,
@@ -54,14 +49,12 @@ import { IInnerTableProps, IResponse } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { contractsList } from '@/utils/contracts';
 import {
-  filterDate,
   filterOperations,
   hexToBinary,
   invertBytes,
 } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
-import { resetDate } from '@/utils/resetDate';
 import {
   AmountContainer,
   BalanceContainer,
@@ -70,7 +63,6 @@ import {
   ButtonExpand,
   CheckboxOperations,
   ContainerSigners,
-  ContainerTabInteractions,
   Em,
   FrozenContainerLi,
   FrozenContentRewards,
@@ -83,7 +75,6 @@ import {
   StakingRewards,
   ValidOperation,
 } from '@/views/accounts/detail';
-import { FilterByDate } from '@/views/transactions';
 import { ReceiveBackground } from '@/views/validator';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -270,15 +261,6 @@ const Account: React.FC<IAccountPage> = () => {
     );
   };
 
-  const resetQueryDate = () => {
-    setQueryAndRouter(resetDate(router.query), router);
-  };
-
-  const filterQueryDate = (selectedDays: ISelectedDays) => {
-    const getFilteredDays = filterDate(selectedDays);
-    setQueryAndRouter({ ...router.query, ...getFilteredDays }, router);
-  };
-
   const filterFromTo = (op: number) => {
     const updatedQuery = { ...router.query };
     if (op === 0) {
@@ -333,7 +315,6 @@ const Account: React.FC<IAccountPage> = () => {
   };
 
   const transactionTableProps: IInnerTableProps = {
-    scrollUp: false,
     dataName: 'transactions',
     request: getRequest,
     query: router.query,
@@ -367,16 +348,6 @@ const Account: React.FC<IAccountPage> = () => {
         router,
       );
     },
-    dateFilterProps: {
-      resetDate: resetQueryDate,
-      filterDate: filterQueryDate,
-    },
-    showDataFilter: false,
-  };
-
-  const dateFilterProps: IDateFilter = {
-    resetDate: resetQueryDate,
-    filterDate: filterQueryDate,
   };
 
   const transactionsFiltersProps = {
@@ -397,31 +368,25 @@ const Account: React.FC<IAccountPage> = () => {
   const SelectedTabComponent: React.FC = () => {
     switch (router?.query?.tab || t('common:Titles.Assets')) {
       case t('common:Titles.Assets'):
+        const Filters = showInteractionButtons ? CreateAssetButton : undefined;
+
         return (
-          <>
-            <ContainerTabInteractions>
-              {showInteractionButtons && <CreateAssetButton />}
-            </ContainerTabInteractions>
-            <Assets
-              assetsTableProps={assetsTableProps}
-              address={router.query.account as string}
-              showInteractionButtons={showInteractionButtons}
-            />
-          </>
+          <Assets
+            assetsTableProps={assetsTableProps}
+            address={router.query.account as string}
+            showInteractionButtons={showInteractionButtons}
+            Filters={Filters}
+          />
         );
 
       case t('accounts:SingleAccount.Tabs.ProprietaryAssets'):
         return (
-          <>
-            <ContainerTabInteractions>
-              {showInteractionButtons && <CreateAssetButton />}
-            </ContainerTabInteractions>
-            <ProprietaryAssets
-              assetsTableProps={proprietaryAssetsTableProps}
-              address={router.query.account as string}
-              showInteractionButtons={showInteractionButtons}
-            />
-          </>
+          <ProprietaryAssets
+            assetsTableProps={proprietaryAssetsTableProps}
+            address={router.query.account as string}
+            showInteractionButtons={showInteractionButtons}
+            Filters={Filters}
+          />
         );
       case t('common:Titles.Transactions'):
         return <Transactions transactionsTableProps={transactionTableProps} />;
@@ -860,9 +825,6 @@ const Account: React.FC<IAccountPage> = () => {
           t('accounts:SingleAccount.Tabs.Transactions') && (
           <TxsFiltersWrapper>
             <ContainerFilter>
-              <TransactionsFilters
-                {...transactionsFiltersProps}
-              ></TransactionsFilters>
               <RightFiltersContent>
                 <FilterDiv>
                   <span>Transaction In/Out</span>
@@ -870,9 +832,6 @@ const Account: React.FC<IAccountPage> = () => {
                     <Filter key={index} {...filter} />
                   ))}
                 </FilterDiv>
-                <FilterByDate>
-                  <DateFilter {...dateFilterProps} />
-                </FilterByDate>
               </RightFiltersContent>
             </ContainerFilter>
           </TxsFiltersWrapper>

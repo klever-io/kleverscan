@@ -365,6 +365,8 @@ const SetITOPricesSections = ({ par }: IProps): JSX.Element[] => {
 
 const BuySections = ({ par, precision }: IProps): JSX.Element[] => {
   const parameter = par as unknown as IBuyContractPayload;
+  const currency =
+    parameter?.buyType === 'ITOBuy' ? parameter?.id : parameter?.currencyID;
 
   return [
     <span key={parameter?.buyType}>{parameter?.buyType}</span>,
@@ -372,7 +374,7 @@ const BuySections = ({ par, precision }: IProps): JSX.Element[] => {
     <span key={parameter?.id}>{parameter?.id}</span>,
     <span key={parameter?.amount}>
       {formatAmountField(parameter?.amount, precision)}{' '}
-      {parameter?.amount ? parameter?.currencyID : null}
+      {parameter?.amount ? currency : null}
     </span>,
   ];
 };

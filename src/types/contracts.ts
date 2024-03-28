@@ -573,7 +573,7 @@ export type IParameter =
   | IProposalContract
   | IVoteContract
   | IConfigITOContract
-  | IBuyContract
+  | IBuyContractPayload
   | ISellContract
   | ICancelMarketOrderContract
   | ICreateMarketplaceContract

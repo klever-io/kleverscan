@@ -9,7 +9,6 @@ import React, { useEffect, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
 import { IoReloadSharp } from 'react-icons/io5';
 import { useQuery } from 'react-query';
-// import { VscJson } from 'react-icons/vsc';
 import Pagination from '../Pagination';
 import { PaginationContainer } from '../Pagination/styles';
 import Skeleton from '../Skeleton';
@@ -110,7 +109,7 @@ const Table: React.FC<ITable> = ({
         };
         return responseFormatted;
       }
-      // setPage(1);
+
       return [];
     } catch (error) {
       console.error(error);

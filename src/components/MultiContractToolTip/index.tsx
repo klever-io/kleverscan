@@ -16,19 +16,19 @@ export const MultiContractToolTip: React.FC<IMultiContract> = ({
 }) => {
   const reduceContracts = (): ReducedContract => {
     const reducedContract: ReducedContract = {};
-    contract.forEach(contrct => {
-      if (!reducedContract[contrct.type]) {
-        reducedContract[contrct.type] = 1;
+    contract.forEach(innerContract => {
+      if (!reducedContract[innerContract.type]) {
+        reducedContract[innerContract.type] = 1;
       } else {
-        reducedContract[contrct.type] += 1;
+        reducedContract[innerContract.type] += 1;
       }
     });
     return reducedContract;
   };
 
   const msg = Object.entries(reduceContracts())
-    .map(([contrct, number]) => {
-      return `${ContractsIndex[contrct]}: ${number}x`;
+    .map(([innerContract, number]) => {
+      return `${ContractsIndex[innerContract]}: ${number}x`;
     })
     .join('\n');
 

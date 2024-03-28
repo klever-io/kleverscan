@@ -32,6 +32,7 @@ import {
 import {
   Contract,
   ContractsName,
+  IBuyContractPayload,
   IContract,
   ITransferContract,
 } from '../../types/contracts';
@@ -61,6 +62,73 @@ export const toAddressSectionElement = (toAddress: string): JSX.Element => {
   );
 };
 
+const getAssetsAndCurreciesList = (
+  contract: IContract,
+  transaction: ITransaction,
+): string[] => {
+  const assets: string[] = [];
+  if (contract.parameter === undefined) return assets;
+
+  if ('assetId' in contract.parameter && contract.parameter.assetId) {
+    assets.push(contract.parameter.assetId);
+  }
+  if ('currencyID' in contract.parameter && contract.parameter.currencyID) {
+    assets.push(contract.parameter.currencyID);
+  }
+  if (contract?.type === TransactionType.Claim) {
+    const claimReceipt = findReceipt(transaction.receipts, 17) as
+      | IClaimReceipt
+      | undefined;
+    if (claimReceipt?.assetIdReceived) {
+      assets.push(claimReceipt.assetIdReceived);
+    }
+  }
+  if (contract?.type === TransactionType.BuyOrder) {
+    const buyContract = transaction.contract[0]
+      ?.parameter as IBuyContractPayload;
+
+    if (buyContract.buyType === 'ITOBuy' && buyContract?.id) {
+      assets.push(buyContract.id);
+    }
+  }
+
+  return assets;
+};
+
+const getTransactionPrecision = (
+  contract: IContract,
+  transaction: ITransaction,
+  assetPrecisions: { [key: string]: number },
+): number | undefined => {
+  if (contract.parameter === undefined) return;
+
+  if (contract?.type === TransactionType.Claim) {
+    const claimReceipt = findReceipt(transaction.receipts, 17) as
+      | IClaimReceipt
+      | undefined;
+    if (claimReceipt?.assetIdReceived) {
+      return assetPrecisions[claimReceipt.assetIdReceived];
+    }
+  }
+  if (contract?.type === TransactionType.BuyOrder) {
+    const buyContract = transaction.contract[0]
+      ?.parameter as IBuyContractPayload;
+    if (buyContract.buyType === 'ITOBuy' && buyContract?.id) {
+      return assetPrecisions[buyContract.id];
+    }
+  }
+
+  if ('currencyID' in contract.parameter && contract.parameter.currencyID) {
+    return assetPrecisions[contract.parameter.currencyID];
+  }
+
+  if ('assetId' in contract.parameter && contract.parameter.assetId) {
+    return assetPrecisions[contract.parameter.assetId];
+  }
+
+  return;
+};
+
 export const requestTransactionsDefault = async (
   page: number,
   limit: number,
@@ -83,26 +151,7 @@ export const requestTransactionsDefault = async (
     (transaction: ITransaction) => {
       if (transaction.contract && transaction.contract.length) {
         transaction.contract.forEach(contract => {
-          if (contract.parameter === undefined) return;
-
-          if ('assetId' in contract.parameter && contract.parameter.assetId) {
-            assets.push(contract.parameter.assetId);
-          }
-          if (
-            'currencyID' in contract.parameter &&
-            contract.parameter.currencyID
-          ) {
-            assets.push(contract.parameter.currencyID);
-          }
-
-          if (contract.type === TransactionType.Claim) {
-            const claimReceipt = findReceipt(transaction.receipts, 17) as
-              | IClaimReceipt
-              | undefined;
-            if (claimReceipt?.assetIdReceived) {
-              assets.push(claimReceipt?.assetIdReceived);
-            }
-          }
+          assets.push(...getAssetsAndCurreciesList(contract, transaction));
         });
       }
     },
@@ -116,25 +165,11 @@ export const requestTransactionsDefault = async (
         transaction.contract.forEach(contract => {
           if (contract.parameter === undefined) return;
 
-          if ('assetId' in contract.parameter && contract.parameter.assetId) {
-            transaction.precision = assetPrecisions[contract.parameter.assetId];
-          }
-          if (
-            'currencyID' in contract.parameter &&
-            contract.parameter.currencyID
-          ) {
-            transaction.precision =
-              assetPrecisions[contract.parameter.currencyID];
-          }
-          if (contract?.type === TransactionType.Claim) {
-            const claimReceipt = findReceipt(transaction.receipts, 17) as
-              | IClaimReceipt
-              | undefined;
-            if (claimReceipt?.assetIdReceived) {
-              transaction.precision =
-                assetPrecisions[claimReceipt.assetIdReceived];
-            }
-          }
+          transaction.precision = getTransactionPrecision(
+            contract,
+            transaction,
+            assetPrecisions,
+          );
         });
       }
       return transaction;

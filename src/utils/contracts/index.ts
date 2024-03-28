@@ -478,7 +478,6 @@ export enum contractTableHeaders {
   'BLS public key',
   'Public Key',
   'Bucket Id',
-  // 'Asset Id',
   'Claim Type',
   'Trigger Type',
   'Description',

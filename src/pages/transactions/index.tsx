@@ -249,7 +249,7 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
         ) : (
           <DoubleRow>
             <CenteredRow key={contractType}>
-              {ContractsName[contractType]}
+              <span>{ContractsName[contractType]}</span>
             </CenteredRow>
             <CenteredRow>
               {getLabelForTableField(contractType)?.[0] ? (

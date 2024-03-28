@@ -246,6 +246,10 @@ export const DoubleRow = styled.div`
   gap: 10px;
 
   width: 100%;
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    gap: 4px;
+  }
 `;
 
 export const CenteredRow = styled.div`

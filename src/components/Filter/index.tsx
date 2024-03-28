@@ -104,9 +104,8 @@ const Filter: React.FC<IFilter> = ({
     e.stopPropagation();
     e.preventDefault();
 
-    setSelected(allItem);
     if (onClick) {
-      onClick('');
+      onClick(allItem);
     }
   };
 

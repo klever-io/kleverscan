@@ -5,30 +5,7 @@ interface IStatus {
   status: string;
 }
 
-export interface ITableType {
-  type:
-    | 'transactions'
-    | 'blocks'
-    | 'accounts'
-    | 'assets'
-    | 'transactionDetail'
-    | 'buckets'
-    | 'accounts'
-    | 'assetsPage'
-    | 'holders'
-    | 'validators'
-    | 'validator'
-    | 'nodes'
-    | 'networkParams'
-    | 'proposals'
-    | 'votes'
-    | 'delegations'
-    | 'nfts'
-    | 'validatorsList'
-    | 'rewards'
-    | 'marketplaces'
-    | 'launchPad';
-
+export interface TableRowProps {
   haveData?: number;
   pathname?: string;
   rowSections?: boolean;
@@ -40,40 +17,80 @@ export const ContainerView = styled.div`
   width: 100%;
 `;
 
-export const TableBody = styled.div<{ cols: number }>`
+export const TableBody = styled.div`
   min-width: fit-content;
 
-  display: grid;
-  grid-template-columns: ${props => `repeat(${props.cols}, 1fr)`};
-  column-width: 236px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
 
   color: ${props => props.theme.black};
-  padding: 16px;
 
-  border-radius: 16px;
-  border: solid 1px transparent;
+  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+    display: block;
+    border-radius: 16px;
+    border: solid 1px transparent;
+    padding: 16px;
 
-  /* background + gradient border */
-  background-image: linear-gradient(
-      ${props => props.theme.table.background},
-      ${props => props.theme.table.background}
-    ),
-    linear-gradient(
-      to bottom,
-      ${props => props.theme.darkGray},
-      transparent 50%
-    );
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
-
-  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
-    grid-template-columns: repeat(2, 1fr);
+    /* background + gradient border */
+    background-image: linear-gradient(
+        ${props => props.theme.table.background},
+        ${props => props.theme.table.background}
+      ),
+      linear-gradient(
+        to bottom,
+        ${props => props.theme.darkGray},
+        transparent 50%
+      );
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
   }
 `;
 
+export const RowContainer = styled.div`
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  flex: 0 5 236px;
+
+  display: table-row;
+
+  gap: 0.25rem;
+  padding: 0.5rem 0;
+`;
+
 export const HeaderItem = styled.div`
+  display: table-cell;
   padding: 6px 16px;
   margin-bottom: 16px;
+`;
+
+export const TableRow = styled.div<TableRowProps>`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  /* justify-content: space-between; */
+  /* align-items: center; */
+
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 0.75rem;
+
+    padding: 16px;
+
+    border-radius: 16px;
+    border: solid 1px ${props => props.theme.darkGray};
+
+    background-color: ${props => props.theme.table.background};
+  }
+
+  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+    display: table-row;
+  }
 `;
 
 export const MobileCardItem = styled.span<{
@@ -86,8 +103,7 @@ export const MobileCardItem = styled.span<{
   display: flex;
   flex-direction: column;
 
-  font-size: 0.875rem;
-  line-height: 1rem;
+  font-size: 1rem;
 
   ${props =>
     !props.columnSpan || props.columnSpan >= 0
@@ -100,7 +116,6 @@ export const MobileCardItem = styled.span<{
         `}
 
   a,span {
-    height: 24px;
     display: flex;
     align-items: center;
   }
@@ -122,28 +137,46 @@ export const MobileCardItem = styled.span<{
     css`
       text-align: right;
       align-items: flex-end;
-      span {
+      span,
+      a {
         justify-content: flex-end;
       }
     `}
+
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: ${props => (props.isAssets ? 'column' : 'row')};
     gap: 0.5rem;
     grid-column: unset;
 
+    display: table-cell;
+
+    table-layout: auto;
+    width: 236px;
+
     padding: 12px 16px;
 
-    border-bottom: solid 1px ${props => props.theme.darkGray};
+    font-size: 0.875rem;
+    line-height: 1rem;
 
-    ${props =>
-      props.isLastRow &&
-      css`
-        border-bottom: none;
-      `}
+    a,
+    span {
+      height: 24px;
+      display: flex;
+      align-items: center;
+    }
   }
+
+  ${props =>
+    props.isLastRow
+      ? css`
+          border-bottom: none;
+        `
+      : css`
+          border-bottom: solid 1px ${props => props.theme.darkGray};
+        `}
 `;
 
-export const MobileHeader = styled.div`
+export const MobileHeader = styled.span`
   color: ${props => props.theme.table.text};
   font-weight: 600;
   font-size: 0.8rem;
@@ -155,7 +188,7 @@ export const CustomFieldWrapper = styled.div`
   text-underline-offset: 0.2rem;
 `;
 
-export const TimestampInfo = styled.div`
+export const TimestampInfo = styled.span`
   width: 14ch;
 `;
 
@@ -177,14 +210,8 @@ export const Status = styled.div<IStatus>`
 
   background-color: ${props =>
     props.status === 'ApprovedProposal'
-      ? transparentize(0.9, props.theme.table['success'])
-      : transparentize(0.9, props.theme.table[props.status])} !important;
-
-  border: 1px solid
-    ${props =>
-      props.status === 'ApprovedProposal'
-        ? props.theme.table['success']
-        : props.theme.table[props.status]} !important;
+      ? transparentize(0.8, props.theme.table['success'])
+      : transparentize(0.8, props.theme.table[props.status])} !important;
 
   padding: 2px 6px;
   border-radius: 24px;

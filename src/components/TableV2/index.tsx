@@ -23,7 +23,6 @@ import {
   FloatContainer,
   HeaderItem,
   IoReloadSharpWrapper,
-  ITableType,
   ItemContainer,
   LimitContainer,
   LimitItems,
@@ -32,6 +31,8 @@ import {
   RetryContainer,
   TableBody,
   TableContainer,
+  TableRow,
+  TableRowProps,
 } from './styles';
 
 export interface ITable {
@@ -130,8 +131,7 @@ const Table: React.FC<ITable> = ({
     onErrorHandler(),
   );
 
-  const props: ITableType = {
-    type,
+  const props: TableRowProps = {
     pathname: router.pathname,
     haveData: response?.items?.length,
   };
@@ -215,32 +215,38 @@ const Table: React.FC<ITable> = ({
         </ExportContainer>
       </FloatContainer>
       <ContainerView ref={tableRef}>
-        <TableBody cols={header.length}>
-          {((!isMobile && !isTablet) || !rowSections) &&
-            header.map((item, index) => {
-              return <HeaderItem key={JSON.stringify(item)}>{item}</HeaderItem>;
-            })}
+        <TableBody>
           {isLoading && (
             <>
               {Array(limit)
                 .fill(limit)
-                .map((_, index) =>
-                  header.map((item, index2) => (
-                    <MobileCardItem
-                      isAssets={type === 'assets' || type === 'proposals'}
-                      isRightAligned={isMobile || isTablet}
-                      key={String(index2) + String(index)}
-                      columnSpan={1}
-                      isLastRow={index === limit - 1}
-                    >
-                      <DoubleRow>
-                        {type === 'transactions' && <Skeleton width="100%" />}
-                        <Skeleton width="100%" />
-                      </DoubleRow>
-                    </MobileCardItem>
-                  )),
-                )}
+                .map((_, index) => (
+                  <TableRow key={String(index)}>
+                    {header.map((item, index2) => (
+                      <MobileCardItem
+                        isAssets={type === 'assets' || type === 'proposals'}
+                        isRightAligned={isMobile || isTablet}
+                        key={String(index2) + String(index)}
+                        columnSpan={2}
+                        isLastRow={index === limit - 1}
+                      >
+                        <DoubleRow>
+                          {type === 'transactions' && <Skeleton width="100%" />}
+                          <Skeleton width="100%" />
+                        </DoubleRow>
+                      </MobileCardItem>
+                    ))}
+                  </TableRow>
+                ))}
             </>
+          )}
+
+          {!isMobile && !isTablet && rowSections && (
+            <TableRow>
+              {header.map((item, index) => (
+                <HeaderItem key={JSON.stringify(item)}>{item}</HeaderItem>
+              ))}
+            </TableRow>
           )}
           {response?.items &&
             response?.items?.length > 0 &&
@@ -249,27 +255,35 @@ const Table: React.FC<ITable> = ({
               const isLastRow = index === response?.items?.length - 1;
 
               return (
-                rowSections &&
-                rowSections(item)?.map(({ element, span }, index2) => {
-                  const [updatedSpanCount, isRightAligned] =
-                    processRowSectionsLayout(spanCount, span);
-                  spanCount = updatedSpanCount;
+                <TableRow
+                  key={JSON.stringify(item) + String(index)}
+                  {...props}
+                  rowSections={true}
+                >
+                  {rowSections &&
+                    rowSections(item)?.map(({ element, span }, index2) => {
+                      const [updatedSpanCount, isRightAligned] =
+                        processRowSectionsLayout(spanCount, span);
+                      spanCount = updatedSpanCount;
 
-                  return (
-                    <MobileCardItem
-                      isAssets={type === 'assets' || type === 'proposals'}
-                      isRightAligned={(isMobile || isTablet) && isRightAligned}
-                      key={String(index2) + String(index)}
-                      columnSpan={span}
-                      isLastRow={isLastRow}
-                    >
-                      {isMobile || isTablet ? (
-                        <MobileHeader>{header[index2]}</MobileHeader>
-                      ) : null}
-                      {element}
-                    </MobileCardItem>
-                  );
-                })
+                      return (
+                        <MobileCardItem
+                          isAssets={type === 'assets' || type === 'proposals'}
+                          isRightAligned={
+                            (isMobile || isTablet) && isRightAligned
+                          }
+                          key={String(index2) + String(index)}
+                          columnSpan={span}
+                          isLastRow={isLastRow}
+                        >
+                          {isMobile || isTablet ? (
+                            <MobileHeader>{header[index2]}</MobileHeader>
+                          ) : null}
+                          {element}
+                        </MobileCardItem>
+                      );
+                    })}
+                </TableRow>
               );
             })}
 

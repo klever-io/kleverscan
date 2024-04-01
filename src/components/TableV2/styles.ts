@@ -41,7 +41,7 @@ export const TableBody = styled.div`
       linear-gradient(
         to bottom,
         ${props => props.theme.darkGray},
-        transparent 50%
+        transparent 100%
       );
     background-origin: border-box;
     background-clip: padding-box, border-box;
@@ -81,7 +81,7 @@ export const TableRow = styled.div<TableRowProps>`
   }
 `;
 
-export const MobileCardItem = styled.span<{
+export const MobileCardItem = styled.div<{
   columnSpan?: number;
   isRightAligned?: boolean;
   isAssets?: boolean;
@@ -138,6 +138,7 @@ export const MobileCardItem = styled.span<{
     grid-column: unset;
 
     display: table-cell;
+    vertical-align: middle;
 
     table-layout: auto;
     width: ${props =>
@@ -154,6 +155,7 @@ export const MobileCardItem = styled.span<{
       display: flex;
       align-items: center;
     }
+
     ${props =>
       props.isLastRow
         ? css`
@@ -181,7 +183,7 @@ export const TimestampInfo = styled.span`
   width: 14ch;
 `;
 
-export const Status = styled.div<IStatus>`
+export const Status = styled.span<IStatus>`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -231,16 +233,31 @@ export const CustomLink = styled.a<{
   align-self: end;
   min-width: 13rem;
   text-align: center;
+
+  display: flex;
+  justify-content: center;
+  padding: 8px 16px;
+
+  height: 34px !important;
+
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: ${props => (props.tabAsset ? '500' : '600')}!important;
+
+  min-width: 8rem;
+  max-width: 15rem;
+
+  background: ${props => (props.tabAsset ? '' : props.theme.violet)};
   color: ${props =>
     props.tabAsset ? props.theme.black : props.theme.true.white} !important;
-  border: 2px solid ${props => props.theme.violet};
-  background: ${props => (props.tabAsset ? '' : props.theme.violet)};
-  padding: 0.625rem 2.94rem;
-  font-weight: ${props => (props.tabAsset ? '500' : '600')}!important;
-  border-radius: 4px;
+  border: 1px solid ${props => transparentize(0.75, props.theme.black)};
+  border-radius: 24px;
+
   cursor: pointer;
+
+  transition: all 0.1s ease;
+
   &:hover {
-    filter: brightness(1.1);
     background: ${props => props.theme.violet};
   }
 

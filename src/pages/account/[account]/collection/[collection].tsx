@@ -1,7 +1,7 @@
 import { Validators as Icon } from '@/assets/cards';
 import Detail from '@/components/Detail';
-import { ITable } from '@/components/Table';
 import { CustomLink } from '@/components/Table/styles';
+import { ITable } from '@/components/TableV2';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import { INfts, IPagination, IRowSection } from '@/types/index';
@@ -92,7 +92,6 @@ const Collection: React.FC<ICollectionPage> = () => {
     type: 'nfts',
     header,
     rowSections,
-    scrollUp: true,
     dataName: 'collection',
     request: (page: number, limit: number) => requestCollection(page, limit),
   };

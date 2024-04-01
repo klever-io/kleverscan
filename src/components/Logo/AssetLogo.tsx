@@ -54,38 +54,30 @@ export const AssetLogo: React.FC<IAssetLogo> = ({
     }
     return logo;
   };
+
   useEffect(() => {
     validateLogo(getCorrectLogo());
   }, []);
 
-  const renderLogo = (url: string) => {
-    return (
-      <Container data-testid="asset-logo-container" size={size}>
+  return (
+    <Container data-testid="asset-logo-container" size={size}>
+      {urlIsImg && !error ? (
         <NextImageWrapperLogo>
           <Image
             layout="fill"
             objectFit="cover"
             objectPosition="center"
             alt={`${name}-logo`}
-            src={url}
+            src={getCorrectLogo()}
             onError={() => setError(true)}
             loader={({ src, width }) => `${src}?w=${width}`}
           />
         </NextImageWrapperLogo>
-        {isVerified()}
-      </Container>
-    );
-  };
-
-  if (urlIsImg && !error) {
-    return renderLogo(getCorrectLogo());
-  }
-
-  return (
-    <Container data-testid="asset-logo-container" size={size}>
-      <LetterLogo invertColors={invertColors}>
-        {ticker?.split('')?.[0] || '--'}
-      </LetterLogo>
+      ) : (
+        <LetterLogo invertColors={invertColors}>
+          {ticker?.split('')?.[0] || '--'}
+        </LetterLogo>
+      )}
       {isVerified()}
     </Container>
   );

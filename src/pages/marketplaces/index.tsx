@@ -1,7 +1,7 @@
 import { Accounts as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
-import Table, { ITable } from '@/components/Table';
+import Table, { ITable } from '@/components/TableV2';
 import { getMarketplaces } from '@/services/requests/marketplace';
 import { Container, FlexSpan, Header } from '@/styles/common';
 import { IMarketplace } from '@/types/marketplaces';
@@ -92,7 +92,6 @@ const Marketplaces: React.FC = () => {
     header: marketplacesHeader,
     rowSections: marketplacesRowSections,
     request: () => getMarketplaces(),
-    scrollUp: true,
     dataName: 'marketplaces',
   };
 

@@ -1037,6 +1037,7 @@ export interface IFilterDater {
 export interface IRowSection {
   element: JSX.Element;
   span: number;
+  width?: number;
 }
 
 export interface IOffset {

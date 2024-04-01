@@ -182,12 +182,15 @@ export const TimestampInfo = styled.span`
 `;
 
 export const Status = styled.span<IStatus>`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+
   width: 70%;
   max-width: 80px;
   font-weight: bold;
-
-  padding: 2px 6px;
-  border-radius: 24px;
 
   color: ${props =>
     props.status === 'ApprovedProposal'
@@ -198,6 +201,9 @@ export const Status = styled.span<IStatus>`
     props.status === 'ApprovedProposal'
       ? transparentize(0.8, props.theme.table['success'])
       : transparentize(0.8, props.theme.table[props.status])} !important;
+
+  padding: 2px 6px;
+  border-radius: 24px;
 
   ${props =>
     props.status === 'inactive' &&

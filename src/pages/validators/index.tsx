@@ -4,9 +4,10 @@ import Copy from '@/components/Copy';
 import Detail from '@/components/Detail';
 import { IFilter } from '@/components/Filter';
 import Progress from '@/components/Progress';
-import { Status } from '@/components/Table/styles';
 import { ITable } from '@/components/TableV2';
+import { Status } from '@/components/TableV2/styles';
 import api from '@/services/api';
+import { DoubleRow } from '@/styles/common';
 import { IRowSection, IValidator } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { capitalizeString } from '@/utils/convertString';
@@ -21,13 +22,10 @@ import React from 'react';
 
 export const validatorsHeaders = [
   'Rank',
-  'Name',
-  'Rating',
-  'Status',
-  'Stake',
-  'Commission',
+  'Name/Can Delegate',
+  'Status/Rating',
+  'Stake/Commission',
   'Produced / Missed',
-  'Can Delegate',
   'Cumulative Stake',
 ];
 
@@ -50,66 +48,58 @@ const validatorsRowSections = (validator: IValidator): IRowSection[] => {
   const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'fail');
   const sections = ownerAddress
     ? [
-        { element: <p key={rank}>{rank}°</p>, span: 1 },
+        { element: <p key={rank}>{rank}°</p>, span: 1, width: 100 },
         {
           element: (
-            <span key={ownerAddress}>
-              {
-                <AddressContainer>
-                  <Link href={`validator/${ownerAddress}`}>
-                    {name ? name : parsedAddress}
-                  </Link>
-                  <Copy data={ownerAddress} info="Validator Address" />
-                </AddressContainer>
-              }
-            </span>
-          ),
-          span: 1,
-        },
-        {
-          element: (
-            <span key={rating}>{((rating * 100) / 10000000).toFixed(2)}%</span>
-          ),
-          span: 1,
-        },
-
-        {
-          element: <span key={status}>{capitalizeString(status)}</span>,
-          span: 1,
-        },
-        {
-          element: (
-            <span key={staked}>
-              {formatAmount(staked / 10 ** KLV_PRECISION)} KLV
-            </span>
-          ),
-          span: 1,
-        },
-        {
-          element: <span key={commission}>{commission / 10 ** 2}%</span>,
-          span: 1,
-        },
-        {
-          element: (
-            <span
-              key={totalProduced}
-            >{`${totalProduced} / ${totalMissed}`}</span>
-          ),
-          span: 1,
-        },
-        {
-          element: (
-            <Status
-              status={canDelegate ? 'success' : 'fail'}
-              key={String(canDelegate)}
-            >
-              <DelegateIcon />
-              <p>{canDelegate ? 'Yes' : 'No'}</p>
-            </Status>
+            <DoubleRow key={ownerAddress + status}>
+              <span>
+                {
+                  <AddressContainer>
+                    <Link href={`validator/${ownerAddress}`}>
+                      {name ? name : parsedAddress}
+                    </Link>
+                    <Copy data={ownerAddress} info="Validator Address" />
+                  </AddressContainer>
+                }
+              </span>
+              <Status
+                status={canDelegate ? 'success' : 'fail'}
+                key={String(canDelegate)}
+              >
+                {canDelegate ? 'Yes' : 'No'}
+              </Status>
+            </DoubleRow>
           ),
           span: 1,
         },
 
+        {
+          element: (
+            <DoubleRow key={status + rating}>
+              <span>{capitalizeString(status)}</span>
+              <span>{((rating * 100) / 10000000).toFixed(2)}%</span>
+            </DoubleRow>
+          ),
+          span: 1,
+        },
+        {
+          element: (
+            <DoubleRow key={staked}>
+              <span>{formatAmount(staked / 10 ** KLV_PRECISION)} KLV</span>
+              <span key={commission}>{commission / 10 ** 2}%</span>
+            </DoubleRow>
+          ),
+          span: 1,
+        },
+        {
+          element: (
+            <DoubleRow key={totalProduced}>
+              <span>{totalProduced}</span>
+              <span>{totalMissed}</span>
+            </DoubleRow>
+          ),
+          span: 1,
+        },
         {
           element: (
             <Progress percent={cumulativeStaked} key={cumulativeStaked} />

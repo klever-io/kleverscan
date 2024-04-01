@@ -35,7 +35,8 @@ export const ProgressContent = styled.div`
 
   position: relative;
 
-  background-color: ${props => props.theme.background};
+  background-color: ${props =>
+    props.theme.dark ? props.theme.darkGray : props.theme.lightGray};
 
   border-radius: 0.25rem;
 

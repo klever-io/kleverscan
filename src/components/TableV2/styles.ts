@@ -81,7 +81,7 @@ export const TableRow = styled.div<TableRowProps>`
   }
 `;
 
-export const MobileCardItem = styled.span<{
+export const MobileCardItem = styled.div<{
   columnSpan?: number;
   isRightAligned?: boolean;
   isAssets?: boolean;

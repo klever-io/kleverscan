@@ -54,6 +54,7 @@ export const AssetLogo: React.FC<IAssetLogo> = ({
     }
     return logo;
   };
+
   useEffect(() => {
     validateLogo(getCorrectLogo());
   }, []);
@@ -77,16 +78,14 @@ export const AssetLogo: React.FC<IAssetLogo> = ({
     );
   };
 
-  if (urlIsImg && !error) {
-    return renderLogo(getCorrectLogo());
-  }
-
-  return (
+  return urlIsImg && !error ? (
+    renderLogo(getCorrectLogo())
+  ) : (
     <Container data-testid="asset-logo-container" size={size}>
       <LetterLogo invertColors={invertColors}>
         {ticker?.split('')?.[0] || '--'}
       </LetterLogo>
-      {isVerified()}
+      {/* {isVerified()} */}
     </Container>
   );
 };

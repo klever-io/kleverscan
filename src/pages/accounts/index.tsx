@@ -2,7 +2,7 @@ import { Accounts as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
 import Skeleton from '@/components/Skeleton';
-import Table, { ITable } from '@/components/Table';
+import Table, { ITable } from '@/components/TableV2';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import {
@@ -232,7 +232,6 @@ const Accounts: React.FC<IAccounts> = () => {
     rowSections,
     request: (page, limit) => requestAccounts(page, limit),
     dataName: 'accounts',
-    scrollUp: true,
   };
 
   return (

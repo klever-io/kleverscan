@@ -1,10 +1,10 @@
-import { getStatusIcon } from '@/assets/status';
 import Filter, { IFilter } from '@/components/Filter';
-import { CustomLink, Status } from '@/components/Table/styles';
 import Table, { ITable } from '@/components/TableV2';
+import { CustomLink, Status } from '@/components/TableV2/styles';
 import Tooltip from '@/components/Tooltip';
 import { paramsStyles } from '@/components/Tooltip/configs';
 import { useMobile } from '@/contexts/mobile';
+import { DoubleRow } from '@/styles/common';
 import { IRowSection } from '@/types/index';
 import {
   IParsedProposal,
@@ -12,21 +12,13 @@ import {
   IProposalsProps,
 } from '@/types/proposals';
 import { setQueryAndRouter } from '@/utils';
-import { capitalizeString } from '@/utils/convertString';
 import { parseAddress } from '@/utils/parseValues';
 import { passViewportStyles } from '@/utils/viewportStyles';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
-import {
-  FilterContainer,
-  ProposalsContainer,
-  ProposalStatus,
-  ProposalTime,
-  ProposerDescAndLink,
-  UpVotes,
-} from './styles';
+import { FilterContainer, ProposalsContainer } from './styles';
 
 const Proposals: React.FC<IProposalsProps> = ({ request }) => {
   const { t } = useTranslation(['common', 'proposals']);
@@ -67,16 +59,28 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
       parsedParameters,
     } = props;
 
-    const getProposalStatusColor = () => {
+    const getProposalStatusColorAndText = () => {
       switch (proposalStatus) {
         case 'ApprovedProposal':
-          return 'success';
+          return {
+            color: 'success',
+            text: 'Approved',
+          };
         case 'DeniedProposal':
-          return 'fail';
+          return {
+            color: 'fail',
+            text: 'Denied',
+          };
         case 'ActiveProposal':
-          return 'pending';
+          return {
+            color: 'pending',
+            text: 'Active',
+          };
         default:
-          return 'text';
+          return {
+            color: 'text',
+            text: 'Unknown',
+          };
       }
     };
 
@@ -87,9 +91,9 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
         return <></>;
       }
       return fullParameters.map((param, index: number) => {
-        if (index < 3) {
+        if (index < 2) {
           return (
-            <div
+            <span
               key={index}
               style={{
                 overflow: 'hidden',
@@ -97,13 +101,12 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
                 whiteSpace: 'nowrap',
               }}
             >
-              <small>{param.paramText}</small>
-              <br />
-            </div>
+              {param.paramText}
+            </span>
           );
         }
-        if (index === 3) {
-          return <div key={index}>...</div>;
+        if (index === 2) {
+          return <span key={index}>...</span>;
         }
       });
     };
@@ -116,26 +119,25 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
       );
       if (parsedParameters) {
         return (
-          <span style={{ display: 'flex' }}>
-            <Tooltip
-              Component={() => (
-                <div>{renderProposalsNetworkParams(parsedParameters)}</div>
-              )}
-              customStyles={passViewportStyles(
-                isMobile,
-                isTablet,
-                ...paramsStyles,
-              )}
-              msg={message}
-              maxVw={100}
-            ></Tooltip>
-          </span>
+          <Tooltip
+            Component={() => (
+              <DoubleRow>
+                {renderProposalsNetworkParams(parsedParameters)}
+              </DoubleRow>
+            )}
+            customStyles={passViewportStyles(
+              isMobile,
+              isTablet,
+              ...paramsStyles,
+            )}
+            msg={message}
+            maxVw={100}
+          ></Tooltip>
         );
       }
       return <></>;
     };
 
-    const StatusIcon = getStatusIcon(proposalStatus);
     const precision = 6;
 
     const getPositiveVotes = () => {
@@ -157,59 +159,49 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
       return <span style={{ color: 'red' }}>Unavailable</span>;
     };
     const sections = [
-      { element: <p key={proposalId}>#{proposalId}</p>, span: 1 },
+      { element: <p key={proposalId}>#{proposalId}</p>, span: 1, width: 100 },
       {
         element: (
-          <ProposerDescAndLink key={proposer}>
+          <DoubleRow key={proposer}>
             <Link href={`/account/${proposer}`}>
-              <a>{parseAddress(proposer, 20)}</a>
+              <a>{parseAddress(proposer, 16)}</a>
             </Link>
-          </ProposerDescAndLink>
+            <Status
+              status={getProposalStatusColorAndText().color}
+              key={proposalStatus}
+            >
+              {getProposalStatusColorAndText().text}
+            </Status>
+          </DoubleRow>
         ),
         span: 1,
       },
       {
         element: (
-          <ProposalTime key={`${epochStart}/${epochEnd}`}>
+          <DoubleRow key={`${epochStart}/${epochEnd}`}>
             <span>Created Epoch: {epochStart}</span>
             <span className="endTime">Ending Epoch: {epochEnd - 1}</span>
-          </ProposalTime>
+          </DoubleRow>
         ),
         span: 1,
       },
       {
         element: (
-          <UpVotes key={String(votes)}>
-            <p>
-              {getPositiveVotes()}/{parseTotalStaked()}
-            </p>
-          </UpVotes>
+          <DoubleRow key={String(votes)}>
+            <span>{getPositiveVotes()}</span>
+            <span>{parseTotalStaked()}</span>
+          </DoubleRow>
         ),
         span: 1,
       },
       {
-        element: (
-          <Status status={getProposalStatusColor()} key={proposalStatus}>
-            <StatusIcon />
-            <ProposalStatus>{capitalizeString(proposalStatus)}</ProposalStatus>
-          </Status>
-        ),
-        span: 1,
-      },
-      {
-        element: (
-          <span key={String(parsedParameters)}>
-            {renderProposalsNetworkParamsWithToolTip()}
-          </span>
-        ),
+        element: renderProposalsNetworkParamsWithToolTip(),
         span: 1,
       },
       {
         element: (
           <Link href={{ pathname: `/proposal/${proposalId}` }} key={proposalId}>
-            <a>
-              <CustomLink> {t('common:Buttons.Details')}</CustomLink>
-            </a>
+            <CustomLink> {t('common:Buttons.Details')}</CustomLink>
           </Link>
         ),
         span: 2,
@@ -221,10 +213,9 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
 
   const header = [
     'Number',
-    'Proposer',
+    'Proposer/Status',
     'Time',
     'Upvotes/Total Staked',
-    `${t('common:Buttons.Status')}`,
     'Network Parameters',
     '',
   ];

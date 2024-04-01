@@ -179,9 +179,9 @@ const Accounts: React.FC<IAccounts> = () => {
 
   const header = [
     `${t('table:Address')}`,
-    `KLV ${t('table:Staked')}`,
     'Nonce',
     `KLV ${t('table:Balance')}`,
+    `KLV ${t('table:Staked')}`,
   ];
 
   const { isMobile } = useMobile();
@@ -201,24 +201,24 @@ const Accounts: React.FC<IAccounts> = () => {
         ),
         span: 2,
       },
-
+      {
+        element: <span key={nonce}>{nonce}</span>,
+        span: 1,
+        width: 100,
+      },
       {
         element: (
-          <strong key={frozenBalance}>
-            {formatAmount(frozenBalance / 10 ** KLV_PRECISION)} KLV
-          </strong>
+          <span key={balance}>
+            {formatAmount(balance / 10 ** KLV_PRECISION)} KLV
+          </span>
         ),
         span: 1,
       },
       {
-        element: <span key={nonce}>{nonce}</span>,
-        span: 1,
-      },
-      {
         element: (
-          <strong key={balance}>
-            {formatAmount(balance / 10 ** KLV_PRECISION)} KLV
-          </strong>
+          <span key={frozenBalance}>
+            {formatAmount(frozenBalance / 10 ** KLV_PRECISION)} KLV
+          </span>
         ),
         span: 1,
       },

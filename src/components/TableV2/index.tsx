@@ -263,45 +263,53 @@ const Table: React.FC<ITable> = ({
                   rowSections={true}
                 >
                   {rowSections &&
-                    rowSections(item)?.map(({ element, span }, index2) => {
-                      const [updatedSpanCount, isRightAligned] =
-                        processRowSectionsLayout(spanCount, span);
-                      spanCount = updatedSpanCount;
-                      const isLastItem =
-                        rowSections(item)?.length &&
-                        index2 === rowSections(item).length - 1;
-                      let itemWidth =
-                        tableRef.current?.offsetWidth &&
-                        (tableRef.current?.offsetWidth - 32) / header.length;
-                      if (itemWidth && itemWidth > 236) {
-                        itemWidth = 236;
-                      }
-                      if (isLastItem) {
-                        itemWidth =
-                          tableRef.current?.offsetWidth &&
-                          tableRef.current?.offsetWidth -
-                            32 -
-                            (itemWidth || 0) * (header.length - 1);
-                      }
+                    rowSections(item)?.map(
+                      ({ element, span, width }, index2) => {
+                        const [updatedSpanCount, isRightAligned] =
+                          processRowSectionsLayout(spanCount, span);
+                        spanCount = updatedSpanCount;
+                        const isLastItem =
+                          rowSections(item)?.length &&
+                          index2 === rowSections(item).length - 1;
+                        let itemWidth =
+                          width ||
+                          (tableRef.current?.offsetWidth &&
+                            (tableRef.current?.offsetWidth - 32) /
+                              header.length);
+                        if (itemWidth && itemWidth > 236) {
+                          itemWidth = 236;
+                        }
+                        if (isLastItem) {
+                          const previousWidth = rowSections(item)
+                            .slice(0, index2)
+                            .reduce((acc, curr) => {
+                              return acc + (curr.width || itemWidth || 0);
+                            }, 0);
 
-                      return (
-                        <MobileCardItem
-                          isAssets={type === 'assets' || type === 'proposals'}
-                          isRightAligned={
-                            (isMobile || isTablet) && isRightAligned
-                          }
-                          key={String(index2) + String(index)}
-                          columnSpan={span}
-                          isLastRow={isLastRow}
-                          dynamicWidth={itemWidth}
-                        >
-                          {isMobile || isTablet ? (
-                            <MobileHeader>{header[index2]}</MobileHeader>
-                          ) : null}
-                          {element}
-                        </MobileCardItem>
-                      );
-                    })}
+                          itemWidth =
+                            tableRef.current?.offsetWidth &&
+                            tableRef.current?.offsetWidth - 32 - previousWidth;
+                        }
+
+                        return (
+                          <MobileCardItem
+                            isAssets={type === 'assets' || type === 'proposals'}
+                            isRightAligned={
+                              (isMobile || isTablet) && isRightAligned
+                            }
+                            key={String(index2) + String(index)}
+                            columnSpan={span}
+                            isLastRow={isLastRow}
+                            dynamicWidth={itemWidth}
+                          >
+                            {isMobile || isTablet ? (
+                              <MobileHeader>{header[index2]}</MobileHeader>
+                            ) : null}
+                            {element}
+                          </MobileCardItem>
+                        );
+                      },
+                    )}
                 </TableRow>
               );
             })}

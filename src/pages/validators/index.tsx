@@ -4,8 +4,8 @@ import Copy from '@/components/Copy';
 import Detail from '@/components/Detail';
 import { IFilter } from '@/components/Filter';
 import Progress from '@/components/Progress';
-import { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
+import { ITable } from '@/components/TableV2';
 import api from '@/services/api';
 import { IRowSection, IValidator } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
@@ -31,9 +31,7 @@ export const validatorsHeaders = [
   'Cumulative Stake',
 ];
 
-const validatorsRowSections = (
-  validator: IValidator,
-): IRowSection[] | undefined => {
+const validatorsRowSections = (validator: IValidator): IRowSection[] => {
   const {
     name,
     ownerAddress,
@@ -81,21 +79,21 @@ const validatorsRowSections = (
         },
         {
           element: (
-            <strong key={staked}>
+            <span key={staked}>
               {formatAmount(staked / 10 ** KLV_PRECISION)} KLV
-            </strong>
+            </span>
           ),
           span: 1,
         },
         {
-          element: <strong key={commission}>{commission / 10 ** 2}%</strong>,
+          element: <span key={commission}>{commission / 10 ** 2}%</span>,
           span: 1,
         },
         {
           element: (
-            <strong
+            <span
               key={totalProduced}
-            >{`${totalProduced} / ${totalMissed}`}</strong>
+            >{`${totalProduced} / ${totalMissed}`}</span>
           ),
           span: 1,
         },
@@ -119,7 +117,7 @@ const validatorsRowSections = (
           span: 2,
         },
       ]
-    : undefined;
+    : [];
 
   return sections;
 };
@@ -169,7 +167,6 @@ const Validators: React.FC = () => {
     header: validatorsHeaders,
     rowSections: validatorsRowSections,
     request: (page, limit) => requestValidators(page, limit),
-    scrollUp: true,
     dataName: 'validators',
   };
 

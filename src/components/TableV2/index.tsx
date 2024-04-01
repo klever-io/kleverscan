@@ -218,37 +218,68 @@ const Table: React.FC<ITable> = ({
       </FloatContainer>
       <ContainerView ref={tableRef}>
         <TableBody>
-          {isLoading && (
-            <>
-              {Array(limit)
-                .fill(limit)
-                .map((_, index) => (
-                  <TableRow key={String(index)}>
-                    {header?.map((item, index2) => (
-                      <MobileCardItem
-                        isAssets={type === 'assets' || type === 'proposals'}
-                        isRightAligned={isMobile || isTablet}
-                        key={String(index2) + String(index)}
-                        columnSpan={2}
-                        isLastRow={index === limit - 1}
-                      >
-                        <DoubleRow>
-                          {type === 'transactions' && <Skeleton width="100%" />}
-                          <Skeleton width="100%" />
-                        </DoubleRow>
-                      </MobileCardItem>
-                    ))}
-                  </TableRow>
-                ))}
-            </>
-          )}
-
           {!isMobile && !isTablet && rowSections && (
             <TableRow>
               {header?.map((item, index) => (
                 <HeaderItem key={JSON.stringify(item)}>{item}</HeaderItem>
               ))}
             </TableRow>
+          )}
+
+          {isLoading && (
+            <>
+              {Array(limit)
+                .fill(limit)
+                .map((_, index) => (
+                  <TableRow key={String(index)}>
+                    {header?.map((item, index2) => {
+                      const isLastItem = rowSections
+                        ? rowSections(item)?.length &&
+                          index2 === rowSections(item).length - 1
+                        : false;
+                      let itemWidth = rowSections
+                        ? rowSections(item)[index2].width ||
+                          (tableRef.current?.offsetWidth &&
+                            (tableRef.current?.offsetWidth - 32) /
+                              header.length)
+                        : 0;
+
+                      if (itemWidth && itemWidth > 236) {
+                        itemWidth = 236;
+                      }
+                      if (isLastItem) {
+                        const previousWidth = rowSections
+                          ? rowSections(item)
+                              .slice(0, index2)
+                              .reduce((acc, curr) => {
+                                return acc + (curr.width || itemWidth || 0);
+                              }, 0)
+                          : 0;
+
+                        itemWidth =
+                          tableRef.current?.offsetWidth &&
+                          tableRef.current?.offsetWidth - 32 - previousWidth;
+                      }
+
+                      return (
+                        <MobileCardItem
+                          isAssets={type === 'assets' || type === 'proposals'}
+                          isRightAligned={isMobile || isTablet}
+                          key={String(index2) + String(index)}
+                          columnSpan={2}
+                          isLastRow={index === limit - 1}
+                          dynamicWidth={itemWidth}
+                        >
+                          <DoubleRow>
+                            {type !== 'accounts' && <Skeleton width="100%" />}
+                            <Skeleton width="100%" />
+                          </DoubleRow>
+                        </MobileCardItem>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+            </>
           )}
           {response?.items &&
             response?.items?.length > 0 &&

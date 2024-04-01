@@ -41,7 +41,7 @@ export const TableBody = styled.div`
       linear-gradient(
         to bottom,
         ${props => props.theme.darkGray},
-        transparent 50%
+        transparent 100%
       );
     background-origin: border-box;
     background-clip: padding-box, border-box;
@@ -138,6 +138,7 @@ export const MobileCardItem = styled.div<{
     grid-column: unset;
 
     display: table-cell;
+    vertical-align: middle;
 
     table-layout: auto;
     width: ${props =>
@@ -154,6 +155,7 @@ export const MobileCardItem = styled.div<{
       display: flex;
       align-items: center;
     }
+
     ${props =>
       props.isLastRow
         ? css`

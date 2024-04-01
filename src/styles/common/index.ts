@@ -59,7 +59,7 @@ export const CardContainer = styled.section`
 
 export const DefaultCardStyles = css`
   background-color: ${props =>
-    props.theme.dark ? props.theme.navbar.background : props.theme.white};
+    props.theme.dark ? props.theme.table.background : props.theme.white};
 `;
 
 export const Card = styled.div`
@@ -68,6 +68,8 @@ export const Card = styled.div`
   width: 100%;
   padding: 1.5rem;
   overflow: hidden;
+  border-radius: 24px;
+  border: 1px solid ${props => props.theme.darkGray};
 
   display: flex;
 

@@ -149,8 +149,3 @@ export const AssetCardContent = styled(CardContent)`
     grid-template-columns: repeat(2, 1fr);
   }
 `;
-
-export const AssetLink = styled.a`
-  display: flex;
-  gap: 20px;
-`;

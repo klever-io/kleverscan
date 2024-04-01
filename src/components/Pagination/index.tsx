@@ -25,7 +25,9 @@ const Pagination: React.FC<IPagination> = ({
   const [showModalRight, setShowModalRight] = useState(false);
 
   useEffect(() => {
-    window.scrollTo(0, (tableRef?.current?.offsetTop || 100) - 100);
+    if ((tableRef?.current?.offsetTop || 100) < window.scrollY) {
+      window.scrollTo(0, (tableRef?.current?.offsetTop || 100) - 100);
+    }
   }, [page]);
 
   const prevProps = {

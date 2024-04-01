@@ -113,6 +113,7 @@ const Assets: React.FC = () => {
                 ticker={ticker}
                 name={name}
                 verified={verified}
+                size={36}
               />
             </a>
           </Link>

@@ -1,3 +1,4 @@
+import { DefaultCardStyles } from '@/styles/common';
 import { Form } from '@unform/web';
 import { lighten } from 'polished';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
@@ -13,6 +14,7 @@ interface ISpaceForm {
 }
 
 export const FormSection = styled.div<{ inner?: boolean; top?: number }>`
+  ${DefaultCardStyles}
   padding: 1.5rem;
   position: relative;
 
@@ -24,10 +26,8 @@ export const FormSection = styled.div<{ inner?: boolean; top?: number }>`
 
   border-radius: 1rem;
 
-  border: 0.2px solid ${({ theme }) => theme.input.border};
+  border: 1px solid ${({ theme }) => theme.darkGray};
   box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? '#000' : lighten(0.8, '#000'))};
-
-  background-color: ${props => props.theme.white};
 
   ${props =>
     props.inner &&
@@ -119,11 +119,10 @@ export const InputWrapper = styled.div``;
 export const FormGap = styled.div<ISpaceForm>``;
 
 export const ButtonContainer = styled.button<IButton>`
-  background-color: ${props => props.theme.violet};
-  padding-top: 15px;
-  padding-bottom: 15px;
-  padding-left: 10px;
-  padding-right: 10px;
+  background-color: ${props =>
+    props.theme.dark ? props.theme.purple : props.theme.violet};
+
+  padding: 12px 10px;
   width: 30%;
   display: flex;
   justify-content: center;
@@ -135,7 +134,6 @@ export const ButtonContainer = styled.button<IButton>`
 
   transition: background-color 0.5s, opacity 0.4s 0.1s;
 
-  border: 0.2px solid ${({ theme }) => theme.input.border};
   box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? '#000' : lighten(0.6, '#000'))};
 
   user-select: none;

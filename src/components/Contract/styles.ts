@@ -1,3 +1,4 @@
+import { DefaultCardStyles } from '@/styles/common';
 import { lighten, transparentize } from 'polished';
 import { BsPersonSquare } from 'react-icons/bs';
 import { IoMdCloseCircle } from 'react-icons/io';
@@ -258,10 +259,10 @@ export const IconsContainer = styled.div`
 `;
 
 export const SelectContainer = styled.div<{ span?: number }>`
+  ${DefaultCardStyles}
   display: flex;
   align-items: flex-end;
   flex-direction: row;
-  background-color: ${props => props.theme.white};
   padding: 1.37rem;
   border-radius: 1rem;
   width: 100%;
@@ -272,7 +273,7 @@ export const SelectContainer = styled.div<{ span?: number }>`
       grid-column: auto / span ${props.span};
     `}
 
-  border: 0.2px solid ${({ theme }) => theme.input.border};
+  border: 1px solid ${({ theme }) => theme.darkGray};
   box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? '#000' : lighten(0.8, '#000'))};
 
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {

@@ -365,7 +365,7 @@ export const ContractProvider: React.FC = ({ children }) => {
       for (const assetId in totalCosts) {
         const amount = totalCosts[assetId];
         const asset = assetsList?.find(item => item.assetId === assetId);
-        if ((asset?.balance || 0) < amount) {
+        if (asset?.balance && asset.balance < amount) {
           setWarningOpen(true);
           setTxLoading(false);
           return false;

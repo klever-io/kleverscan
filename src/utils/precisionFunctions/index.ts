@@ -19,17 +19,14 @@ export async function getPrecision(
       return {};
     }
     const aux: string[] = [];
-    const NFTs: { [assetId: string]: number } = {};
+
     assetIds.forEach(assetId => {
       if (
         !Object.keys(storedPrecisions).includes(assetId) &&
         assetId !== '' &&
-        !aux.includes(assetId) &&
-        assetId.split('/').length === 1
+        !aux.includes(assetId)
       ) {
         aux.push(assetId);
-      } else if (assetId.split('/').length > 1) {
-        NFTs[assetId] = 0;
       }
     });
 
@@ -43,7 +40,7 @@ export async function getPrecision(
     }
     try {
       const { precisions } = await getPrecisionFromApi(aux);
-      const newPrecisions = { ...storedPrecisions, ...precisions, ...NFTs };
+      const newPrecisions = { ...storedPrecisions, ...precisions };
       localStorage.setItem('precisions', JSON.stringify(newPrecisions));
       return assetIds.reduce((prev, current) => {
         return {
@@ -60,10 +57,6 @@ export async function getPrecision(
 
     if (assetId === '') {
       throw new Error('Empty Asset ID');
-    }
-
-    if (assetId.split('/').length === 2) {
-      return 0;
     }
 
     if (

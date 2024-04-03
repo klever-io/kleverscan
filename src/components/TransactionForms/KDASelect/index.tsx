@@ -313,7 +313,7 @@ const CollectionIDField: React.FC<CollectionIDFieldProps> = ({
   const watchCollection: string = watch('collection');
   const watchCollectionAssetId = watch('collectionAssetId');
 
-  const { isLoading: collectionIdListLoading } = useQuery({
+  const { isLoading: collectionIdListLoading, refetch } = useQuery({
     queryKey: ['collectionList', watchCollection, debouncedCollectionInput],
     queryFn: () =>
       collectionListCall(router, walletAddress, debouncedCollectionInput),
@@ -322,7 +322,10 @@ const CollectionIDField: React.FC<CollectionIDFieldProps> = ({
       if (!newData) return;
 
       setCollectionIdData(prevData => {
-        return [...prevData, ...newData];
+        const overwrittenValues = new Map(
+          [...prevData, ...newData].map(item => [item.assetId, item]),
+        ).values();
+        return Array.from(overwrittenValues);
       });
     },
   });
@@ -370,15 +373,28 @@ const CollectionIDField: React.FC<CollectionIDFieldProps> = ({
     <SelectContent>
       <FieldLabel>
         <MarginRightAutoLabel>Asset ID</MarginRightAutoLabel>
-        {!collection?.isNFT && collection?.balance && (
-          <BalanceLabel>
-            Balance:{' '}
-            {toLocaleFixed(
-              selectedCollection?.balance /
-                10 ** (selectedCollection?.precision || 0),
-              selectedCollection?.precision || 0,
-            )}
-          </BalanceLabel>
+        {!collection?.isNFT && selectedCollection?.balance && (
+          <>
+            <ReloadWrapper
+              onClick={e => {
+                e.stopPropagation();
+                e.preventDefault();
+
+                refetch();
+              }}
+              $loading={collectionIdListLoading}
+            >
+              <IoReloadSharp />
+            </ReloadWrapper>
+            <BalanceLabel>
+              Balance:{' '}
+              {toLocaleFixed(
+                selectedCollection?.balance /
+                  10 ** (selectedCollection?.precision || 0),
+                selectedCollection?.precision || 0,
+              )}
+            </BalanceLabel>
+          </>
         )}
         <DropdownCustomLabel>
           <span>Custom value?</span>

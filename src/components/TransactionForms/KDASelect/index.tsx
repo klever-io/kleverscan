@@ -313,7 +313,11 @@ const CollectionIDField: React.FC<CollectionIDFieldProps> = ({
   const watchCollection: string = watch('collection');
   const watchCollectionAssetId = watch('collectionAssetId');
 
-  const { isLoading: collectionIdListLoading, refetch } = useQuery({
+  const {
+    isLoading: collectionIdListLoading,
+    refetch,
+    isFetching: collectionIdListFetching,
+  } = useQuery({
     queryKey: ['collectionList', watchCollection, debouncedCollectionInput],
     queryFn: () =>
       collectionListCall(router, walletAddress, debouncedCollectionInput),
@@ -382,7 +386,7 @@ const CollectionIDField: React.FC<CollectionIDFieldProps> = ({
 
                 refetch();
               }}
-              $loading={collectionIdListLoading}
+              $loading={collectionIdListFetching}
             >
               <IoReloadSharp />
             </ReloadWrapper>

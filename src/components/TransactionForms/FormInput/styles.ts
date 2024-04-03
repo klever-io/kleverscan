@@ -336,8 +336,7 @@ export const TooltipContainer = styled.div<{
 `;
 
 export const RequiredSpan = styled.span`
-  color: ${props =>
-    props.theme.dark ? props.theme.lightPurple : props.theme.lightGray};
+  color: ${({ theme }) => (theme.dark ? theme.lightPurple : theme.purple)};
 `;
 
 export const InputLabel = styled.label<ILabel>`
@@ -387,10 +386,19 @@ export const ErrorMessage = styled.span<{ warning?: boolean }>`
     `}
 `;
 
-export const DropdownCustomLabel = styled(InputLabel)`
+export const MarginRightAutoLabel = styled.span`
+  width: 100%;
+  margin-right: auto;
+`;
+
+export const DropdownCustomLabel = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
   margin: 0;
   > span {
-    margin-left: auto;
+    white-space: nowrap;
   }
 `;
 

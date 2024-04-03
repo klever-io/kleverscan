@@ -1,7 +1,6 @@
 import Select from '@/components/Contract/Select';
 import {
   AssetIDInput,
-  BalanceContainer,
   BalanceLabel,
   FieldLabel,
   SelectContainer,
@@ -11,6 +10,7 @@ import { getAssetsList, showAssetIdInput } from '@/components/Contract/utils';
 import {
   DropdownCustomLabel,
   ErrorMessage,
+  MarginRightAutoLabel,
   RequiredSpan,
 } from '@/components/TransactionForms/FormInput/styles';
 import { useContract } from '@/contexts/contract';
@@ -18,7 +18,7 @@ import { useMulticontract } from '@/contexts/contract/multicontract';
 import { ReloadWrapper } from '@/contexts/contract/styles';
 import { useExtension } from '@/contexts/extension';
 import { collectionListCall } from '@/services/requests/collection';
-import { ICollectionList, IDropdownItem } from '@/types';
+import { ICollection, ICollectionList, IDropdownItem } from '@/types';
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import { useDebounce } from '@/utils/hooks';
 import { setQuery } from '@/utils/hooks/contract';
@@ -153,12 +153,17 @@ export const KDASelect: React.FC<IKDASelect> = props => {
   }, [assetsFetching, kassetsFetching]);
 
   const setCollectionValue = async (value?: ICollectionList) => {
-    if (!isMultiContract && router.pathname !== '/')
+    if (!isMultiContract && router.pathname !== '/') {
       value?.value &&
         (await setQuery('collection', value?.value || '', router));
 
+      await new Promise(resolve => setTimeout(resolve, 0));
+      await setQuery('collectionAssetId', '', router);
+    }
+
     setCollection(value?.value ? value : undefined);
     setValue('collection', value?.value || '');
+    setValue('collectionAssetId', '');
 
     validateFields.forEach(field => {
       const value = getValues(field);
@@ -202,7 +207,8 @@ export const KDASelect: React.FC<IKDASelect> = props => {
   }, [senderAccount]);
 
   const showAssetIdInputConditional =
-    selectedCollection?.isNFT &&
+    selectedCollection &&
+    !selectedCollection?.isFungible &&
     !collectionContracts.includes(contractType) &&
     showAssetIdInput(contractType, assetTriggerType);
 
@@ -228,23 +234,18 @@ export const KDASelect: React.FC<IKDASelect> = props => {
 
   const onChangeHandler = async (value: ICollectionList) => {
     setCollectionValue(value);
-    if (!value.isNFT) {
-      setValue('collectionAssetId', '');
-    }
   };
 
   return (
     <SelectContainer key={selectedCollection?.assetId}>
       <SelectContent configITO={contractType === 'ConfigITOContract'}>
-        <BalanceContainer>
-          <FieldLabel>
+        <FieldLabel>
+          <MarginRightAutoLabel>
             Select an asset/collection
-            {required && <RequiredSpan> (required)</RequiredSpan>}
-          </FieldLabel>
-          <ReloadWrapper onClick={refetch} $loading={loading}>
-            <IoReloadSharp />
-          </ReloadWrapper>
-          {selectedCollection?.balance && (
+          </MarginRightAutoLabel>
+          {required && <RequiredSpan> (required)</RequiredSpan>}
+
+          {selectedCollection?.isFungible && selectedCollection?.balance && (
             <BalanceLabel>
               Balance:{' '}
               {toLocaleFixed(
@@ -253,7 +254,10 @@ export const KDASelect: React.FC<IKDASelect> = props => {
               )}
             </BalanceLabel>
           )}
-        </BalanceContainer>
+          <ReloadWrapper onClick={refetch} $loading={loading}>
+            <IoReloadSharp />
+          </ReloadWrapper>
+        </FieldLabel>
         <Select
           collection={selectedCollection}
           options={options}
@@ -278,15 +282,23 @@ export const KDASelect: React.FC<IKDASelect> = props => {
           </ErrorMessage>
         )}
       </SelectContent>
-      {showAssetIdInputConditional && <CollectionIDField />}
+      {showAssetIdInputConditional && (
+        <CollectionIDField collection={selectedCollection} />
+      )}
     </SelectContainer>
   );
 };
 
-const CollectionIDField: React.FC = () => {
+interface CollectionIDFieldProps {
+  collection: ICollectionList;
+}
+
+const CollectionIDField: React.FC<CollectionIDFieldProps> = ({
+  collection,
+}) => {
   const [isCustom, setIsCustom] = useState(false);
   const [collectionInputValue, setCollectionInputValue] = useState('');
-  const [collectionIdData, setCollectionIdData] = useState<IDropdownItem[]>([]);
+  const [collectionIdData, setCollectionIdData] = useState<ICollection[]>([]);
   const debouncedCollectionInput = useDebounce(collectionInputValue, 500);
   const router = useRouter();
   const { walletAddress } = useExtension();
@@ -315,7 +327,18 @@ const CollectionIDField: React.FC = () => {
     },
   });
 
-  const selectedCollectionId = collectionIdData?.filter(
+  const cellectionOptions: IDropdownItem[] = useMemo(() => {
+    return collectionIdData.map(asset => {
+      const parseCollectionId = asset.assetId.split('/')[1];
+      return { label: parseCollectionId, value: parseCollectionId };
+    });
+  }, [collectionIdData]);
+
+  const selectedCollection = collectionIdData?.filter(
+    e => String(e.nftNonce) === watchCollectionAssetId,
+  )[0];
+
+  const selectedCollectionId = cellectionOptions?.filter(
     e => e.value === watchCollectionAssetId,
   )[0] || { label: watchCollectionAssetId, value: watchCollectionAssetId } || {
       label: '',
@@ -331,7 +354,7 @@ const CollectionIDField: React.FC = () => {
   }
 
   const collectionIdChangeHandler = async (value: any) => {
-    if (!isMultiContract)
+    if (!isMultiContract && router.pathname !== '/')
       await setQuery('collectionAssetId', value?.value, router);
     setCollectionAssetId(value?.value);
     setValue('collectionAssetId', value?.value, {
@@ -346,7 +369,17 @@ const CollectionIDField: React.FC = () => {
   return (
     <SelectContent>
       <FieldLabel>
-        <span>Asset ID</span>
+        <MarginRightAutoLabel>Asset ID</MarginRightAutoLabel>
+        {!collection?.isNFT && collection?.balance && (
+          <BalanceLabel>
+            Balance:{' '}
+            {toLocaleFixed(
+              selectedCollection?.balance /
+                10 ** (selectedCollection?.precision || 0),
+              selectedCollection?.precision || 0,
+            )}
+          </BalanceLabel>
+        )}
         <DropdownCustomLabel>
           <span>Custom value?</span>
           <input
@@ -372,7 +405,7 @@ const CollectionIDField: React.FC = () => {
         />
       ) : (
         <Select
-          options={collectionIdData}
+          options={cellectionOptions}
           onChange={collectionIdChangeHandler}
           onInputChange={handleInputChange}
           loading={collectionIdListLoading}

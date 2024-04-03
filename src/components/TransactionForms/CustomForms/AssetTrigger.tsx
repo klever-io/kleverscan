@@ -97,6 +97,26 @@ const AssetTrigger: React.FC<IContractProps> = ({
   );
 };
 
+const getMintForm = (collection: ICollectionList, walletAddress: string) => {
+  const hasInternalId = collection.value?.split('/').length > 1;
+
+  return (
+    <FormSection>
+      <FormInput
+        name="receiver"
+        title="Receiver"
+        required
+        dynamicInitialValue={walletAddress}
+        tooltip={tooltip.receiver}
+      />
+      <FormInput name="amount" title="Amount" type="number" required />
+      {!collection.isNFT && !collection.isFungible && !hasInternalId ? (
+        <FormInput name="value" title="Max Amount for new ID" type="number" />
+      ) : null}
+    </FormSection>
+  );
+};
+
 const getAssetTriggerForm = (
   triggerType: number,
   collection: ICollectionList,
@@ -105,18 +125,7 @@ const getAssetTriggerForm = (
 ) => {
   switch (triggerType) {
     case 0:
-      return (
-        <FormSection>
-          <FormInput
-            name="receiver"
-            title="Receiver"
-            required
-            dynamicInitialValue={walletAddress}
-            tooltip={tooltip.receiver}
-          />
-          <FormInput name="amount" title="Amount" type="number" required />
-        </FormSection>
-      );
+      return getMintForm(collection, walletAddress);
     case 1:
       return (
         <FormSection>

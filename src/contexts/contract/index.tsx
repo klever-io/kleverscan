@@ -154,7 +154,8 @@ export const ContractProvider: React.FC = ({ children }) => {
             ...item,
             label: item.assetId,
             value: item.assetId,
-            isNFT: item.assetType !== 'Fungible',
+            isNFT: item.assetType === 'NonFungible',
+            isFungible: item.assetType === 'Fungible',
           });
         });
       }
@@ -219,6 +220,7 @@ export const ContractProvider: React.FC = ({ children }) => {
         label: item.assetId,
         value: item.assetId,
         isNFT: assets?.[item.assetId]?.assetType === 1,
+        isFungible: assets?.[item.assetId]?.assetType === 0,
         minEpochsToWithdraw: minEpochsToWithdraw ? minEpochsToWithdraw : null,
         royalties: item.royalties || undefined,
       });
@@ -240,6 +242,7 @@ export const ContractProvider: React.FC = ({ children }) => {
         value: 'KLV',
         precision: KLV_PRECISION,
         isNFT: false,
+        isFungible: true,
         minEpochsToWithdraw: minEpochsToWithdraw ? minEpochsToWithdraw : null,
         balance,
         frozenBalance,

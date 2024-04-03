@@ -49,7 +49,7 @@ export const LoadingBackground = styled.div`
 `;
 
 export const CloseIcon = styled(IoMdCloseCircle).attrs(props => ({
-  color: props.theme.form.hash,
+  color: props.theme.true.white,
   size: 24,
 }))`
   min-width: 24px;
@@ -187,7 +187,7 @@ export const ExtraOptionContainer = styled.div`
 
   animation: ${ColorChangeAnimation} 2s infinite;
 
-  background-color: ${props => props.theme.white};
+  background-color: ${props => props.theme.purple};
   box-shadow: 0 0 1rem 0
     ${props => (props.theme.dark ? '#000' : lighten(0.8, '#000'))};
 
@@ -197,8 +197,7 @@ export const ExtraOptionContainer = styled.div`
   gap: 1rem;
 
   a {
-    color: ${props =>
-      props.theme.dark ? props.theme.darkText : props.theme.form.hash};
+    color: ${props => props.theme.true.white};
     font-size: 1.1rem;
     letter-spacing: 0.05rem;
 
@@ -209,18 +208,15 @@ export const ExtraOptionContainer = styled.div`
     animation: none;
 
     &:hover {
-      color: ${props =>
-        props.theme.dark ? props.theme.true.white : props.theme.form.hoverHash};
+      color: ${props => props.theme.true.white};
     }
 
     &:visited {
-      color: ${props =>
-        props.theme.dark ? props.theme.darkText : props.theme.form.hash};
+      color: ${props => props.theme.true.white};
     }
 
     &:active {
-      color: ${props =>
-        props.theme.dark ? props.theme.darkText : props.theme.form.hash};
+      color: ${props => props.theme.true.white};
     }
 
     svg {
@@ -308,11 +304,14 @@ export const AssetTriggerContainer = styled.div`
 
 export const FieldLabel = styled.label`
   user-select: none;
-  font-size: smaller;
+  font-size: 0.875rem;
   color: ${({ theme }) => theme.darkText};
   margin-bottom: 0.3rem;
 
   display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
 
   span {
     min-width: fit-content;
@@ -321,11 +320,11 @@ export const FieldLabel = styled.label`
 
 export const BalanceLabel = styled.label`
   user-select: none;
-  font-size: smaller;
-  font-weight: 600;
   display: flex;
-  color: ${({ theme }) => theme.darkText};
-  margin-bottom: 0.3rem;
+  color: ${({ theme }) => (theme.dark ? theme.lightPurple : theme.purple)};
+  font-size: 0.875rem;
+
+  white-space: nowrap;
 `;
 
 export const AssetIDInput = styled.input<{ $error?: boolean }>`

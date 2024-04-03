@@ -72,10 +72,10 @@ export const HashComponent: React.FC<IHashComponentProps> = ({
           </a>
         </Link>
       ) : (
-        <InlineLoader />
+        <InlineLoader color="white" />
       )}
       <IconsContainer>
-        {!loading && <Copy data={hash ? hash : ''} />}
+        {!loading && <Copy data={hash ? hash : ''} color="white" />}
         <CloseIcon onClick={() => setHash(null)} />
       </IconsContainer>
     </ExtraOptionContainer>

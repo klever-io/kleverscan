@@ -1,13 +1,12 @@
-import { IDropdownItem } from '@/components/Contract/Select';
 import api from '@/services/api';
-import { ICollectionIdListResponse } from '@/types';
+import { ICollection, ICollectionIdListResponse } from '@/types';
 import { NextRouter } from 'next/router';
 
 export const collectionListCall = async (
   router: NextRouter,
   walletAddress: string,
   partialId?: string,
-): Promise<IDropdownItem[] | undefined> => {
+): Promise<ICollection[] | undefined> => {
   try {
     const parseCollection = JSON.parse(
       router?.query?.contractDetails as string,
@@ -20,11 +19,7 @@ export const collectionListCall = async (
     });
 
     if (!res.error || res.error === '') {
-      const parseResponse = res.data.collection.map(e => {
-        const parseCollectionId = e.assetId.split('/')[1];
-        return { label: parseCollectionId, value: parseCollectionId };
-      });
-      return parseResponse;
+      return res.data.collection;
     }
   } catch (error) {
     console.error(error);

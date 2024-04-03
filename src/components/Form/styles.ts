@@ -114,7 +114,8 @@ export const ButtonContainer = styled.button<IButton>`
   }
 
   &[type='submit'] {
-    background-color: ${props => props.theme.purple};
+    background-color: ${props =>
+      props.theme.dark ? props.theme.violet : props.theme.purple};
   }
 `;
 

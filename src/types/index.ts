@@ -51,6 +51,7 @@ export interface ICollectionList {
   value: string;
   assetId: string;
   isNFT: boolean;
+  isFungible: boolean;
   frozenBalance?: number;
   balance?: number;
   precision?: number;
@@ -853,26 +854,28 @@ export interface IAccountResponse extends IResponse {
   data: { account: IAccount };
 }
 
+export interface ICollection {
+  address: string;
+  assetId: string;
+  collection: string;
+  nftNonce: number;
+  assetName: string;
+  assetType: number;
+  balance: number;
+  precision: number;
+  frozenBalance: number;
+  unfrozenBalance: number;
+  lastClaim: {
+    timestamp: number;
+    epoch: number;
+  };
+  buckets: IBucket[];
+  stakingType: number;
+}
+
 export interface ICollectionIdListResponse extends IResponse {
   data: {
-    collection: {
-      address: string;
-      assetId: string;
-      collection: string;
-      nftNonce: number;
-      assetName: string;
-      assetType: number;
-      balance: number;
-      precision: number;
-      frozenBalance: number;
-      unfrozenBalance: number;
-      lastClaim: {
-        timestamp: number;
-        epoch: number;
-      };
-      buckets: IBucket[];
-      stakingType: number;
-    }[];
+    collection: ICollection[];
   };
 }
 

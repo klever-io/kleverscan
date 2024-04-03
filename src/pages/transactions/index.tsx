@@ -238,8 +238,8 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
             <Copy info="TXHash" data={hash} />
           </CenteredRow>
           <CenteredRow>
-            <TimestampInfo>{formatDate(timestamp)}</TimestampInfo>
-            <Status status={status.toLowerCase()}>
+            <TimestampInfo>{formatDate(timestamp || Date.now())}</TimestampInfo>
+            <Status status={status?.toLowerCase()}>
               {capitalizeString(status)}
             </Status>
           </CenteredRow>

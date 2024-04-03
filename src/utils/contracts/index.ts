@@ -385,7 +385,7 @@ export const filteredSections = (
   data?: string[],
 ): JSX.Element[] => {
   const props = {
-    par: contract[0].parameter,
+    par: contract?.[0]?.parameter,
     receipts,
     precision,
     data,

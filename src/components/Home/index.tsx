@@ -4,7 +4,6 @@ import CoinCard from '@/components/Cards/CoinDataFetcher/CoinCard';
 import HomeTransactions from '@/components/HomeTransactions';
 import { ChartDailyTransactions } from '@/components/HomeTransactions/ChartDailyTransactions';
 import { HomeInput } from '@/components/InputGlobal/HomeInput';
-import QuickAccess from '@/components/QuickAccess';
 import Wizard from '@/components/Wizard';
 import { HomeDataProvider } from '@/contexts/mainPage';
 import {
@@ -32,21 +31,21 @@ const Home: React.FC = () => {
   return (
     <HomeDataProvider>
       <Container>
-        <HomeInput />
-        {!!wizard && <Wizard {...wizProps} />}
-        <QuickAccess setWizard={setWizard} />
         <DataContainer>
+          <HomeInput />
+          {!!wizard && <Wizard {...wizProps} />}
+          {/* <QuickAccess setWizard={setWizard} /> */}
           <DataCardsContainer>
             <HomeDataCards />
-            <CoinCard />
-            <ProposalValidatorWrapper />
             <ChartDailyTransactions />
           </DataCardsContainer>
+          <CoinCard />
         </DataContainer>
         <CardContainer>
           <HomeTransactions />
           <BlockCardFetcher />
         </CardContainer>
+        <ProposalValidatorWrapper />
       </Container>
     </HomeDataProvider>
   );

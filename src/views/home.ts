@@ -37,6 +37,11 @@ const PullFade = keyframes`
 
 export const Container = styled.div`
   background-color: ${props => props.theme.background};
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 80px;
 `;
 
 export const IconContainer = styled.div`
@@ -52,17 +57,11 @@ export const ProgressContainerSpanSkeleton = styled(ProgressContainerSpan)`
 `;
 
 export const Section = styled.section`
-  padding: 3rem 0.5rem 0 0.5rem;
-
   h1 {
     color: ${props =>
       props.theme.dark ? props.theme.black : props.theme.darkBlue};
     margin-bottom: 1rem;
     width: fit-content;
-  }
-
-  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
-    padding: 0 min(3%, 0.5rem) 0;
   }
 `;
 
@@ -73,9 +72,10 @@ export const SectionCards = styled(Section)`
 `;
 
 export const DataContainer = styled(Section)`
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding: 0 0.5rem 0 0.5rem;
-  }
+  display: flex;
+  flex-direction: column;
+
+  gap: 32px;
 `;
 
 export const CardContainer = styled.div`
@@ -83,6 +83,7 @@ export const CardContainer = styled.div`
   flex-direction: column;
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: row;
+    gap: 32px;
   }
 `;
 
@@ -108,51 +109,28 @@ export const Input = styled(DefaultInput)`
 `;
 
 export const DataCardsContainer = styled.div`
-  margin-top: 3rem;
-
   display: flex;
   flex-direction: row;
   align-items: flex-start;
 
-  gap: 4rem;
+  height: 256px;
 
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    flex-direction: column;
-  }
-  &:nth-child(2) {
-    margin-top: 4rem;
-  }
-  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
-    flex-direction: column;
-  }
+  gap: 16px;
 `;
 
 export const DataCardsWrapper = styled.div`
   width: 100%;
-  display: flex;
-  justify-content: center;
-  padding: 0;
-  gap: 1rem;
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    height: fit-content;
-  }
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    flex-direction: column;
-  }
-  @media (min-width: 1247px) {
-    flex-direction: row;
-    height: fit-content;
-  }
 `;
 
 export const DataCardsContent = styled.div`
   width: 100%;
   height: 50%;
-  display: flex;
-  margin: 3px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+
   justify-content: center;
 
-  gap: 1rem;
+  gap: 16px;
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     height: auto;
@@ -169,7 +147,7 @@ export const DataCardDefaultStyles = css`
   ${props =>
     props.theme.dark &&
     css`
-      border: 1px solid ${props.theme.card.background};
+      border: 1px solid ${props.theme.darkBlue300};
     `};
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
     ${DefaultCardStyles}
@@ -177,14 +155,14 @@ export const DataCardDefaultStyles = css`
 `;
 
 export const DataCard = styled.div`
+  ${DataCardDefaultStyles}
   padding: 1.2rem;
   padding-left: 2rem;
   width: 100%;
-  height: 8rem;
+  height: 120px;
   align-items: center;
   display: flex;
   border-radius: 1rem;
-  ${DataCardDefaultStyles}
   ${props => !props.theme.dark && DefaultCardStyles}
   @media
   screen
@@ -442,14 +420,7 @@ export const BlockCardHash = styled.span`
   cursor: default;
 `;
 
-export const TransactionContainer = styled.div`
-  ${DataCardDefaultStyles};
-  display: flex;
-  justify-content: center;
-  border-radius: 16px;
-  flex-direction: column;
-  background-color: ${props => props.theme.dark && 'transparent'} !important;
-`;
+export const TransactionContainer = styled.div``;
 
 export const ChartsContainer = styled(TransactionContainer)`
   ${DataCardDefaultStyles}
@@ -624,8 +595,8 @@ export const TransactionTimer = styled.div`
 
 export const TransactionChart = styled(TransactionContent)`
   ${DataCardDefaultStyles}
-  width: 40%;
-  min-height: 22rem;
+  width: 100%;
+  min-height: 100%;
   position: relative;
   display: flex;
   justify-content: space-between;
@@ -648,15 +619,6 @@ export const TransactionChart = styled(TransactionContent)`
     font-size: 1rem;
     color: ${props => props.theme.darkText};
   }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    min-height: 24.5rem;
-  }
-  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 100%;
-    height: 30rem;
-    margin: 0;
-  } ;
 `;
 
 export const FixedTxChart = styled(TransactionChart)`
@@ -855,7 +817,7 @@ export const ContainerHide = styled.div`
   align-items: center;
   justify-content: space-between;
   color: white;
-  padding: 1.5rem 0;
+  margin-bottom: 1.5rem;
   > h1 {
     margin: 0;
     font-weight: 500;

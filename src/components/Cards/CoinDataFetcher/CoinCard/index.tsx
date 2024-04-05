@@ -1,5 +1,5 @@
-import { InfoSquare } from '@/assets/icons';
-import Chart, { ChartType } from '@/components/Chart';
+import { BitcoinMe, VoxSwap } from '@/assets/swap-exchange';
+import { ChartType } from '@/components/Chart';
 import { PriceTooltip } from '@/components/Chart/Tooltips';
 import { Loader } from '@/components/Loader/styles';
 import { useMobile } from '@/contexts/mobile';
@@ -20,6 +20,7 @@ import {
 } from '@/types';
 import { getVariation } from '@/utils';
 import { useTranslation } from 'next-i18next';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React, { useCallback, useRef, useState } from 'react';
 import { IoReloadSharp } from 'react-icons/io5';
@@ -29,7 +30,6 @@ import {
   ArrowTopRight,
   ArrowVariation,
   ButtonContainer,
-  ButtonInformation,
   CardContainer,
   CardContent,
   CardContentError,
@@ -41,8 +41,8 @@ import {
   Content,
   ContentDeskTop,
   ContentError,
-  CurrencyIcon,
   Description,
+  EnchangeLinks,
   HeaderContainer,
   HeaderContent,
   HeaderGraph,
@@ -54,10 +54,8 @@ import {
   SpanTime,
 } from './styles';
 
-interface IDropDow {
-  shortname: string;
-  volume: { price: number; variation: number };
-}
+const Chart = dynamic(() => import('@/components/Chart'), { ssr: false });
+
 interface IPropsRenderCoinsCard {
   coin: ICoinInfo;
   cardRef: React.RefObject<HTMLDivElement>;
@@ -70,6 +68,21 @@ interface IPropsRenderCoinsCard {
 interface ICoinTimes {
   [name: string]: number | string;
 }
+
+const swapExchangeInfo = [
+  {
+    text: 'Swap and buy KLV and KFI',
+    url: 'https://voxswap.io/USDT-KLV',
+    icon: <VoxSwap />,
+    color: '#B7EC42',
+  },
+  {
+    text: 'Exchange the market top tokens',
+    url: 'https://bitcoin.me/us/trade/KLV-USDT',
+    icon: <BitcoinMe />,
+    color: '#FF6700',
+  },
+];
 
 const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
   const {
@@ -209,7 +222,6 @@ const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
 };
 const CoinCard: React.FC = () => {
   const { t } = useTranslation('home');
-  const coinsName = ['KLV', 'KFI'];
   const [selectedCoin, setSelectedCoin] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -371,36 +383,33 @@ const CoinCard: React.FC = () => {
     <Container>
       {!isTablet ? (
         <ContainerDesktop>
-          {!boolChecker(coinsLoadingBool) && (
-            <div>
-              {coinsName.map((coin, index) => (
-                <ButtonContainer key={index}>
-                  <a
-                    target="_blank"
-                    href={`https://bitcoin.me/us/trade/${coin}-USDT`}
-                    rel="noreferrer"
-                  >
-                    <ButtonInformation>
-                      {t('CardBuy', { asset: coin })}
-                      <CurrencyIcon />
-                    </ButtonInformation>
+          <ContentDeskTop>
+            <RenderCoinsCard
+              renderKfiMarketCap={renderKfiMarketCap}
+              assetsData={assetsData}
+              refetchCoin={refetchCoinsCall[0]}
+              coinDays={coinDays}
+              cardRef={cardRef}
+              coin={coins[0]}
+            />
+            <EnchangeLinks>
+              {swapExchangeInfo.map((item, index) => (
+                <ButtonContainer key={index} borderColor={item.color}>
+                  <a target="_blank" href={item.url} rel="noreferrer">
+                    {item.text}
                   </a>
+                  {item.icon}
                 </ButtonContainer>
               ))}
-            </div>
-          )}
-          <ContentDeskTop>
-            {coins.map((coin, index) => (
-              <RenderCoinsCard
-                renderKfiMarketCap={renderKfiMarketCap}
-                assetsData={assetsData}
-                refetchCoin={refetchCoinsCall[index]}
-                coinDays={coinDays}
-                cardRef={cardRef}
-                coin={coin}
-                key={index}
-              />
-            ))}
+            </EnchangeLinks>
+            <RenderCoinsCard
+              renderKfiMarketCap={renderKfiMarketCap}
+              assetsData={assetsData}
+              refetchCoin={refetchCoinsCall[1]}
+              coinDays={coinDays}
+              cardRef={cardRef}
+              coin={coins[1]}
+            />
           </ContentDeskTop>
         </ContainerDesktop>
       ) : (
@@ -443,24 +452,6 @@ const CoinCard: React.FC = () => {
             </Content>
           ) : (
             <CoinCardSkeleton />
-          )}
-          {!boolChecker(coinsLoadingBool) && (
-            <ButtonContainer>
-              <a
-                target="_blank"
-                href={`https://bitcoin.me/en/trade/${
-                  selectedCoin === 0 ? 'KLV' : 'KFI'
-                }-USDT`}
-                rel="noreferrer"
-              >
-                <ButtonInformation>
-                  {selectedCoin === 0
-                    ? t('CardBuy', { asset: 'KLV' })
-                    : t('CardBuy', { asset: 'KFI' })}
-                  <InfoSquare />
-                </ButtonInformation>
-              </a>
-            </ButtonContainer>
           )}
         </>
       )}

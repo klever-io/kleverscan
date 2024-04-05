@@ -43,7 +43,7 @@ export const Content = styled.div`
 
   flex-direction: row;
   border: 1px solid
-    ${props => (props.theme.dark ? props.theme.true.black : 'none')} !important;
+    ${props => (props.theme.dark ? props.theme.blueGray500 : 'none')} !important;
   ${DataCardDefaultStyles}
   background-color: ${props =>
     props.theme.dark ? 'transparent' : props.theme.true.white} !important;
@@ -60,13 +60,25 @@ export const CardContainer = styled.div`
   position: relative;
   min-height: 17.4rem;
   align-items: center;
-  border-radius: 0.5rem;
   min-width: 100%;
-  border: 1px solid
-    ${props => (props.theme.dark ? props.theme.card.background : 'transparent')};
-  border-radius: 1rem;
-  background-color: ${props =>
-    props.theme.dark ? 'transparent' : props.theme.true.white} !important;
+  border-radius: 12px;
+
+  border: 1px solid transparent;
+  background-image: linear-gradient(
+      ${props =>
+        props.theme.dark ? props.theme.background : props.theme.white},
+      ${props =>
+        props.theme.dark ? props.theme.background : props.theme.white}
+    ),
+    linear-gradient(
+      to bottom,
+      ${props => props.theme.gray800},
+      transparent 50%,
+      ${props => props.theme.gray800} 175%
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
     min-width: initial;
     width: 49%;
@@ -436,57 +448,61 @@ export const SpanTime = styled.span<{ selected: boolean }>`
   cursor: pointer;
 `;
 
-export const ButtonInformation = styled.button`
+export const ButtonContainer = styled.button<{ borderColor: string }>`
   ${DataCardDefaultStyles}
   display: flex;
-  width: 15rem;
-  flex-direction: row;
+  width: 193px;
+
+  flex-direction: column;
   justify-content: space-between;
   align-items: center;
   text-align: start;
-  padding: 9px 20px;
+  padding: 16px 52px 16px 20px;
   margin-top: 1rem;
-  border-radius: 0.5rem;
+  border-radius: 12px;
   color: ${props => props.theme.true.white};
-  background-color: ${({ theme }) =>
-    theme.dark && theme.true.newBlack} !important;
-  :hover {
-    opacity: 0.55;
+
+  border: 1px solid ${props => props.borderColor};
+
+  transition: 0.25s ease-in-out;
+
+  :hover,
+  :focus {
+    box-shadow: inset 193px 193px 0 0 ${props => props.borderColor};
+
+    color: ${props => props.theme.true.newBlack};
+    svg {
+      path {
+        fill: ${props => props.theme.true.newBlack};
+        fill-opacity: 1;
+      }
+    }
   }
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    background-color: ${({ theme }) => theme.violet} !important;
     width: 100%;
     font-size: 1rem;
     font-weight: 700;
   }
   font-size: 1.25rem;
 
-  svg {
-    path {
-      fill: ${({ theme }) => (theme.dark ? theme.true.white : theme.violet)};
-    }
-  }
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     height: 11.5rem;
     margin-top: 0rem;
     align-items: flex-start;
-    padding: 1.2rem 3rem 0.5rem 1.2rem;
+    padding: 16px 52px 16px 20px;
     text-align: start;
     color: ${props => props.theme.black};
   }
 `;
-export const ButtonContainer = styled.div`
-  width: 100%;
-  a {
-    width: 100%;
-  }
-  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    position: relative;
-    width: fit-content;
-    :nth-child(1) {
-      margin-bottom: 1rem;
-    }
-  }
+
+export const EnchangeLinks = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.5rem;
+  color: ${props => props.theme.true.white};
+  font-size: 1rem;
+  font-weight: 500;
 `;
 
 export const CurrencyIcon = styled(Currency)`
@@ -497,7 +513,7 @@ export const CurrencyIcon = styled(Currency)`
 
 export const ContentDeskTop = styled.div`
   display: flex;
-  justify-content: space-around;
+  gap: 16px;
   width: 100%;
 `;
 

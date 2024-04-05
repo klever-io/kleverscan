@@ -12,6 +12,26 @@ import Tooltip from '@/components/Tooltip';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import api from '@/services/api';
 import { CenteredRow, Container, DoubleRow, Header } from '@/styles/common';
+import {
+  IAssetTransactionResponse,
+  IClaimReceipt,
+  IReceipt,
+  IRowSection,
+  ITransaction,
+} from '@/types';
+import {
+  Contract,
+  ContractsName,
+  IBuyContractPayload,
+  IContract,
+  ITransferContract,
+} from '@/types/contracts';
+import {
+  contractTypes,
+  filteredSections,
+  getLabelForTableField,
+  transactionTableHeaders,
+} from '@/utils/contracts';
 import { capitalizeString } from '@/utils/convertString';
 import { findReceipt } from '@/utils/findKey';
 import { formatAmount, formatDate } from '@/utils/formatFunctions';
@@ -22,26 +42,6 @@ import { TransactionType } from '@klever/sdk-web';
 import Link from 'next/link';
 import { NextRouter, useRouter } from 'next/router';
 import React from 'react';
-import {
-  IAssetTransactionResponse,
-  IClaimReceipt,
-  IReceipt,
-  IRowSection,
-  ITransaction,
-} from '../../types';
-import {
-  Contract,
-  ContractsName,
-  IBuyContractPayload,
-  IContract,
-  ITransferContract,
-} from '../../types/contracts';
-import {
-  contractTypes,
-  filteredSections,
-  getLabelForTableField,
-  transactionTableHeaders,
-} from '../../utils/contracts';
 
 interface IRequestTxQuery {
   asset?: string;
@@ -186,7 +186,7 @@ export const requestTransactionsDefault = async (
 
 const getContractType = contractTypes;
 
-const getCustomFields = (
+export const getCustomFields = (
   contract: IContract[],
   receipts: IReceipt[],
   precision?: number,

@@ -21,7 +21,6 @@ import {
 import { format } from 'date-fns';
 import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
-import { Container } from './styles';
 
 export const ChartDailyTransactions: React.FC = () => {
   const filterDays = [1, 7, 15, 30];
@@ -96,57 +95,54 @@ export const ChartDailyTransactions: React.FC = () => {
     last24h - (transactionsList?.[transactionsList?.length - 2]?.valueNow || 0);
   const variation = getVariation(variationCalc / 100);
   return (
-    <Container>
-      <h1>{t('Daily Transactions')}</h1>
-      <TransactionChart>
-        <ContainerTimeFilter>
-          <div>
-            <span>{t('Transactions')}</span>
-            <Last24hTxs>
-              {toLocaleFixed(last24h, 0)}
-              <Last24Text>
-                <span>24h</span>
-              </Last24Text>
-            </Last24hTxs>
-            <VariationText $positive={variation.includes('+')}>
-              <ArrowVariation $positive={variation.includes('+')} />
-              {variation}
-            </VariationText>
-          </div>
-          <ListItemTimeFilter>
-            {loadingDailyTxs && <Loader width={20} height={20} />}
-            {filterDays.map(item => (
-              <ItemTimeFilter
-                key={String(item)}
-                onClick={() => setTimeFilter(item + 1)}
-                selected={!!(timeFilter === item + 1)}
-              >
-                {item !== 30 ? `${String(item)}D` : '1M'}
-              </ItemTimeFilter>
-            ))}
-          </ListItemTimeFilter>
-        </ContainerTimeFilter>
-        {!!transactionsList?.length && (
-          <TransactionChartContent>
-            <Chart
-              type={ChartType.DoubleArea}
-              data={transactionsList}
-              hasTooltip={true}
-              value="valueNow"
-              value2="valuePast"
-              strokeWidth={1}
-              yAxis={true}
-              height={'100%'}
-              CustomTooltip={DoubleTxsTooltip}
-            />
-          </TransactionChartContent>
-        )}
-        {!loadingDailyTxs && !transactionsList?.length && (
-          <TransactionEmpty>
-            <span>{commonT('EmptyData')}</span>
-          </TransactionEmpty>
-        )}
-      </TransactionChart>
-    </Container>
+    <TransactionChart>
+      <ContainerTimeFilter>
+        <div>
+          <span>{t('Transactions')}</span>
+          <Last24hTxs>
+            {toLocaleFixed(last24h, 0)}
+            <Last24Text>
+              <span>24h</span>
+            </Last24Text>
+          </Last24hTxs>
+          <VariationText $positive={variation.includes('+')}>
+            <ArrowVariation $positive={variation.includes('+')} />
+            {variation}
+          </VariationText>
+        </div>
+        <ListItemTimeFilter>
+          {loadingDailyTxs && <Loader width={20} height={20} />}
+          {filterDays.map(item => (
+            <ItemTimeFilter
+              key={String(item)}
+              onClick={() => setTimeFilter(item + 1)}
+              selected={!!(timeFilter === item + 1)}
+            >
+              {item !== 30 ? `${String(item)}D` : '1M'}
+            </ItemTimeFilter>
+          ))}
+        </ListItemTimeFilter>
+      </ContainerTimeFilter>
+      {!!transactionsList?.length && (
+        <TransactionChartContent>
+          <Chart
+            type={ChartType.DoubleArea}
+            data={transactionsList}
+            hasTooltip={true}
+            value="valueNow"
+            value2="valuePast"
+            strokeWidth={1}
+            yAxis={true}
+            height={'100%'}
+            CustomTooltip={DoubleTxsTooltip}
+          />
+        </TransactionChartContent>
+      )}
+      {!loadingDailyTxs && !transactionsList?.length && (
+        <TransactionEmpty>
+          <span>{commonT('EmptyData')}</span>
+        </TransactionEmpty>
+      )}
+    </TransactionChart>
   );
 };

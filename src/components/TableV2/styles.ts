@@ -40,18 +40,27 @@ export const TableBody = styled.div`
       ),
       linear-gradient(
         to bottom,
-        ${props => props.theme.darkGray},
-        transparent 100%
+        ${props => props.theme.gray800},
+        transparent 50%,
+        ${props => props.theme.gray800} 175%
       );
     background-origin: border-box;
     background-clip: padding-box, border-box;
   }
 `;
 
-export const HeaderItem = styled.div`
+export const HeaderItem = styled.div<{ smaller?: boolean }>`
   display: table-cell;
   padding: 6px 16px;
   margin-bottom: 16px;
+
+  ${props =>
+    props.smaller &&
+    css`
+      font-size: 0.875rem;
+      padding: 4px 8px;
+      margin-bottom: 8px;
+    `}
 `;
 
 export const TableRow = styled.div<TableRowProps>`
@@ -88,23 +97,15 @@ export const MobileCardItem = styled.div<{
   isAccountPage?: boolean;
   isLastRow?: boolean;
   dynamicWidth?: number;
+  smaller?: boolean;
 }>`
   display: flex;
   flex-direction: column;
 
   font-size: 1rem;
 
-  ${props =>
-    !props.columnSpan || props.columnSpan >= 0
-      ? css`
-          grid-column: span ${props.columnSpan};
-          gap: 0.25rem;
-        `
-      : css`
-          display: none;
-        `}
-
-  a,span {
+  a,
+  span {
     display: flex;
     align-items: center;
   }
@@ -130,6 +131,22 @@ export const MobileCardItem = styled.div<{
       a {
         justify-content: flex-end;
       }
+    `}
+
+  ${props =>
+    !props.columnSpan || props.columnSpan >= 0
+      ? css`
+          grid-column: span ${props.columnSpan};
+          gap: 0.25rem;
+        `
+      : css`
+          display: none;
+        `}
+
+  ${props =>
+    props.smaller &&
+    css`
+      font-size: 0.75rem;
     `}
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
@@ -164,6 +181,13 @@ export const MobileCardItem = styled.div<{
         : css`
             border-bottom: solid 1px ${props => props.theme.darkGray};
           `}
+
+    ${props =>
+      props.smaller &&
+      css`
+        font-size: 0.75rem;
+        padding: 4px 8px;
+      `}
   }
 `;
 

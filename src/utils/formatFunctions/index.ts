@@ -18,7 +18,7 @@ export const formatDate = (timestamp: number): string => {
     timestamp = timestamp / 10 ** 3;
   }
 
-  return format(new Date(timestamp), 'MM/dd/yyyy HH:mm');
+  return format(new Date(timestamp || 0), 'MM/dd/yyyy HH:mm');
 };
 
 /**

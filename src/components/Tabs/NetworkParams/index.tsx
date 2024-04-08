@@ -49,13 +49,13 @@ const NetworkParams: React.FC = () => {
 
     return [
       {
-        element: <span key={String(number)}>#{number}</span>,
+        element: props => <span key={String(number)}>#{number}</span>,
         span: 2,
         width: 100,
       },
-      { element: <p key={parameter}>{parameter}</p>, span: 2 },
+      { element: props => <p key={parameter}>{parameter}</p>, span: 2 },
       {
-        element: (
+        element: props => (
           <p key={currentValue} className="currentValue">
             {currentValue}
           </p>

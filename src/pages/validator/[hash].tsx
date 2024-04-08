@@ -427,9 +427,9 @@ const Validator: React.FC<IValidatorPage> = () => {
 
   const rowSections = (bucket: IBucket): IRowSection[] => {
     const { address, id, stakedEpoch, balance } = bucket;
-    const sections = [
+    const sections: IRowSection[] = [
       {
-        element: (
+        element: props => (
           <CenteredRow key={id}>
             <Link href={`/account/${address}`} key={address}>
               {parseAddress(address || '', 24)}
@@ -440,7 +440,7 @@ const Validator: React.FC<IValidatorPage> = () => {
         span: 2,
       },
       {
-        element: (
+        element: props => (
           <CenteredRow key={id}>
             {parseAddress(id || '', 24)}
             <Copy data={id} info="id"></Copy>
@@ -448,9 +448,12 @@ const Validator: React.FC<IValidatorPage> = () => {
         ),
         span: 2,
       },
-      { element: <span key={stakedEpoch}>{stakedEpoch}</span>, span: 1 },
       {
-        element: (
+        element: props => <span key={stakedEpoch}>{stakedEpoch}</span>,
+        span: 1,
+      },
+      {
+        element: props => (
           <span key={balance}>
             {formatAmount(balance / 10 ** KLV_PRECISION)}
           </span>

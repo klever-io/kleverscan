@@ -48,19 +48,22 @@ const Collection: React.FC<ICollectionPage> = () => {
 
     const collectionId = assetId.split('/')[0];
     const nftId = assetId.split('/')[1];
-    const sections = address
+    const sections: IRowSection[] = address
       ? [
           {
-            element: <span key={assetId}>#{nftId}</span>,
-            span: 1,
-          },
-          { element: <span key={collection}>{collection}</span>, span: 1 },
-          {
-            element: <span key={collectionId}>{collectionId}</span>,
+            element: props => <span key={assetId}>#{nftId}</span>,
             span: 1,
           },
           {
-            element: (
+            element: props => <span key={collection}>{collection}</span>,
+            span: 1,
+          },
+          {
+            element: props => <span key={collectionId}>{collectionId}</span>,
+            span: 1,
+          },
+          {
+            element: props => (
               <Link href={`/account/${address}`} key={address}>
                 {isMobile
                   ? parseAddress(address, 14)
@@ -72,7 +75,7 @@ const Collection: React.FC<ICollectionPage> = () => {
             span: 1,
           },
           {
-            element: (
+            element: props => (
               <Link
                 href={`/account/${address}/collection/${collectionId}/${nftId}`}
                 key={assetId}
@@ -83,7 +86,7 @@ const Collection: React.FC<ICollectionPage> = () => {
             span: 2,
           },
         ]
-      : [{ element: <></>, span: 1 }];
+      : [{ element: props => <></>, span: 1 }];
 
     return sections;
   };

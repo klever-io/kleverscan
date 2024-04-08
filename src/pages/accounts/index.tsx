@@ -188,9 +188,9 @@ const Accounts: React.FC<IAccounts> = () => {
 
   const rowSections = (account: IAccount): IRowSection[] => {
     const { address, balance, frozenBalance, nonce } = account;
-    const sections = [
+    const sections: IRowSection[] = [
       {
-        element: (
+        element: props => (
           <CenteredRow key={address}>
             <Link href={`/account/${address}`}>
               {isMobile ? parseAddress(address, 24) : address}
@@ -202,12 +202,12 @@ const Accounts: React.FC<IAccounts> = () => {
         span: 2,
       },
       {
-        element: <span key={nonce}>{nonce}</span>,
+        element: props => <span key={nonce}>{nonce}</span>,
         span: 1,
         width: 100,
       },
       {
-        element: (
+        element: props => (
           <span key={balance}>
             {formatAmount(balance / 10 ** KLV_PRECISION)} KLV
           </span>
@@ -215,7 +215,7 @@ const Accounts: React.FC<IAccounts> = () => {
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <span key={frozenBalance}>
             {formatAmount(frozenBalance / 10 ** KLV_PRECISION)} KLV
           </span>

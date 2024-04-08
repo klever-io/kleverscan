@@ -21,7 +21,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
-export const blocksHeader = ['', 'Block', 'Transactions', 'Burned', 'Rewards'];
+export const blocksHeader = [
+  '',
+  'Block',
+  'Size/TXs',
+  'Fees(Kapp/Burned)',
+  'Rewards(Fee/Block)',
+];
 
 export const blocksRowSections = (block: IBlock): IRowSection[] => {
   const {
@@ -39,10 +45,10 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
     blockRewards,
   } = block;
 
-  const sections = [
+  const sections: IRowSection[] = [
     {
-      element: (
-        <Link href={`/validator/${producerOwnerAddress}`} key={producerLogo}>
+      element: props => (
+        <Link href={`/validator/${producerOwnerAddress}`}>
           <a>
             <AssetLogo
               logo={producerLogo}
@@ -57,8 +63,8 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
       width: 50,
     },
     {
-      element: (
-        <DoubleRow key={nonce + epoch}>
+      element: props => (
+        <DoubleRow {...props} key={nonce + epoch}>
           <Link href={`/block/${nonce}`}>{String(nonce)}</Link>
           <Link
             href={`/validator/${producerOwnerAddress}`}
@@ -71,8 +77,9 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
       span: 1,
     },
     {
-      element: (
-        <DoubleRow key={txCount + size}>
+      element: props => (
+        <DoubleRow {...props} key={txCount + size}>
+          <span>{size} Bytes</span>
           <span>
             {txCount} TX{txCount > 1 ? 's' : ''}
           </span>
@@ -81,8 +88,8 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
       span: 1,
     },
     {
-      element: (
-        <DoubleRow key={String(kAppFees) + String(txBurnedFees)}>
+      element: props => (
+        <DoubleRow {...props} key={String(kAppFees) + String(txBurnedFees)}>
           <span>{formatAmount((kAppFees || 0) / 10 ** KLV_PRECISION)} KLV</span>
           <span>{`${formatAmount(
             (txBurnedFees || 0) / 10 ** KLV_PRECISION,
@@ -92,8 +99,8 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
       span: 1,
     },
     {
-      element: (
-        <DoubleRow key={String(txFees) + String(blockRewards)}>
+      element: props => (
+        <DoubleRow {...props} key={String(txFees) + String(blockRewards)}>
           <span>
             {formatAmount(((txFees || 0) * 0.5) / 10 ** KLV_PRECISION)} KLV
           </span>
@@ -145,6 +152,7 @@ const BlockCardFetcher: React.FC = () => {
     showLimit: false,
     showPagination: false,
     smaller: true,
+    interval: 4000,
   };
 
   return (

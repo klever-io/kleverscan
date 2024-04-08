@@ -229,10 +229,10 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
 
   const customFields = getCustomFields(contract, receipts, precision, data);
 
-  const sections = [
+  const sections: IRowSection[] = [
     {
-      element: (
-        <DoubleRow key={hash}>
+      element: props => (
+        <DoubleRow {...props} key={hash}>
           <CenteredRow className="bucketIdCopy">
             <Link href={`/transaction/${hash}`}>{parseAddress(hash, 24)}</Link>
             <Copy info="TXHash" data={hash} />
@@ -248,8 +248,8 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
       span: 2,
     },
     {
-      element: (
-        <DoubleRow key={blockNum}>
+      element: props => (
+        <DoubleRow {...props} key={blockNum}>
           <Link href={`/block/${blockNum || 0}`}>
             <a className="address">{blockNum || 0}</a>
           </Link>
@@ -261,8 +261,8 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
       span: 1,
     },
     {
-      element: (
-        <DoubleRow key={sender}>
+      element: props => (
+        <DoubleRow {...props} key={sender}>
           <Link href={`/account/${sender}`}>
             <a className="address">{parseAddress(sender, 16)}</a>
           </Link>
@@ -272,9 +272,9 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
       span: 1,
     },
     {
-      element:
+      element: props =>
         contractType === 'Multi contract' ? (
-          <DoubleRow>
+          <DoubleRow {...props}>
             <MultiContractToolTip
               contract={contract}
               contractType={contractType}
@@ -282,7 +282,7 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
             <CenteredRow>- -</CenteredRow>
           </DoubleRow>
         ) : (
-          <DoubleRow>
+          <DoubleRow {...props}>
             <CenteredRow key={contractType}>
               <span>{ContractsName[contractType]}</span>
             </CenteredRow>
@@ -303,32 +303,33 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
       span: 1,
     },
     {
-      element: contractType ? (
-        <DoubleRow>
-          {getLabelForTableField(contractType)?.[1] ? (
-            <Tooltip
-              msg={getLabelForTableField(contractType)[1]}
-              Component={() => (
-                <CustomFieldWrapper>{customFields[1]}</CustomFieldWrapper>
-              )}
-            />
-          ) : (
-            <span> - - </span>
-          )}
-          {getLabelForTableField(contractType)?.[2] ? (
-            <Tooltip
-              msg={getLabelForTableField(contractType)[2]}
-              Component={() => (
-                <CustomFieldWrapper>{customFields[2]}</CustomFieldWrapper>
-              )}
-            />
-          ) : (
-            <span> - - </span>
-          )}
-        </DoubleRow>
-      ) : (
-        <></>
-      ),
+      element: props =>
+        contractType ? (
+          <DoubleRow {...props}>
+            {getLabelForTableField(contractType)?.[1] ? (
+              <Tooltip
+                msg={getLabelForTableField(contractType)[1]}
+                Component={() => (
+                  <CustomFieldWrapper>{customFields[1]}</CustomFieldWrapper>
+                )}
+              />
+            ) : (
+              <span> - - </span>
+            )}
+            {getLabelForTableField(contractType)?.[2] ? (
+              <Tooltip
+                msg={getLabelForTableField(contractType)[2]}
+                Component={() => (
+                  <CustomFieldWrapper>{customFields[2]}</CustomFieldWrapper>
+                )}
+              />
+            ) : (
+              <span> - - </span>
+            )}
+          </DoubleRow>
+        ) : (
+          <></>
+        ),
       span: 1,
     },
   ];

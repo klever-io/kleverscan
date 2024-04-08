@@ -103,9 +103,9 @@ const Assets: React.FC = () => {
       );
     };
 
-    const sections = [
+    const sections: IRowSection[] = [
       {
-        element: (
+        element: props => (
           <Link href={`/asset/${assetId}`} key={assetId}>
             <a>
               <AssetLogo
@@ -122,8 +122,8 @@ const Assets: React.FC = () => {
         width: 50,
       },
       {
-        element: (
-          <DoubleRow key={assetId}>
+        element: props => (
+          <DoubleRow {...props} key={assetId}>
             <Link href={`/asset/${assetId}`} key={assetId}>
               <a>{name}</a>
             </Link>
@@ -140,8 +140,8 @@ const Assets: React.FC = () => {
       },
 
       {
-        element: (
-          <DoubleRow key={assetType + precision}>
+        element: props => (
+          <DoubleRow {...props} key={assetType + precision}>
             <span key={assetType}>{assetType}</span>
             <span key={precision}>
               {precision} decimal{precision > 1 && 's'}
@@ -152,8 +152,8 @@ const Assets: React.FC = () => {
         span: 1,
       },
       {
-        element: (
-          <DoubleRow>
+        element: props => (
+          <DoubleRow {...props}>
             <span key={circulatingSupply}>
               {formatAmount(circulatingSupply / 10 ** precision)} {ticker}
             </span>
@@ -165,8 +165,11 @@ const Assets: React.FC = () => {
         span: 1,
       },
       {
-        element: (
-          <DoubleRow key={initialSupply + String(staking?.totalStaked)}>
+        element: props => (
+          <DoubleRow
+            {...props}
+            key={initialSupply + String(staking?.totalStaked)}
+          >
             <span key={initialSupply}>
               {formatAmount(initialSupply / 10 ** precision)} {ticker}
             </span>
@@ -180,7 +183,7 @@ const Assets: React.FC = () => {
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <span>
             {staking
               ? staking?.interestType === 'APRI'

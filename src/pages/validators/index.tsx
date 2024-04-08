@@ -48,10 +48,10 @@ const validatorsRowSections = (validator: IValidator): IRowSection[] => {
   const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'fail');
   const sections = ownerAddress
     ? [
-        { element: <p key={rank}>{rank}°</p>, span: 1, width: 100 },
+        { element: props => <p key={rank}>{rank}°</p>, span: 1, width: 100 },
         {
-          element: (
-            <DoubleRow key={ownerAddress + status}>
+          element: props => (
+            <DoubleRow {...props} key={ownerAddress + status}>
               <span>
                 {
                   <AddressContainer>
@@ -74,8 +74,8 @@ const validatorsRowSections = (validator: IValidator): IRowSection[] => {
         },
 
         {
-          element: (
-            <DoubleRow key={status + rating}>
+          element: props => (
+            <DoubleRow {...props} key={status + rating}>
               <span>{capitalizeString(status)}</span>
               <span>{((rating * 100) / 10000000).toFixed(2)}%</span>
             </DoubleRow>
@@ -83,8 +83,8 @@ const validatorsRowSections = (validator: IValidator): IRowSection[] => {
           span: 1,
         },
         {
-          element: (
-            <DoubleRow key={staked}>
+          element: props => (
+            <DoubleRow {...props} key={staked}>
               <span>{formatAmount(staked / 10 ** KLV_PRECISION)} KLV</span>
               <span key={commission}>{commission / 10 ** 2}%</span>
             </DoubleRow>
@@ -92,8 +92,8 @@ const validatorsRowSections = (validator: IValidator): IRowSection[] => {
           span: 1,
         },
         {
-          element: (
-            <DoubleRow key={totalProduced}>
+          element: props => (
+            <DoubleRow {...props} key={totalProduced}>
               <span>{totalProduced}</span>
               <span>{totalMissed}</span>
             </DoubleRow>
@@ -101,7 +101,7 @@ const validatorsRowSections = (validator: IValidator): IRowSection[] => {
           span: 1,
         },
         {
-          element: (
+          element: props => (
             <Progress percent={cumulativeStaked} key={cumulativeStaked} />
           ),
           span: 2,

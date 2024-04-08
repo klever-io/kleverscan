@@ -4,6 +4,7 @@ import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/TableV2';
 import { getMarketplaces } from '@/services/requests/marketplace';
 import { Container, FlexSpan, Header } from '@/styles/common';
+import { IRowSection } from '@/types';
 import { IMarketplace } from '@/types/marketplaces';
 import { PERCENTAGE_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
@@ -27,9 +28,9 @@ const Marketplaces: React.FC = () => {
   const marketplacesRowSections = (marketplace: IMarketplace) => {
     const { id, name, ownerAddress, referralAddress, referralPercentage } =
       marketplace;
-    const rowSections = [
+    const rowSections: IRowSection[] = [
       {
-        element: (
+        element: props => (
           <FlexSpan>
             <Link href={`marketplace/${id}`}>{id}</Link>
             <Copy data={id} info="Marketplace Id" />
@@ -38,7 +39,7 @@ const Marketplaces: React.FC = () => {
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <span key={name}>
             <Link href={`marketplace/${id}`}>{name}</Link>
           </span>
@@ -46,7 +47,7 @@ const Marketplaces: React.FC = () => {
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <FlexSpan>
             <Link href={`account/${ownerAddress}`}>
               {parseAddress(ownerAddress, 20)}
@@ -57,7 +58,7 @@ const Marketplaces: React.FC = () => {
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <FlexSpan>
             {referralAddress ? (
               <>
@@ -74,7 +75,7 @@ const Marketplaces: React.FC = () => {
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <span>
             {referralPercentage
               ? `${referralPercentage / 10 ** PERCENTAGE_PRECISION}%`

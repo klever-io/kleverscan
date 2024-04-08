@@ -67,10 +67,10 @@ export const homeTransactionsRowSections = (
 
   const customFields = getCustomFields(contract, receipts, precision, data);
 
-  const sections = [
+  const sections: IRowSection[] = [
     {
-      element: (
-        <DoubleRow key={hash}>
+      element: props => (
+        <DoubleRow {...props} key={hash}>
           <CenteredRow className="bucketIdCopy">
             <Link href={`/transaction/${hash}`}>{parseAddress(hash, 24)}</Link>
             <Copy info="TXHash" data={hash} />
@@ -86,8 +86,8 @@ export const homeTransactionsRowSections = (
       span: 2,
     },
     {
-      element: (
-        <DoubleRow key={blockNum}>
+      element: props => (
+        <DoubleRow {...props} key={blockNum}>
           <Link href={`/block/${blockNum || 0}`}>
             <a className="address">{blockNum || 0}</a>
           </Link>
@@ -99,8 +99,8 @@ export const homeTransactionsRowSections = (
       span: 1,
     },
     {
-      element: (
-        <DoubleRow key={sender}>
+      element: props => (
+        <DoubleRow {...props} key={sender}>
           <Link href={`/account/${sender}`}>
             <a className="address">{parseAddress(sender, 16)}</a>
           </Link>
@@ -110,9 +110,9 @@ export const homeTransactionsRowSections = (
       span: 1,
     },
     {
-      element:
+      element: props =>
         contractType === 'Multi contract' ? (
-          <DoubleRow>
+          <DoubleRow {...props}>
             <MultiContractToolTip
               contract={contract}
               contractType={contractType}
@@ -120,7 +120,7 @@ export const homeTransactionsRowSections = (
             <CenteredRow>- -</CenteredRow>
           </DoubleRow>
         ) : (
-          <DoubleRow>
+          <DoubleRow {...props}>
             <CenteredRow key={contractType}>
               <span>{ContractsName[contractType]}</span>
             </CenteredRow>
@@ -161,6 +161,7 @@ const HomeTransactions: React.FC = () => {
     showLimit: false,
     showPagination: false,
     smaller: true,
+    interval: 4000,
   };
 
   return (

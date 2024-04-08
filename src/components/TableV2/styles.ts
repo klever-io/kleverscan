@@ -128,7 +128,8 @@ export const MobileCardItem = styled.div<{
       text-align: right;
       align-items: flex-end;
       span,
-      a {
+      a,
+      div {
         justify-content: flex-end;
       }
     `}
@@ -186,7 +187,7 @@ export const MobileCardItem = styled.div<{
       props.smaller &&
       css`
         font-size: 0.75rem;
-        padding: 4px 8px;
+        padding: 8px 8px;
       `}
   }
 `;
@@ -201,6 +202,10 @@ export const CustomFieldWrapper = styled.div`
   text-decoration: underline dashed;
   text-decoration-color: ${props => transparentize(0.5, props.theme.black)};
   text-underline-offset: 0.2rem;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 export const TimestampInfo = styled.span`

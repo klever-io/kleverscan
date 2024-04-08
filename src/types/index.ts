@@ -1037,8 +1037,11 @@ export interface IFilterDater {
   enddate: string;
 }
 
+export interface TableRowElementProps {
+  smaller?: boolean;
+}
 export interface IRowSection {
-  element: JSX.Element;
+  element: React.FC<TableRowElementProps>;
   span: number;
   width?: number;
 }

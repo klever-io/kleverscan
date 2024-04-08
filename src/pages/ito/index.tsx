@@ -114,9 +114,9 @@ const ITOsPage: React.FC = () => {
       );
     };
 
-    const sections = [
+    const sections: IRowSection[] = [
       {
-        element: (
+        element: props => (
           <Link href={`/asset/${assetId}?reference=ito`} key={assetId}>
             <a>
               <AssetLogo
@@ -132,7 +132,7 @@ const ITOsPage: React.FC = () => {
       },
 
       {
-        element: (
+        element: props => (
           <Link href={`/asset/${assetId}?reference=ito`} key={name}>
             <a style={{ overflow: 'hidden' }}>{name}</a>
           </Link>
@@ -140,7 +140,7 @@ const ITOsPage: React.FC = () => {
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <ContainerAssetId>
             <Link href={`/asset/${assetId}?reference=ito`} key={assetId}>
               {assetId}
@@ -152,7 +152,7 @@ const ITOsPage: React.FC = () => {
       },
 
       {
-        element: (
+        element: props => (
           <span key={bestKLVRate}>
             {bestKLVRate || '- -'}
             {bestKLVRate && ' KLV'}
@@ -160,9 +160,9 @@ const ITOsPage: React.FC = () => {
         ),
         span: 1,
       },
-      { element: <span key={assetType}>{assetType}</span>, span: 1 },
+      { element: props => <span key={assetType}>{assetType}</span>, span: 1 },
       {
-        element: (
+        element: props => (
           <strong key={maxAmount}>
             {renderSoldAmount()} {ticker}
           </strong>
@@ -170,7 +170,7 @@ const ITOsPage: React.FC = () => {
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <strong key={maxAmount}>
             {renderTotalAmount()} {ticker}
           </strong>
@@ -178,11 +178,11 @@ const ITOsPage: React.FC = () => {
         span: 1,
       },
       {
-        element: <span key={access}>{access}</span>,
+        element: props => <span key={access}>{access}</span>,
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <ParticipateButton
             onClick={() => {
               setITO(asset);

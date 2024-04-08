@@ -285,7 +285,7 @@ const Table: React.FC<ITable> = ({
                           dynamicWidth={itemWidth}
                           smaller={smaller}
                         >
-                          <DoubleRow>
+                          <DoubleRow {...props}>
                             {type !== 'accounts' && <Skeleton width="100%" />}
                             <Skeleton width="100%" />
                           </DoubleRow>
@@ -304,13 +304,13 @@ const Table: React.FC<ITable> = ({
 
               return (
                 <TableRow
-                  key={JSON.stringify(item) + String(index)}
+                  key={JSON.stringify(item)}
                   {...props}
                   rowSections={true}
                 >
                   {rowSections &&
                     rowSections(item)?.map(
-                      ({ element, span, width }, index2) => {
+                      ({ element: Element, span, width }, index2) => {
                         const [updatedSpanCount, isRightAligned] =
                           processRowSectionsLayout(spanCount, span);
                         spanCount = updatedSpanCount;
@@ -352,7 +352,9 @@ const Table: React.FC<ITable> = ({
                             {isMobile || isTablet ? (
                               <MobileHeader>{header[index2]}</MobileHeader>
                             ) : null}
-                            {element}
+                            {Element({
+                              smaller,
+                            })}
                           </MobileCardItem>
                         );
                       },

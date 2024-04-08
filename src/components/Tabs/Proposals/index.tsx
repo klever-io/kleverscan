@@ -121,7 +121,7 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
         return (
           <Tooltip
             Component={() => (
-              <DoubleRow>
+              <DoubleRow {...props}>
                 {renderProposalsNetworkParams(parsedParameters)}
               </DoubleRow>
             )}
@@ -158,11 +158,15 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
       }
       return <span style={{ color: 'red' }}>Unavailable</span>;
     };
-    const sections = [
-      { element: <p key={proposalId}>#{proposalId}</p>, span: 1, width: 100 },
+    const sections: IRowSection[] = [
       {
-        element: (
-          <DoubleRow key={proposer}>
+        element: props => <p key={proposalId}>#{proposalId}</p>,
+        span: 1,
+        width: 100,
+      },
+      {
+        element: props => (
+          <DoubleRow {...props} key={proposer}>
             <Link href={`/account/${proposer}`}>
               <a>{parseAddress(proposer, 16)}</a>
             </Link>
@@ -177,8 +181,8 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
         span: 1,
       },
       {
-        element: (
-          <DoubleRow key={`${epochStart}/${epochEnd}`}>
+        element: props => (
+          <DoubleRow {...props} key={`${epochStart}/${epochEnd}`}>
             <span>Created Epoch: {epochStart}</span>
             <span className="endTime">Ending Epoch: {epochEnd - 1}</span>
           </DoubleRow>
@@ -186,8 +190,8 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
         span: 1,
       },
       {
-        element: (
-          <DoubleRow key={String(votes)}>
+        element: props => (
+          <DoubleRow {...props} key={String(votes)}>
             <span>{getPositiveVotes()}</span>
             <span>{parseTotalStaked()}</span>
           </DoubleRow>
@@ -195,11 +199,11 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
         span: 1,
       },
       {
-        element: renderProposalsNetworkParamsWithToolTip(),
+        element: props => renderProposalsNetworkParamsWithToolTip(),
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <Link href={{ pathname: `/proposal/${proposalId}` }} key={proposalId}>
             <CustomLink> {t('common:Buttons.Details')}</CustomLink>
           </Link>

@@ -17,6 +17,24 @@ export const ContainerView = styled.div`
   width: 100%;
 `;
 
+export const TableGradientBorder = css`
+  border: 1px solid transparent;
+  background-image: linear-gradient(
+      ${props =>
+        props.theme.dark ? props.theme.background : props.theme.white},
+      ${props =>
+        props.theme.dark ? props.theme.background : props.theme.white}
+    ),
+    linear-gradient(
+      to bottom,
+      ${props => props.theme.gray800},
+      transparent 50%,
+      ${props => props.theme.gray800} 175%
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+`;
+
 export const TableBody = styled.div`
   min-width: fit-content;
   width: 100%;
@@ -30,22 +48,9 @@ export const TableBody = styled.div`
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
     display: block;
     border-radius: 16px;
-    border: solid 1px transparent;
     padding: 16px;
 
-    /* background + gradient border */
-    background-image: linear-gradient(
-        ${props => props.theme.table.background},
-        ${props => props.theme.table.background}
-      ),
-      linear-gradient(
-        to bottom,
-        ${props => props.theme.gray800},
-        transparent 50%,
-        ${props => props.theme.gray800} 175%
-      );
-    background-origin: border-box;
-    background-clip: padding-box, border-box;
+    ${TableGradientBorder}
   }
 `;
 

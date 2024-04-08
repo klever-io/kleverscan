@@ -3,7 +3,7 @@ import ProposalsCard from './ProposalsCard';
 import { CardsWrapper } from './style';
 import ValidatorsCard from './ValidatorsCard';
 
-const ProposalValidatorWrapper: React.FC = () => {
+const ProposalValidatorSection: React.FC = () => {
   return (
     <CardsWrapper>
       <ProposalsCard />
@@ -12,4 +12,4 @@ const ProposalValidatorWrapper: React.FC = () => {
   );
 };
 
-export default ProposalValidatorWrapper;
+export default ProposalValidatorSection;

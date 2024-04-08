@@ -13,7 +13,7 @@ import {
   DataContainer,
 } from '@/views/home';
 import React, { useEffect, useState } from 'react';
-import ProposalValidatorWrapper from './NewCards';
+import ProposalValidatorSection from './ProposalsAndValidatorsSection';
 
 const Home: React.FC = () => {
   const [wizard, setWizard] = useState(null);
@@ -45,7 +45,7 @@ const Home: React.FC = () => {
           <HomeTransactions />
           <BlockCardFetcher />
         </CardContainer>
-        <ProposalValidatorWrapper />
+        <ProposalValidatorSection />
       </Container>
     </HomeDataProvider>
   );

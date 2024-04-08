@@ -3,24 +3,23 @@ import Image from 'next/image';
 import React, { useContext } from 'react';
 import {
   CardContainer,
-  CardContent,
   CardSection,
+  Content,
   NextImageValidatorWrapper,
   StackedImageWrapper,
   Title,
 } from '../style';
-const ProposalsCard: React.FC = () => {
-  const { totalProposals, activeProposals } = useContext(HomeData);
 
+const ValidatorsCard: React.FC = () => {
+  const { totalValidators, activeValidators } = useContext(HomeData);
   return (
     <CardContainer>
-      <Title>Proposals</Title>
-      <CardContent>
+      <Title>
         <StackedImageWrapper>
           <NextImageValidatorWrapper>
             <Image
-              src="/homeCards/proposalsIcon.svg"
-              alt="Proposals icon"
+              src="/homeCards/validatorsIcon.svg"
+              alt="Validators icon"
               width={32}
               height={32}
               loader={({ src, width }) => `${src}?w=${width}`}
@@ -28,26 +27,29 @@ const ProposalsCard: React.FC = () => {
           </NextImageValidatorWrapper>
           <NextImageValidatorWrapper>
             <Image
-              src="/homeCards/proposalsBackground.svg"
-              alt="Proposals icon background"
+              src="/homeCards/validatorsBackground.svg"
+              alt="Validators icon background"
               width={48}
               height={48}
               loader={({ src, width }) => `${src}?w=${width}`}
             />
           </NextImageValidatorWrapper>
         </StackedImageWrapper>
+        <span>Validators</span>
+      </Title>
+
+      <Content>
         <CardSection>
-          <span>Live Proposals</span>
-          <span>{activeProposals}</span>
+          <span>Active Validators</span>
+          <span>{activeValidators}</span>
         </CardSection>
-        <hr />
         <CardSection>
-          <span>Completed Proposals</span>
-          <span>{totalProposals}</span>
+          <span>Total Validators</span>
+          <span>{totalValidators}</span>
         </CardSection>
-      </CardContent>
+      </Content>
     </CardContainer>
   );
 };
 
-export default ProposalsCard;
+export default ValidatorsCard;

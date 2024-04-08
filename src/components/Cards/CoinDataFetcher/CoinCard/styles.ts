@@ -1,4 +1,5 @@
 import { ArrowUpRightSquare, ArrowUpSquare, Currency } from '@/assets/icons';
+import { TableGradientBorder } from '@/components/TableV2/styles';
 import { DefaultCardStyles } from '@/styles/common';
 import { DataCardDefaultStyles } from '@/views/home';
 import Image from 'next/image';
@@ -55,28 +56,14 @@ export const Content = styled.div`
 `;
 
 export const CardContainer = styled.div`
+  ${TableGradientBorder}
+
   scroll-snap-align: start;
   position: relative;
   min-height: 17.4rem;
   align-items: center;
   min-width: 100%;
   border-radius: 12px;
-
-  border: 1px solid transparent;
-  background-image: linear-gradient(
-      ${props =>
-        props.theme.dark ? props.theme.background : props.theme.white},
-      ${props =>
-        props.theme.dark ? props.theme.background : props.theme.white}
-    ),
-    linear-gradient(
-      to bottom,
-      ${props => props.theme.gray800},
-      transparent 50%,
-      ${props => props.theme.gray800} 175%
-    );
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
 
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
     min-width: initial;

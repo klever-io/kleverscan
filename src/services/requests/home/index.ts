@@ -10,6 +10,7 @@ import {
   Service,
 } from '@/types';
 import { IBlock, IBlocksResponse } from '@/types/blocks';
+import { IProposal } from '@/types/proposals';
 import { getEpochInfo } from '@/utils';
 import { calcApr } from '@/utils/calcApr';
 
@@ -142,9 +143,26 @@ const homeProposalsCall = async (): Promise<
       route: 'proposals/list',
     });
     if (!res.error || res.error === '') {
-      if (typeof res.pagination.totalRecords === 'number') {
-        return { totalProposals: res.pagination.totalRecords };
-      }
+      return { totalProposals: res.pagination.totalRecords };
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const homeLastApprovedProposalCall = async (): Promise<
+  { approvedProposal: IProposal } | undefined
+> => {
+  try {
+    const res = await api.get({
+      route: 'proposals/list',
+      query: {
+        status: 'ApprovedProposal',
+        limit: 1,
+      },
+    });
+    if (!res.error || res.error === '') {
+      return { approvedProposal: res.data.proposals?.[0] };
     }
   } catch (error) {
     console.error(error);
@@ -152,17 +170,25 @@ const homeProposalsCall = async (): Promise<
 };
 
 const homeActiveProposalsCall = async (): Promise<
-  { totalActiveProposals: number } | undefined
+  | {
+      totalActiveProposals: number;
+      activeProposals: IProposal[];
+    }
+  | undefined
 > => {
   try {
     const res = await api.get({
       route: 'proposals/list',
-      query: { status: 'ActiveProposal' },
+      query: {
+        status: 'ActiveProposal',
+        limit: 2,
+      },
     });
     if (!res.error || res.error === '') {
-      if (typeof res.pagination.totalRecords === 'number') {
-        return { totalActiveProposals: res.pagination.totalRecords };
-      }
+      return {
+        totalActiveProposals: res.pagination.totalRecords,
+        activeProposals: res.data.proposals,
+      };
     }
   } catch (error) {
     console.error(error);
@@ -448,6 +474,7 @@ export {
   homeBeforeYesterdayTransactionsCall,
   homeProposalsCall,
   homeActiveProposalsCall,
+  homeLastApprovedProposalCall,
   homeTotalValidators,
   homeTotalActiveValidators,
   homeKlvDataCall,

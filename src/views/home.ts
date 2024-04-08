@@ -4,6 +4,7 @@ import {
   LineArrowUpSquare,
 } from '@/assets/icons';
 import { default as DefaultInput } from '@/components/InputGlobal';
+import { TableGradientBorder } from '@/components/TableV2/styles';
 import { DefaultCardStyles } from '@/styles/common';
 import { lighten, transparentize } from 'polished';
 import { BiChevronDownSquare } from 'react-icons/bi';
@@ -160,7 +161,7 @@ export const DataCardDefaultStyles = css`
 `;
 
 export const DataCard = styled.div`
-  ${DataCardDefaultStyles}
+  ${TableGradientBorder}
   padding: 1.2rem;
   padding-left: 2rem;
   width: 100%;
@@ -599,7 +600,7 @@ export const TransactionTimer = styled.div`
 `;
 
 export const TransactionChart = styled(TransactionContent)`
-  ${DataCardDefaultStyles}
+  ${TableGradientBorder}
   width: 100%;
   min-height: 100%;
   height: 320px;

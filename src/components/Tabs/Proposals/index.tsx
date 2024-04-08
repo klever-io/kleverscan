@@ -20,6 +20,36 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { FilterContainer, ProposalsContainer } from './styles';
 
+export const getProposalStatusColorAndText = (
+  status: string,
+): {
+  color: string;
+  text: string;
+} => {
+  switch (status) {
+    case 'ApprovedProposal':
+      return {
+        color: 'success',
+        text: 'Approved',
+      };
+    case 'DeniedProposal':
+      return {
+        color: 'fail',
+        text: 'Denied',
+      };
+    case 'ActiveProposal':
+      return {
+        color: 'pending',
+        text: 'Active',
+      };
+    default:
+      return {
+        color: 'text',
+        text: 'Unknown',
+      };
+  }
+};
+
 const Proposals: React.FC<IProposalsProps> = ({ request }) => {
   const { t } = useTranslation(['common', 'proposals']);
   const { isMobile, isTablet } = useMobile();
@@ -59,30 +89,8 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
       parsedParameters,
     } = props;
 
-    const getProposalStatusColorAndText = () => {
-      switch (proposalStatus) {
-        case 'ApprovedProposal':
-          return {
-            color: 'success',
-            text: 'Approved',
-          };
-        case 'DeniedProposal':
-          return {
-            color: 'fail',
-            text: 'Denied',
-          };
-        case 'ActiveProposal':
-          return {
-            color: 'pending',
-            text: 'Active',
-          };
-        default:
-          return {
-            color: 'text',
-            text: 'Unknown',
-          };
-      }
-    };
+    const proposalStatusColorAndText =
+      getProposalStatusColorAndText(proposalStatus);
 
     const renderProposalsNetworkParams = (
       fullParameters: IParsedProposalParam[] | undefined,
@@ -171,10 +179,10 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
               <a>{parseAddress(proposer, 16)}</a>
             </Link>
             <Status
-              status={getProposalStatusColorAndText().color}
+              status={proposalStatusColorAndText.color}
               key={proposalStatus}
             >
-              {getProposalStatusColorAndText().text}
+              {proposalStatusColorAndText.text}
             </Status>
           </DoubleRow>
         ),

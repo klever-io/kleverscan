@@ -110,12 +110,17 @@ export const Input = styled(DefaultInput)`
 
 export const DataCardsContainer = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: flex-start;
 
-  height: 256px;
+  height: auto;
 
   gap: 16px;
+
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    flex-direction: row;
+    height: 256px;
+  }
 `;
 
 export const DataCardsWrapper = styled.div`
@@ -597,6 +602,7 @@ export const TransactionChart = styled(TransactionContent)`
   ${DataCardDefaultStyles}
   width: 100%;
   min-height: 100%;
+  height: 320px;
   position: relative;
   display: flex;
   justify-content: space-between;
@@ -618,6 +624,10 @@ export const TransactionChart = styled(TransactionContent)`
   p {
     font-size: 1rem;
     color: ${props => props.theme.darkText};
+  }
+
+  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+    height: 100%;
   }
 `;
 

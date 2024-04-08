@@ -42,8 +42,7 @@ export const Content = styled.div`
   position: relative;
 
   flex-direction: row;
-  border: 1px solid
-    ${props => (props.theme.dark ? props.theme.blueGray500 : 'none')} !important;
+  border: none !important;
   ${DataCardDefaultStyles}
   background-color: ${props =>
     props.theme.dark ? 'transparent' : props.theme.true.white} !important;

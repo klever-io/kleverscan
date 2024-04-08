@@ -1,11 +1,10 @@
-import BlockCard from '@/components/Cards/BlockCardFetcher/BlockCard';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Table, { ITable } from '@/components/TableV2';
 import { useHomeData } from '@/contexts/mainPage';
-import { blockCall } from '@/services/apiCalls';
+import { defaultPagination } from '@/services/apiCalls';
 import { DoubleRow } from '@/styles/common';
 import { IBlock } from '@/types/blocks';
-import { IRowSection } from '@/types/index';
+import { IPaginatedResponse, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
@@ -14,11 +13,9 @@ import {
   ContainerHide,
   SectionCards,
   TransactionContainer,
-  TransactionEmpty,
 } from '@/views/home';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
 export const blocksHeader = [
@@ -122,33 +119,24 @@ const BlockCardFetcher: React.FC = () => {
   const { t } = useTranslation('blocks');
   const [hideMenu, setHideMenu] = useState(false);
 
-  const getBlocks = () => {
-    if (blocks && blocks.length) {
-      return blocks.map((block: IBlock, index) => {
-        return (
-          <BlockCard
-            blockIndex={index}
-            key={JSON.stringify(block)}
-            {...block}
-          />
-        );
-      });
-    }
-    return (
-      <TransactionEmpty>
-        <span>{commonT('EmptyData')}</span>
-      </TransactionEmpty>
-    );
+  const homeBlocksCall: (
+    page: number,
+    limit: number,
+  ) => Promise<IPaginatedResponse> = async (page = 1, limit = 10) => {
+    return {
+      data: { blocks },
+      error: '',
+      code: '',
+      pagination: defaultPagination,
+    };
   };
-
-  const router = useRouter();
 
   const tableProps: ITable = {
     type: 'blocks',
     header: blocksHeader,
     rowSections: blocksRowSections,
     dataName: 'blocks',
-    request: (page: number, limit: number) => blockCall(page, limit),
+    request: (page: number, limit: number) => homeBlocksCall(page, limit),
     showLimit: false,
     showPagination: false,
     smaller: true,

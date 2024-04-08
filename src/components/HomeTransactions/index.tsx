@@ -7,13 +7,10 @@ import {
 } from '@/components/TableV2/styles';
 import Tooltip from '@/components/Tooltip';
 import { useHomeData } from '@/contexts/mainPage';
-import {
-  getCustomFields,
-  requestTransactionsDefault,
-  toAddressSectionElement,
-} from '@/pages/transactions';
+import { getCustomFields, toAddressSectionElement } from '@/pages/transactions';
+import { defaultPagination } from '@/services/apiCalls';
 import { CenteredRow, DoubleRow } from '@/styles/common';
-import { IRowSection, ITransaction } from '@/types';
+import { IPaginatedResponse, IRowSection, ITransaction } from '@/types';
 import { Contract, ContractsName, ITransferContract } from '@/types/contracts';
 import { contractTypes, getLabelForTableField } from '@/utils/contracts';
 import { capitalizeString } from '@/utils/convertString';
@@ -152,12 +149,24 @@ const HomeTransactions: React.FC = () => {
 
   const router = useRouter();
 
+  const homeTransactionsCall: (
+    page: number,
+    limit: number,
+  ) => Promise<IPaginatedResponse> = async (page = 1, limit = 10) => {
+    return {
+      data: { transactions: homeTransactions },
+      error: '',
+      code: '',
+      pagination: defaultPagination,
+    };
+  };
+
   const tableProps: ITable = {
     type: 'transactions',
     header: homeTransactionTableHeaders,
     rowSections: homeTransactionsRowSections,
     dataName: 'transactions',
-    request: (page, limit) => requestTransactionsDefault(page, limit, router),
+    request: (page, limit) => homeTransactionsCall(page, limit),
     showLimit: false,
     showPagination: false,
     smaller: true,

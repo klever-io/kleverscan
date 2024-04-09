@@ -20,31 +20,33 @@ const FadeIn = keyframes`
 
 export const Container = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   position: relative;
   width: 100%;
+
+  gap: 16px;
+
   h1 {
     font-size: 1.6rem;
   }
+  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    flex-direction: row;
+  }
 `;
 
-export const Content = styled.div`
+export const Carousel = styled.div`
   display: flex;
-  width: 100%;
-  overflow-x: hidden;
   scroll-behavior: smooth !important;
   border-radius: ${props => (props.theme.dark ? 0 : '1rem')};
   scroll-snap-type: x mandatory;
   scroll-snap-stop: always;
 
-  width: 21rem;
   width: 100%;
-  overflow-y: hidden;
+  overflow: hidden;
   position: relative;
 
   flex-direction: row;
   border: none !important;
-  ${DataCardDefaultStyles}
   background-color: ${props =>
     props.theme.dark ? 'transparent' : props.theme.true.white} !important;
   &&::-webkit-scrollbar {
@@ -55,27 +57,36 @@ export const Content = styled.div`
   -ms-overflow-style: none;
 `;
 
-export const CardContainer = styled.div`
+export const CoinsContainer = styled.div`
   ${TableGradientBorder}
+  border-radius: 16px;
 
+  width: 50%;
+  position: relative;
+
+  display: flex;
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 100%;
+  }
+`;
+
+export const CardContainer = styled.div`
   scroll-snap-align: start;
   position: relative;
   min-height: 17.4rem;
   align-items: center;
   min-width: 100%;
-  border-radius: 12px;
+  padding-top: 40px;
 
-  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
-    min-width: initial;
-    width: 49%;
-    height: 24rem;
-  }
+  /* height: 24rem; */
 `;
 
 export const CardContent = styled.div`
   display: flex;
   flex-direction: column;
   min-width: 100%;
+  width: 100%;
 
   animation: 1.5s ease 0s 1 normal none running ${FadeIn};
   a {
@@ -298,35 +309,44 @@ export const IconContainer = styled(Image).attrs(_ => ({
 
 export const CoinsSelector = styled.div`
   display: flex;
-  width: 79px;
-  height: 32px;
   gap: 0.5rem;
+
+  position: absolute;
+  z-index: 1;
+  left: 16px;
+  top: 16px;
+
+  padding: 4px;
+
+  border-radius: 24px;
+
+  background-color: ${props => props.theme.blue};
+
   transition: 0.5s ease;
-  margin-bottom: 1rem;
 `;
 
 export const CoinSelector = styled.button<{ isSelected: boolean }>`
-  min-width: 100%;
+  width: 82px;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: ${({ theme }) => theme.true.white};
-  transition: 0.5s ease;
+  transition: 0.5s ease-out;
   font-style: normal;
   font-weight: 500;
   font-size: 12px;
-  line-height: 16px;
+  line-height: 24px;
   gap: 0.5rem;
   background-color: ${props =>
-    !props.isSelected ? props.theme.card.background : '#515395'};
+    props.isSelected ? props.theme.violet : 'transaparent'};
 
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.3);
 
   -webkit-user-select: none; /* Safari */
   user-select: none; /* Standard syntax */
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: 24px;
 `;
 
 export const ContainerLoading = styled.div`
@@ -438,6 +458,7 @@ export const ButtonContainer = styled.button<{ borderColor: string }>`
   ${DataCardDefaultStyles}
   display: flex;
   width: 193px;
+  aspect-ratio: 1;
 
   flex-direction: column;
   justify-content: space-between;
@@ -468,14 +489,14 @@ export const ButtonContainer = styled.button<{ borderColor: string }>`
     width: 100%;
     font-size: 1rem;
     font-weight: 700;
+
+    align-items: flex-start;
   }
   font-size: 1.25rem;
 
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    height: 11.5rem;
     margin-top: 0rem;
     align-items: flex-start;
-    padding: 16px 52px 16px 20px;
     text-align: start;
     color: ${props => props.theme.black};
   }
@@ -489,25 +510,14 @@ export const EnchangeLinks = styled.div`
   color: ${props => props.theme.true.white};
   font-size: 1rem;
   font-weight: 500;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    flex-direction: row;
+  }
 `;
 
 export const CurrencyIcon = styled(Currency)`
   position: absolute;
   bottom: 1rem;
   right: 1rem;
-`;
-
-export const ContentDeskTop = styled.div`
-  display: flex;
-  gap: 16px;
-  width: 100%;
-`;
-
-export const ContainerDesktop = styled.div`
-  display: flex;
-  width: 100%;
-  gap: 0.5rem;
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    display: none;
-  }
 `;

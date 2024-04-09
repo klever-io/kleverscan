@@ -4,9 +4,9 @@ import React from 'react';
 import {
   CardContainerSkeleton,
   CardContent,
+  Carousel,
   ChartContainerSkeleton,
   Container,
-  Content,
   HeaderContainer,
   HeaderContentSkeleton,
   Name,
@@ -15,7 +15,7 @@ import {
 const CoinCardSkeleton: React.FC = () => {
   return (
     <Container>
-      <Content style={{ marginBottom: '1rem' }}>
+      <Carousel style={{ marginBottom: '1rem' }}>
         {Array(2)
           .fill(2)
           .map((_, index) => (
@@ -46,7 +46,7 @@ const CoinCardSkeleton: React.FC = () => {
               </CardContent>
             </CardContainerSkeleton>
           ))}
-      </Content>
+      </Carousel>
     </Container>
   );
 };

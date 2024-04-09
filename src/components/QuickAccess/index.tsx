@@ -2,9 +2,13 @@ import { useTranslation } from 'next-i18next';
 import React, { useState } from 'react';
 import SquarePlus from '../../../public/SquarePlus.svg';
 import ModalContract, { IModalContract } from '../Contract/ModalContract';
-import { Title } from '../InputGlobal/HomeInput/styles';
-import { Carousel } from './Carousel';
-import { CardItem, Container, PlusIcon, TitleContainer } from './styles';
+import {
+  CardItem,
+  Container,
+  Content,
+  PlusIcon,
+  TitleContainer,
+} from './styles';
 
 interface IShortCutContract {
   title: string;
@@ -64,10 +68,9 @@ const QuickAccess: React.FC<{
   return (
     <Container>
       <TitleContainer>
-        <Title>{t('QuickAccess')}</Title>
         <small>{t('QuickAccess Description')}</small>
       </TitleContainer>
-      <Carousel>
+      <Content>
         {quickAccessContract.map(contract => (
           <CardItem
             key={JSON.stringify(contract.title)}
@@ -79,7 +82,7 @@ const QuickAccess: React.FC<{
             <p>{contract.title}</p>
           </CardItem>
         ))}
-      </Carousel>
+      </Content>
       {openModalTransactions && <ModalContract {...modalOptions} />}
     </Container>
   );

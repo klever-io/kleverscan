@@ -2,6 +2,7 @@ import { ContractProvider } from '@/contexts/contract';
 import { FeesProvider } from '@/contexts/contract/fees';
 import { ModalsProvider } from '@/contexts/contract/modals';
 import { MulticontractProvider } from '@/contexts/contract/multicontract';
+import { WizardProvider } from '@/contexts/contract/wizard';
 import { ContractModalProvider } from '@/contexts/contractModal';
 import { ExtensionProvider } from '@/contexts/extension';
 import { InputSearchProvider } from '@/contexts/inputSearch';
@@ -33,7 +34,7 @@ const ContextProviders: React.FC = ({ children }) => {
                     <InputSearchProvider>
                       <ParticipateProvider>
                         <ContractModalProvider>
-                          {children}
+                          <WizardProvider>{children}</WizardProvider>
                         </ContractModalProvider>
                       </ParticipateProvider>
                     </InputSearchProvider>

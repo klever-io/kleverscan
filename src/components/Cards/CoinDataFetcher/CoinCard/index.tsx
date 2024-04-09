@@ -2,7 +2,8 @@ import { BitcoinMe, VoxSwap } from '@/assets/swap-exchange';
 import { ChartType } from '@/components/Chart';
 import { PriceTooltip } from '@/components/Chart/Tooltips';
 import { Loader } from '@/components/Loader/styles';
-import { useMobile } from '@/contexts/mobile';
+import QuickAccess from '@/components/QuickAccess';
+import { useWizard } from '@/contexts/contract/wizard';
 import {
   homeKfiCall,
   homeKfiChartCall,
@@ -33,13 +34,12 @@ import {
   CardContainer,
   CardContent,
   CardContentError,
+  Carousel,
   ChartContainer,
+  CoinsContainer,
   CoinSelector,
   CoinsSelector,
   Container,
-  ContainerDesktop,
-  Content,
-  ContentDeskTop,
   ContentError,
   Description,
   EnchangeLinks,
@@ -220,8 +220,8 @@ const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
     </CardContainer>
   );
 };
+
 const CoinCard: React.FC = () => {
-  const { t } = useTranslation('home');
   const [selectedCoin, setSelectedCoin] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -229,7 +229,8 @@ const CoinCard: React.FC = () => {
     KLV: 1,
     KFI: 1,
   });
-  const { isTablet } = useMobile();
+  const { setWizard } = useWizard();
+
   const handleSelectCoin = useCallback(() => {
     if (carouselRef.current !== null && cardRef.current !== null)
       setSelectedCoin(
@@ -381,81 +382,50 @@ const CoinCard: React.FC = () => {
 
   return (
     <Container>
-      {!isTablet ? (
-        <ContainerDesktop>
-          <ContentDeskTop>
-            <RenderCoinsCard
-              renderKfiMarketCap={renderKfiMarketCap}
-              assetsData={assetsData}
-              refetchCoin={refetchCoinsCall[0]}
-              coinDays={coinDays}
-              cardRef={cardRef}
-              coin={coins[0]}
-            />
-            <EnchangeLinks>
-              {swapExchangeInfo.map((item, index) => (
-                <ButtonContainer key={index} borderColor={item.color}>
-                  <a target="_blank" href={item.url} rel="noreferrer">
-                    {item.text}
-                  </a>
-                  {item.icon}
-                </ButtonContainer>
-              ))}
-            </EnchangeLinks>
-            <RenderCoinsCard
-              renderKfiMarketCap={renderKfiMarketCap}
-              assetsData={assetsData}
-              refetchCoin={refetchCoinsCall[1]}
-              coinDays={coinDays}
-              cardRef={cardRef}
-              coin={coins[1]}
-            />
-          </ContentDeskTop>
-        </ContainerDesktop>
-      ) : (
-        <>
-          <h1>Featured tokens</h1>
-          <CoinsSelector>
+      <QuickAccess setWizard={setWizard} />
+      <EnchangeLinks>
+        {swapExchangeInfo.map((item, index) => (
+          <ButtonContainer key={index} borderColor={item.color}>
+            <a target="_blank" href={item.url} rel="noreferrer">
+              {item.text}
+            </a>
+            {item.icon}
+          </ButtonContainer>
+        ))}
+      </EnchangeLinks>
+
+      <CoinsContainer>
+        <CoinsSelector>
+          {coins.map((coin, index) => (
+            <CoinSelector
+              key={String(index)}
+              isSelected={selectedCoin === index}
+              onClick={() => {
+                handleSelection(index);
+              }}
+            >
+              {coin.shortname}
+            </CoinSelector>
+          ))}
+        </CoinsSelector>
+        {!boolChecker(coinsLoadingBool) ? (
+          <Carousel ref={carouselRef} onScroll={handleSelectCoin}>
             {coins.map((coin, index) => (
-              <CoinSelector
-                key={String(index)}
-                isSelected={selectedCoin === index}
-                onClick={() => {
-                  handleSelection(index);
-                }}
-              >
-                <IconContainer
-                  src={`/coins/${coin.shortname.toLowerCase()}.png`}
-                  width={20}
-                  height={20}
-                  loader={({ src, width }: { src: string; width: number }) =>
-                    `${src}?w=${width}`
-                  }
-                />
-                <p>{coin.shortname}</p>
-              </CoinSelector>
+              <RenderCoinsCard
+                renderKfiMarketCap={renderKfiMarketCap}
+                assetsData={assetsData}
+                refetchCoin={refetchCoinsCall[index]}
+                cardRef={cardRef}
+                coinDays={coinDays}
+                coin={coin}
+                key={index}
+              />
             ))}
-          </CoinsSelector>
-          {!boolChecker(coinsLoadingBool) ? (
-            <Content ref={carouselRef} onScroll={handleSelectCoin}>
-              {coins.map((coin, index) => (
-                <RenderCoinsCard
-                  renderKfiMarketCap={renderKfiMarketCap}
-                  assetsData={assetsData}
-                  refetchCoin={refetchCoinsCall[index]}
-                  cardRef={cardRef}
-                  coinDays={coinDays}
-                  coin={coin}
-                  key={index}
-                />
-              ))}
-            </Content>
-          ) : (
-            <CoinCardSkeleton />
-          )}
-        </>
-      )}
-      <CoinsFetchFails />
+          </Carousel>
+        ) : (
+          <CoinCardSkeleton />
+        )}
+      </CoinsContainer>
     </Container>
   );
 };

@@ -1,13 +1,14 @@
 import { DefaultCardStyles } from '@/styles/common';
 import styled from 'styled-components';
+import { TableGradientBorder } from '../TableV2/styles';
 
 export const Container = styled.div`
+  ${TableGradientBorder}
   width: 100%;
   color: white;
-  padding: 2.5rem 0 0 1rem;
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding: 2rem 0 0 1rem;
-  }
+
+  padding: 16px 24px;
+  border-radius: 16px;
 `;
 
 export const TitleContainer = styled.div`
@@ -27,20 +28,22 @@ export const CardItem = styled.div`
   flex-direction: column;
   justify-content: space-between;
   padding: 0 20px 10px;
-  width: 8.5rem;
-  height: 8.125rem;
-  margin-bottom: 1rem;
+  height: 94px;
 
-  background: ${props => props.theme.dark && props.theme.blue};
   border-radius: 0.5rem;
+  border: 1px solid ${props => props.theme.violet};
   cursor: pointer;
   p {
     color: ${props => props.theme.black};
     font-weight: 700;
     font-size: 0.9rem;
   }
-  :hover {
-    opacity: 0.55;
+
+  transition: 0.25s ease-in-out;
+
+  :hover,
+  :focus {
+    background-color: ${props => props.theme.violet};
   }
 `;
 export const PlusIcon = styled.div`
@@ -56,4 +59,11 @@ export const PlusIcon = styled.div`
           : props.theme.violet} !important;
     }
   }
+`;
+
+export const Content = styled.div`
+  display: grid;
+  gap: 8px;
+
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
 `;

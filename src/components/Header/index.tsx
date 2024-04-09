@@ -8,7 +8,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useRef, useState } from 'react';
-import NetworkRedirectButton from '../NetworkRedirectButton';
 import ConnectWallet from './ConnectWallet';
 import OptionsContainer from './OptionsContainer';
 import {
@@ -208,7 +207,6 @@ const Navbar: React.FC = () => {
                 <DesktopSubWrapper>
                   {router.pathname !== '/' && <Input />}
                   <ConnectWallet clickConnection={closeDrawer} />
-                  <NetworkRedirectButton />
                   <OptionsContainer />
                 </DesktopSubWrapper>
               </DesktopContainer>
@@ -256,7 +254,6 @@ const Navbar: React.FC = () => {
                   >
                     <ConnectWallet clickConnection={closeDrawer} />
                   </ConnectContainer>
-                  <NetworkRedirectButton />
                 </>
               )}
 
@@ -275,7 +272,6 @@ const Navbar: React.FC = () => {
             >
               <ConnectWallet clickConnection={closeDrawer} />
             </ConnectContainer>
-            <NetworkRedirectButton />
           </ConnectionWrapper>
         )}
       </Container>

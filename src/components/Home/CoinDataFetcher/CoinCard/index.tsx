@@ -236,7 +236,9 @@ const CoinCard: React.FC = () => {
   const handleSelectCoin = useCallback(() => {
     if (carouselRef.current !== null && cardRef.current !== null)
       setSelectedCoin(
-        carouselRef.current.scrollLeft / cardRef.current.offsetWidth,
+        Math.round(
+          carouselRef.current.scrollLeft / cardRef.current.offsetWidth,
+        ),
       );
   }, [carouselRef, cardRef]);
 

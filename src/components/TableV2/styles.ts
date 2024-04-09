@@ -35,7 +35,7 @@ export const TableGradientBorder = css`
   background-clip: padding-box, border-box;
 `;
 
-export const TableBody = styled.div`
+export const TableBody = styled.div<{ smaller?: boolean }>`
   min-width: fit-content;
   width: 100%;
 
@@ -50,6 +50,12 @@ export const TableBody = styled.div`
     border-radius: 16px;
     padding: 16px;
 
+    ${props =>
+      props.smaller &&
+      css`
+        padding: 8px;
+      `}
+
     ${TableGradientBorder}
   }
 `;
@@ -57,14 +63,14 @@ export const TableBody = styled.div`
 export const HeaderItem = styled.div<{ smaller?: boolean }>`
   display: table-cell;
   padding: 6px 16px;
-  margin-bottom: 16px;
+  padding-bottom: 32px;
 
   ${props =>
     props.smaller &&
     css`
-      font-size: 0.875rem;
+      font-size: 0.75rem;
       padding: 4px 8px;
-      margin-bottom: 8px;
+      padding-bottom: 16px;
     `}
 `;
 

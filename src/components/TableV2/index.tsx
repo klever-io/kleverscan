@@ -229,7 +229,7 @@ const Table: React.FC<ITable> = ({
         </FloatContainer>
       )}
       <ContainerView ref={tableRef}>
-        <TableBody>
+        <TableBody smaller={smaller}>
           {!isMobile && !isTablet && rowSections && (
             <TableRow>
               {header?.map((item, index) => (

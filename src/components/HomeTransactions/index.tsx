@@ -1,3 +1,4 @@
+import { PurpleArrowRight } from '@/assets/icons';
 import Copy from '@/components/Copy';
 import { MultiContractToolTip } from '@/components/MultiContractToolTip';
 import {
@@ -7,6 +8,7 @@ import {
 } from '@/components/TableV2/styles';
 import Tooltip from '@/components/Tooltip';
 import { useHomeData } from '@/contexts/mainPage';
+import { useMobile } from '@/contexts/mobile';
 import { getCustomFields, toAddressSectionElement } from '@/pages/transactions';
 import { defaultPagination } from '@/services/apiCalls';
 import { CenteredRow, DoubleRow } from '@/styles/common';
@@ -146,6 +148,7 @@ const HomeTransactions: React.FC = () => {
   const { t } = useTranslation('transactions');
   const { transactions: homeTransactions } = useHomeData();
   const [hideMenu, setHideMenu] = useState(false);
+  const { isTablet } = useMobile();
 
   const router = useRouter();
 
@@ -177,6 +180,18 @@ const HomeTransactions: React.FC = () => {
     <SectionCards>
       <ContainerHide>
         <h1>{t('Last Transactions')}</h1>
+        <Link
+          href={{
+            pathname: '/transactions',
+          }}
+        >
+          <a>
+            {' '}
+            View All
+            <PurpleArrowRight />
+          </a>
+        </Link>
+
         <div onClick={() => setHideMenu(!hideMenu)}>
           <p>{hideMenu ? 'Show' : 'Hide'}</p>
           <ArrowUpSquareHideMenu $hide={hideMenu} />

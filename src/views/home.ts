@@ -67,6 +67,9 @@ export const Section = styled.section`
 `;
 
 export const SectionCards = styled(Section)`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
     width: 50%;
   }
@@ -84,7 +87,7 @@ export const CardContainer = styled.div`
   flex-direction: column;
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: row;
-    gap: 32px;
+    gap: 16px;
   }
 `;
 
@@ -828,7 +831,7 @@ export const ContainerHide = styled.div`
   align-items: center;
   justify-content: space-between;
   color: white;
-  margin-bottom: 1.5rem;
+
   > h1 {
     margin: 0;
     font-weight: 500;
@@ -847,6 +850,17 @@ export const ContainerHide = styled.div`
         fill: ${({ theme }) => theme.black};
       }
     }
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 1rem;
+
+    color: ${({ theme }) => theme.violet};
+    font-size: 0.875rem;
+    line-height: 1rem;
   }
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     div {

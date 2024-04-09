@@ -1,3 +1,4 @@
+import { PurpleArrowRight } from '@/assets/icons';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Table, { ITable } from '@/components/TableV2';
 import { useHomeData } from '@/contexts/mainPage';
@@ -147,11 +148,23 @@ const BlockCardFetcher: React.FC = () => {
     <SectionCards>
       <ContainerHide>
         <h1>{t('Recent Blocks')}</h1>
+
+        <Link
+          href={{
+            pathname: '/transactions',
+          }}
+        >
+          <a>
+            View All
+            <PurpleArrowRight />
+          </a>
+        </Link>
         <div onClick={() => setHideMenu(!hideMenu)}>
           <p>{hideMenu ? 'Show' : 'Hide'}</p>
           <ArrowUpSquareHideMenu $hide={hideMenu} />
         </div>
       </ContainerHide>
+
       <TransactionContainer>
         {!hideMenu && <Table {...tableProps} />}
       </TransactionContainer>

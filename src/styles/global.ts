@@ -17,6 +17,8 @@ export default createGlobalStyle`
 
   a, a:hover, a:focus, a:active {
     color: inherit;
+    text-underline-offset: 0.2rem;
+
   }
   
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {

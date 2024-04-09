@@ -1,4 +1,5 @@
 import { HomeData } from '@/contexts/mainPage';
+import { IProposal } from '@/types/proposals';
 import Image from 'next/image';
 import React, { useContext } from 'react';
 import {
@@ -60,14 +61,33 @@ const ProposalsCard: React.FC = () => {
 
       <ProposalCardsSection>
         <ProposalCardTitle>Last Approved Proposal</ProposalCardTitle>
-        {lastApprovedProposal && <Proposal proposal={lastApprovedProposal} />}
+        {lastApprovedProposal?.proposalId !== undefined ? (
+          <Proposal proposal={lastApprovedProposal} />
+        ) : (
+          <Proposal
+            proposal={
+              {
+                description: 'No approved proposals',
+              } as IProposal
+            }
+          />
+        )}
       </ProposalCardsSection>
       <ProposalCardsSection>
         <ProposalCardTitle>Active Proposals</ProposalCardTitle>
-        {activeProposals &&
+        {activeProposals && (activeProposals?.length || 0) > 0 ? (
           activeProposals.map(proposal => (
             <Proposal key={proposal.proposalId} proposal={proposal} />
-          ))}
+          ))
+        ) : (
+          <Proposal
+            proposal={
+              {
+                description: 'No active proposals',
+              } as IProposal
+            }
+          />
+        )}
       </ProposalCardsSection>
     </CardContainer>
   );

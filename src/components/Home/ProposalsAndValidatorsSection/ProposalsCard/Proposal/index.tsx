@@ -18,12 +18,14 @@ export const Proposal: React.FC<ProposalProps> = ({ proposal }) => {
     getProposalStatusColorAndText(proposalStatus);
   return (
     <ProposalContainer>
-      <ProposalTitle>
-        Proposal #{proposalId}
-        <Status status={proposalStatusColorAndText.color}>
-          {proposalStatusColorAndText.text}
-        </Status>
-      </ProposalTitle>
+      {proposalId && (
+        <ProposalTitle>
+          Proposal #{proposalId}
+          <Status status={proposalStatusColorAndText.color}>
+            {proposalStatusColorAndText.text}
+          </Status>
+        </ProposalTitle>
+      )}
       <ProposalDescription>{description}</ProposalDescription>
     </ProposalContainer>
   );

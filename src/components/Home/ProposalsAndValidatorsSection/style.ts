@@ -124,6 +124,13 @@ export const ProposalTitle = styled.span`
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  > span {
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+    color: ${props => props.theme.darkText};
+  }
 `;
 
 export const ProposalContainer = styled.div`

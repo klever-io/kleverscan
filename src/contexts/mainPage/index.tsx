@@ -6,13 +6,14 @@ import {
   homeGetAggregateCall,
   homeGetBlocksCall,
   homeLastApprovedProposalCall,
+  homeNodes,
   homeProposalsCall,
   homeTotalActiveValidators,
   homeTotalValidators,
   homeTransactionsCall,
   homeYesterdayAccountsCall,
 } from '@/services/requests/home';
-import { IEpochInfo, ITransaction } from '@/types';
+import { IEpochInfo, ITransaction, Node } from '@/types';
 import { IBlock } from '@/types/blocks';
 import { IProposal } from '@/types/proposals';
 import { createContext, useContext } from 'react';
@@ -39,6 +40,7 @@ export interface IHomeData {
   totalValidators?: number;
   activeValidators?: number;
   lastApprovedProposal?: IProposal;
+  nodes?: Node[];
 }
 
 export const HomeData = createContext({} as IHomeData);
@@ -58,6 +60,7 @@ export const HomeDataProvider: React.FC = ({ children }) => {
     approvedProposalsResult,
     validatorsResult,
     activeValidatorsResult,
+    nodes,
   ] = useQueries([
     {
       queryKey: 'aggregateData',
@@ -114,6 +117,11 @@ export const HomeDataProvider: React.FC = ({ children }) => {
       queryFn: homeTotalActiveValidators,
       refetchInterval: watcherTimeout,
     },
+    {
+      queryKey: 'nodesData',
+      queryFn: homeNodes,
+      refetchInterval: watcherTimeout,
+    },
   ]);
 
   const values: IHomeData = {
@@ -137,6 +145,7 @@ export const HomeDataProvider: React.FC = ({ children }) => {
     totalValidators: validatorsResult.data?.totalValidators,
     activeValidators: activeValidatorsResult.data?.totalActiveValidators,
     lastApprovedProposal: approvedProposalsResult.data?.approvedProposal,
+    nodes: nodes.data?.nodes,
   };
 
   return <HomeData.Provider value={values}>{children}</HomeData.Provider>;

@@ -115,25 +115,49 @@ export const ProposalCardTitle = styled.span`
     props.theme.dark ? props.theme.true.white : props.theme.true.black};
 `;
 
-export const ProposalTitle = styled.span`
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.5rem;
-  color: ${props => props.theme.violet};
-
+export const CardHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
 
   > span {
+    margin-left: auto;
     font-size: 0.875rem;
     font-weight: 500;
     line-height: 1.25rem;
     color: ${props => props.theme.darkText};
   }
+
+  a {
+    text-decoration: underline;
+    text-underline-offset: 0.2rem;
+  }
+
+  a:hover,
+  a:active,
+  a:focus {
+    color: ${props => props.theme.violet};
+  }
 `;
 
-export const ProposalContainer = styled.div`
+export const ArrowIconContainer = styled.a`
+  display: flex;
+  align-items: center;
+`;
+
+export const CardTitle = styled.a`
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5rem;
+  color: ${props => props.theme.violet};
+
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+export const InnerCardContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -143,7 +167,7 @@ export const ProposalContainer = styled.div`
   padding: 16px 12px;
 `;
 
-export const ProposalDescription = styled.span`
+export const CardDescription = styled.span`
   font-size: 0.825rem;
   font-weight: 300;
   line-height: 1rem;
@@ -164,4 +188,8 @@ export const ProposalStatus = styled.div`
   line-height: 1rem;
   color: ${props =>
     props.theme.dark ? props.theme.text.gray : props.theme.darkText};
+`;
+
+export const Timestamp = styled.span`
+  margin-left: auto;
 `;

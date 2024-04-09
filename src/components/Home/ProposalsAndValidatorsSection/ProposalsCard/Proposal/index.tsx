@@ -1,10 +1,13 @@
+import { PurpleArrowRight } from '@/assets/icons';
 import { Status } from '@/components/TableV2/styles';
 import { getProposalStatusColorAndText } from '@/components/Tabs/Proposals';
 import { IProposal } from '@/types/proposals';
 import {
-  ProposalContainer,
-  ProposalDescription,
-  ProposalTitle,
+  ArrowIconContainer,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  InnerCardContainer,
 } from '../../style';
 
 interface ProposalProps {
@@ -17,16 +20,21 @@ export const Proposal: React.FC<ProposalProps> = ({ proposal }) => {
   const proposalStatusColorAndText =
     getProposalStatusColorAndText(proposalStatus);
   return (
-    <ProposalContainer>
+    <InnerCardContainer>
       {proposalId && (
-        <ProposalTitle>
-          Proposal #{proposalId}
+        <CardHeader>
+          <CardTitle href={`/proposals/${proposalId}`}>
+            Proposal #{proposalId}
+          </CardTitle>
+          <ArrowIconContainer href={`/proposals/${proposalId}`}>
+            <PurpleArrowRight />
+          </ArrowIconContainer>
           <Status status={proposalStatusColorAndText.color}>
             {proposalStatusColorAndText.text}
           </Status>
-        </ProposalTitle>
+        </CardHeader>
       )}
-      <ProposalDescription>{description}</ProposalDescription>
-    </ProposalContainer>
+      <CardDescription>{description}</CardDescription>
+    </InnerCardContainer>
   );
 };

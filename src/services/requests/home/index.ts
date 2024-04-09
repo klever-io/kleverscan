@@ -7,6 +7,7 @@ import {
   IGeckoChartResponse,
   IGeckoResponse,
   ITransaction,
+  Node,
   Service,
 } from '@/types';
 import { IBlock, IBlocksResponse } from '@/types/blocks';
@@ -227,6 +228,24 @@ const homeTotalActiveValidators = async (): Promise<
       if (typeof res.pagination.totalRecords === 'number') {
         return { totalActiveValidators: res.pagination.totalRecords };
       }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const homeNodes = async (): Promise<
+  | {
+      nodes: Node[];
+    }
+  | undefined
+> => {
+  try {
+    const res = await api.get({
+      route: 'node/locations',
+    });
+    if (!res.error || res.error === '') {
+      return { nodes: res.data.locations };
     }
   } catch (error) {
     console.error(error);
@@ -473,6 +492,7 @@ export {
   homeTransactionsCall,
   homeBeforeYesterdayTransactionsCall,
   homeProposalsCall,
+  homeNodes,
   homeActiveProposalsCall,
   homeLastApprovedProposalCall,
   homeTotalValidators,

@@ -1086,3 +1086,11 @@ export type SearchRequest =
 export interface NotFound {
   notFound: true;
 }
+
+export interface Nodes {
+  locations: Node[];
+}
+
+export interface Node {
+  coordinates: [number, number];
+}

@@ -1,4 +1,6 @@
 import { HomeData } from '@/contexts/mainPage';
+import { MapContainer } from '@/views/nodes';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import React, { useContext } from 'react';
 import {
@@ -9,9 +11,12 @@ import {
   StackedImageWrapper,
   Title,
 } from '../style';
+import { LastBlock } from './LastBlock';
+
+const Map = dynamic(() => import('@/components/Map/index'), { ssr: false });
 
 const ValidatorsCard: React.FC = () => {
-  const { totalValidators, activeValidators } = useContext(HomeData);
+  const { totalValidators, activeValidators, nodes } = useContext(HomeData);
   return (
     <CardContainer>
       <Title>
@@ -48,6 +53,12 @@ const ValidatorsCard: React.FC = () => {
           <span>{totalValidators}</span>
         </CardSection>
       </Content>
+
+      <MapContainer>
+        <Map nodes={nodes} />
+      </MapContainer>
+
+      <LastBlock />
     </CardContainer>
   );
 };

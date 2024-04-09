@@ -16,7 +16,6 @@ export default createGlobalStyle`
   }
 
   a, a:hover, a:focus, a:active {
-    text-decoration: none;
     color: inherit;
   }
   

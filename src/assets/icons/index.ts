@@ -29,6 +29,7 @@ import PlusSquare from './plus-square.svg';
 import PlusWhite from './plus-white.svg';
 import Plus from './plus.svg';
 import Proposal from './proposal.svg';
+import PurpleArrowRight from './purple-arrow-right.svg';
 import QRCode from './qr-code.svg';
 import Receive from './receive.svg';
 import Redirect from './redirect.svg';
@@ -100,4 +101,5 @@ export {
   FilterArrowDown,
   Refresh,
   PageDownload,
+  PurpleArrowRight,
 };

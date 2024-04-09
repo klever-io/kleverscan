@@ -1,8 +1,8 @@
 import { BitcoinMe, VoxSwap } from '@/assets/swap-exchange';
 import { ChartType } from '@/components/Chart';
 import { PriceTooltip } from '@/components/Chart/Tooltips';
+import QuickAccess from '@/components/Home/QuickAccess';
 import { Loader } from '@/components/Loader/styles';
-import QuickAccess from '@/components/QuickAccess';
 import { useWizard } from '@/contexts/contract/wizard';
 import {
   homeKfiCall,
@@ -22,6 +22,7 @@ import {
 import { getVariation } from '@/utils';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
+import { ImageLoaderProps } from 'next/image';
 import Link from 'next/link';
 import React, { useCallback, useRef, useState } from 'react';
 import { IoReloadSharp } from 'react-icons/io5';
@@ -118,8 +119,9 @@ const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
                 src={`/coins/${shortname.toLowerCase()}.png`}
                 width={50}
                 height={50}
-                loader={({ src, width }: { src: string; width: number }) =>
-                  `${src}?w=${width}`
+                quality={100}
+                loader={({ src, width, quality }: ImageLoaderProps) =>
+                  `${src}?w=${width}&q=${quality || 100}`
                 }
               />
 

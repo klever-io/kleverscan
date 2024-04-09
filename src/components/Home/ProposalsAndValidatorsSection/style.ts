@@ -9,7 +9,7 @@ export const CardContainer = styled.div`
   flex-direction: column;
   gap: 8px;
 
-  width: 50%;
+  width: 100%;
 
   hr {
     display: block;

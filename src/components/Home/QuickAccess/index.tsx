@@ -1,18 +1,22 @@
+import { Currency, PaperPlus, Token, Transfer } from '@/assets/transaction';
 import { useTranslation } from 'next-i18next';
 import React, { useState } from 'react';
-import SquarePlus from '../../../public/SquarePlus.svg';
-import ModalContract, { IModalContract } from '../Contract/ModalContract';
+import { FaRegSnowflake, FaRocket, FaVoteYea } from 'react-icons/fa';
+import SquarePlus from '../../../../public/SquarePlus.svg';
+import ModalContract, { IModalContract } from '../../Contract/ModalContract';
 import {
   CardItem,
   Container,
   Content,
   PlusIcon,
+  Title,
   TitleContainer,
 } from './styles';
 
 interface IShortCutContract {
   title: string;
   type: string;
+  icon?: JSX.Element;
   openWiz?: () => void;
 }
 
@@ -26,26 +30,41 @@ const QuickAccess: React.FC<{
   const [titleModal, setTitleModal] = useState('');
 
   const quickAccessContract: IShortCutContract[] = [
-    { title: 'Transfer', type: 'TransferContract' },
+    {
+      title: 'Transfer',
+      type: 'TransferContract',
+      icon: <Transfer />,
+    },
     {
       title: 'Create Token',
       type: 'CreateAssetContract',
       openWiz: () => setWizard('Token'),
+      icon: <Currency />,
     },
     {
       title: 'Create NFT',
       type: 'CreateAssetContract',
       openWiz: () => setWizard('NFT'),
+      icon: <Token />,
     },
     {
       title: 'Create ITO',
       type: 'ConfigITOContract',
       openWiz: () => setWizard('ITO'),
+      icon: <FaRocket size={22} />,
     },
-    { title: 'Freeze', type: 'FreezeContract' },
-    { title: 'Vote', type: 'VoteContract' },
-    { title: 'Proposal', type: 'ProposalContract' },
-    { title: 'Create Validator', type: 'CreateValidatorContract' },
+    {
+      title: 'Freeze',
+      type: 'FreezeContract',
+      icon: <FaRegSnowflake size={22} />,
+    },
+    { title: 'Vote', type: 'VoteContract', icon: <FaVoteYea size={22} /> },
+    { title: 'Proposal', type: 'ProposalContract', icon: <PaperPlus /> },
+    {
+      title: 'Create Validator',
+      type: 'CreateValidatorContract',
+      icon: <SquarePlus />,
+    },
   ];
 
   const modalOptions: IModalContract = {
@@ -69,6 +88,7 @@ const QuickAccess: React.FC<{
     <Container>
       <TitleContainer>
         <small>{t('QuickAccess Description')}</small>
+        <Title>{t('QuickAccess')}</Title>
       </TitleContainer>
       <Content>
         {quickAccessContract.map(contract => (
@@ -76,9 +96,7 @@ const QuickAccess: React.FC<{
             key={JSON.stringify(contract.title)}
             onClick={e => handleClick(contract, e)}
           >
-            <PlusIcon>
-              <SquarePlus />
-            </PlusIcon>
+            <PlusIcon>{contract.icon}</PlusIcon>
             <p>{contract.title}</p>
           </CardItem>
         ))}

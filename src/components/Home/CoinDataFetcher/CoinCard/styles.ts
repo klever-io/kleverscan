@@ -61,7 +61,7 @@ export const CoinsContainer = styled.div`
   ${TableGradientBorder}
   border-radius: 16px;
 
-  width: 50%;
+  width: calc((100% - 225px) / 2);
   position: relative;
 
   display: flex;
@@ -74,10 +74,9 @@ export const CoinsContainer = styled.div`
 export const CardContainer = styled.div`
   scroll-snap-align: start;
   position: relative;
-  min-height: 17.4rem;
   align-items: center;
   min-width: 100%;
-  padding-top: 40px;
+  padding: 40px 16px 16px;
 
   /* height: 24rem; */
 `;
@@ -117,7 +116,7 @@ export const CardContainerSkeleton = styled(CardContainer)`
 
 export const HeaderContainer = styled.div`
   display: flex;
-  padding: 1.5rem;
+  padding: 16px 0px;
   flex-direction: row;
 
   z-index: 0;
@@ -305,6 +304,8 @@ export const IconContainer = styled(Image).attrs(_ => ({
 }))`
   cursor: pointer;
   padding-right: 1rem;
+
+  border-radius: 50%;
 `;
 
 export const CoinsSelector = styled.div`
@@ -486,7 +487,6 @@ export const ButtonContainer = styled.button<{ borderColor: string }>`
     }
   }
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 100%;
     font-size: 1rem;
     font-weight: 700;
 

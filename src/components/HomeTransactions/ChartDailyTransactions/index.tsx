@@ -1,6 +1,6 @@
-import { ArrowVariation } from '@/components/Cards/CoinDataFetcher/CoinCard/styles';
 import Chart, { ChartType } from '@/components/Chart';
 import { DoubleTxsTooltip } from '@/components/Chart/Tooltips';
+import { ArrowVariation } from '@/components/Home/CoinDataFetcher/CoinCard/styles';
 import { Loader } from '@/components/Loader/styles';
 import { IDoubleChart } from '@/pages/charts';
 import api from '@/services/api';

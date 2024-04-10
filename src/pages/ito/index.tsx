@@ -27,7 +27,7 @@ import { GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { NextRouter, useRouter } from 'next/router';
 import { ReactNode, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { IoIosInfinite } from 'react-icons/io';
@@ -50,28 +50,22 @@ export function getBestKLVRate(packData: IPackInfo[]): number | undefined {
   return bestKLVRate;
 }
 
-const ITOsPage: React.FC = () => {
-  const [ITO, setITO] = useState<IParsedITO | null>(null);
-  const {
-    openParticipateModal,
-    setOpenParticipateModal,
-    txHash,
-    setTxHash,
-    setLoading,
-  } = useParticipate();
-  const { t } = useTranslation('itos');
-  const router = useRouter();
+export const requestITOSQuery = async (
+  page: number,
+  limit: number,
+  router: NextRouter,
+): Promise<IITOResponse> => {
+  const dataITOs = await requestITOs(router, page, limit);
+  await parseITOs(dataITOs.data.itos);
+  return dataITOs;
+};
 
-  const requestITOSQuery = async (
-    page: number,
-    limit: number,
-  ): Promise<IITOResponse> => {
-    const dataITOs = await requestITOs(router, page, limit);
-    await parseITOs(dataITOs.data.itos);
-    return dataITOs;
-  };
-
-  const rowSections = (asset: IParsedITO): IRowSection[] => {
+export const getITOrowSections =
+  (
+    setITO: (asset: IParsedITO) => void,
+    setOpenParticipateModal: (open: boolean) => void,
+  ) =>
+  (asset: IParsedITO): IRowSection[] => {
     const {
       ticker,
       name,
@@ -200,23 +194,35 @@ const ITOsPage: React.FC = () => {
     return sections;
   };
 
-  const header = [
-    '',
-    'Project Name',
-    'ID',
-    'Best KLV Rate',
-    'Type',
-    'Sold',
-    'Total',
-    'Access',
-    '',
-  ];
+export const ITOheaders = [
+  '',
+  'Project Name',
+  'ID',
+  'Best KLV Rate',
+  'Type',
+  'Sold',
+  'Total',
+  'Access',
+  '',
+];
+
+const ITOsPage: React.FC = () => {
+  const [ITO, setITO] = useState<IParsedITO | null>(null);
+  const {
+    openParticipateModal,
+    setOpenParticipateModal,
+    txHash,
+    setTxHash,
+    setLoading,
+  } = useParticipate();
+  const { t } = useTranslation('itos');
+  const router = useRouter();
 
   const tableProps: ITable = {
-    rowSections,
-    header,
+    rowSections: getITOrowSections(setITO, setOpenParticipateModal),
+    header: ITOheaders,
     type: 'launchPad',
-    request: (page, limit) => requestITOSQuery(page, limit),
+    request: (page, limit) => requestITOSQuery(page, limit, router),
     dataName: 'itos',
     scrollUp: false,
     showLimit: false,

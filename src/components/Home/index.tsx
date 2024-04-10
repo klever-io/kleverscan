@@ -12,6 +12,7 @@ import {
   DataContainer,
 } from '@/views/home';
 import React from 'react';
+import { HomeITOSection } from './HomeITOSection';
 import ProposalValidatorSection from './ProposalsAndValidatorsSection';
 
 const Home: React.FC = () => {
@@ -31,6 +32,7 @@ const Home: React.FC = () => {
           <BlockCardFetcher />
         </CardContainer>
         <ProposalValidatorSection />
+        <HomeITOSection />
       </Container>
     </HomeDataProvider>
   );

@@ -80,7 +80,7 @@ import nextI18nextConfig from '../../../next-i18next.config';
 const ProposalVoters = (props: IProposalVoters) => {
   const rowSections = (props: IParsedVote): IRowSection[] => {
     const { status, voter, votingPower, voteDate } = props;
-    let sections = [{ element: props => <></>, span: 1 }];
+    let sections: IRowSection[] = [{ element: props => <></>, span: 1 }];
     sections = [
       {
         element: props => (

@@ -217,8 +217,8 @@ const CollectionIDField: React.FC<{ name: string }> = props => {
     onSuccess: newData => {
       if (!newData) return;
 
-      setCollectionIdData(prevData => {
-        return [...prevData, ...newData];
+      setCollectionIdData((prevData): IDropdownItem[] => {
+        return [...prevData, ...newData] as IDropdownItem[];
       });
     },
   });

@@ -46,7 +46,7 @@ const validatorsRowSections = (validator: IValidator): IRowSection[] => {
   } = validator;
 
   const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'fail');
-  const sections = ownerAddress
+  const sections: IRowSection[] = ownerAddress
     ? [
         { element: props => <p key={rank}>{rank}°</p>, span: 1, width: 100 },
         {

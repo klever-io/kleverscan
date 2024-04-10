@@ -152,9 +152,9 @@ const Buckets: React.FC<IBuckets> = ({
       }
     };
 
-    const sections = [
+    const sections: IRowSection[] = [
       {
-        element: (
+        element: props => (
           <Link href={`/asset/${asset.assetId}`} key={asset.assetId}>
             <a>{asset.assetId}</a>
           </Link>
@@ -162,7 +162,7 @@ const Buckets: React.FC<IBuckets> = ({
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <p key={bucket.unstakedEpoch}>
             {(bucket.balance / 10 ** asset.precision).toLocaleString()}
           </p>
@@ -170,7 +170,7 @@ const Buckets: React.FC<IBuckets> = ({
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <Status staked={true} key={'true'}>
             {'True'}
           </Status>
@@ -178,7 +178,7 @@ const Buckets: React.FC<IBuckets> = ({
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <span key={bucket.unstakedEpoch}>
             {bucket.stakedEpoch.toLocaleString()}
           </span>
@@ -186,7 +186,7 @@ const Buckets: React.FC<IBuckets> = ({
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <RowContent key={bucket.id}>
             <CenteredRow className="bucketIdCopy">
               <span>{parseAddress(bucket.id, 24)}</span>
@@ -197,7 +197,7 @@ const Buckets: React.FC<IBuckets> = ({
         span: 2,
       },
       {
-        element: (
+        element: props => (
           <>
             {bucket.unstakedEpoch === UINT32_MAX
               ? '--'
@@ -207,11 +207,11 @@ const Buckets: React.FC<IBuckets> = ({
         span: 1,
       },
       {
-        element: <>{bucket?.availableEpoch}</>,
+        element: props => <>{bucket?.availableEpoch}</>,
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <>
             {bucket.delegation.length > 0 ? (
               <>
@@ -226,7 +226,7 @@ const Buckets: React.FC<IBuckets> = ({
         ),
         span: 2,
       },
-      { element: <> {getButton()}</>, span: 2 },
+      { element: props => <> {getButton()}</>, span: 2 },
     ];
 
     return sections;

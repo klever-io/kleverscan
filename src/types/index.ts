@@ -1037,8 +1037,11 @@ export interface IFilterDater {
   enddate: string;
 }
 
+export interface TableRowElementProps {
+  smaller?: boolean;
+}
 export interface IRowSection {
-  element: JSX.Element;
+  element: React.FC<TableRowElementProps>;
   span: number;
   width?: number;
 }
@@ -1082,4 +1085,12 @@ export type SearchRequest =
 
 export interface NotFound {
   notFound: true;
+}
+
+export interface Nodes {
+  locations: Node[];
+}
+
+export interface Node {
+  coordinates: [number, number];
 }

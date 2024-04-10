@@ -57,10 +57,10 @@ const Assets: React.FC<IAssets> = ({
       ) : (
         <></>
       );
-    const sections = [
-      { element: <span key={ticker}>{ticker}</span>, span: 1 },
+    const sections: IRowSection[] = [
+      { element: props => <span key={ticker}>{ticker}</span>, span: 1 },
       {
-        element: (
+        element: props => (
           <Link key={assetId} href={`/asset/${assetId}`}>
             {assetId}
           </Link>
@@ -68,16 +68,16 @@ const Assets: React.FC<IAssets> = ({
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <span key={assetType}>
             {assetType === 0 ? 'Fungible' : 'Non Fungible'}
           </span>
         ),
         span: 1,
       },
-      { element: <span key={precision}>{precision}</span>, span: 1 },
+      { element: props => <span key={precision}>{precision}</span>, span: 1 },
       {
-        element: (
+        element: props => (
           <span key={balance}>
             {formatAmount(balance / 10 ** precision)} {ticker}
           </span>
@@ -85,7 +85,7 @@ const Assets: React.FC<IAssets> = ({
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <span key={frozenBalance}>
             {formatAmount(frozenBalance / 10 ** precision)} {ticker}
           </span>
@@ -93,7 +93,7 @@ const Assets: React.FC<IAssets> = ({
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <span key={unfrozenBalance}>
             {formatAmount(unfrozenBalance / 10 ** precision)} {ticker}
           </span>
@@ -101,7 +101,7 @@ const Assets: React.FC<IAssets> = ({
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <span key={JSON.stringify(staking)}>
             {parseApr(staking?.interestType)}
           </span>
@@ -119,12 +119,12 @@ const Assets: React.FC<IAssets> = ({
 
     if (assetType === 1) {
       sections.push({
-        element: sectionViewNfts,
+        element: props => sectionViewNfts,
         span: 2,
       });
     } else if (assetType === 0 && showInteractionButtons) {
       sections.push({
-        element: <FreezeButton />,
+        element: props => <FreezeButton />,
         span: 2,
       });
     }

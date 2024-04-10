@@ -18,9 +18,9 @@ const Validators: React.FC<IValidatorsProps> = props => {
   });
   const { isMobile } = useMobile();
   const rowSections = (validatorHash: string): IRowSection[] => {
-    const sections = [
+    const sections: IRowSection[] = [
       {
-        element: (
+        element: props => (
           <span>
             {isMobile ? parseAddress(validatorHash, 36) : validatorHash}
           </span>

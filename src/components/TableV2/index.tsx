@@ -66,6 +66,8 @@ export interface ITable {
   intervalController?: React.Dispatch<React.SetStateAction<number>>;
   showLimit?: boolean;
   Filters?: React.FC;
+  smaller?: boolean;
+  showPagination?: boolean;
 }
 
 const onErrorHandler = () => {
@@ -86,7 +88,9 @@ const Table: React.FC<ITable> = ({
   interval,
   intervalController,
   Filters,
+  smaller = false,
   showLimit = true,
+  showPagination = true,
 }) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
@@ -172,56 +176,66 @@ const Table: React.FC<ITable> = ({
 
   return (
     <TableContainer>
-      <FloatContainer>
-        {Filters && <Filters />}
-        {showLimit ? (
-          <LimitContainer>
-            <span>Items per page</span>
-            <LimitItems>
-              {limits?.map(value => (
-                <ItemContainer
-                  key={value}
-                  onClick={() => {
-                    setQueryAndRouter(
-                      { ...router.query, limit: value.toString(), page: '1' },
-                      router,
-                    );
-                    refetch();
-                  }}
-                  active={value === (Number(router.query?.limit) || limit)}
-                >
-                  {value}
-                </ItemContainer>
-              ))}
-            </LimitItems>
-          </LimitContainer>
-        ) : null}
+      {(showLimit || Filters) && (
+        <FloatContainer>
+          {Filters && <Filters />}
+          {showLimit ? (
+            <>
+              <LimitContainer>
+                <span>Items per page</span>
+                <LimitItems>
+                  {limits?.map(value => (
+                    <ItemContainer
+                      key={value}
+                      onClick={() => {
+                        setQueryAndRouter(
+                          {
+                            ...router.query,
+                            limit: value.toString(),
+                            page: '1',
+                          },
+                          router,
+                        );
+                        refetch();
+                      }}
+                      active={value === (Number(router.query?.limit) || limit)}
+                    >
+                      {value}
+                    </ItemContainer>
+                  ))}
+                </LimitItems>
+              </LimitContainer>
 
-        <ExportContainer>
-          <Tooltip
-            msg="Refresh"
-            Component={() => (
-              <IoReloadSharpWrapper $loading={isFetching}>
-                <IoReloadSharp size={22} onClick={() => refetch()} />
-              </IoReloadSharpWrapper>
-            )}
-          />
+              <ExportContainer>
+                <Tooltip
+                  msg="Refresh"
+                  Component={() => (
+                    <IoReloadSharpWrapper $loading={isFetching}>
+                      <IoReloadSharp size={22} onClick={() => refetch()} />
+                    </IoReloadSharpWrapper>
+                  )}
+                />
 
-          {dataName === 'transactions' && (
-            <ExportButton
-              items={response?.items}
-              tableRequest={tableRequest}
-              totalRecords={response?.totalPages * limit || 10000}
-            />
-          )}
-        </ExportContainer>
-      </FloatContainer>
+                {dataName === 'transactions' && (
+                  <ExportButton
+                    items={response?.items}
+                    tableRequest={tableRequest}
+                    totalRecords={response?.totalPages * limit || 10000}
+                  />
+                )}
+              </ExportContainer>
+            </>
+          ) : null}
+        </FloatContainer>
+      )}
       <ContainerView ref={tableRef}>
-        <TableBody>
+        <TableBody smaller={smaller}>
           {!isMobile && !isTablet && rowSections && (
             <TableRow>
               {header?.map((item, index) => (
-                <HeaderItem key={JSON.stringify(item)}>{item}</HeaderItem>
+                <HeaderItem key={JSON.stringify(item)} smaller={smaller}>
+                  {item}
+                </HeaderItem>
               ))}
             </TableRow>
           )}
@@ -238,7 +252,7 @@ const Table: React.FC<ITable> = ({
                           index2 === rowSections(item).length - 1
                         : false;
                       let itemWidth = rowSections
-                        ? rowSections(item)[index2].width ||
+                        ? rowSections(item)?.[index2]?.width ||
                           (tableRef.current?.offsetWidth &&
                             (tableRef.current?.offsetWidth - 32) /
                               header.length)
@@ -269,8 +283,9 @@ const Table: React.FC<ITable> = ({
                           columnSpan={2}
                           isLastRow={index === limit - 1}
                           dynamicWidth={itemWidth}
+                          smaller={smaller}
                         >
-                          <DoubleRow>
+                          <DoubleRow {...props}>
                             {type !== 'accounts' && <Skeleton width="100%" />}
                             <Skeleton width="100%" />
                           </DoubleRow>
@@ -289,13 +304,13 @@ const Table: React.FC<ITable> = ({
 
               return (
                 <TableRow
-                  key={JSON.stringify(item) + String(index)}
+                  key={JSON.stringify(item)}
                   {...props}
                   rowSections={true}
                 >
                   {rowSections &&
                     rowSections(item)?.map(
-                      ({ element, span, width }, index2) => {
+                      ({ element: Element, span, width }, index2) => {
                         const [updatedSpanCount, isRightAligned] =
                           processRowSectionsLayout(spanCount, span);
                         spanCount = updatedSpanCount;
@@ -332,11 +347,14 @@ const Table: React.FC<ITable> = ({
                             columnSpan={span}
                             isLastRow={isLastRow}
                             dynamicWidth={itemWidth}
+                            smaller={smaller}
                           >
                             {isMobile || isTablet ? (
                               <MobileHeader>{header[index2]}</MobileHeader>
                             ) : null}
-                            {element}
+                            {Element({
+                              smaller,
+                            })}
                           </MobileCardItem>
                         );
                       },
@@ -361,21 +379,23 @@ const Table: React.FC<ITable> = ({
           <BsFillArrowUpCircleFill />
         </BackTopButton>
       </ContainerView>
-      {typeof response?.totalPages === 'number' && response?.totalPages > 1 && (
-        <PaginationContainer>
-          <Pagination
-            tableRef={tableRef}
-            count={response?.totalPages}
-            page={Number(router.query?.page) || page}
-            onPaginate={page => {
-              setQueryAndRouter(
-                { ...router.query, page: page.toString() },
-                router,
-              );
-            }}
-          />
-        </PaginationContainer>
-      )}
+      {showPagination &&
+        typeof response?.totalPages === 'number' &&
+        response?.totalPages > 1 && (
+          <PaginationContainer>
+            <Pagination
+              tableRef={tableRef}
+              count={response?.totalPages}
+              page={Number(router.query?.page) || page}
+              onPaginate={page => {
+                setQueryAndRouter(
+                  { ...router.query, page: page.toString() },
+                  router,
+                );
+              }}
+            />
+          </PaginationContainer>
+        )}
     </TableContainer>
   );
 };

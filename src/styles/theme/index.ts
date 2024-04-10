@@ -10,7 +10,11 @@ const theme = {
   border: '#eeeff6',
 
   blueGray300: '#646693',
+  blueGray500: '#404264',
+
+  gray800: '#848495',
   gray700: '#aaaaaa',
+
   green: '#4EBC87',
   red: '#F84960',
   rose: '#EE3F71',
@@ -23,6 +27,7 @@ const theme = {
   lightBlue: '#585A92',
   error: '#9E1313',
   darkBlue: '#0C0D1C',
+  darkBlue300: '#222345',
   blue: '#181935',
   darkText: '#515395',
   secondaryText: '#595C98',

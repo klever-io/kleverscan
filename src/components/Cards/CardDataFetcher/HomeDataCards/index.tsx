@@ -2,7 +2,7 @@ import { Accounts, TPS, Transactions } from '@/assets/cards';
 import {
   NextImageCardWrapper,
   StackedImageWrapper,
-} from '@/components/Home/NewCards/style';
+} from '@/components/Home/ProposalsAndValidatorsSection/style';
 import { useHomeData } from '@/contexts/mainPage';
 import { useMobile } from '@/contexts/mobile';
 import { useTheme } from '@/contexts/theme';

@@ -35,7 +35,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useQuery, UseQueryResult } from 'react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
 
@@ -52,6 +52,8 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
   const pagination = props.pagination;
   const router = useRouter();
   const [page, setPage] = useState(1);
+
+  const tableRef = useRef<HTMLDivElement>(null);
 
   // const assetsKeys = Object.keys(
   //   serversideMarketplaceResponse.data.assets.assets || [],
@@ -228,7 +230,7 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
           route="/marketplaces"
         />
       </Header>
-      <CardTabContainer>
+      <CardTabContainer ref={tableRef}>
         <CardHeader>
           <CardHeaderItem selected={true}>
             <span>{t('common:Tabs.Overview')}</span>
@@ -241,7 +243,7 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
       {renderSellCards()}
       <PaginationContainer>
         <Pagination
-          scrollUp={true}
+          tableRef={tableRef}
           count={pagination?.totalPages}
           page={page}
           onPaginate={page => {

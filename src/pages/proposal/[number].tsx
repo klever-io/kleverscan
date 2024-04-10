@@ -80,10 +80,10 @@ import nextI18nextConfig from '../../../next-i18next.config';
 const ProposalVoters = (props: IProposalVoters) => {
   const rowSections = (props: IParsedVote): IRowSection[] => {
     const { status, voter, votingPower, voteDate } = props;
-    let sections = [{ element: <></>, span: 1 }];
+    let sections: IRowSection[] = [{ element: props => <></>, span: 1 }];
     sections = [
       {
-        element: (
+        element: props => (
           <CenteredRow key={voter}>
             <Link href={`/account/${voter}`}>{parseAddress(voter, 24)}</Link>
             <Copy data={voter} info="voter"></Copy>
@@ -91,9 +91,12 @@ const ProposalVoters = (props: IProposalVoters) => {
         ),
         span: 2,
       },
-      { element: <span key={votingPower}>{votingPower}%</span>, span: 1 },
       {
-        element: (
+        element: props => <span key={votingPower}>{votingPower}%</span>,
+        span: 1,
+      },
+      {
+        element: props => (
           <StatusContent key={status}>
             <AiFillCheckCircle
               color={typeVoteColors[status]}

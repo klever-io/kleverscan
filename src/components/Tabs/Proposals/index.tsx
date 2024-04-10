@@ -20,6 +20,36 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { FilterContainer, ProposalsContainer } from './styles';
 
+export const getProposalStatusColorAndText = (
+  status: string,
+): {
+  color: string;
+  text: string;
+} => {
+  switch (status) {
+    case 'ApprovedProposal':
+      return {
+        color: 'success',
+        text: 'Approved',
+      };
+    case 'DeniedProposal':
+      return {
+        color: 'fail',
+        text: 'Denied',
+      };
+    case 'ActiveProposal':
+      return {
+        color: 'pending',
+        text: 'Active',
+      };
+    default:
+      return {
+        color: 'text',
+        text: 'Unknown',
+      };
+  }
+};
+
 const Proposals: React.FC<IProposalsProps> = ({ request }) => {
   const { t } = useTranslation(['common', 'proposals']);
   const { isMobile, isTablet } = useMobile();
@@ -59,30 +89,8 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
       parsedParameters,
     } = props;
 
-    const getProposalStatusColorAndText = () => {
-      switch (proposalStatus) {
-        case 'ApprovedProposal':
-          return {
-            color: 'success',
-            text: 'Approved',
-          };
-        case 'DeniedProposal':
-          return {
-            color: 'fail',
-            text: 'Denied',
-          };
-        case 'ActiveProposal':
-          return {
-            color: 'pending',
-            text: 'Active',
-          };
-        default:
-          return {
-            color: 'text',
-            text: 'Unknown',
-          };
-      }
-    };
+    const proposalStatusColorAndText =
+      getProposalStatusColorAndText(proposalStatus);
 
     const renderProposalsNetworkParams = (
       fullParameters: IParsedProposalParam[] | undefined,
@@ -121,7 +129,7 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
         return (
           <Tooltip
             Component={() => (
-              <DoubleRow>
+              <DoubleRow {...props}>
                 {renderProposalsNetworkParams(parsedParameters)}
               </DoubleRow>
             )}
@@ -158,27 +166,31 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
       }
       return <span style={{ color: 'red' }}>Unavailable</span>;
     };
-    const sections = [
-      { element: <p key={proposalId}>#{proposalId}</p>, span: 1, width: 100 },
+    const sections: IRowSection[] = [
       {
-        element: (
-          <DoubleRow key={proposer}>
+        element: props => <p key={proposalId}>#{proposalId}</p>,
+        span: 1,
+        width: 100,
+      },
+      {
+        element: props => (
+          <DoubleRow {...props} key={proposer}>
             <Link href={`/account/${proposer}`}>
               <a>{parseAddress(proposer, 16)}</a>
             </Link>
             <Status
-              status={getProposalStatusColorAndText().color}
+              status={proposalStatusColorAndText.color}
               key={proposalStatus}
             >
-              {getProposalStatusColorAndText().text}
+              {proposalStatusColorAndText.text}
             </Status>
           </DoubleRow>
         ),
         span: 1,
       },
       {
-        element: (
-          <DoubleRow key={`${epochStart}/${epochEnd}`}>
+        element: props => (
+          <DoubleRow {...props} key={`${epochStart}/${epochEnd}`}>
             <span>Created Epoch: {epochStart}</span>
             <span className="endTime">Ending Epoch: {epochEnd - 1}</span>
           </DoubleRow>
@@ -186,8 +198,8 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
         span: 1,
       },
       {
-        element: (
-          <DoubleRow key={String(votes)}>
+        element: props => (
+          <DoubleRow {...props} key={String(votes)}>
             <span>{getPositiveVotes()}</span>
             <span>{parseTotalStaked()}</span>
           </DoubleRow>
@@ -195,11 +207,11 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
         span: 1,
       },
       {
-        element: renderProposalsNetworkParamsWithToolTip(),
+        element: props => renderProposalsNetworkParamsWithToolTip(),
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <Link href={{ pathname: `/proposal/${proposalId}` }} key={proposalId}>
             <CustomLink> {t('common:Buttons.Details')}</CustomLink>
           </Link>

@@ -32,7 +32,7 @@ const Holders: React.FC<IHolders> = ({
       props;
     return [
       {
-        element: (
+        element: props => (
           <RankingContainer key={index}>
             <RankingText>{rank}°</RankingText>
           </RankingContainer>
@@ -40,7 +40,7 @@ const Holders: React.FC<IHolders> = ({
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <AddressContainer key={address}>
             <Link href={`/account/${address}`}>
               {parseAddress(address, 40)}
@@ -52,7 +52,7 @@ const Holders: React.FC<IHolders> = ({
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <span key={asset.circulatingSupply}>
             {((balance / asset.circulatingSupply) * 100).toFixed(2)}%
           </span>
@@ -60,7 +60,7 @@ const Holders: React.FC<IHolders> = ({
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <span key={asset.precision}>
             {formatAmount(frozenBalance / 10 ** asset.precision)}
           </span>
@@ -68,7 +68,7 @@ const Holders: React.FC<IHolders> = ({
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <span key={balance}>
             {formatAmount(balance / 10 ** asset.precision)}
           </span>
@@ -76,7 +76,7 @@ const Holders: React.FC<IHolders> = ({
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <span key={totalBalance}>
             {formatAmount(totalBalance / 10 ** asset.precision)}
           </span>

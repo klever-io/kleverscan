@@ -5,14 +5,17 @@ import {
   homeBeforeYesterdayTransactionsCall,
   homeGetAggregateCall,
   homeGetBlocksCall,
+  homeLastApprovedProposalCall,
+  homeNodes,
   homeProposalsCall,
   homeTotalActiveValidators,
   homeTotalValidators,
   homeTransactionsCall,
   homeYesterdayAccountsCall,
 } from '@/services/requests/home';
-import { IEpochInfo, ITransaction } from '@/types';
+import { IEpochInfo, ITransaction, Node } from '@/types';
 import { IBlock } from '@/types/blocks';
+import { IProposal } from '@/types/proposals';
 import { createContext, useContext } from 'react';
 import { useQueries } from 'react-query';
 
@@ -21,20 +24,23 @@ export interface IDaysCoins {
 }
 export interface IHomeData {
   actualTPS: number;
-  blocks: IBlock[] | undefined;
+  blocks?: IBlock[];
   metrics: IEpochInfo;
   newTransactions: number;
-  beforeYesterdayTransactions: number | undefined;
-  newAccounts: number | undefined;
-  totalAccounts: number | undefined;
+  beforeYesterdayTransactions?: number;
+  newAccounts?: number;
+  totalAccounts?: number;
   transactions: ITransaction[];
-  totalTransactions: number | undefined;
+  totalTransactions?: number;
   loadingCards: boolean;
   loadingBlocks: boolean;
-  totalProposals: number | undefined;
-  activeProposals: number | undefined;
-  totalValidators: number | undefined;
-  activeValidators: number | undefined;
+  totalProposals?: number;
+  activeProposalsCount?: number;
+  activeProposals?: IProposal[];
+  totalValidators?: number;
+  activeValidators?: number;
+  lastApprovedProposal?: IProposal;
+  nodes?: Node[];
 }
 
 export const HomeData = createContext({} as IHomeData);
@@ -51,8 +57,10 @@ export const HomeDataProvider: React.FC = ({ children }) => {
     beforeYesterdayTransactionsResult,
     proposalsResult,
     activeProposalsResult,
+    approvedProposalsResult,
     validatorsResult,
     activeValidatorsResult,
+    nodes,
   ] = useQueries([
     {
       queryKey: 'aggregateData',
@@ -95,6 +103,11 @@ export const HomeDataProvider: React.FC = ({ children }) => {
       refetchInterval: watcherTimeout,
     },
     {
+      queryKey: 'approvedProposalData',
+      queryFn: homeLastApprovedProposalCall,
+      refetchInterval: watcherTimeout,
+    },
+    {
       queryKey: 'validatorsData',
       queryFn: homeTotalValidators,
       refetchInterval: watcherTimeout,
@@ -102,6 +115,11 @@ export const HomeDataProvider: React.FC = ({ children }) => {
     {
       queryKey: 'activeValidatorsData',
       queryFn: homeTotalActiveValidators,
+      refetchInterval: watcherTimeout,
+    },
+    {
+      queryKey: 'nodesData',
+      queryFn: homeNodes,
       refetchInterval: watcherTimeout,
     },
   ]);
@@ -122,9 +140,12 @@ export const HomeDataProvider: React.FC = ({ children }) => {
     loadingCards: accountResult.isLoading,
     loadingBlocks: blocksResult.isLoading,
     totalProposals: proposalsResult.data?.totalProposals,
-    activeProposals: activeProposalsResult.data?.totalActiveProposals,
+    activeProposalsCount: activeProposalsResult.data?.totalActiveProposals,
+    activeProposals: activeProposalsResult.data?.activeProposals,
     totalValidators: validatorsResult.data?.totalValidators,
     activeValidators: activeValidatorsResult.data?.totalActiveValidators,
+    lastApprovedProposal: approvedProposalsResult.data?.approvedProposal,
+    nodes: nodes.data?.nodes,
   };
 
   return <HomeData.Provider value={values}>{children}</HomeData.Provider>;

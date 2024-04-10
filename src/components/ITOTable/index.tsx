@@ -4,7 +4,7 @@ import { setQueryAndRouter } from '@/utils';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { processRowSectionsLayout } from '@/utils/table';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
 import { IoReloadSharp } from 'react-icons/io5';
 import { useQuery } from 'react-query';
@@ -61,7 +61,7 @@ export interface ITable {
     | 'launchPad';
 
   header: string[];
-  rowSections?: (item: any) => IRowSection[] | undefined;
+  rowSections?: (item: any) => IRowSection[];
   scrollUp?: boolean;
   dataName?: string;
   request: (page: number, limit: number) => Promise<IPaginatedResponse>;
@@ -94,6 +94,7 @@ const Table: React.FC<ITable> = ({
   const { isMobile, isTablet } = useMobile();
   const limits = [5, 10, 50, 100];
   const [scrollTop, setScrollTop] = useState<boolean>(false);
+  const tableRef = useRef<HTMLDivElement>(null);
 
   const page = Number(router.query?.page) || 1;
   const limit = Number(router.query?.limit) || 10;
@@ -239,7 +240,12 @@ const Table: React.FC<ITable> = ({
                 })}
               </Header>
             )}
-          <Body {...props} data-testid="table-body" autoUpdate={!!interval}>
+          <Body
+            {...props}
+            data-testid="table-body"
+            autoUpdate={!!interval}
+            ref={tableRef}
+          >
             {isLoading && (
               <>
                 {Array(limit)
@@ -267,28 +273,30 @@ const Table: React.FC<ITable> = ({
                         {...props}
                         rowSections={true}
                       >
-                        {rowSections(item)?.map(({ element, span }, index2) => {
-                          const [updatedSpanCount, isRightAligned] =
-                            processRowSectionsLayout(spanCount, span);
-                          spanCount = updatedSpanCount;
-                          return (
-                            <MobileCardItem
-                              isAssets={
-                                type === 'assets' || type === 'proposals'
-                              }
-                              isRightAligned={
-                                (isMobile || isTablet) && isRightAligned
-                              }
-                              key={String(index2) + String(index)}
-                              columnSpan={span}
-                            >
-                              {isMobile || isTablet ? (
-                                <MobileHeader>{header[index2]}</MobileHeader>
-                              ) : null}
-                              {element}
-                            </MobileCardItem>
-                          );
-                        })}
+                        {rowSections(item)?.map(
+                          ({ element: Element, span }, index2) => {
+                            const [updatedSpanCount, isRightAligned] =
+                              processRowSectionsLayout(spanCount, span);
+                            spanCount = updatedSpanCount;
+                            return (
+                              <MobileCardItem
+                                isAssets={
+                                  type === 'assets' || type === 'proposals'
+                                }
+                                isRightAligned={
+                                  (isMobile || isTablet) && isRightAligned
+                                }
+                                key={String(index2) + String(index)}
+                                columnSpan={span}
+                              >
+                                {isMobile || isTablet ? (
+                                  <MobileHeader>{header[index2]}</MobileHeader>
+                                ) : null}
+                                {Element({})}
+                              </MobileCardItem>
+                            );
+                          },
+                        )}
                       </Row>
                     )}
                   </React.Fragment>
@@ -317,7 +325,6 @@ const Table: React.FC<ITable> = ({
         response?.totalPages > 1 && (
           <PaginationContainer>
             <Pagination
-              scrollUp={scrollUp}
               count={response?.totalPages}
               page={Number(router.query?.page) || page}
               onPaginate={page => {
@@ -326,6 +333,7 @@ const Table: React.FC<ITable> = ({
                   router,
                 );
               }}
+              tableRef={tableRef}
             />
           </PaginationContainer>
         )}

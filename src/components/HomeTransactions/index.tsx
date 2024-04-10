@@ -1,110 +1,204 @@
-import { PlusSquare } from '@/assets/icons';
+import { PurpleArrowRight } from '@/assets/icons';
+import Copy from '@/components/Copy';
+import { MultiContractToolTip } from '@/components/MultiContractToolTip';
+import {
+  CustomFieldWrapper,
+  Status,
+  TimestampInfo,
+} from '@/components/TableV2/styles';
+import Tooltip from '@/components/Tooltip';
 import { useHomeData } from '@/contexts/mainPage';
-import { getContractType } from '@/utils';
-import { getPrecision } from '@/utils/precisionFunctions';
+import { useMobile } from '@/contexts/mobile';
+import { getCustomFields, toAddressSectionElement } from '@/pages/transactions';
+import { defaultPagination } from '@/services/apiCalls';
+import { CenteredRow, DoubleRow } from '@/styles/common';
+import { IPaginatedResponse, IRowSection, ITransaction } from '@/types';
+import { Contract, ContractsName, ITransferContract } from '@/types/contracts';
+import { contractTypes, getLabelForTableField } from '@/utils/contracts';
+import { capitalizeString } from '@/utils/convertString';
+import { formatAmount, formatDate } from '@/utils/formatFunctions';
+import { KLV_PRECISION } from '@/utils/globalVariables';
+import { parseAddress } from '@/utils/parseValues';
 import {
   ArrowUpSquareHideMenu,
   ContainerHide,
   SectionCards,
   TransactionContainer,
-  TransactionEmpty,
-  ViewMoreContainer,
 } from '@/views/home';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
-import { ITransaction } from '../../types';
-import TransactionItem, {
-  IContract,
-  TransactionItemLoading,
-} from '../TransactionItem';
+import { useRouter } from 'next/router';
+import React, { useState } from 'react';
+import Table, { ITable } from '../TableV2';
+
+export const homeTransactionTableHeaders = [
+  'Transaction Hash',
+  'Block/Fees',
+  'From/To',
+  'Type',
+];
+
+export const homeTransactionsRowSections = (
+  props: ITransaction,
+): IRowSection[] => {
+  const {
+    hash,
+    blockNum,
+    timestamp,
+    sender,
+    receipts,
+    contract,
+    kAppFee,
+    bandwidthFee,
+    status,
+    precision,
+    data,
+  } = props;
+
+  let toAddress = '- -';
+  const contractType = contractTypes(contract);
+
+  if (contractType === Contract.Transfer) {
+    const parameter = contract[0].parameter as ITransferContract;
+
+    toAddress = parameter.toAddress;
+  }
+
+  const customFields = getCustomFields(contract, receipts, precision, data);
+
+  const sections: IRowSection[] = [
+    {
+      element: props => (
+        <DoubleRow {...props} key={hash}>
+          <CenteredRow className="bucketIdCopy">
+            <Link href={`/transaction/${hash}`}>{parseAddress(hash, 24)}</Link>
+            <Copy info="TXHash" data={hash} />
+          </CenteredRow>
+          <CenteredRow>
+            <TimestampInfo>{formatDate(timestamp || Date.now())}</TimestampInfo>
+            <Status status={status?.toLowerCase()}>
+              {capitalizeString(status)}
+            </Status>
+          </CenteredRow>
+        </DoubleRow>
+      ),
+      span: 2,
+    },
+    {
+      element: props => (
+        <DoubleRow {...props} key={blockNum}>
+          <Link href={`/block/${blockNum || 0}`}>
+            <a className="address">{blockNum || 0}</a>
+          </Link>
+          <span>
+            {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
+          </span>
+        </DoubleRow>
+      ),
+      span: 1,
+    },
+    {
+      element: props => (
+        <DoubleRow {...props} key={sender}>
+          <Link href={`/account/${sender}`}>
+            <a className="address">{parseAddress(sender, 16)}</a>
+          </Link>
+          {toAddressSectionElement(toAddress)}
+        </DoubleRow>
+      ),
+      span: 1,
+    },
+    {
+      element: props =>
+        contractType === 'Multi contract' ? (
+          <DoubleRow {...props}>
+            <MultiContractToolTip
+              contract={contract}
+              contractType={contractType}
+            />
+            <CenteredRow>- -</CenteredRow>
+          </DoubleRow>
+        ) : (
+          <DoubleRow {...props}>
+            <CenteredRow key={contractType}>
+              <span>{ContractsName[contractType]}</span>
+            </CenteredRow>
+            <CenteredRow>
+              {getLabelForTableField(contractType)?.[0] ? (
+                <Tooltip
+                  msg={getLabelForTableField(contractType)[0]}
+                  Component={() => (
+                    <CustomFieldWrapper>{customFields[0]}</CustomFieldWrapper>
+                  )}
+                />
+              ) : (
+                <span> - - </span>
+              )}
+            </CenteredRow>
+          </DoubleRow>
+        ),
+      span: 1,
+    },
+  ];
+
+  return sections;
+};
 
 const HomeTransactions: React.FC = () => {
-  const { t: commonT } = useTranslation('common');
   const { t } = useTranslation('transactions');
   const { transactions: homeTransactions } = useHomeData();
-  const [transactions, setTransactions] =
-    useState<ITransaction[]>(homeTransactions);
   const [hideMenu, setHideMenu] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { isTablet } = useMobile();
 
-  useEffect(() => {
-    const assetsIds = homeTransactions.map(({ contract }) => {
-      let contractFilter = {} as IContract;
-      contractFilter = contract[0] as IContract;
-      const assetId = contractFilter?.parameter?.assetId;
-      if (assetId) {
-        return assetId.split('/')[0];
-      }
-      return 'KLV';
-    });
+  const router = useRouter();
 
-    const addPrecisions = async () => {
-      setLoading(true);
-      const precisions = await getPrecision(assetsIds);
-      const assetsPrecision = assetsIds.map(item => {
-        return precisions[item];
-      });
-      const newTxs = homeTransactions.map((obj, index) => {
-        const contractType = obj.contract[0].typeString;
-        const checkContract = getContractType(contractType);
-
-        if (checkContract) {
-          obj.contract[0] = {
-            ...obj.contract[0],
-            precision: assetsPrecision[index],
-          };
-        }
-
-        return obj;
-      });
-      setTransactions(newTxs);
-      setLoading(false);
+  const homeTransactionsCall: (
+    page: number,
+    limit: number,
+  ) => Promise<IPaginatedResponse> = async (page = 1, limit = 10) => {
+    return {
+      data: { transactions: homeTransactions },
+      error: '',
+      code: '',
+      pagination: defaultPagination,
     };
-    addPrecisions();
-  }, [homeTransactions]);
+  };
+
+  const tableProps: ITable = {
+    type: 'transactions',
+    header: homeTransactionTableHeaders,
+    rowSections: homeTransactionsRowSections,
+    dataName: 'transactions',
+    request: (page, limit) => homeTransactionsCall(page, limit),
+    showLimit: false,
+    showPagination: false,
+    smaller: true,
+    interval: 4000,
+  };
 
   return (
     <SectionCards>
       <ContainerHide>
         <h1>{t('Last Transactions')}</h1>
+        <Link
+          href={{
+            pathname: '/transactions',
+          }}
+        >
+          <a>
+            {' '}
+            View All
+            <PurpleArrowRight />
+          </a>
+        </Link>
+
         <div onClick={() => setHideMenu(!hideMenu)}>
           <p>{hideMenu ? 'Show' : 'Hide'}</p>
           <ArrowUpSquareHideMenu $hide={hideMenu} />
         </div>
       </ContainerHide>
       <TransactionContainer>
-        {!hideMenu && (
-          <>
-            {loading &&
-              Array.from(Array(10).keys()).map(key => (
-                <TransactionItemLoading key={key} />
-              ))}
-
-            {!loading &&
-              transactions?.map(transaction => (
-                <TransactionItem key={transaction.hash} {...transaction} />
-              ))}
-
-            {!loading && transactions.length === 0 && (
-              <TransactionEmpty>
-                <span>{commonT('EmptyData')}</span>
-              </TransactionEmpty>
-            )}
-            <Link href={'/transactions'}>
-              <a>
-                <ViewMoreContainer>
-                  <PlusSquare />
-                  <p>
-                    {commonT('Cards.ViewAll', { type: 'as' }) +
-                      ' ' +
-                      commonT('Titles.Transactions')}
-                  </p>
-                </ViewMoreContainer>
-              </a>
-            </Link>
-          </>
-        )}
+        {!hideMenu && <Table {...tableProps} />}
       </TransactionContainer>
     </SectionCards>
   );

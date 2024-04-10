@@ -13,6 +13,7 @@ import Arrow from './arrow.svg';
 import Calendar from './calendar.svg';
 import Category from './category.svg';
 import Certified from './Certified.svg';
+import Check from './check.svg';
 import ChevronRight from './chevron-right.svg';
 import Compass from './compass.svg';
 import Copy from './copy.svg';
@@ -25,10 +26,12 @@ import InfoSquare from './info-square.svg';
 import LaunchPadPlus from './launchpad-plus.svg';
 import LineArrowUpSquare from './line-arrow-up-square.svg';
 import PageDownload from './page-download.svg';
+import Plug from './plug.svg';
 import PlusSquare from './plus-square.svg';
 import PlusWhite from './plus-white.svg';
 import Plus from './plus.svg';
 import Proposal from './proposal.svg';
+import PurpleArrowRight from './purple-arrow-right.svg';
 import QRCode from './qr-code.svg';
 import Receive from './receive.svg';
 import Redirect from './redirect.svg';
@@ -100,4 +103,7 @@ export {
   FilterArrowDown,
   Refresh,
   PageDownload,
+  PurpleArrowRight,
+  Plug,
+  Check,
 };

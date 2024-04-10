@@ -22,6 +22,7 @@ import {
   formatDate,
   toLocaleFixed,
 } from '@/utils/formatFunctions';
+import { KLV_PRECISION } from '@/utils/globalVariables';
 import {
   getStorageUpdateConfig,
   storageUpdateBlocks,
@@ -50,9 +51,94 @@ interface IBlocksStatsYesterday {
   totalKappsFees: number;
   totalTxRewards: number;
 }
+export const blocksHeader = [
+  'Block/ Epoch',
+  'Size/Transactions',
+  'Produced by/ Created At',
+  'kApp Fees/Burned Fees',
+  'Fee Rewards/Block Rewards',
+];
+
+export const blocksRowSections = (block: IBlock): IRowSection[] => {
+  const {
+    nonce,
+    size,
+    epoch,
+    producerName,
+    producerOwnerAddress,
+    timestamp,
+    txCount,
+    txFees,
+    kAppFees,
+    txBurnedFees,
+    blockRewards,
+  } = block;
+
+  const sections: IRowSection[] = [
+    {
+      element: props => (
+        <DoubleRow {...props} key={nonce + epoch}>
+          <Link href={`/block/${nonce}`}>{String(nonce)}</Link>
+          <span>{epoch}</span>
+        </DoubleRow>
+      ),
+      span: 1,
+    },
+    {
+      element: props => (
+        <DoubleRow {...props} key={txCount + size}>
+          <span>{size} Bytes</span>
+          <span>
+            {txCount} TX{txCount > 1 ? 's' : ''}
+          </span>
+        </DoubleRow>
+      ),
+      span: 1,
+    },
+    {
+      element: props => (
+        <DoubleRow {...props} key={producerOwnerAddress + timestamp}>
+          <Link
+            href={`/validator/${producerOwnerAddress}`}
+            key={producerOwnerAddress}
+          >
+            {parseAddress(producerName, 16)}
+          </Link>
+          <span key={timestamp}>{formatDate(timestamp)}</span>
+        </DoubleRow>
+      ),
+      span: 1,
+    },
+    {
+      element: props => (
+        <DoubleRow {...props} key={String(kAppFees) + String(txBurnedFees)}>
+          <span>{formatAmount((kAppFees || 0) / 10 ** KLV_PRECISION)} KLV</span>
+          <span>{`${formatAmount(
+            (txBurnedFees || 0) / 10 ** KLV_PRECISION,
+          )} KLV`}</span>
+        </DoubleRow>
+      ),
+      span: 1,
+    },
+    {
+      element: props => (
+        <DoubleRow {...props} key={String(txFees) + String(blockRewards)}>
+          <span>
+            {formatAmount(((txFees || 0) * 0.5) / 10 ** KLV_PRECISION)} KLV
+          </span>
+          <span>
+            {formatAmount((blockRewards || 0) / 10 ** KLV_PRECISION)} KLV
+          </span>
+        </DoubleRow>
+      ),
+      span: 1,
+    },
+  ];
+
+  return sections;
+};
 
 const Blocks: React.FC<IBlocks> = () => {
-  const precision = 6; // default KLV precision
   const blocksWatcherInterval = 4 * 1000; // 4 secs
   const [blocksInterval, setBlocksInterval] = useState(0);
   const { data: blocksStatsToday } = useQuery(
@@ -114,14 +200,15 @@ const Blocks: React.FC<IBlocks> = () => {
       values: [
         blocksStatsYesterday ? (
           `${formatAmount(
-            (blocksStatsYesterday?.totalBlockRewards || 0) / 10 ** precision,
+            (blocksStatsYesterday?.totalBlockRewards || 0) /
+              10 ** KLV_PRECISION,
           )} KLV`
         ) : (
           <Skeleton />
         ),
         blocksStatsToday ? (
           `${formatAmount(
-            (blocksStatsToday?.totalBlockRewards || 0) / 10 ** precision,
+            (blocksStatsToday?.totalBlockRewards || 0) / 10 ** KLV_PRECISION,
           )} KLV`
         ) : (
           <Skeleton />
@@ -134,14 +221,14 @@ const Blocks: React.FC<IBlocks> = () => {
       values: [
         blocksStatsYesterday ? (
           `${formatAmount(
-            (blocksStatsYesterday?.totalBurned || 0) / 10 ** precision,
+            (blocksStatsYesterday?.totalBurned || 0) / 10 ** KLV_PRECISION,
           )} KLV`
         ) : (
           <Skeleton />
         ),
         blocksStatsToday ? (
           `${formatAmount(
-            (blocksStatsToday?.totalBurned || 0) / 10 ** precision,
+            (blocksStatsToday?.totalBurned || 0) / 10 ** KLV_PRECISION,
           )} KLV`
         ) : (
           <Skeleton />
@@ -190,97 +277,10 @@ const Blocks: React.FC<IBlocks> = () => {
     );
   };
 
-  const header = [
-    'Block/ Epoch',
-    'Size/Tx Count',
-    'Produced by/ Created At',
-    'kApp Fees/Burned Fees',
-    'Fee Rewards/Block Rewards',
-  ];
-
-  const rowSections = (block: IBlock): IRowSection[] => {
-    const {
-      nonce,
-      size,
-      epoch,
-      producerName,
-      producerOwnerAddress,
-      timestamp,
-      txCount,
-      txFees,
-      kAppFees,
-      txBurnedFees,
-      blockRewards,
-    } = block;
-
-    const sections = [
-      {
-        element: (
-          <DoubleRow key={nonce + epoch}>
-            <Link href={`/block/${nonce}`}>{String(nonce)}</Link>
-            <span>{epoch}</span>
-          </DoubleRow>
-        ),
-        span: 1,
-      },
-      {
-        element: (
-          <DoubleRow key={txCount + size}>
-            <span>{size} Bytes</span>
-            <span>
-              {txCount} TX{txCount > 1 ? 's' : ''}
-            </span>
-          </DoubleRow>
-        ),
-        span: 1,
-      },
-      {
-        element: (
-          <DoubleRow key={producerOwnerAddress + timestamp}>
-            <Link
-              href={`/validator/${producerOwnerAddress}`}
-              key={producerOwnerAddress}
-            >
-              {parseAddress(producerName, 16)}
-            </Link>
-            <span key={timestamp}>{formatDate(timestamp)}</span>
-          </DoubleRow>
-        ),
-        span: 1,
-      },
-      {
-        element: (
-          <DoubleRow key={String(kAppFees) + String(txBurnedFees)}>
-            <span>{formatAmount((kAppFees || 0) / 10 ** precision)} KLV</span>
-            <span>{`${formatAmount(
-              (txBurnedFees || 0) / 10 ** precision,
-            )} KLV`}</span>
-          </DoubleRow>
-        ),
-        span: 1,
-      },
-      {
-        element: (
-          <DoubleRow key={String(txFees) + String(blockRewards)}>
-            <span>
-              {formatAmount(((txFees || 0) * 0.5) / 10 ** precision)} KLV
-            </span>
-            <span>
-              {formatAmount((blockRewards || 0) / 10 ** precision)} KLV
-            </span>
-          </DoubleRow>
-        ),
-        span: 1,
-      },
-    ];
-
-    return sections;
-  };
-
   const tableProps: ITable = {
     type: 'blocks',
-    header,
-    rowSections,
+    header: blocksHeader,
+    rowSections: blocksRowSections,
     dataName: 'blocks',
     request: (page: number, limit: number) => blockCall(page, limit),
     interval: blocksInterval,

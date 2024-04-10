@@ -17,7 +17,25 @@ export const ContainerView = styled.div`
   width: 100%;
 `;
 
-export const TableBody = styled.div`
+export const TableGradientBorder = css`
+  border: 1px solid transparent;
+  background-image: linear-gradient(
+      ${props =>
+        props.theme.dark ? props.theme.background : props.theme.white},
+      ${props =>
+        props.theme.dark ? props.theme.background : props.theme.white}
+    ),
+    linear-gradient(
+      to bottom,
+      ${props => props.theme.gray800},
+      transparent 50%,
+      ${props => props.theme.gray800} 175%
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+`;
+
+export const TableBody = styled.div<{ smaller?: boolean }>`
   min-width: fit-content;
   width: 100%;
 
@@ -30,28 +48,30 @@ export const TableBody = styled.div`
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
     display: block;
     border-radius: 16px;
-    border: solid 1px transparent;
     padding: 16px;
 
-    /* background + gradient border */
-    background-image: linear-gradient(
-        ${props => props.theme.table.background},
-        ${props => props.theme.table.background}
-      ),
-      linear-gradient(
-        to bottom,
-        ${props => props.theme.darkGray},
-        transparent 100%
-      );
-    background-origin: border-box;
-    background-clip: padding-box, border-box;
+    ${props =>
+      props.smaller &&
+      css`
+        padding: 8px;
+      `}
+
+    ${TableGradientBorder}
   }
 `;
 
-export const HeaderItem = styled.div`
+export const HeaderItem = styled.div<{ smaller?: boolean }>`
   display: table-cell;
   padding: 6px 16px;
-  margin-bottom: 16px;
+  padding-bottom: 32px;
+
+  ${props =>
+    props.smaller &&
+    css`
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      padding-bottom: 16px;
+    `}
 `;
 
 export const TableRow = styled.div<TableRowProps>`
@@ -88,23 +108,15 @@ export const MobileCardItem = styled.div<{
   isAccountPage?: boolean;
   isLastRow?: boolean;
   dynamicWidth?: number;
+  smaller?: boolean;
 }>`
   display: flex;
   flex-direction: column;
 
   font-size: 1rem;
 
-  ${props =>
-    !props.columnSpan || props.columnSpan >= 0
-      ? css`
-          grid-column: span ${props.columnSpan};
-          gap: 0.25rem;
-        `
-      : css`
-          display: none;
-        `}
-
-  a,span {
+  a,
+  span {
     display: flex;
     align-items: center;
   }
@@ -127,9 +139,26 @@ export const MobileCardItem = styled.div<{
       text-align: right;
       align-items: flex-end;
       span,
-      a {
+      a,
+      div {
         justify-content: flex-end;
       }
+    `}
+
+  ${props =>
+    !props.columnSpan || props.columnSpan >= 0
+      ? css`
+          grid-column: span ${props.columnSpan};
+          gap: 0.25rem;
+        `
+      : css`
+          display: none;
+        `}
+
+  ${props =>
+    props.smaller &&
+    css`
+      font-size: 0.75rem;
     `}
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
@@ -164,6 +193,13 @@ export const MobileCardItem = styled.div<{
         : css`
             border-bottom: solid 1px ${props => props.theme.darkGray};
           `}
+
+    ${props =>
+      props.smaller &&
+      css`
+        font-size: 0.75rem;
+        padding: 8px 8px;
+      `}
   }
 `;
 
@@ -177,6 +213,10 @@ export const CustomFieldWrapper = styled.div`
   text-decoration: underline dashed;
   text-decoration-color: ${props => transparentize(0.5, props.theme.black)};
   text-underline-offset: 0.2rem;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 export const TimestampInfo = styled.span`

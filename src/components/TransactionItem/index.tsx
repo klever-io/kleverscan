@@ -21,7 +21,7 @@ import { ITransaction } from '../../types';
 import {
   NextImageCardWrapper,
   StackedImageWrapper,
-} from '../Home/NewCards/style';
+} from '../Home/ProposalsAndValidatorsSection/style';
 import Skeleton from '../Skeleton';
 
 export interface IContract {

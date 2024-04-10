@@ -1,3 +1,4 @@
+import { TableRowElementProps } from '@/types';
 import { transparentize } from 'polished';
 import styled, { css } from 'styled-components';
 
@@ -242,7 +243,7 @@ export const RowContent = styled.div`
   min-width: 30%;
 `;
 
-export const DoubleRow = styled.div`
+export const DoubleRow = styled.div<TableRowElementProps>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -250,6 +251,12 @@ export const DoubleRow = styled.div`
   gap: 10px;
 
   width: 100%;
+
+  ${props =>
+    props.smaller &&
+    css`
+      gap: 4px;
+    `}
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     gap: 4px;

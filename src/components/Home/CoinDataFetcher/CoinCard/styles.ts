@@ -455,7 +455,7 @@ export const SpanTime = styled.span<{ selected: boolean }>`
   cursor: pointer;
 `;
 
-export const ButtonContainer = styled.button<{ borderColor: string }>`
+export const Button = styled.a<{ borderColor: string }>`
   ${DataCardDefaultStyles}
   display: flex;
   width: 193px;
@@ -473,6 +473,8 @@ export const ButtonContainer = styled.button<{ borderColor: string }>`
   border: 1px solid ${props => props.borderColor};
 
   transition: 0.25s ease-in-out;
+
+  text-decoration: none !important;
 
   :hover,
   :focus {

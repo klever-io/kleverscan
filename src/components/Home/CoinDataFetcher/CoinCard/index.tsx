@@ -31,7 +31,7 @@ import CoinCardSkeleton from '../CoinCardSkeleton';
 import {
   ArrowTopRight,
   ArrowVariation,
-  ButtonContainer,
+  Button,
   CardContainer,
   CardContent,
   CardContentError,
@@ -389,12 +389,16 @@ const CoinCard: React.FC = () => {
       <QuickAccess setWizard={setWizard} />
       <EnchangeLinks>
         {swapExchangeInfo.map((item, index) => (
-          <ButtonContainer key={index} borderColor={item.color}>
-            <a target="_blank" href={item.url} rel="noreferrer">
-              {item.text}
-            </a>
+          <Button
+            borderColor={item.color}
+            target="_blank"
+            href={item.url}
+            rel="noreferrer"
+            key={index}
+          >
+            <span>{item.text}</span>
             {item.icon}
-          </ButtonContainer>
+          </Button>
         ))}
       </EnchangeLinks>
 

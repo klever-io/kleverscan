@@ -29,8 +29,6 @@ export const ExtensionProvider: React.FC = ({ children }) => {
   const [walletAddress, setWalletAddress] = useState<string>('');
   const [openDrawer, setOpenDrawer] = useState(false);
 
-  const { setSenderAccount } = useContract();
-
   useEffect(() => {
     const init = async () => {
       if (typeof window !== 'undefined') {

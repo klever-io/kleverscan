@@ -2984,9 +2984,7 @@ export const ConfirmTransaction: React.FC<IWizardConfirmProps> = ({
             </ConfirmCardBasisInfo>
             {additionalFields && (
               <ConfirmCardBasisInfo>
-                <span>
-                  {t('wizards:createToken.stepsInformations.initialSupply')}
-                </span>
+                <span>{t('wizards:common.initialSupply')}</span>
                 <span>{initialSupply ? initialSupply : 0}</span>
               </ConfirmCardBasisInfo>
             )}

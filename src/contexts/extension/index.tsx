@@ -8,7 +8,6 @@ import {
   useState,
 } from 'react';
 import { toast } from 'react-toastify';
-import { useContract } from '../contract';
 
 interface IExtension {
   extensionInstalled: boolean | undefined;

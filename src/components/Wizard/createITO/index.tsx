@@ -142,8 +142,10 @@ export const CreateITOThirdStep: React.FC<IAssetITOInformations> = ({
     formState: { errors },
   } = useFormContext();
 
+  const { walletAddress } = useExtension();
+
   useEffect(() => {
-    const getWallet = sessionStorage.getItem('walletAddress');
+    const getWallet = walletAddress;
     if (getWallet !== null) {
       setAddress(getWallet);
       setValue(formValue || '', getWallet, { shouldValidate: true });

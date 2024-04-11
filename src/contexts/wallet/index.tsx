@@ -1,4 +1,4 @@
-import { useKleverExtension } from '@/contexts/wallet/kleverExtension';
+import { useKleverExtension } from '@/contexts/wallet/kleverExtension/kleverExtension';
 import { doIf } from '@/utils/promiseFunctions';
 import {
   createContext,

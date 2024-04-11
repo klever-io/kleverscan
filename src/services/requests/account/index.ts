@@ -466,7 +466,7 @@ export interface IAccountBalance {
 }
 
 export const getAccountBalanceRequest = async (
-  walletAddress: string,
+  walletAddress: string | undefined,
   setLoadingBalance: React.Dispatch<React.SetStateAction<boolean>>,
 ): Promise<IAccountBalance> => {
   if (!walletAddress) {

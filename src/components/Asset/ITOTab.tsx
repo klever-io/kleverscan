@@ -1,7 +1,7 @@
 import { statusWithIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
 import { displayITOpacks } from '@/components/ITO';
-import { useExtension } from '@/contexts/extension';
+import { useWallet } from '@/contexts/wallet';
 import { IParsedITO } from '@/types';
 import { formatDate } from '@/utils/formatFunctions';
 import {
@@ -25,17 +25,17 @@ export interface ITOTabProps {
 }
 
 export const ITOTab: React.FC<ITOTabProps> = ({ ITO }) => {
-  const { extensionInstalled, connectExtension } = useExtension();
+  const { connectProvider, availableProviders } = useWallet();
   const { t } = useTranslation('itos');
   const router = useRouter();
   const [expand, setExpand] = useState({ whitelist: false, packs: false });
   const [txHash, setTxHash] = useState('');
 
   useEffect(() => {
-    if (extensionInstalled) {
-      connectExtension();
+    if (availableProviders.length > 0) {
+      connectProvider(availableProviders[0]);
     }
-  }, [extensionInstalled]);
+  }, [availableProviders]);
   return (
     <>
       {ITO && ITO.isActive ? (

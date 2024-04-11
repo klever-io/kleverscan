@@ -1,6 +1,6 @@
 import { AccountDetailsModal } from '@/components/AccountDetailsModal';
 import Tour from '@/components/Tour';
-import { useExtension } from '@/contexts/extension';
+import { useWallet, WalletProvider } from '@/contexts/wallet';
 import { useScroll } from '@/utils/hooks';
 import { parseAddress } from '@/utils/parseValues';
 import Image from 'next/image';
@@ -23,39 +23,41 @@ interface IConnectWallet {
 
 const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
   const [openUserInfos, setOpenUserInfos] = useState(false);
-  const {
-    walletAddress,
-    extensionLoading,
-    extensionInstalled,
-    connectExtension,
-    openDrawer,
-    setOpenDrawer,
-  } = useExtension();
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [isProviderModalOpen, setIsProviderModalOpen] = useState(false);
+
+  const { availableProviders, provider, connectProvider } = useWallet();
+  const hasProvider = availableProviders.length > 0;
 
   const handleClick = () => {
-    setOpenDrawer(true);
+    setIsTutorialOpen(true);
   };
   const closeMenu = () => {
-    setOpenDrawer(false);
+    setIsTutorialOpen(false);
   };
 
   useEffect(() => {
-    document.body.style.overflow = openDrawer ? 'hidden' : 'visible';
-  }, [openDrawer]);
+    document.body.style.overflow = isTutorialOpen ? 'hidden' : 'visible';
+  }, [isTutorialOpen]);
 
   useScroll(openUserInfos, () => setOpenUserInfos(false));
 
   const connectAndOpen = () => {
-    if (!walletAddress) {
-      connectExtension();
+    if (!provider?.getAddress()) {
+      setIsProviderModalOpen(true);
     } else {
       setOpenUserInfos(!openUserInfos);
     }
   };
 
+  const connectToProvider = (provider: WalletProvider) => async () => {
+    setIsProviderModalOpen(false);
+    await connectProvider(provider);
+  };
+
   return (
     <>
-      {!extensionInstalled && (
+      {!hasProvider && (
         <>
           <ConnectContainer>
             <ConnectButton onClick={handleClick}>
@@ -72,42 +74,44 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
           <BackgroundHelper
             onClick={closeMenu}
             onTouchStart={closeMenu}
-            opened={openDrawer}
+            opened={isTutorialOpen}
           />
           <WalletHelp
-            closeDrawer={() => setOpenDrawer(false)}
-            opened={openDrawer}
+            closeDrawer={() => setIsTutorialOpen(false)}
+            opened={isTutorialOpen}
             clickConnectionMobile={clickConnection}
           />
         </>
       )}
 
-      {extensionInstalled && (
+      {hasProvider && (
         <Tour
           guideName="connectWallet"
           side="bottom"
           tourTooltip="Now that you connected your wallet, click here to see more options"
-          condition={!!walletAddress}
+          condition={!!provider?.getAddress()}
         >
           <ConnectButton
             onClick={() => connectAndOpen()}
-            key={String(extensionInstalled)}
-            walletAddress={!!walletAddress}
-            $loading={extensionLoading}
+            key={String(hasProvider)}
+            walletAddress={!!provider?.getAddress()}
+            $loading={provider?.isLoading}
           >
-            {extensionLoading ? (
+            {provider?.isLoading ? (
               <span style={{ zIndex: 2 }}>Waiting Extension...</span>
             ) : (
               <>
-                {walletAddress && (
+                {!!provider?.getAddress() && (
                   <ConnectedWallet
                     onClick={() => setOpenUserInfos(!openUserInfos)}
                   >
                     <GraySpan>Connected Wallet</GraySpan>
-                    <BlackSpan>{parseAddress(walletAddress, 12)}</BlackSpan>
+                    <BlackSpan>
+                      {parseAddress(provider?.getAddress(), 12)}
+                    </BlackSpan>
                   </ConnectedWallet>
                 )}
-                {!walletAddress && (
+                {!provider?.getAddress() && (
                   <>
                     <Image
                       width={25}
@@ -125,7 +129,7 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
           </ConnectButton>
         </Tour>
       )}
-      {walletAddress &&
+      {!!provider?.getAddress() &&
         ReactDOM.createPortal(
           <AccountDetailsModal
             openUserInfos={openUserInfos}
@@ -133,13 +137,64 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
           />,
           window.document.body,
         )}
-      {walletAddress &&
+      {!!provider?.getAddress() &&
         ReactDOM.createPortal(
           <BackGroundUserInfo
             isOpen={openUserInfos}
             onClick={() => setOpenUserInfos(false)}
             onTouchStart={() => setOpenUserInfos(false)}
           />,
+          window.document.body,
+        )}
+      {isProviderModalOpen &&
+        ReactDOM.createPortal(
+          <div
+            style={{
+              // TODO POC styles, create a better modal with the design team
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: 7,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            onClick={e => {
+              e.preventDefault();
+              if (e.target === e.currentTarget) {
+                setIsProviderModalOpen(false);
+              }
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: 'white',
+                padding: '20px',
+                zIndex: 8,
+              }}
+            >
+              <h4>Available providers:</h4>
+              {availableProviders.map(provider => {
+                return (
+                  <button
+                    style={{
+                      backgroundColor: '#aa33b5',
+                      color: 'white',
+                      padding: '8px',
+                      marginTop: '16px',
+                    }}
+                    key={provider.getProviderName()}
+                    onClick={connectToProvider(provider)}
+                  >
+                    Connect to {provider.getProviderName()}
+                  </button>
+                );
+              })}
+            </div>
+          </div>,
           window.document.body,
         )}
     </>

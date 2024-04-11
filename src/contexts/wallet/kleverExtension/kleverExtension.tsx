@@ -1,4 +1,4 @@
-import { WalletProvider } from '@/contexts/wallet/index';
+import { WalletProvider } from '@/contexts/wallet';
 import { web } from '@klever/sdk-web';
 import { createContext, PropsWithChildren, useContext, useState } from 'react';
 import { toast } from 'react-toastify';

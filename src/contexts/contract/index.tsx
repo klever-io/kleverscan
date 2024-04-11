@@ -118,7 +118,7 @@ export const ContractProvider: React.FC = ({ children }) => {
   const [senderAccount, setSenderAccount] = useState<string>('');
 
   useEffect(() => {
-    if (walletAddress !== '' && senderAccount === '') {
+    if (walletAddress !== '') {
       setSenderAccount(walletAddress);
     }
   }, [walletAddress]);

@@ -51,7 +51,18 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
   setTxHash,
   setLoading,
 }) => {
-  const [selectedPackCurrency, setSelectedPackCurrency] = useState<string>('');
+  const getPackCurrencyOptions = () => {
+    return (
+      ITO?.packData?.map(pack => ({
+        label: pack.key,
+        value: pack.key,
+      })) || []
+    );
+  };
+
+  const [selectedPackCurrency, setSelectedPackCurrency] = useState<string>(
+    getPackCurrencyOptions()[0]?.value || '',
+  );
   const [selectedPack, setSelectedPack] = useState<number>(0);
   const [assetAmount, setAssetAmount] = useState<number>(0);
   const [currencyAmount, setCurrencyAmount] = useState<number>(0);
@@ -90,15 +101,6 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
       document.documentElement.style.overflow = 'unset';
     };
   }, [isOpenParticipateModal]);
-
-  const getPackCurrencyOptions = () => {
-    return (
-      ITO?.packData?.map(pack => ({
-        label: pack.key,
-        value: pack.key,
-      })) || []
-    );
-  };
 
   const getPackOptions = () => {
     const packs =

@@ -30,6 +30,11 @@ export const AssetITOSummary: React.FC<AssetITOProps> = ({
   setOpenParticipateModal,
 }) => {
   const remainingTime = useCountdown((ITO?.endTime || 0) * 1000);
+  const access =
+    ITO?.whitelistEndTime && Date.now() < ITO?.whitelistEndTime
+      ? 'Whitelist Only'
+      : 'Public';
+
   const { setOpenDrawer, extensionInstalled, walletAddress, connectExtension } =
     useExtension();
 
@@ -53,10 +58,16 @@ export const AssetITOSummary: React.FC<AssetITOProps> = ({
   return (
     <>
       <CardContainer>
-        <Title>Live ITO</Title>
+        <Title>
+          Live {ITO?.ticker} ITO - {access}
+        </Title>
         <Subtitle>
-          Time for action! This guide enlights you on your blockchain gaming
-          path
+          You can participate in the {ITO?.ticker} ITO{' '}
+          {(ITO?.maxAmount || ITO?.endTime) &&
+            `and get an exclusive rate
+          for ${ITO?.ticker}`}
+          . To participate, click the button below and choose the amount you
+          want to invest.
         </Subtitle>
         <TotalRaised>
           <Label>Total Raised</Label>

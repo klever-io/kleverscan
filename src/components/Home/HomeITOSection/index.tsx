@@ -1,3 +1,4 @@
+import { PurpleArrowRight } from '@/assets/icons';
 import { ParticipateModal } from '@/components/Asset/AssetSummary/ParticipateModal';
 import { HashComponent } from '@/components/Contract';
 import Table, { ITable } from '@/components/ITOTable';
@@ -5,6 +6,7 @@ import { useParticipate } from '@/contexts/participate';
 import { getITOrowSections, ITOheaders, requestITOSQuery } from '@/pages/ito';
 import { IParsedITO } from '@/types';
 import { TableContainer, TableHeader, TableTitle } from '@/views/launchpad';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 import ReactDOM from 'react-dom';
@@ -21,7 +23,7 @@ export const HomeITOSection: React.FC = () => {
   const router = useRouter();
 
   const rowSections = useCallback(
-    getITOrowSections(setITO, setOpenParticipateModal),
+    getITOrowSections(setITO, setOpenParticipateModal, 'home'),
     [setITO, setOpenParticipateModal],
   );
 
@@ -33,6 +35,7 @@ export const HomeITOSection: React.FC = () => {
     dataName: 'itos',
     scrollUp: false,
     showLimit: false,
+    showPagination: false,
   };
 
   const hashProps = {
@@ -44,7 +47,20 @@ export const HomeITOSection: React.FC = () => {
     <>
       <TableContainer>
         <TableHeader>
-          <TableTitle>Live Projects</TableTitle>
+          <TableTitle>
+            Live Projects
+            <Link
+              href={{
+                pathname: '/ito',
+              }}
+            >
+              <a>
+                {' '}
+                View All
+                <PurpleArrowRight />
+              </a>
+            </Link>
+          </TableTitle>
         </TableHeader>
         {txHash && <HashComponent {...hashProps} />}
 

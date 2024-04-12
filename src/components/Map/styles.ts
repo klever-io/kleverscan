@@ -29,6 +29,10 @@ export const Container = styled.div`
   .leaflet-control-container {
     display: none;
   }
+
+  .leaflet-pane {
+    z-index: 1;
+  }
 `;
 
 export const Row = styled.div`

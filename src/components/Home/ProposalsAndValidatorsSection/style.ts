@@ -37,6 +37,18 @@ export const Title = styled.div`
     color: ${props =>
       props.theme.dark ? props.theme.true.white : props.theme.true.black};
   }
+
+  a {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 1rem;
+
+    color: ${({ theme }) => theme.violet};
+    font-size: 0.875rem;
+    line-height: 1rem;
+  }
 `;
 
 export const Content = styled.div`

@@ -12,6 +12,8 @@ import {
   Title,
 } from '../style';
 import { LastBlock } from './LastBlock';
+import Link from 'next/link';
+import { PurpleArrowRight } from '@/assets/icons';
 
 const Map = dynamic(() => import('@/components/Map/index'), { ssr: false });
 
@@ -41,6 +43,17 @@ const ValidatorsCard: React.FC = () => {
           </NextImageValidatorWrapper>
         </StackedImageWrapper>
         <span>Validators</span>
+        <Link
+          href={{
+            pathname: '/validators',
+          }}
+        >
+          <a>
+            {' '}
+            View All
+            <PurpleArrowRight />
+          </a>
+        </Link>
       </Title>
 
       <Content>

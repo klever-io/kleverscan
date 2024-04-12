@@ -68,6 +68,7 @@ export interface ITable {
   interval?: number;
   intervalController?: React.Dispatch<React.SetStateAction<number>>;
   showLimit?: boolean;
+  showPagination?: boolean;
 }
 
 const onErrorHandler = () => {
@@ -89,6 +90,7 @@ const Table: React.FC<ITable> = ({
   interval,
   intervalController,
   showLimit = true,
+  showPagination = true,
 }) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
@@ -304,23 +306,25 @@ const Table: React.FC<ITable> = ({
               })}
           </Body>
 
-          {!isFetching && (!response?.items || response?.items?.length === 0) && (
-            <>
-              <RetryContainer onClick={() => refetch()} $loading={isFetching}>
-                <span>Retry</span>
-                <IoReloadSharp size={20} />
-              </RetryContainer>
-              <EmptyRow {...props}>
-                <p>Oops! Apparently no data here.</p>
-              </EmptyRow>
-            </>
-          )}
+          {!isFetching &&
+            (!response?.items || response?.items?.length === 0) && (
+              <>
+                <RetryContainer onClick={() => refetch()} $loading={isFetching}>
+                  <span>Retry</span>
+                  <IoReloadSharp size={20} />
+                </RetryContainer>
+                <EmptyRow {...props}>
+                  <p>Oops! Apparently no data here.</p>
+                </EmptyRow>
+              </>
+            )}
         </Container>
         <BackTopButton onClick={handleScrollTop} isHidden={scrollTop}>
           <BsFillArrowUpCircleFill />
         </BackTopButton>
       </ContainerView>
-      {typeof scrollUp === 'boolean' &&
+      {showPagination &&
+        typeof scrollUp === 'boolean' &&
         typeof response?.totalPages === 'number' &&
         response?.totalPages > 1 && (
           <PaginationContainer>

@@ -38,6 +38,21 @@ export const TableTitle = styled.h2`
 
   font-size: 1.5rem;
   font-weight: 700;
+
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 1rem;
+
+    color: ${({ theme }) => theme.violet};
+    font-size: 0.875rem;
+    line-height: 1rem;
+  }
 `;
 
 export const TableContainer = styled.div``;

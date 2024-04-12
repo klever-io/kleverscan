@@ -13,6 +13,8 @@ import {
   Title,
 } from '../style';
 import { Proposal } from './Proposal';
+import Link from 'next/link';
+import { PurpleArrowRight } from '@/assets/icons';
 
 const ProposalsCard: React.FC = () => {
   const {
@@ -46,6 +48,18 @@ const ProposalsCard: React.FC = () => {
           </NextImageValidatorWrapper>
         </StackedImageWrapper>
         <span>Proposals</span>
+
+        <Link
+          href={{
+            pathname: '/proposals',
+          }}
+        >
+          <a>
+            {' '}
+            View All
+            <PurpleArrowRight />
+          </a>
+        </Link>
       </Title>
 
       <Content>

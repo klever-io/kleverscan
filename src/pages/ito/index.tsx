@@ -64,6 +64,7 @@ export const getITOrowSections =
   (
     setITO: (asset: IParsedITO) => void,
     setOpenParticipateModal: (open: boolean) => void,
+    reference?: string,
   ) =>
   (asset: IParsedITO): IRowSection[] => {
     const {
@@ -111,7 +112,10 @@ export const getITOrowSections =
     const sections: IRowSection[] = [
       {
         element: props => (
-          <Link href={`/asset/${assetId}?reference=ito`} key={assetId}>
+          <Link
+            href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
+            key={assetId}
+          >
             <a>
               <AssetLogo
                 logo={logo}
@@ -127,7 +131,10 @@ export const getITOrowSections =
 
       {
         element: props => (
-          <Link href={`/asset/${assetId}?reference=ito`} key={name}>
+          <Link
+            href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
+            key={name}
+          >
             <a style={{ overflow: 'hidden' }}>{name}</a>
           </Link>
         ),
@@ -136,7 +143,10 @@ export const getITOrowSections =
       {
         element: props => (
           <ContainerAssetId>
-            <Link href={`/asset/${assetId}?reference=ito`} key={assetId}>
+            <Link
+              href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
+              key={assetId}
+            >
               {assetId}
             </Link>
             <Copy info="Asset ID" data={assetId} svgSize={18} />
@@ -219,7 +229,7 @@ const ITOsPage: React.FC = () => {
   const router = useRouter();
 
   const tableProps: ITable = {
-    rowSections: getITOrowSections(setITO, setOpenParticipateModal),
+    rowSections: getITOrowSections(setITO, setOpenParticipateModal, 'ito'),
     header: ITOheaders,
     type: 'launchPad',
     request: (page, limit) => requestITOSQuery(page, limit, router),

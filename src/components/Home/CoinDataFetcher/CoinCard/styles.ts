@@ -326,28 +326,42 @@ export const CoinsSelector = styled.div`
   transition: 0.5s ease;
 `;
 
+export const CoinsSlider = styled.div<{ selectedIndex: number }>`
+  width: 82px;
+  height: 24px;
+  position: absolute;
+
+  transition: 0.4s ease-in-out;
+
+  transform: translateX(
+    ${props => (props.selectedIndex >= 1 ? props.selectedIndex * 82 + 8 : 0)}px
+  );
+
+  background-color: ${props => props.theme.violet};
+  border-radius: 24px;
+`;
+
 export const CoinSelector = styled.button<{ isSelected: boolean }>`
+  position: relative;
   width: 82px;
   height: 100%;
+  z-index: 2;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${({ theme }) => theme.true.white};
+  color: ${props =>
+    props.isSelected ? props.theme.true.white : props.theme.gray700};
   transition: 0.5s ease-out;
   font-style: normal;
   font-weight: 500;
   font-size: 12px;
   line-height: 24px;
-  gap: 0.5rem;
-  background-color: ${props =>
-    props.isSelected ? props.theme.violet : 'transaparent'};
-
-  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.3);
+  gap: 8px;
 
   -webkit-user-select: none; /* Safari */
   user-select: none; /* Standard syntax */
   cursor: pointer;
-  border-radius: 24px;
 `;
 
 export const ContainerLoading = styled.div`

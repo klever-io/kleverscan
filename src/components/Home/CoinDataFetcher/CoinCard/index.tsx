@@ -40,6 +40,7 @@ import {
   CoinsContainer,
   CoinSelector,
   CoinsSelector,
+  CoinsSlider,
   Container,
   ContentError,
   Description,
@@ -238,18 +239,11 @@ const CoinCard: React.FC = () => {
   });
   const { setWizard } = useWizard();
 
-  const handleSelectCoin = useCallback(() => {
-    if (carouselRef.current !== null && cardRef.current !== null)
-      setSelectedCoin(
-        Math.round(
-          carouselRef.current.scrollLeft / cardRef.current.offsetWidth,
-        ),
-      );
-  }, [carouselRef, cardRef]);
-
   const handleSelection = (index: number) => {
-    if (carouselRef.current !== null && cardRef.current !== null)
+    if (carouselRef.current !== null && cardRef.current !== null) {
       carouselRef.current.scrollLeft = index * cardRef.current.offsetWidth;
+      setSelectedCoin(index);
+    }
   };
 
   const queryFnKlvChart = () => homeKlvChartCall(coinDays.current);
@@ -425,9 +419,10 @@ const CoinCard: React.FC = () => {
               {coin.shortname}
             </CoinSelector>
           ))}
+          <CoinsSlider selectedIndex={selectedCoin} />
         </CoinsSelector>
         {!boolChecker(coinsLoadingBool) ? (
-          <Carousel ref={carouselRef} onScroll={handleSelectCoin}>
+          <Carousel ref={carouselRef}>
             {coins.map((coin, index) => (
               <RenderCoinsCard
                 renderKfiMarketCap={renderKfiMarketCap}

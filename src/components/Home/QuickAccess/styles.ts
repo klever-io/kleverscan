@@ -47,7 +47,7 @@ export const CardItem = styled.div`
 
   padding: 16px 20px;
 
-  border-radius: 0.5rem;
+  border-radius: 8px;
   border: 1px solid ${props => props.theme.violet};
   cursor: pointer;
 

@@ -20,7 +20,6 @@ interface IShortCutContract {
   openWiz?: () => void;
 }
 
-// TODO -> Check type for setWizard
 const QuickAccess: React.FC<{
   setWizard: React.Dispatch<React.SetStateAction<any>>;
 }> = ({ setWizard }) => {

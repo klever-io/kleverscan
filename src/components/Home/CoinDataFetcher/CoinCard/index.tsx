@@ -44,10 +44,13 @@ import {
   ContentError,
   Description,
   EnchangeLinks,
+  ExchangeIconContainer,
+  ExchangeTextContainer,
   HeaderContainer,
   HeaderContent,
   HeaderGraph,
   IconContainer,
+  LeftContainer,
   Name,
   NameError,
   SetTimeContainer,
@@ -72,13 +75,15 @@ interface ICoinTimes {
 
 const swapExchangeInfo = [
   {
-    text: 'Swap and buy KLV and KFI',
+    text1: 'Swap and buy',
+    text2: 'KLV and KFI',
     url: 'https://voxswap.io/USDT-KLV',
     icon: <VoxSwap />,
     color: '#B7EC42',
   },
   {
-    text: 'Exchange the market top tokens',
+    text1: 'Exchange the',
+    text2: 'market top tokens',
     url: 'https://bitcoin.me/us/trade/KLV-USDT',
     icon: <BitcoinMe />,
     color: '#FF6700',
@@ -145,11 +150,11 @@ const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
                     maximumFractionDigits: 6,
                   })
                 : assetsData?.kfi?.prices?.todaysPrice
-                ? assetsData?.kfi?.prices?.todaysPrice.toLocaleString(
-                    undefined,
-                    { maximumFractionDigits: 6 },
-                  )
-                : '--'}
+                  ? assetsData?.kfi?.prices?.todaysPrice.toLocaleString(
+                      undefined,
+                      { maximumFractionDigits: 6 },
+                    )
+                  : '--'}
             </p>
             <Description
               positive={
@@ -386,21 +391,26 @@ const CoinCard: React.FC = () => {
 
   return (
     <Container>
-      <QuickAccess setWizard={setWizard} />
-      <EnchangeLinks>
-        {swapExchangeInfo.map((item, index) => (
-          <Button
-            borderColor={item.color}
-            target="_blank"
-            href={item.url}
-            rel="noreferrer"
-            key={index}
-          >
-            <span>{item.text}</span>
-            {item.icon}
-          </Button>
-        ))}
-      </EnchangeLinks>
+      <LeftContainer>
+        <EnchangeLinks>
+          {swapExchangeInfo.map((item, index) => (
+            <Button
+              borderColor={item.color}
+              target="_blank"
+              href={item.url}
+              rel="noreferrer"
+              key={index}
+            >
+              <ExchangeIconContainer>{item.icon}</ExchangeIconContainer>
+              <ExchangeTextContainer>
+                <p>{item.text1}</p>
+                <p>{item.text2}</p>
+              </ExchangeTextContainer>
+            </Button>
+          ))}
+        </EnchangeLinks>
+        <QuickAccess setWizard={setWizard} />
+      </LeftContainer>
 
       <CoinsContainer>
         <CoinsSelector>

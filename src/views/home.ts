@@ -1,5 +1,7 @@
 import {
+  ArrowDown,
   ArrowDownSquare,
+  ArrowDropdown,
   ArrowUpSquare,
   LineArrowUpSquare,
 } from '@/assets/icons';
@@ -85,6 +87,8 @@ export const DataContainer = styled(Section)`
 export const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 24px;
+
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: row;
     gap: 16px;
@@ -365,8 +369,12 @@ export const BlockCardContainer = styled.div<BlockCardContainerProps>`
     `}
 
   border-radius: 1rem;
-  transition: 1s all ease, 0.1s filter ease;
-  transition: color 0.1s ease, background-color 0.1s ease;
+  transition:
+    1s all ease,
+    0.1s filter ease;
+  transition:
+    color 0.1s ease,
+    background-color 0.1s ease;
 
   animation: ${PullFade} 1s ease-in-out;
 
@@ -815,7 +823,7 @@ export const ButtonExpand = styled.div`
   gap: 0.5rem;
   align-items: center;
   justify-content: center;
-  width: 152px;
+  width: 100%;
   height: 3rem;
   background: linear-gradient(
     360deg,
@@ -907,9 +915,11 @@ export const ViewMoreContainer = styled.div`
   }
 `;
 
-export const ArrowDownDataCards = styled(ArrowDownSquare)<{
+export const ArrowDownDataCards = styled(ArrowDropdown)<{
   $expanded: boolean;
 }>`
+  transition: rotate 0.3s;
+
   rotate: ${({ $expanded }) => ($expanded ? 180 : 0)}deg;
   path {
     fill: ${({ theme }) => theme.black};

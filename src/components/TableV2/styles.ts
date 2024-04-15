@@ -41,7 +41,7 @@ export const TableBody = styled.div<{ smaller?: boolean }>`
 
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 16px;
 
   color: ${props => props.theme.black};
 
@@ -49,6 +49,7 @@ export const TableBody = styled.div<{ smaller?: boolean }>`
     display: block;
     border-radius: 16px;
     padding: 16px;
+    gap: 40px;
 
     ${props =>
       props.smaller &&
@@ -86,7 +87,8 @@ export const TableRow = styled.div<TableRowProps>`
     display: grid;
     width: 100%;
     grid-template-columns: repeat(2, 1fr);
-    grid-gap: 0.75rem;
+    column-gap: 12px;
+    row-gap: 4px;
 
     padding: 16px;
 
@@ -149,7 +151,11 @@ export const MobileCardItem = styled.div<{
     !props.columnSpan || props.columnSpan >= 0
       ? css`
           grid-column: span ${props.columnSpan};
-          gap: 0.25rem;
+          gap: 4px;
+          ${props.smaller &&
+          css`
+            gap: 2px;
+          `}
         `
       : css`
           display: none;

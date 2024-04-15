@@ -27,9 +27,7 @@ const Tooltip: React.FC<ITooltipProps> = ({
       maxVw={maxVw}
     >
       {Component ? (
-        <div data-tip data-for="buttonTooltip">
-          <Component />
-        </div>
+        Component({})
       ) : (
         <IconHelp data-tip data-for="buttonTooltip">
           button

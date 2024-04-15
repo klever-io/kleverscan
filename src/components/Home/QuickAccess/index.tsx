@@ -88,7 +88,7 @@ const QuickAccess: React.FC<{
     <Container>
       <TitleContainer>
         <small>{t('QuickAccess Description')}</small>
-        <Title>{t('QuickAccess')}</Title>
+        <Title>What do you want to do?</Title>
       </TitleContainer>
       <Content>
         {quickAccessContract.map(contract => (

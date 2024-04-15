@@ -7,22 +7,35 @@ export const Container = styled.div`
   width: 100%;
   color: white;
 
-  padding: 16px 24px;
+  padding: 16px 8px;
   border-radius: 16px;
 
   display: flex;
   flex-direction: column;
   gap: 16px;
+
+  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+    padding: 16px 24px;
+  }
 `;
 
 export const TitleContainer = styled.div`
   width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
   small {
     color: ${props => props.theme.darkText};
     width: auto;
     font-weight: 400;
     font-size: 0.9rem;
     line-height: 18px;
+  }
+
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    text-align: center;
   }
 `;
 
@@ -51,13 +64,15 @@ export const CardItem = styled.div`
     background-color: ${props => props.theme.violet};
   }
 
-  grid-column: span 2;
+  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+    grid-column: span 2;
 
-  :nth-last-child(2) {
-    grid-column: 1/4;
-  }
-  :nth-last-child(1) {
-    grid-column: 4/7;
+    :nth-last-child(2) {
+      grid-column: 1/4;
+    }
+    :nth-last-child(1) {
+      grid-column: 4/7;
+    }
   }
 `;
 export const PlusIcon = styled.div`
@@ -78,9 +93,8 @@ export const Content = styled.div`
   display: grid;
   gap: 8px;
 
-  grid-template-columns: repeat(auto-fill, 6);
-
-  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    grid-template-columns: repeat(2, 1fr);
   }
 `;
 

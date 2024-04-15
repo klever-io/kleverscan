@@ -366,7 +366,9 @@ export const MobileBackground = styled.div<IMobileMenu>`
   background-color: ${props =>
     transparentize(props.theme.dark ? 0.85 : 0.7, props.theme.black)};
 
-  transition: opacity 0.5s ease, visibility 0.5s ease;
+  transition:
+    opacity 0.5s ease,
+    visibility 0.5s ease;
 `;
 
 const expand = keyframes`
@@ -448,7 +450,7 @@ export const MenuIcon = styled(HiOutlineMenuAlt2).attrs(props => ({
 
 export const ConnectContainer = styled.div`
   display: flex;
-  max-width: 10rem;
+  max-width: 200px;
   width: 100%;
   z-index: 5;
   position: sticky;

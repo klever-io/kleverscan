@@ -457,7 +457,7 @@ export const SpanTime = styled.span<{ selected: boolean }>`
 
 export const ExchangeIconContainer = styled.div`
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   height: 100%;
 
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
@@ -476,7 +476,6 @@ export const Button = styled.a<{ borderColor: string }>`
 
   width: 100%;
   padding: 16px 20px;
-  margin-top: 1rem;
   border-radius: 8px;
   color: ${props => props.theme.true.white};
 
@@ -500,7 +499,7 @@ export const Button = styled.a<{ borderColor: string }>`
   }
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     align-items: flex-start;
-    flex-direction: column-reverse;
+    flex-direction: column;
     padding: 16px 20px;
   }
   font-size: 1.25rem;

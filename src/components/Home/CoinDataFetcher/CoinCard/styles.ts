@@ -61,7 +61,7 @@ export const CoinsContainer = styled.div`
   ${TableGradientBorder}
   border-radius: 16px;
 
-  width: calc((100% - 225px) / 2);
+  width: 50%;
   position: relative;
 
   display: flex;
@@ -455,19 +455,29 @@ export const SpanTime = styled.span<{ selected: boolean }>`
   cursor: pointer;
 `;
 
+export const ExchangeIconContainer = styled.div`
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    align-items: center;
+  }
+`;
+
+export const ExchangeTextContainer = styled.div``;
+
 export const Button = styled.a<{ borderColor: string }>`
   ${DataCardDefaultStyles}
   display: flex;
-  width: 193px;
-  aspect-ratio: 1;
-
-  flex-direction: column;
-  justify-content: space-between;
   align-items: center;
   text-align: start;
-  padding: 16px 52px 16px 20px;
+  gap: 16px;
+
+  width: 100%;
+  padding: 16px 20px;
   margin-top: 1rem;
-  border-radius: 12px;
+  border-radius: 8px;
   color: ${props => props.theme.true.white};
 
   border: 1px solid ${props => props.borderColor};
@@ -478,7 +488,7 @@ export const Button = styled.a<{ borderColor: string }>`
 
   :hover,
   :focus {
-    box-shadow: inset 193px 193px 0 0 ${props => props.borderColor};
+    box-shadow: inset 350px 0 0 0 ${props => props.borderColor};
 
     color: ${props => props.theme.true.newBlack};
     svg {
@@ -490,7 +500,7 @@ export const Button = styled.a<{ borderColor: string }>`
   }
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     align-items: flex-start;
-
+    flex-direction: column-reverse;
     padding: 16px 20px;
   }
   font-size: 1.25rem;
@@ -503,6 +513,16 @@ export const Button = styled.a<{ borderColor: string }>`
   }
 `;
 
+export const LeftContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 50%;
+  }
+`;
+
 export const EnchangeLinks = styled.div`
   display: flex;
   flex-direction: row;
@@ -511,11 +531,6 @@ export const EnchangeLinks = styled.div`
   color: ${props => props.theme.true.white};
   font-size: 1rem;
   font-weight: 500;
-
-  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    flex-direction: column;
-    gap: 8px;
-  }
 `;
 
 export const CurrencyIcon = styled(Currency)`

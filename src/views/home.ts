@@ -43,8 +43,11 @@ export const Container = styled.div`
 
   display: flex;
   flex-direction: column;
+  gap: 32px;
 
-  gap: 80px;
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    gap: 80px;
+  }
 `;
 
 export const IconContainer = styled.div`
@@ -81,7 +84,10 @@ export const DataContainer = styled(Section)`
   display: flex;
   flex-direction: column;
 
-  gap: 32px;
+  gap: 16px;
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    gap: 32px;
+  }
 `;
 
 export const CardContainer = styled.div`

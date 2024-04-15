@@ -25,7 +25,7 @@ import {
 import { CircularProgressContainer } from '@/views/validators';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
 import HomeDataCardsSkeleton from '../HomeDataCardsSkeleton';
 import GradientSVG from './GradientSVG';
@@ -34,6 +34,8 @@ const HomeDataCards: React.FC = ({}) => {
   const [expanded, setExpanded] = useState(false);
   const { isMobile, isTablet } = useMobile();
   const { isDarkTheme } = useTheme();
+
+  const dataCardsRef = useRef<HTMLDivElement>(null);
 
   const {
     actualTPS,
@@ -164,11 +166,22 @@ const HomeDataCards: React.FC = ({}) => {
   const displayCards = !isMobile
     ? dataCards
     : expanded
-    ? dataCards
-    : dataCards.slice(0, 1);
+      ? dataCards
+      : dataCards.slice(0, 1);
+
+  const handleExpand = () => {
+    setExpanded(!expanded);
+
+    if (!expanded) {
+      dataCardsRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  };
   return !loadingCards ? (
     <DataCardsWrapper>
-      <DataCardsContent>
+      <DataCardsContent ref={dataCardsRef}>
         {isTablet && !isMobile && (
           <>
             <MobileCardsContainer>
@@ -284,9 +297,9 @@ const HomeDataCards: React.FC = ({}) => {
         )}
       </DataCardsContent>
       <ExpandData>
-        <ButtonExpand onClick={() => setExpanded(!expanded)}>
+        <ButtonExpand onClick={handleExpand}>
           <ArrowDownDataCards $expanded={expanded} />
-          <p>{expanded ? 'Hide Cards' : 'Expand Cards'}</p>
+          <p>{expanded ? 'Hide Cards' : 'See More Cards'}</p>
         </ButtonExpand>
       </ExpandData>
     </DataCardsWrapper>

@@ -53,6 +53,7 @@ export const homeTransactionsRowSections = (
     status,
     precision,
     data,
+    nonce,
   } = props;
 
   let toAddress = '- -';
@@ -120,7 +121,7 @@ export const homeTransactionsRowSections = (
           </DoubleRow>
         ) : (
           <DoubleRow {...props}>
-            <CenteredRow key={contractType}>
+            <CenteredRow>
               <span>{ContractsName[contractType]}</span>
             </CenteredRow>
             <CenteredRow>

@@ -20,7 +20,7 @@ const FadeIn = keyframes`
 
 export const Container = styled.div`
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   position: relative;
   width: 100%;
 
@@ -489,10 +489,9 @@ export const Button = styled.a<{ borderColor: string }>`
     }
   }
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    font-size: 1rem;
-    font-weight: 700;
-
     align-items: flex-start;
+
+    padding: 16px 20px;
   }
   font-size: 1.25rem;
 
@@ -506,15 +505,16 @@ export const Button = styled.a<{ borderColor: string }>`
 
 export const EnchangeLinks = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: 16px;
   color: ${props => props.theme.true.white};
   font-size: 1rem;
   font-weight: 500;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    flex-direction: row;
+  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    flex-direction: column;
+    gap: 8px;
   }
 `;
 

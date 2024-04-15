@@ -53,6 +53,11 @@ export const Title = styled.div`
 
 export const Content = styled.div`
   display: flex;
+  justify-content: space-between;
+
+  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+    justify-content: start;
+  }
 `;
 
 export const CardSection = styled.div`

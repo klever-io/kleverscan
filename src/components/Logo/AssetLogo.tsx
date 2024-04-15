@@ -36,6 +36,8 @@ export const AssetLogo: React.FC<IAssetLogo> = ({
 
   const validateLogo = useCallback(
     async (url: string) => {
+      if (!logo) return;
+
       const isImg = await validateImgUrl(url, maxRequestAwaitTime);
       if (isImg) {
         setUrlIsImg(true);

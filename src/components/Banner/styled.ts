@@ -5,8 +5,8 @@ import styled from 'styled-components';
 export const BannerContainer = styled(Container)<{ status: boolean }>`
   width: 100%;
   justify-content: center;
-  min-height: 4rem;
-  padding: 1.5rem 2.5rem 1.5rem 1.7rem;
+  min-height: 2rem;
+  padding: 4px 32px 4px 16px;
   color: ${({ theme, status }) =>
     status ? theme.true.black : theme.true.white};
   background-color: ${({ theme, status }) =>
@@ -20,7 +20,8 @@ export const BannerContainer = styled(Container)<{ status: boolean }>`
 `;
 
 export const BannerParagraph = styled.p`
-  word-break: break-all;
+  font-size: 0.875rem;
+  line-height: 1rem;
 `;
 
 export const ButtonClose = styled(GrFormClose).attrs(props => ({

@@ -34,7 +34,7 @@ interface ApplyFormModalProps {
   asset: IAsset;
   defaultValues?: {
     short_description: string;
-    project_description: string;
+    project_description_copy: string;
   };
   setTxHash: (txHash: string) => void;
   setLoading: (state: boolean) => void;
@@ -51,7 +51,7 @@ export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
   refetchAssetInfo,
 }) => {
   const [projectDescription, setProjectDescription] = useState<string>(
-    defaultValues?.project_description || '',
+    defaultValues?.project_description_copy || '',
   );
   const [shortDescription, setShortDescription] = useState<string>(
     defaultValues?.short_description || '',
@@ -102,7 +102,7 @@ export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
       const body = {
         id: asset.assetId,
         short_description: shortDescription,
-        project_description: projectDescription,
+        project_description_copy: projectDescription,
         signedTransaction: JSON.stringify(signedTransaction),
       };
 

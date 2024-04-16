@@ -122,13 +122,13 @@ export const About = styled.div`
     align-items: center;
     gap: 8px;
   }
+`;
 
-  p {
-    color: ${({ theme }) => theme.darkText};
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5;
-  }
+export const AboutHtml = styled.div`
+  color: ${({ theme }) => theme.darkText};
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
 `;
 
 export const EditContainer = styled.div`

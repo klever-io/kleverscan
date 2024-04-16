@@ -21,6 +21,7 @@ import { AssetITOSummary } from './AssetITOSummary';
 import { ParticipateModal } from './ParticipateModal';
 import {
   About,
+  AboutHtml,
   AssetHeaderContainer,
   AssetSubtitle,
   AssetTitle,
@@ -38,6 +39,8 @@ import {
   SocialNetworks,
   TitleContainer,
 } from './styles';
+
+import DOMPurify from 'dompurify';
 
 export interface AssetSummaryProps extends AssetProps {
   ITO: IParsedITO | undefined;
@@ -207,7 +210,7 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
           )}
         </RightSide>
       </Header>
-      {asset_info?.project_description_copy ? (
+      {asset_info?.project_description ? (
         <About>
           <h2>
             About the project
@@ -217,7 +220,11 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
               </EditContainer>
             )}
           </h2>
-          <p>{asset_info?.project_description_copy}</p>
+          <AboutHtml
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(asset_info?.project_description),
+            }}
+          />
         </About>
       ) : null}
       {asset &&
@@ -228,7 +235,7 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
             setOpenApplyFormModal={setOpenApplyFormModal}
             defaultValues={{
               short_description: asset_info?.short_description,
-              project_description_copy: asset_info?.project_description_copy,
+              project_description: asset_info?.project_description,
             }}
             refetchAssetInfo={refetchAssetInfo}
             asset={asset}

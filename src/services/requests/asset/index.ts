@@ -46,7 +46,11 @@ export const assetInfoCall = async (router: NextRouter): Promise<any> => {
         'asset_info',
         assetId,
         {
-          fields: ['short_description', 'project_description'],
+          fields: [
+            'short_description',
+            'project_description',
+            'project_description_copy',
+          ],
         },
       ],
     });

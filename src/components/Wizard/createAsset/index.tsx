@@ -473,6 +473,8 @@ export const CreateAssetOwnerAddressStep: React.FC<IAssetInformations> = ({
   const [changeOwnerAddress, setChangeOwnerAddress] = useState(false);
   const [checkedField, setCheckedField] = useState(0);
 
+  const { walletAddress } = useExtension();
+
   const {
     setValue,
     register,
@@ -481,7 +483,7 @@ export const CreateAssetOwnerAddressStep: React.FC<IAssetInformations> = ({
   } = useFormContext();
 
   useEffect(() => {
-    const getWallet = sessionStorage.getItem('walletAddress');
+    const getWallet = walletAddress;
     if (getWallet !== null) {
       setAddress(getWallet);
       setValue(formValue || '', getWallet, { shouldValidate: true });
@@ -662,8 +664,10 @@ export const CreateAssetRoyaltyAddress: React.FC<IWizardComponents> = ({
     formState: { errors },
   } = useFormContext();
 
+  const { walletAddress } = useExtension();
+
   useEffect(() => {
-    const getWalletAddress = sessionStorage.getItem('walletAddress');
+    const getWalletAddress = walletAddress;
     if (getWalletAddress !== null) {
       setAddress(getWalletAddress);
       setValue('royalties.address', getWalletAddress, { shouldValidate: true });
@@ -2984,9 +2988,7 @@ export const ConfirmTransaction: React.FC<IWizardConfirmProps> = ({
             </ConfirmCardBasisInfo>
             {additionalFields && (
               <ConfirmCardBasisInfo>
-                <span>
-                  {t('wizards:createToken.stepsInformations.initialSupply')}
-                </span>
+                <span>{t('wizards:common.initialSupply')}</span>
                 <span>{initialSupply ? initialSupply : 0}</span>
               </ConfirmCardBasisInfo>
             )}

@@ -207,7 +207,7 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
           )}
         </RightSide>
       </Header>
-      {asset_info?.project_description ? (
+      {asset_info?.project_description_copy ? (
         <About>
           <h2>
             About the project
@@ -217,7 +217,7 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
               </EditContainer>
             )}
           </h2>
-          <p>{asset_info?.project_description}</p>
+          <p>{asset_info?.project_description_copy}</p>
         </About>
       ) : null}
       {asset &&
@@ -228,7 +228,7 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
             setOpenApplyFormModal={setOpenApplyFormModal}
             defaultValues={{
               short_description: asset_info?.short_description,
-              project_description: asset_info?.project_description,
+              project_description_copy: asset_info?.project_description_copy,
             }}
             refetchAssetInfo={refetchAssetInfo}
             asset={asset}

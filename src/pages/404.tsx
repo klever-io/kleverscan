@@ -25,7 +25,7 @@ const NotFound: React.FC = () => {
             <Button hasBackground onClick={handleBack}>
               <span>Back to homepage</span>
             </Button>
-            <a href="https://support.klever.org/">
+            <a href="https://support.klever.org/" rel="nofollow">
               <Button hasBackground={false}>
                 <span>Visit our help center</span>
               </Button>

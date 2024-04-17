@@ -23,6 +23,7 @@ import {
   WarningContainer,
   WarningText,
 } from '@/views/create-transaction';
+import Link from 'next/link';
 import React, { useEffect } from 'react';
 
 export const warningMessage = `You don't have enough currency. Please check the amount of your transaction as well as the fee cost.`;
@@ -124,8 +125,7 @@ const CreateTransaction: React.FC = () => {
               will appear and you will fill in your wallet password. At the end,
               the hash of your transaction will be generated. You can view your
               transaction details on the{' '}
-              <a href="https://kleverscan.org/transactions/">Transactions</a>{' '}
-              page.
+              <Link href="/transactions">Transactions</Link> page.
             </span>
           </div>
         </CreateTxCard>

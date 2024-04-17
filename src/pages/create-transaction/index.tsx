@@ -23,6 +23,7 @@ import {
   WarningContainer,
   WarningText,
 } from '@/views/create-transaction';
+import Link from 'next/link';
 import React, { useEffect } from 'react';
 
 export const warningMessage = `You don't have enough currency. Please check the amount of your transaction as well as the fee cost.`;
@@ -79,7 +80,7 @@ const CreateTransaction: React.FC = () => {
               <a
                 href="https://chromewebstore.google.com/detail/klever-wallet/ifclboecfhkjbpmhgehodcjpciihhmif"
                 target="_blank"
-                rel="noreferrer"
+                rel="noreferrer nofollow"
               >
                 download the Klever Extension
               </a>{' '}
@@ -87,7 +88,11 @@ const CreateTransaction: React.FC = () => {
             </p>
             <p>
               Or enter this page via{' '}
-              <a href="https://www.klever.io/" target="_blank" rel="noreferrer">
+              <a
+                href="https://www.klever.io/"
+                target="_blank"
+                rel="noreferrer nofollow"
+              >
                 the Klever Wallet App internal browser
               </a>{' '}
               if you are in a mobile device.
@@ -120,8 +125,7 @@ const CreateTransaction: React.FC = () => {
               will appear and you will fill in your wallet password. At the end,
               the hash of your transaction will be generated. You can view your
               transaction details on the{' '}
-              <a href="https://kleverscan.org/transactions/">Transactions</a>{' '}
-              page.
+              <Link href="/transactions">Transactions</Link> page.
             </span>
           </div>
         </CreateTxCard>

@@ -43,7 +43,9 @@ export const WalletBanner: React.FC = () => {
           <Description>
             Maximize your project&apos;s potential with Klever Wallet post-ITO
             on KleverScan. A self-custodial{' '}
-            <a href="https://klever.io/en-us/crypto-wallet">crypto wallet</a>
+            <a href="https://klever.io/en-us/crypto-wallet" rel="nofollow">
+              crypto wallet
+            </a>
             enhances your token management, ensuring optimal security and
             seamless access across blockchains. Elevate your digital
             assets&apos; visibility and control with Klever Wallet
@@ -51,7 +53,7 @@ export const WalletBanner: React.FC = () => {
           {!isTablet ? (
             <Links>
               {links.map((link, index) => (
-                <LinkStyle href={link.href} key={link.href}>
+                <LinkStyle href={link.href} key={link.href} rel="nofollow">
                   {link.icon}
                   {link.text}
                 </LinkStyle>
@@ -61,7 +63,7 @@ export const WalletBanner: React.FC = () => {
             <Button
               href="https://onelink.to/455hxv"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow"
             >
               Download Now!
             </Button>

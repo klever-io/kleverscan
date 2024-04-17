@@ -130,7 +130,6 @@ const ITOsPage: React.FC = () => {
         ),
         span: 1,
       },
-
       {
         element: (
           <Link href={`/asset/${assetId}?reference=ito`} key={name}>
@@ -150,7 +149,6 @@ const ITOsPage: React.FC = () => {
         ),
         span: 1,
       },
-
       {
         element: (
           <span key={bestKLVRate}>

@@ -80,15 +80,11 @@ export const TableRow = styled.div<TableRowProps>`
   flex-direction: column;
   width: 100%;
 
-  /* justify-content: space-between; */
-  /* align-items: center; */
-
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     display: grid;
     width: 100%;
     grid-template-columns: repeat(2, 1fr);
-    column-gap: 12px;
-    row-gap: 4px;
+    gap: 4px;
 
     padding: 16px;
 
@@ -115,7 +111,7 @@ export const MobileCardItem = styled.div<{
   display: flex;
   flex-direction: column;
 
-  font-size: 1rem;
+  font-size: 0.75rem;
 
   a,
   span {
@@ -151,21 +147,12 @@ export const MobileCardItem = styled.div<{
     !props.columnSpan || props.columnSpan >= 0
       ? css`
           grid-column: span ${props.columnSpan};
-          gap: 4px;
-          ${props.smaller &&
-          css`
-            gap: 2px;
-          `}
+          gap: 2px;
         `
       : css`
           display: none;
         `}
 
-  ${props =>
-    props.smaller &&
-    css`
-      font-size: 0.75rem;
-    `}
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: ${props => (props.isAssets ? 'column' : 'row')};
@@ -227,6 +214,10 @@ export const CustomFieldWrapper = styled.div`
 
 export const TimestampInfo = styled.span`
   width: 14ch;
+
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    width: 12ch;
+  }
 `;
 
 export const Status = styled.span<IStatus>`
@@ -259,6 +250,10 @@ export const Status = styled.span<IStatus>`
       color: ${props.theme.table.icon} !important;
       
     `}
+
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    width: fit-content;
+  }
 `;
 
 export const EmptyRow = styled.div`

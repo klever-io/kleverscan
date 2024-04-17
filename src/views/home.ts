@@ -141,6 +141,7 @@ export const DataCardsWrapper = styled.div`
   width: 100%;
 `;
 
+// prettier-ignore
 export const DataCardsContent = styled.div`
   width: 100%;
   height: 50%;
@@ -151,13 +152,8 @@ export const DataCardsContent = styled.div`
 
   gap: 16px;
 
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    height: auto;
-    flex-direction: column;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    flex-direction: column;
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) and (min-width: ${props => props.theme.breakpoints.mobile}) {
+    grid-template-columns: 1fr 1fr;
   }
 `;
 
@@ -175,18 +171,17 @@ export const DataCardDefaultStyles = css`
 
 export const DataCard = styled.div`
   ${TableGradientBorder}
-  padding: 1.2rem;
-  padding-left: 2rem;
+  padding: 16px;
   width: 100%;
-  height: 120px;
-  align-items: center;
+
   display: flex;
+  align-items: center;
+  gap: 16px;
+
   border-radius: 1rem;
   ${props => !props.theme.dark && DefaultCardStyles}
-  @media
-  screen
-  and
-  (min-width: ${props => props.theme.breakpoints.tablet}) {
+
+  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
     ${DefaultCardStyles}
   }
   background-color: ${({ theme }) =>
@@ -196,25 +191,31 @@ export const DataCard = styled.div`
 
     color: ${props =>
       props.theme.dark ? props.theme.lightGray : props.theme.navbar.text};
-    font-weight: 700;
-    font-size: 14px;
-    line-height: 16px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    line-height: 1rem;
   }
   small {
+    font-size: 0.825rem;
     color: ${props =>
       props.theme.dark
-        ? props.theme.lightGray
+        ? props.theme.blueGray300
         : props.theme.navbar.text} !important;
   }
   &.epoch {
-    flex-direction: column;
-    align-items: flex-start;
-    align-content: center;
+    justify-content: space-between;
   }
 
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
-    padding-left: 1.2rem;
+    height: 120px;
+    padding: 0 24px;
   }
+`;
+
+export const EpochCardContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 `;
 
 export const DataCardContent = styled.div`
@@ -228,6 +229,7 @@ export const MobileCardsContainer = styled.div`
   gap: 1rem;
   width: 100%;
 `;
+
 export const EpochCard = styled.div`
   padding: 1.2rem;
 
@@ -245,6 +247,7 @@ export const EpochCard = styled.div`
 export const Percentage = styled.div`
   display: flex;
   min-width: 15rem;
+  height: 100%;
 
   justify-content: space-between;
   align-items: center;
@@ -262,7 +265,7 @@ export const Percentage = styled.div`
       props.theme.dark ? props.theme.true.white : props.theme.true.black};
   }
   div {
-    min-height: 3rem;
+    min-height: 2rem;
   }
 `;
 
@@ -274,21 +277,13 @@ export const DataCardValue = styled.div<{ isEpoch?: boolean }>`
   flex-wrap: wrap;
   margin-left: 0;
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    ${props =>
-      props.isEpoch &&
-      css`
-        margin-left: 0.77rem;
-      `}
-  }
-
   p {
     width: fit-content;
     height: fit-content;
     color: ${props =>
       props.theme.dark ? props.theme.black : props.theme.darkBlue};
     font-weight: 500;
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     padding-right: 0.5rem;
   }
   div {
@@ -305,7 +300,7 @@ export const DataCardValue = styled.div<{ isEpoch?: boolean }>`
     color: ${props =>
       props.theme.dark ? props.theme.black : props.theme.darkBlue};
   }
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     div {
       span {
         align-self: flex-start;
@@ -325,6 +320,7 @@ export const MobileEpoch = styled.div`
     font-size: 0.9rem;
   }
 `;
+
 export const DataCardLatest = styled.div<IVariation>`
   min-width: fit-content;
   display: flex;
@@ -622,12 +618,13 @@ export const TransactionChart = styled(TransactionContent)`
   min-height: 100%;
   height: 320px;
   position: relative;
+
   display: flex;
   justify-content: space-between;
   flex-direction: column;
-  background-color: ${props => props.theme.dark && 'transparent'} !important;
+  align-items: center;
 
-  padding: 1rem;
+  background-color: ${props => props.theme.dark && 'transparent'} !important;
 
   border-radius: 16px;
 
@@ -645,6 +642,7 @@ export const TransactionChart = styled(TransactionContent)`
   }
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+    padding: 16px;
     height: 100%;
   }
 `;
@@ -661,14 +659,12 @@ export const FixedTxChart = styled(TransactionChart)`
 
 export const TransactionChartContent = styled.div`
   overflow: hidden;
-  bottom: 0;
-  position: absolute;
-  width: calc(100% - 2rem);
+  width: 100%;
   height: 68%;
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
     position: absolute;
-    bottom: 0.3rem;
-    left: -0.1rem;
+    bottom: 0;
   }
 `;
 

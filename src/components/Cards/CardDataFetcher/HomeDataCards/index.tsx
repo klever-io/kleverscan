@@ -17,6 +17,7 @@ import {
   DataCardsContent,
   DataCardsWrapper,
   DataCardValue,
+  EpochCardContent,
   ExpandData,
   MobileCardsContainer,
   MobileEpoch,
@@ -29,26 +30,8 @@ import { useRef, useState } from 'react';
 import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
 import HomeDataCardsSkeleton from '../HomeDataCardsSkeleton';
 import GradientSVG from './GradientSVG';
-const HomeDataCards: React.FC = ({}) => {
-  const { t } = useTranslation('common', { keyPrefix: 'Cards' });
-  const [expanded, setExpanded] = useState(false);
-  const { isMobile, isTablet } = useMobile();
-  const { isDarkTheme } = useTheme();
 
-  const dataCardsRef = useRef<HTMLDivElement>(null);
-
-  const {
-    actualTPS,
-    blocks,
-    metrics,
-    newTransactions,
-    beforeYesterdayTransactions,
-    newAccounts = 0,
-    totalAccounts,
-    totalTransactions,
-    loadingCards,
-  } = useHomeData();
-
+const DefaultCards: React.FC<{ index: number }> = ({ index }) => {
   const icons = [
     [
       '/homeCards/transactionsIcon.svg',
@@ -57,7 +40,90 @@ const HomeDataCards: React.FC = ({}) => {
     ['/homeCards/accountsIcon.svg', '/homeCards/accountsBackground.svg'],
     ['/homeCards/tpsIcon.svg', '/homeCards/tpsBackground.svg'],
   ];
+
+  return (
+    <StackedImageWrapper>
+      <NextImageCardWrapper>
+        <Image
+          src={icons[index][0]}
+          alt="tps icon background"
+          width={44}
+          height={44}
+          loader={({ src, width }) => `${src}?w=${width}`}
+        />
+      </NextImageCardWrapper>
+      <NextImageCardWrapper>
+        <Image
+          src={icons[index][1]}
+          alt="tps icon background"
+          width={44}
+          height={44}
+          loader={({ src, width }) => `${src}?w=${width}`}
+        />
+      </NextImageCardWrapper>
+    </StackedImageWrapper>
+  );
+};
+
+const Progress: React.FC<{ percent: number }> = ({ percent }) => {
+  const { isDarkTheme } = useTheme();
+  const idCSS = 'gradient';
+
+  return (
+    <CircularProgressContainer>
+      <GradientSVG />
+      <CircularProgressbar
+        counterClockwise
+        strokeWidth={5}
+        value={percent}
+        styles={buildStyles({
+          pathColor: `url(#gradient)`,
+          trailColor: `${isDarkTheme ? '#404264' : '#F4F4F4'}`,
+        })}
+      />
+    </CircularProgressContainer>
+  );
+};
+
+const EpochCard: React.FC = () => {
+  const { blocks, metrics } = useHomeData();
+  const { t } = useTranslation('common', { keyPrefix: 'Cards' });
   const block = blocks && blocks[0];
+
+  return (
+    <DataCard className="epoch">
+      <EpochCardContent>
+        <span>
+          {`${t('Epoch')}` + (block?.epoch ? ` #${block.epoch} ` : ' ')}
+        </span>
+        <DataCardValue isEpoch={true}>
+          <p className="epochSeconds">
+            {metrics.remainingTime?.toLocaleString()}
+          </p>
+        </DataCardValue>
+        <small>Time remaining</small>
+      </EpochCardContent>
+      <Progress percent={metrics.epochLoadPercent} />
+    </DataCard>
+  );
+};
+
+const HomeDataCards: React.FC = ({}) => {
+  const { t } = useTranslation('common', { keyPrefix: 'Cards' });
+  const { isMobile, isTablet } = useMobile();
+
+  const dataCardsRef = useRef<HTMLDivElement>(null);
+
+  const {
+    actualTPS,
+    blocks,
+    metrics,
+    newTransactions,
+    newAccounts = 0,
+    totalAccounts,
+    totalTransactions,
+    loadingCards,
+  } = useHomeData();
 
   const dataCards: IDataCard[] = [
     {
@@ -75,233 +141,28 @@ const HomeDataCards: React.FC = ({}) => {
     { title: t('Live/Peak TPS'), value: actualTPS, Icon: TPS },
   ];
 
-  const DefaultCards: React.FC<{ index: number }> = ({ index }) => (
-    <StackedImageWrapper>
-      <NextImageCardWrapper>
-        <Image
-          src={icons[index][0]}
-          alt="tps icon background"
-          width={32}
-          height={32}
-          loader={({ src, width }) => `${src}?w=${width}`}
-        />
-      </NextImageCardWrapper>
-      <NextImageCardWrapper>
-        <Image
-          src={icons[index][1]}
-          alt="tps icon background"
-          width={44}
-          height={44}
-          loader={({ src, width }) => `${src}?w=${width}`}
-        />
-      </NextImageCardWrapper>
-    </StackedImageWrapper>
-  );
-
-  const Progress: React.FC<{ percent: number }> = ({ percent }) => {
-    const idCSS = 'gradient';
-    return (
-      <CircularProgressContainer>
-        <GradientSVG />
-        <CircularProgressbar
-          counterClockwise
-          value={percent}
-          styles={buildStyles({
-            pathColor: `url(#${idCSS})`,
-            trailColor: `${isDarkTheme ? '#404264' : '#F4F4F4'}`,
-          })}
-        />
-      </CircularProgressContainer>
-    );
-  };
-
-  const PercentageComponent: React.FC<{
-    progress?: any;
-    value?: string | number;
-  }> = ({ progress, value }) => {
-    return (
-      <Percentage>
-        <p className="epochSeconds">{value?.toLocaleString()}</p>
-        {progress >= 0 && (
-          <div>
-            <Progress percent={metrics.epochLoadPercent} />
-          </div>
-        )}
-      </Percentage>
-    );
-  };
-
-  const EpochCard: React.FC = () => (
-    <DataCard className="epoch">
-      <span>
-        {`${t('Epoch')}` + (block?.epoch ? ` #${block.epoch} ` : ' ')}
-      </span>
-      <DataCardValue isEpoch={true}>
-        {
-          <PercentageComponent
-            progress={metrics.epochLoadPercent}
-            value={metrics.remainingTime}
-          />
-        }
-      </DataCardValue>
-      <small>Time remaining</small>
-    </DataCard>
-  );
-
-  const EpochCardMobile: React.FC = () => (
-    <DataCard className="epoch">
-      <DataCardValue isEpoch={true}>
-        <PercentageComponent progress={metrics.epochLoadPercent} />
-        <MobileEpoch>
-          <span>
-            {`${t('Epoch')}` + (block?.epoch ? ` #${block.epoch} ` : ' ')}
-          </span>
-          <PercentageComponent value={metrics.remainingTime} />
-          <small>Time remaining</small>
-        </MobileEpoch>
-      </DataCardValue>
-    </DataCard>
-  );
-
-  const displayCards = !isMobile
-    ? dataCards
-    : expanded
-      ? dataCards
-      : dataCards.slice(0, 1);
-
-  const handleExpand = () => {
-    setExpanded(!expanded);
-
-    if (!expanded) {
-      dataCardsRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    }
-  };
   return !loadingCards ? (
     <DataCardsWrapper>
       <DataCardsContent ref={dataCardsRef}>
-        {isTablet && !isMobile && (
-          <>
-            <MobileCardsContainer>
-              <EpochCardMobile />
-              {
-                <DataCard>
-                  <StackedImageWrapper>
-                    <NextImageCardWrapper>
-                      <Image
-                        src="/homeCards/tpsIcon.svg"
-                        alt="tps icon"
-                        width={32}
-                        height={32}
-                        loader={({ src, width }) => `${src}?w=${width}`}
-                      />
-                    </NextImageCardWrapper>
-                    <NextImageCardWrapper>
-                      <Image
-                        src="/homeCards/tpsBackground.svg"
-                        alt="tps icon background"
-                        width={44}
-                        height={44}
-                        loader={({ src, width }) => `${src}?w=${width}`}
-                      />
-                    </NextImageCardWrapper>
-                  </StackedImageWrapper>
-                  <div>
-                    <span>{dataCards[2].title}</span>
-                    <DataCardValue>
-                      <p>{dataCards[2].value.toLocaleString()}</p>
-                      {dataCards[2].variation &&
-                        !dataCards[2].variation.includes('%') && (
-                          <DataCardLatest
-                            positive={dataCards[2].variation.includes('+')}
-                          >
-                            <ArrowData
-                              $positive={dataCards[2].variation.includes('+')}
-                            />
-                            <p>{dataCards[2].variation}/24h</p>
-                          </DataCardLatest>
-                        )}
-                    </DataCardValue>
-                  </div>
-                </DataCard>
-              }
-            </MobileCardsContainer>
-            <MobileCardsContainer>
-              {displayCards
-                .slice(0, 2)
-                .map(({ title, value, variation }, index) => (
-                  <DataCard key={String(index)}>
-                    <DefaultCards index={index} />
-                    <div>
-                      <span>{title}</span>
-                      <DataCardValue>
-                        <p>{value.toLocaleString()}</p>
-                        {variation && !variation.includes('%') && (
-                          <DataCardLatest positive={variation.includes('+')}>
-                            <ArrowData $positive={variation.includes('+')} />
-                            <p>{variation}/24h</p>
-                          </DataCardLatest>
-                        )}
-                      </DataCardValue>
-                    </div>
-                  </DataCard>
-                ))}
-            </MobileCardsContainer>
-          </>
-        )}
-        {isMobile && (
-          <>
-            <EpochCardMobile />
-            {displayCards.map(({ title, value, variation }, index) => (
-              <DataCard key={String(index)}>
-                <DefaultCards index={index} />
-                <DataCardContent>
-                  <span>{title}</span>
-                  <DataCardValue>
-                    <p>{value.toLocaleString()}</p>
-                    {variation && !variation.includes('%') && (
-                      <DataCardLatest positive={variation.includes('+')}>
-                        <ArrowData $positive={variation.includes('+')} />
-                        <p>{variation}/24h</p>
-                      </DataCardLatest>
-                    )}
-                  </DataCardValue>
-                </DataCardContent>
-              </DataCard>
-            ))}
-          </>
-        )}
-        {!isTablet && (
-          <>
-            <EpochCard />
-            {displayCards.map(({ title, value, variation }, index) => (
-              <DataCard key={String(index)}>
-                <DefaultCards index={index} />
-                <div>
-                  <span>{title}</span>
-                  <DataCardValue>
-                    <p>{value?.toLocaleString()}</p>
-                    {variation && !variation.includes('%') && (
-                      <DataCardLatest positive={variation.includes('+')}>
-                        <ArrowData $positive={variation.includes('+')} />
-                        <p>{variation}/24h</p>
-                      </DataCardLatest>
-                    )}
-                  </DataCardValue>
-                </div>
-              </DataCard>
-            ))}
-          </>
-        )}
+        <EpochCard />
+        {dataCards.map(({ title, value, variation }, index) => (
+          <DataCard key={String(index)}>
+            <DefaultCards index={index} />
+            <div>
+              <span>{title}</span>
+              <DataCardValue>
+                <p>{value?.toLocaleString()}</p>
+                {variation && !variation.includes('%') && (
+                  <DataCardLatest positive={variation.includes('+')}>
+                    <ArrowData $positive={variation.includes('+')} />
+                    <p>{variation}/24h</p>
+                  </DataCardLatest>
+                )}
+              </DataCardValue>
+            </div>
+          </DataCard>
+        ))}
       </DataCardsContent>
-      <ExpandData>
-        <ButtonExpand onClick={handleExpand}>
-          <ArrowDownDataCards $expanded={expanded} />
-          <p>{expanded ? 'Hide Cards' : 'See More Cards'}</p>
-        </ButtonExpand>
-      </ExpandData>
     </DataCardsWrapper>
   ) : (
     <HomeDataCardsSkeleton />

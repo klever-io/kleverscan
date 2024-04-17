@@ -9,7 +9,7 @@ import { contractsList } from '../contracts';
  * @param timestamp number
  * @returns a formatted date in a string type
  */
-export const formatDate = (timestamp: number): string => {
+export const formatDate = (timestamp: number, reduced = false): string => {
   while (new Date(timestamp).getFullYear() < 2000) {
     timestamp = timestamp * 10 ** 3;
   }
@@ -18,7 +18,9 @@ export const formatDate = (timestamp: number): string => {
     timestamp = timestamp / 10 ** 3;
   }
 
-  return format(new Date(timestamp || 0), 'MM/dd/yyyy HH:mm');
+  return !reduced
+    ? format(new Date(timestamp || 0), 'MM/dd/yyyy HH:mm')
+    : format(new Date(timestamp || 0), 'MM/dd/yy HH:mm');
 };
 
 /**

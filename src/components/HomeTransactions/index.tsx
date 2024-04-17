@@ -38,6 +38,13 @@ export const homeTransactionTableHeaders = [
   'Type',
 ];
 
+export const homeTransactionTabletTableHeaders = [
+  'Transaction Hash',
+  'Type',
+  'Block/Fees',
+  'From/To',
+];
+
 export const homeTransactionsRowSections = (
   props: ITransaction,
 ): IRowSection[] => {
@@ -145,13 +152,120 @@ export const homeTransactionsRowSections = (
   return sections;
 };
 
+export const homeTransactionsTabletRowSections = (
+  props: ITransaction,
+): IRowSection[] => {
+  const {
+    hash,
+    blockNum,
+    timestamp,
+    sender,
+    receipts,
+    contract,
+    kAppFee,
+    bandwidthFee,
+    status,
+    precision,
+    data,
+  } = props;
+
+  let toAddress = '- -';
+  const contractType = contractTypes(contract);
+
+  if (contractType === Contract.Transfer) {
+    const parameter = contract[0].parameter as ITransferContract;
+
+    toAddress = parameter.toAddress;
+  }
+
+  const customFields = getCustomFields(contract, receipts, precision, data);
+
+  const sections: IRowSection[] = [
+    {
+      element: props => (
+        <DoubleRow {...props} key={hash}>
+          <CenteredRow className="bucketIdCopy">
+            <Link href={`/transaction/${hash}`}>{parseAddress(hash, 16)}</Link>
+            <Copy info="TXHash" data={hash} />
+          </CenteredRow>
+          <CenteredRow>
+            <TimestampInfo>
+              {formatDate(timestamp || Date.now(), true)}
+            </TimestampInfo>
+            <Status status={status?.toLowerCase()}>
+              {capitalizeString(status)}
+            </Status>
+          </CenteredRow>
+        </DoubleRow>
+      ),
+      span: 1,
+    },
+    {
+      element: props =>
+        contractType === 'Multi contract' ? (
+          <DoubleRow {...props}>
+            <MultiContractToolTip
+              contract={contract}
+              contractType={contractType}
+            />
+            <CenteredRow>- -</CenteredRow>
+          </DoubleRow>
+        ) : (
+          <DoubleRow {...props}>
+            <CenteredRow>
+              <span>{ContractsName[contractType]}</span>
+            </CenteredRow>
+            <CenteredRow>
+              {getLabelForTableField(contractType)?.[0] ? (
+                <Tooltip
+                  msg={getLabelForTableField(contractType)[0]}
+                  Component={() => (
+                    <CustomFieldWrapper>{customFields[0]}</CustomFieldWrapper>
+                  )}
+                />
+              ) : (
+                <span> - - </span>
+              )}
+            </CenteredRow>
+          </DoubleRow>
+        ),
+      span: 1,
+    },
+    {
+      element: props => (
+        <DoubleRow {...props} key={blockNum}>
+          <Link href={`/block/${blockNum || 0}`}>
+            <a className="address">{blockNum || 0}</a>
+          </Link>
+          <span>
+            {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
+          </span>
+        </DoubleRow>
+      ),
+      span: 1,
+    },
+    {
+      element: props => (
+        <DoubleRow {...props} key={sender}>
+          <Link href={`/account/${sender}`}>
+            <a className="address">{parseAddress(sender, 16)}</a>
+          </Link>
+          {toAddressSectionElement(toAddress)}
+        </DoubleRow>
+      ),
+      span: 1,
+    },
+  ];
+
+  return sections;
+};
+
 const HomeTransactions: React.FC = () => {
   const { t } = useTranslation('transactions');
   const { transactions: homeTransactions } = useHomeData();
   const [hideMenu, setHideMenu] = useState(false);
-  const { isTablet } = useMobile();
 
-  const router = useRouter();
+  const { isTablet } = useMobile();
 
   const homeTransactionsCall: (
     page: number,
@@ -167,8 +281,12 @@ const HomeTransactions: React.FC = () => {
 
   const tableProps: ITable = {
     type: 'transactions',
-    header: homeTransactionTableHeaders,
-    rowSections: homeTransactionsRowSections,
+    header: isTablet
+      ? homeTransactionTabletTableHeaders
+      : homeTransactionTableHeaders,
+    rowSections: isTablet
+      ? homeTransactionsTabletRowSections
+      : homeTransactionsRowSections,
     dataName: 'transactions',
     request: (page, limit) => homeTransactionsCall(page, limit),
     showLimit: false,

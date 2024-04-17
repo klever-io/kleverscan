@@ -180,7 +180,7 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
                 key={social.social}
                 href={social.uri}
                 target="_blank"
-                rel="noreferrer"
+                rel="noreferrer nofollow"
               >
                 <social.icon />
               </LinkStyles>

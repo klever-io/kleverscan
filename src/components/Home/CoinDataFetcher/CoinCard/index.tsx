@@ -24,7 +24,7 @@ import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
 import { ImageLoaderProps } from 'next/image';
 import Link from 'next/link';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { IoReloadSharp } from 'react-icons/io5';
 import { useQueries } from 'react-query';
 import CoinCardSkeleton from '../CoinCardSkeleton';
@@ -37,8 +37,8 @@ import {
   CardContentError,
   Carousel,
   ChartContainer,
-  CoinsContainer,
   CoinSelector,
+  CoinsContainer,
   CoinsSelector,
   CoinsSlider,
   Container,
@@ -102,7 +102,7 @@ const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
   } = props;
   const { shortname, name, price, variation, marketCap, prices } = coin;
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
-  const [daysSelected, setSelectedDays] = useState<string | number>(1);
+  const [daysSelected, setDaysSelected] = useState<string | number>(1);
   const [switchCardLoading, setSwitchCardLoading] = useState(false);
   const timeGraph = [1, 30, 180];
 
@@ -111,7 +111,7 @@ const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
       ...coinDays.current,
       [shortname]: time,
     };
-    setSelectedDays(time);
+    setDaysSelected(time);
     refetchCoin();
   };
 
@@ -392,7 +392,7 @@ const CoinCard: React.FC = () => {
               borderColor={item.color}
               target="_blank"
               href={item.url}
-              rel="noreferrer"
+              rel="noreferrer nofollow"
               key={index}
             >
               <ExchangeIconContainer>{item.icon}</ExchangeIconContainer>

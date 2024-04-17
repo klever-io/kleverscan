@@ -79,7 +79,7 @@ const CreateTransaction: React.FC = () => {
               <a
                 href="https://chromewebstore.google.com/detail/klever-wallet/ifclboecfhkjbpmhgehodcjpciihhmif"
                 target="_blank"
-                rel="noreferrer"
+                rel="noreferrer nofollow"
               >
                 download the Klever Extension
               </a>{' '}
@@ -87,7 +87,11 @@ const CreateTransaction: React.FC = () => {
             </p>
             <p>
               Or enter this page via{' '}
-              <a href="https://www.klever.io/" target="_blank" rel="noreferrer">
+              <a
+                href="https://www.klever.io/"
+                target="_blank"
+                rel="noreferrer nofollow"
+              >
                 the Klever Wallet App internal browser
               </a>{' '}
               if you are in a mobile device.

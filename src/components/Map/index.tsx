@@ -72,8 +72,8 @@ const Map: React.FC<IMap> = ({ nodes }) => {
         attributionControl={false}
       >
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png"
-          attribution="&copy; <a href='http://basemaps.org/copyright>Base Maps</a> contributors'"
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/dark_nolabels/{z}/{x}/{y}.png"
+          attribution="&copy; <a href='http://basemaps.org/copyright' rel='nofollow'>Base Maps</a> contributors'"
         />
 
         {nodes.map((node, index) => (

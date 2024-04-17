@@ -82,7 +82,7 @@ const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
   } = props;
   const { shortname, name, price, variation, marketCap, prices } = coin;
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
-  const [daysSelected, setSelectedDays] = useState<string | number>(1);
+  const [daysSelected, setDaysSelected] = useState<string | number>(1);
   const [switchCardLoading, setSwitchCardLoading] = useState(false);
   const timeGraph = [1, 30, 180];
 
@@ -91,7 +91,7 @@ const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
       ...coinDays.current,
       [shortname]: time,
     };
-    setSelectedDays(time);
+    setDaysSelected(time);
     refetchCoin();
   };
 
@@ -378,7 +378,7 @@ const CoinCard: React.FC = () => {
                   <a
                     target="_blank"
                     href={`https://bitcoin.me/us/trade/${coin}-USDT`}
-                    rel="noreferrer"
+                    rel="noreferrer nofollow"
                   >
                     <ButtonInformation>
                       {t('CardBuy', { asset: coin })}
@@ -451,7 +451,7 @@ const CoinCard: React.FC = () => {
                 href={`https://bitcoin.me/en/trade/${
                   selectedCoin === 0 ? 'KLV' : 'KFI'
                 }-USDT`}
-                rel="noreferrer"
+                rel="noreferrer nofollow"
               >
                 <ButtonInformation>
                   {selectedCoin === 0

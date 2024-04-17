@@ -527,7 +527,7 @@ export const mock1 = {
           Wallet: 'https://klever.io/',
           Website: 'https://klever.org/',
           Whitepaper:
-            'https://klever.org/s/Klever-Blockchain-Whitepaper-v20-lr.pdf',
+            'https://storage.googleapis.com/kleverchain-public/Klever-Blockchain-Whitepaper-v.2.0-lr.pdf',
         },
         precision: 6,
         initialSupply: 21000000000000,

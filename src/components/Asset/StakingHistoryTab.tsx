@@ -6,9 +6,9 @@ import {
   EpochDepositsWrapper,
   EpochGeneralData,
   EpochWrapper,
-  FallbackFPRRow,
   FPRFrozenContainer,
   FPRRow,
+  FallbackFPRRow,
   HistoryWrapper,
   NoDepositsContainer,
   PaginationHistory,
@@ -158,23 +158,22 @@ const FPRHistory: React.FC<FPRHistoryProps> = ({ fpr, asset }) => {
             </HistoryWrapper>
           </FPRRow>
         ) : (
-          <FPRRow isStakingRoyalties={false}>
+          <FPRRow isStakingRoyalties={false} span={2}>
             <FallbackFPRRow>
               <HistoryWrapper>
                 <EpochDepositsWrapper>
                   {renderHistoryContent(historyArray, currentIndex)}
                 </EpochDepositsWrapper>
               </HistoryWrapper>
+
               <NoDepositsContainer>
                 {asset?.assetId === 'KLV' || asset?.assetId === 'KFI' ? (
-                  <>
-                    <p>
-                      {t('assets:Staking.No Deposits')}
-                      <br />
-                      <br />
-                      {t('assets:Staking.Info Deposits KLVorKFI')}
-                    </p>
-                  </>
+                  <p>
+                    {t('assets:Staking.No Deposits')}
+                    <br />
+                    <br />
+                    {t('assets:Staking.Info Deposits KLVorKFI')}
+                  </p>
                 ) : (
                   <p>{t('assets:Staking.No Deposits')}</p>
                 )}
@@ -218,12 +217,14 @@ const FPRHistory: React.FC<FPRHistoryProps> = ({ fpr, asset }) => {
     );
   };
   return (
-    <>
+    <div>
       <StakingHistoryTitle>
         <strong>{t('assets:Staking.Title History', { type: 'FPR' })}</strong>
         {renderFPRHeaderMsg()}
       </StakingHistoryTitle>
+
       {renderStakingHistory(fpr, FPRIndex)}
+
       {!((asset?.staking?.fpr?.length || 0) - FPRIndex <= 0) && (
         <PaginationHistory
           onClick={() => setFPRIndex(asset?.staking?.fpr?.length || 0)}
@@ -235,13 +236,14 @@ const FPRHistory: React.FC<FPRHistoryProps> = ({ fpr, asset }) => {
           </strong>
         </PaginationHistory>
       )}
+
       {!!((asset?.staking?.fpr?.length || 0) - FPRIndex <= 0) &&
         !!((asset?.staking?.fpr?.length || 0) > 3) && (
           <PaginationHistory onClick={() => showDefaultItems()}>
             <strong>Show less</strong>
           </PaginationHistory>
         )}
-    </>
+    </div>
   );
 };
 

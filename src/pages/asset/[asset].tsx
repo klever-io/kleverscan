@@ -102,9 +102,9 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       ...router.query,
       sortBy: holderQuery?.toLowerCase() || '',
     };
-    if (holderQuery === 'Total Balance') {
-      newQuery = { ...router.query, sortBy: 'total' || '' };
-    }
+    if (holderQuery === 'Total Balance')
+      newQuery = { ...router.query, sortBy: 'total' };
+
     if (asset) {
       const response = await api.get({
         route: `assets/holders/${asset.assetId}`,

@@ -121,13 +121,13 @@ export const Row = styled.div<{ isStakingRoyalties?: boolean; span?: number }>`
     strong {
       font-weight: 500;
       font-size: 0.95rem;
-      color: ${props => props.theme.darkText};
+      color: ${props => props.theme.black};
     }
 
     small {
       font-weight: 400;
       font-size: 0.95rem;
-      color: ${props => props.theme.darkText};
+      color: ${props => props.theme.black};
     }
 
     a {
@@ -137,7 +137,7 @@ export const Row = styled.div<{ isStakingRoyalties?: boolean; span?: number }>`
     }
 
     p {
-      color: ${props => props.theme.darkText};
+      color: ${props => props.theme.black};
       font-weight: 400;
     }
   }
@@ -156,7 +156,7 @@ export const Row = styled.div<{ isStakingRoyalties?: boolean; span?: number }>`
   &:after {
     content: '';
     position: absolute;
-    border-bottom: 1px solid ${props => props.theme.card.border};
+    border-bottom: 1px solid ${props => props.theme.faq.border};
     bottom: 0px;
 
     left: 0;
@@ -183,6 +183,9 @@ export const FPRRow = styled(Row)`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  overflow: hidden;
+  border-left: 1px solid ${props => props.theme.gray800};
+  border-right: 1px solid ${props => props.theme.gray800};
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     align-items: center;
   }
@@ -191,7 +194,7 @@ export const FPRRow = styled(Row)`
 export const ExpandableRow = styled(Row)<{ expandVar: boolean }>`
   ${props =>
     props.expandVar &&
-    ` 
+    `
 flex-direction: column !important;
 align-items: start !important;
 `}
@@ -200,7 +203,7 @@ align-items: start !important;
 export const WhiteListRow = styled(Row)<{ expandVar: boolean }>`
   ${props =>
     props.expandVar &&
-    ` 
+    `
 flex-direction: column !important;
 align-items: start !important;
 `}
@@ -223,7 +226,7 @@ export const ExpandWrapper = styled.div<{ expandVar: boolean }>`
 
   ${props =>
     !props.expandVar &&
-    ` 
+    `
 flex-direction: column;
 `}
 `;
@@ -416,7 +419,6 @@ export const EllipsisSpan = styled.span`
 `;
 
 export const StakingHistoryTitle = styled.div`
-  background-color: ${props => props.theme.card.border};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -425,11 +427,12 @@ export const StakingHistoryTitle = styled.div`
   max-height: 92px;
   flex-direction: column;
   gap: 0.3rem;
-  color: ${props => props.theme.darkText};
+  border: 1px solid ${props => props.theme.gray800};
+  color: ${props => props.theme.black};
   strong {
     font-weight: 600;
     font-size: larger;
-    color: ${props => props.theme.darkText};
+    color: ${props => props.theme.black};
     margin-right: 0.2rem;
   }
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
@@ -546,12 +549,12 @@ export const EpochWrapper = styled.div`
 
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: ${props => props.theme.shadow};
+    color: ${props => props.theme.black};
 
     strong {
       font-weight: 600;
       font-size: 0.95rem;
-      color: ${props => props.theme.shadow};
+      color: ${props => props.theme.black};
     }
   }
 `;
@@ -564,11 +567,11 @@ export const EpochGeneralData = styled.div`
   gap: 2rem;
   min-height: 182px;
   height: 100%;
-  background-color: ${props => props.theme.lightBlue};
   border-radius: 10px;
+  border: 1px solid ${props => props.theme.black};
   text-align: center;
   margin: 0.5rem;
-  color: ${props => props.theme.true.white};
+  color: ${props => props.theme.black};
 `;
 
 export const ShowDetailsButton = styled.button`

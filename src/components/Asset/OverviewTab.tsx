@@ -14,7 +14,7 @@ import React from 'react';
 import { useQuery } from 'react-query';
 
 export interface AssetProps {
-  asset: IAsset | undefined;
+  asset?: IAsset;
 }
 
 export const OverviewTab: React.FC<AssetProps> = ({ asset }) => {
@@ -36,7 +36,7 @@ export const OverviewTab: React.FC<AssetProps> = ({ asset }) => {
   return (
     <>
       {asset?.ownerAddress && (
-        <Row isStakingRoyalties={false} span={2}>
+        <Row span={2}>
           <span>
             <strong>{t('table:Owner')}</strong>
           </span>
@@ -52,9 +52,10 @@ export const OverviewTab: React.FC<AssetProps> = ({ asset }) => {
           </div>
         </Row>
       )}
-      <Row isStakingRoyalties={false}>
+
+      <Row>
         <span>
-          <strong>{t('table:MaxSupply')}</strong>
+          <strong>{t('table:MaxSupply').toUpperCase()}</strong>
         </span>
         <span>
           <small>
@@ -69,9 +70,9 @@ export const OverviewTab: React.FC<AssetProps> = ({ asset }) => {
           </small>
         </span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
-          <strong>{t('table:InitialSupply')}</strong>
+          <strong>{t('table:InitialSupply').toUpperCase()}</strong>
         </span>
         <span>
           <small>
@@ -86,9 +87,9 @@ export const OverviewTab: React.FC<AssetProps> = ({ asset }) => {
           </small>
         </span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
-          <strong>Circulating Supply</strong>
+          <strong>{t('table:CirculatingSupply').toUpperCase()}</strong>
         </span>
         <span>
           <small>
@@ -103,9 +104,9 @@ export const OverviewTab: React.FC<AssetProps> = ({ asset }) => {
           </small>
         </span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
-          <strong>{t('assets:Overview.Burned Value')}</strong>
+          <strong>{t('assets:Overview.Burned Value').toUpperCase()}</strong>
         </span>
         <span>
           <small>
@@ -120,9 +121,9 @@ export const OverviewTab: React.FC<AssetProps> = ({ asset }) => {
           </small>
         </span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
-          <strong>{t('common:Cards.Total Staked')}</strong>
+          <strong>{t('common:Cards.Total Staked').toUpperCase()}</strong>
         </span>
         <span>
           <small>
@@ -137,29 +138,33 @@ export const OverviewTab: React.FC<AssetProps> = ({ asset }) => {
           </small>
         </span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
-          <strong>{t('assets:Overview.Holders')}</strong>
+          <strong>{t('assets:Overview.Holders').toUpperCase()}</strong>
         </span>
         <span>{asset ? holdersPagination?.totalRecords : <Skeleton />}</span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
-          <strong>{t('common:Titles.Transactions')}</strong>
+          <strong>{t('common:Titles.Transactions').toUpperCase()}</strong>
         </span>
         <span>
-          {asset ? transactionsPagination?.totalRecords : <Skeleton />}
+          {asset ? (
+            toLocaleFixed(transactionsPagination?.totalRecords ?? 0, 0)
+          ) : (
+            <Skeleton />
+          )}
         </span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
-          <strong>{t('common:Cards.Market Cap')}</strong>
+          <strong>{t('common:Cards.Market Cap').toUpperCase()}</strong>
         </span>
         <span>--</span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
-          <strong>{t('assets:Overview.Staking Type')}</strong>
+          <strong>{t('assets:Overview.Staking Type').toUpperCase()}</strong>
         </span>
         <span>
           {asset ? parseApr(asset?.staking?.interestType) : <Skeleton />}

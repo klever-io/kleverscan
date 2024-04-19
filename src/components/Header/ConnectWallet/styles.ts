@@ -40,6 +40,7 @@ export const ConnectButton = styled.div<{
   }
 
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+    max-width: 100%;
     svg {
       width: 18px;
       height: 18px;
@@ -101,6 +102,7 @@ export const ConnectContainer = styled.div`
   align-items: flex-start;
 
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 200px;
     margin-left: 0;
     margin-top: auto;
   }
@@ -110,6 +112,7 @@ export const ConnectContainer = styled.div`
   }
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    width: 100%;
     flex-direction: column-reverse;
     align-items: flex-end;
     gap: 1.5rem;

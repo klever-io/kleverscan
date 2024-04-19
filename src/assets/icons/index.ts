@@ -51,6 +51,7 @@ import WizardLeftArrow from './wizard-left-arrow.svg';
 import WizardPlusSquare from './wizard-plus-square.svg';
 import WizardRightArrow from './wizard-right-arrow.svg';
 import WizardTxSuccess from './wizard-tx-success.svg';
+import ArrowDownHide from './arrow-down-hide.svg';
 
 export {
   Arrow,
@@ -106,4 +107,5 @@ export {
   PurpleArrowRight,
   Plug,
   Check,
+  ArrowDownHide,
 };

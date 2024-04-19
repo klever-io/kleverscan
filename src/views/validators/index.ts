@@ -56,20 +56,8 @@ export const ProgressIndicator = styled.div<{ percent: number }>`
 `;
 
 export const CircularProgressContainer = styled.div`
+  position: relative;
   display: flex;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  right: 0.5rem;
-  top: 0.1rem;
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    position: relative;
-    width: 4.6rem;
-    height: 5.5rem;
-    right: 12.4rem;
-  }
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    width: 5.8rem;
-    right: 12.8rem;
-  }
+  width: 50px;
+  height: 50px;
 `;

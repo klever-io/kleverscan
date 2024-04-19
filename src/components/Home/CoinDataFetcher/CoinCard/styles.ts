@@ -76,16 +76,21 @@ export const CardContainer = styled.div`
   position: relative;
   align-items: center;
   min-width: 100%;
-  padding: 40px 16px 16px;
+  padding: 56px 4px 0;
 
-  /* height: 24rem; */
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    padding: 40px 16px 16px;
+  }
 `;
 
 export const CardContent = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: space-around;
+
   min-width: 100%;
   width: 100%;
+  height: 100%;
 
   animation: 1.5s ease 0s 1 normal none running ${FadeIn};
   a {
@@ -321,11 +326,16 @@ export const CoinsSelector = styled.div`
 
   border-radius: 24px;
 
-  background-color: ${props => props.theme.blue};
+  background-color: ${props => props.theme.gray900};
 
   transition: 0.5s ease;
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    width: calc(100% - 32px);
+  }
 `;
 
+// prettier-ignore
 export const CoinsSlider = styled.div<{ selectedIndex: number }>`
   width: 82px;
   height: 24px;
@@ -339,6 +349,12 @@ export const CoinsSlider = styled.div<{ selectedIndex: number }>`
 
   background-color: ${props => props.theme.violet};
   border-radius: 24px;
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 50%;
+
+    transform: translateX(${props => props.selectedIndex >= 1 ? `calc(${props.selectedIndex * 100}% - 8px)` : '0%'});
+  }
 `;
 
 export const CoinSelector = styled.button<{ isSelected: boolean }>`
@@ -354,14 +370,18 @@ export const CoinSelector = styled.button<{ isSelected: boolean }>`
     props.isSelected ? props.theme.true.white : props.theme.gray700};
   transition: 0.5s ease-out;
   font-style: normal;
-  font-weight: 500;
-  font-size: 12px;
+  font-weight: 600;
+  font-size: 0.875rem;
   line-height: 24px;
   gap: 8px;
 
   -webkit-user-select: none; /* Safari */
   user-select: none; /* Standard syntax */
   cursor: pointer;
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 50%;
+  }
 `;
 
 export const ContainerLoading = styled.div`

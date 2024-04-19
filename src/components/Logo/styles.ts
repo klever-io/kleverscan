@@ -32,9 +32,10 @@ export const LetterLogo = styled.div<{ invertColors?: boolean }>`
   justify-content: center;
   font-size: 1rem;
   text-transform: uppercase;
-  text-decoration: none !important;
   color: ${props =>
     props.invertColors ? props.theme.white : props.theme.black};
+
+  float: left;
 `;
 
 export const Verified = styled(Certified)`

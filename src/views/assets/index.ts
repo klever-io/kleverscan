@@ -89,7 +89,6 @@ export const Row = styled.div<ITableType>`
 export const ContainerAssetId = styled.section`
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 4px;
   overflow: hidden;
   width: 100%;
@@ -100,6 +99,10 @@ export const ContainerAssetId = styled.section`
 
   a {
     overflow: hidden;
+  }
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    justify-content: space-between;
   }
 `;
 

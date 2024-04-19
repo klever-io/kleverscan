@@ -139,6 +139,7 @@ export const AssetCardHeaderItem = styled(CardHeaderItem)`
 `;
 
 export const AssetCardContent = styled(CardContent)`
+  height: 90vh;
   background: none;
   overflow-x: hidden;
 

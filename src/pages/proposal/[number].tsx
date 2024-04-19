@@ -1,8 +1,8 @@
 import { Copy } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import Title from '@/components/Layout/Title';
-import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
+import Table, { ITable } from '@/components/TableV2';
 import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
 import Tooltip from '@/components/Tooltip';
 import { useContractModal } from '@/contexts/contractModal';
@@ -17,6 +17,7 @@ import {
   CardHeader,
   CardHeaderItem,
   CardTabContainer,
+  CenteredRow,
   Container,
 } from '@/styles/common';
 import { IRowSection } from '@/types/index';
@@ -66,7 +67,6 @@ import {
   VotesHeader,
 } from '@/views/proposals/detail';
 import { ButtonExpand } from '@/views/transactions/detail';
-import { CenteredRow } from '@/views/validators/detail';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -80,10 +80,10 @@ import nextI18nextConfig from '../../../next-i18next.config';
 const ProposalVoters = (props: IProposalVoters) => {
   const rowSections = (props: IParsedVote): IRowSection[] => {
     const { status, voter, votingPower, voteDate } = props;
-    let sections = [{ element: <></>, span: 1 }];
+    let sections: IRowSection[] = [{ element: props => <></>, span: 1 }];
     sections = [
       {
-        element: (
+        element: props => (
           <CenteredRow key={voter}>
             <Link href={`/account/${voter}`}>{parseAddress(voter, 24)}</Link>
             <Copy data={voter} info="voter"></Copy>
@@ -91,16 +91,19 @@ const ProposalVoters = (props: IProposalVoters) => {
         ),
         span: 2,
       },
-      { element: <p key={votingPower}>{votingPower}%</p>, span: 1 },
       {
-        element: (
+        element: props => <span key={votingPower}>{votingPower}%</span>,
+        span: 1,
+      },
+      {
+        element: props => (
           <StatusContent key={status}>
             <AiFillCheckCircle
               color={typeVoteColors[status]}
               size={18}
               style={{ marginRight: 5 }}
             />
-            <small>{voteDate}</small>
+            <span>{voteDate}</span>
           </StatusContent>
         ),
         span: 1,

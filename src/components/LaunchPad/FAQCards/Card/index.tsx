@@ -19,7 +19,11 @@ export const FAQCard: React.FC<{
         <Title>{title}</Title>
         <Description>{description}</Description>
       </Content>
-      <FAQAction href={buttonLink} target="_blank" rel="noopener noreferrer">
+      <FAQAction
+        href={buttonLink}
+        target="_blank"
+        rel="noopener noreferrer nofollow"
+      >
         {buttonLabel} <Arrow />
       </FAQAction>
     </CardContainer>

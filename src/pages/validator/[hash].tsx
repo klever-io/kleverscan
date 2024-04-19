@@ -4,7 +4,7 @@ import Dropdown from '@/components/Dropdown';
 import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
 import Skeleton from '@/components/Skeleton';
-import Table, { ITable } from '@/components/Table';
+import Table, { ITable } from '@/components/TableV2';
 import { useContractModal } from '@/contexts/contractModal';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
@@ -13,6 +13,7 @@ import {
   CardContent,
   CardHeader,
   CardHeaderItem,
+  CenteredRow,
   Container,
 } from '@/styles/common';
 import {
@@ -44,11 +45,7 @@ import {
   TitleInformation,
   ValidatorTitle,
 } from '@/views/validator';
-import {
-  CardContainer,
-  CenteredRow,
-  TableContainer,
-} from '@/views/validators/detail';
+import { CardContainer, TableContainer } from '@/views/validators/detail';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -430,9 +427,9 @@ const Validator: React.FC<IValidatorPage> = () => {
 
   const rowSections = (bucket: IBucket): IRowSection[] => {
     const { address, id, stakedEpoch, balance } = bucket;
-    const sections = [
+    const sections: IRowSection[] = [
       {
-        element: (
+        element: props => (
           <CenteredRow key={id}>
             <Link href={`/account/${address}`} key={address}>
               {parseAddress(address || '', 24)}
@@ -443,7 +440,7 @@ const Validator: React.FC<IValidatorPage> = () => {
         span: 2,
       },
       {
-        element: (
+        element: props => (
           <CenteredRow key={id}>
             {parseAddress(id || '', 24)}
             <Copy data={id} info="id"></Copy>
@@ -451,12 +448,15 @@ const Validator: React.FC<IValidatorPage> = () => {
         ),
         span: 2,
       },
-      { element: <span key={stakedEpoch}>{stakedEpoch}</span>, span: 1 },
       {
-        element: (
-          <strong key={balance}>
+        element: props => <span key={stakedEpoch}>{stakedEpoch}</span>,
+        span: 1,
+      },
+      {
+        element: props => (
+          <span key={balance}>
             {formatAmount(balance / 10 ** KLV_PRECISION)}
-          </strong>
+          </span>
         ),
         span: 1,
       },
@@ -470,7 +470,6 @@ const Validator: React.FC<IValidatorPage> = () => {
     header,
     rowSections,
     request: (page, limit) => requestValidatorDelegations(page, limit),
-    scrollUp: false,
     dataName: 'validator',
   };
 

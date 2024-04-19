@@ -1,10 +1,8 @@
 import { getSelectedTab } from '@/utils/index';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import DateFilter, { IDateFilter } from '../DateFilter';
 import {
   Container,
-  FilterContent,
   Indicator,
   ItemContainer,
   TabContainer,
@@ -14,17 +12,9 @@ import {
 export interface ITabs {
   headers: string[];
   onClick?(header: string, index: number): void;
-  dateFilterProps?: IDateFilter;
-  showDataFilter?: boolean;
 }
 
-const Tabs: React.FC<ITabs> = ({
-  headers,
-  onClick,
-  dateFilterProps,
-  children,
-  showDataFilter = true,
-}) => {
+const Tabs: React.FC<ITabs> = ({ headers, onClick, children }) => {
   const router = useRouter();
   const [selected, setSelected] = useState<number>(0);
   useEffect(() => {
@@ -55,15 +45,6 @@ const Tabs: React.FC<ITabs> = ({
             );
           })}
         </TabContent>
-        {dateFilterProps && headers[selected] === 'Transactions' && (
-          <FilterContent showDataFilter={showDataFilter}>
-            {showDataFilter && (
-              <div>
-                <DateFilter {...dateFilterProps} />
-              </div>
-            )}
-          </FilterContent>
-        )}
       </TabContainer>
       {children}
     </Container>

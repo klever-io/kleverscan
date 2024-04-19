@@ -2,7 +2,7 @@ import { Accounts as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
 import Skeleton from '@/components/Skeleton';
-import Table, { ITable } from '@/components/Table';
+import Table, { ITable } from '@/components/TableV2';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import {
@@ -179,18 +179,18 @@ const Accounts: React.FC<IAccounts> = () => {
 
   const header = [
     `${t('table:Address')}`,
-    `KLV ${t('table:Staked')}`,
     'Nonce',
     `KLV ${t('table:Balance')}`,
+    `KLV ${t('table:Staked')}`,
   ];
 
   const { isMobile } = useMobile();
 
   const rowSections = (account: IAccount): IRowSection[] => {
     const { address, balance, frozenBalance, nonce } = account;
-    const sections = [
+    const sections: IRowSection[] = [
       {
-        element: (
+        element: props => (
           <CenteredRow key={address}>
             <Link href={`/account/${address}`}>
               {isMobile ? parseAddress(address, 24) : address}
@@ -201,24 +201,24 @@ const Accounts: React.FC<IAccounts> = () => {
         ),
         span: 2,
       },
-
       {
-        element: (
-          <strong key={frozenBalance}>
-            {formatAmount(frozenBalance / 10 ** KLV_PRECISION)} KLV
-          </strong>
+        element: props => <span key={nonce}>{nonce}</span>,
+        span: 1,
+        width: 100,
+      },
+      {
+        element: props => (
+          <span key={balance}>
+            {formatAmount(balance / 10 ** KLV_PRECISION)} KLV
+          </span>
         ),
         span: 1,
       },
       {
-        element: <span key={nonce}>{nonce}</span>,
-        span: 1,
-      },
-      {
-        element: (
-          <strong key={balance}>
-            {formatAmount(balance / 10 ** KLV_PRECISION)} KLV
-          </strong>
+        element: props => (
+          <span key={frozenBalance}>
+            {formatAmount(frozenBalance / 10 ** KLV_PRECISION)} KLV
+          </span>
         ),
         span: 1,
       },
@@ -232,7 +232,6 @@ const Accounts: React.FC<IAccounts> = () => {
     rowSections,
     request: (page, limit) => requestAccounts(page, limit),
     dataName: 'accounts',
-    scrollUp: true,
   };
 
   return (

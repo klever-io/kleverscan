@@ -114,7 +114,8 @@ export const Button = styled.button<{ isMobile?: boolean }>`
   align-items: center;
   gap: 0.5rem;
   color: ${props => props.theme.true.white};
-  background: ${props => props.theme.violet};
+  background: ${props =>
+    props.theme.dark ? props.theme.purple : props.theme.violet};
 
   padding: 0.5rem 1rem;
   border-radius: 5px;

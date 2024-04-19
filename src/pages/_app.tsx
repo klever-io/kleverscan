@@ -19,6 +19,7 @@ const ErrorBoundary =
 declare global {
   interface Window {
     kleverWeb: any;
+    kleverHub: any;
     Canny: any;
     attachEvent: any;
   }

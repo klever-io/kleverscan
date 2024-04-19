@@ -1,4 +1,3 @@
-import { DefaultCardStyles } from '@/styles/common';
 import styled, { css, keyframes } from 'styled-components';
 
 interface DayItemProps {
@@ -62,35 +61,39 @@ export const Container = styled.div`
   }
 `;
 
+export const CloseContainer = styled.div`
+  display: grid;
+  place-items: center;
+
+  svg {
+    animation: ${fadeInItem} 0.2s ease-in-out;
+    path {
+      fill: ${props => props.theme.violet} !important;
+    }
+  }
+`;
+
 export const OutsideContainer = styled.div`
   display: flex;
   width: 100%;
   align-items: center;
   gap: 1rem;
-  height: 2.8rem;
-  svg {
-    height: 2rem;
-    width: 2rem;
-    color: ${props => props.theme.navbar.text};
-    animation: ${fadeInItem} 0.2s ease-in-out;
-    &:hover {
-      cursor: pointer;
-      filter: brightness(0.5);
-    }
-  }
 `;
 
 export const OutsideContent = styled.div`
-  ${DefaultCardStyles}
-  padding: 1rem;
-  height: 100%;
+  border: 1px solid ${props => props.theme.black};
+  border-radius: 24px;
+
+  box-sizing: border-box;
+
+  height: 32px;
+  padding: 0 1rem;
   width: 100%;
+
   display: flex;
   flex-direction: row !important;
   align-items: center;
   justify-content: space-between;
-
-  border-radius: 0.5rem;
 
   cursor: pointer;
 
@@ -99,23 +102,25 @@ export const OutsideContent = styled.div`
   svg {
     height: unset !important;
     width: unset !important;
-  }
-  &:hover {
-    filter: brightness(0.9);
+
+    path {
+      fill: ${props => props.theme.black};
+    }
   }
 `;
 
 export const Input = styled.input`
   width: 75%;
   font-weight: 700;
-  font-size: 0.95rem;
-  color: ${props => props.theme.violet};
+  font-size: 0.875rem;
+  line-height: 1rem;
+  color: ${props => props.theme.gray700};
 
   caret-color: transparent;
 
   cursor: pointer;
   &::placeholder {
-    color: ${props => props.theme.violet};
+    color: ${props => props.theme.gray700};
   }
   &:not([value='']) {
     animation: ${fadeInItem} 0.2s ease-in-out;
@@ -131,13 +136,14 @@ export const CalendarContainer = styled.div`
   width: 18rem;
   padding: 1rem;
   margin-left: 5rem;
-  background-color: ${props => props.theme.white};
+  background-color: ${props => props.theme.background};
   position: absolute;
   bottom: -0.5rem;
   right: 0;
   transform: translateY(100%);
   z-index: 2;
   border-radius: 20px;
+  border: 1px solid ${props => props.theme.gray700};
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
 
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
@@ -183,7 +189,7 @@ export const MonthPicker = styled.div.attrs((props: MonthPickerProps) => ({
   justify-content: space-between;
   align-items: center;
   color: ${props => props.theme.black};
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   svg {
     cursor: pointer;
     &:hover {

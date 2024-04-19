@@ -1,8 +1,8 @@
+import { DefaultCardStyles } from '@/styles/common';
 import styled, { css } from 'styled-components';
 
 export const Container = styled.div<{ isInHomePage: boolean }>`
-  background-color: ${props =>
-    props.theme.dark ? props.theme.footer.background : props.theme.true.white};
+  ${DefaultCardStyles}
   position: relative;
   padding: 0.75rem 1rem;
   display: flex;
@@ -14,16 +14,12 @@ export const Container = styled.div<{ isInHomePage: boolean }>`
   align-items: center;
   justify-content: space-between;
 
-  border-radius: 0.5rem;
+  border-radius: 24px;
   mix-blend-mode: normal;
   cursor: text;
 
-  border: 1px solid ${props => props.theme.white && props.theme.lightGray};
-  ${props =>
-    props.theme.dark &&
-    css`
-      border: 1px solid ${({ theme }) => theme.input.borderSearchBar};
-    `}
+  border: 1px solid
+    ${props => (props.theme.dark ? props.theme.lightGray : props.theme.gray800)};
 
   ${props =>
     props.isInHomePage &&
@@ -37,10 +33,14 @@ export const Container = styled.div<{ isInHomePage: boolean }>`
     width: 100%;
     min-width: 5rem;
 
-    color: ${props => props.theme.input.border.search} !important;
+    color: ${props =>
+      props.theme.dark
+        ? props.theme.lightGray
+        : props.theme.gray800} !important;
 
     &::placeholder {
-      color: ${props => props.theme.input.border.search};
+      color: ${props =>
+        props.theme.dark ? props.theme.lightGray : props.theme.gray800};
     }
 
     &::selection {
@@ -54,6 +54,10 @@ export const Container = styled.div<{ isInHomePage: boolean }>`
 
   svg {
     cursor: pointer;
+    path {
+      fill: ${props =>
+        props.theme.dark ? props.theme.lightGray : props.theme.gray800};
+    }
   }
 `;
 

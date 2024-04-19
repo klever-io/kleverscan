@@ -1,7 +1,6 @@
 import Copy from '@/components/Copy';
-import Table, { ITable } from '@/components/Table';
+import Table, { ITable } from '@/components/TableV2';
 import { useContractModal } from '@/contexts/contractModal';
-import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import { CenteredRow, RowContent } from '@/styles/common';
 import { IAssetsBuckets, IInnerTableProps, IRowSection } from '@/types/index';
@@ -22,7 +21,6 @@ const Buckets: React.FC<IBuckets> = ({
   showInteractionButtons,
 }) => {
   const UINT32_MAX = 4294967295;
-  const { isMobile } = useMobile();
   const { t } = useTranslation('accounts');
   const { getInteractionsButtons } = useContractModal();
 
@@ -154,9 +152,9 @@ const Buckets: React.FC<IBuckets> = ({
       }
     };
 
-    const sections = [
+    const sections: IRowSection[] = [
       {
-        element: (
+        element: props => (
           <Link href={`/asset/${asset.assetId}`} key={asset.assetId}>
             <a>{asset.assetId}</a>
           </Link>
@@ -164,7 +162,7 @@ const Buckets: React.FC<IBuckets> = ({
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <p key={bucket.unstakedEpoch}>
             {(bucket.balance / 10 ** asset.precision).toLocaleString()}
           </p>
@@ -172,7 +170,7 @@ const Buckets: React.FC<IBuckets> = ({
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <Status staked={true} key={'true'}>
             {'True'}
           </Status>
@@ -180,7 +178,7 @@ const Buckets: React.FC<IBuckets> = ({
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <span key={bucket.unstakedEpoch}>
             {bucket.stakedEpoch.toLocaleString()}
           </span>
@@ -188,10 +186,10 @@ const Buckets: React.FC<IBuckets> = ({
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <RowContent key={bucket.id}>
             <CenteredRow className="bucketIdCopy">
-              <span>{!isMobile ? bucket.id : parseAddress(bucket.id, 24)}</span>
+              <span>{parseAddress(bucket.id, 24)}</span>
               <Copy info="BucketId" data={bucket.id} />
             </CenteredRow>
           </RowContent>
@@ -199,7 +197,7 @@ const Buckets: React.FC<IBuckets> = ({
         span: 2,
       },
       {
-        element: (
+        element: props => (
           <>
             {bucket.unstakedEpoch === UINT32_MAX
               ? '--'
@@ -209,11 +207,11 @@ const Buckets: React.FC<IBuckets> = ({
         span: 1,
       },
       {
-        element: <>{bucket?.availableEpoch}</>,
+        element: props => <>{bucket?.availableEpoch}</>,
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <>
             {bucket.delegation.length > 0 ? (
               <>
@@ -228,7 +226,7 @@ const Buckets: React.FC<IBuckets> = ({
         ),
         span: 2,
       },
-      { element: <> {getButton()}</>, span: 2 },
+      { element: props => <> {getButton()}</>, span: 2 },
     ];
 
     return sections;

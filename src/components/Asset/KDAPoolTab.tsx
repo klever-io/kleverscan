@@ -25,7 +25,7 @@ export const KDAPoolTab: React.FC<KDAPoolTabProps> = ({ asset, assetPool }) => {
 
   return (
     <>
-      <Row isStakingRoyalties={false} span={2}>
+      <Row span={2}>
         <span>
           <strong>Owner</strong>
         </span>
@@ -43,7 +43,7 @@ export const KDAPoolTab: React.FC<KDAPoolTabProps> = ({ asset, assetPool }) => {
           </ReceiveBackground>
         </div>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
           <strong>Is Active</strong>
         </span>
@@ -67,7 +67,7 @@ export const KDAPoolTab: React.FC<KDAPoolTabProps> = ({ asset, assetPool }) => {
           </small>
         </span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
           <strong>KLV Balance</strong>
         </span>
@@ -84,7 +84,7 @@ export const KDAPoolTab: React.FC<KDAPoolTabProps> = ({ asset, assetPool }) => {
           </small>
         </span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
           <strong>KDA Balance</strong>
         </span>
@@ -101,7 +101,7 @@ export const KDAPoolTab: React.FC<KDAPoolTabProps> = ({ asset, assetPool }) => {
           </small>
         </span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
           <strong>Converted Fees</strong>
         </span>
@@ -111,13 +111,13 @@ export const KDAPoolTab: React.FC<KDAPoolTabProps> = ({ asset, assetPool }) => {
           </small>
         </span>
       </Row>
-      <Row isStakingRoyalties={false} span={2}>
+      <Row span={2}>
         <span>
           <strong>Ratio</strong>
         </span>
         <span>{assetPool ? String(assetPool.ratio) : <Skeleton />}</span>
       </Row>
-      <Row isStakingRoyalties={false} span={2}>
+      <Row span={2}>
         <span>
           <strong>Admin Address</strong>
         </span>

@@ -1,3 +1,4 @@
+import { TableRowElementProps } from '@/types';
 import { transparentize } from 'polished';
 import styled, { css } from 'styled-components';
 
@@ -5,6 +6,8 @@ export const Container = styled.div`
   display: flex;
 
   gap: 2rem;
+
+  padding-top: 40px;
 
   flex-direction: column;
 `;
@@ -57,7 +60,7 @@ export const CardContainer = styled.section`
 
 export const DefaultCardStyles = css`
   background-color: ${props =>
-    props.theme.dark ? props.theme.navbar.background : props.theme.white};
+    props.theme.dark ? props.theme.table.background : props.theme.white};
 `;
 
 export const Card = styled.div`
@@ -66,6 +69,8 @@ export const Card = styled.div`
   width: 100%;
   padding: 1.5rem;
   overflow: hidden;
+  border-radius: 24px;
+  border: 1px solid ${props => props.theme.darkGray};
 
   display: flex;
 
@@ -238,6 +243,26 @@ export const RowContent = styled.div`
   min-width: 30%;
 `;
 
+export const DoubleRow = styled.div<TableRowElementProps>`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  width: 100%;
+
+  ${props =>
+    props.smaller &&
+    css`
+      gap: 4px;
+    `}
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    gap: 4px;
+  }
+`;
+
 export const CenteredRow = styled.div`
   display: flex;
   align-items: center;
@@ -250,14 +275,12 @@ export const CenteredRow = styled.div`
   overflow: visible;
 
   strong {
-    font-size: 1rem;
     font-weight: 600;
   }
 
   a {
     color: ${props => props.theme.black};
 
-    font-size: 1rem;
     font-weight: 600;
     text-decoration: none;
 
@@ -268,7 +291,6 @@ export const CenteredRow = styled.div`
 
   p {
     font-weight: 600;
-    font-size: 0.85rem;
   }
 
   svg {
@@ -276,7 +298,11 @@ export const CenteredRow = styled.div`
   }
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    flex-wrap: wrap;
+    span,
+    a,
+    p {
+      min-width: fit-content;
+    }
   }
 `;
 
@@ -288,7 +314,7 @@ export const FrozenContainer = styled.div`
 
   flex-direction: column;
 
-  background-color: ${props => props.theme.accountCard.frozenBackground};
+  border: 1px solid ${props => props.theme.black};
   border-radius: 0.75rem;
 
   div {
@@ -301,6 +327,7 @@ export const FrozenContainer = styled.div`
     align-items: center;
 
     &:not(:last-child) {
+      border-bottom: 1px solid ${props => props.theme.black};
       border-bottom-left-radius: 0px;
       border-bottom-right-radius: 0px;
     }

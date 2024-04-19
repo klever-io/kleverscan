@@ -25,7 +25,10 @@ export const LoaderWrapper = styled.div`
 
 const baseTransform = `translateY(-50%)`;
 
-export const InlineLoaderWrapper = styled.div<{ height: number }>`
+export const InlineLoaderWrapper = styled.div<{
+  height: number;
+  color: string;
+}>`
   display: inline-block;
   position: relative;
   width: 80px;
@@ -37,7 +40,7 @@ export const InlineLoaderWrapper = styled.div<{ height: number }>`
     width: ${({ height }) => height}px;
     height: ${({ height }) => height}px;
     border-radius: 50%;
-    background: ${({ theme }) => theme.darkText};
+    background: ${({ color }) => color};
     animation-timing-function: cubic-bezier(0, 1, 1, 0);
   }
   div:nth-child(1) {

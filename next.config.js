@@ -1,5 +1,3 @@
-/* eslint @typescript-eslint/no-var-requires: "off" */
-
 const withImages = require('next-images');
 const { i18n } = require('./next-i18next.config');
 
@@ -64,6 +62,11 @@ module.exports = withImages({
       {
         source: '/launchpad',
         destination: '/ito',
+        permanent: true,
+      },
+      {
+        source: '/home',
+        destination: '/',
         permanent: true,
       },
     ];

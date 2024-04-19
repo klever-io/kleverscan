@@ -51,6 +51,7 @@ export interface ICollectionList {
   value: string;
   assetId: string;
   isNFT: boolean;
+  isFungible: boolean;
   frozenBalance?: number;
   balance?: number;
   precision?: number;
@@ -562,9 +563,9 @@ export interface ITxQuery {
 }
 
 export interface IInnerTableProps {
-  scrollUp: boolean;
   dataName: string;
   request: (page: number, limit: number) => Promise<any>;
+  scrollUp?: boolean;
   query?: ITxQuery;
   page?: number;
 }
@@ -853,26 +854,28 @@ export interface IAccountResponse extends IResponse {
   data: { account: IAccount };
 }
 
+export interface ICollection {
+  address: string;
+  assetId: string;
+  collection: string;
+  nftNonce: number;
+  assetName: string;
+  assetType: number;
+  balance: number;
+  precision: number;
+  frozenBalance: number;
+  unfrozenBalance: number;
+  lastClaim: {
+    timestamp: number;
+    epoch: number;
+  };
+  buckets: IBucket[];
+  stakingType: number;
+}
+
 export interface ICollectionIdListResponse extends IResponse {
   data: {
-    collection: {
-      address: string;
-      assetId: string;
-      collection: string;
-      nftNonce: number;
-      assetName: string;
-      assetType: number;
-      balance: number;
-      precision: number;
-      frozenBalance: number;
-      unfrozenBalance: number;
-      lastClaim: {
-        timestamp: number;
-        epoch: number;
-      };
-      buckets: IBucket[];
-      stakingType: number;
-    }[];
+    collection: ICollection[];
   };
 }
 
@@ -1034,9 +1037,13 @@ export interface IFilterDater {
   enddate: string;
 }
 
+export interface TableRowElementProps {
+  smaller?: boolean;
+}
 export interface IRowSection {
-  element: JSX.Element;
+  element: React.FC<TableRowElementProps>;
   span: number;
+  width?: number;
 }
 
 export interface IOffset {
@@ -1078,4 +1085,12 @@ export type SearchRequest =
 
 export interface NotFound {
   notFound: true;
+}
+
+export interface Nodes {
+  locations: Node[];
+}
+
+export interface Node {
+  coordinates: [number, number];
 }

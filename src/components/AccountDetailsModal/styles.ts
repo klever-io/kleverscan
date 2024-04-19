@@ -1,6 +1,6 @@
 import { transparentize } from 'polished';
 import { MdArrowDropDown } from 'react-icons/md';
-import styled, { keyframes } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 export const FadeIn = keyframes`
   from {
@@ -261,13 +261,18 @@ export const BodyContent = styled.div`
 
   display: flex;
   flex-direction: column;
+  gap: 4px;
 
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
     gap: 0.5rem;
   }
 `;
 
-export const ActionItem = styled.div`
+export const ActionItem = styled.div<{
+  secondary?: boolean;
+  active?: boolean;
+  disabled?: boolean;
+}>`
   position: static;
 
   display: flex;
@@ -281,22 +286,59 @@ export const ActionItem = styled.div`
 
   padding: 0.75rem;
   border: 1px solid transparent;
+  border-radius: 6px;
 
   cursor: pointer;
+  user-select: none;
 
-  :hover {
-    border: 1px solid ${props => props.theme.card.border};
-    border-radius: 0.375rem;
+  ${props =>
+    props.active &&
+    css`
+      color: ${props.theme.true.white};
+      background-color: ${props.theme.footer.border};
+      border-bottom: 1px solid ${props => props.theme.card.border};
 
-    background-color: ${props => props.theme.footer.border};
-    color: ${props => props.theme.true.white};
+      border-radius: 6px 6px 0 0;
+      font-weight: 500;
+    `}
 
-    font-weight: 500;
+  ${props =>
+    props.secondary &&
+    css`
+      margin-left: 24px;
+      margin-right: 4px;
 
-    path:nth-child() {
-      fill: ${props => props.theme.true.white};
-    }
-  }
+      background-color: ${props.theme.blue};
+
+      &:last-child {
+        margin-bottom: 4px;
+      }
+    `}
+
+  ${props =>
+    props.disabled &&
+    css`
+      cursor: not-allowed;
+      opacity: 0.75;
+      filter: grayscale(0.25);
+    `}
+
+    ${props =>
+    !props.disabled &&
+    !props.active &&
+    css`
+      :hover {
+        border: 1px solid ${props => props.theme.card.border};
+
+        background-color: ${props => props.theme.footer.border};
+        color: ${props => props.theme.true.white};
+
+        path:nth-child() {
+          fill: ${props => props.theme.true.white};
+        }
+      }
+    `}
+  
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
     font-size: 1.1rem;
     gap: 1rem;
@@ -305,6 +347,28 @@ export const ActionItem = styled.div`
   svg {
     &:nth-child(3) {
       margin-left: auto;
+
+      transition: transform 0.2s ease-in-out;
+      ${props =>
+        props.active &&
+        css`
+          transform: rotate(180deg);
+        `}
     }
   }
+`;
+
+export const SubSection = styled.div<{ active?: boolean }>`
+  ${props =>
+    props.active &&
+    css`
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      border: 1px solid ${props => props.theme.card.border};
+      border-radius: 6px;
+
+      backdrop-filter: brightness(0.9);
+    `}
 `;

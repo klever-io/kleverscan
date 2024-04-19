@@ -1,4 +1,4 @@
-import Table, { ITable } from '@/components/Table';
+import Table, { ITable } from '@/components/TableV2';
 import { IInnerTableProps, IRewardsAssets, IRowSection } from '@/types/index';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useTranslation } from 'next-i18next';
@@ -32,9 +32,9 @@ const Rewards: React.FC<IRewards> = ({ rewardsTableProps }) => {
     const displayRewards = expanded[assetId]
       ? allStakingRewards
       : allStakingRewards.slice(0, 3);
-    const sections = [
+    const sections: IRowSection[] = [
       {
-        element: (
+        element: props => (
           <Link key={assetId} href={`/asset/${assetId}`}>
             {assetId}
           </Link>
@@ -42,7 +42,7 @@ const Rewards: React.FC<IRewards> = ({ rewardsTableProps }) => {
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <>
             <FrozenContainerRewards>
               {displayRewards.length >= 1 ? (

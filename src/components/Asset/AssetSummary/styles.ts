@@ -237,7 +237,6 @@ export const CardContainer = styled.div`
   background-repeat: no-repeat;
 
   max-width: 420px;
-  aspect-ratio: 2.26;
 
   padding-top: 29px;
   padding-left: 53px;
@@ -347,6 +346,6 @@ export const ParticipateButton = styled.button<{ secondary?: boolean }>`
     secondary &&
     css`
       background-color: transparent;
-      color: ${theme.black};
+      color: ${theme.black} !important;
     `}
 `;

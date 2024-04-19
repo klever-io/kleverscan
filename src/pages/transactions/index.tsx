@@ -1,55 +1,54 @@
-import { ArrowRight } from '@/assets/icons';
-import { getStatusIcon } from '@/assets/status';
 import { Transactions as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
-import DateFilter, {
-  IDateFilter,
-  ISelectedDays,
-} from '@/components/DateFilter';
 import Title from '@/components/Layout/Title';
 import { MultiContractToolTip } from '@/components/MultiContractToolTip';
-import Table, { ITable } from '@/components/Table';
-import { Status } from '@/components/Table/styles';
+import Table, { ITable } from '@/components/TableV2';
+import {
+  CustomFieldWrapper,
+  Status,
+  TimestampInfo,
+} from '@/components/TableV2/styles';
+import Tooltip from '@/components/Tooltip';
 import TransactionsFilters from '@/components/TransactionsFilters';
-import { FilterContainer } from '@/components/TransactionsFilters/styles';
-import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
-import { CenteredRow, Container, Header } from '@/styles/common';
-import { setQueryAndRouter } from '@/utils';
+import { CenteredRow, Container, DoubleRow, Header } from '@/styles/common';
+import {
+  IAssetTransactionResponse,
+  IClaimReceipt,
+  IReceipt,
+  IRowSection,
+  ITransaction,
+} from '@/types';
+import {
+  Contract,
+  ContractsName,
+  IBuyContractPayload,
+  IContract,
+  ITransferContract,
+} from '@/types/contracts';
+import {
+  contractTypes,
+  filteredSections,
+  getLabelForTableField,
+  transactionTableHeaders,
+} from '@/utils/contracts';
 import { capitalizeString } from '@/utils/convertString';
+import { findReceipt } from '@/utils/findKey';
 import { formatAmount, formatDate } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import { getPrecision } from '@/utils/precisionFunctions';
-import { FilterByDate } from '@/views/transactions';
+import { TransactionType } from '@klever/sdk-web';
 import Link from 'next/link';
 import { NextRouter, useRouter } from 'next/router';
-import React, { useCallback } from 'react';
-import {
-  IAssetTransactionResponse,
-  IReceipt,
-  IRowSection,
-  ITransaction,
-} from '../../types';
-import {
-  Contract,
-  ContractsName,
-  IContract,
-  ITransferContract,
-} from '../../types/contracts';
-import {
-  contractTypes,
-  filteredSections,
-  getHeaderForTable,
-  initialsTableHeaders,
-} from '../../utils/contracts';
+import React from 'react';
 
 interface IRequestTxQuery {
   asset?: string;
 }
 
 export const toAddressSectionElement = (toAddress: string): JSX.Element => {
-  if (toAddress === '--') {
+  if (toAddress === '- -') {
     return (
       <span data-testid="toAddressEmpty" style={{ cursor: 'default' }}>
         {toAddress}
@@ -61,6 +60,73 @@ export const toAddressSectionElement = (toAddress: string): JSX.Element => {
       <a className="address">{parseAddress(toAddress, 16)}</a>
     </Link>
   );
+};
+
+const getAssetsAndCurreciesList = (
+  contract: IContract,
+  transaction: ITransaction,
+): string[] => {
+  const assets: string[] = [];
+  if (contract.parameter === undefined) return assets;
+
+  if ('assetId' in contract.parameter && contract.parameter.assetId) {
+    assets.push(contract.parameter.assetId);
+  }
+  if ('currencyID' in contract.parameter && contract.parameter.currencyID) {
+    assets.push(contract.parameter.currencyID);
+  }
+  if (contract?.type === TransactionType.Claim) {
+    const claimReceipt = findReceipt(transaction.receipts, 17) as
+      | IClaimReceipt
+      | undefined;
+    if (claimReceipt?.assetIdReceived) {
+      assets.push(claimReceipt.assetIdReceived);
+    }
+  }
+  if (contract?.type === TransactionType.BuyOrder) {
+    const buyContract = transaction.contract[0]
+      ?.parameter as IBuyContractPayload;
+
+    if (buyContract.buyType === 'ITOBuy' && buyContract?.id) {
+      assets.push(buyContract.id);
+    }
+  }
+
+  return assets;
+};
+
+const getTransactionPrecision = (
+  contract: IContract,
+  transaction: ITransaction,
+  assetPrecisions: { [key: string]: number },
+): number | undefined => {
+  if (contract.parameter === undefined) return;
+
+  if (contract?.type === TransactionType.Claim) {
+    const claimReceipt = findReceipt(transaction.receipts, 17) as
+      | IClaimReceipt
+      | undefined;
+    if (claimReceipt?.assetIdReceived) {
+      return assetPrecisions[claimReceipt.assetIdReceived];
+    }
+  }
+  if (contract?.type === TransactionType.BuyOrder) {
+    const buyContract = transaction.contract[0]
+      ?.parameter as IBuyContractPayload;
+    if (buyContract.buyType === 'ITOBuy' && buyContract?.id) {
+      return assetPrecisions[buyContract.id];
+    }
+  }
+
+  if ('currencyID' in contract.parameter && contract.parameter.currencyID) {
+    return assetPrecisions[contract.parameter.currencyID];
+  }
+
+  if ('assetId' in contract.parameter && contract.parameter.assetId) {
+    return assetPrecisions[contract.parameter.assetId];
+  }
+
+  return;
 };
 
 export const requestTransactionsDefault = async (
@@ -85,17 +151,7 @@ export const requestTransactionsDefault = async (
     (transaction: ITransaction) => {
       if (transaction.contract && transaction.contract.length) {
         transaction.contract.forEach(contract => {
-          if (contract.parameter === undefined) return;
-
-          if ('assetId' in contract.parameter && contract.parameter.assetId) {
-            assets.push(contract.parameter.assetId);
-          }
-          if (
-            'currencyID' in contract.parameter &&
-            contract.parameter.currencyID
-          ) {
-            assets.push(contract.parameter.currencyID);
-          }
+          assets.push(...getAssetsAndCurreciesList(contract, transaction));
         });
       }
     },
@@ -109,16 +165,11 @@ export const requestTransactionsDefault = async (
         transaction.contract.forEach(contract => {
           if (contract.parameter === undefined) return;
 
-          if ('assetId' in contract.parameter && contract.parameter.assetId) {
-            transaction.precision = assetPrecisions[contract.parameter.assetId];
-          }
-          if (
-            'currencyID' in contract.parameter &&
-            contract.parameter.currencyID
-          ) {
-            transaction.precision =
-              assetPrecisions[contract.parameter.currencyID];
-          }
+          transaction.precision = getTransactionPrecision(
+            contract,
+            transaction,
+            assetPrecisions,
+          );
         });
       }
       return transaction;
@@ -133,177 +184,169 @@ export const requestTransactionsDefault = async (
   };
 };
 
-const Transactions: React.FC = () => {
-  const router = useRouter();
-  const { isMobile } = useMobile();
+const getContractType = contractTypes;
 
-  const defaultHeader = [...initialsTableHeaders, 'kApp Fee', 'Bandwidth Fee'];
-  const queryHeader = getHeaderForTable(router, defaultHeader);
-  const getContractType = useCallback(contractTypes, []);
-  const getFilteredSections = (
-    contract: IContract[],
-    receipts: IReceipt[],
-    precision?: number,
-  ): IRowSection[] => {
-    const contractType = getContractType(contract);
-    const filteredSectionsResult = filteredSections(
-      contract,
-      contractType,
-      receipts,
-      precision,
-    );
-    if (contractType === 'Multi contract') {
-      const extraHeadersLength =
-        queryHeader.length - initialsTableHeaders.length;
-      return Array(extraHeadersLength)
-        .fill(extraHeadersLength)
-        .map(_ => ({ element: <span>--</span>, span: 1 }));
-    }
-    return filteredSectionsResult;
-  };
+export const getCustomFields = (
+  contract: IContract[],
+  receipts: IReceipt[],
+  precision?: number,
+  data?: string[],
+): JSX.Element[] => {
+  const contractType = getContractType(contract);
+  const filteredSectionsResult = filteredSections(
+    contract,
+    contractType,
+    receipts,
+    precision,
+    data,
+  );
+  return filteredSectionsResult;
+};
 
-  const rowSections = (props: ITransaction): IRowSection[] => {
-    const {
-      hash,
-      blockNum,
-      timestamp,
-      sender,
-      receipts,
-      contract,
-      kAppFee,
-      bandwidthFee,
-      status,
-      precision,
-    } = props;
+export const transactionRowSections = (props: ITransaction): IRowSection[] => {
+  const {
+    hash,
+    blockNum,
+    timestamp,
+    sender,
+    receipts,
+    contract,
+    kAppFee,
+    bandwidthFee,
+    status,
+    precision,
+    data,
+  } = props;
 
-    const StatusIcon = getStatusIcon(status);
-    let toAddress = '--';
-    const contractType = getContractType(contract);
+  let toAddress = '- -';
+  const contractType = getContractType(contract);
 
-    if (contractType === Contract.Transfer) {
-      const parameter = contract[0].parameter as ITransferContract;
+  if (contractType === Contract.Transfer) {
+    const parameter = contract[0].parameter as ITransferContract;
 
-      toAddress = parameter.toAddress;
-    }
+    toAddress = parameter.toAddress;
+  }
 
-    const sections = [
-      {
-        element: (
-          <CenteredRow className="bucketIdCopy" key={hash}>
+  const customFields = getCustomFields(contract, receipts, precision, data);
+
+  const sections: IRowSection[] = [
+    {
+      element: props => (
+        <DoubleRow {...props} key={hash}>
+          <CenteredRow className="bucketIdCopy">
             <Link href={`/transaction/${hash}`}>{parseAddress(hash, 24)}</Link>
             <Copy info="TXHash" data={hash} />
           </CenteredRow>
-        ),
-        span: 2,
-      },
-      {
-        element: (
-          <Link href={`/block/${blockNum || 0}`} key={blockNum}>
+          <CenteredRow>
+            <TimestampInfo>{formatDate(timestamp || Date.now())}</TimestampInfo>
+            <Status status={status?.toLowerCase()}>
+              {capitalizeString(status)}
+            </Status>
+          </CenteredRow>
+        </DoubleRow>
+      ),
+      span: 2,
+    },
+    {
+      element: props => (
+        <DoubleRow {...props} key={blockNum}>
+          <Link href={`/block/${blockNum || 0}`}>
             <a className="address">{blockNum || 0}</a>
           </Link>
-        ),
-        span: 1,
-      },
-
-      {
-        element: <small key={timestamp}>{formatDate(timestamp)}</small>,
-        span: 1,
-      },
-      {
-        element: (
-          <Link href={`/account/${sender}`} key={sender}>
+          <span>
+            {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
+          </span>
+        </DoubleRow>
+      ),
+      span: 1,
+    },
+    {
+      element: props => (
+        <DoubleRow {...props} key={sender}>
+          <Link href={`/account/${sender}`}>
             <a className="address">{parseAddress(sender, 16)}</a>
           </Link>
-        ),
-        span: 1,
-      },
-      { element: !isMobile ? <ArrowRight /> : <></>, span: -1 },
-      {
-        element: toAddressSectionElement(toAddress),
-        span: 1,
-      },
-      {
-        element: (
-          <Status status={status} key={status}>
-            <StatusIcon />
-            <span>{capitalizeString(status)}</span>
-          </Status>
-        ),
-        span: 1,
-      },
-      {
-        element:
-          contractType === 'Multi contract' ? (
+          {toAddressSectionElement(toAddress)}
+        </DoubleRow>
+      ),
+      span: 1,
+    },
+    {
+      element: props =>
+        contractType === 'Multi contract' ? (
+          <DoubleRow {...props}>
             <MultiContractToolTip
               contract={contract}
               contractType={contractType}
             />
-          ) : (
-            <strong key={contractType}>{ContractsName[contractType]}</strong>
-          ),
-        span: 1,
-      },
-      {
-        element: contractType ? (
-          <strong>{formatAmount(kAppFee / 10 ** KLV_PRECISION)}</strong>
+            <CenteredRow>- -</CenteredRow>
+          </DoubleRow>
+        ) : (
+          <DoubleRow {...props}>
+            <CenteredRow key={contractType}>
+              <span>{ContractsName[contractType]}</span>
+            </CenteredRow>
+            <CenteredRow>
+              {getLabelForTableField(contractType)?.[0] ? (
+                <Tooltip
+                  msg={getLabelForTableField(contractType)[0]}
+                  Component={() => (
+                    <CustomFieldWrapper>{customFields[0]}</CustomFieldWrapper>
+                  )}
+                />
+              ) : (
+                <span> - - </span>
+              )}
+            </CenteredRow>
+          </DoubleRow>
+        ),
+      span: 1,
+    },
+    {
+      element: props =>
+        contractType ? (
+          <DoubleRow {...props}>
+            {getLabelForTableField(contractType)?.[1] ? (
+              <Tooltip
+                msg={getLabelForTableField(contractType)[1]}
+                Component={() => (
+                  <CustomFieldWrapper>{customFields[1]}</CustomFieldWrapper>
+                )}
+              />
+            ) : (
+              <span> - - </span>
+            )}
+            {getLabelForTableField(contractType)?.[2] ? (
+              <Tooltip
+                msg={getLabelForTableField(contractType)[2]}
+                Component={() => (
+                  <CustomFieldWrapper>{customFields[2]}</CustomFieldWrapper>
+                )}
+              />
+            ) : (
+              <span> - - </span>
+            )}
+          </DoubleRow>
         ) : (
           <></>
         ),
-        span: 1,
-      },
-      {
-        element: !router.query.type ? (
-          <strong>{formatAmount(bandwidthFee / 10 ** KLV_PRECISION)}</strong>
-        ) : (
-          <></>
-        ),
-        span: 1,
-      },
-    ];
-    const filteredContract = getFilteredSections(contract, receipts, precision);
+      span: 1,
+    },
+  ];
 
-    if (router.query.type) {
-      sections.pop();
-      sections.pop();
-      sections.push(...filteredContract);
-    }
-    return sections;
-  };
+  return sections;
+};
+
+const Transactions: React.FC = () => {
+  const router = useRouter();
 
   const tableProps: ITable = {
     type: 'transactions',
-    header: queryHeader,
-    rowSections,
+    header: transactionTableHeaders,
+    rowSections: transactionRowSections,
     dataName: 'transactions',
-    scrollUp: true,
     request: (page, limit) => requestTransactionsDefault(page, limit, router),
-  };
-
-  const resetDate = () => {
-    const updatedQuery = { ...router.query };
-    delete updatedQuery.startdate;
-    delete updatedQuery.enddate;
-    setQueryAndRouter(updatedQuery, router);
-  };
-  const filterDate = (selectedDays: ISelectedDays) => {
-    setQueryAndRouter(
-      {
-        ...router.query,
-        startdate: selectedDays.start.getTime().toString(),
-        enddate: selectedDays.end
-          ? (selectedDays.end.getTime() + 24 * 60 * 60 * 1000).toString()
-          : (selectedDays.start.getTime() + 24 * 60 * 60 * 1000).toString(),
-      },
-      router,
-    );
-  };
-  const dateFilterProps: IDateFilter = {
-    resetDate,
-    filterDate,
-  };
-
-  const transactionsFiltersProps = {
-    setQuery: setQueryAndRouter,
+    Filters: TransactionsFilters,
   };
 
   return (
@@ -312,14 +355,6 @@ const Transactions: React.FC = () => {
         <Title title="Transactions" Icon={Icon} />
       </Header>
 
-      <FilterContainer>
-        <TransactionsFilters
-          {...transactionsFiltersProps}
-        ></TransactionsFilters>
-        <FilterByDate>
-          <DateFilter {...dateFilterProps} />
-        </FilterByDate>
-      </FilterContainer>
       <Table {...tableProps} />
     </Container>
   );

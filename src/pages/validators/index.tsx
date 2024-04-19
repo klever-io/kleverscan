@@ -4,9 +4,10 @@ import Copy from '@/components/Copy';
 import Detail from '@/components/Detail';
 import { IFilter } from '@/components/Filter';
 import Progress from '@/components/Progress';
-import { ITable } from '@/components/Table';
-import { Status } from '@/components/Table/styles';
+import { ITable } from '@/components/TableV2';
+import { Status } from '@/components/TableV2/styles';
 import api from '@/services/api';
+import { DoubleRow } from '@/styles/common';
 import { IRowSection, IValidator } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { capitalizeString } from '@/utils/convertString';
@@ -21,19 +22,14 @@ import React from 'react';
 
 export const validatorsHeaders = [
   'Rank',
-  'Name',
-  'Rating',
-  'Status',
-  'Stake',
-  'Commission',
+  'Name/Can Delegate',
+  'Status/Rating',
+  'Stake/Commission',
   'Produced / Missed',
-  'Can Delegate',
   'Cumulative Stake',
 ];
 
-const validatorsRowSections = (
-  validator: IValidator,
-): IRowSection[] | undefined => {
+const validatorsRowSections = (validator: IValidator): IRowSection[] => {
   const {
     name,
     ownerAddress,
@@ -50,76 +46,68 @@ const validatorsRowSections = (
   } = validator;
 
   const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'fail');
-  const sections = ownerAddress
+  const sections: IRowSection[] = ownerAddress
     ? [
-        { element: <p key={rank}>{rank}°</p>, span: 1 },
+        { element: props => <p key={rank}>{rank}°</p>, span: 1, width: 100 },
         {
-          element: (
-            <span key={ownerAddress}>
-              {
-                <AddressContainer>
-                  <Link href={`validator/${ownerAddress}`}>
-                    {name ? name : parsedAddress}
-                  </Link>
-                  <Copy data={ownerAddress} info="Validator Address" />
-                </AddressContainer>
-              }
-            </span>
-          ),
-          span: 1,
-        },
-        {
-          element: (
-            <span key={rating}>{((rating * 100) / 10000000).toFixed(2)}%</span>
-          ),
-          span: 1,
-        },
-
-        {
-          element: <span key={status}>{capitalizeString(status)}</span>,
-          span: 1,
-        },
-        {
-          element: (
-            <strong key={staked}>
-              {formatAmount(staked / 10 ** KLV_PRECISION)} KLV
-            </strong>
-          ),
-          span: 1,
-        },
-        {
-          element: <strong key={commission}>{commission / 10 ** 2}%</strong>,
-          span: 1,
-        },
-        {
-          element: (
-            <strong
-              key={totalProduced}
-            >{`${totalProduced} / ${totalMissed}`}</strong>
-          ),
-          span: 1,
-        },
-        {
-          element: (
-            <Status
-              status={canDelegate ? 'success' : 'fail'}
-              key={String(canDelegate)}
-            >
-              <DelegateIcon />
-              <p>{canDelegate ? 'Yes' : 'No'}</p>
-            </Status>
+          element: props => (
+            <DoubleRow {...props} key={ownerAddress + status}>
+              <span>
+                {
+                  <AddressContainer>
+                    <Link href={`validator/${ownerAddress}`}>
+                      {name ? name : parsedAddress}
+                    </Link>
+                    <Copy data={ownerAddress} info="Validator Address" />
+                  </AddressContainer>
+                }
+              </span>
+              <Status
+                status={canDelegate ? 'success' : 'fail'}
+                key={String(canDelegate)}
+              >
+                {canDelegate ? 'Yes' : 'No'}
+              </Status>
+            </DoubleRow>
           ),
           span: 1,
         },
 
         {
-          element: (
+          element: props => (
+            <DoubleRow {...props} key={status + rating}>
+              <span>{capitalizeString(status)}</span>
+              <span>{((rating * 100) / 10000000).toFixed(2)}%</span>
+            </DoubleRow>
+          ),
+          span: 1,
+        },
+        {
+          element: props => (
+            <DoubleRow {...props} key={staked}>
+              <span>{formatAmount(staked / 10 ** KLV_PRECISION)} KLV</span>
+              <span key={commission}>{commission / 10 ** 2}%</span>
+            </DoubleRow>
+          ),
+          span: 1,
+        },
+        {
+          element: props => (
+            <DoubleRow {...props} key={totalProduced}>
+              <span>{totalProduced}</span>
+              <span>{totalMissed}</span>
+            </DoubleRow>
+          ),
+          span: 1,
+        },
+        {
+          element: props => (
             <Progress percent={cumulativeStaked} key={cumulativeStaked} />
           ),
           span: 2,
         },
       ]
-    : undefined;
+    : [];
 
   return sections;
 };
@@ -169,7 +157,6 @@ const Validators: React.FC = () => {
     header: validatorsHeaders,
     rowSections: validatorsRowSections,
     request: (page, limit) => requestValidators(page, limit),
-    scrollUp: true,
     dataName: 'validators',
   };
 

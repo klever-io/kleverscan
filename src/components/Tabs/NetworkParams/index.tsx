@@ -1,4 +1,4 @@
-import Table, { ITable } from '@/components/Table';
+import Table, { ITable } from '@/components/TableV2';
 import api from '@/services/api';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
 import React from 'react';
@@ -48,10 +48,14 @@ const NetworkParams: React.FC = () => {
     const { number, parameter, currentValue } = props;
 
     return [
-      { element: <strong key={String(number)}>#{number}</strong>, span: 2 },
-      { element: <p key={parameter}>{parameter}</p>, span: 2 },
       {
-        element: (
+        element: props => <span key={String(number)}>#{number}</span>,
+        span: 2,
+        width: 100,
+      },
+      { element: props => <p key={parameter}>{parameter}</p>, span: 2 },
+      {
+        element: props => (
           <p key={currentValue} className="currentValue">
             {currentValue}
           </p>

@@ -16,6 +16,7 @@
     "ticker": "ticker",
     "precision": "Precision",
     "maxSupply": "Max Supply",
+    "initialSupply": "Initial Supply",
     "maxSupplyOf": "Max. Supply of {{ticker}}",
     "URI": "URI {{assetText}} image",
     "imageTicker": "Do you already have an image to represent {{ticker}} {{assetText}}",

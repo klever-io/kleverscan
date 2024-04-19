@@ -1,5 +1,5 @@
-import Table, { ITable } from '@/components/Table';
 import { CustomLink } from '@/components/Table/styles';
+import Table, { ITable } from '@/components/TableV2';
 import { useContractModal } from '@/contexts/contractModal';
 import {
   IInnerTableProps,
@@ -16,12 +16,14 @@ interface IProprietaryAssets {
   assetsTableProps: IInnerTableProps;
   address: string;
   showInteractionButtons?: boolean;
+  Filters?: React.FC;
 }
 
 const ProprietaryAssets: React.FC<IProprietaryAssets> = ({
   assetsTableProps,
   address,
   showInteractionButtons,
+  Filters,
 }) => {
   const header = [
     'Token',
@@ -50,10 +52,10 @@ const ProprietaryAssets: React.FC<IProprietaryAssets> = ({
       ) : (
         <></>
       );
-    const sections = [
-      { element: <span key={ticker}>{ticker}</span>, span: 1 },
+    const sections: IRowSection[] = [
+      { element: props => <span key={ticker}>{ticker}</span>, span: 1 },
       {
-        element: (
+        element: props => (
           <Link key={assetId} href={`/asset/${assetId}`}>
             {assetId}
           </Link>
@@ -61,40 +63,40 @@ const ProprietaryAssets: React.FC<IProprietaryAssets> = ({
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <span key={assetType}>
             {assetType === 'Fungible' ? 'Fungible' : 'Non Fungible'}
           </span>
         ),
         span: 1,
       },
-      { element: <strong key={precision}>{precision}</strong>, span: 1 },
+      { element: props => <span key={precision}>{precision}</span>, span: 1 },
       {
-        element: (
-          <strong key={circulatingSupply}>
+        element: props => (
+          <span key={circulatingSupply}>
             {formatAmount(circulatingSupply / 10 ** precision)} {ticker}
-          </strong>
+          </span>
         ),
         span: 1,
       },
       {
-        element: (
-          <strong key={staking?.totalStaked || 0}>
+        element: props => (
+          <span key={staking?.totalStaked || 0}>
             {formatAmount((staking?.totalStaked || 0) / 10 ** precision)}{' '}
             {ticker}
-          </strong>
+          </span>
         ),
         span: 1,
       },
       {
-        element: (
-          <strong key={JSON.stringify(staking)}>
+        element: props => (
+          <span key={JSON.stringify(staking)}>
             {parseApr(staking?.interestType)}
-          </strong>
+          </span>
         ),
         span: 1,
       },
-      { element: sectionViewNfts, span: 2 },
+      { element: props => sectionViewNfts, span: 2 },
     ];
 
     const [AssetTriggerButton] = getInteractionsButtons([
@@ -109,7 +111,7 @@ const ProprietaryAssets: React.FC<IProprietaryAssets> = ({
 
     if (showInteractionButtons) {
       sections.push({
-        element: <AssetTriggerButton />,
+        element: props => <AssetTriggerButton />,
         span: 2,
       });
     }
@@ -121,6 +123,7 @@ const ProprietaryAssets: React.FC<IProprietaryAssets> = ({
     rowSections,
     type: 'assets',
     header,
+    Filters,
   };
 
   return <Table {...tableProps} />;

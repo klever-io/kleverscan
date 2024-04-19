@@ -280,7 +280,6 @@ const Block: React.FC<IBlockPage> = ({ block }) => {
   };
 
   const transactionTableProps = {
-    scrollUp: false,
     dataName: 'transactions',
     request: (page: number, limit: number) => requestBlock(page, limit),
   };
@@ -288,11 +287,7 @@ const Block: React.FC<IBlockPage> = ({ block }) => {
   const SelectedTabComponent: React.FC = () => {
     switch (selectedTab) {
       case 'Transactions':
-        return (
-          <>
-            <Transactions transactionsTableProps={transactionTableProps} />
-          </>
-        );
+        return <Transactions transactionsTableProps={transactionTableProps} />;
       case 'Validators':
         return <Validators validators={validators} />;
       default:

@@ -130,7 +130,6 @@ const precisionParse = async (
       return;
     }
     const precision = await getPrecision(precisionField);
-
     payload[fieldName] = addPrecision(field, precision);
   };
 

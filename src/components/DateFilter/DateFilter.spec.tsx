@@ -56,7 +56,7 @@ describe('Component: DateFilter', () => {
       prefetch: jest.fn(() => null),
     }));
     await act(async () => {
-      renderWithTheme(<DateFilter {...props} />);
+      renderWithTheme(<DateFilter />);
     });
   });
 

@@ -1,4 +1,4 @@
-// import { lighten } from 'polished';
+import { DefaultCardStyles } from '@/styles/common';
 import { lighten, transparentize } from 'polished';
 import styled, { css } from 'styled-components';
 
@@ -32,15 +32,15 @@ export const ReactSelectStyles = css`
   }
 
   .react-select__control {
+    ${DefaultCardStyles}
     border-radius: 0.5rem;
-    border: 1px solid ${props => props.theme.darkText};
+    border: 1px solid ${props => props.theme.darkGray};
     height: 2.5rem;
     width: 100%;
     padding: 0 0.625rem;
     color: ${props => props.theme.darkText};
 
     min-height: 3rem;
-    background-color: ${props => props.theme.white};
 
     transition: 0.2s ease-in-out;
     &:hover {
@@ -50,7 +50,7 @@ export const ReactSelectStyles = css`
   }
   .react-select__control--is-focused {
     color: ${props => props.theme.darkText};
-    border: 1px solid ${({ theme }) => theme.darkText};
+    border: 1px solid ${({ theme }) => theme.darkGray};
     box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? lighten(0.2, props.theme.card.background) : lighten(0.6, props.theme.card.background))};
   }
   .react-select__indicator-separator {
@@ -75,11 +75,12 @@ export const ReactSelectStyles = css`
     color: ${props => props.theme.darkText} !important;
   }
   .react-select__menu {
-    background-color: ${props => props.theme.white};
+    ${DefaultCardStyles}
     border-radius: 0.5rem;
-    border: none;
+    border: 1px solid ${props => props.theme.darkGray};
     color: ${props => props.theme.darkText};
     overflow: overlay;
+    padding-left: 4px;
   }
   .react-select__option {
     background-color: unset;

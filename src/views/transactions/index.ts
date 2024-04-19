@@ -56,26 +56,23 @@ export const MultiContractContainer = styled.strong`
   overflow: visible !important;
 `;
 
-export const MultiContractCounter = styled.span`
+export const MultiContractCounter = styled.div`
   background-color: ${props => props.theme.violet};
-  position: relative;
-  line-height: 20px;
-  color: ${props => props.theme.true.white} !important;
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  transform: translate(75%, -50%);
+
   width: 20px !important;
   height: 20px !important;
-  text-align: center;
-  display: inline-block;
+  line-height: 20px;
 
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    transform: translate(5%, 28%);
-    bottom: 5px;
-    right: 1px;
-  }
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    bottom: 5px;
-    right: 1px;
-  }
-  transform: translateY(-50%);
   font-size: smaller !important;
   border-radius: 50%;
+
+  color: ${props => props.theme.true.white} !important;
+
+  text-align: center;
+  display: inline-block;
 `;

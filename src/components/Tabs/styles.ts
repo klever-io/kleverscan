@@ -4,11 +4,11 @@ export const Container = styled.div`
   display: flex;
 
   flex-direction: column;
+
+  margin-top: 2rem;
 `;
 
 export const TabContainer = styled.div`
-  margin: 2rem 0;
-
   display: flex;
 
   flex-direction: row;
@@ -22,7 +22,6 @@ export const TabContainer = styled.div`
 
 export const TabContent = styled.div`
   display: flex;
-  margin: 2rem 0;
   overflow-x: auto;
   overflow-y: hidden;
 
@@ -55,10 +54,10 @@ export const ItemContainer = styled.div<{ selected: boolean }>`
   }
 `;
 
-export const FilterContent = styled.div<{ showDataFilter: boolean }>`
+export const FilterContent = styled.div`
   gap: 1rem;
   width: 100%;
-  display: ${props => (props.showDataFilter ? 'flex' : 'none')};
+  display: flex;
   align-items: center;
   > div:last-child {
     min-width: 18rem;

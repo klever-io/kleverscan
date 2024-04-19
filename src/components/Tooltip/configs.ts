@@ -1,18 +1,5 @@
 import { Place } from '@/types/index';
 
-// transactions page multicontract
-const multiContractMobile = { offset: { right: 97, top: 2 } };
-const multiContractTablet = {
-  offset: { right: 106, top: 2 },
-  place: 'left' as Place,
-};
-const multiContractDesktop = { offset: { right: 54, top: 5 } };
-export const multiContractStyles = [
-  multiContractMobile,
-  multiContractTablet,
-  multiContractDesktop,
-];
-
 //transactions page coin
 const coinMobile = {
   offset: { left: 40, top: 2 },

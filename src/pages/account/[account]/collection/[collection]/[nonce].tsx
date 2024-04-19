@@ -1,39 +1,17 @@
-import { ArrowRight } from '@/assets/icons';
-import { getStatusIcon } from '@/assets/status';
 import { TransactionDetails as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import { Button } from '@/components/CreateTxShortCut/styles';
 import Title from '@/components/Layout/Title';
-import { MultiContractToolTip } from '@/components/MultiContractToolTip';
 import Skeleton from '@/components/Skeleton';
-import Table, { ITable } from '@/components/Table';
-import { Status } from '@/components/Table/styles';
-import { useMobile } from '@/contexts/mobile';
-import { requestTransactionsDefault } from '@/pages/transactions';
+import Table, { ITable } from '@/components/TableV2';
+import {
+  requestTransactionsDefault,
+  transactionRowSections,
+} from '@/pages/transactions';
 import { requestNonce } from '@/services/requests/account/collection-nonce';
 import { Container, Header } from '@/styles/common';
-import {
-  Contract,
-  ContractsName,
-  IContract,
-  ITransferContract,
-} from '@/types/contracts';
-import {
-  IParsedAsset,
-  IReceipt,
-  IRowSection,
-  ITransaction,
-} from '@/types/index';
-import {
-  contractTypes,
-  filteredSections,
-  getHeaderForTable,
-  initialsTableHeaders,
-} from '@/utils/contracts';
-import { capitalizeString } from '@/utils/convertString';
-import { formatAmount, formatDate } from '@/utils/formatFunctions';
-import { KLV_PRECISION } from '@/utils/globalVariables';
-import { parseAddress } from '@/utils/parseValues';
+import { IParsedAsset } from '@/types/index';
+import { transactionTableHeaders } from '@/utils/contracts';
 import { SingleNFTTableContainer } from '@/views/accounts';
 import {
   CardContainer,
@@ -42,9 +20,8 @@ import {
   CenteredRow,
   Row,
 } from '@/views/transactions/detail';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from 'react-query';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
@@ -69,138 +46,11 @@ const NftDetail: React.FC<IParsedAsset> = () => {
     enabled: !!router?.isReady,
   });
 
-  const { isMobile } = useMobile();
-  const getContractType = useCallback(contractTypes, []);
-
-  const header = [...initialsTableHeaders, 'kApp Fee', 'Bandwidth Fee'];
-  const getFilteredSections = (
-    contract: IContract[],
-    receipts: IReceipt[],
-    precision?: number,
-  ): IRowSection[] => {
-    const contractType = getContractType(contract);
-    return filteredSections(contract, contractType, receipts, precision);
-  };
-
-  const rowSections = (props: ITransaction): IRowSection[] => {
-    const {
-      hash,
-      blockNum,
-      timestamp,
-      sender,
-      receipts,
-      contract,
-      kAppFee,
-      bandwidthFee,
-      status,
-      precision,
-    } = props;
-
-    const StatusIcon = getStatusIcon(status);
-    let toAddress = '--';
-    const contractType = getContractType(contract);
-
-    if (contractType === Contract.Transfer) {
-      const parameter = contract[0].parameter as ITransferContract;
-
-      toAddress = parameter.toAddress;
-    }
-
-    const sections = [
-      {
-        element: (
-          <CenteredRow className="bucketIdCopy" key={hash}>
-            <Link href={`/transaction/${hash}`}>{parseAddress(hash, 24)}</Link>
-            <Copy info="TXHash" data={hash} />
-          </CenteredRow>
-        ),
-        span: 2,
-      },
-      {
-        element: (
-          <Link href={`/block/${blockNum || 0}`} key={blockNum}>
-            <a className="address">{blockNum || 0}</a>
-          </Link>
-        ),
-        span: 1,
-      },
-
-      {
-        element: <small key={timestamp}>{formatDate(timestamp)}</small>,
-        span: 1,
-      },
-      {
-        element: (
-          <Link href={`/account/${sender}`} key={sender}>
-            <a className="address">{parseAddress(sender, 16)}</a>
-          </Link>
-        ),
-        span: 1,
-      },
-      { element: !isMobile ? <ArrowRight /> : <></>, span: -1 },
-      {
-        element: (
-          <Link href={`/account/${toAddress}`} key={toAddress}>
-            <a className="address">{parseAddress(toAddress, 16)}</a>
-          </Link>
-        ),
-        span: 1,
-      },
-      {
-        element: (
-          <Status status={status} key={status}>
-            <StatusIcon />
-            <span>{capitalizeString(status)}</span>
-          </Status>
-        ),
-        span: 1,
-      },
-      {
-        element:
-          contractType === 'Multi contract' ? (
-            <MultiContractToolTip
-              contract={contract}
-              contractType={contractType}
-            />
-          ) : (
-            <strong key={contractType}>{ContractsName[contractType]}</strong>
-          ),
-        span: 1,
-      },
-      {
-        element: contractType ? (
-          <strong>{formatAmount(kAppFee / 10 ** KLV_PRECISION)}</strong>
-        ) : (
-          <></>
-        ),
-        span: 1,
-      },
-      {
-        element: !router.query.type ? (
-          <strong>{formatAmount(bandwidthFee / 10 ** KLV_PRECISION)}</strong>
-        ) : (
-          <></>
-        ),
-        span: 1,
-      },
-    ];
-    const filteredContract = getFilteredSections(contract, receipts, precision);
-
-    if (router.query.type) {
-      sections.pop();
-      sections.pop();
-      sections.push(...filteredContract);
-    }
-
-    return sections;
-  };
-
   const tableProps: ITable = {
     type: 'transactions',
-    header: getHeaderForTable(router, header),
-    rowSections,
+    header: transactionTableHeaders,
+    rowSections: transactionRowSections,
     dataName: 'transactions',
-    scrollUp: true,
     request: (page, limit) =>
       requestTransactionsDefault(page, limit, router, {
         asset: `${router.query.collection}/${router.query.nonce}`,

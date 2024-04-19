@@ -62,8 +62,22 @@ export const ExtensionProvider: React.FC = ({ children }) => {
     try {
       if (!web.isKleverWebActive()) {
         setExtensionLoading(true);
-        const res = await web.initialize();
-        setExtensionLoading(false);
+
+        if (window.kleverHub !== undefined) {
+          await window.kleverHub.initialize();
+
+          window.kleverHub.onAccountChanged((e: any) => {
+            if (e.chain === 'KLV' && e.address.length === 62) {
+              setWalletAddress(e.address);
+            } else {
+              logoutExtension();
+            }
+          });
+          setExtensionLoading(false);
+        } else {
+          await web.initialize();
+          setExtensionLoading(false);
+        }
       }
       const address: string = await window.kleverWeb.getWalletAddress();
       if (address.startsWith('klv') && address.length === 62) {

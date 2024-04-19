@@ -7,22 +7,26 @@ export const ConnectButton = styled.div<{
   walletAddress?: boolean;
   $loading?: boolean;
 }>`
-  max-width: 10rem;
+  max-width: 200px;
   width: 100%;
+  height: 36px;
+  padding: 0.5rem 1rem;
+  border-radius: 24px;
+  position: relative;
+  background: ${props => (props.walletAddress ? 'none' : props.theme.violet)};
+
   display: flex;
-  gap: 0.4rem;
+  gap: 8px;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 0.75rem;
-  height: 2rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
+
   text-align: center;
-  position: relative;
-  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
   color: ${props => props.theme.true.white};
-  background: ${props => (props.walletAddress ? 'none' : props.theme.violet)};
+
+  cursor: pointer;
 
   input {
     display: none;
@@ -36,6 +40,7 @@ export const ConnectButton = styled.div<{
   }
 
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+    max-width: 100%;
     svg {
       width: 18px;
       height: 18px;
@@ -97,6 +102,7 @@ export const ConnectContainer = styled.div`
   align-items: flex-start;
 
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 200px;
     margin-left: 0;
     margin-top: auto;
   }
@@ -106,6 +112,7 @@ export const ConnectContainer = styled.div`
   }
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    width: 100%;
     flex-direction: column-reverse;
     align-items: flex-end;
     gap: 1.5rem;
@@ -302,7 +309,9 @@ export const BackgroundHelper = styled.div<{ opened: boolean }>`
   background-color: ${props =>
     transparentize(props.theme.dark ? 0.85 : 0.7, props.theme.black)};
 
-  transition: opacity 0.5s ease, visibility 0.5s ease;
+  transition:
+    opacity 0.5s ease,
+    visibility 0.5s ease;
   z-index: 3;
 `;
 

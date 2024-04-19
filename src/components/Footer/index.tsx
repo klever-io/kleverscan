@@ -95,7 +95,12 @@ const Footer: React.FC = () => {
   const { isMobile } = useMobile();
   const { isDarkTheme } = useTheme();
   const SocialItem: React.FC<ISocial> = ({ Icon, link }) => (
-    <a target="_blank" href={link} rel="noreferrer" data-testid={`social-item`}>
+    <a
+      target="_blank"
+      href={link}
+      rel="nofollow noreferrer"
+      data-testid={`social-item`}
+    >
       <SocialIcon>
         <Icon />
       </SocialIcon>

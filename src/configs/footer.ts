@@ -68,7 +68,7 @@ const contents: IContent[] = [
     infoLinks: [
       {
         name: 'WhitePaper',
-        href: 'https://klever.org/s/Klever-Blockchain-Whitepaper-v20-lr.pdf',
+        href: 'https://storage.googleapis.com/kleverchain-public/Klever-Blockchain-Whitepaper-v.2.0-lr.pdf',
       },
       {
         name: 'Forum',
@@ -98,4 +98,4 @@ const contents: IContent[] = [
 
 const version = '1.0.6';
 
-export { socials, description, contents, version };
+export { contents, description, socials, version };

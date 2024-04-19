@@ -130,7 +130,6 @@ export const getITOrowSections =
         ),
         span: 1,
       },
-
       {
         element: props => (
           <Link
@@ -156,7 +155,6 @@ export const getITOrowSections =
         ),
         span: 1,
       },
-
       {
         element: props => (
           <span key={bestKLVRate}>

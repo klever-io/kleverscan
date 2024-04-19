@@ -84,7 +84,7 @@ export const ParticipateButton = styled.button`
   align-items: center;
   justify-content: center;
 
-  padding: 14px 30px;
+  padding: 10px 30px;
   border-radius: 24px;
 
   background-color: ${({ theme }) => theme.violet};
@@ -100,5 +100,9 @@ export const ParticipateButton = styled.button`
 
   &:hover {
     filter: brightness(1.2);
+  }
+
+  @media screen and (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    padding: 14px 30px;
   }
 `;

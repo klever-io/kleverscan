@@ -1,6 +1,6 @@
 import {
   ArrowDown,
-  ArrowDownSquare,
+  ArrowDownHide,
   ArrowDropdown,
   ArrowUpSquare,
   LineArrowUpSquare,
@@ -839,7 +839,8 @@ export const ButtonExpand = styled.div`
 export const ContainerHide = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 16px;
   color: white;
 
   > h1 {
@@ -876,6 +877,10 @@ export const ContainerHide = styled.div`
     div {
       display: none;
     }
+  }
+
+  > :last-child {
+    margin-left: auto;
   }
 `;
 
@@ -937,6 +942,17 @@ export const ArrowUpSquareHideMenu = styled(LineArrowUpSquare)<{
     fill: ${({ theme }) => theme.black};
   }
 `;
+
+export const ArrowHide = styled(ArrowDownHide)<{
+  $hide: boolean;
+}>`
+  rotate: ${({ $hide }) => ($hide ? 180 : 0)}deg;
+
+  path {
+    fill: ${({ theme }) => theme.black};
+  }
+`;
+
 export const CardIconContainer = styled.div`
   display: flex;
   align-items: center;

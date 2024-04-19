@@ -20,7 +20,7 @@ import { formatAmount, formatDate } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import {
-  ArrowUpSquareHideMenu,
+  ArrowHide,
   ContainerHide,
   SectionCards,
   TransactionContainer,
@@ -29,7 +29,7 @@ import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
-import Table, { ITable } from '../TableV2';
+import Table, { ITable } from '../../TableV2';
 
 export const homeTransactionTableHeaders = [
   'Transaction Hash',
@@ -184,10 +184,6 @@ export const homeTransactionsTabletRowSections = (
     {
       element: props => (
         <DoubleRow {...props} key={hash}>
-          <CenteredRow className="bucketIdCopy">
-            <Link href={`/transaction/${hash}`}>{parseAddress(hash, 16)}</Link>
-            <Copy info="TXHash" data={hash} />
-          </CenteredRow>
           <CenteredRow>
             <TimestampInfo>
               {formatDate(timestamp || Date.now(), true)}
@@ -195,6 +191,10 @@ export const homeTransactionsTabletRowSections = (
             <Status status={status?.toLowerCase()}>
               {capitalizeString(status)}
             </Status>
+          </CenteredRow>
+          <CenteredRow className="bucketIdCopy">
+            <Link href={`/transaction/${hash}`}>{parseAddress(hash, 16)}</Link>
+            <Copy info="TXHash" data={hash} svgSize={16} />
           </CenteredRow>
         </DoubleRow>
       ),
@@ -271,8 +271,11 @@ const HomeTransactions: React.FC = () => {
     page: number,
     limit: number,
   ) => Promise<IPaginatedResponse> = async (page = 1, limit = 10) => {
+    const quantity = isTablet ? 5 : 10;
     return {
-      data: { transactions: homeTransactions },
+      data: {
+        transactions: homeTransactions.slice(0, quantity),
+      },
       error: '',
       code: '',
       pagination: defaultPagination,
@@ -311,10 +314,11 @@ const HomeTransactions: React.FC = () => {
           </a>
         </Link>
 
-        <div onClick={() => setHideMenu(!hideMenu)}>
-          <p>{hideMenu ? 'Show' : 'Hide'}</p>
-          <ArrowUpSquareHideMenu $hide={hideMenu} />
-        </div>
+        {isTablet ? (
+          <div onClick={() => setHideMenu(!hideMenu)}>
+            <ArrowHide $hide={hideMenu} />
+          </div>
+        ) : null}
       </ContainerHide>
       <TransactionContainer>
         {!hideMenu && <Table {...tableProps} />}

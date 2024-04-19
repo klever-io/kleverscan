@@ -298,7 +298,11 @@ export const CenteredRow = styled.div`
   }
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    flex-wrap: wrap;
+    span,
+    a,
+    p {
+      min-width: fit-content;
+    }
   }
 `;
 

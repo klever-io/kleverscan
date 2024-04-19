@@ -2,8 +2,15 @@ import { PurpleArrowRight } from '@/assets/icons';
 import { ParticipateModal } from '@/components/Asset/AssetSummary/ParticipateModal';
 import { HashComponent } from '@/components/Contract';
 import Table, { ITable } from '@/components/ITOTable';
+import { useMobile } from '@/contexts/mobile';
 import { useParticipate } from '@/contexts/participate';
-import { getITOrowSections, ITOheaders, requestITOSQuery } from '@/pages/ito';
+import {
+  getITOrowSections,
+  getITOTabletRowSections,
+  ITOheaders,
+  ITOTabletheaders,
+  requestITOSQuery,
+} from '@/pages/ito';
 import { IParsedITO } from '@/types';
 import { TableContainer, TableHeader, TableTitle } from '@/views/launchpad';
 import Link from 'next/link';
@@ -21,15 +28,18 @@ export const HomeITOSection: React.FC = () => {
     setLoading,
   } = useParticipate();
   const router = useRouter();
+  const { isTablet } = useMobile();
 
   const rowSections = useCallback(
-    getITOrowSections(setITO, setOpenParticipateModal, 'home'),
-    [setITO, setOpenParticipateModal],
+    isTablet
+      ? getITOTabletRowSections(setITO, setOpenParticipateModal, 'home')
+      : getITOrowSections(setITO, setOpenParticipateModal, 'home'),
+    [setITO, setOpenParticipateModal, isTablet],
   );
 
   const tableProps: ITable = {
     rowSections,
-    header: ITOheaders,
+    header: isTablet ? ITOTabletheaders : ITOheaders,
     type: 'launchPad',
     request: (page, limit) => requestITOSQuery(page, limit, router),
     dataName: 'itos',

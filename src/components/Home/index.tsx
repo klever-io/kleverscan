@@ -1,8 +1,8 @@
-import BlockCardFetcher from '@/components/Cards/BlockCardFetcher';
-import HomeDataCards from '@/components/Cards/CardDataFetcher/HomeDataCards';
+import BlockCardFetcher from '@/components/Home/BlockCardFetcher';
+import HomeDataCards from '@/components/Home/CardDataFetcher/HomeDataCards';
 import CoinCard from '@/components/Home/CoinDataFetcher/CoinCard';
-import HomeTransactions from '@/components/HomeTransactions';
-import { ChartDailyTransactions } from '@/components/HomeTransactions/ChartDailyTransactions';
+import HomeTransactions from '@/components/Home/HomeTransactions';
+import { ChartDailyTransactions } from '@/components/Home/HomeTransactions/ChartDailyTransactions';
 import { HomeInput } from '@/components/InputGlobal/HomeInput';
 import { HomeDataProvider } from '@/contexts/mainPage';
 import {

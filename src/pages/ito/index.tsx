@@ -32,6 +32,8 @@ import { ReactNode, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { IoIosInfinite } from 'react-icons/io';
 import nextI18nextConfig from '../../../next-i18next.config';
+import { CenteredRow, DoubleRow } from '@/styles/common';
+import { ProjectName } from '@/views/ito/style';
 
 export function getBestKLVRate(packData: IPackInfo[]): number | undefined {
   let bestKLVRate: number | undefined = undefined;
@@ -197,7 +199,144 @@ export const getITOrowSections =
             Participate
           </ParticipateButton>
         ),
+        span: 2,
+      },
+    ];
+
+    return sections;
+  };
+
+export const getITOTabletRowSections =
+  (
+    setITO: (asset: IParsedITO) => void,
+    setOpenParticipateModal: (open: boolean) => void,
+    reference?: string,
+  ) =>
+  (asset: IParsedITO): IRowSection[] => {
+    const {
+      ticker,
+      name,
+      logo,
+      assetId,
+      assetType,
+      precision,
+      verified,
+      maxAmount,
+      mintedAmount,
+      packData,
+      startTime,
+      endTime,
+      whitelistStartTime,
+      whitelistEndTime,
+    } = asset;
+
+    const bestKLVRate = getBestKLVRate(packData);
+
+    const access = Date.now() < whitelistEndTime ? 'Whitelist Only' : 'Public';
+
+    const renderTotalAmount = (): ReactNode => {
+      return (
+        <strong>
+          {!(maxAmount === 0 || Number.isNaN(maxAmount)) ? (
+            formatAmount(maxAmount / 10 ** precision)
+          ) : (
+            <IoIosInfinite />
+          )}
+        </strong>
+      );
+    };
+    const renderSoldAmount = (): ReactNode => {
+      return (
+        <strong>
+          {mintedAmount && mintedAmount !== 0
+            ? formatAmount(mintedAmount / 10 ** precision)
+            : 0}
+        </strong>
+      );
+    };
+
+    const sections: IRowSection[] = [
+      {
+        element: props => (
+          <CenteredRow>
+            <Link
+              href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
+              key={assetId}
+            >
+              <a>
+                <AssetLogo
+                  logo={logo}
+                  ticker={ticker}
+                  name={name}
+                  verified={verified}
+                  size={36}
+                />
+              </a>
+            </Link>
+            <DoubleRow>
+              <Link
+                href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
+                key={name}
+              >
+                <ProjectName style={{ overflow: 'hidden' }}>{name}</ProjectName>
+              </Link>
+              <ContainerAssetId>
+                <Link
+                  href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
+                  key={assetId}
+                >
+                  {assetId}
+                </Link>
+                <Copy info="Asset ID" data={assetId} svgSize={18} />
+              </ContainerAssetId>
+            </DoubleRow>
+          </CenteredRow>
+        ),
+        span: 2,
+      },
+      { element: props => <span key={assetType}>{assetType}</span>, span: 1 },
+      {
+        element: props => <span key={access}>{access}</span>,
         span: 1,
+      },
+      {
+        element: props => (
+          <DoubleRow>
+            <span key={bestKLVRate}>
+              {bestKLVRate || '- -'}
+              {bestKLVRate && ' KLV'}
+            </span>
+            <br />
+          </DoubleRow>
+        ),
+        span: 1,
+      },
+      {
+        element: props => (
+          <DoubleRow>
+            <strong key={maxAmount}>
+              {renderSoldAmount()} {ticker}
+            </strong>
+            <strong key={maxAmount}>
+              {renderTotalAmount()} {ticker}
+            </strong>
+          </DoubleRow>
+        ),
+        span: 1,
+      },
+      {
+        element: props => (
+          <ParticipateButton
+            onClick={() => {
+              setITO(asset);
+              setOpenParticipateModal(true);
+            }}
+            key={name}
+          >
+            Participate
+          </ParticipateButton>
+        ),
+        span: 2,
       },
     ];
 
@@ -213,6 +352,14 @@ export const ITOheaders = [
   'Sold',
   'Total',
   'Access',
+  '',
+];
+export const ITOTabletheaders = [
+  '',
+  'Type',
+  'Access',
+  'Best KLV Rate',
+  'Sold/Total',
   '',
 ];
 

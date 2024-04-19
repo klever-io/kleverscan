@@ -310,7 +310,7 @@ export const FrozenContainer = styled.div`
 
   flex-direction: column;
 
-  background-color: ${props => props.theme.accountCard.frozenBackground};
+  border: 1px solid ${props => props.theme.black};
   border-radius: 0.75rem;
 
   div {
@@ -323,6 +323,7 @@ export const FrozenContainer = styled.div`
     align-items: center;
 
     &:not(:last-child) {
+      border-bottom: 1px solid ${props => props.theme.black};
       border-bottom-left-radius: 0px;
       border-bottom-right-radius: 0px;
     }

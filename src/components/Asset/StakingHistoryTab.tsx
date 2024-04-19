@@ -11,10 +11,11 @@ import {
   FallbackFPRRow,
   HistoryWrapper,
   NoDepositsContainer,
-  PaginationHistory,
   StakingHeader,
   StakingHeaderSpan,
-  StakingHistoryTitle,
+  StakingHistoryFooter,
+  StakingHistoryHeader,
+  StakingHistoryScrollFooter,
 } from '@/views/assets/detail';
 import { useTranslation } from 'next-i18next';
 import { default as React, useState } from 'react';
@@ -44,10 +45,7 @@ const FPRHistory: React.FC<FPRHistoryProps> = ({ fpr, asset }) => {
   const isMobile = useMobile();
   const [FPRIndex, setFPRIndex] = useState<number>(3);
 
-  const showDefaultItems = () => {
-    setFPRIndex(3);
-    window.scrollTo(0, 0);
-  };
+  const showDefaultItems = () => setFPRIndex(3);
 
   const renderHistoryContent = (historyArray: IFPR[], currentIndex: number) => (
     <EpochWrapper>
@@ -95,10 +93,7 @@ const FPRHistory: React.FC<FPRHistoryProps> = ({ fpr, asset }) => {
         historyArray[currentIndex]?.kda.length > 0;
       elements.push(
         hasDataToRender ? (
-          <FPRRow
-            key={historyArray[currentIndex].epoch}
-            isStakingRoyalties={false}
-          >
+          <FPRRow key={historyArray[currentIndex].epoch} span={2}>
             <HistoryWrapper>
               {renderHistoryContent(historyArray, currentIndex)}
               <EpochDepositsWrapper>
@@ -158,7 +153,7 @@ const FPRHistory: React.FC<FPRHistoryProps> = ({ fpr, asset }) => {
             </HistoryWrapper>
           </FPRRow>
         ) : (
-          <FPRRow isStakingRoyalties={false} span={2}>
+          <FPRRow span={2}>
             <FallbackFPRRow>
               <HistoryWrapper>
                 <EpochDepositsWrapper>
@@ -217,33 +212,33 @@ const FPRHistory: React.FC<FPRHistoryProps> = ({ fpr, asset }) => {
     );
   };
   return (
-    <div>
-      <StakingHistoryTitle>
+    <>
+      <StakingHistoryHeader>
         <strong>{t('assets:Staking.Title History', { type: 'FPR' })}</strong>
         {renderFPRHeaderMsg()}
-      </StakingHistoryTitle>
+      </StakingHistoryHeader>
 
       {renderStakingHistory(fpr, FPRIndex)}
 
       {!((asset?.staking?.fpr?.length || 0) - FPRIndex <= 0) && (
-        <PaginationHistory
-          onClick={() => setFPRIndex(asset?.staking?.fpr?.length || 0)}
+        <StakingHistoryFooter
+          onClick={() => setFPRIndex(asset?.staking?.fpr?.length ?? 0)}
         >
           <strong>
             {t('common:Buttons.Show', {
               type: `${t('common:Tabs.More').toLowerCase()}`,
             })}
           </strong>
-        </PaginationHistory>
+        </StakingHistoryFooter>
       )}
 
       {!!((asset?.staking?.fpr?.length || 0) - FPRIndex <= 0) &&
         !!((asset?.staking?.fpr?.length || 0) > 3) && (
-          <PaginationHistory onClick={() => showDefaultItems()}>
+          <StakingHistoryScrollFooter onClick={() => showDefaultItems()}>
             <strong>Show less</strong>
-          </PaginationHistory>
+          </StakingHistoryScrollFooter>
         )}
-    </div>
+    </>
   );
 };
 

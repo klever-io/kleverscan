@@ -107,7 +107,7 @@ export const StakingRoyaltiesTab: React.FC<StakingRoyaltiesTabProps> = ({
                     </p>
                     <p>
                       {t('assets:Staking.Percentage')}:{' '}
-                      {transfer.percentage / 10 ** 2}%
+                      {transfer?.percentage / 10 ** 2 || 0}%
                     </p>
                   </Row>
                 ),

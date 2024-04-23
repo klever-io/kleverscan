@@ -399,14 +399,14 @@ export const HeaderGraph = styled.div`
   }
 `;
 
-export const ArrowVariation = styled(ArrowUpSquare).attrs(props => ({
+export const ArrowVariation = styled(ArrowUpSquare).attrs(() => ({
   size: 17,
 }))<{ $isPositive: boolean }>`
+  rotate: ${props => !props.$isPositive && '180deg'};
+
   path {
-    fill: ${props => props =>
-      props.theme.card[props.isPositive ? 'green' : 'red']};
+    fill: ${props => props.theme.card[props.$isPositive ? 'green' : 'red']};
   }
-  rotate: ${props => (props.isPositive ? '' : '180deg')};
 `;
 
 export const SetTimeContainer = styled.div`

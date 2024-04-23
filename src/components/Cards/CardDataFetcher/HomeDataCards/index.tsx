@@ -25,16 +25,23 @@ import {
 import { CircularProgressContainer } from '@/views/validators';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
-import { useState } from 'react';
+import { FC, useState } from 'react';
 import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
 import HomeDataCardsSkeleton from '../HomeDataCardsSkeleton';
 import GradientSVG from './GradientSVG';
-const HomeDataCards: React.FC = ({}) => {
-  const { t } = useTranslation('common', { keyPrefix: 'Cards' });
-  const [expanded, setExpanded] = useState(false);
-  const { isMobile, isTablet } = useMobile();
-  const { isDarkTheme } = useTheme();
 
+const ICONS = [
+  ['/homeCards/transactionsIcon.svg', '/homeCards/transactionsBackground.svg'],
+  ['/homeCards/accountsIcon.svg', '/homeCards/accountsBackground.svg'],
+  ['/homeCards/tpsIcon.svg', '/homeCards/tpsBackground.svg'],
+];
+
+const HomeDataCards: FC = () => {
+  const [expanded, setExpanded] = useState(false);
+
+  const { isDarkTheme } = useTheme();
+  const { isMobile, isTablet } = useMobile();
+  const { t } = useTranslation('common', { keyPrefix: 'Cards' });
   const {
     actualTPS,
     blocks,
@@ -47,27 +54,21 @@ const HomeDataCards: React.FC = ({}) => {
     loadingCards,
   } = useHomeData();
 
-  const icons = [
-    [
-      '/homeCards/transactionsIcon.svg',
-      '/homeCards/transactionsBackground.svg',
-    ],
-    ['/homeCards/accountsIcon.svg', '/homeCards/accountsBackground.svg'],
-    ['/homeCards/tpsIcon.svg', '/homeCards/tpsBackground.svg'],
-  ];
   const block = blocks && blocks[0];
 
   const dataCards: IDataCard[] = [
     {
       Icon: Transactions,
       title: t('Total Transactions'),
-      value: totalTransactions || 0,
-      variation: `+ ${newTransactions.toLocaleString()}`,
+      value: totalTransactions ?? 0,
+      variation: `+ ${Math.abs(
+        newTransactions - (beforeYesterdayTransactions ?? 0),
+      ).toLocaleString()}`,
     },
     {
       Icon: Accounts,
       title: t('Total Accounts'),
-      value: totalAccounts || 0,
+      value: totalAccounts ?? 0,
       variation: `+ ${newAccounts === 0 ? '0%' : newAccounts.toLocaleString()}`,
     },
     { title: t('Live/Peak TPS'), value: actualTPS, Icon: TPS },
@@ -77,7 +78,7 @@ const HomeDataCards: React.FC = ({}) => {
     <StackedImageWrapper>
       <NextImageCardWrapper>
         <Image
-          src={icons[index][0]}
+          src={ICONS[index][0]}
           alt="tps icon background"
           width={32}
           height={32}
@@ -86,7 +87,7 @@ const HomeDataCards: React.FC = ({}) => {
       </NextImageCardWrapper>
       <NextImageCardWrapper>
         <Image
-          src={icons[index][1]}
+          src={ICONS[index][1]}
           alt="tps icon background"
           width={44}
           height={44}

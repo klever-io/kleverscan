@@ -4,15 +4,15 @@ import { DoubleTxsTooltip } from '@/components/Chart/Tooltips';
 import { Loader } from '@/components/Loader/styles';
 import { IDoubleChart } from '@/pages/charts';
 import api from '@/services/api';
-import { IDailyTransaction, IParsedDailyTransaction } from '@/types';
+import { IDailyTransaction } from '@/types';
 import { getVariation } from '@/utils';
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import {
   ContainerTimeFilter,
   ItemTimeFilter,
-  Last24hTxs,
-  Last24Text,
   ListItemTimeFilter,
+  TimeSeriesChgValue,
+  TimeSeriesChgValueText,
   TransactionChart,
   TransactionChartContent,
   TransactionEmpty,
@@ -23,125 +23,161 @@ import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 import { Container } from './styles';
 
+const CHART_TIME_FILTER = [1, 7, 15, 30];
+const TIME_SERIES_CHG_VALUE = {
+  inPeriod: 0,
+  percent: '',
+};
+
 export const ChartDailyTransactions: React.FC = () => {
-  const filterDays = [1, 7, 15, 30];
-  const [transactionsList, setTransactionsList] = useState<IDoubleChart[]>();
-  const [timeFilter, setTimeFilter] = useState(16);
-  const [loadingDailyTxs, setLoadingDailyTxs] = useState(false);
+  const [isLoadingDailyTxs, setIsLoadingDailyTxs] = useState(false);
+  const [filterPeriod, setFilterPeriod] = useState(16);
+  const [transactionTimeSeriesChgValue, setTransactionTimeSeriesChgValue] =
+    useState(TIME_SERIES_CHG_VALUE);
+  const [transactionTimeSeries, setTransactionTimeSeries] = useState<
+    IDoubleChart[]
+  >([]);
+
   const { t: commonT } = useTranslation('common');
   const { t } = useTranslation('transactions');
 
   useEffect(() => {
-    const fetchTotalDays = async () => {
-      setLoadingDailyTxs(true);
+    const getTransactionsChartTimeSeries = async () => {
       try {
+        setIsLoadingDailyTxs(true);
+
         const res = await api.get({
-          route: `transaction/list/count/${timeFilter * 2}`,
+          route: `transaction/list/count/${filterPeriod * 2}`,
         });
-        if (!res.error || res.error === '') {
-          const rawTxList = res?.data?.number_by_day;
-          if (rawTxList) {
-            const sortedTxList = rawTxList.sort(
-              (a: IDailyTransaction, b: IDailyTransaction) => a.key - b.key,
-            );
-            const parsedTxList = sortedTxList.map((tx: IDailyTransaction) => {
-              if (tx.key) {
-                const date = new Date(tx.key);
-                // Set timezone to UTC
-                date.setTime(
-                  date.getTime() + date.getTimezoneOffset() * 60 * 1000,
-                );
-                const dateString = format(date, 'dd MMM');
-                return {
-                  date:
-                    dateString.slice(0, 2) +
-                    ' ' +
-                    commonT(`Date.Months.${dateString.slice(3)}`),
-                  value: tx.doc_count,
-                };
-              }
+        if (res?.error?.length) return;
+
+        const rawTxList: IDailyTransaction[] = res?.data?.number_by_day;
+        if (!rawTxList) return;
+
+        const parsedTxList = rawTxList
+          .sort((a, b) => a.key - b.key)
+          .reduce((acc, transaction) => {
+            if (
+              !transaction ||
+              !transaction.key ||
+              isNaN(transaction.doc_count)
+            )
+              return acc;
+
+            const date = new Date(transaction.key);
+
+            date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+
+            const formattedDate = format(date, 'dd MMM');
+            const [day, month] = formattedDate.split(' ');
+
+            const monthString = commonT(`Date.Months.${month}`);
+
+            const dateString = `${day} ${monthString}`;
+
+            acc.push({
+              date: dateString,
+              value: transaction.doc_count,
             });
-            const firstSlice = parsedTxList.slice(0, parsedTxList.length / 2);
-            const secondSlice = parsedTxList.slice(
-              parsedTxList.length / 2,
-              parsedTxList.length,
-            );
-            const mergedDailyTransactions = firstSlice.map(
-              (txPast: IParsedDailyTransaction, index: number) => {
-                return {
-                  valueNow: secondSlice[index].value,
-                  dateNow: secondSlice[index].date,
-                  valuePast: txPast.value,
-                  datePast: txPast.date,
-                  txPast,
-                  txNow: secondSlice[index],
-                };
-              },
-            );
-            setTransactionsList(mergedDailyTransactions);
-          }
-        }
-      } catch (error) {
-        console.error(error);
+
+            return acc;
+          }, [] as Array<{ date: string; value: number }>);
+
+        const firstSlice = parsedTxList.slice(0, parsedTxList.length / 2);
+        const secondSlice = parsedTxList.slice(
+          parsedTxList.length / 2,
+          parsedTxList.length,
+        );
+
+        const mergedTransactionTimeSeries = firstSlice.map((txPast, index) => ({
+          valueNow: secondSlice[index].value as number,
+          dateNow: secondSlice[index].date,
+          txNow: secondSlice[index],
+          valuePast: txPast.value as number,
+          datePast: txPast.date as string,
+          txPast,
+        })) as IDoubleChart[];
+
+        const firstValue = mergedTransactionTimeSeries[0];
+        const lastValue =
+          mergedTransactionTimeSeries[mergedTransactionTimeSeries?.length - 1];
+        const valueDiff = Math.abs(firstValue?.valueNow - lastValue?.valueNow);
+
+        setTransactionTimeSeries(mergedTransactionTimeSeries);
+        setTransactionTimeSeriesChgValue({
+          inPeriod: valueDiff,
+          percent: getVariation(valueDiff / 1000),
+        });
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoadingDailyTxs(false);
       }
-      setLoadingDailyTxs(false);
     };
 
-    fetchTotalDays();
-  }, [timeFilter]);
+    getTransactionsChartTimeSeries();
+  }, [filterPeriod]);
 
-  const last24h =
-    transactionsList?.[transactionsList?.length - 1]?.valueNow || 0;
-  const variationCalc =
-    last24h - (transactionsList?.[transactionsList?.length - 2]?.valueNow || 0);
-  const variation = getVariation(variationCalc / 100);
   return (
     <Container>
-      <h1>{t('Daily Transactions')}</h1>
+      <h1>{t('Transactions')}</h1>
+
       <TransactionChart>
         <ContainerTimeFilter>
           <div>
             <span>{t('Transactions')}</span>
-            <Last24hTxs>
-              {toLocaleFixed(last24h, 0)}
-              <Last24Text>
-                <span>24h</span>
-              </Last24Text>
-            </Last24hTxs>
-            <VariationText $positive={variation.includes('+')}>
-              <ArrowVariation $positive={variation.includes('+')} />
-              {variation}
+
+            <TimeSeriesChgValue>
+              {toLocaleFixed(transactionTimeSeriesChgValue.inPeriod, 0)}
+
+              <TimeSeriesChgValueText>
+                <span>{filterPeriod < 30 ? `${filterPeriod - 1}D` : '1M'}</span>
+              </TimeSeriesChgValueText>
+            </TimeSeriesChgValue>
+            <VariationText
+              $positive={transactionTimeSeriesChgValue.percent.includes('+')}
+            >
+              <ArrowVariation
+                $isPositive={transactionTimeSeriesChgValue.percent.includes(
+                  '+',
+                )}
+              />
+              {transactionTimeSeriesChgValue.percent}
             </VariationText>
           </div>
+
           <ListItemTimeFilter>
-            {loadingDailyTxs && <Loader width={20} height={20} />}
-            {filterDays.map(item => (
+            {isLoadingDailyTxs && <Loader width={20} height={20} />}
+
+            {CHART_TIME_FILTER.map(item => (
               <ItemTimeFilter
                 key={String(item)}
-                onClick={() => setTimeFilter(item + 1)}
-                selected={!!(timeFilter === item + 1)}
+                onClick={() => setFilterPeriod(item + 1)}
+                selected={!!(filterPeriod === item + 1)}
               >
                 {item !== 30 ? `${String(item)}D` : '1M'}
               </ItemTimeFilter>
             ))}
           </ListItemTimeFilter>
         </ContainerTimeFilter>
-        {!!transactionsList?.length && (
+
+        {!!transactionTimeSeries?.length && (
           <TransactionChartContent>
             <Chart
               type={ChartType.DoubleArea}
-              data={transactionsList}
-              hasTooltip={true}
+              data={transactionTimeSeries}
+              CustomTooltip={DoubleTxsTooltip}
               value="valueNow"
               value2="valuePast"
-              strokeWidth={1}
               yAxis={true}
+              hasTooltip={true}
+              strokeWidth={1}
               height={'100%'}
-              CustomTooltip={DoubleTxsTooltip}
             />
           </TransactionChartContent>
         )}
-        {!loadingDailyTxs && !transactionsList?.length && (
+
+        {!isLoadingDailyTxs && !transactionTimeSeries?.length && (
           <TransactionEmpty>
             <span>{commonT('EmptyData')}</span>
           </TransactionEmpty>

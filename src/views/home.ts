@@ -1,5 +1,4 @@
 import {
-  ArrowDown,
   ArrowDownHide,
   ArrowDropdown,
   ArrowUpSquare,
@@ -993,23 +992,24 @@ export const SpanWithLimit = styled.span`
   }
 `;
 
-export const Last24hTxs = styled.div`
-  color: ${props => props.theme.black};
+export const TimeSeriesChgValue = styled.div`
+  display: flex;
+  font-weight: 500;
   font-size: 2rem;
+  color: ${props => props.theme.black};
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
     font-size: 2.7rem;
   }
-  font-weight: 500;
-  display: flex;
 `;
-export const Last24Text = styled.div`
+
+export const TimeSeriesChgValueText = styled.div`
   display: flex;
   align-items: flex-end;
+  margin-left: 0.1rem;
   transform: translateY(-12%);
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
     transform: translateY(-15%);
   }
-  margin-left: 0.1rem;
 `;
 
 export const VariationText = styled.div<{ $positive: boolean }>`

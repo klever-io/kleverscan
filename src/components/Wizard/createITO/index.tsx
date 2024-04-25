@@ -17,8 +17,8 @@ import { useQuery } from 'react-query';
 import {
   ButtonsComponent,
   ConnectButtonComponent,
-  infinitySymbol,
   IWizardComponents,
+  infinitySymbol,
 } from '../createAsset';
 import {
   AddressesContainer,
@@ -435,7 +435,7 @@ export const CreateITOSixStep: React.FC<IAssetITOInformations> = ({
       if (maxSupply === 0) {
         return true;
       } else if (maxSupply < maxAmount) {
-        return 'Max Amount must be less than Max Supply';
+        return 'Maximum Amount must be less than Maximum Supply';
       }
       return true;
     }

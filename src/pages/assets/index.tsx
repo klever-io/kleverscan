@@ -71,7 +71,7 @@ const Assets: React.FC = () => {
     '',
     'Token Name/ID',
     `Type/Precision`,
-    `Circulating/Max Supply`,
+    `Circulating/Maximum Supply`,
     `Initial Supply/Total Staked`,
     `${t('table:RewardsType')}`,
   ];

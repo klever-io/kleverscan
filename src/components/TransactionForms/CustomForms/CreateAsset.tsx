@@ -174,7 +174,7 @@ const BasicInfoSection: React.FC<ISectionProps> = ({ isNFT, isFungible }) => {
       )}
       <FormInput
         name="maxSupply"
-        title="Max Supply"
+        title="Maximum Supply"
         type="number"
         tooltip={tooltip.maxSupply}
         precision={precision}
@@ -523,21 +523,21 @@ export const StakingSection: React.FC<IStakingSectionProps> = ({
       )}
       <FormInput
         name="staking.minEpochsToClaim"
-        title="Min Epochs to Claim"
+        title="Minimum Epochs to Claim"
         type="number"
         precision={0}
         tooltip={tooltip.staking.minEpochsToClaim}
       />
       <FormInput
         name="staking.minEpochsToUnstake"
-        title="Min Epochs to Unstake"
+        title="Minimum Epochs to Unstake"
         type="number"
         precision={0}
         tooltip={tooltip.staking.minEpochsToUnstake}
       />
       <FormInput
         name="staking.minEpochsToWithdraw"
-        title="Min Epochs to Withdraw"
+        title="Minimum Epochs to Withdraw"
         type="number"
         precision={0}
         tooltip={tooltip.staking.minEpochsToWithdraw}

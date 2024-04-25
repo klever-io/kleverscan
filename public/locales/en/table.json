@@ -5,7 +5,7 @@
   "Name": "Name",
   "Type": "Type",
   "InitialSupply": "Initial Supply",
-  "MaxSupply": "Max Supply",
+  "MaxSupply": "Maximum Supply",
   "CirculatingSupply": "Circulating Supply",
   "RewardsType": "Rewards Type",
   "Precision": "Precision",

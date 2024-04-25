@@ -33,10 +33,10 @@ import {
   CreateAssetWelcomeStep,
   CreatePreicisonStep,
   DesktopStepsComponent,
-  infinitySymbol,
-  propertiesCommonDefaultValues,
   StepsBasics,
   URIsSection,
+  infinitySymbol,
+  propertiesCommonDefaultValues,
 } from '..';
 import { createToken, parseRoles } from '../../utils';
 import { WizardBody } from '../styles';
@@ -142,7 +142,7 @@ const WizCreateToken: React.FC<any> = ({
     },
     {
       key: 'selectAssetMaxSupply',
-      label: 'Select Asset Max Supply',
+      label: 'Select Asset Maximum Supply',
       isDone: false,
       component: (
         <CreateAssetMaxSupplyStep

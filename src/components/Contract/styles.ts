@@ -264,10 +264,9 @@ export const SelectContainer = styled.div<{ span?: number }>`
   width: 100%;
   gap: 1rem;
 
-  ${props =>
-    css`
-      grid-column: auto / span ${props.span};
-    `}
+  ${props => css`
+    grid-column: auto / span ${props.span};
+  `}
 
   border: 1px solid ${({ theme }) => theme.darkGray};
   box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? '#000' : lighten(0.8, '#000'))};

@@ -1,6 +1,6 @@
 import { useInputSearch } from '@/contexts/inputSearch';
 import { useTheme } from '@/contexts/theme';
-import { getAsset } from '@/services/requests/asset';
+import { getAssetByPartialSymbol } from '@/services/requests/asset';
 import getAccount from '@/services/requests/searchBar/account';
 import getBlock from '@/services/requests/searchBar/block';
 import getTransaction from '@/services/requests/transaction';
@@ -85,7 +85,7 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
   };
   const canSearchResult = canSearch();
 
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: trimmedSearch,
     queryFn: () => getCorrectQueryFn(),
     enabled: canSearchResult,
@@ -123,7 +123,7 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
 
   const getCorrectQueryFn = (): Promise<SearchRequest> | undefined => {
     if (isAsset()) {
-      return getAsset(trimmedSearch);
+      return getAssetByPartialSymbol(trimmedSearch);
     }
 
     if (isAccount()) {

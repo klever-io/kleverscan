@@ -883,9 +883,7 @@ export interface IAssetsResponse extends IPaginatedResponse {
 }
 
 export interface IAssetResponse extends IResponse {
-  data: {
-    asset: IAsset;
-  };
+  data: Record<'asset', IAsset> | null;
 }
 
 export interface IAssetPage {

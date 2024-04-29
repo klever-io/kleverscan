@@ -102,10 +102,14 @@ export const ChartDailyTransactions: React.FC = () => {
         const lastValue =
           mergedTransactionTimeSeries[mergedTransactionTimeSeries?.length - 1];
         const valueDiff = Math.abs(firstValue?.valueNow - lastValue?.valueNow);
+        const totalSum = mergedTransactionTimeSeries.reduce(
+          (acc, curr) => (acc += curr?.valueNow ?? 0),
+          0,
+        );
 
         setTransactionTimeSeries(mergedTransactionTimeSeries);
         setTransactionTimeSeriesChgValue({
-          inPeriod: valueDiff,
+          inPeriod: totalSum,
           percent: getVariation(valueDiff / 1000),
         });
       } catch (err) {

@@ -61,8 +61,8 @@ const HomeDataCards: FC = () => {
       Icon: Transactions,
       title: t('Total Transactions'),
       value: totalTransactions ?? 0,
-      variation: `+ ${Math.abs(
-        newTransactions - (beforeYesterdayTransactions ?? 0),
+      variation: `+ ${(
+        newTransactions + (beforeYesterdayTransactions ?? 0)
       ).toLocaleString()}`,
     },
     {

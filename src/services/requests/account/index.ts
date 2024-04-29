@@ -60,10 +60,7 @@ export const generateEmptyAccountResponse = (
 export const assetsRequest = (
   address: string,
 ): ((page: number, limit: number) => Promise<IResponse>) => {
-  const requestAssets = async (
-    page: number,
-    limit: number,
-  ): Promise<IResponse> => {
+  const get = async (page: number, limit: number): Promise<IResponse> => {
     if (!address) {
       return {
         data: { assets: [] },
@@ -119,16 +116,13 @@ export const assetsRequest = (
     };
   };
 
-  return requestAssets;
+  return get;
 };
 
 export const ownedAssetsRequest = (
   address: string,
 ): ((page: number, limit: number) => Promise<IResponse>) => {
-  const requestAssets = async (
-    page: number,
-    limit: number,
-  ): Promise<IResponse> => {
+  const get = async (page: number, limit: number): Promise<IResponse> => {
     const ownedAssetsResponse = await api.get({
       route: 'assets/kassets',
       query: { owner: `${address}`, page, limit },
@@ -152,14 +146,14 @@ export const ownedAssetsRequest = (
     return proprietaryAssets;
   };
 
-  return requestAssets;
+  return get;
 };
 
 export const transactionsRequest = (
   address: string,
   query: IQueryParams,
 ): ((page: number, limit: number) => Promise<IResponse>) => {
-  const transactionsRequest = async (page: number, limit: number) => {
+  const get = async (page: number, limit: number) => {
     const localQuery: IQueryParams = { ...query, page, limit };
     delete localQuery.tab;
     const transactionsResponse = await api.get({
@@ -221,13 +215,14 @@ export const transactionsRequest = (
       },
     };
   };
-  return transactionsRequest;
+
+  return get;
 };
 
 export const bucketsRequest = (
   address: string,
 ): ((page: number, limit: number) => Promise<IResponse | []>) => {
-  const requestBuckets = async (
+  const get = async (
     page: number,
     limit: number,
   ): Promise<IPaginatedResponse | []> => {
@@ -235,41 +230,39 @@ export const bucketsRequest = (
       route: `address/${address}`,
     });
     if (!accountResponse) return [];
-    const bucketsTable: IAssetsBuckets[] = [];
+
     const assets = accountResponse?.data?.account?.assets || {};
+    const assetsBuckets: IAssetsBuckets[] = [];
 
     const assetsWithBuckets = Object.keys(assets).filter(
       asset => assets[asset]?.buckets?.length,
     );
 
-    const assetsDetailsRes: IAssetsResponse = await api.get({
+    const assetsDetailsResponse: IAssetsResponse = await api.get({
       route: `assets/list`,
       query: { asset: assetsWithBuckets, page, limit },
     });
 
-    const assetsDetails = assetsDetailsRes?.data?.assets;
+    const allAssetsDetails = assetsDetailsResponse?.data?.assets;
 
-    for (const assetDetails of assetsDetails) {
-      const asset = assets[assetDetails.assetId];
+    for (const { assetId, staking } of allAssetsDetails) {
+      const asset = assets[assetId];
 
-      asset.staking = assetDetails.staking;
+      if (asset?.staking) asset.staking = staking;
 
-      for (const bucket of asset.buckets || []) {
-        bucketsTable.push({
-          asset: { ...asset },
-          bucket: { ...bucket },
-        });
-      }
+      for (const bucket of asset?.buckets ?? [])
+        assetsBuckets.push({ asset, bucket });
     }
 
     return {
-      data: { buckets: bucketsTable },
-      pagination: assetsDetailsRes.pagination,
+      data: { buckets: assetsBuckets },
+      pagination: assetsDetailsResponse.pagination,
       code: 'successful',
       error: '',
     };
   };
-  return requestBuckets;
+
+  return get;
 };
 
 export const accountCall = async (
@@ -368,10 +361,7 @@ export const accountAssetsOwnerCall = async (
 export const rewardsFPRPool = (
   address: string,
 ): ((page: number, limit: number) => Promise<IResponse | []>) => {
-  const requestBuckets = async (
-    page: number,
-    limit: number,
-  ): Promise<IResponse | []> => {
+  const get = async (page: number, limit: number): Promise<IResponse | []> => {
     const accountResponse: IAccountResponse = await api.get({
       route: `address/${address}`,
     });
@@ -435,7 +425,8 @@ export const rewardsFPRPool = (
     );
     return { data: { rewards: responseAll }, code: 'successful', error: '' };
   };
-  return requestBuckets;
+
+  return get;
 };
 
 export const myAccountCall = async (

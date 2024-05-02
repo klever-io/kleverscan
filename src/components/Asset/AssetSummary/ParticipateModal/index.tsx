@@ -189,8 +189,6 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
 
     const qtyPacks = selectedPackData.packs.length;
 
-    const assetPrecision = selectedPackData?.precision;
-
     const packs =
       selectedPackData?.packs ||
       ([
@@ -201,7 +199,8 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
       ] as IPackItem[]);
 
     if (qtyPacks === 1) {
-      return cost / packs[0].price;
+      const result = cost / packs[0].price;
+      return ITO?.precision ? +result.toFixed(ITO.precision) : result;
     } else if (qtyPacks === 2) {
       if (cost >= 0 && cost <= packs[0].amount * packs[0].price) {
         return cost / packs[0].price;
@@ -356,11 +355,16 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
                 <Input
                   value={assetAmount}
                   onChange={e => {
-                    const value = Number(e.target.value);
-                    if (Number.isNaN(value)) return;
+                    const { value } = e.target;
 
-                    setAssetAmount(value);
-                    setCurrencyAmount(calculateCostFromAmount(value));
+                    const [_, decimalPart] = value.toString().split('.');
+                    if (decimalPart?.length > ITO.precision) return;
+
+                    const valueToNum = Number(value);
+                    if (Number.isNaN(valueToNum)) return;
+
+                    setAssetAmount(valueToNum);
+                    setCurrencyAmount(calculateCostFromAmount(valueToNum));
                   }}
                 />
                 {ITO.assetType === 'Fungible' ? (

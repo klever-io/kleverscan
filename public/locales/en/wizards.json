@@ -15,7 +15,7 @@
     "name": "name",
     "ticker": "ticker",
     "precision": "Precision",
-    "maxSupply": "Max Supply",
+    "maxSupply": "Maximum Supply",
     "initialSupply": "Initial Supply",
     "maxSupplyOf": "Max. Supply of {{ticker}}",
     "URI": "URI {{assetText}} image",
@@ -194,7 +194,7 @@
         "ownerAddress": "Owner Address",
         "tokenPrecision": "Token Precision",
         "initialSupply": "Initial Supply",
-        "maxSupply": "Max Supply",
+        "maxSupply": "Maximum Supply",
         "tokenImage": "Token Image"
       },
       "advancedStepsLabels": {
@@ -244,7 +244,7 @@
         "tokenName": "NFT Name",
         "tokenTicker": "NFT Ticker",
         "ownerAddress": "Owner Address",
-        "maxSupply": "Max Supply",
+        "maxSupply": "Maximum Supply",
         "tokenImage": "NFT Image"
       },
       "advancedStepsLabels": {
@@ -276,7 +276,7 @@
       "startTimeRightNow": "Start right now?",
       "tooltipTimeITO": "If you leave this field blank, this ITO will be open from now until the status is changed to PausedITO",
       "whatIsTheAmount": "What is the amount of tokens that will be sold in {{collection}} ITO?",
-      "tooltipAmountOne": "If you leave this field blank, all the max supply of",
+      "tooltipAmountOne": "If you leave this field blank, all the maximum supply of",
       "tooltipAmountTwo": "will be available during the ITO.",
       "initialITOStatus": "What is the initial {{collection}} ITO Status?",
       "tooltipStatus": "You can even initialize an ITO with paused status and enable it in the future if you want to.",

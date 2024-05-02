@@ -1,6 +1,5 @@
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import { screen, waitFor } from '@testing-library/react';
-import React from 'react';
 import { act } from 'react-dom/test-utils';
 import theme from '../../styles/theme';
 import { klvAsset, mockedTxContractComponents } from '../../test/mocks';
@@ -153,7 +152,7 @@ describe('Component: TransactionContractComponents', () => {
       const token = screen.getByText(/Ticker/i);
       const precisionAsset = screen.getByText(/Precision/i);
       const initialSupply = screen.getByText(/Initial Supply/i);
-      const maxSupply = screen.getByText(/Max Supply/i);
+      const maxSupply = screen.getByText(/Maximum Supply/i);
 
       expect(assetId).toBeInTheDocument();
       expect(name).toBeInTheDocument();

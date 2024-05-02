@@ -180,7 +180,7 @@ const Buckets: React.FC<IBuckets> = ({
       {
         element: props => (
           <span key={bucket.unstakedEpoch}>
-            {bucket.stakedEpoch.toLocaleString()}
+            {bucket.stakedEpoch?.toLocaleString()}
           </span>
         ),
         span: 1,
@@ -201,7 +201,7 @@ const Buckets: React.FC<IBuckets> = ({
           <>
             {bucket.unstakedEpoch === UINT32_MAX
               ? '--'
-              : bucket.unstakedEpoch.toLocaleString()}
+              : bucket.unstakedEpoch?.toLocaleString()}
           </>
         ),
         span: 1,
@@ -213,7 +213,7 @@ const Buckets: React.FC<IBuckets> = ({
       {
         element: props => (
           <>
-            {bucket.delegation.length > 0 ? (
+            {bucket.delegation?.length > 0 ? (
               <>
                 <Link href={`/validator/${bucket.delegation}`}>
                   <a>{parseAddress(bucket.delegation, 22)}</a>

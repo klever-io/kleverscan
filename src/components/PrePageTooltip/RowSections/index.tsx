@@ -4,6 +4,7 @@ import { Loader } from '@/components/Loader/styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import {
   IAccountResponse,
+  IAsset,
   IAssetResponse,
   IRowSection,
   ITransactionResponse,
@@ -177,7 +178,7 @@ export const AssetRowSections = (
   setShowTooltip: React.Dispatch<SetStateAction<boolean>>,
 ): IRowSection[] => {
   if (res.data || res.error === '') {
-    const { asset } = res.data;
+    const asset = res.data?.asset as IAsset;
 
     return [
       {

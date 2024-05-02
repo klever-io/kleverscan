@@ -293,8 +293,8 @@ export interface IAccount {
 }
 
 export interface IAssetsBuckets {
-  asset: IAccountAsset;
-  bucket: IBucket;
+  asset?: IAccountAsset;
+  bucket?: IBucket;
 }
 
 export interface IHolders {

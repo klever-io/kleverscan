@@ -31,7 +31,7 @@ const Rewards: React.FC<IRewards> = ({ rewardsTableProps }) => {
 
     const displayRewards = expanded[assetId]
       ? allStakingRewards
-      : allStakingRewards.slice(0, 3);
+      : allStakingRewards?.slice(0, 3);
     const sections: IRowSection[] = [
       {
         element: props => (

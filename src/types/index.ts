@@ -351,7 +351,7 @@ export interface IProprietaryAsset {
 
 export interface IRewardsAssets {
   allowance: number;
-  allStakingRewards: [
+  allStakingRewards?: [
     {
       assetId: string;
       precision: number;

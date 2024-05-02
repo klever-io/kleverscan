@@ -37,14 +37,16 @@ const Buckets: React.FC<IBuckets> = ({
   const rowSections = (assetBucket: IAssetsBuckets): IRowSection[] => {
     const { asset, bucket } = assetBucket;
 
-    const minEpochsToUnstake = asset.staking?.minEpochsToUnstake ?? 1;
-    const minEpochsToWithdraw = asset.staking?.minEpochsToWithdraw ?? 2;
+    const minEpochsToUnstake = asset?.staking?.minEpochsToUnstake ?? 1;
+    const minEpochsToWithdraw = asset?.staking?.minEpochsToWithdraw ?? 2;
 
-    const unfreezeEquation = bucket.stakedEpoch + minEpochsToUnstake - epoch;
+    const unfreezeEquation =
+      (bucket?.stakedEpoch || 0) + minEpochsToUnstake - epoch;
     const isUnfreezeLocked = () => {
       return unfreezeEquation > 0;
     };
-    const withdrawEquation = bucket.unstakedEpoch - epoch + minEpochsToWithdraw;
+    const withdrawEquation =
+      (bucket?.unstakedEpoch || 0) - epoch + minEpochsToWithdraw;
 
     const isWithdrawLocked = () => {
       if (bucket?.unstakedEpoch === UINT32_MAX) {
@@ -76,14 +78,14 @@ const Buckets: React.FC<IBuckets> = ({
         title: t('SingleAccount.Buttons.Delegate'),
         contractType: 'DelegateContract',
         defaultValues: {
-          bucketId: bucket.id,
+          bucketId: bucket?.id,
         },
       },
       {
         title: t('SingleAccount.Buttons.Undelegate'),
         contractType: 'UndelegateContract',
         defaultValues: {
-          bucketId: bucket.id,
+          bucketId: bucket?.id,
         },
       },
       {
@@ -91,15 +93,15 @@ const Buckets: React.FC<IBuckets> = ({
         contractType: 'WithdrawContract',
         defaultValues: {
           withdrawType: 0,
-          collection: asset.assetId,
+          collection: asset?.assetId,
         },
       },
       {
         title: t('SingleAccount.Buttons.Unfreeze'),
         contractType: 'UnfreezeContract',
         defaultValues: {
-          collection: asset.assetId,
-          bucketId: bucket.id,
+          collection: asset?.assetId,
+          bucketId: bucket?.id,
         },
       },
       {
@@ -109,9 +111,9 @@ const Buckets: React.FC<IBuckets> = ({
     ]);
 
     const getDelegation = () => {
-      if (bucket.delegation) {
+      if (bucket?.delegation) {
         return <></>;
-      } else if (asset.assetId === 'KLV') {
+      } else if (asset?.assetId === 'KLV') {
         return <>{showInteractionButtons && <DelegateButton />}</>;
       } else {
         return <>--</>;
@@ -120,7 +122,7 @@ const Buckets: React.FC<IBuckets> = ({
 
     const getButton = () => {
       if (isUnfreezeLocked() || isWithdrawLocked()) {
-        if (bucket.delegation) {
+        if (bucket?.delegation) {
           return (
             <>
               {showInteractionButtons && <UndelegateButton />}
@@ -129,8 +131,8 @@ const Buckets: React.FC<IBuckets> = ({
           );
         }
         return <>{showInteractionButtons && <LockedButton />}</>;
-      } else if (bucket.unstakedEpoch !== UINT32_MAX) {
-        if (bucket.delegation) {
+      } else if (bucket?.unstakedEpoch !== UINT32_MAX) {
+        if (bucket?.delegation) {
           return (
             <>
               {showInteractionButtons && <UndelegateButton />}
@@ -140,7 +142,7 @@ const Buckets: React.FC<IBuckets> = ({
         }
         return <>{showInteractionButtons && <WithdrawButton />}</>;
       } else {
-        if (bucket.delegation) {
+        if (bucket?.delegation) {
           return (
             <ContractContainer>
               {showInteractionButtons && <UndelegateButton />}
@@ -155,16 +157,19 @@ const Buckets: React.FC<IBuckets> = ({
     const sections: IRowSection[] = [
       {
         element: props => (
-          <Link href={`/asset/${asset.assetId}`} key={asset.assetId}>
-            <a>{asset.assetId}</a>
+          <Link href={`/asset/${asset?.assetId}`} key={asset?.assetId}>
+            <a>{asset?.assetId}</a>
           </Link>
         ),
         span: 1,
       },
       {
         element: props => (
-          <p key={bucket.unstakedEpoch}>
-            {(bucket.balance / 10 ** asset.precision).toLocaleString()}
+          <p key={bucket?.unstakedEpoch}>
+            {(
+              (bucket?.balance || 0) /
+              10 ** (asset?.precision || 0)
+            ).toLocaleString()}
           </p>
         ),
         span: 1,
@@ -179,18 +184,18 @@ const Buckets: React.FC<IBuckets> = ({
       },
       {
         element: props => (
-          <span key={bucket.unstakedEpoch}>
-            {bucket.stakedEpoch?.toLocaleString()}
+          <span key={bucket?.unstakedEpoch}>
+            {bucket?.stakedEpoch?.toLocaleString()}
           </span>
         ),
         span: 1,
       },
       {
         element: props => (
-          <RowContent key={bucket.id}>
+          <RowContent key={bucket?.id}>
             <CenteredRow className="bucketIdCopy">
-              <span>{parseAddress(bucket.id, 24)}</span>
-              <Copy info="BucketId" data={bucket.id} />
+              <span>{parseAddress(bucket?.id || '', 24)}</span>
+              <Copy info="BucketId" data={bucket?.id} />
             </CenteredRow>
           </RowContent>
         ),
@@ -199,9 +204,9 @@ const Buckets: React.FC<IBuckets> = ({
       {
         element: props => (
           <>
-            {bucket.unstakedEpoch === UINT32_MAX
+            {bucket?.unstakedEpoch === UINT32_MAX
               ? '--'
-              : bucket.unstakedEpoch?.toLocaleString()}
+              : bucket?.unstakedEpoch?.toLocaleString()}
           </>
         ),
         span: 1,
@@ -213,10 +218,10 @@ const Buckets: React.FC<IBuckets> = ({
       {
         element: props => (
           <>
-            {bucket.delegation?.length > 0 ? (
+            {bucket?.delegation?.length && bucket?.delegation?.length > 0 ? (
               <>
-                <Link href={`/validator/${bucket.delegation}`}>
-                  <a>{parseAddress(bucket.delegation, 22)}</a>
+                <Link href={`/validator/${bucket?.delegation}`}>
+                  <a>{parseAddress(bucket?.delegation, 22)}</a>
                 </Link>
               </>
             ) : (

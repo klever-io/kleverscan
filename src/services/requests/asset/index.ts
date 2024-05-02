@@ -36,6 +36,27 @@ export const getAsset = async (assetId: string): Promise<IAssetResponse> =>
     route: `assets/${assetId}`,
   });
 
+export const getAssetByPartialSymbol = async (
+  assetRef: string,
+): Promise<IAssetResponse> => {
+  const result = {
+    data: null,
+  } as IAssetResponse;
+
+  if (assetRef?.length) {
+    const res = await api.get({
+      route: `assets/list?asset=${assetRef}`,
+    });
+
+    if (res?.data?.assets?.length)
+      result.data = {
+        asset: res.data.assets[0],
+      };
+  }
+
+  return result;
+};
+
 export const assetInfoCall = async (router: NextRouter): Promise<any> => {
   try {
     const assetId = router.query?.asset as string;

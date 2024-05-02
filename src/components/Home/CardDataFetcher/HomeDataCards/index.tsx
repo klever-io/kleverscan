@@ -9,38 +9,28 @@ import { useTheme } from '@/contexts/theme';
 import { IDataCard } from '@/types/home';
 import {
   ArrowData,
-  ArrowDownDataCards,
-  ButtonExpand,
   DataCard,
-  DataCardContent,
   DataCardLatest,
   DataCardsContent,
   DataCardsWrapper,
   DataCardValue,
   EpochCardContent,
-  ExpandData,
-  MobileCardsContainer,
-  MobileEpoch,
-  Percentage,
 } from '@/views/home';
 import { CircularProgressContainer } from '@/views/validators';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
 import HomeDataCardsSkeleton from '../HomeDataCardsSkeleton';
 import GradientSVG from './GradientSVG';
 
-const DefaultCards: React.FC<{ index: number }> = ({ index }) => {
-  const icons = [
-    [
-      '/homeCards/transactionsIcon.svg',
-      '/homeCards/transactionsBackground.svg',
-    ],
-    ['/homeCards/accountsIcon.svg', '/homeCards/accountsBackground.svg'],
-    ['/homeCards/tpsIcon.svg', '/homeCards/tpsBackground.svg'],
-  ];
+const icons = [
+  ['/homeCards/transactionsIcon.svg', '/homeCards/transactionsBackground.svg'],
+  ['/homeCards/accountsIcon.svg', '/homeCards/accountsBackground.svg'],
+  ['/homeCards/tpsIcon.svg', '/homeCards/tpsBackground.svg'],
+];
 
+const DefaultCards: React.FC<{ index: number }> = ({ index }) => {
   return (
     <StackedImageWrapper>
       <NextImageCardWrapper>
@@ -119,6 +109,7 @@ const HomeDataCards: React.FC = ({}) => {
     blocks,
     metrics,
     newTransactions,
+    beforeYesterdayTransactions,
     newAccounts = 0,
     totalAccounts,
     totalTransactions,
@@ -129,13 +120,15 @@ const HomeDataCards: React.FC = ({}) => {
     {
       Icon: Transactions,
       title: t('Total Transactions'),
-      value: totalTransactions || 0,
-      variation: `+ ${newTransactions.toLocaleString()}`,
+      value: totalTransactions ?? 0,
+      variation: `+ ${(
+        newTransactions + (beforeYesterdayTransactions ?? 0)
+      ).toLocaleString()}`,
     },
     {
       Icon: Accounts,
       title: t('Total Accounts'),
-      value: totalAccounts || 0,
+      value: totalAccounts ?? 0,
       variation: `+ ${newAccounts === 0 ? '0%' : newAccounts.toLocaleString()}`,
     },
     { title: t('Live/Peak TPS'), value: actualTPS, Icon: TPS },

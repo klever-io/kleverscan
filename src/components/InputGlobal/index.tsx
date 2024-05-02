@@ -89,25 +89,20 @@ const Input: React.FC<InputGlobal> = ({
   };
 
   return (
-    <>
-      <Container {...containerProps}>
-        <input {...inputProps} />
-        <Search onClick={handleSearch} id={'SearchIcon'} />
-        {showTooltip && (
-          <>
-            <FocusBackground
-              onClick={handleTooltipFocus}
-              id="FocusBackground"
-            />
-            <PrePageTooltip
-              search={search}
-              setShowTooltip={setShowTooltip}
-              isInHomePage={containerProps.isInHomePage}
-            />
-          </>
-        )}
-      </Container>
-    </>
+    <Container {...containerProps}>
+      <input {...inputProps} />
+      <Search onClick={handleSearch} id={'SearchIcon'} />
+      {showTooltip && (
+        <>
+          <FocusBackground onClick={handleTooltipFocus} id="FocusBackground" />
+          <PrePageTooltip
+            search={search}
+            setShowTooltip={setShowTooltip}
+            isInHomePage={containerProps.isInHomePage}
+          />
+        </>
+      )}
+    </Container>
   );
 };
 

@@ -6,6 +6,7 @@ import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import { getAsset } from '@/services/requests/asset';
+import { IAsset } from '@/types';
 import { parseAddress } from '@/utils/parseValues';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
@@ -431,7 +432,7 @@ export const CreateITOSixStep: React.FC<IAssetITOInformations> = ({
   };
   const validateInput = (maxAmount: number) => {
     if (!isLoading) {
-      const maxSupply = data?.data.asset.maxSupply || 0;
+      const maxSupply = data?.data?.asset.maxSupply || 0;
       if (maxSupply === 0) {
         return true;
       } else if (maxSupply < maxAmount) {
@@ -469,7 +470,7 @@ export const CreateITOSixStep: React.FC<IAssetITOInformations> = ({
         </ErrorInputContainer>
         <GenericInfoCard>
           Klever Tip: {t('wizards:createITO.steps.tooltipAmountOne')}{' '}
-          <strong>{data?.data.asset.maxSupply || infinity}</strong>{' '}
+          <strong>{data?.data?.asset.maxSupply || infinity}</strong>{' '}
           {t('wizards:createITO.steps.tooltipAmountTwo')}
         </GenericInfoCard>
       </div>
@@ -1391,7 +1392,8 @@ export const AssetDetails: React.FC = () => {
   };
   const RenderAssetDetails: React.FC = () => {
     if (data) {
-      const { asset } = data.data;
+      const asset = data.data?.asset as IAsset;
+
       return (
         <>
           <div>

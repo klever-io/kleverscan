@@ -14,6 +14,7 @@ import {
 import React from 'react';
 import { HomeITOSection } from './HomeITOSection';
 import ProposalValidatorSection from './ProposalsAndValidatorsSection';
+import MostTransacted from './MostTransacted';
 
 const Home: React.FC = () => {
   return (
@@ -31,6 +32,7 @@ const Home: React.FC = () => {
           <HomeTransactions />
           <BlockCardFetcher />
         </CardContainer>
+        <MostTransacted />
         <ProposalValidatorSection />
         <HomeITOSection />
       </Container>

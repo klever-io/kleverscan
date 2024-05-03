@@ -2,6 +2,7 @@ import { IDaysCoins } from '@/contexts/mainPage';
 import api from '@/services/api';
 import {
   IAggregateResponse,
+  IAsset,
   IAssetData,
   IEpochInfo,
   IGeckoChartResponse,
@@ -11,7 +12,7 @@ import {
   Service,
 } from '@/types';
 import { IBlock, IBlocksResponse } from '@/types/blocks';
-import { IProposal } from '@/types/proposals';
+import { IProposal, MostTransferedToken } from '@/types/proposals';
 import { getEpochInfo } from '@/utils';
 import { calcApr } from '@/utils/calcApr';
 
@@ -96,7 +97,7 @@ const homeYesterdayAccountsCall = async (): Promise<
 };
 
 const homeTransactionsCall = async (): Promise<
-  { totalTransactions: number; transcations: ITransaction[] } | undefined
+  { totalTransactions: number; transactions: ITransaction[] } | undefined
 > => {
   try {
     const res = await api.get({
@@ -105,7 +106,7 @@ const homeTransactionsCall = async (): Promise<
     if (!res.error || res.error === '') {
       return {
         totalTransactions: res.pagination.totalRecords,
-        transcations: res.data.transactions,
+        transactions: res.data.transactions,
       };
     }
   } catch (error) {
@@ -483,6 +484,92 @@ const homeKfiPriceCall = async (): Promise<
   }
 };
 
+const homeMostTransactedTokens = async (): Promise<
+  MostTransferedToken[] | undefined
+> => {
+  try {
+    const mostTransactedRes = await api.get({
+      route: 'transaction/statistics',
+      query: {
+        assetType: 'Fungible',
+      },
+    });
+
+    if (mostTransactedRes.error) {
+      console.error(mostTransactedRes.error);
+      return;
+    }
+
+    const assetsRes = await api.get({
+      route: 'assets/list',
+      query: {
+        asset: mostTransactedRes.data.most_transacted.map(
+          (token: MostTransferedToken) => token.key,
+        ),
+      },
+    });
+
+    const data = mostTransactedRes.data.most_transacted.map(
+      (token: MostTransferedToken) => {
+        const asset = assetsRes.data.assets.find(
+          (asset: IAsset) => asset.assetId === token.key,
+        );
+        return {
+          ...token,
+          logo: asset.logo || '',
+        };
+      },
+    );
+
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const homeMostTransactedNFTs = async (): Promise<
+  MostTransferedToken[] | undefined
+> => {
+  try {
+    const mostTransactedRes = await api.get({
+      route: 'transaction/statistics',
+      query: {
+        assetType: 'NonFungible',
+      },
+    });
+
+    if (mostTransactedRes.error) {
+      console.error(mostTransactedRes.error);
+      return;
+    }
+
+    const assetsRes = await api.get({
+      route: 'assets/list',
+      query: {
+        asset: mostTransactedRes.data.most_transacted.map(
+          (token: MostTransferedToken) => token.key,
+        ),
+      },
+    });
+
+    const data = mostTransactedRes.data.most_transacted.map(
+      (token: MostTransferedToken) => {
+        const asset = assetsRes.data.assets.find(
+          (asset: IAsset) => asset.assetId === token.key,
+        );
+        return {
+          ...token,
+          logo: asset.logo || '',
+        };
+      },
+    );
+
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export {
   defaultAggregateData,
   homeAccountsCall,
@@ -504,4 +591,6 @@ export {
   homeTotalValidators,
   homeTransactionsCall,
   homeYesterdayAccountsCall,
+  homeMostTransactedTokens,
+  homeMostTransactedNFTs,
 };

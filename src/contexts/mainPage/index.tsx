@@ -6,6 +6,8 @@ import {
   homeGetAggregateCall,
   homeGetBlocksCall,
   homeLastApprovedProposalCall,
+  homeMostTransactedNFTs,
+  homeMostTransactedTokens,
   homeNodes,
   homeProposalsCall,
   homeTotalActiveValidators,
@@ -15,7 +17,7 @@ import {
 } from '@/services/requests/home';
 import { IEpochInfo, ITransaction, Node } from '@/types';
 import { IBlock } from '@/types/blocks';
-import { IProposal } from '@/types/proposals';
+import { IProposal, MostTransferedToken } from '@/types/proposals';
 import { createContext, useContext } from 'react';
 import { useQueries } from 'react-query';
 
@@ -41,6 +43,8 @@ export interface IHomeData {
   activeValidators?: number;
   lastApprovedProposal?: IProposal;
   nodes?: Node[];
+  mostTransactedTokens: MostTransferedToken[];
+  mostTransactedNFTs: MostTransferedToken[];
 }
 
 export const HomeData = createContext({} as IHomeData);
@@ -61,6 +65,8 @@ export const HomeDataProvider: React.FC = ({ children }) => {
     validatorsResult,
     activeValidatorsResult,
     nodes,
+    mostTransactedTokens,
+    mostTransactedNFTs,
   ] = useQueries([
     {
       queryKey: 'aggregateData',
@@ -122,6 +128,16 @@ export const HomeDataProvider: React.FC = ({ children }) => {
       queryFn: homeNodes,
       refetchInterval: watcherTimeout,
     },
+    {
+      queryKey: 'mostTransactedTokens',
+      queryFn: homeMostTransactedTokens,
+      refetchInterval: watcherTimeout,
+    },
+    {
+      queryKey: 'mostTransactedNFTs',
+      queryFn: homeMostTransactedNFTs,
+      refetchInterval: watcherTimeout,
+    },
   ]);
 
   const values: IHomeData = {
@@ -135,7 +151,7 @@ export const HomeDataProvider: React.FC = ({ children }) => {
       beforeYesterdayTransactionsResult.data?.beforeYesterdayTxs,
     newAccounts: yesterdayAccountResult.data?.newAccounts,
     totalAccounts: accountResult.data?.totalAccounts,
-    transactions: transactionsResult.data?.transcations || [],
+    transactions: transactionsResult.data?.transactions || [],
     totalTransactions: transactionsResult.data?.totalTransactions,
     loadingCards: accountResult.isLoading,
     loadingBlocks: blocksResult.isLoading,
@@ -146,6 +162,8 @@ export const HomeDataProvider: React.FC = ({ children }) => {
     activeValidators: activeValidatorsResult.data?.totalActiveValidators,
     lastApprovedProposal: approvedProposalsResult.data?.approvedProposal,
     nodes: nodes.data?.nodes,
+    mostTransactedTokens: mostTransactedTokens.data || [],
+    mostTransactedNFTs: mostTransactedNFTs.data || [],
   };
 
   return <HomeData.Provider value={values}>{children}</HomeData.Provider>;

@@ -65,15 +65,12 @@ const PermID: React.FC = () => {
   const parsedPermissions: IDropdownItem[] = [];
   if (res?.data?.account?.permissions)
     res.data.account.permissions.map((permission: IAccPermission) => {
-      if (permission.signers.some(signer => signer.address === walletAddress))
-        parsedPermissions.push({
-          label: `#${permission.id} - ${
-            permission.permissionName
-          } - Threshold: ${permission.Threshold} - ${
-            permission.type === 0 ? 'Owner' : 'User'
-          }`,
-          value: permission.id,
-        });
+      parsedPermissions.push({
+        label: `#${permission.id} - ${permission.permissionName} - Threshold: ${
+          permission.Threshold
+        } - ${permission.type === 0 ? 'Owner' : 'User'}`,
+        value: permission.id,
+      });
     });
 
   return (

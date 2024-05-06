@@ -8,6 +8,9 @@ const darktheme = {
   black: '#FFFF',
   gray700: '#B7BDC6',
   darkText: '#C6C7EB',
+
+  black10: 'rgba(255, 255, 255, 0.1)',
+
   legacy: {
     ...theme.legacy,
     background: '#0B0B1E',

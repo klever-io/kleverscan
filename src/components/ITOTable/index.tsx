@@ -238,7 +238,7 @@ const Table: React.FC<ITable> = ({
             !!response?.items?.length && (
               <Header {...props} key={String(header)}>
                 {header.map((item, index) => {
-                  return <span key={JSON.stringify(item)}>{item}</span>;
+                  return <span key={JSON.stringify(item) + index}>{item}</span>;
                 })}
               </Header>
             )}

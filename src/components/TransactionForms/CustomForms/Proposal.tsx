@@ -74,9 +74,9 @@ const Proposal: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
           title="Epochs Duration"
           type="number"
           span={2}
-          max={paramsList?.[34].currentValue || 40}
+          max={paramsList?.[34]?.currentValue || 40}
           tooltip={`Number of epochs the proposal will be active, each epoch lasts 6 hours. Maximum ${
-            paramsList?.[34].currentValue || 40
+            paramsList?.[34]?.currentValue || 40
           } epochs`}
           required
         />

@@ -75,7 +75,9 @@ export const Row = styled.div<ITableType>`
 
   font-size: 0.75rem;
 
-  border: 1px solid ${props => props.theme.navbar.text};
+  border: 1px solid
+    ${props =>
+      props.theme.dark ? props.theme.navbar.text : props.theme.black10};
   border-bottom: none;
 
   width: 100%;
@@ -86,12 +88,16 @@ export const Row = styled.div<ITableType>`
 
   &:last-child {
     border-radius: 0 0 4px 4px;
-    border-bottom: 1px solid ${props => props.theme.navbar.text};
+    border: 1px solid
+      ${props =>
+        props.theme.dark ? props.theme.navbar.text : props.theme.black10};
   }
 
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     border-radius: 1.5rem;
-    border: 1px solid ${props => props.theme.navbar.text};
+    border: 1px solid
+      ${props =>
+        props.theme.dark ? props.theme.navbar.text : props.theme.black10};
 
     &:first-child {
       border-radius: 1.5rem;
@@ -289,6 +295,12 @@ export const MobileCardItem = styled.span<{
         justify-content: flex-end;
       }
     `}
+
+  a {
+    text-decoration: underline;
+    text-underline-offset: 0.2rem;
+  }
+
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: column;
     ${props =>
@@ -454,7 +466,9 @@ export const ItemContainer = styled.div<{
 }>`
   height: 1.9rem;
   width: 1.9rem;
-  font: 500 15px Montserrat, sans-serif;
+  font:
+    500 15px Montserrat,
+    sans-serif;
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     font-size: small;

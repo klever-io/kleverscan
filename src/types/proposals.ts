@@ -240,3 +240,9 @@ export interface IProposalsMessages {
   KAppFeeITOTrigger: string;
   KAppFeeSmartContract: string;
 }
+
+export interface MostTransferedToken {
+  doc_count: number;
+  key: string;
+  logo: string;
+}

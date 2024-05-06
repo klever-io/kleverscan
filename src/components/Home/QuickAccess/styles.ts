@@ -85,6 +85,21 @@ export const PlusIcon = styled.div`
           ? props.theme.true.white
           : props.theme.violet} !important;
     }
+
+    > circle {
+      fill: ${props =>
+        props.theme.dark
+          ? props.theme.true.white
+          : props.theme.violet} !important;
+
+      stroke: ${props =>
+        props.theme.dark
+          ? props.theme.true.white
+          : props.theme.violet} !important;
+    }
+    > rect {
+      fill: ${props => props.theme.white} !important;
+    }
   }
 `;
 
@@ -101,4 +116,5 @@ export const Content = styled.div`
 export const Title = styled.h2`
   font-size: 1.5rem;
   line-height: 1.75rem;
+  color: ${props => props.theme.black};
 `;

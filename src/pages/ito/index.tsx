@@ -116,7 +116,6 @@ export const getITOrowSections =
         element: props => (
           <Link
             href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
-            key={assetId}
           >
             <a>
               <AssetLogo
@@ -134,7 +133,6 @@ export const getITOrowSections =
         element: props => (
           <Link
             href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
-            key={name}
           >
             <a style={{ overflow: 'hidden' }}>{name}</a>
           </Link>
@@ -146,7 +144,6 @@ export const getITOrowSections =
           <ContainerAssetId>
             <Link
               href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
-              key={assetId}
             >
               {assetId}
             </Link>
@@ -157,17 +154,17 @@ export const getITOrowSections =
       },
       {
         element: props => (
-          <span key={bestKLVRate}>
+          <span>
             {bestKLVRate || '- -'}
             {bestKLVRate && ' KLV'}
           </span>
         ),
         span: 1,
       },
-      { element: props => <span key={assetType}>{assetType}</span>, span: 1 },
+      { element: props => <span>{assetType}</span>, span: 1 },
       {
         element: props => (
-          <strong key={maxAmount}>
+          <strong>
             {renderSoldAmount()} {ticker}
           </strong>
         ),
@@ -175,14 +172,14 @@ export const getITOrowSections =
       },
       {
         element: props => (
-          <strong key={maxAmount}>
+          <strong>
             {renderTotalAmount()} {ticker}
           </strong>
         ),
         span: 1,
       },
       {
-        element: props => <span key={access}>{access}</span>,
+        element: props => <span>{access}</span>,
         span: 1,
       },
       {
@@ -192,7 +189,6 @@ export const getITOrowSections =
               setITO(asset);
               setOpenParticipateModal(true);
             }}
-            key={name}
           >
             Participate
           </ParticipateButton>
@@ -259,7 +255,6 @@ export const getITOTabletRowSections =
           <CenteredRow>
             <Link
               href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
-              key={assetId}
             >
               <a>
                 <AssetLogo
@@ -274,14 +269,12 @@ export const getITOTabletRowSections =
             <DoubleRow>
               <Link
                 href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
-                key={name}
               >
                 <ProjectName style={{ overflow: 'hidden' }}>{name}</ProjectName>
               </Link>
               <ContainerAssetId>
                 <Link
                   href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
-                  key={assetId}
                 >
                   {assetId}
                 </Link>
@@ -292,15 +285,15 @@ export const getITOTabletRowSections =
         ),
         span: 2,
       },
-      { element: props => <span key={assetType}>{assetType}</span>, span: 1 },
+      { element: props => <span>{assetType}</span>, span: 1 },
       {
-        element: props => <span key={access}>{access}</span>,
+        element: props => <span>{access}</span>,
         span: 1,
       },
       {
         element: props => (
           <DoubleRow>
-            <span key={bestKLVRate}>
+            <span>
               {bestKLVRate || '- -'}
               {bestKLVRate && ' KLV'}
             </span>
@@ -312,10 +305,10 @@ export const getITOTabletRowSections =
       {
         element: props => (
           <DoubleRow>
-            <strong key={maxAmount}>
+            <strong>
               {renderSoldAmount()} {ticker}
             </strong>
-            <strong key={maxAmount}>
+            <strong>
               {renderTotalAmount()} {ticker}
             </strong>
           </DoubleRow>
@@ -329,7 +322,6 @@ export const getITOTabletRowSections =
               setITO(asset);
               setOpenParticipateModal(true);
             }}
-            key={name}
           >
             Participate
           </ParticipateButton>

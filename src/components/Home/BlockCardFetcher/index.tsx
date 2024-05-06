@@ -260,9 +260,11 @@ const BlockCardFetcher: React.FC = () => {
             <PurpleArrowRight />
           </a>
         </Link>
-        <div onClick={() => setHideMenu(!hideMenu)}>
-          <ArrowHide $hide={hideMenu} />
-        </div>
+        {isTablet ? (
+          <div onClick={() => setHideMenu(!hideMenu)}>
+            <ArrowHide $hide={hideMenu} />
+          </div>
+        ) : null}
       </ContainerHide>
 
       <TransactionContainer>

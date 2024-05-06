@@ -1,5 +1,5 @@
 import { DefaultCardStyles } from '@/styles/common';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { TableGradientBorder } from '../../TableV2/styles';
 
 export const Container = styled.div`
@@ -54,6 +54,8 @@ export const CardItem = styled.div`
   transition: 0.25s ease-in-out;
 
   p {
+    transition: 0.25s ease-in-out;
+
     color: ${props => props.theme.black};
     font-weight: 700;
     font-size: 0.9rem;
@@ -62,6 +64,29 @@ export const CardItem = styled.div`
   :hover,
   :focus {
     background-color: ${props => props.theme.violet};
+
+    ${props =>
+      !props.theme.dark &&
+      css`
+        p {
+          color: ${props => props.theme.white};
+        }
+
+        svg {
+          path {
+            fill: ${props => props.theme.white} !important;
+          }
+
+          > circle {
+            fill: ${props => props.theme.white} !important;
+
+            stroke: ${props => props.theme.white} !important;
+          }
+          > rect {
+            fill: ${props => props.theme.violet} !important;
+          }
+        }
+      `}
   }
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
@@ -79,7 +104,11 @@ export const PlusIcon = styled.div`
   color: black;
 
   svg {
+    transition: 0.25s ease-in-out;
+
     path {
+      transition: 0.25s ease-in-out;
+
       fill: ${props =>
         props.theme.dark
           ? props.theme.true.white
@@ -87,6 +116,8 @@ export const PlusIcon = styled.div`
     }
 
     > circle {
+      transition: 0.25s ease-in-out;
+
       fill: ${props =>
         props.theme.dark
           ? props.theme.true.white
@@ -98,6 +129,8 @@ export const PlusIcon = styled.div`
           : props.theme.violet} !important;
     }
     > rect {
+      transition: 0.25s ease-in-out;
+
       fill: ${props => props.theme.white} !important;
     }
   }

@@ -178,7 +178,9 @@ export const InnerCardContainer = styled.div`
   gap: 4px;
 
   border-radius: 1rem;
-  border: 1px solid ${props => props.theme.card.border};
+  border: 1px solid
+    ${props =>
+      props.theme.dark ? props.theme.card.border : props.theme.black10};
   padding: 16px 12px;
 `;
 

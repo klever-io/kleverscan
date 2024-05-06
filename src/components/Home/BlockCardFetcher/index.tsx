@@ -243,7 +243,6 @@ const BlockCardFetcher: React.FC = () => {
     showLimit: false,
     showPagination: false,
     smaller: true,
-    interval: 4000,
   };
 
   return (
@@ -267,7 +266,7 @@ const BlockCardFetcher: React.FC = () => {
       </ContainerHide>
 
       <TransactionContainer>
-        {!hideMenu && <Table {...tableProps} />}
+        {!hideMenu && <Table key={JSON.stringify(blocks)} {...tableProps} />}
       </TransactionContainer>
     </SectionCards>
   );

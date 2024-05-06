@@ -1,7 +1,9 @@
 import { IDaysCoins } from '@/contexts/mainPage';
 import api from '@/services/api';
 import {
+  IAggregate,
   IAggregateResponse,
+  IAsset,
   IAssetData,
   IEpochInfo,
   IGeckoChartResponse,
@@ -11,7 +13,7 @@ import {
   Service,
 } from '@/types';
 import { IBlock, IBlocksResponse } from '@/types/blocks';
-import { IProposal } from '@/types/proposals';
+import { IProposal, MostTransferedToken } from '@/types/proposals';
 import { getEpochInfo } from '@/utils';
 import { calcApr } from '@/utils/calcApr';
 
@@ -25,8 +27,13 @@ const defaultAggregateData = {
   },
 };
 
+interface HomeAggregateCallResponse extends IAggregate {
+  actualTPS: number;
+  metrics: IEpochInfo;
+}
+
 const homeGetAggregateCall = async (): Promise<
-  { actualTPS: number; metrics: IEpochInfo } | undefined
+  HomeAggregateCallResponse | undefined
 > => {
   try {
     const aggregate: IAggregateResponse = await api.get({
@@ -38,6 +45,7 @@ const homeGetAggregateCall = async (): Promise<
       const chainStatistics = aggregate.data.statistics;
 
       return {
+        ...aggregate.data,
         actualTPS: chainStatistics.liveTPS / chainStatistics.peakTPS,
         metrics: getEpochInfo(aggregate.data.overview),
       };
@@ -96,18 +104,23 @@ const homeYesterdayAccountsCall = async (): Promise<
 };
 
 const homeTransactionsCall = async (): Promise<
-  { totalTransactions: number; transcations: ITransaction[] } | undefined
+  { totalTransactions: number; transactions: ITransaction[] } | undefined
 > => {
   try {
     const res = await api.get({
-      route: 'transaction/list?minify=true',
+      route: 'transaction/list',
+      query: {
+        minify: true,
+        limit: 1,
+      },
     });
-    if (!res.error || res.error === '') {
-      return {
-        totalTransactions: res.pagination.totalRecords,
-        transcations: res.data.transactions,
-      };
+    if (res.error) {
+      console.error(res.error);
     }
+    return {
+      totalTransactions: res.pagination.totalRecords,
+      transactions: res.data.transactions,
+    };
   } catch (error) {
     console.error(error);
   }
@@ -483,6 +496,92 @@ const homeKfiPriceCall = async (): Promise<
   }
 };
 
+const homeMostTransactedTokens = async (): Promise<
+  MostTransferedToken[] | undefined
+> => {
+  try {
+    const mostTransactedRes = await api.get({
+      route: 'transaction/statistics',
+      query: {
+        assetType: 'Fungible',
+      },
+    });
+
+    if (mostTransactedRes.error) {
+      console.error(mostTransactedRes.error);
+      return;
+    }
+
+    const assetsRes = await api.get({
+      route: 'assets/list',
+      query: {
+        asset: mostTransactedRes.data.most_transacted.map(
+          (token: MostTransferedToken) => token.key,
+        ),
+      },
+    });
+
+    const data = mostTransactedRes.data.most_transacted.map(
+      (token: MostTransferedToken) => {
+        const asset = assetsRes.data.assets.find(
+          (asset: IAsset) => asset.assetId === token.key,
+        );
+        return {
+          ...token,
+          logo: asset.logo || '',
+        };
+      },
+    );
+
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const homeMostTransactedNFTs = async (): Promise<
+  MostTransferedToken[] | undefined
+> => {
+  try {
+    const mostTransactedRes = await api.get({
+      route: 'transaction/statistics',
+      query: {
+        assetType: 'NonFungible',
+      },
+    });
+
+    if (mostTransactedRes.error) {
+      console.error(mostTransactedRes.error);
+      return;
+    }
+
+    const assetsRes = await api.get({
+      route: 'assets/list',
+      query: {
+        asset: mostTransactedRes.data.most_transacted.map(
+          (token: MostTransferedToken) => token.key,
+        ),
+      },
+    });
+
+    const data = mostTransactedRes.data.most_transacted.map(
+      (token: MostTransferedToken) => {
+        const asset = assetsRes.data.assets.find(
+          (asset: IAsset) => asset.assetId === token.key,
+        );
+        return {
+          ...token,
+          logo: asset.logo || '',
+        };
+      },
+    );
+
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export {
   defaultAggregateData,
   homeAccountsCall,
@@ -504,4 +603,6 @@ export {
   homeTotalValidators,
   homeTransactionsCall,
   homeYesterdayAccountsCall,
+  homeMostTransactedTokens,
+  homeMostTransactedNFTs,
 };

@@ -27,9 +27,11 @@ export const TableGradientBorder = css`
     ),
     linear-gradient(
       to bottom,
-      ${props => props.theme.gray800},
+      ${props =>
+        props.theme.dark ? props.theme.gray800 : props.theme.black10},
       transparent 50%,
-      ${props => props.theme.gray800} 175%
+      ${props => (props.theme.dark ? props.theme.gray800 : props.theme.black10)}
+        175%
     );
   background-origin: border-box;
   background-clip: padding-box, border-box;
@@ -89,7 +91,9 @@ export const TableRow = styled.div<TableRowProps>`
     padding: 16px;
 
     border-radius: 16px;
-    border: solid 1px ${props => props.theme.darkGray};
+    border: solid 1px
+      ${props =>
+        props.theme.dark ? props.theme.darkGray : props.theme.black10};
 
     background-color: ${props => props.theme.table.background};
   }
@@ -184,7 +188,9 @@ export const MobileCardItem = styled.div<{
             border-bottom: none;
           `
         : css`
-            border-bottom: solid 1px ${props => props.theme.darkGray};
+            border-bottom: solid 1px
+              ${props =>
+                props.theme.dark ? props.theme.darkGray : props.theme.black10};
           `}
 
     ${props =>

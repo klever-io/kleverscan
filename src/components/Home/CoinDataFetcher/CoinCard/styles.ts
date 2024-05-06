@@ -125,14 +125,9 @@ export const HeaderContainer = styled.div`
   flex-direction: row;
 
   z-index: 0;
-  ${props =>
-    props.theme.dark
-      ? css`
-          border-bottom: 1px solid #222345;
-        `
-      : css`
-          border-bottom: 1px solid ${props.theme.lightGray};
-        `};
+  border-bottom: 1px solid
+    ${props =>
+      props.theme.dark ? props.theme.darkBlue300 : props.theme.black10};
 `;
 
 export const HeaderContent = styled.div`
@@ -145,8 +140,7 @@ export const HeaderContent = styled.div`
 
   svg {
     path {
-      fill: ${props =>
-        props.theme.dark ? props.theme.true.white : props.theme.true.black};
+      fill: ${props => props.theme.black};
     }
   }
 `;
@@ -326,7 +320,8 @@ export const CoinsSelector = styled.div`
 
   border-radius: 24px;
 
-  background-color: ${props => props.theme.gray900};
+  background-color: ${props =>
+    props.theme.dark ? props.theme.gray900 : props.theme.black10};
 
   transition: 0.5s ease;
 
@@ -429,7 +424,7 @@ export const ArrowTopRight = styled(ArrowUpRightSquare).attrs(props => ({
 export const HeaderGraph = styled.div`
   display: flex;
   gap: 5rem;
-  color: ${props => props.theme.true.white};
+  color: ${props => props.theme.black};
   padding: 0.5rem 1.5rem 0 1.5rem;
   justify-content: space-between;
   span {
@@ -447,8 +442,7 @@ export const HeaderGraph = styled.div`
     font-weight: 500;
     font-size: 1.2rem;
     line-height: 16px;
-    color: ${props =>
-      props.theme.dark ? props.theme.true.white : props.theme.true.black};
+    color: ${props => props.theme.black};
   }
 `;
 
@@ -511,7 +505,7 @@ export const Button = styled.a<{ borderColor: string }>`
   width: 100%;
   padding: 16px 20px;
   border-radius: 8px;
-  color: ${props => props.theme.true.white};
+  color: ${props => props.theme.black};
 
   border: 1px solid ${props => props.borderColor};
 
@@ -561,7 +555,7 @@ export const EnchangeLinks = styled.div`
   flex-direction: row;
   justify-content: space-between;
   gap: 16px;
-  color: ${props => props.theme.true.white};
+  color: ${props => props.theme.black};
   font-size: 1rem;
   font-weight: 500;
 `;

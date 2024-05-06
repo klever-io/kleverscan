@@ -50,6 +50,7 @@ export const Content = styled.div`
 export const ArrowContainer = styled.div`
   display: grid;
   place-items: center;
+  cursor: pointer;
 `;
 
 export const Header = styled.div`

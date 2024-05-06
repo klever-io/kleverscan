@@ -9,7 +9,7 @@ import {
   IParameterOnlyAssetId,
   IWhitelistInfo,
 } from './contracts';
-import { INodeOverview } from './proposals';
+import { INodeOverview, IProposal } from './proposals';
 
 export type Query = {
   [key: string]: any;
@@ -351,7 +351,7 @@ export interface IProprietaryAsset {
 
 export interface IRewardsAssets {
   allowance: number;
-  allStakingRewards: [
+  allStakingRewards?: [
     {
       assetId: string;
       precision: number;
@@ -929,13 +929,24 @@ export interface IStatisticsResponse extends IResponse {
   };
 }
 
-export interface IAggregateResponse extends IResponse {
-  data: {
-    blocks: IBlock[];
-    transactions: ITransaction[];
-    statistics: IChainStatistics;
-    overview: INodeOverview;
+export interface IAggregate {
+  blocks: IBlock[];
+  transactions: ITransaction[];
+  statistics: IChainStatistics;
+  overview: INodeOverview;
+  proposalStatistics: {
+    activeProposals: IProposal[];
+    lastProposal: IProposal;
   };
+  validatorStatistics: {
+    active: number;
+    total: number;
+    eligible: number;
+  };
+}
+
+export interface IAggregateResponse extends IResponse {
+  data: IAggregate;
 }
 
 export interface IGeckoResponse extends IResponse {

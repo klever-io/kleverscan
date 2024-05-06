@@ -28,7 +28,7 @@ import {
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import Table, { ITable } from '../../TableV2';
 
 export const homeTransactionTableHeaders = [
@@ -270,17 +270,20 @@ const HomeTransactions: React.FC = () => {
   const homeTransactionsCall: (
     page: number,
     limit: number,
-  ) => Promise<IPaginatedResponse> = async (page = 1, limit = 10) => {
-    const quantity = isTablet ? 5 : 10;
-    return {
-      data: {
-        transactions: homeTransactions.slice(0, quantity),
-      },
-      error: '',
-      code: '',
-      pagination: defaultPagination,
-    };
-  };
+  ) => Promise<IPaginatedResponse> = useCallback(
+    async (page = 1, limit = 10) => {
+      const quantity = isTablet ? 5 : 10;
+      return {
+        data: {
+          transactions: homeTransactions.slice(0, quantity),
+        },
+        error: '',
+        code: '',
+        pagination: defaultPagination,
+      };
+    },
+    [homeTransactions, isTablet],
+  );
 
   const tableProps: ITable = {
     type: 'transactions',
@@ -295,7 +298,6 @@ const HomeTransactions: React.FC = () => {
     showLimit: false,
     showPagination: false,
     smaller: true,
-    interval: 4000,
   };
 
   return (
@@ -321,7 +323,9 @@ const HomeTransactions: React.FC = () => {
         ) : null}
       </ContainerHide>
       <TransactionContainer>
-        {!hideMenu && <Table {...tableProps} />}
+        {!hideMenu && (
+          <Table key={JSON.stringify(homeTransactions)} {...tableProps} />
+        )}
       </TransactionContainer>
     </SectionCards>
   );

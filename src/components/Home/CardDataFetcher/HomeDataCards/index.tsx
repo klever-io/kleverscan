@@ -4,23 +4,22 @@ import {
   StackedImageWrapper,
 } from '@/components/Home/ProposalsAndValidatorsSection/style';
 import { useHomeData } from '@/contexts/mainPage';
-import { useMobile } from '@/contexts/mobile';
 import { useTheme } from '@/contexts/theme';
 import { IDataCard } from '@/types/home';
 import {
   ArrowData,
   DataCard,
   DataCardLatest,
+  DataCardValue,
   DataCardsContent,
   DataCardsWrapper,
-  DataCardValue,
   EpochCardContent,
 } from '@/views/home';
 import { CircularProgressContainer } from '@/views/validators';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import { useRef } from 'react';
-import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import HomeDataCardsSkeleton from '../HomeDataCardsSkeleton';
 import GradientSVG from './GradientSVG';
 
@@ -98,16 +97,13 @@ const EpochCard: React.FC = () => {
   );
 };
 
-const HomeDataCards: React.FC = ({}) => {
-  const { t } = useTranslation('common', { keyPrefix: 'Cards' });
-  const { isMobile, isTablet } = useMobile();
-
+const HomeDataCards: React.FC = () => {
   const dataCardsRef = useRef<HTMLDivElement>(null);
+
+  const { t } = useTranslation('common', { keyPrefix: 'Cards' });
 
   const {
     actualTPS,
-    blocks,
-    metrics,
     newTransactions,
     beforeYesterdayTransactions,
     newAccounts = 0,
@@ -131,7 +127,14 @@ const HomeDataCards: React.FC = ({}) => {
       value: totalAccounts ?? 0,
       variation: `+ ${newAccounts === 0 ? '0%' : newAccounts.toLocaleString()}`,
     },
-    { title: t('Live/Peak TPS'), value: actualTPS, Icon: TPS },
+    {
+      title: t('Live/Peak TPS'),
+      value: actualTPS.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }),
+      Icon: TPS,
+    },
   ];
 
   return !loadingCards ? (

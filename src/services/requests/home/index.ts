@@ -1,6 +1,7 @@
 import { IDaysCoins } from '@/contexts/mainPage';
 import api from '@/services/api';
 import {
+  IAggregate,
   IAggregateResponse,
   IAsset,
   IAssetData,
@@ -26,8 +27,13 @@ const defaultAggregateData = {
   },
 };
 
+interface HomeAggregateCallResponse extends IAggregate {
+  actualTPS: number;
+  metrics: IEpochInfo;
+}
+
 const homeGetAggregateCall = async (): Promise<
-  { actualTPS: number; metrics: IEpochInfo } | undefined
+  HomeAggregateCallResponse | undefined
 > => {
   try {
     const aggregate: IAggregateResponse = await api.get({
@@ -39,6 +45,7 @@ const homeGetAggregateCall = async (): Promise<
       const chainStatistics = aggregate.data.statistics;
 
       return {
+        ...aggregate.data,
         actualTPS: chainStatistics.liveTPS / chainStatistics.peakTPS,
         metrics: getEpochInfo(aggregate.data.overview),
       };
@@ -101,14 +108,19 @@ const homeTransactionsCall = async (): Promise<
 > => {
   try {
     const res = await api.get({
-      route: 'transaction/list?minify=true',
+      route: 'transaction/list',
+      query: {
+        minify: true,
+        limit: 1,
+      },
     });
-    if (!res.error || res.error === '') {
-      return {
-        totalTransactions: res.pagination.totalRecords,
-        transactions: res.data.transactions,
-      };
+    if (res.error) {
+      console.error(res.error);
     }
+    return {
+      totalTransactions: res.pagination.totalRecords,
+      transactions: res.data.transactions,
+    };
   } catch (error) {
     console.error(error);
   }

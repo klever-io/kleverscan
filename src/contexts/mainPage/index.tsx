@@ -54,16 +54,12 @@ export const HomeDataProvider: React.FC = ({ children }) => {
 
   const [
     aggregateResult,
-    blocksResult,
     accountResult,
     yesterdayAccountResult,
     transactionsResult,
     beforeYesterdayTransactionsResult,
     proposalsResult,
     activeProposalsResult,
-    approvedProposalsResult,
-    validatorsResult,
-    activeValidatorsResult,
     nodes,
     mostTransactedTokens,
     mostTransactedNFTs,
@@ -71,11 +67,6 @@ export const HomeDataProvider: React.FC = ({ children }) => {
     {
       queryKey: 'aggregateData',
       queryFn: homeGetAggregateCall,
-      refetchInterval: watcherTimeout,
-    },
-    {
-      queryKey: 'blocksData',
-      queryFn: homeGetBlocksCall,
       refetchInterval: watcherTimeout,
     },
     {
@@ -109,21 +100,6 @@ export const HomeDataProvider: React.FC = ({ children }) => {
       refetchInterval: watcherTimeout,
     },
     {
-      queryKey: 'approvedProposalData',
-      queryFn: homeLastApprovedProposalCall,
-      refetchInterval: watcherTimeout,
-    },
-    {
-      queryKey: 'validatorsData',
-      queryFn: homeTotalValidators,
-      refetchInterval: watcherTimeout,
-    },
-    {
-      queryKey: 'activeValidatorsData',
-      queryFn: homeTotalActiveValidators,
-      refetchInterval: watcherTimeout,
-    },
-    {
       queryKey: 'nodesData',
       queryFn: homeNodes,
       refetchInterval: watcherTimeout,
@@ -143,7 +119,7 @@ export const HomeDataProvider: React.FC = ({ children }) => {
   const values: IHomeData = {
     actualTPS:
       aggregateResult.data?.actualTPS || defaultAggregateData.actualTPS,
-    blocks: blocksResult.data?.blocks,
+    blocks: aggregateResult.data?.blocks,
     metrics: aggregateResult.data?.metrics || defaultAggregateData.metrics,
     newTransactions:
       beforeYesterdayTransactionsResult.data?.newTransactions || 0,
@@ -151,16 +127,16 @@ export const HomeDataProvider: React.FC = ({ children }) => {
       beforeYesterdayTransactionsResult.data?.beforeYesterdayTxs,
     newAccounts: yesterdayAccountResult.data?.newAccounts,
     totalAccounts: accountResult.data?.totalAccounts,
-    transactions: transactionsResult.data?.transactions || [],
+    transactions: aggregateResult.data?.transactions || [],
     totalTransactions: transactionsResult.data?.totalTransactions,
     loadingCards: accountResult.isLoading,
-    loadingBlocks: blocksResult.isLoading,
+    loadingBlocks: aggregateResult.isLoading,
     totalProposals: proposalsResult.data?.totalProposals,
     activeProposalsCount: activeProposalsResult.data?.totalActiveProposals,
     activeProposals: activeProposalsResult.data?.activeProposals,
-    totalValidators: validatorsResult.data?.totalValidators,
-    activeValidators: activeValidatorsResult.data?.totalActiveValidators,
-    lastApprovedProposal: approvedProposalsResult.data?.approvedProposal,
+    totalValidators: aggregateResult.data?.validatorStatistics.total,
+    activeValidators: aggregateResult.data?.validatorStatistics.active,
+    lastApprovedProposal: aggregateResult.data?.proposalStatistics.lastProposal,
     nodes: nodes.data?.nodes,
     mostTransactedTokens: mostTransactedTokens.data || [],
     mostTransactedNFTs: mostTransactedNFTs.data || [],

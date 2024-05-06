@@ -21,7 +21,8 @@ export const Container = styled.div`
   transition: top 0.1s linear;
   background-color: ${props =>
     props.theme.dark ? props.theme.background : props.theme.true.white};
-  border-bottom: 1px solid ${props => props.theme.blue};
+  border-bottom: 1px solid
+    ${props => (props.theme.dark ? props.theme.blue : props.theme.black10)};
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
     justify-content: space-between;
@@ -476,10 +477,8 @@ export const ConnectionWrapper = styled.div`
   position: relative;
   z-index: 3;
   padding: 0.75rem 1.5rem;
-  border-top: 1px solid
-    ${props => (props.theme.dark ? props.theme.blue : props.theme.lightGray)};
   border-bottom: 1px solid
-    ${props => (props.theme.dark ? props.theme.blue : props.theme.lightGray)};
+    ${props => (props.theme.dark ? props.theme.blue : props.theme.black10)};
   display: flex;
   justify-content: space-between;
   align-items: center;

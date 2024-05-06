@@ -76,7 +76,9 @@ export const secondsToHourMinSec = (input: number, t?: TFunction): string => {
     result += ` ${remainingSeconds}s`;
   }
 
-  result += ' ';
+  if (!result) {
+    return '0s';
+  }
   return result;
 };
 

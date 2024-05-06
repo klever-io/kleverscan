@@ -9,7 +9,6 @@ export const Container = styled.div<{ isInHomePage: boolean }>`
   width: 100%;
   min-width: 11rem;
   max-width: 20rem;
-  border: none;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
@@ -19,7 +18,7 @@ export const Container = styled.div<{ isInHomePage: boolean }>`
   cursor: text;
 
   border: 1px solid
-    ${props => (props.theme.dark ? props.theme.lightGray : props.theme.gray800)};
+    ${props => (props.theme.dark ? props.theme.lightGray : props.theme.black10)};
 
   ${props =>
     props.isInHomePage &&

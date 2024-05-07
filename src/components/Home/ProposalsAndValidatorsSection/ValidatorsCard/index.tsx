@@ -11,7 +11,6 @@ import {
   StackedImageWrapper,
   Title,
 } from '../style';
-import { LastBlock } from './LastBlock';
 import Link from 'next/link';
 import { PurpleArrowRight } from '@/assets/icons';
 
@@ -70,8 +69,6 @@ const ValidatorsCard: React.FC = () => {
       <MapContainer>
         <Map nodes={nodes} />
       </MapContainer>
-
-      <LastBlock />
     </CardContainer>
   );
 };

@@ -252,7 +252,7 @@ const BlockCardFetcher: React.FC = () => {
 
         <Link
           href={{
-            pathname: '/transactions',
+            pathname: '/blocks',
           }}
         >
           <a>

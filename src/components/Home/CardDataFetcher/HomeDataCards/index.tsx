@@ -9,6 +9,7 @@ import { IDataCard } from '@/types/home';
 import {
   ArrowData,
   DataCard,
+  DataCardContent,
   DataCardLatest,
   DataCardValue,
   DataCardsContent,
@@ -35,7 +36,7 @@ const DefaultCards: React.FC<{ index: number }> = ({ index }) => {
       <NextImageCardWrapper>
         <Image
           src={icons[index][0]}
-          alt="tps icon background"
+          alt=""
           width={44}
           height={44}
           loader={({ src, width }) => `${src}?w=${width}`}
@@ -44,7 +45,7 @@ const DefaultCards: React.FC<{ index: number }> = ({ index }) => {
       <NextImageCardWrapper>
         <Image
           src={icons[index][1]}
-          alt="tps icon background"
+          alt=""
           width={44}
           height={44}
           loader={({ src, width }) => `${src}?w=${width}`}
@@ -103,7 +104,7 @@ const HomeDataCards: React.FC = () => {
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
 
   const {
-    actualTPS,
+    livePeakTPS,
     newTransactions,
     beforeYesterdayTransactions,
     newAccounts = 0,
@@ -129,10 +130,7 @@ const HomeDataCards: React.FC = () => {
     },
     {
       title: t('Live/Peak TPS'),
-      value: actualTPS.toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }),
+      value: livePeakTPS,
       Icon: TPS,
     },
   ];
@@ -144,18 +142,18 @@ const HomeDataCards: React.FC = () => {
         {dataCards.map(({ title, value, variation }, index) => (
           <DataCard key={String(index)}>
             <DefaultCards index={index} />
-            <div>
+            <DataCardContent>
               <span>{title}</span>
               <DataCardValue>
                 <p>{value?.toLocaleString()}</p>
-                {variation && !variation.includes('%') && (
-                  <DataCardLatest positive={variation.includes('+')}>
-                    <ArrowData $positive={variation.includes('+')} />
-                    <p>{variation}/24h</p>
-                  </DataCardLatest>
-                )}
               </DataCardValue>
-            </div>
+              {variation && !variation.includes('%') && (
+                <DataCardLatest positive={variation.includes('+')}>
+                  <ArrowData $positive={variation.includes('+')} />
+                  <p>{variation}/24h</p>
+                </DataCardLatest>
+              )}
+            </DataCardContent>
           </DataCard>
         ))}
       </DataCardsContent>

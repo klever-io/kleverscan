@@ -15,7 +15,9 @@ const theme = {
   gray900: '#181818',
   gray800: '#848495',
   gray700: '#aaaaaa',
+  black2: 'rgba(0, 0, 0, 0.02)',
   black10: 'rgba(0, 0, 0, 0.1)',
+  black20: 'rgba(0, 0, 0, 0.2)',
 
   green: '#4EBC87',
   red: '#F84960',

@@ -7,7 +7,7 @@ export const Container = styled.div`
 
   .leaflet-container {
     width: 100%;
-    height: 200px;
+    height: 280px;
 
     overflow: hidden;
 
@@ -24,6 +24,9 @@ export const Container = styled.div`
     background-color: ${props => transparentize(0.25, props.theme.gray700)};
 
     border-radius: 50%;
+
+    pointer-events: none;
+    cursor: unset;
   }
 
   .leaflet-control-container {

@@ -25,7 +25,7 @@ export interface IDaysCoins {
   [coinName: string]: string | number;
 }
 export interface IHomeData {
-  actualTPS: number;
+  livePeakTPS: string;
   blocks?: IBlock[];
   metrics: IEpochInfo;
   newTransactions: number;
@@ -117,8 +117,8 @@ export const HomeDataProvider: React.FC = ({ children }) => {
   ]);
 
   const values: IHomeData = {
-    actualTPS:
-      aggregateResult.data?.actualTPS || defaultAggregateData.actualTPS,
+    livePeakTPS:
+      aggregateResult.data?.livePeakTPS || defaultAggregateData.livePeakTPS,
     blocks: aggregateResult.data?.blocks,
     metrics: aggregateResult.data?.metrics || defaultAggregateData.metrics,
     newTransactions:

@@ -104,7 +104,7 @@ const HomeDataCards: React.FC = () => {
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
 
   const {
-    actualTPS,
+    livePeakTPS,
     newTransactions,
     beforeYesterdayTransactions,
     newAccounts = 0,
@@ -130,10 +130,7 @@ const HomeDataCards: React.FC = () => {
     },
     {
       title: t('Live/Peak TPS'),
-      value: actualTPS.toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }),
+      value: livePeakTPS,
       Icon: TPS,
     },
   ];

@@ -4,6 +4,7 @@ import { MapContainer, Marker, TileLayer } from 'react-leaflet';
 import 'react-leaflet-markercluster/dist/styles.min.css';
 import { Node } from '../../types';
 import { Container } from './styles';
+import { useMobile } from '@/contexts/mobile';
 
 interface IMapConfig {
   initialPosition: LatLngExpression;
@@ -15,9 +16,11 @@ interface IMap {
 }
 
 const Map: React.FC<IMap> = ({ nodes }) => {
+  const { isMobile, isTablet } = useMobile();
+
   const mapConfig: IMapConfig = {
     initialPosition: [30, 0],
-    zoom: 1,
+    zoom: isMobile ? 0.4 : isTablet ? 1 : 1.2,
   };
 
   return (
@@ -26,6 +29,7 @@ const Map: React.FC<IMap> = ({ nodes }) => {
         center={mapConfig.initialPosition}
         zoom={mapConfig.zoom}
         attributionControl={false}
+        zoomSnap={0.1}
       >
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/rastertiles/dark_nolabels/{z}/{x}/{y}.png"

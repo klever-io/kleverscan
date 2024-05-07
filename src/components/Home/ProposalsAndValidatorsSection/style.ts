@@ -88,7 +88,7 @@ export const CardsWrapper = styled.section`
   display: flex;
   width: 100%;
   gap: 1rem;
-  min-height: 500px;
+  min-height: 400px;
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: column;
@@ -179,8 +179,7 @@ export const InnerCardContainer = styled.div`
 
   border-radius: 1rem;
   border: 1px solid
-    ${props =>
-      props.theme.dark ? props.theme.card.border : props.theme.black10};
+    ${props => (props.theme.dark ? props.theme.gray800 : props.theme.black10)};
   padding: 16px 12px;
 `;
 

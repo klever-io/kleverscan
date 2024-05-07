@@ -1,8 +1,6 @@
 import styled from 'styled-components';
 
 export const MapContainer = styled.div`
-  margin-bottom: 1.5rem;
-
   border-radius: 0.5rem;
 `;
 

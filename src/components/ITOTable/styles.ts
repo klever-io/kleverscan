@@ -76,8 +76,7 @@ export const Row = styled.div<ITableType>`
   font-size: 0.75rem;
 
   border: 1px solid
-    ${props =>
-      props.theme.dark ? props.theme.navbar.text : props.theme.black10};
+    ${props => (props.theme.dark ? props.theme.gray800 : props.theme.black10)};
   border-bottom: none;
 
   width: 100%;
@@ -89,15 +88,13 @@ export const Row = styled.div<ITableType>`
   &:last-child {
     border-radius: 0 0 4px 4px;
     border: 1px solid
-      ${props =>
-        props.theme.dark ? props.theme.navbar.text : props.theme.black10};
+      ${props => (props.theme.dark ? props.theme.gray800 : props.theme.black10)};
   }
 
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     border-radius: 1.5rem;
     border: 1px solid
-      ${props =>
-        props.theme.dark ? props.theme.navbar.text : props.theme.black10};
+      ${props => (props.theme.dark ? props.theme.gray800 : props.theme.black10)};
 
     &:first-child {
       border-radius: 1.5rem;

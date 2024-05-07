@@ -217,12 +217,6 @@ export const EpochCardContent = styled.div`
   align-items: flex-start;
 `;
 
-export const DataCardContent = styled.div`
-  margin-left: 1rem;
-  @media (min-width: ${props => props.theme.breakpoints.mobile}) {
-    margin-left: initial;
-  }
-`;
 export const MobileCardsContainer = styled.div`
   display: flex;
   gap: 1rem;
@@ -266,6 +260,11 @@ export const Percentage = styled.div`
   div {
     min-height: 2rem;
   }
+`;
+
+export const DataCardContent = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
 export const DataCardValue = styled.div<{ isEpoch?: boolean }>`
@@ -324,7 +323,6 @@ export const DataCardLatest = styled.div<IVariation>`
   min-width: fit-content;
   display: flex;
   height: 100%;
-  justify-content: center;
   align-items: flex-end;
   gap: 0.3rem;
   span {

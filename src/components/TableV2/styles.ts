@@ -28,9 +28,9 @@ export const TableGradientBorder = css`
     linear-gradient(
       to bottom,
       ${props =>
-        props.theme.dark ? props.theme.gray800 : props.theme.black10},
-      transparent 50%,
-      ${props => (props.theme.dark ? props.theme.gray800 : props.theme.black10)}
+        props.theme.dark ? props.theme.black20 : props.theme.black10},
+      ${props => props.theme.black2} 50%,
+      ${props => (props.theme.dark ? props.theme.black20 : props.theme.black10)}
         175%
     );
   background-origin: border-box;

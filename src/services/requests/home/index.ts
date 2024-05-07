@@ -16,9 +16,10 @@ import { IBlock, IBlocksResponse } from '@/types/blocks';
 import { IProposal, MostTransferedToken } from '@/types/proposals';
 import { getEpochInfo } from '@/utils';
 import { calcApr } from '@/utils/calcApr';
+import { toLocaleFixed } from '@/utils/formatFunctions';
 
 const defaultAggregateData = {
-  actualTPS: 0,
+  livePeakTPS: '0',
   metrics: {
     currentSlot: 0,
     epochFinishSlot: 0,
@@ -28,7 +29,7 @@ const defaultAggregateData = {
 };
 
 interface HomeAggregateCallResponse extends IAggregate {
-  actualTPS: number;
+  livePeakTPS: string;
   metrics: IEpochInfo;
 }
 
@@ -46,7 +47,11 @@ const homeGetAggregateCall = async (): Promise<
 
       return {
         ...aggregate.data,
-        actualTPS: chainStatistics.liveTPS / chainStatistics.peakTPS,
+        livePeakTPS:
+          toLocaleFixed(chainStatistics.liveTPS, 2) +
+          '/' +
+          toLocaleFixed(chainStatistics.peakTPS, 2),
+
         metrics: getEpochInfo(aggregate.data.overview),
       };
     }

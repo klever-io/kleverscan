@@ -51,7 +51,7 @@ export const Container = styled.div<{ isInHomePage: boolean }>`
     }
   }
 
-  svg {
+  > svg {
     cursor: pointer;
     path {
       fill: ${props =>

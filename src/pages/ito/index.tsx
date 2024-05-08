@@ -420,6 +420,7 @@ export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
     locale,
     ['itos'],
     nextI18nextConfig,
+    ['en'],
   );
 
   return { props };

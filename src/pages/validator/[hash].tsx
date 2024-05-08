@@ -545,6 +545,7 @@ export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
     locale,
     ['common', 'validators'],
     nextI18nextConfig,
+    ['en'],
   );
 
   return { props };

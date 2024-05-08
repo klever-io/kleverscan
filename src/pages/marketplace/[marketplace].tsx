@@ -275,6 +275,7 @@ export const getStaticProps: GetStaticProps<IMarketplaceResponse> = async ({
     locale,
     ['common', 'marketPlaces'],
     nextI18nextConfig,
+    ['en'],
   );
   let props = {} as IMarketplaceResponse;
 

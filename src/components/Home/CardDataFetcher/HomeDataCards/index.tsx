@@ -82,18 +82,18 @@ const EpochCard: React.FC = () => {
 
   return (
     <DataCard className="epoch">
+      <Progress percent={metrics.epochLoadPercent} />
       <EpochCardContent>
         <span>
           {`${t('Epoch')}` + (block?.epoch ? ` #${block.epoch} ` : ' ')}
         </span>
+        <small>Time remaining</small>
         <DataCardValue isEpoch={true}>
           <p className="epochSeconds">
             {metrics.remainingTime?.toLocaleString()}
           </p>
         </DataCardValue>
-        <small>Time remaining</small>
       </EpochCardContent>
-      <Progress percent={metrics.epochLoadPercent} />
     </DataCard>
   );
 };

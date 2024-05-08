@@ -201,9 +201,6 @@ export const DataCard = styled.div`
         ? props.theme.blueGray300
         : props.theme.navbar.text} !important;
   }
-  &.epoch {
-    justify-content: space-between;
-  }
 
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
     height: 120px;
@@ -215,6 +212,10 @@ export const EpochCardContent = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+
+  > small {
+    margin-top: 4px;
+  }
 `;
 
 export const MobileCardsContainer = styled.div`

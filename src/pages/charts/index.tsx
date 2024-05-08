@@ -314,6 +314,7 @@ export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
     locale,
     ['charts', 'common'],
     nextI18nextConfig,
+    ['en'],
   );
 
   return { props };

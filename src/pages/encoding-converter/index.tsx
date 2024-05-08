@@ -135,6 +135,7 @@ export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
     locale,
     ['encodingConverter', 'table'],
     nextI18nextConfig,
+    ['en'],
   );
 
   return { props };

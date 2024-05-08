@@ -112,6 +112,7 @@ export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
     locale,
     ['marketPlaces'],
     nextI18nextConfig,
+    ['en'],
   );
 
   return { props };

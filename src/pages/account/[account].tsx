@@ -22,12 +22,12 @@ import { useContractModal } from '@/contexts/contractModal';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import {
+  KFIAllowancePromise,
+  KLVAllowancePromise,
   accountAssetsOwnerCall,
   accountCall,
   assetsRequest,
   bucketsRequest,
-  KFIAllowancePromise,
-  KLVAllowancePromise,
   ownedAssetsRequest,
   pricesCall,
   rewardsFPRPool,
@@ -76,7 +76,7 @@ import {
   ValidOperation,
 } from '@/views/accounts/detail';
 import { ReceiveBackground } from '@/views/validator';
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps, GetStaticPaths } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
@@ -842,7 +842,9 @@ const Account: React.FC<IAccountPage> = () => {
   );
 };
 
-export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  locale = 'en',
+}) => {
   const props = await serverSideTranslations(
     locale,
     ['common', 'accounts'],

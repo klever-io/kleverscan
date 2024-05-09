@@ -30,7 +30,7 @@ import {
   GridSales,
   MktplaceCenteredRow,
 } from '@/views/marketplaces/detail';
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps, GetStaticPaths, GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
@@ -259,17 +259,9 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
   );
 };
 
-export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
-  return {
-    paths: [], //indicates that no page needs be created at build time
-    fallback: 'blocking', //indicates the type of fallback
-  };
-};
-
-export const getStaticProps: GetStaticProps<IMarketplaceResponse> = async ({
-  params,
-  locale = 'en',
-}) => {
+export const getServerSideProps: GetServerSideProps<
+  IMarketplaceResponse
+> = async ({ params, locale = 'en' }) => {
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
   const translations = await serverSideTranslations(
     locale,

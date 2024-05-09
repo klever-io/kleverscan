@@ -76,7 +76,7 @@ import {
   ValidOperation,
 } from '@/views/accounts/detail';
 import { ReceiveBackground } from '@/views/validator';
-import { GetServerSideProps, GetStaticPaths } from 'next';
+import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
@@ -853,13 +853,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   );
 
   return { props };
-};
-
-export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
-  return {
-    paths: [], //indicates that no page needs be created at build time
-    fallback: 'blocking', //indicates the type of fallback
-  };
 };
 
 export default Account;

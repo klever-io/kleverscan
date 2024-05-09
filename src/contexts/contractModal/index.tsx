@@ -19,6 +19,7 @@ export interface IUseInteractionButton {
   title: string;
   contractType: string;
   defaultValues?: any;
+  buttonStyle?: 'primary' | 'secondary';
 }
 
 export const ContractModal = createContext({} as IContractModal);
@@ -62,6 +63,10 @@ export const ContractModalProvider: React.FC = ({ children }) => {
       const interactionButton: React.FC = ({ children }) => {
         const { title, contractType, defaultValues } = param;
 
+        const buttonStyle = param?.buttonStyle
+          ? param.buttonStyle
+          : 'secondary';
+
         const modalOptions: IModalContract = {
           contractType,
           defaultValues,
@@ -78,6 +83,7 @@ export const ContractModalProvider: React.FC = ({ children }) => {
           <ButtonModal
             isLocked={contractType === '--' && true}
             onClick={() => handleClick()}
+            buttonStyle={buttonStyle}
           >
             {children}
             <span>{title}</span>

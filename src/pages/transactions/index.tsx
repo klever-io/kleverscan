@@ -11,7 +11,13 @@ import {
 import Tooltip from '@/components/Tooltip';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import api from '@/services/api';
-import { CenteredRow, Container, DoubleRow, Header } from '@/styles/common';
+import {
+  CenteredRow,
+  Container,
+  DoubleRow,
+  Header,
+  Mono,
+} from '@/styles/common';
 import {
   IAssetTransactionResponse,
   IClaimReceipt,
@@ -51,13 +57,15 @@ export const toAddressSectionElement = (toAddress: string): JSX.Element => {
   if (toAddress === '- -') {
     return (
       <span data-testid="toAddressEmpty" style={{ cursor: 'default' }}>
-        {toAddress}
+        <Mono>{toAddress}</Mono>
       </span>
     );
   }
   return (
     <Link href={`/account/${toAddress}`} key={toAddress}>
-      <a className="address">{parseAddress(toAddress, 16)}</a>
+      <a className="address">
+        <Mono>{parseAddress(toAddress, 16)}</Mono>
+      </a>
     </Link>
   );
 };
@@ -234,7 +242,9 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
       element: props => (
         <DoubleRow {...props} key={hash}>
           <CenteredRow className="bucketIdCopy">
-            <Link href={`/transaction/${hash}`}>{parseAddress(hash, 24)}</Link>
+            <Link href={`/transaction/${hash}`}>
+              <Mono>{parseAddress(hash, 24)}</Mono>
+            </Link>
             <Copy info="TXHash" data={hash} />
           </CenteredRow>
           <CenteredRow>
@@ -264,7 +274,9 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
       element: props => (
         <DoubleRow {...props} key={sender}>
           <Link href={`/account/${sender}`}>
-            <a className="address">{parseAddress(sender, 16)}</a>
+            <a className="address">
+              <Mono>{parseAddress(sender, 16)}</Mono>
+            </a>
           </Link>
           {toAddressSectionElement(toAddress)}
         </DoubleRow>

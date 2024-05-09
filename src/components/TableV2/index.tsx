@@ -94,7 +94,7 @@ const Table: React.FC<ITable> = ({
 }) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
-  const limits = [5, 10, 50, 100];
+  const limits = [10, 20, 50];
   const [scrollTop, setScrollTop] = useState<boolean>(false);
 
   const tableRef = React.useRef<HTMLDivElement>(null);
@@ -233,7 +233,12 @@ const Table: React.FC<ITable> = ({
           {!isMobile && !isTablet && rowSections && (
             <TableRow>
               {header?.map((item, index) => (
-                <HeaderItem key={JSON.stringify(item)} smaller={smaller}>
+                <HeaderItem
+                  key={JSON.stringify(item)}
+                  smaller={smaller}
+                  totalColumns={header.length}
+                  currentColumn={index}
+                >
                   {item}
                 </HeaderItem>
               ))}
@@ -317,25 +322,6 @@ const Table: React.FC<ITable> = ({
                         const isLastItem =
                           rowSections(item)?.length &&
                           index2 === rowSections(item).length - 1;
-                        let itemWidth =
-                          width ||
-                          (tableRef.current?.offsetWidth &&
-                            (tableRef.current?.offsetWidth - 32) /
-                              header.length);
-                        if (itemWidth && itemWidth > 236) {
-                          itemWidth = 236;
-                        }
-                        if (isLastItem) {
-                          const previousWidth = rowSections(item)
-                            .slice(0, index2)
-                            .reduce((acc, curr) => {
-                              return acc + (curr.width || itemWidth || 0);
-                            }, 0);
-
-                          itemWidth =
-                            tableRef.current?.offsetWidth &&
-                            tableRef.current?.offsetWidth - 32 - previousWidth;
-                        }
 
                         return (
                           <MobileCardItem
@@ -346,8 +332,10 @@ const Table: React.FC<ITable> = ({
                             key={String(index2) + String(index)}
                             columnSpan={span}
                             isLastRow={isLastRow}
-                            dynamicWidth={itemWidth}
+                            dynamicWidth={width}
                             smaller={smaller}
+                            totalColumns={header.length}
+                            currentColumn={index2}
                           >
                             {isMobile || isTablet ? (
                               <MobileHeader>{header[index2]}</MobileHeader>
@@ -363,17 +351,18 @@ const Table: React.FC<ITable> = ({
               );
             })}
 
-          {!isFetching && (!response?.items || response?.items?.length === 0) && (
-            <>
-              <RetryContainer onClick={() => refetch()} $loading={isFetching}>
-                <span>Retry</span>
-                <IoReloadSharp size={20} />
-              </RetryContainer>
-              <EmptyRow {...props}>
-                <p>Oops! Apparently no data here.</p>
-              </EmptyRow>
-            </>
-          )}
+          {!isFetching &&
+            (!response?.items || response?.items?.length === 0) && (
+              <>
+                <RetryContainer onClick={() => refetch()} $loading={isFetching}>
+                  <span>Retry</span>
+                  <IoReloadSharp size={20} />
+                </RetryContainer>
+                <EmptyRow {...props}>
+                  <p>Oops! Apparently no data here.</p>
+                </EmptyRow>
+              </>
+            )}
         </TableBody>
         <BackTopButton onClick={handleScrollTop} isHidden={scrollTop}>
           <BsFillArrowUpCircleFill />

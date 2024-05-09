@@ -1,4 +1,4 @@
-import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
+import { proposalsMap } from '@/components/Tabs/NetworkParams/proposalsMap';
 import {
   IParsedProposalParam,
   IProposalParams,
@@ -25,7 +25,7 @@ export const getProposalNetworkParams = (
       paramIndex: index,
       paramLabel: NetworkParamsIndexer[index],
       paramValue: Number(value),
-      paramText: proposalsMessages[NetworkParamsIndexer[index]],
+      paramText: proposalsMap[NetworkParamsIndexer[index]].message,
     }),
   );
 

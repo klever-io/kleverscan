@@ -1,10 +1,14 @@
 import Filter, { IFilter } from '@/components/Filter';
 import Table, { ITable } from '@/components/TableV2';
-import { CustomLink, Status } from '@/components/TableV2/styles';
+import {
+  CustomFieldWrapper,
+  CustomLink,
+  Status,
+} from '@/components/TableV2/styles';
 import Tooltip from '@/components/Tooltip';
 import { paramsStyles } from '@/components/Tooltip/configs';
 import { useMobile } from '@/contexts/mobile';
-import { DoubleRow } from '@/styles/common';
+import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
 import { IRowSection } from '@/types/index';
 import {
   IParsedProposal,
@@ -69,10 +73,10 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
       status === 'Approved'
         ? 'ApprovedProposal'
         : status === 'Denied'
-        ? 'DeniedProposal'
-        : status === 'Active'
-        ? 'ActiveProposal'
-        : '';
+          ? 'DeniedProposal'
+          : status === 'Active'
+            ? 'ActiveProposal'
+            : '';
 
     setQueryAndRouter({ ...router.query, status: actualStatus }, router);
   };
@@ -88,6 +92,15 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
       votes,
       parsedParameters,
     } = props;
+
+    if (parsedParameters?.length === 1) {
+      parsedParameters.push({
+        paramText: '- -',
+        paramValue: 0,
+        paramIndex: '- -',
+        paramLabel: '- -',
+      });
+    }
 
     const proposalStatusColorAndText =
       getProposalStatusColorAndText(proposalStatus);
@@ -120,11 +133,11 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
     };
 
     const renderProposalsNetworkParamsWithToolTip = () => {
-      let message = '';
-      parsedParameters?.forEach(
-        (param2, index2) =>
-          (message += `${param2.paramText}  ${param2.paramValue}` + '\n'),
-      );
+      const message: string[] = [];
+      parsedParameters?.forEach((param2, index2) => {
+        if (param2.paramIndex !== '- -')
+          message.push(`${param2.paramText}  ${param2.paramValue}`);
+      });
       if (parsedParameters) {
         return (
           <Tooltip
@@ -138,7 +151,7 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
               isTablet,
               ...paramsStyles,
             )}
-            msg={message}
+            msg={message.join('\n')}
             maxVw={100}
           ></Tooltip>
         );
@@ -176,7 +189,9 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
         element: props => (
           <DoubleRow {...props} key={proposer}>
             <Link href={`/account/${proposer}`}>
-              <a>{parseAddress(proposer, 16)}</a>
+              <a>
+                <Mono>{parseAddress(proposer, 16)}</Mono>
+              </a>
             </Link>
             <Status
               status={proposalStatusColorAndText.color}
@@ -200,7 +215,24 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
       {
         element: props => (
           <DoubleRow {...props} key={String(votes)}>
-            <span>{getPositiveVotes()}</span>
+            <CenteredRow>
+              {getPositiveVotes()}
+              <Tooltip
+                msg="For a proposal to be approved, it needs to have more than 50% of the total staked votes."
+                Component={() => (
+                  <CustomFieldWrapper>
+                    <span>
+                      {' '}
+                      (
+                      {totalStaked
+                        ? (((votes['0'] || 0) * 100) / totalStaked).toFixed(2)
+                        : '- -'}
+                      %)
+                    </span>
+                  </CustomFieldWrapper>
+                )}
+              />
+            </CenteredRow>
             <span>{parseTotalStaked()}</span>
           </DoubleRow>
         ),

@@ -1,7 +1,10 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+
+import { lighten } from 'polished';
 
 export const ButtonModal = styled.button<{
   isLocked?: boolean;
+  buttonStyle?: 'primary' | 'secondary';
 }>`
   color: ${props => props.theme.true.white};
   background-color: transparent;
@@ -14,6 +17,7 @@ export const ButtonModal = styled.button<{
   align-self: end;
 
   min-width: 8rem;
+  width: 100%;
   max-width: 15rem;
 
   padding: 4px 16px;
@@ -39,6 +43,17 @@ export const ButtonModal = styled.button<{
       props.isLocked ? props.theme.darkGray : props.theme.violet};
     cursor: ${props => (props.isLocked ? 'not-allowed' : 'pointer')};
   }
+
+  ${props =>
+    props.buttonStyle === 'primary' &&
+    css`
+      background-color: ${props.theme.violet};
+      border: 1px solid ${props.theme.violet};
+
+      :hover {
+        background-color: ${lighten(0.1, props.theme.violet)};
+      }
+    `}
 
   opacity: ${props => (props.isLocked ? '0.3' : '1')};
 

@@ -18,8 +18,8 @@ const Proposals: React.FC = () => {
   const { t } = useTranslation(['common', 'proposals']);
   const router = useRouter();
   const tableHeaders = [
-    `${t('proposals:NetworkParameters')}`,
     `${t('common:Titles.Proposals')}`,
+    `${t('proposals:NetworkParameters')}`,
   ];
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
 

@@ -262,7 +262,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     locale,
     ['common', 'accounts', 'table'],
     nextI18nextConfig,
-    ['en'],
   );
 
   return { props };

@@ -11,6 +11,7 @@ import {
   CenteredRow,
   Container,
   Header,
+  Mono,
 } from '@/styles/common';
 import { IAccount, IPagination, IResponse, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
@@ -193,7 +194,7 @@ const Accounts: React.FC<IAccounts> = () => {
         element: props => (
           <CenteredRow key={address}>
             <Link href={`/account/${address}`}>
-              {isMobile ? parseAddress(address, 24) : address}
+              <Mono>{isMobile ? parseAddress(address, 24) : address}</Mono>
             </Link>
 
             <Copy info="Address" data={address} />

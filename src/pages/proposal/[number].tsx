@@ -3,7 +3,7 @@ import { getStatusIcon } from '@/assets/status';
 import Title from '@/components/Layout/Title';
 import { Status } from '@/components/Table/styles';
 import Table, { ITable } from '@/components/TableV2';
-import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
+import { proposalsMap } from '@/components/Tabs/NetworkParams/proposalsMap';
 import Tooltip from '@/components/Tooltip';
 import { useContractModal } from '@/contexts/contractModal';
 import api from '@/services/api';
@@ -181,10 +181,10 @@ const ProposalDetails: React.FC = () => {
     let parsedProposalParams: IParsedProposalParam[] = [];
 
     if (apiNetworkParams) {
-      Object.keys(proposalsMessages).map((key, index) => {
-        currentNetworkParams[proposalsMessages[key]] = {
+      Object.keys(proposalsMap).map((key, index) => {
+        currentNetworkParams[proposalsMap[key].message] = {
           number: index,
-          parameter: proposalsMessages[key] ? proposalsMessages[key] : '',
+          parameter: proposalsMap[key] ? proposalsMap[key].message : '',
           currentValue: apiNetworkParams?.[key]?.value,
           parameterLabel: key,
         };
@@ -197,7 +197,7 @@ const ProposalDetails: React.FC = () => {
           paramIndex: index,
           paramLabel: NetworkParamsIndexer[index],
           paramValue: Number(value),
-          paramText: proposalsMessages[NetworkParamsIndexer[index]],
+          paramText: proposalsMap[NetworkParamsIndexer[index]].message,
         };
       });
     }

@@ -1,8 +1,8 @@
 import { WarningIcon } from '@/assets/calendar';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
-import BuyCard from '@/components/Marketplace/Buycard';
 import { BuyCardSkeleton } from '@/components/Marketplace/BuyCardSkeleton';
+import BuyCard from '@/components/Marketplace/Buycard';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import { getBuyCards, getMarketplace } from '@/services/requests/marketplace';
@@ -30,13 +30,13 @@ import {
   GridSales,
   MktplaceCenteredRow,
 } from '@/views/marketplaces/detail';
-import { GetServerSideProps, GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
-import { useQuery, UseQueryResult } from 'react-query';
+import { UseQueryResult, useQuery } from 'react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
 
 export interface IBuyCard {

@@ -22,8 +22,8 @@ import {
   CenteredRowSpan,
   CommonSpan,
   RowBlockNavigation,
-  TooltipContainer,
   ToolTipStyle,
+  TooltipContainer,
 } from '@/views/blocks/detail';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Link from 'next/link';

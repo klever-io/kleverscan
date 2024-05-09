@@ -46,7 +46,7 @@ import {
   ValidatorTitle,
 } from '@/views/validator';
 import { CardContainer, TableContainer } from '@/views/validators/detail';
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps, GetStaticPaths } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import dynamic from 'next/dynamic';
@@ -540,7 +540,9 @@ const Validator: React.FC<IValidatorPage> = () => {
   );
 };
 
-export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  locale = 'en',
+}) => {
   const props = await serverSideTranslations(
     locale,
     ['common', 'validators'],

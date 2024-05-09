@@ -10,11 +10,13 @@ import { WalletBanner } from '@/components/LaunchPad/WalletBanner';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import { useParticipate } from '@/contexts/participate';
 import { requestITOs } from '@/services/requests/ito';
+import { CenteredRow, DoubleRow } from '@/styles/common';
 import { IITOResponse, IParsedITO, IRowSection } from '@/types';
 import { IPackInfo } from '@/types/contracts';
 import { formatAmount } from '@/utils/formatFunctions';
 import { parseITOs } from '@/utils/parseValues';
 import { ContainerAssetId } from '@/views/assets';
+import { ProjectName } from '@/views/ito/style';
 import {
   ITOContainer,
   MainContainer,
@@ -23,7 +25,7 @@ import {
   TableHeader,
   TableTitle,
 } from '@/views/launchpad';
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
@@ -32,8 +34,6 @@ import { ReactNode, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { IoIosInfinite } from 'react-icons/io';
 import nextI18nextConfig from '../../../next-i18next.config';
-import { CenteredRow, DoubleRow } from '@/styles/common';
-import { ProjectName } from '@/views/ito/style';
 
 export function getBestKLVRate(packData: IPackInfo[]): number | undefined {
   let bestKLVRate: number | undefined = undefined;
@@ -415,7 +415,9 @@ const ITOsPage: React.FC = () => {
   );
 };
 
-export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  locale = 'en',
+}) => {
   const props = await serverSideTranslations(
     locale,
     ['itos'],

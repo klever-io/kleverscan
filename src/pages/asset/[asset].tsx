@@ -20,7 +20,7 @@ import {
   AssetCardHeaderItem,
   AssetPageContainer,
 } from '@/views/assets';
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
@@ -228,7 +228,9 @@ const Asset: React.FC<IAssetPage> = ({}) => {
   );
 };
 
-export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  locale = 'en',
+}) => {
   const props = await serverSideTranslations(
     locale,
     ['common', 'assets', 'table'],
@@ -237,13 +239,6 @@ export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
   );
 
   return { props };
-};
-
-export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
-  return {
-    paths: [],
-    fallback: 'blocking',
-  };
 };
 
 export default Asset;

@@ -48,7 +48,9 @@ export const TableBody = styled.div<{ smaller?: boolean }>`
   color: ${props => props.theme.black};
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
-    display: block;
+    display: table;
+    table-layout: auto;
+
     border-radius: 16px;
     padding: 16px;
     gap: 40px;
@@ -63,10 +65,15 @@ export const TableBody = styled.div<{ smaller?: boolean }>`
   }
 `;
 
-export const HeaderItem = styled.div<{ smaller?: boolean }>`
+export const HeaderItem = styled.div<{
+  smaller?: boolean;
+  totalColumns?: number;
+  currentColumn?: number;
+}>`
   display: table-cell;
   padding: 6px 16px;
   padding-bottom: 32px;
+  white-space: nowrap;
 
   ${props =>
     props.smaller &&
@@ -81,6 +88,7 @@ export const TableRow = styled.div<TableRowProps>`
   display: flex;
   flex-direction: column;
   width: 100%;
+  justify-content: space-between;
 
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     display: grid;
@@ -111,6 +119,8 @@ export const MobileCardItem = styled.div<{
   isLastRow?: boolean;
   dynamicWidth?: number;
   smaller?: boolean;
+  totalColumns?: number;
+  currentColumn?: number;
 }>`
   display: flex;
   flex-direction: column;
@@ -121,6 +131,7 @@ export const MobileCardItem = styled.div<{
   span {
     display: flex;
     align-items: center;
+    font-weight: 400;
   }
 
   a {
@@ -166,9 +177,8 @@ export const MobileCardItem = styled.div<{
     display: table-cell;
     vertical-align: middle;
 
-    table-layout: auto;
     width: ${props =>
-      props.dynamicWidth ? `${props.dynamicWidth}px` : '236px'};
+      props.dynamicWidth ? `${props.dynamicWidth}px` : 'fit-content'};
 
     padding: 12px 16px;
 
@@ -179,7 +189,11 @@ export const MobileCardItem = styled.div<{
     span {
       height: 24px;
       display: flex;
+
       align-items: center;
+
+      min-width: fit-content;
+      white-space: nowrap;
     }
 
     ${props =>

@@ -5,9 +5,10 @@ import Detail from '@/components/Detail';
 import { IFilter } from '@/components/Filter';
 import Progress from '@/components/Progress';
 import { ITable } from '@/components/TableV2';
-import { Status } from '@/components/TableV2/styles';
+import { CustomFieldWrapper, Status } from '@/components/TableV2/styles';
+import Tooltip from '@/components/Tooltip';
 import api from '@/services/api';
-import { DoubleRow } from '@/styles/common';
+import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
 import { IRowSection, IValidator } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { capitalizeString } from '@/utils/convertString';
@@ -56,7 +57,7 @@ const validatorsRowSections = (validator: IValidator): IRowSection[] => {
                 {
                   <AddressContainer>
                     <Link href={`validator/${ownerAddress}`}>
-                      {name ? name : parsedAddress}
+                      {name ? name : <Mono>{parsedAddress}</Mono>}
                     </Link>
                     <Copy data={ownerAddress} info="Validator Address" />
                   </AddressContainer>
@@ -95,7 +96,27 @@ const validatorsRowSections = (validator: IValidator): IRowSection[] => {
           element: props => (
             <DoubleRow {...props} key={totalProduced}>
               <span>{totalProduced}</span>
-              <span>{totalMissed}</span>
+              <CenteredRow>
+                <span>{totalMissed}</span>
+                <Tooltip
+                  msg="Missed Percentage"
+                  Component={() => (
+                    <CustomFieldWrapper>
+                      <span>
+                        {' '}
+                        (
+                        {totalProduced
+                          ? (
+                              ((totalMissed || 0) * 100) /
+                              totalProduced
+                            ).toFixed(2)
+                          : '- -'}
+                        %)
+                      </span>
+                    </CustomFieldWrapper>
+                  )}
+                />
+              </CenteredRow>
             </DoubleRow>
           ),
           span: 1,

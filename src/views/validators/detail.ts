@@ -193,8 +193,8 @@ export const Rating = styled.p.attrs<IRatingProps>(props => ({
     props.rate === 'green'
       ? props.theme.table.success
       : props.rate === 'yellow'
-      ? props.theme.table.pending
-      : props.theme.red};
+        ? props.theme.table.pending
+        : props.theme.red};
 
   color: ${props => props.theme.white} !important;
   font-weight: 400;

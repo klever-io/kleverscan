@@ -250,7 +250,7 @@ export const DoubleRow = styled.div<TableRowElementProps>`
 
   gap: 10px;
 
-  width: 100%;
+  width: fit-content;
 
   ${props =>
     props.smaller &&
@@ -304,6 +304,14 @@ export const CenteredRow = styled.div`
       min-width: fit-content;
     }
   }
+`;
+
+export const Mono = styled.span`
+  font-family: 'Fira Mono', monospace;
+
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.2rem;
 `;
 
 export const FrozenContainer = styled.div`

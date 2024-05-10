@@ -257,34 +257,12 @@ const Accounts: React.FC<IAccounts> = () => {
 
 export const getServerSideProps: GetServerSideProps = async ({
   locale = 'en',
-  locales,
-  defaultLocale,
 }) => {
-  console.log('locale', locale);
-  console.log('locales', locales);
-  console.log('defaultLocale', defaultLocale);
-
   const props = await serverSideTranslations(
     locale,
     ['common', 'accounts', 'table'],
     nextI18nextConfig,
-  );
-  const propsWithoutExtraConfig = await serverSideTranslations(locale, [
-    'common',
-    'accounts',
-    'table',
-  ]);
-  const propsWithoutNamespaces = await serverSideTranslations(locale);
-
-  console.log('nextI18nextConfig', JSON.stringify(nextI18nextConfig, null, 2));
-  console.log('props', JSON.stringify(props, null, 2));
-  console.log(
-    'propsWithoutExtraConfig',
-    JSON.stringify(propsWithoutExtraConfig, null, 2),
-  );
-  console.log(
-    'propsWithoutNamespaces',
-    JSON.stringify(propsWithoutNamespaces, null, 2),
+    ['en'],
   );
 
   return { props };

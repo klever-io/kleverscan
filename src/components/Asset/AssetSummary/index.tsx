@@ -1,4 +1,3 @@
-import { Edit } from '@/assets/icons';
 import * as SocialIcons from '@/assets/social';
 import { AssetProps } from '@/components/Asset/OverviewTab';
 import { HashComponent } from '@/components/Contract';
@@ -15,6 +14,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import { TbPencilMinus } from 'react-icons/tb';
 import { useQuery } from 'react-query';
 import { ApplyFormModal } from './ApplyFormModal';
 import { AssetITOSummary } from './AssetITOSummary';
@@ -168,7 +168,7 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
                 type="button"
                 onClick={() => setOpenApplyFormModal(true)}
               >
-                <Edit />
+                <TbPencilMinus />
                 Add a description
               </ParticipateButton>
             ) : null}
@@ -213,7 +213,7 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
             About the project
             {walletAddress && asset?.ownerAddress === walletAddress && (
               <EditContainer onClick={() => setOpenApplyFormModal(true)}>
-                <Edit />
+                <TbPencilMinus />
               </EditContainer>
             )}
           </h2>

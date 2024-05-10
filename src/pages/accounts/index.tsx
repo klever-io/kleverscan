@@ -269,9 +269,23 @@ export const getServerSideProps: GetServerSideProps = async ({
     ['common', 'accounts', 'table'],
     nextI18nextConfig,
   );
+  const propsWithoutExtraConfig = await serverSideTranslations(locale, [
+    'common',
+    'accounts',
+    'table',
+  ]);
+  const propsWithoutNamespaces = await serverSideTranslations(locale);
 
-  console.log('nextI18nextConfig', JSON.stringify(nextI18nextConfig));
-  console.log('props', JSON.stringify(props));
+  console.log('nextI18nextConfig', JSON.stringify(nextI18nextConfig, null, 2));
+  console.log('props', JSON.stringify(props, null, 2));
+  console.log(
+    'propsWithoutExtraConfig',
+    JSON.stringify(propsWithoutExtraConfig, null, 2),
+  );
+  console.log(
+    'propsWithoutNamespaces',
+    JSON.stringify(propsWithoutNamespaces, null, 2),
+  );
 
   return { props };
 };

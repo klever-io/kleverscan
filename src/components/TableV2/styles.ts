@@ -361,9 +361,9 @@ export const LimitContainer = styled.div`
     margin-bottom: 10px;
   }
   span {
-    padding-left: 0.5rem;
     font-size: 0.9rem;
-    color: ${props => props.theme.gray700};
+    color: ${props =>
+      props.theme.dark ? props.theme.gray700 : props.theme.darkText};
     font-weight: 600;
   }
 `;
@@ -423,7 +423,11 @@ export const ItemContainer = styled.div<{
   justify-content: center;
 
   background-color: ${props =>
-    props.active ? props.theme.violet : props.theme.blue};
+    props.active
+      ? props.theme.violet
+      : props.theme.dark
+        ? props.theme.blue
+        : props.theme.black10};
 
   border-radius: 16px;
 
@@ -512,13 +516,13 @@ export const IoReloadSharpWrapper = styled.div<{
 
   border-radius: 8px;
 
-  background-color: ${props => props.theme.card.background};
+  background-color: ${props =>
+    props.theme.dark ? props.theme.card.background : props.theme.blueGray300};
 
   transition: 0.2s ease;
 
   svg {
-    color: ${props =>
-      props.theme.dark ? props.theme.black : props.theme.darkText};
+    color: ${props => props.theme.true.white};
     animation: ${props => (props.$loading ? rotate : 'none')} 1s linear infinite;
   }
 

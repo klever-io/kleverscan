@@ -1,6 +1,7 @@
 import { transparentize } from 'polished';
 import styled, { css, keyframes } from 'styled-components';
 import { fadeInItem } from '../DateFilter/styles';
+import { DefaultCardStyleWithBorder } from '@/styles/common';
 
 const Show = keyframes`
   0% {
@@ -69,7 +70,7 @@ export const Container = styled.div<{ maxWidth?: boolean; open?: boolean }>`
 `;
 
 export const Content = styled.div<{ open: boolean }>`
-  border: 1px solid ${props => props.theme.black};
+  ${DefaultCardStyleWithBorder}
   border-radius: 24px;
 
   height: 32px;

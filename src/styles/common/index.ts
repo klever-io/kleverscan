@@ -63,14 +63,20 @@ export const DefaultCardStyles = css`
     props.theme.dark ? props.theme.table.background : props.theme.white};
 `;
 
-export const Card = styled.div`
+export const DefaultCardStyleWithBorder = css`
   ${DefaultCardStyles}
+
+  border: 1px solid ${props =>
+    props.theme.dark ? props.theme.black20 : props.theme.black10};
+  border-radius: 24px;
+`;
+
+export const Card = styled.div`
+  ${DefaultCardStyleWithBorder}
 
   width: 100%;
   padding: 1.5rem;
   overflow: hidden;
-  border-radius: 24px;
-  border: 1px solid ${props => props.theme.darkGray};
 
   display: flex;
 
@@ -308,10 +314,6 @@ export const CenteredRow = styled.div`
 
 export const Mono = styled.span`
   font-family: 'Fira Mono', monospace;
-
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 0.2rem;
 `;
 
 export const FrozenContainer = styled.div`

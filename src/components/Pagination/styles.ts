@@ -32,7 +32,8 @@ export const ArrowContainer = styled.div<{ active: boolean }>`
   align-items: center;
   justify-content: center;
 
-  background-color: ${props => props.theme.white};
+  background-color: ${props =>
+    props.theme.dark ? props.theme.true.black : props.theme.lightBlue};
 
   border-radius: 50%;
 

@@ -27,6 +27,7 @@ export const ContainerTabInteractions = styled.div`
 export const BalanceContainer = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 8px;
   width: 100%;
 `;
 

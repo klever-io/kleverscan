@@ -54,12 +54,8 @@ interface IRequestTxQuery {
 }
 
 export const toAddressSectionElement = (toAddress: string): JSX.Element => {
-  if (toAddress === '- -') {
-    return (
-      <span data-testid="toAddressEmpty" style={{ cursor: 'default' }}>
-        <Mono>{toAddress}</Mono>
-      </span>
-    );
+  if (toAddress === '--') {
+    return <Mono>{toAddress}</Mono>;
   }
   return (
     <Link href={`/account/${toAddress}`} key={toAddress}>
@@ -226,7 +222,7 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
     data,
   } = props;
 
-  let toAddress = '- -';
+  let toAddress = '--';
   const contractType = getContractType(contract);
 
   if (contractType === Contract.Transfer) {
@@ -243,7 +239,9 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
         <DoubleRow {...props} key={hash}>
           <CenteredRow className="bucketIdCopy">
             <Link href={`/transaction/${hash}`}>
-              <Mono>{parseAddress(hash, 24)}</Mono>
+              <a>
+                <Mono>{parseAddress(hash, 24)}</Mono>
+              </a>
             </Link>
             <Copy info="TXHash" data={hash} />
           </CenteredRow>

@@ -6,7 +6,7 @@ export const ToggleButtonContainer = styled.div<{ active: boolean }>`
   display: flex;
   align-items: center;
   width: 45px;
-  height: 1.4rem;
+  height: 22px;
   background-color: ${props =>
     props.active ? props.theme.purple : props.theme.borderLogo};
   border-radius: 34px;
@@ -17,8 +17,8 @@ export const ToggleButtonIcon = styled.button<{
   active: boolean;
   hasIcon: boolean;
 }>`
-  height: 17px;
-  width: 17px;
+  height: 16px;
+  width: 16px;
   position: relative;
   left: 3px;
   background-color: ${props => props.theme.white};

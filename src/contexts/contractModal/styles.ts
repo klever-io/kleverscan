@@ -6,7 +6,7 @@ export const ButtonModal = styled.button<{
   isLocked?: boolean;
   buttonStyle?: 'primary' | 'secondary';
 }>`
-  color: ${props => props.theme.true.white};
+  color: ${props => props.theme.black};
   background-color: transparent;
   border: 1px solid
     ${props => (!props.isLocked ? props.theme.violet : props.theme.darkGray)};
@@ -31,7 +31,7 @@ export const ButtonModal = styled.button<{
   transition: all 0.1s ease;
 
   > span {
-    color: ${props => props.theme.true.white} !important;
+    color: ${props => props.theme.black} !important;
   }
 
   :active {

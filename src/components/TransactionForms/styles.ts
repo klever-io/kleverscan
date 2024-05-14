@@ -1,4 +1,4 @@
-import { DefaultCardStyles } from '@/styles/common';
+import { DefaultCardStyleWithBorder, DefaultCardStyles } from '@/styles/common';
 import { Form } from '@unform/web';
 import { lighten } from 'polished';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
@@ -14,7 +14,9 @@ interface ISpaceForm {
 }
 
 export const FormSection = styled.div<{ inner?: boolean; top?: number }>`
-  ${DefaultCardStyles}
+  ${DefaultCardStyleWithBorder}
+  border-radius: 1rem;
+
   padding: 1.5rem;
   position: relative;
 
@@ -23,11 +25,6 @@ export const FormSection = styled.div<{ inner?: boolean; top?: number }>`
   grid-auto-columns: auto;
   column-gap: 1rem;
   row-gap: 3rem;
-
-  border-radius: 1rem;
-
-  border: 1px solid ${({ theme }) => theme.darkGray};
-  box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? '#000' : lighten(0.8, '#000'))};
 
   ${props =>
     props.inner &&
@@ -132,7 +129,9 @@ export const ButtonContainer = styled.button<IButton>`
   margin-top: 1.7rem;
   cursor: pointer;
 
-  transition: background-color 0.5s, opacity 0.4s 0.1s;
+  transition:
+    background-color 0.5s,
+    opacity 0.4s 0.1s;
 
   box-shadow: 0 0 0.5rem -0.125rem ${props => (props.theme.dark ? '#000' : lighten(0.6, '#000'))};
 
@@ -265,5 +264,5 @@ export const SpanMessage = styled.span`
     right: 0;
     left: 10.5rem;
     top: 5rem;
-  } ;
+  }
 `;

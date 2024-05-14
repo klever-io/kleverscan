@@ -11,15 +11,11 @@ import Holders from '@/components/Tabs/Holders';
 import Transactions from '@/components/Tabs/Transactions';
 import api from '@/services/api';
 import { assetCall, assetPoolCall, ITOCall } from '@/services/requests/asset';
-import { CardHeader, CardTabContainer } from '@/styles/common';
+import { CardHeader, CardHeaderItem, CardTabContainer } from '@/styles/common';
 import { IAssetPage, IBalance } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { parseHolders } from '@/utils/parseValues';
-import {
-  AssetCardContent,
-  AssetCardHeaderItem,
-  AssetPageContainer,
-} from '@/views/assets';
+import { AssetCardContent, AssetPageContainer } from '@/views/assets';
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -203,7 +199,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       <CardTabContainer>
         <CardHeader>
           {cardHeaders.map((header, index) => (
-            <AssetCardHeaderItem
+            <CardHeaderItem
               key={String(index)}
               selected={selectedCard === header}
               onClick={() => {
@@ -212,7 +208,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
               }}
             >
               <span>{header}</span>
-            </AssetCardHeaderItem>
+            </CardHeaderItem>
           ))}
         </CardHeader>
 

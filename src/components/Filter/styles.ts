@@ -121,9 +121,10 @@ export const SelectorContainer = styled.div<{ open: boolean }>`
 
   gap: 0.25rem;
 
-  background-color: ${props => props.theme.background};
+  background-color: ${props =>
+    props.theme.dark ? props.theme.background : props.theme.white};
 
-  border: 1px solid ${props => props.theme.black};
+  border: 1px solid ${props => props.theme.black10};
   border-radius: 16px;
 
   animation: ${props => (props.open ? Hide : Show)} 0.2s
@@ -170,11 +171,18 @@ export const Item = styled.div<{ selected: boolean }>`
 
   align-items: center;
   justify-content: center;
-  backdrop-filter: ${props => props.selected && `brightness(2)`};
+  border: 1px solid transparent;
 
   border-radius: 0.5rem;
 
   transition: 0.2s ease;
+
+  ${props =>
+    props.selected &&
+    css`
+      border: 1px solid ${props => props.theme.black10};
+      backdrop-filter: brightness(2);
+    `}
 
   &:hover {
     background-color: ${props => transparentize(0.75, props.theme.lightGray)};

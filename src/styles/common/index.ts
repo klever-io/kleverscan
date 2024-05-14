@@ -5,10 +5,6 @@ import styled, { css } from 'styled-components';
 export const Container = styled.div`
   display: flex;
 
-  gap: 2rem;
-
-  padding-top: 40px;
-
   flex-direction: column;
 `;
 
@@ -181,7 +177,7 @@ export const Row = styled.div<{ isMobileRow?: boolean }>`
   &:not(:last-child) {
     border-bottom: 1px solid
       ${props =>
-        props.theme.dark ? props.theme.footer.border : props.theme.lightGray};
+        props.theme.dark ? props.theme.black10 : props.theme.lightGray};
 
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
@@ -317,14 +313,13 @@ export const Mono = styled.span`
 `;
 
 export const FrozenContainer = styled.div`
-  margin-top: 0.5rem;
   width: 100%;
 
   display: flex;
 
   flex-direction: column;
 
-  border: 1px solid ${props => props.theme.black};
+  border: 1px solid ${props => props.theme.black20};
   border-radius: 0.75rem;
 
   div {
@@ -337,12 +332,9 @@ export const FrozenContainer = styled.div`
     align-items: center;
 
     &:not(:last-child) {
-      border-bottom: 1px solid ${props => props.theme.black};
+      border-bottom: 1px solid ${props => props.theme.black20};
       border-bottom-left-radius: 0px;
       border-bottom-right-radius: 0px;
-    }
-    &:not(:first-child) {
-      /* border-top: 1px solid ${props => props.theme.card.border}; */
     }
     strong {
       width: 10rem;
@@ -376,18 +368,14 @@ export const CardContent = styled.div`
   ${DefaultCardStyles};
   width: 100%;
 
-  border-radius: 0 0.75rem 0.75rem 0.75rem;
+  border-radius: 0.75rem;
 `;
 
 export const CardHeaderItem = styled.div<{ selected: boolean }>`
-  ${DefaultCardStyles}
   border-bottom: none;
   border-right: none;
   box-shadow: none;
   padding: 1rem;
-
-  background-color: ${props =>
-    props.selected ? props.theme.white : 'transparent'};
 
   border-radius: 0;
 
@@ -403,20 +391,11 @@ export const CardHeaderItem = styled.div<{ selected: boolean }>`
 
     opacity: ${props => (props.selected ? 1 : 0.33)};
 
-    transition: 0.2s ease;
-  }
-
-  &:first-of-type {
-    border-radius: 0.75rem 0 0 0;
-  }
-  &:last-of-type {
-    border-radius: 0 0.75rem 0 0;
-    border-right: 1px solid
-      ${props =>
-        props.theme.dark ? props.theme.footer.border : props.theme.lightGray};
-  }
-  &:only-child {
-    border-radius: 0.75rem 0.75rem 0 0;
+    ${props =>
+      props.selected &&
+      css`
+        border-bottom: 2px solid ${props => props.theme.violet};
+      `}
   }
 `;
 

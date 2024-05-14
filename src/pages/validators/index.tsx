@@ -57,7 +57,7 @@ const validatorsRowSections = (validator: IValidator): IRowSection[] => {
                 {
                   <AddressContainer>
                     <Link href={`validator/${ownerAddress}`}>
-                      {name ? name : <Mono>{parsedAddress}</Mono>}
+                      <a>{name ? name : <Mono>{parsedAddress}</Mono>}</a>
                     </Link>
                     <Copy data={ownerAddress} info="Validator Address" />
                   </AddressContainer>

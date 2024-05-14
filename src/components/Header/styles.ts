@@ -4,6 +4,7 @@ import { AiOutlineClose } from 'react-icons/ai';
 import { HiOutlineMenuAlt2 } from 'react-icons/hi';
 import styled, { css, keyframes } from 'styled-components';
 import { default as DefaultInput } from '../InputGlobal';
+import { DefaultCardStyleWithBorder } from '@/styles/common';
 
 interface IMobileMenu {
   opened: boolean;
@@ -388,7 +389,6 @@ export const DropdownContainer = styled.div`
   position: absolute;
   bottom: 0;
   right: -5vw;
-  top: 0;
   animation: ${expand} 0.2s ease;
 
   border-radius: 0 0 0.5rem 0.5rem;
@@ -431,6 +431,7 @@ export const DropdownItem = styled.li<{ disabled: boolean }>`
 `;
 
 export const DropdownMenu = styled.ul`
+  ${DefaultCardStyleWithBorder}
   width: max-content;
   padding: 0.7rem;
   background-color: ${props =>

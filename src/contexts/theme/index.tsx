@@ -1,9 +1,8 @@
-//create context
-
 import theme from '@/styles/theme';
 import darkTheme from '@/styles/theme/dark';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { ThemeProvider } from 'styled-components';
+import { setCookie, getCookie } from 'cookies-next';
 
 interface ITheme {
   toggleDarkTheme: () => void;
@@ -14,24 +13,30 @@ interface ITheme {
 export const ThemeContext = createContext({} as ITheme);
 
 const setDarkThemePreference = (isDark: boolean) => {
-  localStorage.setItem('isDarkTheme', String(isDark));
+  setCookie('isDarkTheme', String(isDark));
 };
 
-export const InternalThemeProvider: React.FC = ({ children }) => {
-  const [isDarkTheme, setIsDarkTheme] = useState(false);
+interface InternalThemeProviderProps {
+  initialDarkTheme?: boolean;
+}
+
+export const InternalThemeProvider: React.FC<InternalThemeProviderProps> = ({
+  children,
+  initialDarkTheme = false,
+}) => {
+  const [isDarkTheme, setIsDarkTheme] = useState(initialDarkTheme);
 
   useEffect(() => {
-    const storedIsDarkTheme = localStorage.getItem('isDarkTheme');
-    if (storedIsDarkTheme === 'true') {
-      setIsDarkTheme(true);
-    } else if (storedIsDarkTheme === null) {
+    const storedIsDarkTheme = getCookie('isDarkTheme');
+
+    if (storedIsDarkTheme === undefined) {
       const prefersDarkMode = window.matchMedia(
         '(prefers-color-scheme: dark)',
       ).matches;
       setDarkThemePreference(prefersDarkMode);
       setIsDarkTheme(prefersDarkMode);
     }
-  }, []);
+  }, [initialDarkTheme]);
 
   const toggleDarkTheme = () => {
     const newIsDarkTheme = !isDarkTheme;

@@ -24,6 +24,7 @@
     "@unform/web": "2.1.6",
     "babel-plugin-inline-react-svg": "2.0.1",
     "clipboard-polyfill": "4.0.0-rc8",
+    "cookies-next": "^4.1.1",
     "date-fns": "2.23.0",
     "geojson2svg": "1.2.9",
     "ioredis": "4.28.2",

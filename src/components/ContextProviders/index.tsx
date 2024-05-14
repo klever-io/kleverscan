@@ -9,6 +9,7 @@ import { InputSearchProvider } from '@/contexts/inputSearch';
 import { MobileProvider } from '@/contexts/mobile';
 import { ParticipateProvider } from '@/contexts/participate';
 import { InternalThemeProvider } from '@/contexts/theme';
+import { GetServerSideProps } from 'next';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ToastContainer } from 'react-toastify';
 
@@ -23,28 +24,26 @@ const ContextProviders: React.FC = ({ children }) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <InternalThemeProvider>
-        <ToastContainer />
-        <MobileProvider>
-          <ExtensionProvider>
-            <ModalsProvider>
-              <FeesProvider>
-                <MulticontractProvider>
-                  <ContractProvider>
-                    <InputSearchProvider>
-                      <ParticipateProvider>
-                        <ContractModalProvider>
-                          <WizardProvider>{children}</WizardProvider>
-                        </ContractModalProvider>
-                      </ParticipateProvider>
-                    </InputSearchProvider>
-                  </ContractProvider>
-                </MulticontractProvider>
-              </FeesProvider>
-            </ModalsProvider>
-          </ExtensionProvider>
-        </MobileProvider>
-      </InternalThemeProvider>
+      <ToastContainer />
+      <MobileProvider>
+        <ExtensionProvider>
+          <ModalsProvider>
+            <FeesProvider>
+              <MulticontractProvider>
+                <ContractProvider>
+                  <InputSearchProvider>
+                    <ParticipateProvider>
+                      <ContractModalProvider>
+                        <WizardProvider>{children}</WizardProvider>
+                      </ContractModalProvider>
+                    </ParticipateProvider>
+                  </InputSearchProvider>
+                </ContractProvider>
+              </MulticontractProvider>
+            </FeesProvider>
+          </ModalsProvider>
+        </ExtensionProvider>
+      </MobileProvider>
     </QueryClientProvider>
   );
 };

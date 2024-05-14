@@ -27,9 +27,9 @@ const ModalContract: React.FC<IModalContract> = ({
     queue,
     selectedId,
     setSelectedContractAndQuery,
-    clearQuery,
     setIsModal,
     resetForms,
+    setSelectedContractType,
   } = useMulticontract();
 
   const { setOpenModal } = useContractModal();
@@ -41,12 +41,12 @@ const ModalContract: React.FC<IModalContract> = ({
   }, [extensionInstalled]);
 
   const closeModal = () => {
-    clearQuery();
     setOpenModal(false);
     closeQuickAccessModal && closeQuickAccessModal(false);
   };
 
   useEffect(() => {
+    setSelectedContractType(contractType);
     setSelectedContractAndQuery(contractType);
     setIsModal(true);
     resetForms(defaultValues, contractType);
@@ -59,26 +59,28 @@ const ModalContract: React.FC<IModalContract> = ({
   }, []);
 
   return (
-    <Container onMouseDown={closeModal}>
-      <Content onMouseDown={e => e.stopPropagation()}>
-        <TitleContent>
-          <h1>{title}</h1>
-          <AiOutlineClose onClick={closeModal} cursor={'pointer'} />
-        </TitleContent>
-        {queue.map(item => {
-          return (
-            <QueueItemContainer
-              key={JSON.stringify(item.ref)}
-              visible={item.elementId === selectedId}
-            >
-              {item.ref}
-            </QueueItemContainer>
-          );
-        })}
-        <AdvancedOptions />
-      </Content>
-      <WarningModal message={warningMessage} />
-    </Container>
+    <>
+      <Container onMouseDown={closeModal}>
+        <Content onMouseDown={e => e.stopPropagation()}>
+          <TitleContent>
+            <h1>{title}</h1>
+            <AiOutlineClose onClick={closeModal} cursor={'pointer'} />
+          </TitleContent>
+          {queue.map(item => {
+            return (
+              <QueueItemContainer
+                key={JSON.stringify(item.ref)}
+                visible={item.elementId === selectedId}
+              >
+                {item.ref}
+              </QueueItemContainer>
+            );
+          })}
+          <AdvancedOptions />
+        </Content>
+        <WarningModal message={warningMessage} />
+      </Container>
+    </>
   );
 };
 

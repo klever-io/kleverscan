@@ -2,9 +2,15 @@ import ModalContract, {
   IModalContract,
 } from '@/components/Contract/ModalContract';
 import { useRouter } from 'next/router';
-import { createContext, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import ReactDOM from 'react-dom';
-import { useMulticontract } from '../contract/multicontract';
 import { ButtonModal } from './styles';
 
 interface IContractModal {
@@ -26,7 +32,6 @@ export const ContractModal = createContext({} as IContractModal);
 
 export const ContractModalProvider: React.FC = ({ children }) => {
   const [mounted, setMounted] = useState(false);
-  const { setSelectedContractType } = useMulticontract();
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [modalOptions, setModalOptions] = useState<IModalContract>({
     title: '',
@@ -53,63 +58,62 @@ export const ContractModalProvider: React.FC = ({ children }) => {
     checkInitialUrl();
   }, [router.isReady]);
 
-  const getInteractionsButtons = (
-    params: IUseInteractionButton[],
-    isLeftAligned?: boolean,
-  ): React.FC[] => {
-    const buttons: React.FC[] = [];
+  const getInteractionsButtons = useCallback(
+    (params: IUseInteractionButton[], isLeftAligned?: boolean): React.FC[] => {
+      const buttons: React.FC[] = [];
 
-    for (const param of params) {
-      const interactionButton: React.FC = ({ children }) => {
-        const { title, contractType, defaultValues } = param;
+      for (const param of params) {
+        const interactionButton: React.FC = ({ children }) => {
+          const { title, contractType, defaultValues } = param;
 
-        const buttonStyle = param?.buttonStyle
-          ? param.buttonStyle
-          : 'secondary';
+          const buttonStyle = param?.buttonStyle
+            ? param.buttonStyle
+            : 'secondary';
 
-        const modalOptions: IModalContract = {
-          contractType,
-          defaultValues,
-          title,
+          const modalOptions: IModalContract = {
+            contractType,
+            defaultValues,
+            title,
+          };
+
+          const handleClick = () => {
+            setOpenModal(() => (contractType === '--' ? false : true));
+            setModalOptions(() => modalOptions);
+          };
+
+          return (
+            <ButtonModal
+              isLocked={contractType === '--' && true}
+              onClick={() => handleClick()}
+              buttonStyle={buttonStyle}
+            >
+              {children}
+              <span>{title}</span>
+            </ButtonModal>
+          );
         };
+        buttons.push(interactionButton);
+      }
 
-        const handleClick = () => {
-          setOpenModal(() => (contractType === '--' ? false : true));
-          setModalOptions(() => modalOptions);
-          setSelectedContractType(contractType);
-        };
+      return buttons;
+    },
+    [],
+  );
 
-        return (
-          <ButtonModal
-            isLocked={contractType === '--' && true}
-            onClick={() => handleClick()}
-            buttonStyle={buttonStyle}
-          >
-            {children}
-            <span>{title}</span>
-          </ButtonModal>
-        );
-      };
-      buttons.push(interactionButton);
-    }
-
-    return buttons;
-  };
-
-  const values: IContractModal = { getInteractionsButtons, setOpenModal };
+  const values = useMemo(
+    () => ({ getInteractionsButtons, setOpenModal }),
+    [getInteractionsButtons],
+  );
 
   return (
     <ContractModal.Provider value={values}>
-      <>
-        {mounted &&
-          openModal &&
-          ReactDOM.createPortal(
-            <ModalContract {...modalOptions} />,
-            window.document.body,
-          )}
+      {mounted &&
+        ReactDOM.createPortal(
+          openModal && <ModalContract {...modalOptions} />,
+          window.document.body,
+        )}
 
-        {children}
-      </>
+      {children}
     </ContractModal.Provider>
   );
 };

@@ -1,3 +1,4 @@
+import { DefaultCardStyleWithBorder } from '@/styles/common';
 import styled, { css, keyframes } from 'styled-components';
 
 interface DayItemProps {
@@ -81,8 +82,7 @@ export const OutsideContainer = styled.div`
 `;
 
 export const OutsideContent = styled.div`
-  border: 1px solid ${props => props.theme.black};
-  border-radius: 24px;
+  ${DefaultCardStyleWithBorder}
 
   box-sizing: border-box;
 
@@ -111,16 +111,17 @@ export const OutsideContent = styled.div`
 
 export const Input = styled.input`
   width: 75%;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 0.875rem;
   line-height: 1rem;
-  color: ${props => props.theme.gray700};
+  color: ${props => props.theme.black};
 
   caret-color: transparent;
 
   cursor: pointer;
   &::placeholder {
-    color: ${props => props.theme.gray700};
+    color: ${props =>
+      props.theme.dark ? props.theme.gray700 : props.theme.darkGray};
   }
   &:not([value='']) {
     animation: ${fadeInItem} 0.2s ease-in-out;

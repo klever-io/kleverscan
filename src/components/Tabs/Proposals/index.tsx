@@ -270,15 +270,17 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
     type: 'proposals',
     dataName: 'proposals',
     request: (page, limit) => request(page, limit, router),
-  };
-
-  return (
-    <ProposalsContainer>
+    Filters: () => (
       <FilterContainer>
         {filters.map((filter, index) => (
           <Filter key={String(index)} {...filter} />
         ))}
       </FilterContainer>
+    ),
+  };
+
+  return (
+    <ProposalsContainer>
       <Table {...tableProps} />
     </ProposalsContainer>
   );

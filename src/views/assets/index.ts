@@ -119,27 +119,7 @@ export const AssetPageContainer = styled(Container)`
   margin: 0 auto;
 `;
 
-export const AssetCardHeaderItem = styled(CardHeaderItem)`
-  background: none;
-
-  &:last-of-type,
-  &:first-of-type {
-    border: none;
-  }
-
-  span {
-    transition: none;
-
-    ${props =>
-      props.selected &&
-      css`
-        border-bottom: 2px solid ${props => props.theme.violet};
-      `}
-  }
-`;
-
 export const AssetCardContent = styled(CardContent)`
-  height: 90vh;
   background: none;
   overflow-x: hidden;
 

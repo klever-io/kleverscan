@@ -50,17 +50,6 @@ const NetworkParams: React.FC = () => {
 
   const rowSections = (props: INetworkParam): IRowSection[] => {
     const { number, parameter, currentValue } = props;
-
-    const [ProposalButton] = getInteractionsButtons([
-      {
-        title: 'Propose Change',
-        contractType: 'ProposalContract',
-        defaultValues: {
-          parameters: [{ label: number, value: '' }],
-        },
-        buttonStyle: 'primary',
-      },
-    ]);
     return [
       {
         element: props => <span key={String(number)}>#{number}</span>,
@@ -77,7 +66,19 @@ const NetworkParams: React.FC = () => {
         span: 1,
       },
       {
-        element: props => <ProposalButton />,
+        element: props => {
+          const [ProposalButton] = getInteractionsButtons([
+            {
+              title: 'Propose Change',
+              contractType: 'ProposalContract',
+              defaultValues: {
+                parameters: [{ label: number, value: '' }],
+              },
+              buttonStyle: 'primary',
+            },
+          ]);
+          return <ProposalButton />;
+        },
         span: 2,
         width: 200,
       },

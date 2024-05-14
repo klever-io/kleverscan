@@ -57,7 +57,8 @@ export const OutsideContainer = styled.div`
   width: 40px;
   height: 40px;
 
-  background-color: ${props => props.theme.card.background};
+  background-color: ${props =>
+    props.theme.dark ? props.theme.card.background : props.theme.blueGray300};
 
   border-radius: 8px;
 

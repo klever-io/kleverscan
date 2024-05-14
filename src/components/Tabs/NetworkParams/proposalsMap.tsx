@@ -3,7 +3,7 @@ import { KLV_PRECISION } from '@/utils/globalVariables';
 
 export const proposalsMap: IProposalsMap = {
   FeePerDataByte: {
-    message: 'Fee Per Data Byte',
+    message: 'Fee per Data Byte',
     precision: KLV_PRECISION,
     unit: 'KLV/Byte',
   },
@@ -18,7 +18,7 @@ export const proposalsMap: IProposalsMap = {
     unit: 'KLV',
   },
   MaxEpochsUnclaimed: {
-    message: 'Max Epochs to clear unclaimed',
+    message: 'Max Epochs to Clear Unclaimed',
     precision: 0,
     unit: 'Epochs',
   },
@@ -148,12 +148,12 @@ export const proposalsMap: IProposalsMap = {
     unit: 'KLV',
   },
   MaxNFTMintBatch: {
-    message: 'Max NFT Mint per batch',
+    message: 'Max NFT Mint per Batch',
     precision: 0,
     unit: 'NFTs',
   },
   MinKFIStakedToEnableProposals: {
-    message: 'Min KFI staked to enable Proposals Kapps',
+    message: 'Min KFI staked to Enable Proposals Kapps',
     precision: KLV_PRECISION,
     unit: 'KFI',
   },
@@ -164,14 +164,14 @@ export const proposalsMap: IProposalsMap = {
   },
   MaxBucketSize: { message: 'Max bucket size', precision: 0, unit: 'KDA' },
   LeaderValidatorRewardsPercentage: {
-    message: 'Leader Validator rewards percentage',
+    message: 'Leader Validator Rewards Percentage',
     precision: 2,
     unit: '%',
   },
   ProposalMaxEpochsDuration: {
-    message: 'Max Epochs for active proposal duration',
-    precision: KLV_PRECISION,
-    unit: 'KLV',
+    message: 'Max Epochs for Active Proposal Duration',
+    precision: 0,
+    unit: 'Epochs',
   },
   KAppFeeDeposit: {
     message: 'KApp Fee for Deposit',

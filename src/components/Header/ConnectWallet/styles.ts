@@ -72,7 +72,7 @@ export const ConnectButton = styled.div<{
         background: inherit;
         position: absolute;
         inset: 3px;
-        border-radius: 5px;
+        border-radius: 24px;
         height: calc(100% - 2 * 3px);
         width: calc(100% - 2 * 3px);
       }

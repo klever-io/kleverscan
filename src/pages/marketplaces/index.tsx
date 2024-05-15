@@ -1,14 +1,15 @@
 import { Accounts as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
-import Table, { ITable } from '@/components/Table';
+import Table, { ITable } from '@/components/TableV2';
 import { getMarketplaces } from '@/services/requests/marketplace';
-import { Container, FlexSpan, Header } from '@/styles/common';
+import { Container, FlexSpan, Header, Mono } from '@/styles/common';
+import { IRowSection } from '@/types';
 import { IMarketplace } from '@/types/marketplaces';
 import { PERCENTAGE_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import { TableTitle } from '@/views/marketplaces';
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
@@ -27,18 +28,22 @@ const Marketplaces: React.FC = () => {
   const marketplacesRowSections = (marketplace: IMarketplace) => {
     const { id, name, ownerAddress, referralAddress, referralPercentage } =
       marketplace;
-    const rowSections = [
+    const rowSections: IRowSection[] = [
       {
-        element: (
+        element: props => (
           <FlexSpan>
-            <Link href={`marketplace/${id}`}>{id}</Link>
+            <Link href={`marketplace/${id}`}>
+              <a>
+                <Mono>{id}</Mono>
+              </a>
+            </Link>
             <Copy data={id} info="Marketplace Id" />
           </FlexSpan>
         ),
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <span key={name}>
             <Link href={`marketplace/${id}`}>{name}</Link>
           </span>
@@ -46,10 +51,12 @@ const Marketplaces: React.FC = () => {
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <FlexSpan>
             <Link href={`account/${ownerAddress}`}>
-              {parseAddress(ownerAddress, 20)}
+              <a>
+                <Mono>{parseAddress(ownerAddress, 20)}</Mono>
+              </a>
             </Link>
             <Copy data={ownerAddress} info="Marketplace Owner Address" />
           </FlexSpan>
@@ -57,12 +64,14 @@ const Marketplaces: React.FC = () => {
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <FlexSpan>
             {referralAddress ? (
               <>
                 <Link href={`account/${referralAddress}`}>
-                  {parseAddress(referralAddress, 20)}
+                  <a>
+                    <Mono>{parseAddress(referralAddress, 20)}</Mono>
+                  </a>
                 </Link>
                 <Copy data={referralAddress} info="Referral Address" />
               </>
@@ -74,7 +83,7 @@ const Marketplaces: React.FC = () => {
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <span>
             {referralPercentage
               ? `${referralPercentage / 10 ** PERCENTAGE_PRECISION}%`
@@ -92,7 +101,6 @@ const Marketplaces: React.FC = () => {
     header: marketplacesHeader,
     rowSections: marketplacesRowSections,
     request: () => getMarketplaces(),
-    scrollUp: true,
     dataName: 'marketplaces',
   };
 
@@ -107,11 +115,14 @@ const Marketplaces: React.FC = () => {
   );
 };
 
-export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  locale = 'en',
+}) => {
   const props = await serverSideTranslations(
     locale,
     ['marketPlaces'],
     nextI18nextConfig,
+    ['en'],
   );
 
   return { props };

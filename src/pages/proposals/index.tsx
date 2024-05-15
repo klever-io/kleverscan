@@ -7,7 +7,7 @@ import { requestProposals } from '@/services/requests/proposals';
 import { Card, Container, Header } from '@/styles/common';
 import { setQueryAndRouter } from '@/utils';
 import { CardContainer } from '@/views/proposals';
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
@@ -18,8 +18,8 @@ const Proposals: React.FC = () => {
   const { t } = useTranslation(['common', 'proposals']);
   const router = useRouter();
   const tableHeaders = [
-    `${t('proposals:NetworkParameters')}`,
     `${t('common:Titles.Proposals')}`,
+    `${t('proposals:NetworkParameters')}`,
   ];
   const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
 
@@ -77,11 +77,14 @@ const Proposals: React.FC = () => {
   );
 };
 
-export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  locale = 'en',
+}) => {
   const props = await serverSideTranslations(
     locale,
     ['common', 'proposals'],
     nextI18nextConfig,
+    ['en'],
   );
 
   return { props };

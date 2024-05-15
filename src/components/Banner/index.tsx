@@ -23,11 +23,11 @@ interface IHeathReturn {
 
 const errorMessage = {
   WARNING:
-    "Warning: It appears that the server response time is slightly above the expected rate at the moment. We're working to optimize this. Your patience is appreciated as we fine-tune performance.",
+    'Note: Server response times are currently a bit high. Thanks for your patience.',
   ALERT:
-    "We're facing a temporary performance issue affecting server response time. Our team is actively resolving this issue. We apologize for the inconvenience.",
+    "We're facing a temporary performance issue affecting server response time. We apologize for the inconvenience.",
   CRITICAL:
-    "We regret to inform you that we're experiencing issues establishing a connection with the server right now. Our technical team is aware of the problem and is working to resolve it as quickly as possible. Please wait a while and try again.",
+    "We're experiencing issues establishing a connection with the server. Our technical team is working to resolve it as quickly as possible. Please wait a while and try again.",
 };
 
 const healthRequest = async (): Promise<IResultsHeath[]> => {
@@ -72,7 +72,7 @@ const BannerResult: React.FC<IResultsHeath> = (data: IResultsHeath) => {
     <>
       {openBanner && data.status !== 'OK' && data.message && (
         <BannerContainer status={data.status === 'ALERT'}>
-          <BannerParagraph>{`Status ${data.name} request: ${
+          <BannerParagraph>{`${data.name.toUpperCase()} service: ${
             errorMessage[data.status]
           }`}</BannerParagraph>
           <ButtonClose onClick={handleClick} />
@@ -97,11 +97,7 @@ const Banner: React.FC = () => {
   }, []);
 
   return !loading ? (
-    <>
-      {res?.map(result => (
-        <BannerResult {...result} key={result.name} />
-      ))}
-    </>
+    <>{res?.map(result => <BannerResult {...result} key={result.name} />)}</>
   ) : (
     <></>
   );

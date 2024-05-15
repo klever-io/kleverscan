@@ -1,12 +1,7 @@
 import styled from 'styled-components';
 
 export const MapContainer = styled.div`
-  margin-bottom: 1.5rem;
-
-  background-color: ${props => props.theme.white};
   border-radius: 0.5rem;
-
-  box-shadow: 0 2px 15px ${props => props.theme.shadow};
 `;
 
 export const CardDetails = styled.div<{ variation?: boolean }>`

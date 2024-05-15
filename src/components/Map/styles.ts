@@ -2,9 +2,12 @@ import { transparentize } from 'polished';
 import styled from 'styled-components';
 
 export const Container = styled.div`
+  user-select: none;
+  pointer-events: none;
+
   .leaflet-container {
     width: 100%;
-    height: 30rem;
+    height: 280px;
 
     overflow: hidden;
 
@@ -14,36 +17,24 @@ export const Container = styled.div`
   }
 
   .map-marker {
-    width: 0.75rem;
-    height: 0.75rem;
+    width: 8px !important;
+    height: 8px !important;
+    border: 1px solid ${props => props.theme.gray800};
 
-    background-color: ${props => transparentize(0.25, props.theme.map.marker)};
+    background-color: ${props => transparentize(0.25, props.theme.gray700)};
 
     border-radius: 50%;
+
+    pointer-events: none;
+    cursor: unset;
   }
 
-  .map-cluster {
-    margin: -1.975rem 0 0 -1.975rem !important;
-    padding: 1.975rem;
+  .leaflet-control-container {
+    display: none;
+  }
 
-    display: flex;
-
+  .leaflet-pane {
     z-index: 1;
-
-    align-items: center;
-    justify-content: center;
-
-    background-image: ${props => props.theme.text.background};
-
-    border-radius: 50%;
-
-    font-size: 0.975rem;
-    font-weight: 500;
-    text-align: right;
-    color: ${props => props.theme.white};
-
-    box-shadow: inset 0 0 0 0.437rem
-      ${props => transparentize(0.5, props.theme.white)};
   }
 `;
 

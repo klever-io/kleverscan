@@ -1,20 +1,22 @@
 import { ParticipateModal } from '@/components/Asset/AssetSummary/ParticipateModal';
 import { HashComponent } from '@/components/Contract';
 import Copy from '@/components/Copy';
+import Table, { ITable } from '@/components/ITOTable';
 import { LaunchPadBanner } from '@/components/LaunchPad/Banner';
 import { LaunchPadFAQ } from '@/components/LaunchPad/FAQ';
 import { LaunchPadFAQCards } from '@/components/LaunchPad/FAQCards';
 import { LearnBanner } from '@/components/LaunchPad/LearnBanner';
 import { WalletBanner } from '@/components/LaunchPad/WalletBanner';
 import AssetLogo from '@/components/Logo/AssetLogo';
-import Table, { ITable } from '@/components/NewTable';
 import { useParticipate } from '@/contexts/participate';
 import { requestITOs } from '@/services/requests/ito';
+import { CenteredRow, DoubleRow } from '@/styles/common';
 import { IITOResponse, IParsedITO, IRowSection } from '@/types';
 import { IPackInfo } from '@/types/contracts';
 import { formatAmount } from '@/utils/formatFunctions';
 import { parseITOs } from '@/utils/parseValues';
 import { ContainerAssetId } from '@/views/assets';
+import { ProjectName } from '@/views/ito/style';
 import {
   ITOContainer,
   MainContainer,
@@ -23,11 +25,11 @@ import {
   TableHeader,
   TableTitle,
 } from '@/views/launchpad';
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { NextRouter, useRouter } from 'next/router';
 import { ReactNode, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { IoIosInfinite } from 'react-icons/io';
@@ -50,28 +52,23 @@ export function getBestKLVRate(packData: IPackInfo[]): number | undefined {
   return bestKLVRate;
 }
 
-const ITOsPage: React.FC = () => {
-  const [ITO, setITO] = useState<IParsedITO | null>(null);
-  const {
-    openParticipateModal,
-    setOpenParticipateModal,
-    txHash,
-    setTxHash,
-    setLoading,
-  } = useParticipate();
-  const { t } = useTranslation('itos');
-  const router = useRouter();
+export const requestITOSQuery = async (
+  page: number,
+  limit: number,
+  router: NextRouter,
+): Promise<IITOResponse> => {
+  const dataITOs = await requestITOs(router, page, limit);
+  await parseITOs(dataITOs.data.itos);
+  return dataITOs;
+};
 
-  const requestITOSQuery = async (
-    page: number,
-    limit: number,
-  ): Promise<IITOResponse> => {
-    const dataITOs = await requestITOs(router, page, limit);
-    await parseITOs(dataITOs.data.itos);
-    return dataITOs;
-  };
-
-  const rowSections = (asset: IParsedITO): IRowSection[] => {
+export const getITOrowSections =
+  (
+    setITO: (asset: IParsedITO) => void,
+    setOpenParticipateModal: (open: boolean) => void,
+    reference?: string,
+  ) =>
+  (asset: IParsedITO): IRowSection[] => {
     const {
       ticker,
       name,
@@ -114,10 +111,12 @@ const ITOsPage: React.FC = () => {
       );
     };
 
-    const sections = [
+    const sections: IRowSection[] = [
       {
-        element: (
-          <Link href={`/asset/${assetId}?reference=ito`} key={assetId}>
+        element: props => (
+          <Link
+            href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
+          >
             <a>
               <AssetLogo
                 logo={logo}
@@ -131,17 +130,21 @@ const ITOsPage: React.FC = () => {
         span: 1,
       },
       {
-        element: (
-          <Link href={`/asset/${assetId}?reference=ito`} key={name}>
+        element: props => (
+          <Link
+            href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
+          >
             <a style={{ overflow: 'hidden' }}>{name}</a>
           </Link>
         ),
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <ContainerAssetId>
-            <Link href={`/asset/${assetId}?reference=ito`} key={assetId}>
+            <Link
+              href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
+            >
               {assetId}
             </Link>
             <Copy info="Asset ID" data={assetId} svgSize={18} />
@@ -150,71 +153,223 @@ const ITOsPage: React.FC = () => {
         span: 1,
       },
       {
-        element: (
-          <span key={bestKLVRate}>
+        element: props => (
+          <span>
             {bestKLVRate || '- -'}
             {bestKLVRate && ' KLV'}
           </span>
         ),
         span: 1,
       },
-      { element: <span key={assetType}>{assetType}</span>, span: 1 },
+      { element: props => <span>{assetType}</span>, span: 1 },
       {
-        element: (
-          <strong key={maxAmount}>
+        element: props => (
+          <strong>
             {renderSoldAmount()} {ticker}
           </strong>
         ),
         span: 1,
       },
       {
-        element: (
-          <strong key={maxAmount}>
+        element: props => (
+          <strong>
             {renderTotalAmount()} {ticker}
           </strong>
         ),
         span: 1,
       },
       {
-        element: <span key={access}>{access}</span>,
+        element: props => <span>{access}</span>,
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <ParticipateButton
             onClick={() => {
               setITO(asset);
               setOpenParticipateModal(true);
             }}
-            key={name}
           >
             Participate
           </ParticipateButton>
         ),
-        span: 1,
+        span: 2,
       },
     ];
 
     return sections;
   };
 
-  const header = [
-    '',
-    'Project Name',
-    'ID',
-    'Best KLV Rate',
-    'Type',
-    'Sold',
-    'Total',
-    'Access',
-    '',
-  ];
+export const getITOTabletRowSections =
+  (
+    setITO: (asset: IParsedITO) => void,
+    setOpenParticipateModal: (open: boolean) => void,
+    reference?: string,
+  ) =>
+  (asset: IParsedITO): IRowSection[] => {
+    const {
+      ticker,
+      name,
+      logo,
+      assetId,
+      assetType,
+      precision,
+      verified,
+      maxAmount,
+      mintedAmount,
+      packData,
+      startTime,
+      endTime,
+      whitelistStartTime,
+      whitelistEndTime,
+    } = asset;
+
+    const bestKLVRate = getBestKLVRate(packData);
+
+    const access = Date.now() < whitelistEndTime ? 'Whitelist Only' : 'Public';
+
+    const renderTotalAmount = (): ReactNode => {
+      return (
+        <strong>
+          {!(maxAmount === 0 || Number.isNaN(maxAmount)) ? (
+            formatAmount(maxAmount / 10 ** precision)
+          ) : (
+            <IoIosInfinite />
+          )}
+        </strong>
+      );
+    };
+    const renderSoldAmount = (): ReactNode => {
+      return (
+        <strong>
+          {mintedAmount && mintedAmount !== 0
+            ? formatAmount(mintedAmount / 10 ** precision)
+            : 0}
+        </strong>
+      );
+    };
+
+    const sections: IRowSection[] = [
+      {
+        element: props => (
+          <CenteredRow>
+            <Link
+              href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
+            >
+              <a>
+                <AssetLogo
+                  logo={logo}
+                  ticker={ticker}
+                  name={name}
+                  verified={verified}
+                  size={36}
+                />
+              </a>
+            </Link>
+            <DoubleRow>
+              <Link
+                href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
+              >
+                <ProjectName style={{ overflow: 'hidden' }}>{name}</ProjectName>
+              </Link>
+              <ContainerAssetId>
+                <Link
+                  href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
+                >
+                  {assetId}
+                </Link>
+                <Copy info="Asset ID" data={assetId} svgSize={18} />
+              </ContainerAssetId>
+            </DoubleRow>
+          </CenteredRow>
+        ),
+        span: 2,
+      },
+      { element: props => <span>{assetType}</span>, span: 1 },
+      {
+        element: props => <span>{access}</span>,
+        span: 1,
+      },
+      {
+        element: props => (
+          <DoubleRow>
+            <span>
+              {bestKLVRate || '- -'}
+              {bestKLVRate && ' KLV'}
+            </span>
+            <br />
+          </DoubleRow>
+        ),
+        span: 1,
+      },
+      {
+        element: props => (
+          <DoubleRow>
+            <strong>
+              {renderSoldAmount()} {ticker}
+            </strong>
+            <strong>
+              {renderTotalAmount()} {ticker}
+            </strong>
+          </DoubleRow>
+        ),
+        span: 1,
+      },
+      {
+        element: props => (
+          <ParticipateButton
+            onClick={() => {
+              setITO(asset);
+              setOpenParticipateModal(true);
+            }}
+          >
+            Participate
+          </ParticipateButton>
+        ),
+        span: 2,
+      },
+    ];
+
+    return sections;
+  };
+
+export const ITOheaders = [
+  '',
+  'Project Name',
+  'ID',
+  'Best KLV Rate',
+  'Type',
+  'Sold',
+  'Total',
+  'Access',
+  '',
+];
+export const ITOTabletheaders = [
+  '',
+  'Type',
+  'Access',
+  'Best KLV Rate',
+  'Sold/Total',
+  '',
+];
+
+const ITOsPage: React.FC = () => {
+  const [ITO, setITO] = useState<IParsedITO | null>(null);
+  const {
+    openParticipateModal,
+    setOpenParticipateModal,
+    txHash,
+    setTxHash,
+    setLoading,
+  } = useParticipate();
+  const { t } = useTranslation('itos');
+  const router = useRouter();
 
   const tableProps: ITable = {
-    rowSections,
-    header,
+    rowSections: getITOrowSections(setITO, setOpenParticipateModal, 'ito'),
+    header: ITOheaders,
     type: 'launchPad',
-    request: (page, limit) => requestITOSQuery(page, limit),
+    request: (page, limit) => requestITOSQuery(page, limit, router),
     dataName: 'itos',
     scrollUp: false,
     showLimit: false,
@@ -260,11 +415,14 @@ const ITOsPage: React.FC = () => {
   );
 };
 
-export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  locale = 'en',
+}) => {
   const props = await serverSideTranslations(
     locale,
     ['itos'],
     nextI18nextConfig,
+    ['en'],
   );
 
   return { props };

@@ -1,8 +1,8 @@
 import { WarningIcon } from '@/assets/calendar';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
-import BuyCard from '@/components/Marketplace/Buycard';
 import { BuyCardSkeleton } from '@/components/Marketplace/BuyCardSkeleton';
+import BuyCard from '@/components/Marketplace/Buycard';
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
 import { getBuyCards, getMarketplace } from '@/services/requests/marketplace';
@@ -30,13 +30,13 @@ import {
   GridSales,
   MktplaceCenteredRow,
 } from '@/views/marketplaces/detail';
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
-import { useQuery, UseQueryResult } from 'react-query';
+import React, { useEffect, useRef, useState } from 'react';
+import { UseQueryResult, useQuery } from 'react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
 
 export interface IBuyCard {
@@ -52,6 +52,8 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
   const pagination = props.pagination;
   const router = useRouter();
   const [page, setPage] = useState(1);
+
+  const tableRef = useRef<HTMLDivElement>(null);
 
   // const assetsKeys = Object.keys(
   //   serversideMarketplaceResponse.data.assets.assets || [],
@@ -228,7 +230,7 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
           route="/marketplaces"
         />
       </Header>
-      <CardTabContainer>
+      <CardTabContainer ref={tableRef}>
         <CardHeader>
           <CardHeaderItem selected={true}>
             <span>{t('common:Tabs.Overview')}</span>
@@ -241,7 +243,7 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
       {renderSellCards()}
       <PaginationContainer>
         <Pagination
-          scrollUp={true}
+          tableRef={tableRef}
           count={pagination?.totalPages}
           page={page}
           onPaginate={page => {
@@ -257,22 +259,15 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
   );
 };
 
-export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
-  return {
-    paths: [], //indicates that no page needs be created at build time
-    fallback: 'blocking', //indicates the type of fallback
-  };
-};
-
-export const getStaticProps: GetStaticProps<IMarketplaceResponse> = async ({
-  params,
-  locale = 'en',
-}) => {
+export const getServerSideProps: GetServerSideProps<
+  IMarketplaceResponse
+> = async ({ params, locale = 'en' }) => {
   const redirectProps = { redirect: { destination: '/404', permanent: false } };
   const translations = await serverSideTranslations(
     locale,
     ['common', 'marketPlaces'],
     nextI18nextConfig,
+    ['en'],
   );
   let props = {} as IMarketplaceResponse;
 

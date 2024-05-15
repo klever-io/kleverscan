@@ -3,7 +3,7 @@ import { isBeta } from './navbar';
 
 const coins: string[] = ['KLV', 'KFI'];
 
-const status: string[] = ['Success', 'Pending', 'Fail'];
+const status: string[] = ['Success', 'Fail'];
 
 const contracts = Object.values(ContractsName)
   .map(contract => contract)

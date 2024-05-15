@@ -346,6 +346,6 @@ export const ParticipateButton = styled.button<{ secondary?: boolean }>`
     secondary &&
     css`
       background-color: transparent;
-      color: ${theme.black};
+      color: ${theme.black} !important;
     `}
 `;

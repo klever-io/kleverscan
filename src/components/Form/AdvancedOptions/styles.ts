@@ -1,3 +1,4 @@
+import { DefaultCardStyleWithBorder } from '@/styles/common';
 import { lighten } from 'polished';
 import styled from 'styled-components';
 
@@ -14,6 +15,7 @@ export const Container = styled.div<IContainer>`
 `;
 
 export const ExtraOptionContainer = styled.div`
+  ${DefaultCardStyleWithBorder}
   display: flex;
   flex-direction: column;
 
@@ -24,12 +26,10 @@ export const ExtraOptionContainer = styled.div`
   border-radius: 12px;
   padding-top: 1rem;
   padding-bottom: 1rem;
-  background-color: ${props => props.theme.white};
   padding-left: 1rem;
   padding-right: 1.4rem;
   padding-top: 1.7rem;
   padding-bottom: 1.7rem;
-  box-shadow: 0 0 0.5rem -0.125rem ${props => lighten(0.8, '#000')};
 `;
 
 export const InputLabel = styled.label`

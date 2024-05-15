@@ -4,6 +4,7 @@ import { AiOutlineClose } from 'react-icons/ai';
 import { HiOutlineMenuAlt2 } from 'react-icons/hi';
 import styled, { css, keyframes } from 'styled-components';
 import { default as DefaultInput } from '../InputGlobal';
+import { DefaultCardStyleWithBorder } from '@/styles/common';
 
 interface IMobileMenu {
   opened: boolean;
@@ -21,7 +22,8 @@ export const Container = styled.div`
   transition: top 0.1s linear;
   background-color: ${props =>
     props.theme.dark ? props.theme.background : props.theme.true.white};
-  border-bottom: 1px solid ${props => props.theme.blue};
+  border-bottom: 1px solid
+    ${props => (props.theme.dark ? props.theme.blue : props.theme.black10)};
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
     justify-content: space-between;
@@ -366,7 +368,9 @@ export const MobileBackground = styled.div<IMobileMenu>`
   background-color: ${props =>
     transparentize(props.theme.dark ? 0.85 : 0.7, props.theme.black)};
 
-  transition: opacity 0.5s ease, visibility 0.5s ease;
+  transition:
+    opacity 0.5s ease,
+    visibility 0.5s ease;
 `;
 
 const expand = keyframes`
@@ -385,7 +389,6 @@ export const DropdownContainer = styled.div`
   position: absolute;
   bottom: 0;
   right: -5vw;
-  top: 0;
   animation: ${expand} 0.2s ease;
 
   border-radius: 0 0 0.5rem 0.5rem;
@@ -428,6 +431,7 @@ export const DropdownItem = styled.li<{ disabled: boolean }>`
 `;
 
 export const DropdownMenu = styled.ul`
+  ${DefaultCardStyleWithBorder}
   width: max-content;
   padding: 0.7rem;
   background-color: ${props =>
@@ -448,7 +452,6 @@ export const MenuIcon = styled(HiOutlineMenuAlt2).attrs(props => ({
 
 export const ConnectContainer = styled.div`
   display: flex;
-  max-width: 10rem;
   width: 100%;
   z-index: 5;
   position: sticky;
@@ -475,10 +478,8 @@ export const ConnectionWrapper = styled.div`
   position: relative;
   z-index: 3;
   padding: 0.75rem 1.5rem;
-  border-top: 1px solid
-    ${props => (props.theme.dark ? props.theme.blue : props.theme.lightGray)};
   border-bottom: 1px solid
-    ${props => (props.theme.dark ? props.theme.blue : props.theme.lightGray)};
+    ${props => (props.theme.dark ? props.theme.blue : props.theme.black10)};
   display: flex;
   justify-content: space-between;
   align-items: center;

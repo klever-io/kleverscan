@@ -89,7 +89,6 @@ export const Row = styled.div<ITableType>`
 export const ContainerAssetId = styled.section`
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 4px;
   overflow: hidden;
   width: 100%;
@@ -100,6 +99,10 @@ export const ContainerAssetId = styled.section`
 
   a {
     overflow: hidden;
+  }
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    justify-content: space-between;
   }
 `;
 
@@ -114,25 +117,6 @@ export const ContainerAssetName = styled(ContainerAssetId)`
 export const AssetPageContainer = styled(Container)`
   max-width: 1440px;
   margin: 0 auto;
-`;
-
-export const AssetCardHeaderItem = styled(CardHeaderItem)`
-  background: none;
-
-  &:last-of-type,
-  &:first-of-type {
-    border: none;
-  }
-
-  span {
-    transition: none;
-
-    ${props =>
-      props.selected &&
-      css`
-        border-bottom: 2px solid ${props => props.theme.violet};
-      `}
-  }
 `;
 
 export const AssetCardContent = styled(CardContent)`

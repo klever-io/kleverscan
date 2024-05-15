@@ -24,33 +24,8 @@ export const Container = styled.div`
 `;
 
 export const ArrowContainer = styled.div<{ active: boolean }>`
-  height: 2rem;
-  width: 2rem;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  background-color: ${props => props.theme.white};
-
-  border-radius: 50%;
-
-  cursor: ${props => (props.active ? 'pointer' : 'not-allowed')};
-
-  opacity: ${props => !props.active && 0.3};
-`;
-
-export const ItemContainer = styled.div<{
-  active: boolean;
-  onClick: () => void;
-}>`
-  height: 2rem;
-  width: 2rem;
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    font-size: smaller;
-  }
+  height: 40px;
+  width: 40px;
 
   display: flex;
 
@@ -58,7 +33,47 @@ export const ItemContainer = styled.div<{
   justify-content: center;
 
   background-color: ${props =>
-    props.active ? props.theme.purple : 'transparent'};
+    props.theme.dark ? props.theme.true.black : props.theme.lightBlue};
+
+  border-radius: 50%;
+
+  cursor: ${props => (props.active ? 'pointer' : 'not-allowed')};
+
+  opacity: ${props => !props.active && 0.3};
+
+  transition: background-color 0.1s ease;
+
+  svg {
+    path {
+      fill: ${props => props.theme.true.white};
+    }
+  }
+
+  &:hover {
+    ${props =>
+      props.active &&
+      css`
+        background-color: ${props => props.theme.violet};
+      `}
+  }
+`;
+
+export const ItemContainer = styled.div<{
+  active: boolean;
+  onClick: () => void;
+}>`
+  height: 24px;
+  width: 24px;
+
+  font-size: 1rem;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background-color: ${props =>
+    props.active ? props.theme.violet : 'transparent'};
 
   border-radius: 50%;
 
@@ -73,8 +88,8 @@ export const ItemContainer = styled.div<{
     ${props =>
       !props.active
         ? css`
-            background-color: ${props => props.theme.purple};
-            color: ${props => props.theme.white};
+            background-color: ${props => props.theme.violet};
+            color: ${props => props.theme.true.white};
           `
         : css`
             cursor: not-allowed;

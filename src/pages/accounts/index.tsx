@@ -2,7 +2,7 @@ import { Accounts as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
 import Skeleton from '@/components/Skeleton';
-import Table, { ITable } from '@/components/Table';
+import Table, { ITable } from '@/components/TableV2';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import {
@@ -11,6 +11,7 @@ import {
   CenteredRow,
   Container,
   Header,
+  Mono,
 } from '@/styles/common';
 import { IAccount, IPagination, IResponse, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
@@ -18,12 +19,12 @@ import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import { getAge } from '@/utils/timeFunctions';
 import { TableContainer } from '@/views/accounts';
-import { GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
+import { GetServerSideProps } from 'next';
 
 interface IAccounts {
   accounts: IAccount[];
@@ -179,21 +180,23 @@ const Accounts: React.FC<IAccounts> = () => {
 
   const header = [
     `${t('table:Address')}`,
-    `KLV ${t('table:Staked')}`,
     'Nonce',
     `KLV ${t('table:Balance')}`,
+    `KLV ${t('table:Staked')}`,
   ];
 
   const { isMobile } = useMobile();
 
   const rowSections = (account: IAccount): IRowSection[] => {
     const { address, balance, frozenBalance, nonce } = account;
-    const sections = [
+    const sections: IRowSection[] = [
       {
-        element: (
+        element: props => (
           <CenteredRow key={address}>
             <Link href={`/account/${address}`}>
-              {isMobile ? parseAddress(address, 24) : address}
+              <a>
+                <Mono>{isMobile ? parseAddress(address, 24) : address}</Mono>
+              </a>
             </Link>
 
             <Copy info="Address" data={address} />
@@ -201,24 +204,24 @@ const Accounts: React.FC<IAccounts> = () => {
         ),
         span: 2,
       },
-
       {
-        element: (
-          <strong key={frozenBalance}>
-            {formatAmount(frozenBalance / 10 ** KLV_PRECISION)} KLV
-          </strong>
+        element: props => <span key={nonce}>{nonce}</span>,
+        span: 1,
+        width: 100,
+      },
+      {
+        element: props => (
+          <span key={balance}>
+            {formatAmount(balance / 10 ** KLV_PRECISION)} KLV
+          </span>
         ),
         span: 1,
       },
       {
-        element: <span key={nonce}>{nonce}</span>,
-        span: 1,
-      },
-      {
-        element: (
-          <strong key={balance}>
-            {formatAmount(balance / 10 ** KLV_PRECISION)} KLV
-          </strong>
+        element: props => (
+          <span key={frozenBalance}>
+            {formatAmount(frozenBalance / 10 ** KLV_PRECISION)} KLV
+          </span>
         ),
         span: 1,
       },
@@ -232,7 +235,6 @@ const Accounts: React.FC<IAccounts> = () => {
     rowSections,
     request: (page, limit) => requestAccounts(page, limit),
     dataName: 'accounts',
-    scrollUp: true,
   };
 
   return (
@@ -255,11 +257,14 @@ const Accounts: React.FC<IAccounts> = () => {
   );
 };
 
-export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  locale = 'en',
+}) => {
   const props = await serverSideTranslations(
     locale,
     ['common', 'accounts', 'table'],
     nextI18nextConfig,
+    ['en'],
   );
 
   return { props };

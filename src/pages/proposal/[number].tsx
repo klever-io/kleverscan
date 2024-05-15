@@ -1,9 +1,9 @@
 import { Copy } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import Title from '@/components/Layout/Title';
-import Table, { ITable } from '@/components/Table';
 import { Status } from '@/components/Table/styles';
-import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
+import Table, { ITable } from '@/components/TableV2';
+import { proposalsMap } from '@/components/Tabs/NetworkParams/proposalsMap';
 import Tooltip from '@/components/Tooltip';
 import { useContractModal } from '@/contexts/contractModal';
 import api from '@/services/api';
@@ -17,6 +17,7 @@ import {
   CardHeader,
   CardHeaderItem,
   CardTabContainer,
+  CenteredRow,
   Container,
 } from '@/styles/common';
 import { IRowSection } from '@/types/index';
@@ -66,8 +67,7 @@ import {
   VotesHeader,
 } from '@/views/proposals/detail';
 import { ButtonExpand } from '@/views/transactions/detail';
-import { CenteredRow } from '@/views/validators/detail';
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
@@ -80,10 +80,10 @@ import nextI18nextConfig from '../../../next-i18next.config';
 const ProposalVoters = (props: IProposalVoters) => {
   const rowSections = (props: IParsedVote): IRowSection[] => {
     const { status, voter, votingPower, voteDate } = props;
-    let sections = [{ element: <></>, span: 1 }];
+    let sections: IRowSection[] = [{ element: props => <></>, span: 1 }];
     sections = [
       {
-        element: (
+        element: props => (
           <CenteredRow key={voter}>
             <Link href={`/account/${voter}`}>{parseAddress(voter, 24)}</Link>
             <Copy data={voter} info="voter"></Copy>
@@ -91,16 +91,19 @@ const ProposalVoters = (props: IProposalVoters) => {
         ),
         span: 2,
       },
-      { element: <p key={votingPower}>{votingPower}%</p>, span: 1 },
       {
-        element: (
+        element: props => <span key={votingPower}>{votingPower}%</span>,
+        span: 1,
+      },
+      {
+        element: props => (
           <StatusContent key={status}>
             <AiFillCheckCircle
               color={typeVoteColors[status]}
               size={18}
               style={{ marginRight: 5 }}
             />
-            <small>{voteDate}</small>
+            <span>{voteDate}</span>
           </StatusContent>
         ),
         span: 1,
@@ -178,10 +181,10 @@ const ProposalDetails: React.FC = () => {
     let parsedProposalParams: IParsedProposalParam[] = [];
 
     if (apiNetworkParams) {
-      Object.keys(proposalsMessages).map((key, index) => {
-        currentNetworkParams[proposalsMessages[key]] = {
+      Object.keys(proposalsMap).map((key, index) => {
+        currentNetworkParams[proposalsMap[key].message] = {
           number: index,
-          parameter: proposalsMessages[key] ? proposalsMessages[key] : '',
+          parameter: proposalsMap[key] ? proposalsMap[key].message : '',
           currentValue: apiNetworkParams?.[key]?.value,
           parameterLabel: key,
         };
@@ -194,7 +197,7 @@ const ProposalDetails: React.FC = () => {
           paramIndex: index,
           paramLabel: NetworkParamsIndexer[index],
           paramValue: Number(value),
-          paramText: proposalsMessages[NetworkParamsIndexer[index]],
+          paramText: proposalsMap[NetworkParamsIndexer[index]].message,
         };
       });
     }
@@ -545,21 +548,17 @@ const ProposalDetails: React.FC = () => {
   );
 };
 
-export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  locale = 'en',
+}) => {
   const props = await serverSideTranslations(
     locale,
     ['common', 'proposals'],
     nextI18nextConfig,
+    ['en'],
   );
 
   return { props };
-};
-
-export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
-  return {
-    paths: [], //indicates that no page needs be created at build time
-    fallback: 'blocking', //indicates the type of fallback
-  };
 };
 
 export default ProposalDetails;

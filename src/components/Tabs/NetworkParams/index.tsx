@@ -1,8 +1,10 @@
-import Table, { ITable } from '@/components/Table';
+import Table, { ITable } from '@/components/TableV2';
 import api from '@/services/api';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
 import React from 'react';
-import { proposalsMessages } from './proposalMessages';
+import { proposalsMap } from './proposalsMap';
+import { toLocaleFixed } from '@/utils/formatFunctions';
+import { useContractModal } from '@/contexts/contractModal';
 
 interface INetworkParams extends IPaginatedResponse {
   data: {
@@ -27,13 +29,13 @@ const requestNetworkParams = async (): Promise<INetworkParams> => {
   };
 
   if (data) {
-    networkParams.data.parameters = Object.keys(proposalsMessages)
+    networkParams.data.parameters = Object.keys(proposalsMap)
       .map((key, index) => {
         return {
           number: index,
-          parameter: proposalsMessages[key] ? proposalsMessages[key] : '',
+          parameter: proposalsMap[key].message ? proposalsMap[key].message : '',
           currentValue: data.parameters[key]?.value
-            ? data.parameters[key].value
+            ? `${(Number(data.parameters[key].value) / 10 ** proposalsMap[key].precision).toLocaleString()} ${proposalsMap[key].unit}`
             : '',
         };
       })
@@ -44,24 +46,46 @@ const requestNetworkParams = async (): Promise<INetworkParams> => {
 };
 
 const NetworkParams: React.FC = () => {
+  const { getInteractionsButtons } = useContractModal();
+
   const rowSections = (props: INetworkParam): IRowSection[] => {
     const { number, parameter, currentValue } = props;
-
     return [
-      { element: <strong key={String(number)}>#{number}</strong>, span: 2 },
-      { element: <p key={parameter}>{parameter}</p>, span: 2 },
       {
-        element: (
+        element: props => <span key={String(number)}>#{number}</span>,
+        span: 2,
+        width: 100,
+      },
+      { element: props => <p key={parameter}>{parameter}</p>, span: 1 },
+      {
+        element: props => (
           <p key={currentValue} className="currentValue">
             {currentValue}
           </p>
         ),
         span: 1,
       },
+      {
+        element: props => {
+          const [ProposalButton] = getInteractionsButtons([
+            {
+              title: 'Propose Change',
+              contractType: 'ProposalContract',
+              defaultValues: {
+                parameters: [{ label: number, value: '' }],
+              },
+              buttonStyle: 'primary',
+            },
+          ]);
+          return <ProposalButton />;
+        },
+        span: 2,
+        width: 200,
+      },
     ];
   };
 
-  const header = ['Number', 'Parameter', 'Current Value'];
+  const header = ['Number', 'Parameter', 'Current Value', 'Change'];
 
   const tableProps: ITable = {
     rowSections,

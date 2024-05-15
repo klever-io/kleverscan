@@ -95,7 +95,7 @@ export const SectionTitle = styled.h2`
   margin-bottom: 1rem;
 `;
 
-export const Row = styled.div<{ isStakingRoyalties?: boolean; span?: number }>`
+export const Row = styled.div<{ span?: number }>`
   width: 100%;
   padding: 0.75rem 1rem;
   gap: 4px;
@@ -121,13 +121,13 @@ export const Row = styled.div<{ isStakingRoyalties?: boolean; span?: number }>`
     strong {
       font-weight: 500;
       font-size: 0.95rem;
-      color: ${props => props.theme.darkText};
+      color: ${props => props.theme.black};
     }
 
     small {
       font-weight: 400;
       font-size: 0.95rem;
-      color: ${props => props.theme.darkText};
+      color: ${props => props.theme.black};
     }
 
     a {
@@ -137,7 +137,7 @@ export const Row = styled.div<{ isStakingRoyalties?: boolean; span?: number }>`
     }
 
     p {
-      color: ${props => props.theme.darkText};
+      color: ${props => props.theme.black};
       font-weight: 400;
     }
   }
@@ -153,10 +153,10 @@ export const Row = styled.div<{ isStakingRoyalties?: boolean; span?: number }>`
     word-break: break-all;
   }
 
-  &:after {
+  &::after {
     content: '';
     position: absolute;
-    border-bottom: 1px solid ${props => props.theme.card.border};
+    border-bottom: 1px solid ${props => props.theme.faq.border};
     bottom: 0px;
 
     left: 0;
@@ -179,19 +179,24 @@ export const AssetEmptyRow = styled(EmptyRow)`
 `;
 
 export const FPRRow = styled(Row)`
-  overflow: auto;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  border-left: 1px solid ${props => props.theme.black20};
+  border-right: 1px solid ${props => props.theme.black20};
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     align-items: center;
+  }
+
+  &:after {
+    width: 100%;
   }
 `;
 
 export const ExpandableRow = styled(Row)<{ expandVar: boolean }>`
   ${props =>
     props.expandVar &&
-    ` 
+    `
 flex-direction: column !important;
 align-items: start !important;
 `}
@@ -200,7 +205,7 @@ align-items: start !important;
 export const WhiteListRow = styled(Row)<{ expandVar: boolean }>`
   ${props =>
     props.expandVar &&
-    ` 
+    `
 flex-direction: column !important;
 align-items: start !important;
 `}
@@ -223,7 +228,7 @@ export const ExpandWrapper = styled.div<{ expandVar: boolean }>`
 
   ${props =>
     !props.expandVar &&
-    ` 
+    `
 flex-direction: column;
 `}
 `;
@@ -256,7 +261,7 @@ export const FrozenContainer = styled.div`
   display: flex;
   overflow: auto;
   flex-direction: column;
-  background-color: ${props => props.theme.accountCard.frozenBackground};
+  border: 1px solid ${props => props.theme.black20};
   border-radius: 0.75rem;
   flex-wrap: wrap;
   overflow-x: auto;
@@ -278,14 +283,14 @@ export const FrozenContainer = styled.div`
   }
 
   div {
-    padding: 1.25rem 2rem;
+    padding: 1.1rem 2rem;
     display: flex;
     flex-direction: row;
     align-items: center;
 
     gap: 1rem;
     &:not(:last-child) {
-      border-bottom: 1px solid ${props => props.theme.card.border};
+      border-bottom: 1px solid ${props => props.theme.black20};
       border-width: 100%;
       border-bottom-left-radius: 0px;
       border-bottom-right-radius: 0px;
@@ -293,11 +298,11 @@ export const FrozenContainer = styled.div`
     strong {
       min-width: 15rem;
       font-weight: 600;
-      color: ${props => props.theme.darkText};
+      color: ${props => props.theme.black};
     }
 
     span {
-      color: ${props => props.theme.darkText};
+      color: ${props => props.theme.black};
     }
     p {
       font-weight: 400;
@@ -336,6 +341,7 @@ export const ContentRow = styled.div`
     padding: 0px;
   }
 `;
+
 export const ContentScrollBar = styled.div`
   width: 100%;
   overflow-x: scroll;
@@ -415,23 +421,25 @@ export const EllipsisSpan = styled.span`
   }
 `;
 
-export const StakingHistoryTitle = styled.div`
-  background-color: ${props => props.theme.card.border};
+export const StakingHistoryBase = styled.div`
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 2.5rem;
-  border-radius: 10px 10px 0 0;
-  max-height: 92px;
-  flex-direction: column;
   gap: 0.3rem;
-  color: ${props => props.theme.darkText};
+  padding: 8px 0;
+
+  grid-column: auto / span 2;
+  border: 1px solid ${props => props.theme.black20};
+  color: ${props => props.theme.black};
+
   strong {
     font-weight: 600;
     font-size: larger;
-    color: ${props => props.theme.darkText};
+    color: ${props => props.theme.black};
     margin-right: 0.2rem;
   }
+
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     flex-direction: row;
     padding: 1.5rem;
@@ -440,18 +448,36 @@ export const StakingHistoryTitle = styled.div`
   }
 `;
 
-export const PaginationHistory = styled(StakingHistoryTitle)`
-  border-radius: 0;
-  padding: 1.5rem;
-  max-height: 30px;
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
+export const StakingHistoryHeader = styled(StakingHistoryBase)`
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  padding: 1rem;
+  border-radius: 10px 10px 0 0;
+  background-color: ${props => props.theme.background};
+`;
+
+export const StakingHistoryFooter = styled(StakingHistoryBase)`
+  position: sticky;
+  bottom: 0;
+  border-top: 0;
+
+  border-radius: 0 0 10px 10px;
+  background-color: ${props => props.theme.background};
+
   strong {
     font-size: medium;
   }
-  :hover {
+
+  &:hover {
     cursor: pointer;
   }
+`;
+
+export const StakingHistoryScrollFooter = styled(StakingHistoryFooter)`
+  border-radius: unset;
+  padding: 1rem;
 `;
 
 export const TitleWrapper = styled.div`
@@ -546,12 +572,12 @@ export const EpochWrapper = styled.div`
 
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: ${props => props.theme.shadow};
+    color: ${props => props.theme.black};
 
     strong {
       font-weight: 600;
       font-size: 0.95rem;
-      color: ${props => props.theme.shadow};
+      color: ${props => props.theme.black};
     }
   }
 `;
@@ -564,11 +590,11 @@ export const EpochGeneralData = styled.div`
   gap: 2rem;
   min-height: 182px;
   height: 100%;
-  background-color: ${props => props.theme.lightBlue};
   border-radius: 10px;
+  border: 1px solid ${props => props.theme.black20};
   text-align: center;
   margin: 0.5rem;
-  color: ${props => props.theme.true.white};
+  color: ${props => props.theme.black};
 `;
 
 export const ShowDetailsButton = styled.button`

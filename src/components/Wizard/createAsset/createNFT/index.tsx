@@ -26,10 +26,10 @@ import {
   CreateAssetTickerStep,
   CreateAssetWelcomeStep,
   DesktopStepsComponent,
-  infinitySymbol,
-  propertiesCommonDefaultValues,
   StepsBasics,
   URIsSection,
+  infinitySymbol,
+  propertiesCommonDefaultValues,
 } from '..';
 import { createNFT, parseRoles } from '../../utils';
 import { WizardBody } from '../styles';
@@ -123,7 +123,7 @@ const WizCreateNFT: React.FC<any> = ({
     },
     {
       key: 'selectAssetMaxSupply',
-      label: 'Select Asset Max Supply',
+      label: 'Select Asset Maximum Supply',
       isDone: false,
       component: (
         <CreateAssetMaxSupplyStep

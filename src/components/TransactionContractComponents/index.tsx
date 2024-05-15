@@ -17,8 +17,8 @@ import {
   IDelegateContract,
   IDepositContract,
   IFreezeContract,
-  IIndexedContract,
   IITOTriggerContract,
+  IIndexedContract,
   IPackInfo,
   IProposalContract,
   ISellContract,
@@ -27,10 +27,10 @@ import {
   ISmartContract,
   ITOTriggerType,
   ITransferContract,
+  IURIs,
   IUndelegateContract,
   IUnfreezeContract,
   IUpdateAccountPermissionContract,
-  IURIs,
   IValidatorConfigContract,
   IVoteContract,
   IWithdrawContract,
@@ -384,7 +384,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
       </Row>
       <Row>
         <span>
-          <strong>Max Supply</strong>
+          <strong>Maximum Supply</strong>
         </span>
         <span>
           <small>
@@ -2643,14 +2643,14 @@ export const SmartContract: React.FC<IIndexedContract> = ({
           <RowContent>
             <BalanceContainer>
               <NetworkParamsContainer>
-                {Object.entries(parameter?.callValue || {}).map(
-                  ([key, value]) => (
-                    <div key={key}>
-                      <strong>{key}</strong>
+                {(parameter?.callValue || []).map(({ asset, value }) => {
+                  return (
+                    <div key={asset}>
+                      <strong>{asset}</strong>
                       <span>{value}</span>
                     </div>
-                  ),
-                )}
+                  );
+                })}
               </NetworkParamsContainer>
             </BalanceContainer>
           </RowContent>
@@ -2955,15 +2955,15 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerTypeData> = ({
                 <span>{par.staking?.apr}</span>
               </section>
               <section>
-                <StrongWidth>min Epochs To Claim</StrongWidth>
+                <StrongWidth>Minimum Epochs To Claim</StrongWidth>
                 <span>{par.staking?.minEpochsToClaim}</span>
               </section>
               <section>
-                <StrongWidth>min Epochs To Unstake</StrongWidth>
+                <StrongWidth>Minimum Epochs To Unstake</StrongWidth>
                 <span>{par.staking?.minEpochsToUnstake}</span>
               </section>
               <section>
-                <StrongWidth>min Epochs To Withdraw</StrongWidth>
+                <StrongWidth>Minimum Epochs To Withdraw</StrongWidth>
                 <span>{par.staking?.minEpochsToWithdraw}</span>
               </section>
               <section>

@@ -9,5 +9,8 @@ module.exports = {
     ],
     defaultLocale: 'en',
   },
+  fallbackLng: {
+    default: ['en'],
+  },
   localePath: path.resolve('./public/locales'),
 };

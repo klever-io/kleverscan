@@ -1,10 +1,9 @@
+import { TableRowElementProps } from '@/types';
 import { transparentize } from 'polished';
 import styled, { css } from 'styled-components';
 
 export const Container = styled.div`
   display: flex;
-
-  gap: 2rem;
 
   flex-direction: column;
 `;
@@ -57,11 +56,19 @@ export const CardContainer = styled.section`
 
 export const DefaultCardStyles = css`
   background-color: ${props =>
-    props.theme.dark ? props.theme.navbar.background : props.theme.white};
+    props.theme.dark ? props.theme.table.background : props.theme.white};
+`;
+
+export const DefaultCardStyleWithBorder = css`
+  ${DefaultCardStyles}
+
+  border: 1px solid ${props =>
+    props.theme.dark ? props.theme.black20 : props.theme.black10};
+  border-radius: 24px;
 `;
 
 export const Card = styled.div`
-  ${DefaultCardStyles}
+  ${DefaultCardStyleWithBorder}
 
   width: 100%;
   padding: 1.5rem;
@@ -170,7 +177,7 @@ export const Row = styled.div<{ isMobileRow?: boolean }>`
   &:not(:last-child) {
     border-bottom: 1px solid
       ${props =>
-        props.theme.dark ? props.theme.footer.border : props.theme.lightGray};
+        props.theme.dark ? props.theme.black10 : props.theme.lightGray};
 
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
@@ -238,6 +245,26 @@ export const RowContent = styled.div`
   min-width: 30%;
 `;
 
+export const DoubleRow = styled.div<TableRowElementProps>`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  width: fit-content;
+
+  ${props =>
+    props.smaller &&
+    css`
+      gap: 4px;
+    `}
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    gap: 4px;
+  }
+`;
+
 export const CenteredRow = styled.div`
   display: flex;
   align-items: center;
@@ -250,17 +277,15 @@ export const CenteredRow = styled.div`
   overflow: visible;
 
   strong {
-    font-size: 1rem;
     font-weight: 600;
   }
 
   a {
     color: ${props => props.theme.black};
 
-    font-size: 1rem;
     font-weight: 600;
-    text-decoration: none;
 
+    padding-bottom: 1px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -268,7 +293,6 @@ export const CenteredRow = styled.div`
 
   p {
     font-weight: 600;
-    font-size: 0.85rem;
   }
 
   svg {
@@ -276,19 +300,26 @@ export const CenteredRow = styled.div`
   }
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    flex-wrap: wrap;
+    span,
+    a,
+    p {
+      min-width: fit-content;
+    }
   }
 `;
 
+export const Mono = styled.span`
+  font-family: 'Fira Mono', monospace;
+`;
+
 export const FrozenContainer = styled.div`
-  margin-top: 0.5rem;
   width: 100%;
 
   display: flex;
 
   flex-direction: column;
 
-  background-color: ${props => props.theme.accountCard.frozenBackground};
+  border: 1px solid ${props => props.theme.black20};
   border-radius: 0.75rem;
 
   div {
@@ -301,11 +332,9 @@ export const FrozenContainer = styled.div`
     align-items: center;
 
     &:not(:last-child) {
+      border-bottom: 1px solid ${props => props.theme.black20};
       border-bottom-left-radius: 0px;
       border-bottom-right-radius: 0px;
-    }
-    &:not(:first-child) {
-      /* border-top: 1px solid ${props => props.theme.card.border}; */
     }
     strong {
       width: 10rem;
@@ -339,18 +368,14 @@ export const CardContent = styled.div`
   ${DefaultCardStyles};
   width: 100%;
 
-  border-radius: 0 0.75rem 0.75rem 0.75rem;
+  border-radius: 0.75rem;
 `;
 
 export const CardHeaderItem = styled.div<{ selected: boolean }>`
-  ${DefaultCardStyles}
   border-bottom: none;
   border-right: none;
   box-shadow: none;
   padding: 1rem;
-
-  background-color: ${props =>
-    props.selected ? props.theme.white : 'transparent'};
 
   border-radius: 0;
 
@@ -366,20 +391,11 @@ export const CardHeaderItem = styled.div<{ selected: boolean }>`
 
     opacity: ${props => (props.selected ? 1 : 0.33)};
 
-    transition: 0.2s ease;
-  }
-
-  &:first-of-type {
-    border-radius: 0.75rem 0 0 0;
-  }
-  &:last-of-type {
-    border-radius: 0 0.75rem 0 0;
-    border-right: 1px solid
-      ${props =>
-        props.theme.dark ? props.theme.footer.border : props.theme.lightGray};
-  }
-  &:only-child {
-    border-radius: 0.75rem 0.75rem 0 0;
+    ${props =>
+      props.selected &&
+      css`
+        border-bottom: 2px solid ${props => props.theme.violet};
+      `}
   }
 `;
 

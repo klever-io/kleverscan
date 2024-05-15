@@ -331,16 +331,31 @@ export const CustomLink = styled.a<{
   align-self: end;
   min-width: 13rem;
   text-align: center;
+
+  display: flex;
+  justify-content: center;
+  padding: 8px 16px;
+
+  height: 34px !important;
+
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: ${props => (props.tabAsset ? '500' : '600')}!important;
+
+  min-width: 8rem;
+  max-width: 15rem;
+
+  background: ${props => (props.tabAsset ? '' : props.theme.violet)};
   color: ${props =>
     props.tabAsset ? props.theme.black : props.theme.true.white} !important;
-  border: 2px solid ${props => props.theme.violet};
-  background: ${props => (props.tabAsset ? '' : props.theme.violet)};
-  padding: 0.625rem 2.94rem;
-  font-weight: ${props => (props.tabAsset ? '500' : '600')}!important;
-  border-radius: 4px;
+  border: 1px solid ${props => transparentize(0.75, props.theme.black)};
+  border-radius: 24px;
+
   cursor: pointer;
+
+  transition: all 0.1s ease;
+
   &:hover {
-    filter: brightness(1.1);
     background: ${props => props.theme.violet};
   }
 
@@ -362,7 +377,6 @@ export const FloatContainer = styled.div`
 
 export const LimitContainer = styled.div`
   ${DefaultCardStyles}
-  margin-left: auto;
   display: block;
   position: relative;
   float: right;

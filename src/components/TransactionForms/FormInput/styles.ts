@@ -22,7 +22,7 @@ const defaultStyles = css`
   width: 100%;
 
   padding: 0.5rem 1rem;
-  border: 1px solid ${({ theme }) => theme.darkText};
+  border: 1px solid ${({ theme }) => theme.black20};
   border-radius: 0.5rem;
 
   color: ${({ theme }) => theme.darkText};
@@ -200,11 +200,10 @@ export const TooltipContent = styled.div`
 export const Container = styled.div<IProps>`
   width: 100%;
   position: relative;
-  ${props =>
-    css`
-      grid-column: auto / span ${props.span};
-      padding-top: ${props.paddingTop ? props.paddingTop : 0}rem;
-    `}
+  ${props => css`
+    grid-column: auto / span ${props.span};
+    padding-top: ${props.paddingTop ? props.paddingTop : 0}rem;
+  `}
 
   > span {
     color: ${props => (props.error ? props.theme.error : props.theme.gray)};
@@ -246,7 +245,11 @@ export const Slider = styled.div<{ active?: string; disabled?: boolean }>`
   right: 0;
   bottom: 0;
   background-color: ${props =>
-    props?.active === 'true' ? props.theme.purple : lighten(0, '#7B7DB2')};
+    props?.active === 'true'
+      ? props.theme.dark
+        ? props.theme.purple
+        : props.theme.violet
+      : lighten(0, '#7B7DB2')};
   -webkit-transition: 0.4s;
   transition: 0.4s;
   border-radius: 5rem;
@@ -332,8 +335,7 @@ export const TooltipContainer = styled.div<{
 `;
 
 export const RequiredSpan = styled.span`
-  color: ${props =>
-    props.theme.dark ? props.theme.lightBlue : props.theme.lightGray};
+  color: ${({ theme }) => (theme.dark ? theme.lightPurple : theme.purple)};
 `;
 
 export const InputLabel = styled.label<ILabel>`
@@ -383,10 +385,19 @@ export const ErrorMessage = styled.span<{ warning?: boolean }>`
     `}
 `;
 
-export const DropdownCustomLabel = styled(InputLabel)`
+export const MarginRightAutoLabel = styled.span`
+  width: 100%;
+  margin-right: auto;
+`;
+
+export const DropdownCustomLabel = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
   margin: 0;
   > span {
-    margin-left: auto;
+    white-space: nowrap;
   }
 `;
 

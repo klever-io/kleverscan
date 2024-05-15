@@ -4,6 +4,7 @@ import { Loader } from '@/components/Loader/styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import {
   IAccountResponse,
+  IAsset,
   IAssetResponse,
   IRowSection,
   ITransactionResponse,
@@ -119,7 +120,7 @@ export const TransactionRowSections = (
 
     return [
       {
-        element: (
+        element: props => (
           <TitleWrapper>
             <TitleSpan>Transaction Summary</TitleSpan>
             {getRedirectButton(
@@ -131,12 +132,12 @@ export const TransactionRowSections = (
         span: 2,
       },
       {
-        element: <span>{getTxStatus()}</span>,
+        element: props => <span>{getTxStatus()}</span>,
         span: 1,
       },
-      { element: <DateSpan>{date}</DateSpan>, span: 1 },
+      { element: props => <DateSpan>{date}</DateSpan>, span: 1 },
       {
-        element: (
+        element: props => (
           <HashSpan onClick={() => setShowTooltip(false)}>
             <Link href={`/transaction/${transaction.hash}`}>
               {transaction.hash}
@@ -145,9 +146,9 @@ export const TransactionRowSections = (
         ),
         span: 1,
       },
-      { element: amountOrContractType(), span: 1 },
+      { element: props => amountOrContractType(), span: 1 },
       {
-        element: (
+        element: props => (
           <SpanWrapper>
             From:{' '}
             <UnderlineSpan onClick={() => setShowTooltip(false)}>
@@ -160,14 +161,14 @@ export const TransactionRowSections = (
         span: 1,
       },
       {
-        element: <SpanWrapper>To: {getReceiver()}</SpanWrapper>,
+        element: props => <SpanWrapper>To: {getReceiver()}</SpanWrapper>,
         span: 1,
       },
     ];
   }
   return [
-    { element: <TitleSpan>Transaction Summary</TitleSpan>, span: 2 },
-    { element: <span>{res.error}</span>, span: 2 },
+    { element: props => <TitleSpan>Transaction Summary</TitleSpan>, span: 2 },
+    { element: props => <span>{res.error}</span>, span: 2 },
   ];
 };
 
@@ -177,11 +178,11 @@ export const AssetRowSections = (
   setShowTooltip: React.Dispatch<SetStateAction<boolean>>,
 ): IRowSection[] => {
   if (res.data || res.error === '') {
-    const { asset } = res.data;
+    const asset = res.data?.asset as IAsset;
 
     return [
       {
-        element: (
+        element: props => (
           <TitleWrapper>
             <TitleSpan>Token Summary</TitleSpan>
             {getRedirectButton(`/asset/${asset.assetId}`, setShowTooltip)}
@@ -190,7 +191,7 @@ export const AssetRowSections = (
         span: 2,
       },
       {
-        element: (
+        element: props => (
           <HoverDiv onClick={() => setShowTooltip(false)}>
             <Link href={`/asset/${asset.assetId}`}>
               <LogoWrapper>
@@ -211,9 +212,12 @@ export const AssetRowSections = (
         ),
         span: 1,
       },
-      { element: <AssetTypeSpan>{asset.assetType}</AssetTypeSpan>, span: 1 },
       {
-        element: (
+        element: props => <AssetTypeSpan>{asset.assetType}</AssetTypeSpan>,
+        span: 1,
+      },
+      {
+        element: props => (
           <>
             <SpanWrapperBottom>Max. Supply:</SpanWrapperBottom>
             {asset.maxSupply ? (
@@ -230,7 +234,7 @@ export const AssetRowSections = (
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <>
             <SpanWrapperBottom> Circulating Supply:</SpanWrapperBottom>
             <TxTypeSpan>
@@ -246,8 +250,8 @@ export const AssetRowSections = (
     ];
   }
   return [
-    { element: <TitleSpan>Token Summary</TitleSpan>, span: 2 },
-    { element: <span>{res.error}</span>, span: 2 },
+    { element: props => <TitleSpan>Token Summary</TitleSpan>, span: 2 },
+    { element: props => <span>{res.error}</span>, span: 2 },
   ];
 };
 
@@ -271,7 +275,7 @@ export const AccountRowSections = (
 
     return [
       {
-        element: (
+        element: props => (
           <TitleWrapper>
             <TitleSpan>Account Resume</TitleSpan>
             {getRedirectButton(`/account/${account.address}`, setShowTooltip)}
@@ -280,7 +284,7 @@ export const AccountRowSections = (
         span: 2,
       },
       {
-        element: (
+        element: props => (
           <HashSpan
             style={{ maxWidth: '20rem' }}
             onClick={() => setShowTooltip(false)}
@@ -291,7 +295,7 @@ export const AccountRowSections = (
         span: 2,
       },
       {
-        element: (
+        element: props => (
           <HoverDiv onClick={() => setShowTooltip(false)}>
             <Link href={'/asset/klv'}>
               <LogoWrapper>
@@ -313,7 +317,7 @@ export const AccountRowSections = (
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <>
             <SpanWrapperBottom> KLV Balance:</SpanWrapperBottom>
             <TxTypeSpan>
@@ -327,7 +331,7 @@ export const AccountRowSections = (
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <DivWrapper>
             {`Account total assets: ${getAccountTotalAssets()}`}
           </DivWrapper>
@@ -338,8 +342,8 @@ export const AccountRowSections = (
   }
 
   return [
-    { element: <TitleSpan>Account Summary</TitleSpan>, span: 2 },
-    { element: <span>{res.error}</span>, span: 2 },
+    { element: props => <TitleSpan>Account Summary</TitleSpan>, span: 2 },
+    { element: props => <span>{res.error}</span>, span: 2 },
   ];
 };
 
@@ -354,7 +358,7 @@ export const BlockRowSections = (
 
     return [
       {
-        element: (
+        element: props => (
           <TitleWrapper>
             <TitleSpan>Block Summary</TitleSpan>
             {getRedirectButton(`/block/${block.nonce}`, setShowTooltip)}
@@ -363,7 +367,7 @@ export const BlockRowSections = (
         span: 2,
       },
       {
-        element: (
+        element: props => (
           <SpanWrapper>
             Nonce:{' '}
             <HashSpan onClick={() => setShowTooltip(false)}>
@@ -374,11 +378,11 @@ export const BlockRowSections = (
         span: 1,
       },
       {
-        element: <DateSpan>{date}</DateSpan>,
+        element: props => <DateSpan>{date}</DateSpan>,
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <SpanWrapper>
             Miner:{' '}
             <UnderlineSpan onClick={() => setShowTooltip(false)}>
@@ -392,7 +396,7 @@ export const BlockRowSections = (
         span: 1,
       },
       {
-        element: (
+        element: props => (
           <HoverDiv onClick={() => setShowTooltip(false)}>
             <Link href={`/account/${block.producerOwnerAddress}`}>
               <LogoWrapper>
@@ -409,17 +413,19 @@ export const BlockRowSections = (
         span: 1,
       },
       {
-        element: <SpanWrapper>Epoch: {`${block.epoch}`}</SpanWrapper>,
+        element: props => <SpanWrapper>Epoch: {`${block.epoch}`}</SpanWrapper>,
         span: 1,
       },
       {
-        element: <SpanWrapper>Transactions: {`${block.txCount}`}</SpanWrapper>,
+        element: props => (
+          <SpanWrapper>Transactions: {`${block.txCount}`}</SpanWrapper>
+        ),
         span: 1,
       },
     ];
   }
   return [
-    { element: <TitleSpan>Block Summary</TitleSpan>, span: 2 },
-    { element: <span>{res.error}</span>, span: 2 },
+    { element: props => <TitleSpan>Block Summary</TitleSpan>, span: 2 },
+    { element: props => <span>{res.error}</span>, span: 2 },
   ];
 };

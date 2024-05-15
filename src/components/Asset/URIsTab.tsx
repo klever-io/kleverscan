@@ -9,7 +9,7 @@ export const UrisTab: React.FC<AssetProps> = ({ asset }) => {
       {Object.entries(asset?.uris || []).length ? (
         Object.entries(asset?.uris || []).map(
           ([key, value]: [string, string]) => (
-            <Row key={String(key)} isStakingRoyalties={false} span={2}>
+            <Row key={String(key)} span={2}>
               <span>
                 <strong>{key}</strong>
               </span>

@@ -1,4 +1,4 @@
-import { proposalsMessages } from '@/components/Tabs/NetworkParams/proposalMessages';
+import { proposalsMap } from '@/components/Tabs/NetworkParams/proposalsMap';
 import api from '@/services/api';
 import { IParamList, IResponse } from '@/types';
 import {
@@ -44,10 +44,10 @@ export const getParamsList = async (): Promise<IParamList[] | undefined> => {
   const paramsList = [] as IParamList[];
 
   if (data) {
-    networkParams = Object.keys(proposalsMessages).map((key, index) => {
+    networkParams = Object.keys(proposalsMap).map((key, index) => {
       return {
         number: index,
-        parameter: proposalsMessages[key] ? proposalsMessages[key] : '',
+        parameter: proposalsMap[key] ? proposalsMap[key].message : '',
         currentValue: data.parameters[key]?.value,
         parameterLabel: key,
       };

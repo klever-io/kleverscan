@@ -3,7 +3,7 @@ import {
   CenteredRow as DefaultCenteredRow,
   Row as DefaultRow,
 } from '@/styles/common';
-import styled, { css, DefaultTheme, StyledComponent } from 'styled-components';
+import styled, { DefaultTheme, StyledComponent, css } from 'styled-components';
 
 interface IExpandCenteredRow {
   openJson?: boolean;
@@ -329,7 +329,7 @@ export const KdaFeeSpan = styled.span`
 export const ExpandRow = styled(DefaultRow)<{ expandVar: boolean }>`
   ${props =>
     props.expandVar &&
-    ` 
+    `
 flex-direction: column !important;
 align-items: start !important;
 `}

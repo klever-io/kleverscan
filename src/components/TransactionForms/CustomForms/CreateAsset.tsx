@@ -34,12 +34,27 @@ interface IPrecisionProps {
 }
 interface ISectionProps {
   isNFT?: boolean;
+  isFungible?: boolean;
   precision?: number;
 }
 
+export const assetTypes = [
+  {
+    label: 'Fungible',
+    value: 0,
+  },
+  {
+    label: 'Non Fungible',
+    value: 1,
+  },
+  {
+    label: 'Semi Fungible',
+    value: 2,
+  },
+];
+
 const parseCreateAsset = (data: ICreateAsset) => {
   const dataCopy = JSON.parse(JSON.stringify(data));
-  dataCopy.type = dataCopy.type ? 1 : 0;
   parseSplitRoyalties(dataCopy);
   parseURIs(dataCopy);
   parseStaking(dataCopy);
@@ -54,7 +69,8 @@ const CreateAsset: React.FC<IContractProps> = ({
 }) => {
   const { handleSubmit, watch } = useFormContext<ICreateAsset>();
 
-  const isNFT = Boolean(watch('type'));
+  const isFungible = watch('type') === 0;
+  const isNFT = watch('type') === 1;
 
   const precision = watch('precision');
 
@@ -63,7 +79,7 @@ const CreateAsset: React.FC<IContractProps> = ({
     await handleFormSubmit(dataCopy);
   };
 
-  const sectionProps = { isNFT, precision };
+  const sectionProps = { isNFT, isFungible, precision };
 
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
@@ -71,23 +87,24 @@ const CreateAsset: React.FC<IContractProps> = ({
         <FormInput
           name="type"
           title="Asset Type"
-          type="checkbox"
-          toggleOptions={['Token', 'NFT']}
+          type="dropdown"
+          options={assetTypes}
+          defaultValue={0}
         />
       </FormSection>
       <BasicInfoSection {...sectionProps} />
       <URIsSection />
       <RoyaltiesSection {...sectionProps} />
-      {!isNFT && <StakingSection />}
+      {isFungible && <StakingSection />}
       <RolesSection />
       <PropertiesSection />
     </FormBody>
   );
 };
 
-const BasicInfoSection: React.FC<ISectionProps> = ({ isNFT }) => {
+const BasicInfoSection: React.FC<ISectionProps> = ({ isNFT, isFungible }) => {
   const [logoError, setLogoError] = useState<string | null>(null);
-  const { watch, trigger, setValue } = useFormContext<ICreateAsset>();
+  const { watch, trigger } = useFormContext<ICreateAsset>();
   const { walletAddress } = useExtension();
   const precision = watch('precision');
   const logo = watch('logo');
@@ -146,7 +163,7 @@ const BasicInfoSection: React.FC<ISectionProps> = ({ isNFT }) => {
           required
         />
       )}
-      {!isNFT && (
+      {isFungible && (
         <FormInput
           name="initialSupply"
           title="Initial Supply"
@@ -157,7 +174,7 @@ const BasicInfoSection: React.FC<ISectionProps> = ({ isNFT }) => {
       )}
       <FormInput
         name="maxSupply"
-        title="Max Supply"
+        title="Maximum Supply"
         type="number"
         tooltip={tooltip.maxSupply}
         precision={precision}
@@ -230,7 +247,7 @@ export const URIsSection: React.FC<URIProps> = ({ tooltip: customTooltip }) => {
 };
 
 export const RoyaltiesSection: React.FC<ISectionProps> = props => {
-  const { isNFT } = props;
+  const { isFungible } = props;
   const { walletAddress } = useExtension();
   let precision = 8;
   if (props?.precision !== undefined) {
@@ -257,7 +274,7 @@ export const RoyaltiesSection: React.FC<ISectionProps> = props => {
         dynamicInitialValue={walletAddress}
         required
       />
-      {isNFT && (
+      {!isFungible && (
         <FormInput
           name="royalties.transferFixed"
           title="Transfer Fixed"
@@ -266,7 +283,7 @@ export const RoyaltiesSection: React.FC<ISectionProps> = props => {
           tooltip={tooltip.royalties.transferFixed}
         />
       )}
-      {isNFT && (
+      {!isFungible && (
         <FormInput
           name="royalties.marketPercentage"
           title="Market Percentage"
@@ -275,7 +292,7 @@ export const RoyaltiesSection: React.FC<ISectionProps> = props => {
           tooltip={tooltip.royalties.marketPercentage}
         />
       )}
-      {isNFT && (
+      {!isFungible && (
         <FormInput
           name="royalties.marketFixed"
           title="Market Fixed"
@@ -299,7 +316,7 @@ export const RoyaltiesSection: React.FC<ISectionProps> = props => {
         tooltip={tooltip.royalties.itoFixed}
       />
 
-      {!isNFT && <TransferPercentageSection precision={precision} />}
+      {isFungible && <TransferPercentageSection precision={precision} />}
       <SplitRoyaltiesSection {...props} />
     </FormSection>
   );
@@ -365,7 +382,7 @@ const TransferPercentageSection: React.FC<IPrecisionProps> = ({
   );
 };
 
-const SplitRoyaltiesSection: React.FC<ISectionProps> = ({ isNFT }) => {
+const SplitRoyaltiesSection: React.FC<ISectionProps> = ({ isFungible }) => {
   const { control, getValues } = useFormContext();
   const router = useRouter();
   const { fields, append, remove } = useFieldArray({
@@ -400,7 +417,7 @@ const SplitRoyaltiesSection: React.FC<ISectionProps> = ({ isNFT }) => {
             tooltip={tooltip.royalties.splitRoyalties.address}
             required
           />
-          {!isNFT && (
+          {isFungible && (
             <FormInput
               name={`royalties.splitRoyalties[${index}].percentTransferPercentage`}
               title={`Percentage over Transfer Percentage`}
@@ -411,7 +428,7 @@ const SplitRoyaltiesSection: React.FC<ISectionProps> = ({ isNFT }) => {
               {...percentageProps}
             />
           )}
-          {isNFT && (
+          {!isFungible && (
             <FormInput
               name={`royalties.splitRoyalties[${index}].percentTransferFixed`}
               title={`Percentage over Transfer Fixed`}
@@ -420,7 +437,7 @@ const SplitRoyaltiesSection: React.FC<ISectionProps> = ({ isNFT }) => {
               {...percentageProps}
             />
           )}
-          {isNFT && (
+          {!isFungible && (
             <FormInput
               name={`royalties.splitRoyalties[${index}].percentMarketPercentage`}
               title={`Percentage over Market Percentage`}
@@ -428,7 +445,7 @@ const SplitRoyaltiesSection: React.FC<ISectionProps> = ({ isNFT }) => {
               {...percentageProps}
             />
           )}
-          {isNFT && (
+          {!isFungible && (
             <FormInput
               name={`royalties.splitRoyalties[${index}].percentMarketFixed`}
               title={`Percentage over Market Fixed`}
@@ -506,21 +523,21 @@ export const StakingSection: React.FC<IStakingSectionProps> = ({
       )}
       <FormInput
         name="staking.minEpochsToClaim"
-        title="Min Epochs to Claim"
+        title="Minimum Epochs to Claim"
         type="number"
         precision={0}
         tooltip={tooltip.staking.minEpochsToClaim}
       />
       <FormInput
         name="staking.minEpochsToUnstake"
-        title="Min Epochs to Unstake"
+        title="Minimum Epochs to Unstake"
         type="number"
         precision={0}
         tooltip={tooltip.staking.minEpochsToUnstake}
       />
       <FormInput
         name="staking.minEpochsToWithdraw"
-        title="Min Epochs to Withdraw"
+        title="Minimum Epochs to Withdraw"
         type="number"
         precision={0}
         tooltip={tooltip.staking.minEpochsToWithdraw}

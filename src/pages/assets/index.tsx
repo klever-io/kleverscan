@@ -3,16 +3,15 @@ import Copy from '@/components/Copy';
 import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
-import Table, { ITable } from '@/components/Table';
+import Table, { ITable } from '@/components/TableV2';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import { requestAssetsQuery } from '@/services/requests/assets';
-import { Container, Header } from '@/styles/common';
+import { CenteredRow, Container, DoubleRow, Header } from '@/styles/common';
 import { IAsset, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { formatAmount } from '@/utils/formatFunctions';
 import { useFetchPartial } from '@/utils/hooks';
-import { ContainerAssetId, ContainerAssetName } from '@/views/assets';
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
@@ -68,6 +67,15 @@ const Assets: React.FC = () => {
     },
   ];
 
+  const header = [
+    '',
+    'Token Name/ID',
+    `Type/Precision`,
+    `Circulating/Maximum Supply`,
+    `Initial Supply/Total Staked`,
+    `${t('table:RewardsType')}`,
+  ];
+
   const rowSections = (asset: IAsset): IRowSection[] => {
     const {
       ticker,
@@ -85,19 +93,19 @@ const Assets: React.FC = () => {
 
     const renderMaxSupply = (): ReactNode => {
       return (
-        <strong>
+        <span>
           {maxSupply !== 0 ? (
             formatAmount(maxSupply / 10 ** precision)
           ) : (
             <IoIosInfinite />
           )}
-        </strong>
+        </span>
       );
     };
 
-    const sections = [
+    const sections: IRowSection[] = [
       {
-        element: (
+        element: props => (
           <Link href={`/asset/${assetId}`} key={assetId}>
             <a>
               <AssetLogo
@@ -105,112 +113,91 @@ const Assets: React.FC = () => {
                 ticker={ticker}
                 name={name}
                 verified={verified}
+                size={36}
               />
             </a>
           </Link>
         ),
         span: 1,
-      },
-
-      {
-        element: (
-          <Link href={`/asset/${assetId}`} key={ticker}>
-            <a style={{ overflow: 'hidden' }}>
-              <p>{ticker}</p>
-            </a>
-          </Link>
-        ),
-        span: 1,
-      },
-
-      {
-        element: (
-          <ContainerAssetId>
-            <Link href={`/asset/${assetId}`} key={assetId}>
-              {assetId}
-            </Link>
-            <Copy info="Asset ID" data={assetId} />
-          </ContainerAssetId>
-        ),
-        span: 1,
+        width: 50,
       },
       {
-        element: (
-          <ContainerAssetName>
+        element: props => (
+          <DoubleRow {...props} key={assetId}>
             <Link href={`/asset/${assetId}`} key={assetId}>
               <a>{name}</a>
             </Link>
-          </ContainerAssetName>
+
+            <CenteredRow>
+              <Link href={`/asset/${assetId}`} key={assetId}>
+                {assetId}
+              </Link>
+              <Copy info="Asset ID" data={assetId} />
+            </CenteredRow>
+          </DoubleRow>
         ),
         span: 1,
       },
 
-      { element: <span key={assetType}>{assetType}</span>, span: 1 },
       {
-        element: (
-          <strong key={initialSupply}>
-            {formatAmount(initialSupply / 10 ** precision)} {ticker}
-          </strong>
+        element: props => (
+          <DoubleRow {...props} key={assetType + precision}>
+            <span key={assetType}>{assetType}</span>
+            <span key={precision}>
+              {precision} decimal{precision > 1 && 's'}
+            </span>
+          </DoubleRow>
+        ),
+
+        span: 1,
+      },
+      {
+        element: props => (
+          <DoubleRow {...props}>
+            <span key={circulatingSupply}>
+              {formatAmount(circulatingSupply / 10 ** precision)} {ticker}
+            </span>
+            <span key={maxSupply}>
+              {renderMaxSupply()} {ticker}
+            </span>
+          </DoubleRow>
         ),
         span: 1,
       },
       {
-        element: (
-          <strong key={maxSupply}>
-            {renderMaxSupply()} {ticker}
-          </strong>
+        element: props => (
+          <DoubleRow
+            {...props}
+            key={initialSupply + String(staking?.totalStaked)}
+          >
+            <span key={initialSupply}>
+              {formatAmount(initialSupply / 10 ** precision)} {ticker}
+            </span>
+            <span key={String(staking?.totalStaked)}>
+              {staking?.totalStaked
+                ? formatAmount(staking.totalStaked / 10 ** precision)
+                : 0}
+            </span>
+          </DoubleRow>
         ),
         span: 1,
       },
       {
-        element: (
-          <strong key={circulatingSupply}>
-            {formatAmount(circulatingSupply / 10 ** precision)} {ticker}
-          </strong>
-        ),
-        span: 1,
-      },
-      {
-        element: (
-          <strong key={String(staking?.totalStaked)}>
-            {staking?.totalStaked
-              ? formatAmount(staking.totalStaked / 10 ** precision)
-              : 0}
-          </strong>
-        ),
-        span: 1,
-      },
-      {
-        element: (
-          <strong>
+        element: props => (
+          <span>
             {staking
               ? staking?.interestType === 'APRI'
                 ? 'APR'
                 : 'FPR'
               : '--'}
-          </strong>
+          </span>
         ),
         span: 1,
       },
-      { element: <strong key={precision}>{precision}</strong>, span: 1 },
     ];
 
     return sections;
   };
-
-  const header = [
-    '',
-    'Token',
-    'ID',
-    `${t('table:Name')}`,
-    `${t('table:Type')}`,
-    `${t('table:InitialSupply')}`,
-    `${t('table:MaxSupply')}`,
-    `${t('table:CirculatingSupply')}`,
-    `${t('common:Cards.Total Staked')}`,
-    `${t('table:RewardsType')}`,
-    `${t('table:Precision')}`,
-  ];
 
   const tableProps: ITable = {
     rowSections,
@@ -218,7 +205,6 @@ const Assets: React.FC = () => {
     type: 'assetsPage',
     request: (page, limit) => requestAssetsQuery(page, limit, router),
     dataName: 'assets',
-    scrollUp: true,
   };
 
   return (
@@ -238,11 +224,14 @@ const Assets: React.FC = () => {
   );
 };
 
-export const getStaticProps: GetStaticProps = async ({ locale = 'en' }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  locale = 'en',
+}) => {
   const props = await serverSideTranslations(
     locale,
     ['common', 'assets', 'table'],
     nextI18nextConfig,
+    ['en'],
   );
 
   return { props };

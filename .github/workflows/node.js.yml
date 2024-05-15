@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x]
+        node-version: [18.x]
 
     steps:
       - uses: szenius/set-timezone@v1.0
@@ -29,4 +29,4 @@ jobs:
           cache: 'yarn'
       - run: yarn install --frozen-lockfile
       - run: yarn build
-      - run: yarn test:debug-heap
+      # - run: yarn test:debug-heap

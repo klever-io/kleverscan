@@ -407,7 +407,7 @@ export const rewardsFPRPool = (
       }
     });
     const assetIdBuckets = Array.from(
-      new Set(bucketsTable.map(assetBucket => assetBucket.asset.assetId)),
+      new Set(bucketsTable.map(assetBucket => assetBucket.asset?.assetId)),
     );
     const responseAll = await Promise.all(
       assetIdBuckets.map(async assetId => {

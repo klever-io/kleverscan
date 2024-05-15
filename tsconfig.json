@@ -14,12 +14,14 @@
     "isolatedModules": true,
     "types": ["jest", "@testing-library/jest-dom", "@types/gtag.js"],
     "jsx": "preserve",
+    "ignoreDeprecations": "5.0",
     "suppressImplicitAnyIndexErrors": true,
     "baseUrl": "src/",
     "paths": {
       "react": ["../node_modules/@types/react"],
       "@/*": ["./*"]
-    }
+    },
+    "incremental": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules", "cypress.config.ts", "cypress"]

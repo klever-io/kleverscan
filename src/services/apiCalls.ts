@@ -1,4 +1,5 @@
 import api from '@/services/api';
+import { IPagination } from '@/types';
 import { IBlockResponse, IBlockStats } from '@/types/blocks';
 
 export const blockCall = async (
@@ -39,4 +40,13 @@ export const totalStatisticsCall = async (): Promise<IBlockStats> => {
   } else {
     return res.error;
   }
+};
+
+export const defaultPagination: IPagination = {
+  totalPages: 1,
+  next: 1,
+  perPage: 10,
+  previous: 1,
+  self: 1,
+  totalRecords: 10,
 };

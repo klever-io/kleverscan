@@ -1,11 +1,9 @@
-import BlockCardFetcher from '@/components/Cards/BlockCardFetcher';
-import HomeDataCards from '@/components/Cards/CardDataFetcher/HomeDataCards';
-import CoinCard from '@/components/Cards/CoinDataFetcher/CoinCard';
-import HomeTransactions from '@/components/HomeTransactions';
-import { ChartDailyTransactions } from '@/components/HomeTransactions/ChartDailyTransactions';
+import BlockCardFetcher from '@/components/Home/BlockCardFetcher';
+import HomeDataCards from '@/components/Home/CardDataFetcher/HomeDataCards';
+import CoinCard from '@/components/Home/CoinDataFetcher/CoinCard';
+import HomeTransactions from '@/components/Home/HomeTransactions';
+import { ChartDailyTransactions } from '@/components/Home/HomeTransactions/ChartDailyTransactions';
 import { HomeInput } from '@/components/InputGlobal/HomeInput';
-import QuickAccess from '@/components/QuickAccess';
-import Wizard from '@/components/Wizard';
 import { HomeDataProvider } from '@/contexts/mainPage';
 import {
   CardContainer,
@@ -13,40 +11,30 @@ import {
   DataCardsContainer,
   DataContainer,
 } from '@/views/home';
-import React, { useEffect, useState } from 'react';
-import ProposalValidatorWrapper from './NewCards';
+import React from 'react';
+import { HomeITOSection } from './HomeITOSection';
+import ProposalValidatorSection from './ProposalsAndValidatorsSection';
+import MostTransacted from './MostTransacted';
 
 const Home: React.FC = () => {
-  const [wizard, setWizard] = useState(null);
-
-  useEffect(() => {
-    document.body.style.overflow = !!wizard ? 'hidden' : 'visible';
-  }, [wizard]);
-
-  const wizProps = {
-    isOpen: wizard,
-    contract: 0,
-    closeModal: setWizard,
-  };
-
   return (
     <HomeDataProvider>
       <Container>
-        <HomeInput />
-        {!!wizard && <Wizard {...wizProps} />}
-        <QuickAccess setWizard={setWizard} />
         <DataContainer>
+          <HomeInput />
           <DataCardsContainer>
             <HomeDataCards />
-            <CoinCard />
-            <ProposalValidatorWrapper />
             <ChartDailyTransactions />
           </DataCardsContainer>
+          <CoinCard />
         </DataContainer>
         <CardContainer>
           <HomeTransactions />
           <BlockCardFetcher />
         </CardContainer>
+        <MostTransacted />
+        <ProposalValidatorSection />
+        <HomeITOSection />
       </Container>
     </HomeDataProvider>
   );

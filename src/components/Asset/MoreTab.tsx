@@ -20,13 +20,13 @@ export const MoreTab: React.FC<AssetProps> = ({ asset }) => {
 
   return (
     <>
-      <Row isStakingRoyalties={false} span={2}>
+      <Row span={2}>
         <span>
           <strong>{t('assets:More.Issuing Time')}</strong>
         </span>
         <span>{asset ? getIssueDate() : <Skeleton />}</span>
       </Row>
-      <Row isStakingRoyalties={false} span={2}>
+      <Row span={2}>
         <span>
           <strong>{t('assets:More.Issuer')}</strong>
         </span>
@@ -45,13 +45,13 @@ export const MoreTab: React.FC<AssetProps> = ({ asset }) => {
           )}
         </div>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
           <strong>{t('table:Precision')}</strong>
         </span>
         <span>{asset ? asset.precision : <Skeleton />}</span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
           <strong>
             {t('common:Properties.Can', {
@@ -63,7 +63,7 @@ export const MoreTab: React.FC<AssetProps> = ({ asset }) => {
           {asset ? statusWithIcon(asset.properties.canFreeze, t) : <Skeleton />}
         </span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
           <strong>
             {t('common:Properties.Can', {
@@ -75,7 +75,7 @@ export const MoreTab: React.FC<AssetProps> = ({ asset }) => {
           {asset ? statusWithIcon(asset.properties.canWipe, t) : <Skeleton />}
         </span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
           <strong>
             {t('common:Properties.Can', {
@@ -87,7 +87,7 @@ export const MoreTab: React.FC<AssetProps> = ({ asset }) => {
           {asset ? statusWithIcon(asset.properties.canPause, t) : <Skeleton />}
         </span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
           <strong>
             {t('common:Properties.Can', {
@@ -99,7 +99,7 @@ export const MoreTab: React.FC<AssetProps> = ({ asset }) => {
           {asset ? statusWithIcon(asset.properties.canMint, t) : <Skeleton />}
         </span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
           <strong>
             {t('common:Properties.Can', {
@@ -111,7 +111,7 @@ export const MoreTab: React.FC<AssetProps> = ({ asset }) => {
           {asset ? statusWithIcon(asset.properties.canBurn, t) : <Skeleton />}
         </span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
           <strong>
             {t('common:Properties.Can', {
@@ -127,7 +127,7 @@ export const MoreTab: React.FC<AssetProps> = ({ asset }) => {
           )}
         </span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
           <strong>
             {t('common:Properties.Can', {
@@ -143,7 +143,7 @@ export const MoreTab: React.FC<AssetProps> = ({ asset }) => {
           )}
         </span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
           <strong>
             {t('common:Properties.Can', {
@@ -155,7 +155,7 @@ export const MoreTab: React.FC<AssetProps> = ({ asset }) => {
           {asset ? statusWithIcon(asset.attributes.isPaused, t) : <Skeleton />}
         </span>
       </Row>
-      <Row isStakingRoyalties={false}>
+      <Row>
         <span>
           <strong>{t('common:Properties.NFT Mint Stopped')}</strong>
         </span>

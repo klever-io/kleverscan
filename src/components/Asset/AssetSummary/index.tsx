@@ -105,10 +105,10 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
   };
 
   const getRoute = () => {
-    if (router.query.reference === 'ito') {
-      return '/ito';
-    } else {
+    if (!router.query.reference) {
       return '/assets';
+    } else {
+      return `/${router.query.reference}`;
     }
   };
 

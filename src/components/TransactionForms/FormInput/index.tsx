@@ -399,7 +399,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
         <InputLabel disabled={inputProps.disabled}>
           <span>
             {title || name}
-            {required && <RequiredSpan>(required)</RequiredSpan>}
+            {required && <RequiredSpan> (required)</RequiredSpan>}
           </span>
           {tooltip && (
             <TooltipContainer>

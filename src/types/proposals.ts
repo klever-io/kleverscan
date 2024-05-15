@@ -200,43 +200,55 @@ export enum NetworkParamsIndexer {
   KAppFeeSmartContract = 37,
 }
 
-export interface IProposalsMessages {
-  FeePerDataByte: string;
-  KAppFeeCreateValidator: string;
-  KAppFeeCreateAsset: string;
-  MaxEpochsUnclaimed: string;
-  MinSelfDelegatedAmount: string;
-  MinTotalDelegatedAmount: string;
-  BlockRewards: string;
-  StakingRewards: string;
-  KAppFeeTransfer: string;
-  KAppFeeAssetTrigger: string;
-  KAppFeeValidatorConfig: string;
-  KAppFeeFreeze: string;
-  KAppFeeUnfreeze: string;
-  KAppFeeDelegate: string;
-  KAppFeeUndelegate: string;
-  KAppFeeWithdraw: string;
-  KAppFeeClaim: string;
-  KAppFeeUnjail: string;
-  KAppFeeSetAccountName: string;
-  KAppFeeProposal: string;
-  KAppFeeVote: string;
-  KAppFeeConfigITO: string;
-  KAppFeeSetITOPrices: string;
-  KAppFeeBuy: string;
-  KAppFeeSell: string;
-  KAppFeeCancelMarketOrder: string;
-  KAppFeeCreateMarketplace: string;
-  KAppFeeConfigMarketplace: string;
-  KAppFeeUpdateAccountPermission: string;
-  MaxNFTMintBatch: string;
-  MinKFIStakedToEnableProposals: string;
-  MinKLVBucketAmount: string;
-  MaxBucketSize: string;
-  LeaderValidatorRewardsPercentage: string;
-  ProposalMaxEpochsDuration: string;
-  KAppFeeDeposit: string;
-  KAppFeeITOTrigger: string;
-  KAppFeeSmartContract: string;
+export interface IProposalMapItem {
+  message: string;
+  precision: number;
+  unit: string;
+}
+
+export interface IProposalsMap {
+  FeePerDataByte: IProposalMapItem;
+  KAppFeeCreateValidator: IProposalMapItem;
+  KAppFeeCreateAsset: IProposalMapItem;
+  MaxEpochsUnclaimed: IProposalMapItem;
+  MinSelfDelegatedAmount: IProposalMapItem;
+  MinTotalDelegatedAmount: IProposalMapItem;
+  BlockRewards: IProposalMapItem;
+  StakingRewards: IProposalMapItem;
+  KAppFeeTransfer: IProposalMapItem;
+  KAppFeeAssetTrigger: IProposalMapItem;
+  KAppFeeValidatorConfig: IProposalMapItem;
+  KAppFeeFreeze: IProposalMapItem;
+  KAppFeeUnfreeze: IProposalMapItem;
+  KAppFeeDelegate: IProposalMapItem;
+  KAppFeeUndelegate: IProposalMapItem;
+  KAppFeeWithdraw: IProposalMapItem;
+  KAppFeeClaim: IProposalMapItem;
+  KAppFeeUnjail: IProposalMapItem;
+  KAppFeeSetAccountName: IProposalMapItem;
+  KAppFeeProposal: IProposalMapItem;
+  KAppFeeVote: IProposalMapItem;
+  KAppFeeConfigITO: IProposalMapItem;
+  KAppFeeSetITOPrices: IProposalMapItem;
+  KAppFeeBuy: IProposalMapItem;
+  KAppFeeSell: IProposalMapItem;
+  KAppFeeCancelMarketOrder: IProposalMapItem;
+  KAppFeeCreateMarketplace: IProposalMapItem;
+  KAppFeeConfigMarketplace: IProposalMapItem;
+  KAppFeeUpdateAccountPermission: IProposalMapItem;
+  MaxNFTMintBatch: IProposalMapItem;
+  MinKFIStakedToEnableProposals: IProposalMapItem;
+  MinKLVBucketAmount: IProposalMapItem;
+  MaxBucketSize: IProposalMapItem;
+  LeaderValidatorRewardsPercentage: IProposalMapItem;
+  ProposalMaxEpochsDuration: IProposalMapItem;
+  KAppFeeDeposit: IProposalMapItem;
+  KAppFeeITOTrigger: IProposalMapItem;
+  KAppFeeSmartContract: IProposalMapItem;
+}
+
+export interface MostTransferedToken {
+  doc_count: number;
+  key: string;
+  logo: string;
 }

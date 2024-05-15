@@ -151,12 +151,12 @@ const MultisignComponent: React.FC<{
           window.document.body,
         )}
       <RenderMultisignComponent />
-      {!!walletAddress && multiSignData.length && (
+      {!!walletAddress && multiSignData.length ? (
         <>
           <ButtonsComponent {...buttonsProps} />
           <DecodedRawData {...decodedRawProps} />
         </>
-      )}
+      ) : null}
     </Content>
   );
 };

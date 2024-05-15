@@ -4,7 +4,7 @@ import Table, { ITable } from '@/components/TableV2';
 import { useHomeData } from '@/contexts/mainPage';
 import { useMobile } from '@/contexts/mobile';
 import { defaultPagination } from '@/services/apiCalls';
-import { CenteredRow, DoubleRow } from '@/styles/common';
+import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
 import { IBlock } from '@/types/blocks';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
@@ -77,7 +77,13 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
             href={`/validator/${producerOwnerAddress}`}
             key={producerOwnerAddress}
           >
-            <a>{parseAddress(producerName, 16)}</a>
+            <a>
+              {producerName ? (
+                producerName
+              ) : (
+                <Mono>{producerOwnerAddress}</Mono>
+              )}
+            </a>
           </Link>
         </DoubleRow>
       ),

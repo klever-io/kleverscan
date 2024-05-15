@@ -441,7 +441,9 @@ export const TransactionContainer = styled.div``;
 
 export const ChartsContainer = styled(TransactionContainer)`
   ${DataCardDefaultStyles}
-  flex-wrap: wrap;
+
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
   border: none;
   background-color: transparent !important;
@@ -616,6 +618,7 @@ export const TransactionChart = styled(TransactionContent)`
   min-height: 100%;
   height: 320px;
   position: relative;
+  padding: 16px 0;
 
   display: flex;
   justify-content: space-between;

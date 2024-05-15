@@ -11,7 +11,7 @@ import { useHomeData } from '@/contexts/mainPage';
 import { useMobile } from '@/contexts/mobile';
 import { getCustomFields, toAddressSectionElement } from '@/pages/transactions';
 import { defaultPagination } from '@/services/apiCalls';
-import { CenteredRow, DoubleRow } from '@/styles/common';
+import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
 import { IPaginatedResponse, IRowSection, ITransaction } from '@/types';
 import { Contract, ContractsName, ITransferContract } from '@/types/contracts';
 import { contractTypes, getLabelForTableField } from '@/utils/contracts';
@@ -63,7 +63,7 @@ export const homeTransactionsRowSections = (
     nonce,
   } = props;
 
-  let toAddress = '- -';
+  let toAddress = '--';
   const contractType = contractTypes(contract);
 
   if (contractType === Contract.Transfer) {
@@ -79,7 +79,11 @@ export const homeTransactionsRowSections = (
       element: props => (
         <DoubleRow {...props} key={hash}>
           <CenteredRow className="bucketIdCopy">
-            <Link href={`/transaction/${hash}`}>{parseAddress(hash, 24)}</Link>
+            <Link href={`/transaction/${hash}`}>
+              <a>
+                <Mono>{parseAddress(hash, 24)}</Mono>
+              </a>
+            </Link>
             <Copy info="TXHash" data={hash} />
           </CenteredRow>
           <CenteredRow>
@@ -109,7 +113,9 @@ export const homeTransactionsRowSections = (
       element: props => (
         <DoubleRow {...props} key={sender}>
           <Link href={`/account/${sender}`}>
-            <a className="address">{parseAddress(sender, 16)}</a>
+            <a className="address">
+              <Mono>{parseAddress(sender, 16)}</Mono>
+            </a>
           </Link>
           {toAddressSectionElement(toAddress)}
         </DoubleRow>
@@ -169,7 +175,7 @@ export const homeTransactionsTabletRowSections = (
     data,
   } = props;
 
-  let toAddress = '- -';
+  let toAddress = '--';
   const contractType = contractTypes(contract);
 
   if (contractType === Contract.Transfer) {
@@ -192,8 +198,12 @@ export const homeTransactionsTabletRowSections = (
               {capitalizeString(status)}
             </Status>
           </CenteredRow>
-          <CenteredRow className="bucketIdCopy">
-            <Link href={`/transaction/${hash}`}>{parseAddress(hash, 16)}</Link>
+          <CenteredRow>
+            <Link href={`/transaction/${hash}`}>
+              <a>
+                <Mono>{parseAddress(hash, 16)}</Mono>
+              </a>
+            </Link>
             <Copy info="TXHash" data={hash} svgSize={16} />
           </CenteredRow>
         </DoubleRow>
@@ -248,7 +258,9 @@ export const homeTransactionsTabletRowSections = (
       element: props => (
         <DoubleRow {...props} key={sender}>
           <Link href={`/account/${sender}`}>
-            <a className="address">{parseAddress(sender, 16)}</a>
+            <a className="address">
+              <Mono>{parseAddress(sender, 16)}</Mono>
+            </a>
           </Link>
           {toAddressSectionElement(toAddress)}
         </DoubleRow>

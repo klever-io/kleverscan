@@ -721,7 +721,7 @@ export const ContainerTimeFilter = styled.div`
   width: 100%;
   height: fit-content;
   justify-content: space-between;
-  padding: 1.5rem;
+  padding: 0 16px;
 `;
 
 export const ListItemTimeFilter = styled.ul`

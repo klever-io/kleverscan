@@ -284,8 +284,8 @@ export const CenteredRow = styled.div`
     color: ${props => props.theme.black};
 
     font-weight: 600;
-    text-decoration: none;
 
+    padding-bottom: 1px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

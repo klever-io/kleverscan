@@ -4,21 +4,17 @@ import {
   homeActiveProposalsCall,
   homeBeforeYesterdayTransactionsCall,
   homeGetAggregateCall,
-  homeGetBlocksCall,
-  homeLastApprovedProposalCall,
   homeMostTransactedNFTs,
   homeMostTransactedTokens,
   homeNodes,
   homeProposalsCall,
-  homeTotalActiveValidators,
-  homeTotalValidators,
   homeTransactionsCall,
   homeYesterdayAccountsCall,
 } from '@/services/requests/home';
 import { IEpochInfo, ITransaction, Node } from '@/types';
 import { IBlock } from '@/types/blocks';
 import { IProposal, MostTransferedToken } from '@/types/proposals';
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useRef } from 'react';
 import { useQueries } from 'react-query';
 
 export interface IDaysCoins {
@@ -116,19 +112,39 @@ export const HomeDataProvider: React.FC = ({ children }) => {
     },
   ]);
 
+  const prevValuesRef = useRef({
+    totalAccounts: 0,
+    totalTransactions: 0,
+    metrics: defaultAggregateData.metrics,
+  });
+
   const values: IHomeData = {
     livePeakTPS:
       aggregateResult.data?.livePeakTPS || defaultAggregateData.livePeakTPS,
     blocks: aggregateResult.data?.blocks,
-    metrics: aggregateResult.data?.metrics || defaultAggregateData.metrics,
+    metrics:
+      aggregateResult.data?.metrics?.currentSlot &&
+      aggregateResult.data?.metrics?.currentSlot !== 0 &&
+      aggregateResult.data?.metrics?.epochFinishSlot >=
+        prevValuesRef.current.metrics.epochFinishSlot
+        ? aggregateResult.data.metrics
+        : prevValuesRef.current.metrics,
     newTransactions:
       beforeYesterdayTransactionsResult.data?.newTransactions || 0,
     beforeYesterdayTransactions:
       beforeYesterdayTransactionsResult.data?.beforeYesterdayTxs,
     newAccounts: yesterdayAccountResult.data?.newAccounts,
-    totalAccounts: accountResult.data?.totalAccounts,
+    totalAccounts:
+      (accountResult.data?.totalAccounts || 0) >
+      prevValuesRef.current.totalAccounts
+        ? accountResult.data?.totalAccounts
+        : prevValuesRef.current.totalAccounts,
     transactions: aggregateResult.data?.transactions || [],
-    totalTransactions: transactionsResult.data?.totalTransactions,
+    totalTransactions:
+      (transactionsResult.data?.totalTransactions || 0) >
+      prevValuesRef.current.totalTransactions
+        ? transactionsResult.data?.totalTransactions
+        : prevValuesRef.current.totalTransactions,
     loadingCards: accountResult.isLoading,
     loadingBlocks: aggregateResult.isLoading,
     totalProposals: proposalsResult.data?.totalProposals,
@@ -140,6 +156,12 @@ export const HomeDataProvider: React.FC = ({ children }) => {
     nodes: nodes.data?.nodes,
     mostTransactedTokens: mostTransactedTokens.data || [],
     mostTransactedNFTs: mostTransactedNFTs.data || [],
+  };
+
+  prevValuesRef.current = {
+    totalAccounts: values.totalAccounts || 0,
+    totalTransactions: values.totalTransactions || 0,
+    metrics: values.metrics,
   };
 
   return <HomeData.Provider value={values}>{children}</HomeData.Provider>;

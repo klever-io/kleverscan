@@ -51,7 +51,7 @@ const MostTransacted: React.FC = () => {
                     />
                     {item.key}
                   </Cell>
-                  <Cell>{item.doc_count}</Cell>
+                  <Cell>{item.doc_count.toLocaleString()}</Cell>
                 </Row>
               ))}
             </tbody>

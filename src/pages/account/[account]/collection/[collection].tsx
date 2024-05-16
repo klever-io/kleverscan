@@ -46,8 +46,8 @@ const Collection: React.FC<ICollectionPage> = () => {
   const rowSections = (nft: INfts): IRowSection[] => {
     const { address, assetName: collection, assetId } = nft;
 
-    const collectionId = assetId.split('/')[0];
-    const nftId = assetId.split('/')[1];
+    const collectionId = assetId?.split('/')[0];
+    const nftId = assetId?.split('/')[1];
     const sections: IRowSection[] = address
       ? [
           {
@@ -68,8 +68,8 @@ const Collection: React.FC<ICollectionPage> = () => {
                 {isMobile
                   ? parseAddress(address, 14)
                   : address || isTablet
-                  ? parseAddress(address, 20)
-                  : address}
+                    ? parseAddress(address, 20)
+                    : address}
               </Link>
             ),
             span: 1,

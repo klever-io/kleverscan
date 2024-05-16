@@ -82,7 +82,9 @@ const FooterItems: React.FC<IContent> = link => {
               </DonateContainer>
             ) : (
               <Link key={String(index)} href={item.href}>
-                <a>{item.name}</a>
+                <a target="_blank" rel="nofollow noreferrer">
+                  {item.name}
+                </a>
               </Link>
             ),
           )}

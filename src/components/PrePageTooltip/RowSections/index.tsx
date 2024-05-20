@@ -25,6 +25,7 @@ import {
   HashSpan,
   HoverDiv,
   LogoWrapper,
+  QuerySpan,
   RedirectSVG,
   SpanWithIcon,
   SpanWrapper,
@@ -37,6 +38,7 @@ import {
   TxTypeSpan,
   UnderlineSpan,
 } from '../styles';
+import { CustomLink } from '@/components/Table/styles';
 
 const getRedirectButton = (
   path: string,
@@ -176,6 +178,7 @@ export const AssetRowSections = (
   res: IAssetResponse,
   precision: number,
   setShowTooltip: React.Dispatch<SetStateAction<boolean>>,
+  query: string,
 ): IRowSection[] => {
   if (res.data || res.error === '') {
     const asset = res.data?.asset as IAsset;
@@ -203,7 +206,7 @@ export const AssetRowSections = (
                   invertColors={true}
                 />
                 <AssetNameWrapper>
-                  <TokenTicker>{asset.ticker}</TokenTicker>
+                  <TokenTicker>{asset.assetId}</TokenTicker>
                   <TokenNameSpan>{asset.name}</TokenNameSpan>
                 </AssetNameWrapper>
               </LogoWrapper>
@@ -246,6 +249,19 @@ export const AssetRowSections = (
           </>
         ),
         span: 1,
+      },
+      {
+        element: props => (
+          <HoverDiv onClick={() => setShowTooltip(false)}>
+            <Link href={`/assets?asset=${query.toUpperCase()}`}>
+              <CustomLink fullWidth secondary>
+                View All Assets with{' '}
+                <QuerySpan>{query.toUpperCase()}</QuerySpan>
+              </CustomLink>
+            </Link>
+          </HoverDiv>
+        ),
+        span: 2,
       },
     ];
   }

@@ -327,13 +327,15 @@ export const EmptyRow = styled(Row)`
 
 export const CustomLink = styled.a<{
   tabAsset?: boolean;
+  fullWidth?: boolean;
+  secondary?: boolean;
 }>`
   align-self: end;
-  min-width: 13rem;
   text-align: center;
 
   display: flex;
   justify-content: center;
+  align-items: center;
   padding: 8px 16px;
 
   height: 34px !important;
@@ -354,6 +356,27 @@ export const CustomLink = styled.a<{
   cursor: pointer;
 
   transition: all 0.1s ease;
+
+  ${props =>
+    props.fullWidth &&
+    css`
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+    `}
+
+  ${props =>
+    props.secondary &&
+    css`
+      background: transparent;
+      color: ${props.theme.violet} !important;
+      border: 1px solid ${props.theme.violet};
+
+      &:hover {
+        background: ${props.theme.violet};
+        color: ${props.theme.true.white} !important;
+      }
+    `}
 
   &:hover {
     background: ${props => props.theme.violet};
@@ -438,7 +461,9 @@ export const ItemContainer = styled.div<{
 }>`
   height: 1.9rem;
   width: 1.9rem;
-  font: 500 15px Montserrat, sans-serif;
+  font:
+    500 15px Montserrat,
+    sans-serif;
 
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     font-size: small;

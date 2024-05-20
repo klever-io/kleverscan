@@ -215,7 +215,7 @@ const Assets: React.FC = () => {
 
       <FilterContainer>
         {filters.map(filter => (
-          <Filter key={filter.title} {...filter} />
+          <Filter key={filter.title + String(filter.current)} {...filter} />
         ))}
       </FilterContainer>
 

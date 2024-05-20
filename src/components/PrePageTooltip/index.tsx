@@ -145,6 +145,7 @@ const PrePageTooltip: React.FC<IPrePageTooltip> = ({
         data as IAssetResponse,
         precision,
         setShowTooltip,
+        trimmedSearch,
       );
     }
 

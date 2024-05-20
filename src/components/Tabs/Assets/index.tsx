@@ -1,5 +1,7 @@
 import { CustomLink } from '@/components/Table/styles';
 import Table, { ITable } from '@/components/TableV2';
+import { CustomFieldWrapper } from '@/components/TableV2/styles';
+import Tooltip from '@/components/Tooltip';
 import { useContractModal } from '@/contexts/contractModal';
 import { IAccountAsset, IInnerTableProps, IRowSection } from '@/types/index';
 import { parseApr } from '@/utils';
@@ -78,25 +80,46 @@ const Assets: React.FC<IAssets> = ({
       { element: props => <span key={precision}>{precision}</span>, span: 1 },
       {
         element: props => (
-          <span key={balance}>
-            {formatAmount(balance / 10 ** precision)} {ticker}
-          </span>
+          <Tooltip
+            msg={`${(balance / 10 ** precision).toLocaleString()} ${ticker}`}
+            Component={() => (
+              <CustomFieldWrapper>
+                <span>
+                  {formatAmount(balance / 10 ** precision)} {ticker}
+                </span>
+              </CustomFieldWrapper>
+            )}
+          />
         ),
         span: 1,
       },
       {
         element: props => (
-          <span key={frozenBalance}>
-            {formatAmount(frozenBalance / 10 ** precision)} {ticker}
-          </span>
+          <Tooltip
+            msg={`${(frozenBalance / 10 ** precision).toLocaleString()} ${ticker}`}
+            Component={() => (
+              <CustomFieldWrapper>
+                <span key={frozenBalance}>
+                  {formatAmount(frozenBalance / 10 ** precision)} {ticker}
+                </span>
+              </CustomFieldWrapper>
+            )}
+          />
         ),
         span: 1,
       },
       {
         element: props => (
-          <span key={unfrozenBalance}>
-            {formatAmount(unfrozenBalance / 10 ** precision)} {ticker}
-          </span>
+          <Tooltip
+            msg={`${(unfrozenBalance / 10 ** precision).toLocaleString()} ${ticker}`}
+            Component={() => (
+              <CustomFieldWrapper>
+                <span key={unfrozenBalance}>
+                  {formatAmount(unfrozenBalance / 10 ** precision)} {ticker}
+                </span>
+              </CustomFieldWrapper>
+            )}
+          />
         ),
         span: 1,
       },

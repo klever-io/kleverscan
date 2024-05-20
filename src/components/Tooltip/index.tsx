@@ -46,6 +46,7 @@ const Tooltip: React.FC<ITooltipProps> = ({
           backgroundColor="#7B7DB2"
           delayShow={customStyles?.delayShow}
           offset={customStyles?.offset}
+          className={'opaque'}
         >
           {parsedMsgs.map((parsedMsg, index) => (
             <span key={index} style={{ color: 'white' }}>

@@ -4,6 +4,11 @@ import styled from 'styled-components';
 export const StyledTooltip = styled(ReactTooltip)<{ displayMsg: boolean }>`
   width: fit-content !important;
   display: ${props => (props.displayMsg ? 'initial' : 'none')} !important;
+
+  span {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
 `;
 
 export const ToolTipSpan = styled.span<{ maxVw: number | undefined }>`
@@ -21,5 +26,9 @@ export const ToolTipSpan = styled.span<{ maxVw: number | undefined }>`
     div {
       max-width: 100vw;
     }
+  }
+
+  .opaque {
+    opacity: 0.975 !important;
   }
 `;

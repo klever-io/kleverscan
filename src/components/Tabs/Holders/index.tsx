@@ -54,7 +54,7 @@ const Holders: React.FC<IHolders> = ({
       {
         element: props => (
           <span key={asset.circulatingSupply}>
-            {((balance / asset.circulatingSupply) * 100).toFixed(2)}%
+            {((totalBalance / asset.circulatingSupply) * 100).toFixed(2)}%
           </span>
         ),
         span: 1,

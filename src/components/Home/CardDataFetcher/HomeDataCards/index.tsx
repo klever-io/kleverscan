@@ -76,17 +76,14 @@ const Progress: React.FC<{ percent: number }> = ({ percent }) => {
 };
 
 const EpochCard: React.FC = () => {
-  const { blocks, metrics } = useHomeData();
+  const { epoch, metrics } = useHomeData();
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
-  const block = blocks && blocks[0];
 
   return (
     <DataCard className="epoch">
       <Progress percent={metrics.epochLoadPercent} />
       <EpochCardContent>
-        <span>
-          {`${t('Epoch')}` + (block?.epoch ? ` #${block.epoch} ` : ' ')}
-        </span>
+        <span>{`${t('Epoch')}` + (epoch ? ` #${epoch} ` : ' ')}</span>
         <small>Time remaining</small>
         <DataCardValue isEpoch={true}>
           <p className="epochSeconds">

@@ -63,6 +63,22 @@ export const findReceipt = (
  *
  * @param receipts Array of receipts
  * @param type type of the contract
+ * @returns the first receipt that matched the contract type
+ */
+export const findReceipts = (
+  receipts: IReceipt[] | undefined,
+  type: number,
+): IReceipt[] | undefined => {
+  if (!receipts) {
+    return undefined;
+  }
+  return receipts.filter(receipt => receipt.type === type);
+};
+
+/**
+ *
+ * @param receipts Array of receipts
+ * @param type type of the contract
  * @param sender sender of the tx
  * @returns the first receipt that matches the contract type and sender
  */

@@ -1,4 +1,3 @@
-import { EmptyRow } from '@/components/Table/styles';
 import { Row } from '@/views/assets/detail';
 import React from 'react';
 import { AssetProps } from './OverviewTab';
@@ -22,9 +21,9 @@ export const UrisTab: React.FC<AssetProps> = ({ asset }) => {
           ),
         )
       ) : (
-        <EmptyRow type="assets">
+        <Row span={2}>
           <p>No URI found</p>
-        </EmptyRow>
+        </Row>
       )}
     </>
   );

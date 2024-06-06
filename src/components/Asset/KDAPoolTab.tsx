@@ -2,7 +2,6 @@ import { getStatusIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
 import QrCodeModal from '@/components/QrCodeModal';
 import Skeleton from '@/components/Skeleton';
-import { Status } from '@/components/Table/styles';
 import { IAssetPool } from '@/types';
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
@@ -12,6 +11,7 @@ import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React from 'react';
 import { AssetProps } from './OverviewTab';
+import { Status } from '@/styles/common';
 
 interface KDAPoolTabProps extends AssetProps {
   assetPool: IAssetPool | undefined;

@@ -1,5 +1,5 @@
 import Copy from '@/components/Copy';
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import { useContractModal } from '@/contexts/contractModal';
 import api from '@/services/api';
 import { CenteredRow, RowContent } from '@/styles/common';

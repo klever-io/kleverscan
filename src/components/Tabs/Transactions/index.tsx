@@ -1,4 +1,4 @@
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import { transactionRowSections } from '@/pages/transactions';
 import { IInnerTableProps } from '@/types/index';

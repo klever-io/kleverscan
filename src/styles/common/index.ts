@@ -6,6 +6,8 @@ export const Container = styled.div`
   display: flex;
 
   flex-direction: column;
+
+  margin-top: 40px;
 `;
 
 export const Header = styled.section<{ filterOn?: boolean }>`

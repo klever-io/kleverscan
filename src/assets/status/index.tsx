@@ -1,9 +1,9 @@
-import { Status } from '@/components/Table/styles';
 import { TFunction } from 'next-i18next';
 import { ImCancelCircle } from 'react-icons/im';
 import Error from './error2.svg';
 import Pending from './pending.svg';
 import Success from './success2.svg';
+import { Status } from '@/styles/common';
 
 const getStatusIcon = (status: string): any => {
   switch (status) {

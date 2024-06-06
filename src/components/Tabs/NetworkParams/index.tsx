@@ -1,4 +1,4 @@
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import api from '@/services/api';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
 import React from 'react';

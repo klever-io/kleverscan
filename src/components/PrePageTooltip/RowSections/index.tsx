@@ -38,7 +38,7 @@ import {
   TxTypeSpan,
   UnderlineSpan,
 } from '../styles';
-import { CustomLink } from '@/components/Table/styles';
+import { CustomLink } from '@/styles/common';
 
 const getRedirectButton = (
   path: string,

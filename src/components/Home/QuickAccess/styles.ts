@@ -1,6 +1,6 @@
 import { DefaultCardStyles } from '@/styles/common';
 import styled, { css } from 'styled-components';
-import { TableGradientBorder } from '../../TableV2/styles';
+import { TableGradientBorder } from '../../Table/styles';
 
 export const Container = styled.div`
   ${TableGradientBorder}

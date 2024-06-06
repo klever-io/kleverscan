@@ -1,10 +1,10 @@
 import Filter, { IFilter } from '@/components/Filter';
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import {
   CustomFieldWrapper,
   CustomLink,
   Status,
-} from '@/components/TableV2/styles';
+} from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
 import { paramsStyles } from '@/components/Tooltip/configs';
 import { useMobile } from '@/contexts/mobile';

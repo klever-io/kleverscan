@@ -424,3 +424,104 @@ export const FlexSpan = styled.span`
   gap: 0.3rem;
   align-items: center;
 `;
+
+interface IStatus {
+  status: string;
+}
+
+export const Status = styled.div<IStatus>`
+  display: flex;
+
+  flex-direction: row;
+
+  align-items: center;
+
+  gap: 0.9rem;
+
+  svg {
+    min-width: 24px;
+  }
+
+  span {
+    color: ${props =>
+      props.status === 'ApprovedProposal'
+        ? props.theme.table['success']
+        : props.theme.table[props.status]} !important;
+    font-weight: bold;
+  }
+
+  p {
+    color: ${props => props.theme.table[props.status]} !important;
+    text-transform: capitalize;
+  }
+
+  ${props =>
+    props.status === 'inactive' &&
+    `
+      color: ${props.theme.table.icon} !important;
+      
+    `}
+`;
+export const CustomLink = styled.a<{
+  tabAsset?: boolean;
+  fullWidth?: boolean;
+  secondary?: boolean;
+}>`
+  align-self: end;
+  text-align: center;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 16px;
+
+  height: 34px !important;
+
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: ${props => (props.tabAsset ? '500' : '600')}!important;
+
+  min-width: 8rem;
+  max-width: 15rem;
+
+  background: ${props => (props.tabAsset ? '' : props.theme.violet)};
+  color: ${props =>
+    props.tabAsset ? props.theme.black : props.theme.true.white} !important;
+  border: 1px solid ${props => transparentize(0.75, props.theme.black)};
+  border-radius: 24px;
+
+  cursor: pointer;
+
+  transition: all 0.1s ease;
+
+  ${props =>
+    props.fullWidth &&
+    css`
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+    `}
+
+  ${props =>
+    props.secondary &&
+    css`
+      background: transparent;
+      color: ${props.theme.violet} !important;
+      border: 1px solid ${props.theme.violet};
+
+      &:hover {
+        background: ${props.theme.violet};
+        color: ${props.theme.true.white} !important;
+      }
+    `}
+
+  &:hover {
+    background: ${props => props.theme.violet};
+  }
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+`;

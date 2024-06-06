@@ -1,6 +1,6 @@
 import Copy from '@/components/Copy';
 import Filter, { IFilter } from '@/components/Filter';
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import { IBalance, IHolders, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
 import { parseAddress } from '@/utils/parseValues';

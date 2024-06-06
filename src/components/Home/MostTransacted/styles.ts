@@ -1,4 +1,4 @@
-import { TableGradientBorder } from '@/components/TableV2/styles';
+import { TableGradientBorder } from '@/components/Table/styles';
 import styled from 'styled-components';
 
 export const SectionContainer = styled.div`

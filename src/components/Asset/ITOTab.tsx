@@ -5,7 +5,6 @@ import { useExtension } from '@/contexts/extension';
 import { IParsedITO } from '@/types';
 import { formatDate } from '@/utils/formatFunctions';
 import {
-  AssetEmptyRow,
   EllipsisSpan,
   ExpandableRow,
   ExpandWrapper,
@@ -194,9 +193,9 @@ export const ITOTab: React.FC<ITOTabProps> = ({ ITO }) => {
           )}
         </>
       ) : (
-        <AssetEmptyRow type="assets">
+        <Row>
           <p>No active ITO found</p>
-        </AssetEmptyRow>
+        </Row>
       )}
     </>
   );

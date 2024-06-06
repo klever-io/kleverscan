@@ -1,4 +1,4 @@
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import { IInnerTableProps, IRewardsAssets, IRowSection } from '@/types/index';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useTranslation } from 'next-i18next';

@@ -275,7 +275,6 @@ const homeKlvDataCall = async (): Promise<IGeckoResponse | undefined> => {
     const res = await api.get({
       route: 'coins/klever',
       service: Service.GECKO,
-      useApiProxy: true,
     });
 
     if (!res.error || res.error === '') {
@@ -473,7 +472,6 @@ const homeKfiPriceCall = async (): Promise<
         Name: 'kfi',
         Currency: 'USD',
       },
-      useApiProxy: true,
     });
 
     if (!res.error || res.error === '') {

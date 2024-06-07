@@ -23,7 +23,6 @@ export interface IProps {
   body?: any;
   apiVersion?: string;
   service?: Service;
-  useApiProxy?: boolean;
   requestMode?: RequestMode;
   tries?: number;
 }
@@ -121,58 +120,35 @@ export const withoutBody = async (
   tries = 3,
 ): Promise<any> => {
   const request = async () => {
-    if (props.useApiProxy) {
-      try {
-        // use next api as proxy for get requests, to avoid gecko errors (when fetching prices)
-        const response = await fetch('/api/proxy', {
-          method: Method.POST,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            ...getProps(props),
-            method: method.toString(),
-          }),
-        });
+    try {
+      const { route, query, service, apiVersion } = getProps(props);
+      const requestMode: RequestMode = props?.requestMode ?? 'cors';
 
-        return response.json();
-      } catch (error) {
-        return { data: null, error, code: 'internal_error', pagination };
-      }
-    } else if (!props.useApiProxy) {
-      try {
-        const { route, query, service, apiVersion } = getProps(props);
-        const requestMode: RequestMode = props?.requestMode ?? 'cors';
+      const response = await fetch(getHost(route, query, service, apiVersion), {
+        method: method.toString(),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        mode: requestMode,
+      });
 
-        const response = await fetch(
-          getHost(route, query, service, apiVersion),
-          {
-            method: method.toString(),
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            mode: requestMode,
-          },
-        );
-
-        if (!response.ok) {
-          return {
-            data: null,
-            error: (await response.json()).error,
-            code: 'internal_error',
-            pagination,
-          };
-        }
-
-        return response.json();
-      } catch (error) {
+      if (!response.ok) {
         return {
           data: null,
-          error,
+          error: (await response.json()).error,
           code: 'internal_error',
           pagination,
         };
       }
+
+      return response.json();
+    } catch (error) {
+      return {
+        data: null,
+        error,
+        code: 'internal_error',
+        pagination,
+      };
     }
   };
 
@@ -190,74 +166,51 @@ export const withoutBody = async (
 
 export const withBody = async (props: IProps, method: Method): Promise<any> => {
   const request = async () => {
-    if (props.useApiProxy) {
-      try {
-        // use next api as proxy for post requests, to avoid cors from api-gateway (when fetching prices)
-        const response = await fetch('/api/proxy', {
-          method: method.toString(),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            ...getProps(props),
-            method: method.toString(),
-          }),
-        });
+    try {
+      const { route, body, query, service, apiVersion } = getProps(props);
+      const requestMode: RequestMode = props?.requestMode ?? 'cors';
 
-        return response.json();
+      const response = await fetch(getHost(route, query, service, apiVersion), {
+        method: method.toString(),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+        mode: requestMode,
+      });
+      let resJson;
+
+      try {
+        resJson = await response.json();
       } catch (error) {
-        return { data: null, error, code: 'internal_error', pagination };
-      }
-    } else if (!props.useApiProxy) {
-      try {
-        const { route, body, query, service, apiVersion } = getProps(props);
-        const requestMode: RequestMode = props?.requestMode ?? 'cors';
-
-        const response = await fetch(
-          getHost(route, query, service, apiVersion),
-          {
-            method: method.toString(),
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
-            mode: requestMode,
-          },
-        );
-        let resJson;
-
-        try {
-          resJson = await response.json();
-        } catch (error) {
-          if (!response.ok) {
-            return {
-              data: null,
-              error: 'Could not parse response',
-              code: 'internal_error',
-              pagination,
-            };
-          }
-
-          return {
-            data: null,
-            error: '',
-            code: '',
-          };
-        }
-
         if (!response.ok) {
           return {
             data: null,
-            error: resJson.error,
+            error: 'Could not parse response',
             code: 'internal_error',
             pagination,
           };
         }
 
-        return resJson;
-      } catch (error) {
-        return { data: null, error, code: 'internal_error', pagination };
+        return {
+          data: null,
+          error: '',
+          code: '',
+        };
       }
+
+      if (!response.ok) {
+        return {
+          data: null,
+          error: resJson.error,
+          code: 'internal_error',
+          pagination,
+        };
+      }
+
+      return resJson;
+    } catch (error) {
+      return { data: null, error, code: 'internal_error', pagination };
     }
   };
 

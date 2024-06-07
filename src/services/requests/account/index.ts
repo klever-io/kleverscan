@@ -296,7 +296,6 @@ export const pricesCall = async (): Promise<number | undefined> => {
       route: 'prices/prices',
       service: Service.PROXY,
       body: { names: ['KLV/USD'] },
-      useApiProxy: true,
     });
     if (!res.error || res.error === '') {
       return res?.data?.prices?.symbols[0]?.price;

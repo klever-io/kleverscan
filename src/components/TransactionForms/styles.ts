@@ -266,3 +266,16 @@ export const SpanMessage = styled.span`
     top: 5rem;
   }
 `;
+export const PackRange = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: flex-end;
+  justify-content: center;
+
+  > span {
+    color: ${({ theme }) => theme.darkText};
+    font-weight: 600;
+    margin-bottom: 13px;
+  }
+`;

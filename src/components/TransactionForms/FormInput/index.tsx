@@ -326,6 +326,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
     onInputChange,
     creatable,
     selectFilter,
+    customOnChange,
     ...rest,
   };
 

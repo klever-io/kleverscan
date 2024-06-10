@@ -200,6 +200,11 @@ export const TooltipContent = styled.div`
 export const Container = styled.div<IProps>`
   width: 100%;
   position: relative;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
   ${props => css`
     grid-column: auto / span ${props.span};
     padding-top: ${props.paddingTop ? props.paddingTop : 0}rem;

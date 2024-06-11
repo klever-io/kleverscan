@@ -120,6 +120,12 @@ ${({ theme, logoWarning }) =>
     appearance: textfield;
     -moz-appearance: textfield;
   }
+
+  &:disabled {
+    filter: opacity(0.6);
+    color: ${({ theme }) => theme.gray};
+    cursor: not-allowed;
+  }
 `;
 
 export const FileInput = styled.input<{ Dragging: boolean }>`

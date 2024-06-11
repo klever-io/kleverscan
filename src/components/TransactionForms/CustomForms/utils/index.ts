@@ -1,7 +1,7 @@
 import { setQueryAndRouter } from '@/utils';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { cleanEmptyValues } from '../../FormInput';
-import { PackInfo, WhitelistInfo } from './types';
+import { Pack, PackInfo, WhitelistInfo } from './types';
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 export const parseSplitRoyalties = (data: any): void => {
@@ -118,8 +118,17 @@ export const parsePackInfo = (data: any): void => {
 
   packInfoReference.forEach((item: any) => {
     const label = item.currencyId.toUpperCase();
+    const parsedPacks = item.packs.map((pack: Pack, index: number) => {
+      if (index === item.packs.length - 1) {
+        return {
+          amount: item.packs[index - 1].amount + 1,
+          price: pack.price,
+        };
+      }
+      return pack;
+    });
     packInfo[label] = {
-      packs: item.packs,
+      packs: parsedPacks,
     };
   });
 

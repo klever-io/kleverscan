@@ -16,12 +16,17 @@ import {
   ConnectedWallet,
   GraySpan,
 } from './styles';
+import { useRouter } from 'next/router';
+import { useMobile } from '@/contexts/mobile';
 
 interface IConnectWallet {
   clickConnection: () => void;
 }
 
 const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
+  const router = useRouter();
+  const autoConnectWallet = router.query?.autoconnect;
+  const { isDeviceMobileCheck } = useMobile();
   const [openUserInfos, setOpenUserInfos] = useState(false);
   const {
     walletAddress,
@@ -33,17 +38,12 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
   } = useExtension();
 
   const handleClick = () => {
+    if (isDeviceMobileCheck()) {
+      window.location.href = 'https://k5.link/dl/HiIT';
+      return;
+    }
     setOpenDrawer(true);
   };
-  const closeMenu = () => {
-    setOpenDrawer(false);
-  };
-
-  useEffect(() => {
-    document.body.style.overflow = openDrawer ? 'hidden' : 'visible';
-  }, [openDrawer]);
-
-  useScroll(openUserInfos, () => setOpenUserInfos(false));
 
   const connectAndOpen = () => {
     if (!walletAddress) {
@@ -52,6 +52,22 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
       setOpenUserInfos(!openUserInfos);
     }
   };
+
+  const closeMenu = () => {
+    setOpenDrawer(false);
+  };
+
+  useEffect(() => {
+    if (autoConnectWallet === 'true') {
+      connectAndOpen();
+    }
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = openDrawer ? 'hidden' : 'visible';
+  }, [openDrawer]);
+
+  useScroll(openUserInfos, () => setOpenUserInfos(false));
 
   return (
     <>
@@ -66,7 +82,7 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
                 width={25}
                 height={25}
               />
-              <span>Connect wallet</span>
+              <span>Connect Wallet</span>
             </ConnectButton>
           </ConnectContainer>
           <BackgroundHelper

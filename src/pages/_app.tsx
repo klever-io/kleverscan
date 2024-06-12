@@ -8,16 +8,11 @@ import React, { useEffect } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import Layout from '../components/Layout';
 import NProgress from '../components/NProgress';
-import Bugsnag from '../lib/bugsnag';
 import GlobalStyle from '../styles/global';
 import * as gtag from '../utils/gtag/gtag';
 
 import { getCookie } from 'cookies-next';
 import { InternalThemeProvider } from '@/contexts/theme';
-
-const ErrorBoundary =
-  !process.env.BUGSNAG_DISABLED &&
-  Bugsnag.getPlugin('react')?.createErrorBoundary(React);
 
 //add window methods to global scope
 declare global {
@@ -50,7 +45,7 @@ const MyApp = ({ Component, pageProps, initialDarkTheme }: AppProps) => {
     };
   }, [router.events]);
 
-  const children = (
+  return (
     <>
       <Head>
         <meta
@@ -69,8 +64,6 @@ const MyApp = ({ Component, pageProps, initialDarkTheme }: AppProps) => {
       </InternalThemeProvider>
     </>
   );
-
-  return ErrorBoundary ? <ErrorBoundary>{children}</ErrorBoundary> : children;
 };
 
 MyApp.getInitialProps = async (appContext: AppContext) => {

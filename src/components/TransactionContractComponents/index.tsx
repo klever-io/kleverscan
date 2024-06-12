@@ -150,7 +150,7 @@ interface RenderAssetIdOptions {
 const renderAssetId = (
   parameter: any,
   options: RenderAssetIdOptions = {
-    clearNonce: true,
+    clearNonce: false,
   },
 ) => {
   return parameter?.assetId?.split('/')[0] &&
@@ -261,7 +261,7 @@ export const Transfer: React.FC<IIndexedContract> = ({
         <span>
           <strong>Asset Id</strong>
         </span>
-        {renderAssetId(parameter, { clearNonce: false })}
+        {renderAssetId(parameter)}
       </Row>
       <Row>
         <span>
@@ -273,7 +273,7 @@ export const Transfer: React.FC<IIndexedContract> = ({
               ? toLocaleFixed(parameter?.amount / 10 ** precision, precision)
               : '--'}
           </strong>
-          {renderAssetId(parameter, { clearNonce: false })}
+          {renderAssetId(parameter)}
         </CenteredRow>
       </Row>
       <Row>

@@ -423,6 +423,7 @@ const MultiPackItem = ({ packInfoIndex, packIndex, fieldArray }: any) => {
           title={`From`}
           type="number"
           tooltip={tooltip.packInfo.packItem.amount}
+          value={packIndex === 0 ? 0 : undefined}
           disabled={packIndex === 0}
           required={packIndex !== 0}
         />
@@ -445,7 +446,7 @@ const MultiPackItem = ({ packInfoIndex, packIndex, fieldArray }: any) => {
               value,
             );
           }}
-          value={lastPack ? 'Infinity' : fields[packIndex].amount}
+          dynamicInitialValue={lastPack ? 'Infinity' : fields[packIndex].amount}
           required={!lastPack}
           disabled={lastPack}
         />

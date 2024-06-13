@@ -143,11 +143,24 @@ const renderNFTNonces = (noncesReceipts: IBuyReceipt[]) => {
   return null;
 };
 
-const renderAssetId = (parameter: any) => {
+interface RenderAssetIdOptions {
+  clearNonce?: boolean;
+}
+
+const renderAssetId = (
+  parameter: any,
+  options: RenderAssetIdOptions = {
+    clearNonce: false,
+  },
+) => {
   return parameter?.assetId?.split('/')[0] &&
     parameter?.assetId?.split('/')[0] !== 'KLV' ? (
     <Link href={`/asset/${parameter?.assetId?.split('/')[0]}`}>
-      <a style={{ fontWeight: '500' }}>{parameter?.assetId?.split('/')[0]}</a>
+      <a style={{ fontWeight: '500' }}>
+        {options?.clearNonce
+          ? parameter.assetId.split('/')[0]
+          : parameter.assetId}
+      </a>
     </Link>
   ) : (
     parameter?.amount && (
@@ -167,7 +180,7 @@ export const Transfer: React.FC<IIndexedContract> = ({
   renderMetadata,
 }) => {
   const parameter = par as ITransferContract;
-  const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
+  const assetID = parameter?.assetId || 'KLV';
   const precision = usePrecision(assetID);
   const filteredReceipts = rec as ITransferReceipt[];
 

@@ -366,17 +366,17 @@ const PackSection = ({ packInfoIndex }: { packInfoIndex: number }) => {
       <ButtonContainer
         type="button"
         onClick={() => {
-          const updatedFields = (fields as unknown as Pack[]).map(
-            (field, index) => {
-              if (index === fields.length - 1) {
-                return { amount: (lastPack?.amount || 0) * 10, price: 0 };
-              }
-              return {
-                amount: field.amount,
-                price: field.price,
-              };
-            },
-          );
+          const updatedFields = (
+            getValues(`packInfo[${packInfoIndex}].packs`) as unknown as Pack[]
+          ).map((field, index) => {
+            if (index === fields.length - 1) {
+              return { amount: (lastPack?.amount || 0) * 10, price: 0 };
+            }
+            return {
+              amount: field.amount,
+              price: field.price,
+            };
+          });
 
           const newFields = [
             ...updatedFields,

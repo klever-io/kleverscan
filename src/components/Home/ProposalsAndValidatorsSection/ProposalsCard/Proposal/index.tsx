@@ -1,5 +1,5 @@
 import { PurpleArrowRight } from '@/assets/icons';
-import { Status } from '@/components/TableV2/styles';
+import { Status } from '@/components/Table/styles';
 import { getProposalStatusColorAndText } from '@/components/Tabs/Proposals';
 import { IProposal } from '@/types/proposals';
 import {

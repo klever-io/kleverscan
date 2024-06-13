@@ -1,9 +1,9 @@
 import { Validators as Icon } from '@/assets/cards';
 import Detail from '@/components/Detail';
-import { CustomLink } from '@/components/Table/styles';
-import { ITable } from '@/components/TableV2';
+import { ITable } from '@/components/Table';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
+import { CustomLink } from '@/styles/common';
 import { INfts, IPagination, IRowSection } from '@/types/index';
 import { parseAddress } from '@/utils/parseValues';
 import Link from 'next/link';

@@ -1,5 +1,4 @@
 import { default as DefaultInput } from '@/components/InputGlobal';
-import { EmptyRow } from '@/components/Table/styles';
 import { transparentize } from 'polished';
 import styled, { css } from 'styled-components';
 
@@ -172,10 +171,6 @@ export const Row = styled.div<{ span?: number }>`
       `}
     padding: 1.5rem 2rem;
   }
-`;
-
-export const AssetEmptyRow = styled(EmptyRow)`
-  grid-column: 1 / -1;
 `;
 
 export const FPRRow = styled(Row)`

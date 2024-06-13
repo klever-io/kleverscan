@@ -267,11 +267,11 @@ export const KDASelect: React.FC<IKDASelect> = props => {
             selectedCollection?.value
               ? selectedCollection
               : queue[0].collection
-              ? {
-                  label: queue[0].collection?.label || '',
-                  value: queue[0].collection?.value || '',
-                }
-              : undefined
+                ? {
+                    label: queue[0].collection?.label || '',
+                    value: queue[0].collection?.value || '',
+                  }
+                : undefined
           }
           zIndex={3}
           error={Boolean(collectionError)}
@@ -334,7 +334,7 @@ const CollectionIDField: React.FC<CollectionIDFieldProps> = ({
     },
   });
 
-  const cellectionOptions: IDropdownItem[] = useMemo(() => {
+  const collectionOptions: IDropdownItem[] = useMemo(() => {
     return collectionIdData.map(asset => {
       const parseCollectionId = asset.assetId.split('/')[1];
       return { label: parseCollectionId, value: parseCollectionId };
@@ -345,7 +345,7 @@ const CollectionIDField: React.FC<CollectionIDFieldProps> = ({
     e => String(e.nftNonce) === watchCollectionAssetId,
   )[0];
 
-  const selectedCollectionId = cellectionOptions?.filter(
+  const selectedCollectionId = collectionOptions?.filter(
     e => e.value === watchCollectionAssetId,
   )[0] || { label: watchCollectionAssetId, value: watchCollectionAssetId } || {
       label: '',
@@ -425,7 +425,7 @@ const CollectionIDField: React.FC<CollectionIDFieldProps> = ({
         />
       ) : (
         <Select
-          options={cellectionOptions}
+          options={collectionOptions}
           onChange={collectionIdChangeHandler}
           onInputChange={handleInputChange}
           loading={collectionIdListLoading}

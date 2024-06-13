@@ -5,7 +5,7 @@ import {
   CustomFieldWrapper,
   Status,
   TimestampInfo,
-} from '@/components/TableV2/styles';
+} from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
 import { useHomeData } from '@/contexts/mainPage';
 import { useMobile } from '@/contexts/mobile';
@@ -29,7 +29,7 @@ import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback, useState } from 'react';
-import Table, { ITable } from '../../TableV2';
+import Table, { ITable } from '../../Table';
 
 export const homeTransactionTableHeaders = [
   'Transaction Hash',

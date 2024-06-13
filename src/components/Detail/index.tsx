@@ -1,4 +1,4 @@
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import { Container, Header } from '@/styles/common';
 import React from 'react';
 import Filter, { IFilter } from '../Filter';

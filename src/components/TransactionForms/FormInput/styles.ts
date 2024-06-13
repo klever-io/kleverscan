@@ -120,6 +120,12 @@ ${({ theme, logoWarning }) =>
     appearance: textfield;
     -moz-appearance: textfield;
   }
+
+  &:disabled {
+    filter: opacity(0.6);
+    color: ${({ theme }) => theme.gray};
+    cursor: not-allowed;
+  }
 `;
 
 export const FileInput = styled.input<{ Dragging: boolean }>`
@@ -200,6 +206,11 @@ export const TooltipContent = styled.div`
 export const Container = styled.div<IProps>`
   width: 100%;
   position: relative;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
   ${props => css`
     grid-column: auto / span ${props.span};
     padding-top: ${props.paddingTop ? props.paddingTop : 0}rem;

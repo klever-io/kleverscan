@@ -2,6 +2,7 @@ import { useHomeData } from '@/contexts/mainPage';
 import {
   Cell,
   HeaderItem,
+  MostTransactedLink,
   Row,
   SectionContainer,
   Table,
@@ -9,6 +10,7 @@ import {
   Title,
 } from './styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
+import Link from 'next/link';
 
 const MostTransacted: React.FC = () => {
   const { mostTransactedTokens, mostTransactedNFTs } = useHomeData();
@@ -44,12 +46,16 @@ const MostTransacted: React.FC = () => {
                 <Row key={index}>
                   <Cell>{index + 1}</Cell>
                   <Cell>
-                    <AssetLogo
-                      logo={item.logo}
-                      ticker={item.key}
-                      name={item.key}
-                    />
-                    {item.key}
+                    <Link href={`/asset/${item.key}`}>
+                      <MostTransactedLink href={`/asset/${item.key}`}>
+                        <AssetLogo
+                          logo={item.logo}
+                          ticker={item.key}
+                          name={item.key}
+                        />
+                        {item.key}
+                      </MostTransactedLink>
+                    </Link>
                   </Cell>
                   <Cell>{item.doc_count.toLocaleString()}</Cell>
                 </Row>

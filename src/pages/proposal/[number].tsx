@@ -1,8 +1,7 @@
 import { Copy } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import Title from '@/components/Layout/Title';
-import { Status } from '@/components/Table/styles';
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import { proposalsMap } from '@/components/Tabs/NetworkParams/proposalsMap';
 import Tooltip from '@/components/Tooltip';
 import { useContractModal } from '@/contexts/contractModal';
@@ -19,6 +18,7 @@ import {
   CardTabContainer,
   CenteredRow,
   Container,
+  Status,
 } from '@/styles/common';
 import { IRowSection } from '@/types/index';
 import {

@@ -16,12 +16,17 @@ import {
   ConnectedWallet,
   GraySpan,
 } from './styles';
+import { useRouter } from 'next/router';
+import { useMobile } from '@/contexts/mobile';
 
 interface IConnectWallet {
   clickConnection: () => void;
 }
 
 const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
+  const router = useRouter();
+  const autoConnectWallet = router.query?.autoconnect;
+  const { isDeviceMobileCheck } = useMobile();
   const [openUserInfos, setOpenUserInfos] = useState(false);
   const {
     walletAddress,
@@ -32,18 +37,29 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
     setOpenDrawer,
   } = useExtension();
 
+  const downloadK5 = 'https://onelink.to/455hxv';
+  const K5Kleverscan =
+    'klever-wallet://dp/browser?link=https://kleverscan.org/?autoconnect=true';
+
   const handleClick = () => {
-    setOpenDrawer(true);
-  };
-  const closeMenu = () => {
-    setOpenDrawer(false);
+    const deviceIsMobile = isDeviceMobileCheck();
+    if (deviceIsMobile) {
+      goToK5();
+      setTimeout(() => {
+        GoDownloadWallet();
+      }, 1000);
+    } else {
+      setOpenDrawer(true);
+    }
   };
 
-  useEffect(() => {
-    document.body.style.overflow = openDrawer ? 'hidden' : 'visible';
-  }, [openDrawer]);
+  const goToK5 = () => {
+    window.location.href = K5Kleverscan;
+  };
 
-  useScroll(openUserInfos, () => setOpenUserInfos(false));
+  const GoDownloadWallet = () => {
+    window.location.href = downloadK5;
+  };
 
   const connectAndOpen = () => {
     if (!walletAddress) {
@@ -52,6 +68,22 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
       setOpenUserInfos(!openUserInfos);
     }
   };
+
+  const closeMenu = () => {
+    setOpenDrawer(false);
+  };
+
+  useEffect(() => {
+    if (autoConnectWallet === 'true') {
+      connectAndOpen();
+    }
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = openDrawer ? 'hidden' : 'visible';
+  }, [openDrawer]);
+
+  useScroll(openUserInfos, () => setOpenUserInfos(false));
 
   return (
     <>
@@ -66,7 +98,7 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
                 width={25}
                 height={25}
               />
-              <span>Connect wallet</span>
+              <span>Connect Wallet</span>
             </ConnectButton>
           </ConnectContainer>
           <BackgroundHelper

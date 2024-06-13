@@ -1,6 +1,6 @@
 import { PurpleArrowRight } from '@/assets/icons';
 import AssetLogo from '@/components/Logo/AssetLogo';
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import { useHomeData } from '@/contexts/mainPage';
 import { useMobile } from '@/contexts/mobile';
 import { defaultPagination } from '@/services/apiCalls';
@@ -52,6 +52,8 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
     blockRewards,
   } = block;
 
+  const producerNameIsAddress = producerName === producerOwnerAddress;
+
   const sections: IRowSection[] = [
     {
       element: props => (
@@ -78,10 +80,10 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
             key={producerOwnerAddress}
           >
             <a>
-              {producerName ? (
+              {producerName && !producerNameIsAddress ? (
                 producerName
               ) : (
-                <Mono>{producerOwnerAddress}</Mono>
+                <Mono>{parseAddress(producerOwnerAddress, 24)}</Mono>
               )}
             </a>
           </Link>

@@ -1,4 +1,4 @@
-import { TableGradientBorder } from '@/components/TableV2/styles';
+import { TableGradientBorder } from '@/components/Table/styles';
 import styled from 'styled-components';
 
 export const SectionContainer = styled.div`
@@ -86,4 +86,15 @@ export const Cell = styled.td`
   &:last-child {
     width: 50%;
   }
+`;
+
+export const MostTransactedLink = styled.a`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: ${({ theme }) => theme.black};
+
+  text-decoration: underline;
+
+  cursor: pointer;
 `;

@@ -37,12 +37,28 @@ const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
     setOpenDrawer,
   } = useExtension();
 
+  const downloadK5 = 'https://onelink.to/455hxv';
+  const K5Kleverscan =
+    'klever-wallet://dp/browser?link=https://kleverscan.org/?autoconnect=true';
+
   const handleClick = () => {
-    if (isDeviceMobileCheck()) {
-      window.location.href = 'https://k5.link/dl/HiIT';
-      return;
+    const deviceIsMobile = isDeviceMobileCheck();
+    if (deviceIsMobile) {
+      goToK5();
+      setTimeout(() => {
+        GoDownloadWallet();
+      }, 1000);
+    } else {
+      setOpenDrawer(true);
     }
-    setOpenDrawer(true);
+  };
+
+  const goToK5 = () => {
+    window.location.href = K5Kleverscan;
+  };
+
+  const GoDownloadWallet = () => {
+    window.location.href = downloadK5;
   };
 
   const connectAndOpen = () => {

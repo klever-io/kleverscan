@@ -23,7 +23,7 @@ import {
   removeWrapper,
 } from './utils';
 import { ITOTooltips as tooltip } from './utils/tooltips';
-import { PackInfo, WhitelistInfo } from './utils/types';
+import { Pack, PackInfo, WhitelistInfo } from './utils/types';
 import { useDebounce, useFetchPartial } from '@/utils/hooks';
 
 export type ConfigITOData = {
@@ -178,7 +178,7 @@ const WhitelistConfigSection: React.FC<ISectionProps> = ({
         title="Whitelist Status"
         type="dropdown"
         options={statusOptions}
-        defaultValue={2}
+        dynamicInitialValue={2}
         tooltip={tooltip.whitelistStatus}
       />
     </FormSection>
@@ -254,7 +254,9 @@ export const PackInfoSection: React.FC<{ top?: number }> = ({ top }) => {
   };
 
   const [filterAssets, fetchPartialAsset, loading, setLoading] =
-    useFetchPartial<IAsset>('assets', 'assets/list', 'assetId');
+    useFetchPartial<IAsset>('assets', 'assets/list', 'assetId', {
+      type: 'Fungible',
+    });
   const [assetInput, setAssetInput] = useState<string>('');
   const debouncedAssetInput = useDebounce(assetInput, 500);
   useEffect(() => {
@@ -327,8 +329,9 @@ const PackSection = ({ packInfoIndex }: { packInfoIndex: number }) => {
 
   const packType = watch(`packInfo[${packInfoIndex}].packType`);
   const isSinglePack = packType === 0;
-  const packs = watch(`packInfo[${packInfoIndex}].packs`);
-  const lastPack = packs && packs?.length && packs[packs?.length - 2];
+  const lastPack = (fields &&
+    fields?.length &&
+    fields[fields?.length - 2]) as unknown as Pack;
 
   return (
     <FormSection inner>
@@ -363,17 +366,24 @@ const PackSection = ({ packInfoIndex }: { packInfoIndex: number }) => {
       <ButtonContainer
         type="button"
         onClick={() => {
-          const updatedFields = fields.map((field, index) => {
-            if (index === fields.length - 1) {
-              return { amount: lastPack.amount * 10, price: 0 };
-            }
-            return field;
-          });
+          const updatedFields = (fields as unknown as Pack[]).map(
+            (field, index) => {
+              if (index === fields.length - 1) {
+                return { amount: (lastPack?.amount || 0) * 10, price: 0 };
+              }
+              return {
+                amount: field.amount,
+                price: field.price,
+              };
+            },
+          );
 
-          replace([
+          const newFields = [
             ...updatedFields,
-            { amount: lastPack.amount * 10, price: 0 },
-          ]);
+            { amount: (lastPack?.amount || 0) * 10, price: 0 },
+          ];
+
+          replace(JSON.parse(JSON.stringify(newFields)));
         }}
       >
         Add Pack
@@ -405,11 +415,14 @@ const MultiPackItem = ({ packInfoIndex, packIndex, fieldArray }: any) => {
       </SectionTitle>
       <PackRange>
         <FormInput
-          name={`packInfo[${packInfoIndex}].packs[${packIndex - 1}].amount`}
+          name={
+            packIndex === 0
+              ? `packInfo[${packInfoIndex}].firstAmount`
+              : `packInfo[${packInfoIndex}].packs[${packIndex - 1}].amount`
+          }
           title={`From`}
           type="number"
           tooltip={tooltip.packInfo.packItem.amount}
-          dynamicInitialValue={packIndex === 0 ? '0' : undefined}
           disabled={packIndex === 0}
           required={packIndex !== 0}
         />
@@ -420,10 +433,16 @@ const MultiPackItem = ({ packInfoIndex, packIndex, fieldArray }: any) => {
           type={packIndex === fields.length - 1 ? 'text' : 'number'}
           tooltip={tooltip.packInfo.packItem.amount}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            const { value } = e.target;
+            const target = e.target;
+            const value = Number(target.value);
+
+            if (!value || isNaN(value)) {
+              return;
+            }
+
             setValue(
               `packInfo[${packInfoIndex}].packs[${packIndex}].amount`,
-              Number(value),
+              value,
             );
           }}
           value={lastPack ? 'Infinity' : fields[packIndex].amount}

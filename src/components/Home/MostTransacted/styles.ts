@@ -87,3 +87,14 @@ export const Cell = styled.td`
     width: 50%;
   }
 `;
+
+export const MostTransactedLink = styled.a`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: ${({ theme }) => theme.black};
+
+  text-decoration: underline;
+
+  cursor: pointer;
+`;

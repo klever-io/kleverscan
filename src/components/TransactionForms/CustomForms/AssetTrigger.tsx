@@ -23,6 +23,7 @@ import {
   parseURIs,
 } from './utils';
 import { assetTriggerTooltips as tooltip } from './utils/tooltips';
+import { getNetwork } from '@/utils/networkFunctions';
 
 export interface IMetadataOptions {
   metadata: string;
@@ -280,6 +281,8 @@ const getAssetTriggerForm = (
 };
 
 export const AddRoleSection: React.FC = () => {
+  const network = getNetwork();
+
   return (
     <FormSection>
       <SectionTitle>
@@ -312,6 +315,22 @@ export const AddRoleSection: React.FC = () => {
         toggleOptions={['No', 'Yes']}
         tooltip={tooltip.role.hasRoleSetITOPrices}
       />
+      <FormInput
+        name={`role.hasRoleDeposit`}
+        title={`Has Role Deposit`}
+        type="checkbox"
+        toggleOptions={['No', 'Yes']}
+        tooltip={tooltip.role.hasRoleDeposit}
+      />
+      {network !== 'Mainnet' && (
+        <FormInput
+          name={`role.hasRoleTransfer`}
+          title={`Has Role Transfer`}
+          type="checkbox"
+          toggleOptions={['No', 'Yes']}
+          tooltip={tooltip.role.hasRoleTransfer}
+        />
+      )}
     </FormSection>
   );
 };

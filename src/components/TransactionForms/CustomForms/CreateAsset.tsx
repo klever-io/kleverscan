@@ -28,6 +28,7 @@ import {
   removeWrapper,
 } from './utils';
 import { assetsTooltip as tooltip } from './utils/tooltips';
+import { getNetwork } from '@/utils/networkFunctions';
 
 interface IPrecisionProps {
   precision: number;
@@ -553,6 +554,9 @@ export const RolesSection: React.FC = () => {
     control,
     name: 'roles',
   });
+
+  const network = getNetwork();
+
   return (
     <FormSection>
       <SectionTitle>
@@ -594,6 +598,22 @@ export const RolesSection: React.FC = () => {
             toggleOptions={['No', 'Yes']}
             tooltip={tooltip.roles.hasRoleSetITOPrices}
           />
+          <FormInput
+            name={`role.hasRoleDeposit`}
+            title={`Has Role Deposit`}
+            type="checkbox"
+            toggleOptions={['No', 'Yes']}
+            tooltip={tooltip.roles.hasRoleDeposit}
+          />
+          {network !== 'Mainnet' && (
+            <FormInput
+              name={`role.hasRoleTransfer`}
+              title={`Has Role Transfer`}
+              type="checkbox"
+              toggleOptions={['No', 'Yes']}
+              tooltip={tooltip.roles.hasRoleTransfer}
+            />
+          )}
         </FormSection>
       ))}
       <ButtonContainer type="button" onClick={() => append({})}>

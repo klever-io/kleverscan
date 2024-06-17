@@ -16,6 +16,7 @@
   "dependencies": {
     "@directus/sdk": "^15.0.2",
     "@klever/sdk-web": "^1.1.4",
+    "@svgr/webpack": "^8.1.0",
     "@unform/core": "2.1.6",
     "@unform/web": "^2.1.6",
     "babel-plugin-inline-react-svg": "2.0.1",

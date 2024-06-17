@@ -44,7 +44,14 @@ const Chart: React.FC<PropsWithChildren<IChart>> = ({
   strokeWidth,
   height,
 }) => {
-  const props = { data, hasTooltip, yAxis, strokeWidth, height, CustomTooltip };
+  const props: any = {
+    data,
+    hasTooltip,
+    yAxis,
+    strokeWidth,
+    height,
+    CustomTooltip,
+  };
 
   switch (type) {
     case ChartType.Area:

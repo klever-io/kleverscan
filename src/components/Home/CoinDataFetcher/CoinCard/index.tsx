@@ -412,7 +412,7 @@ const CoinCard: React.FC<PropsWithChildren> = () => {
           {coins.map((coin, index) => (
             <CoinSelector
               key={String(index)}
-              isSelected={selectedCoin === index}
+              $isSelected={selectedCoin === index}
               onClick={() => {
                 handleSelection(index);
               }}
@@ -420,7 +420,7 @@ const CoinCard: React.FC<PropsWithChildren> = () => {
               {coin.shortname}
             </CoinSelector>
           ))}
-          <CoinsSlider selectedIndex={selectedCoin} />
+          <CoinsSlider $selectedIndex={selectedCoin} />
         </CoinsSelector>
         {!boolChecker(coinsLoadingBool) ? (
           <Carousel ref={carouselRef}>

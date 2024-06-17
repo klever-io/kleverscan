@@ -596,7 +596,7 @@ export const ShowDetailsButton = styled.button`
   font-weight: 600;
   color: ${props =>
     props.theme.dark ? props.theme.black : props.theme.footer.border};
-  :hover {
+  &:hover {
     text-decoration: underline;
   }
 `;

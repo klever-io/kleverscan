@@ -287,7 +287,7 @@ export const BlockCardContainer = styled.div<BlockCardContainerProps>`
   animation: ${PullFade} 1s ease-in-out;
 
   animation-fill-mode: forwards;
-  :first-child {
+  &:first-child {
     animation: ${PushFade} 1s ease-in-out;
     animation-fill-mode: forwards;
   }
@@ -606,7 +606,7 @@ export const RetryContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  :hover {
+  &:hover {
     cursor: pointer;
   }
 `;

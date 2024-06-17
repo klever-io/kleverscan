@@ -379,7 +379,7 @@ export const BlockCardContainer = styled.div<BlockCardContainerProps>`
   animation: ${PullFade} 1s ease-in-out;
 
   animation-fill-mode: forwards;
-  :first-child {
+  &:first-child {
     animation: ${PushFade} 1s ease-in-out;
     animation-fill-mode: forwards;
   }
@@ -691,7 +691,7 @@ export const RetryContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  :hover {
+  &:hover {
     cursor: pointer;
   }
 
@@ -880,7 +880,7 @@ export const ContainerHide = styled.div`
     }
   }
 
-  > :last-child {
+  > &:last-child {
     margin-left: auto;
   }
 `;
@@ -918,7 +918,7 @@ export const ViewMoreContainer = styled.div`
     margin-top: 0.2rem;
     height: fit-content;
   }
-  :hover {
+  &:hover {
     opacity: 0.55;
   }
 `;

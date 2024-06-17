@@ -1048,7 +1048,7 @@ export interface IFilterDater {
 }
 
 export interface TableRowElementProps {
-  smaller?: boolean;
+  $smaller?: boolean;
 }
 export interface IRowSection {
   element: React.FC<PropsWithChildren<PropsWithChildren<TableRowElementProps>>>;

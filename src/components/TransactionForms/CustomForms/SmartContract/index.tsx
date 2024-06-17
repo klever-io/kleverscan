@@ -247,7 +247,12 @@ const parseArgument = (
       return abiEncoder.encodeABIValue(value, arrayType);
     });
 
-    parsedValue = abiEncoder.encodeLengthPlusData(parsedArray);
+    const innerType = type.slice(type.indexOf('<') + 1, type.length - 1);
+
+    parsedValue = abiEncoder.encodeLengthPlusData(
+      parsedArray,
+      innerType,
+    ) as string;
   } else {
     parsedValue = abiEncoder.encodeABIValue(value, raw_type, !required);
   }

@@ -193,7 +193,7 @@ export const NFTSelectContainer = styled.div`
     border-radius: 24px;
     color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
 
-    &:hover:not(:focus):not(:disabled) {
+    &:hover:not(&:focus):not(&:disabled) {
       border: 1px solid
         ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
     }
@@ -265,7 +265,7 @@ export const SelectContainer = styled.div`
     border-radius: 24px;
     color: ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
 
-    &:hover:not(:focus):not(:disabled) {
+    &:hover:not(&:focus):not(&:disabled) {
       border: 1px solid
         ${({ theme }) => (theme.dark ? theme.darkText : theme.lightGray)};
     }

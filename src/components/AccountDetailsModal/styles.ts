@@ -197,7 +197,7 @@ export const OtherAssetsContainer = styled.div<{ isMobile?: boolean }>`
     padding-left: 0.3rem;
     align-items: center;
 
-    :hover {
+    &:hover {
       border-radius: 0.375rem;
       background-color: ${props => props.theme.footer.border};
       color: ${props => props.theme.true.white};
@@ -328,7 +328,7 @@ export const ActionItem = styled.div<{
     !props.disabled &&
     !props.active &&
     css`
-      :hover {
+      &:hover {
         border: 1px solid ${props => props.theme.card.border};
 
         background-color: ${props => props.theme.footer.border};

@@ -230,16 +230,11 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
         </FloatContainer>
       )}
       <ContainerView ref={tableRef}>
-        <TableBody smaller={smaller}>
+        <TableBody $smaller={smaller}>
           {!isMobile && !isTablet && rowSections && (
             <TableRow>
               {header?.map((item, index) => (
-                <HeaderItem
-                  key={JSON.stringify(item)}
-                  smaller={smaller}
-                  totalColumns={header.length}
-                  currentColumn={index}
-                >
+                <HeaderItem key={JSON.stringify(item)} $smaller={smaller}>
                   {item}
                 </HeaderItem>
               ))}
@@ -289,7 +284,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                           columnSpan={2}
                           isLastRow={index === limit - 1}
                           dynamicWidth={itemWidth}
-                          smaller={smaller}
+                          $smaller={smaller}
                         >
                           <DoubleRow {...props}>
                             {type !== 'accounts' && <Skeleton width="100%" />}
@@ -334,7 +329,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                             columnSpan={span}
                             isLastRow={isLastRow}
                             dynamicWidth={width}
-                            smaller={smaller}
+                            $smaller={smaller}
                             totalColumns={header.length}
                             currentColumn={index2}
                           >
@@ -342,7 +337,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                               <MobileHeader>{header[index2]}</MobileHeader>
                             ) : null}
                             {Element({
-                              smaller,
+                              $smaller: smaller,
                             })}
                           </MobileCardItem>
                         );

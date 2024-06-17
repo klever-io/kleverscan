@@ -364,7 +364,7 @@ const validator = css`
       max-width: 10rem;
       max-width: 10rem;
     }
-    :nth-child(2) {
+    &:nth-child(2) {
       min-width: 20rem;
       max-width: 20rem;
     }

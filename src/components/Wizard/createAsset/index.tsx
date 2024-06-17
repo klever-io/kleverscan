@@ -1588,7 +1588,7 @@ export const CreatePreicisonStep: React.FC<
             <PrecisionCard
               onClick={() => handleRegister(index)}
               key={String(index)}
-              isSelected={precision === index}
+              $isSelected={precision === index}
             >
               {index}
             </PrecisionCard>

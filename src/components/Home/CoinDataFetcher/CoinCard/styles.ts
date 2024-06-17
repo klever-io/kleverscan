@@ -218,7 +218,7 @@ export const ValueContent = styled.div<{ isDropdown?: boolean }>`
   font-weight: 400;
   color: ${props => props.theme.lightGray};
   gap: 0.25rem;
-  :nth-child(even) {
+  &:nth-child(even) {
     align-items: ${props => (props.isDropdown ? 'flex-end' : '')};
   }
 
@@ -298,9 +298,11 @@ export const ValueDetail = styled.div<{ positive?: boolean }>`
   }
 `;
 
-export const IconContainer = styled(Image).attrs(_ => ({
-  alt: 'Coin',
-}))`
+export const IconContainer = styled(Image).attrs<{ alt?: string }>(
+  ({ alt }) => ({
+    alt: alt || 'Coin',
+  }),
+)`
   cursor: pointer;
 
   border-radius: 50%;
@@ -330,7 +332,7 @@ export const CoinsSelector = styled.div`
 `;
 
 // prettier-ignore
-export const CoinsSlider = styled.div<{ selectedIndex: number }>`
+export const CoinsSlider = styled.div<{ $selectedIndex: number }>`
   width: 82px;
   height: 24px;
   position: absolute;
@@ -338,7 +340,8 @@ export const CoinsSlider = styled.div<{ selectedIndex: number }>`
   transition: 0.4s ease-in-out;
 
   transform: translateX(
-    ${props => (props.selectedIndex >= 1 ? props.selectedIndex * 82 + 8 : 0)}px
+    ${props =>
+      props.$selectedIndex >= 1 ? props.$selectedIndex * 82 + 8 : 0}px
   );
 
   background-color: ${props => props.theme.violet};
@@ -347,11 +350,16 @@ export const CoinsSlider = styled.div<{ selectedIndex: number }>`
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 50%;
 
-    transform: translateX(${props => props.selectedIndex >= 1 ? `calc(${props.selectedIndex * 100}% - 8px)` : '0%'});
+    transform: translateX(
+      ${props =>
+        props.$selectedIndex >= 1
+          ? `calc(${props.$selectedIndex * 100}% - 8px)`
+          : '0%'}
+    );
   }
 `;
 
-export const CoinSelector = styled.button<{ isSelected: boolean }>`
+export const CoinSelector = styled.button<{ $isSelected: boolean }>`
   position: relative;
   width: 82px;
   height: 100%;
@@ -361,7 +369,7 @@ export const CoinSelector = styled.button<{ isSelected: boolean }>`
   align-items: center;
   justify-content: center;
   color: ${props =>
-    props.isSelected ? props.theme.true.white : props.theme.gray700};
+    props.$isSelected ? props.theme.true.white : props.theme.gray700};
   transition: 0.5s ease-out;
   font-style: normal;
   font-weight: 600;
@@ -391,7 +399,7 @@ export const ContentError = styled.div`
   padding: 1rem;
   gap: 0.5rem;
   span {
-    :hover {
+    &:hover {
       opacity: 0.5;
     }
     cursor: pointer;
@@ -512,8 +520,8 @@ export const Button = styled.a<{ borderColor: string }>`
 
   text-decoration: none !important;
 
-  :hover,
-  :focus {
+  &:hover,
+  &:focus {
     box-shadow: inset 350px 0 0 0 ${props => props.borderColor};
 
     color: ${props => props.theme.true.newBlack};

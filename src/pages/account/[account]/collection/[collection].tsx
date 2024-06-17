@@ -65,7 +65,7 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
           },
           {
             element: props => (
-              <Link href={`/account/${address}`} key={address}>
+              <Link href={`/account/${address}`} key={address} legacyBehavior>
                 {isMobile
                   ? parseAddress(address, 14)
                   : address || isTablet
@@ -80,6 +80,7 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
               <Link
                 href={`/account/${address}/collection/${collectionId}/${nftId}`}
                 key={assetId}
+                legacyBehavior
               >
                 <CustomLink>Details</CustomLink>
               </Link>

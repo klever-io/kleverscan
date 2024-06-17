@@ -199,9 +199,7 @@ const Accounts: React.FC<PropsWithChildren<IAccounts>> = () => {
         element: props => (
           <CenteredRow key={address}>
             <Link href={`/account/${address}`}>
-              <a>
-                <Mono>{isMobile ? parseAddress(address, 24) : address}</Mono>
-              </a>
+              <Mono>{isMobile ? parseAddress(address, 24) : address}</Mono>
             </Link>
 
             <Copy info="Address" data={address} />

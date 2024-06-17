@@ -65,11 +65,9 @@ export const HomeITOSection: React.FC<PropsWithChildren> = () => {
                 pathname: '/ito',
               }}
             >
-              <a>
-                {' '}
-                View All
-                <PurpleArrowRight />
-              </a>
+              {' '}
+              View All
+              <PurpleArrowRight />
             </Link>
           </TableTitle>
         </TableHeader>

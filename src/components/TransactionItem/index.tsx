@@ -82,13 +82,11 @@ const TransactionItem: React.FC<PropsWithChildren<ITransaction>> = ({
     }
     if (contract.length === 1 && checkContract) {
       return (
-        <Link href={`/asset/${assetId || 'KLV'}`}>
-          <a className="clean-style">
-            <SpanWithLimit>
-              {amount && `${amount} ${assetId || 'KLV'}`}
-              {!amount && <Skeleton />}
-            </SpanWithLimit>
-          </a>
+        <Link href={`/asset/${assetId || 'KLV'}`} className="clean-style">
+          <SpanWithLimit>
+            {amount && `${amount} ${assetId || 'KLV'}`}
+            {!amount && <Skeleton />}
+          </SpanWithLimit>
         </Link>
       );
     }
@@ -133,11 +131,7 @@ const TransactionItem: React.FC<PropsWithChildren<ITransaction>> = ({
         <TransactionData>
           <p>
             <Link href={`/transaction/${hash}`}>
-              <a>
-                {isMobile
-                  ? `${hash.slice(0, 15)}...`
-                  : `${hash.slice(0, 30)}...`}
-              </a>
+              {isMobile ? `${hash.slice(0, 15)}...` : `${hash.slice(0, 30)}...`}
             </Link>
           </p>
           <TransactionAmount>
@@ -147,26 +141,23 @@ const TransactionItem: React.FC<PropsWithChildren<ITransaction>> = ({
         <TransactionData>
           <p>
             <span>
-              <Link href={`/account/${sender}`}>
-                <a className="clean-style">
-                  {t('From')}:{' '}
-                  {isMobile
-                    ? parseAddress(sender, 12)
-                    : parseAddress(sender, 26)}
-                </a>
+              <Link href={`/account/${sender}`} className="clean-style">
+                {t('From')}:{' '}
+                {isMobile ? parseAddress(sender, 12) : parseAddress(sender, 26)}
               </Link>
             </span>
           </p>
 
-          <Link href={`/account/${contractFilter?.parameter?.toAddress}`}>
-            <a className="clean-style">
-              {t('To')}:{' '}
-              {contractFilter?.parameter?.toAddress
-                ? isMobile
-                  ? parseAddress(contractFilter?.parameter?.toAddress, 12)
-                  : parseAddress(contractFilter?.parameter?.toAddress, 15)
-                : '--'}
-            </a>
+          <Link
+            href={`/account/${contractFilter?.parameter?.toAddress}`}
+            className="clean-style"
+          >
+            {t('To')}:{' '}
+            {contractFilter?.parameter?.toAddress
+              ? isMobile
+                ? parseAddress(contractFilter?.parameter?.toAddress, 12)
+                : parseAddress(contractFilter?.parameter?.toAddress, 15)
+              : '--'}
           </Link>
         </TransactionData>
       </TransactionContainerContent>

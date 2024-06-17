@@ -251,23 +251,25 @@ export const AccountDetailsModal: React.FC<
         </ReloadContainer>
       </QRCodeContainer>
       <BodyContent>
-        <Link href={`/account/${walletAddress}`}>
-          <a onClick={() => setOpenUserInfos(false)}>
-            <ActionItem>
-              <BiWalletAlt size={'1.2rem'} />
-              <p>Account Details</p>
-              <RiArrowRightSLine size={'1.2em'} />
-            </ActionItem>
-          </a>
+        <Link
+          href={`/account/${walletAddress}`}
+          onClick={() => setOpenUserInfos(false)}
+        >
+          <ActionItem>
+            <BiWalletAlt size={'1.2rem'} />
+            <p>Account Details</p>
+            <RiArrowRightSLine size={'1.2em'} />
+          </ActionItem>
         </Link>
-        <Link href={`/create-transaction`}>
-          <a onClick={() => setOpenUserInfos(false)}>
-            <ActionItem>
-              <IoCreateOutline size={'1.2rem'} />
-              <p>Create Transaction</p>
-              <RiArrowRightSLine size={'1.2em'} />
-            </ActionItem>
-          </a>
+        <Link
+          href={`/create-transaction`}
+          onClick={() => setOpenUserInfos(false)}
+        >
+          <ActionItem>
+            <IoCreateOutline size={'1.2rem'} />
+            <p>Create Transaction</p>
+            <RiArrowRightSLine size={'1.2em'} />
+          </ActionItem>
         </Link>
         <SubSection active={openNetworks}>
           <ActionItem

@@ -16,40 +16,38 @@ const BlockCardSkeleton: React.FC<PropsWithChildren<{ index: number }>> = ({
   return (
     <BlockCardContainer blockIndex={index}>
       <Link href={`#`}>
-        <a>
-          <BlockCardRow>
-            <strong>
-              <Skeleton height={lineHeight} />
-            </strong>
-            <p>{t('Miner')}</p>
-          </BlockCardRow>
-          <BlockCardRow>
-            <small>
-              <Skeleton height={16} />
-            </small>
-            <BlockCardHash>
-              <Skeleton height={lineHeight} />
-            </BlockCardHash>
-          </BlockCardRow>
-          <BlockCardRow>
-            <p>{t('Burned')}</p>
-            <span>
-              <Skeleton height={lineHeight} />
-            </span>
-          </BlockCardRow>
-          <BlockCardRow>
-            <p>{commonT('Titles.Transactions')}</p>
-            <span>
-              <Skeleton height={lineHeight} />
-            </span>
-          </BlockCardRow>
-          <BlockCardRow>
-            <p>{t('Reward')}</p>
-            <span>
-              <Skeleton height={lineHeight} />
-            </span>
-          </BlockCardRow>
-        </a>
+        <BlockCardRow>
+          <strong>
+            <Skeleton height={lineHeight} />
+          </strong>
+          <p>{t('Miner')}</p>
+        </BlockCardRow>
+        <BlockCardRow>
+          <small>
+            <Skeleton height={16} />
+          </small>
+          <BlockCardHash>
+            <Skeleton height={lineHeight} />
+          </BlockCardHash>
+        </BlockCardRow>
+        <BlockCardRow>
+          <p>{t('Burned')}</p>
+          <span>
+            <Skeleton height={lineHeight} />
+          </span>
+        </BlockCardRow>
+        <BlockCardRow>
+          <p>{commonT('Titles.Transactions')}</p>
+          <span>
+            <Skeleton height={lineHeight} />
+          </span>
+        </BlockCardRow>
+        <BlockCardRow>
+          <p>{t('Reward')}</p>
+          <span>
+            <Skeleton height={lineHeight} />
+          </span>
+        </BlockCardRow>
       </Link>
     </BlockCardContainer>
   );

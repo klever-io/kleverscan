@@ -192,9 +192,7 @@ const Proposals: React.FC<PropsWithChildren<IProposalsProps>> = ({
         element: props => (
           <DoubleRow {...props} key={proposer}>
             <Link href={`/account/${proposer}`}>
-              <a>
-                <Mono>{parseAddress(proposer, 16)}</Mono>
-              </a>
+              <Mono>{parseAddress(proposer, 16)}</Mono>
             </Link>
             <Status
               status={proposalStatusColorAndText.color}
@@ -247,7 +245,11 @@ const Proposals: React.FC<PropsWithChildren<IProposalsProps>> = ({
       },
       {
         element: props => (
-          <Link href={{ pathname: `/proposal/${proposalId}` }} key={proposalId}>
+          <Link
+            href={{ pathname: `/proposal/${proposalId}` }}
+            key={proposalId}
+            legacyBehavior
+          >
             <CustomLink> {t('common:Buttons.Details')}</CustomLink>
           </Link>
         ),

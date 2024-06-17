@@ -24,24 +24,22 @@ const SelectIcons: React.FC<PropsWithChildren<IFooterItems>> = ({
   return (
     <ItemsContent>
       <Link href={url}>
-        <a>
-          <IconContainer
+        <IconContainer
+          $itemSelected={router.pathname === url}
+          blockIcon={name === 'Blocks'}
+        >
+          <StyledImage
             $itemSelected={router.pathname === url}
-            blockIcon={name === 'Blocks'}
-          >
-            <StyledImage
-              $itemSelected={router.pathname === url}
-              src={icon}
-              alt={`nav-${icon}`}
-              width={24}
-              height={24}
-              loader={({ src, width }: { src: string; width: number }) =>
-                `${src}?w=${width}`
-              }
-            />
-            <p>{name}</p>
-          </IconContainer>
-        </a>
+            src={icon}
+            alt={`nav-${icon}`}
+            width={24}
+            height={24}
+            loader={({ src, width }: { src: string; width: number }) =>
+              `${src}?w=${width}`
+            }
+          />
+          <p>{name}</p>
+        </IconContainer>
       </Link>
     </ItemsContent>
   );

@@ -155,17 +155,18 @@ const renderAssetId = (
 ) => {
   return parameter?.assetId?.split('/')[0] &&
     parameter?.assetId?.split('/')[0] !== 'KLV' ? (
-    <Link href={`/asset/${parameter?.assetId?.split('/')[0]}`}>
-      <a style={{ fontWeight: '500' }}>
-        {options?.clearNonce
-          ? parameter.assetId.split('/')[0]
-          : parameter.assetId}
-      </a>
+    <Link
+      href={`/asset/${parameter?.assetId?.split('/')[0]}`}
+      style={{ fontWeight: '500' }}
+    >
+      {options?.clearNonce
+        ? parameter.assetId.split('/')[0]
+        : parameter.assetId}
     </Link>
   ) : (
     parameter?.amount && (
       <>
-        <Link href={`/asset/KLV`}>
+        <Link href={`/asset/KLV`} legacyBehavior>
           <KLV />
         </Link>
         <Link href={`/asset/KLV`}>KLV</Link>
@@ -282,7 +283,7 @@ export const Transfer: React.FC<PropsWithChildren<IIndexedContract>> = ({
         </span>
         <span>
           <CenteredRow>
-            <Link href={`/account/${parameter?.toAddress}`}>
+            <Link href={`/account/${parameter?.toAddress}`} legacyBehavior>
               {parameter?.toAddress}
             </Link>
             <Copy data={parameter?.toAddress} />
@@ -347,7 +348,7 @@ export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <span>
             <strong>Asset ID</strong>
           </span>
-          <Link href={`/asset/${createAssetReceipt?.assetId}`}>
+          <Link href={`/asset/${createAssetReceipt?.assetId}`} legacyBehavior>
             {createAssetReceipt?.assetId}
           </Link>
         </Row>
@@ -364,7 +365,9 @@ export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
         </span>
         <span>
           <CenteredRow>
-            <Link href={`/account/${ownerAddress}`}>{ownerAddress}</Link>
+            <Link href={`/account/${ownerAddress}`} legacyBehavior>
+              {ownerAddress}
+            </Link>
             <Copy data={ownerAddress} />
           </CenteredRow>
         </span>
@@ -432,7 +435,10 @@ export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
             <Panel>
               <CenteredRow>
                 <strong>Address:&nbsp;</strong>
-                <Link href={`/account/${parameter.royalties?.address}`}>
+                <Link
+                  href={`/account/${parameter.royalties?.address}`}
+                  legacyBehavior
+                >
                   {parameter.royalties?.address}
                 </Link>
                 <Copy data={parameter.royalties?.address}></Copy>
@@ -719,7 +725,9 @@ export const CreateValidator: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <strong>Owner</strong>
         </span>
         <span>
-          <Link href={`/account/${ownerAddress}`}>{ownerAddress}</Link>
+          <Link href={`/account/${ownerAddress}`} legacyBehavior>
+            {ownerAddress}
+          </Link>
         </span>
       </Row>
       {parameter?.config?.logo && (
@@ -729,7 +737,9 @@ export const CreateValidator: React.FC<PropsWithChildren<IIndexedContract>> = ({
           </span>
           <span>
             <CenteredRow>
-              <Link href={parameter.config.logo}>{parameter.config.logo}</Link>
+              <Link href={parameter.config.logo} legacyBehavior>
+                {parameter.config.logo}
+              </Link>
               <Copy data={parameter.config.logo}></Copy>
             </CenteredRow>
           </span>
@@ -767,7 +777,10 @@ export const CreateValidator: React.FC<PropsWithChildren<IIndexedContract>> = ({
         </span>
         <span>
           <CenteredRow>
-            <Link href={`/account/${parameter?.config?.rewardAddress}`}>
+            <Link
+              href={`/account/${parameter?.config?.rewardAddress}`}
+              legacyBehavior
+            >
               {parameter?.config?.rewardAddress}
             </Link>
             <Copy data={parameter?.config?.rewardAddress} />
@@ -1075,7 +1088,7 @@ export const Delegate: React.FC<PropsWithChildren<IIndexedContract>> = ({
         <span>
           <CenteredRow>
             <Link href={`/account/${parameter?.toAddress}`}>
-              <a>{parameter?.toAddress}</a>
+              {parameter?.toAddress}
             </Link>
             <Copy data={parameter?.toAddress} info="Address"></Copy>
           </CenteredRow>
@@ -1641,7 +1654,7 @@ export const ConfigITO: React.FC<PropsWithChildren<IIndexedContract>> = ({
         </span>
         <CenteredRow>
           <Link href={`/account/${parameter?.receiverAddress}`}>
-            <a>{parameter?.receiverAddress}</a>
+            {parameter?.receiverAddress}
           </Link>
           <Copy data={parameter?.receiverAddress} info="Bucket ID"></Copy>
         </CenteredRow>
@@ -2504,7 +2517,10 @@ export const ITOTrigger: React.FC<PropsWithChildren<IIndexedContract>> = ({
               <strong>Receiver Address</strong>
             </span>
             <CenteredRow>
-              <Link href={`/account/${parameter?.receiverAddress}`}>
+              <Link
+                href={`/account/${parameter?.receiverAddress}`}
+                legacyBehavior
+              >
                 {parameter?.receiverAddress}
               </Link>
               <Copy data={parameter?.receiverAddress} info="Bucket ID"></Copy>
@@ -2788,9 +2804,7 @@ const renderAssetTriggerTypeData: React.FC<
         <strong>To</strong>
       </span>
       <CenteredRow>
-        <Link href={`/account/${par?.toAddress}`}>
-          <a>{par?.toAddress}</a>
-        </Link>
+        <Link href={`/account/${par?.toAddress}`}>{par?.toAddress}</Link>
         <Copy data={par?.toAddress} info="address"></Copy>
       </CenteredRow>
     </Row>

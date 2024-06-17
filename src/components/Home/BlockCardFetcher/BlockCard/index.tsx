@@ -94,9 +94,7 @@ const BlockCard: React.FC<PropsWithChildren<IBlockCard>> = ({
       <TransactionContainerContent isBlocks={true}>
         <BlockCardRow>
           <Link href={`/block/${nonce}`}>
-            <a>
-              <strong>#{nonce}</strong>
-            </a>
+            <strong>#{nonce}</strong>
           </Link>
           <small>
             {getAge(fromUnixTime(timestamp), commonT)}{' '}

@@ -55,11 +55,9 @@ const ProposalsCard: React.FC<PropsWithChildren> = () => {
             pathname: '/proposals',
           }}
         >
-          <a>
-            {' '}
-            View All
-            <PurpleArrowRight />
-          </a>
+          {' '}
+          View All
+          <PurpleArrowRight />
         </Link>
       </Title>
 

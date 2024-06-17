@@ -39,7 +39,7 @@ const Rewards: React.FC<PropsWithChildren<IRewards>> = ({
     const sections: IRowSection[] = [
       {
         element: props => (
-          <Link key={assetId} href={`/asset/${assetId}`}>
+          <Link key={assetId} href={`/asset/${assetId}`} legacyBehavior>
             {assetId}
           </Link>
         ),

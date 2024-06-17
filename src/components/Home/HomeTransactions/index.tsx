@@ -81,9 +81,7 @@ export const homeTransactionsRowSections = (
         <DoubleRow {...props} key={hash}>
           <CenteredRow className="bucketIdCopy">
             <Link href={`/transaction/${hash}`}>
-              <a>
-                <Mono>{parseAddress(hash, 24)}</Mono>
-              </a>
+              <Mono>{parseAddress(hash, 24)}</Mono>
             </Link>
             <Copy info="TXHash" data={hash} />
           </CenteredRow>
@@ -100,8 +98,8 @@ export const homeTransactionsRowSections = (
     {
       element: props => (
         <DoubleRow {...props} key={blockNum}>
-          <Link href={`/block/${blockNum || 0}`}>
-            <a className="address">{blockNum || 0}</a>
+          <Link href={`/block/${blockNum || 0}`} className="address">
+            {blockNum || 0}
           </Link>
           <span>
             {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
@@ -113,10 +111,8 @@ export const homeTransactionsRowSections = (
     {
       element: props => (
         <DoubleRow {...props} key={sender}>
-          <Link href={`/account/${sender}`}>
-            <a className="address">
-              <Mono>{parseAddress(sender, 16)}</Mono>
-            </a>
+          <Link href={`/account/${sender}`} className="address">
+            <Mono>{parseAddress(sender, 16)}</Mono>
           </Link>
           {toAddressSectionElement(toAddress)}
         </DoubleRow>
@@ -201,9 +197,7 @@ export const homeTransactionsTabletRowSections = (
           </CenteredRow>
           <CenteredRow>
             <Link href={`/transaction/${hash}`}>
-              <a>
-                <Mono>{parseAddress(hash, 16)}</Mono>
-              </a>
+              <Mono>{parseAddress(hash, 16)}</Mono>
             </Link>
             <Copy info="TXHash" data={hash} svgSize={16} />
           </CenteredRow>
@@ -245,8 +239,8 @@ export const homeTransactionsTabletRowSections = (
     {
       element: props => (
         <DoubleRow {...props} key={blockNum}>
-          <Link href={`/block/${blockNum || 0}`}>
-            <a className="address">{blockNum || 0}</a>
+          <Link href={`/block/${blockNum || 0}`} className="address">
+            {blockNum || 0}
           </Link>
           <span>
             {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
@@ -258,10 +252,8 @@ export const homeTransactionsTabletRowSections = (
     {
       element: props => (
         <DoubleRow {...props} key={sender}>
-          <Link href={`/account/${sender}`}>
-            <a className="address">
-              <Mono>{parseAddress(sender, 16)}</Mono>
-            </a>
+          <Link href={`/account/${sender}`} className="address">
+            <Mono>{parseAddress(sender, 16)}</Mono>
           </Link>
           {toAddressSectionElement(toAddress)}
         </DoubleRow>
@@ -322,11 +314,9 @@ const HomeTransactions: React.FC<PropsWithChildren> = () => {
             pathname: '/transactions',
           }}
         >
-          <a>
-            {' '}
-            View All
-            <PurpleArrowRight />
-          </a>
+          {' '}
+          View All
+          <PurpleArrowRight />
         </Link>
 
         {isTablet ? (

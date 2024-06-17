@@ -136,6 +136,7 @@ const MarketplaceDetails: React.FC<
             <Link
               href={`/account/${serversideMarketplace.ownerAddress}`}
               key={serversideMarketplace.ownerAddress}
+              legacyBehavior
             >
               {serversideMarketplace.ownerAddress}
             </Link>
@@ -154,6 +155,7 @@ const MarketplaceDetails: React.FC<
               <>
                 <Link
                   href={`/account/${serversideMarketplace?.referralAddress}`}
+                  legacyBehavior
                 >
                   {serversideMarketplace?.referralAddress}
                 </Link>

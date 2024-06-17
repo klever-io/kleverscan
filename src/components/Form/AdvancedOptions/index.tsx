@@ -343,6 +343,7 @@ const AdvancedOptionsContent: React.FC<PropsWithChildren> = () => {
               <Tooltip msg="You cannot create a multiple contract using the modal. Go to the `Create Transaction` to create one" />
               <Link
                 href={{ pathname: '/create-transaction', query: router.query }}
+                legacyBehavior
               >
                 <ModalCreateTxLink>Create Transaction</ModalCreateTxLink>
               </Link>

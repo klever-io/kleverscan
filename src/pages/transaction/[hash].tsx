@@ -252,7 +252,9 @@ export const OverviewDetails: React.FC<PropsWithChildren<IOverviewDetails>> = ({
           ) : (
             <span>
               <CenteredRow>
-                <Link href={`/account/${sender || ''}`}>{sender || ''}</Link>
+                <Link href={`/account/${sender || ''}`} legacyBehavior>
+                  {sender || ''}
+                </Link>
                 <Copy data={sender} info="Sender" />
               </CenteredRow>
             </span>

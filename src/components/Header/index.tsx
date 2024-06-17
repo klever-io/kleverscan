@@ -55,9 +55,7 @@ const NavbarItem: React.FC<PropsWithChildren<INavbarItem>> = ({
     return (
       <DropdownItem disabled={router.pathname === page.pathTo}>
         <Link href={page.pathTo} data-testid="navbar-item">
-          <a>
-            <span>{page.name}</span>
-          </a>
+          <span>{page.name}</span>
         </Link>
       </DropdownItem>
     );
@@ -80,7 +78,7 @@ const NavbarItem: React.FC<PropsWithChildren<INavbarItem>> = ({
   }
 
   return (
-    <Link href={pathTo}>
+    <Link href={pathTo} legacyBehavior>
       <LinkStyled
         disabled={router.pathname.includes(name.toLowerCase())}
         href={pathTo}
@@ -117,15 +115,13 @@ export const MobileNavbarItem: React.FC<PropsWithChildren<INavbarItem>> = ({
 
   return (
     <Link href={pathTo}>
-      <a>
-        <MobileItem
-          onClick={onClick}
-          selected={router.pathname === pathTo}
-          data-testid="mobile-navbar-item"
-        >
-          <span>{name}</span>
-        </MobileItem>
-      </a>
+      <MobileItem
+        onClick={onClick}
+        selected={router.pathname === pathTo}
+        data-testid="mobile-navbar-item"
+      >
+        <span>{name}</span>
+      </MobileItem>
     </Link>
   );
 };
@@ -185,17 +181,15 @@ const Navbar: React.FC<PropsWithChildren> = () => {
             openSearch={!isTablet ? false : openSearch}
           >
             <Link href="/">
-              <a>
-                <Logo onClick={closeMenu}>
-                  <Image
-                    src={isDarkTheme ? '/logo-large.svg' : '/NewLogo.svg'}
-                    alt="Logo"
-                    width="215"
-                    height="29"
-                    loader={({ src, width }) => `${src}?w=${width}`}
-                  />
-                </Logo>
-              </a>
+              <Logo onClick={closeMenu}>
+                <Image
+                  src={isDarkTheme ? '/logo-large.svg' : '/NewLogo.svg'}
+                  alt="Logo"
+                  width="215"
+                  height="29"
+                  loader={({ src, width }) => `${src}?w=${width}`}
+                />
+              </Logo>
             </Link>
             {network !== 'Mainnet' && (
               <span>Running on KleverChain {network}</span>

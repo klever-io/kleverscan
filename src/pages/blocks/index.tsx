@@ -79,7 +79,9 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
     {
       element: props => (
         <DoubleRow {...props} key={nonce + epoch}>
-          <Link href={`/block/${nonce}`}>{String(nonce)}</Link>
+          <Link href={`/block/${nonce}`} legacyBehavior>
+            {String(nonce)}
+          </Link>
           <span>{epoch}</span>
         </DoubleRow>
       ),
@@ -102,6 +104,7 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
           <Link
             href={`/validator/${producerOwnerAddress}`}
             key={producerOwnerAddress}
+            legacyBehavior
           >
             {parseAddress(producerName, 16)}
           </Link>

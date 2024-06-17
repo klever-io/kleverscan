@@ -48,11 +48,9 @@ const ValidatorsCard: React.FC<PropsWithChildren> = () => {
             pathname: '/validators',
           }}
         >
-          <a>
-            {' '}
-            View All
-            <PurpleArrowRight />
-          </a>
+          {' '}
+          View All
+          <PurpleArrowRight />
         </Link>
       </Title>
 

@@ -122,27 +122,25 @@ const RenderCoinsCard: React.FC<
     <CardContainer ref={cardRef}>
       <CardContent>
         <Link href={`/asset/${shortname}`}>
-          <a>
-            <HeaderContainer>
-              <IconContainer
-                src={`/coins/${shortname.toLowerCase()}.png`}
-                width={50}
-                height={50}
-                quality={100}
-                loader={({ src, width, quality }: ImageLoaderProps) =>
-                  `${src}?w=${width}&q=${quality || 100}`
-                }
-              />
+          <HeaderContainer>
+            <IconContainer
+              src={`/coins/${shortname.toLowerCase()}.png`}
+              width={50}
+              height={50}
+              quality={100}
+              loader={({ src, width, quality }: ImageLoaderProps) =>
+                `${src}?w=${width}&q=${quality || 100}`
+              }
+            />
 
-              <HeaderContent>
-                <Name>
-                  <span>{shortname}</span>
-                  <p>{name}</p>
-                </Name>
-                <ArrowTopRight />
-              </HeaderContent>
-            </HeaderContainer>
-          </a>
+            <HeaderContent>
+              <Name>
+                <span>{shortname}</span>
+                <p>{name}</p>
+              </Name>
+              <ArrowTopRight />
+            </HeaderContent>
+          </HeaderContainer>
         </Link>
         <HeaderGraph>
           <div>

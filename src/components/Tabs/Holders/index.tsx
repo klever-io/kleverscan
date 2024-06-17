@@ -43,7 +43,7 @@ const Holders: React.FC<PropsWithChildren<IHolders>> = ({
       {
         element: props => (
           <AddressContainer key={address}>
-            <Link href={`/account/${address}`}>
+            <Link href={`/account/${address}`} legacyBehavior>
               {parseAddress(address, 40)}
             </Link>
 

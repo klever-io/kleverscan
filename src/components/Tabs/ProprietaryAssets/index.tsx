@@ -45,7 +45,11 @@ const ProprietaryAssets: React.FC<PropsWithChildren<IProprietaryAssets>> = ({
     const ticker = assetId?.split('-')[0];
     const sectionViewNfts =
       assetType === 'Non Fungible' ? (
-        <Link href={`/account/${address}/collection/${assetId}`} key={address}>
+        <Link
+          href={`/account/${address}/collection/${assetId}`}
+          key={address}
+          legacyBehavior
+        >
           <CustomLink>
             {t('accounts:SingleAccount.Buttons.ViewNFTs')}
           </CustomLink>
@@ -57,7 +61,7 @@ const ProprietaryAssets: React.FC<PropsWithChildren<IProprietaryAssets>> = ({
       { element: props => <span key={ticker}>{ticker}</span>, span: 1 },
       {
         element: props => (
-          <Link key={assetId} href={`/asset/${assetId}`}>
+          <Link key={assetId} href={`/asset/${assetId}`} legacyBehavior>
             {assetId}
           </Link>
         ),

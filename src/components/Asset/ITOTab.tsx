@@ -144,7 +144,10 @@ export const ITOTab: React.FC<PropsWithChildren<ITOTabProps>> = ({ ITO }) => {
                                 <strong>{t('table:Address')}</strong>
                               </span>
                               <EllipsisSpan>
-                                <Link href={`/accounts/${data.address}`}>
+                                <Link
+                                  href={`/accounts/${data.address}`}
+                                  legacyBehavior
+                                >
                                   {data.address}
                                 </Link>
                                 <Copy data={data.address} />

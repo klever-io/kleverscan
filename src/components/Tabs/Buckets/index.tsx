@@ -159,7 +159,7 @@ const Buckets: React.FC<PropsWithChildren<IBuckets>> = ({
       {
         element: props => (
           <Link href={`/asset/${asset?.assetId}`} key={asset?.assetId}>
-            <a>{asset?.assetId}</a>
+            {asset?.assetId}
           </Link>
         ),
         span: 1,
@@ -222,7 +222,7 @@ const Buckets: React.FC<PropsWithChildren<IBuckets>> = ({
             {bucket?.delegation?.length && bucket?.delegation?.length > 0 ? (
               <>
                 <Link href={`/validator/${bucket?.delegation}`}>
-                  <a>{parseAddress(bucket?.delegation, 22)}</a>
+                  {parseAddress(bucket?.delegation, 22)}
                 </Link>
               </>
             ) : (

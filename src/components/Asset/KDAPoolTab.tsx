@@ -35,7 +35,7 @@ export const KDAPoolTab: React.FC<PropsWithChildren<KDAPoolTabProps>> = ({
         </span>
 
         <div>
-          <Link href={`/account/${assetPool?.ownerAddress}`}>
+          <Link href={`/account/${assetPool?.ownerAddress}`} legacyBehavior>
             <HoverAnchor>{assetPool?.ownerAddress}</HoverAnchor>
           </Link>
           <Copy data={assetPool?.ownerAddress} info="ownerAddress" />

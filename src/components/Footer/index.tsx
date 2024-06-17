@@ -82,10 +82,13 @@ const FooterItems: React.FC<PropsWithChildren<IContent>> = link => {
                 </QrCodeDropdown>
               </DonateContainer>
             ) : (
-              <Link key={String(index)} href={item.href}>
-                <a target="_blank" rel="nofollow noreferrer">
-                  {item.name}
-                </a>
+              <Link
+                key={String(index)}
+                href={item.href}
+                target="_blank"
+                rel="nofollow noreferrer"
+              >
+                {item.name}
               </Link>
             ),
           )}

@@ -61,7 +61,7 @@ export const CoinsContainer = styled.div`
   ${TableGradientBorder}
   border-radius: 16px;
 
-  width: 50%;
+  width: calc(50% - 8px);
   position: relative;
 
   display: flex;
@@ -88,7 +88,6 @@ export const CardContent = styled.div`
   flex-direction: column;
   justify-content: space-around;
 
-  min-width: 100%;
   width: 100%;
   height: 100%;
 
@@ -120,6 +119,7 @@ export const CardContainerSkeleton = styled(CardContainer)`
 `;
 
 export const HeaderContainer = styled.div`
+  width: 100%;
   display: flex;
   padding: 16px 0px;
   flex-direction: row;
@@ -302,7 +302,6 @@ export const IconContainer = styled(Image).attrs(_ => ({
   alt: 'Coin',
 }))`
   cursor: pointer;
-  padding-right: 1rem;
 
   border-radius: 50%;
 `;
@@ -546,7 +545,7 @@ export const LeftContainer = styled.div`
   gap: 16px;
 
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 50%;
+    min-width: calc(50% - 8px);
   }
 `;
 

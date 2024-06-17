@@ -65,11 +65,13 @@ export const HashComponent: React.FC<
   return (
     <ExtraOptionContainer>
       {!loading ? (
-        <Link href={`/transaction/${hash}`}>
-          <a target="_blank" rel="noopener noreferrer">
-            Hash: {hash}
-            <IoOpenOutline />
-          </a>
+        <Link
+          href={`/transaction/${hash}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Hash:{hash}
+          <IoOpenOutline />
         </Link>
       ) : (
         <InlineLoader color="white" />

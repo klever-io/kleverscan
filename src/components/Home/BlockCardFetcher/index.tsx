@@ -59,14 +59,12 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
     {
       element: props => (
         <Link href={`/validator/${producerOwnerAddress}`}>
-          <a>
-            <AssetLogo
-              logo={producerLogo}
-              ticker={producerName}
-              name={producerName}
-              size={36}
-            />
-          </a>
+          <AssetLogo
+            logo={producerLogo}
+            ticker={producerName}
+            name={producerName}
+            size={36}
+          />
         </Link>
       ),
       span: 1,
@@ -75,18 +73,18 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
     {
       element: props => (
         <DoubleRow {...props} key={nonce + epoch}>
-          <Link href={`/block/${nonce}`}>{String(nonce)}</Link>
+          <Link href={`/block/${nonce}`} legacyBehavior>
+            {String(nonce)}
+          </Link>
           <Link
             href={`/validator/${producerOwnerAddress}`}
             key={producerOwnerAddress}
           >
-            <a>
-              {producerName && !producerNameIsAddress ? (
-                producerName
-              ) : (
-                <Mono>{parseAddress(producerOwnerAddress, 24)}</Mono>
-              )}
-            </a>
+            {producerName && !producerNameIsAddress ? (
+              producerName
+            ) : (
+              <Mono>{parseAddress(producerOwnerAddress, 24)}</Mono>
+            )}
           </Link>
         </DoubleRow>
       ),
@@ -153,18 +151,17 @@ export const blocksTabletRowSections = (block: IBlock): IRowSection[] => {
       element: props => (
         <CenteredRow>
           <Link href={`/validator/${producerOwnerAddress}`}>
-            <a>
-              <AssetLogo
-                logo={producerLogo}
-                ticker={producerName}
-                name={producerName}
-                size={36}
-              />
-            </a>
+            <AssetLogo
+              logo={producerLogo}
+              ticker={producerName}
+              name={producerName}
+              size={36}
+            />
           </Link>
           <Link
             href={`/validator/${producerOwnerAddress}`}
             key={producerOwnerAddress}
+            legacyBehavior
           >
             <ValidatorName>{parseAddress(producerName, 24)}</ValidatorName>
           </Link>
@@ -175,7 +172,9 @@ export const blocksTabletRowSections = (block: IBlock): IRowSection[] => {
     {
       element: props => (
         <DoubleRow {...props} key={nonce + epoch}>
-          <Link href={`/block/${nonce}`}>{String(nonce)}</Link>
+          <Link href={`/block/${nonce}`} legacyBehavior>
+            {String(nonce)}
+          </Link>
         </DoubleRow>
       ),
       span: 1,
@@ -264,10 +263,8 @@ const BlockCardFetcher: React.FC<PropsWithChildren> = () => {
             pathname: '/blocks',
           }}
         >
-          <a>
-            View All
-            <PurpleArrowRight />
-          </a>
+          View All
+          <PurpleArrowRight />
         </Link>
         {isTablet ? (
           <div onClick={() => setHideMenu(!hideMenu)}>

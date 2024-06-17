@@ -34,9 +34,7 @@ const Marketplaces: React.FC<PropsWithChildren> = () => {
         element: props => (
           <FlexSpan>
             <Link href={`marketplace/${id}`}>
-              <a>
-                <Mono>{id}</Mono>
-              </a>
+              <Mono>{id}</Mono>
             </Link>
             <Copy data={id} info="Marketplace Id" />
           </FlexSpan>
@@ -46,7 +44,9 @@ const Marketplaces: React.FC<PropsWithChildren> = () => {
       {
         element: props => (
           <span key={name}>
-            <Link href={`marketplace/${id}`}>{name}</Link>
+            <Link href={`marketplace/${id}`} legacyBehavior>
+              {name}
+            </Link>
           </span>
         ),
         span: 1,
@@ -55,9 +55,7 @@ const Marketplaces: React.FC<PropsWithChildren> = () => {
         element: props => (
           <FlexSpan>
             <Link href={`account/${ownerAddress}`}>
-              <a>
-                <Mono>{parseAddress(ownerAddress, 20)}</Mono>
-              </a>
+              <Mono>{parseAddress(ownerAddress, 20)}</Mono>
             </Link>
             <Copy data={ownerAddress} info="Marketplace Owner Address" />
           </FlexSpan>
@@ -70,9 +68,7 @@ const Marketplaces: React.FC<PropsWithChildren> = () => {
             {referralAddress ? (
               <>
                 <Link href={`account/${referralAddress}`}>
-                  <a>
-                    <Mono>{parseAddress(referralAddress, 20)}</Mono>
-                  </a>
+                  <Mono>{parseAddress(referralAddress, 20)}</Mono>
                 </Link>
                 <Copy data={referralAddress} info="Referral Address" />
               </>

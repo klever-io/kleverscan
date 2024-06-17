@@ -45,7 +45,7 @@ const getRedirectButton = (
   setShowTooltip: React.Dispatch<SetStateAction<boolean>>,
 ) => (
   <div onClick={() => setShowTooltip(false)}>
-    <Link href={path}>
+    <Link href={path} legacyBehavior>
       <RedirectSVG>
         <Redirect />
       </RedirectSVG>
@@ -111,7 +111,7 @@ export const TransactionRowSections = (
         .parameter as unknown as ITransferContract;
       return parameter?.toAddress ? (
         <UnderlineSpan onClick={() => setShowTooltip(false)}>
-          <Link href={`/account/${parameter?.toAddress}`}>
+          <Link href={`/account/${parameter?.toAddress}`} legacyBehavior>
             {parameter?.toAddress}
           </Link>
         </UnderlineSpan>
@@ -141,7 +141,7 @@ export const TransactionRowSections = (
       {
         element: props => (
           <HashSpan onClick={() => setShowTooltip(false)}>
-            <Link href={`/transaction/${transaction.hash}`}>
+            <Link href={`/transaction/${transaction.hash}`} legacyBehavior>
               {transaction.hash}
             </Link>
           </HashSpan>
@@ -154,7 +154,7 @@ export const TransactionRowSections = (
           <SpanWrapper>
             From:{' '}
             <UnderlineSpan onClick={() => setShowTooltip(false)}>
-              <Link href={`/account/${transaction.sender}`}>
+              <Link href={`/account/${transaction.sender}`} legacyBehavior>
                 {transaction.sender}
               </Link>
             </UnderlineSpan>
@@ -196,7 +196,7 @@ export const AssetRowSections = (
       {
         element: props => (
           <HoverDiv onClick={() => setShowTooltip(false)}>
-            <Link href={`/asset/${asset.assetId}`}>
+            <Link href={`/asset/${asset.assetId}`} legacyBehavior>
               <LogoWrapper>
                 <AssetLogo
                   logo={asset?.logo || ''}
@@ -253,7 +253,7 @@ export const AssetRowSections = (
       {
         element: props => (
           <HoverDiv onClick={() => setShowTooltip(false)}>
-            <Link href={`/assets?asset=${query.toUpperCase()}`}>
+            <Link href={`/assets?asset=${query.toUpperCase()}`} legacyBehavior>
               <CustomLink fullWidth secondary>
                 View All Assets with{' '}
                 <QuerySpan>{query.toUpperCase()}</QuerySpan>
@@ -305,7 +305,9 @@ export const AccountRowSections = (
             style={{ maxWidth: '20rem' }}
             onClick={() => setShowTooltip(false)}
           >
-            <Link href={`/account/${account.address}`}>{account.address}</Link>
+            <Link href={`/account/${account.address}`} legacyBehavior>
+              {account.address}
+            </Link>
           </HashSpan>
         ),
         span: 2,
@@ -313,7 +315,7 @@ export const AccountRowSections = (
       {
         element: props => (
           <HoverDiv onClick={() => setShowTooltip(false)}>
-            <Link href={'/asset/klv'}>
+            <Link href={'/asset/klv'} legacyBehavior>
               <LogoWrapper>
                 <AssetLogo
                   logo={'/assets/klv-logo.png'}
@@ -387,7 +389,10 @@ export const BlockRowSections = (
           <SpanWrapper>
             Nonce:{' '}
             <HashSpan onClick={() => setShowTooltip(false)}>
-              <Link href={`/block/${block.nonce}`}>{`#${block.nonce}`}</Link>
+              <Link
+                href={`/block/${block.nonce}`}
+                legacyBehavior
+              >{`#${block.nonce}`}</Link>
             </HashSpan>
           </SpanWrapper>
         ),
@@ -403,7 +408,10 @@ export const BlockRowSections = (
             Miner:{' '}
             <UnderlineSpan onClick={() => setShowTooltip(false)}>
               {' '}
-              <Link href={`account/${block.producerOwnerAddress}`}>
+              <Link
+                href={`account/${block.producerOwnerAddress}`}
+                legacyBehavior
+              >
                 {block.producerName || block.producerOwnerAddress}
               </Link>
             </UnderlineSpan>
@@ -414,7 +422,10 @@ export const BlockRowSections = (
       {
         element: props => (
           <HoverDiv onClick={() => setShowTooltip(false)}>
-            <Link href={`/account/${block.producerOwnerAddress}`}>
+            <Link
+              href={`/account/${block.producerOwnerAddress}`}
+              legacyBehavior
+            >
               <LogoWrapper>
                 <AssetLogo
                   logo={block?.producerLogo || '--'}

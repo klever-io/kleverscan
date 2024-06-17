@@ -84,24 +84,20 @@ const Block: React.FC<PropsWithChildren<IBlockPage>> = ({ block }) => {
     return (
       <TooltipContainer>
         <Link href={`/block/${nonce - 1}`}>
-          <a>
-            <ToolTipStyle>
-              <Tooltip
-                msg="View previous block"
-                Component={MdOutlineKeyboardArrowLeft}
-              />
-            </ToolTipStyle>
-          </a>
+          <ToolTipStyle>
+            <Tooltip
+              msg="View previous block"
+              Component={MdOutlineKeyboardArrowLeft}
+            />
+          </ToolTipStyle>
         </Link>
         <Link href={`/block/${nonce + 1}`}>
-          <a>
-            <ToolTipStyle>
-              <Tooltip
-                msg="View next block"
-                Component={MdOutlineKeyboardArrowRight}
-              />
-            </ToolTipStyle>
-          </a>
+          <ToolTipStyle>
+            <Tooltip
+              msg="View next block"
+              Component={MdOutlineKeyboardArrowRight}
+            />
+          </ToolTipStyle>
         </Link>
       </TooltipContainer>
     );

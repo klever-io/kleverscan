@@ -59,10 +59,8 @@ export const toAddressSectionElement = (toAddress: string): JSX.Element => {
     return <Mono>{toAddress}</Mono>;
   }
   return (
-    <Link href={`/account/${toAddress}`} key={toAddress}>
-      <a className="address">
-        <Mono>{parseAddress(toAddress, 16)}</Mono>
-      </a>
+    <Link href={`/account/${toAddress}`} key={toAddress} className="address">
+      <Mono>{parseAddress(toAddress, 16)}</Mono>
     </Link>
   );
 };
@@ -240,9 +238,7 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
         <DoubleRow {...props} key={hash}>
           <CenteredRow className="bucketIdCopy">
             <Link href={`/transaction/${hash}`}>
-              <a>
-                <Mono>{parseAddress(hash, 24)}</Mono>
-              </a>
+              <Mono>{parseAddress(hash, 24)}</Mono>
             </Link>
             <Copy info="TXHash" data={hash} />
           </CenteredRow>
@@ -259,8 +255,8 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
     {
       element: props => (
         <DoubleRow {...props} key={blockNum}>
-          <Link href={`/block/${blockNum || 0}`}>
-            <a className="address">{blockNum || 0}</a>
+          <Link href={`/block/${blockNum || 0}`} className="address">
+            {blockNum || 0}
           </Link>
           <span>
             {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
@@ -272,10 +268,8 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
     {
       element: props => (
         <DoubleRow {...props} key={sender}>
-          <Link href={`/account/${sender}`}>
-            <a className="address">
-              <Mono>{parseAddress(sender, 16)}</Mono>
-            </a>
+          <Link href={`/account/${sender}`} className="address">
+            <Mono>{parseAddress(sender, 16)}</Mono>
           </Link>
           {toAddressSectionElement(toAddress)}
         </DoubleRow>

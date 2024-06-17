@@ -122,15 +122,13 @@ const Assets: React.FC<PropsWithChildren> = () => {
       {
         element: props => (
           <Link href={`/asset/${assetId}`} key={assetId}>
-            <a>
-              <AssetLogo
-                logo={logo}
-                ticker={ticker}
-                name={name}
-                verified={verified}
-                size={36}
-              />
-            </a>
+            <AssetLogo
+              logo={logo}
+              ticker={ticker}
+              name={name}
+              verified={verified}
+              size={36}
+            />
           </Link>
         ),
         span: 1,
@@ -140,11 +138,11 @@ const Assets: React.FC<PropsWithChildren> = () => {
         element: props => (
           <DoubleRow {...props} key={assetId}>
             <Link href={`/asset/${assetId}`} key={assetId}>
-              <a>{name}</a>
+              {name}
             </Link>
 
             <CenteredRow>
-              <Link href={`/asset/${assetId}`} key={assetId}>
+              <Link href={`/asset/${assetId}`} key={assetId} legacyBehavior>
                 {assetId}
               </Link>
               <Copy info="Asset ID" data={assetId} />

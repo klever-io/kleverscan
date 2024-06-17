@@ -51,7 +51,11 @@ const Assets: React.FC<PropsWithChildren<IAssets>> = ({
     const ticker = assetId?.split('-')[0];
     const sectionViewNfts =
       assetType === 1 ? (
-        <Link href={`/account/${address}/collection/${assetId}`} key={address}>
+        <Link
+          href={`/account/${address}/collection/${assetId}`}
+          key={address}
+          legacyBehavior
+        >
           <CustomLink tabAsset={true}>
             {t('accounts:SingleAccount.Buttons.ViewNFTs')}
           </CustomLink>
@@ -63,7 +67,7 @@ const Assets: React.FC<PropsWithChildren<IAssets>> = ({
       { element: props => <span key={ticker}>{ticker}</span>, span: 1 },
       {
         element: props => (
-          <Link key={assetId} href={`/asset/${assetId}`}>
+          <Link key={assetId} href={`/asset/${assetId}`} legacyBehavior>
             {assetId}
           </Link>
         ),

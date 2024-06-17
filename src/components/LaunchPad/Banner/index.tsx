@@ -22,12 +22,18 @@ export const LaunchPadBanner: React.FC<PropsWithChildren> = () => {
           in the project, offering real value to investors and users.
         </Description>
         <Buttons>
-          <Link href="/create-transaction?contract=ConfigITOContract">
+          <Link
+            href="/create-transaction?contract=ConfigITOContract"
+            legacyBehavior
+          >
             <Button href="/create-transaction?contract=ConfigITOContract">
               Have a project? Apply here!
             </Button>
           </Link>
-          <Link href="/create-transaction?contract=CreateAssetContract">
+          <Link
+            href="/create-transaction?contract=CreateAssetContract"
+            legacyBehavior
+          >
             <Button
               secondary
               href="/create-transaction?contract=CreateAssetContract"

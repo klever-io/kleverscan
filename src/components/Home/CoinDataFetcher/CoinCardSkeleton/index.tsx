@@ -23,22 +23,20 @@ const CoinCardSkeleton: React.FC<PropsWithChildren> = () => {
             <CardContainerSkeleton key={index}>
               <CardContent>
                 <Link href={`#`}>
-                  <a>
-                    <HeaderContainer>
-                      <Skeleton width={70} height={60} />
+                  <HeaderContainer>
+                    <Skeleton width={70} height={60} />
 
-                      <HeaderContentSkeleton>
-                        <Name>
-                          <span style={{ marginBottom: '0.5rem' }}>
-                            <Skeleton width={60} height={21} />
-                          </span>
-                          <span>
-                            <Skeleton height={21} />
-                          </span>
-                        </Name>
-                      </HeaderContentSkeleton>
-                    </HeaderContainer>
-                  </a>
+                    <HeaderContentSkeleton>
+                      <Name>
+                        <span style={{ marginBottom: '0.5rem' }}>
+                          <Skeleton width={60} height={21} />
+                        </span>
+                        <span>
+                          <Skeleton height={21} />
+                        </span>
+                      </Name>
+                    </HeaderContentSkeleton>
+                  </HeaderContainer>
                 </Link>
 
                 <ChartContainerSkeleton>

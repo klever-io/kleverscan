@@ -45,7 +45,7 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
           </span>
 
           <div>
-            <Link href={`/account/${asset?.ownerAddress}`}>
+            <Link href={`/account/${asset?.ownerAddress}`} legacyBehavior>
               <HoverAnchor>{asset?.ownerAddress}</HoverAnchor>
             </Link>
             <Copy data={asset?.ownerAddress} info="ownerAddress" />

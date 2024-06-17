@@ -36,12 +36,18 @@ export const LearnBanner: React.FC<PropsWithChildren> = () => {
             Join KleverChain and empower your ITO today!
           </Description>
           <Buttons>
-            <Link href="/create-transaction?contract=ConfigITOContract">
+            <Link
+              href="/create-transaction?contract=ConfigITOContract"
+              legacyBehavior
+            >
               <Button href="/create-transaction?contract=ConfigITOContract">
                 Configure your ITO
               </Button>
             </Link>
-            <Link href="/create-transaction?contract=CreateAssetContract">
+            <Link
+              href="/create-transaction?contract=CreateAssetContract"
+              legacyBehavior
+            >
               <Button
                 secondary
                 href="/create-transaction?contract=CreateAssetContract"

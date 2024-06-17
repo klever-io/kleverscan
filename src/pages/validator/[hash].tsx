@@ -253,7 +253,7 @@ const Validator: React.FC<PropsWithChildren<IValidatorPage>> = () => {
             <CenteredRow>
               {router.query.hash ? (
                 <>
-                  <Link href={`/account/${router.query.hash}`}>
+                  <Link href={`/account/${router.query.hash}`} legacyBehavior>
                     {router.query.hash}
                   </Link>
                   <Copy
@@ -432,7 +432,7 @@ const Validator: React.FC<PropsWithChildren<IValidatorPage>> = () => {
       {
         element: props => (
           <CenteredRow key={id}>
-            <Link href={`/account/${address}`} key={address}>
+            <Link href={`/account/${address}`} key={address} legacyBehavior>
               {parseAddress(address || '', 24)}
             </Link>
             <Copy data={address} info="address"></Copy>

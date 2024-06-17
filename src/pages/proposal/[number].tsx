@@ -86,7 +86,9 @@ const ProposalVoters = (props: IProposalVoters) => {
       {
         element: props => (
           <CenteredRow key={voter}>
-            <Link href={`/account/${voter}`}>{parseAddress(voter, 24)}</Link>
+            <Link href={`/account/${voter}`} legacyBehavior>
+              {parseAddress(voter, 24)}
+            </Link>
             <Copy data={voter} info="voter"></Copy>
           </CenteredRow>
         ),
@@ -353,7 +355,7 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
                   <strong>{t('proposals:Proposer')}</strong>
                 </span>
                 <span style={{ marginRight: '0.2rem' }}>
-                  <Link href={`/account/${proposal?.proposer}`}>
+                  <Link href={`/account/${proposal?.proposer}`} legacyBehavior>
                     <HoverLink>{isSkeleton(proposal?.proposer)}</HoverLink>
                   </Link>
                 </span>
@@ -367,7 +369,7 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
                 <span>
                   <strong>Hash</strong>
                 </span>
-                <Link href={`/transaction/${proposal?.txHash}`}>
+                <Link href={`/transaction/${proposal?.txHash}`} legacyBehavior>
                   <HoverLink>{isSkeleton(proposal?.txHash)}</HoverLink>
                 </Link>
               </Row>

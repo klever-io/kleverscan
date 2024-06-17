@@ -643,7 +643,7 @@ export const TransactionChart = styled(TransactionContent)`
   }
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
-    padding: 16px;
+    padding: 16px 0;
     height: 100%;
   }
 `;

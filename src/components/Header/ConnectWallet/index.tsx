@@ -4,7 +4,7 @@ import Tour from '@/components/Tour';
 import { useExtension } from '@/contexts/extension';
 import { useScroll } from '@/utils/hooks';
 import { parseAddress } from '@/utils/parseValues';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import WalletHelp from '../WalletHelp';

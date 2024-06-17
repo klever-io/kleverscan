@@ -11,7 +11,7 @@ import {
 import { useMobile } from '@/contexts/mobile';
 import { useTheme } from '@/contexts/theme';
 import { ArrowUpSquareHideMenu } from '@/views/home';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import Link from 'next/link';
 import { QRCodeSVG } from 'qrcode.react';
 import React, { useRef, useState } from 'react';

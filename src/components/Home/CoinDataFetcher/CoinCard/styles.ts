@@ -2,7 +2,7 @@ import { ArrowUpRightSquare, ArrowUpSquare, Currency } from '@/assets/icons';
 import { TableGradientBorder } from '@/components/Table/styles';
 import { DefaultCardStyles } from '@/styles/common';
 import { DataCardDefaultStyles } from '@/views/home';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import styled, { css, keyframes } from 'styled-components';
 interface IVariation {
   positive: boolean;

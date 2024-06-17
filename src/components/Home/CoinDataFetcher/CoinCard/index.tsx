@@ -23,7 +23,7 @@ import {
 import { getVariation } from '@/utils';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
-import { ImageLoaderProps } from 'next/image';
+import { ImageLoaderProps } from 'next/legacy/image';
 import Link from 'next/link';
 import React, { useCallback, useRef, useState } from 'react';
 import { IoReloadSharp } from 'react-icons/io5';

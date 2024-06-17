@@ -1,7 +1,7 @@
 import { PropsWithChildren } from 'react';
 import { HomeData } from '@/contexts/mainPage';
 import { IProposal } from '@/types/proposals';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import React, { useContext } from 'react';
 import {
   CardContainer,

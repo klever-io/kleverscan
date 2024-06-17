@@ -11,7 +11,7 @@ import { useParticipate } from '@/contexts/participate';
 import { assetInfoCall } from '@/services/requests/asset';
 import { IParsedITO } from '@/types';
 import { useTranslation } from 'next-i18next';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';
 import ReactDOM from 'react-dom';

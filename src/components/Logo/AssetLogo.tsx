@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 import { validateImgUrl } from '@/utils/imageValidate';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   Container,

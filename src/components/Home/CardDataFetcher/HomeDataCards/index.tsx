@@ -19,7 +19,7 @@ import {
 } from '@/views/home';
 import { CircularProgressContainer } from '@/views/validators';
 import { useTranslation } from 'next-i18next';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import { useRef } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import HomeDataCardsSkeleton from '../HomeDataCardsSkeleton';

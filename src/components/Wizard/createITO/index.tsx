@@ -10,7 +10,7 @@ import { getAsset } from '@/services/requests/asset';
 import { IAsset } from '@/types';
 import { parseAddress } from '@/utils/parseValues';
 import { useTranslation } from 'next-i18next';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import { useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { FiPlusSquare } from 'react-icons/fi';

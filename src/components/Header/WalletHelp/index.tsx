@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 import { useTheme } from '@/contexts/theme';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { AiFillExclamationCircle } from 'react-icons/ai';

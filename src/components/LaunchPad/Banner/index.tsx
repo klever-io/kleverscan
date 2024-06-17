@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Link from 'next/link';
 import {
   BannerContainer,
@@ -8,7 +9,7 @@ import {
   Title,
 } from './styles';
 
-export const LaunchPadBanner: React.FC = () => {
+export const LaunchPadBanner: React.FC<PropsWithChildren> = () => {
   return (
     <BannerContainer>
       <Content>

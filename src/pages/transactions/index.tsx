@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Transactions as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
@@ -347,7 +348,7 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
   return sections;
 };
 
-const Transactions: React.FC = () => {
+const Transactions: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
 
   const tableProps: ITable = {

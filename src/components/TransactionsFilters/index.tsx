@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Filter, { IFilter } from '@/components/Filter';
 import { buyType, contracts, status } from '@/configs/transactions';
 import { IAsset } from '@/types';
@@ -14,9 +15,9 @@ interface ITransactionsFilters {
   disabledInput?: boolean;
 }
 
-const TransactionsFilters: React.FC<ITransactionsFilters> = ({
-  disabledInput,
-}) => {
+const TransactionsFilters: React.FC<
+  PropsWithChildren<ITransactionsFilters>
+> = ({ disabledInput }) => {
   const router = useRouter();
   const [query, setLocalQuery] = useState<NextParsedUrlQuery>({});
   const [assets, fetchPartialAsset, loading, setLoading] =

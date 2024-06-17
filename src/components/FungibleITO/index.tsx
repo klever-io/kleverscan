@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { IPackInfo, IPackItem } from '@/types/contracts';
 import { web } from '@klever/sdk-web';
 import { useTranslation } from 'next-i18next';
@@ -39,7 +40,7 @@ export const isFloat = (value: number): boolean => {
   return false;
 };
 
-const FungibleITO: React.FC<IFungibleITO> = ({
+const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
   ITO,
   packInfo,
   packInfoIndex,

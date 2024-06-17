@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Skeleton from '@/components/Skeleton';
 import Link from 'next/link';
 import React from 'react';
@@ -12,7 +13,7 @@ import {
   Name,
 } from '../CoinCard/styles';
 
-const CoinCardSkeleton: React.FC = () => {
+const CoinCardSkeleton: React.FC<PropsWithChildren> = () => {
   return (
     <Container>
       <Carousel style={{ marginBottom: '1rem' }}>

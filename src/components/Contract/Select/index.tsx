@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { IStakingRewards } from '@/pages/account/[account]';
 import { ICollectionList } from '@/types';
 import dynamic from 'next/dynamic';
@@ -38,7 +39,7 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   onCreateOption?: (value: any) => void;
 }
 
-const Select: React.FC<IFilter> = ({
+const Select: React.FC<PropsWithChildren<IFilter>> = ({
   options,
   onChange,
   onInputChange,

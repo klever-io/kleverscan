@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { ContractProvider } from '@/contexts/contract';
 import { FeesProvider } from '@/contexts/contract/fees';
 import { ModalsProvider } from '@/contexts/contract/modals';
@@ -13,7 +14,7 @@ import { GetServerSideProps } from 'next';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ToastContainer } from 'react-toastify';
 
-const ContextProviders: React.FC = ({ children }) => {
+const ContextProviders: React.FC<PropsWithChildren> = ({ children }) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {

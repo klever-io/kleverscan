@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { WarningIcon } from '@/assets/calendar';
 import { Transactions as Icon } from '@/assets/title-icons';
 import MultiContract from '@/components/Contract/MultiContract';
@@ -28,7 +29,7 @@ import React, { useEffect } from 'react';
 
 export const warningMessage = `You don't have enough currency. Please check the amount of your transaction as well as the fee cost.`;
 
-const CreateTransaction: React.FC = () => {
+const CreateTransaction: React.FC<PropsWithChildren> = () => {
   const [isAccountEmpty, setIsAccountEmpty] = React.useState<boolean>(false);
   const { extensionInstalled, connectExtension, walletAddress } =
     useExtension();

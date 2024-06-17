@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { ParticipateModal } from '@/components/Asset/AssetSummary/ParticipateModal';
 import { HashComponent } from '@/components/Contract';
 import Copy from '@/components/Copy';
@@ -353,7 +354,7 @@ export const ITOTabletheaders = [
   '',
 ];
 
-const ITOsPage: React.FC = () => {
+const ITOsPage: React.FC<PropsWithChildren> = () => {
   const [ITO, setITO] = useState<IParsedITO | null>(null);
   const {
     openParticipateModal,

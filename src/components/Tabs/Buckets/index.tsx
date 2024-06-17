@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
 import { useContractModal } from '@/contexts/contractModal';
@@ -16,7 +17,7 @@ export interface IBuckets {
   showInteractionButtons?: boolean;
 }
 
-const Buckets: React.FC<IBuckets> = ({
+const Buckets: React.FC<PropsWithChildren<IBuckets>> = ({
   bucketsTableProps,
   showInteractionButtons,
 }) => {

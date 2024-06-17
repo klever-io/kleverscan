@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { PurpleArrowRight } from '@/assets/icons';
 import Copy from '@/components/Copy';
 import { MultiContractToolTip } from '@/components/MultiContractToolTip';
@@ -272,7 +273,7 @@ export const homeTransactionsTabletRowSections = (
   return sections;
 };
 
-const HomeTransactions: React.FC = () => {
+const HomeTransactions: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('transactions');
   const { transactions: homeTransactions } = useHomeData();
   const [hideMenu, setHideMenu] = useState(false);

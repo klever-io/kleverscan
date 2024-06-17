@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useTheme } from '@/contexts/theme';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
@@ -21,7 +22,7 @@ interface IWalletDrawer {
   clickConnectionMobile: () => void;
 }
 
-const WalletHelp: React.FC<IWalletDrawer> = ({
+const WalletHelp: React.FC<PropsWithChildren<IWalletDrawer>> = ({
   closeDrawer,
   opened,
   clickConnectionMobile,

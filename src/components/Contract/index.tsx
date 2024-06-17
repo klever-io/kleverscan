@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useContract } from '@/contexts/contract';
 import { useFees } from '@/contexts/contract/fees';
 import { IQueue, useMulticontract } from '@/contexts/contract/multicontract';
@@ -45,10 +46,9 @@ export interface IHashComponentProps {
   setHash: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-export const HashComponent: React.FC<IHashComponentProps> = ({
-  hash,
-  setHash,
-}) => {
+export const HashComponent: React.FC<
+  PropsWithChildren<IHashComponentProps>
+> = ({ hash, setHash }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -82,7 +82,7 @@ export const HashComponent: React.FC<IHashComponentProps> = ({
   );
 };
 
-const Contract: React.FC<IContract> = ({
+const Contract: React.FC<PropsWithChildren<IContract>> = ({
   elementId = 0,
   defaultValues = null,
 }) => {

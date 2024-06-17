@@ -1,15 +1,16 @@
+import { PropsWithChildren } from 'react';
 import { useRouter } from 'next/router';
 import { Container, IconContainer, StyledArrow } from './styles';
 
 interface ITitle {
   title?: string;
-  Icon?: React.FC;
+  Icon?: React.FC<PropsWithChildren>;
   route?: string | -1;
-  Component?: React.FC;
+  Component?: React.FC<PropsWithChildren>;
   isAccountOwner?: boolean;
 }
 
-const Title: React.FC<ITitle> = ({
+const Title: React.FC<PropsWithChildren<ITitle>> = ({
   title,
   Icon,
   route,

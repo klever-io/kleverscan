@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { validateImgUrl } from '@/utils/imageValidate';
 import Image from 'next/image';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -17,7 +18,7 @@ interface IAssetLogo {
   size?: number;
 }
 
-export const AssetLogo: React.FC<IAssetLogo> = ({
+export const AssetLogo: React.FC<PropsWithChildren<IAssetLogo>> = ({
   logo,
   ticker,
   name,

@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { isFloat } from '@/components/FungibleITO';
 import { StyledArrow } from '@/components/Layout/Title/styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
@@ -44,7 +45,9 @@ interface ParticipateModalProps {
   setLoading: (state: boolean) => void;
 }
 
-export const ParticipateModal: React.FC<ParticipateModalProps> = ({
+export const ParticipateModal: React.FC<
+  PropsWithChildren<ParticipateModalProps>
+> = ({
   isOpenParticipateModal,
   setOpenParticipateModal,
   ITO,

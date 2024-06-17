@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { PurpleArrowRight } from '@/assets/icons';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Table, { ITable } from '@/components/Table';
@@ -219,7 +220,7 @@ export const blocksTabletRowSections = (block: IBlock): IRowSection[] => {
   return sections;
 };
 
-const BlockCardFetcher: React.FC = () => {
+const BlockCardFetcher: React.FC<PropsWithChildren> = () => {
   const { blocks } = useHomeData();
   const { t: commonT } = useTranslation('common');
   const { t } = useTranslation('blocks');

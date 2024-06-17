@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useHomeData } from '@/contexts/mainPage';
 import {
   Cell,
@@ -12,7 +13,7 @@ import {
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Link from 'next/link';
 
-const MostTransacted: React.FC = () => {
+const MostTransacted: React.FC<PropsWithChildren> = () => {
   const { mostTransactedTokens, mostTransactedNFTs } = useHomeData();
 
   const tables = [

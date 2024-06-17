@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { MultiContractModalInfo } from '@/components/Contract/MultiContract/styles';
 import Select from '@/components/Contract/Select';
 import {
@@ -50,7 +51,7 @@ Be sure that your account has the permission to sign transactions on behalf of t
 
 const showPayloadTooltip = `The payload is the contract data that will be sent to be built and broadcast to the blockchain. If you want to edit it, you can do it here.`;
 
-const PermID: React.FC = () => {
+const PermID: React.FC<PropsWithChildren> = () => {
   const { setPermID, permID, senderAccount } = useContract();
   const { walletAddress } = useExtension();
 
@@ -107,7 +108,7 @@ const PermID: React.FC = () => {
   );
 };
 
-const AccountSelect: React.FC = () => {
+const AccountSelect: React.FC<PropsWithChildren> = () => {
   const { setSenderAccount, setPermID, getAssets } = useContract();
   const { walletAddress } = useExtension();
   const [loggedAccountIsSender, setLoggedAccountIsSender] = useState(true);
@@ -168,7 +169,7 @@ const AccountSelect: React.FC = () => {
   );
 };
 
-const MultiSigSelect: React.FC = () => {
+const MultiSigSelect: React.FC<PropsWithChildren> = () => {
   const { isMultisig, signTxMultiSign } = useContract();
 
   const [multiSig, setMultiSig] = useState<boolean>(isMultisig.current);
@@ -236,7 +237,7 @@ const MultiSigSelect: React.FC = () => {
   );
 };
 
-const AdvancedOptionsContent: React.FC = () => {
+const AdvancedOptionsContent: React.FC<PropsWithChildren> = () => {
   const { showPayload, isMultisig, kdaFee, getAssets } = useContract();
   const { walletAddress } = useExtension();
 
@@ -380,7 +381,7 @@ const AdvancedOptionsContent: React.FC = () => {
   );
 };
 
-const AdvancedOptions: React.FC = () => {
+const AdvancedOptions: React.FC<PropsWithChildren> = () => {
   const [showAdvancedOpts, setShowAdvancedOpts] = useState(false);
 
   return (

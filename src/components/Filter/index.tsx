@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { FilterArrowDown } from '@/assets/icons';
 import React, { useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
@@ -32,7 +33,7 @@ export interface IFilter {
   maxWidth?: boolean;
 }
 
-const Filter: React.FC<IFilter> = ({
+const Filter: React.FC<PropsWithChildren<IFilter>> = ({
   title,
   data,
   onClick,
@@ -81,7 +82,7 @@ const Filter: React.FC<IFilter> = ({
     setInputValue('');
   };
 
-  const SelectorItem: React.FC<IFilterItem> = ({ item }) => {
+  const SelectorItem: React.FC<PropsWithChildren<IFilterItem>> = ({ item }) => {
     const handleClick = () => {
       if (onClick) {
         onClick(item);

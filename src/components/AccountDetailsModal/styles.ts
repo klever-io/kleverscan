@@ -175,7 +175,8 @@ export const OtherAssetsContainer = styled.div<{ isMobile?: boolean }>`
   top: ${props => (props.isMobile ? '15rem' : '13.5rem')};
   left: ${props => (props.isMobile ? '8.5rem' : '6.2rem')};
   padding: 0.75rem 0.75rem;
-  box-shadow: 0 0.4rem 0.8rem 0 rgba(0, 0, 0, 0.2),
+  box-shadow:
+    0 0.4rem 0.8rem 0 rgba(0, 0, 0, 0.2),
     0 0.6rem 1rem 0 rgba(0, 0, 0, 0.19);
   background-color: ${props => props.theme.card.assetText};
   border-radius: 0.5rem;

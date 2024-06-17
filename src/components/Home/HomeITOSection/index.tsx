@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { PurpleArrowRight } from '@/assets/icons';
 import { ParticipateModal } from '@/components/Asset/AssetSummary/ParticipateModal';
 import { HashComponent } from '@/components/Contract';
@@ -18,7 +19,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 import ReactDOM from 'react-dom';
 
-export const HomeITOSection: React.FC = () => {
+export const HomeITOSection: React.FC<PropsWithChildren> = () => {
   const [ITO, setITO] = useState<IParsedITO | null>(null);
   const {
     openParticipateModal,

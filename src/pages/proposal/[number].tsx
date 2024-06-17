@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Copy } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import Title from '@/components/Layout/Title';
@@ -124,7 +125,7 @@ const ProposalVoters = (props: IProposalVoters) => {
   return <Table {...tableProps2} />;
 };
 
-const ProposalDetails: React.FC = () => {
+const ProposalDetails: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation(['common', 'proposals']);
   const [selectedFilter, setSelectedFilter] = useState(
     `${t('common:Statements.Yes')}`,
@@ -226,7 +227,7 @@ const ProposalDetails: React.FC = () => {
     }
   }, [proposal, params]);
 
-  const Progress: React.FC = () => {
+  const Progress: React.FC<PropsWithChildren> = () => {
     if (!proposal) return null;
     return (
       <ProgressBar>
@@ -288,7 +289,7 @@ const ProposalDetails: React.FC = () => {
     dataName: 'voters',
   };
 
-  const SelectedTabComponent: React.FC = useCallback(() => {
+  const SelectedTabComponent: React.FC<PropsWithChildren> = useCallback(() => {
     switch (selectedFilter) {
       case `${t('common:Statements.Yes')}`:
         return <ProposalVoters proposalVotersProps={{ ...tableProps1 }} />;

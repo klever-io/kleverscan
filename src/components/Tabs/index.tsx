@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { getSelectedTab } from '@/utils/index';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -14,7 +15,11 @@ export interface ITabs {
   onClick?(header: string, index: number): void;
 }
 
-const Tabs: React.FC<ITabs> = ({ headers, onClick, children }) => {
+const Tabs: React.FC<PropsWithChildren<ITabs>> = ({
+  headers,
+  onClick,
+  children,
+}) => {
   const router = useRouter();
   const [selected, setSelected] = useState<number>(0);
   useEffect(() => {

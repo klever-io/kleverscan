@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { HomeData } from '@/contexts/mainPage';
 import { MapContainer } from '@/views/nodes';
 import dynamic from 'next/dynamic';
@@ -16,7 +17,7 @@ import { PurpleArrowRight } from '@/assets/icons';
 
 const Map = dynamic(() => import('@/components/Map/index'), { ssr: false });
 
-const ValidatorsCard: React.FC = () => {
+const ValidatorsCard: React.FC<PropsWithChildren> = () => {
   const { totalValidators, activeValidators, nodes } = useContext(HomeData);
   return (
     <CardContainer>

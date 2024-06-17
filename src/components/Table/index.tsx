@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useMobile } from '@/contexts/mobile';
 import { DoubleRow } from '@/styles/common';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
@@ -65,7 +66,7 @@ export interface ITable {
   interval?: number;
   intervalController?: React.Dispatch<React.SetStateAction<number>>;
   showLimit?: boolean;
-  Filters?: React.FC;
+  Filters?: React.FC<PropsWithChildren>;
   smaller?: boolean;
   showPagination?: boolean;
 }
@@ -79,7 +80,7 @@ const onErrorHandler = () => {
   };
 };
 
-const Table: React.FC<ITable> = ({
+const Table: React.FC<PropsWithChildren<ITable>> = ({
   type,
   header,
   rowSections,

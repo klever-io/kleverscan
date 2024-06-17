@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { ArrowDropdown } from '@/assets/icons';
 import { INavbarItem, navbarItems } from '@/configs/navbar';
 import { useMobile } from '@/contexts/mobile';
@@ -44,7 +45,11 @@ interface IDropdownPages {
   onClick?: () => void;
 }
 
-const NavbarItem: React.FC<INavbarItem> = ({ name, pathTo, pages = [] }) => {
+const NavbarItem: React.FC<PropsWithChildren<INavbarItem>> = ({
+  name,
+  pathTo,
+  pages = [],
+}) => {
   const router = useRouter();
   const DropdownDesktop = ({ page }: IDropdownPages) => {
     return (
@@ -91,7 +96,7 @@ const NavbarItem: React.FC<INavbarItem> = ({ name, pathTo, pages = [] }) => {
   );
 };
 
-export const MobileNavbarItem: React.FC<INavbarItem> = ({
+export const MobileNavbarItem: React.FC<PropsWithChildren<INavbarItem>> = ({
   name,
   Icon,
   pathTo,
@@ -125,7 +130,7 @@ export const MobileNavbarItem: React.FC<INavbarItem> = ({
   );
 };
 
-const Navbar: React.FC = () => {
+const Navbar: React.FC<PropsWithChildren> = () => {
   const {
     mobileNavbarRef,
     closeMenu,

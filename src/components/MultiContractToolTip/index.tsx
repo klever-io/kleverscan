@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { ContractsIndex, IContract } from '@/types/contracts';
 import {
   MultiContractContainer,
@@ -10,10 +11,9 @@ interface IMultiContract {
   contractType: string;
   contract: IContract[];
 }
-export const MultiContractToolTip: React.FC<IMultiContract> = ({
-  contractType,
-  contract,
-}) => {
+export const MultiContractToolTip: React.FC<
+  PropsWithChildren<IMultiContract>
+> = ({ contractType, contract }) => {
   const reduceContracts = (): ReducedContract => {
     const reducedContract: ReducedContract = {};
     contract.forEach(innerContract => {

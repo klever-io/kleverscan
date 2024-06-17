@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Filter, { IFilter } from '@/components/Filter';
 import Table, { ITable } from '@/components/Table';
 import {
@@ -54,7 +55,9 @@ export const getProposalStatusColorAndText = (
   }
 };
 
-const Proposals: React.FC<IProposalsProps> = ({ request }) => {
+const Proposals: React.FC<PropsWithChildren<IProposalsProps>> = ({
+  request,
+}) => {
   const { t } = useTranslation(['common', 'proposals']);
   const { isMobile, isTablet } = useMobile();
   const router = useRouter();

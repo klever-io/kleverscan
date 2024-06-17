@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Copy from '@/components/Copy';
 import QrCodeModal from '@/components/QrCodeModal';
 import Skeleton from '@/components/Skeleton';
@@ -17,7 +18,9 @@ export interface AssetProps {
   asset?: IAsset;
 }
 
-export const OverviewTab: React.FC<AssetProps> = ({ asset }) => {
+export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
+  asset,
+}) => {
   const router = useRouter();
   const { t } = useTranslation(['common', 'assets']);
 

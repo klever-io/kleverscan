@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { base64ToHex, isHex } from '@/utils/formatFunctions';
 import { web } from '@klever/sdk-web';
 import { useTranslation } from 'next-i18next';
@@ -18,7 +19,7 @@ interface IFormInputs {
   address: string;
 }
 
-const FormVerifySignature: React.FC = () => {
+const FormVerifySignature: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('verify');
   const [isDirty, setIsDirty] = useState(false);
   const [formValues, setFormValues] = useState<IFormInputs>({

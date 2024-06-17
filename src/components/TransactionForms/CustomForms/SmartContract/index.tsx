@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { ABI, ABIStruct } from '@/types/contracts';
 import { useDidUpdateEffect } from '@/utils/hooks';
@@ -260,7 +261,7 @@ const parseArgument = (
   return parsedValue;
 };
 
-const SmartContract: React.FC<IContractProps> = ({
+const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
   formKey,
   handleFormSubmit,
 }) => {

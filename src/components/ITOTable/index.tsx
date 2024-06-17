@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useMobile } from '@/contexts/mobile';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
@@ -80,7 +81,7 @@ const onErrorHandler = () => {
   };
 };
 
-const Table: React.FC<ITable> = ({
+const Table: React.FC<PropsWithChildren<ITable>> = ({
   type,
   header,
   rowSections,

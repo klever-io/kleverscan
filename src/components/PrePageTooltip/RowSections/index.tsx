@@ -170,7 +170,7 @@ export const TransactionRowSections = (
   }
   return [
     { element: props => <TitleSpan>Transaction Summary</TitleSpan>, span: 2 },
-    { element: props => <span>{res.error}</span>, span: 2 },
+    { element: props => <span>{JSON.stringify(res.error)}</span>, span: 2 },
   ];
 };
 
@@ -267,7 +267,7 @@ export const AssetRowSections = (
   }
   return [
     { element: props => <TitleSpan>Token Summary</TitleSpan>, span: 2 },
-    { element: props => <span>{res.error}</span>, span: 2 },
+    { element: props => <span>{JSON.stringify(res.error)}</span>, span: 2 },
   ];
 };
 
@@ -359,7 +359,7 @@ export const AccountRowSections = (
 
   return [
     { element: props => <TitleSpan>Account Summary</TitleSpan>, span: 2 },
-    { element: props => <span>{res.error}</span>, span: 2 },
+    { element: props => <span>{JSON.stringify(res.error)}</span>, span: 2 },
   ];
 };
 
@@ -442,6 +442,6 @@ export const BlockRowSections = (
   }
   return [
     { element: props => <TitleSpan>Block Summary</TitleSpan>, span: 2 },
-    { element: props => <span>{res.error}</span>, span: 2 },
+    { element: props => <span>{JSON.stringify(res.error)}</span>, span: 2 },
   ];
 };

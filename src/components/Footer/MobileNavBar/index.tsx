@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import {
@@ -14,7 +15,11 @@ interface IFooterItems {
   url: string;
 }
 
-const SelectIcons: React.FC<IFooterItems> = ({ name, icon, url }) => {
+const SelectIcons: React.FC<PropsWithChildren<IFooterItems>> = ({
+  name,
+  icon,
+  url,
+}) => {
   const router = useRouter();
   return (
     <ItemsContent>
@@ -42,7 +47,7 @@ const SelectIcons: React.FC<IFooterItems> = ({ name, icon, url }) => {
   );
 };
 
-export const MobileNavBar: React.FC = () => {
+export const MobileNavBar: React.FC<PropsWithChildren> = () => {
   const footerItems: IFooterItems[] = [
     {
       name: 'Home',

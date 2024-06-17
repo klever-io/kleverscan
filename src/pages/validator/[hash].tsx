@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { getStatusIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
 import Dropdown from '@/components/Dropdown';
@@ -81,7 +82,7 @@ const DynamicValidatorCards = dynamic(
   () => import('../../components/ValidatorCards'),
 );
 
-const Validator: React.FC<IValidatorPage> = () => {
+const Validator: React.FC<PropsWithChildren<IValidatorPage>> = () => {
   const { t } = useTranslation(['validators', 'common']);
   const router = useRouter();
   const [validator, setValidator] = useState<null | IPeer>(null);
@@ -241,7 +242,7 @@ const Validator: React.FC<IValidatorPage> = () => {
     };
   };
 
-  const Overview: React.FC = () => {
+  const Overview: React.FC<PropsWithChildren> = () => {
     return (
       <CardContent>
         <Row>
@@ -473,7 +474,7 @@ const Validator: React.FC<IValidatorPage> = () => {
     dataName: 'validator',
   };
 
-  const InteractionsButtonsComponenet: React.FC = () => {
+  const InteractionsButtonsComponenet: React.FC<PropsWithChildren> = () => {
     const routerAddress = router.query?.hash || '';
     if (!!extensionInstalled && routerAddress === walletAddress) {
       return (

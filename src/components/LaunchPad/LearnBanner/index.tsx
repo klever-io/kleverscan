@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '../Banner/styles';
@@ -12,7 +13,7 @@ import {
   Title,
 } from './styles';
 
-export const LearnBanner: React.FC = () => {
+export const LearnBanner: React.FC<PropsWithChildren> = () => {
   return (
     <BannerContainer>
       <Content>

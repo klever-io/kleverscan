@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import * as SocialIcons from '@/assets/social';
 import { AssetProps } from '@/components/Asset/OverviewTab';
 import { HashComponent } from '@/components/Contract';
@@ -43,7 +44,10 @@ export interface AssetSummaryProps extends AssetProps {
   ITO: IParsedITO | undefined;
 }
 
-export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
+export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
+  asset,
+  ITO,
+}) => {
   const {
     openApplyFormModal,
     setOpenApplyFormModal,

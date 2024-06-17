@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import BlockCardFetcher from '@/components/Home/BlockCardFetcher';
 import HomeDataCards from '@/components/Home/CardDataFetcher/HomeDataCards';
 import CoinCard from '@/components/Home/CoinDataFetcher/CoinCard';
@@ -16,7 +17,7 @@ import { HomeITOSection } from './HomeITOSection';
 import ProposalValidatorSection from './ProposalsAndValidatorsSection';
 import MostTransacted from './MostTransacted';
 
-const Home: React.FC = () => {
+const Home: React.FC<PropsWithChildren> = () => {
   return (
     <HomeDataProvider>
       <Container>

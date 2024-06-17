@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { WizardLeftArrow } from '@/assets/icons';
 import Select from '@/components/Contract/Select';
 import { statusOptions } from '@/components/TransactionForms/CustomForms/ConfigITO';
@@ -84,7 +85,9 @@ export const propertiesCommonDefaultValuesITO = {
 
 const infinity = '\u221e';
 
-export const CreateITOSecondStep: React.FC<IAssetITOInformations> = ({
+export const CreateITOSecondStep: React.FC<
+  PropsWithChildren<IAssetITOInformations>
+> = ({
   informations: { currentStep, title, description, kleverTip },
   handleStep,
   t,
@@ -127,7 +130,9 @@ export const CreateITOSecondStep: React.FC<IAssetITOInformations> = ({
   );
 };
 
-export const CreateITOThirdStep: React.FC<IAssetITOInformations> = ({
+export const CreateITOThirdStep: React.FC<
+  PropsWithChildren<IAssetITOInformations>
+> = ({
   informations: { currentStep, title, description, formValue },
   handleStep,
   t,
@@ -179,7 +184,9 @@ export const CreateITOThirdStep: React.FC<IAssetITOInformations> = ({
     }
   };
 
-  const AddressValidationIcon: React.FC<{ error: any }> = ({ error }) => {
+  const AddressValidationIcon: React.FC<PropsWithChildren<{ error: any }>> = ({
+    error,
+  }) => {
     if (error) return <WizardFailAddressCheck />;
 
     if (changeReceiveAddress && receiveAddress?.length === 62 && !error)
@@ -311,11 +318,9 @@ export const CreateITOThirdStep: React.FC<IAssetITOInformations> = ({
   );
 };
 
-export const CreateITOFourthStep: React.FC<IAssetITOInformations> = ({
-  informations: { currentStep, title, description },
-  handleStep,
-  t,
-}) => {
+export const CreateITOFourthStep: React.FC<
+  PropsWithChildren<IAssetITOInformations>
+> = ({ informations: { currentStep, title, description }, handleStep, t }) => {
   const {
     register,
     setValue,
@@ -403,11 +408,9 @@ export const CreateITOFourthStep: React.FC<IAssetITOInformations> = ({
   );
 };
 
-export const CreateITOSixStep: React.FC<IAssetITOInformations> = ({
-  informations: { currentStep, title, description },
-  handleStep,
-  t,
-}) => {
+export const CreateITOSixStep: React.FC<
+  PropsWithChildren<IAssetITOInformations>
+> = ({ informations: { currentStep, title, description }, handleStep, t }) => {
   const {
     register,
     formState: { errors },
@@ -479,11 +482,9 @@ export const CreateITOSixStep: React.FC<IAssetITOInformations> = ({
   );
 };
 
-export const CreateITOSevenStep: React.FC<IAssetITOInformations> = ({
-  informations: { currentStep, title, description },
-  handleStep,
-  t,
-}) => {
+export const CreateITOSevenStep: React.FC<
+  PropsWithChildren<IAssetITOInformations>
+> = ({ informations: { currentStep, title, description }, handleStep, t }) => {
   const {
     register,
     setValue,
@@ -539,11 +540,9 @@ export const CreateITOSevenStep: React.FC<IAssetITOInformations> = ({
   );
 };
 
-export const CreatePackInfoSteps: React.FC<IAssetITOInformations> = ({
-  informations: { assetType },
-  handleStep,
-  t,
-}) => {
+export const CreatePackInfoSteps: React.FC<
+  PropsWithChildren<IAssetITOInformations>
+> = ({ informations: { assetType }, handleStep, t }) => {
   const { watch } = useFormContext();
   const [packInfo, setPackInfo] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -611,7 +610,7 @@ export const CreatePackInfoSteps: React.FC<IAssetITOInformations> = ({
   );
 };
 
-const CreatePackCurrencyID: React.FC<IWizardComponents> = ({
+const CreatePackCurrencyID: React.FC<PropsWithChildren<IWizardComponents>> = ({
   handleStep,
   previousStep,
   t,
@@ -730,7 +729,9 @@ const CreatePackCurrencyID: React.FC<IWizardComponents> = ({
   );
 };
 
-export const CreatePacks: React.FC<IPackInfoITO> = ({ packInfoIndex }) => {
+export const CreatePacks: React.FC<PropsWithChildren<IPackInfoITO>> = ({
+  packInfoIndex,
+}) => {
   const {
     control,
     register,
@@ -872,11 +873,9 @@ export const CreatePacks: React.FC<IPackInfoITO> = ({ packInfoIndex }) => {
   );
 };
 
-export const CreateWhiteListSettingsSteps: React.FC<IAssetITOInformations> = ({
-  informations: { assetType },
-  handleStep,
-  t,
-}) => {
+export const CreateWhiteListSettingsSteps: React.FC<
+  PropsWithChildren<IAssetITOInformations>
+> = ({ informations: { assetType }, handleStep, t }) => {
   const { watch } = useFormContext();
   const [whitelist, setPackInfo] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -964,11 +963,9 @@ export const CreateWhiteListSettingsSteps: React.FC<IAssetITOInformations> = ({
   );
 };
 
-export const WhitelistStartTimeStep: React.FC<IWizardComponents> = ({
-  handleStep,
-  previousStep,
-  t,
-}) => {
+export const WhitelistStartTimeStep: React.FC<
+  PropsWithChildren<IWizardComponents>
+> = ({ handleStep, previousStep, t }) => {
   const {
     register,
     formState: { errors },
@@ -1025,10 +1022,9 @@ export const WhitelistStartTimeStep: React.FC<IWizardComponents> = ({
   );
 };
 
-export const WhitelistDefaultLimitStep: React.FC<IWizardComponents> = ({
-  handleStep,
-  t,
-}) => {
+export const WhitelistDefaultLimitStep: React.FC<
+  PropsWithChildren<IWizardComponents>
+> = ({ handleStep, t }) => {
   const {
     register,
     formState: { errors },
@@ -1072,10 +1068,9 @@ export const WhitelistDefaultLimitStep: React.FC<IWizardComponents> = ({
   );
 };
 
-export const WhitelistStatusStep: React.FC<IWizardComponents> = ({
-  handleStep,
-  t,
-}) => {
+export const WhitelistStatusStep: React.FC<
+  PropsWithChildren<IWizardComponents>
+> = ({ handleStep, t }) => {
   statusOptions;
   const {
     setValue,
@@ -1128,10 +1123,9 @@ export const WhitelistStatusStep: React.FC<IWizardComponents> = ({
   );
 };
 
-export const WhitelistAddressSteps: React.FC<IWizardComponents> = ({
-  handleStep,
-  t,
-}) => {
+export const WhitelistAddressSteps: React.FC<
+  PropsWithChildren<IWizardComponents>
+> = ({ handleStep, t }) => {
   const { watch } = useFormContext();
   const [whitelist, setPackInfo] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -1191,11 +1185,9 @@ export const WhitelistAddressSteps: React.FC<IWizardComponents> = ({
   );
 };
 
-export const CreateWhitelistedAddress: React.FC<IWizardComponents> = ({
-  handleStep,
-  previousStep,
-  t,
-}) => {
+export const CreateWhitelistedAddress: React.FC<
+  PropsWithChildren<IWizardComponents>
+> = ({ handleStep, previousStep, t }) => {
   const {
     control,
     register,
@@ -1329,10 +1321,9 @@ export const CreateWhitelistedAddress: React.FC<IWizardComponents> = ({
   );
 };
 
-export const ConfirmTransaction: React.FC<IWizardComponents> = ({
-  handleStep,
-  t,
-}) => {
+export const ConfirmTransaction: React.FC<
+  PropsWithChildren<IWizardComponents>
+> = ({ handleStep, t }) => {
   return (
     <>
       <GenericCardContainer>
@@ -1364,7 +1355,7 @@ export const ConfirmTransaction: React.FC<IWizardComponents> = ({
   );
 };
 
-export const AssetDetails: React.FC = () => {
+export const AssetDetails: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('wizards');
   const { watch } = useFormContext();
   const collection = watch('collection');
@@ -1372,7 +1363,9 @@ export const AssetDetails: React.FC = () => {
     queryKey: 'collection',
     queryFn: () => getAsset(collection),
   });
-  const RenderLogo: React.FC<{ logo: string }> = ({ logo }) => {
+  const RenderLogo: React.FC<PropsWithChildren<{ logo: string }>> = ({
+    logo,
+  }) => {
     if (logo) {
       return (
         <ConfirmCardImage>
@@ -1390,7 +1383,7 @@ export const AssetDetails: React.FC = () => {
     }
     return <ConfirmCardImage>{collection[0]?.toUpperCase()}</ConfirmCardImage>;
   };
-  const RenderAssetDetails: React.FC = () => {
+  const RenderAssetDetails: React.FC<PropsWithChildren> = () => {
     if (data) {
       const asset = data.data?.asset as IAsset;
 
@@ -1434,7 +1427,7 @@ export const AssetDetails: React.FC = () => {
   return <RenderAssetDetails />;
 };
 
-export const TransactionDetails: React.FC = () => {
+export const TransactionDetails: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('wizards');
   const { walletAddress } = useExtension();
   return (
@@ -1458,7 +1451,7 @@ export const TransactionDetails: React.FC = () => {
   );
 };
 
-export const TransactionDetails2: React.FC = () => {
+export const TransactionDetails2: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('wizards');
   const { watch } = useFormContext();
   const receiverAddress = watch('receiverAddress');

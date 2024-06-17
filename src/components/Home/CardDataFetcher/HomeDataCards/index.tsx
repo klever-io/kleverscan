@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Accounts, TPS, Transactions } from '@/assets/cards';
 import {
   NextImageCardWrapper,
@@ -30,7 +31,9 @@ const icons = [
   ['/homeCards/tpsIcon.svg', '/homeCards/tpsBackground.svg'],
 ];
 
-const DefaultCards: React.FC<{ index: number }> = ({ index }) => {
+const DefaultCards: React.FC<PropsWithChildren<{ index: number }>> = ({
+  index,
+}) => {
   return (
     <StackedImageWrapper>
       <NextImageCardWrapper>
@@ -55,7 +58,9 @@ const DefaultCards: React.FC<{ index: number }> = ({ index }) => {
   );
 };
 
-const Progress: React.FC<{ percent: number }> = ({ percent }) => {
+const Progress: React.FC<PropsWithChildren<{ percent: number }>> = ({
+  percent,
+}) => {
   const { isDarkTheme } = useTheme();
   const idCSS = 'gradient';
 
@@ -75,7 +80,7 @@ const Progress: React.FC<{ percent: number }> = ({ percent }) => {
   );
 };
 
-const EpochCard: React.FC = () => {
+const EpochCard: React.FC<PropsWithChildren> = () => {
   const { epoch, metrics } = useHomeData();
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
 
@@ -95,7 +100,7 @@ const EpochCard: React.FC = () => {
   );
 };
 
-const HomeDataCards: React.FC = () => {
+const HomeDataCards: React.FC<PropsWithChildren> = () => {
   const dataCardsRef = useRef<HTMLDivElement>(null);
 
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });

@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Proposals as Icon } from '@/assets/title-icons';
 import Title from '@/components/Layout/Title';
 import Tabs, { ITabs } from '@/components/Tabs';
@@ -14,7 +15,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
 
-const Proposals: React.FC = () => {
+const Proposals: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation(['common', 'proposals']);
   const router = useRouter();
   const tableHeaders = [
@@ -29,7 +30,7 @@ const Proposals: React.FC = () => {
     setSelectedTab((router.query.tab as string) || tableHeaders[0]);
   }, [router.isReady]);
 
-  const CardContent: React.FC = () => {
+  const CardContent: React.FC<PropsWithChildren> = () => {
     return (
       <Card>
         <div>
@@ -39,7 +40,7 @@ const Proposals: React.FC = () => {
     );
   };
 
-  const SelectedTabComponent: React.FC = () => {
+  const SelectedTabComponent: React.FC<PropsWithChildren> = () => {
     switch (selectedTab) {
       case `${t('proposals:NetworkParameters')}`:
         return <NetworkParams />;

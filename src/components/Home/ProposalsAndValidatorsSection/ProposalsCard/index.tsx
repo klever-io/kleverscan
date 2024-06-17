@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { HomeData } from '@/contexts/mainPage';
 import { IProposal } from '@/types/proposals';
 import Image from 'next/image';
@@ -16,7 +17,7 @@ import { Proposal } from './Proposal';
 import Link from 'next/link';
 import { PurpleArrowRight } from '@/assets/icons';
 
-const ProposalsCard: React.FC = () => {
+const ProposalsCard: React.FC<PropsWithChildren> = () => {
   const {
     totalProposals,
     activeProposalsCount,

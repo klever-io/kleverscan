@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Loader } from '@/components/Loader/styles';
 import Tooltip from '@/components/Tooltip';
 import { useContractModal } from '@/contexts/contractModal';
@@ -23,7 +24,7 @@ export interface IBuyCard {
   assets: IAsset[] | undefined;
 }
 
-const BuyCard: React.FC<IBuyCard> = ({
+const BuyCard: React.FC<PropsWithChildren<IBuyCard>> = ({
   marketplaceAsset,
   precisionQueries,
   buyCardsLoading,

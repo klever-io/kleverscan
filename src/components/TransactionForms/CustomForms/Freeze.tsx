@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -11,7 +12,10 @@ type FormData = {
   kda: string;
 };
 
-const Freeze: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+const Freeze: React.FC<PropsWithChildren<IContractProps>> = ({
+  formKey,
+  handleFormSubmit,
+}) => {
   const { handleSubmit } = useFormContext<FormData>();
   const { queue } = useMulticontract();
 

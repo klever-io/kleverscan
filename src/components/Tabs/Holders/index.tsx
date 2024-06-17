@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Copy from '@/components/Copy';
 import Filter, { IFilter } from '@/components/Filter';
 import Table, { ITable } from '@/components/Table';
@@ -21,7 +22,7 @@ interface IHolderTableProps {
   page: number;
 }
 
-const Holders: React.FC<IHolders> = ({
+const Holders: React.FC<PropsWithChildren<IHolders>> = ({
   asset,
   holdersTableProps,
   setHolderQuery,

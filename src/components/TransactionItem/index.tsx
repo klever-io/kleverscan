@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { getStatusIcon } from '@/assets/status';
 import { useMobile } from '@/contexts/mobile';
 import { ContractsName } from '@/types/contracts';
@@ -35,7 +36,7 @@ export interface IContract {
   precision?: number;
 }
 
-const TransactionItem: React.FC<ITransaction> = ({
+const TransactionItem: React.FC<PropsWithChildren<ITransaction>> = ({
   hash,
   timestamp,
   contract,
@@ -173,7 +174,7 @@ const TransactionItem: React.FC<ITransaction> = ({
   );
 };
 
-export const TransactionItemLoading: React.FC = () => {
+export const TransactionItemLoading: React.FC<PropsWithChildren> = () => {
   return (
     <TransactionRow>
       <TransactionData $loading>

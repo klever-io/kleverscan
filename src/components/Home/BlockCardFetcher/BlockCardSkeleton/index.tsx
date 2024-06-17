@@ -1,10 +1,13 @@
+import { PropsWithChildren } from 'react';
 import Skeleton from '@/components/Skeleton';
 import { BlockCardContainer, BlockCardHash, BlockCardRow } from '@/views/home';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React from 'react';
 
-const BlockCardSkeleton: React.FC<{ index: number }> = ({ index }) => {
+const BlockCardSkeleton: React.FC<PropsWithChildren<{ index: number }>> = ({
+  index,
+}) => {
   const { t } = useTranslation('blocks');
   const { t: commonT } = useTranslation('common');
 

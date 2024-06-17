@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Accounts as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
@@ -15,7 +16,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import React from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
-const Marketplaces: React.FC = () => {
+const Marketplaces: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('marketPlaces');
   const marketplacesHeader = [
     'Id',

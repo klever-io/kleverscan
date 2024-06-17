@@ -450,7 +450,9 @@ export const GenericInput = styled.input<{
   font-size: 1.5rem;
   color: ${({ theme }) => theme.black};
   font-family: Manrope, sans-serif;
-  transition: border 500ms ease, background-color 500ms ease;
+  transition:
+    border 500ms ease,
+    background-color 500ms ease;
   color-scheme: ${props => (props.theme.dark ? 'dark' : 'auto')};
   /* Chrome, Safari, Edge, Opera */
   ::-webkit-outer-spin-button,

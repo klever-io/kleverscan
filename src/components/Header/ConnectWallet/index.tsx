@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { AccountDetailsModal } from '@/components/AccountDetailsModal';
 import Tour from '@/components/Tour';
 import { useExtension } from '@/contexts/extension';
@@ -23,7 +24,9 @@ interface IConnectWallet {
   clickConnection: () => void;
 }
 
-const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
+const ConnectWallet: React.FC<PropsWithChildren<IConnectWallet>> = ({
+  clickConnection,
+}) => {
   const router = useRouter();
   const autoConnectWallet = router.query?.autoconnect;
   const { isDeviceMobileCheck } = useMobile();

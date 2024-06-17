@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { IChartData } from '@/configs/home';
 import { Theme } from '@/styles/styles';
 import React from 'react';
@@ -9,7 +10,11 @@ interface IMapSvg {
   theme: Theme;
 }
 
-const MapSvg: React.FC<IMapSvg> = ({ chartData, chartOptions, theme }) => {
+const MapSvg: React.FC<PropsWithChildren<IMapSvg>> = ({
+  chartData,
+  chartOptions,
+  theme,
+}) => {
   return (
     <svg viewBox="0 0 200 120">
       <linearGradient id="linear-gradient" x1="0" y1="0" x2="0" y2="100%">

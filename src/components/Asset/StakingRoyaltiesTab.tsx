@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { setQueryAndRouter } from '@/utils';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
@@ -16,10 +17,9 @@ interface StakingRoyaltiesTabProps extends AssetProps {
   setSelectedCard: (card: string) => void;
 }
 
-export const StakingRoyaltiesTab: React.FC<StakingRoyaltiesTabProps> = ({
-  asset,
-  setSelectedCard,
-}) => {
+export const StakingRoyaltiesTab: React.FC<
+  PropsWithChildren<StakingRoyaltiesTabProps>
+> = ({ asset, setSelectedCard }) => {
   const { t } = useTranslation(['common', 'assets']);
   const router = useRouter();
 

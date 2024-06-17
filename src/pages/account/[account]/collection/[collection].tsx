@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Validators as Icon } from '@/assets/cards';
 import Detail from '@/components/Detail';
 import { ITable } from '@/components/Table';
@@ -17,7 +18,7 @@ interface ICollectionPage {
   collectionAsset: string;
 }
 
-const Collection: React.FC<ICollectionPage> = () => {
+const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
   const header = ['ID', 'Collection Name', 'Collection Id', 'Address', ''];
   const [isTablet, setIsTablet] = useState(false);
   const [address, setAddress] = useState<null | string>(null);

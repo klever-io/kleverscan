@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { KLV } from '@/assets/coins';
 import { statusWithIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
@@ -96,16 +97,15 @@ import {
   StrongWidth,
   URIsWrapper,
 } from '@/views/transactions/detail';
-import { useTranslation } from 'next-i18next';
+import { TFunction, useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useState } from 'react';
-import { TFunction } from 'react-i18next';
 import Tooltip from '../Tooltip';
 
 interface IAssetTriggerTypeData {
   parameter: IAssetTriggerContract;
   precision: number;
-  t: TFunction<'common', undefined>;
+  t: TFunction;
 }
 
 const getNFTNonces = (
@@ -174,7 +174,7 @@ const renderAssetId = (
   );
 };
 
-export const Transfer: React.FC<IIndexedContract> = ({
+export const Transfer: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   filteredReceipts: rec,
   renderMetadata,
@@ -312,7 +312,7 @@ export const Transfer: React.FC<IIndexedContract> = ({
   );
 };
 
-export const CreateAsset: React.FC<IIndexedContract> = ({
+export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
   sender,
   parameter: par,
   filteredReceipts: rec,
@@ -689,7 +689,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
   );
 };
 
-export const CreateValidator: React.FC<IIndexedContract> = ({
+export const CreateValidator: React.FC<PropsWithChildren<IIndexedContract>> = ({
   sender,
   parameter: par,
   renderMetadata,
@@ -779,7 +779,7 @@ export const CreateValidator: React.FC<IIndexedContract> = ({
   );
 };
 
-export const ValidatorConfig: React.FC<IIndexedContract> = ({
+export const ValidatorConfig: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   renderMetadata,
 }) => {
@@ -894,7 +894,7 @@ export const ValidatorConfig: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Freeze: React.FC<IIndexedContract> = ({
+export const Freeze: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   contractIndex,
   filteredReceipts: rec,
@@ -945,7 +945,7 @@ export const Freeze: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Unfreeze: React.FC<IIndexedContract> = ({
+export const Unfreeze: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   contractIndex,
   filteredReceipts: rec,
@@ -1032,7 +1032,7 @@ export const Unfreeze: React.FC<IIndexedContract> = ({
     </>
   );
 };
-export const Delegate: React.FC<IIndexedContract> = ({
+export const Delegate: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   filteredReceipts,
   contractIndex,
@@ -1141,7 +1141,7 @@ export const Delegate: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Undelegate: React.FC<IIndexedContract> = ({
+export const Undelegate: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   filteredReceipts,
   contractIndex,
@@ -1245,7 +1245,7 @@ export const Undelegate: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Withdraw: React.FC<IIndexedContract> = ({
+export const Withdraw: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   filteredReceipts,
   contractIndex,
@@ -1351,7 +1351,7 @@ export const Withdraw: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Claim: React.FC<IIndexedContract> = ({
+export const Claim: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   filteredReceipts,
   renderMetadata,
@@ -1429,7 +1429,9 @@ export const Claim: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Unjail: React.FC<IIndexedContract> = ({ renderMetadata }) => {
+export const Unjail: React.FC<PropsWithChildren<IIndexedContract>> = ({
+  renderMetadata,
+}) => {
   return (
     <>
       <Row>
@@ -1443,7 +1445,7 @@ export const Unjail: React.FC<IIndexedContract> = ({ renderMetadata }) => {
   );
 };
 
-export const AssetTrigger: React.FC<IIndexedContract> = ({
+export const AssetTrigger: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   renderMetadata,
   filteredReceipts: rec,
@@ -1490,7 +1492,7 @@ export const AssetTrigger: React.FC<IIndexedContract> = ({
   );
 };
 
-export const SetAccountName: React.FC<IIndexedContract> = ({
+export const SetAccountName: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   renderMetadata,
 }) => {
@@ -1515,7 +1517,7 @@ export const SetAccountName: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Proposal: React.FC<IIndexedContract> = ({
+export const Proposal: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   filteredReceipts,
   contractIndex,
@@ -1577,7 +1579,7 @@ export const Proposal: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Vote: React.FC<IIndexedContract> = ({
+export const Vote: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   renderMetadata,
 }) => {
@@ -1614,7 +1616,7 @@ export const Vote: React.FC<IIndexedContract> = ({
   );
 };
 
-export const ConfigITO: React.FC<IIndexedContract> = ({
+export const ConfigITO: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   renderMetadata,
 }) => {
@@ -1679,7 +1681,7 @@ export const ConfigITO: React.FC<IIndexedContract> = ({
   );
 };
 
-export const SetITOPrices: React.FC<IIndexedContract> = ({
+export const SetITOPrices: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   renderMetadata,
 }) => {
@@ -1716,7 +1718,7 @@ export const SetITOPrices: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Buy: React.FC<IContractBuyProps> = ({
+export const Buy: React.FC<PropsWithChildren<IContractBuyProps>> = ({
   parameter: par,
   filteredReceipts: rec,
   sender,
@@ -2011,7 +2013,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
   );
 };
 
-export const Sell: React.FC<IIndexedContract> = ({
+export const Sell: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   filteredReceipts,
   contractIndex,
@@ -2143,12 +2145,9 @@ export const Sell: React.FC<IIndexedContract> = ({
   );
 };
 
-export const CancelMarketOrder: React.FC<IIndexedContract> = ({
-  parameter: par,
-  filteredReceipts,
-  contractIndex,
-  renderMetadata,
-}) => {
+export const CancelMarketOrder: React.FC<
+  PropsWithChildren<IIndexedContract>
+> = ({ parameter: par, filteredReceipts, contractIndex, renderMetadata }) => {
   const parameter = par as ICancelMarketOrderContract;
   const kAppTransferReceipt = findReceipt(
     filteredReceipts,
@@ -2195,12 +2194,9 @@ export const CancelMarketOrder: React.FC<IIndexedContract> = ({
   );
 };
 
-export const CreateMarketplace: React.FC<IIndexedContract> = ({
-  parameter: par,
-  filteredReceipts,
-  contractIndex,
-  renderMetadata,
-}) => {
+export const CreateMarketplace: React.FC<
+  PropsWithChildren<IIndexedContract>
+> = ({ parameter: par, filteredReceipts, contractIndex, renderMetadata }) => {
   const parameter = par as ICreateMarketplaceContract;
   const createMarketplaceReceipt = findReceipt(
     filteredReceipts,
@@ -2249,10 +2245,9 @@ export const CreateMarketplace: React.FC<IIndexedContract> = ({
   );
 };
 
-export const ConfigMarketplace: React.FC<IIndexedContract> = ({
-  parameter: par,
-  renderMetadata,
-}) => {
+export const ConfigMarketplace: React.FC<
+  PropsWithChildren<IIndexedContract>
+> = ({ parameter: par, renderMetadata }) => {
   const parameter = par as IConfigMarketplaceContract;
 
   return (
@@ -2296,10 +2291,9 @@ export const ConfigMarketplace: React.FC<IIndexedContract> = ({
   );
 };
 
-export const UpdateAccountPermission: React.FC<IIndexedContract> = ({
-  parameter: par,
-  renderMetadata,
-}) => {
+export const UpdateAccountPermission: React.FC<
+  PropsWithChildren<IIndexedContract>
+> = ({ parameter: par, renderMetadata }) => {
   const parameter = par as IUpdateAccountPermissionContract;
   const permission = parameter?.permissions[0];
   const operations = calculatePermissionOperations(permission?.operations);
@@ -2380,7 +2374,7 @@ export const UpdateAccountPermission: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Deposit: React.FC<IIndexedContract> = ({
+export const Deposit: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   renderMetadata,
 }) => {
@@ -2424,7 +2418,7 @@ export const Deposit: React.FC<IIndexedContract> = ({
   );
 };
 
-export const ITOTrigger: React.FC<IIndexedContract> = ({
+export const ITOTrigger: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   renderMetadata,
 }) => {
@@ -2625,7 +2619,7 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({
   );
 };
 
-export const SmartContract: React.FC<IIndexedContract> = ({
+export const SmartContract: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   renderMetadata,
   logs,
@@ -2782,11 +2776,9 @@ const renderPackInfoComponents = (
   );
 };
 
-const renderAssetTriggerTypeData: React.FC<IAssetTriggerTypeData> = ({
-  parameter,
-  precision,
-  t,
-}): any => {
+const renderAssetTriggerTypeData: React.FC<
+  PropsWithChildren<IAssetTriggerTypeData>
+> = ({ parameter, precision, t }): any => {
   const par = parameter;
   const triggerType = par?.triggerType;
 

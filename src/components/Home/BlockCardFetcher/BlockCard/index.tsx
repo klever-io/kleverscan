@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { LetterLogo } from '@/components/Logo/styles';
 import { useMobile } from '@/contexts/mobile';
 import { IBlockCard } from '@/types/blocks';
@@ -18,7 +19,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
-const BlockCard: React.FC<IBlockCard> = ({
+const BlockCard: React.FC<PropsWithChildren<IBlockCard>> = ({
   nonce,
   timestamp,
   hash,

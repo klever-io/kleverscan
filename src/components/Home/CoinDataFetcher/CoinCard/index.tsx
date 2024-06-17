@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { BitcoinMe, VoxSwap } from '@/assets/swap-exchange';
 import { ChartType } from '@/components/Chart';
 import { PriceTooltip } from '@/components/Chart/Tooltips';
@@ -91,7 +92,9 @@ const swapExchangeInfo = [
   },
 ];
 
-const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
+const RenderCoinsCard: React.FC<
+  PropsWithChildren<IPropsRenderCoinsCard>
+> = props => {
   const {
     coin,
     renderKfiMarketCap,
@@ -229,7 +232,7 @@ const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
   );
 };
 
-const CoinCard: React.FC = () => {
+const CoinCard: React.FC<PropsWithChildren> = () => {
   const [selectedCoin, setSelectedCoin] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -356,7 +359,7 @@ const CoinCard: React.FC = () => {
     return '--';
   };
 
-  const CoinsFetchFails: React.FC = () => {
+  const CoinsFetchFails: React.FC<PropsWithChildren> = () => {
     if (coins.length === 0) {
       return klvChartResult.isError && kfiChartResult.isError ? (
         <CardContainer>

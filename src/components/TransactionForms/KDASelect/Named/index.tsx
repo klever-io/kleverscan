@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Select from '@/components/Contract/Select';
 import {
   AssetIDInput,
@@ -38,7 +39,9 @@ interface IKDASelect {
   getAssets?: () => Promise<ICollectionList[]>;
 }
 
-export const NamedKDASelect: React.FC<IKDASelect> = props => {
+export const NamedKDASelect: React.FC<
+  PropsWithChildren<IKDASelect>
+> = props => {
   const { required } = props;
   const shouldUseOwnedCollections = props?.shouldUseOwnedCollections || false;
   const allowedAssets = props?.allowedAssets || ['*'];
@@ -176,7 +179,9 @@ export const NamedKDASelect: React.FC<IKDASelect> = props => {
   );
 };
 
-const CollectionIDField: React.FC<{ name: string }> = props => {
+const CollectionIDField: React.FC<
+  PropsWithChildren<{ name: string }>
+> = props => {
   const name = props.name;
   const [isCustom, setIsCustom] = useState(false);
   const [collectionInputValue, setCollectionInputValue] = useState('');

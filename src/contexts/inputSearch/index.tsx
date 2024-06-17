@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { createContext, useContext, useState } from 'react';
 
 interface ISearch {
@@ -7,7 +8,9 @@ interface ISearch {
 
 export const InputSearchContext = createContext({} as ISearch);
 
-export const InputSearchProvider: React.FC = ({ children }) => {
+export const InputSearchProvider: React.FC<PropsWithChildren> = ({
+  children,
+}) => {
   const [searchValue, setSearchValue] = useState('');
 
   const setLinkValue = (trimmedSearch: string, type: string | undefined) => {

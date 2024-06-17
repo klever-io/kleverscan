@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
 import Tabs, { ITabs } from '@/components/Tabs';
@@ -35,7 +36,7 @@ import {
 } from 'react-icons/md';
 import { ITransactionsResponse, NotFound } from '../../types';
 
-const Block: React.FC<IBlockPage> = ({ block }) => {
+const Block: React.FC<PropsWithChildren<IBlockPage>> = ({ block }) => {
   const {
     hash,
     timestamp,
@@ -79,7 +80,7 @@ const Block: React.FC<IBlockPage> = ({ block }) => {
     setQueryAndRouter({ ...router.query }, router);
   }, [router.isReady]);
 
-  const BlockNavigation: React.FC = () => {
+  const BlockNavigation: React.FC<PropsWithChildren> = () => {
     return (
       <TooltipContainer>
         <Link href={`/block/${nonce - 1}`}>
@@ -106,7 +107,7 @@ const Block: React.FC<IBlockPage> = ({ block }) => {
     );
   };
 
-  const Overview: React.FC = () => {
+  const Overview: React.FC<PropsWithChildren> = () => {
     return (
       <>
         <Row>
@@ -183,7 +184,7 @@ const Block: React.FC<IBlockPage> = ({ block }) => {
     );
   };
 
-  const Info: React.FC = () => {
+  const Info: React.FC<PropsWithChildren> = () => {
     return (
       <>
         <Row>
@@ -268,7 +269,7 @@ const Block: React.FC<IBlockPage> = ({ block }) => {
     );
   };
 
-  const SelectedComponent: React.FC = () => {
+  const SelectedComponent: React.FC<PropsWithChildren> = () => {
     switch (selectedCard) {
       case 'Overview':
         return <Overview />;
@@ -284,7 +285,7 @@ const Block: React.FC<IBlockPage> = ({ block }) => {
     request: (page: number, limit: number) => requestBlock(page, limit),
   };
 
-  const SelectedTabComponent: React.FC = () => {
+  const SelectedTabComponent: React.FC<PropsWithChildren> = () => {
     switch (selectedTab) {
       case 'Transactions':
         return <Transactions transactionsTableProps={transactionTableProps} />;

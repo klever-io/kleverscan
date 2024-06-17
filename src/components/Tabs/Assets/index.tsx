@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Table, { ITable } from '@/components/Table';
 import { CustomFieldWrapper, CustomLink } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
@@ -13,10 +14,10 @@ interface IAssets {
   assetsTableProps: IInnerTableProps;
   address: string;
   showInteractionButtons?: boolean;
-  Filters?: React.FC;
+  Filters?: React.FC<PropsWithChildren>;
 }
 
-const Assets: React.FC<IAssets> = ({
+const Assets: React.FC<PropsWithChildren<IAssets>> = ({
   assetsTableProps,
   address,
   showInteractionButtons,

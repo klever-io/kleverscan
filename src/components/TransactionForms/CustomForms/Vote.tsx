@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useContract } from '@/contexts/contract';
 import { useExtension } from '@/contexts/extension';
 import api from '@/services/api';
@@ -22,7 +23,10 @@ const parseVote = (data: FormData) => {
   data.type = data.type ? 1 : 0;
 };
 
-const Vote: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+const Vote: React.FC<PropsWithChildren<IContractProps>> = ({
+  formKey,
+  handleFormSubmit,
+}) => {
   const { handleSubmit } = useFormContext<FormData>();
 
   const getProposals = async () => {

@@ -1,6 +1,6 @@
 {
   "name": "explorer",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -14,8 +14,6 @@
     "postinstall": "husky install"
   },
   "dependencies": {
-    "@bugsnag/js": "7.16.2",
-    "@bugsnag/plugin-react": "7.16.4",
     "@directus/sdk": "^15.0.2",
     "@klever/sdk-web": "^1.1.4",
     "@types/ioredis": "4.28.2",

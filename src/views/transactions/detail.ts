@@ -190,6 +190,7 @@ export const Hr = styled.hr`
 export const NestedContainerWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 24px;
   width: 100%;
 `;
 

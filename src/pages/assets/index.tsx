@@ -3,7 +3,7 @@ import Copy from '@/components/Copy';
 import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import { requestAssetsQuery } from '@/services/requests/assets';
 import { CenteredRow, Container, DoubleRow, Header } from '@/styles/common';
@@ -20,9 +20,10 @@ import React, { ReactNode } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
 import nextI18nextConfig from '../../../next-i18next.config';
 
-const Assets: React.FC = () => {
+const AssetsFilters: React.FC = () => {
   const router = useRouter();
   const { t } = useTranslation(['common', 'assets', 'table']);
+
   const [filterAssets, fetchPartialAsset, loading, setLoading] =
     useFetchPartial<IAsset>('assets', 'assets/list', 'assetId');
 
@@ -66,6 +67,19 @@ const Assets: React.FC = () => {
       isHiddenInput: false,
     },
   ];
+
+  return (
+    <FilterContainer>
+      {filters.map(filter => (
+        <Filter key={filter.title} {...filter} />
+      ))}
+    </FilterContainer>
+  );
+};
+
+const Assets: React.FC = () => {
+  const router = useRouter();
+  const { t } = useTranslation(['common', 'assets', 'table']);
 
   const header = [
     '',
@@ -205,6 +219,7 @@ const Assets: React.FC = () => {
     type: 'assetsPage',
     request: (page, limit) => requestAssetsQuery(page, limit, router),
     dataName: 'assets',
+    Filters: AssetsFilters,
   };
 
   return (
@@ -212,12 +227,6 @@ const Assets: React.FC = () => {
       <Header>
         <Title title={t('common:Titles.Assets')} Icon={Icon} />
       </Header>
-
-      <FilterContainer>
-        {filters.map(filter => (
-          <Filter key={filter.title + String(filter.current)} {...filter} />
-        ))}
-      </FilterContainer>
 
       <Table {...tableProps} />
     </Container>

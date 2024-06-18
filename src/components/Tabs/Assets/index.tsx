@@ -1,6 +1,5 @@
-import { CustomLink } from '@/components/Table/styles';
-import Table, { ITable } from '@/components/TableV2';
-import { CustomFieldWrapper } from '@/components/TableV2/styles';
+import Table, { ITable } from '@/components/Table';
+import { CustomFieldWrapper, CustomLink } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
 import { useContractModal } from '@/contexts/contractModal';
 import { IAccountAsset, IInnerTableProps, IRowSection } from '@/types/index';

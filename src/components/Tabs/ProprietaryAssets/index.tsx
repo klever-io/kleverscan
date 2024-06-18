@@ -1,6 +1,6 @@
-import { CustomLink } from '@/components/Table/styles';
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import { useContractModal } from '@/contexts/contractModal';
+import { CustomLink } from '@/styles/common';
 import {
   IInnerTableProps,
   IProprietaryAsset,

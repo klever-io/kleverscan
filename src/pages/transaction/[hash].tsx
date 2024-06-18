@@ -4,7 +4,6 @@ import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
 import Skeleton from '@/components/Skeleton';
-import { Status } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
 import {
   AssetTrigger,
@@ -43,6 +42,7 @@ import {
   Container,
   Header,
   Row,
+  Status,
 } from '@/styles/common';
 import {
   IKdaFee,

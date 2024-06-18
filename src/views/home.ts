@@ -5,7 +5,7 @@ import {
   LineArrowUpSquare,
 } from '@/assets/icons';
 import { default as DefaultInput } from '@/components/InputGlobal';
-import { TableGradientBorder } from '@/components/TableV2/styles';
+import { TableGradientBorder } from '@/components/Table/styles';
 import { DefaultCardStyles } from '@/styles/common';
 import { lighten, transparentize } from 'polished';
 import { BiChevronDownSquare } from 'react-icons/bi';

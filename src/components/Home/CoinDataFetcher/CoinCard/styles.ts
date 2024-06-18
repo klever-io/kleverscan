@@ -1,5 +1,5 @@
 import { ArrowUpRightSquare, ArrowUpSquare, Currency } from '@/assets/icons';
-import { TableGradientBorder } from '@/components/TableV2/styles';
+import { TableGradientBorder } from '@/components/Table/styles';
 import { DefaultCardStyles } from '@/styles/common';
 import { DataCardDefaultStyles } from '@/views/home';
 import Image from 'next/image';

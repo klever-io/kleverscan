@@ -71,9 +71,9 @@ const TransferSections = ({ par, precision }: IProps): JSX.Element[] => {
 
   if (typeof window === 'undefined') return [];
 
-  let assetId = 'KLV';
+  let assetId = parameter?.assetId || 'KLV';
   if (parameter?.assetId?.includes('/')) {
-    assetId = parameter?.assetId.split('/')[0];
+    assetId = parameter.assetId.split('/')[0];
   }
 
   if (!parameter?.assetId) precision = KLV_PRECISION;
@@ -516,30 +516,30 @@ const SmartContractSections = ({
 };
 
 export {
-  TransferSections,
-  CreateValidatorSections,
-  ValidatorConfigSections,
-  FreezeSections,
-  UnfreezeSections,
-  DelegateSections,
-  UndelegateSections,
-  WithdrawSections,
-  ClaimSections,
-  UnjailSections,
   AssetTriggerSections,
-  SetAccountNameSections,
-  ProposalSections,
-  VoteSections,
-  ConfigITOSections,
-  SetITOPricesSections,
   BuySections,
-  SellSections,
   CancelMarketOrderSections,
-  CreateMarketplaceSections,
+  ClaimSections,
+  ConfigITOSections,
   ConfigMarketplaceSections,
   CreateAssetSections,
-  UpdateAccountPermissionContractSections,
+  CreateMarketplaceSections,
+  CreateValidatorSections,
+  DelegateSections,
   DepositSections,
+  FreezeSections,
   IITOTriggerSections,
+  ProposalSections,
+  SellSections,
+  SetAccountNameSections,
+  SetITOPricesSections,
   SmartContractSections,
+  TransferSections,
+  UndelegateSections,
+  UnfreezeSections,
+  UnjailSections,
+  UpdateAccountPermissionContractSections,
+  ValidatorConfigSections,
+  VoteSections,
+  WithdrawSections,
 };

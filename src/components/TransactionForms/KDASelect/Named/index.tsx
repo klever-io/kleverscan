@@ -17,7 +17,7 @@ import { useMulticontract } from '@/contexts/contract/multicontract';
 import { ReloadWrapper } from '@/contexts/contract/styles';
 import { useExtension } from '@/contexts/extension';
 import { collectionListCall } from '@/services/requests/collection';
-import { IDropdownItem } from '@/types';
+import { ICollectionList, IDropdownItem } from '@/types';
 import { setQueryAndRouter } from '@/utils';
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import { useDebounce } from '@/utils/hooks';
@@ -29,18 +29,13 @@ import { IoReloadSharp } from 'react-icons/io5';
 import { useQuery } from 'react-query';
 import FormInput, { cleanEmptyValues } from '../../FormInput';
 
-const collectionContracts = [
-  'ConfigITOContract',
-  'ITOTriggerContract',
-  'WithdrawContract',
-];
-
 interface IKDASelect {
   validateFields?: string[];
   shouldUseOwnedCollections?: boolean;
   name?: string;
   required?: boolean;
   allowedAssets?: string[];
+  getAssets?: () => Promise<ICollectionList[]>;
 }
 
 export const NamedKDASelect: React.FC<IKDASelect> = props => {
@@ -52,19 +47,16 @@ export const NamedKDASelect: React.FC<IKDASelect> = props => {
   const [options, setOptions] = useState<IDropdownItem[]>([]);
   const router = useRouter();
 
-  const { getAssets, getKAssets, senderAccount } = useContract();
+  const usecontract = useContract();
+  const { getKAssets, senderAccount } = usecontract;
+  const getAssets = props.getAssets || usecontract.getAssets;
+
   const { walletAddress } = useExtension();
 
   const {
-    register,
-    setValue,
     formState: { errors },
-    getValues,
-    trigger,
     watch,
   } = useFormContext();
-
-  const validateFields = props?.validateFields || [];
 
   const collection = watch('collection');
 
@@ -195,11 +187,9 @@ const CollectionIDField: React.FC<{ name: string }> = props => {
   const { isMultiContract } = useMulticontract();
 
   const {
-    register,
     setValue,
     formState: { errors },
     watch,
-    trigger,
     getValues,
   } = useFormContext();
 

@@ -3,7 +3,7 @@ import Copy from '@/components/Copy';
 import { Button } from '@/components/CreateTxShortCut/styles';
 import Title from '@/components/Layout/Title';
 import Skeleton from '@/components/Skeleton';
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import {
   requestTransactionsDefault,
   transactionRowSections,

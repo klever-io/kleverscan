@@ -2,7 +2,7 @@ import { Blocks as Icon } from '@/assets/title-icons';
 import ToggleButton from '@/components/Button/Toggle';
 import Title from '@/components/Layout/Title';
 import Skeleton from '@/components/Skeleton';
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import {
   blockCall,
   totalStatisticsCall,

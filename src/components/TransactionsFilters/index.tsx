@@ -99,7 +99,7 @@ const TransactionsFilters: React.FC<ITransactionsFilters> = ({
   return (
     <FilterContainer>
       {filters.map(filter => (
-        <Filter key={JSON.stringify(filter)} {...filter} />
+        <Filter key={filter.title} {...filter} />
       ))}
       <DateFilter />
     </FilterContainer>

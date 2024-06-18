@@ -56,6 +56,7 @@ import {
   findReceipt,
   findReceiptWithAssetId,
   findReceiptWithSender,
+  findReceipts,
 } from '@/utils/findKey';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
@@ -142,11 +143,24 @@ const renderNFTNonces = (noncesReceipts: IBuyReceipt[]) => {
   return null;
 };
 
-const renderAssetId = (parameter: any) => {
+interface RenderAssetIdOptions {
+  clearNonce?: boolean;
+}
+
+const renderAssetId = (
+  parameter: any,
+  options: RenderAssetIdOptions = {
+    clearNonce: false,
+  },
+) => {
   return parameter?.assetId?.split('/')[0] &&
     parameter?.assetId?.split('/')[0] !== 'KLV' ? (
     <Link href={`/asset/${parameter?.assetId?.split('/')[0]}`}>
-      <a style={{ fontWeight: '500' }}>{parameter?.assetId?.split('/')[0]}</a>
+      <a style={{ fontWeight: '500' }}>
+        {options?.clearNonce
+          ? parameter.assetId.split('/')[0]
+          : parameter.assetId}
+      </a>
     </Link>
   ) : (
     parameter?.amount && (
@@ -166,7 +180,7 @@ export const Transfer: React.FC<IIndexedContract> = ({
   renderMetadata,
 }) => {
   const parameter = par as ITransferContract;
-  const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
+  const assetID = parameter?.assetId || 'KLV';
   const precision = usePrecision(assetID);
   const filteredReceipts = rec as ITransferReceipt[];
 
@@ -1343,10 +1357,9 @@ export const Claim: React.FC<IIndexedContract> = ({
   renderMetadata,
 }) => {
   const parameter = par as IClaimContract;
-  const claimReceipt = findReceipt(filteredReceipts, 17) as
-    | IClaimReceipt
+  const claimReceipts = findReceipts(filteredReceipts, 17) as
+    | IClaimReceipt[]
     | undefined;
-  const precision = usePrecision(claimReceipt?.assetIdReceived || 'KLV');
 
   return (
     <>
@@ -1362,49 +1375,56 @@ export const Claim: React.FC<IIndexedContract> = ({
         </span>
         <span>{parameter?.claimType}</span>
       </Row>
-      {claimReceipt && (
+      <Row>
+        <span>
+          <strong>Asset Id</strong>
+        </span>
+        <span>{parameter?.id || 'KLV'}</span>
+      </Row>
+      {claimReceipts &&
+        claimReceipts.length > 0 &&
+        claimReceipts?.[0]?.assetId && (
+          <>
+            <Row>
+              <span>
+                <strong>Received</strong>
+              </span>
+              <FrozenContainer>
+                {claimReceipts.map((claimReceipt, index) => {
+                  const precision = usePrecision(
+                    claimReceipt?.assetIdReceived || 'KLV',
+                  );
+
+                  return (
+                    <div>
+                      {toLocaleFixed(
+                        claimReceipt?.amount / 10 ** precision,
+                        precision,
+                      )}{' '}
+                      {claimReceipt.assetIdReceived}
+                    </div>
+                  );
+                })}
+              </FrozenContainer>
+            </Row>
+          </>
+        )}
+      {claimReceipts?.[0]?.marketplaceId && (
         <Row>
           <span>
-            <strong>Asset Id</strong>
+            <strong>MarketPlace ID</strong>
           </span>
-          <span>{claimReceipt?.assetId}</span>
+          <span>{claimReceipts?.[0].marketplaceId || '--'}</span>
         </Row>
       )}
-      {claimReceipt && typeof claimReceipt?.amount === 'number' && (
+      {claimReceipts?.[0]?.orderId && (
         <Row>
           <span>
-            <strong>Amount</strong>
+            <strong>OrderId</strong>
           </span>
-          <span>
-            {toLocaleFixed(claimReceipt?.amount / 10 ** precision, precision)}{' '}
-            {claimReceipt.assetIdReceived}
-          </span>
+          <span>{claimReceipts?.[0].orderId || '--'}</span>
         </Row>
       )}
-      <>
-        <Row>
-          <span>
-            <strong>Asset Id Received</strong>
-          </span>
-          <span>{claimReceipt?.assetIdReceived || '--'}</span>
-        </Row>
-        {claimReceipt?.marketplaceId && (
-          <Row>
-            <span>
-              <strong>MarketPlace ID</strong>
-            </span>
-            <span>{claimReceipt.marketplaceId || '--'}</span>
-          </Row>
-        )}
-        {claimReceipt?.orderId && (
-          <Row>
-            <span>
-              <strong>OrderId</strong>
-            </span>
-            <span>{claimReceipt.orderId || '--'}</span>
-          </Row>
-        )}
-      </>
     </>
   );
 };

@@ -1042,7 +1042,6 @@ const failedGetCachedFetch = {
   data: null,
   error: {
     message: 'Failed to fetch',
-    stack: `TypeError: Failed to fetch at eval (webpack-internal:///./node_modules/@bugsnag/browser/dist/bugsnag.js:3137:22) ...`,
   },
   pagination: {
     self: 0,
@@ -1055,7 +1054,6 @@ const failedGetCachedFetch = {
 };
 const getCachedObjectError = {
   message: 'Failed to fetch',
-  stack: `TypeError: Failed to fetch at eval (webpack-internal:///./node_modules/@bugsnag/browser/dist/bugsnag.js:3137:22) ...`,
 };
 
 const mocks = {

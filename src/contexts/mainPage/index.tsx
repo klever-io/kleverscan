@@ -41,6 +41,7 @@ export interface IHomeData {
   nodes?: Node[];
   mostTransactedTokens: MostTransferedToken[];
   mostTransactedNFTs: MostTransferedToken[];
+  epoch?: number;
 }
 
 export const HomeData = createContext({} as IHomeData);
@@ -156,6 +157,7 @@ export const HomeDataProvider: React.FC = ({ children }) => {
     nodes: nodes.data?.nodes,
     mostTransactedTokens: mostTransactedTokens.data || [],
     mostTransactedNFTs: mostTransactedNFTs.data || [],
+    epoch: aggregateResult.data?.overview?.epochNumber,
   };
 
   prevValuesRef.current = {

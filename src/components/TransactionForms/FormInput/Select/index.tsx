@@ -26,6 +26,7 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   handleScrollBottom?: () => void;
   creatable?: boolean;
   selectFilter?: (e: any) => any;
+  loading?: boolean;
 }
 
 const Filter: React.FC<IFilter> = ({
@@ -39,14 +40,10 @@ const Filter: React.FC<IFilter> = ({
   onInputChange,
   creatable,
   selectFilter,
+  loading,
   ...rest
 }) => {
-  const {
-    register,
-    formState: { errors },
-    setValue,
-    getValues,
-  } = useFormContext();
+  const { register, setValue, getValues } = useFormContext();
 
   const { isMultiContract } = useMulticontract();
 
@@ -95,6 +92,8 @@ const Filter: React.FC<IFilter> = ({
         value={selected?.value !== undefined ? selected : undefined}
         onMenuScrollToBottom={handleScrollBottom}
         creatable={creatable}
+        isLoading={loading}
+        loadingMessage={() => 'Loading...'}
       />
 
       {name && (

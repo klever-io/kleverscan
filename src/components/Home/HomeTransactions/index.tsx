@@ -303,6 +303,7 @@ const HomeTransactions: React.FC<PropsWithChildren> = () => {
     showLimit: false,
     showPagination: false,
     smaller: true,
+    interval: 4000,
   };
 
   return (
@@ -326,9 +327,7 @@ const HomeTransactions: React.FC<PropsWithChildren> = () => {
         ) : null}
       </ContainerHide>
       <TransactionContainer>
-        {!hideMenu && (
-          <Table key={JSON.stringify(homeTransactions)} {...tableProps} />
-        )}
+        {!hideMenu && <Table {...tableProps} />}
       </TransactionContainer>
     </SectionCards>
   );

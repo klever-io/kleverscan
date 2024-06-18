@@ -1051,7 +1051,7 @@ export interface TableRowElementProps {
   $smaller?: boolean;
 }
 export interface IRowSection {
-  element: React.FC<PropsWithChildren<PropsWithChildren<TableRowElementProps>>>;
+  element: React.FC<PropsWithChildren<TableRowElementProps>>;
   span: number;
   width?: number;
 }

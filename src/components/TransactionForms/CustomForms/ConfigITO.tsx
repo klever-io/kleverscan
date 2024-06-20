@@ -80,6 +80,7 @@ const ConfigITO: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
       await handleFormSubmit(dataCopy);
     } catch (e: any) {
       toast.error(e.message);
+      console.error(e);
       return;
     }
   };

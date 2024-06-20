@@ -141,13 +141,14 @@ const ConfirmPayload: React.FC = () => {
               maxWidth: '100%',
               wordBreak: 'break-word',
               overflow: 'hidden',
+              tabSize: '1ch',
             }}
             style={dracula}
             language="json"
             PreTag={PreWithRef}
             wrapLongLines
           >
-            {payloadText.replace(/\t/g, '  ')}
+            {payloadText}
           </SyntaxHighlighter>
 
           {isEditable ? (

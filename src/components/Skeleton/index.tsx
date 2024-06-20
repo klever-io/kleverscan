@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import React from 'react';
 import { Container, SkeletonLoader } from './styles';
 
@@ -8,7 +9,7 @@ interface ISkeleton {
   containerCustomStyles?: React.CSSProperties;
 }
 
-const Skeleton: React.FC<ISkeleton> = ({
+const Skeleton: React.FC<PropsWithChildren<ISkeleton>> = ({
   width,
   height,
   customStyles,

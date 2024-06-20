@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { StyledArrow } from '@/components/Layout/Title/styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import api from '@/services/api';
@@ -41,7 +42,9 @@ interface ApplyFormModalProps {
   refetchAssetInfo: () => void;
 }
 
-export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
+export const ApplyFormModal: React.FC<
+  PropsWithChildren<ApplyFormModalProps>
+> = ({
   isOpenApplyFormModal,
   setOpenApplyFormModal,
   asset,
@@ -118,7 +121,7 @@ export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
       closeModal();
     } catch (error) {
       console.error(error);
-      toast.error(error);
+      toast.error(JSON.stringify(error));
     } finally {
       setLoading(false);
     }

@@ -277,13 +277,17 @@ export const BlockCardContainer = styled.div<BlockCardContainerProps>`
     `}
 
   border-radius: 1rem;
-  transition: 1s all ease, 0.1s filter ease;
-  transition: color 0.1s ease, background-color 0.1s ease;
+  transition:
+    1s all ease,
+    0.1s filter ease;
+  transition:
+    color 0.1s ease,
+    background-color 0.1s ease;
 
   animation: ${PullFade} 1s ease-in-out;
 
   animation-fill-mode: forwards;
-  :first-child {
+  &:first-child {
     animation: ${PushFade} 1s ease-in-out;
     animation-fill-mode: forwards;
   }
@@ -602,7 +606,7 @@ export const RetryContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  :hover {
+  &:hover {
     cursor: pointer;
   }
 `;

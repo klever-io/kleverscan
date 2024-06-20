@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
 import { useContractModal } from '@/contexts/contractModal';
@@ -16,7 +17,7 @@ export interface IBuckets {
   showInteractionButtons?: boolean;
 }
 
-const Buckets: React.FC<IBuckets> = ({
+const Buckets: React.FC<PropsWithChildren<IBuckets>> = ({
   bucketsTableProps,
   showInteractionButtons,
 }) => {
@@ -158,7 +159,7 @@ const Buckets: React.FC<IBuckets> = ({
       {
         element: props => (
           <Link href={`/asset/${asset?.assetId}`} key={asset?.assetId}>
-            <a>{asset?.assetId}</a>
+            {asset?.assetId}
           </Link>
         ),
         span: 1,
@@ -221,7 +222,7 @@ const Buckets: React.FC<IBuckets> = ({
             {bucket?.delegation?.length && bucket?.delegation?.length > 0 ? (
               <>
                 <Link href={`/validator/${bucket?.delegation}`}>
-                  <a>{parseAddress(bucket?.delegation, 22)}</a>
+                  {parseAddress(bucket?.delegation, 22)}
                 </Link>
               </>
             ) : (

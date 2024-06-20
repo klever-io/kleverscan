@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Table, { ITable } from '@/components/Table';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import { transactionRowSections } from '@/pages/transactions';
@@ -9,7 +10,7 @@ interface ITransactionsProps {
   transactionsTableProps: IInnerTableProps;
 }
 
-const Transactions: React.FC<ITransactionsProps> = props => {
+const Transactions: React.FC<PropsWithChildren<ITransactionsProps>> = props => {
   const transactionTableProps = props.transactionsTableProps;
 
   const tableProps: ITable = {

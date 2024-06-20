@@ -1,6 +1,7 @@
+import { PropsWithChildren } from 'react';
 import { Apple, GooglePlay } from '@/assets/icons';
 import { useMobile } from '@/contexts/mobile';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import { FaChrome } from 'react-icons/fa';
 import { Button } from '../Banner/styles';
 import { Description, Label, Title } from '../LearnBanner/styles';
@@ -31,7 +32,7 @@ const links = [
   },
 ];
 
-export const WalletBanner: React.FC = () => {
+export const WalletBanner: React.FC<PropsWithChildren> = () => {
   const { isTablet } = useMobile();
 
   return (

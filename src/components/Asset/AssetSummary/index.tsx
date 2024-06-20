@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import * as SocialIcons from '@/assets/social';
 import { AssetProps } from '@/components/Asset/OverviewTab';
 import { HashComponent } from '@/components/Contract';
@@ -10,7 +11,7 @@ import { useParticipate } from '@/contexts/participate';
 import { assetInfoCall } from '@/services/requests/asset';
 import { IParsedITO } from '@/types';
 import { useTranslation } from 'next-i18next';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';
 import ReactDOM from 'react-dom';
@@ -43,7 +44,10 @@ export interface AssetSummaryProps extends AssetProps {
   ITO: IParsedITO | undefined;
 }
 
-export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
+export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
+  asset,
+  ITO,
+}) => {
   const {
     openApplyFormModal,
     setOpenApplyFormModal,

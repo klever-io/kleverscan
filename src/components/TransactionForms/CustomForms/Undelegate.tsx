@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useContract } from '@/contexts/contract';
 import { useExtension } from '@/contexts/extension';
 import { parseAddress } from '@/utils/parseValues';
@@ -12,7 +13,7 @@ type FormData = {
   kda: string;
 };
 
-const Undelegate: React.FC<IContractProps> = ({
+const Undelegate: React.FC<PropsWithChildren<IContractProps>> = ({
   formKey,
   handleFormSubmit,
 }) => {

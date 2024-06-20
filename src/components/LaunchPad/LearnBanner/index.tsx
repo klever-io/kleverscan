@@ -1,4 +1,5 @@
-import Image from 'next/image';
+import { PropsWithChildren } from 'react';
+import Image from 'next/legacy/image';
 import Link from 'next/link';
 import { Button } from '../Banner/styles';
 import {
@@ -12,7 +13,7 @@ import {
   Title,
 } from './styles';
 
-export const LearnBanner: React.FC = () => {
+export const LearnBanner: React.FC<PropsWithChildren> = () => {
   return (
     <BannerContainer>
       <Content>
@@ -35,12 +36,18 @@ export const LearnBanner: React.FC = () => {
             Join KleverChain and empower your ITO today!
           </Description>
           <Buttons>
-            <Link href="/create-transaction?contract=ConfigITOContract">
+            <Link
+              href="/create-transaction?contract=ConfigITOContract"
+              legacyBehavior
+            >
               <Button href="/create-transaction?contract=ConfigITOContract">
                 Configure your ITO
               </Button>
             </Link>
-            <Link href="/create-transaction?contract=CreateAssetContract">
+            <Link
+              href="/create-transaction?contract=CreateAssetContract"
+              legacyBehavior
+            >
               <Button
                 secondary
                 href="/create-transaction?contract=CreateAssetContract"

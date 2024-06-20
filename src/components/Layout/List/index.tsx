@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import React, { useCallback } from 'react';
 import { IconType } from 'react-icons';
 import { BsQuestionCircleFill } from 'react-icons/bs';
@@ -22,7 +23,7 @@ export interface IList {
   maxPage?: boolean;
 }
 
-const List: React.FC<IList> = ({
+const List: React.FC<PropsWithChildren<IList>> = ({
   title,
   Icon,
   maxItems,
@@ -34,7 +35,7 @@ const List: React.FC<IList> = ({
 }) => {
   const paginationInfo = `Showing ${listSize} of ${maxItems || 0}`;
 
-  const Header: React.FC = () => {
+  const Header: React.FC<PropsWithChildren> = () => {
     return (
       <HeaderContainer>
         <div>
@@ -51,7 +52,7 @@ const List: React.FC<IList> = ({
     [headers],
   );
 
-  const EmptyBody: React.FC = () => {
+  const EmptyBody: React.FC<PropsWithChildren> = () => {
     return (
       <EmptyRow>
         <td

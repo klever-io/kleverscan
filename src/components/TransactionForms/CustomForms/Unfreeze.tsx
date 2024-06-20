@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useContract } from '@/contexts/contract';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { parseAddress } from '@/utils/parseValues';
@@ -12,7 +13,10 @@ type FormData = {
   bucketID: number;
 };
 
-const Unfreeze: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+const Unfreeze: React.FC<PropsWithChildren<IContractProps>> = ({
+  formKey,
+  handleFormSubmit,
+}) => {
   const [bucketsList, setBucketsList] = useState<any>([]);
 
   const { handleSubmit } = useFormContext<FormData>();

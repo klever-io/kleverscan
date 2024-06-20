@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Tooltip from '@/components/Tooltip';
 import { useMobile } from '@/contexts/mobile';
 import { IAPR, IFPR, IKDAFPR, IStaking } from '@/types/index';
@@ -25,10 +26,9 @@ interface IStakingHistoryProps extends AssetProps {
   staking: IStaking | undefined;
 }
 
-export const StakingHistoryTab: React.FC<IStakingHistoryProps> = ({
-  asset,
-  staking,
-}) => {
+export const StakingHistoryTab: React.FC<
+  PropsWithChildren<IStakingHistoryProps>
+> = ({ asset, staking }) => {
   if (!staking) return null;
   if (asset?.staking.interestType === 'APRI') {
     return <APRHistory apr={staking.apr as IAPR[]} />;
@@ -40,7 +40,10 @@ interface FPRHistoryProps extends AssetProps {
   fpr: IFPR[];
 }
 
-const FPRHistory: React.FC<FPRHistoryProps> = ({ fpr, asset }) => {
+const FPRHistory: React.FC<PropsWithChildren<FPRHistoryProps>> = ({
+  fpr,
+  asset,
+}) => {
   const { t } = useTranslation(['common', 'assets']);
   const isMobile = useMobile();
   const [FPRIndex, setFPRIndex] = useState<number>(3);
@@ -246,6 +249,6 @@ interface APRHistoryProps {
   apr: IAPR[];
 }
 
-const APRHistory: React.FC<APRHistoryProps> = ({ apr }) => {
+const APRHistory: React.FC<PropsWithChildren<APRHistoryProps>> = ({ apr }) => {
   return <></>;
 };

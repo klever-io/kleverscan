@@ -1,6 +1,7 @@
+import { PropsWithChildren } from 'react';
 import MultisignComponent from '@/components/MultsignComponent';
 
-const MultiSign: React.FC = () => {
+const MultiSign: React.FC<PropsWithChildren> = () => {
   return <MultisignComponent />;
 };
 

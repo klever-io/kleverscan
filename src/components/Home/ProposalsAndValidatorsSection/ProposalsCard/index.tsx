@@ -1,6 +1,7 @@
+import { PropsWithChildren } from 'react';
 import { HomeData } from '@/contexts/mainPage';
 import { IProposal } from '@/types/proposals';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import React, { useContext } from 'react';
 import {
   CardContainer,
@@ -16,7 +17,7 @@ import { Proposal } from './Proposal';
 import Link from 'next/link';
 import { PurpleArrowRight } from '@/assets/icons';
 
-const ProposalsCard: React.FC = () => {
+const ProposalsCard: React.FC<PropsWithChildren> = () => {
   const {
     totalProposals,
     activeProposalsCount,
@@ -54,11 +55,9 @@ const ProposalsCard: React.FC = () => {
             pathname: '/proposals',
           }}
         >
-          <a>
-            {' '}
-            View All
-            <PurpleArrowRight />
-          </a>
+          {' '}
+          View All
+          <PurpleArrowRight />
         </Link>
       </Title>
 

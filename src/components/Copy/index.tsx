@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Copy as CopyIcon } from '@/assets/icons';
 import * as clipboard from 'clipboard-polyfill';
 import React, { Fragment } from 'react';
@@ -23,7 +24,7 @@ const IconContainer = styled.div`
   }
 `;
 
-const Copy: React.FC<ICopyProps> = ({
+const Copy: React.FC<PropsWithChildren<ICopyProps>> = ({
   data,
   info = 'Text',
   children,

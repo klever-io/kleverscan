@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import React from 'react';
 import {
   ResponsiveContainer,
@@ -16,7 +17,7 @@ interface IChart {
   theme: Theme;
 }
 
-const Chart: React.FC<IChart> = ({ data }) => {
+const Chart: React.FC<PropsWithChildren<IChart>> = ({ data }) => {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <ScatterChart>

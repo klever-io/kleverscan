@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useContract } from '@/contexts/contract';
 import { claimTypes } from '@/utils/contracts';
 import React from 'react';
@@ -11,7 +12,10 @@ type FormData = {
   id: string;
 };
 
-const Claim: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+const Claim: React.FC<PropsWithChildren<IContractProps>> = ({
+  formKey,
+  handleFormSubmit,
+}) => {
   const { handleSubmit, watch } = useFormContext<FormData>();
   const {} = useContract();
   const claimType = watch('claimType');

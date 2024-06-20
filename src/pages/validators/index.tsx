@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Validators as Icon } from '@/assets/cards';
 import { getStatusIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
@@ -57,7 +58,7 @@ const validatorsRowSections = (validator: IValidator): IRowSection[] => {
                 {
                   <AddressContainer>
                     <Link href={`validator/${ownerAddress}`}>
-                      <a>{name ? name : <Mono>{parsedAddress}</Mono>}</a>
+                      {name ? name : <Mono>{parsedAddress}</Mono>}
                     </Link>
                     <Copy data={ownerAddress} info="Validator Address" />
                   </AddressContainer>
@@ -133,7 +134,7 @@ const validatorsRowSections = (validator: IValidator): IRowSection[] => {
   return sections;
 };
 
-const Validators: React.FC = () => {
+const Validators: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
   const [filterValidators, fetchPartialValidator, loading, setLoading] =
     useFetchPartial<IValidator>('validators', 'validator/list', 'name');

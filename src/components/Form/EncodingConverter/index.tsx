@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
@@ -33,12 +34,9 @@ export interface IPropsEncodingConverter {
   decoding: (decoding: string) => string;
 }
 
-const FormEncodingConverter: React.FC<IPropsEncodingConverter> = ({
-  titleTextArea,
-  encoded,
-  decoding,
-  placeHolder,
-}) => {
+const FormEncodingConverter: React.FC<
+  PropsWithChildren<IPropsEncodingConverter>
+> = ({ titleTextArea, encoded, decoding, placeHolder }) => {
   const [formValues, setFormValues] = useState<IFormInputs>({
     encoding: '',
     decoding: '',
@@ -139,7 +137,7 @@ const FormEncodingConverter: React.FC<IPropsEncodingConverter> = ({
   );
 };
 
-const FormPEMFileConverter: React.FC = () => {
+const FormPEMFileConverter: React.FC<PropsWithChildren> = () => {
   const [pemFile, setPemFile] = useState('');
   const [password, setPassword] = useState('');
   const [open, setOpen] = useState(false);

@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { ArrowDown } from '@/assets/icons';
 import {
   DetailsArrowContainer,
@@ -88,7 +89,7 @@ const FeeDetails: React.FC<{
   );
 };
 
-const MultiContract: React.FC = () => {
+const MultiContract: React.FC<PropsWithChildren> = () => {
   const { isTablet } = useMobile();
   const { submitForms } = useContract();
 

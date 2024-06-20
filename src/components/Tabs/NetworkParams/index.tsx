@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Table, { ITable } from '@/components/Table';
 import api from '@/services/api';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
@@ -45,7 +46,7 @@ const requestNetworkParams = async (): Promise<INetworkParams> => {
   return networkParams;
 };
 
-const NetworkParams: React.FC = () => {
+const NetworkParams: React.FC<PropsWithChildren> = () => {
   const { getInteractionsButtons } = useContractModal();
 
   const rowSections = (props: INetworkParam): IRowSection[] => {

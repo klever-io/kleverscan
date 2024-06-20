@@ -1,4 +1,5 @@
-const GradientSVG: React.FC = () => {
+import { PropsWithChildren } from 'react';
+const GradientSVG: React.FC<PropsWithChildren> = () => {
   const idCSS = 'gradient';
   return (
     <svg style={{ height: '100%', width: '100%', position: 'absolute' }}>

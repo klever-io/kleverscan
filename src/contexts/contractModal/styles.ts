@@ -38,7 +38,7 @@ export const ButtonModal = styled.button<{
     transform: ${props => (props.isLocked ? '' : 'translateY(0.1rem)')};
   }
 
-  :hover {
+  &:hover {
     background-color: ${props =>
       props.isLocked ? props.theme.darkGray : props.theme.violet};
     cursor: ${props => (props.isLocked ? 'not-allowed' : 'pointer')};
@@ -50,7 +50,7 @@ export const ButtonModal = styled.button<{
       background-color: ${props.theme.violet};
       border: 1px solid ${props.theme.violet};
 
-      :hover {
+      &:hover {
         background-color: ${lighten(0.1, props.theme.violet)};
       }
     `}

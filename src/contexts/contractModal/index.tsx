@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import ModalContract, {
   IModalContract,
 } from '@/components/Contract/ModalContract';
@@ -17,7 +18,7 @@ interface IContractModal {
   getInteractionsButtons: (
     params: IUseInteractionButton[],
     isLeftAligned?: boolean,
-  ) => React.FC[];
+  ) => React.FC<PropsWithChildren>[];
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -30,7 +31,9 @@ export interface IUseInteractionButton {
 
 export const ContractModal = createContext({} as IContractModal);
 
-export const ContractModalProvider: React.FC = ({ children }) => {
+export const ContractModalProvider: React.FC<PropsWithChildren> = ({
+  children,
+}) => {
   const [mounted, setMounted] = useState(false);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [modalOptions, setModalOptions] = useState<IModalContract>({
@@ -59,11 +62,16 @@ export const ContractModalProvider: React.FC = ({ children }) => {
   }, [router.isReady]);
 
   const getInteractionsButtons = useCallback(
-    (params: IUseInteractionButton[], isLeftAligned?: boolean): React.FC[] => {
-      const buttons: React.FC[] = [];
+    (
+      params: IUseInteractionButton[],
+      isLeftAligned?: boolean,
+    ): React.FC<PropsWithChildren>[] => {
+      const buttons: React.FC<PropsWithChildren>[] = [];
 
       for (const param of params) {
-        const interactionButton: React.FC = ({ children }) => {
+        const interactionButton: React.FC<PropsWithChildren> = ({
+          children,
+        }) => {
           const { title, contractType, defaultValues } = param;
 
           const buttonStyle = param?.buttonStyle

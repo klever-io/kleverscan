@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { BitcoinMe, VoxSwap } from '@/assets/swap-exchange';
 import { ChartType } from '@/components/Chart';
 import { PriceTooltip } from '@/components/Chart/Tooltips';
@@ -22,7 +23,7 @@ import {
 import { getVariation } from '@/utils';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
-import { ImageLoaderProps } from 'next/image';
+import { ImageLoaderProps } from 'next/legacy/image';
 import Link from 'next/link';
 import React, { useCallback, useRef, useState } from 'react';
 import { IoReloadSharp } from 'react-icons/io5';
@@ -91,7 +92,9 @@ const swapExchangeInfo = [
   },
 ];
 
-const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
+const RenderCoinsCard: React.FC<
+  PropsWithChildren<IPropsRenderCoinsCard>
+> = props => {
   const {
     coin,
     renderKfiMarketCap,
@@ -119,27 +122,25 @@ const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
     <CardContainer ref={cardRef}>
       <CardContent>
         <Link href={`/asset/${shortname}`}>
-          <a>
-            <HeaderContainer>
-              <IconContainer
-                src={`/coins/${shortname.toLowerCase()}.png`}
-                width={50}
-                height={50}
-                quality={100}
-                loader={({ src, width, quality }: ImageLoaderProps) =>
-                  `${src}?w=${width}&q=${quality || 100}`
-                }
-              />
+          <HeaderContainer>
+            <IconContainer
+              src={`/coins/${shortname.toLowerCase()}.png`}
+              width={50}
+              height={50}
+              quality={100}
+              loader={({ src, width, quality }: ImageLoaderProps) =>
+                `${src}?w=${width}&q=${quality || 100}`
+              }
+            />
 
-              <HeaderContent>
-                <Name>
-                  <span>{shortname}</span>
-                  <p>{name}</p>
-                </Name>
-                <ArrowTopRight />
-              </HeaderContent>
-            </HeaderContainer>
-          </a>
+            <HeaderContent>
+              <Name>
+                <span>{shortname}</span>
+                <p>{name}</p>
+              </Name>
+              <ArrowTopRight />
+            </HeaderContent>
+          </HeaderContainer>
         </Link>
         <HeaderGraph>
           <div>
@@ -229,7 +230,7 @@ const RenderCoinsCard: React.FC<IPropsRenderCoinsCard> = props => {
   );
 };
 
-const CoinCard: React.FC = () => {
+const CoinCard: React.FC<PropsWithChildren> = () => {
   const [selectedCoin, setSelectedCoin] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -356,7 +357,7 @@ const CoinCard: React.FC = () => {
     return '--';
   };
 
-  const CoinsFetchFails: React.FC = () => {
+  const CoinsFetchFails: React.FC<PropsWithChildren> = () => {
     if (coins.length === 0) {
       return klvChartResult.isError && kfiChartResult.isError ? (
         <CardContainer>
@@ -411,7 +412,7 @@ const CoinCard: React.FC = () => {
           {coins.map((coin, index) => (
             <CoinSelector
               key={String(index)}
-              isSelected={selectedCoin === index}
+              $isSelected={selectedCoin === index}
               onClick={() => {
                 handleSelection(index);
               }}
@@ -419,7 +420,7 @@ const CoinCard: React.FC = () => {
               {coin.shortname}
             </CoinSelector>
           ))}
-          <CoinsSlider selectedIndex={selectedCoin} />
+          <CoinsSlider $selectedIndex={selectedCoin} />
         </CoinsSelector>
         {!boolChecker(coinsLoadingBool) ? (
           <Carousel ref={carouselRef}>

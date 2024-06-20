@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { ArrowGreen, ArrowPink } from '@/assets/icons';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { getAge } from '@/utils/timeFunctions';
@@ -37,7 +38,7 @@ interface IValidatorCards {
   maxDelegation: number | undefined;
 }
 
-const ValidatorCards: React.FC<IValidatorCards> = ({
+const ValidatorCards: React.FC<PropsWithChildren<IValidatorCards>> = ({
   totalStake,
   commission,
   maxDelegation,

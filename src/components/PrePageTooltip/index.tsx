@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useInputSearch } from '@/contexts/inputSearch';
 import { useTheme } from '@/contexts/theme';
 import { getAssetByPartialSymbol } from '@/services/requests/asset';
@@ -67,7 +68,7 @@ const getInputType = (value: string) => {
   }
 };
 
-const PrePageTooltip: React.FC<IPrePageTooltip> = ({
+const PrePageTooltip: React.FC<PropsWithChildren<IPrePageTooltip>> = ({
   search,
   setShowTooltip,
   isInHomePage,

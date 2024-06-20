@@ -20,7 +20,7 @@ export const ReactSelectStyles = css`
     .react-select__control {
       border: 1px dashed ${props => props.theme.card.border};
       filter: opacity(0.7);
-      &:hover:not(:focus):not(:disabled) {
+      &:hover:not(&:focus):not(&:disabled) {
         filter: opacity(1) brightness(1.2);
       }
     }
@@ -90,7 +90,7 @@ export const ReactSelectStyles = css`
     border-radius: 0.5rem;
     border: 1px solid transparent;
     color: ${props => props.theme.darkText};
-    &:hover:not(:focus):not(:disabled) {
+    &:hover:not(&:focus):not(&:disabled) {
       border: 1px solid var(--select-border-color);
     }
   }

@@ -16,6 +16,7 @@ import {
   WhitelistSection,
 } from './ConfigITO';
 import { ITOTooltips as tooltip } from './utils/tooltips';
+import { toast } from 'react-toastify';
 
 interface ITOTriggerData extends ConfigITOData {
   triggerType: number;
@@ -35,8 +36,15 @@ const ITOTrigger: React.FC<IContractProps> = ({
   const triggerType = watch('triggerType');
 
   const onSubmit = async (data: ITOTriggerData) => {
-    parseConfigITO(data);
-    await handleFormSubmit(data);
+    const dataCopy = JSON.parse(JSON.stringify(data));
+    try {
+      parseConfigITO(dataCopy);
+      await handleFormSubmit(dataCopy);
+    } catch (e: any) {
+      toast.error(e.message);
+      console.error(e);
+      return;
+    }
   };
 
   useEffect(() => {

@@ -33,9 +33,7 @@ export const HiddenTextArea = styled.textarea`
 
   word-break: break-word;
 
-  tab-size: 2ch;
-
-  font-family: 'Roboto Mono', monospace;
+  tab-size: 1ch;
 
   caret-color: ${props => props.theme.true.white};
 `;

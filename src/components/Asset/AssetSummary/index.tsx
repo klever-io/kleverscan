@@ -19,6 +19,8 @@ import { useQuery } from 'react-query';
 import { ApplyFormModal } from './ApplyFormModal';
 import { AssetITOSummary } from './AssetITOSummary';
 import { ParticipateModal } from './ParticipateModal';
+import DOMPurify from 'dompurify';
+
 import {
   About,
   AssetHeaderContainer,
@@ -217,7 +219,11 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
               </EditContainer>
             )}
           </h2>
-          <p>{asset_info?.project_description_copy}</p>
+          <p
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(asset_info?.project_description_copy),
+            }}
+          ></p>
         </About>
       ) : null}
       {asset &&

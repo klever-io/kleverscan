@@ -129,6 +129,9 @@ export const About = styled.div`
     font-weight: 400;
     line-height: 1.5;
   }
+  p h2 {
+    color: ${({ theme }) => theme.darkText};
+  }
 `;
 
 export const EditContainer = styled.div`

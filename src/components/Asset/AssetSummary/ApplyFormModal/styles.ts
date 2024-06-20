@@ -1,4 +1,5 @@
 import { ReactSelectStyles } from '@/components/Contract/Select/styles';
+import { EditorContent } from '@tiptap/react';
 import { transparentize } from 'polished';
 import styled, { css } from 'styled-components';
 
@@ -41,6 +42,7 @@ export const Content = styled.div`
 
   background-color: ${({ theme }) => theme.true.newBlack};
 
+  border: 1px solid ${({ theme }) => theme.true.white20};
   border-radius: 24px;
   padding: 40px;
 
@@ -121,6 +123,64 @@ export const Input = styled.textarea`
 
   font-size: 1rem;
   line-height: 1.25rem;
+`;
+
+export const RTEArea = styled(EditorContent)`
+  div:first-child {
+    color: ${({ theme }) => theme.true.white};
+    background-color: transparent;
+
+    border-radius: 8px;
+
+    border: 1px solid ${({ theme }) => theme.true.white};
+
+    padding: 10px;
+
+    min-width: 100%;
+    max-width: 100%;
+
+    min-height: 120px;
+
+    font-size: 1rem;
+    line-height: 1.25rem;
+  }
+
+  .ProseMirror > * + * {
+    margin-top: 0.75em;
+  }
+
+  .ProseMirror ul {
+    padding: 0 1rem;
+    list-style: disc !important;
+  }
+  .ProseMirror ol {
+    padding: 0 2rem;
+    list-style: decimal !important;
+  }
+
+  .ProseMirror hr {
+    border: none;
+    border-top: 3px solid #999999;
+    margin: 2rem 0;
+  }
+
+  .ProseMirror h1 {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin: 0.67em 0;
+  }
+
+  .ProseMirror h2 {
+    font-size: 2em;
+    font-weight: bold;
+    margin: 0.75em 0;
+  }
+
+  .ProseMirror h3 {
+    font-size: 1.75em;
+    font-weight: bold;
+    margin: 0.83em 0;
+  }
 `;
 
 export const InputContainer = styled.div`

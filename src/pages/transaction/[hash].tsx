@@ -395,8 +395,10 @@ const Transaction: React.FC<PropsWithChildren<ITransactionPage>> = props => {
 
   const [expandData, setExpandData] = useState(initializeExpandData());
   const { isDarkTheme } = useTheme();
-  const ReactJson = dynamic(import('react-json-view'), { ssr: false });
-
+  const ReactJson = dynamic(
+    () => import('react-json-view').then(mod => mod.default),
+    { ssr: false },
+  );
   const StatusIcon = getStatusIcon(status);
 
   const updateExpandArray = (index: number) => {

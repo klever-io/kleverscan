@@ -366,10 +366,10 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     }
   };
   const SelectedTabComponent: React.FC<PropsWithChildren> = () => {
+    const Filters = showInteractionButtons ? CreateAssetButton : undefined;
+
     switch (router?.query?.tab || t('common:Titles.Assets')) {
       case t('common:Titles.Assets'):
-        const Filters = showInteractionButtons ? CreateAssetButton : undefined;
-
         return (
           <Assets
             assetsTableProps={assetsTableProps}

@@ -33,7 +33,10 @@ import {
   MultisignButton,
 } from '../styles';
 
-const ReactJson = dynamic(import('react-json-view'), { ssr: false });
+const ReactJson = dynamic(
+  () => import('react-json-view').then(mod => mod.default),
+  { ssr: false },
+);
 
 interface IMultisignList {
   hashs: string[];

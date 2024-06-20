@@ -8,4 +8,5 @@ module.exports = {
   fallbackLng: {
     default: ['en'],
   },
+  react: { useSuspense: false },
 };

@@ -84,6 +84,7 @@ const ConfigITO: React.FC<PropsWithChildren<IContractProps>> = ({
       await handleFormSubmit(dataCopy);
     } catch (e: any) {
       toast.error(e.message);
+      console.error(e);
       return;
     }
   };

@@ -119,9 +119,9 @@ export const parsePackInfo = (data: any): void => {
   packInfoReference.forEach((item: any) => {
     const label = item.currencyId.toUpperCase();
     const parsedPacks = item.packs.map((pack: Pack, index: number) => {
-      if (index === item.packs.length - 1) {
+      if (item.packs.length > 1 && index === item.packs.length - 1) {
         return {
-          amount: item.packs[index - 1].amount + 1,
+          amount: item.packs[index - 1]?.amount + 1,
           price: pack.price,
         };
       }

@@ -58,7 +58,7 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
 
       <Row>
         <span>
-          <strong>{t('table:MaxSupply').toUpperCase()}</strong>
+          <strong>{t('table:MaxSupply')}</strong>
         </span>
         <span>
           <small>
@@ -75,7 +75,7 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
       </Row>
       <Row>
         <span>
-          <strong>{t('table:InitialSupply').toUpperCase()}</strong>
+          <strong>{t('table:InitialSupply')}</strong>
         </span>
         <span>
           <small>
@@ -92,7 +92,7 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
       </Row>
       <Row>
         <span>
-          <strong>{t('table:CirculatingSupply').toUpperCase()}</strong>
+          <strong>{t('table:CirculatingSupply')}</strong>
         </span>
         <span>
           <small>
@@ -109,7 +109,7 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
       </Row>
       <Row>
         <span>
-          <strong>{t('assets:Overview.Burned Value').toUpperCase()}</strong>
+          <strong>{t('assets:Overview.Burned Value')}</strong>
         </span>
         <span>
           <small>
@@ -126,7 +126,7 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
       </Row>
       <Row>
         <span>
-          <strong>{t('common:Cards.Total Staked').toUpperCase()}</strong>
+          <strong>{t('common:Cards.Total Staked')}</strong>
         </span>
         <span>
           <small>
@@ -143,13 +143,13 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
       </Row>
       <Row>
         <span>
-          <strong>{t('assets:Overview.Holders').toUpperCase()}</strong>
+          <strong>{t('assets:Overview.Holders')}</strong>
         </span>
         <span>{asset ? holdersPagination?.totalRecords : <Skeleton />}</span>
       </Row>
       <Row>
         <span>
-          <strong>{t('common:Titles.Transactions').toUpperCase()}</strong>
+          <strong>{t('common:Titles.Transactions')}</strong>
         </span>
         <span>
           {asset ? (
@@ -161,13 +161,13 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
       </Row>
       <Row>
         <span>
-          <strong>{t('common:Cards.Market Cap').toUpperCase()}</strong>
+          <strong>{t('common:Cards.Market Cap')}</strong>
         </span>
         <span>--</span>
       </Row>
       <Row>
         <span>
-          <strong>{t('assets:Overview.Staking Type').toUpperCase()}</strong>
+          <strong>{t('assets:Overview.Staking Type')}</strong>
         </span>
         <span>
           {asset ? parseApr(asset?.staking?.interestType) : <Skeleton />}

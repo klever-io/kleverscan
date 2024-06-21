@@ -38,7 +38,7 @@ const ITOTrigger: React.FC<IContractProps> = ({
   const onSubmit = async (data: ITOTriggerData) => {
     const dataCopy = JSON.parse(JSON.stringify(data));
     try {
-      parseConfigITO(dataCopy);
+      parseConfigITO(dataCopy, collection?.isNFT);
       await handleFormSubmit(dataCopy);
     } catch (e: any) {
       toast.error(e.message);

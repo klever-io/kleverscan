@@ -27,6 +27,7 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   creatable?: boolean;
   selectFilter?: (e: any) => any;
   loading?: boolean;
+  customOnChange?: (e: any) => void;
 }
 
 const Filter: React.FC<IFilter> = ({
@@ -40,6 +41,7 @@ const Filter: React.FC<IFilter> = ({
   onInputChange,
   creatable,
   selectFilter,
+  customOnChange,
   loading,
   ...rest
 }) => {
@@ -56,6 +58,7 @@ const Filter: React.FC<IFilter> = ({
   const handleSelect = (selected: any) => {
     if (name === undefined) return;
 
+    customOnChange && customOnChange(selected);
     const e = {
       target: {
         name,

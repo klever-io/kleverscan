@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import React, { KeyboardEvent, useEffect, useRef } from 'react';
 import { Container } from './styles';
 
@@ -10,7 +11,7 @@ interface Input extends React.InputHTMLAttributes<any> {
   handleConfirmClick: () => void;
 }
 
-const Input: React.FC<Input> = ({
+const Input: React.FC<PropsWithChildren<Input>> = ({
   onChange,
   handleConfirmClick,
   containerStyles,

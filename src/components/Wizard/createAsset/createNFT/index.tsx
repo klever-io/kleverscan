@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import {
   buildTransaction,
   getType,
@@ -34,7 +35,7 @@ import {
 import { createNFT, parseRoles } from '../../utils';
 import { WizardBody } from '../styles';
 
-const WizCreateNFT: React.FC<any> = ({
+const WizCreateNFT: React.FC<PropsWithChildren<any>> = ({
   setTxHash,
   txHash,
   fromAdvancedSteps,
@@ -300,7 +301,7 @@ const WizCreateNFT: React.FC<any> = ({
       });
     } catch (error) {
       console.error(error);
-      toast.error(error);
+      toast.error(JSON.stringify(error));
     }
   };
 

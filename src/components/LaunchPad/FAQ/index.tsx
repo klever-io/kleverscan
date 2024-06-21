@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { FAQDropdown } from './DropdownItem';
 import { Content, FAQContainer, LeftSide, SiteTip, Title } from './styles';
 
@@ -37,7 +38,7 @@ Be ready to act quickly: ITOs can sell out quickly.`,
   },
 ];
 
-export const LaunchPadFAQ: React.FC = () => {
+export const LaunchPadFAQ: React.FC<PropsWithChildren> = () => {
   return (
     <FAQContainer>
       <LeftSide>

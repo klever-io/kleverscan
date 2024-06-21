@@ -102,7 +102,7 @@ export const TourTooltip = styled.div<IPlacement>`
 
   user-select: none;
 
-  ::before {
+  &::before {
     content: '';
 
     position: absolute;

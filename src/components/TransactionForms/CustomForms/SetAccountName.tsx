@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useContract } from '@/contexts/contract';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -9,7 +10,7 @@ type FormData = {
   orderId: string;
 };
 
-const SetAccountName: React.FC<IContractProps> = ({
+const SetAccountName: React.FC<PropsWithChildren<IContractProps>> = ({
   formKey,
   handleFormSubmit,
 }) => {

@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Accounts, Epoch, TPS, Transactions } from '@/assets/cards';
 import Skeleton from '@/components/Skeleton';
 import {
@@ -8,7 +9,7 @@ import {
 } from '@/views/home';
 import { useTranslation } from 'next-i18next';
 
-const HomeDataCardsSkeleton: React.FC = () => {
+const HomeDataCardsSkeleton: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
 
   const dataCards: any[] = [

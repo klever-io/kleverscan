@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Copy } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import Title from '@/components/Layout/Title';
@@ -85,7 +86,9 @@ const ProposalVoters = (props: IProposalVoters) => {
       {
         element: props => (
           <CenteredRow key={voter}>
-            <Link href={`/account/${voter}`}>{parseAddress(voter, 24)}</Link>
+            <Link href={`/account/${voter}`} legacyBehavior>
+              {parseAddress(voter, 24)}
+            </Link>
             <Copy data={voter} info="voter"></Copy>
           </CenteredRow>
         ),
@@ -124,7 +127,7 @@ const ProposalVoters = (props: IProposalVoters) => {
   return <Table {...tableProps2} />;
 };
 
-const ProposalDetails: React.FC = () => {
+const ProposalDetails: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation(['common', 'proposals']);
   const [selectedFilter, setSelectedFilter] = useState(
     `${t('common:Statements.Yes')}`,
@@ -226,7 +229,7 @@ const ProposalDetails: React.FC = () => {
     }
   }, [proposal, params]);
 
-  const Progress: React.FC = () => {
+  const Progress: React.FC<PropsWithChildren> = () => {
     if (!proposal) return null;
     return (
       <ProgressBar>
@@ -288,7 +291,7 @@ const ProposalDetails: React.FC = () => {
     dataName: 'voters',
   };
 
-  const SelectedTabComponent: React.FC = useCallback(() => {
+  const SelectedTabComponent: React.FC<PropsWithChildren> = useCallback(() => {
     switch (selectedFilter) {
       case `${t('common:Statements.Yes')}`:
         return <ProposalVoters proposalVotersProps={{ ...tableProps1 }} />;
@@ -352,7 +355,7 @@ const ProposalDetails: React.FC = () => {
                   <strong>{t('proposals:Proposer')}</strong>
                 </span>
                 <span style={{ marginRight: '0.2rem' }}>
-                  <Link href={`/account/${proposal?.proposer}`}>
+                  <Link href={`/account/${proposal?.proposer}`} legacyBehavior>
                     <HoverLink>{isSkeleton(proposal?.proposer)}</HoverLink>
                   </Link>
                 </span>
@@ -366,7 +369,7 @@ const ProposalDetails: React.FC = () => {
                 <span>
                   <strong>Hash</strong>
                 </span>
-                <Link href={`/transaction/${proposal?.txHash}`}>
+                <Link href={`/transaction/${proposal?.txHash}`} legacyBehavior>
                   <HoverLink>{isSkeleton(proposal?.txHash)}</HoverLink>
                 </Link>
               </Row>

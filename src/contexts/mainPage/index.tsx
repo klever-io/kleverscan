@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import {
   defaultAggregateData,
   homeAccountsCall,
@@ -46,7 +47,7 @@ export interface IHomeData {
 
 export const HomeData = createContext({} as IHomeData);
 
-export const HomeDataProvider: React.FC = ({ children }) => {
+export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const watcherTimeout = 4 * 1000; // 4 secs
 
   const [

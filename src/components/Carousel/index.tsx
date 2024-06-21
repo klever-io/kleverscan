@@ -1,7 +1,8 @@
+import { PropsWithChildren } from 'react';
 import React, { useRef } from 'react';
 import { ArrowLeft, ArrowRight, Container, Content } from './styles';
 
-const Carousel: React.FC = ({ children }) => {
+const Carousel: React.FC<PropsWithChildren> = ({ children }) => {
   const carouselRef = useRef<HTMLDivElement>(null);
 
   const handleLeft = () => {

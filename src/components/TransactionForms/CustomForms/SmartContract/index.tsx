@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { ABI, ABIStruct } from '@/types/contracts';
 import { useDidUpdateEffect } from '@/utils/hooks';
@@ -246,7 +247,12 @@ const parseArgument = (
       return abiEncoder.encodeABIValue(value, arrayType);
     });
 
-    parsedValue = abiEncoder.encodeLengthPlusData(parsedArray);
+    const innerType = type.slice(type.indexOf('<') + 1, type.length - 1);
+
+    parsedValue = abiEncoder.encodeLengthPlusData(
+      parsedArray,
+      innerType,
+    ) as string;
   } else {
     parsedValue = abiEncoder.encodeABIValue(value, raw_type, !required);
   }
@@ -260,7 +266,7 @@ const parseArgument = (
   return parsedValue;
 };
 
-const SmartContract: React.FC<IContractProps> = ({
+const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
   formKey,
   handleFormSubmit,
 }) => {

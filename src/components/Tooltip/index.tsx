@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { IconHelp } from '@/assets/help';
 import { ICustomStyles } from '@/types/index';
 import React, { useState } from 'react';
@@ -5,13 +6,13 @@ import { StyledTooltip, ToolTipSpan } from './styles';
 
 interface ITooltipProps {
   msg: string;
-  Component?: React.FC;
+  Component?: React.FC<PropsWithChildren>;
   customStyles?: ICustomStyles;
   minMsgLength?: number;
   maxVw?: number;
 }
 
-const Tooltip: React.FC<ITooltipProps> = ({
+const Tooltip: React.FC<PropsWithChildren<ITooltipProps>> = ({
   msg,
   Component,
   customStyles,

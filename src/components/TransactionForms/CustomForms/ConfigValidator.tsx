@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useContract } from '@/contexts/contract';
 import { KLV_PRECISION, PERCENTAGE_PRECISION } from '@/utils/globalVariables';
 import React from 'react';
@@ -22,7 +23,7 @@ type FormData = {
   };
 };
 
-const ConfigValidator: React.FC<IContractProps> = ({
+const ConfigValidator: React.FC<PropsWithChildren<IContractProps>> = ({
   formKey,
   handleFormSubmit,
 }) => {

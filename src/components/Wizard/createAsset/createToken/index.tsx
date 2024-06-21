@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import {
   buildTransaction,
   getType,
@@ -42,7 +43,7 @@ import { createToken, parseRoles } from '../../utils';
 import { WizardBody } from '../styles';
 
 // TODO -> Check state setadvancedsteps
-const WizCreateToken: React.FC<any> = ({
+const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
   setTxHash,
   txHash,
   fromAdvancedSteps,
@@ -335,7 +336,7 @@ const WizCreateToken: React.FC<any> = ({
       });
     } catch (error) {
       console.error(error);
-      toast.error(error);
+      toast.error(JSON.stringify(error));
     }
   };
 

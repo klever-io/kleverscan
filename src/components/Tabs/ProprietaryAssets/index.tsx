@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Table, { ITable } from '@/components/Table';
 import { useContractModal } from '@/contexts/contractModal';
 import { CustomLink } from '@/styles/common';
@@ -16,10 +17,10 @@ interface IProprietaryAssets {
   assetsTableProps: IInnerTableProps;
   address: string;
   showInteractionButtons?: boolean;
-  Filters?: React.FC;
+  Filters?: React.FC<PropsWithChildren>;
 }
 
-const ProprietaryAssets: React.FC<IProprietaryAssets> = ({
+const ProprietaryAssets: React.FC<PropsWithChildren<IProprietaryAssets>> = ({
   assetsTableProps,
   address,
   showInteractionButtons,
@@ -44,7 +45,11 @@ const ProprietaryAssets: React.FC<IProprietaryAssets> = ({
     const ticker = assetId?.split('-')[0];
     const sectionViewNfts =
       assetType === 'Non Fungible' ? (
-        <Link href={`/account/${address}/collection/${assetId}`} key={address}>
+        <Link
+          href={`/account/${address}/collection/${assetId}`}
+          key={address}
+          legacyBehavior
+        >
           <CustomLink>
             {t('accounts:SingleAccount.Buttons.ViewNFTs')}
           </CustomLink>
@@ -56,7 +61,7 @@ const ProprietaryAssets: React.FC<IProprietaryAssets> = ({
       { element: props => <span key={ticker}>{ticker}</span>, span: 1 },
       {
         element: props => (
-          <Link key={assetId} href={`/asset/${assetId}`}>
+          <Link key={assetId} href={`/asset/${assetId}`} legacyBehavior>
             {assetId}
           </Link>
         ),

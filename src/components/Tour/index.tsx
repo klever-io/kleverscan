@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { ReactPortal, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { IoIosClose } from 'react-icons/io';
@@ -19,7 +20,7 @@ interface ITourProps {
   condition?: boolean;
 }
 
-const Tour: React.FC<ITourProps> = ({
+const Tour: React.FC<PropsWithChildren<ITourProps>> = ({
   side = 'bottom',
   guideName,
   tourTooltip,

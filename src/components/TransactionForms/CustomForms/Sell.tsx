@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { calculateMarketBuyFixedFee } from '@/utils/create-transaction/fees-calculation.ts';
 import { toLocaleFixed } from '@/utils/formatFunctions';
@@ -26,7 +27,10 @@ const parseSell = (data: FormData) => {
   parseDates(data);
 };
 
-const Sell: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+const Sell: React.FC<PropsWithChildren<IContractProps>> = ({
+  formKey,
+  handleFormSubmit,
+}) => {
   const { handleSubmit, watch } = useFormContext<FormData>();
   const marketType = watch('marketType');
   const { setSelectedRoyaltiesFees, queue } = useMulticontract();

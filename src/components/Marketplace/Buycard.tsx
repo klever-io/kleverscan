@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Loader } from '@/components/Loader/styles';
 import Tooltip from '@/components/Tooltip';
 import { useContractModal } from '@/contexts/contractModal';
@@ -12,7 +13,7 @@ import {
   TooltipWrapper,
 } from '@/views/marketplaces/detail';
 import { useTranslation } from 'next-i18next';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import { useState } from 'react';
 import { UseQueryResult } from 'react-query';
 
@@ -23,7 +24,7 @@ export interface IBuyCard {
   assets: IAsset[] | undefined;
 }
 
-const BuyCard: React.FC<IBuyCard> = ({
+const BuyCard: React.FC<PropsWithChildren<IBuyCard>> = ({
   marketplaceAsset,
   precisionQueries,
   buyCardsLoading,

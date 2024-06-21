@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { divIcon, LatLngExpression } from 'leaflet';
 import React, { Fragment } from 'react';
 import { MapContainer, Marker, TileLayer } from 'react-leaflet';
@@ -15,7 +16,7 @@ interface IMap {
   nodes?: Node[];
 }
 
-const Map: React.FC<IMap> = ({ nodes }) => {
+const Map: React.FC<PropsWithChildren<IMap>> = ({ nodes }) => {
   const { isMobile, isTablet } = useMobile();
 
   const mapConfig: IMapConfig = {

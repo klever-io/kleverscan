@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { AssetSummary } from '@/components/Asset/AssetSummary';
 import { ITOTab } from '@/components/Asset/ITOTab';
 import { KDAPoolTab } from '@/components/Asset/KDAPoolTab';
@@ -24,7 +25,7 @@ import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
 
-const Asset: React.FC<IAssetPage> = ({}) => {
+const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
   const router = useRouter();
   const { t } = useTranslation(['common', 'assets']);
 
@@ -122,7 +123,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
     return { data: { accounts: [] } };
   };
 
-  const SelectedComponent: React.FC = () => {
+  const SelectedComponent: React.FC<PropsWithChildren> = () => {
     switch (selectedCard) {
       case `${t('common:Tabs.Overview')}`:
         return <OverviewTab asset={asset} />;
@@ -160,7 +161,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
     request: (page: number, limit: number) => requestAssetHolders(page, limit),
   };
 
-  const SelectedTabComponent: React.FC = () => {
+  const SelectedTabComponent: React.FC<PropsWithChildren> = () => {
     switch (selectedTab) {
       case `${t('common:Titles.Transactions')}`:
         return <Transactions transactionsTableProps={transactionsTableProps} />;

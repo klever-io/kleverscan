@@ -740,8 +740,8 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
     height: 3.5rem;
   }
 
-  ::before,
-  ::after {
+  &::before,
+  &::after {
     position: absolute;
     content: '';
     color: red;
@@ -749,7 +749,7 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
     height: 30px;
   }
 
-  ::before {
+  &::before {
     content: '';
     width: inherit;
     height: inherit;
@@ -758,7 +758,7 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
     border-top-right-radius: 17px;
   }
 
-  ::after {
+  &::after {
     content: 'Percentage';
     left: 22%;
     top: 55%;
@@ -803,8 +803,8 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
     border: 7.5px solid #ff4681;
     border-top: none;
 
-    ::before,
-    ::after {
+    &::before,
+    &::after {
       position: absolute;
       content: '';
       left: -10px;

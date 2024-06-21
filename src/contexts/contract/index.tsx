@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { sumAllRoyaltiesFees } from '@/components/Contract/MultiContract';
 import {
   buildTransaction,
@@ -91,7 +92,7 @@ export interface IContractContext {
 }
 
 export const Contract = createContext({} as IContractContext);
-export const ContractProvider: React.FC = ({ children }) => {
+export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [txLoading, setTxLoading] = useState<boolean>(false);
   const [txHash, setTxHash] = useState<string | null>(null);
   const [showAdvancedOpts, setShowAdvancedOpts] = useState(false);

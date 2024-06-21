@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { WarningIcon } from '@/assets/calendar';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
@@ -46,7 +47,9 @@ export interface IBuyCard {
   saleAssets: IAsset[] | undefined;
 }
 
-const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
+const MarketplaceDetails: React.FC<
+  PropsWithChildren<IMarketplaceResponse>
+> = props => {
   const serversideMarketplaceResponse = props;
   const { t } = useTranslation(['common', 'marketPlaces']);
   const pagination = props.pagination;
@@ -99,7 +102,7 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
   //   return [currencyId, precision];
   // };
 
-  const Overview: React.FC = () => {
+  const Overview: React.FC<PropsWithChildren> = () => {
     return (
       <>
         <Row>
@@ -133,6 +136,7 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
             <Link
               href={`/account/${serversideMarketplace.ownerAddress}`}
               key={serversideMarketplace.ownerAddress}
+              legacyBehavior
             >
               {serversideMarketplace.ownerAddress}
             </Link>
@@ -151,6 +155,7 @@ const MarketplaceDetails: React.FC<IMarketplaceResponse> = props => {
               <>
                 <Link
                   href={`/account/${serversideMarketplace?.referralAddress}`}
+                  legacyBehavior
                 >
                   {serversideMarketplace?.referralAddress}
                 </Link>

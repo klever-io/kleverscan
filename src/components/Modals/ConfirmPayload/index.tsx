@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { buildTransaction } from '@/components/Contract/utils';
 import ToggleInput from '@/components/Toggle';
 import { useContract } from '@/contexts/contract';
@@ -14,7 +15,7 @@ import {
 } from '../styles';
 import { DetailsRow, ErrorMessage, HiddenTextArea } from './styles';
 
-const ConfirmPayload: React.FC = () => {
+const ConfirmPayload: React.FC<PropsWithChildren> = () => {
   const { payload, formSend, resetFormsData } = useContract();
 
   const { setShowPayloadOpen, showPayloadOpen } = useModal();
@@ -141,13 +142,14 @@ const ConfirmPayload: React.FC = () => {
               maxWidth: '100%',
               wordBreak: 'break-word',
               overflow: 'hidden',
+              tabSize: '1ch',
             }}
             style={dracula}
             language="json"
             PreTag={PreWithRef}
             wrapLongLines
           >
-            {payloadText.replace(/\t/g, '  ')}
+            {payloadText}
           </SyntaxHighlighter>
 
           {isEditable ? (

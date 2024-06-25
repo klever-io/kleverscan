@@ -12,6 +12,8 @@
     "test:debug-speed": "jest --config=./jest-slow-report.config.ts",
     "test:debug-heap": "jest --logHeapUsage",
     "test-cov": "jest --coverage",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
     "postinstall": "husky install"
   },
   "dependencies": {
@@ -77,6 +79,7 @@
     "@types/testing-library__jest-dom": "5.14.5",
     "@typescript-eslint/eslint-plugin": "^7.6.0",
     "bech32": "^2.0.0",
+    "cypress": "^13.12.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "^14.2.4",
     "eslint-config-prettier": "^9.1.0",
@@ -93,5 +96,8 @@
     "ts-node": "10.7.0",
     "typescript": "^5.4.4",
     "typescript-eslint": "^7.6.0"
+  },
+  "resolutions": {
+    "jackspeak": "2.1.1"
   }
 }

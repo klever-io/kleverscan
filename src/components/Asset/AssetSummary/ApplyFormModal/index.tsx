@@ -134,6 +134,7 @@ export const ApplyFormModal: React.FC<
 
   const editor = useEditor({
     extensions: [StarterKit, Underline],
+    content: `${projectDescription}`,
     onUpdate({ editor }) {
       setProjectDescription(editor.getHTML());
     },
@@ -146,7 +147,7 @@ export const ApplyFormModal: React.FC<
           <ArrowContainer onClick={closeModal}>
             <StyledArrow />
           </ArrowContainer>
-          <Title>Add info your project</Title>
+          <Title>Add info to your project</Title>
         </Header>
 
         <AssetVisualization>
@@ -182,8 +183,9 @@ export const ApplyFormModal: React.FC<
 
           <InputRow>
             <Label>About the Project</Label>
-            <Toolbar editor={editor} />
-            <RTEArea editor={editor} />
+            <RTEArea editor={editor}>
+              <Toolbar editor={editor} />
+            </RTEArea>
           </InputRow>
         </BuyForm>
         <SubmitButton type="submit" form="buyForm">

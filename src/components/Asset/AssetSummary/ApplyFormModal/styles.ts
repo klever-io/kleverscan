@@ -2,6 +2,7 @@ import { ReactSelectStyles } from '@/components/Contract/Select/styles';
 import { EditorContent } from '@tiptap/react';
 import { transparentize } from 'polished';
 import styled, { css } from 'styled-components';
+import { RTEStyles } from '../styles';
 
 export const Container = styled.div<{ isOpenApplyFormModal: boolean }>`
   display: grid;
@@ -30,36 +31,48 @@ export const Background = styled.div`
 `;
 
 export const Content = styled.div`
-  position: fixed;
-  inset: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 7;
-
-  min-width: min(900px, 90%);
-  min-height: min(480px, 90%);
-
-  height: fit-content;
-
-  background-color: ${({ theme }) => theme.true.newBlack};
-
-  border: 1px solid ${({ theme }) => theme.true.white20};
-  border-radius: 24px;
-  padding: 40px;
-
   display: flex;
   flex-direction: column;
   gap: 24px;
+
+  position: fixed;
+  z-index: 7;
+  bottom: 0;
+  height: calc(100lvh - 32px);
+  width: 100vw;
+
+  background-color: #181935;
+
+  border-radius: 24px 24px 0 0;
+  padding: 20px;
+
+  @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
+    padding: 40px;
+
+    height: fit-content;
+    min-height: min(480px, 90%);
+
+    min-width: min(800px, 90%);
+    width: fit-content;
+
+    transform: translate(-50%, -50%);
+    inset: 50%;
+
+    border-radius: 24px;
+  }
 `;
 
 export const ArrowContainer = styled.div`
   display: grid;
   place-items: center;
+  cursor: pointer;
 `;
 
 export const Header = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+  height: fit-content;
 `;
 
 export const Title = styled.h1`
@@ -71,17 +84,19 @@ export const Title = styled.h1`
 export const AssetVisualization = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 16px;
+
+  height: fit-content;
 
   padding: 16px;
   border-radius: 8px;
 
-  background-color: ${({ theme }) => theme.ito.darkGray};
+  background-color: #222345;
 `;
 
 export const AssetName = styled.h2`
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: ${({ theme }) => theme.true.white};
 `;
 
@@ -89,12 +104,17 @@ export const BuyForm = styled.form`
   display: flex;
   flex-direction: column;
   gap: 16px;
+  height: 100%;
+
+  overflow: hidden;
 `;
 
 export const InputRow = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+  height: fit-content;
+  max-height: 50%;
 `;
 
 export const Label = styled.label`
@@ -112,9 +132,11 @@ export const Input = styled.textarea`
 
   border-radius: 8px;
 
+  outline: none;
+
   border: 1px solid ${({ theme }) => theme.true.white};
 
-  padding: 6px;
+  padding: 10px;
 
   min-width: 100%;
   max-width: 100%;
@@ -126,60 +148,40 @@ export const Input = styled.textarea`
 `;
 
 export const RTEArea = styled(EditorContent)`
-  div:first-child {
-    color: ${({ theme }) => theme.true.white};
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  .tiptap {
+    color: ${({ theme }) => theme.darkText};
+
     background-color: transparent;
 
-    border-radius: 8px;
-
-    border: 1px solid ${({ theme }) => theme.true.white};
-
-    padding: 10px;
+    padding: 8px;
 
     min-width: 100%;
     max-width: 100%;
 
     min-height: 120px;
+    height: 100%;
 
     font-size: 1rem;
-    line-height: 1.25rem;
+    line-height: 1.5;
+
+    overflow-y: auto;
+
+    @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
+      max-height: 120px;
+    }
   }
 
-  .ProseMirror > * + * {
-    margin-top: 0.75em;
+  border: 1px solid ${({ theme }) => theme.true.white};
+  border-radius: 8px;
+  .ProseMirror {
+    ${RTEStyles}
   }
-
-  .ProseMirror ul {
-    padding: 0 1rem;
-    list-style: disc !important;
-  }
-  .ProseMirror ol {
-    padding: 0 2rem;
-    list-style: decimal !important;
-  }
-
-  .ProseMirror hr {
-    border: none;
-    border-top: 3px solid #999999;
-    margin: 2rem 0;
-  }
-
-  .ProseMirror h1 {
-    font-size: 2.5em;
-    font-weight: bold;
-    margin: 0.67em 0;
-  }
-
-  .ProseMirror h2 {
-    font-size: 2em;
-    font-weight: bold;
-    margin: 0.75em 0;
-  }
-
-  .ProseMirror h3 {
-    font-size: 1.75em;
-    font-weight: bold;
-    margin: 0.83em 0;
+  .ProseMirror:focus {
+    outline: none;
   }
 `;
 

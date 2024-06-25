@@ -1,10 +1,14 @@
 import { type Editor } from '@tiptap/react';
-import { ToolbarButton, ToolbarStyle } from './styles';
+import { ToolbarButton, ToolbarStyle, Icon } from './styles';
 import {
   MdFormatBold,
   MdFormatItalic,
   MdFormatUnderlined,
 } from 'react-icons/md';
+import { RiArrowGoBackLine, RiArrowGoForwardLine } from 'react-icons/ri';
+import { MdFormatListNumbered } from 'react-icons/md';
+import { MdFormatListBulleted } from 'react-icons/md';
+
 import { LuHeading1, LuHeading2, LuHeading3 } from 'react-icons/lu';
 import { AiOutlineStrikethrough } from 'react-icons/ai';
 
@@ -20,11 +24,37 @@ export const Toolbar = ({ editor }: ToolbarProps) => {
       <ToolbarButton
         onClick={e => {
           e.preventDefault();
+          editor.chain().focus().undo().run();
+        }}
+        active={false}
+      >
+        <Icon>
+          <RiArrowGoBackLine />
+        </Icon>
+      </ToolbarButton>
+
+      <ToolbarButton
+        onClick={e => {
+          e.preventDefault();
+          editor.chain().focus().redo().run();
+        }}
+        active={false}
+      >
+        <Icon>
+          <RiArrowGoForwardLine />
+        </Icon>
+      </ToolbarButton>
+
+      <ToolbarButton
+        onClick={e => {
+          e.preventDefault();
           editor.chain().focus().toggleBold().run();
         }}
         active={editor.isActive('bold')}
       >
-        <MdFormatBold />
+        <Icon>
+          <MdFormatBold />
+        </Icon>
       </ToolbarButton>
 
       <ToolbarButton
@@ -34,7 +64,9 @@ export const Toolbar = ({ editor }: ToolbarProps) => {
         }}
         active={editor.isActive('italic')}
       >
-        <MdFormatItalic />
+        <Icon>
+          <MdFormatItalic />
+        </Icon>
       </ToolbarButton>
 
       <ToolbarButton
@@ -44,7 +76,9 @@ export const Toolbar = ({ editor }: ToolbarProps) => {
         }}
         active={editor.isActive('underline')}
       >
-        <MdFormatUnderlined />
+        <Icon>
+          <MdFormatUnderlined />
+        </Icon>
       </ToolbarButton>
 
       <ToolbarButton
@@ -54,7 +88,9 @@ export const Toolbar = ({ editor }: ToolbarProps) => {
         }}
         active={editor.isActive('strike')}
       >
-        <AiOutlineStrikethrough />
+        <Icon>
+          <AiOutlineStrikethrough />
+        </Icon>
       </ToolbarButton>
 
       <ToolbarButton
@@ -64,7 +100,9 @@ export const Toolbar = ({ editor }: ToolbarProps) => {
         }}
         active={editor.isActive('heading', { level: 1 })}
       >
-        <LuHeading1 />
+        <Icon>
+          <LuHeading1 />
+        </Icon>
       </ToolbarButton>
 
       <ToolbarButton
@@ -74,7 +112,9 @@ export const Toolbar = ({ editor }: ToolbarProps) => {
         }}
         active={editor.isActive('heading', { level: 2 })}
       >
-        <LuHeading2 />
+        <Icon>
+          <LuHeading2 />
+        </Icon>
       </ToolbarButton>
       <ToolbarButton
         onClick={e => {
@@ -83,7 +123,33 @@ export const Toolbar = ({ editor }: ToolbarProps) => {
         }}
         active={editor.isActive('heading', { level: 3 })}
       >
-        <LuHeading3 />
+        <Icon>
+          <LuHeading3 />
+        </Icon>
+      </ToolbarButton>
+
+      <ToolbarButton
+        onClick={e => {
+          e.preventDefault();
+          editor.chain().focus().toggleBulletList().run();
+        }}
+        active={editor.isActive('bulletList')}
+      >
+        <Icon>
+          <MdFormatListBulleted />
+        </Icon>
+      </ToolbarButton>
+
+      <ToolbarButton
+        onClick={e => {
+          e.preventDefault();
+          editor.chain().focus().toggleOrderedList().run();
+        }}
+        active={editor.isActive('orderedList')}
+      >
+        <Icon>
+          <MdFormatListNumbered />
+        </Icon>
       </ToolbarButton>
     </ToolbarStyle>
   );

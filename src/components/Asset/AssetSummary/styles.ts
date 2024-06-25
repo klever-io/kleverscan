@@ -105,33 +105,140 @@ export const Header = styled.div`
   }
 `;
 
+export const RTEStyles = css`
+  p {
+    color: ${({ theme }) => theme.darkText};
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  ul {
+    padding: 0 1rem;
+    list-style: disc !important;
+  }
+  ol {
+    padding: 0 2rem;
+    list-style: decimal !important;
+  }
+
+  hr {
+    border: none;
+    border-top: 3px solid #999999;
+    margin: 2rem 0;
+  }
+
+  h1 {
+    font-size: 2em;
+    font-weight: bold;
+  }
+
+  h2 {
+    color: ${({ theme }) => theme.darkText};
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+
+  h3 {
+    font-size: 1.17em;
+    font-weight: bold;
+  }
+`;
+
 export const About = styled.div`
   display: flex;
   flex-direction: column;
   gap: 24px;
 
-  padding: 80px 0;
+  padding-bottom: 80px;
 
-  h2 {
-    color: ${({ theme }) => theme.black};
-    font-size: 1.5rem;
-    font-weight: 600;
-    line-height: 2rem;
+  line-height: 1.5;
+`;
 
-    display: flex;
-    align-items: center;
-    gap: 8px;
+export const AboutTitle = styled.h2`
+  color: ${({ theme }) => theme.black};
+  font-size: 1.5rem;
+  font-weight: 600;
+`;
+
+export const AboutContent = styled.p<{ editable?: boolean }>`
+  color: ${({ theme }) => theme.darkText};
+  border: 2px solid ${props => (props.editable ? '#646693 ' : 'transparent')};
+  border-radius: 8px;
+  padding: 12px 16px;
+  ${RTEStyles}
+`;
+
+export const AddDescriptionButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 8px 16px;
+  border-radius: 24px;
+
+  border-radius: 24px;
+  border: 1px solid ${({ theme }) => theme.violet};
+
+  background-color: ${({ theme }) => theme.violet};
+  color: ${({ theme }) => theme.true.white} !important;
+
+  font-weight: 700;
+  font-size: 0.875rem;
+  line-height: 1;
+  text-decoration: none;
+
+  cursor: pointer;
+  transition: 0.2s;
+
+  &:hover {
+    filter: brightness(1.2);
   }
+`;
 
+export const EditDescriptionButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  align-self: end;
+
+  padding: 8px 16px;
+  border-radius: 24px;
+
+  border-radius: 24px;
+  border: 1px solid ${({ theme }) => theme.violet};
+
+  background-color: ${({ theme }) => theme.violet};
+  color: ${({ theme }) => theme.true.white} !important;
+
+  font-weight: 700;
+  font-size: 0.875rem;
+  line-height: 1;
+  text-decoration: none;
+
+  cursor: pointer;
+  transition: 0.2s;
+
+  &:hover {
+    filter: brightness(1.2);
+  }
+`;
+
+export const AddProjectDescription = styled.div`
   p {
-    color: ${({ theme }) => theme.darkText};
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5;
+    color: ${({ theme }) => theme.black};
   }
-  p h2 {
-    color: ${({ theme }) => theme.darkText};
+  p:first-child {
+    font-weight: 700;
   }
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
 `;
 
 export const EditContainer = styled.div`

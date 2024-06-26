@@ -25,7 +25,7 @@ As of now (10/10/2023) we are currently working on adding tests to the project. 
 
 ## Issues and Bugs
 
-If you find a bug or issue with the project, please open an issue on the GitHub repository. Please include a clear description of the issue and steps to reproduce it. You can also open a pull request with a fix for the issue or message us on our [Slack Channel](https://join.slack.com/t/klever-blockchain/shared_invite/zt-1z69ikw0g-dXtRY7eGTnyRllsCV_YGOw) or through our [Forum](https://forum.klever.org/).
+If you find a bug or issue with the project, please open an issue on the GitHub repository. Please include a clear description of the issue and steps to reproduce it. You can also open a pull request with a fix for the issue or message us on our [Forum](https://forum.klever.org/).
 
 ## Pull Requests
 

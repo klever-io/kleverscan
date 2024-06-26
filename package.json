@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@directus/sdk": "^15.0.2",
-    "@klever/sdk-web": "^1.1.4",
+    "@klever/sdk-web": "^2.0.0",
     "@svgr/webpack": "^8.1.0",
     "@unform/core": "2.1.6",
     "@unform/web": "^2.1.6",

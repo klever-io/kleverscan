@@ -28,4 +28,4 @@ This project is licensed under the terms of the [GNU GPLv3](LICENSE).
 
 ## Support
 
-If you have any questions or issues, please feel free to reach out to us on our [Slack Channel](https://join.slack.com/t/klever-blockchain/shared_invite/zt-1z69ikw0g-dXtRY7eGTnyRllsCV_YGOw) or through our [Forum](https://forum.klever.org/).
+If you have any questions or issues, please feel free to reach out to us on our [Forum](https://forum.klever.org/).

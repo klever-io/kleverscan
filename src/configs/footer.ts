@@ -1,5 +1,4 @@
 import {
-  Discord,
   Facebook,
   Github,
   Instagram,
@@ -38,10 +37,6 @@ const socials: ISocial[] = [
     link: 'https://twitter.com/klever_io',
   },
   {
-    Icon: Discord,
-    link: 'https://discord.gg/klever-io',
-  },
-  {
     Icon: Instagram,
     link: 'https://instagram.com/klever.io',
   },
@@ -74,10 +69,7 @@ const contents: IContent[] = [
         name: 'Forum',
         href: 'https://forum.klever.org/',
       },
-      {
-        name: 'Devs Community',
-        href: 'https://join.slack.com/t/klever-blockchain/shared_invite/zt-1z69ikw0g-dXtRY7eGTnyRllsCV_YGOw',
-      },
+
       { name: 'Klever.Org', href: 'https://klever.org/' },
       { name: 'Klever Docs', href: 'https://docs.klever.finance/' },
       { name: 'Klever News', href: 'https://klevernews.com/' },

@@ -1,6 +1,6 @@
 {
   "name": "explorer",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "private": true,
   "license": "GPL-3.0-only",
   "scripts": {
@@ -33,7 +33,7 @@
     "i18next": "^23.11.5",
     "ioredis": "4.28.2",
     "leaflet": "1.7.1",
-    "next": "13",
+    "next": "^14.2.4",
     "next-i18next": "^15.3.0",
     "next-images": "1.8.1",
     "next-styled-nprogress": "1.0.3",
@@ -84,7 +84,7 @@
     "@typescript-eslint/eslint-plugin": "^7.6.0",
     "bech32": "^2.0.0",
     "eslint": "^9.0.0",
-    "eslint-config-next": "13",
+    "eslint-config-next": "^14.2.4",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-testing-library": "^6.2.0",
     "git-commit-msg-linter": "4.5.0",

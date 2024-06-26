@@ -142,7 +142,7 @@ export const ApplyFormModal: React.FC<
 
   return (
     <Container isOpenApplyFormModal={isOpenApplyFormModal}>
-      <Content>
+      <Content opened={isOpenApplyFormModal}>
         <Header>
           <ArrowContainer onClick={closeModal}>
             <StyledArrow />

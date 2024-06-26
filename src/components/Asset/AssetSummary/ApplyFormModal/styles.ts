@@ -18,6 +18,14 @@ export const Container = styled.div<{ isOpenApplyFormModal: boolean }>`
       : css`
           opacity: 0;
           pointer-events: none;
+
+          transition-delay: 0.4s;
+
+          @media screen and (min-width: ${props =>
+              props.theme.breakpoints.mobile}) {
+            transition-delay: 0s;
+            transition: opacity 100ms linear;
+          }
         `}
 `;
 
@@ -30,21 +38,26 @@ export const Background = styled.div`
   z-index: 6;
 `;
 
-export const Content = styled.div`
+export const Content = styled.div<{ opened: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 24px;
 
-  position: fixed;
-  z-index: 7;
-  bottom: 0;
+  padding: 20px;
   height: calc(100lvh - 32px);
   width: 100vw;
+
+  bottom: 0;
+
+  transform: translateY(${props => (props.opened ? 0 : '100%')});
+  transition: transform 0.4s ease-out;
+
+  position: fixed;
+  z-index: 7;
 
   background-color: #181935;
 
   border-radius: 24px 24px 0 0;
-  padding: 20px;
 
   @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
     padding: 40px;

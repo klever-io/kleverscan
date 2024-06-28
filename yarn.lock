@@ -1537,10 +1537,10 @@
   dependencies:
     "@protobuf-ts/plugin" "^2.7.0"
 
-"@klever/sdk-web@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@klever/sdk-web/-/sdk-web-2.0.0.tgz#bdb46398cce4e422eafd83a390a7d16076048fd4"
-  integrity sha512-g4Gt/UOcAL31AWRy+0B5YCN0KVSGxBMMEqKEq2T8X36ahbo3WB4/UyDRsUJ3KBRQVsL0dQ2tUccIFcgaSiUI4w==
+"@klever/sdk-web@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@klever/sdk-web/-/sdk-web-1.3.0.tgz#89bba1088989f14dc6b3febf4a6d4cf1e3045a7e"
+  integrity sha512-zHVtQ/s9+W35QtsPekZUWHob1NzfmNODzpOyXB39BVfa0Pm+LDULOYwUtAF37DAeCCCAyVNoFp93a34w2BUzzQ==
   dependencies:
     "@klever/kleverweb" "^1.2.2"
     bech32 "^2.0.0"

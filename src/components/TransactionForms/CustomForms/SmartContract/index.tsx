@@ -197,7 +197,11 @@ const parseArgument = (
   let parsedValue = '';
 
   const required = !raw_type?.startsWith('Option');
-  const type = utils.getJSType(raw_type);
+  let type = utils.getJSType(raw_type);
+
+  if (type === raw_type && abi?.types?.[raw_type]?.type === 'enum') {
+    raw_type = 'u64';
+  }
 
   if (typeof value === 'number' && isNaN(value)) {
     return '';

@@ -552,8 +552,8 @@ export interface ISmartContract {
   typeValue: number;
   address: string;
   callValue: {
-    [coin: string]: number;
-  };
+    [coin: string]: number | string;
+  }[];
 }
 
 export type IParameter =

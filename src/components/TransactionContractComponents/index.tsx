@@ -705,7 +705,6 @@ export const CreateValidator: React.FC<PropsWithChildren<IIndexedContract>> = ({
 
   return (
     <>
-      {' '}
       <Row>
         <span>
           <strong>Type</strong>
@@ -2653,7 +2652,6 @@ export const SmartContract: React.FC<PropsWithChildren<IIndexedContract>> = ({
         <span>
           <strong>Contract Address</strong>
         </span>
-
         <CenteredRow>
           <span>{scAddress}</span>
           <Copy data={scAddress} info="address"></Copy>
@@ -2673,13 +2671,15 @@ export const SmartContract: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <RowContent>
             <BalanceContainer>
               <NetworkParamsContainer>
-                {Object.entries(parameter?.callValue || {}).map(
-                  ([key, value]) => (
-                    <div key={key}>
-                      <strong>{key}</strong>
-                      <span>{value}</span>
-                    </div>
-                  ),
+                {(parameter?.callValue || []).map(value =>
+                  Object.entries(value || {}).map(([key, value]) => {
+                    return (
+                      <div key={key}>
+                        <strong>{key}</strong>
+                        <span>{value}</span>
+                      </div>
+                    );
+                  }),
                 )}
               </NetworkParamsContainer>
             </BalanceContainer>

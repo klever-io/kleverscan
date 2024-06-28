@@ -75,9 +75,8 @@ const PrePageTooltip: React.FC<PropsWithChildren<IPrePageTooltip>> = ({
 }) => {
   const [precision, setPrecision] = useState(0);
   const trimmedSearch = search.trim().toLowerCase();
-  const { setLinkValue } = useInputSearch();
+  const { setSearchValue } = useInputSearch();
   const type = getInputType(trimmedSearch);
-  const { isDarkTheme } = useTheme();
   const canSearch = () => {
     if (!type) {
       return false;
@@ -91,12 +90,6 @@ const PrePageTooltip: React.FC<PropsWithChildren<IPrePageTooltip>> = ({
     queryFn: () => getCorrectQueryFn(),
     enabled: canSearchResult,
   });
-
-  if (!isLoading && canSearchResult && !data?.data) {
-    setLinkValue(trimmedSearch, '');
-  } else {
-    setLinkValue(trimmedSearch, type);
-  }
 
   const isAsset = () => {
     if (type === 'asset') {
@@ -142,6 +135,9 @@ const PrePageTooltip: React.FC<PropsWithChildren<IPrePageTooltip>> = ({
 
   const getCorrectRowSections = (data: SearchRequest): IRowSection[] => {
     if (isAsset()) {
+      setSearchValue(
+        `/asset/${(data as IAssetResponse)?.data?.asset?.assetId}`,
+      );
       return AssetRowSections(
         data as IAssetResponse,
         precision,
@@ -151,6 +147,9 @@ const PrePageTooltip: React.FC<PropsWithChildren<IPrePageTooltip>> = ({
     }
 
     if (isAccount()) {
+      setSearchValue(
+        `/account/${(data as IAccountResponse)?.data?.account?.address}`,
+      );
       return AccountRowSections(
         data as IAccountResponse,
         precision,
@@ -159,6 +158,9 @@ const PrePageTooltip: React.FC<PropsWithChildren<IPrePageTooltip>> = ({
     }
 
     if (isTransaction()) {
+      setSearchValue(
+        `/transaction/${(data as ITransactionResponse)?.data?.transaction?.hash}`,
+      );
       return TransactionRowSections(
         data as ITransactionResponse,
         precision,
@@ -167,6 +169,7 @@ const PrePageTooltip: React.FC<PropsWithChildren<IPrePageTooltip>> = ({
     }
 
     if (isBlock()) {
+      setSearchValue(`/block/${(data as IBlockResponse)?.data?.block?.nonce}`);
       return BlockRowSections(
         data as IBlockResponse,
         precision,

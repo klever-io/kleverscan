@@ -333,7 +333,7 @@ const Validator: React.FC<PropsWithChildren<IValidatorPage>> = () => {
               </span>
               {validator ? (
                 <BoldElement>
-                  <span>
+                  <span data-testid="total-stake">
                     {(
                       validator.totalStake /
                       10 ** KLV_PRECISION

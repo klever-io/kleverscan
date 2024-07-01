@@ -239,6 +239,7 @@ const PrePageTooltip: React.FC<PropsWithChildren<IPrePageTooltip>> = ({
                     key={index}
                     isRightAligned={isRightAligned}
                     columnSpan={span}
+                    data-testid="card-item"
                   >
                     <Element />
                   </CardItem>

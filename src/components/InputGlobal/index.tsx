@@ -91,7 +91,7 @@ const Input: React.FC<PropsWithChildren<InputGlobal>> = ({
 
   return (
     <Container {...containerProps}>
-      <input {...inputProps} />
+      <input {...inputProps} data-testid="search" />
       <Search onClick={handleSearch} id={'SearchIcon'} />
       {showTooltip && (
         <>

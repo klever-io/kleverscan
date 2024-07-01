@@ -332,6 +332,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                             $smaller={smaller}
                             totalColumns={header.length}
                             currentColumn={index2}
+                            data-testid={`table-row-${index}`}
                           >
                             {isMobile || isTablet ? (
                               <MobileHeader>{header[index2]}</MobileHeader>

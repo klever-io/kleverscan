@@ -648,7 +648,9 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                   <div>
                     <BalanceKLVValue>
                       {!isLoadingAccount ? (
-                        totalKLV.toLocaleString()
+                        <span data-testid="klv-balance">
+                          {totalKLV.toLocaleString()}
+                        </span>
                       ) : (
                         <Skeleton height={19} />
                       )}
@@ -811,6 +813,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
               onClick={() => {
                 setSelectedTabHeader(header);
               }}
+              data-testid={`header-tab`}
             >
               <span>{header}</span>
             </CardHeaderItem>

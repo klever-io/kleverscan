@@ -235,7 +235,7 @@ export const Checkbox = styled.input`
     box-shadow: inset 0 0 0 1px ${({ theme }) => theme.darkText};
   }
 
-  :checked {
+  &:checked {
     background-color: ${({ theme }) => theme.violet};
     &::before {
       box-shadow: none;

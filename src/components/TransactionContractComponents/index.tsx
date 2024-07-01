@@ -2650,6 +2650,18 @@ export const SmartContract: React.FC<PropsWithChildren<IIndexedContract>> = ({
     <>
       <Row>
         <span>
+          <strong>Type</strong>
+        </span>
+        <strong>Smart Contract</strong>
+      </Row>
+      <Row>
+        <span>
+          <strong>SC Type</strong>
+        </span>
+        <span>{(parameter?.type || '').slice(2)}</span>
+      </Row>
+      <Row>
+        <span>
           <strong>Contract Address</strong>
         </span>
         <CenteredRow>
@@ -2657,12 +2669,7 @@ export const SmartContract: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <Copy data={scAddress} info="address"></Copy>
         </CenteredRow>
       </Row>
-      <Row>
-        <span>
-          <strong>Type</strong>
-        </span>
-        <span>{(parameter?.type || '').slice(2)}</span>
-      </Row>
+
       {Object.entries(parameter?.callValue || {}).length > 0 && (
         <Row>
           <span>

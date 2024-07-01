@@ -62,7 +62,7 @@ export const ContentButton = styled.div<{ selected?: boolean }>`
       }
     `}
 
-  :active {
+  &:active {
     box-shadow: 0 0 10px 5px ${({ theme }) => theme.border};
   }
 `;

@@ -118,7 +118,7 @@ export const ContentTitle = styled.section`
     font-weight: 400;
     font-size: 0.8rem;
 
-    :visited {
+    &:visited {
       color: ${({ theme }) => theme.gray};
     }
     &:hover {

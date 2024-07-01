@@ -34,7 +34,7 @@ export const ButtonModal = styled.button<{
     color: ${props => props.theme.black} !important;
   }
 
-  :active {
+  &:active {
     transform: ${props => (props.isLocked ? '' : 'translateY(0.1rem)')};
   }
 

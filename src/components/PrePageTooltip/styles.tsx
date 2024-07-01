@@ -19,7 +19,7 @@ export const TooltipBody = styled.article<{ isInHomePage: boolean }>`
     left: 0rem;
   }
 
-  :after {
+  &:after {
     content: '';
     display: inline-block;
     background-color: ${props =>

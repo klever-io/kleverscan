@@ -20,9 +20,14 @@ import {
   Input,
   InputRow,
   Label,
+  RTEArea,
   SubmitButton,
   Title,
 } from './styles';
+import { useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Underline from '@tiptap/extension-underline';
+import { Toolbar } from './Toolbar';
 
 const ReactSelect = dynamic(() => import('react-select'), {
   ssr: false,
@@ -127,14 +132,22 @@ export const ApplyFormModal: React.FC<
     }
   };
 
+  const editor = useEditor({
+    extensions: [StarterKit, Underline],
+    content: `${projectDescription}`,
+    onUpdate({ editor }) {
+      setProjectDescription(editor.getHTML());
+    },
+  });
+
   return (
     <Container isOpenApplyFormModal={isOpenApplyFormModal}>
-      <Content>
+      <Content opened={isOpenApplyFormModal}>
         <Header>
           <ArrowContainer onClick={closeModal}>
             <StyledArrow />
           </ArrowContainer>
-          <Title>Add info your project</Title>
+          <Title>Add info to your project</Title>
         </Header>
 
         <AssetVisualization>
@@ -170,12 +183,9 @@ export const ApplyFormModal: React.FC<
 
           <InputRow>
             <Label>About the Project</Label>
-            <Input
-              value={projectDescription}
-              onChange={e => {
-                setProjectDescription(e.target.value);
-              }}
-            />
+            <RTEArea editor={editor}>
+              <Toolbar editor={editor} />
+            </RTEArea>
           </InputRow>
         </BuyForm>
         <SubmitButton type="submit" form="buyForm">

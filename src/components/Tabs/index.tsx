@@ -43,7 +43,11 @@ const Tabs: React.FC<PropsWithChildren<ITabs>> = ({
             };
 
             return (
-              <ItemContainer key={String(index)} {...itemProps}>
+              <ItemContainer
+                key={String(index)}
+                data-testid={`tab`}
+                {...itemProps}
+              >
                 <span>{header}</span>
                 <Indicator selected={index === selected} />
               </ItemContainer>
@@ -51,7 +55,7 @@ const Tabs: React.FC<PropsWithChildren<ITabs>> = ({
           })}
         </TabContent>
       </TabContainer>
-      {children}
+      <div data-testid={`tab-content-${selected}`}>{children}</div>
     </Container>
   );
 };

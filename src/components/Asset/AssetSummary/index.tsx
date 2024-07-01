@@ -20,8 +20,14 @@ import { useQuery } from 'react-query';
 import { ApplyFormModal } from './ApplyFormModal';
 import { AssetITOSummary } from './AssetITOSummary';
 import { ParticipateModal } from './ParticipateModal';
+import DOMPurify from 'dompurify';
+
 import {
   About,
+  AboutContent,
+  AboutTitle,
+  AddDescriptionButton,
+  AddProjectDescription,
   AssetHeaderContainer,
   AssetSubtitle,
   AssetTitle,
@@ -30,6 +36,7 @@ import {
   Container,
   Description,
   EditContainer,
+  EditDescriptionButton,
   Header,
   LeftSide,
   LinkStyles,
@@ -160,23 +167,9 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
             </AssetTitle>
           </TitleContainer>
 
-          <>
-            {asset_info?.short_description ? (
-              <Description>{asset_info?.short_description}</Description>
-            ) : null}
-            {!asset_info?.short_description &&
-            walletAddress &&
-            asset?.ownerAddress === walletAddress ? (
-              <ParticipateButton
-                secondary
-                type="button"
-                onClick={() => setOpenApplyFormModal(true)}
-              >
-                <TbPencilMinus />
-                Add a description
-              </ParticipateButton>
-            ) : null}
-          </>
+          {asset_info?.short_description ? (
+            <Description>{asset_info?.short_description}</Description>
+          ) : null}
 
           <SocialNetworks>
             {getSocialNetworks().map(social => (
@@ -213,15 +206,45 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
       </Header>
       {asset_info?.project_description_copy ? (
         <About>
-          <h2>
-            About the project
-            {walletAddress && asset?.ownerAddress === walletAddress && (
-              <EditContainer onClick={() => setOpenApplyFormModal(true)}>
-                <TbPencilMinus />
-              </EditContainer>
-            )}
-          </h2>
-          <p>{asset_info?.project_description_copy}</p>
+          <AboutTitle>About the project</AboutTitle>
+          <AboutContent
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(asset_info?.project_description_copy),
+            }}
+            editable={
+              walletAddress && asset?.ownerAddress === walletAddress
+                ? true
+                : false
+            }
+          />
+
+          {walletAddress && asset?.ownerAddress === walletAddress && (
+            <EditDescriptionButton
+              type="button"
+              onClick={() => setOpenApplyFormModal(true)}
+            >
+              <TbPencilMinus />
+              Edit description
+            </EditDescriptionButton>
+          )}
+        </About>
+      ) : null}
+      {!asset_info?.project_description_copy &&
+      walletAddress &&
+      asset?.ownerAddress === walletAddress ? (
+        <About>
+          <AboutTitle>About the project</AboutTitle>
+          <AddProjectDescription>
+            <p>Add a Project Description</p>
+            <p>Add a brief description of your project here.</p>
+            <AddDescriptionButton
+              type="button"
+              onClick={() => setOpenApplyFormModal(true)}
+            >
+              <TbPencilMinus />
+              Add a description
+            </AddDescriptionButton>
+          </AddProjectDescription>
         </About>
       ) : null}
       {asset &&

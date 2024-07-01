@@ -50,13 +50,19 @@ export async function getPrecision(
       }, {});
     } catch (error: any) {
       console.error(error);
-      throw new Error(error);
+      return Object.keys(assetIds).reduce((prev, current) => {
+        return {
+          ...prev,
+          [current]: 0,
+        };
+      }, {});
     }
   } else if (typeof assetIds === 'string') {
     const assetId = assetIds;
 
     if (assetId === '') {
-      throw new Error('Empty Asset ID');
+      console.error('Empty Asset ID');
+      return 0;
     }
 
     if (
@@ -69,16 +75,19 @@ export async function getPrecision(
         localStorage.setItem('precisions', JSON.stringify(newPrecisions));
         if (precisions[assetId] === undefined) {
           console.error(`Asset not found - ${assetId}`);
+          return 0;
         }
         return precisions[assetId];
       } catch (error: any) {
-        throw new Error(error);
+        console.error(error);
+        return 0;
       }
     } else {
       return storedPrecisions[assetId.split('/')[0]];
     }
   } else {
-    throw new Error('Invalid Param');
+    console.error('Invalid assetId');
+    return 0;
   }
 }
 

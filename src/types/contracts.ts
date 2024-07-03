@@ -552,8 +552,8 @@ export interface ISmartContract {
   typeValue: number;
   address: string;
   callValue: {
-    [coin: string]: number;
-  };
+    [coin: string]: number | string;
+  }[];
 }
 
 export type IParameter =
@@ -671,7 +671,7 @@ interface Endpoint {
   payableInTokens?: string[];
 }
 
-export type ABIStruct = {
+export type ABIType = {
   type: string;
   fields?: ABIStructField[];
   variants?: ABIVariant[];
@@ -684,6 +684,7 @@ export type ABIStructField = {
 type ABIVariant = {
   name: string;
   fields: ABIVariantField[];
+  discriminant?: number;
 };
 
 type ABIVariantField = {
@@ -705,7 +706,7 @@ export interface ABI {
   name: string;
   constructor: Constructor;
   endpoints: Endpoint[];
-  types: Map<string, ABIStruct>;
+  types: Record<string, ABIType>;
 }
 
 export const RUST_TYPES = [

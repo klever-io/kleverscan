@@ -1,5 +1,5 @@
 import { PropsWithChildren } from 'react';
-import { ABIStruct, RUST_TYPES_WITH_OPTION } from '@/types/contracts';
+import { ABIType, RUST_TYPES_WITH_OPTION } from '@/types/contracts';
 import { utils } from '@klever/sdk-web';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -24,13 +24,13 @@ const ReactSelect = dynamic(() => import('react-select'), {
 
 interface IArguments {
   arguments?: ABIFunctionArguments;
-  structs?: Record<string, ABIStruct>;
+  types?: Record<string, ABIType>;
   handleInputChange: (e: React.FocusEvent<HTMLInputElement>) => void;
 }
 
 const getInitialValue = (
   rawType: string,
-  structs?: Record<string, ABIStruct>,
+  types?: Record<string, ABIType>,
   inner = false,
 ) => {
   const type = utils.getJSType(rawType);
@@ -45,14 +45,14 @@ const getInitialValue = (
   }
 
   if (type === 'object') {
-    if (!structs) {
+    if (!types) {
       return '';
     }
-    const struct = structs[rawType];
+    const struct = types[rawType];
     const initialObjectValue = {};
 
     Object.entries(struct?.fields || []).forEach(([key, v]) => {
-      const initialValue = getInitialValue(v.type, structs, true);
+      const initialValue = getInitialValue(v.type, types, true);
       initialObjectValue[v.name] = initialValue;
     });
 
@@ -63,7 +63,7 @@ const getInitialValue = (
 
 export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
   arguments: args,
-  structs,
+  types,
   handleInputChange,
 }) => {
   const { control, getValues } = useFormContext();
@@ -80,8 +80,14 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
           name: key,
           type: args[key].type,
           raw_type: args[key].raw_type,
-          value: getInitialValue(args[key].raw_type, structs),
+          value: getInitialValue(args[key].raw_type, types),
           required: args[key].required,
+          options: types?.[args[key].raw_type]?.variants?.map(variant => {
+            return {
+              label: variant.name,
+              value: variant.discriminant,
+            };
+          }),
         })),
       );
       handleInputChange({} as any);
@@ -116,6 +122,8 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
             break;
         }
 
+        const inputType = field.type === 'enum' ? 'dropdown' : field.type;
+
         return (
           <FormSection key={field.id} inner>
             <SectionTitle>
@@ -135,11 +143,12 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
               }
               dynamicInitialValue={field.value}
               customOnChange={handleInputChange}
-              type={field.type}
+              type={inputType}
               placeholder={placeholder}
               tooltip={tooltip.arguments.value}
               required={field.required}
               toggleOptions={['False', 'True']}
+              options={field?.options}
               canBeNaN
             />
           </FormSection>
@@ -153,7 +162,7 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
               append({
                 type: utils.getJSType(newValue.value),
                 raw_type: newValue.value,
-                value: getInitialValue(newValue.value, structs),
+                value: getInitialValue(newValue.value, types),
               });
             }}
             value={null}

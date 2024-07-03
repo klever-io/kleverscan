@@ -1,4 +1,4 @@
-import { isBeta } from '@/configs/navbar';
+import { isBeta } from '@/configs/transactions';
 import {
   Contract,
   ContractsIndex,

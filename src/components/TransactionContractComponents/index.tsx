@@ -2678,15 +2678,13 @@ export const SmartContract: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <RowContent>
             <BalanceContainer>
               <NetworkParamsContainer>
-                {(parameter?.callValue || []).map(value =>
-                  Object.entries(value || {}).map(([key, value]) => {
-                    return (
-                      <div key={key}>
-                        <strong>{key}</strong>
-                        <span>{value}</span>
-                      </div>
-                    );
-                  }),
+                {parameter?.callValue?.map(value =>
+                  Object.entries(value).map(([key, value]) => (
+                    <div key={key}>
+                      <strong>{key}</strong>
+                      <span>{value}</span>
+                    </div>
+                  )),
                 )}
               </NetworkParamsContainer>
             </BalanceContainer>

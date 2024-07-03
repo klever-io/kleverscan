@@ -22,11 +22,6 @@ export const heightLimit = 70; // pixels
 export const navbarHeight = 5; // rem
 export const navbarPadding = '1rem 17.5rem';
 
-export const isBeta =
-  process.env.DEFAULT_NODE_HOST?.includes('devnet') ||
-  process.env.DEFAULT_NODE_HOST?.includes('testnet') ||
-  process.env.DEFAULT_IS_BETA;
-
 const navbarItems: INavbarItem[] = [
   {
     name: 'Blocks',

@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
-import { ABI, ABIStruct } from '@/types/contracts';
+import { ABI, ABIType } from '@/types/contracts';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { getNetwork } from '@/utils/networkFunctions';
 import { abiEncoder, utils } from '@klever/sdk-web';
@@ -35,7 +35,7 @@ type FormData = {
 interface ABIMap {
   functions?: ABIFunctionMap;
   construct: ABIFunction;
-  structs?: Record<string, ABIStruct>;
+  types?: Record<string, ABIType>;
 }
 
 interface ABIFunctionMap {
@@ -98,13 +98,11 @@ const parseFunctionArguments = (
   }
 };
 
-const parseAbiStructs = (abi: string): Record<string, ABIStruct> => {
+const parseAbiStructs = (abi: string): Record<string, ABIType> => {
   const parsedAbi: ABI = JSON.parse(abi);
 
-  const result = {} as Record<string, ABIStruct>;
+  const result = {} as Record<string, ABIType>;
   Object.keys(parsedAbi?.types).forEach(typeItem => {
-    if (parsedAbi?.types[typeItem].type !== 'struct') return;
-
     const struct = typeItem;
     const structFields = parsedAbi?.types[typeItem];
 
@@ -118,6 +116,7 @@ const parseAbiFunctions = (
   abi: string,
 ): { functions: ABIFunctionMap; constructor: ABIFunction } => {
   const parsedAbi: ABI = JSON.parse(abi);
+  const types: Record<string, ABIType> = parsedAbi.types || {};
 
   const functions: ABIFunctionMap = {};
   parsedAbi.endpoints.forEach(endpoint => {
@@ -126,8 +125,12 @@ const parseAbiFunctions = (
     const funcName = endpoint.name;
     const inputs = endpoint.inputs.reduce((acc, input) => {
       const isOptional = input.type.startsWith('Option');
+      let type = utils.getJSType(input.type);
+      if (type === input.type) {
+        type = types[input.type]?.type || 'object';
+      }
       acc[input.name] = {
-        type: utils.getJSType(input.type),
+        type,
         required: !isOptional,
         raw_type: input.type,
       };
@@ -194,7 +197,11 @@ const parseArgument = (
   let parsedValue = '';
 
   const required = !raw_type?.startsWith('Option');
-  const type = utils.getJSType(raw_type);
+  let type = utils.getJSType(raw_type);
+
+  if (type === raw_type && abi?.types?.[raw_type]?.type === 'enum') {
+    raw_type = 'u64';
+  }
 
   if (typeof value === 'number' && isNaN(value)) {
     return '';
@@ -210,7 +217,7 @@ const parseArgument = (
     } catch (error) {
       return '';
     }
-    const struct = abi.structs?.[raw_type];
+    const struct = abi.types?.[raw_type];
     if (struct && argument !== null) {
       const structFields: string[] = Object.entries(struct?.fields || []).map(
         ([key, v]) => {
@@ -317,9 +324,9 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
 
     data['construct'] = constructor;
 
-    const structs = parseAbiStructs(abi);
-    if (Object.keys(structs)?.length > 0) {
-      data['structs'] = structs;
+    const types = parseAbiStructs(abi);
+    if (Object.keys(types)?.length > 0) {
+      data['types'] = types;
     }
 
     try {
@@ -336,7 +343,7 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
     parseFunctionArguments(getValues(), setMetadata, abi, scType, metadata);
   };
 
-  const showAddressCondition = network === 'Testnet' || scType === 0;
+  const showAddressCondition = scType === 0;
   const showAbiAndArgumentsCondition =
     scType === 0 || (scType === 1 && fileData?.length > 0);
 
@@ -361,7 +368,6 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
         label: func,
         value: func,
       }));
-
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
       <FormSection>
@@ -445,7 +451,7 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
                 ? abi?.construct?.arguments || undefined
                 : func?.arguments || undefined
             }
-            structs={abi?.structs}
+            types={abi?.types}
             handleInputChange={handleInputChange}
           />
         )}

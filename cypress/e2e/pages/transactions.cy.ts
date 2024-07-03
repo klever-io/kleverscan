@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-import { ContractsIndex } from '../../../src/types/contracts';
+import { contracts } from '../../../src/configs/transactions';
 
 const transaction_links: string[] = [];
 
@@ -13,7 +13,7 @@ describe('Transactions Page', () => {
     cy.get('h1').contains('Transactions').should('be.visible');
   });
 
-  Object.values(ContractsIndex).forEach(type => {
+  Object.values(contracts).forEach(type => {
     if (typeof type !== 'string') return;
 
     it(`should filter transactions by type - ${type}`, () => {
@@ -39,7 +39,7 @@ describe('Transactions Page', () => {
 });
 
 describe('Transaction Details Page', () => {
-  Object.values(ContractsIndex).forEach((type, index) => {
+  Object.values(contracts).forEach((type, index) => {
     if (typeof type !== 'string') return;
 
     it(`should load the transaction details page - ${type}`, () => {

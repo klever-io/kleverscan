@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import api from '@/services/api';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -46,7 +47,9 @@ const healthRequest = async (): Promise<IResultsHeath[]> => {
   }
 };
 
-const BannerResult: React.FC<IResultsHeath> = (data: IResultsHeath) => {
+const BannerResult: React.FC<PropsWithChildren<IResultsHeath>> = (
+  data: IResultsHeath,
+) => {
   const [openBanner, setOpenBanner] = useState<boolean>();
 
   const handleClick = () => {
@@ -79,7 +82,7 @@ const BannerResult: React.FC<IResultsHeath> = (data: IResultsHeath) => {
   );
 };
 
-const Banner: React.FC = () => {
+const Banner: React.FC<PropsWithChildren> = () => {
   const { data: res, isLoading: loading } = useQuery({
     queryKey: ['healthRequest'],
     queryFn: healthRequest,

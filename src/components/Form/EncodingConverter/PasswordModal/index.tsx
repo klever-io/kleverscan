@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import {
   ButtonsRow,
   Container,
@@ -21,7 +22,12 @@ export interface IButton {
   disabled?: boolean;
 }
 
-const Button: React.FC<IButton> = ({ onClick, type, children, disabled }) => {
+const Button: React.FC<PropsWithChildren<IButton>> = ({
+  onClick,
+  type,
+  children,
+  disabled,
+}) => {
   return (
     <ContainerButton onClick={onClick} type={type} disabled={disabled}>
       {children}
@@ -29,7 +35,7 @@ const Button: React.FC<IButton> = ({ onClick, type, children, disabled }) => {
   );
 };
 
-const PasswordModal: React.FC<IPasswordModalProps> = ({
+const PasswordModal: React.FC<PropsWithChildren<IPasswordModalProps>> = ({
   password,
   setPassword,
   closeModal,

@@ -1,5 +1,6 @@
+import { PropsWithChildren } from 'react';
 import { useTheme } from '@/contexts/theme';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { AiFillExclamationCircle } from 'react-icons/ai';
@@ -21,7 +22,7 @@ interface IWalletDrawer {
   clickConnectionMobile: () => void;
 }
 
-const WalletHelp: React.FC<IWalletDrawer> = ({
+const WalletHelp: React.FC<PropsWithChildren<IWalletDrawer>> = ({
   closeDrawer,
   opened,
   clickConnectionMobile,

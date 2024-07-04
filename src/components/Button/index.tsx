@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import React from 'react';
 import { Container } from './styles';
 
@@ -6,7 +7,11 @@ export interface IButton {
   onClick?(): void;
 }
 
-const Button: React.FC<IButton> = ({ mainPage, onClick, children }) => {
+const Button: React.FC<PropsWithChildren<IButton>> = ({
+  mainPage,
+  onClick,
+  children,
+}) => {
   const isMainPage: boolean = mainPage === undefined ? false : mainPage;
 
   return (

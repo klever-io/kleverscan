@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Table, { ITable } from '@/components/Table';
 import { CustomFieldWrapper, CustomLink } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
@@ -13,10 +14,10 @@ interface IAssets {
   assetsTableProps: IInnerTableProps;
   address: string;
   showInteractionButtons?: boolean;
-  Filters?: React.FC;
+  Filters?: React.FC<PropsWithChildren>;
 }
 
-const Assets: React.FC<IAssets> = ({
+const Assets: React.FC<PropsWithChildren<IAssets>> = ({
   assetsTableProps,
   address,
   showInteractionButtons,
@@ -50,7 +51,11 @@ const Assets: React.FC<IAssets> = ({
     const ticker = assetId?.split('-')[0];
     const sectionViewNfts =
       assetType === 1 ? (
-        <Link href={`/account/${address}/collection/${assetId}`} key={address}>
+        <Link
+          href={`/account/${address}/collection/${assetId}`}
+          key={address}
+          legacyBehavior
+        >
           <CustomLink tabAsset={true}>
             {t('accounts:SingleAccount.Buttons.ViewNFTs')}
           </CustomLink>
@@ -62,7 +67,7 @@ const Assets: React.FC<IAssets> = ({
       { element: props => <span key={ticker}>{ticker}</span>, span: 1 },
       {
         element: props => (
-          <Link key={assetId} href={`/asset/${assetId}`}>
+          <Link key={assetId} href={`/asset/${assetId}`} legacyBehavior>
             {assetId}
           </Link>
         ),

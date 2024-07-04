@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
@@ -17,7 +18,7 @@ interface IAllowedAssets {
   allowedAssets?: string[];
 }
 
-export const CallValueSection: React.FC<IAllowedAssets> = ({
+export const CallValueSection: React.FC<PropsWithChildren<IAllowedAssets>> = ({
   allowedAssets,
 }) => {
   const { control, getValues } = useFormContext();

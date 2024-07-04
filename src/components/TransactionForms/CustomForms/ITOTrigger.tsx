@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
 import { ICollectionList } from '@/types';
@@ -22,7 +23,7 @@ interface ITOTriggerData extends ConfigITOData {
   triggerType: number;
 }
 
-const ITOTrigger: React.FC<IContractProps> = ({
+const ITOTrigger: React.FC<PropsWithChildren<IContractProps>> = ({
   formKey,
   handleFormSubmit,
 }) => {

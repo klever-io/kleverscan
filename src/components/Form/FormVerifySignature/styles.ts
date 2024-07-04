@@ -46,7 +46,7 @@ export const TextArea = styled(StyledTextArea)`
     color: ${props => props.theme.darkText};
   }
   font-size: 0.85rem;
-  :focus {
+  &:focus {
     box-shadow: unset;
     border: 1px solid ${({ theme }) => theme.violet};
     outline: 0;
@@ -55,7 +55,7 @@ export const TextArea = styled(StyledTextArea)`
 
 export const InputContainer = styled(Container)`
   border: 1px solid ${({ theme }) => theme.darkText};
-  :focus-within {
+  &:focus-within {
     box-shadow: unset;
     border: 1px solid ${({ theme }) => theme.violet};
     outline: 0;

@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import theme from '@/styles/theme';
 import darkTheme from '@/styles/theme/dark';
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -20,10 +21,9 @@ interface InternalThemeProviderProps {
   initialDarkTheme?: boolean;
 }
 
-export const InternalThemeProvider: React.FC<InternalThemeProviderProps> = ({
-  children,
-  initialDarkTheme = false,
-}) => {
+export const InternalThemeProvider: React.FC<
+  PropsWithChildren<InternalThemeProviderProps>
+> = ({ children, initialDarkTheme = false }) => {
   const [isDarkTheme, setIsDarkTheme] = useState(initialDarkTheme);
 
   useEffect(() => {

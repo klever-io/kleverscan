@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { LoadingBackground } from '@/components/Contract/styles';
 import { Loader } from '@/components/Loader/styles';
 import { createContext, useContext, useState } from 'react';
@@ -16,7 +17,9 @@ interface IParticipate {
 
 export const Participate = createContext({} as IParticipate);
 
-export const ParticipateProvider: React.FC = ({ children }) => {
+export const ParticipateProvider: React.FC<PropsWithChildren> = ({
+  children,
+}) => {
   const [openParticipateModal, setOpenParticipateModal] = useState(false);
   const [openApplyFormModal, setOpenApplyFormModal] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);

@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { ITooltipContent } from '@/pages/charts';
 import { transparentize } from 'polished';
 import React from 'react';
@@ -28,7 +29,7 @@ interface IChart {
   height?: string;
 }
 
-const Chart: React.FC<IChart> = ({
+const Chart: React.FC<PropsWithChildren<IChart>> = ({
   data,
   theme,
   bg = 'regular',

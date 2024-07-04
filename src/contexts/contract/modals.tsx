@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 //create context
 
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -11,7 +12,7 @@ interface IModalContext {
 
 export const ModalContext = createContext({} as IModalContext);
 
-export const ModalsProvider: React.FC = ({ children }) => {
+export const ModalsProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [warningOpen, setWarningOpen] = useState<boolean>(false);
   const [showPayloadOpen, setShowPayloadOpen] = useState(false);
 

@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { ABIStruct, RUST_TYPES_WITH_OPTION } from '@/types/contracts';
 import { utils } from '@klever/sdk-web';
 import dynamic from 'next/dynamic';
@@ -60,7 +61,7 @@ const getInitialValue = (
   return '';
 };
 
-export const ArgumentsSection: React.FC<IArguments> = ({
+export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
   arguments: args,
   structs,
   handleInputChange,

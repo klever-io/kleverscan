@@ -1,7 +1,8 @@
+import { PropsWithChildren } from 'react';
 import PageNProgress from 'next-styled-nprogress';
 import React from 'react';
 
-const NProgress: React.FC = () => {
+const NProgress: React.FC<PropsWithChildren> = () => {
   const props = {
     color: '#EE3F71',
     showSpinner: false,

@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import FormInput from '../../FormInput';
 import {
@@ -25,7 +26,7 @@ interface IProperties {
   setPropertiesString: (propertiesString: string) => void;
 }
 
-export const PropertiesSection: React.FC<IProperties> = ({
+export const PropertiesSection: React.FC<PropsWithChildren<IProperties>> = ({
   propertiesString,
   setPropertiesString,
 }) => {

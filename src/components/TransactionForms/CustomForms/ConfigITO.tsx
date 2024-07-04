@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
 import { IAsset, ICollectionList } from '@/types';
@@ -64,7 +65,10 @@ export const parseConfigITO = (data: ConfigITOData, isNFT?: boolean): void => {
   parseDates(data);
 };
 
-const ConfigITO: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+const ConfigITO: React.FC<PropsWithChildren<IContractProps>> = ({
+  formKey,
+  handleFormSubmit,
+}) => {
   const { handleSubmit, watch } = useFormContext<ConfigITOData>();
 
   const { walletAddress } = useExtension();
@@ -105,7 +109,7 @@ const ConfigITO: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   );
 };
 
-const MainSection: React.FC<ISectionProps> = ({
+const MainSection: React.FC<PropsWithChildren<ISectionProps>> = ({
   walletAddress,
   collection,
 }) => {
@@ -150,7 +154,7 @@ const MainSection: React.FC<ISectionProps> = ({
   );
 };
 
-const WhitelistConfigSection: React.FC<ISectionProps> = ({
+const WhitelistConfigSection: React.FC<PropsWithChildren<ISectionProps>> = ({
   walletAddress,
   collection,
 }) => {
@@ -190,7 +194,9 @@ const WhitelistConfigSection: React.FC<ISectionProps> = ({
   );
 };
 
-export const WhitelistSection: React.FC<{ top?: number }> = ({ top }) => {
+export const WhitelistSection: React.FC<
+  PropsWithChildren<{ top?: number }>
+> = ({ top }) => {
   const { control, getValues } = useFormContext();
   const router = useRouter();
   const { fields, append, remove } = useFieldArray({
@@ -234,11 +240,10 @@ export const WhitelistSection: React.FC<{ top?: number }> = ({ top }) => {
   );
 };
 
-export const PackInfoSection: React.FC<{
-  top?: number;
-  collection?: ICollectionList;
-}> = ({ top, collection }) => {
-  const { control, watch, trigger } = useFormContext();
+export const PackInfoSection: React.FC<PropsWithChildren<{ top?: number }>> = ({
+  top,
+}) => {
+  const { control, watch } = useFormContext();
   const {
     fields,
     append: appendPackInfo,

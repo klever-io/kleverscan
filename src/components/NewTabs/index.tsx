@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { getSelectedTab } from '@/utils/index';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -17,7 +18,7 @@ export interface ITabs {
   showDataFilter?: boolean;
 }
 
-const Tabs: React.FC<ITabs> = ({
+const Tabs: React.FC<PropsWithChildren<ITabs>> = ({
   headers,
   onClick,
   children,

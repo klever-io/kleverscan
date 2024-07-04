@@ -82,10 +82,14 @@ const TransferSections = ({ par, precision }: IProps): JSX.Element[] => {
     <CenteredRow key={parameter?.assetId + String(parameter?.amount)}>
       {formatAmountField(parameter?.amount, precision)}{' '}
       {parameter?.assetId ? (
-        <Link href={`/asset/${assetId}`}>{parameter?.assetId}</Link>
+        <Link href={`/asset/${assetId}`} legacyBehavior>
+          {parameter?.assetId}
+        </Link>
       ) : (
         <>
-          <Link href={`/asset/${assetId}`}>{assetId}</Link>
+          <Link href={`/asset/${assetId}`} legacyBehavior>
+            {assetId}
+          </Link>
         </>
       )}
     </CenteredRow>,
@@ -110,7 +114,7 @@ const CreateValidatorSections = ({ par }: IProps): JSX.Element[] => {
 
   return [
     <span key={parameter?.ownerAddress}>
-      <Link href={`/account/${parameter?.ownerAddress}`}>
+      <Link href={`/account/${parameter?.ownerAddress}`} legacyBehavior>
         {parseAddress(parameter?.ownerAddress, 16)}
       </Link>
     </span>,
@@ -395,9 +399,7 @@ const SellSections = ({ par, precision }: IProps): JSX.Element[] => {
   return [
     <span key={parameter?.marketType}>{parameter?.marketType}</span>,
     <Link href={`/asset/${assetId}`} key={assetId}>
-      <a>
-        <span key={assetId}>{parameter?.assetId}</span>
-      </a>
+      <span key={assetId}>{parameter?.assetId}</span>
     </Link>,
     <span key={parameter?.price}>
       {parameter?.price && formatAmountField(parameter?.price, precision)}{' '}

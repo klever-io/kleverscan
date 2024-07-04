@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import {
   buildTransaction,
   getType,
@@ -40,7 +41,7 @@ import {
 import { WizardBody } from '../../createAsset/styles';
 import { createITO } from '../../utils';
 
-export const WizCreateITO: React.FC<any> = ({
+export const WizCreateITO: React.FC<PropsWithChildren<any>> = ({
   setAddAdvanced,
   addAdvancedSteps,
   setTxHash,

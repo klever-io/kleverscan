@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useExtension } from '@/contexts/extension';
 import { parseAddress } from '@/utils/parseValues';
 import { useEffect, useRef, useState } from 'react';
@@ -11,7 +12,7 @@ import {
   ItemsSelect,
 } from './styles';
 
-export const ConnectedWallet: React.FC = () => {
+export const ConnectedWallet: React.FC<PropsWithChildren> = () => {
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [options, setOptions] = useState([
     { value: true, label: 'MainNet' },

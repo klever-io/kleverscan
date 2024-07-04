@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { IChartData } from '@/configs/home';
 import { ISO2 } from '@/utils/country';
 import { Dispatch, SetStateAction } from 'react';
@@ -1047,10 +1048,10 @@ export interface IFilterDater {
 }
 
 export interface TableRowElementProps {
-  smaller?: boolean;
+  $smaller?: boolean;
 }
 export interface IRowSection {
-  element: React.FC<TableRowElementProps>;
+  element: React.FC<PropsWithChildren<TableRowElementProps>>;
   span: number;
   width?: number;
 }

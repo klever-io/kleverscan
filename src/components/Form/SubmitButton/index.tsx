@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Tooltip from '@/components/Tooltip';
 import { useContract } from '@/contexts/contract';
 import { useMulticontract } from '@/contexts/contract/multicontract';
@@ -10,7 +11,7 @@ import {
   SubmitContainer,
 } from '../styles';
 
-const SubmitButton: React.FC = () => {
+const SubmitButton: React.FC<PropsWithChildren> = () => {
   const { txLoading, submitForms } = useContract();
   const { isMultiContract, processFeesMsgs, kdaFeePoolIsFetching } =
     useMulticontract();

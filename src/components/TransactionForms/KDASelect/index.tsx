@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Select from '@/components/Contract/Select';
 import {
   AssetIDInput,
@@ -41,7 +42,7 @@ interface IKDASelect {
   required?: boolean;
 }
 
-export const KDASelect: React.FC<IKDASelect> = props => {
+export const KDASelect: React.FC<PropsWithChildren<IKDASelect>> = props => {
   const { required } = props;
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -293,9 +294,9 @@ interface CollectionIDFieldProps {
   collection: ICollectionList;
 }
 
-const CollectionIDField: React.FC<CollectionIDFieldProps> = ({
-  collection,
-}) => {
+const CollectionIDField: React.FC<
+  PropsWithChildren<CollectionIDFieldProps>
+> = ({ collection }) => {
   const [isCustom, setIsCustom] = useState(false);
   const [collectionInputValue, setCollectionInputValue] = useState('');
   const [collectionIdData, setCollectionIdData] = useState<ICollection[]>([]);

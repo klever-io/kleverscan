@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useHomeData } from '@/contexts/mainPage';
 import {
   Cell,
@@ -12,7 +13,7 @@ import {
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Link from 'next/link';
 
-const MostTransacted: React.FC = () => {
+const MostTransacted: React.FC<PropsWithChildren> = () => {
   const { mostTransactedTokens, mostTransactedNFTs } = useHomeData();
 
   const tables = [
@@ -46,7 +47,7 @@ const MostTransacted: React.FC = () => {
                 <Row key={index}>
                   <Cell>{index + 1}</Cell>
                   <Cell>
-                    <Link href={`/asset/${item.key}`}>
+                    <Link href={`/asset/${item.key}`} legacyBehavior>
                       <MostTransactedLink href={`/asset/${item.key}`}>
                         <AssetLogo
                           logo={item.logo}

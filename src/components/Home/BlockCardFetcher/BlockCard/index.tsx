@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { LetterLogo } from '@/components/Logo/styles';
 import { useMobile } from '@/contexts/mobile';
 import { IBlockCard } from '@/types/blocks';
@@ -14,11 +15,11 @@ import {
 } from '@/views/home';
 import { fromUnixTime } from 'date-fns';
 import { useTranslation } from 'next-i18next';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
-const BlockCard: React.FC<IBlockCard> = ({
+const BlockCard: React.FC<PropsWithChildren<IBlockCard>> = ({
   nonce,
   timestamp,
   hash,
@@ -93,9 +94,7 @@ const BlockCard: React.FC<IBlockCard> = ({
       <TransactionContainerContent isBlocks={true}>
         <BlockCardRow>
           <Link href={`/block/${nonce}`}>
-            <a>
-              <strong>#{nonce}</strong>
-            </a>
+            <strong>#{nonce}</strong>
           </Link>
           <small>
             {getAge(fromUnixTime(timestamp), commonT)}{' '}

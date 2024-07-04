@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Search } from '@/assets/icons';
 import { useInputSearch } from '@/contexts/inputSearch';
 import { useTranslation } from 'next-i18next';
@@ -12,7 +13,7 @@ interface InputGlobal {
   openSearch?: boolean;
 }
 
-const Input: React.FC<InputGlobal> = ({
+const Input: React.FC<PropsWithChildren<InputGlobal>> = ({
   className,
   setOpenSearch,
   openSearch,
@@ -90,7 +91,7 @@ const Input: React.FC<InputGlobal> = ({
 
   return (
     <Container {...containerProps}>
-      <input {...inputProps} />
+      <input {...inputProps} data-testid="search" />
       <Search onClick={handleSearch} id={'SearchIcon'} />
       {showTooltip && (
         <>

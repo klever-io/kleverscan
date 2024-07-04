@@ -39,7 +39,9 @@ export const Body = styled.p<{ isOpen: boolean }>`
   font-size: 0.875rem;
   line-height: 1.25rem;
 
-  transition: transform 0.1s ease-in-out, opacity 0.1s ease-in-out,
+  transition:
+    transform 0.1s ease-in-out,
+    opacity 0.1s ease-in-out,
     visibility 0.1s ease-in-out;
 
   ${({ isOpen }) =>

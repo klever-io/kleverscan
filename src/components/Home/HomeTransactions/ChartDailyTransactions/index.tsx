@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Chart, { ChartType } from '@/components/Chart';
 import { DoubleTxsTooltip } from '@/components/Chart/Tooltips';
 import { ArrowVariation } from '@/components/Home/CoinDataFetcher/CoinCard/styles';
@@ -28,7 +29,7 @@ const TIME_SERIES_CHG_VALUE = {
   percent: '',
 };
 
-export const ChartDailyTransactions: React.FC = () => {
+export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
   const [isLoadingDailyTxs, setIsLoadingDailyTxs] = useState(false);
   const [filterPeriod, setFilterPeriod] = useState(16);
   const [transactionTimeSeriesChgValue, setTransactionTimeSeriesChgValue] =

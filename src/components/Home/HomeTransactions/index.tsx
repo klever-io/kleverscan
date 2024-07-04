@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { PurpleArrowRight } from '@/assets/icons';
 import Copy from '@/components/Copy';
 import { MultiContractToolTip } from '@/components/MultiContractToolTip';
@@ -80,9 +81,7 @@ export const homeTransactionsRowSections = (
         <DoubleRow {...props} key={hash}>
           <CenteredRow className="bucketIdCopy">
             <Link href={`/transaction/${hash}`}>
-              <a>
-                <Mono>{parseAddress(hash, 24)}</Mono>
-              </a>
+              <Mono>{parseAddress(hash, 24)}</Mono>
             </Link>
             <Copy info="TXHash" data={hash} />
           </CenteredRow>
@@ -99,8 +98,8 @@ export const homeTransactionsRowSections = (
     {
       element: props => (
         <DoubleRow {...props} key={blockNum}>
-          <Link href={`/block/${blockNum || 0}`}>
-            <a className="address">{blockNum || 0}</a>
+          <Link href={`/block/${blockNum || 0}`} className="address">
+            {blockNum || 0}
           </Link>
           <span>
             {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
@@ -112,10 +111,8 @@ export const homeTransactionsRowSections = (
     {
       element: props => (
         <DoubleRow {...props} key={sender}>
-          <Link href={`/account/${sender}`}>
-            <a className="address">
-              <Mono>{parseAddress(sender, 16)}</Mono>
-            </a>
+          <Link href={`/account/${sender}`} className="address">
+            <Mono>{parseAddress(sender, 16)}</Mono>
           </Link>
           {toAddressSectionElement(toAddress)}
         </DoubleRow>
@@ -200,9 +197,7 @@ export const homeTransactionsTabletRowSections = (
           </CenteredRow>
           <CenteredRow>
             <Link href={`/transaction/${hash}`}>
-              <a>
-                <Mono>{parseAddress(hash, 16)}</Mono>
-              </a>
+              <Mono>{parseAddress(hash, 16)}</Mono>
             </Link>
             <Copy info="TXHash" data={hash} svgSize={16} />
           </CenteredRow>
@@ -244,8 +239,8 @@ export const homeTransactionsTabletRowSections = (
     {
       element: props => (
         <DoubleRow {...props} key={blockNum}>
-          <Link href={`/block/${blockNum || 0}`}>
-            <a className="address">{blockNum || 0}</a>
+          <Link href={`/block/${blockNum || 0}`} className="address">
+            {blockNum || 0}
           </Link>
           <span>
             {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
@@ -257,10 +252,8 @@ export const homeTransactionsTabletRowSections = (
     {
       element: props => (
         <DoubleRow {...props} key={sender}>
-          <Link href={`/account/${sender}`}>
-            <a className="address">
-              <Mono>{parseAddress(sender, 16)}</Mono>
-            </a>
+          <Link href={`/account/${sender}`} className="address">
+            <Mono>{parseAddress(sender, 16)}</Mono>
           </Link>
           {toAddressSectionElement(toAddress)}
         </DoubleRow>
@@ -272,7 +265,7 @@ export const homeTransactionsTabletRowSections = (
   return sections;
 };
 
-const HomeTransactions: React.FC = () => {
+const HomeTransactions: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('transactions');
   const { transactions: homeTransactions } = useHomeData();
   const [hideMenu, setHideMenu] = useState(false);
@@ -310,6 +303,7 @@ const HomeTransactions: React.FC = () => {
     showLimit: false,
     showPagination: false,
     smaller: true,
+    interval: 4000,
   };
 
   return (
@@ -321,11 +315,9 @@ const HomeTransactions: React.FC = () => {
             pathname: '/transactions',
           }}
         >
-          <a>
-            {' '}
-            View All
-            <PurpleArrowRight />
-          </a>
+          {' '}
+          View All
+          <PurpleArrowRight />
         </Link>
 
         {isTablet ? (
@@ -335,9 +327,7 @@ const HomeTransactions: React.FC = () => {
         ) : null}
       </ContainerHide>
       <TransactionContainer>
-        {!hideMenu && (
-          <Table key={JSON.stringify(homeTransactions)} {...tableProps} />
-        )}
+        {!hideMenu && <Table {...tableProps} />}
       </TransactionContainer>
     </SectionCards>
   );

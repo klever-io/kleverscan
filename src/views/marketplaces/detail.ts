@@ -76,7 +76,9 @@ export const SalesCardButton = styled.button`
   padding: 0.75rem 0rem;
   border-radius: 0.4rem;
   color: ${props => props.theme.true.white};
-  font: 500 1rem 'Manrope', sans-serif;
+  font:
+    500 1rem 'Manrope',
+    sans-serif;
   &:hover {
     opacity: 0.8;
   }

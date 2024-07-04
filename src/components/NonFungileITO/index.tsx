@@ -1,7 +1,8 @@
+import { PropsWithChildren } from 'react';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { web } from '@klever/sdk-web';
 import { TFunction } from 'next-i18next';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { IParsedITO } from 'types';
@@ -17,7 +18,7 @@ interface INonFungible {
   t: TFunction;
 }
 
-const NonFungibleITO: React.FC<INonFungible> = ({
+const NonFungibleITO: React.FC<PropsWithChildren<INonFungible>> = ({
   selectedITO,
   pack,
   currencyId,

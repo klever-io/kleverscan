@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { parseAddress } from '@/utils/parseValues';
 import { LayoutContainer, Main } from '@/views/home';
 import Head from 'next/head';
@@ -8,7 +9,7 @@ import Footer from '../Footer';
 import { MobileNavBar } from '../Footer/MobileNavBar';
 import Navbar from '../Header';
 
-const Layout: React.FC = ({ children }) => {
+const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   const { pathname, asPath } = useRouter();
   const titleFormatted = () => {
     const klever = 'Klever Explorer';

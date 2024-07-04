@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Accounts as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
@@ -15,7 +16,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import React from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
-const Marketplaces: React.FC = () => {
+const Marketplaces: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('marketPlaces');
   const marketplacesHeader = [
     'Id',
@@ -33,9 +34,7 @@ const Marketplaces: React.FC = () => {
         element: props => (
           <FlexSpan>
             <Link href={`marketplace/${id}`}>
-              <a>
-                <Mono>{id}</Mono>
-              </a>
+              <Mono>{id}</Mono>
             </Link>
             <Copy data={id} info="Marketplace Id" />
           </FlexSpan>
@@ -45,7 +44,9 @@ const Marketplaces: React.FC = () => {
       {
         element: props => (
           <span key={name}>
-            <Link href={`marketplace/${id}`}>{name}</Link>
+            <Link href={`marketplace/${id}`} legacyBehavior>
+              {name}
+            </Link>
           </span>
         ),
         span: 1,
@@ -54,9 +55,7 @@ const Marketplaces: React.FC = () => {
         element: props => (
           <FlexSpan>
             <Link href={`account/${ownerAddress}`}>
-              <a>
-                <Mono>{parseAddress(ownerAddress, 20)}</Mono>
-              </a>
+              <Mono>{parseAddress(ownerAddress, 20)}</Mono>
             </Link>
             <Copy data={ownerAddress} info="Marketplace Owner Address" />
           </FlexSpan>
@@ -69,9 +68,7 @@ const Marketplaces: React.FC = () => {
             {referralAddress ? (
               <>
                 <Link href={`account/${referralAddress}`}>
-                  <a>
-                    <Mono>{parseAddress(referralAddress, 20)}</Mono>
-                  </a>
+                  <Mono>{parseAddress(referralAddress, 20)}</Mono>
                 </Link>
                 <Copy data={referralAddress} info="Referral Address" />
               </>

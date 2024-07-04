@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Assets as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Filter, { IFilter } from '@/components/Filter';
@@ -20,7 +21,7 @@ import React, { ReactNode } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
 import nextI18nextConfig from '../../../next-i18next.config';
 
-const AssetsFilters: React.FC = () => {
+const AssetsFilters: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
   const { t } = useTranslation(['common', 'assets', 'table']);
 
@@ -77,7 +78,7 @@ const AssetsFilters: React.FC = () => {
   );
 };
 
-const Assets: React.FC = () => {
+const Assets: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
   const { t } = useTranslation(['common', 'assets', 'table']);
 
@@ -121,15 +122,13 @@ const Assets: React.FC = () => {
       {
         element: props => (
           <Link href={`/asset/${assetId}`} key={assetId}>
-            <a>
-              <AssetLogo
-                logo={logo}
-                ticker={ticker}
-                name={name}
-                verified={verified}
-                size={36}
-              />
-            </a>
+            <AssetLogo
+              logo={logo}
+              ticker={ticker}
+              name={name}
+              verified={verified}
+              size={36}
+            />
           </Link>
         ),
         span: 1,
@@ -139,11 +138,11 @@ const Assets: React.FC = () => {
         element: props => (
           <DoubleRow {...props} key={assetId}>
             <Link href={`/asset/${assetId}`} key={assetId}>
-              <a>{name}</a>
+              {name}
             </Link>
 
             <CenteredRow>
-              <Link href={`/asset/${assetId}`} key={assetId}>
+              <Link href={`/asset/${assetId}`} key={assetId} legacyBehavior>
                 {assetId}
               </Link>
               <Copy info="Asset ID" data={assetId} />

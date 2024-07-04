@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import {
   calculateTransferFixedFee,
@@ -18,7 +19,10 @@ type FormData = {
   kda: string;
 };
 
-const Transfer: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+const Transfer: React.FC<PropsWithChildren<IContractProps>> = ({
+  formKey,
+  handleFormSubmit,
+}) => {
   const { handleSubmit, watch } = useFormContext<FormData>();
   const { setSelectedRoyaltiesFees, queue } = useMulticontract();
   const amount = watch('amount');

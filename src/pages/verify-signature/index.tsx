@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Validators as Icon } from '@/assets/cards';
 import FormVerifySignature from '@/components/Form/FormVerifySignature';
 import Title from '@/components/Layout/Title';
@@ -15,12 +16,12 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useState } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
 
-const VerifySignature: React.FC = () => {
+const VerifySignature: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('verify');
   const cardHeaders = [`${t('Verify')} ${t('Signature')}`];
   const [selectedCard, setSelectedCard] = useState<string>(cardHeaders[0]);
 
-  const SelectedComponent: React.FC = () => {
+  const SelectedComponent: React.FC<PropsWithChildren> = () => {
     switch (selectedCard) {
       case `${t('Verify')} ${t('Signature')}`:
         return <FormVerifySignature />;

@@ -2,18 +2,14 @@ import { DefaultCardStyleWithBorder } from '@/styles/common';
 import styled, { css, keyframes } from 'styled-components';
 
 interface DayItemProps {
-  isKey: boolean;
-  isBetween: boolean;
-  isCurrent: boolean;
-  isAfter: boolean;
+  isKey?: boolean;
+  isBetween?: boolean;
+  isCurrent?: boolean;
+  isAfter?: boolean;
 }
 
 interface ConfirmButtonProps {
   isActive: boolean;
-}
-
-interface MonthPickerProps {
-  isDisabledRight: boolean;
 }
 
 export const fadeInItem = keyframes`
@@ -183,9 +179,11 @@ export const CalendarContent = styled.div`
   user-select: none;
 `;
 
-export const MonthPicker = styled.div.attrs((props: MonthPickerProps) => ({
-  isDisabledRight: props.isDisabledRight,
-}))`
+interface MonthPickerProps {
+  isDisabledRight: boolean;
+}
+
+export const MonthPicker = styled.div<MonthPickerProps>`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -253,12 +251,7 @@ export const DaysTable = styled.div`
   }
 `;
 
-export const DayItem = styled.div.attrs((props: DayItemProps) => ({
-  isKey: props.isKey,
-  isBetween: props.isBetween,
-  isCurrent: props.isCurrent,
-  isAfter: props.isAfter,
-}))`
+export const DayItem = styled.div<DayItemProps>`
   margin: 0.5rem auto 0;
   height: 2rem;
   width: 2rem;
@@ -319,9 +312,7 @@ export const Warning = styled.div`
   }
 `;
 
-export const Confirm = styled.button.attrs((props: ConfirmButtonProps) => ({
-  isActive: props.isActive,
-}))`
+export const Confirm = styled.button<ConfirmButtonProps>`
   margin-top: 1rem;
   padding: 0.5rem;
   border-radius: 0.5rem;

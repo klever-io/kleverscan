@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import ContextProviders from '@/components/ContextProviders';
 import { appWithTranslation, SSRConfig } from 'next-i18next';
 import App from 'next/app';
@@ -29,7 +30,7 @@ declare type AppProps = NextJsAppProps & {
   initialDarkTheme: boolean;
 };
 
-const LayoutWrapper: React.FC = ({ children }) => {
+const LayoutWrapper: React.FC<PropsWithChildren> = ({ children }) => {
   return <Layout>{children}</Layout>;
 };
 

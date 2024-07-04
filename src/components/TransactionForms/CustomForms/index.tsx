@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import AssetTrigger from './AssetTrigger';
 import Buy from './Buy';
 import CancelMarketOrder from './CancelMarketOrder';
@@ -39,10 +40,9 @@ interface IRenderContractProps {
   contractProps: IContractProps;
 }
 
-export const RenderContract: React.FC<IRenderContractProps> = ({
-  contractName,
-  contractProps,
-}) => {
+export const RenderContract: React.FC<
+  PropsWithChildren<IRenderContractProps>
+> = ({ contractName, contractProps }) => {
   const getContractComponent = () => {
     switch (contractName) {
       case 'TransferContract':

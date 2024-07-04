@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 //create context
 
 import { getParamsList } from '@/services/requests/proposals';
@@ -13,7 +14,7 @@ interface IFees {
 
 export const FeeContext = createContext({} as IFees);
 
-export const FeesProvider: React.FC = ({ children }) => {
+export const FeesProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const { data: paramsList } = useQuery(
     'feesProviderParamsList',
     getParamsList,

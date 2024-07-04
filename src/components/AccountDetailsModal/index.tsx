@@ -4,8 +4,8 @@ import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import {
-  getAccountBalanceRequest,
   IAccountBalance,
+  getAccountBalanceRequest,
 } from '@/services/requests/account';
 import { getNetwork } from '@/utils/networkFunctions';
 import { parseAddress } from '@/utils/parseValues';
@@ -14,6 +14,7 @@ import { useRouter } from 'next/router';
 import { QRCodeSVG } from 'qrcode.react';
 import {
   Dispatch,
+  PropsWithChildren,
   SetStateAction,
   useEffect,
   useMemo,
@@ -68,10 +69,9 @@ export const getNetworkPath = (network: string): string => {
   }
 };
 
-export const AccountDetailsModal: React.FC<IAccountDetailsModal> = ({
-  openUserInfos,
-  setOpenUserInfos,
-}) => {
+export const AccountDetailsModal: React.FC<
+  PropsWithChildren<IAccountDetailsModal>
+> = ({ openUserInfos, setOpenUserInfos }) => {
   const [primaryAsset, setPrimaryAsset] = useState<IAssetBalance[]>([]);
   const [expandAssets, setExpandAssets] = useState<boolean>(false);
   const [loadingBalance, setLoadingBalance] = useState<boolean>(false);
@@ -251,23 +251,25 @@ export const AccountDetailsModal: React.FC<IAccountDetailsModal> = ({
         </ReloadContainer>
       </QRCodeContainer>
       <BodyContent>
-        <Link href={`/account/${walletAddress}`}>
-          <a onClick={() => setOpenUserInfos(false)}>
-            <ActionItem>
-              <BiWalletAlt size={'1.2rem'} />
-              <p>Account Details</p>
-              <RiArrowRightSLine size={'1.2em'} />
-            </ActionItem>
-          </a>
+        <Link
+          href={`/account/${walletAddress}`}
+          onClick={() => setOpenUserInfos(false)}
+        >
+          <ActionItem>
+            <BiWalletAlt size={'1.2rem'} />
+            <p>Account Details</p>
+            <RiArrowRightSLine size={'1.2em'} />
+          </ActionItem>
         </Link>
-        <Link href={`/create-transaction`}>
-          <a onClick={() => setOpenUserInfos(false)}>
-            <ActionItem>
-              <IoCreateOutline size={'1.2rem'} />
-              <p>Create Transaction</p>
-              <RiArrowRightSLine size={'1.2em'} />
-            </ActionItem>
-          </a>
+        <Link
+          href={`/create-transaction`}
+          onClick={() => setOpenUserInfos(false)}
+        >
+          <ActionItem>
+            <IoCreateOutline size={'1.2rem'} />
+            <p>Create Transaction</p>
+            <RiArrowRightSLine size={'1.2em'} />
+          </ActionItem>
         </Link>
         <SubSection active={openNetworks}>
           <ActionItem

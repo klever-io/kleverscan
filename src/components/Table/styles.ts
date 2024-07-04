@@ -37,7 +37,7 @@ export const TableGradientBorder = css`
   background-clip: padding-box, border-box;
 `;
 
-export const TableBody = styled.div<{ smaller?: boolean }>`
+export const TableBody = styled.div<{ $smaller?: boolean }>`
   min-width: fit-content;
   width: 100%;
 
@@ -56,7 +56,7 @@ export const TableBody = styled.div<{ smaller?: boolean }>`
     gap: 40px;
 
     ${props =>
-      props.smaller &&
+      props.$smaller &&
       css`
         padding: 8px;
       `}
@@ -66,9 +66,7 @@ export const TableBody = styled.div<{ smaller?: boolean }>`
 `;
 
 export const HeaderItem = styled.div<{
-  smaller?: boolean;
-  totalColumns?: number;
-  currentColumn?: number;
+  $smaller?: boolean;
 }>`
   display: table-cell;
   padding: 6px 16px;
@@ -76,7 +74,7 @@ export const HeaderItem = styled.div<{
   white-space: nowrap;
 
   ${props =>
-    props.smaller &&
+    props.$smaller &&
     css`
       font-size: 0.75rem;
       padding: 4px 8px;
@@ -118,7 +116,7 @@ export const MobileCardItem = styled.div<{
   isAccountPage?: boolean;
   isLastRow?: boolean;
   dynamicWidth?: number;
-  smaller?: boolean;
+  $smaller?: boolean;
   totalColumns?: number;
   currentColumn?: number;
 }>`
@@ -208,7 +206,7 @@ export const MobileCardItem = styled.div<{
           `}
 
     ${props =>
-      props.smaller &&
+      props.$smaller &&
       css`
         font-size: 0.75rem;
         padding: 8px 8px;

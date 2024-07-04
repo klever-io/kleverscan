@@ -6,11 +6,11 @@ spec:
   template:
     spec:
       containers:
-      - name: explorer
-        resources:
-          limits:
-            memory: 256Mi
-            cpu: 150m
-          requests:
-            cpu: 50m
-            memory: 128Mi
+        - name: explorer
+          resources:
+            limits:
+              memory: 256Mi
+              cpu: 150m
+            requests:
+              cpu: 50m
+              memory: 128Mi

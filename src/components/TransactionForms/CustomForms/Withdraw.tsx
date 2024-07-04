@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { withdrawTypes } from '@/utils/contracts';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -13,7 +14,10 @@ type FormData = {
   currencyID: string;
 };
 
-const Withdraw: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+const Withdraw: React.FC<PropsWithChildren<IContractProps>> = ({
+  formKey,
+  handleFormSubmit,
+}) => {
   const { handleSubmit, watch } = useFormContext<FormData>();
   const withdrawType: number = watch('withdrawType');
 

@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useContract } from '@/contexts/contract';
 import { contractsList } from '@/utils/contracts';
 import { setCharAt } from '@/utils/convertString';
@@ -68,7 +69,7 @@ const parseUpdateAccountPermission = (data: FormData): FormData => {
   return parseBinaryToHex(data);
 };
 
-const UpdateAccountPermission: React.FC<IContractProps> = ({
+const UpdateAccountPermission: React.FC<PropsWithChildren<IContractProps>> = ({
   formKey,
   handleFormSubmit,
 }) => {
@@ -91,7 +92,7 @@ const UpdateAccountPermission: React.FC<IContractProps> = ({
   );
 };
 
-const PermissionsSection: React.FC = () => {
+const PermissionsSection: React.FC<PropsWithChildren> = () => {
   const { control, watch, setValue } = useFormContext();
 
   const {
@@ -247,7 +248,9 @@ interface SignersSectionProps {
   permissionIndex: number;
 }
 
-const SignersSection: React.FC<SignersSectionProps> = ({ permissionIndex }) => {
+const SignersSection: React.FC<PropsWithChildren<SignersSectionProps>> = ({
+  permissionIndex,
+}) => {
   const { control } = useFormContext();
   const {
     fields,

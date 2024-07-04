@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import {
   Slider,
   StyledInput,
@@ -11,7 +12,7 @@ interface ToggleProps {
   options: string[];
 }
 
-const ToggleInput: React.FC<ToggleProps> = ({
+const ToggleInput: React.FC<PropsWithChildren<ToggleProps>> = ({
   inputProps,
   active,
   options,

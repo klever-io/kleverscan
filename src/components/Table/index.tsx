@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useMobile } from '@/contexts/mobile';
 import { DoubleRow } from '@/styles/common';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
@@ -65,7 +66,7 @@ export interface ITable {
   interval?: number;
   intervalController?: React.Dispatch<React.SetStateAction<number>>;
   showLimit?: boolean;
-  Filters?: React.FC;
+  Filters?: React.FC<PropsWithChildren>;
   smaller?: boolean;
   showPagination?: boolean;
 }
@@ -79,7 +80,7 @@ const onErrorHandler = () => {
   };
 };
 
-const Table: React.FC<ITable> = ({
+const Table: React.FC<PropsWithChildren<ITable>> = ({
   type,
   header,
   rowSections,
@@ -229,16 +230,11 @@ const Table: React.FC<ITable> = ({
         </FloatContainer>
       )}
       <ContainerView ref={tableRef}>
-        <TableBody smaller={smaller}>
+        <TableBody $smaller={smaller}>
           {!isMobile && !isTablet && rowSections && (
             <TableRow>
               {header?.map((item, index) => (
-                <HeaderItem
-                  key={JSON.stringify(item)}
-                  smaller={smaller}
-                  totalColumns={header.length}
-                  currentColumn={index}
-                >
+                <HeaderItem key={JSON.stringify(item)} $smaller={smaller}>
                   {item}
                 </HeaderItem>
               ))}
@@ -288,7 +284,7 @@ const Table: React.FC<ITable> = ({
                           columnSpan={2}
                           isLastRow={index === limit - 1}
                           dynamicWidth={itemWidth}
-                          smaller={smaller}
+                          $smaller={smaller}
                         >
                           <DoubleRow {...props}>
                             {type !== 'accounts' && <Skeleton width="100%" />}
@@ -333,15 +329,16 @@ const Table: React.FC<ITable> = ({
                             columnSpan={span}
                             isLastRow={isLastRow}
                             dynamicWidth={width}
-                            smaller={smaller}
+                            $smaller={smaller}
                             totalColumns={header.length}
                             currentColumn={index2}
+                            data-testid={`table-row-${index}`}
                           >
                             {isMobile || isTablet ? (
                               <MobileHeader>{header[index2]}</MobileHeader>
                             ) : null}
                             {Element({
-                              smaller,
+                              $smaller: smaller,
                             })}
                           </MobileCardItem>
                         );

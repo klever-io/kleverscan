@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { WarningIcon } from '@/assets/calendar';
 import { useContract } from '@/contexts/contract';
 import { useModal } from '@/contexts/contract/modals';
@@ -13,7 +14,7 @@ interface IModal {
   message: string;
 }
 
-const WarningModal: React.FC<IModal> = ({ message }) => {
+const WarningModal: React.FC<PropsWithChildren<IModal>> = ({ message }) => {
   const { formSend, ignoreCheckAmount, resetFormsData } = useContract();
 
   const { setWarningOpen, warningOpen } = useModal();

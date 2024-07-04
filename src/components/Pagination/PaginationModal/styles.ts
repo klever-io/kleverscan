@@ -5,7 +5,8 @@ interface ConfirmButtonProps {
 }
 
 interface CalendarContainerProps {
-  modalLeft: boolean;
+  modalLeft?: boolean;
+  tabIndex?: number | string;
 }
 
 export const fadeInItem = keyframes`
@@ -71,11 +72,7 @@ export const Input = styled.input`
   }
 `;
 
-export const PaginationModalContainer = styled.div.attrs(
-  (props: CalendarContainerProps) => {
-    props: props.modalLeft;
-  },
-)`
+export const PaginationModalContainer = styled.div<CalendarContainerProps>`
   min-height: 10.5rem;
   width: 13rem;
   padding: 1rem;
@@ -129,9 +126,7 @@ export const PaginationModalContent = styled.div`
   user-select: none;
 `;
 
-export const Confirm = styled.button.attrs((props: ConfirmButtonProps) => ({
-  isActive: props.isActive,
-}))`
+export const Confirm = styled.button<ConfirmButtonProps>`
   margin-top: 1rem;
   width: 100%;
   padding: 0.5rem;

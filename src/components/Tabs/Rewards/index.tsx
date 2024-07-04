@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Table, { ITable } from '@/components/Table';
 import { IInnerTableProps, IRewardsAssets, IRowSection } from '@/types/index';
 import { KLV_PRECISION } from '@/utils/globalVariables';
@@ -15,7 +16,9 @@ interface IRewards {
   rewardsTableProps: IInnerTableProps;
 }
 
-const Rewards: React.FC<IRewards> = ({ rewardsTableProps }) => {
+const Rewards: React.FC<PropsWithChildren<IRewards>> = ({
+  rewardsTableProps,
+}) => {
   const [expanded, setExpanded] = useState({});
   const { t } = useTranslation('common');
   const headers = ['Asset Id', 'Rewards'];
@@ -36,7 +39,7 @@ const Rewards: React.FC<IRewards> = ({ rewardsTableProps }) => {
     const sections: IRowSection[] = [
       {
         element: props => (
-          <Link key={assetId} href={`/asset/${assetId}`}>
+          <Link key={assetId} href={`/asset/${assetId}`} legacyBehavior>
             {assetId}
           </Link>
         ),

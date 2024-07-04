@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useTheme } from '@/contexts/theme';
 import {
   ProgressContainer,
@@ -6,7 +7,9 @@ import {
   ProgressPercentage,
 } from '@/views/validators';
 
-const Progress: React.FC<{ percent: number }> = ({ percent }) => {
+const Progress: React.FC<PropsWithChildren<{ percent: number }>> = ({
+  percent,
+}) => {
   const { theme } = useTheme();
   return (
     <ProgressContainer>

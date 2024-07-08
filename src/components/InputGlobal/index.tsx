@@ -62,6 +62,7 @@ const Input: React.FC<PropsWithChildren<InputGlobal>> = ({
 
   const handleSearch = (event: KeyboardEvent) => {
     if (event.key === 'Enter' || event.type === 'click') {
+      event.preventDefault();
       if (searchValue !== '') router.push(searchValue);
     }
   };

@@ -23,6 +23,8 @@ const TransactionsFilters: React.FC<
   const [assets, fetchPartialAsset, loading, setLoading] =
     useFetchPartial<IAsset>('assets', 'assets/list', 'assetId');
 
+  const [filters, setFilters] = useState<IFilter[]>([]);
+
   useEffect(() => {
     if (!router.isReady) return;
     setLocalQuery(router.query);
@@ -57,51 +59,55 @@ const TransactionsFilters: React.FC<
     }
   };
 
-  const filters: IFilter[] = [
-    {
-      title: 'Coin',
-      data: assets.map(asset => asset?.assetId),
-      onClick: selected => {
-        handleSelected(selected, 'asset');
+  useEffect(() => {
+    const filters: IFilter[] = [
+      {
+        title: 'Coin',
+        data: assets.map(asset => asset?.assetId),
+        onClick: selected => {
+          handleSelected(selected, 'asset');
+        },
+        onChange: async value => {
+          setLoading(true);
+          await fetchPartialAsset(value);
+        },
+        current: query.asset as string | undefined,
+        loading,
+        disabledInput,
       },
-      onChange: async value => {
-        setLoading(true);
-        await fetchPartialAsset(value);
+      {
+        title: 'Status',
+        data: status,
+        onClick: selected => handleSelected(selected, 'status'),
+        current: query.status as string | undefined,
+        isHiddenInput: false,
       },
-      current: query.asset as string | undefined,
-      loading,
-      disabledInput,
-    },
-    {
-      title: 'Status',
-      data: status,
-      onClick: selected => handleSelected(selected, 'status'),
-      current: query.status as string | undefined,
-      isHiddenInput: false,
-    },
-    {
-      title: 'Contract',
-      data: contracts,
-      onClick: selected => handleSelected(selected, 'type'),
-      current: getContractName(),
-    },
-  ];
+      {
+        title: 'Contract',
+        data: contracts,
+        onClick: selected => handleSelected(selected, 'type'),
+        current: getContractName(),
+      },
+    ];
+    if (getContractName() === 'Buy') {
+      filters.push({
+        title: 'Buy Type',
+        data: buyType,
+        inputType: 'button',
+        onClick: selected => handleSelected(selected, 'buyType'),
+        current: query.buyType as string | undefined,
+      });
+    }
 
-  if (getContractName() === 'Buy') {
-    filters.push({
-      title: 'Buy Type',
-      data: buyType,
-      inputType: 'button',
-      onClick: selected => handleSelected(selected, 'buyType'),
-      current: query.buyType as string | undefined,
-    });
-  }
+    setFilters(filters);
+  }, [query, assets, loading]);
 
   return (
     <FilterContainer>
-      {filters.map(filter => (
-        <Filter key={filter.title} {...filter} />
-      ))}
+      {router.isReady &&
+        filters.map(filter => (
+          <Filter key={`${filter?.title}-${filter?.current}`} {...filter} />
+        ))}
       <DateFilter />
     </FilterContainer>
   );

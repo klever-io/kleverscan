@@ -703,7 +703,7 @@ export const getDefaultCells = async (
 
   const amountContract = [];
   const parameter = contract[0]?.parameter as any;
-  let assetId: any = parameter.assetId || '';
+  let assetId: any = parameter?.assetId || parameter?.kda || '';
 
   switch (contract[0].typeString) {
     case Contract.Transfer:
@@ -821,7 +821,7 @@ export const getDefaultCells = async (
       }
     default:
   }
-  const to = parameter.toAddress || '';
+  const to = parameter?.toAddress || '';
   const contractName = ContractsName[contract[0]?.typeString] || '';
   const created = format(fromUnixTime(timestamp), 'yyyy-MM-dd HH:mm:ss'); // csv date pattern
   const parsedbandwidthFee = bandwidthFee / 10 ** 6;
@@ -880,7 +880,7 @@ export const getContractCells = async (
   // const orderID = contract[0].parameter.orderID || '';
 
   const parameter = contract[0]?.parameter as any;
-  const to = parameter.toAddress || '';
+  const to = parameter?.toAddress || '';
   const contractName = ContractsName[contract[0]?.typeString] || '';
   const created = format(fromUnixTime(timestamp), 'yyyy-MM-dd HH:mm:ss'); // csv date pattern
   const cells = [hash, blockNum, created, sender, to, status, contractName];

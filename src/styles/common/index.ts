@@ -443,7 +443,6 @@ export const Status = styled.div<IStatus>`
   svg {
     min-width: 24px;
   }
-
   span {
     color: ${props =>
       props.status === 'ApprovedProposal'

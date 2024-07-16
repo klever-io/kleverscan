@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import { useMobile } from '@/contexts/mobile';
 import { DoubleRow } from '@/styles/common';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
@@ -6,7 +5,7 @@ import { setQueryAndRouter } from '@/utils';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { processRowSectionsLayout } from '@/utils/table';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
 import { IoReloadSharp } from 'react-icons/io5';
 import { useQuery } from 'react-query';
@@ -107,6 +106,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
     let responseFormatted = {};
     try {
       const response = await request(page, limit);
+
       if (!response.error && dataName) {
         responseFormatted = {
           items: response.data[dataName],

@@ -1,7 +1,14 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import Skeleton from '@/components/Skeleton';
 import api from '@/services/api';
-import { IAssetsResponse, IValidatorResponse } from '@/types';
+import {
+  IAsset,
+  IAssetPool,
+  IAssetPoolsResponse,
+  IAssetsResponse,
+  IDelegationsResponse,
+  IValidatorResponse,
+} from '@/types';
 import { IPackInfo } from '@/types/contracts';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { getPrecision } from '../precisionFunctions';
@@ -60,9 +67,33 @@ export function usePrecision(
   }
 }
 
-type PartialResponse = IAssetsResponse | IValidatorResponse;
+type PartialResponse =
+  | IAssetsResponse
+  | IValidatorResponse
+  | IAssetPoolsResponse;
 
-export const useFetchPartial = <T,>(
+// Funções type guard
+const isAssetsResponse = (
+  response: PartialResponse,
+): response is IAssetsResponse => {
+  return (response as IAssetsResponse).data.assets !== undefined;
+};
+
+const isValidatorResponse = (
+  response: PartialResponse,
+): response is IValidatorResponse => {
+  return (response as IValidatorResponse).data.validators !== undefined;
+};
+
+const isAssetPoolsResponse = (
+  response: PartialResponse,
+): response is IAssetPoolsResponse => {
+  return (response as IAssetPoolsResponse).data.pools !== undefined;
+};
+
+export const useFetchPartial = <
+  T extends IAsset | IDelegationsResponse | IAssetPool,
+>(
   type: string,
   route: string,
   dataType: string,
@@ -88,7 +119,11 @@ export const useFetchPartial = <T,>(
           ...query,
         },
       });
-      setItems([...(response?.data?.[type] || []), ...itemsSearch]);
+      if (isAssetsResponse(response)) {
+        setItems([...(response.data.assets as T[]), ...itemsSearch]);
+      } else if (isAssetPoolsResponse(response)) {
+        setItems([...(response.data.pools as T[]), ...itemsSearch]);
+      }
     } else {
       setItems([...itemsSearch]);
     }
@@ -97,55 +132,78 @@ export const useFetchPartial = <T,>(
   useEffect(() => {
     initialState();
   }, []);
-  return [
-    items,
-    value => {
-      clearTimeout(fetchPartialTimeout);
-      return new Promise(res => {
-        fetchPartialTimeout = setTimeout(async () => {
-          let response: PartialResponse;
-          if (
-            value &&
-            !items.find(asset =>
-              asset[dataType].toUpperCase().includes(value.toUpperCase()),
-            )
-          ) {
-            setLoading(true);
-            if (type !== 'assets') {
-              response = await api.get({
-                route: `${route}`,
-                query: {
-                  dataType: value,
-                  ...query,
-                },
-              });
-            } else {
-              response = await api.get({
-                route: `${route}`,
-                query: {
-                  asset: value,
-                  ...query,
-                },
-              });
-            }
-            if (!response.data[type].length) {
+
+  const fetchItems = (value: string): Promise<T[]> => {
+    clearTimeout(fetchPartialTimeout);
+    return new Promise(res => {
+      fetchPartialTimeout = setTimeout(async () => {
+        let response: PartialResponse;
+
+        if (
+          value &&
+          !items.find(asset =>
+            (asset as any)?.[dataType]
+              ?.toUpperCase()
+              ?.includes(value.toUpperCase()),
+          )
+        ) {
+          setLoading(true);
+          if (type !== 'assets') {
+            response = await api.get({
+              route: `${route}`,
+              query: {
+                dataType: value,
+                ...query,
+              },
+            });
+          } else {
+            response = await api.get({
+              route: `${route}`,
+              query: {
+                asset: value,
+                ...query,
+              },
+            });
+          }
+
+          if (isAssetsResponse(response)) {
+            const responseData = response.data.assets as T[];
+            if (!responseData?.length) {
               setItems([...items]);
             } else {
-              res(response.data[type]);
-              setItems([...items, ...response.data[type]]);
+              res(responseData);
+              setItems([...items, ...responseData]);
             }
-            res(response.data[type]);
-            setLoading(false);
-          } else {
-            res(items);
-            setLoading(false);
+            res(responseData);
+          } else if (isValidatorResponse(response)) {
+            const responseData = response.data.validators as T[];
+            if (!responseData?.length) {
+              setItems([...items]);
+            } else {
+              res(responseData);
+              setItems([...items, ...responseData]);
+            }
+            res(responseData);
+          } else if (isAssetPoolsResponse(response)) {
+            const responseData = response.data.pools as T[];
+            if (!responseData?.length) {
+              setItems([...items]);
+            } else {
+              res(responseData);
+              setItems([...items, ...responseData]);
+            }
+            res(responseData);
           }
-        }, 500);
-      });
-    },
-    loading,
-    setLoading,
-  ];
+          setLoading(false);
+        } else {
+          res(items);
+          setLoading(false);
+        }
+      }, 500);
+    });
+  };
+
+  return [items, fetchItems, loading, setLoading];
 };
 
 export const useSkeleton = (): [

@@ -19,10 +19,9 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation(['common', 'assets', 'table']);
 
   const header = [
-    'Status',
+    'KDA/Status',
     'Owner/Admin Address',
     `KDA/KLV Balance`,
-    `KDA`,
     `Ratio`,
   ];
 
@@ -36,71 +35,69 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
       klvBalance,
       ratio,
     } = asset;
+
+    const handlerStatus = () => (
+      <>
+        <Row>
+          <span>{kda}</span>
+        </Row>
+        <Row>
+          <Status status={active ? 'success' : 'fail'}>
+            {capitalizeString(active ? 'Active' : 'disabled')}
+          </Status>
+        </Row>
+      </>
+    );
+    const handlerAddresses = (i: number) => (
+      <>
+        <Row>
+          <Link href={`/account/${ownerAddress}`} key={ownerAddress}>
+            <Mono key={ownerAddress + i}>{parseAddress(ownerAddress, 16)}</Mono>
+          </Link>
+          <Copy data={ownerAddress} info="Owner Address" />
+        </Row>
+        <Row>
+          <Link href={`/account/${adminAddress}`} key={adminAddress}>
+            <Mono key={adminAddress + i}>{parseAddress(adminAddress, 16)}</Mono>
+          </Link>
+          <Copy data={adminAddress} info="Admin Address" />
+        </Row>
+      </>
+    );
+    const handlerBalance = () => (
+      <>
+        <Row>
+          <span>{kdaBalance} KDA</span>
+        </Row>
+        <Row>
+          <span>{klvBalance} KLV</span>
+        </Row>
+      </>
+    );
+    const handlerRatio = () => (
+      <Row>
+        <span>{ratio}</span>
+      </Row>
+    );
+
     const sections: IRowSection[] = [
       {
-        element: () => (
-          <Row>
-            <Status status={active ? 'success' : 'fail'}>
-              {capitalizeString(active ? 'Active' : 'disabled')}
-            </Status>
-          </Row>
-        ),
+        element: (props, i) => handlerStatus(),
         span: 1,
         width: 50,
       },
       {
-        element: (props, i) => (
-          <>
-            <Row>
-              <Link href={`/account/${ownerAddress}`} key={ownerAddress}>
-                <Mono key={ownerAddress + i}>
-                  {parseAddress(ownerAddress, 16)}
-                </Mono>
-              </Link>
-              <Copy data={ownerAddress} info="Owner Address" />
-            </Row>
-            <Row>
-              <Link href={`/account/${adminAddress}`} key={adminAddress}>
-                <Mono key={adminAddress + i}>
-                  {parseAddress(adminAddress, 16)}
-                </Mono>
-              </Link>
-              <Copy data={adminAddress} info="Admin Address" />
-            </Row>
-          </>
-        ),
+        element: (props, i) => handlerAddresses(i),
         span: 1,
         width: 50,
       },
       {
-        element: (props, i) => (
-          <>
-            <Row>
-              <span>{kdaBalance} KDA</span>
-            </Row>
-            <Row>
-              <span>{klvBalance} KLV</span>
-            </Row>
-          </>
-        ),
+        element: (props, i) => handlerBalance(),
         span: 1,
         width: 50,
       },
       {
-        element: (props, i) => (
-          <Row>
-            <span key={kda + i + 1}>{kda}</span>
-          </Row>
-        ),
-        span: 1,
-        width: 50,
-      },
-      {
-        element: (props, i) => (
-          <Row>
-            <span key={ratio + i + 2}>{ratio}</span>
-          </Row>
-        ),
+        element: (props, i) => handlerRatio(),
         span: 1,
         width: 50,
       },

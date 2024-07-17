@@ -1,5 +1,5 @@
 import { PropsWithChildren } from 'react';
-import * as SocialIcons from '@/assets/social';
+import { icons as SocialIcons } from '@/assets/social';
 import { AssetProps } from '@/components/Asset/OverviewTab';
 import { HashComponent } from '@/components/Contract';
 import Title from '@/components/Layout/Title';

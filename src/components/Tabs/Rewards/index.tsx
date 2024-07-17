@@ -19,7 +19,7 @@ interface IRewards {
 const Rewards: React.FC<PropsWithChildren<IRewards>> = ({
   rewardsTableProps,
 }) => {
-  const [expanded, setExpanded] = useState({});
+  const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
   const { t } = useTranslation('common');
   const headers = ['Asset Id', 'Rewards'];
 

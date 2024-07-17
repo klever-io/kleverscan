@@ -106,7 +106,7 @@ export interface IAPINetworkParams {
 }
 
 export interface IVotingPowers {
-  [address: number]: number;
+  [address: string]: number;
 }
 
 export interface IVote {

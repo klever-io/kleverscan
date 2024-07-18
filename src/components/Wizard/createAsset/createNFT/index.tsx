@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import {
   buildTransaction,
   getType,
@@ -10,7 +9,7 @@ import { gtagEvent } from '@/utils/gtag';
 import { parseAddress } from '@/utils/parseValues';
 import { web } from '@klever/sdk-web';
 import { useTranslation } from 'next-i18next';
-import { useEffect, useState } from 'react';
+import { PropsWithChildren, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import {

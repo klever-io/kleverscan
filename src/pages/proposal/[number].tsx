@@ -24,6 +24,8 @@ import {
 import { IRowSection } from '@/types/index';
 import {
   INetworkParams,
+  IParsedNetworkParam,
+  IParsedNetworkParams,
   IParsedParams,
   IParsedProposalParam,
   IParsedVote,
@@ -102,7 +104,7 @@ const ProposalVoters = (props: IProposalVoters) => {
         element: props => (
           <StatusContent key={status}>
             <AiFillCheckCircle
-              color={typeVoteColors[status]}
+              color={typeVoteColors[status as keyof typeof typeVoteColors]}
               size={18}
               style={{ marginRight: 5 }}
             />
@@ -180,15 +182,20 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
     apiNetworkParams: INetworkParams,
   ): IParsedParams | null => {
     if (!params || !apiNetworkParams) return null;
-    const currentNetworkParams = {} as INetworkParams;
+    const currentNetworkParams = {} as IParsedNetworkParams;
     let parsedProposalParams: IParsedProposalParam[] = [];
 
     if (apiNetworkParams) {
       Object.keys(proposalsMap).map((key, index) => {
-        currentNetworkParams[proposalsMap[key].message] = {
+        currentNetworkParams[
+          proposalsMap[key as keyof typeof proposalsMap].message
+        ] = {
           number: index,
-          parameter: proposalsMap[key] ? proposalsMap[key].message : '',
-          currentValue: apiNetworkParams?.[key]?.value,
+          parameter: proposalsMap[key as keyof typeof proposalsMap]
+            ? proposalsMap[key as keyof typeof proposalsMap].message
+            : '',
+          currentValue:
+            apiNetworkParams?.[key as keyof typeof proposalsMap]?.value,
           parameterLabel: key,
         };
       });
@@ -198,9 +205,12 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
       parsedProposalParams = Object.entries(params).map(([index, value]) => {
         return {
           paramIndex: index,
-          paramLabel: NetworkParamsIndexer[index],
+          paramLabel: NetworkParamsIndexer[Number(index)],
           paramValue: Number(value),
-          paramText: proposalsMap[NetworkParamsIndexer[index]].message,
+          paramText:
+            proposalsMap[
+              NetworkParamsIndexer[Number(index)] as keyof typeof proposalsMap
+            ].message,
         };
       });
     }
@@ -250,7 +260,7 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
               <ProgressBarContent
                 key={key}
                 widthPercentage={percentageCard}
-                background={typeVoteColors[item]}
+                background={typeVoteColors[item as keyof typeof typeVoteColors]}
               />
             );
           }
@@ -508,7 +518,12 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
                       percentageCard = 0;
                     }
                     return (
-                      <CardVote key={key} color={typeVoteColors[item]}>
+                      <CardVote
+                        key={key}
+                        color={
+                          typeVoteColors[item as keyof typeof typeVoteColors]
+                        }
+                      >
                         <span>{filter[key]}</span>
                         <PercentageText>
                           {percentageCard.toFixed(2)}%

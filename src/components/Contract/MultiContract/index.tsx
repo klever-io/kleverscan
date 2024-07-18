@@ -32,32 +32,47 @@ export const sumAllRoyaltiesFees = (
     precision: number;
   };
 } => {
-  const result = {};
+  const result: {
+    [key: string]: {
+      totalFee: number;
+      precision?: number;
+    };
+  } = {};
   queue.forEach(item => {
     if (item.royaltiesFeeAmount && item.collection && !item.collection.isNFT) {
       if (result[item?.collection?.value]) {
-        result[item.collection.value]['totalFee'] += item.royaltiesFeeAmount;
+        result[item.collection.value].totalFee += item.royaltiesFeeAmount;
       } else {
-        result[item.collection.value] = {};
-        result[item.collection.value]['precision'] = item.collection.precision;
-        result[item.collection.value]['totalFee'] = item.royaltiesFeeAmount;
+        result[item.collection.value] = {
+          totalFee: item.royaltiesFeeAmount,
+          precision: item.collection.precision,
+        };
       }
     } else if (item.royaltiesFeeAmount) {
       if (result['KLV']) {
         result['KLV']['totalFee'] += item.royaltiesFeeAmount;
       } else {
-        result['KLV'] = {};
-        result['KLV']['totalFee'] = item.royaltiesFeeAmount;
-        result['KLV']['precision'] = 6;
+        result['KLV'] = {
+          totalFee: item.royaltiesFeeAmount,
+          precision: 6,
+        };
       }
     }
   });
-  Object.keys(result).forEach(key => {
-    result[key]['totalFee'] = result[key]['totalFee'].toFixed(
-      result[key]['precision'],
-    );
-  });
-  return result;
+  const parsedResult = Object.keys(result)
+    .map(key => {
+      return {
+        [key]: {
+          totalFee: result[key].totalFee.toFixed(result[key].precision),
+          precision: result[key].precision || 6,
+        },
+      };
+    })
+    .reduce((acc, cur) => {
+      return { ...acc, ...cur };
+    }, {});
+
+  return parsedResult;
 };
 
 const FeeDetails: React.FC<{

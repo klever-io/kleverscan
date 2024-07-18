@@ -20,7 +20,7 @@ interface IHeathReturn {
   error: string;
 }
 
-const errorMessage = {
+const errorMessage: { [key: string]: string } = {
   WARNING:
     'Note: Server response times are currently a bit high. Thanks for your patience.',
   ALERT:

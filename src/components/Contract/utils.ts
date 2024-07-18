@@ -54,7 +54,7 @@ const getType = (rawType: string): TransactionType => {
       type = 'SmartContract';
       break;
   }
-  return TransactionType[type];
+  return TransactionType[type as keyof typeof TransactionType];
 };
 
 const parsePackInfoPrecision = async (payload: any) => {
@@ -624,7 +624,7 @@ const parseValues = (
     }
   } else if (contractType === 'ProposalContract') {
     if (values.parameters) {
-      const parameters = {};
+      const parameters: { [key: string]: string } = {};
 
       values.parameters.forEach((parameter: any) => {
         if (
@@ -689,7 +689,7 @@ const parseValues = (
   }
 
   if (values.uris) {
-    const uris = {};
+    const uris: { [key: string]: string } = {};
 
     values.uris.forEach((uri: any) => {
       if (uri.label && uri.address) {
@@ -704,7 +704,7 @@ const parseValues = (
 
   Object.keys(parsedValues).forEach((item: any) => {
     if (parsedValues[item] && parsedValues[item].uris) {
-      const uris = {};
+      const uris: { [key: string]: string } = {};
 
       parsedValues[item].uris.forEach((uri: any) => {
         if (uri.label && uri.address) {

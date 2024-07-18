@@ -289,7 +289,9 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
         ) : (
           <DoubleRow {...props}>
             <CenteredRow key={contractType}>
-              <span>{ContractsName[contractType]}</span>
+              <span>
+                {ContractsName[contractType as keyof typeof ContractsName]}
+              </span>
             </CenteredRow>
             <CenteredRow>
               {getLabelForTableField(contractType)?.[0] ? (

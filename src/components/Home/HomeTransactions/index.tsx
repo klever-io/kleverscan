@@ -132,7 +132,9 @@ export const homeTransactionsRowSections = (
         ) : (
           <DoubleRow {...props}>
             <CenteredRow>
-              <span>{ContractsName[contractType]}</span>
+              <span>
+                {ContractsName[contractType as keyof typeof ContractsName]}
+              </span>
             </CenteredRow>
             <CenteredRow>
               {getLabelForTableField(contractType)?.[0] ? (
@@ -218,7 +220,9 @@ export const homeTransactionsTabletRowSections = (
         ) : (
           <DoubleRow {...props}>
             <CenteredRow>
-              <span>{ContractsName[contractType]}</span>
+              <span>
+                {ContractsName[contractType as keyof typeof ContractsName]}
+              </span>
             </CenteredRow>
             <CenteredRow>
               {getLabelForTableField(contractType)?.[0] ? (

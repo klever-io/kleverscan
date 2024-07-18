@@ -49,7 +49,7 @@ const getInitialValue = (
       return '';
     }
     const struct = types[rawType];
-    const initialObjectValue = {};
+    const initialObjectValue: Record<string, any> = {};
 
     Object.entries(struct?.fields || []).forEach(([key, v]) => {
       const initialValue = getInitialValue(v.type, types, true);

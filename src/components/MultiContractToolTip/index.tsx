@@ -39,7 +39,7 @@ export const MultiContractToolTip: React.FC<
       <aside style={{ width: 'fit-content' }}>
         <Tooltip
           msg={msg}
-          customStyles={{ offset: { right: 54, top: 5 } }}
+          customStyles={{ offset: 5 }}
           Component={() => (
             <MultiContractContainer>
               {contractType}

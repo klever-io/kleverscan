@@ -194,9 +194,7 @@ export const parseAllProposals = (
   return [];
 };
 
-export const parseITOs = async (
-  ITOs: IITO[],
-): Promise<IParsedITO | never[]> => {
+export const parseITOs = async (ITOs: any[]): Promise<IParsedITO | never[]> => {
   const assetsInput: string = ITOs.map(ITO => ITO.assetId).join(',');
   const packsPrecisionCalls: Promise<IITO>[] = [];
   const res = await api.get({

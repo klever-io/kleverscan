@@ -157,7 +157,7 @@ export const ParticipateModal: React.FC<
 
     for (const rangeIndex in range) {
       if (amount <= range[rangeIndex]) {
-        priceIndex = rangeIndex;
+        priceIndex = Number(rangeIndex);
         break;
       }
     }
@@ -221,7 +221,7 @@ export const ParticipateModal: React.FC<
 
     for (const rangeIndex in range) {
       if (cost <= range[rangeIndex]) {
-        priceIndex = rangeIndex;
+        priceIndex = Number(rangeIndex);
         break;
       }
     }

@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import { KLV } from '@/assets/coins';
 import { statusWithIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
@@ -99,7 +98,7 @@ import {
 } from '@/views/transactions/detail';
 import { TFunction, useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { PropsWithChildren, useState } from 'react';
 import Tooltip from '../Tooltip';
 
 interface IAssetTriggerTypeData {
@@ -705,7 +704,6 @@ export const CreateValidator: React.FC<PropsWithChildren<IIndexedContract>> = ({
 
   return (
     <>
-      {' '}
       <Row>
         <span>
           <strong>Type</strong>
@@ -1903,7 +1901,7 @@ export const Buy: React.FC<PropsWithChildren<IContractBuyProps>> = ({
         transferReceipts as ITransferReceipt[],
         'assetId',
       );
-      const precisionAllPricesSum = {};
+      const precisionAllPricesSum: Record<string, string> = {};
       Object.keys(allPricesSum).forEach(
         key =>
           (precisionAllPricesSum[key] = toLocaleFixed(
@@ -2651,20 +2649,26 @@ export const SmartContract: React.FC<PropsWithChildren<IIndexedContract>> = ({
     <>
       <Row>
         <span>
+          <strong>Type</strong>
+        </span>
+        <strong>Smart Contract</strong>
+      </Row>
+      <Row>
+        <span>
+          <strong>SC Type</strong>
+        </span>
+        <span>{(parameter?.type || '').slice(2)}</span>
+      </Row>
+      <Row>
+        <span>
           <strong>Contract Address</strong>
         </span>
-
         <CenteredRow>
           <span>{scAddress}</span>
           <Copy data={scAddress} info="address"></Copy>
         </CenteredRow>
       </Row>
-      <Row>
-        <span>
-          <strong>Type</strong>
-        </span>
-        <span>{(parameter?.type || '').slice(2)}</span>
-      </Row>
+
       {Object.entries(parameter?.callValue || {}).length > 0 && (
         <Row>
           <span>
@@ -2673,14 +2677,14 @@ export const SmartContract: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <RowContent>
             <BalanceContainer>
               <NetworkParamsContainer>
-                {(parameter?.callValue || []).map(({ asset, value }) => {
-                  return (
-                    <div key={asset}>
-                      <strong>{asset}</strong>
+                {parameter?.callValue?.map(value =>
+                  Object.entries(value).map(([key, value]) => (
+                    <div key={key}>
+                      <strong>{key}</strong>
                       <span>{value}</span>
                     </div>
-                  );
-                })}
+                  )),
+                )}
               </NetworkParamsContainer>
             </BalanceContainer>
           </RowContent>

@@ -1,5 +1,9 @@
 import { ContractsName } from '../types/contracts';
-import { isBeta } from './navbar';
+
+export const isBeta =
+  process.env.DEFAULT_NODE_HOST?.includes('devnet') ||
+  process.env.DEFAULT_NODE_HOST?.includes('testnet') ||
+  process.env.DEFAULT_IS_BETA;
 
 const coins: string[] = ['KLV', 'KFI'];
 

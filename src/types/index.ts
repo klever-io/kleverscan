@@ -1056,17 +1056,10 @@ export interface IRowSection {
   width?: number;
 }
 
-export interface IOffset {
-  left?: number;
-  right?: number;
-  top?: number;
-  bottom?: number;
-}
-
 export type Place = 'top' | 'right' | 'bottom' | 'left';
 
 export interface ICustomStyles {
-  offset?: IOffset;
+  offset?: number;
   place?: Place;
   delayShow?: number;
 }

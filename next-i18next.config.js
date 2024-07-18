@@ -1,12 +1,11 @@
-// path = require('path');
+const path = require('path');
 
 module.exports = {
   i18n: {
-    locales: ['en'],
+    locales: [
+      'en',
+    ],
     defaultLocale: 'en',
   },
-  fallbackLng: {
-    default: ['en'],
-  },
-  react: { useSuspense: false },
+  localePath: path.resolve('./public/locales'),
 };

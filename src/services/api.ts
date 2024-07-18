@@ -104,7 +104,7 @@ export const getProps = (props: IProps): IProps => {
     }
 
     if (name in defaultValues) {
-      return defaultValues[name];
+      return defaultValues[name as keyof IProps];
     }
 
     return undefined;
@@ -118,7 +118,6 @@ export const getProps = (props: IProps): IProps => {
 export const withoutBody = async (
   props: IProps,
   method: Method,
-  tries = 3,
 ): Promise<any> => {
   const request = async () => {
     if (props.useApiProxy) {
@@ -182,7 +181,7 @@ export const withoutBody = async (
     res => (result = res),
     err => (result = Promise.resolve(err)),
     () => request(),
-    tries,
+    props.tries || 3,
   );
 
   return result;

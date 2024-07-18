@@ -289,7 +289,7 @@ const FormInput: React.FC<
     };
   }, [name, unregister, isCustom]);
 
-  const areaProps = {
+  const areaProps: any = {
     error: Boolean(error),
     logoWarning: logoError !== null ? true : false,
     value: rest.value,

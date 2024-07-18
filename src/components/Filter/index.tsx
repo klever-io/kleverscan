@@ -38,7 +38,7 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
   data,
   onClick,
   onChange,
-  current,
+  current: initial,
   firstItem,
   overFlow,
   inputType = 'text',
@@ -48,7 +48,7 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
   maxWidth,
 }) => {
   const allItem = firstItem || 'All';
-  const [selected, setSelected] = useState(current || allItem);
+  const [selected, setSelected] = useState(initial || allItem);
   const [closed, setClosed] = useState(true);
   const [dontBlur, setDontBlur] = useState(false);
   const [inputValue, setInputValue] = useState('');

@@ -97,7 +97,12 @@ export const AccountDetailsModal: React.FC<
       const { balance, otherAssets } = data;
       return { balance, otherAssets };
     }
-    return { balance: {}, otherAssets: [] };
+    return {
+      balance: {
+        klv: '',
+      },
+      otherAssets: [],
+    };
   }, [data]);
 
   const requestKLV = async () => {

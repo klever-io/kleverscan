@@ -221,12 +221,18 @@ const Contract: React.FC<PropsWithChildren<IContract>> = ({
         {payload && <ConfirmPayload />}
         {txHash && <HashComponent {...hashProps} />}
 
-        {contractsDescription[currentContract?.contractType] && (
+        {contractsDescription[
+          currentContract?.contractType as keyof typeof contractsDescription
+        ] && (
           <CardContainer>
             <Card>
               <div>
                 <span>
-                  {contractsDescription[currentContract?.contractType]}
+                  {
+                    contractsDescription[
+                      currentContract?.contractType as keyof typeof contractsDescription
+                    ]
+                  }
                 </span>
                 <span>KApp Fee: {kappFee} KLV</span>
               </div>

@@ -112,9 +112,9 @@ export const findAllReceiptsWithSender = (
 
 export const extractValuesFromReceipts = (
   receipts: ITransferReceipt[],
-  keyToFind: string,
+  keyToFind: keyof ITransferReceipt,
 ): Record<string, number> => {
-  const result = {};
+  const result: Record<string, number> = {};
   receipts.forEach(receipt => {
     if (receipt[keyToFind] in result) {
       result[receipt[keyToFind]] += receipt.value;

@@ -24,7 +24,9 @@ export const FeesProvider: React.FC<PropsWithChildren> = ({ children }) => {
     return (
       Number(
         paramsList?.find(
-          item => item.parameterLabel === paramContractMap[contractType],
+          item =>
+            item.parameterLabel ===
+            paramContractMap[contractType as keyof typeof paramContractMap],
         )?.currentValue,
       ) /
       10 ** KLV_PRECISION

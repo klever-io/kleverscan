@@ -60,7 +60,10 @@ export function usePrecision(
   }
 }
 
-type PartialResponse = IAssetsResponse | IValidatorResponse;
+type PartialResponse =
+  | IAssetsResponse
+  | IValidatorResponse
+  | { [key: string]: any };
 
 export const useFetchPartial = <T,>(
   type: string,
@@ -107,7 +110,9 @@ export const useFetchPartial = <T,>(
           if (
             value &&
             !items.find(asset =>
-              asset[dataType].toUpperCase().includes(value.toUpperCase()),
+              (asset as { [key: string]: string })[dataType]
+                .toUpperCase()
+                .includes(value.toUpperCase()),
             )
           ) {
             setLoading(true);

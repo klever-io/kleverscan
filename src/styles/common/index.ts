@@ -448,12 +448,17 @@ export const Status = styled.div<IStatus>`
     color: ${props =>
       props.status === 'ApprovedProposal'
         ? props.theme.table['success']
-        : props.theme.table[props.status]} !important;
+        : props.theme.table[
+            props.status as keyof typeof props.theme.table
+          ]} !important;
     font-weight: bold;
   }
 
   p {
-    color: ${props => props.theme.table[props.status]} !important;
+    color: ${props =>
+      props.theme.table[
+        props.status as keyof typeof props.theme.table
+      ]} !important;
     text-transform: capitalize;
   }
 

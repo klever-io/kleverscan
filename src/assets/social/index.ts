@@ -17,3 +17,14 @@ export {
   Github,
   Youtube,
 };
+
+export default {
+  Facebook,
+  Twitter,
+  Discord,
+  Instagram,
+  Linkedin,
+  Telegram,
+  Github,
+  Youtube,
+};

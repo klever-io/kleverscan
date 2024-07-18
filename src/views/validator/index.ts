@@ -118,10 +118,14 @@ export const Status = styled.div<IStatus>`
     fill: ${props => props.theme.white};
   }
   circle {
-    fill: ${props => props.theme.table[props.status]};
+    fill: ${props =>
+      props.theme.table[props.status as keyof typeof props.theme.table]};
   }
   p {
-    color: ${props => props.theme.table[props.status]} !important;
+    color: ${props =>
+      props.theme.table[
+        props.status as keyof typeof props.theme.table
+      ]} !important;
     text-transform: capitalize;
   }
   ${props =>

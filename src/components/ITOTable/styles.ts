@@ -59,7 +59,7 @@ export const Header = styled.div<ITableType>`
   font-size: 0.85rem;
 
   span {
-    ${props => widths[props.type]}
+    ${props => widths[props.type as keyof typeof widths]};
   }
 `;
 
@@ -108,7 +108,8 @@ export const Row = styled.div<ITableType>`
   > span,
   > a {
     @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
-      ${props => props.rowSections && widths[props.type]};
+      ${props =>
+        props.rowSections && widths[props.type as keyof typeof widths]};
     }
   }
   span,
@@ -118,7 +119,7 @@ export const Row = styled.div<ITableType>`
 
     color: ${props => props.theme.black};
 
-    ${props => !props.rowSections && widths[props.type]};
+    ${props => !props.rowSections && widths[props.type as keyof typeof widths]};
 
     a {
       color: ${props => props.theme.black};
@@ -335,12 +336,17 @@ export const Status = styled.div<IStatus>`
     color: ${props =>
       props.status === 'ApprovedProposal'
         ? props.theme.table['success']
-        : props.theme.table[props.status]} !important;
+        : props.theme.table[
+            props.status as keyof typeof props.theme.table
+          ]} !important;
     font-weight: bold;
   }
 
   p {
-    color: ${props => props.theme.table[props.status]} !important;
+    color: ${props =>
+      props.theme.table[
+        props.status as keyof typeof props.theme.table
+      ]} !important;
     text-transform: capitalize;
   }
 

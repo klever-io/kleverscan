@@ -73,7 +73,7 @@ const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
 
       for (const rangeIndex in range) {
         if (amount <= range[rangeIndex]) {
-          priceIndex = rangeIndex;
+          priceIndex = Number(rangeIndex);
           break;
         }
       }

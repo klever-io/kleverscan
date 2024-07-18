@@ -266,7 +266,7 @@ const DateFilter: React.FC<PropsWithChildren> = () => {
   ];
 
   return router.isReady ? (
-    <FilterContainer>
+    <FilterContainer open={calendarOpen}>
       <span>Date Filter</span>
       <Container
         onBlur={() => !dontBlur && setCalendarOpen(false)}

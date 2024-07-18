@@ -12,7 +12,7 @@ export default async function handler(
     const client = queryDirectus();
 
     const response = await client.request(
-      directus[requestFunction](...requestParams),
+      (directus as any)[requestFunction](...requestParams),
     );
 
     res.status(200).json(response);

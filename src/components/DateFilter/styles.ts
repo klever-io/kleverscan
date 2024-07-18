@@ -132,7 +132,6 @@ export const CalendarContainer = styled.div`
   min-height: 18rem;
   width: 18rem;
   padding: 1rem;
-  margin-left: 5rem;
   background-color: ${props => props.theme.background};
   position: absolute;
   bottom: -0.5rem;
@@ -148,8 +147,8 @@ export const CalendarContainer = styled.div`
   }
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    left: 6rem;
     bottom: -100%;
+    left: 50%;
     animation: ${fadeInContainerMobile} 0.2s linear forwards;
     width: 20rem;
   }

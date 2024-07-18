@@ -12,10 +12,9 @@ const coinTablet = {
 export const coinStyles = [coinMobile, coinTablet];
 
 //proposals page network params
-const paramsMobile = { offset: { right: 170 }, place: 'left' as Place };
-const paramsTablet = { offset: { right: 200 }, place: 'left' as Place };
-const paramsDesktop = { offset: { left: 50 } };
-export const paramsStyles = [paramsMobile, paramsTablet, paramsDesktop];
+const paramsMobile = { place: 'left' as Place };
+const paramsTablet = { place: 'left' as Place };
+export const paramsStyles = [paramsMobile, paramsTablet];
 
 //proposal page tip
-export const tipMobile = { offset: {}, place: 'right' as Place };
+export const tipMobile = { place: 'right' as Place };

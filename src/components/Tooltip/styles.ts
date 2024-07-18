@@ -1,9 +1,12 @@
-import ReactTooltip from 'react-tooltip';
+import { Tooltip } from 'react-tooltip';
 import styled from 'styled-components';
 
-export const StyledTooltip = styled(ReactTooltip)<{ displayMsg: boolean }>`
+export const StyledTooltip = styled(Tooltip)<{ displayMsg: boolean }>`
+  --rt-opacity: 0.975;
+
   width: fit-content !important;
   display: ${props => (props.displayMsg ? 'initial' : 'none')} !important;
+  background-color: ${props => props.theme.blueGray400} !important;
 
   span {
     font-size: 0.875rem;
@@ -16,7 +19,7 @@ export const ToolTipSpan = styled.span<{ maxVw: number | undefined }>`
 
   div {
     max-width: ${props => (props.maxVw ? props.maxVw : 50)}vw;
-    min-height: 0;
+    min-height: 1rem;
   }
   div > span {
     white-space: normal;
@@ -26,9 +29,5 @@ export const ToolTipSpan = styled.span<{ maxVw: number | undefined }>`
     div {
       max-width: 100vw;
     }
-  }
-
-  .opaque {
-    opacity: 0.975 !important;
   }
 `;

@@ -348,7 +348,7 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
         },
         {
           KLV: 0,
-        },
+        } as { [key: string]: number },
       );
       totalCosts['KLV'] += totalFees * 10 ** KLV_PRECISION;
 
@@ -377,7 +377,7 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
         KFI: asset.payload.amount,
       }))[0];
       for (const assetId in kfiAmount) {
-        const amount = kfiAmount[assetId];
+        const amount = kfiAmount[assetId as keyof typeof kfiAmount];
         const asset = assetsList
           ?.find(item => item.assetId === assetId)
           ?.buckets?.reduce((acc, current) => acc + current.balance, 0);

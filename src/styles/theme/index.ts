@@ -10,6 +10,7 @@ const theme = {
   border: '#eeeff6',
 
   blueGray300: '#646693',
+  blueGray400: '#7B7DB2',
   blueGray500: '#404264',
 
   gray900: '#181818',

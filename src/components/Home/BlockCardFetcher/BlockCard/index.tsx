@@ -64,7 +64,7 @@ const BlockCard: React.FC<PropsWithChildren<IBlockCard>> = ({
     }
     return (
       <Anchor href={`/validator/${producerOwnerAddress}`}>
-        <LetterLogo>{producerName?.split[0] || 'K'}</LetterLogo>
+        <LetterLogo>{producerName?.split('')[0] || 'K'}</LetterLogo>
       </Anchor>
     );
   };

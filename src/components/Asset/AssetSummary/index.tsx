@@ -1,5 +1,5 @@
 import { PropsWithChildren } from 'react';
-import { icons as SocialIcons } from '@/assets/social';
+import SocialIcons from '@/assets/social';
 import { AssetProps } from '@/components/Asset/OverviewTab';
 import { HashComponent } from '@/components/Contract';
 import Title from '@/components/Layout/Title';
@@ -85,7 +85,7 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
           ? {
               uri: value.startsWith('http') ? value : `https://${value}`,
               social: matchingSocial[0],
-              icon: SocialIcons[matchingSocial[0]],
+              icon: SocialIcons[matchingSocial[0] as keyof typeof SocialIcons],
             }
           : null;
       })

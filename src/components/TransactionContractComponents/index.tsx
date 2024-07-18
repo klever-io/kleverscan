@@ -1902,7 +1902,7 @@ export const Buy: React.FC<PropsWithChildren<IContractBuyProps>> = ({
         transferReceipts as ITransferReceipt[],
         'assetId',
       );
-      const precisionAllPricesSum = {};
+      const precisionAllPricesSum: Record<string, string> = {};
       Object.keys(allPricesSum).forEach(
         key =>
           (precisionAllPricesSum[key] = toLocaleFixed(

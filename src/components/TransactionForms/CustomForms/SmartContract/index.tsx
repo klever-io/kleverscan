@@ -167,7 +167,7 @@ const parseAbiFunctions = (
 
 const parseCallValue = (data: FormData) => {
   const { callValue } = data;
-  const newCallValue = {};
+  const newCallValue: { [coin: string]: number } = {};
 
   ((callValue as unknown as any[]) || []).forEach(value => {
     const { label, amount } = value;
@@ -211,7 +211,7 @@ const parseArgument = (
   }
 
   if (type === 'object' && abi !== null) {
-    let argument = {};
+    let argument: Record<string, any> = {};
     try {
       argument = JSON.parse(value as string);
     } catch (error) {
@@ -352,7 +352,7 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
     !hasFunctions ||
     (scType === 1 && fileData?.length > 0);
 
-  const formInputProps = {
+  const formInputProps: any = {
     name: 'function',
     title: 'Function',
     type: hasFunctions ? 'dropdown' : 'text',

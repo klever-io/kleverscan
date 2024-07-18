@@ -557,10 +557,10 @@ export const getLabelForTableField = (
 ): string[] => {
   const type =
     typeof contractType === 'string'
-      ? ContractsName[contractType]
+      ? ContractsName[contractType as keyof typeof ContractsName]
       : ContractsIndex[contractType];
 
-  return contractLabels[type] || [];
+  return contractLabels[type as keyof typeof contractLabels] || [];
 };
 
 export const getHeaderForCSV = (
@@ -568,7 +568,7 @@ export const getHeaderForCSV = (
   header: string[],
 ): string[] => {
   let newHeaders: string[] = [];
-  switch (ContractsIndex[ContractsIndex[Number(router.query.type)]]) {
+  switch (Number(ContractsIndex[Number(router.query.type)])) {
     case ContractsIndex.Transfer:
       newHeaders = [contractTableHeaders[0], contractTableHeaders[1]];
       break;
@@ -580,9 +580,6 @@ export const getHeaderForCSV = (
       break;
     case ContractsIndex['Config Validator']:
       newHeaders = [contractTableHeaders[6]];
-      break;
-    case ContractsIndex['Validator Config']:
-      newHeaders = [contractTableHeaders[7]];
       break;
     case ContractsIndex.Freeze:
       newHeaders = [contractTableHeaders[9], contractTableHeaders[1]];

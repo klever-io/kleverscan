@@ -7,8 +7,18 @@ import Telegram from './telegram.svg';
 import Twitter from './twitter.svg';
 import Youtube from './youtube.svg';
 
-// Export the icons with strong typing
-export const icons: Record<string, any> = {
+export {
+  Facebook,
+  Twitter,
+  Discord,
+  Instagram,
+  Linkedin,
+  Telegram,
+  Github,
+  Youtube,
+};
+
+export default {
   Facebook,
   Twitter,
   Discord,

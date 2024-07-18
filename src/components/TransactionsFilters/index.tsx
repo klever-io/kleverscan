@@ -30,8 +30,8 @@ const TransactionsFilters: React.FC<
     setLocalQuery(router.query);
   }, [router.isReady, router.query]);
 
-  const getContractIndex = (contractName: string): string =>
-    ContractsIndex[contractName];
+  const getContractIndex = (contractName: string) =>
+    ContractsIndex[contractName as keyof typeof ContractsIndex];
   const getContractName = (): string => ContractsIndex[Number(query.type)];
 
   const handleSelected = (selected: string, filterType: string): void => {
@@ -50,7 +50,7 @@ const TransactionsFilters: React.FC<
         {
           ...updatedQuery,
           page: String(1),
-          [filterType]: getContractIndex(selected),
+          [filterType]: String(getContractIndex(selected)),
         },
         router,
       );

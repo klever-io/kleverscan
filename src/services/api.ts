@@ -104,7 +104,7 @@ export const getProps = (props: IProps): IProps => {
     }
 
     if (name in defaultValues) {
-      return defaultValues[name];
+      return defaultValues[name as keyof IProps];
     }
 
     return undefined;

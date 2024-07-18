@@ -37,20 +37,20 @@ export default async function handler(
     return res.status(400).json({ errors: errors });
   }
 
-  const data = {};
-
   try {
     const { error, status, hash } = await broadcastTXandCheckStatus(
       JSON.parse(signedTransaction),
     );
 
-    if (!error && status === 'success') {
-      data['payment_status'] = 'paid';
-      data['hash'] = hash;
-    } else {
+    if (error || status !== 'success') {
       errors.push('Payment failed.');
       return res.status(400).json({ errors: errors });
     }
+
+    const data = {
+      payment_status: 'paid',
+      hash,
+    };
 
     try {
       const response = await directus.request(

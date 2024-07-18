@@ -336,7 +336,7 @@ const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
       });
     } catch (error) {
       console.error(error);
-      toast.error(JSON.stringify(error + 'BBBBBBBBBBBBBBBBBBBBBBBBB'));
+      toast.error(JSON.stringify(error));
     }
   };
 

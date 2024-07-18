@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import {
   WhiteTick,
   WizardLeftArrow,
@@ -15,7 +14,7 @@ import { parseAddress } from '@/utils/parseValues';
 import { TFunction, useTranslation } from 'next-i18next';
 import Image from 'next/legacy/image';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { FiPlusSquare } from 'react-icons/fi';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
@@ -319,7 +318,11 @@ export const CreateAssetWelcomeStep: React.FC<
         <span>
           {t('wizards:common.txCost')} {transactionCost} KLV.
         </span>
-        <WizardButton onClick={() => handleStep(prev => prev + 1)} fullWidth>
+        <WizardButton
+          type="button"
+          onClick={() => handleStep(prev => prev + 1)}
+          fullWidth
+        >
           <p>{t('wizards:common.readyText')}</p>
           <WizardRightArrowSVG />
         </WizardButton>

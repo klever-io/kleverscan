@@ -258,7 +258,6 @@ const WizCreateNFT: React.FC<PropsWithChildren<any>> = ({
   };
 
   const onSubmit = async (data: any) => {
-    if (!data?.name) return;
     const parsedUris = parseURIs(data);
     const parsedRoles = parseRoles(data);
     const contractyType = 'CreateAssetContract';

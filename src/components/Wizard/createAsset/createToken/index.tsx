@@ -289,7 +289,6 @@ const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
   };
 
   const onSubmit = async (data: any) => {
-    if (!data?.name) return;
     parseStringToNumberSupply(data);
     const parsedUris = parseURIs(data);
     const parsedRoles = parseRoles(data);

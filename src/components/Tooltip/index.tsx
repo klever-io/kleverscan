@@ -23,34 +23,22 @@ const Tooltip: React.FC<PropsWithChildren<ITooltipProps>> = ({
   const parsedMsgs = msg.split('\n');
   return (
     <ToolTipSpan
+      className="button-tooltip"
       onMouseOver={() => setDisplayMessage(true)}
       onMouseLeave={() => setDisplayMessage(false)}
       maxVw={maxVw}
     >
-      {Component ? (
-        <div data-tip data-for="buttonTooltip">
-          {Component({})}
-        </div>
-      ) : (
-        <IconHelp data-tip data-for="buttonTooltip">
-          button
-        </IconHelp>
-      )}
+      {Component ? <div>{Component({})}</div> : <IconHelp>button</IconHelp>}
       {((Component && msg.length > minMsgLength) || !Component) && (
         <StyledTooltip
-          key={String(displayMessage)}
+          anchorSelect=".button-tooltip"
           displayMsg={displayMessage}
-          id="buttonTooltip"
           place={customStyles?.place || 'top'}
-          effect="solid"
-          type="info"
-          backgroundColor="#7B7DB2"
-          delayShow={customStyles?.delayShow}
+          delayShow={customStyles?.delayShow || 300}
           offset={customStyles?.offset}
-          className={'opaque'}
         >
           {parsedMsgs.map((parsedMsg, index) => (
-            <span key={index} style={{ color: 'white' }}>
+            <span key={parsedMsg} style={{ color: 'white' }}>
               {parsedMsg}
               {index + 1 !== parsedMsgs.length && <br />}
             </span>

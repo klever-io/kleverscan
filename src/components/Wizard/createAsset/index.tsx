@@ -187,11 +187,12 @@ export const propertiesValues = (t: TFunction): any[] => {
 };
 
 export const propertiesCommonDefaultValues = {
-  name: '',
-  ticker: '',
-  ownerAddress: '',
-  maxSupply: '',
-  logo: '',
+  name: 'Teste Token Create JKS',
+  ticker: 'TTCJKS',
+  ownerAddress:
+    'klv1u0p8wzuyusgq2jhpjusm66htgs0tsht0gr60zx33th06xk7h6efs6qmr7d',
+  maxSupply: '987,654,321',
+  logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRitYnWgNohnd_me7gGE2RxZhAZ-ppTBK6WvA&s',
   properties: {
     canAddRoles: true,
     canBurn: true,
@@ -201,6 +202,57 @@ export const propertiesCommonDefaultValues = {
     canPause: true,
     canWipe: false,
   },
+  precision: 7,
+  initialSupply: '123,456,789',
+  uris: [
+    {
+      label: 'WEB',
+      uri: 'https://www.saviojks.com.br/',
+    },
+  ],
+  staking: {
+    interestType: 0,
+    apr: 12,
+    minEpochsToClaim: 2,
+    minEpochsToUnstake: 3,
+    minEpochsToWithdraw: 4,
+  },
+  royalties: {
+    address: 'klv1u0p8wzuyusgq2jhpjusm66htgs0tsht0gr60zx33th06xk7h6efs6qmr7d',
+    itoPercentage: 2,
+    itoFixed: 3,
+    transferPercentage: [
+      {
+        amount: 100,
+        percentage: 1,
+      },
+      {
+        amount: 1000,
+        percentage: 5,
+      },
+    ],
+    splitRoyalties: {
+      klv1nj6wjhh8hp6uzezu8xtycqwgvaxefkgwl0j0xtfd8z7fphdvf8nqlg6lpd: {
+        percentTransferPercentage: '1',
+        percentITOPercentage: 2,
+        percentITOFixed: 3,
+      },
+      klv1u0p8wzuyusgq2jhpjusm66htgs0tsht0gr60zx33th06xk7h6efs6qmr7d: {
+        percentTransferPercentage: '4',
+        percentITOPercentage: 5,
+        percentITOFixed: 6,
+      },
+    },
+  },
+  transferPercentage: [{}, {}],
+  splitRoyalties: [{}, {}],
+  roles: [
+    {
+      address: 'klv1u0p8wzuyusgq2jhpjusm66htgs0tsht0gr60zx33th06xk7h6efs6qmr7d',
+      hasRoleMint: true,
+      hasRoleSetITOPrices: true,
+    },
+  ],
 };
 
 export const infinitySymbol = '\u221e';

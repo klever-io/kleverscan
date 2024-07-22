@@ -54,7 +54,7 @@ export const assetTypes = [
   },
 ];
 
-const parseCreateAsset = (data: ICreateAsset) => {
+export const parseCreateAsset = (data: ICreateAsset) => {
   const dataCopy = JSON.parse(JSON.stringify(data));
   parseSplitRoyalties(dataCopy);
   parseURIs(dataCopy);

@@ -340,6 +340,7 @@ export const createITO = (t: TFunction): ICreateITO => {
 
 export const parseRoles = (data: any) => {
   if (data.roles === undefined) {
+    data.roles = [];
     return;
   }
 

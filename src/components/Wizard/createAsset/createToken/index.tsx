@@ -1,21 +1,10 @@
-import {
-  buildTransaction,
-  getType,
-  precisionParse,
-} from '@/components/Contract/utils';
-import {
-  parseSplitRoyalties,
-  parseStringToNumberSupply,
-  parseURIs,
-} from '@/components/TransactionForms/CustomForms/utils';
+import { parseCreateAsset } from '@/components/TransactionForms/CustomForms/CreateAsset';
+import { useContract } from '@/contexts/contract';
 import { useExtension } from '@/contexts/extension';
-import { gtagEvent } from '@/utils/gtag';
 import { parseAddress } from '@/utils/parseValues';
-import { web } from '@klever/sdk-web';
 import { useTranslation } from 'next-i18next';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
 import {
   ConfirmSuccessTransaction,
   ConfirmTransaction,
@@ -38,7 +27,7 @@ import {
   infinitySymbol,
   propertiesCommonDefaultValues,
 } from '..';
-import { createToken, parseRoles } from '../../utils';
+import { createToken } from '../../utils';
 import { WizardBody } from '../styles';
 
 // TODO -> Check state setadvancedsteps
@@ -287,55 +276,20 @@ const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
     setSelectedStep,
     setSteps,
   };
+  const { handleSubmit: handleContractSubmit, txHash: txContractHash } =
+    useContract();
 
   const onSubmit = async (data: any) => {
-    parseStringToNumberSupply(data);
-    const parsedUris = parseURIs(data);
-    const parsedRoles = parseRoles(data);
-
-    parseSplitRoyalties(data);
-    const contractType = 'CreateAssetContract';
-    await precisionParse(data, contractType);
-    if (!data?.royalties) {
-      data['royalties'] = { address: data?.ownerAddress };
-    }
-
-    data.ticker = (data?.ticker as string)?.toUpperCase();
-    data.type = 0;
-    const parseTransaction = {
-      ...data,
-      uris: parsedUris,
-      roles: parsedRoles,
-      ticker: (data?.ticker as string)?.toUpperCase(),
-    };
-
-    try {
-      const unsignedTx = await buildTransaction([
-        {
-          type: getType(contractType),
-          payload: parseTransaction,
-        },
-      ]);
-
-      const signedTx = await window.kleverWeb.signTransaction(
-        unsignedTx.result,
-      );
-      const response = await web.broadcastTransactions([signedTx]);
-      setTxHash(response.data.txsHashes[0]);
-      window.scrollTo(0, 0);
-      toast.success(t('common:transactionBroadcastSuccess'));
-      gtagEvent('send_transaction_wizard', {
-        event_category: 'transaction',
-        event_label: 'send_transaction_wizard',
-        hash: response.data.txsHashes[0],
-        sender: walletAddress,
-        transaction_type: 'CreateAssetContract',
-      });
-    } catch (error) {
-      console.error(error);
-      toast.error(JSON.stringify(error));
-    }
+    const rowData = parseCreateAsset(data);
+    await handleContractSubmit(rowData, '', 'CreateAssetContract', 1);
+    window.scrollTo(0, 0);
   };
+
+  useEffect(() => {
+    if (txContractHash) {
+      setTxHash(txContractHash);
+    }
+  }, [txContractHash]);
 
   return (
     <>

@@ -47,6 +47,7 @@ export const parseURIs = (data: any) => {
     const label = item.label;
     uris[label] = item.uri;
   });
+  data.uris = uris;
   return uris;
 };
 

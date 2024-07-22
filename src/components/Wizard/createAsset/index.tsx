@@ -1279,7 +1279,7 @@ export const CreateAssetSplitRoyalties: React.FC<
               setSplitRoyalties(true);
             }}
           >
-            {t('wizards:common.advancedOptions.royalties.statements')}
+            {t('common:Statements.Yes')}
           </WizardButton>
           <WizardButton secondary centered onClick={() => handleStep(10)}>
             {t('common:Statements.No')}

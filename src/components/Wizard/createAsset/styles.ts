@@ -232,7 +232,7 @@ export const WizardButtonContainer = styled.div`
 export const WizardButton = styled.button.attrs(props => ({
   type: props.type || 'button',
 }))<{
-  type?: 'button' | 'submit' | 'reset'; // Adicionando o tipo aqui
+  type?: 'button' | 'submit' | 'reset';
   secondary?: boolean;
   centered?: boolean;
   fullWidth?: boolean;

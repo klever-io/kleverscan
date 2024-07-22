@@ -225,7 +225,7 @@ const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
     },
   ]);
 
-  const [activeStep, setActiveStep] = useState(steps[14]);
+  const [activeStep, setActiveStep] = useState(steps[0]);
 
   const methods = useForm({
     mode: 'all',
@@ -236,7 +236,7 @@ const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
     },
   });
   const { handleSubmit, watch } = methods;
-  const log = watch();
+
   useEffect(() => {
     setSteps(prev => {
       return prev.map((e, index) => {

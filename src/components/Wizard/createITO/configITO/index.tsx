@@ -150,7 +150,7 @@ export const WizCreateITO: React.FC<PropsWithChildren<any>> = ({
       component: <ConfirmTransaction {...stepsProps} />,
     },
   ]);
-  const [activeStep, setActiveStep] = useState(steps[8]);
+  const [activeStep, setActiveStep] = useState(steps[0]);
 
   const methods = useForm({
     mode: 'all',

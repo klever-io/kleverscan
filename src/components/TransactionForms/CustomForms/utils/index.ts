@@ -34,27 +34,20 @@ export const parseSplitRoyalties = (data: any): void => {
   data.royalties.splitRoyalties = splitRoyalties;
 };
 
-export const parseURIs = (data: any): void => {
+export const parseURIs = (data: any) => {
   if (data.uris === undefined) {
     return;
   }
 
   const urisReference = data.uris;
-
-  delete data.uris;
-
   if (urisReference.length === 0) return;
 
-  const uris: {
-    [key: string]: string;
-  } = {};
-
+  const uris: { [key: string]: string } = {};
   urisReference.forEach((item: any) => {
     const label = item.label;
-    uris[label] = item.value;
+    uris[label] = item.uri;
   });
-
-  data.uris = uris;
+  return uris;
 };
 
 export const parseStaking = (data: any): void => {

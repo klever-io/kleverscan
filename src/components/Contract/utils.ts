@@ -204,20 +204,41 @@ const precisionParse = async (
     case 'CreateAssetContract':
       precision = payload.precision || 0;
       if (payload?.royalties?.splitRoyalties) {
-        payload.royalties.splitRoyalties.forEach((royalty: ISplitRoyalties) => {
-          if (royalty.percentITOPercentage) {
-            royalty.percentITOPercentage = addPrecision(
-              royalty.percentITOPercentage,
-              percentagePrecision,
-            );
-          }
-          if (royalty.percentITOFixed) {
-            royalty.percentITOFixed = addPrecision(
-              royalty.percentITOFixed,
-              percentagePrecision,
-            );
-          }
-        });
+        if (Array.isArray(payload.royalties.splitRoyalties)) {
+          payload.royalties.splitRoyalties.forEach(
+            (royalty: ISplitRoyalties) => {
+              if (royalty.percentITOPercentage) {
+                royalty.percentITOPercentage = addPrecision(
+                  royalty.percentITOPercentage,
+                  percentagePrecision,
+                );
+              }
+              if (royalty.percentITOFixed) {
+                royalty.percentITOFixed = addPrecision(
+                  royalty.percentITOFixed,
+                  percentagePrecision,
+                );
+              }
+            },
+          );
+        } else {
+          Object.values(payload.royalties.splitRoyalties).forEach(
+            (royalty: any) => {
+              if (royalty.percentITOPercentage) {
+                royalty.percentITOPercentage = addPrecision(
+                  royalty.percentITOPercentage,
+                  percentagePrecision,
+                );
+              }
+              if (royalty.percentITOFixed) {
+                royalty.percentITOFixed = addPrecision(
+                  royalty.percentITOFixed,
+                  percentagePrecision,
+                );
+              }
+            },
+          );
+        }
       }
       payload.initialSupply = addPrecision(payload.initialSupply, precision);
 
@@ -870,13 +891,13 @@ const buildTransaction = async (
 };
 
 export {
-  getType,
-  getAssetsList,
-  showAssetIdInput,
-  precisionParse,
-  parseValues,
-  contractHaveKDA,
-  contractHaveBucketId,
-  contractsDescription,
   buildTransaction,
+  contractHaveBucketId,
+  contractHaveKDA,
+  contractsDescription,
+  getAssetsList,
+  getType,
+  parseValues,
+  precisionParse,
+  showAssetIdInput,
 };

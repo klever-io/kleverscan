@@ -131,7 +131,7 @@ export const propertiesValues = (t: TFunction): any[] => {
       }),
       isDefaultChecked: true,
       property: 'canFreeze',
-      tooltip: t('wizards:common.properties.tooltipFreeze'),
+      tooltip: t('wizards:common.advancedOptions.properties.tooltipFreeze'),
     },
     {
       label: t('common:Properties.Can', {
@@ -139,7 +139,7 @@ export const propertiesValues = (t: TFunction): any[] => {
       }),
       isDefaultChecked: true,
       property: 'canPause',
-      tooltip: t('wizards:common.properties.tooltipPause'),
+      tooltip: t('wizards:common.advancedOptions.properties.tooltipPause'),
     },
     {
       label: t('common:Properties.Can', {
@@ -147,7 +147,7 @@ export const propertiesValues = (t: TFunction): any[] => {
       }),
       isDefaultChecked: true,
       property: 'canBurn',
-      tooltip: t('wizards:common.properties.tooltipBurn'),
+      tooltip: t('wizards:common.advancedOptions.properties.tooltipBurn'),
     },
     {
       label: t('common:Properties.Can', {
@@ -155,7 +155,7 @@ export const propertiesValues = (t: TFunction): any[] => {
       }),
       isDefaultChecked: true,
       property: 'canAddRoles',
-      tooltip: t('wizards:common.properties.tooltipAddRoles'),
+      tooltip: t('wizards:common.advancedOptions.properties.tooltipAddRoles'),
     },
     {
       label: t('common:Properties.Can', {
@@ -163,7 +163,7 @@ export const propertiesValues = (t: TFunction): any[] => {
       }),
       isDefaultChecked: true,
       property: 'canMint',
-      tooltip: t('wizards:common.properties.tooltipMint'),
+      tooltip: t('wizards:common.advancedOptions.properties.tooltipMint'),
     },
     {
       label: t('common:Properties.Can', {
@@ -171,7 +171,9 @@ export const propertiesValues = (t: TFunction): any[] => {
       }),
       isDefaultChecked: true,
       property: 'canChangeOwner',
-      tooltip: t('wizards:common.properties.tooltipChangeOwner'),
+      tooltip: t(
+        'wizards:common.advancedOptions.properties.tooltipChangeOwner',
+      ),
     },
     {
       label: t('common:Properties.Can', {
@@ -179,7 +181,7 @@ export const propertiesValues = (t: TFunction): any[] => {
       }),
       isDefaultChecked: false,
       property: 'canWipe',
-      tooltip: t('wizards:common.properties.tooltipWipe'),
+      tooltip: t('wizards:common.advancedOptions.properties.tooltipWipe'),
     },
   ];
 };
@@ -724,7 +726,7 @@ export const CreateAssetRoyaltyAddress: React.FC<
   return (
     <GenericCardContainer>
       <div>
-        <p>{t('wizards:common.advancedOptions.eachAdvancedText')}</p>
+        <p>{t('wizards:common.advancedOptions.royalties.royalties')}</p>
         <p>{t('wizards:common.step')} 2/5</p>
       </div>
       <div>
@@ -800,7 +802,7 @@ export const CreateAssetRoyaltyAddress: React.FC<
       <ChangedAddressContainer>
         {changeOwnerAddress && !isTablet && (
           <div>
-            {t('wizards:common.ownerAddress')}
+            {t('wizards:common.basicOptions.ownerAddress')}
             <GenericInput
               error={error}
               type="text"
@@ -842,8 +844,8 @@ const CreateAssetRoyaltyITOToken: React.FC<PropsWithChildren<any>> = ({
   let errorTransferFixed = null;
 
   try {
-    errorTransferPercentage = eval(`errors?.royalties.percentITOPercentage`);
-    errorTransferFixed = eval(`errors?.royalties.percentITOFixed`);
+    errorTransferPercentage = eval(`errors?.royalties.itoPercentage`);
+    errorTransferFixed = eval(`errors?.royalties.itoPercentage`);
   } catch {
     errorTransferPercentage = null;
     errorTransferFixed = null;
@@ -852,7 +854,7 @@ const CreateAssetRoyaltyITOToken: React.FC<PropsWithChildren<any>> = ({
   return (
     <GenericCardContainer>
       <div>
-        <p>{t('wizards:common.advancedOptions.eachAdvancedText')}</p>
+        <p>{t('wizards:common.advancedOptions.royalties.royalties')}</p>
         <p>{t('wizards:common.step')} 3/5</p>
       </div>
       <div>
@@ -872,13 +874,13 @@ const CreateAssetRoyaltyITOToken: React.FC<PropsWithChildren<any>> = ({
           type="number"
           autoFocus={true}
           placeholder="ITO Percentage"
-          {...register('royalties.percentITOPercentage', {
+          {...register('royalties.itoPercentage', {
             min: { value: 0, message: 'Min value is 0' },
             max: { value: 100, message: 'Max value is 100' },
             valueAsNumber: true,
           })}
         />
-        <p>{t('wizad:common.advancedOptions.royalties.percentageITOBuy')}</p>
+        <p>{t('wizards:common.advancedOptions.royalties.percentageITOBuy')}</p>
         {errorTransferPercentage && (
           <ErrorMessage>{errorTransferPercentage?.message}</ErrorMessage>
         )}
@@ -887,11 +889,11 @@ const CreateAssetRoyaltyITOToken: React.FC<PropsWithChildren<any>> = ({
           error={errorTransferFixed}
           type="number"
           placeholder="ITO Fixed"
-          {...register('royalties.percentITOFixed', {
+          {...register('royalties.itoFixed', {
             valueAsNumber: true,
           })}
         />
-        <p>{t('wizad:common.advancedOptions.royalties.fixedAmountITOBuy')}</p>
+        <p>{t('wizards:common.advancedOptions.royalties.fixedAmountITOBuy')}</p>
         {errorTransferFixed && (
           <ErrorMessage>{errorTransferFixed?.message}</ErrorMessage>
         )}
@@ -916,21 +918,21 @@ const CreateAssetRoyaltyITONFT: React.FC<PropsWithChildren<any>> = ({
   let errorTransferFixed = null;
   let errorMarketPercentage = null;
   let errorMarketFixed = null;
-  let errorITOPercentage = null;
-  let errorITOFixed = null;
+  let errorItoPercentage = null;
+  let errorItoFixed = null;
 
   try {
     errorTransferFixed = eval(`errors?.royalties.percentTransferFixed`);
     errorMarketPercentage = eval(`errors?.royalties.percentMarketPercentage`);
-    errorMarketFixed = eval(`errors?.royalties.percentMarketFixed`);
-    errorITOPercentage = eval(`errors?.royalties.percentITOPercentage`);
-    errorITOFixed = eval(`errors?.royalties.percentITOFixed`);
+    errorMarketFixed = eval(`errors?.royalties.marketFixed`);
+    errorItoPercentage = eval(`errors?.royalties.itoPercentage`);
+    errorItoFixed = eval(`errors?.royalties.itoFixed`);
   } catch {
     errorTransferFixed = null;
     errorMarketPercentage = null;
     errorMarketFixed = null;
-    errorITOPercentage = null;
-    errorITOFixed = null;
+    errorItoPercentage = null;
+    errorItoFixed = null;
   }
 
   return (
@@ -950,7 +952,7 @@ const CreateAssetRoyaltyITONFT: React.FC<PropsWithChildren<any>> = ({
           type="number"
           autoFocus={true}
           placeholder="Transfer Fixed"
-          {...register('royalties.percentTransferFixed', {
+          {...register('royalties.transferFixed', {
             valueAsNumber: true,
           })}
         />
@@ -963,7 +965,7 @@ const CreateAssetRoyaltyITONFT: React.FC<PropsWithChildren<any>> = ({
           error={errorMarketPercentage}
           type="number"
           placeholder="Market Percentage"
-          {...register('royalties.percentMarketPercentage', {
+          {...register('royalties.marketPercentage', {
             min: { value: 0, message: 'Min value is 0' },
             max: { value: 100, message: 'Max value is 100' },
             valueAsNumber: true,
@@ -980,7 +982,7 @@ const CreateAssetRoyaltyITONFT: React.FC<PropsWithChildren<any>> = ({
           error={errorMarketFixed}
           type="number"
           placeholder="Market Fixed"
-          {...register('royalties.percentMarketFixed', {
+          {...register('royalties.marketFixed', {
             valueAsNumber: true,
           })}
         />
@@ -989,10 +991,10 @@ const CreateAssetRoyaltyITONFT: React.FC<PropsWithChildren<any>> = ({
           <ErrorMessage>{errorMarketFixed?.message}</ErrorMessage>
         )}
         <GenericInput
-          error={errorITOPercentage}
+          error={errorItoPercentage}
           type="number"
           placeholder="ITO Percentage"
-          {...register('royalties.percentITOPercentage', {
+          {...register('royalties.itoPercentage', {
             min: { value: 0, message: 'Min value is 0' },
             max: { value: 100, message: 'Max value is 100' },
             valueAsNumber: true,
@@ -1003,19 +1005,19 @@ const CreateAssetRoyaltyITONFT: React.FC<PropsWithChildren<any>> = ({
           Percentage of the currency that will be charged from an ITO Buy - (
           precision 2, 100 = 100% )
         </p>
-        {errorITOPercentage && (
-          <ErrorMessage>{errorITOPercentage?.message}</ErrorMessage>
+        {errorItoPercentage && (
+          <ErrorMessage>{errorItoPercentage?.message}</ErrorMessage>
         )}
         <GenericInput
-          error={errorITOFixed}
+          error={errorItoFixed}
           type="number"
           placeholder="ITO Fixed"
-          {...register('royalties.percentITOFixed', {
+          {...register('royalties.itoFixed', {
             valueAsNumber: true,
           })}
         />
         <p>Fixed amount of the currency that will be charged from an ITO Buy</p>
-        {errorITOFixed && <ErrorMessage>{errorITOFixed?.message}</ErrorMessage>}
+        {errorItoFixed && <ErrorMessage>{errorItoFixed?.message}</ErrorMessage>}
       </div>
 
       <ButtonsComponent buttonsProps={buttonsProps} />
@@ -1094,7 +1096,7 @@ export const CreateAssetRoyaltyTransferPerc: React.FC<
   };
   useEffect(() => {
     if (fields.length === 0) append({});
-  }, []);
+  }, [fields]);
 
   return (
     <GenericCardContainer alignCenter>
@@ -1113,7 +1115,7 @@ export const CreateAssetRoyaltyTransferPerc: React.FC<
         </p>
         <p>
           {t(
-            'wizards:common.advancedOptions.royalties.percentageValuesTransfers',
+            'wizards:common.advancedOptions.royalties.percentageValueTransfers',
             { ticker },
           )}
         </p>
@@ -1214,7 +1216,7 @@ export const CreateAssetSplitRoyalties: React.FC<
   let errorsplitAddres = null;
   let errorSplitTransferPerc = null;
   let errorSplitITOPerc = null;
-  let errorSplitITOFixed = null;
+  let errorSplitPercentITOFixed = null;
 
   const buttonsProps = {
     handleStep,
@@ -1231,14 +1233,14 @@ export const CreateAssetSplitRoyalties: React.FC<
     errorSplitITOPerc = eval(
       `errors?.royalties.splitRoyalties[${currentIndex}]?.percentITOPercentage`,
     );
-    errorSplitITOFixed = eval(
+    errorSplitPercentITOFixed = eval(
       `errors?.royalties.splitRoyalties[${currentIndex}]?.percentITOFixed`,
     );
   } catch {
     errorsplitAddres = null;
     errorSplitTransferPerc = null;
     errorSplitITOPerc = null;
-    errorSplitITOFixed = null;
+    errorSplitPercentITOFixed = null;
   }
 
   if (splitRoyalties) {
@@ -1258,12 +1260,12 @@ export const CreateAssetSplitRoyalties: React.FC<
   };
   useEffect(() => {
     if (fields.length === 0) append({});
-  }, []);
+  }, [fields]);
 
   return !splitRoyalties ? (
     <GenericCardContainer>
       <div>
-        <p>{t('wizards:common.advancedOptions.eachAdvancedText')}</p>
+        <p>{t('wizards:common.advancedOptions.royalties.royalties')}</p>
         <p>{t('wizards:common.advancedOptions.royalties.splitRoyalties')}</p>
       </div>
       <div>
@@ -1363,7 +1365,7 @@ export const CreateAssetSplitRoyalties: React.FC<
         />
         <p>
           {t(
-            'wizards:common.advancedOptions.royalties.itoPercentageReceiverAddressFee',
+            'wizards:common.advancedOptions.royalties.percentITOPercentageReceiverAddressFee',
           )}
         </p>
         {errorSplitITOPerc && (
@@ -1371,7 +1373,7 @@ export const CreateAssetSplitRoyalties: React.FC<
         )}
 
         <GenericInput
-          error={errorSplitITOFixed}
+          error={errorSplitPercentITOFixed}
           type="number"
           {...register(
             `royalties.splitRoyalties[${currentIndex}].percentITOFixed`,
@@ -1388,8 +1390,8 @@ export const CreateAssetSplitRoyalties: React.FC<
             'wizards:common.advancedOptions.royalties.itoFixedReceiverAddressFee',
           )}
         </p>
-        {errorSplitITOFixed && (
-          <ErrorMessage>{errorSplitITOFixed?.message}</ErrorMessage>
+        {errorSplitPercentITOFixed && (
+          <ErrorMessage>{errorSplitPercentITOFixed?.message}</ErrorMessage>
         )}
         <BorderedButton
           type="button"
@@ -1428,7 +1430,7 @@ export const CreateAssetSplitRoyalties: React.FC<
           }}
           fullWidth
         >
-          <span>{t('wizards:common.addAnother', { text: 'URI' })}</span>
+          <span>{t('wizards:common.addAnother', { text: 'Address' })}</span>
           <FiPlusSquare />
         </BorderedButton>
         <ButtonsComponent buttonsProps={buttonsProps} />
@@ -1482,7 +1484,9 @@ export const CreateAssetRoyaltySteps: React.FC<
       key: 'selectSplitRolyalty',
       label: 'Select Split Rolyalty',
       isDone: false,
-      component: <CreateAssetSplitRoyalties {...commonProps} />,
+      component: (
+        <CreateAssetSplitRoyalties {...commonProps} handleStep={handleStep} />
+      ),
     },
   ]);
 
@@ -1503,7 +1507,7 @@ export const CreateAssetRoyaltySteps: React.FC<
   const ticker = watch('ticker');
 
   useEffect(() => {
-    if (currentStep === royaltiesSteps.length) return;
+    if (currentStep >= royaltiesSteps.length) return;
     setActiveStep(royaltiesSteps[currentStep]);
   }, [currentStep]);
 
@@ -1521,7 +1525,7 @@ export const CreateAssetRoyaltySteps: React.FC<
         </p>
         <ButtonsContainer>
           <WizardButton infoStep centered onClick={() => setRoyalties(true)}>
-            {t('wizards:common.advancedOptions.royalties.statements')}
+            {t('common:Statements.Yes')}
           </WizardButton>
           <WizardButton
             infoStep
@@ -1541,14 +1545,14 @@ export const CreateAssetRoyaltySteps: React.FC<
           {t('wizards:common.advancedOptions.royalties.whatIsRoyaltyA')}
         </GenericInfoCard>
       </div>
-      <ButtonsComponent buttonsProps={buttonsProps} noNextButton />
+      <ButtonsComponent buttonsProps={buttonsProps} />
     </GenericCardContainer>
   ) : (
     activeStep.component
   );
 };
 
-export const CreatePreicisonStep: React.FC<
+export const CreatePrecisionStep: React.FC<
   PropsWithChildren<IWizardComponents>
 > = ({ handleStep, t }) => {
   const { setValue, watch } = useFormContext();
@@ -1575,7 +1579,9 @@ export const CreatePreicisonStep: React.FC<
       </div>
       <div>
         <p>
-          {t('wizards:common.basicOptions.whatTickerPrecision', { ticker })}
+          {t('wizards:common.basicOptions.whatTickerPrecision', {
+            ticker: ticker,
+          })}
         </p>
         <p>{t('wizards:common.basicOptions.precisionHint')}</p>
         <PrecisionContainer key={precision}>
@@ -1701,7 +1707,7 @@ export const CreateAssetMaxSupplyStep: React.FC<
         <p>{t('wizards:common.step')} 6/7</p>
       </div>
       <div>
-        <p>{t('wizards:common.maxSupplyOf', { ticker: ticker })}</p>
+        <p>{t('wizards:common.maxSupplyOf', { ticker })}</p>
         <p>{description}</p>
         <GenericInput
           error={error}
@@ -1797,6 +1803,7 @@ export const URIsSection: React.FC<PropsWithChildren<IAssetInformations>> = ({
     control,
     name: 'uris',
   });
+
   const assetText = assetType === 0 ? 'token' : 'NFT';
 
   const [addUri, setAddUri] = useState(false);
@@ -2416,7 +2423,7 @@ export const CreateAssetAddRoles: React.FC<
   }
 
   if (addRole) {
-    buttonsProps.next = !!(!error && Object.entries(error || {}).length);
+    buttonsProps.next = !!(!error && Object.entries(error || {}).length === 0);
   }
 
   const handleNextIndex = () => {
@@ -2430,9 +2437,10 @@ export const CreateAssetAddRoles: React.FC<
       setCurrentIndex(currentIndex - 1);
     }
   };
+
   useEffect(() => {
     if (fields.length === 0) append({});
-  }, []);
+  }, [fields]);
 
   return !addRole ? (
     <GenericCardContainer>
@@ -2519,7 +2527,7 @@ export const CreateAssetAddRoles: React.FC<
           </RolesCheckboxContainer>
         </RolesContainer>
         <GenericInfoCard>
-          {t('wizards:common.advancedOptions.roles.tooltip')}
+          {t('wizards:common.advancedOptions.roles.tooltip', { assetText })}
         </GenericInfoCard>
         <BorderedButton
           type="button"

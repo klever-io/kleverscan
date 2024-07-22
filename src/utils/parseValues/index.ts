@@ -219,7 +219,7 @@ export const parseITOs = async (ITOs: any[]): Promise<IParsedITO | never[]> => {
 
       ITO['royalties'] = {
         fixed: (asset?.royalties?.itoFixed || 0) / 10 ** KLV_PRECISION,
-        percentage: asset?.royalties?.itoPercentage || 0,
+        percentage: asset?.royalties?.percentITOPercentage || 0,
       };
       packsPrecisionCalls.push(processITOPrecisions(ITO, asset.precision));
     });

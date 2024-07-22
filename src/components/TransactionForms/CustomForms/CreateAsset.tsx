@@ -1,10 +1,10 @@
-import { PropsWithChildren } from 'react';
 import { useExtension } from '@/contexts/extension';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { validateImgUrl } from '@/utils/imageValidate';
+import { getNetwork } from '@/utils/networkFunctions';
 import { ICreateAsset } from '@klever/sdk-web';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
 import { IContractProps } from '.';
@@ -29,7 +29,6 @@ import {
   removeWrapper,
 } from './utils';
 import { assetsTooltip as tooltip } from './utils/tooltips';
-import { getNetwork } from '@/utils/networkFunctions';
 
 interface IPrecisionProps {
   precision: number;
@@ -467,7 +466,7 @@ const SplitRoyaltiesSection: React.FC<PropsWithChildren<ISectionProps>> = ({
           <FormInput
             name={`royalties.splitRoyalties[${index}].percentITOPercentage`}
             title={`Percentage over ITO Percentage`}
-            tooltip={tooltip.royalties.splitRoyalties.percentItoPercentage}
+            tooltip={tooltip.royalties.splitRoyalties.percentITOPercentage}
             {...percentageProps}
           />
           <FormInput

@@ -1,7 +1,7 @@
 import { TFunction } from 'next-i18next';
 
 interface ICreateWizard {
-  commomValues: {
+  commonValues: {
     assetType: number;
     additionalFields?: boolean;
     additionalValues?: boolean;
@@ -96,7 +96,7 @@ interface ICreateITO extends ICreateWizard {
 
 export const createToken = (t: TFunction): ICreateAsset => {
   return {
-    commomValues: {
+    commonValues: {
       assetType: 0,
       additionalFields: true,
       basicTotalSteps: 7,
@@ -185,7 +185,7 @@ export const createToken = (t: TFunction): ICreateAsset => {
 
 export const createNFT = (t: TFunction): ICreateAsset => {
   return {
-    commomValues: {
+    commonValues: {
       assetType: 1,
       additionalValues: false,
       basicTotalSteps: 5,
@@ -262,7 +262,7 @@ export const createNFT = (t: TFunction): ICreateAsset => {
 
 export const createITO = (t: TFunction): ICreateITO => {
   return {
-    commomValues: {
+    commonValues: {
       assetType: 15,
       additionalValues: false,
       basicTotalSteps: 7,
@@ -338,11 +338,15 @@ export const createITO = (t: TFunction): ICreateITO => {
   };
 };
 
-export const parseRoles = (data: unknown): void => {
-  if ((data as any)?.roles && (data as any)?.roles[0]?.address) {
+export const parseRoles = (data: any) => {
+  if (data.roles === undefined) {
     return;
   }
-  (data as any).roles = [];
+
+  const rolesReference = data.roles;
+  if (rolesReference.length === 0) return;
+
+  return data.roles;
 };
 
 export const checkEmptyField = (field: string | number): boolean => {

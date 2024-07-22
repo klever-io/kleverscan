@@ -31,7 +31,7 @@ import {
   CreateAssetStakingStep,
   CreateAssetTickerStep,
   CreateAssetWelcomeStep,
-  CreatePreicisonStep,
+  CreatePrecisionStep,
   DesktopStepsComponent,
   StepsBasics,
   URIsSection,
@@ -78,7 +78,7 @@ const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
   };
 
   const {
-    commomValues: { basicTotalSteps },
+    commonValues: { basicTotalSteps },
     stepsInformations: {
       basicStepsLabels,
       advancedStepsIndex,
@@ -90,7 +90,7 @@ const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
     {
       key: 'CreateAssetInfo',
       label: 'Create Asset Information',
-      isDone: false,
+      isDone: true,
       component: (
         <CreateAssetWelcomeStep
           {...stepsProps}
@@ -101,7 +101,7 @@ const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
     {
       key: 'selectAssetName',
       label: 'Select Asset Name',
-      isDone: false,
+      isDone: true,
       component: (
         <CreateAssetNameStep {...stepsProps} informations={assetInfo.name} />
       ),
@@ -109,7 +109,7 @@ const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
     {
       key: 'selectAssetTicker',
       label: 'Select Asset Ticker',
-      isDone: false,
+      isDone: true,
       component: (
         <CreateAssetTickerStep
           {...stepsProps}
@@ -132,7 +132,7 @@ const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
       key: 'selectAssetPrecision',
       label: 'Select Asset Precision',
       isDone: false,
-      component: <CreatePreicisonStep {...stepsProps} />,
+      component: <CreatePrecisionStep {...stepsProps} />,
     },
     {
       key: 'selectAssetInitialSupply',
@@ -166,7 +166,7 @@ const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
       component: (
         <CreateAssetPreConfimStep
           {...stepsProps}
-          informations={assetInfo.commomValues}
+          informations={assetInfo.commonValues}
         />
       ),
     },
@@ -175,7 +175,7 @@ const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
       label: 'Select Asset URIs',
       isDone: false,
       component: (
-        <URIsSection {...stepsProps} informations={assetInfo.commomValues} />
+        <URIsSection {...stepsProps} informations={assetInfo.commonValues} />
       ),
     },
     {
@@ -185,7 +185,7 @@ const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
       component: <CreateAssetStakingStep {...stepsProps} />,
     },
     {
-      key: 'selectroyaltiesSteps',
+      key: 'selectRoyaltiesSteps',
       label: 'Select Asset Royalties Steps',
       isDone: false,
       component: <CreateAssetRoyaltySteps {...stepsProps} />,
@@ -197,7 +197,7 @@ const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
       component: (
         <CreateAssetAddRoles
           {...stepsProps}
-          informations={assetInfo.commomValues}
+          informations={assetInfo.commonValues}
         />
       ),
     },
@@ -219,13 +219,13 @@ const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
       component: (
         <ConfirmTransaction
           {...confirmProps}
-          informations={assetInfo.commomValues}
+          informations={assetInfo.commonValues}
         />
       ),
     },
   ]);
 
-  const [activeStep, setActiveStep] = useState(steps[0]);
+  const [activeStep, setActiveStep] = useState(steps[14]);
 
   const methods = useForm({
     mode: 'all',
@@ -236,7 +236,7 @@ const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
     },
   });
   const { handleSubmit, watch } = methods;
-
+  const log = watch();
   useEffect(() => {
     setSteps(prev => {
       return prev.map((e, index) => {
@@ -292,9 +292,10 @@ const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
     parseStringToNumberSupply(data);
     const parsedUris = parseURIs(data);
     const parsedRoles = parseRoles(data);
+
     parseSplitRoyalties(data);
-    const contractyType = 'CreateAssetContract';
-    await precisionParse(data, contractyType);
+    const contractType = 'CreateAssetContract';
+    await precisionParse(data, contractType);
     if (!data?.royalties) {
       data['royalties'] = { address: data?.ownerAddress };
     }
@@ -306,15 +307,12 @@ const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
       uris: parsedUris,
       roles: parsedRoles,
       ticker: (data?.ticker as string)?.toUpperCase(),
-      royalties: {
-        address: data?.ownerAddress,
-      },
     };
 
     try {
       const unsignedTx = await buildTransaction([
         {
-          type: getType(contractyType),
+          type: getType(contractType),
           payload: parseTransaction,
         },
       ]);

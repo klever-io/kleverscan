@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import { setQueryAndRouter } from '@/utils';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
@@ -10,7 +9,7 @@ import {
 } from '@/views/assets/detail';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import { default as React, useCallback } from 'react';
+import { PropsWithChildren, default as React, useCallback } from 'react';
 import { AssetProps } from './OverviewTab';
 
 interface StakingRoyaltiesTabProps extends AssetProps {

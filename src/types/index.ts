@@ -1,7 +1,6 @@
-import { PropsWithChildren } from 'react';
 import { IChartData } from '@/configs/home';
 import { ISO2 } from '@/utils/country';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, PropsWithChildren, SetStateAction } from 'react';
 import { IBlock, IBlockResponse } from './blocks';
 import {
   Contract,

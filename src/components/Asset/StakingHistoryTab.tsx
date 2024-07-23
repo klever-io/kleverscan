@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import Tooltip from '@/components/Tooltip';
 import { useMobile } from '@/contexts/mobile';
 import { IAPR, IFPR, IKDAFPR, IStaking } from '@/types/index';
@@ -19,7 +18,7 @@ import {
   StakingHistoryScrollFooter,
 } from '@/views/assets/detail';
 import { useTranslation } from 'next-i18next';
-import { default as React, useState } from 'react';
+import { PropsWithChildren, default as React, useState } from 'react';
 import { AssetProps } from './OverviewTab';
 
 interface IStakingHistoryProps extends AssetProps {
@@ -108,7 +107,7 @@ const FPRHistory: React.FC<PropsWithChildren<FPRHistoryProps>> = ({
                       <p>KLV</p>
                     </div>
                     <div>
-                      <strong>{t('assets:Staking.Total Deposited')}</strong>
+                      <strong>{t('assets:Staking.Total deposited')}</strong>
                       {/* here is always KLV */}
                       <p>
                         {toLocaleFixed(
@@ -138,7 +137,7 @@ const FPRHistory: React.FC<PropsWithChildren<FPRHistoryProps>> = ({
                         <p>{kda.kda}</p>
                       </div>
                       <div>
-                        <strong>{t('assets:Staking.Total Deposited')}</strong>
+                        <strong>{t('assets:Staking.Total deposited')}</strong>
                         <p>
                           {toLocaleFixed(kda?.totalAmount, kda.precision || 0)}
                         </p>

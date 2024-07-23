@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import { sumAllRoyaltiesFees } from '@/components/Contract/MultiContract';
 import {
   buildTransaction,
@@ -24,6 +23,7 @@ import { web } from '@klever/sdk-web';
 import { useRouter } from 'next/router';
 import React, {
   createContext,
+  PropsWithChildren,
   useContext,
   useEffect,
   useRef,

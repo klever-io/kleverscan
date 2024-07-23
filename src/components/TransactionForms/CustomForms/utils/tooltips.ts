@@ -35,7 +35,7 @@ export const assetsTooltip = {
         'Percentage that the given address will receive from "market percentage" fee',
       percentMarketFixed:
         'Percentage that the given address will receive from "market fixed" fee',
-      percentItoPercentage:
+      percentITOPercentage:
         'Percentage that the given address will receive from "ITO percentage" fee',
       percentItoFixed:
         'Percentage that the given address will receive from "ITO fixed" fee',

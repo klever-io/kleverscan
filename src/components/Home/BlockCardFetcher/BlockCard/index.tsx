@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import { LetterLogo } from '@/components/Logo/styles';
 import { useMobile } from '@/contexts/mobile';
 import { IBlockCard } from '@/types/blocks';
@@ -17,7 +16,7 @@ import { fromUnixTime } from 'date-fns';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/legacy/image';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 
 const BlockCard: React.FC<PropsWithChildren<IBlockCard>> = ({
   nonce,
@@ -103,7 +102,7 @@ const BlockCard: React.FC<PropsWithChildren<IBlockCard>> = ({
         </BlockCardRow>
         <BlockCardRow>
           <div>
-            <p>{t('Miner')}:</p>
+            <p>{t('blocks:Miner')}:</p>
             <BlockCardHash>
               <strong>
                 <a href={`/account/${producerOwnerAddress}`}>
@@ -122,13 +121,13 @@ const BlockCard: React.FC<PropsWithChildren<IBlockCard>> = ({
             </div>
 
             <div>
-              <p>{t('Burned')}:</p>
+              <p>{t('blocks:Burned')}:</p>
               <span>
                 {formatAmount((txBurnedFees || 0) / 10 ** precision)} KLV
               </span>
             </div>
             <div>
-              <p>{t('Reward')}:</p>
+              <p>{t('blocks:Reward')}:</p>
               <span>
                 {formatAmount((blockRewards || 0) / 10 ** precision)} KLV
               </span>
@@ -145,13 +144,13 @@ const BlockCard: React.FC<PropsWithChildren<IBlockCard>> = ({
             </BlockCardRow>
             <BlockCardRow>
               <div>
-                <p>{t('Burned')}:</p>
+                <p>{t('blocks:Burned')}:</p>
                 <span>
                   {formatAmount((txBurnedFees || 0) / 10 ** precision)} KLV
                 </span>
               </div>
               <div>
-                <p>{t('Reward')}:</p>
+                <p>{t('blocks:Reward')}:</p>
                 <span>
                   {formatAmount((blockRewards || 0) / 10 ** precision)} KLV
                 </span>

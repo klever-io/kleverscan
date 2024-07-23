@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import { KLV } from '@/assets/coins';
 import { statusWithIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
@@ -99,7 +98,7 @@ import {
 } from '@/views/transactions/detail';
 import { TFunction, useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { PropsWithChildren, useState } from 'react';
 import Tooltip from '../Tooltip';
 
 interface IAssetTriggerTypeData {
@@ -470,10 +469,12 @@ export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
                 )}
               </CenteredRow>
               <CenteredRow>
-                {parameter?.royalties?.itoPercentage && (
+                {parameter?.royalties?.percentITOPercentage && (
                   <>
                     <strong>ITO Percentage:&nbsp;</strong>
-                    <span>{parameter?.royalties?.itoPercentage / 100}%</span>
+                    <span>
+                      {parameter?.royalties?.percentITOPercentage / 100}%
+                    </span>
                   </>
                 )}
               </CenteredRow>
@@ -2877,7 +2878,7 @@ const renderAssetTriggerTypeData: React.FC<
               </RoleDiv>
               <RoleDiv>
                 <StrongWidth>ITO Percentage</StrongWidth>
-                <span>{par.royalties.itoPercentage / 100 || 0}%</span>
+                <span>{par.royalties.percentITOPercentage / 100 || 0}%</span>
               </RoleDiv>
               <RoleDiv>
                 <StrongWidth>Market Fixed</StrongWidth>

@@ -2975,9 +2975,7 @@ export const ConfirmTransaction: React.FC<
     <>
       <GenericCardContainer>
         <div>
-          <p>
-            {t('wizards:common.confirm.create', { type: assetText.charAt })}
-          </p>
+          <p>{t('wizards:common.confirm.create', { type: assetText })}</p>
           <p>{t('wizards:common.confirm.review')}</p>
         </div>
         <ReviewContainer>

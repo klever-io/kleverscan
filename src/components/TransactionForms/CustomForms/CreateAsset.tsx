@@ -24,6 +24,7 @@ import {
   parseProperties,
   parseSplitRoyalties,
   parseStaking,
+  parseTickerName,
   parseURIs,
   percentageProps,
   removeWrapper,
@@ -56,6 +57,7 @@ export const assetTypes = [
 
 export const parseCreateAsset = (data: ICreateAsset) => {
   const dataCopy = JSON.parse(JSON.stringify(data));
+  parseTickerName(dataCopy);
   parseSplitRoyalties(dataCopy);
   parseURIs(dataCopy);
   parseStaking(dataCopy);

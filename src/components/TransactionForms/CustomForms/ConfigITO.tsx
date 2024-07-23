@@ -1,9 +1,9 @@
-import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
 import { IAsset, ICollectionList } from '@/types';
+import { useDebounce, useFetchPartial } from '@/utils/hooks';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
 import { toast } from 'react-toastify';
@@ -25,7 +25,6 @@ import {
 } from './utils';
 import { ITOTooltips as tooltip } from './utils/tooltips';
 import { Pack, PackInfo, WhitelistInfo } from './utils/types';
-import { useDebounce, useFetchPartial } from '@/utils/hooks';
 
 export type ConfigITOData = {
   receiverAddress: string;
@@ -240,10 +239,10 @@ export const WhitelistSection: React.FC<
   );
 };
 
-export const PackInfoSection: React.FC<PropsWithChildren<{ top?: number }>> = ({
-  top,
-}) => {
-  const { control, watch } = useFormContext();
+export const PackInfoSection: React.FC<
+  PropsWithChildren<{ top?: number; collection?: ICollectionList }>
+> = ({ top, collection }) => {
+  const { control, watch, trigger } = useFormContext();
   const {
     fields,
     append: appendPackInfo,
@@ -273,6 +272,7 @@ export const PackInfoSection: React.FC<PropsWithChildren<{ top?: number }>> = ({
   const [assetInput, setAssetInput] = useState<string>('');
   const [currency, setCurrency] = useState<IAsset>();
   const debouncedAssetInput = useDebounce(assetInput, 500);
+
   useEffect(() => {
     if (debouncedAssetInput) {
       setLoading(true);

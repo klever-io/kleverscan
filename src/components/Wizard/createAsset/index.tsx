@@ -202,7 +202,6 @@ export const propertiesCommonDefaultValues = {
     canWipe: false,
   },
 };
-
 export const infinitySymbol = '\u221e';
 
 export const ConnectButtonComponent: React.FC<PropsWithChildren> = () => {
@@ -2976,9 +2975,7 @@ export const ConfirmTransaction: React.FC<
     <>
       <GenericCardContainer>
         <div>
-          <p>
-            {t('wizards:common.confirm.create', { type: assetText.charAt })}
-          </p>
+          <p>{t('wizards:common.confirm.create', { type: assetText })}</p>
           <p>{t('wizards:common.confirm.review')}</p>
         </div>
         <ReviewContainer>

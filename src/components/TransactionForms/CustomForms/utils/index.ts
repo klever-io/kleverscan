@@ -34,6 +34,10 @@ export const parseSplitRoyalties = (data: any): void => {
   data.royalties.splitRoyalties = splitRoyalties;
 };
 
+export const parseTickerName = (data: any) => {
+  data.ticker = data.ticker.toUpperCase();
+  return;
+};
 export const parseURIs = (data: any) => {
   if (data.uris === undefined) {
     return;

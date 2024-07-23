@@ -280,6 +280,7 @@ const WizCreateToken: React.FC<PropsWithChildren<any>> = ({
     useContract();
 
   const onSubmit = async (data: any) => {
+    data.type = 0;
     const rowData = parseCreateAsset(data);
     await handleContractSubmit(rowData, '', 'CreateAssetContract', 1);
     window.scrollTo(0, 0);

@@ -71,7 +71,7 @@ const WizCreateNFT: React.FC<PropsWithChildren<any>> = ({
   };
 
   const {
-    commomValues: { basicTotalSteps },
+    commonValues: { basicTotalSteps },
     stepsInformations: {
       basicStepsLabels,
       advancedStepsIndex,
@@ -147,7 +147,7 @@ const WizCreateNFT: React.FC<PropsWithChildren<any>> = ({
       component: (
         <CreateAssetPreConfimStep
           {...stepsProps}
-          informations={assetInfo.commomValues}
+          informations={assetInfo.commonValues}
         />
       ),
     },
@@ -156,11 +156,11 @@ const WizCreateNFT: React.FC<PropsWithChildren<any>> = ({
       label: 'Select Asset URIs',
       isDone: false,
       component: (
-        <URIsSection {...stepsProps} informations={assetInfo.commomValues} />
+        <URIsSection {...stepsProps} informations={assetInfo.commonValues} />
       ),
     },
     {
-      key: 'selectroyaltiesSteps',
+      key: 'selectRoyaltiesSteps',
       label: 'Select Asset Royalties Steps',
       isDone: false,
       component: <CreateAssetRoyaltySteps {...stepsProps} />,
@@ -172,7 +172,7 @@ const WizCreateNFT: React.FC<PropsWithChildren<any>> = ({
       component: (
         <CreateAssetAddRoles
           {...stepsProps}
-          informations={assetInfo.commomValues}
+          informations={assetInfo.commonValues}
         />
       ),
     },
@@ -194,7 +194,7 @@ const WizCreateNFT: React.FC<PropsWithChildren<any>> = ({
       component: (
         <ConfirmTransaction
           {...confirmProps}
-          informations={assetInfo.commomValues}
+          informations={assetInfo.commonValues}
         />
       ),
     },
@@ -260,9 +260,9 @@ const WizCreateNFT: React.FC<PropsWithChildren<any>> = ({
   const onSubmit = async (data: any) => {
     const parsedUris = parseURIs(data);
     const parsedRoles = parseRoles(data);
-    const contractyType = 'CreateAssetContract';
+    const contractType = 'CreateAssetContract';
 
-    await precisionParse(data, contractyType);
+    await precisionParse(data, contractType);
 
     data.ticker = (data?.ticker as string)?.toUpperCase();
     data.type = 1;

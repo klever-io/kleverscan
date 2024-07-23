@@ -26,10 +26,10 @@ export const Proposal: React.FC<PropsWithChildren<ProposalProps>> = ({
     <InnerCardContainer>
       {proposalId && (
         <CardHeader>
-          <CardTitle href={`/proposals/${proposalId}`}>
+          <CardTitle href={`/proposal/${proposalId}`}>
             Proposal #{proposalId}
           </CardTitle>
-          <ArrowIconContainer href={`/proposals/${proposalId}`}>
+          <ArrowIconContainer href={`/proposal/${proposalId}`}>
             <PurpleArrowRight />
           </ArrowIconContainer>
           <Status status={proposalStatusColorAndText.color}>

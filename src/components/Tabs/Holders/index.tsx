@@ -21,6 +21,15 @@ interface IHolderTableProps {
   page: number;
 }
 
+const header = [
+  'Rank',
+  'Address',
+  'Percentage',
+  'Staked Amount',
+  'Balance',
+  'Total Balance',
+];
+
 const Holders: React.FC<IHolders> = ({
   asset,
   holdersTableProps,
@@ -61,11 +70,12 @@ const Holders: React.FC<IHolders> = ({
       },
       {
         element: props => (
-          <span key={asset.precision}>
+          <div key={asset.precision}>
             {formatAmount(frozenBalance / 10 ** asset.precision)}
-          </span>
+          </div>
         ),
         span: 1,
+        maxWidth: 150,
       },
       {
         element: props => (
@@ -85,15 +95,17 @@ const Holders: React.FC<IHolders> = ({
       },
     ];
   };
-
-  const header = [
-    'Rank',
-    'Address',
-    'Percentage',
-    'Frozen Amount',
-    'Balance',
-    'Total Balance',
-  ];
+  const getHeader = () => {
+    if (asset.assetId === 'KFI') {
+      return header.map(item => {
+        if (item === 'Staked Amount') {
+          return `Staked Amount/ Voting Power`;
+        }
+        return item;
+      });
+    }
+    return header;
+  };
 
   const filters: IFilter[] = [
     {
@@ -111,7 +123,7 @@ const Holders: React.FC<IHolders> = ({
 
   const tableProps: ITable = {
     rowSections,
-    header,
+    header: getHeader(),
     type: 'holders',
     ...holdersTableProps,
   };

@@ -1053,6 +1053,7 @@ export interface IRowSection {
   element: React.FC<TableRowElementProps>;
   span: number;
   width?: number;
+  maxWidth?: number;
 }
 
 export interface IOffset {

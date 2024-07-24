@@ -69,11 +69,16 @@ export const HeaderItem = styled.div<{
   smaller?: boolean;
   totalColumns?: number;
   currentColumn?: number;
+  dynamicWidth?: number;
+  maxWidth?: number;
 }>`
   display: table-cell;
   padding: 6px 16px;
   padding-bottom: 32px;
-  white-space: nowrap;
+  white-space: ${props => (props.maxWidth ? 'unset' : 'nowrap')};
+  width: ${props =>
+    props.dynamicWidth ? `${props.dynamicWidth}px` : 'fit-content'};
+  max-width: ${props => (props.maxWidth ? `${props.maxWidth}px` : 'none')};
 
   ${props =>
     props.smaller &&
@@ -118,6 +123,7 @@ export const MobileCardItem = styled.div<{
   isAccountPage?: boolean;
   isLastRow?: boolean;
   dynamicWidth?: number;
+  maxWidth?: number;
   smaller?: boolean;
   totalColumns?: number;
   currentColumn?: number;
@@ -179,6 +185,8 @@ export const MobileCardItem = styled.div<{
 
     width: ${props =>
       props.dynamicWidth ? `${props.dynamicWidth}px` : 'fit-content'};
+
+    max-width: ${props => (props.maxWidth ? `${props.maxWidth}px` : 'none')};
 
     padding: 12px 16px;
 

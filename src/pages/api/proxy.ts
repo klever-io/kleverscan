@@ -8,7 +8,7 @@ export default async function handler(
   try {
     const { route, service, method, query, body } = req.body;
 
-    const props = {
+    const request: RequestInit = {
       method,
       headers: {
         'Content-Type': 'application/json',
@@ -17,10 +17,13 @@ export default async function handler(
     };
 
     if (method === 'POST') {
-      props['body'] = JSON.stringify(body);
+      request['body'] = JSON.stringify(body);
     }
 
-    const response = await fetch(getHost(route, query, service, 'v1.0'), props);
+    const response = await fetch(
+      getHost(route, query, service, 'v1.0'),
+      request,
+    );
     if (!response.ok) {
       res.status(500).json(await response.json());
     } else {

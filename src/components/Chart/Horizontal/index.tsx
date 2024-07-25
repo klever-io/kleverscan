@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import React from 'react';
 import {
   Bar,
@@ -20,7 +21,10 @@ interface IHorizontal {
   theme: Theme;
 }
 
-const Horizontal: React.FC<IHorizontal> = ({ data, theme }) => (
+const Horizontal: React.FC<PropsWithChildren<IHorizontal>> = ({
+  data,
+  theme,
+}) => (
   <ResponsiveContainer width="100%" height="100%">
     <BarChart data={data} layout="vertical">
       <defs>

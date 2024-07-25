@@ -1,4 +1,4 @@
-import { Status } from '@/components/Table/styles';
+import { Status } from '@/styles/common';
 import { TFunction } from 'next-i18next';
 import { ImCancelCircle } from 'react-icons/im';
 import Error from './error2.svg';
@@ -29,11 +29,7 @@ const statusWithIcon = (action: boolean, t: TFunction): JSX.Element => {
   return (
     <Status status={action ? 'success' : 'fail'} key={String(action)}>
       <StatusIcon />
-      <p>
-        {action
-          ? `${t('common:Statements.Yes')}`
-          : `${t('common:Statements.No')}`}
-      </p>
+      <p>{action ? 'Yes' : 'No'}</p>
     </Status>
   );
 };

@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { PurpleArrowRight } from '@/assets/icons';
 import Copy from '@/components/Copy';
 import { MultiContractToolTip } from '@/components/MultiContractToolTip';
@@ -5,13 +6,13 @@ import {
   CustomFieldWrapper,
   Status,
   TimestampInfo,
-} from '@/components/TableV2/styles';
+} from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
 import { useHomeData } from '@/contexts/mainPage';
 import { useMobile } from '@/contexts/mobile';
 import { getCustomFields, toAddressSectionElement } from '@/pages/transactions';
 import { defaultPagination } from '@/services/apiCalls';
-import { CenteredRow, DoubleRow } from '@/styles/common';
+import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
 import { IPaginatedResponse, IRowSection, ITransaction } from '@/types';
 import { Contract, ContractsName, ITransferContract } from '@/types/contracts';
 import { contractTypes, getLabelForTableField } from '@/utils/contracts';
@@ -29,7 +30,7 @@ import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback, useState } from 'react';
-import Table, { ITable } from '../../TableV2';
+import Table, { ITable } from '../../Table';
 
 export const homeTransactionTableHeaders = [
   'Transaction Hash',
@@ -63,7 +64,7 @@ export const homeTransactionsRowSections = (
     nonce,
   } = props;
 
-  let toAddress = '- -';
+  let toAddress = '--';
   const contractType = contractTypes(contract);
 
   if (contractType === Contract.Transfer) {
@@ -79,7 +80,9 @@ export const homeTransactionsRowSections = (
       element: props => (
         <DoubleRow {...props} key={hash}>
           <CenteredRow className="bucketIdCopy">
-            <Link href={`/transaction/${hash}`}>{parseAddress(hash, 24)}</Link>
+            <Link href={`/transaction/${hash}`}>
+              <Mono>{parseAddress(hash, 24)}</Mono>
+            </Link>
             <Copy info="TXHash" data={hash} />
           </CenteredRow>
           <CenteredRow>
@@ -95,8 +98,8 @@ export const homeTransactionsRowSections = (
     {
       element: props => (
         <DoubleRow {...props} key={blockNum}>
-          <Link href={`/block/${blockNum || 0}`}>
-            <a className="address">{blockNum || 0}</a>
+          <Link href={`/block/${blockNum || 0}`} className="address">
+            {blockNum || 0}
           </Link>
           <span>
             {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
@@ -108,8 +111,8 @@ export const homeTransactionsRowSections = (
     {
       element: props => (
         <DoubleRow {...props} key={sender}>
-          <Link href={`/account/${sender}`}>
-            <a className="address">{parseAddress(sender, 16)}</a>
+          <Link href={`/account/${sender}`} className="address">
+            <Mono>{parseAddress(sender, 16)}</Mono>
           </Link>
           {toAddressSectionElement(toAddress)}
         </DoubleRow>
@@ -129,7 +132,9 @@ export const homeTransactionsRowSections = (
         ) : (
           <DoubleRow {...props}>
             <CenteredRow>
-              <span>{ContractsName[contractType]}</span>
+              <span>
+                {ContractsName[contractType as keyof typeof ContractsName]}
+              </span>
             </CenteredRow>
             <CenteredRow>
               {getLabelForTableField(contractType)?.[0] ? (
@@ -169,7 +174,7 @@ export const homeTransactionsTabletRowSections = (
     data,
   } = props;
 
-  let toAddress = '- -';
+  let toAddress = '--';
   const contractType = contractTypes(contract);
 
   if (contractType === Contract.Transfer) {
@@ -192,8 +197,10 @@ export const homeTransactionsTabletRowSections = (
               {capitalizeString(status)}
             </Status>
           </CenteredRow>
-          <CenteredRow className="bucketIdCopy">
-            <Link href={`/transaction/${hash}`}>{parseAddress(hash, 16)}</Link>
+          <CenteredRow>
+            <Link href={`/transaction/${hash}`}>
+              <Mono>{parseAddress(hash, 16)}</Mono>
+            </Link>
             <Copy info="TXHash" data={hash} svgSize={16} />
           </CenteredRow>
         </DoubleRow>
@@ -213,7 +220,9 @@ export const homeTransactionsTabletRowSections = (
         ) : (
           <DoubleRow {...props}>
             <CenteredRow>
-              <span>{ContractsName[contractType]}</span>
+              <span>
+                {ContractsName[contractType as keyof typeof ContractsName]}
+              </span>
             </CenteredRow>
             <CenteredRow>
               {getLabelForTableField(contractType)?.[0] ? (
@@ -234,8 +243,8 @@ export const homeTransactionsTabletRowSections = (
     {
       element: props => (
         <DoubleRow {...props} key={blockNum}>
-          <Link href={`/block/${blockNum || 0}`}>
-            <a className="address">{blockNum || 0}</a>
+          <Link href={`/block/${blockNum || 0}`} className="address">
+            {blockNum || 0}
           </Link>
           <span>
             {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
@@ -247,8 +256,8 @@ export const homeTransactionsTabletRowSections = (
     {
       element: props => (
         <DoubleRow {...props} key={sender}>
-          <Link href={`/account/${sender}`}>
-            <a className="address">{parseAddress(sender, 16)}</a>
+          <Link href={`/account/${sender}`} className="address">
+            <Mono>{parseAddress(sender, 16)}</Mono>
           </Link>
           {toAddressSectionElement(toAddress)}
         </DoubleRow>
@@ -260,7 +269,7 @@ export const homeTransactionsTabletRowSections = (
   return sections;
 };
 
-const HomeTransactions: React.FC = () => {
+const HomeTransactions: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('transactions');
   const { transactions: homeTransactions } = useHomeData();
   const [hideMenu, setHideMenu] = useState(false);
@@ -298,6 +307,7 @@ const HomeTransactions: React.FC = () => {
     showLimit: false,
     showPagination: false,
     smaller: true,
+    interval: 4000,
   };
 
   return (
@@ -309,11 +319,9 @@ const HomeTransactions: React.FC = () => {
             pathname: '/transactions',
           }}
         >
-          <a>
-            {' '}
-            View All
-            <PurpleArrowRight />
-          </a>
+          {' '}
+          View All
+          <PurpleArrowRight />
         </Link>
 
         {isTablet ? (
@@ -323,9 +331,7 @@ const HomeTransactions: React.FC = () => {
         ) : null}
       </ContainerHide>
       <TransactionContainer>
-        {!hideMenu && (
-          <Table key={JSON.stringify(homeTransactions)} {...tableProps} />
-        )}
+        {!hideMenu && <Table {...tableProps} />}
       </TransactionContainer>
     </SectionCards>
   );

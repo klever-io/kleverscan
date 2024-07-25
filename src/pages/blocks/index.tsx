@@ -1,8 +1,9 @@
+import { PropsWithChildren } from 'react';
 import { Blocks as Icon } from '@/assets/title-icons';
 import ToggleButton from '@/components/Button/Toggle';
 import Title from '@/components/Layout/Title';
 import Skeleton from '@/components/Skeleton';
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import {
   blockCall,
   totalStatisticsCall,
@@ -78,7 +79,9 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
     {
       element: props => (
         <DoubleRow {...props} key={nonce + epoch}>
-          <Link href={`/block/${nonce}`}>{String(nonce)}</Link>
+          <Link href={`/block/${nonce}`} legacyBehavior>
+            {String(nonce)}
+          </Link>
           <span>{epoch}</span>
         </DoubleRow>
       ),
@@ -101,6 +104,7 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
           <Link
             href={`/validator/${producerOwnerAddress}`}
             key={producerOwnerAddress}
+            legacyBehavior
           >
             {parseAddress(producerName, 16)}
           </Link>
@@ -138,7 +142,7 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
   return sections;
 };
 
-const Blocks: React.FC<IBlocks> = () => {
+const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
   const blocksWatcherInterval = 4 * 1000; // 4 secs
   const [blocksInterval, setBlocksInterval] = useState(0);
   const { data: blocksStatsToday } = useQuery(
@@ -237,7 +241,11 @@ const Blocks: React.FC<IBlocks> = () => {
     },
   ];
 
-  const CardContent: React.FC<ICard> = ({ title, headers, values }) => {
+  const CardContent: React.FC<PropsWithChildren<ICard>> = ({
+    title,
+    headers,
+    values,
+  }) => {
     const [uptime] = useState(new Date().getTime());
     const [age, setAge] = useState(getAge(new Date()));
 

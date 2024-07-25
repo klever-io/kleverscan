@@ -1,5 +1,7 @@
-import { CustomLink } from '@/components/Table/styles';
-import Table, { ITable } from '@/components/TableV2';
+import { PropsWithChildren } from 'react';
+import Table, { ITable } from '@/components/Table';
+import { CustomFieldWrapper, CustomLink } from '@/components/Table/styles';
+import Tooltip from '@/components/Tooltip';
 import { useContractModal } from '@/contexts/contractModal';
 import { IAccountAsset, IInnerTableProps, IRowSection } from '@/types/index';
 import { parseApr } from '@/utils';
@@ -12,10 +14,10 @@ interface IAssets {
   assetsTableProps: IInnerTableProps;
   address: string;
   showInteractionButtons?: boolean;
-  Filters?: React.FC;
+  Filters?: React.FC<PropsWithChildren>;
 }
 
-const Assets: React.FC<IAssets> = ({
+const Assets: React.FC<PropsWithChildren<IAssets>> = ({
   assetsTableProps,
   address,
   showInteractionButtons,
@@ -49,7 +51,11 @@ const Assets: React.FC<IAssets> = ({
     const ticker = assetId?.split('-')[0];
     const sectionViewNfts =
       assetType === 1 ? (
-        <Link href={`/account/${address}/collection/${assetId}`} key={address}>
+        <Link
+          href={`/account/${address}/collection/${assetId}`}
+          key={address}
+          legacyBehavior
+        >
           <CustomLink tabAsset={true}>
             {t('accounts:SingleAccount.Buttons.ViewNFTs')}
           </CustomLink>
@@ -61,7 +67,7 @@ const Assets: React.FC<IAssets> = ({
       { element: props => <span key={ticker}>{ticker}</span>, span: 1 },
       {
         element: props => (
-          <Link key={assetId} href={`/asset/${assetId}`}>
+          <Link key={assetId} href={`/asset/${assetId}`} legacyBehavior>
             {assetId}
           </Link>
         ),
@@ -78,25 +84,46 @@ const Assets: React.FC<IAssets> = ({
       { element: props => <span key={precision}>{precision}</span>, span: 1 },
       {
         element: props => (
-          <span key={balance}>
-            {formatAmount(balance / 10 ** precision)} {ticker}
-          </span>
+          <Tooltip
+            msg={`${(balance / 10 ** precision).toLocaleString()} ${ticker}`}
+            Component={() => (
+              <CustomFieldWrapper>
+                <span>
+                  {formatAmount(balance / 10 ** precision)} {ticker}
+                </span>
+              </CustomFieldWrapper>
+            )}
+          />
         ),
         span: 1,
       },
       {
         element: props => (
-          <span key={frozenBalance}>
-            {formatAmount(frozenBalance / 10 ** precision)} {ticker}
-          </span>
+          <Tooltip
+            msg={`${(frozenBalance / 10 ** precision).toLocaleString()} ${ticker}`}
+            Component={() => (
+              <CustomFieldWrapper>
+                <span key={frozenBalance}>
+                  {formatAmount(frozenBalance / 10 ** precision)} {ticker}
+                </span>
+              </CustomFieldWrapper>
+            )}
+          />
         ),
         span: 1,
       },
       {
         element: props => (
-          <span key={unfrozenBalance}>
-            {formatAmount(unfrozenBalance / 10 ** precision)} {ticker}
-          </span>
+          <Tooltip
+            msg={`${(unfrozenBalance / 10 ** precision).toLocaleString()} ${ticker}`}
+            Component={() => (
+              <CustomFieldWrapper>
+                <span key={unfrozenBalance}>
+                  {formatAmount(unfrozenBalance / 10 ** precision)} {ticker}
+                </span>
+              </CustomFieldWrapper>
+            )}
+          />
         ),
         span: 1,
       },

@@ -35,7 +35,7 @@ export const assetsTooltip = {
         'Percentage that the given address will receive from "market percentage" fee',
       percentMarketFixed:
         'Percentage that the given address will receive from "market fixed" fee',
-      percentItoPercentage:
+      percentITOPercentage:
         'Percentage that the given address will receive from "ITO percentage" fee',
       percentItoFixed:
         'Percentage that the given address will receive from "ITO fixed" fee',
@@ -58,6 +58,8 @@ export const assetsTooltip = {
     address: 'Target Address',
     hasRoleMint: 'Should be able to mint?',
     hasRoleSetITOPrices: 'Should be able to set ITO prices?',
+    hasRoleDeposit: 'Should be able to deposit?',
+    hasRoleTransfer: 'Should be able to transfer?',
   },
   properties: {
     title: 'Choose the properties the new token will have',

@@ -1,10 +1,11 @@
+import { PropsWithChildren } from 'react';
 import { IUris } from '@/types/index';
 import { renderCorrectPath } from '@/utils/validateSender';
 import React, { useCallback, useState } from 'react';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { Container, ListUris } from './styles';
 
-const Dropdown: React.FC<IUris> = ({ uris }) => {
+const Dropdown: React.FC<PropsWithChildren<IUris>> = ({ uris }) => {
   const [showMore, setShowMore] = useState(false);
   const renderArrowShowMore = useCallback(() => {
     if (showMore) return <IoIosArrowUp />;

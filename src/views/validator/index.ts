@@ -118,10 +118,14 @@ export const Status = styled.div<IStatus>`
     fill: ${props => props.theme.white};
   }
   circle {
-    fill: ${props => props.theme.table[props.status]};
+    fill: ${props =>
+      props.theme.table[props.status as keyof typeof props.theme.table]};
   }
   p {
-    color: ${props => props.theme.table[props.status]} !important;
+    color: ${props =>
+      props.theme.table[
+        props.status as keyof typeof props.theme.table
+      ]} !important;
     text-transform: capitalize;
   }
   ${props =>
@@ -627,8 +631,8 @@ export const Rating = styled.p.attrs<IRatingProps>(props => ({
     props.rate === 'green'
       ? props.theme.table.success
       : props.rate === 'yellow'
-      ? props.theme.table.pending
-      : props.theme.red};
+        ? props.theme.table.pending
+        : props.theme.red};
 
   color: ${props => props.theme.true.black} !important;
   font-weight: 400;
@@ -701,49 +705,13 @@ export const RewardsChartContent = styled.div`
   }
 `;
 
-export const RewardsChart = styled(RewardsChartContent)`
-  span {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: ${props => props.theme.black};
-  }
-
-  p {
-    font-size: 1rem;
-    color: ${props => props.theme.darkText};
-  }
-`;
-
 export const VotesFooter = styled.div`
   display: flex;
-  justify-content: space-between;
-  position: relative;
-  bottom: 2rem;
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
-  strong {
-    color: #37dd72;
-    font-weight: 600;
-    font-size: 1.2rem;
-  }
-  @media (max-width: 1267px) and (min-width: 1253px) {
-    bottom: 3.1rem;
-  }
-  @media (max-width: 768px) and (min-width: 374px) {
-    bottom: 2.5rem;
-  }
-  @media (max-width: 1284px) and (min-width: 1267px) {
-    bottom: 3.2rem;
-  }
-  @media (max-width: 1297px) and (min-width: 1285px) {
-    bottom: 3.2rem;
-  }
-  @media (max-width: 1301px) and (min-width: 1298px) {
-    bottom: 2.5rem;
-  }
-  @media (max-width: 375px) {
-    bottom: 3.5rem;
-  }
+  align-items: center;
+  gap: 8px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: ${props => props.theme.black};
 `;
 
 export const VotesHeader = styled.div`
@@ -776,8 +744,8 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
     height: 3.5rem;
   }
 
-  ::before,
-  ::after {
+  &::before,
+  &::after {
     position: absolute;
     content: '';
     color: red;
@@ -785,7 +753,7 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
     height: 30px;
   }
 
-  ::before {
+  &::before {
     content: '';
     width: inherit;
     height: inherit;
@@ -794,7 +762,7 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
     border-top-right-radius: 17px;
   }
 
-  ::after {
+  &::after {
     content: 'Percentage';
     left: 22%;
     top: 55%;
@@ -839,8 +807,8 @@ export const HalfCirclePie = styled.div<{ rotation: string }>`
     border: 7.5px solid #ff4681;
     border-top: none;
 
-    ::before,
-    ::after {
+    &::before,
+    &::after {
       position: absolute;
       content: '';
       left: -10px;

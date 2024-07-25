@@ -1,8 +1,8 @@
+import { PropsWithChildren } from 'react';
 import { Copy } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import Title from '@/components/Layout/Title';
-import { Status } from '@/components/Table/styles';
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import { proposalsMap } from '@/components/Tabs/NetworkParams/proposalsMap';
 import Tooltip from '@/components/Tooltip';
 import { useContractModal } from '@/contexts/contractModal';
@@ -19,10 +19,13 @@ import {
   CardTabContainer,
   CenteredRow,
   Container,
+  Status,
 } from '@/styles/common';
 import { IRowSection } from '@/types/index';
 import {
   INetworkParams,
+  IParsedNetworkParam,
+  IParsedNetworkParams,
   IParsedParams,
   IParsedProposalParam,
   IParsedVote,
@@ -85,7 +88,9 @@ const ProposalVoters = (props: IProposalVoters) => {
       {
         element: props => (
           <CenteredRow key={voter}>
-            <Link href={`/account/${voter}`}>{parseAddress(voter, 24)}</Link>
+            <Link href={`/account/${voter}`} legacyBehavior>
+              {parseAddress(voter, 24)}
+            </Link>
             <Copy data={voter} info="voter"></Copy>
           </CenteredRow>
         ),
@@ -99,7 +104,7 @@ const ProposalVoters = (props: IProposalVoters) => {
         element: props => (
           <StatusContent key={status}>
             <AiFillCheckCircle
-              color={typeVoteColors[status]}
+              color={typeVoteColors[status as keyof typeof typeVoteColors]}
               size={18}
               style={{ marginRight: 5 }}
             />
@@ -124,7 +129,7 @@ const ProposalVoters = (props: IProposalVoters) => {
   return <Table {...tableProps2} />;
 };
 
-const ProposalDetails: React.FC = () => {
+const ProposalDetails: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation(['common', 'proposals']);
   const [selectedFilter, setSelectedFilter] = useState(
     `${t('common:Statements.Yes')}`,
@@ -177,15 +182,20 @@ const ProposalDetails: React.FC = () => {
     apiNetworkParams: INetworkParams,
   ): IParsedParams | null => {
     if (!params || !apiNetworkParams) return null;
-    const currentNetworkParams = {} as INetworkParams;
+    const currentNetworkParams = {} as IParsedNetworkParams;
     let parsedProposalParams: IParsedProposalParam[] = [];
 
     if (apiNetworkParams) {
       Object.keys(proposalsMap).map((key, index) => {
-        currentNetworkParams[proposalsMap[key].message] = {
+        currentNetworkParams[
+          proposalsMap[key as keyof typeof proposalsMap].message
+        ] = {
           number: index,
-          parameter: proposalsMap[key] ? proposalsMap[key].message : '',
-          currentValue: apiNetworkParams?.[key]?.value,
+          parameter: proposalsMap[key as keyof typeof proposalsMap]
+            ? proposalsMap[key as keyof typeof proposalsMap].message
+            : '',
+          currentValue:
+            apiNetworkParams?.[key as keyof typeof proposalsMap]?.value,
           parameterLabel: key,
         };
       });
@@ -195,9 +205,12 @@ const ProposalDetails: React.FC = () => {
       parsedProposalParams = Object.entries(params).map(([index, value]) => {
         return {
           paramIndex: index,
-          paramLabel: NetworkParamsIndexer[index],
+          paramLabel: NetworkParamsIndexer[Number(index)],
           paramValue: Number(value),
-          paramText: proposalsMap[NetworkParamsIndexer[index]].message,
+          paramText:
+            proposalsMap[
+              NetworkParamsIndexer[Number(index)] as keyof typeof proposalsMap
+            ].message,
         };
       });
     }
@@ -226,7 +239,7 @@ const ProposalDetails: React.FC = () => {
     }
   }, [proposal, params]);
 
-  const Progress: React.FC = () => {
+  const Progress: React.FC<PropsWithChildren> = () => {
     if (!proposal) return null;
     return (
       <ProgressBar>
@@ -247,7 +260,7 @@ const ProposalDetails: React.FC = () => {
               <ProgressBarContent
                 key={key}
                 widthPercentage={percentageCard}
-                background={typeVoteColors[item]}
+                background={typeVoteColors[item as keyof typeof typeVoteColors]}
               />
             );
           }
@@ -288,7 +301,7 @@ const ProposalDetails: React.FC = () => {
     dataName: 'voters',
   };
 
-  const SelectedTabComponent: React.FC = useCallback(() => {
+  const SelectedTabComponent: React.FC<PropsWithChildren> = useCallback(() => {
     switch (selectedFilter) {
       case `${t('common:Statements.Yes')}`:
         return <ProposalVoters proposalVotersProps={{ ...tableProps1 }} />;
@@ -352,7 +365,7 @@ const ProposalDetails: React.FC = () => {
                   <strong>{t('proposals:Proposer')}</strong>
                 </span>
                 <span style={{ marginRight: '0.2rem' }}>
-                  <Link href={`/account/${proposal?.proposer}`}>
+                  <Link href={`/account/${proposal?.proposer}`} legacyBehavior>
                     <HoverLink>{isSkeleton(proposal?.proposer)}</HoverLink>
                   </Link>
                 </span>
@@ -366,7 +379,7 @@ const ProposalDetails: React.FC = () => {
                 <span>
                   <strong>Hash</strong>
                 </span>
-                <Link href={`/transaction/${proposal?.txHash}`}>
+                <Link href={`/transaction/${proposal?.txHash}`} legacyBehavior>
                   <HoverLink>{isSkeleton(proposal?.txHash)}</HoverLink>
                 </Link>
               </Row>
@@ -505,7 +518,12 @@ const ProposalDetails: React.FC = () => {
                       percentageCard = 0;
                     }
                     return (
-                      <CardVote key={key} color={typeVoteColors[item]}>
+                      <CardVote
+                        key={key}
+                        color={
+                          typeVoteColors[item as keyof typeof typeVoteColors]
+                        }
+                      >
                         <span>{filter[key]}</span>
                         <PercentageText>
                           {percentageCard.toFixed(2)}%

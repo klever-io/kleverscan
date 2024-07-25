@@ -1,3 +1,4 @@
+import { Mono } from '@/styles/common';
 import { AiOutlineClose } from 'react-icons/ai';
 import styled, { css } from 'styled-components';
 
@@ -10,7 +11,7 @@ export const TooltipBody = styled.article<{ isInHomePage: boolean }>`
   transform: ${props =>
     props.isInHomePage ? 'translate(-5%, 112%)' : 'translate(-5%, 112%)'};
   left: 1rem;
-  bottom: 1rem;
+  bottom: 1.25rem;
 
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
     transform: ${props =>
@@ -18,7 +19,7 @@ export const TooltipBody = styled.article<{ isInHomePage: boolean }>`
     left: 0rem;
   }
 
-  :after {
+  &:after {
     content: '';
     display: inline-block;
     background-color: ${props =>
@@ -27,8 +28,8 @@ export const TooltipBody = styled.article<{ isInHomePage: boolean }>`
     width: 12.08px;
     height: 12.08px;
     left: 23.73px;
-    top: -5.82px;
-    border-radius: 3px;
+    top: -5px;
+    border-radius: 2px;
     transform: rotate(45deg);
   }
 `;
@@ -38,7 +39,7 @@ export const LeaveButton = styled(AiOutlineClose)`
   text-align: right;
   fill: ${props => props.theme.white};
   top: 22px;
-  :hover {
+  &:hover {
     cursor: pointer;
   }
   fill: ${props => props.theme.white} !important;
@@ -227,7 +228,7 @@ export const AssetNameWrapper = styled.div`
 `;
 
 export const HoverDiv = styled.div`
-  :hover {
+  &:hover {
     cursor: pointer;
   }
 `;
@@ -254,11 +255,26 @@ export const RedirectSVG = styled.span`
   & path {
     fill: ${props => props.theme.white};
   }
-  :hover {
+  &:hover {
     cursor: pointer;
   }
   svg {
     display: table-cell;
     vertical-align: middle;
   }
+`;
+
+export const QuerySpan = styled.span`
+  display: grid;
+  place-items: center;
+
+  margin-left: 0.5rem;
+  padding: 0 0.5rem;
+
+  border-radius: 8px;
+  background-color: ${props =>
+    props.theme.dark ? props.theme.true.black10 : props.theme.true.white10};
+
+  line-height: 1.5;
+  font-weight: 700;
 `;

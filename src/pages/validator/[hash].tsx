@@ -1,10 +1,11 @@
+import { PropsWithChildren } from 'react';
 import { getStatusIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
 import Dropdown from '@/components/Dropdown';
 import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
 import Skeleton from '@/components/Skeleton';
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import { useContractModal } from '@/contexts/contractModal';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
@@ -50,7 +51,7 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import dynamic from 'next/dynamic';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -81,7 +82,7 @@ const DynamicValidatorCards = dynamic(
   () => import('../../components/ValidatorCards'),
 );
 
-const Validator: React.FC<IValidatorPage> = () => {
+const Validator: React.FC<PropsWithChildren<IValidatorPage>> = () => {
   const { t } = useTranslation(['validators', 'common']);
   const router = useRouter();
   const [validator, setValidator] = useState<null | IPeer>(null);
@@ -241,7 +242,7 @@ const Validator: React.FC<IValidatorPage> = () => {
     };
   };
 
-  const Overview: React.FC = () => {
+  const Overview: React.FC<PropsWithChildren> = () => {
     return (
       <CardContent>
         <Row>
@@ -252,7 +253,7 @@ const Validator: React.FC<IValidatorPage> = () => {
             <CenteredRow>
               {router.query.hash ? (
                 <>
-                  <Link href={`/account/${router.query.hash}`}>
+                  <Link href={`/account/${router.query.hash}`} legacyBehavior>
                     {router.query.hash}
                   </Link>
                   <Copy
@@ -332,7 +333,7 @@ const Validator: React.FC<IValidatorPage> = () => {
               </span>
               {validator ? (
                 <BoldElement>
-                  <span>
+                  <span data-testid="total-stake">
                     {(
                       validator.totalStake /
                       10 ** KLV_PRECISION
@@ -431,7 +432,7 @@ const Validator: React.FC<IValidatorPage> = () => {
       {
         element: props => (
           <CenteredRow key={id}>
-            <Link href={`/account/${address}`} key={address}>
+            <Link href={`/account/${address}`} key={address} legacyBehavior>
               {parseAddress(address || '', 24)}
             </Link>
             <Copy data={address} info="address"></Copy>
@@ -473,7 +474,7 @@ const Validator: React.FC<IValidatorPage> = () => {
     dataName: 'validator',
   };
 
-  const InteractionsButtonsComponenet: React.FC = () => {
+  const InteractionsButtonsComponenet: React.FC<PropsWithChildren> = () => {
     const routerAddress = router.query?.hash || '';
     if (!!extensionInstalled && routerAddress === walletAddress) {
       return (

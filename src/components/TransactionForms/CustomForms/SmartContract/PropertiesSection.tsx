@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import FormInput from '../../FormInput';
 import {
@@ -25,7 +26,7 @@ interface IProperties {
   setPropertiesString: (propertiesString: string) => void;
 }
 
-export const PropertiesSection: React.FC<IProperties> = ({
+export const PropertiesSection: React.FC<PropsWithChildren<IProperties>> = ({
   propertiesString,
   setPropertiesString,
 }) => {
@@ -56,12 +57,17 @@ export const PropertiesSection: React.FC<IProperties> = ({
     const byte = property === 'upgradable' || property === 'readable' ? 2 : 0;
 
     if (byte === 0) {
-      const bit = Math.log2(bitValuesBytes0_1[property]);
+      const bit = Math.log2(
+        bitValuesBytes0_1[property as keyof typeof bitValuesBytes0_1],
+      );
       newProperties[bit] = newProperties[bit] === '0' ? '1' : '0';
     }
 
     if (byte === 2) {
-      const bit = Math.log2(bitValuesBytes2_3[property]) + 8;
+      const bit =
+        Math.log2(
+          bitValuesBytes2_3[property as keyof typeof bitValuesBytes2_3],
+        ) + 8;
       newProperties[bit] = newProperties[bit] === '0' ? '1' : '0';
     }
 

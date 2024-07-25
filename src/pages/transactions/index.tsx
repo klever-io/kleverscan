@@ -1,13 +1,14 @@
+import { PropsWithChildren } from 'react';
 import { Transactions as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
 import { MultiContractToolTip } from '@/components/MultiContractToolTip';
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import {
   CustomFieldWrapper,
   Status,
   TimestampInfo,
-} from '@/components/TableV2/styles';
+} from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import api from '@/services/api';
@@ -54,18 +55,12 @@ interface IRequestTxQuery {
 }
 
 export const toAddressSectionElement = (toAddress: string): JSX.Element => {
-  if (toAddress === '- -') {
-    return (
-      <span data-testid="toAddressEmpty" style={{ cursor: 'default' }}>
-        <Mono>{toAddress}</Mono>
-      </span>
-    );
+  if (toAddress === '--') {
+    return <Mono>{toAddress}</Mono>;
   }
   return (
-    <Link href={`/account/${toAddress}`} key={toAddress}>
-      <a className="address">
-        <Mono>{parseAddress(toAddress, 16)}</Mono>
-      </a>
+    <Link href={`/account/${toAddress}`} key={toAddress} className="address">
+      <Mono>{parseAddress(toAddress, 16)}</Mono>
     </Link>
   );
 };
@@ -226,7 +221,7 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
     data,
   } = props;
 
-  let toAddress = '- -';
+  let toAddress = '--';
   const contractType = getContractType(contract);
 
   if (contractType === Contract.Transfer) {
@@ -260,8 +255,8 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
     {
       element: props => (
         <DoubleRow {...props} key={blockNum}>
-          <Link href={`/block/${blockNum || 0}`}>
-            <a className="address">{blockNum || 0}</a>
+          <Link href={`/block/${blockNum || 0}`} className="address">
+            {blockNum || 0}
           </Link>
           <span>
             {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
@@ -273,10 +268,8 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
     {
       element: props => (
         <DoubleRow {...props} key={sender}>
-          <Link href={`/account/${sender}`}>
-            <a className="address">
-              <Mono>{parseAddress(sender, 16)}</Mono>
-            </a>
+          <Link href={`/account/${sender}`} className="address">
+            <Mono>{parseAddress(sender, 16)}</Mono>
           </Link>
           {toAddressSectionElement(toAddress)}
         </DoubleRow>
@@ -296,14 +289,18 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
         ) : (
           <DoubleRow {...props}>
             <CenteredRow key={contractType}>
-              <span>{ContractsName[contractType]}</span>
+              <span>
+                {ContractsName[contractType as keyof typeof ContractsName]}
+              </span>
             </CenteredRow>
             <CenteredRow>
               {getLabelForTableField(contractType)?.[0] ? (
                 <Tooltip
                   msg={getLabelForTableField(contractType)[0]}
                   Component={() => (
-                    <CustomFieldWrapper>{customFields[0]}</CustomFieldWrapper>
+                    <>
+                      <CustomFieldWrapper>{customFields[0]}</CustomFieldWrapper>
+                    </>
                   )}
                 />
               ) : (
@@ -349,7 +346,7 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
   return sections;
 };
 
-const Transactions: React.FC = () => {
+const Transactions: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
 
   const tableProps: ITable = {

@@ -1,5 +1,5 @@
-import { Edit } from '@/assets/icons';
-import * as SocialIcons from '@/assets/social';
+import { PropsWithChildren } from 'react';
+import SocialIcons from '@/assets/social';
 import { AssetProps } from '@/components/Asset/OverviewTab';
 import { HashComponent } from '@/components/Contract';
 import Title from '@/components/Layout/Title';
@@ -11,16 +11,23 @@ import { useParticipate } from '@/contexts/participate';
 import { assetInfoCall } from '@/services/requests/asset';
 import { IParsedITO } from '@/types';
 import { useTranslation } from 'next-i18next';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import { TbPencilMinus } from 'react-icons/tb';
 import { useQuery } from 'react-query';
 import { ApplyFormModal } from './ApplyFormModal';
 import { AssetITOSummary } from './AssetITOSummary';
 import { ParticipateModal } from './ParticipateModal';
+import DOMPurify from 'dompurify';
+
 import {
   About,
+  AboutContent,
+  AboutTitle,
+  AddDescriptionButton,
+  AddProjectDescription,
   AssetHeaderContainer,
   AssetSubtitle,
   AssetTitle,
@@ -29,6 +36,7 @@ import {
   Container,
   Description,
   EditContainer,
+  EditDescriptionButton,
   Header,
   LeftSide,
   LinkStyles,
@@ -43,7 +51,10 @@ export interface AssetSummaryProps extends AssetProps {
   ITO: IParsedITO | undefined;
 }
 
-export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
+export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
+  asset,
+  ITO,
+}) => {
   const {
     openApplyFormModal,
     setOpenApplyFormModal,
@@ -74,7 +85,7 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
           ? {
               uri: value.startsWith('http') ? value : `https://${value}`,
               social: matchingSocial[0],
-              icon: SocialIcons[matchingSocial[0]],
+              icon: SocialIcons[matchingSocial[0] as keyof typeof SocialIcons],
             }
           : null;
       })
@@ -156,23 +167,9 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
             </AssetTitle>
           </TitleContainer>
 
-          <>
-            {asset_info?.short_description ? (
-              <Description>{asset_info?.short_description}</Description>
-            ) : null}
-            {!asset_info?.short_description &&
-            walletAddress &&
-            asset?.ownerAddress === walletAddress ? (
-              <ParticipateButton
-                secondary
-                type="button"
-                onClick={() => setOpenApplyFormModal(true)}
-              >
-                <Edit />
-                Add a description
-              </ParticipateButton>
-            ) : null}
-          </>
+          {asset_info?.short_description ? (
+            <Description>{asset_info?.short_description}</Description>
+          ) : null}
 
           <SocialNetworks>
             {getSocialNetworks().map(social => (
@@ -209,15 +206,45 @@ export const AssetSummary: React.FC<AssetSummaryProps> = ({ asset, ITO }) => {
       </Header>
       {asset_info?.project_description_copy ? (
         <About>
-          <h2>
-            About the project
-            {walletAddress && asset?.ownerAddress === walletAddress && (
-              <EditContainer onClick={() => setOpenApplyFormModal(true)}>
-                <Edit />
-              </EditContainer>
-            )}
-          </h2>
-          <p>{asset_info?.project_description_copy}</p>
+          <AboutTitle>About the project</AboutTitle>
+          <AboutContent
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(asset_info?.project_description_copy),
+            }}
+            editable={
+              walletAddress && asset?.ownerAddress === walletAddress
+                ? true
+                : false
+            }
+          />
+
+          {walletAddress && asset?.ownerAddress === walletAddress && (
+            <EditDescriptionButton
+              type="button"
+              onClick={() => setOpenApplyFormModal(true)}
+            >
+              <TbPencilMinus />
+              Edit description
+            </EditDescriptionButton>
+          )}
+        </About>
+      ) : null}
+      {!asset_info?.project_description_copy &&
+      walletAddress &&
+      asset?.ownerAddress === walletAddress ? (
+        <About>
+          <AboutTitle>About the project</AboutTitle>
+          <AddProjectDescription>
+            <p>Add a Project Description</p>
+            <p>Add a brief description of your project here.</p>
+            <AddDescriptionButton
+              type="button"
+              onClick={() => setOpenApplyFormModal(true)}
+            >
+              <TbPencilMinus />
+              Add a description
+            </AddDescriptionButton>
+          </AddProjectDescription>
         </About>
       ) : null}
       {asset &&

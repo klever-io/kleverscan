@@ -49,7 +49,7 @@ export const Content = styled.div<{ $loading: boolean; isJSONFile?: boolean }>`
   width: 100%;
 
   ${DefaultScrollBar}
-  ::-webkit-scrollbar {
+  &::-webkit-scrollbar {
     height: 0.3em;
   }
 
@@ -118,10 +118,10 @@ export const ContentTitle = styled.section`
     font-weight: 400;
     font-size: 0.8rem;
 
-    :visited {
+    &:visited {
       color: ${({ theme }) => theme.gray};
     }
-    :hover {
+    &:hover {
       color: ${props => lighten(0.2, props.theme.purple)};
       text-decoration: dotted 1px underline;
     }
@@ -335,12 +335,12 @@ export const RightContentContainer = styled.div`
   }
 
   pre {
-    ::-webkit-scrollbar {
+    &::-webkit-scrollbar {
       width: 0.3rem;
       height: 0.5rem;
       z-index: 1;
     }
-    ::-webkit-scrollbar-track {
+    &::-webkit-scrollbar-track {
       margin-top: 0.5rem;
       margin-bottom: 0.5rem;
       box-shadow: inset 0 0 0.25rem rgba(0, 0, 0, 0.3);
@@ -348,12 +348,12 @@ export const RightContentContainer = styled.div`
       cursor: pointer;
     }
 
-    ::-webkit-scrollbar-thumb {
+    &::-webkit-scrollbar-thumb {
       background-color: ${props => transparentize(0.2, props.theme.violet)};
       border-radius: 10px;
       cursor: pointer;
     }
-    ::-webkit-scrollbar-corner {
+    &::-webkit-scrollbar-corner {
       background-color: transparent;
     }
     height: 30rem;

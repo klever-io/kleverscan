@@ -3,7 +3,7 @@ import {
   CenteredRow as DefaultCenteredRow,
   Row as DefaultRow,
 } from '@/styles/common';
-import styled, { DefaultTheme, StyledComponent, css } from 'styled-components';
+import styled, { DefaultTheme, IStyledComponent, css } from 'styled-components';
 
 interface IExpandCenteredRow {
   openJson?: boolean;
@@ -109,12 +109,9 @@ export const CenteredRow = styled(DefaultCenteredRow)`
   }
 `;
 
-export const ExpandCenteredRow: StyledComponent<
-  'div',
-  DefaultTheme,
-  { openJson?: boolean | undefined },
-  never
-> = styled(DefaultCenteredRow)<{ openJson?: boolean }>`
+export const ExpandCenteredRow = styled(DefaultCenteredRow)<{
+  openJson?: boolean;
+}>`
   display: flex;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -190,6 +187,7 @@ export const Hr = styled.hr`
 export const NestedContainerWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 24px;
   width: 100%;
 `;
 
@@ -267,7 +265,7 @@ export const RoleStrong = styled.strong`
 `;
 
 export const HoverAnchor = styled.a`
-  :hover {
+  &:hover {
     text-decoration: underline;
   }
 `;

@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { ParticipateModal } from '@/components/Asset/AssetSummary/ParticipateModal';
 import { HashComponent } from '@/components/Contract';
 import Copy from '@/components/Copy';
@@ -117,14 +118,12 @@ export const getITOrowSections =
           <Link
             href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
           >
-            <a>
-              <AssetLogo
-                logo={logo}
-                ticker={ticker}
-                name={name}
-                verified={verified}
-              />
-            </a>
+            <AssetLogo
+              logo={logo}
+              ticker={ticker}
+              name={name}
+              verified={verified}
+            />
           </Link>
         ),
         span: 1,
@@ -133,8 +132,9 @@ export const getITOrowSections =
         element: props => (
           <Link
             href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
+            style={{ overflow: 'hidden' }}
           >
-            <a style={{ overflow: 'hidden' }}>{name}</a>
+            {name}
           </Link>
         ),
         span: 1,
@@ -144,6 +144,7 @@ export const getITOrowSections =
           <ContainerAssetId>
             <Link
               href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
+              legacyBehavior
             >
               {assetId}
             </Link>
@@ -256,25 +257,25 @@ export const getITOTabletRowSections =
             <Link
               href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
             >
-              <a>
-                <AssetLogo
-                  logo={logo}
-                  ticker={ticker}
-                  name={name}
-                  verified={verified}
-                  size={36}
-                />
-              </a>
+              <AssetLogo
+                logo={logo}
+                ticker={ticker}
+                name={name}
+                verified={verified}
+                size={36}
+              />
             </Link>
             <DoubleRow>
               <Link
                 href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
+                legacyBehavior
               >
                 <ProjectName style={{ overflow: 'hidden' }}>{name}</ProjectName>
               </Link>
               <ContainerAssetId>
                 <Link
                   href={`/asset/${assetId}${reference ? `?reference=${reference}` : ''}`}
+                  legacyBehavior
                 >
                   {assetId}
                 </Link>
@@ -353,7 +354,7 @@ export const ITOTabletheaders = [
   '',
 ];
 
-const ITOsPage: React.FC = () => {
+const ITOsPage: React.FC<PropsWithChildren> = () => {
   const [ITO, setITO] = useState<IParsedITO | null>(null);
   const {
     openParticipateModal,

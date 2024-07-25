@@ -1,4 +1,5 @@
-import Table, { ITable } from '@/components/TableV2';
+import { PropsWithChildren } from 'react';
+import Table, { ITable } from '@/components/Table';
 import { Container, Header } from '@/styles/common';
 import React from 'react';
 import Filter, { IFilter } from '../Filter';
@@ -15,7 +16,7 @@ interface IDetail {
   filters?: IFilter[];
 }
 
-const Detail: React.FC<IDetail> = ({
+const Detail: React.FC<PropsWithChildren<IDetail>> = ({
   title,
   headerIcon: Icon,
   cards,

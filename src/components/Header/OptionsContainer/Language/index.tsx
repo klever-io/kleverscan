@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
 import {
@@ -6,7 +7,7 @@ import {
   LanguageDropdownItem,
 } from './styles';
 
-const Language: React.FC = () => {
+const Language: React.FC<PropsWithChildren> = () => {
   const [active, setActive] = useState(false);
   const router = useRouter();
 

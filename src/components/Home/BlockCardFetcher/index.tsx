@@ -1,10 +1,11 @@
+import { PropsWithChildren } from 'react';
 import { PurpleArrowRight } from '@/assets/icons';
 import AssetLogo from '@/components/Logo/AssetLogo';
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import { useHomeData } from '@/contexts/mainPage';
 import { useMobile } from '@/contexts/mobile';
 import { defaultPagination } from '@/services/apiCalls';
-import { CenteredRow, DoubleRow } from '@/styles/common';
+import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
 import { IBlock } from '@/types/blocks';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
@@ -52,18 +53,18 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
     blockRewards,
   } = block;
 
+  const producerNameIsAddress = producerName === producerOwnerAddress;
+
   const sections: IRowSection[] = [
     {
       element: props => (
         <Link href={`/validator/${producerOwnerAddress}`}>
-          <a>
-            <AssetLogo
-              logo={producerLogo}
-              ticker={producerName}
-              name={producerName}
-              size={36}
-            />
-          </a>
+          <AssetLogo
+            logo={producerLogo}
+            ticker={producerName}
+            name={producerName}
+            size={36}
+          />
         </Link>
       ),
       span: 1,
@@ -72,12 +73,18 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
     {
       element: props => (
         <DoubleRow {...props} key={nonce + epoch}>
-          <Link href={`/block/${nonce}`}>{String(nonce)}</Link>
+          <Link href={`/block/${nonce}`} legacyBehavior>
+            {String(nonce)}
+          </Link>
           <Link
             href={`/validator/${producerOwnerAddress}`}
             key={producerOwnerAddress}
           >
-            <a>{parseAddress(producerName, 16)}</a>
+            {producerName && !producerNameIsAddress ? (
+              producerName
+            ) : (
+              <Mono>{parseAddress(producerOwnerAddress, 24)}</Mono>
+            )}
           </Link>
         </DoubleRow>
       ),
@@ -144,18 +151,17 @@ export const blocksTabletRowSections = (block: IBlock): IRowSection[] => {
       element: props => (
         <CenteredRow>
           <Link href={`/validator/${producerOwnerAddress}`}>
-            <a>
-              <AssetLogo
-                logo={producerLogo}
-                ticker={producerName}
-                name={producerName}
-                size={36}
-              />
-            </a>
+            <AssetLogo
+              logo={producerLogo}
+              ticker={producerName}
+              name={producerName}
+              size={36}
+            />
           </Link>
           <Link
             href={`/validator/${producerOwnerAddress}`}
             key={producerOwnerAddress}
+            legacyBehavior
           >
             <ValidatorName>{parseAddress(producerName, 24)}</ValidatorName>
           </Link>
@@ -166,7 +172,9 @@ export const blocksTabletRowSections = (block: IBlock): IRowSection[] => {
     {
       element: props => (
         <DoubleRow {...props} key={nonce + epoch}>
-          <Link href={`/block/${nonce}`}>{String(nonce)}</Link>
+          <Link href={`/block/${nonce}`} legacyBehavior>
+            {String(nonce)}
+          </Link>
         </DoubleRow>
       ),
       span: 1,
@@ -211,7 +219,7 @@ export const blocksTabletRowSections = (block: IBlock): IRowSection[] => {
   return sections;
 };
 
-const BlockCardFetcher: React.FC = () => {
+const BlockCardFetcher: React.FC<PropsWithChildren> = () => {
   const { blocks } = useHomeData();
   const { t: commonT } = useTranslation('common');
   const { t } = useTranslation('blocks');
@@ -243,6 +251,7 @@ const BlockCardFetcher: React.FC = () => {
     showLimit: false,
     showPagination: false,
     smaller: true,
+    interval: 4000,
   };
 
   return (
@@ -255,10 +264,8 @@ const BlockCardFetcher: React.FC = () => {
             pathname: '/blocks',
           }}
         >
-          <a>
-            View All
-            <PurpleArrowRight />
-          </a>
+          View All
+          <PurpleArrowRight />
         </Link>
         {isTablet ? (
           <div onClick={() => setHideMenu(!hideMenu)}>
@@ -268,7 +275,7 @@ const BlockCardFetcher: React.FC = () => {
       </ContainerHide>
 
       <TransactionContainer>
-        {!hideMenu && <Table key={JSON.stringify(blocks)} {...tableProps} />}
+        {!hideMenu && <Table {...tableProps} />}
       </TransactionContainer>
     </SectionCards>
   );

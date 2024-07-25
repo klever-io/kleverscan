@@ -6,7 +6,7 @@ export const ButtonModal = styled.button<{
   isLocked?: boolean;
   buttonStyle?: 'primary' | 'secondary';
 }>`
-  color: ${props => props.theme.true.white};
+  color: ${props => props.theme.black};
   background-color: transparent;
   border: 1px solid
     ${props => (!props.isLocked ? props.theme.violet : props.theme.darkGray)};
@@ -31,14 +31,14 @@ export const ButtonModal = styled.button<{
   transition: all 0.1s ease;
 
   > span {
-    color: ${props => props.theme.true.white} !important;
+    color: ${props => props.theme.black} !important;
   }
 
-  :active {
+  &:active {
     transform: ${props => (props.isLocked ? '' : 'translateY(0.1rem)')};
   }
 
-  :hover {
+  &:hover {
     background-color: ${props =>
       props.isLocked ? props.theme.darkGray : props.theme.violet};
     cursor: ${props => (props.isLocked ? 'not-allowed' : 'pointer')};
@@ -50,7 +50,7 @@ export const ButtonModal = styled.button<{
       background-color: ${props.theme.violet};
       border: 1px solid ${props.theme.violet};
 
-      :hover {
+      &:hover {
         background-color: ${lighten(0.1, props.theme.violet)};
       }
     `}

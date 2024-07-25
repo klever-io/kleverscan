@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { ITooltipContent } from '@/pages/charts';
 import React from 'react';
 import Area from './Area';
@@ -32,7 +33,7 @@ interface IChart {
   height?: string;
 }
 
-const Chart: React.FC<IChart> = ({
+const Chart: React.FC<PropsWithChildren<IChart>> = ({
   type,
   data,
   value,
@@ -43,7 +44,14 @@ const Chart: React.FC<IChart> = ({
   strokeWidth,
   height,
 }) => {
-  const props = { data, hasTooltip, yAxis, strokeWidth, height, CustomTooltip };
+  const props: any = {
+    data,
+    hasTooltip,
+    yAxis,
+    strokeWidth,
+    height,
+    CustomTooltip,
+  };
 
   switch (type) {
     case ChartType.Area:

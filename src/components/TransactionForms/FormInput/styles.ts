@@ -22,7 +22,7 @@ const defaultStyles = css`
   width: 100%;
 
   padding: 0.5rem 1rem;
-  border: 1px solid ${({ theme }) => theme.darkGray};
+  border: 1px solid ${({ theme }) => theme.black20};
   border-radius: 0.5rem;
 
   color: ${({ theme }) => theme.darkText};
@@ -120,6 +120,12 @@ ${({ theme, logoWarning }) =>
     appearance: textfield;
     -moz-appearance: textfield;
   }
+
+  &:disabled {
+    filter: opacity(0.6);
+    color: ${({ theme }) => theme.gray};
+    cursor: not-allowed;
+  }
 `;
 
 export const FileInput = styled.input<{ Dragging: boolean }>`
@@ -200,11 +206,15 @@ export const TooltipContent = styled.div`
 export const Container = styled.div<IProps>`
   width: 100%;
   position: relative;
-  ${props =>
-    css`
-      grid-column: auto / span ${props.span};
-      padding-top: ${props.paddingTop ? props.paddingTop : 0}rem;
-    `}
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  ${props => css`
+    grid-column: auto / span ${props.span};
+    padding-top: ${props.paddingTop ? props.paddingTop : 0}rem;
+  `}
 
   > span {
     color: ${props => (props.error ? props.theme.error : props.theme.gray)};

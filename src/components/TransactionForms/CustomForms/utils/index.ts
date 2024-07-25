@@ -1,7 +1,7 @@
 import { setQueryAndRouter } from '@/utils';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { cleanEmptyValues } from '../../FormInput';
-import { PackInfo, WhitelistInfo } from './types';
+import { Pack, PackInfo, WhitelistInfo } from './types';
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 export const parseSplitRoyalties = (data: any): void => {
@@ -34,27 +34,25 @@ export const parseSplitRoyalties = (data: any): void => {
   data.royalties.splitRoyalties = splitRoyalties;
 };
 
-export const parseURIs = (data: any): void => {
+export const parseTickerName = (data: any) => {
+  data.ticker = data.ticker.toUpperCase();
+  return;
+};
+export const parseURIs = (data: any) => {
   if (data.uris === undefined) {
     return;
   }
 
   const urisReference = data.uris;
-
-  delete data.uris;
-
   if (urisReference.length === 0) return;
 
-  const uris: {
-    [key: string]: string;
-  } = {};
-
+  const uris: { [key: string]: string } = {};
   urisReference.forEach((item: any) => {
     const label = item.label;
-    uris[label] = item.value;
+    uris[label] = item.uri;
   });
-
   data.uris = uris;
+  return uris;
 };
 
 export const parseStaking = (data: any): void => {
@@ -103,7 +101,7 @@ export const parseKDAFeePool = (data: any): void => {
   data.kdaPool.fRatioKLV = 1;
 };
 
-export const parsePackInfo = (data: any): void => {
+export const parsePackInfo = (data: any, isNFT?: boolean): void => {
   if (data.packInfo === undefined) {
     return;
   }
@@ -118,8 +116,17 @@ export const parsePackInfo = (data: any): void => {
 
   packInfoReference.forEach((item: any) => {
     const label = item.currencyId.toUpperCase();
+    const parsedPacks = item.packs.map((pack: Pack, index: number) => {
+      if (item.packs.length > 1 && index === item.packs.length - 1 && !isNFT) {
+        return {
+          amount: item.packs[index - 1]?.amount + 1,
+          price: pack.price,
+        };
+      }
+      return pack;
+    });
     packInfo[label] = {
-      packs: item.packs,
+      packs: parsedPacks,
     };
   });
 

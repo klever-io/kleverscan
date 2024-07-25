@@ -1,4 +1,5 @@
-import Table, { ITable } from '@/components/TableV2';
+import { PropsWithChildren } from 'react';
+import Table, { ITable } from '@/components/Table';
 import api from '@/services/api';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
 import React from 'react';
@@ -33,9 +34,11 @@ const requestNetworkParams = async (): Promise<INetworkParams> => {
       .map((key, index) => {
         return {
           number: index,
-          parameter: proposalsMap[key].message ? proposalsMap[key].message : '',
+          parameter: proposalsMap[key as keyof typeof proposalsMap].message
+            ? proposalsMap[key as keyof typeof proposalsMap].message
+            : '',
           currentValue: data.parameters[key]?.value
-            ? `${(Number(data.parameters[key].value) / 10 ** proposalsMap[key].precision).toLocaleString()} ${proposalsMap[key].unit}`
+            ? `${(Number(data.parameters[key].value) / 10 ** proposalsMap[key as keyof typeof proposalsMap].precision).toLocaleString()} ${proposalsMap[key as keyof typeof proposalsMap].unit}`
             : '',
         };
       })
@@ -45,22 +48,11 @@ const requestNetworkParams = async (): Promise<INetworkParams> => {
   return networkParams;
 };
 
-const NetworkParams: React.FC = () => {
+const NetworkParams: React.FC<PropsWithChildren> = () => {
   const { getInteractionsButtons } = useContractModal();
 
   const rowSections = (props: INetworkParam): IRowSection[] => {
     const { number, parameter, currentValue } = props;
-
-    const [ProposalButton] = getInteractionsButtons([
-      {
-        title: 'Propose Change',
-        contractType: 'ProposalContract',
-        defaultValues: {
-          parameters: [{ label: number, value: '' }],
-        },
-        buttonStyle: 'primary',
-      },
-    ]);
     return [
       {
         element: props => <span key={String(number)}>#{number}</span>,
@@ -77,7 +69,19 @@ const NetworkParams: React.FC = () => {
         span: 1,
       },
       {
-        element: props => <ProposalButton />,
+        element: props => {
+          const [ProposalButton] = getInteractionsButtons([
+            {
+              title: 'Propose Change',
+              contractType: 'ProposalContract',
+              defaultValues: {
+                parameters: [{ label: number, value: '' }],
+              },
+              buttonStyle: 'primary',
+            },
+          ]);
+          return <ProposalButton />;
+        },
         span: 2,
         width: 200,
       },

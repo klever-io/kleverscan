@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { setQueryAndRouter } from '@/utils';
 import { useDidUpdateEffect } from '@/utils/hooks';
@@ -69,6 +70,7 @@ export interface IBaseFormInputProps
   titleLess?: boolean;
   disableCustom?: boolean;
   selectFilter?: (e: any) => any;
+  loading?: boolean;
 }
 
 export interface IFormInputProps extends IBaseFormInputProps {
@@ -142,7 +144,9 @@ export const onChangeWrapper = (
   };
 };
 
-const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
+const FormInput: React.FC<
+  PropsWithChildren<IFormInputProps | ICustomFormInputProps>
+> = ({
   name,
   title,
   type,
@@ -170,6 +174,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
   titleLess = false,
   disableCustom = false,
   selectFilter,
+  loading = false,
   ...rest
 }) => {
   const areaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -284,7 +289,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
     };
   }, [name, unregister, isCustom]);
 
-  const areaProps = {
+  const areaProps: any = {
     error: Boolean(error),
     logoWarning: logoError !== null ? true : false,
     value: rest.value,
@@ -326,6 +331,8 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
     onInputChange,
     creatable,
     selectFilter,
+    customOnChange,
+    loading,
     ...rest,
   };
 

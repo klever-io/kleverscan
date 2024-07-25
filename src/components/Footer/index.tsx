@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Copy as CopyIcon } from '@/assets/icons';
 import {
   contents,
@@ -10,7 +11,7 @@ import {
 import { useMobile } from '@/contexts/mobile';
 import { useTheme } from '@/contexts/theme';
 import { ArrowUpSquareHideMenu } from '@/views/home';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import Link from 'next/link';
 import { QRCodeSVG } from 'qrcode.react';
 import React, { useRef, useState } from 'react';
@@ -31,7 +32,7 @@ import {
   VersionBuildContainer,
 } from './styles';
 
-const FooterItems: React.FC<IContent> = link => {
+const FooterItems: React.FC<PropsWithChildren<IContent>> = link => {
   const [hideMenu, setHideMenu] = useState(false);
   const { isMobile } = useMobile();
   const closeTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -81,8 +82,13 @@ const FooterItems: React.FC<IContent> = link => {
                 </QrCodeDropdown>
               </DonateContainer>
             ) : (
-              <Link key={String(index)} href={item.href}>
-                <a>{item.name}</a>
+              <Link
+                key={String(index)}
+                href={item.href}
+                target="_blank"
+                rel="nofollow noreferrer"
+              >
+                {item.name}
               </Link>
             ),
           )}
@@ -91,10 +97,10 @@ const FooterItems: React.FC<IContent> = link => {
   );
 };
 
-const Footer: React.FC = () => {
+const Footer: React.FC<PropsWithChildren> = () => {
   const { isMobile } = useMobile();
   const { isDarkTheme } = useTheme();
-  const SocialItem: React.FC<ISocial> = ({ Icon, link }) => (
+  const SocialItem: React.FC<PropsWithChildren<ISocial>> = ({ Icon, link }) => (
     <a
       target="_blank"
       href={link}

@@ -1,6 +1,8 @@
+import { PropsWithChildren } from 'react';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 interface IMobile {
+  isDeviceMobileCheck: () => boolean;
   isMobile: boolean;
   isTablet: boolean;
   mobileMenuOpen: boolean;
@@ -11,11 +13,16 @@ interface IMobile {
 
 export const Mobile = createContext({} as IMobile);
 
-export const MobileProvider: React.FC = ({ children }) => {
+export const MobileProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mobileNavbarRef = useRef<HTMLDivElement>(null);
+
+  const isDeviceMobileCheck = () =>
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator?.userAgent,
+    );
 
   const isMobileCheck = (width: number) =>
     width <= 768 ? setIsMobile(true) : setIsMobile(false);
@@ -63,6 +70,7 @@ export const MobileProvider: React.FC = ({ children }) => {
   };
 
   const values: IMobile = {
+    isDeviceMobileCheck,
     isMobile,
     isTablet,
     mobileMenuOpen,

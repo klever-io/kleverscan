@@ -1,6 +1,7 @@
+import { PropsWithChildren } from 'react';
 import Copy from '@/components/Copy';
 import Filter, { IFilter } from '@/components/Filter';
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import { IBalance, IHolders, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
 import { parseAddress } from '@/utils/parseValues';
@@ -21,7 +22,7 @@ interface IHolderTableProps {
   page: number;
 }
 
-const Holders: React.FC<IHolders> = ({
+const Holders: React.FC<PropsWithChildren<IHolders>> = ({
   asset,
   holdersTableProps,
   setHolderQuery,
@@ -42,7 +43,7 @@ const Holders: React.FC<IHolders> = ({
       {
         element: props => (
           <AddressContainer key={address}>
-            <Link href={`/account/${address}`}>
+            <Link href={`/account/${address}`} legacyBehavior>
               {parseAddress(address, 40)}
             </Link>
 
@@ -54,7 +55,7 @@ const Holders: React.FC<IHolders> = ({
       {
         element: props => (
           <span key={asset.circulatingSupply}>
-            {((balance / asset.circulatingSupply) * 100).toFixed(2)}%
+            {((totalBalance / asset.circulatingSupply) * 100).toFixed(2)}%
           </span>
         ),
         span: 1,

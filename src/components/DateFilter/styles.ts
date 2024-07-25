@@ -1,18 +1,15 @@
+import { DefaultCardStyleWithBorder } from '@/styles/common';
 import styled, { css, keyframes } from 'styled-components';
 
 interface DayItemProps {
-  isKey: boolean;
-  isBetween: boolean;
-  isCurrent: boolean;
-  isAfter: boolean;
+  isKey?: boolean;
+  isBetween?: boolean;
+  isCurrent?: boolean;
+  isAfter?: boolean;
 }
 
 interface ConfirmButtonProps {
   isActive: boolean;
-}
-
-interface MonthPickerProps {
-  isDisabledRight: boolean;
 }
 
 export const fadeInItem = keyframes`
@@ -81,8 +78,7 @@ export const OutsideContainer = styled.div`
 `;
 
 export const OutsideContent = styled.div`
-  border: 1px solid ${props => props.theme.black};
-  border-radius: 24px;
+  ${DefaultCardStyleWithBorder}
 
   box-sizing: border-box;
 
@@ -111,16 +107,17 @@ export const OutsideContent = styled.div`
 
 export const Input = styled.input`
   width: 75%;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 0.875rem;
   line-height: 1rem;
-  color: ${props => props.theme.gray700};
+  color: ${props => props.theme.black};
 
   caret-color: transparent;
 
   cursor: pointer;
   &::placeholder {
-    color: ${props => props.theme.gray700};
+    color: ${props =>
+      props.theme.dark ? props.theme.gray700 : props.theme.darkGray};
   }
   &:not([value='']) {
     animation: ${fadeInItem} 0.2s ease-in-out;
@@ -135,7 +132,6 @@ export const CalendarContainer = styled.div`
   min-height: 18rem;
   width: 18rem;
   padding: 1rem;
-  margin-left: 5rem;
   background-color: ${props => props.theme.background};
   position: absolute;
   bottom: -0.5rem;
@@ -151,8 +147,8 @@ export const CalendarContainer = styled.div`
   }
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    left: 6rem;
     bottom: -100%;
+    left: 50%;
     animation: ${fadeInContainerMobile} 0.2s linear forwards;
     width: 20rem;
   }
@@ -182,9 +178,11 @@ export const CalendarContent = styled.div`
   user-select: none;
 `;
 
-export const MonthPicker = styled.div.attrs((props: MonthPickerProps) => ({
-  isDisabledRight: props.isDisabledRight,
-}))`
+interface MonthPickerProps {
+  isDisabledRight: boolean;
+}
+
+export const MonthPicker = styled.div<MonthPickerProps>`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -252,12 +250,7 @@ export const DaysTable = styled.div`
   }
 `;
 
-export const DayItem = styled.div.attrs((props: DayItemProps) => ({
-  isKey: props.isKey,
-  isBetween: props.isBetween,
-  isCurrent: props.isCurrent,
-  isAfter: props.isAfter,
-}))`
+export const DayItem = styled.div<DayItemProps>`
   margin: 0.5rem auto 0;
   height: 2rem;
   width: 2rem;
@@ -318,9 +311,7 @@ export const Warning = styled.div`
   }
 `;
 
-export const Confirm = styled.button.attrs((props: ConfirmButtonProps) => ({
-  isActive: props.isActive,
-}))`
+export const Confirm = styled.button<ConfirmButtonProps>`
   margin-top: 1rem;
   padding: 0.5rem;
   border-radius: 0.5rem;

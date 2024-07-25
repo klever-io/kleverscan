@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { StyledArrow } from '@/components/Layout/Title/styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import api from '@/services/api';
@@ -19,9 +20,14 @@ import {
   Input,
   InputRow,
   Label,
+  RTEArea,
   SubmitButton,
   Title,
 } from './styles';
+import { useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Underline from '@tiptap/extension-underline';
+import { Toolbar } from './Toolbar';
 
 const ReactSelect = dynamic(() => import('react-select'), {
   ssr: false,
@@ -41,7 +47,9 @@ interface ApplyFormModalProps {
   refetchAssetInfo: () => void;
 }
 
-export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
+export const ApplyFormModal: React.FC<
+  PropsWithChildren<ApplyFormModalProps>
+> = ({
   isOpenApplyFormModal,
   setOpenApplyFormModal,
   asset,
@@ -118,20 +126,28 @@ export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
       closeModal();
     } catch (error) {
       console.error(error);
-      toast.error(error);
+      toast.error(JSON.stringify(error));
     } finally {
       setLoading(false);
     }
   };
 
+  const editor = useEditor({
+    extensions: [StarterKit, Underline],
+    content: `${projectDescription}`,
+    onUpdate({ editor }) {
+      setProjectDescription(editor.getHTML());
+    },
+  });
+
   return (
     <Container isOpenApplyFormModal={isOpenApplyFormModal}>
-      <Content>
+      <Content opened={isOpenApplyFormModal}>
         <Header>
           <ArrowContainer onClick={closeModal}>
             <StyledArrow />
           </ArrowContainer>
-          <Title>Add info your project</Title>
+          <Title>Add info to your project</Title>
         </Header>
 
         <AssetVisualization>
@@ -167,12 +183,9 @@ export const ApplyFormModal: React.FC<ApplyFormModalProps> = ({
 
           <InputRow>
             <Label>About the Project</Label>
-            <Input
-              value={projectDescription}
-              onChange={e => {
-                setProjectDescription(e.target.value);
-              }}
-            />
+            <RTEArea editor={editor}>
+              <Toolbar editor={editor} />
+            </RTEArea>
           </InputRow>
         </BuyForm>
         <SubmitButton type="submit" form="buyForm">

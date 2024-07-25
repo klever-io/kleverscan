@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { AssetSummary } from '@/components/Asset/AssetSummary';
 import { ITOTab } from '@/components/Asset/ITOTab';
 import { KDAPoolTab } from '@/components/Asset/KDAPoolTab';
@@ -11,15 +12,11 @@ import Holders from '@/components/Tabs/Holders';
 import Transactions from '@/components/Tabs/Transactions';
 import api from '@/services/api';
 import { assetCall, assetPoolCall, ITOCall } from '@/services/requests/asset';
-import { CardHeader, CardTabContainer } from '@/styles/common';
+import { CardHeader, CardHeaderItem, CardTabContainer } from '@/styles/common';
 import { IAssetPage, IBalance } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { parseHolders } from '@/utils/parseValues';
-import {
-  AssetCardContent,
-  AssetCardHeaderItem,
-  AssetPageContainer,
-} from '@/views/assets';
+import { AssetCardContent, AssetPageContainer } from '@/views/assets';
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -28,7 +25,7 @@ import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
 
-const Asset: React.FC<IAssetPage> = ({}) => {
+const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
   const router = useRouter();
   const { t } = useTranslation(['common', 'assets']);
 
@@ -126,7 +123,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
     return { data: { accounts: [] } };
   };
 
-  const SelectedComponent: React.FC = () => {
+  const SelectedComponent: React.FC<PropsWithChildren> = () => {
     switch (selectedCard) {
       case `${t('common:Tabs.Overview')}`:
         return <OverviewTab asset={asset} />;
@@ -164,7 +161,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
     request: (page: number, limit: number) => requestAssetHolders(page, limit),
   };
 
-  const SelectedTabComponent: React.FC = () => {
+  const SelectedTabComponent: React.FC<PropsWithChildren> = () => {
     switch (selectedTab) {
       case `${t('common:Titles.Transactions')}`:
         return <Transactions transactionsTableProps={transactionsTableProps} />;
@@ -203,7 +200,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
       <CardTabContainer>
         <CardHeader>
           {cardHeaders.map((header, index) => (
-            <AssetCardHeaderItem
+            <CardHeaderItem
               key={String(index)}
               selected={selectedCard === header}
               onClick={() => {
@@ -212,7 +209,7 @@ const Asset: React.FC<IAssetPage> = ({}) => {
               }}
             >
               <span>{header}</span>
-            </AssetCardHeaderItem>
+            </CardHeaderItem>
           ))}
         </CardHeader>
 

@@ -4,6 +4,7 @@ import { AiOutlineClose } from 'react-icons/ai';
 import { HiOutlineMenuAlt2 } from 'react-icons/hi';
 import styled, { css, keyframes } from 'styled-components';
 import { default as DefaultInput } from '../InputGlobal';
+import { DefaultCardStyleWithBorder } from '@/styles/common';
 
 interface IMobileMenu {
   opened: boolean;
@@ -277,26 +278,24 @@ export const MobileContainer = styled.div<{ $openSearch: boolean }>`
 `;
 
 export const MobileContent = styled.div<IMobileMenu>`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
   padding: 1.5rem;
   height: 100vh;
 
   right: 0;
 
   transform: translateX(${props => (props.opened ? 0 : '100%')});
+  transition: 0.3s ease-out;
 
-  display: flex;
   position: fixed;
 
   z-index: 12;
 
-  flex-direction: column;
-
-  gap: 1.5rem;
-
   background-color: ${props =>
     props.theme.dark ? props.theme.navbar.background : props.theme.true.white};
-
-  transition: 0.3s ease-out;
 
   visibility: ${props => (props.opened ? 'visible' : 'hidden')};
   opacity: ${props => (props.opened ? 1 : 0)};
@@ -388,7 +387,6 @@ export const DropdownContainer = styled.div`
   position: absolute;
   bottom: 0;
   right: -5vw;
-  top: 0;
   animation: ${expand} 0.2s ease;
 
   border-radius: 0 0 0.5rem 0.5rem;
@@ -431,6 +429,7 @@ export const DropdownItem = styled.li<{ disabled: boolean }>`
 `;
 
 export const DropdownMenu = styled.ul`
+  ${DefaultCardStyleWithBorder}
   width: max-content;
   padding: 0.7rem;
   background-color: ${props =>

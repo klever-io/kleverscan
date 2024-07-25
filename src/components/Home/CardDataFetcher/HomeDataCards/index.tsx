@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Accounts, TPS, Transactions } from '@/assets/cards';
 import {
   NextImageCardWrapper,
@@ -18,7 +19,7 @@ import {
 } from '@/views/home';
 import { CircularProgressContainer } from '@/views/validators';
 import { useTranslation } from 'next-i18next';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import { useRef } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import HomeDataCardsSkeleton from '../HomeDataCardsSkeleton';
@@ -30,7 +31,9 @@ const icons = [
   ['/homeCards/tpsIcon.svg', '/homeCards/tpsBackground.svg'],
 ];
 
-const DefaultCards: React.FC<{ index: number }> = ({ index }) => {
+const DefaultCards: React.FC<PropsWithChildren<{ index: number }>> = ({
+  index,
+}) => {
   return (
     <StackedImageWrapper>
       <NextImageCardWrapper>
@@ -55,7 +58,9 @@ const DefaultCards: React.FC<{ index: number }> = ({ index }) => {
   );
 };
 
-const Progress: React.FC<{ percent: number }> = ({ percent }) => {
+const Progress: React.FC<PropsWithChildren<{ percent: number }>> = ({
+  percent,
+}) => {
   const { isDarkTheme } = useTheme();
   const idCSS = 'gradient';
 
@@ -75,18 +80,15 @@ const Progress: React.FC<{ percent: number }> = ({ percent }) => {
   );
 };
 
-const EpochCard: React.FC = () => {
-  const { blocks, metrics } = useHomeData();
+const EpochCard: React.FC<PropsWithChildren> = () => {
+  const { epoch, metrics } = useHomeData();
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
-  const block = blocks && blocks[0];
 
   return (
     <DataCard className="epoch">
       <Progress percent={metrics.epochLoadPercent} />
       <EpochCardContent>
-        <span>
-          {`${t('Epoch')}` + (block?.epoch ? ` #${block.epoch} ` : ' ')}
-        </span>
+        <span>{`${t('Epoch')}` + (epoch ? ` #${epoch} ` : ' ')}</span>
         <small>Time remaining</small>
         <DataCardValue isEpoch={true}>
           <p className="epochSeconds">
@@ -98,7 +100,7 @@ const EpochCard: React.FC = () => {
   );
 };
 
-const HomeDataCards: React.FC = () => {
+const HomeDataCards: React.FC<PropsWithChildren> = () => {
   const dataCardsRef = useRef<HTMLDivElement>(null);
 
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });

@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { IconHelp } from '@/assets/help';
 import { ICustomStyles } from '@/types/index';
 import React, { useState } from 'react';
@@ -5,13 +6,13 @@ import { StyledTooltip, ToolTipSpan } from './styles';
 
 interface ITooltipProps {
   msg: string;
-  Component?: React.FC;
+  Component?: React.FC<PropsWithChildren>;
   customStyles?: ICustomStyles;
   minMsgLength?: number;
   maxVw?: number;
 }
 
-const Tooltip: React.FC<ITooltipProps> = ({
+const Tooltip: React.FC<PropsWithChildren<ITooltipProps>> = ({
   msg,
   Component,
   customStyles,
@@ -22,33 +23,22 @@ const Tooltip: React.FC<ITooltipProps> = ({
   const parsedMsgs = msg.split('\n');
   return (
     <ToolTipSpan
+      className="button-tooltip"
       onMouseOver={() => setDisplayMessage(true)}
       onMouseLeave={() => setDisplayMessage(false)}
       maxVw={maxVw}
     >
-      {Component ? (
-        <div data-tip data-for="buttonTooltip">
-          {Component({})}
-        </div>
-      ) : (
-        <IconHelp data-tip data-for="buttonTooltip">
-          button
-        </IconHelp>
-      )}
+      {Component ? <div>{Component({})}</div> : <IconHelp>button</IconHelp>}
       {((Component && msg.length > minMsgLength) || !Component) && (
         <StyledTooltip
-          key={String(displayMessage)}
+          anchorSelect=".button-tooltip"
           displayMsg={displayMessage}
-          id="buttonTooltip"
           place={customStyles?.place || 'top'}
-          effect="solid"
-          type="info"
-          backgroundColor="#7B7DB2"
-          delayShow={customStyles?.delayShow}
+          delayShow={customStyles?.delayShow || 300}
           offset={customStyles?.offset}
         >
           {parsedMsgs.map((parsedMsg, index) => (
-            <span key={index} style={{ color: 'white' }}>
+            <span key={parsedMsg} style={{ color: 'white' }}>
               {parsedMsg}
               {index + 1 !== parsedMsgs.length && <br />}
             </span>

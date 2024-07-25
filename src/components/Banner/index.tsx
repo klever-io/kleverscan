@@ -1,6 +1,5 @@
+import { PropsWithChildren } from 'react';
 import api from '@/services/api';
-import Bugsnag from '@bugsnag/js';
-import BugsnagPluginReact from '@bugsnag/plugin-react';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { BannerContainer, BannerParagraph, ButtonClose } from './styled';
@@ -21,7 +20,7 @@ interface IHeathReturn {
   error: string;
 }
 
-const errorMessage = {
+const errorMessage: { [key: string]: string } = {
   WARNING:
     'Note: Server response times are currently a bit high. Thanks for your patience.',
   ALERT:
@@ -39,7 +38,6 @@ const healthRequest = async (): Promise<IResultsHeath[]> => {
     const message = res.data.health.results.map(value => value.message);
     message.forEach(element => {
       if (element !== '') {
-        Bugsnag.notify(new Error(element));
         console.warn(element);
       }
     });
@@ -49,7 +47,9 @@ const healthRequest = async (): Promise<IResultsHeath[]> => {
   }
 };
 
-const BannerResult: React.FC<IResultsHeath> = (data: IResultsHeath) => {
+const BannerResult: React.FC<PropsWithChildren<IResultsHeath>> = (
+  data: IResultsHeath,
+) => {
   const [openBanner, setOpenBanner] = useState<boolean>();
 
   const handleClick = () => {
@@ -82,19 +82,11 @@ const BannerResult: React.FC<IResultsHeath> = (data: IResultsHeath) => {
   );
 };
 
-const Banner: React.FC = () => {
+const Banner: React.FC<PropsWithChildren> = () => {
   const { data: res, isLoading: loading } = useQuery({
     queryKey: ['healthRequest'],
     queryFn: healthRequest,
   });
-
-  useEffect(() => {
-    !process.env.BUGSNAG_DISABLED &&
-      Bugsnag.start({
-        apiKey: process.env.BUGSNAG_KEY || '7bf586baa26d4d454069c96573fa0b08',
-        plugins: [new BugsnagPluginReact(React)],
-      });
-  }, []);
 
   return !loading ? (
     <>{res?.map(result => <BannerResult {...result} key={result.name} />)}</>

@@ -1,6 +1,6 @@
 import { DefaultCardStyles } from '@/styles/common';
 import styled, { css } from 'styled-components';
-import { TableGradientBorder } from '../../TableV2/styles';
+import { TableGradientBorder } from '../../Table/styles';
 
 export const Container = styled.div`
   ${TableGradientBorder}
@@ -61,8 +61,8 @@ export const CardItem = styled.div`
     font-size: 0.9rem;
   }
 
-  :hover,
-  :focus {
+  &:hover,
+  &:focus {
     background-color: ${props => props.theme.violet};
 
     ${props =>
@@ -92,10 +92,10 @@ export const CardItem = styled.div`
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
     grid-column: span 2;
 
-    :nth-last-child(2) {
+    &:nth-last-child(2) {
       grid-column: 1/4;
     }
-    :nth-last-child(1) {
+    &:nth-last-child(1) {
       grid-column: 4/7;
     }
   }

@@ -26,7 +26,7 @@ export const FungibleContainer = styled.div`
 export const Content = styled.div`
   width: 50%;
 
-  :first-child {
+  &:first-child {
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
@@ -74,12 +74,12 @@ export const TotalPrice = styled.div`
   span {
     font-size: 0.9rem;
 
-    :first-child {
+    &:first-child {
       color: ${props => props.theme.black};
       font-weight: bold;
     }
 
-    :nth-child(2) {
+    &:nth-child(2) {
       color: ${props => props.theme.black};
     }
   }

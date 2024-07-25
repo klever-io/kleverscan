@@ -18,17 +18,16 @@ import {
   StakingHistoryScrollFooter,
 } from '@/views/assets/detail';
 import { useTranslation } from 'next-i18next';
-import { default as React, useState } from 'react';
+import { PropsWithChildren, default as React, useState } from 'react';
 import { AssetProps } from './OverviewTab';
 
 interface IStakingHistoryProps extends AssetProps {
   staking: IStaking | undefined;
 }
 
-export const StakingHistoryTab: React.FC<IStakingHistoryProps> = ({
-  asset,
-  staking,
-}) => {
+export const StakingHistoryTab: React.FC<
+  PropsWithChildren<IStakingHistoryProps>
+> = ({ asset, staking }) => {
   if (!staking) return null;
   if (asset?.staking.interestType === 'APRI') {
     return <APRHistory apr={staking.apr as IAPR[]} />;
@@ -40,7 +39,10 @@ interface FPRHistoryProps extends AssetProps {
   fpr: IFPR[];
 }
 
-const FPRHistory: React.FC<FPRHistoryProps> = ({ fpr, asset }) => {
+const FPRHistory: React.FC<PropsWithChildren<FPRHistoryProps>> = ({
+  fpr,
+  asset,
+}) => {
   const { t } = useTranslation(['common', 'assets']);
   const isMobile = useMobile();
   const [FPRIndex, setFPRIndex] = useState<number>(3);
@@ -105,7 +107,7 @@ const FPRHistory: React.FC<FPRHistoryProps> = ({ fpr, asset }) => {
                       <p>KLV</p>
                     </div>
                     <div>
-                      <strong>{t('assets:Staking.Total Deposited')}</strong>
+                      <strong>{t('assets:Staking.Total deposited')}</strong>
                       {/* here is always KLV */}
                       <p>
                         {toLocaleFixed(
@@ -135,7 +137,7 @@ const FPRHistory: React.FC<FPRHistoryProps> = ({ fpr, asset }) => {
                         <p>{kda.kda}</p>
                       </div>
                       <div>
-                        <strong>{t('assets:Staking.Total Deposited')}</strong>
+                        <strong>{t('assets:Staking.Total deposited')}</strong>
                         <p>
                           {toLocaleFixed(kda?.totalAmount, kda.precision || 0)}
                         </p>
@@ -246,6 +248,6 @@ interface APRHistoryProps {
   apr: IAPR[];
 }
 
-const APRHistory: React.FC<APRHistoryProps> = ({ apr }) => {
+const APRHistory: React.FC<PropsWithChildren<APRHistoryProps>> = ({ apr }) => {
   return <></>;
 };

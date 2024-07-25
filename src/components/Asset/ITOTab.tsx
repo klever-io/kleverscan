@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { statusWithIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
 import { displayITOpacks } from '@/components/ITO';
@@ -5,7 +6,6 @@ import { useExtension } from '@/contexts/extension';
 import { IParsedITO } from '@/types';
 import { formatDate } from '@/utils/formatFunctions';
 import {
-  AssetEmptyRow,
   EllipsisSpan,
   ExpandableRow,
   ExpandWrapper,
@@ -24,7 +24,7 @@ export interface ITOTabProps {
   ITO: IParsedITO | undefined;
 }
 
-export const ITOTab: React.FC<ITOTabProps> = ({ ITO }) => {
+export const ITOTab: React.FC<PropsWithChildren<ITOTabProps>> = ({ ITO }) => {
   const { extensionInstalled, connectExtension } = useExtension();
   const { t } = useTranslation('itos');
   const router = useRouter();
@@ -144,7 +144,10 @@ export const ITOTab: React.FC<ITOTabProps> = ({ ITO }) => {
                                 <strong>{t('table:Address')}</strong>
                               </span>
                               <EllipsisSpan>
-                                <Link href={`/accounts/${data.address}`}>
+                                <Link
+                                  href={`/accounts/${data.address}`}
+                                  legacyBehavior
+                                >
                                   {data.address}
                                 </Link>
                                 <Copy data={data.address} />
@@ -194,9 +197,9 @@ export const ITOTab: React.FC<ITOTabProps> = ({ ITO }) => {
           )}
         </>
       ) : (
-        <AssetEmptyRow type="assets">
+        <Row>
           <p>No active ITO found</p>
-        </AssetEmptyRow>
+        </Row>
       )}
     </>
   );

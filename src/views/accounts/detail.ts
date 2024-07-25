@@ -27,6 +27,7 @@ export const ContainerTabInteractions = styled.div`
 export const BalanceContainer = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 8px;
   width: 100%;
 `;
 
@@ -211,7 +212,7 @@ export const CheckboxOperations = styled.input`
   -webkit-appearance: none;
   border-radius: 0.2rem;
 
-  ::before {
+  &::before {
     content: ${({ checked }) => (checked ? "''" : "'\\2715'")};
     color: ${({ checked, theme }) =>
       checked ? 'transparent' : theme.true.white};

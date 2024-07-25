@@ -1,10 +1,11 @@
+import { PropsWithChildren } from 'react';
 import Filter, { IFilter } from '@/components/Filter';
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import {
   CustomFieldWrapper,
   CustomLink,
   Status,
-} from '@/components/TableV2/styles';
+} from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
 import { paramsStyles } from '@/components/Tooltip/configs';
 import { useMobile } from '@/contexts/mobile';
@@ -54,7 +55,9 @@ export const getProposalStatusColorAndText = (
   }
 };
 
-const Proposals: React.FC<IProposalsProps> = ({ request }) => {
+const Proposals: React.FC<PropsWithChildren<IProposalsProps>> = ({
+  request,
+}) => {
   const { t } = useTranslation(['common', 'proposals']);
   const { isMobile, isTablet } = useMobile();
   const router = useRouter();
@@ -189,9 +192,7 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
         element: props => (
           <DoubleRow {...props} key={proposer}>
             <Link href={`/account/${proposer}`}>
-              <a>
-                <Mono>{parseAddress(proposer, 16)}</Mono>
-              </a>
+              <Mono>{parseAddress(proposer, 16)}</Mono>
             </Link>
             <Status
               status={proposalStatusColorAndText.color}
@@ -244,7 +245,11 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
       },
       {
         element: props => (
-          <Link href={{ pathname: `/proposal/${proposalId}` }} key={proposalId}>
+          <Link
+            href={{ pathname: `/proposal/${proposalId}` }}
+            key={proposalId}
+            legacyBehavior
+          >
             <CustomLink> {t('common:Buttons.Details')}</CustomLink>
           </Link>
         ),
@@ -270,15 +275,17 @@ const Proposals: React.FC<IProposalsProps> = ({ request }) => {
     type: 'proposals',
     dataName: 'proposals',
     request: (page, limit) => request(page, limit, router),
-  };
-
-  return (
-    <ProposalsContainer>
+    Filters: () => (
       <FilterContainer>
         {filters.map((filter, index) => (
           <Filter key={String(index)} {...filter} />
         ))}
       </FilterContainer>
+    ),
+  };
+
+  return (
+    <ProposalsContainer>
       <Table {...tableProps} />
     </ProposalsContainer>
   );

@@ -1,5 +1,6 @@
+import { PropsWithChildren } from 'react';
 import { PurpleArrowRight } from '@/assets/icons';
-import { Status } from '@/components/TableV2/styles';
+import { Status } from '@/components/Table/styles';
 import { getProposalStatusColorAndText } from '@/components/Tabs/Proposals';
 import { IProposal } from '@/types/proposals';
 import {
@@ -14,7 +15,9 @@ interface ProposalProps {
   proposal: IProposal;
 }
 
-export const Proposal: React.FC<ProposalProps> = ({ proposal }) => {
+export const Proposal: React.FC<PropsWithChildren<ProposalProps>> = ({
+  proposal,
+}) => {
   const { description, proposalId, proposalStatus } = proposal;
 
   const proposalStatusColorAndText =
@@ -23,10 +26,10 @@ export const Proposal: React.FC<ProposalProps> = ({ proposal }) => {
     <InnerCardContainer>
       {proposalId && (
         <CardHeader>
-          <CardTitle href={`/proposals/${proposalId}`}>
+          <CardTitle href={`/proposal/${proposalId}`}>
             Proposal #{proposalId}
           </CardTitle>
-          <ArrowIconContainer href={`/proposals/${proposalId}`}>
+          <ArrowIconContainer href={`/proposal/${proposalId}`}>
             <PurpleArrowRight />
           </ArrowIconContainer>
           <Status status={proposalStatusColorAndText.color}>

@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Wizard from '@/components/Wizard';
 import { createContext, useContext, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
@@ -8,7 +9,7 @@ interface WizardModalProps {
 
 export const WizardContext = createContext({} as WizardModalProps);
 
-export const WizardProvider: React.FC = ({ children }) => {
+export const WizardProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [mounted, setMounted] = useState(false);
 
   const [wizard, setWizard] = useState(null);

@@ -71,9 +71,9 @@ const TransferSections = ({ par, precision }: IProps): JSX.Element[] => {
 
   if (typeof window === 'undefined') return [];
 
-  let assetId = 'KLV';
+  let assetId = parameter?.assetId || 'KLV';
   if (parameter?.assetId?.includes('/')) {
-    assetId = parameter?.assetId.split('/')[0];
+    assetId = parameter.assetId.split('/')[0];
   }
 
   if (!parameter?.assetId) precision = KLV_PRECISION;
@@ -82,10 +82,14 @@ const TransferSections = ({ par, precision }: IProps): JSX.Element[] => {
     <CenteredRow key={parameter?.assetId + String(parameter?.amount)}>
       {formatAmountField(parameter?.amount, precision)}{' '}
       {parameter?.assetId ? (
-        <Link href={`/asset/${assetId}`}>{parameter?.assetId}</Link>
+        <Link href={`/asset/${assetId}`} legacyBehavior>
+          {parameter?.assetId}
+        </Link>
       ) : (
         <>
-          <Link href={`/asset/${assetId}`}>{assetId}</Link>
+          <Link href={`/asset/${assetId}`} legacyBehavior>
+            {assetId}
+          </Link>
         </>
       )}
     </CenteredRow>,
@@ -110,7 +114,7 @@ const CreateValidatorSections = ({ par }: IProps): JSX.Element[] => {
 
   return [
     <span key={parameter?.ownerAddress}>
-      <Link href={`/account/${parameter?.ownerAddress}`}>
+      <Link href={`/account/${parameter?.ownerAddress}`} legacyBehavior>
         {parseAddress(parameter?.ownerAddress, 16)}
       </Link>
     </span>,
@@ -268,7 +272,11 @@ const WithdrawSections = ({
   ];
 };
 
-const ClaimSections = ({ par, receipts, precision }: IProps): JSX.Element[] => {
+const ClaimSections = ({
+  par,
+  receipts,
+  precision = 6,
+}: IProps): JSX.Element[] => {
   const parameter = par as unknown as IClaimContract;
   const claimReceipt = findReceipt(receipts, 17) as IClaimReceipt | undefined;
 
@@ -395,9 +403,7 @@ const SellSections = ({ par, precision }: IProps): JSX.Element[] => {
   return [
     <span key={parameter?.marketType}>{parameter?.marketType}</span>,
     <Link href={`/asset/${assetId}`} key={assetId}>
-      <a>
-        <span key={assetId}>{parameter?.assetId}</span>
-      </a>
+      <span key={assetId}>{parameter?.assetId}</span>
     </Link>,
     <span key={parameter?.price}>
       {parameter?.price && formatAmountField(parameter?.price, precision)}{' '}
@@ -516,30 +522,30 @@ const SmartContractSections = ({
 };
 
 export {
-  TransferSections,
-  CreateValidatorSections,
-  ValidatorConfigSections,
-  FreezeSections,
-  UnfreezeSections,
-  DelegateSections,
-  UndelegateSections,
-  WithdrawSections,
-  ClaimSections,
-  UnjailSections,
   AssetTriggerSections,
-  SetAccountNameSections,
-  ProposalSections,
-  VoteSections,
-  ConfigITOSections,
-  SetITOPricesSections,
   BuySections,
-  SellSections,
   CancelMarketOrderSections,
-  CreateMarketplaceSections,
+  ClaimSections,
+  ConfigITOSections,
   ConfigMarketplaceSections,
   CreateAssetSections,
-  UpdateAccountPermissionContractSections,
+  CreateMarketplaceSections,
+  CreateValidatorSections,
+  DelegateSections,
   DepositSections,
+  FreezeSections,
   IITOTriggerSections,
+  ProposalSections,
+  SellSections,
+  SetAccountNameSections,
+  SetITOPricesSections,
   SmartContractSections,
+  TransferSections,
+  UndelegateSections,
+  UnfreezeSections,
+  UnjailSections,
+  UpdateAccountPermissionContractSections,
+  ValidatorConfigSections,
+  VoteSections,
+  WithdrawSections,
 };

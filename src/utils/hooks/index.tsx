@@ -60,12 +60,16 @@ export function usePrecision(
   }
 }
 
-type PartialResponse = IAssetsResponse | IValidatorResponse;
+type PartialResponse =
+  | IAssetsResponse
+  | IValidatorResponse
+  | { [key: string]: any };
 
 export const useFetchPartial = <T,>(
   type: string,
   route: string,
   dataType: string,
+  query?: { [key: string]: string | number },
 ): [
   T[],
   (value: string) => Promise<T[]>,
@@ -74,15 +78,7 @@ export const useFetchPartial = <T,>(
 ] => {
   const localStorageName = `all${type}Search`;
   const [items, setItems] = useState<T[]>([]);
-  const [itemsSearch, setItemsSearch] = useState<T[]>(() => {
-    try {
-      const storedData = localStorage.getItem(localStorageName);
-      return storedData ? JSON.parse(storedData) : [];
-    } catch (error) {
-      console.error('Error parsing stored data:', error);
-      return [];
-    }
-  });
+  const [itemsSearch, setItemsSearch] = useState<T[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   let fetchPartialTimeout: ReturnType<typeof setTimeout>;
 
@@ -90,7 +86,10 @@ export const useFetchPartial = <T,>(
     if (type !== 'validators') {
       const response = await api.get({
         route: `${route}`,
-        query: { limit: 10 },
+        query: {
+          limit: 10,
+          ...query,
+        },
       });
       setItems([...(response?.data?.[type] || []), ...itemsSearch]);
     } else {
@@ -98,16 +97,6 @@ export const useFetchPartial = <T,>(
     }
   };
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(localStorageName, JSON.stringify(itemsSearch));
-    } catch (error) {
-      console.error('Error storing data:', error);
-    }
-  }, [itemsSearch]);
-  const addAssetsLocalStorage = (response: T[]) => {
-    setItemsSearch([...itemsSearch, ...response]);
-  };
   useEffect(() => {
     initialState();
   }, []);
@@ -121,24 +110,33 @@ export const useFetchPartial = <T,>(
           if (
             value &&
             !items.find(asset =>
-              asset[dataType].toUpperCase().includes(value.toUpperCase()),
+              (asset as { [key: string]: string })[dataType]
+                .toUpperCase()
+                .includes(value.toUpperCase()),
             )
           ) {
             setLoading(true);
             if (type !== 'assets') {
               response = await api.get({
-                route: `${route}?${dataType}=${value}`,
+                route: `${route}`,
+                query: {
+                  dataType: value,
+                  ...query,
+                },
               });
             } else {
               response = await api.get({
-                route: `${route}?asset=${value}`,
+                route: `${route}`,
+                query: {
+                  asset: value,
+                  ...query,
+                },
               });
             }
             if (!response.data[type].length) {
               setItems([...items]);
             } else {
               res(response.data[type]);
-              addAssetsLocalStorage(response.data[type]);
               setItems([...items, ...response.data[type]]);
             }
             res(response.data[type]);
@@ -159,14 +157,14 @@ export const useSkeleton = (): [
   (
     value: string | number | undefined | JSX.Element[],
     skeletonParams?: { height?: string | number; width?: number | string },
-  ) => Element | number | string | JSX.Element | JSX.Element[],
+  ) => number | string | JSX.Element | JSX.Element[],
   Dispatch<SetStateAction<boolean>>,
 ] => {
   const [loading, setLoading] = useState(true);
   const isSkeleton = (
     value: string | number | undefined | JSX.Element[],
     skeletonParams?: { height?: string | number; width?: number | string },
-  ): Element | number | string | JSX.Element | JSX.Element[] => {
+  ): number | string | JSX.Element | JSX.Element[] => {
     return !loading && value ? value : <Skeleton {...skeletonParams} />;
   };
   return [isSkeleton, setLoading];

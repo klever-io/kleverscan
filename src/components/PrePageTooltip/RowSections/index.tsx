@@ -25,6 +25,7 @@ import {
   HashSpan,
   HoverDiv,
   LogoWrapper,
+  QuerySpan,
   RedirectSVG,
   SpanWithIcon,
   SpanWrapper,
@@ -37,13 +38,14 @@ import {
   TxTypeSpan,
   UnderlineSpan,
 } from '../styles';
+import { CustomLink } from '@/styles/common';
 
 const getRedirectButton = (
   path: string,
   setShowTooltip: React.Dispatch<SetStateAction<boolean>>,
 ) => (
   <div onClick={() => setShowTooltip(false)}>
-    <Link href={path}>
+    <Link href={path} legacyBehavior>
       <RedirectSVG>
         <Redirect />
       </RedirectSVG>
@@ -109,7 +111,7 @@ export const TransactionRowSections = (
         .parameter as unknown as ITransferContract;
       return parameter?.toAddress ? (
         <UnderlineSpan onClick={() => setShowTooltip(false)}>
-          <Link href={`/account/${parameter?.toAddress}`}>
+          <Link href={`/account/${parameter?.toAddress}`} legacyBehavior>
             {parameter?.toAddress}
           </Link>
         </UnderlineSpan>
@@ -139,7 +141,7 @@ export const TransactionRowSections = (
       {
         element: props => (
           <HashSpan onClick={() => setShowTooltip(false)}>
-            <Link href={`/transaction/${transaction.hash}`}>
+            <Link href={`/transaction/${transaction.hash}`} legacyBehavior>
               {transaction.hash}
             </Link>
           </HashSpan>
@@ -152,7 +154,7 @@ export const TransactionRowSections = (
           <SpanWrapper>
             From:{' '}
             <UnderlineSpan onClick={() => setShowTooltip(false)}>
-              <Link href={`/account/${transaction.sender}`}>
+              <Link href={`/account/${transaction.sender}`} legacyBehavior>
                 {transaction.sender}
               </Link>
             </UnderlineSpan>
@@ -168,7 +170,7 @@ export const TransactionRowSections = (
   }
   return [
     { element: props => <TitleSpan>Transaction Summary</TitleSpan>, span: 2 },
-    { element: props => <span>{res.error}</span>, span: 2 },
+    { element: props => <span>{JSON.stringify(res.error)}</span>, span: 2 },
   ];
 };
 
@@ -176,6 +178,7 @@ export const AssetRowSections = (
   res: IAssetResponse,
   precision: number,
   setShowTooltip: React.Dispatch<SetStateAction<boolean>>,
+  query: string,
 ): IRowSection[] => {
   if (res.data || res.error === '') {
     const asset = res.data?.asset as IAsset;
@@ -193,7 +196,7 @@ export const AssetRowSections = (
       {
         element: props => (
           <HoverDiv onClick={() => setShowTooltip(false)}>
-            <Link href={`/asset/${asset.assetId}`}>
+            <Link href={`/asset/${asset.assetId}`} legacyBehavior>
               <LogoWrapper>
                 <AssetLogo
                   logo={asset?.logo || ''}
@@ -203,7 +206,7 @@ export const AssetRowSections = (
                   invertColors={true}
                 />
                 <AssetNameWrapper>
-                  <TokenTicker>{asset.ticker}</TokenTicker>
+                  <TokenTicker>{asset.assetId}</TokenTicker>
                   <TokenNameSpan>{asset.name}</TokenNameSpan>
                 </AssetNameWrapper>
               </LogoWrapper>
@@ -247,11 +250,24 @@ export const AssetRowSections = (
         ),
         span: 1,
       },
+      {
+        element: props => (
+          <HoverDiv onClick={() => setShowTooltip(false)}>
+            <Link href={`/assets?asset=${query.toUpperCase()}`} legacyBehavior>
+              <CustomLink fullWidth secondary>
+                View All Assets with{' '}
+                <QuerySpan>{query.toUpperCase()}</QuerySpan>
+              </CustomLink>
+            </Link>
+          </HoverDiv>
+        ),
+        span: 2,
+      },
     ];
   }
   return [
     { element: props => <TitleSpan>Token Summary</TitleSpan>, span: 2 },
-    { element: props => <span>{res.error}</span>, span: 2 },
+    { element: props => <span>{JSON.stringify(res.error)}</span>, span: 2 },
   ];
 };
 
@@ -289,7 +305,9 @@ export const AccountRowSections = (
             style={{ maxWidth: '20rem' }}
             onClick={() => setShowTooltip(false)}
           >
-            <Link href={`/account/${account.address}`}>{account.address}</Link>
+            <Link href={`/account/${account.address}`} legacyBehavior>
+              {account.address}
+            </Link>
           </HashSpan>
         ),
         span: 2,
@@ -297,7 +315,7 @@ export const AccountRowSections = (
       {
         element: props => (
           <HoverDiv onClick={() => setShowTooltip(false)}>
-            <Link href={'/asset/klv'}>
+            <Link href={'/asset/klv'} legacyBehavior>
               <LogoWrapper>
                 <AssetLogo
                   logo={'/assets/klv-logo.png'}
@@ -343,7 +361,7 @@ export const AccountRowSections = (
 
   return [
     { element: props => <TitleSpan>Account Summary</TitleSpan>, span: 2 },
-    { element: props => <span>{res.error}</span>, span: 2 },
+    { element: props => <span>{JSON.stringify(res.error)}</span>, span: 2 },
   ];
 };
 
@@ -371,7 +389,10 @@ export const BlockRowSections = (
           <SpanWrapper>
             Nonce:{' '}
             <HashSpan onClick={() => setShowTooltip(false)}>
-              <Link href={`/block/${block.nonce}`}>{`#${block.nonce}`}</Link>
+              <Link
+                href={`/block/${block.nonce}`}
+                legacyBehavior
+              >{`#${block.nonce}`}</Link>
             </HashSpan>
           </SpanWrapper>
         ),
@@ -387,7 +408,10 @@ export const BlockRowSections = (
             Miner:{' '}
             <UnderlineSpan onClick={() => setShowTooltip(false)}>
               {' '}
-              <Link href={`account/${block.producerOwnerAddress}`}>
+              <Link
+                href={`account/${block.producerOwnerAddress}`}
+                legacyBehavior
+              >
                 {block.producerName || block.producerOwnerAddress}
               </Link>
             </UnderlineSpan>
@@ -398,7 +422,10 @@ export const BlockRowSections = (
       {
         element: props => (
           <HoverDiv onClick={() => setShowTooltip(false)}>
-            <Link href={`/account/${block.producerOwnerAddress}`}>
+            <Link
+              href={`/account/${block.producerOwnerAddress}`}
+              legacyBehavior
+            >
               <LogoWrapper>
                 <AssetLogo
                   logo={block?.producerLogo || '--'}
@@ -426,6 +453,6 @@ export const BlockRowSections = (
   }
   return [
     { element: props => <TitleSpan>Block Summary</TitleSpan>, span: 2 },
-    { element: props => <span>{res.error}</span>, span: 2 },
+    { element: props => <span>{JSON.stringify(res.error)}</span>, span: 2 },
   ];
 };

@@ -1,4 +1,4 @@
-const withImages = require('next-images');
+const path = require('path');
 const { i18n } = require('./next-i18next.config');
 
 const defaultEnvs = [
@@ -8,8 +8,6 @@ const defaultEnvs = [
   'DEFAULT_PRICE_HOST',
   'DEFAULT_NODE_HOST',
   'DEFAULT_EXPLORER_HOST',
-  'BUGSNAG_KEY',
-  'BUGSNAG_DISABLED',
   'DEFAULT_API_MULTISIGN',
   'NEXT_PUBLIC_TRANSFER_ADDRESS',
   'NEXT_PUBLIC_ADD_ASSET_INFO_VALUE',
@@ -27,7 +25,7 @@ const getEnvs = () => {
   return envs;
 };
 
-module.exports = withImages({
+module.exports = {
   env: getEnvs(),
   i18n,
   images: {
@@ -41,8 +39,18 @@ module.exports = withImages({
     ],
   },
   reactStrictMode: false,
-  webpack: config => {
-    config.resolve.fallback = { fs: false };
+  webpack: (config, options) => {
+    config.resolve.fallback = { fs: false, path: false };
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: [
+        options.defaultLoaders.babel,
+        {
+          loader: '@svgr/webpack',
+          options: { babel: false },
+        },
+      ],
+    });
 
     return config;
   },
@@ -51,6 +59,12 @@ module.exports = withImages({
   },
   typescript: {
     ignoreBuildErrors: process.env?.IS_PRODUCTION === 'true',
+  },
+  compiler: {
+    styledComponents: {
+      ssr: true,
+      displayName: true,
+    },
   },
   redirects: async () => {
     return [
@@ -71,4 +85,4 @@ module.exports = withImages({
       },
     ];
   },
-});
+};

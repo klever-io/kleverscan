@@ -1,11 +1,12 @@
+import { PropsWithChildren } from 'react';
 import { Validators as Icon } from '@/assets/cards';
 import { getStatusIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
 import Detail from '@/components/Detail';
 import { IFilter } from '@/components/Filter';
 import Progress from '@/components/Progress';
-import { ITable } from '@/components/TableV2';
-import { CustomFieldWrapper, Status } from '@/components/TableV2/styles';
+import { ITable } from '@/components/Table';
+import { CustomFieldWrapper, Status } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
 import api from '@/services/api';
 import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
@@ -133,7 +134,7 @@ const validatorsRowSections = (validator: IValidator): IRowSection[] => {
   return sections;
 };
 
-const Validators: React.FC = () => {
+const Validators: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
   const [filterValidators, fetchPartialValidator, loading, setLoading] =
     useFetchPartial<IValidator>('validators', 'validator/list', 'name');

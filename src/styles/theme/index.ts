@@ -10,6 +10,7 @@ const theme = {
   border: '#eeeff6',
 
   blueGray300: '#646693',
+  blueGray400: '#7B7DB2',
   blueGray500: '#404264',
 
   gray900: '#181818',
@@ -48,6 +49,12 @@ const theme = {
     white: '#fff',
     black: '#0B0B1E',
     newBlack: '#06060b',
+    black2: 'rgba(0, 0, 0, 0.02)',
+    black10: 'rgba(0, 0, 0, 0.1)',
+    black20: 'rgba(0, 0, 0, 0.2)',
+    white2: 'rgba(255, 255, 255, 0.02)',
+    white10: 'rgba(255, 255, 255, 0.1)',
+    white20: 'rgba(255, 255, 255, 0.2)',
   },
 
   status: {

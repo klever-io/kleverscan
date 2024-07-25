@@ -1,5 +1,4 @@
 import { default as DefaultInput } from '@/components/InputGlobal';
-import { EmptyRow } from '@/components/Table/styles';
 import { transparentize } from 'polished';
 import styled, { css } from 'styled-components';
 
@@ -153,7 +152,7 @@ export const Row = styled.div<{ span?: number }>`
     word-break: break-all;
   }
 
-  &:after {
+  &::after {
     content: '';
     position: absolute;
     border-bottom: 1px solid ${props => props.theme.faq.border};
@@ -174,16 +173,12 @@ export const Row = styled.div<{ span?: number }>`
   }
 `;
 
-export const AssetEmptyRow = styled(EmptyRow)`
-  grid-column: 1 / -1;
-`;
-
 export const FPRRow = styled(Row)`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  border-left: 1px solid ${props => props.theme.gray800};
-  border-right: 1px solid ${props => props.theme.gray800};
+  border-left: 1px solid ${props => props.theme.black20};
+  border-right: 1px solid ${props => props.theme.black20};
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
     align-items: center;
   }
@@ -261,7 +256,7 @@ export const FrozenContainer = styled.div`
   display: flex;
   overflow: auto;
   flex-direction: column;
-  border: 1px solid ${props => props.theme.black};
+  border: 1px solid ${props => props.theme.black20};
   border-radius: 0.75rem;
   flex-wrap: wrap;
   overflow-x: auto;
@@ -290,7 +285,7 @@ export const FrozenContainer = styled.div`
 
     gap: 1rem;
     &:not(:last-child) {
-      border-bottom: 1px solid ${props => props.theme.black};
+      border-bottom: 1px solid ${props => props.theme.black20};
       border-width: 100%;
       border-bottom-left-radius: 0px;
       border-bottom-right-radius: 0px;
@@ -427,9 +422,10 @@ export const StakingHistoryBase = styled.div`
   justify-content: center;
   align-items: center;
   gap: 0.3rem;
+  padding: 8px 0;
 
   grid-column: auto / span 2;
-  border: 1px solid ${props => props.theme.gray800};
+  border: 1px solid ${props => props.theme.black20};
   color: ${props => props.theme.black};
 
   strong {
@@ -460,6 +456,7 @@ export const StakingHistoryHeader = styled(StakingHistoryBase)`
 export const StakingHistoryFooter = styled(StakingHistoryBase)`
   position: sticky;
   bottom: 0;
+  border-top: 0;
 
   border-radius: 0 0 10px 10px;
   background-color: ${props => props.theme.background};
@@ -589,7 +586,7 @@ export const EpochGeneralData = styled.div`
   min-height: 182px;
   height: 100%;
   border-radius: 10px;
-  border: 1px solid ${props => props.theme.black};
+  border: 1px solid ${props => props.theme.black20};
   text-align: center;
   margin: 0.5rem;
   color: ${props => props.theme.black};
@@ -599,7 +596,7 @@ export const ShowDetailsButton = styled.button`
   font-weight: 600;
   color: ${props =>
     props.theme.dark ? props.theme.black : props.theme.footer.border};
-  :hover {
+  &:hover {
     text-decoration: underline;
   }
 `;

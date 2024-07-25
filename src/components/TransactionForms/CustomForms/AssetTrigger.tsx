@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
 import { ICollectionList } from '@/types';
@@ -23,6 +24,7 @@ import {
   parseURIs,
 } from './utils';
 import { assetTriggerTooltips as tooltip } from './utils/tooltips';
+import { getNetwork } from '@/utils/networkFunctions';
 
 export interface IMetadataOptions {
   metadata: string;
@@ -43,7 +45,7 @@ const parseAssetTrigger = (data: IAssetTrigger) => {
   parseMetadata(data);
 };
 
-const AssetTrigger: React.FC<IContractProps> = ({
+const AssetTrigger: React.FC<PropsWithChildren<IContractProps>> = ({
   formKey,
   handleFormSubmit,
 }) => {
@@ -279,7 +281,9 @@ const getAssetTriggerForm = (
   }
 };
 
-export const AddRoleSection: React.FC = () => {
+export const AddRoleSection: React.FC<PropsWithChildren> = () => {
+  const network = getNetwork();
+
   return (
     <FormSection>
       <SectionTitle>
@@ -312,6 +316,22 @@ export const AddRoleSection: React.FC = () => {
         toggleOptions={['No', 'Yes']}
         tooltip={tooltip.role.hasRoleSetITOPrices}
       />
+      <FormInput
+        name={`role.hasRoleDeposit`}
+        title={`Has Role Deposit`}
+        type="checkbox"
+        toggleOptions={['No', 'Yes']}
+        tooltip={tooltip.role.hasRoleDeposit}
+      />
+      {network !== 'Mainnet' && (
+        <FormInput
+          name={`role.hasRoleTransfer`}
+          title={`Has Role Transfer`}
+          type="checkbox"
+          toggleOptions={['No', 'Yes']}
+          tooltip={tooltip.role.hasRoleTransfer}
+        />
+      )}
     </FormSection>
   );
 };

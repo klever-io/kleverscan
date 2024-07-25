@@ -23,6 +23,7 @@ import { web } from '@klever/sdk-web';
 import { useRouter } from 'next/router';
 import React, {
   createContext,
+  PropsWithChildren,
   useContext,
   useEffect,
   useRef,
@@ -91,7 +92,7 @@ export interface IContractContext {
 }
 
 export const Contract = createContext({} as IContractContext);
-export const ContractProvider: React.FC = ({ children }) => {
+export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [txLoading, setTxLoading] = useState<boolean>(false);
   const [txHash, setTxHash] = useState<string | null>(null);
   const [showAdvancedOpts, setShowAdvancedOpts] = useState(false);
@@ -216,6 +217,7 @@ export const ContractProvider: React.FC = ({ children }) => {
       const minEpochsToWithdraw = item?.staking?.minEpochsToWithdraw;
 
       list.push({
+        ...item,
         ...assets[item.assetId],
         label: item.assetId,
         value: item.assetId,
@@ -262,7 +264,6 @@ export const ContractProvider: React.FC = ({ children }) => {
     );
 
     const assetsList = [...KLV, ...KFI, ...list];
-
     return assetsList || ([] as ICollectionList[]);
   };
 
@@ -347,7 +348,7 @@ export const ContractProvider: React.FC = ({ children }) => {
         },
         {
           KLV: 0,
-        },
+        } as { [key: string]: number },
       );
       totalCosts['KLV'] += totalFees * 10 ** KLV_PRECISION;
 
@@ -376,7 +377,7 @@ export const ContractProvider: React.FC = ({ children }) => {
         KFI: asset.payload.amount,
       }))[0];
       for (const assetId in kfiAmount) {
-        const amount = kfiAmount[assetId];
+        const amount = kfiAmount[assetId as keyof typeof kfiAmount];
         const asset = assetsList
           ?.find(item => item.assetId === assetId)
           ?.buckets?.reduce((acc, current) => acc + current.balance, 0);

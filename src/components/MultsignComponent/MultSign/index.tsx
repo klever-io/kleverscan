@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { LoadingBackground } from '@/components/Contract/styles';
 import { Loader } from '@/components/Loader/styles';
 import { useExtension } from '@/contexts/extension';
@@ -122,7 +123,7 @@ const MultisignComponent: React.FC<{
     isDarkTheme,
   };
 
-  const RenderMultisignComponent: React.FC = () => {
+  const RenderMultisignComponent: React.FC<PropsWithChildren> = () => {
     if (!!!walletAddress) {
       return (
         <EmptyTransaction
@@ -151,12 +152,12 @@ const MultisignComponent: React.FC<{
           window.document.body,
         )}
       <RenderMultisignComponent />
-      {!!walletAddress && multiSignData.length && (
+      {!!walletAddress && multiSignData.length ? (
         <>
           <ButtonsComponent {...buttonsProps} />
           <DecodedRawData {...decodedRawProps} />
         </>
-      )}
+      ) : null}
     </Content>
   );
 };

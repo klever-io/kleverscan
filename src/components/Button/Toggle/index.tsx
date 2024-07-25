@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { ToggleButtonContainer, ToggleButtonIcon } from './styles';
 
 interface IToggleButtonProps {
@@ -6,7 +7,7 @@ interface IToggleButtonProps {
   icon?: React.ReactNode;
 }
 
-const ToggleButton: React.FC<IToggleButtonProps> = ({
+const ToggleButton: React.FC<PropsWithChildren<IToggleButtonProps>> = ({
   active,
   icon,
   onClick,

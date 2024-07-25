@@ -1,7 +1,8 @@
+import { PropsWithChildren } from 'react';
 import { HomeData } from '@/contexts/mainPage';
 import { MapContainer } from '@/views/nodes';
 import dynamic from 'next/dynamic';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import React, { useContext } from 'react';
 import {
   CardContainer,
@@ -16,7 +17,7 @@ import { PurpleArrowRight } from '@/assets/icons';
 
 const Map = dynamic(() => import('@/components/Map/index'), { ssr: false });
 
-const ValidatorsCard: React.FC = () => {
+const ValidatorsCard: React.FC<PropsWithChildren> = () => {
   const { totalValidators, activeValidators, nodes } = useContext(HomeData);
   return (
     <CardContainer>
@@ -47,11 +48,9 @@ const ValidatorsCard: React.FC = () => {
             pathname: '/validators',
           }}
         >
-          <a>
-            {' '}
-            View All
-            <PurpleArrowRight />
-          </a>
+          {' '}
+          View All
+          <PurpleArrowRight />
         </Link>
       </Title>
 

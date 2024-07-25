@@ -1,9 +1,10 @@
+import { PropsWithChildren } from 'react';
 import { TransactionDetails as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import { Button } from '@/components/CreateTxShortCut/styles';
 import Title from '@/components/Layout/Title';
 import Skeleton from '@/components/Skeleton';
-import Table, { ITable } from '@/components/TableV2';
+import Table, { ITable } from '@/components/Table';
 import {
   requestTransactionsDefault,
   transactionRowSections,
@@ -32,7 +33,7 @@ interface INonceParams {
   account: string;
 }
 
-const NftDetail: React.FC<IParsedAsset> = () => {
+const NftDetail: React.FC<PropsWithChildren<IParsedAsset>> = () => {
   const [showRawData, setShowRawData] = useState(false);
   const router = useRouter();
 
@@ -67,7 +68,7 @@ const NftDetail: React.FC<IParsedAsset> = () => {
     }
   };
 
-  const RawDataComponent: React.FC = () => {
+  const RawDataComponent: React.FC<PropsWithChildren> = () => {
     return (
       <>
         <SyntaxHighlighter

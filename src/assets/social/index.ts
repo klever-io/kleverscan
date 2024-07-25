@@ -8,6 +8,17 @@ import Twitter from './twitter.svg';
 import Youtube from './youtube.svg';
 
 export {
+  Discord,
+  Facebook,
+  Github,
+  Instagram,
+  Linkedin,
+  Telegram,
+  Twitter,
+  Youtube,
+};
+
+export default {
   Facebook,
   Twitter,
   Discord,

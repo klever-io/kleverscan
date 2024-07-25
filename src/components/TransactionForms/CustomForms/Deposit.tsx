@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { depositTypes } from '@/utils/contracts';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -13,7 +14,10 @@ type FormData = {
   currencyID: string;
 };
 
-const Deposit: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+const Deposit: React.FC<PropsWithChildren<IContractProps>> = ({
+  formKey,
+  handleFormSubmit,
+}) => {
   const { handleSubmit, watch } = useFormContext<FormData>();
   const depositType: number = watch('depositType');
 

@@ -5,11 +5,9 @@ import styled, { css } from 'styled-components';
 export const Container = styled.div`
   display: flex;
 
-  gap: 2rem;
-
-  padding-top: 40px;
-
   flex-direction: column;
+
+  margin-top: 40px;
 `;
 
 export const Header = styled.section<{ filterOn?: boolean }>`
@@ -63,14 +61,20 @@ export const DefaultCardStyles = css`
     props.theme.dark ? props.theme.table.background : props.theme.white};
 `;
 
-export const Card = styled.div`
+export const DefaultCardStyleWithBorder = css`
   ${DefaultCardStyles}
+
+  border: 1px solid ${props =>
+    props.theme.dark ? props.theme.black20 : props.theme.black10};
+  border-radius: 24px;
+`;
+
+export const Card = styled.div`
+  ${DefaultCardStyleWithBorder}
 
   width: 100%;
   padding: 1.5rem;
   overflow: hidden;
-  border-radius: 24px;
-  border: 1px solid ${props => props.theme.darkGray};
 
   display: flex;
 
@@ -175,7 +179,7 @@ export const Row = styled.div<{ isMobileRow?: boolean }>`
   &:not(:last-child) {
     border-bottom: 1px solid
       ${props =>
-        props.theme.dark ? props.theme.footer.border : props.theme.lightGray};
+        props.theme.dark ? props.theme.black10 : props.theme.lightGray};
 
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
@@ -253,7 +257,7 @@ export const DoubleRow = styled.div<TableRowElementProps>`
   width: fit-content;
 
   ${props =>
-    props.smaller &&
+    props.$smaller &&
     css`
       gap: 4px;
     `}
@@ -282,8 +286,8 @@ export const CenteredRow = styled.div`
     color: ${props => props.theme.black};
 
     font-weight: 600;
-    text-decoration: none;
 
+    padding-bottom: 1px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -308,21 +312,16 @@ export const CenteredRow = styled.div`
 
 export const Mono = styled.span`
   font-family: 'Fira Mono', monospace;
-
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 0.2rem;
 `;
 
 export const FrozenContainer = styled.div`
-  margin-top: 0.5rem;
   width: 100%;
 
   display: flex;
 
   flex-direction: column;
 
-  border: 1px solid ${props => props.theme.black};
+  border: 1px solid ${props => props.theme.black20};
   border-radius: 0.75rem;
 
   div {
@@ -335,12 +334,9 @@ export const FrozenContainer = styled.div`
     align-items: center;
 
     &:not(:last-child) {
-      border-bottom: 1px solid ${props => props.theme.black};
+      border-bottom: 1px solid ${props => props.theme.black20};
       border-bottom-left-radius: 0px;
       border-bottom-right-radius: 0px;
-    }
-    &:not(:first-child) {
-      /* border-top: 1px solid ${props => props.theme.card.border}; */
     }
     strong {
       width: 10rem;
@@ -374,18 +370,14 @@ export const CardContent = styled.div`
   ${DefaultCardStyles};
   width: 100%;
 
-  border-radius: 0 0.75rem 0.75rem 0.75rem;
+  border-radius: 0.75rem;
 `;
 
 export const CardHeaderItem = styled.div<{ selected: boolean }>`
-  ${DefaultCardStyles}
   border-bottom: none;
   border-right: none;
   box-shadow: none;
   padding: 1rem;
-
-  background-color: ${props =>
-    props.selected ? props.theme.white : 'transparent'};
 
   border-radius: 0;
 
@@ -401,29 +393,20 @@ export const CardHeaderItem = styled.div<{ selected: boolean }>`
 
     opacity: ${props => (props.selected ? 1 : 0.33)};
 
-    transition: 0.2s ease;
-  }
-
-  &:first-of-type {
-    border-radius: 0.75rem 0 0 0;
-  }
-  &:last-of-type {
-    border-radius: 0 0.75rem 0 0;
-    border-right: 1px solid
-      ${props =>
-        props.theme.dark ? props.theme.footer.border : props.theme.lightGray};
-  }
-  &:only-child {
-    border-radius: 0.75rem 0.75rem 0 0;
+    ${props =>
+      props.selected &&
+      css`
+        border-bottom: 2px solid ${props => props.theme.violet};
+      `}
   }
 `;
 
 export const DefaultScrollBar = css`
-  ::-webkit-scrollbar {
+  &::-webkit-scrollbar {
     width: 0.3em;
     z-index: 1;
   }
-  ::-webkit-scrollbar-track {
+  &::-webkit-scrollbar-track {
     margin-top: 0.75rem;
     margin-bottom: 0.75rem;
     box-shadow: inset 0 0 0.25rem rgba(0, 0, 0, 0.1);
@@ -431,7 +414,7 @@ export const DefaultScrollBar = css`
     cursor: pointer !important;
   }
 
-  ::-webkit-scrollbar-thumb {
+  &::-webkit-scrollbar-thumb {
     background-color: ${props => transparentize(0.2, props.theme.violet)};
     border-radius: 10px;
     cursor: pointer !important;
@@ -442,4 +425,110 @@ export const FlexSpan = styled.span`
   display: flex;
   gap: 0.3rem;
   align-items: center;
+`;
+
+interface IStatus {
+  status: string;
+}
+
+export const Status = styled.div<IStatus>`
+  display: flex;
+
+  flex-direction: row;
+
+  align-items: center;
+
+  gap: 0.9rem;
+
+  svg {
+    min-width: 24px;
+  }
+
+  span {
+    color: ${props =>
+      props.status === 'ApprovedProposal'
+        ? props.theme.table['success']
+        : props.theme.table[
+            props.status as keyof typeof props.theme.table
+          ]} !important;
+    font-weight: bold;
+  }
+
+  p {
+    color: ${props =>
+      props.theme.table[
+        props.status as keyof typeof props.theme.table
+      ]} !important;
+    text-transform: capitalize;
+  }
+
+  ${props =>
+    props.status === 'inactive' &&
+    `
+      color: ${props.theme.table.icon} !important;
+      
+    `}
+`;
+export const CustomLink = styled.a<{
+  tabAsset?: boolean;
+  fullWidth?: boolean;
+  secondary?: boolean;
+}>`
+  align-self: end;
+  text-align: center;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 16px;
+
+  height: 34px !important;
+
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: ${props => (props.tabAsset ? '500' : '600')}!important;
+
+  min-width: 8rem;
+  max-width: 15rem;
+
+  background: ${props => (props.tabAsset ? '' : props.theme.violet)};
+  color: ${props =>
+    props.tabAsset ? props.theme.black : props.theme.true.white} !important;
+  border: 1px solid ${props => transparentize(0.75, props.theme.black)};
+  border-radius: 24px;
+
+  cursor: pointer;
+
+  transition: all 0.1s ease;
+
+  ${props =>
+    props.fullWidth &&
+    css`
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+    `}
+
+  ${props =>
+    props.secondary &&
+    css`
+      background: transparent;
+      color: ${props.theme.violet} !important;
+      border: 1px solid ${props.theme.violet};
+
+      &:hover {
+        background: ${props.theme.violet};
+        color: ${props.theme.true.white} !important;
+      }
+    `}
+
+  &:hover {
+    background: ${props => props.theme.violet};
+  }
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
 `;

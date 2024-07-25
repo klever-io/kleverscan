@@ -1,9 +1,10 @@
+import { PropsWithChildren } from 'react';
 import { Validators as Icon } from '@/assets/cards';
 import Detail from '@/components/Detail';
-import { CustomLink } from '@/components/Table/styles';
-import { ITable } from '@/components/TableV2';
+import { ITable } from '@/components/Table';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
+import { CustomLink } from '@/styles/common';
 import { INfts, IPagination, IRowSection } from '@/types/index';
 import { parseAddress } from '@/utils/parseValues';
 import Link from 'next/link';
@@ -17,7 +18,7 @@ interface ICollectionPage {
   collectionAsset: string;
 }
 
-const Collection: React.FC<ICollectionPage> = () => {
+const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
   const header = ['ID', 'Collection Name', 'Collection Id', 'Address', ''];
   const [isTablet, setIsTablet] = useState(false);
   const [address, setAddress] = useState<null | string>(null);
@@ -46,8 +47,8 @@ const Collection: React.FC<ICollectionPage> = () => {
   const rowSections = (nft: INfts): IRowSection[] => {
     const { address, assetName: collection, assetId } = nft;
 
-    const collectionId = assetId.split('/')[0];
-    const nftId = assetId.split('/')[1];
+    const collectionId = assetId?.split('/')[0];
+    const nftId = assetId?.split('/')[1];
     const sections: IRowSection[] = address
       ? [
           {
@@ -64,12 +65,12 @@ const Collection: React.FC<ICollectionPage> = () => {
           },
           {
             element: props => (
-              <Link href={`/account/${address}`} key={address}>
+              <Link href={`/account/${address}`} key={address} legacyBehavior>
                 {isMobile
                   ? parseAddress(address, 14)
                   : address || isTablet
-                  ? parseAddress(address, 20)
-                  : address}
+                    ? parseAddress(address, 20)
+                    : address}
               </Link>
             ),
             span: 1,
@@ -79,6 +80,7 @@ const Collection: React.FC<ICollectionPage> = () => {
               <Link
                 href={`/account/${address}/collection/${collectionId}/${nftId}`}
                 key={assetId}
+                legacyBehavior
               >
                 <CustomLink>Details</CustomLink>
               </Link>

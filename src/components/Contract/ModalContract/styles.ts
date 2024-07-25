@@ -23,7 +23,7 @@ export const Content = styled.div`
   overflow-x: hidden;
   padding: 1rem;
   max-width: 95vw;
-  min-width: 60vw;
+  min-width: 80vw;
   border-radius: 1rem;
   background-color: ${props => props.theme.modalBackground.background};
 

@@ -1,17 +1,10 @@
-import {
-  buildTransaction,
-  getType,
-  precisionParse,
-} from '@/components/Contract/utils';
-import { parseURIs } from '@/components/TransactionForms/CustomForms/utils';
+import { parseCreateAsset } from '@/components/TransactionForms/CustomForms/CreateAsset';
+import { useContract } from '@/contexts/contract';
 import { useExtension } from '@/contexts/extension';
-import { gtagEvent } from '@/utils/gtag';
 import { parseAddress } from '@/utils/parseValues';
-import { web } from '@klever/sdk-web';
 import { useTranslation } from 'next-i18next';
-import { useEffect, useState } from 'react';
+import { PropsWithChildren, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
 import {
   ConfirmSuccessTransaction,
   ConfirmTransaction,
@@ -31,10 +24,10 @@ import {
   infinitySymbol,
   propertiesCommonDefaultValues,
 } from '..';
-import { createNFT, parseRoles } from '../../utils';
+import { createNFT } from '../../utils';
 import { WizardBody } from '../styles';
 
-const WizCreateNFT: React.FC<any> = ({
+const WizCreateNFT: React.FC<PropsWithChildren<any>> = ({
   setTxHash,
   txHash,
   fromAdvancedSteps,
@@ -71,7 +64,7 @@ const WizCreateNFT: React.FC<any> = ({
   };
 
   const {
-    commomValues: { basicTotalSteps },
+    commonValues: { basicTotalSteps },
     stepsInformations: {
       basicStepsLabels,
       advancedStepsIndex,
@@ -147,7 +140,7 @@ const WizCreateNFT: React.FC<any> = ({
       component: (
         <CreateAssetPreConfimStep
           {...stepsProps}
-          informations={assetInfo.commomValues}
+          informations={assetInfo.commonValues}
         />
       ),
     },
@@ -156,11 +149,11 @@ const WizCreateNFT: React.FC<any> = ({
       label: 'Select Asset URIs',
       isDone: false,
       component: (
-        <URIsSection {...stepsProps} informations={assetInfo.commomValues} />
+        <URIsSection {...stepsProps} informations={assetInfo.commonValues} />
       ),
     },
     {
-      key: 'selectroyaltiesSteps',
+      key: 'selectRoyaltiesSteps',
       label: 'Select Asset Royalties Steps',
       isDone: false,
       component: <CreateAssetRoyaltySteps {...stepsProps} />,
@@ -172,7 +165,7 @@ const WizCreateNFT: React.FC<any> = ({
       component: (
         <CreateAssetAddRoles
           {...stepsProps}
-          informations={assetInfo.commomValues}
+          informations={assetInfo.commonValues}
         />
       ),
     },
@@ -194,7 +187,7 @@ const WizCreateNFT: React.FC<any> = ({
       component: (
         <ConfirmTransaction
           {...confirmProps}
-          informations={assetInfo.commomValues}
+          informations={assetInfo.commonValues}
         />
       ),
     },
@@ -257,52 +250,21 @@ const WizCreateNFT: React.FC<any> = ({
     steps,
   };
 
+  const { handleSubmit: handleContractSubmit, txHash: txContractHash } =
+    useContract();
+
   const onSubmit = async (data: any) => {
-    const parsedUris = parseURIs(data);
-    const parsedRoles = parseRoles(data);
-    const contractyType = 'CreateAssetContract';
-
-    await precisionParse(data, contractyType);
-
-    data.ticker = (data?.ticker as string)?.toUpperCase();
     data.type = 1;
-    const parseTransaction = {
-      ...data,
-      uris: parsedUris,
-      roles: parsedRoles,
-      royalties: {
-        address: data?.ownerAddress,
-      },
-    };
-
-    try {
-      const unsignedTx = await buildTransaction([
-        {
-          type: getType('CreateAssetContract'),
-          payload: parseTransaction,
-        },
-      ]);
-
-      const signedTx = await window.kleverWeb.signTransaction(
-        unsignedTx.result,
-      );
-      const response = await web.broadcastTransactions([signedTx]);
-      setTxHash(response.data.txsHashes[0]);
-      window.scrollTo(0, 0);
-      toast.success('Transaction broadcast successfully');
-
-      gtagEvent('send_transaction_wizard', {
-        event_category: 'transaction',
-        event_label: 'send_transaction_wizard',
-        hash: response.data.txsHashes[0],
-        sender: walletAddress,
-        transaction_type: 'CreateAssetContract',
-      });
-    } catch (error) {
-      console.error(error);
-      toast.error(error);
-    }
+    const rowData = parseCreateAsset(data);
+    await handleContractSubmit(rowData, '', 'CreateAssetContract', 1);
+    window.scrollTo(0, 0);
   };
+
+  useEffect(() => {
+    if (txContractHash) {
+      setTxHash(txContractHash);
+    }
+  }, [txContractHash]);
 
   return (
     <>

@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { ArrowGreen, ArrowPink } from '@/assets/icons';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { getAge } from '@/utils/timeFunctions';
@@ -20,8 +21,6 @@ import {
   RewardCardContentWrapper,
   RewardsCard,
   RewardsCardHeader,
-  RewardsChart,
-  RewardsChartContent,
   StakedIndicator,
   SubContainerVotes,
   VotersPercent,
@@ -30,8 +29,8 @@ import {
 } from '@/views/validator';
 import { useTranslation } from 'next-i18next';
 import React, { useEffect, useState } from 'react';
-import Chart, { ChartType } from '../Chart';
 import Skeleton from '../Skeleton';
+import { KLV } from '@/assets/coins';
 
 interface IValidatorCards {
   totalStake: number | undefined;
@@ -39,7 +38,7 @@ interface IValidatorCards {
   maxDelegation: number | undefined;
 }
 
-const ValidatorCards: React.FC<IValidatorCards> = ({
+const ValidatorCards: React.FC<PropsWithChildren<IValidatorCards>> = ({
   totalStake,
   commission,
   maxDelegation,
@@ -86,27 +85,18 @@ const ValidatorCards: React.FC<IValidatorCards> = ({
     <AllSmallCardsContainer>
       {typeof totalStake === 'number' ? (
         <Card marginLeft>
-          <CardWrapper>
-            <VotesHeader>
-              <span>
-                <strong>{t('CurrentDelegations')}</strong>
-              </span>
-              <span>
-                <p>{`${age} ${commonT('Date.Elapsed Time')}`}</p>
-              </span>
-            </VotesHeader>
-          </CardWrapper>
-          <RewardsChart>
-            <RewardsChartContent>
-              <Chart type={ChartType.Area} data={data} />
-            </RewardsChartContent>
-            <VotesFooter>
-              <span>{(totalStake / 10 ** KLV_PRECISION).toLocaleString()}</span>
-              <span>
-                <strong>{percentVotes}</strong>
-              </span>
-            </VotesFooter>
-          </RewardsChart>
+          <VotesHeader>
+            <span>
+              <strong>{t('CurrentDelegations')}</strong>
+            </span>
+            <span>
+              <p>{`${age} ${commonT('Date.Elapsed Time')}`}</p>
+            </span>
+          </VotesHeader>
+          <VotesFooter>
+            {(totalStake / 10 ** KLV_PRECISION).toLocaleString()}
+            <KLV />
+          </VotesFooter>
         </Card>
       ) : (
         <Skeleton width={'100%'} height={150} />

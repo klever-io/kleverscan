@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useRouter } from 'next/router';
 import React from 'react';
 import {
@@ -8,7 +9,7 @@ import {
 } from '../../views/notFound';
 import { Container, Message } from './styles';
 
-const Maintenance: React.FC = () => {
+const Maintenance: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
 
   const handleBack = () => {

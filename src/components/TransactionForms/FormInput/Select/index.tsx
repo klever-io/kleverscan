@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -26,9 +27,11 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   handleScrollBottom?: () => void;
   creatable?: boolean;
   selectFilter?: (e: any) => any;
+  loading?: boolean;
+  customOnChange?: (e: any) => void;
 }
 
-const Filter: React.FC<IFilter> = ({
+const Filter: React.FC<PropsWithChildren<IFilter>> = ({
   options,
   name,
   selectPlaceholder,
@@ -39,14 +42,11 @@ const Filter: React.FC<IFilter> = ({
   onInputChange,
   creatable,
   selectFilter,
+  customOnChange,
+  loading,
   ...rest
 }) => {
-  const {
-    register,
-    formState: { errors },
-    setValue,
-    getValues,
-  } = useFormContext();
+  const { register, setValue, getValues } = useFormContext();
 
   const { isMultiContract } = useMulticontract();
 
@@ -59,6 +59,7 @@ const Filter: React.FC<IFilter> = ({
   const handleSelect = (selected: any) => {
     if (name === undefined) return;
 
+    customOnChange && customOnChange(selected);
     const e = {
       target: {
         name,
@@ -95,6 +96,8 @@ const Filter: React.FC<IFilter> = ({
         value={selected?.value !== undefined ? selected : undefined}
         onMenuScrollToBottom={handleScrollBottom}
         creatable={creatable}
+        isLoading={loading}
+        loadingMessage={() => 'Loading...'}
       />
 
       {name && (

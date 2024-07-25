@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Contract, { IContract } from '@/components/Contract';
 import { getType } from '@/components/Contract/utils';
 import { getParsedAssetPool } from '@/services/requests/pool';
@@ -66,7 +67,9 @@ interface IMulticontract {
 
 export const MultiContractContext = createContext({} as IMulticontract);
 
-export const MulticontractProvider: React.FC = ({ children }) => {
+export const MulticontractProvider: React.FC<PropsWithChildren> = ({
+  children,
+}) => {
   const [isMultiContract, setIsMultiContract] = useState<boolean>(false);
   const [queue, setQueue] = useState<IQueue[]>([]);
   const [selectedId, setSelectedId] = useState<number>(0);

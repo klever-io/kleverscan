@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Assets as Icon } from '@/assets/title-icons';
 import Chart, { ChartType } from '@/components/Chart';
 import Title from '@/components/Layout/Title';
@@ -142,7 +143,7 @@ const onErrorHandler = () => {
   };
 };
 
-const Charts: React.FC<ICharts> = () => {
+const Charts: React.FC<PropsWithChildren<ICharts>> = () => {
   const { t: commonT } = useTranslation('common');
   const { t } = useTranslation(['charts']);
   const filterDays = [1, 7, 15, 30];

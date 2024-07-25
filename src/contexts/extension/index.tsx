@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { doIf } from '@/utils/promiseFunctions';
 import { web } from '@klever/sdk-web';
 import {
@@ -22,7 +23,9 @@ interface IExtension {
 
 export const Extension = createContext({} as IExtension);
 
-export const ExtensionProvider: React.FC = ({ children }) => {
+export const ExtensionProvider: React.FC<PropsWithChildren> = ({
+  children,
+}) => {
   const [extensionInstalled, setExtensionInstalled] = useState<boolean>();
   const [extensionLoading, setExtensionLoading] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string>('');
@@ -51,13 +54,16 @@ export const ExtensionProvider: React.FC = ({ children }) => {
   }, [walletAddress]);
 
   const connectExtension = async () => {
-    window.kleverWeb.provider = {
-      api:
-        process.env.DEFAULT_API_HOST ||
-        'https://api.testnet.klever.finance/v1.0',
-      node:
-        process.env.DEFAULT_NODE_HOST || 'https://node.testnet.klever.finance',
-    };
+    if (typeof window !== 'undefined' && window.kleverWeb?.provider) {
+      window.kleverWeb.provider = {
+        api:
+          process.env.DEFAULT_API_HOST ||
+          'https://api.testnet.klever.finance/v1.0',
+        node:
+          process.env.DEFAULT_NODE_HOST ||
+          'https://node.testnet.klever.finance',
+      };
+    }
 
     try {
       if (!web.isKleverWebActive()) {

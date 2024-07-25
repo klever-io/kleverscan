@@ -5,7 +5,7 @@ import {
   LineArrowUpSquare,
 } from '@/assets/icons';
 import { default as DefaultInput } from '@/components/InputGlobal';
-import { TableGradientBorder } from '@/components/TableV2/styles';
+import { TableGradientBorder } from '@/components/Table/styles';
 import { DefaultCardStyles } from '@/styles/common';
 import { lighten, transparentize } from 'polished';
 import { BiChevronDownSquare } from 'react-icons/bi';
@@ -379,7 +379,7 @@ export const BlockCardContainer = styled.div<BlockCardContainerProps>`
   animation: ${PullFade} 1s ease-in-out;
 
   animation-fill-mode: forwards;
-  :first-child {
+  &:first-child {
     animation: ${PushFade} 1s ease-in-out;
     animation-fill-mode: forwards;
   }
@@ -441,7 +441,9 @@ export const TransactionContainer = styled.div``;
 
 export const ChartsContainer = styled(TransactionContainer)`
   ${DataCardDefaultStyles}
-  flex-wrap: wrap;
+
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
   border: none;
   background-color: transparent !important;
@@ -616,6 +618,7 @@ export const TransactionChart = styled(TransactionContent)`
   min-height: 100%;
   height: 320px;
   position: relative;
+  padding: 16px 0;
 
   display: flex;
   justify-content: space-between;
@@ -640,7 +643,7 @@ export const TransactionChart = styled(TransactionContent)`
   }
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
-    padding: 16px;
+    padding: 16px 0;
     height: 100%;
   }
 `;
@@ -688,7 +691,7 @@ export const RetryContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  :hover {
+  &:hover {
     cursor: pointer;
   }
 
@@ -718,7 +721,7 @@ export const ContainerTimeFilter = styled.div`
   width: 100%;
   height: fit-content;
   justify-content: space-between;
-  padding: 1.5rem;
+  padding: 0 16px;
 `;
 
 export const ListItemTimeFilter = styled.ul`
@@ -877,7 +880,7 @@ export const ContainerHide = styled.div`
     }
   }
 
-  > :last-child {
+  > &:last-child {
     margin-left: auto;
   }
 `;
@@ -915,7 +918,7 @@ export const ViewMoreContainer = styled.div`
     margin-top: 0.2rem;
     height: fit-content;
   }
-  :hover {
+  &:hover {
     opacity: 0.55;
   }
 `;

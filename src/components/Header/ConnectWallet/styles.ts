@@ -47,7 +47,7 @@ export const ConnectButton = styled.div<{
     }
   }
 
-  :hover {
+  &:hover {
     filter: brightness(1.2);
   }
 
@@ -72,7 +72,7 @@ export const ConnectButton = styled.div<{
         background: inherit;
         position: absolute;
         inset: 3px;
-        border-radius: 5px;
+        border-radius: 24px;
         height: calc(100% - 2 * 3px);
         width: calc(100% - 2 * 3px);
       }
@@ -320,7 +320,7 @@ export const ConnectedWallet = styled.div`
   align-items: flex-start;
   flex-direction: column;
   position: relative;
-  ::after {
+  &::after {
     width: 0.5rem;
     height: 0.5rem;
     border-radius: 50%;

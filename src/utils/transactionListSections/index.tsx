@@ -272,7 +272,11 @@ const WithdrawSections = ({
   ];
 };
 
-const ClaimSections = ({ par, receipts, precision }: IProps): JSX.Element[] => {
+const ClaimSections = ({
+  par,
+  receipts,
+  precision = 6,
+}: IProps): JSX.Element[] => {
   const parameter = par as unknown as IClaimContract;
   const claimReceipt = findReceipt(receipts, 17) as IClaimReceipt | undefined;
 

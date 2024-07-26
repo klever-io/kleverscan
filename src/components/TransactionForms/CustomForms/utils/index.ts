@@ -101,7 +101,7 @@ export const parseKDAFeePool = (data: any): void => {
   data.kdaPool.fRatioKLV = 1;
 };
 
-export const parsePackInfo = (data: any): void => {
+export const parsePackInfo = (data: any, isNFT?: boolean): void => {
   if (data.packInfo === undefined) {
     return;
   }
@@ -117,7 +117,7 @@ export const parsePackInfo = (data: any): void => {
   packInfoReference.forEach((item: any) => {
     const label = item.currencyId.toUpperCase();
     const parsedPacks = item.packs.map((pack: Pack, index: number) => {
-      if (item.packs.length > 1 && index === item.packs.length - 1) {
+      if (item.packs.length > 1 && index === item.packs.length - 1 && !isNFT) {
         return {
           amount: item.packs[index - 1]?.amount + 1,
           price: pack.price,

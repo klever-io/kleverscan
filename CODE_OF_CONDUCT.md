@@ -31,7 +31,7 @@ At KleverScan, we prioritize the safety, security, and respect of our community 
 
 ## 5. Reporting and Enforcement
 
-If you witness or are subjected to unacceptable behavior, or have any other concerns, please report it by contacting the project team at our [Slack Channel](https://join.slack.com/t/klever-blockchain/shared_invite/zt-1z69ikw0g-dXtRY7eGTnyRllsCV_YGOw).
+If you witness or are subjected to unacceptable behavior, or have any other concerns, please report it by contacting the project team at our [Forum](https://forum.klever.org/).
 
 All complaints will be reviewed and investigated promptly and fairly.
 
@@ -55,6 +55,6 @@ This Code of Conduct applies both within project spaces and in public spaces whe
 
 ## 9. Contact Info
 
-If you have any questions about this Code of Conduct, please contact the project team at our [Slack Channel](https://join.slack.com/t/klever-blockchain/shared_invite/zt-1z69ikw0g-dXtRY7eGTnyRllsCV_YGOw) or through our [Forum](https://forum.klever.org/).
+If you have any questions about this Code of Conduct, please contact the project team at our [Forum](https://forum.klever.org/).
 
 Thank you for helping make this a welcoming, friendly community for all.

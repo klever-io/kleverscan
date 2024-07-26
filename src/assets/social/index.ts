@@ -8,13 +8,13 @@ import Twitter from './twitter.svg';
 import Youtube from './youtube.svg';
 
 export {
-  Facebook,
-  Twitter,
   Discord,
+  Facebook,
+  Github,
   Instagram,
   Linkedin,
   Telegram,
-  Github,
+  Twitter,
   Youtube,
 };
 

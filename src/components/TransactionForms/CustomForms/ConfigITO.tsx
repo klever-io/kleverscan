@@ -1,9 +1,9 @@
-import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
 import { IAsset, ICollectionList } from '@/types';
+import { useDebounce, useFetchPartial } from '@/utils/hooks';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
 import { toast } from 'react-toastify';
@@ -25,7 +25,6 @@ import {
 } from './utils';
 import { ITOTooltips as tooltip } from './utils/tooltips';
 import { Pack, PackInfo, WhitelistInfo } from './utils/types';
-import { useDebounce, useFetchPartial } from '@/utils/hooks';
 
 export type ConfigITOData = {
   receiverAddress: string;
@@ -59,8 +58,8 @@ export const statusOptions = [
   },
 ];
 
-export const parseConfigITO = (data: ConfigITOData): void => {
-  parsePackInfo(data);
+export const parseConfigITO = (data: ConfigITOData, isNFT?: boolean): void => {
+  parsePackInfo(data, isNFT);
   parseWhitelistInfo(data);
   parseDates(data);
 };
@@ -80,7 +79,7 @@ const ConfigITO: React.FC<PropsWithChildren<IContractProps>> = ({
   const onSubmit = async (data: ConfigITOData) => {
     const dataCopy = JSON.parse(JSON.stringify(data));
     try {
-      parseConfigITO(dataCopy);
+      parseConfigITO(dataCopy, collection?.isNFT);
       await handleFormSubmit(dataCopy);
     } catch (e: any) {
       toast.error(e.message);
@@ -97,10 +96,14 @@ const ConfigITO: React.FC<PropsWithChildren<IContractProps>> = ({
         required
         validateFields={['maxAmount', 'defaultLimitPerAddress']}
       />
-      <MainSection {...sectionProps} />
-      <WhitelistConfigSection {...sectionProps} />
-      <WhitelistSection />
-      <PackInfoSection />
+      {collection && (
+        <>
+          <MainSection {...sectionProps} />
+          <WhitelistConfigSection {...sectionProps} />
+          <WhitelistSection />
+          <PackInfoSection collection={collection} />
+        </>
+      )}
     </FormBody>
   );
 };
@@ -236,10 +239,10 @@ export const WhitelistSection: React.FC<
   );
 };
 
-export const PackInfoSection: React.FC<PropsWithChildren<{ top?: number }>> = ({
-  top,
-}) => {
-  const { control, watch } = useFormContext();
+export const PackInfoSection: React.FC<
+  PropsWithChildren<{ top?: number; collection?: ICollectionList }>
+> = ({ top, collection }) => {
+  const { control, watch, trigger } = useFormContext();
   const {
     fields,
     append: appendPackInfo,
@@ -267,13 +270,19 @@ export const PackInfoSection: React.FC<PropsWithChildren<{ top?: number }>> = ({
       type: 'Fungible',
     });
   const [assetInput, setAssetInput] = useState<string>('');
+  const [currency, setCurrency] = useState<IAsset>();
   const debouncedAssetInput = useDebounce(assetInput, 500);
+
   useEffect(() => {
     if (debouncedAssetInput) {
       setLoading(true);
       fetchPartialAsset(debouncedAssetInput);
     }
   }, [debouncedAssetInput]);
+
+  useEffect(() => {
+    trigger('packInfo');
+  }, [currency]);
 
   return (
     <FormSection>
@@ -299,14 +308,24 @@ export const PackInfoSection: React.FC<PropsWithChildren<{ top?: number }>> = ({
               options={filterAssets.map(asset => ({
                 value: asset.assetId,
                 label: asset.assetId,
+                asset: asset,
               }))}
               onInputChange={value => {
                 setAssetInput(value);
               }}
+              customOnChange={value => {
+                setCurrency(value.asset);
+              }}
               loading={loading}
               required
             />
-            <PackSection packInfoIndex={index} />
+            {currency && (
+              <PackSection
+                packInfoIndex={index}
+                asset={collection}
+                currency={currency}
+              />
+            )}
           </FormSection>
         );
       })}
@@ -317,7 +336,15 @@ export const PackInfoSection: React.FC<PropsWithChildren<{ top?: number }>> = ({
   );
 };
 
-const PackSection = ({ packInfoIndex }: { packInfoIndex: number }) => {
+const PackSection = ({
+  packInfoIndex,
+  asset,
+  currency,
+}: {
+  packInfoIndex: number;
+  asset?: ICollectionList;
+  currency?: IAsset;
+}) => {
   const { control, getValues, setValue, watch } = useFormContext();
 
   const fieldArray = useFieldArray({
@@ -327,20 +354,57 @@ const PackSection = ({ packInfoIndex }: { packInfoIndex: number }) => {
 
   const { fields, replace, update, append: appendPack } = fieldArray;
 
-  useEffect(() => {
-    if (fields.length === 0) {
-      replace([
-        { amount: 100, price: 0 },
-        { amount: 0, price: 0 },
-      ]);
-    }
-  }, []);
-
   const packType = watch(`packInfo[${packInfoIndex}].packType`);
   const isSinglePack = packType === 0;
   const lastPack = (fields &&
     fields?.length &&
     fields[fields?.length - 2]) as unknown as Pack;
+
+  const renderPackItems = () => {
+    if (asset?.isNFT) {
+      return fields.map((field, index) => (
+        <NFTPackItems
+          key={field.id}
+          packInfoIndex={packInfoIndex}
+          packIndex={index}
+          fieldArray={fieldArray}
+          currency={currency}
+        />
+      ));
+    } else {
+      return (
+        <>
+          <FormInput
+            title="Pack Value"
+            name={`packInfo[${packInfoIndex}].packType`}
+            type="dropdown"
+            options={[
+              { label: 'Fixed', value: 0 },
+              { label: 'Variable', value: 1 },
+            ]}
+            dynamicInitialValue={1}
+            span={2}
+          />
+
+          {isSinglePack ? (
+            <SinglePackItem
+              packInfoIndex={packInfoIndex}
+              fieldArray={fieldArray}
+              currency={currency}
+              asset={asset}
+            />
+          ) : (
+            <FungibleMultiPackItems
+              packInfoIndex={packInfoIndex}
+              fieldArray={fieldArray}
+              currency={currency}
+              asset={asset}
+            />
+          )}
+        </>
+      );
+    }
+  };
 
   return (
     <FormSection inner>
@@ -348,29 +412,7 @@ const PackSection = ({ packInfoIndex }: { packInfoIndex: number }) => {
         <span>Packs</span>
       </SectionTitle>
 
-      <FormInput
-        title="Pack Value"
-        name={`packInfo[${packInfoIndex}].packType`}
-        type="dropdown"
-        options={[
-          { label: 'Fixed', value: 0 },
-          { label: 'Variable', value: 1 },
-        ]}
-        dynamicInitialValue={1}
-        span={2}
-      />
-      {isSinglePack ? (
-        <SinglePackItem packInfoIndex={packInfoIndex} fieldArray={fieldArray} />
-      ) : (
-        fields.map((field, index) => (
-          <MultiPackItem
-            key={field.id}
-            packInfoIndex={packInfoIndex}
-            packIndex={index}
-            fieldArray={fieldArray}
-          />
-        ))
-      )}
+      {renderPackItems()}
 
       <ButtonContainer
         type="button"
@@ -401,7 +443,13 @@ const PackSection = ({ packInfoIndex }: { packInfoIndex: number }) => {
   );
 };
 
-const MultiPackItem = ({ packInfoIndex, packIndex, fieldArray }: any) => {
+const NFTPackItems = ({
+  packInfoIndex,
+  packIndex,
+  fieldArray,
+  currency,
+  asset,
+}: any) => {
   const { control, setValue } = useFormContext();
   const { fields, remove: removePack, replace } = fieldArray;
 
@@ -410,8 +458,8 @@ const MultiPackItem = ({ packInfoIndex, packIndex, fieldArray }: any) => {
   useEffect(() => {
     if (fields.length < 2) {
       replace([
-        { amount: 100, price: 0 },
-        { amount: 0, price: 0 },
+        { amount: 1, price: 0 },
+        { amount: 10, price: 0 },
       ]);
     }
   }, []);
@@ -422,56 +470,114 @@ const MultiPackItem = ({ packInfoIndex, packIndex, fieldArray }: any) => {
         {fields.length > 2 && <HiTrash onClick={() => removePack(packIndex)} />}
         Pack {packIndex + 1}
       </SectionTitle>
-      <PackRange>
-        <FormInput
-          name={
-            packIndex === 0
-              ? `packInfo[${packInfoIndex}].firstAmount`
-              : `packInfo[${packInfoIndex}].packs[${packIndex - 1}].amount`
-          }
-          title={`From`}
-          type="number"
-          tooltip={tooltip.packInfo.packItem.amount}
-          value={packIndex === 0 ? 0 : undefined}
-          disabled={packIndex === 0}
-          required={packIndex !== 0}
-        />
-        <span>to</span>
-        <FormInput
-          name={`packInfo[${packInfoIndex}].packs[${packIndex}].amount`}
-          title={`To`}
-          type={packIndex === fields.length - 1 ? 'text' : 'number'}
-          tooltip={tooltip.packInfo.packItem.amount}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            const target = e.target;
-            const value = Number(target.value);
-
-            if (!value || isNaN(value)) {
-              return;
-            }
-
-            setValue(
-              `packInfo[${packInfoIndex}].packs[${packIndex}].amount`,
-              value,
-            );
-          }}
-          dynamicInitialValue={lastPack ? 'Infinity' : fields[packIndex].amount}
-          required={!lastPack}
-          disabled={lastPack}
-        />
-      </PackRange>
+      <FormInput
+        name={`packInfo[${packInfoIndex}].packs[${packIndex}].amount`}
+        title={`Amount`}
+        type="number"
+        tooltip={tooltip.packInfo.packItem.amount}
+        precision={0}
+        required
+      />
       <FormInput
         name={`packInfo[${packInfoIndex}].packs[${packIndex}].price`}
         title={`Price`}
         type="number"
         tooltip={tooltip.packInfo.packItem.price}
+        precision={currency?.precision}
         required
       />
     </FormSection>
   );
 };
 
-const SinglePackItem = ({ packInfoIndex, fieldArray }: any) => {
+const FungibleMultiPackItems = ({
+  packInfoIndex,
+  fieldArray,
+  currency,
+  asset,
+}: any) => {
+  const { control, setValue, trigger } = useFormContext();
+  const { fields, remove: removePack, replace } = fieldArray;
+
+  useEffect(() => {
+    if (fields.length < 2) {
+      replace([
+        { amount: 100, price: 0 },
+        { amount: 0, price: 0 },
+      ]);
+    }
+  }, []);
+
+  return fields.map((field: any, index: number) => {
+    const lastPack = index === fields?.length - 1;
+
+    return (
+      <FormSection inner key={field.id}>
+        <SectionTitle>
+          {fields.length > 2 && <HiTrash onClick={() => removePack(index)} />}
+          Pack {index + 1}
+        </SectionTitle>
+        <PackRange>
+          <FormInput
+            name={
+              index === 0
+                ? `packInfo[${packInfoIndex}].firstAmount`
+                : `packInfo[${packInfoIndex}].packs[${index - 1}].amount`
+            }
+            title={`From`}
+            type="number"
+            tooltip={tooltip.packInfo.packItem.amount}
+            value={index === 0 ? 0 : undefined}
+            precision={asset?.precision}
+            disabled={index === 0}
+            required={index !== 0}
+          />
+          <span>to</span>
+          <FormInput
+            name={`packInfo[${packInfoIndex}].packs[${index}].amount`}
+            title={`To`}
+            type={index === fields.length - 1 ? 'text' : 'number'}
+            tooltip={tooltip.packInfo.packItem.amount}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              const target = e.target;
+              const value = Number(target.value);
+
+              if (!value || isNaN(value)) {
+                return;
+              }
+
+              setValue(
+                `packInfo[${packInfoIndex}].packs[${index}].amount`,
+                value,
+              );
+
+              trigger('packInfo');
+            }}
+            dynamicInitialValue={lastPack ? 'Infinity' : fields[index].amount}
+            required={!lastPack}
+            precision={asset?.precision}
+            disabled={lastPack}
+          />
+        </PackRange>
+        <FormInput
+          name={`packInfo[${packInfoIndex}].packs[${index}].price`}
+          title={`Price`}
+          type="number"
+          tooltip={tooltip.packInfo.packItem.price}
+          precision={currency?.precision}
+          required
+        />
+      </FormSection>
+    );
+  });
+};
+
+const SinglePackItem = ({
+  packInfoIndex,
+  fieldArray,
+  currency,
+  asset,
+}: any) => {
   const { control, setValue } = useFormContext();
   const { fields, remove: removePack, replace } = fieldArray;
 
@@ -487,6 +593,7 @@ const SinglePackItem = ({ packInfoIndex, fieldArray }: any) => {
         title={`Amount`}
         type="number"
         tooltip={tooltip.packInfo.packItem.amount}
+        precision={asset?.precision}
         required
       />
       <FormInput
@@ -494,6 +601,7 @@ const SinglePackItem = ({ packInfoIndex, fieldArray }: any) => {
         title={`Price`}
         type="number"
         tooltip={tooltip.packInfo.packItem.price}
+        precision={currency?.precision}
         required
       />
     </FormSection>

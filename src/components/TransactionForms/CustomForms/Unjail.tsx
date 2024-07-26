@@ -23,7 +23,7 @@ const Unjail: React.FC<PropsWithChildren<IContractProps>> = ({
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
       <FormSection>
-        <SectionText>No aditional data needed.</SectionText>
+        <SectionText>No additional data needed.</SectionText>
       </FormSection>
     </FormBody>
   );

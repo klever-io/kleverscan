@@ -43,7 +43,7 @@ export interface IHomeData {
   nodes?: Node[];
   mostTransactedTokens: MostTransferredToken[];
   mostTransactedNFTs: MostTransferredToken[];
-  mostTransactedDKAFee: MostTransferredToken[];
+  mostTransactedKDAFee: MostTransferredToken[];
   epoch?: number;
 }
 

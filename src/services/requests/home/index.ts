@@ -13,7 +13,7 @@ import {
   Service,
 } from '@/types';
 import { IBlock, IBlocksResponse } from '@/types/blocks';
-import { IProposal, MostTransferedToken } from '@/types/proposals';
+import { IProposal, MostTransferredToken } from '@/types/proposals';
 import { getEpochInfo } from '@/utils';
 import { calcApr } from '@/utils/calcApr';
 import { toLocaleFixed } from '@/utils/formatFunctions';
@@ -502,7 +502,7 @@ const homeKfiPriceCall = async (): Promise<
 };
 
 const homeMostTransactedTokens = async (): Promise<
-  MostTransferedToken[] | undefined
+  MostTransferredToken[] | undefined
 > => {
   try {
     const mostTransactedRes = await api.get({
@@ -521,13 +521,13 @@ const homeMostTransactedTokens = async (): Promise<
       route: 'assets/list',
       query: {
         asset: mostTransactedRes.data.most_transacted.map(
-          (token: MostTransferedToken) => token.key,
+          (token: MostTransferredToken) => token.key,
         ),
       },
     });
 
     const data = mostTransactedRes.data.most_transacted.map(
-      (token: MostTransferedToken) => {
+      (token: MostTransferredToken) => {
         const asset = assetsRes.data.assets.find(
           (asset: IAsset) => asset.assetId === token.key,
         );
@@ -545,7 +545,7 @@ const homeMostTransactedTokens = async (): Promise<
 };
 
 const homeMostTransactedNFTs = async (): Promise<
-  MostTransferedToken[] | undefined
+  MostTransferredToken[] | undefined
 > => {
   try {
     const mostTransactedRes = await api.get({
@@ -564,13 +564,55 @@ const homeMostTransactedNFTs = async (): Promise<
       route: 'assets/list',
       query: {
         asset: mostTransactedRes.data.most_transacted.map(
-          (token: MostTransferedToken) => token.key,
+          (token: MostTransferredToken) => token.key,
         ),
       },
     });
 
     const data = mostTransactedRes.data.most_transacted.map(
-      (token: MostTransferedToken) => {
+      (token: MostTransferredToken) => {
+        const asset = assetsRes.data.assets.find(
+          (asset: IAsset) => asset.assetId === token.key,
+        );
+        return {
+          ...token,
+          logo: asset.logo || '',
+        };
+      },
+    );
+
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+const homeMostTransactedKDAFee = async (): Promise<
+  MostTransferredToken[] | undefined
+> => {
+  try {
+    const mostTransactedRes = await api.get({
+      route: 'transaction/statistics',
+      query: {
+        type: 'kdafee',
+      },
+    });
+
+    if (mostTransactedRes.error) {
+      console.error(mostTransactedRes.error);
+      return;
+    }
+
+    const assetsRes = await api.get({
+      route: 'assets/list',
+      query: {
+        asset: mostTransactedRes.data.most_transacted.map(
+          (token: MostTransferredToken) => token.key,
+        ),
+      },
+    });
+
+    const data = mostTransactedRes.data.most_transacted.map(
+      (token: MostTransferredToken) => {
         const asset = assetsRes.data.assets.find(
           (asset: IAsset) => asset.assetId === token.key,
         );
@@ -610,4 +652,5 @@ export {
   homeYesterdayAccountsCall,
   homeMostTransactedTokens,
   homeMostTransactedNFTs,
+  homeMostTransactedKDAFee,
 };

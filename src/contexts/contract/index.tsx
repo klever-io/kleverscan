@@ -217,6 +217,7 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
       const minEpochsToWithdraw = item?.staking?.minEpochsToWithdraw;
 
       list.push({
+        ...item,
         ...assets[item.assetId],
         label: item.assetId,
         value: item.assetId,
@@ -263,7 +264,6 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
     );
 
     const assetsList = [...KLV, ...KFI, ...list];
-
     return assetsList || ([] as ICollectionList[]);
   };
 

@@ -50,7 +50,7 @@ export interface IHomeData {
 export const HomeData = createContext({} as IHomeData);
 
 export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  const watcherTimeout = 400 * 1000; // 4 secs
+  const watcherTimeout = 4 * 1000; // 4 secs
 
   const [
     aggregateResult,

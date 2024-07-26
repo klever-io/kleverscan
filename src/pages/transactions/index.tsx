@@ -298,7 +298,9 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
                 <Tooltip
                   msg={getLabelForTableField(contractType)[0]}
                   Component={() => (
-                    <CustomFieldWrapper>{customFields[0]}</CustomFieldWrapper>
+                    <>
+                      <CustomFieldWrapper>{customFields[0]}</CustomFieldWrapper>
+                    </>
                   )}
                 />
               ) : (

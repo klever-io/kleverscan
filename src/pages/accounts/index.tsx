@@ -131,7 +131,7 @@ const Accounts: React.FC<PropsWithChildren<IAccounts>> = () => {
       values: [
         createdYesterday === pagination?.totalRecords
           ? '--'
-          : createdYesterday?.toLocaleString() ?? <Skeleton />,
+          : (createdYesterday?.toLocaleString() ?? <Skeleton />),
         pagination?.totalRecords?.toLocaleString() ?? <Skeleton />,
       ],
     },

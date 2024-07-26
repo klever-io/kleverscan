@@ -381,7 +381,7 @@ export const filteredSections = (
   contract: IContract[],
   contractType: string,
   receipts: IReceipt[],
-  precision = 0,
+  precision = 6,
   data?: string[],
 ): JSX.Element[] => {
   const props = {

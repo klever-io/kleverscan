@@ -13,7 +13,7 @@ import Transactions from '@/components/Tabs/Transactions';
 import api from '@/services/api';
 import { assetCall, assetPoolCall, ITOCall } from '@/services/requests/asset';
 import { CardHeader, CardHeaderItem, CardTabContainer } from '@/styles/common';
-import { IAssetPage, IBalance } from '@/types/index';
+import { IAsset, IAssetPage, IBalance } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { parseHolders } from '@/utils/parseValues';
 import { AssetCardContent, AssetPageContainer } from '@/views/assets';

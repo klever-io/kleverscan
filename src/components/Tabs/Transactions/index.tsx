@@ -15,13 +15,18 @@ const Transactions: React.FC<PropsWithChildren<ITransactionsProps>> = props => {
   const transactionTableProps = props.transactionsTableProps;
   const router = useRouter();
 
-  if (router?.query?.account && !transactionTableHeaders.includes('In/Out')) {
-    transactionTableHeaders.splice(3, 0, 'In/Out');
+  let updatedTransactionTableHeaders = [...transactionTableHeaders];
+
+  if (
+    router?.query?.account &&
+    !updatedTransactionTableHeaders.includes('In/Out')
+  ) {
+    updatedTransactionTableHeaders.splice(3, 0, 'In/Out');
   }
   const tableProps: ITable = {
     ...transactionTableProps,
     rowSections: transactionRowSections,
-    header: transactionTableHeaders,
+    header: updatedTransactionTableHeaders,
     type: 'transactions',
     Filters: TransactionsFilters,
   };

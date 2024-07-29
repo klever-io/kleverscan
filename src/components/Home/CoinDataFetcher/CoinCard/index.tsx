@@ -79,7 +79,7 @@ const swapExchangeInfo = [
   {
     text1: 'Swap and buy',
     text2: 'KLV and KFI',
-    url: 'https://voxswap.io/USDT-KLV',
+    url: 'https://app.voxswap.io/KLV-USDT',
     icon: <VoxSwap />,
     color: '#B7EC42',
   },

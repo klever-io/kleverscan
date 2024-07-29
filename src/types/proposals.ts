@@ -256,7 +256,7 @@ export interface IProposalsMap {
   KAppFeeSmartContract: IProposalMapItem;
 }
 
-export interface MostTransferedToken {
+export interface MostTransferredToken {
   doc_count: number;
   key: string;
   logo: string;

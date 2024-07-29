@@ -60,6 +60,7 @@ const KFI: IAsset = {
   },
   hidden: false,
   verified: false,
+  stakingHolders: 765,
 };
 
 const DVK: IAsset = {
@@ -115,6 +116,7 @@ const DVK: IAsset = {
 
   hidden: false,
   verified: false,
+  stakingHolders: 987,
 };
 
 const SNTEST: IAsset = {
@@ -181,6 +183,7 @@ const SNTEST: IAsset = {
   ],
   hidden: false,
   verified: false,
+  stakingHolders: 987,
 };
 
 const specialAsset: IAsset = {
@@ -235,6 +238,7 @@ const specialAsset: IAsset = {
   },
   hidden: false,
   verified: false,
+  stakingHolders: 987,
 };
 const validator = {
   data: {

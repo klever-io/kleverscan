@@ -226,7 +226,6 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
 
   let toAddress = '--';
   const contractType = getContractType(contract);
-
   if (contractType === Contract.Transfer) {
     const parameter = contract[0].parameter as ITransferContract;
 
@@ -281,18 +280,7 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
       ),
       span: 1,
     },
-    {
-      element: props => (
-        <DoubleRow {...props} key={inOrOut}>
-          <CenteredRow>
-            <InOutSpan status={inOrOut === 'In' ? 'success' : 'pending'}>
-              {inOrOut}
-            </InOutSpan>
-          </CenteredRow>
-        </DoubleRow>
-      ),
-      span: 1,
-    },
+
     {
       element: props =>
         contractType === 'Multi contract' ? (
@@ -359,6 +347,24 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
       span: 1,
     },
   ];
+
+  const inOutRow: IRowSection = {
+    element: props => (
+      <DoubleRow {...props} key={inOrOut}>
+        <CenteredRow>
+          <InOutSpan status={inOrOut === 'In' ? 'success' : 'pending'}>
+            {inOrOut}
+          </InOutSpan>
+        </CenteredRow>
+      </DoubleRow>
+    ),
+    span: 1,
+  };
+
+  if (router?.query?.account) {
+    sections.splice(3, 0, inOutRow);
+    return sections;
+  }
 
   return sections;
 };

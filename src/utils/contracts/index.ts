@@ -464,6 +464,7 @@ export const transactionTableHeaders = [
   'Transaction Hash',
   'Block/Fees',
   'From/To',
+  'In/Out',
   'Type',
   'Misc',
 ];

@@ -6,6 +6,7 @@ import { MultiContractToolTip } from '@/components/MultiContractToolTip';
 import Table, { ITable } from '@/components/Table';
 import {
   CustomFieldWrapper,
+  InOutSpan,
   Status,
   TimestampInfo,
 } from '@/components/Table/styles';
@@ -143,6 +144,7 @@ export const requestTransactionsDefault = async (
   }
 
   const localQuery = { ...router.query, page, limit };
+
   const transactionsResponse = await api.get({
     route: `transaction/list`,
     query: query ?? localQuery,
@@ -220,6 +222,7 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
     precision,
     data,
   } = props;
+  const router = useRouter();
 
   let toAddress = '--';
   const contractType = getContractType(contract);
@@ -229,6 +232,8 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
 
     toAddress = parameter.toAddress;
   }
+
+  const inOrOut = router?.query?.account === sender ? 'In' : 'Out';
 
   const customFields = getCustomFields(contract, receipts, precision, data);
 
@@ -272,6 +277,18 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
             <Mono>{parseAddress(sender, 16)}</Mono>
           </Link>
           {toAddressSectionElement(toAddress)}
+        </DoubleRow>
+      ),
+      span: 1,
+    },
+    {
+      element: props => (
+        <DoubleRow {...props} key={inOrOut}>
+          <CenteredRow>
+            <InOutSpan status={inOrOut === 'In' ? 'success' : 'pending'}>
+              {inOrOut}
+            </InOutSpan>
+          </CenteredRow>
         </DoubleRow>
       ),
       span: 1,

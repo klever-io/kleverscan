@@ -19,17 +19,7 @@ import { useTranslation } from 'next-i18next';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import {
-  ConfirmTransaction,
-  CreateITOFourthStep,
-  CreateITOSecondStep,
-  CreateITOSevenStep,
-  CreateITOSixStep,
-  CreateITOThirdStep,
-  CreatePackInfoSteps,
-  CreateWhiteListSettingsSteps,
-  propertiesCommonDefaultValuesITO,
-} from '..';
+import { propertiesCommonDefaultValuesITO } from '..';
 import { infinitySymbol } from '../../createAsset';
 import { ConfirmSuccessTransaction } from '../../createAsset/ConfirmSuccessTransaction';
 import { CreateAssetWelcomeStep } from '../../createAsset/CreateAssetWelcomeStep';
@@ -37,6 +27,14 @@ import { DesktopStepsComponent } from '../../createAsset/DesktopStepsComponent';
 import { StepsBasics } from '../../createAsset/StepsBasics';
 import { WizardBody } from '../../createAsset/styles';
 import { createITO } from '../../utils';
+import { ConfirmTransaction } from '../ConfirmTransaction';
+import { CreateITOFourthStep } from '../CreateITOFourthStep';
+import { CreateITOSecondStep } from '../CreateITOSecondStep';
+import { CreateITOSevenStep } from '../CreateITOSevenStep';
+import { CreateITOSixStep } from '../CreateITOSixStep';
+import { CreateITOThirdStep } from '../CreateITOThirdStep';
+import { CreatePackInfoSteps } from '../CreatePackInfoSteps';
+import { CreateWhiteListSettingsSteps } from '../CreateWhiteListSettingsSteps';
 
 export const WizCreateITO: React.FC<PropsWithChildren<any>> = ({
   setAddAdvanced,

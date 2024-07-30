@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import { WizardLeftArrow } from '@/assets/icons';
 import Select from '@/components/Contract/Select';
 import { statusOptions } from '@/components/TransactionForms/CustomForms/ConfigITO';
@@ -11,17 +10,14 @@ import { IAsset } from '@/types';
 import { parseAddress } from '@/utils/parseValues';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/legacy/image';
-import { useEffect, useState } from 'react';
+import { PropsWithChildren, useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { FiPlusSquare } from 'react-icons/fi';
 import { IoArrowForward } from 'react-icons/io5';
 import { useQuery } from 'react-query';
-import {
-  ButtonsComponent,
-  ConnectButtonComponent,
-  IWizardComponents,
-  infinitySymbol,
-} from '../createAsset';
+import { IWizardComponents, infinitySymbol } from '../createAsset';
+import { ButtonsComponent } from '../createAsset/ButtonsComponent';
+import { ConnectButtonComponent } from '../createAsset/ConnectButtonComponent';
 import {
   AddressesContainer,
   BackArrowSpan,

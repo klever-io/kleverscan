@@ -30,13 +30,11 @@ import {
   CreateWhiteListSettingsSteps,
   propertiesCommonDefaultValuesITO,
 } from '..';
-import {
-  ConfirmSuccessTransaction,
-  CreateAssetWelcomeStep,
-  DesktopStepsComponent,
-  infinitySymbol,
-  StepsBasics,
-} from '../../createAsset';
+import { infinitySymbol } from '../../createAsset';
+import { ConfirmSuccessTransaction } from '../../createAsset/ConfirmSuccessTransaction';
+import { CreateAssetWelcomeStep } from '../../createAsset/CreateAssetWelcomeStep';
+import { DesktopStepsComponent } from '../../createAsset/DesktopStepsComponent';
+import { StepsBasics } from '../../createAsset/StepsBasics';
 import { WizardBody } from '../../createAsset/styles';
 import { createITO } from '../../utils';
 

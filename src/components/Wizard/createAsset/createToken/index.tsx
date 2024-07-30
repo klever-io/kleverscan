@@ -5,30 +5,27 @@ import { parseAddress } from '@/utils/parseValues';
 import { useTranslation } from 'next-i18next';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import {
-  ConfirmSuccessTransaction,
-  ConfirmTransaction,
-  CreateAssetAddRoles,
-  CreateAssetEightStep,
-  CreateAssetInitialSupplyStep,
-  CreateAssetMaxSupplyStep,
-  CreateAssetNameStep,
-  CreateAssetOwnerAddressStep,
-  CreateAssetPreConfimStep,
-  CreateAssetPropertiesStep,
-  CreateAssetRoyaltySteps,
-  CreateAssetStakingStep,
-  CreateAssetTickerStep,
-  CreateAssetWelcomeStep,
-  CreatePrecisionStep,
-  DesktopStepsComponent,
-  StepsBasics,
-  URIsSection,
-  infinitySymbol,
-  propertiesCommonDefaultValues,
-} from '..';
+import { infinitySymbol, propertiesCommonDefaultValues } from '..';
 import { createToken } from '../../utils';
+import { ConfirmSuccessTransaction } from '../ConfirmSuccessTransaction';
+import { ConfirmTransaction } from '../ConfirmTransaction';
+import { CreateAssetAddRoles } from '../CreateAssetAddRoles';
+import { CreateAssetEightStep } from '../CreateAssetEightStep';
+import { CreateAssetInitialSupplyStep } from '../CreateAssetInitialSupplyStep';
+import { CreateAssetMaxSupplyStep } from '../CreateAssetMaxSupplyStep';
+import { CreateAssetNameStep } from '../CreateAssetNameStep';
+import { CreateAssetOwnerAddressStep } from '../CreateAssetOwnerAddressStep';
+import { CreateAssetPreConfimStep } from '../CreateAssetPreConfimStep';
+import { CreateAssetPropertiesStep } from '../CreateAssetPropertiesStep';
+import { CreateAssetRoyaltySteps } from '../CreateAssetRoyaltySteps';
+import { CreateAssetStakingStep } from '../CreateAssetStakingStep';
+import { CreateAssetTickerStep } from '../CreateAssetTickerStep';
+import { CreateAssetWelcomeStep } from '../CreateAssetWelcomeStep';
+import { CreatePrecisionStep } from '../CreatePrecisionStep';
+import { DesktopStepsComponent } from '../DesktopStepsComponent';
+import { StepsBasics } from '../StepsBasics';
 import { WizardBody } from '../styles';
+import { URIsSection } from '../URIsSection';
 
 // TODO -> Check state setadvancedsteps
 const WizCreateToken: React.FC<PropsWithChildren<any>> = ({

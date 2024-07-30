@@ -6,6 +6,7 @@ import { MultiContractToolTip } from '@/components/MultiContractToolTip';
 import Table, { ITable } from '@/components/Table';
 import {
   CustomFieldWrapper,
+  InOutSpan,
   Status,
   TimestampInfo,
 } from '@/components/Table/styles';
@@ -143,6 +144,7 @@ export const requestTransactionsDefault = async (
   }
 
   const localQuery = { ...router.query, page, limit };
+
   const transactionsResponse = await api.get({
     route: `transaction/list`,
     query: query ?? localQuery,
@@ -220,15 +222,17 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
     precision,
     data,
   } = props;
+  const router = useRouter();
 
   let toAddress = '--';
   const contractType = getContractType(contract);
-
   if (contractType === Contract.Transfer) {
     const parameter = contract[0].parameter as ITransferContract;
 
     toAddress = parameter.toAddress;
   }
+
+  const inOrOut = router?.query?.account === sender ? 'In' : 'Out';
 
   const customFields = getCustomFields(contract, receipts, precision, data);
 
@@ -276,6 +280,7 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
       ),
       span: 1,
     },
+
     {
       element: props =>
         contractType === 'Multi contract' ? (
@@ -342,6 +347,24 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
       span: 1,
     },
   ];
+
+  const inOutRow: IRowSection = {
+    element: props => (
+      <DoubleRow {...props} key={inOrOut}>
+        <CenteredRow>
+          <InOutSpan status={inOrOut === 'In' ? 'success' : 'pending'}>
+            {inOrOut}
+          </InOutSpan>
+        </CenteredRow>
+      </DoubleRow>
+    ),
+    span: 1,
+  };
+
+  if (router?.query?.account) {
+    sections.splice(3, 0, inOutRow);
+    return sections;
+  }
 
   return sections;
 };

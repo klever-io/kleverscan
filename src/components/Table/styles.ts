@@ -279,6 +279,10 @@ export const Status = styled.span<IStatus>`
   }
 `;
 
+export const InOutSpan = styled(Status)`
+  min-width: 50px !important;
+`;
+
 export const EmptyRow = styled.div`
   width: 100% !important;
 

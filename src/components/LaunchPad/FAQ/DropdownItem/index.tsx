@@ -1,12 +1,12 @@
+import { PropsWithChildren } from 'react';
 import { useTheme } from '@/contexts/theme';
 import { useState } from 'react';
 import { FiMinus, FiPlus } from 'react-icons/fi';
 import { Body, CardContainer, Head, Title } from './styles';
 
-export const FAQDropdown: React.FC<{ title: string; description: string }> = ({
-  title,
-  description,
-}) => {
+export const FAQDropdown: React.FC<
+  PropsWithChildren<{ title: string; description: string }>
+> = ({ title, description }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { isDarkTheme } = useTheme();
 

@@ -1,9 +1,10 @@
 import { useExtension } from '@/contexts/extension';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { validateImgUrl } from '@/utils/imageValidate';
+import { getNetwork } from '@/utils/networkFunctions';
 import { ICreateAsset } from '@klever/sdk-web';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
 import { IContractProps } from '.';
@@ -23,12 +24,12 @@ import {
   parseProperties,
   parseSplitRoyalties,
   parseStaking,
+  parseTickerName,
   parseURIs,
   percentageProps,
   removeWrapper,
 } from './utils';
 import { assetsTooltip as tooltip } from './utils/tooltips';
-import { getNetwork } from '@/utils/networkFunctions';
 
 interface IPrecisionProps {
   precision: number;
@@ -54,8 +55,9 @@ export const assetTypes = [
   },
 ];
 
-const parseCreateAsset = (data: ICreateAsset) => {
+export const parseCreateAsset = (data: ICreateAsset) => {
   const dataCopy = JSON.parse(JSON.stringify(data));
+  parseTickerName(dataCopy);
   parseSplitRoyalties(dataCopy);
   parseURIs(dataCopy);
   parseStaking(dataCopy);
@@ -64,7 +66,7 @@ const parseCreateAsset = (data: ICreateAsset) => {
   return dataCopy;
 };
 
-const CreateAsset: React.FC<IContractProps> = ({
+const CreateAsset: React.FC<PropsWithChildren<IContractProps>> = ({
   formKey,
   handleFormSubmit,
 }) => {
@@ -103,7 +105,10 @@ const CreateAsset: React.FC<IContractProps> = ({
   );
 };
 
-const BasicInfoSection: React.FC<ISectionProps> = ({ isNFT, isFungible }) => {
+const BasicInfoSection: React.FC<PropsWithChildren<ISectionProps>> = ({
+  isNFT,
+  isFungible,
+}) => {
   const [logoError, setLogoError] = useState<string | null>(null);
   const { watch, trigger } = useFormContext<ICreateAsset>();
   const { walletAddress } = useExtension();
@@ -195,7 +200,9 @@ interface URIProps {
   tooltip?: string;
 }
 
-export const URIsSection: React.FC<URIProps> = ({ tooltip: customTooltip }) => {
+export const URIsSection: React.FC<PropsWithChildren<URIProps>> = ({
+  tooltip: customTooltip,
+}) => {
   const { control, getValues } = useFormContext();
   const router = useRouter();
   const { fields, append, remove } = useFieldArray({
@@ -247,7 +254,9 @@ export const URIsSection: React.FC<URIProps> = ({ tooltip: customTooltip }) => {
   );
 };
 
-export const RoyaltiesSection: React.FC<ISectionProps> = props => {
+export const RoyaltiesSection: React.FC<
+  PropsWithChildren<ISectionProps>
+> = props => {
   const { isFungible } = props;
   const { walletAddress } = useExtension();
   let precision = 8;
@@ -323,9 +332,9 @@ export const RoyaltiesSection: React.FC<ISectionProps> = props => {
   );
 };
 
-const TransferPercentageSection: React.FC<IPrecisionProps> = ({
-  precision,
-}) => {
+const TransferPercentageSection: React.FC<
+  PropsWithChildren<IPrecisionProps>
+> = ({ precision }) => {
   const { control, trigger, getValues } = useFormContext();
   const router = useRouter();
   const { fields, append, remove } = useFieldArray({
@@ -383,7 +392,9 @@ const TransferPercentageSection: React.FC<IPrecisionProps> = ({
   );
 };
 
-const SplitRoyaltiesSection: React.FC<ISectionProps> = ({ isFungible }) => {
+const SplitRoyaltiesSection: React.FC<PropsWithChildren<ISectionProps>> = ({
+  isFungible,
+}) => {
   const { control, getValues } = useFormContext();
   const router = useRouter();
   const { fields, append, remove } = useFieldArray({
@@ -457,7 +468,7 @@ const SplitRoyaltiesSection: React.FC<ISectionProps> = ({ isFungible }) => {
           <FormInput
             name={`royalties.splitRoyalties[${index}].percentITOPercentage`}
             title={`Percentage over ITO Percentage`}
-            tooltip={tooltip.royalties.splitRoyalties.percentItoPercentage}
+            tooltip={tooltip.royalties.splitRoyalties.percentITOPercentage}
             {...percentageProps}
           />
           <FormInput
@@ -480,10 +491,9 @@ interface IStakingSectionProps {
   isFPR?: boolean;
 }
 
-export const StakingSection: React.FC<IStakingSectionProps> = ({
-  assetTrigger = false,
-  isFPR: isFPRProp,
-}) => {
+export const StakingSection: React.FC<
+  PropsWithChildren<IStakingSectionProps>
+> = ({ assetTrigger = false, isFPR: isFPRProp }) => {
   const { watch, setValue } = useFormContext();
   const isFPR = watch('staking.interestType');
 
@@ -547,7 +557,7 @@ export const StakingSection: React.FC<IStakingSectionProps> = ({
   );
 };
 
-export const RolesSection: React.FC = () => {
+export const RolesSection: React.FC<PropsWithChildren> = () => {
   const { control, getValues } = useFormContext();
   const router = useRouter();
   const { fields, append, remove } = useFieldArray({
@@ -623,7 +633,7 @@ export const RolesSection: React.FC = () => {
   );
 };
 
-const PropertiesSection: React.FC = () => {
+const PropertiesSection: React.FC<PropsWithChildren> = () => {
   return (
     <FormSection>
       <SectionTitle>

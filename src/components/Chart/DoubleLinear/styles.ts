@@ -10,13 +10,13 @@ export const TooltipContainer = styled.div`
   box-shadow: 3px 3px 8px 5px rgba(0, 0, 0, 0.05);
 
   p {
-    :first-child {
+    &:first-child {
       color: black;
     }
-    :nth-child(2) {
+    &:nth-child(2) {
       color: ${props => props.theme.violet};
     }
-    :nth-child(3) {
+    &:nth-child(3) {
       color: ${props => props.theme.lightBlue};
     }
   }

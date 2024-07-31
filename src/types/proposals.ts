@@ -106,7 +106,7 @@ export interface IAPINetworkParams {
 }
 
 export interface IVotingPowers {
-  [address: number]: number;
+  [address: string]: number;
 }
 
 export interface IVote {
@@ -124,15 +124,24 @@ export interface IProposalsPage {
   networkParams: INetworkParams;
 }
 
-export interface INetworkParams {
-  [index: number]: INetworkParam;
+export interface IParsedNetworkParams {
+  [key: string]: IParsedNetworkParam;
 }
 
-export interface INetworkParam {
+export interface IParsedNetworkParam {
   number: number;
   parameter: string;
   currentValue: string;
   parameterLabel: string;
+}
+
+export interface INetworkParams {
+  [key: string]: INetworkParam;
+}
+
+export interface INetworkParam {
+  type: string;
+  value: string;
 }
 
 export interface IProposals {
@@ -148,7 +157,7 @@ export interface IProposalParams {
 }
 
 export interface IParsedParams {
-  currentNetworkParams: INetworkParams;
+  currentNetworkParams: IParsedNetworkParams;
   parsedProposalParams: IParsedProposalParam[];
 }
 
@@ -247,7 +256,7 @@ export interface IProposalsMap {
   KAppFeeSmartContract: IProposalMapItem;
 }
 
-export interface MostTransferedToken {
+export interface MostTransferredToken {
   doc_count: number;
   key: string;
   logo: string;

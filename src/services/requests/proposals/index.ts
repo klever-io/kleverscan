@@ -5,6 +5,7 @@ import {
   INetworkParam,
   INetworkParams,
   INodeOverview,
+  IParsedNetworkParam,
   IProposalsResponse,
 } from '@/types/proposals';
 import { parseAllProposals, parseProposal } from '@/utils/parseValues';
@@ -40,14 +41,16 @@ export const proposalsActiveResponse = async (): Promise<void> => {
 export const getParamsList = async (): Promise<IParamList[] | undefined> => {
   const { data } = await api.get({ route: 'network/network-parameters' });
 
-  let networkParams = {} as INetworkParam[];
+  let networkParams = {} as IParsedNetworkParam[];
   const paramsList = [] as IParamList[];
 
   if (data) {
     networkParams = Object.keys(proposalsMap).map((key, index) => {
       return {
         number: index,
-        parameter: proposalsMap[key] ? proposalsMap[key].message : '',
+        parameter: proposalsMap[key as keyof typeof proposalsMap]
+          ? proposalsMap[key as keyof typeof proposalsMap].message
+          : '',
         currentValue: data.parameters[key]?.value,
         parameterLabel: key,
       };
@@ -55,7 +58,7 @@ export const getParamsList = async (): Promise<IParamList[] | undefined> => {
   }
 
   networkParams.length &&
-    networkParams?.forEach((param: INetworkParam) => {
+    networkParams?.forEach((param: IParsedNetworkParam) => {
       paramsList.push({
         value: param.number,
         label: `${param.parameter}: ${param.currentValue}`,

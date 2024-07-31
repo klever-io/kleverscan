@@ -36,7 +36,7 @@ export const Content = styled.div`
     height: 100%;
   }
 
-  ::after {
+  &::after {
     content: '';
     position: relative;
     top: 10rem;
@@ -130,11 +130,11 @@ export const LinksContainer = styled.div`
   flex-direction: column;
   flex: 0 0 20%;
 
-  :nth-child(-n + 4) {
+  &:nth-child(-n + 4) {
     border-bottom: 1px solid #222345;
   }
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
-    :nth-child(-n + 4) {
+    &:nth-child(-n + 4) {
       border-bottom: 0;
     }
     min-height: 300px;

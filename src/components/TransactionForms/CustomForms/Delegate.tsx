@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useContract } from '@/contexts/contract';
 import { validatorsCall } from '@/services/requests/validators';
 import { IValidator } from '@/types';
@@ -16,7 +17,10 @@ type FormData = {
   receiver: string;
 };
 
-const Delegate: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+const Delegate: React.FC<PropsWithChildren<IContractProps>> = ({
+  formKey,
+  handleFormSubmit,
+}) => {
   const [bucketsList, setBucketsList] = useState<any>([]);
   const [typedName, setTypedName] = useState<string>('');
 

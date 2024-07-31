@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useExtension } from '@/contexts/extension';
 import { getBestKLVRate } from '@/pages/ito';
 import { IParsedITO } from '@/types';
@@ -25,7 +26,7 @@ interface AssetITOProps {
   setOpenParticipateModal: (state: boolean) => void;
 }
 
-export const AssetITOSummary: React.FC<AssetITOProps> = ({
+export const AssetITOSummary: React.FC<PropsWithChildren<AssetITOProps>> = ({
   ITO,
   setOpenParticipateModal,
 }) => {

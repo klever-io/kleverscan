@@ -96,16 +96,15 @@ import {
   StrongWidth,
   URIsWrapper,
 } from '@/views/transactions/detail';
-import { useTranslation } from 'next-i18next';
+import { TFunction, useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import React, { useState } from 'react';
-import { TFunction } from 'react-i18next';
+import React, { PropsWithChildren, useState } from 'react';
 import Tooltip from '../Tooltip';
 
 interface IAssetTriggerTypeData {
   parameter: IAssetTriggerContract;
   precision: number;
-  t: TFunction<'common', undefined>;
+  t: TFunction;
 }
 
 const getNFTNonces = (
@@ -155,17 +154,18 @@ const renderAssetId = (
 ) => {
   return parameter?.assetId?.split('/')[0] &&
     parameter?.assetId?.split('/')[0] !== 'KLV' ? (
-    <Link href={`/asset/${parameter?.assetId?.split('/')[0]}`}>
-      <a style={{ fontWeight: '500' }}>
-        {options?.clearNonce
-          ? parameter.assetId.split('/')[0]
-          : parameter.assetId}
-      </a>
+    <Link
+      href={`/asset/${parameter?.assetId?.split('/')[0]}`}
+      style={{ fontWeight: '500' }}
+    >
+      {options?.clearNonce
+        ? parameter.assetId.split('/')[0]
+        : parameter.assetId}
     </Link>
   ) : (
     parameter?.amount && (
       <>
-        <Link href={`/asset/KLV`}>
+        <Link href={`/asset/KLV`} legacyBehavior>
           <KLV />
         </Link>
         <Link href={`/asset/KLV`}>KLV</Link>
@@ -174,7 +174,7 @@ const renderAssetId = (
   );
 };
 
-export const Transfer: React.FC<IIndexedContract> = ({
+export const Transfer: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   filteredReceipts: rec,
   renderMetadata,
@@ -282,7 +282,7 @@ export const Transfer: React.FC<IIndexedContract> = ({
         </span>
         <span>
           <CenteredRow>
-            <Link href={`/account/${parameter?.toAddress}`}>
+            <Link href={`/account/${parameter?.toAddress}`} legacyBehavior>
               {parameter?.toAddress}
             </Link>
             <Copy data={parameter?.toAddress} />
@@ -312,7 +312,7 @@ export const Transfer: React.FC<IIndexedContract> = ({
   );
 };
 
-export const CreateAsset: React.FC<IIndexedContract> = ({
+export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
   sender,
   parameter: par,
   filteredReceipts: rec,
@@ -347,7 +347,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
           <span>
             <strong>Asset ID</strong>
           </span>
-          <Link href={`/asset/${createAssetReceipt?.assetId}`}>
+          <Link href={`/asset/${createAssetReceipt?.assetId}`} legacyBehavior>
             {createAssetReceipt?.assetId}
           </Link>
         </Row>
@@ -364,7 +364,9 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
         </span>
         <span>
           <CenteredRow>
-            <Link href={`/account/${ownerAddress}`}>{ownerAddress}</Link>
+            <Link href={`/account/${ownerAddress}`} legacyBehavior>
+              {ownerAddress}
+            </Link>
             <Copy data={ownerAddress} />
           </CenteredRow>
         </span>
@@ -432,7 +434,10 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
             <Panel>
               <CenteredRow>
                 <strong>Address:&nbsp;</strong>
-                <Link href={`/account/${parameter.royalties?.address}`}>
+                <Link
+                  href={`/account/${parameter.royalties?.address}`}
+                  legacyBehavior
+                >
                   {parameter.royalties?.address}
                 </Link>
                 <Copy data={parameter.royalties?.address}></Copy>
@@ -464,10 +469,12 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
                 )}
               </CenteredRow>
               <CenteredRow>
-                {parameter?.royalties?.itoPercentage && (
+                {parameter?.royalties?.percentITOPercentage && (
                   <>
                     <strong>ITO Percentage:&nbsp;</strong>
-                    <span>{parameter?.royalties?.itoPercentage / 100}%</span>
+                    <span>
+                      {parameter?.royalties?.percentITOPercentage / 100}%
+                    </span>
                   </>
                 )}
               </CenteredRow>
@@ -689,7 +696,7 @@ export const CreateAsset: React.FC<IIndexedContract> = ({
   );
 };
 
-export const CreateValidator: React.FC<IIndexedContract> = ({
+export const CreateValidator: React.FC<PropsWithChildren<IIndexedContract>> = ({
   sender,
   parameter: par,
   renderMetadata,
@@ -699,7 +706,6 @@ export const CreateValidator: React.FC<IIndexedContract> = ({
 
   return (
     <>
-      {' '}
       <Row>
         <span>
           <strong>Type</strong>
@@ -719,7 +725,9 @@ export const CreateValidator: React.FC<IIndexedContract> = ({
           <strong>Owner</strong>
         </span>
         <span>
-          <Link href={`/account/${ownerAddress}`}>{ownerAddress}</Link>
+          <Link href={`/account/${ownerAddress}`} legacyBehavior>
+            {ownerAddress}
+          </Link>
         </span>
       </Row>
       {parameter?.config?.logo && (
@@ -729,7 +737,9 @@ export const CreateValidator: React.FC<IIndexedContract> = ({
           </span>
           <span>
             <CenteredRow>
-              <Link href={parameter.config.logo}>{parameter.config.logo}</Link>
+              <Link href={parameter.config.logo} legacyBehavior>
+                {parameter.config.logo}
+              </Link>
               <Copy data={parameter.config.logo}></Copy>
             </CenteredRow>
           </span>
@@ -767,7 +777,10 @@ export const CreateValidator: React.FC<IIndexedContract> = ({
         </span>
         <span>
           <CenteredRow>
-            <Link href={`/account/${parameter?.config?.rewardAddress}`}>
+            <Link
+              href={`/account/${parameter?.config?.rewardAddress}`}
+              legacyBehavior
+            >
               {parameter?.config?.rewardAddress}
             </Link>
             <Copy data={parameter?.config?.rewardAddress} />
@@ -779,7 +792,7 @@ export const CreateValidator: React.FC<IIndexedContract> = ({
   );
 };
 
-export const ValidatorConfig: React.FC<IIndexedContract> = ({
+export const ValidatorConfig: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   renderMetadata,
 }) => {
@@ -894,7 +907,7 @@ export const ValidatorConfig: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Freeze: React.FC<IIndexedContract> = ({
+export const Freeze: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   contractIndex,
   filteredReceipts: rec,
@@ -945,7 +958,7 @@ export const Freeze: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Unfreeze: React.FC<IIndexedContract> = ({
+export const Unfreeze: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   contractIndex,
   filteredReceipts: rec,
@@ -1032,7 +1045,7 @@ export const Unfreeze: React.FC<IIndexedContract> = ({
     </>
   );
 };
-export const Delegate: React.FC<IIndexedContract> = ({
+export const Delegate: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   filteredReceipts,
   contractIndex,
@@ -1075,7 +1088,7 @@ export const Delegate: React.FC<IIndexedContract> = ({
         <span>
           <CenteredRow>
             <Link href={`/account/${parameter?.toAddress}`}>
-              <a>{parameter?.toAddress}</a>
+              {parameter?.toAddress}
             </Link>
             <Copy data={parameter?.toAddress} info="Address"></Copy>
           </CenteredRow>
@@ -1141,7 +1154,7 @@ export const Delegate: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Undelegate: React.FC<IIndexedContract> = ({
+export const Undelegate: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   filteredReceipts,
   contractIndex,
@@ -1245,7 +1258,7 @@ export const Undelegate: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Withdraw: React.FC<IIndexedContract> = ({
+export const Withdraw: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   filteredReceipts,
   contractIndex,
@@ -1351,7 +1364,7 @@ export const Withdraw: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Claim: React.FC<IIndexedContract> = ({
+export const Claim: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   filteredReceipts,
   renderMetadata,
@@ -1429,7 +1442,9 @@ export const Claim: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Unjail: React.FC<IIndexedContract> = ({ renderMetadata }) => {
+export const Unjail: React.FC<PropsWithChildren<IIndexedContract>> = ({
+  renderMetadata,
+}) => {
   return (
     <>
       <Row>
@@ -1443,7 +1458,7 @@ export const Unjail: React.FC<IIndexedContract> = ({ renderMetadata }) => {
   );
 };
 
-export const AssetTrigger: React.FC<IIndexedContract> = ({
+export const AssetTrigger: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   renderMetadata,
   filteredReceipts: rec,
@@ -1490,7 +1505,7 @@ export const AssetTrigger: React.FC<IIndexedContract> = ({
   );
 };
 
-export const SetAccountName: React.FC<IIndexedContract> = ({
+export const SetAccountName: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   renderMetadata,
 }) => {
@@ -1515,7 +1530,7 @@ export const SetAccountName: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Proposal: React.FC<IIndexedContract> = ({
+export const Proposal: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   filteredReceipts,
   contractIndex,
@@ -1577,7 +1592,7 @@ export const Proposal: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Vote: React.FC<IIndexedContract> = ({
+export const Vote: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   renderMetadata,
 }) => {
@@ -1614,7 +1629,7 @@ export const Vote: React.FC<IIndexedContract> = ({
   );
 };
 
-export const ConfigITO: React.FC<IIndexedContract> = ({
+export const ConfigITO: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   renderMetadata,
 }) => {
@@ -1639,7 +1654,7 @@ export const ConfigITO: React.FC<IIndexedContract> = ({
         </span>
         <CenteredRow>
           <Link href={`/account/${parameter?.receiverAddress}`}>
-            <a>{parameter?.receiverAddress}</a>
+            {parameter?.receiverAddress}
           </Link>
           <Copy data={parameter?.receiverAddress} info="Bucket ID"></Copy>
         </CenteredRow>
@@ -1679,7 +1694,7 @@ export const ConfigITO: React.FC<IIndexedContract> = ({
   );
 };
 
-export const SetITOPrices: React.FC<IIndexedContract> = ({
+export const SetITOPrices: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   renderMetadata,
 }) => {
@@ -1716,7 +1731,7 @@ export const SetITOPrices: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Buy: React.FC<IContractBuyProps> = ({
+export const Buy: React.FC<PropsWithChildren<IContractBuyProps>> = ({
   parameter: par,
   filteredReceipts: rec,
   sender,
@@ -1888,7 +1903,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
         transferReceipts as ITransferReceipt[],
         'assetId',
       );
-      const precisionAllPricesSum = {};
+      const precisionAllPricesSum: Record<string, string> = {};
       Object.keys(allPricesSum).forEach(
         key =>
           (precisionAllPricesSum[key] = toLocaleFixed(
@@ -2011,7 +2026,7 @@ export const Buy: React.FC<IContractBuyProps> = ({
   );
 };
 
-export const Sell: React.FC<IIndexedContract> = ({
+export const Sell: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   filteredReceipts,
   contractIndex,
@@ -2143,12 +2158,9 @@ export const Sell: React.FC<IIndexedContract> = ({
   );
 };
 
-export const CancelMarketOrder: React.FC<IIndexedContract> = ({
-  parameter: par,
-  filteredReceipts,
-  contractIndex,
-  renderMetadata,
-}) => {
+export const CancelMarketOrder: React.FC<
+  PropsWithChildren<IIndexedContract>
+> = ({ parameter: par, filteredReceipts, contractIndex, renderMetadata }) => {
   const parameter = par as ICancelMarketOrderContract;
   const kAppTransferReceipt = findReceipt(
     filteredReceipts,
@@ -2195,12 +2207,9 @@ export const CancelMarketOrder: React.FC<IIndexedContract> = ({
   );
 };
 
-export const CreateMarketplace: React.FC<IIndexedContract> = ({
-  parameter: par,
-  filteredReceipts,
-  contractIndex,
-  renderMetadata,
-}) => {
+export const CreateMarketplace: React.FC<
+  PropsWithChildren<IIndexedContract>
+> = ({ parameter: par, filteredReceipts, contractIndex, renderMetadata }) => {
   const parameter = par as ICreateMarketplaceContract;
   const createMarketplaceReceipt = findReceipt(
     filteredReceipts,
@@ -2249,10 +2258,9 @@ export const CreateMarketplace: React.FC<IIndexedContract> = ({
   );
 };
 
-export const ConfigMarketplace: React.FC<IIndexedContract> = ({
-  parameter: par,
-  renderMetadata,
-}) => {
+export const ConfigMarketplace: React.FC<
+  PropsWithChildren<IIndexedContract>
+> = ({ parameter: par, renderMetadata }) => {
   const parameter = par as IConfigMarketplaceContract;
 
   return (
@@ -2296,10 +2304,9 @@ export const ConfigMarketplace: React.FC<IIndexedContract> = ({
   );
 };
 
-export const UpdateAccountPermission: React.FC<IIndexedContract> = ({
-  parameter: par,
-  renderMetadata,
-}) => {
+export const UpdateAccountPermission: React.FC<
+  PropsWithChildren<IIndexedContract>
+> = ({ parameter: par, renderMetadata }) => {
   const parameter = par as IUpdateAccountPermissionContract;
   const permission = parameter?.permissions[0];
   const operations = calculatePermissionOperations(permission?.operations);
@@ -2380,7 +2387,7 @@ export const UpdateAccountPermission: React.FC<IIndexedContract> = ({
   );
 };
 
-export const Deposit: React.FC<IIndexedContract> = ({
+export const Deposit: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   renderMetadata,
 }) => {
@@ -2424,7 +2431,7 @@ export const Deposit: React.FC<IIndexedContract> = ({
   );
 };
 
-export const ITOTrigger: React.FC<IIndexedContract> = ({
+export const ITOTrigger: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   renderMetadata,
 }) => {
@@ -2510,7 +2517,10 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({
               <strong>Receiver Address</strong>
             </span>
             <CenteredRow>
-              <Link href={`/account/${parameter?.receiverAddress}`}>
+              <Link
+                href={`/account/${parameter?.receiverAddress}`}
+                legacyBehavior
+              >
                 {parameter?.receiverAddress}
               </Link>
               <Copy data={parameter?.receiverAddress} info="Bucket ID"></Copy>
@@ -2625,7 +2635,7 @@ export const ITOTrigger: React.FC<IIndexedContract> = ({
   );
 };
 
-export const SmartContract: React.FC<IIndexedContract> = ({
+export const SmartContract: React.FC<PropsWithChildren<IIndexedContract>> = ({
   parameter: par,
   renderMetadata,
   logs,
@@ -2641,20 +2651,26 @@ export const SmartContract: React.FC<IIndexedContract> = ({
     <>
       <Row>
         <span>
+          <strong>Type</strong>
+        </span>
+        <strong>Smart Contract</strong>
+      </Row>
+      <Row>
+        <span>
+          <strong>SC Type</strong>
+        </span>
+        <span>{(parameter?.type || '').slice(2)}</span>
+      </Row>
+      <Row>
+        <span>
           <strong>Contract Address</strong>
         </span>
-
         <CenteredRow>
           <span>{scAddress}</span>
           <Copy data={scAddress} info="address"></Copy>
         </CenteredRow>
       </Row>
-      <Row>
-        <span>
-          <strong>Type</strong>
-        </span>
-        <span>{(parameter?.type || '').slice(2)}</span>
-      </Row>
+
       {Object.entries(parameter?.callValue || {}).length > 0 && (
         <Row>
           <span>
@@ -2663,14 +2679,14 @@ export const SmartContract: React.FC<IIndexedContract> = ({
           <RowContent>
             <BalanceContainer>
               <NetworkParamsContainer>
-                {(parameter?.callValue || []).map(({ asset, value }) => {
-                  return (
-                    <div key={asset}>
-                      <strong>{asset}</strong>
+                {parameter?.callValue?.map(value =>
+                  Object.entries(value).map(([key, value]) => (
+                    <div key={key}>
+                      <strong>{key}</strong>
                       <span>{value}</span>
                     </div>
-                  );
-                })}
+                  )),
+                )}
               </NetworkParamsContainer>
             </BalanceContainer>
           </RowContent>
@@ -2782,11 +2798,9 @@ const renderPackInfoComponents = (
   );
 };
 
-const renderAssetTriggerTypeData: React.FC<IAssetTriggerTypeData> = ({
-  parameter,
-  precision,
-  t,
-}): any => {
+const renderAssetTriggerTypeData: React.FC<
+  PropsWithChildren<IAssetTriggerTypeData>
+> = ({ parameter, precision, t }): any => {
   const par = parameter;
   const triggerType = par?.triggerType;
 
@@ -2796,9 +2810,7 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerTypeData> = ({
         <strong>To</strong>
       </span>
       <CenteredRow>
-        <Link href={`/account/${par?.toAddress}`}>
-          <a>{par?.toAddress}</a>
-        </Link>
+        <Link href={`/account/${par?.toAddress}`}>{par?.toAddress}</Link>
         <Copy data={par?.toAddress} info="address"></Copy>
       </CenteredRow>
     </Row>
@@ -2866,7 +2878,7 @@ const renderAssetTriggerTypeData: React.FC<IAssetTriggerTypeData> = ({
               </RoleDiv>
               <RoleDiv>
                 <StrongWidth>ITO Percentage</StrongWidth>
-                <span>{par.royalties.itoPercentage / 100 || 0}%</span>
+                <span>{par.royalties.percentITOPercentage / 100 || 0}%</span>
               </RoleDiv>
               <RoleDiv>
                 <StrongWidth>Market Fixed</StrongWidth>

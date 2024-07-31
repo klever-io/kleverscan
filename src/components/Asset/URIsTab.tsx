@@ -1,8 +1,9 @@
+import { PropsWithChildren } from 'react';
 import { Row } from '@/views/assets/detail';
 import React from 'react';
 import { AssetProps } from './OverviewTab';
 
-export const UrisTab: React.FC<AssetProps> = ({ asset }) => {
+export const UrisTab: React.FC<PropsWithChildren<AssetProps>> = ({ asset }) => {
   return (
     <>
       {Object.entries(asset?.uris || []).length ? (

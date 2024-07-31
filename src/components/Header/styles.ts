@@ -278,26 +278,24 @@ export const MobileContainer = styled.div<{ $openSearch: boolean }>`
 `;
 
 export const MobileContent = styled.div<IMobileMenu>`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
   padding: 1.5rem;
   height: 100vh;
 
   right: 0;
 
   transform: translateX(${props => (props.opened ? 0 : '100%')});
+  transition: 0.3s ease-out;
 
-  display: flex;
   position: fixed;
 
   z-index: 12;
 
-  flex-direction: column;
-
-  gap: 1.5rem;
-
   background-color: ${props =>
     props.theme.dark ? props.theme.navbar.background : props.theme.true.white};
-
-  transition: 0.3s ease-out;
 
   visibility: ${props => (props.opened ? 'visible' : 'hidden')};
   opacity: ${props => (props.opened ? 1 : 0)};

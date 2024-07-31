@@ -212,7 +212,7 @@ export const CheckboxOperations = styled.input`
   -webkit-appearance: none;
   border-radius: 0.2rem;
 
-  ::before {
+  &::before {
     content: ${({ checked }) => (checked ? "''" : "'\\2715'")};
     color: ${({ checked, theme }) =>
       checked ? 'transparent' : theme.true.white};

@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 interface IMobile {
@@ -12,7 +13,7 @@ interface IMobile {
 
 export const Mobile = createContext({} as IMobile);
 
-export const MobileProvider: React.FC = ({ children }) => {
+export const MobileProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { getParamsList } from '@/services/requests/proposals';
 import { IParamList } from '@/types';
 import { useRouter } from 'next/router';
@@ -49,7 +50,10 @@ const parseProposal = (data: any): void => {
   data.parameters = parameters;
 };
 
-const Proposal: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+const Proposal: React.FC<PropsWithChildren<IContractProps>> = ({
+  formKey,
+  handleFormSubmit,
+}) => {
   const { handleSubmit } = useFormContext<FormData>();
 
   const { data: paramsList } = useQuery('paramsList', getParamsList);
@@ -90,9 +94,9 @@ interface IParametersProps {
   paramsList?: IParamList[];
 }
 
-export const ParametersSection: React.FC<IParametersProps> = ({
-  paramsList = [],
-}) => {
+export const ParametersSection: React.FC<
+  PropsWithChildren<IParametersProps>
+> = ({ paramsList = [] }) => {
   const { control, getValues } = useFormContext();
   const router = useRouter();
 

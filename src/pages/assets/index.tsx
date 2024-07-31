@@ -1,9 +1,11 @@
 import { Assets as Icon } from '@/assets/title-icons';
+import AssetsPools from '@/components/AssetsPools';
 import Copy from '@/components/Copy';
 import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Table, { ITable } from '@/components/Table';
+import Tabs, { ITabs } from '@/components/Tabs';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import { requestAssetsQuery } from '@/services/requests/assets';
 import { CenteredRow, Container, DoubleRow, Header } from '@/styles/common';
@@ -16,11 +18,16 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { ReactNode } from 'react';
+import React, {
+  PropsWithChildren,
+  ReactNode,
+  useEffect,
+  useState,
+} from 'react';
 import { IoIosInfinite } from 'react-icons/io';
 import nextI18nextConfig from '../../../next-i18next.config';
 
-const AssetsFilters: React.FC = () => {
+const AssetsFilters: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
   const { t } = useTranslation(['common', 'assets', 'table']);
 
@@ -77,7 +84,7 @@ const AssetsFilters: React.FC = () => {
   );
 };
 
-const Assets: React.FC = () => {
+const Assets: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
   const { t } = useTranslation(['common', 'assets', 'table']);
 
@@ -121,15 +128,13 @@ const Assets: React.FC = () => {
       {
         element: props => (
           <Link href={`/asset/${assetId}`} key={assetId}>
-            <a>
-              <AssetLogo
-                logo={logo}
-                ticker={ticker}
-                name={name}
-                verified={verified}
-                size={36}
-              />
-            </a>
+            <AssetLogo
+              logo={logo}
+              ticker={ticker}
+              name={name}
+              verified={verified}
+              size={36}
+            />
           </Link>
         ),
         span: 1,
@@ -139,11 +144,11 @@ const Assets: React.FC = () => {
         element: props => (
           <DoubleRow {...props} key={assetId}>
             <Link href={`/asset/${assetId}`} key={assetId}>
-              <a>{name}</a>
+              {name}
             </Link>
 
             <CenteredRow>
-              <Link href={`/asset/${assetId}`} key={assetId}>
+              <Link href={`/asset/${assetId}`} key={assetId} legacyBehavior>
                 {assetId}
               </Link>
               <Copy info="Asset ID" data={assetId} />
@@ -222,13 +227,49 @@ const Assets: React.FC = () => {
     Filters: AssetsFilters,
   };
 
+  const tableHeaders = [
+    `${t('common:Titles.Overview')}`,
+    `${t('common:Titles.Pools')}`,
+  ];
+  const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
+
+  const tabProps: ITabs = {
+    headers: tableHeaders,
+    onClick: header => {
+      setSelectedTab(header),
+        setQueryAndRouter({ ...router.query, tab: header }, router);
+    },
+  };
+
+  const SelectedTabComponent: React.FC<PropsWithChildren> = () => {
+    switch (selectedTab) {
+      case `${t('common:Titles.Overview')}`:
+        return (
+          <>
+            <Header>
+              <Title title={t('common:Titles.Assets')} Icon={Icon} />
+            </Header>
+
+            <Table {...tableProps} />
+          </>
+        );
+      case `${t('common:Titles.Pools')}`:
+        return <AssetsPools />;
+      default:
+        return <div />;
+    }
+  };
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    setSelectedTab((router.query.tab as string) || tableHeaders[0]);
+  }, [router.isReady]);
+
   return (
     <Container>
-      <Header>
-        <Title title={t('common:Titles.Assets')} Icon={Icon} />
-      </Header>
-
-      <Table {...tableProps} />
+      <Tabs {...tabProps}>
+        <SelectedTabComponent />
+      </Tabs>
     </Container>
   );
 };

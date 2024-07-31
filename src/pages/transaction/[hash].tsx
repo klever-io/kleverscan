@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { getStatusIcon } from '@/assets/status';
 import { TransactionDetails as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
@@ -108,15 +109,15 @@ export interface IOverviewDetails {
   blockNum?: number;
   nonce: number | undefined;
   sender: string | undefined;
-  KappFeeRow?: React.FC;
+  KappFeeRow?: React.FC<PropsWithChildren>;
   bandwidthFee: number | undefined;
   kdaFee?: IKdaFee | undefined;
   precisionTransaction?: number | undefined;
   timestamp?: number;
   signature: string | string[] | undefined;
-  ThresholdComponent?: React.FC;
+  ThresholdComponent?: React.FC<PropsWithChildren>;
   loading?: boolean;
-  MultiSignList?: React.FC;
+  MultiSignList?: React.FC<PropsWithChildren>;
 }
 
 export const getRawTxTheme = (isDarkTheme = false): IRawTxTheme => {
@@ -140,7 +141,7 @@ export const getRawTxTheme = (isDarkTheme = false): IRawTxTheme => {
   };
 };
 
-export const OverviewDetails: React.FC<IOverviewDetails> = ({
+export const OverviewDetails: React.FC<PropsWithChildren<IOverviewDetails>> = ({
   hash,
   StatusIcon,
   status,
@@ -251,7 +252,9 @@ export const OverviewDetails: React.FC<IOverviewDetails> = ({
           ) : (
             <span>
               <CenteredRow>
-                <Link href={`/account/${sender || ''}`}>{sender || ''}</Link>
+                <Link href={`/account/${sender || ''}`} legacyBehavior>
+                  {sender || ''}
+                </Link>
                 <Copy data={sender} info="Sender" />
               </CenteredRow>
             </span>
@@ -360,7 +363,7 @@ export const OverviewDetails: React.FC<IOverviewDetails> = ({
   );
 };
 
-const Transaction: React.FC<ITransactionPage> = props => {
+const Transaction: React.FC<PropsWithChildren<ITransactionPage>> = props => {
   const { transaction, block } = props;
   const {
     hash,
@@ -392,8 +395,10 @@ const Transaction: React.FC<ITransactionPage> = props => {
 
   const [expandData, setExpandData] = useState(initializeExpandData());
   const { isDarkTheme } = useTheme();
-  const ReactJson = dynamic(import('react-json-view'), { ssr: false });
-
+  const ReactJson = dynamic(
+    () => import('react-json-view').then(mod => mod.default),
+    { ssr: false },
+  );
   const StatusIcon = getStatusIcon(status);
 
   const updateExpandArray = (index: number) => {
@@ -453,7 +458,9 @@ const Transaction: React.FC<ITransactionPage> = props => {
     return <span>{hexToString(data)}</span>;
   };
 
-  const ContractComponent: React.FC<any> = ({ contracts }) => {
+  const ContractComponent: React.FC<PropsWithChildren<any>> = ({
+    contracts,
+  }) => {
     return (
       <div>
         {contracts.map((contract: IIndexedContract, index: number) => {
@@ -782,7 +789,7 @@ const Transaction: React.FC<ITransactionPage> = props => {
     );
   };
 
-  const KappFeeRow: React.FC = () => {
+  const KappFeeRow: React.FC<PropsWithChildren> = () => {
     if (status === 'fail') {
       return (
         <KappFeeSpan>

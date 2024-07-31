@@ -5,7 +5,7 @@ commonLabels:
   branch: development
   env: dev
 patchesStrategicMerge:
-- web-server.yaml
+  - web-server.yaml
 resources:
   - hpa.yaml
 bases:

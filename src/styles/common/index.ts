@@ -257,7 +257,7 @@ export const DoubleRow = styled.div<TableRowElementProps>`
   width: fit-content;
 
   ${props =>
-    props.smaller &&
+    props.$smaller &&
     css`
       gap: 4px;
     `}
@@ -402,11 +402,11 @@ export const CardHeaderItem = styled.div<{ selected: boolean }>`
 `;
 
 export const DefaultScrollBar = css`
-  ::-webkit-scrollbar {
+  &::-webkit-scrollbar {
     width: 0.3em;
     z-index: 1;
   }
-  ::-webkit-scrollbar-track {
+  &::-webkit-scrollbar-track {
     margin-top: 0.75rem;
     margin-bottom: 0.75rem;
     box-shadow: inset 0 0 0.25rem rgba(0, 0, 0, 0.1);
@@ -414,7 +414,7 @@ export const DefaultScrollBar = css`
     cursor: pointer !important;
   }
 
-  ::-webkit-scrollbar-thumb {
+  &::-webkit-scrollbar-thumb {
     background-color: ${props => transparentize(0.2, props.theme.violet)};
     border-radius: 10px;
     cursor: pointer !important;
@@ -448,12 +448,17 @@ export const Status = styled.div<IStatus>`
     color: ${props =>
       props.status === 'ApprovedProposal'
         ? props.theme.table['success']
-        : props.theme.table[props.status]} !important;
+        : props.theme.table[
+            props.status as keyof typeof props.theme.table
+          ]} !important;
     font-weight: bold;
   }
 
   p {
-    color: ${props => props.theme.table[props.status]} !important;
+    color: ${props =>
+      props.theme.table[
+        props.status as keyof typeof props.theme.table
+      ]} !important;
     text-transform: capitalize;
   }
 

@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { ITooltipContent } from '@/pages/charts';
 import { formatAmount } from '@/utils/formatFunctions';
 import React from 'react';
@@ -36,7 +37,12 @@ const CustomTooltip = ({ payload, label, active }: ITooltipContent) => {
   return null;
 };
 
-const Chart: React.FC<IChart> = ({ data, theme, value, value2 }) => {
+const Chart: React.FC<PropsWithChildren<IChart>> = ({
+  data,
+  theme,
+  value,
+  value2,
+}) => {
   const axisProps = {
     axisLine: false,
     tickLine: false,

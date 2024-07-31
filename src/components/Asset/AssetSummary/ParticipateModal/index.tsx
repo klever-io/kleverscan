@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { isFloat } from '@/components/FungibleITO';
 import { StyledArrow } from '@/components/Layout/Title/styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
@@ -44,7 +45,9 @@ interface ParticipateModalProps {
   setLoading: (state: boolean) => void;
 }
 
-export const ParticipateModal: React.FC<ParticipateModalProps> = ({
+export const ParticipateModal: React.FC<
+  PropsWithChildren<ParticipateModalProps>
+> = ({
   isOpenParticipateModal,
   setOpenParticipateModal,
   ITO,
@@ -154,7 +157,7 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
 
     for (const rangeIndex in range) {
       if (amount <= range[rangeIndex]) {
-        priceIndex = rangeIndex;
+        priceIndex = Number(rangeIndex);
         break;
       }
     }
@@ -218,7 +221,7 @@ export const ParticipateModal: React.FC<ParticipateModalProps> = ({
 
     for (const rangeIndex in range) {
       if (cost <= range[rangeIndex]) {
-        priceIndex = rangeIndex;
+        priceIndex = Number(rangeIndex);
         break;
       }
     }

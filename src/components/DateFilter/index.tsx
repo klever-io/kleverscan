@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { ArrowLeft, ArrowRight, WarningIcon } from '@/assets/calendar';
 import { Calendar as CalendarIcon } from '@/assets/icons';
 import { setQueryAndRouter } from '@/utils';
@@ -35,7 +36,7 @@ export interface IRouterDate {
   enddate: Date | string;
 }
 
-const DateFilter: React.FC = () => {
+const DateFilter: React.FC<PropsWithChildren> = () => {
   const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
   const router = useRouter();
 
@@ -223,7 +224,7 @@ const DateFilter: React.FC = () => {
   }, [selectedDays, filterDate]);
 
   const handleClear = useCallback(
-    e => {
+    (e: React.MouseEvent) => {
       e.stopPropagation();
       e.preventDefault();
 
@@ -265,7 +266,7 @@ const DateFilter: React.FC = () => {
   ];
 
   return router.isReady ? (
-    <FilterContainer>
+    <FilterContainer open={calendarOpen}>
       <span>Date Filter</span>
       <Container
         onBlur={() => !dontBlur && setCalendarOpen(false)}

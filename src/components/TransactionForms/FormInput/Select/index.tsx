@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -30,7 +31,7 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   customOnChange?: (e: any) => void;
 }
 
-const Filter: React.FC<IFilter> = ({
+const Filter: React.FC<PropsWithChildren<IFilter>> = ({
   options,
   name,
   selectPlaceholder,

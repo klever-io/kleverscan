@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { getStatusIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
 import QrCodeModal from '@/components/QrCodeModal';
@@ -17,7 +18,10 @@ interface KDAPoolTabProps extends AssetProps {
   assetPool: IAssetPool | undefined;
 }
 
-export const KDAPoolTab: React.FC<KDAPoolTabProps> = ({ asset, assetPool }) => {
+export const KDAPoolTab: React.FC<PropsWithChildren<KDAPoolTabProps>> = ({
+  asset,
+  assetPool,
+}) => {
   const { t } = useTranslation(['common', 'assets']);
 
   const isActive = assetPool?.active;
@@ -31,7 +35,7 @@ export const KDAPoolTab: React.FC<KDAPoolTabProps> = ({ asset, assetPool }) => {
         </span>
 
         <div>
-          <Link href={`/account/${assetPool?.ownerAddress}`}>
+          <Link href={`/account/${assetPool?.ownerAddress}`} legacyBehavior>
             <HoverAnchor>{assetPool?.ownerAddress}</HoverAnchor>
           </Link>
           <Copy data={assetPool?.ownerAddress} info="ownerAddress" />

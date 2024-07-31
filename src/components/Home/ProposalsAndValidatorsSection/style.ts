@@ -103,7 +103,7 @@ export const NextImageValidatorWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  :nth-child(1) {
+  &:nth-child(1) {
     position: absolute;
   }
 `;

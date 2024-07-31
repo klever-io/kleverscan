@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { getStatusIcon } from '@/assets/status';
 import { useMobile } from '@/contexts/mobile';
 import { ContractsName } from '@/types/contracts';
@@ -14,7 +15,7 @@ import {
   TransactionTimer,
 } from '@/views/home';
 import { useTranslation } from 'next-i18next';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { ITransaction } from '../../types';
@@ -35,7 +36,7 @@ export interface IContract {
   precision?: number;
 }
 
-const TransactionItem: React.FC<ITransaction> = ({
+const TransactionItem: React.FC<PropsWithChildren<ITransaction>> = ({
   hash,
   timestamp,
   contract,
@@ -81,13 +82,11 @@ const TransactionItem: React.FC<ITransaction> = ({
     }
     if (contract.length === 1 && checkContract) {
       return (
-        <Link href={`/asset/${assetId || 'KLV'}`}>
-          <a className="clean-style">
-            <SpanWithLimit>
-              {amount && `${amount} ${assetId || 'KLV'}`}
-              {!amount && <Skeleton />}
-            </SpanWithLimit>
-          </a>
+        <Link href={`/asset/${assetId || 'KLV'}`} className="clean-style">
+          <SpanWithLimit>
+            {amount && `${amount} ${assetId || 'KLV'}`}
+            {!amount && <Skeleton />}
+          </SpanWithLimit>
         </Link>
       );
     }
@@ -132,11 +131,7 @@ const TransactionItem: React.FC<ITransaction> = ({
         <TransactionData>
           <p>
             <Link href={`/transaction/${hash}`}>
-              <a>
-                {isMobile
-                  ? `${hash.slice(0, 15)}...`
-                  : `${hash.slice(0, 30)}...`}
-              </a>
+              {isMobile ? `${hash.slice(0, 15)}...` : `${hash.slice(0, 30)}...`}
             </Link>
           </p>
           <TransactionAmount>
@@ -146,26 +141,23 @@ const TransactionItem: React.FC<ITransaction> = ({
         <TransactionData>
           <p>
             <span>
-              <Link href={`/account/${sender}`}>
-                <a className="clean-style">
-                  {t('From')}:{' '}
-                  {isMobile
-                    ? parseAddress(sender, 12)
-                    : parseAddress(sender, 26)}
-                </a>
+              <Link href={`/account/${sender}`} className="clean-style">
+                {t('From')}:{' '}
+                {isMobile ? parseAddress(sender, 12) : parseAddress(sender, 26)}
               </Link>
             </span>
           </p>
 
-          <Link href={`/account/${contractFilter?.parameter?.toAddress}`}>
-            <a className="clean-style">
-              {t('To')}:{' '}
-              {contractFilter?.parameter?.toAddress
-                ? isMobile
-                  ? parseAddress(contractFilter?.parameter?.toAddress, 12)
-                  : parseAddress(contractFilter?.parameter?.toAddress, 15)
-                : '--'}
-            </a>
+          <Link
+            href={`/account/${contractFilter?.parameter?.toAddress}`}
+            className="clean-style"
+          >
+            {t('To')}:{' '}
+            {contractFilter?.parameter?.toAddress
+              ? isMobile
+                ? parseAddress(contractFilter?.parameter?.toAddress, 12)
+                : parseAddress(contractFilter?.parameter?.toAddress, 15)
+              : '--'}
           </Link>
         </TransactionData>
       </TransactionContainerContent>
@@ -173,7 +165,7 @@ const TransactionItem: React.FC<ITransaction> = ({
   );
 };
 
-export const TransactionItemLoading: React.FC = () => {
+export const TransactionItemLoading: React.FC<PropsWithChildren> = () => {
   return (
     <TransactionRow>
       <TransactionData $loading>

@@ -5,7 +5,7 @@ import { setQueryAndRouter } from '@/utils';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { processRowSectionsLayout } from '@/utils/table';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
 import { IoReloadSharp } from 'react-icons/io5';
 import { useQuery } from 'react-query';
@@ -65,7 +65,7 @@ export interface ITable {
   interval?: number;
   intervalController?: React.Dispatch<React.SetStateAction<number>>;
   showLimit?: boolean;
-  Filters?: React.FC;
+  Filters?: React.FC<PropsWithChildren>;
   smaller?: boolean;
   showPagination?: boolean;
 }
@@ -79,7 +79,7 @@ const onErrorHandler = () => {
   };
 };
 
-const Table: React.FC<ITable> = ({
+const Table: React.FC<PropsWithChildren<ITable>> = ({
   type,
   header,
   rowSections,
@@ -309,12 +309,13 @@ const Table: React.FC<ITable> = ({
                             smaller={smaller}
                             totalColumns={header.length}
                             currentColumn={index2}
+                            data-testid={`table-row-${index}`}
                           >
                             {isMobile || isTablet ? (
                               <MobileHeader>{header[index2]}</MobileHeader>
                             ) : null}
                             {Element({
-                              smaller,
+                              $smaller: smaller,
                             })}
                           </MobileCardItem>
                         );

@@ -88,11 +88,11 @@ export const WizardBody = styled.div<{ isFirstContent?: boolean }>`
     height: 100%;
   }
 
-  ::-webkit-scrollbar {
+  &::-webkit-scrollbar {
     width: 0.3em;
     z-index: 1;
   }
-  ::-webkit-scrollbar-track {
+  &::-webkit-scrollbar-track {
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
     box-shadow: inset 0 0 0.25rem rgba(0, 0, 0, 0.3);
@@ -100,7 +100,7 @@ export const WizardBody = styled.div<{ isFirstContent?: boolean }>`
     cursor: pointer !important;
   }
 
-  ::-webkit-scrollbar-thumb {
+  &::-webkit-scrollbar-thumb {
     background-color: ${props => transparentize(0.2, props.theme.violet)};
     border-radius: 10px;
     cursor: pointer !important;
@@ -143,8 +143,8 @@ export const WizardItemContainer = styled.div<{ stepSelected: number }>`
         rgba(255, 255, 255, 0) 90%
       );
 
-      ::after,
-      ::before {
+      &::after,
+      &::before {
         content: '';
         border: 0;
       }
@@ -154,8 +154,8 @@ export const WizardItemContainer = styled.div<{ stepSelected: number }>`
   &:nth-last-child(-n + ${props => props.stepSelected - 3}) {
     > div {
       opacity: 0;
-      ::after,
-      ::before {
+      &::after,
+      &::before {
         content: '';
         border: 0;
       }
@@ -176,7 +176,7 @@ export const WizardLabel = styled.div<{ isDone?: boolean }>`
   position: relative;
   background: ${props => props.theme.lightGray};
 
-  ::before {
+  &::before {
     content: '';
     border-top: 50px solid transparent;
     border-bottom: 50px solid transparent;
@@ -189,7 +189,7 @@ export const WizardLabel = styled.div<{ isDone?: boolean }>`
     margin-left: 1px;
   }
 
-  ::after {
+  &::after {
     content: '';
     border-top: 50px solid transparent;
     border-bottom: 50px solid transparent;
@@ -209,7 +209,7 @@ export const WizardLabel = styled.div<{ isDone?: boolean }>`
       background: ${props => props.theme.violet} !important;
       z-index: 5;
 
-      ::after {
+      &::after {
         border-left: 30px solid ${props => props.theme.violet};
       }
     `}
@@ -229,7 +229,10 @@ export const WizardButtonContainer = styled.div`
   margin-top: 5rem;
 `;
 
-export const WizardButton = styled.button<{
+export const WizardButton = styled.button.attrs(props => ({
+  type: props.type || 'button',
+}))<{
+  type?: 'button' | 'submit' | 'reset';
   secondary?: boolean;
   centered?: boolean;
   fullWidth?: boolean;
@@ -450,11 +453,13 @@ export const GenericInput = styled.input<{
   font-size: 1.5rem;
   color: ${({ theme }) => theme.black};
   font-family: Manrope, sans-serif;
-  transition: border 500ms ease, background-color 500ms ease;
+  transition:
+    border 500ms ease,
+    background-color 500ms ease;
   color-scheme: ${props => (props.theme.dark ? 'dark' : 'auto')};
   /* Chrome, Safari, Edge, Opera */
-  ::-webkit-outer-spin-button,
-  ::-webkit-inner-spin-button {
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
@@ -665,7 +670,7 @@ export const PrecicionsContainer = styled.div`
   }
 `;
 
-export const PrecisionCard = styled.div<{ isSelected: boolean }>`
+export const PrecisionCard = styled.div<{ $isSelected: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -681,7 +686,7 @@ export const PrecisionCard = styled.div<{ isSelected: boolean }>`
   font-weight: 700;
   transition: 200ms ease;
   ${props =>
-    props.isSelected &&
+    props.$isSelected &&
     css`
       border: 1px solid ${({ theme }) => theme.violet};
       color: ${({ theme }) => theme.violet};
@@ -940,7 +945,7 @@ export const StepsContainer = styled.div<{ advancedSteps?: boolean }>`
       justify-content: space-between;
     `}
 
-  ::before {
+  &::before {
     content: '';
     position: absolute;
     top: 65%;
@@ -952,7 +957,7 @@ export const StepsContainer = styled.div<{ advancedSteps?: boolean }>`
   }
 
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
-    ::before {
+    &::before {
       content: '';
       position: absolute;
       top: 1rem;

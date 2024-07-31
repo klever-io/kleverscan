@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { FAQCard } from './Card';
 import { FAQContainer } from './styles';
 
@@ -27,7 +28,7 @@ const FAQCards = [
   },
 ];
 
-export const LaunchPadFAQCards: React.FC = () => {
+export const LaunchPadFAQCards: React.FC<PropsWithChildren> = () => {
   return (
     <FAQContainer>
       {FAQCards.map((card, index) => (

@@ -19,7 +19,7 @@ export const TooltipBody = styled.article<{ isInHomePage: boolean }>`
     left: 0rem;
   }
 
-  :after {
+  &:after {
     content: '';
     display: inline-block;
     background-color: ${props =>
@@ -39,7 +39,7 @@ export const LeaveButton = styled(AiOutlineClose)`
   text-align: right;
   fill: ${props => props.theme.white};
   top: 22px;
-  :hover {
+  &:hover {
     cursor: pointer;
   }
   fill: ${props => props.theme.white} !important;
@@ -228,7 +228,7 @@ export const AssetNameWrapper = styled.div`
 `;
 
 export const HoverDiv = styled.div`
-  :hover {
+  &:hover {
     cursor: pointer;
   }
 `;
@@ -255,7 +255,7 @@ export const RedirectSVG = styled.span`
   & path {
     fill: ${props => props.theme.white};
   }
-  :hover {
+  &:hover {
     cursor: pointer;
   }
   svg {

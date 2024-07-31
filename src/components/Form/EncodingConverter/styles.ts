@@ -62,7 +62,7 @@ export const ContentButton = styled.div<{ selected?: boolean }>`
       }
     `}
 
-  :active {
+  &:active {
     box-shadow: 0 0 10px 5px ${({ theme }) => theme.border};
   }
 `;
@@ -85,7 +85,7 @@ export const EncodingTextArea = styled(StyledTextArea)`
   }
   min-width: 6rem;
   font-size: 0.85rem;
-  :focus {
+  &:focus {
     box-shadow: unset;
     border: 1px solid ${({ theme }) => theme.violet};
     outline: 0;

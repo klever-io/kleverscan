@@ -43,7 +43,7 @@
     "basicOptions": {
       "basicInfoText": "Basic information",
       "ownerAddress": "Owner Address",
-      "whatTickerPrecison": "What will be {{ticker}} precision?",
+      "whatTickerPrecision": "What will be {{ticker}} precision?",
       "precisionHint": "Token precision refers to the number of decimal places that can be used to represent fractional amounts of a token.",
       "kleverPrecisionTip": "Klever Tip: Token precision is an important consideration when creating a token because it affects the usability and divisibility of the token.",
       "initialSupplyOf": "Initial Supply of {{ticker}}",
@@ -138,7 +138,7 @@
         "royaltyReceiverAddress": "Royalty receiver address",
         "howRoyaltiesSplit": "How the royalties are split",
         "transferPercentageReceiverAddressFee": " Percentage that the given address will receive from 'transfer percentage' fee. ( Precision 2, 100 = 100%)",
-        "itoPercentageReceiverAddressFee": "Percentage that the given address receive from 'ITO percentage' fee. ( Precision 2, 100 = 100%)",
+        "percentITOPercentageReceiverAddressFee": "Percentage that the given address receive from 'ITO percentage' fee. ( Precision 2, 100 = 100%)",
         "itoFixedReceiverAddressFee": "Percentage that the given address will receive from 'ITO fixed' fee. ( Precision 2, 100 = 100%)"
       }
     },

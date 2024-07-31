@@ -60,7 +60,10 @@ export function usePrecision(
   }
 }
 
-type PartialResponse = IAssetsResponse | IValidatorResponse;
+type PartialResponse =
+  | IAssetsResponse
+  | IValidatorResponse
+  | { [key: string]: any };
 
 export const useFetchPartial = <T,>(
   type: string,
@@ -107,7 +110,9 @@ export const useFetchPartial = <T,>(
           if (
             value &&
             !items.find(asset =>
-              asset[dataType].toUpperCase().includes(value.toUpperCase()),
+              (asset as { [key: string]: string })[dataType]
+                .toUpperCase()
+                .includes(value.toUpperCase()),
             )
           ) {
             setLoading(true);
@@ -152,14 +157,14 @@ export const useSkeleton = (): [
   (
     value: string | number | undefined | JSX.Element[],
     skeletonParams?: { height?: string | number; width?: number | string },
-  ) => Element | number | string | JSX.Element | JSX.Element[],
+  ) => number | string | JSX.Element | JSX.Element[],
   Dispatch<SetStateAction<boolean>>,
 ] => {
   const [loading, setLoading] = useState(true);
   const isSkeleton = (
     value: string | number | undefined | JSX.Element[],
     skeletonParams?: { height?: string | number; width?: number | string },
-  ): Element | number | string | JSX.Element | JSX.Element[] => {
+  ): number | string | JSX.Element | JSX.Element[] => {
     return !loading && value ? value : <Skeleton {...skeletonParams} />;
   };
   return [isSkeleton, setLoading];

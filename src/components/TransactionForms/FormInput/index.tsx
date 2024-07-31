@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { setQueryAndRouter } from '@/utils';
 import { useDidUpdateEffect } from '@/utils/hooks';
@@ -143,7 +144,9 @@ export const onChangeWrapper = (
   };
 };
 
-const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
+const FormInput: React.FC<
+  PropsWithChildren<IFormInputProps | ICustomFormInputProps>
+> = ({
   name,
   title,
   type,
@@ -286,7 +289,7 @@ const FormInput: React.FC<IFormInputProps | ICustomFormInputProps> = ({
     };
   }, [name, unregister, isCustom]);
 
-  const areaProps = {
+  const areaProps: any = {
     error: Boolean(error),
     logoWarning: logoError !== null ? true : false,
     value: rest.value,

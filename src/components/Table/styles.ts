@@ -262,12 +262,17 @@ export const Status = styled.span<IStatus>`
   color: ${props =>
     props.status === 'ApprovedProposal'
       ? props.theme.table['success']
-      : props.theme.table[props.status]} !important;
+      : props.theme.table[
+          props.status as keyof typeof props.theme.table
+        ]} !important;
 
   background-color: ${props =>
     props.status === 'ApprovedProposal'
       ? transparentize(0.8, props.theme.table['success'])
-      : transparentize(0.8, props.theme.table[props.status])} !important;
+      : transparentize(
+          0.8,
+          props.theme.table[props.status as keyof typeof props.theme.table],
+        )} !important;
 
   padding: 2px 6px;
   border-radius: 24px;

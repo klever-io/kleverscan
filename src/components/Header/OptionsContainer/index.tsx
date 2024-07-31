@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useTheme } from '@/contexts/theme';
 import {
   Container,
@@ -11,7 +12,7 @@ interface IOptionsContainer {
   isConnected?: boolean;
 }
 
-const OptionsContainer: React.FC<IOptionsContainer> = ({
+const OptionsContainer: React.FC<PropsWithChildren<IOptionsContainer>> = ({
   isConnected = null,
 }) => {
   const theme = useTheme();

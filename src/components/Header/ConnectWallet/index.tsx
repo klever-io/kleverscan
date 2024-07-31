@@ -1,9 +1,10 @@
+import { PropsWithChildren } from 'react';
 import { AccountDetailsModal } from '@/components/AccountDetailsModal';
 import Tour from '@/components/Tour';
 import { useExtension } from '@/contexts/extension';
 import { useScroll } from '@/utils/hooks';
 import { parseAddress } from '@/utils/parseValues';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import WalletHelp from '../WalletHelp';
@@ -23,7 +24,9 @@ interface IConnectWallet {
   clickConnection: () => void;
 }
 
-const ConnectWallet: React.FC<IConnectWallet> = ({ clickConnection }) => {
+const ConnectWallet: React.FC<PropsWithChildren<IConnectWallet>> = ({
+  clickConnection,
+}) => {
   const router = useRouter();
   const autoConnectWallet = router.query?.autoconnect;
   const { isDeviceMobileCheck } = useMobile();

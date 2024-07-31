@@ -23,7 +23,7 @@ import { toLocaleFixed } from '@/utils/formatFunctions';
 import { useDebounce } from '@/utils/hooks';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { FieldError, useFormContext } from 'react-hook-form';
 import { IoReloadSharp } from 'react-icons/io5';
 import { useQuery } from 'react-query';
@@ -38,7 +38,9 @@ interface IKDASelect {
   getAssets?: () => Promise<ICollectionList[]>;
 }
 
-export const NamedKDASelect: React.FC<IKDASelect> = props => {
+export const NamedKDASelect: React.FC<
+  PropsWithChildren<IKDASelect>
+> = props => {
   const { required } = props;
   const shouldUseOwnedCollections = props?.shouldUseOwnedCollections || false;
   const allowedAssets = props?.allowedAssets || ['*'];
@@ -176,7 +178,9 @@ export const NamedKDASelect: React.FC<IKDASelect> = props => {
   );
 };
 
-const CollectionIDField: React.FC<{ name: string }> = props => {
+const CollectionIDField: React.FC<
+  PropsWithChildren<{ name: string }>
+> = props => {
   const name = props.name;
   const [isCustom, setIsCustom] = useState(false);
   const [collectionInputValue, setCollectionInputValue] = useState('');

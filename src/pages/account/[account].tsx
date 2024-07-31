@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { KLV } from '@/assets/coins';
 import { AccountDetails as AccountIcon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
@@ -105,14 +106,13 @@ interface IPermissionOperations {
   type: number;
 }
 
-const EmptyComponent: React.FC = () => {
+const EmptyComponent: React.FC<PropsWithChildren> = () => {
   return <></>;
 };
 
-const PermissionOperations: React.FC<IPermissionOperations> = ({
-  operations,
-  type,
-}) => {
+const PermissionOperations: React.FC<
+  PropsWithChildren<IPermissionOperations>
+> = ({ operations, type }) => {
   const [expanded, setExpanded] = useState(false);
   const { t } = useTranslation('common');
   const toggleExpand = () => {
@@ -163,7 +163,7 @@ const PermissionOperations: React.FC<IPermissionOperations> = ({
   );
 };
 
-const Account: React.FC<IAccountPage> = () => {
+const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
   const { t } = useTranslation(['common', 'accounts']);
   const headers = [
     t('common:Titles.Assets'),
@@ -355,7 +355,7 @@ const Account: React.FC<IAccountPage> = () => {
     setQuery: setQueryAndRouter,
   };
 
-  const SelectedComponent: React.FC = () => {
+  const SelectedComponent: React.FC<PropsWithChildren> = () => {
     switch (selectedTabHeader) {
       case t('common:Tabs.Overview'):
         return <Overview />;
@@ -365,11 +365,11 @@ const Account: React.FC<IAccountPage> = () => {
         return <div />;
     }
   };
-  const SelectedTabComponent: React.FC = () => {
+  const SelectedTabComponent: React.FC<PropsWithChildren> = () => {
+    const Filters = showInteractionButtons ? CreateAssetButton : undefined;
+
     switch (router?.query?.tab || t('common:Titles.Assets')) {
       case t('common:Titles.Assets'):
-        const Filters = showInteractionButtons ? CreateAssetButton : undefined;
-
         return (
           <Assets
             assetsTableProps={assetsTableProps}
@@ -514,7 +514,7 @@ const Account: React.FC<IAccountPage> = () => {
 
   (account?.permissions?.length || 0) > 0 &&
     tabHeaders.push(t('accounts:SingleAccount.Tabs.Permission'));
-  const Permission: React.FC = () => {
+  const Permission: React.FC<PropsWithChildren> = () => {
     const msg = `Owner - This is the default permission, 
     granting the holder the ability to execute all contracts.
     The permission can be transferred to another person and
@@ -608,7 +608,7 @@ const Account: React.FC<IAccountPage> = () => {
     );
   };
 
-  const Overview: React.FC = () => {
+  const Overview: React.FC<PropsWithChildren> = () => {
     return (
       <Container>
         <Row isMobileRow>
@@ -648,7 +648,9 @@ const Account: React.FC<IAccountPage> = () => {
                   <div>
                     <BalanceKLVValue>
                       {!isLoadingAccount ? (
-                        totalKLV.toLocaleString()
+                        <span data-testid="klv-balance">
+                          {totalKLV.toLocaleString()}
+                        </span>
                       ) : (
                         <Skeleton height={19} />
                       )}
@@ -811,6 +813,7 @@ const Account: React.FC<IAccountPage> = () => {
               onClick={() => {
                 setSelectedTabHeader(header);
               }}
+              data-testid={`header-tab`}
             >
               <span>{header}</span>
             </CardHeaderItem>

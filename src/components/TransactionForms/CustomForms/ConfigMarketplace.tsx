@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useExtension } from '@/contexts/extension';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -12,7 +13,7 @@ type FormData = {
   receiver: string;
 };
 
-const ConfigMarketplace: React.FC<IContractProps> = ({
+const ConfigMarketplace: React.FC<PropsWithChildren<IContractProps>> = ({
   formKey,
   handleFormSubmit,
 }) => {

@@ -2,6 +2,7 @@ import { TFunction } from 'next-i18next';
 import React, { PropsWithChildren, useState } from 'react';
 import { WizCreateITO } from '../createITO/configITO';
 import WizCreateNFT from './createNFT';
+import { WizCreateSFT } from './CreateSFT';
 import WizCreateToken from './createToken';
 
 export interface IWizardComponents {
@@ -90,7 +91,7 @@ export const propertiesValues = (t: TFunction): any[] => {
       isDefaultChecked: true,
       property: 'canChangeOwner',
       tooltip: t(
-        'wizards:common.advancedOptions.properties.tooltipChangeOwner',
+        'wizards:common.advancedOptions.properties.tooltipChangeOwner'
       ),
     },
     {
@@ -139,6 +140,9 @@ const CreateAssetWizard: React.FC<PropsWithChildren<any>> = ({
   const CreateContractWizard: React.FC<PropsWithChildren> = () => {
     if (isOpen === 'Token') {
       return <WizCreateToken {...stepsProps} />;
+    }
+    if (isOpen === 'SFT') {
+      return <WizCreateSFT {...stepsProps} />;
     }
     if (isOpen === 'NFT') {
       return <WizCreateNFT {...stepsProps} />;

@@ -206,6 +206,58 @@
       }
     }
   },
+  "createSFT": {
+    "welcome": {
+      "title": "Create a semi fungible token",
+      "description": "To create a KDA fungible token we will guide you through a few steps.",
+      "tooltip": "What is a fungible token?",
+      "kleverTip": "Physical money and cryptocurrencies are fungible, which means they can be traded or exchanged for one another."
+    },
+    "name": {
+      "title": "What will be the name of your token?",
+      "description": "Examples of token names: Bitcoin, Ethereum, Matic, Klever...Don't worry, you will have the opportunity to choose the ticker name next.",
+      "kleverTip": "Klever Tip: Choose the name carefully, it will most likely be your brand on the blockchain."
+    },
+    "ticker": {
+      "title": "What is your token's ticker?",
+      "description": "Now you will choose your ticker, it will represent your token in wallets and exchanges. Examples of Ticker names: BTC, ETH, KLV, BNB..."
+    },
+    "ownerAddress": {
+      "description": "This address will be the token manager and will be able to edit some settings. Only the Owner of the token can do this."
+    },
+    "maxSupply": {
+      "description": "The max amount is the upper limit for the total supply of tokens that can be minted",
+      "kleverTip": "If no value is specified now, the initial max amount will be set to infinity. This value can be adjusted later, but use with caution and consider the impact on the token's value and usability."
+    },
+    "advancedSteps": {
+      "properties": {
+        "title": "Review or change your token's properties.",
+        "description": "The settings will only be applied after creating the token, so they don't affect the settings you made during this process."
+      }
+    },
+    "transactionSuccess": {
+      "description": "When confirmed on the blockchain, your token will be created.",
+      "secondDescription": "The token contract is generated after this confirmation."
+    },
+    "stepsInformations": {
+      "basicStepsLabels": {
+        "tokenName": "Token Name",
+        "tokenTicker": "Token Ticker",
+        "ownerAddress": "Owner Address",
+        "tokenPrecision": "Token Precision",
+        "initialSupply": "Initial Supply",
+        "maxSupply": "Maximum Supply",
+        "tokenImage": "Token Image"
+      },
+      "advancedStepsLabels": {
+        "uri": "Uri",
+        "staking": "Staking",
+        "royalties": "Royalties",
+        "roles": "Roles",
+        "properties": "Properties"
+      }
+    }
+  },
   "createNFT": {
     "welcome": {
       "title": "Create a NFT",

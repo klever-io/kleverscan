@@ -205,6 +205,58 @@
       }
     }
   },
+  "createSFT": {
+    "welcome": {
+      "title": "Criar um token fungível",
+      "description": "Para criar um token KDA fungível, iremos guiá-lo através de alguns passos.",
+      "tooltip": "O que é um token fungível?",
+      "kleverTip": "Dinheiro físico e criptomoedas são fungíveis, o que significa que podem ser negociados ou trocados uns pelos outros."
+    },
+    "name": {
+      "title": "Qual será o nome do seu token?",
+      "description": "Exemplos de nomes de tokens: Bitcoin, Ethereum, Matic, Klever... Não se preocupe, você terá a oportunidade de escolher o nome do ticker em seguida.",
+      "kleverTip": "Dica Klever: Escolha o nome cuidadosamente, provavelmente será sua marca na blockchain."
+    },
+    "ticker": {
+      "title": "Qual é o ticker do seu token?",
+      "description": "Agora você escolherá seu ticker, que representará seu token em carteiras e exchanges. Exemplos de nomes de tickers: BTC, ETH, KLV, BNB..."
+    },
+    "ownerAddress": {
+      "description": "Este endereço será o gerenciador do token e poderá editar algumas configurações. Apenas o proprietário do token pode fazer isso."
+    },
+    "maxSupply": {
+      "description": "A quantidade máxima é o limite superior para o fornecimento total de tokens que podem ser criados",
+      "kleverTip": "Se nenhum valor for especificado agora, a quantidade máxima inicial será definida como infinito. Esse valor pode ser ajustado posteriormente, mas use com cautela e considere o impacto no valor e na usabilidade do token."
+    },
+    "advancedSteps": {
+      "properties": {
+        "title": "Revisar ou alterar as propriedades do seu token.",
+        "description": "As configurações só serão aplicadas após a criação do token, para que não afetem as configurações feitas durante este processo."
+      }
+    },
+    "transactionSuccess": {
+      "description": "Quando confirmado na blockchain, seu token será criado.",
+      "secondDescription": "O contrato do token é gerado após esta confirmação."
+    },
+    "stepsInformations": {
+      "basicStepsLabels": {
+        "tokenName": "Nome do Token",
+        "tokenTicker": "Ticker do Token",
+        "ownerAddress": "Endereço do Proprietário",
+        "tokenPrecision": "Precisão do Token",
+        "initialSupply": "Fornecimento Inicial",
+        "maxSupply": "Fornecimento Máximo",
+        "tokenImage": "Imagem do Token"
+      },
+      "advancedStepsLabels": {
+        "uri": "URI",
+        "staking": "Staking",
+        "royalties": "Royalties",
+        "roles": "Funções",
+        "properties": "Propriedades"
+      }
+    }
+  },
   "createNFT": {
     "welcome": {
       "title": "Criar um NFT",

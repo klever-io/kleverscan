@@ -41,7 +41,7 @@ export const ExtensionProvider: React.FC<PropsWithChildren> = ({
             setExtensionInstalled(false);
           },
           () => window.kleverWeb !== undefined,
-          1500, //timeout
+          1500 //timeout
         );
       }
     };
